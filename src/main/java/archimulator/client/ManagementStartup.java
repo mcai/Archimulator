@@ -115,12 +115,14 @@ public class ManagementStartup {
                         ExperimentProfile experimentProfile = new ExperimentProfile(simulatedProgram.getTitle() + "-" + processorProfile.getTitle(), processorProfile);
                         experimentProfile.addWorkload(simulatedProgram);
                         experimentProfile.fastForwardToPseudoCallAndInDetailForMaxInsts(pthreadSpawnedIndex, maxInsts);
+//                        experimentProfile.inDetailToEnd();
                         experimentProfiles.add(experimentProfile);
                     }
                     else if(simulatedProgram.getTitle().startsWith("mst_ht")) {
                         ExperimentProfile experimentProfile = new ExperimentProfile(simulatedProgram.getTitle() + "-" + processorProfile.getTitle(), processorProfile);
                         experimentProfile.addWorkload(simulatedProgram);
                         experimentProfile.fastForwardToPseudoCallAndInDetailForMaxInsts(pthreadSpawnedIndex, maxInsts);
+//                        experimentProfile.inDetailToEnd();
                         experimentProfile.addSimulationCapabilityClass(LLCReuseDistanceProfilingCapability.class);
                         experimentProfile.addSimulationCapabilityClass(HTLLCRequestProfilingCapability.class);
                         experimentProfiles.add(experimentProfile);
@@ -133,6 +135,7 @@ public class ManagementStartup {
                         ExperimentProfile experimentProfile = new ExperimentProfile(simulatedProgram.getTitle() + "-" + processorProfile.getTitle(), processorProfile);
                         experimentProfile.addWorkload(simulatedProgram);
                         experimentProfile.fastForwardToPseudoCallAndInDetailForMaxInsts(pthreadSpawnedIndex, maxInsts);
+//                        experimentProfile.inDetailToEnd();
                         experimentProfile.addSimulationCapabilityClass(LLCReuseDistanceProfilingCapability.class);
                         experimentProfiles.add(experimentProfile);
                     }

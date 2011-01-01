@@ -24,6 +24,7 @@ import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.base.experiment.capability.SimulationCapability;
 import archimulator.sim.base.simulation.Simulation;
 import archimulator.sim.core.BasicThread;
+import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.coherence.event.CoherentCacheServiceNonblockingRequestEvent;
 import archimulator.util.action.Action1;
@@ -41,7 +42,7 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
 
     private List<List<StackEntry>> stackEntries;
 
-    private Map<Integer, Long> reuseDistances;
+    private Map<CacheAccessType, Map<Integer, Long>> reuseDistances;
 
     private long numDownwardReads = 0;
     private long numDownwardWrites = 0;
@@ -64,7 +65,7 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
             }
         }
 
-        this.reuseDistances = new TreeMap<Integer, Long>();
+        this.reuseDistances = new TreeMap<CacheAccessType, Map<Integer, Long>>();
 
         llc.getBlockingEventDispatcher().addListener(CoherentCacheServiceNonblockingRequestEvent.class, new Action1<CoherentCacheServiceNonblockingRequestEvent>() {
             public void apply(CoherentCacheServiceNonblockingRequestEvent event) {
@@ -118,16 +119,18 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
         stats.put("llcReuseDistanceProfilingCapability." + this.llc.getName() + ".numDownwardWrites", this.numDownwardWrites);
         stats.put("llcReuseDistanceProfilingCapability." + this.llc.getName() + ".numEvicts", this.numEvicts);
 
-        for (int reuseDistance : this.reuseDistances.keySet()) {
-            stats.put("llcReuseDistanceProfilingCapability." + this.llc.getName() + ".ht_mt_inter-thread_stackDistances[" + reuseDistance + "]", String.valueOf(this.reuseDistances.get(reuseDistance)));
+        for (CacheAccessType accessType : this.reuseDistances.keySet()) {
+            for (int reuseDistance : this.reuseDistances.get(accessType).keySet()) {
+                stats.put("llcReuseDistanceProfilingCapability." + this.llc.getName() + ".ht_mt_inter-thread_reuseDistances[" + accessType + "][" + reuseDistance + "]", String.valueOf(this.reuseDistances.get(accessType).get(reuseDistance)));
+            }
         }
     }
 
     private void handleServicingRequest(CoherentCacheServiceNonblockingRequestEvent event) {
-        this.setLRU(event.getLineFound().getSet(), this.llc.getTag(event.getAddress()), event.getRequesterAccess().getThread().getId());
+        this.setLRU(event.getLineFound().getSet(), this.llc.getTag(event.getAddress()), event.getRequesterAccess().getThread().getId(), event.getAccessType());
     }
 
-    private void setLRU(int set, int tag, int broughterThreadId) {
+    private void setLRU(int set, int tag, int broughterThreadId, CacheAccessType accessType) {
         StackEntry stackEntryFound = this.getStackEntry(set, tag);
 
         int reuseDistance = -1;
@@ -138,6 +141,7 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
             
             oldBroughterThreadId = stackEntryFound.broughterThreadId;
             stackEntryFound.broughterThreadId = broughterThreadId;
+            stackEntryFound.accessType = accessType;
 
             this.stackEntries.get(set).remove(stackEntryFound);
             this.stackEntries.get(set).add(0, stackEntryFound);
@@ -164,7 +168,7 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
         }
 
         if(BasicThread.isHelperThread(oldBroughterThreadId) && BasicThread.isMainThread(broughterThreadId)) {
-            this.incReuseDistanceStat(reuseDistance);
+            this.incReuseDistanceStat(reuseDistance, accessType);
         }
     }
 
@@ -172,12 +176,16 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
         return this.stackEntries.get(set).get(this.maxReuseDistance - 1);
     }
 
-    private void incReuseDistanceStat(int reuseDistance) {
-        if (!this.reuseDistances.containsKey(reuseDistance)) {
-            this.reuseDistances.put(reuseDistance, 0L);
+    private void incReuseDistanceStat(int reuseDistance, CacheAccessType accessType) {
+        if (!this.reuseDistances.containsKey(accessType)) {
+            this.reuseDistances.put(accessType, new TreeMap<Integer, Long>());
         }
 
-        this.reuseDistances.put(reuseDistance, this.reuseDistances.get(reuseDistance) + 1);
+        if (!this.reuseDistances.get(accessType).containsKey(reuseDistance)) {
+            this.reuseDistances.get(accessType).put(reuseDistance, 0L);
+        }
+
+        this.reuseDistances.get(accessType).put(reuseDistance, this.reuseDistances.get(accessType).get(reuseDistance) + 1);
     }
 
     private StackEntry getStackEntry(int set, int tag) {
@@ -195,10 +203,12 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
     private static class StackEntry implements Serializable {
         private int broughterThreadId;
         private int tag;
+        private CacheAccessType accessType;
 
         private StackEntry() {
             this.broughterThreadId = -1;
             this.tag = -1;
+            this.accessType = CacheAccessType.UNKNOWN;
         }
     }
 }
