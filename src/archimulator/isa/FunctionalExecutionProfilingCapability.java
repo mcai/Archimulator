@@ -43,7 +43,7 @@ public class FunctionalExecutionProfilingCapability implements KernelCapability 
 
 //        final String[] args = {"", "/home/itecgo/Archimulator/benchmarks/CPU2006_Custom1/462.libquantum/baseline/462.libquantum.mips", "33", "5"}; //TODO: path should not be hard coded
 //        final String[] args = {"", "/home/itecgo/Archimulator/benchmarks/Olden_Custom1/em3d/baseline/em3d.mips", "400000", "128", "75", "1"}; //TODO: path should not be hard coded
-//        final String[] args = {"", "/home/itecgo/FleximJ/benchmarks/Olden_Custom1/mst/baseline/mst.mips", "1000"}; //TODO: path should not be hard coded
+//        final String[] args = {"", "/home/itecgo/Archimulator/benchmarks/Olden_Custom1/mst/baseline/mst.mips", "1000"}; //TODO: path should not be hard coded
         final String[] args = {"", "/home/itecgo/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline/429.mcf.mips", "<", "/home/itecgo/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline/data/ref/input/inp.in"}; //TODO: path should not be hard coded
 
         final NativeMipsIsaEmulatorCapability nativeMipsIsaEmulatorCapability = this.kernel.getCapability(NativeMipsIsaEmulatorCapability.class);

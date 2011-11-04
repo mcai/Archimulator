@@ -81,8 +81,7 @@ public class Startup {
     public static final SimulatedProgram SIMULATED_PROGRAM_MST_BASELINE = new SimulatedProgram(
             "Olden_Custom1",
             "mst_baseline_mips",
-//            "/home/itecgo/Archimulator/benchmarks/Olden_Custom1/mst/baseline",
-            "/home/itecgo/FleximJ/benchmarks/Olden_Custom1/mst/baseline",
+            "/home/itecgo/Archimulator/benchmarks/Olden_Custom1/mst/baseline",
             "mst.mips",
             "10000");
 //            "1000");
