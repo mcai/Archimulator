@@ -1,0 +1,29 @@
+Paper Title: Instruction-based Reuse Distance Prediction Replacement Policy
+
+Abstract:
+This paper presents a new cache replacement policy based on Instruction-based Reuse Distance Prediction (IbRDP) Replacement Policy originally proposed by Keramidas, Petoumenos, and Kaxiras [5] and further optimized by Petoumenos et al. [6]. In these works [5,6] we have proven that there is a strong correlation between the temporal characteristics of the cache blocks and the access patterns of instructions (PCs) that touch these cache blocks. Based on this observation we introduced a new class of instruction-based predictors which are able to directly predict with high accuracy at run-time when a cache block is going to be accessed in the future, a.k.a. the reuse distance of a cache block. Being able to predict the reuse distances of the cache blocks permits us to make near-optimal replacement decisions by "looking into the future."
+In this work, we employ an extension of the IbRDP Replacement policy [6]. We carefully re-design the organization as well as the functionality of the predictor and the corresponding replacement algorithm in order to fit into the tight area budget provided by the CRC committee [3]. Since our proposal naturally supports the ability to victimize the currently fetched blocks by not caching them at all in the cache (Selective Caching), we submit for evaluation two versions: the base-IbRDP and the IbRDP enhanced with Selective Caching (IbRDP+SC). 
+Our performance evaluations based on a subset of SPEC2006 applications show that IbRDP achieves an IPC improvement of 4.66% (arithmetic average) over traditional LRU, while IbRDP+SC is able to further increase its distance compared to the baseline LRU to 6.04%. Finally, we also show that IbRDP outperforms the previous state of the art proposal (namely Dynamic Insertion Policy or DIP [7]) by 2.32% in terms of IPC (3.81% for the IbRDP+SC).
+
+Authors:
+1) 
+First Name: Pavlos
+Last Name: Petoumenos
+email: ppetoumenos@ece.upatras.gr
+Affiliation: Department of Electrical and Computer Engineering, University of Patras, Greece
+
+2)
+First Name: Georgios
+Last Name: Keramidas
+email: keramidas@ece.upatras.gr
+Affiliation: Industrial Systems Institute, Patras, Greece
+
+3) 
+First Name: Stefanos
+Last Name: Kaxiras
+email: kaxiras@ece.upatras.gr
+Affiliation: Department of Electrical and Computer Engineering, University of Patras, Greece
+
+
+
+

@@ -1,0 +1,12 @@
+c0t0.totalInsts=60208905
+c0t1.totalInsts=0
+c1t0.totalInsts=0
+c1t1.totalInsts=0
+simulation.duration=00:00:19.7772529
+simulation.totalCycles=60208905
+simulation.totalInsts=60208905
+simulation.instsPerCycle=1.0
+simulation.cyclesPerSecond=3168889.736842105
+simulation.instsPerSecond=3168889.736842105
+experiment.beginTime=20111027_05-49-04
+experiment.workload=.(1000)

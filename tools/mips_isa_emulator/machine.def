@@ -1,0 +1,1331 @@
+/* INSTRUCTION SET DEFINITION
+ *
+ * Instruction definition:
+ * DEFINST(NAME,		BITS,
+ *	MASK,			FORMAT,
+ *	FUCLASS			FLAGS,
+ *	O1,O2,			I1,I2,I3)
+ *
+ *
+ *	BITS, MASK	Definen los bits de una instrucción. Para que una instrucción I case con
+ *			la actual, debe cumplir que (I & MASK == BITS). Si dos o más instrucciones
+ *			lo cumplen, se escogerá la primera de ellas.
+ *
+ *	FORMAT		Cadena de caracteres que indica el formato de la instrucción. Puede
+ *			contener los siguientes elementos separados por comas:
+ *
+ *		J	Target (constante sin signo)
+ *		j	Imm, etiqueta relativa al PC con signo
+ *		s	RS
+ *		b	RS (registro base)
+ *		t	RT
+ *		d	RD
+ *		R	FR
+ *		S	FS
+ *		T	FT
+ *		D	FD
+ *		o	Desplazamiento de Load
+ *		i	imm, entero con signo
+ *		u	uimm, entero sin signo
+ *		H	shift
+ *
+ *	FUCLASS		Unidad de ejecución capaz de procesar la instrucción. Puede ser
+ *			cualquiera de los siguientes valores:
+ *
+ *		fu_NONE		No utiliza ningúna unidad de ejecución
+ *		IntALU		Unidad de enteros
+ *		IntMULT
+ *		IntDIV
+ *		FloatADD
+ *		FloatCMP
+ *		FloatCVT	Conversor entero-coma flotante
+ *		FloatMULT
+ *		FloatDIV
+ *		FloatSQRT
+ *		RdPort		Puerto de lectura
+ *		WrPort		Puerto de escritura
+ *
+ *	FLAGS	Flags que indican el tipo de instrucción
+ *
+ *
+ *		F_ICOMP		Computación entera 
+ *		F_FCOMP		Computación coma flotante
+ *		F_CTRL		Instr de control
+ *		F_UNCOND		cambio incondicional
+ *		F_COND			cambio condicional
+ *		F_MEM		Acceso a memoria
+ *		F_LOAD			instr de carga
+ *		F_STORE			instr de almacenamiento
+ *		F_DISP			modo directo+despl
+ *		F_RR			modo registro-registro
+ *		F_DIRECT		modo directo
+ *		F_TRAP		Instr que produce 'trap'
+ *		F_LONGLAT	Instr de larga latencia
+ *		F_CALL		Llamada a función
+ *		F_RET		Retorno de función
+ *		F_FPCOND	Salto condicional coma flotante
+ *		F_IMM		Instr tiene operando inmediato
+ *
+ *	INx, OUTx	Dependencias de entrada y salida
+ *
+ *		DGPR(N)		Registro entero N
+ *		DFPR(N)		Registro real N de simple precisión
+ *		DREGHI		Registro REGHI
+ *		DREGLO		Registro REGLO
+ *		DFPC		Cualquier registro de control de coma flotante
+ *		DNA		No hay dependencia
+ *
+ *
+ * #define "INSTR"_ACTION
+ * 		Define el comportamiento de la instrucción. Debe tener implementadas
+ *		estas macros de entrada:
+ *		
+ *			OPCODE, RS, RT, RD, SHIFT, FUNC, TARGET
+ *				Campos de la instrucción decodificada
+ *			IMM		-Entero con signo de 32 bits correspondiente al campo IMM
+ *			UIMM		-Entero sin signo de 32 bits correspondiente al campo IMM
+ *				
+ *			GPR(X)		-Leer valor del registro de propósito general número 'X'
+ *			SET_GPR(X, V)	-Escribir 'V' en reg 'X'
+ *			FPRS(X)		-Leer valor del registro real de simple precisión 'X'
+ *			SET_FPRS(X, V)	-Escribir
+ *			FPRD(X)		-Leer valor del registro real de doble precisión 'Y'
+ *			SET_FPRS(X, V)	-Escribir
+ *			PC
+ *			NPC
+ *			BRANCH(X)
+ *			RELBRANCH(X)
+ *			FPCR		-Registros especiales
+ *			SET_FPCR(X)
+ *			WRITE_BYTE, WRITE_HALF, WRITE_WORD, WRITE_DWORD, WRITE
+ *			READ_BYTE, READ_HALF, READ_WORD, READ_DWORD, READ
+ *					-Acceso a memoria
+ *			EXIT		-Finaliza ejecución del programa
+ */
+ 
+ 
+ 
+ 
+/*						*
+ *						*
+ *		INSTRUCCIONES ALIAS		*
+ *						*
+ *						*/
+ 
+ 
+ 
+#define NOP_IMPL { \
+}
+DEFINST(NOP,			0x00000000,
+	0xffffffff,		"",
+	fu_NONE,		0,
+	DNA,DNA,		DNA,DNA,DNA)
+
+
+
+
+
+
+/*						*
+ *						*
+ *	INSTRUCCIONES DE CONTROL FP		*
+ *	(necesitan ser declaradas antes)	*
+ *						*/
+
+ 
+
+#define BC1F_IMPL { \
+	if (!FPCC(CC)) RELBRANCH(IMM << 2); \
+}
+DEFINST(BC1F,			0x45000000,
+	0xffe30000,		"c,j",
+	fu_NONE,		F_CTRL|F_COND,
+	DNA,DNA,		DFPC,DNA,DNA)
+	
+	
+	
+#define BC1T_IMPL { \
+	if (FPCC(CC)) RELBRANCH(IMM << 2); \
+}
+DEFINST(BC1T,			0x45010000,
+	0xffe30000,		"c,j",
+	fu_NONE,		F_CTRL|F_COND,
+	DNA,DNA,		DFPC,DNA,DNA)
+
+
+
+#define MFC1_IMPL { \
+	float temp = FPRS(FS); \
+	word wrd = * (word *) &temp; \
+	SET_GPR(RT, wrd); \
+}
+DEFINST(MFC1,			0x44000000,
+	0xffe007ff,		"t,S",
+	fu_NONE,		0,
+	DGPR(RT),DNA,		DFPR(FS),DNA,DNA)
+	
+	
+	
+#define MTC1_IMPL { \
+	word temp = GPR(RT); \
+	float f = * (float *) &temp; \
+	SET_FPRS(FS, f); \
+}
+DEFINST(MTC1,			0x44800000,
+	0xffe007ff,		"t,S",
+	fu_NONE,		0,
+	DFPR(FS),DNA,		DGPR(RT),DNA,DNA)
+
+	
+			
+#define CFC1_IMPL { \
+	word temp = 0; \
+	switch (FS) { \
+		case 0: \
+			temp = FPC_FIR; \
+			break; \
+		case 25: \
+			temp = (BITS32(FPC_FCSR, 31, 25) << 1) | \
+			BITS32(FPC_FCSR, 23, 23); \
+			break; \
+		case 26: \
+			temp = (BITS32(FPC_FCSR, 17, 12) << 12) | \
+			(BITS32(FPC_FCSR, 6, 2) << 2); \
+			break; \
+		case 28: \
+			temp = (BITS32(FPC_FCSR, 11, 7) << 7) | \
+			(BITS32(FPC_FCSR, 24, 24) << 2)| \
+			BITS32(FPC_FCSR, 1, 0); \
+			break; \
+		case 31: \
+			temp = FPC_FCSR; \
+			break; \
+		default: fatal("machine.def: cfc1: unknown value for fs"); \
+	} \
+	SET_GPR(RT, temp); \
+}
+DEFINST(CFC1,			0x44400000,
+	0xffe007ff,		"t,S",
+	fu_NONE,		0,
+	DGPR(RT),DNA,		DFPC,DNA,DNA)
+	
+	
+	
+#define CTC1_IMPL { \
+	word temp = GPR(RT); \
+	switch (FS) { \
+		case 25: \
+			SET_FPC_FCSR((BITS32(temp, 7, 1) << 25) | \
+			(BITS32(FPC_FCSR, 24, 24) << 24) | \
+			(BITS32(temp, 0, 0) << 23) | \
+			BITS32(FPC_FCSR, 22, 0)); \
+			break; \
+		case 26: \
+			SET_FPC_FCSR((BITS32(FPC_FCSR, 31, 18) << 18) | \
+			(BITS32(temp, 17, 12) << 12) | \
+			(BITS32(FPC_FCSR, 11, 7) << 7) | \
+			(BITS32(temp, 6, 2) << 2) | \
+			BITS32(FPC_FCSR, 1, 0)); \
+			break; \
+		case 28: \
+			SET_FPC_FCSR((BITS32(FPC_FCSR, 31, 25) << 25) | \
+			(BITS32(temp, 2, 2) << 24) | \
+			(BITS32(FPC_FCSR, 23, 12) << 12) | \
+			(BITS32(temp, 11, 7) << 7) | \
+			(BITS32(FPC_FCSR, 6, 2) << 2) | \
+			BITS32(temp, 1, 0)); \
+			break; \
+		case 31: \
+			SET_FPC_FCSR(temp); \
+			break; \
+		default: fatal("machine.def: ctc1: unknown value for fs"); \
+	} \
+}
+DEFINST(CTC1,			0x44c00000,
+	0xffe007ff,		"t,S",
+	fu_NONE,		0,
+	DFPC,DNA,		DGPR(RT),DNA,DNA)
+	
+	
+	
+
+
+
+/*						*
+ *						*
+ *		INSTRUCCIONES NORMALES		*
+ *						*
+ *						*/
+ 
+
+ 
+#define ABS_IMPL { \
+	if (FMT == MD_FMT_SINGLE) { \
+		float temp = FPRS(FS) < 0.0 ? -FPRS(FS) : FPRS(FS); \
+		SET_FPRS(FD, temp); \
+	} else if (FMT == MD_FMT_DOUBLE) { \
+		double temp = FPRD(FS) < 0.0 ? -FPRD(FS) : FPRD(FS); \
+		SET_FPRD(FD, temp); \
+	} else result = MD_MSG_FMTERROR; \
+}
+DEFINST(ABS,			0x44000005,
+	0xfc1f003f,		"D,S",
+	FloatCMP,		F_FCOMP,
+	DFPR(FD),DNA,		DFPR(FS),DNA,DNA)
+	
+	
+	
+#define ADD_IMPL { \
+	sword temp = SGPR(RS) + SGPR(RT); \
+	SET_GPR(RD, temp); \
+}
+DEFINST(ADD,			0x00000020,
+	0xfc0007ff,		"d,s,t",
+	IntALU,			F_ICOMP,
+	DGPR(RD),DNA,		DGPR(RS),DGPR(RT),DNA)
+	
+	
+	
+#define _ADD_IMPL { \
+	if (FMT == MD_FMT_SINGLE) SET_FPRS(FD, FPRS(FS) + FPRS(FT)); \
+	else if (FMT == MD_FMT_DOUBLE) SET_FPRD(FD, FPRD(FS) + FPRD(FT)); \
+	else result = MD_MSG_FMTERROR; \
+}
+DEFINST(_ADD,			0x44000000,
+	0xfc00003f,		"D,S,T",
+	FloatADD,		F_FCOMP,
+	DFPR(FD),DNA,		DFPR(FS),DFPR(FT),DNA)
+	
+	
+	
+#define ADDI_IMPL { \
+	sword temp = SGPR(RS) + IMM; \
+	SET_GPR(RT, temp); \
+}
+DEFINST(ADDI,			0x20000000,
+	0xfc000000,		"t,s,i",
+	IntALU,			F_ICOMP|F_IMM,
+	DGPR(RT),DNA,		DGPR(RS),DNA,DNA)
+
+	
+	
+#define ADDIU_IMPL { \
+	SET_GPR(RT, SGPR(RS) + IMM); \
+}
+DEFINST(ADDIU,			0x24000000,
+	0xfc000000,		"t,s,i",
+	IntALU,			F_ICOMP|F_IMM,
+	DGPR(RT),DNA,		DGPR(RS),DNA,DNA)
+
+	
+
+#define ADDU_IMPL { \
+	SET_GPR(RD, GPR(RS) + GPR(RT)); \
+}
+DEFINST(ADDU,			0x00000021,
+	0xfc0007ff,		"d,s,t",
+	IntALU,			F_ICOMP,
+	DGPR(RD),DNA,		DGPR(RS),DGPR(RT),DNA)
+
+	
+	
+#define AND_IMPL { \
+	SET_GPR(RD, GPR(RS) & GPR(RT)); \
+}
+DEFINST(AND,			0x00000024,
+	0xfc0007ff,		"d,s,t",
+	IntALU,			F_ICOMP,
+	DGPR(RD),DNA,		DGPR(RS),DGPR(RT),DNA)
+
+	
+	
+#define ANDI_IMPL { \
+	SET_GPR(RT, GPR(RS) & UIMM); \
+}
+DEFINST(ANDI,			0x30000000,
+	0xfc000000,		"t,s,u",
+	IntALU,			F_ICOMP|F_IMM,
+	DGPR(RT),DNA,		DGPR(RS),DNA,DNA)
+	
+	
+	
+#define B_IMPL { \
+	RELBRANCH(IMM << 2); \
+}
+DEFINST(B,			0x10000000,
+	0xffff0000,		"j",
+	IntALU,			F_ICOMP|F_CTRL|F_UNCOND,
+	DNA,DNA,		DGPR(RS),DGPR(RT),DNA)
+	
+	
+	
+#define BAL_IMPL { \
+	SET_GPR(31, PC + 8); \
+	RELBRANCH(IMM << 2); \
+}
+DEFINST(BAL,			0x04110000,
+	0xffff0000,		"j",
+	IntALU,			F_ICOMP|F_CTRL|F_UNCOND,
+	DNA,DNA,		DGPR(RS),DGPR(RT),DNA)
+	
+	
+	
+#define BEQ_IMPL { \
+	if (GPR(RS) == GPR(RT)) RELBRANCH(IMM << 2); \
+}
+DEFINST(BEQ,			0x10000000,
+	0xfc000000,		"s,t,j",
+	IntALU,			F_ICOMP|F_CTRL|F_COND,
+	DNA,DNA,		DGPR(RS),DGPR(RT),DNA)
+	
+	
+	
+#define BGEZ_IMPL { \
+	if (SGPR(RS) >= 0) RELBRANCH(IMM << 2); \
+}
+DEFINST(BGEZ,			0x04010000,
+	0xfc1f0000,		"s,j",
+	IntALU,			F_ICOMP|F_CTRL|F_COND,
+	DNA,DNA,		DGPR(RS),DNA,DNA)
+
+
+
+#define BGEZAL_IMPL { \
+	SET_GPR(31, PC + 8); \
+	if (SGPR(RS) >= 0) RELBRANCH(IMM << 2); \
+}
+DEFINST(BGEZAL,			0x04110000,
+	0xfc1f0000,		"s,j",
+	IntALU,			F_ICOMP|F_CTRL|F_COND|F_CALL,
+	DNA,DGPR(31),		DGPR(RS),DNA,DNA)
+
+
+
+#define BGTZ_IMPL { \
+	if (SGPR(RS) > 0) RELBRANCH(IMM << 2); \
+}
+DEFINST(BGTZ,			0x1c000000,
+	0xfc1f0000,		"s,j",
+	IntALU,			F_ICOMP|F_CTRL|F_COND,
+	DNA,DNA,		DGPR(RS),DNA,DNA)
+	
+	
+	
+#define BLEZ_IMPL { \
+	if (SGPR(RS) <= 0) RELBRANCH(IMM << 2); \
+}
+DEFINST(BLEZ,			0x18000000,
+	0xfc1f0000,		"s,j",
+	IntALU,			F_ICOMP|F_CTRL|F_COND,
+	DNA,DNA,		DGPR(RS),DNA,DNA)
+	
+	
+	
+#define BLTZ_IMPL { \
+	if (SGPR(RS) < 0) RELBRANCH(IMM << 2); \
+}
+DEFINST(BLTZ,			0x04000000,
+	0xfc1f0000,		"s,j",
+	IntALU,			F_ICOMP|F_CTRL|F_COND,
+	DNA,DNA,		DGPR(RS),DNA,DNA)
+
+
+
+#define BNE_IMPL { \
+	if (GPR(RS) != GPR(RT)) RELBRANCH(IMM << 2); \
+}
+DEFINST(BNE,			0x14000000,
+	0xfc000000,		"s,t,j",
+	IntALU,			F_ICOMP|F_CTRL|F_COND,
+	DNA,DNA,		DGPR(RS),DGPR(RT),DNA)
+	
+	
+	
+#define BREAK_IMPL { \
+	result = MD_MSG_FINISH; \
+}
+DEFINST(BREAK,			0x0000000d,
+	0xfc00003f,		"",
+	fu_NONE,		0,
+	DNA,DNA,		DNA,DNA,DNA)
+	
+	
+	
+#define C_IMPL { \
+	int less, equal, unordered, condition, cc; \
+	if (FMT == MD_FMT_SINGLE) { \
+		float op1 = FPRS(FS); \
+		float op2 = FPRS(FT); \
+		less = op1 < op2; \
+		equal = op1 == op2; \
+		unordered = FALSE; \
+		cc = BITS32(INST, 10, 8); \
+	} else if (FMT == MD_FMT_DOUBLE) { \
+		double op1 = FPRD(FS); \
+		double op2 = FPRD(FT); \
+		less = op1 < op2; \
+		equal = op1 == op2; \
+		unordered = FALSE; \
+		cc = BITS32(INST, 10, 8); \
+	} else result = MD_MSG_FMTERROR; \
+	if (result != MD_MSG_FMTERROR) { \
+		condition = ((GETBIT32(COND, 2) && less) || \
+			(GETBIT32(COND, 1) && equal) || \
+			(GETBIT32(COND, 0) && unordered)); \
+		SET_FPCC(cc, condition); \
+	} \
+}
+DEFINST(C,			0x44000030,
+	0xfc0000f0,		"c,S,T",
+	FloatCMP,		F_FCOMP,
+	DFPC,DNA,		DFPR(FS),DFPR(FT),DNA)
+	
+	
+	
+#define CVT_D_IMPL { \
+	if (FMT == MD_FMT_SINGLE) { \
+		double temp = (double) FPRS(FS); \
+		SET_FPRD(FD, temp); \
+	} else if (FMT == MD_FMT_WORD) { \
+		float temp = FPRS(FS); \
+		sword wrd = * (sword *) &temp; \
+		SET_FPRD(FD, (double) wrd); \
+	} else if (FMT == MD_FMT_LONG) { \
+		double temp = FPRD(FS); \
+		sdword dwrd = * (sdword *) &temp; \
+		SET_FPRD(FD, (double) dwrd); \
+	} else result = MD_MSG_FMTERROR; \
+}
+DEFINST(CVT_D,			0x44000021,
+	0xfc1f003f,		"D,S",
+	FloatCVT,		F_FCOMP,
+	DFPR(FD),DNA,		DFPR(FS),DNA,DNA)
+	
+	
+	
+#define CVT_S_IMPL { \
+	if (FMT == MD_FMT_DOUBLE) { \
+		float temp = (float) FPRD(FS); \
+		SET_FPRS(FD, temp); \
+	} else if (FMT == MD_FMT_WORD) { \
+		float temp = FPRS(FS); \
+		sword wrd = * (sword *) &temp; \
+		SET_FPRS(FD, (float) wrd); \
+	} else if (FMT == MD_FMT_LONG) { \
+		double temp = FPRD(FS); \
+		sdword dwrd = * (sdword *) &temp; \
+		SET_FPRS(FD, (float) dwrd); \
+	} else result = MD_MSG_FMTERROR; \
+}
+DEFINST(CVT_S,			0x44000020,
+	0xfc1f003f,		"D,S",
+	FloatCVT,		F_FCOMP,
+	DFPR(FD),DNA,		DFPR(FS),DNA,DNA)
+	
+	
+	
+#define CVT_W_IMPL { \
+	sword wrd; \
+	float temp; \
+	if (FMT == MD_FMT_SINGLE) { \
+		wrd = (sword) FPRS(FS); \
+		temp = * (float *) &wrd; \
+		SET_FPRS(FD, temp); \
+	} else if (FMT == MD_FMT_DOUBLE) { \
+		wrd = (sword) FPRD(FS); \
+		temp = * (float *) &wrd; \
+		SET_FPRS(FD, temp); \
+	} else result = MD_MSG_FMTERROR; \
+}
+DEFINST(CVT_W,			0x44000024,
+	0xfc1f003f,		"D,S",
+	FloatCVT,		F_FCOMP,
+	DFPR(FD),DNA,		DFPR(FS),DNA,DNA)
+	
+	
+	
+#define DIV_IMPL { \
+	if (GPR(RT)) { \
+		SET_REGLO(SGPR(RS) / SGPR(RT)); \
+		SET_REGHI(SGPR(RS) % SGPR(RT)); \
+	} \
+}
+DEFINST(DIV,			0x0000001a,
+	0xfc00ffff,		"s,t",
+	IntDIV,			F_ICOMP,
+	DREGLO,DREGHI,		DGPR(RS),DGPR(RT),DNA)
+	
+	
+	
+#define _DIV_IMPL { \
+	if (FMT == MD_FMT_SINGLE) SET_FPRS(FD, FPRS(FS) / FPRS(FT)); \
+	else if (FMT == MD_FMT_DOUBLE) SET_FPRD(FD, FPRD(FS) / FPRD(FT)); \
+	else result = MD_MSG_FMTERROR; \
+}
+DEFINST(_DIV,			0x44000003,
+	0xfc00003f,		"D,S,T",
+	FloatDIV,		F_FCOMP,
+	DFPR(FD),DNA,		DFPR(FS),DFPR(FT),DNA)
+	
+
+
+#define DIVU_IMPL { \
+	if (GPR(RT)) { \
+		SET_REGLO(GPR(RS) / GPR(RT)); \
+		SET_REGHI(GPR(RS) % GPR(RT)); \
+	} \
+}
+DEFINST(DIVU,			0x0000001b,
+	0xfc00003f,		"s,t",
+	IntDIV,			F_ICOMP,
+	DREGLO,DREGHI,		DGPR(RS),DGPR(RT),DNA)
+	
+
+
+#define J_IMPL { \
+	word dest = (BITS32(PC + 4, 32, 28) << 28) | (TARGET << 2); \
+	BRANCH(dest); \
+}
+DEFINST(J,			0x08000000,
+	0xfc000000,		"J",
+	IntALU,			F_CTRL|F_UNCOND,
+	DNA,DNA,		DNA,DNA,DNA)
+
+
+
+#define JAL_IMPL { \
+	word dest = (BITS32(PC + 4, 32, 28) << 28) | (TARGET << 2); \
+	SET_GPR(31, PC + 8); \
+	BRANCH(dest); \
+}
+DEFINST(JAL,			0x0c000000,
+	0xfc000000,		"J",
+	IntALU,			F_CTRL|F_UNCOND|F_CALL,
+	DNA,DGPR(31),		DNA,DNA,DNA)
+	
+	
+	
+#define JALR_IMPL { \
+	BRANCH(GPR(RS)); \
+	SET_GPR(RD, PC + 8); \
+}
+/*#define JALR_IMPL { \
+	regs->regs_NPC = GPR(RS); \
+	regs->regs_NNPC = GPR(RS) + 4; \
+	SET_GPR(RD, PC + 4); \
+}*/
+DEFINST(JALR,			0x00000009,
+	0xfc00003f,		"d,s",
+	IntALU,			F_CTRL|F_UNCOND|F_CALL,
+	DNA,DGPR(RD),		DGPR(RS),DNA,DNA)
+
+
+
+#define JR_IMPL { \
+	BRANCH(GPR(RS)); \
+}
+DEFINST(JR,			0x00000008,
+	0xfc00003f,		"s",
+	fu_NONE,		F_CTRL|F_UNCOND|F_RET,
+	DNA,DNA,		DGPR(RS),DNA,DNA)
+
+	
+	
+#define LB_IMPL { \
+	byte temp; \
+	word addr = GPR(RS) + IMM; \
+	READ_BYTE(addr, &temp); \
+	SET_GPR(RT, SEXT32(temp, 8)); \
+}
+DEFINST(LB,			0x80000000,
+	0xfc000000,		"t,o(b)",
+	RdPort,			F_MEM|F_LOAD|F_DISP,
+	DGPR(RT),DNA,		DGPR(RS),DNA,DNA)
+	
+	
+	
+#define LBU_IMPL { \
+	byte temp; \
+	word addr = GPR(RS) + IMM; \
+	READ_BYTE(addr, &temp); \
+	SET_GPR(RT, temp); \
+}
+DEFINST(LBU,			0x90000000,
+	0xfc000000,		"t,o(b)",
+	RdPort,			F_MEM|F_LOAD|F_DISP,
+	DGPR(RT),DNA,		DGPR(RS),DNA,DNA)
+	
+	
+	
+#define LDC1_IMPL { \
+	dword temp; \
+	READ_DWORD(GPR(RS) + IMM, &temp); \
+	SET_FPRD(FT, * (double *) &temp); \
+}
+DEFINST(LDC1,			0xd4000000,
+	0xfc000000,		"T,o(b)",
+	RdPort,			F_MEM|F_LOAD|F_DISP,
+	DFPR(RT),DNA,		DGPR(RS),DNA,DNA)
+	
+	
+#define LH_IMPL { \
+	half temp; \
+	word addr = GPR(RS) + IMM; \
+	READ_HALF(addr, &temp); \
+	SET_GPR(RT, SEXT32(temp, 16)); \
+}
+DEFINST(LH,			0x84000000,
+	0xfc000000,		"t,o(b)",
+	RdPort,			F_MEM|F_LOAD|F_DISP,
+	DGPR(RT),DNA,		DGPR(RS),DNA,DNA)
+	
+	
+	
+#define LHU_IMPL { \
+	half temp; \
+	word addr = GPR(RS) + IMM; \
+	READ_HALF(addr, &temp); \
+	SET_GPR(RT, temp); \
+}
+DEFINST(LHU,			0x94000000,
+	0xfc000000,		"t,o(b)",
+	RdPort,			F_MEM|F_LOAD|F_DISP,
+	DGPR(RT),DNA,		DGPR(RS),DNA,DNA)
+	
+	
+	
+#define LL_IMPL { \
+	word temp; \
+	SETRMW; \
+	READ_WORD(GPR(RS) + IMM, &temp); \
+	SET_GPR(RT, temp); \
+	result = MD_MSG_STARTRMW; \
+}
+DEFINST(LL,			0xc0000000,
+	0xfc000000,		"t,o(b)",
+	RdPort,			F_MEM|F_LOAD|F_DISP,
+	DGPR(RT),DNA,		DGPR(RS),DNA,DNA)
+	
+	
+	
+#define LUI_IMPL { \
+	SET_GPR(RT, UIMM << 16); \
+}
+DEFINST(LUI,			0x3c000000,
+	0xffe00000,		"t,i",
+	IntALU,			F_ICOMP,
+	DGPR(RT),DNA,		DNA,DNA,DNA)
+
+
+
+#define LW_IMPL { \
+	word temp; \
+	READ_WORD(GPR(RS) + IMM, &temp); \
+	SET_GPR(RT, temp); \
+}
+DEFINST(LW,			0x8c000000,
+	0xfc000000,		"t,o(b)",
+	RdPort,			F_MEM|F_LOAD|F_DISP,
+	DGPR(RT),DNA,		DGPR(RS),DNA,DNA)
+	
+	
+	
+#define LWC1_IMPL { \
+	word temp; \
+	float f; \
+	READ_WORD(GPR(RS) + IMM, &temp); \
+	f = * (float *) &temp; \
+	SET_FPRS(FT, f); \
+}
+DEFINST(LWC1,			0xc4000000,
+	0xfc000000,		"T,o(b)",
+	RdPort,			F_MEM|F_LOAD|F_DISP,
+	DFPR(FT),DNA,		DGPR(RS),DNA,DNA)
+	
+	
+	
+#define LWL_IMPL { \
+	byte	src[4]; \
+	byte	*dst = (byte *) &GPR(RT); \
+	word	addr = GPR(RS) + IMM; \
+	int	i, size = 4 - (addr & 3); \
+	READ_BLK(addr, size, src); \
+	for (i = 0; i < size; i++) \
+		dst[3 - i] = src[i]; \
+}
+DEFINST(LWL,			0x88000000,
+	0xfc000000,		"t,o(b)",
+	RdPort,			F_MEM|F_LOAD|F_DISP,
+	DGPR(RT),DNA,		DGPR(RS),DNA,DNA)
+	
+	
+	
+#define LWR_IMPL { \
+	byte	src[4]; \
+	byte	*dst = (byte *) &GPR(RT); \
+	word	addr = GPR(RS) + IMM; \
+	int	i, size = 1 + (addr & 3); \
+	READ_BLK(addr - size + 1, size, src); \
+	for (i = 0; i < size; i++) \
+		dst[size - i - 1] = src[i]; \
+}
+DEFINST(LWR,			0x98000000,
+	0xfc000000,		"t,o(b)",
+	RdPort,			F_MEM|F_LOAD|F_DISP,
+	DGPR(RT),DNA,		DGPR(RS),DNA,DNA)
+	
+	
+	
+#define MADD_IMPL { \
+	sdword temp, temp1, temp2, temp3; \
+	temp1 = SGPR(RS); \
+	temp2 = SGPR(RT); \
+	temp3 = ((dword) REGHI << 32) | ((dword) REGLO); \
+	temp = temp1 * temp2 + temp3; \
+	SET_REGHI(BITS64(temp, 63, 32)); \
+	SET_REGLO(BITS64(temp, 31, 0)); \
+}
+DEFINST(MADD,			0x70000000,
+	0xfc00ffff,		"s,t",
+	IntMULT,		F_ICOMP,
+	DREGLO,DREGHI,		DGPR(RS),DGPR(RT),DREGLO)
+	
+	
+	
+#define MFHI_IMPL { \
+	SET_GPR(RD, REGHI); \
+}
+DEFINST(MFHI,			0x00000010,
+	0xffff07ff,		"d",
+	IntALU,			F_ICOMP,
+	DGPR(RD),DNA,		DREGHI,DNA,DNA)
+	
+	
+	
+#define MFLO_IMPL { \
+	SET_GPR(RD, REGLO); \
+}
+DEFINST(MFLO,			0x00000012,
+	0xffff07ff,		"d",
+	IntALU,			F_ICOMP,
+	DGPR(RD),DNA,		DREGLO,DNA,DNA)
+	
+	
+	
+#define MOV_IMPL { \
+	if (FMT == MD_FMT_SINGLE) SET_FPRS(FD, FPRS(FS)); \
+	else if (FMT == MD_FMT_DOUBLE) SET_FPRD(FD, FPRD(FS)); \
+	else result = MD_MSG_FMTERROR; \
+}
+DEFINST(MOV,			0x44000006,
+	0xfc1f003f,		"D,S",
+	fu_NONE,		0,
+	DFPR(FD),DNA,		DFPR(FS),DNA,DNA)
+	
+	
+	
+#define MOVF_IMPL { \
+	if (!FPCC(CC)) SET_GPR(RD, GPR(RS)); \
+}
+DEFINST(MOVF,			0x00000001,
+	0xfc0307ff,		"d,s,c",
+	IntALU,			F_ICOMP,
+	DGPR(RD),DNA,		DGPR(RS),DFPC,DNA)
+	
+	
+	
+#define _MOVF_IMPL { \
+	if (FMT == MD_FMT_SINGLE) { \
+		if (!FPCC(CC)) SET_FPRS(FD, FPRS(FS)); \
+	} else if (FMT == MD_FMT_DOUBLE) { \
+		if (!FPCC(CC)) SET_FPRD(FD, FPRD(FS)); \
+	} else result = MD_MSG_FMTERROR; \
+}
+DEFINST(_MOVF,			0x44000011,
+	0xfc03003f,		"D,S,c",
+	IntALU,			F_FCOMP,
+	DFPR(FD),DNA,		DFPR(FS),DFPC,DNA)
+	
+	
+	
+#define MOVN_IMPL { \
+	if (GPR(RT)) SET_GPR(RD, GPR(RS)); \
+}
+DEFINST(MOVN,			0x0000000b,
+	0xfc0007ff,		"d,s,t",
+	IntALU,			F_ICOMP,
+	DGPR(RD),DNA,		DGPR(RS),DGPR(RT),DNA)
+	
+	
+	
+#define _MOVN_IMPL { \
+	if (FMT == MD_FMT_SINGLE) { \
+		if (GPR(RT)) SET_FPRS(FD, FPRS(FS)); \
+	} else if (FMT == MD_FMT_DOUBLE) { \
+		if (GPR(RT)) SET_FPRD(FD, FPRD(FS)); \
+	} else result = MD_MSG_FMTERROR; \
+}
+DEFINST(_MOVN,			0x44000013,
+	0xfc00003f,		"D,S,t",
+	IntALU,			F_FCOMP,
+	DFPR(FD),DNA,		DFPR(FS),DGPR(RT),DNA)
+	
+	
+	
+#define _MOVT_IMPL { \
+	if (FMT == MD_FMT_SINGLE) { \
+		if (FPCC(CC)) SET_FPRS(FD, FPRS(FS)); \
+	} else if (FMT == MD_FMT_DOUBLE) { \
+		if (FPCC(CC)) SET_FPRD(FD, FPRD(FS)); \
+	} else result = MD_MSG_FMTERROR; \
+}
+DEFINST(_MOVT,			0x44010011,
+	0xfc03003f,		"D,S,c",
+	IntALU,			F_FCOMP,
+	DFPR(FD),DNA,		DFPR(FS),DFPC,DNA)
+	
+	
+	
+#define MOVZ_IMPL { \
+	if (!GPR(RT)) SET_GPR(RD, GPR(RS)); \
+}
+DEFINST(MOVZ,			0x0000000a,
+	0xfc0007ff,		"d,s,t",
+	IntALU,			F_ICOMP,
+	DGPR(RD),DNA,		DGPR(RS),DGPR(RT),DNA)
+
+
+
+#define _MOVZ_IMPL { \
+	if (FMT == MD_FMT_SINGLE) { \
+		if (!GPR(RT)) SET_FPRS(FD, FPRS(FS)); \
+	} else if (FMT == MD_FMT_DOUBLE) { \
+		if (!GPR(RT)) SET_FPRD(FD, FPRD(FS)); \
+	} else result = MD_MSG_FMTERROR; \
+}
+DEFINST(_MOVZ,			0x44000012,
+	0xfc00003f,		"D,S,t",
+	IntALU,			F_FCOMP,
+	DFPR(FD),DNA,		DFPR(FS),DGPR(RT),DNA)
+	
+	
+	
+#define MSUB_IMPL { \
+	sdword temp, temp1, temp2, temp3; \
+	temp1 = SGPR(RS); \
+	temp2 = SGPR(RT); \
+	temp3 = ((dword) REGHI << 32) | ((dword) REGLO); \
+	temp = temp3 - temp1 * temp2 + temp3; \
+	SET_REGHI(BITS64(temp, 63, 32)); \
+	SET_REGLO(BITS64(temp, 31, 0)); \
+}
+DEFINST(MSUB,			0x70000004,
+	0xfc00ffff,		"s,t",
+	IntMULT,		F_ICOMP,
+	DREGLO,DREGHI,		DGPR(RS),DGPR(RT),DREGLO)
+	
+	
+	
+#define MTLO_IMPL { \
+	SET_REGLO(GPR(RS)); \
+}
+DEFINST(MTLO,			0x00000013,
+	0xfc1fffff,		"s",
+	IntALU,			F_ICOMP,
+	DREGLO,DNA,		DGPR(RS),DNA,DNA)
+
+
+
+#define MUL_IMPL { \
+	sdword temp = (sdword) SGPR(RS) * (sdword) SGPR(RT); \
+	SET_GPR(RD, temp); \
+}
+DEFINST(MUL,			0x70000002,
+	0xfc0007ff,		"d,s,t",
+	IntMULT,		F_ICOMP,
+	DGPR(RD),DNA,		DGPR(RS),DGPR(RT),DNA)
+	
+	
+	
+#define _MUL_IMPL { \
+	if (FMT == MD_FMT_SINGLE) SET_FPRS(FD, FPRS(FS) * FPRS(FT)); \
+	else if (FMT == MD_FMT_DOUBLE) SET_FPRD(FD, FPRD(FS) * FPRD(FT)); \
+	else result = MD_MSG_FMTERROR; \
+}
+DEFINST(_MUL,			0x44000002,
+	0xfc00003f,		"D,S,T",
+	FloatMULT,		F_FCOMP,
+	DFPR(FD),DNA,		DFPR(FS),DFPR(FT),DNA)
+	
+	
+	
+#define MULT_IMPL { \
+	dword temp = (sdword) SGPR(RS) * (sdword) SGPR(RT); \
+	SET_REGLO(BITS64(temp, 31, 0)); \
+	SET_REGHI(BITS64(temp, 63, 32)); \
+}
+DEFINST(MULT,			0x00000018,
+	0xfc00003f,		"s,t",
+	IntMULT,		F_ICOMP,
+	DREGLO,DREGHI,		DGPR(RS),DGPR(RT),DNA)
+
+
+
+#define MULTU_IMPL { \
+	dword temp = (dword) GPR(RS) * (dword) GPR(RT); \
+	SET_REGLO(BITS64(temp, 31, 0)); \
+	SET_REGHI(BITS64(temp, 63, 32)); \
+}
+DEFINST(MULTU,			0x00000019,
+	0xfc00003f,		"s,t",
+	IntMULT,		F_ICOMP,
+	DREGLO,DREGHI,		DGPR(RS),DGPR(RT),DNA)
+
+
+
+#define NEG_IMPL { \
+	if (FMT == MD_FMT_SINGLE) SET_FPRS(FD, -FPRS(FS)); \
+	else if (FMT == MD_FMT_DOUBLE) SET_FPRD(FD, -FPRD(FS)); \
+	else result = MD_MSG_FMTERROR; \
+}
+DEFINST(NEG,			0x44000007,
+	0xfc1f003f,		"D,S",
+	FloatADD,		F_FCOMP,
+	DFPR(FD),DNA,		DFPR(FS),DNA,DNA)
+	
+	
+	
+#define NOR_IMPL { \
+	word temp = GPR(RS) | GPR(RT); \
+	SET_GPR(RD, ~temp); \
+}
+DEFINST(NOR,			0x00000027,
+	0xfc00003f,		"d,s,t",
+	IntALU,			F_ICOMP,
+	DGPR(RD),DNA,		DGPR(RS),DGPR(RT),DNA)
+	
+	
+	
+#define OR_IMPL { \
+	SET_GPR(RD, GPR(RS) | GPR(RT)); \
+}
+DEFINST(OR,			0x00000025,
+	0xfc0007ff,		"d,s,t",
+	IntALU,			F_ICOMP,
+	DGPR(RD),DNA,		DGPR(RS),DGPR(RT),DNA)
+	
+	
+	
+#define ORI_IMPL { \
+	SET_GPR(RT, GPR(RS) | UIMM); \
+}
+DEFINST(ORI,			0x34000000,
+	0xfc000000,		"t,s,u",
+	IntALU,			F_ICOMP|F_IMM,
+	DGPR(RT),DNA,		DGPR(RS),DNA,DNA)
+	
+	
+	
+#define SB_IMPL { \
+	byte temp = GPR(RT); \
+	word addr = GPR(RS) + IMM; \
+	WRITE_BYTE(addr, temp); \
+}
+DEFINST(SB,			0xa0000000,
+	0xfc000000,		"t,o(b)",
+	WrPort,			F_MEM|F_STORE|F_DISP,
+	DNA,DNA,		DGPR(RS),DGPR(RT),DNA)
+	
+	
+	
+#define SC_IMPL { \
+	word temp = GPR(RT); \
+	if (GETRMW == CURRENT) { \
+		WRITE_WORD(GPR(RS) + IMM, temp); \
+		SET_GPR(RT, 1); \
+	} else { \
+		SET_GPR(RT, 0); \
+	} \
+	result = MD_MSG_ENDRMW; \
+}
+DEFINST(SC,			0xe0000000,
+	0xfc000000,		"t,o(b)",
+	WrPort,			F_MEM|F_STORE|F_DISP,
+	DNA,DNA,		DGPR(RS),DGPR(RT),DNA)
+	
+	
+	
+#define SDC1_IMPL { \
+	double dbl = FPRD(FT); \
+	dword temp = * (dword *) &dbl; \
+	WRITE_DWORD(GPR(RS) + IMM, temp); \
+}
+DEFINST(SDC1,			0xf4000000,
+	0xfc000000,		"T,o(b)",
+	WrPort,			F_MEM|F_STORE|F_DISP,
+	DNA,DNA,		DGPR(RS),DFPR(FT),DNA)
+	
+	
+	
+#define SH_IMPL { \
+	half temp = GPR(RT); \
+	word addr = GPR(RS) + IMM; \
+	WRITE_HALF(addr, temp); \
+}
+DEFINST(SH,			0xa4000000,
+	0xfc000000,		"t,o(b)",
+	WrPort,			F_MEM|F_STORE|F_DISP,
+	DNA,DNA,		DGPR(RS),DGPR(RT),DNA)
+	
+	
+	
+#define SLL_IMPL { \
+	SET_GPR(RD, GPR(RT) << SHIFT); \
+}
+DEFINST(SLL,			0x00000000,
+	0xffe0003f,		"d,t,H",
+	IntALU,			F_ICOMP,
+	DGPR(RD),DNA,		DGPR(RT),DNA,DNA)
+	
+	
+	
+#define SLLV_IMPL { \
+	word s; \
+	s = BITS32(GPR(RS), 4, 0); \
+	SET_GPR(RD, GPR(RT) << s); \
+}
+DEFINST(SLLV,			0x00000004,
+	0xfc0007ff,		"d,t,s",
+	IntALU,			F_ICOMP,
+	DGPR(RD),DNA,		DGPR(RS),DGPR(RT),DNA)
+
+
+
+#define SLT_IMPL { \
+	if (SGPR(RS) < SGPR(RT)) SET_GPR(RD, 1); \
+	else SET_GPR(RD, 0); \
+}
+DEFINST(SLT,			0x0000002a,
+	0xfc00003f,		"d,s,t",
+	IntALU,			F_ICOMP,
+	DGPR(RD),DNA,		DGPR(RS),DGPR(RT),DNA)
+
+
+
+#define SLTI_IMPL { \
+	if (SGPR(RS) < IMM) SET_GPR(RT, 1); \
+	else SET_GPR(RT, 0); \
+}
+DEFINST(SLTI,			0x28000000,
+	0xfc000000,		"t,s,i",
+	IntALU,			F_ICOMP|F_IMM,
+	DGPR(RT),DNA,		DGPR(RS),DNA,DNA)
+
+	
+	
+#define SLTIU_IMPL { \
+	if (GPR(RS) < (word) IMM) SET_GPR(RT, 1); \
+	else SET_GPR(RT, 0); \
+}
+DEFINST(SLTIU,			0x2c000000,
+	0xfc000000,		"t,s,i",
+	IntALU,			F_ICOMP|F_IMM,
+	DGPR(RT),DNA,		DGPR(RS),DNA,DNA)
+
+	
+	
+#define SLTU_IMPL { \
+	if (GPR(RS) < GPR(RT)) SET_GPR(RD, 1); \
+	else SET_GPR(RD, 0); \
+}
+DEFINST(SLTU,			0x0000002b,
+	0xfc0007ff,		"d,s,t",
+	IntALU,			F_ICOMP,
+	DGPR(RD),DNA,		DGPR(RS),DGPR(RT),DNA)
+	
+	
+	
+#define SQRT_IMPL { \
+	if (FMT == MD_FMT_SINGLE) { \
+		float temp = sqrt(FPRS(FS)); \
+		SET_FPRS(FD, temp); \
+	} else if (FMT == MD_FMT_DOUBLE) { \
+		double temp = sqrt(FPRD(FS)); \
+		SET_FPRD(FD, temp); \
+	} else result = MD_MSG_FMTERROR; \
+}
+DEFINST(SQRT,			0x44000004,
+	0xfc1f003f,		"D,S",
+	FloatSQRT,		F_FCOMP,
+	DFPR(FD),DNA,		DFPR(FS),DNA,DNA)
+	
+	
+	
+#define SRA_IMPL { \
+	SET_GPR(RD, SGPR(RT) >> SHIFT); \
+}
+DEFINST(SRA,			0x00000003,
+	0xffe0003f,		"d,t,H",
+	IntALU,			F_ICOMP,
+	DGPR(RD),DNA,		DGPR(RT),DNA,DNA)
+	
+	
+	
+#define SRAV_IMPL { \
+	sword s = BITS32(GPR(RS), 4, 0); \
+	SET_GPR(RD, SGPR(RT) >> s); \
+}
+DEFINST(SRAV,			0x00000007,
+	0xfc0007ff,		"d,t,s",
+	IntALU,			F_ICOMP,
+	DGPR(RD),DNA,		DGPR(RS),DGPR(RT),DNA)
+
+
+
+#define SRL_IMPL { \
+	SET_GPR(RD, GPR(RT) >> SHIFT); \
+}
+DEFINST(SRL,			0x00000002,
+	0xffe0003f,		"d,t,H",
+	IntALU,			F_ICOMP,
+	DGPR(RD),DNA,		DGPR(RT),DNA,DNA)
+
+	
+	
+#define SRLV_IMPL { \
+	word s = BITS32(GPR(RS), 4, 0); \
+	SET_GPR(RD, GPR(RT) >> s); \
+}
+DEFINST(SRLV,			0x00000006,
+	0xfc0007ff,		"d,t,s",
+	IntALU,			F_ICOMP,
+	DGPR(RD),DNA,		DGPR(RS),DGPR(RT),DNA)
+	
+	
+	
+#define _SUB_IMPL { \
+	if (FMT == MD_FMT_SINGLE) SET_FPRS(FD, FPRS(FS) - FPRS(FT)); \
+	else if (FMT == MD_FMT_DOUBLE) SET_FPRD(FD, FPRD(FS) - FPRD(FT)); \
+	else result = MD_MSG_FMTERROR; \
+}
+DEFINST(_SUB,			0x44000001,
+	0xfc00003f,		"D,S,T",
+	FloatADD,		F_FCOMP,
+	DFPR(FD),DNA,		DFPR(FS),DFPR(FT),DNA)
+	
+
+
+
+#define SUBU_IMPL { \
+	SET_GPR(RD, GPR(RS) - GPR(RT)); \
+}
+DEFINST(SUBU,			0x00000023,
+	0xfc0007ff,		"d,s,t",
+	IntALU,			F_ICOMP,
+	DGPR(RD),DNA,		DGPR(RS),DGPR(RT),DNA)
+
+
+
+#define SW_IMPL { \
+	word temp = GPR(RT); \
+	WRITE_WORD(GPR(RS) + IMM, temp); \
+}
+DEFINST(SW,			0xac000000,
+	0xfc000000,		"t,o(b)",
+	WrPort,			F_MEM|F_STORE|F_DISP,
+	DNA,DNA,		DGPR(RS),DGPR(RT),DNA)
+	
+	
+	
+#define SWC1_IMPL { \
+	float f = FPRS(FT); \
+	word temp = * (word *) &f; \
+	WRITE_WORD(GPR(RS) + IMM, temp); \
+}
+DEFINST(SWC1,			0xe4000000,
+	0xfc000000,		"T,o(b)",
+	WrPort,			F_MEM|F_STORE|F_DISP,
+	DNA,DNA,		DGPR(RS),DFPR(FT),DNA)
+	
+	
+	
+#define SWL_IMPL { \
+	byte *src = (byte *) &GPR(RT); \
+	byte dst[4]; \
+	word addr = GPR(RS) + IMM; \
+	int size = 4 - (addr & 3); \
+	int i; \
+	for (i = 0; i < size; i++) \
+		dst[i] = src[3 - i]; \
+	WRITE_BLK(addr, size, dst); \
+}
+DEFINST(SWL,			0xa8000000,
+	0xfc000000,		"t,o(b)",
+	WrPort,			F_MEM|F_STORE|F_DISP,
+	DNA,DNA,		DGPR(RS),DGPR(RT),DNA)
+	
+	
+	
+#define SWR_IMPL { \
+	byte *src = (byte *) &GPR(RT); \
+	byte dst[4]; \
+	word addr = GPR(RS) + IMM; \
+	int size = 1 + (addr & 3); \
+	int i; \
+	for (i = 0; i < size; i++) \
+		dst[i] = src[size - i - 1]; \
+	WRITE_BLK(addr - size + 1, size, dst); \
+}
+DEFINST(SWR,			0xb8000000,
+	0xfc000000,		"t,o(b)",
+	WrPort,			F_MEM|F_STORE|F_DISP,
+	DNA,DNA,		DGPR(RS),DGPR(RT),DNA)
+
+	
+	
+#define SYSCALL_IMPL { \
+	result = MD_MSG_SYSCALL; \
+}
+DEFINST(SYSCALL,		0x0000000c,
+	0xfc00003f,		"",
+	fu_NONE,		0,
+	DNA,DNA,		DNA,DNA,DNA)
+	
+	
+	
+#define TRUNC_W_IMPL { \
+	if (FMT == MD_FMT_SINGLE) { \
+		float temp = FPRS(FS); \
+		sword itmp = (sword) temp; \
+		SET_FPRS(FD, * (float *) &itmp); \
+	} else if (FMT == MD_FMT_DOUBLE) { \
+		double temp = FPRD(FS); \
+		sword itmp = (sword) temp; \
+		SET_FPRS(FD, * (float *) &itmp); \
+	} else result = MD_MSG_FMTERROR; \
+}
+DEFINST(TRUNC_W,		0x4400000d,
+	0xfc1f003f,		"D,S",
+	FloatCVT,		F_FCOMP,
+	DFPR(FD),DNA,		DFPR(FS),DNA,DNA)
+
+	
+	
+#define XOR_IMPL { \
+	SET_GPR(RD, GPR(RS) ^ GPR(RT)); \
+}
+DEFINST(XOR,			0x00000026,
+	0xfc0007ff,		"d,s,t",
+	IntALU,			F_ICOMP,
+	DGPR(RD),DNA,		DGPR(RS),DGPR(RT),DNA)
+
+
+
+#define XORI_IMPL { \
+	SET_GPR(RT, GPR(RS) ^ UIMM); \
+}
+DEFINST(XORI,			0x38000000,
+	0xfc000000,		"t,s,u",
+	IntALU,			F_ICOMP|F_IMM,
+	DGPR(RT),DNA,		DGPR(RS),DNA,DNA)
+

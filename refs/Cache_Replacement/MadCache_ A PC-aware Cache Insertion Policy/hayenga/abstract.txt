@@ -1,0 +1,27 @@
+MadCache: A PC-aware Cache Insertion Policy
+
+*Contact Author
+Mitchell Hayenga
+Department of Electrical and Computer Engineering
+University of Wisconsin-Madison
+Email: hayenga@ece.wisc.edu
+
+
+Andrew Nere
+Department of Electrical and Computer Engineering
+University of Wisconsin-Madison
+Email: nere@wisc.edu
+
+Mikko Lipasti
+Department of Electrical and Computer Engineering
+University of Wisconsin-Madison
+Email: mikko@engr.wisc.edu
+
+
+
+Abstract:
+While the field of computer architecture is always looking for novel research topics to bring improved performance and efficiency, it is often simple improvements to more mature topics that have the most substantial impact.  Cache replacement policy is one such research area, where innovations are highly sought after because of their direct improvement on performance.  Furthermore, as chip-multiprocessors have become the dominant chip design, new cache replacement schemes should seek to improve the performance of workloads for both single-threaded and shared cache multithreaded systems.  
+
+In this paper we propose MadCache, a cache insertion policy that uses memory access history based on the Program Counter (PC) to determine the appropriate policy for the L3 cache.  A PC-based history table stores information regarding cache accesses and determines whether the L3 should default to the LRU replacement policy for workloads that exhibit good locality or bypass for streaming memory accesses.  Furthermore, this PC-based history table allows individual PCs to override this default policy if its history indicates a behavior significantly different from the typical trend of the workload.  
+We show that MadCache is able to improve IPC by 2.5% over LRU for a single-threaded 1MB 16-way L3 cache.  Finally, we extend MadCache to a four thread, 4MB shared L3 cache and demonstrate a 6% improvement in throughput and 4.5% speedup over LRU averaged across the mixed benchmarks we tested.
+

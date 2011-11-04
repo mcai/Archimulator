@@ -1,0 +1,17 @@
+Replacement algorithms in selecting victim lines in
+a cache congruence class (set) should also be designed
+carefully. When prefetched lines are placed in the re-
+gular cache, high frequency of prefetching can increase
+replacing useful cache lines. Casmira et al.[21] proposed
+Prefetch Buffer Filter (PBF), a small fully associative
+buffer, to reduce the effect of cache pollution. This
+buffer holds a prefetched cache line in PBF until it is ac-
+cessed for the first time. Then, the prefetched cache line
+is moved into cache. Jain et al.[41] suggested using soft-
+ware instructions to augment LRU replacement policy.
+These instructions allow a program to evict a cache ele-
+ment by making it the least recently used element or to
+keep a cache element in the cache. Replacement poli-
+cies that select victims based on both frequency and re-
+cency of accesses, such as Adaptive Replacement Cache
+(ARC)[42] can also reduce cache pollution.
