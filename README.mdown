@@ -1,0 +1,107 @@
+FleximJ 2.0 README
+========
+
+This README briefly describes what FleximJ is and how to setup & run FleximJ.
+
+Credits and License Information
+------------------
+
+Copyright (c) 2010-2011 by Min Cai (<min.cai.china@gmail.com>)
+
+This program is free software, licensed under the GPL3.
+Please, read the license file "COPYING" for further information.
+
+FleximJ in a Glance
+------------------
+
+FleximJ is an object-oriented architectural simulator written in 100% Java for evaluating multicore processors.
+
+Web Site
+------------------
+
+Please obtain the latest FleximJ code from FleximJ on Github: http://github.com/mcai/FleximJ/.
+
+Key Features
+------------------
+
+- FleximJ is written in 100% Java with the aid of JNA (Java Native Access) for native POSIX syscall implementations,
+  which assures its portability and usability across many Linux machine configurations.
+
+- FleximJ facilitates interface-based hierarchical object orientation to improve code readability and extensibility.
+
+- FleximJ provides **functional architectural simulation** of:
+	- Program loading for statically-linked MIPS32 ELF executables (both Little Endian and Big Endian are supported);
+	- Functional execution of common integer and floating-point instructions of MIPS32 ISA;
+	- Emulation of common POSIX system calls;
+	- Execution of Pthreads based multithreaded programs.
+
+- FleximJ provides **cycle-accurate microarchitectural simulation** of:
+	- Separate pipeline structures such as the reorder buffer, separate integer and floating point physical register files;
+	- Explicit register renaming based on the merged architectural and rename register file model;
+	- Single-threaded superscalar out-of-order execution, multithreaded SMT and CMP execution model;
+	- Multi-level inclusive cache hierarchy with the directory-based MESI coherence protocol;
+	- Simple cycle-accurate DRAM controller model;
+	- Various kinds of static and dynamic branch predictors, checkpointing-based pipeline recovery on branch misprediction.
+
+- FleximJ supports the following **unclassified simulation features**:
+	- Support measurement of instructions, pipeline structures and the cache hierarchy;
+	- Support generation of instruction traces;
+	- Support both execution-driven and trace-driven memory subsystem simulation;
+	- Support complex simulation strategies, e.g., cycle count based, instruction count based, and hotspot oriented simulation;
+	- Support seamless switching between functional simulation and performance simulation mode;
+	- Support the software-controlled helper threaded data prefetching scheme: classification of good, bad and ugly HT requests.
+
+- FleximJ provides the following **common infrastructure**:
+	- Cycle-accurate event scheduling and dispatching framework for modeling asynchronous activities;
+	- XML-based I/O for configuring and reporting statistics of the simulated architectures, workloads and simulations;
+	- An easy-to-use logging mechanism.
+
+- FleximJ currently supports correct execution of all the **Olden benchmark suite** except incorrect output from "health".
+  Other benchmarks are being tested.
+
+System Requirements
+------------------
+
+FleximJ has been tested on 32/64 bit **Ubuntu Linux 10.04.2** on an Intel Core i5 machine.
+
+For **developing and running FleximJ**, make sure that:
+
+1. You have Ubuntu Linux 10.04 (or other mainstream Linux distros);
+
+2. To compile and run Java programs: JDK 7.0 and Apache Ant 1.8.0 are installed.
+
+Quick Start
+------------------
+
+1. Unpack the zip or tar file containing the FleximJ source;
+
+2. Modify the JAVA_HOME environment variable in ./ant.sh to the folder where your selected JDK 7 distribution resides;
+
+3. Type `./ant.sh run` to compile, build jar and run FleximJ.
+
+Customizing FleximJ for Your Needs
+------------------
+
+FleximJ has embedded in the jar a few benchmark binaries under the directory: `benchmarks/` for your convenience.
+So if you use FleximJ for testing purposes only, there is no need to compile benchmarks for FleximJ by yourself.
+
+In order to customize the simulations for the FleximJ simulator, you will need to set up or edit a few configuration files.
+A few sample configuration files have been provided for your reference under the directory: `configs/`.
+
+How to Compile Benchmarks for FleximJ
+------------------
+
+1. Download and unpack crosstool-0.43 from http:www.kegel.com/crosstool/.
+   Follow the crosstool instructions to build a GCC-based x86 to MIPS cross toolchain, either little endian (demo-mipsel.sh) or big endian (demo-mips.sh));
+
+2. Use the above generated toolchain to compile MIPS32 binaries to be simulated by FleximJ.
+   Add "-mips1" to CFLAGS, "-static" to LDFLAGS during compilation.
+
+Contact
+------------------
+
+Please report bugs and send suggestions to:
+
+Min Cai (<min.cai.china@gmail.com>)
+
+School of Computer Science and Technology, Beijing Institute of Technology, Beijing, China

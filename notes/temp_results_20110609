@@ -1,0 +1,12 @@
+mst 1000, HT version, run to end detailed simulation, execution time in cycles with respect to L2 replacement policy
+----------------------------
+baseline RecentlyUsedEvictionPolicy:
+	501520239
+
+StreamingHTEnhancedLeastRecentlyUsedEvictionPolicy without bypass, not differentiating reads/writes:
+	496066637
+
+StreamingHTEnhancedLeastRecentlyUsedEvictionPolicy with bypass, not differentiating reads/writes:
+	495453387
+
+

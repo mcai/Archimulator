@@ -1,0 +1,65 @@
+基于线程间复用距离的面向异核协同数据预取的共享缓存替换性能优化策略与机制研究
+Inter-Thread Reuse Distance Based Shared LLC Performance Optimization for Helper Threaded Data Prefetching on Chip Multiprocessors
+
+
+思路1 (基于线程间复用距离预测的LLC替换):
+    TODO 1：验证帮助线程替换掉的主线程数据是否都是非delinquent PCs发出的
+    TODO 2：线程间复用距离预测器的设计与实现，预测准确度和覆盖率的评价
+    TODO 3: 基于线程间复用距离预测的LLC替换策略与机制涉及与实现
+
+思路2 (基于线程间复用距离监控的帮助线程同步控制):
+	TODO 1: 基于线程间复用距离监控的帮助线程同步控制机制
+
+TODO *: based on the trace of llcDownwardReadMissesFromDelinquentPCs, calculate the inter-thread reuse distance for each Loads issued by delinquent PCs from HT
+
+-------------------------
+
+Keywords：inter-Thread Reuse Distance, Shared Last Level Cache Replacement, Helper Threads, Data Prefetching, Chip Multiprocessors
+关键词：线程间复用距离，最后一级共享缓存替换，帮助线程，数据预取, 片上多处理器
+-------------------------
+
+Inter-Thread Reuse Distance Prediction Based Shared LLC Replacement for Helper Threaded Data Prefetching on CMPs
+基于线程间复用距离预测的面向异核数据预取的共享缓存替换策略与机制研究
+
+注：以下部分以mst为例
+	
+1. 动机：
+	a. mst中的LLC污染并不严重，原因：delinquent PCs发出的数据缺少复用性（复用距离很大）；
+	b. 异核数据预取对主线程性能的提升是基于主线程访问帮助线程最近访问过的数据
+
+2. 背景：线程内复用距离（即传统的复用距离概念）：
+	
+	对Delinquent PCs引发的LLC缺失：
+		主线程： 线程内复用距离很大 (数据缺少重用性)；
+		帮助线程：线程内复用距离很大 (数据缺少重用性)
+
+	因此，对mst应用而言，LRU算法和基于线程内复用距离预测的现有替换算法无效
+
+3. 线程间复用距离（New！）及基于线程间复用距离的异核数据预取质量评估：
+
+	对Delinquent PCs引发的LLC缺失：
+		帮助线程-followed by-主线程复用距离：
+			(1) 小 => 有用预取;
+			(2) 中等 => 稍微迟到的预取;
+			(3) 大或灰常大 => 无用预取.
+			
+		主线程-followed by-帮助线程复用距离：
+			(1) 小 => 迟到的预取，意味着无需同步，但需要减少数据预取量以加大帮助线程步伐;
+			(2) 中等 => 严重迟到的预取，意味着帮助线程落后于主线程，需要同步;
+			(3) 大或灰常大 => 帮助线程没有覆盖到的主线程缺失.
+	
+4. 面向异核数据预取的线程间复用距离监控与预测机制
+。。。
+
+5. 基于线程间复用距离预测的面向异核数据预取的共享缓存替换
+
+	a. 对非Delinquent PCs引发的LLC缺失采用LRU算法
+	b. 对Delinquent PCs引发的LLC缺失：
+		复用距离=主线程内复用距离 或 帮助线程-followed by-主线程间复用距离
+		
+		(1) 复用距离灰常大: bypass:)
+		(2) 复用距离大: 插入LRU位置
+		(3) 复用距离中等: 插入中间位置
+		(4) 复用距离小: 插入MRU位置
+		
+6. 基于线程间复用距离的帮助线程同步触发时机选择机制

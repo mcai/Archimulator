@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<library>
+<manage_target braces="false" utf8="false">ref.bib</manage_target>
+<library_folder monitor="true"></library_folder>
+<taglist>
+</taglist>
+<doclist>
+  <doc>
+    <filename></filename>
+    <relative_filename></relative_filename>
+    <key>Mehta2004</key>
+    <notes></notes>
+    <bib_type>Misc</bib_type>
+    <bib_doi></bib_doi>
+    <bib_title>Cache Showdown: The Good, Bad and Ugly</bib_title>
+    <bib_authors>Mehta, Bhavesh and Vantrease, Dana and Yen, Luke</bib_authors>
+    <bib_journal></bib_journal>
+    <bib_volume></bib_volume>
+    <bib_number></bib_number>
+    <bib_pages></bib_pages>
+    <bib_year>2004</bib_year>
+    <bib_extra key="Abstract">Prefetching algorithms have been mainly studied in the context of the Coverage and Accuracy metrics. While this is an appropriate metric for prefetching into separate stream buffers, it is a poor assessment of prefetching into a shared cache structure where cache pollution can become a serious factor. Traditionally, prefetches have been categorized as &quot;good&quot; or &quot;bad&quot; if they are accessed or are evicted without being accessed, respectively. We propose a new categorization of &quot;good&quot;, &quot;bad&quot;, and &quot;ugly&quot; that takes into account prefetches that cause harmful cache pollution. This paper proposes a novel structure called the Evict Table (ET) that gauges the amount of cache pollution caused by prefetching into a shared data structure, such as a cache. We show the value of the ET in the context of a chip-multiprocessors, where prefetching among several processing nodes may further increase the contention for cache real-estate. Specifically, we use the ET as an aid in evaluating the effects of Unistride and Czone prefetching algorithms on a chip-multiprocessor’s shared L2 cache across a varying number of cache sizes. 1 1</bib_extra>
+    <bib_extra key="Bibsource">OAI-PMH server at citeseerx.ist.psu.edu</bib_extra>
+    <bib_extra key="Contributor">CiteSeerX</bib_extra>
+    <bib_extra key="Language">en</bib_extra>
+    <bib_extra key="Oai">oai:CiteSeerXPSU:10.1.1.115.6866</bib_extra>
+    <bib_extra key="Relation">10.1.1.37.6114; 10.1.1.55.4004; 10.1.1.85.9737; 10.1.1.117.6719; 10.1.1.12.3639; 10.1.1.137.5086; 10.1.1.84.6302; 10.1.1.13.7350; 10.1.1.31.4592; 10.1.1.121.2399; 10.1.1.108.3882</bib_extra>
+    <bib_extra key="Rights">Metadata may be used without restrictions as long as the oai identifier remains attached to it.</bib_extra>
+    <bib_extra key="Url">http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.115.6866; http://www.cs.wisc.edu/~bsmehta/757/paper.pdf</bib_extra>
+  </doc>
+  <doc>
+    <filename></filename>
+    <relative_filename></relative_filename>
+    <key>Jaleel2010</key>
+    <notes></notes>
+    <bib_type>inproceedings</bib_type>
+    <bib_doi></bib_doi>
+    <bib_title>High performance cache replacement using re-reference interval prediction (RRIP)</bib_title>
+    <bib_authors>Jaleel, Aamer and Theobald, Kevin B. and Simon C.  Steely, Jr. and Emer, Joel S.</bib_authors>
+    <bib_journal></bib_journal>
+    <bib_volume></bib_volume>
+    <bib_number></bib_number>
+    <bib_pages>60-71</bib_pages>
+    <bib_year>2010</bib_year>
+    <bib_extra key="address">Saint-Malo, France</bib_extra>
+    <bib_extra key="booktitle">Proc. 37th International Symposium on Computer Architecture (37th ISCA &apos;2010)</bib_extra>
+    <bib_extra key="Keywords">caches,</bib_extra>
+    <bib_extra key="Month">jun</bib_extra>
+    <bib_extra key="publisher">ACM SIGARCH</bib_extra>
+  </doc>
+  <doc>
+    <filename></filename>
+    <relative_filename></relative_filename>
+    <key>Petoumenos2010</key>
+    <notes></notes>
+    <bib_type>Misc</bib_type>
+    <bib_doi></bib_doi>
+    <bib_title>Instruction-based Reuse Distance Prediction Replacement Policy</bib_title>
+    <bib_authors>Petoumenos, Pavlos and Keramidas, Georgios and Kaxiras, Stefanos</bib_authors>
+    <bib_journal></bib_journal>
+    <bib_volume></bib_volume>
+    <bib_number></bib_number>
+    <bib_pages></bib_pages>
+    <bib_year>2010</bib_year>
+    <bib_extra key="Abstract">This paper presents a new cache replacement policy based on Instruction-based Reuse Distance Prediction (IbRDP) Replacement Policy originally proposed by Keramidas, Petoumenos, and Kaxiras [5] and further optimized by Petoumenos et al. [6]. In these works [5,6] we have proven that there is a strong correlation between the temporal characteristics of the cache blocks and the access patterns of instructions (PCs) that touch these cache blocks. Based on this observation we introduced a new class of instruction-based predictors which are able to directly predict with high accuracy at run-time when a cache block is going to be accessed in the future, a.k.a. the reuse distance of a cache block. Being able to predict the reuse distances of the cache blocks permits us to make near-optimal replacement decisions by &quot;lookingintothefuture.&quot; In this work, we employ an extension of the IbRDP Replacement policy [6]. We carefully re-design the organization as well as the functionality of the predictor and the corresponding replacement algorithm in order to fit into the tight area budget provided by the CRC committee [3]. Since our proposal naturally supports the ability to victimize the currently fetched blocks by not caching them at all in the cache (Selective Caching), we submit for evaluation two versions: the base-IbRDP and the IbRDP enhanced with Selective Caching (IbRDP+SC). Our performance evaluations based on a subset of SPEC2006 applications show that IbRDP achieves an IPC improvement of 4.66% (arithmetic average) over traditional LRU, while IbRDP+SC is able to further increase its distance compared to the baseline LRU to 6.04%. Finally, we also show that IbRDP outperforms the previous state of the art proposal (namely Dynamic Insertion Policy or DIP [7]) by 2.32% in terms of IPC (3.81% for the IbRDP+SC).</bib_extra>
+    <bib_extra key="Bibsource">OAI-PMH server at hal.archives-ouvertes.fr</bib_extra>
+    <bib_extra key="Coverage">Saint Malo; France</bib_extra>
+    <bib_extra key="Language">English</bib_extra>
+    <bib_extra key="Oai">oai:hal.archives-ouvertes.fr:inria-00492936</bib_extra>
+    <bib_extra key="Source">JWAC 2010 - 1st JILP Worshop on Computer Architecture Competitions: cache replacement Championship</bib_extra>
+    <bib_extra key="Subject">[INFO:INFO_AR] Computer Science/Architecture</bib_extra>
+    <bib_extra key="Type">proceeding, seminar, workshop without peer review</bib_extra>
+    <bib_extra key="Url">HAL: http://hal.archives-ouvertes.fr/inria-00492936/en/; http://hal.archives-ouvertes.fr/docs/00/49/29/36/PDF/002_petoumenos.pdf.pdf</bib_extra>
+  </doc>
+  <doc>
+    <filename></filename>
+    <relative_filename></relative_filename>
+    <key>Keramidas2007</key>
+    <notes></notes>
+    <bib_type>InProceedings</bib_type>
+    <bib_doi></bib_doi>
+    <bib_title>Cache replacement based on reuse-distance prediction</bib_title>
+    <bib_authors>Keramidas, Georgios and Petoumenos, Pavlos and Kaxiras, Stefanos</bib_authors>
+    <bib_journal></bib_journal>
+    <bib_volume></bib_volume>
+    <bib_number></bib_number>
+    <bib_pages>245-250</bib_pages>
+    <bib_year>2007</bib_year>
+    <bib_extra key="Bibdate">2008-09-22</bib_extra>
+    <bib_extra key="Bibsource">DBLP, http://dblp.uni-trier.de/db/conf/iccd/iccd2007.html#KeramidasPK07</bib_extra>
+    <bib_extra key="BookTitle">ICCD</bib_extra>
+    <bib_extra key="Crossref">conf/iccd/2007</bib_extra>
+    <bib_extra key="Isbn">1-4244-1258-7</bib_extra>
+    <bib_extra key="Publisher">IEEE</bib_extra>
+    <bib_extra key="Url">http://dx.doi.org/10.1109/ICCD.2007.4601909</bib_extra>
+  </doc>
+  <doc>
+    <filename></filename>
+    <relative_filename></relative_filename>
+    <key>Zhao2010</key>
+    <notes></notes>
+    <bib_type>InProceedings</bib_type>
+    <bib_doi></bib_doi>
+    <bib_title>SPACE: sharing pattern-based directory coherence for multicore scalability</bib_title>
+    <bib_authors>Zhao, Hongzhou and Shriraman, Arrvindh and Dwarkadas, Sandhya</bib_authors>
+    <bib_journal></bib_journal>
+    <bib_volume></bib_volume>
+    <bib_number></bib_number>
+    <bib_pages>135-146</bib_pages>
+    <bib_year>2010</bib_year>
+    <bib_extra key="Bibdate">2011-02-14</bib_extra>
+    <bib_extra key="Bibsource">DBLP, http://dblp.uni-trier.de/db/conf/IEEEpact/pact2010.html#ZhaoSD10</bib_extra>
+    <bib_extra key="BookTitle">PACT</bib_extra>
+    <bib_extra key="Editor">Salapura, Valentina and Gschwind, Michael and Knoop, Jens</bib_extra>
+    <bib_extra key="Isbn">978-1-4503-0178-7</bib_extra>
+    <bib_extra key="Publisher">ACM</bib_extra>
+    <bib_extra key="Series">19th International Conference on Parallel Architecture and Compilation Techniques (PACT 2010), Vienna, Austria, September 11-15, 2010</bib_extra>
+    <bib_extra key="Url">http://doi.acm.org/10.1145/1854273.1854294</bib_extra>
+  </doc>
+  <doc>
+    <filename></filename>
+    <relative_filename></relative_filename>
+    <key>Collins2001</key>
+    <notes></notes>
+    <bib_type>InProceedings</bib_type>
+    <bib_doi></bib_doi>
+    <bib_title>Dynamic Speculative Precomputation</bib_title>
+    <bib_authors>Collins, Jamison D. and Tullsen, Dean M. and Wang, Hong and Shen, John P.</bib_authors>
+    <bib_journal></bib_journal>
+    <bib_volume></bib_volume>
+    <bib_number></bib_number>
+    <bib_pages>306-317</bib_pages>
+    <bib_year>2001</bib_year>
+    <bib_extra key="Address">Austin, Texas</bib_extra>
+    <bib_extra key="Author:corp">IEEE Computer Society TC-MICRO and ACM SIGMICRO</bib_extra>
+    <bib_extra key="BookTitle">Proceedings of the 34th Annual International Symposium on Microarchitecture</bib_extra>
+    <bib_extra key="Month">dec 1–5,</bib_extra>
+  </doc>
+  <doc>
+    <filename></filename>
+    <relative_filename></relative_filename>
+    <key>Chen2010</key>
+    <notes></notes>
+    <bib_type>InProceedings</bib_type>
+    <bib_doi></bib_doi>
+    <bib_title>Adaptive and Speculative Slack Simulations of CMPs on CMPs</bib_title>
+    <bib_authors>Chen, Jianwei and Dabbiru, Lakshmi Kumar and Wong, Daniel and Annavaram, Murali and Dubois, Michel</bib_authors>
+    <bib_journal></bib_journal>
+    <bib_volume></bib_volume>
+    <bib_number></bib_number>
+    <bib_pages>523-534</bib_pages>
+    <bib_year>2010</bib_year>
+    <bib_extra key="Bibdate">2011-01-24</bib_extra>
+    <bib_extra key="Bibsource">DBLP, http://dblp.uni-trier.de/db/conf/micro/micro2010.html#ChenDWAD10</bib_extra>
+    <bib_extra key="BookTitle">MICRO</bib_extra>
+    <bib_extra key="Crossref">conf/micro/2010</bib_extra>
+    <bib_extra key="Isbn">978-0-7695-4299-7</bib_extra>
+    <bib_extra key="Publisher">IEEE</bib_extra>
+    <bib_extra key="Url">http://dx.doi.org/10.1109/MICRO.2010.47</bib_extra>
+  </doc>
+  <doc>
+    <filename></filename>
+    <relative_filename></relative_filename>
+    <key>Jacob2008</key>
+    <notes></notes>
+    <bib_type>Book</bib_type>
+    <bib_doi></bib_doi>
+    <bib_title>Memory Systems: Cache, DRAM, Disk</bib_title>
+    <bib_authors>Jacob, Bruce L. and Ng, Spencer W. and Wang, David T.</bib_authors>
+    <bib_journal></bib_journal>
+    <bib_volume></bib_volume>
+    <bib_number></bib_number>
+    <bib_pages></bib_pages>
+    <bib_year>2008</bib_year>
+    <bib_extra key="Bibdate">2009-09-13</bib_extra>
+    <bib_extra key="Isbn">978-0-12-379751-3</bib_extra>
+    <bib_extra key="Publisher">Morgan Kaufmann</bib_extra>
+    <bib_extra key="Series"></bib_extra>
+    <bib_extra key="Url">http://www.elsevierdirect.com/companion.jsp?ISBN=9780123797513</bib_extra>
+  </doc>
+  <doc>
+    <filename></filename>
+    <relative_filename></relative_filename>
+    <key>Eeckhout2010</key>
+    <notes></notes>
+    <bib_type>Book</bib_type>
+    <bib_doi></bib_doi>
+    <bib_title>Computer Architecture Performance Evaluation Methods</bib_title>
+    <bib_authors>Eeckhout, Lieven</bib_authors>
+    <bib_journal></bib_journal>
+    <bib_volume></bib_volume>
+    <bib_number></bib_number>
+    <bib_pages></bib_pages>
+    <bib_year>2010</bib_year>
+    <bib_extra key="Bibdate">2010-09-08</bib_extra>
+    <bib_extra key="Publisher">Morgan &amp; Claypool Publishers</bib_extra>
+    <bib_extra key="Series">Synthesis Lectures on Computer Architecture</bib_extra>
+    <bib_extra key="Url">http://dx.doi.org/10.2200/S00273ED1V01Y201006CAC010; http://dx.doi.org/10.2200/S00273ED1V01Y201006CAC010</bib_extra>
+  </doc>
+</doclist>
+</library>
