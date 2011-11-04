@@ -14,6 +14,11 @@
       <entry name="?*.dtd" />
       <entry name="?*.tld" />
       <entry name="?*.ftl" />
+      <entry name="?*.xml" />
+      <entry name="?*.mipsel" />
+      <entry name="?*.mips" />
+      <entry name="?*.sesc" />
+      <entry name="?*.so" />
     </wildcardResourcePatterns>
     <annotationProcessing enabled="false" useClasspath="true" />
   </component>
