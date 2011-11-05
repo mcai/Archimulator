@@ -40,6 +40,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class BigMemory extends BasicSimulationObject {
+    private String simulationDirectory;
     private boolean littleEndian;
     private MemoryPageCache cache;
 
@@ -47,9 +48,10 @@ public class BigMemory extends BasicSimulationObject {
     private long hits;
     private long evictions;
 
-    public BigMemory(SimulationObject parent, boolean littleEndian) {
+    public BigMemory(SimulationObject parent, String simulationDirectory, boolean littleEndian) {
         super(parent);
 
+        this.simulationDirectory = simulationDirectory;
         this.littleEndian = littleEndian;
 
         this.cache = new MemoryPageCache(this, "bigMemory.MemoryPageCache", new CacheGeometry(
@@ -65,8 +67,6 @@ public class BigMemory extends BasicSimulationObject {
     }
 
     public void create(int pageId) {
-//        System.out.printf("create(pageId=%d)%n", pageId);
-
         this.prepare(pageId);
     }
 
@@ -77,8 +77,6 @@ public class BigMemory extends BasicSimulationObject {
 
         int directByteBufferDisplacement = getDirectByteBufferDisplacement(pageId);
         bb.position(directByteBufferDisplacement + displacement);
-
-//        System.out.printf("%s(pageId=%d, displacement=%d, offset=0x%08x, size=%d, directByteBufferDisplacement=0x%08x)\n", write ? "write" : "read", pageId, displacement, offset, size, directByteBufferDisplacement);
 
         if (write) {
             bb.put(buf, offset, size);
@@ -156,8 +154,6 @@ public class BigMemory extends BasicSimulationObject {
         }
 
         public MemoryPageCacheLine saveToDisk() {
-//            System.out.printf("saveToDisk(tag=%d)%n", tag);
-
             try {
                 RandomAccessFile raf = new RandomAccessFile(getDiskCacheFileName(), "rws");
                 ByteBuffer diskBb = raf.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, DISK_CACHE_FILE_LENGTH).order(littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
@@ -193,8 +189,6 @@ public class BigMemory extends BasicSimulationObject {
                 }
 
                 try {
-//                    System.out.printf("loadFromDisk(tag=%d)%n", tag);
-
                     RandomAccessFile raf = new RandomAccessFile(getDiskCacheFileName(), "r");
                     ByteBuffer diskBb = raf.getChannel().map(FileChannel.MapMode.READ_ONLY, 0, DISK_CACHE_FILE_LENGTH).order(littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
 
@@ -224,7 +218,8 @@ public class BigMemory extends BasicSimulationObject {
         private String getDiskCacheFileName() {
             int pageIndex = this.tag;
             int fileIndex = getDiskCacheFileIndex(pageIndex);
-            return "test" + fileIndex + ".dat";
+
+            return simulationDirectory + "/mem." + fileIndex + ".diskCache";
         }
 
         private boolean isDiskCacheFileExist() {

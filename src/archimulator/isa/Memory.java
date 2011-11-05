@@ -51,7 +51,7 @@ public class Memory extends BasicSimulationObject {
 
     private BigMemory bigMemory;
 
-    public Memory(Kernel kernel, boolean littleEndian) {
+    public Memory(Kernel kernel, String simulationDirectory, boolean littleEndian) {
         super(kernel);
 
         this.kernel = kernel;
@@ -62,7 +62,7 @@ public class Memory extends BasicSimulationObject {
 
         this.pages = new TreeMap<Integer, Map<Integer, Page>>();
 
-        this.bigMemory = new BigMemory(this, littleEndian);
+        this.bigMemory = new BigMemory(this, simulationDirectory, littleEndian);
 
         this.init();
     }
@@ -334,7 +334,7 @@ public class Memory extends BasicSimulationObject {
             this.pages.put(index, new TreeMap<Integer, Page>());
         }
 
-        Page page = new Page(this.currentMemoryPageId, this.currentMemoryPageId++ << Memory.getPageSizeInLog2());
+        Page page = new Page(this.currentMemoryPageId++);
 
         this.pages.get(index).put(tag, page);
 
@@ -366,9 +366,9 @@ public class Memory extends BasicSimulationObject {
         private int id;
         private int physicalAddress;
 
-        private Page(int id, int physicalAddress) {
+        private Page(int id) {
             this.id = id;
-            this.physicalAddress = physicalAddress;
+            this.physicalAddress = this.id << Memory.getPageSizeInLog2();
 
             bigMemory.create(this.id);
         }
