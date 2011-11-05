@@ -233,7 +233,7 @@ public class BigMemory extends BasicSimulationObject {
         }
     }
 
-    private static final int MEMORY_PAGE_CACHE_CAPACITY = 2048; // 8Mb
+    private static final int MEMORY_PAGE_CACHE_CAPACITY = 512; // 8Mb
     //    private static final int MEMORY_PAGE_CACHE_CAPACITY = 512;
     private static final int MEMORY_PAGE_CACHE_LINE_SIZE = 8;
 
