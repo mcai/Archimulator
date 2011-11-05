@@ -1,5 +1,0 @@
-1. use Ubuntu 10.04 sources and sudo apt-get install gcc-3.4 g++-3.4 flex bison
-2. ./demo-mips.sh with eval `cat mips.dat gcc-3.4.5-glibc-2.3.6.dat` sh all.sh --notest
-3. when encountering errors, change [2.1[3-9]*]  to [2.[0-9]*[0-9]*] in crosstool-0.43/build/mips-unknown-linux-gnu/gcc-3.4.5-glibc-2.3.6/glibc-2.3.6/configure
-./demo-mips.sh with eval `cat mips.dat gcc-3.4.5-glibc-2.3.6.dat` sh all.sh --nounpack --notest
-4. when encountering errors, change comma positions in crosstool-0.43/build/mips-unknown-linux-gnu/gcc-3.4.5-glibc-2.3.6/build-glibc/csu/version-info.h
