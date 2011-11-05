@@ -44,8 +44,8 @@ public class Startup {
     }
 
     public static void simulate(String title, SimulatedProgram simulatedProgram, EvictionPolicyFactory l2EvictionPolicyFactory) {
-//        Experiment experiment = createFunctionalExperiment(title, simulatedProgram);
-        Experiment experiment = createDetailedExperiment(title, simulatedProgram, l2EvictionPolicyFactory);
+        Experiment experiment = createFunctionalExperiment(title, simulatedProgram);
+//        Experiment experiment = createDetailedExperiment(title, simulatedProgram, l2EvictionPolicyFactory);
 //        Experiment experiment = createCheckpointedExperiment(title, simulatedProgram, l2EvictionPolicyFactory);
 
         experiment.start();

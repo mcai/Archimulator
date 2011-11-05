@@ -33,14 +33,14 @@ public class CacheLine<StateT extends Serializable> implements Serializable {
         this.way = way;
         this.state = initialState;
 
-        this.tag = 0;
+        this.tag = -1;
         this.initialState = initialState;
     }
 
     public void invalidate() { //TODO: should notify cache's eviction policy
         assert (this.state != this.initialState);
 
-        this.tag = 0;
+        this.tag = -1;
         this.state = this.initialState;
     }
 

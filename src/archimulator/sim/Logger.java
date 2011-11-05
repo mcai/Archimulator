@@ -28,6 +28,7 @@ public abstract class Logger {
 
     public Logger() {
         this.outputAppender = new CompositeOutputAppender(new ConsoleOutputAppender(), new TelnetServer());
+//        this.outputAppender = new ConsoleOutputAppender();
     }
 
     private String getMessage(String caption, String text) {

@@ -18,11 +18,11 @@
  ******************************************************************************/
 package archimulator.isa;
 
+import archimulator.isa.bigMemory.BigMemory;
 import archimulator.mem.cache.CacheGeometry;
 import archimulator.os.Kernel;
 import archimulator.sim.BasicSimulationObject;
 import archimulator.util.action.Action1;
-import archimulator.util.io.serialization.StandardJavaSerializationHelper;
 import archimulator.sim.event.PollStatsEvent;
 
 import java.io.IOException;
@@ -309,9 +309,10 @@ public class Memory extends BasicSimulationObject {
     }
 
     private void copyPages(int tagDest, int tagSrc, int numPages) {
-        for (int i = 0; i < numPages; i++) {
-            this.getPage(tagDest + i * getPageSize()).bb = this.getPage(tagSrc + i * getPageSize()).bb;
-        }
+        throw new UnsupportedOperationException(); //TODO: support it using BigMemory
+//        for (int i = 0; i < numPages; i++) {
+//            this.getPage(tagDest + i * getPageSize()).bb = this.getPage(tagSrc + i * getPageSize()).bb;
+//        }
     }
 
     public int getPhysicalAddress(int virtualAddress) {
@@ -364,38 +365,31 @@ public class Memory extends BasicSimulationObject {
     private class Page implements Serializable {
         private int id;
         private int physicalAddress;
-        private transient ByteBuffer bb;
 
         private Page(int id, int physicalAddress) {
             this.id = id;
             this.physicalAddress = physicalAddress;
-            this.bb = ByteBuffer.allocateDirect(getPageSize()).order(littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
 
-            bigMemory.access(id);
+            bigMemory.create(this.id);
         }
 
         private void writeObject(ObjectOutputStream oos) throws IOException {
             oos.defaultWriteObject();
 
-            StandardJavaSerializationHelper.writeDirectByteBuffer(oos, this.bb);
+             //TODO: support it using BigMemory
+//            StandardJavaSerializationHelper.writeDirectByteBuffer(oos, this.bb);
         }
-
+//
         private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
             ois.defaultReadObject();
 
-            this.bb = StandardJavaSerializationHelper.readDirectByteBuffer(ois);
+             //TODO: support it using BigMemory
+//            this.bb = StandardJavaSerializationHelper.readDirectByteBuffer(ois);
         }
 
         private void doAccess(int addr, byte[] buf, int offset, int size, boolean write) {
-            this.bb.position(getDisplacement(addr));
-
-            if (write) {
-                this.bb.put(buf, offset, size);
-            } else {
-                this.bb.get(buf, offset, size);
-            }
-
-            bigMemory.access(this.id);
+            int displacement = getDisplacement(addr);
+            bigMemory.readWrite(this.id, displacement, buf, offset, size, write);
         }
     }
 

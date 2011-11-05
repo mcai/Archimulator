@@ -120,7 +120,7 @@ public class TelnetServer implements OutputAppender {
 
                 String line = "";
 
-                for (; line == null || !line.equals("exit"); ) {
+                for (; line != null && !line.equals("exit"); ) {
                     line = in.readLine();
                 }
 
