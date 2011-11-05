@@ -34,18 +34,18 @@ public class NativeEmulatorEnhancedMipsInstructionExecutor extends BasicMipsInst
 //        context.getKernel().getCapability(NativeMipsIsaEmulatorCapability.class).decode(machInst).addi_impl(context.getId(), machInst);
 //    }
 //
-//    // @Override
+    // @Override
 //    public void addiu_impl(final Context context, final int machInst) {
-//        this.checkImplementations(context, new Action() {
-//                    public void apply() {
-////                        // NativeEmulatorEnhancedMipsInstructionExecutor.super.addiu_impl(context, machInst);
-//                    }
-//                }, new Action() {
-//            public void apply() {
-//                context.getKernel().getCapability(NativeMipsIsaEmulatorCapability.class).decode(machInst).addiu_impl(context.getId(), machInst);
-//            }
-//        }
-//        );
+////        this.checkImplementations(context, new Action() {
+////                    public void apply() {
+////                        NativeEmulatorEnhancedMipsInstructionExecutor.super.addiu_impl(context, machInst);
+////                    }
+////                }, new Action() {
+////            public void apply() {
+////                context.getKernel().getCapability(NativeMipsIsaEmulatorCapability.class).decode(machInst).addiu_impl(context.getId(), machInst);
+////            }
+////        }
+////        );
 //        context.getKernel().getCapability(NativeMipsIsaEmulatorCapability.class).decode(machInst).addiu_impl(context.getId(), machInst);
 //    }
 //

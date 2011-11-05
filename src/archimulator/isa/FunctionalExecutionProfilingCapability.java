@@ -35,16 +35,49 @@ public class FunctionalExecutionProfilingCapability implements KernelCapability 
     private EnumSet<Mnemonic> executedMnemonics;
     private Set<String> executedSyscalls;
 
-    public FunctionalExecutionProfilingCapability(Kernel kernel) {
+    public FunctionalExecutionProfilingCapability(final Kernel kernel) {
         this.kernel = kernel;
 
         this.executedMnemonics = EnumSet.noneOf(Mnemonic.class);
         this.executedSyscalls = new HashSet<String>();
 
-//        final String[] args = {"", "/home/itecgo/Archimulator/benchmarks/CPU2006_Custom1/462.libquantum/baseline/462.libquantum.mips", "33", "5"}; //TODO: path should not be hard coded
+        kernel.getBlockingEventDispatcher().addListener(Kernel.KernelCapabilitiesInitializedEvent.class, new Action1<Kernel.KernelCapabilitiesInitializedEvent>() {
+            public void apply(Kernel.KernelCapabilitiesInitializedEvent event) {
+                initNativeMipsIsaEmulatorCapability(kernel);
+            }
+        });
+
+        kernel.getBlockingEventDispatcher().addListener(SyscallExecutedEvent.class, new Action1<SyscallExecutedEvent>() {
+            public void apply(SyscallExecutedEvent event) {
+//                System.out.println(event.getContext().getRegs().dump());
+
+                System.out.printf("0x%08x: syscall %s\n", event.getContext().getRegs().getPc(), event.getSyscallName());
+
+                String syscallName = event.getSyscallName();
+                if (!executedSyscalls.contains(syscallName)) {
+                    executedSyscalls.add(syscallName);
+                }
+            }
+        });
+
+        kernel.getBlockingEventDispatcher().addListener(PollStatsEvent.class, new Action1<PollStatsEvent>() {
+            public void apply(PollStatsEvent event) {
+                dumpStats(event.getStats());
+            }
+        });
+
+        kernel.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
+            public void apply(DumpStatEvent event) {
+                dumpStats(event.getStats());
+            }
+        });
+    }
+
+    private void initNativeMipsIsaEmulatorCapability(Kernel kernel) {
+        //        final String[] args = {"", "/home/itecgo/Archimulator/benchmarks/CPU2006_Custom1/462.libquantum/baseline/462.libquantum.mips", "33", "5"}; //TODO: path should not be hard coded
 //        final String[] args = {"", "/home/itecgo/Archimulator/benchmarks/Olden_Custom1/em3d/baseline/em3d.mips", "400000", "128", "75", "1"}; //TODO: path should not be hard coded
-//        final String[] args = {"", "/home/itecgo/Archimulator/benchmarks/Olden_Custom1/mst/baseline/mst.mips", "1000"}; //TODO: path should not be hard coded
-        final String[] args = {"", "/home/itecgo/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline/429.mcf.mips", "<", "/home/itecgo/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline/data/ref/input/inp.in"}; //TODO: path should not be hard coded
+        final String[] args = {"", "/home/itecgo/FleximJ/benchmarks/Olden_Custom1/mst/baseline/mst.mips", "1000"}; //TODO: path should not be hard coded
+//        final String[] args = {"", "/home/itecgo/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline/429.mcf.mips", "<", "/home/itecgo/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline/data/ref/input/inp.in"}; //TODO: path should not be hard coded
 
         final NativeMipsIsaEmulatorCapability nativeMipsIsaEmulatorCapability = this.kernel.getCapability(NativeMipsIsaEmulatorCapability.class);
 
@@ -61,7 +94,10 @@ public class FunctionalExecutionProfilingCapability implements KernelCapability 
                 for (int i = 0; i < ArchitecturalRegisterFile.NUM_INT_REGS; i++) {
                     int gprInArchimulator = event.getContext().getRegs().getGpr(i);
                     int gprInNative = nativeMipsIsaEmulatorCapability.getNativeMipsIsaEmulator().single_thread_program_get_gpr(i);
-                    assert gprInArchimulator == gprInNative;
+
+                    if (i != 0) {
+                        assert gprInArchimulator == gprInNative;
+                    }
                 }
 
                 for (int i = 0; i < ArchitecturalRegisterFile.NUM_FLOAT_REGS; i++) {
@@ -100,31 +136,6 @@ public class FunctionalExecutionProfilingCapability implements KernelCapability 
                 if (!executedMnemonics.contains(mnemonic)) {
                     executedMnemonics.add(mnemonic);
                 }
-            }
-        });
-
-        kernel.getBlockingEventDispatcher().addListener(SyscallExecutedEvent.class, new Action1<SyscallExecutedEvent>() {
-            public void apply(SyscallExecutedEvent event) {
-//                System.out.println(event.getContext().getRegs().dump());
-
-                System.out.printf("0x%08x: syscall %s\n", event.getContext().getRegs().getPc(), event.getSyscallName());
-
-                String syscallName = event.getSyscallName();
-                if (!executedSyscalls.contains(syscallName)) {
-                    executedSyscalls.add(syscallName);
-                }
-            }
-        });
-
-        kernel.getBlockingEventDispatcher().addListener(PollStatsEvent.class, new Action1<PollStatsEvent>() {
-            public void apply(PollStatsEvent event) {
-                dumpStats(event.getStats());
-            }
-        });
-
-        kernel.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
-            public void apply(DumpStatEvent event) {
-                dumpStats(event.getStats());
             }
         });
     }

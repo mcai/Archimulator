@@ -16,11 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-
 package archimulator.util;
-
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 
 public class StopWatch {
     private final long nsPerTick = 100;
@@ -51,76 +47,59 @@ public class StopWatch {
 
     public long getElapsedTicks() {
         long elapsed;
-        if (running) {
-            elapsed = (System.nanoTime() - startTime);
+        if (this.running) {
+            elapsed = (System.nanoTime() - this.startTime);
         } else {
-            elapsed = (stopTime - startTime);
+            elapsed = (this.stopTime - this.startTime);
         }
-        return elapsed / nsPerTick;
+        return elapsed / this.nsPerTick;
     }
 
     public long getElapsedMilliseconds() {
         long elapsed;
-        if (running) {
-            elapsed = (System.nanoTime() - startTime);
+        if (this.running) {
+            elapsed = (System.nanoTime() - this.startTime);
         } else {
-            elapsed = (stopTime - startTime);
+            elapsed = (this.stopTime - this.startTime);
         }
-        return elapsed / nsPerMs;
+        return elapsed / this.nsPerMs;
     }
 
     public long getElapsedSeconds() {
         long elapsed;
-        if (running) {
-            elapsed = (System.nanoTime() - startTime);
+        if (this.running) {
+            elapsed = (System.nanoTime() - this.startTime);
         } else {
-            elapsed = (stopTime - startTime);
+            elapsed = (this.stopTime - this.startTime);
         }
-        return elapsed / nsPerSs;
+        return elapsed / this.nsPerSs;
     }
 
     public long getElapsedMinutes() {
         long elapsed;
-        if (running) {
-            elapsed = (System.nanoTime() - startTime);
+        if (this.running) {
+            elapsed = (System.nanoTime() - this.startTime);
         } else {
-            elapsed = (stopTime - startTime);
+            elapsed = (this.stopTime - this.startTime);
         }
-        return elapsed / nsPerMm;
+        return elapsed / this.nsPerMm;
     }
 
     public long getElapsedHours() {
         long elapsed;
-        if (running) {
-            elapsed = (System.nanoTime() - startTime);
+        if (this.running) {
+            elapsed = (System.nanoTime() - this.startTime);
         } else {
-            elapsed = (stopTime - startTime);
+            elapsed = (this.stopTime - this.startTime);
         }
-        return elapsed / nsPerHh;
+        return elapsed / this.nsPerHh;
     }
 
     public String getElapsed() {
-        String timeFormatted = "";
-        timeFormatted = this.formatTime(this.getElapsedTicks());
-        return timeFormatted;
+        return this.formatTime();
     }
 
-    private String formatTime(final long elapsedTicks) {//TODO: problem here!!!
-        String formattedTime = "";
-        // should be hh:mm:ss.SSS, but 00 starts with 01
-        SimpleDateFormat formatter = new SimpleDateFormat("00:mm:ss.SSS");
-        Calendar calendar = Calendar.getInstance();
-
-        if (elapsedTicks <= 9999) {
-            calendar.setTimeInMillis(0);
-            formattedTime = formatter.format(calendar.getTime())
-                    + String.valueOf(String.format("%04d", elapsedTicks));
-        } else {
-            calendar.setTimeInMillis(elapsedTicks * nsPerTick / nsPerMs);
-            String formattedTicks = String.format("%07d", elapsedTicks);
-            formattedTicks = formattedTicks.substring(formattedTicks.length() - 4);
-            formattedTime = formatter.format(calendar.getTime()) + formattedTicks;
-        }
-        return formattedTime;
+    private String formatTime() {
+        return TimeSpanHelper.toString(this.getElapsedMilliseconds());
     }
 }

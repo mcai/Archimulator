@@ -19,12 +19,12 @@
 package archimulator.os;
 
 import archimulator.isa.ArchitecturalRegisterFile;
-import archimulator.isa.NativeMipsIsaEmulatorCapability;
 import archimulator.os.event.*;
 import archimulator.os.signal.SignalMask;
 import archimulator.sim.Logger;
 import archimulator.util.action.Predicate;
 import archimulator.util.io.buffer.CircularByteBuffer;
+import org.jruby.ext.posix.FileStat;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -62,7 +62,36 @@ public class BasicSyscallEmulation extends SyscallEmulation {
     @Override
     protected void fstat64_impl(Context context) { //TODO: to be implemented in Archimulator.
         int fd = context.getProcess().translateFileDescriptor(context.getRegs().getGpr(ArchitecturalRegisterFile.REG_A0));
-        context.getKernel().getCapability(NativeMipsIsaEmulatorCapability.class).getNativeMipsIsaEmulator().syscall_fstat64_impl(context.getId(), fd);
+        int bufAddr = context.getRegs().getGpr(ArchitecturalRegisterFile.REG_A1);
+
+        FileStat fstat = PosixUtil.current().fstat(fd);
+
+        context.getRegs().setGpr(ArchitecturalRegisterFile.REG_V0, 0);
+
+        error = checkSyscallError(context);
+
+        if (!error) {
+            int sizeOfDataToWrite = 104;
+            byte[] dataToWrite = new byte[sizeOfDataToWrite];
+
+            ByteBuffer bb = ByteBuffer.wrap(dataToWrite).order(context.getProcess().isLittleEndian() ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
+
+            bb.putInt(0, (int) fstat.dev());
+            bb.putInt(16, (int) fstat.ino());
+            bb.putInt(24, fstat.mode());
+            bb.putInt(28, fstat.nlink());
+            bb.putInt(32, fstat.uid());
+            bb.putInt(36, fstat.gid());
+            bb.putInt(40, (int) fstat.rdev());
+            bb.putLong(56, fstat.st_size());
+            bb.putInt(64, (int) fstat.atime());
+            bb.putInt(72, (int) fstat.mtime());
+            bb.putInt(80, (int) fstat.ctime());
+            bb.putInt(88, (int) fstat.blockSize());
+            bb.putLong(96, fstat.blocks());
+
+            context.getProcess().getMemory().writeBlock(bufAddr, sizeOfDataToWrite, dataToWrite);
+        }
     }
 
     @Override

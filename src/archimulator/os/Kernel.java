@@ -22,11 +22,12 @@ import archimulator.isa.ArchitecturalRegisterFile;
 import archimulator.isa.StaticInstruction;
 import archimulator.os.event.SystemEvent;
 import archimulator.os.signal.SignalAction;
-import archimulator.util.action.Predicate;
-import archimulator.util.io.buffer.CircularByteBuffer;
 import archimulator.sim.BasicSimulationObject;
 import archimulator.sim.Simulation;
 import archimulator.sim.SimulationObject;
+import archimulator.util.action.Predicate;
+import archimulator.util.event.BlockingEvent;
+import archimulator.util.io.buffer.CircularByteBuffer;
 
 import java.io.Serializable;
 import java.util.*;
@@ -72,6 +73,11 @@ public class Kernel extends BasicSimulationObject implements SimulationObject, S
         for (Map.Entry<Class<? extends KernelCapability>, KernelCapabilityFactory> entry : capabilityFactories.entrySet()) {
             this.capabilities.put(entry.getKey(), entry.getValue().createCapability(this));
         }
+
+        simulation.getBlockingEventDispatcher().dispatch(new KernelCapabilitiesInitializedEvent());
+    }
+
+    public class KernelCapabilitiesInitializedEvent implements BlockingEvent {
     }
 
     public Process getProcessFromId(int id) {

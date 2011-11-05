@@ -54,5 +54,21 @@ public class NativeSyscalls {
         return CLOCKS_PER_SEC * totalCycles / CPU_FREQUENCY;
     }
 
-    public static LibC LIBC = (LibC) Native.loadLibrary("c", LibC.class);
+    private static final String LINUX = "linux";
+
+    public static final String OS_NAME = System.getProperty("os.name");
+    public static final String OS_NAME_LC = OS_NAME.toLowerCase();
+    public static final boolean IS_LINUX = OS_NAME_LC.startsWith(LINUX);
+
+    public static String getProperty(String property, String defValue) {
+        try {
+            return System.getProperty(property, defValue);
+        } catch (SecurityException se) {
+            return defValue;
+        }
+    }
+
+    static final String LIBC_NAME = IS_LINUX ? "libc.so.6" : "c";
+
+    public static LibC LIBC = (LibC) Native.loadLibrary(LIBC_NAME, LibC.class);
 }
