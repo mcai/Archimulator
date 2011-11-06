@@ -18,8 +18,8 @@
  ******************************************************************************/
 package archimulator.mem;
 
-import archimulator.ext.SimulationCapability;
-import archimulator.ext.SimulationCapabilityFactory;
+import archimulator.sim.capability.SimulationCapability;
+import archimulator.sim.capability.SimulationCapabilityFactory;
 import archimulator.util.action.Action1;
 import archimulator.sim.Simulation;
 

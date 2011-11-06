@@ -19,10 +19,10 @@
 package archimulator.sim.experiment;
 
 import archimulator.core.*;
-import archimulator.ext.ProcessorCapability;
-import archimulator.ext.ProcessorCapabilityFactory;
-import archimulator.ext.SimulationCapability;
-import archimulator.ext.SimulationCapabilityFactory;
+import archimulator.sim.capability.ProcessorCapability;
+import archimulator.sim.capability.ProcessorCapabilityFactory;
+import archimulator.sim.capability.SimulationCapability;
+import archimulator.sim.capability.SimulationCapabilityFactory;
 import archimulator.mem.MemoryHierarchyConfig;
 import archimulator.mem.cache.eviction.EvictionPolicyFactory;
 import archimulator.mem.cache.eviction.LeastRecentlyUsedEvictionPolicy;

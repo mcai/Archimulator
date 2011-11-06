@@ -20,8 +20,8 @@ package archimulator.sim;
 
 import archimulator.core.*;
 import archimulator.core.Thread;
-import archimulator.ext.SimulationCapability;
-import archimulator.ext.SimulationCapabilityFactory;
+import archimulator.sim.capability.SimulationCapability;
+import archimulator.sim.capability.SimulationCapabilityFactory;
 import archimulator.os.Context;
 import archimulator.os.Kernel;
 import archimulator.util.action.Action1;

@@ -18,10 +18,10 @@
  ******************************************************************************/
 package archimulator.sim;
 
+import archimulator.ext.mem.ht.HtRequestL2VictimTrackingCapability2;
 import archimulator.isa.NativeMipsIsaEmulatorCapability;
 import archimulator.mem.cache.eviction.EvictionPolicyFactory;
 import archimulator.mem.cache.eviction.LeastRecentlyUsedEvictionPolicy;
-import archimulator.mem.ext.ht.HtRequestL2VictimTrackingCapability2;
 import archimulator.sim.experiment.CheckpointedExperiment;
 import archimulator.sim.experiment.DetailedExperiment;
 import archimulator.sim.experiment.Experiment;

@@ -16,25 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.core;
+package archimulator.ext.mem.cache.prediction;
 
-import archimulator.sim.capability.ProcessorCapability;
-import archimulator.mem.CacheHierarchy;
-import archimulator.os.Kernel;
-import archimulator.sim.SimulationObject;
+public interface Predictor<PredictableT extends Comparable<PredictableT>> {
+    void update(int address, PredictableT observedValue);
 
-import java.util.List;
-
-public interface Processor extends SimulationObject {
-    List<Core> getCores();
-
-    ProcessorConfig getConfig();
-
-    Kernel getKernel();
-
-    void updateContextToThreadAssignments();
-
-    CacheHierarchy getCacheHierarchy();
-
-    <CapabilityT extends ProcessorCapability> CapabilityT getCapability(Class<? extends CapabilityT> clz);
+    PredictableT predict(int address, PredictableT defaultValue);
 }

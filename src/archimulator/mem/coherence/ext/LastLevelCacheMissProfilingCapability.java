@@ -18,8 +18,8 @@
  ******************************************************************************/
 package archimulator.mem.coherence.ext;
 
-import archimulator.ext.SimulationCapability;
-import archimulator.ext.SimulationCapabilityFactory;
+import archimulator.sim.capability.SimulationCapability;
+import archimulator.sim.capability.SimulationCapabilityFactory;
 import archimulator.mem.cache.CacheAccess;
 import archimulator.util.math.FrequencyCalculator;
 import archimulator.mem.coherence.event.CoherentCacheBeginCacheAccessEvent;

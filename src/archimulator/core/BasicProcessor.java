@@ -18,8 +18,8 @@
  ******************************************************************************/
 package archimulator.core;
 
-import archimulator.ext.ProcessorCapability;
-import archimulator.ext.ProcessorCapabilityFactory;
+import archimulator.sim.capability.ProcessorCapability;
+import archimulator.sim.capability.ProcessorCapabilityFactory;
 import archimulator.mem.CacheHierarchy;
 import archimulator.os.Context;
 import archimulator.os.ContextKilledEvent;
