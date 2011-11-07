@@ -16,9 +16,8 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.isa.bigMemory;
+package archimulator.isa.memory;
 
-import archimulator.isa.Memory;
 import archimulator.mem.CacheAccessType;
 import archimulator.mem.cache.CacheAccess;
 import archimulator.mem.cache.CacheGeometry;
@@ -30,14 +29,9 @@ import archimulator.sim.BasicSimulationObject;
 import archimulator.sim.SimulationObject;
 import archimulator.util.action.Function2;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.channels.FileChannel;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class BigMemory extends BasicSimulationObject {
     private String simulationDirectory;
@@ -72,7 +66,7 @@ public class BigMemory extends BasicSimulationObject {
         this.prepare(pageId);
     }
 
-    public void readWrite(int pageId, int displacement, byte[] buf, int offset, int size, boolean write) {
+    public void access(int pageId, int displacement, byte[] buf, int offset, int size, boolean write) {
         CacheAccess<Boolean, MemoryPageCacheLine> cacheAccess = this.prepare(pageId);
 
         ByteBuffer bb = cacheAccess.getLine().bb;
@@ -83,6 +77,16 @@ public class BigMemory extends BasicSimulationObject {
         if (write) {
             bb.put(buf, offset, size);
             cacheAccess.getLine().dirty = true;
+
+            byte[] buf2 = new byte[buf.length];
+            this.access(pageId, displacement, buf2, offset, size, false);
+
+            for(int i = offset; i < offset + size; i++) {
+                if(buf[i] != buf2[i]) {
+                    throw new IllegalArgumentException();
+                }
+            }
+
         } else {
             bb.get(buf, offset, size);
         }
@@ -117,12 +121,12 @@ public class BigMemory extends BasicSimulationObject {
         return pageIndex / NUM_PAGES_PER_DISK_CACHE_FILE;
     }
 
-    private static int getDiskCacheFileDisplacement(int pageIndex) {
-        return (pageIndex % NUM_PAGES_PER_DISK_CACHE_FILE) * Memory.getPageSize();
+    private static int getDiskCacheFileDisplacement(int pageId) {
+        return (pageId % NUM_PAGES_PER_DISK_CACHE_FILE) * Memory.getPageSize();
     }
 
-    private static int getDirectByteBufferDisplacement(int pageIndex) {
-        return (pageIndex % MEMORY_PAGE_CACHE_LINE_SIZE) * Memory.getPageSize();
+    private static int getDirectByteBufferDisplacement(int pageId) {
+        return (pageId % MEMORY_PAGE_CACHE_LINE_SIZE) * Memory.getPageSize();
     }
 
     public long getAccesses() {
@@ -147,71 +151,95 @@ public class BigMemory extends BasicSimulationObject {
 
     private Set<Integer> evictedPageIds = new HashSet<Integer>();
 
+    private Map<String, ByteBuffer> diskBbs = new HashMap<String, ByteBuffer>();
+
+    private Map<Integer, byte[]> perLineDiskBbs = new HashMap<Integer, byte[]>();
+
     private class MemoryPageCacheLine extends CacheLine<Boolean> {
         private transient ByteBuffer bb;
         private boolean dirty;
+        private boolean loadedFromDisk;
 
         private MemoryPageCacheLine(int set, int way) {
             super(set, way, false);
         }
 
+        private ByteBuffer getDiskBb() {
+//            try {
+                String diskCacheFileName = this.getDiskCacheFileName();
+
+                if (!diskBbs.containsKey(diskCacheFileName)) {
+//                    RandomAccessFile raf = new RandomAccessFile(diskCacheFileName, "rws");
+//                    diskBbs.put(diskCacheFileName, raf.getChannel().map(FileChannel.MapMode.PRIVATE, 0, DISK_CACHE_FILE_LENGTH).order(littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN));
+
+                    diskBbs.put(diskCacheFileName, ByteBuffer.allocateDirect(DISK_CACHE_FILE_LENGTH).order(littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN));
+                }
+
+                return diskBbs.get(diskCacheFileName);
+//            } catch (IOException e) {
+//                throw new RuntimeException(e);
+//            }
+        }
+
         public MemoryPageCacheLine saveToDisk() {
-            try {
-                RandomAccessFile raf = new RandomAccessFile(getDiskCacheFileName(), "rws");
-                ByteBuffer diskBb = raf.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, DISK_CACHE_FILE_LENGTH).order(littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
+            ByteBuffer diskBb = this.getDiskBb();
 
-                int displacement = getDiskCacheFileDisplacement(this.tag);
+            int displacement = getDiskCacheFileDisplacement(this.tag);
 
-                diskBb.position(displacement);
-                this.bb.position(0);
+            diskBb.position(displacement);
 
-                diskBb.put(this.bb);
+            this.bb.position(0);
 
-                raf.close();
+            byte[] data = new byte[getByteBufferSize()];
+            this.bb.get(data);
+            this.bb.clear();
 
-                this.dirty = false;
+            diskBb.put(data);
 
-                evictedPageIds.add(this.tag);
+            perLineDiskBbs.put(this.tag, data);
 
-                return this;
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+//                raf.close();
+
+            this.dirty = false;
+
+            evictedPageIds.add(this.tag);
+
+            loadedFromDisk = false;
+
+            return this;
         }
 
         public MemoryPageCacheLine initOrLoadFromDisk() {
-            if(this.bb == null)
-            {
+            if (this.bb == null) {
                 this.bb = ByteBuffer.allocateDirect(getByteBufferSize()).order(littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
             }
 
             if (evictedPageIds.contains(this.tag)) {
-                if(!isDiskCacheFileExist()) {
+                if (!this.isDiskCacheFileExist()) {
                     throw new RuntimeException();
                 }
 
-                try {
-                    RandomAccessFile raf = new RandomAccessFile(getDiskCacheFileName(), "r");
-                    ByteBuffer diskBb = raf.getChannel().map(FileChannel.MapMode.READ_ONLY, 0, DISK_CACHE_FILE_LENGTH).order(littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
+                ByteBuffer diskBb = this.getDiskBb();
 
-                    int displacement = getDiskCacheFileDisplacement(this.tag);
+                int displacement = getDiskCacheFileDisplacement(this.tag);
 
-                    diskBb.position(displacement);
+                diskBb.position(displacement);
 
-                    this.bb.clear();
+                byte[] data = new byte[getByteBufferSize()];
+                diskBb.get(data);
 
-                    byte[] data = new byte[getByteBufferSize()];
-                    diskBb.get(data);
+                this.bb.clear();
+                this.bb.put(data);
 
-                    this.bb.position(0);
-                    this.bb.put(data);
-
-                    evictedPageIds.remove(this.tag);
-
-                    raf.close();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+                if(!Arrays.equals(data, perLineDiskBbs.get(this.tag))) {
+                    throw new IllegalArgumentException();
                 }
+
+                evictedPageIds.remove(this.tag);
+
+                loadedFromDisk = true;
+
+//                    raf.close();
             }
 
             return this;
@@ -225,7 +253,8 @@ public class BigMemory extends BasicSimulationObject {
         }
 
         private boolean isDiskCacheFileExist() {
-            return new File(getDiskCacheFileName()).exists();
+            return diskBbs.containsKey(this.getDiskCacheFileName());
+//            return new File(this.getDiskCacheFileName()).exists();
         }
     }
 

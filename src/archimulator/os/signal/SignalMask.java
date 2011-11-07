@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.os.signal;
 
-import archimulator.isa.Memory;
+import archimulator.isa.memory.Memory;
 import archimulator.os.Kernel;
 import archimulator.util.math.MathHelper;
 

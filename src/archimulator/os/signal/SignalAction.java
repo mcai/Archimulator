@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.os.signal;
 
-import archimulator.isa.Memory;
+import archimulator.isa.memory.Memory;
 
 import java.io.Serializable;
 

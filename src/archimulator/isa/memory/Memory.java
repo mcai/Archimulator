@@ -16,18 +16,16 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.isa;
+package archimulator.isa.memory;
 
-import archimulator.isa.bigMemory.BigMemory;
 import archimulator.mem.cache.CacheGeometry;
 import archimulator.os.Kernel;
 import archimulator.sim.BasicSimulationObject;
-import archimulator.util.action.Action1;
 import archimulator.sim.event.PollStatsEvent;
+import archimulator.util.action.Action1;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -36,7 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class Memory extends BasicSimulationObject {
+public abstract class Memory extends BasicSimulationObject {
     private int id;
     private boolean littleEndian;
 
@@ -45,24 +43,24 @@ public class Memory extends BasicSimulationObject {
     private int currentMemoryPageId = 0;
 
     private Kernel kernel;
+    private String simulationDirectory;
+    private int processId;
 
     private transient boolean speculative;
     private transient Map<Integer, List<SpeculativeMemoryBlock>> specBlks;
-
-    private BigMemory bigMemory;
 
     public Memory(Kernel kernel, String simulationDirectory, boolean littleEndian, int processId) {
         super(kernel);
 
         this.kernel = kernel;
+        this.simulationDirectory = simulationDirectory;
+        this.processId = processId;
 
         this.id = this.kernel.currentMemoryId++;
 
         this.littleEndian = littleEndian;
 
         this.pages = new TreeMap<Integer, Map<Integer, Page>>();
-
-        this.bigMemory = new BigMemory(this, simulationDirectory, littleEndian, processId);
 
         this.init();
     }
@@ -73,17 +71,13 @@ public class Memory extends BasicSimulationObject {
         this.init();
     }
 
-    private void init() {
+    protected void init() {
         this.speculative = false;
         this.specBlks = new TreeMap<Integer, List<SpeculativeMemoryBlock>>();
 
         this.kernel.getBlockingEventDispatcher().addListener(PollStatsEvent.class, new Action1<PollStatsEvent>() {
             public void apply(PollStatsEvent event) {
                 event.getStats().put("mem-" + id + ".currentMemoryPageId", Memory.this.currentMemoryPageId);
-
-                String bigMemorystats = String.format("accesses: %d, hits: %d, misses: %d, evictions: %d, hitRatio: %.4f%n", bigMemory.getAccesses(), bigMemory.getHits(), bigMemory.getMisses(), bigMemory.getEvictions(), bigMemory.getHitRatio());
-
-                event.getStats().put("mem-" + id + ".bigMemory", bigMemorystats);
             }
         });
     }
@@ -362,6 +356,38 @@ public class Memory extends BasicSimulationObject {
         }
     }
 
+    protected abstract void onPageCreated(int id);
+
+    protected abstract void doPageAccess(int pageId, int displacement, byte[] buf, int offset, int size, boolean write);
+
+    public int getId() {
+        return id;
+    }
+
+    public boolean isLittleEndian() {
+        return littleEndian;
+    }
+
+    public Kernel getKernel() {
+        return kernel;
+    }
+
+    public String getSimulationDirectory() {
+        return simulationDirectory;
+    }
+
+    public int getProcessId() {
+        return processId;
+    }
+
+    public boolean isSpeculative() {
+        return speculative;
+    }
+
+    public static CacheGeometry getGeometry() {
+        return geometry;
+    }
+
     private class Page implements Serializable {
         private int id;
         private int physicalAddress;
@@ -370,26 +396,23 @@ public class Memory extends BasicSimulationObject {
             this.id = id;
             this.physicalAddress = this.id << Memory.getPageSizeInLog2();
 
-            bigMemory.create(this.id);
+            onPageCreated(id);
         }
 
-        private void writeObject(ObjectOutputStream oos) throws IOException {
-            oos.defaultWriteObject();
-
-             //TODO: support it using BigMemory
-//            StandardJavaSerializationHelper.writeDirectByteBuffer(oos, this.bb);
-        }
+//        private void writeObject(ObjectOutputStream oos) throws IOException {
+//            oos.defaultWriteObject();
 //
-        private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
-            ois.defaultReadObject();
-
-             //TODO: support it using BigMemory
+//            StandardJavaSerializationHelper.writeDirectByteBuffer(oos, this.bb);
+//        }
+//
+//        private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
+//            ois.defaultReadObject();
+//
 //            this.bb = StandardJavaSerializationHelper.readDirectByteBuffer(ois);
-        }
+//        }
 
         private void doAccess(int addr, byte[] buf, int offset, int size, boolean write) {
-            int displacement = getDisplacement(addr);
-            bigMemory.readWrite(this.id, displacement, buf, offset, size, write);
+            doPageAccess(id, getDisplacement(addr), buf, offset, size, write);
         }
     }
 
