@@ -30,13 +30,13 @@ import archimulator.sim.experiment.FunctionalExperiment;
 public class Startup {
     public static void main(String[] args) {
 //        simulate("mst_baseline_LRU", SIMULATED_PROGRAM_MST_BASELINE, LeastRecentlyUsedEvictionPolicy.FACTORY);
-//        simulate("mst_ht_LRU", SIMULATED_PROGRAM_MST_HT, LeastRecentlyUsedEvictionPolicy.FACTORY);
+        simulate("mst_ht_LRU", SIMULATED_PROGRAM_MST_HT, LeastRecentlyUsedEvictionPolicy.FACTORY);
 
 //        simulate("em3d_baseline_LRU", SIMULATED_PROGRAM_EM3D_BASELINE, LeastRecentlyUsedEvictionPolicy.FACTORY);
 //        simulate("libquantum_baseline_LRU", SIMULATED_PROGRAM_462_LIBQUANTUM_BASELINE, LeastRecentlyUsedEvictionPolicy.FACTORY);
 //        simulate("em3d_ht_LRU", SIMULATED_PROGRAM_EM3D_HT, LeastRecentlyUsedEvictionPolicy.FACTORY);
 
-        simulate("mcf_baseline_LRU", SIMULATED_PROGRAM_429_MCF_BASELINE, LeastRecentlyUsedEvictionPolicy.FACTORY);
+//        simulate("mcf_baseline_LRU", SIMULATED_PROGRAM_429_MCF_BASELINE, LeastRecentlyUsedEvictionPolicy.FACTORY);
 //        simulate("mcf_ht_LRU", SIMULATED_PROGRAM_429_MCF_HT, LeastRecentlyUsedEvictionPolicy.FACTORY);
 
 //        simulate("mst_baseline_ENHANCED_LRU", SIMULATED_PROGRAM_MST_BASELINE, ThrashingSensitiveHTEnhancedLeastRecentlyUsedEvictionPolicy.FACTORY);
@@ -83,16 +83,16 @@ public class Startup {
             "mst_baseline_mips",
             "/home/itecgo/Archimulator/benchmarks/Olden_Custom1/mst/baseline",
             "mst.mips",
-            "10000");
-//            "1000");
+//            "10000");
+            "1000");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_MST_HT = new SimulatedProgram(
             "Olden_Custom1",
             "mst_ht_mips",
             "/home/itecgo/Archimulator/benchmarks/Olden_Custom1/mst/ht",
             "mst.mips",
-            "10000");
-//            "1000");
+//            "10000");
+            "1000");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_EM3D_BASELINE = new SimulatedProgram(
             "Olden_Custom1",

@@ -51,7 +51,7 @@ public class Memory extends BasicSimulationObject {
 
     private BigMemory bigMemory;
 
-    public Memory(Kernel kernel, String simulationDirectory, boolean littleEndian) {
+    public Memory(Kernel kernel, String simulationDirectory, boolean littleEndian, int processId) {
         super(kernel);
 
         this.kernel = kernel;
@@ -62,7 +62,7 @@ public class Memory extends BasicSimulationObject {
 
         this.pages = new TreeMap<Integer, Map<Integer, Page>>();
 
-        this.bigMemory = new BigMemory(this, simulationDirectory, littleEndian);
+        this.bigMemory = new BigMemory(this, simulationDirectory, littleEndian, processId);
 
         this.init();
     }

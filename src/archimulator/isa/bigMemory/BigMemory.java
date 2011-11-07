@@ -42,17 +42,19 @@ import java.util.Set;
 public class BigMemory extends BasicSimulationObject {
     private String simulationDirectory;
     private boolean littleEndian;
+    private int processId;
     private MemoryPageCache cache;
 
     private long accesses;
     private long hits;
     private long evictions;
 
-    public BigMemory(SimulationObject parent, String simulationDirectory, boolean littleEndian) {
-        super(parent);
+    public BigMemory(Memory memory, String simulationDirectory, boolean littleEndian, int processId) {
+        super(memory);
 
         this.simulationDirectory = simulationDirectory;
         this.littleEndian = littleEndian;
+        this.processId = processId;
 
         this.cache = new MemoryPageCache(this, "bigMemory.MemoryPageCache", new CacheGeometry(
                 MEMORY_PAGE_CACHE_CAPACITY,
@@ -219,7 +221,7 @@ public class BigMemory extends BasicSimulationObject {
             int pageIndex = this.tag;
             int fileIndex = getDiskCacheFileIndex(pageIndex);
 
-            return simulationDirectory + "/mem." + fileIndex + ".diskCache";
+            return simulationDirectory + "/mem.process" + processId + "." + fileIndex + ".diskCache";
         }
 
         private boolean isDiskCacheFileExist() {

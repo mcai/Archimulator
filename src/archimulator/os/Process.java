@@ -70,7 +70,7 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
 
         this.littleEndian = false;
 
-        this.memory = new Memory(kernel, simulationDirectory, this.littleEndian);
+        this.memory = new Memory(kernel, simulationDirectory, this.littleEndian, this.id);
 
         this.loadProgram(kernel, simulationDirectory, contextConfig);
     }
