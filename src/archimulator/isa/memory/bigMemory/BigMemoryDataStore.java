@@ -36,7 +36,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.*;
 
-public class BigMemoryDataStore extends BasicSimulationObject implements MemoryDataStore { //TODO: errors remain
+public class BigMemoryDataStore extends BasicSimulationObject implements MemoryDataStore {
     private Memory memory;
     private MemoryPageCache cache;
 
@@ -67,29 +67,20 @@ public class BigMemoryDataStore extends BasicSimulationObject implements MemoryD
     }
 
     public void create(int pageId) {
-        this.prepare(pageId);
     }
-
+    
     public void access(int pageId, int displacement, byte[] buf, int offset, int size, boolean write) {
         CacheAccess<Boolean, MemoryPageCacheLine> cacheAccess = this.prepare(pageId);
 
+        int directByteBufferDisplacement = getDirectByteBufferDisplacement(pageId);
+
         ByteBuffer bb = cacheAccess.getLine().bb;
 
-        int directByteBufferDisplacement = getDirectByteBufferDisplacement(pageId);
         bb.position(directByteBufferDisplacement + displacement);
 
         if (write) {
             bb.put(buf, offset, size);
             cacheAccess.getLine().dirty = true;
-
-            byte[] buf2 = new byte[buf.length];
-            this.access(pageId, displacement, buf2, offset, size, false);
-
-            for (int i = offset; i < offset + size; i++) {
-                if (buf[i] != buf2[i]) {
-                    throw new IllegalArgumentException();
-                }
-            }
 
         } else {
             bb.get(buf, offset, size);
@@ -108,11 +99,10 @@ public class BigMemoryDataStore extends BasicSimulationObject implements MemoryD
             if (cacheAccess.isEviction()) {
                 this.evictions++;
 
-                if (cacheAccess.getLine().dirty) {
-                    cacheAccess.getLine().saveToDisk();
-                }
+                cacheAccess.getLine().writeback();
             }
-            cacheAccess.commit().getLine().initOrLoadFromDisk().setNonInitialState(true);
+
+            cacheAccess.commit().getLine().initOrLoadFromDisk(pageId).setNonInitialState(true);
         }
         return cacheAccess;
     }
@@ -157,12 +147,9 @@ public class BigMemoryDataStore extends BasicSimulationObject implements MemoryD
 
     private Map<String, ByteBuffer> diskBbs = new HashMap<String, ByteBuffer>();
 
-    private Map<Integer, byte[]> perLineDiskBbs = new HashMap<Integer, byte[]>();
-
     private class MemoryPageCacheLine extends CacheLine<Boolean> {
         private transient ByteBuffer bb;
         private boolean dirty;
-        private boolean loadedFromDisk;
 
         private MemoryPageCacheLine(int set, int way) {
             super(set, way, false);
@@ -185,35 +172,36 @@ public class BigMemoryDataStore extends BasicSimulationObject implements MemoryD
 //            }
         }
 
-        private MemoryPageCacheLine saveToDisk() {
-            ByteBuffer diskBb = this.getDiskBb();
+        private MemoryPageCacheLine writeback() {
+            if (dirty) {
+                ByteBuffer diskBb = this.getDiskBb();
 
-            int displacement = getDiskCacheFileDisplacement(this.tag);
+                diskBb.position(getDiskCacheFileDisplacement());
 
-            diskBb.position(displacement);
+                this.bb.position(0);
 
-            this.bb.position(0);
+                byte[] data = new byte[getByteBufferSize()];
+                this.bb.get(data);
 
-            byte[] data = new byte[getByteBufferSize()];
-            this.bb.get(data);
-            this.bb.clear();
-
-            diskBb.put(data);
-
-            perLineDiskBbs.put(this.tag, data);
+                diskBb.put(data);
 
 //                raf.close();
 
-            this.dirty = false;
+                this.dirty = false;
+            }
+
+            this.bb.clear();
 
             evictedPageIds.add(this.tag);
-
-            loadedFromDisk = false;
 
             return this;
         }
 
-        private MemoryPageCacheLine initOrLoadFromDisk() {
+        private int getDiskCacheFileDisplacement() {
+            return BigMemoryDataStore.getDiskCacheFileDisplacement(this.tag);
+        }
+
+        private MemoryPageCacheLine initOrLoadFromDisk(int pageId) {
             if (this.bb == null) {
                 this.bb = ByteBuffer.allocateDirect(getByteBufferSize()).order(memory.isLittleEndian() ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
             }
@@ -225,9 +213,7 @@ public class BigMemoryDataStore extends BasicSimulationObject implements MemoryD
 
                 ByteBuffer diskBb = this.getDiskBb();
 
-                int displacement = getDiskCacheFileDisplacement(this.tag);
-
-                diskBb.position(displacement);
+                diskBb.position(getDiskCacheFileDisplacement());
 
                 byte[] data = new byte[getByteBufferSize()];
                 diskBb.get(data);
@@ -235,13 +221,7 @@ public class BigMemoryDataStore extends BasicSimulationObject implements MemoryD
                 this.bb.clear();
                 this.bb.put(data);
 
-                if (!Arrays.equals(data, perLineDiskBbs.get(this.tag))) {
-                    throw new IllegalArgumentException();
-                }
-
                 evictedPageIds.remove(this.tag);
-
-                loadedFromDisk = true;
 
 //                    raf.close();
             }
@@ -269,7 +249,6 @@ public class BigMemoryDataStore extends BasicSimulationObject implements MemoryD
     }
 
     private static final int MEMORY_PAGE_CACHE_CAPACITY = 512; // 8Mb
-    //    private static final int MEMORY_PAGE_CACHE_CAPACITY = 512;
     private static final int MEMORY_PAGE_CACHE_LINE_SIZE = 8;
 
     private static final int NUM_PAGES_PER_DISK_CACHE_FILE = 32 * 1024;

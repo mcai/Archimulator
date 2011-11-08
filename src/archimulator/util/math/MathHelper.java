@@ -20,17 +20,21 @@ package archimulator.util.math;
 
 public class MathHelper {
     public static String dumpBytes(byte[] buffer) {
+        return dumpBytes(buffer, 0, buffer.length);
+    }
+    
+    public static String dumpBytes(byte[] buffer, int offset, int size) {
         if (buffer == null) {
             return "";
         }
 
         StringBuilder sb = new StringBuilder();
 
-        for (int i = 0; i < buffer.length; i++) {
+        for (int i = offset; i < size; i++) {
             if (i != 0 && i % 8 == 0) {
                 sb.append("\n");
             }
-            sb.append(String.format("%08x ", buffer[i]));
+            sb.append(String.format("%08x%s", buffer[i], (i < (size - 1) ? " " : "")));
         }
 
         return sb.toString();

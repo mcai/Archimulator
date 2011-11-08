@@ -21,7 +21,7 @@ package archimulator.os;
 import archimulator.isa.BitField;
 import archimulator.isa.Mnemonic;
 import archimulator.isa.StaticInstruction;
-import archimulator.isa.memory.BasicMemory;
+import archimulator.isa.memory.BigMemory;
 import archimulator.isa.memory.Memory;
 import archimulator.sim.BasicSimulationObject;
 import archimulator.sim.ContextConfig;
@@ -71,9 +71,8 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
 
         this.littleEndian = false;
 
-        this.memory = new BasicMemory(kernel, simulationDirectory, this.littleEndian, this.id);
-//        this.memory = new BigMemory(kernel, simulationDirectory, this.littleEndian, this.id);
-//        this.memory = new ProfiledBigMemory(kernel, simulationDirectory, this.littleEndian, this.id);
+//        this.memory = new BasicMemory(kernel, simulationDirectory, this.littleEndian, this.id);
+        this.memory = new BigMemory(kernel, simulationDirectory, this.littleEndian, this.id);
 
         this.loadProgram(kernel, simulationDirectory, contextConfig);
     }
