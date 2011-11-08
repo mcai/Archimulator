@@ -18,43 +18,32 @@
  ******************************************************************************/
 package archimulator.isa.memory;
 
+import archimulator.isa.memory.bigMemory.MemoryDataStore;
+import archimulator.isa.memory.bigMemory.BigMemoryDataStore;
 import archimulator.os.Kernel;
-import archimulator.sim.event.PollStatsEvent;
-import archimulator.util.action.Action1;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ProfiledDiskBackedMemory extends Memory {
+public class ProfiledBigMemory extends Memory {
     private transient Map<Integer, ByteBuffer> bbs;
-    private BigMemory bigMemory;
+    private MemoryDataStore dataStore;
 
-    public ProfiledDiskBackedMemory(Kernel kernel, String simulationDirectory, boolean littleEndian, int processId) {
+    public ProfiledBigMemory(Kernel kernel, String simulationDirectory, boolean littleEndian, int processId) {
         super(kernel, simulationDirectory, littleEndian, processId);
 
         this.bbs = new HashMap<Integer, ByteBuffer>();
 
-        this.bigMemory = new BigMemory(this, simulationDirectory, littleEndian, processId);
-    }
-
-    @Override
-    protected void init() {
-        super.init();
-
-        this.getKernel().getBlockingEventDispatcher().addListener(PollStatsEvent.class, new Action1<PollStatsEvent>() {
-            public void apply(PollStatsEvent event) {
-                event.getStats().put("mem-" + getId() + ".bigMemory", String.format("accesses: %d, hits: %d, misses: %d, evictions: %d, hitRatio: %.4f\n", bigMemory.getAccesses(), bigMemory.getHits(), bigMemory.getMisses(), bigMemory.getEvictions(), bigMemory.getHitRatio()));
-            }
-        });
+        this.dataStore = new BigMemoryDataStore(this);
     }
 
     @Override
     protected void onPageCreated(int id) {
         this.bbs.put(id, ByteBuffer.allocateDirect(getPageSize()).order(isLittleEndian() ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN));
 
-        this.bigMemory.create(id);
+        this.dataStore.create(id);
     }
 
     @Override
@@ -64,7 +53,7 @@ public class ProfiledDiskBackedMemory extends Memory {
             bb.position(displacement);
             bb.put(buf, offset, size);
 
-            this.bigMemory.access(pageId, displacement, buf, offset, size, write);
+            this.dataStore.access(pageId, displacement, buf, offset, size, write);
         }
         else {
             byte[] buf2 = buf.clone();
@@ -77,17 +66,17 @@ public class ProfiledDiskBackedMemory extends Memory {
                 System.out.println();
             }
 
-            this.bigMemory.access(pageId, displacement, buf, offset, size, write);
+            this.dataStore.access(pageId, displacement, buf, offset, size, write);
 
             for(int i = offset; i < offset + size; i++) {
                 if(buf[i] != buf2[i]) {
-                this.bigMemory.access(pageId, displacement, buf, offset, size, write);
+                this.dataStore.access(pageId, displacement, buf, offset, size, write);
                     throw new IllegalArgumentException();
                 }
             }
 
 //            if(!Arrays.equals(buf, buf2)) {
-//                this.bigMemory.access(pageId, displacement, buf, offset, size, write);
+//                this.dataStore.access(pageId, displacement, buf, offset, size, write);
 //                throw new IllegalArgumentException();
 //            }
         }
@@ -101,6 +90,6 @@ public class ProfiledDiskBackedMemory extends Memory {
 //            bb.get(buf, offset, size);
 //        }
 //
-//        this.bigMemory.access(pageId, displacement, buf, offset, size, write);
+//        this.dataStore.access(pageId, displacement, buf, offset, size, write);
     }
 }

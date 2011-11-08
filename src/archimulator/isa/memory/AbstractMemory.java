@@ -18,37 +18,23 @@
  ******************************************************************************/
 package archimulator.isa.memory;
 
+import archimulator.isa.memory.bigMemory.MemoryDataStore;
 import archimulator.os.Kernel;
-import archimulator.sim.event.PollStatsEvent;
-import archimulator.util.action.Action1;
 
-public class DiskBackedMemory extends Memory {
-    private BigMemory bigMemory;
-
-    public DiskBackedMemory(Kernel kernel, String simulationDirectory, boolean littleEndian, int processId) {
+public abstract class AbstractMemory extends Memory {
+    public AbstractMemory(Kernel kernel, String simulationDirectory, boolean littleEndian, int processId) {
         super(kernel, simulationDirectory, littleEndian, processId);
-
-        this.bigMemory = new BigMemory(this, simulationDirectory, littleEndian, processId);
-    }
-
-    @Override
-    protected void init() {
-        super.init();
-
-        this.getKernel().getBlockingEventDispatcher().addListener(PollStatsEvent.class, new Action1<PollStatsEvent>() {
-            public void apply(PollStatsEvent event) {
-                event.getStats().put("mem-" + getId() + ".bigMemory", String.format("accesses: %d, hits: %d, misses: %d, evictions: %d, hitRatio: %.4f\n", bigMemory.getAccesses(), bigMemory.getHits(), bigMemory.getMisses(), bigMemory.getEvictions(), bigMemory.getHitRatio()));
-            }
-        });
     }
 
     @Override
     protected void onPageCreated(int id) {
-        this.bigMemory.create(id);
+        this.getDataStore().create(id);
     }
 
     @Override
     protected void doPageAccess(int pageId, int displacement, byte[] buf, int offset, int size, boolean write) {
-        this.bigMemory.access(pageId, displacement, buf, offset, size, write);
+        this.getDataStore().access(pageId, displacement, buf, offset, size, write);
     }
+
+    protected abstract MemoryDataStore getDataStore();
 }

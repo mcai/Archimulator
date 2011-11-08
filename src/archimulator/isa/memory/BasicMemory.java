@@ -18,36 +18,20 @@
  ******************************************************************************/
 package archimulator.isa.memory;
 
+import archimulator.isa.memory.bigMemory.BasicMemoryDataStore;
+import archimulator.isa.memory.bigMemory.MemoryDataStore;
 import archimulator.os.Kernel;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.util.HashMap;
-import java.util.Map;
-
-public class BasicMemory extends Memory {
-    private transient Map<Integer, ByteBuffer> bbs;
+public class BasicMemory extends AbstractMemory {
+    private MemoryDataStore dataStore;
 
     public BasicMemory(Kernel kernel, String simulationDirectory, boolean littleEndian, int processId) {
         super(kernel, simulationDirectory, littleEndian, processId);
-
-        this.bbs = new HashMap<Integer, ByteBuffer>();
+        this.dataStore = new BasicMemoryDataStore(this);
     }
 
     @Override
-    protected void onPageCreated(int id) {
-        this.bbs.put(id, ByteBuffer.allocateDirect(getPageSize()).order(isLittleEndian() ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN));
-    }
-
-    @Override
-    protected void doPageAccess(int pageId, int displacement, byte[] buf, int offset, int size, boolean write) {
-        ByteBuffer bb = this.bbs.get(pageId);
-        bb.position(displacement);
-
-        if (write) {
-            bb.put(buf, offset, size);
-        } else {
-            bb.get(buf, offset, size);
-        }
+    protected MemoryDataStore getDataStore() {
+        return this.dataStore;
     }
 }
