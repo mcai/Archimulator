@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010-2011 by Min Cai (min.cai.china@gmail.com).
+ * Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).
  *
  * This file is part of the Archimulator multicore architectural simulator.
  *
@@ -68,7 +68,7 @@ public class TelnetServer implements OutputAppender {
     private void welcome(SocketThread socketThread) {
         appendStdOutLine(socketThread, "Archimulator - A Flexible Multicore Architectural Simulator Written in Java.\n");
         appendStdOutLine(socketThread, "Version: 2.0.\n");
-        appendStdOutLine(socketThread, "Copyright (c) 2010-2011 by Min Cai (min.cai.china@gmail.com).\n");
+        appendStdOutLine(socketThread, "Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).\n");
     }
 
     public void stop() {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010-2011 by Min Cai (min.cai.china@gmail.com).
+ * Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).
  *
  * This file is part of the Archimulator multicore architectural simulator.
  *
@@ -32,9 +32,15 @@ import archimulator.sim.event.PollStatsEvent;
 import archimulator.util.action.Action1;
 import archimulator.util.action.Function2;
 
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.*;
+import java.nio.channels.FileChannel;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class BigMemoryDataStore extends BasicSimulationObject implements MemoryDataStore {
     private Memory memory;
@@ -68,7 +74,7 @@ public class BigMemoryDataStore extends BasicSimulationObject implements MemoryD
 
     public void create(int pageId) {
     }
-    
+
     public void access(int pageId, int displacement, byte[] buf, int offset, int size, boolean write) {
         CacheAccess<Boolean, MemoryPageCacheLine> cacheAccess = this.prepare(pageId);
 
@@ -102,7 +108,7 @@ public class BigMemoryDataStore extends BasicSimulationObject implements MemoryD
                 cacheAccess.getLine().writeback();
             }
 
-            cacheAccess.commit().getLine().initOrLoadFromDisk(pageId).setNonInitialState(true);
+            cacheAccess.commit().getLine().initOrLoadFromDisk().setNonInitialState(true);
         }
         return cacheAccess;
     }
@@ -156,20 +162,18 @@ public class BigMemoryDataStore extends BasicSimulationObject implements MemoryD
         }
 
         private ByteBuffer getDiskBb() {
-//            try {
-            String diskCacheFileName = this.getDiskCacheFileName();
+            try {
+                String diskCacheFileName = this.getDiskCacheFileName();
 
-            if (!diskBbs.containsKey(diskCacheFileName)) {
-//                    RandomAccessFile raf = new RandomAccessFile(diskCacheFileName, "rws");
-//                    diskBbs.put(diskCacheFileName, raf.getChannel().map(FileChannel.MapMode.PRIVATE, 0, DISK_CACHE_FILE_LENGTH).order(littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN));
+                if (!diskBbs.containsKey(diskCacheFileName)) {
+                    RandomAccessFile raf = new RandomAccessFile(diskCacheFileName, "rws");
+                    diskBbs.put(diskCacheFileName, raf.getChannel().map(FileChannel.MapMode.PRIVATE, 0, DISK_CACHE_FILE_LENGTH).order(memory.isLittleEndian() ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN));
+                }
 
-                diskBbs.put(diskCacheFileName, ByteBuffer.allocateDirect(DISK_CACHE_FILE_LENGTH).order(memory.isLittleEndian() ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN));
+                return diskBbs.get(diskCacheFileName);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-
-            return diskBbs.get(diskCacheFileName);
-//            } catch (IOException e) {
-//                throw new RuntimeException(e);
-//            }
         }
 
         private MemoryPageCacheLine writeback() {
@@ -201,7 +205,7 @@ public class BigMemoryDataStore extends BasicSimulationObject implements MemoryD
             return BigMemoryDataStore.getDiskCacheFileDisplacement(this.tag);
         }
 
-        private MemoryPageCacheLine initOrLoadFromDisk(int pageId) {
+        private MemoryPageCacheLine initOrLoadFromDisk() {
             if (this.bb == null) {
                 this.bb = ByteBuffer.allocateDirect(getByteBufferSize()).order(memory.isLittleEndian() ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
             }

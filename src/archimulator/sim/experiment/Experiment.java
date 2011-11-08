@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010-2011 by Min Cai (min.cai.china@gmail.com).
+ * Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).
  *
  * This file is part of the Archimulator multicore architectural simulator.
  *
@@ -297,7 +297,7 @@ public abstract class Experiment {
 
         System.out.println("Archimulator - A Flexible Multicore Architectural Simulator Written in Java.\n");
         System.out.println("Version: 2.0.\n");
-        System.out.println("Copyright (c) 2010-2011 by Min Cai (min.cai.china@gmail.com).\n");
+        System.out.println("Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).\n");
     }
 
     public static void CopyEmbeddedResourceIntoTempDirectory(String name) {

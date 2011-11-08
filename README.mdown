@@ -6,7 +6,7 @@ This README briefly describes what Archimulator is and how to setup & run Archim
 Credits and License Information
 ------------------
 
-Copyright (c) 2010-2011 by Min Cai (<min.cai.china@gmail.com>)
+Copyright (c) 2010-2012 by Min Cai (<min.cai.china@gmail.com>)
 
 This program is free software, licensed under the GPL3.
 Please, read the license file "COPYING" for further information.

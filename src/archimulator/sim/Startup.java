@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010-2011 by Min Cai (min.cai.china@gmail.com).
+ * Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).
  *
  * This file is part of the Archimulator multicore architectural simulator.
  *
@@ -29,8 +29,8 @@ import archimulator.sim.experiment.FunctionalExperiment;
 
 public class Startup {
     public static void main(String[] args) {
-//        simulate("mst_baseline_LRU", SIMULATED_PROGRAM_MST_BASELINE, LeastRecentlyUsedEvictionPolicy.FACTORY);
-        simulate("mst_ht_LRU", SIMULATED_PROGRAM_MST_HT, LeastRecentlyUsedEvictionPolicy.FACTORY);
+        simulate("mst_baseline_LRU", SIMULATED_PROGRAM_MST_BASELINE, LeastRecentlyUsedEvictionPolicy.FACTORY);
+//        simulate("mst_ht_LRU", SIMULATED_PROGRAM_MST_HT, LeastRecentlyUsedEvictionPolicy.FACTORY);
 
 //        simulate("em3d_baseline_LRU", SIMULATED_PROGRAM_EM3D_BASELINE, LeastRecentlyUsedEvictionPolicy.FACTORY);
 //        simulate("libquantum_baseline_LRU", SIMULATED_PROGRAM_462_LIBQUANTUM_BASELINE, LeastRecentlyUsedEvictionPolicy.FACTORY);
@@ -93,10 +93,10 @@ public class Startup {
             "/home/itecgo/Archimulator/benchmarks/Olden_Custom1/mst/ht",
             "mst.mips",
 //            "10000");
-//            "1000");
+            "1000");
 //            "100");
 //            "200");
-            "400");
+//            "400");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_EM3D_BASELINE = new SimulatedProgram(
             "Olden_Custom1",
