@@ -96,7 +96,7 @@ public abstract class Experiment {
 
         this.processorConfig = ProcessorConfig.createDefaultProcessorConfig(MemoryHierarchyConfig.createDefaultMemoryHierarchyConfig(this.l2EvictionPolicyFactory), this.processorCapabilityFactories, this.kernelCapabilityFactories, this.numCores, this.numThreadsPerCore);
 
-        this.beginTime = new SimpleDateFormat("yyyyMMdd_HH-mm-ss").format(new Date());
+        this.beginTime = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date());
 
         this.blockingEventDispatcher = new BlockingEventDispatcher<BlockingEvent>();
         this.cycleAccurateEventQueue = new CycleAccurateEventQueue();
