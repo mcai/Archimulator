@@ -18,8 +18,8 @@
  ******************************************************************************/
 package archimulator.ext.mem.delinquentLoad;
 
-import archimulator.core.event.InstructionCommittedEvent;
 import archimulator.core.Thread;
+import archimulator.core.event.InstructionCommittedEvent;
 import archimulator.mem.coherence.event.CoherentCacheBeginCacheAccessEvent;
 import archimulator.util.action.Action1;
 

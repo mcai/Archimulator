@@ -22,9 +22,9 @@ import archimulator.mem.MemoryAccessInitiatedEvent;
 import archimulator.mem.MemoryHierarchyAccess;
 import archimulator.mem.MemoryHierarchyAccessType;
 import archimulator.mem.coherence.FirstLevelCache;
+import archimulator.sim.BasicSimulationObject;
 import archimulator.util.action.Action;
 import archimulator.util.math.Counter;
-import archimulator.sim.BasicSimulationObject;
 
 import java.util.ArrayList;
 import java.util.List;

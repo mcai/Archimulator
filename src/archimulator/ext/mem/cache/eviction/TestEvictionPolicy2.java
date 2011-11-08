@@ -1,12 +1,12 @@
 package archimulator.ext.mem.cache.eviction;
 
 import archimulator.core.BasicThread;
+import archimulator.ext.mem.cache.prediction.CacheBasedPredictor;
+import archimulator.ext.mem.cache.prediction.Predictor;
 import archimulator.mem.cache.*;
 import archimulator.mem.cache.eviction.EvictionPolicy;
 import archimulator.mem.cache.eviction.EvictionPolicyFactory;
 import archimulator.mem.cache.eviction.LeastRecentlyUsedEvictionPolicy;
-import archimulator.ext.mem.cache.prediction.CacheBasedPredictor;
-import archimulator.ext.mem.cache.prediction.Predictor;
 import archimulator.util.action.Function2;
 
 import java.io.Serializable;

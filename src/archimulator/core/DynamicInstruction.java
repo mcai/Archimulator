@@ -20,8 +20,8 @@ package archimulator.core;
 
 import archimulator.isa.StaticInstruction;
 import archimulator.isa.StaticInstructionType;
-import archimulator.util.StringHelper;
 import archimulator.sim.Simulation;
+import archimulator.util.StringHelper;
 
 public class DynamicInstruction {
     private long id;

@@ -18,10 +18,10 @@
  ******************************************************************************/
 package archimulator.sim.strategy.checkpoint;
 
-import archimulator.util.action.Action1;
 import archimulator.sim.SimulationStartingImage;
 import archimulator.sim.event.PseudocallEncounteredEvent;
 import archimulator.sim.strategy.SequentialSimulationStrategy;
+import archimulator.util.action.Action1;
 
 import java.util.concurrent.CyclicBarrier;
 

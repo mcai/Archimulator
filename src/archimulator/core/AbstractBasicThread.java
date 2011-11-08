@@ -19,16 +19,16 @@
 package archimulator.core;
 
 import archimulator.core.bpred.*;
+import archimulator.isa.ArchitecturalRegisterFile;
+import archimulator.isa.RegisterDependencyType;
 import archimulator.mem.CacheAccessType;
 import archimulator.mem.coherence.event.CoherentCacheBeginCacheAccessEvent;
 import archimulator.mem.tlb.TranslationLookasideBuffer;
-import archimulator.isa.ArchitecturalRegisterFile;
-import archimulator.isa.RegisterDependencyType;
 import archimulator.os.Context;
-import archimulator.util.action.Action1;
 import archimulator.sim.BasicSimulationObject;
 import archimulator.sim.event.DumpStatEvent;
 import archimulator.sim.event.ResetStatEvent;
+import archimulator.util.action.Action1;
 
 public abstract class AbstractBasicThread extends BasicSimulationObject implements Thread {
     protected int num;

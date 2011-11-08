@@ -20,12 +20,12 @@ package archimulator.core;
 
 import archimulator.core.bpred.BranchPredictorConfig;
 import archimulator.core.bpred.PerfectBranchPredictorConfig;
-import archimulator.sim.capability.ProcessorCapability;
-import archimulator.sim.capability.ProcessorCapabilityFactory;
 import archimulator.mem.MemoryHierarchyConfig;
 import archimulator.mem.tlb.TranslationLookasideBufferConfig;
 import archimulator.os.KernelCapability;
 import archimulator.os.KernelCapabilityFactory;
+import archimulator.sim.capability.ProcessorCapability;
+import archimulator.sim.capability.ProcessorCapabilityFactory;
 
 import java.util.Map;
 

@@ -18,10 +18,10 @@
  ******************************************************************************/
 package archimulator.core;
 
-import archimulator.util.action.Action1;
-import archimulator.util.action.NamedAction;
 import archimulator.sim.event.DumpStatEvent;
 import archimulator.sim.event.ResetStatEvent;
+import archimulator.util.action.Action1;
+import archimulator.util.action.NamedAction;
 
 import java.util.EnumMap;
 import java.util.EnumSet;

@@ -20,9 +20,9 @@ package archimulator.mem;
 
 import archimulator.mem.coherence.message.MemoryDeviceMessage;
 import archimulator.mem.net.Net;
-import archimulator.util.action.Action;
 import archimulator.sim.BasicSimulationObject;
 import archimulator.sim.SimulationObject;
+import archimulator.util.action.Action;
 
 import java.io.Serializable;
 

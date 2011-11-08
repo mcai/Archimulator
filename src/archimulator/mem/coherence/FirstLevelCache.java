@@ -25,11 +25,11 @@ import archimulator.mem.coherence.exception.CoherentCacheException;
 import archimulator.mem.coherence.exception.CoherentCacheMessageProcessException;
 import archimulator.mem.coherence.message.*;
 import archimulator.mem.net.Net;
+import archimulator.sim.event.DumpStatEvent;
+import archimulator.sim.event.ResetStatEvent;
 import archimulator.util.action.Action;
 import archimulator.util.action.Action1;
 import archimulator.util.action.NamedAction;
-import archimulator.sim.event.DumpStatEvent;
-import archimulator.sim.event.ResetStatEvent;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

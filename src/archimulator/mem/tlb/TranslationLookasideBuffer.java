@@ -24,12 +24,12 @@ import archimulator.mem.cache.CacheAccess;
 import archimulator.mem.cache.CacheLine;
 import archimulator.mem.cache.EvictableCache;
 import archimulator.mem.cache.eviction.LeastRecentlyUsedEvictionPolicy;
-import archimulator.util.action.Action;
-import archimulator.util.action.Action1;
-import archimulator.util.action.Function2;
 import archimulator.sim.SimulationObject;
 import archimulator.sim.event.DumpStatEvent;
 import archimulator.sim.event.ResetStatEvent;
+import archimulator.util.action.Action;
+import archimulator.util.action.Action1;
+import archimulator.util.action.Function2;
 
 import java.io.Serializable;
 

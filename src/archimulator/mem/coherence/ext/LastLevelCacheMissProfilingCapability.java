@@ -18,19 +18,19 @@
  ******************************************************************************/
 package archimulator.mem.coherence.ext;
 
-import archimulator.sim.capability.SimulationCapability;
-import archimulator.sim.capability.SimulationCapabilityFactory;
 import archimulator.mem.cache.CacheAccess;
-import archimulator.util.math.FrequencyCalculator;
 import archimulator.mem.coherence.event.CoherentCacheBeginCacheAccessEvent;
 import archimulator.mem.coherence.event.CoherentCacheEndCacheAccessEvent;
-import archimulator.util.action.Action1;
-import archimulator.util.IntegerIntegerPair;
-import archimulator.util.Triple;
 import archimulator.sim.Simulation;
+import archimulator.sim.capability.SimulationCapability;
+import archimulator.sim.capability.SimulationCapabilityFactory;
 import archimulator.sim.event.DumpStatEvent;
 import archimulator.sim.event.PollStatsEvent;
 import archimulator.sim.event.PseudocallEncounteredEvent;
+import archimulator.util.IntegerIntegerPair;
+import archimulator.util.Triple;
+import archimulator.util.action.Action1;
+import archimulator.util.math.FrequencyCalculator;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;

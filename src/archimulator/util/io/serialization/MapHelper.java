@@ -34,19 +34,19 @@ public class MapHelper {
     }
 
     public static void load(Map<String, Object> map, InputStream in) {
-            try {
-                Properties prop = new Properties();
+        try {
+            Properties prop = new Properties();
 
-                prop.load(in);
+            prop.load(in);
 
-                for (Object key : prop.keySet()) {
-                    map.put(key.toString(), prop.get(key).toString());
-                }
-
-                in.close();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            for (Object key : prop.keySet()) {
+                map.put(key.toString(), prop.get(key).toString());
             }
+
+            in.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static void save(Map<String, Object> map, String fileName) {

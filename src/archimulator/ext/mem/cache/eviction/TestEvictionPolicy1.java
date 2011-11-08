@@ -20,6 +20,7 @@ package archimulator.ext.mem.cache.eviction;
 
 import archimulator.core.BasicThread;
 import archimulator.core.Processor;
+import archimulator.ext.mem.delinquentLoad.DelinquentLoadIdentificationCapability;
 import archimulator.mem.cache.CacheHit;
 import archimulator.mem.cache.CacheLine;
 import archimulator.mem.cache.CacheMiss;
@@ -27,9 +28,8 @@ import archimulator.mem.cache.EvictableCache;
 import archimulator.mem.cache.eviction.EvictionPolicy;
 import archimulator.mem.cache.eviction.EvictionPolicyFactory;
 import archimulator.mem.cache.eviction.LeastRecentlyUsedEvictionPolicy;
-import archimulator.ext.mem.delinquentLoad.DelinquentLoadIdentificationCapability;
-import archimulator.util.action.Action1;
 import archimulator.sim.event.ProcessorInitializedEvent;
+import archimulator.util.action.Action1;
 
 import java.io.Serializable;
 

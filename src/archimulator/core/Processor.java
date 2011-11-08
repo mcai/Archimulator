@@ -18,10 +18,10 @@
  ******************************************************************************/
 package archimulator.core;
 
-import archimulator.sim.capability.ProcessorCapability;
 import archimulator.mem.CacheHierarchy;
 import archimulator.os.Kernel;
 import archimulator.sim.SimulationObject;
+import archimulator.sim.capability.ProcessorCapability;
 
 import java.util.List;
 

@@ -26,13 +26,13 @@ public class CompositeOutputAppender implements OutputAppender {
     }
 
     public void appendStdOutLine(long currentCycle, String text) {
-        for(OutputAppender appender : this.appenders) {
+        for (OutputAppender appender : this.appenders) {
             appender.appendStdOutLine(currentCycle, text);
         }
     }
 
     public void appendStdErrLine(long currentCycle, String text) {
-        for(OutputAppender appender : this.appenders) {
+        for (OutputAppender appender : this.appenders) {
             appender.appendStdErrLine(currentCycle, text);
         }
     }

@@ -20,11 +20,11 @@ package archimulator.sim.strategy;
 
 import archimulator.core.Core;
 import archimulator.sim.Logger;
-import archimulator.util.action.Action1;
 import archimulator.sim.event.DumpStatEvent;
 import archimulator.sim.event.PauseSimulationEvent;
 import archimulator.sim.event.ResetStatEvent;
 import archimulator.sim.event.StopSimulationEvent;
+import archimulator.util.action.Action1;
 
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;

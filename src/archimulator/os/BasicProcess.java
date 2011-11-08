@@ -19,9 +19,9 @@
 package archimulator.os;
 
 import archimulator.ext.analysis.Instruction;
-import archimulator.isa.memory.Memory;
 import archimulator.isa.StaticInstruction;
 import archimulator.isa.dissembler.MipsDissembler;
+import archimulator.isa.memory.Memory;
 import archimulator.os.elf.ElfFile;
 import archimulator.os.elf.ElfSectionHeader;
 import archimulator.sim.ContextConfig;

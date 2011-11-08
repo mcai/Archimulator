@@ -18,10 +18,10 @@
  ******************************************************************************/
 package archimulator.mem;
 
+import archimulator.sim.Simulation;
 import archimulator.sim.capability.SimulationCapability;
 import archimulator.sim.capability.SimulationCapabilityFactory;
 import archimulator.util.action.Action1;
-import archimulator.sim.Simulation;
 
 import java.io.PrintWriter;
 

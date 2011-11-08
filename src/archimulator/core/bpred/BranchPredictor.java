@@ -20,10 +20,10 @@ package archimulator.core.bpred;
 
 import archimulator.core.Thread;
 import archimulator.isa.Mnemonic;
-import archimulator.util.action.Action1;
-import archimulator.util.Reference;
 import archimulator.sim.event.DumpStatEvent;
 import archimulator.sim.event.ResetStatEvent;
+import archimulator.util.Reference;
+import archimulator.util.action.Action1;
 
 public abstract class BranchPredictor {
     private String name;

@@ -21,8 +21,8 @@ package archimulator.core.bpred;
 import archimulator.core.Thread;
 import archimulator.isa.Mnemonic;
 import archimulator.isa.StaticInstructionType;
-import archimulator.util.math.SaturatingCounter;
 import archimulator.util.Reference;
+import archimulator.util.math.SaturatingCounter;
 
 public class CombinedBranchPredictor extends DynamicBranchPredictor {
     private TwoBitBranchPredictor bimod;

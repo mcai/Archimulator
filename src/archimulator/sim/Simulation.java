@@ -18,12 +18,20 @@
  ******************************************************************************/
 package archimulator.sim;
 
-import archimulator.core.*;
+import archimulator.core.BasicProcessor;
+import archimulator.core.Core;
+import archimulator.core.Processor;
 import archimulator.core.Thread;
-import archimulator.sim.capability.SimulationCapability;
-import archimulator.sim.capability.SimulationCapabilityFactory;
 import archimulator.os.Context;
 import archimulator.os.Kernel;
+import archimulator.sim.capability.SimulationCapability;
+import archimulator.sim.capability.SimulationCapabilityFactory;
+import archimulator.sim.event.DumpStatEvent;
+import archimulator.sim.event.PollStatsEvent;
+import archimulator.sim.event.ProcessorInitializedEvent;
+import archimulator.sim.strategy.SimulationStrategy;
+import archimulator.util.StopWatch;
+import archimulator.util.StringHelper;
 import archimulator.util.action.Action1;
 import archimulator.util.action.NamedAction;
 import archimulator.util.action.Predicate;
@@ -32,12 +40,6 @@ import archimulator.util.event.BlockingEventDispatcher;
 import archimulator.util.event.CycleAccurateEventQueue;
 import archimulator.util.io.file.FileHelper;
 import archimulator.util.io.serialization.MapHelper;
-import archimulator.util.StopWatch;
-import archimulator.util.StringHelper;
-import archimulator.sim.event.DumpStatEvent;
-import archimulator.sim.event.PollStatsEvent;
-import archimulator.sim.event.ProcessorInitializedEvent;
-import archimulator.sim.strategy.SimulationStrategy;
 
 import java.io.File;
 import java.text.MessageFormat;

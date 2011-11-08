@@ -25,10 +25,10 @@ import archimulator.mem.coherence.message.MemReadMessage;
 import archimulator.mem.coherence.message.MemWriteMessage;
 import archimulator.mem.coherence.message.MemoryDeviceMessage;
 import archimulator.mem.net.Net;
-import archimulator.util.action.Action;
-import archimulator.util.action.Action1;
 import archimulator.sim.event.DumpStatEvent;
 import archimulator.sim.event.ResetStatEvent;
+import archimulator.util.action.Action;
+import archimulator.util.action.Action1;
 
 public abstract class MainMemory extends MemoryDevice {
     private long reads;

@@ -18,11 +18,11 @@
  ******************************************************************************/
 package archimulator.ext.mem.cache.eviction;
 
+import archimulator.ext.mem.cache.prediction.CacheBasedPredictor;
+import archimulator.ext.mem.cache.prediction.Predictor;
 import archimulator.mem.CacheAccessType;
 import archimulator.mem.cache.Cache;
 import archimulator.mem.cache.CacheGeometry;
-import archimulator.ext.mem.cache.prediction.CacheBasedPredictor;
-import archimulator.ext.mem.cache.prediction.Predictor;
 import archimulator.util.math.Quantizer;
 
 import java.io.Serializable;

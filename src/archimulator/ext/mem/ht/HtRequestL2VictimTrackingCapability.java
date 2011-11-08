@@ -20,8 +20,6 @@ package archimulator.ext.mem.ht;
 
 import archimulator.core.BasicThread;
 import archimulator.core.Processor;
-import archimulator.sim.capability.ProcessorCapability;
-import archimulator.sim.capability.ProcessorCapabilityFactory;
 import archimulator.mem.MemoryHierarchyAccess;
 import archimulator.mem.cache.Cache;
 import archimulator.mem.cache.CacheLine;
@@ -31,12 +29,14 @@ import archimulator.mem.coherence.CoherentCache;
 import archimulator.mem.coherence.MESIState;
 import archimulator.mem.coherence.event.CoherentCacheFillLineEvent;
 import archimulator.mem.coherence.event.CoherentCacheServiceNonblockingRequestEvent;
-import archimulator.util.action.Action1;
-import archimulator.util.action.Function2;
-import archimulator.util.action.Predicate;
+import archimulator.sim.capability.ProcessorCapability;
+import archimulator.sim.capability.ProcessorCapabilityFactory;
 import archimulator.sim.event.DumpStatEvent;
 import archimulator.sim.event.PollStatsEvent;
 import archimulator.sim.event.ResetStatEvent;
+import archimulator.util.action.Action1;
+import archimulator.util.action.Function2;
+import archimulator.util.action.Predicate;
 
 import java.util.Map;
 

@@ -19,8 +19,8 @@
 package archimulator.mem;
 
 import archimulator.core.DynamicInstruction;
-import archimulator.util.action.Action;
 import archimulator.sim.Simulation;
+import archimulator.util.action.Action;
 
 import java.util.ArrayList;
 import java.util.List;

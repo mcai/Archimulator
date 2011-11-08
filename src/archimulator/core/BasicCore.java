@@ -20,12 +20,12 @@ package archimulator.core;
 
 import archimulator.isa.StaticInstructionType;
 import archimulator.os.ContextState;
+import archimulator.util.Reference;
+import archimulator.util.RoundRobinScheduler;
 import archimulator.util.action.Action;
 import archimulator.util.action.Action1;
 import archimulator.util.action.Function1;
 import archimulator.util.action.Predicate;
-import archimulator.util.Reference;
-import archimulator.util.RoundRobinScheduler;
 
 import java.util.Iterator;
 import java.util.List;

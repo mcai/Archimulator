@@ -23,8 +23,8 @@ import archimulator.mem.MemoryHierarchyAccess;
 import archimulator.mem.cache.eviction.EvictionPolicy;
 import archimulator.mem.cache.eviction.EvictionPolicyFactory;
 import archimulator.mem.coherence.CoherentCache;
-import archimulator.util.action.Function2;
 import archimulator.sim.SimulationObject;
+import archimulator.util.action.Function2;
 
 import java.io.Serializable;
 

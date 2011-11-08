@@ -26,11 +26,11 @@ import archimulator.mem.net.L1sToL2Net;
 import archimulator.mem.net.L2ToMemNet;
 import archimulator.mem.net.Net;
 import archimulator.mem.tlb.TranslationLookasideBuffer;
+import archimulator.sim.BasicSimulationObject;
 import archimulator.sim.Logger;
 import archimulator.util.event.BlockingEvent;
 import archimulator.util.event.BlockingEventDispatcher;
 import archimulator.util.event.CycleAccurateEventQueue;
-import archimulator.sim.BasicSimulationObject;
 
 import java.util.ArrayList;
 import java.util.List;

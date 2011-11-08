@@ -24,10 +24,10 @@ import archimulator.mem.cache.*;
 import archimulator.mem.cache.eviction.EvictionPolicy;
 import archimulator.mem.cache.eviction.EvictionPolicyFactory;
 import archimulator.mem.cache.eviction.LeastRecentlyUsedEvictionPolicy;
+import archimulator.sim.event.ProcessorInitializedEvent;
+import archimulator.util.IntegerIntegerPair;
 import archimulator.util.action.Action1;
 import archimulator.util.action.Function2;
-import archimulator.util.IntegerIntegerPair;
-import archimulator.sim.event.ProcessorInitializedEvent;
 
 import java.io.Serializable;
 import java.util.ArrayList;

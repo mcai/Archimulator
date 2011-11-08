@@ -85,8 +85,8 @@ public class BigMemoryDataStore extends BasicSimulationObject implements MemoryD
             byte[] buf2 = new byte[buf.length];
             this.access(pageId, displacement, buf2, offset, size, false);
 
-            for(int i = offset; i < offset + size; i++) {
-                if(buf[i] != buf2[i]) {
+            for (int i = offset; i < offset + size; i++) {
+                if (buf[i] != buf2[i]) {
                     throw new IllegalArgumentException();
                 }
             }
@@ -170,16 +170,16 @@ public class BigMemoryDataStore extends BasicSimulationObject implements MemoryD
 
         private ByteBuffer getDiskBb() {
 //            try {
-                String diskCacheFileName = this.getDiskCacheFileName();
+            String diskCacheFileName = this.getDiskCacheFileName();
 
-                if (!diskBbs.containsKey(diskCacheFileName)) {
+            if (!diskBbs.containsKey(diskCacheFileName)) {
 //                    RandomAccessFile raf = new RandomAccessFile(diskCacheFileName, "rws");
 //                    diskBbs.put(diskCacheFileName, raf.getChannel().map(FileChannel.MapMode.PRIVATE, 0, DISK_CACHE_FILE_LENGTH).order(littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN));
 
-                    diskBbs.put(diskCacheFileName, ByteBuffer.allocateDirect(DISK_CACHE_FILE_LENGTH).order(memory.isLittleEndian() ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN));
-                }
+                diskBbs.put(diskCacheFileName, ByteBuffer.allocateDirect(DISK_CACHE_FILE_LENGTH).order(memory.isLittleEndian() ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN));
+            }
 
-                return diskBbs.get(diskCacheFileName);
+            return diskBbs.get(diskCacheFileName);
 //            } catch (IOException e) {
 //                throw new RuntimeException(e);
 //            }
@@ -235,7 +235,7 @@ public class BigMemoryDataStore extends BasicSimulationObject implements MemoryD
                 this.bb.clear();
                 this.bb.put(data);
 
-                if(!Arrays.equals(data, perLineDiskBbs.get(this.tag))) {
+                if (!Arrays.equals(data, perLineDiskBbs.get(this.tag))) {
                     throw new IllegalArgumentException();
                 }
 

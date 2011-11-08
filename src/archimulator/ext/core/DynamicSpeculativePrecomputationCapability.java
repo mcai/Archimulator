@@ -18,30 +18,31 @@
  ******************************************************************************/
 package archimulator.ext.core;
 
-import archimulator.sim.capability.ProcessorCapability;
-import archimulator.sim.capability.ProcessorCapabilityFactory;
-import archimulator.core.*;
+import archimulator.core.Core;
+import archimulator.core.Processor;
 import archimulator.core.Thread;
 import archimulator.core.event.InstructionCommittedEvent;
 import archimulator.core.event.InstructionDecodedEvent;
-import archimulator.mem.CacheAccessType;
-import archimulator.mem.cache.*;
-import archimulator.mem.cache.eviction.EvictionPolicyFactory;
-import archimulator.mem.cache.eviction.LeastRecentlyUsedEvictionPolicy;
-import archimulator.mem.coherence.event.CoherentCacheBeginCacheAccessEvent;
 import archimulator.ext.mem.delinquentLoad.AbstractDelinquentLoadIdentificationTable;
 import archimulator.ext.mem.delinquentLoad.DelinquentLoad;
 import archimulator.isa.ArchitecturalRegisterFile;
 import archimulator.isa.StaticInstruction;
 import archimulator.isa.StaticInstructionType;
+import archimulator.mem.CacheAccessType;
+import archimulator.mem.cache.*;
+import archimulator.mem.cache.eviction.EvictionPolicyFactory;
+import archimulator.mem.cache.eviction.LeastRecentlyUsedEvictionPolicy;
+import archimulator.mem.coherence.event.CoherentCacheBeginCacheAccessEvent;
 import archimulator.os.Context;
 import archimulator.os.ContextKilledEvent;
 import archimulator.os.ContextState;
 import archimulator.sim.Logger;
+import archimulator.sim.SimulationObject;
+import archimulator.sim.capability.ProcessorCapability;
+import archimulator.sim.capability.ProcessorCapabilityFactory;
 import archimulator.util.action.Action1;
 import archimulator.util.action.Function2;
 import archimulator.util.action.Predicate;
-import archimulator.sim.SimulationObject;
 
 import java.util.*;
 

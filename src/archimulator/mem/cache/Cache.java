@@ -18,11 +18,11 @@
  ******************************************************************************/
 package archimulator.mem.cache;
 
+import archimulator.sim.BasicSimulationObject;
+import archimulator.sim.SimulationObject;
 import archimulator.util.action.Action1;
 import archimulator.util.action.Function2;
 import archimulator.util.action.Predicate;
-import archimulator.sim.BasicSimulationObject;
-import archimulator.sim.SimulationObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;

@@ -18,13 +18,14 @@
  ******************************************************************************/
 package archimulator.ext.mem.delinquentLoad;
 
-import archimulator.core.*;
+import archimulator.core.Core;
+import archimulator.core.Processor;
 import archimulator.core.Thread;
 import archimulator.sim.capability.ProcessorCapability;
 import archimulator.sim.capability.ProcessorCapabilityFactory;
-import archimulator.util.action.Action1;
 import archimulator.sim.event.DumpStatEvent;
 import archimulator.sim.event.PollStatsEvent;
+import archimulator.util.action.Action1;
 
 import java.util.HashMap;
 import java.util.List;

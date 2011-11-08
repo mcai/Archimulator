@@ -18,20 +18,20 @@
  ******************************************************************************/
 package archimulator.core;
 
-import archimulator.sim.capability.ProcessorCapability;
-import archimulator.sim.capability.ProcessorCapabilityFactory;
 import archimulator.mem.CacheHierarchy;
 import archimulator.os.Context;
 import archimulator.os.ContextKilledEvent;
 import archimulator.os.ContextState;
 import archimulator.os.Kernel;
+import archimulator.sim.BasicSimulationObject;
 import archimulator.sim.Logger;
+import archimulator.sim.capability.ProcessorCapability;
+import archimulator.sim.capability.ProcessorCapabilityFactory;
+import archimulator.sim.event.ResetStatEvent;
 import archimulator.util.action.Action1;
 import archimulator.util.event.BlockingEvent;
 import archimulator.util.event.BlockingEventDispatcher;
 import archimulator.util.event.CycleAccurateEventQueue;
-import archimulator.sim.BasicSimulationObject;
-import archimulator.sim.event.ResetStatEvent;
 
 import java.util.*;
 

@@ -21,10 +21,10 @@ package archimulator.ext.mem.cache.eviction;
 import archimulator.mem.cache.*;
 import archimulator.mem.cache.eviction.EvictionPolicy;
 import archimulator.mem.cache.eviction.EvictionPolicyFactory;
-import archimulator.util.action.Action1;
 import archimulator.sim.event.DumpStatEvent;
 import archimulator.sim.event.PollStatsEvent;
 import archimulator.sim.event.ResetStatEvent;
+import archimulator.util.action.Action1;
 
 import java.io.Serializable;
 import java.util.Map;

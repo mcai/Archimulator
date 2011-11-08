@@ -20,8 +20,8 @@ package archimulator.mem.net;
 
 import archimulator.mem.CacheHierarchy;
 import archimulator.mem.MemoryDevice;
-import archimulator.util.action.Action;
 import archimulator.sim.BasicSimulationObject;
+import archimulator.util.action.Action;
 
 import java.util.ArrayList;
 import java.util.HashMap;

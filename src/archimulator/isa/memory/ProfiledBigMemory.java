@@ -18,8 +18,8 @@
  ******************************************************************************/
 package archimulator.isa.memory;
 
-import archimulator.isa.memory.bigMemory.MemoryDataStore;
 import archimulator.isa.memory.bigMemory.BigMemoryDataStore;
+import archimulator.isa.memory.bigMemory.MemoryDataStore;
 import archimulator.os.Kernel;
 
 import java.nio.ByteBuffer;
@@ -48,29 +48,28 @@ public class ProfiledBigMemory extends Memory {
 
     @Override
     protected void doPageAccess(int pageId, int displacement, byte[] buf, int offset, int size, boolean write) {
-        if(write) {
+        if (write) {
             ByteBuffer bb = this.bbs.get(pageId);
             bb.position(displacement);
             bb.put(buf, offset, size);
 
             this.dataStore.access(pageId, displacement, buf, offset, size, write);
-        }
-        else {
+        } else {
             byte[] buf2 = buf.clone();
 
             ByteBuffer bb = this.bbs.get(pageId);
             bb.position(displacement);
             bb.get(buf2, offset, size);
 
-            if(pageId == 1513) {
+            if (pageId == 1513) {
                 System.out.println();
             }
 
             this.dataStore.access(pageId, displacement, buf, offset, size, write);
 
-            for(int i = offset; i < offset + size; i++) {
-                if(buf[i] != buf2[i]) {
-                this.dataStore.access(pageId, displacement, buf, offset, size, write);
+            for (int i = offset; i < offset + size; i++) {
+                if (buf[i] != buf2[i]) {
+                    this.dataStore.access(pageId, displacement, buf, offset, size, write);
                     throw new IllegalArgumentException();
                 }
             }

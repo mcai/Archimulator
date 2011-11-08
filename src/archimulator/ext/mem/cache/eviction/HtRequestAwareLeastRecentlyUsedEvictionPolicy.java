@@ -31,13 +31,13 @@ import archimulator.mem.coherence.event.CoherentCacheBeginCacheAccessEvent;
 import archimulator.mem.coherence.event.CoherentCacheFillLineEvent;
 import archimulator.mem.coherence.event.CoherentCacheNonblockingRequestHitToTransientTagEvent;
 import archimulator.mem.coherence.event.CoherentCacheServiceNonblockingRequestEvent;
+import archimulator.sim.event.DumpStatEvent;
+import archimulator.sim.event.PollStatsEvent;
+import archimulator.sim.event.ResetStatEvent;
 import archimulator.util.action.Action1;
 import archimulator.util.action.Function2;
 import archimulator.util.math.MathHelper;
 import archimulator.util.math.SaturatingCounter;
-import archimulator.sim.event.DumpStatEvent;
-import archimulator.sim.event.PollStatsEvent;
-import archimulator.sim.event.ResetStatEvent;
 
 import java.io.Serializable;
 import java.util.Map;
