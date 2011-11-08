@@ -1,0 +1,12 @@
+c0t0.totalInsts=202487832
+c0t1.totalInsts=10382
+c1t0.totalInsts=36189857
+c1t1.totalInsts=0
+simulation.duration=00:02:52.964
+simulation.totalCycles=202488994
+simulation.totalInsts=238688071
+simulation.instsPerCycle=1.1787705903660126
+simulation.cyclesPerSecond=1177261.5930232557
+simulation.instsPerSecond=1387721.3430232557
+experiment.beginTime=20111108_13-19-53
+experiment.workload=Olden_Custom1.mst_ht_mips(1000)
