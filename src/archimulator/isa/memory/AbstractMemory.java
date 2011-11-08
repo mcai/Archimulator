@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.isa.memory;
 
-import archimulator.isa.memory.bigMemory.MemoryDataStore;
+import archimulator.isa.memory.datastore.MemoryDataStore;
 import archimulator.os.Kernel;
 
 public abstract class AbstractMemory extends Memory {

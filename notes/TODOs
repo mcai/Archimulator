@@ -94,11 +94,11 @@ recent priority:
 
 * introduce subblock granularity into the directory data structure and cache coherence protocol.
 
-* find an independent branch prediction simulator and compare its result with FleximJ's. Refer to:
+* find an independent branch prediction simulator and compare its result with Archimulator's. Refer to:
       The 2nd JILP Championship Branch Prediction Competition (CBP-2)
       (http://cava.cs.utsa.edu/camino/cbp2/)
 
-    * integrate MyBranchPredictor into FleximJ and check its MPKI!!!
+    * integrate MyBranchPredictor into Archimulator and check its MPKI!!!
 
 * investigate and pick & integrate the select cache replacement algorithms from:
     1st JILP Workshop on Computer Architecture Competitions (JWAC-1): Cache Replacement Championship

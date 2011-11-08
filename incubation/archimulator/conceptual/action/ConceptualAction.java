@@ -16,12 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.isa.memory.bigMemory;
+package archimulator.conceptual.action;
 
-import archimulator.sim.SimulationObject;
-
-public interface MemoryDataStore extends SimulationObject {
-    void create(int pageId);
-
-    void access(int pageId, int displacement, byte[] buf, int offset, int size, boolean write);
+public class ConceptualAction {
 }

@@ -16,7 +16,32 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package flexim.conceptual.model;
+package archimulator.util.simpleCache;
 
-public class ConceptualModel {
+public class DefaultSimpleCacheAccessType implements SimpleCacheAccessType {
+    private String value;
+
+    public DefaultSimpleCacheAccessType(String value) {
+        this.value = value;
+    }
+
+    public boolean isSetOnGetValue() {
+        return false;
+    }
+
+    public boolean isSetOnSetValue() {
+        return true;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return this.value;
+    }
+
+    public static DefaultSimpleCacheAccessType READ = new DefaultSimpleCacheAccessType("read");
+    public static DefaultSimpleCacheAccessType WRITE = new DefaultSimpleCacheAccessType("write");
 }

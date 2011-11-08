@@ -475,7 +475,7 @@ public abstract class CoherentCache<StateT extends Serializable> extends MemoryD
                 assert this.findAndLockProcess.cacheAccess.isHitInCache();
             }
 
-            if (this.findAndLockProcess.getCacheAccess().getReference().getAccessType().isWriteback()) { //TODO: verifying the case of writeback
+            if (this.findAndLockProcess.getCacheAccess().getReference().getAccessType().isWriteback()) { //TODO: verifying the case of writeToNextLevel
 //                assert !this.findAndLockProcess.cacheAccess.isBypass() || this.findAndLockProcess.cacheAccess.getReference();
             }
 

@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package flexim.conceptual.model;
+package archimulator.conceptual.model;
 
-public class FunctionalModel extends ConceptualModel {
+public class CostModel extends ConceptualModel {
 }

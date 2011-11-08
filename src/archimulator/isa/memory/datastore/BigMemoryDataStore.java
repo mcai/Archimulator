@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.isa.memory.bigMemory;
+package archimulator.isa.memory.datastore;
 
 import archimulator.isa.memory.Memory;
 import archimulator.mem.CacheAccessType;
@@ -108,7 +108,8 @@ public class BigMemoryDataStore extends BasicSimulationObject implements MemoryD
                 cacheAccess.getLine().writeback();
             }
 
-            cacheAccess.commit().getLine().initOrLoadFromDisk().setNonInitialState(true);
+            cacheAccess.getLine().initOrLoadFromDisk(this.cache.getTag(pageId));
+            cacheAccess.commit().getLine().setNonInitialState(true);
         }
         return cacheAccess;
     }
@@ -163,7 +164,7 @@ public class BigMemoryDataStore extends BasicSimulationObject implements MemoryD
 
         private ByteBuffer getDiskBb() {
             try {
-                String diskCacheFileName = this.getDiskCacheFileName();
+                String diskCacheFileName = this.getDiskCacheFileName(this.tag);
 
                 if (!diskBbs.containsKey(diskCacheFileName)) {
                     RandomAccessFile raf = new RandomAccessFile(diskCacheFileName, "rws");
@@ -180,7 +181,7 @@ public class BigMemoryDataStore extends BasicSimulationObject implements MemoryD
             if (dirty) {
                 ByteBuffer diskBb = this.getDiskBb();
 
-                diskBb.position(getDiskCacheFileDisplacement());
+                diskBb.position(BigMemoryDataStore.getDiskCacheFileDisplacement(this.tag));
 
                 this.bb.position(0);
 
@@ -201,23 +202,19 @@ public class BigMemoryDataStore extends BasicSimulationObject implements MemoryD
             return this;
         }
 
-        private int getDiskCacheFileDisplacement() {
-            return BigMemoryDataStore.getDiskCacheFileDisplacement(this.tag);
-        }
-
-        private MemoryPageCacheLine initOrLoadFromDisk() {
+        private MemoryPageCacheLine initOrLoadFromDisk(int newTag) {
             if (this.bb == null) {
                 this.bb = ByteBuffer.allocateDirect(getByteBufferSize()).order(memory.isLittleEndian() ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
             }
 
-            if (evictedPageIds.contains(this.tag)) {
-                if (!this.isDiskCacheFileExist()) {
+            if (evictedPageIds.contains(newTag)) {
+                if (!this.isDiskCacheFileExist(newTag)) {
                     throw new RuntimeException();
                 }
 
                 ByteBuffer diskBb = this.getDiskBb();
 
-                diskBb.position(getDiskCacheFileDisplacement());
+                diskBb.position(BigMemoryDataStore.getDiskCacheFileDisplacement(newTag));
 
                 byte[] data = new byte[getByteBufferSize()];
                 diskBb.get(data);
@@ -225,7 +222,7 @@ public class BigMemoryDataStore extends BasicSimulationObject implements MemoryD
                 this.bb.clear();
                 this.bb.put(data);
 
-                evictedPageIds.remove(this.tag);
+                evictedPageIds.remove(newTag);
 
 //                    raf.close();
             }
@@ -233,15 +230,12 @@ public class BigMemoryDataStore extends BasicSimulationObject implements MemoryD
             return this;
         }
 
-        private String getDiskCacheFileName() {
-            int pageIndex = this.tag;
-            int fileIndex = getDiskCacheFileIndex(pageIndex);
-
-            return memory.getSimulationDirectory() + "/mem.process" + memory.getProcessId() + "." + fileIndex + ".diskCache";
+        private String getDiskCacheFileName(int tag) {
+            return memory.getSimulationDirectory() + "/mem.process" + memory.getProcessId() + "." + getDiskCacheFileIndex(tag) + ".diskCache";
         }
 
-        private boolean isDiskCacheFileExist() {
-            return diskBbs.containsKey(this.getDiskCacheFileName());
+        private boolean isDiskCacheFileExist(int tag) {
+            return diskBbs.containsKey(this.getDiskCacheFileName(tag));
 //            return new File(this.getDiskCacheFileName()).exists();
         }
     }

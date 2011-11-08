@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.isa.memory.bigMemory;
+package archimulator.isa.memory.datastore;
 
 import archimulator.isa.memory.Memory;
 import archimulator.sim.BasicSimulationObject;
@@ -42,7 +42,7 @@ public class BasicMemoryDataStore extends BasicSimulationObject implements Memor
     }
 
     public void access(int pageId, int displacement, byte[] buf, int offset, int size, boolean write) {
-        ByteBuffer bb = this.bbs.get(pageId);
+        ByteBuffer bb = getByteBuffer(pageId);
         bb.position(displacement);
 
         if (write) {
@@ -50,5 +50,9 @@ public class BasicMemoryDataStore extends BasicSimulationObject implements Memor
         } else {
             bb.get(buf, offset, size);
         }
+    }
+
+    private ByteBuffer getByteBuffer(int pageId) {
+        return this.bbs.get(pageId);
     }
 }

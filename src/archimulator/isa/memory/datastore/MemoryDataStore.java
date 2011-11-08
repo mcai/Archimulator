@@ -16,24 +16,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.isa.memory;
+package archimulator.isa.memory.datastore;
 
-import archimulator.isa.memory.datastore.BigMemoryDataStore;
-import archimulator.isa.memory.datastore.MemoryDataStore;
-import archimulator.isa.memory.datastore.NewBigMemoryDataStore;
-import archimulator.os.Kernel;
+import archimulator.sim.SimulationObject;
 
-public class BigMemory extends AbstractMemory {
-    private MemoryDataStore dataStore;
+public interface MemoryDataStore extends SimulationObject {
+    void create(int pageId);
 
-    public BigMemory(Kernel kernel, String simulationDirectory, boolean littleEndian, int processId) {
-        super(kernel, simulationDirectory, littleEndian, processId);
-//        this.dataStore = new BigMemoryDataStore(this);
-        this.dataStore = new NewBigMemoryDataStore(this);
-    }
-
-    @Override
-    protected MemoryDataStore getDataStore() {
-        return this.dataStore;
-    }
+    void access(int pageId, int displacement, byte[] buf, int offset, int size, boolean write);
 }

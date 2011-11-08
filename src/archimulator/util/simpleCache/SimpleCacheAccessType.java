@@ -16,7 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package flexim.conceptual.model;
+package archimulator.util.simpleCache;
 
-public class PerformanceModel extends ConceptualModel {
+public interface SimpleCacheAccessType {
+    boolean isSetOnGetValue();
+
+    boolean isSetOnSetValue();
 }
