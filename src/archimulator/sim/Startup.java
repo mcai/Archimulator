@@ -44,12 +44,25 @@ public class Startup {
 //        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_EM3D_BASELINE, 3));
 
         List<ContextConfig> contextConfigs = new ArrayList<ContextConfig>();
-        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_MST_BASELINE, 0));
-        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_EM3D_BASELINE, 1));
-        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_EM3D_BASELINE, 2));
-        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_MST_BASELINE, 3));
+//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_MST_BASELINE, 0));
+        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_429_MCF_BASELINE, 0));
+//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_EM3D_BASELINE, 1));
+//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_EM3D_BASELINE, 2));
+//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_MST_BASELINE, 3));
+//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_MST_BASELINE, 4));
+//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_EM3D_BASELINE, 5));
+//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_EM3D_BASELINE, 6));
+//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_MST_BASELINE, 7));
+//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_MST_BASELINE, 8));
+//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_EM3D_BASELINE, 9));
+//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_EM3D_BASELINE, 10));
+//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_MST_BASELINE, 11));
+//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_MST_BASELINE, 12));
+//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_EM3D_BASELINE, 13));
+//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_EM3D_BASELINE, 14));
+//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_MST_BASELINE, 15));
 
-        simulate("test1", LeastRecentlyUsedEvictionPolicy.FACTORY, 2, 2, contextConfigs);
+        simulate("test1", LeastRecentlyUsedEvictionPolicy.FACTORY, 1, 1, contextConfigs);
 //        simulate("mst_ht_LRU", LeastRecentlyUsedEvictionPolicy.FACTORY, SIMULATED_PROGRAM_MST_HT);
 
 //        simulate("em3d_baseline_LRU", SIMULATED_PROGRAM_EM3D_BASELINE, LeastRecentlyUsedEvictionPolicy.FACTORY);
