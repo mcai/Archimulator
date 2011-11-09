@@ -103,6 +103,7 @@ public class Simulation implements SimulationObject {
 
         this.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
             public void apply(DumpStatEvent event) {
+                pollSimulationState();
                 dumpStat(event.getStats());
             }
         });
@@ -139,49 +140,11 @@ public class Simulation implements SimulationObject {
                 public void run() {
                     Simulation.this.getCycleAccurateEventQueue().schedule(new NamedAction("Simulation.dumpState") {
                         public void apply() {
-                            Simulation.this.logger.infof(Logger.SIMULATION, "%s", new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(new Date()));
-                            Simulation.this.logger.infof(Logger.SIMULATION, "\tduration: %s", getFormattedDuration());
-
-                            Simulation.this.logger.infof(Logger.SIMULATION, "\ttotalCycles: %s", MessageFormat.format("{0}", Simulation.this.getCycleAccurateEventQueue().getCurrentCycle()));
-
-                            List<String> totalInstsPerThread = new ArrayList<String>();
-                            List<String> llcReadMissesPerThread = new ArrayList<String>();
-                            List<String> llcWriteMissesPerThread = new ArrayList<String>();
-
-                            for (int i = 0; i < getConfig().getProcessorConfig().getNumCores(); i++) {
-                                for (int j = 0; j < getConfig().getProcessorConfig().getNumThreadsPerCore(); j++) {
-                                    totalInstsPerThread.add("c" + i + "t" + j + ": " + getProcessor().getCores().get(i).getThreads().get(j).getTotalInsts());
-                                    llcReadMissesPerThread.add("c" + i + "t" + j + ": " + getProcessor().getCores().get(i).getThreads().get(j).getLlcReadMisses());
-                                    llcWriteMissesPerThread.add("c" + i + "t" + j + ": " + getProcessor().getCores().get(i).getThreads().get(j).getLlcWriteMisses());
-                                }
-                            }
-
-                            Simulation.this.logger.infof(Logger.SIMULATION, "\ttotalInsts: %s", MessageFormat.format("{0}", getTotalInsts()) + " (" + StringHelper.join(totalInstsPerThread, ", ") + ")");
-                            Simulation.this.logger.infof(Logger.SIMULATION, "\tllcReadMisses: %s", MessageFormat.format("{0}", getLlcReadMisses()) + " (" + StringHelper.join(llcReadMissesPerThread, ", ") + ")");
-                            Simulation.this.logger.infof(Logger.SIMULATION, "\tllcWriteMisses: %s", MessageFormat.format("{0}", getLlcWriteMisses()) + " (" + StringHelper.join(llcWriteMissesPerThread, ", ") + ")");
-
-                            Simulation.this.logger.infof(Logger.SIMULATION, "\tinstsPerCycle: %s", MessageFormat.format("{0}", getInstsPerCycle()));
-                            Simulation.this.logger.infof(Logger.SIMULATION, "\tcyclesPerSecond: %s", MessageFormat.format("{0}", getCyclesPerSecond()));
-                            Simulation.this.logger.infof(Logger.SIMULATION, "\tinstsPerSecond: %s\n", MessageFormat.format("{0}", getInstsPerSecond()));
-
-                            Map<String, Object> polledStats = new LinkedHashMap<String, Object>();
-
-                            Simulation.this.getBlockingEventDispatcher().dispatch(new PollStatsEvent(polledStats));
-
-                            for (Map.Entry<String, Object> entry : polledStats.entrySet()) {
-                                Simulation.this.logger.infof(Logger.SIMULATION, "\t%s: %s", entry.getKey(), entry.getValue());
-                            }
-
-                            Simulation.this.logger.infof(Logger.SIMULATION, "\tmax memory: %s", MessageFormat.format("{0}", Runtime.getRuntime().maxMemory()));
-                            Simulation.this.logger.infof(Logger.SIMULATION, "\ttotal memory: %s", MessageFormat.format("{0}", Runtime.getRuntime().totalMemory()));
-                            Simulation.this.logger.infof(Logger.SIMULATION, "\tused memory: %s\n", MessageFormat.format("{0}", Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()));
-
-                            getProcessor().getCacheHierarchy().dumpState();
-//                            Simulation.this.logger.info(Logger.SIMULATION, "");
+                            pollSimulationState();
                         }
                     }, 0);
                 }
-            }, 10000, 10000);
+            }, 2000, 10000);
 
             this.getStrategy().execute();
 
@@ -198,6 +161,49 @@ public class Simulation implements SimulationObject {
             hasError = true;
             System.exit(-1);
         }
+    }
+
+    private void pollSimulationState() {
+        this.logger.infof(Logger.SIMULATION, "------ Simulation %s: BEGIN DUMP STATE at %s ------\n", this.getConfig().getTitle(), new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(new Date()));
+        this.logger.infof(Logger.SIMULATION, "\tduration: %s", this.getFormattedDuration());
+
+        this.logger.infof(Logger.SIMULATION, "\ttotalCycles: %s", MessageFormat.format("{0}", this.getCycleAccurateEventQueue().getCurrentCycle()));
+
+        List<String> totalInstsPerThread = new ArrayList<String>();
+        List<String> llcReadMissesPerThread = new ArrayList<String>();
+        List<String> llcWriteMissesPerThread = new ArrayList<String>();
+
+        for (int i = 0; i < this.getConfig().getProcessorConfig().getNumCores(); i++) {
+            for (int j = 0; j < this.getConfig().getProcessorConfig().getNumThreadsPerCore(); j++) {
+                totalInstsPerThread.add("c" + i + "t" + j + ": " + this.getProcessor().getCores().get(i).getThreads().get(j).getTotalInsts());
+                llcReadMissesPerThread.add("c" + i + "t" + j + ": " + this.getProcessor().getCores().get(i).getThreads().get(j).getLlcReadMisses());
+                llcWriteMissesPerThread.add("c" + i + "t" + j + ": " + this.getProcessor().getCores().get(i).getThreads().get(j).getLlcWriteMisses());
+            }
+        }
+
+        this.logger.infof(Logger.SIMULATION, "\ttotalInsts: %s", MessageFormat.format("{0}", this.getTotalInsts()) + " (" + StringHelper.join(totalInstsPerThread, ", ") + ")");
+        this.logger.infof(Logger.SIMULATION, "\tllcReadMisses: %s", MessageFormat.format("{0}", this.getLlcReadMisses()) + " (" + StringHelper.join(llcReadMissesPerThread, ", ") + ")");
+        this.logger.infof(Logger.SIMULATION, "\tllcWriteMisses: %s", MessageFormat.format("{0}", this.getLlcWriteMisses()) + " (" + StringHelper.join(llcWriteMissesPerThread, ", ") + ")");
+
+        this.logger.infof(Logger.SIMULATION, "\tinstsPerCycle: %s", MessageFormat.format("{0}", this.getInstsPerCycle()));
+        this.logger.infof(Logger.SIMULATION, "\tcyclesPerSecond: %s", MessageFormat.format("{0}", this.getCyclesPerSecond()));
+        this.logger.infof(Logger.SIMULATION, "\tinstsPerSecond: %s\n", MessageFormat.format("{0}", this.getInstsPerSecond()));
+
+        Map<String, Object> polledStats = new LinkedHashMap<String, Object>();
+
+        this.getBlockingEventDispatcher().dispatch(new PollStatsEvent(polledStats));
+
+        for (Map.Entry<String, Object> entry : polledStats.entrySet()) {
+            this.logger.infof(Logger.SIMULATION, "\t%s: %s", entry.getKey(), entry.getValue());
+        }
+
+        this.logger.infof(Logger.SIMULATION, "\tmax memory: %s", MessageFormat.format("{0}", Runtime.getRuntime().maxMemory()));
+        this.logger.infof(Logger.SIMULATION, "\ttotal memory: %s", MessageFormat.format("{0}", Runtime.getRuntime().totalMemory()));
+        this.logger.infof(Logger.SIMULATION, "\tused memory: %s\n", MessageFormat.format("{0}", Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()));
+
+        this.getProcessor().getCacheHierarchy().dumpState();
+
+        this.logger.info(Logger.SIMULATION, "------ END DUMP STATE ------\n");
     }
 
     private void dumpStat(Map<String, Object> stats) {

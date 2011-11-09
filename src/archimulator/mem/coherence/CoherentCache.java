@@ -33,6 +33,7 @@ import archimulator.mem.coherence.event.CoherentCacheNonblockingRequestHitToTran
 import archimulator.mem.coherence.event.CoherentCacheServiceNonblockingRequestEvent;
 import archimulator.mem.coherence.exception.CacheLineLockFailedException;
 import archimulator.mem.coherence.exception.CoherentCacheException;
+import archimulator.sim.Logger;
 import archimulator.sim.event.DumpStatEvent;
 import archimulator.sim.event.ResetStatEvent;
 import archimulator.util.action.Action;
@@ -148,9 +149,9 @@ public abstract class CoherentCache<StateT extends Serializable> extends MemoryD
 
     public void dumpState() {
         if (!this.pendingProcesses.isEmpty()) {
-            System.out.println(this.getName() + ":");
+            this.getLogger().infof(Logger.COHRENCE, this.getName() + ":");
             for (PendingActionOwner pendingProcess : this.pendingProcesses) {
-                System.out.printf("\t%s%n", pendingProcess);
+                this.getLogger().infof(Logger.COHRENCE, "\t%s\n", pendingProcess);
             }
         }
     }
