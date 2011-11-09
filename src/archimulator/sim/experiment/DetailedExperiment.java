@@ -18,12 +18,14 @@
  ******************************************************************************/
 package archimulator.sim.experiment;
 
-import archimulator.sim.SimulatedProgram;
+import archimulator.sim.ContextConfig;
 import archimulator.sim.strategy.RunToEndDetailedSimulationStrategy;
 
+import java.util.List;
+
 public class DetailedExperiment extends Experiment {
-    public DetailedExperiment(String title, int numCores, int numThreadsPerCore, SimulatedProgram... simulatedPrograms) {
-        super(title, numCores, numThreadsPerCore, simulatedPrograms);
+    public DetailedExperiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs) {
+        super(title, numCores, numThreadsPerCore, contextConfigs);
     }
 
     @Override

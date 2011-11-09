@@ -27,13 +27,29 @@ import archimulator.sim.experiment.DetailedExperiment;
 import archimulator.sim.experiment.Experiment;
 import archimulator.sim.experiment.FunctionalExperiment;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Startup {
     public static void main(String[] args) {
 //        simulate("mst_baseline_LRU", SIMULATED_PROGRAM_MST_BASELINE, LeastRecentlyUsedEvictionPolicy.FACTORY);
 //        simulate("mst_base-ht_LRU", LeastRecentlyUsedEvictionPolicy.FACTORY, SIMULATED_PROGRAM_MST_BASELINE, SIMULATED_PROGRAM_EM3D_BASELINE, SIMULATED_PROGRAM_MST_BASELINE, SIMULATED_PROGRAM_EM3D_BASELINE);
 //        simulate("mst_base-ht_LRU", LeastRecentlyUsedEvictionPolicy.FACTORY, SIMULATED_PROGRAM_MST_BASELINE, SIMULATED_PROGRAM_EM3D_BASELINE, SIMULATED_PROGRAM_MST_BASELINE);
 //        simulate("mst_base-ht_LRU", LeastRecentlyUsedEvictionPolicy.FACTORY, SIMULATED_PROGRAM_MST_BASELINE, SIMULATED_PROGRAM_MST_BASELINE);
-        simulate("mst_base-ht_LRU", LeastRecentlyUsedEvictionPolicy.FACTORY, SIMULATED_PROGRAM_MST_BASELINE, SIMULATED_PROGRAM_EM3D_BASELINE);
+
+//        List<ContextConfig> contextConfigs = new ArrayList<ContextConfig>();
+//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_MST_BASELINE, 0));
+//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_EM3D_BASELINE, 1));
+//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_MST_BASELINE, 2));
+//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_EM3D_BASELINE, 3));
+
+        List<ContextConfig> contextConfigs = new ArrayList<ContextConfig>();
+        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_MST_BASELINE, 0));
+        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_EM3D_BASELINE, 1));
+        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_EM3D_BASELINE, 2));
+        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_MST_BASELINE, 3));
+
+        simulate("test1", LeastRecentlyUsedEvictionPolicy.FACTORY, 2, 2, contextConfigs);
 //        simulate("mst_ht_LRU", LeastRecentlyUsedEvictionPolicy.FACTORY, SIMULATED_PROGRAM_MST_HT);
 
 //        simulate("em3d_baseline_LRU", SIMULATED_PROGRAM_EM3D_BASELINE, LeastRecentlyUsedEvictionPolicy.FACTORY);
@@ -47,25 +63,26 @@ public class Startup {
 //        simulate("mst_ht_ENHANCED_LRU", SIMULATED_PROGRAM_MST_HT, ThrashingSensitiveHTEnhancedLeastRecentlyUsedEvictionPolicy.FACTORY);
     }
 
-    public static void simulate(String title, EvictionPolicyFactory l2EvictionPolicyFactory, SimulatedProgram... simulatedPrograms) {
-//        Experiment experiment = createFunctionalExperiment(title, simulatedPrograms);
-        Experiment experiment = createDetailedExperiment(title, l2EvictionPolicyFactory, simulatedPrograms);
-//        Experiment experiment = createCheckpointedExperiment(title, l2EvictionPolicyFactory, simulatedPrograms);
+
+    public static void simulate(String title, EvictionPolicyFactory l2EvictionPolicyFactory, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs) {
+//        Experiment experiment = createFunctionalExperiment(title, contextConfigs);
+        Experiment experiment = createDetailedExperiment(title, l2EvictionPolicyFactory, numCores, numThreadsPerCore, contextConfigs);
+//        Experiment experiment = createCheckpointedExperiment(title, l2EvictionPolicyFactory, contextConfigs);
 
         experiment.start();
         experiment.join();
     }
 
-    public static Experiment createFunctionalExperiment(String title, SimulatedProgram... simulatedPrograms) {
-        return new FunctionalExperiment(title, 2, 2, simulatedPrograms)
+    public static Experiment createFunctionalExperiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs) {
+        return new FunctionalExperiment(title, numCores, numThreadsPerCore, contextConfigs)
                 //                .addSimulationCapabilityFactory(LastLevelCacheMissProfilingCapability.class, LastLevelCacheMissProfilingCapability.FACTORY)
                 //                .addProcessorCapabilityFactory(HtRequestL2VictimTrackingCapability.class, HtRequestL2VictimTrackingCapability.FACTORY)
                 .addKernelCapabilityFactory(NativeMipsIsaEmulatorCapability.class, NativeMipsIsaEmulatorCapability.FACTORY);
 //                .addKernelCapabilityFactory(FunctionalExecutionProfilingCapability.class, FunctionalExecutionProfilingCapability.FACTORY);
     }
 
-    public static Experiment createDetailedExperiment(String title, EvictionPolicyFactory l2EvictionPolicyFactory, SimulatedProgram... simulatedPrograms) {
-        return new DetailedExperiment(title, 2, 2, simulatedPrograms)
+    public static Experiment createDetailedExperiment(String title, EvictionPolicyFactory l2EvictionPolicyFactory, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs) {
+        return new DetailedExperiment(title, numCores, numThreadsPerCore, contextConfigs)
                 //                .addSimulationCapabilityFactory(LastLevelCacheMissProfilingCapability.class, LastLevelCacheMissProfilingCapability.FACTORY)
                 //                .addProcessorCapabilityFactory(HtRequestL2VictimTrackingCapability.class, HtRequestL2VictimTrackingCapability.FACTORY)
                 .addProcessorCapabilityFactory(HtRequestL2VictimTrackingCapability2.class, HtRequestL2VictimTrackingCapability2.FACTORY)
@@ -73,8 +90,8 @@ public class Startup {
                 .setL2EvictionPolicyFactory(l2EvictionPolicyFactory);
     }
 
-    public static Experiment createCheckpointedExperiment(String title, EvictionPolicyFactory l2EvictionPolicyFactory, SimulatedProgram... simulatedPrograms) {
-        return new CheckpointedExperiment(title, 2, 2, 2000000000, simulatedPrograms)
+    public static Experiment createCheckpointedExperiment(String title, EvictionPolicyFactory l2EvictionPolicyFactory, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs) {
+        return new CheckpointedExperiment(title, numCores, numThreadsPerCore, contextConfigs, 2000000000)
                 //                .addSimulationCapabilityFactory(LastLevelCacheMissProfilingCapability.class, LastLevelCacheMissProfilingCapability.FACTORY)
                 //                .addProcessorCapabilityFactory(HtRequestL2VictimTrackingCapability.class, HtRequestL2VictimTrackingCapability.FACTORY)
                 .addProcessorCapabilityFactory(HtRequestL2VictimTrackingCapability2.class, HtRequestL2VictimTrackingCapability2.FACTORY)

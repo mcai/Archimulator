@@ -40,14 +40,14 @@ public abstract class Memory extends BasicSimulationObject {
 
     private Map<Integer, Map<Integer, Page>> pages;
 
-    private int currentMemoryPageId = 0;
-
     private Kernel kernel;
     private String simulationDirectory;
     private int processId;
 
     private transient boolean speculative;
     private transient Map<Integer, List<SpeculativeMemoryBlock>> specBlks;
+    
+    private int numPages;
 
     public Memory(Kernel kernel, String simulationDirectory, boolean littleEndian, int processId) {
         super(kernel);
@@ -77,7 +77,7 @@ public abstract class Memory extends BasicSimulationObject {
 
         this.kernel.getBlockingEventDispatcher().addListener(PollStatsEvent.class, new Action1<PollStatsEvent>() {
             public void apply(PollStatsEvent event) {
-                event.getStats().put("mem-" + id + ".currentMemoryPageId", Memory.this.currentMemoryPageId);
+                event.getStats().put("mem-" + id + ".numPages", numPages);
             }
         });
     }
@@ -328,7 +328,8 @@ public abstract class Memory extends BasicSimulationObject {
             this.pages.put(index, new TreeMap<Integer, Page>());
         }
 
-        Page page = new Page(this.currentMemoryPageId++);
+        this.numPages++;
+        Page page = new Page(currentMemoryPageId++);
 
         this.pages.get(index).put(tag, page);
 
@@ -451,4 +452,6 @@ public abstract class Memory extends BasicSimulationObject {
     public static int getPageSize() {
         return geometry.getLineSize();
     }
+
+    private static int currentMemoryPageId = 0; //TODO: support serialization!!!
 }

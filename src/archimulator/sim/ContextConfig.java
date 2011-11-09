@@ -29,6 +29,10 @@ public class ContextConfig {
 
     private List<String> cmdArgList;
 
+    public ContextConfig(SimulatedProgram simulatedProgram, int threadId) {
+        this(simulatedProgram, "ctx" + threadId + ".out", threadId);
+    }
+
     public ContextConfig(SimulatedProgram simulatedProgram, String stdout, int threadId) {
         this.simulatedProgram = simulatedProgram;
         this.stdout = stdout;

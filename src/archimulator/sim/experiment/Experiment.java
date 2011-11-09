@@ -26,7 +26,6 @@ import archimulator.mem.cache.eviction.LeastRecentlyUsedEvictionPolicy;
 import archimulator.os.KernelCapability;
 import archimulator.os.KernelCapabilityFactory;
 import archimulator.sim.ContextConfig;
-import archimulator.sim.SimulatedProgram;
 import archimulator.sim.Simulation;
 import archimulator.sim.SimulationConfig;
 import archimulator.sim.capability.ProcessorCapability;
@@ -79,18 +78,13 @@ public abstract class Experiment {
 
     private Simulation simulation;
 
-    public Experiment(String title, int numCores, int numThreadsPerCore, SimulatedProgram... simulatedPrograms) {
+    public Experiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs) {
         this.id = currentId++;
 
         this.title = title;
         this.numCores = numCores;
         this.numThreadsPerCore = numThreadsPerCore;
-
-        this.contextConfigs = new ArrayList<ContextConfig>();
-        
-        for(int i = 0; i < simulatedPrograms.length; i++) {
-            this.contextConfigs.add(new ContextConfig(simulatedPrograms[i], "ctx" + i + ".out", i));
-        }
+        this.contextConfigs = contextConfigs;
 
         this.l2EvictionPolicyFactory = LeastRecentlyUsedEvictionPolicy.FACTORY;
 

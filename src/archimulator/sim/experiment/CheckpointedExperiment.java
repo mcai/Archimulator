@@ -18,16 +18,18 @@
  ******************************************************************************/
 package archimulator.sim.experiment;
 
-import archimulator.sim.SimulatedProgram;
+import archimulator.sim.ContextConfig;
 import archimulator.sim.SimulationStartingImage;
 import archimulator.sim.strategy.checkpoint.CheckpointToInstructionCountBasedDetailedSimulationStrategy;
 import archimulator.sim.strategy.checkpoint.RoiBasedRunToCheckpointFunctionalSimulationStrategy;
 
+import java.util.List;
+
 public class CheckpointedExperiment extends Experiment {
     private int maxInsts;
 
-    public CheckpointedExperiment(String title, int numCores, int numThreadsPerCore, int maxInsts, SimulatedProgram... simulatedPrograms) {
-        super(title, numCores, numThreadsPerCore, simulatedPrograms);
+    public CheckpointedExperiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs, int maxInsts) {
+        super(title, numCores, numThreadsPerCore, contextConfigs);
         this.maxInsts = maxInsts;
     }
 
