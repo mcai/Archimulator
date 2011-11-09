@@ -26,8 +26,8 @@ import archimulator.sim.strategy.checkpoint.RoiBasedRunToCheckpointFunctionalSim
 public class CheckpointedExperiment extends Experiment {
     private int maxInsts;
 
-    public CheckpointedExperiment(String title, int numCores, int numThreadsPerCore, SimulatedProgram simulatedProgram, int maxInsts) {
-        super(title, numCores, numThreadsPerCore, simulatedProgram);
+    public CheckpointedExperiment(String title, int numCores, int numThreadsPerCore, int maxInsts, SimulatedProgram... simulatedPrograms) {
+        super(title, numCores, numThreadsPerCore, simulatedPrograms);
         this.maxInsts = maxInsts;
     }
 

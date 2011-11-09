@@ -54,17 +54,15 @@ public abstract class SimpleCache<KeyT, ValueT, AccessTypeT extends SimpleCacheA
         return (KeyT[]) keys.toArray();
     }
 
-    protected abstract void doWriteToNextLevel(KeyT key, ValueT value, AccessTypeT accessType);
+    protected abstract void doWriteToNextLevel(KeyT key, ValueT value, boolean writeback);
 
-    public void writeToNextLevel(CacheLine line) {
-        this.doWriteToNextLevel(line.key, line.value, line.accessType);
+    public void writeToNextLevel(CacheLine line, boolean writeback) {
+        this.doWriteToNextLevel(line.key, line.value, writeback);
         line.key = null;
         line.value = null;
     }
 
-    protected abstract Pair<ValueT, AccessTypeT> doReadFromNextLevel(KeyT key);
-
-    protected abstract boolean existsOnNextLevel(KeyT key);
+    protected abstract Pair<ValueT, AccessTypeT> doReadFromNextLevel(KeyT key, ValueT oldValue);
 
     public ValueT get(KeyT key, AccessTypeT type) {
         Reference<ValueT> valueRef = new Reference<ValueT>();
@@ -94,14 +92,12 @@ public abstract class SimpleCache<KeyT, ValueT, AccessTypeT extends SimpleCacheA
         }
         else {
             if(cacheAccess.isEviction()) {
-                writeToNextLevel(cacheAccess.line);
+                writeToNextLevel(cacheAccess.line, cacheAccess.isWriteback());
             }
 
-            if(existsOnNextLevel(key)) {
-                Pair<ValueT, AccessTypeT> pair = doReadFromNextLevel(key);
-                cacheAccess.line.value = pair.getFirst();
-                cacheAccess.line.accessType = pair.getSecond();
-            }
+            Pair<ValueT, AccessTypeT> pair = doReadFromNextLevel(key, cacheAccess.line.value);
+            cacheAccess.line.value = pair.getFirst();
+            cacheAccess.line.accessType = pair.getSecond();
 
             cacheAccess.commit();
         }
@@ -194,7 +190,7 @@ public abstract class SimpleCache<KeyT, ValueT, AccessTypeT extends SimpleCacheA
                     this.line.accessType = this.reference.type;
                 }
 
-                cacheEventDispatcher.dispatch(new SetValueEvent<KeyT, ValueT, AccessTypeT>(this.reference.key, oldValue, this.line.value, oldAccessType, this.reference.type, isHitInCache(), isEviction()));
+                cacheEventDispatcher.dispatch(new SetValueEvent<KeyT, ValueT, AccessTypeT>(this.reference.key, oldValue, this.line.value, oldAccessType, this.reference.type, isHitInCache(), isEviction(), isWriteback()));
             }
             else {
                 AccessTypeT oldAccessType = this.line.accessType;
@@ -205,7 +201,7 @@ public abstract class SimpleCache<KeyT, ValueT, AccessTypeT extends SimpleCacheA
                     this.line.accessType = this.reference.type;
                 }
 
-                cacheEventDispatcher.dispatch(new GetValueEvent<KeyT, ValueT, AccessTypeT>(this.reference.key, this.reference.value.get(), oldAccessType, this.reference.type, isHitInCache(), isEviction()));
+                cacheEventDispatcher.dispatch(new GetValueEvent<KeyT, ValueT, AccessTypeT>(this.reference.key, this.reference.value.get(), oldAccessType, this.reference.type, isHitInCache(), isEviction(), isWriteback()));
             }
             return this;
         }
@@ -213,6 +209,8 @@ public abstract class SimpleCache<KeyT, ValueT, AccessTypeT extends SimpleCacheA
         public abstract boolean isHitInCache();
 
         public abstract boolean isEviction();
+        
+        public abstract boolean isWriteback();
     }
 
     public class CacheHit extends CacheAccess {
@@ -231,6 +229,11 @@ public abstract class SimpleCache<KeyT, ValueT, AccessTypeT extends SimpleCacheA
         }
 
         @Override
+        public boolean isWriteback() {
+            return false;
+        }
+
+        @Override
         public CacheAccess commit() {
             evictionPolicy.handlePromotionOnHit(this);
             return super.commit();
@@ -239,11 +242,13 @@ public abstract class SimpleCache<KeyT, ValueT, AccessTypeT extends SimpleCacheA
 
     public class CacheMiss extends CacheAccess {
         private boolean eviction;
+        private boolean writeback;
 
         public CacheMiss(CacheReference reference, CacheLine line) {
             super(reference, line);
 
-            this.eviction = (line.key != null && line.accessType.isDirty());
+            this.eviction = (line.key != null);
+            this.writeback = (line.key != null && line.accessType.isDirty());
         }
 
         @Override
@@ -254,6 +259,11 @@ public abstract class SimpleCache<KeyT, ValueT, AccessTypeT extends SimpleCacheA
         @Override
         public boolean isEviction() {
             return eviction;
+        }
+
+        @Override
+        public boolean isWriteback() {
+            return writeback;
         }
 
         @Override

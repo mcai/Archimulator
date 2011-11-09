@@ -18,9 +18,8 @@
  ******************************************************************************/
 package archimulator.isa.memory;
 
-import archimulator.isa.memory.datastore.BigMemoryDataStore;
 import archimulator.isa.memory.datastore.MemoryDataStore;
-import archimulator.isa.memory.datastore.NewBigMemoryDataStore;
+import archimulator.isa.memory.datastore.SimpleCacheBasedNewBigMemoryDataStore;
 import archimulator.os.Kernel;
 
 public class BigMemory extends AbstractMemory {
@@ -28,8 +27,8 @@ public class BigMemory extends AbstractMemory {
 
     public BigMemory(Kernel kernel, String simulationDirectory, boolean littleEndian, int processId) {
         super(kernel, simulationDirectory, littleEndian, processId);
-//        this.dataStore = new BigMemoryDataStore(this);
-        this.dataStore = new NewBigMemoryDataStore(this);
+//        this.dataStore = new CacheBasedBigMemoryDataStore(this);
+        this.dataStore = new SimpleCacheBasedNewBigMemoryDataStore(this);
     }
 
     @Override

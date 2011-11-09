@@ -25,14 +25,16 @@ public class GetValueEvent<KeyT, ValueT, AccessTypeT extends SimpleCacheAccessTy
     private AccessTypeT newAccessType;
     private boolean hitInCache;
     private boolean eviction;
+    private boolean writeback;
 
-    public GetValueEvent(KeyT key, ValueT value, AccessTypeT oldAccessType, AccessTypeT newAccessType, boolean hitInCache, boolean eviction) {
+    public GetValueEvent(KeyT key, ValueT value, AccessTypeT oldAccessType, AccessTypeT newAccessType, boolean hitInCache, boolean eviction, boolean writeback) {
         this.key = key;
         this.value = value;
         this.oldAccessType = oldAccessType;
         this.newAccessType = newAccessType;
         this.hitInCache = hitInCache;
         this.eviction = eviction;
+        this.writeback = writeback;
     }
 
     public KeyT getKey() {
@@ -59,8 +61,12 @@ public class GetValueEvent<KeyT, ValueT, AccessTypeT extends SimpleCacheAccessTy
         return eviction;
     }
 
+    public boolean isWriteback() {
+        return writeback;
+    }
+
     @Override
     public String toString() {
-        return String.format("GetValueEvent{key=%s, value=%s, oldAccessType=%s, newAccessType=%s, hitInCache=%s, eviction=%s}", key, value, oldAccessType, newAccessType, hitInCache, eviction);
+        return String.format("GetValueEvent{key=%s, value=%s, oldAccessType=%s, newAccessType=%s, hitInCache=%s, eviction=%s, writeback=%s}", key, value, oldAccessType, newAccessType, hitInCache, eviction, writeback);
     }
 }

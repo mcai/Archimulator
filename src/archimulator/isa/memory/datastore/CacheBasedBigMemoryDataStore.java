@@ -42,7 +42,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class BigMemoryDataStore extends BasicSimulationObject implements MemoryDataStore {
+public class CacheBasedBigMemoryDataStore extends BasicSimulationObject implements MemoryDataStore {
     private Memory memory;
     private MemoryPageCache cache;
 
@@ -50,14 +50,18 @@ public class BigMemoryDataStore extends BasicSimulationObject implements MemoryD
     private long hits;
     private long evictions;
 
-    public BigMemoryDataStore(final Memory memory) {
+    private Set<Integer> bufferIdsExistsOnDisk = new HashSet<Integer>();
+
+    private Map<String, ByteBuffer> diskBbs = new HashMap<String, ByteBuffer>();
+
+    public CacheBasedBigMemoryDataStore(final Memory memory) {
         super(memory);
         this.memory = memory;
 
         this.cache = new MemoryPageCache(this, "bigMemory.MemoryPageCache", new CacheGeometry(
-                MEMORY_PAGE_CACHE_CAPACITY,
-                MEMORY_PAGE_CACHE_CAPACITY / MEMORY_PAGE_CACHE_LINE_SIZE,
-                MEMORY_PAGE_CACHE_LINE_SIZE),
+                NUM_BUFFERS,
+                NUM_BUFFERS,
+                1),
                 LeastRecentlyUsedEvictionPolicy.FACTORY,
                 new Function2<Integer, Integer, MemoryPageCacheLine>() {
                     public MemoryPageCacheLine apply(Integer set, Integer way) {
@@ -76,13 +80,13 @@ public class BigMemoryDataStore extends BasicSimulationObject implements MemoryD
     }
 
     public void access(int pageId, int displacement, byte[] buf, int offset, int size, boolean write) {
-        CacheAccess<Boolean, MemoryPageCacheLine> cacheAccess = this.prepare(pageId);
+        int byteBufferIndex = getByteBufferIndex(pageId);
 
-        int directByteBufferDisplacement = getDirectByteBufferDisplacement(pageId);
+        CacheAccess<Boolean, MemoryPageCacheLine> cacheAccess = this.prepare(byteBufferIndex);
 
         ByteBuffer bb = cacheAccess.getLine().bb;
 
-        bb.position(directByteBufferDisplacement + displacement);
+        bb.position(getDirectByteBufferDisplacement(pageId) + displacement);
 
         if (write) {
             bb.put(buf, offset, size);
@@ -93,8 +97,8 @@ public class BigMemoryDataStore extends BasicSimulationObject implements MemoryD
         }
     }
 
-    private CacheAccess<Boolean, MemoryPageCacheLine> prepare(int pageId) {
-        CacheAccess<Boolean, MemoryPageCacheLine> cacheAccess = this.cache.newAccess(pageId, CacheAccessType.UNKNOWN);
+    private CacheAccess<Boolean, MemoryPageCacheLine> prepare(int byteBufferIndex) {
+        CacheAccess<Boolean, MemoryPageCacheLine> cacheAccess = this.cache.newAccess(byteBufferIndex, CacheAccessType.UNKNOWN);
 
         this.accesses++;
 
@@ -108,26 +112,26 @@ public class BigMemoryDataStore extends BasicSimulationObject implements MemoryD
                 cacheAccess.getLine().writeback();
             }
 
-            cacheAccess.getLine().initOrLoadFromDisk(this.cache.getTag(pageId));
+            cacheAccess.getLine().initOrLoadFromDisk(this.cache.getTag(byteBufferIndex));
             cacheAccess.commit().getLine().setNonInitialState(true);
         }
         return cacheAccess;
     }
 
-    private static int getByteBufferSize() {
-        return Memory.getPageSize() * MEMORY_PAGE_CACHE_LINE_SIZE;
+    private static int getByteBufferIndex(int pageId) {
+        return pageId / NUM_PAGES_PER_BUFFER;
     }
 
-    private static int getDiskCacheFileIndex(int pageIndex) {
-        return pageIndex / NUM_PAGES_PER_DISK_CACHE_FILE;
+    private static int getDiskCacheFileIndex(int byteBufferIndex) {
+        return byteBufferIndex / NUM_BUFFERS_PER_DISK_CACHE_FILE;
     }
 
-    private static int getDiskCacheFileDisplacement(int pageId) {
-        return (pageId % NUM_PAGES_PER_DISK_CACHE_FILE) * Memory.getPageSize();
+    private static int getDiskCacheFileDisplacement(int byteBufferIndex) {
+        return (byteBufferIndex % NUM_BUFFERS_PER_DISK_CACHE_FILE) * BUFFER_LENGTH;
     }
 
     private static int getDirectByteBufferDisplacement(int pageId) {
-        return (pageId % MEMORY_PAGE_CACHE_LINE_SIZE) * Memory.getPageSize();
+        return (pageId % NUM_PAGES_PER_BUFFER) * Memory.getPageSize();
     }
 
     public long getAccesses() {
@@ -149,10 +153,6 @@ public class BigMemoryDataStore extends BasicSimulationObject implements MemoryD
     public double getHitRatio() {
         return this.accesses > 0 ? (double) this.hits / this.accesses : 0.0;
     }
-
-    private Set<Integer> evictedPageIds = new HashSet<Integer>();
-
-    private Map<String, ByteBuffer> diskBbs = new HashMap<String, ByteBuffer>();
 
     private class MemoryPageCacheLine extends CacheLine<Boolean> {
         private transient ByteBuffer bb;
@@ -181,50 +181,46 @@ public class BigMemoryDataStore extends BasicSimulationObject implements MemoryD
             if (dirty) {
                 ByteBuffer diskBb = this.getDiskBb();
 
-                diskBb.position(BigMemoryDataStore.getDiskCacheFileDisplacement(this.tag));
+                diskBb.position(CacheBasedBigMemoryDataStore.getDiskCacheFileDisplacement(this.tag));
 
                 this.bb.position(0);
 
-                byte[] data = new byte[getByteBufferSize()];
+                byte[] data = new byte[BUFFER_LENGTH];
                 this.bb.get(data);
 
                 diskBb.put(data);
-
-//                raf.close();
 
                 this.dirty = false;
             }
 
             this.bb.clear();
 
-            evictedPageIds.add(this.tag);
+            bufferIdsExistsOnDisk.add(this.tag);
 
             return this;
         }
 
         private MemoryPageCacheLine initOrLoadFromDisk(int newTag) {
             if (this.bb == null) {
-                this.bb = ByteBuffer.allocateDirect(getByteBufferSize()).order(memory.isLittleEndian() ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
+                this.bb = ByteBuffer.allocateDirect(BUFFER_LENGTH).order(memory.isLittleEndian() ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
             }
 
-            if (evictedPageIds.contains(newTag)) {
+            if (bufferIdsExistsOnDisk.contains(newTag)) {
                 if (!this.isDiskCacheFileExist(newTag)) {
                     throw new RuntimeException();
                 }
 
                 ByteBuffer diskBb = this.getDiskBb();
 
-                diskBb.position(BigMemoryDataStore.getDiskCacheFileDisplacement(newTag));
+                diskBb.position(CacheBasedBigMemoryDataStore.getDiskCacheFileDisplacement(newTag));
 
-                byte[] data = new byte[getByteBufferSize()];
+                byte[] data = new byte[BUFFER_LENGTH];
                 diskBb.get(data);
 
                 this.bb.clear();
                 this.bb.put(data);
 
-                evictedPageIds.remove(newTag);
-
-//                    raf.close();
+                bufferIdsExistsOnDisk.remove(newTag);
             }
 
             return this;
@@ -236,7 +232,6 @@ public class BigMemoryDataStore extends BasicSimulationObject implements MemoryD
 
         private boolean isDiskCacheFileExist(int tag) {
             return diskBbs.containsKey(this.getDiskCacheFileName(tag));
-//            return new File(this.getDiskCacheFileName()).exists();
         }
     }
 
@@ -246,9 +241,10 @@ public class BigMemoryDataStore extends BasicSimulationObject implements MemoryD
         }
     }
 
-    private static final int MEMORY_PAGE_CACHE_CAPACITY = 512; // 8Mb
-    private static final int MEMORY_PAGE_CACHE_LINE_SIZE = 8;
+    private static final int NUM_PAGES_PER_BUFFER = 8;
+    private static final int NUM_BUFFERS = 128;
+    private static final int NUM_BUFFERS_PER_DISK_CACHE_FILE = 4096;
 
-    private static final int NUM_PAGES_PER_DISK_CACHE_FILE = 32 * 1024;
-    private static final int DISK_CACHE_FILE_LENGTH = NUM_PAGES_PER_DISK_CACHE_FILE * Memory.getPageSize(); // 128 Mb
+    private static final int DISK_CACHE_FILE_LENGTH = NUM_BUFFERS_PER_DISK_CACHE_FILE * NUM_PAGES_PER_BUFFER * Memory.getPageSize(); // 128 Mb
+    private static final int BUFFER_LENGTH = NUM_PAGES_PER_BUFFER * Memory.getPageSize();
 }

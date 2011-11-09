@@ -62,7 +62,6 @@ public abstract class Experiment {
     private String title;
     private int numCores;
     private int numThreadsPerCore;
-    private ContextConfig contextConfig;
     private List<ContextConfig> contextConfigs;
     private EvictionPolicyFactory l2EvictionPolicyFactory;
     private ProcessorConfig processorConfig;
@@ -80,17 +79,18 @@ public abstract class Experiment {
 
     private Simulation simulation;
 
-    public Experiment(String title, int numCores, int numThreadsPerCore, SimulatedProgram simulatedProgram) { //TODO: add support for multi simulatedProgram configuration at startup
+    public Experiment(String title, int numCores, int numThreadsPerCore, SimulatedProgram... simulatedPrograms) {
         this.id = currentId++;
 
         this.title = title;
         this.numCores = numCores;
         this.numThreadsPerCore = numThreadsPerCore;
 
-        this.contextConfig = new ContextConfig(simulatedProgram, "ctx0.out", 0);
-
         this.contextConfigs = new ArrayList<ContextConfig>();
-        this.contextConfigs.add(this.contextConfig);
+        
+        for(int i = 0; i < simulatedPrograms.length; i++) {
+            this.contextConfigs.add(new ContextConfig(simulatedPrograms[i], "ctx" + i + ".out", i));
+        }
 
         this.l2EvictionPolicyFactory = LeastRecentlyUsedEvictionPolicy.FACTORY;
 
@@ -178,7 +178,11 @@ public abstract class Experiment {
 
     private void dumpStats(Map<String, Object> stats, boolean detailedSimulation) {
         stats.put("experiment.beginTime", this.beginTime);
-        stats.put("experiment.workload", this.contextConfig.getSimulatedProgram().getSetTitle() + "." + this.contextConfig.getSimulatedProgram().getTitle() + "(" + this.contextConfig.getSimulatedProgram().getArgs() + ")");
+        stats.put("experiment.workloads.size", this.contextConfigs.size());
+        
+        for(ContextConfig contextConfig : this.contextConfigs) {
+            stats.put("experiment.workload." + contextConfig.getThreadId(), contextConfig.getSimulatedProgram().getSetTitle() + "." + contextConfig.getSimulatedProgram().getTitle() + "(" + contextConfig.getSimulatedProgram().getArgs() + ")");
+        }
 
         if (detailedSimulation) {
             stats.put("experiment.numCores", this.numCores);

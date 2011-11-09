@@ -22,8 +22,8 @@ import archimulator.sim.SimulatedProgram;
 import archimulator.sim.strategy.RunToEndDetailedSimulationStrategy;
 
 public class DetailedExperiment extends Experiment {
-    public DetailedExperiment(String title, int numCores, int numThreadsPerCore, SimulatedProgram simulatedProgram) {
-        super(title, numCores, numThreadsPerCore, simulatedProgram);
+    public DetailedExperiment(String title, int numCores, int numThreadsPerCore, SimulatedProgram... simulatedPrograms) {
+        super(title, numCores, numThreadsPerCore, simulatedPrograms);
     }
 
     @Override

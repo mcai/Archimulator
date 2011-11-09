@@ -38,7 +38,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class NewBigMemoryDataStore extends BasicSimulationObject implements MemoryDataStore {
+public class SimpleCacheBasedNewBigMemoryDataStore extends BasicSimulationObject implements MemoryDataStore {
     private Memory memory;
 
     private long accesses;
@@ -47,11 +47,11 @@ public class NewBigMemoryDataStore extends BasicSimulationObject implements Memo
 
     private SimpleCache<Integer, ByteBuffer, DefaultSimpleCacheAccessType> cache;
 
-    private Set<Integer> nextLevel = new HashSet<Integer>();
+    private Set<Integer> bufferIdsExistsOnDisk = new HashSet<Integer>();
 
     private Map<String, ByteBuffer> diskBbs = new HashMap<String, ByteBuffer>();
 
-    public NewBigMemoryDataStore(final Memory memory) {
+    public SimpleCacheBasedNewBigMemoryDataStore(final Memory memory) {
         super(memory);
         this.memory = memory;
 
@@ -61,30 +61,26 @@ public class NewBigMemoryDataStore extends BasicSimulationObject implements Memo
             }
         });
 
-        this.cache = new SimpleCache<Integer, ByteBuffer, DefaultSimpleCacheAccessType>(1024) {
+        this.cache = new SimpleCache<Integer, ByteBuffer, DefaultSimpleCacheAccessType>(NUM_BUFFERS) {
             @Override
-            protected void doWriteToNextLevel(Integer key, ByteBuffer value, DefaultSimpleCacheAccessType accessType) {
-                nextLevel.add(key);
-
-                if (accessType == DefaultSimpleCacheAccessType.WRITE) {
+            protected void doWriteToNextLevel(Integer key, ByteBuffer value, boolean writeback) {
+                if (writeback) {
                     writeToDisk(key, value);
+                    bufferIdsExistsOnDisk.add(key);
                 }
             }
 
             @Override
-            protected Pair<ByteBuffer, DefaultSimpleCacheAccessType> doReadFromNextLevel(Integer key) {
-                ByteBuffer bb = ByteBuffer.allocateDirect(Memory.getPageSize()).order(memory.isLittleEndian() ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
-
-                if (nextLevel.contains(key)) {
-                    readFromDisk(key, bb);
+            protected Pair<ByteBuffer, DefaultSimpleCacheAccessType> doReadFromNextLevel(Integer key, ByteBuffer oldValue) {
+                if(oldValue == null) {
+                    oldValue = ByteBuffer.allocateDirect(BUFFER_LENGTH).order(memory.isLittleEndian() ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
                 }
 
-                return new Pair<ByteBuffer, DefaultSimpleCacheAccessType>(bb, DefaultSimpleCacheAccessType.READ);
-            }
+                if (bufferIdsExistsOnDisk.contains(key)) {
+                    readFromDisk(key, oldValue);
+                }
 
-            @Override
-            protected boolean existsOnNextLevel(Integer key) {
-                return nextLevel.contains(key);
+                return new Pair<ByteBuffer, DefaultSimpleCacheAccessType>(oldValue, DefaultSimpleCacheAccessType.READ);
             }
         };
 
@@ -114,31 +110,27 @@ public class NewBigMemoryDataStore extends BasicSimulationObject implements Memo
     }
 
     public void create(int pageId) {
-        ByteBuffer bb = ByteBuffer.allocateDirect(Memory.getPageSize()).order(memory.isLittleEndian() ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
-        writeToDisk(pageId, bb);
-
-        this.nextLevel.add(pageId);
     }
 
-    public void writeToDisk(int pageId, ByteBuffer bb) {
-        ByteBuffer diskBb = this.getDiskBb(pageId);
+    public void writeToDisk(int byteBufferIndex, ByteBuffer bb) {
+        ByteBuffer diskBb = this.getDiskBb(byteBufferIndex);
 
-        diskBb.position(getDiskCacheFileDisplacement(pageId));
+        diskBb.position(getDiskCacheFileDisplacement(byteBufferIndex));
 
         bb.position(0);
 
-        byte[] data = new byte[Memory.getPageSize()];
+        byte[] data = new byte[BUFFER_LENGTH];
         bb.get(data);
 
         diskBb.put(data);
     }
 
-    public void readFromDisk(int pageId, ByteBuffer bb) {
-        ByteBuffer diskBb = this.getDiskBb(pageId);
+    public void readFromDisk(int byteBufferIndex, ByteBuffer bb) {
+        ByteBuffer diskBb = this.getDiskBb(byteBufferIndex);
 
-        diskBb.position(getDiskCacheFileDisplacement(pageId));
+        diskBb.position(getDiskCacheFileDisplacement(byteBufferIndex));
 
-        byte[] data = new byte[Memory.getPageSize()];
+        byte[] data = new byte[BUFFER_LENGTH];
         diskBb.get(data);
 
         bb.clear();
@@ -146,22 +138,25 @@ public class NewBigMemoryDataStore extends BasicSimulationObject implements Memo
     }
 
     public void access(int pageId, int displacement, byte[] buf, int offset, int size, boolean write) {
-        ByteBuffer bb = this.cache.get(pageId, write ? DefaultSimpleCacheAccessType.WRITE : DefaultSimpleCacheAccessType.READ);
+        int byteBufferIndex = getByteBufferIndex(pageId);
 
-        bb.position(displacement);
+        ByteBuffer bb = this.cache.get(byteBufferIndex, write ? DefaultSimpleCacheAccessType.WRITE : DefaultSimpleCacheAccessType.READ);
+
+        int directByteBufferDisplacement = getDirectByteBufferDisplacement(pageId);
+
+        bb.position(directByteBufferDisplacement + displacement);
 
         if (write) {
             bb.put(buf, offset, size);
-
-            this.cache.put(pageId, bb, DefaultSimpleCacheAccessType.WRITE);
+            this.cache.put(byteBufferIndex, bb, DefaultSimpleCacheAccessType.WRITE);
         } else {
             bb.get(buf, offset, size);
         }
     }
 
-    private ByteBuffer getDiskBb(int pageIndex) {
+    private ByteBuffer getDiskBb(int byteBufferIndex) {
         try {
-            String diskCacheFileName = memory.getSimulationDirectory() + "/mem.process" + memory.getProcessId() + "." + pageIndex / NUM_PAGES_PER_DISK_CACHE_FILE + ".diskCache";
+            String diskCacheFileName = memory.getSimulationDirectory() + "/mem.process" + memory.getProcessId() + "." + byteBufferIndex / NUM_BUFFERS_PER_DISK_CACHE_FILE + ".diskCache";
 
             if (!diskBbs.containsKey(diskCacheFileName)) {
                 RandomAccessFile raf = new RandomAccessFile(diskCacheFileName, "rws");
@@ -174,8 +169,16 @@ public class NewBigMemoryDataStore extends BasicSimulationObject implements Memo
         }
     }
 
-    private static int getDiskCacheFileDisplacement(int pageId) {
-        return (pageId % NUM_PAGES_PER_DISK_CACHE_FILE) * Memory.getPageSize();
+    private static int getByteBufferIndex(int pageId) {
+        return pageId / NUM_PAGES_PER_BUFFER;
+    }
+
+    private static int getDiskCacheFileDisplacement(int byteBufferIndex) {
+        return (byteBufferIndex % NUM_BUFFERS_PER_DISK_CACHE_FILE) * BUFFER_LENGTH;
+    }
+
+    private static int getDirectByteBufferDisplacement(int pageId) {
+        return (pageId % NUM_PAGES_PER_BUFFER) * Memory.getPageSize();
     }
 
     public long getAccesses() {
@@ -198,6 +201,10 @@ public class NewBigMemoryDataStore extends BasicSimulationObject implements Memo
         return this.accesses > 0 ? (double) this.hits / this.accesses : 0.0;
     }
 
-    private static final int NUM_PAGES_PER_DISK_CACHE_FILE = 32 * 1024;
-    private static final int DISK_CACHE_FILE_LENGTH = NUM_PAGES_PER_DISK_CACHE_FILE * Memory.getPageSize(); // 128 Mb
+    private static final int NUM_PAGES_PER_BUFFER = 8;
+    private static final int NUM_BUFFERS = 128;
+    private static final int NUM_BUFFERS_PER_DISK_CACHE_FILE = 4096;
+
+    private static final int DISK_CACHE_FILE_LENGTH = NUM_BUFFERS_PER_DISK_CACHE_FILE * NUM_PAGES_PER_BUFFER * Memory.getPageSize(); // 128 Mb
+    private static final int BUFFER_LENGTH = NUM_PAGES_PER_BUFFER * Memory.getPageSize();
 }

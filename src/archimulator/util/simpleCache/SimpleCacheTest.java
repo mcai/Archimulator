@@ -32,8 +32,8 @@ public class SimpleCacheTest {
             private Map<Integer, Integer> nextLevel = new HashMap<Integer, Integer>();
 
             @Override
-            protected void doWriteToNextLevel(Integer key, Integer value, DefaultSimpleCacheAccessType accessType) {
-                if(accessType == DefaultSimpleCacheAccessType.WRITE) {
+            protected void doWriteToNextLevel(Integer key, Integer value, boolean writeback) {
+                if(writeback) {
                     nextLevel.put(key, value);
                 }
 
@@ -41,7 +41,7 @@ public class SimpleCacheTest {
             }
 
             @Override
-            protected Pair<Integer, DefaultSimpleCacheAccessType> doReadFromNextLevel(Integer key) {
+            protected Pair<Integer, DefaultSimpleCacheAccessType> doReadFromNextLevel(Integer key, Integer oldValue) {
 //                System.out.printf("doReadFromNextLevel(%d)\n\n", key);
 
                 Integer value = nextLevel.get(key);
@@ -49,10 +49,6 @@ public class SimpleCacheTest {
                 return new Pair<Integer, DefaultSimpleCacheAccessType>(value, DefaultSimpleCacheAccessType.READ);
             }
 
-            @Override
-            protected boolean existsOnNextLevel(Integer key) {
-                return nextLevel.containsKey(key);
-            }
         };
 
         cache.getCacheEventDispatcher().addListener(SetValueEvent.class, new Action1<SetValueEvent>() {

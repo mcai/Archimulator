@@ -29,8 +29,12 @@ import archimulator.sim.experiment.FunctionalExperiment;
 
 public class Startup {
     public static void main(String[] args) {
-        simulate("mst_baseline_LRU", SIMULATED_PROGRAM_MST_BASELINE, LeastRecentlyUsedEvictionPolicy.FACTORY);
-        simulate("mst_ht_LRU", SIMULATED_PROGRAM_MST_HT, LeastRecentlyUsedEvictionPolicy.FACTORY);
+//        simulate("mst_baseline_LRU", SIMULATED_PROGRAM_MST_BASELINE, LeastRecentlyUsedEvictionPolicy.FACTORY);
+//        simulate("mst_base-ht_LRU", LeastRecentlyUsedEvictionPolicy.FACTORY, SIMULATED_PROGRAM_MST_BASELINE, SIMULATED_PROGRAM_EM3D_BASELINE, SIMULATED_PROGRAM_MST_BASELINE, SIMULATED_PROGRAM_EM3D_BASELINE);
+//        simulate("mst_base-ht_LRU", LeastRecentlyUsedEvictionPolicy.FACTORY, SIMULATED_PROGRAM_MST_BASELINE, SIMULATED_PROGRAM_EM3D_BASELINE, SIMULATED_PROGRAM_MST_BASELINE);
+//        simulate("mst_base-ht_LRU", LeastRecentlyUsedEvictionPolicy.FACTORY, SIMULATED_PROGRAM_MST_BASELINE, SIMULATED_PROGRAM_MST_BASELINE);
+        simulate("mst_base-ht_LRU", LeastRecentlyUsedEvictionPolicy.FACTORY, SIMULATED_PROGRAM_MST_BASELINE, SIMULATED_PROGRAM_EM3D_BASELINE);
+//        simulate("mst_ht_LRU", LeastRecentlyUsedEvictionPolicy.FACTORY, SIMULATED_PROGRAM_MST_HT);
 
 //        simulate("em3d_baseline_LRU", SIMULATED_PROGRAM_EM3D_BASELINE, LeastRecentlyUsedEvictionPolicy.FACTORY);
 //        simulate("libquantum_baseline_LRU", SIMULATED_PROGRAM_462_LIBQUANTUM_BASELINE, LeastRecentlyUsedEvictionPolicy.FACTORY);
@@ -43,25 +47,25 @@ public class Startup {
 //        simulate("mst_ht_ENHANCED_LRU", SIMULATED_PROGRAM_MST_HT, ThrashingSensitiveHTEnhancedLeastRecentlyUsedEvictionPolicy.FACTORY);
     }
 
-    public static void simulate(String title, SimulatedProgram simulatedProgram, EvictionPolicyFactory l2EvictionPolicyFactory) {
-        Experiment experiment = createFunctionalExperiment(title, simulatedProgram);
-//        Experiment experiment = createDetailedExperiment(title, simulatedProgram, l2EvictionPolicyFactory);
-//        Experiment experiment = createCheckpointedExperiment(title, simulatedProgram, l2EvictionPolicyFactory);
+    public static void simulate(String title, EvictionPolicyFactory l2EvictionPolicyFactory, SimulatedProgram... simulatedPrograms) {
+//        Experiment experiment = createFunctionalExperiment(title, simulatedPrograms);
+        Experiment experiment = createDetailedExperiment(title, l2EvictionPolicyFactory, simulatedPrograms);
+//        Experiment experiment = createCheckpointedExperiment(title, l2EvictionPolicyFactory, simulatedPrograms);
 
         experiment.start();
         experiment.join();
     }
 
-    public static Experiment createFunctionalExperiment(String title, SimulatedProgram simulatedProgram) {
-        return new FunctionalExperiment(title, 2, 2, simulatedProgram)
+    public static Experiment createFunctionalExperiment(String title, SimulatedProgram... simulatedPrograms) {
+        return new FunctionalExperiment(title, 2, 2, simulatedPrograms)
                 //                .addSimulationCapabilityFactory(LastLevelCacheMissProfilingCapability.class, LastLevelCacheMissProfilingCapability.FACTORY)
                 //                .addProcessorCapabilityFactory(HtRequestL2VictimTrackingCapability.class, HtRequestL2VictimTrackingCapability.FACTORY)
                 .addKernelCapabilityFactory(NativeMipsIsaEmulatorCapability.class, NativeMipsIsaEmulatorCapability.FACTORY);
 //                .addKernelCapabilityFactory(FunctionalExecutionProfilingCapability.class, FunctionalExecutionProfilingCapability.FACTORY);
     }
 
-    public static Experiment createDetailedExperiment(String title, SimulatedProgram simulatedProgram, EvictionPolicyFactory l2EvictionPolicyFactory) {
-        return new DetailedExperiment(title, 2, 2, simulatedProgram)
+    public static Experiment createDetailedExperiment(String title, EvictionPolicyFactory l2EvictionPolicyFactory, SimulatedProgram... simulatedPrograms) {
+        return new DetailedExperiment(title, 2, 2, simulatedPrograms)
                 //                .addSimulationCapabilityFactory(LastLevelCacheMissProfilingCapability.class, LastLevelCacheMissProfilingCapability.FACTORY)
                 //                .addProcessorCapabilityFactory(HtRequestL2VictimTrackingCapability.class, HtRequestL2VictimTrackingCapability.FACTORY)
                 .addProcessorCapabilityFactory(HtRequestL2VictimTrackingCapability2.class, HtRequestL2VictimTrackingCapability2.FACTORY)
@@ -69,8 +73,8 @@ public class Startup {
                 .setL2EvictionPolicyFactory(l2EvictionPolicyFactory);
     }
 
-    public static Experiment createCheckpointedExperiment(String title, SimulatedProgram simulatedProgram, EvictionPolicyFactory l2EvictionPolicyFactory) {
-        return new CheckpointedExperiment(title, 2, 2, simulatedProgram, 2000000000)
+    public static Experiment createCheckpointedExperiment(String title, EvictionPolicyFactory l2EvictionPolicyFactory, SimulatedProgram... simulatedPrograms) {
+        return new CheckpointedExperiment(title, 2, 2, 2000000000, simulatedPrograms)
                 //                .addSimulationCapabilityFactory(LastLevelCacheMissProfilingCapability.class, LastLevelCacheMissProfilingCapability.FACTORY)
                 //                .addProcessorCapabilityFactory(HtRequestL2VictimTrackingCapability.class, HtRequestL2VictimTrackingCapability.FACTORY)
                 .addProcessorCapabilityFactory(HtRequestL2VictimTrackingCapability2.class, HtRequestL2VictimTrackingCapability2.FACTORY)
@@ -85,7 +89,7 @@ public class Startup {
             "mst.mips",
 //            "10000");
 //            "1000");
-            "2000");
+            "1000");
 //    "400");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_MST_HT = new SimulatedProgram(
@@ -94,7 +98,7 @@ public class Startup {
             "/home/itecgo/Archimulator/benchmarks/Olden_Custom1/mst/ht",
             "mst.mips",
 //            "10000");
-            "2000");
+            "1000");
 //            "100");
 //            "200");
 //            "400");
