@@ -22,4 +22,6 @@ public interface SimpleCacheAccessType {
     boolean isSetOnGetValue();
 
     boolean isSetOnSetValue();
+
+    boolean isDirty();
 }

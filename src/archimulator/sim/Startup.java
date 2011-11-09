@@ -29,7 +29,7 @@ import archimulator.sim.experiment.FunctionalExperiment;
 
 public class Startup {
     public static void main(String[] args) {
-//        simulate("mst_baseline_LRU", SIMULATED_PROGRAM_MST_BASELINE, LeastRecentlyUsedEvictionPolicy.FACTORY);
+        simulate("mst_baseline_LRU", SIMULATED_PROGRAM_MST_BASELINE, LeastRecentlyUsedEvictionPolicy.FACTORY);
         simulate("mst_ht_LRU", SIMULATED_PROGRAM_MST_HT, LeastRecentlyUsedEvictionPolicy.FACTORY);
 
 //        simulate("em3d_baseline_LRU", SIMULATED_PROGRAM_EM3D_BASELINE, LeastRecentlyUsedEvictionPolicy.FACTORY);
@@ -94,7 +94,7 @@ public class Startup {
             "/home/itecgo/Archimulator/benchmarks/Olden_Custom1/mst/ht",
             "mst.mips",
 //            "10000");
-            "1000");
+            "2000");
 //            "100");
 //            "200");
 //            "400");

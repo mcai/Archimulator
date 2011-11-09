@@ -19,10 +19,12 @@
 package archimulator.util.simpleCache;
 
 public class DefaultSimpleCacheAccessType implements SimpleCacheAccessType {
+    private boolean dirty;
     private String value;
 
-    public DefaultSimpleCacheAccessType(String value) {
+    public DefaultSimpleCacheAccessType(String value, boolean dirty) {
         this.value = value;
+        this.dirty = dirty;
     }
 
     public boolean isSetOnGetValue() {
@@ -37,11 +39,15 @@ public class DefaultSimpleCacheAccessType implements SimpleCacheAccessType {
         return value;
     }
 
+    public boolean isDirty() {
+        return dirty;
+    }
+
     @Override
     public String toString() {
         return this.value;
     }
 
-    public static DefaultSimpleCacheAccessType READ = new DefaultSimpleCacheAccessType("read");
-    public static DefaultSimpleCacheAccessType WRITE = new DefaultSimpleCacheAccessType("write");
+    public static DefaultSimpleCacheAccessType READ = new DefaultSimpleCacheAccessType("read", false);
+    public static DefaultSimpleCacheAccessType WRITE = new DefaultSimpleCacheAccessType("write", true);
 }

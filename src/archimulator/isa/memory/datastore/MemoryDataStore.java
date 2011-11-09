@@ -18,9 +18,7 @@
  ******************************************************************************/
 package archimulator.isa.memory.datastore;
 
-import archimulator.sim.SimulationObject;
-
-public interface MemoryDataStore extends SimulationObject {
+public interface MemoryDataStore {
     void create(int pageId);
 
     void access(int pageId, int displacement, byte[] buf, int offset, int size, boolean write);

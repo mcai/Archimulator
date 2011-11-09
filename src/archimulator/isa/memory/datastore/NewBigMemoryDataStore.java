@@ -28,10 +28,15 @@ import archimulator.util.simpleCache.GetValueEvent;
 import archimulator.util.simpleCache.SetValueEvent;
 import archimulator.util.simpleCache.SimpleCache;
 
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.channels.FileChannel;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class NewBigMemoryDataStore extends BasicSimulationObject implements MemoryDataStore {
     private Memory memory;
@@ -42,7 +47,9 @@ public class NewBigMemoryDataStore extends BasicSimulationObject implements Memo
 
     private SimpleCache<Integer, ByteBuffer, DefaultSimpleCacheAccessType> cache;
 
-    private Map<Integer, ByteBuffer> nextLevel = new HashMap<Integer, ByteBuffer>();
+    private Set<Integer> nextLevel = new HashSet<Integer>();
+
+    private Map<String, ByteBuffer> diskBbs = new HashMap<String, ByteBuffer>();
 
     public NewBigMemoryDataStore(final Memory memory) {
         super(memory);
@@ -57,20 +64,27 @@ public class NewBigMemoryDataStore extends BasicSimulationObject implements Memo
         this.cache = new SimpleCache<Integer, ByteBuffer, DefaultSimpleCacheAccessType>(1024) {
             @Override
             protected void doWriteToNextLevel(Integer key, ByteBuffer value, DefaultSimpleCacheAccessType accessType) {
+                nextLevel.add(key);
+
                 if (accessType == DefaultSimpleCacheAccessType.WRITE) {
-                    nextLevel.put(key, value);
+                    writeToDisk(key, value);
                 }
             }
 
             @Override
             protected Pair<ByteBuffer, DefaultSimpleCacheAccessType> doReadFromNextLevel(Integer key) {
-                ByteBuffer value = nextLevel.get(key);
-                return new Pair<ByteBuffer, DefaultSimpleCacheAccessType>(value, DefaultSimpleCacheAccessType.READ);
+                ByteBuffer bb = ByteBuffer.allocateDirect(Memory.getPageSize()).order(memory.isLittleEndian() ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
+
+                if (nextLevel.contains(key)) {
+                    readFromDisk(key, bb);
+                }
+
+                return new Pair<ByteBuffer, DefaultSimpleCacheAccessType>(bb, DefaultSimpleCacheAccessType.READ);
             }
 
             @Override
             protected boolean existsOnNextLevel(Integer key) {
-                return nextLevel.containsKey(key);
+                return nextLevel.contains(key);
             }
         };
 
@@ -101,7 +115,34 @@ public class NewBigMemoryDataStore extends BasicSimulationObject implements Memo
 
     public void create(int pageId) {
         ByteBuffer bb = ByteBuffer.allocateDirect(Memory.getPageSize()).order(memory.isLittleEndian() ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
-        this.nextLevel.put(pageId, bb);
+        writeToDisk(pageId, bb);
+
+        this.nextLevel.add(pageId);
+    }
+
+    public void writeToDisk(int pageId, ByteBuffer bb) {
+        ByteBuffer diskBb = this.getDiskBb(pageId);
+
+        diskBb.position(getDiskCacheFileDisplacement(pageId));
+
+        bb.position(0);
+
+        byte[] data = new byte[Memory.getPageSize()];
+        bb.get(data);
+
+        diskBb.put(data);
+    }
+
+    public void readFromDisk(int pageId, ByteBuffer bb) {
+        ByteBuffer diskBb = this.getDiskBb(pageId);
+
+        diskBb.position(getDiskCacheFileDisplacement(pageId));
+
+        byte[] data = new byte[Memory.getPageSize()];
+        diskBb.get(data);
+
+        bb.clear();
+        bb.put(data);
     }
 
     public void access(int pageId, int displacement, byte[] buf, int offset, int size, boolean write) {
@@ -111,9 +152,30 @@ public class NewBigMemoryDataStore extends BasicSimulationObject implements Memo
 
         if (write) {
             bb.put(buf, offset, size);
+
+            this.cache.put(pageId, bb, DefaultSimpleCacheAccessType.WRITE);
         } else {
             bb.get(buf, offset, size);
         }
+    }
+
+    private ByteBuffer getDiskBb(int pageIndex) {
+        try {
+            String diskCacheFileName = memory.getSimulationDirectory() + "/mem.process" + memory.getProcessId() + "." + pageIndex / NUM_PAGES_PER_DISK_CACHE_FILE + ".diskCache";
+
+            if (!diskBbs.containsKey(diskCacheFileName)) {
+                RandomAccessFile raf = new RandomAccessFile(diskCacheFileName, "rws");
+                diskBbs.put(diskCacheFileName, raf.getChannel().map(FileChannel.MapMode.PRIVATE, 0, DISK_CACHE_FILE_LENGTH).order(memory.isLittleEndian() ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN));
+            }
+
+            return diskBbs.get(diskCacheFileName);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static int getDiskCacheFileDisplacement(int pageId) {
+        return (pageId % NUM_PAGES_PER_DISK_CACHE_FILE) * Memory.getPageSize();
     }
 
     public long getAccesses() {
@@ -135,4 +197,7 @@ public class NewBigMemoryDataStore extends BasicSimulationObject implements Memo
     public double getHitRatio() {
         return this.accesses > 0 ? (double) this.hits / this.accesses : 0.0;
     }
+
+    private static final int NUM_PAGES_PER_DISK_CACHE_FILE = 32 * 1024;
+    private static final int DISK_CACHE_FILE_LENGTH = NUM_PAGES_PER_DISK_CACHE_FILE * Memory.getPageSize(); // 128 Mb
 }

@@ -243,7 +243,7 @@ public abstract class SimpleCache<KeyT, ValueT, AccessTypeT extends SimpleCacheA
         public CacheMiss(CacheReference reference, CacheLine line) {
             super(reference, line);
 
-            this.eviction = line.key != null;
+            this.eviction = (line.key != null && line.accessType.isDirty());
         }
 
         @Override
