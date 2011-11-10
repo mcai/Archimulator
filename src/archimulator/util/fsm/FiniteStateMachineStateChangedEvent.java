@@ -19,17 +19,17 @@
 package archimulator.util.fsm;
 
 public class FiniteStateMachineStateChangedEvent extends FiniteStateMachineEvent {
-    private FiniteStateMachine<?> from;
+    private FiniteStateMachine<?, ?> from;
     private Object condition;
     private Object[] params;
 
-    public FiniteStateMachineStateChangedEvent(FiniteStateMachine<?> from, Object condition, Object... params) {
+    public FiniteStateMachineStateChangedEvent(FiniteStateMachine<?, ?> from, Object condition, Object... params) {
         this.from = from;
         this.condition = condition;
         this.params = params;
     }
 
-    public FiniteStateMachine<?> getFrom() {
+    public FiniteStateMachine<?, ?> getFrom() {
         return from;
     }
 

@@ -42,6 +42,7 @@ import archimulator.util.event.BlockingEvent;
 import archimulator.util.event.BlockingEventDispatcher;
 import archimulator.util.event.CycleAccurateEventQueue;
 import archimulator.util.fsm.FiniteStateMachine;
+import archimulator.util.fsm.FiniteStateMachineFactory;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -72,7 +73,8 @@ public abstract class Experiment {
 
     private CyclicBarrier phaser;
 
-    private FiniteStateMachine<ExperimentState> fsm;
+    private FiniteStateMachineFactory<ExperimentState, ExperimentCondition> fsmFactory;
+    private FiniteStateMachine<ExperimentState, ExperimentCondition> fsm;
 
     private Thread threadStartExperiment;
 
@@ -99,18 +101,18 @@ public abstract class Experiment {
 
         this.phaser = new CyclicBarrier(2);
 
-        this.fsm = new FiniteStateMachine<ExperimentState>(title, ExperimentState.NOT_STARTED);
+        this.fsmFactory = new FiniteStateMachineFactory<ExperimentState, ExperimentCondition>();
 
-        this.fsm.inState(ExperimentState.NOT_STARTED)
-                .ignoreCondition(FSM_CONDITION_STOP)
-                .onCondition(FSM_CONDITION_START, new Function1X<ExperimentState, ExperimentState>() {
-                    public ExperimentState apply(ExperimentState state, Object... params) {
+        this.fsmFactory.inState(ExperimentState.NOT_STARTED)
+                .ignoreCondition(ExperimentCondition.STOP)
+                .onCondition(ExperimentCondition.START, new Function1X<FiniteStateMachine<ExperimentState, ExperimentCondition>, ExperimentState>() {
+                    public ExperimentState apply(FiniteStateMachine<ExperimentState, ExperimentCondition> from, Object... params) {
                         threadStartExperiment = new Thread() {
                             @Override
                             public void run() {
                                 doStart();
 
-                                fsm.fireTransition("stop");
+                                fsm.fireTransition(ExperimentCondition.STOP);
 
                                 System.gc();
                             }
@@ -123,25 +125,25 @@ public abstract class Experiment {
                     }
                 });
 
-        this.fsm.inState(ExperimentState.RUNNING)
-                .ignoreCondition(FSM_CONDITION_START)
-                .onCondition(FSM_CONDITION_PAUSE, new Function1X<ExperimentState, ExperimentState>() {
-                    public ExperimentState apply(ExperimentState param1, Object... otherParams) {
+        this.fsmFactory.inState(ExperimentState.RUNNING)
+                .ignoreCondition(ExperimentCondition.START)
+                .onCondition(ExperimentCondition.PAUSE, new Function1X<FiniteStateMachine<ExperimentState, ExperimentCondition>, ExperimentState>() {
+                    public ExperimentState apply(FiniteStateMachine<ExperimentState, ExperimentCondition> from, Object... params) {
                         getBlockingEventDispatcher().dispatch(new PauseSimulationEvent());
                         return ExperimentState.PAUSED;
                     }
                 })
-                .onCondition(FSM_CONDITION_STOP, new Function1X<ExperimentState, ExperimentState>() {
-                    public ExperimentState apply(ExperimentState param1, Object... otherParams) {
+                .onCondition(ExperimentCondition.STOP, new Function1X<FiniteStateMachine<ExperimentState, ExperimentCondition>, ExperimentState>() {
+                    public ExperimentState apply(FiniteStateMachine<ExperimentState, ExperimentCondition> from, Object... params) {
                         getBlockingEventDispatcher().dispatch(new StopSimulationEvent());
                         return ExperimentState.STOPPED;
                     }
                 });
 
-        this.fsm.inState(ExperimentState.PAUSED)
-                .ignoreCondition(FSM_CONDITION_PAUSE)
-                .onCondition(FSM_CONDITION_RESUME, new Function1X<ExperimentState, ExperimentState>() {
-                    public ExperimentState apply(ExperimentState param1, Object... otherParams) {
+        this.fsmFactory.inState(ExperimentState.PAUSED)
+                .ignoreCondition(ExperimentCondition.PAUSE)
+                .onCondition(ExperimentCondition.RESUME, new Function1X<FiniteStateMachine<ExperimentState, ExperimentCondition>, ExperimentState>() {
+                    public ExperimentState apply(FiniteStateMachine<ExperimentState, ExperimentCondition> from, Object... params) {
                         try {
                             getPhaser().await();
                         } catch (InterruptedException e) {
@@ -152,8 +154,8 @@ public abstract class Experiment {
                         return ExperimentState.RUNNING;
                     }
                 })
-                .onCondition(FSM_CONDITION_STOP, new Function1X<ExperimentState, ExperimentState>() {
-                    public ExperimentState apply(ExperimentState param1, Object... otherParams) {
+                .onCondition(ExperimentCondition.STOP, new Function1X<FiniteStateMachine<ExperimentState, ExperimentCondition>, ExperimentState>() {
+                    public ExperimentState apply(FiniteStateMachine<ExperimentState, ExperimentCondition> from, Object... params) {
                         try {
                             getPhaser().await();
                         } catch (InterruptedException e) {
@@ -166,8 +168,10 @@ public abstract class Experiment {
                     }
                 });
 
-        this.fsm.inState(ExperimentState.STOPPED)
-                .ignoreCondition("stop");
+        this.fsmFactory.inState(ExperimentState.STOPPED)
+                .ignoreCondition(ExperimentCondition.STOP);
+
+        this.fsm = new FiniteStateMachine<ExperimentState, ExperimentCondition>(this.fsmFactory, title, ExperimentState.NOT_STARTED);
     }
 
     private void dumpStats(Map<String, Object> stats, boolean detailedSimulation) {
@@ -206,21 +210,21 @@ public abstract class Experiment {
     }
 
     public void start() {
-        this.fsm.fireTransition(FSM_CONDITION_START);
+        this.fsm.fireTransition(ExperimentCondition.START);
     }
 
     protected abstract void doStart();
 
     public void pause() {
-        this.fsm.fireTransition(FSM_CONDITION_PAUSE);
+        this.fsm.fireTransition(ExperimentCondition.PAUSE);
     }
 
     public void resume() {
-        this.fsm.fireTransition(FSM_CONDITION_RESUME);
+        this.fsm.fireTransition(ExperimentCondition.RESUME);
     }
 
     public void stop() {
-        this.fsm.fireTransition(FSM_CONDITION_STOP);
+        this.fsm.fireTransition(ExperimentCondition.STOP);
     }
 
     public void join() {
@@ -272,11 +276,13 @@ public abstract class Experiment {
     public Simulation getSimulation() {
         return simulation;
     }
-
-    private static final String FSM_CONDITION_START = "start";
-    private static final String FSM_CONDITION_STOP = "stop";
-    private static final String FSM_CONDITION_PAUSE = "pause";
-    private static final String FSM_CONDITION_RESUME = "resume";
+    
+    private enum ExperimentCondition {
+        START,
+        STOP,
+        PAUSE,
+        RESUME
+    }
 
     private static long currentId = 0;
 

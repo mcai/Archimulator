@@ -23,7 +23,7 @@ import archimulator.util.StringHelper;
 import java.util.Arrays;
 
 public class EnterStateEvent extends FiniteStateMachineStateChangedEvent {
-    EnterStateEvent(FiniteStateMachine<?> from, Object condition, Object... params) {
+    EnterStateEvent(FiniteStateMachine<?, ?> from, Object condition, Object... params) {
         super(from, condition, params);
     }
 
