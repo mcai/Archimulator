@@ -221,12 +221,12 @@ public class FsmBasedHtRequestLlcVictimTrackingCapability implements ProcessorCa
                 });
 
         this.fsmFactory.inState(CacheLineHtRequestState.BAD_HT)
-                .onCondition(CacheLineHtRequestCondition.HT_HIT, new Function1X<FiniteStateMachine<CacheLineHtRequestState, CacheLineHtRequestCondition>, CacheLineHtRequestState>() {
+                .ignoreCondition(CacheLineHtRequestCondition.HT_HIT)
+                .onCondition(CacheLineHtRequestCondition.MT_HIT, new Function1X<FiniteStateMachine<CacheLineHtRequestState, CacheLineHtRequestCondition>, CacheLineHtRequestState>() {
                     public CacheLineHtRequestState apply(FiniteStateMachine<CacheLineHtRequestState, CacheLineHtRequestCondition> from, Object... params) {
-                        return CacheLineHtRequestState.BAD_HT;
+                        return CacheLineHtRequestState.UGLY_HT;
                     }
                 })
-                .ignoreCondition(CacheLineHtRequestCondition.MT_HIT)
                 .onConditions(CacheLineHtRequestCondition.EVICTED, new Function1X<FiniteStateMachine<CacheLineHtRequestState, CacheLineHtRequestCondition>, CacheLineHtRequestState>() {
                     public CacheLineHtRequestState apply(FiniteStateMachine<CacheLineHtRequestState, CacheLineHtRequestCondition> from, Object... params) {
                         badHtRequests++;
@@ -321,7 +321,7 @@ public class FsmBasedHtRequestLlcVictimTrackingCapability implements ProcessorCa
         private int victimTag = -1;
 
         public boolean isHt() {
-            return this == UNUSED_HT;
+            return this == UNUSED_HT || this == BAD_HT;
         }
     }
 
