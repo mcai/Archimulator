@@ -22,7 +22,6 @@ import archimulator.core.BasicThread;
 import archimulator.core.Processor;
 import archimulator.mem.cache.CacheLine;
 import archimulator.mem.coherence.CoherentCache;
-import archimulator.mem.coherence.MESIState;
 import archimulator.mem.coherence.event.CoherentCacheEndCacheAccessEvent;
 import archimulator.mem.coherence.event.CoherentCacheServiceNonblockingRequestEvent;
 import archimulator.mem.coherence.event.LastLevelCacheLineEvictedByMemWriteProcessEvent;
@@ -42,7 +41,7 @@ import java.util.List;
 import java.util.Map;
 
 public class FsmBasedHtRequestLlcVictimTrackingCapability implements ProcessorCapability {
-    private CoherentCache<MESIState>.LockableCache llc;
+    private CoherentCache<?>.LockableCache llc;
 
     private long totalHtRequests;
     private long goodHtRequests;
