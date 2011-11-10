@@ -24,6 +24,7 @@ import archimulator.mem.MemoryDevice;
 import archimulator.mem.MemoryHierarchyAccess;
 import archimulator.mem.cache.CacheAccess;
 import archimulator.mem.cache.CacheGeometry;
+import archimulator.mem.coherence.event.LastLevelCacheLineEvictedByMemWriteProcessEvent;
 import archimulator.mem.coherence.exception.CoherentCacheException;
 import archimulator.mem.coherence.exception.CoherentCacheMessageProcessException;
 import archimulator.mem.coherence.message.*;
@@ -169,6 +170,7 @@ public class LastLevelCache extends CoherentCache<MESIState> {
             this.getPendingActions().push(new ActionBasedPendingActionOwner() {
                 @Override
                 public boolean apply() {
+                    getBlockingEventDispatcher().dispatch(new LastLevelCacheLineEvictedByMemWriteProcessEvent(LastLevelCache.this, cacheAccess.getLine()));
                     cacheAccess.getLine().invalidate();
 
                     return true;

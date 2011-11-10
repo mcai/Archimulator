@@ -18,44 +18,19 @@
  ******************************************************************************/
 package archimulator.mem.coherence.event;
 
-import archimulator.mem.MemoryHierarchyAccess;
 import archimulator.mem.cache.CacheLine;
 import archimulator.mem.coherence.CoherentCache;
 
-public class CoherentCacheServiceNonblockingRequestEvent extends CoherentCacheEvent {
-    private int address;
-    private MemoryHierarchyAccess requesterAccess;
-    private CacheLine<?> lineFound;
-    private boolean hitInCache;
-    private boolean eviction;
+public class FirstLevelCacheLineEvictedByL2UpwardWriteProcessEvent extends CoherentCacheEvent {
+    private CacheLine<?> lineToInvalidate;
 
-    public CoherentCacheServiceNonblockingRequestEvent(CoherentCache<?> cache, int address, MemoryHierarchyAccess requesterAccess, CacheLine<?> lineFound, boolean hitInCache, boolean eviction) {
+    public FirstLevelCacheLineEvictedByL2UpwardWriteProcessEvent(CoherentCache<?> cache, CacheLine<?> lineToInvalidate) {
         super(cache);
 
-        this.address = address;
-        this.requesterAccess = requesterAccess;
-        this.lineFound = lineFound;
-        this.hitInCache = hitInCache;
-        this.eviction = eviction;
+        this.lineToInvalidate = lineToInvalidate;
     }
 
-    public int getAddress() {
-        return address;
-    }
-
-    public MemoryHierarchyAccess getRequesterAccess() {
-        return requesterAccess;
-    }
-
-    public CacheLine<?> getLineFound() {
-        return lineFound;
-    }
-
-    public boolean isHitInCache() {
-        return hitInCache;
-    }
-
-    public boolean isEviction() {
-        return eviction;
+    public CacheLine<?> getLineToInvalidate() {
+        return lineToInvalidate;
     }
 }

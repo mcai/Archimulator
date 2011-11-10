@@ -18,32 +18,19 @@
  ******************************************************************************/
 package archimulator.mem.coherence.event;
 
-import archimulator.mem.MemoryHierarchyAccess;
 import archimulator.mem.cache.CacheLine;
 import archimulator.mem.coherence.CoherentCache;
 
-public class CoherentCacheFillLineEvent extends CoherentCacheEvent {
-    private int address;
-    private MemoryHierarchyAccess requesterAccess;
-    private CacheLine<?> lineToReplace;
+public class LastLevelCacheLineEvictedByMemWriteProcessEvent extends CoherentCacheEvent {
+    private CacheLine<?> lineToInvalidate;
 
-    public CoherentCacheFillLineEvent(CoherentCache<?> cache, int address, MemoryHierarchyAccess requesterAccess, CacheLine<?> lineToReplace) {
+    public LastLevelCacheLineEvictedByMemWriteProcessEvent(CoherentCache<?> cache, CacheLine<?> lineToInvalidate) {
         super(cache);
 
-        this.address = address;
-        this.requesterAccess = requesterAccess;
-        this.lineToReplace = lineToReplace;
+        this.lineToInvalidate = lineToInvalidate;
     }
 
-    public int getAddress() {
-        return address;
-    }
-
-    public MemoryHierarchyAccess getRequesterAccess() {
-        return requesterAccess;
-    }
-
-    public CacheLine<?> getLineToReplace() {
-        return lineToReplace;
+    public CacheLine<?> getLineToInvalidate() {
+        return lineToInvalidate;
     }
 }

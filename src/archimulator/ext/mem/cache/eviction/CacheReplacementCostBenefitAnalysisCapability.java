@@ -136,7 +136,7 @@
 //        boolean htHit = lineFound != null && this.mirrorCache.getLine(lineFound).ht;
 //        boolean mtHit = lineFound != null && !this.mirrorCache.getLine(lineFound).ht;
 //
-//        MirrorCacheLine lineForVictim = this.mirrorCache.findLineForVictim(addr);
+//        MirrorCacheLine lineForVictim = this.mirrorCache.findVictimLineForTag(addr);
 //        boolean victimHit = lineForVictim != null;
 //
 //        if (BasicThread.isMainThread(requesterAccess.getThread())) {
@@ -185,7 +185,7 @@
 //            return mirrorCache.getLine(ownerCacheLine.getSet(), ownerCacheLine.getWay());
 //        }
 //
-//        public MirrorCacheLine findLineForVictim(int address) {
+//        public MirrorCacheLine findVictimLineForTag(int address) {
 //            int tag = this.getTag(address);
 //            int set = this.getSet(address);
 //

@@ -28,7 +28,6 @@ import archimulator.mem.cache.CacheLine;
 import archimulator.mem.cache.EvictableCache;
 import archimulator.mem.cache.eviction.EvictionPolicyFactory;
 import archimulator.mem.coherence.event.CoherentCacheBeginCacheAccessEvent;
-import archimulator.mem.coherence.event.CoherentCacheFillLineEvent;
 import archimulator.mem.coherence.event.CoherentCacheNonblockingRequestHitToTransientTagEvent;
 import archimulator.mem.coherence.event.CoherentCacheServiceNonblockingRequestEvent;
 import archimulator.mem.coherence.exception.CacheLineLockFailedException;
@@ -413,11 +412,7 @@ public abstract class CoherentCache<StateT extends Serializable> extends MemoryD
                         }
                     }, tag)) {
                         if (!cacheAccessType.isUpward()) {
-                            getBlockingEventDispatcher().dispatch(new CoherentCacheServiceNonblockingRequestEvent(CoherentCache.this, tag, access, this.cacheAccess.getLine()));
-
-                            if (!this.cacheAccess.isHitInCache()) {
-                                getBlockingEventDispatcher().dispatch(new CoherentCacheFillLineEvent(CoherentCache.this, tag, access, this.cacheAccess.getLine()));
-                            }
+                            getBlockingEventDispatcher().dispatch(new CoherentCacheServiceNonblockingRequestEvent(CoherentCache.this, tag, access, this.cacheAccess.getLine(), this.cacheAccess.isHitInCache(), this.cacheAccess.isEviction()));
                         }
 
                         if (this.cacheAccess.isEviction()) {

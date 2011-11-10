@@ -21,6 +21,7 @@ package archimulator.mem.coherence;
 import archimulator.core.DynamicInstruction;
 import archimulator.mem.*;
 import archimulator.mem.cache.CacheAccess;
+import archimulator.mem.coherence.event.FirstLevelCacheLineEvictedByL2UpwardWriteProcessEvent;
 import archimulator.mem.coherence.exception.CoherentCacheException;
 import archimulator.mem.coherence.exception.CoherentCacheMessageProcessException;
 import archimulator.mem.coherence.message.*;
@@ -469,6 +470,7 @@ public class FirstLevelCache extends CoherentCache<MESIState> {
                 @Override
                 public boolean apply() {
                     findAndLockProcess.getCacheAccess().getLine().invalidate();
+                    getBlockingEventDispatcher().dispatch(new FirstLevelCacheLineEvictedByL2UpwardWriteProcessEvent(FirstLevelCache.this, findAndLockProcess.getCacheAccess().getLine()));
 
                     final int size = findAndLockProcess.getCacheAccess().getLine().getState() == MESIState.MODIFIED ? getCache().getLineSize() + 8 : 8;
                     sendReply(source, message, size);

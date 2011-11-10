@@ -23,6 +23,7 @@ import archimulator.util.action.Function1X;
 import archimulator.util.event.BlockingEventDispatcher;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class FiniteStateMachine<StateT> {
@@ -30,15 +31,17 @@ public class FiniteStateMachine<StateT> {
     private StateT state;
     private Map<StateT, StateTransitions> transitions;
     private BlockingEventDispatcher<FiniteStateMachineEvent> finitestateMachineEventDispatcher;
+    private Map<Object, Object> properties;
 
     public FiniteStateMachine(String name, StateT initialState) {
         this.name = name;
         this.state = initialState;
         this.transitions = new HashMap<StateT, StateTransitions>();
         this.finitestateMachineEventDispatcher = new BlockingEventDispatcher<FiniteStateMachineEvent>();
+        this.properties = new HashMap<Object, Object>();
     }
 
-    public StateTransitions in(StateT state) {
+    public StateTransitions inState(StateT state) {
         if (!this.transitions.containsKey(state)) {
             this.transitions.put(state, new StateTransitions());
         }
@@ -71,15 +74,24 @@ public class FiniteStateMachine<StateT> {
     }
 
     private void changeState(FiniteStateMachine<?> from, Object condition, Object[] params, StateT newState) {
-        if (state != newState) {
-            finitestateMachineEventDispatcher.dispatch(FiniteStateMachine.this, new ExitStateEvent(from, condition, params));
-            state = newState;
-            finitestateMachineEventDispatcher.dispatch(FiniteStateMachine.this, new EnterStateEvent(from, condition, params));
+        if (this.state != newState) {
+            this.finitestateMachineEventDispatcher.dispatch(FiniteStateMachine.this, new ExitStateEvent(from, condition, params));
+            this.state = newState;
+            this.finitestateMachineEventDispatcher.dispatch(FiniteStateMachine.this, new EnterStateEvent(from, condition, params));
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public <T> T get(Object key) {
+        return this.properties.containsKey(key) ? (T) this.properties.get(key) : null;
+    }
+
+    public void put(Object key, Object value) {
+        this.properties.put(key, value);
+    }
+
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public StateT getState() {
@@ -118,7 +130,15 @@ public class FiniteStateMachine<StateT> {
             this.perStateTransitions = new HashMap<Object, Function1X<StateT, StateT>>();
         }
 
-        public StateTransitions on(Object condition, Function1X<StateT, StateT> transition) {
+        public StateTransitions onConditions(List<?> conditions, Function1X<StateT, StateT> transition) {
+            for(Object condition : conditions) {
+                this.onCondition(condition, transition);
+            }
+
+            return this;
+        }
+
+        public StateTransitions onCondition(Object condition, Function1X<StateT, StateT> transition) {
             if (this.perStateTransitions.containsKey(condition)) {
                 throw new IllegalArgumentException("Transition of condition " + condition + " in state " + state + " has already been registered");
             }
@@ -128,8 +148,8 @@ public class FiniteStateMachine<StateT> {
             return this;
         }
 
-        public StateTransitions ignore(Object condition) {
-            return this.on(condition, new Function1X<StateT, StateT>() {
+        public StateTransitions ignoreCondition(Object condition) {
+            return this.onCondition(condition, new Function1X<StateT, StateT>() {
                 public StateT apply(StateT state, Object... params) {
                     return state;
                 }
@@ -150,5 +170,4 @@ public class FiniteStateMachine<StateT> {
             }
         }
     }
-
 }

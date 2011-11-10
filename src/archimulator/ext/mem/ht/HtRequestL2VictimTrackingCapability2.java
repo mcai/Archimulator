@@ -25,7 +25,6 @@ import archimulator.mem.cache.Cache;
 import archimulator.mem.cache.CacheLine;
 import archimulator.mem.coherence.CoherentCache;
 import archimulator.mem.coherence.MESIState;
-import archimulator.mem.coherence.event.CoherentCacheFillLineEvent;
 import archimulator.mem.coherence.event.CoherentCacheServiceNonblockingRequestEvent;
 import archimulator.sim.capability.ProcessorCapability;
 import archimulator.sim.capability.ProcessorCapabilityFactory;
@@ -56,18 +55,14 @@ public class HtRequestL2VictimTrackingCapability2 implements ProcessorCapability
 
         this.mirrorCache = new MirrorCache(ownerCache.getName() + ".htRequestEvictTable.mirrorCache");
 
-        processor.getBlockingEventDispatcher().addListener(CoherentCacheFillLineEvent.class, new Action1<CoherentCacheFillLineEvent>() {
-            public void apply(CoherentCacheFillLineEvent event) {
-                if (event.getCache().getCache() == HtRequestL2VictimTrackingCapability2.this.ownerCache) {
-                    fillLine(event.getAddress(), event.getRequesterAccess(), (CoherentCache.LockableCacheLine) event.getLineToReplace());
-                }
-            }
-        });
-
         processor.getBlockingEventDispatcher().addListener(CoherentCacheServiceNonblockingRequestEvent.class, new Action1<CoherentCacheServiceNonblockingRequestEvent>() {
             public void apply(CoherentCacheServiceNonblockingRequestEvent event) {
                 if (event.getCache().getCache() == HtRequestL2VictimTrackingCapability2.this.ownerCache) {
                     serviceRequest(event.getAddress(), event.getRequesterAccess(), (CoherentCache.LockableCacheLine) event.getLineFound());
+
+                    if(!event.isHitInCache()) {
+                        fillLine(event.getAddress(), event.getRequesterAccess(), (CoherentCache.LockableCacheLine) event.getLineFound());
+                    }
                 }
             }
         });

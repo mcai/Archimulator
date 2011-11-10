@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim;
 
-import archimulator.ext.mem.ht.HtRequestL2VictimTrackingCapability2;
+import archimulator.ext.mem.newHt.FsmBasedHtRequestLlcVictimTrackingCapability;
 import archimulator.isa.NativeMipsIsaEmulatorCapability;
 import archimulator.mem.cache.eviction.EvictionPolicyFactory;
 import archimulator.mem.cache.eviction.LeastRecentlyUsedEvictionPolicy;
@@ -65,7 +65,7 @@ public class Startup {
 //        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_MST_BASELINE, 15));
 
 //        simulate("test2", LeastRecentlyUsedEvictionPolicy.FACTORY, 2, 2, contextConfigs);
-        simulate("test_mst_200_detailed", LeastRecentlyUsedEvictionPolicy.FACTORY, 2, 2, contextConfigs);
+        simulate("mst_10000_detailed-HTRequest_Profiling", LeastRecentlyUsedEvictionPolicy.FACTORY, 2, 2, contextConfigs);
 //        simulate("mst_ht_LRU", LeastRecentlyUsedEvictionPolicy.FACTORY, SIMULATED_PROGRAM_MST_HT);
 
 //        simulate("em3d_baseline_LRU", SIMULATED_PROGRAM_EM3D_BASELINE, LeastRecentlyUsedEvictionPolicy.FACTORY);
@@ -100,7 +100,8 @@ public class Startup {
         return new DetailedExperiment(title, numCores, numThreadsPerCore, contextConfigs)
                 //                .addSimulationCapabilityFactory(LastLevelCacheMissProfilingCapability.class, LastLevelCacheMissProfilingCapability.FACTORY)
                 //                .addProcessorCapabilityFactory(HtRequestL2VictimTrackingCapability.class, HtRequestL2VictimTrackingCapability.FACTORY)
-                .addProcessorCapabilityFactory(HtRequestL2VictimTrackingCapability2.class, HtRequestL2VictimTrackingCapability2.FACTORY)
+//                .addProcessorCapabilityFactory(HtRequestL2VictimTrackingCapability2.class, HtRequestL2VictimTrackingCapability2.FACTORY)
+                .addProcessorCapabilityFactory(FsmBasedHtRequestLlcVictimTrackingCapability.class, FsmBasedHtRequestLlcVictimTrackingCapability.FACTORY)
                 .addKernelCapabilityFactory(NativeMipsIsaEmulatorCapability.class, NativeMipsIsaEmulatorCapability.FACTORY)
                 .setL2EvictionPolicyFactory(l2EvictionPolicyFactory);
     }
@@ -109,7 +110,8 @@ public class Startup {
         return new CheckpointedExperiment(title, numCores, numThreadsPerCore, contextConfigs, 2000000000)
                 //                .addSimulationCapabilityFactory(LastLevelCacheMissProfilingCapability.class, LastLevelCacheMissProfilingCapability.FACTORY)
                 //                .addProcessorCapabilityFactory(HtRequestL2VictimTrackingCapability.class, HtRequestL2VictimTrackingCapability.FACTORY)
-                .addProcessorCapabilityFactory(HtRequestL2VictimTrackingCapability2.class, HtRequestL2VictimTrackingCapability2.FACTORY)
+//                .addProcessorCapabilityFactory(HtRequestL2VictimTrackingCapability2.class, HtRequestL2VictimTrackingCapability2.FACTORY)
+                .addProcessorCapabilityFactory(FsmBasedHtRequestLlcVictimTrackingCapability.class, FsmBasedHtRequestLlcVictimTrackingCapability.FACTORY)
                 .addKernelCapabilityFactory(NativeMipsIsaEmulatorCapability.class, NativeMipsIsaEmulatorCapability.FACTORY)
                 .setL2EvictionPolicyFactory(l2EvictionPolicyFactory);
     }
@@ -129,10 +131,10 @@ public class Startup {
             "mst_ht_mips",
             "/home/itecgo/Archimulator/benchmarks/Olden_Custom1/mst/ht",
             "mst.mips",
-//            "10000");
+            "10000");
 //            "1000");
 //            "100");
-            "200");
+//            "200");
 //            "400");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_EM3D_BASELINE = new SimulatedProgram(

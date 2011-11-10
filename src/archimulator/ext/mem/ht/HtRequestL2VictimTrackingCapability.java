@@ -27,7 +27,6 @@ import archimulator.mem.cache.EvictableCache;
 import archimulator.mem.cache.eviction.LeastRecentlyUsedEvictionPolicy;
 import archimulator.mem.coherence.CoherentCache;
 import archimulator.mem.coherence.MESIState;
-import archimulator.mem.coherence.event.CoherentCacheFillLineEvent;
 import archimulator.mem.coherence.event.CoherentCacheServiceNonblockingRequestEvent;
 import archimulator.sim.capability.ProcessorCapability;
 import archimulator.sim.capability.ProcessorCapabilityFactory;
@@ -68,18 +67,14 @@ public class HtRequestL2VictimTrackingCapability implements ProcessorCapability 
 
         this.evictionPolicy = new LeastRecentlyUsedEvictionPolicy(cache);
 
-        processor.getBlockingEventDispatcher().addListener(CoherentCacheFillLineEvent.class, new Action1<CoherentCacheFillLineEvent>() {
-            public void apply(CoherentCacheFillLineEvent event) {
-                if (event.getCache().getCache() == HtRequestL2VictimTrackingCapability.this.ownerCache) {
-                    fillLine(event.getAddress(), event.getRequesterAccess(), (CoherentCache.LockableCacheLine) event.getLineToReplace());
-                }
-            }
-        });
-
         processor.getBlockingEventDispatcher().addListener(CoherentCacheServiceNonblockingRequestEvent.class, new Action1<CoherentCacheServiceNonblockingRequestEvent>() {
             public void apply(CoherentCacheServiceNonblockingRequestEvent event) {
                 if (event.getCache().getCache() == HtRequestL2VictimTrackingCapability.this.ownerCache) {
                     serviceRequest(event.getAddress(), event.getRequesterAccess(), (CoherentCache.LockableCacheLine) event.getLineFound());
+
+                    if(!event.isHitInCache()) {
+                        fillLine(event.getAddress(), event.getRequesterAccess(), (CoherentCache.LockableCacheLine) event.getLineFound());
+                    }
                 }
             }
         });

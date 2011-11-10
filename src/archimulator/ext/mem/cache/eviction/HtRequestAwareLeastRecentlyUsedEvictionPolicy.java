@@ -28,7 +28,6 @@ import archimulator.mem.cache.eviction.EvictionPolicyFactory;
 import archimulator.mem.cache.eviction.LeastRecentlyUsedEvictionPolicy;
 import archimulator.mem.coherence.MESIState;
 import archimulator.mem.coherence.event.CoherentCacheBeginCacheAccessEvent;
-import archimulator.mem.coherence.event.CoherentCacheFillLineEvent;
 import archimulator.mem.coherence.event.CoherentCacheNonblockingRequestHitToTransientTagEvent;
 import archimulator.mem.coherence.event.CoherentCacheServiceNonblockingRequestEvent;
 import archimulator.sim.event.DumpStatEvent;
@@ -76,11 +75,11 @@ public abstract class HtRequestAwareLeastRecentlyUsedEvictionPolicy<StateT exten
 
         this.quntizedHtRequestCachePollutionForEvictionPolicy = QuntizedHtRequestCachePollutionForEvictionPolicy.MEDIUM;
 
-        cache.getBlockingEventDispatcher().addListener(CoherentCacheFillLineEvent.class, new Action1<CoherentCacheFillLineEvent>() {
+        cache.getBlockingEventDispatcher().addListener(CoherentCacheServiceNonblockingRequestEvent.class, new Action1<CoherentCacheServiceNonblockingRequestEvent>() {
             @SuppressWarnings("Unchecked")
-            public void apply(CoherentCacheFillLineEvent event) {
-                if (event.getCache().getCache().equals(getCache())) {
-                    if (event.getLineToReplace().getState() != MESIState.INVALID && !mirrorCache.getLine(event.getLineToReplace()).htRequest) {
+            public void apply(CoherentCacheServiceNonblockingRequestEvent event) {
+                if (event.getCache().getCache().equals(getCache()) && !event.isHitInCache()) {
+                    if (event.getLineFound().getState() != MESIState.INVALID && !mirrorCache.getLine(event.getLineFound()).htRequest) {
                         evictedMtLines++;
 
                         if (evictedMtLines == evictedMtLinesPerInterval) {
@@ -92,11 +91,11 @@ public abstract class HtRequestAwareLeastRecentlyUsedEvictionPolicy<StateT exten
                     }
 
                     if (BasicThread.isHelperThread(event.getRequesterAccess().getThread())) {
-                        if (event.getLineToReplace().getState() != MESIState.INVALID && !mirrorCache.getLine(event.getLineToReplace()).htRequest) {
-                            newMtCacheLineEvictedByHtRequest(event.getLineToReplace().getTag(), event.getRequesterAccess().getPhysicalAddress());
+                        if (event.getLineFound().getState() != MESIState.INVALID && !mirrorCache.getLine(event.getLineFound()).htRequest) {
+                            newMtCacheLineEvictedByHtRequest(event.getLineFound().getTag(), event.getRequesterAccess().getPhysicalAddress());
                         }
 
-                        mirrorCache.getLine(event.getLineToReplace()).htRequest = true;
+                        mirrorCache.getLine(event.getLineFound()).htRequest = true;
                         totalHtRequests.inc();
                     }
                 }
