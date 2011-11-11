@@ -18,23 +18,29 @@
  ******************************************************************************/
 package archimulator.mem.cache;
 
-import archimulator.util.action.Function2;
+import archimulator.util.action.Function3;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CacheSet<StateT extends Serializable, LineT extends CacheLine<StateT>> implements Serializable {
+    private Cache<StateT, LineT> cache;
     private List<LineT> lines;
     private int num;
 
-    public CacheSet(int associativity, int num, Function2<Integer, Integer, LineT> createLine) {
+    public CacheSet(Cache<StateT, LineT> cache, int associativity, int num, Function3<Cache<?, ?>, Integer, Integer, LineT> createLine) {
+        this.cache = cache;
         this.num = num;
 
         this.lines = new ArrayList<LineT>();
         for (int i = 0; i < associativity; i++) {
-            this.lines.add(createLine.apply(this.num, i));
+            this.lines.add(createLine.apply(cache, this.num, i));
         }
+    }
+
+    public Cache<StateT, LineT> getCache() {
+        return cache;
     }
 
     public List<LineT> getLines() {

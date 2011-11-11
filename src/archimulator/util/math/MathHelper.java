@@ -22,7 +22,7 @@ public class MathHelper {
     public static String dumpBytes(byte[] buffer) {
         return dumpBytes(buffer, 0, buffer.length);
     }
-    
+
     public static String dumpBytes(byte[] buffer, int offset, int size) {
         if (buffer == null) {
             return "";

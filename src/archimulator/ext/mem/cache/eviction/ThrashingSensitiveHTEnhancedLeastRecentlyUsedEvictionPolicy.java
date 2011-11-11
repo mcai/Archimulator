@@ -27,7 +27,7 @@ import archimulator.mem.cache.eviction.LeastRecentlyUsedEvictionPolicy;
 import archimulator.sim.event.ProcessorInitializedEvent;
 import archimulator.util.IntegerIntegerPair;
 import archimulator.util.action.Action1;
-import archimulator.util.action.Function2;
+import archimulator.util.action.Function3;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -104,16 +104,16 @@ public class ThrashingSensitiveHTEnhancedLeastRecentlyUsedEvictionPolicy<StateT 
     private class MirrorCacheLine extends CacheLine<Boolean> {
         private boolean ht;
 
-        private MirrorCacheLine(int set, int way) {
-            super(set, way, true);
+        private MirrorCacheLine(Cache<?, ?> cache, int set, int way) {
+            super(cache, set, way, true);
         }
     }
 
     private class MirrorCache extends Cache<Boolean, MirrorCacheLine> {
         private MirrorCache() {
-            super(getCache(), getCache().getName() + ".streamingHTEnhancedLeastRecentlyUsedEvictionPolicy.mirrorCache", getCache().getGeometry(), new Function2<Integer, Integer, MirrorCacheLine>() {
-                public MirrorCacheLine apply(Integer set, Integer way) {
-                    return new MirrorCacheLine(set, way);
+            super(getCache(), getCache().getName() + ".streamingHTEnhancedLeastRecentlyUsedEvictionPolicy.mirrorCache", getCache().getGeometry(), new Function3<Cache<?, ?>, Integer, Integer, MirrorCacheLine>() {
+                public MirrorCacheLine apply(Cache<?, ?> cache, Integer set, Integer way) {
+                    return new MirrorCacheLine(cache, set, way);
                 }
             });
         }

@@ -18,17 +18,24 @@
  ******************************************************************************/
 package archimulator.mem.cache;
 
+import archimulator.mem.cache.event.CacheLineInvalidatedEvent;
+import archimulator.mem.cache.event.CacheLineStateChangedToNonInitialStateEvent;
+import archimulator.mem.cache.event.CacheLineTagChangedEvent;
+import archimulator.mem.cache.event.CacheLineValidatedEvent;
+
 import java.io.Serializable;
 
 public class CacheLine<StateT extends Serializable> implements Serializable {
+    private Cache<?, ?> cache;
     private int set;
     private int way;
     private StateT initialState;
 
-    protected int tag;
-    protected StateT state;
+    private int tag;
+    private StateT state;
 
-    public CacheLine(int set, int way, StateT initialState) {
+    public CacheLine(Cache<?, ?> cache, int set, int way, StateT initialState) {
+        this.cache = cache;
         this.set = set;
         this.way = way;
         this.state = initialState;
@@ -39,16 +46,31 @@ public class CacheLine<StateT extends Serializable> implements Serializable {
 
     public void invalidate() { //TODO: should notify cache's eviction policy
         assert (this.state != this.initialState);
+        
+        int previousTag = this.tag;
+        StateT previousState = this.state;
 
         this.tag = -1;
         this.state = this.initialState;
+
+        this.cache.getBlockingEventDispatcher().dispatch(new CacheLineInvalidatedEvent(this, previousTag, previousState));
     }
 
     public void setNonInitialState(StateT state) {
         if (state == this.initialState) {
             throw new IllegalArgumentException();
         }
-        this.state = state; //TODO: should notify cache's eviction policy
+        
+        if(!this.state.equals(state)) {
+            StateT previousState = this.state;
+            this.state = state; //TODO: should notify cache's eviction policy
+
+            this.cache.getBlockingEventDispatcher().dispatch(new CacheLineStateChangedToNonInitialStateEvent(this, previousState));
+        }
+    }
+
+    public Cache<?, ?> getCache() {
+        return cache;
     }
 
     public int getSet() {
@@ -67,12 +89,25 @@ public class CacheLine<StateT extends Serializable> implements Serializable {
         return tag;
     }
 
+    protected void setTag(int tag) {
+        if(this.tag != tag) {
+            int previousTag = this.tag;
+            this.tag = tag;
+
+            this.cache.getBlockingEventDispatcher().dispatch(new CacheLineTagChangedEvent(this, previousTag));
+
+            if(previousTag == -1) {
+                this.cache.getBlockingEventDispatcher().dispatch(new CacheLineValidatedEvent(this));
+            }
+        }
+    }
+
     public StateT getState() {
         return state;
     }
 
     @Override
     public String toString() {
-        return String.format("CacheLine{set=%d, way=%d, initialState=%s, tag=%d, state=%s}", set, way, initialState, tag, state);
+        return String.format("CacheLine{set=%d, way=%d, tag=%s, state=%s}", set, way, tag == -1 ? "<INVALID>" : String.format("0x%08x", tag), state);
     }
 }

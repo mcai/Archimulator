@@ -21,7 +21,7 @@ package archimulator.ext.mem.cache.eviction;
 import archimulator.mem.CacheAccessType;
 import archimulator.mem.cache.*;
 import archimulator.mem.cache.eviction.EvictionPolicy;
-import archimulator.util.action.Function2;
+import archimulator.util.action.Function3;
 import archimulator.util.math.Quantizer;
 
 import java.io.Serializable;
@@ -146,16 +146,16 @@ public abstract class AbstractReuseDistancePredictionEvictionPolicy<StateT exten
         protected int timeStamp;
         protected int predictedReuseDistance;
 
-        private MirrorCacheLine(int set, int way) {
-            super(set, way, true);
+        private MirrorCacheLine(Cache<?, ?> cache, int set, int way) {
+            super(cache, set, way, true);
         }
     }
 
     protected class MirrorCache extends Cache<Boolean, MirrorCacheLine> {
         private MirrorCache() {
-            super(getCache(), getCache().getName() + ".reuseDistancePredictionEvictionPolicy.mirrorCache", getCache().getGeometry(), new Function2<Integer, Integer, MirrorCacheLine>() {
-                public MirrorCacheLine apply(Integer set, Integer way) {
-                    return new MirrorCacheLine(set, way);
+            super(getCache(), getCache().getName() + ".reuseDistancePredictionEvictionPolicy.mirrorCache", getCache().getGeometry(), new Function3<Cache<?, ?>, Integer, Integer, MirrorCacheLine>() {
+                public MirrorCacheLine apply(Cache<?, ?> cache, Integer set, Integer way) {
+                    return new MirrorCacheLine(cache, set, way);
                 }
             });
         }

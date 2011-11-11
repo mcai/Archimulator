@@ -32,7 +32,7 @@ import archimulator.sim.event.DumpStatEvent;
 import archimulator.sim.event.PollStatsEvent;
 import archimulator.sim.event.ResetStatEvent;
 import archimulator.util.action.Action1;
-import archimulator.util.action.Function2;
+import archimulator.util.action.Function3;
 
 import java.util.Map;
 
@@ -60,7 +60,7 @@ public class HtRequestL2VictimTrackingCapability2 implements ProcessorCapability
                 if (event.getCache().getCache() == HtRequestL2VictimTrackingCapability2.this.ownerCache) {
                     serviceRequest(event.getAddress(), event.getRequesterAccess(), (CoherentCache.LockableCacheLine) event.getLineFound());
 
-                    if(!event.isHitInCache()) {
+                    if (!event.isHitInCache()) {
                         fillLine(event.getAddress(), event.getRequesterAccess(), (CoherentCache.LockableCacheLine) event.getLineFound());
                     }
                 }
@@ -177,16 +177,16 @@ public class HtRequestL2VictimTrackingCapability2 implements ProcessorCapability
         private int victimTag;
         private boolean victimHit;
 
-        private MirrorCacheLine(int set, int way) {
-            super(set, way, true);
+        private MirrorCacheLine(Cache<?, ?> cache, int set, int way) {
+            super(cache, set, way, true);
         }
     }
 
     private class MirrorCache extends Cache<Boolean, MirrorCacheLine> {
         private MirrorCache(String name) {
-            super(ownerCache, name, ownerCache.getGeometry(), new Function2<Integer, Integer, MirrorCacheLine>() {
-                public MirrorCacheLine apply(Integer set, Integer way) {
-                    return new MirrorCacheLine(set, way);
+            super(ownerCache, name, ownerCache.getGeometry(), new Function3<Cache<?, ?>, Integer, Integer, MirrorCacheLine>() {
+                public MirrorCacheLine apply(Cache<?, ?> cache, Integer set, Integer way) {
+                    return new MirrorCacheLine(cache, set, way);
                 }
             });
         }

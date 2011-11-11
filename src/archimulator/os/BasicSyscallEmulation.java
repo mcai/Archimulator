@@ -41,17 +41,17 @@ public class BasicSyscallEmulation extends SyscallEmulation {
     public BasicSyscallEmulation(Kernel kernel) {
         super(kernel);
 
-        openFlagMappings = new ArrayList<OpenFlagMapping>();
-        openFlagMappings.add(new OpenFlagMapping(TargetOpenFlags.O_RDONLY, OpenFlags.O_RDONLY));
-        openFlagMappings.add(new OpenFlagMapping(TargetOpenFlags.O_WRONLY, OpenFlags.O_WRONLY));
-        openFlagMappings.add(new OpenFlagMapping(TargetOpenFlags.O_RDWR, OpenFlags.O_RDWR));
-        openFlagMappings.add(new OpenFlagMapping(TargetOpenFlags.O_APPEND, OpenFlags.O_APPEND));
-        openFlagMappings.add(new OpenFlagMapping(TargetOpenFlags.O_SYNC, OpenFlags.O_SYNC));
-        openFlagMappings.add(new OpenFlagMapping(TargetOpenFlags.O_CREAT, OpenFlags.O_CREAT));
-        openFlagMappings.add(new OpenFlagMapping(TargetOpenFlags.O_TRUNC, OpenFlags.O_TRUNC));
-        openFlagMappings.add(new OpenFlagMapping(TargetOpenFlags.O_EXCL, OpenFlags.O_EXCL));
-        openFlagMappings.add(new OpenFlagMapping(TargetOpenFlags.O_NOCTTY, OpenFlags.O_NOCTTY));
-        openFlagMappings.add(new OpenFlagMapping(0x2000, 0));
+        this.openFlagMappings = new ArrayList<OpenFlagMapping>();
+        this.openFlagMappings.add(new OpenFlagMapping(TargetOpenFlags.O_RDONLY, OpenFlags.O_RDONLY));
+        this.openFlagMappings.add(new OpenFlagMapping(TargetOpenFlags.O_WRONLY, OpenFlags.O_WRONLY));
+        this.openFlagMappings.add(new OpenFlagMapping(TargetOpenFlags.O_RDWR, OpenFlags.O_RDWR));
+        this.openFlagMappings.add(new OpenFlagMapping(TargetOpenFlags.O_APPEND, OpenFlags.O_APPEND));
+        this.openFlagMappings.add(new OpenFlagMapping(TargetOpenFlags.O_SYNC, OpenFlags.O_SYNC));
+        this.openFlagMappings.add(new OpenFlagMapping(TargetOpenFlags.O_CREAT, OpenFlags.O_CREAT));
+        this.openFlagMappings.add(new OpenFlagMapping(TargetOpenFlags.O_TRUNC, OpenFlags.O_TRUNC));
+        this.openFlagMappings.add(new OpenFlagMapping(TargetOpenFlags.O_EXCL, OpenFlags.O_EXCL));
+        this.openFlagMappings.add(new OpenFlagMapping(TargetOpenFlags.O_NOCTTY, OpenFlags.O_NOCTTY));
+        this.openFlagMappings.add(new OpenFlagMapping(0x2000, 0));
     }
 
     @Override
@@ -523,7 +523,7 @@ public class BasicSyscallEmulation extends SyscallEmulation {
         int mode = context.getRegs().getGpr(ArchitecturalRegisterFile.REG_A2);
 
         int hostFlags = 0;
-        for (OpenFlagMapping mapping : openFlagMappings) {
+        for (OpenFlagMapping mapping : this.openFlagMappings) {
             if ((tgtFlags & mapping.getTargetFlag()) != 0) {
                 tgtFlags &= ~mapping.getTargetFlag();
                 hostFlags |= mapping.getHostFlag();

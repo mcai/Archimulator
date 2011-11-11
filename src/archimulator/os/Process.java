@@ -21,7 +21,6 @@ package archimulator.os;
 import archimulator.isa.BitField;
 import archimulator.isa.Mnemonic;
 import archimulator.isa.StaticInstruction;
-import archimulator.isa.memory.BasicMemory;
 import archimulator.isa.memory.BigMemory;
 import archimulator.isa.memory.Memory;
 import archimulator.sim.BasicSimulationObject;

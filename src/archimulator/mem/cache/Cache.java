@@ -21,7 +21,7 @@ package archimulator.mem.cache;
 import archimulator.sim.BasicSimulationObject;
 import archimulator.sim.SimulationObject;
 import archimulator.util.action.Action1;
-import archimulator.util.action.Function2;
+import archimulator.util.action.Function3;
 import archimulator.util.action.Predicate;
 
 import java.io.Serializable;
@@ -33,7 +33,7 @@ public class Cache<StateT extends Serializable, LineT extends CacheLine<StateT>>
     protected CacheGeometry geometry;
     protected List<CacheSet<StateT, LineT>> sets;
 
-    public Cache(SimulationObject parent, String name, CacheGeometry geometry, Function2<Integer, Integer, LineT> createLine) {
+    public Cache(SimulationObject parent, String name, CacheGeometry geometry, Function3<Cache<?, ?>, Integer, Integer, LineT> createLine) {
         super(parent);
 
         this.name = name;
@@ -41,7 +41,7 @@ public class Cache<StateT extends Serializable, LineT extends CacheLine<StateT>>
 
         this.sets = new ArrayList<CacheSet<StateT, LineT>>();
         for (int i = 0; i < this.getNumSets(); i++) {
-            this.sets.add(new CacheSet<StateT, LineT>(this.getAssociativity(), i, createLine));
+            this.sets.add(new CacheSet<StateT, LineT>(this, this.getAssociativity(), i, createLine));
         }
     }
 

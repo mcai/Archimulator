@@ -41,7 +41,7 @@ import archimulator.sim.SimulationObject;
 import archimulator.sim.capability.ProcessorCapability;
 import archimulator.sim.capability.ProcessorCapabilityFactory;
 import archimulator.util.action.Action1;
-import archimulator.util.action.Function2;
+import archimulator.util.action.Function3;
 import archimulator.util.action.Predicate;
 
 import java.util.*;
@@ -54,9 +54,9 @@ public class DynamicSpeculativePrecomputationCapability implements ProcessorCapa
     private Map<Thread, SliceInformationTable> sits;
 
     public DynamicSpeculativePrecomputationCapability(Processor processor) {
-        this.sliceCache = new SliceCache(processor, "sliceCache", new CacheGeometry(SLICE_CACHE_CAPACITY, SLICE_CACHE_CAPACITY, 1), LeastRecentlyUsedEvictionPolicy.FACTORY, new Function2<Integer, Integer, SliceCacheLine>() {
-            public SliceCacheLine apply(Integer set, Integer way) {
-                return new SliceCacheLine(set, way);
+        this.sliceCache = new SliceCache(processor, "sliceCache", new CacheGeometry(SLICE_CACHE_CAPACITY, SLICE_CACHE_CAPACITY, 1), LeastRecentlyUsedEvictionPolicy.FACTORY, new Function3<Cache<?, ?>, Integer, Integer, SliceCacheLine>() {
+            public SliceCacheLine apply(Cache<?, ?> cache, Integer set, Integer way) {
+                return new SliceCacheLine(cache, set, way);
             }
         });
 
@@ -76,13 +76,13 @@ public class DynamicSpeculativePrecomputationCapability implements ProcessorCapa
     private class SliceCacheLine extends CacheLine<Boolean> {
         private transient Map<Integer, Integer> machInsts;
 
-        private SliceCacheLine(int set, int way) {
-            super(set, way, false);
+        private SliceCacheLine(Cache<?, ?> cache, int set, int way) {
+            super(cache, set, way, false);
         }
     }
 
     private class SliceCache extends EvictableCache<Boolean, SliceCacheLine> {
-        private SliceCache(SimulationObject parent, String name, CacheGeometry geometry, EvictionPolicyFactory evictionPolicyFactory, Function2<Integer, Integer, SliceCacheLine> createLine) {
+        private SliceCache(SimulationObject parent, String name, CacheGeometry geometry, EvictionPolicyFactory evictionPolicyFactory, Function3<Cache<?, ?>, Integer, Integer, SliceCacheLine> createLine) {
             super(parent, name, geometry, evictionPolicyFactory, createLine);
         }
 

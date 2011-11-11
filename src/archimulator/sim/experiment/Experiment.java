@@ -48,7 +48,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
@@ -177,8 +180,8 @@ public abstract class Experiment {
     private void dumpStats(Map<String, Object> stats, boolean detailedSimulation) {
         stats.put("experiment.beginTime", this.beginTime);
         stats.put("experiment.workloads.size", this.contextConfigs.size());
-        
-        for(ContextConfig contextConfig : this.contextConfigs) {
+
+        for (ContextConfig contextConfig : this.contextConfigs) {
             stats.put("experiment.workload." + contextConfig.getThreadId(), contextConfig.getSimulatedProgram().getSetTitle() + "." + contextConfig.getSimulatedProgram().getTitle() + "(" + contextConfig.getSimulatedProgram().getArgs() + ")");
         }
 
@@ -276,7 +279,7 @@ public abstract class Experiment {
     public Simulation getSimulation() {
         return simulation;
     }
-    
+
     private enum ExperimentCondition {
         START,
         STOP,

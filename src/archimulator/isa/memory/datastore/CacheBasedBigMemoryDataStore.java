@@ -20,17 +20,14 @@ package archimulator.isa.memory.datastore;
 
 import archimulator.isa.memory.Memory;
 import archimulator.mem.CacheAccessType;
-import archimulator.mem.cache.CacheAccess;
-import archimulator.mem.cache.CacheGeometry;
-import archimulator.mem.cache.CacheLine;
-import archimulator.mem.cache.EvictableCache;
+import archimulator.mem.cache.*;
 import archimulator.mem.cache.eviction.EvictionPolicyFactory;
 import archimulator.mem.cache.eviction.LeastRecentlyUsedEvictionPolicy;
 import archimulator.sim.BasicSimulationObject;
 import archimulator.sim.SimulationObject;
 import archimulator.sim.event.PollStatsEvent;
 import archimulator.util.action.Action1;
-import archimulator.util.action.Function2;
+import archimulator.util.action.Function3;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -63,9 +60,9 @@ public class CacheBasedBigMemoryDataStore extends BasicSimulationObject implemen
                 NUM_BUFFERS,
                 1),
                 LeastRecentlyUsedEvictionPolicy.FACTORY,
-                new Function2<Integer, Integer, MemoryPageCacheLine>() {
-                    public MemoryPageCacheLine apply(Integer set, Integer way) {
-                        return new MemoryPageCacheLine(set, way);
+                new Function3<Cache<?, ?>, Integer, Integer, MemoryPageCacheLine>() {
+                    public MemoryPageCacheLine apply(Cache<?, ?> cache, Integer set, Integer way) {
+                        return new MemoryPageCacheLine(cache, set, way);
                     }
                 });
 
@@ -158,13 +155,13 @@ public class CacheBasedBigMemoryDataStore extends BasicSimulationObject implemen
         private transient ByteBuffer bb;
         private boolean dirty;
 
-        private MemoryPageCacheLine(int set, int way) {
-            super(set, way, false);
+        private MemoryPageCacheLine(Cache<?, ?> cache, int set, int way) {
+            super(cache, set, way, false);
         }
 
         private ByteBuffer getDiskBb() {
             try {
-                String diskCacheFileName = this.getDiskCacheFileName(this.tag);
+                String diskCacheFileName = this.getDiskCacheFileName(this.getTag());
 
                 if (!diskBbs.containsKey(diskCacheFileName)) {
                     RandomAccessFile raf = new RandomAccessFile(diskCacheFileName, "rws");
@@ -181,7 +178,7 @@ public class CacheBasedBigMemoryDataStore extends BasicSimulationObject implemen
             if (dirty) {
                 ByteBuffer diskBb = this.getDiskBb();
 
-                diskBb.position(CacheBasedBigMemoryDataStore.getDiskCacheFileDisplacement(this.tag));
+                diskBb.position(CacheBasedBigMemoryDataStore.getDiskCacheFileDisplacement(this.getTag()));
 
                 this.bb.position(0);
 
@@ -195,7 +192,7 @@ public class CacheBasedBigMemoryDataStore extends BasicSimulationObject implemen
 
             this.bb.clear();
 
-            bufferIdsExistsOnDisk.add(this.tag);
+            bufferIdsExistsOnDisk.add(this.getTag());
 
             return this;
         }
@@ -236,7 +233,7 @@ public class CacheBasedBigMemoryDataStore extends BasicSimulationObject implemen
     }
 
     private class MemoryPageCache extends EvictableCache<Boolean, MemoryPageCacheLine> {
-        private MemoryPageCache(SimulationObject parent, String name, CacheGeometry geometry, EvictionPolicyFactory evictionPolicyFactory, Function2<Integer, Integer, MemoryPageCacheLine> createLine) {
+        private MemoryPageCache(SimulationObject parent, String name, CacheGeometry geometry, EvictionPolicyFactory evictionPolicyFactory, Function3<Cache<?, ?>, Integer, Integer, MemoryPageCacheLine> createLine) {
             super(parent, name, geometry, evictionPolicyFactory, createLine);
         }
     }

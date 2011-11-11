@@ -22,7 +22,7 @@ import archimulator.mem.CacheAccessType;
 import archimulator.mem.cache.*;
 import archimulator.mem.cache.eviction.EvictionPolicyFactory;
 import archimulator.mem.cache.eviction.LeastRecentlyUsedEvictionPolicy;
-import archimulator.util.action.Function2;
+import archimulator.util.action.Function3;
 import archimulator.util.math.SaturatingCounter;
 
 public class CacheBasedPredictor<PredictableT extends Comparable<PredictableT>> implements Predictor<PredictableT> {
@@ -34,9 +34,9 @@ public class CacheBasedPredictor<PredictableT extends Comparable<PredictableT>> 
 
     public CacheBasedPredictor(Cache<?, ?> cache, String name, CacheGeometry geometry, EvictionPolicyFactory evictionPolicyFactory, final int counterThreshold, final int counterMaxValue) {
         this.evictableCache = new EvictableCache<Boolean, PredictorLine>(cache, name, geometry, evictionPolicyFactory,
-                new Function2<Integer, Integer, PredictorLine>() {
-                    public PredictorLine apply(Integer set, Integer way) {
-                        return new PredictorLine(set, way, counterThreshold, counterMaxValue);
+                new Function3<Cache<?, ?>, Integer, Integer, PredictorLine>() {
+                    public PredictorLine apply(Cache<?, ?> cache, Integer set, Integer way) {
+                        return new PredictorLine(cache, set, way, counterThreshold, counterMaxValue);
                     }
                 });
     }
@@ -77,8 +77,8 @@ public class CacheBasedPredictor<PredictableT extends Comparable<PredictableT>> 
         private PredictableT predictedValue;
         private SaturatingCounter confidence;
 
-        private PredictorLine(int set, int way, int counterThreshold, int counterMaxValue) {
-            super(set, way, false);
+        private PredictorLine(Cache<?, ?> cache, int set, int way, int counterThreshold, int counterMaxValue) {
+            super(cache, set, way, false);
 
             this.predictedValue = null;
             this.confidence = new SaturatingCounter(0, counterThreshold, counterMaxValue, 0);

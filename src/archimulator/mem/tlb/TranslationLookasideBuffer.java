@@ -20,6 +20,7 @@ package archimulator.mem.tlb;
 
 import archimulator.mem.CacheAccessType;
 import archimulator.mem.MemoryHierarchyAccess;
+import archimulator.mem.cache.Cache;
 import archimulator.mem.cache.CacheAccess;
 import archimulator.mem.cache.CacheLine;
 import archimulator.mem.cache.EvictableCache;
@@ -29,7 +30,7 @@ import archimulator.sim.event.DumpStatEvent;
 import archimulator.sim.event.ResetStatEvent;
 import archimulator.util.action.Action;
 import archimulator.util.action.Action1;
-import archimulator.util.action.Function2;
+import archimulator.util.action.Function3;
 
 import java.io.Serializable;
 
@@ -47,9 +48,9 @@ public class TranslationLookasideBuffer implements Serializable {
         this.name = name;
         this.config = config;
 
-        this.cache = new EvictableCache<Boolean, CacheLine<Boolean>>(parent, name, config.getGeometry(), LeastRecentlyUsedEvictionPolicy.FACTORY, new Function2<Integer, Integer, CacheLine<Boolean>>() {
-            public CacheLine<Boolean> apply(Integer set, Integer way) {
-                return new CacheLine<Boolean>(set, way, false);
+        this.cache = new EvictableCache<Boolean, CacheLine<Boolean>>(parent, name, config.getGeometry(), LeastRecentlyUsedEvictionPolicy.FACTORY, new Function3<Cache<?, ?>, Integer, Integer, CacheLine<Boolean>>() {
+            public CacheLine<Boolean> apply(Cache<?, ?> cache, Integer set, Integer way) {
+                return new CacheLine<Boolean>(cache, set, way, false);
             }
         });
 

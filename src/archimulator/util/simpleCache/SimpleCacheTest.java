@@ -28,12 +28,12 @@ import java.util.Map;
 public class SimpleCacheTest {
     @SuppressWarnings("unchecked")
     public static void main(String[] args) {
-        final SimpleCache<Integer, Integer, DefaultSimpleCacheAccessType> cache = new SimpleCache<Integer, Integer, DefaultSimpleCacheAccessType>(3){
+        final SimpleCache<Integer, Integer, DefaultSimpleCacheAccessType> cache = new SimpleCache<Integer, Integer, DefaultSimpleCacheAccessType>(3) {
             private Map<Integer, Integer> nextLevel = new HashMap<Integer, Integer>();
 
             @Override
             protected void doWriteToNextLevel(Integer key, Integer value, boolean writeback) {
-                if(writeback) {
+                if (writeback) {
                     nextLevel.put(key, value);
                 }
 

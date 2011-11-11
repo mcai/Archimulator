@@ -46,7 +46,7 @@ public abstract class Memory extends BasicSimulationObject {
 
     private transient boolean speculative;
     private transient Map<Integer, List<SpeculativeMemoryBlock>> specBlks;
-    
+
     private int numPages;
 
     public Memory(Kernel kernel, String simulationDirectory, boolean littleEndian, int processId) {

@@ -65,6 +65,6 @@ public class CacheReference {
 
     @Override
     public String toString() {
-        return String.format("CacheReference{threadId=%d, tag=%d, accessType=%s}", (getAccess() != null ? getAccess().getThread().getId() : -1), tag, accessType);
+        return String.format("CacheReference{threadId=%d, tag=%s, accessType=%s}", (getAccess() != null ? getAccess().getThread().getId() : -1), tag == -1 ? "<INVALID>" : String.format("0x%08x", tag), accessType);
     }
 }

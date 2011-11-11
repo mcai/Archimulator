@@ -34,7 +34,7 @@ import archimulator.sim.event.DumpStatEvent;
 import archimulator.sim.event.PollStatsEvent;
 import archimulator.sim.event.ResetStatEvent;
 import archimulator.util.action.Action1;
-import archimulator.util.action.Function2;
+import archimulator.util.action.Function3;
 import archimulator.util.action.Predicate;
 
 import java.util.Map;
@@ -55,9 +55,9 @@ public class HtRequestL2VictimTrackingCapability implements ProcessorCapability 
     public HtRequestL2VictimTrackingCapability(Processor processor) {
         CoherentCache<MESIState>.LockableCache ownerCache = processor.getCacheHierarchy().getL2Cache().getCache();
 
-        this.cache = new EvictableCache(processor, ownerCache.getName() + ".htRequestEvictTable", ownerCache.getGeometry(), LeastRecentlyUsedEvictionPolicy.FACTORY, new Function2<Integer, Integer, HtRequestEvictTableLine>() {
-            public HtRequestEvictTableLine apply(Integer set, Integer way) {
-                return new HtRequestEvictTableLine(set, way);
+        this.cache = new EvictableCache(processor, ownerCache.getName() + ".htRequestEvictTable", ownerCache.getGeometry(), LeastRecentlyUsedEvictionPolicy.FACTORY, new Function3<Cache<?, ?>, Integer, Integer, HtRequestEvictTableLine>() {
+            public HtRequestEvictTableLine apply(Cache<?, ?> cache, Integer set, Integer way) {
+                return new HtRequestEvictTableLine(cache, set, way);
             }
         });
 
@@ -72,7 +72,7 @@ public class HtRequestL2VictimTrackingCapability implements ProcessorCapability 
                 if (event.getCache().getCache() == HtRequestL2VictimTrackingCapability.this.ownerCache) {
                     serviceRequest(event.getAddress(), event.getRequesterAccess(), (CoherentCache.LockableCacheLine) event.getLineFound());
 
-                    if(!event.isHitInCache()) {
+                    if (!event.isHitInCache()) {
                         fillLine(event.getAddress(), event.getRequesterAccess(), (CoherentCache.LockableCacheLine) event.getLineFound());
                     }
                 }
@@ -408,13 +408,13 @@ public class HtRequestL2VictimTrackingCapability implements ProcessorCapability 
     private class HtRequestEvictTableLine extends CacheLine<HtRequestEvictTableEntryState> {
         private HtRequest htRequest;
 
-        private HtRequestEvictTableLine(int set, int way) {
-            super(set, way, HtRequestEvictTableEntryState.INVALID);
+        private HtRequestEvictTableLine(Cache<?, ?> cache, int set, int way) {
+            super(cache, set, way, HtRequestEvictTableEntryState.INVALID);
         }
 
         private void setStateAndTag(HtRequestEvictTableEntryState state, int tag) {
             this.setNonInitialState(state);
-            this.tag = tag;
+            this.setTag(tag);
         }
     }
 
@@ -422,16 +422,16 @@ public class HtRequestL2VictimTrackingCapability implements ProcessorCapability 
         private transient boolean htRequest;
         private transient MemoryHierarchyAccess broughterHtAccess;
 
-        private MirrorCacheLine(int set, int way) {
-            super(set, way, true);
+        private MirrorCacheLine(Cache<?, ?> cache, int set, int way) {
+            super(cache, set, way, true);
         }
     }
 
     private class MirrorCache extends Cache<Boolean, MirrorCacheLine> {
         private MirrorCache(String name) {
-            super(cache, name, ownerCache.getGeometry(), new Function2<Integer, Integer, MirrorCacheLine>() {
-                public MirrorCacheLine apply(Integer set, Integer way) {
-                    return new MirrorCacheLine(set, way);
+            super(cache, name, ownerCache.getGeometry(), new Function3<Cache<?, ?>, Integer, Integer, MirrorCacheLine>() {
+                public MirrorCacheLine apply(Cache<?, ?> cache, Integer set, Integer way) {
+                    return new MirrorCacheLine(cache, set, way);
                 }
             });
         }

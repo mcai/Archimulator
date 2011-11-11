@@ -42,7 +42,7 @@ public class CacheMiss<StateT extends Serializable, LineT extends CacheLine<Stat
     @Override
     public CacheAccess<StateT, LineT> commit() {
         if (!this.isBypass()) {
-            this.getLine().tag = this.getReference().getTag(); //TODO: should notify cache's eviction policy
+            this.getLine().setTag(this.getReference().getTag()); //TODO: should notify cache's eviction policy
             this.getCache().getEvictionPolicy().handleInsertionOnMiss(this);
         }
         return super.commit();

@@ -58,4 +58,9 @@ public class CoherentCacheServiceNonblockingRequestEvent extends CoherentCacheEv
     public boolean isEviction() {
         return eviction;
     }
+
+    @Override
+    public String toString() {
+        return String.format("CoherentCacheServiceNonblockingRequestEvent{address=0x%08x, requesterAccess=%s, lineFound=%s, hitInCache=%s, eviction=%s}", address, requesterAccess, lineFound, hitInCache, eviction);
+    }
 }

@@ -72,7 +72,7 @@ public class SimpleCacheBasedNewBigMemoryDataStore extends BasicSimulationObject
 
             @Override
             protected Pair<ByteBuffer, DefaultSimpleCacheAccessType> doReadFromNextLevel(Integer key, ByteBuffer oldValue) {
-                if(oldValue == null) {
+                if (oldValue == null) {
                     oldValue = ByteBuffer.allocateDirect(BUFFER_LENGTH).order(memory.isLittleEndian() ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
                 }
 

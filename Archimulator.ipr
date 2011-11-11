@@ -38,6 +38,12 @@
   <component name="EntryPointsManager">
     <entry_points version="2.0" />
   </component>
+  <component name="ExportToHTMLSettings">
+    <option name="printScope" value="1" />
+    <option name="PRINT_LINE_NUMBERS" value="true" />
+    <option name="OPEN_IN_BROWSER" value="true" />
+    <option name="OUTPUT_DIRECTORY" value="$USER_HOME$/Desktop" />
+  </component>
   <component name="IdProvider" IDEtalkID="8B7CD6B1DC5BAF6EC4A2DBC8818F84AD" />
   <component name="JavadocGenerationManager">
     <option name="OUTPUT_DIRECTORY" />

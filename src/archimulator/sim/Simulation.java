@@ -87,10 +87,6 @@ public class Simulation implements SimulationObject {
 
         this.capabilities = new HashMap<Class<? extends SimulationCapability>, SimulationCapability>();
 
-        for (Map.Entry<Class<? extends SimulationCapability>, SimulationCapabilityFactory> entry : capabilityFactories.entrySet()) {
-            this.capabilities.put(entry.getKey(), entry.getValue().createCapability(this));
-        }
-
         this.processor = new BasicProcessor(this.blockingEventDispatcher, this.cycleAccurateEventQueue, this.logger, this.config.getProcessorConfig(), this.getStrategy().prepareKernel(), this.getStrategy().prepareCacheHierarchy(), this.config.getProcessorConfig().getProcessorCapabilityFactories());
 
         this.getBlockingEventDispatcher().dispatch(new ProcessorInitializedEvent(this.processor));
@@ -107,6 +103,10 @@ public class Simulation implements SimulationObject {
                 dumpStat(event.getStats());
             }
         });
+
+        for (Map.Entry<Class<? extends SimulationCapability>, SimulationCapabilityFactory> entry : capabilityFactories.entrySet()) {
+            this.capabilities.put(entry.getKey(), entry.getValue().createCapability(this));
+        }
     }
 
     public Kernel createKernel() {

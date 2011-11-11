@@ -24,14 +24,14 @@ import archimulator.mem.cache.eviction.EvictionPolicy;
 import archimulator.mem.cache.eviction.EvictionPolicyFactory;
 import archimulator.mem.coherence.CoherentCache;
 import archimulator.sim.SimulationObject;
-import archimulator.util.action.Function2;
+import archimulator.util.action.Function3;
 
 import java.io.Serializable;
 
 public class EvictableCache<StateT extends Serializable, LineT extends CacheLine<StateT>> extends Cache<StateT, LineT> {
     protected EvictionPolicy<StateT, LineT> evictionPolicy;
 
-    public EvictableCache(SimulationObject parent, String name, CacheGeometry geometry, EvictionPolicyFactory evictionPolicyFactory, Function2<Integer, Integer, LineT> createLine) {
+    public EvictableCache(SimulationObject parent, String name, CacheGeometry geometry, EvictionPolicyFactory evictionPolicyFactory, Function3<Cache<?, ?>, Integer, Integer, LineT> createLine) {
         super(parent, name, geometry, createLine);
 
         this.evictionPolicy = evictionPolicyFactory.create(this);

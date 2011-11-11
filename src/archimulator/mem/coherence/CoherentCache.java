@@ -22,10 +22,7 @@ import archimulator.mem.CacheAccessType;
 import archimulator.mem.CacheHierarchy;
 import archimulator.mem.MemoryDevice;
 import archimulator.mem.MemoryHierarchyAccess;
-import archimulator.mem.cache.CacheAccess;
-import archimulator.mem.cache.CacheGeometry;
-import archimulator.mem.cache.CacheLine;
-import archimulator.mem.cache.EvictableCache;
+import archimulator.mem.cache.*;
 import archimulator.mem.cache.eviction.EvictionPolicyFactory;
 import archimulator.mem.coherence.event.CoherentCacheBeginCacheAccessEvent;
 import archimulator.mem.coherence.event.CoherentCacheNonblockingRequestHitToTransientTagEvent;
@@ -37,7 +34,7 @@ import archimulator.sim.event.DumpStatEvent;
 import archimulator.sim.event.ResetStatEvent;
 import archimulator.util.action.Action;
 import archimulator.util.action.Action1;
-import archimulator.util.action.Function2;
+import archimulator.util.action.Function3;
 import archimulator.util.action.NamedAction;
 
 import java.io.IOException;
@@ -223,11 +220,11 @@ public abstract class CoherentCache<StateT extends Serializable> extends MemoryD
     }
 
     public class LockableCacheLine extends CacheLine<StateT> {
-        private transient int transientTag;
+        private transient int transientTag = -1;
         private List<Action> suspendedActions;
 
-        public LockableCacheLine(int set, int way, StateT initialState) {
-            super(set, way, initialState);
+        public LockableCacheLine(Cache<?, ?> cache, int set, int way, StateT initialState) {
+            super(cache, set, way, initialState);
 
             this.suspendedActions = new ArrayList<Action>();
         }
@@ -245,7 +242,7 @@ public abstract class CoherentCache<StateT extends Serializable> extends MemoryD
         public LockableCacheLine unlock() {
             assert (this.isLocked());
 
-            this.transientTag = 0;
+            this.transientTag = -1;
 
             for (Action action : this.suspendedActions) {
                 getCycleAccurateEventQueue().schedule(action, 0);
@@ -261,15 +258,20 @@ public abstract class CoherentCache<StateT extends Serializable> extends MemoryD
         }
 
         public boolean isLocked() {
-            return transientTag != 0;
+            return transientTag != -1;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("LockableCacheLine{set=%d, way=%d, tag=%s, transientTag=%s, state=%s}", getSet(), getWay(), getTag() == -1 ? "<INVALID>" : String.format("0x%08x", getTag()), transientTag == -1 ? "<INVALID>" : String.format("0x%08x", transientTag), getState());
         }
     }
 
     public class LockableCache extends EvictableCache<StateT, LockableCacheLine> {
         public LockableCache(String name, CacheGeometry geometry, final StateT initialState, EvictionPolicyFactory evictionPolicyFactory) {
-            super(CoherentCache.this, name, geometry, evictionPolicyFactory, new Function2<Integer, Integer, LockableCacheLine>() {
-                public LockableCacheLine apply(Integer set, Integer way) {
-                    return new LockableCacheLine(set, way, initialState);
+            super(CoherentCache.this, name, geometry, evictionPolicyFactory, new Function3<Cache<?, ?>, Integer, Integer, LockableCacheLine>() {
+                public LockableCacheLine apply(Cache<?, ?> cache, Integer set, Integer way) {
+                    return new LockableCacheLine(cache, set, way, initialState);
                 }
             });
         }

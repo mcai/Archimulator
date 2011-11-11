@@ -21,7 +21,7 @@ package archimulator.ext.mem.cache.eviction;
 import archimulator.mem.cache.*;
 import archimulator.mem.cache.eviction.EvictionPolicy;
 import archimulator.mem.cache.eviction.EvictionPolicyFactory;
-import archimulator.util.action.Function2;
+import archimulator.util.action.Function3;
 
 import java.io.Serializable;
 
@@ -77,8 +77,8 @@ public class RereferenceIntervalPredictionEvictionPolicy<StateT extends Serializ
     private class MirrorCacheLine extends CacheLine<Boolean> {
         private int predictedRereferenceInterval;
 
-        private MirrorCacheLine(int set, int way) {
-            super(set, way, true);
+        private MirrorCacheLine(Cache<?, ?> cache, int set, int way) {
+            super(cache, set, way, true);
 
             this.predictedRereferenceInterval = predictedRereferenceIntervalMaxValue;
         }
@@ -86,9 +86,9 @@ public class RereferenceIntervalPredictionEvictionPolicy<StateT extends Serializ
 
     private class MirrorCache extends Cache<Boolean, MirrorCacheLine> {
         private MirrorCache() {
-            super(getCache(), getCache().getName() + ".rereferenceIntervalPredictionEvictionPolicy.mirrorCache", getCache().getGeometry(), new Function2<Integer, Integer, MirrorCacheLine>() {
-                public MirrorCacheLine apply(Integer set, Integer way) {
-                    return new MirrorCacheLine(set, way);
+            super(getCache(), getCache().getName() + ".rereferenceIntervalPredictionEvictionPolicy.mirrorCache", getCache().getGeometry(), new Function3<Cache<?, ?>, Integer, Integer, MirrorCacheLine>() {
+                public MirrorCacheLine apply(Cache<?, ?> cache, Integer set, Integer way) {
+                    return new MirrorCacheLine(cache, set, way);
                 }
             });
         }
