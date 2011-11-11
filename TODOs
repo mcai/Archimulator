@@ -1,2 +1,10 @@
 Reading list:
     Predicting Inter-Thread Cache Contention on a Chip Multi-Processor Architecture
+
+Hints from Cache showndown: the good, bad and ugly:
+    Useful prefetches are those that are actually accessed, while harmful prefetches are those that are never accessed
+    and are a direct cause of misses to cache lines that were displaced by that prefetch line. Finally, useless
+    prefetches are those that are never accessed.
+
+    At any point in execution, the union of the non-prefetched tags in the cache and the evict tags in the ET give the state of of cache as if prefetching had never occurred.
+
