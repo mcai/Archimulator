@@ -24,7 +24,7 @@ import archimulator.util.fsm.FiniteStateMachine;
 import java.util.Arrays;
 
 public class ExitStateEvent extends FiniteStateMachineStateChangedEvent {
-    ExitStateEvent(FiniteStateMachine<?, ?> from, Object condition, Object... params) {
+    public ExitStateEvent(FiniteStateMachine<?, ?> from, Object condition, Object... params) {
         super(from, condition, params);
     }
 

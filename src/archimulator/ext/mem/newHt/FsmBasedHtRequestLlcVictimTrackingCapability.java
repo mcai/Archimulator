@@ -162,7 +162,7 @@ public class FsmBasedHtRequestLlcVictimTrackingCapability implements ProcessorCa
                 })
                 .onCondition(CacheLineHtRequestCondition.EVICTED_BY_HT, new Function1X<FiniteStateMachine<CacheLineHtRequestState, CacheLineHtRequestCondition>, CacheLineHtRequestState>() {
                     public CacheLineHtRequestState apply(FiniteStateMachine<CacheLineHtRequestState, CacheLineHtRequestCondition> from, Object... params) {
-                        from.getState().victimTag = (Integer) params[0];
+                        from.put("victimTag", params[0]);
 
                         return CacheLineHtRequestState.INVALID;
                     }
@@ -189,7 +189,7 @@ public class FsmBasedHtRequestLlcVictimTrackingCapability implements ProcessorCa
                 })
                 .onCondition(CacheLineHtRequestCondition.VICTIM_HIT_BY_MT, new Function1X<FiniteStateMachine<CacheLineHtRequestState, CacheLineHtRequestCondition>, CacheLineHtRequestState>() {
                     public CacheLineHtRequestState apply(FiniteStateMachine<CacheLineHtRequestState, CacheLineHtRequestCondition> from, Object... params) {
-                        from.getState().victimTag = -1;
+                        from.put("victimTag", -1);
                         return CacheLineHtRequestState.POLLUTING_HT;
                     }
                 })
@@ -211,7 +211,7 @@ public class FsmBasedHtRequestLlcVictimTrackingCapability implements ProcessorCa
                 })
                 .onCondition(CacheLineHtRequestCondition.VICTIM_HIT_BY_MT, new Function1X<FiniteStateMachine<CacheLineHtRequestState, CacheLineHtRequestCondition>, CacheLineHtRequestState>() {
                     public CacheLineHtRequestState apply(FiniteStateMachine<CacheLineHtRequestState, CacheLineHtRequestCondition> from, Object... params) {
-                        from.getState().victimTag = -1;
+                        from.put("victimTag", -1);
                         return CacheLineHtRequestState.USED_POLLUTING_HT;
                     }
                 })
@@ -295,7 +295,7 @@ public class FsmBasedHtRequestLlcVictimTrackingCapability implements ProcessorCa
         int set = this.llc.getSet(tag);
 
         for (FiniteStateMachine<CacheLineHtRequestState, CacheLineHtRequestCondition> fsm : this.fsms.get(set).values()) {
-            if (fsm.getState().isHt() && fsm.getState().victimTag == tag) {
+            if (fsm.getState().isHt() && fsm.get(Integer.class, "victimTag") == tag) {
                 return fsm;
             }
         }
@@ -318,8 +318,6 @@ public class FsmBasedHtRequestLlcVictimTrackingCapability implements ProcessorCa
         USED_HT,
         POLLUTING_HT,
         USED_POLLUTING_HT;
-
-        private int victimTag = -1;
 
         public boolean isHt() {
             return this == UNUSED_HT || this == POLLUTING_HT;

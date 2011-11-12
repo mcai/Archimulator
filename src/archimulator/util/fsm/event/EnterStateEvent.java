@@ -24,7 +24,7 @@ import archimulator.util.fsm.FiniteStateMachine;
 import java.util.Arrays;
 
 public class EnterStateEvent extends FiniteStateMachineStateChangedEvent {
-    EnterStateEvent(FiniteStateMachine<?, ?> from, Object condition, Object... params) {
+    public EnterStateEvent(FiniteStateMachine<?, ?> from, Object condition, Object... params) {
         super(from, condition, params);
     }
 

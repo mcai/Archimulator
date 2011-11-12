@@ -18,15 +18,31 @@
  ******************************************************************************/
 package archimulator.util.fsm;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class FiniteStateMachine<StateT, ConditionT> {
     private FiniteStateMachineFactory<StateT, ConditionT> factory;
     private String name;
     private StateT state;
 
+    private Map<Object, Object> properties;
+
     public FiniteStateMachine(FiniteStateMachineFactory<StateT, ConditionT> factory, String name, StateT state) {
         this.factory = factory;
         this.name = name;
         this.state = state;
+
+        this.properties = new HashMap<Object, Object>();
+    }
+
+    public void put(Object key, Object value) {
+        this.properties.put(key, value);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T get(Class<T> clz, Object key) {
+        return (T) this.properties.get(key);
     }
 
     public String getName() {
