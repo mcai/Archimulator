@@ -16,28 +16,9 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.util.fsm;
+package archimulator.util.fsm.event;
 
-public class FiniteStateMachineStateChangedEvent extends FiniteStateMachineEvent {
-    private FiniteStateMachine<?, ?> from;
-    private Object condition;
-    private Object[] params;
+import archimulator.util.event.BlockingEvent;
 
-    public FiniteStateMachineStateChangedEvent(FiniteStateMachine<?, ?> from, Object condition, Object... params) {
-        this.from = from;
-        this.condition = condition;
-        this.params = params;
-    }
-
-    public FiniteStateMachine<?, ?> getFrom() {
-        return from;
-    }
-
-    public Object getCondition() {
-        return condition;
-    }
-
-    public Object[] getParams() {
-        return params;
-    }
+public abstract class FiniteStateMachineEvent implements BlockingEvent {
 }

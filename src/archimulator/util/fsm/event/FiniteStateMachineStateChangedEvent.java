@@ -16,19 +16,30 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.util.fsm;
+package archimulator.util.fsm.event;
 
-import archimulator.util.StringHelper;
+import archimulator.util.fsm.FiniteStateMachine;
 
-import java.util.Arrays;
+public class FiniteStateMachineStateChangedEvent extends FiniteStateMachineEvent {
+    private FiniteStateMachine<?, ?> from;
+    private Object condition;
+    private Object[] params;
 
-public class EnterStateEvent extends FiniteStateMachineStateChangedEvent {
-    EnterStateEvent(FiniteStateMachine<?, ?> from, Object condition, Object... params) {
-        super(from, condition, params);
+    public FiniteStateMachineStateChangedEvent(FiniteStateMachine<?, ?> from, Object condition, Object... params) {
+        this.from = from;
+        this.condition = condition;
+        this.params = params;
     }
 
-    @Override
-    public String toString() {
-        return String.format("After %s.%s%s", getFrom(), getCondition(), (getParams() == null || getParams().length == 0 ? "" : "(" + StringHelper.join(Arrays.asList(getParams()), ", ") + ")"));
+    public FiniteStateMachine<?, ?> getFrom() {
+        return from;
+    }
+
+    public Object getCondition() {
+        return condition;
+    }
+
+    public Object[] getParams() {
+        return params;
     }
 }

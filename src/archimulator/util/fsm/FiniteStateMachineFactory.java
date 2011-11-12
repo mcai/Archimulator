@@ -21,6 +21,9 @@ package archimulator.util.fsm;
 import archimulator.util.action.Action2;
 import archimulator.util.action.Function1X;
 import archimulator.util.event.BlockingEventDispatcher;
+import archimulator.util.fsm.event.EnterStateEvent;
+import archimulator.util.fsm.event.ExitStateEvent;
+import archimulator.util.fsm.event.FiniteStateMachineEvent;
 
 import java.util.HashMap;
 import java.util.List;
