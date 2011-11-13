@@ -68,12 +68,8 @@ public abstract class SimpleCache<KeyT, ValueT, AccessTypeT extends SimpleCacheA
 
     protected abstract void doWriteToNextLevel(KeyT key, ValueT value, boolean writeback);
 
-    private void writeToNextLevel(CacheLine line, boolean writeback) {
-        this.doWriteToNextLevel(line.key, line.value, writeback);
-        this.invalidate(line);
-    }
-
     private void invalidate(CacheLine line) {
+        this.doWriteToNextLevel(line.key, line.value, line.isDirty());
         line.key = null;
         line.value = null;
     }
@@ -130,10 +126,10 @@ public abstract class SimpleCache<KeyT, ValueT, AccessTypeT extends SimpleCacheA
             cacheAccess.commit();
         } else {
             if (cacheAccess.isEviction()) {
-                writeToNextLevel(cacheAccess.line, cacheAccess.isWriteback());
+                this.invalidate(cacheAccess.line);
             }
 
-            Pair<ValueT, AccessTypeT> pair = doReadFromNextLevel(key, cacheAccess.line.value);
+            Pair<ValueT, AccessTypeT> pair = this.doReadFromNextLevel(key, cacheAccess.line.value);
             cacheAccess.line.value = pair.getFirst();
             cacheAccess.line.accessType = pair.getSecond();
 
@@ -186,6 +182,14 @@ public abstract class SimpleCache<KeyT, ValueT, AccessTypeT extends SimpleCacheA
         private CacheLine(int set, int way) {
             this.set = set;
             this.way = way;
+        }
+        
+        public boolean isEviction() {
+            return this.key != null;
+        }
+        
+        public boolean isDirty() {
+            return this.isEviction() && this.accessType.isDirty();
         }
     }
 
@@ -288,8 +292,8 @@ public abstract class SimpleCache<KeyT, ValueT, AccessTypeT extends SimpleCacheA
         public CacheMiss(CacheReference reference, CacheLine line) {
             super(reference, line);
 
-            this.eviction = (line.key != null);
-            this.writeback = (line.key != null && line.accessType.isDirty());
+            this.eviction = line.isEviction();
+            this.writeback = line.isDirty();
         }
 
         @Override

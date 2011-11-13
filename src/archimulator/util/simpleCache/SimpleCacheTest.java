@@ -45,7 +45,6 @@ public class SimpleCacheTest {
 //                System.out.printf("doReadFromNextLevel(%d)\n\n", key);
 
                 Integer value = nextLevel.get(key);
-                nextLevel.remove(key);
                 return new Pair<Integer, DefaultSimpleCacheAccessType>(value, DefaultSimpleCacheAccessType.READ);
             }
 
@@ -69,23 +68,23 @@ public class SimpleCacheTest {
         cache.put(0, 1, 22, DefaultSimpleCacheAccessType.WRITE);
         cache.put(0, 2, 33, DefaultSimpleCacheAccessType.WRITE);
         cache.put(0, 3, 44, DefaultSimpleCacheAccessType.WRITE);
-        
+
+        Pair<Integer, Integer> lru = cache.getLRU(0);
+        System.out.println("LRU before removeLRU(..): " + lru);
+        System.out.printf("keys: %s\n\n", Arrays.toString(cache.getKeys(0)));
+
+        cache.removeLRU(0);
+
+        Pair<Integer, Integer> lru1 = cache.getLRU(0);
+        System.out.println("LRU after removeLRU(..): " + lru1);
+        System.out.printf("keys: %s\n\n", Arrays.toString(cache.getKeys(0)));
+
         System.out.println(cache.get(0, 0, DefaultSimpleCacheAccessType.READ));
         System.out.println(cache.get(0, 1, DefaultSimpleCacheAccessType.READ));
         System.out.println(cache.get(0, 2, DefaultSimpleCacheAccessType.READ));
         System.out.println(cache.get(0, 3, DefaultSimpleCacheAccessType.READ));
 
-        Pair<Integer, Integer> lru = cache.getLRU(0);
-        System.out.println(lru);
-        
-        cache.removeLRU(0);
-
-        Pair<Integer, Integer> lru1 = cache.getLRU(0);
-        System.out.println(lru1);
-
-        System.out.println(cache.get(0, 0, DefaultSimpleCacheAccessType.READ));
-
         Pair<Integer, Integer> lru2 = cache.getLRU(0);
-        System.out.println(lru2);
+        System.out.println("LRU after get(..): " + lru2);
     }
 }
