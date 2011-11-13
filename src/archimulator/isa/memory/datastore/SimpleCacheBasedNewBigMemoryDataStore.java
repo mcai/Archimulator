@@ -61,7 +61,7 @@ public class SimpleCacheBasedNewBigMemoryDataStore extends BasicSimulationObject
             }
         });
 
-        this.cache = new SimpleCache<Integer, ByteBuffer, DefaultSimpleCacheAccessType>(NUM_BUFFERS) {
+        this.cache = new SimpleCache<Integer, ByteBuffer, DefaultSimpleCacheAccessType>(1, NUM_BUFFERS) {
             @Override
             protected void doWriteToNextLevel(Integer key, ByteBuffer value, boolean writeback) {
                 if (writeback) {
@@ -140,7 +140,7 @@ public class SimpleCacheBasedNewBigMemoryDataStore extends BasicSimulationObject
     public void access(int pageId, int displacement, byte[] buf, int offset, int size, boolean write) {
         int byteBufferIndex = getByteBufferIndex(pageId);
 
-        ByteBuffer bb = this.cache.get(byteBufferIndex, write ? DefaultSimpleCacheAccessType.WRITE : DefaultSimpleCacheAccessType.READ);
+        ByteBuffer bb = this.cache.get(0, byteBufferIndex, write ? DefaultSimpleCacheAccessType.WRITE : DefaultSimpleCacheAccessType.READ);
 
         int directByteBufferDisplacement = getDirectByteBufferDisplacement(pageId);
 
@@ -148,7 +148,7 @@ public class SimpleCacheBasedNewBigMemoryDataStore extends BasicSimulationObject
 
         if (write) {
             bb.put(buf, offset, size);
-            this.cache.put(byteBufferIndex, bb, DefaultSimpleCacheAccessType.WRITE);
+            this.cache.put(0, byteBufferIndex, bb, DefaultSimpleCacheAccessType.WRITE);
         } else {
             bb.get(buf, offset, size);
         }

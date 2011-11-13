@@ -28,7 +28,7 @@ import java.util.Map;
 public class SimpleCacheTest {
     @SuppressWarnings("unchecked")
     public static void main(String[] args) {
-        final SimpleCache<Integer, Integer, DefaultSimpleCacheAccessType> cache = new SimpleCache<Integer, Integer, DefaultSimpleCacheAccessType>(3) {
+        final SimpleCache<Integer, Integer, DefaultSimpleCacheAccessType> cache = new SimpleCache<Integer, Integer, DefaultSimpleCacheAccessType>(1, 3) {
             private Map<Integer, Integer> nextLevel = new HashMap<Integer, Integer>();
 
             @Override
@@ -54,25 +54,38 @@ public class SimpleCacheTest {
         cache.getCacheEventDispatcher().addListener(SetValueEvent.class, new Action1<SetValueEvent>() {
             public void apply(SetValueEvent event) {
                 System.out.printf("setValue(%s)\n", event);
-                System.out.printf("keys: %s\n\n", Arrays.toString(cache.getKeys()));
+                System.out.printf("keys: %s\n\n", Arrays.toString(cache.getKeys(0)));
             }
         });
 
         cache.getCacheEventDispatcher().addListener(GetValueEvent.class, new Action1<GetValueEvent>() {
             public void apply(GetValueEvent event) {
                 System.out.printf("getValue(%s)\n", event);
-                System.out.printf("keys: %s\n\n", Arrays.toString(cache.getKeys()));
+                System.out.printf("keys: %s\n\n", Arrays.toString(cache.getKeys(0)));
             }
         });
 
-        cache.put(0, 11, DefaultSimpleCacheAccessType.WRITE);
-        cache.put(1, 22, DefaultSimpleCacheAccessType.WRITE);
-        cache.put(2, 33, DefaultSimpleCacheAccessType.WRITE);
-        cache.put(3, 44, DefaultSimpleCacheAccessType.WRITE);
+        cache.put(0, 0, 11, DefaultSimpleCacheAccessType.WRITE);
+        cache.put(0, 1, 22, DefaultSimpleCacheAccessType.WRITE);
+        cache.put(0, 2, 33, DefaultSimpleCacheAccessType.WRITE);
+        cache.put(0, 3, 44, DefaultSimpleCacheAccessType.WRITE);
+        
+        System.out.println(cache.get(0, 0, DefaultSimpleCacheAccessType.READ));
+        System.out.println(cache.get(0, 1, DefaultSimpleCacheAccessType.READ));
+        System.out.println(cache.get(0, 2, DefaultSimpleCacheAccessType.READ));
+        System.out.println(cache.get(0, 3, DefaultSimpleCacheAccessType.READ));
 
-        System.out.println(cache.get(0, DefaultSimpleCacheAccessType.READ));
-        System.out.println(cache.get(1, DefaultSimpleCacheAccessType.READ));
-        System.out.println(cache.get(2, DefaultSimpleCacheAccessType.READ));
-        System.out.println(cache.get(3, DefaultSimpleCacheAccessType.READ));
+        Pair<Integer, Integer> lru = cache.getLRU(0);
+        System.out.println(lru);
+        
+        cache.removeLRU(0);
+
+        Pair<Integer, Integer> lru1 = cache.getLRU(0);
+        System.out.println(lru1);
+
+        System.out.println(cache.get(0, 0, DefaultSimpleCacheAccessType.READ));
+
+        Pair<Integer, Integer> lru2 = cache.getLRU(0);
+        System.out.println(lru2);
     }
 }

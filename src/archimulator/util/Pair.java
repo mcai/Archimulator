@@ -54,4 +54,9 @@ public class Pair<K, T> {
         result = 31 * result + second.hashCode();
         return result;
     }
+
+    @Override
+    public String toString() {
+        return String.format("Pair{first=%s, second=%s}", first, second);
+    }
 }

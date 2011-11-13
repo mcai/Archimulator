@@ -27,15 +27,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class SimpleCache<KeyT, ValueT, AccessTypeT extends SimpleCacheAccessType> {
-    private List<CacheLine> lines;
+    private List<List<CacheLine>> lines;
     private LeastRecentlyUsedEvictionPolicy evictionPolicy;
     private BlockingEventDispatcher<CacheEvent> cacheEventDispatcher;
+    private int numSets;
+    private int associativity;
 
-    public SimpleCache(int size) {
-        this.lines = new ArrayList<CacheLine>();
+    public SimpleCache(int numSets, int associativity) {
+        this.numSets = numSets;
+        this.associativity = associativity;
 
-        for (int i = 0; i < size; i++) {
-            this.lines.add(new CacheLine(i));
+        this.lines = new ArrayList<List<CacheLine>>();
+
+        for(int i = 0; i < numSets; i++) {
+            ArrayList<CacheLine> linesPerSet = new ArrayList<CacheLine>();
+            this.lines.add(linesPerSet);
+            
+            for (int j = 0; j < associativity; j++) {
+                linesPerSet.add(new CacheLine(i, j));
+            }
         }
 
         this.evictionPolicy = new LeastRecentlyUsedEvictionPolicy();
@@ -44,46 +54,76 @@ public abstract class SimpleCache<KeyT, ValueT, AccessTypeT extends SimpleCacheA
     }
 
     @SuppressWarnings("unchecked")
-    public KeyT[] getKeys() {
+    public KeyT[] getKeys(int set) {
         List<KeyT> keys = new ArrayList<KeyT>();
 
-        for (int i = 0; i < this.lines.size(); i++) {
-            keys.add(this.evictionPolicy.getCacheLineInStackPosition(i).key);
+        for (int i = 0; i < this.associativity; i++) {
+            keys.add(this.evictionPolicy.getCacheLineInStackPosition(set, i).key);
         }
 
         return (KeyT[]) keys.toArray();
     }
 
+    protected abstract Pair<ValueT, AccessTypeT> doReadFromNextLevel(KeyT key, ValueT oldValue);
+
     protected abstract void doWriteToNextLevel(KeyT key, ValueT value, boolean writeback);
 
-    public void writeToNextLevel(CacheLine line, boolean writeback) {
+    private void writeToNextLevel(CacheLine line, boolean writeback) {
         this.doWriteToNextLevel(line.key, line.value, writeback);
+        this.invalidate(line);
+    }
+
+    private void invalidate(CacheLine line) {
         line.key = null;
         line.value = null;
     }
 
-    protected abstract Pair<ValueT, AccessTypeT> doReadFromNextLevel(KeyT key, ValueT oldValue);
+    public Pair<KeyT, ValueT> getLRU(int set) {
+        int way = this.evictionPolicy.getLRU(set);
 
-    public ValueT get(KeyT key, AccessTypeT type) {
+        CacheLine line = this.getLine(set, way);
+
+        return new Pair<KeyT, ValueT>(line.key, line.value);
+    }
+    
+    public void setLRU(int set, KeyT key) {
+        CacheLine line = this.findLine(set, key);
+        
+        if(line == null) {
+            throw new IllegalArgumentException();
+        }
+        
+        this.evictionPolicy.setLRU(set, line.way);
+    }
+    
+    public void removeLRU(int set) {
+        int way = this.evictionPolicy.getLRU(set);
+
+        CacheLine line = this.getLine(set, way);
+
+        this.invalidate(line);
+    }
+
+    public ValueT get(int set, KeyT key, AccessTypeT type) {
         Reference<ValueT> valueRef = new Reference<ValueT>();
-        this.access(key, valueRef, type, false);
+        this.access(set, key, valueRef, type, false);
         return valueRef.get();
     }
 
-    public void put(KeyT key, ValueT value, AccessTypeT type) {
+    public void put(int set, KeyT key, ValueT value, AccessTypeT type) {
         Reference<ValueT> valueRef = new Reference<ValueT>(value);
-        this.access(key, valueRef, type, true);
+        this.access(set, key, valueRef, type, true);
     }
 
-    private void access(KeyT key, Reference<ValueT> value, AccessTypeT type, boolean write) {
-        CacheLine line = this.findLine(key);
+    private void access(int set, KeyT key, Reference<ValueT> value, AccessTypeT type, boolean write) {
+        CacheLine line = this.findLine(set, key);
 
         CacheAccess cacheAccess;
 
         if (line != null) {
-            cacheAccess = this.newHit(key, value, type, write, line);
+            cacheAccess = this.newHit(set, key, value, type, write, line);
         } else {
-            cacheAccess = this.newMiss(key, value, type, write);
+            cacheAccess = this.newMiss(set, key, value, type, write);
         }
 
         if (cacheAccess.isHitInCache()) {
@@ -101,15 +141,15 @@ public abstract class SimpleCache<KeyT, ValueT, AccessTypeT extends SimpleCacheA
         }
     }
 
-    private CacheAccess newHit(KeyT key, Reference<ValueT> value, AccessTypeT type, boolean write, CacheLine line) {
-        return new CacheHit(new CacheReference(key, value, type, write), line);
+    private CacheAccess newHit(int set, KeyT key, Reference<ValueT> value, AccessTypeT type, boolean write, CacheLine line) {
+        return new CacheHit(new CacheReference(set, key, value, type, write), line);
     }
 
-    private CacheAccess newMiss(KeyT key, Reference<ValueT> value, AccessTypeT type, boolean write) {
-        CacheReference reference = new CacheReference(key, value, type, write);
+    private CacheAccess newMiss(int set, KeyT key, Reference<ValueT> value, AccessTypeT type, boolean write) {
+        CacheReference reference = new CacheReference(set, key, value, type, write);
 
-        for (int i = 0; i < lines.size(); i++) {
-            CacheLine line = getLine(i);
+        for (int i = 0; i < this.associativity; i++) {
+            CacheLine line = getLine(set, i);
             if (line.key == null) {
                 return new CacheMiss(reference, line);
             }
@@ -118,12 +158,12 @@ public abstract class SimpleCache<KeyT, ValueT, AccessTypeT extends SimpleCacheA
         return evictionPolicy.handleReplacement(reference);
     }
 
-    private CacheLine getLine(int way) {
-        return this.lines.get(way);
+    private CacheLine getLine(int set, int way) {
+        return this.lines.get(set).get(way);
     }
 
-    private CacheLine findLine(KeyT key) {
-        for (CacheLine line : this.lines) {
+    private CacheLine findLine(int set, KeyT key) {
+        for (CacheLine line : this.lines.get(set)) {
             if (line.key != null && line.key.equals(key)) {
                 return line;
             }
@@ -136,24 +176,28 @@ public abstract class SimpleCache<KeyT, ValueT, AccessTypeT extends SimpleCacheA
         return cacheEventDispatcher;
     }
 
-    public class CacheLine {
+    private class CacheLine {
+        private int set;
         private int way;
         private KeyT key;
         private ValueT value;
         private AccessTypeT accessType;
 
-        public CacheLine(int way) {
+        private CacheLine(int set, int way) {
+            this.set = set;
             this.way = way;
         }
     }
 
-    public class CacheReference {
+    private class CacheReference {
+        private int set;
         private KeyT key;
         private Reference<ValueT> value;
         private AccessTypeT type;
         private boolean write;
 
-        public CacheReference(KeyT key, Reference<ValueT> value, AccessTypeT type, boolean write) {
+        private CacheReference(int set, KeyT key, Reference<ValueT> value, AccessTypeT type, boolean write) {
+            this.set = set;
             this.key = key;
             this.value = value;
             this.type = type;
@@ -161,7 +205,7 @@ public abstract class SimpleCache<KeyT, ValueT, AccessTypeT extends SimpleCacheA
         }
     }
 
-    public abstract class CacheAccess {
+    private abstract class CacheAccess {
         CacheReference reference;
         CacheLine line;
 
@@ -210,7 +254,7 @@ public abstract class SimpleCache<KeyT, ValueT, AccessTypeT extends SimpleCacheA
         public abstract boolean isWriteback();
     }
 
-    public class CacheHit extends CacheAccess {
+    private class CacheHit extends CacheAccess {
         public CacheHit(CacheReference reference, CacheLine line) {
             super(reference, line);
         }
@@ -237,7 +281,7 @@ public abstract class SimpleCache<KeyT, ValueT, AccessTypeT extends SimpleCacheA
         }
     }
 
-    public class CacheMiss extends CacheAccess {
+    private class CacheMiss extends CacheAccess {
         private boolean eviction;
         private boolean writeback;
 
@@ -271,7 +315,7 @@ public abstract class SimpleCache<KeyT, ValueT, AccessTypeT extends SimpleCacheA
         }
     }
 
-    public static interface EvictionPolicy<CacheReferenceT, CacheHitT, CacheMissT> {
+    private static interface EvictionPolicy<CacheReferenceT, CacheHitT, CacheMissT> {
         CacheMissT handleReplacement(CacheReferenceT reference);
 
         void handlePromotionOnHit(CacheHitT hit);
@@ -279,54 +323,60 @@ public abstract class SimpleCache<KeyT, ValueT, AccessTypeT extends SimpleCacheA
         void handleInsertionOnMiss(CacheMissT miss);
     }
 
-    public abstract class StackBasedEvictionPolicy implements EvictionPolicy<CacheReference, CacheHit, CacheMiss> {
-        private List<StackEntry> stackEntries;
+    private abstract class StackBasedEvictionPolicy implements EvictionPolicy<CacheReference, CacheHit, CacheMiss> {
+        private List<List<StackEntry>> stackEntries;
 
         protected StackBasedEvictionPolicy() {
-            this.stackEntries = new ArrayList<StackEntry>();
-
-            for (int i = 0; i < lines.size(); i++) {
-                this.stackEntries.add(new StackEntry(getLine(i)));
+            this.stackEntries = new ArrayList<List<StackEntry>>();
+            
+            for(int i = 0; i < numSets; i++) {
+                ArrayList<StackEntry> stackEntriesPerSet = new ArrayList<StackEntry>();
+                this.stackEntries.add(stackEntriesPerSet);
+                
+                for(int j = 0; j < associativity; j++) {
+                    stackEntriesPerSet.add(new StackEntry(getLine(i, j)));
+                    
+                }
             }
         }
 
-        public int getMRU() {
-            return this.getCacheLineInStackPosition(0).way;
+        public int getMRU(int set) {
+            return this.getCacheLineInStackPosition(set, 0).way;
         }
 
-        public int getLRU() {
-            return this.getCacheLineInStackPosition(lines.size() - 1).way;
+        public int getLRU(int set) {
+            return this.getCacheLineInStackPosition(set, associativity - 1).way;
         }
 
-        public void setMRU(int way) {
-            this.setStackPosition(way, 0);
+        public void setMRU(int set, int way) {
+            this.setStackPosition(set, way, 0);
         }
 
-        public void setLRU(int way) {
-            this.setStackPosition(way, lines.size() - 1);
+        public void setLRU(int set, int way) {
+            this.setStackPosition(set, way, associativity - 1);
         }
 
-        public int getWayInStackPosition(int stackPosition) {
-            return this.getCacheLineInStackPosition(stackPosition).way;
+        public int getWayInStackPosition(int set, int stackPosition) {
+            return this.getCacheLineInStackPosition(set, stackPosition).way;
         }
 
-        public CacheLine getCacheLineInStackPosition(int stackPosition) {
-            return this.stackEntries.get(stackPosition).line;
+        public CacheLine getCacheLineInStackPosition(int set, int stackPosition) {
+            return this.stackEntries.get(set).get(stackPosition).line;
         }
 
-        public int getStackPosition(int way) {
-            StackEntry stackEntryFound = this.getStackEntry(way);
-            return this.stackEntries.indexOf(stackEntryFound);
+        public int getStackPosition(int set, int way) {
+            StackEntry stackEntryFound = this.getStackEntry(set, way);
+            return this.stackEntries.get(set).indexOf(stackEntryFound);
         }
 
-        public void setStackPosition(int way, int newStackPosition) {
-            StackEntry stackEntryFound = this.getStackEntry(way);
-            this.stackEntries.remove(stackEntryFound);
-            this.stackEntries.add(newStackPosition, stackEntryFound);
+        public void setStackPosition(int set, int way, int newStackPosition) {
+            StackEntry stackEntryFound = this.getStackEntry(set, way);
+            this.stackEntries.get(set).remove(stackEntryFound);
+            this.stackEntries.get(set).add(newStackPosition, stackEntryFound);
         }
 
-        private StackEntry getStackEntry(int way) {
-            for (StackEntry stackEntry : this.stackEntries) {
+        private StackEntry getStackEntry(int set, int way) {
+            for (StackEntry stackEntry : this.stackEntries.get(set)) {
                 if (stackEntry.line.way == way) {
                     return stackEntry;
                 }
@@ -344,17 +394,17 @@ public abstract class SimpleCache<KeyT, ValueT, AccessTypeT extends SimpleCacheA
         }
     }
 
-    public class LeastRecentlyUsedEvictionPolicy extends StackBasedEvictionPolicy {
+    private class LeastRecentlyUsedEvictionPolicy extends StackBasedEvictionPolicy {
         public CacheMiss handleReplacement(CacheReference reference) {
-            return new CacheMiss(reference, getLine(this.getLRU()));
+            return new CacheMiss(reference, getLine(reference.set, this.getLRU(reference.set)));
         }
 
         public void handlePromotionOnHit(CacheHit hit) {
-            this.setMRU(hit.line.way);
+            this.setMRU(hit.line.set, hit.line.way);
         }
 
         public void handleInsertionOnMiss(CacheMiss miss) {
-            this.setMRU(miss.line.way);
+            this.setMRU(miss.line.set, miss.line.way);
         }
     }
 }
