@@ -18,10 +18,10 @@
  ******************************************************************************/
 package archimulator.core;
 
-import archimulator.mem.MemoryAccessInitiatedEvent;
-import archimulator.mem.MemoryHierarchyAccess;
-import archimulator.mem.MemoryHierarchyAccessType;
-import archimulator.mem.coherence.FirstLevelCache;
+import archimulator.uncore.MemoryAccessInitiatedEvent;
+import archimulator.uncore.MemoryHierarchyAccess;
+import archimulator.uncore.MemoryHierarchyAccessType;
+import archimulator.uncore.coherence.FirstLevelCache;
 import archimulator.sim.BasicSimulationObject;
 import archimulator.util.action.Action;
 import archimulator.util.math.Counter;

@@ -18,8 +18,8 @@
  ******************************************************************************/
 package archimulator.sim;
 
-import archimulator.mem.BasicCacheHierarchy;
-import archimulator.mem.CacheHierarchy;
+import archimulator.uncore.BasicCacheHierarchy;
+import archimulator.uncore.CacheHierarchy;
 import archimulator.os.Kernel;
 import archimulator.util.io.serialization.StandardJavaSerializationHelper;
 

@@ -18,8 +18,8 @@
  ******************************************************************************/
 package archimulator.sim.strategy;
 
-import archimulator.mem.BasicCacheHierarchy;
-import archimulator.mem.CacheHierarchy;
+import archimulator.uncore.BasicCacheHierarchy;
+import archimulator.uncore.CacheHierarchy;
 import archimulator.os.Kernel;
 import archimulator.sim.Simulation;
 

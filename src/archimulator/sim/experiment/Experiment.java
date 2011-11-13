@@ -20,9 +20,9 @@ package archimulator.sim.experiment;
 
 import archimulator.core.ProcessorConfig;
 import archimulator.isa.NativeMipsIsaEmulatorCapability;
-import archimulator.mem.MemoryHierarchyConfig;
-import archimulator.mem.cache.eviction.EvictionPolicyFactory;
-import archimulator.mem.cache.eviction.LeastRecentlyUsedEvictionPolicy;
+import archimulator.uncore.MemoryHierarchyConfig;
+import archimulator.uncore.cache.eviction.EvictionPolicyFactory;
+import archimulator.uncore.cache.eviction.LeastRecentlyUsedEvictionPolicy;
 import archimulator.os.KernelCapability;
 import archimulator.os.KernelCapabilityFactory;
 import archimulator.sim.ContextConfig;

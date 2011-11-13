@@ -20,8 +20,8 @@ package archimulator.core;
 
 import archimulator.core.bpred.BranchPredictorConfig;
 import archimulator.core.bpred.PerfectBranchPredictorConfig;
-import archimulator.mem.MemoryHierarchyConfig;
-import archimulator.mem.tlb.TranslationLookasideBufferConfig;
+import archimulator.uncore.MemoryHierarchyConfig;
+import archimulator.uncore.tlb.TranslationLookasideBufferConfig;
 import archimulator.os.KernelCapability;
 import archimulator.os.KernelCapabilityFactory;
 import archimulator.sim.capability.ProcessorCapability;

@@ -19,10 +19,10 @@
 package archimulator.isa.memory.datastore;
 
 import archimulator.isa.memory.Memory;
-import archimulator.mem.CacheAccessType;
-import archimulator.mem.cache.*;
-import archimulator.mem.cache.eviction.EvictionPolicyFactory;
-import archimulator.mem.cache.eviction.LeastRecentlyUsedEvictionPolicy;
+import archimulator.uncore.CacheAccessType;
+import archimulator.uncore.cache.*;
+import archimulator.uncore.cache.eviction.EvictionPolicyFactory;
+import archimulator.uncore.cache.eviction.LeastRecentlyUsedEvictionPolicy;
 import archimulator.sim.BasicSimulationObject;
 import archimulator.sim.SimulationObject;
 import archimulator.sim.event.PollStatsEvent;

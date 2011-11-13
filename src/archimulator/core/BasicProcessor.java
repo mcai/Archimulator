@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.core;
 
-import archimulator.mem.CacheHierarchy;
+import archimulator.uncore.CacheHierarchy;
 import archimulator.os.Context;
 import archimulator.os.ContextKilledEvent;
 import archimulator.os.ContextState;

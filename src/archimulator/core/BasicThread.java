@@ -25,7 +25,7 @@ import archimulator.core.event.InstructionDecodedEvent;
 import archimulator.isa.RegisterDependencyType;
 import archimulator.isa.StaticInstruction;
 import archimulator.isa.StaticInstructionType;
-import archimulator.mem.MemoryHierarchyThread;
+import archimulator.uncore.MemoryHierarchyThread;
 import archimulator.os.ContextState;
 import archimulator.sim.Logger;
 import archimulator.sim.event.ResetStatEvent;

@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.core;
 
-import archimulator.mem.MemoryHierarchyThread;
+import archimulator.uncore.MemoryHierarchyThread;
 import archimulator.os.Context;
 
 public interface Thread extends MemoryHierarchyThread {

@@ -18,8 +18,8 @@
  ******************************************************************************/
 package archimulator.core;
 
-import archimulator.mem.MemoryHierarchyCore;
-import archimulator.mem.coherence.FirstLevelCache;
+import archimulator.uncore.MemoryHierarchyCore;
+import archimulator.uncore.coherence.FirstLevelCache;
 import archimulator.util.action.Action;
 
 import java.util.List;
