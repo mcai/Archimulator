@@ -21,10 +21,8 @@ package archimulator.ext.uncore.newHt2;
 import archimulator.core.BasicThread;
 import archimulator.uncore.cache.Cache;
 import archimulator.uncore.cache.CacheLine;
-import archimulator.uncore.cache.event.CacheLineInvalidatedEvent;
-import archimulator.uncore.cache.event.CacheLineStateChangedToNonInitialStateEvent;
-import archimulator.uncore.cache.event.CacheLineTagChangedEvent;
-import archimulator.uncore.cache.event.CacheLineValidatedEvent;
+import archimulator.uncore.cache.EvictableCache;
+import archimulator.uncore.cache.eviction.LeastRecentlyUsedEvictionPolicy;
 import archimulator.uncore.coherence.CoherentCache;
 import archimulator.uncore.coherence.MESIState;
 import archimulator.uncore.coherence.event.CoherentCacheServiceNonblockingRequestEvent;
@@ -37,15 +35,13 @@ import archimulator.sim.event.ResetStatEvent;
 import archimulator.util.action.Action1;
 import archimulator.util.action.Function3;
 
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
 public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements SimulationCapability {
     private CoherentCache<MESIState>.LockableCache llc;
 
-    private Cache<HtRequestVictimCacheLineState, HtRequestVictimCacheLine> htRequestVictimCache;
+    private EvictableCache<HtRequestVictimCacheLineState, HtRequestVictimCacheLine> htRequestVictimCache;
     private Map<Integer, Map<Integer, LastLevelCacheLineHtRequestState>> htRequestStates;
 
     private long totalHtRequests;
@@ -53,14 +49,10 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
     private long pollutingHtRequests;
     private long unusedHtRequests;
 
-    private PrintWriter fileWriter;
-    private Simulation simulation;
-
     public LastLevelCacheHtRequestCachePollutionProfilingCapability(final Simulation simulation) {
-        this.simulation = simulation;
         this.llc = simulation.getProcessor().getCacheHierarchy().getL2Cache().getCache();
 
-        this.htRequestVictimCache = new Cache<HtRequestVictimCacheLineState, HtRequestVictimCacheLine>(simulation.getProcessor(), this.llc.getName() + ".htRequestVictimCache", this.llc.getGeometry(), new Function3<Cache<?, ?>, Integer, Integer, HtRequestVictimCacheLine>() {
+        this.htRequestVictimCache = new EvictableCache<HtRequestVictimCacheLineState, HtRequestVictimCacheLine>(simulation.getProcessor(), this.llc.getName() + ".htRequestVictimCache", this.llc.getGeometry(), LeastRecentlyUsedEvictionPolicy.FACTORY, new Function3<Cache<?, ?>, Integer, Integer, HtRequestVictimCacheLine>() {
             public HtRequestVictimCacheLine apply(Cache<?, ?> cache, Integer set, Integer way) {
                 return new HtRequestVictimCacheLine(cache, set, way);
             }
@@ -80,38 +72,6 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
             public void apply(CoherentCacheServiceNonblockingRequestEvent event) {
                 if (event.getCache().getCache() == LastLevelCacheHtRequestCachePollutionProfilingCapability.this.llc) {
                     serviceRequest(event);
-                }
-            }
-        });
-
-        simulation.getBlockingEventDispatcher().addListener(CacheLineInvalidatedEvent.class, new Action1<CacheLineInvalidatedEvent>() {
-            public void apply(CacheLineInvalidatedEvent event) {
-                if (event.getLine().getCache() == LastLevelCacheHtRequestCachePollutionProfilingCapability.this.llc) {
-                    fileWriter.printf("[%d] %s\n", simulation.getCycleAccurateEventQueue().getCurrentCycle(), event);
-                }
-            }
-        });
-
-        simulation.getBlockingEventDispatcher().addListener(CacheLineValidatedEvent.class, new Action1<CacheLineValidatedEvent>() {
-            public void apply(CacheLineValidatedEvent event) {
-                if (event.getLine().getCache() == LastLevelCacheHtRequestCachePollutionProfilingCapability.this.llc) {
-                    fileWriter.printf("[%d] %s\n", simulation.getCycleAccurateEventQueue().getCurrentCycle(), event);
-                }
-            }
-        });
-
-        simulation.getBlockingEventDispatcher().addListener(CacheLineStateChangedToNonInitialStateEvent.class, new Action1<CacheLineStateChangedToNonInitialStateEvent>() {
-            public void apply(CacheLineStateChangedToNonInitialStateEvent event) {
-                if (event.getLine().getCache() == LastLevelCacheHtRequestCachePollutionProfilingCapability.this.llc) {
-//                    fileWriter.printf("[%d] %s\n", simulation.getCycleAccurateEventQueue().getCurrentCycle(), event);
-                }
-            }
-        });
-
-        simulation.getBlockingEventDispatcher().addListener(CacheLineTagChangedEvent.class, new Action1<CacheLineTagChangedEvent>() {
-            public void apply(CacheLineTagChangedEvent event) {
-                if (event.getLine().getCache() == LastLevelCacheHtRequestCachePollutionProfilingCapability.this.llc) {
-//                    fileWriter.printf("[%d] %s\n", simulation.getCycleAccurateEventQueue().getCurrentCycle(), event);
                 }
             }
         });
@@ -138,13 +98,6 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
                 }
             }
         });
-
-        String logFileName = simulation.getConfig().getCwd() + "/LastLevelCacheHtRequestCachePollutionProfilingCapability.out";
-        try {
-            this.fileWriter = new PrintWriter(logFileName);
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     private void dumpStats(Map<String, Object> stats) {
@@ -155,32 +108,33 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
     }
 
     private void serviceRequest(CoherentCacheServiceNonblockingRequestEvent event) {
-        if(!event.isHitInCache() && event.isEviction()) {
-//        if (event.isHitInCache()) {
-            this.fileWriter.printf("[%d] %s\n", this.simulation.getCycleAccurateEventQueue().getCurrentCycle(), event);
-        }
-
         boolean requesterIsHt = BasicThread.isHelperThread(event.getRequesterAccess().getThread());
         CacheLine<?> ownerCacheLine = event.getLineFound();
+        
         LastLevelCacheLineHtRequestState htRequestState = this.htRequestStates.get(ownerCacheLine.getSet()).get(ownerCacheLine.getWay());
+        boolean victimIsHt = htRequestState == LastLevelCacheLineHtRequestState.HT;
 
-        if (event.isHitInCache()) {
-//            fsm.fireTransition(requesterIsHt ? CacheLineHtRequestCondition.HT_HIT : CacheLineHtRequestCondition.MT_HIT);
-        } else {
-            if (event.isEviction()) {
-//                fsm.fireTransition(requesterIsHt ? CacheLineHtRequestCondition.EVICTED_BY_HT : CacheLineHtRequestCondition.EVICTED_BY_MT, event.getLineFound().getTag());
-            }
+        HtRequestVictimCacheLine htRequestVictimCacheLine = this.findHtRequestVictimCacheLine(this.llc.getTag(event.getAddress()));
 
-            HtRequestVictimCacheLine lineForVictim = this.findVictimLineForTag(this.llc.getTag(event.getAddress()));
-            if (lineForVictim != null) {
-//                lineForVictim.fireTransition(CacheLineHtRequestCondition.VICTIM_HIT_BY_MT);
-            }
-//
-//            fsm.fireTransition(requesterIsHt ? CacheLineHtRequestCondition.HT_MISS : CacheLineHtRequestCondition.MT_MISS);
+        if(requesterIsHt && !event.isHitInCache() && !event.isEviction()) {
+            // case 1
+
+        }
+        else if(requesterIsHt && !event.isHitInCache() && event.isEviction() && !victimIsHt) {
+            // case 2
+        }
+        else if(requesterIsHt && !event.isHitInCache() && event.isEviction() && victimIsHt) {
+            //  case 3
+        }
+        else if(!requesterIsHt && !event.isHitInCache() && event.isEviction() && victimIsHt) {
+            // case 4
+        }
+        else if(!requesterIsHt && !victimIsHt) { //TODO: case 5
+            //case 5
         }
     }
 
-    public HtRequestVictimCacheLine findVictimLineForTag(int tag) {
+    public HtRequestVictimCacheLine findHtRequestVictimCacheLine(int tag) {
         int set = this.llc.getSet(tag);
 
         for (int way = 0; way < this.llc.getAssociativity(); way++) {
@@ -191,14 +145,6 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
         }
 
         return null;
-    }
-
-    @Override
-    protected void finalize() throws Throwable {
-        this.fileWriter.flush();
-        this.fileWriter.close();
-
-        super.finalize();
     }
 
     private class HtRequestVictimCacheLine extends CacheLine<HtRequestVictimCacheLineState> {
