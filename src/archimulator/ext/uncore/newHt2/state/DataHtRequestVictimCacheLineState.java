@@ -19,18 +19,7 @@
 package archimulator.ext.uncore.newHt2.state;
 
 public class DataHtRequestVictimCacheLineState extends HtRequestVictimCacheLineState {
-    private int victimTag;
-
-    public DataHtRequestVictimCacheLineState(int victimTag) {
+    public DataHtRequestVictimCacheLineState() {
         super(HtRequestVictimCacheLineStateType.DATA);
-        this.victimTag = victimTag;
-    }
-
-    public int getVictimTag() {
-        return victimTag;
-    }
-
-    public void setVictimTag(int victimTag) {
-        this.victimTag = victimTag;
     }
 }

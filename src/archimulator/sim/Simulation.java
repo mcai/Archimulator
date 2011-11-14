@@ -26,9 +26,7 @@ import archimulator.os.Context;
 import archimulator.os.Kernel;
 import archimulator.sim.capability.SimulationCapability;
 import archimulator.sim.capability.SimulationCapabilityFactory;
-import archimulator.sim.event.DumpStatEvent;
-import archimulator.sim.event.PollStatsEvent;
-import archimulator.sim.event.ProcessorInitializedEvent;
+import archimulator.sim.event.*;
 import archimulator.sim.strategy.SimulationStrategy;
 import archimulator.util.StopWatch;
 import archimulator.util.StringHelper;
@@ -146,7 +144,11 @@ public class Simulation implements SimulationObject {
                 }
             }, 2000, 10000);
 
+            this.getBlockingEventDispatcher().dispatch(new SimulationStartedEvent());
+
             this.getStrategy().execute();
+
+            this.getBlockingEventDispatcher().dispatch(new SimulationStoppedEvent());
 
             timerDumpState.cancel();
 

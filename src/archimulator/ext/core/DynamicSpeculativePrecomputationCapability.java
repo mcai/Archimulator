@@ -96,7 +96,7 @@ public class DynamicSpeculativePrecomputationCapability implements ProcessorCapa
                 }
             }
 
-            throw null;
+            return null;
         }
     }
 

@@ -1,0 +1,41 @@
+[1856830] htRequest: CoherentCacheServiceNonblockingRequestEvent{address=0x00002c00, requesterAccess=c1t0 0x00402c3c: 0x00002c00 IFETCH, lineFound=LockableCacheLine{set=176, way=0, tag=<INVALID>, transientTag=0x00002c00, state=INVALID}, hitInCache=false, eviction=false}
+[1857083] htRequest: CoherentCacheServiceNonblockingRequestEvent{address=0x00002c40, requesterAccess=c1t0 0x00402c68: 0x00002c40 IFETCH, lineFound=LockableCacheLine{set=177, way=0, tag=<INVALID>, transientTag=0x00002c40, state=INVALID}, hitInCache=false, eviction=false}
+[1857088] htRequest: CoherentCacheServiceNonblockingRequestEvent{address=0x003e9b80, requesterAccess=c1t0 0x00402c40: 0x003e9b80 STORE, lineFound=LockableCacheLine{set=6766, way=1, tag=<INVALID>, transientTag=0x003e9b80, state=INVALID}, hitInCache=false, eviction=false}
+[1857358] htRequest: CoherentCacheServiceNonblockingRequestEvent{address=0x003e9b00, requesterAccess=c1t0 0x00402c58: 0x003e9b00 STORE, lineFound=LockableCacheLine{set=6764, way=1, tag=<INVALID>, transientTag=0x003e9b00, state=INVALID}, hitInCache=false, eviction=false}
+[1857372] htRequest: CoherentCacheServiceNonblockingRequestEvent{address=0x00002c80, requesterAccess=c1t0 0x00402c84: 0x00002c80 IFETCH, lineFound=LockableCacheLine{set=178, way=0, tag=<INVALID>, transientTag=0x00002c80, state=INVALID}, hitInCache=false, eviction=false}
+[1857635] htRequest: CoherentCacheServiceNonblockingRequestEvent{address=0x003e9ac0, requesterAccess=c1t0 0x0040c574: 0x003e9ac0 STORE, lineFound=LockableCacheLine{set=6763, way=1, tag=<INVALID>, transientTag=0x003e9ac0, state=INVALID}, hitInCache=false, eviction=false}
+[1857708] htRequest: CoherentCacheServiceNonblockingRequestEvent{address=0x00002d80, requesterAccess=c1t0 0x00402dbc: 0x00002d80 IFETCH, lineFound=LockableCacheLine{set=182, way=0, tag=<INVALID>, transientTag=0x00002d80, state=INVALID}, hitInCache=false, eviction=false}
+[1858075] htRequest: CoherentCacheServiceNonblockingRequestEvent{address=0x003e9a80, requesterAccess=c1t0 0x00406c44: 0x003e9a80 STORE, lineFound=LockableCacheLine{set=6762, way=1, tag=<INVALID>, transientTag=0x003e9a80, state=INVALID}, hitInCache=false, eviction=false}
+[1858102] htRequest: CoherentCacheServiceNonblockingRequestEvent{address=0x00006c80, requesterAccess=c1t0 0x00406cbc: 0x00006c80 IFETCH, lineFound=LockableCacheLine{set=434, way=0, tag=<INVALID>, transientTag=0x00006c80, state=INVALID}, hitInCache=false, eviction=false}
+[1858435] htRequest: CoherentCacheServiceNonblockingRequestEvent{address=0x00006d00, requesterAccess=c1t0 0x00406d0c: 0x00006d00 IFETCH, lineFound=LockableCacheLine{set=436, way=0, tag=<INVALID>, transientTag=0x00006d00, state=INVALID}, hitInCache=false, eviction=false}
+[1859034] htRequest: CoherentCacheServiceNonblockingRequestEvent{address=0x00002cc0, requesterAccess=c1t0 0x00402cdc: 0x00002cc0 IFETCH, lineFound=LockableCacheLine{set=179, way=0, tag=<INVALID>, transientTag=0x00002cc0, state=INVALID}, hitInCache=false, eviction=false}
+[1859287] htRequest: CoherentCacheServiceNonblockingRequestEvent{address=0x00002d40, requesterAccess=c1t0 0x00402d7c: 0x00002d40 IFETCH, lineFound=LockableCacheLine{set=181, way=0, tag=<INVALID>, transientTag=0x00002d40, state=INVALID}, hitInCache=false, eviction=false}
+[1859546] htRequest: CoherentCacheServiceNonblockingRequestEvent{address=0x00001380, requesterAccess=c1t0 0x004013bc: 0x00001380 IFETCH, lineFound=LockableCacheLine{set=78, way=0, tag=<INVALID>, transientTag=0x00001380, state=INVALID}, hitInCache=false, eviction=false}
+[1859800] htRequest: CoherentCacheServiceNonblockingRequestEvent{address=0x000013c0, requesterAccess=c1t0 0x004013e0: 0x000013c0 IFETCH, lineFound=LockableCacheLine{set=79, way=0, tag=<INVALID>, transientTag=0x000013c0, state=INVALID}, hitInCache=false, eviction=false}
+[1859809] htRequest: CoherentCacheServiceNonblockingRequestEvent{address=0x000913c0, requesterAccess=c1t0 0x004013cc: 0x000913c0 LOAD, lineFound=LockableCacheLine{set=1103, way=0, tag=<INVALID>, transientTag=0x000913c0, state=INVALID}, hitInCache=false, eviction=false}
+[1861497] 	goodHtRequest, tag: 0x000913c0
+[1861604] htRequest: CoherentCacheServiceNonblockingRequestEvent{address=0x00001400, requesterAccess=c1t0 0x00401418: 0x00001400 IFETCH, lineFound=LockableCacheLine{set=80, way=0, tag=<INVALID>, transientTag=0x00001400, state=INVALID}, hitInCache=false, eviction=false}
+[1861858] htRequest: CoherentCacheServiceNonblockingRequestEvent{address=0x00001440, requesterAccess=c1t0 0x0040144c: 0x00001440 IFETCH, lineFound=LockableCacheLine{set=81, way=0, tag=<INVALID>, transientTag=0x00001440, state=INVALID}, hitInCache=false, eviction=false}
+[1862270] htRequest: CoherentCacheServiceNonblockingRequestEvent{address=0x00001480, requesterAccess=c1t0 0x004014a0: 0x00001480 IFETCH, lineFound=LockableCacheLine{set=82, way=0, tag=<INVALID>, transientTag=0x00001480, state=INVALID}, hitInCache=false, eviction=false}
+[1862564] htRequest: CoherentCacheServiceNonblockingRequestEvent{address=0x000014c0, requesterAccess=c1t0 0x004014fc: 0x000014c0 IFETCH, lineFound=LockableCacheLine{set=83, way=0, tag=<INVALID>, transientTag=0x000014c0, state=INVALID}, hitInCache=false, eviction=false}
+[1862829] htRequest: CoherentCacheServiceNonblockingRequestEvent{address=0x00001500, requesterAccess=c1t0 0x00401508: 0x00001500 IFETCH, lineFound=LockableCacheLine{set=84, way=0, tag=<INVALID>, transientTag=0x00001500, state=INVALID}, hitInCache=false, eviction=false}
+[1864740] htRequest: CoherentCacheServiceNonblockingRequestEvent{address=0x00001540, requesterAccess=c1t0 0x00401550: 0x00001540 IFETCH, lineFound=LockableCacheLine{set=85, way=0, tag=<INVALID>, transientTag=0x00001540, state=INVALID}, hitInCache=false, eviction=false}
+[1883814] 	goodHtRequest, tag: 0x000913c0
+[1891672] 	goodHtRequest, tag: 0x000913c0
+[1900939] htRequest: CoherentCacheServiceNonblockingRequestEvent{address=0x003ea000, requesterAccess=c1t0 0x00401544: 0x003ea000 LOAD, lineFound=LockableCacheLine{set=6784, way=1, tag=<INVALID>, transientTag=0x003ea000, state=INVALID}, hitInCache=false, eviction=false}
+[1914701] 	goodHtRequest, tag: 0x000913c0
+[1920378] 	goodHtRequest, tag: 0x000913c0
+[1937080] 	goodHtRequest, tag: 0x000913c0
+[1941598] 	goodHtRequest, tag: 0x000913c0
+[1997968] 	goodHtRequest, tag: 0x000913c0
+[1998476] 	goodHtRequest, tag: 0x000913c0
+[2015501] 	goodHtRequest, tag: 0x000913c0
+[2019220] 	goodHtRequest, tag: 0x000913c0
+[2067633] 	goodHtRequest, tag: 0x000913c0
+[2069720] 	goodHtRequest, tag: 0x000913c0
+[2106098] 	goodHtRequest, tag: 0x000913c0
+[2109738] 	goodHtRequest, tag: 0x000913c0
+[2123549] 	goodHtRequest, tag: 0x000913c0
+[2128356] 	goodHtRequest, tag: 0x000913c0
+[2215934] 	goodHtRequest, tag: 0x000913c0
+[2215985] 	goodHtRequest, tag: 0x000913c0

@@ -19,49 +19,62 @@
 package archimulator.ext.uncore.newHt2;
 
 import archimulator.core.BasicThread;
-import archimulator.ext.uncore.newHt2.state.*;
-import archimulator.uncore.cache.CacheLine;
-import archimulator.uncore.coherence.CoherentCache;
-import archimulator.uncore.coherence.MESIState;
-import archimulator.uncore.coherence.event.CoherentCacheServiceNonblockingRequestEvent;
+import archimulator.ext.uncore.newHt2.state.DataHtRequestVictimCacheLineState;
+import archimulator.ext.uncore.newHt2.state.HtRequestVictimCacheLineState;
+import archimulator.ext.uncore.newHt2.state.InvalidHtRequestVictimCacheLineState;
+import archimulator.ext.uncore.newHt2.state.NullHtRequestVictimCacheLineState;
 import archimulator.sim.Simulation;
 import archimulator.sim.capability.SimulationCapability;
 import archimulator.sim.capability.SimulationCapabilityFactory;
-import archimulator.sim.event.DumpStatEvent;
-import archimulator.sim.event.PollStatsEvent;
-import archimulator.sim.event.ResetStatEvent;
-import archimulator.util.Pair;
+import archimulator.sim.event.*;
+import archimulator.uncore.CacheAccessType;
+import archimulator.uncore.cache.*;
+import archimulator.uncore.cache.eviction.LeastRecentlyUsedEvictionPolicy;
+import archimulator.uncore.coherence.CoherentCache;
+import archimulator.uncore.coherence.MESIState;
+import archimulator.uncore.coherence.event.CoherentCacheServiceNonblockingRequestEvent;
 import archimulator.util.action.Action1;
-import archimulator.util.simpleCache.DefaultSimpleCacheAccessType;
-import archimulator.util.simpleCache.SimpleCache;
+import archimulator.util.action.Function3;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
+//on replacement:
+//	1. HT replaces INVALID => insert NULL
+//	2. HT replaces MT => insert DATA
+//	3. HT replaces HT => No action
+//	4. MT replaces HT => Remove LRU
+//	5. MT replaces MT, Exists HT => Remove LRU, Insert DATA
+//
+//on reference:
+//	1. MT miss + HT miss + VT Hit => ; Bad HT, VT.setLRU
+//	2. MT miss + HT hit + VT miss => MT to HT; Good HT, removeLRU
+//	3. MT miss + HT hit + VT hit => MT to HT; VT.setLRU, removeLRU
+//	4. MT hit + HT miss + VT hit => ; VT.setLRU
 public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements SimulationCapability {
     private CoherentCache<MESIState>.LockableCache llc;
 
-    private SimpleCache<Integer, HtRequestVictimCacheLineState, DefaultSimpleCacheAccessType> htRequestVictimCache;
+    private EvictableCache<HtRequestVictimCacheLineState, CacheLine<HtRequestVictimCacheLineState>> htRequestVictimCache;
     private Map<Integer, Map<Integer, LastLevelCacheLineHtRequestState>> htRequestStates;
 
     private long totalHtRequests;
-    private long usedHtRequests;
-    private long pollutingHtRequests;
-    private long unusedHtRequests;
+    private long goodHtRequests;
+    private long badHtRequests;
+
+    private PrintWriter fileWriter;
+    private Simulation simulation;
 
     public LastLevelCacheHtRequestCachePollutionProfilingCapability(final Simulation simulation) {
+        this.simulation = simulation;
         this.llc = simulation.getProcessor().getCacheHierarchy().getL2Cache().getCache();
 
-        this.htRequestVictimCache = new SimpleCache<Integer, HtRequestVictimCacheLineState, DefaultSimpleCacheAccessType>(this.llc.getNumSets(), this.llc.getAssociativity()) {
-            @Override
-            protected Pair<HtRequestVictimCacheLineState, DefaultSimpleCacheAccessType> doReadFromNextLevel(Integer key, HtRequestVictimCacheLineState oldValue) {
-                return new Pair<HtRequestVictimCacheLineState, DefaultSimpleCacheAccessType>(new InvalidHtRequestVictimCacheLineState(), DefaultSimpleCacheAccessType.READ);
+        this.htRequestVictimCache = new EvictableCache<HtRequestVictimCacheLineState, CacheLine<HtRequestVictimCacheLineState>>(this.llc, "", this.llc.getGeometry(), LeastRecentlyUsedEvictionPolicy.FACTORY, new Function3<Cache<?, ?>, Integer, Integer, CacheLine<HtRequestVictimCacheLineState>>() {
+            public CacheLine<HtRequestVictimCacheLineState> apply(Cache<?, ?> cache, Integer set, Integer way) {
+                return new CacheLine<HtRequestVictimCacheLineState>(cache, set, way, new InvalidHtRequestVictimCacheLineState());
             }
-
-            @Override
-            protected void doWriteToNextLevel(Integer key, HtRequestVictimCacheLineState value, boolean writeback) {
-            }
-        };
+        });
 
         this.htRequestStates = new HashMap<Integer, Map<Integer, LastLevelCacheLineHtRequestState>>();
         for (int set = 0; set < this.llc.getNumSets(); set++) {
@@ -73,7 +86,7 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
             }
         }
 
-        simulation.getProcessor().getBlockingEventDispatcher().addListener(CoherentCacheServiceNonblockingRequestEvent.class, new Action1<CoherentCacheServiceNonblockingRequestEvent>() {
+        simulation.getBlockingEventDispatcher().addListener(CoherentCacheServiceNonblockingRequestEvent.class, new Action1<CoherentCacheServiceNonblockingRequestEvent>() {
             public void apply(CoherentCacheServiceNonblockingRequestEvent event) {
                 if (event.getCache().getCache() == LastLevelCacheHtRequestCachePollutionProfilingCapability.this.llc) {
                     serviceRequest(event);
@@ -81,82 +94,172 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
             }
         });
 
-        simulation.getProcessor().getBlockingEventDispatcher().addListener(ResetStatEvent.class, new Action1<ResetStatEvent>() {
+        simulation.getBlockingEventDispatcher().addListener(ResetStatEvent.class, new Action1<ResetStatEvent>() {
             public void apply(ResetStatEvent event) {
                 totalHtRequests = 0;
-                usedHtRequests = 0;
-                pollutingHtRequests = 0;
-                unusedHtRequests = 0;
+                goodHtRequests = 0;
+                badHtRequests = 0;
             }
         });
 
-        simulation.getProcessor().getBlockingEventDispatcher().addListener(PollStatsEvent.class, new Action1<PollStatsEvent>() {
+        simulation.getBlockingEventDispatcher().addListener(PollStatsEvent.class, new Action1<PollStatsEvent>() {
             public void apply(PollStatsEvent event) {
                 dumpStats(event.getStats());
             }
         });
 
-        simulation.getProcessor().getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
+        simulation.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
             public void apply(DumpStatEvent event) {
                 if (event.getType() == DumpStatEvent.Type.DETAILED_SIMULATION) {
                     dumpStats(event.getStats());
                 }
             }
         });
+
+        simulation.getBlockingEventDispatcher().addListener(SimulationStartedEvent.class, new Action1<SimulationStartedEvent>() {
+            public void apply(SimulationStartedEvent event) {
+                try {
+                    fileWriter = new PrintWriter(simulation.getConfig().getCwd() + "/LastLevelCacheHtRequestCachePollutionProfilingCapability.out");
+                } catch (FileNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
+        simulation.getBlockingEventDispatcher().addListener(SimulationStoppedEvent.class, new Action1<SimulationStoppedEvent>() {
+            public void apply(SimulationStoppedEvent event) {
+                fileWriter.flush();
+                fileWriter.close();
+            }
+        });
     }
 
     private void dumpStats(Map<String, Object> stats) {
         stats.put("lastLevelCacheHtRequestCachePollutionProfilingCapability." + this.llc.getName() + ".totalHtRequests", String.valueOf(this.totalHtRequests));
-        stats.put("lastLevelCacheHtRequestCachePollutionProfilingCapability." + this.llc.getName() + ".usedHtRequests.confirmed", String.valueOf(this.usedHtRequests));
-        stats.put("lastLevelCacheHtRequestCachePollutionProfilingCapability." + this.llc.getName() + ".pollutingHtRequests.confirmed", String.valueOf(this.pollutingHtRequests));
-        stats.put("lastLevelCacheHtRequestCachePollutionProfilingCapability." + this.llc.getName() + ".unusedHtRequests.confirmed", String.valueOf(this.unusedHtRequests));
+        stats.put("lastLevelCacheHtRequestCachePollutionProfilingCapability." + this.llc.getName() + ".goodHtRequests", String.valueOf(this.goodHtRequests));
+        stats.put("lastLevelCacheHtRequestCachePollutionProfilingCapability." + this.llc.getName() + ".badHtRequests", String.valueOf(this.badHtRequests));
+        stats.put("lastLevelCacheHtRequestCachePollutionProfilingCapability." + this.llc.getName() + ".uglyHtRequests", String.valueOf(this.totalHtRequests - this.goodHtRequests - this.badHtRequests));
     }
 
     private void serviceRequest(CoherentCacheServiceNonblockingRequestEvent event) {
         boolean requesterIsHt = BasicThread.isHelperThread(event.getRequesterAccess().getThread());
-        CacheLine<?> ownerCacheLine = event.getLineFound();
-        
-        int set = ownerCacheLine.getSet();
-        
-        LastLevelCacheLineHtRequestState htRequestState = this.htRequestStates.get(ownerCacheLine.getSet()).get(ownerCacheLine.getWay());
-        boolean victimIsHt = htRequestState == LastLevelCacheLineHtRequestState.HT;
+        CacheLine<?> llcLine = event.getLineFound();
 
-        int htRequestVictimWay = this.findHtRequestVictimWayFromTag(this.llc.getTag(event.getAddress()));
+        int set = llcLine.getSet();
 
-        if(htRequestVictimWay == -1) {
-            //TODO: not found
-        }
+        LastLevelCacheLineHtRequestState htRequestState = this.htRequestStates.get(set).get(llcLine.getWay());
+        boolean lineFoundIsHt = htRequestState == LastLevelCacheLineHtRequestState.HT;
 
-        if(requesterIsHt && !event.isHitInCache() && !event.isEviction()) {
-            // case 1
-            this.htRequestVictimCache.put(set, -1, new NullHtRequestVictimCacheLineState(), DefaultSimpleCacheAccessType.READ);
+        if (!event.isHitInCache()) {
+            if (requesterIsHt) {
+                this.fileWriter.printf("[%d] htRequest: %s\n", this.simulation.getCycleAccurateEventQueue().getCurrentCycle(), event);
 
-        }
-        else if(requesterIsHt && !event.isHitInCache() && event.isEviction() && !victimIsHt) {
-            // case 2
-        }
-        else if(requesterIsHt && !event.isHitInCache() && event.isEviction() && victimIsHt) {
-            //  case 3
-        }
-        else if(!requesterIsHt && !event.isHitInCache() && event.isEviction() && victimIsHt) {
-            // case 4
-        }
-        else if(!requesterIsHt && !victimIsHt) { //TODO: case 5
-            //case 5
-        }
-    }
-
-    public int findHtRequestVictimWayFromTag(int tag) {
-        int set = this.llc.getSet(tag);
-
-        for (int way = 0; way < this.llc.getAssociativity(); way++) {
-            HtRequestVictimCacheLineState line = this.htRequestVictimCache.get(set, way, DefaultSimpleCacheAccessType.READ); //TODO:...
-            if (line instanceof DataHtRequestVictimCacheLineState && ((DataHtRequestVictimCacheLineState) line).getVictimTag() == tag) {
-                return way;
+                this.setHt(set, llcLine.getWay());
+                this.totalHtRequests++;
+            } else {
+                this.setMt(set, llcLine.getWay());
             }
         }
 
-        return -1;
+        if (requesterIsHt && !event.isHitInCache() && !event.isEviction()) {
+            // case 1
+            this.insertNullEntry(set);
+        } else if (requesterIsHt && !event.isHitInCache() && event.isEviction() && !lineFoundIsHt) {
+            // case 2
+            this.insertDataEntry(set, llcLine.getTag());
+        } else if (requesterIsHt && !event.isHitInCache() && event.isEviction() && lineFoundIsHt) {
+            //  case 3
+        } else if (!requesterIsHt && !event.isHitInCache() && event.isEviction() && lineFoundIsHt) {
+            // case 4
+            this.setMt(set, llcLine.getWay());
+            this.removeLru(set);
+        } else if (!requesterIsHt && !lineFoundIsHt) {
+            //case 5
+            boolean htRequestFound = false;
+
+            for (int way = 0; way < this.htRequestVictimCache.getAssociativity(); way++) {
+                if (!(this.htRequestVictimCache.getLine(set, way).getState() instanceof InvalidHtRequestVictimCacheLineState)) {
+                    htRequestFound = true;
+                    break;
+                }
+            }
+
+            if (htRequestFound) {
+                this.removeLru(set);
+                this.insertDataEntry(set, llcLine.getTag());
+            }
+        }
+
+        boolean mtHit = event.isHitInCache() && !requesterIsHt && !lineFoundIsHt;
+        boolean htHit = event.isHitInCache() && !requesterIsHt && lineFoundIsHt;
+
+        CacheLine<HtRequestVictimCacheLineState> vtLine = this.findHtRequestVictimLine(this.llc.getTag(event.getAddress()));
+
+        boolean vtHit = !requesterIsHt && vtLine != null;
+
+        if (!mtHit && !htHit && vtHit) {
+            this.fileWriter.printf("[%d] \tbadHtRequest, tag: 0x%08x\n", this.simulation.getCycleAccurateEventQueue().getCurrentCycle(), vtLine.getTag());
+
+            this.badHtRequests++;
+            this.setLru(set, vtLine.getWay());
+        } else if (!mtHit && htHit && !vtHit) {
+            this.fileWriter.printf("[%d] \tgoodHtRequest, tag: 0x%08x\n", this.simulation.getCycleAccurateEventQueue().getCurrentCycle(), event.getLineFound().getTag());
+
+            this.setHt(set, llcLine.getWay());
+            this.goodHtRequests++;
+            this.removeLru(set);
+        } else if (!mtHit && htHit && vtHit) {
+            this.setHt(set, llcLine.getWay());
+            this.setLru(set, vtLine.getWay());
+            this.removeLru(set);
+        } else if (mtHit && !htHit && vtHit) {
+            this.setLru(set, vtLine.getWay());
+        }
+    }
+
+    private void setHt(int set, int way) {
+        this.htRequestStates.get(set).put(way, LastLevelCacheLineHtRequestState.HT);
+    }
+
+    private void setMt(int set, int way) {
+        this.htRequestStates.get(set).put(way, LastLevelCacheLineHtRequestState.MT);
+    }
+
+    private void insertDataEntry(int set, int tag) {
+        this.findInvalidLineAndNewMiss(tag, CacheAccessType.UNKNOWN, set).commit().getLine().setNonInitialState(new DataHtRequestVictimCacheLineState());
+    }
+
+    private void insertNullEntry(int set) {
+        this.findInvalidLineAndNewMiss(0, CacheAccessType.UNKNOWN, set).commit().getLine().setNonInitialState(new NullHtRequestVictimCacheLineState());
+    }
+
+    private void setLru(int set, int way) {
+        this.getLruPolicyForHtRequestVictimCache().setLRU(set, way);
+    }
+
+    private void removeLru(int set) {
+        this.htRequestVictimCache.getLine(set, this.getLruPolicyForHtRequestVictimCache().getLRU(set)).invalidate();
+    }
+
+    private LeastRecentlyUsedEvictionPolicy<HtRequestVictimCacheLineState, CacheLine<HtRequestVictimCacheLineState>> getLruPolicyForHtRequestVictimCache() {
+        return (LeastRecentlyUsedEvictionPolicy<HtRequestVictimCacheLineState, CacheLine<HtRequestVictimCacheLineState>>) this.htRequestVictimCache.getEvictionPolicy();
+    }
+
+    private CacheMiss<HtRequestVictimCacheLineState, CacheLine<HtRequestVictimCacheLineState>> findInvalidLineAndNewMiss(int address, CacheAccessType accessType, int set) {
+        CacheReference reference = new CacheReference(null, null, address, this.htRequestVictimCache.getTag(address), accessType, set);
+
+        for (int way = 0; way < this.htRequestVictimCache.getAssociativity(); way++) {
+            CacheLine<HtRequestVictimCacheLineState> line = this.htRequestVictimCache.getLine(set, way);
+            if (line.getState() == line.getInitialState()) {
+                return new CacheMiss<HtRequestVictimCacheLineState, CacheLine<HtRequestVictimCacheLineState>>(this.htRequestVictimCache, reference, way);
+            }
+        }
+
+        throw new IllegalArgumentException();
+    }
+
+    public CacheLine<HtRequestVictimCacheLineState> findHtRequestVictimLine(int tag) {
+        return this.htRequestVictimCache.findLine(tag);
     }
 
     public static final SimulationCapabilityFactory FACTORY = new SimulationCapabilityFactory() {
