@@ -12,8 +12,6 @@ public interface POSIX {
         ENOENT, ENOTDIR, ENAMETOOLONG, EACCESS, ELOOP, EFAULT, EIO, EBADF
     }
 
-    ;
-
     public int chmod(String filename, int mode);
 
     public int chown(String filename, int user, int group);

@@ -36,18 +36,13 @@ public class SimpleCacheTest {
                 if (writeback) {
                     nextLevel.put(key, value);
                 }
-
-//                System.out.printf("doWriteToNextLevel(%d => %d)\n\n", key, value);
             }
 
             @Override
             protected Pair<Integer, DefaultSimpleCacheAccessType> doReadFromNextLevel(Integer key, Integer oldValue) {
-//                System.out.printf("doReadFromNextLevel(%d)\n\n", key);
-
                 Integer value = nextLevel.get(key);
                 return new Pair<Integer, DefaultSimpleCacheAccessType>(value, DefaultSimpleCacheAccessType.READ);
             }
-
         };
 
         cache.getCacheEventDispatcher().addListener(SetValueEvent.class, new Action1<SetValueEvent>() {

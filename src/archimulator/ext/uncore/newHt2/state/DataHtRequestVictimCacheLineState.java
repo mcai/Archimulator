@@ -16,12 +16,21 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.os.event;
+package archimulator.ext.uncore.newHt2.state;
 
-public enum SystemEventType {
-    READ,
-    RESUME,
-    WAIT,
-    POLL,
-    SIG_SUSPEND
+public class DataHtRequestVictimCacheLineState extends HtRequestVictimCacheLineState {
+    private int victimTag;
+
+    public DataHtRequestVictimCacheLineState(int victimTag) {
+        super(HtRequestVictimCacheLineStateType.DATA);
+        this.victimTag = victimTag;
+    }
+
+    public int getVictimTag() {
+        return victimTag;
+    }
+
+    public void setVictimTag(int victimTag) {
+        this.victimTag = victimTag;
+    }
 }

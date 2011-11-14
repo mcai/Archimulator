@@ -19,10 +19,8 @@
 package archimulator.ext.uncore.newHt2;
 
 import archimulator.core.BasicThread;
-import archimulator.uncore.cache.Cache;
+import archimulator.ext.uncore.newHt2.state.*;
 import archimulator.uncore.cache.CacheLine;
-import archimulator.uncore.cache.EvictableCache;
-import archimulator.uncore.cache.eviction.LeastRecentlyUsedEvictionPolicy;
 import archimulator.uncore.coherence.CoherentCache;
 import archimulator.uncore.coherence.MESIState;
 import archimulator.uncore.coherence.event.CoherentCacheServiceNonblockingRequestEvent;
@@ -32,8 +30,10 @@ import archimulator.sim.capability.SimulationCapabilityFactory;
 import archimulator.sim.event.DumpStatEvent;
 import archimulator.sim.event.PollStatsEvent;
 import archimulator.sim.event.ResetStatEvent;
+import archimulator.util.Pair;
 import archimulator.util.action.Action1;
-import archimulator.util.action.Function3;
+import archimulator.util.simpleCache.DefaultSimpleCacheAccessType;
+import archimulator.util.simpleCache.SimpleCache;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,7 +41,7 @@ import java.util.Map;
 public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements SimulationCapability {
     private CoherentCache<MESIState>.LockableCache llc;
 
-    private EvictableCache<HtRequestVictimCacheLineState, HtRequestVictimCacheLine> htRequestVictimCache;
+    private SimpleCache<Integer, HtRequestVictimCacheLineState, DefaultSimpleCacheAccessType> htRequestVictimCache;
     private Map<Integer, Map<Integer, LastLevelCacheLineHtRequestState>> htRequestStates;
 
     private long totalHtRequests;
@@ -52,11 +52,16 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
     public LastLevelCacheHtRequestCachePollutionProfilingCapability(final Simulation simulation) {
         this.llc = simulation.getProcessor().getCacheHierarchy().getL2Cache().getCache();
 
-        this.htRequestVictimCache = new EvictableCache<HtRequestVictimCacheLineState, HtRequestVictimCacheLine>(simulation.getProcessor(), this.llc.getName() + ".htRequestVictimCache", this.llc.getGeometry(), LeastRecentlyUsedEvictionPolicy.FACTORY, new Function3<Cache<?, ?>, Integer, Integer, HtRequestVictimCacheLine>() {
-            public HtRequestVictimCacheLine apply(Cache<?, ?> cache, Integer set, Integer way) {
-                return new HtRequestVictimCacheLine(cache, set, way);
+        this.htRequestVictimCache = new SimpleCache<Integer, HtRequestVictimCacheLineState, DefaultSimpleCacheAccessType>(this.llc.getNumSets(), this.llc.getAssociativity()) {
+            @Override
+            protected Pair<HtRequestVictimCacheLineState, DefaultSimpleCacheAccessType> doReadFromNextLevel(Integer key, HtRequestVictimCacheLineState oldValue) {
+                return new Pair<HtRequestVictimCacheLineState, DefaultSimpleCacheAccessType>(new InvalidHtRequestVictimCacheLineState(), DefaultSimpleCacheAccessType.READ);
             }
-        });
+
+            @Override
+            protected void doWriteToNextLevel(Integer key, HtRequestVictimCacheLineState value, boolean writeback) {
+            }
+        };
 
         this.htRequestStates = new HashMap<Integer, Map<Integer, LastLevelCacheLineHtRequestState>>();
         for (int set = 0; set < this.llc.getNumSets(); set++) {
@@ -111,13 +116,20 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
         boolean requesterIsHt = BasicThread.isHelperThread(event.getRequesterAccess().getThread());
         CacheLine<?> ownerCacheLine = event.getLineFound();
         
+        int set = ownerCacheLine.getSet();
+        
         LastLevelCacheLineHtRequestState htRequestState = this.htRequestStates.get(ownerCacheLine.getSet()).get(ownerCacheLine.getWay());
         boolean victimIsHt = htRequestState == LastLevelCacheLineHtRequestState.HT;
 
-        HtRequestVictimCacheLine htRequestVictimCacheLine = this.findHtRequestVictimCacheLine(this.llc.getTag(event.getAddress()));
+        int htRequestVictimWay = this.findHtRequestVictimWayFromTag(this.llc.getTag(event.getAddress()));
+
+        if(htRequestVictimWay == -1) {
+            //TODO: not found
+        }
 
         if(requesterIsHt && !event.isHitInCache() && !event.isEviction()) {
             // case 1
+            this.htRequestVictimCache.put(set, -1, new NullHtRequestVictimCacheLineState(), DefaultSimpleCacheAccessType.READ);
 
         }
         else if(requesterIsHt && !event.isHitInCache() && event.isEviction() && !victimIsHt) {
@@ -134,23 +146,17 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
         }
     }
 
-    public HtRequestVictimCacheLine findHtRequestVictimCacheLine(int tag) {
+    public int findHtRequestVictimWayFromTag(int tag) {
         int set = this.llc.getSet(tag);
 
         for (int way = 0; way < this.llc.getAssociativity(); way++) {
-            HtRequestVictimCacheLine line = this.htRequestVictimCache.getLine(set, way);
-            if (line.getState() == HtRequestVictimCacheLineState.DATA && line.getState().getVictimTag() == tag) {
-                return line;
+            HtRequestVictimCacheLineState line = this.htRequestVictimCache.get(set, way, DefaultSimpleCacheAccessType.READ); //TODO:...
+            if (line instanceof DataHtRequestVictimCacheLineState && ((DataHtRequestVictimCacheLineState) line).getVictimTag() == tag) {
+                return way;
             }
         }
 
-        return null;
-    }
-
-    private class HtRequestVictimCacheLine extends CacheLine<HtRequestVictimCacheLineState> {
-        private HtRequestVictimCacheLine(Cache<?, ?> cache, int set, int way) {
-            super(cache, set, way, HtRequestVictimCacheLineState.INVALID);
-        }
+        return -1;
     }
 
     public static final SimulationCapabilityFactory FACTORY = new SimulationCapabilityFactory() {

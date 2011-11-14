@@ -16,20 +16,18 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.ext.uncore.newHt2;
+package archimulator.ext.uncore.newHt2.state;
 
-public enum HtRequestVictimCacheLineState {
-    INVALID,
-    NULL,
-    DATA;
+import java.io.Serializable;
 
-    private int victimTag;
+public class HtRequestVictimCacheLineState implements Serializable {
+    private HtRequestVictimCacheLineStateType type;
 
-    public int getVictimTag() {
-        return victimTag;
+    public HtRequestVictimCacheLineState(HtRequestVictimCacheLineStateType type) {
+        this.type = type;
     }
 
-    public void setVictimTag(int victimTag) {
-        this.victimTag = victimTag;
+    public HtRequestVictimCacheLineStateType getType() {
+        return type;
     }
 }

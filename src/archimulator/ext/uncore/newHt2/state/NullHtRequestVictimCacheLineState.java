@@ -16,10 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.ext.uncore.newHt2;
+package archimulator.ext.uncore.newHt2.state;
 
-public enum LastLevelCacheLineHtRequestState {
-    INVALID,
-    HT,
-    MT
+public class NullHtRequestVictimCacheLineState extends HtRequestVictimCacheLineState {
+    public NullHtRequestVictimCacheLineState() {
+        super(HtRequestVictimCacheLineStateType.NULL);
+    }
 }
