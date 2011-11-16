@@ -168,7 +168,7 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
             // case 2
             this.insertDataEntry(set, llcLine.getTag());
         } else if (requesterIsHt && !event.isHitInCache() && event.isEviction() && lineFoundIsHt) {
-            //  case 3
+            // case 3
         } else if (!requesterIsHt && !event.isHitInCache() && event.isEviction() && lineFoundIsHt) {
             // case 4
             this.setMt(set, llcLine.getWay());
