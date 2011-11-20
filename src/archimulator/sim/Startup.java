@@ -134,8 +134,8 @@ public class Startup {
             "/home/itecgo/Archimulator/benchmarks/Olden_Custom1/mst/ht",
             "mst.mips",
 //            "10000");
-            "1000");
-//            "100");
+//            "1000");
+            "100");
 //            "200");
 //            "400");
 

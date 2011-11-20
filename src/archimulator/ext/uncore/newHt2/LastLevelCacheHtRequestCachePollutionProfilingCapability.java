@@ -175,19 +175,19 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
             this.removeLru(set);
         } else if (!requesterIsHt && !lineFoundIsHt) {
             //case 5
-            boolean htRequestFound = false;
-
-            for (int way = 0; way < this.htRequestVictimCache.getAssociativity(); way++) {
-                if (!(this.htRequestVictimCache.getLine(set, way).getState() instanceof InvalidHtRequestVictimCacheLineState)) {
-                    htRequestFound = true;
-                    break;
-                }
-            }
-
-            if (htRequestFound) {
-                this.removeLru(set);
-                this.insertDataEntry(set, llcLine.getTag());
-            }
+//            boolean htRequestFound = false;
+//
+//            for (int way = 0; way < this.htRequestVictimCache.getAssociativity(); way++) {
+//                if (!(this.htRequestVictimCache.getLine(set, way).getState() instanceof InvalidHtRequestVictimCacheLineState)) {
+//                    htRequestFound = true;
+//                    break;
+//                }
+//            }
+//
+//            if (htRequestFound) {
+//                this.removeLru(set);
+//                this.insertDataEntry(set, llcLine.getTag());
+//            }
         }
 
         boolean mtHit = event.isHitInCache() && !requesterIsHt && !lineFoundIsHt;
@@ -198,22 +198,22 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
         boolean vtHit = !requesterIsHt && vtLine != null;
 
         if (!mtHit && !htHit && vtHit) {
-            this.fileWriter.printf("[%d] \tbadHtRequest, tag: 0x%08x\n", this.simulation.getCycleAccurateEventQueue().getCurrentCycle(), vtLine.getTag());
-
-            this.badHtRequests++;
-            this.setLru(set, vtLine.getWay());
+//            this.fileWriter.printf("[%d] \tbadHtRequest, tag: 0x%08x\n", this.simulation.getCycleAccurateEventQueue().getCurrentCycle(), vtLine.getTag());
+//
+//            this.badHtRequests++;
+//            this.setLru(set, vtLine.getWay());
         } else if (!mtHit && htHit && !vtHit) {
-            this.fileWriter.printf("[%d] \tgoodHtRequest, tag: 0x%08x\n", this.simulation.getCycleAccurateEventQueue().getCurrentCycle(), event.getLineFound().getTag());
-
-            this.setHt(set, llcLine.getWay());
-            this.goodHtRequests++;
-            this.removeLru(set);
+//            this.fileWriter.printf("[%d] \tgoodHtRequest, tag: 0x%08x\n", this.simulation.getCycleAccurateEventQueue().getCurrentCycle(), event.getLineFound().getTag());
+//
+//            this.setHt(set, llcLine.getWay());
+//            this.goodHtRequests++;
+//            this.removeLru(set);
         } else if (!mtHit && htHit && vtHit) {
-            this.setHt(set, llcLine.getWay());
-            this.setLru(set, vtLine.getWay());
-            this.removeLru(set);
+//            this.setHt(set, llcLine.getWay());
+//            this.setLru(set, vtLine.getWay());
+//            this.removeLru(set);
         } else if (mtHit && !htHit && vtHit) {
-            this.setLru(set, vtLine.getWay());
+//            this.setLru(set, vtLine.getWay());
         }
     }
 
@@ -238,6 +238,15 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
     }
 
     private void removeLru(int set) {
+        LeastRecentlyUsedEvictionPolicy<HtRequestVictimCacheLineState, CacheLine<HtRequestVictimCacheLineState>> lru = this.getLruPolicyForHtRequestVictimCache();
+
+        for(int i = 0; i < this.llc.getAssociativity(); i++) {
+            int way = lru.getWayInStackPosition(set, i);
+            if(this.htRequestVictimCache.getLine(set, way).getState() instanceof InvalidHtRequestVictimCacheLineState) {
+
+            }
+        }
+
         this.htRequestVictimCache.getLine(set, this.getLruPolicyForHtRequestVictimCache().getLRU(set)).invalidate();
     }
 

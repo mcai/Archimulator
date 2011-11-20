@@ -45,7 +45,9 @@ public class CacheLine<StateT extends Serializable> implements Serializable {
     }
 
     public void invalidate() { //TODO: should notify cache's eviction policy
-        assert (this.state != this.initialState);
+        if ((this.state == this.initialState)) {
+            throw new IllegalArgumentException();
+        }
         
         int previousTag = this.tag;
         StateT previousState = this.state;

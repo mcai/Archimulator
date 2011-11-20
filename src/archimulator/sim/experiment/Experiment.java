@@ -100,8 +100,6 @@ public abstract class Experiment {
         this.blockingEventDispatcher = new BlockingEventDispatcher<BlockingEvent>();
         this.cycleAccurateEventQueue = new CycleAccurateEventQueue();
 
-        final int slacks = 100;
-
         this.phaser = new CyclicBarrier(2);
 
         this.fsmFactory = new FiniteStateMachineFactory<ExperimentState, ExperimentCondition>();
