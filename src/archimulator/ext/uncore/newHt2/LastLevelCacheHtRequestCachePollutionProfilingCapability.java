@@ -149,7 +149,7 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
 
         if (!event.isHitInCache()) {
             if (requesterIsHt) {
-                this.fileWriter.printf("[%d] htRequest: %s\n", this.simulation.getCycleAccurateEventQueue().getCurrentCycle(), event);
+//                this.fileWriter.printf("[%d] htRequest: %s\n", this.simulation.getCycleAccurateEventQueue().getCurrentCycle(), event);
 
 //                this.setHt(set, llcLine.getWay());
                 this.totalHtRequests++;
@@ -160,34 +160,35 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
 
         if (requesterIsHt && !event.isHitInCache() && !event.isEviction()) {
             // case 1
-            this.checkInvariants(set);
+//            this.checkInvariants(set);
 
             this.setHt(set, llcLine.getWay());
             this.insertNullEntry(set);
 
-            this.checkInvariants(set);
+//            this.checkInvariants(set);
         } else if (requesterIsHt && !event.isHitInCache() && event.isEviction() && !lineFoundIsHt) {
             // case 2
-            this.checkInvariants(set);
+//            this.checkInvariants(set);
 
             this.setHt(set, llcLine.getWay());
             this.insertDataEntry(set, llcLine.getTag());
 
-            this.checkInvariants(set);
+//            this.checkInvariants(set);
         } else if (requesterIsHt && !event.isHitInCache() && event.isEviction() && lineFoundIsHt) {
             // case 3
 
-            this.checkInvariants(set);
+//            this.checkInvariants(set);
         } else if (!requesterIsHt && !event.isHitInCache() && event.isEviction() && lineFoundIsHt) {
             // case 4
-            this.checkInvariants(set);
+//            this.checkInvariants(set);
 
             this.setMt(set, llcLine.getWay());
             this.removeLru(set);
 
-            this.checkInvariants(set);
+//            this.checkInvariants(set);
         } else if (!requesterIsHt && !lineFoundIsHt) {
             //case 5
+//            this.checkInvariants(set);
             boolean htRequestFound = false;
 
             for (int way = 0; way < this.htRequestVictimCache.getAssociativity(); way++) {
@@ -202,7 +203,7 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
                 this.insertDataEntry(set, llcLine.getTag());
             }
 
-            this.checkInvariants(set);
+//            this.checkInvariants(set);
         }
 
         boolean mtHit = event.isHitInCache() && !requesterIsHt && !lineFoundIsHt;
@@ -213,16 +214,16 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
         boolean vtHit = !requesterIsHt && vtLine != null;
 
         if (!mtHit && !htHit && vtHit) {
-            this.checkInvariants(set);
+//            this.checkInvariants(set);
 
 //            this.fileWriter.printf("[%d] \tbadHtRequest, tag: 0x%08x\n", this.simulation.getCycleAccurateEventQueue().getCurrentCycle(), vtLine.getTag());
 
             this.badHtRequests++;
             this.setLru(set, vtLine.getWay());
 
-            this.checkInvariants(set);
+//            this.checkInvariants(set);
         } else if (!mtHit && htHit && !vtHit) {
-            this.checkInvariants(set);
+//            this.checkInvariants(set);
 
 //            this.fileWriter.printf("[%d] \tgoodHtRequest, tag: 0x%08x\n", this.simulation.getCycleAccurateEventQueue().getCurrentCycle(), event.getLineFound().getTag());
 
@@ -230,21 +231,21 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
             this.goodHtRequests++;
             this.removeLru(set);
 
-            this.checkInvariants(set);
+//            this.checkInvariants(set);
         } else if (!mtHit && htHit && vtHit) {
-            this.checkInvariants(set);
+//            this.checkInvariants(set);
 
             this.setMt(set, llcLine.getWay());
             this.setLru(set, vtLine.getWay());
             this.removeLru(set);
 
-            this.checkInvariants(set);
+//            this.checkInvariants(set);
         } else if (mtHit && !htHit && vtHit) {
-            this.checkInvariants(set);
+//            this.checkInvariants(set);
 
             this.setLru(set, vtLine.getWay());
 
-            this.checkInvariants(set);
+//            this.checkInvariants(set);
         }
     }
     
