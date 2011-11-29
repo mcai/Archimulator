@@ -45,14 +45,14 @@ public class CacheLine<StateT extends Serializable> implements Serializable {
     }
 
     public void invalidate() { //TODO: should notify cache's eviction policy
-        if ((this.state == this.initialState)) {
+        if ((this.state == this.initialState || this.tag == INVALID_TAG)) {
             throw new IllegalArgumentException();
         }
         
         int previousTag = this.tag;
         StateT previousState = this.state;
 
-        this.tag = -1;
+        this.tag = INVALID_TAG;
         this.state = this.initialState;
 
         this.cache.getBlockingEventDispatcher().dispatch(new CacheLineInvalidatedEvent(this, previousTag, previousState));
@@ -92,13 +92,17 @@ public class CacheLine<StateT extends Serializable> implements Serializable {
     }
 
     protected void setTag(int tag) {
+        if(this.state == this.initialState || tag == INVALID_TAG) {
+            throw new IllegalArgumentException();
+        }
+        
         if(this.tag != tag) {
             int previousTag = this.tag;
             this.tag = tag;
 
             this.cache.getBlockingEventDispatcher().dispatch(new CacheLineTagChangedEvent(this, previousTag));
 
-            if(previousTag == -1) {
+            if(previousTag == INVALID_TAG) {
                 this.cache.getBlockingEventDispatcher().dispatch(new CacheLineValidatedEvent(this));
             }
         }
@@ -112,4 +116,6 @@ public class CacheLine<StateT extends Serializable> implements Serializable {
     public String toString() {
         return String.format("CacheLine{set=%d, way=%d, tag=%s, state=%s}", set, way, tag == -1 ? "<INVALID>" : String.format("0x%08x", tag), state);
     }
+
+    public static final int INVALID_TAG = -1;
 }

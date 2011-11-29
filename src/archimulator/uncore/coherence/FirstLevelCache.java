@@ -283,6 +283,15 @@ public class FirstLevelCache extends CoherentCache<MESIState> {
             this.getPendingActions().push(new ActionBasedPendingActionOwner() {
                 @Override
                 public boolean apply() {
+                    findAndLockProcess.getCacheAccess().commit().getLine().unlock();
+
+                    return true;
+                }
+            });
+
+            this.getPendingActions().push(new ActionBasedPendingActionOwner() {
+                @Override
+                public boolean apply() {
                     if (!findAndLockProcess.getCacheAccess().isHitInCache()) {
                         getPendingActions().push(new DownwardReadProcess(access, access.getPhysicalTag()).addOnCompletedCallback(new Action1<DownwardReadProcess>() {
                             public void apply(DownwardReadProcess downwardReadProcess) {
@@ -305,6 +314,8 @@ public class FirstLevelCache extends CoherentCache<MESIState> {
                 @Override
                 public boolean apply() {
                     findAndLockProcess.getCacheAccess().getLine().setNonInitialState(MESIState.MODIFIED);
+
+                    findAndLockProcess.getCacheAccess().commit().getLine().unlock();
 
                     return true;
                 }
@@ -403,7 +414,7 @@ public class FirstLevelCache extends CoherentCache<MESIState> {
             this.getPendingActions().push(new ActionBasedPendingActionOwner() {
                 @Override
                 public boolean apply() {
-                    cacheAccess.getLine().invalidate();
+//                    cacheAccess.getLine().invalidate();
 
                     return true;
                 }
@@ -456,6 +467,8 @@ public class FirstLevelCache extends CoherentCache<MESIState> {
 
                     findAndLockProcess.getCacheAccess().getLine().setNonInitialState(MESIState.SHARED);
 
+                    findAndLockProcess.getCacheAccess().commit().getLine().unlock();
+
                     return true;
                 }
             });
@@ -470,6 +483,9 @@ public class FirstLevelCache extends CoherentCache<MESIState> {
                 @Override
                 public boolean apply() {
                     findAndLockProcess.getCacheAccess().getLine().invalidate();
+
+                    findAndLockProcess.getCacheAccess().commit().getLine().unlock();
+
                     getBlockingEventDispatcher().dispatch(new FirstLevelCacheLineEvictedByL2UpwardWriteProcessEvent(FirstLevelCache.this, findAndLockProcess.getCacheAccess().getLine()));
 
                     final int size = findAndLockProcess.getCacheAccess().getLine().getState() == MESIState.MODIFIED ? getCache().getLineSize() + 8 : 8;

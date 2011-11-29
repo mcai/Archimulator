@@ -110,7 +110,8 @@ public class CacheBasedBigMemoryDataStore extends BasicSimulationObject implemen
             }
 
             cacheAccess.getLine().initOrLoadFromDisk(this.cache.getTag(byteBufferIndex));
-            cacheAccess.commit().getLine().setNonInitialState(true);
+            cacheAccess.getLine().setNonInitialState(true);
+            cacheAccess.commit();
         }
         return cacheAccess;
     }

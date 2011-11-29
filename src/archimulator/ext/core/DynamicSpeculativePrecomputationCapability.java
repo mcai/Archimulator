@@ -404,7 +404,8 @@ public class DynamicSpeculativePrecomputationCapability implements ProcessorCapa
             CacheMiss<Boolean, SliceCacheLine> miss = sliceCache.findInvalidLineAndNewMiss(slice.triggerPc, CacheAccessType.UNKNOWN, set);
 
             if (miss != null) {
-                miss.commit().getLine().setNonInitialState(true);
+                miss.getLine().setNonInitialState(true);
+                miss.commit();
 
                 Map<Integer, Integer> machInsts = new TreeMap<Integer, Integer>();
 

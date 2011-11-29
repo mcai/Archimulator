@@ -171,7 +171,7 @@ public class LastLevelCache extends CoherentCache<MESIState> {
                 @Override
                 public boolean apply() {
                     getBlockingEventDispatcher().dispatch(new LastLevelCacheLineEvictedByMemWriteProcessEvent(LastLevelCache.this, cacheAccess.getLine()));
-                    cacheAccess.getLine().invalidate();
+//                    cacheAccess.getLine().invalidate();
 
                     return true;
                 }
@@ -225,6 +225,8 @@ public class LastLevelCache extends CoherentCache<MESIState> {
 
                     sendReply(source, message, 8);
 
+                    findAndLockProcess.getCacheAccess().commit().getLine().unlock();
+
                     return true;
                 }
             });
@@ -235,6 +237,11 @@ public class LastLevelCache extends CoherentCache<MESIState> {
                     if (message.isDirty()) {
                         if (findAndLockProcess.getCacheAccess().isHitInCache() || !findAndLockProcess.getCacheAccess().isBypass()) {
                             findAndLockProcess.getCacheAccess().getLine().setNonInitialState(MESIState.MODIFIED);
+                        }
+                    }
+                    else {
+                        if (findAndLockProcess.getCacheAccess().isHitInCache() || !findAndLockProcess.getCacheAccess().isBypass()) {
+                            findAndLockProcess.getCacheAccess().getLine().setNonInitialState(MESIState.EXCLUSIVE);
                         }
                     }
 
@@ -261,6 +268,7 @@ public class LastLevelCache extends CoherentCache<MESIState> {
     private class L1DownwardReadProcess extends LockingProcess {
         private FirstLevelCache source;
         private DownwardReadMessage message;
+        private boolean hasCopyback;
 
         private L1DownwardReadProcess(final FirstLevelCache source, final DownwardReadMessage message) {
             super(message.getAccess(), message.getTag(), CacheAccessType.DOWNWARD_READ);
@@ -276,6 +284,17 @@ public class LastLevelCache extends CoherentCache<MESIState> {
 
                     sendReply(source, message, source.getCache().getLineSize() + 8);
 
+                    if (!findAndLockProcess.getCacheAccess().isHitInCache() && !findAndLockProcess.getCacheAccess().isBypass()) {
+                        if(hasCopyback) {
+                            findAndLockProcess.getCacheAccess().getLine().setNonInitialState(MESIState.MODIFIED);
+                        }
+                        else {
+                            findAndLockProcess.getCacheAccess().getLine().setNonInitialState(MESIState.EXCLUSIVE);
+                        }
+                    }
+
+                    findAndLockProcess.getCacheAccess().commit().getLine().unlock();
+
                     return true;
                 }
             });
@@ -288,16 +307,17 @@ public class LastLevelCache extends CoherentCache<MESIState> {
                             getPendingActions().push(new UpwardReadProcess(message.getAccess(), message.getTag(), getOwnerOrFirstSharer(message.getTag())).addOnCompletedCallback(new Action1<UpwardReadProcess>() {
                                 public void apply(UpwardReadProcess upwardReadProcess) {
                                     if (upwardReadProcess.hasCopyback) {
-                                        findAndLockProcess.getCacheAccess().getLine().setNonInitialState(MESIState.MODIFIED);
+                                        hasCopyback = true;
+//                                        findAndLockProcess.getCacheAccess().getLine().setNonInitialState(MESIState.MODIFIED);
                                     }
                                 }
                             }));
                         } else {
                             getPendingActions().push(new MemReadProcess(message.getAccess(), message.getTag()).addOnCompletedCallback(new Action1<MemReadProcess>() {
                                 public void apply(MemReadProcess memReadProcess) {
-                                    if (!findAndLockProcess.getCacheAccess().isHitInCache() && !findAndLockProcess.getCacheAccess().isBypass()) {
-                                        findAndLockProcess.getCacheAccess().getLine().setNonInitialState(MESIState.EXCLUSIVE);
-                                    }
+//                                    if (!findAndLockProcess.getCacheAccess().isHitInCache() && !findAndLockProcess.getCacheAccess().isBypass()) {
+//                                        findAndLockProcess.getCacheAccess().getLine().setNonInitialState(MESIState.EXCLUSIVE);
+//                                    }
                                 }
                             }));
                         }
@@ -345,6 +365,8 @@ public class LastLevelCache extends CoherentCache<MESIState> {
                     if (findAndLockProcess.getCacheAccess().isHitInCache() || !findAndLockProcess.getCacheAccess().isBypass()) {
                         findAndLockProcess.getCacheAccess().getLine().setNonInitialState(findAndLockProcess.getCacheAccess().getLine().getState() == MESIState.MODIFIED ? MESIState.MODIFIED : MESIState.EXCLUSIVE);
                     }
+
+                    findAndLockProcess.getCacheAccess().commit().getLine().unlock();
 
                     sendReply(source, message, source.getCache().getLineSize() + 8);
 

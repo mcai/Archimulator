@@ -88,7 +88,9 @@ public class TranslationLookasideBuffer implements Serializable {
             if (cacheAccess.isEviction()) {
                 this.evictions++;
             }
-            cacheAccess.commit().getLine().setNonInitialState(true);
+
+            cacheAccess.getLine().setNonInitialState(true);
+            cacheAccess.commit();
         }
 
         access.getThread().getCycleAccurateEventQueue().schedule(onCompletedCallback, cacheAccess.isHitInCache() ? this.config.getHitLatency() : this.config.getMissLatency());

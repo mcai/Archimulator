@@ -280,8 +280,9 @@ public abstract class CoherentCache<StateT extends Serializable> extends MemoryD
         public LockableCacheLine findLine(int address) {
             int tag = this.getTag(address);
             int set = this.getSet(address);
-
-            for (LockableCacheLine line : this.sets.get(set).getLines()) {
+            
+            for(int way = 0; way < this.getAssociativity(); way++) {
+                LockableCacheLine line = this.getLine(set, way);
                 if (line.getTag() == tag && line.getState() != line.getInitialState() || line.getTransientTag() == tag && line.isLocked()) {
                     return line;
                 }
@@ -463,7 +464,7 @@ public abstract class CoherentCache<StateT extends Serializable> extends MemoryD
         @Override
         protected void complete() {
             if (this.findAndLockProcess.status == FindAndLockStatus.ACQUIRED) {
-                this.findAndLockProcess.cacheAccess.commit().getLine().unlock();
+//                this.findAndLockProcess.cacheAccess.commit().getLine().unlock();
                 this.findAndLockProcess.status = FindAndLockStatus.RELEASED;
             } else if (this.findAndLockProcess.status == FindAndLockStatus.FAILED) {
                 this.findAndLockProcess.cacheAccess.abort();

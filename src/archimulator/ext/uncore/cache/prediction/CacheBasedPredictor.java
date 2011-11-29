@@ -44,10 +44,9 @@ public class CacheBasedPredictor<PredictableT extends Comparable<PredictableT>> 
     public void update(int address, PredictableT observedValue) {
         CacheAccess<Boolean, PredictorLine> access = this.evictableCache.newAccess(null, null, address, CacheAccessType.UNKNOWN);
         if (!access.isHitInCache()) {
-            access.commit().getLine().setNonInitialState(true);
-        } else {
-            access.commit();
+            access.getLine().setNonInitialState(true);
         }
+        access.commit();
 
         PredictorLine line = this.evictableCache.getLine(access.getReference().getSet(), access.getWay());
 
