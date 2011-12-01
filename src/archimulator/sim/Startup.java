@@ -81,8 +81,8 @@ public class Startup {
 
     public static void simulate(String title, EvictionPolicyFactory l2EvictionPolicyFactory, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs) {
 //        Experiment experiment = createFunctionalExperiment(title, contextConfigs);
-        Experiment experiment = createDetailedExperiment(title, l2EvictionPolicyFactory, numCores, numThreadsPerCore, contextConfigs);
-//        Experiment experiment = createCheckpointedExperiment(title, l2EvictionPolicyFactory, numCores, numThreadsPerCore, contextConfigs);
+//        Experiment experiment = createDetailedExperiment(title, l2EvictionPolicyFactory, numCores, numThreadsPerCore, contextConfigs);
+        Experiment experiment = createCheckpointedExperiment(title, l2EvictionPolicyFactory, numCores, numThreadsPerCore, contextConfigs);
 
         experiment.start();
         experiment.join();
@@ -124,6 +124,7 @@ public class Startup {
             "/home/itecgo/Archimulator/benchmarks/Olden_Custom1/mst/baseline",
             "mst.mips",
 //            "10000");
+//            "2000");
 //            "1000");
             "1000");
 //    "400");
@@ -134,6 +135,7 @@ public class Startup {
             "/home/itecgo/Archimulator/benchmarks/Olden_Custom1/mst/ht",
             "mst.mips",
 //            "10000");
+//            "2000");
             "1000");
 //            "400");
 //            "200");

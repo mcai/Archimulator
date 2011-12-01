@@ -39,7 +39,7 @@
 \pdf_title "Shared LLC Pollution by Helper Threaded Data Prefetching on CMPs"
 \pdf_author "Min Cai, Zhimin Gu"
 \pdf_keywords "chip multiprocessors, helper threaded data prefetching, cache replacement, cache pollution"
-\pdf_bookmarks true
+\pdf_bookmarks false
 \pdf_bookmarksnumbered true
 \pdf_bookmarksopen true
 \pdf_bookmarksopenlevel 1
@@ -175,7 +175,7 @@ et al.
 
 : Your Title
 \begin_inset Note Note
-status open
+status collapsed
 
 \begin_layout Plain Layout
 left side
@@ -314,126 +314,360 @@ ion of HT requests to the MT performance.
 Simulation Environment
 \end_layout
 
+\begin_layout Standard
+We use an in-house multicore architectural simulator named Archimulator
+ in our experiments mentioned in this work.
+ Archimulator is an execution-driven architectural simulator implemented
+ in Java and running on Linux that supports application-only cycle-accurate
+ modeling of multicore multithreaded architectures.
+ It has preliminary support of simulating Pthreads based parallel workloads.
+\end_layout
+
 \begin_layout Section
 Methodology
+\end_layout
+
+\begin_layout Subsection
+Overview
+\end_layout
+
+\begin_layout Standard
+First, we need to track which LLC requests come from the main thread, and
+ which LLC requests come from the helper thread.
+ For example, consider a simulated multicore machine which has two cores
+ where each core has two hardware threads.
+ In our system call emulation mode simulation in Archimulator, without the
+ OS intervention, one hardware thread can only run at least one software
+ context (or called thread).
+ Therefore, the typical software context to hardware thread assignments
+ can be: core 0 thread 0 run context 0 (which is the main thread), core
+ 0 thread 1 run context 1 (which is the pthread manager thread), core 1
+ thread 0 run context 2 (which is the helper thread), and core 1 thread
+ 1 is idle.
+ We use this configuration in the following discussions.
+ 
+\end_layout
+
+\begin_layout Standard
+Second, to monitor the request and replacement activities in LLC, we need
+ to consider the event when the LLC receives a request coming from the upper
+ level cache (i.e., a hit or miss), which is named CoherentCacheServiceNonblocking
+RequestEvent in Archimulator.
+ The event has a few important properties, e.g., the address of the requested
+ LLC line, the requester memory hierarchy access, line found in the LLC,
+ a boolean value indicating whether the request hits in the LLC, and a boolean
+ value indicating whether the request needs to evict some LLC line.
+ This event is similar to the comination of two events mentioned in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Mehta2004"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Thirdly, in order to track the HT request state in the LLC and victims replaced
+ by HT requests, we add two data structures to the LLC, namely htRequestStates
+ and htRequestVictimCache.
+ htRequestStates is a mirror cache of the LLC, which maintains an HT request
+ state field for each LLC line, which can be in three values: INVALID, MT
+ and HT.
+ htRequestVictimCache is an LRU cache that has the same structure of the
+ LLC, but there is no mapping between each LLC line and each htRequestVictimCach
+e line.
+ Each htRequestVictimCache line contains a field, the type of field can
+ be in three values: INVALID, NULL and DATA.
+\end_layout
+
+\begin_layout Subsection
+Algorithms
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset listings
+lstparams "basicstyle={\footnotesize\ttfamily},breaklines=true,frame=single,language=Java,numbers=left,numberstyle={\scriptsize}"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+if(hitInLLC && requesterIsHT) {
+\end_layout
+
+\begin_layout Plain Layout
+
+  totalHtRequests++;
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+if(requesterIsHT && hitInLLC && hasEviction) {
+\end_layout
+
+\begin_layout Plain Layout
+
+  llc.setHT(set, llcLine.way);
+\end_layout
+
+\begin_layout Plain Layout
+
+  victimCache.insertNullEntry(set);
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+else if(requesterIsHT && !hitInLLC && hasEviction && !lineFoundIsHT) {
+\end_layout
+
+\begin_layout Plain Layout
+
+  llc.setHT(set, llcLine.way);
+\end_layout
+
+\begin_layout Plain Layout
+
+  victimCache.insertDataEntry(set, llcLine.tag);
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+else if(requesterIsHT && !hitInCache && hasEviction && lineFoundIsHT) {
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+else if(!requesterIsHT && !hitInCache && hasEviction && lineFoundIsHT) {
+\end_layout
+
+\begin_layout Plain Layout
+
+  llc.setMT(set, llcLine.way);
+\end_layout
+
+\begin_layout Plain Layout
+
+  victimCache.removeLRU(set);
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+else if(!requesterIsHT && !lineFoundIsHT) {
+\end_layout
+
+\begin_layout Plain Layout
+
+  if(htRequestFound()) {
+\end_layout
+
+\begin_layout Plain Layout
+
+    victimCache.removeLRU(set);
+\end_layout
+
+\begin_layout Plain Layout
+
+    victimCache.insertDataEntry(set, llcLine.tag);
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+LLC Line Brought In
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset listings
+lstparams "basicstyle={\footnotesize\ttfamily},breaklines=true,frame=single,language=Java,numbers=left,numberstyle={\scriptsize}"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+if(!mtHit && !htHit && vtHit) {
+\end_layout
+
+\begin_layout Plain Layout
+
+  badHtRequests++;
+\end_layout
+
+\begin_layout Plain Layout
+
+  victimCache.setLRU(set, vtLine.way);
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+else if(!mtHit && htHit && !vtHit) {
+\end_layout
+
+\begin_layout Plain Layout
+
+  llc.setMT(set, llcLine.way);
+\end_layout
+
+\begin_layout Plain Layout
+
+  goodHtRequests++;
+\end_layout
+
+\begin_layout Plain Layout
+
+  removeLRU(set);
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+else if(!mtHit && htHit && vtHit) {
+\end_layout
+
+\begin_layout Plain Layout
+
+  llc.setMT(set, llcLine.way);
+\end_layout
+
+\begin_layout Plain Layout
+
+  victimCache.setLRU(set, vtLine.way);
+\end_layout
+
+\begin_layout Plain Layout
+
+  victimCache.removeLRU(set);
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+else if(mtHit && !htHit && vtHit) {
+\end_layout
+
+\begin_layout Plain Layout
+
+  victimCache.setLRU(set, vtLine.way);
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Servicing MT and HT Requests
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
 Results
 \end_layout
 
-\begin_layout Standard
-\begin_inset Float figure
-placement htbp
-wide false
-sideways false
-status collapsed
-
-\begin_layout Plain Layout
-\align center
-
-\family sans
-A single column figure goes here
+\begin_layout Itemize
+mst 1000, HT version, HT params: ?, ?, ? , detailed simulation vs checkpointed
+ simulation
 \end_layout
 
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-Captions go 
-\emph on
-under
-\emph default
- the figure
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\begin_inset Float table
-placement htbp
-wide false
-sideways false
-status collapsed
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-Table captions go 
-\emph on
-above
-\emph default
- the table
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Tabular
-<lyxtabular version="3" rows="2" columns="2">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0pt">
-<column alignment="center" valignment="top" width="0pt">
-<row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-delete
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-this
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-example
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-table
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
+\begin_layout Itemize
+mst 10000, HT version, HT params: ?, ?, ? , checkpointed simulation
 \end_layout
 
 \begin_layout Section
@@ -445,13 +679,7 @@ Conclusion
 \end_layout
 
 \begin_layout Standard
-\begin_inset CommandInset citation
-LatexCommand citet
-key "IEEEexample:beebe_archive"
-
-\end_inset
-
-
+TODO: our work: what? how? result? Further work?
 \end_layout
 
 \begin_layout Section*
@@ -468,7 +696,7 @@ This work was supported by the National Natural Science Foundation of China
 \begin_layout Standard
 \begin_inset CommandInset bibtex
 LatexCommand bibtex
-bibfiles "IEEEabrv,IEEEexample"
+bibfiles "ref"
 options "IEEEtran"
 
 \end_inset
