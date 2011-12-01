@@ -134,10 +134,9 @@ public class Startup {
             "/home/itecgo/Archimulator/benchmarks/Olden_Custom1/mst/ht",
             "mst.mips",
 //            "10000");
-//            "1000");
-            "400");
-//            "200");
+            "1000");
 //            "400");
+//            "200");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_EM3D_BASELINE = new SimulatedProgram(
             "Olden_Custom1",

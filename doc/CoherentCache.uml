@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>archimulator.uncore.coherence.CoherentCache</OriginalElement>
+  <nodes>
+    <node x="100.25" y="79.0">archimulator.sim.SimulationObject</node>
+    <node x="6.250000000000028" y="79.0">java.lang.Object</node>
+    <node x="38.57196969696969" y="395.0">archimulator.uncore.coherence.LastLevelCache</node>
+    <node x="187.5719696969697" y="395.0">archimulator.uncore.coherence.FirstLevelCache</node>
+    <node x="0.0" y="158.0">archimulator.sim.BasicSimulationObject</node>
+    <node x="167.6969696969697" y="0.0">java.io.Serializable</node>
+    <node x="123.0378787878788" y="316.0">archimulator.uncore.coherence.CoherentCache</node>
+    <node x="139.0378787878788" y="237.0">archimulator.uncore.MemoryDevice</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="archimulator.sim.BasicSimulationObject" target="java.lang.Object">
+      <point x="-43.25" y="-14.5" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="archimulator.uncore.coherence.CoherentCache" target="archimulator.uncore.MemoryDevice">
+      <point x="0.0" y="-14.5" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="archimulator.sim.BasicSimulationObject" target="archimulator.sim.SimulationObject">
+      <point x="43.25" y="-14.5" />
+      <point x="129.75" y="133.0" />
+      <point x="135.5" y="133.0" />
+      <point x="-35.25" y="14.5" />
+    </edge>
+    <edge source="archimulator.sim.SimulationObject" target="java.io.Serializable">
+      <point x="0.0" y="-14.5" />
+      <point x="170.75" y="54.0" />
+      <point x="193.9469696969697" y="54.0" />
+      <point x="-26.25" y="14.5" />
+    </edge>
+    <edge source="archimulator.uncore.MemoryDevice" target="java.io.Serializable">
+      <point x="41.66666666666666" y="-14.5" />
+      <point x="243.20454545454544" y="212.0" />
+      <point x="251.75" y="212.0" />
+      <point x="251.75" y="54.0" />
+      <point x="246.4469696969697" y="54.0" />
+      <point x="26.249999999999993" y="14.5" />
+    </edge>
+    <edge source="archimulator.uncore.MemoryDevice" target="archimulator.sim.BasicSimulationObject">
+      <point x="-41.66666666666666" y="-14.5" />
+      <point x="159.87121212121212" y="212.0" />
+      <point x="86.5" y="212.0" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="archimulator.uncore.coherence.LastLevelCache" target="archimulator.uncore.coherence.CoherentCache">
+      <point x="0.0" y="-14.5" />
+      <point x="103.07196969696969" y="370.0" />
+      <point x="162.2878787878788" y="370.0" />
+      <point x="-39.25" y="14.5" />
+    </edge>
+    <edge source="archimulator.uncore.MemoryDevice" target="archimulator.sim.SimulationObject">
+      <point x="0.0" y="-14.5" />
+      <point x="201.5378787878788" y="212.0" />
+      <point x="206.0" y="212.0" />
+      <point x="35.25" y="14.5" />
+    </edge>
+    <edge source="archimulator.uncore.coherence.FirstLevelCache" target="archimulator.uncore.coherence.CoherentCache">
+      <point x="0.0" y="-14.5" />
+      <point x="253.0719696969697" y="370.0" />
+      <point x="240.7878787878788" y="370.0" />
+      <point x="39.25" y="14.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="142.5" y="332.5" />
+  <SelectedNodes />
+  <Categories />
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

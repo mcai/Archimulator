@@ -31,9 +31,9 @@ theorems-std
 \paperfontsize default
 \spacing single
 \use_hyperref true
-\pdf_title "Shared LLC Pollution by Helper Threaded Data Prefetching on CMPs"
+\pdf_title "Hardware Support for Efficient Helper Threaded Data Prefetching on Chip Multiprocessors"
 \pdf_author "Min Cai, Zhimin Gu"
-\pdf_keywords "chip multiprocessors, helper threaded data prefetching, cache replacement, cache pollution"
+\pdf_keywords "chip multiprocessors, helper threaded prefetching, cache replacement, memory level parallelism"
 \pdf_bookmarks false
 \pdf_bookmarksnumbered false
 \pdf_bookmarksopen false
@@ -81,7 +81,8 @@ theorems-std
 \begin_body
 
 \begin_layout Title
-Shared LLC Pollution by Helper Threaded Data Prefetching on CMPs
+Hardware Support for Efficient Helper Threaded Data Prefetching on Chip
+ Multiprocessors
 \begin_inset Foot
 status collapsed
 
@@ -108,28 +109,40 @@ Helper threaded data prefetching on chip multiprocessors (CMPs), in its
  most basic form, utilizes the processing power of underutilized neighboring
  cores that communicate via a shared last level cache (LLC) to improve the
  performance of a single-threaded program running in a CMP.
- However, the multiple memory reference/miss streams that come from the
- main thread (MT) and the helper thread (HT) can inevitably stress and pollute
- LLC if no effective LLC content management techniques are employed.
+ However, the multiple concurrent memory reference/miss streams that come
+ from both the main thread (MT) and the helper thread (HT) can inevitably
+ stress and pollute LLC if no effective LLC content management techniques
+ are employed.
 \end_layout
 
 \begin_layout Abstract
-In this paper, we present the methodology and mechanisms used for evaluating
- the cache pollution caused by helper-threaded data prefetching on CMPs
- to shed insights on improving the effectiveness and timeliness of the scheme.
- Firstly, the experimental framework for simulating helper-threaded data
- prefetching on CMPs is described.
- Secondly, the methodology to classify and quantify the contribution of
- HT requests to the MT performance is discussed.
- Results of memory-intensive benchmarks from Olden and CPU2006 show that:
- (1) there is notable cache pollution caused by helper-threaded data prefetching
- on CMPs; (2) there is room for improving the effectiveness and timeliness
- of helper-threaded data prefetching on CMPs.
+In this paper, we leverage both passive and active forms of LLC content
+ management techniques to improve the effectiveness of helper threaded data
+ prefetching on CMPs.
+ Firstly, the contribution of HT requests to the MT performance is quantified
+ and classified accordingly.
+ Secondly, based on inter-thread reuse distance prediction, contribution
+ aware LLC replacement with bypassing is proposed to make near-optimal replaceme
+nt decisions for HT requests based on their contribution to the MT performance.
+ Thirdly, by exploiting the inherent memory level parallelism (MLP) available
+ on CMPs, the scheme of hardware constructed dynamic p-thread chaining is
+ discussed to tackle with late HT requests as for MT references.
+ Finally, the proposed mechanisms are implemented in an execution-driven
+ cycle-accurate multicore architectural simulator and their comparative
+ performance to their existing counterparts are provided using memory-intensive
+ benchmarks from Olden and CPU2006.
+ Results shows that: (1) contribution aware LLC replacement with bypassing
+ can improve the MT performance by XX% as compared to the baseline helper
+ threaded data prefetching on CMPs, and additional L2 bypassing for select
+ harmful HT requests can further improve the MT performance by XX%; (2)
+ MLP-aware hardware constructed dynamic p-thread chaining can transform
+ xx% of late HT requests to useful ones and therefore improve the MT performance
+ by XX%.
 \end_layout
 
 \begin_layout Keywords
 chip multiprocessors, helper threaded data prefetching, cache replacement,
- cache pollution
+ memory level parallelism
 \end_layout
 
 \begin_layout Section

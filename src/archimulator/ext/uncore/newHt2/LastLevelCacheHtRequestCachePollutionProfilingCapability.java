@@ -53,8 +53,8 @@ import java.util.Map;
 public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements SimulationCapability {
     private CoherentCache<MESIState>.LockableCache llc;
 
-    private EvictableCache<HtRequestVictimCacheLineState, CacheLine<HtRequestVictimCacheLineState>> htRequestVictimCache;
     private Map<Integer, Map<Integer, LastLevelCacheLineHtRequestState>> htRequestStates;
+    private EvictableCache<HtRequestVictimCacheLineState, CacheLine<HtRequestVictimCacheLineState>> htRequestVictimCache;
 
     private long totalHtRequests;
     private long goodHtRequests;
@@ -67,12 +67,6 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
         this.simulation = simulation;
         this.llc = simulation.getProcessor().getCacheHierarchy().getL2Cache().getCache();
 
-        this.htRequestVictimCache = new EvictableCache<HtRequestVictimCacheLineState, CacheLine<HtRequestVictimCacheLineState>>(this.llc, "", this.llc.getGeometry(), LeastRecentlyUsedEvictionPolicy.FACTORY, new Function3<Cache<?, ?>, Integer, Integer, CacheLine<HtRequestVictimCacheLineState>>() {
-            public CacheLine<HtRequestVictimCacheLineState> apply(Cache<?, ?> cache, Integer set, Integer way) {
-                return new CacheLine<HtRequestVictimCacheLineState>(cache, set, way, new InvalidHtRequestVictimCacheLineState());
-            }
-        });
-
         this.htRequestStates = new HashMap<Integer, Map<Integer, LastLevelCacheLineHtRequestState>>();
         for (int set = 0; set < this.llc.getNumSets(); set++) {
             HashMap<Integer, LastLevelCacheLineHtRequestState> htRequestStatesPerSet = new HashMap<Integer, LastLevelCacheLineHtRequestState>();
@@ -82,6 +76,12 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
                 htRequestStatesPerSet.put(way, LastLevelCacheLineHtRequestState.INVALID);
             }
         }
+
+        this.htRequestVictimCache = new EvictableCache<HtRequestVictimCacheLineState, CacheLine<HtRequestVictimCacheLineState>>(this.llc, "", this.llc.getGeometry(), LeastRecentlyUsedEvictionPolicy.FACTORY, new Function3<Cache<?, ?>, Integer, Integer, CacheLine<HtRequestVictimCacheLineState>>() {
+            public CacheLine<HtRequestVictimCacheLineState> apply(Cache<?, ?> cache, Integer set, Integer way) {
+                return new CacheLine<HtRequestVictimCacheLineState>(cache, set, way, new InvalidHtRequestVictimCacheLineState());
+            }
+        });
 
         simulation.getBlockingEventDispatcher().addListener(CoherentCacheServiceNonblockingRequestEvent.class, new Action1<CoherentCacheServiceNonblockingRequestEvent>() {
             public void apply(CoherentCacheServiceNonblockingRequestEvent event) {
