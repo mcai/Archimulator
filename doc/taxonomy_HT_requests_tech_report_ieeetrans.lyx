@@ -1,0 +1,480 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass IEEEtran
+\begin_preamble
+% for subfigures/subtables
+\ifCLASSOPTIONcompsoc
+\usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
+\else
+\usepackage[caption=false,font=footnotesize]{subfig}
+\fi
+\end_preamble
+\use_default_options false
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding default
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\float_placement tbh
+\paperfontsize default
+\spacing single
+\use_hyperref true
+\pdf_title "Shared LLC Pollution by Helper Threaded Data Prefetching on CMPs"
+\pdf_author "Min Cai, Zhimin Gu"
+\pdf_keywords "chip multiprocessors, helper threaded data prefetching, cache replacement, cache pollution"
+\pdf_bookmarks true
+\pdf_bookmarksnumbered true
+\pdf_bookmarksopen true
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks false
+\pdf_pdfborder true
+\pdf_colorlinks false
+\pdf_backref false
+\pdf_pdfusetitle false
+\pdf_quoted_options "pdfpagelayout=OneColumn, pdfnewwindow=true, pdfstartview=XYZ, plainpages=false"
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 0
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 2
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+You find the IEEEtran document class documentation here: http://mirror.ctan.org/ma
+cros/latex/contrib/IEEEtran/IEEEtran_HOWTO.pdf
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Title
+A Quantitative Analysis of Shared LLC Pollution by Helper Threaded Data
+ Prefetching on CMPs
+\end_layout
+
+\begin_layout Author
+Min
+\begin_inset space ~
+\end_inset
+
+Cai, Zhimin
+\begin_inset space ~
+\end_inset
+
+Gu
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+Min Cai is with the School of Computer Science and Technology, Beijing Institute
+ of Technology, Beijing, China, e-mail: 
+\begin_inset CommandInset href
+LatexCommand href
+target "min.cai.china@gmail.com"
+
+\end_inset
+
+.
+\end_layout
+
+\end_inset
+
+
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+Zhimin Gu is with the School of Computer Science and Technology, Beijing
+ Institute of Technology, Beijing, China, e-mail: 
+\begin_inset CommandInset href
+LatexCommand href
+target "zmgu@x263.net"
+
+\end_inset
+
+.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Page headings
+Journal of XXX
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+}{
+\end_layout
+
+\end_inset
+
+Your Name 
+\begin_inset Flex Lowercase
+status open
+
+\begin_layout Plain Layout
+
+\emph on
+et al.
+\end_layout
+
+\end_inset
+
+: Your Title
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+left side
+\series bold
+}{
+\series default
+right side
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Abstract
+Helper threaded data prefetching on chip multiprocessors (CMPs), in its
+ most basic form, utilizes the processing power of underutilized neighboring
+ cores that communicate via a shared last level cache (LLC) to improve the
+ performance of a single-threaded program running in a CMP.
+ However, the multiple memory reference/miss streams that come from the
+ main thread (MT) and the helper thread (HT) can inevitably stress and pollute
+ LLC if no effective LLC content management techniques are employed.
+\end_layout
+
+\begin_layout Abstract
+In this paper, we present the methodology and mechanisms used in the quantitativ
+e analysis of the shared LLC pollution caused by helper-threaded data prefetchin
+g on CMPs, in the aim of providing insights on improving the effectiveness
+ and timeliness of the scheme.
+ Firstly, the simulation environment for simulating helper-threaded data
+ prefetching on CMPs is described.
+ Secondly, the methodology to classify and quantify the contribution of
+ HT requests to the MT performance is discussed.
+ Results of memory-intensive benchmarks from Olden and CPU2006 show that:
+ (1) there is notable cache pollution caused by helper-threaded data prefetching
+ on CMPs; (2) there is room for improving the effectiveness and timeliness
+ of helper-threaded data prefetching on CMPs.
+\end_layout
+
+\begin_layout Keywords
+chip multiprocessors, helper threaded data prefetching, cache replacement,
+ cache pollution
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+The 
+\series bold
+
+\backslash
+IEEEPARstart
+\series default
+ command is needed in the first paragraph fo the document.
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+IEEEPARstart{
+\end_layout
+
+\end_inset
+
+ H
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+}{
+\end_layout
+
+\end_inset
+
+elper
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+ threaded data prefetching on chip multiprocessors (CMPs), in its most basic
+ form, utilizes the processing power of underutilized neighboring cores
+ that communicate via a shared last level cache (LLC) to improve the performance
+ of a single-threaded program running in a CMP.
+ However, the multiple memory reference/miss streams that come from the
+ main thread (MT) and the helper thread (HT) can inevitably stress and pollute
+ LLC if no effective LLC content management techniques are employed.
+\end_layout
+
+\begin_layout Standard
+In this paper, we present the methodology and mechanisms used in the quantitativ
+e analysis of the shared LLC pollution caused by helper-threaded data prefetchin
+g on CMPs, in the aim of providing insights on improving the effectiveness
+ and timeliness of the scheme.
+ Firstly, the experimental framework for simulating helper-threaded data
+ prefetching on CMPs is described.
+ Secondly, the methodology to classify and quantify the contribution of
+ HT requests to the MT performance is discussed.
+ Results of memory-intensive benchmarks from Olden and CPU2006 show that:
+ (1) there is notable cache pollution caused by helper-threaded data prefetching
+ on CMPs; (2) there is room for improving the effectiveness and timeliness
+ of helper-threaded data prefetching on CMPs.
+\end_layout
+
+\begin_layout Standard
+The remaining of the paper is organized as follows.
+ Section 2 introduces the simulation environment for simulating helper-threaded
+ data prefetching on CMPs.
+ Section 3 discusses the methodology used to classify and quantify the contribut
+ion of HT requests to the MT performance.
+ Section 4 presents the results.
+ Section 5 shows the previous work.
+ Section 6 concludes the paper.
+\end_layout
+
+\begin_layout Section
+Simulation Environment
+\end_layout
+
+\begin_layout Section
+Methodology
+\end_layout
+
+\begin_layout Section
+Results
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement htbp
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+
+\family sans
+A single column figure goes here
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Captions go 
+\emph on
+under
+\emph default
+ the figure
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Float table
+placement htbp
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Table captions go 
+\emph on
+above
+\emph default
+ the table
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="2">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0pt">
+<column alignment="center" valignment="top" width="0pt">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+delete
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+this
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+example
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+table
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Previous Work
+\end_layout
+
+\begin_layout Section
+Conclusion
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset citation
+LatexCommand citet
+key "IEEEexample:beebe_archive"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section*
+Acknowlegments
+\end_layout
+
+\begin_layout Standard
+This work was supported by the National Natural Science Foundation of China
+ under the contract No.
+ 61070029.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset bibtex
+LatexCommand bibtex
+bibfiles "IEEEabrv,IEEEexample"
+options "IEEEtran"
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document
