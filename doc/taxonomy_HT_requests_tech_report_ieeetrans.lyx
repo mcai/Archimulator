@@ -506,6 +506,15 @@ reference "fig:Servicing-MT-and-HT-requests"
 \end_layout
 
 \begin_layout Standard
+
+\color red
+TODOs: dispatching and handling of CoherentCacheServiceNonblockingRequestEvent:
+ dispatching in CoherentCache.AbstractFindAndLockProcess.doLockingProcess(..)
+ handling in LastLevelCacheHtRequestCachePollutionProfilingCapability.serviceRequ
+est(..)
+\end_layout
+
+\begin_layout Standard
 \begin_inset Float figure
 wide false
 sideways false
