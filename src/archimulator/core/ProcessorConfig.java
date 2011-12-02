@@ -50,7 +50,7 @@ public class ProcessorConfig {
     private Map<Class<? extends KernelCapability>, KernelCapabilityFactory> kernelCapabilityFactories;
 
     public ProcessorConfig(int numCores, int numThreadsPerCore, MemoryHierarchyConfig memoryHierarchyConfig, Map<Class<? extends ProcessorCapability>, ProcessorCapabilityFactory> processorCapabilityFactories, Map<Class<? extends KernelCapability>, KernelCapabilityFactory> kernelCapabilityFactories) {
-        this(numCores, numThreadsPerCore, 128, 8, 8, 8, 96, 96, 48, memoryHierarchyConfig, processorCapabilityFactories, kernelCapabilityFactories);
+        this(numCores, numThreadsPerCore, 128, 4, 4, 4, 96, 96, 48, memoryHierarchyConfig, processorCapabilityFactories, kernelCapabilityFactories);
     }
 
     public ProcessorConfig(int numCores, int numThreadsPerCore, int physicalRegisterFileCapacity, int decodeWidth, int issueWidth, int commitWidth, int decodeBufferCapacity, int reorderBufferCapacity, int loadStoreQueueCapacity, MemoryHierarchyConfig memoryHierarchyConfig, Map<Class<? extends ProcessorCapability>, ProcessorCapabilityFactory> processorCapabilityFactories, Map<Class<? extends KernelCapability>, KernelCapabilityFactory> kernelCapabilityFactories) {
