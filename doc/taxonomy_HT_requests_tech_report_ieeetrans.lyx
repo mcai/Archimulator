@@ -32,7 +32,7 @@
 \output_sync 0
 \bibtex_command default
 \index_command default
-\float_placement tbh
+\float_placement tph
 \paperfontsize default
 \spacing single
 \use_hyperref true
@@ -112,11 +112,11 @@ Cai, Zhimin
 
 Gu
 \begin_inset Foot
-status collapsed
+status open
 
 \begin_layout Plain Layout
-Min Cai is with the School of Computer Science and Technology, Beijing Institute
- of Technology, Beijing, China, e-mail: 
+Min Cai, School of Computer Science and Technology, Beijing Institute of
+ Technology, Beijing, China, e-mail: 
 \begin_inset CommandInset href
 LatexCommand href
 target "min.cai.china@gmail.com"
@@ -130,11 +130,11 @@ target "min.cai.china@gmail.com"
 
 
 \begin_inset Foot
-status collapsed
+status open
 
 \begin_layout Plain Layout
-Zhimin Gu is with the School of Computer Science and Technology, Beijing
- Institute of Technology, Beijing, China, e-mail: 
+Zhimin Gu, School of Computer Science and Technology, Beijing Institute
+ of Technology, Beijing, China, e-mail: 
 \begin_inset CommandInset href
 LatexCommand href
 target "zmgu@x263.net"
@@ -289,7 +289,17 @@ In this paper, we present the methodology and mechanisms used in the quantitativ
 e analysis of the shared LLC pollution caused by helper-threaded data prefetchin
 g on CMPs, in the aim of providing insights on improving the effectiveness
  and timeliness of the scheme.
- Firstly, the experimental framework for simulating helper-threaded data
+ 
+\end_layout
+
+\begin_layout Standard
+We assume here a two level cache hierarchy where L1 caches are private and
+ the L2 cache is shared among all processor cores on a single chip.
+ 
+\end_layout
+
+\begin_layout Standard
+Firstly, the experimental framework for simulating helper-threaded data
  prefetching on CMPs is described.
  Secondly, the methodology to classify and quantify the contribution of
  HT requests to the MT performance is discussed.
@@ -315,12 +325,23 @@ Simulation Environment
 \end_layout
 
 \begin_layout Standard
-We use an in-house multicore architectural simulator named Archimulator
- in our experiments mentioned in this work.
- Archimulator is an execution-driven architectural simulator implemented
- in Java and running on Linux that supports application-only cycle-accurate
+Simulator: we use an in-house multicore architectural simulator named Archimulat
+or in our experiments mentioned in this work.
+ Archimulator is an execution-driven architectural simulator written in
+ Java and running on Linux that supports application-only cycle-accurate
  modeling of multicore multithreaded architectures.
  It has preliminary support of simulating Pthreads based parallel workloads.
+\end_layout
+
+\begin_layout Standard
+Target machine: 4(8)-wide OoO 2 x 2 CMP, shared 4MB 8-way set-associative
+ L2, private 32KB 8-way set-associative L1 data caches and 32KB 4-way set-associ
+ative L1 instruction caches, MESI coherence between L1s, switch based point-to-p
+oint on-chip interconnect.
+\end_layout
+
+\begin_layout Standard
+...
 \end_layout
 
 \begin_layout Section
@@ -328,7 +349,30 @@ Methodology
 \end_layout
 
 \begin_layout Subsection
-Overview
+Definitions 
+\end_layout
+
+\begin_layout Standard
+Based on their contribution to the MT performance, on the LLC which is shared
+ by MT, HT and some other threads, the following taxonomy of HT requests
+ can be obtained:
+\end_layout
+
+\begin_layout Itemize
+# Good HT requests = # HT requests that hit by MT before evicted;
+\end_layout
+
+\begin_layout Itemize
+# Bad HT requests = # HT requests whose requested data are used later (or
+ not used at all) by MT than the evicted data;
+\end_layout
+
+\begin_layout Itemize
+# Ugly HT requests = # HT requests - # good HT requests - # bad HT requests.
+\end_layout
+
+\begin_layout Subsection
+Hardware Changes
 \end_layout
 
 \begin_layout Standard
@@ -336,28 +380,33 @@ First, we need to track which LLC requests come from the main thread, and
  which LLC requests come from the helper thread.
  For example, consider a simulated multicore machine which has two cores
  where each core has two hardware threads.
- In our system call emulation mode simulation in Archimulator, without the
- OS intervention, one hardware thread can only run at least one software
- context (or called thread).
+ In our application-only simulation using Archimulator, without the OS intervent
+ion, one hardware thread can only run at least one software context (or
+ called thread).
  Therefore, the typical software context to hardware thread assignments
- can be: core 0 thread 0 run context 0 (which is the main thread), core
- 0 thread 1 run context 1 (which is the pthread manager thread), core 1
- thread 0 run context 2 (which is the helper thread), and core 1 thread
- 1 is idle.
+ can be: 
+\bar under
+core 0 thread 0 run context 0 (which is the main thread), core 0 thread
+ 1 run context 1 (which is the pthread manager thread), core 1 thread 0
+ run context 2 (which is the helper thread), and core 1 thread 1 is idle
+\bar default
+.
  We use this configuration in the following discussions.
- 
 \end_layout
 
 \begin_layout Standard
 Second, to monitor the request and replacement activities in LLC, we need
- to consider the event when the LLC receives a request coming from the upper
- level cache (i.e., a hit or miss), which is named CoherentCacheServiceNonblocking
-RequestEvent in Archimulator.
+ to consider 
+\bar under
+the event indicating the LLC receives a request coming from the upper level
+ cache
+\bar default
+, whether it is a hit or a miss.
  The event has a few important properties, e.g., the address of the requested
  LLC line, the requester memory hierarchy access, line found in the LLC,
  a boolean value indicating whether the request hits in the LLC, and a boolean
  value indicating whether the request needs to evict some LLC line.
- This event is similar to the comination of two events mentioned in 
+ This event is similar to the discussion in 
 \begin_inset CommandInset citation
 LatexCommand cite
 key "Mehta2004"
@@ -368,21 +417,92 @@ key "Mehta2004"
 \end_layout
 
 \begin_layout Standard
-Thirdly, in order to track the HT request state in the LLC and victims replaced
- by HT requests, we add two data structures to the LLC, namely htRequestStates
- and htRequestVictimCache.
- htRequestStates is a mirror cache of the LLC, which maintains an HT request
- state field for each LLC line, which can be in three values: INVALID, MT
- and HT.
- htRequestVictimCache is an LRU cache that has the same structure of the
- LLC, but there is no mapping between each LLC line and each htRequestVictimCach
-e line.
- Each htRequestVictimCache line contains a field, the type of field can
- be in three values: INVALID, NULL and DATA.
+Thirdly, in order to track the HT request states in the LLC, we need to
+ 
+\bar under
+add one field to each LLC line to indicate whether the line is brought by
+ the main thread (MT) or the helper thread (HT) or otherwise invalid (INVALID)
+\bar default
+.
+ 
+\end_layout
+
+\begin_layout Standard
+Fourthly, in order to track victims replaced by HT requests, 
+\bar under
+we need to add an LRU cache named HT Request Victim Cache (HTRVC) to maintain
+ the LLC lines that are evicted by HT requests
+\bar default
+.
+ Similar to the evict table used in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Mehta2004"
+
+\end_inset
+
+, the HTRVC has the same structure of the LLC, but there is no direct mapping
+ between LLC lines and HTRVC lines.
+ HTRVC has only the purpose of profiling, so it has no impact on performance.
 \end_layout
 
 \begin_layout Subsection
-Algorithms
+Invariants 
+\end_layout
+
+\begin_layout Standard
+Similar to the two invariants proposed in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Mehta2004"
+
+\end_inset
+
+, there are two invariants that should be maintained:
+\end_layout
+
+\begin_layout Enumerate
+# of HT Lines in the LLC Set = # of Victim Entries in the HTRVC Set;
+\end_layout
+
+\begin_layout Enumerate
+# of Victim Entries in HTRVC Set + # of Valid MT LLC Lines in Set ≤ LLC
+ Set Associativity.
+\end_layout
+
+\begin_layout Standard
+From the above two invariants, we can conclude that: # of HT Lines in the
+ LLC Set+ # of Valid MT LLC Lines in Set ≤ LLC Set Associativity.
+\end_layout
+
+\begin_layout Subsection
+Actions taken on LLC and HT Request Victim Cache
+\end_layout
+
+\begin_layout Standard
+Similar to the approach proposed in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Mehta2004"
+
+\end_inset
+
+, corresponding actions should be taken in LLC and HTRVC when filling an
+ LLC line (Fig.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:LLC-Line-Brought-In"
+
+\end_inset
+
+) or servicing an incoming LLC request (Fig.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Servicing-MT-and-HT-requests"
+
+\end_inset
+
+).
 \end_layout
 
 \begin_layout Standard
@@ -393,13 +513,53 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset listings
-lstparams "basicstyle={\footnotesize\ttfamily},breaklines=true,frame=single,language=Java,numbers=left,numberstyle={\scriptsize}"
+lstparams "basicstyle={\scriptsize\ttfamily},breaklines=true,frame=single,language=Java"
 inline false
 status open
 
 \begin_layout Plain Layout
 
-if(hitInLLC && requesterIsHT) {
+//Inputs:
+\end_layout
+
+\begin_layout Plain Layout
+
+//  hitInLLC: whether the request hits in LLC or not
+\end_layout
+
+\begin_layout Plain Layout
+
+//  requesterIsHT: whether the request comes from HT or not
+\end_layout
+
+\begin_layout Plain Layout
+
+//  hasEviction: whether the request needs to evict some data
+\end_layout
+
+\begin_layout Plain Layout
+
+//  lineFoundIsHT: whether the LLC line found is brought by HT or not
+\end_layout
+
+\begin_layout Plain Layout
+
+//  htRequestFound(): whether there is at least one line in the LLC set
+ that is brought by HT
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+//HT miss
+\end_layout
+
+\begin_layout Plain Layout
+
+if(!hitInLLC && requesterIsHT) {
 \end_layout
 
 \begin_layout Plain Layout
@@ -418,7 +578,12 @@ if(hitInLLC && requesterIsHT) {
 
 \begin_layout Plain Layout
 
-if(requesterIsHT && hitInLLC && hasEviction) {
+//Case 1: HT evicts INVALID
+\end_layout
+
+\begin_layout Plain Layout
+
+if(requesterIsHT && !hitInLLC && !hasEviction) {
 \end_layout
 
 \begin_layout Plain Layout
@@ -428,12 +593,17 @@ if(requesterIsHT && hitInLLC && hasEviction) {
 
 \begin_layout Plain Layout
 
-  victimCache.insertNullEntry(set);
+  htrvc.insertNullEntry(set);
 \end_layout
 
 \begin_layout Plain Layout
 
 }
+\end_layout
+
+\begin_layout Plain Layout
+
+//Case 2: HT evicts MT
 \end_layout
 
 \begin_layout Plain Layout
@@ -448,7 +618,7 @@ else if(requesterIsHT && !hitInLLC && hasEviction && !lineFoundIsHT) {
 
 \begin_layout Plain Layout
 
-  victimCache.insertDataEntry(set, llcLine.tag);
+  htrvc.insertDataEntry(set, llcLine.tag);
 \end_layout
 
 \begin_layout Plain Layout
@@ -458,7 +628,12 @@ else if(requesterIsHT && !hitInLLC && hasEviction && !lineFoundIsHT) {
 
 \begin_layout Plain Layout
 
-else if(requesterIsHT && !hitInCache && hasEviction && lineFoundIsHT) {
+//Case 3: HT evicts HT
+\end_layout
+
+\begin_layout Plain Layout
+
+else if(requesterIsHT && !hitInLLC && hasEviction && lineFoundIsHT) {
 \end_layout
 
 \begin_layout Plain Layout
@@ -468,7 +643,12 @@ else if(requesterIsHT && !hitInCache && hasEviction && lineFoundIsHT) {
 
 \begin_layout Plain Layout
 
-else if(!requesterIsHT && !hitInCache && hasEviction && lineFoundIsHT) {
+//Case 4: MT evicts HT
+\end_layout
+
+\begin_layout Plain Layout
+
+else if(!requesterIsHT && !hitInLLC && hasEviction && lineFoundIsHT) {
 \end_layout
 
 \begin_layout Plain Layout
@@ -478,12 +658,17 @@ else if(!requesterIsHT && !hitInCache && hasEviction && lineFoundIsHT) {
 
 \begin_layout Plain Layout
 
-  victimCache.removeLRU(set);
+  htrvc.removeLRU(set);
 \end_layout
 
 \begin_layout Plain Layout
 
 }
+\end_layout
+
+\begin_layout Plain Layout
+
+//Case 5: MT evicts MT, and there exists one HT line
 \end_layout
 
 \begin_layout Plain Layout
@@ -498,12 +683,12 @@ else if(!requesterIsHT && !lineFoundIsHT) {
 
 \begin_layout Plain Layout
 
-    victimCache.removeLRU(set);
+    htrvc.removeLRU(set);
 \end_layout
 
 \begin_layout Plain Layout
 
-    victimCache.insertDataEntry(set, llcLine.tag);
+    htrvc.insertDataEntry(set, llcLine.tag);
 \end_layout
 
 \begin_layout Plain Layout
@@ -525,7 +710,14 @@ else if(!requesterIsHT && !lineFoundIsHT) {
 \begin_inset Caption
 
 \begin_layout Plain Layout
-LLC Line Brought In
+Actions Taken When Fillling an LLC Line
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:LLC-Line-Brought-In"
+
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -546,9 +738,38 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset listings
-lstparams "basicstyle={\footnotesize\ttfamily},breaklines=true,frame=single,language=Java,numbers=left,numberstyle={\scriptsize}"
+lstparams "basicstyle={\scriptsize\ttfamily},breaklines=true,frame=single,language=Java"
 inline false
 status open
+
+\begin_layout Plain Layout
+
+//Inputs:
+\end_layout
+
+\begin_layout Plain Layout
+
+//  mtHit: whether the request comes from MT and hits in the LLC
+\end_layout
+
+\begin_layout Plain Layout
+
+//  htHit: whether the request comes from HT and hits in the LLC
+\end_layout
+
+\begin_layout Plain Layout
+
+//  vtHit: whether the request comes from MT and hits in the HTRVC
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+//Case 1: VT hit => Good HT request (HT request evicted useful data)
+\end_layout
 
 \begin_layout Plain Layout
 
@@ -562,12 +783,18 @@ if(!mtHit && !htHit && vtHit) {
 
 \begin_layout Plain Layout
 
-  victimCache.setLRU(set, vtLine.way);
+  htrvc.setLRU(set, vtLine.way);
 \end_layout
 
 \begin_layout Plain Layout
 
 }
+\end_layout
+
+\begin_layout Plain Layout
+
+//Case 2: HT hit => Bad HT request (HT requested data hit before evicted
+ data)
 \end_layout
 
 \begin_layout Plain Layout
@@ -587,12 +814,17 @@ else if(!mtHit && htHit && !vtHit) {
 
 \begin_layout Plain Layout
 
-  removeLRU(set);
+  htrvc.removeLRU(set);
 \end_layout
 
 \begin_layout Plain Layout
 
 }
+\end_layout
+
+\begin_layout Plain Layout
+
+//Case 3: HT and VT hit (Useful data evicted and requested back in by HT)
 \end_layout
 
 \begin_layout Plain Layout
@@ -607,12 +839,12 @@ else if(!mtHit && htHit && vtHit) {
 
 \begin_layout Plain Layout
 
-  victimCache.setLRU(set, vtLine.way);
+  htrvc.setLRU(set, vtLine.way);
 \end_layout
 
 \begin_layout Plain Layout
 
-  victimCache.removeLRU(set);
+  htrvc.removeLRU(set);
 \end_layout
 
 \begin_layout Plain Layout
@@ -622,12 +854,18 @@ else if(!mtHit && htHit && vtHit) {
 
 \begin_layout Plain Layout
 
+//Case 4: MT and VT hit(Useful data evicted and requested back in by HT
+ and hit to by MT)
+\end_layout
+
+\begin_layout Plain Layout
+
 else if(mtHit && !htHit && vtHit) {
 \end_layout
 
 \begin_layout Plain Layout
 
-  victimCache.setLRU(set, vtLine.way);
+  htrvc.setLRU(set, vtLine.way);
 \end_layout
 
 \begin_layout Plain Layout
@@ -644,7 +882,14 @@ else if(mtHit && !htHit && vtHit) {
 \begin_inset Caption
 
 \begin_layout Plain Layout
-Servicing MT and HT Requests
+Actions Taken When Servicing an LLC Request
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Servicing-MT-and-HT-requests"
+
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -658,20 +903,81 @@ Servicing MT and HT Requests
 \end_layout
 
 \begin_layout Section
-Results
+Preliminary Results
+\end_layout
+
+\begin_layout Enumerate
+mst 1000, HT version (params: LOOKAHEAD=20, STRIDE=10), detailed simulation
+ vs checkpointed simulation
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+detailed simulation
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+llc.totalHtRequests=584655 
 \end_layout
 
 \begin_layout Itemize
-mst 1000, HT version, HT params: ?, ?, ? , detailed simulation vs checkpointed
- simulation
+llc.goodHtRequests=584579 
 \end_layout
 
 \begin_layout Itemize
-mst 10000, HT version, HT params: ?, ?, ? , checkpointed simulation
+llc.badHtRequests=0
 \end_layout
 
+\begin_layout Itemize
+llc.uglyHtRequests=76
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+checkpointed simulation
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+llc.totalHtRequests=585150
+\end_layout
+
+\begin_layout Itemize
+llc.goodHtRequests=585079
+\end_layout
+
+\begin_layout Itemize
+llc.badHtRequests=0
+\end_layout
+
+\begin_layout Itemize
+llc.uglyHtRequests=71
+\end_layout
+
+\end_deeper
+\end_deeper
+\begin_layout Enumerate
+mst 10000, HT version, checkpointed simulation
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+pending...
+\end_layout
+
+\end_deeper
 \begin_layout Section
 Previous Work
+\end_layout
+
+\begin_layout Standard
+TODO: previous work on prefetch taxonomies.
+ Traditional coverage and accuracy metrics for h/w prefetches.
+ -> good, bad and ugly breakdown of h/w prefetches.
+ -> more fine-grained breakdowns of h/w prefetches.
+ any previous work on cache request breakdowns for helper threaded data
+ prefetching? 
 \end_layout
 
 \begin_layout Section
@@ -679,7 +985,7 @@ Conclusion
 \end_layout
 
 \begin_layout Standard
-TODO: our work: what? how? result? Further work?
+TODOs: our work: what? how? result? Further work?
 \end_layout
 
 \begin_layout Section*
