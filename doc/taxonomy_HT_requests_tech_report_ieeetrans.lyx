@@ -299,6 +299,12 @@ We assume here a two level cache hierarchy where L1 caches are private and
 \end_layout
 
 \begin_layout Standard
+The main contributions of this paper can be summarized as follows:
+\color red
+TODOs.
+\end_layout
+
+\begin_layout Standard
 Firstly, the experimental framework for simulating helper-threaded data
  prefetching on CMPs is described.
  Secondly, the methodology to classify and quantify the contribution of
