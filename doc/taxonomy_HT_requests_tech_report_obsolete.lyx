@@ -1855,10 +1855,10 @@ Experimentation
 \end_layout
 
 \begin_layout Standard
-We use the yet-to-publish FleximJ simulator to evaluate different cache
+We use the yet-to-publish Archimulator simulator to evaluate different cache
  replacement strategies and dynamic pre-computation thread scheme proposed
  in previous sections.
- FleximJ is an execution-driven architectural simulator implemented in Java
+ Archimulator is an execution-driven architectural simulator implemented in Java
  and running on Linux that supports application-only cycle-accurate modeling
  of multicore multithreaded architectures.
  It has preliminary support of simulating Pthreads based parallel workloads.

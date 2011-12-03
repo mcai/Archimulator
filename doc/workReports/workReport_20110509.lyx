@@ -104,7 +104,7 @@ Implemented
  inter-thread reference based HT request classification
 \color inherit
  to track the victim cache lines evicted by HT requests and measure its
- contribution to MT performance (good, bad and ugly) in FleximJ, similar
+ contribution to MT performance (good, bad and ugly) in Archimulator, similar
  to the mechanism proposed in 
 \begin_inset CommandInset citation
 LatexCommand cite
@@ -143,7 +143,7 @@ key "Keramidas2007,Petoumenos2010"
 
 \end_inset
 
-, in FleximJ; 
+, in Archimulator;
 \end_layout
 
 \begin_layout Enumerate
@@ -248,7 +248,7 @@ manager thread
 \begin_layout Enumerate
 
 \color red
-Fixed many bugs in FleximJ
+Fixed many bugs in Archimulator
 \color inherit
  to make it faster, more capable and more accurate (its current detailed
  simulation speed (without parallel simulation enabled) is about 
@@ -266,7 +266,7 @@ Fixed many bugs in FleximJ
 \begin_layout Standard
 \begin_inset CommandInset bibtex
 LatexCommand bibtex
-bibfiles "/home/itecgo/FleximJ/doc/ref"
+bibfiles "/home/itecgo/Archimulator/doc/ref"
 options "plain"
 
 \end_inset

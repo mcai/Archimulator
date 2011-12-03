@@ -1,4 +1,4 @@
-itecgo@itecgo-desktop:~/Desktop/multi2sim-3.1/src$ ./m2s --cpu-sim detailed /home/itecgo/FleximJ/benchmarks/Olden_Custom1/mst/baseline/mst 1000
+itecgo@itecgo-desktop:~/Desktop/multi2sim-3.1/src$ ./m2s --cpu-sim detailed /home/itecgo/Archimulator/benchmarks/Olden_Custom1/mst/baseline/mst 1000
 
 ; Multi2Sim 3.1 - A Simulation Framework for CPU-GPU Heterogeneous Computing
 ; Please use command 'm2s --help' for a list of command-line options.
@@ -32,7 +32,7 @@ CyclesPerSecond = 623185
 
 ----------
 
-itecgo@itecgo-desktop:~/Desktop/multi2sim-3.1/src$ ./m2s --cpu-sim detailed /home/itecgo/FleximJ/benchmarks/Olden_Custom1/mst/baseline/mst 10000
+itecgo@itecgo-desktop:~/Desktop/multi2sim-3.1/src$ ./m2s --cpu-sim detailed /home/itecgo/Archimulator/benchmarks/Olden_Custom1/mst/baseline/mst 10000
 
 ; Multi2Sim 3.1 - A Simulation Framework for CPU-GPU Heterogeneous Computing
 ; Please use command 'm2s --help' for a list of command-line options.

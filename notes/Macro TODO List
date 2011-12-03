@@ -12,7 +12,7 @@ a. For prepush threading:
 	2. cache replacement/prepush filtering(bypassing)/prepush thread progress control(throttling & synchronization with main thread)
 		(based on the history and prediction of good, bad and ugly prepushes)
 		priority: 1
-		my previous work: clone of rereference prediction based cache replacement policies in FleximJ
+		my previous work: clone of rereference prediction based cache replacement policies in Archimulator
 		current state of my work: pending
 		
 	3. interaction with h/w prefetching
@@ -30,7 +30,7 @@ a. For prepush threading:
 		my previous work:
 		current state of my work: literature study
 
-b. For FleximJ simulator:
+b. For Archimulator simulator:
 
 	1. improving accuracy
 		priority: 1
@@ -39,12 +39,12 @@ b. For FleximJ simulator:
 		
 	2. improving speed
 		priority: 3
-		my previous work: use Java specific profilers to find hotspots in FleximJ and reduce simulation time purposefully to some extent
+		my previous work: use Java specific profilers to find hotspots in Archimulator and reduce simulation time purposefully to some extent
 		current state of my work: literature study
 		
 	3. support sampled simulation (statistical simulation is abandoned for resource limitation)
 		priority: 1
-		my previous work: general framework done in FleximJ, switching from fast forward to detailed simulation mode
+		my previous work: general framework done in Archimulator, switching from fast forward to detailed simulation mode
 		current state of my work: literature study; state-of-the-art microarchitecture warmup mechanisms pending
 		
 	4. support parallel simulation

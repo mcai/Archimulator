@@ -961,7 +961,7 @@ Sidebar: Concept of Priority Stack in Cache Replacement
 \begin_layout Standard
 \align center
 \begin_inset Graphics
-	filename /home/itecgo/FleximJ/doc/landscape_cache_replacement_LRU_LFU.pdf
+	filename /home/itecgo/Archimulator/doc/landscape_cache_replacement_LRU_LFU.pdf
 	scale 33
 
 \end_inset

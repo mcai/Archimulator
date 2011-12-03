@@ -1,4 +1,4 @@
-FleximJ models inclusive caches.
+Archimulator models inclusive caches.
 
 The inclusion property requires that the contents of all the
 smaller caches of a multi-level cache hierarchy be a subset of
