@@ -23,7 +23,9 @@ inline void push_thread_func()
         tmp = *global_tmp;
         key = (unsigned int)global_inserted;
 
+#ifdef MIPS_1
         asm ("addiu $0,$0,3724");
+#endif
 
         while(tmp)
         {
@@ -35,74 +37,33 @@ inline void push_thread_func()
                 {
                     hash = tmp->edgehash;
 
+#ifdef MIPS_1
                     asm ("addiu $0,$0,3725");
+#endif
 
                     j = (hash->mapfunc)(key);
 
+#ifdef MIPS_1
                     asm ("addiu $0,$0,3726");
+#endif
 
                     for(ent = hash->array[j];
 						ent &&
 							ent->key != key;
 						ent = ent->next);
 
+#ifdef MIPS_1
                     asm ("addiu $0,$0,3727");
+#endif
                 }
             }
 
             tmp = *global_tmp;
         }
 
+#ifdef MIPS_1
         asm ("addiu $0,$0,3728");
+#endif
     }
 }
-
-//inline void push_thread_func1()
-//{
-//    Hash hash;
-//    int i, j;
-//    unsigned int key;
-//    Vertex volatile tmp;
-//    HashEntry volatile ent;
-//
-//    while(1)
-//    {
-//        while(!global_tmp);
-//
-//        tmp = *global_tmp;
-//
-//        asm ("addiu $0,$0,3724");
-//
-//        while(global_flag && tmp)
-//        {
-//            for(i = 0; global_flag && tmp && i < LOOKAHEAD; i++, tmp = tmp->next);
-//
-//            for(i = 0; global_flag && tmp && i < STRIDE; i++, tmp = tmp->next)
-//            {
-//                if(global_flag && tmp && tmp != global_inserted)
-//                {
-//                    hash = tmp->edgehash;
-//                    key = (unsigned int)global_inserted;
-//
-//                    asm ("addiu $0,$0,3725");
-//
-//                    j = (hash->mapfunc)(key);
-//
-//                    asm ("addiu $0,$0,3726");
-//
-//                    for(ent = hash->array[j];
-//						ent &&
-//							ent->key != key;
-//						ent = ent->next);
-//
-//                    asm ("addiu $0,$0,3727");
-//                }
-//            }
-//
-//            tmp = *global_tmp;
-//        }
-//
-//        asm ("addiu $0,$0,3728");
-//    }
-//}
 

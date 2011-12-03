@@ -69,7 +69,9 @@ long primal_net_simplex(  net )
           
   //~ syscall(500, 0); // enter detailed simulation
 
+#ifdef MIPS_1
   asm ("addiu $0,$0,3720");
+#endif
 
 
     while( !opt )

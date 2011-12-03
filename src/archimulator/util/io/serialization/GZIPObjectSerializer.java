@@ -36,20 +36,4 @@ public class GZIPObjectSerializer<T> {
             throw new RuntimeException(e);
         }
     }
-
-    public static void main(String[] args) {
-        GZIPObjectSerializer<String> serializer = new GZIPObjectSerializer<String>();
-
-        String str = "hello world.";
-
-        String fileName = "/home/itecgo/Desktop/hello.gz";
-
-        serializer.serialize(str, fileName);
-
-        String str1 = serializer.deserialize(fileName);
-
-        System.out.println(str1);
-
-        assert (str.equals(str1));
-    }
 }

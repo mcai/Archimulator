@@ -1,5 +1,5 @@
 CC  = /home/itecgo/Archimulator_crosscompiler/mips-unknown-linux-gnu/bin/mips-unknown-linux-gnu-gcc
-CFLAGS  = $(EXTRA_CFLAGS) -O3
+CFLAGS  = $(EXTRA_CFLAGS) -DMIPS_1 -O3
 LDFLAGS = $(EXTRA_LDFLAGS) -static -O3
 LIBS = $(EXTRA_LIBS)
 

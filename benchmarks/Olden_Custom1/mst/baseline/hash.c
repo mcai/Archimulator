@@ -46,7 +46,9 @@ Hash MakeHash(int size, int (*map)(unsigned int))
 
 void *HashLookup(unsigned int key, Hash hash)
 {
+#ifdef MIPS_1
   asm ("addiu $0,$0,3721");
+#endif
   int j;
   HashEntry ent;
 
@@ -58,10 +60,14 @@ void *HashLookup(unsigned int key, Hash hash)
            ent->key!=key; 
        ent=ent->next);             /* 8% miss in ent->next */       /* adt_pf can detect :) */
   if (ent) {
+#ifdef MIPS_1
     asm ("addiu $0,$0,3722");
+#endif
     return ent->entry;
   }
+#ifdef MIPS_1
   asm ("addiu $0,$0,3723");
+#endif
   return NULL;
 }
 

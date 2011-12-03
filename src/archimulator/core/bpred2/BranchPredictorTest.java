@@ -28,7 +28,7 @@ public class BranchPredictorTest {
         final Counter counterDirectionMispredictions = new Counter(0);
         final Counter counterTargetMispredictions = new Counter(0);
 
-        BranchPredictorTraceTester traceReader = new BranchPredictorTraceTester("/opt/itecgo/Tools/cbp2-infrastructure-v2/src/compress/gzip.trace");
+        BranchPredictorTraceTester traceReader = new BranchPredictorTraceTester("/home/itecgo/Tools/cbp2-infrastructure-v2/src/compress/gzip.trace");
 
         traceReader.run(new Action1<BranchPredictorTraceRecord>() {
             public void apply(BranchPredictorTraceRecord traceRecord) {
