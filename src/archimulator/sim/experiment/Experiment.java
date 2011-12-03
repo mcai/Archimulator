@@ -19,7 +19,6 @@
 package archimulator.sim.experiment;
 
 import archimulator.core.ProcessorConfig;
-import archimulator.isa.NativeMipsIsaEmulatorCapability;
 import archimulator.uncore.MemoryHierarchyConfig;
 import archimulator.uncore.cache.eviction.EvictionPolicyFactory;
 import archimulator.uncore.cache.eviction.LeastRecentlyUsedEvictionPolicy;
@@ -288,11 +287,6 @@ public abstract class Experiment {
     private static long currentId = 0;
 
     static {
-        CopyEmbeddedResourceIntoTempDirectory("lib" + NativeMipsIsaEmulatorCapability.LIBRARY_NAME + ".so");
-        System.setProperty("jna.library.path", System.getProperty("java.io.tmpdir"));
-    }
-
-    static {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
@@ -303,23 +297,5 @@ public abstract class Experiment {
         System.out.println("Archimulator - A Flexible Multicore Architectural Simulator Written in Java.\n");
         System.out.println("Version: 2.0.\n");
         System.out.println("Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).\n");
-    }
-
-    public static void CopyEmbeddedResourceIntoTempDirectory(String name) {
-        try {
-            InputStream in = Experiment.class.getResourceAsStream("/resources/" + name);
-            byte[] buffer = new byte[1024];
-            int read;
-
-            FileOutputStream fos = new FileOutputStream(System.getProperty("java.io.tmpdir") + "/" + name);
-
-            while ((read = in.read(buffer)) != -1) {
-                fos.write(buffer, 0, read);
-            }
-            fos.close();
-            in.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 }

@@ -43,7 +43,14 @@ public class FunctionalExecutionProfilingCapability implements KernelCapability 
 
         kernel.getBlockingEventDispatcher().addListener(Kernel.KernelCapabilitiesInitializedEvent.class, new Action1<Kernel.KernelCapabilitiesInitializedEvent>() {
             public void apply(Kernel.KernelCapabilitiesInitializedEvent event) {
-                initNativeMipsIsaEmulatorCapability(kernel);
+                kernel.getBlockingEventDispatcher().addListener(InstructionFunctionallyExecutedEvent.class, new Action1<InstructionFunctionallyExecutedEvent>() {
+                    public void apply(InstructionFunctionallyExecutedEvent event1) {
+                        Mnemonic mnemonic = event1.getStaticInst().getMnemonic();
+                        if (!executedMnemonics.contains(mnemonic)) {
+                            executedMnemonics.add(mnemonic);
+                        }
+                    }
+                });
             }
         });
 
@@ -69,73 +76,6 @@ public class FunctionalExecutionProfilingCapability implements KernelCapability 
         kernel.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
             public void apply(DumpStatEvent event) {
                 dumpStats(event.getStats());
-            }
-        });
-    }
-
-    private void initNativeMipsIsaEmulatorCapability(Kernel kernel) {
-        //        final String[] args = {"", "/home/itecgo/Archimulator/benchmarks/CPU2006_Custom1/462.libquantum/baseline/462.libquantum.mips", "33", "5"}; //TODO: path should not be hard coded
-//        final String[] args = {"", "/home/itecgo/Archimulator/benchmarks/Olden_Custom1/em3d/baseline/em3d.mips", "400000", "128", "75", "1"}; //TODO: path should not be hard coded
-        final String[] args = {"", "/home/itecgo/Archimulator/benchmarks/Olden_Custom1/mst/baseline/mst.mips", "1000"}; //TODO: path should not be hard coded
-//        final String[] args = {"", "/home/itecgo/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline/429.mcf.mips", "<", "/home/itecgo/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline/data/ref/input/inp.in"}; //TODO: path should not be hard coded
-
-        final NativeMipsIsaEmulatorCapability nativeMipsIsaEmulatorCapability = this.kernel.getCapability(NativeMipsIsaEmulatorCapability.class);
-
-        nativeMipsIsaEmulatorCapability.getNativeMipsIsaEmulator().single_thread_program_init(args.length, args);
-
-//        nativeMipsIsaEmulatorCapability.getNativeMipsIsaEmulator().single_thread_program_quit();
-
-        kernel.getBlockingEventDispatcher().addListener(InstructionFunctionallyExecutedEvent.class, new Action1<InstructionFunctionallyExecutedEvent>() {
-            public void apply(InstructionFunctionallyExecutedEvent event) {
-                if (!nativeMipsIsaEmulatorCapability.getNativeMipsIsaEmulator().single_thread_program_execute_next_instruction()) {
-                    System.exit(0);
-                }
-
-                for (int i = 0; i < ArchitecturalRegisterFile.NUM_INT_REGS; i++) {
-                    int gprInArchimulator = event.getContext().getRegs().getGpr(i);
-                    int gprInNative = nativeMipsIsaEmulatorCapability.getNativeMipsIsaEmulator().single_thread_program_get_gpr(i);
-
-                    if (i != 0) {
-                        assert gprInArchimulator == gprInNative;
-                    }
-                }
-
-                for (int i = 0; i < ArchitecturalRegisterFile.NUM_FLOAT_REGS; i++) {
-                    float fprsInArchimulator = event.getContext().getRegs().getFpr().getFloat(i);
-                    float fprsInNative = nativeMipsIsaEmulatorCapability.getNativeMipsIsaEmulator().single_thread_program_get_fprs(i);
-                    assert Float.valueOf(fprsInArchimulator).equals(Float.valueOf(fprsInNative));
-                }
-
-                for (int i = 0; i < ArchitecturalRegisterFile.NUM_FLOAT_REGS; i++) {
-                    double fprdInArchimulator = event.getContext().getRegs().getFpr().getDouble(i);
-                    double fprdInNative = nativeMipsIsaEmulatorCapability.getNativeMipsIsaEmulator().single_thread_program_get_fprd(i);
-
-                    assert Double.valueOf(fprdInArchimulator).equals(Double.valueOf(fprdInNative));
-                }
-
-                int hiInArchimulator = event.getContext().getRegs().getHi();
-                int hiInNative = nativeMipsIsaEmulatorCapability.getNativeMipsIsaEmulator().single_thread_program_get_hi();
-                assert hiInArchimulator == hiInNative;
-
-                int loInArchimulator = event.getContext().getRegs().getLo();
-                int loInNative = nativeMipsIsaEmulatorCapability.getNativeMipsIsaEmulator().single_thread_program_get_lo();
-                assert loInArchimulator == loInNative;
-
-                int fcsrInArchimulator = event.getContext().getRegs().getFcsr();
-                int fcsrInNative = nativeMipsIsaEmulatorCapability.getNativeMipsIsaEmulator().single_thread_program_get_fcsr();
-                assert fcsrInArchimulator == fcsrInNative;
-
-                int firInNative = nativeMipsIsaEmulatorCapability.getNativeMipsIsaEmulator().single_thread_program_get_fir();
-                assert firInNative == 0;
-
-                assert (event.getContext().getRegs().getPc() == nativeMipsIsaEmulatorCapability.getNativeMipsIsaEmulator().single_thread_program_get_pc());
-                assert (event.getContext().getRegs().getNpc() == nativeMipsIsaEmulatorCapability.getNativeMipsIsaEmulator().single_thread_program_get_npc());
-                assert (event.getContext().getRegs().getNnpc() == nativeMipsIsaEmulatorCapability.getNativeMipsIsaEmulator().single_thread_program_get_nnpc());
-
-                Mnemonic mnemonic = event.getStaticInst().getMnemonic();
-                if (!executedMnemonics.contains(mnemonic)) {
-                    executedMnemonics.add(mnemonic);
-                }
             }
         });
     }

@@ -19,7 +19,6 @@
 package archimulator.sim;
 
 import archimulator.ext.uncore.newHt2.LastLevelCacheHtRequestCachePollutionProfilingCapability;
-import archimulator.isa.NativeMipsIsaEmulatorCapability;
 import archimulator.uncore.cache.eviction.EvictionPolicyFactory;
 import archimulator.uncore.cache.eviction.LeastRecentlyUsedEvictionPolicy;
 import archimulator.sim.experiment.CheckpointedExperiment;
@@ -89,10 +88,9 @@ public class Startup {
     }
 
     public static Experiment createFunctionalExperiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs) {
-        return new FunctionalExperiment(title, numCores, numThreadsPerCore, contextConfigs)
+        return new FunctionalExperiment(title, numCores, numThreadsPerCore, contextConfigs);
                 //                .addSimulationCapabilityFactory(LastLevelCacheMissProfilingCapability.class, LastLevelCacheMissProfilingCapability.FACTORY)
                 //                .addProcessorCapabilityFactory(HtRequestL2VictimTrackingCapability.class, HtRequestL2VictimTrackingCapability.FACTORY)
-                .addKernelCapabilityFactory(NativeMipsIsaEmulatorCapability.class, NativeMipsIsaEmulatorCapability.FACTORY);
 //                .addKernelCapabilityFactory(FunctionalExecutionProfilingCapability.class, FunctionalExecutionProfilingCapability.FACTORY);
     }
 
@@ -103,7 +101,6 @@ public class Startup {
                         //                .addProcessorCapabilityFactory(HtRequestL2VictimTrackingCapability.class, HtRequestL2VictimTrackingCapability.FACTORY)
 //                .addProcessorCapabilityFactory(HtRequestL2VictimTrackingCapability2.class, HtRequestL2VictimTrackingCapability2.FACTORY)
 //                .addProcessorCapabilityFactory(FsmBasedHtRequestLlcVictimTrackingCapability.class, FsmBasedHtRequestLlcVictimTrackingCapability.FACTORY)
-                .addKernelCapabilityFactory(NativeMipsIsaEmulatorCapability.class, NativeMipsIsaEmulatorCapability.FACTORY)
                 .setL2EvictionPolicyFactory(l2EvictionPolicyFactory);
     }
 
@@ -114,7 +111,6 @@ public class Startup {
                         //                .addProcessorCapabilityFactory(HtRequestL2VictimTrackingCapability.class, HtRequestL2VictimTrackingCapability.FACTORY)
 //                .addProcessorCapabilityFactory(HtRequestL2VictimTrackingCapability2.class, HtRequestL2VictimTrackingCapability2.FACTORY)
 //                .addProcessorCapabilityFactory(FsmBasedHtRequestLlcVictimTrackingCapability.class, FsmBasedHtRequestLlcVictimTrackingCapability.FACTORY)
-                .addKernelCapabilityFactory(NativeMipsIsaEmulatorCapability.class, NativeMipsIsaEmulatorCapability.FACTORY)
                 .setL2EvictionPolicyFactory(l2EvictionPolicyFactory);
     }
 
@@ -181,38 +177,4 @@ public class Startup {
             "/home/itecgo/Archimulator/benchmarks/CPU2006_Custom1/462.libquantum/ht",
             "462.libquantum.mips",
             "33 5");
-
-    //TODO: hints, to be removed
-    //    public static void main(String[] args) {
-////        simulationCapabilityFactories.put(MemoryAccessTraceGenerationCapability.class, MemoryAccessTraceGenerationCapability.FACTORY);
-////        simulationCapabilityFactories.put(CacheHierarchyEventVisualizationCapability.class, CacheHierarchyEventVisualizationCapability.FACTORY);
-////        simulationCapabilityFactories.put(LastLevelCacheMissProfilingCapability.class, LastLevelCacheMissProfilingCapability.FACTORY);
-////        simulationCapabilityFactories.put(FunctionalExecutionProfilingCapability.class, FunctionalExecutionProfilingCapability.FACTORY);
-//
-////        processorCapabilityFactories.put(DelinquentLoadIdentificationCapability.class, DelinquentLoadIdentificationCapability.FACTORY);
-////        processorCapabilityFactories.put(DynamicSpeculativePrecomputationCapability.class, DynamicSpeculativePrecomputationCapability.FACTORY);
-//
-//        kernelCapabilityFactories.put(NativeMipsIsaEmulatorCapability.class, NativeMipsIsaEmulatorCapability.FACTORY);
-//
-////        Simulation.simulate(createDefaultDetailedSimulationConfig(TestEvictionPolicy1.FACTORY, processorCapabilityFactories, kernelCapabilityFactories), simulationCapabilityFactories);
-////        Simulation.simulate(createDefaultDetailedSimulationConfig(TestEvictionPolicy2.FACTORY, processorCapabilityFactories, kernelCapabilityFactories), simulationCapabilityFactories);
-////        Simulation.simulate(createDefaultDetailedSimulationConfig(HtRequestAwareLeastRecentlyUsedEvictionPolicy.XOR_BASED_VICTIM_TRACKING_FACTORY, processorCapabilityFactories, kernelCapabilityFactories), simulationCapabilityFactories);
-////        Simulation.simulate(createDefaultDetailedSimulationConfig(HtRequestAwareLeastRecentlyUsedEvictionPolicy.COUNTING_BLOOM_FILTER_BASED_VICTIM_TRACKING_FACTORY, processorCapabilityFactories, kernelCapabilityFactories), simulationCapabilityFactories);
-////        Simulation.simulate(createDefaultDetailedSimulationConfig(HtRequestAwareLeastRecentlyUsedEvictionPolicy.TREE_SET_BASED_VICTIM_TRACKING_FACTORY, processorCapabilityFactories, kernelCapabilityFactories), simulationCapabilityFactories);
-//        Simulation.simulate(createDefaultDetailedSimulationConfig(ThrashingSensitiveHTEnhancedLeastRecentlyUsedEvictionPolicy.FACTORY, processorCapabilityFactories, kernelCapabilityFactories, 2, 2, new ArrayList<ContextConfig>()), simulationCapabilityFactories);
-////        Simulation.simulate(createFunctionalSimulationConfig(LeastRecentlyUsedEvictionPolicy.FACTORY, processorCapabilityFactories, kernelCapabilityFactories), simulationCapabilityFactories);
-//        Simulation.simulate(createDefaultDetailedSimulationConfig(LeastRecentlyUsedEvictionPolicy.FACTORY, processorCapabilityFactories, kernelCapabilityFactories, 2, 2, new ArrayList<ContextConfig>()), simulationCapabilityFactories);
-////        Simulation.simulate(createDefaultDetailedSimulationConfig(LeastFrequentlyUsedEvictionPolicy.FACTORY, processorCapabilityFactories, kernelCapabilityFactories), simulationCapabilityFactories);
-////        Simulation.simulate(createDefaultDetailedSimulationConfig(ReuseDistancePredictionEvictionPolicy.FACTORY_WITH_SELECTIVE_CACHING, processorCapabilityFactories, kernelCapabilityFactories), simulationCapabilityFactories);
-//
-////        Simulation.simulate(createDefaultDetailedSimulationConfig(ReuseDistanceBasedEvaluatorEvictionPolicy.factory(LeastRecentlyUsedEvictionPolicy.FACTORY)), processorCapabilityFactories, kernelCapabilityFactories), simulationCapabilityFactories);
-////        Simulation.simulate(createDefaultDetailedSimulationConfig(ReuseDistanceBasedEvaluatorEvictionPolicy.factory(RandomEvictionPolicy.FACTORY)), processorCapabilityFactories, kernelCapabilityFactories), simulationCapabilityFactories);
-////        Simulation.simulate(createDefaultDetailedSimulationConfig(ReuseDistanceBasedEvaluatorEvictionPolicy.factory(ReuseDistancePredictionEvictionPolicy.FACTORY_WITH_SELECTIVE_CACHING), processorCapabilityFactories, kernelCapabilityFactories), simulationCapabilityFactories);
-////        Simulation.simulate(createDefaultDetailedSimulationConfig(ReuseDistanceBasedEvaluatorEvictionPolicy.factory(RereferenceIntervalPredictionEvictionPolicy.FACTORY)), processorCapabilityFactories, kernelCapabilityFactories), simulationCapabilityFactories);
-////        Simulation.simulate(createDefaultDetailedSimulationConfig(ReuseDistanceBasedEvaluatorEvictionPolicy.factory(HtRequestAwareLeastRecentlyUsedEvictionPolicy.XOR_BASED_VICTIM_TRACKING_FACTORY)), processorCapabilityFactories, kernelCapabilityFactories), simulationCapabilityFactories);
-//
-////        for (SimulationConfig simulationConfig : createDefaultCheckpointedSimulationConfig()) {
-////            Simulation.simulate(simulationConfig);
-////        }
-//    }
 }

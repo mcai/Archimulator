@@ -229,8 +229,7 @@ public class StaticInstruction implements Serializable {
         registerInstruction(Mnemonic.XORI);
     }
 
-    //    private static MipsInstructionExecutor executor = new BasicMipsInstructionExecutor();
-    private static MipsInstructionExecutor executor = new NativeEmulatorEnhancedMipsInstructionExecutor();
+    private static MipsInstructionExecutor executor = new BasicMipsInstructionExecutor();
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.ADD, fuOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags(StaticInstructionFlag.INTEGER_COMPUTATION)
