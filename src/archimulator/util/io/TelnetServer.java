@@ -92,13 +92,17 @@ public class TelnetServer implements OutputAppender {
     }
 
     private void appendStdOutLine(SocketThread socketThread, String text) {
-        socketThread.out.print(text + "\r\n");
-        socketThread.out.flush();
+        if(socketThread.out != null) {
+            socketThread.out.print(text + "\r\n");
+            socketThread.out.flush();
+        }
     }
 
     private void appendStdErrLine(SocketThread socketThread, String text) {
-        socketThread.out.print(text + "\r\n");
-        socketThread.out.flush();
+        if(socketThread.out != null) {
+            socketThread.out.print(text + "\r\n");
+            socketThread.out.flush();
+        }
     }
 
     private class SocketThread extends Thread {
