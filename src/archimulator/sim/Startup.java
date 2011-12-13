@@ -44,7 +44,9 @@ public class Startup {
 
         List<ContextConfig> contextConfigs = new ArrayList<ContextConfig>();
 //        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_MST_BASELINE, 0));
-        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_MST_HT, 0));
+//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_MST_HT, 0));
+//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_EM3D_BASELINE, 0));
+        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_EM3D_HT, 0));
 //        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_429_MCF_BASELINE, 0));
 //        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_429_MCF_HT, 0));
 //        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_EM3D_BASELINE, 1));
@@ -65,7 +67,7 @@ public class Startup {
 
 //        simulate("test2", LeastRecentlyUsedEvictionPolicy.FACTORY, 2, 2, contextConfigs);
 //        simulate("mst_1000_detailed-HTRequest_Profiling", LeastRecentlyUsedEvictionPolicy.FACTORY, 2, 2, contextConfigs);
-        simulate("mst_10000_functional", LeastRecentlyUsedEvictionPolicy.FACTORY, 2, 2, contextConfigs);
+        simulate("em3d_1000_ht_detailed", LeastRecentlyUsedEvictionPolicy.FACTORY, 2, 2, contextConfigs);
 //        simulate("mst_ht_LRU", LeastRecentlyUsedEvictionPolicy.FACTORY, SIMULATED_PROGRAM_MST_HT);
 
 //        simulate("em3d_baseline_LRU", SIMULATED_PROGRAM_EM3D_BASELINE, LeastRecentlyUsedEvictionPolicy.FACTORY);
@@ -80,8 +82,8 @@ public class Startup {
     }
 
     public static void simulate(String title, EvictionPolicyFactory l2EvictionPolicyFactory, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs) {
-        Experiment experiment = createFunctionalExperiment(title, numCores, numThreadsPerCore, contextConfigs);
-//        Experiment experiment = createDetailedExperiment(title, l2EvictionPolicyFactory, numCores, numThreadsPerCore, contextConfigs);
+//        Experiment experiment = createFunctionalExperiment(title, numCores, numThreadsPerCore, contextConfigs);
+        Experiment experiment = createDetailedExperiment(title, l2EvictionPolicyFactory, numCores, numThreadsPerCore, contextConfigs);
 //        Experiment experiment = createCheckpointedExperiment(title, l2EvictionPolicyFactory, numCores, numThreadsPerCore, contextConfigs);
 
         experiment.start();
@@ -142,14 +144,20 @@ public class Startup {
             "em3d_baseline_mips",
             "/home/itecgo/Archimulator/benchmarks/Olden_Custom1/em3d/baseline",
             "em3d.mips",
-            "400000 128 75 1");
+//            "400000 128 75 1");
+//            "400 128 75 1");
+            "1000 128 75 1");
+//            "10000 128 75 1");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_EM3D_HT = new SimulatedProgram(
             "Olden_Custom1",
-            "em3d__ht_mips",
-            "/home/itecgo/Archimulator/benchmarks/Olden_Custom1/em3d_/ht",
-            "em3d_.mips",
-            "400000 128 75 1");
+            "em3d_ht_mips",
+            "/home/itecgo/Archimulator/benchmarks/Olden_Custom1/em3d/ht",
+            "em3d.mips",
+//            "400000 128 75 1");
+//            "400 128 75 1");
+            "1000 128 75 1");
+//            "10000 128 75 1");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_429_MCF_BASELINE = new SimulatedProgram(
             "CPU2006_Custom1",
