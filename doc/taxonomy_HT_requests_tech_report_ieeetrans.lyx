@@ -331,8 +331,8 @@ Simulation Environment
 \end_layout
 
 \begin_layout Standard
-Simulator: we use an in-house multicore architectural simulator named Archimulat
-or in our experiments mentioned in this work.
+We use an in-house multicore architectural simulator named Archimulator
+ in our experiments mentioned in this work.
  Archimulator is an execution-driven architectural simulator written in
  Java and running on Linux that supports application-only cycle-accurate
  modeling of multicore multithreaded architectures.
@@ -403,8 +403,9 @@ status open
 \begin_layout Plain Layout
 
 \size scriptsize
-superscalar width is 4; physical register file capacity: 128; decode buffer
- capacity: 96; reorder buffer capacity: 96; load store queue capacity: 48
+4-wide superscalar OoO 2 x 2 CMP; physical register file capacity: 128;
+ decode buffer capacity: 96; reorder buffer capacity: 96; load store queue
+ capacity: 48
 \end_layout
 
 \end_inset
@@ -422,7 +423,7 @@ superscalar width is 4; physical register file capacity: 128; decode buffer
 \begin_layout Plain Layout
 
 \size scriptsize
-Branch Predictor
+Branch Predictors
 \end_layout
 
 \end_inset
@@ -589,7 +590,7 @@ Int Mult
 
 \end_inset
 </cell>
-<cell multirow="3" alignment="left" valignment="middle" bottomline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -635,7 +636,7 @@ Int Div
 
 \end_inset
 </cell>
-<cell multirow="4" alignment="left" valignment="top" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -679,7 +680,7 @@ Fp Add
 
 \end_inset
 </cell>
-<cell multirow="3" alignment="left" valignment="middle" bottomline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -725,7 +726,7 @@ Fp Compare
 
 \end_inset
 </cell>
-<cell multirow="4" alignment="left" valignment="top" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -769,7 +770,7 @@ Fp Convert
 
 \end_inset
 </cell>
-<cell multirow="4" alignment="left" valignment="top" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -813,7 +814,7 @@ Fp Mult
 
 \end_inset
 </cell>
-<cell multirow="3" alignment="left" valignment="middle" bottomline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -859,7 +860,7 @@ Fp Div
 
 \end_inset
 </cell>
-<cell multirow="4" alignment="left" valignment="top" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -903,7 +904,7 @@ Fp Sqrt
 
 \end_inset
 </cell>
-<cell multirow="4" alignment="left" valignment="top" bottomline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -947,7 +948,7 @@ Read Port
 
 \end_inset
 </cell>
-<cell multirow="3" alignment="left" valignment="middle" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -993,7 +994,7 @@ Write Port
 
 \end_inset
 </cell>
-<cell multirow="4" alignment="left" valignment="top" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -1042,7 +1043,7 @@ Write Port
 \begin_layout Plain Layout
 
 \size scriptsize
-Cache Geos
+Cache Geometries
 \end_layout
 
 \end_inset
@@ -1333,7 +1334,7 @@ status open
 \begin_layout Plain Layout
 
 \size scriptsize
-switch based P2P topology, 32B link width
+Switch based P2P topology, 32B link width
 \end_layout
 
 \end_inset
@@ -1491,7 +1492,7 @@ status open
 \begin_inset Graphics
 	filename res/cacheconfig.pdf
 	scale 68
-	BoundingBox 30bp 510bp 330bp 760bp
+	BoundingBox 30bp 475bp 330bp 760bp
 	clip
 
 \end_inset
