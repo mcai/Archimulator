@@ -67,7 +67,7 @@ public class Startup {
 
 //        simulate("test2", LeastRecentlyUsedEvictionPolicy.FACTORY, 2, 2, contextConfigs);
 //        simulate("mst_1000_detailed-HTRequest_Profiling", LeastRecentlyUsedEvictionPolicy.FACTORY, 2, 2, contextConfigs);
-        simulate("em3d_4000_ht_detailed", LeastRecentlyUsedEvictionPolicy.FACTORY, 2, 2, contextConfigs);
+        simulate("em3d_10000_ht_detailed", LeastRecentlyUsedEvictionPolicy.FACTORY, 2, 2, contextConfigs);
 //        simulate("mst_ht_LRU", LeastRecentlyUsedEvictionPolicy.FACTORY, SIMULATED_PROGRAM_MST_HT);
 
 //        simulate("em3d_baseline_LRU", SIMULATED_PROGRAM_EM3D_BASELINE, LeastRecentlyUsedEvictionPolicy.FACTORY);
@@ -157,8 +157,8 @@ public class Startup {
 //            "400000 128 75 1");
 //            "400 128 75 1");
 //            "1000 128 75 1");
-            "4000 128 75 1");
-//            "10000 128 75 1");
+//            "4000 128 75 1");
+            "10000 128 75 1");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_429_MCF_BASELINE = new SimulatedProgram(
             "CPU2006_Custom1",
