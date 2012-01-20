@@ -37,40 +37,40 @@ public class ExperimentProfileManagementStartup {
     }
 
     private void submitExperimentProfiles() throws SQLException {
-//        List<SimulatedProgram> simulatedPrograms = new ArrayList<SimulatedProgram>();
-//        simulatedPrograms.add(Startup.SIMULATED_PROGRAM_MST_HT);
-//        simulatedPrograms.add(Startup.SIMULATED_PROGRAM_EM3D_HT);
-//        simulatedPrograms.add(Startup.SIMULATED_PROGRAM_429_MCF_HT);
-//
-//        List<Integer> l2SizeInKBytes = new ArrayList<Integer>();
-//        l2SizeInKBytes.add(512);
-//        l2SizeInKBytes.add(512 * 2);
-//        l2SizeInKBytes.add(512 * 4);
-//        l2SizeInKBytes.add(512 * 8);
-//
-//        List<ExperimentBuilder.ExperimentProfile> experimentProfiles = new ArrayList<ExperimentBuilder.ExperimentProfile>();
-//
-//        for (SimulatedProgram simulatedProgram : simulatedPrograms) {
-//            experimentProfiles.add(ExperimentBuilder.on().cores(2).threadsPerCore(2)
-//                    .with().workload(simulatedProgram)
-//                    .simulate().functionallyToEnd());
-//
-//            for (int l2SizeInKByte : l2SizeInKBytes) {
-//                experimentProfiles.add(ExperimentBuilder.on().cores(2).threadsPerCore(2).l2Size(1024 * l2SizeInKByte).l2Associativity(8)
-//                        .with().workload(simulatedProgram)
-//                        .simulate().functionallyToPseudoCallAndInDetailForMaxInsts(3720, 2000000000)
-//                        .addSimulationCapabilityFactory(LastLevelCacheHtRequestCachePollutionProfilingCapability.class, LastLevelCacheHtRequestCachePollutionProfilingCapability.FACTORY));
-//
-//                experimentProfiles.add(ExperimentBuilder.on().cores(2).threadsPerCore(2).l2Size(1024 * l2SizeInKByte).l2Associativity(8)
-//                        .with().workload(simulatedProgram)
-//                        .simulate().inDetailToEnd()
-//                        .addSimulationCapabilityFactory(LastLevelCacheHtRequestCachePollutionProfilingCapability.class, LastLevelCacheHtRequestCachePollutionProfilingCapability.FACTORY));
-//            }
-//        }
-//
-//        for(ExperimentBuilder.ExperimentProfile experimentProfile : experimentProfiles) {
-//            this.archimulatorService.addExperimentProfile(experimentProfile);
-//        }
+        List<SimulatedProgram> simulatedPrograms = new ArrayList<SimulatedProgram>();
+        simulatedPrograms.add(Startup.SIMULATED_PROGRAM_MST_HT);
+        simulatedPrograms.add(Startup.SIMULATED_PROGRAM_EM3D_HT);
+        simulatedPrograms.add(Startup.SIMULATED_PROGRAM_429_MCF_HT);
+
+        List<Integer> l2SizeInKBytes = new ArrayList<Integer>();
+        l2SizeInKBytes.add(512);
+        l2SizeInKBytes.add(512 * 2);
+        l2SizeInKBytes.add(512 * 4);
+        l2SizeInKBytes.add(512 * 8);
+
+        List<ExperimentBuilder.ExperimentProfile> experimentProfiles = new ArrayList<ExperimentBuilder.ExperimentProfile>();
+
+        for (SimulatedProgram simulatedProgram : simulatedPrograms) {
+            experimentProfiles.add(ExperimentBuilder.on().cores(2).threadsPerCore(2)
+                    .with().workload(simulatedProgram)
+                    .simulate().functionallyToEnd());
+
+            for (int l2SizeInKByte : l2SizeInKBytes) {
+                experimentProfiles.add(ExperimentBuilder.on().cores(2).threadsPerCore(2).l2Size(1024 * l2SizeInKByte).l2Associativity(8)
+                        .with().workload(simulatedProgram)
+                        .simulate().functionallyToPseudoCallAndInDetailForMaxInsts(3720, 2000000000)
+                        .addSimulationCapabilityFactory(LastLevelCacheHtRequestCachePollutionProfilingCapability.class, LastLevelCacheHtRequestCachePollutionProfilingCapability.FACTORY));
+
+                experimentProfiles.add(ExperimentBuilder.on().cores(2).threadsPerCore(2).l2Size(1024 * l2SizeInKByte).l2Associativity(8)
+                        .with().workload(simulatedProgram)
+                        .simulate().inDetailToEnd()
+                        .addSimulationCapabilityFactory(LastLevelCacheHtRequestCachePollutionProfilingCapability.class, LastLevelCacheHtRequestCachePollutionProfilingCapability.FACTORY));
+            }
+        }
+
+        for(ExperimentBuilder.ExperimentProfile experimentProfile : experimentProfiles) {
+            this.archimulatorService.addExperimentProfile(experimentProfile);
+        }
         
         System.out.println(this.archimulatorService.getExperimentProfilesAsList().size());
         
