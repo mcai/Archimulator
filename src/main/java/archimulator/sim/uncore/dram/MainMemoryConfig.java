@@ -18,7 +18,9 @@
  ******************************************************************************/
 package archimulator.sim.uncore.dram;
 
-public abstract class MainMemoryConfig {
+import java.io.Serializable;
+
+public abstract class MainMemoryConfig implements Serializable {
     private MainMemoryType type;
     private int lineSize;
 

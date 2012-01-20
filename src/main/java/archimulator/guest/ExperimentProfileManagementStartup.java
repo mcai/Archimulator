@@ -1,12 +1,18 @@
 package archimulator.guest;
 
+import archimulator.model.experiment.ExperimentBuilder;
+import archimulator.model.simulation.SimulatedProgram;
 import archimulator.service.ArchimulatorService;
+import archimulator.sim.Startup;
+import archimulator.sim.ext.uncore.newHt2.LastLevelCacheHtRequestCachePollutionProfilingCapability;
 import archimulator.util.DateHelper;
 import com.caucho.hessian.client.HessianProxyFactory;
 
 import java.net.MalformedURLException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class ExperimentProfileManagementStartup {
     private ArchimulatorService archimulatorService;
@@ -45,17 +51,17 @@ public class ExperimentProfileManagementStartup {
 //        List<ExperimentBuilder.ExperimentProfile> experimentProfiles = new ArrayList<ExperimentBuilder.ExperimentProfile>();
 //
 //        for (SimulatedProgram simulatedProgram : simulatedPrograms) {
-//            experimentProfiles.add(on().cores(2).threadsPerCore(2)
+//            experimentProfiles.add(ExperimentBuilder.on().cores(2).threadsPerCore(2)
 //                    .with().workload(simulatedProgram)
 //                    .simulate().functionallyToEnd());
 //
 //            for (int l2SizeInKByte : l2SizeInKBytes) {
-//                experimentProfiles.add(on().cores(2).threadsPerCore(2).l2Size(1024 * l2SizeInKByte).l2Associativity(8)
+//                experimentProfiles.add(ExperimentBuilder.on().cores(2).threadsPerCore(2).l2Size(1024 * l2SizeInKByte).l2Associativity(8)
 //                        .with().workload(simulatedProgram)
 //                        .simulate().functionallyToPseudoCallAndInDetailForMaxInsts(3720, 2000000000)
 //                        .addSimulationCapabilityFactory(LastLevelCacheHtRequestCachePollutionProfilingCapability.class, LastLevelCacheHtRequestCachePollutionProfilingCapability.FACTORY));
 //
-//                experimentProfiles.add(on().cores(2).threadsPerCore(2).l2Size(1024 * l2SizeInKByte).l2Associativity(8)
+//                experimentProfiles.add(ExperimentBuilder.on().cores(2).threadsPerCore(2).l2Size(1024 * l2SizeInKByte).l2Associativity(8)
 //                        .with().workload(simulatedProgram)
 //                        .simulate().inDetailToEnd()
 //                        .addSimulationCapabilityFactory(LastLevelCacheHtRequestCachePollutionProfilingCapability.class, LastLevelCacheHtRequestCachePollutionProfilingCapability.FACTORY));
@@ -65,7 +71,13 @@ public class ExperimentProfileManagementStartup {
 //        for(ExperimentBuilder.ExperimentProfile experimentProfile : experimentProfiles) {
 //            this.archimulatorService.addExperimentProfile(experimentProfile);
 //        }
-
+        
+        System.out.println(this.archimulatorService.getExperimentProfilesAsList().size());
+        
+        for(ExperimentBuilder.ExperimentProfile experimentProfile : this.archimulatorService.getExperimentProfilesAsList()) {
+            System.out.println(experimentProfile.getState());
+        }
+        
         this.archimulatorService.setRunningExperimentEnabled(true);
     }
 

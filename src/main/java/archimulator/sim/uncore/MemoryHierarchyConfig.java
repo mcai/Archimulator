@@ -25,7 +25,9 @@ import archimulator.sim.uncore.coherence.LastLevelCacheConfig;
 import archimulator.sim.uncore.dram.FixedLatencyMainMemoryConfig;
 import archimulator.sim.uncore.dram.MainMemoryConfig;
 
-public class MemoryHierarchyConfig {
+import java.io.Serializable;
+
+public class MemoryHierarchyConfig implements Serializable {
     private FirstLevelCacheConfig instructionCache;
     private FirstLevelCacheConfig dataCache;
     private LastLevelCacheConfig l2Cache;

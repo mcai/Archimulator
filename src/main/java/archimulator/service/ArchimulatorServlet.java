@@ -4,6 +4,7 @@ import archimulator.model.experiment.ExperimentBuilder;
 import com.caucho.hessian.server.HessianServlet;
 
 import java.sql.SQLException;
+import java.util.List;
 
 public class ArchimulatorServlet extends HessianServlet implements ArchimulatorService {
     @Override
@@ -19,6 +20,11 @@ public class ArchimulatorServlet extends HessianServlet implements ArchimulatorS
     @Override
     public void addExperimentProfile(ExperimentBuilder.ExperimentProfile experimentProfile) throws SQLException {
         this.getProxy().addExperimentProfile(experimentProfile);
+    }
+
+    @Override
+    public List<ExperimentBuilder.ExperimentProfile> getExperimentProfilesAsList() throws SQLException {
+        return this.getProxy().getExperimentProfilesAsList();
     }
 
     @Override

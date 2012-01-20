@@ -29,10 +29,9 @@ import archimulator.util.action.Predicate;
 import archimulator.util.event.BlockingEvent;
 import archimulator.util.io.buffer.CircularByteBuffer;
 
-import java.io.Serializable;
 import java.util.*;
 
-public class Kernel extends BasicSimulationObject implements SimulationObject, Serializable {
+public class Kernel extends BasicSimulationObject implements SimulationObject {
     private List<Pipe> pipes;
     private List<SystemEvent> systemEvents;
     private List<SignalAction> signalActions;

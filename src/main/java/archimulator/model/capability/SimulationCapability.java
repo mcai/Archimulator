@@ -18,5 +18,7 @@
  ******************************************************************************/
 package archimulator.model.capability;
 
-public interface SimulationCapability {
+import java.io.Serializable;
+
+public interface SimulationCapability extends Serializable {
 }

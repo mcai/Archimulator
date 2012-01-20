@@ -23,7 +23,9 @@ import archimulator.util.io.appender.CompositeOutputAppender;
 import archimulator.util.io.appender.ConsoleOutputAppender;
 import archimulator.util.io.appender.OutputAppender;
 
-public abstract class Logger {
+import java.io.Serializable;
+
+public abstract class Logger implements Serializable {
     private OutputAppender outputAppender;
 
     public Logger() {

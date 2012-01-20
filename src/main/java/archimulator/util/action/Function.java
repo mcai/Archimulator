@@ -18,6 +18,8 @@
  ******************************************************************************/
 package archimulator.util.action;
 
-public interface Function<TResult> {
+import java.io.Serializable;
+
+public interface Function<TResult> extends Serializable {
     TResult apply();
 }

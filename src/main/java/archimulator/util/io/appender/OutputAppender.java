@@ -18,7 +18,9 @@
  ******************************************************************************/
 package archimulator.util.io.appender;
 
-public interface OutputAppender {
+import java.io.Serializable;
+
+public interface OutputAppender extends Serializable {
     void appendStdOutLine(long currentCycle, String text);
 
     void appendStdErrLine(long currentCycle, String text);

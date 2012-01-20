@@ -20,6 +20,8 @@ package archimulator.model.capability;
 
 import archimulator.model.simulation.Simulation;
 
-public interface SimulationCapabilityFactory {
+import java.io.Serializable;
+
+public interface SimulationCapabilityFactory extends Serializable {
     SimulationCapability createCapability(Simulation simulation);
 }

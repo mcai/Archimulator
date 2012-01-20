@@ -23,11 +23,10 @@ import archimulator.model.simulation.SimulationObject;
 import archimulator.sim.isa.ArchitecturalRegisterFile;
 import archimulator.sim.isa.SyscallExecutedEvent;
 
-import java.io.Serializable;
 import java.util.Map;
 import java.util.TreeMap;
 
-public abstract class SyscallEmulation extends BasicSimulationObject implements SimulationObject, Serializable {
+public abstract class SyscallEmulation extends BasicSimulationObject implements SimulationObject {
     public static final int EPERM = 1;
     public static final int ENOENT = 2;
     public static final int ESRCH = 3;

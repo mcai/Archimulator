@@ -50,9 +50,8 @@ public class ExperimentBuilder {
         private int l2Size = 1024 * 1024 * 4;
         private int l2Associativity = 8;
 
-        //TODO: serialization
-        private transient Map<Class<? extends ProcessorCapability>, ProcessorCapabilityFactory> processorCapabilityFactories = new HashMap<Class<? extends ProcessorCapability>, ProcessorCapabilityFactory>();
-        private transient Map<Class<? extends KernelCapability>, KernelCapabilityFactory> kernelCapabilityFactories = new HashMap<Class<? extends KernelCapability>, KernelCapabilityFactory>();
+        private Map<Class<? extends ProcessorCapability>, ProcessorCapabilityFactory> processorCapabilityFactories = new HashMap<Class<? extends ProcessorCapability>, ProcessorCapabilityFactory>();
+        private Map<Class<? extends KernelCapability>, KernelCapabilityFactory> kernelCapabilityFactories = new HashMap<Class<? extends KernelCapability>, KernelCapabilityFactory>();
 
         public ProcessorProfile cores(int numCores) {
             this.numCores = numCores;
@@ -164,8 +163,8 @@ public class ExperimentBuilder {
         @DatabaseField(dataType = DataType.SERIALIZABLE)
         private WorkloadProfile workloadProfile;
 
-        //TODO: serialization
-        private transient Map<Class<? extends SimulationCapability>, SimulationCapabilityFactory> simulationCapabilityFactories = new HashMap<Class<? extends SimulationCapability>, SimulationCapabilityFactory>();
+        @DatabaseField(dataType = DataType.SERIALIZABLE)
+        private HashMap<Class<? extends SimulationCapability>, SimulationCapabilityFactory> simulationCapabilityFactories = new HashMap<Class<? extends SimulationCapability>, SimulationCapabilityFactory>();
 
         @DatabaseField
         private ExperimentProfileType type;

@@ -9,6 +9,7 @@ import com.j256.ormlite.table.TableUtils;
 import it.sauronsoftware.cron4j.Scheduler;
 
 import java.sql.SQLException;
+import java.util.List;
 
 public class ArchimulatorServiceImpl implements ArchimulatorService {
     private Dao<ExperimentBuilder.ExperimentProfile, Long> experimentProfiles;
@@ -65,6 +66,11 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
     @Override
     public void addExperimentProfile(ExperimentBuilder.ExperimentProfile experimentProfile) throws SQLException {
         this.experimentProfiles.create(experimentProfile);
+    }
+    
+    @Override
+    public List<ExperimentBuilder.ExperimentProfile> getExperimentProfilesAsList() throws SQLException {
+        return this.experimentProfiles.queryForAll();
     }
 
     @Override

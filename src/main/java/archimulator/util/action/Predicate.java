@@ -18,6 +18,8 @@
  ******************************************************************************/
 package archimulator.util.action;
 
-public interface Predicate<T> {
+import java.io.Serializable;
+
+public interface Predicate<T> extends Serializable {
     boolean apply(T param);
 }

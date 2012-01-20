@@ -20,9 +20,10 @@ package archimulator.util.event;
 
 import archimulator.util.action.Action;
 
+import java.io.Serializable;
 import java.util.PriorityQueue;
 
-public final class CycleAccurateEventQueue {
+public final class CycleAccurateEventQueue implements Serializable {
     private long currentCycle;
     private PriorityQueue<CycleAccurateEvent> events;
 

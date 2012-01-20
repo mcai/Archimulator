@@ -18,7 +18,9 @@
  ******************************************************************************/
 package archimulator.sim.core.bpred;
 
-public abstract class BranchPredictorConfig {
+import java.io.Serializable;
+
+public abstract class BranchPredictorConfig implements Serializable {
     private BranchPredictorType type;
 
     public BranchPredictorConfig(BranchPredictorType type) {

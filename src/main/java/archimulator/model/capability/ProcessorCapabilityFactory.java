@@ -20,6 +20,8 @@ package archimulator.model.capability;
 
 import archimulator.sim.core.Processor;
 
-public interface ProcessorCapabilityFactory {
+import java.io.Serializable;
+
+public interface ProcessorCapabilityFactory extends Serializable {
     ProcessorCapability createCapability(Processor processor);
 }

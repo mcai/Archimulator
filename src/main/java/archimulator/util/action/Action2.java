@@ -18,6 +18,8 @@
  ******************************************************************************/
 package archimulator.util.action;
 
-public interface Action2<T1, T2> {
+import java.io.Serializable;
+
+public interface Action2<T1, T2> extends Serializable {
     void apply(T1 param1, T2 param2);
 }

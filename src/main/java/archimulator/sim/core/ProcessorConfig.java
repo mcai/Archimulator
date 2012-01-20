@@ -27,9 +27,10 @@ import archimulator.sim.os.KernelCapabilityFactory;
 import archimulator.sim.uncore.MemoryHierarchyConfig;
 import archimulator.sim.uncore.tlb.TranslationLookasideBufferConfig;
 
+import java.io.Serializable;
 import java.util.Map;
 
-public class ProcessorConfig {
+public class ProcessorConfig implements Serializable {
     private int numCores;
     private int numThreadsPerCore;
 
