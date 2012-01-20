@@ -98,6 +98,7 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
         }
 
         profile.setState(ExperimentBuilder.ExperimentProfileState.STOPPED);
+        this.experimentProfiles.update(profile);
     }
 
     @Override
