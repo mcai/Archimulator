@@ -21,13 +21,13 @@ package archimulator.core;
 import archimulator.core.bpred.*;
 import archimulator.isa.ArchitecturalRegisterFile;
 import archimulator.isa.RegisterDependencyType;
-import archimulator.uncore.CacheAccessType;
-import archimulator.uncore.coherence.event.CoherentCacheBeginCacheAccessEvent;
-import archimulator.uncore.tlb.TranslationLookasideBuffer;
 import archimulator.os.Context;
 import archimulator.sim.BasicSimulationObject;
 import archimulator.sim.event.DumpStatEvent;
 import archimulator.sim.event.ResetStatEvent;
+import archimulator.uncore.CacheAccessType;
+import archimulator.uncore.coherence.event.CoherentCacheBeginCacheAccessEvent;
+import archimulator.uncore.tlb.TranslationLookasideBuffer;
 import archimulator.util.action.Action1;
 
 public abstract class AbstractBasicThread extends BasicSimulationObject implements Thread {
@@ -144,10 +144,12 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
                 if (!event.getCacheAccess().isHitInCache() && event.getCache().isLastLevelCache()) {
                     if (event.getAccess().getThread() == AbstractBasicThread.this) {
                         CacheAccessType accessType = event.getCacheAccess().getReference().getAccessType();
-                        if (accessType.isDownwardRead()) {
-                            llcReadMisses++;
-                        } else if (accessType.isDownwardWrite()) {
-                            llcWriteMisses++;
+                        if (!accessType.isUpward()) {
+                            if (accessType.isDownwardRead() || accessType.isDownwardWrite()) {
+                                llcReadMisses++;
+                            } else if (accessType.isWriteback()) {
+                                llcWriteMisses++;
+                            }
                         }
                     }
                 }

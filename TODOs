@@ -8,3 +8,6 @@ Hints from Cache showndown: the good, bad and ugly:
 
     At any point in execution, the union of the non-prefetched tags in the cache and the evict tags in the ET give the state of of cache as if prefetching had never occurred.
 
+TODOs:
+    L2: 512K, 1M, 2M, 3M
+    Benchmarks: mst, em3d, mcf

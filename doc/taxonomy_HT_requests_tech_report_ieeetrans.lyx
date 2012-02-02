@@ -195,9 +195,14 @@ Helper threaded data prefetching on chip multiprocessors (CMPs), in its
  most basic form, utilizes the processing power of underutilized neighboring
  cores that communicate via a shared last level cache (LLC) to improve the
  performance of a single-threaded program running in a CMP.
- However, the multiple memory reference/miss streams that come from the
- main thread (MT) and the helper thread (HT) can inevitably stress and pollute
- LLC if no effective LLC content management techniques are employed.
+ The multiple memory reference/miss streams that come from the main thread
+ (MT) and the helper thread (HT) can inevitably stress and pollute LLC if
+ no effective LLC content management techniques are employed.
+ However, the classic accuracy and coverage metrics for HT requests and
+ the classification of “Useful” and “Useless” HT requests don’t care about
+ cache pollution and HT request lateness, which are two kinds of deficiencies
+ in the HT scheme.
+ 
 \end_layout
 
 \begin_layout Abstract
@@ -285,23 +290,138 @@ status collapsed
 \end_layout
 
 \begin_layout Standard
-In this paper, we present the methodology and mechanisms used in the quantitativ
-e analysis of the shared LLC pollution caused by helper-threaded data prefetchin
-g on CMPs, in the aim of providing insights on improving the effectiveness
- and timeliness of the scheme.
+Several metrics have been proposed in the past for evaluating and thus finetunin
+g the MT performance improvement brought by the HT scheme, among which prefetch
+ accuracy and coverage are the most intuitive ones
+\color red
+[]
+\color inherit
+.
+ We can adapt the definitions of accuracy and coverage for hardware prefetching
+ to the HT scheme.
+ HT request accuracy is defined as the ratio of the number of useful HT
+ requests to the number of total HT requests.
+ And HT request coverage is defined as the ratio of the number of useful
+ HT requests to the number of MT misses plus MT hits to HT requested data.
+ To measure coverage and accuracy all HT requests can be categorized into
  
+\begin_inset Quotes eld
+\end_inset
+
+Useful
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+Useless
+\begin_inset Quotes erd
+\end_inset
+
+ HT requests.
+ Similar to the approach to hardware prefetching
+\color red
+[]
+\color inherit
+, a 
+\begin_inset Quotes eld
+\end_inset
+
+Useful
+\begin_inset Quotes erd
+\end_inset
+
+ HT request is one whose brought data is hit by a MT request before it is
+ replaced, while a 
+\begin_inset Quotes eld
+\end_inset
+
+Useless
+\begin_inset Quotes erd
+\end_inset
+
+ Ht request is one whose brought data is replaced before it is hit by a
+ MT request.
 \end_layout
 
 \begin_layout Standard
-We assume here a two level cache hierarchy where L1 caches are private and
- the L2 cache is shared among all processor cores on a single chip.
+However the above accuracy and coverage metrics for HT requests and the
+ classification of 
+\begin_inset Quotes eld
+\end_inset
+
+Useful
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+Useless
+\begin_inset Quotes erd
+\end_inset
+
+ HT requests don't care about cache pollution and HT request lateness, which
+ are two kinds of deficiencies in the HT scheme.
+\end_layout
+
+\begin_layout Standard
+In this paper, based on the idea of cache pollution and HT request lateness,
+ we present the methodology and mechanisms used in the quantitative analysis
+ of the shared LLC pollution caused by helper-threaded data prefetching
+ on CMPs, in the aim of providing insights on improving the effectiveness
+ and timeliness of the scheme.
+ We assume here a two level cache hierarchy where L1 caches are private
+ and the L2 cache is shared among all processor cores on a single chip.
  
 \end_layout
 
 \begin_layout Standard
 The main contributions of this paper can be summarized as follows:
 \color red
- TODOs.
+ 
+\end_layout
+
+\begin_layout Enumerate
+Presents the cycle-accurate multicore simulation framework to evaluate the
+ cache pollution effects and lateness for HT requests in the helper thread
+ scheme for CMPs.
+\end_layout
+
+\begin_layout Enumerate
+Discussed the cache pollution aware classification of 
+\begin_inset Quotes eld
+\end_inset
+
+good
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+bad
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+ugly
+\begin_inset Quotes erd
+\end_inset
+
+ HT requests.
+\end_layout
+
+\begin_layout Enumerate
+Discussed the lateness measurement of HT requests which is a good indicator
+ for potential improvement of the HT scheme.
 \end_layout
 
 \begin_layout Standard
@@ -1433,33 +1553,57 @@ Definitions
 \end_layout
 
 \begin_layout Standard
-Based on their contribution to the MT performance, on the LLC which is shared
- by MT, HT and some other threads, the following taxonomy of HT requests
- can be obtained:
+We propose the following taxonomy of HT requests based on the cache pollution
+ and HT request lateness:
 \end_layout
 
-\begin_layout Itemize
+\begin_layout Enumerate
 # Good HT requests = # HT requests that hit by MT before evicted;
 \end_layout
 
-\begin_layout Itemize
+\begin_layout Enumerate
 # Bad HT requests = # HT requests whose requested data are used later (or
  not used at all) by MT than the evicted data;
 \end_layout
 
-\begin_layout Itemize
-# Ugly HT requests = # HT requests - # good HT requests - # bad HT requests.
+\begin_layout Enumerate
+# Ugly HT requests = # HT requests - # good HT requests - # bad HT requests;
+\end_layout
+
+\begin_layout Enumerate
+# Late HT requests = # In-flight HT requests that hit by MT requests.
+\end_layout
+
+\begin_layout Standard
+Among these types of HT requests, 
+\end_layout
+
+\begin_layout Enumerate
+good HT requests have positive impact on MT performance, 
+\end_layout
+
+\begin_layout Enumerate
+ugly HT request have little performance impact on MT performance,
+\end_layout
+
+\begin_layout Enumerate
+bad HT requests are harmful for MT performance, 
+\end_layout
+
+\begin_layout Enumerate
+and late HT requests are good indicators for potential performance improvement
+ of the HT scheme.
 \end_layout
 
 \begin_layout Subsection
 Hardware Changes
 \end_layout
 
-\begin_layout Standard
-First, we need to track which LLC requests come from the main thread, and
- which LLC requests come from the helper thread.
- For example, consider a simulated multicore machine which has two cores
- where each core has two hardware threads.
+\begin_layout Enumerate
+In order to evaluate the above metrics, first we need to identify the source
+ of each LLC request, i.e., whether it comes from MT or HT or other threads.
+ Consider a simulated multicore machine which has two cores where each core
+ has two hardware threads.
  In our application-only simulation using Archimulator, without the OS intervent
 ion, one hardware thread can only run at least one software context (or
  called thread).
@@ -1481,11 +1625,12 @@ reference "fig:Simulated-Multicore-Architecture"
  We use this configuration in the following discussions.
 \end_layout
 
+\begin_deeper
 \begin_layout Standard
 \begin_inset Float figure
 wide false
 sideways false
-status open
+status collapsed
 
 \begin_layout Plain Layout
 \align center
@@ -1529,7 +1674,8 @@ name "fig:Simulated-Multicore-Architecture"
 
 \end_layout
 
-\begin_layout Standard
+\end_deeper
+\begin_layout Enumerate
 Second, to monitor the request and replacement activities in LLC, we need
  to consider 
 \bar under
@@ -1551,7 +1697,7 @@ key "Mehta2004"
 .
 \end_layout
 
-\begin_layout Standard
+\begin_layout Enumerate
 Thirdly, in order to track the HT request states in the LLC, we need to
  
 \bar under
@@ -1562,7 +1708,7 @@ add one field to each LLC line to indicate whether the line is brought by
  
 \end_layout
 
-\begin_layout Standard
+\begin_layout Enumerate
 Fourthly, in order to track victims replaced by HT requests, 
 \bar under
 we need to add an LRU cache named HT Request Victim Cache (HTRVC) to maintain
@@ -1579,6 +1725,12 @@ key "Mehta2004"
 , the HTRVC has the same structure of the LLC, but there is no direct mapping
  between LLC lines and HTRVC lines.
  HTRVC has only the purpose of profiling, so it has no impact on performance.
+\end_layout
+
+\begin_layout Enumerate
+Lastly, in order to measure late HT requests, we only need to identify the
+ event when an MT request hits to an LLC line which is being brought by
+ an inflight HT request.
 \end_layout
 
 \begin_layout Subsection
@@ -1606,8 +1758,9 @@ key "Mehta2004"
 \end_layout
 
 \begin_layout Standard
-From the above two invariants, we can conclude that: # of HT Lines in the
- LLC Set+ # of Valid MT LLC Lines in Set ≤ LLC Set Associativity.
+HT lines refer to the cache lines that are brought by HT requests.
+ From the above two invariants, we can easily conclude that: # of HT Lines
+ in the LLC Set+ # of Valid MT LLC Lines in Set ≤ LLC Set Associativity.
 \end_layout
 
 \begin_layout Subsection
@@ -1623,37 +1776,84 @@ key "Mehta2004"
 \end_inset
 
 , corresponding actions should be taken in LLC and HTRVC when filling an
- LLC line (Fig.
+ LLC line or servicing an incoming LLC request.
+\end_layout
+
+\begin_layout Standard
+As illustrated in Fig.
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "fig:LLC-Line-Brought-In"
 
 \end_inset
 
-) or servicing an incoming LLC request (Fig.
+, when filling an LLC line, we should consider five cases:
+\end_layout
+
+\begin_layout Enumerate
+An HT request evicts an INVALID line.
+ In this case, no eviction is needed.
+\end_layout
+
+\begin_layout Enumerate
+An HT request evicts an LLC line which is previously brought by an MT request.
+ In this cache, eviction is needed to make room for the incoming HT request.
+\end_layout
+
+\begin_layout Enumerate
+An HT request evicts an LLC line which is previously brought by an HT request.
+ In this cache, eviction is needed to make room for the incoming HT request.
+\end_layout
+
+\begin_layout Enumerate
+An MT request evicts an LLC line which is previously brought by an HT request.
+ In this cache, eviction is needed to make room for the incoming MT request.
+\end_layout
+
+\begin_layout Enumerate
+An MT request evicts an LLC line which is previously brought by an MT request,
+ and there exists one line that is brought by an HT request.
+ In this cache, eviction is needed to make room for the incoming MT request.
+\end_layout
+
+\begin_layout Standard
+As illustrated in Fig.
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "fig:Servicing-MT-and-HT-requests"
 
 \end_inset
 
-).
+, when servicing an incoming LLC request, either hit or miss:
 \end_layout
 
-\begin_layout Standard
+\begin_layout Enumerate
+Victim hit, which indicates a good HT request.
+ This happens when HT request evicted useful data.
+\end_layout
 
-\color red
-TODOs: dispatching and handling of CoherentCacheServiceNonblockingRequestEvent:
- dispatching in CoherentCache.AbstractFindAndLockProcess.doLockingProcess(..)
- handling in LastLevelCacheHtRequestCachePollutionProfilingCapability.serviceRequ
-est(..)
+\begin_layout Enumerate
+HT hit, which indicates a bad HT request.
+ This happens when HT requested data is hit by MT request before evicted
+ data.
+\end_layout
+
+\begin_layout Enumerate
+HT and Victim hit.
+ This happens when useful data evicted and brought back in by HT request.
+\end_layout
+
+\begin_layout Enumerate
+MT and Victim hit.
+ This happens when useful data evicted and brought back in by HT request
+ and hit to by MT request.
 \end_layout
 
 \begin_layout Standard
 \begin_inset Float figure
 wide false
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset listings
@@ -1722,7 +1922,7 @@ if(!hitInLLC && requesterIsHT) {
 
 \begin_layout Plain Layout
 
-//Case 1: HT evicts INVALID
+//Case 1
 \end_layout
 
 \begin_layout Plain Layout
@@ -1747,7 +1947,7 @@ if(requesterIsHT && !hitInLLC && !hasEviction) {
 
 \begin_layout Plain Layout
 
-//Case 2: HT evicts MT
+//Case 2
 \end_layout
 
 \begin_layout Plain Layout
@@ -1772,7 +1972,7 @@ else if(requesterIsHT && !hitInLLC && hasEviction && !lineFoundIsHT) {
 
 \begin_layout Plain Layout
 
-//Case 3: HT evicts HT
+//Case 3
 \end_layout
 
 \begin_layout Plain Layout
@@ -1787,7 +1987,7 @@ else if(requesterIsHT && !hitInLLC && hasEviction && lineFoundIsHT) {
 
 \begin_layout Plain Layout
 
-//Case 4: MT evicts HT
+//Case 4
 \end_layout
 
 \begin_layout Plain Layout
@@ -1812,7 +2012,7 @@ else if(!requesterIsHT && !hitInLLC && hasEviction && lineFoundIsHT) {
 
 \begin_layout Plain Layout
 
-//Case 5: MT evicts MT, and there exists one HT line
+//Case 5
 \end_layout
 
 \begin_layout Plain Layout
@@ -1878,7 +2078,7 @@ name "fig:LLC-Line-Brought-In"
 \begin_inset Float figure
 wide false
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset listings
@@ -1912,7 +2112,7 @@ status open
 
 \begin_layout Plain Layout
 
-//Case 1: VT hit => Good HT request (HT request evicted useful data)
+//Case 1
 \end_layout
 
 \begin_layout Plain Layout
@@ -1937,8 +2137,7 @@ if(!mtHit && !htHit && vtHit) {
 
 \begin_layout Plain Layout
 
-//Case 2: HT hit => Bad HT request (HT requested data hit before evicted
- data)
+//Case 2
 \end_layout
 
 \begin_layout Plain Layout
@@ -1968,7 +2167,7 @@ else if(!mtHit && htHit && !vtHit) {
 
 \begin_layout Plain Layout
 
-//Case 3: HT and VT hit (Useful data evicted and requested back in by HT)
+//Case 3
 \end_layout
 
 \begin_layout Plain Layout
@@ -1998,8 +2197,7 @@ else if(!mtHit && htHit && vtHit) {
 
 \begin_layout Plain Layout
 
-//Case 4: MT and VT hit(Useful data evicted and requested back in by HT
- and hit to by MT)
+//Case 4
 \end_layout
 
 \begin_layout Plain Layout
@@ -2051,8 +2249,8 @@ Preliminary Results
 \end_layout
 
 \begin_layout Enumerate
-mst 1000, HT version (params: LOOKAHEAD=20, STRIDE=10), detailed simulation
- vs checkpointed simulation
+4M LLC, mst 1000, HT version (params: LOOKAHEAD=20, STRIDE=10), detailed
+ simulation vs checkpointed simulation
 \end_layout
 
 \begin_deeper
@@ -2102,7 +2300,7 @@ llc.uglyHtRequests=71
 \end_deeper
 \end_deeper
 \begin_layout Enumerate
-mst 10000, HT version, checkpointed simulation
+4M LLC, mst 10000, HT version, checkpointed simulation
 \end_layout
 
 \begin_deeper
@@ -2112,7 +2310,7 @@ pending...
 
 \end_deeper
 \begin_layout Enumerate
-em3d 1000, HT version (params: LOOKAHEAD=20), detailed simulation
+4M LLC, em3d 1000, HT version (params: LOOKAHEAD=20), detailed simulation
 \end_layout
 
 \begin_deeper
@@ -2134,7 +2332,7 @@ llc.uglyHtRequests=22
 
 \end_deeper
 \begin_layout Enumerate
-em3d 400000, HT version, checkpointed simulation
+4M LLC, em3d 400000, HT version, checkpointed simulation
 \end_layout
 
 \begin_deeper
@@ -2143,17 +2341,74 @@ pending...
 \end_layout
 
 \end_deeper
+\begin_layout Enumerate
+1M LLC, mst 1000, HT version (snapshot at cycle #351552909)
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+llc.mtMisses: 1431649 
+\end_layout
+
+\begin_layout Itemize
+llc.totalHtRequests: 683517
+\end_layout
+
+\begin_layout Itemize
+llc.usefulHtRequests: 683253
+\end_layout
+
+\begin_layout Itemize
+llc.ht_accuracy: 99.96% 
+\end_layout
+
+\begin_layout Itemize
+llc.ht_coverage: 47.72% 
+\end_layout
+
+\begin_layout Itemize
+llc.goodHtRequests: 683246 
+\end_layout
+
+\begin_layout Itemize
+llc.badHtRequests: 1 
+\end_layout
+
+\begin_layout Itemize
+llc.uglyHtRequests: 270 
+\end_layout
+
+\begin_layout Itemize
+llc.lateHtRequests: 69075
+\end_layout
+
+\end_deeper
 \begin_layout Section
 Previous Work
 \end_layout
 
 \begin_layout Standard
-TODO: previous work on prefetch taxonomies.
- Traditional coverage and accuracy metrics for h/w prefetches.
- -> good, bad and ugly breakdown of h/w prefetches.
- -> more fine-grained breakdowns of h/w prefetches.
- any previous work on cache request breakdowns for helper threaded data
- prefetching? 
+TODOs: previous work on prefetch taxonomies.
+ 
+\end_layout
+
+\begin_layout Enumerate
+Classic metrics of coverage and accuracy for h/w prefetches.
+\end_layout
+
+\begin_layout Enumerate
+Good, bad and ugly breakdown of h/w prefetches.
+ 
+\end_layout
+
+\begin_layout Enumerate
+More fine-grained breakdowns of h/w prefetches.
+ 
+\end_layout
+
+\begin_layout Enumerate
+Any previous work on cache request breakdowns for helper threaded data prefetchi
+ng? 
 \end_layout
 
 \begin_layout Section

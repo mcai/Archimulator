@@ -18,6 +18,9 @@
  ******************************************************************************/
 package archimulator.uncore.coherence;
 
+import archimulator.sim.Logger;
+import archimulator.sim.event.DumpStatEvent;
+import archimulator.sim.event.ResetStatEvent;
 import archimulator.uncore.CacheAccessType;
 import archimulator.uncore.CacheHierarchy;
 import archimulator.uncore.MemoryDevice;
@@ -29,9 +32,6 @@ import archimulator.uncore.coherence.event.CoherentCacheNonblockingRequestHitToT
 import archimulator.uncore.coherence.event.CoherentCacheServiceNonblockingRequestEvent;
 import archimulator.uncore.coherence.exception.CacheLineLockFailedException;
 import archimulator.uncore.coherence.exception.CoherentCacheException;
-import archimulator.sim.Logger;
-import archimulator.sim.event.DumpStatEvent;
-import archimulator.sim.event.ResetStatEvent;
 import archimulator.util.action.Action;
 import archimulator.util.action.Action1;
 import archimulator.util.action.Function3;
@@ -280,8 +280,8 @@ public abstract class CoherentCache<StateT extends Serializable> extends MemoryD
         public LockableCacheLine findLine(int address) {
             int tag = this.getTag(address);
             int set = this.getSet(address);
-            
-            for(int way = 0; way < this.getAssociativity(); way++) {
+
+            for (int way = 0; way < this.getAssociativity(); way++) {
                 LockableCacheLine line = this.getLine(set, way);
                 if (line.getTag() == tag && line.getState() != line.getInitialState() || line.getTransientTag() == tag && line.isLocked()) {
                     return line;
@@ -415,7 +415,7 @@ public abstract class CoherentCache<StateT extends Serializable> extends MemoryD
                         }
                     }, tag)) {
                         if (!cacheAccessType.isUpward()) {
-                            getBlockingEventDispatcher().dispatch(new CoherentCacheServiceNonblockingRequestEvent(CoherentCache.this, tag, access, this.cacheAccess.getLine(), this.cacheAccess.isHitInCache(), this.cacheAccess.isEviction()));
+                            getBlockingEventDispatcher().dispatch(new CoherentCacheServiceNonblockingRequestEvent(CoherentCache.this, tag, access, this.cacheAccess.getLine(), this.cacheAccess.isHitInCache(), this.cacheAccess.isEviction(), this.cacheAccess.getReference().getAccessType()));
                         }
 
                         if (this.cacheAccess.isEviction()) {

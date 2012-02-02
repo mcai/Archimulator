@@ -44,9 +44,9 @@ public class Startup {
 
         List<ContextConfig> contextConfigs = new ArrayList<ContextConfig>();
 //        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_MST_BASELINE, 0));
-//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_MST_HT, 0));
+        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_MST_HT, 0));
 //        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_EM3D_BASELINE, 0));
-        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_EM3D_HT, 0));
+//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_EM3D_HT, 0));
 //        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_429_MCF_BASELINE, 0));
 //        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_429_MCF_HT, 0));
 //        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_EM3D_BASELINE, 1));
@@ -66,19 +66,19 @@ public class Startup {
 //        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_MST_BASELINE, 15));
 
 //        simulate("test2", LeastRecentlyUsedEvictionPolicy.FACTORY, 2, 2, contextConfigs);
-//        simulate("mst_1000_detailed-HTRequest_Profiling", LeastRecentlyUsedEvictionPolicy.FACTORY, 2, 2, contextConfigs);
-        simulate("em3d_10000_ht_detailed", LeastRecentlyUsedEvictionPolicy.FACTORY, 2, 2, contextConfigs);
-//        simulate("mst_ht_LRU", LeastRecentlyUsedEvictionPolicy.FACTORY, SIMULATED_PROGRAM_MST_HT);
+        simulate("mst_4000_detailed-HTRequest_Profiling_l2_1M", LeastRecentlyUsedEvictionPolicy.FACTORY, 2, 2, contextConfigs);
+//        simulate("em3d_10000_ht_detailed", LeastRecentlyUsedEvictionPolicy.FACTORY, 2, 2, contextConfigs);
+//        simulate("mst_ht_LRU", LeastRecentlyUsedEvictionPolicy.FACTORY, SIMULATED_PROGRAM_MST_HT, 2, 2, contextConfigs);
 
-//        simulate("em3d_baseline_LRU", SIMULATED_PROGRAM_EM3D_BASELINE, LeastRecentlyUsedEvictionPolicy.FACTORY);
-//        simulate("libquantum_baseline_LRU", SIMULATED_PROGRAM_462_LIBQUANTUM_BASELINE, LeastRecentlyUsedEvictionPolicy.FACTORY);
-//        simulate("em3d_ht_LRU", SIMULATED_PROGRAM_EM3D_HT, LeastRecentlyUsedEvictionPolicy.FACTORY);
+//        simulate("em3d_baseline_LRU", SIMULATED_PROGRAM_EM3D_BASELINE, LeastRecentlyUsedEvictionPolicy.FACTORY, 2, 2, contextConfigs);
+//        simulate("libquantum_baseline_LRU", SIMULATED_PROGRAM_462_LIBQUANTUM_BASELINE, LeastRecentlyUsedEvictionPolicy.FACTORY, 2, 2, contextConfigs);
+//        simulate("em3d_ht_LRU", SIMULATED_PROGRAM_EM3D_HT, LeastRecentlyUsedEvictionPolicy.FACTORY, 2, 2, contextConfigs);
 
-//        simulate("mcf_baseline_LRU", SIMULATED_PROGRAM_429_MCF_BASELINE, LeastRecentlyUsedEvictionPolicy.FACTORY);
-//        simulate("mcf_ht_LRU", SIMULATED_PROGRAM_429_MCF_HT, LeastRecentlyUsedEvictionPolicy.FACTORY);
+//        simulate("mcf_baseline_LRU", SIMULATED_PROGRAM_429_MCF_BASELINE, LeastRecentlyUsedEvictionPolicy.FACTORY, 2, 2, contextConfigs);
+//        simulate("mcf_ht_LRU", SIMULATED_PROGRAM_429_MCF_HT, LeastRecentlyUsedEvictionPolicy.FACTORY, 2, 2, contextConfigs);
 
-//        simulate("mst_baseline_ENHANCED_LRU", SIMULATED_PROGRAM_MST_BASELINE, ThrashingSensitiveHTEnhancedLeastRecentlyUsedEvictionPolicy.FACTORY);
-//        simulate("mst_ht_ENHANCED_LRU", SIMULATED_PROGRAM_MST_HT, ThrashingSensitiveHTEnhancedLeastRecentlyUsedEvictionPolicy.FACTORY);
+//        simulate("mst_baseline_ENHANCED_LRU", SIMULATED_PROGRAM_MST_BASELINE, ThrashingSensitiveHTEnhancedLeastRecentlyUsedEvictionPolicy.FACTORY), 2, 2, contextConfigs;
+//        simulate("mst_ht_ENHANCED_LRU", SIMULATED_PROGRAM_MST_HT, ThrashingSensitiveHTEnhancedLeastRecentlyUsedEvictionPolicy.FACTORY, 2, 2, contextConfigs);
     }
 
     public static void simulate(String title, EvictionPolicyFactory l2EvictionPolicyFactory, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs) {
@@ -124,7 +124,6 @@ public class Startup {
             "mst.mips",
 //            "10000");
 //            "2000");
-//            "1000");
             "1000");
 //    "400");
 
@@ -133,7 +132,8 @@ public class Startup {
             "mst_ht_mips",
             "/home/itecgo/Archimulator/benchmarks/Olden_Custom1/mst/ht",
             "mst.mips",
-            "10000");
+//            "10000");
+            "4000");
 //            "2000");
 //            "1000");
 //            "400");

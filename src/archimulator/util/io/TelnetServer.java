@@ -44,7 +44,15 @@ public class TelnetServer implements OutputAppender {
             @Override
             public void run() {
                 try {
-                    serverSocket = new ServerSocket(SERVER_PORT);
+                    int port = SERVER_PORT;
+
+                    for(;;) {
+                        try {
+                            serverSocket = new ServerSocket(port++);
+                            break;
+                        } catch (IOException e) {
+                        }
+                    }
 
                     System.out.println("Archimulator's Telnet server is listening at port " + serverSocket.getLocalPort() + "\n");
 

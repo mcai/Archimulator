@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.uncore.coherence.event;
 
+import archimulator.uncore.CacheAccessType;
 import archimulator.uncore.MemoryHierarchyAccess;
 import archimulator.uncore.cache.CacheLine;
 import archimulator.uncore.coherence.CoherentCache;
@@ -28,8 +29,9 @@ public class CoherentCacheServiceNonblockingRequestEvent extends CoherentCacheEv
     private CacheLine<?> lineFound;
     private boolean hitInCache;
     private boolean eviction;
+    private CacheAccessType accessType;
 
-    public CoherentCacheServiceNonblockingRequestEvent(CoherentCache<?> cache, int address, MemoryHierarchyAccess requesterAccess, CacheLine<?> lineFound, boolean hitInCache, boolean eviction) {
+    public CoherentCacheServiceNonblockingRequestEvent(CoherentCache<?> cache, int address, MemoryHierarchyAccess requesterAccess, CacheLine<?> lineFound, boolean hitInCache, boolean eviction, CacheAccessType accessType) {
         super(cache);
 
         this.address = address;
@@ -37,6 +39,7 @@ public class CoherentCacheServiceNonblockingRequestEvent extends CoherentCacheEv
         this.lineFound = lineFound;
         this.hitInCache = hitInCache;
         this.eviction = eviction;
+        this.accessType = accessType;
     }
 
     public int getAddress() {
@@ -59,8 +62,12 @@ public class CoherentCacheServiceNonblockingRequestEvent extends CoherentCacheEv
         return eviction;
     }
 
+    public CacheAccessType getAccessType() {
+        return accessType;
+    }
+
     @Override
     public String toString() {
-        return String.format("CoherentCacheServiceNonblockingRequestEvent{address=0x%08x, requesterAccess=%s, lineFound=%s, hitInCache=%s, eviction=%s}", address, requesterAccess, lineFound, hitInCache, eviction);
+        return String.format("CoherentCacheServiceNonblockingRequestEvent{address=0x%08x, requesterAccess=%s, lineFound=%s, hitInCache=%s, eviction=%s, accessType=%s}", address, requesterAccess, lineFound, hitInCache, eviction, accessType);
     }
 }

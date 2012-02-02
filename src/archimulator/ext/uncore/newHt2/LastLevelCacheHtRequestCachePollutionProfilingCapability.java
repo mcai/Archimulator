@@ -29,6 +29,7 @@ import archimulator.uncore.cache.*;
 import archimulator.uncore.cache.eviction.LeastRecentlyUsedEvictionPolicy;
 import archimulator.uncore.coherence.CoherentCache;
 import archimulator.uncore.coherence.MESIState;
+import archimulator.uncore.coherence.event.CoherentCacheNonblockingRequestHitToTransientTagEvent;
 import archimulator.uncore.coherence.event.CoherentCacheServiceNonblockingRequestEvent;
 import archimulator.util.action.Action1;
 import archimulator.util.action.Function3;
@@ -56,9 +57,16 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
     private Map<Integer, Map<Integer, LastLevelCacheLineHtRequestState>> htRequestStates;
     private EvictableCache<HtRequestVictimCacheLineState, CacheLine<HtRequestVictimCacheLineState>> htRequestVictimCache;
 
+    private long mtMisses;
+
     private long totalHtRequests;
+
+    private long usefulHtRequests;
+
     private long goodHtRequests;
     private long badHtRequests;
+
+    private long lateHtRequests;
 
     private PrintWriter fileWriter;
     private Simulation simulation;
@@ -91,11 +99,27 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
             }
         });
 
+        simulation.getBlockingEventDispatcher().addListener(CoherentCacheNonblockingRequestHitToTransientTagEvent.class, new Action1<CoherentCacheNonblockingRequestHitToTransientTagEvent>() {
+            @SuppressWarnings("Unchecked")
+            public void apply(CoherentCacheNonblockingRequestHitToTransientTagEvent event) {
+                if (event.getCache().getCache() == LastLevelCacheHtRequestCachePollutionProfilingCapability.this.llc) {
+                    markLateHtRequest(event);
+                }
+            }
+        });
+
         simulation.getBlockingEventDispatcher().addListener(ResetStatEvent.class, new Action1<ResetStatEvent>() {
             public void apply(ResetStatEvent event) {
+                mtMisses = 0;
+
                 totalHtRequests = 0;
+
+                usefulHtRequests = 0;
+
                 goodHtRequests = 0;
                 badHtRequests = 0;
+
+                lateHtRequests = 0;
             }
         });
 
@@ -132,10 +156,34 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
     }
 
     private void dumpStats(Map<String, Object> stats) {
+        stats.put("lastLevelCacheHtRequestCachePollutionProfilingCapability." + this.llc.getName() + ".mtMisses", String.valueOf(this.mtMisses));
+
         stats.put("lastLevelCacheHtRequestCachePollutionProfilingCapability." + this.llc.getName() + ".totalHtRequests", String.valueOf(this.totalHtRequests));
+
+        stats.put("lastLevelCacheHtRequestCachePollutionProfilingCapability." + this.llc.getName() + ".usefulHtRequests", String.valueOf(this.usefulHtRequests));
+
+        stats.put("lastLevelCacheHtRequestCachePollutionProfilingCapability." + this.llc.getName() + ".ht_accuracy", String.valueOf(100.0 * (double) this.usefulHtRequests / this.totalHtRequests) + "%");
+        stats.put("lastLevelCacheHtRequestCachePollutionProfilingCapability." + this.llc.getName() + ".ht_coverage", String.valueOf(100.0 * (double) this.usefulHtRequests / this.mtMisses) + "%");
+
         stats.put("lastLevelCacheHtRequestCachePollutionProfilingCapability." + this.llc.getName() + ".goodHtRequests", String.valueOf(this.goodHtRequests));
         stats.put("lastLevelCacheHtRequestCachePollutionProfilingCapability." + this.llc.getName() + ".badHtRequests", String.valueOf(this.badHtRequests));
         stats.put("lastLevelCacheHtRequestCachePollutionProfilingCapability." + this.llc.getName() + ".uglyHtRequests", String.valueOf(this.totalHtRequests - this.goodHtRequests - this.badHtRequests));
+
+        stats.put("lastLevelCacheHtRequestCachePollutionProfilingCapability." + this.llc.getName() + ".lateHtRequests", String.valueOf(this.lateHtRequests));
+    }
+
+    private void markLateHtRequest(CoherentCacheNonblockingRequestHitToTransientTagEvent event) {
+        boolean requesterIsHt = BasicThread.isHelperThread(event.getRequesterAccess().getThread());
+        CacheLine<?> llcLine = event.getLineFound();
+
+        int set = llcLine.getSet();
+
+        LastLevelCacheLineHtRequestState htRequestState = this.htRequestStates.get(set).get(llcLine.getWay());
+        boolean lineFoundIsHt = htRequestState == LastLevelCacheLineHtRequestState.HT;
+
+        if (!requesterIsHt && lineFoundIsHt) {
+            this.lateHtRequests++;
+        }
     }
 
     private void serviceRequest(CoherentCacheServiceNonblockingRequestEvent event) {
@@ -155,6 +203,21 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
                 this.totalHtRequests++;
             } else {
 //                this.setMt(set, llcLine.getWay());
+            }
+        }
+
+        if(!requesterIsHt) {
+            if(!event.isHitInCache()) {
+                this.mtMisses++;
+            }
+            else if(event.isHitInCache() && lineFoundIsHt) {
+                this.mtMisses++;
+            }
+        }
+
+        if (event.isHitInCache()) {
+            if (!requesterIsHt && lineFoundIsHt) {
+                this.usefulHtRequests++;
             }
         }
 
@@ -248,30 +311,30 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
 //            this.checkInvariants(set);
         }
     }
-    
+
     private void checkInvariants(int set) {
         int numhtRequestsInLlc = 0;
         int numVictimEntries = 0;
-        
-        for(int way = 0; way < this.llc.getAssociativity(); way++) {
-            if(this.htRequestStates.get(set).get(way).equals(LastLevelCacheLineHtRequestState.HT)) {
+
+        for (int way = 0; way < this.llc.getAssociativity(); way++) {
+            if (this.htRequestStates.get(set).get(way).equals(LastLevelCacheLineHtRequestState.HT)) {
                 numhtRequestsInLlc++;
             }
         }
 
-        for(int way = 0; way < this.llc.getAssociativity(); way++) {
-            if(!this.htRequestVictimCache.getLine(set, way).getState().getType().equals(HtRequestVictimCacheLineStateType.INVALID)) {
+        for (int way = 0; way < this.llc.getAssociativity(); way++) {
+            if (!this.htRequestVictimCache.getLine(set, way).getState().getType().equals(HtRequestVictimCacheLineStateType.INVALID)) {
                 numVictimEntries++;
             }
         }
-        
-        if(numhtRequestsInLlc != numVictimEntries) {
+
+        if (numhtRequestsInLlc != numVictimEntries) {
             throw new IllegalArgumentException();
         }
     }
 
     private void setHt(int set, int way) {
-        if(this.htRequestStates.get(set).get(way).equals(LastLevelCacheLineHtRequestState.HT)) {
+        if (this.htRequestStates.get(set).get(way).equals(LastLevelCacheLineHtRequestState.HT)) {
             throw new IllegalArgumentException();
         }
 
@@ -279,7 +342,7 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
     }
 
     private void setMt(int set, int way) {
-        if(this.htRequestStates.get(set).get(way).equals(LastLevelCacheLineHtRequestState.MT)) {
+        if (this.htRequestStates.get(set).get(way).equals(LastLevelCacheLineHtRequestState.MT)) {
             throw new IllegalArgumentException();
         }
 
@@ -314,7 +377,7 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
                 return;
             }
         }
-        
+
         throw new IllegalArgumentException();
     }
 
