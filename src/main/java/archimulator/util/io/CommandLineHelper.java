@@ -46,7 +46,7 @@ public class CommandLineHelper {
             return -1;
         }
     }
-    
+
     public static List<String> invokeShellCommandAndGetResult(String args) {
         return invokeNativeCommandAndGetResult(new String[]{"sh", "-c", args});
     }

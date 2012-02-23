@@ -46,7 +46,7 @@ public class TelnetServer implements OutputAppender {
                 try {
                     int port = SERVER_PORT;
 
-                    for(;;) {
+                    for (; ; ) {
                         try {
                             serverSocket = new ServerSocket(port++);
                             break;
@@ -100,14 +100,14 @@ public class TelnetServer implements OutputAppender {
     }
 
     private void appendStdOutLine(SocketThread socketThread, String text) {
-        if(socketThread.out != null) {
+        if (socketThread.out != null) {
             socketThread.out.print(text + "\r\n");
             socketThread.out.flush();
         }
     }
 
     private void appendStdErrLine(SocketThread socketThread, String text) {
-        if(socketThread.out != null) {
+        if (socketThread.out != null) {
             socketThread.out.print(text + "\r\n");
             socketThread.out.flush();
         }

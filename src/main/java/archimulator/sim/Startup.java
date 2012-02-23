@@ -18,13 +18,15 @@
  ******************************************************************************/
 package archimulator.sim;
 
-import archimulator.ext.uncore.newHt2.LastLevelCacheHtRequestCachePollutionProfilingCapability;
-import archimulator.uncore.cache.eviction.EvictionPolicyFactory;
-import archimulator.uncore.cache.eviction.LeastRecentlyUsedEvictionPolicy;
-import archimulator.sim.experiment.CheckpointedExperiment;
-import archimulator.sim.experiment.DetailedExperiment;
-import archimulator.sim.experiment.Experiment;
-import archimulator.sim.experiment.FunctionalExperiment;
+import archimulator.model.base.ContextConfig;
+import archimulator.model.base.SimulatedProgram;
+import archimulator.model.experiment.CheckpointedExperiment;
+import archimulator.model.experiment.DetailedExperiment;
+import archimulator.model.experiment.Experiment;
+import archimulator.model.experiment.FunctionalExperiment;
+import archimulator.sim.ext.uncore.newHt2.LastLevelCacheHtRequestCachePollutionProfilingCapability;
+import archimulator.sim.uncore.cache.eviction.EvictionPolicyFactory;
+import archimulator.sim.uncore.cache.eviction.LeastRecentlyUsedEvictionPolicy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,8 +94,8 @@ public class Startup {
 
     public static Experiment createFunctionalExperiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs) {
         return new FunctionalExperiment(title, numCores, numThreadsPerCore, contextConfigs);
-                //                .addSimulationCapabilityFactory(LastLevelCacheMissProfilingCapability.class, LastLevelCacheMissProfilingCapability.FACTORY)
-                //                .addProcessorCapabilityFactory(HtRequestL2VictimTrackingCapability.class, HtRequestL2VictimTrackingCapability.FACTORY)
+        //                .addSimulationCapabilityFactory(LastLevelCacheMissProfilingCapability.class, LastLevelCacheMissProfilingCapability.FACTORY)
+        //                .addProcessorCapabilityFactory(HtRequestL2VictimTrackingCapability.class, HtRequestL2VictimTrackingCapability.FACTORY)
 //                .addKernelCapabilityFactory(FunctionalExecutionProfilingCapability.class, FunctionalExecutionProfilingCapability.FACTORY);
     }
 

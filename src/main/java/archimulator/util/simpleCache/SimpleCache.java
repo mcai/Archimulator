@@ -39,10 +39,10 @@ public abstract class SimpleCache<KeyT, ValueT, AccessTypeT extends SimpleCacheA
 
         this.lines = new ArrayList<List<CacheLine>>();
 
-        for(int i = 0; i < numSets; i++) {
+        for (int i = 0; i < numSets; i++) {
             ArrayList<CacheLine> linesPerSet = new ArrayList<CacheLine>();
             this.lines.add(linesPerSet);
-            
+
             for (int j = 0; j < associativity; j++) {
                 linesPerSet.add(new CacheLine(i, j));
             }
@@ -81,17 +81,17 @@ public abstract class SimpleCache<KeyT, ValueT, AccessTypeT extends SimpleCacheA
 
         return new Pair<KeyT, ValueT>(line.key, line.value);
     }
-    
+
     public void setLRU(int set, KeyT key) {
         CacheLine line = this.findLine(set, key);
-        
-        if(line == null) {
+
+        if (line == null) {
             throw new IllegalArgumentException();
         }
-        
+
         this.evictionPolicy.setLRU(set, line.way);
     }
-    
+
     public void removeLRU(int set) {
         int way = this.evictionPolicy.getLRU(set);
 
@@ -183,11 +183,11 @@ public abstract class SimpleCache<KeyT, ValueT, AccessTypeT extends SimpleCacheA
             this.set = set;
             this.way = way;
         }
-        
+
         public boolean isEviction() {
             return this.key != null;
         }
-        
+
         public boolean isDirty() {
             return this.isEviction() && this.accessType.isDirty();
         }
@@ -332,14 +332,14 @@ public abstract class SimpleCache<KeyT, ValueT, AccessTypeT extends SimpleCacheA
 
         protected StackBasedEvictionPolicy() {
             this.stackEntries = new ArrayList<List<StackEntry>>();
-            
-            for(int i = 0; i < numSets; i++) {
+
+            for (int i = 0; i < numSets; i++) {
                 ArrayList<StackEntry> stackEntriesPerSet = new ArrayList<StackEntry>();
                 this.stackEntries.add(stackEntriesPerSet);
-                
-                for(int j = 0; j < associativity; j++) {
+
+                for (int j = 0; j < associativity; j++) {
                     stackEntriesPerSet.add(new StackEntry(getLine(i, j)));
-                    
+
                 }
             }
         }

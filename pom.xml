@@ -99,6 +99,11 @@
             <version>3.3.0</version>
         </dependency>
         <dependency>
+            <groupId>org.jruby.ext.posix</groupId>
+            <artifactId>jna-posix</artifactId>
+            <version>1.0.3</version>
+        </dependency>
+        <dependency>
             <groupId>jpathwatch</groupId>
             <artifactId>jpathwatch</artifactId>
             <version>0.94</version>
