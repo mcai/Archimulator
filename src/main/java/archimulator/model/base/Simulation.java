@@ -28,7 +28,6 @@ import archimulator.sim.core.Processor;
 import archimulator.sim.core.Thread;
 import archimulator.sim.os.Context;
 import archimulator.sim.os.Kernel;
-import archimulator.util.StopWatch;
 import archimulator.util.StringHelper;
 import archimulator.util.action.Action1;
 import archimulator.util.action.NamedAction;
@@ -38,6 +37,8 @@ import archimulator.util.event.BlockingEventDispatcher;
 import archimulator.util.event.CycleAccurateEventQueue;
 import archimulator.util.io.file.FileHelper;
 import archimulator.util.io.serialization.MapHelper;
+import org.apache.commons.lang.time.DurationFormatUtils;
+import org.apache.commons.lang.time.StopWatch;
 
 import java.io.File;
 import java.text.MessageFormat;
@@ -219,12 +220,12 @@ public class Simulation implements SimulationObject {
         stats.put("simulation.instsPerSecond", String.valueOf(this.getInstsPerSecond()));
     }
 
-    public long getDuration() {
-        return this.stopWatch.getElapsedSeconds();
+    public long getDurationInSeconds() {
+        return this.stopWatch.getTime() / 1000;
     }
 
     public String getFormattedDuration() {
-        return this.stopWatch.getElapsed();
+        return DurationFormatUtils.formatDurationHMS(this.stopWatch.getTime());
     }
 
     public long getTotalInsts() {
@@ -268,11 +269,11 @@ public class Simulation implements SimulationObject {
     }
 
     public double getCyclesPerSecond() {
-        return (double) this.getCycleAccurateEventQueue().getCurrentCycle() / this.getDuration();
+        return (double) this.getCycleAccurateEventQueue().getCurrentCycle() / this.getDurationInSeconds();
     }
 
     public double getInstsPerSecond() {
-        return (double) this.getTotalInsts() / this.getDuration();
+        return (double) this.getTotalInsts() / this.getDurationInSeconds();
     }
 
     public SimulationConfig getConfig() {
