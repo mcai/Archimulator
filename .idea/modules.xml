@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Archimulator.iml" filepath="$PROJECT_DIR$/Archimulator.iml" />
+      <module fileurl="file://$PROJECT_DIR$/archimulator.iml" filepath="$PROJECT_DIR$/archimulator.iml" />
     </modules>
   </component>
 </project>

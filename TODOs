@@ -11,3 +11,12 @@ Hints from Cache showndown: the good, bad and ugly:
 TODOs:
     L2: 512K, 1M, 2M, 3M
     Benchmarks: mst, em3d, mcf
+
+---------------------
+
+Archimulator on the cloud:
+    1. get CPU usage on Guest
+    2. get Memory usage on Guest
+    3. experiment configuration, monitoring events and result definitions; experiment start, pause, stop..
+    4. hessian service interface and implementation on Server
+    5. SQLite based persistence on Server
