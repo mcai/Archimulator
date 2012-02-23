@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.model.strategy.checkpoint;
 
-import archimulator.model.base.SimulationStartingImage;
+import archimulator.model.simulation.SimulationStartingImage;
 import archimulator.model.strategy.SequentialSimulationStrategy;
 import archimulator.sim.os.Kernel;
 import archimulator.sim.uncore.CacheHierarchy;

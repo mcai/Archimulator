@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.core;
 
-import archimulator.model.base.Simulation;
+import archimulator.model.simulation.Simulation;
 import archimulator.sim.isa.StaticInstruction;
 import archimulator.sim.isa.StaticInstructionType;
 import archimulator.util.StringHelper;

@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.isa.memory;
 
-import archimulator.model.base.BasicSimulationObject;
+import archimulator.model.simulation.BasicSimulationObject;
 import archimulator.model.event.PollStatsEvent;
 import archimulator.sim.os.Kernel;
 import archimulator.sim.uncore.cache.CacheGeometry;

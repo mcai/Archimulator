@@ -1,4 +1,4 @@
-package archimulator.model.base;
+package archimulator.model.simulation;
 
 public class SimulationObjectLogger extends Logger {
     private SimulationObject simulationObject;

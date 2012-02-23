@@ -18,8 +18,8 @@
  ******************************************************************************/
 package archimulator.model.experiment;
 
-import archimulator.model.base.ContextConfig;
-import archimulator.model.base.SimulationStartingImage;
+import archimulator.model.simulation.ContextConfig;
+import archimulator.model.simulation.SimulationStartingImage;
 import archimulator.model.strategy.checkpoint.CheckpointToInstructionCountBasedDetailedSimulationStrategy;
 import archimulator.model.strategy.checkpoint.RoiBasedRunToCheckpointFunctionalSimulationStrategy;
 

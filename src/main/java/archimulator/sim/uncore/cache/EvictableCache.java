@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache;
 
-import archimulator.model.base.SimulationObject;
+import archimulator.model.simulation.SimulationObject;
 import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;

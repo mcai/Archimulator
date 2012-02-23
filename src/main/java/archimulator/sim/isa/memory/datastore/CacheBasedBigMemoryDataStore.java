@@ -18,8 +18,8 @@
  ******************************************************************************/
 package archimulator.sim.isa.memory.datastore;
 
-import archimulator.model.base.BasicSimulationObject;
-import archimulator.model.base.SimulationObject;
+import archimulator.model.simulation.BasicSimulationObject;
+import archimulator.model.simulation.SimulationObject;
 import archimulator.model.event.PollStatsEvent;
 import archimulator.sim.isa.memory.Memory;
 import archimulator.sim.uncore.CacheAccessType;

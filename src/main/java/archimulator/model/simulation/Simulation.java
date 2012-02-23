@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.model.base;
+package archimulator.model.simulation;
 
 import archimulator.model.capability.SimulationCapability;
 import archimulator.model.capability.SimulationCapabilityFactory;

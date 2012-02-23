@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.model.experiment;
 
-import archimulator.model.base.ContextConfig;
+import archimulator.model.simulation.ContextConfig;
 import archimulator.model.strategy.RunToEndDetailedSimulationStrategy;
 
 import java.util.List;

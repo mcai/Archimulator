@@ -16,37 +16,18 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.model.base;
+package archimulator.model.simulation;
 
-import archimulator.sim.core.ProcessorConfig;
+import archimulator.util.event.BlockingEvent;
+import archimulator.util.event.BlockingEventDispatcher;
+import archimulator.util.event.CycleAccurateEventQueue;
 
-import java.io.File;
-import java.util.List;
+import java.io.Serializable;
 
-public class SimulationConfig {
-    private String title;
-    private ProcessorConfig processorConfig;
-    private List<ContextConfig> contextConfigs;
+public interface SimulationObject extends Serializable {
+    BlockingEventDispatcher<BlockingEvent> getBlockingEventDispatcher();
 
-    public SimulationConfig(String title, ProcessorConfig processorConfig, List<ContextConfig> contextConfigs) {
-        this.title = title;
-        this.processorConfig = processorConfig;
-        this.contextConfigs = contextConfigs;
-    }
+    CycleAccurateEventQueue getCycleAccurateEventQueue();
 
-    public String getTitle() {
-        return title;
-    }
-
-    public String getCwd() {
-        return "experiments" + File.separator + this.title;
-    }
-
-    public ProcessorConfig getProcessorConfig() {
-        return processorConfig;
-    }
-
-    public List<ContextConfig> getContextConfigs() {
-        return contextConfigs;
-    }
+    Logger getLogger();
 }

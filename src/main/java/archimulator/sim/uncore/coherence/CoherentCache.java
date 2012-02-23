@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore.coherence;
 
-import archimulator.model.base.Logger;
+import archimulator.model.simulation.Logger;
 import archimulator.model.event.DumpStatEvent;
 import archimulator.model.event.ResetStatEvent;
 import archimulator.sim.uncore.CacheAccessType;

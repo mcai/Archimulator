@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.isa;
 
-import archimulator.model.base.Logger;
+import archimulator.model.simulation.Logger;
 import archimulator.model.event.PseudocallEncounteredEvent;
 import archimulator.sim.core.FunctionalUnitOperationType;
 import archimulator.sim.os.Context;

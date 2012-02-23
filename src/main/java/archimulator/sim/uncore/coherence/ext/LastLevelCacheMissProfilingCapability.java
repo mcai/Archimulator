@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore.coherence.ext;
 
-import archimulator.model.base.Simulation;
+import archimulator.model.simulation.Simulation;
 import archimulator.model.capability.SimulationCapability;
 import archimulator.model.capability.SimulationCapabilityFactory;
 import archimulator.model.event.DumpStatEvent;

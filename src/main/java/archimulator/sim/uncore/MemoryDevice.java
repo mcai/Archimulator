@@ -18,8 +18,8 @@
  ******************************************************************************/
 package archimulator.sim.uncore;
 
-import archimulator.model.base.BasicSimulationObject;
-import archimulator.model.base.SimulationObject;
+import archimulator.model.simulation.BasicSimulationObject;
+import archimulator.model.simulation.SimulationObject;
 import archimulator.sim.uncore.coherence.message.MemoryDeviceMessage;
 import archimulator.sim.uncore.net.Net;
 import archimulator.util.action.Action;

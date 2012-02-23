@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.os;
 
-import archimulator.model.base.Logger;
+import archimulator.model.simulation.Logger;
 import archimulator.sim.isa.ArchitecturalRegisterFile;
 import archimulator.sim.os.event.*;
 import archimulator.sim.os.signal.SignalMask;
@@ -26,7 +26,6 @@ import archimulator.util.action.Predicate;
 import archimulator.util.io.buffer.CircularByteBuffer;
 import org.jruby.ext.posix.FileStat;
 
-import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.IOException;

@@ -18,8 +18,8 @@
  ******************************************************************************/
 package archimulator.sim;
 
-import archimulator.model.base.ContextConfig;
-import archimulator.model.base.SimulatedProgram;
+import archimulator.model.simulation.ContextConfig;
+import archimulator.model.simulation.SimulatedProgram;
 import archimulator.model.experiment.CheckpointedExperiment;
 import archimulator.model.experiment.DetailedExperiment;
 import archimulator.model.experiment.Experiment;

@@ -18,8 +18,8 @@
  ******************************************************************************/
 package archimulator.sim.ext.core;
 
-import archimulator.model.base.Logger;
-import archimulator.model.base.SimulationObject;
+import archimulator.model.simulation.Logger;
+import archimulator.model.simulation.SimulationObject;
 import archimulator.model.capability.ProcessorCapability;
 import archimulator.model.capability.ProcessorCapabilityFactory;
 import archimulator.sim.core.Core;

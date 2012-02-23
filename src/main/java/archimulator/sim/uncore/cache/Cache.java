@@ -18,8 +18,8 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache;
 
-import archimulator.model.base.BasicSimulationObject;
-import archimulator.model.base.SimulationObject;
+import archimulator.model.simulation.BasicSimulationObject;
+import archimulator.model.simulation.SimulationObject;
 import archimulator.util.action.Action1;
 import archimulator.util.action.Function3;
 import archimulator.util.action.Predicate;

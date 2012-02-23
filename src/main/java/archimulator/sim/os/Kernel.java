@@ -18,9 +18,9 @@
  ******************************************************************************/
 package archimulator.sim.os;
 
-import archimulator.model.base.BasicSimulationObject;
-import archimulator.model.base.Simulation;
-import archimulator.model.base.SimulationObject;
+import archimulator.model.simulation.BasicSimulationObject;
+import archimulator.model.simulation.Simulation;
+import archimulator.model.simulation.SimulationObject;
 import archimulator.sim.isa.ArchitecturalRegisterFile;
 import archimulator.sim.isa.StaticInstruction;
 import archimulator.sim.os.event.SystemEvent;

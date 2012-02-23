@@ -18,8 +18,8 @@
  ******************************************************************************/
 package archimulator.sim.core;
 
-import archimulator.model.base.BasicSimulationObject;
-import archimulator.model.base.Logger;
+import archimulator.model.simulation.BasicSimulationObject;
+import archimulator.model.simulation.Logger;
 import archimulator.model.capability.ProcessorCapability;
 import archimulator.model.capability.ProcessorCapabilityFactory;
 import archimulator.model.event.ResetStatEvent;

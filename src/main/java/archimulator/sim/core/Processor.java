@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.core;
 
-import archimulator.model.base.SimulationObject;
+import archimulator.model.simulation.SimulationObject;
 import archimulator.model.capability.ProcessorCapability;
 import archimulator.sim.os.Kernel;
 import archimulator.sim.uncore.CacheHierarchy;

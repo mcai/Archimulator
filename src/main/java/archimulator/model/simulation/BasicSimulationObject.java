@@ -16,18 +16,36 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.model.base;
+package archimulator.model.simulation;
 
 import archimulator.util.event.BlockingEvent;
 import archimulator.util.event.BlockingEventDispatcher;
 import archimulator.util.event.CycleAccurateEventQueue;
 
-import java.io.Serializable;
+public class BasicSimulationObject implements SimulationObject {
+    private BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher;
+    private CycleAccurateEventQueue cycleAccurateEventQueue;
+    private Logger logger;
 
-public interface SimulationObject extends Serializable {
-    BlockingEventDispatcher<BlockingEvent> getBlockingEventDispatcher();
+    public BasicSimulationObject(BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, Logger logger) {
+        this.blockingEventDispatcher = blockingEventDispatcher;
+        this.cycleAccurateEventQueue = cycleAccurateEventQueue;
+        this.logger = logger;
+    }
 
-    CycleAccurateEventQueue getCycleAccurateEventQueue();
+    public BasicSimulationObject(SimulationObject parent) {
+        this(parent.getBlockingEventDispatcher(), parent.getCycleAccurateEventQueue(), parent.getLogger());
+    }
 
-    Logger getLogger();
+    public BlockingEventDispatcher<BlockingEvent> getBlockingEventDispatcher() {
+        return blockingEventDispatcher;
+    }
+
+    public CycleAccurateEventQueue getCycleAccurateEventQueue() {
+        return cycleAccurateEventQueue;
+    }
+
+    public Logger getLogger() {
+        return logger;
+    }
 }

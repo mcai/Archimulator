@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore;
 
-import archimulator.model.base.SimulationObject;
+import archimulator.model.simulation.SimulationObject;
 
 public interface MemoryHierarchyCore extends SimulationObject {
     int getNum();

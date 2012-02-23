@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.model.capability;
 
-import archimulator.model.base.Simulation;
+import archimulator.model.simulation.Simulation;
 
 public interface SimulationCapabilityFactory {
     SimulationCapability createCapability(Simulation simulation);

@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.model.strategy;
 
-import archimulator.model.base.Logger;
+import archimulator.model.simulation.Logger;
 import archimulator.model.event.PseudocallEncounteredEvent;
 import archimulator.util.action.Action1;
 

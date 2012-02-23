@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.model.strategy.checkpoint;
 
-import archimulator.model.base.SimulationStartingImage;
+import archimulator.model.simulation.SimulationStartingImage;
 import archimulator.model.event.PseudocallEncounteredEvent;
 import archimulator.model.strategy.SequentialSimulationStrategy;
 import archimulator.util.action.Action1;

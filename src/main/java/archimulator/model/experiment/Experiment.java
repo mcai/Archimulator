@@ -18,9 +18,9 @@
  ******************************************************************************/
 package archimulator.model.experiment;
 
-import archimulator.model.base.ContextConfig;
-import archimulator.model.base.Simulation;
-import archimulator.model.base.SimulationConfig;
+import archimulator.model.simulation.ContextConfig;
+import archimulator.model.simulation.Simulation;
+import archimulator.model.simulation.SimulationConfig;
 import archimulator.model.capability.ProcessorCapability;
 import archimulator.model.capability.ProcessorCapabilityFactory;
 import archimulator.model.capability.SimulationCapability;

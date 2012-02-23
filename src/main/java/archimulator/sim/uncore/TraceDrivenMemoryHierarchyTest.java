@@ -25,8 +25,8 @@
 //import archimulator.sim.uncore.dram.*;
 //import archimulator.sim.uncore.tlb.TranslationLookasideBuffer;
 //import archimulator.sim.uncore.tlb.TranslationLookasideBufferConfig;
-//import archimulator.model.base.BasicSimulationObject;
-//import archimulator.model.base.Logger;
+//import archimulator.model.simulation.BasicSimulationObject;
+//import archimulator.model.simulation.Logger;
 //import archimulator.util.action.Action;
 //import archimulator.util.event.BlockingEvent;
 //import archimulator.util.event.BlockingEventDispatcher;

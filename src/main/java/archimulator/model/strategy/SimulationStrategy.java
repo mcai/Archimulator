@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.model.strategy;
 
-import archimulator.model.base.Simulation;
+import archimulator.model.simulation.Simulation;
 import archimulator.sim.os.Kernel;
 import archimulator.sim.uncore.BasicCacheHierarchy;
 import archimulator.sim.uncore.CacheHierarchy;

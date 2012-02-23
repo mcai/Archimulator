@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.os;
 
-import archimulator.model.base.ContextConfig;
+import archimulator.model.simulation.ContextConfig;
 import archimulator.sim.ext.analysis.Instruction;
 import archimulator.sim.isa.StaticInstruction;
 import archimulator.sim.isa.dissembler.MipsDissembler;

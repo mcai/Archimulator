@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.core;
 
-import archimulator.model.base.BasicSimulationObject;
+import archimulator.model.simulation.BasicSimulationObject;
 import archimulator.sim.uncore.MemoryAccessInitiatedEvent;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.MemoryHierarchyAccessType;

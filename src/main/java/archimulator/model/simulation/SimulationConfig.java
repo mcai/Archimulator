@@ -16,33 +16,22 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.model.base;
+package archimulator.model.simulation;
 
-import java.io.Serializable;
+import archimulator.sim.core.ProcessorConfig;
 
-public class SimulatedProgram implements Serializable {
-    private String setTitle;
+import java.io.File;
+import java.util.List;
+
+public class SimulationConfig {
     private String title;
-    private String cwd;
-    private String exe;
-    private String args;
-    private String stdin;
+    private ProcessorConfig processorConfig;
+    private List<ContextConfig> contextConfigs;
 
-    public SimulatedProgram(String setTitle, String title, String cwd, String exe, String args) {
-        this(setTitle, title, cwd, exe, args, "");
-    }
-
-    public SimulatedProgram(String setTitle, String title, String cwd, String exe, String args, String stdin) {
-        this.setTitle = setTitle;
+    public SimulationConfig(String title, ProcessorConfig processorConfig, List<ContextConfig> contextConfigs) {
         this.title = title;
-        this.cwd = cwd;
-        this.exe = exe;
-        this.args = args;
-        this.stdin = stdin;
-    }
-
-    public String getSetTitle() {
-        return setTitle;
+        this.processorConfig = processorConfig;
+        this.contextConfigs = contextConfigs;
     }
 
     public String getTitle() {
@@ -50,18 +39,14 @@ public class SimulatedProgram implements Serializable {
     }
 
     public String getCwd() {
-        return cwd;
+        return "experiments" + File.separator + this.title;
     }
 
-    public String getExe() {
-        return exe;
+    public ProcessorConfig getProcessorConfig() {
+        return processorConfig;
     }
 
-    public String getArgs() {
-        return args;
-    }
-
-    public String getStdin() {
-        return stdin;
+    public List<ContextConfig> getContextConfigs() {
+        return contextConfigs;
     }
 }
