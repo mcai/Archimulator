@@ -20,3 +20,30 @@ Archimulator on the cloud:
     3. experiment configuration, monitoring events and result definitions; experiment start, pause, stop..
     4. hessian service interface and implementation on Server
     5. SQLite based persistence on Server
+
+
+temp result:
+[34359736761]  ------ Simulation mst_10000_detailed-HTRequest_Profiling_l2_4M.detailedSimulation: BEGIN DUMP STATE at 2012.02.27 18:20:27 ------
+
+[34359736761]  	duration: 3 days 22:18:07.851
+[34359736761]  	totalCycles: 34,359,736,761
+[34359736761]  	totalInsts: 19,092,071,755 (c0t0: 18175177586, c0t1: 4468136, c1t0: 912426033, c1t1: 0)
+[34359736761]  	llcReadMisses: 127,984,947 (c0t0: 57885311, c0t1: 18766, c1t0: 70080870, c1t1: 0)
+[34359736761]  	llcWriteMisses: 21,906,182 (c0t0: 21906093, c0t1: 27, c1t0: 62, c1t1: 0)
+[34359736761]  	instsPerCycle: 0.556
+[34359736761]  	cyclesPerSecond: 101,210.758
+[34359736761]  	instsPerSecond: 56,238.005
+
+[34359736761]  	mem-0.numPages: 330987
+[34359736761]  	lastLevelCacheHtRequestCachePollutionProfilingCapability.llc.mtMisses: 149869837
+[34359736761]  	lastLevelCacheHtRequestCachePollutionProfilingCapability.llc.totalHtRequests: 70080932
+[34359736761]  	lastLevelCacheHtRequestCachePollutionProfilingCapability.llc.usefulHtRequests: 70059640
+[34359736761]  	lastLevelCacheHtRequestCachePollutionProfilingCapability.llc.ht_accuracy: 99.96961798396174%
+[34359736761]  	lastLevelCacheHtRequestCachePollutionProfilingCapability.llc.ht_coverage: 46.74699152438526%
+[34359736761]  	lastLevelCacheHtRequestCachePollutionProfilingCapability.llc.goodHtRequests: 70059384
+[34359736761]  	lastLevelCacheHtRequestCachePollutionProfilingCapability.llc.badHtRequests: 9
+[34359736761]  	lastLevelCacheHtRequestCachePollutionProfilingCapability.llc.uglyHtRequests: 21539
+[34359736761]  	lastLevelCacheHtRequestCachePollutionProfilingCapability.llc.lateHtRequests: 5647179
+[34359736761]  	max memory: 3,728,277,504
+[34359736761]  	total memory: 507,248,640
+[34359736761]  	used memory: 267,562,688
