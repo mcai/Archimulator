@@ -176,7 +176,7 @@ public abstract class Experiment {
         stats.put("experiment.workloads.size", this.contextConfigs.size());
 
         for (ContextConfig contextConfig : this.contextConfigs) {
-            stats.put("experiment.workload." + contextConfig.getThreadId(), contextConfig.getSimulatedProgram().getSetTitle() + "." + contextConfig.getSimulatedProgram().getTitle() + "(" + contextConfig.getSimulatedProgram().getArgs() + ")");
+            stats.put("experiment.workload." + contextConfig.getThreadId(), contextConfig.getSimulatedProgram().getExe() + "(" + contextConfig.getSimulatedProgram().getArgs() + ")");
         }
 
         if (detailedSimulation) {

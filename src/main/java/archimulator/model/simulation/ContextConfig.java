@@ -43,7 +43,7 @@ public class ContextConfig {
 
     @Override
     public String toString() {
-        return String.format("%s-%s(%s)", simulatedProgram.getSetTitle(), simulatedProgram.getTitle(), simulatedProgram.getArgs());
+        return String.format("%s(%s)", simulatedProgram.getExe(), simulatedProgram.getArgs());
     }
 
     public SimulatedProgram getSimulatedProgram() {

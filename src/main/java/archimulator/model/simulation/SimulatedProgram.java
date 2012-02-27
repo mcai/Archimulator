@@ -21,32 +21,20 @@ package archimulator.model.simulation;
 import java.io.Serializable;
 
 public class SimulatedProgram implements Serializable {
-    private String setTitle;
-    private String title;
     private String cwd;
     private String exe;
     private String args;
     private String stdin;
 
-    public SimulatedProgram(String setTitle, String title, String cwd, String exe, String args) {
-        this(setTitle, title, cwd, exe, args, "");
+    public SimulatedProgram(String cwd, String exe, String args) {
+        this(cwd, exe, args, "");
     }
 
-    public SimulatedProgram(String setTitle, String title, String cwd, String exe, String args, String stdin) {
-        this.setTitle = setTitle;
-        this.title = title;
+    public SimulatedProgram(String cwd, String exe, String args, String stdin) {
         this.cwd = cwd;
         this.exe = exe;
         this.args = args;
         this.stdin = stdin;
-    }
-
-    public String getSetTitle() {
-        return setTitle;
-    }
-
-    public String getTitle() {
-        return title;
     }
 
     public String getCwd() {

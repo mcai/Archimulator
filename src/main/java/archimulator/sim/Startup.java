@@ -120,8 +120,6 @@ public class Startup {
     }
 
     public static final SimulatedProgram SIMULATED_PROGRAM_MST_BASELINE = new SimulatedProgram(
-            "Olden_Custom1",
-            "mst_baseline_mips",
             "/home/itecgo/Archimulator/benchmarks/Olden_Custom1/mst/baseline",
             "mst.mips",
 //            "10000");
@@ -130,8 +128,6 @@ public class Startup {
 //    "400");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_MST_HT = new SimulatedProgram(
-            "Olden_Custom1",
-            "mst_ht_mips",
             "/home/itecgo/Archimulator/benchmarks/Olden_Custom1/mst/ht",
             "mst.mips",
             "10000");
@@ -142,8 +138,6 @@ public class Startup {
 //            "200");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_EM3D_BASELINE = new SimulatedProgram(
-            "Olden_Custom1",
-            "em3d_baseline_mips",
             "/home/itecgo/Archimulator/benchmarks/Olden_Custom1/em3d/baseline",
             "em3d.mips",
 //            "400000 128 75 1");
@@ -152,8 +146,6 @@ public class Startup {
 //            "10000 128 75 1");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_EM3D_HT = new SimulatedProgram(
-            "Olden_Custom1",
-            "em3d_ht_mips",
             "/home/itecgo/Archimulator/benchmarks/Olden_Custom1/em3d/ht",
             "em3d.mips",
 //            "400000 128 75 1");
@@ -163,29 +155,21 @@ public class Startup {
             "10000 128 75 1");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_429_MCF_BASELINE = new SimulatedProgram(
-            "CPU2006_Custom1",
-            "429_mcf_baseline_mips",
             "/home/itecgo/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline",
             "429.mcf.mips",
             "/home/itecgo/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline/data/ref/input/inp.in");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_429_MCF_HT = new SimulatedProgram(
-            "CPU2006_Custom1",
-            "429_mcf_ht_mips",
             "/home/itecgo/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht",
             "429.mcf.mips",
             "/home/itecgo/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht/data/ref/input/inp.in");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_462_LIBQUANTUM_BASELINE = new SimulatedProgram(
-            "CPU2006_Custom1",
-            "462_libquantum_baseline_mips",
             "/home/itecgo/Archimulator/benchmarks/CPU2006_Custom1/462.libquantum/baseline",
             "462.libquantum.mips",
             "33 5");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_462_LIBQUANTUM_HT = new SimulatedProgram(
-            "CPU2006_Custom1",
-            "462_libquantum_ht_mips",
             "/home/itecgo/Archimulator/benchmarks/CPU2006_Custom1/462.libquantum/ht",
             "462.libquantum.mips",
             "33 5");

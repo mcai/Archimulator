@@ -72,21 +72,26 @@ public class ExperimentBuilder {
         experiment.join();
     }
 
-    public List<ContextConfig> createContextConfigs(String setTitle, String title, String cwd, String exe, String args) {
+    public List<ContextConfig> createContextConfigs(String cwd, String exe, String args) {
         List<ContextConfig> contextConfigs = new ArrayList<ContextConfig>();
-        contextConfigs.add(new ContextConfig(new SimulatedProgram(setTitle, title, cwd, exe, args), 0));
+        contextConfigs.add(new ContextConfig(new SimulatedProgram(cwd, exe, args), 0));
         return contextConfigs;
     }
 
     public static void main(String[] args) {
+        System.out.println(System.getProperty("user.home"));
+        
         ExperimentBuilder experimentBuilder = new ExperimentBuilder();
         Experiment experiment = experimentBuilder.createCheckpointedExperiment("mst_10000_detailed-HTRequest_Profiling_l2_4M", 2, 2, experimentBuilder.createContextConfigs(
-                "Olden_Custom1",
-                "mst_ht_mips",
                 "/home/itecgo/Archimulator/benchmarks/Olden_Custom1/mst/ht",
                 "mst.mips",
                 "10000"
         ), LeastRecentlyUsedEvictionPolicy.FACTORY, null, null, null);
         experimentBuilder.runExperimentTillEnd(experiment);
     }
+
+    // DSL example:
+//    on(cores(2).threadsPerCore(2).l2Size("8M")).with(System.getProperty("user.home") + "/Archimulator/benchmarks/Olden_Custom1/mst/ht/mst.mips 10000").runFunctionallyToEnd().addExperimentListener(..)
+//    on(cores(2).threadsPerCore(2).l2Size("8M")).with(System.getProperty("user.home") + "/Archimulator/benchmarks/Olden_Custom1/mst/ht/mst.mips 10000").runInDetailToEnd().addExperimentListener(..)
+//    on(cores(2).threadsPerCore(2).l2Size("8M")).with(System.getProperty("user.home") + "/Archimulator/benchmarks/Olden_Custom1/mst/ht/mst.mips 10000").runFunctionallyTillPseudoCall(3721).runInDetailForCycles(2000000000).addExperimentListener(..)
 }
