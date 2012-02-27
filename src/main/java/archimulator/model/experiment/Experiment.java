@@ -234,7 +234,7 @@ public abstract class Experiment {
         }
     }
 
-    public void runTillEnd() {
+    public void runToEnd() {
         this.start();
         this.join();
     }

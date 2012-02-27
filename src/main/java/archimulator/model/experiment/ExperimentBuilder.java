@@ -99,17 +99,17 @@ public class ExperimentBuilder {
         on().cores(2).threadsPerCore(2)
                 .with().singleThreaded(System.getProperty("user.home") + "/Archimulator/benchmarks/Olden_Custom1/mst/ht", "mst.mips", "10000")
                 .simulate().functionallyToEnd()
-                .runTillEnd();
+                .runToEnd();
 
         on().cores(2).threadsPerCore(2).l2Size(4 * 1024 * 1024)
                 .with().singleThreaded(System.getProperty("user.home") + "/Archimulator/benchmarks/Olden_Custom1/mst/ht", "mst.mips", "10000")
                 .simulate().inDetailToEnd()
-                .runTillEnd();
+                .runToEnd();
 
         on().cores(2).threadsPerCore(2).l2Size(4 * 1024 * 1024)
                 .with().singleThreaded(System.getProperty("user.home") + "/Archimulator/benchmarks/Olden_Custom1/mst/ht", "mst.mips", "10000")
                 .simulate().functionallyToPseudoCallAndInDetailForMaxInsts(3728, 2000000000)
-                .runTillEnd();
+                .runToEnd();
     }
 
     public static ProcessorProfile on() {
