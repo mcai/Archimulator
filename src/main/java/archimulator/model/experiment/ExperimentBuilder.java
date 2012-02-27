@@ -34,36 +34,40 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ExperimentBuilder {
-    public Experiment createFunctionExperiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs,
-                                               List<Pair<Class<? extends SimulationCapability>, SimulationCapabilityFactory>> simulationCapabilityFactoryPairs,
-                                               List<Pair<Class<? extends ProcessorCapability>, ProcessorCapabilityFactory>> processorCapabilityFactoryPairs,
-                                               List<Pair<Class<? extends KernelCapability>, KernelCapabilityFactory>> kernelCapabilityFactoryPairs) {
+    public static FunctionalExperiment createFunctionExperiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs,
+                                                                List<Pair<Class<? extends SimulationCapability>, SimulationCapabilityFactory>> simulationCapabilityFactoryPairs,
+                                                                List<Pair<Class<? extends ProcessorCapability>, ProcessorCapabilityFactory>> processorCapabilityFactoryPairs,
+                                                                List<Pair<Class<? extends KernelCapability>, KernelCapabilityFactory>> kernelCapabilityFactoryPairs) {
         return addCapabilityFactoriesToExperiment(new FunctionalExperiment(title, numCores, numThreadsPerCore, contextConfigs), simulationCapabilityFactoryPairs, processorCapabilityFactoryPairs, kernelCapabilityFactoryPairs);
     }
 
-    public Experiment createDetailedExperiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs,
-                                               EvictionPolicyFactory l2EvictionPolicyFactory,
-                                               List<Pair<Class<? extends SimulationCapability>, SimulationCapabilityFactory>> simulationCapabilityFactoryPairs,
-                                               List<Pair<Class<? extends ProcessorCapability>, ProcessorCapabilityFactory>> processorCapabilityFactoryPairs,
-                                               List<Pair<Class<? extends KernelCapability>, KernelCapabilityFactory>> kernelCapabilityFactoryPairs) {
-        return addCapabilityFactoriesToExperiment(
+    public static DetailedExperiment createDetailedExperiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs,
+                                                              EvictionPolicyFactory l2EvictionPolicyFactory,
+                                                              List<Pair<Class<? extends SimulationCapability>, SimulationCapabilityFactory>> simulationCapabilityFactoryPairs,
+                                                              List<Pair<Class<? extends ProcessorCapability>, ProcessorCapabilityFactory>> processorCapabilityFactoryPairs,
+                                                              List<Pair<Class<? extends KernelCapability>, KernelCapabilityFactory>> kernelCapabilityFactoryPairs) {
+        DetailedExperiment detailedExperiment = addCapabilityFactoriesToExperiment(
                 new DetailedExperiment(title, numCores, numThreadsPerCore, contextConfigs),
                 simulationCapabilityFactoryPairs, processorCapabilityFactoryPairs, kernelCapabilityFactoryPairs
-        ).setL2EvictionPolicyFactory(l2EvictionPolicyFactory);
+        );
+        detailedExperiment.setL2EvictionPolicyFactory(l2EvictionPolicyFactory);
+        return detailedExperiment;
     }
 
-    public Experiment createCheckpointedExperiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs,
-                                                   EvictionPolicyFactory l2EvictionPolicyFactory,
-                                                   List<Pair<Class<? extends SimulationCapability>, SimulationCapabilityFactory>> simulationCapabilityFactoryPairs,
-                                                   List<Pair<Class<? extends ProcessorCapability>, ProcessorCapabilityFactory>> processorCapabilityFactoryPairs,
-                                                   List<Pair<Class<? extends KernelCapability>, KernelCapabilityFactory>> kernelCapabilityFactoryPairs) {
-        return addCapabilityFactoriesToExperiment(
-                new CheckpointedExperiment(title, numCores, numThreadsPerCore, contextConfigs, 2000000000),
+    public static CheckpointedExperiment createCheckpointedExperiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs,
+                                                                      EvictionPolicyFactory l2EvictionPolicyFactory,
+                                                                      int maxInsts, List<Pair<Class<? extends SimulationCapability>, SimulationCapabilityFactory>> simulationCapabilityFactoryPairs,
+                                                                      List<Pair<Class<? extends ProcessorCapability>, ProcessorCapabilityFactory>> processorCapabilityFactoryPairs,
+                                                                      List<Pair<Class<? extends KernelCapability>, KernelCapabilityFactory>> kernelCapabilityFactoryPairs) {
+        CheckpointedExperiment checkpointedExperiment = addCapabilityFactoriesToExperiment(
+                new CheckpointedExperiment(title, numCores, numThreadsPerCore, contextConfigs, maxInsts),
                 simulationCapabilityFactoryPairs, processorCapabilityFactoryPairs, kernelCapabilityFactoryPairs
-        ).setL2EvictionPolicyFactory(l2EvictionPolicyFactory);
+        );
+        checkpointedExperiment.setL2EvictionPolicyFactory(l2EvictionPolicyFactory);
+        return checkpointedExperiment;
     }
 
-    private Experiment addCapabilityFactoriesToExperiment(Experiment experiment, List<Pair<Class<? extends SimulationCapability>, SimulationCapabilityFactory>> simulationCapabilityFactoryPairs, List<Pair<Class<? extends ProcessorCapability>, ProcessorCapabilityFactory>> processorCapabilityFactoryPairs, List<Pair<Class<? extends KernelCapability>, KernelCapabilityFactory>> kernelCapabilityFactoryPairs) {
+    private static <ExperimentT extends Experiment> ExperimentT addCapabilityFactoriesToExperiment(ExperimentT experiment, List<Pair<Class<? extends SimulationCapability>, SimulationCapabilityFactory>> simulationCapabilityFactoryPairs, List<Pair<Class<? extends ProcessorCapability>, ProcessorCapabilityFactory>> processorCapabilityFactoryPairs, List<Pair<Class<? extends KernelCapability>, KernelCapabilityFactory>> kernelCapabilityFactoryPairs) {
         if (simulationCapabilityFactoryPairs != null) {
             for (Pair<Class<? extends SimulationCapability>, SimulationCapabilityFactory> pair : simulationCapabilityFactoryPairs) {
                 experiment.addSimulationCapabilityFactory(pair.getFirst(), pair.getSecond());
@@ -85,31 +89,149 @@ public class ExperimentBuilder {
         return experiment;
     }
 
-    public void runExperimentTillEnd(Experiment experiment) {
-        experiment.start();
-        experiment.join();
-    }
-
-    public List<ContextConfig> createContextConfigs(String cwd, String exe, String args) {
+    public static List<ContextConfig> createContextConfigs(String cwd, String exe, String args) {
         List<ContextConfig> contextConfigs = new ArrayList<ContextConfig>();
         contextConfigs.add(new ContextConfig(new SimulatedProgram(cwd, exe, args), 0));
         return contextConfigs;
     }
 
     public static void main(String[] args) {
-        System.out.println(System.getProperty("user.home"));
-        
-        ExperimentBuilder experimentBuilder = new ExperimentBuilder();
-        Experiment experiment = experimentBuilder.createCheckpointedExperiment("mst_10000_detailed-HTRequest_Profiling_l2_4M", 2, 2, experimentBuilder.createContextConfigs(
-                "/home/itecgo/Archimulator/benchmarks/Olden_Custom1/mst/ht",
-                "mst.mips",
-                "10000"
-        ), LeastRecentlyUsedEvictionPolicy.FACTORY, null, null, null);
-        experimentBuilder.runExperimentTillEnd(experiment);
+        on().cores(2).threadsPerCore(2)
+                .with().singleThreaded(System.getProperty("user.home") + "/Archimulator/benchmarks/Olden_Custom1/mst/ht", "mst.mips", "10000")
+                .simulate().functionallyToEnd()
+                .runTillEnd();
+
+        on().cores(2).threadsPerCore(2).l2Size(4 * 1024 * 1024)
+                .with().singleThreaded(System.getProperty("user.home") + "/Archimulator/benchmarks/Olden_Custom1/mst/ht", "mst.mips", "10000")
+                .simulate().inDetailToEnd()
+                .runTillEnd();
+
+        on().cores(2).threadsPerCore(2).l2Size(4 * 1024 * 1024)
+                .with().singleThreaded(System.getProperty("user.home") + "/Archimulator/benchmarks/Olden_Custom1/mst/ht", "mst.mips", "10000")
+                .simulate().functionallyToPseudoCallAndInDetailForMaxInsts(3728, 2000000000)
+                .runTillEnd();
+    }
+
+    public static ProcessorProfile on() {
+        return new ProcessorProfile();
+    }
+
+    public static class ProcessorProfile {
+        private int numCores;
+        private int numThreadsPerCore;
+        private int l2Size;
+
+        public ProcessorProfile cores(int numCores) {
+            this.numCores = numCores;
+            return this;
+        }
+
+        public ProcessorProfile threadsPerCore(int numThreadsPerCore) {
+            this.numThreadsPerCore = numThreadsPerCore;
+            return this;
+        }
+
+        public ProcessorProfile l2Size(int l2Size) {
+            this.l2Size = l2Size;
+            return this;
+        }
+
+        public WorkloadProfile with() {
+            return new WorkloadProfile(this);
+        }
+
+        public int getNumCores() {
+            return numCores;
+        }
+
+        public int getNumThreadsPerCore() {
+            return numThreadsPerCore;
+        }
+
+        public int getL2Size() {//TODO: to be used
+            return l2Size;
+        }
+    }
+
+    public static class WorkloadProfile {
+        private ProcessorProfile processorProfile;
+        private List<ContextConfig> contextConfigs;
+
+        public WorkloadProfile(ProcessorProfile processorProfile) {
+            this.processorProfile = processorProfile;
+        }
+
+        public WorkloadProfile singleThreaded(String cwd, String exe, String args) {
+            this.contextConfigs = new ArrayList<ContextConfig>();
+            this.contextConfigs.add(new ContextConfig(new SimulatedProgram(cwd, exe, args), 0));
+
+            return this;
+        }
+
+        public WorkloadProfile multiThreaded() {
+            throw new UnsupportedOperationException(); //TODO
+        }
+
+        public WorkloadProfile multiProgramed() {
+            throw new UnsupportedOperationException(); //TODO
+        }
+
+        public ExperimentProfile simulate() {
+            return new ExperimentProfile(this);
+        }
+
+        public ProcessorProfile getProcessorProfile() {
+            return processorProfile;
+        }
+
+        public List<ContextConfig> getContextConfigs() {
+            return contextConfigs;
+        }
+    }
+
+    public static class ExperimentProfile {//TODO: experiment event listener support to experiment
+        private WorkloadProfile workloadProfile;
+
+        public ExperimentProfile(WorkloadProfile workloadProfile) {
+            this.workloadProfile = workloadProfile;
+        }
+
+        public FunctionalExperiment functionallyToEnd() {
+            return createFunctionExperiment("", //TODO: title or ID number
+                    this.workloadProfile.getProcessorProfile().getNumCores(),
+                    this.workloadProfile.getProcessorProfile().getNumThreadsPerCore(),
+                    this.workloadProfile.getContextConfigs(), null, null, null);
+        }
+
+        public DetailedExperiment inDetailToEnd() {
+            return createDetailedExperiment("", //TODO: title or ID number
+                    this.workloadProfile.getProcessorProfile().getNumCores(),
+                    this.workloadProfile.getProcessorProfile().getNumThreadsPerCore(),
+                    this.workloadProfile.getContextConfigs(),
+                    LeastRecentlyUsedEvictionPolicy.FACTORY,
+                    null, null, null);
+        }
+
+        public CheckpointedExperiment functionallyToPseudoCallAndInDetailForMaxInsts(int pseudoCall, int maxInsts) {//TODO: pseudoCall: to be used
+            return createCheckpointedExperiment("", //TODO: title or ID number
+                    this.workloadProfile.getProcessorProfile().getNumCores(),
+                    this.workloadProfile.getProcessorProfile().getNumThreadsPerCore(),
+                    this.workloadProfile.getContextConfigs(),
+                    LeastRecentlyUsedEvictionPolicy.FACTORY,
+                    maxInsts, null, null, null);
+        }
+
+        public ProcessorProfile getProcessorProfile() {
+            return this.workloadProfile.getProcessorProfile();
+        }
+
+        public WorkloadProfile getWorkloadProfile() {
+            return workloadProfile;
+        }
     }
 
     // DSL example:
 //    on(cores(2).threadsPerCore(2).l2Size("8M")).with(System.getProperty("user.home") + "/Archimulator/benchmarks/Olden_Custom1/mst/ht/mst.mips 10000").runFunctionallyToEnd().addExperimentListener(..)
-//    on(cores(2).threadsPerCore(2).l2Size("8M")).with(System.getProperty("user.home") + "/Archimulator/benchmarks/Olden_Custom1/mst/ht/mst.mips 10000").runInDetailToEnd().addExperimentListener(..)
-//    on(cores(2).threadsPerCore(2).l2Size("8M")).with(System.getProperty("user.home") + "/Archimulator/benchmarks/Olden_Custom1/mst/ht/mst.mips 10000").runFunctionallyTillPseudoCall(3721).runInDetailForCycles(2000000000).addExperimentListener(..)
+//    on(cores(2).threadsPerCore(2).l2Size("8M")).with(System.getProperty("user.home") + "/Archimulator/benchmarks/Olden_Custom1/mst/ht/mst.mips 10000").inDetailToEnd().addExperimentListener(..)
+//    on(cores(2).threadsPerCore(2).l2Size("8M")).with(System.getProperty("user.home") + "/Archimulator/benchmarks/Olden_Custom1/mst/ht/mst.mips 10000").functionallyTillPseudoCall(3721).inDetailForCycles(2000000000).addExperimentListener(..)
 }

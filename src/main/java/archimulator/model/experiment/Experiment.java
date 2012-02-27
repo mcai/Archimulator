@@ -18,9 +18,6 @@
  ******************************************************************************/
 package archimulator.model.experiment;
 
-import archimulator.model.simulation.ContextConfig;
-import archimulator.model.simulation.Simulation;
-import archimulator.model.simulation.SimulationConfig;
 import archimulator.model.capability.ProcessorCapability;
 import archimulator.model.capability.ProcessorCapabilityFactory;
 import archimulator.model.capability.SimulationCapability;
@@ -28,6 +25,9 @@ import archimulator.model.capability.SimulationCapabilityFactory;
 import archimulator.model.event.DumpStatEvent;
 import archimulator.model.event.PauseSimulationEvent;
 import archimulator.model.event.StopSimulationEvent;
+import archimulator.model.simulation.ContextConfig;
+import archimulator.model.simulation.Simulation;
+import archimulator.model.simulation.SimulationConfig;
 import archimulator.model.strategy.SimulationStrategy;
 import archimulator.sim.core.ProcessorConfig;
 import archimulator.sim.os.KernelCapability;
@@ -232,6 +232,11 @@ public abstract class Experiment {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    public void runTillEnd() {
+        this.start();
+        this.join();
     }
 
     protected void doSimulation(String title, SimulationStrategy strategy, BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
