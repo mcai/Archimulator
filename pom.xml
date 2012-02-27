@@ -65,22 +65,17 @@
         <dependency>
             <groupId>org.zkoss.zk</groupId>
             <artifactId>zul</artifactId>
-            <version>5.0.10</version>
-        </dependency>
-        <dependency>
-            <groupId>org.zkoss.theme</groupId>
-            <artifactId>breeze</artifactId>
-            <version>5.0.10</version>
+            <version>6.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.zkoss.zk</groupId>
             <artifactId>zkplus</artifactId>
-            <version>5.0.10</version>
+            <version>6.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.zkoss.zk</groupId>
             <artifactId>zhtml</artifactId>
-            <version>5.0.10</version>
+            <version>6.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
