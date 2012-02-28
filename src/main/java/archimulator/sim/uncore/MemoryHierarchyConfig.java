@@ -54,15 +54,11 @@ public class MemoryHierarchyConfig {
         return mainMemory;
     }
 
-    public static MemoryHierarchyConfig createDefaultMemoryHierarchyConfig(EvictionPolicyFactory l2EvictionPolicyFactory) {
+    public static MemoryHierarchyConfig createDefaultMemoryHierarchyConfig(int l2Size, int l2Associativity, EvictionPolicyFactory l2EvictionPolicyFactory) {
         FirstLevelCacheConfig l1ICacheConfig = new FirstLevelCacheConfig(32768, 4, LeastRecentlyUsedEvictionPolicy.FACTORY);
         FirstLevelCacheConfig l1DCacheConfig = new FirstLevelCacheConfig(32768, 8, LeastRecentlyUsedEvictionPolicy.FACTORY);
 
-//        LastLevelCacheConfig l2CacheConfig = new LastLevelCacheConfig(4194304, 8, l2EvictionPolicyFactory);
-//        LastLevelCacheConfig l2CacheConfig = new LastLevelCacheConfig(524288 * 2, 8, l2EvictionPolicyFactory);
-//        LastLevelCacheConfig l2CacheConfig = new LastLevelCacheConfig(524288 * 4, 8, l2EvictionPolicyFactory);
-        LastLevelCacheConfig l2CacheConfig = new LastLevelCacheConfig(524288 * 8, 8, l2EvictionPolicyFactory);
-//        LastLevelCacheConfig l2CacheConfig = new LastLevelCacheConfig(32768 * 2, 8, l2EvictionPolicyFactory);
+        LastLevelCacheConfig l2CacheConfig = new LastLevelCacheConfig(l2Size, l2Associativity, l2EvictionPolicyFactory);
 
         MainMemoryConfig mainMemoryConfig = new FixedLatencyMainMemoryConfig();
 

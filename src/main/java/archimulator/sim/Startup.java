@@ -100,23 +100,23 @@ public class Startup {
     }
 
     public static Experiment createDetailedExperiment(String title, EvictionPolicyFactory l2EvictionPolicyFactory, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs) {
-        return new DetailedExperiment(title, numCores, numThreadsPerCore, contextConfigs)
+        return new DetailedExperiment(title, numCores, numThreadsPerCore, contextConfigs, LeastRecentlyUsedEvictionPolicy.FACTORY, 524288 * 8, 8)
                 //                .addSimulationCapabilityFactory(LastLevelCacheMissProfilingCapability.class, LastLevelCacheMissProfilingCapability.FACTORY)
                 .addSimulationCapabilityFactory(LastLevelCacheHtRequestCachePollutionProfilingCapability.class, LastLevelCacheHtRequestCachePollutionProfilingCapability.FACTORY)
                         //                .addProcessorCapabilityFactory(HtRequestL2VictimTrackingCapability.class, HtRequestL2VictimTrackingCapability.FACTORY)
 //                .addProcessorCapabilityFactory(HtRequestL2VictimTrackingCapability2.class, HtRequestL2VictimTrackingCapability2.FACTORY)
 //                .addProcessorCapabilityFactory(FsmBasedHtRequestLlcVictimTrackingCapability.class, FsmBasedHtRequestLlcVictimTrackingCapability.FACTORY)
-                .setL2EvictionPolicyFactory(l2EvictionPolicyFactory);
+                ;
     }
 
     public static Experiment createCheckpointedExperiment(String title, EvictionPolicyFactory l2EvictionPolicyFactory, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs) {
-        return new CheckpointedExperiment(title, numCores, numThreadsPerCore, contextConfigs, 2000000000)
+        return new CheckpointedExperiment(title, numCores, numThreadsPerCore, contextConfigs, 2000000000, 524288 * 8, 8, LeastRecentlyUsedEvictionPolicy.FACTORY, 3720)
                 //                .addSimulationCapabilityFactory(LastLevelCacheMissProfilingCapability.class, LastLevelCacheMissProfilingCapability.FACTORY)
                 .addSimulationCapabilityFactory(LastLevelCacheHtRequestCachePollutionProfilingCapability.class, LastLevelCacheHtRequestCachePollutionProfilingCapability.FACTORY)
                         //                .addProcessorCapabilityFactory(HtRequestL2VictimTrackingCapability.class, HtRequestL2VictimTrackingCapability.FACTORY)
 //                .addProcessorCapabilityFactory(HtRequestL2VictimTrackingCapability2.class, HtRequestL2VictimTrackingCapability2.FACTORY)
 //                .addProcessorCapabilityFactory(FsmBasedHtRequestLlcVictimTrackingCapability.class, FsmBasedHtRequestLlcVictimTrackingCapability.FACTORY)
-                .setL2EvictionPolicyFactory(l2EvictionPolicyFactory);
+                ;
     }
 
     public static final SimulatedProgram SIMULATED_PROGRAM_MST_BASELINE = new SimulatedProgram(

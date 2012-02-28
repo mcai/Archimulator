@@ -34,7 +34,6 @@ import archimulator.sim.os.KernelCapability;
 import archimulator.sim.os.KernelCapabilityFactory;
 import archimulator.sim.uncore.MemoryHierarchyConfig;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicyFactory;
-import archimulator.sim.uncore.cache.eviction.LeastRecentlyUsedEvictionPolicy;
 import archimulator.util.action.Action1;
 import archimulator.util.action.Function1X;
 import archimulator.util.event.BlockingEvent;
@@ -62,7 +61,6 @@ public abstract class Experiment {
     private int numCores;
     private int numThreadsPerCore;
     private List<ContextConfig> contextConfigs;
-    private EvictionPolicyFactory l2EvictionPolicyFactory;
     private ProcessorConfig processorConfig;
 
     private String beginTime;
@@ -79,7 +77,7 @@ public abstract class Experiment {
 
     private Simulation simulation;
 
-    public Experiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs) {
+    public Experiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs, int l2Size, int l2Associativity, EvictionPolicyFactory l2EvictionPolicyFactory) {
         this.id = currentId++;
 
         this.title = title;
@@ -87,9 +85,7 @@ public abstract class Experiment {
         this.numThreadsPerCore = numThreadsPerCore;
         this.contextConfigs = contextConfigs;
 
-        this.l2EvictionPolicyFactory = LeastRecentlyUsedEvictionPolicy.FACTORY;
-
-        this.processorConfig = ProcessorConfig.createDefaultProcessorConfig(MemoryHierarchyConfig.createDefaultMemoryHierarchyConfig(this.l2EvictionPolicyFactory), this.processorCapabilityFactories, this.kernelCapabilityFactories, this.numCores, this.numThreadsPerCore);
+        this.processorConfig = ProcessorConfig.createDefaultProcessorConfig(MemoryHierarchyConfig.createDefaultMemoryHierarchyConfig(l2Size, l2Associativity, l2EvictionPolicyFactory), this.processorCapabilityFactories, this.kernelCapabilityFactories, this.numCores, this.numThreadsPerCore);
 
         this.beginTime = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date());
 
@@ -182,7 +178,7 @@ public abstract class Experiment {
         if (detailedSimulation) {
             stats.put("experiment.numCores", this.numCores);
             stats.put("experiment.numThreadsPerCore", this.numThreadsPerCore);
-            stats.put("experiment.l2EvictionPolicy", this.l2EvictionPolicyFactory.getName());
+            stats.put("experiment.l2EvictionPolicy", this.processorConfig.getMemoryHierarchyConfig().getL2Cache().getEvictionPolicyFactory().getName());
         }
     }
 
@@ -198,11 +194,6 @@ public abstract class Experiment {
 
     public Experiment addKernelCapabilityFactory(Class<? extends KernelCapability> clz, KernelCapabilityFactory factory) {
         this.kernelCapabilityFactories.put(clz, factory);
-        return this;
-    }
-
-    public Experiment setL2EvictionPolicyFactory(EvictionPolicyFactory l2EvictionPolicyFactory) {
-        this.l2EvictionPolicyFactory = l2EvictionPolicyFactory;
         return this;
     }
 

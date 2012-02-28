@@ -20,12 +20,13 @@ package archimulator.model.experiment;
 
 import archimulator.model.simulation.ContextConfig;
 import archimulator.model.strategy.RunToEndFunctionalSimulationStrategy;
+import archimulator.sim.uncore.cache.eviction.LeastRecentlyUsedEvictionPolicy;
 
 import java.util.List;
 
 public class FunctionalExperiment extends Experiment {
     public FunctionalExperiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs) {
-        super(title, numCores, numThreadsPerCore, contextConfigs);
+        super(title, numCores, numThreadsPerCore, contextConfigs, 524288 * 8, 8, LeastRecentlyUsedEvictionPolicy.FACTORY);
     }
 
     @Override

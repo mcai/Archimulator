@@ -22,22 +22,25 @@ import archimulator.model.simulation.ContextConfig;
 import archimulator.model.simulation.SimulationStartingImage;
 import archimulator.model.strategy.checkpoint.CheckpointToInstructionCountBasedDetailedSimulationStrategy;
 import archimulator.model.strategy.checkpoint.RoiBasedRunToCheckpointFunctionalSimulationStrategy;
+import archimulator.sim.uncore.cache.eviction.EvictionPolicyFactory;
 
 import java.util.List;
 
 public class CheckpointedExperiment extends Experiment {
     private int maxInsts;
+    private int pthreadSpawnedIndex;
 
-    public CheckpointedExperiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs, int maxInsts) {
-        super(title, numCores, numThreadsPerCore, contextConfigs);
+    public CheckpointedExperiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs, int maxInsts, int l2Size, int l2Associativity, EvictionPolicyFactory l2EvictionPolicyFactory, int pthreadSpawnedIndex) {
+        super(title, numCores, numThreadsPerCore, contextConfigs, l2Size, l2Associativity, l2EvictionPolicyFactory);
         this.maxInsts = maxInsts;
+        this.pthreadSpawnedIndex = pthreadSpawnedIndex;
     }
 
     @Override
     protected void doStart() {
         SimulationStartingImage simulationStartingImage = new SimulationStartingImage();
 
-        this.doSimulation(this.getTitle() + ".checkpointedSimulation.phase0", new RoiBasedRunToCheckpointFunctionalSimulationStrategy(this.getPhaser(), simulationStartingImage), getBlockingEventDispatcher(), getCycleAccurateEventQueue());
+        this.doSimulation(this.getTitle() + ".checkpointedSimulation.phase0", new RoiBasedRunToCheckpointFunctionalSimulationStrategy(this.getPhaser(), this.pthreadSpawnedIndex, simulationStartingImage), getBlockingEventDispatcher(), getCycleAccurateEventQueue());
 
         getBlockingEventDispatcher().clearListeners();
         getCycleAccurateEventQueue().resetCurrentCycle();

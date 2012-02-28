@@ -20,12 +20,13 @@ package archimulator.model.experiment;
 
 import archimulator.model.simulation.ContextConfig;
 import archimulator.model.strategy.RunToEndDetailedSimulationStrategy;
+import archimulator.sim.uncore.cache.eviction.EvictionPolicyFactory;
 
 import java.util.List;
 
 public class DetailedExperiment extends Experiment {
-    public DetailedExperiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs) {
-        super(title, numCores, numThreadsPerCore, contextConfigs);
+    public DetailedExperiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs, EvictionPolicyFactory l2EvictionPolicyFactory, int l2Size, int l2Associativity) {
+        super(title, numCores, numThreadsPerCore, contextConfigs, l2Size, l2Associativity, l2EvictionPolicyFactory);
     }
 
     @Override
