@@ -55,6 +55,7 @@ public class Startup {
 //            "400 128 75 1");
             "1000 128 75 1");
 //            "10000 128 75 1");
+//            "400000 128 75 1");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_EM3D_HT = new SimulatedProgram(
             getUserHome() + "/Archimulator/benchmarks/Olden_Custom1/em3d/ht",
@@ -63,7 +64,8 @@ public class Startup {
 //            "400 128 75 1");
 //            "1000 128 75 1");
 //            "4000 128 75 1");
-            "10000 128 75 1");
+//            "10000 128 75 1");
+            "400000 128 75 1");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_429_MCF_BASELINE = new SimulatedProgram(
             getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline",
@@ -92,9 +94,9 @@ public class Startup {
 
     public static void main(String[] args) {
         List<SimulatedProgram> simulatedPrograms = new ArrayList<SimulatedProgram>();
-        simulatedPrograms.add(SIMULATED_PROGRAM_MST_HT);
+//        simulatedPrograms.add(SIMULATED_PROGRAM_MST_HT);
         simulatedPrograms.add(SIMULATED_PROGRAM_EM3D_HT);
-        simulatedPrograms.add(SIMULATED_PROGRAM_429_MCF_HT);
+//        simulatedPrograms.add(SIMULATED_PROGRAM_429_MCF_HT);
 
         List<Integer> l2SizeInKBytes = new ArrayList<Integer>();
         l2SizeInKBytes.add(512);
@@ -109,17 +111,17 @@ public class Startup {
                     .with().workload(simulatedProgram)
                     .simulate().functionallyToEnd());
 
-            for (int l2SizeInKByte : l2SizeInKBytes) {
-                experiments.add(on().cores(2).threadsPerCore(2).l2Size(1024 * l2SizeInKByte).l2Associativity(8)
-                        .with().workload(simulatedProgram)
-                        .simulate().functionallyToPseudoCallAndInDetailForMaxInsts(3720, 2000000000)
-                        .addSimulationCapabilityFactory(LastLevelCacheHtRequestCachePollutionProfilingCapability.class, LastLevelCacheHtRequestCachePollutionProfilingCapability.FACTORY));
-
+//            for (int l2SizeInKByte : l2SizeInKBytes) {
 //                experiments.add(on().cores(2).threadsPerCore(2).l2Size(1024 * l2SizeInKByte).l2Associativity(8)
 //                        .with().workload(simulatedProgram)
-//                        .simulate().inDetailToEnd()
+//                        .simulate().functionallyToPseudoCallAndInDetailForMaxInsts(3720, 2000000000)
 //                        .addSimulationCapabilityFactory(LastLevelCacheHtRequestCachePollutionProfilingCapability.class, LastLevelCacheHtRequestCachePollutionProfilingCapability.FACTORY));
-            }
+//
+////                experiments.add(on().cores(2).threadsPerCore(2).l2Size(1024 * l2SizeInKByte).l2Associativity(8)
+////                        .with().workload(simulatedProgram)
+////                        .simulate().inDetailToEnd()
+////                        .addSimulationCapabilityFactory(LastLevelCacheHtRequestCachePollutionProfilingCapability.class, LastLevelCacheHtRequestCachePollutionProfilingCapability.FACTORY));
+//            }
         }
         
         for(Experiment experiment : experiments) {
