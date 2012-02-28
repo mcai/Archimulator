@@ -24,6 +24,7 @@ import archimulator.model.capability.SimulationCapability;
 import archimulator.model.capability.SimulationCapabilityFactory;
 import archimulator.model.simulation.ContextConfig;
 import archimulator.model.simulation.SimulatedProgram;
+import archimulator.sim.ext.uncore.newHt2.LastLevelCacheHtRequestCachePollutionProfilingCapability;
 import archimulator.sim.os.KernelCapability;
 import archimulator.sim.os.KernelCapabilityFactory;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicyFactory;
@@ -101,11 +102,13 @@ public class ExperimentBuilder {
         on().cores(2).threadsPerCore(2).l2Size(1024 * 1024 * 4).l2Associativity(8)
                 .with().workload(System.getProperty("user.home") + "/Archimulator/benchmarks/Olden_Custom1/mst/ht", "mst.mips", "10000")
                 .simulate().inDetailToEnd()
+                .addSimulationCapabilityFactory(LastLevelCacheHtRequestCachePollutionProfilingCapability.class, LastLevelCacheHtRequestCachePollutionProfilingCapability.FACTORY)
                 .runToEnd();
 
         on().cores(2).threadsPerCore(2).l2Size(1024 * 1024 * 4).l2Associativity(8)
                 .with().workload(System.getProperty("user.home") + "/Archimulator/benchmarks/Olden_Custom1/mst/ht", "mst.mips", "10000")
                 .simulate().functionallyToPseudoCallAndInDetailForMaxInsts(3720, 2000000000)
+                .addSimulationCapabilityFactory(LastLevelCacheHtRequestCachePollutionProfilingCapability.class, LastLevelCacheHtRequestCachePollutionProfilingCapability.FACTORY)
                 .runToEnd();
     }
 
