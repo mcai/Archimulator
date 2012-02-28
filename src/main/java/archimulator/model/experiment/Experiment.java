@@ -187,12 +187,12 @@ public abstract class Experiment {
         return this;
     }
 
-    public Experiment addProcessorCapabilityFactory(Class<? extends ProcessorCapability> clz, ProcessorCapabilityFactory factory) {
+    public Experiment addProcessorCapabilityFactory(Class<? extends ProcessorCapability> clz, ProcessorCapabilityFactory factory) {//TODO: error here
         this.processorCapabilityFactories.put(clz, factory);
         return this;
     }
 
-    public Experiment addKernelCapabilityFactory(Class<? extends KernelCapability> clz, KernelCapabilityFactory factory) {
+    public Experiment addKernelCapabilityFactory(Class<? extends KernelCapability> clz, KernelCapabilityFactory factory) {//TODO: error here
         this.kernelCapabilityFactories.put(clz, factory);
         return this;
     }
