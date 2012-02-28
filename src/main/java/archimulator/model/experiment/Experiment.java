@@ -52,8 +52,6 @@ import java.util.concurrent.CyclicBarrier;
 
 public abstract class Experiment {
     private Map<Class<? extends SimulationCapability>, SimulationCapabilityFactory> simulationCapabilityFactories = new HashMap<Class<? extends SimulationCapability>, SimulationCapabilityFactory>();
-    private Map<Class<? extends ProcessorCapability>, ProcessorCapabilityFactory> processorCapabilityFactories = new HashMap<Class<? extends ProcessorCapability>, ProcessorCapabilityFactory>();
-    private Map<Class<? extends KernelCapability>, KernelCapabilityFactory> kernelCapabilityFactories = new HashMap<Class<? extends KernelCapability>, KernelCapabilityFactory>();
 
     private long id;
 
@@ -77,7 +75,7 @@ public abstract class Experiment {
 
     private Simulation simulation;
 
-    public Experiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs, int l2Size, int l2Associativity, EvictionPolicyFactory l2EvictionPolicyFactory) {
+    public Experiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs, int l2Size, int l2Associativity, EvictionPolicyFactory l2EvictionPolicyFactory, Map<Class<? extends ProcessorCapability>, ProcessorCapabilityFactory> processorCapabilityFactories, Map<Class<? extends KernelCapability>, KernelCapabilityFactory> kernelCapabilityFactories) {
         this.id = currentId++;
 
         this.title = title;
@@ -85,7 +83,7 @@ public abstract class Experiment {
         this.numThreadsPerCore = numThreadsPerCore;
         this.contextConfigs = contextConfigs;
 
-        this.processorConfig = ProcessorConfig.createDefaultProcessorConfig(MemoryHierarchyConfig.createDefaultMemoryHierarchyConfig(l2Size, l2Associativity, l2EvictionPolicyFactory), this.processorCapabilityFactories, this.kernelCapabilityFactories, this.numCores, this.numThreadsPerCore);
+        this.processorConfig = ProcessorConfig.createDefaultProcessorConfig(MemoryHierarchyConfig.createDefaultMemoryHierarchyConfig(l2Size, l2Associativity, l2EvictionPolicyFactory), processorCapabilityFactories, kernelCapabilityFactories, this.numCores, this.numThreadsPerCore);
 
         this.beginTime = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date());
 
@@ -187,16 +185,6 @@ public abstract class Experiment {
         return this;
     }
 
-    public Experiment addProcessorCapabilityFactory(Class<? extends ProcessorCapability> clz, ProcessorCapabilityFactory factory) {//TODO: error here
-        this.processorCapabilityFactories.put(clz, factory);
-        return this;
-    }
-
-    public Experiment addKernelCapabilityFactory(Class<? extends KernelCapability> clz, KernelCapabilityFactory factory) {//TODO: error here
-        this.kernelCapabilityFactories.put(clz, factory);
-        return this;
-    }
-
     public void start() {
         this.fsm.fireTransition(ExperimentCondition.START);
     }
@@ -287,8 +275,8 @@ public abstract class Experiment {
             }
         });
 
-        System.out.println("Archimulator - A Flexible Multicore Architectural Simulator Written in Java.\n");
-        System.out.println("Version: 2.0.\n");
+        System.out.println("Archimulator - A Cloud Enabled Multicore Architectural Simulator Written in Java.\n");
+        System.out.println("Version: 3.0.\n");
         System.out.println("Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).\n");
     }
 }

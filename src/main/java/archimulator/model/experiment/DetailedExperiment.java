@@ -18,19 +18,24 @@
  ******************************************************************************/
 package archimulator.model.experiment;
 
+import archimulator.model.capability.ProcessorCapability;
+import archimulator.model.capability.ProcessorCapabilityFactory;
 import archimulator.model.simulation.ContextConfig;
 import archimulator.model.strategy.RunToEndDetailedSimulationStrategy;
+import archimulator.sim.os.KernelCapability;
+import archimulator.sim.os.KernelCapabilityFactory;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicyFactory;
 
 import java.util.List;
+import java.util.Map;
 
 public class DetailedExperiment extends Experiment {
-    public DetailedExperiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs, EvictionPolicyFactory l2EvictionPolicyFactory, int l2Size, int l2Associativity) {
-        super(title, numCores, numThreadsPerCore, contextConfigs, l2Size, l2Associativity, l2EvictionPolicyFactory);
+    public DetailedExperiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs, EvictionPolicyFactory l2EvictionPolicyFactory, int l2Size, int l2Associativity, Map<Class<? extends ProcessorCapability>, ProcessorCapabilityFactory> processorCapabilityFactories, Map<Class<? extends KernelCapability>, KernelCapabilityFactory> kernelCapabilityFactories) {
+        super(title, numCores, numThreadsPerCore, contextConfigs, l2Size, l2Associativity, l2EvictionPolicyFactory, processorCapabilityFactories, kernelCapabilityFactories);
     }
 
     @Override
     protected void doStart() {
-        doSimulation(getTitle() + ".detailedSimulation", new RunToEndDetailedSimulationStrategy(this.getPhaser()), getBlockingEventDispatcher(), getCycleAccurateEventQueue());
+        doSimulation(getTitle() + "/detailedSimulation", new RunToEndDetailedSimulationStrategy(this.getPhaser()), getBlockingEventDispatcher(), getCycleAccurateEventQueue());
     }
 }

@@ -18,19 +18,24 @@
  ******************************************************************************/
 package archimulator.model.experiment;
 
+import archimulator.model.capability.ProcessorCapability;
+import archimulator.model.capability.ProcessorCapabilityFactory;
 import archimulator.model.simulation.ContextConfig;
 import archimulator.model.strategy.RunToEndFunctionalSimulationStrategy;
+import archimulator.sim.os.KernelCapability;
+import archimulator.sim.os.KernelCapabilityFactory;
 import archimulator.sim.uncore.cache.eviction.LeastRecentlyUsedEvictionPolicy;
 
 import java.util.List;
+import java.util.Map;
 
 public class FunctionalExperiment extends Experiment {
-    public FunctionalExperiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs) {
-        super(title, numCores, numThreadsPerCore, contextConfigs, 524288 * 8, 8, LeastRecentlyUsedEvictionPolicy.FACTORY);
+    public FunctionalExperiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs, Map<Class<? extends ProcessorCapability>, ProcessorCapabilityFactory> processorCapabilityFactories, Map<Class<? extends KernelCapability>, KernelCapabilityFactory> kernelCapabilityFactories) {
+        super(title, numCores, numThreadsPerCore, contextConfigs, 524288 * 8, 8, LeastRecentlyUsedEvictionPolicy.FACTORY, processorCapabilityFactories, kernelCapabilityFactories);
     }
 
     @Override
     protected void doStart() {
-        this.doSimulation(this.getTitle() + ".functionalSimulation", new RunToEndFunctionalSimulationStrategy(this.getPhaser()), this.getBlockingEventDispatcher(), this.getCycleAccurateEventQueue());
+        this.doSimulation(this.getTitle() + "/functionalSimulation", new RunToEndFunctionalSimulationStrategy(this.getPhaser()), this.getBlockingEventDispatcher(), this.getCycleAccurateEventQueue());
     }
 }

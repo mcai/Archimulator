@@ -18,20 +18,25 @@
  ******************************************************************************/
 package archimulator.model.experiment;
 
+import archimulator.model.capability.ProcessorCapability;
+import archimulator.model.capability.ProcessorCapabilityFactory;
 import archimulator.model.simulation.ContextConfig;
 import archimulator.model.simulation.SimulationStartingImage;
 import archimulator.model.strategy.checkpoint.CheckpointToInstructionCountBasedDetailedSimulationStrategy;
 import archimulator.model.strategy.checkpoint.RoiBasedRunToCheckpointFunctionalSimulationStrategy;
+import archimulator.sim.os.KernelCapability;
+import archimulator.sim.os.KernelCapabilityFactory;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicyFactory;
 
 import java.util.List;
+import java.util.Map;
 
 public class CheckpointedExperiment extends Experiment {
     private int maxInsts;
     private int pthreadSpawnedIndex;
 
-    public CheckpointedExperiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs, int maxInsts, int l2Size, int l2Associativity, EvictionPolicyFactory l2EvictionPolicyFactory, int pthreadSpawnedIndex) {
-        super(title, numCores, numThreadsPerCore, contextConfigs, l2Size, l2Associativity, l2EvictionPolicyFactory);
+    public CheckpointedExperiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs, int maxInsts, int l2Size, int l2Associativity, EvictionPolicyFactory l2EvictionPolicyFactory, int pthreadSpawnedIndex, Map<Class<? extends ProcessorCapability>, ProcessorCapabilityFactory> processorCapabilityFactories, Map<Class<? extends KernelCapability>, KernelCapabilityFactory> kernelCapabilityFactories) {
+        super(title, numCores, numThreadsPerCore, contextConfigs, l2Size, l2Associativity, l2EvictionPolicyFactory, processorCapabilityFactories, kernelCapabilityFactories);
         this.maxInsts = maxInsts;
         this.pthreadSpawnedIndex = pthreadSpawnedIndex;
     }
@@ -40,11 +45,11 @@ public class CheckpointedExperiment extends Experiment {
     protected void doStart() {
         SimulationStartingImage simulationStartingImage = new SimulationStartingImage();
 
-        this.doSimulation(this.getTitle() + ".checkpointedSimulation.phase0", new RoiBasedRunToCheckpointFunctionalSimulationStrategy(this.getPhaser(), this.pthreadSpawnedIndex, simulationStartingImage), getBlockingEventDispatcher(), getCycleAccurateEventQueue());
+        this.doSimulation(this.getTitle() + "/checkpointedSimulation/phase0", new RoiBasedRunToCheckpointFunctionalSimulationStrategy(this.getPhaser(), this.pthreadSpawnedIndex, simulationStartingImage), getBlockingEventDispatcher(), getCycleAccurateEventQueue());
 
         getBlockingEventDispatcher().clearListeners();
         getCycleAccurateEventQueue().resetCurrentCycle();
 
-        this.doSimulation(this.getTitle() + ".checkpointedSimulation.phase1", new CheckpointToInstructionCountBasedDetailedSimulationStrategy(this.getPhaser(), this.maxInsts, simulationStartingImage), getBlockingEventDispatcher(), getCycleAccurateEventQueue());
+        this.doSimulation(this.getTitle() + "/checkpointedSimulation/phase1", new CheckpointToInstructionCountBasedDetailedSimulationStrategy(this.getPhaser(), this.maxInsts, simulationStartingImage), getBlockingEventDispatcher(), getCycleAccurateEventQueue());
     }
 }

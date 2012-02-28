@@ -18,117 +18,27 @@
  ******************************************************************************/
 package archimulator.sim;
 
-import archimulator.model.simulation.ContextConfig;
-import archimulator.model.simulation.SimulatedProgram;
-import archimulator.model.experiment.CheckpointedExperiment;
-import archimulator.model.experiment.DetailedExperiment;
 import archimulator.model.experiment.Experiment;
-import archimulator.model.experiment.FunctionalExperiment;
+import archimulator.model.simulation.SimulatedProgram;
 import archimulator.sim.ext.uncore.newHt2.LastLevelCacheHtRequestCachePollutionProfilingCapability;
-import archimulator.sim.uncore.cache.eviction.EvictionPolicyFactory;
-import archimulator.sim.uncore.cache.eviction.LeastRecentlyUsedEvictionPolicy;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static archimulator.model.experiment.ExperimentBuilder.*;
+
 public class Startup {
-    public static void main(String[] args) {
-//        simulate("mst_baseline_LRU", SIMULATED_PROGRAM_MST_BASELINE, LeastRecentlyUsedEvictionPolicy.FACTORY);
-//        simulate("mst_base-ht_LRU", LeastRecentlyUsedEvictionPolicy.FACTORY, SIMULATED_PROGRAM_MST_BASELINE, SIMULATED_PROGRAM_EM3D_BASELINE, SIMULATED_PROGRAM_MST_BASELINE, SIMULATED_PROGRAM_EM3D_BASELINE);
-//        simulate("mst_base-ht_LRU", LeastRecentlyUsedEvictionPolicy.FACTORY, SIMULATED_PROGRAM_MST_BASELINE, SIMULATED_PROGRAM_EM3D_BASELINE, SIMULATED_PROGRAM_MST_BASELINE);
-//        simulate("mst_base-ht_LRU", LeastRecentlyUsedEvictionPolicy.FACTORY, SIMULATED_PROGRAM_MST_BASELINE, SIMULATED_PROGRAM_MST_BASELINE);
-
-//        List<ContextConfig> contextConfigs = new ArrayList<ContextConfig>();
-//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_MST_BASELINE, 0));
-//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_EM3D_BASELINE, 1));
-//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_MST_BASELINE, 2));
-//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_EM3D_BASELINE, 3));
-
-        List<ContextConfig> contextConfigs = new ArrayList<ContextConfig>();
-//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_MST_BASELINE, 0));
-        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_MST_HT, 0));
-//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_EM3D_BASELINE, 0));
-//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_EM3D_HT, 0));
-//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_429_MCF_BASELINE, 0));
-//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_429_MCF_HT, 0));
-//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_EM3D_BASELINE, 1));
-//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_EM3D_BASELINE, 2));
-//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_MST_BASELINE, 3));
-//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_MST_BASELINE, 4));
-//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_EM3D_BASELINE, 5));
-//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_EM3D_BASELINE, 6));
-//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_MST_BASELINE, 7));
-//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_MST_BASELINE, 8));
-//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_EM3D_BASELINE, 9));
-//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_EM3D_BASELINE, 10));
-//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_MST_BASELINE, 11));
-//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_MST_BASELINE, 12));
-//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_EM3D_BASELINE, 13));
-//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_EM3D_BASELINE, 14));
-//        contextConfigs.add(new ContextConfig(SIMULATED_PROGRAM_MST_BASELINE, 15));
-
-//        simulate("test2", LeastRecentlyUsedEvictionPolicy.FACTORY, 2, 2, contextConfigs);
-        simulate("mst_10000_detailed-HTRequest_Profiling_l2_4M", LeastRecentlyUsedEvictionPolicy.FACTORY, 2, 2, contextConfigs);
-//        simulate("em3d_10000_ht_detailed", LeastRecentlyUsedEvictionPolicy.FACTORY, 2, 2, contextConfigs);
-//        simulate("mst_ht_LRU", LeastRecentlyUsedEvictionPolicy.FACTORY, SIMULATED_PROGRAM_MST_HT, 2, 2, contextConfigs);
-
-//        simulate("em3d_baseline_LRU", SIMULATED_PROGRAM_EM3D_BASELINE, LeastRecentlyUsedEvictionPolicy.FACTORY, 2, 2, contextConfigs);
-//        simulate("libquantum_baseline_LRU", SIMULATED_PROGRAM_462_LIBQUANTUM_BASELINE, LeastRecentlyUsedEvictionPolicy.FACTORY, 2, 2, contextConfigs);
-//        simulate("em3d_ht_LRU", SIMULATED_PROGRAM_EM3D_HT, LeastRecentlyUsedEvictionPolicy.FACTORY, 2, 2, contextConfigs);
-
-//        simulate("mcf_baseline_LRU", SIMULATED_PROGRAM_429_MCF_BASELINE, LeastRecentlyUsedEvictionPolicy.FACTORY, 2, 2, contextConfigs);
-//        simulate("mcf_ht_LRU", SIMULATED_PROGRAM_429_MCF_HT, LeastRecentlyUsedEvictionPolicy.FACTORY, 2, 2, contextConfigs);
-
-//        simulate("mst_baseline_ENHANCED_LRU", SIMULATED_PROGRAM_MST_BASELINE, ThrashingSensitiveHTEnhancedLeastRecentlyUsedEvictionPolicy.FACTORY), 2, 2, contextConfigs;
-//        simulate("mst_ht_ENHANCED_LRU", SIMULATED_PROGRAM_MST_HT, ThrashingSensitiveHTEnhancedLeastRecentlyUsedEvictionPolicy.FACTORY, 2, 2, contextConfigs);
-    }
-
-    public static void simulate(String title, EvictionPolicyFactory l2EvictionPolicyFactory, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs) {
-//        Experiment experiment = createFunctionalExperiment(title, numCores, numThreadsPerCore, contextConfigs);
-        Experiment experiment = createDetailedExperiment(title, l2EvictionPolicyFactory, numCores, numThreadsPerCore, contextConfigs);
-//        Experiment experiment = createCheckpointedExperiment(title, l2EvictionPolicyFactory, numCores, numThreadsPerCore, contextConfigs);
-
-        experiment.start();
-        experiment.join();
-    }
-
-    public static Experiment createFunctionalExperiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs) {
-        return new FunctionalExperiment(title, numCores, numThreadsPerCore, contextConfigs);
-        //                .addSimulationCapabilityFactory(LastLevelCacheMissProfilingCapability.class, LastLevelCacheMissProfilingCapability.FACTORY)
-        //                .addProcessorCapabilityFactory(HtRequestL2VictimTrackingCapability.class, HtRequestL2VictimTrackingCapability.FACTORY)
-//                .addKernelCapabilityFactory(FunctionalExecutionProfilingCapability.class, FunctionalExecutionProfilingCapability.FACTORY);
-    }
-
-    public static Experiment createDetailedExperiment(String title, EvictionPolicyFactory l2EvictionPolicyFactory, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs) {
-        return new DetailedExperiment(title, numCores, numThreadsPerCore, contextConfigs, LeastRecentlyUsedEvictionPolicy.FACTORY, 524288 * 8, 8)
-                //                .addSimulationCapabilityFactory(LastLevelCacheMissProfilingCapability.class, LastLevelCacheMissProfilingCapability.FACTORY)
-                .addSimulationCapabilityFactory(LastLevelCacheHtRequestCachePollutionProfilingCapability.class, LastLevelCacheHtRequestCachePollutionProfilingCapability.FACTORY)
-                        //                .addProcessorCapabilityFactory(HtRequestL2VictimTrackingCapability.class, HtRequestL2VictimTrackingCapability.FACTORY)
-//                .addProcessorCapabilityFactory(HtRequestL2VictimTrackingCapability2.class, HtRequestL2VictimTrackingCapability2.FACTORY)
-//                .addProcessorCapabilityFactory(FsmBasedHtRequestLlcVictimTrackingCapability.class, FsmBasedHtRequestLlcVictimTrackingCapability.FACTORY)
-                ;
-    }
-
-    public static Experiment createCheckpointedExperiment(String title, EvictionPolicyFactory l2EvictionPolicyFactory, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs) {
-        return new CheckpointedExperiment(title, numCores, numThreadsPerCore, contextConfigs, 2000000000, 524288 * 8, 8, LeastRecentlyUsedEvictionPolicy.FACTORY, 3720)
-                //                .addSimulationCapabilityFactory(LastLevelCacheMissProfilingCapability.class, LastLevelCacheMissProfilingCapability.FACTORY)
-                .addSimulationCapabilityFactory(LastLevelCacheHtRequestCachePollutionProfilingCapability.class, LastLevelCacheHtRequestCachePollutionProfilingCapability.FACTORY)
-                        //                .addProcessorCapabilityFactory(HtRequestL2VictimTrackingCapability.class, HtRequestL2VictimTrackingCapability.FACTORY)
-//                .addProcessorCapabilityFactory(HtRequestL2VictimTrackingCapability2.class, HtRequestL2VictimTrackingCapability2.FACTORY)
-//                .addProcessorCapabilityFactory(FsmBasedHtRequestLlcVictimTrackingCapability.class, FsmBasedHtRequestLlcVictimTrackingCapability.FACTORY)
-                ;
-    }
-
     public static final SimulatedProgram SIMULATED_PROGRAM_MST_BASELINE = new SimulatedProgram(
-            "/home/itecgo/Archimulator/benchmarks/Olden_Custom1/mst/baseline",
+            getUserHome() + "/Archimulator/benchmarks/Olden_Custom1/mst/baseline",
             "mst.mips",
-//            "10000");
+            "10000");
 //            "2000");
-            "1000");
+//            "1000");
 //    "400");
+//    "100");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_MST_HT = new SimulatedProgram(
-            "/home/itecgo/Archimulator/benchmarks/Olden_Custom1/mst/ht",
+            getUserHome() + "/Archimulator/benchmarks/Olden_Custom1/mst/ht",
             "mst.mips",
             "10000");
 //            "4000");
@@ -136,9 +46,10 @@ public class Startup {
 //            "1000");
 //            "400");
 //            "200");
+//            "100");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_EM3D_BASELINE = new SimulatedProgram(
-            "/home/itecgo/Archimulator/benchmarks/Olden_Custom1/em3d/baseline",
+            getUserHome() + "/Archimulator/benchmarks/Olden_Custom1/em3d/baseline",
             "em3d.mips",
 //            "400000 128 75 1");
 //            "400 128 75 1");
@@ -146,7 +57,7 @@ public class Startup {
 //            "10000 128 75 1");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_EM3D_HT = new SimulatedProgram(
-            "/home/itecgo/Archimulator/benchmarks/Olden_Custom1/em3d/ht",
+            getUserHome() + "/Archimulator/benchmarks/Olden_Custom1/em3d/ht",
             "em3d.mips",
 //            "400000 128 75 1");
 //            "400 128 75 1");
@@ -155,22 +66,63 @@ public class Startup {
             "10000 128 75 1");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_429_MCF_BASELINE = new SimulatedProgram(
-            "/home/itecgo/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline",
+            getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline",
             "429.mcf.mips",
-            "/home/itecgo/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline/data/ref/input/inp.in");
+            getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline/data/ref/input/inp.in");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_429_MCF_HT = new SimulatedProgram(
-            "/home/itecgo/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht",
+            getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht",
             "429.mcf.mips",
-            "/home/itecgo/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht/data/ref/input/inp.in");
+            getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht/data/ref/input/inp.in");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_462_LIBQUANTUM_BASELINE = new SimulatedProgram(
-            "/home/itecgo/Archimulator/benchmarks/CPU2006_Custom1/462.libquantum/baseline",
+            getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/462.libquantum/baseline",
             "462.libquantum.mips",
             "33 5");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_462_LIBQUANTUM_HT = new SimulatedProgram(
-            "/home/itecgo/Archimulator/benchmarks/CPU2006_Custom1/462.libquantum/ht",
+            getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/462.libquantum/ht",
             "462.libquantum.mips",
             "33 5");
+
+    private static String getUserHome() {
+        return System.getProperty("user.home");
+    }
+
+    public static void main(String[] args) {
+        List<SimulatedProgram> simulatedPrograms = new ArrayList<SimulatedProgram>();
+        simulatedPrograms.add(SIMULATED_PROGRAM_MST_HT);
+//        simulatedPrograms.add(SIMULATED_PROGRAM_EM3D_HT);
+//        simulatedPrograms.add(SIMULATED_PROGRAM_429_MCF_HT);
+
+        List<Integer> l2SizeInKBytes = new ArrayList<Integer>();
+        l2SizeInKBytes.add(512);
+        l2SizeInKBytes.add(512 * 2);
+        l2SizeInKBytes.add(512 * 4);
+        l2SizeInKBytes.add(512 * 8);
+        
+        List<Experiment> experiments = new ArrayList<Experiment>();
+
+        for (SimulatedProgram simulatedProgram : simulatedPrograms) {
+            experiments.add(on().cores(2).threadsPerCore(2)
+                    .with().workload(simulatedProgram)
+                    .simulate().functionallyToEnd());
+
+            for (int l2SizeInKByte : l2SizeInKBytes) {
+                experiments.add(on().cores(2).threadsPerCore(2).l2Size(1024 * l2SizeInKByte).l2Associativity(8)
+                        .with().workload(simulatedProgram)
+                        .simulate().inDetailToEnd()
+                        .addSimulationCapabilityFactory(LastLevelCacheHtRequestCachePollutionProfilingCapability.class, LastLevelCacheHtRequestCachePollutionProfilingCapability.FACTORY));
+
+                experiments.add(on().cores(2).threadsPerCore(2).l2Size(1024 * l2SizeInKByte).l2Associativity(8)
+                        .with().workload(simulatedProgram)
+                        .simulate().functionallyToPseudoCallAndInDetailForMaxInsts(3720, 2000000000)
+                        .addSimulationCapabilityFactory(LastLevelCacheHtRequestCachePollutionProfilingCapability.class, LastLevelCacheHtRequestCachePollutionProfilingCapability.FACTORY));
+            }
+        }
+        
+        for(Experiment experiment : experiments) {
+            experiment.runToEnd();
+        }
+    }
 }
