@@ -32,6 +32,7 @@ import archimulator.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class ExperimentBuilder {
     public static FunctionalExperiment createFunctionExperiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs,
@@ -93,17 +94,17 @@ public class ExperimentBuilder {
 
     public static void main(String[] args) {
         on().cores(2).threadsPerCore(2)
-                .with().singleThreaded(System.getProperty("user.home") + "/Archimulator/benchmarks/Olden_Custom1/mst/ht", "mst.mips", "10000")
+                .with().workload(System.getProperty("user.home") + "/Archimulator/benchmarks/Olden_Custom1/mst/ht", "mst.mips", "10000")
                 .simulate().functionallyToEnd()
                 .runToEnd();
 
         on().cores(2).threadsPerCore(2).l2Size(1024 * 1024 * 4).l2Associativity(8)
-                .with().singleThreaded(System.getProperty("user.home") + "/Archimulator/benchmarks/Olden_Custom1/mst/ht", "mst.mips", "10000")
+                .with().workload(System.getProperty("user.home") + "/Archimulator/benchmarks/Olden_Custom1/mst/ht", "mst.mips", "10000")
                 .simulate().inDetailToEnd()
                 .runToEnd();
 
         on().cores(2).threadsPerCore(2).l2Size(1024 * 1024 * 4).l2Associativity(8)
-                .with().singleThreaded(System.getProperty("user.home") + "/Archimulator/benchmarks/Olden_Custom1/mst/ht", "mst.mips", "10000")
+                .with().workload(System.getProperty("user.home") + "/Archimulator/benchmarks/Olden_Custom1/mst/ht", "mst.mips", "10000")
                 .simulate().functionallyToPseudoCallAndInDetailForMaxInsts(3720, 2000000000)
                 .runToEnd();
     }
@@ -165,19 +166,16 @@ public class ExperimentBuilder {
 
         public WorkloadProfile(ProcessorProfile processorProfile) {
             this.processorProfile = processorProfile;
+            this.contextConfigs = new ArrayList<ContextConfig>();
         }
 
-        public WorkloadProfile singleThreaded(String cwd, String exe, String args) {
-            this.contextConfigs = createContextConfigs(cwd,  exe,  args);
+        public WorkloadProfile workload(String cwd, String exe, String args) {
+            return this.workload(cwd, exe, args, 0);
+        }
+        
+        public WorkloadProfile workload(String cwd, String exe, String args, int threadId) {
+            this.contextConfigs.add(new ContextConfig(new SimulatedProgram(cwd,  exe, args), threadId));
             return this;
-        }
-
-        public WorkloadProfile multiThreaded() {
-            throw new UnsupportedOperationException(); //TODO
-        }
-
-        public WorkloadProfile multiProgramed() {
-            throw new UnsupportedOperationException(); //TODO
         }
 
         public ExperimentProfile simulate() {
@@ -201,29 +199,30 @@ public class ExperimentBuilder {
         }
 
         public FunctionalExperiment functionallyToEnd() {
-            return createFunctionExperiment("", //TODO: title or ID number
+            return createFunctionExperiment(UUID.randomUUID().toString(),
                     this.workloadProfile.getProcessorProfile().getNumCores(),
                     this.workloadProfile.getProcessorProfile().getNumThreadsPerCore(),
-                    this.workloadProfile.getContextConfigs(), null, null, null);
+                    this.workloadProfile.getContextConfigs(),
+                    null, null, null); //TODO: capabilities support
         }
 
         public DetailedExperiment inDetailToEnd() {
-            return createDetailedExperiment("", //TODO: title or ID number
+            return createDetailedExperiment(UUID.randomUUID().toString(),
                     this.workloadProfile.getProcessorProfile().getNumCores(),
                     this.workloadProfile.getProcessorProfile().getNumThreadsPerCore(),
                     this.workloadProfile.getContextConfigs(),
                     this.workloadProfile.getProcessorProfile().getL2Size(), this.workloadProfile.getProcessorProfile().getL2Associativity(), LeastRecentlyUsedEvictionPolicy.FACTORY,
-                    null, null, null);
+                    null, null, null); //TODO: capabilities support
         }
 
         public CheckpointedExperiment functionallyToPseudoCallAndInDetailForMaxInsts(int pthreadSpawnedIndex, int maxInsts) {
-            return createCheckpointedExperiment("", //TODO: title or ID number
+            return createCheckpointedExperiment(UUID.randomUUID().toString(),
                     this.workloadProfile.getProcessorProfile().getNumCores(),
                     this.workloadProfile.getProcessorProfile().getNumThreadsPerCore(),
                     this.workloadProfile.getContextConfigs(),
                     maxInsts, this.workloadProfile.getProcessorProfile().getL2Size(), this.workloadProfile.getProcessorProfile().getL2Associativity(), LeastRecentlyUsedEvictionPolicy.FACTORY,
                     pthreadSpawnedIndex,
-                    null, null, null);
+                    null, null, null); //TODO: capabilities support
         }
 
         public ProcessorProfile getProcessorProfile() {
