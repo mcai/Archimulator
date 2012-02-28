@@ -74,6 +74,7 @@ public class Startup {
             getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht",
             "429.mcf.mips",
             getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht/data/ref/input/inp.in");
+//            getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht/data/test/input/inp.in");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_462_LIBQUANTUM_BASELINE = new SimulatedProgram(
             getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/462.libquantum/baseline",
@@ -92,8 +93,8 @@ public class Startup {
     public static void main(String[] args) {
         List<SimulatedProgram> simulatedPrograms = new ArrayList<SimulatedProgram>();
         simulatedPrograms.add(SIMULATED_PROGRAM_MST_HT);
-//        simulatedPrograms.add(SIMULATED_PROGRAM_EM3D_HT);
-//        simulatedPrograms.add(SIMULATED_PROGRAM_429_MCF_HT);
+        simulatedPrograms.add(SIMULATED_PROGRAM_EM3D_HT);
+        simulatedPrograms.add(SIMULATED_PROGRAM_429_MCF_HT);
 
         List<Integer> l2SizeInKBytes = new ArrayList<Integer>();
         l2SizeInKBytes.add(512);
@@ -111,13 +112,13 @@ public class Startup {
             for (int l2SizeInKByte : l2SizeInKBytes) {
                 experiments.add(on().cores(2).threadsPerCore(2).l2Size(1024 * l2SizeInKByte).l2Associativity(8)
                         .with().workload(simulatedProgram)
-                        .simulate().inDetailToEnd()
-                        .addSimulationCapabilityFactory(LastLevelCacheHtRequestCachePollutionProfilingCapability.class, LastLevelCacheHtRequestCachePollutionProfilingCapability.FACTORY));
-
-                experiments.add(on().cores(2).threadsPerCore(2).l2Size(1024 * l2SizeInKByte).l2Associativity(8)
-                        .with().workload(simulatedProgram)
                         .simulate().functionallyToPseudoCallAndInDetailForMaxInsts(3720, 2000000000)
                         .addSimulationCapabilityFactory(LastLevelCacheHtRequestCachePollutionProfilingCapability.class, LastLevelCacheHtRequestCachePollutionProfilingCapability.FACTORY));
+
+//                experiments.add(on().cores(2).threadsPerCore(2).l2Size(1024 * l2SizeInKByte).l2Associativity(8)
+//                        .with().workload(simulatedProgram)
+//                        .simulate().inDetailToEnd()
+//                        .addSimulationCapabilityFactory(LastLevelCacheHtRequestCachePollutionProfilingCapability.class, LastLevelCacheHtRequestCachePollutionProfilingCapability.FACTORY));
             }
         }
         
