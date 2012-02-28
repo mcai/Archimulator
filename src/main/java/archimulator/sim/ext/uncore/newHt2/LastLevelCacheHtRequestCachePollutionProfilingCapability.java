@@ -140,7 +140,7 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
         simulation.getBlockingEventDispatcher().addListener(SimulationStartedEvent.class, new Action1<SimulationStartedEvent>() {
             public void apply(SimulationStartedEvent event) {
                 try {
-                    fileWriter = new PrintWriter(simulation.getConfig().getCwd() + "/LastLevelCacheHtRequestCachePollutionProfilingCapability.out");
+                    fileWriter = new PrintWriter(simulation.getConfig().getCwd() + "/lastLevelCacheHtRequestCachePollutionProfilingCapability_out.txt");
                 } catch (FileNotFoundException e) {
                     throw new RuntimeException(e);
                 }

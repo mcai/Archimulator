@@ -30,7 +30,7 @@ public class ContextConfig {
     private List<String> cmdArgList;
 
     public ContextConfig(SimulatedProgram simulatedProgram, int threadId) {
-        this(simulatedProgram, "ctx" + threadId + ".out", threadId);
+        this(simulatedProgram, "ctx" + threadId + "_out.txt", threadId);
     }
 
     public ContextConfig(SimulatedProgram simulatedProgram, String stdout, int threadId) {

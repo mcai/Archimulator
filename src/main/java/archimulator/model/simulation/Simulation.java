@@ -153,9 +153,9 @@ public class Simulation implements SimulationObject {
 
             timerDumpState.cancel();
 
-            MapHelper.save(this.getStatInFastForward(), this.getConfig().getCwd() + "/stat.fastForward");
-            MapHelper.save(this.getStatInWarmup(), this.getConfig().getCwd() + "/stat.cacheWarmup");
-            MapHelper.save(this.getStatInMeasurement(), this.getConfig().getCwd() + "/stat.measurement");
+            MapHelper.save(this.getStatInFastForward(), this.getConfig().getCwd() + "/stat_fastForward.txt");
+            MapHelper.save(this.getStatInWarmup(), this.getConfig().getCwd() + "/stat_cacheWarmup.txt");
+            MapHelper.save(this.getStatInMeasurement(), this.getConfig().getCwd() + "/stat_measurement.txt");
 
             resetIdCounters();
             this.getBlockingEventDispatcher().clearListeners();
