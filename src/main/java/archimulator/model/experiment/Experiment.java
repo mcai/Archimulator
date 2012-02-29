@@ -75,7 +75,7 @@ public abstract class Experiment {
 
     private Simulation simulation;
 
-    public Experiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs, int l2Size, int l2Associativity, EvictionPolicyFactory l2EvictionPolicyFactory, Map<Class<? extends ProcessorCapability>, ProcessorCapabilityFactory> processorCapabilityFactories, Map<Class<? extends KernelCapability>, KernelCapabilityFactory> kernelCapabilityFactories) {
+    public Experiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs, int l2Size, int l2Associativity, EvictionPolicyFactory l2EvictionPolicyFactory, Map<Class<? extends SimulationCapability>, SimulationCapabilityFactory> simulationCapabilityFactories, Map<Class<? extends ProcessorCapability>, ProcessorCapabilityFactory> processorCapabilityFactories, Map<Class<? extends KernelCapability>, KernelCapabilityFactory> kernelCapabilityFactories) {
         this.id = currentId++;
 
         this.title = title;
@@ -85,6 +85,8 @@ public abstract class Experiment {
 
         this.processorConfig = ProcessorConfig.createDefaultProcessorConfig(MemoryHierarchyConfig.createDefaultMemoryHierarchyConfig(l2Size, l2Associativity, l2EvictionPolicyFactory), processorCapabilityFactories, kernelCapabilityFactories, this.numCores, this.numThreadsPerCore);
 
+        this.simulationCapabilityFactories = simulationCapabilityFactories;
+        
         this.beginTime = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date());
 
         this.blockingEventDispatcher = new BlockingEventDispatcher<BlockingEvent>();
@@ -178,11 +180,6 @@ public abstract class Experiment {
             stats.put("experiment.numThreadsPerCore", this.numThreadsPerCore);
             stats.put("experiment.l2EvictionPolicy", this.processorConfig.getMemoryHierarchyConfig().getL2Cache().getEvictionPolicyFactory().getName());
         }
-    }
-
-    public Experiment addSimulationCapabilityFactory(Class<? extends SimulationCapability> clz, SimulationCapabilityFactory factory) {
-        this.simulationCapabilityFactories.put(clz, factory);
-        return this;
     }
 
     public void start() {
