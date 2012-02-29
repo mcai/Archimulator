@@ -28,6 +28,9 @@ import archimulator.sim.os.KernelCapability;
 import archimulator.sim.os.KernelCapabilityFactory;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicyFactory;
 import archimulator.sim.uncore.cache.eviction.LeastRecentlyUsedEvictionPolicy;
+import com.j256.ormlite.field.DataType;
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
 
 import java.io.Serializable;
 import java.util.*;
@@ -37,14 +40,19 @@ public class ExperimentBuilder {
         return new ProcessorProfile();
     }
 
+    public static String getUserHome() {
+        return System.getProperty("user.home");
+    }
+
     public static class ProcessorProfile implements Serializable {
         private int numCores = 2;
         private int numThreadsPerCore = 2;
         private int l2Size = 1024 * 1024 * 4;
         private int l2Associativity = 8;
 
-        private Map<Class<? extends ProcessorCapability>, ProcessorCapabilityFactory> processorCapabilityFactories = new HashMap<Class<? extends ProcessorCapability>, ProcessorCapabilityFactory>();
-        private Map<Class<? extends KernelCapability>, KernelCapabilityFactory> kernelCapabilityFactories = new HashMap<Class<? extends KernelCapability>, KernelCapabilityFactory>();
+        //TODO: serialization
+        private transient Map<Class<? extends ProcessorCapability>, ProcessorCapabilityFactory> processorCapabilityFactories = new HashMap<Class<? extends ProcessorCapability>, ProcessorCapabilityFactory>();
+        private transient Map<Class<? extends KernelCapability>, KernelCapabilityFactory> kernelCapabilityFactories = new HashMap<Class<? extends KernelCapability>, KernelCapabilityFactory>();
 
         public ProcessorProfile cores(int numCores) {
             this.numCores = numCores;
@@ -136,24 +144,48 @@ public class ExperimentBuilder {
         }
     }
 
+    public static enum ExperimentProfileType {
+        FUNCTIONAL_EXPERIMENT,
+        DETAILED_EXPERIMENT,
+        CHECKPOINTED_EXPERIMENT
+    }
+    
+    public static enum ExperimentProfileState {
+        SUBMITTED,
+        RUNNING,
+        STOPPED
+    }
+
+    @DatabaseTable
     public static class ExperimentProfile implements Serializable {
+        @DatabaseField(generatedId = true)
+        private long id;
+
+        @DatabaseField(dataType = DataType.SERIALIZABLE)
         private WorkloadProfile workloadProfile;
 
-        private Map<Class<? extends SimulationCapability>, SimulationCapabilityFactory> simulationCapabilityFactories = new HashMap<Class<? extends SimulationCapability>, SimulationCapabilityFactory>();
-        
-        public static enum ExperimentProfileType {
-            FUNCTIONAL_EXPERIMENT,
-            DETAILED_EXPERIMENT,
-            CHECKPOINTED_EXPERIMENT
-        }
-        
+        //TODO: serialization
+        private transient Map<Class<? extends SimulationCapability>, SimulationCapabilityFactory> simulationCapabilityFactories = new HashMap<Class<? extends SimulationCapability>, SimulationCapabilityFactory>();
+
+        @DatabaseField
         private ExperimentProfileType type;
+
+        @DatabaseField
         private int pthreadSpawnedIndex;
+
+        @DatabaseField
         private int maxInsts;
+
+        @DatabaseField
+        private ExperimentProfileState state;
+        
+        public ExperimentProfile() {
+        }
 
         public ExperimentProfile(WorkloadProfile workloadProfile) {
             this.workloadProfile = workloadProfile;
             this.type = ExperimentProfileType.FUNCTIONAL_EXPERIMENT;
+            this.state = ExperimentProfileState.SUBMITTED;
         }
 
         public ExperimentProfile functionallyToEnd() {
@@ -213,12 +245,40 @@ public class ExperimentBuilder {
             }
         }
 
+        public long getId() {
+            return id;
+        }
+
         public ProcessorProfile getProcessorProfile() {
             return this.workloadProfile.getProcessorProfile();
         }
 
         public WorkloadProfile getWorkloadProfile() {
             return workloadProfile;
+        }
+
+        public Map<Class<? extends SimulationCapability>, SimulationCapabilityFactory> getSimulationCapabilityFactories() {
+            return simulationCapabilityFactories;
+        }
+
+        public ExperimentProfileType getType() {
+            return type;
+        }
+
+        public int getPthreadSpawnedIndex() {
+            return pthreadSpawnedIndex;
+        }
+
+        public int getMaxInsts() {
+            return maxInsts;
+        }
+
+        public ExperimentProfileState getState() {
+            return state;
+        }
+
+        public void setState(ExperimentProfileState state) {
+            this.state = state;
         }
     }
 

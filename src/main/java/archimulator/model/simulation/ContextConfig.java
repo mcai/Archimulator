@@ -19,10 +19,11 @@
 package archimulator.model.simulation;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
-public class ContextConfig {
+public class ContextConfig implements Serializable {
     private SimulatedProgram simulatedProgram;
     private String stdout;
     private int threadId;

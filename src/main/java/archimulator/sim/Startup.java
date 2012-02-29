@@ -18,7 +18,6 @@
  ******************************************************************************/
 package archimulator.sim;
 
-import archimulator.model.experiment.Experiment;
 import archimulator.model.simulation.SimulatedProgram;
 import archimulator.sim.ext.uncore.newHt2.LastLevelCacheHtRequestCachePollutionProfilingCapability;
 
@@ -87,10 +86,6 @@ public class Startup {
             getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/462.libquantum/ht",
             "462.libquantum.mips",
             "33 5");
-
-    private static String getUserHome() {
-        return System.getProperty("user.home");
-    }
 
     public static void main(String[] args) {
         List<SimulatedProgram> simulatedPrograms = new ArrayList<SimulatedProgram>();
