@@ -74,7 +74,7 @@ public class TelnetServer implements OutputAppender {
     }
 
     private void welcome(SocketThread socketThread) {
-        appendStdOutLine(socketThread, "Archimulator - A Flexible Multicore Architectural Simulator Written in Java.\n");
+        appendStdOutLine(socketThread, "Archimulator - A Cloud Enabled Multicore Architectural Simulator Written in Java.\n");
         appendStdOutLine(socketThread, "Version: 3.0.\n");
         appendStdOutLine(socketThread, "Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).\n");
     }
