@@ -47,6 +47,16 @@ public class ArchimulatorServlet extends HessianServlet implements ArchimulatorS
         this.getProxy().setRunningExperimentEnabled(runningExperimentEnabled);
     }
 
+    @Override
+    public void setUserPassword(String userId, String password) throws SQLException {
+        this.getProxy().setUserPassword(userId, password);
+    }
+
+    @Override
+    public boolean authenticateUser(String userId, String password) throws SQLException {
+        return this.getProxy().authenticateUser(userId, password);
+    }
+
     private ArchimulatorService getProxy() {
         return ArchimulatorServletContextListener.getArchimulatorService(this.getServletContext());
     }

@@ -1,0 +1,32 @@
+<?page title="用户登录 - Archimulator用户后台"?>
+<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit"?>
+<zk>
+    <window title="用户登录 - Archimulator用户后台" border="normal" width="300px" mode="modal" apply="archimulator.view.LoginPage">
+        <grid>
+            <columns>
+                <column width="60px"/>
+                <column width="200px"/>
+            </columns>
+            <rows>
+                <row>
+                    用户名:
+                    <textbox id="textboxUserId"/>
+                </row>
+                <row>
+                    密码:
+                    <textbox id="textboxPassword" type="password"/>
+                </row>
+            </rows>
+        </grid>
+
+        <separator/>
+        <div align="center">
+            <hbox>
+                <button id="buttonLogin" forward="winLogin.onOK" label="登 录"/>
+            </hbox>
+        </div>
+    </window>
+</zk>
+
+
+			

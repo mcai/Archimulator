@@ -1,6 +1,7 @@
 package archimulator.service;
 
 import archimulator.model.experiment.ExperimentBuilder;
+import archimulator.model.user.User;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcPooledConnectionSource;
@@ -13,6 +14,8 @@ import java.util.List;
 
 public class ArchimulatorServiceImpl implements ArchimulatorService {
     private Dao<ExperimentBuilder.ExperimentProfile, Long> experimentProfiles;
+
+    private Dao<User, String> users;
 
     private transient Scheduler scheduler;
 
@@ -28,8 +31,16 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
             this.connectionSource.setTestBeforeGet(true);
 
             TableUtils.createTableIfNotExists(this.connectionSource, ExperimentBuilder.ExperimentProfile.class);
+            TableUtils.createTableIfNotExists(this.connectionSource, User.class);
 
             this.experimentProfiles = DaoManager.createDao(this.connectionSource, ExperimentBuilder.ExperimentProfile.class);
+            this.users = DaoManager.createDao(this.connectionSource, User.class);
+            
+            this.runningExperimentEnabled = false;
+
+            if (!this.users.idExists(USER_ID_ADMIN)) {
+                this.setUserPassword(USER_ID_ADMIN, USER_PASSWORD_ADMIN);
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -111,8 +122,27 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
         this.runningExperimentEnabled = runningExperimentEnabled;
     }
 
+    @Override
+    public void setUserPassword(String userId, String password) throws SQLException {
+        if (!this.users.idExists(userId)) {
+            this.users.create(new User(userId, password));
+        } else {
+            User user = this.users.queryForId(userId);
+            user.setPassword(password);
+            this.users.update(user);
+        }
+    }
+
+    @Override
+    public boolean authenticateUser(String userId, String password) throws SQLException {
+        return this.users.idExists(userId) && this.users.queryForId(userId).getPassword().equals(password);
+    }
+
     private void doHousekeeping() throws SQLException {
     }
+
+    public static final String USER_ID_ADMIN = "itecgo";
+    public static final String USER_PASSWORD_ADMIN = "1026@ustc";
 
     public static final String DATABASE_REVISION = "18";
 

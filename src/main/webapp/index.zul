@@ -1,0 +1,52 @@
+<?page title="首页 - Archimulator用户后台"?>
+<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit"?>
+<zk>
+    <window id="win" title="首页 - Archimulator用户后台" border="normal" width="100%" visible="false" apply="archimulator.view.IndexPage">
+        <zscript>
+         import org.zkoss.zk.ui.*;
+
+         Session s = Sessions.getCurrent();
+         if(s.getAttribute("userId") == null)
+           Executions.sendRedirect("login.zul");
+         else
+            win.setVisible(true);
+
+         void logout() {
+           s.invalidate();
+           Executions.sendRedirect("login.zul");
+         }
+         </zscript>
+        <vbox>
+            <hbox>
+                <label style="color:red">运行实验:</label>
+                <checkbox id="checkboxRunningExperimentEnabled"/>
+            </hbox>
+        </vbox>
+
+        <separator bar="true"/>
+
+        <vbox>
+            <hbox>
+                <button id="buttonGoToBenchmarks" label="评测程序管理" href="benchmarks.zul"/>
+                <button id="buttonGoToArchitectures" label="目标体系结构管理" href="architectures.zul"/>
+                <button id="buttonGoToExperiments" label="实验管理" href="experiments.zul"/>
+                <button id="buttonClearData" label="清空数据" style="color:red"/>
+                <button id="buttonLogout" label="注销" onClick="logout()"/>
+            </hbox>
+        </vbox>
+
+        <separator/>
+        <separator bar="true"/>
+
+        <vbox>
+            <hbox>
+                新密码:
+                <textbox id="textboxChangePassword" type="password" width="100px"/>
+                <button id="buttonChangePassword" label="修改密码"/>
+            </hbox>
+        </vbox>
+    </window>
+</zk>
+
+
+			

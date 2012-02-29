@@ -21,4 +21,8 @@ public interface ArchimulatorService {
     boolean isRunningExperimentEnabled();
 
     void setRunningExperimentEnabled(boolean runningExperimentEnabled);
+
+    void setUserPassword(String userId, String password) throws SQLException;
+
+    boolean authenticateUser(String userId, String password) throws SQLException;
 }
