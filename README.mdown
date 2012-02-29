@@ -1,4 +1,4 @@
-Archimulator 2.0 README
+Archimulator 3.0 README
 ========
 
 This README briefly describes what Archimulator is and how to setup & run Archimulator.
