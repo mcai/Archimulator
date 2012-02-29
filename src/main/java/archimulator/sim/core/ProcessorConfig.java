@@ -18,17 +18,15 @@
  ******************************************************************************/
 package archimulator.sim.core;
 
-import archimulator.model.capability.ProcessorCapability;
-import archimulator.model.capability.ProcessorCapabilityFactory;
+import archimulator.model.capability.*;
 import archimulator.sim.core.bpred.BranchPredictorConfig;
 import archimulator.sim.core.bpred.PerfectBranchPredictorConfig;
-import archimulator.sim.os.KernelCapability;
-import archimulator.sim.os.KernelCapabilityFactory;
+import archimulator.model.capability.KernelCapability;
 import archimulator.sim.uncore.MemoryHierarchyConfig;
 import archimulator.sim.uncore.tlb.TranslationLookasideBufferConfig;
 
 import java.io.Serializable;
-import java.util.Map;
+import java.util.List;
 
 public class ProcessorConfig implements Serializable {
     private int numCores;
@@ -47,14 +45,14 @@ public class ProcessorConfig implements Serializable {
 
     private MemoryHierarchyConfig memoryHierarchyConfig;
 
-    private Map<Class<? extends ProcessorCapability>, ProcessorCapabilityFactory> processorCapabilityFactories;
-    private Map<Class<? extends KernelCapability>, KernelCapabilityFactory> kernelCapabilityFactories;
+    private List<Class<? extends ProcessorCapability>> processorCapabilityClasses;
+    private List<Class<? extends KernelCapability>> kernelCapabilityClasses;
 
-    public ProcessorConfig(int numCores, int numThreadsPerCore, MemoryHierarchyConfig memoryHierarchyConfig, Map<Class<? extends ProcessorCapability>, ProcessorCapabilityFactory> processorCapabilityFactories, Map<Class<? extends KernelCapability>, KernelCapabilityFactory> kernelCapabilityFactories) {
-        this(numCores, numThreadsPerCore, 128, 4, 4, 4, 96, 96, 48, memoryHierarchyConfig, processorCapabilityFactories, kernelCapabilityFactories);
+    public ProcessorConfig(int numCores, int numThreadsPerCore, MemoryHierarchyConfig memoryHierarchyConfig, List<Class<? extends ProcessorCapability>> processorCapabilityClasses, List<Class<? extends KernelCapability>> kernelCapabilityClasses) {
+        this(numCores, numThreadsPerCore, 128, 4, 4, 4, 96, 96, 48, memoryHierarchyConfig, processorCapabilityClasses, kernelCapabilityClasses);
     }
 
-    public ProcessorConfig(int numCores, int numThreadsPerCore, int physicalRegisterFileCapacity, int decodeWidth, int issueWidth, int commitWidth, int decodeBufferCapacity, int reorderBufferCapacity, int loadStoreQueueCapacity, MemoryHierarchyConfig memoryHierarchyConfig, Map<Class<? extends ProcessorCapability>, ProcessorCapabilityFactory> processorCapabilityFactories, Map<Class<? extends KernelCapability>, KernelCapabilityFactory> kernelCapabilityFactories) {
+    public ProcessorConfig(int numCores, int numThreadsPerCore, int physicalRegisterFileCapacity, int decodeWidth, int issueWidth, int commitWidth, int decodeBufferCapacity, int reorderBufferCapacity, int loadStoreQueueCapacity, MemoryHierarchyConfig memoryHierarchyConfig, List<Class<? extends ProcessorCapability>> processorCapabilityClasses, List<Class<? extends KernelCapability>> kernelCapabilityClasses) {
         this.numCores = numCores;
         this.numThreadsPerCore = numThreadsPerCore;
 
@@ -68,8 +66,8 @@ public class ProcessorConfig implements Serializable {
 
         this.memoryHierarchyConfig = memoryHierarchyConfig;
 
-        this.processorCapabilityFactories = processorCapabilityFactories;
-        this.kernelCapabilityFactories = kernelCapabilityFactories;
+        this.processorCapabilityClasses = processorCapabilityClasses;
+        this.kernelCapabilityClasses = kernelCapabilityClasses;
     }
 
     public int getNumCores() {
@@ -128,16 +126,16 @@ public class ProcessorConfig implements Serializable {
         return memoryHierarchyConfig;
     }
 
-    public Map<Class<? extends ProcessorCapability>, ProcessorCapabilityFactory> getProcessorCapabilityFactories() {
-        return processorCapabilityFactories;
+    public List<Class<? extends ProcessorCapability>> getProcessorCapabilityClasses() {
+        return processorCapabilityClasses;
     }
 
-    public Map<Class<? extends KernelCapability>, KernelCapabilityFactory> getKernelCapabilityFactories() {
-        return kernelCapabilityFactories;
+    public List<Class<? extends KernelCapability>> getKernelCapabilityClasses() {
+        return kernelCapabilityClasses;
     }
 
-    public static ProcessorConfig createDefaultProcessorConfig(MemoryHierarchyConfig memoryHierarchyConfig, Map<Class<? extends ProcessorCapability>, ProcessorCapabilityFactory> processorCapabilityFactories, Map<Class<? extends KernelCapability>, KernelCapabilityFactory> kernelCapabilityFactories, int numCores, int numThreadsPerCore) {
-        ProcessorConfig processorConfig = new ProcessorConfig(numCores, numThreadsPerCore, memoryHierarchyConfig, processorCapabilityFactories, kernelCapabilityFactories);
+    public static ProcessorConfig createDefaultProcessorConfig(MemoryHierarchyConfig memoryHierarchyConfig, List<Class<? extends ProcessorCapability>> processorCapabilityClasses, List<Class<? extends KernelCapability>> kernelCapabilityClasses, int numCores, int numThreadsPerCore) {
+        ProcessorConfig processorConfig = new ProcessorConfig(numCores, numThreadsPerCore, memoryHierarchyConfig, processorCapabilityClasses, kernelCapabilityClasses);
         processorConfig.setBpred(new PerfectBranchPredictorConfig());
         processorConfig.setTlb(new TranslationLookasideBufferConfig(32768, 4));
         return processorConfig;

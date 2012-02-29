@@ -20,7 +20,6 @@ package archimulator.sim.uncore.coherence.ext;
 
 import archimulator.model.simulation.Simulation;
 import archimulator.model.capability.SimulationCapability;
-import archimulator.model.capability.SimulationCapabilityFactory;
 import archimulator.model.event.DumpStatEvent;
 import archimulator.model.event.PollStatsEvent;
 import archimulator.model.event.PseudocallEncounteredEvent;
@@ -186,10 +185,4 @@ public class LastLevelCacheMissProfilingCapability implements SimulationCapabili
             return (int) (endCycle - beginCycle);
         }
     }
-
-    public static final SimulationCapabilityFactory FACTORY = new SimulationCapabilityFactory() {
-        public SimulationCapability createCapability(Simulation simulation) {
-            return new LastLevelCacheMissProfilingCapability(simulation);
-        }
-    };
 }

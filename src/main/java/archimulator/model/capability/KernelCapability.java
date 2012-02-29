@@ -16,8 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.os;
+package archimulator.model.capability;
 
-public interface KernelCapabilityFactory {
-    KernelCapability createCapability(Kernel kernel);
+public interface KernelCapability extends Capability {
 }

@@ -110,12 +110,12 @@ public class Startup {
                 experimentProfiles.add(on().cores(2).threadsPerCore(2).l2Size(1024 * l2SizeInKByte).l2Associativity(8)
                         .with().workload(simulatedProgram)
                         .simulate().functionallyToPseudoCallAndInDetailForMaxInsts(3720, 2000000000)
-                        .addSimulationCapabilityFactory(LastLevelCacheHtRequestCachePollutionProfilingCapability.class, LastLevelCacheHtRequestCachePollutionProfilingCapability.FACTORY));
+                        .addSimulationCapabilityClass(LastLevelCacheHtRequestCachePollutionProfilingCapability.class));
 
                 experimentProfiles.add(on().cores(2).threadsPerCore(2).l2Size(1024 * l2SizeInKByte).l2Associativity(8)
                         .with().workload(simulatedProgram)
                         .simulate().inDetailToEnd()
-                        .addSimulationCapabilityFactory(LastLevelCacheHtRequestCachePollutionProfilingCapability.class, LastLevelCacheHtRequestCachePollutionProfilingCapability.FACTORY));
+                        .addSimulationCapabilityClass(LastLevelCacheHtRequestCachePollutionProfilingCapability.class));
             }
         }
         

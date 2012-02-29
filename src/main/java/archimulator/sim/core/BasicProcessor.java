@@ -18,10 +18,10 @@
  ******************************************************************************/
 package archimulator.sim.core;
 
+import archimulator.model.capability.CapabilityFactory;
 import archimulator.model.simulation.BasicSimulationObject;
 import archimulator.model.simulation.Logger;
 import archimulator.model.capability.ProcessorCapability;
-import archimulator.model.capability.ProcessorCapabilityFactory;
 import archimulator.model.event.ResetStatEvent;
 import archimulator.sim.os.Context;
 import archimulator.sim.os.ContextKilledEvent;
@@ -48,7 +48,7 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
 
     private Map<Context, Thread> contextToThreadMappings;
 
-    public BasicProcessor(BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, Logger logger, ProcessorConfig processorConfig, Kernel kernel, CacheHierarchy cacheHierarchy, Map<Class<? extends ProcessorCapability>, ProcessorCapabilityFactory> capabilityFactories) {
+    public BasicProcessor(BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, Logger logger, ProcessorConfig processorConfig, Kernel kernel, CacheHierarchy cacheHierarchy, List<Class<? extends ProcessorCapability>> capabilityClasses) {
         super(blockingEventDispatcher, cycleAccurateEventQueue, logger);
 
         this.config = processorConfig;
@@ -89,8 +89,8 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
 
         this.capabilities = new HashMap<Class<? extends ProcessorCapability>, ProcessorCapability>();
 
-        for (Map.Entry<Class<? extends ProcessorCapability>, ProcessorCapabilityFactory> entry : capabilityFactories.entrySet()) {
-            this.capabilities.put(entry.getKey(), entry.getValue().createCapability(this));
+        for(Class<? extends ProcessorCapability> capabilityClz : capabilityClasses) {
+            this.capabilities.put(capabilityClz, CapabilityFactory.createProcessorCapability(capabilityClz, this));
         }
     }
 

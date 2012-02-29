@@ -18,6 +18,8 @@
  ******************************************************************************/
 package archimulator.sim.os;
 
+import archimulator.model.capability.CapabilityFactory;
+import archimulator.model.capability.KernelCapability;
 import archimulator.model.simulation.BasicSimulationObject;
 import archimulator.model.simulation.Simulation;
 import archimulator.model.simulation.SimulationObject;
@@ -48,7 +50,7 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
 
     private Map<Class<? extends KernelCapability>, KernelCapability> capabilities;
 
-    public Kernel(Simulation simulation, int numCores, int numThreadsPerCore, Map<Class<? extends KernelCapability>, KernelCapabilityFactory> capabilityFactories) {
+    public Kernel(Simulation simulation, int numCores, int numThreadsPerCore, List<Class<? extends KernelCapability>> capabilityClasses) {
         super(simulation);
 
         this.numCores = numCores;
@@ -69,8 +71,8 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
 
         this.capabilities = new HashMap<Class<? extends KernelCapability>, KernelCapability>();
 
-        for (Map.Entry<Class<? extends KernelCapability>, KernelCapabilityFactory> entry : capabilityFactories.entrySet()) {
-            this.capabilities.put(entry.getKey(), entry.getValue().createCapability(this));
+        for(Class<? extends KernelCapability> capabilityClz : capabilityClasses) {
+            this.capabilities.put(capabilityClz, CapabilityFactory.createKernelCapability(capabilityClz, this));
         }
 
         simulation.getBlockingEventDispatcher().dispatch(new KernelCapabilitiesInitializedEvent());

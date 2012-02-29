@@ -18,8 +18,8 @@
  ******************************************************************************/
 package archimulator.model.simulation;
 
+import archimulator.model.capability.CapabilityFactory;
 import archimulator.model.capability.SimulationCapability;
-import archimulator.model.capability.SimulationCapabilityFactory;
 import archimulator.model.event.*;
 import archimulator.model.strategy.SimulationStrategy;
 import archimulator.sim.core.BasicProcessor;
@@ -68,7 +68,7 @@ public class Simulation implements SimulationObject {
 
     private Logger logger;
 
-    public Simulation(SimulationConfig config, SimulationStrategy strategy, Map<Class<? extends SimulationCapability>, SimulationCapabilityFactory> capabilityFactories, BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
+    public Simulation(SimulationConfig config, SimulationStrategy strategy, List<Class<? extends SimulationCapability>> capabilityClasses, BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
         this.blockingEventDispatcher = blockingEventDispatcher;
         this.cycleAccurateEventQueue = cycleAccurateEventQueue;
 
@@ -86,7 +86,7 @@ public class Simulation implements SimulationObject {
 
         this.capabilities = new HashMap<Class<? extends SimulationCapability>, SimulationCapability>();
 
-        this.processor = new BasicProcessor(this.blockingEventDispatcher, this.cycleAccurateEventQueue, this.logger, this.config.getProcessorConfig(), this.getStrategy().prepareKernel(), this.getStrategy().prepareCacheHierarchy(), this.config.getProcessorConfig().getProcessorCapabilityFactories());
+        this.processor = new BasicProcessor(this.blockingEventDispatcher, this.cycleAccurateEventQueue, this.logger, this.config.getProcessorConfig(), this.getStrategy().prepareKernel(), this.getStrategy().prepareCacheHierarchy(), this.config.getProcessorConfig().getProcessorCapabilityClasses());
 
         this.getBlockingEventDispatcher().dispatch(new ProcessorInitializedEvent(this.processor));
 
@@ -103,13 +103,13 @@ public class Simulation implements SimulationObject {
             }
         });
 
-        for (Map.Entry<Class<? extends SimulationCapability>, SimulationCapabilityFactory> entry : capabilityFactories.entrySet()) {
-            this.capabilities.put(entry.getKey(), entry.getValue().createCapability(this));
+        for(Class<? extends SimulationCapability> capabilityClz : capabilityClasses) {
+            this.capabilities.put(capabilityClz, CapabilityFactory.createSimulationCapability(capabilityClz, this));
         }
     }
 
     public Kernel createKernel() {
-        Kernel kernel = new Kernel(this, this.config.getProcessorConfig().getNumCores(), this.config.getProcessorConfig().getNumThreadsPerCore(), this.config.getProcessorConfig().getKernelCapabilityFactories());
+        Kernel kernel = new Kernel(this, this.config.getProcessorConfig().getNumCores(), this.config.getProcessorConfig().getNumThreadsPerCore(), this.config.getProcessorConfig().getKernelCapabilityClasses());
 
         for (final ContextConfig contextConfig : this.config.getContextConfigs()) {
             final Context context = Context.load(kernel, this.config.getCwd(), contextConfig);

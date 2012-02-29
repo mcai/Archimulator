@@ -21,7 +21,6 @@ package archimulator.sim.ext.core;
 import archimulator.model.simulation.Logger;
 import archimulator.model.simulation.SimulationObject;
 import archimulator.model.capability.ProcessorCapability;
-import archimulator.model.capability.ProcessorCapabilityFactory;
 import archimulator.sim.core.Core;
 import archimulator.sim.core.Processor;
 import archimulator.sim.core.Thread;
@@ -533,10 +532,4 @@ public class DynamicSpeculativePrecomputationCapability implements ProcessorCapa
     }
 
     private static final int SLICE_CACHE_CAPACITY = 32;
-
-    public static final ProcessorCapabilityFactory FACTORY = new ProcessorCapabilityFactory() {
-        public ProcessorCapability createCapability(Processor processor) {
-            return new DynamicSpeculativePrecomputationCapability(processor);
-        }
-    };
 }

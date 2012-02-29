@@ -19,7 +19,6 @@
 package archimulator.sim.ext.uncore.newHt;
 
 import archimulator.model.capability.ProcessorCapability;
-import archimulator.model.capability.ProcessorCapabilityFactory;
 import archimulator.model.event.DumpStatEvent;
 import archimulator.model.event.PollStatsEvent;
 import archimulator.model.event.ResetStatEvent;
@@ -337,10 +336,4 @@ public class FsmBasedHtRequestLlcVictimTrackingCapability implements ProcessorCa
 
         public static final List<CacheLineHtRequestCondition> EVICTED = Arrays.asList(EVICTED_BY_HT, EVICTED_BY_MT, FLUSH);
     }
-
-    public static final ProcessorCapabilityFactory FACTORY = new ProcessorCapabilityFactory() {
-        public ProcessorCapability createCapability(Processor processor) {
-            return new FsmBasedHtRequestLlcVictimTrackingCapability(processor);
-        }
-    };
 }

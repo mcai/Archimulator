@@ -18,7 +18,5 @@
  ******************************************************************************/
 package archimulator.model.capability;
 
-import java.io.Serializable;
-
-public interface ProcessorCapability extends Serializable {
+public interface ProcessorCapability extends Capability {
 }

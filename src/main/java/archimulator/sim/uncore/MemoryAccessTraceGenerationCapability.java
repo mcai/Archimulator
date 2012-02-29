@@ -20,7 +20,6 @@ package archimulator.sim.uncore;
 
 import archimulator.model.simulation.Simulation;
 import archimulator.model.capability.SimulationCapability;
-import archimulator.model.capability.SimulationCapabilityFactory;
 import archimulator.util.action.Action1;
 
 import java.io.PrintWriter;
@@ -59,10 +58,4 @@ public class MemoryAccessTraceGenerationCapability implements SimulationCapabili
     private void writeTraceLine(MemoryAccessTraceLine memoryAccessTraceLine) {
         this.fileWriter.printf("%s\n", memoryAccessTraceLine);
     }
-
-    public static final SimulationCapabilityFactory FACTORY = new SimulationCapabilityFactory() {
-        public SimulationCapability createCapability(Simulation simulation) {
-            return new MemoryAccessTraceGenerationCapability(simulation);
-        }
-    };
 }

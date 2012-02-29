@@ -18,27 +18,22 @@
  ******************************************************************************/
 package archimulator.model.experiment;
 
-import archimulator.model.capability.ProcessorCapability;
-import archimulator.model.capability.ProcessorCapabilityFactory;
-import archimulator.model.capability.SimulationCapability;
-import archimulator.model.capability.SimulationCapabilityFactory;
+import archimulator.model.capability.*;
 import archimulator.model.simulation.ContextConfig;
 import archimulator.model.simulation.SimulationStartingImage;
 import archimulator.model.strategy.checkpoint.CheckpointToInstructionCountBasedDetailedSimulationStrategy;
 import archimulator.model.strategy.checkpoint.RoiBasedRunToCheckpointFunctionalSimulationStrategy;
-import archimulator.sim.os.KernelCapability;
-import archimulator.sim.os.KernelCapabilityFactory;
+import archimulator.model.capability.KernelCapability;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicyFactory;
 
 import java.util.List;
-import java.util.Map;
 
 public class CheckpointedExperiment extends Experiment {
     private int maxInsts;
     private int pthreadSpawnedIndex;
 
-    public CheckpointedExperiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs, int maxInsts, int l2Size, int l2Associativity, EvictionPolicyFactory l2EvictionPolicyFactory, int pthreadSpawnedIndex, Map<Class<? extends SimulationCapability>, SimulationCapabilityFactory> simulationCapabilityFactories, Map<Class<? extends ProcessorCapability>, ProcessorCapabilityFactory> processorCapabilityFactories, Map<Class<? extends KernelCapability>, KernelCapabilityFactory> kernelCapabilityFactories) {
-        super(title, numCores, numThreadsPerCore, contextConfigs, l2Size, l2Associativity, l2EvictionPolicyFactory, simulationCapabilityFactories, processorCapabilityFactories, kernelCapabilityFactories);
+    public CheckpointedExperiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs, int maxInsts, int l2Size, int l2Associativity, EvictionPolicyFactory l2EvictionPolicyFactory, int pthreadSpawnedIndex, List<Class<? extends SimulationCapability>> simulationCapabilityClasses, List<Class<? extends ProcessorCapability>> processorCapabilityClasses, List<Class<? extends KernelCapability>> kernelCapabilityClasses) {
+        super(title, numCores, numThreadsPerCore, contextConfigs, l2Size, l2Associativity, l2EvictionPolicyFactory, simulationCapabilityClasses, processorCapabilityClasses, kernelCapabilityClasses);
         this.maxInsts = maxInsts;
         this.pthreadSpawnedIndex = pthreadSpawnedIndex;
     }

@@ -18,11 +18,10 @@
  ******************************************************************************/
 package archimulator.sim.isa;
 
+import archimulator.model.capability.KernelCapability;
 import archimulator.model.event.DumpStatEvent;
 import archimulator.model.event.PollStatsEvent;
 import archimulator.sim.os.Kernel;
-import archimulator.sim.os.KernelCapability;
-import archimulator.sim.os.KernelCapabilityFactory;
 import archimulator.util.action.Action1;
 
 import java.util.EnumSet;
@@ -93,10 +92,4 @@ public class FunctionalExecutionProfilingCapability implements KernelCapability 
             stats.put("FunctionalExecutionProfilingCapability" + ".executedSyscalls." + syscallName, "");
         }
     }
-
-    public static final KernelCapabilityFactory FACTORY = new KernelCapabilityFactory() {
-        public KernelCapability createCapability(Kernel kernel) {
-            return new FunctionalExecutionProfilingCapability(kernel);
-        }
-    };
 }

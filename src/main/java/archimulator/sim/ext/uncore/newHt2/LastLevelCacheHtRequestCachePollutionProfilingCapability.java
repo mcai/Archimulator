@@ -20,7 +20,6 @@ package archimulator.sim.ext.uncore.newHt2;
 
 import archimulator.model.simulation.Simulation;
 import archimulator.model.capability.SimulationCapability;
-import archimulator.model.capability.SimulationCapabilityFactory;
 import archimulator.model.event.*;
 import archimulator.sim.core.BasicThread;
 import archimulator.sim.ext.uncore.newHt2.state.*;
@@ -400,10 +399,4 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
     public CacheLine<HtRequestVictimCacheLineState> findHtRequestVictimLine(int tag) {
         return this.htRequestVictimCache.findLine(tag);
     }
-
-    public static final SimulationCapabilityFactory FACTORY = new SimulationCapabilityFactory() {
-        public SimulationCapability createCapability(Simulation simulation) {
-            return new LastLevelCacheHtRequestCachePollutionProfilingCapability(simulation);
-        }
-    };
 }

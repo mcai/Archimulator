@@ -19,7 +19,6 @@
 package archimulator.sim.ext.uncore.ht;
 
 import archimulator.model.capability.ProcessorCapability;
-import archimulator.model.capability.ProcessorCapabilityFactory;
 import archimulator.model.event.DumpStatEvent;
 import archimulator.model.event.PollStatsEvent;
 import archimulator.model.event.ResetStatEvent;
@@ -440,10 +439,4 @@ public class HtRequestL2VictimTrackingCapability implements ProcessorCapability 
             return mirrorCache.getLine(ownerCacheLine.getSet(), ownerCacheLine.getWay());
         }
     }
-
-    public static final ProcessorCapabilityFactory FACTORY = new ProcessorCapabilityFactory() {
-        public ProcessorCapability createCapability(Processor processor) {
-            return new HtRequestL2VictimTrackingCapability(processor);
-        }
-    };
 }

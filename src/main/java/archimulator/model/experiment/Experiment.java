@@ -18,10 +18,7 @@
  ******************************************************************************/
 package archimulator.model.experiment;
 
-import archimulator.model.capability.ProcessorCapability;
-import archimulator.model.capability.ProcessorCapabilityFactory;
-import archimulator.model.capability.SimulationCapability;
-import archimulator.model.capability.SimulationCapabilityFactory;
+import archimulator.model.capability.*;
 import archimulator.model.event.DumpStatEvent;
 import archimulator.model.event.PauseSimulationEvent;
 import archimulator.model.event.StopSimulationEvent;
@@ -30,8 +27,7 @@ import archimulator.model.simulation.Simulation;
 import archimulator.model.simulation.SimulationConfig;
 import archimulator.model.strategy.SimulationStrategy;
 import archimulator.sim.core.ProcessorConfig;
-import archimulator.sim.os.KernelCapability;
-import archimulator.sim.os.KernelCapabilityFactory;
+import archimulator.model.capability.KernelCapability;
 import archimulator.sim.uncore.MemoryHierarchyConfig;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicyFactory;
 import archimulator.util.action.Action1;
@@ -43,15 +39,12 @@ import archimulator.util.fsm.FiniteStateMachine;
 import archimulator.util.fsm.FiniteStateMachineFactory;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
 public abstract class Experiment {
-    private Map<Class<? extends SimulationCapability>, SimulationCapabilityFactory> simulationCapabilityFactories = new HashMap<Class<? extends SimulationCapability>, SimulationCapabilityFactory>();
+    private List<Class<? extends SimulationCapability>> simulationCapabilityClasses = new ArrayList<Class<? extends SimulationCapability>> ();
 
     private long id;
 
@@ -75,7 +68,7 @@ public abstract class Experiment {
 
     private Simulation simulation;
 
-    public Experiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs, int l2Size, int l2Associativity, EvictionPolicyFactory l2EvictionPolicyFactory, Map<Class<? extends SimulationCapability>, SimulationCapabilityFactory> simulationCapabilityFactories, Map<Class<? extends ProcessorCapability>, ProcessorCapabilityFactory> processorCapabilityFactories, Map<Class<? extends KernelCapability>, KernelCapabilityFactory> kernelCapabilityFactories) {
+    public Experiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs, int l2Size, int l2Associativity, EvictionPolicyFactory l2EvictionPolicyFactory, List<Class<? extends SimulationCapability>> simulationCapabilityClasses, List<Class<? extends ProcessorCapability>> processorCapabilityClasses, List<Class<? extends KernelCapability>> kernelCapabilityClasses) {
         this.id = currentId++;
 
         this.title = title;
@@ -83,9 +76,9 @@ public abstract class Experiment {
         this.numThreadsPerCore = numThreadsPerCore;
         this.contextConfigs = contextConfigs;
 
-        this.processorConfig = ProcessorConfig.createDefaultProcessorConfig(MemoryHierarchyConfig.createDefaultMemoryHierarchyConfig(l2Size, l2Associativity, l2EvictionPolicyFactory), processorCapabilityFactories, kernelCapabilityFactories, this.numCores, this.numThreadsPerCore);
+        this.processorConfig = ProcessorConfig.createDefaultProcessorConfig(MemoryHierarchyConfig.createDefaultMemoryHierarchyConfig(l2Size, l2Associativity, l2EvictionPolicyFactory), processorCapabilityClasses, kernelCapabilityClasses, this.numCores, this.numThreadsPerCore);
 
-        this.simulationCapabilityFactories = simulationCapabilityFactories;
+        this.simulationCapabilityClasses = simulationCapabilityClasses;
         
         this.beginTime = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date());
 
@@ -216,7 +209,7 @@ public abstract class Experiment {
     }
 
     protected void doSimulation(String title, SimulationStrategy strategy, BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
-        this.simulation = new Simulation(new SimulationConfig(title, this.processorConfig, this.contextConfigs), strategy, this.simulationCapabilityFactories, blockingEventDispatcher, cycleAccurateEventQueue);
+        this.simulation = new Simulation(new SimulationConfig(title, this.processorConfig, this.contextConfigs), strategy, this.simulationCapabilityClasses, blockingEventDispatcher, cycleAccurateEventQueue);
 
         this.simulation.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
             public void apply(DumpStatEvent event) {

@@ -18,14 +18,10 @@
  ******************************************************************************/
 package archimulator.model.experiment;
 
-import archimulator.model.capability.ProcessorCapability;
-import archimulator.model.capability.ProcessorCapabilityFactory;
-import archimulator.model.capability.SimulationCapability;
-import archimulator.model.capability.SimulationCapabilityFactory;
+import archimulator.model.capability.*;
 import archimulator.model.simulation.ContextConfig;
 import archimulator.model.simulation.SimulatedProgram;
-import archimulator.sim.os.KernelCapability;
-import archimulator.sim.os.KernelCapabilityFactory;
+import archimulator.model.capability.KernelCapability;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicyFactory;
 import archimulator.sim.uncore.cache.eviction.LeastRecentlyUsedEvictionPolicy;
 import com.j256.ormlite.field.DataType;
@@ -50,8 +46,8 @@ public class ExperimentBuilder {
         private int l2Size = 1024 * 1024 * 4;
         private int l2Associativity = 8;
 
-        private Map<Class<? extends ProcessorCapability>, ProcessorCapabilityFactory> processorCapabilityFactories = new HashMap<Class<? extends ProcessorCapability>, ProcessorCapabilityFactory>();
-        private Map<Class<? extends KernelCapability>, KernelCapabilityFactory> kernelCapabilityFactories = new HashMap<Class<? extends KernelCapability>, KernelCapabilityFactory>();
+        private List<Class<? extends ProcessorCapability>> processorCapabilityClasses = new ArrayList<Class<? extends ProcessorCapability>>();
+        private List<Class<? extends KernelCapability>> kernelCapabilityClasses = new ArrayList<Class<? extends KernelCapability>>();
 
         public ProcessorProfile cores(int numCores) {
             this.numCores = numCores;
@@ -73,13 +69,13 @@ public class ExperimentBuilder {
             return this;
         }
 
-        public ProcessorProfile addProcessorCapabilityFactory(Class<? extends ProcessorCapability> clz, ProcessorCapabilityFactory factory) {
-            this.processorCapabilityFactories.put(clz, factory);
+        public ProcessorProfile addProcessorCapabilityClass(Class<? extends ProcessorCapability> clz) {
+            this.processorCapabilityClasses.add(clz);
             return this;
         }
 
-        public ProcessorProfile addKernelCapabilityFactory(Class<? extends KernelCapability> clz, KernelCapabilityFactory factory) {
-            this.kernelCapabilityFactories.put(clz, factory);
+        public ProcessorProfile addKernelCapabilityClass(Class<? extends KernelCapability> clz) {
+            this.kernelCapabilityClasses.add(clz);
             return this;
         }
 
@@ -103,12 +99,12 @@ public class ExperimentBuilder {
             return l2Associativity;
         }
 
-        public Map<Class<? extends ProcessorCapability>, ProcessorCapabilityFactory> getProcessorCapabilityFactories() {
-            return processorCapabilityFactories;
+        public List<Class<? extends ProcessorCapability>> getProcessorCapabilityClasses() {
+            return processorCapabilityClasses;
         }
 
-        public Map<Class<? extends KernelCapability>, KernelCapabilityFactory> getKernelCapabilityFactories() {
-            return kernelCapabilityFactories;
+        public List<Class<? extends KernelCapability>> getKernelCapabilityClasses() {
+            return kernelCapabilityClasses;
         }
     }
 
@@ -164,7 +160,7 @@ public class ExperimentBuilder {
         private WorkloadProfile workloadProfile;
 
         @DatabaseField(dataType = DataType.SERIALIZABLE)
-        private HashMap<Class<? extends SimulationCapability>, SimulationCapabilityFactory> simulationCapabilityFactories = new HashMap<Class<? extends SimulationCapability>, SimulationCapabilityFactory>();
+        private ArrayList<Class<? extends SimulationCapability>> simulationCapabilityClasses = new ArrayList<Class<? extends SimulationCapability>>();
 
         @DatabaseField
         private ExperimentProfileType type;
@@ -204,8 +200,8 @@ public class ExperimentBuilder {
             return this;
         }
 
-        public ExperimentProfile addSimulationCapabilityFactory(Class<? extends SimulationCapability> clz, SimulationCapabilityFactory factory) {
-            this.simulationCapabilityFactories.put(clz, factory);
+        public ExperimentProfile addSimulationCapabilityClass(Class<? extends SimulationCapability> clz) {
+            this.simulationCapabilityClasses.add(clz);
             return this;
         }
         
@@ -216,8 +212,8 @@ public class ExperimentBuilder {
                             this.getProcessorProfile().getNumCores(),
                             this.getProcessorProfile().getNumThreadsPerCore(),
                             this.workloadProfile.getContextConfigs(),
-                            this.simulationCapabilityFactories, this.getProcessorProfile().getProcessorCapabilityFactories(),
-                            this.getProcessorProfile().getKernelCapabilityFactories()
+                            this.simulationCapabilityClasses, this.getProcessorProfile().getProcessorCapabilityClasses(),
+                            this.getProcessorProfile().getKernelCapabilityClasses()
                     ).runToEnd();
                     break;
                 case DETAILED_EXPERIMENT:
@@ -226,8 +222,8 @@ public class ExperimentBuilder {
                             this.getProcessorProfile().getNumThreadsPerCore(),
                             this.workloadProfile.getContextConfigs(),
                             this.getProcessorProfile().getL2Size(), this.getProcessorProfile().getL2Associativity(), LeastRecentlyUsedEvictionPolicy.FACTORY,
-                            this.simulationCapabilityFactories, this.getProcessorProfile().getProcessorCapabilityFactories(),
-                            this.getProcessorProfile().getKernelCapabilityFactories()
+                            this.simulationCapabilityClasses, this.getProcessorProfile().getProcessorCapabilityClasses(),
+                            this.getProcessorProfile().getKernelCapabilityClasses()
                     ).runToEnd();
                     break;
                 case CHECKPOINTED_EXPERIMENT:
@@ -237,8 +233,8 @@ public class ExperimentBuilder {
                             this.workloadProfile.getContextConfigs(),
                             this.maxInsts, this.getProcessorProfile().getL2Size(), this.getProcessorProfile().getL2Associativity(), LeastRecentlyUsedEvictionPolicy.FACTORY,
                             this.pthreadSpawnedIndex,
-                            this.simulationCapabilityFactories, this.getProcessorProfile().getProcessorCapabilityFactories(),
-                            this.getProcessorProfile().getKernelCapabilityFactories()
+                            this.simulationCapabilityClasses, this.getProcessorProfile().getProcessorCapabilityClasses(),
+                            this.getProcessorProfile().getKernelCapabilityClasses()
                     ).runToEnd();
                     break;
             }
@@ -256,8 +252,8 @@ public class ExperimentBuilder {
             return workloadProfile;
         }
 
-        public Map<Class<? extends SimulationCapability>, SimulationCapabilityFactory> getSimulationCapabilityFactories() {
-            return simulationCapabilityFactories;
+        public ArrayList<Class<? extends SimulationCapability>> getSimulationCapabilityClasses() {
+            return simulationCapabilityClasses;
         }
 
         public ExperimentProfileType getType() {
@@ -282,26 +278,29 @@ public class ExperimentBuilder {
     }
 
     private static FunctionalExperiment createFunctionExperiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs,
-                                                                 Map<Class<? extends SimulationCapability>, SimulationCapabilityFactory> simulationCapabilityFactories, Map<Class<? extends ProcessorCapability>, ProcessorCapabilityFactory> processorCapabilityFactories,
-                                                                 Map<Class<? extends KernelCapability>, KernelCapabilityFactory> kernelCapabilityFactories) {
+                                                                 List<Class<? extends SimulationCapability>> simulationCapabilityClasses,
+                                                                 List<Class<? extends ProcessorCapability>> processorCapabilityClasses,
+                                                                 List<Class<? extends KernelCapability>> kernelCapabilityClasses) {
         return new FunctionalExperiment(title, numCores, numThreadsPerCore, contextConfigs,
-                simulationCapabilityFactories, processorCapabilityFactories, kernelCapabilityFactories);
+                simulationCapabilityClasses, processorCapabilityClasses, kernelCapabilityClasses);
     }
 
     private static DetailedExperiment createDetailedExperiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs,
                                                                int l2Size, int l2Associativity, EvictionPolicyFactory l2EvictionPolicyFactory,
-                                                               Map<Class<? extends SimulationCapability>, SimulationCapabilityFactory> simulationCapabilityFactories, Map<Class<? extends ProcessorCapability>, ProcessorCapabilityFactory> processorCapabilityFactories,
-                                                               Map<Class<? extends KernelCapability>, KernelCapabilityFactory> kernelCapabilityFactories) {
+                                                               List<Class<? extends SimulationCapability>> simulationCapabilityClasses,
+                                                               List<Class<? extends ProcessorCapability>> processorCapabilityClasses,
+                                                               List<Class<? extends KernelCapability>> kernelCapabilityClasses) {
         return new DetailedExperiment(title, numCores, numThreadsPerCore, contextConfigs, l2EvictionPolicyFactory, l2Size, l2Associativity,
-                simulationCapabilityFactories, processorCapabilityFactories, kernelCapabilityFactories);
+                simulationCapabilityClasses, processorCapabilityClasses, kernelCapabilityClasses);
     }
 
     private static CheckpointedExperiment createCheckpointedExperiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs,
                                                                        int maxInsts, int l2Size, int l2Associativity, EvictionPolicyFactory l2EvictionPolicyFactory,
                                                                        int pthreadSpawnedIndex,
-                                                                       Map<Class<? extends SimulationCapability>, SimulationCapabilityFactory> simulationCapabilityFactories, Map<Class<? extends ProcessorCapability>, ProcessorCapabilityFactory> processorCapabilityFactories,
-                                                                       Map<Class<? extends KernelCapability>, KernelCapabilityFactory> kernelCapabilityFactories) {
+                                                                       List<Class<? extends SimulationCapability>> simulationCapabilityClasses,
+                                                                       List<Class<? extends ProcessorCapability>> processorCapabilityClasses,
+                                                                       List<Class<? extends KernelCapability>> kernelCapabilityClasses) {
         return new CheckpointedExperiment(title, numCores, numThreadsPerCore, contextConfigs, maxInsts, l2Size, l2Associativity, l2EvictionPolicyFactory, pthreadSpawnedIndex,
-                simulationCapabilityFactories, processorCapabilityFactories, kernelCapabilityFactories);
+                simulationCapabilityClasses, processorCapabilityClasses, kernelCapabilityClasses);
     }
 }

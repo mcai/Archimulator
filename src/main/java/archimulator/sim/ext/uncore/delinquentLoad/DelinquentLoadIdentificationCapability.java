@@ -19,7 +19,6 @@
 package archimulator.sim.ext.uncore.delinquentLoad;
 
 import archimulator.model.capability.ProcessorCapability;
-import archimulator.model.capability.ProcessorCapabilityFactory;
 import archimulator.model.event.DumpStatEvent;
 import archimulator.model.event.PollStatsEvent;
 import archimulator.sim.core.Core;
@@ -91,10 +90,4 @@ public class DelinquentLoadIdentificationCapability implements ProcessorCapabili
 //            System.out.printf("%s: Delinquent load {pc = 0x%08x, functionCallPc = 0x%08x}\n", this.getThread().getName(), delinquentLoad.getPc(), delinquentLoad.getFunctionCallPc());
         }
     }
-
-    public static final ProcessorCapabilityFactory FACTORY = new ProcessorCapabilityFactory() {
-        public ProcessorCapability createCapability(Processor processor) {
-            return new DelinquentLoadIdentificationCapability(processor);
-        }
-    };
 }
