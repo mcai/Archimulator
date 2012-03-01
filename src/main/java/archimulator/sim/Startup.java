@@ -18,8 +18,8 @@
  ******************************************************************************/
 package archimulator.sim;
 
-import archimulator.model.experiment.builder.ExperimentProfile;
-import archimulator.model.experiment.builder.ProcessorProfile;
+import archimulator.model.experiment.profile.ExperimentProfile;
+import archimulator.model.experiment.profile.ProcessorProfile;
 import archimulator.model.simulation.SimulatedProgram;
 import archimulator.sim.ext.uncore.newHt2.LastLevelCacheHtRequestCachePollutionProfilingCapability;
 

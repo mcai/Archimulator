@@ -18,9 +18,9 @@
  ******************************************************************************/
 package archimulator.service;
 
-import archimulator.model.experiment.builder.ExperimentProfile;
-import archimulator.model.experiment.builder.ExperimentProfileState;
-import archimulator.model.experiment.builder.ProcessorProfile;
+import archimulator.model.experiment.profile.ExperimentProfile;
+import archimulator.model.experiment.profile.ExperimentProfileState;
+import archimulator.model.experiment.profile.ProcessorProfile;
 import archimulator.model.simulation.SimulatedProgram;
 import archimulator.model.user.User;
 import com.j256.ormlite.dao.Dao;

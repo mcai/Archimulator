@@ -1,7 +1,7 @@
 <?page title="首页 - Archimulator用户后台"?>
 <?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit"?>
 <zk>
-    <window id="win" title="首页 - Archimulator用户后台" border="normal" width="100%" visible="false" apply="archimulator.view.IndexPage">
+    <window id="win" title="首页 - Archimulator用户后台" border="normal" width="100%" visible="false" apply="archimulator.view.page.IndexPage">
         <zscript>
          import org.zkoss.zk.ui.*;
 
@@ -27,9 +27,9 @@
 
         <vbox>
             <hbox>
-                <button id="buttonGoToBenchmarks" label="评测程序管理" href="benchmarks.zul"/>
-                <button id="buttonGoToArchitectures" label="目标体系结构管理" href="architectures.zul"/>
-                <button id="buttonGoToExperiments" label="实验管理" href="experiments.zul"/>
+                <button id="buttonGoToSimulatedPrograms" label="评测程序管理" href="simulatedPrograms.zul"/>
+                <button id="buttonGoToProcessorConfigs" label="目标体系结构管理" href="processorConfigs.zul"/>
+                <button id="buttonGoToExperimentProfiles" label="实验管理" href="experimentProfiles.zul"/>
                 <button id="buttonClearData" label="清空数据" style="color:red"/>
                 <button id="buttonLogout" label="注销" onClick="logout()"/>
             </hbox>

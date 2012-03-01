@@ -18,8 +18,8 @@
  ******************************************************************************/
 package archimulator.guest;
 
-import archimulator.model.experiment.builder.ExperimentProfile;
-import archimulator.model.experiment.builder.ProcessorProfile;
+import archimulator.model.experiment.profile.ExperimentProfile;
+import archimulator.model.experiment.profile.ProcessorProfile;
 import archimulator.model.simulation.SimulatedProgram;
 import archimulator.service.ArchimulatorService;
 import archimulator.sim.Startup;

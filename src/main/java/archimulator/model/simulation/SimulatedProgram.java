@@ -18,10 +18,12 @@
  ******************************************************************************/
 package archimulator.model.simulation;
 
+import archimulator.util.DateHelper;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.io.Serializable;
+import java.util.Date;
 
 @DatabaseTable
 public class SimulatedProgram implements Serializable {
@@ -39,6 +41,9 @@ public class SimulatedProgram implements Serializable {
 
     @DatabaseField
     private String stdin;
+
+    @DatabaseField
+    private long createdTime;
     
     public SimulatedProgram() {
     }
@@ -52,6 +57,7 @@ public class SimulatedProgram implements Serializable {
         this.exe = exe;
         this.args = args;
         this.stdin = stdin;
+        this.createdTime = DateHelper.toTick(new Date());
     }
 
     public long getId() {
@@ -72,5 +78,29 @@ public class SimulatedProgram implements Serializable {
 
     public String getStdin() {
         return stdin;
+    }
+
+    public long getCreatedTime() {
+        return createdTime;
+    }
+
+    public String getCreatedTimeAsString() {
+        return DateHelper.toString(DateHelper.fromTick(this.createdTime));
+    }
+
+    public void setCwd(String cwd) {
+        this.cwd = cwd;
+    }
+
+    public void setExe(String exe) {
+        this.exe = exe;
+    }
+
+    public void setArgs(String args) {
+        this.args = args;
+    }
+
+    public void setStdin(String stdin) {
+        this.stdin = stdin;
     }
 }

@@ -18,8 +18,8 @@
  ******************************************************************************/
 package archimulator.service;
 
-import archimulator.model.experiment.builder.ExperimentProfile;
-import archimulator.model.experiment.builder.ProcessorProfile;
+import archimulator.model.experiment.profile.ExperimentProfile;
+import archimulator.model.experiment.profile.ProcessorProfile;
 import archimulator.model.simulation.SimulatedProgram;
 import com.caucho.hessian.server.HessianServlet;
 

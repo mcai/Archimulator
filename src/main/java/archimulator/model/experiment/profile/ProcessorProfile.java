@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.model.experiment.builder;
+package archimulator.model.experiment.profile;
 
 import archimulator.model.capability.KernelCapability;
 import archimulator.model.capability.ProcessorCapability;

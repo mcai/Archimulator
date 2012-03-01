@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.view;
+package archimulator.view.page;
 
 import archimulator.service.ArchimulatorService;
 import archimulator.service.ArchimulatorServletContextListener;

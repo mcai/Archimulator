@@ -1,6 +1,6 @@
 package archimulator.util;
 
-import archimulator.model.experiment.builder.ExperimentProfile;
+import archimulator.model.experiment.profile.ExperimentProfile;
 import com.jcraft.jsch.*;
 
 import java.io.File;

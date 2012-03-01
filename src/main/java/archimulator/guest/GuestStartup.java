@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.guest;
 
-import archimulator.model.experiment.builder.ExperimentProfile;
+import archimulator.model.experiment.profile.ExperimentProfile;
 import archimulator.service.ArchimulatorService;
 import archimulator.util.DateHelper;
 import archimulator.util.UpdateHelper;

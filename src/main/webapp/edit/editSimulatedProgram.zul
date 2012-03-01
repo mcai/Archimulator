@@ -1,0 +1,61 @@
+<zk>
+    <window id="winEditSimulatedProgram" title="编辑评测程序 - Archimulator用户后台" border="normal" visible="false"
+            width="30%" height="300px" sizable="true"
+            apply="archimulator.view.page.edit.EditSimulatedProgramPage">
+        <zscript>
+            import org.zkoss.zk.ui.*;
+
+            Session s = Sessions.getCurrent();
+            if(s.getAttribute("userId") == null)
+            Executions.sendRedirect("login.zul");
+            else
+            winEditSimulatedProgram.setVisible(true);
+
+            void logout() {
+            s.invalidate();
+            Executions.sendRedirect("login.zul");
+            }
+        </zscript>
+        <grid>
+            <columns>
+                <column width="100px"/>
+                <column width="200px"/>
+                <column width="200px"/>
+                <column width="200px"/>
+                <column width="200px"/>
+            </columns>
+            <rows>
+                <row>
+                    编号
+                    <textbox id="textboxId" readonly="true" width="150px"/>
+                </row>
+                <row>
+                    当前目录
+                    <textbox id="textboxCwd" width="150px"/>
+                </row>
+                <row>
+                    可执行文件名
+                    <textbox id="textboxExe" width="150px"/>
+                </row>
+                <row>
+                    程序参数
+                    <textbox id="textboxArgs" width="150px"/>
+                </row>
+                <row>
+                    标准输入
+                    <textbox id="textboxStdin" width="150px"/>
+                </row>
+            </rows>
+        </grid>
+
+        <separator bar="true"/>
+        <separator/>
+
+        <div align="center">
+            <hbox>
+                <button id="buttonOk" forward="winEditSimulatedProgram.onOK" label="确 定"/>
+                <button id="buttonCancel" forward="winEditSimulatedProgram.onCancel" label="取 消"/>
+            </hbox>
+        </div>
+    </window>
+</zk>
