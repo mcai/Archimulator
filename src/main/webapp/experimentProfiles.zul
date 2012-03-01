@@ -1,0 +1,58 @@
+<?page title="实验管理 - Archimulator用户后台"?>
+<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit"?>
+<zk>
+    <window id="win" title="实验管理 - Archimulator用户后台" border="normal" width="100%" visible="false" apply="archimulator.view.page.ExperimentProfilesPage">
+        <zscript>
+         import org.zkoss.zk.ui.*;
+
+         Session s = Sessions.getCurrent();
+         if(s.getAttribute("userId") == null)
+           Executions.sendRedirect("login.zul");
+         else
+            win.setVisible(true);
+
+         void logout() {
+           s.invalidate();
+           Executions.sendRedirect("login.zul");
+         }
+         </zscript>
+        <vbox>
+            <hbox>
+                <button id="buttonGoToIndex" label="主页" href="index.zul"/>
+                <button id="buttonGoToSimulatedPrograms" label="评测程序管理" href="simulatedPrograms.zul"/>
+                <button id="buttonGoToProcessorProfiles" label="目标体系结构管理" href="processorProfiles.zul"/>
+                <button id="buttonClearData" label="清空数据" style="color:red"/>
+                <button id="buttonLogout" label="注销" onClick="logout()"/>
+            </hbox>
+        </vbox>
+
+        <separator bar="true"/>
+
+        <hbox>
+            <label>实验列表</label>
+            (合计:
+            <label value="@{archimulatorService.experimentProfilesAsList.size}" style="color:green"/>
+            个):
+        </hbox>
+
+        <separator/>
+
+        <hbox>
+            <button id="buttonAddExperimentProfile" label="添加"/>
+        </hbox>
+
+        <separator/>
+
+        <listbox id="listboxExperimentProfiles" model="@{archimulatorService.experimentProfilesAsList}" itemRenderer="archimulator.view.renderer.ExperimentProfileListCellRenderer" emptyMessage="实验列表为空" multiple="true" mold="paging"
+                 pageSize="10" pagingPosition="bottom">
+            <listhead>
+                <listheader label="编号" width="50px"/>
+                <listheader label="pthreadSpawnedIndex" width="150px"/>
+                <listheader label="maxInsts" width="150px"/>
+                <listheader label="创建日期" width="200px"/>
+                <listheader label="操作" width="60px"/>
+            </listhead>
+        </listbox>
+
+    </window>
+</zk>

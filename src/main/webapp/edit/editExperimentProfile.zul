@@ -1,0 +1,51 @@
+<zk>
+    <window id="winEditExperimentProfile" title="编辑实验 - Archimulator用户后台" border="normal" visible="false"
+            width="30%" height="300px" sizable="true"
+            apply="archimulator.view.page.edit.EditExperimentProfilePage">
+        <zscript>
+            import org.zkoss.zk.ui.*;
+
+            Session s = Sessions.getCurrent();
+            if(s.getAttribute("userId") == null)
+            Executions.sendRedirect("login.zul");
+            else
+            winEditExperimentProfile.setVisible(true);
+
+            void logout() {
+            s.invalidate();
+            Executions.sendRedirect("login.zul");
+            }
+        </zscript>
+        <grid>
+            <columns>
+                <column width="100px"/>
+                <column width="200px"/>
+                <column width="200px"/>
+            </columns>
+            <rows>
+                <row>
+                    编号
+                    <textbox id="textboxId" readonly="true" width="150px"/>
+                </row>
+                <row>
+                    pthreadSpawnedIndex
+                    <textbox id="textboxPthreadSpawnedIndex" width="150px"/>
+                </row>
+                <row>
+                    maxInsts
+                    <textbox id="textboxMaxInsts" width="150px"/>
+                </row>
+            </rows>
+        </grid>
+
+        <separator bar="true"/>
+        <separator/>
+
+        <div align="center">
+            <hbox>
+                <button id="buttonOk" forward="winEditExperimentProfile.onOK" label="确 定"/>
+                <button id="buttonCancel" forward="winEditExperimentProfile.onCancel" label="取 消"/>
+            </hbox>
+        </div>
+    </window>
+</zk>

@@ -25,12 +25,14 @@ import archimulator.model.experiment.FunctionalExperiment;
 import archimulator.model.simulation.ContextConfig;
 import archimulator.model.simulation.SimulatedProgram;
 import archimulator.sim.uncore.cache.eviction.LeastRecentlyUsedEvictionPolicy;
+import archimulator.util.DateHelper;
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -60,12 +62,17 @@ public class ExperimentProfile implements Serializable {
     @DatabaseField
     private ExperimentProfileState state;
 
+    @DatabaseField
+    private long createdTime;
+
     public ExperimentProfile() {
     }
 
     public ExperimentProfile(ProcessorProfile processorProfile) {
         this.processorProfile = processorProfile;
         this.state = ExperimentProfileState.SUBMITTED;
+
+        this.createdTime = DateHelper.toTick(new Date());
     }
 
     public ExperimentProfile addWorkload(SimulatedProgram simulatedProgram) {
@@ -150,6 +157,22 @@ public class ExperimentProfile implements Serializable {
 
     public void setState(ExperimentProfileState state) {
         this.state = state;
+    }
+
+    public long getCreatedTime() {
+        return createdTime;
+    }
+
+    public String getCreatedTimeAsString() {
+        return DateHelper.toString(DateHelper.fromTick(this.createdTime));
+    }
+
+    public void setPthreadSpawnedIndex(int pthreadSpawnedIndex) {
+        this.pthreadSpawnedIndex = pthreadSpawnedIndex;
+    }
+
+    public void setMaxInsts(int maxInsts) {
+        this.maxInsts = maxInsts;
     }
 
     public static String getUserHome() {
