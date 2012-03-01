@@ -28,7 +28,7 @@
         <vbox>
             <hbox>
                 <button id="buttonGoToSimulatedPrograms" label="评测程序管理" href="simulatedPrograms.zul"/>
-                <button id="buttonGoToProcessorConfigs" label="目标体系结构管理" href="processorConfigs.zul"/>
+                <button id="buttonGoToProcessorProfiles" label="目标体系结构管理" href="processorProfiles.zul"/>
                 <button id="buttonGoToExperimentProfiles" label="实验管理" href="experimentProfiles.zul"/>
                 <button id="buttonClearData" label="清空数据" style="color:red"/>
                 <button id="buttonLogout" label="注销" onClick="logout()"/>
