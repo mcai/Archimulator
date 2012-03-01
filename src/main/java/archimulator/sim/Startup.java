@@ -18,17 +18,17 @@
  ******************************************************************************/
 package archimulator.sim;
 
+import archimulator.model.experiment.builder.ExperimentProfile;
+import archimulator.model.experiment.builder.ProcessorProfile;
 import archimulator.model.simulation.SimulatedProgram;
 import archimulator.sim.ext.uncore.newHt2.LastLevelCacheHtRequestCachePollutionProfilingCapability;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static archimulator.model.experiment.ExperimentBuilder.*;
-
 public class Startup {
     public static final SimulatedProgram SIMULATED_PROGRAM_MST_BASELINE = new SimulatedProgram(
-            getUserHome() + "/Archimulator/benchmarks/Olden_Custom1/mst/baseline",
+            ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/Olden_Custom1/mst/baseline",
             "mst.mips",
             "10000");
 //            "2000");
@@ -37,7 +37,7 @@ public class Startup {
 //    "100");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_MST_HT = new SimulatedProgram(
-            getUserHome() + "/Archimulator/benchmarks/Olden_Custom1/mst/ht",
+            ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/Olden_Custom1/mst/ht",
             "mst.mips",
             "10000");
 //            "4000");
@@ -48,7 +48,7 @@ public class Startup {
 //            "100");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_EM3D_BASELINE = new SimulatedProgram(
-            getUserHome() + "/Archimulator/benchmarks/Olden_Custom1/em3d/baseline",
+            ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/Olden_Custom1/em3d/baseline",
             "em3d.mips",
 //            "400000 128 75 1");
 //            "400 128 75 1");
@@ -57,7 +57,7 @@ public class Startup {
 //            "400000 128 75 1");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_EM3D_HT = new SimulatedProgram(
-            getUserHome() + "/Archimulator/benchmarks/Olden_Custom1/em3d/ht",
+            ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/Olden_Custom1/em3d/ht",
             "em3d.mips",
 //            "400000 128 75 1");
 //            "400 128 75 1");
@@ -67,23 +67,23 @@ public class Startup {
             "400000 128 75 1");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_429_MCF_BASELINE = new SimulatedProgram(
-            getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline",
+            ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline",
             "429.mcf.mips",
-            getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline/data/ref/input/inp.in");
+            ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline/data/ref/input/inp.in");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_429_MCF_HT = new SimulatedProgram(
-            getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht",
+            ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht",
             "429.mcf.mips",
-            getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht/data/ref/input/inp.in");
+            ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht/data/ref/input/inp.in");
 //            getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht/data/test/input/inp.in");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_462_LIBQUANTUM_BASELINE = new SimulatedProgram(
-            getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/462.libquantum/baseline",
+            ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/462.libquantum/baseline",
             "462.libquantum.mips",
             "33 5");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_462_LIBQUANTUM_HT = new SimulatedProgram(
-            getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/462.libquantum/ht",
+            ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/462.libquantum/ht",
             "462.libquantum.mips",
             "33 5");
 
@@ -98,24 +98,29 @@ public class Startup {
         l2SizeInKBytes.add(512 * 2);
         l2SizeInKBytes.add(512 * 4);
         l2SizeInKBytes.add(512 * 8);
-        
+
         List<ExperimentProfile> experimentProfiles = new ArrayList<ExperimentProfile>();
 
         for (SimulatedProgram simulatedProgram : simulatedPrograms) {
-            experimentProfiles.add(on().cores(2).threadsPerCore(2)
-                    .with().workload(simulatedProgram)
-                    .simulate().functionallyToEnd());
+            ProcessorProfile processorProfile = new ProcessorProfile(2, 2, 1024 * 1024 * 4, 8);
+
+            ExperimentProfile experimentProfile = new ExperimentProfile(processorProfile);
+            experimentProfile.addWorkload(simulatedProgram);
+            experimentProfile.functionallyToEnd();
+            experimentProfiles.add(experimentProfile);
 
             for (int l2SizeInKByte : l2SizeInKBytes) {
-                experimentProfiles.add(on().cores(2).threadsPerCore(2).l2Size(1024 * l2SizeInKByte).l2Associativity(8)
-                        .with().workload(simulatedProgram)
-                        .simulate().functionallyToPseudoCallAndInDetailForMaxInsts(3720, 2000000000)
-                        .addSimulationCapabilityClass(LastLevelCacheHtRequestCachePollutionProfilingCapability.class));
+                ProcessorProfile processorProfile1 = new ProcessorProfile(2, 2, 1024 * l2SizeInKByte, 8);
 
-                experimentProfiles.add(on().cores(2).threadsPerCore(2).l2Size(1024 * l2SizeInKByte).l2Associativity(8)
-                        .with().workload(simulatedProgram)
-                        .simulate().inDetailToEnd()
-                        .addSimulationCapabilityClass(LastLevelCacheHtRequestCachePollutionProfilingCapability.class));
+                ExperimentProfile experimentProfile1 = new ExperimentProfile(processorProfile1);
+                experimentProfile1.addWorkload(simulatedProgram);
+                experimentProfile1.functionallyToPseudoCallAndInDetailForMaxInsts(3720, 2000000000).addSimulationCapabilityClass(LastLevelCacheHtRequestCachePollutionProfilingCapability.class);
+                experimentProfiles.add(experimentProfile1);
+
+                ExperimentProfile experimentProfile2 = new ExperimentProfile(processorProfile1);
+                experimentProfile2.addWorkload(simulatedProgram);
+                experimentProfile2.inDetailToEnd().addSimulationCapabilityClass(LastLevelCacheHtRequestCachePollutionProfilingCapability.class);
+                experimentProfiles.add(experimentProfile2);
             }
         }
         

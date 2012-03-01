@@ -1,6 +1,26 @@
+/*******************************************************************************
+ * Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).
+ *
+ * This file is part of the Archimulator multicore architectural simulator.
+ *
+ * Archimulator is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Archimulator is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
 package archimulator.service;
 
-import archimulator.model.experiment.ExperimentBuilder;
+import archimulator.model.experiment.builder.ExperimentProfile;
+import archimulator.model.experiment.builder.ProcessorProfile;
+import archimulator.model.simulation.SimulatedProgram;
 import com.caucho.hessian.server.HessianServlet;
 
 import java.sql.SQLException;
@@ -18,17 +38,82 @@ public class ArchimulatorServlet extends HessianServlet implements ArchimulatorS
     }
 
     @Override
-    public void addExperimentProfile(ExperimentBuilder.ExperimentProfile experimentProfile) throws SQLException {
+    public List<SimulatedProgram> getSimulatedProgramsAsList() throws SQLException {
+        return this.getProxy().getSimulatedProgramsAsList();
+    }
+
+    @Override
+    public SimulatedProgram getSimulatedProgramById(long simulatedProgramId) throws SQLException {
+        return this.getProxy().getSimulatedProgramById(simulatedProgramId);
+    }
+
+    @Override
+    public void addSimulatedProgram(SimulatedProgram simulatedProgram) throws SQLException {
+        this.getProxy().addSimulatedProgram(simulatedProgram);
+    }
+
+    @Override
+    public void removeSimulatedProgramById(long simulatedProgramId) throws SQLException {
+        this.getProxy().removeSimulatedProgramById(simulatedProgramId);
+    }
+
+    @Override
+    public void updateSimulatedProgram(SimulatedProgram simulatedProgram) throws SQLException {
+        this.getProxy().updateSimulatedProgram(simulatedProgram);
+    }
+
+    @Override
+    public List<ProcessorProfile> getProcessorProfilesAsList() throws SQLException {
+        return this.getProxy().getProcessorProfilesAsList();
+    }
+
+    @Override
+    public ProcessorProfile getProcessorProfileById(long processorProfileId) throws SQLException {
+        return this.getProxy().getProcessorProfileById(processorProfileId);
+    }
+
+    @Override
+    public void addProcessorProfile(ProcessorProfile processorProfile) throws SQLException {
+        this.getProxy().addProcessorProfile(processorProfile);
+    }
+
+    @Override
+    public void removeProcessorProfileById(long processorProfileId) throws SQLException {
+        this.getProxy().removeProcessorProfileById(processorProfileId);
+    }
+
+    @Override
+    public void updateProcessorProfile(ProcessorProfile processorProfile) throws SQLException {
+        this.getProxy().updateProcessorProfile(processorProfile);
+    }
+
+    @Override
+    public void addExperimentProfile(ExperimentProfile experimentProfile) throws SQLException {
         this.getProxy().addExperimentProfile(experimentProfile);
     }
 
     @Override
-    public List<ExperimentBuilder.ExperimentProfile> getExperimentProfilesAsList() throws SQLException {
+    public void removeExperimentProfileById(long experimentProfileId) throws SQLException {
+        this.getProxy().removeExperimentProfileById(experimentProfileId);
+    }
+
+    @Override
+    public void updateExperimentProfile(ExperimentProfile experimentProfile) throws SQLException {
+        this.getProxy().updateExperimentProfile(experimentProfile);
+    }
+
+    @Override
+    public List<ExperimentProfile> getExperimentProfilesAsList() throws SQLException {
         return this.getProxy().getExperimentProfilesAsList();
     }
 
     @Override
-    public ExperimentBuilder.ExperimentProfile retrieveOneExperimentProfileToRun() throws SQLException {
+    public ExperimentProfile getExperimentProfileById(long experimentProfileId) throws SQLException {
+        return this.getProxy().getExperimentProfileById(experimentProfileId);
+    }
+
+    @Override
+    public ExperimentProfile retrieveOneExperimentProfileToRun() throws SQLException {
         return this.getProxy().retrieveOneExperimentProfileToRun();
     }
 

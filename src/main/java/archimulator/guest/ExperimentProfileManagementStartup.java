@@ -1,6 +1,25 @@
+/*******************************************************************************
+ * Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).
+ *
+ * This file is part of the Archimulator multicore architectural simulator.
+ *
+ * Archimulator is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Archimulator is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
 package archimulator.guest;
 
-import archimulator.model.experiment.ExperimentBuilder;
+import archimulator.model.experiment.builder.ExperimentProfile;
+import archimulator.model.experiment.builder.ProcessorProfile;
 import archimulator.model.simulation.SimulatedProgram;
 import archimulator.service.ArchimulatorService;
 import archimulator.sim.Startup;
@@ -48,33 +67,38 @@ public class ExperimentProfileManagementStartup {
         l2SizeInKBytes.add(512 * 4);
         l2SizeInKBytes.add(512 * 8);
 
-        List<ExperimentBuilder.ExperimentProfile> experimentProfiles = new ArrayList<ExperimentBuilder.ExperimentProfile>();
+        List<ExperimentProfile> experimentProfiles = new ArrayList<ExperimentProfile>();
 
         for (SimulatedProgram simulatedProgram : simulatedPrograms) {
-            experimentProfiles.add(ExperimentBuilder.on().cores(2).threadsPerCore(2)
-                    .with().workload(simulatedProgram)
-                    .simulate().functionallyToEnd());
+            ProcessorProfile processorProfile = new ProcessorProfile(2, 2, 1024 * 1024 * 4, 8);
+
+            ExperimentProfile experimentProfile = new ExperimentProfile(processorProfile);
+            experimentProfile.addWorkload(simulatedProgram);
+            experimentProfile.functionallyToEnd();
+            experimentProfiles.add(experimentProfile);
 
             for (int l2SizeInKByte : l2SizeInKBytes) {
-                experimentProfiles.add(ExperimentBuilder.on().cores(2).threadsPerCore(2).l2Size(1024 * l2SizeInKByte).l2Associativity(8)
-                        .with().workload(simulatedProgram)
-                        .simulate().functionallyToPseudoCallAndInDetailForMaxInsts(3720, 2000000000)
-                        .addSimulationCapabilityClass(LastLevelCacheHtRequestCachePollutionProfilingCapability.class));
+                ProcessorProfile processorProfile1 = new ProcessorProfile(2, 2, 1024 * l2SizeInKByte, 8);
 
-                experimentProfiles.add(ExperimentBuilder.on().cores(2).threadsPerCore(2).l2Size(1024 * l2SizeInKByte).l2Associativity(8)
-                        .with().workload(simulatedProgram)
-                        .simulate().inDetailToEnd()
-                        .addSimulationCapabilityClass(LastLevelCacheHtRequestCachePollutionProfilingCapability.class));
+                ExperimentProfile experimentProfile1 = new ExperimentProfile(processorProfile1);
+                experimentProfile1.addWorkload(simulatedProgram);
+                experimentProfile1.functionallyToPseudoCallAndInDetailForMaxInsts(3720, 2000000000).addSimulationCapabilityClass(LastLevelCacheHtRequestCachePollutionProfilingCapability.class);
+                experimentProfiles.add(experimentProfile1);
+
+                ExperimentProfile experimentProfile2 = new ExperimentProfile(processorProfile1);
+                experimentProfile2.addWorkload(simulatedProgram);
+                experimentProfile2.inDetailToEnd().addSimulationCapabilityClass(LastLevelCacheHtRequestCachePollutionProfilingCapability.class);
+                experimentProfiles.add(experimentProfile2);
             }
         }
 
-        for(ExperimentBuilder.ExperimentProfile experimentProfile : experimentProfiles) {
+        for(ExperimentProfile experimentProfile : experimentProfiles) {
             this.archimulatorService.addExperimentProfile(experimentProfile);
         }
         
         System.out.println(this.archimulatorService.getExperimentProfilesAsList().size());
         
-        for(ExperimentBuilder.ExperimentProfile experimentProfile : this.archimulatorService.getExperimentProfilesAsList()) {
+        for(ExperimentProfile experimentProfile : this.archimulatorService.getExperimentProfilesAsList()) {
             System.out.println(experimentProfile.getState());
         }
         

@@ -16,27 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.service;
+package archimulator.model.experiment.builder;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-
-public class ArchimulatorServletContextListener implements ServletContextListener {
-    @Override
-    public void contextInitialized(ServletContextEvent sce) {
-        ArchimulatorService archimulatorService = new ArchimulatorServiceImpl();
-        sce.getServletContext().setAttribute("archimulatorService", archimulatorService);
-    }
-
-    @Override
-    public void contextDestroyed(ServletContextEvent sce) {
-        getArchimulatorService(sce.getServletContext()).stop();
-        sce.getServletContext().removeAttribute("archimulatorService");
-    }
-
-    @SuppressWarnings("unchecked")
-    public static ArchimulatorService getArchimulatorService(ServletContext context) {
-        return (ArchimulatorService) context.getAttribute("archimulatorService");
-    }
+public enum ExperimentProfileType {
+    FUNCTIONAL_EXPERIMENT,
+    DETAILED_EXPERIMENT,
+    CHECKPOINTED_EXPERIMENT
 }

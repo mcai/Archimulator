@@ -18,13 +18,30 @@
  ******************************************************************************/
 package archimulator.model.simulation;
 
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
+
 import java.io.Serializable;
 
+@DatabaseTable
 public class SimulatedProgram implements Serializable {
+    @DatabaseField(generatedId = true)
+    private long id;
+
+    @DatabaseField
     private String cwd;
+
+    @DatabaseField
     private String exe;
+
+    @DatabaseField
     private String args;
+
+    @DatabaseField
     private String stdin;
+    
+    public SimulatedProgram() {
+    }
 
     public SimulatedProgram(String cwd, String exe, String args) {
         this(cwd, exe, args, "");
@@ -35,6 +52,10 @@ public class SimulatedProgram implements Serializable {
         this.exe = exe;
         this.args = args;
         this.stdin = stdin;
+    }
+
+    public long getId() {
+        return id;
     }
 
     public String getCwd() {

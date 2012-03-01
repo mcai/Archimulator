@@ -1,6 +1,6 @@
 package archimulator.util;
 
-import archimulator.model.experiment.ExperimentBuilder;
+import archimulator.model.experiment.builder.ExperimentProfile;
 import com.jcraft.jsch.*;
 
 import java.io.File;
@@ -74,7 +74,7 @@ public class UpdateHelper {
             ChannelSftp sftpChannel = (ChannelSftp) channel;
 
             sftpChannel.cd(DeploymentProfile.getCurrent().getArchimulatorDirectoryPath());
-            getDir(sftpChannel, ".", new File(ExperimentBuilder.getUserHome() + "/Archimulator"));
+            getDir(sftpChannel, ".", new File(ExperimentProfile.getUserHome() + "/Archimulator"));
 
             sftpChannel.exit();
             session.disconnect();
