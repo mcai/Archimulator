@@ -29,9 +29,9 @@ public abstract class BranchPredictor {
     private String name;
     private BranchPredictorType type;
 
-    protected int accesses;
-    protected int hits;
-    protected int misses;
+    protected long accesses;
+    protected long hits;
+    protected long misses;
 
     private Thread thread;
 
@@ -82,15 +82,15 @@ public abstract class BranchPredictor {
         return type;
     }
 
-    public int getAccesses() {
+    public long getAccesses() {
         return accesses;
     }
 
-    public int getHits() {
+    public long getHits() {
         return hits;
     }
 
-    public int getMisses() {
+    public long getMisses() {
         return misses;
     }
 
