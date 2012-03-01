@@ -1,0 +1,61 @@
+<zk>
+    <window id="winEditProcessorProfile" title="编辑目标体系结构 - Archimulator用户后台" border="normal" visible="false"
+            width="30%" height="300px" sizable="true"
+            apply="archimulator.view.page.edit.EditProcessorProfilePage">
+        <zscript>
+            import org.zkoss.zk.ui.*;
+
+            Session s = Sessions.getCurrent();
+            if(s.getAttribute("userId") == null)
+            Executions.sendRedirect("login.zul");
+            else
+            winEditProcessorProfile.setVisible(true);
+
+            void logout() {
+            s.invalidate();
+            Executions.sendRedirect("login.zul");
+            }
+        </zscript>
+        <grid>
+            <columns>
+                <column width="100px"/>
+                <column width="200px"/>
+                <column width="200px"/>
+                <column width="200px"/>
+                <column width="200px"/>
+            </columns>
+            <rows>
+                <row>
+                    编号
+                    <textbox id="textboxId" readonly="true" width="150px"/>
+                </row>
+                <row>
+                    核心数
+                    <textbox id="textboxNumCores" width="150px"/>
+                </row>
+                <row>
+                    每核心硬件线程数
+                    <textbox id="textboxNumThreadsPerCore" width="150px"/>
+                </row>
+                <row>
+                    二级缓存大小
+                    <textbox id="textboxL2Size" width="150px"/>
+                </row>
+                <row>
+                    二级缓存相联度
+                    <textbox id="textboxL2Associativity" width="150px"/>
+                </row>
+            </rows>
+        </grid>
+
+        <separator bar="true"/>
+        <separator/>
+
+        <div align="center">
+            <hbox>
+                <button id="buttonOk" forward="winEditProcessorProfile.onOK" label="确 定"/>
+                <button id="buttonCancel" forward="winEditProcessorProfile.onCancel" label="取 消"/>
+            </hbox>
+        </div>
+    </window>
+</zk>
