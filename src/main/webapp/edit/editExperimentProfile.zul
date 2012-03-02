@@ -1,6 +1,6 @@
 <zk>
     <window id="winEditExperimentProfile" title="编辑实验 - Archimulator用户后台" border="normal" visible="false"
-            width="30%" height="300px" sizable="true"
+            width="800px" height="550px" sizable="true"
             apply="archimulator.view.page.edit.EditExperimentProfilePage">
         <zscript>
             import org.zkoss.zk.ui.*;
@@ -18,14 +18,30 @@
         </zscript>
         <grid>
             <columns>
-                <column width="100px"/>
-                <column width="200px"/>
-                <column width="200px"/>
+                <column width="150px"/>
+                <column width="600px"/>
             </columns>
             <rows>
                 <row>
                     编号
                     <textbox id="textboxId" readonly="true" width="150px"/>
+                </row>
+                <row>
+                    目标体系结构
+                    <combobox id="comboboxProcessorProfiles" width="450px"/>
+                </row>
+                <row>
+                    负载->硬件线程映射
+                    <grid id="gridContextConfigs" vflex="true" height="300px">
+                        <columns>
+                            <column width="60px"/>
+                            <column width="100px"/>
+                            <column width="60px"/>
+                            <column width="350px"/>
+                        </columns>
+                        <rows>
+                        </rows>
+                    </grid>
                 </row>
                 <row>
                     pthreadSpawnedIndex

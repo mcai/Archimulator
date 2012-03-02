@@ -21,7 +21,6 @@
                 <button id="buttonGoToIndex" label="主页" href="index.zul"/>
                 <button id="buttonGoToSimulatedPrograms" label="评测程序管理" href="simulatedPrograms.zul"/>
                 <button id="buttonGoToProcessorProfiles" label="目标体系结构管理" href="processorProfiles.zul"/>
-                <button id="buttonClearData" label="清空数据" style="color:red"/>
                 <button id="buttonLogout" label="注销" onClick="logout()"/>
             </hbox>
         </vbox>

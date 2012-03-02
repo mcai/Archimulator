@@ -20,11 +20,40 @@ package archimulator.model.capability;
 
 import archimulator.model.simulation.Simulation;
 import archimulator.sim.core.Processor;
+import archimulator.sim.ext.core.DynamicSpeculativePrecomputationCapability;
+import archimulator.sim.ext.uncore.delinquentLoad.DelinquentLoadIdentificationCapability;
+import archimulator.sim.ext.uncore.ht.HtRequestL2VictimTrackingCapability;
+import archimulator.sim.ext.uncore.ht.HtRequestL2VictimTrackingCapability2;
+import archimulator.sim.ext.uncore.newHt.FsmBasedHtRequestLlcVictimTrackingCapability;
+import archimulator.sim.ext.uncore.newHt2.LastLevelCacheHtRequestCachePollutionProfilingCapability;
+import archimulator.sim.isa.FunctionalExecutionProfilingCapability;
 import archimulator.sim.os.Kernel;
+import archimulator.sim.uncore.MemoryAccessTraceGenerationCapability;
+import archimulator.sim.uncore.coherence.ext.LastLevelCacheMissProfilingCapability;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CapabilityFactory {
+    private static List<Class<? extends SimulationCapability>> simulationCapabilityClasses = new ArrayList<Class<? extends SimulationCapability>>();
+    private static List<Class<? extends ProcessorCapability>> processorCapabilityClasses = new ArrayList<Class<? extends ProcessorCapability>>();
+    private static List<Class<? extends KernelCapability>> kernelCapabilityClasses = new ArrayList<Class<? extends KernelCapability>>();
+
+    static {
+        simulationCapabilityClasses.add(LastLevelCacheHtRequestCachePollutionProfilingCapability.class);
+        simulationCapabilityClasses.add(LastLevelCacheMissProfilingCapability.class);
+        simulationCapabilityClasses.add(MemoryAccessTraceGenerationCapability.class);
+
+        processorCapabilityClasses.add(DynamicSpeculativePrecomputationCapability.class);
+        processorCapabilityClasses.add(DelinquentLoadIdentificationCapability.class);
+        processorCapabilityClasses.add(HtRequestL2VictimTrackingCapability.class);
+        processorCapabilityClasses.add(FsmBasedHtRequestLlcVictimTrackingCapability.class);
+        processorCapabilityClasses.add(HtRequestL2VictimTrackingCapability2.class);
+
+        kernelCapabilityClasses.add(FunctionalExecutionProfilingCapability.class);
+    }
+
     public static <SimulationCapabilityT extends SimulationCapability> SimulationCapabilityT createSimulationCapability(Class<SimulationCapabilityT> simulationCapabilityClz, Simulation simulation) {
         try {
             return simulationCapabilityClz.getConstructor(new Class[]{Simulation.class}).newInstance(simulation);
@@ -65,5 +94,17 @@ public class CapabilityFactory {
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static List<Class<? extends SimulationCapability>> getSimulationCapabilityClasses() {
+        return simulationCapabilityClasses;
+    }
+
+    public static List<Class<? extends ProcessorCapability>> getProcessorCapabilityClasses() {
+        return processorCapabilityClasses;
+    }
+
+    public static List<Class<? extends KernelCapability>> getKernelCapabilityClasses() {
+        return kernelCapabilityClasses;
     }
 }

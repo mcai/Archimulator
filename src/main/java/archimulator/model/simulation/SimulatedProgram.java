@@ -103,4 +103,9 @@ public class SimulatedProgram implements Serializable {
     public void setStdin(String stdin) {
         this.stdin = stdin;
     }
+
+    @Override
+    public String toString() {
+        return String.format("SimulatedProgram{id=%d, cwd='%s', exe='%s', args='%s', stdin='%s'}", id, cwd, exe, args, stdin);
+    }
 }

@@ -122,4 +122,9 @@ public class ProcessorProfile implements Serializable {
     public void setL2Associativity(int l2Associativity) {
         this.l2Associativity = l2Associativity;
     }
+
+    @Override
+    public String toString() {
+        return String.format("ProcessorProfile{id=%d, numCores=%d, numThreadsPerCore=%d, l2Size=%d, l2Associativity=%d}", id, numCores, numThreadsPerCore, l2Size, l2Associativity);
+    }
 }

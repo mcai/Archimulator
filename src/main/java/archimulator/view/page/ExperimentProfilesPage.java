@@ -19,7 +19,8 @@ public class ExperimentProfilesPage extends GenericForwardComposer<Window> {
         Map<String, Object> arg = new HashMap<String, Object>();
 
         arg.put("create", true);
-        arg.put("experimentProfile", new ExperimentProfile(new ProcessorProfile(2, 2, 1024 * 1024 * 4, 8))); //TODO: should set null or load from db
+        ExperimentProfile experimentProfile = new ExperimentProfile(new ProcessorProfile(2, 2, 1024 * 1024 * 4, 8));
+        arg.put("experimentProfile", experimentProfile); //TODO: should set null or load from db
 
         Window win = (Window) Executions.createComponents("/edit/editExperimentProfile.zul", null, arg);
         win.doModal();

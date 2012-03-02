@@ -26,22 +26,21 @@ import archimulator.model.simulation.ContextConfig;
 import archimulator.model.simulation.SimulatedProgram;
 import archimulator.sim.uncore.cache.eviction.LeastRecentlyUsedEvictionPolicy;
 import archimulator.util.DateHelper;
+import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @DatabaseTable
 public class ExperimentProfile implements Serializable {
     @DatabaseField(generatedId = true)
     private long id;
 
-    @DatabaseField(foreign = true, foreignAutoRefresh = true)
+    @DatabaseField(dataType = DataType.SERIALIZABLE)
     private ProcessorProfile processorProfile;
 
     @DatabaseField(dataType = DataType.SERIALIZABLE)
@@ -165,6 +164,10 @@ public class ExperimentProfile implements Serializable {
 
     public String getCreatedTimeAsString() {
         return DateHelper.toString(DateHelper.fromTick(this.createdTime));
+    }
+
+    public void setProcessorProfile(ProcessorProfile processorProfile) {
+        this.processorProfile = processorProfile;
     }
 
     public void setPthreadSpawnedIndex(int pthreadSpawnedIndex) {
