@@ -193,7 +193,7 @@ public class EditExperimentProfilePage extends GenericForwardComposer<Window> {
 
     private void populateExperimentProfileTypes() {
         if(this.radioGroupExperimentProfileTypes.getSelectedIndex() != -1) {
-            ExperimentProfileType experimentProfileType = ExperimentProfileType.FUNCTIONAL_EXPERIMENT;
+            ExperimentProfileType experimentProfileType;
 
             String selectedLabel = this.radioGroupExperimentProfileTypes.getSelectedItem().getLabel();
             if(selectedLabel.equals("功能模拟")) {
