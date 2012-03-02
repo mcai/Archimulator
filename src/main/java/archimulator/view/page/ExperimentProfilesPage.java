@@ -43,6 +43,8 @@ public class ExperimentProfilesPage extends GenericForwardComposer<Window> {
 
             arg.put("create", true);
             ExperimentProfile experimentProfile = new ExperimentProfile(processorProfile);
+            experimentProfile.setPthreadSpawnedIndex(3720);
+            experimentProfile.setMaxInsts(2000000000);
             arg.put("experimentProfile", experimentProfile);
 
             Window win = (Window) Executions.createComponents("/edit/editExperimentProfile.zul", null, arg);

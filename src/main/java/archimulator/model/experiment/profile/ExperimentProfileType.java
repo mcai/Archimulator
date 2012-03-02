@@ -21,5 +21,19 @@ package archimulator.model.experiment.profile;
 public enum ExperimentProfileType {
     FUNCTIONAL_EXPERIMENT,
     DETAILED_EXPERIMENT,
-    CHECKPOINTED_EXPERIMENT
+    CHECKPOINTED_EXPERIMENT;
+
+    @Override
+    public String toString() {
+        switch (this) {
+            case FUNCTIONAL_EXPERIMENT:
+                return "功能模拟";
+            case DETAILED_EXPERIMENT:
+                return "详细模拟";
+            case CHECKPOINTED_EXPERIMENT:
+                return "分段模拟";
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
 }

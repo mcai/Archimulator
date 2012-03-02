@@ -87,6 +87,10 @@ public class ExperimentProfile implements Serializable {
         return contextConfigs;
     }
 
+    public void setType(ExperimentProfileType type) {
+        this.type = type;
+    }
+
     public ExperimentProfile functionallyToEnd() {
         this.type = ExperimentProfileType.FUNCTIONAL_EXPERIMENT;
         return this;

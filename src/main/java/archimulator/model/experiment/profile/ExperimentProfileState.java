@@ -21,5 +21,19 @@ package archimulator.model.experiment.profile;
 public enum ExperimentProfileState {
     SUBMITTED,
     RUNNING,
-    STOPPED
+    STOPPED;
+
+    @Override
+    public String toString() {
+        switch (this) {
+            case SUBMITTED:
+                return "等候运行";
+            case RUNNING:
+                return "正在运行";
+            case STOPPED:
+                return "运行结束";
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
 }

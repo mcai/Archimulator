@@ -23,9 +23,11 @@ public class ExperimentProfileListCellRenderer implements ListitemRenderer<Exper
         final ArchimulatorService archimulatorService = ArchimulatorServletContextListener.getArchimulatorService(httpSession.getServletContext());
 
         item.appendChild(new Listcell(data.getId() + ""));
+        item.appendChild(new Listcell(data.getType() + ""));
         item.appendChild(new Listcell(data.getPthreadSpawnedIndex() + ""));
         item.appendChild(new Listcell(data.getMaxInsts() + ""));
         item.appendChild(new Listcell(data.getCreatedTimeAsString() + ""));
+        item.appendChild(new Listcell(data.getState() + ""));
 
         Listcell listCellEdit = new Listcell();
         item.appendChild(listCellEdit);

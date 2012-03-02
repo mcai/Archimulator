@@ -1,6 +1,8 @@
 package archimulator.view.page.edit;
 
 import archimulator.model.experiment.profile.ExperimentProfile;
+import archimulator.model.experiment.profile.ExperimentProfileState;
+import archimulator.model.experiment.profile.ExperimentProfileType;
 import archimulator.model.experiment.profile.ProcessorProfile;
 import archimulator.model.simulation.ContextConfig;
 import archimulator.model.simulation.SimulatedProgram;
@@ -8,6 +10,8 @@ import archimulator.service.ArchimulatorService;
 import archimulator.service.ArchimulatorServletContextListener;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.SelectEvent;
 import org.zkoss.zk.ui.util.GenericForwardComposer;
 import org.zkoss.zul.*;
@@ -20,8 +24,10 @@ public class EditExperimentProfilePage extends GenericForwardComposer<Window> {
     private Textbox textboxId;
     private Combobox comboboxProcessorProfiles;
     private Grid gridContextConfigs;
+    private Radiogroup radioGroupExperimentProfileTypes;
     private Textbox textboxPthreadSpawnedIndex;
     private Textbox textboxMaxInsts;
+    private Label labelState;
 
     private Button buttonOk;
     private Button buttonCancel;
@@ -55,8 +61,19 @@ public class EditExperimentProfilePage extends GenericForwardComposer<Window> {
             this.populateContextConfigs(this.experimentProfile.getProcessorProfile(), this.experimentProfile.getContextConfigs());
         }
 
+        for(Radio radio : this.radioGroupExperimentProfileTypes.getItems()) {
+            if(radio.getLabel().equals(this.experimentProfile.getType() + "")) {
+                this.radioGroupExperimentProfileTypes.setSelectedItem(radio);
+                break;
+            }
+        }
+
         this.textboxPthreadSpawnedIndex.setValue(this.experimentProfile.getPthreadSpawnedIndex() + "");
         this.textboxMaxInsts.setValue(this.experimentProfile.getMaxInsts() + "");
+        
+        this.populateExperimentProfileTypes();
+
+        this.labelState.setValue(this.experimentProfile.getState() + "");
 
         if (this.create) {
             this.textboxId.setValue("N/A");
@@ -71,42 +88,60 @@ public class EditExperimentProfilePage extends GenericForwardComposer<Window> {
             populateContextConfigs(processorProfile, null);
         }
     }
+    
+    public void onCheck$radioGroupExperimentProfileTypes(Event event) {
+        populateExperimentProfileTypes();
+    }
 
     public void onOK() throws SQLException {
-        this.experimentProfile.setPthreadSpawnedIndex(Integer.parseInt(this.textboxPthreadSpawnedIndex.getValue()));
-        this.experimentProfile.setMaxInsts(Integer.parseInt(this.textboxMaxInsts.getValue()));
-
-        if(this.comboboxProcessorProfiles.getSelectedIndex() != -1) {
-            ProcessorProfile processorProfile = this.comboboxProcessorProfiles.getSelectedItem().getValue();
-            this.experimentProfile.setProcessorProfile(processorProfile);
-            
-            this.experimentProfile.getContextConfigs().clear();
-
-            int i = 0;
-            
-            for(Component component : this.gridContextConfigs.getRows().getChildren()) {
-                Row row = (Row) component;
-                Combobox comboboxSimulatedProgram = (Combobox) row.getChildren().get(3);
-
-                if(comboboxSimulatedProgram.getSelectedIndex() != -1) {
-                    SimulatedProgram simulatedProgram = comboboxSimulatedProgram.getSelectedItem().getValue();
-                    this.experimentProfile.getContextConfigs().add(new ContextConfig(simulatedProgram, i));
+        if(this.experimentProfile.getState() == ExperimentProfileState.RUNNING) {
+            Messagebox.show("当前编辑的实验正在运行中，无法保存改动！", "编辑实验", Messagebox.OK, Messagebox.EXCLAMATION, new EventListener<Event>() {
+                @Override
+                public void onEvent(Event event) throws Exception {
+                    switch ((Integer) event.getData()) {
+                        case Messagebox.OK:
+                            Executions.sendRedirect(null);
+                            break;
+                    }
                 }
+            });
+        }
+        else {
+            this.experimentProfile.setPthreadSpawnedIndex(Integer.parseInt(this.textboxPthreadSpawnedIndex.getValue()));
+            this.experimentProfile.setMaxInsts(Integer.parseInt(this.textboxMaxInsts.getValue()));
 
-                i++;
+            if(this.comboboxProcessorProfiles.getSelectedIndex() != -1) {
+                ProcessorProfile processorProfile = this.comboboxProcessorProfiles.getSelectedItem().getValue();
+                this.experimentProfile.setProcessorProfile(processorProfile);
+
+                this.experimentProfile.getContextConfigs().clear();
+
+                int i = 0;
+
+                for(Component component : this.gridContextConfigs.getRows().getChildren()) {
+                    Row row = (Row) component;
+                    Combobox comboboxSimulatedProgram = (Combobox) row.getChildren().get(3);
+
+                    if(comboboxSimulatedProgram.getSelectedIndex() != -1) {
+                        SimulatedProgram simulatedProgram = comboboxSimulatedProgram.getSelectedItem().getValue();
+                        this.experimentProfile.getContextConfigs().add(new ContextConfig(simulatedProgram, i));
+                    }
+
+                    i++;
+                }
             }
+
+            HttpSession httpSession = (HttpSession) this.session.getNativeSession();
+            final ArchimulatorService archimulatorService = ArchimulatorServletContextListener.getArchimulatorService(httpSession.getServletContext());
+
+            if (this.create) {
+                archimulatorService.addExperimentProfile(this.experimentProfile);
+            } else {
+                archimulatorService.updateExperimentProfile(this.experimentProfile);
+            }
+
+            Executions.sendRedirect("/experimentProfiles.zul");
         }
-
-        HttpSession httpSession = (HttpSession) this.session.getNativeSession();
-        final ArchimulatorService archimulatorService = ArchimulatorServletContextListener.getArchimulatorService(httpSession.getServletContext());
-
-        if (this.create) {
-            archimulatorService.addExperimentProfile(this.experimentProfile);
-        } else {
-            archimulatorService.updateExperimentProfile(this.experimentProfile);
-        }
-
-        Executions.sendRedirect("/experimentProfiles.zul");
     }
 
     public void onCancel() {
@@ -153,6 +188,34 @@ public class EditExperimentProfilePage extends GenericForwardComposer<Window> {
             }
 
             this.gridContextConfigs.getRows().appendChild(row);
+        }
+    }
+
+    private void populateExperimentProfileTypes() {
+        if(this.radioGroupExperimentProfileTypes.getSelectedIndex() != -1) {
+            ExperimentProfileType experimentProfileType = ExperimentProfileType.FUNCTIONAL_EXPERIMENT;
+
+            String selectedLabel = this.radioGroupExperimentProfileTypes.getSelectedItem().getLabel();
+            if(selectedLabel.equals("功能模拟")) {
+                experimentProfileType = ExperimentProfileType.FUNCTIONAL_EXPERIMENT;
+                this.textboxMaxInsts.setReadonly(true);
+                this.textboxPthreadSpawnedIndex.setReadonly(true);
+            }
+            else if(selectedLabel.equals("详细模拟")) {
+                experimentProfileType = ExperimentProfileType.DETAILED_EXPERIMENT;
+                this.textboxMaxInsts.setReadonly(true);
+                this.textboxPthreadSpawnedIndex.setReadonly(true);
+            }
+            else if(selectedLabel.equals("分段模拟")) {
+                experimentProfileType = ExperimentProfileType.CHECKPOINTED_EXPERIMENT;
+                this.textboxMaxInsts.setReadonly(false);
+                this.textboxPthreadSpawnedIndex.setReadonly(false);
+            }
+            else {
+                throw new IllegalArgumentException();
+            }
+
+            this.experimentProfile.setType(experimentProfileType);
         }
     }
 }

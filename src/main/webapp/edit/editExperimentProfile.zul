@@ -1,6 +1,6 @@
 <zk>
     <window id="winEditExperimentProfile" title="编辑实验 - Archimulator用户后台" border="normal" visible="false"
-            width="800px" height="550px" sizable="true"
+            width="800px" height="580px" sizable="true"
             apply="archimulator.view.page.edit.EditExperimentProfilePage">
         <zscript>
             import org.zkoss.zk.ui.*;
@@ -32,7 +32,7 @@
                 </row>
                 <row>
                     负载->硬件线程映射
-                    <grid id="gridContextConfigs" vflex="true" height="300px">
+                    <grid id="gridContextConfigs" vflex="true" height="280px">
                         <columns>
                             <column width="60px"/>
                             <column width="100px"/>
@@ -44,12 +44,24 @@
                     </grid>
                 </row>
                 <row>
-                    pthreadSpawnedIndex
+                    类型
+                    <radiogroup id="radioGroupExperimentProfileTypes">
+                        <radio label="功能模拟"/>
+                        <radio label="详细模拟"/>
+                        <radio label="分段模拟"/>
+                    </radiogroup>
+                </row>
+                <row>
+                    生成帮助线程伪指令编号
                     <textbox id="textboxPthreadSpawnedIndex" width="150px"/>
                 </row>
                 <row>
-                    maxInsts
+                    最大指令数
                     <textbox id="textboxMaxInsts" width="150px"/>
+                </row>
+                <row>
+                    状态
+                    <label id="labelState" width="150px"/>
                 </row>
             </rows>
         </grid>
