@@ -25,6 +25,7 @@ import com.caucho.hessian.server.HessianServlet;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Set;
 
 public class ArchimulatorServlet extends HessianServlet implements ArchimulatorService {
     @Override
@@ -113,8 +114,18 @@ public class ArchimulatorServlet extends HessianServlet implements ArchimulatorS
     }
 
     @Override
-    public ExperimentProfile retrieveOneExperimentProfileToRun() throws SQLException {
-        return this.getProxy().retrieveOneExperimentProfileToRun();
+    public ExperimentProfile retrieveOneExperimentProfileToRun(String simulatorUserId) throws SQLException {
+        return this.getProxy().retrieveOneExperimentProfileToRun(simulatorUserId);
+    }
+
+    @Override
+    public void notifyExperimentPaused(long experimentProfileId) throws SQLException {
+        this.getProxy().notifyExperimentPaused(experimentProfileId);
+    }
+
+    @Override
+    public void notifyExperimentResumed(long experimentProfileId) throws SQLException {
+        this.getProxy().notifyExperimentResumed(experimentProfileId);
     }
 
     @Override
@@ -140,6 +151,41 @@ public class ArchimulatorServlet extends HessianServlet implements ArchimulatorS
     @Override
     public boolean authenticateUser(String userId, String password) throws SQLException {
         return this.getProxy().authenticateUser(userId, password);
+    }
+
+    @Override
+    public void pauseExperimentById(long experimentProfileId) throws SQLException {
+        this.getProxy().pauseExperimentById(experimentProfileId);
+    }
+
+    @Override
+    public void resumeExperimentById(long experimentProfileId) throws SQLException {
+        this.getProxy().resumeExperimentById(experimentProfileId);
+    }
+
+    @Override
+    public void stopExperimentById(long experimentProfileId) throws SQLException {
+        this.getProxy().stopExperimentById(experimentProfileId);
+    }
+
+    @Override
+    public void refreshExperimentStateById(long experimentProfileId) throws SQLException {
+        this.getProxy().refreshExperimentStateById(experimentProfileId);
+    }
+
+    @Override
+    public Set<String> getUserIds() {
+        return this.getProxy().getUserIds();
+    }
+
+    @Override
+    public void send(String fromUserId, String toUserId, String message) {
+        this.getProxy().send(fromUserId, toUserId, message);
+    }
+
+    @Override
+    public String receive(String userId) {
+        return this.getProxy().receive(userId);
     }
 
     private ArchimulatorService getProxy() {

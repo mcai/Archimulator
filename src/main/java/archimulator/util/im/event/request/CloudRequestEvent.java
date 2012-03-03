@@ -16,27 +16,9 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.model.experiment.profile;
+package archimulator.util.im.event.request;
 
-public enum ExperimentProfileState {
-    SUBMITTED,
-    RUNNING,
-    PAUSED,
-    STOPPED;
+import archimulator.util.im.event.CloudEvent;
 
-    @Override
-    public String toString() {
-        switch (this) {
-            case SUBMITTED:
-                return "等候运行";
-            case RUNNING:
-                return "正在运行";
-            case PAUSED:
-                return "暂停运行";
-            case STOPPED:
-                return "运行结束";
-            default:
-                throw new IllegalArgumentException();
-        }
-    }
+public class CloudRequestEvent extends CloudEvent {
 }

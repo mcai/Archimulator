@@ -46,11 +46,11 @@
                  pageSize="10" pagingPosition="bottom">
             <listhead>
                 <listheader label="编号" width="50px"/>
-                <listheader label="当前目录" width="150px"/>
-                <listheader label="可执行文件名" width="150px"/>
-                <listheader label="程序参数" width="100px"/>
+                <listheader label="当前目录" width="300px"/>
+                <listheader label="可执行文件名" width="100px"/>
+                <listheader label="程序参数" width="300px"/>
                 <listheader label="标准输入" width="100px"/>
-                <listheader label="创建日期" width="200px"/>
+                <listheader label="创建日期" width="150px"/>
                 <listheader label="操作" width="60px"/>
             </listhead>
         </listbox>

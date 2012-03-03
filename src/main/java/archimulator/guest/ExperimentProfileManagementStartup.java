@@ -55,11 +55,69 @@ public class ExperimentProfileManagementStartup {
         e.printStackTrace();
     }
 
+//    private void submitExperimentProfiles() throws SQLException {
+//        List<SimulatedProgram> simulatedPrograms = new ArrayList<SimulatedProgram>();
+//        simulatedPrograms.add(Startup.SIMULATED_PROGRAM_MST_HT);
+//        simulatedPrograms.add(Startup.SIMULATED_PROGRAM_EM3D_HT);
+//        simulatedPrograms.add(Startup.SIMULATED_PROGRAM_429_MCF_HT);
+//
+//        List<Integer> l2SizeInKBytes = new ArrayList<Integer>();
+//        l2SizeInKBytes.add(512);
+//        l2SizeInKBytes.add(512 * 2);
+//        l2SizeInKBytes.add(512 * 4);
+//        l2SizeInKBytes.add(512 * 8);
+//
+//        List<ExperimentProfile> experimentProfiles = new ArrayList<ExperimentProfile>();
+//
+//        for (SimulatedProgram simulatedProgram : simulatedPrograms) {
+//            ProcessorProfile processorProfile = new ProcessorProfile(2, 2, 1024 * 1024 * 4, 8);
+//
+//            ExperimentProfile experimentProfile = new ExperimentProfile(processorProfile);
+//            experimentProfile.addWorkload(simulatedProgram);
+//            experimentProfile.functionallyToEnd();
+//            experimentProfiles.add(experimentProfile);
+//
+//            for (int l2SizeInKByte : l2SizeInKBytes) {
+//                ProcessorProfile processorProfile1 = new ProcessorProfile(2, 2, 1024 * l2SizeInKByte, 8);
+//
+//                ExperimentProfile experimentProfile1 = new ExperimentProfile(processorProfile1);
+//                experimentProfile1.addWorkload(simulatedProgram);
+//                experimentProfile1.functionallyToPseudoCallAndInDetailForMaxInsts(3720, 2000000000).addSimulationCapabilityClass(LastLevelCacheHtRequestCachePollutionProfilingCapability.class);
+//                experimentProfiles.add(experimentProfile1);
+//
+//                ExperimentProfile experimentProfile2 = new ExperimentProfile(processorProfile1);
+//                experimentProfile2.addWorkload(simulatedProgram);
+//                experimentProfile2.inDetailToEnd().addSimulationCapabilityClass(LastLevelCacheHtRequestCachePollutionProfilingCapability.class);
+//                experimentProfiles.add(experimentProfile2);
+//            }
+//        }
+//
+//        for(ExperimentProfile experimentProfile : experimentProfiles) {
+//            this.archimulatorService.addExperimentProfile(experimentProfile);
+//        }
+//
+//        System.out.println(this.archimulatorService.getExperimentProfilesAsList().size());
+//
+//        for(ExperimentProfile experimentProfile : this.archimulatorService.getExperimentProfilesAsList()) {
+//            System.out.println(experimentProfile.getState());
+//        }
+//
+//        this.archimulatorService.setRunningExperimentEnabled(true);
+//    }
+
     private void submitExperimentProfiles() throws SQLException {
+        this.archimulatorService.setRunningExperimentEnabled(false);
+        
+        this.archimulatorService.clearData();
+
         List<SimulatedProgram> simulatedPrograms = new ArrayList<SimulatedProgram>();
         simulatedPrograms.add(Startup.SIMULATED_PROGRAM_MST_HT);
         simulatedPrograms.add(Startup.SIMULATED_PROGRAM_EM3D_HT);
         simulatedPrograms.add(Startup.SIMULATED_PROGRAM_429_MCF_HT);
+
+        for(SimulatedProgram simulatedProgram : simulatedPrograms) {
+            this.archimulatorService.addSimulatedProgram(simulatedProgram);
+        }
 
         List<Integer> l2SizeInKBytes = new ArrayList<Integer>();
         l2SizeInKBytes.add(512);
@@ -67,42 +125,9 @@ public class ExperimentProfileManagementStartup {
         l2SizeInKBytes.add(512 * 4);
         l2SizeInKBytes.add(512 * 8);
 
-        List<ExperimentProfile> experimentProfiles = new ArrayList<ExperimentProfile>();
-
-        for (SimulatedProgram simulatedProgram : simulatedPrograms) {
-            ProcessorProfile processorProfile = new ProcessorProfile(2, 2, 1024 * 1024 * 4, 8);
-
-            ExperimentProfile experimentProfile = new ExperimentProfile(processorProfile);
-            experimentProfile.addWorkload(simulatedProgram);
-            experimentProfile.functionallyToEnd();
-            experimentProfiles.add(experimentProfile);
-
-            for (int l2SizeInKByte : l2SizeInKBytes) {
-                ProcessorProfile processorProfile1 = new ProcessorProfile(2, 2, 1024 * l2SizeInKByte, 8);
-
-                ExperimentProfile experimentProfile1 = new ExperimentProfile(processorProfile1);
-                experimentProfile1.addWorkload(simulatedProgram);
-                experimentProfile1.functionallyToPseudoCallAndInDetailForMaxInsts(3720, 2000000000).addSimulationCapabilityClass(LastLevelCacheHtRequestCachePollutionProfilingCapability.class);
-                experimentProfiles.add(experimentProfile1);
-
-                ExperimentProfile experimentProfile2 = new ExperimentProfile(processorProfile1);
-                experimentProfile2.addWorkload(simulatedProgram);
-                experimentProfile2.inDetailToEnd().addSimulationCapabilityClass(LastLevelCacheHtRequestCachePollutionProfilingCapability.class);
-                experimentProfiles.add(experimentProfile2);
-            }
+        for (int l2SizeInKByte : l2SizeInKBytes) {
+            this.archimulatorService.addProcessorProfile(new ProcessorProfile(2, 2, 1024 * l2SizeInKByte, 8));
         }
-
-        for(ExperimentProfile experimentProfile : experimentProfiles) {
-            this.archimulatorService.addExperimentProfile(experimentProfile);
-        }
-        
-        System.out.println(this.archimulatorService.getExperimentProfilesAsList().size());
-        
-        for(ExperimentProfile experimentProfile : this.archimulatorService.getExperimentProfilesAsList()) {
-            System.out.println(experimentProfile.getState());
-        }
-        
-        this.archimulatorService.setRunningExperimentEnabled(true);
     }
 
     public static void main(String[] args) throws SQLException {

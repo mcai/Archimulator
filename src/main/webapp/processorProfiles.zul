@@ -46,11 +46,11 @@
                  pageSize="10" pagingPosition="bottom">
             <listhead>
                 <listheader label="编号" width="50px"/>
-                <listheader label="核心数" width="150px"/>
-                <listheader label="每核心硬件线程数" width="150px"/>
-                <listheader label="二级缓存大小" width="100px"/>
-                <listheader label="二级缓存相联度" width="100px"/>
-                <listheader label="创建日期" width="200px"/>
+                <listheader label="核心数" width="100px"/>
+                <listheader label="每核心线程数" width="120px"/>
+                <listheader label="L2大小" width="100px"/>
+                <listheader label="L2相联度" width="100px"/>
+                <listheader label="创建日期" width="150px"/>
                 <listheader label="操作" width="60px"/>
             </listhead>
         </listbox>

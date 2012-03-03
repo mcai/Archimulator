@@ -18,19 +18,33 @@
  ******************************************************************************/
 package archimulator.guest;
 
+import archimulator.model.experiment.Experiment;
 import archimulator.model.experiment.profile.ExperimentProfile;
 import archimulator.service.ArchimulatorService;
 import archimulator.util.DateHelper;
 import archimulator.util.UpdateHelper;
+import archimulator.util.action.Action1;
+import archimulator.util.im.channel.CloudMessageChannel;
+import archimulator.util.im.event.request.RefreshExperiementStateRequestEvent;
+import archimulator.util.im.event.request.PauseExperimentRequestEvent;
+import archimulator.util.im.event.request.ResumeExperimentRequestEvent;
+import archimulator.util.im.event.request.StopExperimentRequestEvent;
+import archimulator.util.im.sink.GracefulMessageSink;
 import com.caucho.hessian.HessianException;
 import com.caucho.hessian.client.HessianProxyFactory;
 
 import java.net.MalformedURLException;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class GuestStartup {
     private ArchimulatorService archimulatorService;
+    private Map<Long, Experiment> experimentProfileIdsToExperiments;
+    private CloudMessageChannel cloudMessageChannel;
+    private String simulatorUserId;
 
     public GuestStartup() {
         try {
@@ -44,6 +58,54 @@ public class GuestStartup {
             recordException(e);
             throw new RuntimeException(e);
         }
+
+        this.experimentProfileIdsToExperiments = new HashMap<Long, Experiment>();
+        
+        this.cloudMessageChannel = new CloudMessageChannel(UUID.randomUUID().toString(), new GracefulMessageSink(this.archimulatorService));
+
+        this.simulatorUserId = this.cloudMessageChannel.getUserId();
+
+        this.cloudMessageChannel.addCloudEventListener(PauseExperimentRequestEvent.class, new Action1<PauseExperimentRequestEvent>() {
+            @Override
+            public void apply(PauseExperimentRequestEvent event) {
+                try {
+                    pauseExperiment(event.getExperimentProfileId());
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
+        this.cloudMessageChannel.addCloudEventListener(ResumeExperimentRequestEvent.class, new Action1<ResumeExperimentRequestEvent>() {
+            @Override
+            public void apply(ResumeExperimentRequestEvent event) {
+                try {
+                    resumeExperiment(event.getExperimentProfileId());
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
+        this.cloudMessageChannel.addCloudEventListener(StopExperimentRequestEvent.class, new Action1<StopExperimentRequestEvent>() {
+            @Override
+            public void apply(StopExperimentRequestEvent event) {
+                try {
+                    stopExperiment(event.getExperimentProfileId());
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
+        this.cloudMessageChannel.addCloudEventListener(RefreshExperiementStateRequestEvent.class, new Action1<RefreshExperiementStateRequestEvent>() {
+            @Override
+            public void apply(RefreshExperiementStateRequestEvent event) {
+                //TODO
+            }
+        });
+
+        this.cloudMessageChannel.open();
     }
 
     public static void recordException(Exception e) {
@@ -93,11 +155,15 @@ public class GuestStartup {
     
     private boolean retrieveAndExecuteNewExperimentProfile() throws SQLException {
         if(this.archimulatorService.isRunningExperimentEnabled()) {
-            ExperimentProfile profile = this.archimulatorService.retrieveOneExperimentProfileToRun();
+            ExperimentProfile experimentProfile = this.archimulatorService.retrieveOneExperimentProfileToRun(this.simulatorUserId);
             
-            if(profile != null) {
-                profile.runToEnd();
-                this.archimulatorService.notifyExperimentStopped(profile.getId());
+            if(experimentProfile != null) {
+                System.out.printf("[%s Contact Server] Running new experiment profile\n", DateHelper.toString(new Date()));
+
+                Experiment experiment = experimentProfile.createExperiment();
+                this.experimentProfileIdsToExperiments.put(experimentProfile.getId(), experiment);
+                experiment.runToEnd();
+                this.archimulatorService.notifyExperimentStopped(experimentProfile.getId());
                 return true;
             }
             else {
@@ -108,6 +174,34 @@ public class GuestStartup {
         else {
             System.out.printf("[%s Contact Server] No experiment profile to run\n", DateHelper.toString(new Date()));
             return false;
+        }
+    }
+
+    public void pauseExperiment(long experimentProfileId) throws SQLException {
+        System.out.printf("[%s Contact Server] Pausing experiment\n", DateHelper.toString(new Date()));
+
+        if (this.experimentProfileIdsToExperiments.containsKey(experimentProfileId)) {
+            this.experimentProfileIdsToExperiments.get(experimentProfileId).pause();
+            this.archimulatorService.notifyExperimentPaused(experimentProfileId);
+        }
+    }
+
+    public void resumeExperiment(long experimentProfileId) throws SQLException {
+        System.out.printf("[%s Contact Server] Resuming experiment\n", DateHelper.toString(new Date()));
+
+        if (this.experimentProfileIdsToExperiments.containsKey(experimentProfileId)) {
+            this.experimentProfileIdsToExperiments.get(experimentProfileId).resume();
+            this.archimulatorService.notifyExperimentResumed(experimentProfileId);
+        }
+    }
+
+    public void stopExperiment(long experimentProfileId) throws SQLException {
+        System.out.printf("[%s Contact Server] Stopping experiment\n", DateHelper.toString(new Date()));
+
+        if (this.experimentProfileIdsToExperiments.containsKey(experimentProfileId)) {
+            this.experimentProfileIdsToExperiments.get(experimentProfileId).stop();
+            this.experimentProfileIdsToExperiments.remove(experimentProfileId);
+            this.archimulatorService.notifyExperimentStopped(experimentProfileId);
         }
     }
 

@@ -125,7 +125,7 @@ public class Startup {
         }
         
         for(ExperimentProfile experimentProfile : experimentProfiles) {
-            experimentProfile.runToEnd();
+            experimentProfile.createExperiment().runToEnd();
         }
     }
 }

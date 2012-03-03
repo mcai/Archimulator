@@ -16,27 +16,44 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.model.experiment.profile;
+package archimulator.util.im.sink;
 
-public enum ExperimentProfileState {
-    SUBMITTED,
-    RUNNING,
-    PAUSED,
-    STOPPED;
+import java.util.HashSet;
+import java.util.Set;
+
+public class GracefulMessageSink implements MessageSink {
+    private MessageSink proxy;
+
+    public GracefulMessageSink(MessageSink proxy) {
+        this.proxy = proxy;
+    }
 
     @Override
-    public String toString() {
-        switch (this) {
-            case SUBMITTED:
-                return "等候运行";
-            case RUNNING:
-                return "正在运行";
-            case PAUSED:
-                return "暂停运行";
-            case STOPPED:
-                return "运行结束";
-            default:
-                throw new IllegalArgumentException();
+    public Set<String> getUserIds() {
+        try {
+            return this.proxy.getUserIds();
+        } catch (Exception e) {
+            System.err.println(e);
+            return new HashSet<String>();
+        }
+    }
+
+    @Override
+    public void send(String fromUserId, String toUserId, String message) {
+        try {
+            this.proxy.send(fromUserId, toUserId, message);
+        } catch (Exception e) {
+            System.err.println(e); //TODO: schedule resend
+        }
+    }
+
+    @Override
+    public String receive(String userId) {
+        try {
+            return this.proxy.receive(userId);
+        } catch (Exception e) {
+            System.err.println(e);
+            return null;
         }
     }
 }

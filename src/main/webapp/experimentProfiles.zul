@@ -49,9 +49,9 @@
                 <listheader label="实验类型" width="100px"/>
                 <listheader label="生成帮助线程伪指令编号" width="180px"/>
                 <listheader label="最大指令数" width="150px"/>
-                <listheader label="创建日期" width="200px"/>
+                <listheader label="创建日期" width="150px"/>
                 <listheader label="状态" width="100px"/>
-                <listheader label="操作" width="60px"/>
+                <listheader label="操作" width="300px"/>
             </listhead>
         </listbox>
 

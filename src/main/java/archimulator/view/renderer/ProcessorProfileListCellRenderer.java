@@ -1,8 +1,27 @@
+/*******************************************************************************
+ * Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).
+ *
+ * This file is part of the Archimulator multicore architectural simulator.
+ *
+ * Archimulator is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Archimulator is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
 package archimulator.view.renderer;
 
 import archimulator.model.experiment.profile.ProcessorProfile;
 import archimulator.service.ArchimulatorService;
 import archimulator.service.ArchimulatorServletContextListener;
+import archimulator.util.StorageUnit;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Session;
 import org.zkoss.zk.ui.event.Event;
@@ -25,7 +44,7 @@ public class ProcessorProfileListCellRenderer implements ListitemRenderer<Proces
         item.appendChild(new Listcell(data.getId() + ""));
         item.appendChild(new Listcell(data.getNumCores() + ""));
         item.appendChild(new Listcell(data.getNumThreadsPerCore() + ""));
-        item.appendChild(new Listcell(data.getL2Size() + ""));
+        item.appendChild(new Listcell(StorageUnit.toString(data.getL2Size()) + ""));
         item.appendChild(new Listcell(data.getL2Associativity() + ""));
         item.appendChild(new Listcell(data.getCreatedTimeAsString() + ""));
 

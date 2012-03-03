@@ -16,27 +16,25 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.model.experiment.profile;
+package archimulator.util.im.sink;
 
-public enum ExperimentProfileState {
-    SUBMITTED,
-    RUNNING,
-    PAUSED,
-    STOPPED;
+import java.util.ArrayList;
+import java.util.List;
 
-    @Override
-    public String toString() {
-        switch (this) {
-            case SUBMITTED:
-                return "等候运行";
-            case RUNNING:
-                return "正在运行";
-            case PAUSED:
-                return "暂停运行";
-            case STOPPED:
-                return "运行结束";
-            default:
-                throw new IllegalArgumentException();
-        }
+public class CloudUser {
+    private String id;
+    private transient List<InstantMessage> instantMessages;
+
+    public CloudUser(String id) {
+        this.id = id;
+        this.instantMessages = new ArrayList<InstantMessage>();
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public List<InstantMessage> getInstantMessages() {
+        return instantMessages;
     }
 }

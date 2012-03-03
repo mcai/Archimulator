@@ -50,5 +50,4 @@ temp result:
 
 
 //TODO:
-1. start, pause, resume, and stop experiment from admin UI
-2. in the admin UI: render experiment result periodically and in the end of the experiment
+1. in the admin UI: render experiment result periodically and in the end of the experiment

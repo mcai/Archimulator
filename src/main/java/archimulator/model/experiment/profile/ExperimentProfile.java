@@ -21,15 +21,14 @@ package archimulator.model.experiment.profile;
 import archimulator.model.capability.SimulationCapability;
 import archimulator.model.experiment.CheckpointedExperiment;
 import archimulator.model.experiment.DetailedExperiment;
+import archimulator.model.experiment.Experiment;
 import archimulator.model.experiment.FunctionalExperiment;
 import archimulator.model.simulation.ContextConfig;
 import archimulator.model.simulation.SimulatedProgram;
 import archimulator.sim.uncore.cache.eviction.LeastRecentlyUsedEvictionPolicy;
 import archimulator.util.DateHelper;
-import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
-import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.io.Serializable;
@@ -63,6 +62,9 @@ public class ExperimentProfile implements Serializable {
 
     @DatabaseField
     private long createdTime;
+
+    @DatabaseField
+    private String simulatorUserId;
 
     public ExperimentProfile() {
     }
@@ -129,20 +131,19 @@ public class ExperimentProfile implements Serializable {
         return maxInsts;
     }
 
-    public void runToEnd() {
+    public Experiment createExperiment() {
         switch (this.type) {
             case FUNCTIONAL_EXPERIMENT:
-                new FunctionalExperiment(UUID.randomUUID().toString(), this.getProcessorProfile().getNumCores(), this.getProcessorProfile().getNumThreadsPerCore(), this.getContextConfigs(),
-                        this.simulationCapabilityClasses, this.getProcessorProfile().getProcessorCapabilityClasses(), this.getProcessorProfile().getKernelCapabilityClasses()).runToEnd();
-                break;
+                return new FunctionalExperiment(UUID.randomUUID().toString(), this.getProcessorProfile().getNumCores(), this.getProcessorProfile().getNumThreadsPerCore(), this.getContextConfigs(),
+                        this.simulationCapabilityClasses, this.getProcessorProfile().getProcessorCapabilityClasses(), this.getProcessorProfile().getKernelCapabilityClasses());
             case DETAILED_EXPERIMENT:
-                new DetailedExperiment(UUID.randomUUID().toString(), this.getProcessorProfile().getNumCores(), this.getProcessorProfile().getNumThreadsPerCore(), this.getContextConfigs(), LeastRecentlyUsedEvictionPolicy.FACTORY, this.getProcessorProfile().getL2Size(), this.getProcessorProfile().getL2Associativity(),
-                        this.simulationCapabilityClasses, this.getProcessorProfile().getProcessorCapabilityClasses(), this.getProcessorProfile().getKernelCapabilityClasses()).runToEnd();
-                break;
+                return new DetailedExperiment(UUID.randomUUID().toString(), this.getProcessorProfile().getNumCores(), this.getProcessorProfile().getNumThreadsPerCore(), this.getContextConfigs(), LeastRecentlyUsedEvictionPolicy.FACTORY, this.getProcessorProfile().getL2Size(), this.getProcessorProfile().getL2Associativity(),
+                        this.simulationCapabilityClasses, this.getProcessorProfile().getProcessorCapabilityClasses(), this.getProcessorProfile().getKernelCapabilityClasses());
             case CHECKPOINTED_EXPERIMENT:
-                new CheckpointedExperiment(UUID.randomUUID().toString(), this.getProcessorProfile().getNumCores(), this.getProcessorProfile().getNumThreadsPerCore(), this.getContextConfigs(), this.getMaxInsts(), this.getProcessorProfile().getL2Size(), this.getProcessorProfile().getL2Associativity(), LeastRecentlyUsedEvictionPolicy.FACTORY, this.getPthreadSpawnedIndex(),
-                        this.simulationCapabilityClasses, this.getProcessorProfile().getProcessorCapabilityClasses(), this.getProcessorProfile().getKernelCapabilityClasses()).runToEnd();
-                break;
+                return new CheckpointedExperiment(UUID.randomUUID().toString(), this.getProcessorProfile().getNumCores(), this.getProcessorProfile().getNumThreadsPerCore(), this.getContextConfigs(), this.getMaxInsts(), this.getProcessorProfile().getL2Size(), this.getProcessorProfile().getL2Associativity(), LeastRecentlyUsedEvictionPolicy.FACTORY, this.getPthreadSpawnedIndex(),
+                        this.simulationCapabilityClasses, this.getProcessorProfile().getProcessorCapabilityClasses(), this.getProcessorProfile().getKernelCapabilityClasses());
+                default:
+                    throw new IllegalArgumentException();
         }
     }
 
@@ -180,6 +181,14 @@ public class ExperimentProfile implements Serializable {
 
     public void setMaxInsts(int maxInsts) {
         this.maxInsts = maxInsts;
+    }
+
+    public String getSimulatorUserId() {
+        return simulatorUserId;
+    }
+
+    public void setSimulatorUserId(String simulatorUserId) {
+        this.simulatorUserId = simulatorUserId;
     }
 
     public static String getUserHome() {

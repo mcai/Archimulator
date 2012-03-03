@@ -21,11 +21,12 @@ package archimulator.service;
 import archimulator.model.experiment.profile.ExperimentProfile;
 import archimulator.model.experiment.profile.ProcessorProfile;
 import archimulator.model.simulation.SimulatedProgram;
+import archimulator.util.im.sink.MessageSink;
 
 import java.sql.SQLException;
 import java.util.List;
 
-public interface ArchimulatorService {
+public interface ArchimulatorService extends MessageSink {
     void stop();
 
     void clearData() throws SQLException;
@@ -60,7 +61,11 @@ public interface ArchimulatorService {
 
     void updateExperimentProfile(ExperimentProfile experimentProfile) throws SQLException;
 
-    ExperimentProfile retrieveOneExperimentProfileToRun() throws SQLException;
+    ExperimentProfile retrieveOneExperimentProfileToRun(String simulatorUserId) throws SQLException;
+
+    void notifyExperimentPaused(long experimentProfileId) throws SQLException;
+
+    void notifyExperimentResumed(long experimentProfileId) throws SQLException;
 
     void notifyExperimentStopped(long experimentProfileId) throws SQLException;
 
@@ -71,4 +76,12 @@ public interface ArchimulatorService {
     void setUserPassword(String userId, String password) throws SQLException;
 
     boolean authenticateUser(String userId, String password) throws SQLException;
+
+    void pauseExperimentById(long experimentProfileId) throws SQLException;
+
+    void resumeExperimentById(long experimentProfileId) throws SQLException;
+
+    void stopExperimentById(long experimentProfileId) throws SQLException;
+
+    void refreshExperimentStateById(long experimentProfileId) throws SQLException;
 }

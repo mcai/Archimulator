@@ -23,6 +23,13 @@ import archimulator.model.experiment.profile.ExperimentProfileState;
 import archimulator.model.experiment.profile.ProcessorProfile;
 import archimulator.model.simulation.SimulatedProgram;
 import archimulator.model.user.User;
+import archimulator.util.im.channel.CloudMessageChannel;
+import archimulator.util.im.event.request.PauseExperimentRequestEvent;
+import archimulator.util.im.event.request.RefreshExperiementStateRequestEvent;
+import archimulator.util.im.event.request.ResumeExperimentRequestEvent;
+import archimulator.util.im.event.request.StopExperimentRequestEvent;
+import archimulator.util.im.sink.MessageSink;
+import archimulator.util.im.sink.MessageSinkImpl;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcPooledConnectionSource;
@@ -32,6 +39,7 @@ import it.sauronsoftware.cron4j.Scheduler;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Set;
 
 public class ArchimulatorServiceImpl implements ArchimulatorService {
     private Dao<SimulatedProgram, Long> simulatedPrograms;
@@ -45,6 +53,10 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
     private JdbcPooledConnectionSource connectionSource;
     
     private boolean runningExperimentEnabled;
+    
+    private MessageSink messageSinkProxy;
+    
+    private CloudMessageChannel cloudMessageChannel;
 
     @SuppressWarnings("unchecked")
     public ArchimulatorServiceImpl() {
@@ -71,6 +83,11 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+        
+        this.messageSinkProxy = new MessageSinkImpl();
+
+        this.cloudMessageChannel = new CloudMessageChannel("#admin", this);
+        this.cloudMessageChannel.open();
 
         this.scheduler = new Scheduler();
         this.scheduler.schedule("* * * * *", new Runnable() {
@@ -91,6 +108,8 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
         try {
             this.scheduler.stop();
             this.connectionSource.close();
+            
+            this.cloudMessageChannel.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -98,7 +117,11 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
     
     @Override
     public void clearData() throws SQLException {
+        this.simulatedPrograms.delete(this.simulatedPrograms.deleteBuilder().prepare());
+        this.processorProfiles.delete(this.processorProfiles.deleteBuilder().prepare());
         this.experimentProfiles.delete(this.experimentProfiles.deleteBuilder().prepare());
+
+        this.users.delete(this.users.deleteBuilder().prepare());
     }
 
     @Override
@@ -177,7 +200,7 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
     }
 
     @Override
-    public ExperimentProfile retrieveOneExperimentProfileToRun() throws SQLException {
+    public ExperimentProfile retrieveOneExperimentProfileToRun(String simulatorUserId) throws SQLException {
         if(!this.runningExperimentEnabled) {
             return null;
         }
@@ -186,11 +209,34 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
         ExperimentProfile result = this.experimentProfiles.queryForFirst(query);
         if(result != null) {
             result.setState(ExperimentProfileState.RUNNING);
+            result.setSimulatorUserId(simulatorUserId);
             this.experimentProfiles.update(result);
             return result;
         }
         
         return null;
+    }
+    
+    @Override
+    public void notifyExperimentPaused(long experimentProfileId) throws SQLException {
+        ExperimentProfile profile = this.experimentProfiles.queryForId(experimentProfileId);
+        if(profile == null || profile.getState() != ExperimentProfileState.RUNNING) {
+            return;
+        }
+
+        profile.setState(ExperimentProfileState.PAUSED);
+        this.experimentProfiles.update(profile);
+    }
+    
+    @Override
+    public void notifyExperimentResumed(long experimentProfileId) throws SQLException {
+        ExperimentProfile profile = this.experimentProfiles.queryForId(experimentProfileId);
+        if(profile == null || profile.getState() != ExperimentProfileState.PAUSED) {
+            return;
+        }
+
+        profile.setState(ExperimentProfileState.RUNNING);
+        this.experimentProfiles.update(profile);
     }
 
     @Override
@@ -230,13 +276,74 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
         return this.users.idExists(userId) && this.users.queryForId(userId).getPassword().equals(password);
     }
 
+    @Override
+    public Set<String> getUserIds() {
+        return this.messageSinkProxy.getUserIds();
+    }
+
+    @Override
+    public void send(String fromUserId, String toUserId, String message) {
+        this.messageSinkProxy.send(fromUserId, toUserId, message);
+    }
+
+    @Override
+    public String receive(String userId) {
+        return this.messageSinkProxy.receive(userId);
+    }
+
+    @Override
+    public void pauseExperimentById(long experimentProfileId) throws SQLException {
+        if(!this.experimentProfiles.idExists(experimentProfileId)) {
+            return;
+        }
+        
+        ExperimentProfile experimentProfile = this.getExperimentProfileById(experimentProfileId);
+        if(experimentProfile.getState() == ExperimentProfileState.RUNNING) {
+            this.cloudMessageChannel.send(experimentProfile.getSimulatorUserId(), new PauseExperimentRequestEvent(experimentProfile.getId()));
+        }
+    }
+    
+    @Override
+    public void resumeExperimentById(long experimentProfileId) throws SQLException {
+        if(!this.experimentProfiles.idExists(experimentProfileId)) {
+            return;
+        }
+
+        ExperimentProfile experimentProfile = this.getExperimentProfileById(experimentProfileId);
+        if(experimentProfile.getState() == ExperimentProfileState.PAUSED) {
+            this.cloudMessageChannel.send(experimentProfile.getSimulatorUserId(), new ResumeExperimentRequestEvent(experimentProfile.getId()));
+        }
+    }
+
+    @Override
+    public void stopExperimentById(long experimentProfileId) throws SQLException {
+        if(!this.experimentProfiles.idExists(experimentProfileId)) {
+            return;
+        }
+
+        ExperimentProfile experimentProfile = this.getExperimentProfileById(experimentProfileId);
+        if(experimentProfile.getState() != ExperimentProfileState.SUBMITTED) {
+            this.cloudMessageChannel.send(experimentProfile.getSimulatorUserId(), new StopExperimentRequestEvent(experimentProfile.getId()));
+        }
+    }
+    
+    @Override
+    public void refreshExperimentStateById(long experimentProfileId) throws SQLException {
+        if(!this.experimentProfiles.idExists(experimentProfileId)) {
+            return;
+        }
+
+        ExperimentProfile experimentProfile = this.getExperimentProfileById(experimentProfileId);
+        this.cloudMessageChannel.send(experimentProfile.getSimulatorUserId(), new RefreshExperiementStateRequestEvent(experimentProfile.getId()));
+    }
+
     private void doHousekeeping() throws SQLException {
     }
 
     public static final String USER_ID_ADMIN = "itecgo";
     public static final String USER_PASSWORD_ADMIN = "1026@ustc";
 
-    public static final String DATABASE_REVISION = "21";
+    public static final String DATABASE_REVISION = "22";
 
     //    public static final String DATABASE_URL = "jdbc:h2:mem:account";
     public static final String DATABASE_URL = "jdbc:h2:~/.archimulator/data/v" + DATABASE_REVISION;

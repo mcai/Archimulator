@@ -34,15 +34,15 @@
                     <textbox id="textboxNumCores" width="150px"/>
                 </row>
                 <row>
-                    每核心硬件线程数
+                    每核心线程数
                     <textbox id="textboxNumThreadsPerCore" width="150px"/>
                 </row>
                 <row>
-                    二级缓存大小
+                    L2大小
                     <textbox id="textboxL2Size" width="150px"/>
                 </row>
                 <row>
-                    二级缓存相联度
+                    L2相联度
                     <textbox id="textboxL2Associativity" width="150px"/>
                 </row>
             </rows>
