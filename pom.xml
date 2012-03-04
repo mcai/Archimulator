@@ -15,19 +15,19 @@
 
     <repositories>
         <!--<repository>-->
-            <!--<id>ZK_CE</id>-->
-            <!--<name>ZK CE Repository</name>-->
-            <!--<url>http://mavensync.zkoss.org/maven2</url>-->
+        <!--<id>ZK_CE</id>-->
+        <!--<name>ZK CE Repository</name>-->
+        <!--<url>http://mavensync.zkoss.org/maven2</url>-->
         <!--</repository>-->
         <!--<repository>-->
-            <!--<id>gridgainsystems</id>-->
-            <!--<name>gridgainsystems Repository</name>-->
-            <!--<url>http://www.gridgainsystems.com/maven2</url>-->
+        <!--<id>gridgainsystems</id>-->
+        <!--<name>gridgainsystems Repository</name>-->
+        <!--<url>http://www.gridgainsystems.com/maven2</url>-->
         <!--</repository>-->
         <!--<repository>-->
-            <!--<id>littleshoot</id>-->
-            <!--<name>LittleShoot Repository</name>-->
-            <!--<url>http://svn.littleshoot.org/maven</url>-->
+        <!--<id>littleshoot</id>-->
+        <!--<name>LittleShoot Repository</name>-->
+        <!--<url>http://svn.littleshoot.org/maven</url>-->
         <!--</repository>-->
     </repositories>
 
@@ -109,9 +109,9 @@
             <version>4.31</version>
         </dependency>
         <dependency>
-        	<groupId>com.h2database</groupId>
-        	<artifactId>h2</artifactId>
-        	<version>1.3.163</version>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.3.163</version>
         </dependency>
         <dependency>
             <groupId>com.jcraft</groupId>
@@ -122,6 +122,11 @@
             <groupId>net.sf.cron4j</groupId>
             <artifactId>cron4j</artifactId>
             <version>2.2.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jfree</groupId>
+            <artifactId>jfreechart</artifactId>
+            <version>1.0.14</version>
         </dependency>
     </dependencies>
     <build>

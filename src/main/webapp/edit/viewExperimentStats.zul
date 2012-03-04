@@ -32,7 +32,19 @@
         <separator bar="true"/>
         <separator/>
 
-        <vbox id="vboxStats" vflex="true" height="360px"/>
+        <div height="230px">
+            <vbox id="vboxStats" vflex="true"/>
+        </div>
+
+        <separator bar="true"/>
+        <separator/>
+
+        <div align="center">
+            <hbox>
+                <image id="imageStats"/>
+                <image id="imageStats2"/>
+            </hbox>
+        </div>
 
         <separator bar="true"/>
         <separator/>

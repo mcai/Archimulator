@@ -19,19 +19,20 @@
 package archimulator.view.page.edit;
 
 import archimulator.model.experiment.profile.ExperimentProfile;
+import archimulator.view.ChartHelper;
 import archimulator.view.ServerPush;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.util.GenericForwardComposer;
-import org.zkoss.zul.Button;
-import org.zkoss.zul.Textbox;
-import org.zkoss.zul.Vbox;
-import org.zkoss.zul.Window;
+import org.zkoss.zul.*;
 
 import java.sql.SQLException;
 
 public class ViewExperimentStatsPage extends GenericForwardComposer<Window> {
     private Textbox textboxId;
     private Vbox vboxStats;
+
+    private Image imageStats;
+    private Image imageStats2;
 
     private Button buttonOk;
     private Button buttonCancel;
@@ -50,6 +51,9 @@ public class ViewExperimentStatsPage extends GenericForwardComposer<Window> {
         this.experimentProfile = (ExperimentProfile) arg.get("experimentProfile");
 
         this.textboxId.setValue(this.experimentProfile.getId() + "");
+
+        this.imageStats.setContent(ChartHelper.render("图表1", 300, 200)); //TODO
+        this.imageStats2.setContent(ChartHelper.render("图表2", 300, 200)); //TODO
 
         ServerPush.start(this.vboxStats);
 
