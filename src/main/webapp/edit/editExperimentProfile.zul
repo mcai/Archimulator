@@ -34,10 +34,10 @@
                     负载->硬件线程映射
                     <grid id="gridContextConfigs" vflex="true" height="280px">
                         <columns>
-                            <column width="60px"/>
-                            <column width="100px"/>
-                            <column width="60px"/>
-                            <column width="350px"/>
+                            <column width="50px"/>
+                            <column width="50px"/>
+                            <column width="50px"/>
+                            <column width="430px"/>
                         </columns>
                         <rows>
                         </rows>

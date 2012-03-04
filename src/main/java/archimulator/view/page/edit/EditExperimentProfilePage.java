@@ -176,21 +176,21 @@ public class EditExperimentProfilePage extends GenericForwardComposer<Window> {
             Row row = new Row();
 
             Label labelThreadId = new Label("线程");
-            labelThreadId.setWidth("50px");
+            labelThreadId.setWidth("40px");
             row.appendChild(labelThreadId);
 
             Textbox textboxThreadId = new Textbox();
-            textboxThreadId.setWidth("80px");
+            textboxThreadId.setWidth("40px");
             textboxThreadId.setText(i + "");
             textboxThreadId.setReadonly(true);
             row.appendChild(textboxThreadId);
 
             Label labelSimulatedProgram = new Label("负载");
-            labelSimulatedProgram.setWidth("50px");
+            labelSimulatedProgram.setWidth("40px");
             row.appendChild(labelSimulatedProgram);
 
             Combobox comboboxSimulatedProgram = new Combobox();
-            comboboxSimulatedProgram.setWidth("330px");
+            comboboxSimulatedProgram.setWidth("400px");
             comboboxSimulatedProgram.setModel(new ListModelList<SimulatedProgram>(archimulatorService.getSimulatedProgramsAsList()));
             row.appendChild(comboboxSimulatedProgram);
 

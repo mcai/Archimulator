@@ -1,0 +1,46 @@
+<zk>
+    <window id="viewExperimentStats" title="实验统计 - Archimulator用户后台" border="normal" visible="false"
+            width="800px" height="580px" sizable="true"
+            apply="archimulator.view.page.edit.ViewExperimentStatsPage">
+        <zscript>
+            import org.zkoss.zk.ui.*;
+
+            Session s = Sessions.getCurrent();
+            if(s.getAttribute("userId") == null)
+            Executions.sendRedirect("login.zul");
+            else
+            viewExperimentStats.setVisible(true);
+
+            void logout() {
+            s.invalidate();
+            Executions.sendRedirect("login.zul");
+            }
+        </zscript>
+        <grid>
+            <columns>
+                <column width="150px"/>
+                <column width="600px"/>
+            </columns>
+            <rows>
+                <row>
+                    编号
+                    <textbox id="textboxId" readonly="true" width="150px"/>
+                </row>
+            </rows>
+        </grid>
+
+        <separator bar="true"/>
+        <separator/>
+
+        <vbox id="vboxStats" vflex="true" height="360px"/>
+
+        <separator bar="true"/>
+        <separator/>
+
+        <div align="center">
+            <hbox>
+                <button id="buttonOk" forward="viewExperimentStats.onOK" label="关 闭"/>
+            </hbox>
+        </div>
+    </window>
+</zk>

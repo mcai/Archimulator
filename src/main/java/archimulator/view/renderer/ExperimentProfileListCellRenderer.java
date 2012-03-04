@@ -66,6 +66,10 @@ public class ExperimentProfileListCellRenderer implements ListitemRenderer<Exper
         if(data.getState() == ExperimentProfileState.RUNNING || data.getState() == ExperimentProfileState.PAUSED) {
             addButtonStop(listCellOperations, data, archimulatorService);
         }
+
+        if(data.getState() != ExperimentProfileState.SUBMITTED) {
+            addButtonStats(listCellOperations, data, archimulatorService);
+        }
     }
 
     private void addButtonEdit(Listcell listCellOperations, final ExperimentProfile data) {
@@ -170,5 +174,22 @@ public class ExperimentProfileListCellRenderer implements ListitemRenderer<Exper
             }
         });
         listCellOperations.appendChild(buttonStop);
+    }
+
+    private void addButtonStats(Listcell listCellOperations, final ExperimentProfile data, final ArchimulatorService archimulatorService) {
+        Button buttonStats = new Button("统计");
+
+        buttonStats.addEventListener(Events.ON_CLICK, new EventListener<Event>() {
+            @Override
+            public void onEvent(Event event) throws Exception {
+                Map<String, Object> arg = new HashMap<String, Object>();
+
+                arg.put("experimentProfile", data);
+
+                Window win = (Window) Executions.createComponents("/edit/viewExperimentStats.zul", null, arg);
+                win.doModal();
+            }
+        });
+        listCellOperations.appendChild(buttonStats);
     }
 }

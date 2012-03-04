@@ -21,6 +21,7 @@ package archimulator.model.experiment.profile;
 import archimulator.model.capability.KernelCapability;
 import archimulator.model.capability.ProcessorCapability;
 import archimulator.util.DateHelper;
+import archimulator.util.StorageUnit;
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -125,6 +126,6 @@ public class ProcessorProfile implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("ProcessorProfile{id=%d, numCores=%d, numThreadsPerCore=%d, l2Size=%d, l2Associativity=%d}", id, numCores, numThreadsPerCore, l2Size, l2Associativity);
+        return String.format("ProcessorProfile{id=%d, numCores=%d, numThreadsPerCore=%d, l2Size=%s, l2Associativity=%d}", id, numCores, numThreadsPerCore, StorageUnit.toString(l2Size), l2Associativity);
     }
 }
