@@ -1,21 +1,20 @@
 package archimulator.view;
 
+import archimulator.util.action.Action1;
 import org.zkoss.lang.Threads;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Desktop;
 import org.zkoss.zk.ui.Executions;
-import org.zkoss.zul.Label;
 import org.zkoss.zul.Messagebox;
-import org.zkoss.zul.Separator;
 
 public class ServerPush {
-    public static void start(Component info) throws InterruptedException {
+    public static <ComponentT extends Component> void start(ComponentT info, Action1<ComponentT> onUpdateCallback) throws InterruptedException {
         Desktop desktop = Executions.getCurrent().getDesktop();
         if (desktop.isServerPushEnabled()) {
             Messagebox.show("Already started");
         } else {
             desktop.enableServerPush(true);
-            new WorkingThread(info).start();
+            new WorkingThread<ComponentT>(info, onUpdateCallback).start();
         }
     }
 
@@ -28,28 +27,30 @@ public class ServerPush {
         }
     }
 
-    public static void updateInfo(Component info) {
-        Integer i = (Integer) info.getAttribute("count");
-        int v = i == null ? 0 : i + 1;
-
-        while (info.getChildren().size() > 10) {
-            info.getChildren().get(0).detach();
-            info.getChildren().get(0).detach();
-        }
-        info.setAttribute("count", new Integer(v));
-
-        info.appendChild(new Label(" " + v));
-
-        Separator separator = new Separator();
-        separator.setBar(true);
-        info.appendChild(separator);
-    }
+//    public static void updateInfo(Component info) {
+//        Integer i = (Integer) info.getAttribute("count");
+//        int v = i == null ? 0 : i + 1;
+//
+//        while (info.getChildren().size() > 10) {
+//            info.getChildren().get(0).detach();
+//            info.getChildren().get(0).detach();
+//        }
+//        info.setAttribute("count", new Integer(v));
+//
+//        info.appendChild(new Label(" " + v));
+//
+//        Separator separator = new Separator();
+//        separator.setBar(true);
+//        info.appendChild(separator);
+//    }
     
-    private static class WorkingThread extends Thread {
-        private final Desktop desktop;
-        private final Component info;
+    private static class WorkingThread<ComponentT extends Component> extends Thread {
+        private Desktop desktop;
+        private ComponentT info;
+        private Action1<ComponentT> onUpdateCallback;
 
-        private WorkingThread(Component info) {
+        private WorkingThread(ComponentT info, Action1<ComponentT> onUpdateCallback) {
+            this.onUpdateCallback = onUpdateCallback;
             this.desktop = info.getDesktop();
             this.info = info;
         }
@@ -60,7 +61,7 @@ public class ServerPush {
                     Executions.activate(desktop);
 
                     try {
-                        updateInfo(info);
+                        onUpdateCallback.apply(info);
                     } catch (RuntimeException ex) {
                         System.out.println(ex);
                         throw ex;

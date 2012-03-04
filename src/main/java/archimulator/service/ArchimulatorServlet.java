@@ -25,6 +25,7 @@ import com.caucho.hessian.server.HessianServlet;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class ArchimulatorServlet extends HessianServlet implements ArchimulatorService {
@@ -171,6 +172,21 @@ public class ArchimulatorServlet extends HessianServlet implements ArchimulatorS
     @Override
     public void refreshExperimentStateById(long experimentProfileId) throws SQLException {
         this.getProxy().refreshExperimentStateById(experimentProfileId);
+    }
+
+    @Override
+    public void notifyPollStatsCompletedEvent(long experimentProfileId, Map<String, Object> stats) throws SQLException {
+        this.getProxy().notifyPollStatsCompletedEvent(experimentProfileId, stats);
+    }
+
+    @Override
+    public void notifyDumpStatsCompletedEvent(long experimentProfileId, Map<String, Object> stats) throws SQLException {
+        this.getProxy().notifyDumpStatsCompletedEvent(experimentProfileId, stats);
+    }
+
+    @Override
+    public Map<String, Object> getExperimentStatsById(long experimentProfileId) throws SQLException {
+        return this.getProxy().getExperimentStatsById(experimentProfileId);
     }
 
     @Override

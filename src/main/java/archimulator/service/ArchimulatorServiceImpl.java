@@ -38,8 +38,7 @@ import com.j256.ormlite.table.TableUtils;
 import it.sauronsoftware.cron4j.Scheduler;
 
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class ArchimulatorServiceImpl implements ArchimulatorService {
     private Dao<SimulatedProgram, Long> simulatedPrograms;
@@ -337,13 +336,47 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
         this.cloudMessageChannel.send(experimentProfile.getSimulatorUserId(), new RefreshExperiementStateRequestEvent(experimentProfile.getId()));
     }
 
+    @Override
+    public void notifyPollStatsCompletedEvent(long experimentProfileId, Map<String, Object> stats) throws SQLException {
+        if(!this.experimentProfiles.idExists(experimentProfileId)) {
+            return;
+        }
+
+        ExperimentProfile experimentProfile = this.getExperimentProfileById(experimentProfileId);
+        experimentProfile.getStats().clear();
+        experimentProfile.getStats().putAll(stats);
+        this.experimentProfiles.update(experimentProfile);
+    }
+
+    @Override
+    public void notifyDumpStatsCompletedEvent(long experimentProfileId, Map<String, Object> stats) throws SQLException {
+        if(!this.experimentProfiles.idExists(experimentProfileId)) {
+            return;
+        }
+
+        ExperimentProfile experimentProfile = this.getExperimentProfileById(experimentProfileId);
+        experimentProfile.getStats().clear();
+        experimentProfile.getStats().putAll(stats);
+        this.experimentProfiles.update(experimentProfile);
+    }
+    
+    @Override
+    public Map<String, Object> getExperimentStatsById(long experimentProfileId) throws SQLException {
+        if(!this.experimentProfiles.idExists(experimentProfileId)) {
+            return new HashMap<String, Object>();
+        }
+
+        ExperimentProfile experimentProfile = this.getExperimentProfileById(experimentProfileId);
+        return experimentProfile.getStats();
+    }
+
     private void doHousekeeping() throws SQLException {
     }
 
     public static final String USER_ID_ADMIN = "itecgo";
     public static final String USER_PASSWORD_ADMIN = "1026@ustc";
 
-    public static final String DATABASE_REVISION = "22";
+    public static final String DATABASE_REVISION = "24";
 
     //    public static final String DATABASE_URL = "jdbc:h2:mem:account";
     public static final String DATABASE_URL = "jdbc:h2:~/.archimulator/data/v" + DATABASE_REVISION;

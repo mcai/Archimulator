@@ -20,13 +20,14 @@ package archimulator.guest;
 
 import archimulator.model.experiment.Experiment;
 import archimulator.model.experiment.profile.ExperimentProfile;
+import archimulator.model.simulation.Simulation;
 import archimulator.service.ArchimulatorService;
 import archimulator.util.DateHelper;
 import archimulator.util.UpdateHelper;
 import archimulator.util.action.Action1;
 import archimulator.util.im.channel.CloudMessageChannel;
-import archimulator.util.im.event.request.RefreshExperiementStateRequestEvent;
 import archimulator.util.im.event.request.PauseExperimentRequestEvent;
+import archimulator.util.im.event.request.RefreshExperiementStateRequestEvent;
 import archimulator.util.im.event.request.ResumeExperimentRequestEvent;
 import archimulator.util.im.event.request.StopExperimentRequestEvent;
 import archimulator.util.im.sink.GracefulMessageSink;
@@ -60,7 +61,7 @@ public class GuestStartup {
         }
 
         this.experimentProfileIdsToExperiments = new HashMap<Long, Experiment>();
-        
+
         this.cloudMessageChannel = new CloudMessageChannel(UUID.randomUUID().toString(), new GracefulMessageSink(this.archimulatorService));
 
         this.simulatorUserId = this.cloudMessageChannel.getUserId();
@@ -152,26 +153,55 @@ public class GuestStartup {
 
         threadRetrieveTask.start();
     }
-    
+
     private boolean retrieveAndExecuteNewExperimentProfile() throws SQLException {
-        if(this.archimulatorService.isRunningExperimentEnabled()) {
+        if (this.archimulatorService.isRunningExperimentEnabled()) {
             ExperimentProfile experimentProfile = this.archimulatorService.retrieveOneExperimentProfileToRun(this.simulatorUserId);
-            
-            if(experimentProfile != null) {
+
+            if (experimentProfile != null) {
                 System.out.printf("[%s Contact Server] Running new experiment profile\n", DateHelper.toString(new Date()));
 
-                Experiment experiment = experimentProfile.createExperiment();
+                final Experiment experiment = experimentProfile.createExperiment();
+
+                experiment.getBlockingEventDispatcher().addListener(Simulation.PollStatsCompletedEvent.class, new Action1<Simulation.PollStatsCompletedEvent>() {
+                    @Override
+                    public void apply(Simulation.PollStatsCompletedEvent event) {
+                        try {
+                            archimulatorService.notifyPollStatsCompletedEvent(getExperimentProfileIdFromExperimentId(experiment.getId()), event.getStats());
+                        } catch (SQLException e) {
+                            recordException(e);
+//                        throw new RuntimeException(e);
+                        } catch (Exception e) {
+                            recordException(e);
+//                        throw new RuntimeException(e);
+                        }
+                    }
+                });
+
+
+                experiment.getBlockingEventDispatcher().addListener(Simulation.DumpStatsCompletedEvent.class, new Action1<Simulation.DumpStatsCompletedEvent>() {
+                    @Override
+                    public void apply(Simulation.DumpStatsCompletedEvent event) {
+                        try {
+                            archimulatorService.notifyDumpStatsCompletedEvent(getExperimentProfileIdFromExperimentId(experiment.getId()), event.getStats());
+                        } catch (SQLException e) {
+                            throw new RuntimeException(e);
+                        } catch (Exception e) {
+                            recordException(e);
+//                        throw new RuntimeException(e);
+                        }
+                    }
+                });
+
                 this.experimentProfileIdsToExperiments.put(experimentProfile.getId(), experiment);
                 experiment.runToEnd();
                 this.archimulatorService.notifyExperimentStopped(experimentProfile.getId());
                 return true;
-            }
-            else {
+            } else {
                 System.out.printf("[%s Contact Server] No experiment profile to run\n", DateHelper.toString(new Date()));
                 return false;
             }
-        }
-        else {
+        } else {
             System.out.printf("[%s Contact Server] No experiment profile to run\n", DateHelper.toString(new Date()));
             return false;
         }
@@ -205,10 +235,20 @@ public class GuestStartup {
         }
     }
 
-//    public static final String SERVICE_URL = "http://204.152.205.131:8080/archimulator/archimulator";
+    public long getExperimentProfileIdFromExperimentId(long experimentId) {
+        for (long experimentProfileId : this.experimentProfileIdsToExperiments.keySet()) {
+            if (this.experimentProfileIdsToExperiments.get(experimentProfileId).getId() == experimentId) {
+                return experimentProfileId;
+            }
+        }
+
+        return -1;
+    }
+
+        public static final String SERVICE_URL = "http://204.152.205.131:8080/archimulator/archimulator";
 //    public static final String SERVICE_URL = "http://50.117.112.114:8080/archimulator/archimulator";
 //    public static final String SERVICE_URL = "http://[2607:f358:10:13::2]:8080/archimulator/archimulator";
-    public static final String SERVICE_URL = "http://localhost:8080/archimulator/archimulator";
+//    public static final String SERVICE_URL = "http://localhost:8080/archimulator/archimulator";
 
     public static void main(String[] args) {
         if (args.length >= 1 && args[0].equals("-s")) {

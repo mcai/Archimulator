@@ -19,20 +19,27 @@
 package archimulator.view.page.edit;
 
 import archimulator.model.experiment.profile.ExperimentProfile;
-import archimulator.view.ChartHelper;
+import archimulator.service.ArchimulatorService;
+import archimulator.service.ArchimulatorServletContextListener;
+import archimulator.util.Pair;
+import archimulator.util.action.Action1;
 import archimulator.view.ServerPush;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.util.GenericForwardComposer;
 import org.zkoss.zul.*;
 
+import javax.servlet.http.HttpSession;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class ViewExperimentStatsPage extends GenericForwardComposer<Window> {
     private Textbox textboxId;
-    private Vbox vboxStats;
+    private Listbox listboxStats;
 
-    private Image imageStats;
-    private Image imageStats2;
+//    private Image imageStats;
+//    private Image imageStats2;
 
     private Button buttonOk;
     private Button buttonCancel;
@@ -52,10 +59,45 @@ public class ViewExperimentStatsPage extends GenericForwardComposer<Window> {
 
         this.textboxId.setValue(this.experimentProfile.getId() + "");
 
-        this.imageStats.setContent(ChartHelper.render("图表1", 300, 200)); //TODO
-        this.imageStats2.setContent(ChartHelper.render("图表2", 300, 200)); //TODO
+//        this.imageStats.setContent(ChartHelper.render("图表1", 300, 200)); //TODO
+//        this.imageStats2.setContent(ChartHelper.render("图表2", 300, 200)); //TODO
 
-        ServerPush.start(this.vboxStats);
+        try {
+            HttpSession httpSession = (HttpSession) session.getNativeSession();
+            ArchimulatorService archimulatorService = ArchimulatorServletContextListener.getArchimulatorService(httpSession.getServletContext());
+
+            Map<String,Object> stats = archimulatorService.getExperimentStatsById(experimentProfile.getId());
+
+            List<Pair<String, String>> statsList = new ArrayList<Pair<String, String>>();
+            for(String key : stats.keySet()) {
+                statsList.add(new Pair<String, String>(key, stats.get(key) + ""));
+            }
+
+            this.listboxStats.setModel(new ListModelList<Pair<String, String>>(statsList));
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        ServerPush.start(this.listboxStats, new Action1<Listbox>() {
+            @Override
+            public void apply(Listbox info) {
+                try {
+                    HttpSession httpSession = (HttpSession) session.getNativeSession();
+                    ArchimulatorService archimulatorService = ArchimulatorServletContextListener.getArchimulatorService(httpSession.getServletContext());
+
+                    Map<String,Object> stats = archimulatorService.getExperimentStatsById(experimentProfile.getId());
+
+                    List<Pair<String, String>> statsList = new ArrayList<Pair<String, String>>();
+                    for(String key : stats.keySet()) {
+                        statsList.add(new Pair<String, String>(key, stats.get(key) + ""));
+                    }
+
+                    info.setModel(new ListModelList<Pair<String, String>>(statsList));
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
 
         this.viewExperimentStats.setTitle("实验统计 - Archimulator用户后台");
     }

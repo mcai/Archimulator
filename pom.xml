@@ -160,7 +160,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>archimulator.sim.Startup</mainClass>
+                            <mainClass>archimulator.guest.GuestStartup</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

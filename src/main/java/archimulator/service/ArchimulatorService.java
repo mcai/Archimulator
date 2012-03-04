@@ -25,6 +25,7 @@ import archimulator.util.im.sink.MessageSink;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 public interface ArchimulatorService extends MessageSink {
     void stop();
@@ -84,4 +85,10 @@ public interface ArchimulatorService extends MessageSink {
     void stopExperimentById(long experimentProfileId) throws SQLException;
 
     void refreshExperimentStateById(long experimentProfileId) throws SQLException;
+
+    void notifyPollStatsCompletedEvent(long experimentProfileId, Map<String, Object> stats) throws SQLException;
+
+    void notifyDumpStatsCompletedEvent(long experimentProfileId, Map<String, Object> stats) throws SQLException;
+
+    Map<String, Object> getExperimentStatsById(long experimentProfileId) throws SQLException;
 }

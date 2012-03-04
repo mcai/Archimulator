@@ -122,7 +122,7 @@ public abstract class SequentialSimulationStrategy extends SimulationStrategy {
         if (this.isSupportFastForward()) {
             this.doFastForward();
 
-            this.getSimulation().getBlockingEventDispatcher().dispatch(new DumpStatEvent(DumpStatEvent.Type.FUNCTIONAL_SIMULATION, this.getSimulation().getStatInFastForward()));
+            this.getSimulation().getBlockingEventDispatcher().dispatch(new DumpStatEvent(DumpStatEvent.Type.FUNCTIONAL_SIMULATION, this.getSimulation().getStatsInFastForward()));
             this.getSimulation().getBlockingEventDispatcher().dispatch(new ResetStatEvent());
         }
 
@@ -134,7 +134,7 @@ public abstract class SequentialSimulationStrategy extends SimulationStrategy {
 
             this.doCacheWarmup();
 
-            this.getSimulation().getBlockingEventDispatcher().dispatch(new DumpStatEvent(DumpStatEvent.Type.DETAILED_SIMULATION, this.getSimulation().getStatInWarmup()));
+            this.getSimulation().getBlockingEventDispatcher().dispatch(new DumpStatEvent(DumpStatEvent.Type.DETAILED_SIMULATION, this.getSimulation().getStatsInWarmup()));
             this.getSimulation().getBlockingEventDispatcher().dispatch(new ResetStatEvent());
         }
 
@@ -146,7 +146,7 @@ public abstract class SequentialSimulationStrategy extends SimulationStrategy {
 
             this.doMeasurement();
 
-            this.getSimulation().getBlockingEventDispatcher().dispatch(new DumpStatEvent(DumpStatEvent.Type.DETAILED_SIMULATION, this.getSimulation().getStatInMeasurement()));
+            this.getSimulation().getBlockingEventDispatcher().dispatch(new DumpStatEvent(DumpStatEvent.Type.DETAILED_SIMULATION, this.getSimulation().getStatsInMeasurement()));
             this.getSimulation().getBlockingEventDispatcher().dispatch(new ResetStatEvent());
         }
 

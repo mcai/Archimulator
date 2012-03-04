@@ -85,6 +85,12 @@ public abstract class Experiment {
         this.blockingEventDispatcher = new BlockingEventDispatcher<BlockingEvent>();
         this.cycleAccurateEventQueue = new CycleAccurateEventQueue();
 
+        this.blockingEventDispatcher.addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
+            public void apply(DumpStatEvent event) {
+                dumpStats(event.getStats(), event.getType() == DumpStatEvent.Type.DETAILED_SIMULATION);
+            }
+        });
+
         this.phaser = new CyclicBarrier(2);
 
         this.fsmFactory = new FiniteStateMachineFactory<ExperimentState, ExperimentCondition>();
@@ -210,13 +216,6 @@ public abstract class Experiment {
 
     protected void doSimulation(String title, SimulationStrategy strategy, BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
         this.simulation = new Simulation(new SimulationConfig(title, this.processorConfig, this.contextConfigs), strategy, this.simulationCapabilityClasses, blockingEventDispatcher, cycleAccurateEventQueue);
-
-        this.simulation.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
-            public void apply(DumpStatEvent event) {
-                dumpStats(event.getStats(), event.getType() == DumpStatEvent.Type.DETAILED_SIMULATION);
-            }
-        });
-
         this.simulation.simulate();
     }
 
@@ -228,7 +227,7 @@ public abstract class Experiment {
         return this.title;
     }
 
-    protected BlockingEventDispatcher<BlockingEvent> getBlockingEventDispatcher() {
+    public BlockingEventDispatcher<BlockingEvent> getBlockingEventDispatcher() {
         return this.blockingEventDispatcher;
     }
 

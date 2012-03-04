@@ -28,6 +28,7 @@ import archimulator.sim.core.Processor;
 import archimulator.sim.core.Thread;
 import archimulator.sim.os.Context;
 import archimulator.sim.os.Kernel;
+import archimulator.util.StorageUnit;
 import archimulator.util.StringHelper;
 import archimulator.util.action.Action1;
 import archimulator.util.action.NamedAction;
@@ -56,11 +57,11 @@ public class Simulation implements SimulationObject {
 
     private StopWatch stopWatch;
 
-    private Map<String, Object> statInFastForward;
+    private Map<String, Object> statsInFastForward;
 
-    private Map<String, Object> statInWarmup;
+    private Map<String, Object> statsInWarmup;
 
-    private Map<String, Object> statInMeasurement;
+    private Map<String, Object> statsInMeasurement;
 
     private BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher;
 
@@ -86,15 +87,39 @@ public class Simulation implements SimulationObject {
 
         this.capabilities = new HashMap<Class<? extends SimulationCapability>, SimulationCapability>();
 
-        this.processor = new BasicProcessor(this.blockingEventDispatcher, this.cycleAccurateEventQueue, this.logger, this.config.getProcessorConfig(), this.getStrategy().prepareKernel(), this.getStrategy().prepareCacheHierarchy(), this.config.getProcessorConfig().getProcessorCapabilityClasses());
+        this.getBlockingEventDispatcher().addListener(PollStatsEvent.class, new Action1<PollStatsEvent>() {
+            public void apply(PollStatsEvent event) {
+                Map<String, Object> stats = event.getStats();
 
-        this.getBlockingEventDispatcher().dispatch(new ProcessorInitializedEvent(this.processor));
+                stats.put("simulation.duration", getFormattedDuration());
 
-        this.stopWatch = new StopWatch();
+                stats.put("simulation.totalCycles", MessageFormat.format("{0}", getCycleAccurateEventQueue().getCurrentCycle()));
 
-        this.statInFastForward = new LinkedHashMap<String, Object>();
-        this.statInWarmup = new LinkedHashMap<String, Object>();
-        this.statInMeasurement = new LinkedHashMap<String, Object>();
+                List<String> totalInstsPerThread = new ArrayList<String>();
+                List<String> llcReadMissesPerThread = new ArrayList<String>();
+                List<String> llcWriteMissesPerThread = new ArrayList<String>();
+
+                for (int i = 0; i < getConfig().getProcessorConfig().getNumCores(); i++) {
+                    for (int j = 0; j < getConfig().getProcessorConfig().getNumThreadsPerCore(); j++) {
+                        totalInstsPerThread.add("c" + i + "t" + j + ": " + getProcessor().getCores().get(i).getThreads().get(j).getTotalInsts());
+                        llcReadMissesPerThread.add("c" + i + "t" + j + ": " + getProcessor().getCores().get(i).getThreads().get(j).getLlcReadMisses());
+                        llcWriteMissesPerThread.add("c" + i + "t" + j + ": " + getProcessor().getCores().get(i).getThreads().get(j).getLlcWriteMisses());
+                    }
+                }
+
+                stats.put("simulation.totalInsts", MessageFormat.format("{0}", getTotalInsts()) + " (" + StringHelper.join(totalInstsPerThread, ", ") + ")");
+                stats.put("simulation.llcReadMisses", MessageFormat.format("{0}", getLlcReadMisses()) + " (" + StringHelper.join(llcReadMissesPerThread, ", ") + ")");
+                stats.put("simulation.llcWriteMisses", MessageFormat.format("{0}", getLlcWriteMisses()) + " (" + StringHelper.join(llcWriteMissesPerThread, ", ") + ")");
+
+                stats.put("simulation.instsPerCycle", MessageFormat.format("{0}", getInstsPerCycle()));
+                stats.put("simulation.cyclesPerSecond", MessageFormat.format("{0}", getCyclesPerSecond()));
+                stats.put("simulation.instsPerSecond", MessageFormat.format("{0}", getInstsPerSecond()));
+
+                stats.put("simulation.max memory", MessageFormat.format("{0}", StorageUnit.toString(Runtime.getRuntime().maxMemory())));
+                stats.put("simulation.total memory", MessageFormat.format("{0}", StorageUnit.toString(Runtime.getRuntime().totalMemory())));
+                stats.put("simulation.used memory", MessageFormat.format("{0}", StorageUnit.toString(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())));
+            }
+        });
 
         this.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
             public void apply(DumpStatEvent event) {
@@ -102,6 +127,16 @@ public class Simulation implements SimulationObject {
                 dumpStat(event.getStats());
             }
         });
+
+        this.processor = new BasicProcessor(this.blockingEventDispatcher, this.cycleAccurateEventQueue, this.logger, this.config.getProcessorConfig(), this.getStrategy().prepareKernel(), this.getStrategy().prepareCacheHierarchy(), this.config.getProcessorConfig().getProcessorCapabilityClasses());
+
+        this.getBlockingEventDispatcher().dispatch(new ProcessorInitializedEvent(this.processor));
+
+        this.stopWatch = new StopWatch();
+
+        this.statsInFastForward = new LinkedHashMap<String, Object>();
+        this.statsInWarmup = new LinkedHashMap<String, Object>();
+        this.statsInMeasurement = new LinkedHashMap<String, Object>();
 
         for(Class<? extends SimulationCapability> capabilityClz : capabilityClasses) {
             this.capabilities.put(capabilityClz, CapabilityFactory.createSimulationCapability(capabilityClz, this));
@@ -153,9 +188,23 @@ public class Simulation implements SimulationObject {
 
             timerDumpState.cancel();
 
-            MapHelper.save(this.getStatInFastForward(), this.getConfig().getCwd() + "/stat_fastForward.txt");
-            MapHelper.save(this.getStatInWarmup(), this.getConfig().getCwd() + "/stat_cacheWarmup.txt");
-            MapHelper.save(this.getStatInMeasurement(), this.getConfig().getCwd() + "/stat_measurement.txt");
+            if(!this.getStatsInFastForward().isEmpty()) {
+                MapHelper.save(this.getStatsInFastForward(), this.getConfig().getCwd() + "/stat_fastForward.txt"); //TODO: report stats to archimulator service
+
+                this.blockingEventDispatcher.dispatch(new DumpStatsCompletedEvent(this.getStatsInFastForward()));
+            }
+
+            if(!this.getStatsInWarmup().isEmpty()) {
+                MapHelper.save(this.getStatsInWarmup(), this.getConfig().getCwd() + "/stat_cacheWarmup.txt"); //TODO: report stats to archimulator service
+
+                this.blockingEventDispatcher.dispatch(new DumpStatsCompletedEvent(this.getStatsInWarmup()));
+            }
+
+            if(!this.getStatsInMeasurement().isEmpty()) {
+                MapHelper.save(this.getStatsInMeasurement(), this.getConfig().getCwd() + "/stat_measurement.txt"); //TODO: report stats to archimulator service
+
+                this.blockingEventDispatcher.dispatch(new DumpStatsCompletedEvent(this.getStatsInMeasurement()));
+            }
 
             resetIdCounters();
             this.getBlockingEventDispatcher().clearListeners();
@@ -167,30 +216,7 @@ public class Simulation implements SimulationObject {
     }
 
     private void pollSimulationState() {
-        this.logger.infof(Logger.SIMULATION, "------ Simulation %s: BEGIN DUMP STATE at %s ------\n", this.getConfig().getTitle(), new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(new Date()));
-        this.logger.infof(Logger.SIMULATION, "\tduration: %s", this.getFormattedDuration());
-
-        this.logger.infof(Logger.SIMULATION, "\ttotalCycles: %s", MessageFormat.format("{0}", this.getCycleAccurateEventQueue().getCurrentCycle()));
-
-        List<String> totalInstsPerThread = new ArrayList<String>();
-        List<String> llcReadMissesPerThread = new ArrayList<String>();
-        List<String> llcWriteMissesPerThread = new ArrayList<String>();
-
-        for (int i = 0; i < this.getConfig().getProcessorConfig().getNumCores(); i++) {
-            for (int j = 0; j < this.getConfig().getProcessorConfig().getNumThreadsPerCore(); j++) {
-                totalInstsPerThread.add("c" + i + "t" + j + ": " + this.getProcessor().getCores().get(i).getThreads().get(j).getTotalInsts());
-                llcReadMissesPerThread.add("c" + i + "t" + j + ": " + this.getProcessor().getCores().get(i).getThreads().get(j).getLlcReadMisses());
-                llcWriteMissesPerThread.add("c" + i + "t" + j + ": " + this.getProcessor().getCores().get(i).getThreads().get(j).getLlcWriteMisses());
-            }
-        }
-
-        this.logger.infof(Logger.SIMULATION, "\ttotalInsts: %s", MessageFormat.format("{0}", this.getTotalInsts()) + " (" + StringHelper.join(totalInstsPerThread, ", ") + ")");
-        this.logger.infof(Logger.SIMULATION, "\tllcReadMisses: %s", MessageFormat.format("{0}", this.getLlcReadMisses()) + " (" + StringHelper.join(llcReadMissesPerThread, ", ") + ")");
-        this.logger.infof(Logger.SIMULATION, "\tllcWriteMisses: %s", MessageFormat.format("{0}", this.getLlcWriteMisses()) + " (" + StringHelper.join(llcWriteMissesPerThread, ", ") + ")");
-
-        this.logger.infof(Logger.SIMULATION, "\tinstsPerCycle: %s", MessageFormat.format("{0}", this.getInstsPerCycle()));
-        this.logger.infof(Logger.SIMULATION, "\tcyclesPerSecond: %s", MessageFormat.format("{0}", this.getCyclesPerSecond()));
-        this.logger.infof(Logger.SIMULATION, "\tinstsPerSecond: %s\n", MessageFormat.format("{0}", this.getInstsPerSecond()));
+        this.logger.infof(Logger.SIMULATION, "------ Simulation %s: BEGIN DUMP STATE at %s ------", this.getConfig().getTitle(), new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(new Date()));
 
         Map<String, Object> polledStats = new LinkedHashMap<String, Object>();
 
@@ -200,13 +226,37 @@ public class Simulation implements SimulationObject {
             this.logger.infof(Logger.SIMULATION, "\t%s: %s", entry.getKey(), entry.getValue());
         }
 
-        this.logger.infof(Logger.SIMULATION, "\tmax memory: %s", MessageFormat.format("{0}", Runtime.getRuntime().maxMemory()));
-        this.logger.infof(Logger.SIMULATION, "\ttotal memory: %s", MessageFormat.format("{0}", Runtime.getRuntime().totalMemory()));
-        this.logger.infof(Logger.SIMULATION, "\tused memory: %s\n", MessageFormat.format("{0}", Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()));
+        //TODO: report polledStats to archimulator service
+
+        this.blockingEventDispatcher.dispatch(new PollStatsCompletedEvent(polledStats));
 
         this.getProcessor().getCacheHierarchy().dumpState();
 
         this.logger.info(Logger.SIMULATION, "------ END DUMP STATE ------\n");
+    }
+
+    public static class PollStatsCompletedEvent implements BlockingEvent {
+        private Map<String, Object> stats;
+
+        public PollStatsCompletedEvent(Map<String, Object> stats) {
+            this.stats = stats;
+        }
+
+        public Map<String, Object> getStats() {
+            return stats;
+        }
+    }
+    
+    public static class DumpStatsCompletedEvent implements BlockingEvent {
+        private Map<String, Object> stats;
+
+        public DumpStatsCompletedEvent(Map<String, Object> stats) {
+            this.stats = stats;
+        }
+
+        public Map<String, Object> getStats() {
+            return stats;
+        }
     }
 
     private void dumpStat(Map<String, Object> stats) {
@@ -292,16 +342,16 @@ public class Simulation implements SimulationObject {
         return this.stopWatch;
     }
 
-    public Map<String, Object> getStatInFastForward() {
-        return this.statInFastForward;
+    public Map<String, Object> getStatsInFastForward() {
+        return this.statsInFastForward;
     }
 
-    public Map<String, Object> getStatInWarmup() {
-        return this.statInWarmup;
+    public Map<String, Object> getStatsInWarmup() {
+        return this.statsInWarmup;
     }
 
-    public Map<String, Object> getStatInMeasurement() {
-        return this.statInMeasurement;
+    public Map<String, Object> getStatsInMeasurement() {
+        return this.statsInMeasurement;
     }
 
     public Map<Class<? extends SimulationCapability>, SimulationCapability> getCapabilities() {
