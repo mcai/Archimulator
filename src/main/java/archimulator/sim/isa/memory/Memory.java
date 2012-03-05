@@ -38,7 +38,7 @@ public abstract class Memory extends BasicSimulationObject {
     private int id;
     private boolean littleEndian;
 
-    private Map<Integer, Map<Integer, Page>> pages;
+    private Map<Integer, Page> pages;
 
     private Kernel kernel;
     private String simulationDirectory;
@@ -60,7 +60,7 @@ public abstract class Memory extends BasicSimulationObject {
 
         this.littleEndian = littleEndian;
 
-        this.pages = new TreeMap<Integer, Map<Integer, Page>>();
+        this.pages = new TreeMap<Integer, Page>();
 
         this.init();
     }
@@ -315,34 +315,25 @@ public abstract class Memory extends BasicSimulationObject {
 
     private Page getPage(int addr) {
         int index = getIndex(addr);
-        int tag = getTag(addr);
 
-        return this.pages.containsKey(index) && this.pages.get(index).containsKey(tag) ? this.pages.get(index).get(tag) : null;
+        return this.pages.containsKey(index) ? this.pages.get(index) : null;
     }
 
     private Page addPage(int addr) {
         int index = getIndex(addr);
-        int tag = getTag(addr);
-
-        if (!this.pages.containsKey(index)) {
-            this.pages.put(index, new TreeMap<Integer, Page>());
-        }
 
         this.numPages++;
         Page page = new Page(currentMemoryPageId++);
 
-        this.pages.get(index).put(tag, page);
-
+        this.pages.put(index, page);
+        
         return page;
     }
 
     private void removePage(int addr) {
         int index = getIndex(addr);
-        int tag = getTag(addr);
 
-        if (this.pages.containsKey(index) && this.pages.get(index).containsKey(tag)) {
-            this.pages.get(index).remove(tag);
-        }
+        this.pages.remove(index);
     }
 
     private void accessPageBoundary(int addr, int size, byte[] buf, int offset, boolean write, boolean createNewPageIfNecessary) {
@@ -431,7 +422,7 @@ public abstract class Memory extends BasicSimulationObject {
         private static final int COUNT = 1024;
     }
 
-    private static CacheGeometry geometry = new CacheGeometry(1 << 22, 1, 1 << 12);
+    private static CacheGeometry geometry = new CacheGeometry(-1, 1, 1 << 12);
 
     public static int getDisplacement(int addr) {
         return CacheGeometry.getDisplacement(addr, geometry);
@@ -442,7 +433,7 @@ public abstract class Memory extends BasicSimulationObject {
     }
 
     private static int getIndex(int addr) {
-        return CacheGeometry.getSet(addr, geometry);
+        return CacheGeometry.getLineId(addr, geometry);
     }
 
     public static int getPageSizeInLog2() {
