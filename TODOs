@@ -17,10 +17,6 @@ TODOs:
 Archimulator on the cloud:
     1. get CPU usage on Guest
     2. get Memory usage on Guest
-    3. experiment configuration, monitoring events and result definitions; experiment start, pause, stop..
-    4. hessian service interface and implementation on Server
-    5. SQLite based persistence on Server
-
 
 temp result:
 [34359736761]  ------ Simulation mst_10000_detailed-HTRequest_Profiling_l2_4M.detailedSimulation: BEGIN DUMP STATE at 2012.02.27 18:20:27 ------
