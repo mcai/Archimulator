@@ -210,7 +210,6 @@ public class Simulation implements SimulationObject {
             this.getBlockingEventDispatcher().clearListeners();
         } catch (Exception e) {
             e.printStackTrace();
-            hasError = true;
             System.exit(-1);
         }
     }
@@ -369,8 +368,6 @@ public class Simulation implements SimulationObject {
     public Logger getLogger() {
         return this.logger;
     }
-
-    public static boolean hasError = false;
 
     public static long currentMessageId = 0;
 

@@ -257,13 +257,6 @@ public abstract class Experiment {
     private static long currentId = 0;
 
     static {
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                System.out.printf("\nExperiment has completed %s.\n", !Simulation.hasError ? "successfully" : "with error(s)");
-            }
-        });
-
         System.out.println("Archimulator - A Cloud Enabled Multicore Architectural Simulator Written in Java.\n");
         System.out.println("Version: 3.0.\n");
         System.out.println("Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).\n");
