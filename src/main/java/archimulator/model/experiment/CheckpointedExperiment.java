@@ -44,7 +44,6 @@ public class CheckpointedExperiment extends Experiment {
 
         this.doSimulation(this.getTitle() + "/checkpointedSimulation/phase0", new RoiBasedRunToCheckpointFunctionalSimulationStrategy(this.getPhaser(), this.pthreadSpawnedIndex, simulationStartingImage), getBlockingEventDispatcher(), getCycleAccurateEventQueue());
 
-//        getBlockingEventDispatcher().clearListeners(); //TODO: error here!!!
         getCycleAccurateEventQueue().resetCurrentCycle();
 
         this.doSimulation(this.getTitle() + "/checkpointedSimulation/phase1", new CheckpointToInstructionCountBasedDetailedSimulationStrategy(this.getPhaser(), this.maxInsts, simulationStartingImage), getBlockingEventDispatcher(), getCycleAccurateEventQueue());
