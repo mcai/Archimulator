@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.util;
 
-import archimulator.util.io.CommandLineHelper;
+import archimulator.util.io.cmd.CommandLineHelper;
 
 import java.util.LinkedList;
 import java.util.Random;

@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.util.io;
+package archimulator.util.io.cmd;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -24,9 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CommandLineHelper {
-    public static int invokeNativeCommand(String args) {
-        String[] cmd = args.split(" ");
-
+    public static int invokeNativeCommand(String[] cmd) {
         try {
             Runtime r = Runtime.getRuntime();
             Process ps = r.exec(cmd);
@@ -47,12 +45,12 @@ public class CommandLineHelper {
         }
     }
 
-    public static List<String> invokeShellCommandAndGetResult(String args) {
-        return invokeNativeCommandAndGetResult(new String[]{"sh", "-c", args});
+    public static int invokeNativeCommand(String args) {
+        return invokeNativeCommand(args.split(" "));
     }
 
-    public static List<String> invokeNativeCommandAndGetResult(String args) {
-        return invokeNativeCommandAndGetResult(args.split(" "));
+    public static int invokeShellCommand(String args) {
+        return invokeNativeCommand(new String[]{"sh", "-c", args});
     }
 
     public static List<String> invokeNativeCommandAndGetResult(String[] cmd) {
@@ -83,5 +81,13 @@ public class CommandLineHelper {
         }
 
         return outputList;
+    }
+
+    public static List<String> invokeNativeCommandAndGetResult(String args) {
+        return invokeNativeCommandAndGetResult(args.split(" "));
+    }
+
+    public static List<String> invokeShellCommandAndGetResult(String args) {
+        return invokeNativeCommandAndGetResult(new String[]{"sh", "-c", args});
     }
 }
