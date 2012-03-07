@@ -91,9 +91,9 @@ public class Simulation implements SimulationObject {
             public void apply(PollStatsEvent event) {
                 Map<String, Object> stats = event.getStats();
 
-                stats.put("simulation.duration", getFormattedDuration());
+                stats.put("duration", getFormattedDuration());
 
-                stats.put("simulation.totalCycles", MessageFormat.format("{0}", getCycleAccurateEventQueue().getCurrentCycle()));
+                stats.put("totalCycles", MessageFormat.format("{0}", getCycleAccurateEventQueue().getCurrentCycle()));
 
                 List<String> totalInstsPerThread = new ArrayList<String>();
                 List<String> llcReadMissesPerThread = new ArrayList<String>();
@@ -107,17 +107,17 @@ public class Simulation implements SimulationObject {
                     }
                 }
 
-                stats.put("simulation.totalInsts", MessageFormat.format("{0}", getTotalInsts()) + " (" + StringHelper.join(totalInstsPerThread, ", ") + ")");
-                stats.put("simulation.llcReadMisses", MessageFormat.format("{0}", getLlcReadMisses()) + " (" + StringHelper.join(llcReadMissesPerThread, ", ") + ")");
-                stats.put("simulation.llcWriteMisses", MessageFormat.format("{0}", getLlcWriteMisses()) + " (" + StringHelper.join(llcWriteMissesPerThread, ", ") + ")");
+                stats.put("totalInsts", MessageFormat.format("{0}", getTotalInsts()) + " (" + StringHelper.join(totalInstsPerThread, ", ") + ")");
+                stats.put("llcReadMisses", MessageFormat.format("{0}", getLlcReadMisses()) + " (" + StringHelper.join(llcReadMissesPerThread, ", ") + ")");
+                stats.put("llcWriteMisses", MessageFormat.format("{0}", getLlcWriteMisses()) + " (" + StringHelper.join(llcWriteMissesPerThread, ", ") + ")");
 
-                stats.put("simulation.instsPerCycle", MessageFormat.format("{0}", getInstsPerCycle()));
-                stats.put("simulation.cyclesPerSecond", MessageFormat.format("{0}", getCyclesPerSecond()));
-                stats.put("simulation.instsPerSecond", MessageFormat.format("{0}", getInstsPerSecond()));
+                stats.put("instsPerCycle", MessageFormat.format("{0}", getInstsPerCycle()));
+                stats.put("cyclesPerSecond", MessageFormat.format("{0}", getCyclesPerSecond()));
+                stats.put("instsPerSecond", MessageFormat.format("{0}", getInstsPerSecond()));
 
-                stats.put("simulation.max memory", MessageFormat.format("{0}", StorageUnit.toString(Runtime.getRuntime().maxMemory())));
-                stats.put("simulation.total memory", MessageFormat.format("{0}", StorageUnit.toString(Runtime.getRuntime().totalMemory())));
-                stats.put("simulation.used memory", MessageFormat.format("{0}", StorageUnit.toString(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())));
+                stats.put("max memory", MessageFormat.format("{0}", StorageUnit.toString(Runtime.getRuntime().maxMemory())));
+                stats.put("total memory", MessageFormat.format("{0}", StorageUnit.toString(Runtime.getRuntime().totalMemory())));
+                stats.put("used memory", MessageFormat.format("{0}", StorageUnit.toString(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())));
             }
         });
 
@@ -189,25 +189,30 @@ public class Simulation implements SimulationObject {
             timerDumpState.cancel();
 
             if(!this.getStatsInFastForward().isEmpty()) {
-                MapHelper.save(this.getStatsInFastForward(), this.getConfig().getCwd() + "/stat_fastForward.txt"); //TODO: report stats to archimulator service
+                MapHelper.save(this.getStatsInFastForward(), this.getConfig().getCwd() + "/stat_fastForward.txt");
+
+                this.statsInFastForward = getStatsWithSimulationPrefix(this.getStatsInFastForward());
 
                 this.blockingEventDispatcher.dispatch(new DumpStatsCompletedEvent(this.getStatsInFastForward()));
             }
 
             if(!this.getStatsInWarmup().isEmpty()) {
-                MapHelper.save(this.getStatsInWarmup(), this.getConfig().getCwd() + "/stat_cacheWarmup.txt"); //TODO: report stats to archimulator service
+                MapHelper.save(this.getStatsInWarmup(), this.getConfig().getCwd() + "/stat_cacheWarmup.txt");
+
+                this.statsInWarmup = getStatsWithSimulationPrefix(this.getStatsInWarmup());
 
                 this.blockingEventDispatcher.dispatch(new DumpStatsCompletedEvent(this.getStatsInWarmup()));
             }
 
             if(!this.getStatsInMeasurement().isEmpty()) {
-                MapHelper.save(this.getStatsInMeasurement(), this.getConfig().getCwd() + "/stat_measurement.txt"); //TODO: report stats to archimulator service
+                MapHelper.save(this.getStatsInMeasurement(), this.getConfig().getCwd() + "/stat_measurement.txt");
+
+                this.statsInMeasurement = getStatsWithSimulationPrefix(this.getStatsInMeasurement());
 
                 this.blockingEventDispatcher.dispatch(new DumpStatsCompletedEvent(this.getStatsInMeasurement()));
             }
 
             resetIdCounters();
-            this.getBlockingEventDispatcher().clearListeners();
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(-1);
@@ -220,12 +225,12 @@ public class Simulation implements SimulationObject {
         Map<String, Object> polledStats = new LinkedHashMap<String, Object>();
 
         this.getBlockingEventDispatcher().dispatch(new PollStatsEvent(polledStats));
+        
+        polledStats = getStatsWithSimulationPrefix(polledStats);
 
         for (Map.Entry<String, Object> entry : polledStats.entrySet()) {
             this.logger.infof(Logger.SIMULATION, "\t%s: %s", entry.getKey(), entry.getValue());
         }
-
-        //TODO: report polledStats to archimulator service
 
         this.blockingEventDispatcher.dispatch(new PollStatsCompletedEvent(polledStats));
 
@@ -257,16 +262,28 @@ public class Simulation implements SimulationObject {
             return stats;
         }
     }
+    
+    private Map<String, Object> getStatsWithSimulationPrefix(Map<String, Object> stats) {
+        String title = this.getConfig().getTitle();
+        String simulationPrefix = title.substring(title.indexOf("/") + 1);
+
+        Map<String, Object> result = new LinkedHashMap<String, Object>();
+        for(String key : stats.keySet()) {
+            result.put(simulationPrefix + "." + key, stats.get(key));
+        }
+
+        return result;
+    }
 
     private void dumpStat(Map<String, Object> stats) {
-        stats.put("simulation.duration", this.getFormattedDuration());
+        stats.put("duration", this.getFormattedDuration());
 
-        stats.put("simulation.totalCycles", String.valueOf(this.getCycleAccurateEventQueue().getCurrentCycle()));
-        stats.put("simulation.totalInsts", String.valueOf(this.getTotalInsts()));
+        stats.put("totalCycles", String.valueOf(this.getCycleAccurateEventQueue().getCurrentCycle()));
+        stats.put("totalInsts", String.valueOf(this.getTotalInsts()));
 
-        stats.put("simulation.instsPerCycle", String.valueOf(this.getInstsPerCycle()));
-        stats.put("simulation.cyclesPerSecond", String.valueOf(this.getCyclesPerSecond()));
-        stats.put("simulation.instsPerSecond", String.valueOf(this.getInstsPerSecond()));
+        stats.put("instsPerCycle", String.valueOf(this.getInstsPerCycle()));
+        stats.put("cyclesPerSecond", String.valueOf(this.getCyclesPerSecond()));
+        stats.put("instsPerSecond", String.valueOf(this.getInstsPerSecond()));
     }
 
     public long getDurationInSeconds() {
