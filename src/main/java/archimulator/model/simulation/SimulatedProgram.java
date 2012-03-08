@@ -30,6 +30,9 @@ public class SimulatedProgram implements Serializable {
     @DatabaseField(generatedId = true)
     private long id;
 
+    @DatabaseField(index = true)
+    private String name;
+
     @DatabaseField
     private String cwd;
 
@@ -104,8 +107,16 @@ public class SimulatedProgram implements Serializable {
         this.stdin = stdin;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     @Override
     public String toString() {
-        return String.format("SimulatedProgram{id=%d, cwd='%s', exe='%s', args='%s', stdin='%s'}", id, cwd, exe, args, stdin);
+        return String.format("%s{id=%d, cwd='%s', exe='%s', args='%s', stdin='%s'}", name != null ? name : "SimulatedProgram", id, cwd, exe, args, stdin);
     }
 }

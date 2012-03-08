@@ -105,12 +105,16 @@ public class ExperimentProfileManagementStartup {
 //        this.archimulatorService.setRunningExperimentEnabled(true);
 //    }
 
-    private void submitExperimentProfiles() throws SQLException {
+    private void submitSimulatedProgramsAndProcessorProfiles() throws SQLException {
         this.archimulatorService.setRunningExperimentEnabled(false);
         
-        this.archimulatorService.clearData();
+//        this.archimulatorService.clearData();
 
         List<SimulatedProgram> simulatedPrograms = new ArrayList<SimulatedProgram>();
+        simulatedPrograms.add(Startup.SIMULATED_PROGRAM_MST_BASELINE);
+        simulatedPrograms.add(Startup.SIMULATED_PROGRAM_EM3D_BASELINE);
+        simulatedPrograms.add(Startup.SIMULATED_PROGRAM_429_MCF_BASELINE);
+
         simulatedPrograms.add(Startup.SIMULATED_PROGRAM_MST_HT);
         simulatedPrograms.add(Startup.SIMULATED_PROGRAM_EM3D_HT);
         simulatedPrograms.add(Startup.SIMULATED_PROGRAM_429_MCF_HT);
@@ -128,6 +132,12 @@ public class ExperimentProfileManagementStartup {
         for (int l2SizeInKByte : l2SizeInKBytes) {
             this.archimulatorService.addProcessorProfile(new ProcessorProfile(2, 2, 1024 * l2SizeInKByte, 8));
         }
+    }
+    
+    private void submitExperimentProfiles() throws SQLException {
+//        this.archimulatorService.setRunningExperimentEnabled(false);
+
+//        this.archimulatorService.setUserPassword("itecgo", "bywwnss");
     }
 
     public static void main(String[] args) throws SQLException {

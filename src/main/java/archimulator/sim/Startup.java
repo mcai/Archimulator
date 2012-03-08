@@ -52,9 +52,9 @@ public class Startup {
             "em3d.mips",
 //            "400000 128 75 1");
 //            "400 128 75 1");
-            "1000 128 75 1");
+//            "1000 128 75 1");
 //            "10000 128 75 1");
-//            "400000 128 75 1");
+            "400000 128 75 1");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_EM3D_HT = new SimulatedProgram(
             ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/Olden_Custom1/em3d/ht",
