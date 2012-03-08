@@ -61,7 +61,7 @@
 
     <servlet-mapping>
         <servlet-name>ArchimulatorServlet</servlet-name>
-        <url-pattern>/archimulator/*</url-pattern>
+        <url-pattern>/api/*</url-pattern>
     </servlet-mapping>
 
     <welcome-file-list>
