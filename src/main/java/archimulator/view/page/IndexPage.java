@@ -20,13 +20,14 @@ package archimulator.view.page;
 
 import archimulator.model.experiment.profile.ExperimentProfile;
 import archimulator.model.experiment.profile.ProcessorProfile;
+import archimulator.model.simulation.ContextConfig;
 import archimulator.model.simulation.SimulatedProgram;
 import archimulator.service.ArchimulatorService;
 import archimulator.service.ArchimulatorServiceImpl;
 import archimulator.service.ArchimulatorServletContextListener;
 import archimulator.util.DateHelper;
 import com.itextpdf.text.*;
-import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.List;
 import com.itextpdf.text.pdf.PdfWriter;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
@@ -37,7 +38,7 @@ import org.zkoss.zul.*;
 import javax.servlet.http.HttpSession;
 import java.io.ByteArrayOutputStream;
 import java.sql.SQLException;
-import java.util.Date;
+import java.util.*;
 
 public class IndexPage extends GenericForwardComposer<Window> {
     Checkbox checkboxRunningExperimentEnabled;
@@ -125,11 +126,6 @@ public class IndexPage extends GenericForwardComposer<Window> {
 
             document.add(listSimulatedPrograms);
 
-            PdfPTable table = new PdfPTable(3);
-            table.addCell("");
-            table.addCell("");
-            table.addCell("");
-
             document.add(Chunk.NEWLINE);
 
             document.add(new Paragraph("Processor Profiles"));
@@ -146,10 +142,35 @@ public class IndexPage extends GenericForwardComposer<Window> {
 
             document.add(new Paragraph("Experiment Profiles"));
 
-            List listExperimentProfiles = new List(List.ORDERED, 20);
+            List listExperimentProfiles = new List(List.ORDERED, 10);
 
             for(ExperimentProfile experimentProfile : archimulatorService.getExperimentProfilesAsList()) {
                 listExperimentProfiles.add(new ListItem(experimentProfile + ""));
+
+                List list1 = new List(List.UNORDERED, 10);
+
+                list1.add(new ListItem("Context Configs"));
+
+                List listContextConfigs = new List(List.UNORDERED, 10);
+
+                for(ContextConfig contextConfig : experimentProfile.getContextConfigs()) {
+                    listContextConfigs.add(new ListItem(contextConfig + ""));
+                }
+
+                list1.add(listContextConfigs);
+
+                list1.add(new ListItem("Stats"));
+
+                List listExperimentStats = new List(List.UNORDERED, 10);
+
+                Map<String,Object> experimentStats = archimulatorService.getExperimentStatsById(experimentProfile.getId());
+                for(String key : experimentStats.keySet()) {
+                    listExperimentStats.add(new ListItem(key + ": " + experimentStats.get(key)));
+                }
+
+                list1.add(listExperimentStats);
+
+                listExperimentProfiles.add(list1);
             }
 
             document.add(listExperimentProfiles);

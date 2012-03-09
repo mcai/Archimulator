@@ -138,7 +138,7 @@ public class EditExperimentProfilePage extends GenericForwardComposer<Window> {
 
                 for(Component component : this.gridContextConfigs.getRows().getChildren()) {
                     Row row = (Row) component;
-                    Combobox comboboxSimulatedProgram = (Combobox) row.getChildren().get(3);
+                    Combobox comboboxSimulatedProgram = (Combobox) row.getChildren().get(1);
 
                     if(comboboxSimulatedProgram.getSelectedIndex() != -1) {
                         SimulatedProgram simulatedProgram = comboboxSimulatedProgram.getSelectedItem().getValue();

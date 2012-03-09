@@ -31,7 +31,7 @@
             <label>Simulated Program List</label>
             (Total:
             <label value="@{archimulatorService.simulatedProgramsAsList.size}" style="color:green"/>
-            个):
+            ):
         </hbox>
 
         <separator/>
