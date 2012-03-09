@@ -97,7 +97,7 @@ public class EditExperimentProfilePage extends GenericForwardComposer<Window> {
             this.textboxId.setValue("N/A");
         }
 
-        this.winEditExperimentProfile.setTitle(this.create ? "添加实验 - Archimulator用户后台" : "编辑实验 - Archimulator用户后台");
+        this.winEditExperimentProfile.setTitle(this.create ? "Add Experiment Profile - Archimulator" : "Edit Experiment Profile - Archimulator");
     }
     
     public void onSelect$comboboxProcessorProfiles(SelectEvent event) throws SQLException {
@@ -113,7 +113,7 @@ public class EditExperimentProfilePage extends GenericForwardComposer<Window> {
 
     public void onOK() throws SQLException {
         if(this.experimentProfile.getState() == ExperimentProfileState.RUNNING) {
-            Messagebox.show("当前编辑的实验正在运行中，无法保存改动！", "编辑实验", Messagebox.OK, Messagebox.EXCLAMATION, new EventListener<Event>() {
+            Messagebox.show("Cannot save changes because selected experiment profile is running!", "Edit Experiment Profile", Messagebox.OK, Messagebox.EXCLAMATION, new EventListener<Event>() {
                 @Override
                 public void onEvent(Event event) throws Exception {
                     switch ((Integer) event.getData()) {
@@ -175,22 +175,12 @@ public class EditExperimentProfilePage extends GenericForwardComposer<Window> {
         for(int i = 0; i < processorProfile.getNumCores() * processorProfile.getNumThreadsPerCore(); i++) {
             Row row = new Row();
 
-            Label labelThreadId = new Label("线程");
-            labelThreadId.setWidth("40px");
+            Label labelThreadId = new Label("Thread " + i + ": ");
+            labelThreadId.setWidth("60px");
             row.appendChild(labelThreadId);
 
-            Textbox textboxThreadId = new Textbox();
-            textboxThreadId.setWidth("40px");
-            textboxThreadId.setText(i + "");
-            textboxThreadId.setReadonly(true);
-            row.appendChild(textboxThreadId);
-
-            Label labelSimulatedProgram = new Label("负载");
-            labelSimulatedProgram.setWidth("40px");
-            row.appendChild(labelSimulatedProgram);
-
             Combobox comboboxSimulatedProgram = new Combobox();
-            comboboxSimulatedProgram.setWidth("400px");
+            comboboxSimulatedProgram.setWidth("460px");
             comboboxSimulatedProgram.setModel(new ListModelList<SimulatedProgram>(archimulatorService.getSimulatedProgramsAsList()));
             row.appendChild(comboboxSimulatedProgram);
 
@@ -214,17 +204,17 @@ public class EditExperimentProfilePage extends GenericForwardComposer<Window> {
             ExperimentProfileType experimentProfileType;
 
             String selectedLabel = this.radioGroupExperimentProfileTypes.getSelectedItem().getLabel();
-            if(selectedLabel.equals("功能模拟")) {
+            if(selectedLabel.equals("Functional Experiment")) {
                 experimentProfileType = ExperimentProfileType.FUNCTIONAL_EXPERIMENT;
                 this.textboxMaxInsts.setReadonly(true);
                 this.textboxPthreadSpawnedIndex.setReadonly(true);
             }
-            else if(selectedLabel.equals("详细模拟")) {
+            else if(selectedLabel.equals("Detailed Experiment")) {
                 experimentProfileType = ExperimentProfileType.DETAILED_EXPERIMENT;
                 this.textboxMaxInsts.setReadonly(true);
                 this.textboxPthreadSpawnedIndex.setReadonly(true);
             }
-            else if(selectedLabel.equals("分段模拟")) {
+            else if(selectedLabel.equals("Checkpointed Experiment")) {
                 experimentProfileType = ExperimentProfileType.CHECKPOINTED_EXPERIMENT;
                 this.textboxMaxInsts.setReadonly(false);
                 this.textboxPthreadSpawnedIndex.setReadonly(false);

@@ -48,10 +48,10 @@ public class ProcessorProfileListCellRenderer implements ListitemRenderer<Proces
         item.appendChild(new Listcell(data.getL2Associativity() + ""));
         item.appendChild(new Listcell(data.getCreatedTimeAsString() + ""));
 
-        Listcell listCellEdit = new Listcell();
-        item.appendChild(listCellEdit);
+        Listcell listCellOperations = new Listcell();
+        item.appendChild(listCellOperations);
 
-        Button buttonEdit = new Button("编辑");
+        Button buttonEdit = new Button("Edit");
         buttonEdit.addEventListener(Events.ON_CLICK, new EventListener<Event>() {
             @Override
             public void onEvent(Event event) throws Exception {
@@ -64,17 +64,14 @@ public class ProcessorProfileListCellRenderer implements ListitemRenderer<Proces
                 win.doModal();
             }
         });
-        listCellEdit.appendChild(buttonEdit);
+        listCellOperations.appendChild(buttonEdit);
 
-        Listcell listCellRemove = new Listcell();
-        item.appendChild(listCellRemove);
-
-        Button buttonRemove = new Button("删除");
+        Button buttonRemove = new Button("Remove");
 
         buttonRemove.addEventListener(Events.ON_CLICK, new EventListener<Event>() {
             @Override
             public void onEvent(Event event) throws Exception {
-                Messagebox.show("确认删除编号为" + data.getId() + "的目标体系结构？", "删除目标体系结构", Messagebox.YES | Messagebox.NO, Messagebox.QUESTION,
+                Messagebox.show("Are you sure to remove processor profile (id: " + data.getId() + ")?", "Remove Processor Profile", Messagebox.YES | Messagebox.NO, Messagebox.QUESTION,
                         new EventListener<Event>() {
                             public void onEvent(Event evt) throws SQLException {
                                 switch ((Integer) evt.getData()) {
@@ -87,6 +84,6 @@ public class ProcessorProfileListCellRenderer implements ListitemRenderer<Proces
                         });
             }
         });
-        listCellRemove.appendChild(buttonRemove);
+        listCellOperations.appendChild(buttonRemove);
     }
 }

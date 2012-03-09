@@ -27,11 +27,11 @@ public enum ExperimentProfileType {
     public String toString() {
         switch (this) {
             case FUNCTIONAL_EXPERIMENT:
-                return "功能模拟";
+                return "Functional Experiment";
             case DETAILED_EXPERIMENT:
-                return "详细模拟";
+                return "Detailed Experiment";
             case CHECKPOINTED_EXPERIMENT:
-                return "分段模拟";
+                return "Checkpointed Experiment";
             default:
                 throw new IllegalArgumentException();
         }

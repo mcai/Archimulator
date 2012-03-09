@@ -1,5 +1,5 @@
 <zk>
-    <window id="viewExperimentStats" title="实验统计 - Archimulator用户后台" border="normal" visible="false"
+    <window id="viewExperimentStats" title="Experiment Stats - Archimulator" border="normal" visible="false"
             width="800px" height="580px" sizable="true"
             apply="archimulator.view.page.edit.ViewExperimentStatsPage">
         <zscript>
@@ -23,7 +23,7 @@
             </columns>
             <rows>
                 <row>
-                    编号
+                    Id
                     <textbox id="textboxId" readonly="true" width="150px"/>
                 </row>
             </rows>
@@ -32,11 +32,11 @@
         <separator bar="true"/>
         <separator/>
 
-        <listbox id="listboxStats"  itemRenderer="archimulator.view.renderer.ExperimentStatListCellRenderer" emptyMessage="统计列表为空" multiple="true" mold="paging"
+        <listbox id="listboxStats"  itemRenderer="archimulator.view.renderer.ExperimentStatListCellRenderer" emptyMessage="Experiment stats list is empty" multiple="true" mold="paging"
                  pageSize="13" pagingPosition="bottom" height="438px">
             <listhead>
-                <listheader label="键" width="380px"/>
-                <listheader label="值" width="380px"/>
+                <listheader label="Key" width="380px"/>
+                <listheader label="Value" width="380px"/>
             </listhead>
         </listbox>
 
@@ -55,7 +55,7 @@
 
         <div align="center">
             <hbox>
-                <button id="buttonOk" forward="viewExperimentStats.onOK" label="关 闭"/>
+                <button id="buttonOk" forward="viewExperimentStats.onOK" label="Close"/>
             </hbox>
         </div>
     </window>

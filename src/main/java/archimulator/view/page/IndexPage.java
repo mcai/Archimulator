@@ -18,20 +18,26 @@
  ******************************************************************************/
 package archimulator.view.page;
 
+import archimulator.model.experiment.profile.ExperimentProfile;
+import archimulator.model.experiment.profile.ProcessorProfile;
+import archimulator.model.simulation.SimulatedProgram;
 import archimulator.service.ArchimulatorService;
 import archimulator.service.ArchimulatorServiceImpl;
 import archimulator.service.ArchimulatorServletContextListener;
+import archimulator.util.DateHelper;
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.util.GenericForwardComposer;
-import org.zkoss.zul.Checkbox;
-import org.zkoss.zul.Messagebox;
-import org.zkoss.zul.Textbox;
-import org.zkoss.zul.Window;
+import org.zkoss.zul.*;
 
 import javax.servlet.http.HttpSession;
+import java.io.ByteArrayOutputStream;
 import java.sql.SQLException;
+import java.util.Date;
 
 public class IndexPage extends GenericForwardComposer<Window> {
     Checkbox checkboxRunningExperimentEnabled;
@@ -61,7 +67,7 @@ public class IndexPage extends GenericForwardComposer<Window> {
             ArchimulatorService archimulatorService = ArchimulatorServletContextListener.getArchimulatorService(httpSession.getServletContext());
             archimulatorService.setUserPassword(ArchimulatorServiceImpl.USER_ID_ADMIN, text);
 
-            Messagebox.show("密码修改成功！", "修改密码", Messagebox.OK, Messagebox.EXCLAMATION, new EventListener<Event>() {
+            Messagebox.show("Password has been changed successfully！", "Change Password", Messagebox.OK, Messagebox.EXCLAMATION, new EventListener<Event>() {
                 @Override
                 public void onEvent(Event event) throws Exception {
                     switch ((Integer) event.getData()) {
@@ -73,12 +79,16 @@ public class IndexPage extends GenericForwardComposer<Window> {
             });
         }
         else {
-            Messagebox.show("新密码不能为空！", "修改密码", Messagebox.OK, Messagebox.EXCLAMATION);
+            Messagebox.show("New password cannot be empty!", "Change Password", Messagebox.OK, Messagebox.EXCLAMATION);
         }
+    }
+    
+    public void onClick$buttonDownloadReport(Event event) {
+        Filedownload.save(generateReport(), "application/pdf", "archimulator_report_" + DateHelper.toFileNameString(new Date()) + ".pdf");
     }
 
     public void onClick$buttonClearData(Event event) {
-        Messagebox.show("数据清空后将无法恢复，确认清空数据吗？", "清空数据", Messagebox.YES | Messagebox.NO, Messagebox.EXCLAMATION,
+        Messagebox.show("Are you sure to clear data", "Clear Data", Messagebox.YES | Messagebox.NO, Messagebox.EXCLAMATION,
                 new EventListener<Event>() {
                     public void onEvent(Event evt) throws SQLException {
                         switch ((Integer) evt.getData()) {
@@ -89,6 +99,74 @@ public class IndexPage extends GenericForwardComposer<Window> {
                     }
                 }
         );
+    }
+
+    private byte[] generateReport() {
+        HttpSession httpSession = (HttpSession) session.getNativeSession();
+        ArchimulatorService archimulatorService = ArchimulatorServletContextListener.getArchimulatorService(httpSession.getServletContext());
+
+        try {
+            Document document = new Document(PageSize.LETTER.rotate());
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            PdfWriter.getInstance(document, out);
+
+            document.addTitle("Archimulator Report");
+            document.addCreator("Archimulator");
+
+            document.open();
+
+            document.add(new Paragraph("Simulated Programs"));
+
+            List listSimulatedPrograms = new List(List.ORDERED, 20);
+
+            for(SimulatedProgram simulatedProgram : archimulatorService.getSimulatedProgramsAsList()) {
+                listSimulatedPrograms.add(new ListItem(simulatedProgram + ""));
+            }
+
+            document.add(listSimulatedPrograms);
+
+            PdfPTable table = new PdfPTable(3);
+            table.addCell("");
+            table.addCell("");
+            table.addCell("");
+
+            document.add(Chunk.NEWLINE);
+
+            document.add(new Paragraph("Processor Profiles"));
+
+            List listProcessorProfiles = new List(List.ORDERED, 20);
+
+            for(ProcessorProfile processorProfile : archimulatorService.getProcessorProfilesAsList()) {
+                listProcessorProfiles.add(new ListItem(processorProfile + ""));
+            }
+
+            document.add(listProcessorProfiles);
+
+            document.add(Chunk.NEWLINE);
+
+            document.add(new Paragraph("Experiment Profiles"));
+
+            List listExperimentProfiles = new List(List.ORDERED, 20);
+
+            for(ExperimentProfile experimentProfile : archimulatorService.getExperimentProfilesAsList()) {
+                listExperimentProfiles.add(new ListItem(experimentProfile + ""));
+            }
+
+            document.add(listExperimentProfiles);
+
+            document.add(Chunk.NEWLINE);
+
+            Anchor anchorArchimulatorWebsite = new Anchor("For more details, please visit: http://www.archimulator.com/.");
+            anchorArchimulatorWebsite.setReference("http://www.archimulator.com/");
+            document.add(anchorArchimulatorWebsite);
+
+            document.close();
+            out.close();
+            return out.toByteArray();
+        } catch (Exception e) {
+            System.out.println(e);
+            return null;
+        }
     }
 
     private void clearData() throws SQLException {

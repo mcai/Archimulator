@@ -1,5 +1,5 @@
 <zk>
-    <window id="winEditProcessorProfile" title="编辑目标体系结构 - Archimulator用户后台" border="normal" visible="false"
+    <window id="winEditProcessorProfile" title="Edit Processor Profile - Archimulator" border="normal" visible="false"
             width="30%" height="300px" sizable="true"
             apply="archimulator.view.page.edit.EditProcessorProfilePage">
         <zscript>
@@ -26,23 +26,23 @@
             </columns>
             <rows>
                 <row>
-                    编号
+                    Id
                     <textbox id="textboxId" readonly="true" width="150px"/>
                 </row>
                 <row>
-                    核心数
+                    # Cores
                     <textbox id="textboxNumCores" width="150px"/>
                 </row>
                 <row>
-                    每核心线程数
+                    # Threads per Core
                     <textbox id="textboxNumThreadsPerCore" width="150px"/>
                 </row>
                 <row>
-                    L2大小
+                    L2 Size
                     <textbox id="textboxL2Size" width="150px"/>
                 </row>
                 <row>
-                    L2相联度
+                    L2 Associativity
                     <textbox id="textboxL2Associativity" width="150px"/>
                 </row>
             </rows>
@@ -53,8 +53,8 @@
 
         <div align="center">
             <hbox>
-                <button id="buttonOk" forward="winEditProcessorProfile.onOK" label="确 定"/>
-                <button id="buttonCancel" forward="winEditProcessorProfile.onCancel" label="取 消"/>
+                <button id="buttonOk" forward="winEditProcessorProfile.onOK" label="OK"/>
+                <button id="buttonCancel" forward="winEditProcessorProfile.onCancel" label="Cancel"/>
             </hbox>
         </div>
     </window>

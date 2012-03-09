@@ -28,13 +28,13 @@ public enum ExperimentProfileState {
     public String toString() {
         switch (this) {
             case SUBMITTED:
-                return "等候运行";
+                return "Submitted";
             case RUNNING:
-                return "正在运行";
+                return "Running";
             case PAUSED:
-                return "暂停运行";
+                return "Paused";
             case STOPPED:
-                return "运行结束";
+                return "Stopped";
             default:
                 throw new IllegalArgumentException();
         }

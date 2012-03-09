@@ -59,8 +59,8 @@ public class ViewExperimentStatsPage extends GenericForwardComposer<Window> {
 
         this.textboxId.setValue(this.experimentProfile.getId() + "");
 
-//        this.imageStats.setContent(ChartHelper.render("图表1", 300, 200)); //TODO
-//        this.imageStats2.setContent(ChartHelper.render("图表2", 300, 200)); //TODO
+//        this.imageStats.setContent(ChartHelper.render("fig1", 300, 200)); //TODO
+//        this.imageStats2.setContent(ChartHelper.render("fig2", 300, 200)); //TODO
 
         try {
             HttpSession httpSession = (HttpSession) session.getNativeSession();
@@ -99,7 +99,7 @@ public class ViewExperimentStatsPage extends GenericForwardComposer<Window> {
             }
         });
 
-        this.viewExperimentStats.setTitle("实验统计 - Archimulator用户后台");
+        this.viewExperimentStats.setTitle("Experiment Stats - Archimulator");
     }
 
     public void onOK() throws SQLException, InterruptedException {

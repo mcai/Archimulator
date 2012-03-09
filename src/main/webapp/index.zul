@@ -1,7 +1,7 @@
-<?page title="首页 - Archimulator用户后台"?>
+<?page title="Home - Archimulator"?>
 <?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit"?>
 <zk>
-    <window id="win" title="首页 - Archimulator用户后台" border="normal" width="100%" visible="false" apply="archimulator.view.page.IndexPage">
+    <window id="win" title="Home - Archimulator" border="normal" width="100%" visible="false" apply="archimulator.view.page.IndexPage">
         <zscript>
          import org.zkoss.zk.ui.*;
 
@@ -18,7 +18,7 @@
          </zscript>
         <vbox>
             <hbox>
-                <label style="color:red">运行实验:</label>
+                <label style="color:red">Run Experiment:</label>
                 <checkbox id="checkboxRunningExperimentEnabled"/>
             </hbox>
         </vbox>
@@ -27,11 +27,12 @@
 
         <vbox>
             <hbox>
-                <button id="buttonGoToSimulatedPrograms" label="评测程序管理" href="simulatedPrograms.zul"/>
-                <button id="buttonGoToProcessorProfiles" label="目标体系结构管理" href="processorProfiles.zul"/>
-                <button id="buttonGoToExperimentProfiles" label="实验管理" href="experimentProfiles.zul"/>
-                <button id="buttonClearData" label="清空数据" style="color:red"/>
-                <button id="buttonLogout" label="注销" onClick="logout()"/>
+                <button id="buttonGoToSimulatedPrograms" label="Simulated Programs" href="simulatedPrograms.zul"/>
+                <button id="buttonGoToProcessorProfiles" label="Processor Profiles" href="processorProfiles.zul"/>
+                <button id="buttonGoToExperimentProfiles" label="Experiment Profiles" href="experimentProfiles.zul"/>
+                <button id="buttonDownloadReport" label="Download Report"/>
+                <button id="buttonClearData" label="Clear Data" style="color:red"/>
+                <button id="buttonLogout" label="Logout" onClick="logout()"/>
             </hbox>
         </vbox>
 
@@ -40,9 +41,9 @@
 
         <vbox>
             <hbox>
-                新密码:
+                New Password:
                 <textbox id="textboxChangePassword" type="password" width="100px"/>
-                <button id="buttonChangePassword" label="修改密码"/>
+                <button id="buttonChangePassword" label="Change Password"/>
             </hbox>
         </vbox>
     </window>

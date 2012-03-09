@@ -34,4 +34,8 @@ public class DateHelper {
 //        return new SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss").format(date);
         return new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date);
     }
+
+    public static String toFileNameString(Date date) {
+        return new SimpleDateFormat("yyyy_MM_dd-HH_mm_ss").format(date);
+    }
 }

@@ -198,6 +198,11 @@ public class ExperimentProfile implements Serializable {
         return stats;
     }
 
+    @Override
+    public String toString() {
+        return String.format("ExperimentProfile{id=%d, type=%s, pthreadSpawnedIndex=%d, maxInsts=%d, state=%s, createdTime=%s}", id, type, pthreadSpawnedIndex, maxInsts, state, DateHelper.toString(DateHelper.fromTick(createdTime)));
+    }
+
     public static String getUserHome() {
         return System.getProperty("user.home");
     }

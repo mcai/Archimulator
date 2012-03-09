@@ -45,7 +45,7 @@ public class LoginPage extends GenericForwardComposer<Window> {
             session.setAttribute("userId", textboxUserId.getValue());
             Executions.sendRedirect("index.zul");
         } else {
-            Messagebox.show("用户名或密码错误，请重新输入！", "用户登录", Messagebox.OK, Messagebox.EXCLAMATION, new EventListener<Event>() {
+            Messagebox.show("User id or password is incorrect, please try again", "User Login", Messagebox.OK, Messagebox.EXCLAMATION, new EventListener<Event>() {
                 @Override
                 public void onEvent(Event event) throws Exception {
                     switch ((Integer) event.getData()) {

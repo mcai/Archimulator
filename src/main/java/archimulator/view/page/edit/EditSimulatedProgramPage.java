@@ -67,7 +67,7 @@ public class EditSimulatedProgramPage extends GenericForwardComposer<Window> {
             this.textboxId.setValue("N/A");
         }
 
-        this.winEditSimulatedProgram.setTitle(this.create ? "添加评测程序 - Archimulator用户后台" : "编辑评测程序 - Archimulator用户后台");
+        this.winEditSimulatedProgram.setTitle(this.create ? "Add Simulated Program - Archimulator" : "Edit Simulated Program - Archimulator");
     }
 
     public void onOK() throws SQLException {

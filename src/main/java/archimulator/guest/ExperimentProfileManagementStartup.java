@@ -112,11 +112,12 @@ public class ExperimentProfileManagementStartup {
 
         List<SimulatedProgram> simulatedPrograms = new ArrayList<SimulatedProgram>();
         simulatedPrograms.add(Startup.SIMULATED_PROGRAM_MST_BASELINE);
-        simulatedPrograms.add(Startup.SIMULATED_PROGRAM_EM3D_BASELINE);
-        simulatedPrograms.add(Startup.SIMULATED_PROGRAM_429_MCF_BASELINE);
-
         simulatedPrograms.add(Startup.SIMULATED_PROGRAM_MST_HT);
+
+        simulatedPrograms.add(Startup.SIMULATED_PROGRAM_EM3D_BASELINE);
         simulatedPrograms.add(Startup.SIMULATED_PROGRAM_EM3D_HT);
+
+        simulatedPrograms.add(Startup.SIMULATED_PROGRAM_429_MCF_BASELINE);
         simulatedPrograms.add(Startup.SIMULATED_PROGRAM_429_MCF_HT);
 
         for(SimulatedProgram simulatedProgram : simulatedPrograms) {
@@ -142,6 +143,7 @@ public class ExperimentProfileManagementStartup {
 
     public static void main(String[] args) throws SQLException {
         ExperimentProfileManagementStartup startup = new ExperimentProfileManagementStartup();
-        startup.submitExperimentProfiles();
+        startup.submitSimulatedProgramsAndProcessorProfiles();
+//        startup.submitExperimentProfiles();
     }
 }

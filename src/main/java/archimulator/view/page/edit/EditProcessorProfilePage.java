@@ -67,7 +67,7 @@ public class EditProcessorProfilePage extends GenericForwardComposer<Window> {
             this.textboxId.setValue("N/A");
         }
 
-        this.winEditProcessorProfile.setTitle(this.create ? "添加目标体系结构 - Archimulator用户后台" : "编辑目标体系结构 - Archimulator用户后台");
+        this.winEditProcessorProfile.setTitle(this.create ? "Add Processor Profile - Archimulator" : "Edit Processor Profile - Archimulator");
     }
 
     public void onOK() throws SQLException {

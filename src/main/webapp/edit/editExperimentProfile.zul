@@ -1,5 +1,5 @@
 <zk>
-    <window id="winEditExperimentProfile" title="编辑实验 - Archimulator用户后台" border="normal" visible="false"
+    <window id="winEditExperimentProfile" title="Edit Experiment Profile - Archimulator" border="normal" visible="false"
             width="800px" height="580px" sizable="true"
             apply="archimulator.view.page.edit.EditExperimentProfilePage">
         <zscript>
@@ -23,44 +23,42 @@
             </columns>
             <rows>
                 <row>
-                    编号
+                    Id
                     <textbox id="textboxId" readonly="true" width="150px"/>
                 </row>
                 <row>
-                    目标体系结构
+                    Processor Profiles
                     <combobox id="comboboxProcessorProfiles" width="450px"/>
                 </row>
                 <row>
-                    负载->硬件线程映射
+                    Context Configs
                     <grid id="gridContextConfigs" vflex="true" height="280px">
                         <columns>
-                            <column width="50px"/>
-                            <column width="50px"/>
-                            <column width="50px"/>
-                            <column width="430px"/>
+                            <column width="78px"/>
+                            <column width="480px"/>
                         </columns>
                         <rows>
                         </rows>
                     </grid>
                 </row>
                 <row>
-                    类型
+                    Type
                     <radiogroup id="radioGroupExperimentProfileTypes">
-                        <radio label="功能模拟"/>
-                        <radio label="详细模拟"/>
-                        <radio label="分段模拟"/>
+                        <radio label="Functional Experiment"/>
+                        <radio label="Detailed Experiment"/>
+                        <radio label="Checkpointed Experiment"/>
                     </radiogroup>
                 </row>
                 <row>
-                    生成帮助线程伪指令编号
+                    Pthread Spawning Pseudocall
                     <textbox id="textboxPthreadSpawnedIndex" width="150px"/>
                 </row>
                 <row>
-                    最大指令数
+                    Max Insts
                     <textbox id="textboxMaxInsts" width="150px"/>
                 </row>
                 <row>
-                    状态
+                    State
                     <label id="labelState" width="150px"/>
                 </row>
             </rows>
@@ -71,8 +69,8 @@
 
         <div align="center">
             <hbox>
-                <button id="buttonOk" forward="winEditExperimentProfile.onOK" label="确 定"/>
-                <button id="buttonCancel" forward="winEditExperimentProfile.onCancel" label="取 消"/>
+                <button id="buttonOk" forward="winEditExperimentProfile.onOK" label="OK"/>
+                <button id="buttonCancel" forward="winEditExperimentProfile.onCancel" label="Cancel"/>
             </hbox>
         </div>
     </window>

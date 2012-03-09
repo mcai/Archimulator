@@ -1,7 +1,7 @@
-<?page title="实验管理 - Archimulator用户后台"?>
+<?page title="Experiment Profiles - Archimulator"?>
 <?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit"?>
 <zk>
-    <window id="win" title="实验管理 - Archimulator用户后台" border="normal" width="100%" visible="false" apply="archimulator.view.page.ExperimentProfilesPage">
+    <window id="win" title="Experiment Profiles - Archimulator" border="normal" width="100%" visible="false" apply="archimulator.view.page.ExperimentProfilesPage">
         <zscript>
          import org.zkoss.zk.ui.*;
 
@@ -18,26 +18,26 @@
          </zscript>
         <vbox>
             <hbox>
-                <button id="buttonGoToIndex" label="主页" href="index.zul"/>
-                <button id="buttonGoToSimulatedPrograms" label="评测程序管理" href="simulatedPrograms.zul"/>
-                <button id="buttonGoToProcessorProfiles" label="目标体系结构管理" href="processorProfiles.zul"/>
-                <button id="buttonLogout" label="注销" onClick="logout()"/>
+                <button id="buttonGoToIndex" label="Home" href="index.zul"/>
+                <button id="buttonGoToSimulatedPrograms" label="Simulated Programs" href="simulatedPrograms.zul"/>
+                <button id="buttonGoToProcessorProfiles" label="Processor Profiles" href="processorProfiles.zul"/>
+                <button id="buttonLogout" label="Logout" onClick="logout()"/>
             </hbox>
         </vbox>
 
         <separator bar="true"/>
 
         <hbox>
-            <label>实验列表</label>
-            (合计:
+            <label>Experiment Profile List</label>
+            (Total:
             <label value="@{archimulatorService.experimentProfilesAsList.size}" style="color:green"/>
-            个):
+            ):
         </hbox>
 
         <separator/>
 
         <hbox>
-            <button id="buttonAddExperimentProfile" label="添加"/>
+            <button id="buttonAddExperimentProfile" label="Add"/>
         </hbox>
 
         <separator/>
@@ -45,13 +45,13 @@
         <listbox id="listboxExperimentProfiles" model="@{archimulatorService.experimentProfilesAsList}" itemRenderer="archimulator.view.renderer.ExperimentProfileListCellRenderer" emptyMessage="实验列表为空" multiple="true" mold="paging"
                  pageSize="10" pagingPosition="bottom">
             <listhead>
-                <listheader label="编号" width="50px"/>
-                <listheader label="实验类型" width="100px"/>
-                <listheader label="生成帮助线程伪指令编号" width="180px"/>
-                <listheader label="最大指令数" width="150px"/>
-                <listheader label="创建日期" width="150px"/>
-                <listheader label="状态" width="100px"/>
-                <listheader label="操作" width="300px"/>
+                <listheader label="Id" width="50px"/>
+                <listheader label="Type" width="150px"/>
+                <listheader label="Pthread Spawning Pseudocall" width="180px"/>
+                <listheader label="Max Insts" width="150px"/>
+                <listheader label="Created Time" width="150px"/>
+                <listheader label="State" width="100px"/>
+                <listheader label="Operations" width="300px"/>
             </listhead>
         </listbox>
 

@@ -73,7 +73,7 @@ public class ExperimentProfileListCellRenderer implements ListitemRenderer<Exper
     }
 
     private void addButtonEdit(Listcell listCellOperations, final ExperimentProfile data) {
-        Button buttonEdit = new Button("编辑");
+        Button buttonEdit = new Button("Edit");
         buttonEdit.addEventListener(Events.ON_CLICK, new EventListener<Event>() {
             @Override
             public void onEvent(Event event) throws Exception {
@@ -90,11 +90,11 @@ public class ExperimentProfileListCellRenderer implements ListitemRenderer<Exper
     }
 
     private void addButtonRemove(Listcell listCellOperations, final ExperimentProfile data, final ArchimulatorService archimulatorService) {
-        Button buttonRemove = new Button("删除");
+        Button buttonRemove = new Button("Remove");
         buttonRemove.addEventListener(Events.ON_CLICK, new EventListener<Event>() {
             @Override
             public void onEvent(Event event) throws Exception {
-                Messagebox.show("确认删除编号为" + data.getId() + "的实验？", "删除实验", Messagebox.YES | Messagebox.NO, Messagebox.QUESTION,
+                Messagebox.show("Are you sure to remove experiment profile (id: " + data.getId() + ")?", "Remove Experiment Profile", Messagebox.YES | Messagebox.NO, Messagebox.QUESTION,
                         new EventListener<Event>() {
                             public void onEvent(Event evt) throws SQLException {
                                 switch ((Integer) evt.getData()) {
@@ -111,12 +111,12 @@ public class ExperimentProfileListCellRenderer implements ListitemRenderer<Exper
     }
 
     private void addButtonPause(Listcell listCellOperations, final ExperimentProfile data, final ArchimulatorService archimulatorService) {
-        Button buttonPause = new Button("暂停");
+        Button buttonPause = new Button("Pause");
 
         buttonPause.addEventListener(Events.ON_CLICK, new EventListener<Event>() {
             @Override
             public void onEvent(Event event) throws Exception {
-                Messagebox.show("确认暂停编号为" + data.getId() + "的实验？", "暂停实验", Messagebox.YES | Messagebox.NO, Messagebox.QUESTION,
+                Messagebox.show("Are you sure to pause experiment profile (id: " + data.getId() + ")?", "Pause Experiment Profile", Messagebox.YES | Messagebox.NO, Messagebox.QUESTION,
                         new EventListener<Event>() {
                             public void onEvent(Event evt) throws SQLException {
                                 switch ((Integer) evt.getData()) {
@@ -133,12 +133,12 @@ public class ExperimentProfileListCellRenderer implements ListitemRenderer<Exper
     }
 
     private void addButtonResume(Listcell listCellOperations, final ExperimentProfile data, final ArchimulatorService archimulatorService) {
-        Button buttonResume = new Button("继续");
+        Button buttonResume = new Button("Resume");
 
         buttonResume.addEventListener(Events.ON_CLICK, new EventListener<Event>() {
             @Override
             public void onEvent(Event event) throws Exception {
-                Messagebox.show("确认继续编号为" + data.getId() + "的实验？", "继续实验", Messagebox.YES | Messagebox.NO, Messagebox.QUESTION,
+                Messagebox.show("Are you sure to resume experiment profile (id: " + data.getId() + ")?", "Resume Experiment Profile", Messagebox.YES | Messagebox.NO, Messagebox.QUESTION,
                         new EventListener<Event>() {
                             public void onEvent(Event evt) throws SQLException {
                                 switch ((Integer) evt.getData()) {
@@ -155,12 +155,12 @@ public class ExperimentProfileListCellRenderer implements ListitemRenderer<Exper
     }
 
     private void addButtonStop(Listcell listCellOperations, final ExperimentProfile data, final ArchimulatorService archimulatorService) {
-        Button buttonStop = new Button("停止");
+        Button buttonStop = new Button("Stop");
 
         buttonStop.addEventListener(Events.ON_CLICK, new EventListener<Event>() {
             @Override
             public void onEvent(Event event) throws Exception {
-                Messagebox.show("确认停止编号为" + data.getId() + "的实验？", "停止实验", Messagebox.YES | Messagebox.NO, Messagebox.QUESTION,
+                Messagebox.show("Are you sure to stop experiment profile (id: " + data.getId() + ")?", "Stop Experiment Profile", Messagebox.YES | Messagebox.NO, Messagebox.QUESTION,
                         new EventListener<Event>() {
                             public void onEvent(Event evt) throws SQLException {
                                 switch ((Integer) evt.getData()) {
@@ -177,7 +177,7 @@ public class ExperimentProfileListCellRenderer implements ListitemRenderer<Exper
     }
 
     private void addButtonStats(Listcell listCellOperations, final ExperimentProfile data, final ArchimulatorService archimulatorService) {
-        Button buttonStats = new Button("统计");
+        Button buttonStats = new Button("Stats");
 
         buttonStats.addEventListener(Events.ON_CLICK, new EventListener<Event>() {
             @Override

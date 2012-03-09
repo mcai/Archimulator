@@ -43,7 +43,7 @@ public class ExperimentProfilesPage extends GenericForwardComposer<Window> {
         ArchimulatorService archimulatorService = ArchimulatorServletContextListener.getArchimulatorService(httpSession.getServletContext());
 
         if(archimulatorService.getProcessorProfilesAsList().isEmpty()) {
-            Messagebox.show("目标体系结构列表为空，请添加目标体系结构后重试！", "添加实验", Messagebox.OK, Messagebox.EXCLAMATION, new EventListener<Event>() {
+            Messagebox.show("Processor profile list is empty, please add one processor profile and try again!", "Add Experiment Profile", Messagebox.OK, Messagebox.EXCLAMATION, new EventListener<Event>() {
                 @Override
                 public void onEvent(Event event) throws Exception {
                     switch ((Integer) event.getData()) {
