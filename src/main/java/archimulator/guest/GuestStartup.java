@@ -27,7 +27,6 @@ import archimulator.util.UpdateHelper;
 import archimulator.util.action.Action1;
 import archimulator.util.im.channel.CloudMessageChannel;
 import archimulator.util.im.event.request.PauseExperimentRequestEvent;
-import archimulator.util.im.event.request.RefreshExperiementStateRequestEvent;
 import archimulator.util.im.event.request.ResumeExperimentRequestEvent;
 import archimulator.util.im.event.request.StopExperimentRequestEvent;
 import archimulator.util.im.sink.GracefulMessageSink;
@@ -96,13 +95,6 @@ public class GuestStartup {
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
-            }
-        });
-
-        this.cloudMessageChannel.addCloudEventListener(RefreshExperiementStateRequestEvent.class, new Action1<RefreshExperiementStateRequestEvent>() {
-            @Override
-            public void apply(RefreshExperiementStateRequestEvent event) {
-                //TODO
             }
         });
 

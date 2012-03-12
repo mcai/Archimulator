@@ -30,6 +30,10 @@
                     <textbox id="textboxId" readonly="true" width="150px"/>
                 </row>
                 <row>
+                    Title
+                    <textbox id="textboxTitle" width="150px"/>
+                </row>
+                <row>
                     Cwd
                     <textbox id="textboxCwd" width="150px"/>
                 </row>

@@ -1,6 +1,6 @@
 <zk>
     <window id="winEditExperimentProfile" title="Edit Experiment Profile - Archimulator" border="normal" visible="false"
-            width="800px" height="580px" sizable="true"
+            width="800px" height="610px" sizable="true"
             apply="archimulator.view.page.edit.EditExperimentProfilePage">
         <zscript>
             import org.zkoss.zk.ui.*;
@@ -27,8 +27,12 @@
                     <textbox id="textboxId" readonly="true" width="150px"/>
                 </row>
                 <row>
+                    Title
+                    <textbox id="textboxTitle" width="450px"/>
+                </row>
+                <row>
                     Processor Profiles
-                    <combobox id="comboboxProcessorProfiles" width="450px"/>
+                    <combobox id="comboboxProcessorProfiles" width="550px"/>
                 </row>
                 <row>
                     Context Configs

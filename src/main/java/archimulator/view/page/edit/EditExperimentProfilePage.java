@@ -40,6 +40,7 @@ import java.util.List;
 
 public class EditExperimentProfilePage extends GenericForwardComposer<Window> {
     private Textbox textboxId;
+    private Textbox textboxTitle;
     private Combobox comboboxProcessorProfiles;
     private Grid gridContextConfigs;
     private Radiogroup radioGroupExperimentProfileTypes;
@@ -71,6 +72,7 @@ public class EditExperimentProfilePage extends GenericForwardComposer<Window> {
         this.experimentProfile = (ExperimentProfile) arg.get("experimentProfile");
 
         this.textboxId.setValue(this.experimentProfile.getId() + "");
+        this.textboxTitle.setValue(this.experimentProfile.getTitle());
 
         this.comboboxProcessorProfiles.setModel(new ListModelList<ProcessorProfile>(archimulatorService.getProcessorProfilesAsList()));
 
@@ -125,6 +127,7 @@ public class EditExperimentProfilePage extends GenericForwardComposer<Window> {
             });
         }
         else {
+            this.experimentProfile.setTitle(this.textboxTitle.getValue());
             this.experimentProfile.setPthreadSpawnedIndex(Integer.parseInt(this.textboxPthreadSpawnedIndex.getValue()));
             this.experimentProfile.setMaxInsts(Integer.parseInt(this.textboxMaxInsts.getValue()));
 

@@ -1,6 +1,6 @@
 <zk>
     <window id="winEditProcessorProfile" title="Edit Processor Profile - Archimulator" border="normal" visible="false"
-            width="30%" height="300px" sizable="true"
+            width="30%" height="310px" sizable="true"
             apply="archimulator.view.page.edit.EditProcessorProfilePage">
         <zscript>
             import org.zkoss.zk.ui.*;
@@ -28,6 +28,10 @@
                 <row>
                     Id
                     <textbox id="textboxId" readonly="true" width="150px"/>
+                </row>
+                <row>
+                    Title
+                    <textbox id="textboxTitle" width="150px"/>
                 </row>
                 <row>
                     # Cores

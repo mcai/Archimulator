@@ -28,6 +28,7 @@ import org.zkoss.zul.Window;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class SimulatedProgramsPage extends GenericForwardComposer<Window> {
     private Button buttonAddSimulatedProgram;
@@ -36,7 +37,7 @@ public class SimulatedProgramsPage extends GenericForwardComposer<Window> {
         Map<String, Object> arg = new HashMap<String, Object>();
 
         arg.put("create", true);
-        arg.put("simulatedProgram", new SimulatedProgram("", "", ""));
+        arg.put("simulatedProgram", new SimulatedProgram(UUID.randomUUID().toString(), "", "", ""));
 
         Window win = (Window) Executions.createComponents("/edit/editSimulatedProgram.zul", null, arg);
         win.doModal();

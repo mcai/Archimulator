@@ -25,7 +25,6 @@ import archimulator.model.simulation.SimulatedProgram;
 import archimulator.model.user.User;
 import archimulator.util.im.channel.CloudMessageChannel;
 import archimulator.util.im.event.request.PauseExperimentRequestEvent;
-import archimulator.util.im.event.request.RefreshExperiementStateRequestEvent;
 import archimulator.util.im.event.request.ResumeExperimentRequestEvent;
 import archimulator.util.im.event.request.StopExperimentRequestEvent;
 import archimulator.util.im.sink.MessageSink;
@@ -325,16 +324,6 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
             this.cloudMessageChannel.send(experimentProfile.getSimulatorUserId(), new StopExperimentRequestEvent(experimentProfile.getId()));
         }
     }
-    
-    @Override
-    public void refreshExperimentStateById(long experimentProfileId) throws SQLException {
-        if(!this.experimentProfiles.idExists(experimentProfileId)) {
-            return;
-        }
-
-        ExperimentProfile experimentProfile = this.getExperimentProfileById(experimentProfileId);
-        this.cloudMessageChannel.send(experimentProfile.getSimulatorUserId(), new RefreshExperiementStateRequestEvent(experimentProfile.getId()));
-    }
 
     @Override
     public void notifyPollStatsCompletedEvent(long experimentProfileId, Map<String, Object> stats) throws SQLException {
@@ -376,7 +365,7 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
     public static final String USER_ID_ADMIN = "itecgo";
     public static final String USER_PASSWORD_ADMIN = "1026@ustc";
 
-    public static final String DATABASE_REVISION = "24";
+    public static final String DATABASE_REVISION = "28";
 
     //    public static final String DATABASE_URL = "jdbc:h2:mem:account";
     public static final String DATABASE_URL = "jdbc:h2:~/.archimulator/data/v" + DATABASE_REVISION;

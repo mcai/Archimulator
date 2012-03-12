@@ -28,6 +28,7 @@ import org.zkoss.zul.Window;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class ProcessorProfilesPage extends GenericForwardComposer<Window> {
     private Button buttonAddProcessorProfile;
@@ -36,7 +37,7 @@ public class ProcessorProfilesPage extends GenericForwardComposer<Window> {
         Map<String, Object> arg = new HashMap<String, Object>();
 
         arg.put("create", true);
-        arg.put("processorProfile", new ProcessorProfile(2, 2, 1024 * 1024 * 4, 8));
+        arg.put("processorProfile", new ProcessorProfile(UUID.randomUUID().toString(), 2, 2, 1024 * 1024 * 4, 8));
 
         Window win = (Window) Executions.createComponents("/edit/editProcessorProfile.zul", null, arg);
         win.doModal();

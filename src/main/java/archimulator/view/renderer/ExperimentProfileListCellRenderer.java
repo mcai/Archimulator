@@ -43,10 +43,11 @@ public class ExperimentProfileListCellRenderer implements ListitemRenderer<Exper
         final ArchimulatorService archimulatorService = ArchimulatorServletContextListener.getArchimulatorService(httpSession.getServletContext());
 
         item.appendChild(new Listcell(data.getId() + ""));
+        item.appendChild(new Listcell(data.getTitle()));
         item.appendChild(new Listcell(data.getType() + ""));
         item.appendChild(new Listcell(data.getType() == ExperimentProfileType.CHECKPOINTED_EXPERIMENT ? data.getPthreadSpawnedIndex() + "" : "N/A"));
         item.appendChild(new Listcell(data.getType() == ExperimentProfileType.CHECKPOINTED_EXPERIMENT ? data.getMaxInsts() + "" : "N/A"));
-        item.appendChild(new Listcell(data.getCreatedTimeAsString() + ""));
+        item.appendChild(new Listcell(data.getCreatedTimeAsString()));
         item.appendChild(new Listcell(data.getState() + ""));
 
         Listcell listCellOperations = new Listcell();

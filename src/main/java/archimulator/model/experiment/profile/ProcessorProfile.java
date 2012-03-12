@@ -36,6 +36,9 @@ public class ProcessorProfile implements Serializable {
     @DatabaseField(generatedId = true)
     private long id;
 
+    @DatabaseField(index = true)
+    private String title;
+
     @DatabaseField
     private int numCores;
 
@@ -60,7 +63,8 @@ public class ProcessorProfile implements Serializable {
     public ProcessorProfile() {
     }
 
-    public ProcessorProfile(int numCores, int numThreadsPerCore, int l2Size, int l2Associativity) {
+    public ProcessorProfile(String title, int numCores, int numThreadsPerCore, int l2Size, int l2Associativity) {
+        this.title = title;
         this.numCores = numCores;
         this.numThreadsPerCore = numThreadsPerCore;
         this.l2Size = l2Size;
@@ -74,6 +78,10 @@ public class ProcessorProfile implements Serializable {
 
     public long getId() {
         return id;
+    }
+
+    public String getTitle() {
+        return title;
     }
 
     public int getNumCores() {
@@ -108,6 +116,10 @@ public class ProcessorProfile implements Serializable {
         return DateHelper.toString(DateHelper.fromTick(this.createdTime));
     }
 
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
     public void setNumCores(int numCores) {
         this.numCores = numCores;
     }
@@ -126,6 +138,6 @@ public class ProcessorProfile implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("ProcessorProfile{id=%d, numCores=%d, numThreadsPerCore=%d, l2Size=%s, l2Associativity=%d}", id, numCores, numThreadsPerCore, StorageUnit.toString(l2Size), l2Associativity);
+        return String.format("ProcessorProfile{id=%d, title='%s', numCores=%d, numThreadsPerCore=%d, l2Size='%s', l2Associativity=%d}", id, title, numCores, numThreadsPerCore, StorageUnit.toString(l2Size), l2Associativity);
     }
 }

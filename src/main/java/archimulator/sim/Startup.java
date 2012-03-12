@@ -28,7 +28,7 @@ import java.util.List;
 
 public class Startup {
     public static final SimulatedProgram SIMULATED_PROGRAM_MST_BASELINE = new SimulatedProgram(
-            ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/Olden_Custom1/mst/baseline",
+            "mst_baseline", ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/Olden_Custom1/mst/baseline",
             "mst.mips",
             "10000");
 //            "2000");
@@ -37,7 +37,7 @@ public class Startup {
 //    "100");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_MST_HT = new SimulatedProgram(
-            ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/Olden_Custom1/mst/ht",
+            "mst_ht", ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/Olden_Custom1/mst/ht",
             "mst.mips",
             "10000");
 //            "4000");
@@ -48,7 +48,7 @@ public class Startup {
 //            "100");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_EM3D_BASELINE = new SimulatedProgram(
-            ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/Olden_Custom1/em3d/baseline",
+            "em3d_baseline", ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/Olden_Custom1/em3d/baseline",
             "em3d.mips",
 //            "400000 128 75 1");
 //            "400 128 75 1");
@@ -57,7 +57,7 @@ public class Startup {
             "400000 128 75 1");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_EM3D_HT = new SimulatedProgram(
-            ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/Olden_Custom1/em3d/ht",
+            "em3d_ht", ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/Olden_Custom1/em3d/ht",
             "em3d.mips",
 //            "400000 128 75 1");
 //            "400 128 75 1");
@@ -67,23 +67,23 @@ public class Startup {
             "400000 128 75 1");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_429_MCF_BASELINE = new SimulatedProgram(
-            ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline",
+            "429_mcf_baseline", ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline",
             "429.mcf.mips",
             ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline/data/ref/input/inp.in");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_429_MCF_HT = new SimulatedProgram(
-            ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht",
+            "429_mcf_ht", ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht",
             "429.mcf.mips",
             ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht/data/ref/input/inp.in");
 //            getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht/data/test/input/inp.in");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_462_LIBQUANTUM_BASELINE = new SimulatedProgram(
-            ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/462.libquantum/baseline",
+            "462_libquantum_baseline", ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/462.libquantum/baseline",
             "462.libquantum.mips",
             "33 5");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_462_LIBQUANTUM_HT = new SimulatedProgram(
-            ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/462.libquantum/ht",
+            "462_libquantum_ht", ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/462.libquantum/ht",
             "462.libquantum.mips",
             "33 5");
 
@@ -102,7 +102,12 @@ public class Startup {
         List<ExperimentProfile> experimentProfiles = new ArrayList<ExperimentProfile>();
 
         for (SimulatedProgram simulatedProgram : simulatedPrograms) {
-            ProcessorProfile processorProfile = new ProcessorProfile(2, 2, 1024 * 1024 * 4, 8);
+            int numCores1 = 2;
+            int numThreadsPerCore1 = 2;
+            int l2SizeInKByte1 = 1024 * 4;
+            int l2Associativity1 = 8;
+
+            ProcessorProfile processorProfile = new ProcessorProfile("C" + numCores1 + "T" + numThreadsPerCore1 + "-" + "L2SizeInKB_" + l2SizeInKByte1 + "-" + "L2Assoc_" + l2Associativity1, numCores1, numThreadsPerCore1, 1024 * l2SizeInKByte1, l2Associativity1);
 
             ExperimentProfile experimentProfile = new ExperimentProfile(processorProfile);
             experimentProfile.addWorkload(simulatedProgram);
@@ -110,7 +115,10 @@ public class Startup {
             experimentProfiles.add(experimentProfile);
 
             for (int l2SizeInKByte : l2SizeInKBytes) {
-                ProcessorProfile processorProfile1 = new ProcessorProfile(2, 2, 1024 * l2SizeInKByte, 8);
+                int numCores = 2;
+                int numThreadsPerCore = 2;
+                int l2Associativity = 8;
+                ProcessorProfile processorProfile1 = new ProcessorProfile("C" + numCores + "T" + numThreadsPerCore + "-" + "L2SizeInKB_" + l2SizeInKByte + "-" + "L2Assoc_" + l2Associativity, numCores, numThreadsPerCore, 1024 * l2SizeInKByte, l2Associativity);
 
                 ExperimentProfile experimentProfile1 = new ExperimentProfile(processorProfile1);
                 experimentProfile1.addWorkload(simulatedProgram);

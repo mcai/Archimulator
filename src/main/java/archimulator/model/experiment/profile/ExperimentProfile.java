@@ -39,6 +39,9 @@ public class ExperimentProfile implements Serializable {
     @DatabaseField(generatedId = true)
     private long id;
 
+    @DatabaseField(index = true)
+    private String title;
+
     @DatabaseField(dataType = DataType.SERIALIZABLE)
     private ProcessorProfile processorProfile;
 
@@ -73,6 +76,11 @@ public class ExperimentProfile implements Serializable {
     }
 
     public ExperimentProfile(ProcessorProfile processorProfile) {
+        this(UUID.randomUUID().toString(), processorProfile);
+    }
+    
+    public ExperimentProfile(String title, ProcessorProfile processorProfile) {
+        this.title = title;
         this.processorProfile = processorProfile;
         this.state = ExperimentProfileState.SUBMITTED;
 
@@ -154,6 +162,10 @@ public class ExperimentProfile implements Serializable {
         return id;
     }
 
+    public String getTitle() {
+        return title;
+    }
+
     public ProcessorProfile getProcessorProfile() {
         return processorProfile;
     }
@@ -172,6 +184,10 @@ public class ExperimentProfile implements Serializable {
 
     public String getCreatedTimeAsString() {
         return DateHelper.toString(DateHelper.fromTick(this.createdTime));
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public void setProcessorProfile(ProcessorProfile processorProfile) {
@@ -200,7 +216,7 @@ public class ExperimentProfile implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("ExperimentProfile{id=%d, type=%s, pthreadSpawnedIndex=%d, maxInsts=%d, state=%s, createdTime=%s}", id, type, pthreadSpawnedIndex, maxInsts, state, DateHelper.toString(DateHelper.fromTick(createdTime)));
+        return String.format("ExperimentProfile{id=%d, title='%s', type=%s, pthreadSpawnedIndex=%d, maxInsts=%d, state=%s, createdTime=%s}", id, title, type, pthreadSpawnedIndex, maxInsts, state, DateHelper.toString(DateHelper.fromTick(createdTime)));
     }
 
     public static String getUserHome() {

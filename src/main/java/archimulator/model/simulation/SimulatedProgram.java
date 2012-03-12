@@ -30,6 +30,9 @@ public class SimulatedProgram implements Serializable {
     @DatabaseField(generatedId = true)
     private long id;
 
+    @DatabaseField(index = true)
+    private String title;
+
     @DatabaseField
     private String cwd;
 
@@ -48,11 +51,12 @@ public class SimulatedProgram implements Serializable {
     public SimulatedProgram() {
     }
 
-    public SimulatedProgram(String cwd, String exe, String args) {
-        this(cwd, exe, args, "");
+    public SimulatedProgram(String title, String cwd, String exe, String args) {
+        this(title, cwd, exe, args, "");
     }
 
-    public SimulatedProgram(String cwd, String exe, String args, String stdin) {
+    public SimulatedProgram(String title, String cwd, String exe, String args, String stdin) {
+        this.title = title;
         this.cwd = cwd;
         this.exe = exe;
         this.args = args;
@@ -62,6 +66,10 @@ public class SimulatedProgram implements Serializable {
 
     public long getId() {
         return id;
+    }
+
+    public String getTitle() {
+        return title;
     }
 
     public String getCwd() {
@@ -88,6 +96,10 @@ public class SimulatedProgram implements Serializable {
         return DateHelper.toString(DateHelper.fromTick(this.createdTime));
     }
 
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
     public void setCwd(String cwd) {
         this.cwd = cwd;
     }
@@ -106,6 +118,6 @@ public class SimulatedProgram implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("SimulatedProgram{id=%d, cwd='%s', exe='%s', args='%s', stdin='%s'}", id, cwd, exe, args, stdin);
+        return String.format("SimulatedProgram{id=%d, title='%s', cwd='%s', exe='%s', args='%s', stdin='%s'}", id, title, cwd, exe, args, stdin);
     }
 }

@@ -41,11 +41,12 @@ public class SimulatedProgramListCellRenderer implements ListitemRenderer<Simula
         final ArchimulatorService archimulatorService = ArchimulatorServletContextListener.getArchimulatorService(httpSession.getServletContext());
 
         item.appendChild(new Listcell(data.getId() + ""));
-        item.appendChild(new Listcell(data.getCwd() + ""));
-        item.appendChild(new Listcell(data.getExe() + ""));
-        item.appendChild(new Listcell(data.getArgs() + ""));
-        item.appendChild(new Listcell(data.getStdin() + ""));
-        item.appendChild(new Listcell(data.getCreatedTimeAsString() + ""));
+        item.appendChild(new Listcell(data.getTitle()));
+        item.appendChild(new Listcell(data.getCwd()));
+        item.appendChild(new Listcell(data.getExe()));
+        item.appendChild(new Listcell(data.getArgs()));
+        item.appendChild(new Listcell(data.getStdin()));
+        item.appendChild(new Listcell(data.getCreatedTimeAsString()));
 
         Listcell listCellOperations = new Listcell();
         item.appendChild(listCellOperations);

@@ -32,6 +32,7 @@ import java.sql.SQLException;
 
 public class EditSimulatedProgramPage extends GenericForwardComposer<Window> {
     private Textbox textboxId;
+    private Textbox textboxTitle;
     private Textbox textboxCwd;
     private Textbox textboxExe;
     private Textbox textboxArgs;
@@ -58,6 +59,7 @@ public class EditSimulatedProgramPage extends GenericForwardComposer<Window> {
         this.simulatedProgram = (SimulatedProgram) arg.get("simulatedProgram");
 
         this.textboxId.setValue(this.simulatedProgram.getId() + "");
+        this.textboxTitle.setValue(this.simulatedProgram.getTitle());
         this.textboxCwd.setValue(this.simulatedProgram.getCwd());
         this.textboxExe.setValue(this.simulatedProgram.getExe());
         this.textboxArgs.setValue(this.simulatedProgram.getArgs());
@@ -71,6 +73,7 @@ public class EditSimulatedProgramPage extends GenericForwardComposer<Window> {
     }
 
     public void onOK() throws SQLException {
+        this.simulatedProgram.setTitle(this.textboxTitle.getValue());
         this.simulatedProgram.setCwd(this.textboxCwd.getValue());
         this.simulatedProgram.setExe(this.textboxExe.getValue());
         this.simulatedProgram.setArgs(this.textboxArgs.getValue());

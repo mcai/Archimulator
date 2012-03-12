@@ -42,11 +42,12 @@ public class ProcessorProfileListCellRenderer implements ListitemRenderer<Proces
         final ArchimulatorService archimulatorService = ArchimulatorServletContextListener.getArchimulatorService(httpSession.getServletContext());
 
         item.appendChild(new Listcell(data.getId() + ""));
+        item.appendChild(new Listcell(data.getTitle()));
         item.appendChild(new Listcell(data.getNumCores() + ""));
         item.appendChild(new Listcell(data.getNumThreadsPerCore() + ""));
         item.appendChild(new Listcell(StorageUnit.toString(data.getL2Size()) + ""));
         item.appendChild(new Listcell(data.getL2Associativity() + ""));
-        item.appendChild(new Listcell(data.getCreatedTimeAsString() + ""));
+        item.appendChild(new Listcell(data.getCreatedTimeAsString()));
 
         Listcell listCellOperations = new Listcell();
         item.appendChild(listCellOperations);

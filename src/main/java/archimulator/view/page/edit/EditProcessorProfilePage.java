@@ -32,6 +32,7 @@ import java.sql.SQLException;
 
 public class EditProcessorProfilePage extends GenericForwardComposer<Window> {
     private Textbox textboxId;
+    private Textbox textboxTitle;
     private Textbox textboxNumCores;
     private Textbox textboxNumThreadsPerCore;
     private Textbox textboxL2Size;
@@ -58,6 +59,7 @@ public class EditProcessorProfilePage extends GenericForwardComposer<Window> {
         this.processorProfile = (ProcessorProfile) arg.get("processorProfile");
 
         this.textboxId.setValue(this.processorProfile.getId() + "");
+        this.textboxTitle.setValue(this.processorProfile.getTitle());
         this.textboxNumCores.setValue(this.processorProfile.getNumCores() + "");
         this.textboxNumThreadsPerCore.setValue(this.processorProfile.getNumThreadsPerCore() + "");
         this.textboxL2Size.setValue(this.processorProfile.getL2Size() + "");
@@ -71,6 +73,7 @@ public class EditProcessorProfilePage extends GenericForwardComposer<Window> {
     }
 
     public void onOK() throws SQLException {
+        this.processorProfile.setTitle(this.textboxTitle.getValue());
         this.processorProfile.setNumCores(Integer.parseInt(this.textboxNumCores.getValue()));
         this.processorProfile.setNumThreadsPerCore(Integer.parseInt(this.textboxNumThreadsPerCore.getValue()));
         this.processorProfile.setL2Size(Integer.parseInt(this.textboxL2Size.getValue()));

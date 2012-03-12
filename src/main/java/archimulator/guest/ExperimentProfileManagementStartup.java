@@ -18,12 +18,10 @@
  ******************************************************************************/
 package archimulator.guest;
 
-import archimulator.model.experiment.profile.ExperimentProfile;
 import archimulator.model.experiment.profile.ProcessorProfile;
 import archimulator.model.simulation.SimulatedProgram;
 import archimulator.service.ArchimulatorService;
 import archimulator.sim.Startup;
-import archimulator.sim.ext.uncore.newHt2.LastLevelCacheHtRequestCachePollutionProfilingCapability;
 import archimulator.util.DateHelper;
 import com.caucho.hessian.client.HessianProxyFactory;
 
@@ -131,7 +129,11 @@ public class ExperimentProfileManagementStartup {
         l2SizeInKBytes.add(512 * 8);
 
         for (int l2SizeInKByte : l2SizeInKBytes) {
-            this.archimulatorService.addProcessorProfile(new ProcessorProfile(2, 2, 1024 * l2SizeInKByte, 8));
+            int numCores = 2;
+            int numThreadsPerCore = 2;
+            int l2Associativity = 8;
+
+            this.archimulatorService.addProcessorProfile(new ProcessorProfile("C" + numCores + "T" + numThreadsPerCore + "-" + "L2SizeInKB_" + l2SizeInKByte + "-" + "L2Assoc_" + l2Associativity, numCores, numThreadsPerCore, 1024 * l2SizeInKByte, l2Associativity));
         }
     }
     
