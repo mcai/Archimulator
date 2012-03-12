@@ -1,5 +1,6 @@
 Reading list:
     Predicting Inter-Thread Cache Contention on a Chip Multi-Processor Architecture
+    Prefetching with Helper Threads for Loosely Coupled Multiprocessor Systems
 
 Hints from Cache showndown: the good, bad and ugly:
     Useful prefetches are those that are actually accessed, while harmful prefetches are those that are never accessed
