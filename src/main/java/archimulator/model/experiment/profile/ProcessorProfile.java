@@ -138,6 +138,6 @@ public class ProcessorProfile implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("ProcessorProfile{id=%d, title='%s', numCores=%d, numThreadsPerCore=%d, l2Size='%s', l2Associativity=%d}", id, title, numCores, numThreadsPerCore, StorageUnit.toString(l2Size), l2Associativity);
+        return String.format("ProcessorProfile{id=%d, title='%s', numCores=%d, numThreadsPerCore=%d, l2Size='%s', l2Associativity=%d, createdTime='%s'}", id, title, numCores, numThreadsPerCore, StorageUnit.toString(l2Size), l2Associativity, DateHelper.toString(createdTime));
     }
 }

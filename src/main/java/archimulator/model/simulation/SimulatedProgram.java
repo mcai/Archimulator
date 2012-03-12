@@ -118,6 +118,6 @@ public class SimulatedProgram implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("SimulatedProgram{id=%d, title='%s', cwd='%s', exe='%s', args='%s', stdin='%s'}", id, title, cwd, exe, args, stdin);
+        return String.format("SimulatedProgram{id=%d, title='%s', cwd='%s', exe='%s', args='%s', stdin='%s', createdTime='%s'}", id, title, cwd, exe, args, stdin, DateHelper.toString(createdTime));
     }
 }

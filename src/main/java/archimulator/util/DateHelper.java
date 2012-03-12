@@ -30,6 +30,10 @@ public class DateHelper {
         return new Date(tick);
     }
 
+    public static String toString(long tick) {
+        return toString(fromTick(tick));
+    }
+    
     public static String toString(Date date) {
 //        return new SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss").format(date);
         return new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date);

@@ -216,7 +216,7 @@ public class ExperimentProfile implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("ExperimentProfile{id=%d, title='%s', type=%s, pthreadSpawnedIndex=%d, maxInsts=%d, state=%s, createdTime=%s}", id, title, type, pthreadSpawnedIndex, maxInsts, state, DateHelper.toString(DateHelper.fromTick(createdTime)));
+        return String.format("ExperimentProfile{id=%d, title='%s', type='%s', pthreadSpawnedIndex=%d, maxInsts=%d, state='%s', createdTime='%s'}", id, title, type, pthreadSpawnedIndex, maxInsts, state, DateHelper.toString(createdTime));
     }
 
     public static String getUserHome() {

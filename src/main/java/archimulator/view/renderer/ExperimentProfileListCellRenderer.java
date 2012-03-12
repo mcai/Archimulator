@@ -45,6 +45,7 @@ public class ExperimentProfileListCellRenderer implements ListitemRenderer<Exper
         item.appendChild(new Listcell(data.getId() + ""));
         item.appendChild(new Listcell(data.getTitle()));
         item.appendChild(new Listcell(data.getType() + ""));
+        item.appendChild(new Listcell(data.getProcessorProfile().getTitle()));
         item.appendChild(new Listcell(data.getType() == ExperimentProfileType.CHECKPOINTED_EXPERIMENT ? data.getPthreadSpawnedIndex() + "" : "N/A"));
         item.appendChild(new Listcell(data.getType() == ExperimentProfileType.CHECKPOINTED_EXPERIMENT ? data.getMaxInsts() + "" : "N/A"));
         item.appendChild(new Listcell(data.getCreatedTimeAsString()));
