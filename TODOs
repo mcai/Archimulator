@@ -46,6 +46,5 @@ temp result:
 [34359736761]  	used memory: 267,562,688
 
 TODOs:
-    1. benchmark management: name, grep...arguments
     2. simulation capabilities management from UI
     3. viewing program output.. from UI
