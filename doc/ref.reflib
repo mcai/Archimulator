@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <library>
 <manage_target braces="false" utf8="false">ref.bib</manage_target>
-<library_folder monitor="true"></library_folder>
+<library_folder monitor="false"></library_folder>
 <taglist>
 </taglist>
 <doclist>
@@ -196,6 +196,60 @@
     <bib_extra key="Publisher">Morgan &amp; Claypool Publishers</bib_extra>
     <bib_extra key="Series">Synthesis Lectures on Computer Architecture</bib_extra>
     <bib_extra key="Url">http://dx.doi.org/10.2200/S00273ED1V01Y201006CAC010; http://dx.doi.org/10.2200/S00273ED1V01Y201006CAC010</bib_extra>
+  </doc>
+  <doc>
+    <filename></filename>
+    <relative_filename></relative_filename>
+    <key>VanLil2000</key>
+    <notes></notes>
+    <bib_type>Article</bib_type>
+    <bib_doi></bib_doi>
+    <bib_title>Data Prefetch Mechanisms</bib_title>
+    <bib_authors>Vanderwiel, and Lilja,</bib_authors>
+    <bib_journal>CSURV: Computing Surveys</bib_journal>
+    <bib_volume>32</bib_volume>
+    <bib_number></bib_number>
+    <bib_pages></bib_pages>
+    <bib_year>2000</bib_year>
+  </doc>
+  <doc>
+    <filename></filename>
+    <relative_filename></relative_filename>
+    <key>Srinivasan2004</key>
+    <notes></notes>
+    <bib_type>Article</bib_type>
+    <bib_doi></bib_doi>
+    <bib_title>A Prefetch Taxonomy</bib_title>
+    <bib_authors>Srinivasan, Viji and Davidson, Edward S. and Tyson, Gary S.</bib_authors>
+    <bib_journal>IEEE Trans. Computers</bib_journal>
+    <bib_volume>53</bib_volume>
+    <bib_number>2</bib_number>
+    <bib_pages>126-140</bib_pages>
+    <bib_year>2004</bib_year>
+    <bib_extra key="Bibdate">2011-10-26</bib_extra>
+    <bib_extra key="Bibsource">DBLP, http://dblp.uni-trier.de/db/journals/tc/tc53.html#SrinivasanDT04</bib_extra>
+    <bib_extra key="Url">http://doi.ieeecomputersociety.org/10.1109/TC.2004.1261824</bib_extra>
+  </doc>
+  <doc>
+    <filename></filename>
+    <relative_filename></relative_filename>
+    <key>Jerger2006</key>
+    <notes></notes>
+    <bib_type>InProceedings</bib_type>
+    <bib_doi></bib_doi>
+    <bib_title>Friendly fire: understanding the effects of multiprocessor prefetches</bib_title>
+    <bib_authors>Jerger, Natalie D. Enright and Hill, Eric L. and Lipasti, Mikko H.</bib_authors>
+    <bib_journal></bib_journal>
+    <bib_volume></bib_volume>
+    <bib_number></bib_number>
+    <bib_pages>177-188</bib_pages>
+    <bib_year>2006</bib_year>
+    <bib_extra key="Bibdate">2008-10-22</bib_extra>
+    <bib_extra key="Bibsource">DBLP, http://dblp.uni-trier.de/db/conf/ispass/ispass2006.html#JergerHL06</bib_extra>
+    <bib_extra key="BookTitle">ISPASS</bib_extra>
+    <bib_extra key="Crossref">conf/ispass/2006</bib_extra>
+    <bib_extra key="Publisher">IEEE Computer Society</bib_extra>
+    <bib_extra key="Url">http://doi.ieeecomputersociety.org/10.1109/ISPASS.2006.1620802</bib_extra>
   </doc>
 </doclist>
 </library>
