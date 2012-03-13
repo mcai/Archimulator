@@ -365,7 +365,7 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
     public static final String USER_ID_ADMIN = "itecgo";
     public static final String USER_PASSWORD_ADMIN = "1026@ustc";
 
-    public static final String DATABASE_REVISION = "28";
+    public static final String DATABASE_REVISION = "29";
 
     //    public static final String DATABASE_URL = "jdbc:h2:mem:account";
     public static final String DATABASE_URL = "jdbc:h2:~/.archimulator/data/v" + DATABASE_REVISION;

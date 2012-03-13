@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.core;
 
-import archimulator.model.capability.CapabilityFactory;
+import archimulator.model.capability.ExperimentCapabilityFactory;
 import archimulator.model.simulation.BasicSimulationObject;
 import archimulator.model.simulation.Logger;
 import archimulator.model.capability.ProcessorCapability;
@@ -90,7 +90,7 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
         this.capabilities = new HashMap<Class<? extends ProcessorCapability>, ProcessorCapability>();
 
         for(Class<? extends ProcessorCapability> capabilityClz : capabilityClasses) {
-            this.capabilities.put(capabilityClz, CapabilityFactory.createProcessorCapability(capabilityClz, this));
+            this.capabilities.put(capabilityClz, ExperimentCapabilityFactory.createProcessorCapability(capabilityClz, this));
         }
     }
 

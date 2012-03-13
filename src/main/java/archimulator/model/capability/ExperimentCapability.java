@@ -20,5 +20,5 @@ package archimulator.model.capability;
 
 import java.io.Serializable;
 
-public interface Capability extends Serializable {
+public interface ExperimentCapability extends Serializable {
 }

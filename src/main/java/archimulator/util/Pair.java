@@ -35,6 +35,14 @@ public class Pair<K, T> {
         return second;
     }
 
+    public void setFirst(K first) {
+        this.first = first;
+    }
+
+    public void setSecond(T second) {
+        this.second = second;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

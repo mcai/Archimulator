@@ -31,10 +31,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class ExperimentProfileManagementStartup {
+public class ManagementStartup {
     private ArchimulatorService archimulatorService;
 
-    public ExperimentProfileManagementStartup() {
+    public ManagementStartup() {
         try {
             HessianProxyFactory factory = new HessianProxyFactory();
             factory.setReadTimeout(30000);
@@ -144,7 +144,7 @@ public class ExperimentProfileManagementStartup {
     }
 
     public static void main(String[] args) throws SQLException {
-        ExperimentProfileManagementStartup startup = new ExperimentProfileManagementStartup();
+        ManagementStartup startup = new ManagementStartup();
         startup.submitSimulatedProgramsAndProcessorProfiles();
 //        startup.submitExperimentProfiles();
     }

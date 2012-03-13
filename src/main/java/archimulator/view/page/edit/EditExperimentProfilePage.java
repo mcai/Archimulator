@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.view.page.edit;
 
+import archimulator.model.capability.*;
 import archimulator.model.experiment.profile.ExperimentProfile;
 import archimulator.model.experiment.profile.ExperimentProfileState;
 import archimulator.model.experiment.profile.ExperimentProfileType;
@@ -26,6 +27,7 @@ import archimulator.model.simulation.ContextConfig;
 import archimulator.model.simulation.SimulatedProgram;
 import archimulator.service.ArchimulatorService;
 import archimulator.service.ArchimulatorServletContextListener;
+import archimulator.util.Pair;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
@@ -36,6 +38,7 @@ import org.zkoss.zul.*;
 
 import javax.servlet.http.HttpSession;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class EditExperimentProfilePage extends GenericForwardComposer<Window> {
@@ -46,6 +49,15 @@ public class EditExperimentProfilePage extends GenericForwardComposer<Window> {
     private Radiogroup radioGroupExperimentProfileTypes;
     private Textbox textboxPthreadSpawnedIndex;
     private Textbox textboxMaxInsts;
+
+    private Listbox listboxSimulationCapabilities;
+    private Listbox listboxProcessorCapabilities;
+    private Listbox listboxKernelCapabilities;
+
+    private ListModelList<Pair<Class<? extends SimulationCapability>,Boolean>> listModelSimulationCapabilities;
+    private ListModelList<Pair<Class<? extends ProcessorCapability>,Boolean>> listModelProcessorCapabilities;
+    private ListModelList<Pair<Class<? extends KernelCapability>,Boolean>> listModelKernelCapabilities;
+
     private Label labelState;
 
     private Button buttonOk;
@@ -90,7 +102,11 @@ public class EditExperimentProfilePage extends GenericForwardComposer<Window> {
 
         this.textboxPthreadSpawnedIndex.setValue(this.experimentProfile.getPthreadSpawnedIndex() + "");
         this.textboxMaxInsts.setValue(this.experimentProfile.getMaxInsts() + "");
-        
+
+        this.populateListSimulatonCapabilities();
+        this.populateListProcessorCapabilities();
+        this.populateListKernelCapabilities();
+
         this.populateExperimentProfileTypes();
 
         this.labelState.setValue(this.experimentProfile.getState() + "");
@@ -101,7 +117,43 @@ public class EditExperimentProfilePage extends GenericForwardComposer<Window> {
 
         this.winEditExperimentProfile.setTitle(this.create ? "Add Experiment Profile - Archimulator" : "Edit Experiment Profile - Archimulator");
     }
-    
+
+    private void populateListSimulatonCapabilities() {
+        List<Pair<Class<? extends SimulationCapability>, Boolean>> listSimulationCapabilityClasses = new ArrayList<Pair<Class<? extends SimulationCapability>, Boolean>>();
+        List<Class<? extends SimulationCapability>> allSimulationCapabilityClasses = ExperimentCapabilityFactory.getSimulationCapabilityClasses();
+        List<Class<? extends SimulationCapability>> simulationCapabilityClasses = this.experimentProfile.getSimulationCapabilityClasses();
+        for(Class<? extends SimulationCapability> clz : allSimulationCapabilityClasses) {
+            listSimulationCapabilityClasses.add(new Pair<Class<? extends SimulationCapability>, Boolean>(clz, simulationCapabilityClasses.contains(clz)));
+        }
+
+        this.listModelSimulationCapabilities = new ListModelList<Pair<Class<? extends SimulationCapability>, Boolean>>(listSimulationCapabilityClasses);
+        this.listboxSimulationCapabilities.setModel(this.listModelSimulationCapabilities);
+    }
+
+    private void populateListProcessorCapabilities() {
+        List<Pair<Class<? extends ProcessorCapability>, Boolean>> listProcessorCapabilityClasses = new ArrayList<Pair<Class<? extends ProcessorCapability>, Boolean>>();
+        List<Class<? extends ProcessorCapability>> allProcessorCapabilityClasses = ExperimentCapabilityFactory.getProcessorCapabilityClasses();
+        List<Class<? extends ProcessorCapability>> processorCapabilityClasses = this.experimentProfile.getProcessorCapabilityClasses();
+        for(Class<? extends ProcessorCapability> clz : allProcessorCapabilityClasses) {
+            listProcessorCapabilityClasses.add(new Pair<Class<? extends ProcessorCapability>, Boolean>(clz, processorCapabilityClasses.contains(clz)));
+        }
+
+        this.listModelProcessorCapabilities = new ListModelList<Pair<Class<? extends ProcessorCapability>, Boolean>>(listProcessorCapabilityClasses);
+        this.listboxProcessorCapabilities.setModel(this.listModelProcessorCapabilities);
+    }
+
+    private void populateListKernelCapabilities() {
+        List<Pair<Class<? extends KernelCapability>, Boolean>> listKernelCapabilityClasses = new ArrayList<Pair<Class<? extends KernelCapability>, Boolean>>();
+        List<Class<? extends KernelCapability>> allKernelCapabilityClasses = ExperimentCapabilityFactory.getKernelCapabilityClasses();
+        List<Class<? extends KernelCapability>> kernelCapabilityClasses = this.experimentProfile.getKernelCapabilityClasses();
+        for(Class<? extends KernelCapability> clz : allKernelCapabilityClasses) {
+            listKernelCapabilityClasses.add(new Pair<Class<? extends KernelCapability>, Boolean>(clz, kernelCapabilityClasses.contains(clz)));
+        }
+
+        this.listModelKernelCapabilities = new ListModelList<Pair<Class<? extends KernelCapability>, Boolean>>(listKernelCapabilityClasses);
+        this.listboxKernelCapabilities.setModel(this.listModelKernelCapabilities);
+    }
+
     public void onSelect$comboboxProcessorProfiles(SelectEvent event) throws SQLException {
         if(this.comboboxProcessorProfiles.getSelectedIndex() != -1) {
             ProcessorProfile processorProfile = this.comboboxProcessorProfiles.getSelectedItem().getValue();
@@ -149,6 +201,27 @@ public class EditExperimentProfilePage extends GenericForwardComposer<Window> {
                     }
 
                     i++;
+                }
+            }
+
+            this.experimentProfile.getSimulationCapabilityClasses().clear();
+            for(Pair<Class<? extends SimulationCapability>, Boolean> entry : this.listModelSimulationCapabilities.getInnerList()) {
+                if(entry.getSecond()) {
+                    this.experimentProfile.getSimulationCapabilityClasses().add(entry.getFirst());
+                }
+            }
+
+            this.experimentProfile.getProcessorCapabilityClasses().clear();
+            for(Pair<Class<? extends ProcessorCapability>, Boolean> entry : this.listModelProcessorCapabilities.getInnerList()) {
+                if(entry.getSecond()) {
+                    this.experimentProfile.getProcessorCapabilityClasses().add(entry.getFirst());
+                }
+            }
+
+            this.experimentProfile.getKernelCapabilityClasses().clear();
+            for(Pair<Class<? extends KernelCapability>, Boolean> entry : this.listModelKernelCapabilities.getInnerList()) {
+                if(entry.getSecond()) {
+                    this.experimentProfile.getKernelCapabilityClasses().add(entry.getFirst());
                 }
             }
 

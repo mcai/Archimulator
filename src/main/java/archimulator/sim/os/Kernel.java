@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.os;
 
-import archimulator.model.capability.CapabilityFactory;
+import archimulator.model.capability.ExperimentCapabilityFactory;
 import archimulator.model.capability.KernelCapability;
 import archimulator.model.simulation.BasicSimulationObject;
 import archimulator.model.simulation.Simulation;
@@ -72,7 +72,7 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
         this.capabilities = new HashMap<Class<? extends KernelCapability>, KernelCapability>();
 
         for(Class<? extends KernelCapability> capabilityClz : capabilityClasses) {
-            this.capabilities.put(capabilityClz, CapabilityFactory.createKernelCapability(capabilityClz, this));
+            this.capabilities.put(capabilityClz, ExperimentCapabilityFactory.createKernelCapability(capabilityClz, this));
         }
 
         simulation.getBlockingEventDispatcher().dispatch(new KernelCapabilitiesInitializedEvent());

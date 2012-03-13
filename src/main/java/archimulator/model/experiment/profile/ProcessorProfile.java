@@ -51,12 +51,6 @@ public class ProcessorProfile implements Serializable {
     @DatabaseField
     private int l2Associativity;
 
-    @DatabaseField(dataType = DataType.SERIALIZABLE)
-    private ArrayList<Class<? extends ProcessorCapability>> processorCapabilityClasses;
-
-    @DatabaseField(dataType = DataType.SERIALIZABLE)
-    private ArrayList<Class<? extends KernelCapability>> kernelCapabilityClasses;
-
     @DatabaseField
     private long createdTime;
 
@@ -69,9 +63,6 @@ public class ProcessorProfile implements Serializable {
         this.numThreadsPerCore = numThreadsPerCore;
         this.l2Size = l2Size;
         this.l2Associativity = l2Associativity;
-
-        this.processorCapabilityClasses = new ArrayList<Class<? extends ProcessorCapability>>();
-        this.kernelCapabilityClasses = new ArrayList<Class<? extends KernelCapability>>();
 
         this.createdTime = DateHelper.toTick(new Date());
     }
@@ -98,14 +89,6 @@ public class ProcessorProfile implements Serializable {
 
     public int getL2Associativity() {
         return l2Associativity;
-    }
-
-    public List<Class<? extends ProcessorCapability>> getProcessorCapabilityClasses() {
-        return processorCapabilityClasses;
-    }
-
-    public List<Class<? extends KernelCapability>> getKernelCapabilityClasses() {
-        return kernelCapabilityClasses;
     }
 
     public long getCreatedTime() {

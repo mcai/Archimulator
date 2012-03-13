@@ -18,6 +18,8 @@
  ******************************************************************************/
 package archimulator.model.experiment.profile;
 
+import archimulator.model.capability.KernelCapability;
+import archimulator.model.capability.ProcessorCapability;
 import archimulator.model.capability.SimulationCapability;
 import archimulator.model.experiment.CheckpointedExperiment;
 import archimulator.model.experiment.DetailedExperiment;
@@ -49,7 +51,13 @@ public class ExperimentProfile implements Serializable {
     private ArrayList<ContextConfig> contextConfigs = new ArrayList<ContextConfig>();
 
     @DatabaseField(dataType = DataType.SERIALIZABLE)
-    private ArrayList<Class<? extends SimulationCapability>> simulationCapabilityClasses = new ArrayList<Class<? extends SimulationCapability>>();
+    private ArrayList<Class<? extends SimulationCapability>> simulationCapabilityClasses;
+
+    @DatabaseField(dataType = DataType.SERIALIZABLE)
+    private ArrayList<Class<? extends ProcessorCapability>> processorCapabilityClasses;
+
+    @DatabaseField(dataType = DataType.SERIALIZABLE)
+    private ArrayList<Class<? extends KernelCapability>> kernelCapabilityClasses;
 
     @DatabaseField
     private ExperimentProfileType type = ExperimentProfileType.FUNCTIONAL_EXPERIMENT;
@@ -85,6 +93,10 @@ public class ExperimentProfile implements Serializable {
         this.state = ExperimentProfileState.SUBMITTED;
 
         this.createdTime = DateHelper.toTick(new Date());
+
+        this.simulationCapabilityClasses = new ArrayList<Class<? extends SimulationCapability>>();
+        this.processorCapabilityClasses = new ArrayList<Class<? extends ProcessorCapability>>();
+        this.kernelCapabilityClasses = new ArrayList<Class<? extends KernelCapability>>();
     }
 
     public ExperimentProfile addWorkload(SimulatedProgram simulatedProgram) {
@@ -130,6 +142,14 @@ public class ExperimentProfile implements Serializable {
         return simulationCapabilityClasses;
     }
 
+    public ArrayList<Class<? extends ProcessorCapability>> getProcessorCapabilityClasses() {
+        return processorCapabilityClasses;
+    }
+
+    public ArrayList<Class<? extends KernelCapability>> getKernelCapabilityClasses() {
+        return kernelCapabilityClasses;
+    }
+
     public ExperimentProfileType getType() {
         return type;
     }
@@ -146,13 +166,13 @@ public class ExperimentProfile implements Serializable {
         switch (this.type) {
             case FUNCTIONAL_EXPERIMENT:
                 return new FunctionalExperiment(UUID.randomUUID().toString(), this.getProcessorProfile().getNumCores(), this.getProcessorProfile().getNumThreadsPerCore(), this.getContextConfigs(),
-                        this.simulationCapabilityClasses, this.getProcessorProfile().getProcessorCapabilityClasses(), this.getProcessorProfile().getKernelCapabilityClasses());
+                        this.simulationCapabilityClasses, this.processorCapabilityClasses, this.kernelCapabilityClasses);
             case DETAILED_EXPERIMENT:
                 return new DetailedExperiment(UUID.randomUUID().toString(), this.getProcessorProfile().getNumCores(), this.getProcessorProfile().getNumThreadsPerCore(), this.getContextConfigs(), LeastRecentlyUsedEvictionPolicy.FACTORY, this.getProcessorProfile().getL2Size(), this.getProcessorProfile().getL2Associativity(),
-                        this.simulationCapabilityClasses, this.getProcessorProfile().getProcessorCapabilityClasses(), this.getProcessorProfile().getKernelCapabilityClasses());
+                        this.simulationCapabilityClasses, this.processorCapabilityClasses, this.kernelCapabilityClasses);
             case CHECKPOINTED_EXPERIMENT:
                 return new CheckpointedExperiment(UUID.randomUUID().toString(), this.getProcessorProfile().getNumCores(), this.getProcessorProfile().getNumThreadsPerCore(), this.getContextConfigs(), this.getMaxInsts(), this.getProcessorProfile().getL2Size(), this.getProcessorProfile().getL2Associativity(), LeastRecentlyUsedEvictionPolicy.FACTORY, this.getPthreadSpawnedIndex(),
-                        this.simulationCapabilityClasses, this.getProcessorProfile().getProcessorCapabilityClasses(), this.getProcessorProfile().getKernelCapabilityClasses());
+                        this.simulationCapabilityClasses, this.processorCapabilityClasses, this.kernelCapabilityClasses);
                 default:
                     throw new IllegalArgumentException();
         }

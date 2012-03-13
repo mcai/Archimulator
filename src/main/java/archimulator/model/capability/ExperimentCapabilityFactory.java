@@ -35,7 +35,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CapabilityFactory {
+public class ExperimentCapabilityFactory {
     private static List<Class<? extends SimulationCapability>> simulationCapabilityClasses = new ArrayList<Class<? extends SimulationCapability>>();
     private static List<Class<? extends ProcessorCapability>> processorCapabilityClasses = new ArrayList<Class<? extends ProcessorCapability>>();
     private static List<Class<? extends KernelCapability>> kernelCapabilityClasses = new ArrayList<Class<? extends KernelCapability>>();

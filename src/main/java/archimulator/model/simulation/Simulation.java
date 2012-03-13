@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.model.simulation;
 
-import archimulator.model.capability.CapabilityFactory;
+import archimulator.model.capability.ExperimentCapabilityFactory;
 import archimulator.model.capability.SimulationCapability;
 import archimulator.model.event.*;
 import archimulator.model.strategy.SimulationStrategy;
@@ -139,7 +139,7 @@ public class Simulation implements SimulationObject {
         this.statsInMeasurement = new LinkedHashMap<String, Object>();
 
         for(Class<? extends SimulationCapability> capabilityClz : capabilityClasses) {
-            this.capabilities.put(capabilityClz, CapabilityFactory.createSimulationCapability(capabilityClz, this));
+            this.capabilities.put(capabilityClz, ExperimentCapabilityFactory.createSimulationCapability(capabilityClz, this));
         }
     }
 

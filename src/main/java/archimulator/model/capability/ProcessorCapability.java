@@ -18,5 +18,5 @@
  ******************************************************************************/
 package archimulator.model.capability;
 
-public interface ProcessorCapability extends Capability {
+public interface ProcessorCapability extends ExperimentCapability {
 }
