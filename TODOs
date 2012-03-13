@@ -46,8 +46,10 @@ temp result:
 [34359736761]  	used memory: 267,562,688
 
 TODOs:
-    2. simulation capabilities management from UI
+    1. simulation capabilities management from UI
+    2. benchmark arguments pushing .. using SedHelper
     3. viewing program output.. from UI
+    4. auto-tuning parameters of the HT scheme
 
     *. a. late HT requests -> Spawn H/W thread to prefetch for HT
        b. bad HT requests -> Pause HT, resume HT in the next phase (128K insts in MT?)
