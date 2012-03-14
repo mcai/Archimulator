@@ -19,6 +19,8 @@
 package archimulator.model.simulation;
 
 import archimulator.util.DateHelper;
+import archimulator.util.io.cmd.CommandLineHelper;
+import archimulator.util.io.cmd.SedHelper;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
@@ -47,6 +49,15 @@ public class SimulatedProgram implements Serializable {
 
     @DatabaseField
     private long createdTime;
+
+    @DatabaseField
+    private boolean helperThreadedProgram;
+
+    @DatabaseField
+    private int htLookahead;
+
+    @DatabaseField
+    private int htStride;
     
     public SimulatedProgram() {
     }
@@ -62,6 +73,22 @@ public class SimulatedProgram implements Serializable {
         this.args = args;
         this.stdin = stdin;
         this.createdTime = DateHelper.toTick(new Date());
+    }
+    
+    public void build() {
+        if(this.helperThreadedProgram) {
+            this.pushMacroDefineArg("push_params.h", "LOOKAHEAD", this.htLookahead + "");
+            this.pushMacroDefineArg("push_params.h", "STRIDE", this.htStride + "");
+            this.buildWithMakefile();
+        }
+    }
+
+    private void pushMacroDefineArg(String fileName, String key, String value) {
+        SedHelper.sedInPlace(this.cwd + "/" + fileName, "#define " + key, "#define " + key + " " + value);
+    }
+
+    private void buildWithMakefile() {
+        CommandLineHelper.invokeShellCommand("sh -c 'cd " + this.cwd + ";make -f Makefile.mips -B'");
     }
 
     public long getId() {
@@ -96,6 +123,18 @@ public class SimulatedProgram implements Serializable {
         return DateHelper.toString(DateHelper.fromTick(this.createdTime));
     }
 
+    public boolean isHelperThreadedProgram() {
+        return helperThreadedProgram;
+    }
+
+    public int getHtLookahead() {
+        return htLookahead;
+    }
+
+    public int getHtStride() {
+        return htStride;
+    }
+
     public void setTitle(String title) {
         this.title = title;
     }
@@ -116,8 +155,20 @@ public class SimulatedProgram implements Serializable {
         this.stdin = stdin;
     }
 
+    public void setHelperThreadedProgram(boolean helperThreadedProgram) {
+        this.helperThreadedProgram = helperThreadedProgram;
+    }
+
+    public void setHtLookahead(int htLookahead) {
+        this.htLookahead = htLookahead;
+    }
+
+    public void setHtStride(int htStride) {
+        this.htStride = htStride;
+    }
+
     @Override
     public String toString() {
-        return String.format("SimulatedProgram{id=%d, title='%s', cwd='%s', exe='%s', args='%s', stdin='%s', createdTime='%s'}", id, title, cwd, exe, args, stdin, DateHelper.toString(createdTime));
+        return String.format("SimulatedProgram{id=%d, title='%s', cwd='%s', exe='%s', args='%s', stdin='%s', createdTime=%s, helperThreadedProgram=%s, htLookahead=%d, htStride=%d}", id, title, cwd, exe, args, stdin, DateHelper.toString(createdTime), helperThreadedProgram, htLookahead, htStride);
     }
 }

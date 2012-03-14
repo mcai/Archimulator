@@ -18,10 +18,10 @@
  ******************************************************************************/
 package archimulator.guest;
 
+import archimulator.model.experiment.profile.ExperimentProfile;
 import archimulator.model.experiment.profile.ProcessorProfile;
 import archimulator.model.simulation.SimulatedProgram;
 import archimulator.service.ArchimulatorService;
-import archimulator.sim.Startup;
 import archimulator.util.DateHelper;
 import com.caucho.hessian.client.HessianProxyFactory;
 
@@ -48,16 +48,22 @@ public class ManagementStartup {
         }
     }
 
-    public static void recordException(Exception e) {
-        System.out.print(String.format("[%s Exception] %s\r\n", DateHelper.toString(new Date()), e));
-        e.printStackTrace();
+    public static SimulatedProgram SIMULATED_PROGRAM_MST_HT(int lookahead, int stride) {
+        SimulatedProgram program = new SimulatedProgram(
+                "mst_ht" + "-lookahead_" + lookahead + "-stride_" + stride, ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/Olden_Custom1/mst/ht",
+                "mst.mips",
+                "10000");
+        program.setHelperThreadedProgram(true);
+        program.setHtLookahead(lookahead);
+        program.setHtStride(stride);
+        return program;
     }
 
 //    private void submitExperimentProfiles() throws SQLException {
 //        List<SimulatedProgram> simulatedPrograms = new ArrayList<SimulatedProgram>();
-//        simulatedPrograms.add(Startup.SIMULATED_PROGRAM_MST_HT);
-//        simulatedPrograms.add(Startup.SIMULATED_PROGRAM_EM3D_HT);
-//        simulatedPrograms.add(Startup.SIMULATED_PROGRAM_429_MCF_HT);
+//        simulatedPrograms.add(SIMULATED_PROGRAM_MST_HT);
+//        simulatedPrograms.add(SIMULATED_PROGRAM_EM3D_HT);
+//        simulatedPrograms.add(SIMULATED_PROGRAM_429_MCF_HT);
 //
 //        List<Integer> l2SizeInKBytes = new ArrayList<Integer>();
 //        l2SizeInKBytes.add(512);
@@ -105,20 +111,25 @@ public class ManagementStartup {
 
     private void submitSimulatedProgramsAndProcessorProfiles() throws SQLException {
         this.archimulatorService.setRunningExperimentEnabled(false);
-        
+
 //        this.archimulatorService.clearData();
 
         List<SimulatedProgram> simulatedPrograms = new ArrayList<SimulatedProgram>();
-        simulatedPrograms.add(Startup.SIMULATED_PROGRAM_MST_BASELINE);
-        simulatedPrograms.add(Startup.SIMULATED_PROGRAM_MST_HT);
+        simulatedPrograms.add(SIMULATED_PROGRAM_MST_BASELINE);
 
-        simulatedPrograms.add(Startup.SIMULATED_PROGRAM_EM3D_BASELINE);
-        simulatedPrograms.add(Startup.SIMULATED_PROGRAM_EM3D_HT);
+        for (int lookahead = 20; lookahead < 800; lookahead *= 2) {
+            for (int stride = 10; stride < 800; stride *= 2) {
+                simulatedPrograms.add(SIMULATED_PROGRAM_MST_HT(lookahead, stride));
+            }
+        }
 
-        simulatedPrograms.add(Startup.SIMULATED_PROGRAM_429_MCF_BASELINE);
-        simulatedPrograms.add(Startup.SIMULATED_PROGRAM_429_MCF_HT);
+        simulatedPrograms.add(SIMULATED_PROGRAM_EM3D_BASELINE);
+        simulatedPrograms.add(SIMULATED_PROGRAM_EM3D_HT);
 
-        for(SimulatedProgram simulatedProgram : simulatedPrograms) {
+        simulatedPrograms.add(SIMULATED_PROGRAM_429_MCF_BASELINE);
+        simulatedPrograms.add(SIMULATED_PROGRAM_429_MCF_HT);
+
+        for (SimulatedProgram simulatedProgram : simulatedPrograms) {
             this.archimulatorService.addSimulatedProgram(simulatedProgram);
         }
 
@@ -128,19 +139,50 @@ public class ManagementStartup {
         l2SizeInKBytes.add(512 * 4);
         l2SizeInKBytes.add(512 * 8);
 
-        for (int l2SizeInKByte : l2SizeInKBytes) {
-            int numCores = 2;
-            int numThreadsPerCore = 2;
-            int l2Associativity = 8;
+        List<Integer> l2Associativities = new ArrayList<Integer>();
+        l2Associativities.add(4);
+        l2Associativities.add(8);
+        l2Associativities.add(16);
 
-            this.archimulatorService.addProcessorProfile(new ProcessorProfile("C" + numCores + "T" + numThreadsPerCore + "-" + "L2SizeInKB_" + l2SizeInKByte + "-" + "L2Assoc_" + l2Associativity, numCores, numThreadsPerCore, 1024 * l2SizeInKByte, l2Associativity));
+        for (int l2SizeInKByte : l2SizeInKBytes) {
+            for (int l2Associativity : l2Associativities) {
+                int numCores = 2;
+                int numThreadsPerCore = 2;
+                this.archimulatorService.addProcessorProfile(new ProcessorProfile("C" + numCores + "T" + numThreadsPerCore + "-" + "L2SizeInKB_" + l2SizeInKByte + "-" + "L2Assoc_" + l2Associativity, numCores, numThreadsPerCore, 1024 * l2SizeInKByte, l2Associativity));
+            }
         }
     }
-    
+
     private void submitExperimentProfiles() throws SQLException {
 //        this.archimulatorService.setRunningExperimentEnabled(false);
 
 //        this.archimulatorService.setUserPassword("itecgo", "bywwnss");
+    }
+
+    public static final SimulatedProgram SIMULATED_PROGRAM_MST_BASELINE = new SimulatedProgram(
+            "mst_baseline", ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/Olden_Custom1/mst/baseline",
+            "mst.mips",
+            "10000");
+    public static final SimulatedProgram SIMULATED_PROGRAM_EM3D_BASELINE = new SimulatedProgram(
+            "em3d_baseline", ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/Olden_Custom1/em3d/baseline",
+            "em3d.mips",
+            "400000 128 75 1");
+    public static final SimulatedProgram SIMULATED_PROGRAM_EM3D_HT = new SimulatedProgram(
+            "em3d_ht", ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/Olden_Custom1/em3d/ht",
+            "em3d.mips",
+            "400000 128 75 1");
+    public static final SimulatedProgram SIMULATED_PROGRAM_429_MCF_BASELINE = new SimulatedProgram(
+            "429_mcf_baseline", ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline",
+            "429.mcf.mips",
+            ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline/data/ref/input/inp.in");
+    public static final SimulatedProgram SIMULATED_PROGRAM_429_MCF_HT = new SimulatedProgram(
+            "429_mcf_ht", ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht",
+            "429.mcf.mips",
+            ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht/data/ref/input/inp.in");
+
+    public static void recordException(Exception e) {
+        System.out.print(String.format("[%s Exception] %s\r\n", DateHelper.toString(new Date()), e));
+        e.printStackTrace();
     }
 
     public static void main(String[] args) throws SQLException {

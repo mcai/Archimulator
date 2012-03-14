@@ -74,6 +74,8 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
         this.memory = new BasicMemory(kernel, simulationDirectory, this.littleEndian, this.id);
 //        this.memory = new BigMemory(kernel, simulationDirectory, this.littleEndian, this.id);
 
+        contextConfig.getSimulatedProgram().build();
+
         this.loadProgram(kernel, simulationDirectory, contextConfig);
     }
 

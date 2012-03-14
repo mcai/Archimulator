@@ -18,14 +18,12 @@
  ******************************************************************************/
 package archimulator.util.io.cmd;
 
-import java.io.IOException;
-
 public class SedHelper {
-    public static void main(String[] args) throws Exception {
-        System.out.println(sed("expression", "hack", "/home/itecgo/Desktop/chick.txt", "/home/itecgo/Desktop/chick2.txt"));
+    public static int sed(String inputFileName, String outputFileName, String oldStuff, String newStuff) {
+        return CommandLineHelper.invokeShellCommand("sed -e 's/" + oldStuff + "/" + newStuff + "/g' " + inputFileName + " > " + outputFileName);
     }
 
-    public static int sed(String oldStuff, String newStuff, String inputFileName, String outputFileName) throws IOException, InterruptedException {
-        return CommandLineHelper.invokeShellCommand("sed -e 's/" + oldStuff + "/" + newStuff + "/g' " + inputFileName + " > " + outputFileName);
+    public static int sedInPlace(String fileName, String oldStuff, String newStuff) {
+        return CommandLineHelper.invokeShellCommand("sed -i -e 's/^" + oldStuff + ".*/" + newStuff + "/g' " + fileName);
     }
 }

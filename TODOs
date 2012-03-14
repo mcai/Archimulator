@@ -46,21 +46,8 @@ temp result:
 [34359736761]  	used memory: 267,562,688
 
 TODOs:
-
-Experiment
-	build()
-		pushParams()
-		compile()
-	simulate()
-	report()
-		stats: plot or email or archive?
-
-benchmark
-    build()?
-
-    1. benchmark arguments pushing .. using SedHelper
-    2. viewing program output.. from UI
-    3. auto-tuning parameters of the HT scheme
+    1. viewing program output.. from UI
+    2. auto-tuning parameters of the HT scheme
 
     *. a. late HT requests -> Spawn H/W thread to prefetch for HT
        b. bad HT requests -> Pause HT, resume HT in the next phase (128K insts in MT?)
