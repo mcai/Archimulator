@@ -46,6 +46,18 @@ temp result:
 [34359736761]  	used memory: 267,562,688
 
 TODOs:
+
+Experiment
+	build()
+		pushParams()
+		compile()
+	simulate()
+	report()
+		stats: plot or email or archive?
+
+benchmark
+    build()?
+
     1. benchmark arguments pushing .. using SedHelper
     2. viewing program output.. from UI
     3. auto-tuning parameters of the HT scheme
