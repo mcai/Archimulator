@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.ext.uncore.ht;
+package archimulator.sim.ext.uncore.llc;
 
 import archimulator.model.simulation.Simulation;
 import archimulator.model.capability.SimulationCapability;

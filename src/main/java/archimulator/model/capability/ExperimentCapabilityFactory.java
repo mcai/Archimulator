@@ -22,7 +22,7 @@ import archimulator.model.simulation.Simulation;
 import archimulator.sim.core.Processor;
 import archimulator.sim.ext.core.DynamicSpeculativePrecomputationCapability;
 import archimulator.sim.ext.uncore.delinquentLoad.DelinquentLoadIdentificationCapability;
-import archimulator.sim.ext.uncore.ht.LLCHTRequestProfilingCapability;
+import archimulator.sim.ext.uncore.llc.LLCHTRequestProfilingCapability;
 import archimulator.sim.ext.uncore.llc.LLCMissProfilingCapability;
 import archimulator.sim.isa.FunctionalExecutionProfilingCapability;
 import archimulator.sim.os.Kernel;
