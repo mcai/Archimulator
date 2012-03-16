@@ -22,14 +22,11 @@ import archimulator.model.simulation.Simulation;
 import archimulator.sim.core.Processor;
 import archimulator.sim.ext.core.DynamicSpeculativePrecomputationCapability;
 import archimulator.sim.ext.uncore.delinquentLoad.DelinquentLoadIdentificationCapability;
-import archimulator.sim.ext.uncore.ht.HtRequestL2VictimTrackingCapability;
-import archimulator.sim.ext.uncore.ht.HtRequestL2VictimTrackingCapability2;
-import archimulator.sim.ext.uncore.newHt.FsmBasedHtRequestLlcVictimTrackingCapability;
-import archimulator.sim.ext.uncore.newHt2.LastLevelCacheHtRequestCachePollutionProfilingCapability;
+import archimulator.sim.ext.uncore.ht.LLCHTRequestProfilingCapability;
+import archimulator.sim.ext.uncore.llc.LLCMissProfilingCapability;
 import archimulator.sim.isa.FunctionalExecutionProfilingCapability;
 import archimulator.sim.os.Kernel;
 import archimulator.sim.uncore.MemoryAccessTraceGenerationCapability;
-import archimulator.sim.uncore.coherence.ext.LastLevelCacheMissProfilingCapability;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -41,15 +38,12 @@ public class ExperimentCapabilityFactory {
     private static List<Class<? extends KernelCapability>> kernelCapabilityClasses = new ArrayList<Class<? extends KernelCapability>>();
 
     static {
-        simulationCapabilityClasses.add(LastLevelCacheHtRequestCachePollutionProfilingCapability.class);
-        simulationCapabilityClasses.add(LastLevelCacheMissProfilingCapability.class);
         simulationCapabilityClasses.add(MemoryAccessTraceGenerationCapability.class);
+        simulationCapabilityClasses.add(LLCMissProfilingCapability.class);
+        simulationCapabilityClasses.add(LLCHTRequestProfilingCapability.class);
 
-        processorCapabilityClasses.add(DynamicSpeculativePrecomputationCapability.class);
         processorCapabilityClasses.add(DelinquentLoadIdentificationCapability.class);
-        processorCapabilityClasses.add(HtRequestL2VictimTrackingCapability.class);
-        processorCapabilityClasses.add(FsmBasedHtRequestLlcVictimTrackingCapability.class);
-        processorCapabilityClasses.add(HtRequestL2VictimTrackingCapability2.class);
+        processorCapabilityClasses.add(DynamicSpeculativePrecomputationCapability.class);
 
         kernelCapabilityClasses.add(FunctionalExecutionProfilingCapability.class);
     }

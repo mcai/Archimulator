@@ -16,13 +16,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.ext.uncore.newHt2;
+package archimulator.sim.ext.uncore.ht;
 
 import archimulator.model.simulation.Simulation;
 import archimulator.model.capability.SimulationCapability;
 import archimulator.model.event.*;
 import archimulator.sim.core.BasicThread;
-import archimulator.sim.ext.uncore.newHt2.state.*;
 import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.cache.*;
 import archimulator.sim.uncore.cache.eviction.LeastRecentlyUsedEvictionPolicy;
@@ -50,49 +49,47 @@ import java.util.Map;
 //	2. MT miss + HT hit + VT miss => MT to HT; Good HT, removeLRU
 //	3. MT miss + HT hit + VT hit => MT to HT; VT.setLRU, removeLRU
 //	4. MT hit + HT miss + VT hit => ; VT.setLRU
-public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements SimulationCapability {
+public class LLCHTRequestProfilingCapability implements SimulationCapability {
     private CoherentCache<MESIState>.LockableCache llc;
 
-    private Map<Integer, Map<Integer, LastLevelCacheLineHtRequestState>> htRequestStates;
-    private EvictableCache<HtRequestVictimCacheLineState, CacheLine<HtRequestVictimCacheLineState>> htRequestVictimCache;
+    private Map<Integer, Map<Integer, LLCLineHTRequestState>> htRequestStates;
+    private EvictableCache<HTRequestVictimCacheLineState, CacheLine<HTRequestVictimCacheLineState>> htRequestVictimCache;
 
-    private long mtMisses;
+    private long numMtMisses;
 
-    private long totalHtRequests;
+    private long numTotalHtRequests;
 
-    private long usefulHtRequests;
+    private long numUsefulHtRequests;
 
-    private long goodHtRequests;
-    private long badHtRequests;
+    private long numGoodHtRequests;
+    private long numBadHtRequests;
 
-    private long lateHtRequests;
+    private long numLateHtRequests;
 
     private PrintWriter fileWriter;
-    private Simulation simulation;
 
-    public LastLevelCacheHtRequestCachePollutionProfilingCapability(final Simulation simulation) {
-        this.simulation = simulation;
+    public LLCHTRequestProfilingCapability(final Simulation simulation) {
         this.llc = simulation.getProcessor().getCacheHierarchy().getL2Cache().getCache();
 
-        this.htRequestStates = new HashMap<Integer, Map<Integer, LastLevelCacheLineHtRequestState>>();
+        this.htRequestStates = new HashMap<Integer, Map<Integer, LLCLineHTRequestState>>();
         for (int set = 0; set < this.llc.getNumSets(); set++) {
-            HashMap<Integer, LastLevelCacheLineHtRequestState> htRequestStatesPerSet = new HashMap<Integer, LastLevelCacheLineHtRequestState>();
+            HashMap<Integer, LLCLineHTRequestState> htRequestStatesPerSet = new HashMap<Integer, LLCLineHTRequestState>();
             this.htRequestStates.put(set, htRequestStatesPerSet);
 
             for (int way = 0; way < this.llc.getAssociativity(); way++) {
-                htRequestStatesPerSet.put(way, LastLevelCacheLineHtRequestState.INVALID);
+                htRequestStatesPerSet.put(way, LLCLineHTRequestState.INVALID);
             }
         }
 
-        this.htRequestVictimCache = new EvictableCache<HtRequestVictimCacheLineState, CacheLine<HtRequestVictimCacheLineState>>(this.llc, "", this.llc.getGeometry(), LeastRecentlyUsedEvictionPolicy.FACTORY, new Function3<Cache<?, ?>, Integer, Integer, CacheLine<HtRequestVictimCacheLineState>>() {
-            public CacheLine<HtRequestVictimCacheLineState> apply(Cache<?, ?> cache, Integer set, Integer way) {
-                return new CacheLine<HtRequestVictimCacheLineState>(cache, set, way, new InvalidHtRequestVictimCacheLineState());
+        this.htRequestVictimCache = new EvictableCache<HTRequestVictimCacheLineState, CacheLine<HTRequestVictimCacheLineState>>(this.llc, "", this.llc.getGeometry(), LeastRecentlyUsedEvictionPolicy.FACTORY, new Function3<Cache<?, ?>, Integer, Integer, CacheLine<HTRequestVictimCacheLineState>>() {
+            public CacheLine<HTRequestVictimCacheLineState> apply(Cache<?, ?> cache, Integer set, Integer way) {
+                return new CacheLine<HTRequestVictimCacheLineState>(cache, set, way, HTRequestVictimCacheLineState.INVALID);
             }
         });
 
         simulation.getBlockingEventDispatcher().addListener(CoherentCacheServiceNonblockingRequestEvent.class, new Action1<CoherentCacheServiceNonblockingRequestEvent>() {
             public void apply(CoherentCacheServiceNonblockingRequestEvent event) {
-                if (event.getCache().getCache() == LastLevelCacheHtRequestCachePollutionProfilingCapability.this.llc) {
+                if (event.getCache().getCache() == LLCHTRequestProfilingCapability.this.llc) {
                     serviceRequest(event);
                 }
             }
@@ -101,7 +98,7 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
         simulation.getBlockingEventDispatcher().addListener(CoherentCacheNonblockingRequestHitToTransientTagEvent.class, new Action1<CoherentCacheNonblockingRequestHitToTransientTagEvent>() {
             @SuppressWarnings("Unchecked")
             public void apply(CoherentCacheNonblockingRequestHitToTransientTagEvent event) {
-                if (event.getCache().getCache() == LastLevelCacheHtRequestCachePollutionProfilingCapability.this.llc) {
+                if (event.getCache().getCache() == LLCHTRequestProfilingCapability.this.llc) {
                     markLateHtRequest(event);
                 }
             }
@@ -109,16 +106,16 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
 
         simulation.getBlockingEventDispatcher().addListener(ResetStatEvent.class, new Action1<ResetStatEvent>() {
             public void apply(ResetStatEvent event) {
-                mtMisses = 0;
+                numMtMisses = 0;
 
-                totalHtRequests = 0;
+                numTotalHtRequests = 0;
 
-                usefulHtRequests = 0;
+                numUsefulHtRequests = 0;
 
-                goodHtRequests = 0;
-                badHtRequests = 0;
+                numGoodHtRequests = 0;
+                numBadHtRequests = 0;
 
-                lateHtRequests = 0;
+                numLateHtRequests = 0;
             }
         });
 
@@ -139,7 +136,7 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
         simulation.getBlockingEventDispatcher().addListener(SimulationStartedEvent.class, new Action1<SimulationStartedEvent>() {
             public void apply(SimulationStartedEvent event) {
                 try {
-                    fileWriter = new PrintWriter(simulation.getConfig().getCwd() + "/lastLevelCacheHtRequestCachePollutionProfilingCapability_out.txt");
+                    fileWriter = new PrintWriter(simulation.getConfig().getCwd() + "/llcHTRequestProfilingCapability_out.txt");
                 } catch (FileNotFoundException e) {
                     throw new RuntimeException(e);
                 }
@@ -155,20 +152,20 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
     }
 
     private void dumpStats(Map<String, Object> stats) {
-        stats.put("lastLevelCacheHtRequestCachePollutionProfilingCapability." + this.llc.getName() + ".mtMisses", String.valueOf(this.mtMisses));
+        stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numMtMisses", String.valueOf(this.numMtMisses));
 
-        stats.put("lastLevelCacheHtRequestCachePollutionProfilingCapability." + this.llc.getName() + ".totalHtRequests", String.valueOf(this.totalHtRequests));
+        stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numTotalHtRequests", String.valueOf(this.numTotalHtRequests));
 
-        stats.put("lastLevelCacheHtRequestCachePollutionProfilingCapability." + this.llc.getName() + ".usefulHtRequests", String.valueOf(this.usefulHtRequests));
+        stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numUsefulHtRequests", String.valueOf(this.numUsefulHtRequests));
 
-        stats.put("lastLevelCacheHtRequestCachePollutionProfilingCapability." + this.llc.getName() + ".ht_accuracy", String.valueOf(100.0 * (double) this.usefulHtRequests / this.totalHtRequests) + "%");
-        stats.put("lastLevelCacheHtRequestCachePollutionProfilingCapability." + this.llc.getName() + ".ht_coverage", String.valueOf(100.0 * (double) this.usefulHtRequests / this.mtMisses) + "%");
+        stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".ht_accuracy", String.valueOf(100.0 * (double) this.numUsefulHtRequests / this.numTotalHtRequests) + "%");
+        stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".ht_coverage", String.valueOf(100.0 * (double) this.numUsefulHtRequests / (this.numMtMisses + this.numUsefulHtRequests)) + "%");
 
-        stats.put("lastLevelCacheHtRequestCachePollutionProfilingCapability." + this.llc.getName() + ".goodHtRequests", String.valueOf(this.goodHtRequests));
-        stats.put("lastLevelCacheHtRequestCachePollutionProfilingCapability." + this.llc.getName() + ".badHtRequests", String.valueOf(this.badHtRequests));
-        stats.put("lastLevelCacheHtRequestCachePollutionProfilingCapability." + this.llc.getName() + ".uglyHtRequests", String.valueOf(this.totalHtRequests - this.goodHtRequests - this.badHtRequests));
+        stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numGoodHtRequests", String.valueOf(this.numGoodHtRequests));
+        stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numBadHtRequests", String.valueOf(this.numBadHtRequests));
+        stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numUglyHtRequests", String.valueOf(this.numTotalHtRequests - this.numGoodHtRequests - this.numBadHtRequests));
 
-        stats.put("lastLevelCacheHtRequestCachePollutionProfilingCapability." + this.llc.getName() + ".lateHtRequests", String.valueOf(this.lateHtRequests));
+        stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numLateHtRequests", String.valueOf(this.numLateHtRequests));
     }
 
     private void markLateHtRequest(CoherentCacheNonblockingRequestHitToTransientTagEvent event) {
@@ -177,11 +174,11 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
 
         int set = llcLine.getSet();
 
-        LastLevelCacheLineHtRequestState htRequestState = this.htRequestStates.get(set).get(llcLine.getWay());
-        boolean lineFoundIsHt = htRequestState == LastLevelCacheLineHtRequestState.HT;
+        LLCLineHTRequestState htRequestState = this.htRequestStates.get(set).get(llcLine.getWay());
+        boolean lineFoundIsHt = htRequestState == LLCLineHTRequestState.HT;
 
         if (!requesterIsHt && lineFoundIsHt) {
-            this.lateHtRequests++;
+            this.numLateHtRequests++;
         }
     }
 
@@ -191,15 +188,15 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
 
         int set = llcLine.getSet();
 
-        LastLevelCacheLineHtRequestState htRequestState = this.htRequestStates.get(set).get(llcLine.getWay());
-        boolean lineFoundIsHt = htRequestState == LastLevelCacheLineHtRequestState.HT;
+        LLCLineHTRequestState htRequestState = this.htRequestStates.get(set).get(llcLine.getWay());
+        boolean lineFoundIsHt = htRequestState == LLCLineHTRequestState.HT;
 
         if (!event.isHitInCache()) {
             if (requesterIsHt) {
 //                this.fileWriter.printf("[%d] htRequest: %s\n", this.simulation.getCycleAccurateEventQueue().getCurrentCycle(), event);
 
 //                this.setHt(set, llcLine.getWay());
-                this.totalHtRequests++;
+                this.numTotalHtRequests++;
             } else {
 //                this.setMt(set, llcLine.getWay());
             }
@@ -207,15 +204,9 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
 
         if (!requesterIsHt) {
             if (!event.isHitInCache()) {
-                this.mtMisses++;
+                this.numMtMisses++;
             } else if (event.isHitInCache() && lineFoundIsHt) {
-                this.mtMisses++;
-            }
-        }
-
-        if (event.isHitInCache()) {
-            if (!requesterIsHt && lineFoundIsHt) {
-                this.usefulHtRequests++;
+                this.numUsefulHtRequests++;
             }
         }
 
@@ -253,7 +244,7 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
             boolean htRequestFound = false;
 
             for (int way = 0; way < this.htRequestVictimCache.getAssociativity(); way++) {
-                if (!(this.htRequestVictimCache.getLine(set, way).getState() instanceof InvalidHtRequestVictimCacheLineState)) {
+                if (this.htRequestVictimCache.getLine(set, way).getState() != HTRequestVictimCacheLineState.INVALID) {
                     htRequestFound = true;
                     break;
                 }
@@ -270,7 +261,7 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
         boolean mtHit = event.isHitInCache() && !requesterIsHt && !lineFoundIsHt;
         boolean htHit = event.isHitInCache() && !requesterIsHt && lineFoundIsHt;
 
-        CacheLine<HtRequestVictimCacheLineState> vtLine = this.findHtRequestVictimLine(this.llc.getTag(event.getAddress()));
+        CacheLine<HTRequestVictimCacheLineState> vtLine = this.findHtRequestVictimLine(this.llc.getTag(event.getAddress()));
 
         boolean vtHit = !requesterIsHt && vtLine != null;
 
@@ -279,7 +270,7 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
 
 //            this.fileWriter.printf("[%d] \tbadHtRequest, tag: 0x%08x\n", this.simulation.getCycleAccurateEventQueue().getCurrentCycle(), vtLine.getTag());
 
-            this.badHtRequests++;
+            this.numBadHtRequests++;
             this.setLru(set, vtLine.getWay());
 
 //            this.checkInvariants(set);
@@ -289,7 +280,7 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
 //            this.fileWriter.printf("[%d] \tgoodHtRequest, tag: 0x%08x\n", this.simulation.getCycleAccurateEventQueue().getCurrentCycle(), event.getLineFound().getTag());
 
             this.setMt(set, llcLine.getWay());
-            this.goodHtRequests++;
+            this.numGoodHtRequests++;
             this.removeLru(set);
 
 //            this.checkInvariants(set);
@@ -301,7 +292,7 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
             this.removeLru(set);
 
 //            this.checkInvariants(set);
-        } else if (mtHit && !htHit && vtHit) {
+        } else if (mtHit && vtHit) {
 //            this.checkInvariants(set);
 
             this.setLru(set, vtLine.getWay());
@@ -315,13 +306,13 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
         int numVictimEntries = 0;
 
         for (int way = 0; way < this.llc.getAssociativity(); way++) {
-            if (this.htRequestStates.get(set).get(way).equals(LastLevelCacheLineHtRequestState.HT)) {
+            if (this.htRequestStates.get(set).get(way) == LLCLineHTRequestState.HT) {
                 numhtRequestsInLlc++;
             }
         }
 
         for (int way = 0; way < this.llc.getAssociativity(); way++) {
-            if (!this.htRequestVictimCache.getLine(set, way).getState().getType().equals(HtRequestVictimCacheLineStateType.INVALID)) {
+            if (this.htRequestVictimCache.getLine(set, way).getState() != HTRequestVictimCacheLineState.INVALID) {
                 numVictimEntries++;
             }
         }
@@ -332,30 +323,30 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
     }
 
     private void setHt(int set, int way) {
-        if (this.htRequestStates.get(set).get(way).equals(LastLevelCacheLineHtRequestState.HT)) {
+        if (this.htRequestStates.get(set).get(way).equals(LLCLineHTRequestState.HT)) {
             throw new IllegalArgumentException();
         }
 
-        this.htRequestStates.get(set).put(way, LastLevelCacheLineHtRequestState.HT);
+        this.htRequestStates.get(set).put(way, LLCLineHTRequestState.HT);
     }
 
     private void setMt(int set, int way) {
-        if (this.htRequestStates.get(set).get(way).equals(LastLevelCacheLineHtRequestState.MT)) {
+        if (this.htRequestStates.get(set).get(way).equals(LLCLineHTRequestState.MT)) {
             throw new IllegalArgumentException();
         }
 
-        this.htRequestStates.get(set).put(way, LastLevelCacheLineHtRequestState.MT);
+        this.htRequestStates.get(set).put(way, LLCLineHTRequestState.MT);
     }
 
     private void insertDataEntry(int set, int tag) {
-        CacheMiss<HtRequestVictimCacheLineState, CacheLine<HtRequestVictimCacheLineState>> newMiss = this.findInvalidLineAndNewMiss(tag, CacheAccessType.UNKNOWN, set);
-        newMiss.getLine().setNonInitialState(new DataHtRequestVictimCacheLineState());
+        CacheMiss<HTRequestVictimCacheLineState, CacheLine<HTRequestVictimCacheLineState>> newMiss = this.findInvalidLineAndNewMiss(tag, CacheAccessType.UNKNOWN, set);
+        newMiss.getLine().setNonInitialState(HTRequestVictimCacheLineState.DATA);
         newMiss.commit();
     }
 
     private void insertNullEntry(int set) {
-        CacheMiss<HtRequestVictimCacheLineState, CacheLine<HtRequestVictimCacheLineState>> newMiss = this.findInvalidLineAndNewMiss(0, CacheAccessType.UNKNOWN, set);
-        newMiss.getLine().setNonInitialState(new NullHtRequestVictimCacheLineState());
+        CacheMiss<HTRequestVictimCacheLineState, CacheLine<HTRequestVictimCacheLineState>> newMiss = this.findInvalidLineAndNewMiss(0, CacheAccessType.UNKNOWN, set);
+        newMiss.getLine().setNonInitialState(HTRequestVictimCacheLineState.NULL);
         newMiss.commit();
     }
 
@@ -364,13 +355,12 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
     }
 
     private void removeLru(int set) {
-        LeastRecentlyUsedEvictionPolicy<HtRequestVictimCacheLineState, CacheLine<HtRequestVictimCacheLineState>> lru = this.getLruPolicyForHtRequestVictimCache();
+        LeastRecentlyUsedEvictionPolicy<HTRequestVictimCacheLineState, CacheLine<HTRequestVictimCacheLineState>> lru = this.getLruPolicyForHtRequestVictimCache();
 
         for (int i = this.llc.getAssociativity() - 1; i >= 0; i--) {
             int way = lru.getWayInStackPosition(set, i);
-            CacheLine<HtRequestVictimCacheLineState> line = this.htRequestVictimCache.getLine(set, way);
-            HtRequestVictimCacheLineState state = line.getState();
-            if (!state.getType().equals(HtRequestVictimCacheLineStateType.INVALID)) {
+            CacheLine<HTRequestVictimCacheLineState> line = this.htRequestVictimCache.getLine(set, way);
+            if (!line.getState().equals(HTRequestVictimCacheLineState.INVALID)) {
                 line.invalidate();
                 return;
             }
@@ -379,24 +369,36 @@ public class LastLevelCacheHtRequestCachePollutionProfilingCapability implements
         throw new IllegalArgumentException();
     }
 
-    private LeastRecentlyUsedEvictionPolicy<HtRequestVictimCacheLineState, CacheLine<HtRequestVictimCacheLineState>> getLruPolicyForHtRequestVictimCache() {
-        return (LeastRecentlyUsedEvictionPolicy<HtRequestVictimCacheLineState, CacheLine<HtRequestVictimCacheLineState>>) this.htRequestVictimCache.getEvictionPolicy();
+    private LeastRecentlyUsedEvictionPolicy<HTRequestVictimCacheLineState, CacheLine<HTRequestVictimCacheLineState>> getLruPolicyForHtRequestVictimCache() {
+        return (LeastRecentlyUsedEvictionPolicy<HTRequestVictimCacheLineState, CacheLine<HTRequestVictimCacheLineState>>) this.htRequestVictimCache.getEvictionPolicy();
     }
 
-    private CacheMiss<HtRequestVictimCacheLineState, CacheLine<HtRequestVictimCacheLineState>> findInvalidLineAndNewMiss(int address, CacheAccessType accessType, int set) {
+    private CacheMiss<HTRequestVictimCacheLineState, CacheLine<HTRequestVictimCacheLineState>> findInvalidLineAndNewMiss(int address, CacheAccessType accessType, int set) {
         CacheReference reference = new CacheReference(null, null, address, this.htRequestVictimCache.getTag(address), accessType, set);
 
         for (int way = 0; way < this.htRequestVictimCache.getAssociativity(); way++) {
-            CacheLine<HtRequestVictimCacheLineState> line = this.htRequestVictimCache.getLine(set, way);
+            CacheLine<HTRequestVictimCacheLineState> line = this.htRequestVictimCache.getLine(set, way);
             if (line.getState() == line.getInitialState()) {
-                return new CacheMiss<HtRequestVictimCacheLineState, CacheLine<HtRequestVictimCacheLineState>>(this.htRequestVictimCache, reference, way);
+                return new CacheMiss<HTRequestVictimCacheLineState, CacheLine<HTRequestVictimCacheLineState>>(this.htRequestVictimCache, reference, way);
             }
         }
 
         throw new IllegalArgumentException();
     }
 
-    public CacheLine<HtRequestVictimCacheLineState> findHtRequestVictimLine(int tag) {
+    public CacheLine<HTRequestVictimCacheLineState> findHtRequestVictimLine(int tag) {
         return this.htRequestVictimCache.findLine(tag);
+    }
+
+    public static enum LLCLineHTRequestState {
+        INVALID,
+        HT,
+        MT
+    }
+
+    public static enum HTRequestVictimCacheLineState {
+        INVALID,
+        NULL,
+        DATA
     }
 }

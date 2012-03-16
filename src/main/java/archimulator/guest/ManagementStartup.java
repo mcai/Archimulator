@@ -86,12 +86,12 @@ public class ManagementStartup {
 //
 //                ExperimentProfile experimentProfile1 = new ExperimentProfile(processorProfile1);
 //                experimentProfile1.addWorkload(simulatedProgram);
-//                experimentProfile1.functionallyToPseudoCallAndInDetailForMaxInsts(3720, 2000000000).addSimulationCapabilityClass(LastLevelCacheHtRequestCachePollutionProfilingCapability.class);
+//                experimentProfile1.functionallyToPseudoCallAndInDetailForMaxInsts(3720, 2000000000).addSimulationCapabilityClass(LLCHTRequestProfilingCapability.class);
 //                experimentProfiles.add(experimentProfile1);
 //
 //                ExperimentProfile experimentProfile2 = new ExperimentProfile(processorProfile1);
 //                experimentProfile2.addWorkload(simulatedProgram);
-//                experimentProfile2.inDetailToEnd().addSimulationCapabilityClass(LastLevelCacheHtRequestCachePollutionProfilingCapability.class);
+//                experimentProfile2.inDetailToEnd().addSimulationCapabilityClass(LLCHTRequestProfilingCapability.class);
 //                experimentProfiles.add(experimentProfile2);
 //            }
 //        }

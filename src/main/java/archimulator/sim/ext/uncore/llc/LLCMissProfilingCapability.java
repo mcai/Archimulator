@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.coherence.ext;
+package archimulator.sim.ext.uncore.llc;
 
 import archimulator.model.simulation.Simulation;
 import archimulator.model.capability.SimulationCapability;
@@ -40,7 +40,7 @@ import java.util.List;
 import java.util.Map;
 
 //TODO: split this class!!! Miss Latency & MLP; pseudocall guided inter-thread reuse distance profiling;
-public class LastLevelCacheMissProfilingCapability implements SimulationCapability {
+public class LLCMissProfilingCapability implements SimulationCapability {
     private Simulation simulation;
     private int numOutstandingMisses;
     private Map<CacheAccess<?, ?>, OutstandingCacheMissInfo> outstandingMisses;
@@ -50,7 +50,7 @@ public class LastLevelCacheMissProfilingCapability implements SimulationCapabili
 
     private List<IntegerIntegerPair> predefinedDelinquentPcs;
 
-    public LastLevelCacheMissProfilingCapability(Simulation simulation) {
+    public LLCMissProfilingCapability(Simulation simulation) {
         this.simulation = simulation;
 
         this.outstandingMisses = new HashMap<CacheAccess<?, ?>, OutstandingCacheMissInfo>();
@@ -145,10 +145,10 @@ public class LastLevelCacheMissProfilingCapability implements SimulationCapabili
 
         final List<Triple<IntegerIntegerPair, Integer, Float>> frequenciesCalculatorLlcDownwardReadMissesPerPc = this.frequencyCalculatorLlcDownwardReadMissesPerPc.getFrequencies();
 
-        stats.put("LastLevelCacheMissProfilingCapability" + ".llcDownwardReadMissesPerPc.size", frequenciesCalculatorLlcDownwardReadMissesPerPc.size());
+        stats.put("llcMissProfilingCapability" + ".llcDownwardReadMissesPerPc.size", frequenciesCalculatorLlcDownwardReadMissesPerPc.size());
 
         for (Triple<IntegerIntegerPair, Integer, Float> triple : frequenciesCalculatorLlcDownwardReadMissesPerPc.subList(0, Math.min(4, frequenciesCalculatorLlcDownwardReadMissesPerPc.size()))) {
-            stats.put("LastLevelCacheMissProfilingCapability" + ".llcDownwardReadMissesPerPc @ " + String.format("ctx%d: PC 0x%08x", triple.getFirst().getFirst(), triple.getFirst().getSecond()),
+            stats.put("llcMissProfilingCapability" + ".llcDownwardReadMissesPerPc @ " + String.format("ctx%d: PC 0x%08x", triple.getFirst().getFirst(), triple.getFirst().getSecond()),
                     triple.getSecond() + "(" + nf.format(triple.getThird()) + ")");
         }
 
@@ -158,10 +158,10 @@ public class LastLevelCacheMissProfilingCapability implements SimulationCapabili
 //        if (pollStats) {
 //            final List<Triple<IntegerIntegerPair, Long, Double>> frequenciesCalculatorLlcDownwardReadMissesFromDelinquentPcs = this.frequencyCalculatorLlcDownwardReadsFromDelinquentPcs.getFrequencies();
 //
-//            stats.put("LastLevelCacheMissProfilingCapability" + ".frequencyCalculatorLlcDownwardReadsFromDelinquentPcs.size", frequenciesCalculatorLlcDownwardReadMissesFromDelinquentPcs.size());
+//            stats.put("llcMissProfilingCapability" + ".frequencyCalculatorLlcDownwardReadsFromDelinquentPcs.size", frequenciesCalculatorLlcDownwardReadMissesFromDelinquentPcs.size());
 //
 //            for (Triple<IntegerIntegerPair, Long, Double> triple : frequenciesCalculatorLlcDownwardReadMissesFromDelinquentPcs) {
-//                stats.put("LastLevelCacheMissProfilingCapability" + ".frequencyCalculatorLlcDownwardReadsFromDelinquentPcs @ " + String.format("ctx%d: 0x%08x", triple.getFirst().getFirst(), triple.getFirst().getSecond()),
+//                stats.put("llcMissProfilingCapability" + ".frequencyCalculatorLlcDownwardReadsFromDelinquentPcs @ " + String.format("ctx%d: 0x%08x", triple.getFirst().getFirst(), triple.getFirst().getSecond()),
 //                        triple.getSecond() + "(" + nf.format(triple.getThird()) + ")");
 //            }
 //        }

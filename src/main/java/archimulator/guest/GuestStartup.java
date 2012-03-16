@@ -43,7 +43,6 @@ import java.util.UUID;
 public class GuestStartup {
     private ArchimulatorService archimulatorService;
     private Map<Long, Experiment> experimentProfileIdsToExperiments;
-    private CloudMessageChannel cloudMessageChannel;
     private String simulatorUserId;
 
     public GuestStartup() {
@@ -61,11 +60,11 @@ public class GuestStartup {
 
         this.experimentProfileIdsToExperiments = new HashMap<Long, Experiment>();
 
-        this.cloudMessageChannel = new CloudMessageChannel(UUID.randomUUID().toString(), new GracefulMessageSink(this.archimulatorService));
+        CloudMessageChannel cloudMessageChannel = new CloudMessageChannel(UUID.randomUUID().toString(), new GracefulMessageSink(this.archimulatorService));
 
-        this.simulatorUserId = this.cloudMessageChannel.getUserId();
+        this.simulatorUserId = cloudMessageChannel.getUserId();
 
-        this.cloudMessageChannel.addCloudEventListener(PauseExperimentRequestEvent.class, new Action1<PauseExperimentRequestEvent>() {
+        cloudMessageChannel.addCloudEventListener(PauseExperimentRequestEvent.class, new Action1<PauseExperimentRequestEvent>() {
             @Override
             public void apply(PauseExperimentRequestEvent event) {
                 try {
@@ -76,7 +75,7 @@ public class GuestStartup {
             }
         });
 
-        this.cloudMessageChannel.addCloudEventListener(ResumeExperimentRequestEvent.class, new Action1<ResumeExperimentRequestEvent>() {
+        cloudMessageChannel.addCloudEventListener(ResumeExperimentRequestEvent.class, new Action1<ResumeExperimentRequestEvent>() {
             @Override
             public void apply(ResumeExperimentRequestEvent event) {
                 try {
@@ -87,7 +86,7 @@ public class GuestStartup {
             }
         });
 
-        this.cloudMessageChannel.addCloudEventListener(StopExperimentRequestEvent.class, new Action1<StopExperimentRequestEvent>() {
+        cloudMessageChannel.addCloudEventListener(StopExperimentRequestEvent.class, new Action1<StopExperimentRequestEvent>() {
             @Override
             public void apply(StopExperimentRequestEvent event) {
                 try {
@@ -98,7 +97,7 @@ public class GuestStartup {
             }
         });
 
-        this.cloudMessageChannel.open();
+        cloudMessageChannel.open();
     }
 
     public static void recordException(Exception e) {
