@@ -20,7 +20,7 @@ package archimulator.sim.ext.uncore.cache.prediction;
 
 import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.cache.*;
-import archimulator.sim.uncore.cache.eviction.EvictionPolicyFactory;
+import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
 import archimulator.sim.uncore.cache.eviction.LeastRecentlyUsedEvictionPolicy;
 import archimulator.util.action.Function3;
 import archimulator.util.math.SaturatingCounter;
@@ -29,11 +29,11 @@ public class CacheBasedPredictor<PredictableT extends Comparable<PredictableT>> 
     private EvictableCache<Boolean, PredictorLine> evictableCache;
 
     public CacheBasedPredictor(Cache<?, ?> cache, String name, CacheGeometry geometry, final int counterThreshold, final int counterMaxValue) {
-        this(cache, name, geometry, LeastRecentlyUsedEvictionPolicy.FACTORY, counterThreshold, counterMaxValue);
+        this(cache, name, geometry, LeastRecentlyUsedEvictionPolicy.class, counterThreshold, counterMaxValue);
     }
 
-    public CacheBasedPredictor(Cache<?, ?> cache, String name, CacheGeometry geometry, EvictionPolicyFactory evictionPolicyFactory, final int counterThreshold, final int counterMaxValue) {
-        this.evictableCache = new EvictableCache<Boolean, PredictorLine>(cache, name, geometry, evictionPolicyFactory,
+    public CacheBasedPredictor(Cache<?, ?> cache, String name, CacheGeometry geometry, Class<? extends EvictionPolicy> evictionPolicyClz, final int counterThreshold, final int counterMaxValue) {
+        this.evictableCache = new EvictableCache<Boolean, PredictorLine>(cache, name, geometry, evictionPolicyClz,
                 new Function3<Cache<?, ?>, Integer, Integer, PredictorLine>() {
                     public PredictorLine apply(Cache<?, ?> cache, Integer set, Integer way) {
                         return new PredictorLine(cache, set, way, counterThreshold, counterMaxValue);

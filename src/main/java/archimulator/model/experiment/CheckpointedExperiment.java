@@ -24,7 +24,7 @@ import archimulator.model.simulation.SimulationStartingImage;
 import archimulator.model.strategy.checkpoint.CheckpointToInstructionCountBasedDetailedSimulationStrategy;
 import archimulator.model.strategy.checkpoint.RoiBasedRunToCheckpointFunctionalSimulationStrategy;
 import archimulator.model.capability.KernelCapability;
-import archimulator.sim.uncore.cache.eviction.EvictionPolicyFactory;
+import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
 
 import java.util.List;
 
@@ -32,8 +32,8 @@ public class CheckpointedExperiment extends Experiment {
     private int maxInsts;
     private int pthreadSpawnedIndex;
 
-    public CheckpointedExperiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs, int maxInsts, int l2Size, int l2Associativity, EvictionPolicyFactory l2EvictionPolicyFactory, int pthreadSpawnedIndex, List<Class<? extends SimulationCapability>> simulationCapabilityClasses, List<Class<? extends ProcessorCapability>> processorCapabilityClasses, List<Class<? extends KernelCapability>> kernelCapabilityClasses) {
-        super(title, numCores, numThreadsPerCore, contextConfigs, l2Size, l2Associativity, l2EvictionPolicyFactory, simulationCapabilityClasses, processorCapabilityClasses, kernelCapabilityClasses);
+    public CheckpointedExperiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs, int l2Size, int l2Associativity, Class<? extends EvictionPolicy> l2EvictionPolicyClz, int maxInsts, int pthreadSpawnedIndex, List<Class<? extends SimulationCapability>> simulationCapabilityClasses, List<Class<? extends ProcessorCapability>> processorCapabilityClasses, List<Class<? extends KernelCapability>> kernelCapabilityClasses) {
+        super(title, numCores, numThreadsPerCore, contextConfigs, l2Size, l2Associativity, l2EvictionPolicyClz, simulationCapabilityClasses, processorCapabilityClasses, kernelCapabilityClasses);
         this.maxInsts = maxInsts;
         this.pthreadSpawnedIndex = pthreadSpawnedIndex;
     }

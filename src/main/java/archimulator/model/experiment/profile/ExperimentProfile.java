@@ -168,10 +168,10 @@ public class ExperimentProfile implements Serializable {
                 return new FunctionalExperiment(UUID.randomUUID().toString(), this.getProcessorProfile().getNumCores(), this.getProcessorProfile().getNumThreadsPerCore(), this.getContextConfigs(),
                         this.simulationCapabilityClasses, this.processorCapabilityClasses, this.kernelCapabilityClasses);
             case DETAILED_EXPERIMENT:
-                return new DetailedExperiment(UUID.randomUUID().toString(), this.getProcessorProfile().getNumCores(), this.getProcessorProfile().getNumThreadsPerCore(), this.getContextConfigs(), LeastRecentlyUsedEvictionPolicy.FACTORY, this.getProcessorProfile().getL2Size(), this.getProcessorProfile().getL2Associativity(),
+                return new DetailedExperiment(UUID.randomUUID().toString(), this.getProcessorProfile().getNumCores(), this.getProcessorProfile().getNumThreadsPerCore(), this.getContextConfigs(), this.getProcessorProfile().getL2Size(), this.getProcessorProfile().getL2Associativity(), LeastRecentlyUsedEvictionPolicy.class,
                         this.simulationCapabilityClasses, this.processorCapabilityClasses, this.kernelCapabilityClasses);
             case CHECKPOINTED_EXPERIMENT:
-                return new CheckpointedExperiment(UUID.randomUUID().toString(), this.getProcessorProfile().getNumCores(), this.getProcessorProfile().getNumThreadsPerCore(), this.getContextConfigs(), this.getMaxInsts(), this.getProcessorProfile().getL2Size(), this.getProcessorProfile().getL2Associativity(), LeastRecentlyUsedEvictionPolicy.FACTORY, this.getPthreadSpawnedIndex(),
+                return new CheckpointedExperiment(UUID.randomUUID().toString(), this.getProcessorProfile().getNumCores(), this.getProcessorProfile().getNumThreadsPerCore(), this.getContextConfigs(), this.getProcessorProfile().getL2Size(), this.getProcessorProfile().getL2Associativity(), LeastRecentlyUsedEvictionPolicy.class, this.getMaxInsts(), this.getPthreadSpawnedIndex(),
                         this.simulationCapabilityClasses, this.processorCapabilityClasses, this.kernelCapabilityClasses);
                 default:
                     throw new IllegalArgumentException();

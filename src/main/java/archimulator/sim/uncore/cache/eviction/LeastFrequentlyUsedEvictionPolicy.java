@@ -80,14 +80,4 @@ public class LeastFrequentlyUsedEvictionPolicy<StateT extends Serializable, Line
             return this.getLine(ownerCacheLine.getSet(), ownerCacheLine.getWay());
         }
     }
-
-    public static final EvictionPolicyFactory FACTORY = new EvictionPolicyFactory() {
-        public String getName() {
-            return "LEAST_FREQUENTLY_USED";
-        }
-
-        public <StateT extends Serializable, LineT extends CacheLine<StateT>> EvictionPolicy<StateT, LineT> create(EvictableCache<StateT, LineT> cache) {
-            return new LeastFrequentlyUsedEvictionPolicy<StateT, LineT>(cache);
-        }
-    };
 }

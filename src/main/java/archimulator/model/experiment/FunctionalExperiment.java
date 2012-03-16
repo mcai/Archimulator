@@ -28,7 +28,7 @@ import java.util.List;
 
 public class FunctionalExperiment extends Experiment {
     public FunctionalExperiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs, List<Class<? extends SimulationCapability>> simulationCapabilityClasses, List<Class<? extends ProcessorCapability>> processorCapabilityClasses, List<Class<? extends KernelCapability>> kernelCapabilityClasses) {
-        super(title, numCores, numThreadsPerCore, contextConfigs, 524288 * 8, 8, LeastRecentlyUsedEvictionPolicy.FACTORY, simulationCapabilityClasses, processorCapabilityClasses, kernelCapabilityClasses);
+        super(title, numCores, numThreadsPerCore, contextConfigs, 524288 * 8, 8, LeastRecentlyUsedEvictionPolicy.class, simulationCapabilityClasses, processorCapabilityClasses, kernelCapabilityClasses);
     }
 
     @Override

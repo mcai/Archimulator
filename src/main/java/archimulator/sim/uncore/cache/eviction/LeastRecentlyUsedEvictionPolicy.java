@@ -41,14 +41,4 @@ public class LeastRecentlyUsedEvictionPolicy<StateT extends Serializable, LineT 
     public void handleInsertionOnMiss(CacheMiss<StateT, LineT> miss) {
         this.setMRU(miss.getReference().getSet(), miss.getWay());
     }
-
-    public static final EvictionPolicyFactory FACTORY = new EvictionPolicyFactory() {
-        public String getName() {
-            return "LEAST_RECENTLY_USED";
-        }
-
-        public <StateT extends Serializable, LineT extends CacheLine<StateT>> EvictionPolicy<StateT, LineT> create(EvictableCache<StateT, LineT> cache) {
-            return new LeastRecentlyUsedEvictionPolicy<StateT, LineT>(cache);
-        }
-    };
 }

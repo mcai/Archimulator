@@ -19,7 +19,7 @@
 package archimulator.sim.uncore.coherence;
 
 import archimulator.sim.uncore.cache.CacheGeometry;
-import archimulator.sim.uncore.cache.eviction.EvictionPolicyFactory;
+import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
 
 import java.io.Serializable;
 
@@ -27,13 +27,13 @@ public abstract class CoherentCacheConfig implements Serializable {
     private CoherentCacheLevelType levelType;
     private CacheGeometry geometry;
     private int hitLatency;
-    private EvictionPolicyFactory evictionPolicyFactory;
+    private Class<? extends EvictionPolicy> evictionPolicyClz;
 
-    public CoherentCacheConfig(CoherentCacheLevelType levelType, CacheGeometry geometry, int hitLatency, EvictionPolicyFactory evictionPolicyFactory) {
+    public CoherentCacheConfig(CoherentCacheLevelType levelType, CacheGeometry geometry, int hitLatency, Class<? extends EvictionPolicy> evictionPolicyClz) {
         this.levelType = levelType;
         this.geometry = geometry;
         this.hitLatency = hitLatency;
-        this.evictionPolicyFactory = evictionPolicyFactory;
+        this.evictionPolicyClz = evictionPolicyClz;
     }
 
     public CoherentCacheLevelType getLevelType() {
@@ -48,7 +48,7 @@ public abstract class CoherentCacheConfig implements Serializable {
         return hitLatency;
     }
 
-    public EvictionPolicyFactory getEvictionPolicyFactory() {
-        return evictionPolicyFactory;
+    public Class<? extends EvictionPolicy> getEvictionPolicyClz() {
+        return evictionPolicyClz;
     }
 }

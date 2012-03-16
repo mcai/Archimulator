@@ -24,7 +24,7 @@ import archimulator.model.event.PollStatsEvent;
 import archimulator.sim.isa.memory.Memory;
 import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.cache.*;
-import archimulator.sim.uncore.cache.eviction.EvictionPolicyFactory;
+import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
 import archimulator.sim.uncore.cache.eviction.LeastRecentlyUsedEvictionPolicy;
 import archimulator.util.action.Action1;
 import archimulator.util.action.Function3;
@@ -59,7 +59,7 @@ public class CacheBasedBigMemoryDataStore extends BasicSimulationObject implemen
                 NUM_BUFFERS,
                 NUM_BUFFERS,
                 1),
-                LeastRecentlyUsedEvictionPolicy.FACTORY,
+                LeastRecentlyUsedEvictionPolicy.class,
                 new Function3<Cache<?, ?>, Integer, Integer, MemoryPageCacheLine>() {
                     public MemoryPageCacheLine apply(Cache<?, ?> cache, Integer set, Integer way) {
                         return new MemoryPageCacheLine(cache, set, way);
@@ -234,8 +234,8 @@ public class CacheBasedBigMemoryDataStore extends BasicSimulationObject implemen
     }
 
     private class MemoryPageCache extends EvictableCache<Boolean, MemoryPageCacheLine> {
-        private MemoryPageCache(SimulationObject parent, String name, CacheGeometry geometry, EvictionPolicyFactory evictionPolicyFactory, Function3<Cache<?, ?>, Integer, Integer, MemoryPageCacheLine> createLine) {
-            super(parent, name, geometry, evictionPolicyFactory, createLine);
+        private MemoryPageCache(SimulationObject parent, String name, CacheGeometry geometry, Class<? extends EvictionPolicy> evictionPolicyClz, Function3<Cache<?, ?>, Integer, Integer, MemoryPageCacheLine> createLine) {
+            super(parent, name, geometry, evictionPolicyClz, createLine);
         }
     }
 

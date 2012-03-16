@@ -20,7 +20,6 @@ package archimulator.sim.ext.uncore.cache.eviction;
 
 import archimulator.sim.uncore.cache.*;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
-import archimulator.sim.uncore.cache.eviction.EvictionPolicyFactory;
 
 import java.io.Serializable;
 
@@ -41,14 +40,4 @@ public class L2BypassingEvictionPolicy<StateT extends Serializable, LineT extend
     @Override
     public void handleInsertionOnMiss(CacheMiss<StateT, LineT> miss) {
     }
-
-    public static final EvictionPolicyFactory FACTORY = new EvictionPolicyFactory() {
-        public String getName() {
-            return "L2_BYPASSING";
-        }
-
-        public <StateT extends Serializable, LineT extends CacheLine<StateT>> EvictionPolicy<StateT, LineT> create(EvictableCache<StateT, LineT> cache) {
-            return new L2BypassingEvictionPolicy<StateT, LineT>(cache);
-        }
-    };
 }

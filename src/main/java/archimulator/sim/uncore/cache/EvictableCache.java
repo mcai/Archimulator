@@ -31,10 +31,10 @@ import java.io.Serializable;
 public class EvictableCache<StateT extends Serializable, LineT extends CacheLine<StateT>> extends Cache<StateT, LineT> {
     protected EvictionPolicy<StateT, LineT> evictionPolicy;
 
-    public EvictableCache(SimulationObject parent, String name, CacheGeometry geometry, EvictionPolicyFactory evictionPolicyFactory, Function3<Cache<?, ?>, Integer, Integer, LineT> createLine) {
+    public EvictableCache(SimulationObject parent, String name, CacheGeometry geometry, Class<? extends EvictionPolicy> evictionPolicyClz, Function3<Cache<?, ?>, Integer, Integer, LineT> createLine) {
         super(parent, name, geometry, createLine);
 
-        this.evictionPolicy = evictionPolicyFactory.create(this);
+        this.evictionPolicy = EvictionPolicyFactory.createEvictionPolicy(evictionPolicyClz, this);
     }
 
     public CacheAccess<StateT, LineT> newAccess(int address, CacheAccessType accessType) {

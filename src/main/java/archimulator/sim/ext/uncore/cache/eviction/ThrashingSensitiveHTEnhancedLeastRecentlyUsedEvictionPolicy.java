@@ -22,8 +22,6 @@ import archimulator.model.event.ProcessorInitializedEvent;
 import archimulator.sim.core.BasicThread;
 import archimulator.sim.core.Processor;
 import archimulator.sim.uncore.cache.*;
-import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
-import archimulator.sim.uncore.cache.eviction.EvictionPolicyFactory;
 import archimulator.sim.uncore.cache.eviction.LeastRecentlyUsedEvictionPolicy;
 import archimulator.util.IntegerIntegerPair;
 import archimulator.util.action.Action1;
@@ -118,14 +116,4 @@ public class ThrashingSensitiveHTEnhancedLeastRecentlyUsedEvictionPolicy<StateT 
             });
         }
     }
-
-    public static final EvictionPolicyFactory FACTORY = new EvictionPolicyFactory() {
-        public String getName() {
-            return "STREAMING_HT_ENHANCED_LEAST_RECENTLY_USED";
-        }
-
-        public <StateT extends Serializable, LineT extends CacheLine<StateT>> EvictionPolicy<StateT, LineT> create(EvictableCache<StateT, LineT> cache) {
-            return new ThrashingSensitiveHTEnhancedLeastRecentlyUsedEvictionPolicy<StateT, LineT>(cache);
-        }
-    };
 }

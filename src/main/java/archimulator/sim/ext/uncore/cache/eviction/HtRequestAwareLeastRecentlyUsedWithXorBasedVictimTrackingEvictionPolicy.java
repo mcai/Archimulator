@@ -19,33 +19,22 @@
 package archimulator.sim.ext.uncore.cache.eviction;
 
 import archimulator.sim.uncore.cache.CacheLine;
-import archimulator.sim.uncore.cache.CacheMiss;
-import archimulator.sim.uncore.cache.CacheReference;
 import archimulator.sim.uncore.cache.EvictableCache;
 
 import java.io.Serializable;
 
-public abstract class ReuseDistancePredictionEvictionPolicy<StateT extends Serializable, LineT extends CacheLine<StateT>> extends AbstractReuseDistancePredictionEvictionPolicy<StateT, LineT> {
-    private boolean selectiveCaching;
+public class HtRequestAwareLeastRecentlyUsedWithXorBasedVictimTrackingEvictionPolicy<StateT extends Serializable, LineT extends CacheLine<StateT>> extends HtRequestAwareLeastRecentlyUsedEvictionPolicy<StateT, LineT> {
+    private XorBasedAddressSetFilter filter;
 
-    public ReuseDistancePredictionEvictionPolicy(EvictableCache<StateT, LineT> cache, boolean selectiveCaching) {
+    public HtRequestAwareLeastRecentlyUsedWithXorBasedVictimTrackingEvictionPolicy(EvictableCache<StateT, LineT> cache) {
         super(cache);
-
-        this.selectiveCaching = selectiveCaching;
     }
 
     @Override
-    public CacheMiss<StateT, LineT> handleReplacement(CacheReference reference) {
-        CacheMiss<StateT, LineT> miss = handleReplacementBasedOnReuseDistancePrediction(reference, this.selectiveCaching);
-
-        if (miss.isBypass()) {
-            this.updateOnEveryAccess(reference.getAccess().getVirtualPc(), reference.getAddress(), reference.getAccessType());
+    public AddressSetFilter getCachePollutionFilter() {
+        if (filter == null) {
+            filter = new XorBasedAddressSetFilter(this.getCache());
         }
-
-        return miss;
-    }
-
-    public boolean isSelectiveCaching() {
-        return selectiveCaching;
+        return filter;
     }
 }

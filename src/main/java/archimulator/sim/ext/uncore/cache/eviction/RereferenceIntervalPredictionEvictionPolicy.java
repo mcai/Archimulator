@@ -20,7 +20,6 @@ package archimulator.sim.ext.uncore.cache.eviction;
 
 import archimulator.sim.uncore.cache.*;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
-import archimulator.sim.uncore.cache.eviction.EvictionPolicyFactory;
 import archimulator.util.action.Function3;
 
 import java.io.Serializable;
@@ -93,14 +92,4 @@ public class RereferenceIntervalPredictionEvictionPolicy<StateT extends Serializ
             });
         }
     }
-
-    public static final EvictionPolicyFactory FACTORY = new EvictionPolicyFactory() {
-        public String getName() {
-            return "REREFERENCE_INTERVAL_PREDICTION";
-        }
-
-        public <StateT extends Serializable, LineT extends CacheLine<StateT>> EvictionPolicy<StateT, LineT> create(EvictableCache<StateT, LineT> cache) {
-            return new RereferenceIntervalPredictionEvictionPolicy<StateT, LineT>(cache);
-        }
-    };
 }

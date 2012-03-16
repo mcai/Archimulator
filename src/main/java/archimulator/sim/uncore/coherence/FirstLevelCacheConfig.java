@@ -19,19 +19,19 @@
 package archimulator.sim.uncore.coherence;
 
 import archimulator.sim.uncore.cache.CacheGeometry;
-import archimulator.sim.uncore.cache.eviction.EvictionPolicyFactory;
+import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
 
 public class FirstLevelCacheConfig extends CoherentCacheConfig {
     private int readPorts; //TODO: to be clarified, should not be confused with MSHRs
     private int writePorts; //TODO: to be clarified, should not be confused with MSHRs
 
-    public FirstLevelCacheConfig(int size, int associativity, EvictionPolicyFactory evictionPolicyFactory) {
-//        this(CoherentCacheLevelType.FIRST_LEVEL_CACHE, new CacheGeometry(size, associativity, 64), 1, 2, 1, evictionPolicyFactory);
-        this(CoherentCacheLevelType.FIRST_LEVEL_CACHE, new CacheGeometry(size, associativity, 64), 1, 128, 128, evictionPolicyFactory); //TODO: should simulate MSHRs in all levels of cache explicitly
+    public FirstLevelCacheConfig(int size, int associativity, Class<? extends EvictionPolicy> evictionPolicyClz) {
+//        this(CoherentCacheLevelType.FIRST_LEVEL_CACHE, new CacheGeometry(size, associativity, 64), 1, 2, 1, evictionPolicyClz);
+        this(CoherentCacheLevelType.FIRST_LEVEL_CACHE, new CacheGeometry(size, associativity, 64), 1, 128, 128, evictionPolicyClz); //TODO: should simulate MSHRs in all levels of cache explicitly
     }
 
-    public FirstLevelCacheConfig(CoherentCacheLevelType levelType, CacheGeometry geometry, int hitLatency, int readPorts, int writePorts, EvictionPolicyFactory evictionPolicyFactory) {
-        super(levelType, geometry, hitLatency, evictionPolicyFactory);
+    public FirstLevelCacheConfig(CoherentCacheLevelType levelType, CacheGeometry geometry, int hitLatency, int readPorts, int writePorts, Class<? extends EvictionPolicy> evictionPolicyClz) {
+        super(levelType, geometry, hitLatency, evictionPolicyClz);
         this.readPorts = readPorts;
         this.writePorts = writePorts;
     }

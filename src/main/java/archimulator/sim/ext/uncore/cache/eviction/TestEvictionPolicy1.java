@@ -26,8 +26,6 @@ import archimulator.sim.uncore.cache.CacheHit;
 import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.cache.CacheMiss;
 import archimulator.sim.uncore.cache.EvictableCache;
-import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
-import archimulator.sim.uncore.cache.eviction.EvictionPolicyFactory;
 import archimulator.sim.uncore.cache.eviction.LeastRecentlyUsedEvictionPolicy;
 import archimulator.util.action.Action1;
 
@@ -77,14 +75,4 @@ public class TestEvictionPolicy1<StateT extends Serializable, LineT extends Cach
             this.setStackPosition(miss.getReference().getSet(), miss.getWay(), 4);
         }
     }
-
-    public static final EvictionPolicyFactory FACTORY = new EvictionPolicyFactory() {
-        public String getName() {
-            return "TEST_1";
-        }
-
-        public <StateT extends Serializable, LineT extends CacheLine<StateT>> EvictionPolicy<StateT, LineT> create(EvictableCache<StateT, LineT> cache) {
-            return new TestEvictionPolicy1<StateT, LineT>(cache);
-        }
-    };
 }

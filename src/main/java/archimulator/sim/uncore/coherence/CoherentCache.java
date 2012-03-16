@@ -26,7 +26,7 @@ import archimulator.sim.uncore.CacheHierarchy;
 import archimulator.sim.uncore.MemoryDevice;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.*;
-import archimulator.sim.uncore.cache.eviction.EvictionPolicyFactory;
+import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
 import archimulator.sim.uncore.coherence.event.CoherentCacheBeginCacheAccessEvent;
 import archimulator.sim.uncore.coherence.event.CoherentCacheNonblockingRequestHitToTransientTagEvent;
 import archimulator.sim.uncore.coherence.event.CoherentCacheServiceNonblockingRequestEvent;
@@ -62,7 +62,7 @@ public abstract class CoherentCache<StateT extends Serializable> extends MemoryD
     public CoherentCache(CacheHierarchy cacheHierarchy, String name, CoherentCacheConfig config, StateT initialState) {
         super(cacheHierarchy, name);
 
-        this.cache = new LockableCache(name, config.getGeometry(), initialState, config.getEvictionPolicyFactory());
+        this.cache = new LockableCache(name, config.getGeometry(), initialState, config.getEvictionPolicyClz());
 
         this.config = config;
 
@@ -268,8 +268,8 @@ public abstract class CoherentCache<StateT extends Serializable> extends MemoryD
     }
 
     public class LockableCache extends EvictableCache<StateT, LockableCacheLine> {
-        public LockableCache(String name, CacheGeometry geometry, final StateT initialState, EvictionPolicyFactory evictionPolicyFactory) {
-            super(CoherentCache.this, name, geometry, evictionPolicyFactory, new Function3<Cache<?, ?>, Integer, Integer, LockableCacheLine>() {
+        public LockableCache(String name, CacheGeometry geometry, final StateT initialState, Class<? extends EvictionPolicy> evictionPolicyClz) {
+            super(CoherentCache.this, name, geometry, evictionPolicyClz, new Function3<Cache<?, ?>, Integer, Integer, LockableCacheLine>() {
                 public LockableCacheLine apply(Cache<?, ?> cache, Integer set, Integer way) {
                     return new LockableCacheLine(cache, set, way, initialState);
                 }

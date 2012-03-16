@@ -26,8 +26,6 @@ import archimulator.sim.uncore.cache.Cache;
 import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.cache.CacheMiss;
 import archimulator.sim.uncore.cache.EvictableCache;
-import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
-import archimulator.sim.uncore.cache.eviction.EvictionPolicyFactory;
 import archimulator.sim.uncore.cache.eviction.LeastRecentlyUsedEvictionPolicy;
 import archimulator.sim.uncore.coherence.MESIState;
 import archimulator.sim.uncore.coherence.event.CoherentCacheBeginCacheAccessEvent;
@@ -223,11 +221,11 @@ public abstract class HtRequestAwareLeastRecentlyUsedEvictionPolicy<StateT exten
         public void remove(int addr);
     }
 
-    private static class TreeSetBasedAddressSetFilter implements AddressSetFilter {
+    public static class TreeSetBasedAddressSetFilter implements AddressSetFilter {
         private EvictableCache<?, ?> cache;
         private Set<Integer> proxy;
 
-        private TreeSetBasedAddressSetFilter(EvictableCache<?, ?> cache) {
+        public TreeSetBasedAddressSetFilter(EvictableCache<?, ?> cache) {
             this.cache = cache;
             this.proxy = new TreeSet<Integer>();
         }
@@ -254,11 +252,11 @@ public abstract class HtRequestAwareLeastRecentlyUsedEvictionPolicy<StateT exten
         }
     }
 
-    private static class XorBasedAddressSetFilter implements AddressSetFilter {
+    public static class XorBasedAddressSetFilter implements AddressSetFilter {
         private EvictableCache<?, ?> cache;
         private int proxy;
 
-        private XorBasedAddressSetFilter(EvictableCache<?, ?> cache) {
+        public XorBasedAddressSetFilter(EvictableCache<?, ?> cache) {
             this.cache = cache;
         }
 
@@ -417,44 +415,4 @@ public abstract class HtRequestAwareLeastRecentlyUsedEvictionPolicy<StateT exten
 
     private static final double htRequestCachePollutionHighThresholdForEvictionPolicy = 0.25;
     private static final double htRequestCachePollutionLowThresholdForEvictionPolicy = 0.005;
-
-    public static final EvictionPolicyFactory TREE_SET_BASED_VICTIM_TRACKING_FACTORY = new EvictionPolicyFactory() {
-        public String getName() {
-            return "HT_REQUEST_AWARE_LEAST_RECENTLY_USED";
-        }
-
-        public <StateT extends Serializable, LineT extends CacheLine<StateT>> EvictionPolicy<StateT, LineT> create(EvictableCache<StateT, LineT> cache) {
-            return new HtRequestAwareLeastRecentlyUsedEvictionPolicy<StateT, LineT>(cache) {
-                private TreeSetBasedAddressSetFilter filter;
-
-                @Override
-                public AddressSetFilter getCachePollutionFilter() {
-                    if (filter == null) {
-                        filter = new TreeSetBasedAddressSetFilter(this.getCache());
-                    }
-                    return filter;
-                }
-            };
-        }
-    };
-
-    public static final EvictionPolicyFactory XOR_BASED_VICTIM_TRACKING_FACTORY = new EvictionPolicyFactory() {
-        public String getName() {
-            return "HT_REQUEST_AWARE_LEAST_RECENTLY_USED";
-        }
-
-        public <StateT extends Serializable, LineT extends CacheLine<StateT>> EvictionPolicy<StateT, LineT> create(EvictableCache<StateT, LineT> cache) {
-            return new HtRequestAwareLeastRecentlyUsedEvictionPolicy<StateT, LineT>(cache) {
-                private XorBasedAddressSetFilter filter;
-
-                @Override
-                public AddressSetFilter getCachePollutionFilter() {
-                    if (filter == null) {
-                        filter = new XorBasedAddressSetFilter(this.getCache());
-                    }
-                    return filter;
-                }
-            };
-        }
-    };
 }

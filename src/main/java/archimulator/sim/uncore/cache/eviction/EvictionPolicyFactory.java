@@ -18,13 +18,57 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache.eviction;
 
+import archimulator.sim.ext.uncore.cache.eviction.*;
 import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.cache.EvictableCache;
 
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 
-public interface EvictionPolicyFactory extends Serializable {
-    String getName();
+public class EvictionPolicyFactory {
+    private static List<Class<? extends EvictionPolicy>> evictionPolicyClasses = new ArrayList<Class<? extends EvictionPolicy>>();
 
-    <StateT extends Serializable, LineT extends CacheLine<StateT>> EvictionPolicy<StateT, LineT> create(EvictableCache<StateT, LineT> cache);
+    static {
+        evictionPolicyClasses.add(LeastRecentlyUsedEvictionPolicy.class);
+        evictionPolicyClasses.add(LeastFrequentlyUsedEvictionPolicy.class);
+        evictionPolicyClasses.add(RandomEvictionPolicy.class);
+
+        evictionPolicyClasses.add(L2BypassingEvictionPolicy.class);
+
+        evictionPolicyClasses.add(RereferenceIntervalPredictionEvictionPolicy.class);
+
+        evictionPolicyClasses.add(ReuseDistanceBasedEvaluatorEvictionPolicy.class);
+
+        evictionPolicyClasses.add(ReuseDistancePredictionWithoutSelectiveCachingEvictionPolicy.class);
+        evictionPolicyClasses.add(ReuseDistancePredictionWithSelectiveCachingEvictionPolicy.class);
+
+        evictionPolicyClasses.add(HtRequestAwareLeastRecentlyUsedWithTreeSetBasedVictimTrackingEvictionPolicy.class);
+        evictionPolicyClasses.add(HtRequestAwareLeastRecentlyUsedWithXorBasedVictimTrackingEvictionPolicy.class);
+
+        evictionPolicyClasses.add(ThrashingSensitiveHTEnhancedLeastRecentlyUsedEvictionPolicy.class);
+
+        evictionPolicyClasses.add(TestEvictionPolicy1.class);
+        evictionPolicyClasses.add(TestEvictionPolicy2.class);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <StateT extends Serializable, LineT extends CacheLine<StateT>> EvictionPolicy<StateT, LineT> createEvictionPolicy(Class<? extends EvictionPolicy> evictionPolicyClz, EvictableCache<StateT, LineT> cache) {
+        try {
+            return evictionPolicyClz.getConstructor(new Class[]{EvictableCache.class}).newInstance(cache);
+        } catch (InstantiationException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(e);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static List<Class<? extends EvictionPolicy>> getEvictionPolicyClasses() {
+        return evictionPolicyClasses;
+    }
 }

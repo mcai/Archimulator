@@ -36,7 +36,7 @@ import archimulator.sim.os.ContextKilledEvent;
 import archimulator.sim.os.ContextState;
 import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.cache.*;
-import archimulator.sim.uncore.cache.eviction.EvictionPolicyFactory;
+import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
 import archimulator.sim.uncore.cache.eviction.LeastRecentlyUsedEvictionPolicy;
 import archimulator.sim.uncore.coherence.event.CoherentCacheBeginCacheAccessEvent;
 import archimulator.util.action.Action1;
@@ -53,7 +53,7 @@ public class DynamicSpeculativePrecomputationCapability implements ProcessorCapa
     private Map<Thread, SliceInformationTable> sits;
 
     public DynamicSpeculativePrecomputationCapability(Processor processor) {
-        this.sliceCache = new SliceCache(processor, "sliceCache", new CacheGeometry(SLICE_CACHE_CAPACITY, SLICE_CACHE_CAPACITY, 1), LeastRecentlyUsedEvictionPolicy.FACTORY, new Function3<Cache<?, ?>, Integer, Integer, SliceCacheLine>() {
+        this.sliceCache = new SliceCache(processor, "sliceCache", new CacheGeometry(SLICE_CACHE_CAPACITY, SLICE_CACHE_CAPACITY, 1), LeastRecentlyUsedEvictionPolicy.class, new Function3<Cache<?, ?>, Integer, Integer, SliceCacheLine>() {
             public SliceCacheLine apply(Cache<?, ?> cache, Integer set, Integer way) {
                 return new SliceCacheLine(cache, set, way);
             }
@@ -81,8 +81,8 @@ public class DynamicSpeculativePrecomputationCapability implements ProcessorCapa
     }
 
     private class SliceCache extends EvictableCache<Boolean, SliceCacheLine> {
-        private SliceCache(SimulationObject parent, String name, CacheGeometry geometry, EvictionPolicyFactory evictionPolicyFactory, Function3<Cache<?, ?>, Integer, Integer, SliceCacheLine> createLine) {
-            super(parent, name, geometry, evictionPolicyFactory, createLine);
+        private SliceCache(SimulationObject parent, String name, CacheGeometry geometry, Class<? extends EvictionPolicy> evictionPolicyClz, Function3<Cache<?, ?>, Integer, Integer, SliceCacheLine> createLine) {
+            super(parent, name, geometry, evictionPolicyClz, createLine);
         }
 
         private CacheMiss<Boolean, SliceCacheLine> findInvalidLineAndNewMiss(int address, CacheAccessType accessType, int set) {

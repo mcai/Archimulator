@@ -23,7 +23,6 @@ import archimulator.model.event.PollStatsEvent;
 import archimulator.model.event.ResetStatEvent;
 import archimulator.sim.uncore.cache.*;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
-import archimulator.sim.uncore.cache.eviction.EvictionPolicyFactory;
 import archimulator.util.action.Action1;
 
 import java.io.Serializable;
@@ -114,17 +113,5 @@ public class ReuseDistanceBasedEvaluatorEvictionPolicy<StateT extends Serializab
         this.evictionPolicy.handlePromotionOnHit(hit);
 
         super.handlePromotionOnHit(hit);
-    }
-
-    public static EvictionPolicyFactory factory(final EvictionPolicyFactory evictionPolicyFactory) {
-        return new EvictionPolicyFactory() {
-            public String getName() {
-                return evictionPolicyFactory.getName() + "_WITH_POLLUTION_EVALUATION";
-            }
-
-            public <StateT extends Serializable, LineT extends CacheLine<StateT>> EvictionPolicy<StateT, LineT> create(EvictableCache<StateT, LineT> cache) {
-                return new ReuseDistanceBasedEvaluatorEvictionPolicy<StateT, LineT>(cache, evictionPolicyFactory.create(cache));
-            }
-        };
     }
 }

@@ -44,14 +44,4 @@ public class RandomEvictionPolicy<StateT extends Serializable, LineT extends Cac
     @Override
     public void handleInsertionOnMiss(CacheMiss<StateT, LineT> miss) {
     }
-
-    public static final EvictionPolicyFactory FACTORY = new EvictionPolicyFactory() {
-        public String getName() {
-            return "RANDOM";
-        }
-
-        public <StateT extends Serializable, LineT extends CacheLine<StateT>> EvictionPolicy<StateT, LineT> create(EvictableCache<StateT, LineT> cache) {
-            return new RandomEvictionPolicy<StateT, LineT>(cache);
-        }
-    };
 }

@@ -29,7 +29,7 @@ import archimulator.model.strategy.SimulationStrategy;
 import archimulator.sim.core.ProcessorConfig;
 import archimulator.model.capability.KernelCapability;
 import archimulator.sim.uncore.MemoryHierarchyConfig;
-import archimulator.sim.uncore.cache.eviction.EvictionPolicyFactory;
+import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
 import archimulator.util.action.Action1;
 import archimulator.util.action.Function1X;
 import archimulator.util.event.BlockingEvent;
@@ -68,7 +68,7 @@ public abstract class Experiment {
 
     private Simulation simulation;
 
-    public Experiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs, int l2Size, int l2Associativity, EvictionPolicyFactory l2EvictionPolicyFactory, List<Class<? extends SimulationCapability>> simulationCapabilityClasses, List<Class<? extends ProcessorCapability>> processorCapabilityClasses, List<Class<? extends KernelCapability>> kernelCapabilityClasses) {
+    public Experiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs, int l2Size, int l2Associativity, Class<? extends EvictionPolicy> l2EvictionPolicyClz, List<Class<? extends SimulationCapability>> simulationCapabilityClasses, List<Class<? extends ProcessorCapability>> processorCapabilityClasses, List<Class<? extends KernelCapability>> kernelCapabilityClasses) {
         this.id = currentId++;
 
         this.title = title;
@@ -76,7 +76,7 @@ public abstract class Experiment {
         this.numThreadsPerCore = numThreadsPerCore;
         this.contextConfigs = contextConfigs;
 
-        this.processorConfig = ProcessorConfig.createDefaultProcessorConfig(MemoryHierarchyConfig.createDefaultMemoryHierarchyConfig(l2Size, l2Associativity, l2EvictionPolicyFactory), processorCapabilityClasses, kernelCapabilityClasses, this.numCores, this.numThreadsPerCore);
+        this.processorConfig = ProcessorConfig.createDefaultProcessorConfig(MemoryHierarchyConfig.createDefaultMemoryHierarchyConfig(l2Size, l2Associativity, l2EvictionPolicyClz), processorCapabilityClasses, kernelCapabilityClasses, this.numCores, this.numThreadsPerCore);
 
         this.simulationCapabilityClasses = simulationCapabilityClasses;
         
@@ -177,7 +177,7 @@ public abstract class Experiment {
         if (detailedSimulation) {
             stats.put("experiment.numCores", this.numCores);
             stats.put("experiment.numThreadsPerCore", this.numThreadsPerCore);
-            stats.put("experiment.l2EvictionPolicy", this.processorConfig.getMemoryHierarchyConfig().getL2Cache().getEvictionPolicyFactory().getName());
+            stats.put("experiment.l2EvictionPolicy", this.processorConfig.getMemoryHierarchyConfig().getL2Cache().getEvictionPolicyClz().getName());
         }
     }
 

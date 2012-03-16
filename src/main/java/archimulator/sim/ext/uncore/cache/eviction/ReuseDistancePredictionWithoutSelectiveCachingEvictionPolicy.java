@@ -19,33 +19,12 @@
 package archimulator.sim.ext.uncore.cache.eviction;
 
 import archimulator.sim.uncore.cache.CacheLine;
-import archimulator.sim.uncore.cache.CacheMiss;
-import archimulator.sim.uncore.cache.CacheReference;
 import archimulator.sim.uncore.cache.EvictableCache;
 
 import java.io.Serializable;
 
-public abstract class ReuseDistancePredictionEvictionPolicy<StateT extends Serializable, LineT extends CacheLine<StateT>> extends AbstractReuseDistancePredictionEvictionPolicy<StateT, LineT> {
-    private boolean selectiveCaching;
-
-    public ReuseDistancePredictionEvictionPolicy(EvictableCache<StateT, LineT> cache, boolean selectiveCaching) {
-        super(cache);
-
-        this.selectiveCaching = selectiveCaching;
-    }
-
-    @Override
-    public CacheMiss<StateT, LineT> handleReplacement(CacheReference reference) {
-        CacheMiss<StateT, LineT> miss = handleReplacementBasedOnReuseDistancePrediction(reference, this.selectiveCaching);
-
-        if (miss.isBypass()) {
-            this.updateOnEveryAccess(reference.getAccess().getVirtualPc(), reference.getAddress(), reference.getAccessType());
-        }
-
-        return miss;
-    }
-
-    public boolean isSelectiveCaching() {
-        return selectiveCaching;
+public class ReuseDistancePredictionWithoutSelectiveCachingEvictionPolicy<StateT extends Serializable, LineT extends CacheLine<StateT>> extends ReuseDistancePredictionEvictionPolicy<StateT, LineT> {
+    public ReuseDistancePredictionWithoutSelectiveCachingEvictionPolicy(EvictableCache<StateT, LineT> stateTLineTEvictableCache) {
+        super(stateTLineTEvictableCache, false);
     }
 }
