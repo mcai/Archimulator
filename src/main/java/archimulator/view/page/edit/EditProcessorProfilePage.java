@@ -21,14 +21,18 @@ package archimulator.view.page.edit;
 import archimulator.sim.base.experiment.profile.ProcessorProfile;
 import archimulator.service.ArchimulatorService;
 import archimulator.service.ArchimulatorServletContextListener;
+import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
+import archimulator.sim.uncore.cache.eviction.EvictionPolicyFactory;
 import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.util.GenericForwardComposer;
-import org.zkoss.zul.Button;
-import org.zkoss.zul.Textbox;
-import org.zkoss.zul.Window;
+import org.zkoss.zul.*;
 
 import javax.servlet.http.HttpSession;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class EditProcessorProfilePage extends GenericForwardComposer<Window> {
     private Textbox textboxId;
@@ -37,6 +41,7 @@ public class EditProcessorProfilePage extends GenericForwardComposer<Window> {
     private Textbox textboxNumThreadsPerCore;
     private Textbox textboxL2Size;
     private Textbox textboxL2Associativity;
+    private Combobox comboboxL2ReplacementPolicies;
 
     private Button buttonOk;
     private Button buttonCancel;
@@ -64,6 +69,14 @@ public class EditProcessorProfilePage extends GenericForwardComposer<Window> {
         this.textboxNumThreadsPerCore.setValue(this.processorProfile.getNumThreadsPerCore() + "");
         this.textboxL2Size.setValue(this.processorProfile.getL2Size() + "");
         this.textboxL2Associativity.setValue(this.processorProfile.getL2Associativity() + "");
+        
+        List<String> evictionPolicyClassNames = new ArrayList<String>();
+        for(Class<? extends EvictionPolicy> clz : EvictionPolicyFactory.getEvictionPolicyClasses()) {
+            evictionPolicyClassNames.add(clz.getName());
+        }
+
+        this.comboboxL2ReplacementPolicies.setModel(new ListModelList<String>(evictionPolicyClassNames));
+        this.comboboxL2ReplacementPolicies.setText(this.processorProfile.getL2EvictionPolicyClz().getName());
 
         if (this.create) {
             this.textboxId.setValue("N/A");
@@ -72,12 +85,32 @@ public class EditProcessorProfilePage extends GenericForwardComposer<Window> {
         this.winEditProcessorProfile.setTitle(this.create ? "Add Processor Profile - Archimulator" : "Edit Processor Profile - Archimulator");
     }
 
-    public void onOK() throws SQLException {
+    @SuppressWarnings("unchecked")
+    public void onOK() throws SQLException, ClassNotFoundException {
         this.processorProfile.setTitle(this.textboxTitle.getValue());
         this.processorProfile.setNumCores(Integer.parseInt(this.textboxNumCores.getValue()));
         this.processorProfile.setNumThreadsPerCore(Integer.parseInt(this.textboxNumThreadsPerCore.getValue()));
         this.processorProfile.setL2Size(Integer.parseInt(this.textboxL2Size.getValue()));
         this.processorProfile.setL2Associativity(Integer.parseInt(this.textboxL2Associativity.getValue()));
+
+        if(this.comboboxL2ReplacementPolicies.getSelectedIndex() != -1) {
+            this.processorProfile.setL2EvictionPolicyClz((Class<? extends EvictionPolicy>) Class.forName(this.comboboxL2ReplacementPolicies.getText()));
+
+        }
+        else {
+            Messagebox.show("Selected L2 replacement policy class is empty, please select one and try again!", "Edit Processor Profile", Messagebox.OK, Messagebox.EXCLAMATION, new EventListener<Event>() {
+                @Override
+                public void onEvent(Event event) throws Exception {
+                    switch ((Integer) event.getData()) {
+                        case Messagebox.OK:
+                            Executions.sendRedirect(null);
+                            break;
+                    }
+                }
+            });
+            
+            return;
+        }
 
         HttpSession httpSession = (HttpSession) this.session.getNativeSession();
         final ArchimulatorService archimulatorService = ArchimulatorServletContextListener.getArchimulatorService(httpSession.getServletContext());

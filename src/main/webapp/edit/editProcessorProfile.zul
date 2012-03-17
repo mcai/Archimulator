@@ -1,6 +1,6 @@
 <zk>
     <window id="winEditProcessorProfile" title="Edit Processor Profile - Archimulator" border="normal" visible="false"
-            width="30%" height="310px" sizable="true"
+            width="38%" height="380px" sizable="true"
             apply="archimulator.view.page.edit.EditProcessorProfilePage">
         <zscript>
             import org.zkoss.zk.ui.*;
@@ -18,36 +18,37 @@
         </zscript>
         <grid>
             <columns>
-                <column width="100px"/>
-                <column width="200px"/>
-                <column width="200px"/>
-                <column width="200px"/>
-                <column width="200px"/>
+                <column width="160px"/>
+                <column width="300px"/>
             </columns>
             <rows>
                 <row>
                     Id
-                    <textbox id="textboxId" readonly="true" width="150px"/>
+                    <textbox id="textboxId" readonly="true" width="280px"/>
                 </row>
                 <row>
                     Title
-                    <textbox id="textboxTitle" width="150px"/>
+                    <textbox id="textboxTitle" width="280px"/>
                 </row>
                 <row>
                     # Cores
-                    <textbox id="textboxNumCores" width="150px"/>
+                    <textbox id="textboxNumCores" width="280px"/>
                 </row>
                 <row>
                     # Threads per Core
-                    <textbox id="textboxNumThreadsPerCore" width="150px"/>
+                    <textbox id="textboxNumThreadsPerCore" width="280px"/>
                 </row>
                 <row>
                     L2 Size
-                    <textbox id="textboxL2Size" width="150px"/>
+                    <textbox id="textboxL2Size" width="280px"/>
                 </row>
                 <row>
                     L2 Associativity
-                    <textbox id="textboxL2Associativity" width="150px"/>
+                    <textbox id="textboxL2Associativity" width="280px"/>
+                </row>
+                <row>
+                    L2 Replacement Policy
+                    <combobox id="comboboxL2ReplacementPolicies" width="280px"/>
                 </row>
             </rows>
         </grid>

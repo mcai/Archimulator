@@ -203,6 +203,20 @@ public class EditExperimentProfilePage extends GenericForwardComposer<Window> {
                     i++;
                 }
             }
+            else {
+                Messagebox.show("Selected processor profile is empty, please select one and try again!", "Edit Experiment Profile", Messagebox.OK, Messagebox.EXCLAMATION, new EventListener<Event>() {
+                    @Override
+                    public void onEvent(Event event) throws Exception {
+                        switch ((Integer) event.getData()) {
+                            case Messagebox.OK:
+                                Executions.sendRedirect(null);
+                                break;
+                        }
+                    }
+                });
+
+                return;
+            }
 
             this.experimentProfile.getSimulationCapabilityClasses().clear();
             for(Pair<Class<? extends SimulationCapability>, Boolean> entry : this.listModelSimulationCapabilities.getInnerList()) {

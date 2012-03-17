@@ -19,6 +19,8 @@
 package archimulator.view.page;
 
 import archimulator.sim.base.experiment.profile.ProcessorProfile;
+import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
+import archimulator.sim.uncore.cache.eviction.LeastRecentlyUsedEvictionPolicy;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.util.GenericForwardComposer;
@@ -37,7 +39,8 @@ public class ProcessorProfilesPage extends GenericForwardComposer<Window> {
         Map<String, Object> arg = new HashMap<String, Object>();
 
         arg.put("create", true);
-        arg.put("processorProfile", new ProcessorProfile(UUID.randomUUID().toString(), 2, 2, 1024 * 1024 * 4, 8));
+        Class<? extends EvictionPolicy> l2EvictionPolicyClz = LeastRecentlyUsedEvictionPolicy.class;
+        arg.put("processorProfile", new ProcessorProfile(UUID.randomUUID().toString(), 2, 2, 1024 * 1024 * 4, 8, l2EvictionPolicyClz));
 
         Window win = (Window) Executions.createComponents("/edit/editProcessorProfile.zul", null, arg);
         win.doModal();

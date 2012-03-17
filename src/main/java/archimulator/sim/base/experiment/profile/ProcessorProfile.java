@@ -18,8 +18,10 @@
  ******************************************************************************/
 package archimulator.sim.base.experiment.profile;
 
+import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
 import archimulator.util.DateHelper;
 import archimulator.util.StorageUnit;
+import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
@@ -46,18 +48,22 @@ public class ProcessorProfile implements Serializable {
     @DatabaseField
     private int l2Associativity;
 
+    @DatabaseField(dataType = DataType.SERIALIZABLE)
+    private Class<? extends EvictionPolicy> l2EvictionPolicyClz;
+
     @DatabaseField
     private long createdTime;
 
     public ProcessorProfile() {
     }
 
-    public ProcessorProfile(String title, int numCores, int numThreadsPerCore, int l2Size, int l2Associativity) {
+    public ProcessorProfile(String title, int numCores, int numThreadsPerCore, int l2Size, int l2Associativity, Class<? extends EvictionPolicy> l2EvictionPolicyClz) {
         this.title = title;
         this.numCores = numCores;
         this.numThreadsPerCore = numThreadsPerCore;
         this.l2Size = l2Size;
         this.l2Associativity = l2Associativity;
+        this.l2EvictionPolicyClz = l2EvictionPolicyClz;
 
         this.createdTime = DateHelper.toTick(new Date());
     }
@@ -84,6 +90,10 @@ public class ProcessorProfile implements Serializable {
 
     public int getL2Associativity() {
         return l2Associativity;
+    }
+
+    public Class<? extends EvictionPolicy> getL2EvictionPolicyClz() {
+        return l2EvictionPolicyClz;
     }
 
     public long getCreatedTime() {
@@ -114,8 +124,12 @@ public class ProcessorProfile implements Serializable {
         this.l2Associativity = l2Associativity;
     }
 
+    public void setL2EvictionPolicyClz(Class<? extends EvictionPolicy> l2EvictionPolicyClz) {
+        this.l2EvictionPolicyClz = l2EvictionPolicyClz;
+    }
+
     @Override
     public String toString() {
-        return String.format("ProcessorProfile{id=%d, title='%s', numCores=%d, numThreadsPerCore=%d, l2Size='%s', l2Associativity=%d, createdTime='%s'}", id, title, numCores, numThreadsPerCore, StorageUnit.toString(l2Size), l2Associativity, DateHelper.toString(createdTime));
+        return String.format("ProcessorProfile{id=%d, title='%s', numCores=%d, numThreadsPerCore=%d, l2Size='%s', l2Associativity=%d, l2EvictionPolicyClz.name='%s', createdTime='%s'}", id, title, numCores, numThreadsPerCore, StorageUnit.toString(l2Size), l2Associativity, l2EvictionPolicyClz.getName(), DateHelper.toString(createdTime));
     }
 }

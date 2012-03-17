@@ -22,6 +22,8 @@ import archimulator.sim.base.experiment.profile.ExperimentProfile;
 import archimulator.sim.base.experiment.profile.ProcessorProfile;
 import archimulator.sim.base.simulation.SimulatedProgram;
 import archimulator.service.ArchimulatorService;
+import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
+import archimulator.sim.uncore.cache.eviction.LeastRecentlyUsedEvictionPolicy;
 import archimulator.util.DateHelper;
 import com.caucho.hessian.client.HessianProxyFactory;
 
@@ -144,11 +146,14 @@ public class ManagementStartup {
         l2Associativities.add(8);
         l2Associativities.add(16);
 
+        Class<? extends EvictionPolicy> l2EvictionPolicyClz = LeastRecentlyUsedEvictionPolicy.class;
+        String l2EvictionPolicyClzName = "LRU";
+
         for (int l2SizeInKByte : l2SizeInKBytes) {
             for (int l2Associativity : l2Associativities) {
                 int numCores = 2;
                 int numThreadsPerCore = 2;
-                this.archimulatorService.addProcessorProfile(new ProcessorProfile("C" + numCores + "T" + numThreadsPerCore + "-" + "L2SizeInKB_" + l2SizeInKByte + "-" + "L2Assoc_" + l2Associativity, numCores, numThreadsPerCore, 1024 * l2SizeInKByte, l2Associativity));
+                this.archimulatorService.addProcessorProfile(new ProcessorProfile("C" + numCores + "T" + numThreadsPerCore + "-" + "L2SizeInKB_" + l2SizeInKByte + "-" + "L2Assoc_" + l2Associativity + "-" + "L2Repl_" + l2EvictionPolicyClzName, numCores, numThreadsPerCore, 1024 * l2SizeInKByte, l2Associativity, l2EvictionPolicyClz));
             }
         }
     }
