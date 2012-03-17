@@ -18,8 +18,8 @@
  ******************************************************************************/
 package archimulator.sim.uncore.dram;
 
-import archimulator.model.event.DumpStatEvent;
-import archimulator.model.event.ResetStatEvent;
+import archimulator.sim.base.event.DumpStatEvent;
+import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.uncore.CacheHierarchy;
 import archimulator.sim.uncore.MemoryDevice;
 import archimulator.sim.uncore.coherence.LastLevelCache;

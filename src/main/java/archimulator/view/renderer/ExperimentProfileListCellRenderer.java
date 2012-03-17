@@ -18,9 +18,9 @@
  ******************************************************************************/
 package archimulator.view.renderer;
 
-import archimulator.model.experiment.profile.ExperimentProfile;
-import archimulator.model.experiment.profile.ExperimentProfileState;
-import archimulator.model.experiment.profile.ExperimentProfileType;
+import archimulator.sim.base.experiment.profile.ExperimentProfile;
+import archimulator.sim.base.experiment.profile.ExperimentProfileState;
+import archimulator.sim.base.experiment.profile.ExperimentProfileType;
 import archimulator.service.ArchimulatorService;
 import archimulator.service.ArchimulatorServletContextListener;
 import org.zkoss.zk.ui.Executions;

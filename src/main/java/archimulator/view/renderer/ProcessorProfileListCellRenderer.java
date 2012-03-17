@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.view.renderer;
 
-import archimulator.model.experiment.profile.ProcessorProfile;
+import archimulator.sim.base.experiment.profile.ProcessorProfile;
 import archimulator.service.ArchimulatorService;
 import archimulator.service.ArchimulatorServletContextListener;
 import archimulator.util.StorageUnit;

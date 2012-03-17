@@ -18,8 +18,8 @@
  ******************************************************************************/
 package archimulator.sim.core;
 
-import archimulator.model.simulation.Logger;
-import archimulator.model.event.ResetStatEvent;
+import archimulator.sim.base.simulation.Logger;
+import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.core.bpred.BranchPredictorUpdate;
 import archimulator.sim.core.bpred.DynamicBranchPredictor;
 import archimulator.sim.core.event.InstructionCommittedEvent;

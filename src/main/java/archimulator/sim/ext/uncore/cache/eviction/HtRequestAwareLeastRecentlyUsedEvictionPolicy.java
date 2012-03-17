@@ -18,9 +18,9 @@
  ******************************************************************************/
 package archimulator.sim.ext.uncore.cache.eviction;
 
-import archimulator.model.event.DumpStatEvent;
-import archimulator.model.event.PollStatsEvent;
-import archimulator.model.event.ResetStatEvent;
+import archimulator.sim.base.event.DumpStatEvent;
+import archimulator.sim.base.event.PollStatsEvent;
+import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.core.BasicThread;
 import archimulator.sim.uncore.cache.Cache;
 import archimulator.sim.uncore.cache.CacheLine;

@@ -18,8 +18,8 @@
  ******************************************************************************/
 package archimulator.sim.core;
 
-import archimulator.model.event.DumpStatEvent;
-import archimulator.model.event.ResetStatEvent;
+import archimulator.sim.base.event.DumpStatEvent;
+import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.util.action.Action1;
 import archimulator.util.action.NamedAction;
 

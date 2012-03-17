@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.view.page;
 
-import archimulator.model.simulation.SimulatedProgram;
+import archimulator.sim.base.simulation.SimulatedProgram;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.util.GenericForwardComposer;

@@ -18,8 +18,8 @@
  ******************************************************************************/
 package archimulator.sim.uncore;
 
-import archimulator.model.simulation.Simulation;
-import archimulator.model.capability.SimulationCapability;
+import archimulator.sim.base.simulation.Simulation;
+import archimulator.sim.base.experiment.capability.SimulationCapability;
 import archimulator.util.action.Action1;
 
 import java.io.PrintWriter;

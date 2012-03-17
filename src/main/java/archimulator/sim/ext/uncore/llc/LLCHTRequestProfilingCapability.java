@@ -18,9 +18,9 @@
  ******************************************************************************/
 package archimulator.sim.ext.uncore.llc;
 
-import archimulator.model.simulation.Simulation;
-import archimulator.model.capability.SimulationCapability;
-import archimulator.model.event.*;
+import archimulator.sim.base.simulation.Simulation;
+import archimulator.sim.base.experiment.capability.SimulationCapability;
+import archimulator.sim.base.event.*;
 import archimulator.sim.core.BasicThread;
 import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.cache.*;

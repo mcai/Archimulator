@@ -48,6 +48,7 @@ temp result:
 TODOs:
     1. viewing program output.. from UI
     2. auto-tuning parameters of the HT scheme
+    3. manager UI for L2 replacement policies
 
     *. a. late HT requests -> Spawn H/W thread to prefetch for HT
        b. bad HT requests -> Pause HT, resume HT in the next phase (128K insts in MT?)

@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.isa.memory.datastore;
 
-import archimulator.model.simulation.BasicSimulationObject;
+import archimulator.sim.base.simulation.BasicSimulationObject;
 import archimulator.sim.isa.memory.Memory;
 
 import java.nio.ByteBuffer;

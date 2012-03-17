@@ -20,8 +20,8 @@
 //
 //import archimulator.sim.core.BasicThread;
 //import archimulator.sim.core.Processor;
-//import archimulator.model.capability.ProcessorCapability;
-//import archimulator.model.capability.ProcessorCapabilityFactory;
+//import archimulator.sim.base.experiment.capability.ProcessorCapability;
+//import archimulator.sim.base.experiment.capability.ProcessorCapabilityFactory;
 //import archimulator.sim.uncore.MemoryHierarchyAccess;
 //import archimulator.sim.uncore.cache.Cache;
 //import archimulator.sim.uncore.cache.CacheLine;

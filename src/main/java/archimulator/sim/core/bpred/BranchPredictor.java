@@ -18,8 +18,8 @@
  ******************************************************************************/
 package archimulator.sim.core.bpred;
 
-import archimulator.model.event.DumpStatEvent;
-import archimulator.model.event.ResetStatEvent;
+import archimulator.sim.base.event.DumpStatEvent;
+import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.core.Thread;
 import archimulator.sim.isa.Mnemonic;
 import archimulator.util.Reference;

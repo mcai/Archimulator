@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore;
 
-import archimulator.model.simulation.SimulationObject;
+import archimulator.sim.base.simulation.SimulationObject;
 import archimulator.sim.uncore.tlb.TranslationLookasideBuffer;
 
 public interface MemoryHierarchyThread extends SimulationObject {

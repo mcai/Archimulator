@@ -18,13 +18,13 @@
  ******************************************************************************/
 package archimulator.view.page.edit;
 
-import archimulator.model.capability.*;
-import archimulator.model.experiment.profile.ExperimentProfile;
-import archimulator.model.experiment.profile.ExperimentProfileState;
-import archimulator.model.experiment.profile.ExperimentProfileType;
-import archimulator.model.experiment.profile.ProcessorProfile;
-import archimulator.model.simulation.ContextConfig;
-import archimulator.model.simulation.SimulatedProgram;
+import archimulator.sim.base.experiment.capability.*;
+import archimulator.sim.base.experiment.profile.ExperimentProfile;
+import archimulator.sim.base.experiment.profile.ExperimentProfileState;
+import archimulator.sim.base.experiment.profile.ExperimentProfileType;
+import archimulator.sim.base.experiment.profile.ProcessorProfile;
+import archimulator.sim.base.simulation.ContextConfig;
+import archimulator.sim.base.simulation.SimulatedProgram;
 import archimulator.service.ArchimulatorService;
 import archimulator.service.ArchimulatorServletContextListener;
 import archimulator.util.Pair;

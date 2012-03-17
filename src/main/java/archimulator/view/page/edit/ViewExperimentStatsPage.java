@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.view.page.edit;
 
-import archimulator.model.experiment.profile.ExperimentProfile;
+import archimulator.sim.base.experiment.profile.ExperimentProfile;
 import archimulator.service.ArchimulatorService;
 import archimulator.service.ArchimulatorServletContextListener;
 import archimulator.util.Pair;

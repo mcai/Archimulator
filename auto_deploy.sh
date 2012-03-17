@@ -15,5 +15,5 @@ REMOTE_SERVER_IP=50.115.38.134
 
 #------------------------------------------------------------------------
 
-ssh root@$REMOTE_SERVER_IP 'cd /home/itecgo/Archimulator; nohup `java -cp "out/artifacts/Archimulator_jar/Archimulator.jar:out/artifacts/Archimulator_jar/jna.jar" archimulator.guest.GuestStartup` &'
-#ssh root@$REMOTE_SERVER_IP 'cd /home/itecgo/Archimulator; java -cp "out/artifacts/Archimulator_jar/Archimulator.jar:out/artifacts/Archimulator_jar/jna.jar" archimulator.guest.GuestStartup'
+ssh root@$REMOTE_SERVER_IP 'cd /home/itecgo/Archimulator; nohup `java -cp "out/artifacts/Archimulator_jar/Archimulator.jar:out/artifacts/Archimulator_jar/jna.jar" archimulator.client.GuestStartup` &'
+#ssh root@$REMOTE_SERVER_IP 'cd /home/itecgo/Archimulator; java -cp "out/artifacts/Archimulator_jar/Archimulator.jar:out/artifacts/Archimulator_jar/jna.jar" archimulator.client.GuestStartup'

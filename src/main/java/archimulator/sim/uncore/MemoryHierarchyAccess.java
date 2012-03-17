@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore;
 
-import archimulator.model.simulation.Simulation;
+import archimulator.sim.base.simulation.Simulation;
 import archimulator.sim.core.DynamicInstruction;
 import archimulator.util.action.Action;
 

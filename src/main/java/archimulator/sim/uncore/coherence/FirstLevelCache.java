@@ -18,8 +18,8 @@
  ******************************************************************************/
 package archimulator.sim.uncore.coherence;
 
-import archimulator.model.event.DumpStatEvent;
-import archimulator.model.event.ResetStatEvent;
+import archimulator.sim.base.event.DumpStatEvent;
+import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.core.DynamicInstruction;
 import archimulator.sim.uncore.*;
 import archimulator.sim.uncore.cache.CacheAccess;

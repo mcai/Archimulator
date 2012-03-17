@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore;
 
-import archimulator.model.simulation.SimulationObject;
+import archimulator.sim.base.simulation.SimulationObject;
 import archimulator.sim.uncore.coherence.FirstLevelCache;
 import archimulator.sim.uncore.coherence.LastLevelCache;
 import archimulator.sim.uncore.dram.MainMemory;

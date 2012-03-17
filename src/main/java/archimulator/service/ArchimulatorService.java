@@ -18,9 +18,9 @@
  ******************************************************************************/
 package archimulator.service;
 
-import archimulator.model.experiment.profile.ExperimentProfile;
-import archimulator.model.experiment.profile.ProcessorProfile;
-import archimulator.model.simulation.SimulatedProgram;
+import archimulator.sim.base.experiment.profile.ExperimentProfile;
+import archimulator.sim.base.experiment.profile.ProcessorProfile;
+import archimulator.sim.base.simulation.SimulatedProgram;
 import archimulator.util.im.sink.MessageSink;
 
 import java.sql.SQLException;

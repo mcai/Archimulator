@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.ext.uncore.cache.eviction;
 
-import archimulator.model.event.ProcessorInitializedEvent;
+import archimulator.sim.base.event.ProcessorInitializedEvent;
 import archimulator.sim.core.BasicThread;
 import archimulator.sim.core.Processor;
 import archimulator.sim.uncore.cache.*;

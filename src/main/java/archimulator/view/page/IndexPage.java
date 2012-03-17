@@ -18,10 +18,10 @@
  ******************************************************************************/
 package archimulator.view.page;
 
-import archimulator.model.experiment.profile.ExperimentProfile;
-import archimulator.model.experiment.profile.ProcessorProfile;
-import archimulator.model.simulation.ContextConfig;
-import archimulator.model.simulation.SimulatedProgram;
+import archimulator.sim.base.experiment.profile.ExperimentProfile;
+import archimulator.sim.base.experiment.profile.ProcessorProfile;
+import archimulator.sim.base.simulation.ContextConfig;
+import archimulator.sim.base.simulation.SimulatedProgram;
 import archimulator.service.ArchimulatorService;
 import archimulator.service.ArchimulatorServiceImpl;
 import archimulator.service.ArchimulatorServletContextListener;

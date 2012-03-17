@@ -18,9 +18,9 @@
  ******************************************************************************/
 package archimulator.sim.core;
 
-import archimulator.model.simulation.BasicSimulationObject;
-import archimulator.model.event.DumpStatEvent;
-import archimulator.model.event.ResetStatEvent;
+import archimulator.sim.base.simulation.BasicSimulationObject;
+import archimulator.sim.base.event.DumpStatEvent;
+import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.core.bpred.*;
 import archimulator.sim.isa.ArchitecturalRegisterFile;
 import archimulator.sim.isa.RegisterDependencyType;

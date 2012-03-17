@@ -197,7 +197,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>archimulator.guest.GuestStartup</mainClass>
+                            <mainClass>archimulator.client.GuestStartup</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

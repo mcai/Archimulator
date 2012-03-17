@@ -18,10 +18,10 @@
  ******************************************************************************/
 package archimulator.sim.core;
 
-import archimulator.model.capability.*;
+import archimulator.sim.base.experiment.capability.*;
 import archimulator.sim.core.bpred.BranchPredictorConfig;
 import archimulator.sim.core.bpred.PerfectBranchPredictorConfig;
-import archimulator.model.capability.KernelCapability;
+import archimulator.sim.base.experiment.capability.KernelCapability;
 import archimulator.sim.uncore.MemoryHierarchyConfig;
 import archimulator.sim.uncore.tlb.TranslationLookasideBufferConfig;
 

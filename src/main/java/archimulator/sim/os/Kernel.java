@@ -18,11 +18,11 @@
  ******************************************************************************/
 package archimulator.sim.os;
 
-import archimulator.model.capability.ExperimentCapabilityFactory;
-import archimulator.model.capability.KernelCapability;
-import archimulator.model.simulation.BasicSimulationObject;
-import archimulator.model.simulation.Simulation;
-import archimulator.model.simulation.SimulationObject;
+import archimulator.sim.base.experiment.capability.ExperimentCapabilityFactory;
+import archimulator.sim.base.experiment.capability.KernelCapability;
+import archimulator.sim.base.simulation.BasicSimulationObject;
+import archimulator.sim.base.simulation.Simulation;
+import archimulator.sim.base.simulation.SimulationObject;
 import archimulator.sim.isa.ArchitecturalRegisterFile;
 import archimulator.sim.isa.StaticInstruction;
 import archimulator.sim.os.event.SystemEvent;

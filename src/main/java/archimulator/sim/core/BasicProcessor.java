@@ -18,11 +18,11 @@
  ******************************************************************************/
 package archimulator.sim.core;
 
-import archimulator.model.capability.ExperimentCapabilityFactory;
-import archimulator.model.simulation.BasicSimulationObject;
-import archimulator.model.simulation.Logger;
-import archimulator.model.capability.ProcessorCapability;
-import archimulator.model.event.ResetStatEvent;
+import archimulator.sim.base.experiment.capability.ExperimentCapabilityFactory;
+import archimulator.sim.base.simulation.BasicSimulationObject;
+import archimulator.sim.base.simulation.Logger;
+import archimulator.sim.base.experiment.capability.ProcessorCapability;
+import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.os.Context;
 import archimulator.sim.os.ContextKilledEvent;
 import archimulator.sim.os.ContextState;

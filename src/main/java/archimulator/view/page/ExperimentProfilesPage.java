@@ -18,8 +18,8 @@
  ******************************************************************************/
 package archimulator.view.page;
 
-import archimulator.model.experiment.profile.ExperimentProfile;
-import archimulator.model.experiment.profile.ProcessorProfile;
+import archimulator.sim.base.experiment.profile.ExperimentProfile;
+import archimulator.sim.base.experiment.profile.ProcessorProfile;
 import archimulator.service.ArchimulatorService;
 import archimulator.service.ArchimulatorServletContextListener;
 import org.zkoss.zk.ui.Executions;

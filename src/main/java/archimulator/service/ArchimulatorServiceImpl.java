@@ -18,11 +18,11 @@
  ******************************************************************************/
 package archimulator.service;
 
-import archimulator.model.experiment.profile.ExperimentProfile;
-import archimulator.model.experiment.profile.ExperimentProfileState;
-import archimulator.model.experiment.profile.ProcessorProfile;
-import archimulator.model.simulation.SimulatedProgram;
-import archimulator.model.user.User;
+import archimulator.sim.base.experiment.profile.ExperimentProfile;
+import archimulator.sim.base.experiment.profile.ExperimentProfileState;
+import archimulator.sim.base.experiment.profile.ProcessorProfile;
+import archimulator.sim.base.simulation.SimulatedProgram;
+import archimulator.sim.base.user.User;
 import archimulator.util.im.channel.CloudMessageChannel;
 import archimulator.util.im.event.request.PauseExperimentRequestEvent;
 import archimulator.util.im.event.request.ResumeExperimentRequestEvent;

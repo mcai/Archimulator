@@ -1,4 +1,4 @@
 Manifest-Version: 1.0
 Class-Path: jna.jar
-Main-Class: archimulator.guest.GuestStartup
+Main-Class: archimulator.client.GuestStartup
 

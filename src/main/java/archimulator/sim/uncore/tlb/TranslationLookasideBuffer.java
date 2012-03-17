@@ -18,9 +18,9 @@
  ******************************************************************************/
 package archimulator.sim.uncore.tlb;
 
-import archimulator.model.simulation.SimulationObject;
-import archimulator.model.event.DumpStatEvent;
-import archimulator.model.event.ResetStatEvent;
+import archimulator.sim.base.simulation.SimulationObject;
+import archimulator.sim.base.event.DumpStatEvent;
+import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.Cache;

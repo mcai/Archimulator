@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.os;
 
-import archimulator.model.simulation.Logger;
+import archimulator.sim.base.simulation.Logger;
 import archimulator.sim.isa.ArchitecturalRegisterFile;
 import archimulator.sim.os.event.*;
 import archimulator.sim.os.signal.SignalMask;

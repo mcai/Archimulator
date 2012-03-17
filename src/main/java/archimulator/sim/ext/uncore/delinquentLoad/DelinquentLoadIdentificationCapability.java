@@ -18,9 +18,9 @@
  ******************************************************************************/
 package archimulator.sim.ext.uncore.delinquentLoad;
 
-import archimulator.model.capability.ProcessorCapability;
-import archimulator.model.event.DumpStatEvent;
-import archimulator.model.event.PollStatsEvent;
+import archimulator.sim.base.experiment.capability.ProcessorCapability;
+import archimulator.sim.base.event.DumpStatEvent;
+import archimulator.sim.base.event.PollStatsEvent;
 import archimulator.sim.core.Core;
 import archimulator.sim.core.Processor;
 import archimulator.sim.core.Thread;
