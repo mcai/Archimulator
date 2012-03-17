@@ -53,5 +53,3 @@ TODOs:
        b. bad HT requests -> Pause HT, resume HT in the next phase (128K insts in MT?)
        c. good HT requests -> increase/decrease confidence counter value
 
-    * HT coverage calculation: is it correct?
-
