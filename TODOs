@@ -27,3 +27,10 @@ TODOs:
        b. bad HT requests -> Pause HT, resume HT in the next phase (128K insts in MT?)
        c. good HT requests -> increase/decrease confidence counter value
 
+Paper hints:
+    1. from "Scheduling Threads for Constructive Cache Sharing on CMPs":
+       In contrast, our work focuses on promoting constructive cache interference by taking advantage
+       of the potential overlap in memory references among cooperating threads that share an address space, particularly
+       multithreaded programs, for the reasons cited above.
+
+
