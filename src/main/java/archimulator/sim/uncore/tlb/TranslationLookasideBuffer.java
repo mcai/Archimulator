@@ -27,7 +27,7 @@ import archimulator.sim.uncore.cache.Cache;
 import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.cache.EvictableCache;
-import archimulator.sim.uncore.cache.eviction.LeastRecentlyUsedEvictionPolicy;
+import archimulator.sim.uncore.cache.eviction.LRUPolicy;
 import archimulator.util.action.Action;
 import archimulator.util.action.Action1;
 import archimulator.util.action.Function3;
@@ -48,7 +48,7 @@ public class TranslationLookasideBuffer implements Serializable {
         this.name = name;
         this.config = config;
 
-        this.cache = new EvictableCache<Boolean, CacheLine<Boolean>>(parent, name, config.getGeometry(), LeastRecentlyUsedEvictionPolicy.class, new Function3<Cache<?, ?>, Integer, Integer, CacheLine<Boolean>>() {
+        this.cache = new EvictableCache<Boolean, CacheLine<Boolean>>(parent, name, config.getGeometry(), LRUPolicy.class, new Function3<Cache<?, ?>, Integer, Integer, CacheLine<Boolean>>() {
             public CacheLine<Boolean> apply(Cache<?, ?> cache, Integer set, Integer way) {
                 return new CacheLine<Boolean>(cache, set, way, false);
             }

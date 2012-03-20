@@ -26,20 +26,20 @@ import archimulator.sim.uncore.cache.CacheHit;
 import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.cache.CacheMiss;
 import archimulator.sim.uncore.cache.EvictableCache;
-import archimulator.sim.uncore.cache.eviction.LeastRecentlyUsedEvictionPolicy;
+import archimulator.sim.uncore.cache.eviction.LRUPolicy;
 import archimulator.util.action.Action1;
 
 import java.io.Serializable;
 
-public class TestEvictionPolicy1<StateT extends Serializable, LineT extends CacheLine<StateT>> extends LeastRecentlyUsedEvictionPolicy<StateT, LineT> {
+public class TestPolicy1<StateT extends Serializable, LineT extends CacheLine<StateT>> extends LRUPolicy<StateT, LineT> {
     private Processor processor;
 
-    public TestEvictionPolicy1(EvictableCache<StateT, LineT> cache) {
+    public TestPolicy1(EvictableCache<StateT, LineT> cache) {
         super(cache);
 
         cache.getBlockingEventDispatcher().addListener(ProcessorInitializedEvent.class, new Action1<ProcessorInitializedEvent>() {
             public void apply(ProcessorInitializedEvent event) {
-                TestEvictionPolicy1.this.processor = event.getProcessor();
+                TestPolicy1.this.processor = event.getProcessor();
             }
         });
     }

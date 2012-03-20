@@ -29,13 +29,13 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReuseDistanceMonitor {
+public class RDMonitor {
     private Predictor<Integer> predictor;
-    private ReuseDistanceSampler sampler;
+    private RDSampler sampler;
 
-    public ReuseDistanceMonitor(Cache<?, ?> cache, Quantizer quantizerReuseDistance) {
-        this.predictor = new CacheBasedPredictor<Integer>(cache, cache.getName() + ".reuseDistancePredictor", new CacheGeometry(16 * 16 * cache.getGeometry().getLineSize(), 16, cache.getGeometry().getLineSize()), 0, 3);
-        this.sampler = new ReuseDistanceSampler(4096, (quantizerReuseDistance.getMaxValue() + 1) * quantizerReuseDistance.getQuantum(), quantizerReuseDistance);
+    public RDMonitor(Cache<?, ?> cache, Quantizer quantizerRd) {
+        this.predictor = new CacheBasedPredictor<Integer>(cache, cache.getName() + ".rdPredictor", new CacheGeometry(16 * 16 * cache.getGeometry().getLineSize(), 16, cache.getGeometry().getLineSize()), 0, 3);
+        this.sampler = new RDSampler(4096, (quantizerRd.getMaxValue() + 1) * quantizerRd.getQuantum(), quantizerRd);
     }
 
     public void update(int pc, int address, CacheAccessType accessType) {
@@ -46,42 +46,42 @@ public class ReuseDistanceMonitor {
         return this.predictor.predict(pc, 0);
     }
 
-    private class ReuseDistanceSampler implements Serializable {
-        private List<ReuseDistanceSamplerEntry> entries;
+    private class RDSampler implements Serializable {
+        private List<RDSamplerEntry> entries;
 
         private int samplingPeriod;
         private int samplingCounter;
 
-        private Quantizer quantizerReuseDistance;
+        private Quantizer quantizerRd;
 
-        private ReuseDistanceSampler(int samplingPeriod, int maxReuseDistance, Quantizer quantizerReuseDistance) {
+        private RDSampler(int samplingPeriod, int maxReuseDistance, Quantizer quantizerRd) {
             this.samplingPeriod = samplingPeriod;
 
-            this.quantizerReuseDistance = quantizerReuseDistance;
+            this.quantizerRd = quantizerRd;
 
             this.samplingCounter = 0;
 
-            this.entries = new ArrayList<ReuseDistanceSamplerEntry>();
+            this.entries = new ArrayList<RDSamplerEntry>();
             for (int i = 0; i < maxReuseDistance / this.samplingPeriod; i++) {
-                this.entries.add(new ReuseDistanceSamplerEntry());
+                this.entries.add(new RDSamplerEntry());
             }
         }
 
         private void update(int pc, int address, CacheAccessType accessType) {
             for (int i = 0; i < this.entries.size(); i++) {
-                ReuseDistanceSamplerEntry entry = this.entries.get(i);
+                RDSamplerEntry entry = this.entries.get(i);
                 if (entry.valid && entry.address == address) {
                     entry.valid = false;
                     int reuseDistance = (i + (accessType.isDownwardWrite() ? 8 : 0)) * this.samplingPeriod;
-                    predictor.update(entry.pc, this.quantizerReuseDistance.quantize(reuseDistance));
+                    predictor.update(entry.pc, this.quantizerRd.quantize(reuseDistance));
                     break;
                 }
             }
 
             if (this.samplingCounter == 0) {
-                ReuseDistanceSamplerEntry victimEntry = this.entries.get(this.entries.size() - 1);
+                RDSamplerEntry victimEntry = this.entries.get(this.entries.size() - 1);
                 if (victimEntry.valid) {
-                    predictor.update(victimEntry.pc, this.quantizerReuseDistance.getMaxValue());
+                    predictor.update(victimEntry.pc, this.quantizerRd.getMaxValue());
                 }
 
                 this.entries.remove(victimEntry);
@@ -97,7 +97,7 @@ public class ReuseDistanceMonitor {
             }
         }
 
-        private class ReuseDistanceSamplerEntry implements Serializable {
+        private class RDSamplerEntry implements Serializable {
             private boolean valid;
             private int pc;
             private int address;

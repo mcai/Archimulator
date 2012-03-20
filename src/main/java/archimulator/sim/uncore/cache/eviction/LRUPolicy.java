@@ -16,15 +16,29 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.ext.uncore.cache.eviction;
+package archimulator.sim.uncore.cache.eviction;
 
-import archimulator.sim.uncore.cache.CacheLine;
-import archimulator.sim.uncore.cache.EvictableCache;
+import archimulator.sim.uncore.cache.*;
 
 import java.io.Serializable;
 
-public class ReuseDistancePredictionWithSelectiveCachingEvictionPolicy<StateT extends Serializable, LineT extends CacheLine<StateT>> extends ReuseDistancePredictionEvictionPolicy<StateT, LineT> {
-    public ReuseDistancePredictionWithSelectiveCachingEvictionPolicy(EvictableCache<StateT, LineT> stateTLineTEvictableCache) {
-        super(stateTLineTEvictableCache, true);
+public class LRUPolicy<StateT extends Serializable, LineT extends CacheLine<StateT>> extends StackBasedEvictionPolicy<StateT, LineT> {
+    public LRUPolicy(EvictableCache<StateT, LineT> cache) {
+        super(cache);
+    }
+
+    @Override
+    public CacheMiss<StateT, LineT> handleReplacement(CacheReference reference) {
+        return new CacheMiss<StateT, LineT>(this.getCache(), reference, this.getLRU(reference.getSet()));
+    }
+
+    @Override
+    public void handlePromotionOnHit(CacheHit<StateT, LineT> hit) {
+        this.setMRU(hit.getReference().getSet(), hit.getWay());
+    }
+
+    @Override
+    public void handleInsertionOnMiss(CacheMiss<StateT, LineT> miss) {
+        this.setMRU(miss.getReference().getSet(), miss.getWay());
     }
 }

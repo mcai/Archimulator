@@ -22,16 +22,16 @@ import archimulator.sim.core.BasicThread;
 import archimulator.sim.ext.uncore.cache.prediction.CacheBasedPredictor;
 import archimulator.sim.ext.uncore.cache.prediction.Predictor;
 import archimulator.sim.uncore.cache.*;
-import archimulator.sim.uncore.cache.eviction.LeastRecentlyUsedEvictionPolicy;
+import archimulator.sim.uncore.cache.eviction.LRUPolicy;
 import archimulator.util.action.Function3;
 
 import java.io.Serializable;
 
-public class TestEvictionPolicy2<StateT extends Serializable, LineT extends CacheLine<StateT>> extends LeastRecentlyUsedEvictionPolicy<StateT, LineT> {
+public class TestPolicy2<StateT extends Serializable, LineT extends CacheLine<StateT>> extends LRUPolicy<StateT, LineT> {
     private MirrorCache mirrorCache;
     private Predictor<Boolean> replacementOwnershipPredictor;
 
-    public TestEvictionPolicy2(EvictableCache<StateT, LineT> cache) {
+    public TestPolicy2(EvictableCache<StateT, LineT> cache) {
         super(cache);
 
         this.mirrorCache = new MirrorCache();

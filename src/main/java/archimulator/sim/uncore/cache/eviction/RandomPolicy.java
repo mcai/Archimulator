@@ -16,25 +16,32 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.ext.uncore.cache.eviction;
+package archimulator.sim.uncore.cache.eviction;
 
-import archimulator.sim.uncore.cache.CacheLine;
-import archimulator.sim.uncore.cache.EvictableCache;
+import archimulator.sim.uncore.cache.*;
 
 import java.io.Serializable;
+import java.util.Random;
 
-public class HtRequestAwareLeastRecentlyUsedWithTreeSetBasedVictimTrackingEvictionPolicy<StateT extends Serializable, LineT extends CacheLine<StateT>> extends HtRequestAwareLeastRecentlyUsedEvictionPolicy<StateT, LineT> {
-    private TreeSetBasedAddressSetFilter filter;
+public class RandomPolicy<StateT extends Serializable, LineT extends CacheLine<StateT>> extends EvictionPolicy<StateT, LineT> {
+    private Random random;
 
-    public HtRequestAwareLeastRecentlyUsedWithTreeSetBasedVictimTrackingEvictionPolicy(EvictableCache<StateT, LineT> cache) {
+    public RandomPolicy(EvictableCache<StateT, LineT> cache) {
         super(cache);
+
+        this.random = new Random(13);
     }
 
     @Override
-    public AddressSetFilter getCachePollutionFilter() {
-        if (filter == null) {
-            filter = new TreeSetBasedAddressSetFilter(this.getCache());
-        }
-        return filter;
+    public CacheMiss<StateT, LineT> handleReplacement(CacheReference reference) {
+        return new CacheMiss<StateT, LineT>(this.getCache(), reference, this.random.nextInt(this.getCache().getAssociativity()));
+    }
+
+    @Override
+    public void handlePromotionOnHit(CacheHit<StateT, LineT> hit) {
+    }
+
+    @Override
+    public void handleInsertionOnMiss(CacheMiss<StateT, LineT> miss) {
     }
 }

@@ -16,28 +16,15 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.ext.uncore.cache.eviction;
+package archimulator.sim.ext.uncore.cache.eviction.rd;
 
-import archimulator.sim.uncore.cache.*;
-import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
+import archimulator.sim.uncore.cache.CacheLine;
+import archimulator.sim.uncore.cache.EvictableCache;
 
 import java.io.Serializable;
 
-public class L2BypassingEvictionPolicy<StateT extends Serializable, LineT extends CacheLine<StateT>> extends EvictionPolicy<StateT, LineT> {
-    public L2BypassingEvictionPolicy(EvictableCache<StateT, LineT> cache) {
-        super(cache);
-    }
-
-    @Override
-    public CacheMiss<StateT, LineT> handleReplacement(CacheReference reference) {
-        return new CacheMiss<StateT, LineT>(this.getCache(), reference, -1);
-    }
-
-    @Override
-    public void handlePromotionOnHit(CacheHit<StateT, LineT> hit) {
-    }
-
-    @Override
-    public void handleInsertionOnMiss(CacheMiss<StateT, LineT> miss) {
+public class RDPredictionWithoutSelectiveCachingPolicy<StateT extends Serializable, LineT extends CacheLine<StateT>> extends RDPredictionEvictionPolicy<StateT, LineT> {
+    public RDPredictionWithoutSelectiveCachingPolicy(EvictableCache<StateT, LineT> stateTLineTEvictableCache) {
+        super(stateTLineTEvictableCache, false);
     }
 }

@@ -23,7 +23,7 @@ import archimulator.sim.base.experiment.profile.ProcessorProfile;
 import archimulator.sim.base.simulation.SimulatedProgram;
 import archimulator.service.ArchimulatorService;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
-import archimulator.sim.uncore.cache.eviction.LeastRecentlyUsedEvictionPolicy;
+import archimulator.sim.uncore.cache.eviction.LRUPolicy;
 import archimulator.util.DateHelper;
 import com.caucho.hessian.client.HessianProxyFactory;
 
@@ -146,7 +146,7 @@ public class ManagementStartup {
         l2Associativities.add(8);
         l2Associativities.add(16);
 
-        Class<? extends EvictionPolicy> l2EvictionPolicyClz = LeastRecentlyUsedEvictionPolicy.class;
+        Class<? extends EvictionPolicy> l2EvictionPolicyClz = LRUPolicy.class;
         String l2EvictionPolicyClzName = "LRU";
 
         for (int l2SizeInKByte : l2SizeInKBytes) {

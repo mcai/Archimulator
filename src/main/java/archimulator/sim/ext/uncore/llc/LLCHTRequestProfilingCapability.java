@@ -24,7 +24,7 @@ import archimulator.sim.base.event.*;
 import archimulator.sim.core.BasicThread;
 import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.cache.*;
-import archimulator.sim.uncore.cache.eviction.LeastRecentlyUsedEvictionPolicy;
+import archimulator.sim.uncore.cache.eviction.LRUPolicy;
 import archimulator.sim.uncore.coherence.CoherentCache;
 import archimulator.sim.uncore.coherence.MESIState;
 import archimulator.sim.uncore.coherence.event.CoherentCacheNonblockingRequestHitToTransientTagEvent;
@@ -49,6 +49,7 @@ import java.util.Map;
 //	2. MT miss + HT hit + VT miss => MT to HT; Good HT, removeLRU
 //	3. MT miss + HT hit + VT hit => MT to HT; VT.setLRU, removeLRU
 //	4. MT hit + HT miss + VT hit => ; VT.setLRU
+//TODO: to be resurrected; hints: to be merged with HTAwareLRUPolicy!!!
 public class LLCHTRequestProfilingCapability implements SimulationCapability {
     private CoherentCache<MESIState>.LockableCache llc;
 
@@ -81,7 +82,7 @@ public class LLCHTRequestProfilingCapability implements SimulationCapability {
             }
         }
 
-        this.htRequestVictimCache = new EvictableCache<HTRequestVictimCacheLineState, CacheLine<HTRequestVictimCacheLineState>>(this.llc, "", this.llc.getGeometry(), LeastRecentlyUsedEvictionPolicy.class, new Function3<Cache<?, ?>, Integer, Integer, CacheLine<HTRequestVictimCacheLineState>>() {
+        this.htRequestVictimCache = new EvictableCache<HTRequestVictimCacheLineState, CacheLine<HTRequestVictimCacheLineState>>(this.llc, "", this.llc.getGeometry(), LRUPolicy.class, new Function3<Cache<?, ?>, Integer, Integer, CacheLine<HTRequestVictimCacheLineState>>() {
             public CacheLine<HTRequestVictimCacheLineState> apply(Cache<?, ?> cache, Integer set, Integer way) {
                 return new CacheLine<HTRequestVictimCacheLineState>(cache, set, way, HTRequestVictimCacheLineState.INVALID);
             }
@@ -355,7 +356,7 @@ public class LLCHTRequestProfilingCapability implements SimulationCapability {
     }
 
     private void removeLru(int set) {
-        LeastRecentlyUsedEvictionPolicy<HTRequestVictimCacheLineState, CacheLine<HTRequestVictimCacheLineState>> lru = this.getLruPolicyForHtRequestVictimCache();
+        LRUPolicy<HTRequestVictimCacheLineState, CacheLine<HTRequestVictimCacheLineState>> lru = this.getLruPolicyForHtRequestVictimCache();
 
         for (int i = this.llc.getAssociativity() - 1; i >= 0; i--) {
             int way = lru.getWayInStackPosition(set, i);
@@ -369,8 +370,8 @@ public class LLCHTRequestProfilingCapability implements SimulationCapability {
         throw new IllegalArgumentException();
     }
 
-    private LeastRecentlyUsedEvictionPolicy<HTRequestVictimCacheLineState, CacheLine<HTRequestVictimCacheLineState>> getLruPolicyForHtRequestVictimCache() {
-        return (LeastRecentlyUsedEvictionPolicy<HTRequestVictimCacheLineState, CacheLine<HTRequestVictimCacheLineState>>) this.htRequestVictimCache.getEvictionPolicy();
+    private LRUPolicy<HTRequestVictimCacheLineState, CacheLine<HTRequestVictimCacheLineState>> getLruPolicyForHtRequestVictimCache() {
+        return (LRUPolicy<HTRequestVictimCacheLineState, CacheLine<HTRequestVictimCacheLineState>>) this.htRequestVictimCache.getEvictionPolicy();
     }
 
     private CacheMiss<HTRequestVictimCacheLineState, CacheLine<HTRequestVictimCacheLineState>> findInvalidLineAndNewMiss(int address, CacheAccessType accessType, int set) {

@@ -16,8 +16,9 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.ext.uncore.cache.eviction;
+package archimulator.sim.ext.uncore.cache.eviction.rd;
 
+import archimulator.sim.ext.uncore.cache.eviction.RDMonitor;
 import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.cache.*;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
@@ -26,18 +27,18 @@ import archimulator.util.math.Quantizer;
 
 import java.io.Serializable;
 
-public abstract class AbstractReuseDistancePredictionEvictionPolicy<StateT extends Serializable, LineT extends CacheLine<StateT>> extends EvictionPolicy<StateT, LineT> {
+public abstract class AbstractRDPredictionEvictionPolicy<StateT extends Serializable, LineT extends CacheLine<StateT>> extends EvictionPolicy<StateT, LineT> {
     protected MirrorCache mirrorCache;
 
     protected Quantizer quantizerReuseDistance;
     protected Quantizer quantizerTimestamp;
 
-    protected ReuseDistanceMonitor reuseDistanceMonitor;
+    protected RDMonitor rdMonitor;
 
     protected int accessesCounterLow;
     protected int accessesCounterHigh;
 
-    public AbstractReuseDistancePredictionEvictionPolicy(EvictableCache<StateT, LineT> cache) {
+    public AbstractRDPredictionEvictionPolicy(EvictableCache<StateT, LineT> cache) {
         super(cache);
 
         this.mirrorCache = new MirrorCache();
@@ -45,20 +46,20 @@ public abstract class AbstractReuseDistancePredictionEvictionPolicy<StateT exten
         this.quantizerTimestamp = new Quantizer(7, 16384);
         this.quantizerReuseDistance = new Quantizer(15, 8192);
 
-        this.reuseDistanceMonitor = new ReuseDistanceMonitor(this.getCache(), this.quantizerReuseDistance);
+        this.rdMonitor = new RDMonitor(this.getCache(), this.quantizerReuseDistance);
 
         this.accessesCounterLow = 0;
         this.accessesCounterHigh = 1;
     }
 
-    protected CacheMiss<StateT, LineT> handleReplacementBasedOnReuseDistancePrediction(CacheReference reference, boolean selectiveCaching) {
+    protected CacheMiss<StateT, LineT> handleReplacementBasedOnRDPrediction(CacheReference reference, boolean selectiveCaching) {
         int victimTime = 0;
         int victimWay = 0;
 
         int newPredictedReuseDistance = 0;
 
         if (selectiveCaching) {
-            newPredictedReuseDistance = this.reuseDistanceMonitor.lookup(reference.getAccess().getVirtualPc());
+            newPredictedReuseDistance = this.rdMonitor.lookup(reference.getAccess().getVirtualPc());
         }
 
         if (newPredictedReuseDistance == this.quantizerReuseDistance.getMaxValue()) {
@@ -99,7 +100,7 @@ public abstract class AbstractReuseDistancePredictionEvictionPolicy<StateT exten
             return false;
         }
 
-        int predictedRequesterReuseDistance = this.reuseDistanceMonitor.lookup(miss.getReference().getAccess().getVirtualPc()); //TODO: thread awareness: threadId-pc pair??!!
+        int predictedRequesterReuseDistance = this.rdMonitor.lookup(miss.getReference().getAccess().getVirtualPc()); //TODO: thread awareness: threadId-pc pair??!!
         int predictedVictimReuseDistance = this.mirrorCache.getLine(miss.getReference().getSet(), miss.getWay()).predictedReuseDistance;
 
         return predictedRequesterReuseDistance > predictedVictimReuseDistance;
@@ -121,7 +122,7 @@ public abstract class AbstractReuseDistancePredictionEvictionPolicy<StateT exten
         MirrorCacheLine mirrorLine = this.mirrorCache.getLine(set, way);
         if (!accessType.isWriteback()) {
             mirrorLine.timeStamp = this.accessesCounterHigh;
-            mirrorLine.predictedReuseDistance = accessType.isDownwardReadOrWrite() ? this.reuseDistanceMonitor.lookup(pc) : 0;
+            mirrorLine.predictedReuseDistance = accessType.isDownwardReadOrWrite() ? this.rdMonitor.lookup(pc) : 0;
         } else {
             mirrorLine.timeStamp = 0;
             mirrorLine.predictedReuseDistance = this.quantizerReuseDistance.getMaxValue();
@@ -138,7 +139,7 @@ public abstract class AbstractReuseDistancePredictionEvictionPolicy<StateT exten
                     this.accessesCounterHigh = 0;
                 }
             }
-            this.reuseDistanceMonitor.update(pc, address, accessType);
+            this.rdMonitor.update(pc, address, accessType);
         }
     }
 
@@ -153,7 +154,7 @@ public abstract class AbstractReuseDistancePredictionEvictionPolicy<StateT exten
 
     protected class MirrorCache extends Cache<Boolean, MirrorCacheLine> {
         private MirrorCache() {
-            super(getCache(), getCache().getName() + ".reuseDistancePredictionEvictionPolicy.mirrorCache", getCache().getGeometry(), new Function3<Cache<?, ?>, Integer, Integer, MirrorCacheLine>() {
+            super(getCache(), getCache().getName() + ".rdPredictionEvictionPolicy.mirrorCache", getCache().getGeometry(), new Function3<Cache<?, ?>, Integer, Integer, MirrorCacheLine>() {
                 public MirrorCacheLine apply(Cache<?, ?> cache, Integer set, Integer way) {
                     return new MirrorCacheLine(cache, set, way);
                 }

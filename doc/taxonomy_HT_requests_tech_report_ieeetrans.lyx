@@ -690,7 +690,7 @@ Hardware Support
 \end_layout
 
 \begin_layout Subsubsection
-Simulation Environment
+Experimental Setup
 \end_layout
 
 \begin_layout Standard
@@ -703,19 +703,76 @@ We use an in-house multicore architectural simulator named Archimulator
  
 \end_layout
 
+\begin_layout Subsubsection
+Target CMP Architecture
+\end_layout
+
 \begin_layout Standard
-As shown in Tab.
+As shown in Fig.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Simulated-CMP-Architecture"
+
+\end_inset
+
+, the simulated target CMP architecture has two cores where each core is
+ a two-way SMT with its own private L1 caches (32KB 8-way data caches and
+ 32KB 4-way instruction caches).
+ Both cores share a 4MB 8-way L2 cacche.
+ MESI coherence is maintained between L1 caches.
+ Detailed parameters are shown in Tab.
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:Baseline-Hardware-Configurations"
 
 \end_inset
 
-, we simulate a target machine with 4-wide out-of-order CMP which has two
- cores where each core can support two hardware threads.
- It has shared 4MB 8-way set-associative L2, private 32KB 8-way set-associative
- L1 data caches and 32KB 4-way set-associative L1 instruction caches, MESI
- coherence between L1s, switch based point-to-point on-chip interconnect.
+.
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename /home/itecgo/Archimulator/doc/res/cacheconfig.pdf
+	scale 68
+	BoundingBox 30bp 475bp 330bp 760bp
+	clip
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Simulated CMP Architecture
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Simulated-CMP-Architecture"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1794,15 +1851,8 @@ Software Context to Hardware Thread Mapping
 \end_layout
 
 \begin_layout Standard
-As shown in Fig.
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:Simulated-Multicore-Architecture"
-
-\end_inset
-
-, for a typical Pthreads based HT program, there are three threads when
- running: MT, HT and the Pthreads manager thread.
+For a typical Pthreads based HT program, there are three threads when running:
+ MT, HT and the Pthreads manager thread.
  The Pthreads manager thread takes the role of spawning, pausing and resuming
  HT by passing signals to HT.
  Consider a simulated target multicore machine which has two cores where
@@ -1812,57 +1862,16 @@ ion, one hardware thread can only run at least one software context (or
  simply called thread).
  Therefore, the typical software context to hardware thread mappings can
  be: C0T0 -> MT, C0T1 -> Pthreads manager thread, C1T0 -> HT (C = core,
- T = thread).
+ T = thread), as shown in Fig.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Simulated-CMP-Architecture"
+
+\end_inset
+
+.
  We use this context mapping in the following discussions.
  
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status collapsed
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename res/cacheconfig.pdf
-	scale 68
-	BoundingBox 30bp 475bp 330bp 760bp
-	clip
-
-\end_inset
-
-
-\begin_inset VSpace defskip
-\end_inset
-
-
-\begin_inset Caption
-
-\begin_layout Plain Layout
-Simulated Multicore Architectures
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:Simulated-Multicore-Architecture"
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout Subsubsection
@@ -2209,23 +2218,23 @@ When servicing an incoming LLC request, either hit or miss, we should consider
 \end_layout
 
 \begin_layout Enumerate
-Victim hit, which indicates a good HT request.
+LLC miss and victim hit, which indicates a bad HT request.
  This happens when HT request evicts useful data.
 \end_layout
 
 \begin_layout Enumerate
-HT hit, which indicates a bad HT request.
+HT LLC hit, which indicates a good HT request.
  This happens when HT requested data is hit by MT request before evicted
  data.
 \end_layout
 
 \begin_layout Enumerate
-HT and Victim hit.
+HT LLC hit and victim hit.
  This happens when useful data is evicted and brought back in by HT request.
 \end_layout
 
 \begin_layout Enumerate
-MT and Victim hit.
+MT LLC hit and victim hit.
  This happens when useful data is evicted and brought back in by HT request
  and hit to by MT request.
 \end_layout

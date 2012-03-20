@@ -16,25 +16,21 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.cache.eviction;
+package archimulator.sim.ext.uncore.cache.eviction;
 
 import archimulator.sim.uncore.cache.*;
+import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
 
 import java.io.Serializable;
-import java.util.Random;
 
-public class RandomEvictionPolicy<StateT extends Serializable, LineT extends CacheLine<StateT>> extends EvictionPolicy<StateT, LineT> {
-    private Random random;
-
-    public RandomEvictionPolicy(EvictableCache<StateT, LineT> cache) {
+public class L2BypassingPolicy<StateT extends Serializable, LineT extends CacheLine<StateT>> extends EvictionPolicy<StateT, LineT> {
+    public L2BypassingPolicy(EvictableCache<StateT, LineT> cache) {
         super(cache);
-
-        this.random = new Random(13);
     }
 
     @Override
     public CacheMiss<StateT, LineT> handleReplacement(CacheReference reference) {
-        return new CacheMiss<StateT, LineT>(this.getCache(), reference, this.random.nextInt(this.getCache().getAssociativity()));
+        return new CacheMiss<StateT, LineT>(this.getCache(), reference, -1);
     }
 
     @Override

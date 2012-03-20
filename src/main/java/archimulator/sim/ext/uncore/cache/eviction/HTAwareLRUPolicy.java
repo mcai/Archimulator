@@ -26,7 +26,7 @@ import archimulator.sim.uncore.cache.Cache;
 import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.cache.CacheMiss;
 import archimulator.sim.uncore.cache.EvictableCache;
-import archimulator.sim.uncore.cache.eviction.LeastRecentlyUsedEvictionPolicy;
+import archimulator.sim.uncore.cache.eviction.LRUPolicy;
 import archimulator.sim.uncore.coherence.MESIState;
 import archimulator.sim.uncore.coherence.event.CoherentCacheBeginCacheAccessEvent;
 import archimulator.sim.uncore.coherence.event.CoherentCacheNonblockingRequestHitToTransientTagEvent;
@@ -42,7 +42,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-public abstract class HtRequestAwareLeastRecentlyUsedEvictionPolicy<StateT extends Serializable, LineT extends CacheLine<StateT>> extends LeastRecentlyUsedEvictionPolicy<StateT, LineT> {
+//TODO: to be resurrected; hints: to be merged with LLCHTRequestProfilingCapability!!!
+public abstract class HTAwareLRUPolicy<StateT extends Serializable, LineT extends CacheLine<StateT>> extends LRUPolicy<StateT, LineT> {
     private MirrorCache mirrorCache;
 
     private int evictedMtLinesPerInterval;
@@ -58,7 +59,7 @@ public abstract class HtRequestAwareLeastRecentlyUsedEvictionPolicy<StateT exten
 
     private QuntizedHtRequestCachePollutionForEvictionPolicy quntizedHtRequestCachePollutionForEvictionPolicy;
 
-    public HtRequestAwareLeastRecentlyUsedEvictionPolicy(EvictableCache<StateT, LineT> cache) {
+    public HTAwareLRUPolicy(EvictableCache<StateT, LineT> cache) {
         super(cache);
 
         this.mirrorCache = new MirrorCache();
@@ -134,9 +135,9 @@ public abstract class HtRequestAwareLeastRecentlyUsedEvictionPolicy<StateT exten
 
         cache.getBlockingEventDispatcher().addListener(ResetStatEvent.class, new Action1<ResetStatEvent>() {
             public void apply(ResetStatEvent event) {
-                HtRequestAwareLeastRecentlyUsedEvictionPolicy.this.totalHtRequests.reset();
-                HtRequestAwareLeastRecentlyUsedEvictionPolicy.this.usedHtRequests.reset();
-                HtRequestAwareLeastRecentlyUsedEvictionPolicy.this.lateHtRequests.reset();
+                HTAwareLRUPolicy.this.totalHtRequests.reset();
+                HTAwareLRUPolicy.this.usedHtRequests.reset();
+                HTAwareLRUPolicy.this.lateHtRequests.reset();
             }
         });
 
@@ -297,20 +298,20 @@ public abstract class HtRequestAwareLeastRecentlyUsedEvictionPolicy<StateT exten
     }
 
     private void dumpStats(Map<String, Object> stats) {
-        stats.put(this.getCache().getName() + ".htRequestAwareLeastRecentlyUsedEvictionPolicy.constants.evictedMtLinesPerInterval", String.valueOf(this.evictedMtLinesPerInterval));
+        stats.put(this.getCache().getName() + ".htAwareLRUPolicy.constants.evictedMtLinesPerInterval", String.valueOf(this.evictedMtLinesPerInterval));
 
-        stats.put(this.getCache().getName() + ".htRequestAwareLeastRecentlyUsedEvictionPolicy.cachePollutionFilter", this.getCachePollutionFilter().toString());
+        stats.put(this.getCache().getName() + ".htAwareLRUPolicy.cachePollutionFilter", this.getCachePollutionFilter().toString());
 
-        stats.put(this.getCache().getName() + ".htRequestAwareLeastRecentlyUsedEvictionPolicy.intervals", String.valueOf(this.intervals));
-        stats.put(this.getCache().getName() + ".htRequestAwareLeastRecentlyUsedEvictionPolicy.currentInterval.evictedMtLines", String.valueOf(this.evictedMtLines));
+        stats.put(this.getCache().getName() + ".htAwareLRUPolicy.intervals", String.valueOf(this.intervals));
+        stats.put(this.getCache().getName() + ".htAwareLRUPolicy.currentInterval.evictedMtLines", String.valueOf(this.evictedMtLines));
 
-        stats.put(this.getCache().getName() + ".htRequestAwareLeastRecentlyUsedEvictionPolicy.currentInterval.totalHtRequests", String.valueOf(this.totalHtRequests));
-        stats.put(this.getCache().getName() + ".htRequestAwareLeastRecentlyUsedEvictionPolicy.currentInterval.usedHtRequests", String.valueOf(this.usedHtRequests));
-        stats.put(this.getCache().getName() + ".htRequestAwareLeastRecentlyUsedEvictionPolicy.currentInterval.lateHtRequests", String.valueOf(this.lateHtRequests));
-        stats.put(this.getCache().getName() + ".htRequestAwareLeastRecentlyUsedEvictionPolicy.currentInterval.htRequestInducedMtMisses", String.valueOf(this.htRequestInducedMtMisses));
-        stats.put(this.getCache().getName() + ".htRequestAwareLeastRecentlyUsedEvictionPolicy.currentInterval.totalMtMisses", String.valueOf(this.totalMtMisses));
+        stats.put(this.getCache().getName() + ".htAwareLRUPolicy.currentInterval.totalHtRequests", String.valueOf(this.totalHtRequests));
+        stats.put(this.getCache().getName() + ".htAwareLRUPolicy.currentInterval.usedHtRequests", String.valueOf(this.usedHtRequests));
+        stats.put(this.getCache().getName() + ".htAwareLRUPolicy.currentInterval.lateHtRequests", String.valueOf(this.lateHtRequests));
+        stats.put(this.getCache().getName() + ".htAwareLRUPolicy.currentInterval.htRequestInducedMtMisses", String.valueOf(this.htRequestInducedMtMisses));
+        stats.put(this.getCache().getName() + ".htAwareLRUPolicy.currentInterval.totalMtMisses", String.valueOf(this.totalMtMisses));
 
-        stats.put(this.getCache().getName() + ".htRequestAwareLeastRecentlyUsedEvictionPolicy.currentInterval.quntizedHtRequestCachePollutionForEvictionPolicy", String.valueOf(this.quntizedHtRequestCachePollutionForEvictionPolicy));
+        stats.put(this.getCache().getName() + ".htAwareLRUPolicy.currentInterval.quntizedHtRequestCachePollutionForEvictionPolicy", String.valueOf(this.quntizedHtRequestCachePollutionForEvictionPolicy));
     }
 
     private class MirrorCacheLine extends CacheLine<Boolean> {
@@ -323,7 +324,7 @@ public abstract class HtRequestAwareLeastRecentlyUsedEvictionPolicy<StateT exten
 
     private class MirrorCache extends Cache<Boolean, MirrorCacheLine> {
         private MirrorCache() {
-            super(getCache(), getCache().getName() + ".htRequestAwareLeastRecentlyUsedEvictionPolicy.mirrorCache", getCache().getGeometry(), new Function3<Cache<?, ?>, Integer, Integer, MirrorCacheLine>() {
+            super(getCache(), getCache().getName() + ".htAwareLRUPolicy.mirrorCache", getCache().getGeometry(), new Function3<Cache<?, ?>, Integer, Integer, MirrorCacheLine>() {
                 public MirrorCacheLine apply(Cache<?, ?> cache, Integer set, Integer way) {
                     return new MirrorCacheLine(cache, set, way);
                 }
@@ -391,7 +392,7 @@ public abstract class HtRequestAwareLeastRecentlyUsedEvictionPolicy<StateT exten
         }
     }
 
-    //TODO: for demonstration only, to be adpated for the HT scheme
+    //TODO: for demonstration only, to be adapted for the HT scheme
     private class HtAggressivenessCounter {
         private SaturatingCounter aggressiveness;
 

@@ -23,17 +23,17 @@ import archimulator.sim.uncore.cache.EvictableCache;
 
 import java.io.Serializable;
 
-public class HtRequestAwareLeastRecentlyUsedWithXorBasedVictimTrackingEvictionPolicy<StateT extends Serializable, LineT extends CacheLine<StateT>> extends HtRequestAwareLeastRecentlyUsedEvictionPolicy<StateT, LineT> {
-    private XorBasedAddressSetFilter filter;
+public class HTAwareLRUWithTreeSetBasedVictimTrackingPolicy<StateT extends Serializable, LineT extends CacheLine<StateT>> extends HTAwareLRUPolicy<StateT, LineT> {
+    private TreeSetBasedAddressSetFilter filter;
 
-    public HtRequestAwareLeastRecentlyUsedWithXorBasedVictimTrackingEvictionPolicy(EvictableCache<StateT, LineT> cache) {
+    public HTAwareLRUWithTreeSetBasedVictimTrackingPolicy(EvictableCache<StateT, LineT> cache) {
         super(cache);
     }
 
     @Override
     public AddressSetFilter getCachePollutionFilter() {
         if (filter == null) {
-            filter = new XorBasedAddressSetFilter(this.getCache());
+            filter = new TreeSetBasedAddressSetFilter(this.getCache());
         }
         return filter;
     }

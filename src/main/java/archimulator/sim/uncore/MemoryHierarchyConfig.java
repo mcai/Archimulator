@@ -19,7 +19,7 @@
 package archimulator.sim.uncore;
 
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
-import archimulator.sim.uncore.cache.eviction.LeastRecentlyUsedEvictionPolicy;
+import archimulator.sim.uncore.cache.eviction.LRUPolicy;
 import archimulator.sim.uncore.coherence.FirstLevelCacheConfig;
 import archimulator.sim.uncore.coherence.LastLevelCacheConfig;
 import archimulator.sim.uncore.dram.FixedLatencyMainMemoryConfig;
@@ -57,8 +57,8 @@ public class MemoryHierarchyConfig implements Serializable {
     }
 
     public static MemoryHierarchyConfig createDefaultMemoryHierarchyConfig(int l2Size, int l2Associativity, Class<? extends EvictionPolicy> l2EvictionPolicyClz) {
-        FirstLevelCacheConfig l1ICacheConfig = new FirstLevelCacheConfig(32768, 4, LeastRecentlyUsedEvictionPolicy.class);
-        FirstLevelCacheConfig l1DCacheConfig = new FirstLevelCacheConfig(32768, 8, LeastRecentlyUsedEvictionPolicy.class);
+        FirstLevelCacheConfig l1ICacheConfig = new FirstLevelCacheConfig(32768, 4, LRUPolicy.class);
+        FirstLevelCacheConfig l1DCacheConfig = new FirstLevelCacheConfig(32768, 8, LRUPolicy.class);
 
         LastLevelCacheConfig l2CacheConfig = new LastLevelCacheConfig(l2Size, l2Associativity, l2EvictionPolicyClz);
 

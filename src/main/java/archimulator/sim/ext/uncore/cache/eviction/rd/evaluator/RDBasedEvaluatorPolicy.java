@@ -16,11 +16,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.ext.uncore.cache.eviction;
+package archimulator.sim.ext.uncore.cache.eviction.rd.evaluator;
 
 import archimulator.sim.base.event.DumpStatEvent;
 import archimulator.sim.base.event.PollStatsEvent;
 import archimulator.sim.base.event.ResetStatEvent;
+import archimulator.sim.ext.uncore.cache.eviction.rd.AbstractRDPredictionEvictionPolicy;
 import archimulator.sim.uncore.cache.*;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
 import archimulator.util.action.Action1;
@@ -28,14 +29,14 @@ import archimulator.util.action.Action1;
 import java.io.Serializable;
 import java.util.Map;
 
-public class ReuseDistanceBasedEvaluatorEvictionPolicy<StateT extends Serializable, LineT extends CacheLine<StateT>> extends AbstractReuseDistancePredictionEvictionPolicy<StateT, LineT> {
+public class RDBasedEvaluatorPolicy<StateT extends Serializable, LineT extends CacheLine<StateT>> extends AbstractRDPredictionEvictionPolicy<StateT, LineT> {
     private EvictionPolicy<StateT, LineT> evictionPolicy;
 
     private long totalReplacements;
     private long pollutingReplacements;
     private long nonOptimalReplacements;
 
-    public ReuseDistanceBasedEvaluatorEvictionPolicy(EvictableCache<StateT, LineT> cache, EvictionPolicy<StateT, LineT> evictionPolicy) {
+    public RDBasedEvaluatorPolicy(EvictableCache<StateT, LineT> cache, EvictionPolicy<StateT, LineT> evictionPolicy) {
         super(cache);
 
         this.evictionPolicy = evictionPolicy;
@@ -64,7 +65,7 @@ public class ReuseDistanceBasedEvaluatorEvictionPolicy<StateT extends Serializab
     }
 
     private void dumpStats(Map<String, Object> stats) {
-        String desc = this.evictionPolicy.getClass().getName() + ".reuseDistanceBasedEvaluatorEvictionPolicy";
+        String desc = this.evictionPolicy.getClass().getName() + ".rdBasedEvaluatorEvictionPolicy";
 
         stats.put(getCache().getName() + "." + desc + ".totalReplacements", String.valueOf(totalReplacements));
         stats.put(getCache().getName() + "." + desc + ".pollutingReplacements", String.valueOf(pollutingReplacements));
@@ -86,7 +87,7 @@ public class ReuseDistanceBasedEvaluatorEvictionPolicy<StateT extends Serializab
     public CacheMiss<StateT, LineT> handleReplacement(CacheReference reference) {
         CacheMiss<StateT, LineT> miss = this.evictionPolicy.handleReplacement(reference);
 
-        CacheMiss<StateT, LineT> reuseDistancePredictionBasedMiss = this.handleReplacementBasedOnReuseDistancePrediction(reference, true);
+        CacheMiss<StateT, LineT> reuseDistancePredictionBasedMiss = this.handleReplacementBasedOnRDPrediction(reference, true);
 
         this.totalReplacements++;
 

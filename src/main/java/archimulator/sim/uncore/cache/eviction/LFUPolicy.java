@@ -23,10 +23,10 @@ import archimulator.util.action.Function3;
 
 import java.io.Serializable;
 
-public class LeastFrequentlyUsedEvictionPolicy<StateT extends Serializable, LineT extends CacheLine<StateT>> extends EvictionPolicy<StateT, LineT> {
+public class LFUPolicy<StateT extends Serializable, LineT extends CacheLine<StateT>> extends EvictionPolicy<StateT, LineT> {
     private MirrorCache mirrorCache;
 
-    public LeastFrequentlyUsedEvictionPolicy(EvictableCache<StateT, LineT> cache) {
+    public LFUPolicy(EvictableCache<StateT, LineT> cache) {
         super(cache);
 
         this.mirrorCache = new MirrorCache();

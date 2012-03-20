@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.ext.uncore.cache.eviction;
+package archimulator.sim.ext.uncore.cache.eviction.rd;
 
 import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.cache.CacheMiss;
@@ -25,10 +25,10 @@ import archimulator.sim.uncore.cache.EvictableCache;
 
 import java.io.Serializable;
 
-public abstract class ReuseDistancePredictionEvictionPolicy<StateT extends Serializable, LineT extends CacheLine<StateT>> extends AbstractReuseDistancePredictionEvictionPolicy<StateT, LineT> {
+public abstract class RDPredictionEvictionPolicy<StateT extends Serializable, LineT extends CacheLine<StateT>> extends AbstractRDPredictionEvictionPolicy<StateT, LineT> {
     private boolean selectiveCaching;
 
-    public ReuseDistancePredictionEvictionPolicy(EvictableCache<StateT, LineT> cache, boolean selectiveCaching) {
+    public RDPredictionEvictionPolicy(EvictableCache<StateT, LineT> cache, boolean selectiveCaching) {
         super(cache);
 
         this.selectiveCaching = selectiveCaching;
@@ -36,7 +36,7 @@ public abstract class ReuseDistancePredictionEvictionPolicy<StateT extends Seria
 
     @Override
     public CacheMiss<StateT, LineT> handleReplacement(CacheReference reference) {
-        CacheMiss<StateT, LineT> miss = handleReplacementBasedOnReuseDistancePrediction(reference, this.selectiveCaching);
+        CacheMiss<StateT, LineT> miss = handleReplacementBasedOnRDPrediction(reference, this.selectiveCaching);
 
         if (miss.isBypass()) {
             this.updateOnEveryAccess(reference.getAccess().getVirtualPc(), reference.getAddress(), reference.getAccessType());

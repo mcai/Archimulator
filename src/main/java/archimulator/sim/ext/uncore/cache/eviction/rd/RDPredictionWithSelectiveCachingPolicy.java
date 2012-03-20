@@ -16,15 +16,15 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.ext.uncore.cache.eviction;
+package archimulator.sim.ext.uncore.cache.eviction.rd;
 
 import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.cache.EvictableCache;
 
 import java.io.Serializable;
 
-public class ReuseDistancePredictionWithoutSelectiveCachingEvictionPolicy<StateT extends Serializable, LineT extends CacheLine<StateT>> extends ReuseDistancePredictionEvictionPolicy<StateT, LineT> {
-    public ReuseDistancePredictionWithoutSelectiveCachingEvictionPolicy(EvictableCache<StateT, LineT> stateTLineTEvictableCache) {
-        super(stateTLineTEvictableCache, false);
+public class RDPredictionWithSelectiveCachingPolicy<StateT extends Serializable, LineT extends CacheLine<StateT>> extends RDPredictionEvictionPolicy<StateT, LineT> {
+    public RDPredictionWithSelectiveCachingPolicy(EvictableCache<StateT, LineT> stateTLineTEvictableCache) {
+        super(stateTLineTEvictableCache, true);
     }
 }

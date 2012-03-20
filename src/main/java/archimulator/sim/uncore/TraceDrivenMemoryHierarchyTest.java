@@ -19,7 +19,7 @@
 //package archimulator.sim.uncore;
 //
 //import archimulator.sim.uncore.cache.CacheGeometry;
-//import archimulator.sim.uncore.cache.eviction.LeastRecentlyUsedEvictionPolicy;
+//import archimulator.sim.uncore.cache.eviction.LRUPolicy;
 //import archimulator.sim.uncore.coherence.FirstLevelCache;
 //import archimulator.sim.uncore.coherence.LastLevelCache;
 //import archimulator.sim.uncore.dram.*;
@@ -480,6 +480,6 @@
 //
 //    public static void main(String[] args) {
 //        String filePath = args.length == 0 ? "traces/little.trace" : args[0];
-//        new TraceDrivenMemoryHierarchyTest("lru", MemoryHierarchyConfig.createDefaultMemoryHierarchyConfig(LeastRecentlyUsedEvictionPolicy.FACTORY), 2, 2).run(filePath);
+//        new TraceDrivenMemoryHierarchyTest("lru", MemoryHierarchyConfig.createDefaultMemoryHierarchyConfig(LRUPolicy.FACTORY), 2, 2).run(filePath);
 //    }
 //}

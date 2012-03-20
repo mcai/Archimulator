@@ -25,7 +25,7 @@ import archimulator.sim.isa.memory.Memory;
 import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.cache.*;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
-import archimulator.sim.uncore.cache.eviction.LeastRecentlyUsedEvictionPolicy;
+import archimulator.sim.uncore.cache.eviction.LRUPolicy;
 import archimulator.util.action.Action1;
 import archimulator.util.action.Function3;
 
@@ -59,7 +59,7 @@ public class CacheBasedBigMemoryDataStore extends BasicSimulationObject implemen
                 NUM_BUFFERS,
                 NUM_BUFFERS,
                 1),
-                LeastRecentlyUsedEvictionPolicy.class,
+                LRUPolicy.class,
                 new Function3<Cache<?, ?>, Integer, Integer, MemoryPageCacheLine>() {
                     public MemoryPageCacheLine apply(Cache<?, ?> cache, Integer set, Integer way) {
                         return new MemoryPageCacheLine(cache, set, way);

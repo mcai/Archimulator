@@ -19,6 +19,10 @@
 package archimulator.sim.uncore.cache.eviction;
 
 import archimulator.sim.ext.uncore.cache.eviction.*;
+import archimulator.sim.ext.uncore.cache.eviction.rd.evaluator.RDBasedEvaluatorPolicy;
+import archimulator.sim.ext.uncore.cache.eviction.rd.RDPredictionWithSelectiveCachingPolicy;
+import archimulator.sim.ext.uncore.cache.eviction.rd.RDPredictionWithoutSelectiveCachingPolicy;
+import archimulator.sim.ext.uncore.cache.eviction.rd.RRIPPolicy;
 import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.cache.EvictableCache;
 
@@ -31,26 +35,26 @@ public class EvictionPolicyFactory {
     private static List<Class<? extends EvictionPolicy>> evictionPolicyClasses = new ArrayList<Class<? extends EvictionPolicy>>();
 
     static {
-        evictionPolicyClasses.add(LeastRecentlyUsedEvictionPolicy.class);
-        evictionPolicyClasses.add(LeastFrequentlyUsedEvictionPolicy.class);
-        evictionPolicyClasses.add(RandomEvictionPolicy.class);
+        evictionPolicyClasses.add(LRUPolicy.class);
+        evictionPolicyClasses.add(LFUPolicy.class);
+        evictionPolicyClasses.add(RandomPolicy.class);
 
-        evictionPolicyClasses.add(L2BypassingEvictionPolicy.class);
+        evictionPolicyClasses.add(L2BypassingPolicy.class);
 
-        evictionPolicyClasses.add(RereferenceIntervalPredictionEvictionPolicy.class);
+        evictionPolicyClasses.add(RRIPPolicy.class);
 
-        evictionPolicyClasses.add(ReuseDistanceBasedEvaluatorEvictionPolicy.class);
+        evictionPolicyClasses.add(RDBasedEvaluatorPolicy.class);
 
-        evictionPolicyClasses.add(ReuseDistancePredictionWithoutSelectiveCachingEvictionPolicy.class);
-        evictionPolicyClasses.add(ReuseDistancePredictionWithSelectiveCachingEvictionPolicy.class);
+        evictionPolicyClasses.add(RDPredictionWithoutSelectiveCachingPolicy.class);
+        evictionPolicyClasses.add(RDPredictionWithSelectiveCachingPolicy.class);
 
-        evictionPolicyClasses.add(HtRequestAwareLeastRecentlyUsedWithTreeSetBasedVictimTrackingEvictionPolicy.class);
-        evictionPolicyClasses.add(HtRequestAwareLeastRecentlyUsedWithXorBasedVictimTrackingEvictionPolicy.class);
+        evictionPolicyClasses.add(HTAwareLRUWithTreeSetBasedVictimTrackingPolicy.class);
+        evictionPolicyClasses.add(HTAwareLRUWithXorBasedVictimTrackingPolicy.class);
 
-        evictionPolicyClasses.add(ThrashingSensitiveHTEnhancedLeastRecentlyUsedEvictionPolicy.class);
+        evictionPolicyClasses.add(ThrashingSensitiveHTEnhancedLRUPolicy.class);
 
-        evictionPolicyClasses.add(TestEvictionPolicy1.class);
-        evictionPolicyClasses.add(TestEvictionPolicy2.class);
+        evictionPolicyClasses.add(TestPolicy1.class);
+        evictionPolicyClasses.add(TestPolicy2.class);
     }
 
     @SuppressWarnings("unchecked")

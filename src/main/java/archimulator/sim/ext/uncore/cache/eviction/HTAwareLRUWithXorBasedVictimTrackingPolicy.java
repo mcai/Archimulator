@@ -16,29 +16,25 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.cache.eviction;
+package archimulator.sim.ext.uncore.cache.eviction;
 
-import archimulator.sim.uncore.cache.*;
+import archimulator.sim.uncore.cache.CacheLine;
+import archimulator.sim.uncore.cache.EvictableCache;
 
 import java.io.Serializable;
 
-public class LeastRecentlyUsedEvictionPolicy<StateT extends Serializable, LineT extends CacheLine<StateT>> extends StackBasedEvictionPolicy<StateT, LineT> {
-    public LeastRecentlyUsedEvictionPolicy(EvictableCache<StateT, LineT> cache) {
+public class HTAwareLRUWithXorBasedVictimTrackingPolicy<StateT extends Serializable, LineT extends CacheLine<StateT>> extends HTAwareLRUPolicy<StateT, LineT> {
+    private XorBasedAddressSetFilter filter;
+
+    public HTAwareLRUWithXorBasedVictimTrackingPolicy(EvictableCache<StateT, LineT> cache) {
         super(cache);
     }
 
     @Override
-    public CacheMiss<StateT, LineT> handleReplacement(CacheReference reference) {
-        return new CacheMiss<StateT, LineT>(this.getCache(), reference, this.getLRU(reference.getSet()));
-    }
-
-    @Override
-    public void handlePromotionOnHit(CacheHit<StateT, LineT> hit) {
-        this.setMRU(hit.getReference().getSet(), hit.getWay());
-    }
-
-    @Override
-    public void handleInsertionOnMiss(CacheMiss<StateT, LineT> miss) {
-        this.setMRU(miss.getReference().getSet(), miss.getWay());
+    public AddressSetFilter getCachePollutionFilter() {
+        if (filter == null) {
+            filter = new XorBasedAddressSetFilter(this.getCache());
+        }
+        return filter;
     }
 }

@@ -22,7 +22,7 @@ import archimulator.sim.base.event.ProcessorInitializedEvent;
 import archimulator.sim.core.BasicThread;
 import archimulator.sim.core.Processor;
 import archimulator.sim.uncore.cache.*;
-import archimulator.sim.uncore.cache.eviction.LeastRecentlyUsedEvictionPolicy;
+import archimulator.sim.uncore.cache.eviction.LRUPolicy;
 import archimulator.util.IntegerIntegerPair;
 import archimulator.util.action.Action1;
 import archimulator.util.action.Function3;
@@ -31,20 +31,20 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ThrashingSensitiveHTEnhancedLeastRecentlyUsedEvictionPolicy<StateT extends Serializable, LineT extends CacheLine<StateT>> extends LeastRecentlyUsedEvictionPolicy<StateT, LineT> {
+public class ThrashingSensitiveHTEnhancedLRUPolicy<StateT extends Serializable, LineT extends CacheLine<StateT>> extends LRUPolicy<StateT, LineT> {
     private MirrorCache mirrorCache;
     private Processor processor;
 
     private List<IntegerIntegerPair> predefinedDelinquentPcs;
 
-    public ThrashingSensitiveHTEnhancedLeastRecentlyUsedEvictionPolicy(EvictableCache<StateT, LineT> cache) {
+    public ThrashingSensitiveHTEnhancedLRUPolicy(EvictableCache<StateT, LineT> cache) {
         super(cache);
 
         this.mirrorCache = new MirrorCache();
 
         cache.getBlockingEventDispatcher().addListener(ProcessorInitializedEvent.class, new Action1<ProcessorInitializedEvent>() {
             public void apply(ProcessorInitializedEvent event) {
-                ThrashingSensitiveHTEnhancedLeastRecentlyUsedEvictionPolicy.this.processor = event.getProcessor();
+                ThrashingSensitiveHTEnhancedLRUPolicy.this.processor = event.getProcessor();
             }
         });
 

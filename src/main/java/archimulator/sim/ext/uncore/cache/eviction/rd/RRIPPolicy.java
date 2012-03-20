@@ -16,20 +16,21 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.ext.uncore.cache.eviction;
+package archimulator.sim.ext.uncore.cache.eviction.rd;
 
+import archimulator.sim.ext.uncore.cache.eviction.DynamicInsertionPolicy;
 import archimulator.sim.uncore.cache.*;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
 import archimulator.util.action.Function3;
 
 import java.io.Serializable;
 
-public class RereferenceIntervalPredictionEvictionPolicy<StateT extends Serializable, LineT extends CacheLine<StateT>> extends EvictionPolicy<StateT, LineT> {
+public class RRIPPolicy<StateT extends Serializable, LineT extends CacheLine<StateT>> extends EvictionPolicy<StateT, LineT> {
     private int predictedRereferenceIntervalMaxValue;
     private DynamicInsertionPolicy insertionPolicy;
     private MirrorCache mirrorCache;
 
-    public RereferenceIntervalPredictionEvictionPolicy(EvictableCache<StateT, LineT> cache) {
+    public RRIPPolicy(EvictableCache<StateT, LineT> cache) {
         super(cache);
 
         this.predictedRereferenceIntervalMaxValue = 3;
