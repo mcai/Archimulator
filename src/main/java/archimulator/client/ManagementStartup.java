@@ -24,6 +24,7 @@ import archimulator.sim.base.experiment.profile.ProcessorProfile;
 import archimulator.sim.base.simulation.SimulatedProgram;
 import archimulator.service.ArchimulatorService;
 import archimulator.sim.ext.uncore.cache.eviction.LLCHTAwareLRUPolicy;
+import archimulator.sim.ext.uncore.llc.LLCHTRequestProfilingCapability;
 import archimulator.sim.uncore.cache.eviction.LRUPolicy;
 import archimulator.util.DateHelper;
 import com.caucho.hessian.client.HessianProxyFactory;
@@ -49,17 +50,6 @@ public class ManagementStartup {
             recordException(e);
             throw new RuntimeException(e);
         }
-    }
-
-    public static SimulatedProgram SIMULATED_PROGRAM_MST_HT(int lookahead, int stride) {
-        SimulatedProgram program = new SimulatedProgram(
-                "mst_ht" + "-lookahead_" + lookahead + "-stride_" + stride, ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/Olden_Custom1/mst/ht",
-                "mst.mips",
-                "10000");
-        program.setHelperThreadedProgram(true);
-        program.setHtLookahead(lookahead);
-        program.setHtStride(stride);
-        return program;
     }
 
     private void submitSimulatedProgramsAndProcessorProfiles() throws SQLException {
@@ -130,6 +120,7 @@ public class ManagementStartup {
                         ExperimentProfile experimentProfile = new ExperimentProfile(simulatedProgram.getTitle() + "-" + processorProfile.getTitle(), processorProfile);
                         experimentProfile.addWorkload(simulatedProgram);
                         experimentProfile.inDetailToEnd();
+                        experimentProfile.addSimulationCapabilityClass(LLCHTRequestProfilingCapability.class);
                         experimentProfiles.add(experimentProfile);
                     }
                 }
@@ -163,19 +154,34 @@ public class ManagementStartup {
     public static final SimulatedProgram SIMULATED_PROGRAM_MST_BASELINE = new SimulatedProgram(
             "mst_baseline", ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/Olden_Custom1/mst/baseline",
             "mst.mips",
-            "10000");
+            "100");
+
+    public static SimulatedProgram SIMULATED_PROGRAM_MST_HT(int lookahead, int stride) {
+        SimulatedProgram program = new SimulatedProgram(
+                "mst_ht" + "-lookahead_" + lookahead + "-stride_" + stride, ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/Olden_Custom1/mst/ht",
+                "mst.mips",
+                "100");
+        program.setHelperThreadedProgram(true);
+        program.setHtLookahead(lookahead);
+        program.setHtStride(stride);
+        return program;
+    }
+
     public static final SimulatedProgram SIMULATED_PROGRAM_EM3D_BASELINE = new SimulatedProgram(
             "em3d_baseline", ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/Olden_Custom1/em3d/baseline",
             "em3d.mips",
             "400000 128 75 1");
+
     public static final SimulatedProgram SIMULATED_PROGRAM_EM3D_HT = new SimulatedProgram(
             "em3d_ht", ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/Olden_Custom1/em3d/ht",
             "em3d.mips",
             "400000 128 75 1");
+
     public static final SimulatedProgram SIMULATED_PROGRAM_429_MCF_BASELINE = new SimulatedProgram(
             "429_mcf_baseline", ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline",
             "429.mcf.mips",
             ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline/data/ref/input/inp.in");
+
     public static final SimulatedProgram SIMULATED_PROGRAM_429_MCF_HT = new SimulatedProgram(
             "429_mcf_ht", ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht",
             "429.mcf.mips",

@@ -22,7 +22,7 @@ import archimulator.sim.base.event.DumpStatEvent;
 import archimulator.sim.base.event.PollStatsEvent;
 import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.core.BasicThread;
-import archimulator.sim.ext.uncore.llc.LLCHTRequestProfilingHelper;
+import archimulator.sim.ext.uncore.llc.LLCHTRequestProfilingCapability;
 import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.cache.CacheMiss;
 import archimulator.sim.uncore.cache.EvictableCache;
@@ -34,7 +34,7 @@ import java.io.Serializable;
 import java.util.Map;
 
 public class LLCHTAwareLRUPolicy<StateT extends Serializable, LineT extends CacheLine<StateT>> extends LRUPolicy<StateT, LineT> {
-    private LLCHTRequestProfilingHelper<StateT, LineT> llcHtRequestProfilingHelper;
+    private LLCHTRequestProfilingCapability llcHtRequestProfilingCapability;
 
     private int evictedMtLinesPerInterval;
 
@@ -50,7 +50,7 @@ public class LLCHTAwareLRUPolicy<StateT extends Serializable, LineT extends Cach
     public LLCHTAwareLRUPolicy(EvictableCache<StateT, LineT> cache) {
         super(cache);
 
-        this.llcHtRequestProfilingHelper = new LLCHTRequestProfilingHelper<StateT, LineT>(cache);
+        this.llcHtRequestProfilingCapability = new LLCHTRequestProfilingCapability(cache);
 
         this.evictedMtLinesPerInterval = cache.getNumSets() * cache.getAssociativity() / 2;
         
@@ -59,16 +59,16 @@ public class LLCHTAwareLRUPolicy<StateT extends Serializable, LineT extends Cach
         this.totalHtRequests = new IntervalStat();
         this.badHtRequests = new IntervalStat();
 
-        this.llcHtRequestProfilingHelper.getEventDispatcher().addListener(LLCHTRequestProfilingHelper.HTRequestEvent.class, new Action1<LLCHTRequestProfilingHelper.HTRequestEvent>() {
+        this.llcHtRequestProfilingCapability.getEventDispatcher().addListener(LLCHTRequestProfilingCapability.HTRequestEvent.class, new Action1<LLCHTRequestProfilingCapability.HTRequestEvent>() {
             @Override
-            public void apply(LLCHTRequestProfilingHelper.HTRequestEvent event) {
+            public void apply(LLCHTRequestProfilingCapability.HTRequestEvent event) {
                 totalHtRequests.inc();
             }
         });
         
-        this.llcHtRequestProfilingHelper.getEventDispatcher().addListener(LLCHTRequestProfilingHelper.BadHTRequestEvent.class, new Action1<LLCHTRequestProfilingHelper.BadHTRequestEvent>() {
+        this.llcHtRequestProfilingCapability.getEventDispatcher().addListener(LLCHTRequestProfilingCapability.BadHTRequestEvent.class, new Action1<LLCHTRequestProfilingCapability.BadHTRequestEvent>() {
             @Override
-            public void apply(LLCHTRequestProfilingHelper.BadHTRequestEvent event) {
+            public void apply(LLCHTRequestProfilingCapability.BadHTRequestEvent event) {
                 badHtRequests.inc();
             }
         });
@@ -77,7 +77,7 @@ public class LLCHTAwareLRUPolicy<StateT extends Serializable, LineT extends Cach
             public void apply(CoherentCacheServiceNonblockingRequestEvent event) {
                 if (event.getCache().getCache().equals(getCache()) && !event.isHitInCache() &&
                         event.isEviction() &&
-                        llcHtRequestProfilingHelper.getHTRequestState(event.getLineFound().getSet(), event.getLineFound().getWay()).equals(LLCHTRequestProfilingHelper.LLCLineHTRequestState.MT)) {
+                        llcHtRequestProfilingCapability.getHTRequestState(event.getLineFound().getSet(), event.getLineFound().getWay()).equals(LLCHTRequestProfilingCapability.LLCLineHTRequestState.MT)) {
                     evictedMtLines++;
 
                     if (evictedMtLines == evictedMtLinesPerInterval) {
