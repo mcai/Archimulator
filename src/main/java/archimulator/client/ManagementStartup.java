@@ -22,7 +22,7 @@ import archimulator.sim.base.experiment.profile.ExperimentProfile;
 import archimulator.sim.base.experiment.profile.ProcessorProfile;
 import archimulator.sim.base.simulation.SimulatedProgram;
 import archimulator.service.ArchimulatorService;
-import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
+import archimulator.sim.ext.uncore.cache.eviction.LLCHTAwareLRUPolicy;
 import archimulator.sim.uncore.cache.eviction.LRUPolicy;
 import archimulator.util.DateHelper;
 import com.caucho.hessian.client.HessianProxyFactory;
@@ -61,69 +61,16 @@ public class ManagementStartup {
         return program;
     }
 
-//    private void submitExperimentProfiles() throws SQLException {
-//        List<SimulatedProgram> simulatedPrograms = new ArrayList<SimulatedProgram>();
-//        simulatedPrograms.add(SIMULATED_PROGRAM_MST_HT);
-//        simulatedPrograms.add(SIMULATED_PROGRAM_EM3D_HT);
-//        simulatedPrograms.add(SIMULATED_PROGRAM_429_MCF_HT);
-//
-//        List<Integer> l2SizeInKBytes = new ArrayList<Integer>();
-//        l2SizeInKBytes.add(512);
-//        l2SizeInKBytes.add(512 * 2);
-//        l2SizeInKBytes.add(512 * 4);
-//        l2SizeInKBytes.add(512 * 8);
-//
-//        List<ExperimentProfile> experimentProfiles = new ArrayList<ExperimentProfile>();
-//
-//        for (SimulatedProgram simulatedProgram : simulatedPrograms) {
-//            ProcessorProfile processorProfile = new ProcessorProfile(2, 2, 1024 * 1024 * 4, 8);
-//
-//            ExperimentProfile experimentProfile = new ExperimentProfile(processorProfile);
-//            experimentProfile.addWorkload(simulatedProgram);
-//            experimentProfile.functionallyToEnd();
-//            experimentProfiles.add(experimentProfile);
-//
-//            for (int l2SizeInKByte : l2SizeInKBytes) {
-//                ProcessorProfile processorProfile1 = new ProcessorProfile(2, 2, 1024 * l2SizeInKByte, 8);
-//
-//                ExperimentProfile experimentProfile1 = new ExperimentProfile(processorProfile1);
-//                experimentProfile1.addWorkload(simulatedProgram);
-//                experimentProfile1.functionallyToPseudoCallAndInDetailForMaxInsts(3720, 2000000000).addSimulationCapabilityClass(LLCHTRequestProfilingCapability.class);
-//                experimentProfiles.add(experimentProfile1);
-//
-//                ExperimentProfile experimentProfile2 = new ExperimentProfile(processorProfile1);
-//                experimentProfile2.addWorkload(simulatedProgram);
-//                experimentProfile2.inDetailToEnd().addSimulationCapabilityClass(LLCHTRequestProfilingCapability.class);
-//                experimentProfiles.add(experimentProfile2);
-//            }
-//        }
-//
-//        for(ExperimentProfile experimentProfile : experimentProfiles) {
-//            this.archimulatorService.addExperimentProfile(experimentProfile);
-//        }
-//
-//        System.out.println(this.archimulatorService.getExperimentProfilesAsList().size());
-//
-//        for(ExperimentProfile experimentProfile : this.archimulatorService.getExperimentProfilesAsList()) {
-//            System.out.println(experimentProfile.getState());
-//        }
-//
-//        this.archimulatorService.setRunningExperimentEnabled(true);
-//    }
-
     private void submitSimulatedProgramsAndProcessorProfiles() throws SQLException {
         this.archimulatorService.setRunningExperimentEnabled(false);
-
-//        this.archimulatorService.clearData();
 
         List<SimulatedProgram> simulatedPrograms = new ArrayList<SimulatedProgram>();
         simulatedPrograms.add(SIMULATED_PROGRAM_MST_BASELINE);
 
-        for (int lookahead = 20; lookahead < 800; lookahead *= 2) {
-            for (int stride = 10; stride < 800; stride *= 2) {
-                simulatedPrograms.add(SIMULATED_PROGRAM_MST_HT(lookahead, stride));
-            }
-        }
+        simulatedPrograms.add(SIMULATED_PROGRAM_MST_HT(10, 10));
+        simulatedPrograms.add(SIMULATED_PROGRAM_MST_HT(20, 10));
+        simulatedPrograms.add(SIMULATED_PROGRAM_MST_HT(320, 320));
+        simulatedPrograms.add(SIMULATED_PROGRAM_MST_HT(640, 320));
 
         simulatedPrograms.add(SIMULATED_PROGRAM_EM3D_BASELINE);
         simulatedPrograms.add(SIMULATED_PROGRAM_EM3D_HT);
@@ -136,32 +83,63 @@ public class ManagementStartup {
         }
 
         List<Integer> l2SizeInKBytes = new ArrayList<Integer>();
-        l2SizeInKBytes.add(512);
-        l2SizeInKBytes.add(512 * 2);
-        l2SizeInKBytes.add(512 * 4);
-        l2SizeInKBytes.add(512 * 8);
+        l2SizeInKBytes.add(1024);
+        l2SizeInKBytes.add(1024 * 2);
+        l2SizeInKBytes.add(1024 * 4);
 
         List<Integer> l2Associativities = new ArrayList<Integer>();
         l2Associativities.add(4);
         l2Associativities.add(8);
-        l2Associativities.add(16);
-
-        Class<? extends EvictionPolicy> l2EvictionPolicyClz = LRUPolicy.class;
-        String l2EvictionPolicyClzName = "LRU";
 
         for (int l2SizeInKByte : l2SizeInKBytes) {
             for (int l2Associativity : l2Associativities) {
                 int numCores = 2;
                 int numThreadsPerCore = 2;
-                this.archimulatorService.addProcessorProfile(new ProcessorProfile("C" + numCores + "T" + numThreadsPerCore + "-" + "L2SizeInKB_" + l2SizeInKByte + "-" + "L2Assoc_" + l2Associativity + "-" + "L2Repl_" + l2EvictionPolicyClzName, numCores, numThreadsPerCore, 1024 * l2SizeInKByte, l2Associativity, l2EvictionPolicyClz));
+                this.archimulatorService.addProcessorProfile(new ProcessorProfile("C" + numCores + "T" + numThreadsPerCore + "-" + "L2SizeInKB_" + l2SizeInKByte + "-" + "L2Assoc_" + l2Associativity + "-" + "L2Repl_" + "LRU", numCores, numThreadsPerCore, 1024 * l2SizeInKByte, l2Associativity, LRUPolicy.class));
+                this.archimulatorService.addProcessorProfile(new ProcessorProfile("C" + numCores + "T" + numThreadsPerCore + "-" + "L2SizeInKB_" + l2SizeInKByte + "-" + "L2Assoc_" + l2Associativity + "-" + "L2Repl_" + "LLCHTAwareLRU", numCores, numThreadsPerCore, 1024 * l2SizeInKByte, l2Associativity, LLCHTAwareLRUPolicy.class));
             }
         }
     }
 
     private void submitExperimentProfiles() throws SQLException {
-//        this.archimulatorService.setRunningExperimentEnabled(false);
+        List<ExperimentProfile> experimentProfiles = new ArrayList<ExperimentProfile>();
 
-//        this.archimulatorService.setUserPassword("itecgo", "bywwnss");
+        List<SimulatedProgram> simulatedPrograms = this.archimulatorService.getSimulatedProgramsAsList();
+
+        for (SimulatedProgram simulatedProgram : simulatedPrograms) {
+            if(simulatedProgram.getTitle().startsWith("mst_baseline")) {
+                List<ProcessorProfile> processorProfiles = this.archimulatorService.getProcessorProfilesAsList();
+
+                for(ProcessorProfile processorProfile : processorProfiles) {
+                    if(processorProfile.getL2EvictionPolicyClz().equals(LRUPolicy.class)) {
+                        ExperimentProfile experimentProfile = new ExperimentProfile(processorProfile);
+                        experimentProfile.addWorkload(simulatedProgram);
+//                        experimentProfile.functionallyToEnd();
+//                        experimentProfile.inDetailToEnd();
+                        experimentProfile.cacheWarmupToPseudoCallAndInDetailForMaxInsts(3720, 2000000000);
+                        experimentProfiles.add(experimentProfile);
+                    }
+                }
+            }
+            else if(simulatedProgram.getTitle().startsWith("mst_ht")) {
+                List<ProcessorProfile> processorProfiles = this.archimulatorService.getProcessorProfilesAsList();
+
+                for(ProcessorProfile processorProfile : processorProfiles) {
+                    if(processorProfile.getL2EvictionPolicyClz().equals(LRUPolicy.class) || processorProfile.getL2EvictionPolicyClz().equals(LLCHTAwareLRUPolicy.class)) {
+                        ExperimentProfile experimentProfile = new ExperimentProfile(processorProfile);
+                        experimentProfile.addWorkload(simulatedProgram);
+//                        experimentProfile.functionallyToEnd();
+//                        experimentProfile.inDetailToEnd();
+                        experimentProfile.cacheWarmupToPseudoCallAndInDetailForMaxInsts(3720, 2000000000);
+                        experimentProfiles.add(experimentProfile);
+                    }
+                }
+            }
+        }
+
+        for(ExperimentProfile experimentProfile : experimentProfiles) {
+            this.archimulatorService.addExperimentProfile(experimentProfile);
+        }
     }
 
     public static final SimulatedProgram SIMULATED_PROGRAM_MST_BASELINE = new SimulatedProgram(
@@ -193,6 +171,6 @@ public class ManagementStartup {
     public static void main(String[] args) throws SQLException {
         ManagementStartup startup = new ManagementStartup();
         startup.submitSimulatedProgramsAndProcessorProfiles();
-//        startup.submitExperimentProfiles();
+        startup.submitExperimentProfiles();
     }
 }

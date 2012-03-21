@@ -18,7 +18,6 @@
  ******************************************************************************/
 package archimulator.sim.ext.uncore.cache.eviction.rd;
 
-import archimulator.sim.ext.uncore.cache.eviction.RDMonitor;
 import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.cache.*;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;

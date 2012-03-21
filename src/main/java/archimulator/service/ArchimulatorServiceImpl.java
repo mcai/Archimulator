@@ -131,6 +131,12 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
     public SimulatedProgram getSimulatedProgramById(long simulatedProgramId) throws SQLException {
         return this.simulatedPrograms.queryForId(simulatedProgramId);
     }
+    
+    @Override
+    public SimulatedProgram getSimulatedProgramByTitle(String simulatedProgramTitle) throws SQLException {
+        PreparedQuery<SimulatedProgram> query = this.simulatedPrograms.queryBuilder().where().eq("title", simulatedProgramTitle).prepare();
+        return this.simulatedPrograms.queryForFirst(query);
+    }
 
     @Override
     public void addSimulatedProgram(SimulatedProgram simulatedProgram) throws SQLException {
@@ -158,6 +164,12 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
     }
 
     @Override
+    public ProcessorProfile getProcessorProfileByTitle(String processorProfileTitle) throws SQLException {
+        PreparedQuery<ProcessorProfile> query = this.processorProfiles.queryBuilder().where().eq("title", processorProfileTitle).prepare();
+        return this.processorProfiles.queryForFirst(query);
+    }
+
+    @Override
     public void addProcessorProfile(ProcessorProfile processorProfile) throws SQLException {
         this.processorProfiles.create(processorProfile);
     }
@@ -180,6 +192,12 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
     @Override
     public ExperimentProfile getExperimentProfileById(long experimentProfileId) throws SQLException {
         return this.experimentProfiles.queryForId(experimentProfileId);
+    }
+
+    @Override
+    public ExperimentProfile getExperimentProfileByTitle(String experimentProfileTitle) throws SQLException {
+        PreparedQuery<ExperimentProfile> query = this.experimentProfiles.queryBuilder().where().eq("title", experimentProfileTitle).prepare();
+        return this.experimentProfiles.queryForFirst(query);
     }
 
     @Override

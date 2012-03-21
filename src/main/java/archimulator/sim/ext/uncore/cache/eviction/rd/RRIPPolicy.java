@@ -18,7 +18,6 @@
  ******************************************************************************/
 package archimulator.sim.ext.uncore.cache.eviction.rd;
 
-import archimulator.sim.ext.uncore.cache.eviction.DynamicInsertionPolicy;
 import archimulator.sim.uncore.cache.*;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
 import archimulator.util.action.Function3;

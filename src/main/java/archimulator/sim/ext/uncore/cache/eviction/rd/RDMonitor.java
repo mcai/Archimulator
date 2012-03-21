@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.ext.uncore.cache.eviction;
+package archimulator.sim.ext.uncore.cache.eviction.rd;
 
 import archimulator.sim.ext.uncore.cache.prediction.CacheBasedPredictor;
 import archimulator.sim.ext.uncore.cache.prediction.Predictor;

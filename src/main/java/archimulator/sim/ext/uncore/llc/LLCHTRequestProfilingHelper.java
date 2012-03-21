@@ -18,40 +18,24 @@
  ******************************************************************************/
 package archimulator.sim.ext.uncore.llc;
 
-import archimulator.sim.base.simulation.Simulation;
-import archimulator.sim.base.experiment.capability.SimulationCapability;
 import archimulator.sim.base.event.*;
 import archimulator.sim.core.BasicThread;
 import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.cache.*;
 import archimulator.sim.uncore.cache.eviction.LRUPolicy;
-import archimulator.sim.uncore.coherence.CoherentCache;
-import archimulator.sim.uncore.coherence.MESIState;
 import archimulator.sim.uncore.coherence.event.CoherentCacheNonblockingRequestHitToTransientTagEvent;
 import archimulator.sim.uncore.coherence.event.CoherentCacheServiceNonblockingRequestEvent;
 import archimulator.util.action.Action1;
 import archimulator.util.action.Function3;
+import archimulator.util.event.BlockingEvent;
+import archimulator.util.event.BlockingEventDispatcher;
 
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-//on replacement:
-//	1. HT replaces INVALID => insert NULL
-//	2. HT replaces MT => insert DATA
-//	3. HT replaces HT => No action
-//	4. MT replaces HT => Remove LRU
-//	5. MT replaces MT, Exists HT => Remove LRU, Insert DATA
-//
-//on reference:
-//	1. MT miss + HT miss + VT Hit => ; Bad HT, VT.setLRU
-//	2. MT miss + HT hit + VT miss => MT to HT; Good HT, removeLRU
-//	3. MT miss + HT hit + VT hit => MT to HT; VT.setLRU, removeLRU
-//	4. MT hit + HT miss + VT hit => ; VT.setLRU
-//TODO: to be resurrected; hints: to be merged with HTAwareLRUPolicy!!!
-public class LLCHTRequestProfilingCapability implements SimulationCapability {
-    private CoherentCache<MESIState>.LockableCache llc;
+public class LLCHTRequestProfilingHelper<StateT extends Serializable, LineT extends CacheLine<StateT>> {
+    private EvictableCache<StateT, LineT> llc;
 
     private Map<Integer, Map<Integer, LLCLineHTRequestState>> htRequestStates;
     private EvictableCache<HTRequestVictimCacheLineState, CacheLine<HTRequestVictimCacheLineState>> htRequestVictimCache;
@@ -66,11 +50,11 @@ public class LLCHTRequestProfilingCapability implements SimulationCapability {
     private long numBadHtRequests;
 
     private long numLateHtRequests;
+    
+    private BlockingEventDispatcher<LLCHTRequestProfilingHelperEvent> eventDispatcher;
 
-    private PrintWriter fileWriter;
-
-    public LLCHTRequestProfilingCapability(final Simulation simulation) {
-        this.llc = simulation.getProcessor().getCacheHierarchy().getL2Cache().getCache();
+    public LLCHTRequestProfilingHelper(EvictableCache<StateT, LineT> llc) {
+        this.llc = llc;
 
         this.htRequestStates = new HashMap<Integer, Map<Integer, LLCLineHTRequestState>>();
         for (int set = 0; set < this.llc.getNumSets(); set++) {
@@ -88,24 +72,26 @@ public class LLCHTRequestProfilingCapability implements SimulationCapability {
             }
         });
 
-        simulation.getBlockingEventDispatcher().addListener(CoherentCacheServiceNonblockingRequestEvent.class, new Action1<CoherentCacheServiceNonblockingRequestEvent>() {
+        this.eventDispatcher = new BlockingEventDispatcher<LLCHTRequestProfilingHelperEvent>();
+
+        llc.getBlockingEventDispatcher().addListener(CoherentCacheServiceNonblockingRequestEvent.class, new Action1<CoherentCacheServiceNonblockingRequestEvent>() {
             public void apply(CoherentCacheServiceNonblockingRequestEvent event) {
-                if (event.getCache().getCache() == LLCHTRequestProfilingCapability.this.llc) {
+                if (event.getCache().getCache().equals(LLCHTRequestProfilingHelper.this.llc)) {
                     serviceRequest(event);
                 }
             }
         });
 
-        simulation.getBlockingEventDispatcher().addListener(CoherentCacheNonblockingRequestHitToTransientTagEvent.class, new Action1<CoherentCacheNonblockingRequestHitToTransientTagEvent>() {
+        llc.getBlockingEventDispatcher().addListener(CoherentCacheNonblockingRequestHitToTransientTagEvent.class, new Action1<CoherentCacheNonblockingRequestHitToTransientTagEvent>() {
             @SuppressWarnings("Unchecked")
             public void apply(CoherentCacheNonblockingRequestHitToTransientTagEvent event) {
-                if (event.getCache().getCache() == LLCHTRequestProfilingCapability.this.llc) {
-                    markLateHtRequest(event);
+                if (event.getCache().getCache().equals(LLCHTRequestProfilingHelper.this.llc)) {
+                    markLateHTRequest(event);
                 }
             }
         });
 
-        simulation.getBlockingEventDispatcher().addListener(ResetStatEvent.class, new Action1<ResetStatEvent>() {
+        llc.getBlockingEventDispatcher().addListener(ResetStatEvent.class, new Action1<ResetStatEvent>() {
             public void apply(ResetStatEvent event) {
                 numMtMisses = 0;
 
@@ -120,62 +106,45 @@ public class LLCHTRequestProfilingCapability implements SimulationCapability {
             }
         });
 
-        simulation.getBlockingEventDispatcher().addListener(PollStatsEvent.class, new Action1<PollStatsEvent>() {
+        llc.getBlockingEventDispatcher().addListener(PollStatsEvent.class, new Action1<PollStatsEvent>() {
             public void apply(PollStatsEvent event) {
                 dumpStats(event.getStats());
             }
         });
 
-        simulation.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
+        llc.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
             public void apply(DumpStatEvent event) {
                 if (event.getType() == DumpStatEvent.Type.DETAILED_SIMULATION) {
                     dumpStats(event.getStats());
                 }
             }
         });
-
-        simulation.getBlockingEventDispatcher().addListener(SimulationStartedEvent.class, new Action1<SimulationStartedEvent>() {
-            public void apply(SimulationStartedEvent event) {
-                try {
-                    fileWriter = new PrintWriter(simulation.getConfig().getCwd() + "/llcHTRequestProfilingCapability_out.txt");
-                } catch (FileNotFoundException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
-
-        simulation.getBlockingEventDispatcher().addListener(SimulationStoppedEvent.class, new Action1<SimulationStoppedEvent>() {
-            public void apply(SimulationStoppedEvent event) {
-                fileWriter.flush();
-                fileWriter.close();
-            }
-        });
     }
 
     private void dumpStats(Map<String, Object> stats) {
-        stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numMtMisses", String.valueOf(this.numMtMisses));
+        stats.put("llcHTRequestProfilingHelper." + this.llc.getName() + ".numMtMisses", String.valueOf(this.numMtMisses));
 
-        stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numTotalHtRequests", String.valueOf(this.numTotalHtRequests));
+        stats.put("llcHTRequestProfilingHelper." + this.llc.getName() + ".numTotalHtRequests", String.valueOf(this.numTotalHtRequests));
 
-        stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numUsefulHtRequests", String.valueOf(this.numUsefulHtRequests));
+        stats.put("llcHTRequestProfilingHelper." + this.llc.getName() + ".numUsefulHtRequests", String.valueOf(this.numUsefulHtRequests));
 
-        stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".ht_accuracy", String.valueOf(100.0 * (double) this.numUsefulHtRequests / this.numTotalHtRequests) + "%");
-        stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".ht_coverage", String.valueOf(100.0 * (double) this.numUsefulHtRequests / (this.numMtMisses + this.numUsefulHtRequests)) + "%");
+        stats.put("llcHTRequestProfilingHelper." + this.llc.getName() + ".htRequestAccuracy", String.valueOf(100.0 * (double) this.numUsefulHtRequests / this.numTotalHtRequests) + "%");
+        stats.put("llcHTRequestProfilingHelper." + this.llc.getName() + ".htRequestCoverage", String.valueOf(100.0 * (double) this.numUsefulHtRequests / (this.numMtMisses + this.numUsefulHtRequests)) + "%");
 
-        stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numGoodHtRequests", String.valueOf(this.numGoodHtRequests));
-        stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numBadHtRequests", String.valueOf(this.numBadHtRequests));
-        stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numUglyHtRequests", String.valueOf(this.numTotalHtRequests - this.numGoodHtRequests - this.numBadHtRequests));
+        stats.put("llcHTRequestProfilingHelper." + this.llc.getName() + ".numGoodHtRequests", String.valueOf(this.numGoodHtRequests));
+        stats.put("llcHTRequestProfilingHelper." + this.llc.getName() + ".numBadHtRequests", String.valueOf(this.numBadHtRequests));
+        stats.put("llcHTRequestProfilingHelper." + this.llc.getName() + ".numUglyHtRequests", String.valueOf(this.numTotalHtRequests - this.numGoodHtRequests - this.numBadHtRequests));
 
-        stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numLateHtRequests", String.valueOf(this.numLateHtRequests));
+        stats.put("llcHTRequestProfilingHelper." + this.llc.getName() + ".numLateHtRequests", String.valueOf(this.numLateHtRequests));
     }
 
-    private void markLateHtRequest(CoherentCacheNonblockingRequestHitToTransientTagEvent event) {
+    private void markLateHTRequest(CoherentCacheNonblockingRequestHitToTransientTagEvent event) {
         boolean requesterIsHt = BasicThread.isHelperThread(event.getRequesterAccess().getThread());
         CacheLine<?> llcLine = event.getLineFound();
 
         int set = llcLine.getSet();
 
-        LLCLineHTRequestState htRequestState = this.htRequestStates.get(set).get(llcLine.getWay());
+        LLCLineHTRequestState htRequestState = this.getHTRequestState(set, llcLine.getWay());
         boolean lineFoundIsHt = htRequestState == LLCLineHTRequestState.HT;
 
         if (!requesterIsHt && lineFoundIsHt) {
@@ -189,17 +158,13 @@ public class LLCHTRequestProfilingCapability implements SimulationCapability {
 
         int set = llcLine.getSet();
 
-        LLCLineHTRequestState htRequestState = this.htRequestStates.get(set).get(llcLine.getWay());
+        LLCLineHTRequestState htRequestState = this.getHTRequestState(set, llcLine.getWay());
         boolean lineFoundIsHt = htRequestState == LLCLineHTRequestState.HT;
 
         if (!event.isHitInCache()) {
             if (requesterIsHt) {
-//                this.fileWriter.printf("[%d] htRequest: %s\n", this.simulation.getCycleAccurateEventQueue().getCurrentCycle(), event);
-
-//                this.setHt(set, llcLine.getWay());
                 this.numTotalHtRequests++;
-            } else {
-//                this.setMt(set, llcLine.getWay());
+                this.eventDispatcher.dispatch(new HTRequestEvent());
             }
         }
 
@@ -212,36 +177,16 @@ public class LLCHTRequestProfilingCapability implements SimulationCapability {
         }
 
         if (requesterIsHt && !event.isHitInCache() && !event.isEviction()) {
-            // case 1
-//            this.checkInvariants(set);
-
-            this.setHt(set, llcLine.getWay());
+            this.markHT(set, llcLine.getWay());
             this.insertNullEntry(set);
-
-//            this.checkInvariants(set);
         } else if (requesterIsHt && !event.isHitInCache() && event.isEviction() && !lineFoundIsHt) {
-            // case 2
-//            this.checkInvariants(set);
-
-            this.setHt(set, llcLine.getWay());
+            this.markHT(set, llcLine.getWay());
             this.insertDataEntry(set, llcLine.getTag());
-
-//            this.checkInvariants(set);
         } else if (requesterIsHt && !event.isHitInCache() && event.isEviction() && lineFoundIsHt) {
-            // case 3
-
-//            this.checkInvariants(set);
         } else if (!requesterIsHt && !event.isHitInCache() && event.isEviction() && lineFoundIsHt) {
-            // case 4
-//            this.checkInvariants(set);
-
-            this.setMt(set, llcLine.getWay());
-            this.removeLru(set);
-
-//            this.checkInvariants(set);
+            this.markMT(set, llcLine.getWay());
+            this.removeLRU(set);
         } else if (!requesterIsHt && !lineFoundIsHt) {
-            //case 5
-//            this.checkInvariants(set);
             boolean htRequestFound = false;
 
             for (int way = 0; way < this.htRequestVictimCache.getAssociativity(); way++) {
@@ -252,11 +197,9 @@ public class LLCHTRequestProfilingCapability implements SimulationCapability {
             }
 
             if (htRequestFound) {
-                this.removeLru(set);
+                this.removeLRU(set);
                 this.insertDataEntry(set, llcLine.getTag());
             }
-
-//            this.checkInvariants(set);
         }
 
         boolean mtHit = event.isHitInCache() && !requesterIsHt && !lineFoundIsHt;
@@ -267,76 +210,44 @@ public class LLCHTRequestProfilingCapability implements SimulationCapability {
         boolean vtHit = !requesterIsHt && vtLine != null;
 
         if (!mtHit && !htHit && vtHit) {
-//            this.checkInvariants(set);
-
-//            this.fileWriter.printf("[%d] \tbadHtRequest, tag: 0x%08x\n", this.simulation.getCycleAccurateEventQueue().getCurrentCycle(), vtLine.getTag());
-
             this.numBadHtRequests++;
-            this.setLru(set, vtLine.getWay());
-
-//            this.checkInvariants(set);
+            this.eventDispatcher.dispatch(new BadHTRequestEvent());
+            this.setLRU(set, vtLine.getWay());
         } else if (!mtHit && htHit && !vtHit) {
-//            this.checkInvariants(set);
-
-//            this.fileWriter.printf("[%d] \tgoodHtRequest, tag: 0x%08x\n", this.simulation.getCycleAccurateEventQueue().getCurrentCycle(), event.getLineFound().getTag());
-
-            this.setMt(set, llcLine.getWay());
+            this.markMT(set, llcLine.getWay());
             this.numGoodHtRequests++;
-            this.removeLru(set);
-
-//            this.checkInvariants(set);
+            this.removeLRU(set);
         } else if (!mtHit && htHit && vtHit) {
-//            this.checkInvariants(set);
-
-            this.setMt(set, llcLine.getWay());
-            this.setLru(set, vtLine.getWay());
-            this.removeLru(set);
-
-//            this.checkInvariants(set);
+            this.markMT(set, llcLine.getWay());
+            this.setLRU(set, vtLine.getWay());
+            this.removeLRU(set);
         } else if (mtHit && vtHit) {
-//            this.checkInvariants(set);
-
-            this.setLru(set, vtLine.getWay());
-
-//            this.checkInvariants(set);
+            this.setLRU(set, vtLine.getWay());
         }
     }
 
-    private void checkInvariants(int set) {
-        int numhtRequestsInLlc = 0;
-        int numVictimEntries = 0;
-
-        for (int way = 0; way < this.llc.getAssociativity(); way++) {
-            if (this.htRequestStates.get(set).get(way) == LLCLineHTRequestState.HT) {
-                numhtRequestsInLlc++;
-            }
-        }
-
-        for (int way = 0; way < this.llc.getAssociativity(); way++) {
-            if (this.htRequestVictimCache.getLine(set, way).getState() != HTRequestVictimCacheLineState.INVALID) {
-                numVictimEntries++;
-            }
-        }
-
-        if (numhtRequestsInLlc != numVictimEntries) {
+    private void markHT(int set, int way) {
+        if (this.getHTRequestState(set, way).equals(LLCLineHTRequestState.HT)) {
             throw new IllegalArgumentException();
         }
+
+        this.setHTRequestState(set, way, LLCLineHTRequestState.HT);
     }
 
-    private void setHt(int set, int way) {
-        if (this.htRequestStates.get(set).get(way).equals(LLCLineHTRequestState.HT)) {
+    private void markMT(int set, int way) {
+        if (this.getHTRequestState(set, way).equals(LLCLineHTRequestState.MT)) {
             throw new IllegalArgumentException();
         }
 
-        this.htRequestStates.get(set).put(way, LLCLineHTRequestState.HT);
+        this.setHTRequestState(set, way, LLCLineHTRequestState.MT);
     }
-
-    private void setMt(int set, int way) {
-        if (this.htRequestStates.get(set).get(way).equals(LLCLineHTRequestState.MT)) {
-            throw new IllegalArgumentException();
-        }
-
-        this.htRequestStates.get(set).put(way, LLCLineHTRequestState.MT);
+    
+    public LLCLineHTRequestState getHTRequestState(int set, int way) {
+        return this.htRequestStates.get(set).get(way);
+    }
+    
+    private void setHTRequestState(int set, int way, LLCLineHTRequestState htRequestState) {
+        this.htRequestStates.get(set).put(way, htRequestState);
     }
 
     private void insertDataEntry(int set, int tag) {
@@ -351,11 +262,11 @@ public class LLCHTRequestProfilingCapability implements SimulationCapability {
         newMiss.commit();
     }
 
-    private void setLru(int set, int way) {
+    private void setLRU(int set, int way) {
         this.getLruPolicyForHtRequestVictimCache().setLRU(set, way);
     }
 
-    private void removeLru(int set) {
+    private void removeLRU(int set) {
         LRUPolicy<HTRequestVictimCacheLineState, CacheLine<HTRequestVictimCacheLineState>> lru = this.getLruPolicyForHtRequestVictimCache();
 
         for (int i = this.llc.getAssociativity() - 1; i >= 0; i--) {
@@ -387,8 +298,12 @@ public class LLCHTRequestProfilingCapability implements SimulationCapability {
         throw new IllegalArgumentException();
     }
 
-    public CacheLine<HTRequestVictimCacheLineState> findHtRequestVictimLine(int tag) {
+    private CacheLine<HTRequestVictimCacheLineState> findHtRequestVictimLine(int tag) {
         return this.htRequestVictimCache.findLine(tag);
+    }
+
+    public BlockingEventDispatcher<LLCHTRequestProfilingHelperEvent> getEventDispatcher() {
+        return eventDispatcher;
     }
 
     public static enum LLCLineHTRequestState {
@@ -401,5 +316,14 @@ public class LLCHTRequestProfilingCapability implements SimulationCapability {
         INVALID,
         NULL,
         DATA
+    }
+    
+    public abstract class LLCHTRequestProfilingHelperEvent implements BlockingEvent {
+    }
+    
+    public class HTRequestEvent extends LLCHTRequestProfilingHelperEvent {
+    }
+    
+    public class BadHTRequestEvent extends LLCHTRequestProfilingHelperEvent {
     }
 }

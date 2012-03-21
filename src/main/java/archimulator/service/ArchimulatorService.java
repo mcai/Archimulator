@@ -35,6 +35,8 @@ public interface ArchimulatorService extends MessageSink {
     List<SimulatedProgram> getSimulatedProgramsAsList() throws SQLException;
     
     SimulatedProgram getSimulatedProgramById(long simulatedProgramId) throws SQLException;
+
+    SimulatedProgram getSimulatedProgramByTitle(String simulatedProgramTitle) throws SQLException;
     
     void addSimulatedProgram(SimulatedProgram simulatedProgram) throws SQLException;
     
@@ -45,6 +47,8 @@ public interface ArchimulatorService extends MessageSink {
     List<ProcessorProfile> getProcessorProfilesAsList() throws SQLException;
     
     ProcessorProfile getProcessorProfileById(long processorProfileId) throws SQLException;
+
+    ProcessorProfile getProcessorProfileByTitle(String processorProfileTitle) throws SQLException;
     
     void addProcessorProfile(ProcessorProfile processorProfile) throws SQLException;
     
@@ -55,6 +59,8 @@ public interface ArchimulatorService extends MessageSink {
     List<ExperimentProfile> getExperimentProfilesAsList() throws SQLException;
 
     ExperimentProfile getExperimentProfileById(long experimentProfileId) throws SQLException;
+
+    ExperimentProfile getExperimentProfileByTitle(String experimentProfileTitle) throws SQLException;
 
     void addExperimentProfile(ExperimentProfile experimentProfile) throws SQLException;
 

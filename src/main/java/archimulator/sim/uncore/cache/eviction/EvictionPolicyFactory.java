@@ -19,6 +19,7 @@
 package archimulator.sim.uncore.cache.eviction;
 
 import archimulator.sim.ext.uncore.cache.eviction.*;
+import archimulator.sim.ext.uncore.cache.eviction.LLCHTAwareLRUPolicy;
 import archimulator.sim.ext.uncore.cache.eviction.rd.evaluator.RDBasedEvaluatorPolicy;
 import archimulator.sim.ext.uncore.cache.eviction.rd.RDPredictionWithSelectiveCachingPolicy;
 import archimulator.sim.ext.uncore.cache.eviction.rd.RDPredictionWithoutSelectiveCachingPolicy;
@@ -48,8 +49,7 @@ public class EvictionPolicyFactory {
         evictionPolicyClasses.add(RDPredictionWithoutSelectiveCachingPolicy.class);
         evictionPolicyClasses.add(RDPredictionWithSelectiveCachingPolicy.class);
 
-        evictionPolicyClasses.add(HTAwareLRUWithTreeSetBasedVictimTrackingPolicy.class);
-        evictionPolicyClasses.add(HTAwareLRUWithXorBasedVictimTrackingPolicy.class);
+        evictionPolicyClasses.add(LLCHTAwareLRUPolicy.class);
 
         evictionPolicyClasses.add(ThrashingSensitiveHTEnhancedLRUPolicy.class);
 

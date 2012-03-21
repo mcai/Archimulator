@@ -50,6 +50,11 @@ public class ArchimulatorServlet extends HessianServlet implements ArchimulatorS
     }
 
     @Override
+    public SimulatedProgram getSimulatedProgramByTitle(String simulatedProgramTitle) throws SQLException {
+        return this.getProxy().getSimulatedProgramByTitle(simulatedProgramTitle);
+    }
+
+    @Override
     public void addSimulatedProgram(SimulatedProgram simulatedProgram) throws SQLException {
         this.getProxy().addSimulatedProgram(simulatedProgram);
     }
@@ -72,6 +77,11 @@ public class ArchimulatorServlet extends HessianServlet implements ArchimulatorS
     @Override
     public ProcessorProfile getProcessorProfileById(long processorProfileId) throws SQLException {
         return this.getProxy().getProcessorProfileById(processorProfileId);
+    }
+
+    @Override
+    public ProcessorProfile getProcessorProfileByTitle(String processorProfileTitle) throws SQLException {
+        return this.getProxy().getProcessorProfileByTitle(processorProfileTitle);
     }
 
     @Override
@@ -112,6 +122,11 @@ public class ArchimulatorServlet extends HessianServlet implements ArchimulatorS
     @Override
     public ExperimentProfile getExperimentProfileById(long experimentProfileId) throws SQLException {
         return this.getProxy().getExperimentProfileById(experimentProfileId);
+    }
+
+    @Override
+    public ExperimentProfile getExperimentProfileByTitle(String experimentProfileTitle) throws SQLException {
+        return this.getProxy().getExperimentProfileByTitle(experimentProfileTitle);
     }
 
     @Override
