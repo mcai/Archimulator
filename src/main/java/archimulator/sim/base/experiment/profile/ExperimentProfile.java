@@ -137,6 +137,22 @@ public class ExperimentProfile implements Serializable {
         return this;
     }
 
+    public Experiment createExperiment() {
+        switch (this.type) {
+            case FUNCTIONAL_EXPERIMENT:
+                return new FunctionalExperiment(this.title, this.processorProfile.getNumCores(), this.processorProfile.getNumThreadsPerCore(), this.contextConfigs,
+                        this.simulationCapabilityClasses, this.processorCapabilityClasses, this.kernelCapabilityClasses);
+            case DETAILED_EXPERIMENT:
+                return new DetailedExperiment(this.title, this.processorProfile.getNumCores(), this.processorProfile.getNumThreadsPerCore(), this.contextConfigs, this.processorProfile.getL2Size(), this.processorProfile.getL2Associativity(), this.processorProfile.getL2EvictionPolicyClz(),
+                        this.simulationCapabilityClasses, this.processorCapabilityClasses, this.kernelCapabilityClasses);
+            case CHECKPOINTED_EXPERIMENT:
+                return new CheckpointedExperiment(this.title, this.processorProfile.getNumCores(), this.processorProfile.getNumThreadsPerCore(), this.contextConfigs, this.processorProfile.getL2Size(), this.processorProfile.getL2Associativity(), this.processorProfile.getL2EvictionPolicyClz(), this.maxInsts, this.pthreadSpawnedIndex,
+                        this.simulationCapabilityClasses, this.processorCapabilityClasses, this.kernelCapabilityClasses);
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
+
     public ArrayList<Class<? extends SimulationCapability>> getSimulationCapabilityClasses() {
         return simulationCapabilityClasses;
     }
@@ -159,22 +175,6 @@ public class ExperimentProfile implements Serializable {
 
     public int getMaxInsts() {
         return maxInsts;
-    }
-
-    public Experiment createExperiment() {
-        switch (this.type) {
-            case FUNCTIONAL_EXPERIMENT:
-                return new FunctionalExperiment(UUID.randomUUID().toString(), this.getProcessorProfile().getNumCores(), this.getProcessorProfile().getNumThreadsPerCore(), this.getContextConfigs(),
-                        this.simulationCapabilityClasses, this.processorCapabilityClasses, this.kernelCapabilityClasses);
-            case DETAILED_EXPERIMENT:
-                return new DetailedExperiment(UUID.randomUUID().toString(), this.getProcessorProfile().getNumCores(), this.getProcessorProfile().getNumThreadsPerCore(), this.getContextConfigs(), this.getProcessorProfile().getL2Size(), this.getProcessorProfile().getL2Associativity(), this.getProcessorProfile().getL2EvictionPolicyClz(),
-                        this.simulationCapabilityClasses, this.processorCapabilityClasses, this.kernelCapabilityClasses);
-            case CHECKPOINTED_EXPERIMENT:
-                return new CheckpointedExperiment(UUID.randomUUID().toString(), this.getProcessorProfile().getNumCores(), this.getProcessorProfile().getNumThreadsPerCore(), this.getContextConfigs(), this.getProcessorProfile().getL2Size(), this.getProcessorProfile().getL2Associativity(), this.getProcessorProfile().getL2EvictionPolicyClz(), this.getMaxInsts(), this.getPthreadSpawnedIndex(),
-                        this.simulationCapabilityClasses, this.processorCapabilityClasses, this.kernelCapabilityClasses);
-            default:
-                throw new IllegalArgumentException();
-        }
     }
 
     public long getId() {

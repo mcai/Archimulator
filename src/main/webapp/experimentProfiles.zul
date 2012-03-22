@@ -46,11 +46,11 @@
                  pageSize="10" pagingPosition="bottom">
             <listhead>
                 <listheader label="Id" width="50px"/>
-                <listheader label="Title" width="200px"/>
+                <listheader label="Title" width="300px"/>
                 <listheader label="Type" width="150px"/>
-                <listheader label="Processor Profile Title" width="200px"/>
+                <listheader label="Processor Profile Title" width="300px"/>
                 <listheader label="Pthread Spawning Pseudocall" width="230px"/>
-                <listheader label="Max Insts" width="150px"/>
+                <listheader label="Max Insts" width="120px"/>
                 <listheader label="Created Time" width="150px"/>
                 <listheader label="State" width="100px"/>
                 <listheader label="Operations" width="360px"/>

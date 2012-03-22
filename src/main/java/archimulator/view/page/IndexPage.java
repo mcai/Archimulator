@@ -142,7 +142,7 @@ public class IndexPage extends GenericForwardComposer<Window> {
 
             document.add(new Paragraph("Experiment Profiles"));
 
-            List listExperimentProfiles = new List(List.ORDERED, 10);
+            List listExperimentProfiles = new List(List.ORDERED, 20);
 
             for(ExperimentProfile experimentProfile : archimulatorService.getExperimentProfilesAsList()) {
                 listExperimentProfiles.add(new ListItem(experimentProfile + ""));

@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.client;
 
+import archimulator.service.ArchimulatorServiceImpl;
 import archimulator.sim.base.experiment.profile.ExperimentProfile;
 import archimulator.sim.base.experiment.profile.ProcessorProfile;
 import archimulator.sim.base.simulation.SimulatedProgram;
@@ -69,8 +70,10 @@ public class ManagementStartup {
 
         simulatedPrograms.add(SIMULATED_PROGRAM_MST_HT(10, 10));
         simulatedPrograms.add(SIMULATED_PROGRAM_MST_HT(20, 10));
+        simulatedPrograms.add(SIMULATED_PROGRAM_MST_HT(20, 20));
         simulatedPrograms.add(SIMULATED_PROGRAM_MST_HT(320, 320));
         simulatedPrograms.add(SIMULATED_PROGRAM_MST_HT(640, 320));
+        simulatedPrograms.add(SIMULATED_PROGRAM_MST_HT(640, 640));
 
         simulatedPrograms.add(SIMULATED_PROGRAM_EM3D_BASELINE);
         simulatedPrograms.add(SIMULATED_PROGRAM_EM3D_HT);
@@ -95,8 +98,8 @@ public class ManagementStartup {
             for (int l2Associativity : l2Associativities) {
                 int numCores = 2;
                 int numThreadsPerCore = 2;
-                this.archimulatorService.addProcessorProfile(new ProcessorProfile("C" + numCores + "T" + numThreadsPerCore + "-" + "L2SizeInKB_" + l2SizeInKByte + "-" + "L2Assoc_" + l2Associativity + "-" + "L2Repl_" + "LRU", numCores, numThreadsPerCore, 1024 * l2SizeInKByte, l2Associativity, LRUPolicy.class));
-                this.archimulatorService.addProcessorProfile(new ProcessorProfile("C" + numCores + "T" + numThreadsPerCore + "-" + "L2SizeInKB_" + l2SizeInKByte + "-" + "L2Assoc_" + l2Associativity + "-" + "L2Repl_" + "LLCHTAwareLRU", numCores, numThreadsPerCore, 1024 * l2SizeInKByte, l2Associativity, LLCHTAwareLRUPolicy.class));
+                this.archimulatorService.addProcessorProfile(new ProcessorProfile("C" + numCores + "T" + numThreadsPerCore + "-" + "L2_" + l2SizeInKByte + "KB" + "_" + "Assoc" + l2Associativity + "_" + "LRU", numCores, numThreadsPerCore, 1024 * l2SizeInKByte, l2Associativity, LRUPolicy.class));
+                this.archimulatorService.addProcessorProfile(new ProcessorProfile("C" + numCores + "T" + numThreadsPerCore + "-" + "L2_" + l2SizeInKByte + "KB" + "_" + "Assoc" + l2Associativity + "_" + "LLCHTAwareLRU", numCores, numThreadsPerCore, 1024 * l2SizeInKByte, l2Associativity, LLCHTAwareLRUPolicy.class));
             }
         }
     }
@@ -112,11 +115,9 @@ public class ManagementStartup {
 
                 for(ProcessorProfile processorProfile : processorProfiles) {
                     if(processorProfile.getL2EvictionPolicyClz().equals(LRUPolicy.class)) {
-                        ExperimentProfile experimentProfile = new ExperimentProfile(processorProfile);
+                        ExperimentProfile experimentProfile = new ExperimentProfile(simulatedProgram.getTitle() + "-" + processorProfile.getTitle(), processorProfile);
                         experimentProfile.addWorkload(simulatedProgram);
-//                        experimentProfile.functionallyToEnd();
-//                        experimentProfile.inDetailToEnd();
-                        experimentProfile.cacheWarmupToPseudoCallAndInDetailForMaxInsts(3720, 2000000000);
+                        experimentProfile.inDetailToEnd();
                         experimentProfiles.add(experimentProfile);
                     }
                 }
@@ -125,12 +126,25 @@ public class ManagementStartup {
                 List<ProcessorProfile> processorProfiles = this.archimulatorService.getProcessorProfilesAsList();
 
                 for(ProcessorProfile processorProfile : processorProfiles) {
-                    if(processorProfile.getL2EvictionPolicyClz().equals(LRUPolicy.class) || processorProfile.getL2EvictionPolicyClz().equals(LLCHTAwareLRUPolicy.class)) {
-                        ExperimentProfile experimentProfile = new ExperimentProfile(processorProfile);
+                    if(processorProfile.getL2EvictionPolicyClz().equals(LRUPolicy.class)) {
+                        ExperimentProfile experimentProfile = new ExperimentProfile(simulatedProgram.getTitle() + "-" + processorProfile.getTitle(), processorProfile);
                         experimentProfile.addWorkload(simulatedProgram);
-//                        experimentProfile.functionallyToEnd();
-//                        experimentProfile.inDetailToEnd();
-                        experimentProfile.cacheWarmupToPseudoCallAndInDetailForMaxInsts(3720, 2000000000);
+                        experimentProfile.inDetailToEnd();
+                        experimentProfiles.add(experimentProfile);
+                    }
+                }
+            }
+        }
+
+        for (SimulatedProgram simulatedProgram : simulatedPrograms) {
+            if(simulatedProgram.getTitle().startsWith("mst_ht")) {
+                List<ProcessorProfile> processorProfiles = this.archimulatorService.getProcessorProfilesAsList();
+
+                for(ProcessorProfile processorProfile : processorProfiles) {
+                    if(processorProfile.getL2EvictionPolicyClz().equals(LLCHTAwareLRUPolicy.class)) {
+                        ExperimentProfile experimentProfile = new ExperimentProfile(simulatedProgram.getTitle() + "-" + processorProfile.getTitle(), processorProfile);
+                        experimentProfile.addWorkload(simulatedProgram);
+                        experimentProfile.inDetailToEnd();
                         experimentProfiles.add(experimentProfile);
                     }
                 }
@@ -140,6 +154,10 @@ public class ManagementStartup {
         for(ExperimentProfile experimentProfile : experimentProfiles) {
             this.archimulatorService.addExperimentProfile(experimentProfile);
         }
+    }
+    
+    private void resetAdminPassword() throws SQLException {
+        this.archimulatorService.setUserPassword(ArchimulatorServiceImpl.USER_ID_ADMIN, "1026@ustc");
     }
 
     public static final SimulatedProgram SIMULATED_PROGRAM_MST_BASELINE = new SimulatedProgram(
@@ -172,5 +190,6 @@ public class ManagementStartup {
         ManagementStartup startup = new ManagementStartup();
         startup.submitSimulatedProgramsAndProcessorProfiles();
         startup.submitExperimentProfiles();
+//        startup.resetAdminPassword();
     }
 }
