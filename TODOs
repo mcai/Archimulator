@@ -20,7 +20,7 @@ Archimulator on the cloud:
     2. get Memory usage on Guest
 
 TODOs:
-    1. stack profile and reuse distance profiling
+    1. intra-thread and inter-thread stack distance and reuse distance profiling
     2. PC/load address relative + HT request taxonomy based auto-tuning parameters of the HT scheme
     2. viewing program output.. from UI
 
