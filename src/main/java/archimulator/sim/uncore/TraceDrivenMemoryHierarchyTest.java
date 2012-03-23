@@ -45,16 +45,12 @@
 //
 //    private CycleAccurateEventQueue cycleAccurateEventQueue;
 //
-//    private Logger logger;
-//
 //    private MainMemory mainMemory;
 //    private LastLevelCache l2Cache;
 //
 //    public TraceDrivenMemoryHierarchyTest(String title, MemoryHierarchyConfig memoryHierarchyConfig, int numCores, int numThreadsPerCore) {
 //        this.blockingEventDispatcher = new BlockingEventDispatcher<BlockingEvent>();
 //        this.cycleAccurateEventQueue = new CycleAccurateEventQueue();
-//
-//        this.logger = new Logger(this);
 //
 //        this.title = title;
 //
@@ -238,10 +234,6 @@
 //
 //    public CycleAccurateEventQueue getCycleAccurateEventQueue() {
 //        return this.cycleAccurateEventQueue;
-//    }
-//
-//    public Logger getLogger() {
-//        return this.logger;
 //    }
 //
 //    public MainMemory getMainMemory() {

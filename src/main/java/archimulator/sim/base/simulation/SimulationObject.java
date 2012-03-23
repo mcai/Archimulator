@@ -28,6 +28,4 @@ public interface SimulationObject extends Serializable {
     BlockingEventDispatcher<BlockingEvent> getBlockingEventDispatcher();
 
     CycleAccurateEventQueue getCycleAccurateEventQueue();
-
-    Logger getLogger();
 }

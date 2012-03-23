@@ -542,7 +542,7 @@ public class BasicSyscallEmulation extends SyscallEmulation {
         }
 
         if (tgtFlags != 0) {
-            context.getLogger().fatalf(Logger.SYSCALL, "Syscall (open): cannot decode flags 0x%08x", tgtFlags);
+            Logger.fatalf(Logger.SYSCALL, "Syscall (open): cannot decode flags 0x%08x", context.getCycleAccurateEventQueue().getCurrentCycle(), tgtFlags);
         }
 
         String path = context.getProcess().getMemory().readString(addr, MAX_BUFFER_SIZE);

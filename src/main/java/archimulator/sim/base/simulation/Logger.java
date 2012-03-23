@@ -18,66 +18,50 @@
  ******************************************************************************/
 package archimulator.sim.base.simulation;
 
-import archimulator.util.io.TelnetServer;
-import archimulator.util.io.appender.CompositeOutputAppender;
-import archimulator.util.io.appender.ConsoleOutputAppender;
-import archimulator.util.io.appender.OutputAppender;
-
-import java.io.Serializable;
-
-public abstract class Logger implements Serializable {
-    private OutputAppender outputAppender;
-
-    public Logger() {
-        this.outputAppender = new CompositeOutputAppender(new ConsoleOutputAppender(), new TelnetServer());
-//        this.outputAppender = new ConsoleOutputAppender();
+public class Logger {
+    public static void infof(String category, String format, long currentCycle, Object... args) {
+        info(category, String.format(format, args), currentCycle);
     }
 
-    private String getMessage(String caption, String text) {
+    public static void info(String category, String text, long currentCycle) {
+        info(getMessage(category + "|" + "info", text), currentCycle);
+    }
+
+    public static void warnf(String category, String format, long currentCycle, Object... args) {
+        warn(category, String.format(format, args), currentCycle);
+    }
+
+    public static void warn(String category, String text, long currentCycle) {
+        warn(getMessage(category + "|" + "warn", text), currentCycle);
+    }
+
+    public static void fatalf(String category, String format, long currentCycle, Object... args) {
+        fatal(category, String.format(format, args), currentCycle);
+    }
+
+    public static void fatal(String category, String text, long currentCycle) {
+        throw new RuntimeException("[" + currentCycle + "] " + getMessage(category + "|" + "fatal", text));
+    }
+
+    public static void panicf(String category, String format, long currentCycle, Object... args) {
+        panic(category, String.format(format, args), currentCycle);
+    }
+
+    public static void panic(String category, String text, long currentCycle) {
+        throw new RuntimeException("[" + currentCycle + "] " + getMessage(category + "|" + "panic", text));
+    }
+
+    private static void info(String text, long currentCycle) {
+        System.out.println("[" + currentCycle + "] " + text);
+    }
+
+    private static void warn(String text, long currentCycle) {
+        System.err.println("[" + currentCycle + "] " + text);
+    }
+
+    private static String getMessage(String caption, String text) {
         return String.format("%s %s", caption.endsWith("info") ? "" : "[" + caption + "]", text);
     }
-
-    public void infof(String category, String format, Object... args) {
-        this.info(category, String.format(format, args));
-    }
-
-    public void info(String category, String text) {
-        this.info(this.getMessage(category + "|" + "info", text));
-    }
-
-    public void warnf(String category, String format, Object... args) {
-        this.warn(category, String.format(format, args));
-    }
-
-    public void warn(String category, String text) {
-        this.warn(this.getMessage(category + "|" + "warn", text));
-    }
-
-    public void fatalf(String category, String format, Object... args) {
-        this.fatal(category, String.format(format, args));
-    }
-
-    public void fatal(String category, String text) {
-        throw new RuntimeException("[" + this.getCurrentCycle() + "] " + this.getMessage(category + "|" + "fatal", text));
-    }
-
-    public void panicf(String category, String format, Object... args) {
-        this.panic(category, String.format(format, args));
-    }
-
-    public void panic(String category, String text) {
-        throw new RuntimeException("[" + this.getCurrentCycle() + "] " + this.getMessage(category + "|" + "panic", text));
-    }
-
-    private void info(String text) {
-        this.outputAppender.appendStdOutLine(this.getCurrentCycle(), text);
-    }
-
-    private void warn(String text) {
-        this.outputAppender.appendStdErrLine(this.getCurrentCycle(), text);
-    }
-
-    protected abstract long getCurrentCycle();
 
     public static final String EVENT_QUEUE = "EVENT_QUEUE";
     public static final String SIMULATOR = "SIMULATOR";

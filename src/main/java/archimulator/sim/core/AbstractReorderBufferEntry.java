@@ -17,10 +17,10 @@ public abstract class AbstractReorderBufferEntry {
 
     protected DynamicInstruction dynamicInst;
 
-    protected Map<Integer, PhysicalRegister> oldPhysRegs;
+    protected Map<Integer, PhysicalRegisterFile.PhysicalRegister> oldPhysRegs;
 
-    protected Map<Integer, PhysicalRegister> physRegs;
-    protected Map<Integer, PhysicalRegister> srcPhysRegs;
+    protected Map<Integer, PhysicalRegisterFile.PhysicalRegister> physRegs;
+    protected Map<Integer, PhysicalRegisterFile.PhysicalRegister> srcPhysRegs;
 
     protected boolean speculative;
 
@@ -48,9 +48,9 @@ public abstract class AbstractReorderBufferEntry {
         this.dirUpdate = dirUpdate;
         this.speculative = speculative;
 
-        this.oldPhysRegs = new TreeMap<Integer, PhysicalRegister>();
-        this.physRegs = new TreeMap<Integer, PhysicalRegister>();
-        this.srcPhysRegs = new TreeMap<Integer, PhysicalRegister>();
+        this.oldPhysRegs = new TreeMap<Integer, PhysicalRegisterFile.PhysicalRegister>();
+        this.physRegs = new TreeMap<Integer, PhysicalRegisterFile.PhysicalRegister>();
+        this.srcPhysRegs = new TreeMap<Integer, PhysicalRegisterFile.PhysicalRegister>();
     }
 
     public void writeback() {
@@ -62,7 +62,7 @@ public abstract class AbstractReorderBufferEntry {
     protected abstract boolean isNeedWriteback();
 
     private void doWriteback() {
-        for (Map.Entry<Integer, PhysicalRegister> entry : this.physRegs.entrySet()) {
+        for (Map.Entry<Integer, PhysicalRegisterFile.PhysicalRegister> entry : this.physRegs.entrySet()) {
             if (entry.getKey() != 0) {
                 entry.getValue().writeback();
             }
@@ -103,23 +103,23 @@ public abstract class AbstractReorderBufferEntry {
         return dynamicInst;
     }
 
-    public Map<Integer, PhysicalRegister> getOldPhysRegs() {
+    public Map<Integer, PhysicalRegisterFile.PhysicalRegister> getOldPhysRegs() {
         return oldPhysRegs;
     }
 
-    public Map<Integer, PhysicalRegister> getPhysRegs() {
+    public Map<Integer, PhysicalRegisterFile.PhysicalRegister> getPhysRegs() {
         return physRegs;
     }
 
-    public void setPhysRegs(Map<Integer, PhysicalRegister> physRegs) {
+    public void setPhysRegs(Map<Integer, PhysicalRegisterFile.PhysicalRegister> physRegs) {
         this.physRegs = physRegs;
     }
 
-    public Map<Integer, PhysicalRegister> getSrcPhysRegs() {
+    public Map<Integer, PhysicalRegisterFile.PhysicalRegister> getSrcPhysRegs() {
         return srcPhysRegs;
     }
 
-    public void setSrcPhysRegs(Map<Integer, PhysicalRegister> srcPhysRegs) {
+    public void setSrcPhysRegs(Map<Integer, PhysicalRegisterFile.PhysicalRegister> srcPhysRegs) {
         this.srcPhysRegs = srcPhysRegs;
     }
 

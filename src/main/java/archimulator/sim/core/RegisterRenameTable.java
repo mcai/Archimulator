@@ -23,18 +23,18 @@ import java.util.TreeMap;
 
 public class RegisterRenameTable {
     private final String name;
-    private final Map<Integer, PhysicalRegister> entries;
+    private final Map<Integer, PhysicalRegisterFile.PhysicalRegister> entries;
 
     public RegisterRenameTable(String name) {
         this.name = name;
-        this.entries = new TreeMap<Integer, PhysicalRegister>();
+        this.entries = new TreeMap<Integer, PhysicalRegisterFile.PhysicalRegister>();
     }
 
-    public PhysicalRegister get(int dep) {
+    public PhysicalRegisterFile.PhysicalRegister get(int dep) {
         return this.entries.get(dep);
     }
 
-    public void put(int dep, PhysicalRegister physReg) {
+    public void put(int dep, PhysicalRegisterFile.PhysicalRegister physReg) {
         this.entries.put(dep, physReg);
     }
 

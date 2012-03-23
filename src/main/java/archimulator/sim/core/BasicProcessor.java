@@ -48,8 +48,8 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
 
     private Map<Context, Thread> contextToThreadMappings;
 
-    public BasicProcessor(BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, Logger logger, ProcessorConfig processorConfig, Kernel kernel, CacheHierarchy cacheHierarchy, List<Class<? extends ProcessorCapability>> capabilityClasses) {
-        super(blockingEventDispatcher, cycleAccurateEventQueue, logger);
+    public BasicProcessor(BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, ProcessorConfig processorConfig, Kernel kernel, CacheHierarchy cacheHierarchy, List<Class<? extends ProcessorCapability>> capabilityClasses) {
+        super(blockingEventDispatcher, cycleAccurateEventQueue);
 
         this.config = processorConfig;
 

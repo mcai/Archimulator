@@ -61,7 +61,6 @@ public abstract class Experiment {
 
     private CyclicBarrier phaser;
 
-    private FiniteStateMachineFactory<ExperimentState, ExperimentCondition> fsmFactory;
     private FiniteStateMachine<ExperimentState, ExperimentCondition> fsm;
 
     private Thread threadStartExperiment;
@@ -93,77 +92,8 @@ public abstract class Experiment {
 
         this.phaser = new CyclicBarrier(2);
 
-        this.fsmFactory = new FiniteStateMachineFactory<ExperimentState, ExperimentCondition>();
-
-        this.fsmFactory.inState(ExperimentState.NOT_STARTED)
-                .ignoreCondition(ExperimentCondition.STOP)
-                .onCondition(ExperimentCondition.START, new Function1X<FiniteStateMachine<ExperimentState, ExperimentCondition>, ExperimentState>() {
-                    public ExperimentState apply(FiniteStateMachine<ExperimentState, ExperimentCondition> from, Object... params) {
-                        threadStartExperiment = new Thread() {
-                            @Override
-                            public void run() {
-                                doStart();
-
-                                fsm.fireTransition(ExperimentCondition.STOP);
-
-                                System.gc();
-                            }
-                        };
-
-                        threadStartExperiment.setDaemon(true);
-                        threadStartExperiment.start();
-
-                        return ExperimentState.RUNNING;
-                    }
-                });
-
-        this.fsmFactory.inState(ExperimentState.RUNNING)
-                .ignoreCondition(ExperimentCondition.START)
-                .onCondition(ExperimentCondition.PAUSE, new Function1X<FiniteStateMachine<ExperimentState, ExperimentCondition>, ExperimentState>() {
-                    public ExperimentState apply(FiniteStateMachine<ExperimentState, ExperimentCondition> from, Object... params) {
-                        getBlockingEventDispatcher().dispatch(new PauseSimulationEvent());
-                        return ExperimentState.PAUSED;
-                    }
-                })
-                .onCondition(ExperimentCondition.STOP, new Function1X<FiniteStateMachine<ExperimentState, ExperimentCondition>, ExperimentState>() {
-                    public ExperimentState apply(FiniteStateMachine<ExperimentState, ExperimentCondition> from, Object... params) {
-                        getBlockingEventDispatcher().dispatch(new StopSimulationEvent());
-                        return ExperimentState.STOPPED;
-                    }
-                });
-
-        this.fsmFactory.inState(ExperimentState.PAUSED)
-                .ignoreCondition(ExperimentCondition.PAUSE)
-                .onCondition(ExperimentCondition.RESUME, new Function1X<FiniteStateMachine<ExperimentState, ExperimentCondition>, ExperimentState>() {
-                    public ExperimentState apply(FiniteStateMachine<ExperimentState, ExperimentCondition> from, Object... params) {
-                        try {
-                            getPhaser().await();
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        } catch (BrokenBarrierException e) {
-                            throw new RuntimeException(e);
-                        }
-                        return ExperimentState.RUNNING;
-                    }
-                })
-                .onCondition(ExperimentCondition.STOP, new Function1X<FiniteStateMachine<ExperimentState, ExperimentCondition>, ExperimentState>() {
-                    public ExperimentState apply(FiniteStateMachine<ExperimentState, ExperimentCondition> from, Object... params) {
-                        try {
-                            getPhaser().await();
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        } catch (BrokenBarrierException e) {
-                            throw new RuntimeException(e);
-                        }
-                        getBlockingEventDispatcher().dispatch(new StopSimulationEvent());
-                        return ExperimentState.STOPPED;
-                    }
-                });
-
-        this.fsmFactory.inState(ExperimentState.STOPPED)
-                .ignoreCondition(ExperimentCondition.STOP);
-
-        this.fsm = new FiniteStateMachine<ExperimentState, ExperimentCondition>(this.fsmFactory, title, ExperimentState.NOT_STARTED);
+        this.fsm = new FiniteStateMachine<ExperimentState, ExperimentCondition>(fsmFactory, title, ExperimentState.NOT_STARTED);
+        this.fsm.put("experiment", this);
     }
 
     private void dumpStats(Map<String, Object> stats, boolean detailedSimulation) {
@@ -256,7 +186,90 @@ public abstract class Experiment {
 
     private static long currentId = 0;
 
+    private static FiniteStateMachineFactory<ExperimentState, ExperimentCondition> fsmFactory;
+
     static {
+        fsmFactory = new FiniteStateMachineFactory<ExperimentState, ExperimentCondition>();
+
+        fsmFactory.inState(ExperimentState.NOT_STARTED)
+                .ignoreCondition(ExperimentCondition.STOP)
+                .onCondition(ExperimentCondition.START, new Function1X<FiniteStateMachine<ExperimentState, ExperimentCondition>, ExperimentState>() {
+                    public ExperimentState apply(final FiniteStateMachine<ExperimentState, ExperimentCondition> from, Object... params) {
+                        final Experiment experiment = from.get(Experiment.class, "experiment");
+
+                        Thread threadStartExperiment = new Thread() {
+                            @Override
+                            public void run() {
+                                experiment.doStart();
+
+                                from.fireTransition(ExperimentCondition.STOP);
+
+                                System.gc();
+                            }
+                        };
+
+                        threadStartExperiment.setDaemon(true);
+                        threadStartExperiment.start();
+
+                        experiment.threadStartExperiment = threadStartExperiment;
+
+                        return ExperimentState.RUNNING;
+                    }
+                });
+
+        fsmFactory.inState(ExperimentState.RUNNING)
+                .ignoreCondition(ExperimentCondition.START)
+                .onCondition(ExperimentCondition.PAUSE, new Function1X<FiniteStateMachine<ExperimentState, ExperimentCondition>, ExperimentState>() {
+                    public ExperimentState apply(FiniteStateMachine<ExperimentState, ExperimentCondition> from, Object... params) {
+                        Experiment experiment = from.get(Experiment.class, "experiment");
+                        experiment.getBlockingEventDispatcher().dispatch(new PauseSimulationEvent());
+                        return ExperimentState.PAUSED;
+                    }
+                })
+                .onCondition(ExperimentCondition.STOP, new Function1X<FiniteStateMachine<ExperimentState, ExperimentCondition>, ExperimentState>() {
+                    public ExperimentState apply(FiniteStateMachine<ExperimentState, ExperimentCondition> from, Object... params) {
+                        Experiment experiment = from.get(Experiment.class, "experiment");
+                        experiment.getBlockingEventDispatcher().dispatch(new StopSimulationEvent());
+                        experiment.getBlockingEventDispatcher().clearListeners();
+                        return ExperimentState.STOPPED;
+                    }
+                });
+
+        fsmFactory.inState(ExperimentState.PAUSED)
+                .ignoreCondition(ExperimentCondition.PAUSE)
+                .onCondition(ExperimentCondition.RESUME, new Function1X<FiniteStateMachine<ExperimentState, ExperimentCondition>, ExperimentState>() {
+                    public ExperimentState apply(FiniteStateMachine<ExperimentState, ExperimentCondition> from, Object... params) {
+                        try {
+                            Experiment experiment = from.get(Experiment.class, "experiment");
+                            experiment.getPhaser().await();
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        } catch (BrokenBarrierException e) {
+                            throw new RuntimeException(e);
+                        }
+                        return ExperimentState.RUNNING;
+                    }
+                })
+                .onCondition(ExperimentCondition.STOP, new Function1X<FiniteStateMachine<ExperimentState, ExperimentCondition>, ExperimentState>() {
+                    public ExperimentState apply(FiniteStateMachine<ExperimentState, ExperimentCondition> from, Object... params) {
+                        try {
+                            Experiment experiment = from.get(Experiment.class, "experiment");
+                            experiment.getPhaser().await();
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        } catch (BrokenBarrierException e) {
+                            throw new RuntimeException(e);
+                        }
+                        Experiment experiment = from.get(Experiment.class, "experiment");
+                        experiment.getBlockingEventDispatcher().dispatch(new StopSimulationEvent());
+                        experiment.getBlockingEventDispatcher().clearListeners();
+                        return ExperimentState.STOPPED;
+                    }
+                });
+
+        fsmFactory.inState(ExperimentState.STOPPED)
+                .ignoreCondition(ExperimentCondition.STOP);
+
         System.out.println("Archimulator - A Cloud Enabled Multicore Architectural Simulator Written in Java.\n");
         System.out.println("Version: 3.0.\n");
         System.out.println("Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).\n");

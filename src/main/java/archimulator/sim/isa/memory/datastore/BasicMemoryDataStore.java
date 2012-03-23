@@ -38,7 +38,8 @@ public class BasicMemoryDataStore extends BasicSimulationObject implements Memor
     }
 
     public void create(int pageId) {
-        this.bbs.put(pageId, ByteBuffer.allocateDirect(Memory.getPageSize()).order(memory.isLittleEndian() ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN));
+//        this.bbs.put(pageId, ByteBuffer.allocateDirect(Memory.getPageSize()).order(memory.isLittleEndian() ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN));
+        this.bbs.put(pageId, ByteBuffer.allocate(Memory.getPageSize()).order(memory.isLittleEndian() ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN));
     }
 
     public void access(int pageId, int displacement, byte[] buf, int offset, int size, boolean write) {

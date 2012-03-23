@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.core;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +33,7 @@ public class PhysicalRegisterFile {
 
         this.entries = new ArrayList<PhysicalRegister>();
         for (int i = 0; i < capacity; i++) {
-            this.entries.add(new PhysicalRegister(this));
+            this.entries.add(new PhysicalRegister());
         }
 
         this.numFreePhysicalRegs = capacity;
@@ -65,7 +66,109 @@ public class PhysicalRegisterFile {
         return numFreePhysicalRegs;
     }
 
-    public void setNumFreePhysicalRegs(int numFreePhysicalRegs) {
-        this.numFreePhysicalRegs = numFreePhysicalRegs;
+    public class PhysicalRegister implements Serializable {
+        private PhysicalRegisterState state;
+
+        private int dep;
+
+        private List<ReorderBufferEntry> effectiveAddressComputationOperandDependents;
+        private List<LoadStoreQueueEntry> storeAddressDependents;
+        private List<AbstractReorderBufferEntry> dependents;
+
+        private PhysicalRegister() {
+            this.state = PhysicalRegisterState.AVAILABLE;
+
+            this.effectiveAddressComputationOperandDependents = new ArrayList<ReorderBufferEntry>();
+            this.storeAddressDependents = new ArrayList<LoadStoreQueueEntry>();
+            this.dependents = new ArrayList<AbstractReorderBufferEntry>();
+        }
+
+        public void reserve(int dep) {
+            assert (this.state == PhysicalRegisterState.AVAILABLE);
+
+            this.dep = dep;
+            this.state = PhysicalRegisterState.ARCHITECTURAL_REGISTER;
+
+            numFreePhysicalRegs--;
+        }
+
+        public void allocate(int dep) {
+            assert (this.state == PhysicalRegisterState.AVAILABLE);
+
+            this.dep = dep;
+            this.state = PhysicalRegisterState.RENAME_BUFFER_NOT_VALID;
+
+            numFreePhysicalRegs--;
+        }
+
+        public void writeback() {
+            assert (this.state == PhysicalRegisterState.RENAME_BUFFER_NOT_VALID);
+
+            this.state = PhysicalRegisterState.RENAME_BUFFER_VALID;
+
+            for (ReorderBufferEntry effectiveAddressComputationOperandDependent : this.effectiveAddressComputationOperandDependents) {
+                effectiveAddressComputationOperandDependent.setEffectiveAddressComputationOperandReady(true);
+            }
+
+            for (LoadStoreQueueEntry storeAddressDependent : this.storeAddressDependents) {
+                storeAddressDependent.setStoreAddressReady(true);
+            }
+
+            for (AbstractReorderBufferEntry dependent : this.dependents) {
+                dependent.setNumNotReadyOperands(dependent.getNumNotReadyOperands() - 1);
+            }
+
+            this.effectiveAddressComputationOperandDependents.clear();
+            this.storeAddressDependents.clear();
+            this.dependents.clear();
+        }
+
+        public void commit() {
+            assert (this.state == PhysicalRegisterState.RENAME_BUFFER_VALID);
+
+            this.state = PhysicalRegisterState.ARCHITECTURAL_REGISTER;
+        }
+
+        public void recover() {
+            assert (this.state == PhysicalRegisterState.RENAME_BUFFER_NOT_VALID || this.state == PhysicalRegisterState.RENAME_BUFFER_VALID);
+
+            this.dep = -1;
+            this.state = PhysicalRegisterState.AVAILABLE;
+
+            numFreePhysicalRegs++;
+        }
+
+        public void reclaim() {
+            assert (this.state == PhysicalRegisterState.ARCHITECTURAL_REGISTER);
+
+            this.dep = -1;
+            this.state = PhysicalRegisterState.AVAILABLE;
+
+            numFreePhysicalRegs++;
+        }
+
+        public boolean isReady() {
+            return this.state == PhysicalRegisterState.RENAME_BUFFER_VALID || this.state == PhysicalRegisterState.ARCHITECTURAL_REGISTER;
+        }
+
+        public int getDep() {
+            return dep;
+        }
+
+        public PhysicalRegisterState getState() {
+            return state;
+        }
+
+        public List<AbstractReorderBufferEntry> getDependents() {
+            return dependents;
+        }
+
+        public List<LoadStoreQueueEntry> getStoreAddressDependents() {
+            return storeAddressDependents;
+        }
+
+        public List<ReorderBufferEntry> getEffectiveAddressComputationOperandDependents() {
+            return effectiveAddressComputationOperandDependents;
+        }
     }
 }

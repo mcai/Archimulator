@@ -61,7 +61,8 @@ public class StandardJavaSerializationHelper {
     public static ByteBuffer readDirectByteBuffer(ObjectInputStream ois) throws IOException, ClassNotFoundException {
         byte[] bufferData = (byte[]) ois.readObject();
 
-        ByteBuffer buffer = ByteBuffer.allocateDirect(bufferData.length);
+//        ByteBuffer buffer = ByteBuffer.allocateDirect(bufferData.length);
+        ByteBuffer buffer = ByteBuffer.allocate(bufferData.length);
         buffer.position(0);
         buffer.put(bufferData);
         return buffer;

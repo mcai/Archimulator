@@ -1382,7 +1382,7 @@ public class StaticInstruction implements Serializable {
     @Odeps({})
     private static void unknown(Context context, int machInst) {
         if (!context.isSpeculative()) {
-            context.getLogger().panicf(Logger.INSTRUCTION, "{ctx-%d} 0x%08x: Unknown instruction 0x%08x", context.getId(), context.getRegs().getPc(), machInst);
+            Logger.panicf(Logger.INSTRUCTION, "{ctx-%d} 0x%08x: Unknown instruction 0x%08x", context.getCycleAccurateEventQueue().getCurrentCycle(), context.getId(), context.getRegs().getPc(), machInst);
         }
     }
 

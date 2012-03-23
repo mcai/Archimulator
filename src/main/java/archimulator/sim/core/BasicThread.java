@@ -275,13 +275,13 @@ public class BasicThread extends AbstractBasicThread {
         for (int odep : reorderBufferEntry.getDynamicInst().getStaticInst().getOdeps()) {
             if (odep != 0) {
                 reorderBufferEntry.getOldPhysRegs().put(odep, this.renameTable.get(odep));
-                PhysicalRegister physReg = this.getPhysicalRegisterFile(RegisterDependencyType.getType(odep)).allocate(odep);
+                PhysicalRegisterFile.PhysicalRegister physReg = this.getPhysicalRegisterFile(RegisterDependencyType.getType(odep)).allocate(odep);
                 this.renameTable.put(odep, physReg);
                 reorderBufferEntry.getPhysRegs().put(odep, physReg);
             }
         }
 
-        for (PhysicalRegister physReg : reorderBufferEntry.getSrcPhysRegs().values()) {
+        for (PhysicalRegisterFile.PhysicalRegister physReg : reorderBufferEntry.getSrcPhysRegs().values()) {
             if (!physReg.isReady()) {
                 reorderBufferEntry.setNumNotReadyOperands(reorderBufferEntry.getNumNotReadyOperands() + 1);
                 physReg.getDependents().add(reorderBufferEntry);
@@ -289,7 +289,7 @@ public class BasicThread extends AbstractBasicThread {
         }
 
         if (reorderBufferEntry.isEffectiveAddressComputation()) {
-            PhysicalRegister physReg = reorderBufferEntry.getSrcPhysRegs().get(reorderBufferEntry.getDynamicInst().getStaticInst().getIdeps().get(0));
+            PhysicalRegisterFile.PhysicalRegister physReg = reorderBufferEntry.getSrcPhysRegs().get(reorderBufferEntry.getDynamicInst().getStaticInst().getIdeps().get(0));
             if (!physReg.isReady()) {
                 physReg.getEffectiveAddressComputationOperandDependents().add(reorderBufferEntry);
             } else {
@@ -304,7 +304,7 @@ public class BasicThread extends AbstractBasicThread {
             loadStoreQueueEntry.setSrcPhysRegs(reorderBufferEntry.getSrcPhysRegs());
             loadStoreQueueEntry.setPhysRegs(reorderBufferEntry.getPhysRegs());
 
-            for (PhysicalRegister physReg : loadStoreQueueEntry.getSrcPhysRegs().values()) {
+            for (PhysicalRegisterFile.PhysicalRegister physReg : loadStoreQueueEntry.getSrcPhysRegs().values()) {
                 if (!physReg.isReady()) {
                     physReg.getDependents().add(loadStoreQueueEntry);
                 }
@@ -312,7 +312,7 @@ public class BasicThread extends AbstractBasicThread {
 
             loadStoreQueueEntry.setNumNotReadyOperands(reorderBufferEntry.getNumNotReadyOperands());
 
-            PhysicalRegister storeAddressPhysReg = loadStoreQueueEntry.getSrcPhysRegs().get(loadStoreQueueEntry.getDynamicInst().getStaticInst().getIdeps().get(0));
+            PhysicalRegisterFile.PhysicalRegister storeAddressPhysReg = loadStoreQueueEntry.getSrcPhysRegs().get(loadStoreQueueEntry.getDynamicInst().getStaticInst().getIdeps().get(0));
             if (!storeAddressPhysReg.isReady()) {
                 storeAddressPhysReg.getStoreAddressDependents().add(loadStoreQueueEntry);
             } else {
@@ -394,7 +394,7 @@ public class BasicThread extends AbstractBasicThread {
 
         if (this.getCycleAccurateEventQueue().getCurrentCycle() - this.lastCommitCycle > COMMIT_TIMEOUT && this.lastCommitCycle % COMMIT_TIMEOUT == 0) {
             if (noInstructionCommittedCounterThreshold > 5) {
-                this.getLogger().fatalf(Logger.THREAD, "%s: No instruction committed for %d cycles, %d committed.", this.getName(), COMMIT_TIMEOUT, this.totalInsts);
+                Logger.fatalf(Logger.THREAD, "%s: No instruction committed for %d cycles, %d committed.", this.getCycleAccurateEventQueue().getCurrentCycle(), this.getName(), COMMIT_TIMEOUT, this.totalInsts);
             } else {
                 this.lastCommitCycle = this.getCycleAccurateEventQueue().getCurrentCycle();
                 this.noInstructionCommittedCounterThreshold++;

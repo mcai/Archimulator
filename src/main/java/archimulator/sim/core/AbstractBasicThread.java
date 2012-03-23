@@ -116,21 +116,21 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
 
         for (int i = 0; i < ArchitecturalRegisterFile.NUM_INT_REGS; i++) {
             int dep = RegisterDependencyType.toRegisterDependency(RegisterDependencyType.INTEGER, i);
-            PhysicalRegister physReg = this.intPhysicalRegisterFile.getEntries().get(i);
+            PhysicalRegisterFile.PhysicalRegister physReg = this.intPhysicalRegisterFile.getEntries().get(i);
             physReg.reserve(dep);
             this.renameTable.put(dep, physReg);
         }
 
         for (int i = 0; i < ArchitecturalRegisterFile.NUM_FLOAT_REGS; i++) {
             int dep = RegisterDependencyType.toRegisterDependency(RegisterDependencyType.FLOAT, i);
-            PhysicalRegister physReg = this.fpPhysicalRegisterFile.getEntries().get(i);
+            PhysicalRegisterFile.PhysicalRegister physReg = this.fpPhysicalRegisterFile.getEntries().get(i);
             physReg.reserve(dep);
             this.renameTable.put(dep, physReg);
         }
 
         for (int i = 0; i < ArchitecturalRegisterFile.NUM_MISC_REGS; i++) {
             int dep = RegisterDependencyType.toRegisterDependency(RegisterDependencyType.MISC, i);
-            PhysicalRegister physReg = this.miscPhysicalRegisterFile.getEntries().get(i);
+            PhysicalRegisterFile.PhysicalRegister physReg = this.miscPhysicalRegisterFile.getEntries().get(i);
             physReg.reserve(dep);
             this.renameTable.put(dep, physReg);
         }

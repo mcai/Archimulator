@@ -200,7 +200,8 @@ public class CacheBasedBigMemoryDataStore extends BasicSimulationObject implemen
 
         private MemoryPageCacheLine initOrLoadFromDisk(int newTag) {
             if (this.bb == null) {
-                this.bb = ByteBuffer.allocateDirect(BUFFER_LENGTH).order(memory.isLittleEndian() ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
+//                this.bb = ByteBuffer.allocateDirect(BUFFER_LENGTH).order(memory.isLittleEndian() ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
+                this.bb = ByteBuffer.allocate(BUFFER_LENGTH).order(memory.isLittleEndian() ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
             }
 
             if (bufferIdsExistsOnDisk.contains(newTag)) {

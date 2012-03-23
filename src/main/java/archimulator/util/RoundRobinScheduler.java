@@ -32,6 +32,8 @@ public class RoundRobinScheduler<ResourceT> {
 
     private int resourceId;
 
+    private BitSet stalled;
+
     public RoundRobinScheduler(List<ResourceT> resources, Predicate<ResourceT> pred, Function1<ResourceT, Boolean> consumeAction, int quant) {
         this.resources = resources;
         this.pred = pred;
@@ -39,15 +41,17 @@ public class RoundRobinScheduler<ResourceT> {
         this.quant = quant;
 
         this.resourceId = 0;
+
+        this.stalled = new BitSet(this.resources.size());
     }
 
     public void consumeNext() {
-        this.resourceId = consumeNext(this.resources, this.resourceId, this.quant, this.pred, this.consumeAction);
+        this.resourceId = consumeNext(this.resourceId);
     }
 
-    private static <T> int findNext(List<T> resources, Predicate<T> pred, BitSet except) {
-        for (int i = 0; i < resources.size(); i++) {
-            if (pred.apply(resources.get(i)) && !except.get(i)) {
+    private int findNext(BitSet except) {
+        for (int i = 0; i < this.resources.size(); i++) {
+            if (this.pred.apply(this.resources.get(i)) && !except.get(i)) {
                 return i;
             }
         }
@@ -55,22 +59,22 @@ public class RoundRobinScheduler<ResourceT> {
         return -1;
     }
 
-    private static <T> int consumeNext(List<T> resources, int resourceId, int quant, Predicate<T> pred, Function1<T, Boolean> consumeAction) {
-        BitSet stalled = new BitSet(resources.size());
+    private int consumeNext(int resourceId) {
+        this.stalled.clear();
 
-        resourceId = (resourceId + 1) % resources.size();
+        resourceId = (resourceId + 1) % this.resources.size();
 
-        for (int numConsumed = 0; numConsumed < quant; numConsumed++) {
-            if (stalled.get(resourceId) || !pred.apply(resources.get(resourceId))) {
-                resourceId = findNext(resources, pred, stalled);
+        for (int numConsumed = 0; numConsumed < this.quant; numConsumed++) {
+            if (this.stalled.get(resourceId) || !this.pred.apply(this.resources.get(resourceId))) {
+                resourceId = findNext(this.stalled);
             }
 
             if (resourceId == -1) {
                 break;
             }
 
-            if (!consumeAction.apply(resources.get(resourceId))) {
-                stalled.set(resourceId);
+            if (!this.consumeAction.apply(this.resources.get(resourceId))) {
+                this.stalled.set(resourceId);
             }
         }
 

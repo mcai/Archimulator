@@ -169,7 +169,6 @@ public class GuestStartup {
                     }
                 });
 
-
                 experiment.getBlockingEventDispatcher().addListener(Simulation.DumpStatsCompletedEvent.class, new Action1<Simulation.DumpStatsCompletedEvent>() {
                     @Override
                     public void apply(Simulation.DumpStatsCompletedEvent event) {
@@ -186,7 +185,7 @@ public class GuestStartup {
 
                 this.experimentProfileIdsToExperiments.put(experimentProfile.getId(), experiment);
                 experiment.runToEnd();
-                this.archimulatorService.notifyExperimentStopped(experimentProfile.getId());
+                this.stopExperiment(experimentProfile.getId());
                 return true;
             } else {
                 System.out.printf("[%s Contact Server] No experiment profile to run\n", DateHelper.toString(new Date()));
@@ -239,8 +238,8 @@ public class GuestStartup {
     //        public static final String SERVICE_URL = "http://204.152.205.131:8080/archimulator/archimulator";
 //    public static final String SERVICE_URL = "http://50.117.112.114:8080/archimulator/archimulator";
 //    public static final String SERVICE_URL = "http://[2607:f358:10:13::2]:8080/archimulator/archimulator";
-    public static final String SERVICE_URL = "http://localhost:8080/api";
-//    public static final String SERVICE_URL = "http://www.archimulator.com/api";
+//    public static final String SERVICE_URL = "http://localhost:8080/api";
+    public static final String SERVICE_URL = "http://www.archimulator.com/api";
 
     public static void main(String[] args) {
         if (args.length >= 1 && args[0].equals("-s")) {

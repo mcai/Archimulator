@@ -25,16 +25,14 @@ import archimulator.util.event.CycleAccurateEventQueue;
 public class BasicSimulationObject implements SimulationObject {
     private BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher;
     private CycleAccurateEventQueue cycleAccurateEventQueue;
-    private Logger logger;
 
-    public BasicSimulationObject(BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, Logger logger) {
+    public BasicSimulationObject(BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
         this.blockingEventDispatcher = blockingEventDispatcher;
         this.cycleAccurateEventQueue = cycleAccurateEventQueue;
-        this.logger = logger;
     }
 
     public BasicSimulationObject(SimulationObject parent) {
-        this(parent.getBlockingEventDispatcher(), parent.getCycleAccurateEventQueue(), parent.getLogger());
+        this(parent.getBlockingEventDispatcher(), parent.getCycleAccurateEventQueue());
     }
 
     public BlockingEventDispatcher<BlockingEvent> getBlockingEventDispatcher() {
@@ -43,9 +41,5 @@ public class BasicSimulationObject implements SimulationObject {
 
     public CycleAccurateEventQueue getCycleAccurateEventQueue() {
         return cycleAccurateEventQueue;
-    }
-
-    public Logger getLogger() {
-        return logger;
     }
 }

@@ -55,6 +55,6 @@ public abstract class SimulationStrategy {
     }
 
     public CacheHierarchy prepareCacheHierarchy() {
-        return new BasicCacheHierarchy(this.simulation.getBlockingEventDispatcher(), this.simulation.getCycleAccurateEventQueue(), this.simulation.getLogger(), this.simulation.getConfig().getProcessorConfig());
+        return new BasicCacheHierarchy(this.simulation.getBlockingEventDispatcher(), this.simulation.getCycleAccurateEventQueue(), this.simulation.getConfig().getProcessorConfig());
     }
 }

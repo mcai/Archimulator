@@ -49,7 +49,7 @@ public abstract class SequentialSimulationStrategy extends SimulationStrategy {
     public abstract void endSimulation();
 
     private void doFastForward() {
-        this.getSimulation().getLogger().info(Logger.SIMULATION, "Switched to fast forward mode.");
+        Logger.info(Logger.SIMULATION, "Switched to fast forward mode.", this.getSimulation().getCycleAccurateEventQueue().getCurrentCycle());
 
         while (!requestStop && !this.getSimulation().getProcessor().getKernel().getContexts().isEmpty() && this.canDoFastForwardOneCycle()) {
             for (Core core : this.getSimulation().getProcessor().getCores()) {
@@ -61,7 +61,7 @@ public abstract class SequentialSimulationStrategy extends SimulationStrategy {
     }
 
     private void doCacheWarmup() {
-        this.getSimulation().getLogger().info(Logger.SIMULATION, "Switched to cache warmup mode.");
+        Logger.info(Logger.SIMULATION, "Switched to cache warmup mode.", this.getSimulation().getCycleAccurateEventQueue().getCurrentCycle());
 
         while (!requestStop && !this.getSimulation().getProcessor().getKernel().getContexts().isEmpty() && this.canDoCacheWarmupOneCycle()) {
             for (Core core : this.getSimulation().getProcessor().getCores()) {
@@ -73,7 +73,7 @@ public abstract class SequentialSimulationStrategy extends SimulationStrategy {
     }
 
     private void doMeasurement() {
-        this.getSimulation().getLogger().info(Logger.SIMULATION, "Switched to measurement mode.");
+        Logger.info(Logger.SIMULATION, "Switched to measurement mode.", this.getSimulation().getCycleAccurateEventQueue().getCurrentCycle());
 
         while (!requestStop && !this.getSimulation().getProcessor().getKernel().getContexts().isEmpty() && this.canDoMeasurementOneCycle()) {
             for (Core core : this.getSimulation().getProcessor().getCores()) {

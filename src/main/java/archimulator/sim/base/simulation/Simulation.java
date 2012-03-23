@@ -67,13 +67,9 @@ public class Simulation implements SimulationObject {
 
     private CycleAccurateEventQueue cycleAccurateEventQueue;
 
-    private Logger logger;
-
     public Simulation(SimulationConfig config, SimulationStrategy strategy, List<Class<? extends SimulationCapability>> capabilityClasses, BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
         this.blockingEventDispatcher = blockingEventDispatcher;
         this.cycleAccurateEventQueue = cycleAccurateEventQueue;
-
-        this.logger = new SimulationObjectLogger(this);
 
         this.config = config;
         this.strategy = strategy;
@@ -128,7 +124,7 @@ public class Simulation implements SimulationObject {
             }
         });
 
-        this.processor = new BasicProcessor(this.blockingEventDispatcher, this.cycleAccurateEventQueue, this.logger, this.config.getProcessorConfig(), this.getStrategy().prepareKernel(), this.getStrategy().prepareCacheHierarchy(), this.config.getProcessorConfig().getProcessorCapabilityClasses());
+        this.processor = new BasicProcessor(this.blockingEventDispatcher, this.cycleAccurateEventQueue, this.config.getProcessorConfig(), this.getStrategy().prepareKernel(), this.getStrategy().prepareCacheHierarchy(), this.config.getProcessorConfig().getProcessorCapabilityClasses());
 
         this.getBlockingEventDispatcher().dispatch(new ProcessorInitializedEvent(this.processor));
 
@@ -164,9 +160,9 @@ public class Simulation implements SimulationObject {
 
     public void simulate() {
         try {
-            this.logger.infof(Logger.SIMULATOR, "run simulation: %s", this.getConfig().getTitle());
+            Logger.infof(Logger.SIMULATOR, "run simulation: %s", this.cycleAccurateEventQueue.getCurrentCycle(), this.getConfig().getTitle());
 
-            this.logger.info(Logger.SIMULATOR, "");
+            Logger.info(Logger.SIMULATOR, "", this.cycleAccurateEventQueue.getCurrentCycle());
 
             Timer timerDumpState = new Timer(true);
             timerDumpState.schedule(new TimerTask() {
@@ -220,7 +216,7 @@ public class Simulation implements SimulationObject {
     }
 
     private void pollSimulationState() {
-        this.logger.infof(Logger.SIMULATION, "------ Simulation %s: BEGIN DUMP STATE at %s ------", this.getConfig().getTitle(), new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(new Date()));
+        Logger.infof(Logger.SIMULATION, "------ Simulation %s: BEGIN DUMP STATE at %s ------", this.cycleAccurateEventQueue.getCurrentCycle(), this.getConfig().getTitle(), new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(new Date()));
 
         Map<String, Object> polledStats = new LinkedHashMap<String, Object>();
 
@@ -229,14 +225,14 @@ public class Simulation implements SimulationObject {
         polledStats = getStatsWithSimulationPrefix(polledStats);
 
         for (Map.Entry<String, Object> entry : polledStats.entrySet()) {
-            this.logger.infof(Logger.SIMULATION, "\t%s: %s", entry.getKey(), entry.getValue());
+            Logger.infof(Logger.SIMULATION, "\t%s: %s", this.cycleAccurateEventQueue.getCurrentCycle(), entry.getKey(), entry.getValue());
         }
 
         this.blockingEventDispatcher.dispatch(new PollStatsCompletedEvent(polledStats));
 
         this.getProcessor().getCacheHierarchy().dumpState();
 
-        this.logger.info(Logger.SIMULATION, "------ END DUMP STATE ------\n");
+        Logger.info(Logger.SIMULATION, "------ END DUMP STATE ------\n", this.cycleAccurateEventQueue.getCurrentCycle());
     }
 
     public static class PollStatsCompletedEvent implements BlockingEvent {
@@ -380,10 +376,6 @@ public class Simulation implements SimulationObject {
 
     public BlockingEventDispatcher<BlockingEvent> getBlockingEventDispatcher() {
         return this.blockingEventDispatcher;
-    }
-
-    public Logger getLogger() {
-        return this.logger;
     }
 
     public static long currentMessageId = 0;

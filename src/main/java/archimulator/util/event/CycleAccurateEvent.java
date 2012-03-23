@@ -30,7 +30,7 @@ public class CycleAccurateEvent implements Comparable<CycleAccurateEvent> {
     }
 
     public int compareTo(CycleAccurateEvent otherEvent) {
-        return new Long(when).compareTo(otherEvent.when);
+        return this.when < otherEvent.when ? -1 : this.when == otherEvent.when ? 0 : 1;
     }
 
     @Override

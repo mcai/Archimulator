@@ -419,7 +419,7 @@ public class DynamicSpeculativePrecomputationCapability implements ProcessorCapa
 
                 slices.add(slice);
             } else {
-                this.thread.getLogger().infof(Logger.THREAD, "%s: There is no sufficient hardware resource for storing slice, kindly ignored.", this.thread.getName());
+                Logger.infof(Logger.THREAD, "%s: There is no sufficient hardware resource for storing slice, kindly ignored.", this.thread.getCycleAccurateEventQueue().getCurrentCycle(), this.thread.getName());
             }
         }
 
@@ -447,7 +447,7 @@ public class DynamicSpeculativePrecomputationCapability implements ProcessorCapa
                 slice.spawningCount++;
                 slice.spawnedThreadContext = newContext;
             } else {
-                this.thread.getLogger().infof(Logger.THREAD, "%s: There is no sufficient hardware resource for spawning precomputation thread, kindly ignored.", this.thread.getName());
+                Logger.infof(Logger.THREAD, "%s: There is no sufficient hardware resource for spawning precomputation thread, kindly ignored.", this.thread.getCycleAccurateEventQueue().getCurrentCycle(), this.thread.getName());
             }
         }
 

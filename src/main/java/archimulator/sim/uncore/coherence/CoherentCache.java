@@ -145,9 +145,9 @@ public abstract class CoherentCache<StateT extends Serializable> extends MemoryD
 
     public void dumpState() {
         if (!this.pendingProcesses.isEmpty()) {
-            this.getLogger().infof(Logger.COHRENCE, this.getName() + ":");
+            Logger.infof(Logger.COHRENCE, this.getName() + ":", this.getCycleAccurateEventQueue().getCurrentCycle());
             for (PendingActionOwner pendingProcess : this.pendingProcesses) {
-                this.getLogger().infof(Logger.COHRENCE, "\t%s\n", pendingProcess);
+                Logger.infof(Logger.COHRENCE, "\t%s\n", this.getCycleAccurateEventQueue().getCurrentCycle(), pendingProcess);
             }
         }
     }

@@ -47,8 +47,8 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
     private L1sToL2Net l1sToL2Network;
     private L2ToMemNet l2ToMemNetwork;
 
-    public BasicCacheHierarchy(BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, Logger logger, ProcessorConfig processorConfig) {
-        super(blockingEventDispatcher, cycleAccurateEventQueue, logger);
+    public BasicCacheHierarchy(BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, ProcessorConfig processorConfig) {
+        super(blockingEventDispatcher, cycleAccurateEventQueue);
 
         switch (processorConfig.getMemoryHierarchyConfig().getMainMemory().getType()) {
             case SIMPLE:

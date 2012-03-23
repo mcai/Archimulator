@@ -32,7 +32,8 @@ public class CircularByteBuffer implements Serializable {
     private int writeIndex = 0;
 
     public CircularByteBuffer(int capacity) {
-        buffer = ByteBuffer.allocateDirect(capacity);
+//        buffer = ByteBuffer.allocateDirect(capacity);
+        buffer = ByteBuffer.allocate(capacity);
     }
 
     private void writeObject(ObjectOutputStream oos) throws IOException {
