@@ -69,6 +69,8 @@ public class ExperimentProfileListCellRenderer implements ListitemRenderer<Exper
             addButtonStop(listCellOperations, data, archimulatorService);
         }
 
+        addButtonReset(listCellOperations, data, archimulatorService);
+
         if(data.getState() != ExperimentProfileState.SUBMITTED) {
             addButtonStats(listCellOperations, data, archimulatorService);
         }
@@ -176,6 +178,28 @@ public class ExperimentProfileListCellRenderer implements ListitemRenderer<Exper
             }
         });
         listCellOperations.appendChild(buttonStop);
+    }
+
+    private void addButtonReset(Listcell listCellOperations, final ExperimentProfile data, final ArchimulatorService archimulatorService) {
+        Button buttonReset = new Button("Reset");
+
+        buttonReset.addEventListener(Events.ON_CLICK, new EventListener<Event>() {
+            @Override
+            public void onEvent(Event event) throws Exception {
+                Messagebox.show("Are you sure to reset experiment profile (id: " + data.getId() + ")?", "Reset Experiment Profile", Messagebox.YES | Messagebox.NO, Messagebox.QUESTION,
+                        new EventListener<Event>() {
+                            public void onEvent(Event evt) throws SQLException {
+                                switch ((Integer) evt.getData()) {
+                                    case Messagebox.YES:
+                                        archimulatorService.resetExperimentById(data.getId());
+                                        Executions.sendRedirect(null);
+                                        break;
+                                }
+                            }
+                        });
+            }
+        });
+        listCellOperations.appendChild(buttonReset);
     }
 
     private void addButtonStats(Listcell listCellOperations, final ExperimentProfile data, final ArchimulatorService archimulatorService) {

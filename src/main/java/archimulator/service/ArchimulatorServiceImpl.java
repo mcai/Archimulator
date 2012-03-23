@@ -344,6 +344,21 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
     }
 
     @Override
+    public void resetExperimentById(long experimentProfileId) throws SQLException {
+        if(!this.experimentProfiles.idExists(experimentProfileId)) {
+            return;
+        }
+
+        ExperimentProfile experimentProfile = this.getExperimentProfileById(experimentProfileId);
+        if(experimentProfile.getState() != ExperimentProfileState.SUBMITTED) {
+            this.cloudMessageChannel.send(experimentProfile.getSimulatorUserId(), new StopExperimentRequestEvent(experimentProfile.getId()));
+        }
+        experimentProfile.setState(ExperimentProfileState.SUBMITTED);
+        experimentProfile.getStats().clear();
+        this.experimentProfiles.update(experimentProfile);
+    }
+
+    @Override
     public void notifyPollStatsCompletedEvent(long experimentProfileId, Map<String, Object> stats) throws SQLException {
         if(!this.experimentProfiles.idExists(experimentProfileId)) {
             return;
