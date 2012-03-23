@@ -85,7 +85,7 @@ public class IndexPage extends GenericForwardComposer<Window> {
     }
     
     public void onClick$buttonDownloadReport(Event event) {
-        Filedownload.save(generateReport(), "application/pdf", "archimulator_report_" + DateHelper.toFileNameString(new Date()) + ".pdf");
+        Filedownload.save(generateReport(), "text/plain", "archimulator_report_" + DateHelper.toFileNameString(new Date()) + ".txt");
     }
 
     public void onClick$buttonClearData(Event event) {
@@ -106,84 +106,50 @@ public class IndexPage extends GenericForwardComposer<Window> {
         HttpSession httpSession = (HttpSession) session.getNativeSession();
         ArchimulatorService archimulatorService = ArchimulatorServletContextListener.getArchimulatorService(httpSession.getServletContext());
 
+        StringBuilder sb = new StringBuilder();
+
         try {
-            Document document = new Document(PageSize.LETTER.rotate());
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            PdfWriter.getInstance(document, out);
+            sb.append("Archimulator Report").append("\r\n");
+            sb.append("-----------------------------------------------------------------------\r\n\r\n");
 
-            document.addTitle("Archimulator Report");
-            document.addCreator("Archimulator");
-
-            document.open();
-
-            document.add(new Paragraph("Simulated Programs"));
-
-            List listSimulatedPrograms = new List(List.ORDERED, 20);
-
-            for(SimulatedProgram simulatedProgram : archimulatorService.getSimulatedProgramsAsList()) {
-                listSimulatedPrograms.add(new ListItem(simulatedProgram + ""));
+            java.util.List<SimulatedProgram> simulatedPrograms = archimulatorService.getSimulatedProgramsAsList();
+            sb.append("a. Simulated Programs").append(" (total: ").append(simulatedPrograms.size()).append(")").append("\r\n");
+            for(SimulatedProgram simulatedProgram : simulatedPrograms) {
+                sb.append("  ").append(simulatedProgram).append("\r\n");
             }
 
-            document.add(listSimulatedPrograms);
+            sb.append("\r\n");
 
-            document.add(Chunk.NEWLINE);
-
-            document.add(new Paragraph("Processor Profiles"));
-
-            List listProcessorProfiles = new List(List.ORDERED, 20);
-
-            for(ProcessorProfile processorProfile : archimulatorService.getProcessorProfilesAsList()) {
-                listProcessorProfiles.add(new ListItem(processorProfile + ""));
+            java.util.List<ProcessorProfile> processorProfiles = archimulatorService.getProcessorProfilesAsList();
+            sb.append("b. Processor Profiles").append(" (total: ").append(processorProfiles.size()).append(")").append("\r\n");
+            for(ProcessorProfile processorProfile : processorProfiles) {
+                sb.append("  ").append(processorProfile).append("\r\n");
             }
 
-            document.add(listProcessorProfiles);
+            sb.append("\r\n");
 
-            document.add(Chunk.NEWLINE);
+            java.util.List<ExperimentProfile> experimentProfiles = archimulatorService.getExperimentProfilesAsList();
+            sb.append("c. Experiment Profiles").append(" (total: ").append(experimentProfiles.size()).append(")").append("\r\n");
+            for(ExperimentProfile experimentProfile : experimentProfiles) {
+                sb.append("  ").append(experimentProfile).append("\r\n");
 
-            document.add(new Paragraph("Experiment Profiles"));
-
-            List listExperimentProfiles = new List(List.ORDERED, 20);
-
-            for(ExperimentProfile experimentProfile : archimulatorService.getExperimentProfilesAsList()) {
-                listExperimentProfiles.add(new ListItem(experimentProfile + ""));
-
-                List list1 = new List(List.UNORDERED, 10);
-
-                list1.add(new ListItem("Context Configs"));
-
-                List listContextConfigs = new List(List.UNORDERED, 10);
+                sb.append("  ").append("  ").append("Context Configs").append("\r\n");
 
                 for(ContextConfig contextConfig : experimentProfile.getContextConfigs()) {
-                    listContextConfigs.add(new ListItem(contextConfig + ""));
+                    sb.append("  ").append("  ").append("  ").append(contextConfig).append("\r\n");
                 }
 
-                list1.add(listContextConfigs);
-
-                list1.add(new ListItem("Stats"));
-
-                List listExperimentStats = new List(List.UNORDERED, 10);
+                sb.append("  ").append("  ").append("Stats").append("\r\n");
 
                 Map<String,Object> experimentStats = archimulatorService.getExperimentStatsById(experimentProfile.getId());
                 for(String key : experimentStats.keySet()) {
-                    listExperimentStats.add(new ListItem(key + ": " + experimentStats.get(key)));
+                    sb.append("  ").append("  ").append("  ").append(key + ": " + experimentStats.get(key)).append("\r\n");
                 }
-
-                list1.add(listExperimentStats);
-
-                listExperimentProfiles.add(list1);
             }
 
-            document.add(listExperimentProfiles);
-
-            document.add(Chunk.NEWLINE);
-
-            Anchor anchorArchimulatorWebsite = new Anchor("For more details, please visit: http://www.archimulator.com/.");
-            anchorArchimulatorWebsite.setReference("http://www.archimulator.com/");
-            document.add(anchorArchimulatorWebsite);
-
-            document.close();
-            out.close();
-            return out.toByteArray();
+            sb.append("\r\n");
+            
+            return sb.toString().getBytes();
         } catch (Exception e) {
             System.out.println(e);
             return null;

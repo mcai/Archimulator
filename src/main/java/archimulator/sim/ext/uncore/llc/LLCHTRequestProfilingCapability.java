@@ -19,6 +19,8 @@
 package archimulator.sim.ext.uncore.llc;
 
 import archimulator.sim.base.event.*;
+import archimulator.sim.base.experiment.capability.SimulationCapability;
+import archimulator.sim.base.simulation.Simulation;
 import archimulator.sim.core.BasicThread;
 import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.cache.*;
@@ -30,12 +32,11 @@ import archimulator.util.action.Function3;
 import archimulator.util.event.BlockingEvent;
 import archimulator.util.event.BlockingEventDispatcher;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LLCHTRequestProfilingHelper<StateT extends Serializable, LineT extends CacheLine<StateT>> {
-    private EvictableCache<StateT, LineT> llc;
+public class LLCHTRequestProfilingCapability implements SimulationCapability {
+    private EvictableCache<?, ?> llc;
 
     private Map<Integer, Map<Integer, LLCLineHTRequestState>> htRequestStates;
     private EvictableCache<HTRequestVictimCacheLineState, CacheLine<HTRequestVictimCacheLineState>> htRequestVictimCache;
@@ -51,9 +52,13 @@ public class LLCHTRequestProfilingHelper<StateT extends Serializable, LineT exte
 
     private long numLateHtRequests;
     
-    private BlockingEventDispatcher<LLCHTRequestProfilingHelperEvent> eventDispatcher;
+    private BlockingEventDispatcher<LLCHTRequestProfilingCapabilityEvent> eventDispatcher;
 
-    public LLCHTRequestProfilingHelper(EvictableCache<StateT, LineT> llc) {
+    public LLCHTRequestProfilingCapability(Simulation simulation) {
+        this(simulation.getProcessor().getCacheHierarchy().getL2Cache().getCache());
+    }
+
+    public LLCHTRequestProfilingCapability(EvictableCache<?, ?> llc) {
         this.llc = llc;
 
         this.htRequestStates = new HashMap<Integer, Map<Integer, LLCLineHTRequestState>>();
@@ -72,11 +77,11 @@ public class LLCHTRequestProfilingHelper<StateT extends Serializable, LineT exte
             }
         });
 
-        this.eventDispatcher = new BlockingEventDispatcher<LLCHTRequestProfilingHelperEvent>();
+        this.eventDispatcher = new BlockingEventDispatcher<LLCHTRequestProfilingCapabilityEvent>();
 
         llc.getBlockingEventDispatcher().addListener(CoherentCacheServiceNonblockingRequestEvent.class, new Action1<CoherentCacheServiceNonblockingRequestEvent>() {
             public void apply(CoherentCacheServiceNonblockingRequestEvent event) {
-                if (event.getCache().getCache().equals(LLCHTRequestProfilingHelper.this.llc)) {
+                if (event.getCache().getCache().equals(LLCHTRequestProfilingCapability.this.llc)) {
                     serviceRequest(event);
                 }
             }
@@ -85,7 +90,7 @@ public class LLCHTRequestProfilingHelper<StateT extends Serializable, LineT exte
         llc.getBlockingEventDispatcher().addListener(CoherentCacheNonblockingRequestHitToTransientTagEvent.class, new Action1<CoherentCacheNonblockingRequestHitToTransientTagEvent>() {
             @SuppressWarnings("Unchecked")
             public void apply(CoherentCacheNonblockingRequestHitToTransientTagEvent event) {
-                if (event.getCache().getCache().equals(LLCHTRequestProfilingHelper.this.llc)) {
+                if (event.getCache().getCache().equals(LLCHTRequestProfilingCapability.this.llc)) {
                     markLateHTRequest(event);
                 }
             }
@@ -122,20 +127,20 @@ public class LLCHTRequestProfilingHelper<StateT extends Serializable, LineT exte
     }
 
     private void dumpStats(Map<String, Object> stats) {
-        stats.put("llcHTRequestProfilingHelper." + this.llc.getName() + ".numMtMisses", String.valueOf(this.numMtMisses));
+        stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numMtMisses", String.valueOf(this.numMtMisses));
 
-        stats.put("llcHTRequestProfilingHelper." + this.llc.getName() + ".numTotalHtRequests", String.valueOf(this.numTotalHtRequests));
+        stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numTotalHtRequests", String.valueOf(this.numTotalHtRequests));
 
-        stats.put("llcHTRequestProfilingHelper." + this.llc.getName() + ".numUsefulHtRequests", String.valueOf(this.numUsefulHtRequests));
+        stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numUsefulHtRequests", String.valueOf(this.numUsefulHtRequests));
 
-        stats.put("llcHTRequestProfilingHelper." + this.llc.getName() + ".htRequestAccuracy", String.valueOf(100.0 * (double) this.numUsefulHtRequests / this.numTotalHtRequests) + "%");
-        stats.put("llcHTRequestProfilingHelper." + this.llc.getName() + ".htRequestCoverage", String.valueOf(100.0 * (double) this.numUsefulHtRequests / (this.numMtMisses + this.numUsefulHtRequests)) + "%");
+        stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".htRequestAccuracy", String.valueOf(100.0 * (double) this.numUsefulHtRequests / this.numTotalHtRequests) + "%");
+        stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".htRequestCoverage", String.valueOf(100.0 * (double) this.numUsefulHtRequests / (this.numMtMisses + this.numUsefulHtRequests)) + "%");
 
-        stats.put("llcHTRequestProfilingHelper." + this.llc.getName() + ".numGoodHtRequests", String.valueOf(this.numGoodHtRequests));
-        stats.put("llcHTRequestProfilingHelper." + this.llc.getName() + ".numBadHtRequests", String.valueOf(this.numBadHtRequests));
-        stats.put("llcHTRequestProfilingHelper." + this.llc.getName() + ".numUglyHtRequests", String.valueOf(this.numTotalHtRequests - this.numGoodHtRequests - this.numBadHtRequests));
+        stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numGoodHtRequests", String.valueOf(this.numGoodHtRequests));
+        stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numBadHtRequests", String.valueOf(this.numBadHtRequests));
+        stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numUglyHtRequests", String.valueOf(this.numTotalHtRequests - this.numGoodHtRequests - this.numBadHtRequests));
 
-        stats.put("llcHTRequestProfilingHelper." + this.llc.getName() + ".numLateHtRequests", String.valueOf(this.numLateHtRequests));
+        stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numLateHtRequests", String.valueOf(this.numLateHtRequests));
     }
 
     private void markLateHTRequest(CoherentCacheNonblockingRequestHitToTransientTagEvent event) {
@@ -302,7 +307,7 @@ public class LLCHTRequestProfilingHelper<StateT extends Serializable, LineT exte
         return this.htRequestVictimCache.findLine(tag);
     }
 
-    public BlockingEventDispatcher<LLCHTRequestProfilingHelperEvent> getEventDispatcher() {
+    public BlockingEventDispatcher<LLCHTRequestProfilingCapabilityEvent> getEventDispatcher() {
         return eventDispatcher;
     }
 
@@ -318,12 +323,12 @@ public class LLCHTRequestProfilingHelper<StateT extends Serializable, LineT exte
         DATA
     }
     
-    public abstract class LLCHTRequestProfilingHelperEvent implements BlockingEvent {
+    public abstract class LLCHTRequestProfilingCapabilityEvent implements BlockingEvent {
     }
     
-    public class HTRequestEvent extends LLCHTRequestProfilingHelperEvent {
+    public class HTRequestEvent extends LLCHTRequestProfilingCapabilityEvent {
     }
     
-    public class BadHTRequestEvent extends LLCHTRequestProfilingHelperEvent {
+    public class BadHTRequestEvent extends LLCHTRequestProfilingCapabilityEvent {
     }
 }
