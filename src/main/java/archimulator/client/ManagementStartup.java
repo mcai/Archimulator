@@ -54,6 +54,8 @@ public class ManagementStartup {
 
     private void submitSimulatedProgramsAndProcessorProfiles() throws SQLException {
         this.archimulatorService.setRunningExperimentEnabled(false);
+        
+        this.archimulatorService.clearData();
 
         List<SimulatedProgram> simulatedPrograms = new ArrayList<SimulatedProgram>();
         simulatedPrograms.add(SIMULATED_PROGRAM_MST_BASELINE);
@@ -143,8 +145,12 @@ public class ManagementStartup {
         }
 
         for(ExperimentProfile experimentProfile : experimentProfiles) {
+            System.out.println("Submitting experiment profile: " + experimentProfile);
+            
             this.archimulatorService.addExperimentProfile(experimentProfile);
         }
+
+        this.archimulatorService.setRunningExperimentEnabled(true);
     }
     
     private void resetAdminPassword() throws SQLException {
@@ -152,15 +158,15 @@ public class ManagementStartup {
     }
 
     public static final SimulatedProgram SIMULATED_PROGRAM_MST_BASELINE = new SimulatedProgram(
-            "mst_baseline", ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/Olden_Custom1/mst/baseline",
+            "mst_baseline", ExperimentProfile.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/baseline",
             "mst.mips",
-            "1000");
+            "10000");
 
     public static SimulatedProgram SIMULATED_PROGRAM_MST_HT(int lookahead, int stride) {
         SimulatedProgram program = new SimulatedProgram(
-                "mst_ht" + "-lookahead_" + lookahead + "-stride_" + stride, ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/Olden_Custom1/mst/ht",
+                "mst_ht" + "-lookahead_" + lookahead + "-stride_" + stride, ExperimentProfile.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/ht",
                 "mst.mips",
-                "1000");
+                "10000");
         program.setHelperThreadedProgram(true);
         program.setHtLookahead(lookahead);
         program.setHtStride(stride);
@@ -168,24 +174,24 @@ public class ManagementStartup {
     }
 
     public static final SimulatedProgram SIMULATED_PROGRAM_EM3D_BASELINE = new SimulatedProgram(
-            "em3d_baseline", ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/Olden_Custom1/em3d/baseline",
+            "em3d_baseline", ExperimentProfile.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/em3d/baseline",
             "em3d.mips",
             "400000 128 75 1");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_EM3D_HT = new SimulatedProgram(
-            "em3d_ht", ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/Olden_Custom1/em3d/ht",
+            "em3d_ht", ExperimentProfile.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/em3d/ht",
             "em3d.mips",
             "400000 128 75 1");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_429_MCF_BASELINE = new SimulatedProgram(
-            "429_mcf_baseline", ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline",
+            "429_mcf_baseline", ExperimentProfile.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline",
             "429.mcf.mips",
-            ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline/data/ref/input/inp.in");
+            ExperimentProfile.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline/data/ref/input/inp.in");
 
     public static final SimulatedProgram SIMULATED_PROGRAM_429_MCF_HT = new SimulatedProgram(
-            "429_mcf_ht", ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht",
+            "429_mcf_ht", ExperimentProfile.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht",
             "429.mcf.mips",
-            ExperimentProfile.getUserHome() + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht/data/ref/input/inp.in");
+            ExperimentProfile.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht/data/ref/input/inp.in");
 
     public static void recordException(Exception e) {
         System.out.print(String.format("[%s Exception] %s\r\n", DateHelper.toString(new Date()), e));

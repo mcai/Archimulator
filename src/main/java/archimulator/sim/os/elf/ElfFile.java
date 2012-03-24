@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.os.elf;
 
+import archimulator.sim.base.experiment.profile.ExperimentProfile;
 import archimulator.util.io.buffer.BigEndianBufferAccessor;
 import archimulator.util.io.buffer.BufferAccessor;
 import archimulator.util.io.buffer.LittleEndianBufferAccessor;
@@ -51,7 +52,7 @@ public class ElfFile {
 
     public ElfFile(String filename) {
         try {
-            this.file = new RandomAccessFile(filename, "r");
+            this.file = new RandomAccessFile(filename.replaceAll(ExperimentProfile.USER_HOME_TEMPLATE_ARG, System.getProperty("user.home")), "r");
             this.buffer = new RandomAccessFileBuffer(this.file);
 
             this.sectionHeaders = new ArrayList<ElfSectionHeader>();

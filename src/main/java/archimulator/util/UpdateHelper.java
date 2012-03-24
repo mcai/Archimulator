@@ -74,7 +74,7 @@ public class UpdateHelper {
             ChannelSftp sftpChannel = (ChannelSftp) channel;
 
             sftpChannel.cd(DeploymentProfile.getCurrent().getArchimulatorDirectoryPath());
-            getDir(sftpChannel, ".", new File(ExperimentProfile.getUserHome() + "/Archimulator"));
+            getDir(sftpChannel, ".", new File(ExperimentProfile.USER_HOME_TEMPLATE_ARG + "/Archimulator"));
 
             sftpChannel.exit();
             session.disconnect();

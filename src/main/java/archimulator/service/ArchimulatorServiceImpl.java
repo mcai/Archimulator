@@ -55,6 +55,8 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
     private MessageSink messageSinkProxy;
     
     private CloudMessageChannel cloudMessageChannel;
+    
+    private boolean loadingProgramStalled;
 
     @SuppressWarnings("unchecked")
     public ArchimulatorServiceImpl() {
@@ -118,8 +120,6 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
         this.simulatedPrograms.delete(this.simulatedPrograms.deleteBuilder().prepare());
         this.processorProfiles.delete(this.processorProfiles.deleteBuilder().prepare());
         this.experimentProfiles.delete(this.experimentProfiles.deleteBuilder().prepare());
-
-        this.users.delete(this.users.deleteBuilder().prepare());
     }
 
     @Override
@@ -217,7 +217,7 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
 
     @Override
     public ExperimentProfile retrieveOneExperimentProfileToRun(String simulatorUserId) throws SQLException {
-        if(!this.runningExperimentEnabled) {
+        if(!this.runningExperimentEnabled || loadingProgramStalled) {
             return null;
         }
 
@@ -227,6 +227,24 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
             result.setState(ExperimentProfileState.RUNNING);
             result.setSimulatorUserId(simulatorUserId);
             this.experimentProfiles.update(result);
+            
+            Thread thread = new Thread(){
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(30000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    loadingProgramStalled = false;
+                }
+            };
+            thread.setDaemon(true);
+            thread.start();
+
+            loadingProgramStalled = true;
+            
             return result;
         }
         

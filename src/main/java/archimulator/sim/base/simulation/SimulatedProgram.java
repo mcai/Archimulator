@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.base.simulation;
 
+import archimulator.sim.base.experiment.profile.ExperimentProfile;
 import archimulator.util.DateHelper;
 import archimulator.util.io.cmd.CommandLineHelper;
 import archimulator.util.io.cmd.SedHelper;
@@ -79,8 +80,8 @@ public class SimulatedProgram implements Serializable {
         if(this.helperThreadedProgram) {
             this.pushMacroDefineArg("push_params.h", "LOOKAHEAD", this.htLookahead + "");
             this.pushMacroDefineArg("push_params.h", "STRIDE", this.htStride + "");
-            this.buildWithMakefile();
         }
+        this.buildWithMakefile();
     }
 
     private void pushMacroDefineArg(String fileName, String key, String value) {
@@ -88,7 +89,7 @@ public class SimulatedProgram implements Serializable {
     }
 
     private void buildWithMakefile() {
-        CommandLineHelper.invokeShellCommand("sh -c 'cd " + this.cwd + ";make -f Makefile.mips -B'");
+        CommandLineHelper.invokeShellCommand("sh -c 'cd " + this.cwd.replaceAll(ExperimentProfile.USER_HOME_TEMPLATE_ARG, System.getProperty("user.home")) + ";make -f Makefile.mips -B'");
     }
 
     public long getId() {

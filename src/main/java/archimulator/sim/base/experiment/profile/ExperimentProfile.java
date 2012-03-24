@@ -238,7 +238,5 @@ public class ExperimentProfile implements Serializable {
         return String.format("ExperimentProfile{id=%d, title='%s', processorProfile.title='%s', type='%s', pthreadSpawnedIndex=%d, maxInsts=%d, state='%s', createdTime='%s'}", id, title, processorProfile.getTitle(), type, pthreadSpawnedIndex, maxInsts, state, DateHelper.toString(createdTime));
     }
 
-    public static String getUserHome() {
-        return System.getProperty("user.home");
-    }
+    public static final String USER_HOME_TEMPLATE_ARG = "<user.home>";
 }

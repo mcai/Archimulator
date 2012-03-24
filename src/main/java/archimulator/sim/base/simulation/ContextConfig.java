@@ -28,8 +28,6 @@ public class ContextConfig implements Serializable {
     private String stdout;
     private int threadId;
 
-    private List<String> cmdArgList;
-
     public ContextConfig(SimulatedProgram simulatedProgram, int threadId) {
         this(simulatedProgram, "ctx" + threadId + "_out.txt", threadId);
     }
@@ -38,13 +36,6 @@ public class ContextConfig implements Serializable {
         this.simulatedProgram = simulatedProgram;
         this.stdout = stdout;
         this.threadId = threadId;
-
-        this.cmdArgList = Arrays.asList((simulatedProgram.getCwd() + File.separator + simulatedProgram.getExe() + " " + simulatedProgram.getArgs()).split(" "));
-    }
-
-    @Override
-    public String toString() {
-        return String.format("thread %d -> '%s'", threadId, simulatedProgram.getTitle());
     }
 
     public SimulatedProgram getSimulatedProgram() {
@@ -59,7 +50,8 @@ public class ContextConfig implements Serializable {
         return threadId;
     }
 
-    public List<String> toCmdArgList() {
-        return cmdArgList;
+    @Override
+    public String toString() {
+        return String.format("thread %d -> '%s'", threadId, simulatedProgram.getTitle());
     }
 }

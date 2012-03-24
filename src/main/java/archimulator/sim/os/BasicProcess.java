@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.os;
 
+import archimulator.sim.base.experiment.profile.ExperimentProfile;
 import archimulator.sim.base.simulation.ContextConfig;
 import archimulator.sim.ext.analysis.Instruction;
 import archimulator.sim.isa.StaticInstruction;
@@ -26,10 +27,8 @@ import archimulator.sim.isa.memory.Memory;
 import archimulator.sim.os.elf.ElfFile;
 import archimulator.sim.os.elf.ElfSectionHeader;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.io.File;
+import java.util.*;
 
 public class BasicProcess extends Process {
     private Map<Integer, Integer> pcsToMachInsts;
@@ -48,7 +47,9 @@ public class BasicProcess extends Process {
 
         this.instructions = new HashMap<String, SortedMap<Integer, Instruction>>();
 
-        String elfFileName = contextConfig.toCmdArgList().get(0);
+        List<String> cmdArgList = Arrays.asList((contextConfig.getSimulatedProgram().getCwd() + File.separator + contextConfig.getSimulatedProgram().getExe() + " " + contextConfig.getSimulatedProgram().getArgs()).replaceAll(ExperimentProfile.USER_HOME_TEMPLATE_ARG, System.getProperty("user.home")).split(" "));
+
+        String elfFileName = cmdArgList.get(0);
 
         ElfFile elfFile = new ElfFile(elfFileName);
 
@@ -104,20 +105,20 @@ public class BasicProcess extends Process {
         this.getMemory().zero(this.getStackBase() - this.getStackSize(), this.getStackSize());
 
         int stackPtr = this.getEnvironBase();
-        this.getMemory().writeWord(stackPtr, contextConfig.toCmdArgList().size());
+        this.getMemory().writeWord(stackPtr, cmdArgList.size());
         stackPtr += 4;
 
         int argAddr = stackPtr;
-        stackPtr += (contextConfig.toCmdArgList().size() + 1) * 4;
+        stackPtr += (cmdArgList.size() + 1) * 4;
 
         int envAddr = stackPtr;
         stackPtr += (this.getEnvs().size() + 1) * 4;
 
-        for (int i = 0; i < contextConfig.toCmdArgList().size(); i++) {
+        for (int i = 0; i < cmdArgList.size(); i++) {
             this.getMemory().writeWord(argAddr + i * 4, stackPtr);
-            stackPtr += this.getMemory().writeString(stackPtr, contextConfig.toCmdArgList().get(i));
+            stackPtr += this.getMemory().writeString(stackPtr, cmdArgList.get(i));
         }
-        this.getMemory().writeWord(argAddr + contextConfig.toCmdArgList().size() * 4, 0);
+        this.getMemory().writeWord(argAddr + cmdArgList.size() * 4, 0);
 
         for (int i = 0; i < this.getEnvs().size(); i++) {
             this.getMemory().writeWord(envAddr + i * 4, stackPtr);
