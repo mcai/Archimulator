@@ -76,7 +76,7 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
             this.runningExperimentEnabled = false;
 
             if (!this.users.idExists(USER_ID_ADMIN)) {
-                this.setUserPassword(USER_ID_ADMIN, USER_PASSWORD_ADMIN);
+                this.setUserPassword(USER_ID_ADMIN, USER_INITIAL_PASSWORD_ADMIN);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -396,7 +396,7 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
     }
 
     public static final String USER_ID_ADMIN = "itecgo";
-    public static final String USER_PASSWORD_ADMIN = "1026@ustc";
+    public static final String USER_INITIAL_PASSWORD_ADMIN = "bywwnss";
 
     public static final String DATABASE_REVISION = "31";
 

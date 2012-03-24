@@ -148,7 +148,7 @@ public class ManagementStartup {
     }
     
     private void resetAdminPassword() throws SQLException {
-        this.archimulatorService.setUserPassword(ArchimulatorServiceImpl.USER_ID_ADMIN, "1026@ustc");
+        this.archimulatorService.setUserPassword(ArchimulatorServiceImpl.USER_ID_ADMIN, ArchimulatorServiceImpl.USER_INITIAL_PASSWORD_ADMIN);
     }
 
     public static final SimulatedProgram SIMULATED_PROGRAM_MST_BASELINE = new SimulatedProgram(
