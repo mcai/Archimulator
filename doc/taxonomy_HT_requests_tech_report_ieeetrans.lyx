@@ -36,7 +36,7 @@
 \paperfontsize default
 \spacing single
 \use_hyperref true
-\pdf_title "A Taxonomy of HT Requests in Helper Threaded Data Prefetching on CMPs"
+\pdf_title "A Taxonomy of HT LLC Requests in Helper Threaded Data Prefetching on CMPs"
 \pdf_author "Min Cai, Zhimin Gu"
 \pdf_keywords "chip multiprocessors, helper threaded data prefetching, cache replacement, cache pollution"
 \pdf_bookmarks false
@@ -97,7 +97,7 @@ cros/latex/contrib/IEEEtran/IEEEtran_HOWTO.pdf
 \end_layout
 
 \begin_layout Title
-A Taxonomy of HT Requests in Helper Threaded Data Prefetching on CMPs
+A Taxonomy of HT LLC Requests in Helper Threaded Data Prefetching on CMPs
 \end_layout
 
 \begin_layout Author
@@ -697,8 +697,10 @@ Experimental Setup
 We use an in-house multicore architectural simulator named Archimulator
  in our experiments mentioned in this work.
  Archimulator is an execution-driven architectural simulator written in
- Java and running on Linux that supports application-only cycle-accurate
- modeling of multicore multithreaded architectures.
+ Java and running on Linux.
+ It provides cycle-accurate application-only simulation of MIPS II executables
+ on multicore architectures consisting of OoO super-scalar cores and configurabl
+e memory hierarchy of directory-based MESI coherence.
  It has support of simulating Pthreads based parallel workloads.
  
 \end_layout

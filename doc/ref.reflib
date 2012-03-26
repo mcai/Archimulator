@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <library>
 <manage_target braces="false" utf8="false">ref.bib</manage_target>
-<library_folder monitor="false"></library_folder>
+<library_folder monitor="true"></library_folder>
 <taglist>
 </taglist>
 <doclist>
@@ -250,6 +250,272 @@
     <bib_extra key="Crossref">conf/ispass/2006</bib_extra>
     <bib_extra key="Publisher">IEEE Computer Society</bib_extra>
     <bib_extra key="Url">http://doi.ieeecomputersociety.org/10.1109/ISPASS.2006.1620802</bib_extra>
+  </doc>
+  <doc>
+    <filename></filename>
+    <relative_filename></relative_filename>
+    <key>Luk2001</key>
+    <notes></notes>
+    <bib_type>InProceedings</bib_type>
+    <bib_doi></bib_doi>
+    <bib_title>Tolerating memory latency through software-controlled pre-execution in simultaneous multithreading processors</bib_title>
+    <bib_authors>Luk, Chi-Keung</bib_authors>
+    <bib_journal></bib_journal>
+    <bib_volume></bib_volume>
+    <bib_number></bib_number>
+    <bib_pages>40-51</bib_pages>
+    <bib_year>2001</bib_year>
+    <bib_extra key="Bibdate">2002-12-18</bib_extra>
+    <bib_extra key="Bibsource">DBLP, http://dblp.uni-trier.de/db/conf/isca/isca2001.html#Luk01</bib_extra>
+    <bib_extra key="BookTitle">ISCA</bib_extra>
+    <bib_extra key="Url">http://doi.acm.org/10.1145/379240.379250</bib_extra>
+  </doc>
+  <doc>
+    <filename></filename>
+    <relative_filename></relative_filename>
+    <key>Kim2002</key>
+    <notes></notes>
+    <bib_type>Article</bib_type>
+    <bib_doi></bib_doi>
+    <bib_title>Design and evaluation of compiler algorithms for pre-execution</bib_title>
+    <bib_authors>Kim, Dongkeun and Yeung, Donald</bib_authors>
+    <bib_journal>ACM SIG\-PLAN Notices</bib_journal>
+    <bib_volume>37</bib_volume>
+    <bib_number>10</bib_number>
+    <bib_pages>159-170</bib_pages>
+    <bib_year>2002</bib_year>
+    <bib_extra key="Acknowledgement">Nelson H. F. Beebe, University of Utah, Department of Mathematics, 110 LCB, 155 S 1400 E RM 233, Salt Lake City, UT 84112-0090, USA, Tel: +1 801 581 5254, FAX: +1 801 581 4148, e-mail: \path|beebe@math.utah.edu|, \path|beebe@acm.org|, \path|beebe@computer.org| (Internet), URL: \path|http://www.math.utah.edu/ beebe/|</bib_extra>
+    <bib_extra key="Bibdate">Thu May 15 12:23:09 MDT 2003</bib_extra>
+    <bib_extra key="Bibsource">http://portal.acm.org/</bib_extra>
+    <bib_extra key="Coden">SINODQ</bib_extra>
+    <bib_extra key="Issn">0362-1340 (print), 1523-2867 (print), 1558-1160 (electronic)</bib_extra>
+    <bib_extra key="Issn-l">0362-1340</bib_extra>
+    <bib_extra key="Month">oct</bib_extra>
+  </doc>
+  <doc>
+    <filename></filename>
+    <relative_filename></relative_filename>
+    <key>RoG2006</key>
+    <notes></notes>
+    <bib_type>Article</bib_type>
+    <bib_doi></bib_doi>
+    <bib_title>Speculative pre-execution assisted by compiler (SPEAR)</bib_title>
+    <bib_authors>Ro, Won Woo and Gaudiot, Jean-Luc</bib_authors>
+    <bib_journal>J. Parallel Distrib. Comput</bib_journal>
+    <bib_volume>66</bib_volume>
+    <bib_number>8</bib_number>
+    <bib_pages>1076-1089</bib_pages>
+    <bib_year>2006</bib_year>
+    <bib_extra key="Bibdate">2007-02-27</bib_extra>
+    <bib_extra key="Bibsource">DBLP, http://dblp.uni-trier.de/db/journals/jpdc/jpdc66.html#RoG06</bib_extra>
+    <bib_extra key="Url">http://dx.doi.org/10.1016/j.jpdc.2006.03.010</bib_extra>
+  </doc>
+  <doc>
+    <filename></filename>
+    <relative_filename></relative_filename>
+    <key>Chou2004</key>
+    <notes></notes>
+    <bib_type>InProceedings</bib_type>
+    <bib_doi></bib_doi>
+    <bib_title>Microarchitecture Optimizations for Exploiting Memory-Level Parallelism</bib_title>
+    <bib_authors>Chou, Yuan and Fahs, Brian and Abraham, Santosh G.</bib_authors>
+    <bib_journal></bib_journal>
+    <bib_volume></bib_volume>
+    <bib_number></bib_number>
+    <bib_pages>76-89</bib_pages>
+    <bib_year>2004</bib_year>
+    <bib_extra key="Bibdate">2011-10-26</bib_extra>
+    <bib_extra key="Bibsource">DBLP, http://dblp.uni-trier.de/db/conf/isca/isca2004.html#ChouFA04</bib_extra>
+    <bib_extra key="BookTitle">ISCA</bib_extra>
+    <bib_extra key="Crossref">conf/isca/2004</bib_extra>
+    <bib_extra key="Isbn">0-7695-2143-6</bib_extra>
+    <bib_extra key="Publisher">IEEE Computer Society</bib_extra>
+    <bib_extra key="Url">http://doi.ieeecomputersociety.org/10.1109/ISCA.2004.1310765</bib_extra>
+  </doc>
+  <doc>
+    <filename></filename>
+    <relative_filename></relative_filename>
+    <key>Zhou2005</key>
+    <notes></notes>
+    <bib_type>Article</bib_type>
+    <bib_doi></bib_doi>
+    <bib_title>Enhancing Memory-Level Parallelism via Recovery-Free Value Prediction</bib_title>
+    <bib_authors>Zhou, Huiyang and Conte, Thomas M.</bib_authors>
+    <bib_journal>IEEE Trans. Computers</bib_journal>
+    <bib_volume>54</bib_volume>
+    <bib_number>7</bib_number>
+    <bib_pages>897-912</bib_pages>
+    <bib_year>2005</bib_year>
+    <bib_extra key="Bibdate">2011-10-27</bib_extra>
+    <bib_extra key="Bibsource">DBLP, http://dblp.uni-trier.de/db/journals/tc/tc54.html#ZhouC05</bib_extra>
+    <bib_extra key="Url">http://doi.ieeecomputersociety.org/10.1109/TC.2005.117</bib_extra>
+  </doc>
+  <doc>
+    <filename></filename>
+    <relative_filename></relative_filename>
+    <key>Qureshi2006</key>
+    <notes></notes>
+    <bib_type>InProceedings</bib_type>
+    <bib_doi></bib_doi>
+    <bib_title>A Case for MLP-Aware Cache Replacement</bib_title>
+    <bib_authors>Qureshi, Moinuddin K. and Lynch, Daniel N. and Mutlu, Onur and Patt, Yale N.</bib_authors>
+    <bib_journal></bib_journal>
+    <bib_volume></bib_volume>
+    <bib_number></bib_number>
+    <bib_pages>167-178</bib_pages>
+    <bib_year>2006</bib_year>
+    <bib_extra key="Bibdate">2006-10-06</bib_extra>
+    <bib_extra key="Bibsource">DBLP, http://dblp.uni-trier.de/db/conf/isca/isca2006.html#QureshiLMP06</bib_extra>
+    <bib_extra key="BookTitle">ISCA</bib_extra>
+    <bib_extra key="Crossref">conf/isca/2006</bib_extra>
+    <bib_extra key="Isbn">0-7695-2608-X</bib_extra>
+    <bib_extra key="Publisher">IEEE Computer Society</bib_extra>
+    <bib_extra key="Url">http://doi.ieeecomputersociety.org/10.1109/ISCA.2006.5</bib_extra>
+  </doc>
+  <doc>
+    <filename></filename>
+    <relative_filename></relative_filename>
+    <key>Pai2000</key>
+    <notes></notes>
+    <bib_type>Article</bib_type>
+    <bib_doi></bib_doi>
+    <bib_title>Code Transformations to Improve Memory Parallelism</bib_title>
+    <bib_authors>Pai, Vijay S. and Adve, Sarita V.</bib_authors>
+    <bib_journal>J. Instruction-Level Parallelism</bib_journal>
+    <bib_volume>2</bib_volume>
+    <bib_number></bib_number>
+    <bib_pages></bib_pages>
+    <bib_year>2000</bib_year>
+    <bib_extra key="Bibdate">2004-07-23</bib_extra>
+    <bib_extra key="Bibsource">DBLP, http://dblp.uni-trier.de/db/journals/jilp/jilp2.html#PaiA00</bib_extra>
+    <bib_extra key="Url">http://www.jilp.org/vol2/v2paper11.pdf</bib_extra>
+  </doc>
+  <doc>
+    <filename></filename>
+    <relative_filename></relative_filename>
+    <key>Pai2001</key>
+    <notes></notes>
+    <bib_type>InProceedings</bib_type>
+    <bib_doi></bib_doi>
+    <bib_title>Comparing and Combining Read Miss Clustering and Software Prefetching</bib_title>
+    <bib_authors>Pai, Vijay S. and Adve, Sarita V.</bib_authors>
+    <bib_journal></bib_journal>
+    <bib_volume></bib_volume>
+    <bib_number></bib_number>
+    <bib_pages>292-303</bib_pages>
+    <bib_year>2001</bib_year>
+    <bib_extra key="Bibdate">2012-01-03</bib_extra>
+    <bib_extra key="Bibsource">DBLP, http://dblp.uni-trier.de/db/conf/IEEEpact/IEEEpact2001.html#PaiA01</bib_extra>
+    <bib_extra key="BookTitle">IEEE PACT</bib_extra>
+    <bib_extra key="Crossref">conf/IEEEpact/2001</bib_extra>
+    <bib_extra key="Isbn">0-7695-1363-8</bib_extra>
+    <bib_extra key="Publisher">IEEE Computer Society</bib_extra>
+    <bib_extra key="Url">http://doi.ieeecomputersociety.org/10.1109/PACT.2001.953310</bib_extra>
+  </doc>
+  <doc>
+    <filename></filename>
+    <relative_filename></relative_filename>
+    <key>Ozturk2006</key>
+    <notes></notes>
+    <bib_type>InProceedings</bib_type>
+    <bib_doi></bib_doi>
+    <bib_title>Cache miss clustering for banked memory systems</bib_title>
+    <bib_authors>Ozturk, Ozcan and Chen, G. and Kandemir, Mahmut T. and Karaköy, Mustafa</bib_authors>
+    <bib_journal></bib_journal>
+    <bib_volume></bib_volume>
+    <bib_number></bib_number>
+    <bib_pages>244-250</bib_pages>
+    <bib_year>2006</bib_year>
+    <bib_extra key="Bibdate">2007-05-16</bib_extra>
+    <bib_extra key="Bibsource">DBLP, http://dblp.uni-trier.de/db/conf/iccad/iccad2006.html#OzturkCKK06</bib_extra>
+    <bib_extra key="BookTitle">ICCAD</bib_extra>
+    <bib_extra key="Editor">Hassoun, Soha</bib_extra>
+    <bib_extra key="Isbn">1-59593-389-1</bib_extra>
+    <bib_extra key="Publisher">ACM</bib_extra>
+    <bib_extra key="Series">2006 International Conference on Computer-Aided Design (ICCAD’06), November 5-9, 2006, San Jose, CA, USA</bib_extra>
+    <bib_extra key="Url">http://doi.acm.org/10.1145/1233501.1233550</bib_extra>
+  </doc>
+  <doc>
+    <filename></filename>
+    <relative_filename></relative_filename>
+    <key>Qureshi2007</key>
+    <notes></notes>
+    <bib_type>InProceedings</bib_type>
+    <bib_doi></bib_doi>
+    <bib_title>Adaptive insertion policies for high performance caching</bib_title>
+    <bib_authors>Qureshi, Moinuddin K. and Jaleel, Aamer and Patt, Yale N. and Simon C.  Steely, Jr. and Emer, Joel S.</bib_authors>
+    <bib_journal></bib_journal>
+    <bib_volume></bib_volume>
+    <bib_number></bib_number>
+    <bib_pages>381-391</bib_pages>
+    <bib_year>2007</bib_year>
+    <bib_extra key="Address">San Diego, California, USA</bib_extra>
+    <bib_extra key="BookTitle">Proc. 34th International Symposium on Computer Architecture (34th ISCA’07)</bib_extra>
+    <bib_extra key="Keywords">memory &amp; caches,</bib_extra>
+    <bib_extra key="Month">jun</bib_extra>
+    <bib_extra key="Publisher">ACM SIGARCH</bib_extra>
+  </doc>
+  <doc>
+    <filename></filename>
+    <relative_filename></relative_filename>
+    <key>Jaleel2008</key>
+    <notes></notes>
+    <bib_type>InProceedings</bib_type>
+    <bib_doi></bib_doi>
+    <bib_title>Adaptive insertion policies for managing shared caches</bib_title>
+    <bib_authors>Jaleel, Aamer and Hasenplaugh, William and Qureshi, Moinuddin K. and Sebot, Julien and , Simon C. Steely Jr. and Emer, Joel S.</bib_authors>
+    <bib_journal></bib_journal>
+    <bib_volume></bib_volume>
+    <bib_number></bib_number>
+    <bib_pages>208-219</bib_pages>
+    <bib_year>2008</bib_year>
+    <bib_extra key="Bibdate">2009-03-02</bib_extra>
+    <bib_extra key="Bibsource">DBLP, http://dblp.uni-trier.de/db/conf/IEEEpact/pact2008.html#JaleelHQSSE08</bib_extra>
+    <bib_extra key="BookTitle">PACT</bib_extra>
+    <bib_extra key="Editor">Moshovos, Andreas and Tarditi, David and Olukotun, Kunle</bib_extra>
+    <bib_extra key="Isbn">978-1-60558-282-5</bib_extra>
+    <bib_extra key="Publisher">ACM</bib_extra>
+    <bib_extra key="Series">17th International Conference on Parallel Architecture and Compilation Techniques (PACT 2008), Toronto, Ontario, Canada, October 25-29, 2008</bib_extra>
+    <bib_extra key="Url">http://doi.acm.org/10.1145/1454115.1454145</bib_extra>
+  </doc>
+  <doc>
+    <filename></filename>
+    <relative_filename></relative_filename>
+    <key>Qureshi2006-1</key>
+    <notes></notes>
+    <bib_type>InProceedings</bib_type>
+    <bib_doi></bib_doi>
+    <bib_title>Utility-Based Cache Partitioning: A Low-Overhead, High-Performance, Runtime Mechanism to Partition Shared Caches</bib_title>
+    <bib_authors>Qureshi, Moinuddin K. and Patt, Yale N.</bib_authors>
+    <bib_journal></bib_journal>
+    <bib_volume></bib_volume>
+    <bib_number></bib_number>
+    <bib_pages>423-432</bib_pages>
+    <bib_year>2006</bib_year>
+    <bib_extra key="Bibdate">2007-01-23</bib_extra>
+    <bib_extra key="Bibsource">DBLP, http://dblp.uni-trier.de/db/conf/micro/micro2006.html#QureshiP06</bib_extra>
+    <bib_extra key="BookTitle">MICRO</bib_extra>
+    <bib_extra key="Crossref">conf/micro/2006</bib_extra>
+    <bib_extra key="Publisher">IEEE Computer Society</bib_extra>
+    <bib_extra key="Url">http://doi.ieeecomputersociety.org/10.1109/MICRO.2006.49</bib_extra>
+  </doc>
+  <doc>
+    <filename></filename>
+    <relative_filename></relative_filename>
+    <key>Newman2O03</key>
+    <notes></notes>
+    <bib_type>Article</bib_type>
+    <bib_doi></bib_doi>
+    <bib_title>Data-intensive e-science frontier research</bib_title>
+    <bib_authors>Newman, Harvey and Ellisman, Mark H. and Orcutt, John A.</bib_authors>
+    <bib_journal>Commun. ACM</bib_journal>
+    <bib_volume>46</bib_volume>
+    <bib_number>11</bib_number>
+    <bib_pages>68-77</bib_pages>
+    <bib_year>2003</bib_year>
+    <bib_extra key="Bibdate">2006-02-09</bib_extra>
+    <bib_extra key="Bibsource">DBLP, http://dblp.uni-trier.de/db/journals/cacm/cacm46.html#NewmanEO03</bib_extra>
+    <bib_extra key="Url">http://doi.acm.org/10.1145/948383.948411</bib_extra>
   </doc>
 </doclist>
 </library>
