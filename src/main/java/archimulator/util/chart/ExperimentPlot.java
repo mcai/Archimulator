@@ -13,11 +13,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ExperiemntPlot {
+public class ExperimentPlot {
     private String title;
     private List<ExperimentSubPlot> subPlots;
 
-    public ExperiemntPlot(String title) {
+    public ExperimentPlot(String title) {
         this.title = title;
         this.subPlots = new ArrayList<ExperimentSubPlot>();
     }
@@ -66,7 +66,7 @@ public class ExperiemntPlot {
         }
     }
 
-    private static void addExperimentSubPlotInstsPerSecond(final ArchimulatorService archimulatorService, ExperiemntPlot experiemntPlot) throws SQLException {
+    private static void addExperimentSubPlotInstsPerSecond(final ArchimulatorService archimulatorService, ExperimentPlot experimentPlot) throws SQLException {
         ExperimentSubPlot experimentSubPlotCyclesPerSecond = new ExperimentSubPlot("Insts per Second");
 
         List<ExperimentProfile> experimentProfiles = archimulatorService.getExperimentProfilesAsList();
@@ -86,10 +86,10 @@ public class ExperiemntPlot {
                 }));
             }
         }
-        experiemntPlot.getSubPlots().add(experimentSubPlotCyclesPerSecond);
+        experimentPlot.getSubPlots().add(experimentSubPlotCyclesPerSecond);
     }
 
-    private static void addExperimentSubPlotCyclesPerSecond(final ArchimulatorService archimulatorService, ExperiemntPlot experiemntPlot) throws SQLException {
+    private static void addExperimentSubPlotCyclesPerSecond(final ArchimulatorService archimulatorService, ExperimentPlot experimentPlot) throws SQLException {
         ExperimentSubPlot experimentSubPlotCyclesPerSecond = new ExperimentSubPlot("Cycles per Second");
 
         List<ExperimentProfile> experimentProfiles = archimulatorService.getExperimentProfilesAsList();
@@ -109,7 +109,7 @@ public class ExperiemntPlot {
                 }));
             }
         }
-        experiemntPlot.getSubPlots().add(experimentSubPlotCyclesPerSecond);
+        experimentPlot.getSubPlots().add(experimentSubPlotCyclesPerSecond);
     }
     
     public static void main(String[] args) throws MalformedURLException, SQLException {
@@ -120,12 +120,12 @@ public class ExperiemntPlot {
 
         final ArchimulatorService archimulatorService = (ArchimulatorService) factory.create(ArchimulatorService.class, GuestStartup.SERVICE_URL);
 
-        ExperiemntPlot experiemntPlot = new ExperiemntPlot("Experiment Stats - Archimulator");
+        ExperimentPlot experimentPlot = new ExperimentPlot("Experiment Stats - Archimulator");
 
-        addExperimentSubPlotInstsPerSecond(archimulatorService, experiemntPlot);
-        addExperimentSubPlotCyclesPerSecond(archimulatorService, experiemntPlot);
+        addExperimentSubPlotInstsPerSecond(archimulatorService, experimentPlot);
+        addExperimentSubPlotCyclesPerSecond(archimulatorService, experimentPlot);
 
-        ExperimentPlotFrame experimentPlotFrame = new ExperimentPlotFrame(experiemntPlot);
+        ExperimentPlotFrame experimentPlotFrame = new ExperimentPlotFrame(experimentPlot);
         experimentPlotFrame.pack();
         RefineryUtilities.centerFrameOnScreen(experimentPlotFrame);
         experimentPlotFrame.setVisible(true);

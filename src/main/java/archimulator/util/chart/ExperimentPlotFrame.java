@@ -24,27 +24,27 @@ import java.util.List;
 public class ExperimentPlotFrame extends ApplicationFrame {
     public int numSubPlots;
     private List<TimeSeriesCollection> dataSets;
-    private List<Map<ExperiemntPlot.ExperimentSubPlotLine, Function<Double>>> dataSinks;
-    private ExperiemntPlot experiemntPlot;
+    private List<Map<ExperimentPlot.ExperimentSubPlotLine, Function<Double>>> dataSinks;
+    private ExperimentPlot experimentPlot;
 
-    public ExperimentPlotFrame(ExperiemntPlot experiemntPlot) throws SQLException {
-        super(experiemntPlot.getTitle());
-        this.experiemntPlot = experiemntPlot;
+    public ExperimentPlotFrame(ExperimentPlot experimentPlot) throws SQLException {
+        super(experimentPlot.getTitle());
+        this.experimentPlot = experimentPlot;
 
-        this.numSubPlots = experiemntPlot.getSubPlots().size();
+        this.numSubPlots = experimentPlot.getSubPlots().size();
         
         CombinedDomainXYPlot plot = new CombinedDomainXYPlot(new DateAxis("Time"));
         this.dataSets = new ArrayList<TimeSeriesCollection> ();
-        this.dataSinks = new ArrayList<Map<ExperiemntPlot.ExperimentSubPlotLine, Function<Double>>>();
+        this.dataSinks = new ArrayList<Map<ExperimentPlot.ExperimentSubPlotLine, Function<Double>>>();
 
-        for(ExperiemntPlot.ExperimentSubPlot experimentSubPlot : experiemntPlot.getSubPlots()) {
+        for(ExperimentPlot.ExperimentSubPlot experimentSubPlot : experimentPlot.getSubPlots()) {
             TimeSeriesCollection dataSetsPerSubPlot = new TimeSeriesCollection();
             this.dataSets.add(dataSetsPerSubPlot);
 
-            HashMap<ExperiemntPlot.ExperimentSubPlotLine, Function<Double>> dataSinksPerSubPlot = new HashMap<ExperiemntPlot.ExperimentSubPlotLine, Function<Double>>();
+            HashMap<ExperimentPlot.ExperimentSubPlotLine, Function<Double>> dataSinksPerSubPlot = new HashMap<ExperimentPlot.ExperimentSubPlotLine, Function<Double>>();
             this.dataSinks.add(dataSinksPerSubPlot);
 
-            for(ExperiemntPlot.ExperimentSubPlotLine experimentSubPlotLine : experimentSubPlot.getLines()) {
+            for(ExperimentPlot.ExperimentSubPlotLine experimentSubPlotLine : experimentSubPlot.getLines()) {
                 TimeSeries timeSeries = new TimeSeries(experimentSubPlotLine.getTitle());
                 dataSetsPerSubPlot.addSeries(timeSeries);
                 dataSinksPerSubPlot.put(experimentSubPlotLine, experimentSubPlotLine.getGetValueCallback());
@@ -59,7 +59,7 @@ public class ExperimentPlotFrame extends ApplicationFrame {
             plot.add(subplot);
         }
 
-        JFreeChart chart = new JFreeChart(experiemntPlot.getTitle(), plot);
+        JFreeChart chart = new JFreeChart(experimentPlot.getTitle(), plot);
         chart.setBorderPaint(Color.black);
         chart.setBorderVisible(true);
         chart.setBackgroundPaint(Color.white);
@@ -90,11 +90,11 @@ public class ExperimentPlotFrame extends ApplicationFrame {
                 for (int i = 0; i < numSubPlots; i++) {
                     TimeSeriesCollection timeSeriesCollection = dataSets.get(i);
 
-                    ExperiemntPlot.ExperimentSubPlot experimentSubPlot = experiemntPlot.getSubPlots().get(i);
+                    ExperimentPlot.ExperimentSubPlot experimentSubPlot = experimentPlot.getSubPlots().get(i);
                     for(int j = 0; j < experimentSubPlot.getLines().size(); j++) {
                         Object seriesObj = timeSeriesCollection.getSeries().get(j);
                         TimeSeries series = (TimeSeries) seriesObj;
-                        ExperiemntPlot.ExperimentSubPlotLine experimentSubPlotLine = experimentSubPlot.getLines().get(j);
+                        ExperimentPlot.ExperimentSubPlotLine experimentSubPlotLine = experimentSubPlot.getLines().get(j);
                         Double value = dataSinks.get(i).get(experimentSubPlotLine).apply();
                         System.out.printf("[%s] '%s'.'%s' = %s\n", DateHelper.toString(new Date()), experimentSubPlot.getTitleY(), experimentSubPlotLine.getTitle(), value);
                         series.addOrUpdate(new Millisecond(), value);
