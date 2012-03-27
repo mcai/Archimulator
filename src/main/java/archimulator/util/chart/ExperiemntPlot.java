@@ -13,46 +13,46 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SimulationPlot {
+public class ExperiemntPlot {
     private String title;
-    private List<SimulationSubPlot> subPlots;
+    private List<ExperimentSubPlot> subPlots;
 
-    public SimulationPlot(String title) {
+    public ExperiemntPlot(String title) {
         this.title = title;
-        this.subPlots = new ArrayList<SimulationSubPlot>();
+        this.subPlots = new ArrayList<ExperimentSubPlot>();
     }
 
     public String getTitle() {
         return title;
     }
 
-    public List<SimulationSubPlot> getSubPlots() {
+    public List<ExperimentSubPlot> getSubPlots() {
         return subPlots;
     }
 
-    public static class SimulationSubPlot {
+    public static class ExperimentSubPlot {
         private String titleY;
-        private List<SimulationSubPlotLine> lines;
+        private List<ExperimentSubPlotLine> lines;
         
-        public SimulationSubPlot(String titleY) {
+        public ExperimentSubPlot(String titleY) {
             this.titleY = titleY;
-            this.lines = new ArrayList<SimulationSubPlotLine>();
+            this.lines = new ArrayList<ExperimentSubPlotLine>();
         }
 
         public String getTitleY() {
             return titleY;
         }
 
-        public List<SimulationSubPlotLine> getLines() {
+        public List<ExperimentSubPlotLine> getLines() {
             return lines;
         }
     }
     
-    public static class SimulationSubPlotLine {
+    public static class ExperimentSubPlotLine {
         private String title;
         private Function<Double> getValueCallback;
 
-        public SimulationSubPlotLine(String title, Function<Double> getValueCallback) {
+        public ExperimentSubPlotLine(String title, Function<Double> getValueCallback) {
             this.title = title;
             this.getValueCallback = getValueCallback;
         }
@@ -66,13 +66,13 @@ public class SimulationPlot {
         }
     }
 
-    private static void addSimulationSubPlotInstsPerSecond(final ArchimulatorService archimulatorService, SimulationPlot simulationPlot) throws SQLException {
-        SimulationSubPlot simulationSubPlotCyclesPerSecond = new SimulationSubPlot("Insts per Second");
+    private static void addExperimentSubPlotInstsPerSecond(final ArchimulatorService archimulatorService, ExperiemntPlot experiemntPlot) throws SQLException {
+        ExperimentSubPlot experimentSubPlotCyclesPerSecond = new ExperimentSubPlot("Insts per Second");
 
         List<ExperimentProfile> experimentProfiles = archimulatorService.getExperimentProfilesAsList();
         for(final ExperimentProfile experimentProfile : experimentProfiles) {
             if(experimentProfile.getState() == ExperimentProfileState.RUNNING) {
-                simulationSubPlotCyclesPerSecond.getLines().add(new SimulationSubPlotLine("Exp #" + experimentProfile.getId(), new Function<Double>() {
+                experimentSubPlotCyclesPerSecond.getLines().add(new ExperimentSubPlotLine("Exp #" + experimentProfile.getId(), new Function<Double>() {
                     @Override
                     public Double apply() {
                         try {
@@ -86,16 +86,16 @@ public class SimulationPlot {
                 }));
             }
         }
-        simulationPlot.getSubPlots().add(simulationSubPlotCyclesPerSecond);
+        experiemntPlot.getSubPlots().add(experimentSubPlotCyclesPerSecond);
     }
 
-    private static void addSimulationSubPlotCyclesPerSecond(final ArchimulatorService archimulatorService, SimulationPlot simulationPlot) throws SQLException {
-        SimulationSubPlot simulationSubPlotCyclesPerSecond = new SimulationSubPlot("Cycles per Second");
+    private static void addExperimentSubPlotCyclesPerSecond(final ArchimulatorService archimulatorService, ExperiemntPlot experiemntPlot) throws SQLException {
+        ExperimentSubPlot experimentSubPlotCyclesPerSecond = new ExperimentSubPlot("Cycles per Second");
 
         List<ExperimentProfile> experimentProfiles = archimulatorService.getExperimentProfilesAsList();
         for(final ExperimentProfile experimentProfile : experimentProfiles) {
             if(experimentProfile.getState() == ExperimentProfileState.RUNNING) {
-                simulationSubPlotCyclesPerSecond.getLines().add(new SimulationSubPlotLine("Exp #" + experimentProfile.getId(), new Function<Double>() {
+                experimentSubPlotCyclesPerSecond.getLines().add(new ExperimentSubPlotLine("Exp #" + experimentProfile.getId(), new Function<Double>() {
                     @Override
                     public Double apply() {
                         try {
@@ -109,7 +109,7 @@ public class SimulationPlot {
                 }));
             }
         }
-        simulationPlot.getSubPlots().add(simulationSubPlotCyclesPerSecond);
+        experiemntPlot.getSubPlots().add(experimentSubPlotCyclesPerSecond);
     }
     
     public static void main(String[] args) throws MalformedURLException, SQLException {
@@ -120,14 +120,14 @@ public class SimulationPlot {
 
         final ArchimulatorService archimulatorService = (ArchimulatorService) factory.create(ArchimulatorService.class, GuestStartup.SERVICE_URL);
 
-        SimulationPlot simulationPlot = new SimulationPlot("Experiment Stats - Archimulator");
+        ExperiemntPlot experiemntPlot = new ExperiemntPlot("Experiment Stats - Archimulator");
 
-        addSimulationSubPlotInstsPerSecond(archimulatorService, simulationPlot);
-        addSimulationSubPlotCyclesPerSecond(archimulatorService, simulationPlot);
+        addExperimentSubPlotInstsPerSecond(archimulatorService, experiemntPlot);
+        addExperimentSubPlotCyclesPerSecond(archimulatorService, experiemntPlot);
 
-        SimulationPlotFrame simulationPlotFrame = new SimulationPlotFrame(simulationPlot);
-        simulationPlotFrame.pack();
-        RefineryUtilities.centerFrameOnScreen(simulationPlotFrame);
-        simulationPlotFrame.setVisible(true);
+        ExperimentPlotFrame experimentPlotFrame = new ExperimentPlotFrame(experiemntPlot);
+        experimentPlotFrame.pack();
+        RefineryUtilities.centerFrameOnScreen(experimentPlotFrame);
+        experimentPlotFrame.setVisible(true);
     }
 }

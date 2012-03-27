@@ -21,37 +21,36 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.List;
 
-public class SimulationPlotFrame extends ApplicationFrame {
+public class ExperimentPlotFrame extends ApplicationFrame {
     public int numSubPlots;
     private List<TimeSeriesCollection> dataSets;
-    private List<Map<SimulationPlot.SimulationSubPlotLine, Function<Double>>> dataSinks;
-    private SimulationPlot simulationPlot;
+    private List<Map<ExperiemntPlot.ExperimentSubPlotLine, Function<Double>>> dataSinks;
+    private ExperiemntPlot experiemntPlot;
 
-    @SuppressWarnings("unchecked")
-    public SimulationPlotFrame(SimulationPlot simulationPlot) throws SQLException {
-        super(simulationPlot.getTitle());
-        this.simulationPlot = simulationPlot;
+    public ExperimentPlotFrame(ExperiemntPlot experiemntPlot) throws SQLException {
+        super(experiemntPlot.getTitle());
+        this.experiemntPlot = experiemntPlot;
 
-        this.numSubPlots = simulationPlot.getSubPlots().size();
+        this.numSubPlots = experiemntPlot.getSubPlots().size();
         
         CombinedDomainXYPlot plot = new CombinedDomainXYPlot(new DateAxis("Time"));
         this.dataSets = new ArrayList<TimeSeriesCollection> ();
-        this.dataSinks = new ArrayList<Map<SimulationPlot.SimulationSubPlotLine, Function<Double>>>();
+        this.dataSinks = new ArrayList<Map<ExperiemntPlot.ExperimentSubPlotLine, Function<Double>>>();
 
-        for(SimulationPlot.SimulationSubPlot simulationSubPlot : simulationPlot.getSubPlots()) {
+        for(ExperiemntPlot.ExperimentSubPlot experimentSubPlot : experiemntPlot.getSubPlots()) {
             TimeSeriesCollection dataSetsPerSubPlot = new TimeSeriesCollection();
             this.dataSets.add(dataSetsPerSubPlot);
 
-            HashMap<SimulationPlot.SimulationSubPlotLine, Function<Double>> dataSinksPerSubPlot = new HashMap<SimulationPlot.SimulationSubPlotLine, Function<Double>>();
+            HashMap<ExperiemntPlot.ExperimentSubPlotLine, Function<Double>> dataSinksPerSubPlot = new HashMap<ExperiemntPlot.ExperimentSubPlotLine, Function<Double>>();
             this.dataSinks.add(dataSinksPerSubPlot);
 
-            for(SimulationPlot.SimulationSubPlotLine simulationSubPlotLine : simulationSubPlot.getLines()) {
-                TimeSeries timeSeries = new TimeSeries(simulationSubPlotLine.getTitle());
+            for(ExperiemntPlot.ExperimentSubPlotLine experimentSubPlotLine : experimentSubPlot.getLines()) {
+                TimeSeries timeSeries = new TimeSeries(experimentSubPlotLine.getTitle());
                 dataSetsPerSubPlot.addSeries(timeSeries);
-                dataSinksPerSubPlot.put(simulationSubPlotLine, simulationSubPlotLine.getGetValueCallback());
+                dataSinksPerSubPlot.put(experimentSubPlotLine, experimentSubPlotLine.getGetValueCallback());
             }
 
-            NumberAxis rangeAxis = new NumberAxis(simulationSubPlot.getTitleY());
+            NumberAxis rangeAxis = new NumberAxis(experimentSubPlot.getTitleY());
             rangeAxis.setAutoRangeIncludesZero(false);
             XYPlot subplot = new XYPlot(dataSetsPerSubPlot, null, rangeAxis, new StandardXYItemRenderer());
             subplot.setBackgroundPaint(Color.lightGray);
@@ -60,7 +59,7 @@ public class SimulationPlotFrame extends ApplicationFrame {
             plot.add(subplot);
         }
 
-        JFreeChart chart = new JFreeChart(simulationPlot.getTitle(), plot);
+        JFreeChart chart = new JFreeChart(experiemntPlot.getTitle(), plot);
         chart.setBorderPaint(Color.black);
         chart.setBorderVisible(true);
         chart.setBackgroundPaint(Color.white);
@@ -91,13 +90,13 @@ public class SimulationPlotFrame extends ApplicationFrame {
                 for (int i = 0; i < numSubPlots; i++) {
                     TimeSeriesCollection timeSeriesCollection = dataSets.get(i);
 
-                    SimulationPlot.SimulationSubPlot simulationSubPlot = simulationPlot.getSubPlots().get(i);
-                    for(int j = 0; j < simulationSubPlot.getLines().size(); j++) {
+                    ExperiemntPlot.ExperimentSubPlot experimentSubPlot = experiemntPlot.getSubPlots().get(i);
+                    for(int j = 0; j < experimentSubPlot.getLines().size(); j++) {
                         Object seriesObj = timeSeriesCollection.getSeries().get(j);
                         TimeSeries series = (TimeSeries) seriesObj;
-                        SimulationPlot.SimulationSubPlotLine simulationSubPlotLine = simulationSubPlot.getLines().get(j);
-                        Double value = dataSinks.get(i).get(simulationSubPlotLine).apply();
-                        System.out.printf("[%s] '%s'.'%s' = %s\n", DateHelper.toString(new Date()), simulationSubPlot.getTitleY(), simulationSubPlotLine.getTitle(), value);
+                        ExperiemntPlot.ExperimentSubPlotLine experimentSubPlotLine = experimentSubPlot.getLines().get(j);
+                        Double value = dataSinks.get(i).get(experimentSubPlotLine).apply();
+                        System.out.printf("[%s] '%s'.'%s' = %s\n", DateHelper.toString(new Date()), experimentSubPlot.getTitleY(), experimentSubPlotLine.getTitle(), value);
                         series.addOrUpdate(new Millisecond(), value);
                     }
                 }
