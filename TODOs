@@ -34,4 +34,96 @@ Paper hints:
        of the potential overlap in memory references among cooperating threads that share an address space, particularly
        multithreaded programs, for the reasons cited above.
 
+    2. from "PACMan: Prefetch-Aware Cache Management for High Performance Caching":
+       Although prefetching improves performance by fetching useful data
+       in advance, it can interact with LLC management policies to in-
+       troduce application performance variability. This variability stems
+       from the fact that current replacement policies treat prefetch and
+       demand requests identically.
+       ...
+       PACMan dynamically estimates and mitigates the degree of prefetch-induced
+       cache interference by modifying the cache insertion and hit pro-
+       motion policies to treat demand and prefetch requests differently.
+       ...
+       While an intelligent cache management technique can improve application
+       memory performance, prefetching can increase performance
+       even more by fetching useful data in advance to the cache.
+       However, we show that prefetching alone, without the help of
+       a prefetch-aware cache management technique, can interact
+       poorly with LLC management, often causing performance
+       degradation and variability.
+       ...
+       In addition, we implement three recent replacement policy proposals: DRRIP [12],
+       Segmented-LRU (Seg-LRU) [5], and Sampling Deadblock Prediction (SDBP) [16]
+       and evaluate their performance in the presence of hardware prefetching.
+       ...
+       From a cache management perspective, prefetch requests have
+       different properties than a demand request. In general, cache lines
+       inserted into the LLC by demand requests are more likely to be
+       performance-critical than prefetch requests. Thus, a replacement
+       policy may benefit by giving more preference to items fetched by
+       demand requests versus those from prefetch requests. This work
+       explores different replacement policies for prefetch requests.
+       ...
+       Cache replacement policies essentially predict the re-reference
+       behavior of cache lines. The natural opportunity to make re-
+       reference predictions is on cache insertions and cache hits. For ex-
+       ample, LRU predicts that a missing cache line will be re-referenced
+       soon and always inserts the missing line at the “MRU position”
+       of the LRU chain. Similarly, LRU predicts that a line receiving a
+       cache hit will also be re-referenced soon and moves the line to the
+       MRU position.
+       ...
+       We propose four types of prefetch-aware cache manage-
+       ment policies:
+       • PACMan on Misses (PACMan-M): PACMan-M modifies the
+       re-reference prediction only when a prefetch request misses
+       in the cache. In particular, PACMan-M predicts that all
+       prefetch requests will be re-referenced in the distant future.
+       For example, like previous LRU-based studies, PACMan-M
+       can be implemented by inserting all prefetch requests at the
+       LRU position [18, 31]. In doing so, PACMan-M reduces the
+       average in-cache lifetime of a prefetched cache line, in ef-
+       fect prioritizing demand requests over prefetch requests. In
+       the event the line is subsequently re-referenced, the replace-
+       ment state is updated on the cache hit. However, if there
+       is no subsequent request, PACMan-M is useful for avoiding
+       prefetcher pollution.
+       • PACMan on Hits (PACMan-H): PACMan-H modifies the re-
+       reference prediction only when a prefetch request hits in the
+       cache. Unlike a conventional replacement policy that always
+       updates re-reference predictions on cache hits, PACMan-H
+       chooses not to update the re-reference prediction on prefetch
+       cache hits. In doing so, PACMan-H treats “prefetchable” re-
+       quests with lower priority. In doing so, PACMan-H enables
+       useful, but hard to prefetch, demand requests to be retained
+       in the cache.
+       • PACMan on Hits and Misses (PACMan-HM): PACMan-HM
+       modifies the re-reference predictions for prefetch request cache
+       hits and misses. PACMan-HM gives shorter lifetime to all
+       prefetch requests by using the PACMan-M policy on prefetch
+       misses and the PACMan-H policy on prefetch hits. PACMan-
+       HM is useful for avoiding prefetcher pollution and retaining
+       hard to prefetch lines.
+       • Dynamic PACMan (PACMan-DYN): Statically predicting
+       the re-reference pattern of prefetch requests can significantly
+       degrade performance of workloads that benefit from prefetch-
+       ing. To ensure robust prefetch-aware replacement, we pro-
+       pose to dynamically detect the re-reference behavior of
+       prefetch requests. PACMan-DYN uses Set Dueling [27] to
+       dynamically predict the re-reference behavior of prefetch re-
+       quests.
+       ...
+       DRRIP Background
+       Instead of using a 4-bit LRU counter per cache line for a 16-way
+       set-associative cache, DRRIP uses an M-bit counter per cache line
+       to store the lines re-reference prediction value (RRPV). The RRPV
+       in essence controls the lifetime of a cache line. In general, large
+       RRPVs cause insertion closer to the “LRU position” and, there-
+       fore, have a short lifetime in the cache. In contrast, small RRPVs
+       comparatively have a longer lifetime in the cache.
+
+
+
+
 
