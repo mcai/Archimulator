@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class ExperimentPlot {
     private String title;
@@ -78,9 +79,14 @@ public class ExperimentPlot {
                     @Override
                     public Double apply() {
                         try {
-                            String str = (String) archimulatorService.getExperimentStatsById(experimentProfile.getId()).get("detailedSimulation.instsPerSecond");
-                            str = str.replaceAll(",", "");
-                            return (double)(int)(Double.valueOf(str).doubleValue());
+                            Map<String,Object> experimentStatsById = archimulatorService.getExperimentStatsById(experimentProfile.getId());
+                            String key = "checkpointedSimulation/phase1.instsPerSecond";
+                            if(experimentStatsById.containsKey(key)) {
+                                String str = (String) experimentStatsById.get(key);
+                                str = str.replaceAll(",", "");
+                                return (double)(int)(Double.valueOf(str).doubleValue());
+                            }
+                            return 0.0;
                         } catch (SQLException e) {
                             recordException(e);
                             return 0.0;
@@ -102,9 +108,14 @@ public class ExperimentPlot {
                     @Override
                     public Double apply() {
                         try {
-                            String str = (String) archimulatorService.getExperimentStatsById(experimentProfile.getId()).get("detailedSimulation.cyclesPerSecond");
-                            str = str.replaceAll(",", "");
-                            return (double)(int)(Double.valueOf(str).doubleValue());
+                            Map<String, Object> experimentStatsById = archimulatorService.getExperimentStatsById(experimentProfile.getId());
+                            String key = "checkpointedSimulation/phase1.cyclesPerSecond";
+                            if(experimentStatsById.containsKey(key)) {
+                                String str = (String) experimentStatsById.get(key);
+                                str = str.replaceAll(",", "");
+                                return (double)(int)(Double.valueOf(str).doubleValue());
+                            }
+                            return 0.0;
                         } catch (SQLException e) {
                             recordException(e);
                             return 0.0;
