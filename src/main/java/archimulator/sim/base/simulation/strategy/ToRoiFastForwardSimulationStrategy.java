@@ -16,26 +16,25 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.base.simulation.strategy.checkpoint;
+package archimulator.sim.base.simulation.strategy;
 
 import archimulator.sim.base.simulation.SimulationStartingImage;
 import archimulator.sim.base.event.PseudocallEncounteredEvent;
-import archimulator.sim.base.simulation.strategy.SequentialSimulationStrategy;
 import archimulator.util.action.Action1;
 
 import java.util.concurrent.CyclicBarrier;
 
-public class RoiBasedRunToCheckpointFunctionalSimulationStrategy extends SequentialSimulationStrategy {
+public class ToRoiFastForwardSimulationStrategy extends SequentialSimulationStrategy {
     private int pthreadSpawnedIndex;
     private SimulationStartingImage simulationStartingImage;
 
     private boolean pthreadHasSpawned;
 
-    public RoiBasedRunToCheckpointFunctionalSimulationStrategy(CyclicBarrier phaser, SimulationStartingImage simulationStartingImage) {
+    public ToRoiFastForwardSimulationStrategy(CyclicBarrier phaser, SimulationStartingImage simulationStartingImage) {
         this(phaser, 3720, simulationStartingImage);
     }
 
-    public RoiBasedRunToCheckpointFunctionalSimulationStrategy(CyclicBarrier phaser, int pthreadSpawnedIndex, SimulationStartingImage simulationStartingImage) {
+    public ToRoiFastForwardSimulationStrategy(CyclicBarrier phaser, int pthreadSpawnedIndex, SimulationStartingImage simulationStartingImage) {
         super(phaser);
 
         this.pthreadSpawnedIndex = pthreadSpawnedIndex;
@@ -44,12 +43,12 @@ public class RoiBasedRunToCheckpointFunctionalSimulationStrategy extends Sequent
 
     @Override
     public boolean canDoFastForwardOneCycle() {
-        throw new IllegalArgumentException();
+        return !pthreadHasSpawned;
     }
 
     @Override
     public boolean canDoCacheWarmupOneCycle() {
-        return !pthreadHasSpawned;
+        throw new IllegalArgumentException();
     }
 
     @Override
@@ -63,7 +62,7 @@ public class RoiBasedRunToCheckpointFunctionalSimulationStrategy extends Sequent
 
         this.getSimulation().getProcessor().getKernel().getBlockingEventDispatcher().addListener(PseudocallEncounteredEvent.class, new Action1<PseudocallEncounteredEvent>() {
             public void apply(PseudocallEncounteredEvent event) {
-                if (event.getArg() == RoiBasedRunToCheckpointFunctionalSimulationStrategy.this.pthreadSpawnedIndex) {
+                if (event.getArg() == ToRoiFastForwardSimulationStrategy.this.pthreadSpawnedIndex) {
                     pthreadHasSpawned = true;
                 }
             }
@@ -78,12 +77,12 @@ public class RoiBasedRunToCheckpointFunctionalSimulationStrategy extends Sequent
 
     @Override
     public boolean isSupportFastForward() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isSupportCacheWarmup() {
-        return true;
+        return false;
     }
 
     @Override

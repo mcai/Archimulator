@@ -16,29 +16,23 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.base.simulation.strategy.checkpoint;
-
-import archimulator.sim.base.simulation.SimulationStartingImage;
-import archimulator.sim.base.simulation.strategy.SequentialSimulationStrategy;
-import archimulator.sim.os.Kernel;
-import archimulator.sim.uncore.CacheHierarchy;
+package archimulator.sim.base.simulation.strategy;
 
 import java.util.concurrent.CyclicBarrier;
 
-public class CheckpointToInstructionCountBasedDetailedSimulationStrategy extends SequentialSimulationStrategy {
+public class InstructionCountBasedFunctionalSimulationStrategy extends SequentialSimulationStrategy {
     private long maxInsts;
-    private SimulationStartingImage simulationStartingImage;
+    private long numInsts;
 
-    public CheckpointToInstructionCountBasedDetailedSimulationStrategy(CyclicBarrier phaser, long maxInsts, SimulationStartingImage simulationStartingImage) {
+    public InstructionCountBasedFunctionalSimulationStrategy(CyclicBarrier phaser, long maxInsts) {
         super(phaser);
 
         this.maxInsts = maxInsts;
-        this.simulationStartingImage = simulationStartingImage;
     }
 
     @Override
     public boolean canDoFastForwardOneCycle() {
-        throw new IllegalArgumentException();
+        return --this.numInsts >= 0;
     }
 
     @Override
@@ -48,11 +42,12 @@ public class CheckpointToInstructionCountBasedDetailedSimulationStrategy extends
 
     @Override
     public boolean canDoMeasurementOneCycle() {
-        return this.getSimulation().getProcessor().getCores().get(0).getThreads().get(0).getTotalInsts() < this.maxInsts;
+        throw new IllegalArgumentException();
     }
 
     @Override
     public void beginSimulation() {
+        this.numInsts = this.maxInsts;
     }
 
     @Override
@@ -61,7 +56,7 @@ public class CheckpointToInstructionCountBasedDetailedSimulationStrategy extends
 
     @Override
     public boolean isSupportFastForward() {
-        return false;
+        return true;
     }
 
     @Override
@@ -71,16 +66,6 @@ public class CheckpointToInstructionCountBasedDetailedSimulationStrategy extends
 
     @Override
     public boolean isSupportMeasurement() {
-        return true;
-    }
-
-    @Override
-    public Kernel prepareKernel() {
-        return this.simulationStartingImage.getKernel();
-    }
-
-    @Override
-    public CacheHierarchy prepareCacheHierarchy() {
-        return this.simulationStartingImage.getCacheHierarchy();
+        return false;
     }
 }

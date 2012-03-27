@@ -16,39 +16,48 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.base.simulation.strategy.detailed;
+package archimulator.sim.base.simulation.strategy;
 
+import archimulator.sim.base.simulation.Logger;
 import archimulator.sim.base.event.PseudocallEncounteredEvent;
-import archimulator.sim.base.simulation.strategy.SequentialSimulationStrategy;
 import archimulator.util.action.Action1;
 
 import java.util.concurrent.CyclicBarrier;
 
-public class RoiBasedFastForwardAndDetailedSimulationStrategy extends SequentialSimulationStrategy {
-    private int maxInstsInMeasurement;
+public class RunToEndFunctionalSimulationStrategy extends SequentialSimulationStrategy {
     private int pthreadSpawnedIndex;
 
-    private boolean pthreadHasSpawned;
-
-    public RoiBasedFastForwardAndDetailedSimulationStrategy(CyclicBarrier phaser, int maxInstsInMeasurement) {
-        this(phaser, 3720, maxInstsInMeasurement);
+    public RunToEndFunctionalSimulationStrategy(CyclicBarrier phaser) {
+        this(phaser, 3720);
     }
 
-    public RoiBasedFastForwardAndDetailedSimulationStrategy(CyclicBarrier phaser, int pthreadSpawnedIndex, int maxInstsInMeasurement) {
+    public RunToEndFunctionalSimulationStrategy(CyclicBarrier phaser, int pthreadSpawnedIndex) {
         super(phaser);
 
-        this.maxInstsInMeasurement = maxInstsInMeasurement;
         this.pthreadSpawnedIndex = pthreadSpawnedIndex;
     }
 
     @Override
-    public void beginSimulation() {
-        this.pthreadHasSpawned = false;
+    public boolean canDoFastForwardOneCycle() {
+        return true;
+    }
 
+    @Override
+    public boolean canDoCacheWarmupOneCycle() {
+        throw new IllegalArgumentException();
+    }
+
+    @Override
+    public boolean canDoMeasurementOneCycle() {
+        throw new IllegalArgumentException();
+    }
+
+    @Override
+    public void beginSimulation() {
         this.getSimulation().getBlockingEventDispatcher().addListener(PseudocallEncounteredEvent.class, new Action1<PseudocallEncounteredEvent>() {
             public void apply(PseudocallEncounteredEvent event) {
-                if (event.getArg() == RoiBasedFastForwardAndDetailedSimulationStrategy.this.pthreadSpawnedIndex) {
-                    pthreadHasSpawned = true;
+                if (event.getArg() == RunToEndFunctionalSimulationStrategy.this.pthreadSpawnedIndex) {
+                    Logger.infof(Logger.SIMULATION, "%s encountered pseudocall %d", getSimulation().getCycleAccurateEventQueue().getCurrentCycle(), event.getContext().getThread(getSimulation().getProcessor()).getName(), event.getArg());
                 }
             }
         });
@@ -56,18 +65,6 @@ public class RoiBasedFastForwardAndDetailedSimulationStrategy extends Sequential
 
     @Override
     public void endSimulation() {
-    }
-
-    public final boolean canDoFastForwardOneCycle() {
-        return !pthreadHasSpawned;
-    }
-
-    public final boolean canDoCacheWarmupOneCycle() {
-        return false;
-    }
-
-    public final boolean canDoMeasurementOneCycle() {
-        return this.getSimulation().getProcessor().getCores().get(0).getThreads().get(0).getTotalInsts() < this.maxInstsInMeasurement;
     }
 
     @Override
@@ -82,6 +79,6 @@ public class RoiBasedFastForwardAndDetailedSimulationStrategy extends Sequential
 
     @Override
     public boolean isSupportMeasurement() {
-        return true;
+        return false;
     }
 }

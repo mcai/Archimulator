@@ -153,7 +153,9 @@ public class BasicProcess extends Process {
 
     @Override
     public StaticInstruction getStaticInst(int pc) {
-        assert (this.pcsToMachInsts.containsKey(pc));
+        if ((!this.pcsToMachInsts.containsKey(pc))) {
+            throw new IllegalArgumentException();
+        }
         return this.machInstsToStaticInsts.get(this.pcsToMachInsts.get(pc));
     }
 }

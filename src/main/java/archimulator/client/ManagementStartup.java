@@ -112,7 +112,6 @@ public class ManagementStartup {
                     if(processorProfile.getL2EvictionPolicyClz().equals(LRUPolicy.class)) {
                         ExperimentProfile experimentProfile = new ExperimentProfile(simulatedProgram.getTitle() + "-" + processorProfile.getTitle(), processorProfile);
                         experimentProfile.addWorkload(simulatedProgram);
-//                        experimentProfile.inDetailToEnd();
                         experimentProfile.fastForwardToPseudoCallAndInDetailForMaxInsts(pthreadSpawnedIndex, maxInsts);
                         experimentProfiles.add(experimentProfile);
                     }
@@ -125,7 +124,6 @@ public class ManagementStartup {
                     if(processorProfile.getL2EvictionPolicyClz().equals(LRUPolicy.class)) {
                         ExperimentProfile experimentProfile = new ExperimentProfile(simulatedProgram.getTitle() + "-" + processorProfile.getTitle(), processorProfile);
                         experimentProfile.addWorkload(simulatedProgram);
-//                        experimentProfile.inDetailToEnd();
                         experimentProfile.fastForwardToPseudoCallAndInDetailForMaxInsts(pthreadSpawnedIndex, maxInsts);
                         experimentProfile.addSimulationCapabilityClass(LLCHTRequestProfilingCapability.class);
                         experimentProfiles.add(experimentProfile);
@@ -142,7 +140,6 @@ public class ManagementStartup {
                     if(processorProfile.getL2EvictionPolicyClz().equals(LLCHTAwareLRUPolicy.class)) {
                         ExperimentProfile experimentProfile = new ExperimentProfile(simulatedProgram.getTitle() + "-" + processorProfile.getTitle(), processorProfile);
                         experimentProfile.addWorkload(simulatedProgram);
-//                        experimentProfile.inDetailToEnd();
                         experimentProfile.fastForwardToPseudoCallAndInDetailForMaxInsts(pthreadSpawnedIndex, maxInsts);
                         experimentProfiles.add(experimentProfile);
                     }

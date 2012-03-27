@@ -16,9 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.base.simulation.strategy.detailed;
-
-import archimulator.sim.base.simulation.strategy.SequentialSimulationStrategy;
+package archimulator.sim.base.simulation.strategy;
 
 import java.util.concurrent.CyclicBarrier;
 

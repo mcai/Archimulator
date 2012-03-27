@@ -18,48 +18,54 @@
  ******************************************************************************/
 package archimulator.sim.base.simulation.strategy;
 
+import archimulator.sim.base.simulation.SimulationStartingImage;
+import archimulator.sim.os.Kernel;
+import archimulator.sim.uncore.CacheHierarchy;
+
 import java.util.concurrent.CyclicBarrier;
 
-public abstract class ThreePhaseSimulationStrategy extends SequentialSimulationStrategy {
-    protected State state;
+public class FromRoiDetailedSimulationStrategy extends SequentialSimulationStrategy {
+    private long maxInsts;
+    private SimulationStartingImage simulationStartingImage;
 
-    protected ThreePhaseSimulationStrategy(CyclicBarrier phaser) {
+    public FromRoiDetailedSimulationStrategy(CyclicBarrier phaser, long maxInsts, SimulationStartingImage simulationStartingImage) {
         super(phaser);
 
-        this.setState(State.FAST_FORWARD);
+        this.maxInsts = maxInsts;
+        this.simulationStartingImage = simulationStartingImage;
     }
 
-    protected void switchToWarmup() {
-        this.setState(State.CACHE_WARMUP);
+    @Override
+    public boolean canDoFastForwardOneCycle() {
+        throw new IllegalArgumentException();
     }
 
-    protected void switchToMeasurement() {
-        this.setState(State.MEASUREMENT);
-        this.resetStat();
+    @Override
+    public boolean canDoCacheWarmupOneCycle() {
+        throw new IllegalArgumentException();
+    }
+
+    @Override
+    public boolean canDoMeasurementOneCycle() {
+        return this.getSimulation().getProcessor().getCores().get(0).getThreads().get(0).getTotalInsts() < this.maxInsts;
     }
 
     @Override
     public void beginSimulation() {
-        this.state = State.FAST_FORWARD;
     }
 
     @Override
     public void endSimulation() {
-        if (this.state != State.STOPPED) {
-            this.setState(State.STOPPED);
-        }
     }
-
-    protected abstract void resetStat();
 
     @Override
     public boolean isSupportFastForward() {
-        return true;
+        return false;
     }
 
     @Override
     public boolean isSupportCacheWarmup() {
-        return true;
+        return false;
     }
 
     @Override
@@ -67,14 +73,13 @@ public abstract class ThreePhaseSimulationStrategy extends SequentialSimulationS
         return true;
     }
 
-    public void setState(State state) {
-        this.state = state;
+    @Override
+    public Kernel prepareKernel() {
+        return this.simulationStartingImage.getKernel();
     }
 
-    protected static enum State {
-        FAST_FORWARD,
-        CACHE_WARMUP,
-        MEASUREMENT,
-        STOPPED
+    @Override
+    public CacheHierarchy prepareCacheHierarchy() {
+        return this.simulationStartingImage.getCacheHierarchy();
     }
 }
