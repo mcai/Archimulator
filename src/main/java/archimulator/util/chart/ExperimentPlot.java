@@ -4,6 +4,7 @@ import archimulator.client.GuestStartup;
 import archimulator.service.ArchimulatorService;
 import archimulator.sim.base.experiment.profile.ExperimentProfile;
 import archimulator.sim.base.experiment.profile.ExperimentProfileState;
+import archimulator.util.DateHelper;
 import archimulator.util.action.Function;
 import com.caucho.hessian.client.HessianProxyFactory;
 import org.jfree.ui.RefineryUtilities;
@@ -11,6 +12,7 @@ import org.jfree.ui.RefineryUtilities;
 import java.net.MalformedURLException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class ExperimentPlot {
@@ -80,7 +82,8 @@ public class ExperimentPlot {
                             str = str.replaceAll(",", "");
                             return (double)(int)(Double.valueOf(str).doubleValue());
                         } catch (SQLException e) {
-                            throw new RuntimeException(e);
+                            recordException(e);
+                            return 0.0;
                         }
                     }
                 }));
@@ -103,13 +106,19 @@ public class ExperimentPlot {
                             str = str.replaceAll(",", "");
                             return (double)(int)(Double.valueOf(str).doubleValue());
                         } catch (SQLException e) {
-                            throw new RuntimeException(e);
+                            recordException(e);
+                            return 0.0;
                         }
                     }
                 }));
             }
         }
         experimentPlot.getSubPlots().add(experimentSubPlotCyclesPerSecond);
+    }
+
+    public static void recordException(Exception e) {
+        System.out.print(String.format("[%s Exception] %s\r\n", DateHelper.toString(new Date()), e));
+        e.printStackTrace();
     }
     
     public static void main(String[] args) throws MalformedURLException, SQLException {
