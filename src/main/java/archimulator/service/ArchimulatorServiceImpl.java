@@ -232,7 +232,7 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
                 @Override
                 public void run() {
                     try {
-                        Thread.sleep(30000);
+                        Thread.sleep(20000);
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }

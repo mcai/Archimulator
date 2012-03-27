@@ -125,7 +125,7 @@ public class ExperimentProfile implements Serializable {
         return this;
     }
 
-    public ExperimentProfile cacheWarmupToPseudoCallAndInDetailForMaxInsts(int pthreadSpawnedIndex, int maxInsts) {
+    public ExperimentProfile fastForwardToPseudoCallAndInDetailForMaxInsts(int pthreadSpawnedIndex, int maxInsts) {
         this.type = ExperimentProfileType.CHECKPOINTED_EXPERIMENT;
         this.pthreadSpawnedIndex = pthreadSpawnedIndex;
         this.maxInsts = maxInsts;
