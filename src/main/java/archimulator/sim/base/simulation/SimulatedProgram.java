@@ -27,6 +27,7 @@ import com.j256.ormlite.table.DatabaseTable;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 @DatabaseTable
 public class SimulatedProgram implements Serializable {
@@ -85,11 +86,20 @@ public class SimulatedProgram implements Serializable {
     }
 
     private void pushMacroDefineArg(String fileName, String key, String value) {
-        SedHelper.sedInPlace(this.cwd + "/" + fileName, "#define " + key, "#define " + key + " " + value);
+        fileName = this.cwd.replaceAll(ExperimentProfile.USER_HOME_TEMPLATE_ARG, System.getProperty("user.home")) + "/" + fileName;
+        System.out.printf("[%s] Pushing Macro Define Arg in %s: %s, %s\n", DateHelper.toString(new Date()), fileName, key, value);
+        List<String> result = SedHelper.sedInPlace(fileName, "#define " + key, "#define " + key + " " + value);
+        for(String line : result) {
+            System.out.println(line);
+        }
     }
 
     private void buildWithMakefile() {
-        CommandLineHelper.invokeShellCommand("sh -c 'cd " + this.cwd.replaceAll(ExperimentProfile.USER_HOME_TEMPLATE_ARG, System.getProperty("user.home")) + ";make -f Makefile.mips -B'");
+        System.out.printf("[%s] Building with Makefile\n", DateHelper.toString(new Date()));
+        List<String> result = CommandLineHelper.invokeShellCommandAndGetResult("sh -c 'cd " + this.cwd.replaceAll(ExperimentProfile.USER_HOME_TEMPLATE_ARG, System.getProperty("user.home")) + ";make -f Makefile.mips -B'");
+        for(String line : result) {
+            System.out.println(line);
+        }
     }
 
     public long getId() {

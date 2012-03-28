@@ -18,12 +18,14 @@
  ******************************************************************************/
 package archimulator.util.io.cmd;
 
+import java.util.List;
+
 public class SedHelper {
-    public static int sed(String inputFileName, String outputFileName, String oldStuff, String newStuff) {
-        return CommandLineHelper.invokeShellCommand("sed -e 's/" + oldStuff + "/" + newStuff + "/g' " + inputFileName + " > " + outputFileName);
+    public static List<String> sed(String inputFileName, String outputFileName, String oldStuff, String newStuff) {
+        return CommandLineHelper.invokeShellCommandAndGetResult("sed -e 's/" + oldStuff + "/" + newStuff + "/g' " + inputFileName + " > " + outputFileName);
     }
 
-    public static int sedInPlace(String fileName, String oldStuff, String newStuff) {
-        return CommandLineHelper.invokeShellCommand("sed -i -e 's/^" + oldStuff + ".*/" + newStuff + "/g' " + fileName);
+    public static List<String> sedInPlace(String fileName, String oldStuff, String newStuff) {
+        return CommandLineHelper.invokeShellCommandAndGetResult("sed -i -e 's/^" + oldStuff + ".*/" + newStuff + "/g' " + fileName);
     }
 }
