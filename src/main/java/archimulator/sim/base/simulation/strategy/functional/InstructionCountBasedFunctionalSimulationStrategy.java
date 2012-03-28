@@ -16,18 +16,25 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.base.simulation.strategy;
+package archimulator.sim.base.simulation.strategy.functional;
+
+import archimulator.sim.base.simulation.strategy.SequentialSimulationStrategy;
 
 import java.util.concurrent.CyclicBarrier;
 
-public class RunToEndDetailedSimulationStrategy extends SequentialSimulationStrategy {
-    public RunToEndDetailedSimulationStrategy(CyclicBarrier phaser) {
+public class InstructionCountBasedFunctionalSimulationStrategy extends SequentialSimulationStrategy {
+    private long maxInsts;
+    private long numInsts;
+
+    public InstructionCountBasedFunctionalSimulationStrategy(CyclicBarrier phaser, long maxInsts) {
         super(phaser);
+
+        this.maxInsts = maxInsts;
     }
 
     @Override
     public boolean canDoFastForwardOneCycle() {
-        throw new IllegalArgumentException();
+        return --this.numInsts >= 0;
     }
 
     @Override
@@ -37,11 +44,12 @@ public class RunToEndDetailedSimulationStrategy extends SequentialSimulationStra
 
     @Override
     public boolean canDoMeasurementOneCycle() {
-        return true;
+        throw new IllegalArgumentException();
     }
 
     @Override
     public void beginSimulation() {
+        this.numInsts = this.maxInsts;
     }
 
     @Override
@@ -50,7 +58,7 @@ public class RunToEndDetailedSimulationStrategy extends SequentialSimulationStra
 
     @Override
     public boolean isSupportFastForward() {
-        return false;
+        return true;
     }
 
     @Override
@@ -60,6 +68,6 @@ public class RunToEndDetailedSimulationStrategy extends SequentialSimulationStra
 
     @Override
     public boolean isSupportMeasurement() {
-        return true;
+        return false;
     }
 }

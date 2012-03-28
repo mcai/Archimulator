@@ -16,22 +16,31 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.base.simulation.strategy;
+package archimulator.sim.base.simulation.strategy.functional;
+
+import archimulator.sim.base.simulation.Logger;
+import archimulator.sim.base.event.PseudocallEncounteredEvent;
+import archimulator.sim.base.simulation.strategy.SequentialSimulationStrategy;
+import archimulator.util.action.Action1;
 
 import java.util.concurrent.CyclicBarrier;
 
-public class InstructionCountBasedDetailedSimulationStrategy extends SequentialSimulationStrategy {
-    private long maxInsts;
+public class RunToEndFunctionalSimulationStrategy extends SequentialSimulationStrategy {
+    private int pthreadSpawnedIndex;
 
-    public InstructionCountBasedDetailedSimulationStrategy(CyclicBarrier phaser, long maxInsts) {
+    public RunToEndFunctionalSimulationStrategy(CyclicBarrier phaser) {
+        this(phaser, 3720);
+    }
+
+    public RunToEndFunctionalSimulationStrategy(CyclicBarrier phaser, int pthreadSpawnedIndex) {
         super(phaser);
 
-        this.maxInsts = maxInsts;
+        this.pthreadSpawnedIndex = pthreadSpawnedIndex;
     }
 
     @Override
     public boolean canDoFastForwardOneCycle() {
-        throw new IllegalArgumentException();
+        return true;
     }
 
     @Override
@@ -41,11 +50,18 @@ public class InstructionCountBasedDetailedSimulationStrategy extends SequentialS
 
     @Override
     public boolean canDoMeasurementOneCycle() {
-        return this.getSimulation().getProcessor().getCores().get(0).getThreads().get(0).getTotalInsts() < this.maxInsts;
+        throw new IllegalArgumentException();
     }
 
     @Override
     public void beginSimulation() {
+        this.getSimulation().getBlockingEventDispatcher().addListener(PseudocallEncounteredEvent.class, new Action1<PseudocallEncounteredEvent>() {
+            public void apply(PseudocallEncounteredEvent event) {
+                if (event.getArg() == RunToEndFunctionalSimulationStrategy.this.pthreadSpawnedIndex) {
+                    Logger.infof(Logger.SIMULATION, "%s encountered pseudocall %d", getSimulation().getCycleAccurateEventQueue().getCurrentCycle(), event.getContext().getThread(getSimulation().getProcessor()).getName(), event.getArg());
+                }
+            }
+        });
     }
 
     @Override
@@ -54,7 +70,7 @@ public class InstructionCountBasedDetailedSimulationStrategy extends SequentialS
 
     @Override
     public boolean isSupportFastForward() {
-        return false;
+        return true;
     }
 
     @Override
@@ -64,6 +80,6 @@ public class InstructionCountBasedDetailedSimulationStrategy extends SequentialS
 
     @Override
     public boolean isSupportMeasurement() {
-        return true;
+        return false;
     }
 }

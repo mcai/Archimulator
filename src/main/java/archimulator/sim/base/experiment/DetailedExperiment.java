@@ -20,7 +20,7 @@ package archimulator.sim.base.experiment;
 
 import archimulator.sim.base.experiment.capability.*;
 import archimulator.sim.base.simulation.ContextConfig;
-import archimulator.sim.base.simulation.strategy.RunToEndDetailedSimulationStrategy;
+import archimulator.sim.base.simulation.strategy.detailed.RunToEndDetailedSimulationStrategy;
 import archimulator.sim.base.experiment.capability.KernelCapability;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
 

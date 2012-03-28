@@ -16,15 +16,16 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.base.simulation.strategy;
+package archimulator.sim.base.simulation.strategy.detailed;
+
+import archimulator.sim.base.simulation.strategy.SequentialSimulationStrategy;
 
 import java.util.concurrent.CyclicBarrier;
 
-public class InstructionCountBasedFunctionalSimulationStrategy extends SequentialSimulationStrategy {
+public class InstructionCountBasedDetailedSimulationStrategy extends SequentialSimulationStrategy {
     private long maxInsts;
-    private long numInsts;
 
-    public InstructionCountBasedFunctionalSimulationStrategy(CyclicBarrier phaser, long maxInsts) {
+    public InstructionCountBasedDetailedSimulationStrategy(CyclicBarrier phaser, long maxInsts) {
         super(phaser);
 
         this.maxInsts = maxInsts;
@@ -32,7 +33,7 @@ public class InstructionCountBasedFunctionalSimulationStrategy extends Sequentia
 
     @Override
     public boolean canDoFastForwardOneCycle() {
-        return --this.numInsts >= 0;
+        throw new IllegalArgumentException();
     }
 
     @Override
@@ -42,12 +43,11 @@ public class InstructionCountBasedFunctionalSimulationStrategy extends Sequentia
 
     @Override
     public boolean canDoMeasurementOneCycle() {
-        throw new IllegalArgumentException();
+        return this.getSimulation().getProcessor().getCores().get(0).getThreads().get(0).getTotalInsts() < this.maxInsts;
     }
 
     @Override
     public void beginSimulation() {
-        this.numInsts = this.maxInsts;
     }
 
     @Override
@@ -56,7 +56,7 @@ public class InstructionCountBasedFunctionalSimulationStrategy extends Sequentia
 
     @Override
     public boolean isSupportFastForward() {
-        return true;
+        return false;
     }
 
     @Override
@@ -66,6 +66,6 @@ public class InstructionCountBasedFunctionalSimulationStrategy extends Sequentia
 
     @Override
     public boolean isSupportMeasurement() {
-        return false;
+        return true;
     }
 }
