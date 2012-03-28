@@ -23,7 +23,7 @@ public class ExperimentBarPlotFrame extends ApplicationFrame {
         JFreeChart chart = ChartFactory.createStackedBarChart(
                 title,
                 "Experiment",
-                "# HT Requests",
+                "# HT LLC Requests",
                 dataSet,
                 PlotOrientation.VERTICAL,
                 true,
@@ -47,9 +47,9 @@ public class ExperimentBarPlotFrame extends ApplicationFrame {
     }
 
     private static CategoryDataset createDataset() {
-        String goodHtRequest = "Good HT Request";
-        String badHtRequest = "Bad HT Request";
-        String uglyHtrequest = "Ugly HT Request";
+        String goodHtRequest = "Good HT LLC Request";
+        String badHtRequest = "Bad HT LLC Request";
+        String uglyHtrequest = "Ugly HT LLC Request";
 
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
         
@@ -66,7 +66,7 @@ public class ExperimentBarPlotFrame extends ApplicationFrame {
     }
 
     public static void main(String[] args) {
-        ExperimentBarPlotFrame experimentBarPlotFrame = new ExperimentBarPlotFrame("Good, Bad and Ugly HT Request Distribution");
+        ExperimentBarPlotFrame experimentBarPlotFrame = new ExperimentBarPlotFrame("HT LLC Request Distribution");
         experimentBarPlotFrame.pack();
         RefineryUtilities.centerFrameOnScreen(experimentBarPlotFrame);
         experimentBarPlotFrame.setVisible(true);
