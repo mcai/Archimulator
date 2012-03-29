@@ -164,14 +164,16 @@ public class ManagementStartup {
             "mst_baseline", ExperimentProfile.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/baseline",
             "mst.mips",
 //            "10000");
-            "1024");
+//            "1024");
+            "2000");
 
     public static SimulatedProgram SIMULATED_PROGRAM_MST_HT(int lookahead, int stride) {
         SimulatedProgram program = new SimulatedProgram(
                 "mst_ht" + "-lookahead_" + lookahead + "-stride_" + stride, ExperimentProfile.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/ht",
                 "mst.mips",
 //                "10000");
-                "1024");
+//                "1024");
+                "2000");
         program.setHelperThreadedProgram(true);
         program.setHtLookahead(lookahead);
         program.setHtStride(stride);
