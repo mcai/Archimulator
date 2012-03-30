@@ -1,0 +1,1458 @@
+Archimulator Report
+-----------------------------------------------------------------------
+
+a. Simulated Programs (total: 11)
+  SimulatedProgram{id=186, title='mst_baseline', cwd='<user.home>/Archimulator/benchmarks/Olden_Custom1/mst/baseline', exe='mst.mips', args='10000', stdin='', createdTime=2012/03/24 00:08:28, helperThreadedProgram=false, htLookahead=0, htStride=0}
+  SimulatedProgram{id=187, title='mst_ht-lookahead_10-stride_10', cwd='<user.home>/Archimulator/benchmarks/Olden_Custom1/mst/ht', exe='mst.mips', args='10000', stdin='', createdTime=2012/03/24 00:08:29, helperThreadedProgram=true, htLookahead=10, htStride=10}
+  SimulatedProgram{id=188, title='mst_ht-lookahead_20-stride_10', cwd='<user.home>/Archimulator/benchmarks/Olden_Custom1/mst/ht', exe='mst.mips', args='10000', stdin='', createdTime=2012/03/24 00:08:29, helperThreadedProgram=true, htLookahead=20, htStride=10}
+  SimulatedProgram{id=189, title='mst_ht-lookahead_20-stride_20', cwd='<user.home>/Archimulator/benchmarks/Olden_Custom1/mst/ht', exe='mst.mips', args='10000', stdin='', createdTime=2012/03/24 00:08:29, helperThreadedProgram=true, htLookahead=20, htStride=20}
+  SimulatedProgram{id=190, title='mst_ht-lookahead_320-stride_320', cwd='<user.home>/Archimulator/benchmarks/Olden_Custom1/mst/ht', exe='mst.mips', args='10000', stdin='', createdTime=2012/03/24 00:08:29, helperThreadedProgram=true, htLookahead=320, htStride=320}
+  SimulatedProgram{id=191, title='mst_ht-lookahead_640-stride_320', cwd='<user.home>/Archimulator/benchmarks/Olden_Custom1/mst/ht', exe='mst.mips', args='10000', stdin='', createdTime=2012/03/24 00:08:29, helperThreadedProgram=true, htLookahead=640, htStride=320}
+  SimulatedProgram{id=192, title='mst_ht-lookahead_640-stride_640', cwd='<user.home>/Archimulator/benchmarks/Olden_Custom1/mst/ht', exe='mst.mips', args='10000', stdin='', createdTime=2012/03/24 00:08:29, helperThreadedProgram=true, htLookahead=640, htStride=640}
+  SimulatedProgram{id=193, title='em3d_baseline', cwd='<user.home>/Archimulator/benchmarks/Olden_Custom1/em3d/baseline', exe='em3d.mips', args='400000 128 75 1', stdin='', createdTime=2012/03/24 00:08:28, helperThreadedProgram=false, htLookahead=0, htStride=0}
+  SimulatedProgram{id=194, title='em3d_ht', cwd='<user.home>/Archimulator/benchmarks/Olden_Custom1/em3d/ht', exe='em3d.mips', args='400000 128 75 1', stdin='', createdTime=2012/03/24 00:08:28, helperThreadedProgram=false, htLookahead=0, htStride=0}
+  SimulatedProgram{id=195, title='429_mcf_baseline', cwd='<user.home>/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline', exe='429.mcf.mips', args='<user.home>/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline/data/ref/input/inp.in', stdin='', createdTime=2012/03/24 00:08:28, helperThreadedProgram=false, htLookahead=0, htStride=0}
+  SimulatedProgram{id=196, title='429_mcf_ht', cwd='<user.home>/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht', exe='429.mcf.mips', args='<user.home>/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht/data/ref/input/inp.in', stdin='', createdTime=2012/03/24 00:08:28, helperThreadedProgram=false, htLookahead=0, htStride=0}
+
+b. Processor Profiles (total: 12)
+  ProcessorProfile{id=205, title='C2T2-L2_1024KB_Assoc4_LRU', numCores=2, numThreadsPerCore=2, l2Size='1 MB', l2Associativity=4, l2EvictionPolicyClz.name='archimulator.sim.uncore.cache.eviction.LRUPolicy', createdTime='2012/03/24 00:08:29'}
+  ProcessorProfile{id=206, title='C2T2-L2_1024KB_Assoc4_LLCHTAwareLRU', numCores=2, numThreadsPerCore=2, l2Size='1 MB', l2Associativity=4, l2EvictionPolicyClz.name='archimulator.sim.ext.uncore.cache.eviction.LLCHTAwareLRUPolicy', createdTime='2012/03/24 00:08:29'}
+  ProcessorProfile{id=207, title='C2T2-L2_1024KB_Assoc8_LRU', numCores=2, numThreadsPerCore=2, l2Size='1 MB', l2Associativity=8, l2EvictionPolicyClz.name='archimulator.sim.uncore.cache.eviction.LRUPolicy', createdTime='2012/03/24 00:08:29'}
+  ProcessorProfile{id=208, title='C2T2-L2_1024KB_Assoc8_LLCHTAwareLRU', numCores=2, numThreadsPerCore=2, l2Size='1 MB', l2Associativity=8, l2EvictionPolicyClz.name='archimulator.sim.ext.uncore.cache.eviction.LLCHTAwareLRUPolicy', createdTime='2012/03/24 00:08:29'}
+  ProcessorProfile{id=209, title='C2T2-L2_2048KB_Assoc4_LRU', numCores=2, numThreadsPerCore=2, l2Size='2 MB', l2Associativity=4, l2EvictionPolicyClz.name='archimulator.sim.uncore.cache.eviction.LRUPolicy', createdTime='2012/03/24 00:08:29'}
+  ProcessorProfile{id=210, title='C2T2-L2_2048KB_Assoc4_LLCHTAwareLRU', numCores=2, numThreadsPerCore=2, l2Size='2 MB', l2Associativity=4, l2EvictionPolicyClz.name='archimulator.sim.ext.uncore.cache.eviction.LLCHTAwareLRUPolicy', createdTime='2012/03/24 00:08:29'}
+  ProcessorProfile{id=211, title='C2T2-L2_2048KB_Assoc8_LRU', numCores=2, numThreadsPerCore=2, l2Size='2 MB', l2Associativity=8, l2EvictionPolicyClz.name='archimulator.sim.uncore.cache.eviction.LRUPolicy', createdTime='2012/03/24 00:08:29'}
+  ProcessorProfile{id=212, title='C2T2-L2_2048KB_Assoc8_LLCHTAwareLRU', numCores=2, numThreadsPerCore=2, l2Size='2 MB', l2Associativity=8, l2EvictionPolicyClz.name='archimulator.sim.ext.uncore.cache.eviction.LLCHTAwareLRUPolicy', createdTime='2012/03/24 00:08:29'}
+  ProcessorProfile{id=213, title='C2T2-L2_4096KB_Assoc4_LRU', numCores=2, numThreadsPerCore=2, l2Size='4 MB', l2Associativity=4, l2EvictionPolicyClz.name='archimulator.sim.uncore.cache.eviction.LRUPolicy', createdTime='2012/03/24 00:08:29'}
+  ProcessorProfile{id=214, title='C2T2-L2_4096KB_Assoc4_LLCHTAwareLRU', numCores=2, numThreadsPerCore=2, l2Size='4 MB', l2Associativity=4, l2EvictionPolicyClz.name='archimulator.sim.ext.uncore.cache.eviction.LLCHTAwareLRUPolicy', createdTime='2012/03/24 00:08:29'}
+  ProcessorProfile{id=215, title='C2T2-L2_4096KB_Assoc8_LRU', numCores=2, numThreadsPerCore=2, l2Size='4 MB', l2Associativity=8, l2EvictionPolicyClz.name='archimulator.sim.uncore.cache.eviction.LRUPolicy', createdTime='2012/03/24 00:08:29'}
+  ProcessorProfile{id=216, title='C2T2-L2_4096KB_Assoc8_LLCHTAwareLRU', numCores=2, numThreadsPerCore=2, l2Size='4 MB', l2Associativity=8, l2EvictionPolicyClz.name='archimulator.sim.ext.uncore.cache.eviction.LLCHTAwareLRUPolicy', createdTime='2012/03/24 00:08:29'}
+
+c. Experiment Profiles (total: 78)
+  ExperimentProfile{id=979, title='mst_baseline-C2T2-L2_1024KB_Assoc4_LRU', processorProfile.title='C2T2-L2_1024KB_Assoc4_LRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Stopped', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_baseline'
+    Stats
+      detailedSimulation.experiment.beginTime: 2012/03/24 00:08:04
+      detailedSimulation.experiment.workloads.size: 1
+      detailedSimulation.experiment.workload.0: mst.mips(10000)
+      detailedSimulation.experiment.numCores: 2
+      detailedSimulation.experiment.numThreadsPerCore: 2
+      detailedSimulation.experiment.l2EvictionPolicy: archimulator.sim.uncore.cache.eviction.LRUPolicy
+      detailedSimulation.duration: 78:14:03.664
+      detailedSimulation.totalCycles: 85189681492
+      detailedSimulation.totalInsts: 20098735697
+      detailedSimulation.instsPerCycle: 0.2359292269321072
+      detailedSimulation.cyclesPerSecond: 302473.9883185451
+      detailedSimulation.instsPerSecond: 71362.45423106557
+      detailedSimulation.mainMemory.accesses: 290351207
+      detailedSimulation.mainMemory.reads: 284038345
+      detailedSimulation.mainMemory.writes: 6312862
+      detailedSimulation.llc.hitRatio: 0.5622427001221844
+      detailedSimulation.llc.downwardAccesses: 699153072
+      detailedSimulation.llc.downwardHits: 393093711
+      detailedSimulation.llc.downwardMisses: 306059361
+      detailedSimulation.llc.downwardBypasses: 0
+      detailedSimulation.llc.downwardReadHits: 50786542
+      detailedSimulation.llc.downwardReadMisses: 284037911
+      detailedSimulation.llc.downwardReadBypasses: 0
+      detailedSimulation.llc.downwardWriteHits: 342307169
+      detailedSimulation.llc.downwardWriteMisses: 22021450
+      detailedSimulation.llc.downwardWriteBypasses: 0
+      detailedSimulation.llc.evictions: 306042977
+      detailedSimulation.c0.icache.hitRatio: 0.9999998374494533
+      detailedSimulation.c0.icache.downwardAccesses: 2614571336
+      detailedSimulation.c0.icache.downwardHits: 2614570911
+      detailedSimulation.c0.icache.downwardMisses: 425
+      detailedSimulation.c0.icache.downwardBypasses: 0
+      detailedSimulation.c0.icache.downwardReadHits: 2614570911
+      detailedSimulation.c0.icache.downwardReadMisses: 425
+      detailedSimulation.c0.icache.downwardReadBypasses: 0
+      detailedSimulation.c0.icache.downwardWriteHits: 0
+      detailedSimulation.c0.icache.downwardWriteMisses: 0
+      detailedSimulation.c0.icache.downwardWriteBypasses: 0
+      detailedSimulation.c0.icache.evictions: 38
+      detailedSimulation.c0.icache.upwardReads: 0
+      detailedSimulation.c0.icache.upwardWrites: 0
+      detailedSimulation.c0.dcache.hitRatio: 0.9161086975342811
+      detailedSimulation.c0.dcache.downwardAccesses: 4342865688
+      detailedSimulation.c0.dcache.downwardHits: 3978537029
+      detailedSimulation.c0.dcache.downwardMisses: 364328659
+      detailedSimulation.c0.dcache.downwardBypasses: 0
+      detailedSimulation.c0.dcache.downwardReadHits: 2381668248
+      detailedSimulation.c0.dcache.downwardReadMisses: 334824028
+      detailedSimulation.c0.dcache.downwardReadBypasses: 0
+      detailedSimulation.c0.dcache.downwardWriteHits: 1596868781
+      detailedSimulation.c0.dcache.downwardWriteMisses: 29504631
+      detailedSimulation.c0.dcache.downwardWriteBypasses: 0
+      detailedSimulation.c0.dcache.evictions: 364328147
+      detailedSimulation.c0.dcache.upwardReads: 0
+      detailedSimulation.c0.dcache.upwardWrites: 0
+      detailedSimulation.c0t0.itlb.hitRatio: 0.9999998374494533
+      detailedSimulation.c0t0.itlb.accesses: 2614571336
+      detailedSimulation.c0t0.itlb.hits: 2614570911
+      detailedSimulation.c0t0.itlb.misses: 425
+      detailedSimulation.c0t0.itlb.evictions: 38
+      detailedSimulation.c0t0.dtlb.hitRatio: 0.9161574425370532
+      detailedSimulation.c0t0.dtlb.accesses: 4342865688
+      detailedSimulation.c0t0.dtlb.hits: 3978748722
+      detailedSimulation.c0t0.dtlb.misses: 364116966
+      detailedSimulation.c0t0.dtlb.evictions: 364116454
+      detailedSimulation.c0t1.itlb.hitRatio: 0.0
+      detailedSimulation.c0t1.itlb.accesses: 0
+      detailedSimulation.c0t1.itlb.hits: 0
+      detailedSimulation.c0t1.itlb.misses: 0
+      detailedSimulation.c0t1.itlb.evictions: 0
+      detailedSimulation.c0t1.dtlb.hitRatio: 0.0
+      detailedSimulation.c0t1.dtlb.accesses: 0
+      detailedSimulation.c0t1.dtlb.hits: 0
+      detailedSimulation.c0t1.dtlb.misses: 0
+      detailedSimulation.c0t1.dtlb.evictions: 0
+      detailedSimulation.c1.icache.hitRatio: 0.0
+      detailedSimulation.c1.icache.downwardAccesses: 0
+      detailedSimulation.c1.icache.downwardHits: 0
+      detailedSimulation.c1.icache.downwardMisses: 0
+      detailedSimulation.c1.icache.downwardBypasses: 0
+      detailedSimulation.c1.icache.downwardReadHits: 0
+      detailedSimulation.c1.icache.downwardReadMisses: 0
+      detailedSimulation.c1.icache.downwardReadBypasses: 0
+      detailedSimulation.c1.icache.downwardWriteHits: 0
+      detailedSimulation.c1.icache.downwardWriteMisses: 0
+      detailedSimulation.c1.icache.downwardWriteBypasses: 0
+      detailedSimulation.c1.icache.evictions: 0
+      detailedSimulation.c1.icache.upwardReads: 0
+      detailedSimulation.c1.icache.upwardWrites: 0
+      detailedSimulation.c1.dcache.hitRatio: 0.0
+      detailedSimulation.c1.dcache.downwardAccesses: 0
+      detailedSimulation.c1.dcache.downwardHits: 0
+      detailedSimulation.c1.dcache.downwardMisses: 0
+      detailedSimulation.c1.dcache.downwardBypasses: 0
+      detailedSimulation.c1.dcache.downwardReadHits: 0
+      detailedSimulation.c1.dcache.downwardReadMisses: 0
+      detailedSimulation.c1.dcache.downwardReadBypasses: 0
+      detailedSimulation.c1.dcache.downwardWriteHits: 0
+      detailedSimulation.c1.dcache.downwardWriteMisses: 0
+      detailedSimulation.c1.dcache.downwardWriteBypasses: 0
+      detailedSimulation.c1.dcache.evictions: 0
+      detailedSimulation.c1.dcache.upwardReads: 0
+      detailedSimulation.c1.dcache.upwardWrites: 0
+      detailedSimulation.c1t0.itlb.hitRatio: 0.0
+      detailedSimulation.c1t0.itlb.accesses: 0
+      detailedSimulation.c1t0.itlb.hits: 0
+      detailedSimulation.c1t0.itlb.misses: 0
+      detailedSimulation.c1t0.itlb.evictions: 0
+      detailedSimulation.c1t0.dtlb.hitRatio: 0.0
+      detailedSimulation.c1t0.dtlb.accesses: 0
+      detailedSimulation.c1t0.dtlb.hits: 0
+      detailedSimulation.c1t0.dtlb.misses: 0
+      detailedSimulation.c1t0.dtlb.evictions: 0
+      detailedSimulation.c1t1.itlb.hitRatio: 0.0
+      detailedSimulation.c1t1.itlb.accesses: 0
+      detailedSimulation.c1t1.itlb.hits: 0
+      detailedSimulation.c1t1.itlb.misses: 0
+      detailedSimulation.c1t1.itlb.evictions: 0
+      detailedSimulation.c1t1.dtlb.hitRatio: 0.0
+      detailedSimulation.c1t1.dtlb.accesses: 0
+      detailedSimulation.c1t1.dtlb.hits: 0
+      detailedSimulation.c1t1.dtlb.misses: 0
+      detailedSimulation.c1t1.dtlb.evictions: 0
+      detailedSimulation.c0.noFreeFu.INTEGER_ALU: 23053
+      detailedSimulation.c0.noFreeFu.INTEGER_MULT_DIV: 1999687765
+      detailedSimulation.c0.noFreeFu.FP_ADDER: 0
+      detailedSimulation.c0.noFreeFu.FP_MULT_DIV: 0
+      detailedSimulation.c0.noFreeFu.MEMORY_PORT: 961380061
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.NONE: 0
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.INT_ALU: 0
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.INT_MULTIPLY: 0
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.INT_DIVIDE: 1487319908
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.FLOAT_ADD: 0
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.FLOAT_COMPARE: 0
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.FLOAT_CONVERT: 0
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.FLOAT_MULTIPLY: 0
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.FLOAT_DIVIDE: 0
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.FLOAT_SQRT: 0
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.READ_PORT: 565515861
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.WRITE_PORT: 864498706
+      detailedSimulation.c0t0.bpred.type: PERFECT
+      detailedSimulation.c0t0.bpred.accesses: 3134641312
+      detailedSimulation.c0t0.bpred.hits: 3134641312
+      detailedSimulation.c0t0.bpred.misses: 0
+      detailedSimulation.c0t0.bpred.hitRatio: 1.0
+      detailedSimulation.c0t0.totalInsts: 20098735697
+      detailedSimulation.c0t0.llcReadMisses: 284038345
+      detailedSimulation.c0t0.llcWriteMisses: 22021016
+      detailedSimulation.c0t0.decodeBufferFull: 76543712886
+      detailedSimulation.c0t0.reorderBufferFull: 85188635769
+      detailedSimulation.c0t0.loadStoreQueueFull: 733558
+      detailedSimulation.c0t0.intPhysicalRegisterFileFull: 0
+      detailedSimulation.c0t0.fpPhysicalRegisterFileFull: 0
+      detailedSimulation.c0t0.miscPhysicalRegisterFileFull: 0
+      detailedSimulation.c0t0.fetchStallsOnDecodeBufferIsFull: 74065567366
+      detailedSimulation.c0t0.registerRenameStallsOnDecodeBufferIsEmpty: 212473
+      detailedSimulation.c0t0.registerRenameStallsOnReorderBufferIsFull: 162649078082
+      detailedSimulation.c0t0.registerRenameStallsOnLoadStoreQueueFull: 629184
+      detailedSimulation.c0t0.selectionStallOnCanNotLoad: 0
+      detailedSimulation.c0t0.selectionStallOnCanNotStore: 1260997534
+      detailedSimulation.c0t0.selectionStallOnNoFreeFunctionalUnit: 2917334475
+      detailedSimulation.c0t1.bpred.type: PERFECT
+      detailedSimulation.c0t1.bpred.accesses: 0
+      detailedSimulation.c0t1.bpred.hits: 0
+      detailedSimulation.c0t1.bpred.misses: 0
+      detailedSimulation.c0t1.bpred.hitRatio: 0.0
+      detailedSimulation.c0t1.totalInsts: 0
+      detailedSimulation.c0t1.llcReadMisses: 0
+      detailedSimulation.c0t1.llcWriteMisses: 0
+      detailedSimulation.c0t1.decodeBufferFull: 0
+      detailedSimulation.c0t1.reorderBufferFull: 0
+      detailedSimulation.c0t1.loadStoreQueueFull: 0
+      detailedSimulation.c0t1.intPhysicalRegisterFileFull: 0
+      detailedSimulation.c0t1.fpPhysicalRegisterFileFull: 0
+      detailedSimulation.c0t1.miscPhysicalRegisterFileFull: 0
+      detailedSimulation.c0t1.fetchStallsOnDecodeBufferIsFull: 0
+      detailedSimulation.c0t1.registerRenameStallsOnDecodeBufferIsEmpty: 0
+      detailedSimulation.c0t1.registerRenameStallsOnReorderBufferIsFull: 0
+      detailedSimulation.c0t1.registerRenameStallsOnLoadStoreQueueFull: 0
+      detailedSimulation.c0t1.selectionStallOnCanNotLoad: 0
+      detailedSimulation.c0t1.selectionStallOnCanNotStore: 0
+      detailedSimulation.c0t1.selectionStallOnNoFreeFunctionalUnit: 0
+      detailedSimulation.c1.noFreeFu.INTEGER_ALU: 0
+      detailedSimulation.c1.noFreeFu.INTEGER_MULT_DIV: 0
+      detailedSimulation.c1.noFreeFu.FP_ADDER: 0
+      detailedSimulation.c1.noFreeFu.FP_MULT_DIV: 0
+      detailedSimulation.c1.noFreeFu.MEMORY_PORT: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.NONE: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.INT_ALU: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.INT_MULTIPLY: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.INT_DIVIDE: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.FLOAT_ADD: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.FLOAT_COMPARE: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.FLOAT_CONVERT: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.FLOAT_MULTIPLY: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.FLOAT_DIVIDE: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.FLOAT_SQRT: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.READ_PORT: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.WRITE_PORT: 0
+      detailedSimulation.c1t0.bpred.type: PERFECT
+      detailedSimulation.c1t0.bpred.accesses: 0
+      detailedSimulation.c1t0.bpred.hits: 0
+      detailedSimulation.c1t0.bpred.misses: 0
+      detailedSimulation.c1t0.bpred.hitRatio: 0.0
+      detailedSimulation.c1t0.totalInsts: 0
+      detailedSimulation.c1t0.llcReadMisses: 0
+      detailedSimulation.c1t0.llcWriteMisses: 0
+      detailedSimulation.c1t0.decodeBufferFull: 0
+      detailedSimulation.c1t0.reorderBufferFull: 0
+      detailedSimulation.c1t0.loadStoreQueueFull: 0
+      detailedSimulation.c1t0.intPhysicalRegisterFileFull: 0
+      detailedSimulation.c1t0.fpPhysicalRegisterFileFull: 0
+      detailedSimulation.c1t0.miscPhysicalRegisterFileFull: 0
+      detailedSimulation.c1t0.fetchStallsOnDecodeBufferIsFull: 0
+      detailedSimulation.c1t0.registerRenameStallsOnDecodeBufferIsEmpty: 0
+      detailedSimulation.c1t0.registerRenameStallsOnReorderBufferIsFull: 0
+      detailedSimulation.c1t0.registerRenameStallsOnLoadStoreQueueFull: 0
+      detailedSimulation.c1t0.selectionStallOnCanNotLoad: 0
+      detailedSimulation.c1t0.selectionStallOnCanNotStore: 0
+      detailedSimulation.c1t0.selectionStallOnNoFreeFunctionalUnit: 0
+      detailedSimulation.c1t1.bpred.type: PERFECT
+      detailedSimulation.c1t1.bpred.accesses: 0
+      detailedSimulation.c1t1.bpred.hits: 0
+      detailedSimulation.c1t1.bpred.misses: 0
+      detailedSimulation.c1t1.bpred.hitRatio: 0.0
+      detailedSimulation.c1t1.totalInsts: 0
+      detailedSimulation.c1t1.llcReadMisses: 0
+      detailedSimulation.c1t1.llcWriteMisses: 0
+      detailedSimulation.c1t1.decodeBufferFull: 0
+      detailedSimulation.c1t1.reorderBufferFull: 0
+      detailedSimulation.c1t1.loadStoreQueueFull: 0
+      detailedSimulation.c1t1.intPhysicalRegisterFileFull: 0
+      detailedSimulation.c1t1.fpPhysicalRegisterFileFull: 0
+      detailedSimulation.c1t1.miscPhysicalRegisterFileFull: 0
+      detailedSimulation.c1t1.fetchStallsOnDecodeBufferIsFull: 0
+      detailedSimulation.c1t1.registerRenameStallsOnDecodeBufferIsEmpty: 0
+      detailedSimulation.c1t1.registerRenameStallsOnReorderBufferIsFull: 0
+      detailedSimulation.c1t1.registerRenameStallsOnLoadStoreQueueFull: 0
+      detailedSimulation.c1t1.selectionStallOnCanNotLoad: 0
+      detailedSimulation.c1t1.selectionStallOnCanNotStore: 0
+      detailedSimulation.c1t1.selectionStallOnNoFreeFunctionalUnit: 0
+  ExperimentProfile{id=980, title='mst_baseline-C2T2-L2_1024KB_Assoc8_LRU', processorProfile.title='C2T2-L2_1024KB_Assoc8_LRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Stopped', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_baseline'
+    Stats
+      detailedSimulation.experiment.beginTime: 2012/03/24 15:09:10
+      detailedSimulation.experiment.workloads.size: 1
+      detailedSimulation.experiment.workload.0: mst.mips(10000)
+      detailedSimulation.experiment.numCores: 2
+      detailedSimulation.experiment.numThreadsPerCore: 2
+      detailedSimulation.experiment.l2EvictionPolicy: archimulator.sim.uncore.cache.eviction.LRUPolicy
+      detailedSimulation.duration: 74:17:02.053
+      detailedSimulation.totalCycles: 85189873645
+      detailedSimulation.totalInsts: 20098735690
+      detailedSimulation.instsPerCycle: 0.23592869469151564
+      detailedSimulation.cyclesPerSecond: 318559.70580206567
+      detailedSimulation.instsPerSecond: 75157.37557119459
+      detailedSimulation.mainMemory.accesses: 290401275
+      detailedSimulation.mainMemory.reads: 284087850
+      detailedSimulation.mainMemory.writes: 6313425
+      detailedSimulation.llc.hitRatio: 0.562356490816123
+      detailedSimulation.llc.downwardAccesses: 699152990
+      detailedSimulation.llc.downwardHits: 393173222
+      detailedSimulation.llc.downwardMisses: 305979768
+      detailedSimulation.llc.downwardBypasses: 0
+      detailedSimulation.llc.downwardReadHits: 50736996
+      detailedSimulation.llc.downwardReadMisses: 284087416
+      detailedSimulation.llc.downwardReadBypasses: 0
+      detailedSimulation.llc.downwardWriteHits: 342436226
+      detailedSimulation.llc.downwardWriteMisses: 21892352
+      detailedSimulation.llc.downwardWriteBypasses: 0
+      detailedSimulation.llc.evictions: 305963384
+      detailedSimulation.c0.icache.hitRatio: 0.9999998374494533
+      detailedSimulation.c0.icache.downwardAccesses: 2614571336
+      detailedSimulation.c0.icache.downwardHits: 2614570911
+      detailedSimulation.c0.icache.downwardMisses: 425
+      detailedSimulation.c0.icache.downwardBypasses: 0
+      detailedSimulation.c0.icache.downwardReadHits: 2614570911
+      detailedSimulation.c0.icache.downwardReadMisses: 425
+      detailedSimulation.c0.icache.downwardReadBypasses: 0
+      detailedSimulation.c0.icache.downwardWriteHits: 0
+      detailedSimulation.c0.icache.downwardWriteMisses: 0
+      detailedSimulation.c0.icache.downwardWriteBypasses: 0
+      detailedSimulation.c0.icache.evictions: 38
+      detailedSimulation.c0.icache.upwardReads: 0
+      detailedSimulation.c0.icache.upwardWrites: 0
+      detailedSimulation.c0.dcache.hitRatio: 0.9161086325464461
+      detailedSimulation.c0.dcache.downwardAccesses: 4342861835
+      detailedSimulation.c0.dcache.downwardHits: 3978533217
+      detailedSimulation.c0.dcache.downwardMisses: 364328618
+      detailedSimulation.c0.dcache.downwardBypasses: 0
+      detailedSimulation.c0.dcache.downwardReadHits: 2381664436
+      detailedSimulation.c0.dcache.downwardReadMisses: 334823987
+      detailedSimulation.c0.dcache.downwardReadBypasses: 0
+      detailedSimulation.c0.dcache.downwardWriteHits: 1596868781
+      detailedSimulation.c0.dcache.downwardWriteMisses: 29504631
+      detailedSimulation.c0.dcache.downwardWriteBypasses: 0
+      detailedSimulation.c0.dcache.evictions: 364328106
+      detailedSimulation.c0.dcache.upwardReads: 0
+      detailedSimulation.c0.dcache.upwardWrites: 0
+      detailedSimulation.c0t0.itlb.hitRatio: 0.9999998374494533
+      detailedSimulation.c0t0.itlb.accesses: 2614571336
+      detailedSimulation.c0t0.itlb.hits: 2614570911
+      detailedSimulation.c0t0.itlb.misses: 425
+      detailedSimulation.c0t0.itlb.evictions: 38
+      detailedSimulation.c0t0.dtlb.hitRatio: 0.9161573681516856
+      detailedSimulation.c0t0.dtlb.accesses: 4342861835
+      detailedSimulation.c0t0.dtlb.hits: 3978744869
+      detailedSimulation.c0t0.dtlb.misses: 364116966
+      detailedSimulation.c0t0.dtlb.evictions: 364116454
+      detailedSimulation.c0t1.itlb.hitRatio: 0.0
+      detailedSimulation.c0t1.itlb.accesses: 0
+      detailedSimulation.c0t1.itlb.hits: 0
+      detailedSimulation.c0t1.itlb.misses: 0
+      detailedSimulation.c0t1.itlb.evictions: 0
+      detailedSimulation.c0t1.dtlb.hitRatio: 0.0
+      detailedSimulation.c0t1.dtlb.accesses: 0
+      detailedSimulation.c0t1.dtlb.hits: 0
+      detailedSimulation.c0t1.dtlb.misses: 0
+      detailedSimulation.c0t1.dtlb.evictions: 0
+      detailedSimulation.c1.icache.hitRatio: 0.0
+      detailedSimulation.c1.icache.downwardAccesses: 0
+      detailedSimulation.c1.icache.downwardHits: 0
+      detailedSimulation.c1.icache.downwardMisses: 0
+      detailedSimulation.c1.icache.downwardBypasses: 0
+      detailedSimulation.c1.icache.downwardReadHits: 0
+      detailedSimulation.c1.icache.downwardReadMisses: 0
+      detailedSimulation.c1.icache.downwardReadBypasses: 0
+      detailedSimulation.c1.icache.downwardWriteHits: 0
+      detailedSimulation.c1.icache.downwardWriteMisses: 0
+      detailedSimulation.c1.icache.downwardWriteBypasses: 0
+      detailedSimulation.c1.icache.evictions: 0
+      detailedSimulation.c1.icache.upwardReads: 0
+      detailedSimulation.c1.icache.upwardWrites: 0
+      detailedSimulation.c1.dcache.hitRatio: 0.0
+      detailedSimulation.c1.dcache.downwardAccesses: 0
+      detailedSimulation.c1.dcache.downwardHits: 0
+      detailedSimulation.c1.dcache.downwardMisses: 0
+      detailedSimulation.c1.dcache.downwardBypasses: 0
+      detailedSimulation.c1.dcache.downwardReadHits: 0
+      detailedSimulation.c1.dcache.downwardReadMisses: 0
+      detailedSimulation.c1.dcache.downwardReadBypasses: 0
+      detailedSimulation.c1.dcache.downwardWriteHits: 0
+      detailedSimulation.c1.dcache.downwardWriteMisses: 0
+      detailedSimulation.c1.dcache.downwardWriteBypasses: 0
+      detailedSimulation.c1.dcache.evictions: 0
+      detailedSimulation.c1.dcache.upwardReads: 0
+      detailedSimulation.c1.dcache.upwardWrites: 0
+      detailedSimulation.c1t0.itlb.hitRatio: 0.0
+      detailedSimulation.c1t0.itlb.accesses: 0
+      detailedSimulation.c1t0.itlb.hits: 0
+      detailedSimulation.c1t0.itlb.misses: 0
+      detailedSimulation.c1t0.itlb.evictions: 0
+      detailedSimulation.c1t0.dtlb.hitRatio: 0.0
+      detailedSimulation.c1t0.dtlb.accesses: 0
+      detailedSimulation.c1t0.dtlb.hits: 0
+      detailedSimulation.c1t0.dtlb.misses: 0
+      detailedSimulation.c1t0.dtlb.evictions: 0
+      detailedSimulation.c1t1.itlb.hitRatio: 0.0
+      detailedSimulation.c1t1.itlb.accesses: 0
+      detailedSimulation.c1t1.itlb.hits: 0
+      detailedSimulation.c1t1.itlb.misses: 0
+      detailedSimulation.c1t1.itlb.evictions: 0
+      detailedSimulation.c1t1.dtlb.hitRatio: 0.0
+      detailedSimulation.c1t1.dtlb.accesses: 0
+      detailedSimulation.c1t1.dtlb.hits: 0
+      detailedSimulation.c1t1.dtlb.misses: 0
+      detailedSimulation.c1t1.dtlb.evictions: 0
+      detailedSimulation.c0.noFreeFu.INTEGER_ALU: 23054
+      detailedSimulation.c0.noFreeFu.INTEGER_MULT_DIV: 1999687769
+      detailedSimulation.c0.noFreeFu.FP_ADDER: 0
+      detailedSimulation.c0.noFreeFu.FP_MULT_DIV: 0
+      detailedSimulation.c0.noFreeFu.MEMORY_PORT: 961379869
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.NONE: 0
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.INT_ALU: 0
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.INT_MULTIPLY: 0
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.INT_DIVIDE: 1487319908
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.FLOAT_ADD: 0
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.FLOAT_COMPARE: 0
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.FLOAT_CONVERT: 0
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.FLOAT_MULTIPLY: 0
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.FLOAT_DIVIDE: 0
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.FLOAT_SQRT: 0
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.READ_PORT: 565507432
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.WRITE_PORT: 864488963
+      detailedSimulation.c0t0.bpred.type: PERFECT
+      detailedSimulation.c0t0.bpred.accesses: 3134641314
+      detailedSimulation.c0t0.bpred.hits: 3134641314
+      detailedSimulation.c0t0.bpred.misses: 0
+      detailedSimulation.c0t0.bpred.hitRatio: 1.0
+      detailedSimulation.c0t0.totalInsts: 20098735690
+      detailedSimulation.c0t0.llcReadMisses: 284087850
+      detailedSimulation.c0t0.llcWriteMisses: 21891918
+      detailedSimulation.c0t0.decodeBufferFull: 76543905485
+      detailedSimulation.c0t0.reorderBufferFull: 85188829271
+      detailedSimulation.c0t0.loadStoreQueueFull: 732175
+      detailedSimulation.c0t0.intPhysicalRegisterFileFull: 0
+      detailedSimulation.c0t0.fpPhysicalRegisterFileFull: 0
+      detailedSimulation.c0t0.miscPhysicalRegisterFileFull: 0
+      detailedSimulation.c0t0.fetchStallsOnDecodeBufferIsFull: 74065759526
+      detailedSimulation.c0t0.registerRenameStallsOnDecodeBufferIsEmpty: 212412
+      detailedSimulation.c0t0.registerRenameStallsOnReorderBufferIsFull: 162649460021
+      detailedSimulation.c0t0.registerRenameStallsOnLoadStoreQueueFull: 627904
+      detailedSimulation.c0t0.selectionStallOnCanNotLoad: 0
+      detailedSimulation.c0t0.selectionStallOnCanNotStore: 1260976942
+      detailedSimulation.c0t0.selectionStallOnNoFreeFunctionalUnit: 2917316303
+      detailedSimulation.c0t1.bpred.type: PERFECT
+      detailedSimulation.c0t1.bpred.accesses: 0
+      detailedSimulation.c0t1.bpred.hits: 0
+      detailedSimulation.c0t1.bpred.misses: 0
+      detailedSimulation.c0t1.bpred.hitRatio: 0.0
+      detailedSimulation.c0t1.totalInsts: 0
+      detailedSimulation.c0t1.llcReadMisses: 0
+      detailedSimulation.c0t1.llcWriteMisses: 0
+      detailedSimulation.c0t1.decodeBufferFull: 0
+      detailedSimulation.c0t1.reorderBufferFull: 0
+      detailedSimulation.c0t1.loadStoreQueueFull: 0
+      detailedSimulation.c0t1.intPhysicalRegisterFileFull: 0
+      detailedSimulation.c0t1.fpPhysicalRegisterFileFull: 0
+      detailedSimulation.c0t1.miscPhysicalRegisterFileFull: 0
+      detailedSimulation.c0t1.fetchStallsOnDecodeBufferIsFull: 0
+      detailedSimulation.c0t1.registerRenameStallsOnDecodeBufferIsEmpty: 0
+      detailedSimulation.c0t1.registerRenameStallsOnReorderBufferIsFull: 0
+      detailedSimulation.c0t1.registerRenameStallsOnLoadStoreQueueFull: 0
+      detailedSimulation.c0t1.selectionStallOnCanNotLoad: 0
+      detailedSimulation.c0t1.selectionStallOnCanNotStore: 0
+      detailedSimulation.c0t1.selectionStallOnNoFreeFunctionalUnit: 0
+      detailedSimulation.c1.noFreeFu.INTEGER_ALU: 0
+      detailedSimulation.c1.noFreeFu.INTEGER_MULT_DIV: 0
+      detailedSimulation.c1.noFreeFu.FP_ADDER: 0
+      detailedSimulation.c1.noFreeFu.FP_MULT_DIV: 0
+      detailedSimulation.c1.noFreeFu.MEMORY_PORT: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.NONE: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.INT_ALU: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.INT_MULTIPLY: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.INT_DIVIDE: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.FLOAT_ADD: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.FLOAT_COMPARE: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.FLOAT_CONVERT: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.FLOAT_MULTIPLY: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.FLOAT_DIVIDE: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.FLOAT_SQRT: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.READ_PORT: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.WRITE_PORT: 0
+      detailedSimulation.c1t0.bpred.type: PERFECT
+      detailedSimulation.c1t0.bpred.accesses: 0
+      detailedSimulation.c1t0.bpred.hits: 0
+      detailedSimulation.c1t0.bpred.misses: 0
+      detailedSimulation.c1t0.bpred.hitRatio: 0.0
+      detailedSimulation.c1t0.totalInsts: 0
+      detailedSimulation.c1t0.llcReadMisses: 0
+      detailedSimulation.c1t0.llcWriteMisses: 0
+      detailedSimulation.c1t0.decodeBufferFull: 0
+      detailedSimulation.c1t0.reorderBufferFull: 0
+      detailedSimulation.c1t0.loadStoreQueueFull: 0
+      detailedSimulation.c1t0.intPhysicalRegisterFileFull: 0
+      detailedSimulation.c1t0.fpPhysicalRegisterFileFull: 0
+      detailedSimulation.c1t0.miscPhysicalRegisterFileFull: 0
+      detailedSimulation.c1t0.fetchStallsOnDecodeBufferIsFull: 0
+      detailedSimulation.c1t0.registerRenameStallsOnDecodeBufferIsEmpty: 0
+      detailedSimulation.c1t0.registerRenameStallsOnReorderBufferIsFull: 0
+      detailedSimulation.c1t0.registerRenameStallsOnLoadStoreQueueFull: 0
+      detailedSimulation.c1t0.selectionStallOnCanNotLoad: 0
+      detailedSimulation.c1t0.selectionStallOnCanNotStore: 0
+      detailedSimulation.c1t0.selectionStallOnNoFreeFunctionalUnit: 0
+      detailedSimulation.c1t1.bpred.type: PERFECT
+      detailedSimulation.c1t1.bpred.accesses: 0
+      detailedSimulation.c1t1.bpred.hits: 0
+      detailedSimulation.c1t1.bpred.misses: 0
+      detailedSimulation.c1t1.bpred.hitRatio: 0.0
+      detailedSimulation.c1t1.totalInsts: 0
+      detailedSimulation.c1t1.llcReadMisses: 0
+      detailedSimulation.c1t1.llcWriteMisses: 0
+      detailedSimulation.c1t1.decodeBufferFull: 0
+      detailedSimulation.c1t1.reorderBufferFull: 0
+      detailedSimulation.c1t1.loadStoreQueueFull: 0
+      detailedSimulation.c1t1.intPhysicalRegisterFileFull: 0
+      detailedSimulation.c1t1.fpPhysicalRegisterFileFull: 0
+      detailedSimulation.c1t1.miscPhysicalRegisterFileFull: 0
+      detailedSimulation.c1t1.fetchStallsOnDecodeBufferIsFull: 0
+      detailedSimulation.c1t1.registerRenameStallsOnDecodeBufferIsEmpty: 0
+      detailedSimulation.c1t1.registerRenameStallsOnReorderBufferIsFull: 0
+      detailedSimulation.c1t1.registerRenameStallsOnLoadStoreQueueFull: 0
+      detailedSimulation.c1t1.selectionStallOnCanNotLoad: 0
+      detailedSimulation.c1t1.selectionStallOnCanNotStore: 0
+      detailedSimulation.c1t1.selectionStallOnNoFreeFunctionalUnit: 0
+  ExperimentProfile{id=981, title='mst_baseline-C2T2-L2_2048KB_Assoc4_LRU', processorProfile.title='C2T2-L2_2048KB_Assoc4_LRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Running', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_baseline'
+    Stats
+      detailedSimulation.duration: 25:07:43.304
+      detailedSimulation.totalCycles: 15,882,415,320
+      detailedSimulation.totalInsts: 16,299,097,782 (c0t0: 16299097782, c0t1: 0, c1t0: 0, c1t1: 0)
+      detailedSimulation.llcReadMisses: 15,621 (c0t0: 15621, c0t1: 0, c1t0: 0, c1t1: 0)
+      detailedSimulation.llcWriteMisses: 21,471,320 (c0t0: 21471320, c0t1: 0, c1t0: 0, c1t1: 0)
+      detailedSimulation.instsPerCycle: 1.026
+      detailedSimulation.cyclesPerSecond: 175,568.081
+      detailedSimulation.instsPerSecond: 180,174.19
+      detailedSimulation.max memory: 3.5 GB
+      detailedSimulation.total memory: 1.9 GB
+      detailedSimulation.used memory: 1.6 GB
+      detailedSimulation.mem-0.numPages: 324250
+  ExperimentProfile{id=982, title='mst_baseline-C2T2-L2_2048KB_Assoc8_LRU', processorProfile.title='C2T2-L2_2048KB_Assoc8_LRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Stopped', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_baseline'
+    Stats
+      detailedSimulation.experiment.beginTime: 2012/03/24 15:10:11
+      detailedSimulation.experiment.workloads.size: 1
+      detailedSimulation.experiment.workload.0: mst.mips(10000)
+      detailedSimulation.experiment.numCores: 2
+      detailedSimulation.experiment.numThreadsPerCore: 2
+      detailedSimulation.experiment.l2EvictionPolicy: archimulator.sim.uncore.cache.eviction.LRUPolicy
+      detailedSimulation.duration: 73:44:42.226
+      detailedSimulation.totalCycles: 85073714315
+      detailedSimulation.totalInsts: 20098735690
+      detailedSimulation.instsPerCycle: 0.23625083084513024
+      detailedSimulation.cyclesPerSecond: 320450.0279303305
+      detailedSimulation.instsPerSecond: 75706.58534288577
+      detailedSimulation.mainMemory.accesses: 285843839
+      detailedSimulation.mainMemory.reads: 279549433
+      detailedSimulation.mainMemory.writes: 6294406
+      detailedSimulation.llc.hitRatio: 0.5688608246009926
+      detailedSimulation.llc.downwardAccesses: 699153318
+      detailedSimulation.llc.downwardHits: 397720933
+      detailedSimulation.llc.downwardMisses: 301432385
+      detailedSimulation.llc.downwardBypasses: 0
+      detailedSimulation.llc.downwardReadHits: 55275577
+      detailedSimulation.llc.downwardReadMisses: 279548999
+      detailedSimulation.llc.downwardReadBypasses: 0
+      detailedSimulation.llc.downwardWriteHits: 342445356
+      detailedSimulation.llc.downwardWriteMisses: 21883386
+      detailedSimulation.llc.downwardWriteBypasses: 0
+      detailedSimulation.llc.evictions: 301399617
+      detailedSimulation.c0.icache.hitRatio: 0.9999998374494488
+      detailedSimulation.c0.icache.downwardAccesses: 2614571263
+      detailedSimulation.c0.icache.downwardHits: 2614570838
+      detailedSimulation.c0.icache.downwardMisses: 425
+      detailedSimulation.c0.icache.downwardBypasses: 0
+      detailedSimulation.c0.icache.downwardReadHits: 2614570838
+      detailedSimulation.c0.icache.downwardReadMisses: 425
+      detailedSimulation.c0.icache.downwardReadBypasses: 0
+      detailedSimulation.c0.icache.downwardWriteHits: 0
+      detailedSimulation.c0.icache.downwardWriteMisses: 0
+      detailedSimulation.c0.icache.downwardWriteBypasses: 0
+      detailedSimulation.c0.icache.evictions: 38
+      detailedSimulation.c0.icache.upwardReads: 0
+      detailedSimulation.c0.icache.upwardWrites: 0
+      detailedSimulation.c0.dcache.hitRatio: 0.916111097468057
+      detailedSimulation.c0.dcache.downwardAccesses: 4342991397
+      detailedSimulation.c0.dcache.downwardHits: 3978662615
+      detailedSimulation.c0.dcache.downwardMisses: 364328782
+      detailedSimulation.c0.dcache.downwardBypasses: 0
+      detailedSimulation.c0.dcache.downwardReadHits: 2381793834
+      detailedSimulation.c0.dcache.downwardReadMisses: 334824151
+      detailedSimulation.c0.dcache.downwardReadBypasses: 0
+      detailedSimulation.c0.dcache.downwardWriteHits: 1596868781
+      detailedSimulation.c0.dcache.downwardWriteMisses: 29504631
+      detailedSimulation.c0.dcache.downwardWriteBypasses: 0
+      detailedSimulation.c0.dcache.evictions: 364328270
+      detailedSimulation.c0.dcache.upwardReads: 0
+      detailedSimulation.c0.dcache.upwardWrites: 0
+      detailedSimulation.c0t0.itlb.hitRatio: 0.9999998374494488
+      detailedSimulation.c0t0.itlb.accesses: 2614571263
+      detailedSimulation.c0t0.itlb.hits: 2614570838
+      detailedSimulation.c0t0.itlb.misses: 425
+      detailedSimulation.c0t0.itlb.evictions: 38
+      detailedSimulation.c0t0.dtlb.hitRatio: 0.9161598693813853
+      detailedSimulation.c0t0.dtlb.accesses: 4342991397
+      detailedSimulation.c0t0.dtlb.hits: 3978874431
+      detailedSimulation.c0t0.dtlb.misses: 364116966
+      detailedSimulation.c0t0.dtlb.evictions: 364116454
+      detailedSimulation.c0t1.itlb.hitRatio: 0.0
+      detailedSimulation.c0t1.itlb.accesses: 0
+      detailedSimulation.c0t1.itlb.hits: 0
+      detailedSimulation.c0t1.itlb.misses: 0
+      detailedSimulation.c0t1.itlb.evictions: 0
+      detailedSimulation.c0t1.dtlb.hitRatio: 0.0
+      detailedSimulation.c0t1.dtlb.accesses: 0
+      detailedSimulation.c0t1.dtlb.hits: 0
+      detailedSimulation.c0t1.dtlb.misses: 0
+      detailedSimulation.c0t1.dtlb.evictions: 0
+      detailedSimulation.c1.icache.hitRatio: 0.0
+      detailedSimulation.c1.icache.downwardAccesses: 0
+      detailedSimulation.c1.icache.downwardHits: 0
+      detailedSimulation.c1.icache.downwardMisses: 0
+      detailedSimulation.c1.icache.downwardBypasses: 0
+      detailedSimulation.c1.icache.downwardReadHits: 0
+      detailedSimulation.c1.icache.downwardReadMisses: 0
+      detailedSimulation.c1.icache.downwardReadBypasses: 0
+      detailedSimulation.c1.icache.downwardWriteHits: 0
+      detailedSimulation.c1.icache.downwardWriteMisses: 0
+      detailedSimulation.c1.icache.downwardWriteBypasses: 0
+      detailedSimulation.c1.icache.evictions: 0
+      detailedSimulation.c1.icache.upwardReads: 0
+      detailedSimulation.c1.icache.upwardWrites: 0
+      detailedSimulation.c1.dcache.hitRatio: 0.0
+      detailedSimulation.c1.dcache.downwardAccesses: 0
+      detailedSimulation.c1.dcache.downwardHits: 0
+      detailedSimulation.c1.dcache.downwardMisses: 0
+      detailedSimulation.c1.dcache.downwardBypasses: 0
+      detailedSimulation.c1.dcache.downwardReadHits: 0
+      detailedSimulation.c1.dcache.downwardReadMisses: 0
+      detailedSimulation.c1.dcache.downwardReadBypasses: 0
+      detailedSimulation.c1.dcache.downwardWriteHits: 0
+      detailedSimulation.c1.dcache.downwardWriteMisses: 0
+      detailedSimulation.c1.dcache.downwardWriteBypasses: 0
+      detailedSimulation.c1.dcache.evictions: 0
+      detailedSimulation.c1.dcache.upwardReads: 0
+      detailedSimulation.c1.dcache.upwardWrites: 0
+      detailedSimulation.c1t0.itlb.hitRatio: 0.0
+      detailedSimulation.c1t0.itlb.accesses: 0
+      detailedSimulation.c1t0.itlb.hits: 0
+      detailedSimulation.c1t0.itlb.misses: 0
+      detailedSimulation.c1t0.itlb.evictions: 0
+      detailedSimulation.c1t0.dtlb.hitRatio: 0.0
+      detailedSimulation.c1t0.dtlb.accesses: 0
+      detailedSimulation.c1t0.dtlb.hits: 0
+      detailedSimulation.c1t0.dtlb.misses: 0
+      detailedSimulation.c1t0.dtlb.evictions: 0
+      detailedSimulation.c1t1.itlb.hitRatio: 0.0
+      detailedSimulation.c1t1.itlb.accesses: 0
+      detailedSimulation.c1t1.itlb.hits: 0
+      detailedSimulation.c1t1.itlb.misses: 0
+      detailedSimulation.c1t1.itlb.evictions: 0
+      detailedSimulation.c1t1.dtlb.hitRatio: 0.0
+      detailedSimulation.c1t1.dtlb.accesses: 0
+      detailedSimulation.c1t1.dtlb.hits: 0
+      detailedSimulation.c1t1.dtlb.misses: 0
+      detailedSimulation.c1t1.dtlb.evictions: 0
+      detailedSimulation.c0.noFreeFu.INTEGER_ALU: 23056
+      detailedSimulation.c0.noFreeFu.INTEGER_MULT_DIV: 1999687761
+      detailedSimulation.c0.noFreeFu.FP_ADDER: 0
+      detailedSimulation.c0.noFreeFu.FP_MULT_DIV: 0
+      detailedSimulation.c0.noFreeFu.MEMORY_PORT: 961388078
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.NONE: 0
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.INT_ALU: 0
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.INT_MULTIPLY: 0
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.INT_DIVIDE: 1487319908
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.FLOAT_ADD: 0
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.FLOAT_COMPARE: 0
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.FLOAT_CONVERT: 0
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.FLOAT_MULTIPLY: 0
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.FLOAT_DIVIDE: 0
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.FLOAT_SQRT: 0
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.READ_PORT: 565253522
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.WRITE_PORT: 864895938
+      detailedSimulation.c0t0.bpred.type: PERFECT
+      detailedSimulation.c0t0.bpred.accesses: 3134641314
+      detailedSimulation.c0t0.bpred.hits: 3134641314
+      detailedSimulation.c0t0.bpred.misses: 0
+      detailedSimulation.c0t0.bpred.hitRatio: 1.0
+      detailedSimulation.c0t0.totalInsts: 20098735690
+      detailedSimulation.c0t0.llcReadMisses: 279549433
+      detailedSimulation.c0t0.llcWriteMisses: 21882952
+      detailedSimulation.c0t0.decodeBufferFull: 76427511902
+      detailedSimulation.c0t0.reorderBufferFull: 85072666880
+      detailedSimulation.c0t0.loadStoreQueueFull: 735096
+      detailedSimulation.c0t0.intPhysicalRegisterFileFull: 0
+      detailedSimulation.c0t0.fpPhysicalRegisterFileFull: 0
+      detailedSimulation.c0t0.miscPhysicalRegisterFileFull: 0
+      detailedSimulation.c0t0.fetchStallsOnDecodeBufferIsFull: 73949600568
+      detailedSimulation.c0t0.registerRenameStallsOnDecodeBufferIsEmpty: 212992
+      detailedSimulation.c0t0.registerRenameStallsOnReorderBufferIsFull: 162416615622
+      detailedSimulation.c0t0.registerRenameStallsOnLoadStoreQueueFull: 630539
+      detailedSimulation.c0t0.selectionStallOnCanNotLoad: 1
+      detailedSimulation.c0t0.selectionStallOnCanNotStore: 1260922177
+      detailedSimulation.c0t0.selectionStallOnNoFreeFunctionalUnit: 2917469368
+      detailedSimulation.c0t1.bpred.type: PERFECT
+      detailedSimulation.c0t1.bpred.accesses: 0
+      detailedSimulation.c0t1.bpred.hits: 0
+      detailedSimulation.c0t1.bpred.misses: 0
+      detailedSimulation.c0t1.bpred.hitRatio: 0.0
+      detailedSimulation.c0t1.totalInsts: 0
+      detailedSimulation.c0t1.llcReadMisses: 0
+      detailedSimulation.c0t1.llcWriteMisses: 0
+      detailedSimulation.c0t1.decodeBufferFull: 0
+      detailedSimulation.c0t1.reorderBufferFull: 0
+      detailedSimulation.c0t1.loadStoreQueueFull: 0
+      detailedSimulation.c0t1.intPhysicalRegisterFileFull: 0
+      detailedSimulation.c0t1.fpPhysicalRegisterFileFull: 0
+      detailedSimulation.c0t1.miscPhysicalRegisterFileFull: 0
+      detailedSimulation.c0t1.fetchStallsOnDecodeBufferIsFull: 0
+      detailedSimulation.c0t1.registerRenameStallsOnDecodeBufferIsEmpty: 0
+      detailedSimulation.c0t1.registerRenameStallsOnReorderBufferIsFull: 0
+      detailedSimulation.c0t1.registerRenameStallsOnLoadStoreQueueFull: 0
+      detailedSimulation.c0t1.selectionStallOnCanNotLoad: 0
+      detailedSimulation.c0t1.selectionStallOnCanNotStore: 0
+      detailedSimulation.c0t1.selectionStallOnNoFreeFunctionalUnit: 0
+      detailedSimulation.c1.noFreeFu.INTEGER_ALU: 0
+      detailedSimulation.c1.noFreeFu.INTEGER_MULT_DIV: 0
+      detailedSimulation.c1.noFreeFu.FP_ADDER: 0
+      detailedSimulation.c1.noFreeFu.FP_MULT_DIV: 0
+      detailedSimulation.c1.noFreeFu.MEMORY_PORT: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.NONE: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.INT_ALU: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.INT_MULTIPLY: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.INT_DIVIDE: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.FLOAT_ADD: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.FLOAT_COMPARE: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.FLOAT_CONVERT: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.FLOAT_MULTIPLY: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.FLOAT_DIVIDE: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.FLOAT_SQRT: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.READ_PORT: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.WRITE_PORT: 0
+      detailedSimulation.c1t0.bpred.type: PERFECT
+      detailedSimulation.c1t0.bpred.accesses: 0
+      detailedSimulation.c1t0.bpred.hits: 0
+      detailedSimulation.c1t0.bpred.misses: 0
+      detailedSimulation.c1t0.bpred.hitRatio: 0.0
+      detailedSimulation.c1t0.totalInsts: 0
+      detailedSimulation.c1t0.llcReadMisses: 0
+      detailedSimulation.c1t0.llcWriteMisses: 0
+      detailedSimulation.c1t0.decodeBufferFull: 0
+      detailedSimulation.c1t0.reorderBufferFull: 0
+      detailedSimulation.c1t0.loadStoreQueueFull: 0
+      detailedSimulation.c1t0.intPhysicalRegisterFileFull: 0
+      detailedSimulation.c1t0.fpPhysicalRegisterFileFull: 0
+      detailedSimulation.c1t0.miscPhysicalRegisterFileFull: 0
+      detailedSimulation.c1t0.fetchStallsOnDecodeBufferIsFull: 0
+      detailedSimulation.c1t0.registerRenameStallsOnDecodeBufferIsEmpty: 0
+      detailedSimulation.c1t0.registerRenameStallsOnReorderBufferIsFull: 0
+      detailedSimulation.c1t0.registerRenameStallsOnLoadStoreQueueFull: 0
+      detailedSimulation.c1t0.selectionStallOnCanNotLoad: 0
+      detailedSimulation.c1t0.selectionStallOnCanNotStore: 0
+      detailedSimulation.c1t0.selectionStallOnNoFreeFunctionalUnit: 0
+      detailedSimulation.c1t1.bpred.type: PERFECT
+      detailedSimulation.c1t1.bpred.accesses: 0
+      detailedSimulation.c1t1.bpred.hits: 0
+      detailedSimulation.c1t1.bpred.misses: 0
+      detailedSimulation.c1t1.bpred.hitRatio: 0.0
+      detailedSimulation.c1t1.totalInsts: 0
+      detailedSimulation.c1t1.llcReadMisses: 0
+      detailedSimulation.c1t1.llcWriteMisses: 0
+      detailedSimulation.c1t1.decodeBufferFull: 0
+      detailedSimulation.c1t1.reorderBufferFull: 0
+      detailedSimulation.c1t1.loadStoreQueueFull: 0
+      detailedSimulation.c1t1.intPhysicalRegisterFileFull: 0
+      detailedSimulation.c1t1.fpPhysicalRegisterFileFull: 0
+      detailedSimulation.c1t1.miscPhysicalRegisterFileFull: 0
+      detailedSimulation.c1t1.fetchStallsOnDecodeBufferIsFull: 0
+      detailedSimulation.c1t1.registerRenameStallsOnDecodeBufferIsEmpty: 0
+      detailedSimulation.c1t1.registerRenameStallsOnReorderBufferIsFull: 0
+      detailedSimulation.c1t1.registerRenameStallsOnLoadStoreQueueFull: 0
+      detailedSimulation.c1t1.selectionStallOnCanNotLoad: 0
+      detailedSimulation.c1t1.selectionStallOnCanNotStore: 0
+      detailedSimulation.c1t1.selectionStallOnNoFreeFunctionalUnit: 0
+  ExperimentProfile{id=983, title='mst_baseline-C2T2-L2_4096KB_Assoc4_LRU', processorProfile.title='C2T2-L2_4096KB_Assoc4_LRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Running', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_baseline'
+    Stats
+      detailedSimulation.duration: 25:07:02.206
+      detailedSimulation.totalCycles: 15,914,529,590
+      detailedSimulation.totalInsts: 16,331,396,269 (c0t0: 16331396269, c0t1: 0, c1t0: 0, c1t1: 0)
+      detailedSimulation.llcReadMisses: 13,824 (c0t0: 13824, c0t1: 0, c1t0: 0, c1t1: 0)
+      detailedSimulation.llcWriteMisses: 21,508,496 (c0t0: 21508496, c0t1: 0, c1t0: 0, c1t1: 0)
+      detailedSimulation.instsPerCycle: 1.026
+      detailedSimulation.cyclesPerSecond: 176,002.849
+      detailedSimulation.instsPerSecond: 180,613.084
+      detailedSimulation.max memory: 3.5 GB
+      detailedSimulation.total memory: 1.9 GB
+      detailedSimulation.used memory: 1.8 GB
+      detailedSimulation.mem-0.numPages: 324762
+  ExperimentProfile{id=984, title='mst_baseline-C2T2-L2_4096KB_Assoc8_LRU', processorProfile.title='C2T2-L2_4096KB_Assoc8_LRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Stopped', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_baseline'
+    Stats
+      detailedSimulation.experiment.beginTime: 2012/03/24 15:11:12
+      detailedSimulation.experiment.workloads.size: 1
+      detailedSimulation.experiment.workload.0: mst.mips(10000)
+      detailedSimulation.experiment.numCores: 2
+      detailedSimulation.experiment.numThreadsPerCore: 2
+      detailedSimulation.experiment.l2EvictionPolicy: archimulator.sim.uncore.cache.eviction.LRUPolicy
+      detailedSimulation.duration: 72:30:17.154
+      detailedSimulation.totalCycles: 84973150981
+      detailedSimulation.totalInsts: 20098735690
+      detailedSimulation.instsPerCycle: 0.23653042705800187
+      detailedSimulation.cyclesPerSecond: 325546.42410647584
+      detailedSimulation.instsPerSecond: 77001.63472111012
+      detailedSimulation.mainMemory.accesses: 281617518
+      detailedSimulation.mainMemory.reads: 275362806
+      detailedSimulation.mainMemory.writes: 6254712
+      detailedSimulation.llc.hitRatio: 0.5748524880455165
+      detailedSimulation.llc.downwardAccesses: 699153166
+      detailedSimulation.llc.downwardHits: 401909937
+      detailedSimulation.llc.downwardMisses: 297243229
+      detailedSimulation.llc.downwardBypasses: 0
+      detailedSimulation.llc.downwardReadHits: 59462128
+      detailedSimulation.llc.downwardReadMisses: 275362372
+      detailedSimulation.llc.downwardReadBypasses: 0
+      detailedSimulation.llc.downwardWriteHits: 342447809
+      detailedSimulation.llc.downwardWriteMisses: 21880857
+      detailedSimulation.llc.downwardWriteBypasses: 0
+      detailedSimulation.llc.evictions: 297177693
+      detailedSimulation.c0.icache.hitRatio: 0.9999998374493898
+      detailedSimulation.c0.icache.downwardAccesses: 2614570314
+      detailedSimulation.c0.icache.downwardHits: 2614569889
+      detailedSimulation.c0.icache.downwardMisses: 425
+      detailedSimulation.c0.icache.downwardBypasses: 0
+      detailedSimulation.c0.icache.downwardReadHits: 2614569889
+      detailedSimulation.c0.icache.downwardReadMisses: 425
+      detailedSimulation.c0.icache.downwardReadBypasses: 0
+      detailedSimulation.c0.icache.downwardWriteHits: 0
+      detailedSimulation.c0.icache.downwardWriteMisses: 0
+      detailedSimulation.c0.icache.downwardWriteBypasses: 0
+      detailedSimulation.c0.icache.evictions: 38
+      detailedSimulation.c0.icache.upwardReads: 0
+      detailedSimulation.c0.icache.upwardWrites: 0
+      detailedSimulation.c0.dcache.hitRatio: 0.9161106574673977
+      detailedSimulation.c0.dcache.downwardAccesses: 4342967712
+      detailedSimulation.c0.dcache.downwardHits: 3978639006
+      detailedSimulation.c0.dcache.downwardMisses: 364328706
+      detailedSimulation.c0.dcache.downwardBypasses: 0
+      detailedSimulation.c0.dcache.downwardReadHits: 2381770225
+      detailedSimulation.c0.dcache.downwardReadMisses: 334824075
+      detailedSimulation.c0.dcache.downwardReadBypasses: 0
+      detailedSimulation.c0.dcache.downwardWriteHits: 1596868781
+      detailedSimulation.c0.dcache.downwardWriteMisses: 29504631
+      detailedSimulation.c0.dcache.downwardWriteBypasses: 0
+      detailedSimulation.c0.dcache.evictions: 364328194
+      detailedSimulation.c0.dcache.upwardReads: 0
+      detailedSimulation.c0.dcache.upwardWrites: 0
+      detailedSimulation.c0t0.itlb.hitRatio: 0.9999998374493898
+      detailedSimulation.c0t0.itlb.accesses: 2614570314
+      detailedSimulation.c0t0.itlb.hits: 2614569889
+      detailedSimulation.c0t0.itlb.misses: 425
+      detailedSimulation.c0t0.itlb.evictions: 38
+      detailedSimulation.c0t0.dtlb.hitRatio: 0.9161594121471562
+      detailedSimulation.c0t0.dtlb.accesses: 4342967712
+      detailedSimulation.c0t0.dtlb.hits: 3978850746
+      detailedSimulation.c0t0.dtlb.misses: 364116966
+      detailedSimulation.c0t0.dtlb.evictions: 364116454
+      detailedSimulation.c0t1.itlb.hitRatio: 0.0
+      detailedSimulation.c0t1.itlb.accesses: 0
+      detailedSimulation.c0t1.itlb.hits: 0
+      detailedSimulation.c0t1.itlb.misses: 0
+      detailedSimulation.c0t1.itlb.evictions: 0
+      detailedSimulation.c0t1.dtlb.hitRatio: 0.0
+      detailedSimulation.c0t1.dtlb.accesses: 0
+      detailedSimulation.c0t1.dtlb.hits: 0
+      detailedSimulation.c0t1.dtlb.misses: 0
+      detailedSimulation.c0t1.dtlb.evictions: 0
+      detailedSimulation.c1.icache.hitRatio: 0.0
+      detailedSimulation.c1.icache.downwardAccesses: 0
+      detailedSimulation.c1.icache.downwardHits: 0
+      detailedSimulation.c1.icache.downwardMisses: 0
+      detailedSimulation.c1.icache.downwardBypasses: 0
+      detailedSimulation.c1.icache.downwardReadHits: 0
+      detailedSimulation.c1.icache.downwardReadMisses: 0
+      detailedSimulation.c1.icache.downwardReadBypasses: 0
+      detailedSimulation.c1.icache.downwardWriteHits: 0
+      detailedSimulation.c1.icache.downwardWriteMisses: 0
+      detailedSimulation.c1.icache.downwardWriteBypasses: 0
+      detailedSimulation.c1.icache.evictions: 0
+      detailedSimulation.c1.icache.upwardReads: 0
+      detailedSimulation.c1.icache.upwardWrites: 0
+      detailedSimulation.c1.dcache.hitRatio: 0.0
+      detailedSimulation.c1.dcache.downwardAccesses: 0
+      detailedSimulation.c1.dcache.downwardHits: 0
+      detailedSimulation.c1.dcache.downwardMisses: 0
+      detailedSimulation.c1.dcache.downwardBypasses: 0
+      detailedSimulation.c1.dcache.downwardReadHits: 0
+      detailedSimulation.c1.dcache.downwardReadMisses: 0
+      detailedSimulation.c1.dcache.downwardReadBypasses: 0
+      detailedSimulation.c1.dcache.downwardWriteHits: 0
+      detailedSimulation.c1.dcache.downwardWriteMisses: 0
+      detailedSimulation.c1.dcache.downwardWriteBypasses: 0
+      detailedSimulation.c1.dcache.evictions: 0
+      detailedSimulation.c1.dcache.upwardReads: 0
+      detailedSimulation.c1.dcache.upwardWrites: 0
+      detailedSimulation.c1t0.itlb.hitRatio: 0.0
+      detailedSimulation.c1t0.itlb.accesses: 0
+      detailedSimulation.c1t0.itlb.hits: 0
+      detailedSimulation.c1t0.itlb.misses: 0
+      detailedSimulation.c1t0.itlb.evictions: 0
+      detailedSimulation.c1t0.dtlb.hitRatio: 0.0
+      detailedSimulation.c1t0.dtlb.accesses: 0
+      detailedSimulation.c1t0.dtlb.hits: 0
+      detailedSimulation.c1t0.dtlb.misses: 0
+      detailedSimulation.c1t0.dtlb.evictions: 0
+      detailedSimulation.c1t1.itlb.hitRatio: 0.0
+      detailedSimulation.c1t1.itlb.accesses: 0
+      detailedSimulation.c1t1.itlb.hits: 0
+      detailedSimulation.c1t1.itlb.misses: 0
+      detailedSimulation.c1t1.itlb.evictions: 0
+      detailedSimulation.c1t1.dtlb.hitRatio: 0.0
+      detailedSimulation.c1t1.dtlb.accesses: 0
+      detailedSimulation.c1t1.dtlb.hits: 0
+      detailedSimulation.c1t1.dtlb.misses: 0
+      detailedSimulation.c1t1.dtlb.evictions: 0
+      detailedSimulation.c0.noFreeFu.INTEGER_ALU: 23056
+      detailedSimulation.c0.noFreeFu.INTEGER_MULT_DIV: 1999687758
+      detailedSimulation.c0.noFreeFu.FP_ADDER: 0
+      detailedSimulation.c0.noFreeFu.FP_MULT_DIV: 0
+      detailedSimulation.c0.noFreeFu.MEMORY_PORT: 961388708
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.NONE: 0
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.INT_ALU: 0
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.INT_MULTIPLY: 0
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.INT_DIVIDE: 1487319908
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.FLOAT_ADD: 0
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.FLOAT_COMPARE: 0
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.FLOAT_CONVERT: 0
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.FLOAT_MULTIPLY: 0
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.FLOAT_DIVIDE: 0
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.FLOAT_SQRT: 0
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.READ_PORT: 565450511
+      detailedSimulation.c0.acquireFailedOnNoFreeFu.WRITE_PORT: 864711293
+      detailedSimulation.c0t0.bpred.type: PERFECT
+      detailedSimulation.c0t0.bpred.accesses: 3134641314
+      detailedSimulation.c0t0.bpred.hits: 3134641314
+      detailedSimulation.c0t0.bpred.misses: 0
+      detailedSimulation.c0t0.bpred.hitRatio: 1.0
+      detailedSimulation.c0t0.totalInsts: 20098735690
+      detailedSimulation.c0t0.llcReadMisses: 275362806
+      detailedSimulation.c0t0.llcWriteMisses: 21880423
+      detailedSimulation.c0t0.decodeBufferFull: 76326879602
+      detailedSimulation.c0t0.reorderBufferFull: 84972105584
+      detailedSimulation.c0t0.loadStoreQueueFull: 733028
+      detailedSimulation.c0t0.intPhysicalRegisterFileFull: 0
+      detailedSimulation.c0t0.fpPhysicalRegisterFileFull: 0
+      detailedSimulation.c0t0.miscPhysicalRegisterFileFull: 0
+      detailedSimulation.c0t0.fetchStallsOnDecodeBufferIsFull: 73849040096
+      detailedSimulation.c0t0.registerRenameStallsOnDecodeBufferIsEmpty: 213002
+      detailedSimulation.c0t0.registerRenameStallsOnReorderBufferIsFull: 162215775230
+      detailedSimulation.c0t0.registerRenameStallsOnLoadStoreQueueFull: 628511
+      detailedSimulation.c0t0.selectionStallOnCanNotLoad: 1
+      detailedSimulation.c0t0.selectionStallOnCanNotStore: 1260978097
+      detailedSimulation.c0t0.selectionStallOnNoFreeFunctionalUnit: 2917481712
+      detailedSimulation.c0t1.bpred.type: PERFECT
+      detailedSimulation.c0t1.bpred.accesses: 0
+      detailedSimulation.c0t1.bpred.hits: 0
+      detailedSimulation.c0t1.bpred.misses: 0
+      detailedSimulation.c0t1.bpred.hitRatio: 0.0
+      detailedSimulation.c0t1.totalInsts: 0
+      detailedSimulation.c0t1.llcReadMisses: 0
+      detailedSimulation.c0t1.llcWriteMisses: 0
+      detailedSimulation.c0t1.decodeBufferFull: 0
+      detailedSimulation.c0t1.reorderBufferFull: 0
+      detailedSimulation.c0t1.loadStoreQueueFull: 0
+      detailedSimulation.c0t1.intPhysicalRegisterFileFull: 0
+      detailedSimulation.c0t1.fpPhysicalRegisterFileFull: 0
+      detailedSimulation.c0t1.miscPhysicalRegisterFileFull: 0
+      detailedSimulation.c0t1.fetchStallsOnDecodeBufferIsFull: 0
+      detailedSimulation.c0t1.registerRenameStallsOnDecodeBufferIsEmpty: 0
+      detailedSimulation.c0t1.registerRenameStallsOnReorderBufferIsFull: 0
+      detailedSimulation.c0t1.registerRenameStallsOnLoadStoreQueueFull: 0
+      detailedSimulation.c0t1.selectionStallOnCanNotLoad: 0
+      detailedSimulation.c0t1.selectionStallOnCanNotStore: 0
+      detailedSimulation.c0t1.selectionStallOnNoFreeFunctionalUnit: 0
+      detailedSimulation.c1.noFreeFu.INTEGER_ALU: 0
+      detailedSimulation.c1.noFreeFu.INTEGER_MULT_DIV: 0
+      detailedSimulation.c1.noFreeFu.FP_ADDER: 0
+      detailedSimulation.c1.noFreeFu.FP_MULT_DIV: 0
+      detailedSimulation.c1.noFreeFu.MEMORY_PORT: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.NONE: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.INT_ALU: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.INT_MULTIPLY: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.INT_DIVIDE: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.FLOAT_ADD: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.FLOAT_COMPARE: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.FLOAT_CONVERT: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.FLOAT_MULTIPLY: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.FLOAT_DIVIDE: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.FLOAT_SQRT: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.READ_PORT: 0
+      detailedSimulation.c1.acquireFailedOnNoFreeFu.WRITE_PORT: 0
+      detailedSimulation.c1t0.bpred.type: PERFECT
+      detailedSimulation.c1t0.bpred.accesses: 0
+      detailedSimulation.c1t0.bpred.hits: 0
+      detailedSimulation.c1t0.bpred.misses: 0
+      detailedSimulation.c1t0.bpred.hitRatio: 0.0
+      detailedSimulation.c1t0.totalInsts: 0
+      detailedSimulation.c1t0.llcReadMisses: 0
+      detailedSimulation.c1t0.llcWriteMisses: 0
+      detailedSimulation.c1t0.decodeBufferFull: 0
+      detailedSimulation.c1t0.reorderBufferFull: 0
+      detailedSimulation.c1t0.loadStoreQueueFull: 0
+      detailedSimulation.c1t0.intPhysicalRegisterFileFull: 0
+      detailedSimulation.c1t0.fpPhysicalRegisterFileFull: 0
+      detailedSimulation.c1t0.miscPhysicalRegisterFileFull: 0
+      detailedSimulation.c1t0.fetchStallsOnDecodeBufferIsFull: 0
+      detailedSimulation.c1t0.registerRenameStallsOnDecodeBufferIsEmpty: 0
+      detailedSimulation.c1t0.registerRenameStallsOnReorderBufferIsFull: 0
+      detailedSimulation.c1t0.registerRenameStallsOnLoadStoreQueueFull: 0
+      detailedSimulation.c1t0.selectionStallOnCanNotLoad: 0
+      detailedSimulation.c1t0.selectionStallOnCanNotStore: 0
+      detailedSimulation.c1t0.selectionStallOnNoFreeFunctionalUnit: 0
+      detailedSimulation.c1t1.bpred.type: PERFECT
+      detailedSimulation.c1t1.bpred.accesses: 0
+      detailedSimulation.c1t1.bpred.hits: 0
+      detailedSimulation.c1t1.bpred.misses: 0
+      detailedSimulation.c1t1.bpred.hitRatio: 0.0
+      detailedSimulation.c1t1.totalInsts: 0
+      detailedSimulation.c1t1.llcReadMisses: 0
+      detailedSimulation.c1t1.llcWriteMisses: 0
+      detailedSimulation.c1t1.decodeBufferFull: 0
+      detailedSimulation.c1t1.reorderBufferFull: 0
+      detailedSimulation.c1t1.loadStoreQueueFull: 0
+      detailedSimulation.c1t1.intPhysicalRegisterFileFull: 0
+      detailedSimulation.c1t1.fpPhysicalRegisterFileFull: 0
+      detailedSimulation.c1t1.miscPhysicalRegisterFileFull: 0
+      detailedSimulation.c1t1.fetchStallsOnDecodeBufferIsFull: 0
+      detailedSimulation.c1t1.registerRenameStallsOnDecodeBufferIsEmpty: 0
+      detailedSimulation.c1t1.registerRenameStallsOnReorderBufferIsFull: 0
+      detailedSimulation.c1t1.registerRenameStallsOnLoadStoreQueueFull: 0
+      detailedSimulation.c1t1.selectionStallOnCanNotLoad: 0
+      detailedSimulation.c1t1.selectionStallOnCanNotStore: 0
+      detailedSimulation.c1t1.selectionStallOnNoFreeFunctionalUnit: 0
+  ExperimentProfile{id=985, title='mst_ht-lookahead_10-stride_10-C2T2-L2_1024KB_Assoc4_LRU', processorProfile.title='C2T2-L2_1024KB_Assoc4_LRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Running', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_10-stride_10'
+    Stats
+      detailedSimulation.duration: 25:06:29.966
+      detailedSimulation.totalCycles: 14,430,085,804
+      detailedSimulation.totalInsts: 14,826,897,169 (c0t0: 14826897169, c0t1: 0, c1t0: 0, c1t1: 0)
+      detailedSimulation.llcReadMisses: 21,065 (c0t0: 21065, c0t1: 0, c1t0: 0, c1t1: 0)
+      detailedSimulation.llcWriteMisses: 19,650,717 (c0t0: 19650717, c0t1: 0, c1t0: 0, c1t1: 0)
+      detailedSimulation.instsPerCycle: 1.027
+      detailedSimulation.cyclesPerSecond: 159,644.269
+      detailedSimulation.instsPerSecond: 164,034.309
+      detailedSimulation.max memory: 3.5 GB
+      detailedSimulation.total memory: 1.7 GB
+      detailedSimulation.used memory: 1.6 GB
+      detailedSimulation.mem-0.numPages: 296938
+      detailedSimulation.llcHTRequestProfilingCapability.llc.numMtMisses: 19671782
+      detailedSimulation.llcHTRequestProfilingCapability.llc.numTotalHtRequests: 0
+      detailedSimulation.llcHTRequestProfilingCapability.llc.numUsefulHtRequests: 0
+      detailedSimulation.llcHTRequestProfilingCapability.llc.htRequestAccuracy: NaN%
+      detailedSimulation.llcHTRequestProfilingCapability.llc.htRequestCoverage: 0.0%
+      detailedSimulation.llcHTRequestProfilingCapability.llc.numGoodHtRequests: 0
+      detailedSimulation.llcHTRequestProfilingCapability.llc.numBadHtRequests: 0
+      detailedSimulation.llcHTRequestProfilingCapability.llc.numUglyHtRequests: 0
+      detailedSimulation.llcHTRequestProfilingCapability.llc.numLateHtRequests: 0
+  ExperimentProfile{id=986, title='mst_ht-lookahead_10-stride_10-C2T2-L2_1024KB_Assoc8_LRU', processorProfile.title='C2T2-L2_1024KB_Assoc8_LRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Running', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_10-stride_10'
+    Stats
+      detailedSimulation.duration: 25:05:33.702
+      detailedSimulation.totalCycles: 14,154,547,591
+      detailedSimulation.totalInsts: 14,548,544,156 (c0t0: 14548544156, c0t1: 0, c1t0: 0, c1t1: 0)
+      detailedSimulation.llcReadMisses: 20,638 (c0t0: 20638, c0t1: 0, c1t0: 0, c1t1: 0)
+      detailedSimulation.llcWriteMisses: 19,306,379 (c0t0: 19306379, c0t1: 0, c1t0: 0, c1t1: 0)
+      detailedSimulation.instsPerCycle: 1.028
+      detailedSimulation.cyclesPerSecond: 156,692.987
+      detailedSimulation.instsPerSecond: 161,054.589
+      detailedSimulation.max memory: 3.5 GB
+      detailedSimulation.total memory: 1.9 GB
+      detailedSimulation.used memory: 1.8 GB
+      detailedSimulation.mem-0.numPages: 291818
+      detailedSimulation.llcHTRequestProfilingCapability.llc.numMtMisses: 19327017
+      detailedSimulation.llcHTRequestProfilingCapability.llc.numTotalHtRequests: 0
+      detailedSimulation.llcHTRequestProfilingCapability.llc.numUsefulHtRequests: 0
+      detailedSimulation.llcHTRequestProfilingCapability.llc.htRequestAccuracy: NaN%
+      detailedSimulation.llcHTRequestProfilingCapability.llc.htRequestCoverage: 0.0%
+      detailedSimulation.llcHTRequestProfilingCapability.llc.numGoodHtRequests: 0
+      detailedSimulation.llcHTRequestProfilingCapability.llc.numBadHtRequests: 0
+      detailedSimulation.llcHTRequestProfilingCapability.llc.numUglyHtRequests: 0
+      detailedSimulation.llcHTRequestProfilingCapability.llc.numLateHtRequests: 0
+  ExperimentProfile{id=987, title='mst_ht-lookahead_10-stride_10-C2T2-L2_2048KB_Assoc4_LRU', processorProfile.title='C2T2-L2_2048KB_Assoc4_LRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Running', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_10-stride_10'
+    Stats
+      detailedSimulation.duration: 25:05:03.731
+      detailedSimulation.totalCycles: 13,967,047,318
+      detailedSimulation.totalInsts: 14,360,764,923 (c0t0: 14360764923, c0t1: 0, c1t0: 0, c1t1: 0)
+      detailedSimulation.llcReadMisses: 12,819 (c0t0: 12819, c0t1: 0, c1t0: 0, c1t1: 0)
+      detailedSimulation.llcWriteMisses: 19,067,539 (c0t0: 19067539, c0t1: 0, c1t0: 0, c1t1: 0)
+      detailedSimulation.instsPerCycle: 1.028
+      detailedSimulation.cyclesPerSecond: 154,668.697
+      detailedSimulation.instsPerSecond: 159,028.658
+      detailedSimulation.max memory: 3.5 GB
+      detailedSimulation.total memory: 1.6 GB
+      detailedSimulation.used memory: 1.6 GB
+      detailedSimulation.mem-0.numPages: 288490
+      detailedSimulation.llcHTRequestProfilingCapability.llc.numMtMisses: 19080358
+      detailedSimulation.llcHTRequestProfilingCapability.llc.numTotalHtRequests: 0
+      detailedSimulation.llcHTRequestProfilingCapability.llc.numUsefulHtRequests: 0
+      detailedSimulation.llcHTRequestProfilingCapability.llc.htRequestAccuracy: NaN%
+      detailedSimulation.llcHTRequestProfilingCapability.llc.htRequestCoverage: 0.0%
+      detailedSimulation.llcHTRequestProfilingCapability.llc.numGoodHtRequests: 0
+      detailedSimulation.llcHTRequestProfilingCapability.llc.numBadHtRequests: 0
+      detailedSimulation.llcHTRequestProfilingCapability.llc.numUglyHtRequests: 0
+      detailedSimulation.llcHTRequestProfilingCapability.llc.numLateHtRequests: 0
+  ExperimentProfile{id=988, title='mst_ht-lookahead_10-stride_10-C2T2-L2_2048KB_Assoc8_LRU', processorProfile.title='C2T2-L2_2048KB_Assoc8_LRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Running', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_10-stride_10'
+    Stats
+      detailedSimulation.duration: 25:04:24.207
+      detailedSimulation.totalCycles: 14,187,706,102
+      detailedSimulation.totalInsts: 14,583,477,765 (c0t0: 14583477765, c0t1: 0, c1t0: 0, c1t1: 0)
+      detailedSimulation.llcReadMisses: 12,965 (c0t0: 12965, c0t1: 0, c1t0: 0, c1t1: 0)
+      detailedSimulation.llcWriteMisses: 19,342,799 (c0t0: 19342799, c0t1: 0, c1t0: 0, c1t1: 0)
+      detailedSimulation.instsPerCycle: 1.028
+      detailedSimulation.cyclesPerSecond: 157,180.117
+      detailedSimulation.instsPerSecond: 161,564.719
+      detailedSimulation.max memory: 3.5 GB
+      detailedSimulation.total memory: 1.9 GB
+      detailedSimulation.used memory: 1.3 GB
+      detailedSimulation.mem-0.numPages: 292586
+      detailedSimulation.llcHTRequestProfilingCapability.llc.numMtMisses: 19355764
+      detailedSimulation.llcHTRequestProfilingCapability.llc.numTotalHtRequests: 0
+      detailedSimulation.llcHTRequestProfilingCapability.llc.numUsefulHtRequests: 0
+      detailedSimulation.llcHTRequestProfilingCapability.llc.htRequestAccuracy: NaN%
+      detailedSimulation.llcHTRequestProfilingCapability.llc.htRequestCoverage: 0.0%
+      detailedSimulation.llcHTRequestProfilingCapability.llc.numGoodHtRequests: 0
+      detailedSimulation.llcHTRequestProfilingCapability.llc.numBadHtRequests: 0
+      detailedSimulation.llcHTRequestProfilingCapability.llc.numUglyHtRequests: 0
+      detailedSimulation.llcHTRequestProfilingCapability.llc.numLateHtRequests: 0
+  ExperimentProfile{id=989, title='mst_ht-lookahead_10-stride_10-C2T2-L2_4096KB_Assoc4_LRU', processorProfile.title='C2T2-L2_4096KB_Assoc4_LRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Running', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_10-stride_10'
+    Stats
+      detailedSimulation.duration: 25:03:53.691
+      detailedSimulation.totalCycles: 13,920,488,824
+      detailedSimulation.totalInsts: 14,313,367,086 (c0t0: 14313367086, c0t1: 0, c1t0: 0, c1t1: 0)
+      detailedSimulation.llcReadMisses: 12,213 (c0t0: 12213, c0t1: 0, c1t0: 0, c1t1: 0)
+      detailedSimulation.llcWriteMisses: 19,006,548 (c0t0: 19006548, c0t1: 0, c1t0: 0, c1t1: 0)
+      detailedSimulation.instsPerCycle: 1.028
+      detailedSimulation.cyclesPerSecond: 154,272.703
+      detailedSimulation.instsPerSecond: 158,626.745
+      detailedSimulation.max memory: 3.5 GB
+      detailedSimulation.total memory: 1.6 GB
+      detailedSimulation.used memory: 1.5 GB
+      detailedSimulation.mem-0.numPages: 287466
+      detailedSimulation.llcHTRequestProfilingCapability.llc.numMtMisses: 19018761
+      detailedSimulation.llcHTRequestProfilingCapability.llc.numTotalHtRequests: 0
+      detailedSimulation.llcHTRequestProfilingCapability.llc.numUsefulHtRequests: 0
+      detailedSimulation.llcHTRequestProfilingCapability.llc.htRequestAccuracy: NaN%
+      detailedSimulation.llcHTRequestProfilingCapability.llc.htRequestCoverage: 0.0%
+      detailedSimulation.llcHTRequestProfilingCapability.llc.numGoodHtRequests: 0
+      detailedSimulation.llcHTRequestProfilingCapability.llc.numBadHtRequests: 0
+      detailedSimulation.llcHTRequestProfilingCapability.llc.numUglyHtRequests: 0
+      detailedSimulation.llcHTRequestProfilingCapability.llc.numLateHtRequests: 0
+  ExperimentProfile{id=990, title='mst_ht-lookahead_10-stride_10-C2T2-L2_4096KB_Assoc8_LRU', processorProfile.title='C2T2-L2_4096KB_Assoc8_LRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Running', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_10-stride_10'
+    Stats
+      detailedSimulation.duration: 25:03:24.028
+      detailedSimulation.totalCycles: 14,287,674,285
+      detailedSimulation.totalInsts: 14,684,256,531 (c0t0: 14684256531, c0t1: 0, c1t0: 0, c1t1: 0)
+      detailedSimulation.llcReadMisses: 13,028 (c0t0: 13028, c0t1: 0, c1t0: 0, c1t1: 0)
+      detailedSimulation.llcWriteMisses: 19,464,791 (c0t0: 19464791, c0t1: 0, c1t0: 0, c1t1: 0)
+      detailedSimulation.instsPerCycle: 1.028
+      detailedSimulation.cyclesPerSecond: 158,392.913
+      detailedSimulation.instsPerSecond: 162,789.417
+      detailedSimulation.max memory: 3.5 GB
+      detailedSimulation.total memory: 1.7 GB
+      detailedSimulation.used memory: 1.5 GB
+      detailedSimulation.mem-0.numPages: 294378
+      detailedSimulation.llcHTRequestProfilingCapability.llc.numMtMisses: 19477819
+      detailedSimulation.llcHTRequestProfilingCapability.llc.numTotalHtRequests: 0
+      detailedSimulation.llcHTRequestProfilingCapability.llc.numUsefulHtRequests: 0
+      detailedSimulation.llcHTRequestProfilingCapability.llc.htRequestAccuracy: NaN%
+      detailedSimulation.llcHTRequestProfilingCapability.llc.htRequestCoverage: 0.0%
+      detailedSimulation.llcHTRequestProfilingCapability.llc.numGoodHtRequests: 0
+      detailedSimulation.llcHTRequestProfilingCapability.llc.numBadHtRequests: 0
+      detailedSimulation.llcHTRequestProfilingCapability.llc.numUglyHtRequests: 0
+      detailedSimulation.llcHTRequestProfilingCapability.llc.numLateHtRequests: 0
+  ExperimentProfile{id=991, title='mst_ht-lookahead_20-stride_10-C2T2-L2_1024KB_Assoc4_LRU', processorProfile.title='C2T2-L2_1024KB_Assoc4_LRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_20-stride_10'
+    Stats
+  ExperimentProfile{id=992, title='mst_ht-lookahead_20-stride_10-C2T2-L2_1024KB_Assoc8_LRU', processorProfile.title='C2T2-L2_1024KB_Assoc8_LRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_20-stride_10'
+    Stats
+  ExperimentProfile{id=993, title='mst_ht-lookahead_20-stride_10-C2T2-L2_2048KB_Assoc4_LRU', processorProfile.title='C2T2-L2_2048KB_Assoc4_LRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_20-stride_10'
+    Stats
+  ExperimentProfile{id=994, title='mst_ht-lookahead_20-stride_10-C2T2-L2_2048KB_Assoc8_LRU', processorProfile.title='C2T2-L2_2048KB_Assoc8_LRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_20-stride_10'
+    Stats
+  ExperimentProfile{id=995, title='mst_ht-lookahead_20-stride_10-C2T2-L2_4096KB_Assoc4_LRU', processorProfile.title='C2T2-L2_4096KB_Assoc4_LRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_20-stride_10'
+    Stats
+  ExperimentProfile{id=996, title='mst_ht-lookahead_20-stride_10-C2T2-L2_4096KB_Assoc8_LRU', processorProfile.title='C2T2-L2_4096KB_Assoc8_LRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_20-stride_10'
+    Stats
+  ExperimentProfile{id=997, title='mst_ht-lookahead_20-stride_20-C2T2-L2_1024KB_Assoc4_LRU', processorProfile.title='C2T2-L2_1024KB_Assoc4_LRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_20-stride_20'
+    Stats
+  ExperimentProfile{id=998, title='mst_ht-lookahead_20-stride_20-C2T2-L2_1024KB_Assoc8_LRU', processorProfile.title='C2T2-L2_1024KB_Assoc8_LRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_20-stride_20'
+    Stats
+  ExperimentProfile{id=999, title='mst_ht-lookahead_20-stride_20-C2T2-L2_2048KB_Assoc4_LRU', processorProfile.title='C2T2-L2_2048KB_Assoc4_LRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_20-stride_20'
+    Stats
+  ExperimentProfile{id=1000, title='mst_ht-lookahead_20-stride_20-C2T2-L2_2048KB_Assoc8_LRU', processorProfile.title='C2T2-L2_2048KB_Assoc8_LRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_20-stride_20'
+    Stats
+  ExperimentProfile{id=1001, title='mst_ht-lookahead_20-stride_20-C2T2-L2_4096KB_Assoc4_LRU', processorProfile.title='C2T2-L2_4096KB_Assoc4_LRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_20-stride_20'
+    Stats
+  ExperimentProfile{id=1002, title='mst_ht-lookahead_20-stride_20-C2T2-L2_4096KB_Assoc8_LRU', processorProfile.title='C2T2-L2_4096KB_Assoc8_LRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_20-stride_20'
+    Stats
+  ExperimentProfile{id=1003, title='mst_ht-lookahead_320-stride_320-C2T2-L2_1024KB_Assoc4_LRU', processorProfile.title='C2T2-L2_1024KB_Assoc4_LRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_320-stride_320'
+    Stats
+  ExperimentProfile{id=1004, title='mst_ht-lookahead_320-stride_320-C2T2-L2_1024KB_Assoc8_LRU', processorProfile.title='C2T2-L2_1024KB_Assoc8_LRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_320-stride_320'
+    Stats
+  ExperimentProfile{id=1005, title='mst_ht-lookahead_320-stride_320-C2T2-L2_2048KB_Assoc4_LRU', processorProfile.title='C2T2-L2_2048KB_Assoc4_LRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_320-stride_320'
+    Stats
+  ExperimentProfile{id=1006, title='mst_ht-lookahead_320-stride_320-C2T2-L2_2048KB_Assoc8_LRU', processorProfile.title='C2T2-L2_2048KB_Assoc8_LRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_320-stride_320'
+    Stats
+  ExperimentProfile{id=1007, title='mst_ht-lookahead_320-stride_320-C2T2-L2_4096KB_Assoc4_LRU', processorProfile.title='C2T2-L2_4096KB_Assoc4_LRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_320-stride_320'
+    Stats
+  ExperimentProfile{id=1008, title='mst_ht-lookahead_320-stride_320-C2T2-L2_4096KB_Assoc8_LRU', processorProfile.title='C2T2-L2_4096KB_Assoc8_LRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_320-stride_320'
+    Stats
+  ExperimentProfile{id=1009, title='mst_ht-lookahead_640-stride_320-C2T2-L2_1024KB_Assoc4_LRU', processorProfile.title='C2T2-L2_1024KB_Assoc4_LRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_640-stride_320'
+    Stats
+  ExperimentProfile{id=1010, title='mst_ht-lookahead_640-stride_320-C2T2-L2_1024KB_Assoc8_LRU', processorProfile.title='C2T2-L2_1024KB_Assoc8_LRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_640-stride_320'
+    Stats
+  ExperimentProfile{id=1011, title='mst_ht-lookahead_640-stride_320-C2T2-L2_2048KB_Assoc4_LRU', processorProfile.title='C2T2-L2_2048KB_Assoc4_LRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_640-stride_320'
+    Stats
+  ExperimentProfile{id=1012, title='mst_ht-lookahead_640-stride_320-C2T2-L2_2048KB_Assoc8_LRU', processorProfile.title='C2T2-L2_2048KB_Assoc8_LRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_640-stride_320'
+    Stats
+  ExperimentProfile{id=1013, title='mst_ht-lookahead_640-stride_320-C2T2-L2_4096KB_Assoc4_LRU', processorProfile.title='C2T2-L2_4096KB_Assoc4_LRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_640-stride_320'
+    Stats
+  ExperimentProfile{id=1014, title='mst_ht-lookahead_640-stride_320-C2T2-L2_4096KB_Assoc8_LRU', processorProfile.title='C2T2-L2_4096KB_Assoc8_LRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_640-stride_320'
+    Stats
+  ExperimentProfile{id=1015, title='mst_ht-lookahead_640-stride_640-C2T2-L2_1024KB_Assoc4_LRU', processorProfile.title='C2T2-L2_1024KB_Assoc4_LRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_640-stride_640'
+    Stats
+  ExperimentProfile{id=1016, title='mst_ht-lookahead_640-stride_640-C2T2-L2_1024KB_Assoc8_LRU', processorProfile.title='C2T2-L2_1024KB_Assoc8_LRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_640-stride_640'
+    Stats
+  ExperimentProfile{id=1017, title='mst_ht-lookahead_640-stride_640-C2T2-L2_2048KB_Assoc4_LRU', processorProfile.title='C2T2-L2_2048KB_Assoc4_LRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_640-stride_640'
+    Stats
+  ExperimentProfile{id=1018, title='mst_ht-lookahead_640-stride_640-C2T2-L2_2048KB_Assoc8_LRU', processorProfile.title='C2T2-L2_2048KB_Assoc8_LRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_640-stride_640'
+    Stats
+  ExperimentProfile{id=1019, title='mst_ht-lookahead_640-stride_640-C2T2-L2_4096KB_Assoc4_LRU', processorProfile.title='C2T2-L2_4096KB_Assoc4_LRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_640-stride_640'
+    Stats
+  ExperimentProfile{id=1020, title='mst_ht-lookahead_640-stride_640-C2T2-L2_4096KB_Assoc8_LRU', processorProfile.title='C2T2-L2_4096KB_Assoc8_LRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_640-stride_640'
+    Stats
+  ExperimentProfile{id=1021, title='mst_ht-lookahead_10-stride_10-C2T2-L2_1024KB_Assoc4_LLCHTAwareLRU', processorProfile.title='C2T2-L2_1024KB_Assoc4_LLCHTAwareLRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_10-stride_10'
+    Stats
+  ExperimentProfile{id=1022, title='mst_ht-lookahead_10-stride_10-C2T2-L2_1024KB_Assoc8_LLCHTAwareLRU', processorProfile.title='C2T2-L2_1024KB_Assoc8_LLCHTAwareLRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_10-stride_10'
+    Stats
+  ExperimentProfile{id=1023, title='mst_ht-lookahead_10-stride_10-C2T2-L2_2048KB_Assoc4_LLCHTAwareLRU', processorProfile.title='C2T2-L2_2048KB_Assoc4_LLCHTAwareLRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_10-stride_10'
+    Stats
+  ExperimentProfile{id=1024, title='mst_ht-lookahead_10-stride_10-C2T2-L2_2048KB_Assoc8_LLCHTAwareLRU', processorProfile.title='C2T2-L2_2048KB_Assoc8_LLCHTAwareLRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_10-stride_10'
+    Stats
+  ExperimentProfile{id=1025, title='mst_ht-lookahead_10-stride_10-C2T2-L2_4096KB_Assoc4_LLCHTAwareLRU', processorProfile.title='C2T2-L2_4096KB_Assoc4_LLCHTAwareLRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_10-stride_10'
+    Stats
+  ExperimentProfile{id=1026, title='mst_ht-lookahead_10-stride_10-C2T2-L2_4096KB_Assoc8_LLCHTAwareLRU', processorProfile.title='C2T2-L2_4096KB_Assoc8_LLCHTAwareLRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_10-stride_10'
+    Stats
+  ExperimentProfile{id=1027, title='mst_ht-lookahead_20-stride_10-C2T2-L2_1024KB_Assoc4_LLCHTAwareLRU', processorProfile.title='C2T2-L2_1024KB_Assoc4_LLCHTAwareLRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_20-stride_10'
+    Stats
+  ExperimentProfile{id=1028, title='mst_ht-lookahead_20-stride_10-C2T2-L2_1024KB_Assoc8_LLCHTAwareLRU', processorProfile.title='C2T2-L2_1024KB_Assoc8_LLCHTAwareLRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_20-stride_10'
+    Stats
+  ExperimentProfile{id=1029, title='mst_ht-lookahead_20-stride_10-C2T2-L2_2048KB_Assoc4_LLCHTAwareLRU', processorProfile.title='C2T2-L2_2048KB_Assoc4_LLCHTAwareLRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_20-stride_10'
+    Stats
+  ExperimentProfile{id=1030, title='mst_ht-lookahead_20-stride_10-C2T2-L2_2048KB_Assoc8_LLCHTAwareLRU', processorProfile.title='C2T2-L2_2048KB_Assoc8_LLCHTAwareLRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_20-stride_10'
+    Stats
+  ExperimentProfile{id=1031, title='mst_ht-lookahead_20-stride_10-C2T2-L2_4096KB_Assoc4_LLCHTAwareLRU', processorProfile.title='C2T2-L2_4096KB_Assoc4_LLCHTAwareLRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_20-stride_10'
+    Stats
+  ExperimentProfile{id=1032, title='mst_ht-lookahead_20-stride_10-C2T2-L2_4096KB_Assoc8_LLCHTAwareLRU', processorProfile.title='C2T2-L2_4096KB_Assoc8_LLCHTAwareLRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_20-stride_10'
+    Stats
+  ExperimentProfile{id=1033, title='mst_ht-lookahead_20-stride_20-C2T2-L2_1024KB_Assoc4_LLCHTAwareLRU', processorProfile.title='C2T2-L2_1024KB_Assoc4_LLCHTAwareLRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_20-stride_20'
+    Stats
+  ExperimentProfile{id=1034, title='mst_ht-lookahead_20-stride_20-C2T2-L2_1024KB_Assoc8_LLCHTAwareLRU', processorProfile.title='C2T2-L2_1024KB_Assoc8_LLCHTAwareLRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_20-stride_20'
+    Stats
+  ExperimentProfile{id=1035, title='mst_ht-lookahead_20-stride_20-C2T2-L2_2048KB_Assoc4_LLCHTAwareLRU', processorProfile.title='C2T2-L2_2048KB_Assoc4_LLCHTAwareLRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_20-stride_20'
+    Stats
+  ExperimentProfile{id=1036, title='mst_ht-lookahead_20-stride_20-C2T2-L2_2048KB_Assoc8_LLCHTAwareLRU', processorProfile.title='C2T2-L2_2048KB_Assoc8_LLCHTAwareLRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_20-stride_20'
+    Stats
+  ExperimentProfile{id=1037, title='mst_ht-lookahead_20-stride_20-C2T2-L2_4096KB_Assoc4_LLCHTAwareLRU', processorProfile.title='C2T2-L2_4096KB_Assoc4_LLCHTAwareLRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_20-stride_20'
+    Stats
+  ExperimentProfile{id=1038, title='mst_ht-lookahead_20-stride_20-C2T2-L2_4096KB_Assoc8_LLCHTAwareLRU', processorProfile.title='C2T2-L2_4096KB_Assoc8_LLCHTAwareLRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_20-stride_20'
+    Stats
+  ExperimentProfile{id=1039, title='mst_ht-lookahead_320-stride_320-C2T2-L2_1024KB_Assoc4_LLCHTAwareLRU', processorProfile.title='C2T2-L2_1024KB_Assoc4_LLCHTAwareLRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_320-stride_320'
+    Stats
+  ExperimentProfile{id=1040, title='mst_ht-lookahead_320-stride_320-C2T2-L2_1024KB_Assoc8_LLCHTAwareLRU', processorProfile.title='C2T2-L2_1024KB_Assoc8_LLCHTAwareLRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_320-stride_320'
+    Stats
+  ExperimentProfile{id=1041, title='mst_ht-lookahead_320-stride_320-C2T2-L2_2048KB_Assoc4_LLCHTAwareLRU', processorProfile.title='C2T2-L2_2048KB_Assoc4_LLCHTAwareLRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_320-stride_320'
+    Stats
+  ExperimentProfile{id=1042, title='mst_ht-lookahead_320-stride_320-C2T2-L2_2048KB_Assoc8_LLCHTAwareLRU', processorProfile.title='C2T2-L2_2048KB_Assoc8_LLCHTAwareLRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_320-stride_320'
+    Stats
+  ExperimentProfile{id=1043, title='mst_ht-lookahead_320-stride_320-C2T2-L2_4096KB_Assoc4_LLCHTAwareLRU', processorProfile.title='C2T2-L2_4096KB_Assoc4_LLCHTAwareLRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_320-stride_320'
+    Stats
+  ExperimentProfile{id=1044, title='mst_ht-lookahead_320-stride_320-C2T2-L2_4096KB_Assoc8_LLCHTAwareLRU', processorProfile.title='C2T2-L2_4096KB_Assoc8_LLCHTAwareLRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_320-stride_320'
+    Stats
+  ExperimentProfile{id=1045, title='mst_ht-lookahead_640-stride_320-C2T2-L2_1024KB_Assoc4_LLCHTAwareLRU', processorProfile.title='C2T2-L2_1024KB_Assoc4_LLCHTAwareLRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_640-stride_320'
+    Stats
+  ExperimentProfile{id=1046, title='mst_ht-lookahead_640-stride_320-C2T2-L2_1024KB_Assoc8_LLCHTAwareLRU', processorProfile.title='C2T2-L2_1024KB_Assoc8_LLCHTAwareLRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_640-stride_320'
+    Stats
+  ExperimentProfile{id=1047, title='mst_ht-lookahead_640-stride_320-C2T2-L2_2048KB_Assoc4_LLCHTAwareLRU', processorProfile.title='C2T2-L2_2048KB_Assoc4_LLCHTAwareLRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_640-stride_320'
+    Stats
+  ExperimentProfile{id=1048, title='mst_ht-lookahead_640-stride_320-C2T2-L2_2048KB_Assoc8_LLCHTAwareLRU', processorProfile.title='C2T2-L2_2048KB_Assoc8_LLCHTAwareLRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_640-stride_320'
+    Stats
+  ExperimentProfile{id=1049, title='mst_ht-lookahead_640-stride_320-C2T2-L2_4096KB_Assoc4_LLCHTAwareLRU', processorProfile.title='C2T2-L2_4096KB_Assoc4_LLCHTAwareLRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_640-stride_320'
+    Stats
+  ExperimentProfile{id=1050, title='mst_ht-lookahead_640-stride_320-C2T2-L2_4096KB_Assoc8_LLCHTAwareLRU', processorProfile.title='C2T2-L2_4096KB_Assoc8_LLCHTAwareLRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_640-stride_320'
+    Stats
+  ExperimentProfile{id=1051, title='mst_ht-lookahead_640-stride_640-C2T2-L2_1024KB_Assoc4_LLCHTAwareLRU', processorProfile.title='C2T2-L2_1024KB_Assoc4_LLCHTAwareLRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_640-stride_640'
+    Stats
+  ExperimentProfile{id=1052, title='mst_ht-lookahead_640-stride_640-C2T2-L2_1024KB_Assoc8_LLCHTAwareLRU', processorProfile.title='C2T2-L2_1024KB_Assoc8_LLCHTAwareLRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_640-stride_640'
+    Stats
+  ExperimentProfile{id=1053, title='mst_ht-lookahead_640-stride_640-C2T2-L2_2048KB_Assoc4_LLCHTAwareLRU', processorProfile.title='C2T2-L2_2048KB_Assoc4_LLCHTAwareLRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_640-stride_640'
+    Stats
+  ExperimentProfile{id=1054, title='mst_ht-lookahead_640-stride_640-C2T2-L2_2048KB_Assoc8_LLCHTAwareLRU', processorProfile.title='C2T2-L2_2048KB_Assoc8_LLCHTAwareLRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_640-stride_640'
+    Stats
+  ExperimentProfile{id=1055, title='mst_ht-lookahead_640-stride_640-C2T2-L2_4096KB_Assoc4_LLCHTAwareLRU', processorProfile.title='C2T2-L2_4096KB_Assoc4_LLCHTAwareLRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_640-stride_640'
+    Stats
+  ExperimentProfile{id=1056, title='mst_ht-lookahead_640-stride_640-C2T2-L2_4096KB_Assoc8_LLCHTAwareLRU', processorProfile.title='C2T2-L2_4096KB_Assoc8_LLCHTAwareLRU', type='Detailed Experiment', pthreadSpawnedIndex=0, maxInsts=0, state='Submitted', createdTime='2012/03/24 00:08:29'}
+    Context Configs
+      thread 0 -> 'mst_ht-lookahead_640-stride_640'
+    Stats
+

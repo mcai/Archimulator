@@ -102,7 +102,7 @@ public class ManagementStartup {
         List<SimulatedProgram> simulatedPrograms = this.archimulatorService.getSimulatedProgramsAsList();
 
         int pthreadSpawnedIndex = 3720;
-        int maxInsts = 20000000;
+        int maxInsts = 100000000;
 
         for (SimulatedProgram simulatedProgram : simulatedPrograms) {
             if(simulatedProgram.getTitle().startsWith("mst_baseline")) {
@@ -165,7 +165,8 @@ public class ManagementStartup {
             "mst.mips",
 //            "10000");
 //            "1024");
-            "2000");
+//            "2000");
+            "4000");
 
     public static SimulatedProgram SIMULATED_PROGRAM_MST_HT(int lookahead, int stride) {
         SimulatedProgram program = new SimulatedProgram(
@@ -173,7 +174,8 @@ public class ManagementStartup {
                 "mst.mips",
 //                "10000");
 //                "1024");
-                "2000");
+//                "2000");
+                "4000");
         program.setHelperThreadedProgram(true);
         program.setHtLookahead(lookahead);
         program.setHtStride(stride);
