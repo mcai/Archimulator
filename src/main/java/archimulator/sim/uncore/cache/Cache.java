@@ -46,10 +46,8 @@ public class Cache<StateT extends Serializable, LineT extends CacheLine<StateT>>
     }
 
     public void forAll(int set, Predicate<LineT> predicate, Action1<LineT> action) {
-        assert (set >= 0 && set < this.getNumSets());
-
         for (int way = 0; way < this.getAssociativity(); way++) {
-            LineT line = this.sets.get(set).getLines().get(way);
+            LineT line = this.getLine(set, way);
             if (predicate.apply(line)) {
                 action.apply(line);
             }
@@ -57,10 +55,8 @@ public class Cache<StateT extends Serializable, LineT extends CacheLine<StateT>>
     }
 
     public void forAny(int set, Predicate<LineT> predicate, Action1<LineT> action) {
-        assert (set >= 0 && set < this.getNumSets());
-
         for (int way = 0; way < this.getAssociativity(); way++) {
-            LineT line = this.sets.get(set).getLines().get(way);
+            LineT line = this.getLine(set, way);
             if (predicate.apply(line)) {
                 action.apply(line);
                 return;
@@ -69,10 +65,8 @@ public class Cache<StateT extends Serializable, LineT extends CacheLine<StateT>>
     }
 
     public void forExact(int set, Predicate<LineT> predicate, Action1<LineT> action) {
-        assert (set >= 0 && set < this.getNumSets());
-
         for (int way = 0; way < this.getAssociativity(); way++) {
-            LineT line = this.sets.get(set).getLines().get(way);
+            LineT line = this.getLine(set, way);
             if (predicate.apply(line)) {
                 action.apply(line);
                 return;
@@ -83,12 +77,10 @@ public class Cache<StateT extends Serializable, LineT extends CacheLine<StateT>>
     }
 
     public int count(int set, Predicate<LineT> predicate) {
-        assert (set >= 0 && set < this.getNumSets());
-
         int count = 0;
 
         for (int way = 0; way < this.getAssociativity(); way++) {
-            if (predicate.apply(this.sets.get(set).getLines().get(way))) {
+            if (predicate.apply(this.getLine(set, way))) {
                 count++;
             }
         }
@@ -97,10 +89,8 @@ public class Cache<StateT extends Serializable, LineT extends CacheLine<StateT>>
     }
 
     public boolean containsAny(int set, Predicate<LineT> predicate) {
-        assert (set >= 0 && set < this.getNumSets());
-
         for (int way = 0; way < this.getAssociativity(); way++) {
-            if (predicate.apply(this.sets.get(set).getLines().get(way))) {
+            if (predicate.apply(this.getLine(set, way))) {
                 return true;
             }
         }
@@ -109,10 +99,8 @@ public class Cache<StateT extends Serializable, LineT extends CacheLine<StateT>>
     }
 
     public boolean containsAll(int set, Predicate<LineT> predicate) {
-        assert (set >= 0 && set < this.getNumSets());
-
         for (int way = 0; way < this.getAssociativity(); way++) {
-            if (!predicate.apply(this.sets.get(set).getLines().get(way))) {
+            if (!predicate.apply(this.getLine(set, way))) {
                 return false;
             }
         }
@@ -121,18 +109,26 @@ public class Cache<StateT extends Serializable, LineT extends CacheLine<StateT>>
     }
 
     public List<LineT> getLines(int set) {
+        if (set < 0 || set >= this.getNumSets()) {
+            throw new IllegalArgumentException(String.format("set: %d, this.numSets: %d", set, this.getNumSets()));
+        }
+
         return this.sets.get(set).getLines();
     }
 
     public LineT getLine(int set, int way) {
-        return this.sets.get(set).getLines().get(way);
+        if (way < 0 || way >= this.getAssociativity()) {
+            throw new IllegalArgumentException(String.format("way: %d, this.associativity: %d", way, this.getAssociativity()));
+        }
+
+        return this.getLines(set).get(way);
     }
 
     public LineT findLine(int address) {
         int tag = this.getTag(address);
         int set = this.getSet(address);
 
-        for (LineT line : this.sets.get(set).getLines()) {
+        for (LineT line : this.getLines(set)) {
             if (line.getTag() == tag && line.getState() != line.getInitialState()) {
                 return line;
             }
