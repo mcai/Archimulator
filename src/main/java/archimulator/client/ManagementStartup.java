@@ -102,7 +102,7 @@ public class ManagementStartup {
         List<SimulatedProgram> simulatedPrograms = this.archimulatorService.getSimulatedProgramsAsList();
 
         int pthreadSpawnedIndex = 3720;
-        int maxInsts = 100000000;
+        int maxInsts = 200000000;
 
         for (SimulatedProgram simulatedProgram : simulatedPrograms) {
             if(simulatedProgram.getTitle().startsWith("mst_baseline")) {
@@ -163,19 +163,19 @@ public class ManagementStartup {
     public static final SimulatedProgram SIMULATED_PROGRAM_MST_BASELINE = new SimulatedProgram(
             "mst_baseline", ExperimentProfile.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/baseline",
             "mst.mips",
-//            "10000");
+            "10000");
 //            "1024");
 //            "2000");
-            "4000");
+//            "4000");
 
     public static SimulatedProgram SIMULATED_PROGRAM_MST_HT(int lookahead, int stride) {
         SimulatedProgram program = new SimulatedProgram(
                 "mst_ht" + "-lookahead_" + lookahead + "-stride_" + stride, ExperimentProfile.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/ht",
                 "mst.mips",
-//                "10000");
+                "10000");
 //                "1024");
 //                "2000");
-                "4000");
+//                "4000");
         program.setHelperThreadedProgram(true);
         program.setHtLookahead(lookahead);
         program.setHtStride(stride);
