@@ -142,7 +142,13 @@ public class Cache<StateT extends Serializable, LineT extends CacheLine<StateT>>
     }
 
     public int getSet(int addr) {
-        return CacheGeometry.getSet(addr, this.geometry);
+        int set = CacheGeometry.getSet(addr, this.geometry);
+
+        if (set < 0 || set >= this.getNumSets()) {
+            throw new IllegalArgumentException(String.format("addr: 0x%08x, set: %d, this.numSets: %d", addr, set, this.getNumSets()));
+        }
+
+        return set;
     }
 
     public int getLineId(int addr) {

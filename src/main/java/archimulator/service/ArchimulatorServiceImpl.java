@@ -383,7 +383,6 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
         }
 
         ExperimentProfile experimentProfile = this.getExperimentProfileById(experimentProfileId);
-        experimentProfile.getStats().clear();
         experimentProfile.getStats().putAll(stats);
         this.experimentProfiles.update(experimentProfile);
     }
@@ -395,7 +394,6 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
         }
 
         ExperimentProfile experimentProfile = this.getExperimentProfileById(experimentProfileId);
-        experimentProfile.getStats().clear();
         experimentProfile.getStats().putAll(stats);
         this.experimentProfiles.update(experimentProfile);
     }

@@ -156,30 +156,44 @@ public class GuestStartup {
 
                 experiment.getBlockingEventDispatcher().addListener(Simulation.PollStatsCompletedEvent.class, new Action1<Simulation.PollStatsCompletedEvent>() {
                     @Override
-                    public void apply(Simulation.PollStatsCompletedEvent event) {
-                        try {
-                            archimulatorService.notifyPollStatsCompletedEvent(getExperimentProfileIdFromExperimentId(experiment.getId()), event.getStats());
-                        } catch (SQLException e) {
-                            recordException(e);
+                    public void apply(final Simulation.PollStatsCompletedEvent event) {
+                        Thread threadNotify = new Thread() {
+                            @Override
+                            public void run() {
+                                try {
+                                    archimulatorService.notifyPollStatsCompletedEvent(getExperimentProfileIdFromExperimentId(experiment.getId()), event.getStats());
+                                } catch (SQLException e) {
+                                    recordException(e);
 //                        throw new RuntimeException(e);
-                        } catch (Exception e) {
-                            recordException(e);
+                                } catch (Exception e) {
+                                    recordException(e);
 //                        throw new RuntimeException(e);
-                        }
+                                }
+                            }
+                        };
+                        threadNotify.setDaemon(true);
+                        threadNotify.start();
                     }
                 });
 
                 experiment.getBlockingEventDispatcher().addListener(Simulation.DumpStatsCompletedEvent.class, new Action1<Simulation.DumpStatsCompletedEvent>() {
                     @Override
-                    public void apply(Simulation.DumpStatsCompletedEvent event) {
-                        try {
-                            archimulatorService.notifyDumpStatsCompletedEvent(getExperimentProfileIdFromExperimentId(experiment.getId()), event.getStats());
-                        } catch (SQLException e) {
-                            throw new RuntimeException(e);
-                        } catch (Exception e) {
-                            recordException(e);
+                    public void apply(final Simulation.DumpStatsCompletedEvent event) {
+                        Thread threadNotify = new Thread() {
+                            @Override
+                            public void run() {
+                                try {
+                                    archimulatorService.notifyDumpStatsCompletedEvent(getExperimentProfileIdFromExperimentId(experiment.getId()), event.getStats());
+                                } catch (SQLException e) {
+                                    throw new RuntimeException(e);
+                                } catch (Exception e) {
+                                    recordException(e);
 //                        throw new RuntimeException(e);
-                        }
+                                }
+                            }
+                        };
+                        threadNotify.setDaemon(true);
+                        threadNotify.start();
                     }
                 });
 
