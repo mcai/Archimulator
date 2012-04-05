@@ -20,6 +20,7 @@ package archimulator.sim.os;
 
 import archimulator.sim.base.simulation.BasicSimulationObject;
 import archimulator.sim.base.simulation.ContextConfig;
+import archimulator.sim.base.simulation.Simulation;
 import archimulator.sim.base.simulation.SimulationObject;
 import archimulator.sim.isa.BitField;
 import archimulator.sim.isa.Mnemonic;
@@ -54,12 +55,10 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
 
     private int id;
 
-    private static int currentId = 0;
-
     public Process(Kernel kernel, String simulationDirectory, ContextConfig contextConfig) {
         super(kernel);
 
-        this.id = currentId++;
+        this.id = Simulation.currentProcessId++;
         kernel.getProcesses().add(this);
 
         this.stdinFileDescriptor = contextConfig.getSimulatedProgram().getStdin().length() > 0 ? NativeSyscalls.LIBC.open(simulationDirectory + File.separator + contextConfig.getSimulatedProgram().getStdin(), OpenFlags.O_RDONLY) : 0;

@@ -21,6 +21,7 @@ package archimulator.sim.uncore.coherence;
 import archimulator.sim.base.simulation.Logger;
 import archimulator.sim.base.event.DumpStatEvent;
 import archimulator.sim.base.event.ResetStatEvent;
+import archimulator.sim.base.simulation.Simulation;
 import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.CacheHierarchy;
 import archimulator.sim.uncore.MemoryDevice;
@@ -298,7 +299,7 @@ public abstract class CoherentCache<StateT extends Serializable> extends MemoryD
         private Stack<PendingActionOwner> pendingActions;
 
         public CoherentCacheProcess() {
-            this.id = currentCoherentCacheProcessId++;
+            this.id = Simulation.currentCoherentCacheProcessId++;
             this.onCompletedCallbacks = new ArrayList<Action1<? extends PendingActionOwner>>();
             this.pendingActions = new Stack<PendingActionOwner>();
         }
@@ -340,8 +341,6 @@ public abstract class CoherentCache<StateT extends Serializable> extends MemoryD
             return pendingActions;
         }
     }
-
-    private static long currentCoherentCacheProcessId = 0;
 
     public enum FindAndLockStatus {
         IDLE,

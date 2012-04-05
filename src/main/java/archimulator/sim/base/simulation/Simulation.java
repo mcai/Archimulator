@@ -378,19 +378,29 @@ public class Simulation implements SimulationObject {
         return this.blockingEventDispatcher;
     }
 
-    public static long currentMessageId = 0;
+    public static int currentMemoryPageId = 0;
+    public static int currentProcessId = 0;
 
     public static long currentDynamicInstructionId = 0;
     public static long currentReorderBufferEntryId = 0;
     public static long currentDecodeBufferEntryId = 0;
     public static long currentMemoryHierarchyAccessId = 0;
 
+    public static long currentCacheAccessId = 0;
+    public static long currentNetMessageId;
+    public static long currentCoherentCacheProcessId = 0;
+
     private static void resetIdCounters() {
-        currentMessageId = 0;
+        currentMemoryPageId = 0;
+        currentProcessId = 0;
 
         currentDynamicInstructionId = 0;
         currentReorderBufferEntryId = 0;
         currentDecodeBufferEntryId = 0;
         currentMemoryHierarchyAccessId = 0;
+
+        currentCacheAccessId = 0;
+        currentNetMessageId = 0;
+        currentCoherentCacheProcessId = 0;
     }
 }

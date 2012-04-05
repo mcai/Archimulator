@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore.net;
 
+import archimulator.sim.base.simulation.Simulation;
 import archimulator.util.action.Action;
 
 public class NetMessage {
@@ -30,7 +31,7 @@ public class NetMessage {
     private long beginCycle;
 
     public NetMessage(NetNode srcNode, NetNode destNode, int size, Action onCompletedCallback, long beginCycle) {
-        this.id = currentId++;
+        this.id = Simulation.currentNetMessageId++;
 
         this.srcNode = srcNode;
         this.destNode = destNode;
@@ -62,5 +63,7 @@ public class NetMessage {
         return size;
     }
 
-    private static long currentId;
+    public long getBeginCycle() {
+        return beginCycle;
+    }
 }

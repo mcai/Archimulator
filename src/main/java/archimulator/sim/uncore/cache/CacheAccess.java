@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache;
 
+import archimulator.sim.base.simulation.Simulation;
 import archimulator.sim.uncore.coherence.event.CoherentCacheEndCacheAccessEvent;
 
 import java.io.Serializable;
@@ -33,7 +34,7 @@ public abstract class CacheAccess<StateT extends Serializable, LineT extends Cac
     private boolean committed;
 
     public CacheAccess(EvictableCache<StateT, LineT> cache, CacheReference reference, int way) {
-        this.id = currentId++;
+        this.id = Simulation.currentCacheAccessId++;
         this.cache = cache;
         this.reference = reference;
         this.way = way;
@@ -87,6 +88,4 @@ public abstract class CacheAccess<StateT extends Serializable, LineT extends Cac
     public String toString() {
         return String.format("[%d, %d] {hitInCache=%s, bypass=%s, eviction=%s}", reference.getSet(), way, isHitInCache(), isBypass(), isEviction());
     }
-
-    private static long currentId = 0;
 }

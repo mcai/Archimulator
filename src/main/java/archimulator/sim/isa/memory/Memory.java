@@ -20,6 +20,7 @@ package archimulator.sim.isa.memory;
 
 import archimulator.sim.base.simulation.BasicSimulationObject;
 import archimulator.sim.base.event.PollStatsEvent;
+import archimulator.sim.base.simulation.Simulation;
 import archimulator.sim.os.Kernel;
 import archimulator.sim.uncore.cache.CacheGeometry;
 import archimulator.util.action.Action1;
@@ -323,7 +324,7 @@ public abstract class Memory extends BasicSimulationObject {
         int index = getIndex(addr);
 
         this.numPages++;
-        Page page = new Page(currentMemoryPageId++);
+        Page page = new Page(Simulation.currentMemoryPageId++);
 
         this.pages.put(index, page);
         
@@ -443,6 +444,4 @@ public abstract class Memory extends BasicSimulationObject {
     public static int getPageSize() {
         return geometry.getLineSize();
     }
-
-    private static int currentMemoryPageId = 0; //TODO: support serialization!!!
 }
