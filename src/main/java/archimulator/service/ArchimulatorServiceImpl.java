@@ -377,7 +377,7 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
     }
 
     @Override
-    public void notifyPollStatsCompletedEvent(long experimentProfileId, Map<String, Object> stats) throws SQLException {
+    public void notifyPollStatsCompletedEvent(long experimentProfileId, Map<String, String> stats) throws SQLException {
         if(!this.experimentProfiles.idExists(experimentProfileId)) {
             return;
         }
@@ -388,7 +388,7 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
     }
 
     @Override
-    public void notifyDumpStatsCompletedEvent(long experimentProfileId, Map<String, Object> stats) throws SQLException {
+    public void notifyDumpStatsCompletedEvent(long experimentProfileId, Map<String, String> stats) throws SQLException {
         if(!this.experimentProfiles.idExists(experimentProfileId)) {
             return;
         }
@@ -399,9 +399,9 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
     }
     
     @Override
-    public Map<String, Object> getExperimentStatsById(long experimentProfileId) throws SQLException {
+    public Map<String, String> getExperimentStatsById(long experimentProfileId) throws SQLException {
         if(!this.experimentProfiles.idExists(experimentProfileId)) {
-            return new HashMap<String, Object>();
+            return new HashMap<String, String>();
         }
 
         ExperimentProfile experimentProfile = this.getExperimentProfileById(experimentProfileId);
@@ -414,7 +414,7 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
     public static final String USER_ID_ADMIN = "itecgo";
     public static final String USER_INITIAL_PASSWORD_ADMIN = "bywwnss";
 
-    public static final String DATABASE_REVISION = "31";
+    public static final String DATABASE_REVISION = "32";
 
     //    public static final String DATABASE_URL = "jdbc:h2:mem:account";
     public static final String DATABASE_URL = "jdbc:h2:~/.archimulator/data/v" + DATABASE_REVISION;

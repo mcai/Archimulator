@@ -35,10 +35,7 @@ import com.caucho.hessian.client.HessianProxyFactory;
 
 import java.net.MalformedURLException;
 import java.sql.SQLException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class GuestStartup {
     private ArchimulatorService archimulatorService;
@@ -161,7 +158,14 @@ public class GuestStartup {
                             @Override
                             public void run() {
                                 try {
-                                    archimulatorService.notifyPollStatsCompletedEvent(getExperimentProfileIdFromExperimentId(experiment.getId()), event.getStats());
+                                    Map<String, Object> stats = event.getStats();
+
+                                    Map<String, String> stats1 = new TreeMap<String, String>();
+                                    for(String key : stats.keySet()) {
+                                        stats1.put(key, stats.get(key) + "");
+                                    }
+
+                                    archimulatorService.notifyPollStatsCompletedEvent(getExperimentProfileIdFromExperimentId(experiment.getId()), stats1);
                                 } catch (SQLException e) {
                                     recordException(e);
 //                        throw new RuntimeException(e);
@@ -183,7 +187,14 @@ public class GuestStartup {
                             @Override
                             public void run() {
                                 try {
-                                    archimulatorService.notifyDumpStatsCompletedEvent(getExperimentProfileIdFromExperimentId(experiment.getId()), event.getStats());
+                                    Map<String, Object> stats = event.getStats();
+
+                                    Map<String, String> stats1 = new TreeMap<String, String>();
+                                    for(String key : stats.keySet()) {
+                                        stats1.put(key, stats.get(key) + "");
+                                    }
+
+                                    archimulatorService.notifyDumpStatsCompletedEvent(getExperimentProfileIdFromExperimentId(experiment.getId()), stats1);
                                 } catch (SQLException e) {
                                     throw new RuntimeException(e);
                                 } catch (Exception e) {

@@ -79,10 +79,10 @@ public class ExperimentPlot {
                     @Override
                     public Double apply() {
                         try {
-                            Map<String,Object> experimentStatsById = archimulatorService.getExperimentStatsById(experimentProfile.getId());
+                            Map<String, String> experimentStatsById = archimulatorService.getExperimentStatsById(experimentProfile.getId());
                             String key = "checkpointedSimulation/phase1.instsPerSecond";
                             if(experimentStatsById.containsKey(key)) {
-                                String str = (String) experimentStatsById.get(key);
+                                String str = experimentStatsById.get(key);
                                 str = str.replaceAll(",", "");
                                 return (double)(int)(Double.valueOf(str).doubleValue());
                             }
@@ -108,10 +108,10 @@ public class ExperimentPlot {
                     @Override
                     public Double apply() {
                         try {
-                            Map<String, Object> experimentStatsById = archimulatorService.getExperimentStatsById(experimentProfile.getId());
+                            Map<String, String> experimentStatsById = archimulatorService.getExperimentStatsById(experimentProfile.getId());
                             String key = "checkpointedSimulation/phase1.cyclesPerSecond";
                             if(experimentStatsById.containsKey(key)) {
-                                String str = (String) experimentStatsById.get(key);
+                                String str = experimentStatsById.get(key);
                                 str = str.replaceAll(",", "");
                                 return (double)(int)(Double.valueOf(str).doubleValue());
                             }

@@ -141,9 +141,9 @@ public class IndexPage extends GenericForwardComposer<Window> {
 
                 sb.append("  ").append("  ").append("Stats").append("\r\n");
 
-                Map<String,Object> experimentStats = archimulatorService.getExperimentStatsById(experimentProfile.getId());
+                Map<String, String> experimentStats = archimulatorService.getExperimentStatsById(experimentProfile.getId());
                 for(String key : experimentStats.keySet()) {
-                    sb.append("  ").append("  ").append("  ").append(key + ": " + experimentStats.get(key)).append("\r\n");
+                    sb.append("  ").append("  ").append("  ").append(key).append(": ").append(experimentStats.get(key)).append("\r\n");
                 }
             }
 

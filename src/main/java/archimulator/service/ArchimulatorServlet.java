@@ -190,17 +190,17 @@ public class ArchimulatorServlet extends HessianServlet implements ArchimulatorS
     }
 
     @Override
-    public void notifyPollStatsCompletedEvent(long experimentProfileId, Map<String, Object> stats) throws SQLException {
+    public void notifyPollStatsCompletedEvent(long experimentProfileId, Map<String, String> stats) throws SQLException {
         this.getProxy().notifyPollStatsCompletedEvent(experimentProfileId, stats);
     }
 
     @Override
-    public void notifyDumpStatsCompletedEvent(long experimentProfileId, Map<String, Object> stats) throws SQLException {
+    public void notifyDumpStatsCompletedEvent(long experimentProfileId, Map<String, String> stats) throws SQLException {
         this.getProxy().notifyDumpStatsCompletedEvent(experimentProfileId, stats);
     }
 
     @Override
-    public Map<String, Object> getExperimentStatsById(long experimentProfileId) throws SQLException {
+    public Map<String, String> getExperimentStatsById(long experimentProfileId) throws SQLException {
         return this.getProxy().getExperimentStatsById(experimentProfileId);
     }
 

@@ -18,9 +18,9 @@
  ******************************************************************************/
 package archimulator.view.page.edit;
 
-import archimulator.sim.base.experiment.profile.ExperimentProfile;
 import archimulator.service.ArchimulatorService;
 import archimulator.service.ArchimulatorServletContextListener;
+import archimulator.sim.base.experiment.profile.ExperimentProfile;
 import archimulator.util.Pair;
 import archimulator.util.action.Action1;
 import archimulator.view.ServerPush;
@@ -66,10 +66,10 @@ public class ViewExperimentStatsPage extends GenericForwardComposer<Window> {
             HttpSession httpSession = (HttpSession) session.getNativeSession();
             ArchimulatorService archimulatorService = ArchimulatorServletContextListener.getArchimulatorService(httpSession.getServletContext());
 
-            Map<String,Object> stats = archimulatorService.getExperimentStatsById(experimentProfile.getId());
+            Map<String, String> stats = archimulatorService.getExperimentStatsById(experimentProfile.getId());
 
             List<Pair<String, String>> statsList = new ArrayList<Pair<String, String>>();
-            for(String key : stats.keySet()) {
+            for (String key : stats.keySet()) {
                 statsList.add(new Pair<String, String>(key, stats.get(key) + ""));
             }
 
@@ -85,10 +85,10 @@ public class ViewExperimentStatsPage extends GenericForwardComposer<Window> {
                     HttpSession httpSession = (HttpSession) session.getNativeSession();
                     ArchimulatorService archimulatorService = ArchimulatorServletContextListener.getArchimulatorService(httpSession.getServletContext());
 
-                    Map<String,Object> stats = archimulatorService.getExperimentStatsById(experimentProfile.getId());
+                    Map<String, String> stats = archimulatorService.getExperimentStatsById(experimentProfile.getId());
 
                     List<Pair<String, String>> statsList = new ArrayList<Pair<String, String>>();
-                    for(String key : stats.keySet()) {
+                    for (String key : stats.keySet()) {
                         statsList.add(new Pair<String, String>(key, stats.get(key) + ""));
                     }
 
