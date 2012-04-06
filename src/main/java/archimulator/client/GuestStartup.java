@@ -160,7 +160,7 @@ public class GuestStartup {
                                 try {
                                     Map<String, Object> stats = event.getStats();
 
-                                    Map<String, String> stats1 = new TreeMap<String, String>();
+                                    Map<String, String> stats1 = new LinkedHashMap<String, String>();
                                     for(String key : stats.keySet()) {
                                         stats1.put(key, stats.get(key) + "");
                                     }
@@ -189,7 +189,7 @@ public class GuestStartup {
                                 try {
                                     Map<String, Object> stats = event.getStats();
 
-                                    Map<String, String> stats1 = new TreeMap<String, String>();
+                                    Map<String, String> stats1 = new LinkedHashMap<String, String>();
                                     for(String key : stats.keySet()) {
                                         stats1.put(key, stats.get(key) + "");
                                     }
