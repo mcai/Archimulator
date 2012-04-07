@@ -18,7 +18,6 @@
  ******************************************************************************/
 package archimulator.util.chart;
 
-import archimulator.service.ArchimulatorService;
 import archimulator.sim.base.experiment.profile.ExperimentProfile;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -33,23 +32,32 @@ import org.jfree.ui.ApplicationFrame;
 
 import javax.swing.*;
 import java.awt.*;
-import java.sql.SQLException;
 
 public class ExperimentBarPlotFrame extends ApplicationFrame {
-    public ExperimentBarPlotFrame(ExperimentBarPlot experimentBarPlot, ArchimulatorService archimulatorService) {
+    public ExperimentBarPlotFrame(ExperimentBarPlot experimentBarPlot) {
         super(experimentBarPlot.getTitle());
-        CategoryDataset dataSet = createDataset(experimentBarPlot, archimulatorService);
-//        JFreeChart chart = ChartFactory.createBarChart(
-        JFreeChart chart = ChartFactory.createStackedBarChart(
-                experimentBarPlot.getTitle(),
-                "Experiment",
-                experimentBarPlot.getTitleY(),
-                dataSet,
-                PlotOrientation.VERTICAL,
-                true,
-                true,
-                false
-        );
+        CategoryDataset dataSet = createDataset(experimentBarPlot);
+        JFreeChart chart = experimentBarPlot.isStacked() ?
+                ChartFactory.createStackedBarChart(
+                        experimentBarPlot.getTitle(),
+                        "Experiment",
+                        experimentBarPlot.getTitleY(),
+                        dataSet,
+                        PlotOrientation.VERTICAL,
+                        true,
+                        true,
+                        false
+                ) :
+                ChartFactory.createBarChart(
+                        experimentBarPlot.getTitle(),
+                        "Experiment",
+                        experimentBarPlot.getTitleY(),
+                        dataSet,
+                        PlotOrientation.VERTICAL,
+                        true,
+                        true,
+                        false
+                );
 
         CategoryPlot plot = chart.getCategoryPlot();
 
@@ -62,21 +70,17 @@ public class ExperimentBarPlotFrame extends ApplicationFrame {
         setContentPane(chartPanel);
     }
 
-    private static CategoryDataset createDataset(ExperimentBarPlot experimentBarPlot, ArchimulatorService archimulatorService) {
+    private static CategoryDataset createDataset(ExperimentBarPlot experimentBarPlot) {
         DefaultCategoryDataset dataSet = new DefaultCategoryDataset();
 
-        try {
-            for(ExperimentProfile experimentProfile : archimulatorService.getExperimentProfilesAsList()) {
-                if(experimentBarPlot.getExperimentProfilePred().apply(experimentProfile)) {
-                    for(ExperimentBarPlot.ExperimentSubBarPlot experimentSubBarPlot : experimentBarPlot.getSubBarPlots()) {
-                        dataSet.addValue(experimentSubBarPlot.getGetValueCallback().apply(experimentProfile), experimentSubBarPlot.getTitle(), "Exp #" + experimentProfile.getId());
-                    }
+        for (ExperimentProfile experimentProfile : experimentBarPlot.getExperimentProfiles()) {
+            if (experimentBarPlot.getExperimentProfilePred().apply(experimentProfile)) {
+                for (ExperimentBarPlot.ExperimentSubBarPlot experimentSubBarPlot : experimentBarPlot.getSubBarPlots()) {
+                    dataSet.addValue(experimentSubBarPlot.getGetValueCallback().apply(experimentProfile), experimentSubBarPlot.getTitle(), "Exp #" + experimentProfile.getId());
                 }
             }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
         }
-        
+
         return dataSet;
     }
 }

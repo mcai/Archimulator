@@ -37,13 +37,17 @@ import java.util.List;
 public class ExperimentBarPlot {
     private String title;
     private String titleY;
-    private List<ExperimentSubBarPlot> subBarPlots;
+    private boolean stacked;
     private Predicate<ExperimentProfile> experimentProfilePred;
+    private List<ExperimentProfile> experimentProfiles;
+    private List<ExperimentSubBarPlot> subBarPlots;
 
-    public ExperimentBarPlot(String title, String titleY, Predicate<ExperimentProfile> experimentProfilePred) {
+    public ExperimentBarPlot(String title, String titleY, boolean stacked, Predicate<ExperimentProfile> experimentProfilePred, List<ExperimentProfile> experimentProfiles) {
         this.title = title;
         this.titleY = titleY;
+        this.stacked = stacked;
         this.experimentProfilePred = experimentProfilePred;
+        this.experimentProfiles = experimentProfiles;
         this.subBarPlots = new ArrayList<ExperimentSubBarPlot>();
     }
 
@@ -55,12 +59,20 @@ public class ExperimentBarPlot {
         return titleY;
     }
 
-    public List<ExperimentSubBarPlot> getSubBarPlots() {
-        return subBarPlots;
+    public boolean isStacked() {
+        return stacked;
     }
 
     public Predicate<ExperimentProfile> getExperimentProfilePred() {
         return experimentProfilePred;
+    }
+
+    public List<ExperimentProfile> getExperimentProfiles() {
+        return experimentProfiles;
+    }
+
+    public List<ExperimentSubBarPlot> getSubBarPlots() {
+        return subBarPlots;
     }
 
     public static class ExperimentSubBarPlot {
@@ -100,7 +112,7 @@ public class ExperimentBarPlot {
         e.printStackTrace();
     }
 
-    public static void main(String[] args) throws MalformedURLException {
+    public static void main(String[] args) throws MalformedURLException, SQLException {
         HessianProxyFactory factory = new HessianProxyFactory();
         factory.setReadTimeout(30000);
         factory.setConnectTimeout(20000);
@@ -108,12 +120,12 @@ public class ExperimentBarPlot {
 
         final ArchimulatorService archimulatorService = (ArchimulatorService) factory.create(ArchimulatorService.class, GuestStartup.SERVICE_URL);
 
-        ExperimentBarPlot experimentBarPlot = new ExperimentBarPlot("HT LLC Request Distribution", "# HT LLC Requests", new Predicate<ExperimentProfile>() {
+        ExperimentBarPlot experimentBarPlot = new ExperimentBarPlot("HT LLC Request Distribution", "# HT LLC Requests", true, new Predicate<ExperimentProfile>() {
             @Override
             public boolean apply(ExperimentProfile experimentProfile) {
                 return experimentProfile.getState() == ExperimentProfileState.STOPPED && experimentProfile.getTitle().contains("HT");
             }
-        });
+        }, archimulatorService.getExperimentProfilesAsList());
 
         experimentBarPlot.getSubBarPlots().add(new ExperimentBarPlot.ExperimentSubBarPlot("Good HT LLC Request", new Function1<ExperimentProfile, Double>() {
             @Override
@@ -134,7 +146,7 @@ public class ExperimentBarPlot {
             }
         }));
 
-        ExperimentBarPlotFrame experimentBarPlotFrame = new ExperimentBarPlotFrame(experimentBarPlot, archimulatorService);
+        ExperimentBarPlotFrame experimentBarPlotFrame = new ExperimentBarPlotFrame(experimentBarPlot);
         experimentBarPlotFrame.pack();
         RefineryUtilities.centerFrameOnScreen(experimentBarPlotFrame);
         experimentBarPlotFrame.setVisible(true);
