@@ -200,6 +200,11 @@ public class ArchimulatorServlet extends HessianServlet implements ArchimulatorS
     }
 
     @Override
+    public String getExperimentStatById(long experimentProfileId, String key) throws SQLException {
+        return this.getProxy().getExperimentStatById(experimentProfileId, key);
+    }
+
+    @Override
     public Set<String> getUserIds() {
         return this.getProxy().getUserIds();
     }

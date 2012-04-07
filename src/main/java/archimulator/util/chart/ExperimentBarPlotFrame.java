@@ -1,8 +1,25 @@
+/*******************************************************************************
+ * Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).
+ *
+ * This file is part of the Archimulator multicore architectural simulator.
+ *
+ * Archimulator is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Archimulator is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
 package archimulator.util.chart;
 
-import java.awt.*;
-import java.util.Random;
-
+import archimulator.service.ArchimulatorService;
+import archimulator.sim.base.experiment.profile.ExperimentProfile;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -13,17 +30,20 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.ui.ApplicationFrame;
-import org.jfree.ui.RefineryUtilities;
+
+import javax.swing.*;
+import java.awt.*;
+import java.sql.SQLException;
 
 public class ExperimentBarPlotFrame extends ApplicationFrame {
-    public ExperimentBarPlotFrame(String title) {
-        super(title);
-        CategoryDataset dataSet = createDataset();
+    public ExperimentBarPlotFrame(ExperimentBarPlot experimentBarPlot, ArchimulatorService archimulatorService) {
+        super(experimentBarPlot.getTitle());
+        CategoryDataset dataSet = createDataset(experimentBarPlot, archimulatorService);
 //        JFreeChart chart = ChartFactory.createBarChart(
         JFreeChart chart = ChartFactory.createStackedBarChart(
-                title,
+                experimentBarPlot.getTitle(),
                 "Experiment",
-                "# HT LLC Requests",
+                experimentBarPlot.getTitleY(),
                 dataSet,
                 PlotOrientation.VERTICAL,
                 true,
@@ -32,43 +52,31 @@ public class ExperimentBarPlotFrame extends ApplicationFrame {
         );
 
         CategoryPlot plot = chart.getCategoryPlot();
-//        plot.getRenderer().setSeriesPaint(0, new Color(128, 0, 0));
-//        plot.getRenderer().setSeriesPaint(1, new Color(0, 128, 0));
-//        plot.getRenderer().setSeriesPaint(2, new Color(0, 0, 128));
 
         CategoryAxis domainAxis = plot.getDomainAxis();
         domainAxis.setCategoryLabelPositions(CategoryLabelPositions.UP_45);
 
-        ChartPdfExporter.exportPdf(chart, 600, 400, "/home/itecgo/Desktop/12.pdf"); //TODO: for demo only.
-        
         ChartPanel chartPanel = new ChartPanel(chart, false);
-        chartPanel.setPreferredSize(new Dimension(500, 270));
+        chartPanel.setPreferredSize(new Dimension(500, 470));
+        chartPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         setContentPane(chartPanel);
     }
 
-    private static CategoryDataset createDataset() {
-        String goodHtRequest = "Good HT LLC Request";
-        String badHtRequest = "Bad HT LLC Request";
-        String uglyHtrequest = "Ugly HT LLC Request";
+    private static CategoryDataset createDataset(ExperimentBarPlot experimentBarPlot, ArchimulatorService archimulatorService) {
+        DefaultCategoryDataset dataSet = new DefaultCategoryDataset();
 
-        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        
-        Random random = new Random();
-        
-        for(int i = 0; i < 16; i++) {
-            String exp = "Exp #" + i;
-            dataset.addValue(500 + random.nextInt(500), goodHtRequest, exp);
-            dataset.addValue(500 + random.nextInt(500), badHtRequest, exp);
-            dataset.addValue(500 + random.nextInt(500), uglyHtrequest, exp);
+        try {
+            for(ExperimentProfile experimentProfile : archimulatorService.getExperimentProfilesAsList()) {
+                if(experimentBarPlot.getExperimentProfilePred().apply(experimentProfile)) {
+                    for(ExperimentBarPlot.ExperimentSubBarPlot experimentSubBarPlot : experimentBarPlot.getSubBarPlots()) {
+                        dataSet.addValue(experimentSubBarPlot.getGetValueCallback().apply(experimentProfile), experimentSubBarPlot.getTitle(), "Exp #" + experimentProfile.getId());
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
         
-        return dataset;
-    }
-
-    public static void main(String[] args) {
-        ExperimentBarPlotFrame experimentBarPlotFrame = new ExperimentBarPlotFrame("HT LLC Request Distribution");
-        experimentBarPlotFrame.pack();
-        RefineryUtilities.centerFrameOnScreen(experimentBarPlotFrame);
-        experimentBarPlotFrame.setVisible(true);
+        return dataSet;
     }
 }

@@ -425,6 +425,22 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
         return stats;
     }
 
+    @Override
+    public String getExperimentStatById(long experimentProfileId, String key) throws SQLException {
+        if(!this.experimentProfiles.idExists(experimentProfileId)) {
+            return null;
+        }
+
+        PreparedQuery<ExperimentProfileStat> query = this.experimentProfileStats.queryBuilder().where().eq("experimentProfileId", experimentProfileId).and().eq("key", key).prepare();
+        ExperimentProfileStat result = this.experimentProfileStats.queryForFirst(query);
+        if(result != null) {
+            return result.getValue();
+        }
+        else {
+            return null;
+        }
+    }
+
     private void doHousekeeping() throws SQLException {
     }
 

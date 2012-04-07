@@ -164,6 +164,7 @@ public class ManagementStartup {
             "mst_baseline", ExperimentProfile.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/baseline",
             "mst.mips",
             "10000");
+//            "100");
 //            "1024");
 //            "2000");
 //            "4000");
@@ -173,6 +174,7 @@ public class ManagementStartup {
                 "mst_ht" + "-lookahead_" + lookahead + "-stride_" + stride, ExperimentProfile.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/ht",
                 "mst.mips",
                 "10000");
+//                "100");
 //                "1024");
 //                "2000");
 //                "4000");
