@@ -144,7 +144,7 @@ public class GuestStartup {
 
     private boolean retrieveAndExecuteNewExperimentProfile() throws SQLException {
         if (this.archimulatorService.isRunningExperimentEnabled()) {
-            ExperimentProfile experimentProfile = this.archimulatorService.retrieveOneExperimentProfileToRun(this.simulatorUserId);
+            final ExperimentProfile experimentProfile = this.archimulatorService.retrieveOneExperimentProfileToRun(this.simulatorUserId);
 
             if (experimentProfile != null) {
                 System.out.printf("[%s Contact Server] Running new experiment profile\n", DateHelper.toString(new Date()));
@@ -165,7 +165,7 @@ public class GuestStartup {
                                         stats1.put(key, stats.get(key) + "");
                                     }
 
-                                    archimulatorService.notifyPollStatsCompletedEvent(getExperimentProfileIdFromExperimentId(experiment.getId()), stats1);
+                                    archimulatorService.updateExperimentStatsById(experimentProfile.getId(), stats1);
                                 } catch (SQLException e) {
                                     recordException(e);
 //                        throw new RuntimeException(e);
@@ -194,9 +194,10 @@ public class GuestStartup {
                                         stats1.put(key, stats.get(key) + "");
                                     }
 
-                                    archimulatorService.notifyDumpStatsCompletedEvent(getExperimentProfileIdFromExperimentId(experiment.getId()), stats1);
+                                    archimulatorService.updateExperimentStatsById(experimentProfile.getId(), stats1);
                                 } catch (SQLException e) {
-                                    throw new RuntimeException(e);
+                                    recordException(e);
+//                        throw new RuntimeException(e);
                                 } catch (Exception e) {
                                     recordException(e);
 //                        throw new RuntimeException(e);
@@ -250,17 +251,7 @@ public class GuestStartup {
         }
     }
 
-    public long getExperimentProfileIdFromExperimentId(long experimentId) {
-        for (long experimentProfileId : this.experimentProfileIdsToExperiments.keySet()) {
-            if (this.experimentProfileIdsToExperiments.get(experimentProfileId).getId() == experimentId) {
-                return experimentProfileId;
-            }
-        }
-
-        return -1;
-    }
-
-    //        public static final String SERVICE_URL = "http://204.152.205.131:8080/archimulator/archimulator";
+//    public static final String SERVICE_URL = "http://204.152.205.131:8080/archimulator/archimulator";
 //    public static final String SERVICE_URL = "http://50.117.112.114:8080/archimulator/archimulator";
 //    public static final String SERVICE_URL = "http://[2607:f358:10:13::2]:8080/archimulator/archimulator";
 //    public static final String SERVICE_URL = "http://localhost:8080/api";

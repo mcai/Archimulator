@@ -76,9 +76,6 @@ public class ExperimentProfile implements Serializable {
     @DatabaseField
     private String simulatorUserId;
 
-    @DatabaseField(dataType = DataType.SERIALIZABLE)
-    private LinkedHashMap<String, String> stats = new LinkedHashMap<String, String>();
-
     public ExperimentProfile() {
     }
 
@@ -227,10 +224,6 @@ public class ExperimentProfile implements Serializable {
 
     public void setSimulatorUserId(String simulatorUserId) {
         this.simulatorUserId = simulatorUserId;
-    }
-
-    public Map<String, String> getStats() {
-        return stats;
     }
 
     @Override

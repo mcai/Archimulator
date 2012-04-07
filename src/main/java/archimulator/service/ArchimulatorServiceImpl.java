@@ -19,6 +19,7 @@
 package archimulator.service;
 
 import archimulator.sim.base.experiment.profile.ExperimentProfile;
+import archimulator.sim.base.experiment.profile.ExperimentProfileStat;
 import archimulator.sim.base.experiment.profile.ExperimentProfileState;
 import archimulator.sim.base.experiment.profile.ProcessorProfile;
 import archimulator.sim.base.simulation.SimulatedProgram;
@@ -32,6 +33,8 @@ import archimulator.util.im.sink.MessageSinkImpl;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcPooledConnectionSource;
+import com.j256.ormlite.stmt.DeleteBuilder;
+import com.j256.ormlite.stmt.PreparedDelete;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.table.TableUtils;
 import it.sauronsoftware.cron4j.Scheduler;
@@ -43,6 +46,7 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
     private Dao<SimulatedProgram, Long> simulatedPrograms;
     private Dao<ProcessorProfile, Long> processorProfiles;
     private Dao<ExperimentProfile, Long> experimentProfiles;
+    private Dao<ExperimentProfileStat, Long> experimentProfileStats;
 
     private Dao<User, String> users;
 
@@ -68,11 +72,13 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
             TableUtils.createTableIfNotExists(this.connectionSource, SimulatedProgram.class);
             TableUtils.createTableIfNotExists(this.connectionSource, ProcessorProfile.class);
             TableUtils.createTableIfNotExists(this.connectionSource, ExperimentProfile.class);
+            TableUtils.createTableIfNotExists(this.connectionSource, ExperimentProfileStat.class);
             TableUtils.createTableIfNotExists(this.connectionSource, User.class);
 
             this.simulatedPrograms = DaoManager.createDao(this.connectionSource, SimulatedProgram.class);
             this.processorProfiles = DaoManager.createDao(this.connectionSource, ProcessorProfile.class);
             this.experimentProfiles = DaoManager.createDao(this.connectionSource, ExperimentProfile.class);
+            this.experimentProfileStats = DaoManager.createDao(this.connectionSource, ExperimentProfileStat.class);
             this.users = DaoManager.createDao(this.connectionSource, User.class);
             
             this.runningExperimentEnabled = false;
@@ -372,40 +378,51 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
             this.cloudMessageChannel.send(experimentProfile.getSimulatorUserId(), new StopExperimentRequestEvent(experimentProfile.getId()));
         }
         experimentProfile.setState(ExperimentProfileState.SUBMITTED);
-        experimentProfile.getStats().clear();
         this.experimentProfiles.update(experimentProfile);
+
+        DeleteBuilder<ExperimentProfileStat,Long> deleteBuilder = this.experimentProfileStats.deleteBuilder();
+        deleteBuilder.where().eq("experimentProfileId", experimentProfileId);
+        PreparedDelete<ExperimentProfileStat> query = deleteBuilder.prepare();
+        this.experimentProfileStats.delete(query);
     }
 
     @Override
-    public void notifyPollStatsCompletedEvent(long experimentProfileId, Map<String, String> stats) throws SQLException {
+    public void updateExperimentStatsById(long experimentProfileId, Map<String, String> stats) throws SQLException {
         if(!this.experimentProfiles.idExists(experimentProfileId)) {
             return;
         }
 
-        ExperimentProfile experimentProfile = this.getExperimentProfileById(experimentProfileId);
-        experimentProfile.getStats().putAll(stats);
-        this.experimentProfiles.update(experimentProfile);
-    }
+        for(String key : stats.keySet()) {
+            String value = stats.get(key);
 
-    @Override
-    public void notifyDumpStatsCompletedEvent(long experimentProfileId, Map<String, String> stats) throws SQLException {
-        if(!this.experimentProfiles.idExists(experimentProfileId)) {
-            return;
+            PreparedQuery<ExperimentProfileStat> query = this.experimentProfileStats.queryBuilder().where().eq("experimentProfileId", experimentProfileId).and().eq("key", key).prepare();
+            ExperimentProfileStat result = this.experimentProfileStats.queryForFirst(query);
+            if(result != null) {
+                result.setValue(value);
+                this.experimentProfileStats.update(result);
+            }
+            else {
+                ExperimentProfileStat stat = new ExperimentProfileStat(experimentProfileId, key, value);
+                this.experimentProfileStats.create(stat);
+            }
         }
-
-        ExperimentProfile experimentProfile = this.getExperimentProfileById(experimentProfileId);
-        experimentProfile.getStats().putAll(stats);
-        this.experimentProfiles.update(experimentProfile);
     }
-    
+
     @Override
     public Map<String, String> getExperimentStatsById(long experimentProfileId) throws SQLException {
         if(!this.experimentProfiles.idExists(experimentProfileId)) {
             return new HashMap<String, String>();
         }
 
-        ExperimentProfile experimentProfile = this.getExperimentProfileById(experimentProfileId);
-        return experimentProfile.getStats();
+        PreparedQuery<ExperimentProfileStat> query = this.experimentProfileStats.queryBuilder().where().eq("experimentProfileId", experimentProfileId).prepare();
+        List<ExperimentProfileStat> result = this.experimentProfileStats.query(query);
+
+        Map<String, String> stats = new LinkedHashMap<String, String>();
+        for(ExperimentProfileStat stat : result) {
+            stats.put(stat.getKey(), stat.getValue());
+        }
+
+        return stats;
     }
 
     private void doHousekeeping() throws SQLException {
@@ -414,7 +431,7 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
     public static final String USER_ID_ADMIN = "itecgo";
     public static final String USER_INITIAL_PASSWORD_ADMIN = "bywwnss";
 
-    public static final String DATABASE_REVISION = "32";
+    public static final String DATABASE_REVISION = "33";
 
     //    public static final String DATABASE_URL = "jdbc:h2:mem:account";
     public static final String DATABASE_URL = "jdbc:h2:~/.archimulator/data/v" + DATABASE_REVISION;

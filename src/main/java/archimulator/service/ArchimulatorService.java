@@ -92,9 +92,7 @@ public interface ArchimulatorService extends MessageSink {
 
     void resetExperimentById(long experimentProfileId) throws SQLException;
 
-    void notifyPollStatsCompletedEvent(long experimentProfileId, Map<String, String> stats) throws SQLException;
-
-    void notifyDumpStatsCompletedEvent(long experimentProfileId, Map<String, String> stats) throws SQLException;
+    void updateExperimentStatsById(long experimentProfileId, Map<String, String> stats) throws SQLException;
 
     Map<String, String> getExperimentStatsById(long experimentProfileId) throws SQLException;
 }
