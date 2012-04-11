@@ -119,20 +119,21 @@ public class ManagementStartup {
                         ExperimentProfile experimentProfile = new ExperimentProfile(simulatedProgram.getTitle() + "-" + processorProfile.getTitle(), processorProfile);
                         experimentProfile.addWorkload(simulatedProgram);
                         experimentProfile.fastForwardToPseudoCallAndInDetailForMaxInsts(pthreadSpawnedIndex, maxInsts);
+                        experimentProfile.addSimulationCapabilityClass(LLCHTRequestProfilingCapability.class);
                         experimentProfiles.add(experimentProfile);
                     }
                 }
             }
-            else if(processorProfile.getL2EvictionPolicyClz().equals(LLCHTAwareLRUPolicy.class)) {
-                for(SimulatedProgram simulatedProgram : simulatedPrograms) {
-                    if(simulatedProgram.getTitle().startsWith("mst_ht")) {
-                        ExperimentProfile experimentProfile = new ExperimentProfile(simulatedProgram.getTitle() + "-" + processorProfile.getTitle(), processorProfile);
-                        experimentProfile.addWorkload(simulatedProgram);
-                        experimentProfile.fastForwardToPseudoCallAndInDetailForMaxInsts(pthreadSpawnedIndex, maxInsts);
-                        experimentProfiles.add(experimentProfile);
-                    }
-                }
-            }
+//            else if(processorProfile.getL2EvictionPolicyClz().equals(LLCHTAwareLRUPolicy.class)) {
+//                for(SimulatedProgram simulatedProgram : simulatedPrograms) {
+//                    if(simulatedProgram.getTitle().startsWith("mst_ht")) {
+//                        ExperimentProfile experimentProfile = new ExperimentProfile(simulatedProgram.getTitle() + "-" + processorProfile.getTitle(), processorProfile);
+//                        experimentProfile.addWorkload(simulatedProgram);
+//                        experimentProfile.fastForwardToPseudoCallAndInDetailForMaxInsts(pthreadSpawnedIndex, maxInsts);
+//                        experimentProfiles.add(experimentProfile);
+//                    }
+//                }
+//            }
         }
 
         ///////////////////
