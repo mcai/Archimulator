@@ -76,7 +76,10 @@ public class ExperimentBarPlotFrame extends ApplicationFrame {
         for (ExperimentProfile experimentProfile : experimentBarPlot.getExperimentProfiles()) {
             if (experimentBarPlot.getExperimentProfilePred().apply(experimentProfile)) {
                 for (ExperimentBarPlot.ExperimentSubBarPlot experimentSubBarPlot : experimentBarPlot.getSubBarPlots()) {
-                    dataSet.addValue(experimentSubBarPlot.getGetValueCallback().apply(experimentProfile), experimentSubBarPlot.getTitle(), "Exp #" + experimentProfile.getId());
+                    dataSet.addValue(
+                            experimentSubBarPlot.getGetValueCallback().apply(experimentProfile), experimentSubBarPlot.getTitle(),
+                            experimentSubBarPlot.getGetTitleCallback().apply(experimentProfile)
+                    );
                 }
             }
         }

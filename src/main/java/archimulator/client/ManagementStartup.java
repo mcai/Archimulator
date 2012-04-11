@@ -104,12 +104,18 @@ public class ManagementStartup {
         int pthreadSpawnedIndex = 3720;
         int maxInsts = 200000000;
 
-        for (SimulatedProgram simulatedProgram : simulatedPrograms) {
-            if(simulatedProgram.getTitle().startsWith("mst_baseline")) {
-                List<ProcessorProfile> processorProfiles = this.archimulatorService.getProcessorProfilesAsList();
+        List<ProcessorProfile> processorProfiles = this.archimulatorService.getProcessorProfilesAsList();
 
-                for(ProcessorProfile processorProfile : processorProfiles) {
-                    if(processorProfile.getL2EvictionPolicyClz().equals(LRUPolicy.class)) {
+        for(ProcessorProfile processorProfile : processorProfiles) {
+            if(processorProfile.getL2EvictionPolicyClz().equals(LRUPolicy.class)) {
+                for(SimulatedProgram simulatedProgram : simulatedPrograms) {
+                    if(simulatedProgram.getTitle().startsWith("mst_baseline")) {
+                        ExperimentProfile experimentProfile = new ExperimentProfile(simulatedProgram.getTitle() + "-" + processorProfile.getTitle(), processorProfile);
+                        experimentProfile.addWorkload(simulatedProgram);
+                        experimentProfile.fastForwardToPseudoCallAndInDetailForMaxInsts(pthreadSpawnedIndex, maxInsts);
+                        experimentProfiles.add(experimentProfile);
+                    }
+                    else if(simulatedProgram.getTitle().startsWith("mst_ht")) {
                         ExperimentProfile experimentProfile = new ExperimentProfile(simulatedProgram.getTitle() + "-" + processorProfile.getTitle(), processorProfile);
                         experimentProfile.addWorkload(simulatedProgram);
                         experimentProfile.fastForwardToPseudoCallAndInDetailForMaxInsts(pthreadSpawnedIndex, maxInsts);
@@ -117,27 +123,9 @@ public class ManagementStartup {
                     }
                 }
             }
-            else if(simulatedProgram.getTitle().startsWith("mst_ht")) {
-                List<ProcessorProfile> processorProfiles = this.archimulatorService.getProcessorProfilesAsList();
-
-                for(ProcessorProfile processorProfile : processorProfiles) {
-                    if(processorProfile.getL2EvictionPolicyClz().equals(LRUPolicy.class)) {
-                        ExperimentProfile experimentProfile = new ExperimentProfile(simulatedProgram.getTitle() + "-" + processorProfile.getTitle(), processorProfile);
-                        experimentProfile.addWorkload(simulatedProgram);
-                        experimentProfile.fastForwardToPseudoCallAndInDetailForMaxInsts(pthreadSpawnedIndex, maxInsts);
-                        experimentProfile.addSimulationCapabilityClass(LLCHTRequestProfilingCapability.class);
-                        experimentProfiles.add(experimentProfile);
-                    }
-                }
-            }
-        }
-
-        for (SimulatedProgram simulatedProgram : simulatedPrograms) {
-            if(simulatedProgram.getTitle().startsWith("mst_ht")) {
-                List<ProcessorProfile> processorProfiles = this.archimulatorService.getProcessorProfilesAsList();
-
-                for(ProcessorProfile processorProfile : processorProfiles) {
-                    if(processorProfile.getL2EvictionPolicyClz().equals(LLCHTAwareLRUPolicy.class)) {
+            else if(processorProfile.getL2EvictionPolicyClz().equals(LLCHTAwareLRUPolicy.class)) {
+                for(SimulatedProgram simulatedProgram : simulatedPrograms) {
+                    if(simulatedProgram.getTitle().startsWith("mst_ht")) {
                         ExperimentProfile experimentProfile = new ExperimentProfile(simulatedProgram.getTitle() + "-" + processorProfile.getTitle(), processorProfile);
                         experimentProfile.addWorkload(simulatedProgram);
                         experimentProfile.fastForwardToPseudoCallAndInDetailForMaxInsts(pthreadSpawnedIndex, maxInsts);
@@ -146,10 +134,49 @@ public class ManagementStartup {
                 }
             }
         }
+
+        ///////////////////
+
+//        for (SimulatedProgram simulatedProgram : simulatedPrograms) {
+//            if(simulatedProgram.getTitle().startsWith("mst_baseline")) {
+//                for(ProcessorProfile processorProfile : processorProfiles) {
+//                    if(processorProfile.getL2EvictionPolicyClz().equals(LRUPolicy.class)) {
+//                        ExperimentProfile experimentProfile = new ExperimentProfile(simulatedProgram.getTitle() + "-" + processorProfile.getTitle(), processorProfile);
+//                        experimentProfile.addWorkload(simulatedProgram);
+//                        experimentProfile.fastForwardToPseudoCallAndInDetailForMaxInsts(pthreadSpawnedIndex, maxInsts);
+//                        experimentProfiles.add(experimentProfile);
+//                    }
+//                }
+//            }
+//            else if(simulatedProgram.getTitle().startsWith("mst_ht")) {
+//                for(ProcessorProfile processorProfile : processorProfiles) {
+//                    if(processorProfile.getL2EvictionPolicyClz().equals(LRUPolicy.class)) {
+//                        ExperimentProfile experimentProfile = new ExperimentProfile(simulatedProgram.getTitle() + "-" + processorProfile.getTitle(), processorProfile);
+//                        experimentProfile.addWorkload(simulatedProgram);
+//                        experimentProfile.fastForwardToPseudoCallAndInDetailForMaxInsts(pthreadSpawnedIndex, maxInsts);
+//                        experimentProfile.addSimulationCapabilityClass(LLCHTRequestProfilingCapability.class);
+//                        experimentProfiles.add(experimentProfile);
+//                    }
+//                }
+//            }
+//        }
+//
+//        for (SimulatedProgram simulatedProgram : simulatedPrograms) {
+//            if(simulatedProgram.getTitle().startsWith("mst_ht")) {
+//                for(ProcessorProfile processorProfile : processorProfiles) {
+//                    if(processorProfile.getL2EvictionPolicyClz().equals(LLCHTAwareLRUPolicy.class)) {
+//                        ExperimentProfile experimentProfile = new ExperimentProfile(simulatedProgram.getTitle() + "-" + processorProfile.getTitle(), processorProfile);
+//                        experimentProfile.addWorkload(simulatedProgram);
+//                        experimentProfile.fastForwardToPseudoCallAndInDetailForMaxInsts(pthreadSpawnedIndex, maxInsts);
+//                        experimentProfiles.add(experimentProfile);
+//                    }
+//                }
+//            }
+//        }
 
         for(ExperimentProfile experimentProfile : experimentProfiles) {
             System.out.println("Submitting experiment profile: " + experimentProfile);
-            
+
             this.archimulatorService.addExperimentProfile(experimentProfile);
         }
 
@@ -163,21 +190,21 @@ public class ManagementStartup {
     public static final SimulatedProgram SIMULATED_PROGRAM_MST_BASELINE = new SimulatedProgram(
             "mst_baseline", ExperimentProfile.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/baseline",
             "mst.mips",
-            "10000");
+//            "10000");
 //            "100");
 //            "1024");
 //            "2000");
-//            "4000");
+            "4000");
 
     public static SimulatedProgram SIMULATED_PROGRAM_MST_HT(int lookahead, int stride) {
         SimulatedProgram program = new SimulatedProgram(
                 "mst_ht" + "-lookahead_" + lookahead + "-stride_" + stride, ExperimentProfile.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/ht",
                 "mst.mips",
-                "10000");
+//                "10000");
 //                "100");
 //                "1024");
 //                "2000");
-//                "4000");
+                "4000");
         program.setHelperThreadedProgram(true);
         program.setHtLookahead(lookahead);
         program.setHtStride(stride);

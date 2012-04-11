@@ -45,7 +45,7 @@ public class ProcessorProfileListCellRenderer implements ListitemRenderer<Proces
         item.appendChild(new Listcell(data.getTitle()));
         item.appendChild(new Listcell(data.getNumCores() + ""));
         item.appendChild(new Listcell(data.getNumThreadsPerCore() + ""));
-        item.appendChild(new Listcell(StorageUnit.toString(data.getL2Size()) + ""));
+        item.appendChild(new Listcell(StorageUnit.toString(data.getL2Size())));
         item.appendChild(new Listcell(data.getL2Associativity() + ""));
         item.appendChild(new Listcell(data.getCreatedTimeAsString()));
 

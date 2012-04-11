@@ -255,6 +255,7 @@ public class GuestStartup {
 //    public static final String SERVICE_URL = "http://50.117.112.114:8080/archimulator/archimulator";
 //    public static final String SERVICE_URL = "http://[2607:f358:10:13::2]:8080/archimulator/archimulator";
 //    public static final String SERVICE_URL = "http://localhost:8080/api";
+//    public static final String SERVICE_URL = "http://[2607:f358:10:13::2]/api";
     public static final String SERVICE_URL = "http://www.archimulator.com/api";
 
     public static void main(String[] args) {
