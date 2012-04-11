@@ -111,14 +111,13 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
     
     @Override
     public void stop() {
+        this.scheduler.stop();
         try {
-            this.scheduler.stop();
             this.connectionSource.close();
-            
-            this.cloudMessageChannel.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+        this.cloudMessageChannel.close();
     }
     
     @Override
