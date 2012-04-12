@@ -189,39 +189,44 @@ right side
 
 \begin_layout Abstract
 Helper threaded data prefetching on chip multiprocessors (CMPs), in its
- most basic form, utilizes the processing power of underutilized neighboring
- cores that communicate via a shared last level cache (LLC) to improve the
- performance of a single-threaded program running on a CMP.
- The multiple memory reference/miss streams that come from the main thread
- (MT) and the helper thread (HT) can inevitably stress and pollute LLC if
- no effective LLC content management techniques are employed.
- As a first step, appropriate metrics should be used to measure the effectivenes
-s and cache pollution of the HT scheme.
- However, due to the shared LLC structure, the traditional metrics of accuracy
- and coverage and good/bad classification for hardware prefetching cannnot
- be applied to describe the inter-thread interference and cache pollution
- in the helper threaded data prefetching.
- 
+ most basic form, uses the processing power of underutilized neighboring
+ cores to improve the performance of a single-threaded program running on
+ a shared cache CMP.
+ Effective helper threaded data prefetching demands that the helper thread
+ (HT) should issue correct and timely LLC requests just before the main
+ thread (MT) requests them.
+ However this ideal case can not be assumed in the practical implemention
+ of helper threaded data prefetching on CMPs: some LLC requests coming from
+ HT could not contribute to the MT performance, but instead stress and pollute
+ LLC if no effective LLC replacement techniques are employed.
+ Traditional notions of accuracy and coverage for hardware based data prefetchin
+g can be applied to helper threaded data prefetching on CMPs as well, however
+ they do not provide sufficient details on the cache pollution and inter-thread
+ LLC interference caused by HT LLC requests for improving LLC replacement
+ for helper threaded data prefetching on CMPs.
 \end_layout
 
 \begin_layout Abstract
-In this paper, based on the idea of cache pollution and HT request lateness,
- we present a taxonomy of HT requests to evaluate the effectiveness of the
- helper-threaded data prefetching on CMPs, in the aim of providing insights
- on designing and implementing effective LLC content management mechanisms
- for the HT scheme.
- Firstly, the taxonomy is proposed.
- Secondly, the hardware changes to support the taxonomy and algorithms for
- tracking HT requests and victims.
- Lastly, results of memory-intensive benchmarks from Olden and CPU2006 show
- that: (1) there is notable cache pollution caused by helper-threaded data
- prefetching on CMPs; (2) there is room for improving the effectiveness
- and timeliness of helper-threaded data prefetching on CMPs.
+In this paper, we present the dynamic LLC replacement technique for helper
+ threaded data prefetching on CMPs, based on a pollution-aware taxonomy
+ of HT LLC requests.
+ Firstly, the experimental methodology used in this work are discussed.
+ Secondly, a pollution aware taxonomy of HT LLC requests is presented from
+ the view of the contribution of HT LLC requests to the MT performance.
+ Thirdly, based on the intuition of the result of the taxonomy applied to
+ the Pthreads based helper threaded version of the memory-intensive mst
+ benchmark in Olden, the dynamic LLC replacement for helper threaded data
+ prefetching on CMPs are elaborated.
+ Experimental results from cycle accurate simulation show that: (1) there
+ is non-trivial LLC pollution caused by HT in helper-threaded data prefetching
+ on CMPs; (2) LLC request taxonomy based dynamic LLC replacement can improve
+ the effectiveness and timeliness of helper-threaded data prefetching on
+ CMPs.
 \end_layout
 
 \begin_layout Keywords
 chip multiprocessors, helper threaded data prefetching, cache replacement,
- cache pollution
+ cache pollution, inter-thread interference
 \end_layout
 
 \begin_layout Section
@@ -279,25 +284,24 @@ status collapsed
 
 \end_inset
 
- threaded data prefetching on chip multiprocessors (CMPs)
-\begin_inset CommandInset citation
-LatexCommand cite
-key "VanLil2000"
-
-\end_inset
-
-, in its most basic form, utilizes the processing power of underutilized
- neighboring cores that communicate via a shared last level cache (LLC)
- to improve the performance of a single-threaded program running in a CMP.
- However, the multiple memory reference/miss streams that come from the
- main thread (MT) and the helper thread (HT) can inevitably stress and pollute
- LLC if no effective LLC content management techniques are employed.
+ threaded data prefetching on chip multiprocessors (CMPs), in its most basic
+ form, uses the processing power of underutilized neighboring cores to improve
+ the performance of a single-threaded program running on a shared cache
+ CMP.
+ Effective helper threaded data prefetching demands that the helper thread
+ (HT) should issue correct and timely LLC requests just before the main
+ thread (MT) requests them.
+ However this ideal case can not be assumed in the practical implemention
+ of helper threaded data prefetching on CMPs: some LLC requests coming from
+ HT could not contribute to the MT performance, but instead stress and pollute
+ LLC if no effective LLC replacement techniques are employed.
+ 
 \end_layout
 
 \begin_layout Standard
 Several metrics have been proposed in the past for evaluating the effectiveness
- of hardware prefetching, among which prefetch accuracy and coverage are
- the most intuitive ones 
+ of hardware based data prefetching, among which prefetch accuracy and coverage
+ are the most intuitive ones 
 \begin_inset CommandInset citation
 LatexCommand cite
 key "Srinivasan2004"
@@ -305,8 +309,8 @@ key "Srinivasan2004"
 \end_inset
 
 .
- We can adapt the definitions of accuracy and coverage for hardware prefetching
- to the HT scheme.
+ We can easily adapt the definitions of accuracy and coverage for hardware
+ based data prefetching to the HT scheme.
  HT request accuracy is defined as the ratio of the number of useful HT
  requests to the number of total HT requests.
  And HT request coverage is defined as the ratio of the number of useful
@@ -357,10 +361,7 @@ Useless
 
  Ht request is one whose brought data is replaced before it is hit by a
  MT request.
-\end_layout
-
-\begin_layout Standard
-However the above accuracy and coverage metrics for HT requests and the
+ However the above accuracy and coverage metrics for HT requests and the
  classification of 
 \begin_inset Quotes eld
 \end_inset
@@ -377,336 +378,81 @@ Useless
 \begin_inset Quotes erd
 \end_inset
 
- HT requests don't care about cache pollution and HT request lateness, which
- are two kinds of deficiencies in the HT scheme.
+ HT requests don't care about the cache pollution and inter-thread interference
+ caused by HT LLC requests, which are two kinds of deficiencies in the HT
+ scheme.
  
 \end_layout
 
 \begin_layout Standard
-In this paper, based on the idea of cache pollution and HT request lateness,
- we present a taxonomy of HT requests to evaluate the effectiveness of the
- helper-threaded data prefetching on CMPs, in the aim of providing insights
- on designing and implementing effective LLC content management mechanisms
- for the HT scheme.
+In this paper, we present the dynamic LLC replacement technique for helper
+ threaded data prefetching on CMPs, based on a pollution-aware taxonomy
+ of HT LLC requests.
+ Firstly, the experimental methodology used in this work are discussed.
+ Secondly, a pollution aware taxonomy of HT LLC requests is presented from
+ the view of the contribution of HT LLC requests to the MT performance,
+ in the aim of providing insights on designing and implementing effective
+ LLC replacement techniques for the HT scheme.
+ Thirdly, based on the intuition of the result of the taxonomy applied to
+ the Pthreads based helper threaded version of the memory-intensive mst
+ benchmark in Olden, the dynamic LLC replacement for helper threaded data
+ prefetching on CMPs are elaborated.
+ Experimental results from cycle accurate simulation show that: (1) there
+ is non-trivial LLC pollution caused by HT in helper-threaded data prefetching
+ on CMPs; (2) LLC request taxonomy based dynamic LLC replacement can improve
+ the effectiveness and timeliness of helper-threaded data prefetching on
+ CMPs.
  We assume here a two level cache hierarchy where L1 caches are private
  and the L2 cache is shared among all processor cores on a single chip.
  
 \end_layout
 
 \begin_layout Standard
-The main contributions of this paper can be summarized as follows:
-\color red
- 
+The main contributions of this paper can be summarized as answers for the
+ following two questions:
 \end_layout
 
 \begin_layout Enumerate
-Proposes the cycle-accurate multicore simulation framework to evaluate the
- cache pollution effects and lateness for HT requests in the helper thread
- scheme for CMPs.
+How can the HT LLC requests be classified based on the cache pollution and
+ inter-thread LLC interference caused by HT LLC requests in helper threaded
+ data prefetching on CMPs (or the HT scheme)?
 \end_layout
 
 \begin_layout Enumerate
-Presents the cache pollution aware classification of 
-\begin_inset Quotes eld
-\end_inset
-
-good
-\begin_inset Quotes erd
-\end_inset
-
-, 
-\begin_inset Quotes eld
-\end_inset
-
-bad
-\begin_inset Quotes erd
-\end_inset
-
- and 
-\begin_inset Quotes eld
-\end_inset
-
-ugly
-\begin_inset Quotes erd
-\end_inset
-
- HT requests.
-\end_layout
-
-\begin_layout Enumerate
-Presents the lateness measurement of HT requests which is a good indicator
- for potential improvement of the HT scheme.
+How can LLC replacement be improved based on the observed result of the
+ proposed pollution-aware HT LLC request taxonomy in the HT scheme?
 \end_layout
 
 \begin_layout Standard
-Firstly, the taxonomy is proposed.
- Secondly, the hardware changes to support the taxonomy and algorithms for
- tracking HT requests and victims.
- Lastly, results of memory-intensive benchmarks from Olden and CPU2006 show
- that: (1) there is notable cache pollution caused by helper-threaded data
- prefetching on CMPs; (2) there is room for improving the effectiveness
- and timeliness of helper-threaded data prefetching on CMPs.
-\end_layout
-
-\begin_layout Standard
-The remaining of the paper is organized as follows.
- Section 2 presents a taxonomy of HT requests to assist evaluating shared
- LLC pollution caused by helper-threaded data prefetching on CMPs, the hardware
- changes to support the taxonomy and algorithms for tracking HT requests
- and victims.
- Section 3 presents the results.
- Section 4 shows the previous work.
- Section 5 concludes the paper.
+The rest of this paper is organized as follows.
+ Section 3 presents the experimental methodology used in this work.
+ Section 2 presents the pollution aware taxonomy of HT requests and the
+ experimental result of mst in Olden.
+ Section 4 discusses the dynamic LLC replacement for helper threaded data
+ prefetching on CMPs and its experimental results.
+ Section 5 talks about related work.
+ In section 6 we conclude the paper.
 \end_layout
 
 \begin_layout Section
-Methodology
-\end_layout
-
-\begin_layout Subsection
-A Taxonomy of HT requests 
+Experimental Methodology
 \end_layout
 
 \begin_layout Standard
-As illustrated in Tab.
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "tab:HT-Request-Taxonomy"
-
-\end_inset
-
-, We propose a taxonomy of HT requests based on the cache pollution and
- HT request lateness.
- Among these types of HT requests, good HT requests have positive impact
- on MT performance.
- Ugly HT requests have little performance impact on MT performance because
- the requested data are not referenced by MT before evicted and they do
- not evict any data that will be used by MT.
- Bad HT requests are harmful for MT performance which should be prevented
- as much as possible.
- Late HT requests are good indicators for potential performance improvement
- of the HT scheme because late HT requests may be converted to good HT requests
- by finetuning the parameters of the HT scheme.
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float table
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-HT Request Taxonomy
-\begin_inset CommandInset label
-LatexCommand label
-name "tab:HT-Request-Taxonomy"
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\align center
-
-\size scriptsize
-\begin_inset Tabular
-<lyxtabular version="3" rows="5" columns="2">
-<features tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0">
-<column alignment="left" valignment="top" width="0">
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-Name
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-Description
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-Good HT requests
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-HT requests that hit by MT before evicted
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-Bad HT requests
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-\begin_inset Box Frameless
-position "t"
-hor_pos "c"
-has_inner_box 1
-inner_pos "t"
-use_parbox 0
-use_makebox 0
-width "68col%"
-special "none"
-height "1.1in"
-height_special "totalheight"
-status open
-
-\begin_layout Plain Layout
-
-\size scriptsize
-HT requests whose requested data are used later (or not used at all) by
- MT than the evicted data
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-Ugly HT requests
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-Requests that are not good or bad
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-Late HT requests
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-In-flight HT requests that hit by MT requests
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Subsection
-Hardware Support
-\end_layout
-
-\begin_layout Subsubsection
-Experimental Setup
-\end_layout
-
-\begin_layout Standard
-We use an in-house multicore architectural simulator named Archimulator
- in our experiments mentioned in this work.
- Archimulator is an execution-driven architectural simulator written in
- Java and running on Linux.
- It provides cycle-accurate application-only simulation of MIPS II executables
- on multicore architectures consisting of OoO super-scalar cores and configurabl
-e memory hierarchy of directory-based MESI coherence.
- It has support of simulating Pthreads based parallel workloads.
+We use an in-house CMP architectural simulator named Archimulator in our
+ experiments mentioned in this work.
+ Archimulator is a flexible execution-driven architectural simulator written
+ in Java and running on Linux.
+ It provides fast forward functional simulation and cycle-accurate application-o
+nly simulation of MIPSII executables on multicore architectures consisting
+ of out-of-order super-scalar cores and configurable memory hierarchy of
+ directory-based MESI coherence.
+ It has basic support of simulating Pthreads based multithreaded workloads.
  
 \end_layout
 
-\begin_layout Subsubsection
-Target CMP Architecture
+\begin_layout Subsection
+Simulated CMP Architecture
 \end_layout
 
 \begin_layout Standard
@@ -722,7 +468,9 @@ reference "fig:Simulated-CMP-Architecture"
  32KB 4-way instruction caches).
  Both cores share a 4MB 8-way L2 cacche.
  MESI coherence is maintained between L1 caches.
- Detailed parameters are shown in Tab.
+ An LRU cache called HTRVC is attached to the LLC(L2) to implement the taxonommy
+ of HT LLC requests, which will be detailed in the next section.
+ Detailed microarchitecture parameters are listed in Tab.
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:Baseline-Hardware-Configurations"
@@ -737,13 +485,13 @@ reference "tab:Baseline-Hardware-Configurations"
 \begin_inset Float figure
 wide false
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
 	filename /home/itecgo/Archimulator/doc/res/cacheconfig.pdf
-	scale 68
+	scale 58
 	BoundingBox 30bp 475bp 330bp 760bp
 	clip
 
@@ -1848,7 +1596,7 @@ name "tab:Baseline-Hardware-Configurations"
 
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsection
 Software Context to Hardware Thread Mapping
 \end_layout
 
@@ -1863,8 +1611,19 @@ For a typical Pthreads based HT program, there are three threads when running:
 ion, one hardware thread can only run at least one software context (or
  simply called thread).
  Therefore, the typical software context to hardware thread mappings can
- be: C0T0 -> MT, C0T1 -> Pthreads manager thread, C1T0 -> HT (C = core,
- T = thread), as shown in Fig.
+ be: C0T0 
+\begin_inset Formula $\rightarrow$
+\end_inset
+
+ MT, C0T1 
+\begin_inset Formula $\rightarrow$
+\end_inset
+
+ Pthreads manager thread, C1T0 
+\begin_inset Formula $\rightarrow$
+\end_inset
+
+ HT (C = core, T = thread), as shown in Fig.
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "fig:Simulated-CMP-Architecture"
@@ -1876,78 +1635,342 @@ reference "fig:Simulated-CMP-Architecture"
  
 \end_layout
 
-\begin_layout Subsubsection
-Hardware Changes
-\end_layout
-
-\begin_layout Paragraph
-LLC request and replacement event tracking
+\begin_layout Subsection
+ROI Based Two Phase Fast Simulation of Helper Threaded Workloads
 \end_layout
 
 \begin_layout Standard
-To monitor the request and replacement activities in LLC, we need to consider
- the event when the LLC receives a request coming from the upper level cache,
- whether it is a hit or a miss.
- The event has a few important properties to be used in the experiment,
- e.g., the address of the requested LLC line, the requester memory hierarchy
- access, line found in the LLC, a boolean value indicating whether the request
- hits in the LLC, and a boolean value indicating whether the request needs
- to evict some LLC line.
- This event is similar to one used in 
-\begin_inset CommandInset citation
-LatexCommand cite
-key "Mehta2004"
+As shown in Fig.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Helper-Threaded-Data-Prefetching-on-CMPs"
 
 \end_inset
 
-.
-\end_layout
+, Here we use two phase simulation technique to speedup the simulation of
+ benchmark executions.
+ We utilize the special case when a MIPS32 assembly instruction 
+\family typewriter
+addi
+\family default
+ is invoked with register operands being R0: 
+\family typewriter
+addi R0, R0, imm
+\family default
+ to indicate the spawning point of the helper thread (named by 
+\begin_inset Quotes eld
+\end_inset
 
-\begin_layout Paragraph
-LLC HT request state tracking
+HT Spawn
+\begin_inset Quotes erd
+\end_inset
+
+: 
+\family typewriter
+addi R0, R0, 
+\family default
+3720).
+ Since the code executed after encountering the 
+\begin_inset Quotes eld
+\end_inset
+
+HT spawn
+\begin_inset Quotes erd
+\end_inset
+
+ is our region of interest in this work, code execution before encountering
+ the 
+\begin_inset Quotes eld
+\end_inset
+
+HT spawn
+\begin_inset Quotes erd
+\end_inset
+
+ can be simulated functionally without the hassle of modeling the microarchitect
+ure details while not hurting the experimental results.
+ To take cache warmup into account, we simulate in the detailed simulation
+ mode 200 million instructions in the main thread after 
+\begin_inset Quotes eld
+\end_inset
+
+HT Spawn
+\begin_inset Quotes erd
+\end_inset
+
+ pseudocall is encountered.
 \end_layout
 
 \begin_layout Standard
-In order to track the HT request states in the LLC, we need to add one field
- to each LLC line to indicate whether the line is brought by the main thread
- (MT) or the helper thread (HT) or otherwise invalid (INVALID).
- 
-\end_layout
+\align center
+\begin_inset Float figure
+wide false
+sideways false
+status open
 
-\begin_layout Paragraph
-LLC HT request victim state tracking
-\end_layout
-
-\begin_layout Standard
-In order to track victims replaced by HT requests, we need to add an LRU
- cache named HT Request Victim Cache (HTRVC) to maintain the LLC lines that
- are evicted by HT requests.
- Similar to the evict table used in 
-\begin_inset CommandInset citation
-LatexCommand cite
-key "Mehta2004"
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename ht_scheme.pdf
+	scale 32
+	BoundingBox 30bp 38bp 810bp 538bp
+	clip
 
 \end_inset
 
-, the HTRVC has the same structure of the LLC, but there is no direct mapping
- between LLC lines and HTRVC lines.
- HTRVC has only the purpose of profiling, so it has no impact on performance.
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Caption
+
+\begin_layout Plain Layout
+ROI Based Two Phase Fast Simulation of Helper Threaded Data Prefetching
+ on CMPs
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Helper-Threaded-Data-Prefetching-on-CMPs"
+
+\end_inset
+
+
 \end_layout
 
-\begin_layout Paragraph
-Detecting Late HT Requests
+\end_inset
+
+
 \end_layout
 
-\begin_layout Standard
-Lastly, in order to measure late HT requests, we only need to identify the
- event when an MT request hits to an LLC line which is being brought by
- an inflight HT request coming from the upper level cache.
- This can be accomplished by monitoring the LLC MSHRs or similar hardware
- components.
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Pollution Aware Taxonomy of HT LLC Requests
 \end_layout
 
 \begin_layout Subsection
-Algorithms for Tracking HT Requests and Victims
+Definitions
+\end_layout
+
+\begin_layout Standard
+As illustrated in Tab.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "tab:HT-Request-Taxonomy"
+
+\end_inset
+
+, We propose a taxonomy of HT requests based on the cache pollution and
+ HT request lateness.
+ Among these types of HT requests, good HT requests have positive impact
+ on MT performance.
+ Ugly HT requests have little performance impact on MT performance because
+ the requested data are not referenced by MT before evicted and they do
+ not evict any data that will be used by MT.
+ Bad HT requests are harmful for MT performance which should be prevented
+ as much as possible.
+ Late HT requests are good indicators for potential performance improvement
+ of the HT scheme because late HT requests may be converted to good HT requests
+ by finetuning the parameters of the HT scheme.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+HT Request Taxonomy
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:HT-Request-Taxonomy"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+
+\size scriptsize
+\begin_inset Tabular
+<lyxtabular version="3" rows="5" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0">
+<column alignment="left" valignment="top" width="0">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size scriptsize
+Name
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size scriptsize
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size scriptsize
+Good HT requests
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size scriptsize
+HT requests that hit by MT before evicted
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size scriptsize
+Bad HT requests
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size scriptsize
+\begin_inset Box Frameless
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "68col%"
+special "none"
+height "1.1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+
+\size scriptsize
+HT requests whose requested data are used later (or not used at all) by
+ MT than the evicted data
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size scriptsize
+Ugly HT requests
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size scriptsize
+Requests that are not good or bad
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size scriptsize
+Late HT requests
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size scriptsize
+In-flight HT requests that hit by MT requests
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Algorithms for Tracking HT LLC Requests and Victims
 \end_layout
 
 \begin_layout Standard
@@ -1958,6 +1981,7 @@ There are two invariants that should be maintained:
 # of HT Lines in the LLC Set = # of Victim Entries in the HTRVC Set;
 \end_layout
 
+\begin_deeper
 \begin_layout Enumerate
 # of Victim Entries in HTRVC Set + # of Valid MT LLC Lines in Set ≤ LLC
  Set Associativity.
@@ -2024,7 +2048,7 @@ reference "fig:LLC-Line-Brought-In"
 \begin_inset Float figure
 wide false
 sideways false
-status open
+status collapsed
 
 \begin_layout Plain Layout
 \begin_inset listings
@@ -2258,7 +2282,7 @@ reference "fig:Servicing-MT-and-HT-requests"
 \begin_inset Float figure
 wide false
 sideways false
-status open
+status collapsed
 
 \begin_layout Plain Layout
 \begin_inset listings
@@ -2400,7 +2424,78 @@ name "fig:Servicing-MT-and-HT-requests"
 
 \end_layout
 
-\begin_layout Section
+\end_deeper
+\begin_layout Subsection
+Hardware Support for the Pollution-Aware Taxonomy of HT LLC Requests
+\end_layout
+
+\begin_layout Subsubsection
+LLC request and replacement event tracking
+\end_layout
+
+\begin_layout Standard
+To monitor the request and replacement activities in LLC, we need to consider
+ the event when the LLC receives a request coming from the upper level cache,
+ whether it is a hit or a miss.
+ The event has a few important properties to be used in the experiment,
+ e.g., the address of the requested LLC line, the requester memory hierarchy
+ access, line found in the LLC, a boolean value indicating whether the request
+ hits in the LLC, and a boolean value indicating whether the request needs
+ to evict some LLC line.
+ This event is similar to one used in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Mehta2004"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsubsection
+LLC HT request state tracking
+\end_layout
+
+\begin_layout Standard
+In order to track the HT request states in the LLC, we need to add one field
+ to each LLC line to indicate whether the line is brought by the main thread
+ (MT) or the helper thread (HT) or otherwise invalid (INVALID).
+ 
+\end_layout
+
+\begin_layout Subsubsection
+LLC HT request victim state tracking
+\end_layout
+
+\begin_layout Standard
+In order to track victims replaced by HT requests, we need to add an LRU
+ cache named HT Request Victim Cache (HTRVC) to maintain the LLC lines that
+ are evicted by HT requests.
+ Similar to the evict table used in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Mehta2004"
+
+\end_inset
+
+, the HTRVC has the same structure of the LLC, but there is no direct mapping
+ between LLC lines and HTRVC lines.
+ HTRVC has only the purpose of profiling, so it has no impact on performance.
+\end_layout
+
+\begin_layout Subsubsection
+Detecting Late HT Requests
+\end_layout
+
+\begin_layout Standard
+Lastly, in order to measure late HT requests, we only need to identify the
+ event when an MT request hits to an LLC line which is being brought by
+ an inflight HT request coming from the upper level cache.
+ This can be accomplished by monitoring the LLC MSHRs or equivalent hardware
+ components.
+\end_layout
+
+\begin_layout Subsection
 Results
 \end_layout
 
@@ -2550,7 +2645,15 @@ llc.lateHtRequests: 69075
 
 \end_deeper
 \begin_layout Section
-Previous Work
+Dyanamic LLC Replacement for Helper Threaded Data Prefetching on CMPs
+\end_layout
+
+\begin_layout Subsection
+Results
+\end_layout
+
+\begin_layout Section
+Related Work
 \end_layout
 
 \begin_layout Standard

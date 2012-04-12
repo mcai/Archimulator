@@ -68,10 +68,12 @@ public class MonitorStartup {
                     }
                 }
 
+                System.out.println("numRunningExperimentProfiles: " + numRunningExperimentProfiles);
+
                 arduinoHelper.blink(numRunningExperimentProfiles);
 
                 try {
-                    Thread.sleep(10000);
+                    Thread.sleep(30000);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
