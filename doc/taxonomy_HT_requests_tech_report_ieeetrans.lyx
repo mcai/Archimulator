@@ -1601,7 +1601,7 @@ Software Context to Hardware Thread Mapping
 \end_layout
 
 \begin_layout Standard
-For a typical Pthreads based HT program, there are three threads when running:
+In a typical Pthreads based HT program, there are three threads when running:
  MT, HT and the Pthreads manager thread.
  The Pthreads manager thread takes the role of spawning, pausing and resuming
  HT by passing signals to HT.
@@ -1636,7 +1636,7 @@ reference "fig:Simulated-CMP-Architecture"
 \end_layout
 
 \begin_layout Subsection
-ROI Based Two Phase Fast Simulation of Helper Threaded Workloads
+ROI Based Two-Phase Fast Simulation of Helper Threaded Workloads
 \end_layout
 
 \begin_layout Standard
@@ -1647,8 +1647,8 @@ reference "fig:Helper-Threaded-Data-Prefetching-on-CMPs"
 
 \end_inset
 
-, Here we use two phase simulation technique to speedup the simulation of
- benchmark executions.
+, here we use two-phase simulation strategy to reduce simulaton time of
+ memory-intensive benchmark executions which often take very long to complete.
  We utilize the special case when a MIPS32 assembly instruction 
 \family typewriter
 addi
@@ -1678,8 +1678,8 @@ HT spawn
 \begin_inset Quotes erd
 \end_inset
 
- is our region of interest in this work, code execution before encountering
- the 
+ is our region of interest (ROI) in this work, code execution before encounterin
+g the 
 \begin_inset Quotes eld
 \end_inset
 
@@ -1689,8 +1689,8 @@ HT spawn
 
  can be simulated functionally without the hassle of modeling the microarchitect
 ure details while not hurting the experimental results.
- To take cache warmup into account, we simulate in the detailed simulation
- mode 200 million instructions in the main thread after 
+ To ensure caches are warmed up, we simulate in the detailed simulation
+ mode 200 million instructions in the main thread after the 
 \begin_inset Quotes eld
 \end_inset
 
@@ -1752,7 +1752,102 @@ Pollution Aware Taxonomy of HT LLC Requests
 \end_layout
 
 \begin_layout Subsection
-Definitions
+A Taxonomy Based on HT-MT Inter-Thread and MT Intra-Thread Reuse Distances
+\end_layout
+
+\begin_layout Standard
+We propose a pollution aware taxonomy of HT LLC requests based on the observed
+ cache pollution caused by HT LLC requests.
+\end_layout
+
+\begin_layout Standard
+The notion of inter-thread reuse distance is proposed to help explain the
+ taxonomy.
+ The traditional intra-thread reuse distance of a reference to data element
+ x is defined as the number of distinct data elements that have been referenced
+ between two contiguous accesses of x (or ∞ if the element has not been
+ referenced thereafter).
+ These two contiguous accesses are issued by the same thread in the traditional
+ notion.
+ To accomodate the case where one thread Tb accesses data element x that
+ has been previously brought into the cache by another thread Ta, we introduce
+ the notion of Ta-Tb inter-thread reuse distance, as compared to the traditional
+ intra-thread reuse distance.
+ Therefore, we could use HT-MT inter-thread reuse distance to describe the
+ case where the main thread accesses data element x that has been previously
+ brought into the LLC by the helper thread.
+ 
+\end_layout
+
+\begin_layout Standard
+Based on the notions of HT-MT inter-thread reuse distance (HT-MT_ITRD) and
+ MT intra-thread reuse distance (MT_RD), we can classify the HT LLC requests
+ into three types: good, bad and ugly.
+ Let's assume that when an HT LLC request with data 
+\family typewriter
+d
+\family default
+ evicts the LLC line containing victim data 
+\family typewriter
+v
+\family default
+ which is brought by MT, and afterwards the LLC line containing 
+\family typewriter
+d
+\family default
+ is evicted by an MT LLC request with data 
+\family typewriter
+m
+\family default
+, then we can see that: 
+\end_layout
+
+\begin_layout Enumerate
+HT-MT_ITRD(
+\family typewriter
+d
+\family default
+) < MT_RD(
+\family typewriter
+v
+\family default
+) < MT_RD(
+\family typewriter
+m
+\family default
+) , indicating it's a good HT request;
+\end_layout
+
+\begin_layout Enumerate
+MT_RD(
+\family typewriter
+v
+\family default
+) < HT-MT_ITRD(
+\family typewriter
+d
+\family default
+) < MT_RD(
+\family typewriter
+m
+\family default
+) , indicating it's a bad HT request; 
+\end_layout
+
+\begin_layout Enumerate
+MT_RD(
+\family typewriter
+m
+\family default
+) < HT_MT_ITRD(
+\family typewriter
+d
+\family default
+), MT_RD(
+\family typewriter
+m
+\family default
+), indicating it's an ugly HT request.
 \end_layout
 
 \begin_layout Standard
@@ -1763,25 +1858,29 @@ reference "tab:HT-Request-Taxonomy"
 
 \end_inset
 
-, We propose a taxonomy of HT requests based on the cache pollution and
- HT request lateness.
- Among these types of HT requests, good HT requests have positive impact
- on MT performance.
+, among these three types of HT requests, good HT requests have positive
+ impact on MT performance.
  Ugly HT requests have little performance impact on MT performance because
  the requested data are not referenced by MT before evicted and they do
  not evict any data that will be used by MT.
  Bad HT requests are harmful for MT performance which should be prevented
  as much as possible.
- Late HT requests are good indicators for potential performance improvement
- of the HT scheme because late HT requests may be converted to good HT requests
- by finetuning the parameters of the HT scheme.
+ 
+\end_layout
+
+\begin_layout Standard
+Among good HT requests, late HT requests should be differentiated, which
+ are in-flight HT LLC requests that are hit by MT LLC requests, as they
+ are good indicators for potential performance improvement of the HT scheme
+ because late HT requests may be converted to timely HT requests by finetuning
+ the parameters of the HT scheme.
 \end_layout
 
 \begin_layout Standard
 \begin_inset Float table
 wide false
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset Caption
@@ -1811,7 +1910,7 @@ name "tab:HT-Request-Taxonomy"
 
 \size scriptsize
 \begin_inset Tabular
-<lyxtabular version="3" rows="5" columns="2">
+<lyxtabular version="3" rows="4" columns="2">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0">
 <column alignment="left" valignment="top" width="0">
@@ -1910,7 +2009,7 @@ HT requests whose requested data are used later (or not used at all) by
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -1921,37 +2020,13 @@ Ugly HT requests
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-Requests that are not good or bad
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-Late HT requests
-\end_layout
-
-\end_inset
-</cell>
 <cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 
 \size scriptsize
-In-flight HT requests that hit by MT requests
+Requests that are not good or bad
 \end_layout
 
 \end_inset
@@ -1967,6 +2042,76 @@ In-flight HT requests that hit by MT requests
 \end_inset
 
 
+\end_layout
+
+\begin_layout Subsection
+Hardware Support for the Pollution-Aware Taxonomy of HT LLC Requests
+\end_layout
+
+\begin_layout Subsubsection
+LLC request and replacement event tracking
+\end_layout
+
+\begin_layout Standard
+To monitor the request and replacement activities in LLC, we need to consider
+ the event when the LLC receives a request coming from the upper level cache,
+ whether it is a hit or a miss.
+ The event has a few important properties to be used in the experiment,
+ e.g., the address of the requested LLC line, the requester memory hierarchy
+ access, line found in the LLC, a boolean value indicating whether the request
+ hits in the LLC, and a boolean value indicating whether the request needs
+ to evict some LLC line.
+ This event is similar to one used in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Mehta2004"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsubsection
+LLC HT request state tracking
+\end_layout
+
+\begin_layout Standard
+In order to track the HT request states in the LLC, we need to add one field
+ to each LLC line to indicate whether the line is brought by the main thread
+ (MT) or the helper thread (HT) or otherwise invalid (INVALID).
+ 
+\end_layout
+
+\begin_layout Subsubsection
+LLC HT request victim state tracking
+\end_layout
+
+\begin_layout Standard
+In order to track victims replaced by HT requests, we need to add an LRU
+ cache named HT Request Victim Cache (HTRVC) to maintain the LLC lines that
+ are evicted by HT requests.
+ Similar to the evict table used in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Mehta2004"
+
+\end_inset
+
+, the HTRVC has the same structure of the LLC, but there is no direct mapping
+ between LLC lines and HTRVC lines.
+ HTRVC has only the purpose of profiling, so it has no impact on performance.
+\end_layout
+
+\begin_layout Subsubsection
+Detecting Late HT Requests
+\end_layout
+
+\begin_layout Standard
+Lastly, in order to measure late HT requests, we only need to identify the
+ event when an MT request hits to an LLC line which is being brought by
+ an inflight HT request coming from the upper level cache.
+ This can be accomplished by monitoring the LLC MSHRs or equivalent hardware
+ components.
 \end_layout
 
 \begin_layout Subsection
@@ -2426,76 +2571,6 @@ name "fig:Servicing-MT-and-HT-requests"
 
 \end_deeper
 \begin_layout Subsection
-Hardware Support for the Pollution-Aware Taxonomy of HT LLC Requests
-\end_layout
-
-\begin_layout Subsubsection
-LLC request and replacement event tracking
-\end_layout
-
-\begin_layout Standard
-To monitor the request and replacement activities in LLC, we need to consider
- the event when the LLC receives a request coming from the upper level cache,
- whether it is a hit or a miss.
- The event has a few important properties to be used in the experiment,
- e.g., the address of the requested LLC line, the requester memory hierarchy
- access, line found in the LLC, a boolean value indicating whether the request
- hits in the LLC, and a boolean value indicating whether the request needs
- to evict some LLC line.
- This event is similar to one used in 
-\begin_inset CommandInset citation
-LatexCommand cite
-key "Mehta2004"
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Subsubsection
-LLC HT request state tracking
-\end_layout
-
-\begin_layout Standard
-In order to track the HT request states in the LLC, we need to add one field
- to each LLC line to indicate whether the line is brought by the main thread
- (MT) or the helper thread (HT) or otherwise invalid (INVALID).
- 
-\end_layout
-
-\begin_layout Subsubsection
-LLC HT request victim state tracking
-\end_layout
-
-\begin_layout Standard
-In order to track victims replaced by HT requests, we need to add an LRU
- cache named HT Request Victim Cache (HTRVC) to maintain the LLC lines that
- are evicted by HT requests.
- Similar to the evict table used in 
-\begin_inset CommandInset citation
-LatexCommand cite
-key "Mehta2004"
-
-\end_inset
-
-, the HTRVC has the same structure of the LLC, but there is no direct mapping
- between LLC lines and HTRVC lines.
- HTRVC has only the purpose of profiling, so it has no impact on performance.
-\end_layout
-
-\begin_layout Subsubsection
-Detecting Late HT Requests
-\end_layout
-
-\begin_layout Standard
-Lastly, in order to measure late HT requests, we only need to identify the
- event when an MT request hits to an LLC line which is being brought by
- an inflight HT request coming from the upper level cache.
- This can be accomplished by monitoring the LLC MSHRs or equivalent hardware
- components.
-\end_layout
-
-\begin_layout Subsection
 Results
 \end_layout
 
@@ -2664,9 +2739,9 @@ key "Mehta2004"
 \end_inset
 
  presents a taxonomy of hardware prefetches based on the idea of shared
- cache pollution.
- A hardware structure called the Evict Table (ET) is added to the LLC to
- gauge the amount of shared cache pollution caused by hardware prefetching.
+ cache pollution in the hardware based data prefetching for shared L2 CMP.
+ A hardware structure called the Evict Table (ET) is attached to the LLC
+ to gauge the amount of shared cache pollution caused by hardware prefetching.
  
 \begin_inset CommandInset citation
 LatexCommand cite
