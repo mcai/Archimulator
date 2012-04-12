@@ -45,7 +45,7 @@ public class ManagementStartup {
             factory.setConnectTimeout(20000);
             factory.setOverloadEnabled(true);
 
-            this.archimulatorService = (ArchimulatorService) factory.create(ArchimulatorService.class, GuestStartup.SERVICE_URL);
+            this.archimulatorService = (ArchimulatorService) factory.create(ArchimulatorService.class, SERVICE_URL);
         } catch (MalformedURLException e) {
             recordException(e);
             throw new RuntimeException(e);
@@ -103,6 +103,7 @@ public class ManagementStartup {
 
         int pthreadSpawnedIndex = 3720;
         int maxInsts = 200000000;
+//        int maxInsts = 20000;
 
         List<ProcessorProfile> processorProfiles = this.archimulatorService.getProcessorProfilesAsList();
 
@@ -124,16 +125,16 @@ public class ManagementStartup {
                     }
                 }
             }
-//            else if(processorProfile.getL2EvictionPolicyClz().equals(LLCHTAwareLRUPolicy.class)) {
-//                for(SimulatedProgram simulatedProgram : simulatedPrograms) {
-//                    if(simulatedProgram.getTitle().startsWith("mst_ht")) {
-//                        ExperimentProfile experimentProfile = new ExperimentProfile(simulatedProgram.getTitle() + "-" + processorProfile.getTitle(), processorProfile);
-//                        experimentProfile.addWorkload(simulatedProgram);
-//                        experimentProfile.fastForwardToPseudoCallAndInDetailForMaxInsts(pthreadSpawnedIndex, maxInsts);
-//                        experimentProfiles.add(experimentProfile);
-//                    }
-//                }
-//            }
+            else if(processorProfile.getL2EvictionPolicyClz().equals(LLCHTAwareLRUPolicy.class)) {
+                for(SimulatedProgram simulatedProgram : simulatedPrograms) {
+                    if(simulatedProgram.getTitle().startsWith("mst_ht")) {
+                        ExperimentProfile experimentProfile = new ExperimentProfile(simulatedProgram.getTitle() + "-" + processorProfile.getTitle(), processorProfile);
+                        experimentProfile.addWorkload(simulatedProgram);
+                        experimentProfile.fastForwardToPseudoCallAndInDetailForMaxInsts(pthreadSpawnedIndex, maxInsts);
+                        experimentProfiles.add(experimentProfile);
+                    }
+                }
+            }
         }
 
         ///////////////////
@@ -188,11 +189,19 @@ public class ManagementStartup {
         this.archimulatorService.setUserPassword(ArchimulatorServiceImpl.USER_ID_ADMIN, ArchimulatorServiceImpl.USER_INITIAL_PASSWORD_ADMIN);
     }
 
+    //    public static final String SERVICE_URL = "http://204.152.205.131:8080/archimulator/archimulator";
+    //    public static final String SERVICE_URL = "http://50.117.112.114:8080/archimulator/archimulator";
+    //    public static final String SERVICE_URL = "http://[2607:f358:10:13::2]:8080/archimulator/archimulator";
+//        public static final String SERVICE_URL = "http://localhost:8080/api";
+//    public static final String SERVICE_URL = "http://[2607:f358:10:13::2]/api";
+        public static final String SERVICE_URL = "http://www.archimulator.com/api";
+
     public static final SimulatedProgram SIMULATED_PROGRAM_MST_BASELINE = new SimulatedProgram(
             "mst_baseline", ExperimentProfile.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/baseline",
             "mst.mips",
 //            "10000");
 //            "100");
+//            "400");
 //            "1024");
 //            "2000");
             "4000");
@@ -203,6 +212,7 @@ public class ManagementStartup {
                 "mst.mips",
 //                "10000");
 //                "100");
+//                "400");
 //                "1024");
 //                "2000");
                 "4000");

@@ -123,6 +123,8 @@ Paper hints:
        fore, have a short lifetime in the cache. In contrast, small RRPVs
        comparatively have a longer lifetime in the cache.
 
+Arduino from Java:
+-Djava.library.path="/home/itecgo/Tools/arduino-1.0/lib"
 
 
 

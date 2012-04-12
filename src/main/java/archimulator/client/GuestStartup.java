@@ -18,10 +18,10 @@
  ******************************************************************************/
 package archimulator.client;
 
+import archimulator.service.ArchimulatorService;
 import archimulator.sim.base.experiment.Experiment;
 import archimulator.sim.base.experiment.profile.ExperimentProfile;
 import archimulator.sim.base.simulation.Simulation;
-import archimulator.service.ArchimulatorService;
 import archimulator.util.DateHelper;
 import archimulator.util.UpdateHelper;
 import archimulator.util.action.Action1;
@@ -49,7 +49,7 @@ public class GuestStartup {
             factory.setConnectTimeout(20000);
             factory.setOverloadEnabled(true);
 
-            this.archimulatorService = (ArchimulatorService) factory.create(ArchimulatorService.class, SERVICE_URL);
+            this.archimulatorService = (ArchimulatorService) factory.create(ArchimulatorService.class, ManagementStartup.SERVICE_URL);
         } catch (MalformedURLException e) {
             recordException(e);
             throw new RuntimeException(e);
@@ -154,58 +154,44 @@ public class GuestStartup {
                 experiment.getBlockingEventDispatcher().addListener(Simulation.PollStatsCompletedEvent.class, new Action1<Simulation.PollStatsCompletedEvent>() {
                     @Override
                     public void apply(final Simulation.PollStatsCompletedEvent event) {
-                        Thread threadNotify = new Thread() {
-                            @Override
-                            public void run() {
-                                try {
-                                    Map<String, Object> stats = event.getStats();
+                        try {
+                            Map<String, Object> stats = event.getStats();
 
-                                    Map<String, String> stats1 = new LinkedHashMap<String, String>();
-                                    for(String key : stats.keySet()) {
-                                        stats1.put(key, stats.get(key) + "");
-                                    }
-
-                                    archimulatorService.updateExperimentStatsById(experimentProfile.getId(), stats1);
-                                } catch (SQLException e) {
-                                    recordException(e);
-//                        throw new RuntimeException(e);
-                                } catch (Exception e) {
-                                    recordException(e);
-//                        throw new RuntimeException(e);
-                                }
+                            Map<String, String> stats1 = new LinkedHashMap<String, String>();
+                            for (String key : stats.keySet()) {
+                                stats1.put(key, stats.get(key) + "");
                             }
-                        };
-                        threadNotify.setDaemon(true);
-                        threadNotify.start();
+
+                            archimulatorService.updateExperimentStatsById(experimentProfile.getId(), stats1);
+                        } catch (SQLException e) {
+                            recordException(e);
+//                        throw new RuntimeException(e);
+                        } catch (Exception e) {
+                            recordException(e);
+//                        throw new RuntimeException(e);
+                        }
                     }
                 });
 
                 experiment.getBlockingEventDispatcher().addListener(Simulation.DumpStatsCompletedEvent.class, new Action1<Simulation.DumpStatsCompletedEvent>() {
                     @Override
                     public void apply(final Simulation.DumpStatsCompletedEvent event) {
-                        Thread threadNotify = new Thread() {
-                            @Override
-                            public void run() {
-                                try {
-                                    Map<String, Object> stats = event.getStats();
+                        try {
+                            Map<String, Object> stats = event.getStats();
 
-                                    Map<String, String> stats1 = new LinkedHashMap<String, String>();
-                                    for(String key : stats.keySet()) {
-                                        stats1.put(key, stats.get(key) + "");
-                                    }
-
-                                    archimulatorService.updateExperimentStatsById(experimentProfile.getId(), stats1);
-                                } catch (SQLException e) {
-                                    recordException(e);
-//                        throw new RuntimeException(e);
-                                } catch (Exception e) {
-                                    recordException(e);
-//                        throw new RuntimeException(e);
-                                }
+                            Map<String, String> stats1 = new LinkedHashMap<String, String>();
+                            for (String key : stats.keySet()) {
+                                stats1.put(key, stats.get(key) + "");
                             }
-                        };
-                        threadNotify.setDaemon(true);
-                        threadNotify.start();
+
+                            archimulatorService.updateExperimentStatsById(experimentProfile.getId(), stats1);
+                        } catch (SQLException e) {
+                            recordException(e);
+//                        throw new RuntimeException(e);
+                        } catch (Exception e) {
+                            recordException(e);
+//                        throw new RuntimeException(e);
+                        }
                     }
                 });
 
@@ -250,13 +236,6 @@ public class GuestStartup {
             this.archimulatorService.notifyExperimentStopped(experimentProfileId);
         }
     }
-
-//    public static final String SERVICE_URL = "http://204.152.205.131:8080/archimulator/archimulator";
-//    public static final String SERVICE_URL = "http://50.117.112.114:8080/archimulator/archimulator";
-//    public static final String SERVICE_URL = "http://[2607:f358:10:13::2]:8080/archimulator/archimulator";
-//    public static final String SERVICE_URL = "http://localhost:8080/api";
-    public static final String SERVICE_URL = "http://[2607:f358:10:13::2]/api";
-//    public static final String SERVICE_URL = "http://www.archimulator.com/api";
 
     public static void main(String[] args) {
         if (args.length >= 1 && args[0].equals("-s")) {

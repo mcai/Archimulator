@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.util.chart;
 
-import archimulator.client.GuestStartup;
+import archimulator.client.ManagementStartup;
 import archimulator.service.ArchimulatorService;
 import archimulator.sim.base.experiment.profile.ExperimentProfile;
 import archimulator.sim.base.experiment.profile.ExperimentProfileState;
@@ -178,7 +178,7 @@ public class ExperimentBarPlot {
         factory.setConnectTimeout(20000);
         factory.setOverloadEnabled(true);
 
-        ArchimulatorService archimulatorService = (ArchimulatorService) factory.create(ArchimulatorService.class, GuestStartup.SERVICE_URL);
+        ArchimulatorService archimulatorService = (ArchimulatorService) factory.create(ArchimulatorService.class, ManagementStartup.SERVICE_URL);
 
         ExperimentBarPlot experimentBarPlot = createHTLLCRequestDistributionBarPlot(archimulatorService);
 

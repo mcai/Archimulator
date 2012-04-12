@@ -119,7 +119,6 @@ public class Simulation implements SimulationObject {
 
         this.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
             public void apply(DumpStatEvent event) {
-                pollSimulationState();
                 dumpStat(event.getStats());
             }
         });
@@ -164,25 +163,7 @@ public class Simulation implements SimulationObject {
 
             Logger.info(Logger.SIMULATOR, "", this.cycleAccurateEventQueue.getCurrentCycle());
 
-            Timer timerDumpState = new Timer(true);
-            timerDumpState.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    Simulation.this.getCycleAccurateEventQueue().schedule(new NamedAction("Simulation.dumpState") {
-                        public void apply() {
-                            pollSimulationState();
-                        }
-                    }, 0);
-                }
-            }, 2000, 10000);
-
-            this.getBlockingEventDispatcher().dispatch(new SimulationStartedEvent());
-
             this.getStrategy().execute();
-
-            this.getBlockingEventDispatcher().dispatch(new SimulationStoppedEvent());
-
-            timerDumpState.cancel();
 
             if(!this.getStatsInFastForward().isEmpty()) {
                 MapHelper.save(this.getStatsInFastForward(), this.getConfig().getCwd() + "/stat_fastForward.txt");
@@ -215,26 +196,6 @@ public class Simulation implements SimulationObject {
         }
     }
 
-    private void pollSimulationState() {
-        Logger.infof(Logger.SIMULATION, "------ Simulation %s: BEGIN DUMP STATE at %s ------", this.cycleAccurateEventQueue.getCurrentCycle(), this.getConfig().getTitle(), new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(new Date()));
-
-        Map<String, Object> polledStats = new LinkedHashMap<String, Object>();
-
-        this.getBlockingEventDispatcher().dispatch(new PollStatsEvent(polledStats));
-        
-        polledStats = getStatsWithSimulationPrefix(polledStats);
-
-        for (Map.Entry<String, Object> entry : polledStats.entrySet()) {
-            Logger.infof(Logger.SIMULATION, "\t%s: %s", this.cycleAccurateEventQueue.getCurrentCycle(), entry.getKey(), entry.getValue());
-        }
-
-        this.blockingEventDispatcher.dispatch(new PollStatsCompletedEvent(polledStats));
-
-        this.getProcessor().getCacheHierarchy().dumpState();
-
-        Logger.info(Logger.SIMULATION, "------ END DUMP STATE ------\n", this.cycleAccurateEventQueue.getCurrentCycle());
-    }
-
     public static class PollStatsCompletedEvent implements BlockingEvent {
         private Map<String, Object> stats;
 
@@ -258,8 +219,8 @@ public class Simulation implements SimulationObject {
             return stats;
         }
     }
-    
-    private Map<String, Object> getStatsWithSimulationPrefix(Map<String, Object> stats) {
+
+    public Map<String, Object> getStatsWithSimulationPrefix(Map<String, Object> stats) {
         String title = this.getConfig().getTitle();
         String simulationPrefix = title.substring(title.indexOf("/") + 1);
 

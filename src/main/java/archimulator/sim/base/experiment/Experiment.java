@@ -18,11 +18,13 @@
  ******************************************************************************/
 package archimulator.sim.base.experiment;
 
+import archimulator.sim.base.event.PauseExperimentEvent;
+import archimulator.sim.base.event.PollStatsEvent;
+import archimulator.sim.base.event.StopExperimentEvent;
 import archimulator.sim.base.experiment.capability.*;
 import archimulator.sim.base.event.DumpStatEvent;
-import archimulator.sim.base.event.PauseSimulationEvent;
-import archimulator.sim.base.event.StopSimulationEvent;
 import archimulator.sim.base.simulation.ContextConfig;
+import archimulator.sim.base.simulation.Logger;
 import archimulator.sim.base.simulation.Simulation;
 import archimulator.sim.base.simulation.SimulationConfig;
 import archimulator.sim.base.simulation.strategy.SimulationStrategy;
@@ -32,6 +34,7 @@ import archimulator.sim.uncore.MemoryHierarchyConfig;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
 import archimulator.util.action.Action1;
 import archimulator.util.action.Function1X;
+import archimulator.util.action.NamedAction;
 import archimulator.util.event.BlockingEvent;
 import archimulator.util.event.BlockingEventDispatcher;
 import archimulator.util.event.CycleAccurateEventQueue;
@@ -66,6 +69,7 @@ public abstract class Experiment {
     private Thread threadStartExperiment;
 
     private Simulation simulation;
+    private Timer timerPollState;
 
     public Experiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs, int l2Size, int l2Associativity, Class<? extends EvictionPolicy> l2EvictionPolicyClz, List<Class<? extends SimulationCapability>> simulationCapabilityClasses, List<Class<? extends ProcessorCapability>> processorCapabilityClasses, List<Class<? extends KernelCapability>> kernelCapabilityClasses) {
         this.id = currentId++;
@@ -86,6 +90,7 @@ public abstract class Experiment {
 
         this.blockingEventDispatcher.addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
             public void apply(DumpStatEvent event) {
+                pollSimulationState();
                 dumpStats(event.getStats(), event.getType() == DumpStatEvent.Type.DETAILED_SIMULATION);
             }
         });
@@ -94,6 +99,32 @@ public abstract class Experiment {
 
         this.fsm = new FiniteStateMachine<ExperimentState, ExperimentCondition>(fsmFactory, title, ExperimentState.NOT_STARTED);
         this.fsm.put("experiment", this);
+
+        this.timerPollState = new Timer(true);
+    }
+
+    private void pollSimulationState() {
+        if(this.simulation == null) {
+            return;
+        }
+
+        Logger.infof(Logger.SIMULATION, "------ Simulation %s: BEGIN DUMP STATE at %s ------", this.cycleAccurateEventQueue.getCurrentCycle(), this.simulation.getConfig().getTitle(), new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(new Date()));
+
+        Map<String, Object> polledStats = new LinkedHashMap<String, Object>();
+
+        this.getBlockingEventDispatcher().dispatch(new PollStatsEvent(polledStats));
+
+        polledStats = this.simulation.getStatsWithSimulationPrefix(polledStats);
+
+        for (Map.Entry<String, Object> entry : polledStats.entrySet()) {
+            Logger.infof(Logger.SIMULATION, "\t%s: %s", this.cycleAccurateEventQueue.getCurrentCycle(), entry.getKey(), entry.getValue());
+        }
+
+        this.blockingEventDispatcher.dispatch(new Simulation.PollStatsCompletedEvent(polledStats));
+
+        this.simulation.getProcessor().getCacheHierarchy().dumpState();
+
+        Logger.info(Logger.SIMULATION, "------ END DUMP STATE ------\n", this.cycleAccurateEventQueue.getCurrentCycle());
     }
 
     private void dumpStats(Map<String, Object> stats, boolean detailedSimulation) {
@@ -200,6 +231,17 @@ public abstract class Experiment {
                         Thread threadStartExperiment = new Thread() {
                             @Override
                             public void run() {
+                                experiment.timerPollState.schedule(new TimerTask() {
+                                    @Override
+                                    public void run() {
+                                        experiment.getCycleAccurateEventQueue().schedule(new NamedAction("Simulation.pollState") {
+                                            public void apply() {
+                                                experiment.pollSimulationState();
+                                            }
+                                        }, 0);
+                                    }
+                                }, 2000, 10000);
+
                                 experiment.doStart();
 
                                 from.fireTransition(ExperimentCondition.STOP);
@@ -222,14 +264,14 @@ public abstract class Experiment {
                 .onCondition(ExperimentCondition.PAUSE, new Function1X<FiniteStateMachine<ExperimentState, ExperimentCondition>, ExperimentState>() {
                     public ExperimentState apply(FiniteStateMachine<ExperimentState, ExperimentCondition> from, Object... params) {
                         Experiment experiment = from.get(Experiment.class, "experiment");
-                        experiment.getBlockingEventDispatcher().dispatch(new PauseSimulationEvent());
+                        experiment.getBlockingEventDispatcher().dispatch(new PauseExperimentEvent());
                         return ExperimentState.PAUSED;
                     }
                 })
                 .onCondition(ExperimentCondition.STOP, new Function1X<FiniteStateMachine<ExperimentState, ExperimentCondition>, ExperimentState>() {
                     public ExperimentState apply(FiniteStateMachine<ExperimentState, ExperimentCondition> from, Object... params) {
                         Experiment experiment = from.get(Experiment.class, "experiment");
-                        experiment.getBlockingEventDispatcher().dispatch(new StopSimulationEvent());
+                        experiment.getBlockingEventDispatcher().dispatch(new StopExperimentEvent());
                         experiment.getBlockingEventDispatcher().clearListeners();
                         return ExperimentState.STOPPED;
                     }
@@ -261,7 +303,8 @@ public abstract class Experiment {
                             throw new RuntimeException(e);
                         }
                         Experiment experiment = from.get(Experiment.class, "experiment");
-                        experiment.getBlockingEventDispatcher().dispatch(new StopSimulationEvent());
+                        experiment.timerPollState.cancel();
+                        experiment.getBlockingEventDispatcher().dispatch(new StopExperimentEvent());
                         experiment.getBlockingEventDispatcher().clearListeners();
                         return ExperimentState.STOPPED;
                     }

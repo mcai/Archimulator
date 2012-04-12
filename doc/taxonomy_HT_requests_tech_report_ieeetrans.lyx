@@ -36,7 +36,7 @@
 \paperfontsize default
 \spacing single
 \use_hyperref true
-\pdf_title "A Taxonomy of HT LLC Requests in Helper Threaded Data Prefetching on CMPs"
+\pdf_title "Dynamic LLC Replacement for Helper Threaded Data Prefetching on CMPs"
 \pdf_author "Min Cai, Zhimin Gu"
 \pdf_keywords "chip multiprocessors, helper threaded data prefetching, cache replacement, cache pollution"
 \pdf_bookmarks false
@@ -97,7 +97,7 @@ cros/latex/contrib/IEEEtran/IEEEtran_HOWTO.pdf
 \end_layout
 
 \begin_layout Title
-A Taxonomy of HT LLC Requests in Helper Threaded Data Prefetching on CMPs
+Dynamic LLC Replacement for Helper Threaded Data Prefetching on CMPs
 \end_layout
 
 \begin_layout Author
