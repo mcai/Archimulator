@@ -35,7 +35,7 @@ import archimulator.util.event.BlockingEventDispatcher;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LLCHTRequestProfilingCapability implements SimulationCapability {
+public class HTLLCRequestProfilingCapability implements SimulationCapability {
     private EvictableCache<?, ?> llc;
 
     private Map<Integer, Map<Integer, LLCLineHTLLCRequestState>> htLLCRequestStates;
@@ -52,13 +52,13 @@ public class LLCHTRequestProfilingCapability implements SimulationCapability {
 
     private long numLateHTLLCRequests;
     
-    private BlockingEventDispatcher<LLCHTRequestProfilingCapabilityEvent> eventDispatcher;
+    private BlockingEventDispatcher<HTLLCRequestProfilingCapabilityEvent> eventDispatcher;
 
-    public LLCHTRequestProfilingCapability(Simulation simulation) {
+    public HTLLCRequestProfilingCapability(Simulation simulation) {
         this(simulation.getProcessor().getCacheHierarchy().getL2Cache().getCache());
     }
 
-    public LLCHTRequestProfilingCapability(EvictableCache<?, ?> llc) {
+    public HTLLCRequestProfilingCapability(EvictableCache<?, ?> llc) {
         this.llc = llc;
 
         this.htLLCRequestStates = new HashMap<Integer, Map<Integer, LLCLineHTLLCRequestState>>();
@@ -77,11 +77,11 @@ public class LLCHTRequestProfilingCapability implements SimulationCapability {
             }
         });
 
-        this.eventDispatcher = new BlockingEventDispatcher<LLCHTRequestProfilingCapabilityEvent>();
+        this.eventDispatcher = new BlockingEventDispatcher<HTLLCRequestProfilingCapabilityEvent>();
 
         llc.getBlockingEventDispatcher().addListener(CoherentCacheServiceNonblockingRequestEvent.class, new Action1<CoherentCacheServiceNonblockingRequestEvent>() {
             public void apply(CoherentCacheServiceNonblockingRequestEvent event) {
-                if (event.getCache().getCache().equals(LLCHTRequestProfilingCapability.this.llc)) {
+                if (event.getCache().getCache().equals(HTLLCRequestProfilingCapability.this.llc)) {
                     serviceRequest(event);
                 }
             }
@@ -90,7 +90,7 @@ public class LLCHTRequestProfilingCapability implements SimulationCapability {
         llc.getBlockingEventDispatcher().addListener(CoherentCacheNonblockingRequestHitToTransientTagEvent.class, new Action1<CoherentCacheNonblockingRequestHitToTransientTagEvent>() {
             @SuppressWarnings("Unchecked")
             public void apply(CoherentCacheNonblockingRequestHitToTransientTagEvent event) {
-                if (event.getCache().getCache().equals(LLCHTRequestProfilingCapability.this.llc)) {
+                if (event.getCache().getCache().equals(HTLLCRequestProfilingCapability.this.llc)) {
                     markLateHTRequest(event);
                 }
             }
@@ -167,7 +167,7 @@ public class LLCHTRequestProfilingCapability implements SimulationCapability {
         if (!event.isHitInCache()) {
             if (requesterIsHT) {
                 this.numTotalHTLLCRequests++;
-                this.eventDispatcher.dispatch(new HTRequestEvent());
+                this.eventDispatcher.dispatch(new HTLLCRequestEvent());
             }
         }
 
@@ -305,7 +305,7 @@ public class LLCHTRequestProfilingCapability implements SimulationCapability {
         return this.htLLCRequestVictimCache.findLine(tag);
     }
 
-    public BlockingEventDispatcher<LLCHTRequestProfilingCapabilityEvent> getEventDispatcher() {
+    public BlockingEventDispatcher<HTLLCRequestProfilingCapabilityEvent> getEventDispatcher() {
         return eventDispatcher;
     }
 
@@ -321,12 +321,12 @@ public class LLCHTRequestProfilingCapability implements SimulationCapability {
         DATA
     }
     
-    public abstract class LLCHTRequestProfilingCapabilityEvent implements BlockingEvent {
+    public abstract class HTLLCRequestProfilingCapabilityEvent implements BlockingEvent {
     }
     
-    public class HTRequestEvent extends LLCHTRequestProfilingCapabilityEvent {
+    public class HTLLCRequestEvent extends HTLLCRequestProfilingCapabilityEvent {
     }
     
-    public class BadHTLLCRequestEvent extends LLCHTRequestProfilingCapabilityEvent {
+    public class BadHTLLCRequestEvent extends HTLLCRequestProfilingCapabilityEvent {
     }
 }

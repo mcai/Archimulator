@@ -24,7 +24,7 @@ import archimulator.sim.base.experiment.profile.ProcessorProfile;
 import archimulator.sim.base.simulation.SimulatedProgram;
 import archimulator.service.ArchimulatorService;
 import archimulator.sim.ext.uncore.cache.eviction.LLCHTAwareLRUPolicy;
-import archimulator.sim.ext.uncore.llc.LLCHTRequestProfilingCapability;
+import archimulator.sim.ext.uncore.llc.HTLLCRequestProfilingCapability;
 import archimulator.sim.uncore.cache.eviction.LRUPolicy;
 import archimulator.util.DateHelper;
 import com.caucho.hessian.client.HessianProxyFactory;
@@ -120,7 +120,7 @@ public class ManagementStartup {
                         ExperimentProfile experimentProfile = new ExperimentProfile(simulatedProgram.getTitle() + "-" + processorProfile.getTitle(), processorProfile);
                         experimentProfile.addWorkload(simulatedProgram);
                         experimentProfile.fastForwardToPseudoCallAndInDetailForMaxInsts(pthreadSpawnedIndex, maxInsts);
-                        experimentProfile.addSimulationCapabilityClass(LLCHTRequestProfilingCapability.class);
+                        experimentProfile.addSimulationCapabilityClass(HTLLCRequestProfilingCapability.class);
                         experimentProfiles.add(experimentProfile);
                     }
                 }
@@ -156,7 +156,7 @@ public class ManagementStartup {
 //                        ExperimentProfile experimentProfile = new ExperimentProfile(simulatedProgram.getTitle() + "-" + processorProfile.getTitle(), processorProfile);
 //                        experimentProfile.addWorkload(simulatedProgram);
 //                        experimentProfile.fastForwardToPseudoCallAndInDetailForMaxInsts(pthreadSpawnedIndex, maxInsts);
-//                        experimentProfile.addSimulationCapabilityClass(LLCHTRequestProfilingCapability.class);
+//                        experimentProfile.addSimulationCapabilityClass(HTLLCRequestProfilingCapability.class);
 //                        experimentProfiles.add(experimentProfile);
 //                    }
 //                }
