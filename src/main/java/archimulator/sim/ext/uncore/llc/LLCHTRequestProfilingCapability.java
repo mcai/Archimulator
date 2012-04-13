@@ -43,9 +43,9 @@ public class LLCHTRequestProfilingCapability implements SimulationCapability {
 
     private long numMtMisses;
 
-    private long numTotalHtRequests;
+    private long numTotalHTRequests;
 
-    private long numUsefulHtRequests;
+    private long numUsefulHTRequests;
 
     private long numGoodHtRequests;
     private long numBadHtRequests;
@@ -100,9 +100,9 @@ public class LLCHTRequestProfilingCapability implements SimulationCapability {
             public void apply(ResetStatEvent event) {
                 numMtMisses = 0;
 
-                numTotalHtRequests = 0;
+                numTotalHTRequests = 0;
 
-                numUsefulHtRequests = 0;
+                numUsefulHTRequests = 0;
 
                 numGoodHtRequests = 0;
                 numBadHtRequests = 0;
@@ -129,69 +129,67 @@ public class LLCHTRequestProfilingCapability implements SimulationCapability {
     private void dumpStats(Map<String, Object> stats) {
         stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numMtMisses", String.valueOf(this.numMtMisses));
 
-        stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numTotalHtRequests", String.valueOf(this.numTotalHtRequests));
+        stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numTotalHTRequests", String.valueOf(this.numTotalHTRequests));
 
-        stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numUsefulHtRequests", String.valueOf(this.numUsefulHtRequests));
+        stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numUsefulHTRequests", String.valueOf(this.numUsefulHTRequests));
 
-        stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".htRequestAccuracy", String.valueOf(100.0 * (double) this.numUsefulHtRequests / this.numTotalHtRequests) + "%");
-        stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".htRequestCoverage", String.valueOf(100.0 * (double) this.numUsefulHtRequests / (this.numMtMisses + this.numUsefulHtRequests)) + "%");
+        stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".htRequestAccuracy", String.valueOf(100.0 * (double) this.numUsefulHTRequests / this.numTotalHTRequests) + "%");
+        stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".htRequestCoverage", String.valueOf(100.0 * (double) this.numUsefulHTRequests / (this.numMtMisses + this.numUsefulHTRequests)) + "%");
 
         stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numGoodHtRequests", String.valueOf(this.numGoodHtRequests));
         stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numBadHtRequests", String.valueOf(this.numBadHtRequests));
-        stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numUglyHtRequests", String.valueOf(this.numTotalHtRequests - this.numGoodHtRequests - this.numBadHtRequests));
+        stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numUglyHtRequests", String.valueOf(this.numTotalHTRequests - this.numGoodHtRequests - this.numBadHtRequests));
 
         stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numLateHtRequests", String.valueOf(this.numLateHtRequests));
     }
 
     private void markLateHTRequest(CoherentCacheNonblockingRequestHitToTransientTagEvent event) {
-        boolean requesterIsHt = BasicThread.isHelperThread(event.getRequesterAccess().getThread());
+        boolean requesterIsHT = BasicThread.isHelperThread(event.getRequesterAccess().getThread());
         CacheLine<?> llcLine = event.getLineFound();
 
         int set = llcLine.getSet();
 
-        LLCLineHTRequestState htRequestState = this.getHTRequestState(set, llcLine.getWay());
-        boolean lineFoundIsHt = htRequestState == LLCLineHTRequestState.HT;
+        boolean lineFoundIsHT = this.getHTRequestState(set, llcLine.getWay()) == LLCLineHTRequestState.HT;
 
-        if (!requesterIsHt && lineFoundIsHt) {
+        if (!requesterIsHT && lineFoundIsHT) {
             this.numLateHtRequests++;
         }
     }
 
     private void serviceRequest(CoherentCacheServiceNonblockingRequestEvent event) {
-        boolean requesterIsHt = BasicThread.isHelperThread(event.getRequesterAccess().getThread());
+        boolean requesterIsHT = BasicThread.isHelperThread(event.getRequesterAccess().getThread());
         CacheLine<?> llcLine = event.getLineFound();
 
         int set = llcLine.getSet();
 
-        LLCLineHTRequestState htRequestState = this.getHTRequestState(set, llcLine.getWay());
-        boolean lineFoundIsHt = htRequestState == LLCLineHTRequestState.HT;
+        boolean lineFoundIsHT = this.getHTRequestState(set, llcLine.getWay()) == LLCLineHTRequestState.HT;
 
         if (!event.isHitInCache()) {
-            if (requesterIsHt) {
-                this.numTotalHtRequests++;
+            if (requesterIsHT) {
+                this.numTotalHTRequests++;
                 this.eventDispatcher.dispatch(new HTRequestEvent());
             }
         }
 
-        if (!requesterIsHt) {
+        if (!requesterIsHT) {
             if (!event.isHitInCache()) {
                 this.numMtMisses++;
-            } else if (event.isHitInCache() && lineFoundIsHt) {
-                this.numUsefulHtRequests++;
+            } else if (event.isHitInCache() && lineFoundIsHT) {
+                this.numUsefulHTRequests++;
             }
         }
 
-        if (requesterIsHt && !event.isHitInCache() && !event.isEviction()) {
+        if (requesterIsHT && !event.isHitInCache() && !event.isEviction()) {
             this.markHT(set, llcLine.getWay());
             this.insertNullEntry(set);
-        } else if (requesterIsHt && !event.isHitInCache() && event.isEviction() && !lineFoundIsHt) {
+        } else if (requesterIsHT && !event.isHitInCache() && event.isEviction() && !lineFoundIsHT) {
             this.markHT(set, llcLine.getWay());
             this.insertDataEntry(set, llcLine.getTag());
-        } else if (requesterIsHt && !event.isHitInCache() && event.isEviction() && lineFoundIsHt) {
-        } else if (!requesterIsHt && !event.isHitInCache() && event.isEviction() && lineFoundIsHt) {
+        } else if (requesterIsHT && !event.isHitInCache() && event.isEviction() && lineFoundIsHT) {
+        } else if (!requesterIsHT && !event.isHitInCache() && event.isEviction() && lineFoundIsHT) {
             this.markMT(set, llcLine.getWay());
             this.removeLRU(set);
-        } else if (!requesterIsHt && !lineFoundIsHt) {
+        } else if (!requesterIsHT && !lineFoundIsHT) {
             boolean htRequestFound = false;
 
             for (int way = 0; way < this.htRequestVictimCache.getAssociativity(); way++) {
@@ -207,16 +205,16 @@ public class LLCHTRequestProfilingCapability implements SimulationCapability {
             }
         }
 
-        boolean mtHit = event.isHitInCache() && !requesterIsHt && !lineFoundIsHt;
-        boolean htHit = event.isHitInCache() && !requesterIsHt && lineFoundIsHt;
+        boolean mtHit = event.isHitInCache() && !requesterIsHT && !lineFoundIsHT;
+        boolean htHit = event.isHitInCache() && !requesterIsHT && lineFoundIsHT;
 
         CacheLine<HTRequestVictimCacheLineState> vtLine = this.findHtRequestVictimLine(this.llc.getTag(event.getAddress()));
 
-        boolean vtHit = !requesterIsHt && vtLine != null;
+        boolean vtHit = !requesterIsHT && vtLine != null;
 
         if (!mtHit && !htHit && vtHit) {
             this.numBadHtRequests++;
-            this.eventDispatcher.dispatch(new BadHTRequestEvent());
+            this.eventDispatcher.dispatch(new BadHTLLCRequestEvent());
             this.setLRU(set, vtLine.getWay());
         } else if (!mtHit && htHit && !vtHit) {
             this.markMT(set, llcLine.getWay());
@@ -329,6 +327,6 @@ public class LLCHTRequestProfilingCapability implements SimulationCapability {
     public class HTRequestEvent extends LLCHTRequestProfilingCapabilityEvent {
     }
     
-    public class BadHTRequestEvent extends LLCHTRequestProfilingCapabilityEvent {
+    public class BadHTLLCRequestEvent extends LLCHTRequestProfilingCapabilityEvent {
     }
 }

@@ -66,9 +66,9 @@ public class LLCHTAwareLRUPolicy<StateT extends Serializable, LineT extends Cach
             }
         });
         
-        this.llcHtRequestProfilingCapability.getEventDispatcher().addListener(LLCHTRequestProfilingCapability.BadHTRequestEvent.class, new Action1<LLCHTRequestProfilingCapability.BadHTRequestEvent>() {
+        this.llcHtRequestProfilingCapability.getEventDispatcher().addListener(LLCHTRequestProfilingCapability.BadHTLLCRequestEvent.class, new Action1<LLCHTRequestProfilingCapability.BadHTLLCRequestEvent>() {
             @Override
-            public void apply(LLCHTRequestProfilingCapability.BadHTRequestEvent event) {
+            public void apply(LLCHTRequestProfilingCapability.BadHTLLCRequestEvent event) {
                 badHtRequests.inc();
             }
         });
