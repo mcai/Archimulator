@@ -77,7 +77,7 @@ public class LLCHTAwareLRUPolicy<StateT extends Serializable, LineT extends Cach
             public void apply(CoherentCacheServiceNonblockingRequestEvent event) {
                 if (event.getCache().getCache().equals(getCache()) && !event.isHitInCache() &&
                         event.isEviction() &&
-                        llcHtRequestProfilingCapability.getHTRequestState(event.getLineFound().getSet(), event.getLineFound().getWay()).equals(LLCHTRequestProfilingCapability.LLCLineHTRequestState.MT)) {
+                        llcHtRequestProfilingCapability.getHTLLCRequestState(event.getLineFound().getSet(), event.getLineFound().getWay()).equals(LLCHTRequestProfilingCapability.LLCLineHTLLCRequestState.MT)) {
                     evictedMtLines++;
 
                     if (evictedMtLines == evictedMtLinesPerInterval) {
