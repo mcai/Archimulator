@@ -27,14 +27,21 @@ import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.coherence.event.CoherentCacheServiceNonblockingRequestEvent;
 import archimulator.util.action.Action1;
 
-import java.util.HashMap;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 //TODO
 public class LLCReuseDistanceProfilingCapability implements SimulationCapability {
     private EvictableCache<?, ?> llc;
 
-    private Map<Integer, Map<Integer, LLCLineRequestState>> llcLineRequestStates;
+    private int maxStackDistance = 50;
+
+    private List<List<StackEntry>> stackEntries;
+
+    private Map<Integer, Long> stackDistances;
 
     public LLCReuseDistanceProfilingCapability(Simulation simulation) {
         this(simulation.getProcessor().getCacheHierarchy().getL2Cache().getCache());
@@ -43,15 +50,17 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
     public LLCReuseDistanceProfilingCapability(EvictableCache<?, ?> llc) {
         this.llc = llc;
 
-        this.llcLineRequestStates = new HashMap<Integer, Map<Integer, LLCLineRequestState>>();
-        for (int set = 0; set < this.llc.getNumSets(); set++) {
-            HashMap<Integer, LLCLineRequestState> htRequestStatesPerSet = new HashMap<Integer, LLCLineRequestState>();
-            this.llcLineRequestStates.put(set, htRequestStatesPerSet);
+        this.stackEntries = new ArrayList<List<StackEntry>>();
 
-            for (int way = 0; way < this.llc.getAssociativity(); way++) {
-                htRequestStatesPerSet.put(way, LLCLineRequestState.INVALID);
+        for (int set = 0; set < this.llc.getNumSets(); set++) {
+            this.stackEntries.add(new ArrayList<StackEntry>());
+
+            for (int way = 0; way < this.maxStackDistance; way++) {
+                this.stackEntries.get(set).add(new StackEntry());
             }
         }
+
+        this.stackDistances = new TreeMap<Integer, Long>();
 
         llc.getBlockingEventDispatcher().addListener(CoherentCacheServiceNonblockingRequestEvent.class, new Action1<CoherentCacheServiceNonblockingRequestEvent>() {
             public void apply(CoherentCacheServiceNonblockingRequestEvent event) {
@@ -63,7 +72,7 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
 
         llc.getBlockingEventDispatcher().addListener(ResetStatEvent.class, new Action1<ResetStatEvent>() {
             public void apply(ResetStatEvent event) {
-
+                //TODO: clear stackEntries
             }
         });
 
@@ -83,14 +92,85 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
     }
 
     private void dumpStats(Map<String, Object> stats) {
-//        stats.put("llcReuseDistanceProfilingCapability." + this.llc.getName() + ".numMTLLCMisses", String.valueOf(this.numMTLLCMisses));
+        for (int stackDistance : this.stackDistances.keySet()) {
+            stats.put("llcReuseDistanceProfilingCapability." + this.llc.getName() + ".stackDistances[" + stackDistance + "]", String.valueOf(this.stackDistances.get(stackDistance)));
+        }
     }
 
     private void handleServicingRequest(CoherentCacheServiceNonblockingRequestEvent event) {
-        //TODO: clear llcLineRequestStates
+        this.doAccess(event.getLineFound().getSet(), this.llc.getTag(event.getAddress()), event.getRequesterAccess().getThread().getId());
     }
 
-    public static class LLCLineRequestState {
-        public static final LLCLineRequestState INVALID = new LLCLineRequestState();
+    private void doAccess(int set, int tag, int broughterThreadId) {
+        this.incStackDistanceStat(this.getStackDistanceAndSetStackPosition(set, tag, broughterThreadId));
+    }
+
+    private void incStackDistanceStat(int stackDistance) {
+        if (!this.stackDistances.containsKey(stackDistance)) {
+            this.stackDistances.put(stackDistance, 0L);
+        }
+
+        this.stackDistances.put(stackDistance, this.stackDistances.get(stackDistance));
+    }
+
+    private StackEntry getLRUStackEntry(int set) {
+        return this.stackEntries.get(set).get(this.maxStackDistance - 1);
+    }
+
+    private int getStackDistanceAndSetStackPosition(int set, int tag, int broughterThreadId) {
+        StackEntry stackEntryFound = this.getStackEntry(set, tag);
+
+        if (stackEntryFound != null) {
+            int oldStackPosition = this.stackEntries.get(set).indexOf(stackEntryFound);
+
+            stackEntryFound.broughterThreadId = broughterThreadId;
+
+            this.stackEntries.get(set).remove(stackEntryFound);
+            this.stackEntries.get(set).add(0, stackEntryFound);
+
+            return this.maxStackDistance - oldStackPosition;
+        } else {
+            for (int way = 0; way < this.maxStackDistance; way++) {
+                StackEntry stackEntry = this.stackEntries.get(set).get(way);
+                if (stackEntry.tag == -1) {
+                    stackEntryFound = stackEntry;
+                    break;
+                }
+            }
+
+            if (stackEntryFound == null) {
+                stackEntryFound = this.getLRUStackEntry(set);
+            }
+
+            stackEntryFound.tag = tag;
+            stackEntryFound.broughterThreadId = broughterThreadId;
+
+            this.stackEntries.get(set).remove(stackEntryFound);
+            this.stackEntries.get(set).add(0, stackEntryFound);
+
+            return -1;
+        }
+    }
+
+    private StackEntry getStackEntry(int set, int tag) {
+        List<StackEntry> lineReplacementStatesPerSet = this.stackEntries.get(set);
+
+        for (StackEntry stackEntry : lineReplacementStatesPerSet) {
+            if (stackEntry.tag == tag) {
+                return stackEntry;
+            }
+        }
+
+        return null;
+    }
+
+    private static class StackEntry implements Serializable {
+        private int broughterThreadId;
+        private int tag;
+
+        private StackEntry() {
+            this.broughterThreadId = -1;
+            this.tag = -1;
+        }
     }
 }
