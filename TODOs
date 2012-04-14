@@ -126,6 +126,19 @@ Paper hints:
 Arduino from Java:
 -Djava.library.path="/home/itecgo/Tools/arduino-1.0/lib"
 
+from Multicore-Aware Reuse Distance Analysis:
+Definition of reuse distance in multithreaded program:
+    For a multithreaded program, the reuse distance of a reference by
+    thread T to address x is
+    (a) ∞ if x has never been referenced before;
+    (b) ∞ if x has been overwritten by a thread which does not
+    share a cache with T since the last reference by a thread
+    which shares a cache with T ; or
+    (c) the number of distinct data accessed by threads which
+    share a cache with T since the last reference to x by a
+    thread which shares a cache with T .
+
+
 
 
 

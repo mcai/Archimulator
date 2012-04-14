@@ -38,7 +38,7 @@ import java.util.Map;
 public class HTLLCRequestProfilingCapability implements SimulationCapability {
     private EvictableCache<?, ?> llc;
 
-    private Map<Integer, Map<Integer, LLCLineHTLLCRequestState>> htLLCRequestStates;
+    private Map<Integer, Map<Integer, Integer>> llcLineBroughterThreadIds;
     private EvictableCache<HTLLCRequestVictimCacheLineState, CacheLine<HTLLCRequestVictimCacheLineState>> htLLCRequestVictimCache;
 
     private long numMTLLCMisses;
@@ -61,13 +61,13 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
     public HTLLCRequestProfilingCapability(EvictableCache<?, ?> llc) {
         this.llc = llc;
 
-        this.htLLCRequestStates = new HashMap<Integer, Map<Integer, LLCLineHTLLCRequestState>>();
+        this.llcLineBroughterThreadIds = new HashMap<Integer, Map<Integer, Integer>>();
         for (int set = 0; set < this.llc.getNumSets(); set++) {
-            HashMap<Integer, LLCLineHTLLCRequestState> htRequestStatesPerSet = new HashMap<Integer, LLCLineHTLLCRequestState>();
-            this.htLLCRequestStates.put(set, htRequestStatesPerSet);
+            HashMap<Integer, Integer> llcLineBroughterThreadIdsPerSet = new HashMap<Integer, Integer>();
+            this.llcLineBroughterThreadIds.put(set, llcLineBroughterThreadIdsPerSet);
 
             for (int way = 0; way < this.llc.getAssociativity(); way++) {
-                htRequestStatesPerSet.put(way, LLCLineHTLLCRequestState.INVALID);
+                llcLineBroughterThreadIdsPerSet.put(way, -1);
             }
         }
 
@@ -82,7 +82,7 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
         llc.getBlockingEventDispatcher().addListener(CoherentCacheServiceNonblockingRequestEvent.class, new Action1<CoherentCacheServiceNonblockingRequestEvent>() {
             public void apply(CoherentCacheServiceNonblockingRequestEvent event) {
                 if (event.getCache().getCache().equals(HTLLCRequestProfilingCapability.this.llc)) {
-                    serviceRequest(event);
+                    handleServicingRequest(event);
                 }
             }
         });
@@ -149,20 +149,20 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
 
         int set = llcLine.getSet();
 
-        boolean lineFoundIsHT = this.getHTLLCRequestState(set, llcLine.getWay()) == LLCLineHTLLCRequestState.HT;
+        boolean lineFoundIsHT = this.getLLCLineBroughterThreadId(set, llcLine.getWay()) == BasicThread.getHelperThreadId();
 
         if (!requesterIsHT && lineFoundIsHT) {
             this.numLateHTLLCRequests++;
         }
     }
 
-    private void serviceRequest(CoherentCacheServiceNonblockingRequestEvent event) {
+    private void handleServicingRequest(CoherentCacheServiceNonblockingRequestEvent event) {
         boolean requesterIsHT = BasicThread.isHelperThread(event.getRequesterAccess().getThread());
         CacheLine<?> llcLine = event.getLineFound();
 
         int set = llcLine.getSet();
 
-        boolean lineFoundIsHT = this.getHTLLCRequestState(set, llcLine.getWay()) == LLCLineHTLLCRequestState.HT;
+        boolean lineFoundIsHT = this.getLLCLineBroughterThreadId(set, llcLine.getWay()) == BasicThread.getHelperThreadId();
 
         if (!event.isHitInCache()) {
             if (requesterIsHT) {
@@ -230,27 +230,19 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
     }
 
     private void markHT(int set, int way) {
-        if (this.getHTLLCRequestState(set, way).equals(LLCLineHTLLCRequestState.HT)) {
-            throw new IllegalArgumentException();
-        }
-
-        this.setHTLLCRequestState(set, way, LLCLineHTLLCRequestState.HT);
+        this.setLLCLineBroughterThreadId(set, way, BasicThread.getHelperThreadId());
     }
 
     private void markMT(int set, int way) {
-        if (this.getHTLLCRequestState(set, way).equals(LLCLineHTLLCRequestState.MT)) {
-            throw new IllegalArgumentException();
-        }
-
-        this.setHTLLCRequestState(set, way, LLCLineHTLLCRequestState.MT);
+        this.setLLCLineBroughterThreadId(set, way, BasicThread.getMainThreadId());
     }
     
-    public LLCLineHTLLCRequestState getHTLLCRequestState(int set, int way) {
-        return this.htLLCRequestStates.get(set).get(way);
+    public int getLLCLineBroughterThreadId(int set, int way) {
+        return this.llcLineBroughterThreadIds.get(set).get(way);
     }
     
-    private void setHTLLCRequestState(int set, int way, LLCLineHTLLCRequestState htLLCRequestState) {
-        this.htLLCRequestStates.get(set).put(way, htLLCRequestState);
+    private void setLLCLineBroughterThreadId(int set, int way, int llcLineBroughterThreadId) {
+        this.llcLineBroughterThreadIds.get(set).put(way, llcLineBroughterThreadId);
     }
 
     private void insertDataEntry(int set, int tag) {
@@ -309,18 +301,12 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
         return eventDispatcher;
     }
 
-    public static enum LLCLineHTLLCRequestState {
-        INVALID,
-        HT,
-        MT
-    }
-
     public static enum HTLLCRequestVictimCacheLineState {
         INVALID,
         NULL,
         DATA
     }
-    
+
     public abstract class HTLLCRequestProfilingCapabilityEvent implements BlockingEvent {
     }
     

@@ -53,7 +53,7 @@ public class LLCHTAwareLRUPolicy<StateT extends Serializable, LineT extends Cach
         this.llcHtRequestProfilingCapability = new HTLLCRequestProfilingCapability(cache);
 
         this.evictedMtLinesPerInterval = cache.getNumSets() * cache.getAssociativity() / 2;
-        
+
         this.htRequestCachePollution = HTRequestCachePollution.MEDIUM;
 
         this.totalHtRequests = new IntervalStat();
@@ -65,7 +65,7 @@ public class LLCHTAwareLRUPolicy<StateT extends Serializable, LineT extends Cach
                 totalHtRequests.inc();
             }
         });
-        
+
         this.llcHtRequestProfilingCapability.getEventDispatcher().addListener(HTLLCRequestProfilingCapability.BadHTLLCRequestEvent.class, new Action1<HTLLCRequestProfilingCapability.BadHTLLCRequestEvent>() {
             @Override
             public void apply(HTLLCRequestProfilingCapability.BadHTLLCRequestEvent event) {
@@ -77,7 +77,7 @@ public class LLCHTAwareLRUPolicy<StateT extends Serializable, LineT extends Cach
             public void apply(CoherentCacheServiceNonblockingRequestEvent event) {
                 if (event.getCache().getCache().equals(getCache()) && !event.isHitInCache() &&
                         event.isEviction() &&
-                        llcHtRequestProfilingCapability.getHTLLCRequestState(event.getLineFound().getSet(), event.getLineFound().getWay()).equals(HTLLCRequestProfilingCapability.LLCLineHTLLCRequestState.MT)) {
+                        llcHtRequestProfilingCapability.getLLCLineBroughterThreadId(event.getLineFound().getSet(), event.getLineFound().getWay()) == BasicThread.getMainThreadId()) {
                     evictedMtLines++;
 
                     if (evictedMtLines == evictedMtLinesPerInterval) {
@@ -150,7 +150,7 @@ public class LLCHTAwareLRUPolicy<StateT extends Serializable, LineT extends Cach
         long numBadHtRequests = this.badHtRequests.newInterval();
         long numTotalHtRequests = this.totalHtRequests.newInterval();
 
-        double pollution =  this.getHtRequestPollution(numBadHtRequests, numTotalHtRequests);
+        double pollution = this.getHtRequestPollution(numBadHtRequests, numTotalHtRequests);
 
         if (pollution > htRequestCachePollutionDegreeHighThreshold) {
             this.htRequestCachePollution = HTRequestCachePollution.HIGH;
