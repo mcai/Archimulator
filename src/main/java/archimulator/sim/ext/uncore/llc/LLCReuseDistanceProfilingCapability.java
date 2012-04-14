@@ -102,23 +102,17 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
     }
 
     private void doAccess(int set, int tag, int broughterThreadId) {
-        this.incStackDistanceStat(this.getStackDistanceAndSetStackPosition(set, tag, broughterThreadId));
-    }
-
-    private void incStackDistanceStat(int stackDistance) {
-        if (!this.stackDistances.containsKey(stackDistance)) {
-            this.stackDistances.put(stackDistance, 0L);
-        }
-
-        this.stackDistances.put(stackDistance, this.stackDistances.get(stackDistance));
+        this.setLRU(set, tag, broughterThreadId);
     }
 
     private StackEntry getLRUStackEntry(int set) {
         return this.stackEntries.get(set).get(this.maxStackDistance - 1);
     }
 
-    private int getStackDistanceAndSetStackPosition(int set, int tag, int broughterThreadId) {
+    private void setLRU(int set, int tag, int broughterThreadId) {
         StackEntry stackEntryFound = this.getStackEntry(set, tag);
+
+        int stackDistance = -1;
 
         if (stackEntryFound != null) {
             int oldStackPosition = this.stackEntries.get(set).indexOf(stackEntryFound);
@@ -128,7 +122,7 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
             this.stackEntries.get(set).remove(stackEntryFound);
             this.stackEntries.get(set).add(0, stackEntryFound);
 
-            return this.maxStackDistance - oldStackPosition;
+            stackDistance = this.maxStackDistance - oldStackPosition;
         } else {
             for (int way = 0; way < this.maxStackDistance; way++) {
                 StackEntry stackEntry = this.stackEntries.get(set).get(way);
@@ -147,9 +141,17 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
 
             this.stackEntries.get(set).remove(stackEntryFound);
             this.stackEntries.get(set).add(0, stackEntryFound);
-
-            return -1;
         }
+
+        this.incStackDistanceStat(stackDistance);
+    }
+
+    private void incStackDistanceStat(int stackDistance) {
+        if (!this.stackDistances.containsKey(stackDistance)) {
+            this.stackDistances.put(stackDistance, 0L);
+        }
+
+        this.stackDistances.put(stackDistance, this.stackDistances.get(stackDistance));
     }
 
     private StackEntry getStackEntry(int set, int tag) {
