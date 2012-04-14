@@ -189,9 +189,10 @@ right side
 
 \begin_layout Abstract
 Helper threaded inter-core data prefetching on shared cache chip multiprocessors
- (CMPs), in its most basic form, uses the processing power of an underutilized
- neighboring core to improve the performance of a single-threaded program
- running on the computation core.
+ (CMPs), in its most basic form, (1) uses the shared cache enabled fast
+ inter-thread communication when both the main core and the helper core
+ access the same cache line; (2) utilizes an idle neighboring core to prefetch
+ the LLC cache line before the computation core need it.
  Effective helper threaded inter-core data prefetching demands that the
  helper thread (HT) should issue correct and timely LLC requests just before
  the main thread (MT) requests them.
@@ -204,6 +205,11 @@ g can be applied to helper threaded inter-core data prefetching as well,
  however they do not provide sufficient details on the cache pollution and
  inter-thread LLC interference caused by HT LLC requests for improving LLC
  replacement for helper threaded inter-core data prefetching.
+\end_layout
+
+\begin_layout Abstract
+fast inter-thread communication when more than one core sharing the cache
+ accesses the same block 
 \end_layout
 
 \begin_layout Abstract
@@ -285,10 +291,11 @@ status collapsed
 \end_inset
 
  threaded inter-core data prefetching on shared cache chip multiprocessors
- (CMPs), in its most basic form, uses the processing power of an underutilized
- neighboring core to improve the performance of a single-threaded program
- running on the computation core.
- Effective helper threaded data prefetching demands that the helper thread
+ (CMPs), in its most basic form, (1) uses the shared cache enabled fast
+ inter-thread communication when both the main core and the helper core
+ access the same cache line; (2) utilizes an idle neighboring core to prefetch
+ the LLC cache line before the computation core need it.
+  Effective helper threaded data prefetching demands that the helper thread
  (HT) should issue correct and timely LLC requests just before the main
  thread (MT) requests them.
  However this ideal case can not be assumed in the practical implemention
