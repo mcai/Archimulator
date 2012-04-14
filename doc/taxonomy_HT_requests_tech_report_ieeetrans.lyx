@@ -36,9 +36,9 @@
 \paperfontsize default
 \spacing single
 \use_hyperref true
-\pdf_title "Dynamic LLC Replacement for Helper Threaded Data Prefetching on CMPs"
+\pdf_title "Dynamic LLC Replacement for Helper Threaded Inter-Core Data Prefetching"
 \pdf_author "Min Cai, Zhimin Gu"
-\pdf_keywords "chip multiprocessors, helper threaded data prefetching, cache replacement, cache pollution"
+\pdf_keywords "chip multiprocessors, helper threaded inter-core data prefetching, cache replacement, cache pollution"
 \pdf_bookmarks false
 \pdf_bookmarksnumbered true
 \pdf_bookmarksopen true
@@ -97,7 +97,7 @@ cros/latex/contrib/IEEEtran/IEEEtran_HOWTO.pdf
 \end_layout
 
 \begin_layout Title
-Dynamic LLC Replacement for Helper Threaded Data Prefetching on CMPs
+Dynamic LLC Replacement for Helper Threaded Inter-Core Data Prefetching
 \end_layout
 
 \begin_layout Author
@@ -188,35 +188,35 @@ right side
 \end_layout
 
 \begin_layout Abstract
-Helper threaded data prefetching on chip multiprocessors (CMPs), in its
- most basic form, uses the processing power of underutilized neighboring
- cores to improve the performance of a single-threaded program running on
- a shared cache CMP.
- Effective helper threaded data prefetching demands that the helper thread
- (HT) should issue correct and timely LLC requests just before the main
- thread (MT) requests them.
+Helper threaded inter-core data prefetching on shared cache chip multiprocessors
+ (CMPs), in its most basic form, uses the processing power of an underutilized
+ neighboring core to improve the performance of a single-threaded program
+ running on the computation core.
+ Effective helper threaded inter-core data prefetching demands that the
+ helper thread (HT) should issue correct and timely LLC requests just before
+ the main thread (MT) requests them.
  However this ideal case can not be assumed in the practical implemention
- of helper threaded data prefetching on CMPs: some LLC requests coming from
- HT could not contribute to the MT performance, but instead stress and pollute
- LLC if no effective LLC replacement techniques are employed.
+ of helper threaded inter-core data prefetching: some LLC requests coming
+ from HT could not contribute to the MT performance, but instead stress
+ and pollute LLC if no effective LLC replacement techniques are employed.
  Traditional notions of accuracy and coverage for hardware based data prefetchin
-g can be applied to helper threaded data prefetching on CMPs as well, however
- they do not provide sufficient details on the cache pollution and inter-thread
- LLC interference caused by HT LLC requests for improving LLC replacement
- for helper threaded data prefetching on CMPs.
+g can be applied to helper threaded inter-core data prefetching as well,
+ however they do not provide sufficient details on the cache pollution and
+ inter-thread LLC interference caused by HT LLC requests for improving LLC
+ replacement for helper threaded inter-core data prefetching.
 \end_layout
 
 \begin_layout Abstract
 In this paper, we present the dynamic LLC replacement technique for helper
- threaded data prefetching on CMPs, based on a pollution-aware taxonomy
+ threaded inter-core data prefetching, based on a pollution-aware taxonomy
  of HT LLC requests.
  Firstly, the experimental methodology used in this work are discussed.
  Secondly, a pollution aware taxonomy of HT LLC requests is presented from
  the view of the contribution of HT LLC requests to the MT performance.
  Thirdly, based on the intuition of the result of the taxonomy applied to
  the Pthreads based helper threaded version of the memory-intensive mst
- benchmark in Olden, the dynamic LLC replacement for helper threaded data
- prefetching on CMPs are elaborated.
+ benchmark in Olden, the dynamic LLC replacement for helper threaded inter-core
+ data prefetching are elaborated.
  Experimental results from cycle accurate simulation show that: (1) there
  is non-trivial LLC pollution caused by HT in helper-threaded data prefetching
  on CMPs; (2) LLC request taxonomy based dynamic LLC replacement can improve
@@ -225,8 +225,8 @@ In this paper, we present the dynamic LLC replacement technique for helper
 \end_layout
 
 \begin_layout Keywords
-chip multiprocessors, helper threaded data prefetching, cache replacement,
- cache pollution, inter-thread interference
+chip multiprocessors, helper threaded inter-core data prefetching, cache
+ replacement, cache pollution, inter-thread interference
 \end_layout
 
 \begin_layout Section
@@ -284,17 +284,17 @@ status collapsed
 
 \end_inset
 
- threaded data prefetching on chip multiprocessors (CMPs), in its most basic
- form, uses the processing power of underutilized neighboring cores to improve
- the performance of a single-threaded program running on a shared cache
- CMP.
+ threaded inter-core data prefetching on shared cache chip multiprocessors
+ (CMPs), in its most basic form, uses the processing power of an underutilized
+ neighboring core to improve the performance of a single-threaded program
+ running on the computation core.
  Effective helper threaded data prefetching demands that the helper thread
  (HT) should issue correct and timely LLC requests just before the main
  thread (MT) requests them.
  However this ideal case can not be assumed in the practical implemention
- of helper threaded data prefetching on CMPs: some LLC requests coming from
- HT could not contribute to the MT performance, but instead stress and pollute
- LLC if no effective LLC replacement techniques are employed.
+ of helper threaded inter-core data prefetching: some LLC requests coming
+ from HT could not contribute to the MT performance, but instead stress
+ and pollute LLC if no effective LLC replacement techniques are employed.
  
 \end_layout
 
@@ -386,7 +386,7 @@ useless
 
 \begin_layout Standard
 In this paper, we present the dynamic LLC replacement technique for helper
- threaded data prefetching on CMPs, based on a pollution-aware taxonomy
+ threaded inter-core data prefetching, based on a pollution-aware taxonomy
  of HT LLC requests.
  Firstly, the experimental methodology used in this work are discussed.
  Secondly, a pollution aware taxonomy of HT LLC requests is presented from
@@ -395,8 +395,8 @@ In this paper, we present the dynamic LLC replacement technique for helper
  LLC replacement techniques for the HT scheme.
  Thirdly, based on the intuition of the result of the taxonomy applied to
  the Pthreads based helper threaded version of the memory-intensive mst
- benchmark in Olden, the dynamic LLC replacement for helper threaded data
- prefetching on CMPs are elaborated.
+ benchmark in Olden, the dynamic LLC replacement for helper threaded inter-core
+ data prefetching are elaborated.
  Experimental results from cycle accurate simulation show that: (1) there
  is non-trivial LLC pollution caused by HT in helper-threaded data prefetching
  on CMPs; (2) LLC request taxonomy based dynamic LLC replacement can improve
@@ -415,7 +415,7 @@ The main contributions of this paper can be summarized as answers for the
 \begin_layout Enumerate
 How can the HT LLC requests be classified based on the cache pollution and
  inter-thread LLC interference caused by HT LLC requests in helper threaded
- data prefetching on CMPs (or the HT scheme)?
+ inter-core data prefetching (or the HT scheme)?
 \end_layout
 
 \begin_layout Enumerate
@@ -428,8 +428,8 @@ The rest of this paper is organized as follows.
  Section 3 presents the experimental methodology used in this work.
  Section 2 presents the pollution aware taxonomy of HT requests and the
  experimental result of mst in Olden.
- Section 4 discusses the dynamic LLC replacement for helper threaded data
- prefetching on CMPs and its experimental results.
+ Section 4 discusses the dynamic LLC replacement for helper threaded inter-core
+ data prefetching and its experimental results.
  Section 5 talks about related work.
  In section 6 we conclude the paper.
 \end_layout
@@ -1643,7 +1643,7 @@ ROI Based Two-Phase Fast Simulation of Helper Threaded Workloads
 As shown in Fig.
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "fig:Helper-Threaded-Data-Prefetching-on-CMPs"
+reference "fig:Helper-Threaded-Inter-Core-Data-Prefetching"
 
 \end_inset
 
@@ -1726,11 +1726,11 @@ status open
 \begin_inset Caption
 
 \begin_layout Plain Layout
-ROI Based Two Phase Fast Simulation of Helper Threaded Data Prefetching
- on CMPs
+ROI Based Two Phase Fast Simulation of Helper Threaded Inter-Core Data Prefetchi
+ng
 \begin_inset CommandInset label
 LatexCommand label
-name "fig:Helper-Threaded-Data-Prefetching-on-CMPs"
+name "fig:Helper-Threaded-Inter-Core-Data-Prefetching"
 
 \end_inset
 
@@ -6899,7 +6899,7 @@ Unmodified
 \end_layout
 
 \begin_layout Section
-Dyanamic LLC Replacement for Helper Threaded Data Prefetching on CMPs
+Dyanamic LLC Replacement for Helper Threaded Inter-Core Data Prefetching
 \end_layout
 
 \begin_layout Subsection
