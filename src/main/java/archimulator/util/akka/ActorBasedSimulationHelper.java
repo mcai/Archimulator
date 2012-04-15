@@ -1,11 +1,13 @@
 package archimulator.util.akka;
 
 import akka.actor.*;
+import archimulator.util.DateHelper;
 import org.apache.commons.lang.time.StopWatch;
 import org.jfree.data.statistics.Statistics;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class ActorBasedSimulationHelper {
@@ -21,11 +23,11 @@ public class ActorBasedSimulationHelper {
 
         ActorRef processor = system.actorOf(new Props(new UntypedActorFactory() {
             public UntypedActor create() {
-                return new Processor(4, 4);
+                return new Processor(2, 2);
             }
         }), "processor");
 
-        processor.tell(new SimulationConfig("mst", 10000));
+        processor.tell(new SimulationConfig("mst", 1000000000L));
 
         system.awaitTermination();
 
@@ -37,18 +39,18 @@ public class ActorBasedSimulationHelper {
 
     private static class SimulationConfig implements Serializable {
         private String workload;
-        private int maxCycles;
+        private long maxCycles;
 
-        public SimulationConfig(String workload, int maxCycles) {
+        public SimulationConfig(String workload, long maxCycles) {
             this.workload = workload;
             this.maxCycles = maxCycles;
         }
     }
 
     private static class ExecuteOneCycle implements Serializable {
-        private int currentCycle;
+        private long currentCycle;
 
-        public ExecuteOneCycle(int currentCycle) {
+        public ExecuteOneCycle(long currentCycle) {
             this.currentCycle = currentCycle;
         }
     }
@@ -61,7 +63,7 @@ public class ActorBasedSimulationHelper {
         public void onReceive(Object o) throws Exception {
             if (o instanceof ExecuteOneCycle) {
                 ExecuteOneCycle executeOneCycle = (ExecuteOneCycle) o;
-                System.out.printf("[%s: %d] Execute one cycle.\n", getSelf().path().name(), executeOneCycle.currentCycle);
+//                System.out.printf("[%s %s: %d] Execute one cycle.\n", DateHelper.toString(new Date()), getSelf().path().name(), executeOneCycle.currentCycle);
                 getSender().tell(new OneCycleExecuted(), getSelf());
             } else {
                 unhandled(o);
@@ -75,8 +77,8 @@ public class ActorBasedSimulationHelper {
 
         private List<ActorRef> cores;
 
-        private int currentCycle = 0;
-        private int maxCycles = 0;
+        private long currentCycle = 0;
+        private long maxCycles = 0;
 
         private int numPendings = 0;
 
@@ -111,7 +113,11 @@ public class ActorBasedSimulationHelper {
                 numPendings--;
 
                 if (numPendings == 0) {
-                    System.out.printf("[%s: %d] Execute one cycle.\n", getSelf().path().name(), currentCycle);
+//                    System.out.printf("[%s %s: %d] Execute one cycle.\n", DateHelper.toString(new Date()), getSelf().path().name(), currentCycle);
+
+                    if(currentCycle % 1000000 == 0) {
+                        System.out.printf("[%s %s: %d] Execute one cycle.\n", DateHelper.toString(new Date()), getSelf().path().name(), currentCycle);
+                    }
 
                     currentCycle++;
 
@@ -127,7 +133,7 @@ public class ActorBasedSimulationHelper {
             }
         }
 
-        private void executeOneCycle(int currentCycle) {
+        private void executeOneCycle(long currentCycle) {
             numPendings = this.cores.size();
 
             for (ActorRef core : cores) {
