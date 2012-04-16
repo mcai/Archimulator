@@ -59,7 +59,6 @@ public class ActorBasedSimulationHelper {
     }
 
     public static class Core extends UntypedActor {
-        @Override
         public void onReceive(Object o) throws Exception {
             if (o instanceof ExecuteOneCycle) {
                 ExecuteOneCycle executeOneCycle = (ExecuteOneCycle) o;
@@ -100,7 +99,6 @@ public class ActorBasedSimulationHelper {
             }
         }
 
-        @Override
         public void onReceive(Object o) throws Exception {
             if (o instanceof SimulationConfig) {
                 SimulationConfig simulationConfig = (SimulationConfig) o;
