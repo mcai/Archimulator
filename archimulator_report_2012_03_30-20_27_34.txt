@@ -1,3 +1,5 @@
+mst 4000, pthread spawn -> 100M insts on MT.
+
 Archimulator Report
 -----------------------------------------------------------------------
 
