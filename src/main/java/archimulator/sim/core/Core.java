@@ -57,7 +57,7 @@ public interface Core extends MemoryHierarchyCore {
 
     List<AbstractReorderBufferEntry> getReadyStoreQueue();
 
-    List<AbstractReorderBufferEntry> getoooEventQueue();
+    List<AbstractReorderBufferEntry> getOooEventQueue();
 
     void doFastForwardOneCycle();
 

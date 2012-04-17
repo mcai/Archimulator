@@ -71,7 +71,7 @@ public abstract class AbstractReorderBufferEntry {
 
     public void signalCompleted() {
         if (!this.squashed) {
-            this.thread.getCore().getoooEventQueue().add(this);
+            this.thread.getCore().getOooEventQueue().add(this);
         }
     }
 

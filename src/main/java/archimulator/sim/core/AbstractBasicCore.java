@@ -324,7 +324,7 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
         return readyStoreQueue;
     }
 
-    public List<AbstractReorderBufferEntry> getoooEventQueue() {
+    public List<AbstractReorderBufferEntry> getOooEventQueue() {
         return oooEventQueue;
     }
 
