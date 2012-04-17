@@ -30,17 +30,21 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
-public class MonitorStartup {
-    private ArchimulatorService archimulatorService;
+public class ArduinoBasedMonitorStartup {
+    private static void recordException(Exception e) {
+        System.out.print(String.format("[%s Exception] %s\r\n", DateHelper.toString(new Date()), e));
+        e.printStackTrace();
+    }
 
-    public MonitorStartup() {
+    public static void main(String[] args) throws SQLException {
+        ArchimulatorService archimulatorService;
         try {
             HessianProxyFactory factory = new HessianProxyFactory();
             factory.setReadTimeout(30000);
             factory.setConnectTimeout(20000);
             factory.setOverloadEnabled(true);
 
-            this.archimulatorService = (ArchimulatorService) factory.create(ArchimulatorService.class, ManagementStartup.SERVICE_URL);
+            archimulatorService = (ArchimulatorService) factory.create(ArchimulatorService.class, ManagementStartup.SERVICE_URL);
         } catch (MalformedURLException e) {
             recordException(e);
             throw new RuntimeException(e);
@@ -81,14 +85,5 @@ public class MonitorStartup {
                 throw new RuntimeException(e);
             }
         }
-    }
-
-    public static void recordException(Exception e) {
-        System.out.print(String.format("[%s Exception] %s\r\n", DateHelper.toString(new Date()), e));
-        e.printStackTrace();
-    }
-
-    public static void main(String[] args) throws SQLException {
-        MonitorStartup startup = new MonitorStartup();
     }
 }
