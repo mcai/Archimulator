@@ -195,8 +195,8 @@ public class ManagementStartup {
     //    public static final String SERVICE_URL = "http://204.152.205.131:8080/archimulator/archimulator";
     //    public static final String SERVICE_URL = "http://50.117.112.114:8080/archimulator/archimulator";
     //    public static final String SERVICE_URL = "http://[2607:f358:10:13::2]:8080/archimulator/archimulator";
-//        public static final String SERVICE_URL = "http://localhost:8080/api";
-    public static final String SERVICE_URL = "http://[2607:f358:10:13::2]/api";
+        public static final String SERVICE_URL = "http://localhost:8080/api";
+//    public static final String SERVICE_URL = "http://[2607:f358:10:13::2]/api";
 //        public static final String SERVICE_URL = "http://www.archimulator.com/api";
 
     public static final SimulatedProgram SIMULATED_PROGRAM_MST_BASELINE = new SimulatedProgram(
