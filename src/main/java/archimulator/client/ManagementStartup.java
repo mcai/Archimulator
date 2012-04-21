@@ -24,8 +24,6 @@ import archimulator.sim.base.experiment.profile.ProcessorProfile;
 import archimulator.sim.base.simulation.SimulatedProgram;
 import archimulator.service.ArchimulatorService;
 import archimulator.sim.ext.uncore.cache.eviction.LLCHTAwareLRUPolicy;
-import archimulator.sim.ext.uncore.llc.HTLLCRequestProfilingCapability;
-import archimulator.sim.ext.uncore.llc.LLCReuseDistanceProfilingCapability;
 import archimulator.sim.uncore.cache.eviction.LRUPolicy;
 import archimulator.util.DateHelper;
 import com.caucho.hessian.client.HessianProxyFactory;
@@ -59,20 +57,20 @@ public class ManagementStartup {
         this.archimulatorService.clearData();
 
         List<SimulatedProgram> simulatedPrograms = new ArrayList<SimulatedProgram>();
-        simulatedPrograms.add(SIMULATED_PROGRAM_MST_BASELINE);
+        simulatedPrograms.add(Presets.SIMULATED_PROGRAM_MST_BASELINE);
 
-        simulatedPrograms.add(SIMULATED_PROGRAM_MST_HT(10, 10));
-        simulatedPrograms.add(SIMULATED_PROGRAM_MST_HT(20, 10));
-        simulatedPrograms.add(SIMULATED_PROGRAM_MST_HT(20, 20));
-        simulatedPrograms.add(SIMULATED_PROGRAM_MST_HT(320, 320));
-        simulatedPrograms.add(SIMULATED_PROGRAM_MST_HT(640, 320));
-        simulatedPrograms.add(SIMULATED_PROGRAM_MST_HT(640, 640));
+        simulatedPrograms.add(Presets.SIMULATED_PROGRAM_MST_HT(10, 10));
+        simulatedPrograms.add(Presets.SIMULATED_PROGRAM_MST_HT(20, 10));
+        simulatedPrograms.add(Presets.SIMULATED_PROGRAM_MST_HT(20, 20));
+        simulatedPrograms.add(Presets.SIMULATED_PROGRAM_MST_HT(320, 320));
+        simulatedPrograms.add(Presets.SIMULATED_PROGRAM_MST_HT(640, 320));
+        simulatedPrograms.add(Presets.SIMULATED_PROGRAM_MST_HT(640, 640));
 
-        simulatedPrograms.add(SIMULATED_PROGRAM_EM3D_BASELINE);
-        simulatedPrograms.add(SIMULATED_PROGRAM_EM3D_HT);
+        simulatedPrograms.add(Presets.SIMULATED_PROGRAM_EM3D_BASELINE);
+        simulatedPrograms.add(Presets.SIMULATED_PROGRAM_EM3D_HT);
 
-        simulatedPrograms.add(SIMULATED_PROGRAM_429_MCF_BASELINE);
-        simulatedPrograms.add(SIMULATED_PROGRAM_429_MCF_HT);
+        simulatedPrograms.add(Presets.SIMULATED_PROGRAM_429_MCF_BASELINE);
+        simulatedPrograms.add(Presets.SIMULATED_PROGRAM_429_MCF_HT);
 
         for (SimulatedProgram simulatedProgram : simulatedPrograms) {
             this.archimulatorService.addSimulatedProgram(simulatedProgram);
@@ -91,8 +89,8 @@ public class ManagementStartup {
             for (int l2Associativity : l2Associativities) {
                 int numCores = 2;
                 int numThreadsPerCore = 2;
-                this.archimulatorService.addProcessorProfile(new ProcessorProfile("C" + numCores + "T" + numThreadsPerCore + "-" + "L2_" + l2SizeInKByte + "KB" + "_" + "Assoc" + l2Associativity + "_" + "LRU", numCores, numThreadsPerCore, 1024 * l2SizeInKByte, l2Associativity, LRUPolicy.class));
-                this.archimulatorService.addProcessorProfile(new ProcessorProfile("C" + numCores + "T" + numThreadsPerCore + "-" + "L2_" + l2SizeInKByte + "KB" + "_" + "Assoc" + l2Associativity + "_" + "LLCHTAwareLRU", numCores, numThreadsPerCore, 1024 * l2SizeInKByte, l2Associativity, LLCHTAwareLRUPolicy.class));
+                this.archimulatorService.addProcessorProfile(Presets.processor(l2SizeInKByte, l2Associativity, numCores, numThreadsPerCore, "LRU", LRUPolicy.class));
+                this.archimulatorService.addProcessorProfile(Presets.processor(l2SizeInKByte, l2Associativity, numCores, numThreadsPerCore, "LLCHTAwareLRU", LLCHTAwareLRUPolicy.class));
             }
         }
     }
@@ -112,32 +110,17 @@ public class ManagementStartup {
             if(processorProfile.getL2EvictionPolicyClz().equals(LRUPolicy.class)) {
                 for(SimulatedProgram simulatedProgram : simulatedPrograms) {
                     if(simulatedProgram.getTitle().startsWith("mst_baseline")) {
-                        ExperimentProfile experimentProfile = new ExperimentProfile(simulatedProgram.getTitle() + "-" + processorProfile.getTitle(), processorProfile);
-                        experimentProfile.addWorkload(simulatedProgram);
-                        experimentProfile.fastForwardToPseudoCallAndInDetailForMaxInsts(pthreadSpawnedIndex, maxInsts);
-//                        experimentProfile.inDetailToEnd();
-                        experimentProfiles.add(experimentProfile);
+                        experimentProfiles.add(Presets.baseline_lru(pthreadSpawnedIndex, maxInsts, processorProfile, simulatedProgram));
                     }
                     else if(simulatedProgram.getTitle().startsWith("mst_ht")) {
-                        ExperimentProfile experimentProfile = new ExperimentProfile(simulatedProgram.getTitle() + "-" + processorProfile.getTitle(), processorProfile);
-                        experimentProfile.addWorkload(simulatedProgram);
-                        experimentProfile.fastForwardToPseudoCallAndInDetailForMaxInsts(pthreadSpawnedIndex, maxInsts);
-//                        experimentProfile.inDetailToEnd();
-                        experimentProfile.addSimulationCapabilityClass(LLCReuseDistanceProfilingCapability.class);
-                        experimentProfile.addSimulationCapabilityClass(HTLLCRequestProfilingCapability.class);
-                        experimentProfiles.add(experimentProfile);
+                        experimentProfiles.add(Presets.ht_lru(pthreadSpawnedIndex, maxInsts, processorProfile, simulatedProgram));
                     }
                 }
             }
             else if(processorProfile.getL2EvictionPolicyClz().equals(LLCHTAwareLRUPolicy.class)) {
                 for(SimulatedProgram simulatedProgram : simulatedPrograms) {
                     if(simulatedProgram.getTitle().startsWith("mst_ht")) {
-                        ExperimentProfile experimentProfile = new ExperimentProfile(simulatedProgram.getTitle() + "-" + processorProfile.getTitle(), processorProfile);
-                        experimentProfile.addWorkload(simulatedProgram);
-                        experimentProfile.fastForwardToPseudoCallAndInDetailForMaxInsts(pthreadSpawnedIndex, maxInsts);
-//                        experimentProfile.inDetailToEnd();
-                        experimentProfile.addSimulationCapabilityClass(LLCReuseDistanceProfilingCapability.class);
-                        experimentProfiles.add(experimentProfile);
+                        experimentProfiles.add(Presets.ht_ht_aware_lru(pthreadSpawnedIndex, maxInsts, processorProfile, simulatedProgram));
                     }
                 }
             }
@@ -184,13 +167,12 @@ public class ManagementStartup {
 
         for(ExperimentProfile experimentProfile : experimentProfiles) {
             System.out.println("Submitting experiment profile: " + experimentProfile);
-
             this.archimulatorService.addExperimentProfile(experimentProfile);
         }
 
         this.archimulatorService.setRunningExperimentEnabled(true);
     }
-    
+
     private void resetAdminPassword() throws SQLException {
         this.archimulatorService.setUserPassword(ArchimulatorServiceImpl.USER_ID_ADMIN, ArchimulatorServiceImpl.USER_INITIAL_PASSWORD_ADMIN);
     }
@@ -201,52 +183,6 @@ public class ManagementStartup {
         public static final String SERVICE_URL = "http://localhost:8080/api";
 //    public static final String SERVICE_URL = "http://[2607:f358:10:13::2]/api";
 //        public static final String SERVICE_URL = "http://www.archimulator.com/api";
-
-    public static final SimulatedProgram SIMULATED_PROGRAM_MST_BASELINE = new SimulatedProgram(
-            "mst_baseline", ExperimentProfile.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/baseline",
-            "mst.mips",
-//            "10000");
-//            "100");
-//            "400");
-//            "1024");
-//            "2000");
-            "4000");
-
-    public static SimulatedProgram SIMULATED_PROGRAM_MST_HT(int lookahead, int stride) {
-        SimulatedProgram program = new SimulatedProgram(
-                "mst_ht" + "-lookahead_" + lookahead + "-stride_" + stride, ExperimentProfile.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/ht",
-                "mst.mips",
-//                "10000");
-//                "100");
-//                "400");
-//                "1024");
-//                "2000");
-                "4000");
-        program.setHelperThreadedProgram(true);
-        program.setHtLookahead(lookahead);
-        program.setHtStride(stride);
-        return program;
-    }
-
-    public static final SimulatedProgram SIMULATED_PROGRAM_EM3D_BASELINE = new SimulatedProgram(
-            "em3d_baseline", ExperimentProfile.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/em3d/baseline",
-            "em3d.mips",
-            "400000 128 75 1");
-
-    public static final SimulatedProgram SIMULATED_PROGRAM_EM3D_HT = new SimulatedProgram(
-            "em3d_ht", ExperimentProfile.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/em3d/ht",
-            "em3d.mips",
-            "400000 128 75 1");
-
-    public static final SimulatedProgram SIMULATED_PROGRAM_429_MCF_BASELINE = new SimulatedProgram(
-            "429_mcf_baseline", ExperimentProfile.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline",
-            "429.mcf.mips",
-            ExperimentProfile.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline/data/ref/input/inp.in");
-
-    public static final SimulatedProgram SIMULATED_PROGRAM_429_MCF_HT = new SimulatedProgram(
-            "429_mcf_ht", ExperimentProfile.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht",
-            "429.mcf.mips",
-            ExperimentProfile.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht/data/ref/input/inp.in");
 
     public static void recordException(Exception e) {
         System.out.print(String.format("[%s Exception] %s\r\n", DateHelper.toString(new Date()), e));

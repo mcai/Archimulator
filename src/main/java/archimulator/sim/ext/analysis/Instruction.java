@@ -31,6 +31,7 @@ public class Instruction {
     private int leaderType;
 
     private BasicBlock basicBlock;
+    private String sectionName;
 
     public Instruction(Process process, int pc, StaticInstruction staticInstruction) {
         this.process = process;
@@ -77,6 +78,14 @@ public class Instruction {
 
     public void setBasicBlock(BasicBlock basicBlock) {
         this.basicBlock = basicBlock;
+    }
+
+    public String getSectionName() {
+        return sectionName;
+    }
+
+    public void setSectionName(String sectionName) {
+        this.sectionName = sectionName;
     }
 
     @Override

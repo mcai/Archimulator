@@ -20,6 +20,7 @@ package archimulator.sim.os;
 
 import archimulator.sim.base.experiment.profile.ExperimentProfile;
 import archimulator.sim.base.simulation.ContextConfig;
+import archimulator.sim.ext.analysis.ElfAnalyzer;
 import archimulator.sim.ext.analysis.Instruction;
 import archimulator.sim.isa.StaticInstruction;
 import archimulator.sim.isa.dissembler.MipsDissembler;
@@ -35,6 +36,7 @@ public class BasicProcess extends Process {
     private Map<Integer, StaticInstruction> machInstsToStaticInsts;
 
     private Map<String, SortedMap<Integer, Instruction>> instructions;
+    private ElfAnalyzer elfAnalyzer;
 
     public BasicProcess(Kernel kernel, String simulationDirectory, ContextConfig contextConfig) {
         super(kernel, simulationDirectory, contextConfig);
@@ -130,7 +132,8 @@ public class BasicProcess extends Process {
             throw new IllegalArgumentException("'environ' overflow, increment MAX_ENVIRON");
         }
 
-//        new ElfAnalyzer(elfFileName, elfFile, this.instructions, this.getProgramEntry()).buildControlFlowGraphs();
+        this.elfAnalyzer = new ElfAnalyzer(elfFileName, elfFile, this.instructions, this.getProgramEntry());
+        this.elfAnalyzer.buildControlFlowGraphs();
     }
 
     private void predecode(String sectionName, Memory memory, int pc) {
@@ -157,5 +160,9 @@ public class BasicProcess extends Process {
             throw new IllegalArgumentException();
         }
         return this.machInstsToStaticInsts.get(this.pcsToMachInsts.get(pc));
+    }
+
+    public ElfAnalyzer getElfAnalyzer() {
+        return elfAnalyzer;
     }
 }

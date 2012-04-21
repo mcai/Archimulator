@@ -22,30 +22,23 @@ import archimulator.sim.isa.BasicMipsInstructionExecutor;
 import archimulator.sim.isa.StaticInstructionType;
 import archimulator.sim.os.elf.ElfFile;
 import archimulator.sim.os.elf.Symbol;
+import archimulator.util.DateHelper;
 import archimulator.util.StringHelper;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
+import java.io.*;
+import java.util.*;
 
 public class ElfAnalyzer {
     private Program program;
     private ElfFile elfFile;
     private Map<String, SortedMap<Integer, Instruction>> insts;
     private int programEntry;
-    private String dissemblyFileName;
 
     public ElfAnalyzer(String fileName, ElfFile elfFile, Map<String, SortedMap<Integer, Instruction>> insts, int programEntry) {
         this.elfFile = elfFile;
         this.insts = insts;
         this.programEntry = programEntry;
         this.program = new Program(fileName);
-
-        this.dissemblyFileName = fileName + ".dis";
     }
 
     public void buildControlFlowGraphs() {
@@ -70,11 +63,26 @@ public class ElfAnalyzer {
             }
         }
 
+        for(String sectionName : this.insts.keySet()) {
+            for(Instruction instruction : this.insts.get(sectionName).values()) {
+                instruction.setSectionName(sectionName);
+            }
+        }
+
+//        for (Function function : this.program.getFunctions()) {
+//            for (int i = 0; i < function.getNumInsts(); i++) {
+//                int pc = (int) function.getSymbol().getSt_value() + i * 4;
+//
+//                Instruction instruction = this.insts.get(function.getSectionName()).get(pc);
+//                if(instruction.getBasicBlock() == null && !instruction.getSectionName().equals(".init")) {
+//                    throw new IllegalArgumentException(instruction + "");
+//                }
+//            }
+//        }
+
         for (Function function : this.program.getFunctions()) {
             this.createControlFlowGraph(function);
         }
-
-        this.dumpAnalysisResult();
     }
 
     private void createControlFlowGraph(Function function) {
@@ -112,20 +120,25 @@ public class ElfAnalyzer {
     private void createControlFlowGraphEdges(Function function) {
         for (BasicBlock basicBlock : function.getBasicBlocks()) {
             if (basicBlock.getInstructions().size() >= 2) {
-                Instruction lastInst = basicBlock.getInstructions().get(basicBlock.getInstructions().size() - 2);
+                Instruction lastInstruction = basicBlock.getInstructions().get(basicBlock.getInstructions().size() - 2);
 
-                StaticInstructionType staticInstructionType = lastInst.getStaticInstruction().getMnemonic().getType();
+                StaticInstructionType staticInstructionType = lastInstruction.getStaticInstruction().getMnemonic().getType();
 
                 if (staticInstructionType == StaticInstructionType.CONDITIONAL) {
                     BasicBlock nextBasicBlock = function.getBasicBlocks().get(basicBlock.getNum() + 1);
                     this.createControlFlowGraphEdge(basicBlock, nextBasicBlock, ControlFlowGraphEdgeType.NOT_TAKEN);
 
-                    Instruction targetInstruction = this.getTargetInstruction(function, lastInst);
+                    Instruction targetInstruction = this.getTargetInstruction(function, lastInstruction);
 
-                    this.createControlFlowGraphEdge(basicBlock, targetInstruction.getBasicBlock(), ControlFlowGraphEdgeType.TAKEN);
+                    if(targetInstruction.getBasicBlock() != null) {
+                        this.createControlFlowGraphEdge(basicBlock, targetInstruction.getBasicBlock(), ControlFlowGraphEdgeType.TAKEN);
+                    }
+                    else {
+                        System.out.print(String.format("[%s WARN] Cannot find parent basic block for instruction: %s in section %s\n", DateHelper.toString(new Date()), targetInstruction, targetInstruction.getSectionName()));
+                    }
                     basicBlock.setType(BasicBlockType.CONDITIONAL);
                 } else if (staticInstructionType == StaticInstructionType.UNCONDITIONAL) {
-                    Instruction targetInstruction = this.getTargetInstruction(function, lastInst);
+                    Instruction targetInstruction = this.getTargetInstruction(function, lastInstruction);
                     this.createControlFlowGraphEdge(basicBlock, targetInstruction.getBasicBlock(), ControlFlowGraphEdgeType.TAKEN);
                     basicBlock.setType(BasicBlockType.UNCONDITIONAL);
                 } else if (staticInstructionType == StaticInstructionType.FUNCTION_RETURN) {
@@ -191,35 +204,35 @@ public class ElfAnalyzer {
         }
     }
 
+    public void dumpAnalysisResult(Writer out) {
+        PrintWriter bw = new PrintWriter(out);
 
-    private void dumpAnalysisResult() {
-        try {
-            PrintWriter bw = new PrintWriter(new FileWriter(this.dissemblyFileName));
+        for (Function function : this.program.getFunctions()) {
+            bw.println(String.format("0x%08x <%s>: ", function.getBasicBlocks().get(0).getInstructions().get(0).getPc(), function.getSymbol().getName()));
 
-            for (Function function : this.program.getFunctions()) {
-                bw.println(String.format("0x%08x <%s>: ", function.getBasicBlocks().get(0).getInstructions().get(0).getPc(), function.getSymbol().getName()));
+            for (BasicBlock basicBlock : function.getBasicBlocks()) {
+                bw.print("\tbb" + basicBlock.getNum() + ": \t; type = " + basicBlock.getType() + "; ");
+                bw.print("  preds = ");
 
-                for (BasicBlock basicBlock : function.getBasicBlocks()) {
-                    bw.print("\tbb" + basicBlock.getNum() + ": \t; type = " + basicBlock.getType() + "; ");
-                    bw.print("  preds = ");
+                List<String> preds = new ArrayList<String>();
 
-                    List<String> preds = new ArrayList<String>();
-
-                    for (ControlFlowGraphEdge incomingEdge : basicBlock.getIncomingEdges()) {
-                        preds.add("bb" + incomingEdge.getFrom().getNum());
-                    }
-
-                    bw.println(StringHelper.join(preds, ", "));
-
-                    for (Instruction instruction : basicBlock.getInstructions()) {
-                        bw.println("\t\t" + instruction + (instruction.isLeader() ? " <leader:" + instruction.getLeaderType() + ">" : ""));
-                    }
-
-                    bw.println();
+                for (ControlFlowGraphEdge incomingEdge : basicBlock.getIncomingEdges()) {
+                    preds.add("bb" + incomingEdge.getFrom().getNum());
                 }
-            }
 
-            bw.close();
+                bw.println(StringHelper.join(preds, ", "));
+
+                for (Instruction instruction : basicBlock.getInstructions()) {
+                    bw.println("\t\t" + instruction + (instruction.isLeader() ? " <leader:" + instruction.getLeaderType() + ">" : ""));
+                }
+
+                bw.println();
+            }
+        }
+
+        bw.close();
+        try {
+            out.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
