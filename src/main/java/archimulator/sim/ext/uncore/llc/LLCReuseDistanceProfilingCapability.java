@@ -20,6 +20,7 @@ package archimulator.sim.ext.uncore.llc;
 
 import archimulator.sim.base.event.DumpStatEvent;
 import archimulator.sim.base.event.PollStatsEvent;
+import archimulator.sim.base.event.PseudocallEncounteredEvent;
 import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.base.experiment.capability.SimulationCapability;
 import archimulator.sim.base.simulation.Simulation;
@@ -29,15 +30,13 @@ import archimulator.sim.core.Processor;
 import archimulator.sim.analysis.BasicBlock;
 import archimulator.sim.analysis.Function;
 import archimulator.sim.analysis.Instruction;
-import archimulator.sim.isa.StaticInstruction;
+import archimulator.sim.isa.ArchitecturalRegisterFile;
 import archimulator.sim.isa.StaticInstructionType;
-import archimulator.sim.isa.dissembler.MipsDissembler;
 import archimulator.sim.os.BasicProcess;
 import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.MemoryHierarchyAccessType;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.coherence.event.CoherentCacheServiceNonblockingRequestEvent;
-import archimulator.util.DateHelper;
 import archimulator.util.action.Action1;
 
 import java.io.Serializable;
@@ -56,9 +55,13 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
     private long numDownwardWrites = 0;
     private long numEvicts = 0;
 
-//    private String hotspotFunctionName = "HashLookup"; //TODO: should not be hardcoded!!!
-    private String hotspotFunctionName = "push_thread_func"; //TODO: should not be hardcoded!!!
-    private Map<Integer, Instruction> loadsInHotspotFunction;
+    private String hotspotFunctionName = "HashLookup"; //TODO: should not be hardcoded!!!
+//    private String hotspotFunctionName = "push_thread_func"; //TODO: should not be hardcoded!!!
+
+    private int hotspotThreadId = BasicThread.getMainThreadId();
+//    private int hotspotThreadId = BasicThread.getHelperThreadId();
+
+    private Map<Integer, LoadEntry> loadsInHotspotFunction;
 
     public LLCReuseDistanceProfilingCapability(Simulation simulation) {
         this(simulation.getProcessor().getCacheHierarchy().getL2Cache().getCache());
@@ -79,43 +82,22 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
 
         this.reuseDistances = new TreeMap<CacheAccessType, Map<Integer, Long>>();
 
+        llc.getBlockingEventDispatcher().addListener(PseudocallEncounteredEvent.class, new Action1<PseudocallEncounteredEvent>() {
+            public void apply(PseudocallEncounteredEvent event) {
+                if(event.getArg() == 3820) {
+                    event.getContext().getRegs().setGpr(ArchitecturalRegisterFile.REG_V0, 100);
+                }
+//                if (BasicThread.isHelperThread(event.getContext().getThread()))
+//                    System.out.println("pseudocall: " + event.getContext().getThread().getName() + " - " + event.getArg());
+            }
+        });
+
         llc.getBlockingEventDispatcher().addListener(CoherentCacheServiceNonblockingRequestEvent.class, new Action1<CoherentCacheServiceNonblockingRequestEvent>() {
             public void apply(CoherentCacheServiceNonblockingRequestEvent event) {
                 if (event.getCache().getCache().equals(LLCReuseDistanceProfilingCapability.this.llc)) {
                     switch (event.getAccessType()) {
                         case DOWNWARD_READ:
                             numDownwardReads++;
-
-                            if(event.getRequesterAccess().getType() == MemoryHierarchyAccessType.LOAD) {
-                                if (loadsInHotspotFunction == null) {
-                                    loadsInHotspotFunction = new TreeMap<Integer, Instruction>();
-
-                                    Processor processor = event.getRequesterAccess().getDynamicInst().getThread().getCore().getProcessor();
-                                    BasicProcess process = (BasicProcess) processor.getCores().get(0).getThreads().get(0).getContext().getProcess();
-
-                                    for (Function function : process.getElfAnalyzer().getProgram().getFunctions()) {
-                                        if (function.getSymbol().getName().equals(hotspotFunctionName)) {
-                                            for (BasicBlock basicBlock : function.getBasicBlocks()) {
-                                                for (Instruction instruction : basicBlock.getInstructions()) {
-                                                    if (instruction.getStaticInstruction().getMnemonic().getType() == StaticInstructionType.LOAD) {
-                                                        loadsInHotspotFunction.put(instruction.getPc(), instruction);
-                                                    }
-                                                }
-                                            }
-
-                                            break;
-                                        }
-                                    }
-                                }
-
-                                DynamicInstruction dynamicInst = event.getRequesterAccess().getDynamicInst();
-
-//                                if (loadsInHotspotFunction.containsKey(dynamicInst.getPc()) && BasicThread.isMainThread(dynamicInst.getThread().getContext().getThreadId())) {
-                                if (loadsInHotspotFunction.containsKey(dynamicInst.getPc()) && BasicThread.isHelperThread(dynamicInst.getThread().getContext().getThreadId())) {
-                                    StaticInstruction staticInst = dynamicInst.getThread().getContext().getProcess().getStaticInst(dynamicInst.getPc());
-                                    System.out.print(String.format("[%s %s: Load Request in Hotspot Function] %s \r\n", DateHelper.toString(new Date()), dynamicInst.getThread().getId(), MipsDissembler.disassemble(dynamicInst.getPc(), staticInst)));
-                                }
-                            }
                             break;
                         case DOWNWARD_WRITE:
                             numDownwardWrites++;
@@ -162,6 +144,15 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
         stats.put("llcReuseDistanceProfilingCapability." + this.llc.getName() + ".numDownwardWrites", this.numDownwardWrites);
         stats.put("llcReuseDistanceProfilingCapability." + this.llc.getName() + ".numEvicts", this.numEvicts);
 
+        if(this.loadsInHotspotFunction != null) {
+            for(int pc : this.loadsInHotspotFunction.keySet()) {
+                LoadEntry loadEntry = this.loadsInHotspotFunction.get(pc);
+                if(loadEntry.accesses > 0) {
+                    stats.put(String.format("llcReuseDistanceProfilingCapability.%s.loadsInHotspotFunction@[0x%08x]", this.llc.getName(), pc), loadEntry);
+                }
+            }
+        }
+
         for (CacheAccessType accessType : this.reuseDistances.keySet()) {
             for (int reuseDistance : this.reuseDistances.get(accessType).keySet()) {
                 stats.put("llcReuseDistanceProfilingCapability." + this.llc.getName() + ".ht_mt_inter-thread_reuseDistances[" + accessType + "][" + reuseDistance + "]", String.valueOf(this.reuseDistances.get(accessType).get(reuseDistance)));
@@ -170,6 +161,37 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
     }
 
     private void handleServicingRequest(CoherentCacheServiceNonblockingRequestEvent event) {
+        if(event.getRequesterAccess().getType() == MemoryHierarchyAccessType.LOAD) {
+            if (loadsInHotspotFunction == null) {
+                loadsInHotspotFunction = new TreeMap<Integer, LoadEntry>();
+                Processor processor = event.getRequesterAccess().getDynamicInst().getThread().getCore().getProcessor();
+                BasicProcess process = (BasicProcess) processor.getCores().get(0).getThreads().get(0).getContext().getProcess();
+
+                for (Function function : process.getElfAnalyzer().getProgram().getFunctions()) {
+                    if (function.getSymbol().getName().equals(hotspotFunctionName)) {
+                        for (BasicBlock basicBlock : function.getBasicBlocks()) {
+                            for (Instruction instruction : basicBlock.getInstructions()) {
+                                if (instruction.getStaticInstruction().getMnemonic().getType() == StaticInstructionType.LOAD) {
+                                    loadsInHotspotFunction.put(instruction.getPc(), new LoadEntry(instruction));
+                                }
+                            }
+                        }
+
+                        break;
+                    }
+                }
+            }
+
+            DynamicInstruction dynamicInst = event.getRequesterAccess().getDynamicInst();
+
+            if (loadsInHotspotFunction.containsKey(dynamicInst.getPc()) && dynamicInst.getThread().getContext().getThreadId() == hotspotThreadId) {
+                loadsInHotspotFunction.get(dynamicInst.getPc()).accesses++;
+                if(event.isHitInCache()) {
+                    loadsInHotspotFunction.get(dynamicInst.getPc()).hits++;
+                }
+            }
+        }
+
         this.setLRU(event.getLineFound().getSet(), this.llc.getTag(event.getAddress()), event.getRequesterAccess().getThread().getId(), event.getAccessType());
     }
 
@@ -241,6 +263,25 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
         }
 
         return null;
+    }
+
+    private static class LoadEntry implements Serializable {
+        private Instruction instruction;
+        private int accesses;
+        private int hits;
+
+        private LoadEntry(Instruction instruction) {
+            this.instruction = instruction;
+        }
+
+        private double getHitRatio() {
+            return this.accesses > 0 ? (double) this.hits / this.accesses : 0.0;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("LoadEntry{instruction=%s, accesses=%d, hits=%d, misses=%d, hitRatio=%.4f}", instruction, accesses, hits, accesses - hits, getHitRatio());
+        }
     }
 
     private static class StackEntry implements Serializable {

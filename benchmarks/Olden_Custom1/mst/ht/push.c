@@ -16,6 +16,11 @@ inline void push_thread_func()
     Vertex volatile tmp;
     HashEntry volatile ent;
 
+    int lookahead = 0;
+    int tempValue = 0;
+
+    lookahead = LOOKAHEAD;
+
     while(1)
     {
         while(!global_tmp);
@@ -29,6 +34,19 @@ inline void push_thread_func()
 
         while(tmp)
         {
+#ifdef MIPS_1
+            asm ("addiu %0,$2,0" : "=r" (tempValue));
+            printf("tempValue: %d\n",tempValue);
+
+            asm ("addiu $0,$0,3820");
+//            asm ("addiu %0,$2,0" : "=r" (lookahead));
+            asm ("addiu %0,$0,0" : "=r" (lookahead));
+
+            printf("lookahead: %d\n",lookahead);
+
+            asm ("addiu $2,%0,0" : :"r"(tempValue));
+#endif
+
             for(i = 0; tmp && i < LOOKAHEAD; i++, tmp = tmp->next);
 
             for(i = 0; tmp && i < STRIDE; i++, tmp = tmp->next)
