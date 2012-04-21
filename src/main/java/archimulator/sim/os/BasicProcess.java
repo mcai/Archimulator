@@ -20,8 +20,8 @@ package archimulator.sim.os;
 
 import archimulator.sim.base.experiment.profile.ExperimentProfile;
 import archimulator.sim.base.simulation.ContextConfig;
-import archimulator.sim.ext.analysis.ElfAnalyzer;
-import archimulator.sim.ext.analysis.Instruction;
+import archimulator.sim.analysis.ElfAnalyzer;
+import archimulator.sim.analysis.Instruction;
 import archimulator.sim.isa.StaticInstruction;
 import archimulator.sim.isa.dissembler.MipsDissembler;
 import archimulator.sim.isa.memory.Memory;

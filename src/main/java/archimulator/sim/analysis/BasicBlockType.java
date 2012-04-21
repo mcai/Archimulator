@@ -16,25 +16,13 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.ext.analysis;
+package archimulator.sim.analysis;
 
-import java.util.SortedSet;
-import java.util.TreeSet;
-
-public class Program {
-    private String fileName;
-    private SortedSet<Function> functions;
-
-    public Program(String fileName) {
-        this.fileName = fileName;
-        this.functions = new TreeSet<Function>();
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
-
-    public SortedSet<Function> getFunctions() {
-        return functions;
-    }
+public enum BasicBlockType {
+    UNKNOWN,
+    SEQUENTIAL,
+    CONDITIONAL,
+    UNCONDITIONAL,
+    FUNCTION_CALL,
+    FUNCTION_RETURN
 }

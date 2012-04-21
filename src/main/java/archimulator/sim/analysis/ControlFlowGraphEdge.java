@@ -16,13 +16,22 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.ext.analysis;
+package archimulator.sim.analysis;
 
-public enum BasicBlockType {
-    UNKNOWN,
-    SEQUENTIAL,
-    CONDITIONAL,
-    UNCONDITIONAL,
-    FUNCTION_CALL,
-    FUNCTION_RETURN
+public class ControlFlowGraphEdge {
+    private BasicBlock from;
+    private BasicBlock to;
+
+    public ControlFlowGraphEdge(BasicBlock from, BasicBlock to) {
+        this.from = from;
+        this.to = to;
+    }
+
+    public BasicBlock getFrom() {
+        return from;
+    }
+
+    public BasicBlock getTo() {
+        return to;
+    }
 }

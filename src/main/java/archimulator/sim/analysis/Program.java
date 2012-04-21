@@ -16,22 +16,25 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.ext.analysis;
+package archimulator.sim.analysis;
 
-public class ControlFlowGraphEdge {
-    private BasicBlock from;
-    private BasicBlock to;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
-    public ControlFlowGraphEdge(BasicBlock from, BasicBlock to) {
-        this.from = from;
-        this.to = to;
+public class Program {
+    private String fileName;
+    private SortedSet<Function> functions;
+
+    public Program(String fileName) {
+        this.fileName = fileName;
+        this.functions = new TreeSet<Function>();
     }
 
-    public BasicBlock getFrom() {
-        return from;
+    public String getFileName() {
+        return fileName;
     }
 
-    public BasicBlock getTo() {
-        return to;
+    public SortedSet<Function> getFunctions() {
+        return functions;
     }
 }
