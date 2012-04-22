@@ -138,6 +138,53 @@ Definition of reuse distance in multithreaded program:
     share a cache with T since the last reference to x by a
     thread which shares a cache with T .
 
+from Feedback Directed Prefetching: Improving the Performance and Bandwidth-Efficiency of Hardware Prefetchers :
+The goal of this paper is to reduce the negative perfor-
+mance and bandwidth impact of aggressive prefetching while
+preserving the large performance benefits provided by it. To
+achieve this goal, we propose simple and implementable mech-
+anisms that dynamically adjust the aggressiveness of the hard-
+ware prefetcher as well as the location in the processor cache
+where prefetched data is inserted.
+The proposed mechanisms estimate the effectiveness of the
+prefetcher by monitoring the accuracy and timeliness of the
+prefetch requests as well as the cache pollution caused by the
+prefetch requests. We describe simple hardware implemen-
+tations to estimate accuracy, timeliness, and cache pollution.
+Based on the run-time estimation of these three metrics, the
+aggressiveness of the hardware prefetcher is decreased or in-
+creased dynamically. Also, based on the run-time estimation
+of the cache pollution caused by the prefetcher, the proposed
+mechanism dynamically decides where to insert the prefetched
+blocks in the processor cache’s LRU stack.
+Our results show that using the proposed dynamic feed-
+back mechanisms improve the average performance of 17
+memory-intensive benchmarks in the SPEC CPU2000 suite by
+6.5% compared to the best-performing conventional stream-
+based prefetcher configuration. With the proposed mechanism,
+the negative performance impact incurred on some bench-
+marks due to stream-based prefetching is completely elimi-
+nated. Furthermore, the proposed mechanism consumes 18.7%
+less memory bandwidth than the best-performing stream-based
+prefetcher configuration. Compared to a conventional stream-
+based prefetcher configuration that consumes similar amount
+of memory bandwidth, feedback directed prefetching provides
+13.6% higher performance. We also show that the dynamic
+feedback mechanism works similarly well when implemented
+to dynamically adjust the aggressiveness of a global-history-
+buffer (GHB) based delta correlation prefetcher [10] or a
+PC-based stride prefetcher [1]. Compared to a conventional
+GHB-based delta correlation prefetcher configuration that con-
+sumes similar amount of memory bandwidth, feedback di-
+rected prefetching provides 9.9% higher performance. The
+proposed mechanism provides these benefits with a modest
+hardware storage cost of 2.54 KB and without significantly
+increasing hardware complexity. On the remaining 9 SPEC
+CPU2000 benchmarks, the proposed dynamic feedback mech-
+anism performs as well as the best-performing conventional
+stream prefetcher configuration for those 9 benchmarks.
+
+
 
 
 
