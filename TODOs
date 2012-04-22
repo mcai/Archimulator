@@ -184,6 +184,11 @@ CPU2000 benchmarks, the proposed dynamic feedback mech-
 anism performs as well as the best-performing conventional
 stream prefetcher configuration for those 9 benchmarks.
 
+Aggressiveness of the prefetcher is determined by how far the prefetcher
+stays ahead of the demand access stream of the program as well as how many
+prefetch requests are generated, as shown in Table 1 and Section 2.1.
+
+
 
 
 
