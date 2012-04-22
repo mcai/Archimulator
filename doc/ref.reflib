@@ -10,7 +10,7 @@
     <relative_filename></relative_filename>
     <key>Mehta2004</key>
     <notes></notes>
-    <bib_type>Misc</bib_type>
+    <bib_type>techreport</bib_type>
     <bib_doi></bib_doi>
     <bib_title>Cache Showdown: The Good, Bad and Ugly</bib_title>
     <bib_authors>Mehta, Bhavesh and Vantrease, Dana and Yen, Luke</bib_authors>
@@ -19,14 +19,6 @@
     <bib_number></bib_number>
     <bib_pages></bib_pages>
     <bib_year>2004</bib_year>
-    <bib_extra key="Abstract">Prefetching algorithms have been mainly studied in the context of the Coverage and Accuracy metrics. While this is an appropriate metric for prefetching into separate stream buffers, it is a poor assessment of prefetching into a shared cache structure where cache pollution can become a serious factor. Traditionally, prefetches have been categorized as &quot;good&quot; or &quot;bad&quot; if they are accessed or are evicted without being accessed, respectively. We propose a new categorization of &quot;good&quot;, &quot;bad&quot;, and &quot;ugly&quot; that takes into account prefetches that cause harmful cache pollution. This paper proposes a novel structure called the Evict Table (ET) that gauges the amount of cache pollution caused by prefetching into a shared data structure, such as a cache. We show the value of the ET in the context of a chip-multiprocessors, where prefetching among several processing nodes may further increase the contention for cache real-estate. Specifically, we use the ET as an aid in evaluating the effects of Unistride and Czone prefetching algorithms on a chip-multiprocessor’s shared L2 cache across a varying number of cache sizes. 1 1</bib_extra>
-    <bib_extra key="Bibsource">OAI-PMH server at citeseerx.ist.psu.edu</bib_extra>
-    <bib_extra key="Contributor">CiteSeerX</bib_extra>
-    <bib_extra key="Language">en</bib_extra>
-    <bib_extra key="Oai">oai:CiteSeerXPSU:10.1.1.115.6866</bib_extra>
-    <bib_extra key="Relation">10.1.1.37.6114; 10.1.1.55.4004; 10.1.1.85.9737; 10.1.1.117.6719; 10.1.1.12.3639; 10.1.1.137.5086; 10.1.1.84.6302; 10.1.1.13.7350; 10.1.1.31.4592; 10.1.1.121.2399; 10.1.1.108.3882</bib_extra>
-    <bib_extra key="Rights">Metadata may be used without restrictions as long as the oai identifier remains attached to it.</bib_extra>
-    <bib_extra key="Url">http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.115.6866; http://www.cs.wisc.edu/~bsmehta/757/paper.pdf</bib_extra>
   </doc>
   <doc>
     <filename></filename>
@@ -217,7 +209,7 @@
     <relative_filename></relative_filename>
     <key>Srinivasan2004</key>
     <notes></notes>
-    <bib_type>Article</bib_type>
+    <bib_type>article</bib_type>
     <bib_doi></bib_doi>
     <bib_title>A Prefetch Taxonomy</bib_title>
     <bib_authors>Srinivasan, Viji and Davidson, Edward S. and Tyson, Gary S.</bib_authors>
@@ -226,16 +218,13 @@
     <bib_number>2</bib_number>
     <bib_pages>126-140</bib_pages>
     <bib_year>2004</bib_year>
-    <bib_extra key="Bibdate">2011-10-26</bib_extra>
-    <bib_extra key="Bibsource">DBLP, http://dblp.uni-trier.de/db/journals/tc/tc53.html#SrinivasanDT04</bib_extra>
-    <bib_extra key="Url">http://doi.ieeecomputersociety.org/10.1109/TC.2004.1261824</bib_extra>
   </doc>
   <doc>
     <filename></filename>
     <relative_filename></relative_filename>
     <key>Jerger2006</key>
     <notes></notes>
-    <bib_type>InProceedings</bib_type>
+    <bib_type>inproceedings</bib_type>
     <bib_doi></bib_doi>
     <bib_title>Friendly fire: understanding the effects of multiprocessor prefetches</bib_title>
     <bib_authors>Jerger, Natalie D. Enright and Hill, Eric L. and Lipasti, Mikko H.</bib_authors>
@@ -244,12 +233,8 @@
     <bib_number></bib_number>
     <bib_pages>177-188</bib_pages>
     <bib_year>2006</bib_year>
-    <bib_extra key="Bibdate">2008-10-22</bib_extra>
-    <bib_extra key="Bibsource">DBLP, http://dblp.uni-trier.de/db/conf/ispass/ispass2006.html#JergerHL06</bib_extra>
-    <bib_extra key="BookTitle">ISPASS</bib_extra>
-    <bib_extra key="Crossref">conf/ispass/2006</bib_extra>
-    <bib_extra key="Publisher">IEEE Computer Society</bib_extra>
-    <bib_extra key="Url">http://doi.ieeecomputersociety.org/10.1109/ISPASS.2006.1620802</bib_extra>
+    <bib_extra key="booktitle">ISPASS</bib_extra>
+    <bib_extra key="publisher">IEEE Computer Society</bib_extra>
   </doc>
   <doc>
     <filename></filename>
@@ -516,6 +501,26 @@
     <bib_extra key="Bibdate">2006-02-09</bib_extra>
     <bib_extra key="Bibsource">DBLP, http://dblp.uni-trier.de/db/journals/cacm/cacm46.html#NewmanEO03</bib_extra>
     <bib_extra key="Url">http://doi.acm.org/10.1145/948383.948411</bib_extra>
+  </doc>
+  <doc>
+    <filename></filename>
+    <relative_filename></relative_filename>
+    <key>Srinath2007</key>
+    <notes></notes>
+    <bib_type>InProceedings</bib_type>
+    <bib_doi></bib_doi>
+    <bib_title>Feedback Directed Prefetching: Improving the Performance and Bandwidth-Efficiency of Hardware Prefetchers</bib_title>
+    <bib_authors>Srinath, Santhosh and Mutlu, Onur and Kim, Hyesoon and Patt, Yale N.</bib_authors>
+    <bib_journal></bib_journal>
+    <bib_volume></bib_volume>
+    <bib_number></bib_number>
+    <bib_pages>63-74</bib_pages>
+    <bib_year>2007</bib_year>
+    <bib_extra key="Address">San Francisco, CA, USA</bib_extra>
+    <bib_extra key="BookTitle">Proc. 13th International Conference on High-Performance Computer Architecture (13th HPCA’07)</bib_extra>
+    <bib_extra key="Keywords">prefetching, LRU/MRU, SPEC CPU2000, FDP,</bib_extra>
+    <bib_extra key="Month">feb</bib_extra>
+    <bib_extra key="Publisher">IEEE Computer Society</bib_extra>
   </doc>
 </doclist>
 </library>

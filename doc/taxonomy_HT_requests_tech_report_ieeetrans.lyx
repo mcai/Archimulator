@@ -36,7 +36,7 @@
 \paperfontsize default
 \spacing single
 \use_hyperref true
-\pdf_title "Dynamic LLC Replacement for Helper Threaded Inter-Core Data Prefetching"
+\pdf_title "Pollution-Aware Feedback Directed Helper Threaded Inter-Core Data Prefetching"
 \pdf_author "Min Cai, Zhimin Gu"
 \pdf_keywords "chip multiprocessors, helper threaded inter-core data prefetching, cache replacement, cache pollution"
 \pdf_bookmarks false
@@ -82,22 +82,8 @@
 
 \begin_body
 
-\begin_layout Standard
-\begin_inset Note Note
-status collapsed
-
-\begin_layout Plain Layout
-You find the IEEEtran document class documentation here: http://mirror.ctan.org/ma
-cros/latex/contrib/IEEEtran/IEEEtran_HOWTO.pdf
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
 \begin_layout Title
-Dynamic LLC Replacement for Helper Threaded Inter-Core Data Prefetching
+Pollution-Aware Feedback Directed Helper Threaded Inter-Core Data Prefetching
 \end_layout
 
 \begin_layout Author
@@ -151,7 +137,7 @@ target "zmgu@x263.net"
 \begin_layout Page headings
 Journal of XXX
 \begin_inset ERT
-status collapsed
+status open
 
 \begin_layout Plain Layout
 
@@ -171,63 +157,41 @@ et al.
 \end_inset
 
 : Your Title
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-left side
-\series bold
-}{
-\series default
-right side
-\end_layout
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout Abstract
 Helper threaded inter-core data prefetching on shared cache chip multiprocessors
  (CMPs), in its most basic form, (1) uses the shared cache enabled fast
  inter-thread communication when both the main core and the helper core
- access the same cache line; (2) utilizes an idle neighboring core to prefetch
- the LLC cache line before the computation core need it.
+ access the same cache line; (2) constructs a helper thread in the software
+ running on an idle neighboring core to speculatively issue LLC prefetch
+ requests to the predicted memory addresses before the computation core
+ access these addresses.
  Effective helper threaded inter-core data prefetching demands that the
  helper thread (HT) should issue correct and timely LLC requests just before
  the main thread (MT) requests them.
  However this ideal case can not be assumed in the practical implemention
- of helper threaded inter-core data prefetching: some LLC requests coming
- from HT could not contribute to the MT performance, but instead stress
- and pollute LLC if no effective LLC replacement techniques are employed.
- Traditional notions of accuracy and coverage for hardware based data prefetchin
-g can be applied to helper threaded inter-core data prefetching as well,
- however they do not provide sufficient details on the cache pollution and
- inter-thread LLC interference caused by HT LLC requests for improving LLC
- replacement for helper threaded inter-core data prefetching.
+ of helper threaded inter-core data prefetching: inaccurate and/or untimely
+ LLC requests coming from HT could not contribute to the MT performance,
+ but instead stress and pollute LLC if no effective LLC replacement and
+ pollution-aware feedback techniques are employed
 \end_layout
 
 \begin_layout Abstract
-fast inter-thread communication when more than one core sharing the cache
- accesses the same block 
-\end_layout
-
-\begin_layout Abstract
-In this paper, we present the dynamic LLC replacement technique for helper
- threaded inter-core data prefetching, based on a pollution-aware taxonomy
- of HT LLC requests.
- Firstly, the experimental methodology used in this work are discussed.
- Secondly, a pollution aware taxonomy of HT LLC requests is presented from
- the view of the contribution of HT LLC requests to the MT performance.
- Thirdly, based on the intuition of the result of the taxonomy applied to
- the Pthreads based helper threaded version of the memory-intensive mst
- benchmark in Olden, the dynamic LLC replacement for helper threaded inter-core
- data prefetching are elaborated.
- Experimental results from cycle accurate simulation show that: (1) there
- is non-trivial LLC pollution caused by HT in helper-threaded data prefetching
- on CMPs; (2) LLC request taxonomy based dynamic LLC replacement can improve
- the effectiveness and timeliness of helper-threaded data prefetching on
- CMPs.
+In this paper, we present a pollution-aware feedback mechnism for dynamic
+ helper threaded inter-core data prefetching, based on a pollution-aware
+ taxonomy of HT LLC requests.
+ A pollution aware taxonomy of HT LLC requests is presented from the view
+ of the contribution of HT LLC requests to the MT performance.
+ Based on the pollution aware taxonomy of HT LLC requests, the feedback
+ mechanism for dynamic helper threaded inter-core data prefetching is proposed
+ to finetune LLC replacement and parameters of the HT scheme.
+ Experimental results from cycle accurate simulation of the Pthreads based
+ helper threaded version of the memory-intensive mst benchmark in Olden
+ show that: (1) there is non-trivial LLC pollution caused by HT in helper-thread
+ed data prefetching on CMPs; (2) LLC request taxonomy based dynamic LLC
+ replacement can improve the effectiveness and timeliness of helper-threaded
+ data prefetching on CMPs.
 \end_layout
 
 \begin_layout Keywords
@@ -293,15 +257,18 @@ status collapsed
  threaded inter-core data prefetching on shared cache chip multiprocessors
  (CMPs), in its most basic form, (1) uses the shared cache enabled fast
  inter-thread communication when both the main core and the helper core
- access the same cache line; (2) utilizes an idle neighboring core to prefetch
- the LLC cache line before the computation core need it.
+ access the same cache line; (2) constructs a helper thread in the software
+ running on an idle neighboring core to speculatively issue LLC prefetch
+ requests to the predicted memory addresses before the computation core
+ access these addresses.
   Effective helper threaded data prefetching demands that the helper thread
  (HT) should issue correct and timely LLC requests just before the main
  thread (MT) requests them.
  However this ideal case can not be assumed in the practical implemention
- of helper threaded inter-core data prefetching: some LLC requests coming
- from HT could not contribute to the MT performance, but instead stress
- and pollute LLC if no effective LLC replacement techniques are employed.
+ of helper threaded inter-core data prefetching: inaccurate and/or untimely
+ LLC requests coming from HT could not contribute to the MT performance,
+ but instead stress and pollute LLC if no effective LLC replacement techniques
+ are employed.
  
 \end_layout
 
@@ -368,8 +335,8 @@ useless
 
  HT request is one whose brought data is replaced before it is hit by a
  MT request.
- However the above accuracy and coverage metrics for HT requests and the
- classification of 
+ However the above traditional accuracy and coverage metrics for HT requests
+ and the classification of 
 \begin_inset Quotes eld
 \end_inset
 
@@ -385,30 +352,27 @@ useless
 \begin_inset Quotes erd
 \end_inset
 
- HT requests don't care about the cache pollution and inter-thread interference
+ HT requests don't care about the LLC pollution and inter-thread interference
  caused by HT LLC requests, which are two kinds of deficiencies in the HT
  scheme.
  
 \end_layout
 
 \begin_layout Standard
-In this paper, we present the dynamic LLC replacement technique for helper
- threaded inter-core data prefetching, based on a pollution-aware taxonomy
- of HT LLC requests.
- Firstly, the experimental methodology used in this work are discussed.
- Secondly, a pollution aware taxonomy of HT LLC requests is presented from
- the view of the contribution of HT LLC requests to the MT performance,
- in the aim of providing insights on designing and implementing effective
- LLC replacement techniques for the HT scheme.
- Thirdly, based on the intuition of the result of the taxonomy applied to
- the Pthreads based helper threaded version of the memory-intensive mst
- benchmark in Olden, the dynamic LLC replacement for helper threaded inter-core
- data prefetching are elaborated.
- Experimental results from cycle accurate simulation show that: (1) there
- is non-trivial LLC pollution caused by HT in helper-threaded data prefetching
- on CMPs; (2) LLC request taxonomy based dynamic LLC replacement can improve
- the effectiveness and timeliness of helper-threaded data prefetching on
- CMPs.
+In this paper, we present a pollution-aware feedback mechnism for dynamic
+ helper threaded inter-core data prefetching, based on a pollution-aware
+ taxonomy of HT LLC requests.
+ A pollution aware taxonomy of HT LLC requests is presented from the view
+ of the contribution of HT LLC requests to the MT performance.
+ Based on the pollution aware taxonomy of HT LLC requests, the feedback
+ mechanism for dynamic helper threaded inter-core data prefetching is proposed
+ to finetune LLC replacement and parameters of the HT scheme.
+ Experimental results from cycle accurate simulation of the Pthreads based
+ helper threaded version of the memory-intensive mst benchmark in Olden
+ show that: (1) there is non-trivial LLC pollution caused by HT in helper-thread
+ed data prefetching on CMPs; (2) LLC request taxonomy based dynamic LLC
+ replacement can improve the effectiveness and timeliness of helper-threaded
+ data prefetching on CMPs.
  We assume here a two level cache hierarchy where L1 caches are private
  and the L2 cache is shared among all processor cores on a single chip.
  
@@ -432,17 +396,852 @@ How can LLC replacement be improved based on the observed result of the
 
 \begin_layout Standard
 The rest of this paper is organized as follows.
- Section 3 presents the experimental methodology used in this work.
  Section 2 presents the pollution aware taxonomy of HT requests and the
  experimental result of mst in Olden.
- Section 4 discusses the dynamic LLC replacement for helper threaded inter-core
+ Section 3 discusses the dynamic LLC replacement for helper threaded inter-core
  data prefetching and its experimental results.
- Section 5 talks about related work.
- In section 6 we conclude the paper.
+ Section 4 presents the experimental methodology used in this work.
+ Section 5 discusses results.
+ Section 6 talks about related work.
+ In section 7 we conclude the paper.
 \end_layout
 
 \begin_layout Section
-Experimental Methodology
+Pollution Aware Taxonomy of HT LLC Requests
+\end_layout
+
+\begin_layout Subsection
+A Taxonomy Based on HT-MT Inter-Thread and MT Intra-Thread Reuse Distances
+\end_layout
+
+\begin_layout Standard
+We propose a pollution aware taxonomy of HT LLC requests based on the observed
+ cache pollution caused by HT LLC requests.
+\end_layout
+
+\begin_layout Standard
+The notion of inter-thread reuse distance is proposed to help explain the
+ taxonomy.
+ The traditional intra-thread reuse distance of a reference to data element
+ x is defined as the number of distinct data elements that have been referenced
+ between two contiguous accesses of x (or ∞ if the element has not been
+ referenced thereafter).
+ These two contiguous accesses are issued by the same thread in the traditional
+ notion.
+ To accomodate the case where one thread Tb accesses data element x that
+ has been previously brought into the cache by another thread Ta, we introduce
+ the notion of Ta-Tb inter-thread reuse distance, as compared to the traditional
+ intra-thread reuse distance.
+ Therefore, we could use HT-MT inter-thread reuse distance to describe the
+ case where the main thread accesses data element x that has been previously
+ brought into the LLC by the helper thread.
+ 
+\end_layout
+
+\begin_layout Standard
+Based on the notions of HT-MT inter-thread reuse distance (HT-MT_ITRD) and
+ MT intra-thread reuse distance (MT_RD), we can classify the HT LLC requests
+ into three types: good, bad and ugly.
+ Let's assume that when an HT LLC request with data 
+\family typewriter
+d
+\family default
+ evicts the LLC line containing victim data 
+\family typewriter
+v
+\family default
+ which is brought by MT, and afterwards the LLC line containing 
+\family typewriter
+d
+\family default
+ is evicted by an MT LLC request with data 
+\family typewriter
+m
+\family default
+, then we can see that: 
+\end_layout
+
+\begin_layout Enumerate
+HT-MT_ITRD(
+\family typewriter
+d
+\family default
+) < MT_RD(
+\family typewriter
+v
+\family default
+) < MT_RD(
+\family typewriter
+m
+\family default
+) , indicating it's a good HT request;
+\end_layout
+
+\begin_layout Enumerate
+MT_RD(
+\family typewriter
+v
+\family default
+) < HT-MT_ITRD(
+\family typewriter
+d
+\family default
+) < MT_RD(
+\family typewriter
+m
+\family default
+) , indicating it's a bad HT request in which data brought by HT displaces
+ an LLC line that will later be needed by MT; 
+\end_layout
+
+\begin_layout Enumerate
+MT_RD(
+\family typewriter
+m
+\family default
+) < HT_MT_ITRD(
+\family typewriter
+d
+\family default
+), MT_RD(
+\family typewriter
+m
+\family default
+), indicating it's an ugly HT request.
+\end_layout
+
+\begin_layout Standard
+As illustrated in Tab.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "tab:HT-Request-Taxonomy"
+
+\end_inset
+
+, among these three types of HT requests, good HT requests have positive
+ impact on MT performance.
+ Ugly HT requests have little performance impact on MT performance because
+ the requested data are not referenced by MT before evicted and they do
+ not evict any data that will be used by MT.
+ Bad HT requests are harmful for MT performance which should be prevented
+ as much as possible.
+ 
+\end_layout
+
+\begin_layout Standard
+Among good HT requests, late HT requests should be differentiated, which
+ are in-flight HT LLC requests that are hit by MT LLC requests, as they
+ are good indicators for potential performance improvement of the HT scheme
+ because late HT requests may be converted to timely HT requests by finetuning
+ the parameters of the HT scheme.
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+HT Request Taxonomy
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:HT-Request-Taxonomy"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+
+\size scriptsize
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0">
+<column alignment="left" valignment="top" width="0">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size scriptsize
+Name
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size scriptsize
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size scriptsize
+Good HT requests
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size scriptsize
+HT requests that hit by MT before evicted
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size scriptsize
+Bad HT requests
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size scriptsize
+\begin_inset Box Frameless
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "68col%"
+special "none"
+height "1.1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+
+\size scriptsize
+HT requests whose requested data are used later (or not used at all) by
+ MT than the evicted data
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size scriptsize
+Ugly HT requests
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size scriptsize
+Requests that are not good or bad
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Hardware Support for the Pollution-Aware Taxonomy of HT LLC Requests
+\end_layout
+
+\begin_layout Subsubsection
+LLC request and replacement event tracking
+\end_layout
+
+\begin_layout Standard
+To monitor the request and replacement activities in LLC, we need to consider
+ the event when the LLC receives a request coming from the upper level cache,
+ whether it is a hit or a miss.
+ The event has a few important properties to be used in the experiment,
+ e.g., the address of the requested LLC line, the requester memory hierarchy
+ access, line found in the LLC, a boolean value indicating whether the request
+ hits in the LLC, and a boolean value indicating whether the request needs
+ to evict some LLC line.
+ This event is similar to one used in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Mehta2004"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsubsection
+LLC HT request state tracking
+\end_layout
+
+\begin_layout Standard
+In order to track the HT request states in the LLC, we need to add one field
+ to each LLC line to indicate whether the line is brought by the main thread
+ (MT) or the helper thread (HT) or otherwise invalid (INVALID).
+ 
+\end_layout
+
+\begin_layout Subsubsection
+LLC HT request victim state tracking
+\end_layout
+
+\begin_layout Standard
+In order to track victims replaced by HT requests, we need to add an LRU
+ cache named HT Request Victim Cache (HTRVC) to maintain the LLC lines that
+ are evicted by HT requests.
+ Similar to the evict table used in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Mehta2004"
+
+\end_inset
+
+, the HTRVC has the same structure of the LLC, but there is no direct mapping
+ between LLC lines and HTRVC lines.
+ HTRVC has only the purpose of profiling, so it has no impact on performance.
+\end_layout
+
+\begin_layout Subsubsection
+Detecting Late HT Requests
+\end_layout
+
+\begin_layout Standard
+Lastly, in order to measure late HT requests, we only need to identify the
+ event when an MT request hits to an LLC line which is being brought by
+ an inflight HT request coming from the upper level cache.
+ This can be accomplished by monitoring the LLC MSHRs or equivalent hardware
+ components.
+\end_layout
+
+\begin_layout Subsection
+Algorithms for Tracking HT LLC Requests and Victims
+\end_layout
+
+\begin_layout Standard
+There are two invariants that should be maintained:
+\end_layout
+
+\begin_layout Enumerate
+# of HT Lines in the LLC Set = # of Victim Entries in the HTRVC Set;
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+# of Victim Entries in HTRVC Set + # of Valid MT LLC Lines in Set ≤ LLC
+ Set Associativity.
+\end_layout
+
+\begin_layout Standard
+HT lines refer to the cache lines that are brought by HT requests.
+ From the above two invariants, we can easily conclude that: # of HT Lines
+ in the LLC Set+ # of Valid MT LLC Lines in Set ≤ LLC Set Associativity.
+ Actions should be taken in LLC and HTRVC when filling an LLC line or servicing
+ an incoming LLC request.
+\end_layout
+
+\begin_layout Subsubsection
+Actions taken on Filling an LLC Line
+\end_layout
+
+\begin_layout Standard
+When filling an LLC line, we should consider five cases:
+\end_layout
+
+\begin_layout Enumerate
+An HT request evicts an INVALID line.
+ In this case, no eviction is needed.
+\end_layout
+
+\begin_layout Enumerate
+An HT request evicts an LLC line which is previously brought by an MT request.
+ In this case, eviction is needed to make room for the incoming HT request.
+\end_layout
+
+\begin_layout Enumerate
+An HT request evicts an LLC line which is previously brought by an HT request.
+ In this case, eviction is needed to make room for the incoming HT request.
+\end_layout
+
+\begin_layout Enumerate
+An MT request evicts an LLC line which is previously brought by an HT request.
+ In this case, eviction is needed to make room for the incoming MT request.
+\end_layout
+
+\begin_layout Enumerate
+An MT request evicts an LLC line which is previously brought by an MT request,
+ and there exists one line that is brought by an HT request.
+ In this case, eviction is needed to make room for the incoming MT request.
+\end_layout
+
+\begin_layout Standard
+Specific actions taken on the above five cases are listed in Fig.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:LLC-Line-Brought-In"
+
+\end_inset
+
+, where hitInLLC: whether the request hits in LLC or not, requesterIsHT:
+ whether the request comes from HT or not, hasEviction: whether the request
+ needs to evict some data, lineFoundIsHT: whether the LLC line found is
+ brought by HT or not, and htRequestFound(): whether there is at least one
+ line in the LLC set that is brought by HT.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset listings
+lstparams "basicstyle={\scriptsize\ttfamily},breaklines=true,frame=single,language=Java"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+//HT miss
+\end_layout
+
+\begin_layout Plain Layout
+
+if(!hitInLLC && requesterIsHT) {
+\end_layout
+
+\begin_layout Plain Layout
+
+  totalHtRequests++;
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+//Case 1
+\end_layout
+
+\begin_layout Plain Layout
+
+if(requesterIsHT && !hitInLLC && !hasEviction) {
+\end_layout
+
+\begin_layout Plain Layout
+
+  llc.setHT(set, llcLine.way);
+\end_layout
+
+\begin_layout Plain Layout
+
+  htrvc.insertNullEntry(set);
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+//Case 2
+\end_layout
+
+\begin_layout Plain Layout
+
+else if(requesterIsHT && !hitInLLC && hasEviction && !lineFoundIsHT) {
+\end_layout
+
+\begin_layout Plain Layout
+
+  llc.setHT(set, llcLine.way);
+\end_layout
+
+\begin_layout Plain Layout
+
+  htrvc.insertDataEntry(set, llcLine.tag);
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+//Case 3
+\end_layout
+
+\begin_layout Plain Layout
+
+else if(requesterIsHT && !hitInLLC && hasEviction && lineFoundIsHT) {
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+//Case 4
+\end_layout
+
+\begin_layout Plain Layout
+
+else if(!requesterIsHT && !hitInLLC && hasEviction && lineFoundIsHT) {
+\end_layout
+
+\begin_layout Plain Layout
+
+  llc.setMT(set, llcLine.way);
+\end_layout
+
+\begin_layout Plain Layout
+
+  htrvc.removeLRU(set);
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+//Case 5
+\end_layout
+
+\begin_layout Plain Layout
+
+else if(!requesterIsHT && !lineFoundIsHT) {
+\end_layout
+
+\begin_layout Plain Layout
+
+  if(htRequestFound()) {
+\end_layout
+
+\begin_layout Plain Layout
+
+    htrvc.removeLRU(set);
+\end_layout
+
+\begin_layout Plain Layout
+
+    htrvc.insertDataEntry(set, llcLine.tag);
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Actions Taken When Fillling an LLC Line
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:LLC-Line-Brought-In"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Actions taken on Servicing an Incoming LLC Request
+\end_layout
+
+\begin_layout Standard
+When servicing an incoming LLC request, either hit or miss, we should consider
+ four cases:
+\end_layout
+
+\begin_layout Enumerate
+LLC miss and victim hit, which indicates a bad HT request.
+ This happens when HT request evicts useful data.
+\end_layout
+
+\begin_layout Enumerate
+HT LLC hit, which indicates a good HT request.
+ This happens when HT requested data is hit by MT request before evicted
+ data.
+\end_layout
+
+\begin_layout Enumerate
+HT LLC hit and victim hit.
+ This happens when useful data is evicted and brought back in by HT request.
+\end_layout
+
+\begin_layout Enumerate
+MT LLC hit and victim hit.
+ This happens when useful data is evicted and brought back in by HT request
+ and hit to by MT request.
+\end_layout
+
+\begin_layout Standard
+Specific actions taken on the above five cases are listed in Fig.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Servicing-MT-and-HT-requests"
+
+\end_inset
+
+, where mtHit: whether the request comes from MT and hits in the LLC, htHit:
+ whether the request comes from HT and hits in the LLC, and vtHit: whether
+ the request comes from MT and hits in the HTRVC.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset listings
+lstparams "basicstyle={\scriptsize\ttfamily},breaklines=true,frame=single,language=Java"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+//Case 1
+\end_layout
+
+\begin_layout Plain Layout
+
+if(!mtHit && !htHit && vtHit) {
+\end_layout
+
+\begin_layout Plain Layout
+
+  badHtRequests++;
+\end_layout
+
+\begin_layout Plain Layout
+
+  htrvc.setLRU(set, vtLine.way);
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+//Case 2
+\end_layout
+
+\begin_layout Plain Layout
+
+else if(!mtHit && htHit && !vtHit) {
+\end_layout
+
+\begin_layout Plain Layout
+
+  llc.setMT(set, llcLine.way);
+\end_layout
+
+\begin_layout Plain Layout
+
+  goodHtRequests++;
+\end_layout
+
+\begin_layout Plain Layout
+
+  htrvc.removeLRU(set);
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+//Case 3
+\end_layout
+
+\begin_layout Plain Layout
+
+else if(!mtHit && htHit && vtHit) {
+\end_layout
+
+\begin_layout Plain Layout
+
+  llc.setMT(set, llcLine.way);
+\end_layout
+
+\begin_layout Plain Layout
+
+  htrvc.setLRU(set, vtLine.way);
+\end_layout
+
+\begin_layout Plain Layout
+
+  htrvc.removeLRU(set);
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+//Case 4
+\end_layout
+
+\begin_layout Plain Layout
+
+else if(mtHit && !htHit && vtHit) {
+\end_layout
+
+\begin_layout Plain Layout
+
+  htrvc.setLRU(set, vtLine.way);
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Actions Taken When Servicing an LLC Request
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Servicing-MT-and-HT-requests"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Section
+Pollution-Aware Feedback Directed Helper Threaded Inter-Core Data Prefetching
+\end_layout
+
+\begin_layout Standard
+Based on the pollution-aware taxonomy of HT LLC requests, we propose a dynamic
+ XXX..
+\end_layout
+
+\begin_layout Section
+Evaluation Methodology
 \end_layout
 
 \begin_layout Standard
@@ -1713,12 +2512,12 @@ HT Spawn
 \begin_inset Float figure
 wide false
 sideways false
-status open
+status collapsed
 
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename ht_scheme.pdf
+	filename /home/itecgo/Archimulator/doc/ht_scheme.pdf
 	scale 32
 	BoundingBox 30bp 38bp 810bp 538bp
 	clip
@@ -1755,830 +2554,6 @@ name "fig:Helper-Threaded-Inter-Core-Data-Prefetching"
 \end_layout
 
 \begin_layout Section
-Pollution Aware Taxonomy of HT LLC Requests
-\end_layout
-
-\begin_layout Subsection
-A Taxonomy Based on HT-MT Inter-Thread and MT Intra-Thread Reuse Distances
-\end_layout
-
-\begin_layout Standard
-We propose a pollution aware taxonomy of HT LLC requests based on the observed
- cache pollution caused by HT LLC requests.
-\end_layout
-
-\begin_layout Standard
-The notion of inter-thread reuse distance is proposed to help explain the
- taxonomy.
- The traditional intra-thread reuse distance of a reference to data element
- x is defined as the number of distinct data elements that have been referenced
- between two contiguous accesses of x (or ∞ if the element has not been
- referenced thereafter).
- These two contiguous accesses are issued by the same thread in the traditional
- notion.
- To accomodate the case where one thread Tb accesses data element x that
- has been previously brought into the cache by another thread Ta, we introduce
- the notion of Ta-Tb inter-thread reuse distance, as compared to the traditional
- intra-thread reuse distance.
- Therefore, we could use HT-MT inter-thread reuse distance to describe the
- case where the main thread accesses data element x that has been previously
- brought into the LLC by the helper thread.
- 
-\end_layout
-
-\begin_layout Standard
-Based on the notions of HT-MT inter-thread reuse distance (HT-MT_ITRD) and
- MT intra-thread reuse distance (MT_RD), we can classify the HT LLC requests
- into three types: good, bad and ugly.
- Let's assume that when an HT LLC request with data 
-\family typewriter
-d
-\family default
- evicts the LLC line containing victim data 
-\family typewriter
-v
-\family default
- which is brought by MT, and afterwards the LLC line containing 
-\family typewriter
-d
-\family default
- is evicted by an MT LLC request with data 
-\family typewriter
-m
-\family default
-, then we can see that: 
-\end_layout
-
-\begin_layout Enumerate
-HT-MT_ITRD(
-\family typewriter
-d
-\family default
-) < MT_RD(
-\family typewriter
-v
-\family default
-) < MT_RD(
-\family typewriter
-m
-\family default
-) , indicating it's a good HT request;
-\end_layout
-
-\begin_layout Enumerate
-MT_RD(
-\family typewriter
-v
-\family default
-) < HT-MT_ITRD(
-\family typewriter
-d
-\family default
-) < MT_RD(
-\family typewriter
-m
-\family default
-) , indicating it's a bad HT request; 
-\end_layout
-
-\begin_layout Enumerate
-MT_RD(
-\family typewriter
-m
-\family default
-) < HT_MT_ITRD(
-\family typewriter
-d
-\family default
-), MT_RD(
-\family typewriter
-m
-\family default
-), indicating it's an ugly HT request.
-\end_layout
-
-\begin_layout Standard
-As illustrated in Tab.
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "tab:HT-Request-Taxonomy"
-
-\end_inset
-
-, among these three types of HT requests, good HT requests have positive
- impact on MT performance.
- Ugly HT requests have little performance impact on MT performance because
- the requested data are not referenced by MT before evicted and they do
- not evict any data that will be used by MT.
- Bad HT requests are harmful for MT performance which should be prevented
- as much as possible.
- 
-\end_layout
-
-\begin_layout Standard
-Among good HT requests, late HT requests should be differentiated, which
- are in-flight HT LLC requests that are hit by MT LLC requests, as they
- are good indicators for potential performance improvement of the HT scheme
- because late HT requests may be converted to timely HT requests by finetuning
- the parameters of the HT scheme.
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset Float table
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-HT Request Taxonomy
-\begin_inset CommandInset label
-LatexCommand label
-name "tab:HT-Request-Taxonomy"
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\align center
-
-\size scriptsize
-\begin_inset Tabular
-<lyxtabular version="3" rows="4" columns="2">
-<features tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0">
-<column alignment="left" valignment="top" width="0">
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-Name
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-Description
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-Good HT requests
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-HT requests that hit by MT before evicted
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-Bad HT requests
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-\begin_inset Box Frameless
-position "t"
-hor_pos "c"
-has_inner_box 1
-inner_pos "t"
-use_parbox 0
-use_makebox 0
-width "68col%"
-special "none"
-height "1.1in"
-height_special "totalheight"
-status open
-
-\begin_layout Plain Layout
-
-\size scriptsize
-HT requests whose requested data are used later (or not used at all) by
- MT than the evicted data
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-Ugly HT requests
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-Requests that are not good or bad
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Subsection
-Hardware Support for the Pollution-Aware Taxonomy of HT LLC Requests
-\end_layout
-
-\begin_layout Subsubsection
-LLC request and replacement event tracking
-\end_layout
-
-\begin_layout Standard
-To monitor the request and replacement activities in LLC, we need to consider
- the event when the LLC receives a request coming from the upper level cache,
- whether it is a hit or a miss.
- The event has a few important properties to be used in the experiment,
- e.g., the address of the requested LLC line, the requester memory hierarchy
- access, line found in the LLC, a boolean value indicating whether the request
- hits in the LLC, and a boolean value indicating whether the request needs
- to evict some LLC line.
- This event is similar to one used in 
-\begin_inset CommandInset citation
-LatexCommand cite
-key "Mehta2004"
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Subsubsection
-LLC HT request state tracking
-\end_layout
-
-\begin_layout Standard
-In order to track the HT request states in the LLC, we need to add one field
- to each LLC line to indicate whether the line is brought by the main thread
- (MT) or the helper thread (HT) or otherwise invalid (INVALID).
- 
-\end_layout
-
-\begin_layout Subsubsection
-LLC HT request victim state tracking
-\end_layout
-
-\begin_layout Standard
-In order to track victims replaced by HT requests, we need to add an LRU
- cache named HT Request Victim Cache (HTRVC) to maintain the LLC lines that
- are evicted by HT requests.
- Similar to the evict table used in 
-\begin_inset CommandInset citation
-LatexCommand cite
-key "Mehta2004"
-
-\end_inset
-
-, the HTRVC has the same structure of the LLC, but there is no direct mapping
- between LLC lines and HTRVC lines.
- HTRVC has only the purpose of profiling, so it has no impact on performance.
-\end_layout
-
-\begin_layout Subsubsection
-Detecting Late HT Requests
-\end_layout
-
-\begin_layout Standard
-Lastly, in order to measure late HT requests, we only need to identify the
- event when an MT request hits to an LLC line which is being brought by
- an inflight HT request coming from the upper level cache.
- This can be accomplished by monitoring the LLC MSHRs or equivalent hardware
- components.
-\end_layout
-
-\begin_layout Subsection
-Algorithms for Tracking HT LLC Requests and Victims
-\end_layout
-
-\begin_layout Standard
-There are two invariants that should be maintained:
-\end_layout
-
-\begin_layout Enumerate
-# of HT Lines in the LLC Set = # of Victim Entries in the HTRVC Set;
-\end_layout
-
-\begin_deeper
-\begin_layout Enumerate
-# of Victim Entries in HTRVC Set + # of Valid MT LLC Lines in Set ≤ LLC
- Set Associativity.
-\end_layout
-
-\begin_layout Standard
-HT lines refer to the cache lines that are brought by HT requests.
- From the above two invariants, we can easily conclude that: # of HT Lines
- in the LLC Set+ # of Valid MT LLC Lines in Set ≤ LLC Set Associativity.
- Actions should be taken in LLC and HTRVC when filling an LLC line or servicing
- an incoming LLC request.
-\end_layout
-
-\begin_layout Subsubsection
-Actions taken on Filling an LLC Line
-\end_layout
-
-\begin_layout Standard
-When filling an LLC line, we should consider five cases:
-\end_layout
-
-\begin_layout Enumerate
-An HT request evicts an INVALID line.
- In this case, no eviction is needed.
-\end_layout
-
-\begin_layout Enumerate
-An HT request evicts an LLC line which is previously brought by an MT request.
- In this case, eviction is needed to make room for the incoming HT request.
-\end_layout
-
-\begin_layout Enumerate
-An HT request evicts an LLC line which is previously brought by an HT request.
- In this case, eviction is needed to make room for the incoming HT request.
-\end_layout
-
-\begin_layout Enumerate
-An MT request evicts an LLC line which is previously brought by an HT request.
- In this case, eviction is needed to make room for the incoming MT request.
-\end_layout
-
-\begin_layout Enumerate
-An MT request evicts an LLC line which is previously brought by an MT request,
- and there exists one line that is brought by an HT request.
- In this case, eviction is needed to make room for the incoming MT request.
-\end_layout
-
-\begin_layout Standard
-Specific actions taken on the above five cases are listed in Fig.
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:LLC-Line-Brought-In"
-
-\end_inset
-
-, where hitInLLC: whether the request hits in LLC or not, requesterIsHT:
- whether the request comes from HT or not, hasEviction: whether the request
- needs to evict some data, lineFoundIsHT: whether the LLC line found is
- brought by HT or not, and htRequestFound(): whether there is at least one
- line in the LLC set that is brought by HT.
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status collapsed
-
-\begin_layout Plain Layout
-\begin_inset listings
-lstparams "basicstyle={\scriptsize\ttfamily},breaklines=true,frame=single,language=Java"
-inline false
-status open
-
-\begin_layout Plain Layout
-
-//HT miss
-\end_layout
-
-\begin_layout Plain Layout
-
-if(!hitInLLC && requesterIsHT) {
-\end_layout
-
-\begin_layout Plain Layout
-
-  totalHtRequests++;
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-//Case 1
-\end_layout
-
-\begin_layout Plain Layout
-
-if(requesterIsHT && !hitInLLC && !hasEviction) {
-\end_layout
-
-\begin_layout Plain Layout
-
-  llc.setHT(set, llcLine.way);
-\end_layout
-
-\begin_layout Plain Layout
-
-  htrvc.insertNullEntry(set);
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-//Case 2
-\end_layout
-
-\begin_layout Plain Layout
-
-else if(requesterIsHT && !hitInLLC && hasEviction && !lineFoundIsHT) {
-\end_layout
-
-\begin_layout Plain Layout
-
-  llc.setHT(set, llcLine.way);
-\end_layout
-
-\begin_layout Plain Layout
-
-  htrvc.insertDataEntry(set, llcLine.tag);
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-//Case 3
-\end_layout
-
-\begin_layout Plain Layout
-
-else if(requesterIsHT && !hitInLLC && hasEviction && lineFoundIsHT) {
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-//Case 4
-\end_layout
-
-\begin_layout Plain Layout
-
-else if(!requesterIsHT && !hitInLLC && hasEviction && lineFoundIsHT) {
-\end_layout
-
-\begin_layout Plain Layout
-
-  llc.setMT(set, llcLine.way);
-\end_layout
-
-\begin_layout Plain Layout
-
-  htrvc.removeLRU(set);
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-//Case 5
-\end_layout
-
-\begin_layout Plain Layout
-
-else if(!requesterIsHT && !lineFoundIsHT) {
-\end_layout
-
-\begin_layout Plain Layout
-
-  if(htRequestFound()) {
-\end_layout
-
-\begin_layout Plain Layout
-
-    htrvc.removeLRU(set);
-\end_layout
-
-\begin_layout Plain Layout
-
-    htrvc.insertDataEntry(set, llcLine.tag);
-\end_layout
-
-\begin_layout Plain Layout
-
-  }
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-Actions Taken When Fillling an LLC Line
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:LLC-Line-Brought-In"
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Subsubsection
-Actions taken on Servicing an Incoming LLC Request
-\end_layout
-
-\begin_layout Standard
-When servicing an incoming LLC request, either hit or miss, we should consider
- four cases:
-\end_layout
-
-\begin_layout Enumerate
-LLC miss and victim hit, which indicates a bad HT request.
- This happens when HT request evicts useful data.
-\end_layout
-
-\begin_layout Enumerate
-HT LLC hit, which indicates a good HT request.
- This happens when HT requested data is hit by MT request before evicted
- data.
-\end_layout
-
-\begin_layout Enumerate
-HT LLC hit and victim hit.
- This happens when useful data is evicted and brought back in by HT request.
-\end_layout
-
-\begin_layout Enumerate
-MT LLC hit and victim hit.
- This happens when useful data is evicted and brought back in by HT request
- and hit to by MT request.
-\end_layout
-
-\begin_layout Standard
-Specific actions taken on the above five cases are listed in Fig.
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:Servicing-MT-and-HT-requests"
-
-\end_inset
-
-, where mtHit: whether the request comes from MT and hits in the LLC, htHit:
- whether the request comes from HT and hits in the LLC, and vtHit: whether
- the request comes from MT and hits in the HTRVC.
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status collapsed
-
-\begin_layout Plain Layout
-\begin_inset listings
-lstparams "basicstyle={\scriptsize\ttfamily},breaklines=true,frame=single,language=Java"
-inline false
-status open
-
-\begin_layout Plain Layout
-
-//Case 1
-\end_layout
-
-\begin_layout Plain Layout
-
-if(!mtHit && !htHit && vtHit) {
-\end_layout
-
-\begin_layout Plain Layout
-
-  badHtRequests++;
-\end_layout
-
-\begin_layout Plain Layout
-
-  htrvc.setLRU(set, vtLine.way);
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-//Case 2
-\end_layout
-
-\begin_layout Plain Layout
-
-else if(!mtHit && htHit && !vtHit) {
-\end_layout
-
-\begin_layout Plain Layout
-
-  llc.setMT(set, llcLine.way);
-\end_layout
-
-\begin_layout Plain Layout
-
-  goodHtRequests++;
-\end_layout
-
-\begin_layout Plain Layout
-
-  htrvc.removeLRU(set);
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-//Case 3
-\end_layout
-
-\begin_layout Plain Layout
-
-else if(!mtHit && htHit && vtHit) {
-\end_layout
-
-\begin_layout Plain Layout
-
-  llc.setMT(set, llcLine.way);
-\end_layout
-
-\begin_layout Plain Layout
-
-  htrvc.setLRU(set, vtLine.way);
-\end_layout
-
-\begin_layout Plain Layout
-
-  htrvc.removeLRU(set);
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-//Case 4
-\end_layout
-
-\begin_layout Plain Layout
-
-else if(mtHit && !htHit && vtHit) {
-\end_layout
-
-\begin_layout Plain Layout
-
-  htrvc.setLRU(set, vtLine.way);
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-Actions Taken When Servicing an LLC Request
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:Servicing-MT-and-HT-requests"
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_deeper
-\begin_layout Subsection
 Results
 \end_layout
 
@@ -2615,7 +2590,7 @@ reference "tab:HT-Request-Taxonomy-Results"
 \begin_inset Float table
 wide false
 sideways false
-status open
+status collapsed
 
 \begin_layout Plain Layout
 \begin_inset Caption
@@ -6905,24 +6880,12 @@ Unmodified
 
 \end_layout
 
-\begin_layout Section
-Dyanamic LLC Replacement for Helper Threaded Inter-Core Data Prefetching
-\end_layout
-
-\begin_layout Subsection
-Algorithms
-\end_layout
-
-\begin_layout Subsection
-Results
-\end_layout
-
 \begin_layout Standard
 \align center
 \begin_inset Float table
 wide false
 sideways false
-status open
+status collapsed
 
 \begin_layout Plain Layout
 \begin_inset Caption
@@ -11205,14 +11168,16 @@ Related Work
 \end_layout
 
 \begin_layout Standard
+Our taxonomy of HT LLC requests is mostly similar to the work in 
 \begin_inset CommandInset citation
 LatexCommand cite
 key "Mehta2004"
 
 \end_inset
 
- presents a taxonomy of hardware prefetches based on the idea of shared
- cache pollution in the hardware based data prefetching for shared L2 CMP.
+, which presents a taxonomy of hardware prefetches based on the idea of
+ shared cache pollution in the hardware based data prefetching for shared
+ L2 CMP.
  A hardware structure called the Evict Table (ET) is attached to the LLC
  to gauge the amount of shared cache pollution caused by hardware prefetching.
  
@@ -11247,6 +11212,17 @@ More fine-grained breakdowns of h/w prefetches.
 \begin_layout Enumerate
 Any previous work on cache request breakdowns for helper threaded data prefetchi
 ng? 
+\end_layout
+
+\begin_layout Standard
+Our feedback-directed scheme is similar to the work in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Srinath2007"
+
+\end_inset
+
+, which proposes a feedback directed mechanism for hardware prefetching.
 \end_layout
 
 \begin_layout Section
