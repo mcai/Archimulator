@@ -162,11 +162,11 @@ et al.
 \begin_layout Abstract
 Helper threaded inter-core data prefetching on shared cache chip multiprocessors
  (CMPs), in its most basic form, (1) uses the shared cache enabled fast
- inter-thread communication when both the main core and the helper core
- access the same cache line; (2) constructs a helper thread in the software
- running on an idle neighboring core to speculatively issue LLC prefetch
- requests to the predicted memory addresses before the computation core
- access these addresses.
+ inter-thread communication when both the main core and the otherwise idle
+ neighboring helper core access the same cache line; (2) constructs a helper
+ thread in the software running on the helper core to speculatively issue
+ LLC prefetch requests to the predicted memory addresses before the computation
+ core access these addresses.
  Effective helper threaded inter-core data prefetching demands that the
  helper thread (HT) should issue correct and timely LLC requests just before
  the main thread (MT) requests them.
@@ -256,11 +256,11 @@ status collapsed
 
  threaded inter-core data prefetching on shared cache chip multiprocessors
  (CMPs), in its most basic form, (1) uses the shared cache enabled fast
- inter-thread communication when both the main core and the helper core
- access the same cache line; (2) constructs a helper thread in the software
- running on an idle neighboring core to speculatively issue LLC prefetch
- requests to the predicted memory addresses before the computation core
- access these addresses.
+ inter-thread communication when both the main core and the otherwise idle
+ neighboring helper core access the same cache line; (2) constructs a helper
+ thread in the software running on the helper core to speculatively issue
+ LLC prefetch requests to the predicted memory addresses before the computation
+ core access these addresses.
   Effective helper threaded data prefetching demands that the helper thread
  (HT) should issue correct and timely LLC requests just before the main
  thread (MT) requests them.
@@ -11180,38 +11180,8 @@ key "Mehta2004"
  L2 CMP.
  A hardware structure called the Evict Table (ET) is attached to the LLC
  to gauge the amount of shared cache pollution caused by hardware prefetching.
- 
-\begin_inset CommandInset citation
-LatexCommand cite
-key "Jerger2006"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-TODOs: previous work on prefetch taxonomies.
- 
-\end_layout
-
-\begin_layout Enumerate
-Classic metrics of coverage and accuracy for h/w prefetches.
-\end_layout
-
-\begin_layout Enumerate
-Good, bad and ugly breakdown of h/w prefetches.
- 
-\end_layout
-
-\begin_layout Enumerate
-More fine-grained breakdowns of h/w prefetches.
- 
-\end_layout
-
-\begin_layout Enumerate
-Any previous work on cache request breakdowns for helper threaded data prefetchi
-ng? 
+ Good, bad and ugly requests are identified based on cache replacement activitie
+s involved by hardware prefetches.
 \end_layout
 
 \begin_layout Standard
