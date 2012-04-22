@@ -170,11 +170,11 @@ Helper threaded inter-core data prefetching on shared cache chip multiprocessors
  Effective helper threaded inter-core data prefetching demands that the
  helper thread (HT) should issue correct and timely LLC requests just before
  the main thread (MT) requests them.
- However this ideal case can not be assumed in the practical implemention
- of helper threaded inter-core data prefetching: inaccurate and/or untimely
+ Unfortunately, this ideal case can not be assumed in the existing implementatio
+n of helper threaded inter-core data prefetching: inaccurate and/or untimely
  LLC requests coming from HT could not contribute to the MT performance,
  but instead stress and pollute LLC if no effective LLC replacement and
- pollution-aware feedback techniques are employed
+ pollution-aware feedback techniques are employed.
 \end_layout
 
 \begin_layout Abstract
@@ -264,8 +264,8 @@ status collapsed
   Effective helper threaded data prefetching demands that the helper thread
  (HT) should issue correct and timely LLC requests just before the main
  thread (MT) requests them.
- However this ideal case can not be assumed in the practical implemention
- of helper threaded inter-core data prefetching: inaccurate and/or untimely
+ Unfortunately, this ideal case can not be assumed in the existing implementatio
+n of helper threaded inter-core data prefetching: inaccurate and/or untimely
  LLC requests coming from HT could not contribute to the MT performance,
  but instead stress and pollute LLC if no effective LLC replacement techniques
  are employed.
