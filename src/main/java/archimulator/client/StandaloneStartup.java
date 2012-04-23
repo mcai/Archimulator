@@ -22,11 +22,12 @@ public class StandaloneStartup {
         int pthreadSpawnedIndex = 3720;
         int maxInsts = 200000000;
 
-        SimulatedProgram simulatedProgram = Presets.SIMULATED_PROGRAM_MST_BASELINE;
-//        SimulatedProgram simulatedProgram = Presets.SIMULATED_PROGRAM_MST_HT(20, 10);
-        ProcessorProfile processorProfile = Presets.processor(1024 * 4, 8, 2, 2, "LRU", LRUPolicy.class);
-        final ExperimentProfile experimentProfile = Presets.baseline_lru(pthreadSpawnedIndex, maxInsts, processorProfile, simulatedProgram);
-//        final ExperimentProfile experimentProfile = Presets.ht_lru(pthreadSpawnedIndex, maxInsts, processorProfile, simulatedProgram);
+//        SimulatedProgram simulatedProgram = Presets.SIMULATED_PROGRAM_MST_BASELINE;
+        SimulatedProgram simulatedProgram = Presets.SIMULATED_PROGRAM_MST_HT(20, 10);
+//        ProcessorProfile processorProfile = Presets.processor(1024 * 4, 8, 2, 2, "LRU", LRUPolicy.class);
+        ProcessorProfile processorProfile = Presets.processor(1024 / 4, 8, 2, 2, "LRU", LRUPolicy.class); //256K L2
+//        final ExperimentProfile experimentProfile = Presets.baseline_lru(pthreadSpawnedIndex, maxInsts, processorProfile, simulatedProgram);
+        final ExperimentProfile experimentProfile = Presets.ht_lru(pthreadSpawnedIndex, maxInsts, processorProfile, simulatedProgram);
 
         final Experiment experiment = experimentProfile.createExperiment();
 
