@@ -54,7 +54,7 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
     private Process process;
     private Context parent;
 
-    private Stack<Integer> functionCallPcStack;
+    private Stack<FunctionCallContext> functionCallContextStack;
 
     private boolean pseudocallEncounteredInLastInstructionExecution;
 
@@ -101,7 +101,7 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
 
         this.state = ContextState.IDLE;
 
-        this.functionCallPcStack = new Stack<Integer>();
+        this.functionCallContextStack = new Stack<FunctionCallContext>();
 
         this.process = process;
     }
@@ -246,8 +246,8 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
         return parent == null ? 1 : parent.getPid();
     }
 
-    public Stack<Integer> getFunctionCallPcStack() {
-        return functionCallPcStack;
+    public Stack<FunctionCallContext> getFunctionCallContextStack() {
+        return functionCallContextStack;
     }
 
     public boolean isSpeculative() {

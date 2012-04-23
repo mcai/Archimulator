@@ -712,15 +712,15 @@ public class BasicMipsInstructionExecutor implements MipsInstructionExecutor {
     public static int getTargetPcForControl(int pc, int machInst, Mnemonic mnemonic) {
         switch (mnemonic) {
             case J:
-                return BasicMipsInstructionExecutor.getTargetPcForJ(pc, machInst);
+                return getTargetPcForJ(pc, machInst);
             case JAL:
-                return BasicMipsInstructionExecutor.getTargetPcForJal(pc, machInst);
+                return getTargetPcForJal(pc, machInst);
             case JALR:
                 throw new IllegalArgumentException();
             case JR:
                 throw new IllegalArgumentException();
             default:
-                return BasicMipsInstructionExecutor.getTargetPcForBranch(pc, machInst);
+                return getTargetPcForBranch(pc, machInst);
         }
     }
 
@@ -736,11 +736,11 @@ public class BasicMipsInstructionExecutor implements MipsInstructionExecutor {
         return MathHelper.mbits(pc, 32, 28) | (BitField.TARGET.valueOf(machInst) << 2);
     }
 
-    private static int getTargetPcForJalr(Context context, int machInst) {
+    public static int getTargetPcForJalr(Context context, int machInst) {
         return context.getRegs().getGpr(BitField.RS.valueOf(machInst));
     }
 
-    private static int getTargetPcForJr(Context context, int machInst) {
+    public static int getTargetPcForJr(Context context, int machInst) {
         return context.getRegs().getGpr(BitField.RS.valueOf(machInst));
     }
 }

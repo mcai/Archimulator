@@ -69,17 +69,6 @@ public class ElfAnalyzer {
             }
         }
 
-//        for (Function function : this.program.getFunctions()) {
-//            for (int i = 0; i < function.getNumInsts(); i++) {
-//                int pc = (int) function.getSymbol().getSt_value() + i * 4;
-//
-//                Instruction instruction = this.insts.get(function.getSectionName()).get(pc);
-//                if(instruction.getBasicBlock() == null && !instruction.getSectionName().equals(".init")) {
-//                    throw new IllegalArgumentException(instruction + "");
-//                }
-//            }
-//        }
-
         for (Function function : this.program.getFunctions()) {
             this.createControlFlowGraph(function);
         }

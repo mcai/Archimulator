@@ -138,7 +138,7 @@ public class DynamicSpeculativePrecomputationCapability implements ProcessorCapa
             this.thread.getBlockingEventDispatcher().addListener(InstructionCommittedEvent.class, new Action1<InstructionCommittedEvent>() {
                 public void apply(InstructionCommittedEvent event) {
                     if (event.getDynamicInst().getThread() == RetiredInstructionBuffer.this.thread) {
-                        if (state == RetiredInstructionBufferState.IDLE && delinquentLoad != null && event.getDynamicInst().getPc() == delinquentLoad.getPc() && event.getDynamicInst().getThread().getContext().getFunctionCallPcStack().size() > 0 && event.getDynamicInst().getThread().getContext().getFunctionCallPcStack().peek() == delinquentLoad.getFunctionCallPc()) {
+                        if (state == RetiredInstructionBufferState.IDLE && delinquentLoad != null && event.getDynamicInst().getPc() == delinquentLoad.getPc() && !event.getDynamicInst().getThread().getContext().getFunctionCallContextStack().isEmpty() && event.getDynamicInst().getThread().getContext().getFunctionCallContextStack().peek().getPc() == delinquentLoad.getFunctionCallPc()) {
                             state = RetiredInstructionBufferState.INSTRUCTION_GATHERING;
 
                             retiredInstructions.add(new RetiredInstruction(event.getDynamicInst().getPc(), event.getDynamicInst().isUseStackPointerAsEffectiveAddressBase(), event.getDynamicInst().getEffectiveAddressDisplacement(), event.getDynamicInst().getStaticInst()));
@@ -148,7 +148,7 @@ public class DynamicSpeculativePrecomputationCapability implements ProcessorCapa
                             }
                             retiredInstructions.add(new RetiredInstruction(event.getDynamicInst().getPc(), event.getDynamicInst().isUseStackPointerAsEffectiveAddressBase(), event.getDynamicInst().getEffectiveAddressDisplacement(), event.getDynamicInst().getStaticInst()));
 
-                            if (event.getDynamicInst().getPc() == delinquentLoad.getPc() && event.getDynamicInst().getThread().getContext().getFunctionCallPcStack().size() > 0 && event.getDynamicInst().getThread().getContext().getFunctionCallPcStack().peek() == delinquentLoad.getFunctionCallPc()) {
+                            if (event.getDynamicInst().getPc() == delinquentLoad.getPc() && !event.getDynamicInst().getThread().getContext().getFunctionCallContextStack().isEmpty() && event.getDynamicInst().getThread().getContext().getFunctionCallContextStack().peek().getPc() == delinquentLoad.getFunctionCallPc()) {
                                 buildSlice();
                             }
                         }

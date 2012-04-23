@@ -49,7 +49,7 @@ public class DynamicInstruction {
             this.effectiveAddressBase = StaticInstruction.getEffectiveAddressBase(this.thread.getContext(), this.staticInst.getMachInst());
             this.effectiveAddressDisplacement = StaticInstruction.getEffectiveAddressDisplacement(this.staticInst.getMachInst());
 
-            this.useStackPointerAsEffectiveAddressBase = StaticInstruction.useStackPointerAsEffectiveAddressBase(this.thread.getContext(), this.staticInst.getMachInst());
+            this.useStackPointerAsEffectiveAddressBase = StaticInstruction.useStackPointerAsEffectiveAddressBase(this.staticInst.getMachInst());
         }
 
         this.hasL2Miss = false;

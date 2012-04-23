@@ -21,23 +21,11 @@ package archimulator.sim.isa;
 import archimulator.sim.os.Context;
 import archimulator.util.event.BlockingEvent;
 
-public class InstructionFunctionallyExecutedEvent implements BlockingEvent {
-    private int pc;
-    private StaticInstruction staticInst;
+public class FunctionReturnEvent implements BlockingEvent {
     private Context context;
 
-    public InstructionFunctionallyExecutedEvent(int pc, StaticInstruction staticInst, Context context) {
-        this.pc = pc;
-        this.staticInst = staticInst;
+    public FunctionReturnEvent(Context context) {
         this.context = context;
-    }
-
-    public int getPc() {
-        return pc;
-    }
-
-    public StaticInstruction getStaticInst() {
-        return staticInst;
     }
 
     public Context getContext() {

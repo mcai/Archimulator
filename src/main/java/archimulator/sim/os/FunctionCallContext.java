@@ -16,31 +16,22 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.isa;
+package archimulator.sim.os;
 
-import archimulator.sim.os.Context;
-import archimulator.util.event.BlockingEvent;
-
-public class InstructionFunctionallyExecutedEvent implements BlockingEvent {
+public class FunctionCallContext {
     private int pc;
-    private StaticInstruction staticInst;
-    private Context context;
+    private int targetPc;
 
-    public InstructionFunctionallyExecutedEvent(int pc, StaticInstruction staticInst, Context context) {
+    public FunctionCallContext(int pc, int targetPc) {
         this.pc = pc;
-        this.staticInst = staticInst;
-        this.context = context;
+        this.targetPc = targetPc;
     }
 
     public int getPc() {
         return pc;
     }
 
-    public StaticInstruction getStaticInst() {
-        return staticInst;
-    }
-
-    public Context getContext() {
-        return context;
+    public int getTargetPc() {
+        return targetPc;
     }
 }

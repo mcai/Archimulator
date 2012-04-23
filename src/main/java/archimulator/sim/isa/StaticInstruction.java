@@ -21,16 +21,13 @@ package archimulator.sim.isa;
 import archimulator.sim.base.simulation.Logger;
 import archimulator.sim.base.event.PseudocallEncounteredEvent;
 import archimulator.sim.core.FunctionalUnitOperationType;
-import archimulator.sim.os.Context;
+import archimulator.sim.os.*;
 import archimulator.util.math.MathHelper;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class StaticInstruction implements Serializable {
     private Mnemonic mnemonic;
@@ -901,7 +898,7 @@ public class StaticInstruction implements Serializable {
         executor.jal_impl(context, machInst);
 
         if (!context.isSpeculative()) {
-            context.getFunctionCallPcStack().push(context.getRegs().getPc());
+            onFunctionCall(context, false);
         }
     }
 
@@ -914,7 +911,7 @@ public class StaticInstruction implements Serializable {
         executor.jalr_impl(context, machInst);
 
         if (!context.isSpeculative()) {
-            context.getFunctionCallPcStack().push(context.getRegs().getPc());
+            onFunctionCall(context, true);
         }
     }
 
@@ -927,7 +924,7 @@ public class StaticInstruction implements Serializable {
         executor.jr_impl(context, machInst);
 
         if (!context.isSpeculative() && BitField.RS.valueOf(machInst) == ArchitecturalRegisterFile.REG_RA) {
-            context.getFunctionCallPcStack().pop();
+            onFunctionReturn(context);
         }
     }
 
@@ -1386,8 +1383,20 @@ public class StaticInstruction implements Serializable {
         }
     }
 
-    public boolean useStackPointerAsEffectiveAddressBase(Context context) {
-        return useStackPointerAsEffectiveAddressBase(context, this.machInst);
+    private static void onFunctionCall(Context context, boolean jalr) {
+        StaticInstruction staticInst = context.getProcess().getStaticInst(context.getRegs().getPc());
+        int targetPc = jalr ? BasicMipsInstructionExecutor.getTargetPcForJalr(context, staticInst.getMachInst()) : BasicMipsInstructionExecutor.getTargetPcForJr(context, staticInst.getMachInst());
+        context.getFunctionCallContextStack().push(new FunctionCallContext(context.getRegs().getPc(), targetPc));
+        context.getBlockingEventDispatcher().dispatch(new FunctionalCallEvent(context));
+    }
+
+    private static void onFunctionReturn(Context context) {
+        context.getFunctionCallContextStack().pop();
+        context.getBlockingEventDispatcher().dispatch(new FunctionReturnEvent(context));
+    }
+
+    public boolean useStackPointerAsEffectiveAddressBase() {
+        return useStackPointerAsEffectiveAddressBase(this.machInst);
     }
 
     public int getEffectiveAddressBase(Context context) {
@@ -1402,7 +1411,7 @@ public class StaticInstruction implements Serializable {
         return getEffectiveAddress(context, this.machInst);
     }
 
-    public static boolean useStackPointerAsEffectiveAddressBase(Context context, int machInst) {
+    public static boolean useStackPointerAsEffectiveAddressBase(int machInst) {
         return BitField.RS.valueOf(machInst) == ArchitecturalRegisterFile.REG_SP;
     }
 
@@ -1419,9 +1428,9 @@ public class StaticInstruction implements Serializable {
     }
 
     public static void execute(StaticInstruction staticInst, Context context) {
+        int oldPc = context.getRegs().getPc();
         execute(staticInst.mnemonic, context, staticInst.machInst);
-
-        context.getBlockingEventDispatcher().dispatch(new InstructionFunctionallyExecutedEvent(staticInst, context));
+        context.getBlockingEventDispatcher().dispatch(new InstructionFunctionallyExecutedEvent(oldPc, staticInst, context));
     }
 
     private static void execute(Mnemonic mnemonic, Context context, int machInst) {

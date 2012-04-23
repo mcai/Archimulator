@@ -1,3 +1,21 @@
+/*******************************************************************************
+ * Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).
+ *
+ * This file is part of the Archimulator multicore architectural simulator.
+ *
+ * Archimulator is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Archimulator is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
 package archimulator.client;
 
 import archimulator.sim.base.experiment.Experiment;
@@ -43,10 +61,12 @@ public class StandaloneStartup {
                         stats1.put(key, stats.get(key) + "");
                     }
 
-                    Context context = experiment.getSimulation().getProcessor().getCores().get(0).getThreads().get(0).getContext();
-                    if(context != null) {
-                        ((BasicProcess) context.getProcess()).getElfAnalyzer().dumpAnalysisResult(new FileWriter("/home/itecgo/Desktop/dis.txt"));
-                    }
+//                    Context context = experiment.getSimulation().getProcessor().getCores().get(0).getThreads().get(0).getContext();
+//                    if(context != null) {
+//                        FileWriter out = new FileWriter("/home/itecgo/Desktop/dis.txt");
+//                        ((BasicProcess) context.getProcess()).getElfAnalyzer().dumpAnalysisResult(out);
+//                        out.close();
+//                    }
                 } catch (Exception e) {
                     recordException(e);
 //                        throw new RuntimeException(e);

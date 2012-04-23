@@ -20,6 +20,7 @@ package archimulator.sim.ext.uncore.delinquentLoad;
 
 import archimulator.sim.core.Thread;
 import archimulator.sim.core.event.InstructionCommittedEvent;
+import archimulator.sim.os.FunctionCallContext;
 import archimulator.sim.uncore.coherence.event.CoherentCacheBeginCacheAccessEvent;
 import archimulator.util.action.Action1;
 
@@ -39,13 +40,13 @@ public abstract class AbstractDelinquentLoadIdentificationTable {
         thread.getBlockingEventDispatcher().addListener(InstructionCommittedEvent.class, new Action1<InstructionCommittedEvent>() {
             public void apply(InstructionCommittedEvent event) {
                 if (event.getDynamicInst().getThread() == AbstractDelinquentLoadIdentificationTable.this.thread) {
-                    Stack<Integer> functionCallPcStack = event.getDynamicInst().getThread().getContext().getFunctionCallPcStack();
+                    Stack<FunctionCallContext> functionCallContextStack = event.getDynamicInst().getThread().getContext().getFunctionCallContextStack();
 
-                    if (functionCallPcStack.size() > 0) {
+                    if (functionCallContextStack.size() > 0) {
                         boolean delinquentLoadFound = false;
 
                         for (DelinquentLoadImpl delinquentLoad : delinquentLoads) {
-                            if (delinquentLoad.getPc() == event.getDynamicInst().getPc() && delinquentLoad.getFunctionCallPc() == functionCallPcStack.peek()) {
+                            if (delinquentLoad.getPc() == event.getDynamicInst().getPc() && delinquentLoad.getFunctionCallPc() == functionCallContextStack.peek().getPc()) {
                                 delinquentLoad.executionCount++;
                                 delinquentLoad.cyclesSpentInFirstEntryOfReorderBuffer += event.getDynamicInst().getCyclesSpentAtHeadOfReorderBuffer();
                                 delinquentLoadFound = true;
@@ -54,7 +55,7 @@ public abstract class AbstractDelinquentLoadIdentificationTable {
                         }
 
                         if (!delinquentLoadFound && event.getDynamicInst().isHasL2Miss() && delinquentLoads.size() < CAPACITY) {
-                            DelinquentLoadImpl delinquentLoad = new DelinquentLoadImpl(event.getDynamicInst().getPc(), functionCallPcStack.peek());
+                            DelinquentLoadImpl delinquentLoad = new DelinquentLoadImpl(event.getDynamicInst().getPc(), functionCallContextStack.peek().getPc());
                             delinquentLoad.executionCount = 1;
                             delinquentLoad.cyclesSpentInFirstEntryOfReorderBuffer = event.getDynamicInst().getCyclesSpentAtHeadOfReorderBuffer();
                             delinquentLoads.add(delinquentLoad);

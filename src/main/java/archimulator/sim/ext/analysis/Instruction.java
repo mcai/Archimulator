@@ -26,7 +26,6 @@ public class Instruction {
     private Process process;
     private int pc;
     private StaticInstruction staticInstruction;
-    private String functionName;
     private boolean leader;
     private int leaderType;
 
@@ -49,14 +48,6 @@ public class Instruction {
 
     public StaticInstruction getStaticInstruction() {
         return staticInstruction;
-    }
-
-    public String getFunctionName() {
-        return functionName;
-    }
-
-    public void setFunctionName(String functionName) {
-        this.functionName = functionName;
     }
 
     public boolean isLeader() {

@@ -24,16 +24,24 @@ import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.base.experiment.capability.SimulationCapability;
 import archimulator.sim.base.simulation.Simulation;
 import archimulator.sim.core.BasicThread;
+import archimulator.sim.core.DynamicInstruction;
+import archimulator.sim.core.Processor;
+import archimulator.sim.ext.analysis.BasicBlock;
+import archimulator.sim.ext.analysis.Function;
+import archimulator.sim.ext.analysis.Instruction;
+import archimulator.sim.isa.StaticInstruction;
+import archimulator.sim.isa.StaticInstructionType;
+import archimulator.sim.isa.dissembler.MipsDissembler;
+import archimulator.sim.os.BasicProcess;
 import archimulator.sim.uncore.CacheAccessType;
+import archimulator.sim.uncore.MemoryHierarchyAccessType;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.coherence.event.CoherentCacheServiceNonblockingRequestEvent;
+import archimulator.util.DateHelper;
 import archimulator.util.action.Action1;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 public class LLCReuseDistanceProfilingCapability implements SimulationCapability {
     private EvictableCache<?, ?> llc;
@@ -47,6 +55,10 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
     private long numDownwardReads = 0;
     private long numDownwardWrites = 0;
     private long numEvicts = 0;
+
+//    private String hotspotFunctionName = "HashLookup"; //TODO: should not be hardcoded!!!
+    private String hotspotFunctionName = "push_thread_func"; //TODO: should not be hardcoded!!!
+    private Map<Integer, Instruction> loadsInHotspotFunction;
 
     public LLCReuseDistanceProfilingCapability(Simulation simulation) {
         this(simulation.getProcessor().getCacheHierarchy().getL2Cache().getCache());
@@ -73,6 +85,37 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
                     switch (event.getAccessType()) {
                         case DOWNWARD_READ:
                             numDownwardReads++;
+
+                            if(event.getRequesterAccess().getType() == MemoryHierarchyAccessType.LOAD) {
+                                if (loadsInHotspotFunction == null) {
+                                    loadsInHotspotFunction = new TreeMap<Integer, Instruction>();
+
+                                    Processor processor = event.getRequesterAccess().getDynamicInst().getThread().getCore().getProcessor();
+                                    BasicProcess process = (BasicProcess) processor.getCores().get(0).getThreads().get(0).getContext().getProcess();
+
+                                    for (Function function : process.getElfAnalyzer().getProgram().getFunctions()) {
+                                        if (function.getSymbol().getName().equals(hotspotFunctionName)) {
+                                            for (BasicBlock basicBlock : function.getBasicBlocks()) {
+                                                for (Instruction instruction : basicBlock.getInstructions()) {
+                                                    if (instruction.getStaticInstruction().getMnemonic().getType() == StaticInstructionType.LOAD) {
+                                                        loadsInHotspotFunction.put(instruction.getPc(), instruction);
+                                                    }
+                                                }
+                                            }
+
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                DynamicInstruction dynamicInst = event.getRequesterAccess().getDynamicInst();
+
+//                                if (loadsInHotspotFunction.containsKey(dynamicInst.getPc()) && BasicThread.isMainThread(dynamicInst.getThread().getContext().getThreadId())) {
+                                if (loadsInHotspotFunction.containsKey(dynamicInst.getPc()) && BasicThread.isHelperThread(dynamicInst.getThread().getContext().getThreadId())) {
+                                    StaticInstruction staticInst = dynamicInst.getThread().getContext().getProcess().getStaticInst(dynamicInst.getPc());
+                                    System.out.print(String.format("[%s %s: Load Request in Hotspot Function] %s \r\n", DateHelper.toString(new Date()), dynamicInst.getThread().getId(), MipsDissembler.disassemble(dynamicInst.getPc(), staticInst)));
+                                }
+                            }
                             break;
                         case DOWNWARD_WRITE:
                             numDownwardWrites++;
@@ -138,7 +181,7 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
 
         if (stackEntryFound != null) {
             int oldStackPosition = this.stackEntries.get(set).indexOf(stackEntryFound);
-            
+
             oldBroughterThreadId = stackEntryFound.broughterThreadId;
             stackEntryFound.broughterThreadId = broughterThreadId;
             stackEntryFound.accessType = accessType;
@@ -167,7 +210,7 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
             this.stackEntries.get(set).add(0, stackEntryFound);
         }
 
-        if(BasicThread.isHelperThread(oldBroughterThreadId) && BasicThread.isMainThread(broughterThreadId)) {
+        if (BasicThread.isHelperThread(oldBroughterThreadId) && BasicThread.isMainThread(broughterThreadId)) {
             this.incReuseDistanceStat(reuseDistance, accessType);
         }
     }
