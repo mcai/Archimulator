@@ -43,9 +43,6 @@ inline void push_thread_func()
             asm volatile ("addiu $0,$9,3822");
             asm volatile ("addiu %0,$9,0" : "=r" (stride));
             asm volatile ("addiu $0,$9,3823");
-
-//            printf("post: lookahead: %d\n",lookahead);
-//            printf("post: stride: %d\n",stride);
 #endif
 
 //            for(i = 0; tmp && i < LOOKAHEAD; i++, tmp = tmp->next);
