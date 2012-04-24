@@ -1532,12 +1532,246 @@ name "fig:Servicing-MT-and-HT-requests"
 
 \end_deeper
 \begin_layout Section
+
+\color red
 Pollution-Aware Feedback Directed Helper Threaded Inter-Core Data Prefetching
 \end_layout
 
 \begin_layout Standard
+
+\color red
 Based on the pollution-aware taxonomy of HT LLC requests, we propose a dynamic
  XXX..
+\end_layout
+
+\begin_layout Standard
+
+\color red
+Under the LRU LLC replacement policy, for LLC misses that issued from delinquent
+ PCs in either in MT or HT, the value of HT-MT inter-thread reuse distance
+ is (w.rt.
+ the associativity of the cache) 
+\end_layout
+
+\begin_layout Itemize
+
+\color red
+HT-MT ITRD >= 0
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\color red
+ITSD > assoc 
+\begin_inset Formula $\Rightarrow$
+\end_inset
+
+ replaced HT prefetches (need aggressiveness tuning)
+\end_layout
+
+\begin_layout Itemize
+
+\color red
+ITSD <= assoc
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\color red
+Cache hit 
+\begin_inset Formula $\Rightarrow$
+\end_inset
+
+ useful HT prefetches
+\end_layout
+
+\begin_layout Itemize
+
+\color red
+MSHR hit 
+\begin_inset Formula $\Rightarrow$
+\end_inset
+
+ late
+\begin_inset Formula $_{1}$
+\end_inset
+
+ HT prefetches (need aggressiveness tuning)
+\end_layout
+
+\end_deeper
+\end_deeper
+\begin_layout Itemize
+
+\color red
+HT-MT ITRD <0
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\color red
+Low 
+\begin_inset Formula $\Rightarrow$
+\end_inset
+
+ late
+\begin_inset Formula $_{1}$
+\end_inset
+
+ HT prefetches (need aggressiveness tuning)
+\end_layout
+
+\begin_layout Itemize
+
+\color red
+Medium to High 
+\begin_inset Formula $\Rightarrow$
+\end_inset
+
+ late
+\begin_inset Formula $_{2}$
+\end_inset
+
+ HT prefetches (need synchronization)
+\end_layout
+
+\begin_layout Itemize
+
+\color red
+Distant 
+\begin_inset Formula $\Rightarrow$
+\end_inset
+
+ MT loads not covered by HT prefetches
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+
+\color red
+For each program phase separated by two consecutive synchronizations, in
+ the end of the program phase
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\color red
+ITRD = 1/2 * previous_ITRD + 1/2 * ITRD_in_the_current_phase
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+
+\color red
+A confidence counter with a threshold value of 10 and maximum value of 20
+\end_layout
+
+\begin_layout Itemize
+
+\color red
+Main components, similar to the one used in the reuse distance prediction
+ based cache replacement paper
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\color red
+Data address indexed FIFO backed sampler
+\end_layout
+
+\begin_layout Itemize
+
+\color red
+PC indexed LRU cache backed predictor (has the same geometry as L2)
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+
+\color red
+Extra hardware: an additional HT bit per L2 line
+\end_layout
+
+\begin_layout Itemize
+
+\color red
+Each cache line has an additional HT bit indicating the line is brought
+ by HT and has not been used by MT yet
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\color red
+When a cache line marked by HT is referenced by MT, it is unmarked
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+
+\color red
+Insertion position of an L2 read miss issued from delinquent PCs and marked
+ as HT, if its predicted HT-MT reuse distance is
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+
+\color red
+high 
+\begin_inset Formula $\Rightarrow$
+\end_inset
+
+ just bypass the L2 or LRU position
+\end_layout
+
+\begin_layout Enumerate
+
+\color red
+medium 
+\begin_inset Formula $\Rightarrow$
+\end_inset
+
+ middle position or 1/4 LRU position
+\end_layout
+
+\begin_layout Enumerate
+
+\color red
+low 
+\begin_inset Formula $\Rightarrow$
+\end_inset
+
+ MRU position
+\end_layout
+
+\begin_layout Enumerate
+
+\color red
+cannot be determined 
+\begin_inset Formula $\Rightarrow$
+\end_inset
+
+ LRU position
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+
+\color red
+Insertion position of an L2 read miss issued from delinquent PCs and not
+ marked as HT: LRU position
+\end_layout
+
+\begin_layout Itemize
+
+\color red
+Insertion position of an L2 read miss in remaining cases: MRU position
 \end_layout
 
 \begin_layout Section
