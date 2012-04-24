@@ -252,9 +252,9 @@ public class StaticInstruction implements Serializable {
     @Ideps(Dep.RS)
     @Odeps(Dep.RT)
     private static void addiu(Context context, int machInst) {
-        if (BitField.RT.valueOf(machInst) == 0 && BitField.RS.valueOf(machInst) == 0 && MathHelper.signExtend(BitField.INTIMM.valueOf(machInst)) != 0 && !context.isSpeculative()) {
+        if (BitField.RT.valueOf(machInst) == 0 && MathHelper.signExtend(BitField.INTIMM.valueOf(machInst)) != 0 && !context.isSpeculative()) {
             context.setPseudocallEncounteredInLastInstructionExecution(true);
-            context.getBlockingEventDispatcher().dispatch(new PseudocallEncounteredEvent(context, MathHelper.signExtend(BitField.INTIMM.valueOf(machInst))));
+            context.getBlockingEventDispatcher().dispatch(new PseudocallEncounteredEvent(context, BitField.RS.valueOf(machInst), MathHelper.signExtend(BitField.INTIMM.valueOf(machInst))));
         } else {
             executor.addiu_impl(context, machInst);
         }

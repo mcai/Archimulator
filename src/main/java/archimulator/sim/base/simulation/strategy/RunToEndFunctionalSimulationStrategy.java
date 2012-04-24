@@ -56,8 +56,8 @@ public class RunToEndFunctionalSimulationStrategy extends SequentialSimulationSt
     public void beginSimulation() {
         this.getSimulation().getBlockingEventDispatcher().addListener(PseudocallEncounteredEvent.class, new Action1<PseudocallEncounteredEvent>() {
             public void apply(PseudocallEncounteredEvent event) {
-                if (event.getArg() == RunToEndFunctionalSimulationStrategy.this.pthreadSpawnedIndex) {
-                    Logger.infof(Logger.SIMULATION, "%s encountered pseudocall %d", getSimulation().getCycleAccurateEventQueue().getCurrentCycle(), event.getContext().getThread(getSimulation().getProcessor()).getName(), event.getArg());
+                if (event.getImm() == RunToEndFunctionalSimulationStrategy.this.pthreadSpawnedIndex) {
+                    Logger.infof(Logger.SIMULATION, "%s encountered pseudocall %d", getSimulation().getCycleAccurateEventQueue().getCurrentCycle(), event.getContext().getThread(getSimulation().getProcessor()).getName(), event.getImm());
                 }
             }
         });

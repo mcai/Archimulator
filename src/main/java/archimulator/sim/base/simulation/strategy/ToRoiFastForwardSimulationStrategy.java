@@ -62,7 +62,7 @@ public class ToRoiFastForwardSimulationStrategy extends SequentialSimulationStra
 
         this.getSimulation().getProcessor().getKernel().getBlockingEventDispatcher().addListener(PseudocallEncounteredEvent.class, new Action1<PseudocallEncounteredEvent>() {
             public void apply(PseudocallEncounteredEvent event) {
-                if (event.getArg() == ToRoiFastForwardSimulationStrategy.this.pthreadSpawnedIndex) {
+                if (event.getImm() == ToRoiFastForwardSimulationStrategy.this.pthreadSpawnedIndex) {
                     pthreadHasSpawned = true;
                 }
             }

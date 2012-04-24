@@ -190,7 +190,7 @@ int main(int argc, char *argv[])
   //~ syscall(500, 0); // enter detailed simulation
 
 #ifdef MIPS_1
-  asm ("addiu $0,$0,3720");
+  asm volatile ("addiu $0,$0,3720");
 #endif
 
   dist = ComputeMst(graph,NumNodes,size);

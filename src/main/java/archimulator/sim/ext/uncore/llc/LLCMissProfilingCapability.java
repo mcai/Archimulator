@@ -125,7 +125,7 @@ public class LLCMissProfilingCapability implements SimulationCapability {
         this.simulation.getBlockingEventDispatcher().addListener(PseudocallEncounteredEvent.class, new Action1<PseudocallEncounteredEvent>() {
             public void apply(PseudocallEncounteredEvent event) {
 //                if (BasicThread.isHelperThread(event.getContext().getThread()))
-//                    System.out.println("pseudocall: " + event.getContext().getThread().getName() + " - " + event.getArg());
+//                    System.out.println("pseudocall: " + event.getContext().getThread().getName() + " - " + event.getImm());
             }
         });
     }

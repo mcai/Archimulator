@@ -23,18 +23,24 @@ import archimulator.util.event.BlockingEvent;
 
 public class PseudocallEncounteredEvent implements BlockingEvent {
     private Context context;
-    private int arg;
+    private int rs;
+    private int imm;
 
-    public PseudocallEncounteredEvent(Context context, int arg) {
+    public PseudocallEncounteredEvent(Context context, int rs, int imm) {
         this.context = context;
-        this.arg = arg;
+        this.rs = rs;
+        this.imm = imm;
     }
 
     public Context getContext() {
         return context;
     }
 
-    public int getArg() {
-        return arg;
+    public int getRs() {
+        return rs;
+    }
+
+    public int getImm() {
+        return imm;
     }
 }

@@ -37,6 +37,7 @@ import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.MemoryHierarchyAccessType;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.coherence.event.CoherentCacheServiceNonblockingRequestEvent;
+import archimulator.util.Reference;
 import archimulator.util.action.Action1;
 
 import java.io.Serializable;
@@ -82,13 +83,34 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
 
         this.reuseDistances = new TreeMap<CacheAccessType, Map<Integer, Long>>();
 
+        final Random random = new Random();
+
+        final Reference<Integer> savedT0Value = new Reference<Integer>(-1);
+
         llc.getBlockingEventDispatcher().addListener(PseudocallEncounteredEvent.class, new Action1<PseudocallEncounteredEvent>() {
             public void apply(PseudocallEncounteredEvent event) {
-                if(event.getArg() == 3820) {
-                    event.getContext().getRegs().setGpr(ArchitecturalRegisterFile.REG_V0, 100);
+                if(event.getImm() == 3820) {
+                    System.out.printf("[PRE] GPR[%d] = %d%n", event.getRs(), event.getContext().getRegs().getGpr(event.getRs()));
+                    savedT0Value.set(event.getContext().getRegs().getGpr(event.getRs()));
+//                    event.getContext().getRegs().setGpr(event.getRs(), random.nextInt(100)); //TODO: incorporate lookahead and stride calculation algorithm
+                    event.getContext().getRegs().setGpr(event.getRs(), 640); //TODO: incorporate lookahead and stride calculation algorithm
+                }
+                else if(event.getImm() == 3821) {
+                    event.getContext().getRegs().setGpr(event.getRs(), savedT0Value.get());
+                    System.out.printf("[POST] GPR[%d] = %d%n", event.getRs(), event.getContext().getRegs().getGpr(event.getRs()));
+                }
+                else if(event.getImm() == 3822) {
+                    System.out.printf("[PRE] GPR[%d] = %d%n", event.getRs(), event.getContext().getRegs().getGpr(event.getRs()));
+                    savedT0Value.set(event.getContext().getRegs().getGpr(event.getRs()));
+//                    event.getContext().getRegs().setGpr(event.getRs(), random.nextInt(100)); //TODO: incorporate lookahead and stride calculation algorithm
+                    event.getContext().getRegs().setGpr(event.getRs(), 320); //TODO: incorporate lookahead and stride calculation algorithm
+                }
+                else if(event.getImm() == 3823) {
+                    event.getContext().getRegs().setGpr(event.getRs(), savedT0Value.get());
+                    System.out.printf("[POST] GPR[%d] = %d%n", event.getRs(), event.getContext().getRegs().getGpr(event.getRs()));
                 }
 //                if (BasicThread.isHelperThread(event.getContext().getThread()))
-//                    System.out.println("pseudocall: " + event.getContext().getThread().getName() + " - " + event.getArg());
+//                    System.out.println("pseudocall: " + event.getContext().getThread().getName() + " - " + event.getImm());
             }
         });
 

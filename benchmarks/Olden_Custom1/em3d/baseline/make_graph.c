@@ -269,7 +269,7 @@ void fill_all_from_fields(table_t *table, int groupname)
   //~ syscall(500, 0); // enter detailed simulation
 
 #ifdef MIPS_1
-  asm ("addiu $0,$0,3720");
+  asm volatile ("addiu $0,$0,3720");
 #endif
   
   fill_from_fields(first_node,d_nodes);
