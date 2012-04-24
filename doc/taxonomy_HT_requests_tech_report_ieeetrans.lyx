@@ -502,8 +502,8 @@ lookahead
 stride
 \family default
  are hard coded.
- In our proposed feedback directed mechanism, the processor changes the
- value of 
+ In our following proposed feedback directed mechanism, the processor changes
+ the value of 
 \family typewriter
 lookahead
 \family default
@@ -570,14 +570,17 @@ Traditionally, prefetch accuracy, coverage and lateness are used to evaluate
  the metrics mean in the effectiveness of the HT scheme.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 HT LLC Request Accuracy
 \end_layout
 
 \begin_layout Standard
-HT LLC request accuracy is a measure of how accurately the HT scheme can
- predict and issue prefetch requests for the memory addresses that will
- be accessed by the main thread.
+
+\shape italic
+HT LLC request accuracy
+\shape default
+ is a measure of how accurately the HT scheme can predict and issue prefetch
+ requests for the memory addresses that will be accessed by the main thread.
  It is defined as below
 \end_layout
 
@@ -601,13 +604,17 @@ where Number of Useful HT LLC Requests is the number of LLC lines brought
  as the aggressiveness of the HT scheme is increased.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 HT LLC Request Coverage
 \end_layout
 
 \begin_layout Standard
-HT LLC request coverage is a measure of the fraction of all MT LLC misses
- that can be eliminated by issuing HT LLC misses ahead.
+
+\shape italic
+HT LLC request coverage
+\shape default
+ is a measure of the fraction of all MT LLC misses that can be eliminated
+ by issuing HT LLC misses ahead.
  It is defined as below
 \end_layout
 
@@ -625,7 +632,7 @@ HT\: LLC\: Request\: Coverage=\frac{Number\: of\: Useful\: HT\: LLC\: Requests}{
 
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 HT LLC Request Lateness
 \end_layout
 
@@ -638,7 +645,11 @@ HT LLC request lateness is a measure of how timely the LLC requests generated
  the data.
  Therefore, even though the HT LLC request is accurate, it can only partially
  hide the latency incurred by an LLC miss in the main thread.
- HT LLC request lateness can be defined as below:
+ 
+\shape italic
+HT LLC request lateness
+\shape default
+ can be defined as below
 \end_layout
 
 \begin_layout Standard
@@ -685,16 +696,41 @@ To show why the notion of inter-thread reuse distance is important in the
  Its pointer traversing code structure inherently exhibits irregular memory
  access pattern in its original, single threaded version, which renders
  the common LRU replacement policy inefficient to reduce LLC misses.
- Here we use RD_MT to refer to the intra-thread reuse distance in the main
- thread, and ITRD_HT_MT to refer to the inter-thread reuse distance between
- HT and MT where a data element is first brought to LLC by HT, and later
- on used by MT.
- Therefore, the values of RD_MT in most MT LLC requests is high which reflects
- the irregular memory access pattern in mst.
- However, the values of ITRD_HT_MT in HT LLC requests should be very low
- when the HT scheme is efficient to reduce LLC misses in MT; otherwise,
- high values of ITRD_HT_MT indicate the inefficiency of the HT scheme where
- most data brought by HT is replaced before used by MT.
+ Here we use 
+\begin_inset Formula $RD_{MT}$
+\end_inset
+
+ to refer to the 
+\shape italic
+intra-thread reuse distance
+\shape default
+ in the main thread, and 
+\begin_inset Formula $ITRD_{HT-MT}$
+\end_inset
+
+ to refer to the 
+\shape italic
+inter-thread reuse distance
+\shape default
+ between HT and MT where a data element is first brought to LLC by HT, and
+ later on used by MT.
+ Therefore, the values of 
+\begin_inset Formula $RD_{MT}$
+\end_inset
+
+ in most MT LLC requests is high which reflects the irregular memory access
+ pattern in mst.
+ The values of 
+\begin_inset Formula $ITRD_{HT-MT}$
+\end_inset
+
+ in HT LLC requests should be very small when the HT scheme is efficient
+ to reduce LLC misses in MT, where large values of 
+\begin_inset Formula $ITRD_{HT-MT}$
+\end_inset
+
+ indicate the inefficiency of the HT scheme where most data brought by HT
+ is replaced before used by MT.
 \end_layout
 
 \begin_layout Subsection
@@ -702,125 +738,188 @@ Pollution Aware Taxonomy of HT LLC Requests
 \end_layout
 
 \begin_layout Standard
-Based on the notions of HT-MT inter-thread reuse distance (HT-MT_ITRD) and
- MT intra-thread reuse distance (MT_RD), we can construct a pollution aware
- taxonomy of HT LLC requests where HT LLC requests are classified into three
- types: good, bad and ugly.
-\end_layout
+Based on the notions of HT-MT inter-thread reuse distance (
+\begin_inset Formula $ITRD_{HT-MT}$
+\end_inset
 
-\begin_layout Standard
-Let's assume that when an HT LLC request with data 
+) and MT intra-thread reuse distance (
+\begin_inset Formula $RD_{MT}$
+\end_inset
+
+), we can construct a pollution aware taxonomy of HT LLC requests where
+ HT LLC requests are classified into three types: good, bad and ugly.
+ Let's assume when an HT LLC request referencing data 
 \family typewriter
-d
+h
 \family default
- evicts the LLC line containing victim data 
+ evicts an LLC line containing the victim data 
 \family typewriter
 v
 \family default
  which is brought by MT, and afterwards the LLC line containing 
 \family typewriter
-d
+h
 \family default
  is evicted by an MT LLC request with data 
 \family typewriter
 m
 \family default
-, then we can see that: 
-\end_layout
-
-\begin_layout Enumerate
-HT-MT_ITRD(
+.
+ Therefore, there are two LLC replacement involved: first 
 \family typewriter
-d
+h
 \family default
-) < MT_RD(
+ evicts 
 \family typewriter
 v
 \family default
-) < MT_RD(
+ and then 
 \family typewriter
 m
 \family default
-) , indicating it's a 
+ evicts 
+\family typewriter
+h
+\family default
+.
+ We use 
+\begin_inset Formula $RD_{MT}(v)$
+\end_inset
+
+, 
+\begin_inset Formula $ITRD_{HT-MT}(h)$
+\end_inset
+
+ and 
+\begin_inset Formula $RD_{MT}(m)$
+\end_inset
+
+ to denote the number of distinct data elements that have been referenced
+ between the time when 
+\family typewriter
+h
+\family default
+ evicts 
+\family typewriter
+v
+\family default
+ and the time 
+\family typewriter
+v
+\family default
+, 
+\family typewriter
+h
+\family default
+ and 
+\family typewriter
+m
+\family default
+ is accessed again, respectively.
+ The greater the reuse distance of the data, the farther the data will be
+ referenced again in time.
+ An LLC replacement is considered as optimal if the replacement makes the
+ data with larger reuse distance evicts the data with smaller reuse distance,
+ otherwise the replacement is considered as un-optimal.
+ We have
+\end_layout
+
+\begin_layout Enumerate
+if 
+\begin_inset Formula $ITRD_{HT-MT}(h)$
+\end_inset
+
+ < 
+\begin_inset Formula $RD_{MT}(v)$
+\end_inset
+
+ < 
+\begin_inset Formula $RD_{MT}(m)$
+\end_inset
+
+, then the HT LLC request is considered as 
 \family typewriter
 \shape italic
-good HT request
+good 
 \family default
 \shape default
- whose data is hit by MT before evicted.
+because it evicts the data that has larger reuse distance than its data.
+ Its data is hit by MT before evicted.
  It has posive impact on MT performance since it reduce one MT miss;
 \end_layout
 
 \begin_layout Enumerate
-MT_RD(
-\family typewriter
-v
-\family default
-) < HT-MT_ITRD(
-\family typewriter
-d
-\family default
-) < MT_RD(
-\family typewriter
-m
-\family default
-) , indicating it's a 
+if 
+\begin_inset Formula $RD_{MT}(v)$
+\end_inset
+
+ < 
+\begin_inset Formula $ITRD_{HT-MT}(h)$
+\end_inset
+
+ < 
+\begin_inset Formula $RD_{MT}(m)$
+\end_inset
+
+, then the HT LLC request is considered as
 \family typewriter
 \shape italic
-bad HT request
+ bad
 \family default
 \shape default
- whose data displaces an LLC line that will later be needed by MT.
+ because it evicts the data that has smaller reuse distance than its data.
+ It displaces an LLC line that will later be needed by MT.
  It is harmful for MT performance which should be prevented as much as possible;
  
 \end_layout
 
 \begin_layout Enumerate
-MT_RD(
-\family typewriter
-m
-\family default
-) < HT_MT_ITRD(
-\family typewriter
-d
-\family default
-), MT_RD(
-\family typewriter
-m
-\family default
-), indicating it's an 
+if 
+\begin_inset Formula $RD_{MT}(m)$
+\end_inset
+
+ < 
+\begin_inset Formula $RD_{MT}(v)$
+\end_inset
+
+ and 
+\begin_inset Formula $ITRD_{HT-MT}(h)$
+\end_inset
+
+, then the HT LLC request is considered 
 \family typewriter
 \shape italic
-ugly HT request
+ugly
 \family default
 \shape default
- which is not either good or bad.
+ because both its data and its victim data have larger reuse distances than
+ the data h.
  It has little performance impact on MT performance because the requested
  data is not referenced by MT before evicted and it does not evict any data
  that will be used by MT.
 \end_layout
 
 \begin_layout Standard
-Good HT LLC requests can be further divided into timely requests and late
- requests.
+We can see that, good and bad HT LLC requests are caused by the optimal
+ and un-optimal LLC replacement, respectively.
+ 
+\end_layout
+
+\begin_layout Standard
+As noted in the previous section, good HT LLC requests can be further divided
+ into timely requests and late requests.
  An HT request is called 
 \family typewriter
 \shape italic
-late HT request
+late HT request 
 \family default
 \shape default
- if the data is hit in LLC MSHRs by an MT request where it is brought from
- memory by HT.
+if its requested data has not yet returned from the main memory by the time
+ an MT LLC request references the data.
  Late HT requests only partially hide the LLC miss latency in MT requests,
  but they are good indicators for potential performance improvement of the
- HT scheme because late HT requests may be converted to timely or normal
- 
-\family typewriter
-\shape italic
-good HT requests
-\family default
-\shape default
- by finetuning the parameters of the HT scheme.
+ HT scheme because late HT requests may be converted to timely HT requests
+ by adjusting the aggressiveness parameters of the HT scheme.
 \end_layout
 
 \begin_layout Subsection
@@ -886,11 +985,15 @@ Detecting Late HT Requests
 \end_layout
 
 \begin_layout Standard
-Lastly, in order to measure late HT requests, we only need to identify the
- event when an MT request hits to an LLC line which is being brought by
- an inflight HT request coming from the upper level cache.
- This can be accomplished by monitoring the LLC MSHRs or equivalent hardware
- components.
+Lastly, in order to measure late HT requests, we need to identify the event
+ when an MT request hits to an LLC line which is being brought by an inflight
+ HT request coming from the upper level cache.
+ This can be accomplished by monitoring the LLC Miss Status Holding Register
+ (MSHR).
+ MSHR is a hardware structure that keeps track of all in-flight memory requests.
+ An HT LLC request is late if an MT LLC request for the same address is
+ generated while the HT LLC request is in the LLC MSHR waiting for main
+ memory.
 \end_layout
 
 \begin_layout Subsection
@@ -898,7 +1001,7 @@ Algorithms for Tracking HT LLC Requests and Victims
 \end_layout
 
 \begin_layout Standard
-There are two invariants that should be maintained:
+There are two invariants that should be maintained
 \end_layout
 
 \begin_layout Enumerate
@@ -924,7 +1027,7 @@ Actions taken on Filling an LLC Line
 \end_layout
 
 \begin_layout Standard
-When filling an LLC line, we should consider five cases:
+When filling an LLC line, we should consider five cases
 \end_layout
 
 \begin_layout Enumerate
