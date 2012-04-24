@@ -678,12 +678,35 @@ The Notion of Inter-Thread Reuse Distance in the HT Scheme
 The notion of reuse distance can shed light on how a pollution-aware taxonomy
  of HT LLC requests can be constructed.
  The traditional intra-thread reuse distance of a reference to data element
- x is defined as the number of distinct data elements that have been referenced
- between two contiguous accesses of x (or ∞ if the element has not been
- referenced thereafter).
- Thus, these two contiguous accesses are issued by the same thread in the
- traditional notion.
- To accomodate the case where one thread Tb accesses data element x that
+ x is defined as the number of unique memory references between two consecutive
+ accesses of x in the same thread (or ∞ if the element has not been referenced
+ thereafter).
+ In a k-way set-associative cache a cache miss with reuse distance rd can
+ be classified by the value of reuse distance as below
+\end_layout
+
+\begin_layout Enumerate
+rd < k indicates it is a conflict miss
+\end_layout
+
+\begin_layout Enumerate
+k<= rd < 
+\begin_inset Formula $\infty$
+\end_inset
+
+ indicates it is a capacity miss
+\end_layout
+
+\begin_layout Enumerate
+rd = 
+\begin_inset Formula $\infty$
+\end_inset
+
+ indicates it is a cold miss
+\end_layout
+
+\begin_layout Standard
+To accomodate the case where one thread Tb accesses data element x that
  has been previously brought into the cache by another thread Ta, we introduce
  the notion of Ta-Tb inter-thread reuse distance, as compared to the traditional
  intra-thread reuse distance applied to either Ta or Tb.
@@ -725,12 +748,42 @@ inter-thread reuse distance
 \end_inset
 
  in HT LLC requests should be very small when the HT scheme is efficient
- to reduce LLC misses in MT, where large values of 
+ to reduce LLC misses in MT where for most HT LLC miss, an immediate followup
+ MT LLC request will access the data brought by the previous LLC request
+ and hit in the LLC.
+ Otherwise, large values of 
 \begin_inset Formula $ITRD_{HT-MT}$
 \end_inset
 
  indicate the inefficiency of the HT scheme where most data brought by HT
  is replaced before used by MT.
+\end_layout
+
+\begin_layout Standard
+HT induced cache pollution with respect to MT performance only happens when
+ HT LLC requests evict the data that are previously brought by MT and immediatel
+y referenced again by MT LLC requests, but rarely happens when HT LLC requests
+ evict any data that was previously brought by MT but will not be used by
+ MT in the near future, is evicted by HT, which is typically the case in
+ our selected benchmark 
+\family typewriter
+mst
+\family default
+ which exhibits a thrashing memory access pattern and thus most of the data
+ requested from its delinquent PCs have instant MT intra-thread reuse distances
+ but small HT-MT inter-thread reuse distances, which renders traditional
+ intra-thread reuse distance prediction based LLC replacement useless for
+ 
+\family typewriter
+mst
+\family default
+ with HT.
+ Fortunately, as we will see, HT-MT inter-thread reuse distance prediction
+ based LLC replacement can be useful for 
+\family typewriter
+mst
+\family default
+ with HT.
 \end_layout
 
 \begin_layout Subsection
@@ -902,7 +955,33 @@ ugly
 \begin_layout Standard
 We can see that, good and bad HT LLC requests are caused by the optimal
  and un-optimal LLC replacement, respectively.
- 
+ We can conclude that
+\end_layout
+
+\begin_layout Enumerate
+Low 
+\begin_inset Formula $ITRD_{HT-MT}$
+\end_inset
+
+ is an indicator of good performance of the HT scheme;
+\end_layout
+
+\begin_layout Enumerate
+Medium
+\begin_inset Formula $ITRD_{HT-MT}$
+\end_inset
+
+ signals those potentially late HT prefetches that, depend on the LLC replacemen
+t policy, may be useful, partially useful or useless for MT performance;
+\end_layout
+
+\begin_layout Enumerate
+High 
+\begin_inset Formula $ITRD_{HT-MT}$
+\end_inset
+
+ implies HT and MT is not synchronized well or the amount of (computational
+ and memory access) work in HT and MT is not balanced well.
 \end_layout
 
 \begin_layout Standard
@@ -11346,6 +11425,10 @@ Related Work
 Even though helper threaded data prefetching mechanisms have been studied
  for a long time, taxonomy of HT LLC requests have not been studied before.
  Here we briefly describe previous work in the context of hardwre prefething.
+\end_layout
+
+\begin_layout Subsection
+Reuse Distance
 \end_layout
 
 \begin_layout Subsection
