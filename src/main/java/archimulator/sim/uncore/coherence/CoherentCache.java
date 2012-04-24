@@ -34,8 +34,8 @@ import archimulator.sim.uncore.coherence.event.CoherentCacheNonblockingRequestHi
 import archimulator.sim.uncore.coherence.event.CoherentCacheServiceNonblockingRequestEvent;
 import archimulator.sim.uncore.coherence.exception.CacheLineLockFailedException;
 import archimulator.sim.uncore.coherence.exception.CoherentCacheException;
-import archimulator.sim.uncore.coherence.util.ActionBasedPendingActionOwner;
-import archimulator.sim.uncore.coherence.util.PendingActionOwner;
+import archimulator.sim.uncore.coherence.action.ActionBasedPendingActionOwner;
+import archimulator.sim.uncore.coherence.action.PendingActionOwner;
 import archimulator.util.action.Action;
 import archimulator.util.action.Action1;
 import archimulator.util.action.Function3;

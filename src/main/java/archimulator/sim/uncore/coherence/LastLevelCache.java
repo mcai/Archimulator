@@ -29,7 +29,7 @@ import archimulator.sim.uncore.coherence.event.LastLevelCacheLineEvictedByMemWri
 import archimulator.sim.uncore.coherence.exception.CoherentCacheException;
 import archimulator.sim.uncore.coherence.exception.CoherentCacheMessageProcessException;
 import archimulator.sim.uncore.coherence.message.*;
-import archimulator.sim.uncore.coherence.util.ActionBasedPendingActionOwner;
+import archimulator.sim.uncore.coherence.action.ActionBasedPendingActionOwner;
 import archimulator.sim.uncore.dram.MainMemory;
 import archimulator.sim.uncore.net.Net;
 import archimulator.util.action.Action;

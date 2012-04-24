@@ -16,10 +16,14 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.coherence.util;
+package archimulator.sim.uncore.coherence.action;
 
 import archimulator.sim.uncore.coherence.exception.CoherentCacheException;
 
-public interface PendingActionOwner {
-    boolean processPendingActions() throws CoherentCacheException;
+public abstract class ActionBasedPendingActionOwner implements PendingActionOwner {
+    public boolean processPendingActions() throws CoherentCacheException {
+        return this.apply();
+    }
+
+    public abstract boolean apply() throws CoherentCacheException;
 }
