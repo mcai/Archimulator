@@ -22,9 +22,7 @@ import archimulator.sim.isa.memory.Memory;
 import archimulator.sim.os.Kernel;
 import archimulator.util.math.MathHelper;
 
-import java.io.Serializable;
-
-public class SignalMask implements Serializable, Cloneable {
+public class SignalMask implements Cloneable {
     private int[] signals = new int[Kernel.MAX_SIGNAL / 32];
 
     public SignalMask() {

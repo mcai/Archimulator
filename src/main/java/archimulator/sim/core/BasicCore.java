@@ -96,7 +96,7 @@ public class BasicCore extends AbstractBasicCore {
     }
 
     @Override
-    protected void wakeup() {
+    protected void wakeUp() {
         this.wakeup(this.waitingInstructionQueue, this.readyInstructionQueue);
         this.wakeup(this.waitingStoreQueue, this.readyStoreQueue);
     }
@@ -139,7 +139,7 @@ public class BasicCore extends AbstractBasicCore {
             } else {
                 reorderBufferEntry.setIssued();
                 reorderBufferEntry.setCompleted();
-                reorderBufferEntry.writeback();
+                reorderBufferEntry.writeBack();
             }
 
             it.remove();
@@ -208,10 +208,10 @@ public class BasicCore extends AbstractBasicCore {
     }
 
     @Override
-    protected void writeback() {
+    protected void writeBack() {
         for (AbstractReorderBufferEntry reorderBufferEntry : this.oooEventQueue) {
             reorderBufferEntry.setCompleted();
-            reorderBufferEntry.writeback();
+            reorderBufferEntry.writeBack();
         }
 
         this.oooEventQueue.clear();

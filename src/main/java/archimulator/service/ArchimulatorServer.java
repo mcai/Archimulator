@@ -16,7 +16,7 @@ public class ArchimulatorServer {
 
         webapp.setWar(args[1]);
         webapp.setExtractWAR(false);
-        
+
         server.setHandler(webapp);
 
         server.start();

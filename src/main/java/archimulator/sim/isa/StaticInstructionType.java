@@ -18,9 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.isa;
 
-import java.io.Serializable;
-
-public enum StaticInstructionType implements Serializable {
+public enum StaticInstructionType {
     INTEGER_COMPUTATION,
     FLOAT_COMPUTATION,
     CONDITIONAL,

@@ -27,7 +27,7 @@ public abstract class MemoryDeviceMessage<MessageT extends MemoryDeviceMessage<?
     private MemoryHierarchyAccess access;
     private int tag;
     private Action1<MessageT> onReplyCallback;
-    private boolean hasError;
+    private boolean error;
 
     public MemoryDeviceMessage(MemoryDeviceMessageType type, MemoryHierarchyAccess access, int tag, Action1<MessageT> onReplyCallback) {
         this.type = type;
@@ -56,11 +56,11 @@ public abstract class MemoryDeviceMessage<MessageT extends MemoryDeviceMessage<?
         return tag;
     }
 
-    public boolean isHasError() {
-        return hasError;
+    public boolean isError() {
+        return error;
     }
 
-    public void setHasError(boolean hasError) {
-        this.hasError = hasError;
+    public void setError(boolean error) {
+        this.error = error;
     }
 }

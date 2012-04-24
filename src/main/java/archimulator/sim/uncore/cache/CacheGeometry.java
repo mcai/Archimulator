@@ -18,9 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache;
 
-import java.io.Serializable;
-
-public final class CacheGeometry implements Serializable {
+public final class CacheGeometry {
     private int size;
     private int associativity;
     private int lineSize;

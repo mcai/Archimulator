@@ -18,9 +18,9 @@
  ******************************************************************************/
 package archimulator.sim.uncore.tlb;
 
-import archimulator.sim.base.simulation.SimulationObject;
 import archimulator.sim.base.event.DumpStatEvent;
 import archimulator.sim.base.event.ResetStatEvent;
+import archimulator.sim.base.simulation.SimulationObject;
 import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.Cache;
@@ -32,9 +32,7 @@ import archimulator.util.action.Action;
 import archimulator.util.action.Action1;
 import archimulator.util.action.Function3;
 
-import java.io.Serializable;
-
-public class TranslationLookasideBuffer implements Serializable {
+public class TranslationLookasideBuffer {
     private String name;
     private TranslationLookasideBufferConfig config;
 

@@ -2,11 +2,7 @@ package archimulator.util;
 
 import com.googlecode.charts4j.*;
 
-import java.util.Arrays;
-
 import static com.googlecode.charts4j.Color.*;
-import static com.googlecode.charts4j.UrlUtil.normalize;
-import static com.googlecode.charts4j.USAState.Code.*;
 
 public class GoogleChartHelper {
     public static void main(String[] args) {
@@ -43,7 +39,6 @@ public class GoogleChartHelper {
         fill.addColorAndOffset(WHITE, 0);
         chart.setAreaFill(fill);
         String url = chart.toURLString();
-
 
 
         System.out.println(UrlUtil.normalize(url));

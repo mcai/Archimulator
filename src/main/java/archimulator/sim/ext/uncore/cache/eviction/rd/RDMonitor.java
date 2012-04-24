@@ -25,7 +25,6 @@ import archimulator.sim.uncore.cache.Cache;
 import archimulator.sim.uncore.cache.CacheGeometry;
 import archimulator.util.math.Quantizer;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,7 +45,7 @@ public class RDMonitor {
         return this.predictor.predict(pc, 0);
     }
 
-    private class RDSampler implements Serializable {
+    private class RDSampler {
         private List<RDSamplerEntry> entries;
 
         private int samplingPeriod;
@@ -97,7 +96,7 @@ public class RDMonitor {
             }
         }
 
-        private class RDSamplerEntry implements Serializable {
+        private class RDSamplerEntry {
             private boolean valid;
             private int pc;
             private int address;

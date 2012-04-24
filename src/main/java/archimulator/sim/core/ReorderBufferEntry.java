@@ -31,7 +31,7 @@ public class ReorderBufferEntry extends AbstractReorderBufferEntry {
     }
 
     @Override
-    protected boolean isNeedWriteback() {
+    protected boolean isNeedWriteBack() {
         return !this.effectiveAddressComputation;
     }
 

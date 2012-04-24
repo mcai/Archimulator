@@ -16,7 +16,7 @@
             Executions.sendRedirect("login.zul");
             }
         </zscript>
-        <grid vflex="true" >
+        <grid vflex="true">
             <columns>
                 <column width="150px"/>
                 <column width="600px"/>
@@ -63,7 +63,9 @@
                 </row>
                 <row>
                     Simulation Capabilities
-                    <listbox id="listboxSimulationCapabilities" vflex="true" itemRenderer="archimulator.view.renderer.CapabilityListCellRenderer" emptyMessage="Simulation capability list is empty" multiple="true" mold="paging"
+                    <listbox id="listboxSimulationCapabilities" vflex="true"
+                             itemRenderer="archimulator.view.renderer.CapabilityListCellRenderer"
+                             emptyMessage="Simulation capability list is empty" multiple="true" mold="paging"
                              pageSize="5" pagingPosition="bottom" height="220px">
                         <listhead>
                             <listheader label="Implementation Class" width="620px"/>
@@ -72,7 +74,9 @@
                 </row>
                 <row>
                     Processor Capabilities
-                    <listbox id="listboxProcessorCapabilities" vflex="true" itemRenderer="archimulator.view.renderer.CapabilityListCellRenderer" emptyMessage="Processor capability list is empty" multiple="true" mold="paging"
+                    <listbox id="listboxProcessorCapabilities" vflex="true"
+                             itemRenderer="archimulator.view.renderer.CapabilityListCellRenderer"
+                             emptyMessage="Processor capability list is empty" multiple="true" mold="paging"
                              pageSize="5" pagingPosition="bottom" height="220px">
                         <listhead>
                             <listheader label="Implementation Class" width="620px"/>
@@ -81,7 +85,9 @@
                 </row>
                 <row>
                     Kernel Capabilities
-                    <listbox id="listboxKernelCapabilities" vflex="true" itemRenderer="archimulator.view.renderer.CapabilityListCellRenderer" emptyMessage="Kernel capability list is empty" multiple="true" mold="paging"
+                    <listbox id="listboxKernelCapabilities" vflex="true"
+                             itemRenderer="archimulator.view.renderer.CapabilityListCellRenderer"
+                             emptyMessage="Kernel capability list is empty" multiple="true" mold="paging"
                              pageSize="5" pagingPosition="bottom" height="220px">
                         <listhead>
                             <listheader label="Implementation Class" width="620px"/>

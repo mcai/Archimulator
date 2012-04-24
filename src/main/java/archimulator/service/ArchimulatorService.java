@@ -31,29 +31,29 @@ public interface ArchimulatorService extends MessageSink {
     void stop();
 
     void clearData() throws SQLException;
-    
+
     List<SimulatedProgram> getSimulatedProgramsAsList() throws SQLException;
-    
+
     SimulatedProgram getSimulatedProgramById(long simulatedProgramId) throws SQLException;
 
     SimulatedProgram getSimulatedProgramByTitle(String simulatedProgramTitle) throws SQLException;
-    
+
     void addSimulatedProgram(SimulatedProgram simulatedProgram) throws SQLException;
-    
+
     void removeSimulatedProgramById(long simulatedProgramId) throws SQLException;
-    
+
     void updateSimulatedProgram(SimulatedProgram simulatedProgram) throws SQLException;
 
     List<ProcessorProfile> getProcessorProfilesAsList() throws SQLException;
-    
+
     ProcessorProfile getProcessorProfileById(long processorProfileId) throws SQLException;
 
     ProcessorProfile getProcessorProfileByTitle(String processorProfileTitle) throws SQLException;
-    
+
     void addProcessorProfile(ProcessorProfile processorProfile) throws SQLException;
-    
+
     void removeProcessorProfileById(long processorProfileId) throws SQLException;
-    
+
     void updateProcessorProfile(ProcessorProfile processorProfile) throws SQLException;
 
     List<ExperimentProfile> getExperimentProfilesAsList() throws SQLException;

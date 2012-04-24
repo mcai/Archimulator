@@ -23,7 +23,7 @@ import java.util.List;
 
 public class CloudUser {
     private String id;
-    private transient List<InstantMessage> instantMessages;
+    private List<InstantMessage> instantMessages;
 
     public CloudUser(String id) {
         this.id = id;

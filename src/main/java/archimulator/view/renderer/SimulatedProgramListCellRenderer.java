@@ -18,9 +18,9 @@
  ******************************************************************************/
 package archimulator.view.renderer;
 
-import archimulator.sim.base.simulation.SimulatedProgram;
 import archimulator.service.ArchimulatorService;
 import archimulator.service.ArchimulatorServletContextListener;
+import archimulator.sim.base.simulation.SimulatedProgram;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Session;
 import org.zkoss.zk.ui.event.Event;

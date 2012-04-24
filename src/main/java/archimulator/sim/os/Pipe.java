@@ -20,9 +20,7 @@ package archimulator.sim.os;
 
 import archimulator.util.io.buffer.CircularByteBuffer;
 
-import java.io.Serializable;
-
-public class Pipe implements Serializable {
+public class Pipe {
     private int[] fd;
     private CircularByteBuffer buffer;
 

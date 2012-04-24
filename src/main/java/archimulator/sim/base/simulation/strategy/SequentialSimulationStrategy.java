@@ -18,11 +18,11 @@
  ******************************************************************************/
 package archimulator.sim.base.simulation.strategy;
 
+import archimulator.sim.base.event.DumpStatEvent;
 import archimulator.sim.base.event.PauseExperimentEvent;
+import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.base.event.StopExperimentEvent;
 import archimulator.sim.base.simulation.Logger;
-import archimulator.sim.base.event.DumpStatEvent;
-import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.core.Core;
 import archimulator.util.action.Action1;
 

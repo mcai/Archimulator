@@ -18,11 +18,11 @@
  ******************************************************************************/
 package archimulator.view.renderer;
 
+import archimulator.service.ArchimulatorService;
+import archimulator.service.ArchimulatorServletContextListener;
 import archimulator.sim.base.experiment.profile.ExperimentProfile;
 import archimulator.sim.base.experiment.profile.ExperimentProfileState;
 import archimulator.sim.base.experiment.profile.ExperimentProfileType;
-import archimulator.service.ArchimulatorService;
-import archimulator.service.ArchimulatorServletContextListener;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Session;
 import org.zkoss.zk.ui.event.Event;
@@ -56,22 +56,22 @@ public class ExperimentProfileListCellRenderer implements ListitemRenderer<Exper
 
         addButtonEdit(listCellOperations, data);
         addButtonRemove(listCellOperations, data, archimulatorService);
-        
-        if(data.getState() == ExperimentProfileState.RUNNING) {
+
+        if (data.getState() == ExperimentProfileState.RUNNING) {
             addButtonPause(listCellOperations, data, archimulatorService);
         }
 
-        if(data.getState() == ExperimentProfileState.PAUSED) {
+        if (data.getState() == ExperimentProfileState.PAUSED) {
             addButtonResume(listCellOperations, data, archimulatorService);
         }
 
-        if(data.getState() == ExperimentProfileState.RUNNING || data.getState() == ExperimentProfileState.PAUSED) {
+        if (data.getState() == ExperimentProfileState.RUNNING || data.getState() == ExperimentProfileState.PAUSED) {
             addButtonStop(listCellOperations, data, archimulatorService);
         }
 
         addButtonReset(listCellOperations, data, archimulatorService);
 
-        if(data.getState() != ExperimentProfileState.SUBMITTED) {
+        if (data.getState() != ExperimentProfileState.SUBMITTED) {
             addButtonStats(listCellOperations, data, archimulatorService);
         }
     }

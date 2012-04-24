@@ -53,15 +53,15 @@ public abstract class AbstractReorderBufferEntry {
         this.srcPhysRegs = new TreeMap<Integer, PhysicalRegisterFile.PhysicalRegister>();
     }
 
-    public void writeback() {
-        if (this.isNeedWriteback()) {
-            this.doWriteback();
+    public void writeBack() {
+        if (this.isNeedWriteBack()) {
+            this.doWriteBack();
         }
     }
 
-    protected abstract boolean isNeedWriteback();
+    protected abstract boolean isNeedWriteBack();
 
-    private void doWriteback() {
+    private void doWriteBack() {
         for (Map.Entry<Integer, PhysicalRegisterFile.PhysicalRegister> entry : this.physRegs.entrySet()) {
             if (entry.getKey() != 0) {
                 entry.getValue().writeback();

@@ -20,10 +20,9 @@ package archimulator.sim.isa;
 
 import archimulator.util.math.MathHelper;
 
-import java.io.Serializable;
 import java.lang.reflect.Field;
 
-public class BitField implements Serializable {
+public class BitField {
     private int hi;
     private int lo;
 

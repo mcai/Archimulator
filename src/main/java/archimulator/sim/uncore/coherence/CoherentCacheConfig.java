@@ -21,9 +21,7 @@ package archimulator.sim.uncore.coherence;
 import archimulator.sim.uncore.cache.CacheGeometry;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
 
-import java.io.Serializable;
-
-public abstract class CoherentCacheConfig implements Serializable {
+public abstract class CoherentCacheConfig {
     private CoherentCacheLevelType levelType;
     private CacheGeometry geometry;
     private int hitLatency;

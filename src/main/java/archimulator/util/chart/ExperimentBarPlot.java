@@ -104,9 +104,9 @@ public class ExperimentBarPlot {
     private static Double getExperimentProfileStat(ExperimentProfile experimentProfile, ArchimulatorService archimulatorService, String key) {
         try {
             String value = archimulatorService.getExperimentStatById(experimentProfile.getId(), key);
-            if(value != null) {
+            if (value != null) {
                 value = value.replaceAll(",", "");
-                return (double)(int)(Double.valueOf(value).doubleValue());
+                return (double) (int) (Double.valueOf(value).doubleValue());
             }
             return 0.0;
         } catch (SQLException e) {

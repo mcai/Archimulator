@@ -18,18 +18,19 @@
  ******************************************************************************/
 package archimulator.sim.base.experiment;
 
+import archimulator.sim.base.event.DumpStatEvent;
 import archimulator.sim.base.event.PauseExperimentEvent;
 import archimulator.sim.base.event.PollStatsEvent;
 import archimulator.sim.base.event.StopExperimentEvent;
-import archimulator.sim.base.experiment.capability.*;
-import archimulator.sim.base.event.DumpStatEvent;
+import archimulator.sim.base.experiment.capability.KernelCapability;
+import archimulator.sim.base.experiment.capability.ProcessorCapability;
+import archimulator.sim.base.experiment.capability.SimulationCapability;
 import archimulator.sim.base.simulation.ContextConfig;
 import archimulator.sim.base.simulation.Logger;
 import archimulator.sim.base.simulation.Simulation;
 import archimulator.sim.base.simulation.SimulationConfig;
 import archimulator.sim.base.simulation.strategy.SimulationStrategy;
 import archimulator.sim.core.ProcessorConfig;
-import archimulator.sim.base.experiment.capability.KernelCapability;
 import archimulator.sim.uncore.MemoryHierarchyConfig;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
 import archimulator.util.action.Action1;
@@ -47,7 +48,7 @@ import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
 public abstract class Experiment {
-    private List<Class<? extends SimulationCapability>> simulationCapabilityClasses = new ArrayList<Class<? extends SimulationCapability>> ();
+    private List<Class<? extends SimulationCapability>> simulationCapabilityClasses = new ArrayList<Class<? extends SimulationCapability>>();
 
     private long id;
 
@@ -82,7 +83,7 @@ public abstract class Experiment {
         this.processorConfig = ProcessorConfig.createDefaultProcessorConfig(MemoryHierarchyConfig.createDefaultMemoryHierarchyConfig(l2Size, l2Associativity, l2EvictionPolicyClz), processorCapabilityClasses, kernelCapabilityClasses, this.numCores, this.numThreadsPerCore);
 
         this.simulationCapabilityClasses = simulationCapabilityClasses;
-        
+
         this.beginTime = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date());
 
         this.blockingEventDispatcher = new BlockingEventDispatcher<BlockingEvent>();
@@ -104,7 +105,7 @@ public abstract class Experiment {
     }
 
     private void pollSimulationState() {
-        if(this.simulation == null) {
+        if (this.simulation == null) {
             return;
         }
 

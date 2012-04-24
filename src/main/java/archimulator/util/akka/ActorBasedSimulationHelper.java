@@ -3,9 +3,7 @@ package archimulator.util.akka;
 import akka.actor.*;
 import archimulator.util.DateHelper;
 import org.apache.commons.lang.time.StopWatch;
-import org.jfree.data.statistics.Statistics;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -37,7 +35,7 @@ public class ActorBasedSimulationHelper {
         return stopWatch.getTime();
     }
 
-    private static class SimulationConfig implements Serializable {
+    private static class SimulationConfig {
         private String workload;
         private long maxCycles;
 
@@ -47,7 +45,7 @@ public class ActorBasedSimulationHelper {
         }
     }
 
-    private static class ExecuteOneCycle implements Serializable {
+    private static class ExecuteOneCycle {
         private long currentCycle;
 
         public ExecuteOneCycle(long currentCycle) {
@@ -55,7 +53,7 @@ public class ActorBasedSimulationHelper {
         }
     }
 
-    private static class OneCycleExecuted implements Serializable {
+    private static class OneCycleExecuted {
     }
 
     public static class Core extends UntypedActor {
@@ -113,7 +111,7 @@ public class ActorBasedSimulationHelper {
                 if (numPendings == 0) {
 //                    System.out.printf("[%s %s: %d] Execute one cycle.\n", DateHelper.toString(new Date()), getSelf().path().name(), currentCycle);
 
-                    if(currentCycle % 1000000 == 0) {
+                    if (currentCycle % 1000000 == 0) {
                         System.out.printf("[%s %s: %d] Execute one cycle.\n", DateHelper.toString(new Date()), getSelf().path().name(), currentCycle);
                     }
 

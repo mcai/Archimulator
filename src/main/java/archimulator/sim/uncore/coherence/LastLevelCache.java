@@ -33,12 +33,11 @@ import archimulator.sim.uncore.net.Net;
 import archimulator.util.action.Action;
 import archimulator.util.action.Action1;
 
-import java.io.Serializable;
 import java.util.*;
 
 public class LastLevelCache extends CoherentCache<MESIState> {
     private Map<FirstLevelCache, ShadowTagDirectory> shadowTagDirectories;
-    private transient MainMemory next;
+    private MainMemory next;
 
     public LastLevelCache(CacheHierarchy cacheHierarchy, String name, CoherentCacheConfig config) {
         super(cacheHierarchy, name, config, MESIState.INVALID);
@@ -103,7 +102,7 @@ public class LastLevelCache extends CoherentCache<MESIState> {
         this.next = next;
     }
 
-    private class ShadowTagDirectory implements Serializable {
+    private class ShadowTagDirectory {
         private CacheGeometry geometry;
         private List<Set<Integer>> sets;
 
@@ -256,7 +255,7 @@ public class LastLevelCache extends CoherentCache<MESIState> {
             } catch (CoherentCacheException e) {
                 this.complete();
 
-                this.message.setHasError(true);
+                this.message.setError(true);
                 sendReply(this.source, this.message, 8);
 
                 throw e;
@@ -267,7 +266,7 @@ public class LastLevelCache extends CoherentCache<MESIState> {
     private class L1DownwardReadProcess extends LockingProcess {
         private FirstLevelCache source;
         private DownwardReadMessage message;
-        private boolean hasCopyback;
+        private boolean copyBack;
 
         private L1DownwardReadProcess(final FirstLevelCache source, final DownwardReadMessage message) {
             super(message.getAccess(), message.getTag(), CacheAccessType.DOWNWARD_READ);
@@ -284,7 +283,7 @@ public class LastLevelCache extends CoherentCache<MESIState> {
                     sendReply(source, message, source.getCache().getLineSize() + 8);
 
                     if (!findAndLockProcess.getCacheAccess().isHitInCache() && !findAndLockProcess.getCacheAccess().isBypass()) {
-                        if (hasCopyback) {
+                        if (copyBack) {
                             findAndLockProcess.getCacheAccess().getLine().setNonInitialState(MESIState.MODIFIED);
                         } else {
                             findAndLockProcess.getCacheAccess().getLine().setNonInitialState(MESIState.EXCLUSIVE);
@@ -304,8 +303,8 @@ public class LastLevelCache extends CoherentCache<MESIState> {
                         if (isOwnedOrShared(message.getTag())) {
                             getPendingActions().push(new UpwardReadProcess(message.getAccess(), message.getTag(), getOwnerOrFirstSharer(message.getTag())).addOnCompletedCallback(new Action1<UpwardReadProcess>() {
                                 public void apply(UpwardReadProcess upwardReadProcess) {
-                                    if (upwardReadProcess.hasCopyback) {
-                                        hasCopyback = true;
+                                    if (upwardReadProcess.copyBack) {
+                                        copyBack = true;
 //                                        findAndLockProcess.getCacheAccess().getLine().setNonInitialState(MESIState.MODIFIED);
                                     }
                                 }
@@ -333,7 +332,7 @@ public class LastLevelCache extends CoherentCache<MESIState> {
             } catch (CoherentCacheException e) {
                 this.complete();
 
-                this.message.setHasError(true);
+                this.message.setError(true);
                 sendReply(this.source, this.message, 8);
 
                 throw e;
@@ -393,7 +392,7 @@ public class LastLevelCache extends CoherentCache<MESIState> {
             } catch (CoherentCacheException e) {
                 this.complete();
 
-                this.message.setHasError(true);
+                this.message.setError(true);
                 sendReply(this.source, this.message, 8);
 
                 throw e;
@@ -403,8 +402,8 @@ public class LastLevelCache extends CoherentCache<MESIState> {
 
     private class UpwardReadProcess extends CoherentCacheProcess {
         private boolean completed;
-        private boolean hasError;
-        private boolean hasCopyback;
+        private boolean error;
+        private boolean copyBack;
 
         private UpwardReadProcess(final MemoryHierarchyAccess access, final int tag, final MemoryDevice target) {
             this.getPendingActions().push(new ActionBasedPendingActionOwner() {
@@ -412,10 +411,10 @@ public class LastLevelCache extends CoherentCache<MESIState> {
                 public boolean apply() {
                     sendRequest(target, new UpwardReadMessage(access, tag, new Action1<UpwardReadMessage>() {
                         public void apply(UpwardReadMessage upwardReadMessage) {
-                            if (upwardReadMessage.isHasError()) {
-                                hasError = true;
+                            if (upwardReadMessage.isError()) {
+                                error = true;
                             } else {
-                                hasCopyback = upwardReadMessage.isHasCopyback();
+                                copyBack = upwardReadMessage.isHasCopyback();
                                 completed = true;
                             }
                         }
@@ -428,7 +427,7 @@ public class LastLevelCache extends CoherentCache<MESIState> {
 
         @Override
         public boolean processPendingActions() throws CoherentCacheException {
-            if (this.hasError) {
+            if (this.error) {
                 throw new CoherentCacheMessageProcessException();
             }
 
@@ -438,7 +437,7 @@ public class LastLevelCache extends CoherentCache<MESIState> {
 
     private class UpwardWriteProcess extends CoherentCacheProcess {
         private int pending;
-        private boolean hasError;
+        private boolean error;
 
         private UpwardWriteProcess(final MemoryHierarchyAccess access, final int tag, final FirstLevelCache except) {
             this.getPendingActions().push(new ActionBasedPendingActionOwner() {
@@ -451,8 +450,8 @@ public class LastLevelCache extends CoherentCache<MESIState> {
                                 public boolean apply() {
                                     sendRequest(sharer, new UpwardWriteMessage(access, tag, new Action1<UpwardWriteMessage>() {
                                         public void apply(UpwardWriteMessage upwardWriteMessage) {
-                                            if (upwardWriteMessage.isHasError()) {
-                                                hasError = true;
+                                            if (upwardWriteMessage.isError()) {
+                                                error = true;
                                             } else {
                                                 pending--;
                                             }
@@ -473,7 +472,7 @@ public class LastLevelCache extends CoherentCache<MESIState> {
 
         @Override
         public boolean processPendingActions() throws CoherentCacheException {
-            if (this.hasError) {
+            if (this.error) {
                 throw new CoherentCacheMessageProcessException();
             }
 

@@ -18,9 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.os;
 
-import java.io.Serializable;
-
-class OpenFlagMapping implements Serializable {
+class OpenFlagMapping {
     private int targetFlag;
     private int hostFlag;
 

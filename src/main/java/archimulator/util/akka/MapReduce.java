@@ -15,8 +15,8 @@ import java.util.concurrent.TimeUnit;
 public class MapReduce {
     public static void main(String[] args) {
         List<Long> times = new ArrayList<Long>();
-        
-        for(int i = 0; i < 10; i++) {
+
+        for (int i = 0; i < 10; i++) {
             times.add(execute());
         }
 
@@ -35,7 +35,7 @@ public class MapReduce {
             }
         }), "master");
 
-        for(int i = 1; i < 1000; i++) {
+        for (int i = 1; i < 1000; i++) {
             master.tell(new Task(1000));
         }
 
@@ -43,7 +43,7 @@ public class MapReduce {
 
         stopWatch.stop();
         System.out.println(stopWatch.getTime());
-        
+
         return stopWatch.getTime();
     }
 
@@ -68,7 +68,7 @@ public class MapReduce {
             return n;
         }
     }
-    
+
     private static long currentCalculateId = 0;
 
     static class Work {
@@ -125,7 +125,7 @@ public class MapReduce {
 
     public static class Master extends UntypedActor {
         private final ActorRef workerRouter;
-        
+
         private Map<Long, Task> calculates = new HashMap<Long, Task>();
 
         public Master(final int nrOfWorkers) {
@@ -149,7 +149,7 @@ public class MapReduce {
                     Duration duration = Duration.create(System.currentTimeMillis() - task.start, TimeUnit.MILLISECONDS);
                     System.out.println(String.format("\n\tResult: \t\t%s\n\ttime used: \t%s", task.result, duration));
 
-                    if(this.calculates.isEmpty()) {
+                    if (this.calculates.isEmpty()) {
                         getContext().system().shutdown();
                     }
                 }

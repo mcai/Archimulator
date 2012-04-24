@@ -22,7 +22,6 @@ import archimulator.util.Pair;
 import archimulator.util.Reference;
 import archimulator.util.event.BlockingEventDispatcher;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -389,7 +388,7 @@ public abstract class SimpleCache<KeyT, ValueT, AccessTypeT extends SimpleCacheA
             throw new IllegalArgumentException();
         }
 
-        private class StackEntry implements Serializable {
+        private class StackEntry {
             private CacheLine line;
 
             private StackEntry(CacheLine line) {

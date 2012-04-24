@@ -1,21 +1,22 @@
 <?page title="Simulated Programs - Archimulator"?>
 <?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit"?>
 <zk>
-    <window id="win" title="Simulated Programs - Archimulator" border="normal" width="100%" visible="false" apply="archimulator.view.page.SimulatedProgramsPage">
+    <window id="win" title="Simulated Programs - Archimulator" border="normal" width="100%" visible="false"
+            apply="archimulator.view.page.SimulatedProgramsPage">
         <zscript>
-         import org.zkoss.zk.ui.*;
+            import org.zkoss.zk.ui.*;
 
-         Session s = Sessions.getCurrent();
-         if(s.getAttribute("userId") == null)
-           Executions.sendRedirect("login.zul");
-         else
+            Session s = Sessions.getCurrent();
+            if(s.getAttribute("userId") == null)
+            Executions.sendRedirect("login.zul");
+            else
             win.setVisible(true);
 
-         void logout() {
-           s.invalidate();
-           Executions.sendRedirect("login.zul");
-         }
-         </zscript>
+            void logout() {
+            s.invalidate();
+            Executions.sendRedirect("login.zul");
+            }
+        </zscript>
         <vbox>
             <hbox>
                 <button id="buttonGoToIndex" label="Home" href="index.zul"/>
@@ -42,7 +43,9 @@
 
         <separator/>
 
-        <listbox id="listboxSimulatedPrograms" model="@{archimulatorService.simulatedProgramsAsList}" itemRenderer="archimulator.view.renderer.SimulatedProgramListCellRenderer" emptyMessage="Simulated program list is empty" multiple="true" mold="paging"
+        <listbox id="listboxSimulatedPrograms" model="@{archimulatorService.simulatedProgramsAsList}"
+                 itemRenderer="archimulator.view.renderer.SimulatedProgramListCellRenderer"
+                 emptyMessage="Simulated program list is empty" multiple="true" mold="paging"
                  pageSize="10" pagingPosition="bottom">
             <listhead>
                 <listheader label="Id" width="50px"/>

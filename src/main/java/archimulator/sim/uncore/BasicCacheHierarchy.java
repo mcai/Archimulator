@@ -19,7 +19,6 @@
 package archimulator.sim.uncore;
 
 import archimulator.sim.base.simulation.BasicSimulationObject;
-import archimulator.sim.base.simulation.Logger;
 import archimulator.sim.core.ProcessorConfig;
 import archimulator.sim.uncore.coherence.FirstLevelCache;
 import archimulator.sim.uncore.coherence.LastLevelCache;

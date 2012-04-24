@@ -43,7 +43,7 @@ public class ServerPush {
 //        separator.setBar(true);
 //        info.appendChild(separator);
 //    }
-    
+
     private static class WorkingThread<ComponentT extends Component> extends Thread {
         private Desktop desktop;
         private ComponentT info;

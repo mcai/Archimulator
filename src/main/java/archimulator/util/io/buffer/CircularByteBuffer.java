@@ -18,34 +18,15 @@
  ******************************************************************************/
 package archimulator.util.io.buffer;
 
-import archimulator.util.io.serialization.StandardJavaSerializationHelper;
-
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.nio.ByteBuffer;
 
-public class CircularByteBuffer implements Serializable {
-    private transient ByteBuffer buffer;
+public class CircularByteBuffer {
+    private ByteBuffer buffer;
     private int readIndex = 0;
     private int writeIndex = 0;
 
     public CircularByteBuffer(int capacity) {
-//        buffer = ByteBuffer.allocateDirect(capacity);
         buffer = ByteBuffer.allocate(capacity);
-    }
-
-    private void writeObject(ObjectOutputStream oos) throws IOException {
-        oos.defaultWriteObject();
-
-        StandardJavaSerializationHelper.writeDirectByteBuffer(oos, this.buffer);
-    }
-
-    private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
-        ois.defaultReadObject();
-
-        this.buffer = StandardJavaSerializationHelper.readDirectByteBuffer(ois);
     }
 
     public void reset() {

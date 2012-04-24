@@ -61,7 +61,7 @@ public class BasicSyscallEmulation extends SyscallEmulation {
     protected void exit_group_impl(Context context) {
         context.finish();
     }
-    
+
     public static FileDescriptor getFD(int fd) {
         try {
             return new FileInputStream("/proc/self/fd/" + fd).getFD();

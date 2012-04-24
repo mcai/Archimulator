@@ -18,10 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.base.simulation;
 
-import java.io.File;
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.List;
 
 public class ContextConfig implements Serializable {
     private SimulatedProgram simulatedProgram;

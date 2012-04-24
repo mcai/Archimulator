@@ -20,14 +20,13 @@ package archimulator.sim.isa;
 
 import archimulator.sim.core.FunctionalUnitOperationType;
 
-import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-public enum Mnemonic implements Serializable {
+public enum Mnemonic {
     NOP,
     BREAK,
 

@@ -18,10 +18,10 @@
  ******************************************************************************/
 package archimulator.view.page;
 
-import archimulator.sim.base.experiment.profile.ExperimentProfile;
-import archimulator.sim.base.experiment.profile.ProcessorProfile;
 import archimulator.service.ArchimulatorService;
 import archimulator.service.ArchimulatorServletContextListener;
+import archimulator.sim.base.experiment.profile.ExperimentProfile;
+import archimulator.sim.base.experiment.profile.ProcessorProfile;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
@@ -42,7 +42,7 @@ public class ExperimentProfilesPage extends GenericForwardComposer<Window> {
         HttpSession httpSession = (HttpSession) session.getNativeSession();
         ArchimulatorService archimulatorService = ArchimulatorServletContextListener.getArchimulatorService(httpSession.getServletContext());
 
-        if(archimulatorService.getProcessorProfilesAsList().isEmpty()) {
+        if (archimulatorService.getProcessorProfilesAsList().isEmpty()) {
             Messagebox.show("Processor profile list is empty, please add one processor profile and try again!", "Add Experiment Profile", Messagebox.OK, Messagebox.EXCLAMATION, new EventListener<Event>() {
                 @Override
                 public void onEvent(Event event) throws Exception {
@@ -53,8 +53,7 @@ public class ExperimentProfilesPage extends GenericForwardComposer<Window> {
                     }
                 }
             });
-        }
-        else {
+        } else {
             ProcessorProfile processorProfile = archimulatorService.getProcessorProfilesAsList().get(0);
 
             Map<String, Object> arg = new HashMap<String, Object>();

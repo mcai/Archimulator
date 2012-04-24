@@ -18,17 +18,16 @@
  ******************************************************************************/
 package archimulator.sim.core;
 
-import archimulator.sim.base.experiment.capability.*;
+import archimulator.sim.base.experiment.capability.KernelCapability;
+import archimulator.sim.base.experiment.capability.ProcessorCapability;
 import archimulator.sim.core.bpred.BranchPredictorConfig;
 import archimulator.sim.core.bpred.PerfectBranchPredictorConfig;
-import archimulator.sim.base.experiment.capability.KernelCapability;
 import archimulator.sim.uncore.MemoryHierarchyConfig;
 import archimulator.sim.uncore.tlb.TranslationLookasideBufferConfig;
 
-import java.io.Serializable;
 import java.util.List;
 
-public class ProcessorConfig implements Serializable {
+public class ProcessorConfig {
     private int numCores;
     private int numThreadsPerCore;
 

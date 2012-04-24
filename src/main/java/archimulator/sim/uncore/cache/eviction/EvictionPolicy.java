@@ -22,7 +22,7 @@ import archimulator.sim.uncore.cache.*;
 
 import java.io.Serializable;
 
-public abstract class EvictionPolicy<StateT extends Serializable, LineT extends CacheLine<StateT>> implements Serializable {
+public abstract class EvictionPolicy<StateT extends Serializable, LineT extends CacheLine<StateT>> {
     private EvictableCache<StateT, LineT> cache;
 
     public EvictionPolicy(EvictableCache<StateT, LineT> cache) {

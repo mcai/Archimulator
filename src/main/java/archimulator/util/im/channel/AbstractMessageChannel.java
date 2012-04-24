@@ -82,7 +82,7 @@ public abstract class AbstractMessageChannel implements MessageChannel {
     }
 
     protected void receiveBatch(String userId) {
-        for(;receiveOne(userId););
+        for (; receiveOne(userId); ) ;
     }
 
     @Override

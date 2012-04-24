@@ -22,7 +22,6 @@ import archimulator.sim.uncore.cache.Cache;
 import archimulator.util.math.MathHelper;
 import archimulator.util.math.SaturatingCounter;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -168,13 +167,13 @@ public class DynamicInsertionPolicy {
         return this.random.nextInt(100) <= throttle;
     }
 
-    private enum SetDuelingMonitorType implements Serializable {
+    private enum SetDuelingMonitorType {
         FOLLOWERS,
         LRU,
         BIP
     }
 
-    private class SetDuelingMonitor implements Serializable {
+    private class SetDuelingMonitor {
         private SetDuelingMonitorType type;
         private int ownerThreadId;
 

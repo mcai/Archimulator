@@ -19,7 +19,6 @@
 package archimulator.sim.uncore.cache.eviction;
 
 import archimulator.sim.uncore.cache.*;
-import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
 
 import java.io.Serializable;
 

@@ -1,7 +1,8 @@
 <?page title="User Login - Archimulator"?>
 <?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit"?>
 <zk>
-    <window title="User Login - Archimulator" border="normal" width="300px" mode="modal" apply="archimulator.view.page.LoginPage">
+    <window title="User Login - Archimulator" border="normal" width="300px" mode="modal"
+            apply="archimulator.view.page.LoginPage">
         <grid>
             <columns>
                 <column width="80px"/>

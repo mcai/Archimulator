@@ -18,6 +18,9 @@
  ******************************************************************************/
 package archimulator.sim.ext.uncore.llc;
 
+import archimulator.sim.analysis.BasicBlock;
+import archimulator.sim.analysis.Function;
+import archimulator.sim.analysis.Instruction;
 import archimulator.sim.base.event.DumpStatEvent;
 import archimulator.sim.base.event.PollStatsEvent;
 import archimulator.sim.base.event.PseudocallEncounteredEvent;
@@ -27,10 +30,6 @@ import archimulator.sim.base.simulation.Simulation;
 import archimulator.sim.core.BasicThread;
 import archimulator.sim.core.DynamicInstruction;
 import archimulator.sim.core.Processor;
-import archimulator.sim.analysis.BasicBlock;
-import archimulator.sim.analysis.Function;
-import archimulator.sim.analysis.Instruction;
-import archimulator.sim.isa.ArchitecturalRegisterFile;
 import archimulator.sim.isa.StaticInstructionType;
 import archimulator.sim.os.BasicProcess;
 import archimulator.sim.uncore.CacheAccessType;
@@ -40,7 +39,6 @@ import archimulator.sim.uncore.coherence.event.CoherentCacheServiceNonblockingRe
 import archimulator.util.Reference;
 import archimulator.util.action.Action1;
 
-import java.io.Serializable;
 import java.util.*;
 
 public class LLCReuseDistanceProfilingCapability implements SimulationCapability {
@@ -89,22 +87,19 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
 
         llc.getBlockingEventDispatcher().addListener(PseudocallEncounteredEvent.class, new Action1<PseudocallEncounteredEvent>() {
             public void apply(PseudocallEncounteredEvent event) {
-                if(event.getImm() == 3820) {
+                if (event.getImm() == 3820) {
                     savedRegisterValue.set(event.getContext().getRegs().getGpr(event.getRs()));
 //                    event.getContext().getRegs().setGpr(event.getRs(), random.nextInt(100)); //TODO: incorporate lookahead and stride calculation algorithm
 //                    event.getContext().getRegs().setGpr(event.getRs(), 640); //TODO: incorporate lookahead and stride calculation algorithm
                     event.getContext().getRegs().setGpr(event.getRs(), 20); //TODO: incorporate lookahead and stride calculation algorithm
-                }
-                else if(event.getImm() == 3821) {
+                } else if (event.getImm() == 3821) {
                     event.getContext().getRegs().setGpr(event.getRs(), savedRegisterValue.get());
-                }
-                else if(event.getImm() == 3822) {
+                } else if (event.getImm() == 3822) {
                     savedRegisterValue.set(event.getContext().getRegs().getGpr(event.getRs()));
 //                    event.getContext().getRegs().setGpr(event.getRs(), random.nextInt(100)); //TODO: incorporate lookahead and stride calculation algorithm
 //                    event.getContext().getRegs().setGpr(event.getRs(), 320); //TODO: incorporate lookahead and stride calculation algorithm
                     event.getContext().getRegs().setGpr(event.getRs(), 10); //TODO: incorporate lookahead and stride calculation algorithm
-                }
-                else if(event.getImm() == 3823) {
+                } else if (event.getImm() == 3823) {
                     event.getContext().getRegs().setGpr(event.getRs(), savedRegisterValue.get());
                 }
 //                if (BasicThread.isHelperThread(event.getContext().getThread()))
@@ -164,10 +159,10 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
         stats.put("llcReuseDistanceProfilingCapability." + this.llc.getName() + ".numDownwardWrites", this.numDownwardWrites);
         stats.put("llcReuseDistanceProfilingCapability." + this.llc.getName() + ".numEvicts", this.numEvicts);
 
-        if(this.loadsInHotspotFunction != null) {
-            for(int pc : this.loadsInHotspotFunction.keySet()) {
+        if (this.loadsInHotspotFunction != null) {
+            for (int pc : this.loadsInHotspotFunction.keySet()) {
                 LoadEntry loadEntry = this.loadsInHotspotFunction.get(pc);
-                if(loadEntry.accesses > 0) {
+                if (loadEntry.accesses > 0) {
                     stats.put(String.format("llcReuseDistanceProfilingCapability.%s.loadsInHotspotFunction@[0x%08x]", this.llc.getName(), pc), loadEntry);
                 }
             }
@@ -181,7 +176,7 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
     }
 
     private void handleServicingRequest(CoherentCacheServiceNonblockingRequestEvent event) {
-        if(event.getRequesterAccess().getType() == MemoryHierarchyAccessType.LOAD) {
+        if (event.getRequesterAccess().getType() == MemoryHierarchyAccessType.LOAD) {
             if (loadsInHotspotFunction == null) {
                 loadsInHotspotFunction = new TreeMap<Integer, LoadEntry>();
                 Processor processor = event.getRequesterAccess().getDynamicInst().getThread().getCore().getProcessor();
@@ -206,7 +201,7 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
 
             if (loadsInHotspotFunction.containsKey(dynamicInst.getPc()) && dynamicInst.getThread().getContext().getThreadId() == hotspotThreadId) {
                 loadsInHotspotFunction.get(dynamicInst.getPc()).accesses++;
-                if(event.isHitInCache()) {
+                if (event.isHitInCache()) {
                     loadsInHotspotFunction.get(dynamicInst.getPc()).hits++;
                 }
             }
@@ -285,7 +280,7 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
         return null;
     }
 
-    private static class LoadEntry implements Serializable {
+    private static class LoadEntry {
         private Instruction instruction;
         private int accesses;
         private int hits;
@@ -304,7 +299,7 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
         }
     }
 
-    private static class StackEntry implements Serializable {
+    private static class StackEntry {
         private int broughterThreadId;
         private int tag;
         private CacheAccessType accessType;

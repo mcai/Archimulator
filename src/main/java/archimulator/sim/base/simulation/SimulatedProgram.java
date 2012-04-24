@@ -60,7 +60,7 @@ public class SimulatedProgram implements Serializable {
 
     @DatabaseField
     private int htStride;
-    
+
     public SimulatedProgram() {
     }
 
@@ -76,9 +76,9 @@ public class SimulatedProgram implements Serializable {
         this.stdin = stdin;
         this.createdTime = DateHelper.toTick(new Date());
     }
-    
+
     public void build() {
-        if(this.helperThreadedProgram) {
+        if (this.helperThreadedProgram) {
             this.pushMacroDefineArg("push_params.h", "LOOKAHEAD", this.htLookahead + "");
             this.pushMacroDefineArg("push_params.h", "STRIDE", this.htStride + "");
         }
@@ -89,7 +89,7 @@ public class SimulatedProgram implements Serializable {
         fileName = this.cwd.replaceAll(ExperimentProfile.USER_HOME_TEMPLATE_ARG, System.getProperty("user.home")) + "/" + fileName;
         System.out.printf("[%s] Pushing Macro Define Arg in %s: %s, %s\n", DateHelper.toString(new Date()), fileName, key, value);
         List<String> result = SedHelper.sedInPlace(fileName, "#define " + key, "#define " + key + " " + value);
-        for(String line : result) {
+        for (String line : result) {
             System.out.println(line);
         }
     }
@@ -97,7 +97,7 @@ public class SimulatedProgram implements Serializable {
     private void buildWithMakefile() {
         System.out.printf("[%s] Building with Makefile\n", DateHelper.toString(new Date()));
         List<String> result = CommandLineHelper.invokeShellCommandAndGetResult("sh -c 'cd " + this.cwd.replaceAll(ExperimentProfile.USER_HOME_TEMPLATE_ARG, System.getProperty("user.home")) + ";make -f Makefile.mips -B'");
-        for(String line : result) {
+        for (String line : result) {
             System.out.println(line);
         }
     }

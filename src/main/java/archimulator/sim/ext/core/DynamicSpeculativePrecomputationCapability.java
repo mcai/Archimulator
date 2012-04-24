@@ -18,9 +18,9 @@
  ******************************************************************************/
 package archimulator.sim.ext.core;
 
+import archimulator.sim.base.experiment.capability.ProcessorCapability;
 import archimulator.sim.base.simulation.Logger;
 import archimulator.sim.base.simulation.SimulationObject;
-import archimulator.sim.base.experiment.capability.ProcessorCapability;
 import archimulator.sim.core.Core;
 import archimulator.sim.core.Processor;
 import archimulator.sim.core.Thread;
@@ -73,7 +73,7 @@ public class DynamicSpeculativePrecomputationCapability implements ProcessorCapa
     }
 
     private class SliceCacheLine extends CacheLine<Boolean> {
-        private transient Map<Integer, Integer> machInsts;
+        private Map<Integer, Integer> machInsts;
 
         private SliceCacheLine(Cache<?, ?> cache, int set, int way) {
             super(cache, set, way, false);

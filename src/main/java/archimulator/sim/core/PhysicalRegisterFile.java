@@ -18,7 +18,6 @@
  ******************************************************************************/
 package archimulator.sim.core;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,7 +65,7 @@ public class PhysicalRegisterFile {
         return numFreePhysicalRegs;
     }
 
-    public class PhysicalRegister implements Serializable {
+    public class PhysicalRegister {
         private PhysicalRegisterState state;
 
         private int dep;

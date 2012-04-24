@@ -1,21 +1,22 @@
 <?page title="Home - Archimulator"?>
 <?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit"?>
 <zk>
-    <window id="win" title="Home - Archimulator" border="normal" width="100%" visible="false" apply="archimulator.view.page.IndexPage">
+    <window id="win" title="Home - Archimulator" border="normal" width="100%" visible="false"
+            apply="archimulator.view.page.IndexPage">
         <zscript>
-         import org.zkoss.zk.ui.*;
+            import org.zkoss.zk.ui.*;
 
-         Session s = Sessions.getCurrent();
-         if(s.getAttribute("userId") == null)
-           Executions.sendRedirect("login.zul");
-         else
+            Session s = Sessions.getCurrent();
+            if(s.getAttribute("userId") == null)
+            Executions.sendRedirect("login.zul");
+            else
             win.setVisible(true);
 
-         void logout() {
-           s.invalidate();
-           Executions.sendRedirect("login.zul");
-         }
-         </zscript>
+            void logout() {
+            s.invalidate();
+            Executions.sendRedirect("login.zul");
+            }
+        </zscript>
         <vbox>
             <hbox>
                 <label style="color:red">Run Experiment:</label>

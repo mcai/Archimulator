@@ -32,8 +32,6 @@ import archimulator.util.action.Action;
 import archimulator.util.action.Action1;
 import archimulator.util.action.NamedAction;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -41,20 +39,14 @@ import java.util.List;
 public class FirstLevelCache extends CoherentCache<MESIState> {
     private LastLevelCache next;
 
-    private transient List<MemoryHierarchyAccess> pendingAccesses;
-    private transient EnumMap<MemoryHierarchyAccessType, Integer> pendingAccessesPerType;
+    private List<MemoryHierarchyAccess> pendingAccesses;
+    private EnumMap<MemoryHierarchyAccessType, Integer> pendingAccessesPerType;
 
     private long upwardReads;
     private long upwardWrites;
 
     public FirstLevelCache(CacheHierarchy cacheHierarchy, String name, CoherentCacheConfig config) {
         super(cacheHierarchy, name, config, MESIState.INVALID);
-
-        this.init();
-    }
-
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
 
         this.init();
     }
@@ -170,7 +162,7 @@ public class FirstLevelCache extends CoherentCache<MESIState> {
     public void receiveIfetch(final MemoryHierarchyAccess access, final Action onCompletedCallback) {
         this.scheduleProcess(new LoadProcess(access).addOnCompletedCallback(new Action1<LoadProcess>() {
             public void apply(LoadProcess loadProcess) {
-                if (!loadProcess.isHasError()) {
+                if (!loadProcess.isError()) {
                     onCompletedCallback.apply();
                 } else {
                     getCycleAccurateEventQueue().schedule(new NamedAction("FirstLevelCache.retry(receiveIfetch)") {
@@ -186,7 +178,7 @@ public class FirstLevelCache extends CoherentCache<MESIState> {
     public void receiveLoad(final MemoryHierarchyAccess access, final Action onCompletedCallback) {
         this.scheduleProcess(new LoadProcess(access).addOnCompletedCallback(new Action1<LoadProcess>() {
             public void apply(LoadProcess loadProcess) {
-                if (!loadProcess.isHasError()) {
+                if (!loadProcess.isError()) {
                     onCompletedCallback.apply();
                 } else {
                     getCycleAccurateEventQueue().schedule(new NamedAction("FirstLevelCache.retry(receiveLoad)") {
@@ -202,7 +194,7 @@ public class FirstLevelCache extends CoherentCache<MESIState> {
     public void receiveStore(final MemoryHierarchyAccess access, final Action onCompletedCallback) {
         this.scheduleProcess(new StoreProcess(access).addOnCompletedCallback(new Action1<StoreProcess>() {
             public void apply(StoreProcess storeProcess) {
-                if (!storeProcess.isHasError()) {
+                if (!storeProcess.isError()) {
                     onCompletedCallback.apply();
                 } else {
                     getCycleAccurateEventQueue().schedule(new NamedAction("FirstLevelCache.retry(receiveStore)") {
@@ -254,22 +246,22 @@ public class FirstLevelCache extends CoherentCache<MESIState> {
     }
 
     private abstract class CpuSideProcess extends LockingProcess {
-        protected boolean hasError;
+        protected boolean error;
 
         protected CpuSideProcess(MemoryHierarchyAccess access, int tag, CacheAccessType cacheAccessType) {
             super(access, tag, cacheAccessType);
         }
 
-        public boolean isHasError() {
-            return hasError;
+        public boolean isError() {
+            return error;
         }
 
         @Override
         public boolean processPendingActions() throws CoherentCacheException {
             try {
-                return hasError || super.processPendingActions();
+                return error || super.processPendingActions();
             } catch (CoherentCacheException e) {
-                this.hasError = true;
+                this.error = true;
                 this.complete();
                 return true;
             }
@@ -337,7 +329,7 @@ public class FirstLevelCache extends CoherentCache<MESIState> {
     private class DownwardReadProcess extends CoherentCacheProcess {
         private boolean shared;
         private boolean completed;
-        private boolean hasError;
+        private boolean error;
 
         private DownwardReadProcess(final MemoryHierarchyAccess access, final int tag) {
             this.getPendingActions().push(new ActionBasedPendingActionOwner() {
@@ -345,8 +337,8 @@ public class FirstLevelCache extends CoherentCache<MESIState> {
                 public boolean apply() {
                     sendRequest(next, new DownwardReadMessage(access, tag, new Action1<DownwardReadMessage>() {
                         public void apply(DownwardReadMessage downwardReadMessage) {
-                            if (downwardReadMessage.isHasError()) {
-                                hasError = true;
+                            if (downwardReadMessage.isError()) {
+                                error = true;
                             } else {
                                 completed = true;
                                 shared = downwardReadMessage.isShared();
@@ -365,7 +357,7 @@ public class FirstLevelCache extends CoherentCache<MESIState> {
 
         @Override
         public boolean processPendingActions() throws CoherentCacheException {
-            if (this.hasError) {
+            if (this.error) {
                 throw new CoherentCacheMessageProcessException();
             }
 
@@ -375,7 +367,7 @@ public class FirstLevelCache extends CoherentCache<MESIState> {
 
     private class DownwardWriteProcess extends CoherentCacheProcess {
         private boolean completed;
-        private boolean hasError;
+        private boolean error;
 
         private DownwardWriteProcess(final MemoryHierarchyAccess access, final int tag) {
             this.getPendingActions().push(new ActionBasedPendingActionOwner() {
@@ -383,8 +375,8 @@ public class FirstLevelCache extends CoherentCache<MESIState> {
                 public boolean apply() {
                     sendRequest(next, new DownwardWriteMessage(access, tag, new Action1<DownwardWriteMessage>() {
                         public void apply(DownwardWriteMessage writeMessage) {
-                            if (writeMessage.isHasError()) {
-                                hasError = true;
+                            if (writeMessage.isError()) {
+                                error = true;
                             } else {
                                 completed = true;
                             }
@@ -398,7 +390,7 @@ public class FirstLevelCache extends CoherentCache<MESIState> {
 
         @Override
         public boolean processPendingActions() throws CoherentCacheException {
-            if (this.hasError) {
+            if (this.error) {
                 throw new CoherentCacheMessageProcessException();
             }
 
@@ -408,7 +400,7 @@ public class FirstLevelCache extends CoherentCache<MESIState> {
 
     private class EvictProcess extends CoherentCacheProcess {
         private boolean completed;
-        private boolean hasError;
+        private boolean error;
 
         private EvictProcess(final MemoryHierarchyAccess access, final CacheAccess<MESIState, LockableCacheLine> cacheAccess) {
             this.getPendingActions().push(new ActionBasedPendingActionOwner() {
@@ -431,8 +423,8 @@ public class FirstLevelCache extends CoherentCache<MESIState> {
                         final int size = hasData ? getCache().getLineSize() + 8 : 8;
                         sendRequest(next, new EvictMessage(access, cacheAccess.getLine().getTag(), hasData, new Action1<EvictMessage>() {
                             public void apply(EvictMessage evictMessage) {
-                                if (evictMessage.isHasError()) {
-                                    hasError = true;
+                                if (evictMessage.isError()) {
+                                    error = true;
                                 } else {
                                     completed = true;
                                 }
@@ -447,7 +439,7 @@ public class FirstLevelCache extends CoherentCache<MESIState> {
 
         @Override
         public boolean processPendingActions() throws CoherentCacheException {
-            if (this.hasError) {
+            if (this.error) {
                 throw new CoherentCacheMessageProcessException();
             }
 

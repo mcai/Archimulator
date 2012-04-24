@@ -18,9 +18,9 @@
  ******************************************************************************/
 package archimulator.sim.uncore.coherence;
 
-import archimulator.sim.base.simulation.Logger;
 import archimulator.sim.base.event.DumpStatEvent;
 import archimulator.sim.base.event.ResetStatEvent;
+import archimulator.sim.base.simulation.Logger;
 import archimulator.sim.base.simulation.Simulation;
 import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.CacheHierarchy;
@@ -38,13 +38,11 @@ import archimulator.util.action.Action1;
 import archimulator.util.action.Function3;
 import archimulator.util.action.NamedAction;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.*;
 
 public abstract class CoherentCache<StateT extends Serializable> extends MemoryDevice {
-    private transient List<PendingActionOwner> pendingProcesses;
+    private List<PendingActionOwner> pendingProcesses;
 
     protected CoherentCacheConfig config;
     protected LockableCache cache;
@@ -68,12 +66,6 @@ public abstract class CoherentCache<StateT extends Serializable> extends MemoryD
         this.config = config;
 
         this.random = new Random(13);
-
-        this.init();
-    }
-
-    private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
-        ois.defaultReadObject();
 
         this.init();
     }
@@ -221,7 +213,7 @@ public abstract class CoherentCache<StateT extends Serializable> extends MemoryD
     }
 
     public class LockableCacheLine extends CacheLine<StateT> {
-        private transient int transientTag = -1;
+        private int transientTag = -1;
         private List<Action> suspendedActions;
 
         public LockableCacheLine(Cache<?, ?> cache, int set, int way, StateT initialState) {

@@ -18,9 +18,11 @@
  ******************************************************************************/
 package archimulator.sim.base.simulation;
 
+import archimulator.sim.base.event.DumpStatEvent;
+import archimulator.sim.base.event.PollStatsEvent;
+import archimulator.sim.base.event.ProcessorInitializedEvent;
 import archimulator.sim.base.experiment.capability.ExperimentCapabilityFactory;
 import archimulator.sim.base.experiment.capability.SimulationCapability;
-import archimulator.sim.base.event.*;
 import archimulator.sim.base.simulation.strategy.SimulationStrategy;
 import archimulator.sim.core.BasicProcessor;
 import archimulator.sim.core.Core;
@@ -31,7 +33,6 @@ import archimulator.sim.os.Kernel;
 import archimulator.util.StorageUnit;
 import archimulator.util.StringHelper;
 import archimulator.util.action.Action1;
-import archimulator.util.action.NamedAction;
 import archimulator.util.action.Predicate;
 import archimulator.util.event.BlockingEvent;
 import archimulator.util.event.BlockingEventDispatcher;
@@ -43,7 +44,6 @@ import org.apache.commons.lang.time.StopWatch;
 
 import java.io.File;
 import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class Simulation implements SimulationObject {
@@ -133,7 +133,7 @@ public class Simulation implements SimulationObject {
         this.statsInWarmup = new LinkedHashMap<String, Object>();
         this.statsInMeasurement = new LinkedHashMap<String, Object>();
 
-        for(Class<? extends SimulationCapability> capabilityClz : capabilityClasses) {
+        for (Class<? extends SimulationCapability> capabilityClz : capabilityClasses) {
             this.capabilities.put(capabilityClz, ExperimentCapabilityFactory.createSimulationCapability(capabilityClz, this));
         }
     }
@@ -165,7 +165,7 @@ public class Simulation implements SimulationObject {
 
             this.getStrategy().execute();
 
-            if(!this.getStatsInFastForward().isEmpty()) {
+            if (!this.getStatsInFastForward().isEmpty()) {
                 MapHelper.save(this.getStatsInFastForward(), this.getConfig().getCwd() + "/stat_fastForward.txt");
 
                 this.statsInFastForward = getStatsWithSimulationPrefix(this.getStatsInFastForward());
@@ -173,7 +173,7 @@ public class Simulation implements SimulationObject {
                 this.blockingEventDispatcher.dispatch(new DumpStatsCompletedEvent(this.getStatsInFastForward()));
             }
 
-            if(!this.getStatsInWarmup().isEmpty()) {
+            if (!this.getStatsInWarmup().isEmpty()) {
                 MapHelper.save(this.getStatsInWarmup(), this.getConfig().getCwd() + "/stat_cacheWarmup.txt");
 
                 this.statsInWarmup = getStatsWithSimulationPrefix(this.getStatsInWarmup());
@@ -181,7 +181,7 @@ public class Simulation implements SimulationObject {
                 this.blockingEventDispatcher.dispatch(new DumpStatsCompletedEvent(this.getStatsInWarmup()));
             }
 
-            if(!this.getStatsInMeasurement().isEmpty()) {
+            if (!this.getStatsInMeasurement().isEmpty()) {
                 MapHelper.save(this.getStatsInMeasurement(), this.getConfig().getCwd() + "/stat_measurement.txt");
 
                 this.statsInMeasurement = getStatsWithSimulationPrefix(this.getStatsInMeasurement());
@@ -207,7 +207,7 @@ public class Simulation implements SimulationObject {
             return stats;
         }
     }
-    
+
     public static class DumpStatsCompletedEvent implements BlockingEvent {
         private Map<String, Object> stats;
 
@@ -225,7 +225,7 @@ public class Simulation implements SimulationObject {
         String simulationPrefix = title.substring(title.indexOf("/") + 1);
 
         Map<String, Object> result = new LinkedHashMap<String, Object>();
-        for(String key : stats.keySet()) {
+        for (String key : stats.keySet()) {
             result.put(simulationPrefix + "." + key, stats.get(key));
         }
 

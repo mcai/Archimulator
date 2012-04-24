@@ -24,7 +24,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CacheSet<StateT extends Serializable, LineT extends CacheLine<StateT>> implements Serializable {
+public class CacheSet<StateT extends Serializable, LineT extends CacheLine<StateT>> {
     private Cache<StateT, LineT> cache;
     private List<LineT> lines;
     private int num;

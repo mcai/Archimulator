@@ -19,23 +19,11 @@
 package archimulator.sim.base.simulation;
 
 import archimulator.sim.os.Kernel;
-import archimulator.sim.uncore.BasicCacheHierarchy;
 import archimulator.sim.uncore.CacheHierarchy;
-import archimulator.util.io.serialization.StandardJavaSerializationHelper;
 
 public class SimulationStartingImage {
     private Kernel kernel;
     private CacheHierarchy cacheHierarchy;
-
-    public void saveTo(String checkpointFilePrefix) {
-        StandardJavaSerializationHelper.serialize(this.kernel, checkpointFilePrefix + ".architecture");
-        StandardJavaSerializationHelper.serialize(this.cacheHierarchy, checkpointFilePrefix + ".cacheHierarchy");
-    }
-
-    public void loadFrom(String checkpointFilePrefix) {
-        this.kernel = StandardJavaSerializationHelper.deserialize(Kernel.class, checkpointFilePrefix + ".architecture");
-        this.cacheHierarchy = StandardJavaSerializationHelper.deserialize(BasicCacheHierarchy.class, checkpointFilePrefix + ".cacheHierarchy");
-    }
 
     public Kernel getKernel() {
         return kernel;

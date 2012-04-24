@@ -18,11 +18,11 @@
  ******************************************************************************/
 package archimulator.client;
 
+import archimulator.service.ArchimulatorService;
 import archimulator.service.ArchimulatorServiceImpl;
 import archimulator.sim.base.experiment.profile.ExperimentProfile;
 import archimulator.sim.base.experiment.profile.ProcessorProfile;
 import archimulator.sim.base.simulation.SimulatedProgram;
-import archimulator.service.ArchimulatorService;
 import archimulator.sim.ext.uncore.cache.eviction.LLCHTAwareLRUPolicy;
 import archimulator.sim.uncore.cache.eviction.LRUPolicy;
 import archimulator.util.DateHelper;
@@ -53,7 +53,7 @@ public class ManagementStartup {
 
     private void submitSimulatedProgramsAndProcessorProfiles() throws SQLException {
         this.archimulatorService.setRunningExperimentEnabled(false);
-        
+
         this.archimulatorService.clearData();
 
         List<SimulatedProgram> simulatedPrograms = new ArrayList<SimulatedProgram>();
@@ -106,20 +106,18 @@ public class ManagementStartup {
 
         List<ProcessorProfile> processorProfiles = this.archimulatorService.getProcessorProfilesAsList();
 
-        for(ProcessorProfile processorProfile : processorProfiles) {
-            if(processorProfile.getL2EvictionPolicyClz().equals(LRUPolicy.class)) {
-                for(SimulatedProgram simulatedProgram : simulatedPrograms) {
-                    if(simulatedProgram.getTitle().startsWith("mst_baseline")) {
+        for (ProcessorProfile processorProfile : processorProfiles) {
+            if (processorProfile.getL2EvictionPolicyClz().equals(LRUPolicy.class)) {
+                for (SimulatedProgram simulatedProgram : simulatedPrograms) {
+                    if (simulatedProgram.getTitle().startsWith("mst_baseline")) {
                         experimentProfiles.add(Presets.baseline_lru(pthreadSpawnedIndex, maxInsts, processorProfile, simulatedProgram));
-                    }
-                    else if(simulatedProgram.getTitle().startsWith("mst_ht")) {
+                    } else if (simulatedProgram.getTitle().startsWith("mst_ht")) {
                         experimentProfiles.add(Presets.ht_lru(pthreadSpawnedIndex, maxInsts, processorProfile, simulatedProgram));
                     }
                 }
-            }
-            else if(processorProfile.getL2EvictionPolicyClz().equals(LLCHTAwareLRUPolicy.class)) {
-                for(SimulatedProgram simulatedProgram : simulatedPrograms) {
-                    if(simulatedProgram.getTitle().startsWith("mst_ht")) {
+            } else if (processorProfile.getL2EvictionPolicyClz().equals(LLCHTAwareLRUPolicy.class)) {
+                for (SimulatedProgram simulatedProgram : simulatedPrograms) {
+                    if (simulatedProgram.getTitle().startsWith("mst_ht")) {
                         experimentProfiles.add(Presets.ht_ht_aware_lru(pthreadSpawnedIndex, maxInsts, processorProfile, simulatedProgram));
                     }
                 }
@@ -165,7 +163,7 @@ public class ManagementStartup {
 //            }
 //        }
 
-        for(ExperimentProfile experimentProfile : experimentProfiles) {
+        for (ExperimentProfile experimentProfile : experimentProfiles) {
             System.out.println("Submitting experiment profile: " + experimentProfile);
             this.archimulatorService.addExperimentProfile(experimentProfile);
         }
@@ -180,7 +178,7 @@ public class ManagementStartup {
     //    public static final String SERVICE_URL = "http://204.152.205.131:8080/archimulator/archimulator";
     //    public static final String SERVICE_URL = "http://50.117.112.114:8080/archimulator/archimulator";
     //    public static final String SERVICE_URL = "http://[2607:f358:10:13::2]:8080/archimulator/archimulator";
-        public static final String SERVICE_URL = "http://localhost:8080/api";
+    public static final String SERVICE_URL = "http://localhost:8080/api";
 //    public static final String SERVICE_URL = "http://[2607:f358:10:13::2]/api";
 //        public static final String SERVICE_URL = "http://www.archimulator.com/api";
 

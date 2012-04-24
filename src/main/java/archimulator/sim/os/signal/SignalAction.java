@@ -20,9 +20,7 @@ package archimulator.sim.os.signal;
 
 import archimulator.sim.isa.memory.Memory;
 
-import java.io.Serializable;
-
-public class SignalAction implements Serializable {
+public class SignalAction {
     private int flags;
     private int handler;
     private int restorer;

@@ -37,7 +37,7 @@ public class ExperimentStatsCollectorStartup {
     }
 
     public static void main(String[] args) throws SQLException {
-        collectExperimentStats(new Predicate<ExperimentProfile>(){
+        collectExperimentStats(new Predicate<ExperimentProfile>() {
             @Override
             public boolean apply(ExperimentProfile experimentProfile) {
                 return experimentProfile.getState() == ExperimentProfileState.STOPPED && experimentProfile.getTitle().contains("-L2_1024KB_Assoc4");
@@ -115,13 +115,13 @@ public class ExperimentStatsCollectorStartup {
 
         List<ExperimentProfile> experimentProfiles = archimulatorService.getExperimentProfilesAsList();
 
-        for(ExperimentProfile experimentProfile : experimentProfiles) {
-            if(experimentProfilePred.apply(experimentProfile)) {
+        for (ExperimentProfile experimentProfile : experimentProfiles) {
+            if (experimentProfilePred.apply(experimentProfile)) {
                 System.out.printf("%s:\n", experimentProfile.getTitle());
-                for(String key : keys) {
+                for (String key : keys) {
                     String value = archimulatorService.getExperimentStatById(experimentProfile.getId(), key);
 
-                    if(value != null) {
+                    if (value != null) {
                         System.out.printf("  %s: %s\n", key, value);
                     }
                 }

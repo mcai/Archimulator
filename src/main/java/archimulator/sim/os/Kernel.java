@@ -71,7 +71,7 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
 
         this.capabilities = new HashMap<Class<? extends KernelCapability>, KernelCapability>();
 
-        for(Class<? extends KernelCapability> capabilityClz : capabilityClasses) {
+        for (Class<? extends KernelCapability> capabilityClz : capabilityClasses) {
             this.capabilities.put(capabilityClz, ExperimentCapabilityFactory.createKernelCapability(capabilityClz, this));
         }
 

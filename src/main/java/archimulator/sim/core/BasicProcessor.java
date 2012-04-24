@@ -18,11 +18,10 @@
  ******************************************************************************/
 package archimulator.sim.core;
 
-import archimulator.sim.base.experiment.capability.ExperimentCapabilityFactory;
-import archimulator.sim.base.simulation.BasicSimulationObject;
-import archimulator.sim.base.simulation.Logger;
-import archimulator.sim.base.experiment.capability.ProcessorCapability;
 import archimulator.sim.base.event.ResetStatEvent;
+import archimulator.sim.base.experiment.capability.ExperimentCapabilityFactory;
+import archimulator.sim.base.experiment.capability.ProcessorCapability;
+import archimulator.sim.base.simulation.BasicSimulationObject;
 import archimulator.sim.os.Context;
 import archimulator.sim.os.ContextKilledEvent;
 import archimulator.sim.os.ContextState;
@@ -89,7 +88,7 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
 
         this.capabilities = new HashMap<Class<? extends ProcessorCapability>, ProcessorCapability>();
 
-        for(Class<? extends ProcessorCapability> capabilityClz : capabilityClasses) {
+        for (Class<? extends ProcessorCapability> capabilityClz : capabilityClasses) {
             this.capabilities.put(capabilityClz, ExperimentCapabilityFactory.createProcessorCapability(capabilityClz, this));
         }
     }

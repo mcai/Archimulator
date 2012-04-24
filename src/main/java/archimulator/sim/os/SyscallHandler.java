@@ -18,9 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.os;
 
-import java.io.Serializable;
-
-public abstract class SyscallHandler implements Serializable {
+public abstract class SyscallHandler {
     private final int index;
     private final String name;
 

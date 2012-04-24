@@ -89,9 +89,9 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
 
     public void doMeasurementOneCycle() {
         this.commit();
-        this.writeback();
+        this.writeBack();
         this.refreshLoadStoreQueue();
-        this.wakeup();
+        this.wakeUp();
         this.issue();
         this.dispatch();
         this.registerRename();
@@ -106,11 +106,11 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
 
     protected abstract void dispatch();
 
-    protected abstract void wakeup(); //TODO: to be removed
+    protected abstract void wakeUp(); //TODO: to be removed
 
     protected abstract void issue();
 
-    protected abstract void writeback();
+    protected abstract void writeBack();
 
     protected abstract void refreshLoadStoreQueue();
 

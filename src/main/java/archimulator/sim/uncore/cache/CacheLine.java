@@ -25,7 +25,7 @@ import archimulator.sim.uncore.cache.event.CacheLineValidatedEvent;
 
 import java.io.Serializable;
 
-public class CacheLine<StateT extends Serializable> implements Serializable {
+public class CacheLine<StateT extends Serializable> {
     private Cache<?, ?> cache;
     private int set;
     private int way;

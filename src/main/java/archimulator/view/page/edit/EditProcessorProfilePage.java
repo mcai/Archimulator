@@ -18,9 +18,9 @@
  ******************************************************************************/
 package archimulator.view.page.edit;
 
-import archimulator.sim.base.experiment.profile.ProcessorProfile;
 import archimulator.service.ArchimulatorService;
 import archimulator.service.ArchimulatorServletContextListener;
+import archimulator.sim.base.experiment.profile.ProcessorProfile;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicyFactory;
 import org.zkoss.zk.ui.Executions;
@@ -69,9 +69,9 @@ public class EditProcessorProfilePage extends GenericForwardComposer<Window> {
         this.textboxNumThreadsPerCore.setValue(this.processorProfile.getNumThreadsPerCore() + "");
         this.textboxL2Size.setValue(this.processorProfile.getL2Size() + "");
         this.textboxL2Associativity.setValue(this.processorProfile.getL2Associativity() + "");
-        
+
         List<String> evictionPolicyClassNames = new ArrayList<String>();
-        for(Class<? extends EvictionPolicy> clz : EvictionPolicyFactory.getEvictionPolicyClasses()) {
+        for (Class<? extends EvictionPolicy> clz : EvictionPolicyFactory.getEvictionPolicyClasses()) {
             evictionPolicyClassNames.add(clz.getName());
         }
 
@@ -93,11 +93,10 @@ public class EditProcessorProfilePage extends GenericForwardComposer<Window> {
         this.processorProfile.setL2Size(Integer.parseInt(this.textboxL2Size.getValue()));
         this.processorProfile.setL2Associativity(Integer.parseInt(this.textboxL2Associativity.getValue()));
 
-        if(this.comboboxL2ReplacementPolicies.getSelectedIndex() != -1) {
+        if (this.comboboxL2ReplacementPolicies.getSelectedIndex() != -1) {
             this.processorProfile.setL2EvictionPolicyClz((Class<? extends EvictionPolicy>) Class.forName(this.comboboxL2ReplacementPolicies.getText()));
 
-        }
-        else {
+        } else {
             Messagebox.show("Selected L2 replacement policy class is empty, please select one and try again!", "Edit Processor Profile", Messagebox.OK, Messagebox.EXCLAMATION, new EventListener<Event>() {
                 @Override
                 public void onEvent(Event event) throws Exception {
@@ -108,7 +107,7 @@ public class EditProcessorProfilePage extends GenericForwardComposer<Window> {
                     }
                 }
             });
-            
+
             return;
         }
 

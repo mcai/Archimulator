@@ -18,9 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.os.signal;
 
-import java.io.Serializable;
-
-public class SignalMasks implements Serializable {
+public class SignalMasks {
     private SignalMask pending;
     private SignalMask blocked;
     private SignalMask backup;

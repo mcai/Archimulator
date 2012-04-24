@@ -32,7 +32,8 @@
         <separator bar="true"/>
         <separator/>
 
-        <listbox id="listboxStats"  itemRenderer="archimulator.view.renderer.ExperimentStatListCellRenderer" emptyMessage="Experiment stats list is empty" multiple="true" mold="paging"
+        <listbox id="listboxStats" itemRenderer="archimulator.view.renderer.ExperimentStatListCellRenderer"
+                 emptyMessage="Experiment stats list is empty" multiple="true" mold="paging"
                  pageSize="13" pagingPosition="bottom" height="438px">
             <listhead>
                 <listheader label="Key" width="380px"/>
@@ -44,10 +45,10 @@
         <separator/>
 
         <!--<div align="center">-->
-            <!--<hbox>-->
-                <!--<image id="imageStats"/>-->
-                <!--<image id="imageStats2"/>-->
-            <!--</hbox>-->
+        <!--<hbox>-->
+        <!--<image id="imageStats"/>-->
+        <!--<image id="imageStats2"/>-->
+        <!--</hbox>-->
         <!--</div>-->
 
         <!--<separator bar="true"/>-->

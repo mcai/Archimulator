@@ -73,6 +73,6 @@ public class SetValueEvent<KeyT, ValueT, AccessTypeT extends SimpleCacheAccessTy
 
     @Override
     public String toString() {
-        return String.format("SetValueEvent{key=%s, oldValue=%s, newValue=%s, oldAccessType=%s, newAccessType=%s, hitInCache=%s, eviction=%s, writeback=%s}", key, oldValue, newValue, oldAccessType, newAccessType, hitInCache, eviction, writeback);
+        return String.format("SetValueEvent{key=%s, oldValue=%s, newValue=%s, oldAccessType=%s, newAccessType=%s, hitInCache=%s, eviction=%s, writeBack=%s}", key, oldValue, newValue, oldAccessType, newAccessType, hitInCache, eviction, writeback);
     }
 }

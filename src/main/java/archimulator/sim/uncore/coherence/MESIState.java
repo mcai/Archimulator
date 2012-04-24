@@ -18,9 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore.coherence;
 
-import java.io.Serializable;
-
-public enum MESIState implements Serializable {
+public enum MESIState {
     MODIFIED,
     EXCLUSIVE,
     SHARED,

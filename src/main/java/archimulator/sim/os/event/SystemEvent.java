@@ -20,9 +20,7 @@ package archimulator.sim.os.event;
 
 import archimulator.sim.os.Context;
 
-import java.io.Serializable;
-
-public abstract class SystemEvent implements Serializable {
+public abstract class SystemEvent {
     private Context context;
     private SystemEventType type;
 

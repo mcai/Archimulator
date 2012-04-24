@@ -18,9 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.os;
 
-import java.io.Serializable;
-
-public enum ContextState implements Serializable {
+public enum ContextState {
     IDLE,
     BLOCKED,
     RUNNING,

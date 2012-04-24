@@ -54,7 +54,7 @@ public class ExperimentLinePlot {
     public static class ExperimentSubLinePlot {
         private String titleY;
         private List<ExperimentSubLinePlotLine> lines;
-        
+
         public ExperimentSubLinePlot(String titleY) {
             this.titleY = titleY;
             this.lines = new ArrayList<ExperimentSubLinePlotLine>();
@@ -68,7 +68,7 @@ public class ExperimentLinePlot {
             return lines;
         }
     }
-    
+
     public static class ExperimentSubLinePlotLine {
         private String title;
         private Function<Double> getValueCallback;
@@ -100,16 +100,16 @@ public class ExperimentLinePlot {
         ExperimentSubLinePlot experimentSubLinePlot = new ExperimentSubLinePlot(titleY);
 
         List<ExperimentProfile> experimentProfiles = archimulatorService.getExperimentProfilesAsList();
-        for(final ExperimentProfile experimentProfile : experimentProfiles) {
-            if(experimentProfilePred.apply(experimentProfile)) {
+        for (final ExperimentProfile experimentProfile : experimentProfiles) {
+            if (experimentProfilePred.apply(experimentProfile)) {
                 experimentSubLinePlot.getLines().add(new ExperimentSubLinePlotLine("Exp #" + experimentProfile.getId(), new Function<Double>() {
                     @Override
                     public Double apply() {
                         try {
                             String value = archimulatorService.getExperimentStatById(experimentProfile.getId(), key);
-                            if(value != null) {
+                            if (value != null) {
                                 value = value.replaceAll(",", "");
-                                return (double)(int)(Double.valueOf(value).doubleValue());
+                                return (double) (int) (Double.valueOf(value).doubleValue());
                             }
                             return 0.0;
                         } catch (SQLException e) {
@@ -127,7 +127,7 @@ public class ExperimentLinePlot {
         System.out.print(String.format("[%s Exception] %s\r\n", DateHelper.toString(new Date()), e));
         e.printStackTrace();
     }
-    
+
     public static void main(String[] args) throws MalformedURLException, SQLException {
         HessianProxyFactory factory = new HessianProxyFactory();
         factory.setReadTimeout(30000);

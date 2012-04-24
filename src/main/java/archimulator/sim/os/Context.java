@@ -58,9 +58,9 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
 
     private boolean pseudocallEncounteredInLastInstructionExecution;
 
-    private transient boolean speculative;
+    private boolean speculative;
 
-    private transient ArchitecturalRegisterFile speculativeRegs;
+    private ArchitecturalRegisterFile speculativeRegs;
 
     public static Context load(Kernel kernel, String simulationDirectory, ContextConfig contextConfig) {
         Process process = new BasicProcess(kernel, simulationDirectory, contextConfig);

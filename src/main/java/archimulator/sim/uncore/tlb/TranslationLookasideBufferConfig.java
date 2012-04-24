@@ -20,9 +20,7 @@ package archimulator.sim.uncore.tlb;
 
 import archimulator.sim.uncore.cache.CacheGeometry;
 
-import java.io.Serializable;
-
-public class TranslationLookasideBufferConfig implements Serializable {
+public class TranslationLookasideBufferConfig {
     private CacheGeometry geometry;
     private int hitLatency;
     private int missLatency;

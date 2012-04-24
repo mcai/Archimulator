@@ -18,9 +18,9 @@
  ******************************************************************************/
 package archimulator.view.page.edit;
 
-import archimulator.sim.base.simulation.SimulatedProgram;
 import archimulator.service.ArchimulatorService;
 import archimulator.service.ArchimulatorServletContextListener;
+import archimulator.sim.base.simulation.SimulatedProgram;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.util.GenericForwardComposer;
 import org.zkoss.zul.Button;

@@ -20,11 +20,10 @@ package archimulator.sim.isa;
 
 import archimulator.util.Pair;
 
-import java.io.Serializable;
 import java.util.Arrays;
 
-public final class ArchitecturalRegisterFile implements Serializable, Cloneable {
-    public static class Fpr implements Serializable, Cloneable {
+public final class ArchitecturalRegisterFile implements Cloneable {
+    public static class Fpr implements Cloneable {
         private int[] data = new int[32];
         private boolean littleEndian;
 

@@ -89,7 +89,7 @@ public abstract class StackBasedEvictionPolicy<StateT extends Serializable, Line
         throw new IllegalArgumentException();
     }
 
-    private class StackEntry implements Serializable {
+    private class StackEntry {
         private LineT cacheLine;
 
         private StackEntry(LineT cacheLine) {

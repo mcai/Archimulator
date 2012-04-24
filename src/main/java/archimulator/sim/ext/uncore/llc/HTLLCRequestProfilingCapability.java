@@ -18,7 +18,9 @@
  ******************************************************************************/
 package archimulator.sim.ext.uncore.llc;
 
-import archimulator.sim.base.event.*;
+import archimulator.sim.base.event.DumpStatEvent;
+import archimulator.sim.base.event.PollStatsEvent;
+import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.base.experiment.capability.SimulationCapability;
 import archimulator.sim.base.simulation.Simulation;
 import archimulator.sim.core.BasicThread;
@@ -51,7 +53,7 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
     private long numBadHTLLCRequests;
 
     private long numLateHTLLCRequests;
-    
+
     private BlockingEventDispatcher<HTLLCRequestProfilingCapabilityEvent> eventDispatcher;
 
     public HTLLCRequestProfilingCapability(Simulation simulation) {
@@ -237,11 +239,11 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
     private void markMT(int set, int way) {
         this.setLLCLineBroughterThreadId(set, way, BasicThread.getMainThreadId());
     }
-    
+
     public int getLLCLineBroughterThreadId(int set, int way) {
         return this.llcLineBroughterThreadIds.get(set).get(way);
     }
-    
+
     private void setLLCLineBroughterThreadId(int set, int way, int llcLineBroughterThreadId) {
         this.llcLineBroughterThreadIds.get(set).put(way, llcLineBroughterThreadId);
     }
@@ -310,10 +312,10 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
 
     public abstract class HTLLCRequestProfilingCapabilityEvent implements BlockingEvent {
     }
-    
+
     public class HTLLCRequestEvent extends HTLLCRequestProfilingCapabilityEvent {
     }
-    
+
     public class BadHTLLCRequestEvent extends HTLLCRequestProfilingCapabilityEvent {
     }
 

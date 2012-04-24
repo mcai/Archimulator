@@ -52,7 +52,7 @@ public class ArduinoBasedMonitorStartup {
 
         final ArduinoHelper arduinoHelper = new ArduinoHelper();
 
-        Thread threadArduino = new Thread(){
+        Thread threadArduino = new Thread() {
             @Override
             public void run() {
                 arduinoHelper.run();
@@ -61,13 +61,13 @@ public class ArduinoBasedMonitorStartup {
         threadArduino.setDaemon(true);
         threadArduino.start();
 
-        for(;;) {
+        for (; ; ) {
             try {
                 List<ExperimentProfile> experimentProfiles = archimulatorService.getExperimentProfilesAsList();
                 int numRunningExperimentProfiles = 0;
 
-                for(ExperimentProfile experimentProfile : experimentProfiles) {
-                    if(experimentProfile.getState() == ExperimentProfileState.RUNNING) {
+                for (ExperimentProfile experimentProfile : experimentProfiles) {
+                    if (experimentProfile.getState() == ExperimentProfileState.RUNNING) {
                         numRunningExperimentProfiles++;
                     }
                 }

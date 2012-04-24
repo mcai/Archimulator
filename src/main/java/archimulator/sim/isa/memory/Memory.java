@@ -18,16 +18,13 @@
  ******************************************************************************/
 package archimulator.sim.isa.memory;
 
-import archimulator.sim.base.simulation.BasicSimulationObject;
 import archimulator.sim.base.event.PollStatsEvent;
+import archimulator.sim.base.simulation.BasicSimulationObject;
 import archimulator.sim.base.simulation.Simulation;
 import archimulator.sim.os.Kernel;
 import archimulator.sim.uncore.cache.CacheGeometry;
 import archimulator.util.action.Action1;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
@@ -45,8 +42,8 @@ public abstract class Memory extends BasicSimulationObject {
     private String simulationDirectory;
     private int processId;
 
-    private transient boolean speculative;
-    private transient Map<Integer, List<SpeculativeMemoryBlock>> specBlks;
+    private boolean speculative;
+    private Map<Integer, List<SpeculativeMemoryBlock>> specBlks;
 
     private int numPages;
 
@@ -63,16 +60,6 @@ public abstract class Memory extends BasicSimulationObject {
 
         this.pages = new TreeMap<Integer, Page>();
 
-        this.init();
-    }
-
-    private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
-        ois.defaultReadObject();
-
-        this.init();
-    }
-
-    protected void init() {
         this.speculative = false;
         this.specBlks = new TreeMap<Integer, List<SpeculativeMemoryBlock>>();
 
@@ -327,7 +314,7 @@ public abstract class Memory extends BasicSimulationObject {
         Page page = new Page(Simulation.currentMemoryPageId++);
 
         this.pages.put(index, page);
-        
+
         return page;
     }
 
@@ -381,7 +368,7 @@ public abstract class Memory extends BasicSimulationObject {
         return geometry;
     }
 
-    private class Page implements Serializable {
+    private class Page {
         private int id;
         private int physicalAddress;
 
@@ -409,7 +396,7 @@ public abstract class Memory extends BasicSimulationObject {
         }
     }
 
-    private class SpeculativeMemoryBlock implements Serializable {
+    private class SpeculativeMemoryBlock {
         private int tag;
         private byte[] data;
 

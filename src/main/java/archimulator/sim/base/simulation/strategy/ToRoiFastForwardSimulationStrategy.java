@@ -18,8 +18,8 @@
  ******************************************************************************/
 package archimulator.sim.base.simulation.strategy;
 
-import archimulator.sim.base.simulation.SimulationStartingImage;
 import archimulator.sim.base.event.PseudocallEncounteredEvent;
+import archimulator.sim.base.simulation.SimulationStartingImage;
 import archimulator.util.action.Action1;
 
 import java.util.concurrent.CyclicBarrier;

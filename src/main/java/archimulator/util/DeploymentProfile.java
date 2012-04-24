@@ -24,11 +24,11 @@ public class DeploymentProfile {
 
     private String serverUserId;
     private String serverUserPassword;
-    
+
     private String archimulatorDirectoryPath;
 
     private String description;
-    
+
     public DeploymentProfile(String serverIpv6Address, String serverIpv4Address, String serverUserId, String serverUserPassword, String archimulatorDirectoryPath, String description) {
         this.serverIpv6Address = serverIpv6Address;
         this.serverIpv4Address = serverIpv4Address;

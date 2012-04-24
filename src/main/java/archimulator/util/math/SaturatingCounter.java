@@ -18,9 +18,7 @@
  ******************************************************************************/
 package archimulator.util.math;
 
-import java.io.Serializable;
-
-public class SaturatingCounter implements Serializable {
+public class SaturatingCounter {
     private int minValue;
     private int threshold;
     private int maxValue;

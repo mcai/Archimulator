@@ -67,6 +67,6 @@ public class GetValueEvent<KeyT, ValueT, AccessTypeT extends SimpleCacheAccessTy
 
     @Override
     public String toString() {
-        return String.format("GetValueEvent{key=%s, value=%s, oldAccessType=%s, newAccessType=%s, hitInCache=%s, eviction=%s, writeback=%s}", key, value, oldAccessType, newAccessType, hitInCache, eviction, writeback);
+        return String.format("GetValueEvent{key=%s, value=%s, oldAccessType=%s, newAccessType=%s, hitInCache=%s, eviction=%s, writeBack=%s}", key, value, oldAccessType, newAccessType, hitInCache, eviction, writeback);
     }
 }

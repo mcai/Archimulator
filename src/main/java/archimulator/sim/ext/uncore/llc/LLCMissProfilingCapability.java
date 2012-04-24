@@ -18,11 +18,11 @@
  ******************************************************************************/
 package archimulator.sim.ext.uncore.llc;
 
-import archimulator.sim.base.simulation.Simulation;
-import archimulator.sim.base.experiment.capability.SimulationCapability;
 import archimulator.sim.base.event.DumpStatEvent;
 import archimulator.sim.base.event.PollStatsEvent;
 import archimulator.sim.base.event.PseudocallEncounteredEvent;
+import archimulator.sim.base.experiment.capability.SimulationCapability;
+import archimulator.sim.base.simulation.Simulation;
 import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.coherence.event.CoherentCacheBeginCacheAccessEvent;
 import archimulator.sim.uncore.coherence.event.CoherentCacheEndCacheAccessEvent;

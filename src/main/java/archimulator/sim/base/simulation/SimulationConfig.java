@@ -21,10 +21,9 @@ package archimulator.sim.base.simulation;
 import archimulator.sim.core.ProcessorConfig;
 
 import java.io.File;
-import java.io.Serializable;
 import java.util.List;
 
-public class SimulationConfig implements Serializable {
+public class SimulationConfig {
     private String title;
     private ProcessorConfig processorConfig;
     private List<ContextConfig> contextConfigs;

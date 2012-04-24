@@ -18,10 +18,11 @@
  ******************************************************************************/
 package archimulator.sim.base.experiment;
 
-import archimulator.sim.base.experiment.capability.*;
+import archimulator.sim.base.experiment.capability.KernelCapability;
+import archimulator.sim.base.experiment.capability.ProcessorCapability;
+import archimulator.sim.base.experiment.capability.SimulationCapability;
 import archimulator.sim.base.simulation.ContextConfig;
 import archimulator.sim.base.simulation.strategy.RunToEndDetailedSimulationStrategy;
-import archimulator.sim.base.experiment.capability.KernelCapability;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
 
 import java.util.List;

@@ -29,7 +29,7 @@ public class LoadStoreQueueEntry extends AbstractReorderBufferEntry {
     }
 
     @Override
-    protected boolean isNeedWriteback() {
+    protected boolean isNeedWriteBack() {
         return true;
     }
 

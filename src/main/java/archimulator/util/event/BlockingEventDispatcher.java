@@ -21,13 +21,12 @@ package archimulator.util.event;
 import archimulator.util.action.Action1;
 import archimulator.util.action.Action2;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class BlockingEventDispatcher<BlockingEventT extends BlockingEvent> implements Serializable {
+public class BlockingEventDispatcher<BlockingEventT extends BlockingEvent> {
     protected final Map<Class<? extends BlockingEventT>, List<Action2<?, ? extends BlockingEventT>>> listeners;
 
     public BlockingEventDispatcher() {

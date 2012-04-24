@@ -74,7 +74,8 @@ public class PosixUtil {
     private static class POSIXTypeMapper implements TypeMapper {
         public static final TypeMapper INSTANCE = new POSIXTypeMapper();
 
-        private POSIXTypeMapper() {}
+        private POSIXTypeMapper() {
+        }
 
         public FromNativeConverter getFromNativeConverter(Class klazz) {
             if (Passwd.class.isAssignableFrom(klazz)) {

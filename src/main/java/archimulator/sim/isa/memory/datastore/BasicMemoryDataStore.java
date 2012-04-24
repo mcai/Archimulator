@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class BasicMemoryDataStore extends BasicSimulationObject implements MemoryDataStore {
-    private transient Map<Integer, ByteBuffer> bbs;
+    private Map<Integer, ByteBuffer> bbs;
     private Memory memory;
 
     public BasicMemoryDataStore(Memory memory) {

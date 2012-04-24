@@ -18,9 +18,9 @@
  ******************************************************************************/
 package archimulator.view.renderer;
 
-import archimulator.sim.base.experiment.profile.ProcessorProfile;
 import archimulator.service.ArchimulatorService;
 import archimulator.service.ArchimulatorServletContextListener;
+import archimulator.sim.base.experiment.profile.ProcessorProfile;
 import archimulator.util.StorageUnit;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Session;

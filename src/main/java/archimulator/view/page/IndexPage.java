@@ -18,17 +18,14 @@
  ******************************************************************************/
 package archimulator.view.page;
 
+import archimulator.service.ArchimulatorService;
+import archimulator.service.ArchimulatorServiceImpl;
+import archimulator.service.ArchimulatorServletContextListener;
 import archimulator.sim.base.experiment.profile.ExperimentProfile;
 import archimulator.sim.base.experiment.profile.ProcessorProfile;
 import archimulator.sim.base.simulation.ContextConfig;
 import archimulator.sim.base.simulation.SimulatedProgram;
-import archimulator.service.ArchimulatorService;
-import archimulator.service.ArchimulatorServiceImpl;
-import archimulator.service.ArchimulatorServletContextListener;
 import archimulator.util.DateHelper;
-import com.itextpdf.text.*;
-import com.itextpdf.text.List;
-import com.itextpdf.text.pdf.PdfWriter;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
@@ -36,9 +33,9 @@ import org.zkoss.zk.ui.util.GenericForwardComposer;
 import org.zkoss.zul.*;
 
 import javax.servlet.http.HttpSession;
-import java.io.ByteArrayOutputStream;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Date;
+import java.util.Map;
 
 public class IndexPage extends GenericForwardComposer<Window> {
     Checkbox checkboxRunningExperimentEnabled;
@@ -60,10 +57,10 @@ public class IndexPage extends GenericForwardComposer<Window> {
         archimulatorService.setRunningExperimentEnabled(this.checkboxRunningExperimentEnabled.isChecked());
         Executions.sendRedirect(null);
     }
-    
+
     public void onClick$buttonChangePassword(Event event) throws SQLException {
         String text = this.textboxChangePassword.getText();
-        if(text != null && !text.isEmpty()) {
+        if (text != null && !text.isEmpty()) {
             HttpSession httpSession = (HttpSession) session.getNativeSession();
             ArchimulatorService archimulatorService = ArchimulatorServletContextListener.getArchimulatorService(httpSession.getServletContext());
             archimulatorService.setUserPassword(ArchimulatorServiceImpl.USER_ID_ADMIN, text);
@@ -78,12 +75,11 @@ public class IndexPage extends GenericForwardComposer<Window> {
                     }
                 }
             });
-        }
-        else {
+        } else {
             Messagebox.show("New password cannot be empty!", "Change Password", Messagebox.OK, Messagebox.EXCLAMATION);
         }
     }
-    
+
     public void onClick$buttonDownloadReport(Event event) {
         Filedownload.save(generateReport(), "text/plain", "archimulator_report_" + DateHelper.toFileNameString(new Date()) + ".txt");
     }
@@ -114,7 +110,7 @@ public class IndexPage extends GenericForwardComposer<Window> {
 
             java.util.List<SimulatedProgram> simulatedPrograms = archimulatorService.getSimulatedProgramsAsList();
             sb.append("a. Simulated Programs").append(" (total: ").append(simulatedPrograms.size()).append(")").append("\r\n");
-            for(SimulatedProgram simulatedProgram : simulatedPrograms) {
+            for (SimulatedProgram simulatedProgram : simulatedPrograms) {
                 sb.append("  ").append(simulatedProgram).append("\r\n");
             }
 
@@ -122,7 +118,7 @@ public class IndexPage extends GenericForwardComposer<Window> {
 
             java.util.List<ProcessorProfile> processorProfiles = archimulatorService.getProcessorProfilesAsList();
             sb.append("b. Processor Profiles").append(" (total: ").append(processorProfiles.size()).append(")").append("\r\n");
-            for(ProcessorProfile processorProfile : processorProfiles) {
+            for (ProcessorProfile processorProfile : processorProfiles) {
                 sb.append("  ").append(processorProfile).append("\r\n");
             }
 
@@ -130,25 +126,25 @@ public class IndexPage extends GenericForwardComposer<Window> {
 
             java.util.List<ExperimentProfile> experimentProfiles = archimulatorService.getExperimentProfilesAsList();
             sb.append("c. Experiment Profiles").append(" (total: ").append(experimentProfiles.size()).append(")").append("\r\n");
-            for(ExperimentProfile experimentProfile : experimentProfiles) {
+            for (ExperimentProfile experimentProfile : experimentProfiles) {
                 sb.append("  ").append(experimentProfile).append("\r\n");
 
                 sb.append("  ").append("  ").append("Context Configs").append("\r\n");
 
-                for(ContextConfig contextConfig : experimentProfile.getContextConfigs()) {
+                for (ContextConfig contextConfig : experimentProfile.getContextConfigs()) {
                     sb.append("  ").append("  ").append("  ").append(contextConfig).append("\r\n");
                 }
 
                 sb.append("  ").append("  ").append("Stats").append("\r\n");
 
                 Map<String, String> experimentStats = archimulatorService.getExperimentStatsById(experimentProfile.getId());
-                for(String key : experimentStats.keySet()) {
+                for (String key : experimentStats.keySet()) {
                     sb.append("  ").append("  ").append("  ").append(key).append(": ").append(experimentStats.get(key)).append("\r\n");
                 }
             }
 
             sb.append("\r\n");
-            
+
             return sb.toString().getBytes();
         } catch (Exception e) {
             System.out.println(e);

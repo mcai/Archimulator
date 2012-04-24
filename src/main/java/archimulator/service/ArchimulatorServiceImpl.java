@@ -50,16 +50,16 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
 
     private Dao<User, String> users;
 
-    private transient Scheduler scheduler;
+    private Scheduler scheduler;
 
     private JdbcPooledConnectionSource connectionSource;
-    
+
     private boolean runningExperimentEnabled;
-    
+
     private MessageSink messageSinkProxy;
-    
+
     private CloudMessageChannel cloudMessageChannel;
-    
+
     private boolean loadingProgramStalled;
 
     @SuppressWarnings("unchecked")
@@ -80,7 +80,7 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
             this.experimentProfiles = DaoManager.createDao(this.connectionSource, ExperimentProfile.class);
             this.experimentProfileStats = DaoManager.createDao(this.connectionSource, ExperimentProfileStat.class);
             this.users = DaoManager.createDao(this.connectionSource, User.class);
-            
+
             this.runningExperimentEnabled = false;
 
             if (!this.users.idExists(USER_ID_ADMIN)) {
@@ -89,7 +89,7 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        
+
         this.messageSinkProxy = new MessageSinkImpl();
 
         this.cloudMessageChannel = new CloudMessageChannel("#admin", this);
@@ -108,7 +108,7 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
         });
         this.scheduler.start();
     }
-    
+
     @Override
     public void stop() {
         this.scheduler.stop();
@@ -119,7 +119,7 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
         }
         this.cloudMessageChannel.close();
     }
-    
+
     @Override
     public void clearData() throws SQLException {
         this.simulatedPrograms.delete(this.simulatedPrograms.deleteBuilder().prepare());
@@ -136,7 +136,7 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
     public SimulatedProgram getSimulatedProgramById(long simulatedProgramId) throws SQLException {
         return this.simulatedPrograms.queryForId(simulatedProgramId);
     }
-    
+
     @Override
     public SimulatedProgram getSimulatedProgramByTitle(String simulatedProgramTitle) throws SQLException {
         PreparedQuery<SimulatedProgram> query = this.simulatedPrograms.queryBuilder().where().eq("title", simulatedProgramTitle).prepare();
@@ -193,7 +193,7 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
     public List<ExperimentProfile> getExperimentProfilesAsList() throws SQLException {
         return this.experimentProfiles.queryForAll();
     }
-    
+
     @Override
     public ExperimentProfile getExperimentProfileById(long experimentProfileId) throws SQLException {
         return this.experimentProfiles.queryForId(experimentProfileId);
@@ -222,18 +222,18 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
 
     @Override
     public ExperimentProfile retrieveOneExperimentProfileToRun(String simulatorUserId) throws SQLException {
-        if(!this.runningExperimentEnabled || loadingProgramStalled) {
+        if (!this.runningExperimentEnabled || loadingProgramStalled) {
             return null;
         }
 
         PreparedQuery<ExperimentProfile> query = this.experimentProfiles.queryBuilder().where().eq("state", ExperimentProfileState.SUBMITTED).prepare();
         ExperimentProfile result = this.experimentProfiles.queryForFirst(query);
-        if(result != null) {
+        if (result != null) {
             result.setState(ExperimentProfileState.RUNNING);
             result.setSimulatorUserId(simulatorUserId);
             this.experimentProfiles.update(result);
-            
-            Thread thread = new Thread(){
+
+            Thread thread = new Thread() {
                 @Override
                 public void run() {
                     try {
@@ -249,28 +249,28 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
             thread.start();
 
             loadingProgramStalled = true;
-            
+
             return result;
         }
-        
+
         return null;
     }
-    
+
     @Override
     public void notifyExperimentPaused(long experimentProfileId) throws SQLException {
         ExperimentProfile profile = this.experimentProfiles.queryForId(experimentProfileId);
-        if(profile == null || profile.getState() != ExperimentProfileState.RUNNING) {
+        if (profile == null || profile.getState() != ExperimentProfileState.RUNNING) {
             return;
         }
 
         profile.setState(ExperimentProfileState.PAUSED);
         this.experimentProfiles.update(profile);
     }
-    
+
     @Override
     public void notifyExperimentResumed(long experimentProfileId) throws SQLException {
         ExperimentProfile profile = this.experimentProfiles.queryForId(experimentProfileId);
-        if(profile == null || profile.getState() != ExperimentProfileState.PAUSED) {
+        if (profile == null || profile.getState() != ExperimentProfileState.PAUSED) {
             return;
         }
 
@@ -281,7 +281,7 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
     @Override
     public void notifyExperimentStopped(long experimentProfileId) throws SQLException {
         ExperimentProfile profile = this.experimentProfiles.queryForId(experimentProfileId);
-        if(profile == null || profile.getState() == ExperimentProfileState.SUBMITTED) {
+        if (profile == null || profile.getState() == ExperimentProfileState.SUBMITTED) {
             return;
         }
 
@@ -332,54 +332,54 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
 
     @Override
     public void pauseExperimentById(long experimentProfileId) throws SQLException {
-        if(!this.experimentProfiles.idExists(experimentProfileId)) {
-            return;
-        }
-        
-        ExperimentProfile experimentProfile = this.getExperimentProfileById(experimentProfileId);
-        if(experimentProfile.getState() == ExperimentProfileState.RUNNING) {
-            this.cloudMessageChannel.send(experimentProfile.getSimulatorUserId(), new PauseExperimentRequestEvent(experimentProfile.getId()));
-        }
-    }
-    
-    @Override
-    public void resumeExperimentById(long experimentProfileId) throws SQLException {
-        if(!this.experimentProfiles.idExists(experimentProfileId)) {
+        if (!this.experimentProfiles.idExists(experimentProfileId)) {
             return;
         }
 
         ExperimentProfile experimentProfile = this.getExperimentProfileById(experimentProfileId);
-        if(experimentProfile.getState() == ExperimentProfileState.PAUSED) {
+        if (experimentProfile.getState() == ExperimentProfileState.RUNNING) {
+            this.cloudMessageChannel.send(experimentProfile.getSimulatorUserId(), new PauseExperimentRequestEvent(experimentProfile.getId()));
+        }
+    }
+
+    @Override
+    public void resumeExperimentById(long experimentProfileId) throws SQLException {
+        if (!this.experimentProfiles.idExists(experimentProfileId)) {
+            return;
+        }
+
+        ExperimentProfile experimentProfile = this.getExperimentProfileById(experimentProfileId);
+        if (experimentProfile.getState() == ExperimentProfileState.PAUSED) {
             this.cloudMessageChannel.send(experimentProfile.getSimulatorUserId(), new ResumeExperimentRequestEvent(experimentProfile.getId()));
         }
     }
 
     @Override
     public void stopExperimentById(long experimentProfileId) throws SQLException {
-        if(!this.experimentProfiles.idExists(experimentProfileId)) {
+        if (!this.experimentProfiles.idExists(experimentProfileId)) {
             return;
         }
 
         ExperimentProfile experimentProfile = this.getExperimentProfileById(experimentProfileId);
-        if(experimentProfile.getState() != ExperimentProfileState.SUBMITTED) {
+        if (experimentProfile.getState() != ExperimentProfileState.SUBMITTED) {
             this.cloudMessageChannel.send(experimentProfile.getSimulatorUserId(), new StopExperimentRequestEvent(experimentProfile.getId()));
         }
     }
 
     @Override
     public void resetExperimentById(long experimentProfileId) throws SQLException {
-        if(!this.experimentProfiles.idExists(experimentProfileId)) {
+        if (!this.experimentProfiles.idExists(experimentProfileId)) {
             return;
         }
 
         ExperimentProfile experimentProfile = this.getExperimentProfileById(experimentProfileId);
-        if(experimentProfile.getState() != ExperimentProfileState.SUBMITTED) {
+        if (experimentProfile.getState() != ExperimentProfileState.SUBMITTED) {
             this.cloudMessageChannel.send(experimentProfile.getSimulatorUserId(), new StopExperimentRequestEvent(experimentProfile.getId()));
         }
         experimentProfile.setState(ExperimentProfileState.SUBMITTED);
         this.experimentProfiles.update(experimentProfile);
 
-        DeleteBuilder<ExperimentProfileStat,Long> deleteBuilder = this.experimentProfileStats.deleteBuilder();
+        DeleteBuilder<ExperimentProfileStat, Long> deleteBuilder = this.experimentProfileStats.deleteBuilder();
         deleteBuilder.where().eq("experimentProfileId", experimentProfileId);
         PreparedDelete<ExperimentProfileStat> query = deleteBuilder.prepare();
         this.experimentProfileStats.delete(query);
@@ -387,20 +387,19 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
 
     @Override
     public void updateExperimentStatsById(long experimentProfileId, Map<String, String> stats) throws SQLException {
-        if(!this.experimentProfiles.idExists(experimentProfileId)) {
+        if (!this.experimentProfiles.idExists(experimentProfileId)) {
             return;
         }
 
-        for(String key : stats.keySet()) {
+        for (String key : stats.keySet()) {
             String value = stats.get(key);
 
             PreparedQuery<ExperimentProfileStat> query = this.experimentProfileStats.queryBuilder().where().eq("experimentProfileId", experimentProfileId).and().eq("key", key).prepare();
             ExperimentProfileStat result = this.experimentProfileStats.queryForFirst(query);
-            if(result != null) {
+            if (result != null) {
                 result.setValue(value);
                 this.experimentProfileStats.update(result);
-            }
-            else {
+            } else {
                 ExperimentProfileStat stat = new ExperimentProfileStat(experimentProfileId, key, value);
                 this.experimentProfileStats.create(stat);
             }
@@ -409,7 +408,7 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
 
     @Override
     public Map<String, String> getExperimentStatsById(long experimentProfileId) throws SQLException {
-        if(!this.experimentProfiles.idExists(experimentProfileId)) {
+        if (!this.experimentProfiles.idExists(experimentProfileId)) {
             return new HashMap<String, String>();
         }
 
@@ -417,7 +416,7 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
         List<ExperimentProfileStat> result = this.experimentProfileStats.query(query);
 
         Map<String, String> stats = new LinkedHashMap<String, String>();
-        for(ExperimentProfileStat stat : result) {
+        for (ExperimentProfileStat stat : result) {
             stats.put(stat.getKey(), stat.getValue());
         }
 
@@ -426,16 +425,15 @@ public class ArchimulatorServiceImpl implements ArchimulatorService {
 
     @Override
     public String getExperimentStatById(long experimentProfileId, String key) throws SQLException {
-        if(!this.experimentProfiles.idExists(experimentProfileId)) {
+        if (!this.experimentProfiles.idExists(experimentProfileId)) {
             return null;
         }
 
         PreparedQuery<ExperimentProfileStat> query = this.experimentProfileStats.queryBuilder().where().eq("experimentProfileId", experimentProfileId).and().eq("key", key).prepare();
         ExperimentProfileStat result = this.experimentProfileStats.queryForFirst(query);
-        if(result != null) {
+        if (result != null) {
             return result.getValue();
-        }
-        else {
+        } else {
             return null;
         }
     }

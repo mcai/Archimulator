@@ -18,18 +18,21 @@
  ******************************************************************************/
 package archimulator.sim.isa;
 
-import archimulator.sim.base.simulation.Logger;
 import archimulator.sim.base.event.PseudocallEncounteredEvent;
+import archimulator.sim.base.simulation.Logger;
 import archimulator.sim.core.FunctionalUnitOperationType;
-import archimulator.sim.os.*;
+import archimulator.sim.os.Context;
+import archimulator.sim.os.FunctionCallContext;
 import archimulator.util.math.MathHelper;
 
-import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 
-public class StaticInstruction implements Serializable {
+public class StaticInstruction {
     private Mnemonic mnemonic;
     private int machInst;
     private List<Integer> ideps;

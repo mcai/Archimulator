@@ -18,9 +18,7 @@
  ******************************************************************************/
 package archimulator.util.im.sink;
 
-import java.io.Serializable;
-
-public class InstantMessage implements Serializable {
+public class InstantMessage {
     private Long id;
     private String fromUserId;
     private String body;

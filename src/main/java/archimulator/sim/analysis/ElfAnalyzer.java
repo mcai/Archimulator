@@ -25,7 +25,9 @@ import archimulator.sim.os.elf.Symbol;
 import archimulator.util.DateHelper;
 import archimulator.util.StringHelper;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Writer;
 import java.util.*;
 
 public class ElfAnalyzer {
@@ -63,8 +65,8 @@ public class ElfAnalyzer {
             }
         }
 
-        for(String sectionName : this.insts.keySet()) {
-            for(Instruction instruction : this.insts.get(sectionName).values()) {
+        for (String sectionName : this.insts.keySet()) {
+            for (Instruction instruction : this.insts.get(sectionName).values()) {
                 instruction.setSectionName(sectionName);
             }
         }
@@ -119,10 +121,9 @@ public class ElfAnalyzer {
 
                     Instruction targetInstruction = this.getTargetInstruction(function, lastInstruction);
 
-                    if(targetInstruction.getBasicBlock() != null) {
+                    if (targetInstruction.getBasicBlock() != null) {
                         this.createControlFlowGraphEdge(basicBlock, targetInstruction.getBasicBlock(), ControlFlowGraphEdgeType.TAKEN);
-                    }
-                    else {
+                    } else {
                         System.out.print(String.format("[%s WARN] Cannot find parent basic block for instruction: %s in section %s\n", DateHelper.toString(new Date()), targetInstruction, targetInstruction.getSectionName()));
                     }
                     basicBlock.setType(BasicBlockType.CONDITIONAL);

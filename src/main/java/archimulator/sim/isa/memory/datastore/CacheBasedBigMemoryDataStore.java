@@ -18,9 +18,9 @@
  ******************************************************************************/
 package archimulator.sim.isa.memory.datastore;
 
+import archimulator.sim.base.event.PollStatsEvent;
 import archimulator.sim.base.simulation.BasicSimulationObject;
 import archimulator.sim.base.simulation.SimulationObject;
-import archimulator.sim.base.event.PollStatsEvent;
 import archimulator.sim.isa.memory.Memory;
 import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.cache.*;
@@ -153,7 +153,7 @@ public class CacheBasedBigMemoryDataStore extends BasicSimulationObject implemen
     }
 
     private class MemoryPageCacheLine extends CacheLine<Boolean> {
-        private transient ByteBuffer bb;
+        private ByteBuffer bb;
         private boolean dirty;
 
         private MemoryPageCacheLine(Cache<?, ?> cache, int set, int way) {

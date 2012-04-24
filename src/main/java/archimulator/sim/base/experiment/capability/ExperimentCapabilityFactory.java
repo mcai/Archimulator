@@ -64,7 +64,7 @@ public class ExperimentCapabilityFactory {
         }
     }
 
-    public static <ProcessorCapabilityT extends ProcessorCapability> ProcessorCapabilityT createProcessorCapability(Class<ProcessorCapabilityT> processorCapabilityClz, Processor processor){
+    public static <ProcessorCapabilityT extends ProcessorCapability> ProcessorCapabilityT createProcessorCapability(Class<ProcessorCapabilityT> processorCapabilityClz, Processor processor) {
         try {
             return processorCapabilityClz.getConstructor(new Class[]{Processor.class}).newInstance(processor);
         } catch (InstantiationException e) {
