@@ -32,7 +32,7 @@
 \output_sync 0
 \bibtex_command default
 \index_command default
-\float_placement h
+\float_placement tbh
 \paperfontsize default
 \spacing single
 \use_hyperref true
@@ -164,13 +164,14 @@ et al.
 \end_layout
 
 \begin_layout Abstract
-Helper threaded inter-core data prefetching on shared cache chip multiprocessors
- (CMPs), in its most basic form, (1) uses the shared cache enabled fast
- inter-thread communication when both the main core and the otherwise idle
- neighboring helper core access the same cache line; (2) constructs a helper
- thread in the software running on the helper core to speculatively issue
- LLC prefetch requests to the predicted memory addresses before the computation
- core access these addresses.
+For applications exhibiting irregular memory access patterns, helper threaded
+ inter-core data prefetching on shared cache chip multiprocessors (CMPs),
+ in its most basic form, (1) uses the shared cache enabled fast inter-thread
+ communication when both the main core and the otherwise idle neighboring
+ helper core access the same cache line; (2) constructs a helper thread
+ in the software running on the helper core to speculatively issue LLC prefetch
+ requests to the predicted memory addresses before the computation core
+ access these addresses.
  Effective helper threaded inter-core data prefetching demands that the
  helper thread (HT) should issue correct and timely LLC requests just before
  the main thread (MT) requests them.
@@ -236,7 +237,7 @@ IEEEPARstart{
 
 \end_inset
 
- H
+ F
 \begin_inset ERT
 status collapsed
 
@@ -247,7 +248,7 @@ status collapsed
 
 \end_inset
 
-elper
+or
 \begin_inset ERT
 status collapsed
 
@@ -258,13 +259,14 @@ status collapsed
 
 \end_inset
 
- threaded inter-core data prefetching on shared cache chip multiprocessors
- (CMPs), in its most basic form, (1) uses the shared cache enabled fast
- inter-thread communication when both the main core and the otherwise idle
- neighboring helper core access the same cache line; (2) constructs a helper
- thread in the software running on the helper core to speculatively issue
- LLC prefetch requests to the predicted memory addresses before the computation
- core access these addresses.
+ applications exhibiting irregular memory access patterns, helper threaded
+ inter-core data prefetching on shared cache chip multiprocessors (CMPs),
+ in its most basic form, (1) uses the shared cache enabled fast inter-thread
+ communication when both the main core and the otherwise idle neighboring
+ helper core access the same cache line; (2) constructs a helper thread
+ in the software running on the helper core to speculatively issue LLC prefetch
+ requests to the predicted memory addresses before the computation core
+ access these addresses.
   Effective helper threaded data prefetching demands that the helper thread
  (HT) should issue correct and timely LLC requests just before the main
  thread (MT) requests them.
@@ -408,6 +410,249 @@ The rest of this paper is organized as follows.
  Section 5 discusses results.
  Section 6 talks about related work.
  In section 7 we conclude the paper.
+\end_layout
+
+\begin_layout Section
+Background and Motivation
+\end_layout
+
+\begin_layout Subsection
+The Scheme of Helper Threaded Inter-Core Data Prefetching on Shared Cache
+ CMPs
+\end_layout
+
+\begin_layout Standard
+As illustrated in Fig.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Helper-Threaded-Inter-Core-Data-Prefetching"
+
+\end_inset
+
+, the workflow of helper threaded inter-core data prefetching we implement
+ here can be described as follows.
+ 
+\end_layout
+
+\begin_layout Enumerate
+the helper thread is spawned in the entry point 
+\family typewriter
+main()
+\family default
+ of the program; 
+\end_layout
+
+\begin_layout Enumerate
+the helper thread remains dormant until some caller of the target hotspot
+ function has been invoked and code placed in the caller wakes up the helper
+ thread to let it start the 
+\family typewriter
+prelude
+\family default
+ where the code in the helper thread skips some iterations of pointer traversals
+ (i.e., there is no prefetch issued) to compensate the long time used for
+ data prefetching in the helper thread as compared to the short time used
+ in computation work in the main thread; 
+\end_layout
+
+\begin_layout Enumerate
+the helper thread enters a 
+\family typewriter
+steady state
+\family default
+ of issuing LLC prefetch requests in loop iterations of pointer traversals
+ ahead of the main thread until the execution of the program has passed
+ some point(s) in the target hotspot function; 
+\end_layout
+
+\begin_layout Enumerate
+the code in helper thread is synchronizing pointers with the main thread
+ and begin the next turn of servicing hotspots; 
+\end_layout
+
+\begin_layout Enumerate
+after all the prefetching work is done, the helper thread is destroyed in
+ main().
+ 
+\end_layout
+
+\begin_layout Standard
+Two parameters in the HT scheme controls its aggressiveness: (1) the number
+ of loop iterations of pointer traversals that the helper thread code skip
+ after synchronizing with the main thread in the prelude is called 
+\family typewriter
+lookahead
+\family default
+; (2) the number of loop iterations of pointer traversals in which helper
+ thread code issue LLC prefetch requests in the steady state is called 
+\family typewriter
+stride
+\family default
+.
+ 
+\end_layout
+
+\begin_layout Standard
+In a traditional HT scheme configuration, the values of 
+\family typewriter
+lookahead
+\family default
+ and 
+\family typewriter
+stride
+\family default
+ are hard coded.
+ In our proposed feedback directed mechanism, the processor changes the
+ value of 
+\family typewriter
+lookahead
+\family default
+ and 
+\family typewriter
+stride 
+\family default
+using some temporary register to adjust the aggressiveness of the HT scheme.
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename /home/itecgo/Archimulator/doc/ht_scheme.pdf
+	scale 32
+	BoundingBox 30bp 38bp 810bp 538bp
+	clip
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Caption
+
+\begin_layout Plain Layout
+The Scheme of Helper Threaded Inter-Core Data Prefetching
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Helper-Threaded-Inter-Core-Data-Prefetching"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Pollution-Unaware Metrics For Evaluating the Effectiveness of the HT Scheme
+\end_layout
+
+\begin_layout Standard
+Traditionally, prefetch accuracy, coverage and lateness are used to evaluate
+ the effectiveness of hardware prefetchers.
+ In this section, we adapt the metrics to the HT scheme and describe what
+ the metrics mean in the effectiveness of the HT scheme.
+\end_layout
+
+\begin_layout Subsection
+HT LLC Request Accuracy
+\end_layout
+
+\begin_layout Standard
+HT LLC request accuracy is a measure of how accurately the HT scheme can
+ predict and issue prefetch requests for the memory addresses that will
+ be accessed by the main thread.
+ It is defined as below
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+\size scriptsize
+\begin_inset Formula 
+\[
+HT\: LLC\: Request\: Accuracy=\frac{Number\: of\: Useful\: HT\: LLC\: Requests}{Number\: of\: HT\: LLC\: Requests}
+\]
+
+\end_inset
+
+
+\family default
+\size default
+where Number of Useful HT LLC Requests is the number of LLC lines brought
+ by HT requests that are later on hit by MT requests.
+ For benchmarks with high HT LLC request accuracy, performance increases
+ as the aggressiveness of the HT scheme is increased.
+\end_layout
+
+\begin_layout Subsection
+HT LLC Request Coverage
+\end_layout
+
+\begin_layout Standard
+HT LLC request coverage is a measure of the fraction of all MT LLC misses
+ that can be eliminated by issuing HT LLC misses ahead.
+ It is defined as below
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+\size scriptsize
+\begin_inset Formula 
+\[
+HT\: LLC\: Request\: Coverage=\frac{Number\: of\: Useful\: HT\: LLC\: Requests}{Number\: of\: MT\: LLC\: Requests\: in\: No\: HT}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+HT LLC Request Lateness
+\end_layout
+
+\begin_layout Standard
+HT LLC request lateness is a measure of how timely the LLC requests generated
+ in the helper thread are with respect to the LLC requests generated in
+ the main thread that need the data brought by the helper thread.
+ An HT LLC request is said to be late if its requested data has not yet
+ returned from the main memory by the time an MT LLC request references
+ the data.
+ Therefore, even though the HT LLC request is accurate, it can only partially
+ hide the latency incurred by an LLC miss in the main thread.
+ HT LLC request lateness can be defined as below:
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+\size scriptsize
+\begin_inset Formula 
+\[
+HT\: LLC\: Request\: Lateness=\frac{Number\: of\: Late\: HT\: LLC\: Requests}{Number\: of\: Useful\: HT\: LLC\: Requests}
+\]
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -2378,52 +2623,6 @@ HT Spawn
 \end_inset
 
  pseudocall is encountered.
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset Float figure
-wide false
-sideways false
-status collapsed
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename /home/itecgo/Archimulator/doc/ht_scheme.pdf
-	scale 32
-	BoundingBox 30bp 38bp 810bp 538bp
-	clip
-
-\end_inset
-
-
-\begin_inset VSpace defskip
-\end_inset
-
-
-\begin_inset Caption
-
-\begin_layout Plain Layout
-ROI Based Two Phase Fast Simulation of Helper Threaded Inter-Core Data Prefetchi
-ng
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:Helper-Threaded-Inter-Core-Data-Prefetching"
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout Section
@@ -11041,6 +11240,16 @@ Related Work
 \end_layout
 
 \begin_layout Standard
+Even though helper threaded data prefetching mechanisms have been studied
+ for a long time, taxonomy of HT LLC requests have not been studied before.
+ Here we briefly describe previous work in the context of hardwre prefething.
+\end_layout
+
+\begin_layout Subsection
+Prefetch Taxonomies
+\end_layout
+
+\begin_layout Standard
 Our taxonomy of HT LLC requests is mostly similar to the work in 
 \begin_inset CommandInset citation
 LatexCommand cite
@@ -11055,6 +11264,38 @@ key "Mehta2004"
  to gauge the amount of shared cache pollution caused by hardware prefetching.
  Good, bad and ugly requests are identified based on cache replacement activitie
 s involved by hardware prefetches.
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Jerger2006"
+
+\end_inset
+
+ developed a multiprocessor prefetch traffic and miss taxonomy that builds
+ on existing uniprocessor taxonomy.
+\end_layout
+
+\begin_layout Subsection
+Prefetch Aware Cache Content Management
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset citation
+LatexCommand cite
+key "WuJMSE2011"
+
+\end_inset
+
+ characterizes the performance of state-of-the-art LLC management policies
+ in the presence and absence of hardware prefetching.
+ Prefetch-Aware Cache Management (PACMan) is proposed to dynamically estimates
+ and mitigates the degree of prefetch-induced cache interference by modifying
+ the cache insertion and hit promotion policies to treat domand and prefetch
+ requests differently.
+\end_layout
+
+\begin_layout Subsection
+Feedback Directed Data Prefetching 
 \end_layout
 
 \begin_layout Standard
@@ -11065,7 +11306,10 @@ key "Srinath2007"
 
 \end_inset
 
-, which proposes a feedback directed mechanism for hardware prefetching.
+, which proposes a low-cost feedback directed mechanism for hardware prefetching.
+ The mechanism can be applied to any hardware prefetchers such as sequential
+ prefetchers, stream-based prefetchers, GHB based prefetchers and PC-based
+ stride prefetchers.
 \end_layout
 
 \begin_layout Section
@@ -11073,7 +11317,13 @@ Conclusion
 \end_layout
 
 \begin_layout Standard
-TODOs: our work: what? how? result? Further work?
+This paper proposed the pollution-aware taxonomy of LLC requests issued
+ by the helper thread (HT) in the helper threaded inter-core data prefetching,
+ and discussed a feedback directed runtime mechanism based on the taxonomy
+ that dynamically adjusts the LLC replacement policy and the aggressiveness
+ of a Pthreads based HT implementation to reduce cache pollution caused
+ by HT LLC requests and increase the timeliness of HT LLC requests, thus
+ improve the effectiveness of the HT scheme.
 \end_layout
 
 \begin_layout Section*

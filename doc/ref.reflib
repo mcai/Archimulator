@@ -522,5 +522,28 @@
     <bib_extra key="Month">feb</bib_extra>
     <bib_extra key="Publisher">IEEE Computer Society</bib_extra>
   </doc>
+  <doc>
+    <filename></filename>
+    <relative_filename></relative_filename>
+    <key>WuJMSE2011</key>
+    <notes></notes>
+    <bib_type>InProceedings</bib_type>
+    <bib_doi></bib_doi>
+    <bib_title>PACMan: prefetch-aware cache management for high performance caching</bib_title>
+    <bib_authors>Wu, Carole-Jean and Jaleel, Aamer and Martonosi, Margaret and , Simon C. Steely Jr. and Emer, Joel S.</bib_authors>
+    <bib_journal></bib_journal>
+    <bib_volume></bib_volume>
+    <bib_number></bib_number>
+    <bib_pages>442-453</bib_pages>
+    <bib_year>2011</bib_year>
+    <bib_extra key="Bibdate">2012-03-02</bib_extra>
+    <bib_extra key="Bibsource">DBLP, http://dblp.uni-trier.de/db/conf/micro/micro2011.html#WuJMSE11</bib_extra>
+    <bib_extra key="BookTitle">MICRO</bib_extra>
+    <bib_extra key="Editor">Galuzzi, Carlo and Carro, Luigi and Moshovos, Andreas and Prvulovic, Milos</bib_extra>
+    <bib_extra key="Isbn">978-1-4503-1053-6</bib_extra>
+    <bib_extra key="Publisher">ACM</bib_extra>
+    <bib_extra key="Series">44rd Annual IEEE/ACM International Symposium on Microarchitecture, MICRO 2011, 3-7 December 2011, Porto Alegre, Brazil</bib_extra>
+    <bib_extra key="Url">http://doi.acm.org/10.1145/2155620.2155672</bib_extra>
+  </doc>
 </doclist>
 </library>
