@@ -59,9 +59,9 @@ public class Presets {
     public static ExperimentProfile baseline_lru(int pthreadSpawnedIndex, int maxInsts, ProcessorProfile processorProfile, SimulatedProgram simulatedProgram) {
         ExperimentProfile experimentProfile = new ExperimentProfile(simulatedProgram.getTitle() + "-" + processorProfile.getTitle(), processorProfile);
         experimentProfile.addWorkload(simulatedProgram);
-        experimentProfile.functionallyToEnd();
+//        experimentProfile.functionallyToEnd();
 //        experimentProfile.fastForwardToPseudoCallAndInDetailForMaxInsts(pthreadSpawnedIndex, maxInsts);
-//        experimentProfile.inDetailToEnd();
+        experimentProfile.inDetailToEnd();
         experimentProfile.addSimulationCapabilityClass(LLCReuseDistanceProfilingCapability.class);
         experimentProfile.addSimulationCapabilityClass(HTLLCRequestProfilingCapability.class);
         return experimentProfile;
@@ -70,9 +70,9 @@ public class Presets {
     public static ExperimentProfile ht_lru(int pthreadSpawnedIndex, int maxInsts, ProcessorProfile processorProfile, SimulatedProgram simulatedProgram) {
         ExperimentProfile experimentProfile = new ExperimentProfile(simulatedProgram.getTitle() + "-" + processorProfile.getTitle(), processorProfile);
         experimentProfile.addWorkload(simulatedProgram);
-        experimentProfile.functionallyToEnd();
+//        experimentProfile.functionallyToEnd();
 //        experimentProfile.fastForwardToPseudoCallAndInDetailForMaxInsts(pthreadSpawnedIndex, maxInsts);
-//        experimentProfile.inDetailToEnd();
+        experimentProfile.inDetailToEnd();
         experimentProfile.addSimulationCapabilityClass(LLCReuseDistanceProfilingCapability.class);
         experimentProfile.addSimulationCapabilityClass(HTLLCRequestProfilingCapability.class);
         return experimentProfile;
@@ -81,9 +81,9 @@ public class Presets {
     public static ExperimentProfile ht_ht_aware_lru(int pthreadSpawnedIndex, int maxInsts, ProcessorProfile processorProfile, SimulatedProgram simulatedProgram) {
         ExperimentProfile experimentProfile = new ExperimentProfile(simulatedProgram.getTitle() + "-" + processorProfile.getTitle(), processorProfile);
         experimentProfile.addWorkload(simulatedProgram);
-        experimentProfile.functionallyToEnd();
+//        experimentProfile.functionallyToEnd();
 //        experimentProfile.fastForwardToPseudoCallAndInDetailForMaxInsts(pthreadSpawnedIndex, maxInsts);
-//        experimentProfile.inDetailToEnd();
+        experimentProfile.inDetailToEnd();
         experimentProfile.addSimulationCapabilityClass(LLCReuseDistanceProfilingCapability.class);
         return experimentProfile;
     }

@@ -85,29 +85,27 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
 
         final Random random = new Random();
 
-        final Reference<Integer> savedT0Value = new Reference<Integer>(-1);
+        final Reference<Integer> savedRegisterValue = new Reference<Integer>(-1);
 
         llc.getBlockingEventDispatcher().addListener(PseudocallEncounteredEvent.class, new Action1<PseudocallEncounteredEvent>() {
             public void apply(PseudocallEncounteredEvent event) {
                 if(event.getImm() == 3820) {
-                    System.out.printf("[PRE] GPR[%d] = %d%n", event.getRs(), event.getContext().getRegs().getGpr(event.getRs()));
-                    savedT0Value.set(event.getContext().getRegs().getGpr(event.getRs()));
-//                    event.getContext().getRegs().setGpr(event.getRs(), random.nextInt(100)); //TODO: incorporate lookahead and stride calculation algorithm
-                    event.getContext().getRegs().setGpr(event.getRs(), 640); //TODO: incorporate lookahead and stride calculation algorithm
+                    savedRegisterValue.set(event.getContext().getRegs().getGpr(event.getRs()));
+                    event.getContext().getRegs().setGpr(event.getRs(), random.nextInt(100)); //TODO: incorporate lookahead and stride calculation algorithm
+//                    event.getContext().getRegs().setGpr(event.getRs(), 640); //TODO: incorporate lookahead and stride calculation algorithm
+//                    event.getContext().getRegs().setGpr(event.getRs(), 20); //TODO: incorporate lookahead and stride calculation algorithm
                 }
                 else if(event.getImm() == 3821) {
-                    event.getContext().getRegs().setGpr(event.getRs(), savedT0Value.get());
-                    System.out.printf("[POST] GPR[%d] = %d%n", event.getRs(), event.getContext().getRegs().getGpr(event.getRs()));
+                    event.getContext().getRegs().setGpr(event.getRs(), savedRegisterValue.get());
                 }
                 else if(event.getImm() == 3822) {
-                    System.out.printf("[PRE] GPR[%d] = %d%n", event.getRs(), event.getContext().getRegs().getGpr(event.getRs()));
-                    savedT0Value.set(event.getContext().getRegs().getGpr(event.getRs()));
-//                    event.getContext().getRegs().setGpr(event.getRs(), random.nextInt(100)); //TODO: incorporate lookahead and stride calculation algorithm
-                    event.getContext().getRegs().setGpr(event.getRs(), 320); //TODO: incorporate lookahead and stride calculation algorithm
+                    savedRegisterValue.set(event.getContext().getRegs().getGpr(event.getRs()));
+                    event.getContext().getRegs().setGpr(event.getRs(), random.nextInt(100)); //TODO: incorporate lookahead and stride calculation algorithm
+//                    event.getContext().getRegs().setGpr(event.getRs(), 320); //TODO: incorporate lookahead and stride calculation algorithm
+//                    event.getContext().getRegs().setGpr(event.getRs(), 10); //TODO: incorporate lookahead and stride calculation algorithm
                 }
                 else if(event.getImm() == 3823) {
-                    event.getContext().getRegs().setGpr(event.getRs(), savedT0Value.get());
-                    System.out.printf("[POST] GPR[%d] = %d%n", event.getRs(), event.getContext().getRegs().getGpr(event.getRs()));
+                    event.getContext().getRegs().setGpr(event.getRs(), savedRegisterValue.get());
                 }
 //                if (BasicThread.isHelperThread(event.getContext().getThread()))
 //                    System.out.println("pseudocall: " + event.getContext().getThread().getName() + " - " + event.getImm());
