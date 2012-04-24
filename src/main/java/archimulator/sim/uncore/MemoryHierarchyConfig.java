@@ -20,8 +20,8 @@ package archimulator.sim.uncore;
 
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
 import archimulator.sim.uncore.cache.eviction.LRUPolicy;
-import archimulator.sim.uncore.coherence.FirstLevelCacheConfig;
-import archimulator.sim.uncore.coherence.LastLevelCacheConfig;
+import archimulator.sim.uncore.coherence.config.FirstLevelCacheConfig;
+import archimulator.sim.uncore.coherence.config.LastLevelCacheConfig;
 import archimulator.sim.uncore.dram.FixedLatencyMainMemoryConfig;
 import archimulator.sim.uncore.dram.MainMemoryConfig;
 

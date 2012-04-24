@@ -16,10 +16,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.coherence;
+package archimulator.sim.uncore.coherence.config;
 
 import archimulator.sim.uncore.cache.CacheGeometry;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
+import archimulator.sim.uncore.coherence.CoherentCacheLevelType;
 
 public class FirstLevelCacheConfig extends CoherentCacheConfig {
     private int readPorts; //TODO: to be clarified, should not be confused with MSHRs

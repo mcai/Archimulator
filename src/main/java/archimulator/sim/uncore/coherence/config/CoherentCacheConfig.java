@@ -16,17 +16,38 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.coherence;
+package archimulator.sim.uncore.coherence.config;
 
 import archimulator.sim.uncore.cache.CacheGeometry;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
+import archimulator.sim.uncore.coherence.CoherentCacheLevelType;
 
-public class LastLevelCacheConfig extends CoherentCacheConfig {
-    public LastLevelCacheConfig(int size, int associativity, Class<? extends EvictionPolicy> evictionPolicyClz) {
-        this(CoherentCacheLevelType.LAST_LEVEL_CACHE, new CacheGeometry(size, associativity, 64), 10, evictionPolicyClz);
+public abstract class CoherentCacheConfig {
+    private CoherentCacheLevelType levelType;
+    private CacheGeometry geometry;
+    private int hitLatency;
+    private Class<? extends EvictionPolicy> evictionPolicyClz;
+
+    public CoherentCacheConfig(CoherentCacheLevelType levelType, CacheGeometry geometry, int hitLatency, Class<? extends EvictionPolicy> evictionPolicyClz) {
+        this.levelType = levelType;
+        this.geometry = geometry;
+        this.hitLatency = hitLatency;
+        this.evictionPolicyClz = evictionPolicyClz;
     }
 
-    public LastLevelCacheConfig(CoherentCacheLevelType levelType, CacheGeometry geometry, int hitLatency, Class<? extends EvictionPolicy> evictionPolicyClz) {
-        super(levelType, geometry, hitLatency, evictionPolicyClz);
+    public CoherentCacheLevelType getLevelType() {
+        return levelType;
+    }
+
+    public CacheGeometry getGeometry() {
+        return geometry;
+    }
+
+    public int getHitLatency() {
+        return hitLatency;
+    }
+
+    public Class<? extends EvictionPolicy> getEvictionPolicyClz() {
+        return evictionPolicyClz;
     }
 }
