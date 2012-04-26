@@ -29,6 +29,7 @@ import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.eviction.LRUPolicy;
 import archimulator.sim.uncore.coherence.event.CoherentCacheServiceNonblockingRequestEvent;
 import archimulator.util.action.Action1;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -45,6 +46,7 @@ public class LLCHTAwareLRUPolicy<StateT extends Serializable, LineT extends Cach
 
     private IntervalStat totalHtRequests;
     private IntervalStat badHtRequests;
+    private IntervalStat lateHtRequests;
 
     @SuppressWarnings("unchecked")
     public LLCHTAwareLRUPolicy(EvictableCache<StateT, LineT> cache) {
@@ -58,6 +60,7 @@ public class LLCHTAwareLRUPolicy<StateT extends Serializable, LineT extends Cach
 
         this.totalHtRequests = new IntervalStat();
         this.badHtRequests = new IntervalStat();
+        this.lateHtRequests = new IntervalStat();
 
         this.llcHtRequestProfilingCapability.getEventDispatcher().addListener(HTLLCRequestProfilingCapability.HTLLCRequestEvent.class, new Action1<HTLLCRequestProfilingCapability.HTLLCRequestEvent>() {
             @Override
@@ -70,6 +73,13 @@ public class LLCHTAwareLRUPolicy<StateT extends Serializable, LineT extends Cach
             @Override
             public void apply(HTLLCRequestProfilingCapability.BadHTLLCRequestEvent event) {
                 badHtRequests.inc();
+            }
+        });
+
+        this.llcHtRequestProfilingCapability.getEventDispatcher().addListener(HTLLCRequestProfilingCapability.LateHTLLCRequestEvent.class, new Action1<HTLLCRequestProfilingCapability.LateHTLLCRequestEvent>() {
+            @Override
+            public void apply(HTLLCRequestProfilingCapability.LateHTLLCRequestEvent event) {
+                lateHtRequests.inc();
             }
         });
 
@@ -115,10 +125,13 @@ public class LLCHTAwareLRUPolicy<StateT extends Serializable, LineT extends Cach
 
         stats.put(this.getCache().getName() + ".llcHtAwareLRUPolicy.intervals", String.valueOf(this.intervals));
 
-        stats.put(this.getCache().getName() + ".llcHtAwareLRUPolicy.currentInterval.badHtRequests", String.valueOf(this.badHtRequests));
         stats.put(this.getCache().getName() + ".llcHtAwareLRUPolicy.currentInterval.totalHtRequests", String.valueOf(this.totalHtRequests));
+        stats.put(this.getCache().getName() + ".llcHtAwareLRUPolicy.currentInterval.badHtRequests", String.valueOf(this.badHtRequests));
+        stats.put(this.getCache().getName() + ".llcHtAwareLRUPolicy.currentInterval.lateHtRequests", String.valueOf(this.lateHtRequests));
 
         stats.put(this.getCache().getName() + ".llcHtAwareLRUPolicy.currentInterval.htRequestCachePollution", String.valueOf(this.htRequestCachePollution));
+
+        stats.put(this.getCache().getName() + ".llcHtAwareLRUPolicy.stat", String.format("n: %d, sum: %.4f, std dev: %.4f, mean: %.4f, min: %.4f, max: %.4f\n", stat.getN(), stat.getSum(), stat.getStandardDeviation(), stat.getMean(), stat.getMin(), stat.getMax()));
     }
 
     @Override
@@ -146,11 +159,20 @@ public class LLCHTAwareLRUPolicy<StateT extends Serializable, LineT extends Cach
         }
     }
 
+    private DescriptiveStatistics stat = new DescriptiveStatistics();
+
     private void newInterval() {
-        long numBadHtRequests = this.badHtRequests.newInterval();
         long numTotalHtRequests = this.totalHtRequests.newInterval();
+        long numBadHtRequests = this.badHtRequests.newInterval();
+        long numLateHtRequests = this.lateHtRequests.newInterval();
 
         double pollution = this.getHtRequestPollution(numBadHtRequests, numTotalHtRequests);
+        double lateness = this.getHtRequestLateness(numLateHtRequests, numTotalHtRequests);
+
+//        stat.addValue(pollution);
+//        stat.addValue(numTotalHtRequests);
+        stat.addValue(numBadHtRequests);
+//        stat.addValue(numLateHtRequests);
 
         if (pollution > htRequestCachePollutionDegreeHighThreshold) {
             this.htRequestCachePollution = HTRequestCachePollution.HIGH;
@@ -163,6 +185,10 @@ public class LLCHTAwareLRUPolicy<StateT extends Serializable, LineT extends Cach
 
     private double getHtRequestPollution(long numBadHtRequests, long numTotalHtRequests) {
         return (double) numBadHtRequests / numTotalHtRequests;
+    }
+
+    private double getHtRequestLateness(long numLateHtRequests, long numTotalHtRequests) {
+        return (double) numLateHtRequests / numTotalHtRequests;
     }
 
     private enum HTRequestCachePollution {

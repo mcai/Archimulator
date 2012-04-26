@@ -153,6 +153,7 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
 
         if (!requesterIsHT && lineFoundIsHT) {
             this.numLateHTLLCRequests++;
+            this.eventDispatcher.dispatch(new LateHTLLCRequestEvent());
         }
     }
 
@@ -314,5 +315,8 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
     }
     
     public class BadHTLLCRequestEvent extends HTLLCRequestProfilingCapabilityEvent {
+    }
+
+    public class LateHTLLCRequestEvent extends HTLLCRequestProfilingCapabilityEvent {
     }
 }
