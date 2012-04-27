@@ -131,7 +131,7 @@ public class LLCHTAwareLRUPolicy<StateT extends Serializable, LineT extends Cach
 
         stats.put(this.getCache().getName() + ".llcHtAwareLRUPolicy.currentInterval.htRequestCachePollution", String.valueOf(this.htRequestCachePollution));
 
-        stats.put(this.getCache().getName() + ".llcHtAwareLRUPolicy.stat", String.format("n: %d, sum: %.4f, std dev: %.4f, mean: %.4f, min: %.4f, max: %.4f\n", stat.getN(), stat.getSum(), stat.getStandardDeviation(), stat.getMean(), stat.getMin(), stat.getMax()));
+        stats.put(this.getCache().getName() + ".llcHtAwareLRUPolicy.stat", String.format("n: %d, sum: %.4f, std dev: %.4f, mean: %.4f, min: %.4f, max: %.4f", stat.getN(), stat.getSum(), stat.getStandardDeviation(), stat.getMean(), stat.getMin(), stat.getMax()));
     }
 
     @Override

@@ -14,8 +14,8 @@ public class Presets {
 //            "10000");
 //            "100");
 //            "200");
-            "400");
-//            "1024");
+//            "400");
+            "1024");
 //            "2000");
 //            "4000");
     public static final SimulatedProgram SIMULATED_PROGRAM_EM3D_BASELINE = new SimulatedProgram(
@@ -42,8 +42,8 @@ public class Presets {
 //                "10000");
 //                "100");
 //                "200");
-                "400");
-//                "1024");
+//                "400");
+                "1024");
 //                "2000");
 //                "4000");
         program.setHelperThreadedProgram(true);

@@ -91,18 +91,18 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
             public void apply(PseudocallEncounteredEvent event) {
                 if(event.getImm() == 3820) {
                     savedRegisterValue.set(event.getContext().getRegs().getGpr(event.getRs()));
-                    event.getContext().getRegs().setGpr(event.getRs(), random.nextInt(100)); //TODO: incorporate lookahead and stride calculation algorithm
+//                    event.getContext().getRegs().setGpr(event.getRs(), random.nextInt(100)); //TODO: incorporate lookahead and stride calculation algorithm
 //                    event.getContext().getRegs().setGpr(event.getRs(), 640); //TODO: incorporate lookahead and stride calculation algorithm
-//                    event.getContext().getRegs().setGpr(event.getRs(), 20); //TODO: incorporate lookahead and stride calculation algorithm
+                    event.getContext().getRegs().setGpr(event.getRs(), 20); //TODO: incorporate lookahead and stride calculation algorithm
                 }
                 else if(event.getImm() == 3821) {
                     event.getContext().getRegs().setGpr(event.getRs(), savedRegisterValue.get());
                 }
                 else if(event.getImm() == 3822) {
                     savedRegisterValue.set(event.getContext().getRegs().getGpr(event.getRs()));
-                    event.getContext().getRegs().setGpr(event.getRs(), random.nextInt(100)); //TODO: incorporate lookahead and stride calculation algorithm
+//                    event.getContext().getRegs().setGpr(event.getRs(), random.nextInt(100)); //TODO: incorporate lookahead and stride calculation algorithm
 //                    event.getContext().getRegs().setGpr(event.getRs(), 320); //TODO: incorporate lookahead and stride calculation algorithm
-//                    event.getContext().getRegs().setGpr(event.getRs(), 10); //TODO: incorporate lookahead and stride calculation algorithm
+                    event.getContext().getRegs().setGpr(event.getRs(), 10); //TODO: incorporate lookahead and stride calculation algorithm
                 }
                 else if(event.getImm() == 3823) {
                     event.getContext().getRegs().setGpr(event.getRs(), savedRegisterValue.get());
