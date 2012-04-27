@@ -36,7 +36,7 @@
 \paperfontsize default
 \spacing single
 \use_hyperref true
-\pdf_title "Pollution-Aware Feedback Directed Helper Threaded Inter-Core Data Prefetching"
+\pdf_title "Feedback Directed Helper Threaded Inter-Core Data Prefetching"
 \pdf_author "Min Cai, Zhimin Gu"
 \pdf_keywords "chip multiprocessors, helper threaded inter-core data prefetching, cache replacement, cache pollution"
 \pdf_bookmarks false
@@ -83,7 +83,11 @@
 \begin_body
 
 \begin_layout Title
-Pollution-Aware Feedback Directed Helper Threaded Inter-Core Data Prefetching
+Feedback Directed Helper Threaded 
+\begin_inset Newline newline
+\end_inset
+
+Inter-Core Data Prefetching
 \end_layout
 
 \begin_layout Author
@@ -411,38 +415,56 @@ Pollution Aware Taxonomy of HT LLC Requests
 \end_layout
 
 \begin_layout Subsection
-A Taxonomy Based on HT-MT Inter-Thread and MT Intra-Thread Reuse Distances
+The Notion of Inter-Thread Reuse Distance in the HT Scheme
 \end_layout
 
 \begin_layout Standard
-We propose a pollution aware taxonomy of HT LLC requests based on the observed
- cache pollution caused by HT LLC requests.
-\end_layout
-
-\begin_layout Standard
-The notion of inter-thread reuse distance is proposed to help explain the
- taxonomy.
+The notion of reuse distance can shed light on how a pollution-aware taxonomy
+ of HT LLC requests can be constructed.
  The traditional intra-thread reuse distance of a reference to data element
  x is defined as the number of distinct data elements that have been referenced
  between two contiguous accesses of x (or ∞ if the element has not been
  referenced thereafter).
- These two contiguous accesses are issued by the same thread in the traditional
- notion.
+ Thus, these two contiguous accesses are issued by the same thread in the
+ traditional notion.
  To accomodate the case where one thread Tb accesses data element x that
  has been previously brought into the cache by another thread Ta, we introduce
  the notion of Ta-Tb inter-thread reuse distance, as compared to the traditional
- intra-thread reuse distance.
- Therefore, we could use HT-MT inter-thread reuse distance to describe the
- case where the main thread accesses data element x that has been previously
- brought into the LLC by the helper thread.
- 
+ intra-thread reuse distance applied to either Ta or Tb.
+\end_layout
+
+\begin_layout Standard
+To show why the notion of inter-thread reuse distance is important in the
+ HT scheme as compared to the traditional notion of intra-thread reuse distance,
+ we can consider the mst benchmark in the Olden suite.
+ Its pointer traversing code structure inherently exhibits irregular memory
+ access pattern in its original, single threaded version, which renders
+ the common LRU replacement policy inefficient to reduce LLC misses.
+ Here we use RD_MT to refer to the intra-thread reuse distance in the main
+ thread, and ITRD_HT_MT to refer to the inter-thread reuse distance between
+ HT and MT where a data element is first brought to LLC by HT, and later
+ on used by MT.
+ Therefore, the values of RD_MT in most MT LLC requests is high which reflects
+ the irregular memory access pattern in mst.
+ However, the values of ITRD_HT_MT in HT LLC requests should be very low
+ when the HT scheme is efficient to reduce LLC misses in MT; otherwise,
+ high values of ITRD_HT_MT indicate the inefficiency of the HT scheme where
+ most data brought by HT is replaced before used by MT.
+\end_layout
+
+\begin_layout Subsection
+Pollution Aware Taxonomy of HT LLC Requests
 \end_layout
 
 \begin_layout Standard
 Based on the notions of HT-MT inter-thread reuse distance (HT-MT_ITRD) and
- MT intra-thread reuse distance (MT_RD), we can classify the HT LLC requests
- into three types: good, bad and ugly.
- Let's assume that when an HT LLC request with data 
+ MT intra-thread reuse distance (MT_RD), we can construct a pollution aware
+ taxonomy of HT LLC requests where HT LLC requests are classified into three
+ types: good, bad and ugly.
+\end_layout
+
+\begin_layout Standard
+Let's assume that when an HT LLC request with data 
 \family typewriter
 d
 \family default
@@ -474,7 +496,14 @@ v
 \family typewriter
 m
 \family default
-) , indicating it's a good HT request;
+) , indicating it's a 
+\family typewriter
+\shape italic
+good HT request
+\family default
+\shape default
+ whose data is hit by MT before evicted.
+ It has posive impact on MT performance since it reduce one MT miss;
 \end_layout
 
 \begin_layout Enumerate
@@ -490,8 +519,15 @@ d
 \family typewriter
 m
 \family default
-) , indicating it's a bad HT request in which data brought by HT displaces
- an LLC line that will later be needed by MT; 
+) , indicating it's a 
+\family typewriter
+\shape italic
+bad HT request
+\family default
+\shape default
+ whose data displaces an LLC line that will later be needed by MT.
+ It is harmful for MT performance which should be prevented as much as possible;
+ 
 \end_layout
 
 \begin_layout Enumerate
@@ -507,202 +543,39 @@ d
 \family typewriter
 m
 \family default
-), indicating it's an ugly HT request.
+), indicating it's an 
+\family typewriter
+\shape italic
+ugly HT request
+\family default
+\shape default
+ which is not either good or bad.
+ It has little performance impact on MT performance because the requested
+ data is not referenced by MT before evicted and it does not evict any data
+ that will be used by MT.
 \end_layout
 
 \begin_layout Standard
-As illustrated in Tab.
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "tab:HT-Request-Taxonomy"
-
-\end_inset
-
-, among these three types of HT requests, good HT requests have positive
- impact on MT performance.
- Ugly HT requests have little performance impact on MT performance because
- the requested data are not referenced by MT before evicted and they do
- not evict any data that will be used by MT.
- Bad HT requests are harmful for MT performance which should be prevented
- as much as possible.
+Good HT LLC requests can be further divided into timely requests and late
+ requests.
+ An HT request is called 
+\family typewriter
+\shape italic
+late HT request
+\family default
+\shape default
+ if the data is hit in LLC MSHRs by an MT request where it is brought from
+ memory by HT.
+ Late HT requests only partially hide the LLC miss latency in MT requests,
+ but they are good indicators for potential performance improvement of the
+ HT scheme because late HT requests may be converted to timely or normal
  
-\end_layout
-
-\begin_layout Standard
-Among good HT requests, late HT requests should be differentiated, which
- are in-flight HT LLC requests that are hit by MT LLC requests, as they
- are good indicators for potential performance improvement of the HT scheme
- because late HT requests may be converted to timely HT requests by finetuning
- the parameters of the HT scheme.
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset Float table
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-HT Request Taxonomy
-\begin_inset CommandInset label
-LatexCommand label
-name "tab:HT-Request-Taxonomy"
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\align center
-
-\size scriptsize
-\begin_inset Tabular
-<lyxtabular version="3" rows="4" columns="2">
-<features tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0">
-<column alignment="left" valignment="top" width="0">
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-Name
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-Description
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-Good HT requests
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-HT requests that hit by MT before evicted
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-Bad HT requests
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-\begin_inset Box Frameless
-position "t"
-hor_pos "c"
-has_inner_box 1
-inner_pos "t"
-use_parbox 0
-use_makebox 0
-width "68col%"
-special "none"
-height "1.1in"
-height_special "totalheight"
-status open
-
-\begin_layout Plain Layout
-
-\size scriptsize
-HT requests whose requested data are used later (or not used at all) by
- MT than the evicted data
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-Ugly HT requests
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-Requests that are not good or bad
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
+\family typewriter
+\shape italic
+good HT requests
+\family default
+\shape default
+ by finetuning the parameters of the HT scheme.
 \end_layout
 
 \begin_layout Subsection
