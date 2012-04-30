@@ -113,6 +113,6 @@ public class MemoryHierarchyAccess {
     public String toString() {
 //        return String.format("%d %s %s @ {virtualPc=0x%08x, physicalAddress=0x%08x, physicalTag=0x%08x, dynamicInst=%s}", id, thread.getName(), type, virtualPc, physicalAddress, physicalTag, dynamicInst);
 //        return String.format("%s 0x%08x %s {id=%d, physicalTag=0x%08x}", thread.getName(), virtualPc, type, id, physicalTag);
-        return String.format("%s 0x%08x: 0x%08x %s", thread.getName(), virtualPc, physicalTag, type);
+        return String.format("%s {%d} 0x%08x: 0x%08x %s", thread.getName(), id, virtualPc, physicalTag, type);
     }
 }
