@@ -20,17 +20,17 @@ package archimulator.sim.uncore.cache;
 
 import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
-import archimulator.sim.uncore.coherence.CoherentCache;
+import archimulator.sim.uncore.coherence.common.CoherentCache;
 
 public class CacheReference {
-    private CoherentCache<?> coherentCache;
+    private CoherentCache coherentCache;
     private MemoryHierarchyAccess access;
     private int set;
     private int address;
     private int tag;
     private CacheAccessType accessType;
 
-    public CacheReference(CoherentCache<?> coherentCache, MemoryHierarchyAccess access, int address, int tag, CacheAccessType accessType, int set) {
+    public CacheReference(CoherentCache coherentCache, MemoryHierarchyAccess access, int address, int tag, CacheAccessType accessType, int set) {
         this.coherentCache = coherentCache;
         this.access = access;
         this.set = set;
@@ -39,7 +39,7 @@ public class CacheReference {
         this.accessType = accessType;
     }
 
-    public CoherentCache<?> getCoherentCache() {
+    public CoherentCache getCoherentCache() {
         return coherentCache;
     }
 

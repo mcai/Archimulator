@@ -21,7 +21,7 @@ package archimulator.sim.uncore.coherence.event;
 import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.CacheLine;
-import archimulator.sim.uncore.coherence.CoherentCache;
+import archimulator.sim.uncore.coherence.common.CoherentCache;
 
 public class CoherentCacheServiceNonblockingRequestEvent extends CoherentCacheEvent {
     private int address;
@@ -31,7 +31,7 @@ public class CoherentCacheServiceNonblockingRequestEvent extends CoherentCacheEv
     private boolean eviction;
     private CacheAccessType accessType;
 
-    public CoherentCacheServiceNonblockingRequestEvent(CoherentCache<?> cache, int address, MemoryHierarchyAccess requesterAccess, CacheLine<?> lineFound, boolean hitInCache, boolean eviction, CacheAccessType accessType) {
+    public CoherentCacheServiceNonblockingRequestEvent(CoherentCache cache, int address, MemoryHierarchyAccess requesterAccess, CacheLine<?> lineFound, boolean hitInCache, boolean eviction, CacheAccessType accessType) {
         super(cache);
 
         this.address = address;

@@ -16,33 +16,25 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.coherence.event;
+package archimulator.sim.uncore.coherence.llc.process;
 
+import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
-import archimulator.sim.uncore.cache.CacheAccess;
-import archimulator.sim.uncore.coherence.common.CoherentCache;
+import archimulator.sim.uncore.coherence.common.process.FindAndLockProcess;
+import archimulator.sim.uncore.coherence.common.process.LockingProcess;
+import archimulator.sim.uncore.coherence.llc.LastLevelCache;
 
-public class CoherentCacheBeginCacheAccessEvent extends CoherentCacheEvent {
-    private MemoryHierarchyAccess access;
-    private CacheAccess<?, ?> cacheAccess;
-
-    public CoherentCacheBeginCacheAccessEvent(CoherentCache cache, MemoryHierarchyAccess access, CacheAccess<?, ?> cacheAccess) {
-        super(cache);
-
-        this.cacheAccess = cacheAccess;
-        this.access = access;
-    }
-
-    public MemoryHierarchyAccess getAccess() {
-        return access;
-    }
-
-    public CacheAccess<?, ?> getCacheAccess() {
-        return cacheAccess;
+public abstract class LastLevelCacheLockingProcess extends LockingProcess {
+    public LastLevelCacheLockingProcess(LastLevelCache cache, final MemoryHierarchyAccess access, final int tag, final CacheAccessType cacheAccessType) {
+        super(cache, access, tag, cacheAccessType);
     }
 
     @Override
-    public String toString() {
-        return String.format("CoherentCacheBeginCacheAccessEvent{access=%s, cache.name=%s}", access, getCache().getCache().getName());
+    public FindAndLockProcess newFindAndLockProcess(CacheAccessType cacheAccessType) {
+        return new LastLevelCacheFindAndLockProcess(getCache(), this.access, this.tag, cacheAccessType);
+    }
+
+    public LastLevelCache getCache() {
+        return (LastLevelCache) super.getCache();
     }
 }

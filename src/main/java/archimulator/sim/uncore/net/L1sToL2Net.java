@@ -19,7 +19,7 @@
 package archimulator.sim.uncore.net;
 
 import archimulator.sim.uncore.CacheHierarchy;
-import archimulator.sim.uncore.coherence.FirstLevelCache;
+import archimulator.sim.uncore.coherence.flc.FirstLevelCache;
 
 public class L1sToL2Net extends Net {
     public L1sToL2Net(CacheHierarchy cacheHierarchy) {

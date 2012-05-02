@@ -19,12 +19,12 @@
 package archimulator.sim.uncore.coherence.event;
 
 import archimulator.sim.uncore.cache.CacheLine;
-import archimulator.sim.uncore.coherence.CoherentCache;
+import archimulator.sim.uncore.coherence.common.CoherentCache;
 
 public class FirstLevelCacheLineEvictedByL2UpwardWriteProcessEvent extends CoherentCacheEvent {
     private CacheLine<?> lineToInvalidate;
 
-    public FirstLevelCacheLineEvictedByL2UpwardWriteProcessEvent(CoherentCache<?> cache, CacheLine<?> lineToInvalidate) {
+    public FirstLevelCacheLineEvictedByL2UpwardWriteProcessEvent(CoherentCache cache, CacheLine<?> lineToInvalidate) {
         super(cache);
 
         this.lineToInvalidate = lineToInvalidate;

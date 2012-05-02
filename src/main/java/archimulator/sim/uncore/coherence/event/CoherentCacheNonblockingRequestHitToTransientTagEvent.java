@@ -20,14 +20,14 @@ package archimulator.sim.uncore.coherence.event;
 
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.CacheLine;
-import archimulator.sim.uncore.coherence.CoherentCache;
+import archimulator.sim.uncore.coherence.common.CoherentCache;
 
 public class CoherentCacheNonblockingRequestHitToTransientTagEvent extends CoherentCacheEvent {
     private int address;
     private MemoryHierarchyAccess requesterAccess;
     private CacheLine<?> lineFound;
 
-    public CoherentCacheNonblockingRequestHitToTransientTagEvent(CoherentCache<?> cache, int address, MemoryHierarchyAccess requesterAccess, CacheLine<?> lineFound) {
+    public CoherentCacheNonblockingRequestHitToTransientTagEvent(CoherentCache cache, int address, MemoryHierarchyAccess requesterAccess, CacheLine<?> lineFound) {
         super(cache);
 
         this.address = address;

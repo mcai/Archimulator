@@ -20,7 +20,7 @@ package archimulator.sim.uncore.coherence.config;
 
 import archimulator.sim.uncore.cache.CacheGeometry;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
-import archimulator.sim.uncore.coherence.CoherentCacheLevelType;
+import archimulator.sim.uncore.coherence.common.CoherentCacheLevelType;
 
 public class FirstLevelCacheConfig extends CoherentCacheConfig {
     private int readPorts; //TODO: to be clarified, should not be confused with MSHRs

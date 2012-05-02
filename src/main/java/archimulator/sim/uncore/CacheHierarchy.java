@@ -19,8 +19,8 @@
 package archimulator.sim.uncore;
 
 import archimulator.sim.base.simulation.SimulationObject;
-import archimulator.sim.uncore.coherence.FirstLevelCache;
-import archimulator.sim.uncore.coherence.LastLevelCache;
+import archimulator.sim.uncore.coherence.flc.FirstLevelCache;
+import archimulator.sim.uncore.coherence.llc.LastLevelCache;
 import archimulator.sim.uncore.dram.MainMemory;
 import archimulator.sim.uncore.net.L2ToMemNet;
 import archimulator.sim.uncore.net.Net;

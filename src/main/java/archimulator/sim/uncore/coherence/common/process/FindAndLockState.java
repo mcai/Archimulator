@@ -16,19 +16,14 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.coherence.event;
+package archimulator.sim.uncore.coherence.common.process;
 
-import archimulator.sim.uncore.coherence.common.CoherentCache;
-import archimulator.util.event.BlockingEvent;
-
-public abstract class CoherentCacheEvent implements BlockingEvent {
-    private CoherentCache cache;
-
-    public CoherentCacheEvent(CoherentCache cache) {
-        this.cache = cache;
-    }
-
-    public CoherentCache getCache() {
-        return cache;
-    }
+public enum FindAndLockState {
+    READY,
+    ACQUIRED,
+    EVICTING,
+    WAITING,
+    RELEASED,
+    FAILED,
+    BYPASSED
 }

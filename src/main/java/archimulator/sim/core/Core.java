@@ -19,7 +19,7 @@
 package archimulator.sim.core;
 
 import archimulator.sim.uncore.MemoryHierarchyCore;
-import archimulator.sim.uncore.coherence.FirstLevelCache;
+import archimulator.sim.uncore.coherence.flc.FirstLevelCache;
 import archimulator.util.action.Action;
 
 import java.util.List;

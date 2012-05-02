@@ -20,8 +20,8 @@
 //
 //import archimulator.sim.uncore.cache.CacheGeometry;
 //import archimulator.sim.uncore.cache.eviction.LRUPolicy;
-//import archimulator.sim.uncore.coherence.FirstLevelCache;
-//import archimulator.sim.uncore.coherence.LastLevelCache;
+//import archimulator.sim.uncore.coherence.flc.FirstLevelCache;
+//import archimulator.sim.uncore.coherence.llc.LastLevelCache;
 //import archimulator.sim.uncore.dram.*;
 //import archimulator.sim.uncore.tlb.TranslationLookasideBuffer;
 //import archimulator.sim.uncore.tlb.TranslationLookasideBufferConfig;

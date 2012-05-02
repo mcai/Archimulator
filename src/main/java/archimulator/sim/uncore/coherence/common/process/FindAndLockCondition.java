@@ -16,10 +16,15 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.coherence;
+package archimulator.sim.uncore.coherence.common.process;
 
-public enum CoherentCacheLevelType {
-    FIRST_LEVEL_CACHE,
-    MIDDLE_LEVEL_CACHE,
-    LAST_LEVEL_CACHE
+public enum FindAndLockCondition {
+    BEGIN_EVICTING,
+    EVICTED,
+    FAILED_TO_LOCK,
+    NO_EVICTION,
+    WAIT_FOR_UNLOCK,
+    UNLOCKED,
+    BYPASS,
+    COMPLETED
 }

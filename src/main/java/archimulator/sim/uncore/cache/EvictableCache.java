@@ -23,7 +23,7 @@ import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicyFactory;
-import archimulator.sim.uncore.coherence.CoherentCache;
+import archimulator.sim.uncore.coherence.common.CoherentCache;
 import archimulator.util.action.Function3;
 
 import java.io.Serializable;
@@ -45,7 +45,7 @@ public class EvictableCache<StateT extends Serializable, LineT extends CacheLine
         return this.newAccess(null, access, address, accessType);
     }
 
-    public CacheAccess<StateT, LineT> newAccess(CoherentCache<StateT> coherentCache, MemoryHierarchyAccess access, int address, CacheAccessType accessType) {
+    public CacheAccess<StateT, LineT> newAccess(CoherentCache coherentCache, MemoryHierarchyAccess access, int address, CacheAccessType accessType) {
         LineT line = this.findLine(address);
 
         int set = this.getSet(address);
@@ -57,11 +57,11 @@ public class EvictableCache<StateT extends Serializable, LineT extends CacheLine
         }
     }
 
-    private CacheHit<StateT, LineT> newHit(CoherentCache<StateT> coherentCache, MemoryHierarchyAccess access, int set, int address, CacheAccessType accessType, int way) {
+    private CacheHit<StateT, LineT> newHit(CoherentCache coherentCache, MemoryHierarchyAccess access, int set, int address, CacheAccessType accessType, int way) {
         return new CacheHit<StateT, LineT>(this, new CacheReference(coherentCache, access, address, this.getTag(address), accessType, set), way);
     }
 
-    private CacheMiss<StateT, LineT> newMiss(CoherentCache<StateT> coherentCache, MemoryHierarchyAccess access, int set, int address, CacheAccessType accessType) {
+    private CacheMiss<StateT, LineT> newMiss(CoherentCache coherentCache, MemoryHierarchyAccess access, int set, int address, CacheAccessType accessType) {
         CacheReference reference = new CacheReference(coherentCache, access, address, this.getTag(address), accessType, set);
 
         for (int way = 0; way < this.getAssociativity(); way++) {

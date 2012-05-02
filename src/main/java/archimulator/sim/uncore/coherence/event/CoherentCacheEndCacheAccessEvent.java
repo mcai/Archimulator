@@ -20,14 +20,14 @@ package archimulator.sim.uncore.coherence.event;
 
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.CacheAccess;
-import archimulator.sim.uncore.coherence.CoherentCache;
+import archimulator.sim.uncore.coherence.common.CoherentCache;
 
 public class CoherentCacheEndCacheAccessEvent extends CoherentCacheEvent {
     private MemoryHierarchyAccess access;
     private CacheAccess<?, ?> cacheAccess;
     private boolean aborted;
 
-    public CoherentCacheEndCacheAccessEvent(CoherentCache<?> cache, MemoryHierarchyAccess access, CacheAccess<?, ?> cacheAccess, boolean aborted) {
+    public CoherentCacheEndCacheAccessEvent(CoherentCache cache, MemoryHierarchyAccess access, CacheAccess<?, ?> cacheAccess, boolean aborted) {
         super(cache);
 
         this.cacheAccess = cacheAccess;

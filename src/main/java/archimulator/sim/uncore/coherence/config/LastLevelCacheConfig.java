@@ -20,7 +20,7 @@ package archimulator.sim.uncore.coherence.config;
 
 import archimulator.sim.uncore.cache.CacheGeometry;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
-import archimulator.sim.uncore.coherence.CoherentCacheLevelType;
+import archimulator.sim.uncore.coherence.common.CoherentCacheLevelType;
 
 public class LastLevelCacheConfig extends CoherentCacheConfig {
     public LastLevelCacheConfig(int size, int associativity, Class<? extends EvictionPolicy> evictionPolicyClz) {

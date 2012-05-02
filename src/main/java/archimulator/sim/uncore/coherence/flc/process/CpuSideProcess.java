@@ -16,11 +16,32 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.coherence;
+package archimulator.sim.uncore.coherence.flc.process;
 
-public enum MESIState {
-    MODIFIED,
-    EXCLUSIVE,
-    SHARED,
-    INVALID
+import archimulator.sim.uncore.CacheAccessType;
+import archimulator.sim.uncore.MemoryHierarchyAccess;
+import archimulator.sim.uncore.coherence.exception.CoherentCacheException;
+import archimulator.sim.uncore.coherence.flc.FirstLevelCache;
+
+public abstract class CpuSideProcess extends FirstLevelCacheLockingProcess {
+    private boolean error;
+
+    public CpuSideProcess(FirstLevelCache cache, MemoryHierarchyAccess access, int tag, CacheAccessType cacheAccessType) {
+        super(cache, access, tag, cacheAccessType);
+    }
+
+    @Override
+    public boolean processPendingActions() throws CoherentCacheException {
+        try {
+            return error || super.processPendingActions();
+        } catch (CoherentCacheException e) {
+            this.error = true;
+            this.complete();
+            return true;
+        }
+    }
+
+    public boolean isError() {
+        return error;
+    }
 }
