@@ -18,5 +18,5 @@
  ******************************************************************************/
 package archimulator.sim.uncore.coherence.exception;
 
-public class CoherentCacheException extends Exception {
+public class CoherentCacheException extends RuntimeException {
 }
