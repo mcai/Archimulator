@@ -47,13 +47,4 @@ public class L2UpwardWriteProcess extends FirstLevelCacheLockingProcess {
             }
         });
     }
-
-    @Override
-    public boolean processPendingActions() throws CoherentCacheException {
-        try {
-            return super.processPendingActions();
-        } catch (CoherentCacheException e) {
-            throw new RuntimeException(e);
-        }
-    }
 }
