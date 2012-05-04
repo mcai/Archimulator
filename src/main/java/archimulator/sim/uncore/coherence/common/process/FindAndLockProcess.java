@@ -50,7 +50,8 @@ public abstract class FindAndLockProcess extends CoherentCacheProcess {
                 if (cacheAccess.isEviction()) {
                     evict(access, new Action() {
                         public void apply() {
-                            fsm.fireTransition(FindAndLockCondition.EVICTED);
+                            fsm.fireTransition(FindAndLockCondition.END_EVICT);
+                            cacheAccess.getLine().endEvict();
                         }
                     });
                 }
@@ -88,19 +89,24 @@ public abstract class FindAndLockProcess extends CoherentCacheProcess {
                     this.fsm.fireTransition(FindAndLockCondition.FAILED_TO_LOCK);
                 }
                 else {
-                    if (this.cacheAccess.getLine().lock(new Action() {
+                    Action action = new Action() {
                         public void apply() {
                             fsm.fireTransition(FindAndLockCondition.UNLOCK);
                             doLockingProcess(access, tag, cacheAccessType);
                         }
-                    }, tag)) {
+                    };
+
+                    boolean result = this.cacheAccess.isHitInCache() ? this.cacheAccess.getLine().beginHit(action, tag) :
+                        (this.cacheAccess.isEviction() ? this.cacheAccess.getLine().beginEvict(action, tag) : this.cacheAccess.getLine().beginFill(action, tag));
+
+                    if (result) {
                         if (!cacheAccessType.isUpward()) {
                             this.getCache().getBlockingEventDispatcher().dispatch(new CoherentCacheServiceNonblockingRequestEvent(this.getCache(), tag, access, this.cacheAccess.getLine(), this.cacheAccess.isHitInCache(), this.cacheAccess.isEviction(), this.cacheAccess.getReference().getAccessType()));
                         }
 
                         if (this.cacheAccess.isEviction()) {
                             getCache().incEvictions();
-                            this.fsm.fireTransition(FindAndLockCondition.BEGIN_EVICTING);
+                            this.fsm.fireTransition(FindAndLockCondition.BEGIN_EVICT);
                         } else {
                             this.fsm.fireTransition(FindAndLockCondition.NO_EVICTION);
                         }
@@ -148,7 +154,7 @@ public abstract class FindAndLockProcess extends CoherentCacheProcess {
                         return FindAndLockState.ACQUIRED;
                     }
                 })
-                .onCondition(FindAndLockCondition.BEGIN_EVICTING, new Function1X<FiniteStateMachine<FindAndLockState, FindAndLockCondition>, FindAndLockState>() {
+                .onCondition(FindAndLockCondition.BEGIN_EVICT, new Function1X<FiniteStateMachine<FindAndLockState, FindAndLockCondition>, FindAndLockState>() {
                     @Override
                     public FindAndLockState apply(FiniteStateMachine<FindAndLockState, FindAndLockCondition> param1, Object... otherParams) {
                         return FindAndLockState.EVICTING;
@@ -169,7 +175,7 @@ public abstract class FindAndLockProcess extends CoherentCacheProcess {
                 });
 
         fsmFactory.inState(FindAndLockState.EVICTING)
-                .onCondition(FindAndLockCondition.EVICTED, new Function1X<FiniteStateMachine<FindAndLockState, FindAndLockCondition>, FindAndLockState>() {
+                .onCondition(FindAndLockCondition.END_EVICT, new Function1X<FiniteStateMachine<FindAndLockState, FindAndLockCondition>, FindAndLockState>() {
                     @Override
                     public FindAndLockState apply(FiniteStateMachine<FindAndLockState, FindAndLockCondition> param1, Object... otherParams) {
                         return FindAndLockState.ACQUIRED;

@@ -19,8 +19,8 @@
 package archimulator.sim.uncore.coherence.common.process;
 
 public enum FindAndLockCondition {
-    BEGIN_EVICTING,
-    EVICTED,
+    BEGIN_EVICT,
+    END_EVICT,
     FAILED_TO_LOCK,
     NO_EVICTION,
     WAIT_FOR_UNLOCK,
