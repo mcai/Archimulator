@@ -20,7 +20,10 @@ package archimulator.sim.uncore.coherence.flc.process;
 
 import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
-import archimulator.sim.uncore.coherence.common.process.FindAndLockProcess;
+import archimulator.sim.uncore.cache.CacheAccess;
+import archimulator.sim.uncore.coherence.common.LockableCacheLine;
+import archimulator.sim.uncore.coherence.common.MESIState;
+import archimulator.sim.uncore.coherence.common.process.CoherentCacheProcess;
 import archimulator.sim.uncore.coherence.common.process.LockingProcess;
 import archimulator.sim.uncore.coherence.flc.FirstLevelCache;
 
@@ -30,8 +33,8 @@ public abstract class FirstLevelCacheLockingProcess extends LockingProcess {
     }
 
     @Override
-    public FindAndLockProcess newFindAndLockProcess(CacheAccessType cacheAccessType) {
-        return new FirstLevelCacheFindAndLockProcess(getCache(), this.access, this.tag, cacheAccessType);
+    protected CoherentCacheProcess newEvictProcess(MemoryHierarchyAccess access, CacheAccess<MESIState, LockableCacheLine> cacheAccess) {
+        return new EvictProcess(getCache(), access, cacheAccess);
     }
 
     @Override

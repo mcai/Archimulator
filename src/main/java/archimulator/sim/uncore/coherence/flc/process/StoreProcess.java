@@ -32,9 +32,7 @@ public class StoreProcess extends CpuSideProcess {
             @Override
             public boolean apply() {
                 findAndLockProcess.getCacheAccess().getLine().setNonInitialState(MESIState.MODIFIED);
-
                 findAndLockProcess.getCacheAccess().commit().getLine().unlock();
-
                 return true;
             }
         });
@@ -45,7 +43,6 @@ public class StoreProcess extends CpuSideProcess {
                 if (findAndLockProcess.getCacheAccess().getLine().getState() == MESIState.SHARED || findAndLockProcess.getCacheAccess().getLine().getState() == MESIState.INVALID) {
                     getPendingActions().push(new DownwardWriteProcess(getCache(), access, access.getPhysicalTag()));
                 }
-
                 return true;
             }
         });

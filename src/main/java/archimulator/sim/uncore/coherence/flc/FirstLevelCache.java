@@ -170,7 +170,7 @@ public class FirstLevelCache extends CoherentCache {
                 if (!loadProcess.isError()) {
                     onCompletedCallback.apply();
                 } else {
-                    getCycleAccurateEventQueue().schedule(new NamedAction("FirstLevelCache.retry(receiveIfetch)") {
+                    getCycleAccurateEventQueue().schedule(new Action() {
                         public void apply() {
                             receiveIfetch(access, onCompletedCallback);
                         }
@@ -186,7 +186,7 @@ public class FirstLevelCache extends CoherentCache {
                 if (!loadProcess.isError()) {
                     onCompletedCallback.apply();
                 } else {
-                    getCycleAccurateEventQueue().schedule(new NamedAction("FirstLevelCache.retry(receiveLoad)") {
+                    getCycleAccurateEventQueue().schedule(new Action() {
                         public void apply() {
                             receiveLoad(access, onCompletedCallback);
                         }
@@ -202,7 +202,7 @@ public class FirstLevelCache extends CoherentCache {
                 if (!storeProcess.isError()) {
                     onCompletedCallback.apply();
                 } else {
-                    getCycleAccurateEventQueue().schedule(new NamedAction("FirstLevelCache.retry(receiveStore)") {
+                    getCycleAccurateEventQueue().schedule(new Action() {
                         public void apply() {
                             receiveStore(access, onCompletedCallback);
                         }
@@ -221,10 +221,10 @@ public class FirstLevelCache extends CoherentCache {
     }
 
     private int getReadPorts() {
-        return ((FirstLevelCacheConfig) config).getReadPorts();
+        return ((FirstLevelCacheConfig) getConfig()).getReadPorts();
     }
 
     private int getWritePorts() {
-        return ((FirstLevelCacheConfig) config).getWritePorts();
+        return ((FirstLevelCacheConfig) getConfig()).getWritePorts();
     }
 }

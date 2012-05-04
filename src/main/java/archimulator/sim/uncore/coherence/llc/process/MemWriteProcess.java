@@ -22,6 +22,7 @@ import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.coherence.action.ActionBasedPendingActionOwner;
 import archimulator.sim.uncore.coherence.common.CoherentCache;
+import archimulator.sim.uncore.coherence.common.LockableCacheLine;
 import archimulator.sim.uncore.coherence.common.process.CoherentCacheProcess;
 import archimulator.sim.uncore.coherence.common.MESIState;
 import archimulator.sim.uncore.coherence.event.LastLevelCacheLineEvictedByMemWriteProcessEvent;
@@ -33,7 +34,7 @@ import archimulator.util.action.Action1;
 public class MemWriteProcess extends CoherentCacheProcess {
     private boolean completed;
 
-    public MemWriteProcess(CoherentCache cache, final MemoryHierarchyAccess access, final CacheAccess<MESIState, CoherentCache.LockableCacheLine> cacheAccess) {
+    public MemWriteProcess(CoherentCache cache, final MemoryHierarchyAccess access, final CacheAccess<MESIState, LockableCacheLine> cacheAccess) {
         super(cache);
         this.getPendingActions().push(new ActionBasedPendingActionOwner() {
             @Override

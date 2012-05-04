@@ -33,7 +33,6 @@ public class LoadProcess extends CpuSideProcess {
             @Override
             public boolean apply() {
                 findAndLockProcess.getCacheAccess().commit().getLine().unlock();
-
                 return true;
             }
         });
@@ -48,7 +47,6 @@ public class LoadProcess extends CpuSideProcess {
                         }
                     }));
                 }
-
                 return true;
             }
         });

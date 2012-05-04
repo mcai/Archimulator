@@ -117,7 +117,7 @@ public class FiniteStateMachineFactory<StateT, ConditionT> {
             if (this.perStateTransitions.containsKey(condition)) {
                 changeState(fsm, condition, params, this.perStateTransitions.get(condition).apply(fsm, params));
             } else {
-                throw new IllegalArgumentException("Unexpected condition " + condition + " in state " + this.state);
+                throw new IllegalArgumentException("Unexpected condition " + condition + " in state " + this.state + " is not among " + this.perStateTransitions.keySet());
             }
         }
     }

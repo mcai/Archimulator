@@ -21,7 +21,7 @@ package archimulator.sim.uncore.coherence.flc.process;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.coherence.action.ActionBasedPendingActionOwner;
-import archimulator.sim.uncore.coherence.common.CoherentCache;
+import archimulator.sim.uncore.coherence.common.LockableCacheLine;
 import archimulator.sim.uncore.coherence.common.process.CoherentCacheProcess;
 import archimulator.sim.uncore.coherence.common.MESIState;
 import archimulator.sim.uncore.coherence.exception.CoherentCacheException;
@@ -34,7 +34,7 @@ public class EvictProcess extends CoherentCacheProcess {
     private boolean completed;
     private boolean error;
 
-    public EvictProcess(FirstLevelCache cache, final MemoryHierarchyAccess access, final CacheAccess<MESIState, CoherentCache.LockableCacheLine> cacheAccess) {
+    public EvictProcess(FirstLevelCache cache, final MemoryHierarchyAccess access, final CacheAccess<MESIState, LockableCacheLine> cacheAccess) {
         super(cache);
         this.getPendingActions().push(new ActionBasedPendingActionOwner() {
             @Override

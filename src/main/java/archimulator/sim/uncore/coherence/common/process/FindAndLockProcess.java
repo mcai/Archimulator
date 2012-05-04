@@ -23,6 +23,7 @@ import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.coherence.action.ActionBasedPendingActionOwner;
 import archimulator.sim.uncore.coherence.common.CoherentCache;
+import archimulator.sim.uncore.coherence.common.LockableCacheLine;
 import archimulator.sim.uncore.coherence.common.MESIState;
 import archimulator.sim.uncore.coherence.event.CoherentCacheBeginCacheAccessEvent;
 import archimulator.sim.uncore.coherence.event.CoherentCacheNonblockingRequestHitToTransientTagEvent;
@@ -35,7 +36,7 @@ import archimulator.util.fsm.FiniteStateMachine;
 import archimulator.util.fsm.FiniteStateMachineFactory;
 
 public abstract class FindAndLockProcess extends CoherentCacheProcess {
-    protected CacheAccess<MESIState, CoherentCache.LockableCacheLine> cacheAccess;
+    protected CacheAccess<MESIState, LockableCacheLine> cacheAccess;
     protected FiniteStateMachine<FindAndLockState, FindAndLockCondition> fsm;
 
     public FindAndLockProcess(CoherentCache cache, final MemoryHierarchyAccess access, final int tag, final CacheAccessType cacheAccessType) {
@@ -50,7 +51,6 @@ public abstract class FindAndLockProcess extends CoherentCacheProcess {
                     evict(access, new Action() {
                         public void apply() {
                             fsm.fireTransition(FindAndLockCondition.EVICTED);
-//                                state = FindAndLockState.ACQUIRED;
                         }
                     });
                 }
@@ -86,18 +86,11 @@ public abstract class FindAndLockProcess extends CoherentCacheProcess {
 
                 if (this.cacheAccess.getLine().isLocked() && cacheAccessType.isDownward()) {
                     this.fsm.fireTransition(FindAndLockCondition.FAILED_TO_LOCK);
-//                        this.state = FindAndLockState.FAILED;
-//
-//                        System.out.printf("access: %s%n", access);
-//                        System.out.printf("access.getPhysicalTag(): 0x%08x%n", access.getPhysicalTag());
-//                        System.out.printf("this.cacheAccess.getLine().getAccess(): %s%n", this.cacheAccess.getLine().getAccess());
-//                        System.out.printf("this.cacheAccess.getLine().getAccess().getPhysicalTag(): 0x%08x%n", this.cacheAccess.getLine().getAccess().getPhysicalTag());
                 }
                 else {
                     if (this.cacheAccess.getLine().lock(new Action() {
                         public void apply() {
-                            fsm.fireTransition(FindAndLockCondition.UNLOCKED);
-//                                state = FindAndLockState.READY;
+                            fsm.fireTransition(FindAndLockCondition.UNLOCK);
                             doLockingProcess(access, tag, cacheAccessType);
                         }
                     }, tag)) {
@@ -108,19 +101,15 @@ public abstract class FindAndLockProcess extends CoherentCacheProcess {
                         if (this.cacheAccess.isEviction()) {
                             getCache().incEvictions();
                             this.fsm.fireTransition(FindAndLockCondition.BEGIN_EVICTING);
-//                                state = FindAndLockState.EVICTING;
                         } else {
                             this.fsm.fireTransition(FindAndLockCondition.NO_EVICTION);
-//                                state = FindAndLockState.ACQUIRED;
                         }
                     } else {
                         this.fsm.fireTransition(FindAndLockCondition.WAIT_FOR_UNLOCK);
-//                            state = FindAndLockState.WAITING;
                     }
                 }
             } else {
                 this.fsm.fireTransition(FindAndLockCondition.BYPASS);
-//                    state = FindAndLockState.BYPASSED;
             }
 
             if (this.fsm.getState() == FindAndLockState.ACQUIRED || this.fsm.getState() == FindAndLockState.EVICTING || this.fsm.getState() == FindAndLockState.BYPASSED) {
@@ -130,7 +119,7 @@ public abstract class FindAndLockProcess extends CoherentCacheProcess {
         }
     }
 
-    public CacheAccess<MESIState, CoherentCache.LockableCacheLine> getCacheAccess() {
+    public CacheAccess<MESIState, LockableCacheLine> getCacheAccess() {
         return cacheAccess;
     }
 
@@ -188,7 +177,7 @@ public abstract class FindAndLockProcess extends CoherentCacheProcess {
                 });
 
         fsmFactory.inState(FindAndLockState.WAITING)
-                .onCondition(FindAndLockCondition.UNLOCKED, new Function1X<FiniteStateMachine<FindAndLockState, FindAndLockCondition>, FindAndLockState>() {
+                .onCondition(FindAndLockCondition.UNLOCK, new Function1X<FiniteStateMachine<FindAndLockState, FindAndLockCondition>, FindAndLockState>() {
                     @Override
                     public FindAndLockState apply(FiniteStateMachine<FindAndLockState, FindAndLockCondition> param1, Object... otherParams) {
                         return FindAndLockState.READY;
@@ -196,7 +185,7 @@ public abstract class FindAndLockProcess extends CoherentCacheProcess {
                 });
 
         fsmFactory.inState(FindAndLockState.ACQUIRED)
-                .onCondition(FindAndLockCondition.COMPLETED, new Function1X<FiniteStateMachine<FindAndLockState, FindAndLockCondition>, FindAndLockState>() {
+                .onCondition(FindAndLockCondition.COMPLETE, new Function1X<FiniteStateMachine<FindAndLockState, FindAndLockCondition>, FindAndLockState>() {
                     @Override
                     public FindAndLockState apply(FiniteStateMachine<FindAndLockState, FindAndLockCondition> param1, Object... otherParams) {
                         return FindAndLockState.RELEASED;

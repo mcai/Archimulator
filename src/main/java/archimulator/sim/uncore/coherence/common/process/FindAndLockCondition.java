@@ -24,7 +24,7 @@ public enum FindAndLockCondition {
     FAILED_TO_LOCK,
     NO_EVICTION,
     WAIT_FOR_UNLOCK,
-    UNLOCKED,
+    UNLOCK,
     BYPASS,
-    COMPLETED
+    COMPLETE
 }

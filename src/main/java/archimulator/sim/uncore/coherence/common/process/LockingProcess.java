@@ -20,8 +20,14 @@ package archimulator.sim.uncore.coherence.common.process;
 
 import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
+import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.coherence.common.CoherentCache;
+import archimulator.sim.uncore.coherence.common.LockableCacheLine;
+import archimulator.sim.uncore.coherence.common.MESIState;
 import archimulator.sim.uncore.coherence.exception.CoherentCacheException;
+import archimulator.sim.uncore.coherence.flc.process.EvictProcess;
+import archimulator.util.action.Action;
+import archimulator.util.action.Action1;
 
 public abstract class LockingProcess extends CoherentCacheProcess {
     protected FindAndLockProcess findAndLockProcess;
@@ -32,13 +38,22 @@ public abstract class LockingProcess extends CoherentCacheProcess {
         super(cache);
         this.access = access;
         this.tag = tag;
-        this.findAndLockProcess = this.newFindAndLockProcess(cacheAccessType);
+        this.findAndLockProcess = new FindAndLockProcess(getCache(), this.access, this.tag, cacheAccessType) {
+            @Override
+            protected void evict(MemoryHierarchyAccess access, final Action onCompletedCallback) {
+                getPendingActions().push(newEvictProcess(access, cacheAccess).addOnCompletedCallback(new Action1<EvictProcess>() {
+                    public void apply(EvictProcess evictProcess) {
+                        onCompletedCallback.apply();
+                    }
+                }));
+            }
+        };
     }
 
     @Override
     protected void complete() {
         if (this.findAndLockProcess.fsm.getState() == FindAndLockState.ACQUIRED) {
-            this.findAndLockProcess.fsm.fireTransition(FindAndLockCondition.COMPLETED);
+            this.findAndLockProcess.fsm.fireTransition(FindAndLockCondition.COMPLETE);
 //                this.findAndLockProcess.state = FindAndLockState.RELEASED;
         } else if (this.findAndLockProcess.fsm.getState() == FindAndLockState.FAILED) {
             this.findAndLockProcess.cacheAccess.abort();
@@ -56,7 +71,7 @@ public abstract class LockingProcess extends CoherentCacheProcess {
         return (this.findAndLockProcess.fsm.getState() == FindAndLockState.ACQUIRED || this.findAndLockProcess.fsm.getState() == FindAndLockState.BYPASSED) && super.processPendingActions();
     }
 
-    public abstract FindAndLockProcess newFindAndLockProcess(CacheAccessType cacheAccessType);
+    protected abstract CoherentCacheProcess newEvictProcess(MemoryHierarchyAccess access, CacheAccess<MESIState, LockableCacheLine> cacheAccess);
 
     @Override
     public String toString() {

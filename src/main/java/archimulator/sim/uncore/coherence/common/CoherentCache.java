@@ -24,20 +24,23 @@ import archimulator.sim.base.simulation.Logger;
 import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.CacheHierarchy;
 import archimulator.sim.uncore.MemoryDevice;
-import archimulator.sim.uncore.cache.*;
-import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
+import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.coherence.action.PendingActionOwner;
 import archimulator.sim.uncore.coherence.config.CoherentCacheConfig;
 import archimulator.sim.uncore.coherence.exception.CoherentCacheException;
-import archimulator.util.action.*;
+import archimulator.util.action.Action;
+import archimulator.util.action.Action1;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
 
 public abstract class CoherentCache extends MemoryDevice {
     private List<PendingActionOwner> pendingProcesses;
 
-    protected CoherentCacheConfig config;
-    protected LockableCache cache;
+    private CoherentCacheConfig config;
+    private LockableCache cache;
 
     private Random random;
 
@@ -48,12 +51,12 @@ public abstract class CoherentCache extends MemoryDevice {
     private long downwardWriteMisses;
     private long downwardWriteBypasses;
 
-    protected long evictions;
+    private long evictions;
 
     public CoherentCache(CacheHierarchy cacheHierarchy, String name, CoherentCacheConfig config, MESIState initialState) {
         super(cacheHierarchy, name);
 
-        this.cache = new LockableCache(name, config.getGeometry(), initialState, config.getEvictionPolicyClz());
+        this.cache = new LockableCache(this, name, config.getGeometry(), initialState, config.getEvictionPolicyClz());
 
         this.config = config;
 
@@ -190,8 +193,7 @@ public abstract class CoherentCache extends MemoryDevice {
         }
 
         if (!this.pendingProcesses.isEmpty()) {
-            this.getCycleAccurateEventQueue().schedule(new NamedAction("CoherentCache.processPendingActions") {
-                //            this.getCycleAccurateEventQueue().schedule(new Action() {
+            this.getCycleAccurateEventQueue().schedule(new Action() {
                 public void apply() {
                     processPendingActions();
                 }
@@ -206,80 +208,5 @@ public abstract class CoherentCache extends MemoryDevice {
 
     public boolean isLastLevelCache() {
         return this.config.getLevelType() == CoherentCacheLevelType.LAST_LEVEL_CACHE;
-    }
-
-    public class LockableCacheLine extends CacheLine<MESIState> {
-        private int transientTag = -1;
-        private List<Action> suspendedActions;
-
-        public LockableCacheLine(Cache<?, ?> cache, int set, int way, MESIState initialState) {
-            super(cache, set, way, initialState);
-
-            this.suspendedActions = new ArrayList<Action>();
-        }
-
-        public boolean lock(Action action, int transientTag) {
-            if (this.isLocked()) {
-                this.suspendedActions.add(action);
-                return false;
-            } else {
-                this.transientTag = transientTag;
-                return true;
-            }
-        }
-
-        public LockableCacheLine unlock() {
-            assert (this.isLocked());
-
-            this.transientTag = -1;
-
-            for (Action action : this.suspendedActions) {
-                getCycleAccurateEventQueue().schedule(action, 0);
-            }
-
-            this.suspendedActions.clear();
-
-            return this;
-        }
-
-        public int getTransientTag() {
-            return transientTag;
-        }
-
-        public boolean isLocked() {
-            return transientTag != -1;
-        }
-
-        @Override
-        public String toString() {
-            return String.format("LockableCacheLine{set=%d, way=%d, tag=%s, transientTag=%s, state=%s}", getSet(), getWay(), getTag() == -1 ? "<INVALID>" : String.format("0x%08x", getTag()), transientTag == -1 ? "<INVALID>" : String.format("0x%08x", transientTag), getState());
-        }
-    }
-
-    public class LockableCache extends EvictableCache<MESIState, LockableCacheLine> {
-        public LockableCache(String name, CacheGeometry geometry, final MESIState initialState, Class<? extends EvictionPolicy> evictionPolicyClz) {
-            super(CoherentCache.this, name, geometry, evictionPolicyClz, new Function3<Cache<?, ?>, Integer, Integer, LockableCacheLine>() {
-                public LockableCacheLine apply(Cache<?, ?> cache, Integer set, Integer way) {
-                    return new LockableCacheLine(cache, set, way, initialState);
-                }
-            });
-        }
-
-        @Override
-        public LockableCacheLine findLine(int address) {
-            int tag = this.getTag(address);
-            int set = this.getSet(address);
-
-            for (int way = 0; way < this.getAssociativity(); way++) {
-                LockableCacheLine line = this.getLine(set, way);
-                if (!line.isLocked() && line.getTag() == tag && line.getState() != line.getInitialState()) {
-                    return line;
-                } else if (line.isLocked() && line.getTransientTag() == tag) {
-                    return line;
-                }
-            }
-
-            return null;
-        }
     }
 }
