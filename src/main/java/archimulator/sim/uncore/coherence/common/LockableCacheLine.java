@@ -51,16 +51,6 @@ public class LockableCacheLine extends CacheLine<MESIState> {
     }
 
     public LockableCacheLine unlock() {
-        if(this.replacementFsm.getState() == LockableCacheLineReplacementState.HITTING) {
-            this.endHit();
-        }
-        else if(this.replacementFsm.getState() == LockableCacheLineReplacementState.FILLING) {
-            this.endFill();
-        }
-        else {
-            throw new IllegalArgumentException();
-        }
-
         this.transientTag = -1;
 
         for (Action action : this.suspendedActions) {
@@ -104,7 +94,7 @@ public class LockableCacheLine extends CacheLine<MESIState> {
         return result;
     }
 
-    private void endFill() {
+    public void endFill() {
         this.replacementFsm.fireTransition(LockableCacheLineReplacementCondition.END_FILL);
     }
 
@@ -128,6 +118,10 @@ public class LockableCacheLine extends CacheLine<MESIState> {
         if(this.replacementFsm.getState() == LockableCacheLineReplacementState.INVALID) {
             throw new IllegalArgumentException();
         }
+    }
+
+    public LockableCacheLineReplacementState getReplacementState() {
+        return this.replacementFsm.getState();
     }
 
     @Override

@@ -9,6 +9,6 @@ public enum LockableCacheLineReplacementState {
     FILLING;
 
     public boolean isLocked() {
-        return this == HITTING && this == EVICTING && this == EVICTED && this == FILLING;
+        return this == HITTING || this == EVICTING || this == EVICTED || this == FILLING;
     }
 }

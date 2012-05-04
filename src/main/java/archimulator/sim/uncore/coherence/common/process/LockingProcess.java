@@ -23,9 +23,9 @@ import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.coherence.common.CoherentCache;
 import archimulator.sim.uncore.coherence.common.LockableCacheLine;
+import archimulator.sim.uncore.coherence.common.LockableCacheLineReplacementState;
 import archimulator.sim.uncore.coherence.common.MESIState;
 import archimulator.sim.uncore.coherence.exception.CoherentCacheException;
-import archimulator.sim.uncore.coherence.flc.process.EvictProcess;
 import archimulator.util.action.Action;
 import archimulator.util.action.Action1;
 
@@ -41,8 +41,8 @@ public abstract class LockingProcess extends CoherentCacheProcess {
         this.findAndLockProcess = new FindAndLockProcess(getCache(), this.access, this.tag, cacheAccessType) {
             @Override
             protected void evict(MemoryHierarchyAccess access, final Action onCompletedCallback) {
-                getPendingActions().push(newEvictProcess(access, cacheAccess).addOnCompletedCallback(new Action1<EvictProcess>() {
-                    public void apply(EvictProcess evictProcess) {
+                getPendingActions().push(newEvictProcess(access, cacheAccess).addOnCompletedCallback(new Action1<CoherentCacheProcess>() {
+                    public void apply(CoherentCacheProcess evictProcess) {
                         onCompletedCallback.apply();
                     }
                 }));
@@ -52,11 +52,14 @@ public abstract class LockingProcess extends CoherentCacheProcess {
 
     @Override
     protected void complete() {
-        if (this.findAndLockProcess.fsm.getState() == FindAndLockState.ACQUIRED) {
-            this.findAndLockProcess.fsm.fireTransition(FindAndLockCondition.COMPLETE);
-//                this.findAndLockProcess.state = FindAndLockState.RELEASED;
-        } else if (this.findAndLockProcess.fsm.getState() == FindAndLockState.FAILED) {
-            this.findAndLockProcess.cacheAccess.abort();
+        LockableCacheLineReplacementState replacementState = this.findAndLockProcess.getCacheAccess().getLine().getReplacementState();
+        if (replacementState == LockableCacheLineReplacementState.HITTING) {
+            this.findAndLockProcess.getCacheAccess().getLine().endHit();
+        } else if (replacementState == LockableCacheLineReplacementState.EVICTED) {
+        } else if (replacementState == LockableCacheLineReplacementState.FILLING) {
+            this.findAndLockProcess.getCacheAccess().getLine().endFill();
+        } else {
+            throw new IllegalArgumentException();
         }
 
         super.complete();
@@ -64,11 +67,22 @@ public abstract class LockingProcess extends CoherentCacheProcess {
 
     @Override
     public boolean processPendingActions() throws CoherentCacheException {
-        if (this.findAndLockProcess.fsm.getState() == FindAndLockState.READY || this.findAndLockProcess.fsm.getState() == FindAndLockState.EVICTING) {
+        LockableCacheLineReplacementState replacementState = this.findAndLockProcess.getCacheAccess() != null ? this.findAndLockProcess.getCacheAccess().getLine().getReplacementState() : null;
+        if (replacementState == null) {
+            this.findAndLockProcess.processPendingActions();
+            return false;
+        }
+        if (!this.findAndLockProcess.getCacheAccess().isBypass() && replacementState == LockableCacheLineReplacementState.INVALID) {
+            this.findAndLockProcess.processPendingActions();
+        } else if (!this.findAndLockProcess.getCacheAccess().isBypass() && replacementState == LockableCacheLineReplacementState.VALID) {
+            this.findAndLockProcess.processPendingActions();
+        } else if (replacementState == LockableCacheLineReplacementState.EVICTING) {
             this.findAndLockProcess.processPendingActions();
         }
 
-        return (this.findAndLockProcess.fsm.getState() == FindAndLockState.ACQUIRED || this.findAndLockProcess.fsm.getState() == FindAndLockState.BYPASSED) && super.processPendingActions();
+        LockableCacheLineReplacementState replacementState2 = this.findAndLockProcess.getCacheAccess() != null ? this.findAndLockProcess.getCacheAccess().getLine().getReplacementState() : null;
+
+        return (replacementState2 == LockableCacheLineReplacementState.HITTING || replacementState2 == LockableCacheLineReplacementState.EVICTED || replacementState2 == LockableCacheLineReplacementState.FILLING || this.findAndLockProcess.getCacheAccess().isBypass()) && super.processPendingActions();
     }
 
     protected abstract CoherentCacheProcess newEvictProcess(MemoryHierarchyAccess access, CacheAccess<MESIState, LockableCacheLine> cacheAccess);
