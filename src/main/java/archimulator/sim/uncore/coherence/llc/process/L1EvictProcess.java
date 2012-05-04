@@ -40,11 +40,8 @@ public class L1EvictProcess extends LastLevelCacheLockingProcess {
             @Override
             public boolean apply() {
                 getCache().getShadowTagDirectories().get(source).removeTag(message.getTag());
-
                 getCache().sendReply(source, message, 8);
-
                 findAndLockProcess.getCacheAccess().commit().getLine().unlock();
-
                 return true;
             }
         });

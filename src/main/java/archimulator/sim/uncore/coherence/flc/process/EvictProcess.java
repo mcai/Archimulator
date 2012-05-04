@@ -36,38 +36,25 @@ public class EvictProcess extends CoherentCacheProcess {
 
     public EvictProcess(FirstLevelCache cache, final MemoryHierarchyAccess access, final CacheAccess<MESIState, LockableCacheLine> cacheAccess) {
         super(cache);
+
+        final boolean hasData = cacheAccess.getLine().getState() == MESIState.MODIFIED;
         this.getPendingActions().push(new ActionBasedPendingActionOwner() {
             @Override
             public boolean apply() {
-//                    cacheAccess.getLine().invalidate();
+                final int size = hasData ? getCache().getCache().getLineSize() + 8 : 8;
+                getCache().sendRequest(getCache().getNext(), new EvictMessage(access, cacheAccess.getLine().getTag(), hasData, new Action1<EvictMessage>() {
+                    public void apply(EvictMessage evictMessage) {
+                        if (evictMessage.isError()) {
+                            error = true;
+                        } else {
+                            completed = true;
+                        }
+                    }
+                }), size);
 
                 return true;
             }
         });
-
-        if (cacheAccess.getLine().getState() == MESIState.INVALID) {
-            throw new IllegalArgumentException();
-        } else {
-            final boolean hasData = cacheAccess.getLine().getState() == MESIState.MODIFIED;
-
-            this.getPendingActions().push(new ActionBasedPendingActionOwner() {
-                @Override
-                public boolean apply() {
-                    final int size = hasData ? getCache().getCache().getLineSize() + 8 : 8;
-                    getCache().sendRequest(getCache().getNext(), new EvictMessage(access, cacheAccess.getLine().getTag(), hasData, new Action1<EvictMessage>() {
-                        public void apply(EvictMessage evictMessage) {
-                            if (evictMessage.isError()) {
-                                error = true;
-                            } else {
-                                completed = true;
-                            }
-                        }
-                    }), size);
-
-                    return true;
-                }
-            });
-        }
     }
 
     @Override
