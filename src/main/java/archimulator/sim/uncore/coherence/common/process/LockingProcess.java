@@ -56,6 +56,7 @@ public abstract class LockingProcess extends CoherentCacheProcess {
         if (replacementState == LockableCacheLineReplacementState.HITTING) {
             this.findAndLockProcess.getCacheAccess().getLine().endHit();
         } else if (replacementState == LockableCacheLineReplacementState.EVICTED) {
+            throw new IllegalArgumentException();
         } else if (replacementState == LockableCacheLineReplacementState.FILLING) {
             this.findAndLockProcess.getCacheAccess().getLine().endFill();
         } else {
@@ -82,7 +83,8 @@ public abstract class LockingProcess extends CoherentCacheProcess {
 
         LockableCacheLineReplacementState replacementState2 = this.findAndLockProcess.getCacheAccess() != null ? this.findAndLockProcess.getCacheAccess().getLine().getReplacementState() : null;
 
-        return (replacementState2 == LockableCacheLineReplacementState.HITTING || replacementState2 == LockableCacheLineReplacementState.EVICTED || replacementState2 == LockableCacheLineReplacementState.FILLING || this.findAndLockProcess.getCacheAccess().isBypass()) && super.processPendingActions();
+//        return (replacementState2 == LockableCacheLineReplacementState.HITTING || replacementState2 == LockableCacheLineReplacementState.EVICTED || replacementState2 == LockableCacheLineReplacementState.FILLING || this.findAndLockProcess.getCacheAccess().isBypass()) && super.processPendingActions();
+        return (replacementState2 == LockableCacheLineReplacementState.HITTING || replacementState2 == LockableCacheLineReplacementState.FILLING || this.findAndLockProcess.getCacheAccess().isBypass()) && super.processPendingActions();
     }
 
     protected abstract CoherentCacheProcess newEvictProcess(MemoryHierarchyAccess access, CacheAccess<MESIState, LockableCacheLine> cacheAccess);
