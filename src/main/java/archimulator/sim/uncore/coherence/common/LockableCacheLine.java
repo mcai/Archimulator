@@ -24,6 +24,7 @@ import archimulator.util.action.Action;
 import archimulator.util.action.Function1X;
 import archimulator.util.fsm.FiniteStateMachine;
 import archimulator.util.fsm.FiniteStateMachineFactory;
+import archimulator.util.fsm.SimpleFiniteStateMachine;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +37,7 @@ public class LockableCacheLine extends CacheLine<MESIState> {
     public LockableCacheLine(Cache<?, ?> cache, int set, int way, MESIState initialState) {
         super(cache, set, way, initialState);
 
-        this.replacementFsm = new FiniteStateMachine<LockableCacheLineReplacementState, LockableCacheLineReplacementCondition>(fsmFactory, "fsm", LockableCacheLineReplacementState.INVALID);
+        this.replacementFsm = new SimpleFiniteStateMachine<LockableCacheLineReplacementState, LockableCacheLineReplacementCondition>(fsmFactory, LockableCacheLineReplacementState.INVALID);
         this.suspendedActions = new ArrayList<Action>();
     }
 
@@ -193,19 +194,5 @@ public class LockableCacheLine extends CacheLine<MESIState> {
                         return LockableCacheLineReplacementState.VALID;
                     }
                 });
-    }
-
-    public static void main(String[] args) {
-        FiniteStateMachine<LockableCacheLineReplacementState, LockableCacheLineReplacementCondition> fsm =
-                new FiniteStateMachine<LockableCacheLineReplacementState, LockableCacheLineReplacementCondition>(fsmFactory, "fsm", LockableCacheLineReplacementState.INVALID);
-
-        fsm.fireTransition(LockableCacheLineReplacementCondition.BEGIN_FILL);
-        fsm.fireTransition(LockableCacheLineReplacementCondition.END_FILL);
-
-        fsm.fireTransition(LockableCacheLineReplacementCondition.BEGIN_EVICT);
-        fsm.fireTransition(LockableCacheLineReplacementCondition.END_EVICT);
-
-        fsm.fireTransition(LockableCacheLineReplacementCondition.BEGIN_FILL);
-        fsm.fireTransition(LockableCacheLineReplacementCondition.END_FILL);
     }
 }

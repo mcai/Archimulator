@@ -99,8 +99,7 @@ public abstract class FindAndLockProcess extends CoherentCacheProcess {
             }
         }
 
-        if(this.cacheAccess.getLine().getReplacementState() == LockableCacheLineReplacementState.HITTING ||
-                this.cacheAccess.getLine().getReplacementState() == LockableCacheLineReplacementState.FILLING || this.cacheAccess.isBypass()) {
+        if(this.cacheAccess.getLine().getReplacementState() == LockableCacheLineReplacementState.HITTING || this.cacheAccess.getLine().getReplacementState() == LockableCacheLineReplacementState.FILLING || this.cacheAccess.isBypass()) {
             this.getCache().updateStats(cacheAccessType, this.cacheAccess);
             this.getCache().getBlockingEventDispatcher().dispatch(new CoherentCacheBeginCacheAccessEvent(this.getCache(), access, this.cacheAccess));
         }

@@ -39,6 +39,7 @@ import archimulator.util.action.NamedAction;
 import archimulator.util.event.BlockingEvent;
 import archimulator.util.event.BlockingEventDispatcher;
 import archimulator.util.event.CycleAccurateEventQueue;
+import archimulator.util.fsm.BasicFiniteStateMachine;
 import archimulator.util.fsm.FiniteStateMachine;
 import archimulator.util.fsm.FiniteStateMachineFactory;
 
@@ -65,7 +66,7 @@ public abstract class Experiment {
 
     private CyclicBarrier phaser;
 
-    private FiniteStateMachine<ExperimentState, ExperimentCondition> fsm;
+    private BasicFiniteStateMachine<ExperimentState, ExperimentCondition> fsm;
 
     private Thread threadStartExperiment;
 
@@ -98,7 +99,7 @@ public abstract class Experiment {
 
         this.phaser = new CyclicBarrier(2);
 
-        this.fsm = new FiniteStateMachine<ExperimentState, ExperimentCondition>(fsmFactory, title, ExperimentState.NOT_STARTED);
+        this.fsm = new BasicFiniteStateMachine<ExperimentState, ExperimentCondition>(fsmFactory, title, ExperimentState.NOT_STARTED);
         this.fsm.put("experiment", this);
 
         this.timerPollState = new Timer(true);
@@ -226,8 +227,9 @@ public abstract class Experiment {
         fsmFactory.inState(ExperimentState.NOT_STARTED)
                 .ignoreCondition(ExperimentCondition.STOP)
                 .onCondition(ExperimentCondition.START, new Function1X<FiniteStateMachine<ExperimentState, ExperimentCondition>, ExperimentState>() {
+                    @SuppressWarnings("unchecked")
                     public ExperimentState apply(final FiniteStateMachine<ExperimentState, ExperimentCondition> from, Object... params) {
-                        final Experiment experiment = from.get(Experiment.class, "experiment");
+                        final Experiment experiment = (Experiment) ((BasicFiniteStateMachine)from).get(Experiment.class, "experiment");
 
                         Thread threadStartExperiment = new Thread() {
                             @Override
@@ -263,15 +265,17 @@ public abstract class Experiment {
         fsmFactory.inState(ExperimentState.RUNNING)
                 .ignoreCondition(ExperimentCondition.START)
                 .onCondition(ExperimentCondition.PAUSE, new Function1X<FiniteStateMachine<ExperimentState, ExperimentCondition>, ExperimentState>() {
+                    @SuppressWarnings("unchecked")
                     public ExperimentState apply(FiniteStateMachine<ExperimentState, ExperimentCondition> from, Object... params) {
-                        Experiment experiment = from.get(Experiment.class, "experiment");
+                        final Experiment experiment = (Experiment) ((BasicFiniteStateMachine)from).get(Experiment.class, "experiment");
                         experiment.getBlockingEventDispatcher().dispatch(new PauseExperimentEvent());
                         return ExperimentState.PAUSED;
                     }
                 })
                 .onCondition(ExperimentCondition.STOP, new Function1X<FiniteStateMachine<ExperimentState, ExperimentCondition>, ExperimentState>() {
+                    @SuppressWarnings("unchecked")
                     public ExperimentState apply(FiniteStateMachine<ExperimentState, ExperimentCondition> from, Object... params) {
-                        Experiment experiment = from.get(Experiment.class, "experiment");
+                        final Experiment experiment = (Experiment) ((BasicFiniteStateMachine)from).get(Experiment.class, "experiment");
                         experiment.getBlockingEventDispatcher().dispatch(new StopExperimentEvent());
                         experiment.getBlockingEventDispatcher().clearListeners();
                         return ExperimentState.STOPPED;
@@ -281,9 +285,10 @@ public abstract class Experiment {
         fsmFactory.inState(ExperimentState.PAUSED)
                 .ignoreCondition(ExperimentCondition.PAUSE)
                 .onCondition(ExperimentCondition.RESUME, new Function1X<FiniteStateMachine<ExperimentState, ExperimentCondition>, ExperimentState>() {
+                    @SuppressWarnings("unchecked")
                     public ExperimentState apply(FiniteStateMachine<ExperimentState, ExperimentCondition> from, Object... params) {
                         try {
-                            Experiment experiment = from.get(Experiment.class, "experiment");
+                            final Experiment experiment = (Experiment) ((BasicFiniteStateMachine)from).get(Experiment.class, "experiment");
                             experiment.getPhaser().await();
                         } catch (InterruptedException e) {
                             throw new RuntimeException(e);
@@ -294,16 +299,16 @@ public abstract class Experiment {
                     }
                 })
                 .onCondition(ExperimentCondition.STOP, new Function1X<FiniteStateMachine<ExperimentState, ExperimentCondition>, ExperimentState>() {
+                    @SuppressWarnings("unchecked")
                     public ExperimentState apply(FiniteStateMachine<ExperimentState, ExperimentCondition> from, Object... params) {
+                        final Experiment experiment = (Experiment) ((BasicFiniteStateMachine)from).get(Experiment.class, "experiment");
                         try {
-                            Experiment experiment = from.get(Experiment.class, "experiment");
                             experiment.getPhaser().await();
                         } catch (InterruptedException e) {
                             throw new RuntimeException(e);
                         } catch (BrokenBarrierException e) {
                             throw new RuntimeException(e);
                         }
-                        Experiment experiment = from.get(Experiment.class, "experiment");
                         experiment.timerPollState.cancel();
                         experiment.getBlockingEventDispatcher().dispatch(new StopExperimentEvent());
                         experiment.getBlockingEventDispatcher().clearListeners();

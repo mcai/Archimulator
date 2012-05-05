@@ -22,7 +22,6 @@ import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.coherence.action.ActionBasedPendingActionOwner;
 import archimulator.sim.uncore.coherence.common.MESIState;
 import archimulator.sim.uncore.coherence.event.FirstLevelCacheLineEvictedByL2UpwardWriteProcessEvent;
-import archimulator.sim.uncore.coherence.exception.CoherentCacheException;
 import archimulator.sim.uncore.coherence.flc.FirstLevelCache;
 import archimulator.sim.uncore.coherence.llc.LastLevelCache;
 import archimulator.sim.uncore.coherence.message.UpwardWriteMessage;

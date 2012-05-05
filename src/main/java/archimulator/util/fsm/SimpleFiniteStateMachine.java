@@ -18,10 +18,27 @@
  ******************************************************************************/
 package archimulator.util.fsm;
 
-public interface FiniteStateMachine<StateT, ConditionT> {
-    StateT getState();
+public class SimpleFiniteStateMachine<StateT, ConditionT> implements FiniteStateMachine<StateT,ConditionT> {
+    private FiniteStateMachineFactory<StateT, ConditionT> factory;
+    private StateT state;
 
-    void setState(StateT state);
+    public SimpleFiniteStateMachine(FiniteStateMachineFactory<StateT, ConditionT> factory, StateT state) {
+        this.factory = factory;
+        this.state = state;
+    }
 
-    void fireTransition(ConditionT condition, Object... params);
+    @Override
+    public StateT getState() {
+        return state;
+    }
+
+    @Override
+    public void setState(StateT state) {
+        this.state = state;
+    }
+
+    @Override
+    public void fireTransition(ConditionT condition, Object... params) {
+        this.factory.fireTransition(this, condition, params);
+    }
 }
