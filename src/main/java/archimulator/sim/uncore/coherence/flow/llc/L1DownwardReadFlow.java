@@ -6,6 +6,7 @@ import archimulator.sim.uncore.coherence.common.MESIState;
 import archimulator.sim.uncore.coherence.flc.FirstLevelCache;
 import archimulator.sim.uncore.coherence.flow.FindAndLockFlow;
 import archimulator.sim.uncore.coherence.flow.LockingFlow;
+import archimulator.sim.uncore.coherence.flow.flc.L2UpwardReadFlow;
 import archimulator.sim.uncore.coherence.llc.LastLevelCache;
 import archimulator.util.action.Action;
 
@@ -33,31 +34,36 @@ public class L1DownwardReadFlow extends LockingFlow {
                     public void apply() {
                         if (!findAndLockFlow.getCacheAccess().isHitInCache()) {
                             if (getCache().isOwnedOrShared(tag)) {
-                                final UpwardReadFlow upwardReadFlow = new UpwardReadFlow(getCache(), getCache().getOwnerOrFirstSharer(tag), access, tag);
-                                upwardReadFlow.start(
-                                        new Action() {
-                                            @Override
-                                            public void apply() {
-                                                if (upwardReadFlow.isCopyBack()) {
-                                                    copyBack = true;
-//                                                  findAndLockProcess.getCacheAccess().getLine().setNonInitialState(MESIState.MODIFIED);
+                                getCache().sendRequest(getCache().getOwnerOrFirstSharer(tag), 8, new Action() {
+                                    @Override
+                                    public void apply() {
+                                        final L2UpwardReadFlow l2UpwardReadFlow = new L2UpwardReadFlow(getCache().getOwnerOrFirstSharer(tag), getCache(), access, tag);
+                                        l2UpwardReadFlow.start(
+                                                new Action() {
+                                                    @Override
+                                                    public void apply() {
+                                                        if (l2UpwardReadFlow.isCopyback()) {
+                                                            copyBack = true;
+//                                                          findAndLockProcess.getCacheAccess().getLine().setNonInitialState(MESIState.MODIFIED);
+                                                        }
+
+                                                        reply(findAndLockFlow, onSuccessCallback);
+
+                                                        endFillOrEvict(findAndLockFlow);
+
+                                                        afterFlowEnd(findAndLockFlow);
+
+                                                        onSuccessCallback.apply();
+                                                    }
+                                                }, new Action() {
+                                                    @Override
+                                                    public void apply() {
+                                                        throw new UnsupportedOperationException();
+                                                    }
                                                 }
-
-                                                reply(findAndLockFlow, onSuccessCallback);
-
-                                                endFillOrEvict(findAndLockFlow);
-
-                                                afterFlowEnd(findAndLockFlow);
-
-                                                onSuccessCallback.apply();
-                                            }
-                                        }, new Action() {
-                                            @Override
-                                            public void apply() {
-                                                throw new UnsupportedOperationException();
-                                            }
-                                        }
-                                );
+                                        );
+                                    }
+                                });
                             } else {
                                 MemReadFlow memReadFlow = new MemReadFlow(getCache(), access, tag);
                                 memReadFlow.start(

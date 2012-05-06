@@ -154,20 +154,6 @@ public class FirstLevelCache extends CoherentCache {
     @SuppressWarnings("unchecked")
     public void receiveRequest(MemoryDevice source, MemoryDeviceMessage message) {
         switch (message.getType()) {
-            case UPWARD_READ:
-                L2UpwardReadFlow l2UpwardReadFlow = new L2UpwardReadFlow(this, (LastLevelCache) source, (UpwardReadMessage) message);
-                l2UpwardReadFlow.start(
-                        new Action() {
-                            @Override
-                            public void apply() {
-                            }
-                        }, new Action() {
-                            @Override
-                            public void apply() {
-                            }
-                        }
-                );
-                break;
             case UPWARD_WRITE:
                 L2UpwardWriteFlow l2UpwardWriteFlow = new L2UpwardWriteFlow(this, (LastLevelCache) source, (UpwardWriteMessage) message);
                 l2UpwardWriteFlow.start(
