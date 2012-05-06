@@ -73,36 +73,6 @@ public class LastLevelCache extends CoherentCache {
                         }
                 );
                 break;
-            case DOWNWARD_READ:
-                L1DownwardReadFlow l1DownwardReadFlow = new L1DownwardReadFlow(this, (FirstLevelCache) source, (DownwardReadMessage) message);
-                l1DownwardReadFlow.start(
-                        new Action() {
-                            @Override
-                            public void apply() {
-                            }
-                        }, new Action() {
-                            @Override
-                            public void apply() {
-                                message.setError(true);
-                            }
-                        }
-                );
-                break;
-            case DOWNWARD_WRITE:
-                L1DownwardWriteFlow l1DownwardWriteFlow = new L1DownwardWriteFlow(this, (FirstLevelCache) source, (DownwardWriteMessage) message);
-                l1DownwardWriteFlow.run(
-                        new Action() {
-                            @Override
-                            public void apply() {
-                            }
-                        }, new Action() {
-                            @Override
-                            public void apply() {
-                                message.setError(true);
-                            }
-                        }
-                );
-                break;
             default:
                 throw new IllegalArgumentException();
         }

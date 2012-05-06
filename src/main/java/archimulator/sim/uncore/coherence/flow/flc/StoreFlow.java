@@ -6,6 +6,7 @@ import archimulator.sim.uncore.coherence.common.MESIState;
 import archimulator.sim.uncore.coherence.flc.FirstLevelCache;
 import archimulator.sim.uncore.coherence.flow.FindAndLockFlow;
 import archimulator.sim.uncore.coherence.flow.LockingFlow;
+import archimulator.sim.uncore.coherence.flow.llc.L1DownwardWriteFlow;
 import archimulator.util.action.Action;
 
 public class StoreFlow extends LockingFlow {
@@ -64,34 +65,38 @@ public class StoreFlow extends LockingFlow {
     }
 
     private void downwardWrite(final FindAndLockFlow findAndLockFlow, final Action onSuccessCallback, final Action onFailureCallback) {
-        final DownwardWriteFlow downwardWriteFlow = new DownwardWriteFlow(getCache(), access, access.getPhysicalTag());
-
-        downwardWriteFlow.start(
-                new Action() {
-                    @Override
-                    public void apply() {
-                        findAndLockFlow.getCacheAccess().getLine().setNonInitialState(MESIState.MODIFIED);
-                        findAndLockFlow.getCacheAccess().commit().getLine().unlock();
-
-                        endFillOrEvict(findAndLockFlow);
-
-                        afterFlowEnd(findAndLockFlow);
-
-                        onSuccessCallback.apply();
-                    }
-                }, new Action() {
-                    @Override
-                    public void apply() {
-                        getCache().getCycleAccurateEventQueue().schedule(new Action() {
+        getCache().sendRequest(getCache().getNext(), 8, new Action() {
+            @Override
+            public void apply() {
+                L1DownwardWriteFlow l1DownwardWriteFlow = new L1DownwardWriteFlow(getCache().getNext(), getCache(), access, tag);
+                l1DownwardWriteFlow.run(
+                        new Action() {
+                            @Override
                             public void apply() {
-                                downwardWrite(findAndLockFlow, onSuccessCallback, onFailureCallback);
+                                findAndLockFlow.getCacheAccess().getLine().setNonInitialState(MESIState.MODIFIED);
+                                findAndLockFlow.getCacheAccess().commit().getLine().unlock();
+
+                                endFillOrEvict(findAndLockFlow);
+
+                                afterFlowEnd(findAndLockFlow);
+
+                                onSuccessCallback.apply();
                             }
-                        }, getCache().getRetryLatency());
+                        }, new Action() {
+                            @Override
+                            public void apply() {
+                                getCache().getCycleAccurateEventQueue().schedule(new Action() {
+                                    public void apply() {
+                                        downwardWrite(findAndLockFlow, onSuccessCallback, onFailureCallback);
+                                    }
+                                }, getCache().getRetryLatency());
 
 //                                            throw new UnsupportedOperationException(); //TODO
-                    }
-                }
-        );
+                            }
+                        }
+                );
+            }
+        });
     }
 
     public FirstLevelCache getCache() {

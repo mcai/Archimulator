@@ -31,6 +31,7 @@ import archimulator.sim.uncore.coherence.config.FirstLevelCacheConfig;
 import archimulator.sim.uncore.coherence.flow.flc.L2UpwardReadFlow;
 import archimulator.sim.uncore.coherence.flow.flc.L2UpwardWriteFlow;
 import archimulator.sim.uncore.coherence.flow.flc.LoadFlow;
+import archimulator.sim.uncore.coherence.flow.flc.StoreFlow;
 import archimulator.sim.uncore.coherence.llc.LastLevelCache;
 import archimulator.sim.uncore.coherence.message.MemoryDeviceMessage;
 import archimulator.sim.uncore.coherence.message.UpwardReadMessage;
@@ -229,8 +230,8 @@ public class FirstLevelCache extends CoherentCache {
     }
 
     public void receiveStore(final MemoryHierarchyAccess access, final Action onCompletedCallback) {
-        LoadFlow loadFlow = new LoadFlow(this, access, access.getPhysicalTag());
-        loadFlow.run(
+        StoreFlow storeFlow = new StoreFlow(this, access, access.getPhysicalTag());
+        storeFlow.run(
                 new Action() {
                     @Override
                     public void apply() {

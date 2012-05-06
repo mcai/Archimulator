@@ -6,6 +6,7 @@ import archimulator.sim.uncore.coherence.common.MESIState;
 import archimulator.sim.uncore.coherence.flc.FirstLevelCache;
 import archimulator.sim.uncore.coherence.flow.FindAndLockFlow;
 import archimulator.sim.uncore.coherence.flow.LockingFlow;
+import archimulator.sim.uncore.coherence.flow.llc.L1DownwardReadFlow;
 import archimulator.util.action.Action;
 
 public class LoadFlow extends LockingFlow {
@@ -63,30 +64,32 @@ public class LoadFlow extends LockingFlow {
     }
 
     private void downwardRead(final FindAndLockFlow findAndLockFlow, final Action onSuccessCallback, final Action onFailureCallback) {
-        final DownwardReadFlow downwardReadFlow = new DownwardReadFlow(getCache(), access, access.getPhysicalTag());
-
-        downwardReadFlow.start(
-                new Action() {
-                    @Override
-                    public void apply() {
-                        findAndLockFlow.getCacheAccess().getLine().setNonInitialState(downwardReadFlow.isShared() ? MESIState.SHARED : MESIState.EXCLUSIVE);
-
-                        findAndLockFlow.getCacheAccess().commit().getLine().unlock();
-
-                        endFillOrEvict(findAndLockFlow);
-
-                        afterFlowEnd(findAndLockFlow);
-
-                        onSuccessCallback.apply();
-                    }
-                }, new Action() {
-                    @Override
-                    public void apply() {
-                        getCache().getCycleAccurateEventQueue().schedule(new Action() {
+        getCache().sendRequest(getCache().getNext(), 8, new Action() {
+            @Override
+            public void apply() {
+                final L1DownwardReadFlow l1DownwardReadFlow = new L1DownwardReadFlow(getCache().getNext(), getCache(), access, tag);
+                l1DownwardReadFlow.start(
+                        new Action() {
+                            @Override
                             public void apply() {
-                                downwardRead(findAndLockFlow, onSuccessCallback, onFailureCallback);
+                                findAndLockFlow.getCacheAccess().getLine().setNonInitialState(l1DownwardReadFlow.isShared() ? MESIState.SHARED : MESIState.EXCLUSIVE);
+
+                                findAndLockFlow.getCacheAccess().commit().getLine().unlock();
+
+                                endFillOrEvict(findAndLockFlow);
+
+                                afterFlowEnd(findAndLockFlow);
+
+                                onSuccessCallback.apply();
                             }
-                        }, getCache().getRetryLatency());
+                        }, new Action() {
+                            @Override
+                            public void apply() {
+                                getCache().getCycleAccurateEventQueue().schedule(new Action() {
+                                    public void apply() {
+                                        downwardRead(findAndLockFlow, onSuccessCallback, onFailureCallback);
+                                    }
+                                }, getCache().getRetryLatency());
 
 //                                            findAndLockFlow.getCacheAccess().abort();
 //                                            findAndLockFlow.getCacheAccess().getLine().unlock();
@@ -96,9 +99,11 @@ public class LoadFlow extends LockingFlow {
 //                                            afterFlowEnd(findAndLockFlow);
 //
 //                                            onFailureCallback.apply();
-                    }
-                }
-        );
+                            }
+                        }
+                );
+            }
+        });
     }
 
     public FirstLevelCache getCache() {

@@ -7,7 +7,6 @@ import archimulator.sim.uncore.coherence.flc.FirstLevelCache;
 import archimulator.sim.uncore.coherence.flow.FindAndLockFlow;
 import archimulator.sim.uncore.coherence.flow.LockingFlow;
 import archimulator.sim.uncore.coherence.llc.LastLevelCache;
-import archimulator.sim.uncore.coherence.message.DownwardWriteMessage;
 import archimulator.util.action.Action;
 
 public class L1DownwardWriteFlow extends LockingFlow {
@@ -15,14 +14,12 @@ public class L1DownwardWriteFlow extends LockingFlow {
     private FirstLevelCache source;
     private MemoryHierarchyAccess access;
     private int tag;
-    private DownwardWriteMessage message;
 
-    public L1DownwardWriteFlow(final LastLevelCache cache, final FirstLevelCache source, final DownwardWriteMessage message) {
+    public L1DownwardWriteFlow(final LastLevelCache cache, final FirstLevelCache source, MemoryHierarchyAccess access, int tag) {
         this.cache = cache;
         this.source = source;
-        this.message = message;
-        this.access = message.getAccess();
-        this.tag = message.getTag();
+        this.access = access;
+        this.tag = tag;
     }
 
     public void run(final Action onSuccessCallback, final Action onFailureCallback) {
@@ -32,13 +29,13 @@ public class L1DownwardWriteFlow extends LockingFlow {
                 new Action() {
                     @Override
                     public void apply() {
-                        UpwardWriteFlow upwardWriteFlow = new UpwardWriteFlow(getCache(), source, message.getAccess(), message.getTag());
+                        UpwardWriteFlow upwardWriteFlow = new UpwardWriteFlow(getCache(), source, access, tag);
                         upwardWriteFlow.start(
                                 new Action() {
                                     @Override
                                     public void apply() {
                                         if (!findAndLockFlow.getCacheAccess().isHitInCache() && !getCache().isOwnedOrShared(tag)) {
-                                            MemReadFlow memReadFlow = new MemReadFlow(getCache(), message.getAccess(), message.getTag());
+                                            MemReadFlow memReadFlow = new MemReadFlow(getCache(), access, tag);
                                             memReadFlow.start(
                                                     new Action() {
                                                         @Override
@@ -47,7 +44,7 @@ public class L1DownwardWriteFlow extends LockingFlow {
                                                                 getCache().getShadowTagDirectories().get(sharer).removeTag(tag);
                                                             }
 
-                                                            getCache().getShadowTagDirectories().get(source).addTag(message.getTag());
+                                                            getCache().getShadowTagDirectories().get(source).addTag(tag);
 
                                                             if (findAndLockFlow.getCacheAccess().isHitInCache() || !findAndLockFlow.getCacheAccess().isBypass()) {
                                                                 findAndLockFlow.getCacheAccess().getLine().setNonInitialState(findAndLockFlow.getCacheAccess().getLine().getState() == MESIState.MODIFIED ? MESIState.MODIFIED : MESIState.EXCLUSIVE);
@@ -55,13 +52,11 @@ public class L1DownwardWriteFlow extends LockingFlow {
 
                                                             findAndLockFlow.getCacheAccess().commit().getLine().unlock();
 
-                                                            getCache().sendReply(source, source.getCache().getLineSize() + 8, message);
+                                                            getCache().sendReply(source, source.getCache().getLineSize() + 8, onSuccessCallback);
 
                                                             endFillOrEvict(findAndLockFlow);
 
                                                             afterFlowEnd(findAndLockFlow);
-
-                                                            onSuccessCallback.apply();
                                                         }
                                                     }, new Action() {
                                                         @Override
@@ -88,8 +83,7 @@ public class L1DownwardWriteFlow extends LockingFlow {
 //
 //                        afterFlowEnd(findAndLockFlow);
 
-                        onFailureCallback.apply();
-                        getCache().sendReply(source, 8, message);
+                        getCache().sendReply(source, 8, onFailureCallback);
                     }
                 }, new Action() {
                     @Override
@@ -99,8 +93,7 @@ public class L1DownwardWriteFlow extends LockingFlow {
 
                         afterFlowEnd(findAndLockFlow);
 
-                        onFailureCallback.apply();
-                        getCache().sendReply(source, 8, message);
+                        getCache().sendReply(source, 8, onFailureCallback);
                     }
                 }
         );
