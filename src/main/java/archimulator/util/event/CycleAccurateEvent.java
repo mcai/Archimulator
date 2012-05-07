@@ -21,12 +21,12 @@ package archimulator.util.event;
 import archimulator.util.action.Action;
 
 public class CycleAccurateEvent implements Comparable<CycleAccurateEvent> {
-    private long when;
     private Action action;
+    private long when;
 
-    public CycleAccurateEvent(long when, Action action) {
-        this.when = when;
+    public CycleAccurateEvent(Action action, long when) {
         this.action = action;
+        this.when = when;
     }
 
     public int compareTo(CycleAccurateEvent otherEvent) {

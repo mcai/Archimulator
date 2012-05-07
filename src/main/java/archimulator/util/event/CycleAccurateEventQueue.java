@@ -18,51 +18,108 @@
  ******************************************************************************/
 package archimulator.util.event;
 
+import archimulator.util.event.future.CycleAccurateEventQueueInterface;
+import archimulator.util.event.future.Future;
 import archimulator.util.action.Action;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.PriorityQueue;
+import java.util.concurrent.Semaphore;
 
-public final class CycleAccurateEventQueue {
+public final class CycleAccurateEventQueue implements CycleAccurateEventQueueInterface {
     private long currentCycle;
-    private PriorityQueue<CycleAccurateEvent> events;
+    private final PriorityQueue<CycleAccurateEvent> events;
+    private List<Semaphore> semsToNotify = new ArrayList<Semaphore>();
+    private List<Semaphore> semsToWait = new ArrayList<Semaphore>();
 
     public CycleAccurateEventQueue() {
         this.events = new PriorityQueue<CycleAccurateEvent>();
     }
 
-    public synchronized void advanceOneCycle() {
-        while (!this.events.isEmpty()) {
-            CycleAccurateEvent event = this.events.peek();
-
-            if (event.getWhen() != this.currentCycle) {
-                break;
-            }
-
-            event.getAction().apply();
-            this.events.remove(event);
+    @Override
+    public void advanceOneCycle() {
+        for(Semaphore semToNotify : this.semsToNotify) {
+            semToNotify.release();
         }
+
+        for(Semaphore semToWait : this.semsToWait) {
+            try {
+                semToWait.acquire();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        this.semsToNotify.clear();
+        this.semsToWait.clear();
+
+//        synchronized (this.events) {
+            while (!this.events.isEmpty()) {
+                CycleAccurateEvent event = this.events.peek();
+
+                if (event.getWhen() != this.currentCycle) {
+                    break;
+                }
+
+                event.getAction().apply();
+                this.events.remove(event);
+            }
+//        }
 
         this.currentCycle++;
     }
 
-    public synchronized CycleAccurateEventQueue schedule(Action action, int delay) {
-        assert (delay >= 0);
-
-//        System.out.printf("[%d] scheduling %s after %d cycles%n", currentCycle, action instanceof NamedAction ? ((NamedAction) action).getName() : action, delay);
-
-//        if(action instanceof NamedAction) {
-//            System.out.printf("[%d] scheduling %s after %d cycles%n", currentCycle, ((NamedAction) action).getName(), delay);
-//        }
-
-        this.schedule(new CycleAccurateEvent(this.currentCycle + delay, action));
-
+    @Override
+    public CycleAccurateEventQueueInterface schedule(Action action, int delay) {
+        this.schedule(new CycleAccurateEvent(action, this.currentCycle + delay));
         return this;
     }
 
-    private void schedule(CycleAccurateEvent event) {
-        this.events.add(event);
+    @Override
+    public void schedule(CycleAccurateEvent event) {
+//        synchronized (this.events) {
+            this.events.add(event);
+//        }
     }
 
+    @Override
+    public Future scheduleAndGetFuture(final Action action, int delay) {
+        final Future future = new Future();
+
+        this.schedule(new Action() {
+            @Override
+            public void apply() {
+                try {
+                    action.apply();
+                    future.notifyCompletion();
+                } catch (Exception e) {
+                    future.notifyFailure(e);
+                }
+            }
+        }, delay);
+
+        return future;
+    }
+
+    @Override
+    public AwaitHandleInterface awaitNextCycle() {
+        Semaphore semToNotify = new Semaphore(0, true);
+        this.semsToNotify.add(semToNotify);
+
+        Semaphore semToWait = new Semaphore(0, true);
+        this.semsToWait.add(semToWait);
+
+        try {
+            semToNotify.acquire();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        return new AwaitHandle(semToWait);
+    }
+
+    @Override
     public void resetCurrentCycle() {
         for (CycleAccurateEvent event : this.events) {
             event.setWhen(event.getWhen() - this.currentCycle);
@@ -71,7 +128,21 @@ public final class CycleAccurateEventQueue {
         this.currentCycle = 0;
     }
 
+    @Override
     public long getCurrentCycle() {
         return this.currentCycle;
+    }
+
+    public static class AwaitHandle implements AwaitHandleInterface {
+        private Semaphore semToWait;
+
+        public AwaitHandle(Semaphore semToWait) {
+            this.semToWait = semToWait;
+        }
+
+        @Override
+        public void complete() {
+            this.semToWait.release();
+        }
     }
 }
