@@ -34,7 +34,6 @@ import java.util.*;
 
 public class LastLevelCache extends CoherentCache {
     private Map<FirstLevelCache, ShadowTagDirectory> shadowTagDirectories;
-    private MainMemory next;
 
     public LastLevelCache(CacheHierarchy cacheHierarchy, String name, CoherentCacheConfig config) {
         super(cacheHierarchy, name, config, MESIState.INVALID);
@@ -100,11 +99,10 @@ public class LastLevelCache extends CoherentCache {
     }
 
     public void setNext(MainMemory next) {
-        this.next = next;
+        super.setNext(next);
     }
 
     public MainMemory getNext() {
-        return next;
+        return (MainMemory) super.getNext();
     }
-
 }

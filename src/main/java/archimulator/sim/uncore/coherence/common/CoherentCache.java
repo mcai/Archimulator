@@ -37,6 +37,8 @@ import java.util.List;
 import java.util.Random;
 
 public abstract class CoherentCache extends MemoryDevice {
+    private MemoryDevice next;
+
     private List<PendingActionOwner> pendingProcesses;
 
     private CoherentCacheConfig config;
@@ -208,5 +210,13 @@ public abstract class CoherentCache extends MemoryDevice {
 
     public boolean isLastLevelCache() {
         return this.config.getLevelType() == CoherentCacheLevelType.LAST_LEVEL_CACHE;
+    }
+
+    public MemoryDevice getNext() {
+        return next;
+    }
+
+    public void setNext(MemoryDevice next) {
+        this.next = next;
     }
 }

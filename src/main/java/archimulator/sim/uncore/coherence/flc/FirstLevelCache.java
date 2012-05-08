@@ -42,8 +42,6 @@ import java.util.EnumMap;
 import java.util.List;
 
 public class FirstLevelCache extends CoherentCache {
-    private LastLevelCache next;
-
     private List<MemoryHierarchyAccess> pendingAccesses;
     private EnumMap<MemoryHierarchyAccessType, Integer> pendingAccessesPerType;
 
@@ -213,11 +211,11 @@ public class FirstLevelCache extends CoherentCache {
     }
 
     public void setNext(LastLevelCache next) {
-        this.next = next;
+        super.setNext(next);
     }
 
     public LastLevelCache getNext() {
-        return next;
+        return (LastLevelCache) super.getNext();
     }
 
     private int getReadPorts() {

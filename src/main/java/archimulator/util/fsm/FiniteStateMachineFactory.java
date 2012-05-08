@@ -31,11 +31,9 @@ import java.util.Map;
 
 public class FiniteStateMachineFactory<StateT, ConditionT> {
     private Map<StateT, StateTransitions> transitions;
-    private BlockingEventDispatcher<FiniteStateMachineEvent> finitestateMachineEventDispatcher;
 
     public FiniteStateMachineFactory() {
         this.transitions = new HashMap<StateT, StateTransitions>();
-        this.finitestateMachineEventDispatcher = new BlockingEventDispatcher<FiniteStateMachineEvent>();
     }
 
     public StateTransitions inState(StateT state) {
@@ -58,19 +56,9 @@ public class FiniteStateMachineFactory<StateT, ConditionT> {
         }
     }
 
-    public <EventT extends FiniteStateMachineEvent> void addListener(Class<EventT> eventClass, Action2<FiniteStateMachineFactory<StateT, ConditionT>, EventT> listener) {
-        this.finitestateMachineEventDispatcher.addListener(eventClass, listener);
-    }
-
-    public <EventT extends FiniteStateMachineEvent> void removeListener(Class<EventT> eventClass, Action2<FiniteStateMachineFactory<StateT, ConditionT>, EventT> listener) {
-        this.finitestateMachineEventDispatcher.removeListener(eventClass, listener);
-    }
-
     private void changeState(FiniteStateMachine<StateT, ConditionT> from, Object condition, Object[] params, StateT newState) {
         if (from != newState) {
-            this.finitestateMachineEventDispatcher.dispatch(FiniteStateMachineFactory.this, new ExitStateEvent(from, condition, params));
-            from.setState(newState);
-            this.finitestateMachineEventDispatcher.dispatch(FiniteStateMachineFactory.this, new EnterStateEvent(from, condition, params));
+            from.setState(newState, condition, params);
         }
     }
 

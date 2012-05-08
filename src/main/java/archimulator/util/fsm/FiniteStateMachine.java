@@ -21,7 +21,7 @@ package archimulator.util.fsm;
 public interface FiniteStateMachine<StateT, ConditionT> {
     StateT getState();
 
-    void setState(StateT state);
+    void setState(StateT state, Object condition, Object[] params);
 
     void fireTransition(ConditionT condition, Object... params);
 }

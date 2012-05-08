@@ -18,6 +18,12 @@
  ******************************************************************************/
 package archimulator.util.fsm;
 
+import archimulator.util.action.Action1;
+import archimulator.util.event.BlockingEventDispatcher;
+import archimulator.util.fsm.event.EnterStateEvent;
+import archimulator.util.fsm.event.ExitStateEvent;
+import archimulator.util.fsm.event.FiniteStateMachineEvent;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,6 +33,7 @@ public class BasicFiniteStateMachine<StateT, ConditionT> implements FiniteStateM
     private StateT state;
 
     private Map<Object, Object> properties;
+    private BlockingEventDispatcher<FiniteStateMachineEvent> eventDispatcher;
 
     public BasicFiniteStateMachine(FiniteStateMachineFactory<StateT, ConditionT> factory, String name, StateT state) {
         this.factory = factory;
@@ -34,6 +41,7 @@ public class BasicFiniteStateMachine<StateT, ConditionT> implements FiniteStateM
         this.state = state;
 
         this.properties = new HashMap<Object, Object>();
+        this.eventDispatcher = new BlockingEventDispatcher<FiniteStateMachineEvent>();
     }
 
     public void put(Object key, Object value) {
@@ -43,6 +51,14 @@ public class BasicFiniteStateMachine<StateT, ConditionT> implements FiniteStateM
     @SuppressWarnings("unchecked")
     public <T> T get(Class<T> clz, Object key) {
         return (T) this.properties.get(key);
+    }
+
+    public <EventT extends FiniteStateMachineEvent> void addListener(Class<EventT> eventClass, Action1<EventT> listener) {
+        this.eventDispatcher.addListener(eventClass, listener);
+    }
+
+    public <EventT extends FiniteStateMachineEvent> void removeListener(Class<EventT> eventClass, Action1<EventT> listener) {
+        this.eventDispatcher.removeListener(eventClass, listener);
     }
 
     public String getName() {
@@ -55,8 +71,10 @@ public class BasicFiniteStateMachine<StateT, ConditionT> implements FiniteStateM
     }
 
     @Override
-    public void setState(StateT state) {
+    public void setState(StateT state, Object condition, Object[] params) {
+        this.eventDispatcher.dispatch(new ExitStateEvent(this, condition, params));
         this.state = state;
+        this.eventDispatcher.dispatch(new EnterStateEvent(this, condition, params));
     }
 
     @Override

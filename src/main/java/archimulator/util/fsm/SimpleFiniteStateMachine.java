@@ -33,7 +33,7 @@ public class SimpleFiniteStateMachine<StateT, ConditionT> implements FiniteState
     }
 
     @Override
-    public void setState(StateT state) {
+    public void setState(StateT state, Object condition, Object[] params) {
         this.state = state;
     }
 
