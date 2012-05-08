@@ -81,7 +81,7 @@ public abstract class MainMemory extends MemoryDevice {
             public void apply() {
                 new Action() {
                     public void apply() {
-                        sendReply(source, message, ((LastLevelCache) source).getCache().getLineSize() + 8);
+                        sendReply(source, ((LastLevelCache) source).getCache().getLineSize() + 8, message);
                     }
                 }.apply();
             }
@@ -95,7 +95,7 @@ public abstract class MainMemory extends MemoryDevice {
             public void apply() {
                 new Action() {
                     public void apply() {
-                        sendReply(source, message, 8);
+                        sendReply(source, 8, message);
                     }
                 }.apply();
             }

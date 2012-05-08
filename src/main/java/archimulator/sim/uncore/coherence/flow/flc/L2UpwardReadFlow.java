@@ -28,7 +28,7 @@ public class L2UpwardReadFlow extends LockingFlow {
                     @Override
                     public void apply() {
                         message.setHasCopyback(findAndLockFlow.getCacheAccess().getLine().getState() == MESIState.MODIFIED);
-                        getCache().sendReply(source, message, source.getCache().getLineSize() + 8);
+                        getCache().sendReply(source, source.getCache().getLineSize() + 8, message);
 
                         findAndLockFlow.getCacheAccess().getLine().setNonInitialState(MESIState.SHARED);
 
@@ -36,16 +36,22 @@ public class L2UpwardReadFlow extends LockingFlow {
 
                         endFillOrEvict(findAndLockFlow);
 
+                        afterFlowEnd(findAndLockFlow);
+
                         onSuccessCallback.apply();
                     }
                 }, new Action() {
                     @Override
                     public void apply() {
+//                        afterFlowEnd(findAndLockFlow);
+
                         onFailureCallback.apply();
                     }
                 }, new Action() {
                     @Override
                     public void apply() {
+                        afterFlowEnd(findAndLockFlow);
+
                         onFailureCallback.apply();
                     }
                 }

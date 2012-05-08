@@ -27,31 +27,13 @@ public class LoadFlow extends LockingFlow {
                     @Override
                     public void apply() {
                         if (!findAndLockFlow.getCacheAccess().isHitInCache()) {
-                            final DownwardReadFlow downwardReadFlow = new DownwardReadFlow(getCache(), access, access.getPhysicalTag());
-
-                            downwardReadFlow.start(
-                                    new Action() {
-                                        @Override
-                                        public void apply() {
-                                            findAndLockFlow.getCacheAccess().getLine().setNonInitialState(downwardReadFlow.isShared() ? MESIState.SHARED : MESIState.EXCLUSIVE);
-
-                                            findAndLockFlow.getCacheAccess().commit().getLine().unlock();
-
-                                            endFillOrEvict(findAndLockFlow);
-
-                                            onSuccessCallback.apply();
-                                        }
-                                    }, new Action() {
-                                        @Override
-                                        public void apply() {
-                                            throw new UnsupportedOperationException(); //TODO
-                                        }
-                                    }
-                            );
+                            downwardRead(findAndLockFlow, onSuccessCallback, onFailureCallback);
                         } else {
                             findAndLockFlow.getCacheAccess().commit().getLine().unlock();
 
                             endFillOrEvict(findAndLockFlow);
+
+                            afterFlowEnd(findAndLockFlow);
 
                             onSuccessCallback.apply();
                         }
@@ -59,8 +41,11 @@ public class LoadFlow extends LockingFlow {
                 }, new Action() {
                     @Override
                     public void apply() {
-                        findAndLockFlow.getCacheAccess().abort();
-                        findAndLockFlow.getCacheAccess().getLine().unlock();
+//                        findAndLockFlow.getCacheAccess().abort();
+//                        findAndLockFlow.getCacheAccess().getLine().unlock();
+//
+//                        afterFlowEnd(findAndLockFlow);
+
                         onFailureCallback.apply();
                     }
                 }, new Action() {
@@ -68,7 +53,49 @@ public class LoadFlow extends LockingFlow {
                     public void apply() {
                         findAndLockFlow.getCacheAccess().abort();
                         findAndLockFlow.getCacheAccess().getLine().unlock();
+
+                        afterFlowEnd(findAndLockFlow);
+
                         onFailureCallback.apply();
+                    }
+                }
+        );
+    }
+
+    private void downwardRead(final FindAndLockFlow findAndLockFlow, final Action onSuccessCallback, final Action onFailureCallback) {
+        final DownwardReadFlow downwardReadFlow = new DownwardReadFlow(getCache(), access, access.getPhysicalTag());
+
+        downwardReadFlow.start(
+                new Action() {
+                    @Override
+                    public void apply() {
+                        findAndLockFlow.getCacheAccess().getLine().setNonInitialState(downwardReadFlow.isShared() ? MESIState.SHARED : MESIState.EXCLUSIVE);
+
+                        findAndLockFlow.getCacheAccess().commit().getLine().unlock();
+
+                        endFillOrEvict(findAndLockFlow);
+
+                        afterFlowEnd(findAndLockFlow);
+
+                        onSuccessCallback.apply();
+                    }
+                }, new Action() {
+                    @Override
+                    public void apply() {
+                        getCache().getCycleAccurateEventQueue().schedule(new Action() {
+                            public void apply() {
+                                downwardRead(findAndLockFlow, onSuccessCallback, onFailureCallback);
+                            }
+                        }, getCache().getRetryLatency());
+
+//                                            findAndLockFlow.getCacheAccess().abort();
+//                                            findAndLockFlow.getCacheAccess().getLine().unlock();
+//
+//                                            abort(findAndLockFlow);
+//
+//                                            afterFlowEnd(findAndLockFlow);
+//
+//                                            onFailureCallback.apply();
                     }
                 }
         );

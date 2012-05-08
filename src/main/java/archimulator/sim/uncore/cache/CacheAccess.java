@@ -86,6 +86,6 @@ public abstract class CacheAccess<StateT extends Serializable, LineT extends Cac
 
     @Override
     public String toString() {
-        return String.format("[%d, %d] {hitInCache=%s, bypass=%s, eviction=%s}", reference.getSet(), way, isHitInCache(), isBypass(), isEviction());
+        return String.format("[%d, %d] %s {id=%d, hitInCache=%s, bypass=%s, eviction=%s}", reference.getSet(), way, reference.getAccessType(), id, isHitInCache(), isBypass(), isEviction());
     }
 }

@@ -18,6 +18,9 @@ import archimulator.util.fsm.FiniteStateMachine;
 import archimulator.util.fsm.FiniteStateMachineFactory;
 import archimulator.util.fsm.event.EnterStateEvent;
 
+import java.io.FileWriter;
+import java.io.IOException;
+
 public abstract class FindAndLockFlow extends Flow {
     private CoherentCache cache;
     private MemoryHierarchyAccess access;
@@ -61,6 +64,8 @@ public abstract class FindAndLockFlow extends Flow {
         this.doLockingProcess();
     }
 
+    public static FileWriter fwLocks;
+
     private void doLockingProcess() {
         if (this.cacheAccess == null) {
             this.cacheAccess = this.getCache().getCache().newAccess(this.getCache(), access, tag, cacheAccessType);
@@ -74,6 +79,13 @@ public abstract class FindAndLockFlow extends Flow {
             }
 
             if (this.cacheAccess.getLine().isLocked() && cacheAccessType.isDownward()) {
+                try {
+                    fwLocks.write(String.format("[%d] %s: %s failed to lock, locked by %s\n", this.getCache().getCycleAccurateEventQueue().getCurrentCycle(), this.getCache().getName(), this.cacheAccess, this.cacheAccess.getLine().getCacheAccess()));
+                    fwLocks.flush();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
                 this.fsm.fireTransition(FindAndLockFlowCondition.FAILED_TO_LOCK);
             } else {
                 Action action = new Action() {
@@ -82,10 +94,17 @@ public abstract class FindAndLockFlow extends Flow {
                     }
                 };
 
-                boolean result = this.cacheAccess.isHitInCache() ? this.cacheAccess.getLine().beginHit(action, tag) :
-                        (this.cacheAccess.isEviction() ? this.cacheAccess.getLine().beginEvict(action, tag) : this.cacheAccess.getLine().beginFill(action, tag));
+                boolean result = this.cacheAccess.isHitInCache() ? this.cacheAccess.getLine().beginHit(action, tag, this.cacheAccess) :
+                        (this.cacheAccess.isEviction() ? this.cacheAccess.getLine().beginEvict(action, tag, this.cacheAccess) : this.cacheAccess.getLine().beginFill(action, tag, this.cacheAccess));
 
                 if (result) {
+                    try {
+                        fwLocks.write(String.format("[%d] %s: %s lock\n", this.getCache().getCycleAccurateEventQueue().getCurrentCycle(), this.getCache().getName(), this.cacheAccess));
+                        fwLocks.flush();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+
                     if (!cacheAccessType.isUpward()) {
                         this.getCache().getBlockingEventDispatcher().dispatch(new CoherentCacheServiceNonblockingRequestEvent(this.getCache(), tag, access, this.cacheAccess.getLine(), this.cacheAccess.isHitInCache(), this.cacheAccess.isEviction(), this.cacheAccess.getReference().getAccessType()));
                     }
@@ -123,6 +142,7 @@ public abstract class FindAndLockFlow extends Flow {
                     @Override
                     public void apply() {
                         fsm.fireTransition(FindAndLockFlowCondition.EVICTED);
+                        cacheAccess.getLine().beginFillAfterEvict();
                     }
                 }, new Action() {
                     @Override
@@ -221,5 +241,11 @@ public abstract class FindAndLockFlow extends Flow {
                         return FindAndLockFlowState.FAILED_TO_EVICT;
                     }
                 });
+
+        try {
+            fwLocks = new FileWriter("/home/itecgo/Desktop/failedToLock.txt");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

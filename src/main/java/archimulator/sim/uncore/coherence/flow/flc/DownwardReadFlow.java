@@ -7,7 +7,7 @@ import archimulator.sim.uncore.coherence.message.DownwardReadMessage;
 import archimulator.util.action.Action;
 import archimulator.util.action.Action1;
 
-public class DownwardReadFlow extends Flow {
+public class DownwardReadFlow {
     private FirstLevelCache cache;
     private MemoryHierarchyAccess access;
     private int tag;
@@ -20,7 +20,7 @@ public class DownwardReadFlow extends Flow {
     }
 
     public void start(final Action onSuccessCallback, final Action onFailureCallback) {
-        getCache().sendRequest(getCache().getNext(), new DownwardReadMessage(access, tag, new Action1<DownwardReadMessage>() {
+        getCache().sendRequest(getCache().getNext(), 8, new DownwardReadMessage(access, tag, new Action1<DownwardReadMessage>() {
             public void apply(DownwardReadMessage downwardReadMessage) {
                 if (!downwardReadMessage.isError()) {
                     shared = downwardReadMessage.isShared();
@@ -29,7 +29,7 @@ public class DownwardReadFlow extends Flow {
                     onFailureCallback.apply();
                 }
             }
-        }), 8);
+        }));
     }
 
     public FirstLevelCache getCache() {

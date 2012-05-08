@@ -7,17 +7,17 @@ import archimulator.sim.uncore.coherence.flc.FirstLevelCache;
 import archimulator.sim.uncore.coherence.flow.FindAndLockFlow;
 import archimulator.sim.uncore.coherence.flow.LockingFlow;
 import archimulator.sim.uncore.coherence.llc.LastLevelCache;
-import archimulator.sim.uncore.coherence.message.DownwardReadMessage;
+import archimulator.sim.uncore.coherence.message.DownwardWriteMessage;
 import archimulator.util.action.Action;
 
 public class L1DownwardWriteFlow extends LockingFlow {
     private LastLevelCache cache;
     private FirstLevelCache source;
-    protected MemoryHierarchyAccess access;
-    protected int tag;
-    private DownwardReadMessage message;
+    private MemoryHierarchyAccess access;
+    private int tag;
+    private DownwardWriteMessage message;
 
-    public L1DownwardWriteFlow(final LastLevelCache cache, final FirstLevelCache source, final DownwardReadMessage message) {
+    public L1DownwardWriteFlow(final LastLevelCache cache, final FirstLevelCache source, final DownwardWriteMessage message) {
         this.cache = cache;
         this.source = source;
         this.message = message;
@@ -55,9 +55,11 @@ public class L1DownwardWriteFlow extends LockingFlow {
 
                                                             findAndLockFlow.getCacheAccess().commit().getLine().unlock();
 
-                                                            getCache().sendReply(source, message, source.getCache().getLineSize() + 8);
+                                                            getCache().sendReply(source, source.getCache().getLineSize() + 8, message);
 
                                                             endFillOrEvict(findAndLockFlow);
+
+                                                            afterFlowEnd(findAndLockFlow);
 
                                                             onSuccessCallback.apply();
                                                         }
@@ -81,16 +83,24 @@ public class L1DownwardWriteFlow extends LockingFlow {
                 }, new Action() {
                     @Override
                     public void apply() {
-                        findAndLockFlow.getCacheAccess().abort();
-                        findAndLockFlow.getCacheAccess().getLine().unlock();
+//                        findAndLockFlow.getCacheAccess().abort();
+//                        findAndLockFlow.getCacheAccess().getLine().unlock();
+//
+//                        afterFlowEnd(findAndLockFlow);
+
                         onFailureCallback.apply();
+                        getCache().sendReply(source, 8, message);
                     }
                 }, new Action() {
                     @Override
                     public void apply() {
                         findAndLockFlow.getCacheAccess().abort();
                         findAndLockFlow.getCacheAccess().getLine().unlock();
+
+                        afterFlowEnd(findAndLockFlow);
+
                         onFailureCallback.apply();
+                        getCache().sendReply(source, 8, message);
                     }
                 }
         );

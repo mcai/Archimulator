@@ -35,20 +35,26 @@ public class L2UpwardWriteFlow extends LockingFlow {
                         getCache().getBlockingEventDispatcher().dispatch(new FirstLevelCacheLineEvictedByL2UpwardWriteProcessEvent(getCache(), findAndLockFlow.getCacheAccess().getLine()));
 
                         int size = findAndLockFlow.getCacheAccess().getLine().getState() == MESIState.MODIFIED ? getCache().getCache().getLineSize() + 8 : 8;
-                        getCache().sendReply(source, message, size);
+                        getCache().sendReply(source, size, message);
 
                         endFillOrEvict(findAndLockFlow);
+
+                        afterFlowEnd(findAndLockFlow);
 
                         onSuccessCallback.apply();
                     }
                 }, new Action() {
                     @Override
                     public void apply() {
+//                        afterFlowEnd(findAndLockFlow);
+
                         onFailureCallback.apply();
                     }
                 }, new Action() {
                     @Override
                     public void apply() {
+                        afterFlowEnd(findAndLockFlow);
+
                         onFailureCallback.apply();
                     }
                 }

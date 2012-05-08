@@ -8,7 +8,7 @@ import archimulator.sim.uncore.coherence.message.UpwardReadMessage;
 import archimulator.util.action.Action;
 import archimulator.util.action.Action1;
 
-public class UpwardReadFlow extends Flow {
+public class UpwardReadFlow {
     private LastLevelCache cache;
     private FirstLevelCache target;
     private MemoryHierarchyAccess access;
@@ -23,7 +23,7 @@ public class UpwardReadFlow extends Flow {
     }
 
     public void start(final Action onSuccessCallback, final Action onFailureCallback) {
-        getCache().sendRequest(target, new UpwardReadMessage(access, tag, new Action1<UpwardReadMessage>() {
+        getCache().sendRequest(target, 8, new UpwardReadMessage(access, tag, new Action1<UpwardReadMessage>() {
             public void apply(UpwardReadMessage upwardReadMessage) {
                 if (upwardReadMessage.isError()) {
                     onFailureCallback.apply();
@@ -32,7 +32,7 @@ public class UpwardReadFlow extends Flow {
                     onSuccessCallback.apply();
                 }
             }
-        }), 8);
+        }));
     }
 
     public LastLevelCache getCache() {

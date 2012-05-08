@@ -27,31 +27,14 @@ public class StoreFlow extends LockingFlow {
                     @Override
                     public void apply() {
                         if (findAndLockFlow.getCacheAccess().getLine().getState() == MESIState.SHARED || findAndLockFlow.getCacheAccess().getLine().getState() == MESIState.INVALID) {
-                            final DownwardWriteFlow downwardWriteFlow = new DownwardWriteFlow(getCache(), access, access.getPhysicalTag());
-
-                            downwardWriteFlow.start(
-                                    new Action() {
-                                        @Override
-                                        public void apply() {
-                                            findAndLockFlow.getCacheAccess().getLine().setNonInitialState(MESIState.MODIFIED);
-                                            findAndLockFlow.getCacheAccess().commit().getLine().unlock();
-
-                                            endFillOrEvict(findAndLockFlow);
-
-                                            onSuccessCallback.apply();
-                                        }
-                                    }, new Action() {
-                                        @Override
-                                        public void apply() {
-                                            throw new UnsupportedOperationException(); //TODO
-                                        }
-                                    }
-                            );
+                            downwardWrite(findAndLockFlow, onSuccessCallback, onFailureCallback);
                         } else {
                             findAndLockFlow.getCacheAccess().getLine().setNonInitialState(MESIState.MODIFIED);
                             findAndLockFlow.getCacheAccess().commit().getLine().unlock();
 
                             endFillOrEvict(findAndLockFlow);
+
+                            afterFlowEnd(findAndLockFlow);
 
                             onSuccessCallback.apply();
                         }
@@ -59,8 +42,11 @@ public class StoreFlow extends LockingFlow {
                 }, new Action() {
                     @Override
                     public void apply() {
-                        findAndLockFlow.getCacheAccess().abort();
-                        findAndLockFlow.getCacheAccess().getLine().unlock();
+//                        findAndLockFlow.getCacheAccess().abort();
+//                        findAndLockFlow.getCacheAccess().getLine().unlock();
+//
+//                        afterFlowEnd(findAndLockFlow);
+
                         onFailureCallback.apply();
                     }
                 }, new Action() {
@@ -68,7 +54,41 @@ public class StoreFlow extends LockingFlow {
                     public void apply() {
                         findAndLockFlow.getCacheAccess().abort();
                         findAndLockFlow.getCacheAccess().getLine().unlock();
+
+                        afterFlowEnd(findAndLockFlow);
+
                         onFailureCallback.apply();
+                    }
+                }
+        );
+    }
+
+    private void downwardWrite(final FindAndLockFlow findAndLockFlow, final Action onSuccessCallback, final Action onFailureCallback) {
+        final DownwardWriteFlow downwardWriteFlow = new DownwardWriteFlow(getCache(), access, access.getPhysicalTag());
+
+        downwardWriteFlow.start(
+                new Action() {
+                    @Override
+                    public void apply() {
+                        findAndLockFlow.getCacheAccess().getLine().setNonInitialState(MESIState.MODIFIED);
+                        findAndLockFlow.getCacheAccess().commit().getLine().unlock();
+
+                        endFillOrEvict(findAndLockFlow);
+
+                        afterFlowEnd(findAndLockFlow);
+
+                        onSuccessCallback.apply();
+                    }
+                }, new Action() {
+                    @Override
+                    public void apply() {
+                        getCache().getCycleAccurateEventQueue().schedule(new Action() {
+                            public void apply() {
+                                downwardWrite(findAndLockFlow, onSuccessCallback, onFailureCallback);
+                            }
+                        }, getCache().getRetryLatency());
+
+//                                            throw new UnsupportedOperationException(); //TODO
                     }
                 }
         );

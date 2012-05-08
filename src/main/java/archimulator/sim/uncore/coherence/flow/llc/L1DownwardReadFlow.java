@@ -26,7 +26,7 @@ public class L1DownwardReadFlow extends LockingFlow {
         this.tag = message.getTag();
     }
 
-    public void run(final Action onSuccessCallback, final Action onFailureCallback) {
+    public void start(final Action onSuccessCallback, final Action onFailureCallback) {
         final FindAndLockFlow findAndLockFlow = new LastLevelCacheFindAndLockFlow(this.cache, this.access, this.tag, CacheAccessType.DOWNWARD_READ);
 
         findAndLockFlow.start(
@@ -48,6 +48,8 @@ public class L1DownwardReadFlow extends LockingFlow {
                                                 reply(findAndLockFlow);
 
                                                 endFillOrEvict(findAndLockFlow);
+
+                                                afterFlowEnd(findAndLockFlow);
 
                                                 onSuccessCallback.apply();
                                             }
@@ -72,6 +74,8 @@ public class L1DownwardReadFlow extends LockingFlow {
 
                                                 endFillOrEvict(findAndLockFlow);
 
+                                                afterFlowEnd(findAndLockFlow);
+
                                                 onSuccessCallback.apply();
                                             }
                                         }, new Action() {
@@ -83,20 +87,37 @@ public class L1DownwardReadFlow extends LockingFlow {
                                 );
                             }
                         }
+                        else {
+                            reply(findAndLockFlow);
+
+                            endFillOrEvict(findAndLockFlow);
+
+                            afterFlowEnd(findAndLockFlow);
+
+                            onSuccessCallback.apply();
+                        }
+                    }
+                }, new Action() {
+                    @Override
+                    public void apply() {
+//                        findAndLockFlow.getCacheAccess().abort();
+//                        findAndLockFlow.getCacheAccess().getLine().unlock();
+//
+//                        afterFlowEnd(findAndLockFlow);
+
+                        onFailureCallback.apply();
+                        getCache().sendReply(source, 8, message);
                     }
                 }, new Action() {
                     @Override
                     public void apply() {
                         findAndLockFlow.getCacheAccess().abort();
                         findAndLockFlow.getCacheAccess().getLine().unlock();
+
+                        afterFlowEnd(findAndLockFlow);
+
                         onFailureCallback.apply();
-                    }
-                }, new Action() {
-                    @Override
-                    public void apply() {
-                        findAndLockFlow.getCacheAccess().abort();
-                        findAndLockFlow.getCacheAccess().getLine().unlock();
-                        onFailureCallback.apply();
+                        getCache().sendReply(source, 8, message);
                     }
                 }
         );
@@ -106,7 +127,7 @@ public class L1DownwardReadFlow extends LockingFlow {
         getCache().getShadowTagDirectories().get(source).addTag(message.getTag());
         message.setShared(getCache().isShared(message.getTag()));
 
-        getCache().sendReply(source, message, source.getCache().getLineSize() + 8);
+        getCache().sendReply(source, source.getCache().getLineSize() + 8, message);
 
         if (!findAndLockFlow.getCacheAccess().isHitInCache() && !findAndLockFlow.getCacheAccess().isBypass()) {
             if (copyBack) {

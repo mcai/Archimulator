@@ -19,13 +19,16 @@
 package archimulator.sim.uncore.coherence.common;
 
 import archimulator.sim.uncore.cache.Cache;
+import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.cache.CacheLine;
+import archimulator.sim.uncore.coherence.flow.FindAndLockFlow;
 import archimulator.util.action.Action;
 import archimulator.util.action.Function1X;
 import archimulator.util.fsm.FiniteStateMachine;
 import archimulator.util.fsm.FiniteStateMachineFactory;
 import archimulator.util.fsm.SimpleFiniteStateMachine;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +36,7 @@ public class LockableCacheLine extends CacheLine<MESIState> {
     private FiniteStateMachine<LockableCacheLineReplacementState, LockableCacheLineReplacementCondition> replacementFsm;
     private int transientTag = -1;
     private List<Action> suspendedActions;
+    private CacheAccess<MESIState, LockableCacheLine> cacheAccess;
 
     public LockableCacheLine(Cache<?, ?> cache, int set, int way, MESIState initialState) {
         super(cache, set, way, initialState);
@@ -41,17 +45,25 @@ public class LockableCacheLine extends CacheLine<MESIState> {
         this.suspendedActions = new ArrayList<Action>();
     }
 
-    private boolean lock(Action action, int transientTag) {
+    private boolean lock(Action action, int transientTag, CacheAccess<MESIState, LockableCacheLine> cacheAccess) {
         if (this.isLocked()) {
             this.suspendedActions.add(action);
             return false;
         } else {
             this.transientTag = transientTag;
+            this.cacheAccess = cacheAccess;
             return true;
         }
     }
 
     public LockableCacheLine unlock() {
+        try {
+            FindAndLockFlow.fwLocks.write(String.format("[%d] %s: %s unlock\n", this.getCache().getCycleAccurateEventQueue().getCurrentCycle(), this.getCache().getName(), this.cacheAccess));
+            FindAndLockFlow.fwLocks.flush();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         this.transientTag = -1;
 
         for (Action action : this.suspendedActions) {
@@ -63,8 +75,8 @@ public class LockableCacheLine extends CacheLine<MESIState> {
         return this;
     }
 
-    public boolean beginHit(Action action, int transientTag) {
-        boolean result = lock(action, transientTag);
+    public boolean beginHit(Action action, int transientTag, CacheAccess<MESIState, LockableCacheLine> cacheAccess) {
+        boolean result = lock(action, transientTag, cacheAccess);
         if (result) {
             this.replacementFsm.fireTransition(LockableCacheLineReplacementCondition.BEGIN_HIT);
         }
@@ -75,8 +87,8 @@ public class LockableCacheLine extends CacheLine<MESIState> {
         this.replacementFsm.fireTransition(LockableCacheLineReplacementCondition.END_HIT);
     }
 
-    public boolean beginEvict(Action action, int transientTag) {
-        boolean result = lock(action, transientTag);
+    public boolean beginEvict(Action action, int transientTag, CacheAccess<MESIState, LockableCacheLine> cacheAccess) {
+        boolean result = lock(action, transientTag, cacheAccess);
         if (result) {
             this.replacementFsm.fireTransition(LockableCacheLineReplacementCondition.BEGIN_EVICT);
         }
@@ -87,8 +99,16 @@ public class LockableCacheLine extends CacheLine<MESIState> {
         this.replacementFsm.fireTransition(LockableCacheLineReplacementCondition.END_EVICT);
     }
 
-    public boolean beginFill(Action action, int transientTag) {
-        boolean result = lock(action, transientTag);
+    public void beginFillAfterEvict() {
+        if(this.replacementFsm.getState() != LockableCacheLineReplacementState.EVICTED) {
+            throw new IllegalArgumentException();
+        }
+
+        this.replacementFsm.fireTransition(LockableCacheLineReplacementCondition.BEGIN_FILL);
+    }
+
+    public boolean beginFill(Action action, int transientTag, CacheAccess<MESIState, LockableCacheLine> cacheAccess) {
+        boolean result = lock(action, transientTag, cacheAccess);
         if (result) {
             this.replacementFsm.fireTransition(LockableCacheLineReplacementCondition.BEGIN_FILL);
         }
@@ -102,6 +122,10 @@ public class LockableCacheLine extends CacheLine<MESIState> {
     public void invalidate() {
         this.replacementFsm.fireTransition(LockableCacheLineReplacementCondition.INVALIDATE);
         super.invalidate();
+    }
+
+    public void abort() {
+        this.replacementFsm.fireTransition(LockableCacheLineReplacementCondition.INVALIDATE);
     }
 
     public int getTransientTag() {
@@ -125,9 +149,13 @@ public class LockableCacheLine extends CacheLine<MESIState> {
         return this.replacementFsm.getState();
     }
 
+    public CacheAccess<MESIState, LockableCacheLine> getCacheAccess() {
+        return cacheAccess;
+    }
+
     @Override
     public String toString() {
-        return String.format("LockableCacheLine{set=%d, way=%d, tag=%s, transientTag=%s, state=%s}", getSet(), getWay(), getTag() == -1 ? "<INVALID>" : String.format("0x%08x", getTag()), transientTag == -1 ? "<INVALID>" : String.format("0x%08x", transientTag), getState());
+        return String.format("[%d, %d] {tag=%s, transientTag=%s, state=%s}", getSet(), getWay(), getTag() == -1 ? "<INVALID>" : String.format("0x%08x", getTag()), transientTag == -1 ? "<INVALID>" : String.format("0x%08x", transientTag), getState());
     }
 
     private static FiniteStateMachineFactory<LockableCacheLineReplacementState, LockableCacheLineReplacementCondition> fsmFactory;

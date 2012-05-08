@@ -23,19 +23,21 @@ import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.core.DynamicInstruction;
 import archimulator.sim.uncore.*;
 import archimulator.sim.uncore.cache.CacheAccess;
-import archimulator.sim.uncore.coherence.flc.process.L2UpwardReadProcess;
-import archimulator.sim.uncore.coherence.flc.process.L2UpwardWriteProcess;
-import archimulator.sim.uncore.coherence.flc.process.LoadProcess;
-import archimulator.sim.uncore.coherence.flc.process.StoreProcess;
-import archimulator.sim.uncore.coherence.llc.LastLevelCache;
-import archimulator.sim.uncore.coherence.common.*;
+import archimulator.sim.uncore.coherence.common.CoherentCache;
+import archimulator.sim.uncore.coherence.common.LockableCacheLine;
+import archimulator.sim.uncore.coherence.common.MESIState;
 import archimulator.sim.uncore.coherence.config.CoherentCacheConfig;
 import archimulator.sim.uncore.coherence.config.FirstLevelCacheConfig;
-import archimulator.sim.uncore.coherence.message.*;
+import archimulator.sim.uncore.coherence.flow.flc.L2UpwardReadFlow;
+import archimulator.sim.uncore.coherence.flow.flc.L2UpwardWriteFlow;
+import archimulator.sim.uncore.coherence.flow.flc.LoadFlow;
+import archimulator.sim.uncore.coherence.llc.LastLevelCache;
+import archimulator.sim.uncore.coherence.message.MemoryDeviceMessage;
+import archimulator.sim.uncore.coherence.message.UpwardReadMessage;
+import archimulator.sim.uncore.coherence.message.UpwardWriteMessage;
 import archimulator.sim.uncore.net.Net;
 import archimulator.util.action.Action;
 import archimulator.util.action.Action1;
-import archimulator.util.action.NamedAction;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -152,10 +154,32 @@ public class FirstLevelCache extends CoherentCache {
     public void receiveRequest(MemoryDevice source, MemoryDeviceMessage message) {
         switch (message.getType()) {
             case UPWARD_READ:
-                this.scheduleProcess(new L2UpwardReadProcess(this, (LastLevelCache) source, (UpwardReadMessage) message));
+                L2UpwardReadFlow l2UpwardReadFlow = new L2UpwardReadFlow(this, (LastLevelCache) source, (UpwardReadMessage) message);
+                l2UpwardReadFlow.start(
+                        new Action() {
+                            @Override
+                            public void apply() {
+                            }
+                        }, new Action() {
+                            @Override
+                            public void apply() {
+                            }
+                        }
+                );
                 break;
             case UPWARD_WRITE:
-                this.scheduleProcess(new L2UpwardWriteProcess(this, (LastLevelCache) source, (UpwardWriteMessage) message));
+                L2UpwardWriteFlow l2UpwardWriteFlow = new L2UpwardWriteFlow(this, (LastLevelCache) source, (UpwardWriteMessage) message);
+                l2UpwardWriteFlow.start(
+                        new Action() {
+                            @Override
+                            public void apply() {
+                            }
+                        }, new Action() {
+                            @Override
+                            public void apply() {
+                            }
+                        }
+                );
                 break;
             default:
                 throw new IllegalArgumentException();
@@ -163,51 +187,66 @@ public class FirstLevelCache extends CoherentCache {
     }
 
     public void receiveIfetch(final MemoryHierarchyAccess access, final Action onCompletedCallback) {
-        this.scheduleProcess(new LoadProcess(this, access).addOnCompletedCallback(new Action1<LoadProcess>() {
-            public void apply(LoadProcess loadProcess) {
-                if (!loadProcess.isError()) {
-                    onCompletedCallback.apply();
-                } else {
-                    getCycleAccurateEventQueue().schedule(new Action() {
-                        public void apply() {
-                            receiveIfetch(access, onCompletedCallback);
-                        }
-                    }, getRetryLatency());
+        LoadFlow loadFlow = new LoadFlow(this, access, access.getPhysicalTag());
+        loadFlow.run(
+                new Action() {
+                    @Override
+                    public void apply() {
+                        onCompletedCallback.apply();
+                    }
+                }, new Action() {
+                    @Override
+                    public void apply() {
+                        getCycleAccurateEventQueue().schedule(new Action() {
+                            public void apply() {
+                                receiveIfetch(access, onCompletedCallback);
+                            }
+                        }, getRetryLatency());
+                    }
                 }
-            }
-        }));
+        );
     }
 
     public void receiveLoad(final MemoryHierarchyAccess access, final Action onCompletedCallback) {
-        this.scheduleProcess(new LoadProcess(this, access).addOnCompletedCallback(new Action1<LoadProcess>() {
-            public void apply(LoadProcess loadProcess) {
-                if (!loadProcess.isError()) {
-                    onCompletedCallback.apply();
-                } else {
-                    getCycleAccurateEventQueue().schedule(new Action() {
-                        public void apply() {
-                            receiveLoad(access, onCompletedCallback);
-                        }
-                    }, getRetryLatency());
+        LoadFlow loadFlow = new LoadFlow(this, access, access.getPhysicalTag());
+        loadFlow.run(
+                new Action() {
+                    @Override
+                    public void apply() {
+                        onCompletedCallback.apply();
+                    }
+                }, new Action() {
+                    @Override
+                    public void apply() {
+                        getCycleAccurateEventQueue().schedule(new Action() {
+                            public void apply() {
+                                receiveLoad(access, onCompletedCallback);
+                            }
+                        }, getRetryLatency());
+                    }
                 }
-            }
-        }));
+        );
     }
 
     public void receiveStore(final MemoryHierarchyAccess access, final Action onCompletedCallback) {
-        this.scheduleProcess(new StoreProcess(this, access).addOnCompletedCallback(new Action1<StoreProcess>() {
-            public void apply(StoreProcess storeProcess) {
-                if (!storeProcess.isError()) {
-                    onCompletedCallback.apply();
-                } else {
-                    getCycleAccurateEventQueue().schedule(new Action() {
-                        public void apply() {
-                            receiveStore(access, onCompletedCallback);
-                        }
-                    }, getRetryLatency());
+        LoadFlow loadFlow = new LoadFlow(this, access, access.getPhysicalTag());
+        loadFlow.run(
+                new Action() {
+                    @Override
+                    public void apply() {
+                        onCompletedCallback.apply();
+                    }
+                }, new Action() {
+                    @Override
+                    public void apply() {
+                        getCycleAccurateEventQueue().schedule(new Action() {
+                            public void apply() {
+                                receiveStore(access, onCompletedCallback);
+                            }
+                        }, getRetryLatency());
+                    }
                 }
-            }
-        }));
+        );
     }
 
     public void setNext(LastLevelCache next) {

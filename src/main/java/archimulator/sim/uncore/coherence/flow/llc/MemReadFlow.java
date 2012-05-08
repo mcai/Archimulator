@@ -19,11 +19,11 @@ public class MemReadFlow extends Flow {
     }
 
     public void start(final Action onSuccessCallback, final Action onFailureCallback) {
-        getCache().sendRequest(getCache().getNext(), new MemReadMessage(access, tag, new Action1<MemReadMessage>() {
+        getCache().sendRequest(getCache().getNext(), 8, new MemReadMessage(access, tag, new Action1<MemReadMessage>() {
             public void apply(MemReadMessage memReadMessage) {
                 onSuccessCallback.apply();
             }
-        }), 8);
+        }));
     }
 
     public LastLevelCache getCache() {

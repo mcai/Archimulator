@@ -15,4 +15,15 @@ public abstract class LockingFlow extends Flow {
             throw new IllegalArgumentException();
         }
     }
+
+    protected void abort(FindAndLockFlow findAndLockFlow) {
+        findAndLockFlow.getCacheAccess().getLine().abort();
+    }
+
+    protected void afterFlowEnd(FindAndLockFlow findAndLockFlow) {
+        LockableCacheLineReplacementState replacementStateAfterEndHitOrFill = findAndLockFlow.getCacheAccess().getLine().getReplacementState();
+        if(replacementStateAfterEndHitOrFill != LockableCacheLineReplacementState.INVALID && replacementStateAfterEndHitOrFill != LockableCacheLineReplacementState.VALID) {
+            throw new IllegalArgumentException();
+        }
+    }
 }

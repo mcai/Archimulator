@@ -27,12 +27,9 @@ import archimulator.sim.uncore.MemoryDevice;
 import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.coherence.action.PendingActionOwner;
 import archimulator.sim.uncore.coherence.config.CoherentCacheConfig;
-import archimulator.sim.uncore.coherence.exception.CoherentCacheException;
-import archimulator.util.action.Action;
 import archimulator.util.action.Action1;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -146,7 +143,7 @@ public abstract class CoherentCache extends MemoryDevice {
         }
     }
 
-    protected int getRetryLatency() {
+    public int getRetryLatency() {
         int hitLatency = getHitLatency();
         return hitLatency + random.nextInt(hitLatency + 2);
     }
@@ -181,31 +178,6 @@ public abstract class CoherentCache extends MemoryDevice {
 
     private long getDownwardAccesses() {
         return getDownwardHits() + getDownwardMisses() + getDownwardBypasses();
-    }
-
-    private void processPendingActions() {
-        for (Iterator<PendingActionOwner> it = this.pendingProcesses.iterator(); it.hasNext(); ) {
-            try {
-                if (it.next().processPendingActions()) {
-                    it.remove();
-                }
-            } catch (CoherentCacheException e) {
-                it.remove();
-            }
-        }
-
-        if (!this.pendingProcesses.isEmpty()) {
-            this.getCycleAccurateEventQueue().schedule(new Action() {
-                public void apply() {
-                    processPendingActions();
-                }
-            }, 1);
-        }
-    }
-
-    protected void scheduleProcess(PendingActionOwner process) {
-        this.pendingProcesses.add(process);
-        this.processPendingActions();
     }
 
     public boolean isLastLevelCache() {

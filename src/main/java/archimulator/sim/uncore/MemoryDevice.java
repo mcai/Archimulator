@@ -37,8 +37,17 @@ public abstract class MemoryDevice extends BasicSimulationObject implements Simu
         this.name = name;
     }
 
-    public void sendRequest(final MemoryDevice target, final MemoryDeviceMessage message, final int size) {
+    public void send(final MemoryDevice target, final int size, final Action action) {
         this.getNet(target).transfer(this, target, size, new Action() {
+            public void apply() {
+                action.apply();
+            }
+        });
+    }
+
+    public void sendRequest(final MemoryDevice target, final int size, final MemoryDeviceMessage message) {
+        this.send(target, size, new Action() {
+            @Override
             public void apply() {
                 target.receiveRequest(MemoryDevice.this, message);
             }
@@ -47,7 +56,7 @@ public abstract class MemoryDevice extends BasicSimulationObject implements Simu
 
     protected abstract Net getNet(MemoryDevice to);
 
-    public void sendReply(final MemoryDevice source, final MemoryDeviceMessage message, final int size) {
+    public void sendReply(final MemoryDevice source, final int size, final MemoryDeviceMessage message) {
         this.getNet(source).transfer(this, source, size, new Action() {
             public void apply() {
                 message.reply();

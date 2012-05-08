@@ -7,7 +7,7 @@ import archimulator.sim.uncore.coherence.message.DownwardWriteMessage;
 import archimulator.util.action.Action;
 import archimulator.util.action.Action1;
 
-public class DownwardWriteFlow extends Flow {
+public class DownwardWriteFlow{
     private FirstLevelCache cache;
     private MemoryHierarchyAccess access;
     private int tag;
@@ -19,7 +19,7 @@ public class DownwardWriteFlow extends Flow {
     }
 
     public void start(final Action onSuccessCallback, final Action onFailureCallback) {
-        getCache().sendRequest(getCache().getNext(), new DownwardWriteMessage(access, tag, new Action1<DownwardWriteMessage>() {
+        getCache().sendRequest(getCache().getNext(), 8, new DownwardWriteMessage(access, tag, new Action1<DownwardWriteMessage>() {
             public void apply(DownwardWriteMessage writeMessage) {
                 if (!writeMessage.isError()) {
                     onSuccessCallback.apply();
@@ -27,7 +27,7 @@ public class DownwardWriteFlow extends Flow {
                     onFailureCallback.apply();
                 }
             }
-        }), 8);
+        }));
     }
 
     public FirstLevelCache getCache() {

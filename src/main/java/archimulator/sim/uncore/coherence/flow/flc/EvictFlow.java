@@ -26,7 +26,7 @@ public class EvictFlow extends AbstractEvictFlow {
 
         final int size = hasData ? getCache().getCache().getLineSize() + 8 : 8;
 
-        getCache().sendRequest(getCache().getNext(), new EvictMessage(access, cacheAccess.getLine().getTag(), hasData, new Action1<EvictMessage>() {
+        getCache().sendRequest(getCache().getNext(), size, new EvictMessage(access, cacheAccess.getLine().getTag(), hasData, new Action1<EvictMessage>() {
             public void apply(EvictMessage evictMessage) {
                 if (!evictMessage.isError()) {
                     cacheAccess.getLine().endEvict();
@@ -36,7 +36,7 @@ public class EvictFlow extends AbstractEvictFlow {
                     onFailureCallback.apply();
                 }
             }
-        }), size);
+        }));
     }
 
     public FirstLevelCache getCache() {

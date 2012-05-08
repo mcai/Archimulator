@@ -20,17 +20,25 @@ package archimulator.sim.uncore.coherence.llc;
 
 import archimulator.sim.uncore.CacheHierarchy;
 import archimulator.sim.uncore.MemoryDevice;
-import archimulator.sim.uncore.coherence.common.*;
+import archimulator.sim.uncore.coherence.common.CoherentCache;
+import archimulator.sim.uncore.coherence.common.MESIState;
 import archimulator.sim.uncore.coherence.config.CoherentCacheConfig;
 import archimulator.sim.uncore.coherence.flc.FirstLevelCache;
-import archimulator.sim.uncore.coherence.llc.process.L1DownwardReadProcess;
-import archimulator.sim.uncore.coherence.llc.process.L1DownwardWriteProcess;
-import archimulator.sim.uncore.coherence.llc.process.L1EvictProcess;
-import archimulator.sim.uncore.coherence.message.*;
+import archimulator.sim.uncore.coherence.flow.llc.L1DownwardReadFlow;
+import archimulator.sim.uncore.coherence.flow.llc.L1DownwardWriteFlow;
+import archimulator.sim.uncore.coherence.flow.llc.L1EvictFlow;
+import archimulator.sim.uncore.coherence.message.DownwardReadMessage;
+import archimulator.sim.uncore.coherence.message.DownwardWriteMessage;
+import archimulator.sim.uncore.coherence.message.EvictMessage;
+import archimulator.sim.uncore.coherence.message.MemoryDeviceMessage;
 import archimulator.sim.uncore.dram.MainMemory;
 import archimulator.sim.uncore.net.Net;
+import archimulator.util.action.Action;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class LastLevelCache extends CoherentCache {
     private Map<FirstLevelCache, ShadowTagDirectory> shadowTagDirectories;
@@ -48,16 +56,52 @@ public class LastLevelCache extends CoherentCache {
 
     @Override
     @SuppressWarnings("unchecked")
-    public void receiveRequest(MemoryDevice source, MemoryDeviceMessage message) {
+    public void receiveRequest(MemoryDevice source, final MemoryDeviceMessage message) {
         switch (message.getType()) {
             case EVICT:
-                this.scheduleProcess(new L1EvictProcess(this, (FirstLevelCache) source, (EvictMessage) message));
+                L1EvictFlow l1EvictFlow = new L1EvictFlow(this, (FirstLevelCache) source, (EvictMessage) message);
+                l1EvictFlow.start(
+                        new Action() {
+                            @Override
+                            public void apply() {
+                            }
+                        }, new Action() {
+                            @Override
+                            public void apply() {
+                                message.setError(true);
+                            }
+                        }
+                );
                 break;
             case DOWNWARD_READ:
-                this.scheduleProcess(new L1DownwardReadProcess(this, (FirstLevelCache) source, (DownwardReadMessage) message));
+                L1DownwardReadFlow l1DownwardReadFlow = new L1DownwardReadFlow(this, (FirstLevelCache) source, (DownwardReadMessage) message);
+                l1DownwardReadFlow.start(
+                        new Action() {
+                            @Override
+                            public void apply() {
+                            }
+                        }, new Action() {
+                            @Override
+                            public void apply() {
+                                message.setError(true);
+                            }
+                        }
+                );
                 break;
             case DOWNWARD_WRITE:
-                this.scheduleProcess(new L1DownwardWriteProcess(this, (FirstLevelCache) source, (DownwardWriteMessage) message));
+                L1DownwardWriteFlow l1DownwardWriteFlow = new L1DownwardWriteFlow(this, (FirstLevelCache) source, (DownwardWriteMessage) message);
+                l1DownwardWriteFlow.run(
+                        new Action() {
+                            @Override
+                            public void apply() {
+                            }
+                        }, new Action() {
+                            @Override
+                            public void apply() {
+                                message.setError(true);
+                            }
+                        }
+                );
                 break;
             default:
                 throw new IllegalArgumentException();
