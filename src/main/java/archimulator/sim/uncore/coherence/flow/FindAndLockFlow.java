@@ -7,7 +7,6 @@ import archimulator.sim.uncore.coherence.common.CoherentCache;
 import archimulator.sim.uncore.coherence.common.LockableCacheLine;
 import archimulator.sim.uncore.coherence.common.MESIState;
 import archimulator.sim.uncore.coherence.event.CoherentCacheNonblockingRequestHitToTransientTagEvent;
-import archimulator.sim.uncore.coherence.message.EvictMessage;
 import archimulator.util.action.Action;
 import archimulator.util.action.Action1;
 import archimulator.util.action.Function1X;
@@ -16,7 +15,7 @@ import archimulator.util.fsm.FiniteStateMachine;
 import archimulator.util.fsm.FiniteStateMachineFactory;
 import archimulator.util.fsm.event.EnterStateEvent;
 
-public class FindAndLockFlow {
+public abstract class FindAndLockFlow {
     private CoherentCache cache;
     private MemoryHierarchyAccess access;
     private int tag;
@@ -32,7 +31,7 @@ public class FindAndLockFlow {
         this.fsm = new BasicFiniteStateMachine<FindAndLockFlowState, FindAndLockFlowCondition>(fsmFactory, "findAndLockFlow", FindAndLockFlowState.IDLE);
     }
 
-    public void run(final Action onSuccessCallback, final Action onLockFailureCallback, final Action onEvictFailureCallback) {
+    public void start(final Action onSuccessCallback, final Action onLockFailureCallback, final Action onEvictFailureCallback) {
         this.fsm.addListener(EnterStateEvent.class, new Action1<EnterStateEvent>() {
             @Override
             public void apply(EnterStateEvent event) {
@@ -83,50 +82,46 @@ public class FindAndLockFlow {
                 boolean result;
                 if (this.cacheAccess.isHitInCache()) {
                     result = this.cacheAccess.getLine().beginHit(action, tag);
-                }
-                else if (this.cacheAccess.isEviction()) {
+                } else if (this.cacheAccess.isEviction()) {
                     result = this.cacheAccess.getLine().beginEvict(action, tag);
-                }
-                else {
+                } else {
                     result = this.cacheAccess.getLine().beginFill(action, tag);
                 }
 
-                if(result) {
-                    if(this.cacheAccess.isEviction()) {
+                if (result) {
+                    if (this.cacheAccess.isEviction()) {
                         this.evict(access);
                         this.fsm.fireTransition(FindAndLockFlowCondition.BEGIN_EVICT);
-                    }
-                    else {
+                    } else {
                         this.fsm.fireTransition(FindAndLockFlowCondition.NO_EVICT);
                     }
-                }
-                else {
+                } else {
                     this.fsm.fireTransition(FindAndLockFlowCondition.WAIT_FOR_UNLOCK);
                 }
             }
-        }
-        else {
+        } else {
             this.fsm.fireTransition(FindAndLockFlowCondition.BYPASS);
         }
     }
 
-    private void evict(MemoryHierarchyAccess access) { //TODO: this is modeled after EvictProcess, please consider both FLC and LLC cases
-        final boolean hasData = cacheAccess.getLine().getState() == MESIState.MODIFIED;
-
-        final int size = hasData ? getCache().getCache().getLineSize() + 8 : 8;
-
-        getCache().sendRequest(getCache().getNext(), new EvictMessage(access, cacheAccess.getLine().getTag(), hasData, new Action1<EvictMessage>() {
-            public void apply(EvictMessage evictMessage) {
-                if (evictMessage.isError()) {
-                    cacheAccess.getLine().endEvict();
-                    fsm.fireTransition(FindAndLockFlowCondition.FAILED_TO_EVICT);
-                } else {
-                    cacheAccess.getLine().endEvict();
-                    fsm.fireTransition(FindAndLockFlowCondition.EVICTED);
+    private void evict(MemoryHierarchyAccess access) {
+        AbstractEvictFlow evictFlow = this.createEvictFlow(access);
+        evictFlow.start(
+                new Action() {
+                    @Override
+                    public void apply() {
+                        fsm.fireTransition(FindAndLockFlowCondition.EVICTED);
+                    }
+                }, new Action() {
+                    @Override
+                    public void apply() {
+                        fsm.fireTransition(FindAndLockFlowCondition.FAILED_TO_EVICT);
+                    }
                 }
-            }
-        }), size);
+        );
     }
+
+    protected abstract AbstractEvictFlow createEvictFlow(MemoryHierarchyAccess access);
 
     public CoherentCache getCache() {
         return cache;
@@ -136,7 +131,7 @@ public class FindAndLockFlow {
         return cacheAccess;
     }
 
-    public static enum FindAndLockFlowState {
+    private enum FindAndLockFlowState {
         IDLE,
         WAITING,
         FAILED_TO_LOCK,
@@ -145,7 +140,7 @@ public class FindAndLockFlow {
         FAILED_TO_EVICT
     }
 
-    public static enum FindAndLockFlowCondition {
+    private enum FindAndLockFlowCondition {
         WAIT_FOR_UNLOCK,
         FAILED_TO_LOCK,
         UNLOCKED,

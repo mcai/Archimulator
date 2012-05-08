@@ -1,4 +1,4 @@
-package archimulator.sim.uncore.coherence.flow;
+package archimulator.sim.uncore.coherence.flow.flc;
 
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.flc.FirstLevelCache;
@@ -18,7 +18,7 @@ public class DownwardReadFlow {
         this.tag = tag;
     }
 
-    public void run(final Action onSuccessCallback, final Action onFailureCallback) {
+    public void start(final Action onSuccessCallback, final Action onFailureCallback) {
         getCache().sendRequest(getCache().getNext(), new DownwardReadMessage(access, tag, new Action1<DownwardReadMessage>() {
             public void apply(DownwardReadMessage downwardReadMessage) {
                 if (!downwardReadMessage.isError()) {
