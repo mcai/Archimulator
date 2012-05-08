@@ -5,11 +5,12 @@ import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.common.MESIState;
 import archimulator.sim.uncore.coherence.flc.FirstLevelCache;
 import archimulator.sim.uncore.coherence.flow.FindAndLockFlow;
+import archimulator.sim.uncore.coherence.flow.LockingFlow;
 import archimulator.sim.uncore.coherence.llc.LastLevelCache;
 import archimulator.sim.uncore.coherence.message.DownwardReadMessage;
 import archimulator.util.action.Action;
 
-public class L1DownwardWriteFlow {
+public class L1DownwardWriteFlow extends LockingFlow {
     private LastLevelCache cache;
     private FirstLevelCache source;
     protected MemoryHierarchyAccess access;
@@ -55,6 +56,8 @@ public class L1DownwardWriteFlow {
                                                             findAndLockFlow.getCacheAccess().commit().getLine().unlock();
 
                                                             getCache().sendReply(source, message, source.getCache().getLineSize() + 8);
+
+                                                            endFillOrEvict(findAndLockFlow);
 
                                                             onSuccessCallback.apply();
                                                         }

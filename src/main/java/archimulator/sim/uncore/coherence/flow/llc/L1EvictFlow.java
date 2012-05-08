@@ -1,22 +1,19 @@
 package archimulator.sim.uncore.coherence.flow.llc;
 
+import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
-import archimulator.sim.uncore.cache.CacheAccess;
-import archimulator.sim.uncore.coherence.common.LockableCacheLine;
 import archimulator.sim.uncore.coherence.common.MESIState;
 import archimulator.sim.uncore.coherence.flc.FirstLevelCache;
-import archimulator.sim.uncore.coherence.flow.AbstractEvictFlow;
+import archimulator.sim.uncore.coherence.flow.FindAndLockFlow;
+import archimulator.sim.uncore.coherence.flow.LockingFlow;
 import archimulator.sim.uncore.coherence.llc.LastLevelCache;
 import archimulator.sim.uncore.coherence.message.EvictMessage;
-import archimulator.sim.uncore.coherence.message.MemWriteMessage;
 import archimulator.util.action.Action;
-import archimulator.util.action.Action1;
 
-public class L1EvictFlow implements AbstractEvictFlow {
+public class L1EvictFlow extends LockingFlow {
     private LastLevelCache cache;
     private FirstLevelCache source;
     private MemoryHierarchyAccess access;
-    private CacheAccess<MESIState, LockableCacheLine> cacheAccess;
     private EvictMessage message;
 
     public L1EvictFlow(LastLevelCache cache, final FirstLevelCache source, final EvictMessage message) {
@@ -24,20 +21,46 @@ public class L1EvictFlow implements AbstractEvictFlow {
         this.source = source;
         this.message = message;
         this.access = message.getAccess();
-        this.cacheAccess = cacheAccess;
     }
 
-    @Override
     public void start(final Action onSuccessCallback, final Action onFailureCallback) {
-        if (cacheAccess.getLine().getState() == MESIState.MODIFIED) {
-            getCache().sendRequest(getCache().getNext(), new MemWriteMessage(access, cacheAccess.getLine().getTag(), new Action1<MemWriteMessage>() {
-                public void apply(MemWriteMessage memWriteMessage) {
-                    onSuccessCallback.apply();
+        final FindAndLockFlow findAndLockFlow = new LastLevelCacheFindAndLockFlow(this.cache, this.message.getAccess(), this.message.getTag(), CacheAccessType.EVICT);
+
+        findAndLockFlow.start(
+                new Action() {
+                    @Override
+                    public void apply() {
+                        if (message.isDirty()) {
+                            if (findAndLockFlow.getCacheAccess().isHitInCache() || !findAndLockFlow.getCacheAccess().isBypass()) {
+                                findAndLockFlow.getCacheAccess().getLine().setNonInitialState(MESIState.MODIFIED);
+                            }
+                        } else {
+                            if (findAndLockFlow.getCacheAccess().isHitInCache() || !findAndLockFlow.getCacheAccess().isBypass()) {
+                                findAndLockFlow.getCacheAccess().getLine().setNonInitialState(MESIState.EXCLUSIVE);
+                            }
+                        }
+
+                        getCache().getShadowTagDirectories().get(source).removeTag(message.getTag());
+                        getCache().sendReply(source, message, 8);
+
+                        endFillOrEvict(findAndLockFlow);
+
+                        findAndLockFlow.getCacheAccess().commit().getLine().unlock();
+
+                        onSuccessCallback.apply();
+                    }
+                }, new Action() {
+                    @Override
+                    public void apply() {
+                        onFailureCallback.apply();
+                    }
+                }, new Action() {
+                    @Override
+                    public void apply() {
+                        onFailureCallback.apply();
+                    }
                 }
-            }), getCache().getCache().getLineSize() + 8);
-        } else {
-            onSuccessCallback.apply();
-        }
+        );
     }
 
     public LastLevelCache getCache() {

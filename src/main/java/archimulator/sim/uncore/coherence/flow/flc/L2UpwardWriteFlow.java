@@ -5,11 +5,12 @@ import archimulator.sim.uncore.coherence.common.MESIState;
 import archimulator.sim.uncore.coherence.event.FirstLevelCacheLineEvictedByL2UpwardWriteProcessEvent;
 import archimulator.sim.uncore.coherence.flc.FirstLevelCache;
 import archimulator.sim.uncore.coherence.flow.FindAndLockFlow;
+import archimulator.sim.uncore.coherence.flow.LockingFlow;
 import archimulator.sim.uncore.coherence.llc.LastLevelCache;
 import archimulator.sim.uncore.coherence.message.UpwardWriteMessage;
 import archimulator.util.action.Action;
 
-public class L2UpwardWriteFlow {
+public class L2UpwardWriteFlow extends LockingFlow {
     private FirstLevelCache cache;
     private LastLevelCache source;
     private UpwardWriteMessage message;
@@ -36,6 +37,8 @@ public class L2UpwardWriteFlow {
                         int size = findAndLockFlow.getCacheAccess().getLine().getState() == MESIState.MODIFIED ? getCache().getCache().getLineSize() + 8 : 8;
                         getCache().sendReply(source, message, size);
 
+                        endFillOrEvict(findAndLockFlow);
+
                         onSuccessCallback.apply();
                     }
                 }, new Action() {
@@ -56,5 +59,4 @@ public class L2UpwardWriteFlow {
     public FirstLevelCache getCache() {
         return cache;
     }
-
 }

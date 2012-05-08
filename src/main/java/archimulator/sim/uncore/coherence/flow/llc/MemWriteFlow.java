@@ -4,13 +4,14 @@ import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.coherence.common.LockableCacheLine;
 import archimulator.sim.uncore.coherence.common.MESIState;
+import archimulator.sim.uncore.coherence.event.LastLevelCacheLineEvictedByMemWriteProcessEvent;
 import archimulator.sim.uncore.coherence.flow.AbstractEvictFlow;
 import archimulator.sim.uncore.coherence.llc.LastLevelCache;
 import archimulator.sim.uncore.coherence.message.MemWriteMessage;
 import archimulator.util.action.Action;
 import archimulator.util.action.Action1;
 
-public class MemWriteFlow implements AbstractEvictFlow {
+public class MemWriteFlow extends AbstractEvictFlow {
     private LastLevelCache cache;
     private MemoryHierarchyAccess access;
     private CacheAccess<MESIState, LockableCacheLine> cacheAccess;
@@ -26,10 +27,12 @@ public class MemWriteFlow implements AbstractEvictFlow {
         if (cacheAccess.getLine().getState() == MESIState.MODIFIED) {
             getCache().sendRequest(getCache().getNext(), new MemWriteMessage(access, cacheAccess.getLine().getTag(), new Action1<MemWriteMessage>() {
                 public void apply(MemWriteMessage memWriteMessage) {
+                    getCache().getBlockingEventDispatcher().dispatch(new LastLevelCacheLineEvictedByMemWriteProcessEvent(getCache(), cacheAccess.getLine()));
                     onSuccessCallback.apply();
                 }
             }), getCache().getCache().getLineSize() + 8);
         } else {
+            getCache().getBlockingEventDispatcher().dispatch(new LastLevelCacheLineEvictedByMemWriteProcessEvent(getCache(), cacheAccess.getLine()));
             onSuccessCallback.apply();
         }
     }

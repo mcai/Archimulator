@@ -2,12 +2,13 @@ package archimulator.sim.uncore.coherence.flow.llc;
 
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.flc.FirstLevelCache;
+import archimulator.sim.uncore.coherence.flow.Flow;
 import archimulator.sim.uncore.coherence.llc.LastLevelCache;
 import archimulator.sim.uncore.coherence.message.UpwardReadMessage;
 import archimulator.util.action.Action;
 import archimulator.util.action.Action1;
 
-public class UpwardReadFlow {
+public class UpwardReadFlow extends Flow {
     private LastLevelCache cache;
     private FirstLevelCache target;
     private MemoryHierarchyAccess access;

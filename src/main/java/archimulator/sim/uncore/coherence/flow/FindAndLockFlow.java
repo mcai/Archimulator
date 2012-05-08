@@ -5,8 +5,11 @@ import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.coherence.common.CoherentCache;
 import archimulator.sim.uncore.coherence.common.LockableCacheLine;
+import archimulator.sim.uncore.coherence.common.LockableCacheLineReplacementState;
 import archimulator.sim.uncore.coherence.common.MESIState;
+import archimulator.sim.uncore.coherence.event.CoherentCacheBeginCacheAccessEvent;
 import archimulator.sim.uncore.coherence.event.CoherentCacheNonblockingRequestHitToTransientTagEvent;
+import archimulator.sim.uncore.coherence.event.CoherentCacheServiceNonblockingRequestEvent;
 import archimulator.util.action.Action;
 import archimulator.util.action.Action1;
 import archimulator.util.action.Function1X;
@@ -15,7 +18,7 @@ import archimulator.util.fsm.FiniteStateMachine;
 import archimulator.util.fsm.FiniteStateMachineFactory;
 import archimulator.util.fsm.event.EnterStateEvent;
 
-public abstract class FindAndLockFlow {
+public abstract class FindAndLockFlow extends Flow {
     private CoherentCache cache;
     private MemoryHierarchyAccess access;
     private int tag;
@@ -79,13 +82,17 @@ public abstract class FindAndLockFlow {
                     }
                 };
 
-                boolean result;
-                if (this.cacheAccess.isHitInCache()) {
-                    result = this.cacheAccess.getLine().beginHit(action, tag);
-                } else if (this.cacheAccess.isEviction()) {
-                    result = this.cacheAccess.getLine().beginEvict(action, tag);
-                } else {
-                    result = this.cacheAccess.getLine().beginFill(action, tag);
+                boolean result = this.cacheAccess.isHitInCache() ? this.cacheAccess.getLine().beginHit(action, tag) :
+                        (this.cacheAccess.isEviction() ? this.cacheAccess.getLine().beginEvict(action, tag) : this.cacheAccess.getLine().beginFill(action, tag));
+
+                if (result) {
+                    if (!cacheAccessType.isUpward()) {
+                        this.getCache().getBlockingEventDispatcher().dispatch(new CoherentCacheServiceNonblockingRequestEvent(this.getCache(), tag, access, this.cacheAccess.getLine(), this.cacheAccess.isHitInCache(), this.cacheAccess.isEviction(), this.cacheAccess.getReference().getAccessType()));
+                    }
+
+                    if (this.cacheAccess.isEviction()) {
+                        getCache().incEvictions();
+                    }
                 }
 
                 if (result) {
@@ -101,6 +108,11 @@ public abstract class FindAndLockFlow {
             }
         } else {
             this.fsm.fireTransition(FindAndLockFlowCondition.BYPASS);
+        }
+
+        if(this.cacheAccess.getLine().getReplacementState() == LockableCacheLineReplacementState.HITTING || this.cacheAccess.getLine().getReplacementState() == LockableCacheLineReplacementState.FILLING || this.cacheAccess.isBypass()) {
+            this.getCache().updateStats(cacheAccessType, this.cacheAccess);
+            this.getCache().getBlockingEventDispatcher().dispatch(new CoherentCacheBeginCacheAccessEvent(this.getCache(), access, this.cacheAccess));
         }
     }
 

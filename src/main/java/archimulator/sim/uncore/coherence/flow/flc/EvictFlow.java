@@ -10,7 +10,7 @@ import archimulator.sim.uncore.coherence.message.EvictMessage;
 import archimulator.util.action.Action;
 import archimulator.util.action.Action1;
 
-public class EvictFlow implements AbstractEvictFlow {
+public class EvictFlow extends AbstractEvictFlow {
     private FirstLevelCache cache;
     private MemoryHierarchyAccess access;
     private CacheAccess<MESIState, LockableCacheLine> cacheAccess;

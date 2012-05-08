@@ -4,11 +4,12 @@ import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.coherence.common.MESIState;
 import archimulator.sim.uncore.coherence.flc.FirstLevelCache;
 import archimulator.sim.uncore.coherence.flow.FindAndLockFlow;
+import archimulator.sim.uncore.coherence.flow.LockingFlow;
 import archimulator.sim.uncore.coherence.llc.LastLevelCache;
 import archimulator.sim.uncore.coherence.message.UpwardReadMessage;
 import archimulator.util.action.Action;
 
-public class L2UpwardReadFlow {
+public class L2UpwardReadFlow extends LockingFlow {
     private FirstLevelCache cache;
     private LastLevelCache source;
     private UpwardReadMessage message;
@@ -33,6 +34,8 @@ public class L2UpwardReadFlow {
 
                         findAndLockFlow.getCacheAccess().commit().getLine().unlock();
 
+                        endFillOrEvict(findAndLockFlow);
+
                         onSuccessCallback.apply();
                     }
                 }, new Action() {
@@ -53,5 +56,4 @@ public class L2UpwardReadFlow {
     public FirstLevelCache getCache() {
         return cache;
     }
-
 }

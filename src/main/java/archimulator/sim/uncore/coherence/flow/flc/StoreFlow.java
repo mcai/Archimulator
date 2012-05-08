@@ -5,9 +5,10 @@ import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.common.MESIState;
 import archimulator.sim.uncore.coherence.flc.FirstLevelCache;
 import archimulator.sim.uncore.coherence.flow.FindAndLockFlow;
+import archimulator.sim.uncore.coherence.flow.LockingFlow;
 import archimulator.util.action.Action;
 
-public class StoreFlow {
+public class StoreFlow extends LockingFlow {
     private FirstLevelCache cache;
     private MemoryHierarchyAccess access;
     private int tag;
@@ -34,6 +35,9 @@ public class StoreFlow {
                                         public void apply() {
                                             findAndLockFlow.getCacheAccess().getLine().setNonInitialState(MESIState.MODIFIED);
                                             findAndLockFlow.getCacheAccess().commit().getLine().unlock();
+
+                                            endFillOrEvict(findAndLockFlow);
+
                                             onSuccessCallback.apply();
                                         }
                                     }, new Action() {
@@ -46,6 +50,9 @@ public class StoreFlow {
                         } else {
                             findAndLockFlow.getCacheAccess().getLine().setNonInitialState(MESIState.MODIFIED);
                             findAndLockFlow.getCacheAccess().commit().getLine().unlock();
+
+                            endFillOrEvict(findAndLockFlow);
+
                             onSuccessCallback.apply();
                         }
                     }
