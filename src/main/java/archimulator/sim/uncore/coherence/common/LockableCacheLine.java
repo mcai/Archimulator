@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+//TODO: error?
 public class LockableCacheLine extends CacheLine<MESIState> {
     private FiniteStateMachine<LockableCacheLineReplacementState, LockableCacheLineReplacementCondition> replacementFsm;
     private int transientTag = -1;

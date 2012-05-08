@@ -21,6 +21,7 @@ import archimulator.util.fsm.event.EnterStateEvent;
 import java.io.FileWriter;
 import java.io.IOException;
 
+//TODO: error?
 public abstract class FindAndLockFlow extends Flow {
     private CoherentCache cache;
     private MemoryHierarchyAccess access;
