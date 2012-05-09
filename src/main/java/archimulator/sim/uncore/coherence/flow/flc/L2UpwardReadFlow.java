@@ -23,7 +23,7 @@ public class L2UpwardReadFlow extends LockingFlow {
         this.tag = tag;
     }
 
-    public void start(final Action onSuccessCallback, final Action onFailureCallback) {
+    public void start(final Action onSuccessCallback) {
         final FindAndLockFlow findAndLockFlow = new FirstLevelCacheFindAndLockFlow(this.cache, this.access, this.tag, CacheAccessType.UPWARD_READ);
 
         findAndLockFlow.start(
@@ -45,16 +45,12 @@ public class L2UpwardReadFlow extends LockingFlow {
                 }, new Action() {
                     @Override
                     public void apply() {
-//                        afterFlowEnd(findAndLockFlow);
-
-                        getCache().sendReply(source, 8, onFailureCallback);
+                        throw new IllegalArgumentException();
                     }
                 }, new Action() {
                     @Override
                     public void apply() {
-                        afterFlowEnd(findAndLockFlow);
-
-                        getCache().sendReply(source, 8, onFailureCallback);
+                        throw new IllegalArgumentException();
                     }
                 }
         );

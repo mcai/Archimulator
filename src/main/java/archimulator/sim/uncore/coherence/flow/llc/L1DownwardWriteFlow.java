@@ -76,11 +76,6 @@ public class L1DownwardWriteFlow extends LockingFlow {
                                             endInvalidateSharers(findAndLockFlow, onSuccessCallback);
                                         }
                                     }
-                                }, new Action() {
-                                    @Override
-                                    public void apply() {
-                                        throw new UnsupportedOperationException();
-                                    }
                                 }
                         );
                     }
@@ -110,11 +105,11 @@ public class L1DownwardWriteFlow extends LockingFlow {
 
                             findAndLockFlow.getCacheAccess().commit().getLine().unlock();
 
-                            getCache().sendReply(source, source.getCache().getLineSize() + 8, onSuccessCallback);
-
                             endFillOrEvict(findAndLockFlow);
 
                             afterFlowEnd(findAndLockFlow);
+
+                            getCache().sendReply(source, source.getCache().getLineSize() + 8, onSuccessCallback);
                         }
                     });
                 }
