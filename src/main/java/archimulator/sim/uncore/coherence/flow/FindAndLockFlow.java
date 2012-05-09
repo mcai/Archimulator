@@ -116,7 +116,20 @@ public abstract class FindAndLockFlow extends Flow {
 
                 if (result) {
                     if (this.cacheAccess.isEviction()) {
-                        this.evict(access);
+                        this.evict(access,
+                                new Action() {
+                                    @Override
+                                    public void apply() {
+                                        fsm.fireTransition(FindAndLockFlowCondition.EVICTED);
+                                        cacheAccess.getLine().beginFillAfterEvict();
+                                    }
+                                }, new Action() {
+                                    @Override
+                                    public void apply() {
+                                        fsm.fireTransition(FindAndLockFlowCondition.FAILED_TO_EVICT);
+                                    }
+                                }
+                        );
                         this.fsm.fireTransition(FindAndLockFlowCondition.BEGIN_EVICT);
                     } else {
                         this.fsm.fireTransition(FindAndLockFlowCondition.NO_EVICT);
@@ -135,25 +148,7 @@ public abstract class FindAndLockFlow extends Flow {
         }
     }
 
-    private void evict(MemoryHierarchyAccess access) {
-        AbstractEvictFlow evictFlow = this.createEvictFlow(access);
-        evictFlow.start(
-                new Action() {
-                    @Override
-                    public void apply() {
-                        fsm.fireTransition(FindAndLockFlowCondition.EVICTED);
-                        cacheAccess.getLine().beginFillAfterEvict();
-                    }
-                }, new Action() {
-                    @Override
-                    public void apply() {
-                        fsm.fireTransition(FindAndLockFlowCondition.FAILED_TO_EVICT);
-                    }
-                }
-        );
-    }
-
-    protected abstract AbstractEvictFlow createEvictFlow(MemoryHierarchyAccess access);
+    protected abstract void evict(MemoryHierarchyAccess access, Action onSuccessCallback, Action onFailureCallback);
 
     public CoherentCache getCache() {
         return cache;

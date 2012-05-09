@@ -18,7 +18,7 @@ public class MemReadFlow extends Flow {
         this.tag = tag;
     }
 
-    public void start(final Action onSuccessCallback, final Action onFailureCallback) {
+    public void start(final Action onSuccessCallback) {
         getCache().sendRequest(getCache().getNext(), 8, new MemReadMessage(access, tag, new Action1<MemReadMessage>() {
             public void apply(MemReadMessage memReadMessage) {
                 onSuccessCallback.apply();

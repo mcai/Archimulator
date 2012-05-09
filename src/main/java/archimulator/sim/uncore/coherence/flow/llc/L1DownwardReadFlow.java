@@ -82,11 +82,6 @@ public class L1DownwardReadFlow extends LockingFlow {
 
                                                 onSuccessCallback.apply();
                                             }
-                                        }, new Action() {
-                                            @Override
-                                            public void apply() {
-                                                throw new UnsupportedOperationException();
-                                            }
                                         }
                                 );
                             }

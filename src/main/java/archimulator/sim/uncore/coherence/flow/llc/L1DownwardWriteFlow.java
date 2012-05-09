@@ -115,11 +115,6 @@ public class L1DownwardWriteFlow extends LockingFlow {
 
                             afterFlowEnd(findAndLockFlow);
                         }
-                    }, new Action() {
-                        @Override
-                        public void apply() {
-                            throw new UnsupportedOperationException();
-                        }
                     }
             );
         }
