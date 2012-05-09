@@ -38,10 +38,6 @@ public class L2UpwardWriteFlow extends LockingFlow {
 
                         int size = findAndLockFlow.getCacheAccess().getLine().getState() == MESIState.MODIFIED ? getCache().getCache().getLineSize() + 8 : 8;
 
-                        endFillOrEvict(findAndLockFlow);
-
-                        afterFlowEnd(findAndLockFlow);
-
                         getCache().sendReply(source, size, onSuccessCallback);
                     }
                 }, new Action() {

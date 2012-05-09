@@ -171,12 +171,12 @@ public class FunctionalUnitPool {
         }
 
         this.core.getCycleAccurateEventQueue()
-                .schedule(new NamedAction("FunctionalUnitPool.issueComplete") {
+                .schedule(this, new NamedAction("FunctionalUnitPool.issueComplete") {
                     public void apply() {
                         fuDescriptor.numFree++;
                     }
                 }, fuOperation.issueLatency)
-                .schedule(new NamedAction("FunctionalUnitPool.operationComplete") {
+                .schedule(this, new NamedAction("FunctionalUnitPool.operationComplete") {
                     public void apply() {
                         if (!reorderBufferEntry.isSquashed()) {
                             onCompletedCallback.apply(reorderBufferEntry);

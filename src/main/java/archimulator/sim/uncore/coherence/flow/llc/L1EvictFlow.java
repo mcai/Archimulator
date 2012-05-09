@@ -43,26 +43,18 @@ public class L1EvictFlow extends LockingFlow {
 
                         getCache().getShadowTagDirectories().get(source).removeTag(tag);
 
-                        endFillOrEvict(findAndLockFlow);
-
                         findAndLockFlow.getCacheAccess().commit().getLine().unlock();
-
-                        afterFlowEnd(findAndLockFlow);
 
                         getCache().sendReply(source, 8, onSuccessCallback);
                     }
                 }, new Action() {
                     @Override
                     public void apply() {
-//                        afterFlowEnd(findAndLockFlow);
-
                         getCache().sendReply(source, 8, onFailureCallback);
                     }
                 }, new Action() {
                     @Override
                     public void apply() {
-                        afterFlowEnd(findAndLockFlow);
-
                         getCache().sendReply(source, 8, onFailureCallback);
                     }
                 }

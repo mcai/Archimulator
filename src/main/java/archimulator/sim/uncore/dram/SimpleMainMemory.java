@@ -33,7 +33,7 @@ public class SimpleMainMemory extends MainMemory {
 
     @Override
     protected void access(int addr, final Action onCompletedCallback) {
-        this.getCycleAccurateEventQueue().schedule(new NamedAction("SimpleMainMemory.access") {
+        this.getCycleAccurateEventQueue().schedule(this, new NamedAction("SimpleMainMemory.access") {
             public void apply() {
                 onCompletedCallback.apply();
             }

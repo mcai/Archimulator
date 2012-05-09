@@ -64,7 +64,7 @@ public class NetLink {
                     }
 
                     this.destPort.getBuffer().beginWrite();
-                    this.srcPort.getNode().getNet().getCycleAccurateEventQueue().schedule(new NamedAction("NetLink.toInBuffer") {
+                    this.srcPort.getNode().getNet().getCycleAccurateEventQueue().schedule(this, new NamedAction("NetLink.toInBuffer") {
                         public void apply() {
                             destPort.getBuffer().endWrite(message);
                         }

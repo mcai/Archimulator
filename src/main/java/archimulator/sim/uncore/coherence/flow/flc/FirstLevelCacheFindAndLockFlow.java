@@ -27,13 +27,11 @@ public class FirstLevelCacheFindAndLockFlow extends FindAndLockFlow {
                         new Action() {
                             @Override
                             public void apply() {
-                                getCacheAccess().getLine().endEvict();
                                 onSuccessCallback.apply();
                             }
                         }, new Action() {
                             @Override
                             public void apply() {
-                                getCacheAccess().getLine().endEvict();
                                 onFailureCallback.apply();
                             }
                         }

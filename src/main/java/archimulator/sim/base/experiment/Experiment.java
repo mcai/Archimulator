@@ -45,8 +45,7 @@ import archimulator.util.fsm.FiniteStateMachineFactory;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.*;
 
 public abstract class Experiment {
     private List<Class<? extends SimulationCapability>> simulationCapabilityClasses = new ArrayList<Class<? extends SimulationCapability>>();
@@ -70,8 +69,9 @@ public abstract class Experiment {
 
     private Thread threadStartExperiment;
 
+    private ScheduledExecutorService scheduledExecutorPollState;
+
     private Simulation simulation;
-    private Timer timerPollState;
 
     public Experiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs, int l2Size, int l2Associativity, Class<? extends EvictionPolicy> l2EvictionPolicyClz, List<Class<? extends SimulationCapability>> simulationCapabilityClasses, List<Class<? extends ProcessorCapability>> processorCapabilityClasses, List<Class<? extends KernelCapability>> kernelCapabilityClasses) {
         this.id = currentId++;
@@ -102,7 +102,7 @@ public abstract class Experiment {
         this.fsm = new BasicFiniteStateMachine<ExperimentState, ExperimentCondition>(fsmFactory, title, ExperimentState.NOT_STARTED);
         this.fsm.put("experiment", this);
 
-        this.timerPollState = new Timer(true);
+        this.scheduledExecutorPollState = Executors.newSingleThreadScheduledExecutor();
     }
 
     private void pollSimulationState() {
@@ -234,16 +234,25 @@ public abstract class Experiment {
                         Thread threadStartExperiment = new Thread() {
                             @Override
                             public void run() {
-                                experiment.timerPollState.schedule(new TimerTask() {
+                                experiment.scheduledExecutorPollState.scheduleWithFixedDelay(new Runnable() {
                                     @Override
                                     public void run() {
-                                        experiment.getCycleAccurateEventQueue().schedule(new NamedAction("Simulation.pollState") {
+                                        final Semaphore semaphore = new Semaphore(0);
+
+                                        experiment.getCycleAccurateEventQueue().schedule(this, new NamedAction("Simulation.pollState") {
                                             public void apply() {
                                                 experiment.pollSimulationState();
+                                                semaphore.release();
                                             }
                                         }, 0);
+
+                                        try {
+                                            semaphore.acquire();
+                                        } catch (InterruptedException e) {
+                                            throw new RuntimeException(e);
+                                        }
                                     }
-                                }, 2000, 10000);
+                                }, 2, 10, TimeUnit.SECONDS);
 
                                 experiment.doStart();
 
@@ -309,7 +318,13 @@ public abstract class Experiment {
                         } catch (BrokenBarrierException e) {
                             throw new RuntimeException(e);
                         }
-                        experiment.timerPollState.cancel();
+                        experiment.scheduledExecutorPollState.shutdown();
+                        try {
+                            experiment.scheduledExecutorPollState.awaitTermination(0, TimeUnit.SECONDS);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+
                         experiment.getBlockingEventDispatcher().dispatch(new StopExperimentEvent());
                         experiment.getBlockingEventDispatcher().clearListeners();
                         return ExperimentState.STOPPED;

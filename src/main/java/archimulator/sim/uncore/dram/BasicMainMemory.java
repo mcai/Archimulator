@@ -66,7 +66,7 @@ public class BasicMainMemory extends MainMemory {
             size -= this.config.getBusWidth();
 
             final int currentAddr = addr + offset;
-            this.getCycleAccurateEventQueue().schedule(new NamedAction("BasicMainMemory.accessDram") {
+            this.getCycleAccurateEventQueue().schedule(this, new NamedAction("BasicMainMemory.accessDram") {
                 public void apply() {
                     accessDram(currentAddr, new Action() {
                         public void apply() {
@@ -94,7 +94,7 @@ public class BasicMainMemory extends MainMemory {
 
         this.banks.get(targetBank).startAccess(targetRow, contiguous, new Action() {
             public void apply() {
-                getCycleAccurateEventQueue().schedule(onCompletedCallback, config.getFromDramLatency());
+                getCycleAccurateEventQueue().schedule(this, onCompletedCallback, config.getFromDramLatency());
             }
         });
 
@@ -134,7 +134,7 @@ public class BasicMainMemory extends MainMemory {
         }
 
         private void precharge(final Action onCompletedCallback) {
-            getCycleAccurateEventQueue().schedule(new NamedAction("BasicMainMemory.Bank.precharge") {
+            getCycleAccurateEventQueue().schedule(this, new NamedAction("BasicMainMemory.Bank.precharge") {
                 public void apply() {
                     status = BankStatus.PRECHARGED;
 
@@ -177,12 +177,12 @@ public class BasicMainMemory extends MainMemory {
             } else {
                 if (currentRow == row) {
                     if (contiguous) {
-                        getCycleAccurateEventQueue().schedule(onCompletedCallback, config.getFromDramLatency());
+                        getCycleAccurateEventQueue().schedule(this, onCompletedCallback, config.getFromDramLatency());
                     } else {
-                        getCycleAccurateEventQueue().schedule(onCompletedCallback, (config.getPrechargeLatency() + config.getFromDramLatency()));
+                        getCycleAccurateEventQueue().schedule(this, onCompletedCallback, (config.getPrechargeLatency() + config.getFromDramLatency()));
                     }
                 } else {
-                    getCycleAccurateEventQueue().schedule(new NamedAction("BasicMainMemory.bank.resolveConflict") {
+                    getCycleAccurateEventQueue().schedule(this, new NamedAction("BasicMainMemory.bank.resolveConflict") {
                         public void apply() {
                             currentRow = row;
 

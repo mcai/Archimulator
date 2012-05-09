@@ -34,10 +34,6 @@ public class LoadFlow extends LockingFlow {
                         } else {
                             findAndLockFlow.getCacheAccess().commit().getLine().unlock();
 
-                            endFillOrEvict(findAndLockFlow);
-
-                            afterFlowEnd(findAndLockFlow);
-
                             onSuccessCallback.apply();
 
                             pendings--;
@@ -61,8 +57,6 @@ public class LoadFlow extends LockingFlow {
                         findAndLockFlow.getCacheAccess().abort();
                         findAndLockFlow.getCacheAccess().getLine().unlock();
 
-                        afterFlowEnd(findAndLockFlow);
-
                         onFailureCallback.apply();
 
                         pendings--;
@@ -84,10 +78,6 @@ public class LoadFlow extends LockingFlow {
 
                                 findAndLockFlow.getCacheAccess().commit().getLine().unlock();
 
-                                endFillOrEvict(findAndLockFlow);
-
-                                afterFlowEnd(findAndLockFlow);
-
                                 onSuccessCallback.apply();
 
                                 pendings--;
@@ -95,7 +85,7 @@ public class LoadFlow extends LockingFlow {
                         }, new Action() {
                             @Override
                             public void apply() {
-                                getCache().getCycleAccurateEventQueue().schedule(new Action() {
+                                getCache().getCycleAccurateEventQueue().schedule(this, new Action() {
                                     public void apply() {
                                         downwardRead(findAndLockFlow, onSuccessCallback, onFailureCallback);
                                     }

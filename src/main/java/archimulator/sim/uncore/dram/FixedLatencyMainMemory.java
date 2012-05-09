@@ -33,7 +33,7 @@ public class FixedLatencyMainMemory extends MainMemory {
 
     @Override
     protected void access(int addr, final Action onCompletedCallback) {
-        this.getCycleAccurateEventQueue().schedule(new NamedAction("FixedLatencyMainMemory.access") {
+        this.getCycleAccurateEventQueue().schedule(this, new NamedAction("FixedLatencyMainMemory.access") {
             public void apply() {
                 onCompletedCallback.apply();
             }

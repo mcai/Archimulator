@@ -2,7 +2,6 @@ package archimulator.sim.uncore.coherence.flow.llc;
 
 import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
-import archimulator.sim.uncore.coherence.common.CoherentCache;
 import archimulator.sim.uncore.coherence.common.MESIState;
 import archimulator.sim.uncore.coherence.event.LastLevelCacheLineEvictedByMemWriteProcessEvent;
 import archimulator.sim.uncore.coherence.flow.FindAndLockFlow;
@@ -30,8 +29,13 @@ public class LastLevelCacheFindAndLockFlow extends FindAndLockFlow {
                 }
             });
         } else {
-            getCache().getBlockingEventDispatcher().dispatch(new LastLevelCacheLineEvictedByMemWriteProcessEvent(getCache(), getCacheAccess().getLine()));
-            onSuccessCallback.apply();
+            getCache().getCycleAccurateEventQueue().schedule(this, new Action() {
+                @Override
+                public void apply() {
+                    getCache().getBlockingEventDispatcher().dispatch(new LastLevelCacheLineEvictedByMemWriteProcessEvent(getCache(), getCacheAccess().getLine()));
+                    onSuccessCallback.apply();
+                }
+            }, 0);
         }
     }
 

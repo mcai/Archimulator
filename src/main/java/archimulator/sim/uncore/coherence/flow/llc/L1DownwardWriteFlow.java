@@ -39,8 +39,6 @@ public class L1DownwardWriteFlow extends LockingFlow {
 //                        findAndLockFlow.getCacheAccess().abort();
 //                        findAndLockFlow.getCacheAccess().getLine().unlock();
 //
-//                        afterFlowEnd(findAndLockFlow);
-
                         getCache().sendReply(source, 8, onFailureCallback);
                     }
                 }, new Action() {
@@ -48,8 +46,6 @@ public class L1DownwardWriteFlow extends LockingFlow {
                     public void apply() {
                         findAndLockFlow.getCacheAccess().abort();
                         findAndLockFlow.getCacheAccess().getLine().unlock();
-
-                        afterFlowEnd(findAndLockFlow);
 
                         getCache().sendReply(source, 8, onFailureCallback);
                     }
@@ -108,10 +104,6 @@ public class L1DownwardWriteFlow extends LockingFlow {
                             }
 
                             findAndLockFlow.getCacheAccess().commit().getLine().unlock();
-
-                            endFillOrEvict(findAndLockFlow);
-
-                            afterFlowEnd(findAndLockFlow);
 
                             getCache().sendReply(source, source.getCache().getLineSize() + 8, onSuccessCallback);
                         }

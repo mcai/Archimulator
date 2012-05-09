@@ -91,7 +91,7 @@ public class TranslationLookasideBuffer {
             cacheAccess.commit();
         }
 
-        access.getThread().getCycleAccurateEventQueue().schedule(onCompletedCallback, cacheAccess.isHitInCache() ? this.config.getHitLatency() : this.config.getMissLatency());
+        access.getThread().getCycleAccurateEventQueue().schedule(this, onCompletedCallback, cacheAccess.isHitInCache() ? this.config.getHitLatency() : this.config.getMissLatency());
     }
 
     public String getName() {

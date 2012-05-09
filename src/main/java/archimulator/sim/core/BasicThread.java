@@ -392,7 +392,7 @@ public class BasicThread extends AbstractBasicThread {
     public void commit() {
         int COMMIT_TIMEOUT = 1000000;
 
-        if (this.getCycleAccurateEventQueue().getCurrentCycle() - this.lastCommitCycle > COMMIT_TIMEOUT && this.lastCommitCycle % COMMIT_TIMEOUT == 0) {
+        if (this.getCycleAccurateEventQueue().getCurrentCycle() - this.lastCommitCycle > COMMIT_TIMEOUT) {
             if (noInstructionCommittedCounterThreshold > 5) {
                 Logger.fatalf(Logger.THREAD, "%s: No instruction committed for %d cycles, %d committed.", this.getCycleAccurateEventQueue().getCurrentCycle(), this.getName(), COMMIT_TIMEOUT, this.totalInsts);
             } else {

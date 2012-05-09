@@ -59,7 +59,7 @@ public class Crossbar {
                     }
 
                     destPort.getBuffer().beginWrite();
-                    this.node.getNet().getCycleAccurateEventQueue().schedule(new NamedAction("Crossbar.toOutBuffer") {
+                    this.node.getNet().getCycleAccurateEventQueue().schedule(this, new NamedAction("Crossbar.toOutBuffer") {
                         public void apply() {
                             destPort.getBuffer().endWrite(message);
                         }

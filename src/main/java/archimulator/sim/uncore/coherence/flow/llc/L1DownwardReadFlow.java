@@ -47,10 +47,6 @@ public class L1DownwardReadFlow extends LockingFlow {
 //                                                          findAndLockProcess.getCacheAccess().getLine().setNonInitialState(MESIState.MODIFIED);
                                                         }
 
-                                                        endFillOrEvict(findAndLockFlow);
-
-                                                        afterFlowEnd(findAndLockFlow);
-
                                                         reply(findAndLockFlow, onSuccessCallback);
                                                     }
                                                 }
@@ -68,10 +64,6 @@ public class L1DownwardReadFlow extends LockingFlow {
                                                 //                                        findAndLockProcess.getCacheAccess().getLine().setNonInitialState(MESIState.EXCLUSIVE);
                                                 //                                    }
 
-                                                endFillOrEvict(findAndLockFlow);
-
-                                                afterFlowEnd(findAndLockFlow);
-
                                                 reply(findAndLockFlow, onSuccessCallback);
                                             }
                                         });
@@ -80,10 +72,6 @@ public class L1DownwardReadFlow extends LockingFlow {
                             }
                         }
                         else {
-                            endFillOrEvict(findAndLockFlow);
-
-                            afterFlowEnd(findAndLockFlow);
-
                             reply(findAndLockFlow, onSuccessCallback);
                         }
                     }
@@ -102,8 +90,6 @@ public class L1DownwardReadFlow extends LockingFlow {
                     public void apply() {
                         findAndLockFlow.getCacheAccess().abort();
                         findAndLockFlow.getCacheAccess().getLine().unlock();
-
-                        afterFlowEnd(findAndLockFlow);
 
                         getCache().sendReply(source, 8, onFailureCallback);
                     }

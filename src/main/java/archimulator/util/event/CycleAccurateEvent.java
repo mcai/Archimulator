@@ -21,10 +21,14 @@ package archimulator.util.event;
 import archimulator.util.action.Action;
 
 public class CycleAccurateEvent implements Comparable<CycleAccurateEvent> {
+    private Object sender;
     private Action action;
     private long when;
+    private long id;
 
-    public CycleAccurateEvent(Action action, long when) {
+    public CycleAccurateEvent(Object sender, Action action, long when) {
+        this.id = currentId++;
+        this.sender = sender;
         this.action = action;
         this.when = when;
     }
@@ -35,22 +39,16 @@ public class CycleAccurateEvent implements Comparable<CycleAccurateEvent> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        CycleAccurateEvent that = (CycleAccurateEvent) o;
-
-        if (when != that.when) return false;
-        if (action != null ? !action.equals(that.action) : that.action != null) return false;
-
-        return true;
+        return o instanceof CycleAccurateEvent && this.id == ((CycleAccurateEvent) o).id;
     }
 
     @Override
     public int hashCode() {
-        int result = (int) (when ^ (when >>> 32));
-        result = 31 * result + (action != null ? action.hashCode() : 0);
-        return result;
+        return (int) (id ^ (id >>> 32));
+    }
+
+    public long getId() {
+        return id;
     }
 
     public long getWhen() {
@@ -64,4 +62,15 @@ public class CycleAccurateEvent implements Comparable<CycleAccurateEvent> {
     public Action getAction() {
         return action;
     }
+
+    public Object getSender() {
+        return sender;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("[%d] %s: %s", when, sender, action);
+    }
+
+    private static long currentId = 0;
 }

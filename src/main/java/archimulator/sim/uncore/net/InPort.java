@@ -53,7 +53,7 @@ public class InPort extends NetPort {
                 int latency = (message.getSize() + this.getNode().getCrossbar().getBandwidth()) / this.getNode().getCrossbar().getBandwidth();
 
                 this.getNode().getCrossbar().beginTransfer();
-                this.getNode().getNet().getCycleAccurateEventQueue().schedule(new NamedAction("InPort.toCrossbar") {
+                this.getNode().getNet().getCycleAccurateEventQueue().schedule(this, new NamedAction("InPort.toCrossbar") {
                     public void apply() {
                         getNode().getCrossbar().endTransfer(message);
                     }
@@ -61,7 +61,7 @@ public class InPort extends NetPort {
 
                 if (this.buffer != null) {
                     this.buffer.beginRead();
-                    this.getNode().getNet().getCycleAccurateEventQueue().schedule(new NamedAction("InPort.toCrossbar[buffer]") {
+                    this.getNode().getNet().getCycleAccurateEventQueue().schedule(this, new NamedAction("InPort.toCrossbar[buffer]") {
                         public void apply() {
                             buffer.endRead(message);
                         }

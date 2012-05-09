@@ -35,10 +35,6 @@ public class StoreFlow extends LockingFlow {
                             findAndLockFlow.getCacheAccess().getLine().setNonInitialState(MESIState.MODIFIED);
                             findAndLockFlow.getCacheAccess().commit().getLine().unlock();
 
-                            endFillOrEvict(findAndLockFlow);
-
-                            afterFlowEnd(findAndLockFlow);
-
                             onSuccessCallback.apply();
 
                             pendings--;
@@ -62,8 +58,6 @@ public class StoreFlow extends LockingFlow {
                         findAndLockFlow.getCacheAccess().abort();
                         findAndLockFlow.getCacheAccess().getLine().unlock();
 
-                        afterFlowEnd(findAndLockFlow);
-
                         onFailureCallback.apply();
 
                         pendings--;
@@ -84,10 +78,6 @@ public class StoreFlow extends LockingFlow {
                                 findAndLockFlow.getCacheAccess().getLine().setNonInitialState(MESIState.MODIFIED);
                                 findAndLockFlow.getCacheAccess().commit().getLine().unlock();
 
-                                endFillOrEvict(findAndLockFlow);
-
-                                afterFlowEnd(findAndLockFlow);
-
                                 onSuccessCallback.apply();
 
                                 pendings--;
@@ -95,7 +85,7 @@ public class StoreFlow extends LockingFlow {
                         }, new Action() {
                             @Override
                             public void apply() {
-                                getCache().getCycleAccurateEventQueue().schedule(new Action() {
+                                getCache().getCycleAccurateEventQueue().schedule(this, new Action() {
                                     public void apply() {
                                         downwardWrite(findAndLockFlow, onSuccessCallback, onFailureCallback);
                                     }

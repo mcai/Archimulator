@@ -36,10 +36,6 @@ public class L2UpwardReadFlow extends LockingFlow {
 
                         findAndLockFlow.getCacheAccess().commit().getLine().unlock();
 
-                        endFillOrEvict(findAndLockFlow);
-
-                        afterFlowEnd(findAndLockFlow);
-
                         getCache().sendReply(source, source.getCache().getLineSize() + 8, onSuccessCallback);
                     }
                 }, new Action() {
