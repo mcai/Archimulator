@@ -7,30 +7,31 @@ import archimulator.sim.uncore.coherence.flc.FirstLevelCache;
 import archimulator.sim.uncore.coherence.flow.FindAndLockFlow;
 import archimulator.sim.uncore.coherence.flow.LockingFlow;
 import archimulator.sim.uncore.coherence.llc.LastLevelCache;
-import archimulator.sim.uncore.coherence.message.EvictMessage;
 import archimulator.util.action.Action;
 
 public class L1EvictFlow extends LockingFlow {
     private LastLevelCache cache;
     private FirstLevelCache source;
     private MemoryHierarchyAccess access;
-    private EvictMessage message;
+    private int tag;
+    private boolean hasData;
 
-    public L1EvictFlow(LastLevelCache cache, final FirstLevelCache source, final EvictMessage message) {
+    public L1EvictFlow(LastLevelCache cache, final FirstLevelCache source, MemoryHierarchyAccess access, int tag, boolean hasData) {
         this.cache = cache;
         this.source = source;
-        this.message = message;
-        this.access = message.getAccess();
+        this.access = access;
+        this.tag = tag;
+        this.hasData = hasData;
     }
 
     public void start(final Action onSuccessCallback, final Action onFailureCallback) {
-        final FindAndLockFlow findAndLockFlow = new LastLevelCacheFindAndLockFlow(this.cache, this.message.getAccess(), this.message.getTag(), CacheAccessType.EVICT);
+        final FindAndLockFlow findAndLockFlow = new LastLevelCacheFindAndLockFlow(this.cache, this.access, this.tag, CacheAccessType.EVICT);
 
         findAndLockFlow.start(
                 new Action() {
                     @Override
                     public void apply() {
-                        if (message.isDirty()) {
+                        if (hasData) {
                             if (findAndLockFlow.getCacheAccess().isHitInCache() || !findAndLockFlow.getCacheAccess().isBypass()) {
                                 findAndLockFlow.getCacheAccess().getLine().setNonInitialState(MESIState.MODIFIED);
                             }
@@ -40,8 +41,7 @@ public class L1EvictFlow extends LockingFlow {
                             }
                         }
 
-                        getCache().getShadowTagDirectories().get(source).removeTag(message.getTag());
-                        getCache().sendReply(source, 8, message);
+                        getCache().getShadowTagDirectories().get(source).removeTag(tag);
 
                         endFillOrEvict(findAndLockFlow);
 
@@ -49,23 +49,21 @@ public class L1EvictFlow extends LockingFlow {
 
                         afterFlowEnd(findAndLockFlow);
 
-                        onSuccessCallback.apply();
+                        getCache().sendReply(source, 8, onSuccessCallback);
                     }
                 }, new Action() {
                     @Override
                     public void apply() {
 //                        afterFlowEnd(findAndLockFlow);
 
-                        onFailureCallback.apply();
-                        getCache().sendReply(source, 8, message);
+                        getCache().sendReply(source, 8, onFailureCallback);
                     }
                 }, new Action() {
                     @Override
                     public void apply() {
                         afterFlowEnd(findAndLockFlow);
 
-                        onFailureCallback.apply();
-                        getCache().sendReply(source, 8, message);
+                        getCache().sendReply(source, 8, onFailureCallback);
                     }
                 }
         );
