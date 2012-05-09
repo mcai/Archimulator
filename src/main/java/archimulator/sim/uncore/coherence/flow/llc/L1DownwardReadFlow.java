@@ -42,7 +42,7 @@ public class L1DownwardReadFlow extends LockingFlow {
                                                 new Action() {
                                                     @Override
                                                     public void apply() {
-                                                        if (l2UpwardReadFlow.isCopyback()) {
+                                                        if (l2UpwardReadFlow.isCopyBack()) {
                                                             copyBack = true;
 //                                                          findAndLockProcess.getCacheAccess().getLine().setNonInitialState(MESIState.MODIFIED);
                                                         }

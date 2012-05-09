@@ -14,7 +14,7 @@ public class L2UpwardReadFlow extends LockingFlow {
     private LastLevelCache source;
     private MemoryHierarchyAccess access;
     private int tag;
-    private boolean copyback;
+    private boolean copyBack;
 
     public L2UpwardReadFlow(FirstLevelCache cache, final LastLevelCache source, MemoryHierarchyAccess access, int tag) {
         this.cache = cache;
@@ -30,7 +30,7 @@ public class L2UpwardReadFlow extends LockingFlow {
                 new Action() {
                     @Override
                     public void apply() {
-                        copyback = findAndLockFlow.getCacheAccess().getLine().getState() == MESIState.MODIFIED;
+                        copyBack = findAndLockFlow.getCacheAccess().getLine().getState() == MESIState.MODIFIED;
 
                         findAndLockFlow.getCacheAccess().getLine().setNonInitialState(MESIState.SHARED);
 
@@ -65,7 +65,7 @@ public class L2UpwardReadFlow extends LockingFlow {
         return cache;
     }
 
-    public boolean isCopyback() {
-        return copyback;
+    public boolean isCopyBack() {
+        return copyBack;
     }
 }
