@@ -5,6 +5,7 @@ import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.common.MESIState;
 import archimulator.sim.uncore.coherence.flc.FirstLevelCache;
 import archimulator.sim.uncore.coherence.flow.FindAndLockFlow;
+import archimulator.sim.uncore.coherence.flow.Flow;
 import archimulator.sim.uncore.coherence.flow.LockingFlow;
 import archimulator.sim.uncore.coherence.flow.flc.L2UpwardReadFlow;
 import archimulator.sim.uncore.coherence.llc.LastLevelCache;
@@ -18,7 +19,8 @@ public class L1DownwardReadFlow extends LockingFlow {
     private boolean copyBack;
     private boolean shared;
 
-    public L1DownwardReadFlow(final LastLevelCache cache, final FirstLevelCache source, MemoryHierarchyAccess access, int tag) {
+    public L1DownwardReadFlow(Flow producerFlow, final LastLevelCache cache, final FirstLevelCache source, MemoryHierarchyAccess access, int tag) {
+        super(producerFlow);
         this.cache = cache;
         this.source = source;
         this.access = access;
@@ -26,7 +28,9 @@ public class L1DownwardReadFlow extends LockingFlow {
     }
 
     public void start(final Action onSuccessCallback, final Action onFailureCallback) {
-        final FindAndLockFlow findAndLockFlow = new LastLevelCacheFindAndLockFlow(this.cache, this.access, this.tag, CacheAccessType.DOWNWARD_READ);
+        onCreate(this.cache.getCycleAccurateEventQueue().getCurrentCycle());
+
+        final FindAndLockFlow findAndLockFlow = new LastLevelCacheFindAndLockFlow(this, this.cache, this.access, this.tag, CacheAccessType.DOWNWARD_READ);
 
         findAndLockFlow.start(
                 new Action() {
@@ -37,7 +41,7 @@ public class L1DownwardReadFlow extends LockingFlow {
                                 getCache().sendRequest(getCache().getOwnerOrFirstSharer(tag), 8, new Action() {
                                     @Override
                                     public void apply() {
-                                        final L2UpwardReadFlow l2UpwardReadFlow = new L2UpwardReadFlow(getCache().getOwnerOrFirstSharer(tag), getCache(), access, tag);
+                                        final L2UpwardReadFlow l2UpwardReadFlow = new L2UpwardReadFlow(L1DownwardReadFlow.this, getCache().getOwnerOrFirstSharer(tag), getCache(), access, tag);
                                         l2UpwardReadFlow.start(
                                                 new Action() {
                                                     @Override
@@ -84,6 +88,7 @@ public class L1DownwardReadFlow extends LockingFlow {
 //                        afterFlowEnd(findAndLockFlow);
 
                         getCache().sendReply(source, 8, onFailureCallback);
+                        onDestroy();
                     }
                 }, new Action() {
                     @Override
@@ -92,6 +97,7 @@ public class L1DownwardReadFlow extends LockingFlow {
                         findAndLockFlow.getCacheAccess().getLine().unlock();
 
                         getCache().sendReply(source, 8, onFailureCallback);
+                        onDestroy();
                     }
                 }
         );
@@ -100,8 +106,6 @@ public class L1DownwardReadFlow extends LockingFlow {
     private void reply(FindAndLockFlow findAndLockFlow, Action onSuccessCallback) {
         getCache().getShadowTagDirectories().get(source).addTag(tag);
         this.shared = getCache().isShared(tag);
-
-        getCache().sendReply(source, source.getCache().getLineSize() + 8, onSuccessCallback);
 
         if (!findAndLockFlow.getCacheAccess().isHitInCache() && !findAndLockFlow.getCacheAccess().isBypass()) {
             if (copyBack) {
@@ -112,6 +116,9 @@ public class L1DownwardReadFlow extends LockingFlow {
         }
 
         findAndLockFlow.getCacheAccess().commit().getLine().unlock();
+
+        getCache().sendReply(source, source.getCache().getLineSize() + 8, onSuccessCallback);
+        onDestroy();
     }
 
     public boolean isShared() {
@@ -120,5 +127,10 @@ public class L1DownwardReadFlow extends LockingFlow {
 
     public LastLevelCache getCache() {
         return cache;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("[%s] %s: L1DownwardReadFlow#%d", getBeginCycle(), getCache().getName(), getId());
     }
 }

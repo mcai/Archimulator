@@ -20,6 +20,7 @@ package archimulator.sim.uncore.coherence.common;
 
 import archimulator.sim.uncore.cache.Cache;
 import archimulator.sim.uncore.cache.CacheLine;
+import archimulator.sim.uncore.coherence.flow.LockingFlow;
 import archimulator.util.action.Action;
 
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ import java.util.List;
 public class LockableCacheLine extends CacheLine<MESIState> {
     private int transientTag = -1;
     private List<Action> suspendedActions;
+    private LockingFlow lockingFlow;
 
     public LockableCacheLine(Cache<?, ?> cache, int set, int way, MESIState initialState) {
         super(cache, set, way, initialState);
@@ -35,18 +37,20 @@ public class LockableCacheLine extends CacheLine<MESIState> {
         this.suspendedActions = new ArrayList<Action>();
     }
 
-    public boolean lock(Action action, int transientTag) {
+    public boolean lock(Action action, int transientTag, LockingFlow lockingFlow) {
         if (this.isLocked()) {
             this.suspendedActions.add(action);
             return false;
         } else {
             this.transientTag = transientTag;
+            this.lockingFlow = lockingFlow;
             return true;
         }
     }
 
     public LockableCacheLine unlock() {
         this.transientTag = -1;
+        this.lockingFlow = null;
 
         for (Action action : this.suspendedActions) {
             getCache().getCycleAccurateEventQueue().schedule(this, action, 0);
@@ -57,9 +61,12 @@ public class LockableCacheLine extends CacheLine<MESIState> {
         return this;
     }
 
-
     public int getTransientTag() {
         return transientTag;
+    }
+
+    public LockingFlow getLockingFlow() {
+        return lockingFlow;
     }
 
     public boolean isLocked() {
@@ -68,6 +75,6 @@ public class LockableCacheLine extends CacheLine<MESIState> {
 
     @Override
     public String toString() {
-        return String.format("[%d, %d] {tag=%s, transientTag=%s, state=%s}", getSet(), getWay(), getTag() == -1 ? "<INVALID>" : String.format("0x%08x", getTag()), transientTag == -1 ? "<INVALID>" : String.format("0x%08x", transientTag), getState());
+        return String.format("[%d, %d] {tag=%s, transientTag=%s, lockingFlow=%s, state=%s}", getSet(), getWay(), getTag() == -1 ? "<INVALID>" : String.format("0x%08x", getTag()), transientTag == -1 ? "<INVALID>" : String.format("0x%08x", transientTag), lockingFlow, getState());
     }
 }

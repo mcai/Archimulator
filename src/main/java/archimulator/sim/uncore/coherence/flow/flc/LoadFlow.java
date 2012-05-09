@@ -15,15 +15,16 @@ public class LoadFlow extends LockingFlow {
     private int tag;
 
     public LoadFlow(FirstLevelCache cache, MemoryHierarchyAccess access, int tag) {
+        super(null);
         this.cache = cache;
         this.access = access;
         this.tag = tag;
     }
 
     public void run(final Action onSuccessCallback, final Action onFailureCallback) {
-        pendings++;
+        this.onCreate(this.cache.getCycleAccurateEventQueue().getCurrentCycle());
 
-        final FindAndLockFlow findAndLockFlow = new FirstLevelCacheFindAndLockFlow(this.cache, this.access, this.tag, CacheAccessType.LOAD);
+        final FindAndLockFlow findAndLockFlow = new FirstLevelCacheFindAndLockFlow(this, this.cache, this.access, this.tag, CacheAccessType.LOAD);
 
         findAndLockFlow.start(
                 new Action() {
@@ -35,8 +36,7 @@ public class LoadFlow extends LockingFlow {
                             findAndLockFlow.getCacheAccess().commit().getLine().unlock();
 
                             onSuccessCallback.apply();
-
-                            pendings--;
+                            onDestroy();
                         }
                     }
                 }, new Action() {
@@ -48,8 +48,7 @@ public class LoadFlow extends LockingFlow {
 //                        afterFlowEnd(findAndLockFlow);
 
                         onFailureCallback.apply();
-
-                        pendings--;
+                        onDestroy();
                     }
                 }, new Action() {
                     @Override
@@ -58,8 +57,7 @@ public class LoadFlow extends LockingFlow {
                         findAndLockFlow.getCacheAccess().getLine().unlock();
 
                         onFailureCallback.apply();
-
-                        pendings--;
+                        onDestroy();
                     }
                 }
         );
@@ -69,7 +67,7 @@ public class LoadFlow extends LockingFlow {
         getCache().sendRequest(getCache().getNext(), 8, new Action() {
             @Override
             public void apply() {
-                final L1DownwardReadFlow l1DownwardReadFlow = new L1DownwardReadFlow(getCache().getNext(), getCache(), access, tag);
+                final L1DownwardReadFlow l1DownwardReadFlow = new L1DownwardReadFlow(LoadFlow.this, getCache().getNext(), getCache(), access, tag);
                 l1DownwardReadFlow.start(
                         new Action() {
                             @Override
@@ -79,26 +77,17 @@ public class LoadFlow extends LockingFlow {
                                 findAndLockFlow.getCacheAccess().commit().getLine().unlock();
 
                                 onSuccessCallback.apply();
-
-                                pendings--;
+                                onDestroy();
                             }
                         }, new Action() {
                             @Override
                             public void apply() {
-                                getCache().getCycleAccurateEventQueue().schedule(this, new Action() {
-                                    public void apply() {
-                                        downwardRead(findAndLockFlow, onSuccessCallback, onFailureCallback);
-                                    }
-                                }, getCache().getRetryLatency());
+                                numDownwardReadRetries++;
 
-//                                            findAndLockFlow.getCacheAccess().abort();
-//                                            findAndLockFlow.getCacheAccess().getLine().unlock();
-//
-//                                            abort(findAndLockFlow);
-//
-//                                            afterFlowEnd(findAndLockFlow);
-//
-//                                            onFailureCallback.apply();
+                                findAndLockFlow.getCacheAccess().abort();
+                                findAndLockFlow.getCacheAccess().getLine().unlock();
+
+                                onFailureCallback.apply();
                             }
                         }
                 );
@@ -110,5 +99,14 @@ public class LoadFlow extends LockingFlow {
         return cache;
     }
 
-    private static int pendings = 0;
+    private int numDownwardReadRetries = 0;
+
+    public int getNumDownwardReadRetries() {
+        return numDownwardReadRetries;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("[%s] %s {tag=0x%08x}: LoadFlow#%d", getBeginCycle(), getCache().getName(), access.getPhysicalTag(), getId());
+    }
 }

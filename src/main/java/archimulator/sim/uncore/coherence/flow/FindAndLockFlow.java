@@ -25,7 +25,8 @@ public abstract class FindAndLockFlow extends Flow {
     private CacheAccess<MESIState, LockableCacheLine> cacheAccess;
     private BasicFiniteStateMachine<FindAndLockFlowState, FindAndLockFlowCondition> fsm;
 
-    public FindAndLockFlow(CoherentCache cache, MemoryHierarchyAccess access, int tag, CacheAccessType cacheAccessType) {
+    public FindAndLockFlow(LockingFlow producerFlow, CoherentCache cache, MemoryHierarchyAccess access, int tag, CacheAccessType cacheAccessType) {
+        super(producerFlow);
         this.cache = cache;
         this.access = access;
         this.tag = tag;
@@ -34,6 +35,8 @@ public abstract class FindAndLockFlow extends Flow {
     }
 
     public void start(final Action onSuccessCallback, final Action onLockFailureCallback, final Action onEvictFailureCallback) {
+        this.onCreate(this.cache.getCycleAccurateEventQueue().getCurrentCycle());
+
         this.fsm.addListener(EnterStateEvent.class, new Action1<EnterStateEvent>() {
             @Override
             public void apply(EnterStateEvent event) {
@@ -45,8 +48,10 @@ public abstract class FindAndLockFlow extends Flow {
                         break;
                     case FAILED_TO_LOCK:
                         onLockFailureCallback.apply();
+                        onDestroy();
                         break;
                     case EVICTING:
+                        getCache().incEvictions();
                         break;
                     case LOCKED:
                         if(!cacheAccess.isBypass()) {
@@ -54,9 +59,11 @@ public abstract class FindAndLockFlow extends Flow {
                             getCache().getBlockingEventDispatcher().dispatch(new CoherentCacheBeginCacheAccessEvent(getCache(), access, cacheAccess));
                         }
                         onSuccessCallback.apply();
+                        onDestroy();
                         break;
                     case FAILED_TO_EVICT:
                         onEvictFailureCallback.apply();
+                        onDestroy();
                         break;
                 }
             }
@@ -81,29 +88,17 @@ public abstract class FindAndLockFlow extends Flow {
             } else {
                 if (this.cacheAccess.getLine().lock(new Action() {
                     public void apply() {
+                        fsm.fireTransition(FindAndLockFlowCondition.UNLOCKED);
                         doLockingProcess();
                     }
-                }, tag)) {
+                }, tag, getProducerFlow())) {
                     if (!cacheAccessType.isUpward()) {
                         this.getCache().getBlockingEventDispatcher().dispatch(new CoherentCacheServiceNonblockingRequestEvent(this.getCache(), tag, access, this.cacheAccess.getLine(), this.cacheAccess.isHitInCache(), this.cacheAccess.isEviction(), this.cacheAccess.getReference().getAccessType()));
                     }
 
                     if (this.cacheAccess.isEviction()) {
-                        this.evict(access,
-                                new Action() {
-                                    @Override
-                                    public void apply() {
-                                        fsm.fireTransition(FindAndLockFlowCondition.EVICTED);
-                                    }
-                                }, new Action() {
-                                    @Override
-                                    public void apply() {
-                                        fsm.fireTransition(FindAndLockFlowCondition.FAILED_TO_EVICT);
-                                    }
-                                }
-                        );
+                        this.evict();
                         this.fsm.fireTransition(FindAndLockFlowCondition.BEGIN_EVICT);
-                        getCache().incEvictions();
                     } else {
                         this.fsm.fireTransition(FindAndLockFlowCondition.NO_EVICT);
                     }
@@ -117,6 +112,22 @@ public abstract class FindAndLockFlow extends Flow {
         }
     }
 
+    private void evict() {
+        this.evict(access,
+                new Action() {
+                    @Override
+                    public void apply() {
+                        fsm.fireTransition(FindAndLockFlowCondition.EVICTED);
+                    }
+                }, new Action() {
+                    @Override
+                    public void apply() {
+                        fsm.fireTransition(FindAndLockFlowCondition.FAILED_TO_EVICT);
+                    }
+                }
+        );
+    }
+
     protected abstract void evict(MemoryHierarchyAccess access, Action onSuccessCallback, Action onFailureCallback);
 
     public CoherentCache getCache() {
@@ -125,6 +136,15 @@ public abstract class FindAndLockFlow extends Flow {
 
     public CacheAccess<MESIState, LockableCacheLine> getCacheAccess() {
         return cacheAccess;
+    }
+
+    @Override
+    public LockingFlow getProducerFlow() {
+        return (LockingFlow) super.getProducerFlow();
+    }
+
+    public FindAndLockFlowState getState() {
+        return this.fsm.getState();
     }
 
     private enum FindAndLockFlowState {

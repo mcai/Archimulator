@@ -29,13 +29,13 @@ import archimulator.sim.isa.StaticInstruction;
 import archimulator.sim.isa.StaticInstructionType;
 import archimulator.sim.os.ContextState;
 import archimulator.sim.uncore.MemoryHierarchyThread;
+import archimulator.sim.uncore.coherence.flow.Flow;
 import archimulator.util.Reference;
 import archimulator.util.action.Action;
 import archimulator.util.action.Action1;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.lang.*;
+import java.util.*;
 
 public class BasicThread extends AbstractBasicThread {
     private int commitWidth;
@@ -394,6 +394,8 @@ public class BasicThread extends AbstractBasicThread {
 
         if (this.getCycleAccurateEventQueue().getCurrentCycle() - this.lastCommitCycle > COMMIT_TIMEOUT) {
             if (noInstructionCommittedCounterThreshold > 5) {
+                Flow.dumpTree();
+
                 Logger.fatalf(Logger.THREAD, "%s: No instruction committed for %d cycles, %d committed.", this.getCycleAccurateEventQueue().getCurrentCycle(), this.getName(), COMMIT_TIMEOUT, this.totalInsts);
             } else {
                 this.lastCommitCycle = this.getCycleAccurateEventQueue().getCurrentCycle();

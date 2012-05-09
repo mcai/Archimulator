@@ -5,6 +5,7 @@ import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.common.MESIState;
 import archimulator.sim.uncore.coherence.flc.FirstLevelCache;
 import archimulator.sim.uncore.coherence.flow.FindAndLockFlow;
+import archimulator.sim.uncore.coherence.flow.Flow;
 import archimulator.sim.uncore.coherence.flow.LockingFlow;
 import archimulator.sim.uncore.coherence.llc.LastLevelCache;
 import archimulator.util.action.Action;
@@ -16,7 +17,8 @@ public class L1EvictFlow extends LockingFlow {
     private int tag;
     private boolean hasData;
 
-    public L1EvictFlow(LastLevelCache cache, final FirstLevelCache source, MemoryHierarchyAccess access, int tag, boolean hasData) {
+    public L1EvictFlow(Flow producerFlow, LastLevelCache cache, final FirstLevelCache source, MemoryHierarchyAccess access, int tag, boolean hasData) {
+        super(producerFlow);
         this.cache = cache;
         this.source = source;
         this.access = access;
@@ -25,7 +27,9 @@ public class L1EvictFlow extends LockingFlow {
     }
 
     public void start(final Action onSuccessCallback, final Action onFailureCallback) {
-        final FindAndLockFlow findAndLockFlow = new LastLevelCacheFindAndLockFlow(this.cache, this.access, this.tag, CacheAccessType.EVICT);
+        this.onCreate(this.cache.getCycleAccurateEventQueue().getCurrentCycle());
+
+        final FindAndLockFlow findAndLockFlow = new LastLevelCacheFindAndLockFlow(this, this.cache, this.access, this.tag, CacheAccessType.EVICT);
 
         findAndLockFlow.start(
                 new Action() {
@@ -46,16 +50,19 @@ public class L1EvictFlow extends LockingFlow {
                         findAndLockFlow.getCacheAccess().commit().getLine().unlock();
 
                         getCache().sendReply(source, 8, onSuccessCallback);
+                        onDestroy();
                     }
                 }, new Action() {
                     @Override
                     public void apply() {
                         getCache().sendReply(source, 8, onFailureCallback);
+                        onDestroy();
                     }
                 }, new Action() {
                     @Override
                     public void apply() {
                         getCache().sendReply(source, 8, onFailureCallback);
+                        onDestroy();
                     }
                 }
         );
@@ -63,5 +70,10 @@ public class L1EvictFlow extends LockingFlow {
 
     public LastLevelCache getCache() {
         return cache;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("[%s] %s: L1EvictFlow#%d", getBeginCycle(), getCache().getName(), getId());
     }
 }

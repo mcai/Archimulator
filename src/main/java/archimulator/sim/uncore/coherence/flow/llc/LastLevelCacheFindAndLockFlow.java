@@ -5,12 +5,13 @@ import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.common.MESIState;
 import archimulator.sim.uncore.coherence.event.LastLevelCacheLineEvictedByMemWriteProcessEvent;
 import archimulator.sim.uncore.coherence.flow.FindAndLockFlow;
+import archimulator.sim.uncore.coherence.flow.LockingFlow;
 import archimulator.sim.uncore.coherence.llc.LastLevelCache;
 import archimulator.util.action.Action;
 
 public class LastLevelCacheFindAndLockFlow extends FindAndLockFlow {
-    public LastLevelCacheFindAndLockFlow(LastLevelCache cache, MemoryHierarchyAccess access, int tag, CacheAccessType cacheAccessType) {
-        super(cache, access, tag, cacheAccessType);
+    public LastLevelCacheFindAndLockFlow(LockingFlow lockingFlow, LastLevelCache cache, MemoryHierarchyAccess access, int tag, CacheAccessType cacheAccessType) {
+        super(lockingFlow, cache, access, tag, cacheAccessType);
     }
 
     @Override
@@ -42,5 +43,10 @@ public class LastLevelCacheFindAndLockFlow extends FindAndLockFlow {
     @Override
     public LastLevelCache getCache() {
         return (LastLevelCache) super.getCache();
+    }
+
+    @Override
+    public String toString() {
+        return String.format("[%s] %s%s: LastLevelCacheFindAndLockFlow#%d {state=%s} ", getBeginCycle(), getCache().getName(), getCacheAccess().getLine(), getId(), getState());
     }
 }
