@@ -49,6 +49,10 @@ public abstract class FindAndLockFlow extends Flow {
                     case EVICTING:
                         break;
                     case LOCKED:
+                        if(!cacheAccess.isBypass()) {
+                            getCache().updateStats(cacheAccessType, cacheAccess);
+                            getCache().getBlockingEventDispatcher().dispatch(new CoherentCacheBeginCacheAccessEvent(getCache(), access, cacheAccess));
+                        }
                         onSuccessCallback.apply();
                         break;
                     case FAILED_TO_EVICT:
@@ -110,11 +114,6 @@ public abstract class FindAndLockFlow extends Flow {
             }
         } else {
             this.fsm.fireTransition(FindAndLockFlowCondition.BYPASS);
-        }
-
-        if(this.fsm.getState() == FindAndLockFlowState.LOCKED || this.cacheAccess.isBypass()) {
-            this.getCache().updateStats(cacheAccessType, this.cacheAccess);
-            this.getCache().getBlockingEventDispatcher().dispatch(new CoherentCacheBeginCacheAccessEvent(this.getCache(), access, this.cacheAccess));
         }
     }
 
