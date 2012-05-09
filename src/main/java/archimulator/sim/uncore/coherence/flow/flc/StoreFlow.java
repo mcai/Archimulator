@@ -29,6 +29,7 @@ public class StoreFlow extends LockingFlow {
                 new Action() {
                     @Override
                     public void apply() {
+                        //TODO: error?
                         if (findAndLockFlow.getCacheAccess().getLine().getState() == MESIState.SHARED || findAndLockFlow.getCacheAccess().getLine().getState() == MESIState.INVALID) {
                             downwardWrite(findAndLockFlow, onSuccessCallback, onFailureCallback);
                         } else {
