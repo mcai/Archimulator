@@ -19,7 +19,6 @@
 package archimulator.sim.uncore.net;
 
 import archimulator.util.action.Action;
-import archimulator.util.action.NamedAction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,7 +63,7 @@ public class NetLink {
                     }
 
                     this.destPort.getBuffer().beginWrite();
-                    this.srcPort.getNode().getNet().getCycleAccurateEventQueue().schedule(this, new NamedAction("NetLink.toInBuffer") {
+                    this.srcPort.getNode().getNet().getCycleAccurateEventQueue().schedule(this, new Action() {
                         public void apply() {
                             destPort.getBuffer().endWrite(message);
                         }

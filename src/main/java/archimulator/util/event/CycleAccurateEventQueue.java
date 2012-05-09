@@ -30,11 +30,11 @@ public final class CycleAccurateEventQueue {
         this.events = new PriorityQueue<CycleAccurateEvent>();
     }
 
-    public void advanceOneCycle() {
+    public synchronized void advanceOneCycle() {
         while (!this.events.isEmpty()) {
             CycleAccurateEvent event = this.events.peek();
 
-            if (event.getWhen() != this.currentCycle) {
+            if (event.getWhen() > this.currentCycle) {
                 break;
             }
 
@@ -50,7 +50,7 @@ public final class CycleAccurateEventQueue {
         return this;
     }
 
-    public void schedule(CycleAccurateEvent event) {
+    private void schedule(CycleAccurateEvent event) {
         this.events.add(event);
     }
 

@@ -20,7 +20,6 @@ package archimulator.sim.uncore.dram;
 
 import archimulator.sim.uncore.CacheHierarchy;
 import archimulator.util.action.Action;
-import archimulator.util.action.NamedAction;
 import archimulator.util.math.Counter;
 
 import java.util.ArrayList;
@@ -66,7 +65,7 @@ public class BasicMainMemory extends MainMemory {
             size -= this.config.getBusWidth();
 
             final int currentAddr = addr + offset;
-            this.getCycleAccurateEventQueue().schedule(this, new NamedAction("BasicMainMemory.accessDram") {
+            this.getCycleAccurateEventQueue().schedule(this, new Action() {
                 public void apply() {
                     accessDram(currentAddr, new Action() {
                         public void apply() {
@@ -134,7 +133,7 @@ public class BasicMainMemory extends MainMemory {
         }
 
         private void precharge(final Action onCompletedCallback) {
-            getCycleAccurateEventQueue().schedule(this, new NamedAction("BasicMainMemory.Bank.precharge") {
+            getCycleAccurateEventQueue().schedule(this, new Action() {
                 public void apply() {
                     status = BankStatus.PRECHARGED;
 
@@ -182,7 +181,7 @@ public class BasicMainMemory extends MainMemory {
                         getCycleAccurateEventQueue().schedule(this, onCompletedCallback, (config.getPrechargeLatency() + config.getFromDramLatency()));
                     }
                 } else {
-                    getCycleAccurateEventQueue().schedule(this, new NamedAction("BasicMainMemory.bank.resolveConflict") {
+                    getCycleAccurateEventQueue().schedule(this, new Action() {
                         public void apply() {
                             currentRow = row;
 

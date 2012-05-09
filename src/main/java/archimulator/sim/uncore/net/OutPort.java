@@ -19,7 +19,6 @@
 package archimulator.sim.uncore.net;
 
 import archimulator.util.action.Action;
-import archimulator.util.action.NamedAction;
 
 public class OutPort extends NetPort {
     private OutBuffer buffer;
@@ -54,7 +53,7 @@ public class OutPort extends NetPort {
             int latency = (message.getSize() + this.getLink().getBandwidth()) / this.getLink().getBandwidth();
 
             link.beginTransfer();
-            this.getNode().getNet().getCycleAccurateEventQueue().schedule(this, new NamedAction(String.format("OutPort{%s.%d}.toLink(%d)", this.getNode().getName(), this.num, message.getId())) {
+            this.getNode().getNet().getCycleAccurateEventQueue().schedule(this, new Action() {
                 public void apply() {
                     link.endTransfer(message);
                 }
@@ -62,7 +61,7 @@ public class OutPort extends NetPort {
 
             if (this.buffer != null) {
                 this.buffer.beginRead();
-                this.getNode().getNet().getCycleAccurateEventQueue().schedule(this, new NamedAction("OutPort.toLink[buffer]") {
+                this.getNode().getNet().getCycleAccurateEventQueue().schedule(this, new Action() {
                     public void apply() {
                         buffer.endRead(message);
                     }

@@ -33,9 +33,9 @@ import archimulator.sim.base.simulation.strategy.SimulationStrategy;
 import archimulator.sim.core.ProcessorConfig;
 import archimulator.sim.uncore.MemoryHierarchyConfig;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
+import archimulator.util.action.Action;
 import archimulator.util.action.Action1;
 import archimulator.util.action.Function1X;
-import archimulator.util.action.NamedAction;
 import archimulator.util.event.BlockingEvent;
 import archimulator.util.event.BlockingEventDispatcher;
 import archimulator.util.event.CycleAccurateEventQueue;
@@ -239,7 +239,7 @@ public abstract class Experiment {
                                     public void run() {
                                         final Semaphore semaphore = new Semaphore(0);
 
-                                        experiment.getCycleAccurateEventQueue().schedule(this, new NamedAction("Simulation.pollState") {
+                                        experiment.getCycleAccurateEventQueue().schedule(this, new Action() {
                                             public void apply() {
                                                 experiment.pollSimulationState();
                                                 semaphore.release();

@@ -20,7 +20,6 @@ package archimulator.sim.uncore.dram;
 
 import archimulator.sim.uncore.CacheHierarchy;
 import archimulator.util.action.Action;
-import archimulator.util.action.NamedAction;
 
 public class FixedLatencyMainMemory extends MainMemory {
     private FixedLatencyMainMemoryConfig config;
@@ -33,7 +32,7 @@ public class FixedLatencyMainMemory extends MainMemory {
 
     @Override
     protected void access(int addr, final Action onCompletedCallback) {
-        this.getCycleAccurateEventQueue().schedule(this, new NamedAction("FixedLatencyMainMemory.access") {
+        this.getCycleAccurateEventQueue().schedule(this, new Action() {
             public void apply() {
                 onCompletedCallback.apply();
             }

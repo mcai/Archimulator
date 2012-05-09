@@ -19,7 +19,6 @@
 package archimulator.sim.uncore.net;
 
 import archimulator.util.action.Action;
-import archimulator.util.action.NamedAction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +58,7 @@ public class Crossbar {
                     }
 
                     destPort.getBuffer().beginWrite();
-                    this.node.getNet().getCycleAccurateEventQueue().schedule(this, new NamedAction("Crossbar.toOutBuffer") {
+                    this.node.getNet().getCycleAccurateEventQueue().schedule(this, new Action() {
                         public void apply() {
                             destPort.getBuffer().endWrite(message);
                         }

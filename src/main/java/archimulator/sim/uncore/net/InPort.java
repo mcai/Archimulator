@@ -19,7 +19,6 @@
 package archimulator.sim.uncore.net;
 
 import archimulator.util.action.Action;
-import archimulator.util.action.NamedAction;
 
 public class InPort extends NetPort {
     private InBuffer buffer;
@@ -53,7 +52,7 @@ public class InPort extends NetPort {
                 int latency = (message.getSize() + this.getNode().getCrossbar().getBandwidth()) / this.getNode().getCrossbar().getBandwidth();
 
                 this.getNode().getCrossbar().beginTransfer();
-                this.getNode().getNet().getCycleAccurateEventQueue().schedule(this, new NamedAction("InPort.toCrossbar") {
+                this.getNode().getNet().getCycleAccurateEventQueue().schedule(this, new Action() {
                     public void apply() {
                         getNode().getCrossbar().endTransfer(message);
                     }
@@ -61,7 +60,7 @@ public class InPort extends NetPort {
 
                 if (this.buffer != null) {
                     this.buffer.beginRead();
-                    this.getNode().getNet().getCycleAccurateEventQueue().schedule(this, new NamedAction("InPort.toCrossbar[buffer]") {
+                    this.getNode().getNet().getCycleAccurateEventQueue().schedule(this, new Action() {
                         public void apply() {
                             buffer.endRead(message);
                         }

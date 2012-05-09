@@ -20,8 +20,8 @@ package archimulator.sim.core;
 
 import archimulator.sim.base.event.DumpStatEvent;
 import archimulator.sim.base.event.ResetStatEvent;
+import archimulator.util.action.Action;
 import archimulator.util.action.Action1;
-import archimulator.util.action.NamedAction;
 
 import java.util.EnumMap;
 import java.util.EnumSet;
@@ -171,12 +171,12 @@ public class FunctionalUnitPool {
         }
 
         this.core.getCycleAccurateEventQueue()
-                .schedule(this, new NamedAction("FunctionalUnitPool.issueComplete") {
+                .schedule(this, new Action() {
                     public void apply() {
                         fuDescriptor.numFree++;
                     }
                 }, fuOperation.issueLatency)
-                .schedule(this, new NamedAction("FunctionalUnitPool.operationComplete") {
+                .schedule(this, new Action() {
                     public void apply() {
                         if (!reorderBufferEntry.isSquashed()) {
                             onCompletedCallback.apply(reorderBufferEntry);
