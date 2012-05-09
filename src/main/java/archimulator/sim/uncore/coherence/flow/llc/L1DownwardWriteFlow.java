@@ -6,7 +6,9 @@ import archimulator.sim.uncore.coherence.common.MESIState;
 import archimulator.sim.uncore.coherence.flc.FirstLevelCache;
 import archimulator.sim.uncore.coherence.flow.FindAndLockFlow;
 import archimulator.sim.uncore.coherence.flow.LockingFlow;
+import archimulator.sim.uncore.coherence.flow.flc.L2UpwardWriteFlow;
 import archimulator.sim.uncore.coherence.llc.LastLevelCache;
+import archimulator.util.Reference;
 import archimulator.util.action.Action;
 
 public class L1DownwardWriteFlow extends LockingFlow {
@@ -29,51 +31,7 @@ public class L1DownwardWriteFlow extends LockingFlow {
                 new Action() {
                     @Override
                     public void apply() {
-                        UpwardWriteFlow upwardWriteFlow = new UpwardWriteFlow(getCache(), source, access, tag);
-                        upwardWriteFlow.start(
-                                new Action() {
-                                    @Override
-                                    public void apply() {
-                                        if (!findAndLockFlow.getCacheAccess().isHitInCache() && !getCache().isOwnedOrShared(tag)) {
-                                            MemReadFlow memReadFlow = new MemReadFlow(getCache(), access, tag);
-                                            memReadFlow.start(
-                                                    new Action() {
-                                                        @Override
-                                                        public void apply() {
-                                                            for (final FirstLevelCache sharer : getCache().getSharers(tag)) {
-                                                                getCache().getShadowTagDirectories().get(sharer).removeTag(tag);
-                                                            }
-
-                                                            getCache().getShadowTagDirectories().get(source).addTag(tag);
-
-                                                            if (findAndLockFlow.getCacheAccess().isHitInCache() || !findAndLockFlow.getCacheAccess().isBypass()) {
-                                                                findAndLockFlow.getCacheAccess().getLine().setNonInitialState(findAndLockFlow.getCacheAccess().getLine().getState() == MESIState.MODIFIED ? MESIState.MODIFIED : MESIState.EXCLUSIVE);
-                                                            }
-
-                                                            findAndLockFlow.getCacheAccess().commit().getLine().unlock();
-
-                                                            getCache().sendReply(source, source.getCache().getLineSize() + 8, onSuccessCallback);
-
-                                                            endFillOrEvict(findAndLockFlow);
-
-                                                            afterFlowEnd(findAndLockFlow);
-                                                        }
-                                                    }, new Action() {
-                                                        @Override
-                                                        public void apply() {
-                                                            throw new UnsupportedOperationException();
-                                                        }
-                                                    }
-                                            );
-                                        }
-                                    }
-                                }, new Action() {
-                                    @Override
-                                    public void apply() {
-                                        throw new UnsupportedOperationException();
-                                    }
-                                }
-                        );
+                        beginInvalidateSharers(findAndLockFlow, onSuccessCallback);
                     }
                 }, new Action() {
                     @Override
@@ -97,6 +55,74 @@ public class L1DownwardWriteFlow extends LockingFlow {
                     }
                 }
         );
+    }
+
+    private void beginInvalidateSharers(final FindAndLockFlow findAndLockFlow, final Action onSuccessCallback) {
+        final Reference<Integer> pending = new Reference<Integer>(0);
+
+        for (final FirstLevelCache sharer : getCache().getSharers(tag)) {
+            if (sharer != source) {
+                getCache().sendRequest(sharer, 8, new Action() {
+                    @Override
+                    public void apply() {
+                        L2UpwardWriteFlow l2UpwardWriteFlow = new L2UpwardWriteFlow(sharer, getCache(), access, tag);
+                        l2UpwardWriteFlow.start(
+                                new Action() {
+                                    @Override
+                                    public void apply() {
+                                        pending.set(pending.get() - 1);
+
+                                        if (pending.get() == 0) {
+                                            endInvalidateSharers(findAndLockFlow, onSuccessCallback);
+                                        }
+                                    }
+                                }, new Action() {
+                                    @Override
+                                    public void apply() {
+                                        throw new UnsupportedOperationException();
+                                    }
+                                }
+                        );
+                    }
+                });
+                pending.set(pending.get() + 1);
+            }
+        }
+    }
+
+    private void endInvalidateSharers(final FindAndLockFlow findAndLockFlow, final Action onSuccessCallback) {
+        if (!findAndLockFlow.getCacheAccess().isHitInCache() && !getCache().isOwnedOrShared(tag)) {
+            MemReadFlow memReadFlow = new MemReadFlow(getCache(), access, tag);
+            memReadFlow.start(
+                    new Action() {
+                        @Override
+                        public void apply() {
+                            for (final FirstLevelCache sharer : getCache().getSharers(tag)) {
+                                getCache().getShadowTagDirectories().get(sharer).removeTag(tag);
+                            }
+
+                            getCache().getShadowTagDirectories().get(source).addTag(tag);
+
+                            if (findAndLockFlow.getCacheAccess().isHitInCache() || !findAndLockFlow.getCacheAccess().isBypass()) {
+                                findAndLockFlow.getCacheAccess().getLine().setNonInitialState(findAndLockFlow.getCacheAccess().getLine().getState() == MESIState.MODIFIED ? MESIState.MODIFIED : MESIState.EXCLUSIVE);
+                            }
+
+                            findAndLockFlow.getCacheAccess().commit().getLine().unlock();
+
+                            getCache().sendReply(source, source.getCache().getLineSize() + 8, onSuccessCallback);
+
+                            endFillOrEvict(findAndLockFlow);
+
+                            afterFlowEnd(findAndLockFlow);
+                        }
+                    }, new Action() {
+                        @Override
+                        public void apply() {
+                            throw new UnsupportedOperationException();
+                        }
+                    }
+            );
+        }
     }
 
     public LastLevelCache getCache() {

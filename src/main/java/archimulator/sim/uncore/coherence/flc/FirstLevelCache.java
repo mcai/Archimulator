@@ -28,14 +28,10 @@ import archimulator.sim.uncore.coherence.common.LockableCacheLine;
 import archimulator.sim.uncore.coherence.common.MESIState;
 import archimulator.sim.uncore.coherence.config.CoherentCacheConfig;
 import archimulator.sim.uncore.coherence.config.FirstLevelCacheConfig;
-import archimulator.sim.uncore.coherence.flow.flc.L2UpwardReadFlow;
-import archimulator.sim.uncore.coherence.flow.flc.L2UpwardWriteFlow;
 import archimulator.sim.uncore.coherence.flow.flc.LoadFlow;
 import archimulator.sim.uncore.coherence.flow.flc.StoreFlow;
 import archimulator.sim.uncore.coherence.llc.LastLevelCache;
 import archimulator.sim.uncore.coherence.message.MemoryDeviceMessage;
-import archimulator.sim.uncore.coherence.message.UpwardReadMessage;
-import archimulator.sim.uncore.coherence.message.UpwardWriteMessage;
 import archimulator.sim.uncore.net.Net;
 import archimulator.util.action.Action;
 import archimulator.util.action.Action1;
@@ -151,26 +147,8 @@ public class FirstLevelCache extends CoherentCache {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void receiveRequest(MemoryDevice source, MemoryDeviceMessage message) {
-        switch (message.getType()) {
-            case UPWARD_WRITE:
-                L2UpwardWriteFlow l2UpwardWriteFlow = new L2UpwardWriteFlow(this, (LastLevelCache) source, (UpwardWriteMessage) message);
-                l2UpwardWriteFlow.start(
-                        new Action() {
-                            @Override
-                            public void apply() {
-                            }
-                        }, new Action() {
-                            @Override
-                            public void apply() {
-                            }
-                        }
-                );
-                break;
-            default:
-                throw new IllegalArgumentException();
-        }
+        throw new IllegalArgumentException();
     }
 
     public void receiveIfetch(final MemoryHierarchyAccess access, final Action onCompletedCallback) {

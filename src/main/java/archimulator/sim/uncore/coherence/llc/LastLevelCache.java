@@ -24,11 +24,7 @@ import archimulator.sim.uncore.coherence.common.CoherentCache;
 import archimulator.sim.uncore.coherence.common.MESIState;
 import archimulator.sim.uncore.coherence.config.CoherentCacheConfig;
 import archimulator.sim.uncore.coherence.flc.FirstLevelCache;
-import archimulator.sim.uncore.coherence.flow.llc.L1DownwardReadFlow;
-import archimulator.sim.uncore.coherence.flow.llc.L1DownwardWriteFlow;
 import archimulator.sim.uncore.coherence.flow.llc.L1EvictFlow;
-import archimulator.sim.uncore.coherence.message.DownwardReadMessage;
-import archimulator.sim.uncore.coherence.message.DownwardWriteMessage;
 import archimulator.sim.uncore.coherence.message.EvictMessage;
 import archimulator.sim.uncore.coherence.message.MemoryDeviceMessage;
 import archimulator.sim.uncore.dram.MainMemory;
@@ -55,7 +51,6 @@ public class LastLevelCache extends CoherentCache {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void receiveRequest(MemoryDevice source, final MemoryDeviceMessage message) {
         switch (message.getType()) {
             case EVICT:
