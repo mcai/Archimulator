@@ -21,6 +21,8 @@ public class StoreFlow extends LockingFlow {
     }
 
     public void run(final Action onSuccessCallback, final Action onFailureCallback) {
+        pendings++;
+
         final FindAndLockFlow findAndLockFlow = new FirstLevelCacheFindAndLockFlow(this.cache, this.access, this.tag, CacheAccessType.STORE);
 
         findAndLockFlow.start(
@@ -38,6 +40,8 @@ public class StoreFlow extends LockingFlow {
                             afterFlowEnd(findAndLockFlow);
 
                             onSuccessCallback.apply();
+
+                            pendings--;
                         }
                     }
                 }, new Action() {
@@ -49,6 +53,8 @@ public class StoreFlow extends LockingFlow {
 //                        afterFlowEnd(findAndLockFlow);
 
                         onFailureCallback.apply();
+
+                        pendings--;
                     }
                 }, new Action() {
                     @Override
@@ -59,6 +65,8 @@ public class StoreFlow extends LockingFlow {
                         afterFlowEnd(findAndLockFlow);
 
                         onFailureCallback.apply();
+
+                        pendings--;
                     }
                 }
         );
@@ -81,6 +89,8 @@ public class StoreFlow extends LockingFlow {
                                 afterFlowEnd(findAndLockFlow);
 
                                 onSuccessCallback.apply();
+
+                                pendings--;
                             }
                         }, new Action() {
                             @Override
@@ -102,4 +112,6 @@ public class StoreFlow extends LockingFlow {
     public FirstLevelCache getCache() {
         return cache;
     }
+
+    private static int pendings = 0;
 }

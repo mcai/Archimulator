@@ -83,6 +83,10 @@ public class L1DownwardWriteFlow extends LockingFlow {
                 pending.set(pending.get() + 1);
             }
         }
+
+        if (pending.get() == 0) {
+            endInvalidateSharers(findAndLockFlow, onSuccessCallback);
+        }
     }
 
     private void endInvalidateSharers(final FindAndLockFlow findAndLockFlow, final Action onSuccessCallback) {
