@@ -20,7 +20,6 @@ package archimulator.sim.uncore;
 
 import archimulator.sim.base.simulation.BasicSimulationObject;
 import archimulator.sim.base.simulation.SimulationObject;
-import archimulator.sim.uncore.coherence.message.MemoryDeviceMessage;
 import archimulator.sim.uncore.net.Net;
 import archimulator.util.action.Action;
 
@@ -45,30 +44,11 @@ public abstract class MemoryDevice extends BasicSimulationObject implements Simu
         });
     }
 
-    public void sendRequest(final MemoryDevice target, final int size, final MemoryDeviceMessage message) {
-        this.sendRequest(target, size, new Action() {
-            @Override
-            public void apply() {
-                target.receiveRequest(MemoryDevice.this, message);
-            }
-        });
-    }
-
     protected abstract Net getNet(MemoryDevice to);
-
-    public void sendReply(final MemoryDevice source, final int size, final MemoryDeviceMessage message) {
-        this.getNet(source).transfer(this, source, size, new Action() {
-            public void apply() {
-                message.reply();
-            }
-        });
-    }
 
     public void sendReply(final MemoryDevice source, final int size, final Action action) {
         this.getNet(source).transfer(this, source, size, action);
     }
-
-    public abstract void receiveRequest(MemoryDevice source, MemoryDeviceMessage message);
 
     public CacheHierarchy getCacheHierarchy() {
         return cacheHierarchy;

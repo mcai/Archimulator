@@ -24,11 +24,8 @@ import archimulator.sim.uncore.coherence.common.CoherentCache;
 import archimulator.sim.uncore.coherence.common.MESIState;
 import archimulator.sim.uncore.coherence.config.CoherentCacheConfig;
 import archimulator.sim.uncore.coherence.flc.FirstLevelCache;
-import archimulator.sim.uncore.coherence.flow.llc.L1EvictFlow;
-import archimulator.sim.uncore.coherence.message.MemoryDeviceMessage;
 import archimulator.sim.uncore.dram.MainMemory;
 import archimulator.sim.uncore.net.Net;
-import archimulator.util.action.Action;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -47,11 +44,6 @@ public class LastLevelCache extends CoherentCache {
     @Override
     protected Net getNet(MemoryDevice to) {
         return to instanceof MainMemory ? this.getCacheHierarchy().getL2ToMemNetwork() : this.getCacheHierarchy().getL1sToL2Network();
-    }
-
-    @Override
-    public void receiveRequest(MemoryDevice source, final MemoryDeviceMessage message) {
-        throw new IllegalArgumentException();
     }
 
     public void addShadowTagDirectoryForL1(FirstLevelCache l1Cache) {

@@ -23,9 +23,6 @@ import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.uncore.CacheHierarchy;
 import archimulator.sim.uncore.MemoryDevice;
 import archimulator.sim.uncore.coherence.llc.LastLevelCache;
-import archimulator.sim.uncore.coherence.message.MemReadMessage;
-import archimulator.sim.uncore.coherence.message.MemWriteMessage;
-import archimulator.sim.uncore.coherence.message.MemoryDeviceMessage;
 import archimulator.sim.uncore.net.Net;
 import archimulator.util.action.Action;
 import archimulator.util.action.Action1;
@@ -60,42 +57,28 @@ public abstract class MainMemory extends MemoryDevice {
         return this.getCacheHierarchy().getL2ToMemNetwork();
     }
 
-    @Override
-    public void receiveRequest(MemoryDevice source, MemoryDeviceMessage message) {
-        switch (message.getType()) {
-            case MEM_READ:
-                this.memReadRequestReceive(source, (MemReadMessage) message);
-                break;
-            case MEM_WRITE:
-                this.memWriteRequestReceive(source, (MemWriteMessage) message);
-                break;
-            default:
-                throw new IllegalArgumentException();
-        }
-    }
-
-    private void memReadRequestReceive(final MemoryDevice source, final MemReadMessage message) {
+    public void memReadRequestReceive(final MemoryDevice source, int tag, final Action onSuccessCallback) {
         this.reads++;
 
-        this.access(message.getTag(), new Action() {
+        this.access(tag, new Action() {
             public void apply() {
                 new Action() {
                     public void apply() {
-                        sendReply(source, ((LastLevelCache) source).getCache().getLineSize() + 8, message);
+                        sendReply(source, ((LastLevelCache) source).getCache().getLineSize() + 8, onSuccessCallback);
                     }
                 }.apply();
             }
         });
     }
 
-    private void memWriteRequestReceive(final MemoryDevice source, final MemWriteMessage message) {
+    public void memWriteRequestReceive(final MemoryDevice source, int tag, final Action onSuccessCallback) {
         this.writes++;
 
-        this.access(message.getTag(), (new Action() {
+        this.access(tag, (new Action() {
             public void apply() {
                 new Action() {
                     public void apply() {
-                        sendReply(source, 8, message);
+                        sendReply(source, 8, onSuccessCallback);
                     }
                 }.apply();
             }

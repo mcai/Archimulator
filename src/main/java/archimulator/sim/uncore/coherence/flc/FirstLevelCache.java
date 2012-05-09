@@ -31,7 +31,6 @@ import archimulator.sim.uncore.coherence.config.FirstLevelCacheConfig;
 import archimulator.sim.uncore.coherence.flow.flc.LoadFlow;
 import archimulator.sim.uncore.coherence.flow.flc.StoreFlow;
 import archimulator.sim.uncore.coherence.llc.LastLevelCache;
-import archimulator.sim.uncore.coherence.message.MemoryDeviceMessage;
 import archimulator.sim.uncore.net.Net;
 import archimulator.util.action.Action;
 import archimulator.util.action.Action1;
@@ -144,11 +143,6 @@ public class FirstLevelCache extends CoherentCache {
     @Override
     protected Net getNet(MemoryDevice to) {
         return this.getCacheHierarchy().getL1sToL2Network();
-    }
-
-    @Override
-    public void receiveRequest(MemoryDevice source, MemoryDeviceMessage message) {
-        throw new IllegalArgumentException();
     }
 
     public void receiveIfetch(final MemoryHierarchyAccess access, final Action onCompletedCallback) {

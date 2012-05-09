@@ -65,14 +65,15 @@ public class L1DownwardReadFlow extends LockingFlow {
                                     }
                                 });
                             } else {
-                                MemReadFlow memReadFlow = new MemReadFlow(getCache(), access, tag);
-                                memReadFlow.start(
-                                        new Action() {
+                                getCache().sendRequest(getCache().getNext(), 8, new Action() {
+                                    @Override
+                                    public void apply() {
+                                        getCache().getNext().memReadRequestReceive(getCache(), tag, new Action() {
                                             @Override
                                             public void apply() {
-//                                    if (!findAndLockProcess.getCacheAccess().isHitInCache() && !findAndLockProcess.getCacheAccess().isBypass()) {
-//                                        findAndLockProcess.getCacheAccess().getLine().setNonInitialState(MESIState.EXCLUSIVE);
-//                                    }
+                                                //                                    if (!findAndLockProcess.getCacheAccess().isHitInCache() && !findAndLockProcess.getCacheAccess().isBypass()) {
+                                                //                                        findAndLockProcess.getCacheAccess().getLine().setNonInitialState(MESIState.EXCLUSIVE);
+                                                //                                    }
 
                                                 reply(findAndLockFlow, onSuccessCallback);
 
@@ -82,8 +83,9 @@ public class L1DownwardReadFlow extends LockingFlow {
 
                                                 onSuccessCallback.apply();
                                             }
-                                        }
-                                );
+                                        });
+                                    }
+                                });
                             }
                         }
                         else {

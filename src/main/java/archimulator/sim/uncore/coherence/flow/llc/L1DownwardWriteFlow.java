@@ -92,9 +92,10 @@ public class L1DownwardWriteFlow extends LockingFlow {
 
     private void endInvalidateSharers(final FindAndLockFlow findAndLockFlow, final Action onSuccessCallback) {
         if (!findAndLockFlow.getCacheAccess().isHitInCache() && !getCache().isOwnedOrShared(tag)) {
-            MemReadFlow memReadFlow = new MemReadFlow(getCache(), access, tag);
-            memReadFlow.start(
-                    new Action() {
+            getCache().sendRequest(getCache().getNext(), 8, new Action() {
+                @Override
+                public void apply() {
+                    getCache().getNext().memReadRequestReceive(getCache(), tag, new Action() {
                         @Override
                         public void apply() {
                             for (final FirstLevelCache sharer : getCache().getSharers(tag)) {
@@ -115,8 +116,9 @@ public class L1DownwardWriteFlow extends LockingFlow {
 
                             afterFlowEnd(findAndLockFlow);
                         }
-                    }
-            );
+                    });
+                }
+            });
         }
     }
 
