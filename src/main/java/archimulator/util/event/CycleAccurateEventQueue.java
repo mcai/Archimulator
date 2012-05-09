@@ -20,19 +20,21 @@ package archimulator.util.event;
 
 import archimulator.util.action.Action;
 
-import java.util.PriorityQueue;
+import java.util.*;
 
 public final class CycleAccurateEventQueue {
     private long currentCycle;
-    private final PriorityQueue<CycleAccurateEvent> events;
+    private final List<CycleAccurateEvent> events;
 
     public CycleAccurateEventQueue() {
-        this.events = new PriorityQueue<CycleAccurateEvent>();
+        this.events = new ArrayList<CycleAccurateEvent>();
     }
 
-    public synchronized void advanceOneCycle() {
+    public void advanceOneCycle() {
         while (!this.events.isEmpty()) {
-            CycleAccurateEvent event = this.events.peek();
+            Collections.sort(events);
+
+            CycleAccurateEvent event = this.events.get(0);
 
             if (event.getWhen() > this.currentCycle) {
                 break;
