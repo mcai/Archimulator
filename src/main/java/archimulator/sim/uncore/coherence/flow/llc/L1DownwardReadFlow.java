@@ -47,13 +47,11 @@ public class L1DownwardReadFlow extends LockingFlow {
 //                                                          findAndLockProcess.getCacheAccess().getLine().setNonInitialState(MESIState.MODIFIED);
                                                         }
 
-                                                        reply(findAndLockFlow, onSuccessCallback);
-
                                                         endFillOrEvict(findAndLockFlow);
 
                                                         afterFlowEnd(findAndLockFlow);
 
-                                                        onSuccessCallback.apply();
+                                                        reply(findAndLockFlow, onSuccessCallback);
                                                     }
                                                 }
                                         );
@@ -70,13 +68,11 @@ public class L1DownwardReadFlow extends LockingFlow {
                                                 //                                        findAndLockProcess.getCacheAccess().getLine().setNonInitialState(MESIState.EXCLUSIVE);
                                                 //                                    }
 
-                                                reply(findAndLockFlow, onSuccessCallback);
-
                                                 endFillOrEvict(findAndLockFlow);
 
                                                 afterFlowEnd(findAndLockFlow);
 
-                                                onSuccessCallback.apply();
+                                                reply(findAndLockFlow, onSuccessCallback);
                                             }
                                         });
                                     }
@@ -84,13 +80,11 @@ public class L1DownwardReadFlow extends LockingFlow {
                             }
                         }
                         else {
-                            reply(findAndLockFlow, onSuccessCallback);
-
                             endFillOrEvict(findAndLockFlow);
 
                             afterFlowEnd(findAndLockFlow);
 
-                            onSuccessCallback.apply();
+                            reply(findAndLockFlow, onSuccessCallback);
                         }
                     }
                 }, new Action() {
