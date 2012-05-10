@@ -21,9 +21,13 @@ public class StoreFlow extends LockingFlow {
         this.tag = tag;
     }
 
-    public void run(final Action onSuccessCallback, final Action onFailureCallback) {
+    public void run(final Action onSuccessCallback) {
         this.onCreate(this.cache.getCycleAccurateEventQueue().getCurrentCycle());
 
+        findAndLock(onSuccessCallback);
+    }
+
+    private void findAndLock(final Action onSuccessCallback) {
         final FindAndLockFlow findAndLockFlow = new FirstLevelCacheFindAndLockFlow(this, this.cache, this.access, this.tag, CacheAccessType.STORE);
 
         findAndLockFlow.start(
@@ -31,7 +35,7 @@ public class StoreFlow extends LockingFlow {
                     @Override
                     public void apply() {
                         if (findAndLockFlow.getCacheAccess().getLine().getState() == MESIState.SHARED || findAndLockFlow.getCacheAccess().getLine().getState() == MESIState.INVALID) {
-                            downwardWrite(findAndLockFlow, onSuccessCallback, onFailureCallback);
+                            downwardWrite(findAndLockFlow, onSuccessCallback);
                         } else {
                             findAndLockFlow.getCacheAccess().getLine().setNonInitialState(MESIState.MODIFIED);
                             findAndLockFlow.getCacheAccess().commit().getLine().unlock();
@@ -43,13 +47,11 @@ public class StoreFlow extends LockingFlow {
                 }, new Action() {
                     @Override
                     public void apply() {
-//                        findAndLockFlow.getCacheAccess().abort();
-//                        findAndLockFlow.getCacheAccess().getLine().unlock();
-//
-//                        afterFlowEnd(findAndLockFlow);
-
-                        onFailureCallback.apply();
-                        onDestroy();
+                        getCache().getCycleAccurateEventQueue().schedule(this, new Action() {
+                            public void apply() {
+                                findAndLock(onSuccessCallback);
+                            }
+                        }, getCache().getRetryLatency());
                     }
                 }, new Action() {
                     @Override
@@ -57,14 +59,17 @@ public class StoreFlow extends LockingFlow {
                         findAndLockFlow.getCacheAccess().abort();
                         findAndLockFlow.getCacheAccess().getLine().unlock();
 
-                        onFailureCallback.apply();
-                        onDestroy();
+                        getCache().getCycleAccurateEventQueue().schedule(this, new Action() {
+                            public void apply() {
+                                findAndLock(onSuccessCallback);
+                            }
+                        }, getCache().getRetryLatency());
                     }
                 }
         );
     }
 
-    private void downwardWrite(final FindAndLockFlow findAndLockFlow, final Action onSuccessCallback, final Action onFailureCallback) {
+    private void downwardWrite(final FindAndLockFlow findAndLockFlow, final Action onSuccessCallback) {
         getCache().sendRequest(getCache().getNext(), 8, new Action() {
             @Override
             public void apply() {
@@ -87,7 +92,11 @@ public class StoreFlow extends LockingFlow {
                                 findAndLockFlow.getCacheAccess().abort();
                                 findAndLockFlow.getCacheAccess().getLine().unlock();
 
-                                onFailureCallback.apply();
+                                getCache().getCycleAccurateEventQueue().schedule(this, new Action() {
+                                    public void apply() {
+                                        findAndLock(onSuccessCallback);
+                                    }
+                                }, getCache().getRetryLatency());
                             }
                         }
                 );

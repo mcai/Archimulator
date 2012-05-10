@@ -153,15 +153,6 @@ public class FirstLevelCache extends CoherentCache {
                     public void apply() {
                         onCompletedCallback.apply();
                     }
-                }, new Action() {
-                    @Override
-                    public void apply() {
-                        getCycleAccurateEventQueue().schedule(this, new Action() {
-                            public void apply() {
-                                receiveIfetch(access, onCompletedCallback);
-                            }
-                        }, getRetryLatency());
-                    }
                 }
         );
     }
@@ -174,15 +165,6 @@ public class FirstLevelCache extends CoherentCache {
                     public void apply() {
                         onCompletedCallback.apply();
                     }
-                }, new Action() {
-                    @Override
-                    public void apply() {
-                        getCycleAccurateEventQueue().schedule(this, new Action() {
-                            public void apply() {
-                                receiveLoad(access, onCompletedCallback);
-                            }
-                        }, getRetryLatency());
-                    }
                 }
         );
     }
@@ -194,15 +176,6 @@ public class FirstLevelCache extends CoherentCache {
                     @Override
                     public void apply() {
                         onCompletedCallback.apply();
-                    }
-                }, new Action() {
-                    @Override
-                    public void apply() {
-                        getCycleAccurateEventQueue().schedule(this, new Action() {
-                            public void apply() {
-                                receiveStore(access, onCompletedCallback);
-                            }
-                        }, getRetryLatency());
                     }
                 }
         );

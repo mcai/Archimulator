@@ -21,9 +21,13 @@ public class LoadFlow extends LockingFlow {
         this.tag = tag;
     }
 
-    public void run(final Action onSuccessCallback, final Action onFailureCallback) {
+    public void run(final Action onSuccessCallback) {
         this.onCreate(this.cache.getCycleAccurateEventQueue().getCurrentCycle());
 
+        findAndLock(onSuccessCallback);
+    }
+
+    private void findAndLock(final Action onSuccessCallback) {
         final FindAndLockFlow findAndLockFlow = new FirstLevelCacheFindAndLockFlow(this, this.cache, this.access, this.tag, CacheAccessType.LOAD);
 
         findAndLockFlow.start(
@@ -31,7 +35,7 @@ public class LoadFlow extends LockingFlow {
                     @Override
                     public void apply() {
                         if (!findAndLockFlow.getCacheAccess().isHitInCache()) {
-                            downwardRead(findAndLockFlow, onSuccessCallback, onFailureCallback);
+                            downwardRead(findAndLockFlow, onSuccessCallback);
                         } else {
                             findAndLockFlow.getCacheAccess().commit().getLine().unlock();
 
@@ -42,13 +46,11 @@ public class LoadFlow extends LockingFlow {
                 }, new Action() {
                     @Override
                     public void apply() {
-//                        findAndLockFlow.getCacheAccess().abort();
-//                        findAndLockFlow.getCacheAccess().getLine().unlock();
-//
-//                        afterFlowEnd(findAndLockFlow);
-
-                        onFailureCallback.apply();
-                        onDestroy();
+                        getCache().getCycleAccurateEventQueue().schedule(this, new Action() {
+                            public void apply() {
+                                findAndLock(onSuccessCallback);
+                            }
+                        }, getCache().getRetryLatency());
                     }
                 }, new Action() {
                     @Override
@@ -56,14 +58,17 @@ public class LoadFlow extends LockingFlow {
                         findAndLockFlow.getCacheAccess().abort();
                         findAndLockFlow.getCacheAccess().getLine().unlock();
 
-                        onFailureCallback.apply();
-                        onDestroy();
+                        getCache().getCycleAccurateEventQueue().schedule(this, new Action() {
+                            public void apply() {
+                                findAndLock(onSuccessCallback);
+                            }
+                        }, getCache().getRetryLatency());
                     }
                 }
         );
     }
 
-    private void downwardRead(final FindAndLockFlow findAndLockFlow, final Action onSuccessCallback, final Action onFailureCallback) {
+    private void downwardRead(final FindAndLockFlow findAndLockFlow, final Action onSuccessCallback) {
         getCache().sendRequest(getCache().getNext(), 8, new Action() {
             @Override
             public void apply() {
@@ -87,7 +92,11 @@ public class LoadFlow extends LockingFlow {
                                 findAndLockFlow.getCacheAccess().abort();
                                 findAndLockFlow.getCacheAccess().getLine().unlock();
 
-                                onFailureCallback.apply();
+                                getCache().getCycleAccurateEventQueue().schedule(this, new Action() {
+                                    public void apply() {
+                                        findAndLock(onSuccessCallback);
+                                    }
+                                }, getCache().getRetryLatency());
                             }
                         }
                 );
