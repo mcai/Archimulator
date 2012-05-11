@@ -37,6 +37,7 @@ public class L1DownwardReadFlow extends LockingFlow {
                     @Override
                     public void apply() {
                         if (!findAndLockFlow.getCacheAccess().isHitInCache()) {
+                            //TODO: problem here, should only notify owner but not sharers!!! and lock, read, and unlock owner!?
                             if (getCache().isOwnedOrShared(tag)) {
                                 getCache().sendRequest(getCache().getOwnerOrFirstSharer(tag), 8, new Action() {
                                     @Override
