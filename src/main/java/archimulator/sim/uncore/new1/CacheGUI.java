@@ -20,10 +20,10 @@ public class CacheGUI extends JFrame {
     JCheckBox pause;
 
     Color tmpColour;
-    Color invalidColor = new Color(255, 100, 100);    // Light red
-    Color sharedColor = new Color(100, 255, 100);    // Light green
-    Color modifiedColor = new Color(255, 255, 100);    // Light yellow
-    Color exclusiveColor = new Color(100, 100, 255);// Light blue
+    Color invalidColor = new Color(243, 246, 255);    // Light red
+    Color sharedColor = new Color(194, 255, 77);    // Light green
+    Color modifiedColor = new Color(255, 217, 28);    // Light yellow
+    Color exclusiveColor = new Color(57, 108, 255);// Light blue
 
     //Misc
     String seperator = "-";
