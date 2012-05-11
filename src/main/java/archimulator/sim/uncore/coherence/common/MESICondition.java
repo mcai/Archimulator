@@ -16,10 +16,15 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.coherence.flow;
+package archimulator.sim.uncore.coherence.common;
 
-public abstract class LockingFlow extends Flow {
-    public LockingFlow(Flow producerFlow) {
-        super(producerFlow);
-    }
+public enum MESICondition {
+    LOCAL_READ_HIT,
+    LOCAL_READ_MISS,
+    LOCAL_WRITE_HIT,
+    LOCAL_WRITE_MISS,
+    REMOTE_READ_HIT,
+    REMOTE_READ_MISS,
+    REMOTE_WRITE_HIT,
+    REMOTE_WRITE_MISS
 }
