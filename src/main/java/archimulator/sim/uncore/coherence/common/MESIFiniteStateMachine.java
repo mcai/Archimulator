@@ -16,22 +16,19 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.util.fsm;
+package archimulator.sim.uncore.coherence.common;
 
-public class SimpleFiniteStateMachine<StateT, ConditionT> implements FiniteStateMachine<StateT,ConditionT> {
-    private StateT state;
+import archimulator.util.fsm.SimpleFiniteStateMachine;
+import org.apache.commons.lang.StringUtils;
 
-    public SimpleFiniteStateMachine(StateT state) {
-        this.state = state;
+import java.util.Arrays;
+
+public class MESIFiniteStateMachine extends SimpleFiniteStateMachine<MESIState, MESICondition> {
+    public MESIFiniteStateMachine() {
+        super(MESIState.INVALID);
     }
 
-    @Override
-    public StateT getState() {
-        return state;
-    }
-
-    @Override
-    public void setState(StateT state, ConditionT condition, Object[] params) {
-        this.state = state;
+    public void performAction(MESIAction action, Object... params) { //TODO
+        System.out.println("performing action: " + action + "(" + StringUtils.join(params) + ")");
     }
 }

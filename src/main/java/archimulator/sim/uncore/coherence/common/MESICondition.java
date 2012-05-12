@@ -18,13 +18,17 @@
  ******************************************************************************/
 package archimulator.sim.uncore.coherence.common;
 
+import java.util.Arrays;
+import java.util.List;
+
 public enum MESICondition {
-    LOCAL_READ_HIT,
-    LOCAL_READ_MISS,
-    LOCAL_WRITE_HIT,
-    LOCAL_WRITE_MISS,
-    REMOTE_READ_HIT,
-    REMOTE_READ_MISS,
-    REMOTE_WRITE_HIT,
-    REMOTE_WRITE_MISS
+    READ_WITH_SHARERS,
+    READ_NO_SHARERS,
+    WRITE,
+    REPLACEMENT,
+    EXTERNAL_READ,
+    EXTERNAL_WRITE;
+
+    public static List<MESICondition> READ = Arrays.asList(READ_WITH_SHARERS, READ_NO_SHARERS);
+    public static List<MESICondition> READ_WRITE = Arrays.asList(READ_WITH_SHARERS, READ_NO_SHARERS, WRITE);
 }

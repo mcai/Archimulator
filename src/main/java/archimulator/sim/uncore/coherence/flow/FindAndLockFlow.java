@@ -49,7 +49,7 @@ public abstract class FindAndLockFlow extends Flow {
         this.access = access;
         this.tag = tag;
         this.cacheAccessType = cacheAccessType;
-        this.fsm = new BasicFiniteStateMachine<FindAndLockFlowState, FindAndLockFlowCondition>(fsmFactory, "findAndLockFlow", FindAndLockFlowState.IDLE);
+        this.fsm = new BasicFiniteStateMachine<FindAndLockFlowState, FindAndLockFlowCondition>("findAndLockFlow", FindAndLockFlowState.IDLE);
     }
 
     public void start(final Action onSuccessCallback, final Action onLockFailureCallback, final Action onEvictFailureCallback) {
@@ -102,11 +102,11 @@ public abstract class FindAndLockFlow extends Flow {
             }
 
             if (this.cacheAccess.getLine().isLocked() && cacheAccessType.isDownward()) {
-                this.fsm.fireTransition(FindAndLockFlowCondition.FAILED_TO_LOCK);
+                fsmFactory.fireTransition(this.fsm, FindAndLockFlowCondition.FAILED_TO_LOCK);
             } else {
                 if (this.cacheAccess.getLine().lock(new Action() {
                     public void apply() {
-                        fsm.fireTransition(FindAndLockFlowCondition.UNLOCKED);
+                        fsmFactory.fireTransition(fsm, FindAndLockFlowCondition.UNLOCKED);
                         doLockingProcess();
                     }
                 }, tag, getProducerFlow())) {
@@ -116,17 +116,17 @@ public abstract class FindAndLockFlow extends Flow {
 
                     if (this.cacheAccess.isEviction()) {
                         this.evict();
-                        this.fsm.fireTransition(FindAndLockFlowCondition.BEGIN_EVICT);
+                        fsmFactory.fireTransition(this.fsm, FindAndLockFlowCondition.BEGIN_EVICT);
                     } else {
-                        this.fsm.fireTransition(FindAndLockFlowCondition.NO_EVICT);
+                        fsmFactory.fireTransition(this.fsm, FindAndLockFlowCondition.NO_EVICT);
                     }
                 }
                 else {
-                    this.fsm.fireTransition(FindAndLockFlowCondition.WAIT_FOR_UNLOCK);
+                    fsmFactory.fireTransition(this.fsm, FindAndLockFlowCondition.WAIT_FOR_UNLOCK);
                 }
             }
         } else {
-            this.fsm.fireTransition(FindAndLockFlowCondition.BYPASS);
+            fsmFactory.fireTransition(this.fsm, FindAndLockFlowCondition.BYPASS);
         }
     }
 
@@ -135,12 +135,12 @@ public abstract class FindAndLockFlow extends Flow {
                 new Action() {
                     @Override
                     public void apply() {
-                        fsm.fireTransition(FindAndLockFlowCondition.EVICTED);
+                        fsmFactory.fireTransition(fsm, FindAndLockFlowCondition.EVICTED);
                     }
                 }, new Action() {
                     @Override
                     public void apply() {
-                        fsm.fireTransition(FindAndLockFlowCondition.FAILED_TO_EVICT);
+                        fsmFactory.fireTransition(fsm, FindAndLockFlowCondition.FAILED_TO_EVICT);
                     }
                 }
         );
@@ -185,10 +185,10 @@ public abstract class FindAndLockFlow extends Flow {
         FAILED_TO_EVICT
     }
 
-    private static FiniteStateMachineFactory<FindAndLockFlowState, FindAndLockFlowCondition> fsmFactory;
+    private static FiniteStateMachineFactory<FindAndLockFlowState, FindAndLockFlowCondition, FiniteStateMachine<FindAndLockFlowState, FindAndLockFlowCondition>> fsmFactory;
 
     static {
-        fsmFactory = new FiniteStateMachineFactory<FindAndLockFlowState, FindAndLockFlowCondition>();
+        fsmFactory = new FiniteStateMachineFactory<FindAndLockFlowState, FindAndLockFlowCondition, FiniteStateMachine<FindAndLockFlowState, FindAndLockFlowCondition>>();
 
         fsmFactory.inState(FindAndLockFlowState.IDLE)
                 .onCondition(FindAndLockFlowCondition.WAIT_FOR_UNLOCK, new Function1X<FiniteStateMachine<FindAndLockFlowState, FindAndLockFlowCondition>, FindAndLockFlowState>() {

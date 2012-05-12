@@ -18,18 +18,13 @@
  ******************************************************************************/
 package archimulator.util.fsm;
 
-import archimulator.util.action.Action2;
 import archimulator.util.action.Function1X;
-import archimulator.util.event.BlockingEventDispatcher;
-import archimulator.util.fsm.event.EnterStateEvent;
-import archimulator.util.fsm.event.ExitStateEvent;
-import archimulator.util.fsm.event.FiniteStateMachineEvent;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class FiniteStateMachineFactory<StateT, ConditionT> {
+public class FiniteStateMachineFactory<StateT, ConditionT, FiniteStateMachineT extends FiniteStateMachine<StateT, ConditionT>> {
     private Map<StateT, StateTransitions> transitions;
 
     public FiniteStateMachineFactory() {
@@ -48,7 +43,7 @@ public class FiniteStateMachineFactory<StateT, ConditionT> {
         this.transitions.clear();
     }
 
-    public void fireTransition(FiniteStateMachine<StateT, ConditionT> fsm, ConditionT condition, Object... params) {
+    public void fireTransition(FiniteStateMachineT fsm, ConditionT condition, Object... params) {
         if (this.transitions.containsKey(fsm.getState())) {
             this.transitions.get(fsm.getState()).fireTransition(fsm, condition, params);
         } else {
@@ -56,22 +51,22 @@ public class FiniteStateMachineFactory<StateT, ConditionT> {
         }
     }
 
-    private void changeState(FiniteStateMachine<StateT, ConditionT> from, Object condition, Object[] params, StateT newState) {
+    private void changeState(FiniteStateMachineT from, ConditionT condition, Object[] params, StateT newState) {
         if (from != newState) {
             from.setState(newState, condition, params);
         }
     }
 
     public class StateTransitions {
-        private Map<ConditionT, Function1X<FiniteStateMachine<StateT, ConditionT>, StateT>> perStateTransitions;
+        private Map<ConditionT, Function1X<FiniteStateMachineT, StateT>> perStateTransitions;
         private StateT state;
 
         private StateTransitions(StateT state) {
             this.state = state;
-            this.perStateTransitions = new HashMap<ConditionT, Function1X<FiniteStateMachine<StateT, ConditionT>, StateT>>();
+            this.perStateTransitions = new HashMap<ConditionT, Function1X<FiniteStateMachineT, StateT>>();
         }
 
-        public StateTransitions onConditions(List<ConditionT> conditions, Function1X<FiniteStateMachine<StateT, ConditionT>, StateT> transition) {
+        public StateTransitions onConditions(List<ConditionT> conditions, Function1X<FiniteStateMachineT, StateT> transition) {
             for (ConditionT condition : conditions) {
                 this.onCondition(condition, transition);
             }
@@ -79,7 +74,7 @@ public class FiniteStateMachineFactory<StateT, ConditionT> {
             return this;
         }
 
-        public StateTransitions onCondition(ConditionT condition, Function1X<FiniteStateMachine<StateT, ConditionT>, StateT> transition) {
+        public StateTransitions onCondition(ConditionT condition, Function1X<FiniteStateMachineT, StateT> transition) {
             if (this.perStateTransitions.containsKey(condition)) {
                 throw new IllegalArgumentException("Transition of condition " + condition + " in state " + this.state + " has already been registered");
             }
@@ -90,8 +85,8 @@ public class FiniteStateMachineFactory<StateT, ConditionT> {
         }
 
         public StateTransitions ignoreCondition(ConditionT condition) {
-            return this.onCondition(condition, new Function1X<FiniteStateMachine<StateT, ConditionT>, StateT>() {
-                public StateT apply(FiniteStateMachine<StateT, ConditionT> from, Object... params) {
+            return this.onCondition(condition, new Function1X<FiniteStateMachineT, StateT>() {
+                public StateT apply(FiniteStateMachineT from, Object... params) {
                     return from.getState();
                 }
             });
@@ -101,7 +96,7 @@ public class FiniteStateMachineFactory<StateT, ConditionT> {
             this.perStateTransitions.clear();
         }
 
-        private void fireTransition(FiniteStateMachine<StateT, ConditionT> fsm, ConditionT condition, Object... params) {
+        private void fireTransition(FiniteStateMachineT fsm, ConditionT condition, Object... params) {
             if (this.perStateTransitions.containsKey(condition)) {
                 changeState(fsm, condition, params, this.perStateTransitions.get(condition).apply(fsm, params));
             } else {

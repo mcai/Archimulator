@@ -28,15 +28,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class BasicFiniteStateMachine<StateT, ConditionT> implements FiniteStateMachine<StateT,ConditionT> {
-    private FiniteStateMachineFactory<StateT, ConditionT> factory;
     private String name;
     private StateT state;
 
     private Map<Object, Object> properties;
     private BlockingEventDispatcher<FiniteStateMachineEvent> eventDispatcher;
 
-    public BasicFiniteStateMachine(FiniteStateMachineFactory<StateT, ConditionT> factory, String name, StateT state) {
-        this.factory = factory;
+    public BasicFiniteStateMachine(String name, StateT state) {
         this.name = name;
         this.state = state;
 
@@ -71,14 +69,9 @@ public class BasicFiniteStateMachine<StateT, ConditionT> implements FiniteStateM
     }
 
     @Override
-    public void setState(StateT state, Object condition, Object[] params) {
+    public void setState(StateT state, ConditionT condition, Object[] params) {
         this.eventDispatcher.dispatch(new ExitStateEvent(this, condition, params));
         this.state = state;
         this.eventDispatcher.dispatch(new EnterStateEvent(this, condition, params));
-    }
-
-    @Override
-    public void fireTransition(ConditionT condition, Object... params) {
-        this.factory.fireTransition(this, condition, params);
     }
 }

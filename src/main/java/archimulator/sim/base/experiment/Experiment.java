@@ -99,7 +99,7 @@ public abstract class Experiment {
 
         this.phaser = new CyclicBarrier(2);
 
-        this.fsm = new BasicFiniteStateMachine<ExperimentState, ExperimentCondition>(fsmFactory, title, ExperimentState.NOT_STARTED);
+        this.fsm = new BasicFiniteStateMachine<ExperimentState, ExperimentCondition>(title, ExperimentState.NOT_STARTED);
         this.fsm.put("experiment", this);
 
         this.scheduledExecutorPollState = Executors.newSingleThreadScheduledExecutor();
@@ -145,21 +145,21 @@ public abstract class Experiment {
     }
 
     public void start() {
-        this.fsm.fireTransition(ExperimentCondition.START);
+        fsmFactory.fireTransition(this.fsm, ExperimentCondition.START);
     }
 
     protected abstract void doStart();
 
     public void pause() {
-        this.fsm.fireTransition(ExperimentCondition.PAUSE);
+        fsmFactory.fireTransition(this.fsm, ExperimentCondition.PAUSE);
     }
 
     public void resume() {
-        this.fsm.fireTransition(ExperimentCondition.RESUME);
+        fsmFactory.fireTransition(this.fsm, ExperimentCondition.RESUME);
     }
 
     public void stop() {
-        this.fsm.fireTransition(ExperimentCondition.STOP);
+        fsmFactory.fireTransition(this.fsm, ExperimentCondition.STOP);
     }
 
     public void join() {
@@ -219,10 +219,10 @@ public abstract class Experiment {
 
     private static long currentId = 0;
 
-    private static FiniteStateMachineFactory<ExperimentState, ExperimentCondition> fsmFactory;
+    private static FiniteStateMachineFactory<ExperimentState, ExperimentCondition, FiniteStateMachine<ExperimentState, ExperimentCondition>> fsmFactory;
 
     static {
-        fsmFactory = new FiniteStateMachineFactory<ExperimentState, ExperimentCondition>();
+        fsmFactory = new FiniteStateMachineFactory<ExperimentState, ExperimentCondition, FiniteStateMachine<ExperimentState, ExperimentCondition>>();
 
         fsmFactory.inState(ExperimentState.NOT_STARTED)
                 .ignoreCondition(ExperimentCondition.STOP)
@@ -256,7 +256,7 @@ public abstract class Experiment {
 
                                 experiment.doStart();
 
-                                from.fireTransition(ExperimentCondition.STOP);
+                                fsmFactory.fireTransition(from, ExperimentCondition.STOP);
 
                                 System.gc();
                             }
