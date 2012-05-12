@@ -165,6 +165,5 @@ public class MESIHelper {
         fsmFactory.fireTransition(fsm, MESICondition.READ_NO_SHARERS);
         fsmFactory.fireTransition(fsm, MESICondition.EXTERNAL_READ, "peer");
         fsmFactory.fireTransition(fsm, MESICondition.REPLACEMENT);
-
     }
 }
