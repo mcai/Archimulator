@@ -22,7 +22,7 @@ import archimulator.sim.base.simulation.BasicSimulationObject;
 import archimulator.sim.uncore.MemoryAccessInitiatedEvent;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.MemoryHierarchyAccessType;
-import archimulator.sim.uncore.coherence.flc.FirstLevelCache;
+import archimulator.sim.uncore.coherence.common.FirstLevelCache;
 import archimulator.util.action.Action;
 import archimulator.util.math.Counter;
 

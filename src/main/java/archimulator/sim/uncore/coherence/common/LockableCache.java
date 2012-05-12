@@ -18,28 +18,27 @@
  ******************************************************************************/
 package archimulator.sim.uncore.coherence.common;
 
+import archimulator.sim.base.simulation.SimulationObject;
 import archimulator.sim.uncore.cache.Cache;
 import archimulator.sim.uncore.cache.CacheGeometry;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
 import archimulator.util.action.Function3;
 
-public class LockableCache extends EvictableCache<MESIState, LockableCacheLine> {
-    public LockableCache(CoherentCache cache, String name, CacheGeometry geometry, final MESIState initialState, Class<? extends EvictionPolicy> evictionPolicyClz) {
-        super(cache, name, geometry, evictionPolicyClz, new Function3<Cache<?, ?>, Integer, Integer, LockableCacheLine>() {
-            public LockableCacheLine apply(Cache<?, ?> cache, Integer set, Integer way) {
-                return new LockableCacheLine(cache, set, way, initialState);
-            }
-        });
+import java.io.Serializable;
+
+public class LockableCache<StateT extends Serializable, LineT extends LockableCacheLine<StateT>> extends EvictableCache<StateT, LineT> {
+    public LockableCache(SimulationObject parent, String name, CacheGeometry geometry, Class<? extends EvictionPolicy> evictionPolicyClz, Function3<Cache<?, ?>, Integer, Integer, LineT> createLine) {
+        super(parent, name, geometry, evictionPolicyClz, createLine);
     }
 
     @Override
-    public LockableCacheLine findLine(int address) {
+    public LineT findLine(int address) {
         int tag = this.getTag(address);
         int set = this.getSet(address);
 
         for (int way = 0; way < this.getAssociativity(); way++) {
-            LockableCacheLine line = this.getLine(set, way);
+            LineT line = this.getLine(set, way);
             if (!line.isLocked() && line.getTag() == tag && line.getState() != line.getInitialState()) {
                 return line;
             } else if (line.isLocked() && line.getTransientTag() == tag) {

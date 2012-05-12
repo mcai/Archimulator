@@ -20,9 +20,9 @@ package archimulator.sim.uncore.coherence.flow.flc;
 
 import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
+import archimulator.sim.uncore.coherence.common.FirstLevelCache;
+import archimulator.sim.uncore.coherence.common.MESICondition;
 import archimulator.sim.uncore.coherence.common.MESIState;
-import archimulator.sim.uncore.coherence.flc.FirstLevelCache;
-import archimulator.sim.uncore.coherence.flow.FindAndLockFlow;
 import archimulator.sim.uncore.coherence.flow.LockingFlow;
 import archimulator.sim.uncore.coherence.flow.llc.L1DownwardWriteFlow;
 import archimulator.util.action.Action;
@@ -46,7 +46,7 @@ public class StoreFlow extends LockingFlow {
     }
 
     private void findAndLock(final Action onSuccessCallback) {
-        final FindAndLockFlow findAndLockFlow = new FirstLevelCacheFindAndLockFlow(this, this.cache, this.access, this.tag, CacheAccessType.STORE);
+        final FirstLevelCacheFindAndLockFlow findAndLockFlow = new FirstLevelCacheFindAndLockFlow(this, this.cache, this.access, this.tag, CacheAccessType.STORE);
 
         findAndLockFlow.start(
                 new Action() {
@@ -55,7 +55,7 @@ public class StoreFlow extends LockingFlow {
                         if (findAndLockFlow.getCacheAccess().getLine().getState() == MESIState.SHARED || findAndLockFlow.getCacheAccess().getLine().getState() == MESIState.INVALID) {
                             downwardWrite(findAndLockFlow, onSuccessCallback);
                         } else {
-                            findAndLockFlow.getCacheAccess().getLine().setNonInitialState(MESIState.MODIFIED);
+                            findAndLockFlow.getCacheAccess().getLine().getMesiFsm().fireTransition(MESICondition.WRITE);
                             findAndLockFlow.getCacheAccess().commit().getLine().unlock();
 
                             onSuccessCallback.apply();
@@ -87,7 +87,7 @@ public class StoreFlow extends LockingFlow {
         );
     }
 
-    private void downwardWrite(final FindAndLockFlow findAndLockFlow, final Action onSuccessCallback) {
+    private void downwardWrite(final FirstLevelCacheFindAndLockFlow findAndLockFlow, final Action onSuccessCallback) {
         getCache().sendRequest(getCache().getNext(), 8, new Action() {
             @Override
             public void apply() {
@@ -96,7 +96,7 @@ public class StoreFlow extends LockingFlow {
                         new Action() {
                             @Override
                             public void apply() {
-                                findAndLockFlow.getCacheAccess().getLine().setNonInitialState(MESIState.MODIFIED);
+                                findAndLockFlow.getCacheAccess().getLine().getMesiFsm().fireTransition(MESICondition.WRITE);
                                 findAndLockFlow.getCacheAccess().commit().getLine().unlock();
 
                                 onSuccessCallback.apply();

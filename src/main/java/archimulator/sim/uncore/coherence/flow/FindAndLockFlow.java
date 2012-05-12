@@ -23,7 +23,6 @@ import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.coherence.common.CoherentCache;
 import archimulator.sim.uncore.coherence.common.LockableCacheLine;
-import archimulator.sim.uncore.coherence.common.MESIState;
 import archimulator.sim.uncore.coherence.event.CoherentCacheBeginCacheAccessEvent;
 import archimulator.sim.uncore.coherence.event.CoherentCacheNonblockingRequestHitToTransientTagEvent;
 import archimulator.sim.uncore.coherence.event.CoherentCacheServiceNonblockingRequestEvent;
@@ -35,15 +34,17 @@ import archimulator.util.fsm.FiniteStateMachine;
 import archimulator.util.fsm.FiniteStateMachineFactory;
 import archimulator.util.fsm.event.EnterStateEvent;
 
-public abstract class FindAndLockFlow extends Flow {
-    private CoherentCache cache;
+import java.io.Serializable;
+
+public abstract class FindAndLockFlow<StateT extends Serializable, LineT extends LockableCacheLine<StateT>> extends Flow {
+    private CoherentCache<StateT, LineT> cache;
     private MemoryHierarchyAccess access;
     private int tag;
     private CacheAccessType cacheAccessType;
-    private CacheAccess<MESIState, LockableCacheLine> cacheAccess;
+    private CacheAccess<StateT, LineT> cacheAccess;
     private BasicFiniteStateMachine<FindAndLockFlowState, FindAndLockFlowCondition> fsm;
 
-    public FindAndLockFlow(LockingFlow producerFlow, CoherentCache cache, MemoryHierarchyAccess access, int tag, CacheAccessType cacheAccessType) {
+    public FindAndLockFlow(LockingFlow producerFlow, CoherentCache<StateT, LineT> cache, MemoryHierarchyAccess access, int tag, CacheAccessType cacheAccessType) {
         super(producerFlow);
         this.cache = cache;
         this.access = access;
@@ -148,11 +149,11 @@ public abstract class FindAndLockFlow extends Flow {
 
     protected abstract void evict(MemoryHierarchyAccess access, Action onSuccessCallback, Action onFailureCallback);
 
-    public CoherentCache getCache() {
+    public CoherentCache<StateT, LineT> getCache() {
         return cache;
     }
 
-    public CacheAccess<MESIState, LockableCacheLine> getCacheAccess() {
+    public CacheAccess<StateT, LineT> getCacheAccess() {
         return cacheAccess;
     }
 

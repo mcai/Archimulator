@@ -16,27 +16,30 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.coherence.llc;
+package archimulator.sim.uncore.coherence.common;
 
 import archimulator.sim.uncore.CacheHierarchy;
 import archimulator.sim.uncore.MemoryDevice;
-import archimulator.sim.uncore.coherence.common.CoherentCache;
-import archimulator.sim.uncore.coherence.common.MESIState;
+import archimulator.sim.uncore.cache.Cache;
 import archimulator.sim.uncore.coherence.config.CoherentCacheConfig;
-import archimulator.sim.uncore.coherence.flc.FirstLevelCache;
 import archimulator.sim.uncore.dram.MainMemory;
 import archimulator.sim.uncore.net.Net;
+import archimulator.util.action.Function3;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class LastLevelCache extends CoherentCache {
+public class LastLevelCache extends CoherentCache<LastLevelCacheLineState, LastLevelCacheLine> {
     private Map<FirstLevelCache, ShadowTagDirectory> shadowTagDirectories;
 
     public LastLevelCache(CacheHierarchy cacheHierarchy, String name, CoherentCacheConfig config) {
-        super(cacheHierarchy, name, config, MESIState.INVALID);
+        super(cacheHierarchy, name, config, new LockableCache<LastLevelCacheLineState, LastLevelCacheLine>(cacheHierarchy, name, config.getGeometry(), config.getEvictionPolicyClz(), new Function3<Cache<?, ?>, Integer, Integer, LastLevelCacheLine>() {
+            public LastLevelCacheLine apply(Cache<?, ?> cache, Integer set, Integer way) {
+                return new LastLevelCacheLine(cache, set, way, LastLevelCacheLineState.INVALID);
+            }
+        }));
 
         this.shadowTagDirectories = new LinkedHashMap<FirstLevelCache, ShadowTagDirectory>();
     }

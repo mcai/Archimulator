@@ -22,7 +22,7 @@ import archimulator.sim.base.event.DumpStatEvent;
 import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.uncore.CacheHierarchy;
 import archimulator.sim.uncore.MemoryDevice;
-import archimulator.sim.uncore.coherence.llc.LastLevelCache;
+import archimulator.sim.uncore.coherence.common.LastLevelCache;
 import archimulator.sim.uncore.net.Net;
 import archimulator.util.action.Action;
 import archimulator.util.action.Action1;

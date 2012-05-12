@@ -20,12 +20,12 @@ package archimulator.sim.uncore.coherence.flow.flc;
 
 import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
+import archimulator.sim.uncore.coherence.common.FirstLevelCache;
+import archimulator.sim.uncore.coherence.common.LastLevelCache;
+import archimulator.sim.uncore.coherence.common.MESICondition;
 import archimulator.sim.uncore.coherence.common.MESIState;
-import archimulator.sim.uncore.coherence.flc.FirstLevelCache;
-import archimulator.sim.uncore.coherence.flow.FindAndLockFlow;
 import archimulator.sim.uncore.coherence.flow.Flow;
 import archimulator.sim.uncore.coherence.flow.LockingFlow;
-import archimulator.sim.uncore.coherence.llc.LastLevelCache;
 import archimulator.util.action.Action;
 
 public class L2UpwardReadFlow extends LockingFlow {
@@ -46,7 +46,7 @@ public class L2UpwardReadFlow extends LockingFlow {
     public void start(final Action onSuccessCallback) {
         this.onCreate(this.cache.getCycleAccurateEventQueue().getCurrentCycle());
 
-        final FindAndLockFlow findAndLockFlow = new FirstLevelCacheFindAndLockFlow(this, this.cache, this.access, this.tag, CacheAccessType.UPWARD_READ);
+        final FirstLevelCacheFindAndLockFlow findAndLockFlow = new FirstLevelCacheFindAndLockFlow(this, this.cache, this.access, this.tag, CacheAccessType.UPWARD_READ);
 
         findAndLockFlow.start(
                 new Action() {
@@ -54,7 +54,7 @@ public class L2UpwardReadFlow extends LockingFlow {
                     public void apply() {
                         copyBack = findAndLockFlow.getCacheAccess().getLine().getState() == MESIState.MODIFIED;
 
-                        findAndLockFlow.getCacheAccess().getLine().setNonInitialState(MESIState.SHARED);
+                        findAndLockFlow.getCacheAccess().getLine().getMesiFsm().fireTransition(MESICondition.EXTERNAL_READ);
 
                         findAndLockFlow.getCacheAccess().commit().getLine().unlock();
 

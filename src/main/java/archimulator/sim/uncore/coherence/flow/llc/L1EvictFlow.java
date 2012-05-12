@@ -20,12 +20,11 @@ package archimulator.sim.uncore.coherence.flow.llc;
 
 import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
-import archimulator.sim.uncore.coherence.common.MESIState;
-import archimulator.sim.uncore.coherence.flc.FirstLevelCache;
-import archimulator.sim.uncore.coherence.flow.FindAndLockFlow;
+import archimulator.sim.uncore.coherence.common.FirstLevelCache;
+import archimulator.sim.uncore.coherence.common.LastLevelCache;
+import archimulator.sim.uncore.coherence.common.LastLevelCacheLineState;
 import archimulator.sim.uncore.coherence.flow.Flow;
 import archimulator.sim.uncore.coherence.flow.LockingFlow;
-import archimulator.sim.uncore.coherence.llc.LastLevelCache;
 import archimulator.util.action.Action;
 
 public class L1EvictFlow extends LockingFlow {
@@ -47,20 +46,14 @@ public class L1EvictFlow extends LockingFlow {
     public void start(final Action onSuccessCallback, final Action onFailureCallback) {
         this.onCreate(this.cache.getCycleAccurateEventQueue().getCurrentCycle());
 
-        final FindAndLockFlow findAndLockFlow = new LastLevelCacheFindAndLockFlow(this, this.cache, this.access, this.tag, CacheAccessType.EVICT);
+        final LastLevelCacheFindAndLockFlow findAndLockFlow = new LastLevelCacheFindAndLockFlow(this, this.cache, this.access, this.tag, CacheAccessType.EVICT);
 
         findAndLockFlow.start(
                 new Action() {
                     @Override
                     public void apply() {
-                        if (hasData) {
-                            if (findAndLockFlow.getCacheAccess().isHitInCache() || !findAndLockFlow.getCacheAccess().isBypass()) {
-                                findAndLockFlow.getCacheAccess().getLine().setNonInitialState(MESIState.MODIFIED);
-                            }
-                        } else {
-                            if (findAndLockFlow.getCacheAccess().isHitInCache() || !findAndLockFlow.getCacheAccess().isBypass()) {
-                                findAndLockFlow.getCacheAccess().getLine().setNonInitialState(MESIState.EXCLUSIVE);
-                            }
+                        if (findAndLockFlow.getCacheAccess().isHitInCache() || !findAndLockFlow.getCacheAccess().isBypass()) {
+                            findAndLockFlow.getCacheAccess().getLine().setNonInitialState(hasData ? LastLevelCacheLineState.DIRTY : LastLevelCacheLineState.CLEAN);
                         }
 
                         getCache().getShadowTagDirectories().get(source).removeTag(tag);

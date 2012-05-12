@@ -1,7 +1,6 @@
-package archimulator.sim.uncore.coherence.llc;
+package archimulator.sim.uncore.coherence.common;
 
 import archimulator.sim.uncore.cache.CacheGeometry;
-import archimulator.sim.uncore.coherence.flc.FirstLevelCache;
 
 import java.util.ArrayList;
 import java.util.List;

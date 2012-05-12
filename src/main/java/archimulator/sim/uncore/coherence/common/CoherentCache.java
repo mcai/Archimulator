@@ -29,17 +29,18 @@ import archimulator.sim.uncore.coherence.action.PendingActionOwner;
 import archimulator.sim.uncore.coherence.config.CoherentCacheConfig;
 import archimulator.util.action.Action1;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public abstract class CoherentCache extends MemoryDevice {
+public abstract class CoherentCache<StateT extends Serializable, LineT extends LockableCacheLine<StateT>> extends MemoryDevice {
     private MemoryDevice next;
 
     private List<PendingActionOwner> pendingProcesses;
 
     private CoherentCacheConfig config;
-    private LockableCache cache;
+    private LockableCache<StateT, LineT> cache;
 
     private Random random;
 
@@ -52,10 +53,10 @@ public abstract class CoherentCache extends MemoryDevice {
 
     private long evictions;
 
-    public CoherentCache(CacheHierarchy cacheHierarchy, String name, CoherentCacheConfig config, MESIState initialState) {
+    public CoherentCache(CacheHierarchy cacheHierarchy, String name, CoherentCacheConfig config, LockableCache<StateT, LineT> cache) {
         super(cacheHierarchy, name);
 
-        this.cache = new LockableCache(this, name, config.getGeometry(), initialState, config.getEvictionPolicyClz());
+        this.cache = cache;
 
         this.config = config;
 
@@ -106,7 +107,7 @@ public abstract class CoherentCache extends MemoryDevice {
         this.evictions++;
     }
 
-    public void updateStats(CacheAccessType cacheAccessType, CacheAccess<MESIState, LockableCacheLine> cacheAccess) {
+    public void updateStats(CacheAccessType cacheAccessType, CacheAccess<?, ?> cacheAccess) {
         if (cacheAccessType.isRead()) {
             if (!cacheAccessType.isUpward()) {
                 if (cacheAccess.isHitInCache()) {
@@ -152,7 +153,7 @@ public abstract class CoherentCache extends MemoryDevice {
         return config.getHitLatency();
     }
 
-    public LockableCache getCache() {
+    public LockableCache<StateT, LineT> getCache() {
         return cache;
     }
 

@@ -16,30 +16,28 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.coherence.flc;
+package archimulator.sim.uncore.coherence.common;
 
 import archimulator.sim.base.event.DumpStatEvent;
 import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.core.DynamicInstruction;
 import archimulator.sim.uncore.*;
+import archimulator.sim.uncore.cache.Cache;
 import archimulator.sim.uncore.cache.CacheAccess;
-import archimulator.sim.uncore.coherence.common.CoherentCache;
-import archimulator.sim.uncore.coherence.common.LockableCacheLine;
-import archimulator.sim.uncore.coherence.common.MESIState;
 import archimulator.sim.uncore.coherence.config.CoherentCacheConfig;
 import archimulator.sim.uncore.coherence.config.FirstLevelCacheConfig;
 import archimulator.sim.uncore.coherence.flow.flc.LoadFlow;
 import archimulator.sim.uncore.coherence.flow.flc.StoreFlow;
-import archimulator.sim.uncore.coherence.llc.LastLevelCache;
 import archimulator.sim.uncore.net.Net;
 import archimulator.util.action.Action;
 import archimulator.util.action.Action1;
+import archimulator.util.action.Function3;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 
-public class FirstLevelCache extends CoherentCache {
+public class FirstLevelCache extends CoherentCache<MESIState, FirstLevelCacheLine> {
     private List<MemoryHierarchyAccess> pendingAccesses;
     private EnumMap<MemoryHierarchyAccessType, Integer> pendingAccessesPerType;
 
@@ -47,7 +45,11 @@ public class FirstLevelCache extends CoherentCache {
     private long upwardWrites;
 
     public FirstLevelCache(CacheHierarchy cacheHierarchy, String name, CoherentCacheConfig config) {
-        super(cacheHierarchy, name, config, MESIState.INVALID);
+        super(cacheHierarchy, name, config, new LockableCache<MESIState, FirstLevelCacheLine>(cacheHierarchy, name, config.getGeometry(), config.getEvictionPolicyClz(), new Function3<Cache<?, ?>, Integer, Integer, FirstLevelCacheLine>() {
+            public FirstLevelCacheLine apply(Cache<?, ?> cache, Integer set, Integer way) {
+                return new FirstLevelCacheLine(cache, set, way, MESIState.INVALID);
+            }
+        }));
 
         this.init();
     }
@@ -78,7 +80,7 @@ public class FirstLevelCache extends CoherentCache {
     }
 
     @Override
-    public void updateStats(CacheAccessType cacheAccessType, CacheAccess<MESIState, LockableCacheLine> cacheAccess) {
+    public void updateStats(CacheAccessType cacheAccessType, CacheAccess<?, ?> cacheAccess) {
         super.updateStats(cacheAccessType, cacheAccess);
 
         if (cacheAccessType.isRead()) {

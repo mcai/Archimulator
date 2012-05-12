@@ -20,21 +20,22 @@ package archimulator.sim.uncore.coherence.flow.llc;
 
 import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
-import archimulator.sim.uncore.coherence.common.MESIState;
+import archimulator.sim.uncore.coherence.common.LastLevelCache;
+import archimulator.sim.uncore.coherence.common.LastLevelCacheLine;
+import archimulator.sim.uncore.coherence.common.LastLevelCacheLineState;
 import archimulator.sim.uncore.coherence.event.LastLevelCacheLineEvictedByMemWriteProcessEvent;
 import archimulator.sim.uncore.coherence.flow.FindAndLockFlow;
 import archimulator.sim.uncore.coherence.flow.LockingFlow;
-import archimulator.sim.uncore.coherence.llc.LastLevelCache;
 import archimulator.util.action.Action;
 
-public class LastLevelCacheFindAndLockFlow extends FindAndLockFlow {
+public class LastLevelCacheFindAndLockFlow extends FindAndLockFlow<LastLevelCacheLineState, LastLevelCacheLine> {
     public LastLevelCacheFindAndLockFlow(LockingFlow lockingFlow, LastLevelCache cache, MemoryHierarchyAccess access, int tag, CacheAccessType cacheAccessType) {
         super(lockingFlow, cache, access, tag, cacheAccessType);
     }
 
     @Override
     protected void evict(MemoryHierarchyAccess access, final Action onSuccessCallback, Action onFailureCallback) {
-        if (getCacheAccess().getLine().getState() == MESIState.MODIFIED) {
+        if (getCacheAccess().getLine().getState() == LastLevelCacheLineState.DIRTY) {
             getCache().sendRequest(getCache().getNext(), getCache().getCache().getLineSize() + 8, new Action() {
                 @Override
                 public void apply() {

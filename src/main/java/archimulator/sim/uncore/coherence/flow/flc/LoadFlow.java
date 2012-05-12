@@ -20,9 +20,8 @@ package archimulator.sim.uncore.coherence.flow.flc;
 
 import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
-import archimulator.sim.uncore.coherence.common.MESIState;
-import archimulator.sim.uncore.coherence.flc.FirstLevelCache;
-import archimulator.sim.uncore.coherence.flow.FindAndLockFlow;
+import archimulator.sim.uncore.coherence.common.FirstLevelCache;
+import archimulator.sim.uncore.coherence.common.MESICondition;
 import archimulator.sim.uncore.coherence.flow.LockingFlow;
 import archimulator.sim.uncore.coherence.flow.llc.L1DownwardReadFlow;
 import archimulator.util.action.Action;
@@ -46,7 +45,7 @@ public class LoadFlow extends LockingFlow {
     }
 
     private void findAndLock(final Action onSuccessCallback) {
-        final FindAndLockFlow findAndLockFlow = new FirstLevelCacheFindAndLockFlow(this, this.cache, this.access, this.tag, CacheAccessType.LOAD);
+        final FirstLevelCacheFindAndLockFlow findAndLockFlow = new FirstLevelCacheFindAndLockFlow(this, this.cache, this.access, this.tag, CacheAccessType.LOAD);
 
         findAndLockFlow.start(
                 new Action() {
@@ -86,7 +85,7 @@ public class LoadFlow extends LockingFlow {
         );
     }
 
-    private void downwardRead(final FindAndLockFlow findAndLockFlow, final Action onSuccessCallback) {
+    private void downwardRead(final FirstLevelCacheFindAndLockFlow findAndLockFlow, final Action onSuccessCallback) {
         getCache().sendRequest(getCache().getNext(), 8, new Action() {
             @Override
             public void apply() {
@@ -95,7 +94,7 @@ public class LoadFlow extends LockingFlow {
                         new Action() {
                             @Override
                             public void apply() {
-                                findAndLockFlow.getCacheAccess().getLine().setNonInitialState(l1DownwardReadFlow.isShared() ? MESIState.SHARED : MESIState.EXCLUSIVE);
+                                findAndLockFlow.getCacheAccess().getLine().getMesiFsm().fireTransition(l1DownwardReadFlow.isShared() ? MESICondition.READ_WITH_SHARERS : MESICondition.READ_NO_SHARERS);
 
                                 findAndLockFlow.getCacheAccess().commit().getLine().unlock();
 

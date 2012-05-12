@@ -23,15 +23,16 @@ import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.coherence.flow.LockingFlow;
 import archimulator.util.action.Action;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LockableCacheLine extends CacheLine<MESIState> {
+public class LockableCacheLine<StateT extends Serializable> extends CacheLine<StateT> {
     private int transientTag = -1;
     private List<Action> suspendedActions;
     private LockingFlow lockingFlow;
 
-    public LockableCacheLine(Cache<?, ?> cache, int set, int way, MESIState initialState) {
+    public LockableCacheLine(Cache<?, ?> cache, int set, int way, StateT initialState) {
         super(cache, set, way, initialState);
 
         this.suspendedActions = new ArrayList<Action>();
