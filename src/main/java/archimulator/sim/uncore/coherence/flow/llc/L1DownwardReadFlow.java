@@ -23,6 +23,7 @@ import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.common.FirstLevelCache;
 import archimulator.sim.uncore.coherence.common.LastLevelCache;
 import archimulator.sim.uncore.coherence.common.LastLevelCacheLineState;
+import archimulator.sim.uncore.coherence.common.MESIState;
 import archimulator.sim.uncore.coherence.flow.Flow;
 import archimulator.sim.uncore.coherence.flow.LockingFlow;
 import archimulator.sim.uncore.coherence.flow.flc.L2UpwardReadFlow;
@@ -55,6 +56,9 @@ public class L1DownwardReadFlow extends LockingFlow {
                     public void apply() {
                         if (!findAndLockFlow.getCacheAccess().isHitInCache()) {
                             if (getCache().isOwned(tag)) {
+                                MESIState targetState = getCache().getOwnerOrFirstSharer(tag).getCache().findLine(tag).getState();
+                                System.out.println(targetState);
+
                                 getCache().sendRequest(getCache().getOwnerOrFirstSharer(tag), 8, new Action() {
                                     @Override
                                     public void apply() {

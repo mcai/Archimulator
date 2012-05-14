@@ -24,30 +24,31 @@ import archimulator.util.fsm.FiniteStateMachineFactory;
 
 public class MESIFiniteStateMachine extends BasicFiniteStateMachine<MESIState, MESICondition> {
     private FirstLevelCacheLine cacheLine;
+    private MESIActionProvider mesiActionProvider;
 
     public MESIFiniteStateMachine(FirstLevelCacheLine cacheLine) {
         super(cacheLine.getCache().getName() + ".[" + cacheLine.getSet() + "," + cacheLine.getWay() + "].mesiFsm" , MESIState.INVALID);
         this.cacheLine = cacheLine;
     }
 
-    protected void notifyDirectory() {
-//        System.out.println("notifyDirectory()");
+    public static interface MESIActionProvider {
+        void notifyDirectory();
+
+        void ackToDirectory();
+
+        void copyBackToDirectory();
+
+        void writeBackToDirectory();
+
+        void peerTransfer(String peer);
     }
 
-    protected void ackToDirectory() {
-//        System.out.println("ackToDirectory()");
+    public MESIActionProvider getMesiActionProvider() {
+        return mesiActionProvider;
     }
 
-    protected void copyBackToDirectory() {
-//        System.out.println("copyBackToDirectory()");
-    }
-
-    protected void writeBackToDirectory() {
-//        System.out.println("writeBackToDirectory()");
-    }
-
-    protected void peerTransfer(String peer) {
-//        System.out.println("peerTransfer(" + peer + ")");
+    public void setMesiActionProvider(MESIActionProvider mesiActionProvider) {
+        this.mesiActionProvider = mesiActionProvider;
     }
 
     public void fireTransition(MESICondition condition, Object... params) {
@@ -73,7 +74,7 @@ public class MESIFiniteStateMachine extends BasicFiniteStateMachine<MESIState, M
                 .onCondition(MESICondition.REPLACEMENT, new Function1X<MESIFiniteStateMachine, MESIState>() {
                     @Override
                     public MESIState apply(MESIFiniteStateMachine fsm, Object... params) {
-                        fsm.writeBackToDirectory();
+                        fsm.getMesiActionProvider().writeBackToDirectory();
                         fsm.getCacheLine()._invalidate();
                         return MESIState.INVALID;
                     }
@@ -83,8 +84,8 @@ public class MESIFiniteStateMachine extends BasicFiniteStateMachine<MESIState, M
                     public MESIState apply(MESIFiniteStateMachine fsm, Object... params) {
 //                        String peer = (String) params[0]; //TODO
                         String peer = null;
-                        fsm.peerTransfer(peer);
-                        fsm.copyBackToDirectory();
+                        fsm.getMesiActionProvider().peerTransfer(peer);
+                        fsm.getMesiActionProvider().copyBackToDirectory();
                         fsm.getCacheLine()._setNonInitialState(MESIState.SHARED);
                         return MESIState.SHARED;
                     }
@@ -94,8 +95,8 @@ public class MESIFiniteStateMachine extends BasicFiniteStateMachine<MESIState, M
                     public MESIState apply(MESIFiniteStateMachine fsm, Object... params) {
 //                        String peer = (String) params[0]; //TODO
                         String peer = null;
-                        fsm.peerTransfer(peer);
-                        fsm.ackToDirectory();
+                        fsm.getMesiActionProvider().peerTransfer(peer);
+                        fsm.getMesiActionProvider().ackToDirectory();
                         fsm.getCacheLine()._invalidate();
                         return MESIState.INVALID;
                     }
@@ -118,7 +119,7 @@ public class MESIFiniteStateMachine extends BasicFiniteStateMachine<MESIState, M
                 .onCondition(MESICondition.REPLACEMENT, new Function1X<MESIFiniteStateMachine, MESIState>() {
                     @Override
                     public MESIState apply(MESIFiniteStateMachine fsm, Object... params) {
-                        fsm.notifyDirectory();
+                        fsm.getMesiActionProvider().notifyDirectory();
                         fsm.getCacheLine()._invalidate();
                         return MESIState.INVALID;
                     }
@@ -128,8 +129,8 @@ public class MESIFiniteStateMachine extends BasicFiniteStateMachine<MESIState, M
                     public MESIState apply(MESIFiniteStateMachine fsm, Object... params) {
 //                        String peer = (String) params[0]; //TODO
                         String peer = null;
-                        fsm.peerTransfer(peer);
-                        fsm.ackToDirectory();
+                        fsm.getMesiActionProvider().peerTransfer(peer);
+                        fsm.getMesiActionProvider().ackToDirectory();
                         fsm.getCacheLine()._setNonInitialState(MESIState.SHARED);
                         return MESIState.SHARED;
                     }
@@ -139,8 +140,8 @@ public class MESIFiniteStateMachine extends BasicFiniteStateMachine<MESIState, M
                     public MESIState apply(MESIFiniteStateMachine fsm, Object... params) {
 //                        String peer = (String) params[0]; //TODO
                         String peer = null;
-                        fsm.peerTransfer(peer);
-                        fsm.ackToDirectory();
+                        fsm.getMesiActionProvider().peerTransfer(peer);
+                        fsm.getMesiActionProvider().ackToDirectory();
                         fsm.getCacheLine()._invalidate();
                         return MESIState.INVALID;
                     }
@@ -170,7 +171,7 @@ public class MESIFiniteStateMachine extends BasicFiniteStateMachine<MESIState, M
                 .onCondition(MESICondition.EXTERNAL_WRITE, new Function1X<MESIFiniteStateMachine, MESIState>() {
                     @Override
                     public MESIState apply(MESIFiniteStateMachine fsm, Object... params) {
-                        fsm.ackToDirectory();
+                        fsm.getMesiActionProvider().ackToDirectory();
                         fsm.getCacheLine()._invalidate();
                         return MESIState.INVALID;
                     }
