@@ -21,10 +21,15 @@ package archimulator.sim.uncore.coherence.common;
 import archimulator.sim.uncore.CacheHierarchy;
 import archimulator.sim.uncore.MemoryDevice;
 import archimulator.sim.uncore.cache.Cache;
+import archimulator.sim.uncore.cache.FindCacheLineResult;
+import archimulator.sim.uncore.cache.FindCacheLineResultType;
 import archimulator.sim.uncore.coherence.config.CoherentCacheConfig;
 import archimulator.sim.uncore.dram.MainMemory;
 import archimulator.sim.uncore.net.Net;
 import archimulator.util.action.Function3;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class LastLevelCache extends CoherentCache<LastLevelCacheLineState, LastLevelCacheLine> {
     public LastLevelCache(CacheHierarchy cacheHierarchy, String name, CoherentCacheConfig config) {
@@ -46,5 +51,34 @@ public class LastLevelCache extends CoherentCache<LastLevelCacheLineState, LastL
 
     public MainMemory getNext() {
         return (MainMemory) super.getNext();
+    }
+
+    public boolean isShared(int tag) {
+        return this.getSharers(tag).size() > 1;
+    }
+
+    public boolean isOwned(int tag) {
+        return this.getSharers(tag).size() == 1;
+    }
+
+    public boolean isOwnedOrShared(int tag) {
+        return this.getSharers(tag).size() > 0;
+    }
+
+    public FirstLevelCache getOwnerOrFirstSharer(int tag) {
+        return this.getSharers(tag).get(0);
+    }
+
+    public List<FirstLevelCache> getSharers(int tag) {
+        List<FirstLevelCache> sharers = new ArrayList<FirstLevelCache>();
+
+        for(FirstLevelCache firstLevelCache : this.getCacheHierarchy().getDataCaches()) {
+            FindCacheLineResult<FirstLevelCacheLine> findCacheLineResult = firstLevelCache.getCache().findLine(tag);
+            if(findCacheLineResult.getType() == FindCacheLineResultType.CACHE_HIT) {
+                sharers.add(firstLevelCache);
+            }
+        }
+
+        return sharers;
     }
 }

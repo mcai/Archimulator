@@ -25,13 +25,13 @@ import archimulator.sim.uncore.cache.FindCacheLineResultType;
 import archimulator.sim.uncore.coherence.common.*;
 import archimulator.sim.uncore.coherence.event.LastLevelCacheLineEvictedByMemWriteProcessEvent;
 import archimulator.sim.uncore.coherence.flow.FindAndLockFlow;
-import archimulator.sim.uncore.coherence.flow.LockingFlow;
+import archimulator.sim.uncore.coherence.flow.Flow;
 import archimulator.sim.uncore.coherence.flow.flc.L2UpwardWriteFlow;
 import archimulator.util.Reference;
 import archimulator.util.action.Action;
 
 public class LastLevelCacheFindAndLockFlow extends FindAndLockFlow<LastLevelCacheLineState, LastLevelCacheLine> {
-    public LastLevelCacheFindAndLockFlow(LockingFlow lockingFlow, LastLevelCache cache, MemoryHierarchyAccess access, int tag, CacheAccessType cacheAccessType) {
+    public LastLevelCacheFindAndLockFlow(Flow lockingFlow, LastLevelCache cache, MemoryHierarchyAccess access, int tag, CacheAccessType cacheAccessType) {
         super(lockingFlow, cache, access, tag, cacheAccessType);
     }
 
@@ -39,7 +39,7 @@ public class LastLevelCacheFindAndLockFlow extends FindAndLockFlow<LastLevelCach
     protected void evict(final MemoryHierarchyAccess access, final Action onSuccessCallback, Action onFailureCallback) {
         final Reference<Integer> pending = new Reference<Integer>(0);
 
-        for (final FirstLevelCache sharer : getCacheAccess().getLine().getDirectoryEntry().getSharers()) {
+        for (final FirstLevelCache sharer : getCache().getSharers(getCacheAccess().getReference().getTag())) {
 //            if(sharer.getCache().findLine(getCacheAccess().getReference().getTag()) == null) {
 //                throw new IllegalArgumentException(); //TODO: to be uncommented or ensured, temp workaround
 //            }
@@ -82,7 +82,6 @@ public class LastLevelCacheFindAndLockFlow extends FindAndLockFlow<LastLevelCach
                         @Override
                         public void apply() {
                             getCache().getBlockingEventDispatcher().dispatch(new LastLevelCacheLineEvictedByMemWriteProcessEvent(getCache(), getCacheAccess().getLine()));
-                            getCacheAccess().getLine().getDirectoryEntry().reset();
                             onSuccessCallback.apply();
                         }
                     });
@@ -93,7 +92,6 @@ public class LastLevelCacheFindAndLockFlow extends FindAndLockFlow<LastLevelCach
                 @Override
                 public void apply() {
                     getCache().getBlockingEventDispatcher().dispatch(new LastLevelCacheLineEvictedByMemWriteProcessEvent(getCache(), getCacheAccess().getLine()));
-                    getCacheAccess().getLine().getDirectoryEntry().reset();
                     onSuccessCallback.apply();
                 }
             }, 0);

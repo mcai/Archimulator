@@ -27,12 +27,11 @@ import archimulator.sim.uncore.coherence.common.FirstLevelCacheLine;
 import archimulator.sim.uncore.coherence.common.LastLevelCache;
 import archimulator.sim.uncore.coherence.common.LastLevelCacheLineState;
 import archimulator.sim.uncore.coherence.flow.Flow;
-import archimulator.sim.uncore.coherence.flow.LockingFlow;
 import archimulator.sim.uncore.coherence.flow.flc.L2UpwardWriteFlow;
 import archimulator.util.Reference;
 import archimulator.util.action.Action;
 
-public class L1DownwardWriteFlow extends LockingFlow {
+public class L1DownwardWriteFlow extends Flow {
     private LastLevelCache cache;
     private FirstLevelCache source;
     private MemoryHierarchyAccess access;
@@ -82,7 +81,7 @@ public class L1DownwardWriteFlow extends LockingFlow {
     private void invalidateSharers(final LastLevelCacheFindAndLockFlow findAndLockFlow, final Action onSuccessCallback) {
         final Reference<Integer> pending = new Reference<Integer>(0);
 
-        for (final FirstLevelCache sharer : findAndLockFlow.getCacheAccess().getLine().getDirectoryEntry().getSharers()) {
+        for (final FirstLevelCache sharer : findAndLockFlow.getCache().getSharers(tag)) {
             if (sharer != source) {
 //                if(sharer.getCache().findLine(findAndLockFlow.getCacheAccess().getReference().getTag()) == null) {
 //                    throw new IllegalArgumentException(); //TODO: to be uncommented or ensured, temp workaround
@@ -119,7 +118,7 @@ public class L1DownwardWriteFlow extends LockingFlow {
     }
 
     private void getData(final LastLevelCacheFindAndLockFlow findAndLockFlow, final Action onSuccessCallback) {
-        if (!findAndLockFlow.getCacheAccess().isHitInCache() && !findAndLockFlow.getCacheAccess().getLine().getDirectoryEntry().isOwnedOrShared()) {
+        if (!findAndLockFlow.getCacheAccess().isHitInCache() && !findAndLockFlow.getCache().isOwnedOrShared(tag)) {
             getCache().sendRequest(getCache().getNext(), 8, new Action() {
                 @Override
                 public void apply() {
@@ -138,9 +137,6 @@ public class L1DownwardWriteFlow extends LockingFlow {
     }
 
     private void endGetData(LastLevelCacheFindAndLockFlow findAndLockFlow, Action onSuccessCallback) {
-        findAndLockFlow.getCacheAccess().getLine().getDirectoryEntry().getSharers().clear();
-        findAndLockFlow.getCacheAccess().getLine().getDirectoryEntry().getSharers().add(source);
-
         if (findAndLockFlow.getCacheAccess().isHitInCache() || !findAndLockFlow.getCacheAccess().isBypass()) {
             findAndLockFlow.getCacheAccess().getLine().setNonInitialState(findAndLockFlow.getCacheAccess().getLine().getState() == LastLevelCacheLineState.DIRTY ? LastLevelCacheLineState.DIRTY : LastLevelCacheLineState.CLEAN);
         }

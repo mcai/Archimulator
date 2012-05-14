@@ -21,14 +21,7 @@ package archimulator.sim.uncore.coherence.common;
 import archimulator.sim.uncore.cache.Cache;
 
 public class LastLevelCacheLine extends LockableCacheLine<LastLevelCacheLineState> {
-    private DirectoryEntry directoryEntry;
-
     public LastLevelCacheLine(Cache<?, ?> cache, int set, int way, LastLevelCacheLineState initialState) {
         super(cache, set, way, initialState);
-        this.directoryEntry = new DirectoryEntry();
-    }
-
-    public DirectoryEntry getDirectoryEntry() {
-        return directoryEntry;
     }
 }

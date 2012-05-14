@@ -24,10 +24,9 @@ import archimulator.sim.uncore.coherence.common.FirstLevelCache;
 import archimulator.sim.uncore.coherence.common.LastLevelCache;
 import archimulator.sim.uncore.coherence.common.LastLevelCacheLineState;
 import archimulator.sim.uncore.coherence.flow.Flow;
-import archimulator.sim.uncore.coherence.flow.LockingFlow;
 import archimulator.util.action.Action;
 
-public class L1EvictFlow extends LockingFlow {
+public class L1EvictFlow extends Flow {
     private LastLevelCache cache;
     private FirstLevelCache source;
     private MemoryHierarchyAccess access;
@@ -55,8 +54,6 @@ public class L1EvictFlow extends LockingFlow {
                         if (findAndLockFlow.getCacheAccess().isHitInCache() || !findAndLockFlow.getCacheAccess().isBypass()) {
                             findAndLockFlow.getCacheAccess().getLine().setNonInitialState(hasData ? LastLevelCacheLineState.DIRTY : LastLevelCacheLineState.CLEAN);
                         }
-
-                        findAndLockFlow.getCacheAccess().getLine().getDirectoryEntry().getSharers().remove(source);
 
                         findAndLockFlow.getCacheAccess().commit().getLine().unlock();
 

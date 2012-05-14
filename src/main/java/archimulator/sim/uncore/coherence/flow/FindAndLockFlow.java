@@ -44,7 +44,7 @@ public abstract class FindAndLockFlow<StateT extends Serializable, LineT extends
     private CacheAccess<StateT, LineT> cacheAccess;
     private BasicFiniteStateMachine<FindAndLockFlowState, FindAndLockFlowCondition> fsm;
 
-    public FindAndLockFlow(LockingFlow producerFlow, CoherentCache<StateT, LineT> cache, MemoryHierarchyAccess access, int tag, CacheAccessType cacheAccessType) {
+    public FindAndLockFlow(Flow producerFlow, CoherentCache<StateT, LineT> cache, MemoryHierarchyAccess access, int tag, CacheAccessType cacheAccessType) {
         super(producerFlow);
         this.cache = cache;
         this.access = access;
@@ -158,8 +158,8 @@ public abstract class FindAndLockFlow<StateT extends Serializable, LineT extends
     }
 
     @Override
-    public LockingFlow getProducerFlow() {
-        return (LockingFlow) super.getProducerFlow();
+    public Flow getProducerFlow() {
+        return super.getProducerFlow();
     }
 
     public FindAndLockFlowState getState() {

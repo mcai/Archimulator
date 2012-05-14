@@ -20,15 +20,13 @@ package archimulator.sim.uncore.coherence.flow.flc;
 
 import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
-import archimulator.sim.uncore.coherence.common.FirstLevelCache;
-import archimulator.sim.uncore.coherence.common.LastLevelCache;
-import archimulator.sim.uncore.coherence.common.MESICondition;
-import archimulator.sim.uncore.coherence.common.MESIState;
+import archimulator.sim.uncore.cache.FindCacheLineResult;
+import archimulator.sim.uncore.cache.FindCacheLineResultType;
+import archimulator.sim.uncore.coherence.common.*;
 import archimulator.sim.uncore.coherence.flow.Flow;
-import archimulator.sim.uncore.coherence.flow.LockingFlow;
 import archimulator.util.action.Action;
 
-public class L2UpwardReadFlow extends LockingFlow {
+public class L2UpwardReadFlow extends Flow {
     private FirstLevelCache cache;
     private LastLevelCache source;
     private MemoryHierarchyAccess access;
@@ -46,35 +44,42 @@ public class L2UpwardReadFlow extends LockingFlow {
     public void start(final Action onSuccessCallback) {
         this.onCreate(this.cache.getCycleAccurateEventQueue().getCurrentCycle());
 
-        final FirstLevelCacheFindAndLockFlow findAndLockFlow = new FirstLevelCacheFindAndLockFlow(this, this.cache, this.access, this.tag, CacheAccessType.UPWARD_READ);
+        FindCacheLineResult<FirstLevelCacheLine> findCacheLineResult = this.getCache().getCache().findLine(this.tag);
+        if(findCacheLineResult.getType() == FindCacheLineResultType.CACHE_HIT) {
+            final FirstLevelCacheFindAndLockFlow findAndLockFlow = new FirstLevelCacheFindAndLockFlow(this, this.cache, this.access, this.tag, CacheAccessType.UPWARD_READ);
 
-        findAndLockFlow.start(
-                new Action() {
-                    @Override
-                    public void apply() {
-                        copyBack = findAndLockFlow.getCacheAccess().getLine().getState() == MESIState.MODIFIED;
+            findAndLockFlow.start(
+                    new Action() {
+                        @Override
+                        public void apply() {
+                            copyBack = findAndLockFlow.getCacheAccess().getLine().getState() == MESIState.MODIFIED;
 
-                        findAndLockFlow.getCacheAccess().getLine().getMesiFsm().fireTransition(MESICondition.EXTERNAL_READ);
+                            findAndLockFlow.getCacheAccess().getLine().getMesiFsm().fireTransition(MESICondition.EXTERNAL_READ);
 
-                        findAndLockFlow.getCacheAccess().commit().getLine().unlock();
+                            findAndLockFlow.getCacheAccess().commit().getLine().unlock();
 
-                        getCache().sendReply(source, source.getCache().getLineSize() + 8, onSuccessCallback);
-                        onDestroy();
+                            getCache().sendReply(source, source.getCache().getLineSize() + 8, onSuccessCallback);
+                            onDestroy();
+                        }
+                    }, new Action() {
+                        @Override
+                        public void apply() {
+                            Flow.dumpTree();
+                            throw new IllegalArgumentException();
+                        }
+                    }, new Action() {
+                        @Override
+                        public void apply() {
+                            Flow.dumpTree();
+                            throw new IllegalArgumentException();
+                        }
                     }
-                }, new Action() {
-                    @Override
-                    public void apply() {
-                        Flow.dumpTree();
-                        throw new IllegalArgumentException();
-                    }
-                }, new Action() {
-                    @Override
-                    public void apply() {
-                        Flow.dumpTree();
-                        throw new IllegalArgumentException();
-                    }
-                }
-        );
+            );
+        }
+        else {
+            getCache().sendReply(source, 8, onSuccessCallback);
+            onDestroy();
+        }
     }
 
     public FirstLevelCache getCache() {

@@ -24,12 +24,11 @@ import archimulator.sim.uncore.cache.FindCacheLineResult;
 import archimulator.sim.uncore.cache.FindCacheLineResultType;
 import archimulator.sim.uncore.coherence.common.*;
 import archimulator.sim.uncore.coherence.flow.Flow;
-import archimulator.sim.uncore.coherence.flow.LockingFlow;
 import archimulator.sim.uncore.coherence.flow.flc.L2UpwardReadFlow;
 import archimulator.util.Reference;
 import archimulator.util.action.Action;
 
-public class L1DownwardReadFlow extends LockingFlow {
+public class L1DownwardReadFlow extends Flow {
     private LastLevelCache cache;
     private FirstLevelCache source;
     protected MemoryHierarchyAccess access;
@@ -57,12 +56,8 @@ public class L1DownwardReadFlow extends LockingFlow {
                         if (findAndLockFlow.getCacheAccess().isHitInCache()) {
                             final Reference<Integer> pending = new Reference<Integer>(0);
 
-                            if (findAndLockFlow.getCacheAccess().getLine().getDirectoryEntry().isOwned()) {
-                                final FirstLevelCache ownerOrFirstSharer = findAndLockFlow.getCacheAccess().getLine().getDirectoryEntry().getOwnerOrFirstSharer();
-//                                if (ownerOrFirstSharer.getCache().findLine(findAndLockFlow.getCacheAccess().getReference().getTag()) == null) {
-//                                    throw new IllegalArgumentException(); //TODO: to be uncommented or ensured, temp workaround
-//                                }
-
+                            if (findAndLockFlow.getCache().isOwned(tag)) {
+                                final FirstLevelCache ownerOrFirstSharer = findAndLockFlow.getCache().getOwnerOrFirstSharer(tag);
                                 FindCacheLineResult<FirstLevelCacheLine> findCacheLineResult = ownerOrFirstSharer.getCache().findLine(findAndLockFlow.getCacheAccess().getReference().getTag());
                                 if (findCacheLineResult.getType() == FindCacheLineResultType.CACHE_HIT && findCacheLineResult.getLine().getMesiFsm().getState() != MESIState.SHARED) {
                                     getCache().sendRequest(ownerOrFirstSharer, 8, new Action() {
@@ -112,52 +107,6 @@ public class L1DownwardReadFlow extends LockingFlow {
                                 }
                             });
                         }
-
-//                        if (!findAndLockFlow.getCacheAccess().isHitInCache()) {
-//                            if (findAndLockFlow.getCacheAccess().getLine().getDirectoryEntry().isOwned()) {
-//                                final FirstLevelCache ownerOrFirstSharer = findAndLockFlow.getCacheAccess().getLine().getDirectoryEntry().getOwnerOrFirstSharer();
-//                                MESIState targetState = ownerOrFirstSharer.getCache().findLine(tag).getState();
-//                                System.out.println(targetState);
-//
-//                                getCache().sendRequest(ownerOrFirstSharer, 8, new Action() {
-//                                    @Override
-//                                    public void apply() {
-//                                        final L2UpwardReadFlow l2UpwardReadFlow = new L2UpwardReadFlow(L1DownwardReadFlow.this, ownerOrFirstSharer, getCache(), access, tag);
-//                                        l2UpwardReadFlow.start(
-//                                                new Action() {
-//                                                    @Override
-//                                                    public void apply() {
-//                                                        if (l2UpwardReadFlow.isCopyBack()) {
-//                                                            copyBack = true;
-////                                                          findAndLockProcess.getCacheAccess().getLine().setNonInitialState(MESIState.MODIFIED);
-//                                                        }
-//
-//                                                        reply(findAndLockFlow, onSuccessCallback);
-//                                                    }
-//                                                }
-//                                        );
-//                                    }
-//                                });
-//                            } else {
-//                                getCache().sendRequest(getCache().getNext(), 8, new Action() {
-//                                    @Override
-//                                    public void apply() {
-//                                        getCache().getNext().memReadRequestReceive(getCache(), tag, new Action() {
-//                                            @Override
-//                                            public void apply() {
-//                                                //                                    if (!findAndLockProcess.getCacheAccess().isHitInCache() && !findAndLockProcess.getCacheAccess().isBypass()) {
-//                                                //                                        findAndLockProcess.getCacheAccess().getLine().setNonInitialState(MESIState.EXCLUSIVE);
-//                                                //                                    }
-//
-//                                                reply(findAndLockFlow, onSuccessCallback);
-//                                            }
-//                                        });
-//                                    }
-//                                });
-//                            }
-//                        } else {
-//                            reply(findAndLockFlow, onSuccessCallback);
-//                        }
                     }
                 }, new Action() {
                     @Override
@@ -184,8 +133,7 @@ public class L1DownwardReadFlow extends LockingFlow {
     }
 
     private void reply(LastLevelCacheFindAndLockFlow findAndLockFlow, Action onSuccessCallback) {
-        findAndLockFlow.getCacheAccess().getLine().getDirectoryEntry().getSharers().add(source);
-        this.shared = findAndLockFlow.getCacheAccess().getLine().getDirectoryEntry().isShared();
+        this.shared = findAndLockFlow.getCache().isOwnedOrShared(tag);
 
         if (!findAndLockFlow.getCacheAccess().isHitInCache() && !findAndLockFlow.getCacheAccess().isBypass()) {
             if (copyBack) {

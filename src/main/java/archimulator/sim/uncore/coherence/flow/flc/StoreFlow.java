@@ -23,11 +23,11 @@ import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.common.FirstLevelCache;
 import archimulator.sim.uncore.coherence.common.MESICondition;
 import archimulator.sim.uncore.coherence.common.MESIState;
-import archimulator.sim.uncore.coherence.flow.LockingFlow;
+import archimulator.sim.uncore.coherence.flow.Flow;
 import archimulator.sim.uncore.coherence.flow.llc.L1DownwardWriteFlow;
 import archimulator.util.action.Action;
 
-public class StoreFlow extends LockingFlow {
+public class StoreFlow extends Flow {
     private FirstLevelCache cache;
     private MemoryHierarchyAccess access;
     private int tag;

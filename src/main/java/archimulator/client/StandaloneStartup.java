@@ -44,7 +44,8 @@ public class StandaloneStartup {
         SimulatedProgram simulatedProgram = Presets.SIMULATED_PROGRAM_MST_HT(640, 320);
 //        ProcessorProfile processorProfile = Presets.processor(1024 * 4, 8, 2, 2, "LRU", LRUPolicy.class);
 //        ProcessorProfile processorProfile = Presets.processor(1024 / 4, 8, 2, 2, "LRU", LRUPolicy.class); //256K L2
-        ProcessorProfile processorProfile = Presets.processor(1024 / 4, 8, 2, 2, "LLCHTAwareLRU", LLCHTAwareLRUPolicy.class); //256K L2
+//        ProcessorProfile processorProfile = Presets.processor(1024 / 4, 8, 2, 2, "LLCHTAwareLRU", LLCHTAwareLRUPolicy.class); //256K L2
+        ProcessorProfile processorProfile = Presets.processor(1024 * 2, 8, 2, 2, "LLCHTAwareLRU", LLCHTAwareLRUPolicy.class); //256K L2
 //        final ExperimentProfile experimentProfile = Presets.baseline_lru(pthreadSpawnedIndex, maxInsts, processorProfile, simulatedProgram);
         final ExperimentProfile experimentProfile = Presets.ht_lru(pthreadSpawnedIndex, maxInsts, processorProfile, simulatedProgram);
 
@@ -64,7 +65,7 @@ public class StandaloneStartup {
 
 //                    Context context = experiment.getSimulation().getProcessor().getCores().get(0).getThreads().get(0).getContext();
 //                    if(context != null) {
-//                        FileWriter out = new FileWriter("/home/itecgo/Desktop/dis.txt");
+//                        FileWriter out = new FileWriter("/home/itecgo/Desktop/dis.txt");          e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
 //                        ((BasicProcess) context.getProcess()).getElfAnalyzer().dumpAnalysisResult(out);
 //                        out.close();
 //                    }

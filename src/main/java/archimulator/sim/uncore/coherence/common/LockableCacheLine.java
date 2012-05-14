@@ -20,7 +20,7 @@ package archimulator.sim.uncore.coherence.common;
 
 import archimulator.sim.uncore.cache.Cache;
 import archimulator.sim.uncore.cache.CacheLine;
-import archimulator.sim.uncore.coherence.flow.LockingFlow;
+import archimulator.sim.uncore.coherence.flow.Flow;
 import archimulator.util.action.Action;
 
 import java.io.Serializable;
@@ -30,7 +30,7 @@ import java.util.List;
 public class LockableCacheLine<StateT extends Serializable> extends CacheLine<StateT> {
     private int transientTag = -1;
     private List<Action> suspendedActions;
-    private LockingFlow lockingFlow;
+    private Flow lockingFlow;
 
     public LockableCacheLine(Cache<?, ?> cache, int set, int way, StateT initialState) {
         super(cache, set, way, initialState);
@@ -38,7 +38,7 @@ public class LockableCacheLine<StateT extends Serializable> extends CacheLine<St
         this.suspendedActions = new ArrayList<Action>();
     }
 
-    public boolean lock(Action action, int transientTag, LockingFlow lockingFlow) {
+    public boolean lock(Action action, int transientTag, Flow lockingFlow) {
         if (this.isLocked()) {
             this.suspendedActions.add(action);
             return false;
@@ -66,7 +66,7 @@ public class LockableCacheLine<StateT extends Serializable> extends CacheLine<St
         return transientTag;
     }
 
-    public LockingFlow getLockingFlow() {
+    public Flow getLockingFlow() {
         return lockingFlow;
     }
 

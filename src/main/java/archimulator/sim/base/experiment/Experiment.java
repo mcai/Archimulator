@@ -255,6 +255,12 @@ public abstract class Experiment {
                                 }, 2, 10, TimeUnit.SECONDS);
 
                                 experiment.doStart();
+                                experiment.scheduledExecutorPollState.shutdown();
+                                try {
+                                    experiment.scheduledExecutorPollState.awaitTermination(0, TimeUnit.SECONDS);
+                                } catch (InterruptedException e) {
+                                    throw new RuntimeException(e);
+                                }
 
                                 fsmFactory.fireTransition(from, ExperimentCondition.STOP);
 
