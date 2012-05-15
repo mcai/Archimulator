@@ -42,26 +42,21 @@ public class FirstLevelCacheFindAndLockFlow extends FindAndLockFlow<MESIState, F
         getCache().sendRequest(getCache().getNext(), size, new Action() {
             @Override
             public void apply() {
-                if(hasData) {
-                    L1EvictFlow l1EvictFlow = new L1EvictFlow(FirstLevelCacheFindAndLockFlow.this, getCache().getNext(), getCache(), access, getCacheAccess().getLine().getTag(), hasData);
-                    l1EvictFlow.start(
-                            new Action() {
-                                @Override
-                                public void apply() {
+                L1EvictFlow l1EvictFlow = new L1EvictFlow(FirstLevelCacheFindAndLockFlow.this, getCache().getNext(), getCache(), access, getCacheAccess().getLine().getTag(), hasData);
+                l1EvictFlow.start(
+                        new Action() {
+                            @Override
+                            public void apply() {
 //                                getCacheAccess().getLine().getMesiFsm().fireTransition(MESICondition.REPLACEMENT);
-                                    onSuccessCallback.apply();
-                                }
-                            }, new Action() {
-                                @Override
-                                public void apply() {
-                                    onFailureCallback.apply();
-                                }
+                                onSuccessCallback.apply();
                             }
-                    );
-                }
-                else {
-
-                }
+                        }, new Action() {
+                            @Override
+                            public void apply() {
+                                onFailureCallback.apply();
+                            }
+                        }
+                );
             }
         });
     }
