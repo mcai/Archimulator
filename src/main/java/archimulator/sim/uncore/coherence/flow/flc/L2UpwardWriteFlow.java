@@ -46,7 +46,7 @@ public class L2UpwardWriteFlow extends Flow {
 
         FindCacheLineResult<FirstLevelCacheLine> findCacheLineResult = this.getCache().getCache().findLine(this.tag);
         if(findCacheLineResult.getType() == FindCacheLineResultType.CACHE_HIT) {
-            final FirstLevelCacheFindAndLockFlow findAndLockFlow = new FirstLevelCacheFindAndLockFlow(this, this.cache, access, tag, CacheAccessType.UPWARD_READ);
+            final FirstLevelCacheFindAndLockFlow findAndLockFlow = new FirstLevelCacheFindAndLockFlow(this, this.cache, access, tag, CacheAccessType.UPWARD_WRITE);
 
             findAndLockFlow.start(
                     new Action() {

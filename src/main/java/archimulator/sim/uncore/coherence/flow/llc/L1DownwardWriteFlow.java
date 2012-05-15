@@ -48,7 +48,7 @@ public class L1DownwardWriteFlow extends Flow {
     public void run(final Action onSuccessCallback, final Action onFailureCallback) {
         this.onCreate(this.cache.getCycleAccurateEventQueue().getCurrentCycle());
 
-        final LastLevelCacheFindAndLockFlow findAndLockFlow = new LastLevelCacheFindAndLockFlow(this, this.cache, this.access, this.tag, CacheAccessType.DOWNWARD_READ);
+        final LastLevelCacheFindAndLockFlow findAndLockFlow = new LastLevelCacheFindAndLockFlow(this, this.cache, this.access, this.tag, CacheAccessType.DOWNWARD_WRITE);
 
         findAndLockFlow.start(
                 new Action() {
