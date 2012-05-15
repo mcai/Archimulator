@@ -79,7 +79,7 @@ public class L1DownwardWriteFlow extends LockingFlow {
     private void invalidateSharers(final LastLevelCacheFindAndLockFlow findAndLockFlow, final Action onSuccessCallback) {
         final Reference<Integer> pending = new Reference<Integer>(0);
 
-        for (final FirstLevelCache sharer : getCache().getSharers(tag)) {
+        for (final FirstLevelCache sharer : findAndLockFlow.getCacheAccess().getLine().getDirectoryEntry().getSharers()) {
             if (sharer != source) {
                 getCache().sendRequest(sharer, 8, new Action() {
                     @Override
@@ -109,7 +109,7 @@ public class L1DownwardWriteFlow extends LockingFlow {
     }
 
     private void getData(final LastLevelCacheFindAndLockFlow findAndLockFlow, final Action onSuccessCallback) {
-        if (!findAndLockFlow.getCacheAccess().isHitInCache() && !getCache().isOwnedOrShared(tag)) {
+        if (!findAndLockFlow.getCacheAccess().isHitInCache() && !findAndLockFlow.getCacheAccess().getLine().getDirectoryEntry().isOwnedOrShared()) {
             getCache().sendRequest(getCache().getNext(), 8, new Action() {
                 @Override
                 public void apply() {
@@ -128,11 +128,8 @@ public class L1DownwardWriteFlow extends LockingFlow {
     }
 
     private void endGetData(LastLevelCacheFindAndLockFlow findAndLockFlow, Action onSuccessCallback) {
-        for (final FirstLevelCache sharer : getCache().getSharers(tag)) {
-            getCache().getShadowTagDirectories().get(sharer).removeTag(tag);
-        }
-
-        getCache().getShadowTagDirectories().get(source).addTag(tag);
+        findAndLockFlow.getCacheAccess().getLine().getDirectoryEntry().getSharers().clear();
+        findAndLockFlow.getCacheAccess().getLine().getDirectoryEntry().getSharers().add(source);
 
         if (findAndLockFlow.getCacheAccess().isHitInCache() || !findAndLockFlow.getCacheAccess().isBypass()) {
             findAndLockFlow.getCacheAccess().getLine().setNonInitialState(findAndLockFlow.getCacheAccess().getLine().getState() == LastLevelCacheLineState.DIRTY ? LastLevelCacheLineState.DIRTY : LastLevelCacheLineState.CLEAN);

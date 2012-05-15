@@ -20,12 +20,15 @@ package archimulator.sim.uncore.coherence.flow.llc;
 
 import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
+import archimulator.sim.uncore.coherence.common.FirstLevelCache;
 import archimulator.sim.uncore.coherence.common.LastLevelCache;
 import archimulator.sim.uncore.coherence.common.LastLevelCacheLine;
 import archimulator.sim.uncore.coherence.common.LastLevelCacheLineState;
 import archimulator.sim.uncore.coherence.event.LastLevelCacheLineEvictedByMemWriteProcessEvent;
 import archimulator.sim.uncore.coherence.flow.FindAndLockFlow;
 import archimulator.sim.uncore.coherence.flow.LockingFlow;
+import archimulator.sim.uncore.coherence.flow.flc.L2UpwardWriteFlow;
+import archimulator.util.Reference;
 import archimulator.util.action.Action;
 
 public class LastLevelCacheFindAndLockFlow extends FindAndLockFlow<LastLevelCacheLineState, LastLevelCacheLine> {
@@ -34,7 +37,37 @@ public class LastLevelCacheFindAndLockFlow extends FindAndLockFlow<LastLevelCach
     }
 
     @Override
-    protected void evict(MemoryHierarchyAccess access, final Action onSuccessCallback, Action onFailureCallback) {
+    protected void evict(final MemoryHierarchyAccess access, final Action onSuccessCallback, Action onFailureCallback) {
+        final Reference<Integer> pending = new Reference<Integer>(0);
+
+        for (final FirstLevelCache sharer : getCacheAccess().getLine().getDirectoryEntry().getSharers()) {
+            getCache().sendRequest(sharer, 8, new Action() {
+                @Override
+                public void apply() {
+                    L2UpwardWriteFlow l2UpwardWriteFlow = new L2UpwardWriteFlow(LastLevelCacheFindAndLockFlow.this, sharer, getCache(), access, getCacheAccess().getReference().getTag());
+                    l2UpwardWriteFlow.start(
+                            new Action() {
+                                @Override
+                                public void apply() {
+                                    pending.set(pending.get() - 1);
+
+                                    if (pending.get() == 0) {
+                                        doEvict(onSuccessCallback);
+                                    }
+                                }
+                            }
+                    );
+                }
+            });
+            pending.set(pending.get() + 1);
+        }
+
+        if (pending.get() == 0) {
+            doEvict(onSuccessCallback);
+        }
+    }
+
+    private void doEvict(final Action onSuccessCallback) {
         if (getCacheAccess().getLine().getState() == LastLevelCacheLineState.DIRTY) {
             getCache().sendRequest(getCache().getNext(), getCache().getCache().getLineSize() + 8, new Action() {
                 @Override
@@ -43,6 +76,7 @@ public class LastLevelCacheFindAndLockFlow extends FindAndLockFlow<LastLevelCach
                         @Override
                         public void apply() {
                             getCache().getBlockingEventDispatcher().dispatch(new LastLevelCacheLineEvictedByMemWriteProcessEvent(getCache(), getCacheAccess().getLine()));
+                            getCacheAccess().getLine().getDirectoryEntry().reset();
                             onSuccessCallback.apply();
                         }
                     });
@@ -53,6 +87,7 @@ public class LastLevelCacheFindAndLockFlow extends FindAndLockFlow<LastLevelCach
                 @Override
                 public void apply() {
                     getCache().getBlockingEventDispatcher().dispatch(new LastLevelCacheLineEvictedByMemWriteProcessEvent(getCache(), getCacheAccess().getLine()));
+                    getCacheAccess().getLine().getDirectoryEntry().reset();
                     onSuccessCallback.apply();
                 }
             }, 0);

@@ -73,12 +73,10 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
         for (int i = 0; i < processorConfig.getNumCores(); i++) {
             FirstLevelCache instructionCache = new FirstLevelCache(this, "c" + i + ".icache", processorConfig.getMemoryHierarchyConfig().getInstructionCache());
             instructionCache.setNext(this.l2Cache);
-            this.l2Cache.addShadowTagDirectoryForL1(instructionCache);
             this.instructionCaches.add(instructionCache);
 
             FirstLevelCache dataCache = new FirstLevelCache(this, "c" + i + ".dcache", processorConfig.getMemoryHierarchyConfig().getDataCache());
             dataCache.setNext(this.l2Cache);
-            this.l2Cache.addShadowTagDirectoryForL1(dataCache);
             this.dataCaches.add(dataCache);
 
             for (int j = 0; j < processorConfig.getNumThreadsPerCore(); j++) {

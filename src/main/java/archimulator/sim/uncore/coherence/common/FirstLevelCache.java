@@ -77,53 +77,6 @@ public class FirstLevelCache extends CoherentCache<MESIState, FirstLevelCacheLin
                 }
             }
         });
-
-        for(int set = 0; set < this.getCache().getAssociativity(); set++) {
-            for(FirstLevelCacheLine line : this.getCache().getLines(set)) {
-                line.getMesiFsm().setMesiActionProvider(new MESIActionProviderImpl(line));
-            }
-        }
-    }
-
-    private class MESIActionProviderImpl implements MESIFiniteStateMachine.MESIActionProvider {
-        private FirstLevelCacheLine line;
-        private ShadowTagDirectory shadowTagDirectory;
-
-        public MESIActionProviderImpl(FirstLevelCacheLine line) {
-            this.line = line;
-        }
-
-        @Override
-        public void notifyDirectory() {
-        }
-
-        @Override
-        public void ackToDirectory() {
-            //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-        @Override
-        public void copyBackToDirectory() {
-            //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-        @Override
-        public void writeBackToDirectory() {
-            //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-        @Override
-        public void peerTransfer(String peer) {
-            //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-        public ShadowTagDirectory getShadowTagDirectory() {
-            if(shadowTagDirectory == null) {
-                shadowTagDirectory = FirstLevelCache.this.getNext().getShadowTagDirectories().get(FirstLevelCache.this);
-            }
-
-            return shadowTagDirectory;
-        }
     }
 
     @Override

@@ -26,61 +26,18 @@ import archimulator.sim.uncore.dram.MainMemory;
 import archimulator.sim.uncore.net.Net;
 import archimulator.util.action.Function3;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 public class LastLevelCache extends CoherentCache<LastLevelCacheLineState, LastLevelCacheLine> {
-    private Map<FirstLevelCache, ShadowTagDirectory> shadowTagDirectories;
-
     public LastLevelCache(CacheHierarchy cacheHierarchy, String name, CoherentCacheConfig config) {
         super(cacheHierarchy, name, config, new LockableCache<LastLevelCacheLineState, LastLevelCacheLine>(cacheHierarchy, name, config.getGeometry(), config.getEvictionPolicyClz(), new Function3<Cache<?, ?>, Integer, Integer, LastLevelCacheLine>() {
             public LastLevelCacheLine apply(Cache<?, ?> cache, Integer set, Integer way) {
                 return new LastLevelCacheLine(cache, set, way, LastLevelCacheLineState.INVALID);
             }
         }));
-
-        this.shadowTagDirectories = new LinkedHashMap<FirstLevelCache, ShadowTagDirectory>();
     }
 
     @Override
     protected Net getNet(MemoryDevice to) {
         return to instanceof MainMemory ? this.getCacheHierarchy().getL2ToMemNetwork() : this.getCacheHierarchy().getL1sToL2Network();
-    }
-
-    public void addShadowTagDirectoryForL1(FirstLevelCache l1Cache) {
-        this.shadowTagDirectories.put(l1Cache, new ShadowTagDirectory(l1Cache));
-    }
-
-    public Map<FirstLevelCache, ShadowTagDirectory> getShadowTagDirectories() {
-        return shadowTagDirectories;
-    }
-
-    public boolean isShared(int addr) {
-        return this.getSharers(addr).size() > 1;
-    }
-
-    public boolean isOwned(int addr) {
-        return this.getSharers(addr).size() == 1;
-    }
-
-    public boolean isOwnedOrShared(int addr) {
-        return this.getSharers(addr).size() > 0;
-    }
-
-    public FirstLevelCache getOwnerOrFirstSharer(int addr) {
-        return this.getSharers(addr).get(0);
-    }
-
-    public List<FirstLevelCache> getSharers(int addr) {
-        List<FirstLevelCache> sharers = new ArrayList<FirstLevelCache>();
-        for (Map.Entry<FirstLevelCache, ShadowTagDirectory> entry : this.shadowTagDirectories.entrySet()) {
-            if (entry.getValue().containsTag(addr)) {
-                sharers.add(entry.getKey());
-            }
-        }
-        return sharers;
     }
 
     public void setNext(MainMemory next) {

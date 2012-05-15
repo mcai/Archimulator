@@ -71,8 +71,8 @@ public class Presets {
         ExperimentProfile experimentProfile = new ExperimentProfile(simulatedProgram.getTitle() + "-" + processorProfile.getTitle(), processorProfile);
         experimentProfile.addWorkload(simulatedProgram);
 //        experimentProfile.functionallyToEnd();
-        experimentProfile.fastForwardToPseudoCallAndInDetailForMaxInsts(pthreadSpawnedIndex, maxInsts);
-//        experimentProfile.inDetailToEnd();
+//        experimentProfile.fastForwardToPseudoCallAndInDetailForMaxInsts(pthreadSpawnedIndex, maxInsts);
+        experimentProfile.inDetailToEnd();
         experimentProfile.addSimulationCapabilityClass(LLCReuseDistanceProfilingCapability.class);
         experimentProfile.addSimulationCapabilityClass(HTLLCRequestProfilingCapability.class);
         return experimentProfile;

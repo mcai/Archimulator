@@ -24,31 +24,10 @@ import archimulator.util.fsm.FiniteStateMachineFactory;
 
 public class MESIFiniteStateMachine extends BasicFiniteStateMachine<MESIState, MESICondition> {
     private FirstLevelCacheLine cacheLine;
-    private MESIActionProvider mesiActionProvider;
 
     public MESIFiniteStateMachine(FirstLevelCacheLine cacheLine) {
         super(cacheLine.getCache().getName() + ".[" + cacheLine.getSet() + "," + cacheLine.getWay() + "].mesiFsm" , MESIState.INVALID);
         this.cacheLine = cacheLine;
-    }
-
-    public static interface MESIActionProvider {
-        void notifyDirectory();
-
-        void ackToDirectory();
-
-        void copyBackToDirectory();
-
-        void writeBackToDirectory();
-
-        void peerTransfer(String peer);
-    }
-
-    public MESIActionProvider getMesiActionProvider() {
-        return mesiActionProvider;
-    }
-
-    public void setMesiActionProvider(MESIActionProvider mesiActionProvider) {
-        this.mesiActionProvider = mesiActionProvider;
     }
 
     public void fireTransition(MESICondition condition, Object... params) {
@@ -74,8 +53,7 @@ public class MESIFiniteStateMachine extends BasicFiniteStateMachine<MESIState, M
                 .onCondition(MESICondition.REPLACEMENT, new Function1X<MESIFiniteStateMachine, MESIState>() {
                     @Override
                     public MESIState apply(MESIFiniteStateMachine fsm, Object... params) {
-                        fsm.getMesiActionProvider().writeBackToDirectory();
-                        fsm.getCacheLine()._invalidate();
+                        fsm.getCacheLine().getMesiActionProvider().writeBackToDirectory();
                         return MESIState.INVALID;
                     }
                 })
@@ -84,8 +62,8 @@ public class MESIFiniteStateMachine extends BasicFiniteStateMachine<MESIState, M
                     public MESIState apply(MESIFiniteStateMachine fsm, Object... params) {
 //                        String peer = (String) params[0]; //TODO
                         String peer = null;
-                        fsm.getMesiActionProvider().peerTransfer(peer);
-                        fsm.getMesiActionProvider().copyBackToDirectory();
+                        fsm.getCacheLine().getMesiActionProvider().peerTransfer(peer);
+                        fsm.getCacheLine().getMesiActionProvider().copyBackToDirectory();
                         fsm.getCacheLine()._setNonInitialState(MESIState.SHARED);
                         return MESIState.SHARED;
                     }
@@ -95,8 +73,8 @@ public class MESIFiniteStateMachine extends BasicFiniteStateMachine<MESIState, M
                     public MESIState apply(MESIFiniteStateMachine fsm, Object... params) {
 //                        String peer = (String) params[0]; //TODO
                         String peer = null;
-                        fsm.getMesiActionProvider().peerTransfer(peer);
-                        fsm.getMesiActionProvider().ackToDirectory();
+                        fsm.getCacheLine().getMesiActionProvider().peerTransfer(peer);
+                        fsm.getCacheLine().getMesiActionProvider().ackToDirectory();
                         fsm.getCacheLine()._invalidate();
                         return MESIState.INVALID;
                     }
@@ -119,8 +97,7 @@ public class MESIFiniteStateMachine extends BasicFiniteStateMachine<MESIState, M
                 .onCondition(MESICondition.REPLACEMENT, new Function1X<MESIFiniteStateMachine, MESIState>() {
                     @Override
                     public MESIState apply(MESIFiniteStateMachine fsm, Object... params) {
-                        fsm.getMesiActionProvider().notifyDirectory();
-                        fsm.getCacheLine()._invalidate();
+                        fsm.getCacheLine().getMesiActionProvider().notifyDirectory();
                         return MESIState.INVALID;
                     }
                 })
@@ -129,8 +106,8 @@ public class MESIFiniteStateMachine extends BasicFiniteStateMachine<MESIState, M
                     public MESIState apply(MESIFiniteStateMachine fsm, Object... params) {
 //                        String peer = (String) params[0]; //TODO
                         String peer = null;
-                        fsm.getMesiActionProvider().peerTransfer(peer);
-                        fsm.getMesiActionProvider().ackToDirectory();
+                        fsm.getCacheLine().getMesiActionProvider().peerTransfer(peer);
+                        fsm.getCacheLine().getMesiActionProvider().ackToDirectory();
                         fsm.getCacheLine()._setNonInitialState(MESIState.SHARED);
                         return MESIState.SHARED;
                     }
@@ -140,8 +117,8 @@ public class MESIFiniteStateMachine extends BasicFiniteStateMachine<MESIState, M
                     public MESIState apply(MESIFiniteStateMachine fsm, Object... params) {
 //                        String peer = (String) params[0]; //TODO
                         String peer = null;
-                        fsm.getMesiActionProvider().peerTransfer(peer);
-                        fsm.getMesiActionProvider().ackToDirectory();
+                        fsm.getCacheLine().getMesiActionProvider().peerTransfer(peer);
+                        fsm.getCacheLine().getMesiActionProvider().ackToDirectory();
                         fsm.getCacheLine()._invalidate();
                         return MESIState.INVALID;
                     }
@@ -164,14 +141,13 @@ public class MESIFiniteStateMachine extends BasicFiniteStateMachine<MESIState, M
                 .onCondition(MESICondition.REPLACEMENT, new Function1X<MESIFiniteStateMachine, MESIState>() {
                     @Override
                     public MESIState apply(MESIFiniteStateMachine fsm, Object... params) {
-                        fsm.getCacheLine()._invalidate();
                         return MESIState.INVALID;
                     }
                 })
                 .onCondition(MESICondition.EXTERNAL_WRITE, new Function1X<MESIFiniteStateMachine, MESIState>() {
                     @Override
                     public MESIState apply(MESIFiniteStateMachine fsm, Object... params) {
-                        fsm.getMesiActionProvider().ackToDirectory();
+                        fsm.getCacheLine().getMesiActionProvider().ackToDirectory();
                         fsm.getCacheLine()._invalidate();
                         return MESIState.INVALID;
                     }

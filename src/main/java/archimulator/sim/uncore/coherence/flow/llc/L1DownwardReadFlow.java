@@ -27,6 +27,7 @@ import archimulator.sim.uncore.coherence.common.MESIState;
 import archimulator.sim.uncore.coherence.flow.Flow;
 import archimulator.sim.uncore.coherence.flow.LockingFlow;
 import archimulator.sim.uncore.coherence.flow.flc.L2UpwardReadFlow;
+import archimulator.util.Reference;
 import archimulator.util.action.Action;
 
 public class L1DownwardReadFlow extends LockingFlow {
@@ -54,15 +55,18 @@ public class L1DownwardReadFlow extends LockingFlow {
                 new Action() {
                     @Override
                     public void apply() {
-                        if (!findAndLockFlow.getCacheAccess().isHitInCache()) {
-                            if (getCache().isOwned(tag)) {
-                                MESIState targetState = getCache().getOwnerOrFirstSharer(tag).getCache().findLine(tag).getState();
+                        if (findAndLockFlow.getCacheAccess().isHitInCache()) {
+                            final Reference<Integer> pending = new Reference<Integer>(0);
+
+                            if (findAndLockFlow.getCacheAccess().getLine().getDirectoryEntry().isOwned()) {
+                                final FirstLevelCache ownerOrFirstSharer = findAndLockFlow.getCacheAccess().getLine().getDirectoryEntry().getOwnerOrFirstSharer();
+                                MESIState targetState = ownerOrFirstSharer.getCache().findLine(tag).getState();
                                 System.out.println(targetState);
 
-                                getCache().sendRequest(getCache().getOwnerOrFirstSharer(tag), 8, new Action() {
+                                getCache().sendRequest(ownerOrFirstSharer, 8, new Action() {
                                     @Override
                                     public void apply() {
-                                        final L2UpwardReadFlow l2UpwardReadFlow = new L2UpwardReadFlow(L1DownwardReadFlow.this, getCache().getOwnerOrFirstSharer(tag), getCache(), access, tag);
+                                        final L2UpwardReadFlow l2UpwardReadFlow = new L2UpwardReadFlow(L1DownwardReadFlow.this, ownerOrFirstSharer, getCache(), access, tag);
                                         l2UpwardReadFlow.start(
                                                 new Action() {
                                                     @Override
@@ -72,33 +76,82 @@ public class L1DownwardReadFlow extends LockingFlow {
 //                                                          findAndLockProcess.getCacheAccess().getLine().setNonInitialState(MESIState.MODIFIED);
                                                         }
 
-                                                        reply(findAndLockFlow, onSuccessCallback);
+                                                        if (pending.get() == 0) {
+                                                            reply(findAndLockFlow, onSuccessCallback);
+                                                        }
                                                     }
                                                 }
                                         );
                                     }
                                 });
-                            } else {
-                                getCache().sendRequest(getCache().getNext(), 8, new Action() {
-                                    @Override
-                                    public void apply() {
-                                        getCache().getNext().memReadRequestReceive(getCache(), tag, new Action() {
-                                            @Override
-                                            public void apply() {
-                                                //                                    if (!findAndLockProcess.getCacheAccess().isHitInCache() && !findAndLockProcess.getCacheAccess().isBypass()) {
-                                                //                                        findAndLockProcess.getCacheAccess().getLine().setNonInitialState(MESIState.EXCLUSIVE);
-                                                //                                    }
-
-                                                reply(findAndLockFlow, onSuccessCallback);
-                                            }
-                                        });
-                                    }
-                                });
                             }
+
+                            if (pending.get() == 0) {
+                                reply(findAndLockFlow, onSuccessCallback);
+                            }
+                        } else {
+                            getCache().sendRequest(getCache().getNext(), 8, new Action() {
+                                @Override
+                                public void apply() {
+                                    getCache().getNext().memReadRequestReceive(getCache(), tag, new Action() {
+                                        @Override
+                                        public void apply() {
+                                            //                                    if (!findAndLockProcess.getCacheAccess().isHitInCache() && !findAndLockProcess.getCacheAccess().isBypass()) {
+                                            //                                        findAndLockProcess.getCacheAccess().getLine().setNonInitialState(MESIState.EXCLUSIVE);
+                                            //                                    }
+
+                                            reply(findAndLockFlow, onSuccessCallback);
+                                        }
+                                    });
+                                }
+                            });
                         }
-                        else {
-                            reply(findAndLockFlow, onSuccessCallback);
-                        }
+
+//                        if (!findAndLockFlow.getCacheAccess().isHitInCache()) {
+//                            if (findAndLockFlow.getCacheAccess().getLine().getDirectoryEntry().isOwned()) {
+//                                final FirstLevelCache ownerOrFirstSharer = findAndLockFlow.getCacheAccess().getLine().getDirectoryEntry().getOwnerOrFirstSharer();
+//                                MESIState targetState = ownerOrFirstSharer.getCache().findLine(tag).getState();
+//                                System.out.println(targetState);
+//
+//                                getCache().sendRequest(ownerOrFirstSharer, 8, new Action() {
+//                                    @Override
+//                                    public void apply() {
+//                                        final L2UpwardReadFlow l2UpwardReadFlow = new L2UpwardReadFlow(L1DownwardReadFlow.this, ownerOrFirstSharer, getCache(), access, tag);
+//                                        l2UpwardReadFlow.start(
+//                                                new Action() {
+//                                                    @Override
+//                                                    public void apply() {
+//                                                        if (l2UpwardReadFlow.isCopyBack()) {
+//                                                            copyBack = true;
+////                                                          findAndLockProcess.getCacheAccess().getLine().setNonInitialState(MESIState.MODIFIED);
+//                                                        }
+//
+//                                                        reply(findAndLockFlow, onSuccessCallback);
+//                                                    }
+//                                                }
+//                                        );
+//                                    }
+//                                });
+//                            } else {
+//                                getCache().sendRequest(getCache().getNext(), 8, new Action() {
+//                                    @Override
+//                                    public void apply() {
+//                                        getCache().getNext().memReadRequestReceive(getCache(), tag, new Action() {
+//                                            @Override
+//                                            public void apply() {
+//                                                //                                    if (!findAndLockProcess.getCacheAccess().isHitInCache() && !findAndLockProcess.getCacheAccess().isBypass()) {
+//                                                //                                        findAndLockProcess.getCacheAccess().getLine().setNonInitialState(MESIState.EXCLUSIVE);
+//                                                //                                    }
+//
+//                                                reply(findAndLockFlow, onSuccessCallback);
+//                                            }
+//                                        });
+//                                    }
+//                                });
+//                            }
+//                        } else {
+//                            reply(findAndLockFlow, onSuccessCallback);
+//                        }
                     }
                 }, new Action() {
                     @Override
@@ -125,8 +178,8 @@ public class L1DownwardReadFlow extends LockingFlow {
     }
 
     private void reply(LastLevelCacheFindAndLockFlow findAndLockFlow, Action onSuccessCallback) {
-        getCache().getShadowTagDirectories().get(source).addTag(tag);
-        this.shared = getCache().isShared(tag);
+        findAndLockFlow.getCacheAccess().getLine().getDirectoryEntry().getSharers().add(source);
+        this.shared = findAndLockFlow.getCacheAccess().getLine().getDirectoryEntry().isShared();
 
         if (!findAndLockFlow.getCacheAccess().isHitInCache() && !findAndLockFlow.getCacheAccess().isBypass()) {
             if (copyBack) {

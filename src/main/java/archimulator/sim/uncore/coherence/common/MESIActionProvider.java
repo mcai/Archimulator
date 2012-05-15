@@ -18,17 +18,14 @@
  ******************************************************************************/
 package archimulator.sim.uncore.coherence.common;
 
-import archimulator.sim.uncore.cache.Cache;
+public interface MESIActionProvider {
+    void notifyDirectory();
 
-public class LastLevelCacheLine extends LockableCacheLine<LastLevelCacheLineState> {
-    private DirectoryEntry directoryEntry;
+    void ackToDirectory();
 
-    public LastLevelCacheLine(Cache<?, ?> cache, int set, int way, LastLevelCacheLineState initialState) {
-        super(cache, set, way, initialState);
-        this.directoryEntry = new DirectoryEntry();
-    }
+    void copyBackToDirectory();
 
-    public DirectoryEntry getDirectoryEntry() {
-        return directoryEntry;
-    }
+    void writeBackToDirectory();
+
+    void peerTransfer(String peer);
 }

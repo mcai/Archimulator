@@ -18,17 +18,44 @@
  ******************************************************************************/
 package archimulator.sim.uncore.coherence.common;
 
-import archimulator.sim.uncore.cache.Cache;
+import java.util.ArrayList;
+import java.util.List;
 
-public class LastLevelCacheLine extends LockableCacheLine<LastLevelCacheLineState> {
-    private DirectoryEntry directoryEntry;
+public class DirectoryEntry {
+    private boolean dirty;
+    private List<FirstLevelCache> sharers;
 
-    public LastLevelCacheLine(Cache<?, ?> cache, int set, int way, LastLevelCacheLineState initialState) {
-        super(cache, set, way, initialState);
-        this.directoryEntry = new DirectoryEntry();
+    public DirectoryEntry() {
+        this.dirty = false;
+        this.sharers = new ArrayList<FirstLevelCache>();
     }
 
-    public DirectoryEntry getDirectoryEntry() {
-        return directoryEntry;
+    public void reset() {
+        this.dirty = false;
+        this.sharers.clear();
+    }
+
+    public boolean isShared() {
+        return this.getSharers().size() > 1;
+    }
+
+    public boolean isOwned() {
+        return this.getSharers().size() == 1;
+    }
+
+    public boolean isOwnedOrShared() {
+        return this.getSharers().size() > 0;
+    }
+
+    public FirstLevelCache getOwnerOrFirstSharer() {
+        return this.getSharers().get(0);
+    }
+
+    public boolean isDirty() {
+        return dirty;
+    }
+
+    public List<FirstLevelCache> getSharers() {
+        return sharers;
     }
 }

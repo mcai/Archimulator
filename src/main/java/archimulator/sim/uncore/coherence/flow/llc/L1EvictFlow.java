@@ -56,7 +56,7 @@ public class L1EvictFlow extends LockingFlow {
                             findAndLockFlow.getCacheAccess().getLine().setNonInitialState(hasData ? LastLevelCacheLineState.DIRTY : LastLevelCacheLineState.CLEAN);
                         }
 
-                        getCache().getShadowTagDirectories().get(source).removeTag(tag);
+                        findAndLockFlow.getCacheAccess().getLine().getDirectoryEntry().getSharers().remove(source);
 
                         findAndLockFlow.getCacheAccess().commit().getLine().unlock();
 
