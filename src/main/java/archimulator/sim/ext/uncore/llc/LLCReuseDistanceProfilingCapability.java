@@ -52,7 +52,7 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
 
     private long numDownwardReads = 0;
     private long numDownwardWrites = 0;
-    private long numEvicts = 0;
+    private long numL1Evicts = 0;
 
     private String hotspotFunctionName = "HashLookup"; //TODO: should not be hardcoded!!!
 //    private String hotspotFunctionName = "push_thread_func"; //TODO: should not be hardcoded!!!
@@ -118,7 +118,7 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
                             numDownwardWrites++;
                             break;
                         case EVICT:
-                            numEvicts++;
+                            numL1Evicts++;
                             break;
                         default:
                             throw new IllegalArgumentException();
@@ -135,7 +135,7 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
 
                 numDownwardReads = 0;
                 numDownwardWrites = 0;
-                numEvicts = 0;
+                numL1Evicts = 0;
             }
         });
 
@@ -157,7 +157,7 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
     private void dumpStats(Map<String, Object> stats) {
         stats.put("llcReuseDistanceProfilingCapability." + this.llc.getName() + ".numDownwardReads", this.numDownwardReads);
         stats.put("llcReuseDistanceProfilingCapability." + this.llc.getName() + ".numDownwardWrites", this.numDownwardWrites);
-        stats.put("llcReuseDistanceProfilingCapability." + this.llc.getName() + ".numEvicts", this.numEvicts);
+        stats.put("llcReuseDistanceProfilingCapability." + this.llc.getName() + ".numL1Evicts", this.numL1Evicts);
 
         if (this.loadsInHotspotFunction != null) {
             for (int pc : this.loadsInHotspotFunction.keySet()) {

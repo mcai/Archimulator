@@ -19,6 +19,7 @@
 package archimulator.sim.uncore.dram;
 
 import archimulator.sim.base.event.DumpStatEvent;
+import archimulator.sim.base.event.PollStatsEvent;
 import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.uncore.CacheHierarchy;
 import archimulator.sim.uncore.MemoryDevice;
@@ -26,6 +27,8 @@ import archimulator.sim.uncore.coherence.common.LastLevelCache;
 import archimulator.sim.uncore.net.Net;
 import archimulator.util.action.Action;
 import archimulator.util.action.Action1;
+
+import java.util.Map;
 
 public abstract class MainMemory extends MemoryDevice {
     private long reads;
@@ -41,15 +44,25 @@ public abstract class MainMemory extends MemoryDevice {
             }
         });
 
+        this.getBlockingEventDispatcher().addListener(PollStatsEvent.class, new Action1<PollStatsEvent>() {
+            public void apply(PollStatsEvent event) {
+                dumpStats(event.getStats());
+            }
+        });
+
         this.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
             public void apply(DumpStatEvent event) {
                 if (event.getType() == DumpStatEvent.Type.DETAILED_SIMULATION) {
-                    event.getStats().put(getName() + ".accesses", String.valueOf(getAccesses()));
-                    event.getStats().put(getName() + ".reads", String.valueOf(reads));
-                    event.getStats().put(getName() + ".writes", String.valueOf(writes));
+                    dumpStats(event.getStats());
                 }
             }
         });
+    }
+
+    private void dumpStats(Map<String, Object> stats) {
+        stats.put(getName() + ".accesses", String.valueOf(getAccesses()));
+        stats.put(getName() + ".reads", String.valueOf(reads));
+        stats.put(getName() + ".writes", String.valueOf(writes));
     }
 
     @Override
