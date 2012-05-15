@@ -467,7 +467,7 @@ public class DynamicSpeculativePrecomputationCapability implements ProcessorCapa
         private void prepareRemoveSlice(Slice slice) {
             dlits.get(this.thread).removeDelinquentLoad(slice.delinquentLoad);
 
-            SliceCacheLine lineFound = sliceCache.findLine(slice.triggerPc);
+            SliceCacheLine lineFound = sliceCache.findLine(slice.triggerPc).getLine();
             assert (lineFound != null);
             lineFound.invalidate();
             lineFound.machInsts = null;
@@ -490,7 +490,7 @@ public class DynamicSpeculativePrecomputationCapability implements ProcessorCapa
         @Override
         @SuppressWarnings("unchecked")
         protected StaticInstruction decode(int pc) {
-            SliceCacheLine lineFound = sliceCache.findLine(this.triggerPc);
+            SliceCacheLine lineFound = sliceCache.findLine(this.triggerPc).getLine();
             assert (lineFound != null && lineFound.machInsts != null);
 
             if (lineFound.machInsts.containsKey(pc)) {

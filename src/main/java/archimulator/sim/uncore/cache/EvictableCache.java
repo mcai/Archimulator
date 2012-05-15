@@ -46,7 +46,7 @@ public class EvictableCache<StateT extends Serializable, LineT extends CacheLine
     }
 
     public CacheAccess<StateT, LineT> newAccess(CoherentCache coherentCache, MemoryHierarchyAccess access, int address, CacheAccessType accessType) {
-        LineT line = this.findLine(address);
+        LineT line = this.findLine(address).getLine();
 
         int set = this.getSet(address);
 

@@ -68,7 +68,7 @@ public class CacheBasedPredictor<PredictableT extends Comparable<PredictableT>> 
     }
 
     public PredictableT predict(int address, PredictableT defaultValue) {
-        PredictorLine lineFound = this.evictableCache.findLine(address);
+        PredictorLine lineFound = this.evictableCache.findLine(address).getLine();
         return lineFound != null && lineFound.confidence.isTaken() ? lineFound.predictedValue : defaultValue;
     }
 

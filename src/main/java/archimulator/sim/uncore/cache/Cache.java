@@ -124,17 +124,17 @@ public class Cache<StateT extends Serializable, LineT extends CacheLine<StateT>>
         return this.getLines(set).get(way);
     }
 
-    public LineT findLine(int address) {
+    public FindCacheLineResult<LineT> findLine(int address) {
         int tag = this.getTag(address);
         int set = this.getSet(address);
 
         for (LineT line : this.getLines(set)) {
             if (line.getTag() == tag && line.getState() != line.getInitialState()) {
-                return line;
+                return new FindCacheLineResult<LineT>(FindCacheLineResultType.CACHE_HIT, line);
             }
         }
 
-        return null;
+        return new FindCacheLineResult<LineT>(FindCacheLineResultType.CACHE_MISS, null);
     }
 
     public int getTag(int addr) {

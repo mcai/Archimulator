@@ -77,7 +77,6 @@ public class L2UpwardWriteFlow extends LockingFlow {
                     }
                 }
         );
-
     }
 
     public FirstLevelCache getCache() {

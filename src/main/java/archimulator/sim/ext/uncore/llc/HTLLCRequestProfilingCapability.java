@@ -297,7 +297,7 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
     }
 
     private CacheLine<HTLLCRequestVictimCacheLineState> findHTLLCRequestVictimLine(int tag) {
-        return this.htLLCRequestVictimCache.findLine(tag);
+        return this.htLLCRequestVictimCache.findLine(tag).getLine();
     }
 
     public BlockingEventDispatcher<HTLLCRequestProfilingCapabilityEvent> getEventDispatcher() {

@@ -20,10 +20,9 @@ package archimulator.sim.uncore.coherence.flow.llc;
 
 import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
-import archimulator.sim.uncore.coherence.common.FirstLevelCache;
-import archimulator.sim.uncore.coherence.common.LastLevelCache;
-import archimulator.sim.uncore.coherence.common.LastLevelCacheLineState;
-import archimulator.sim.uncore.coherence.common.MESIState;
+import archimulator.sim.uncore.cache.FindCacheLineResult;
+import archimulator.sim.uncore.cache.FindCacheLineResultType;
+import archimulator.sim.uncore.coherence.common.*;
 import archimulator.sim.uncore.coherence.flow.Flow;
 import archimulator.sim.uncore.coherence.flow.LockingFlow;
 import archimulator.sim.uncore.coherence.flow.flc.L2UpwardReadFlow;
@@ -60,30 +59,37 @@ public class L1DownwardReadFlow extends LockingFlow {
 
                             if (findAndLockFlow.getCacheAccess().getLine().getDirectoryEntry().isOwned()) {
                                 final FirstLevelCache ownerOrFirstSharer = findAndLockFlow.getCacheAccess().getLine().getDirectoryEntry().getOwnerOrFirstSharer();
-                                MESIState targetState = ownerOrFirstSharer.getCache().findLine(tag).getState();
-                                System.out.println(targetState);
+//                                if (ownerOrFirstSharer.getCache().findLine(findAndLockFlow.getCacheAccess().getReference().getTag()) == null) {
+//                                    throw new IllegalArgumentException(); //TODO: to be uncommented or ensured, temp workaround
+//                                }
 
-                                getCache().sendRequest(ownerOrFirstSharer, 8, new Action() {
-                                    @Override
-                                    public void apply() {
-                                        final L2UpwardReadFlow l2UpwardReadFlow = new L2UpwardReadFlow(L1DownwardReadFlow.this, ownerOrFirstSharer, getCache(), access, tag);
-                                        l2UpwardReadFlow.start(
-                                                new Action() {
-                                                    @Override
-                                                    public void apply() {
-                                                        if (l2UpwardReadFlow.isCopyBack()) {
-                                                            copyBack = true;
+                                FindCacheLineResult<FirstLevelCacheLine> findCacheLineResult = ownerOrFirstSharer.getCache().findLine(findAndLockFlow.getCacheAccess().getReference().getTag());
+                                if (findCacheLineResult.getType() == FindCacheLineResultType.CACHE_HIT && findCacheLineResult.getLine().getMesiFsm().getState() != MESIState.SHARED) {
+                                    getCache().sendRequest(ownerOrFirstSharer, 8, new Action() {
+                                        @Override
+                                        public void apply() {
+                                            final L2UpwardReadFlow l2UpwardReadFlow = new L2UpwardReadFlow(L1DownwardReadFlow.this, ownerOrFirstSharer, getCache(), access, tag);
+                                            l2UpwardReadFlow.start(
+                                                    new Action() {
+                                                        @Override
+                                                        public void apply() {
+                                                            if (l2UpwardReadFlow.isCopyBack()) {
+                                                                copyBack = true;
 //                                                          findAndLockProcess.getCacheAccess().getLine().setNonInitialState(MESIState.MODIFIED);
-                                                        }
+                                                            }
 
-                                                        if (pending.get() == 0) {
-                                                            reply(findAndLockFlow, onSuccessCallback);
+                                                            pending.set(pending.get() - 1);
+
+                                                            if (pending.get() == 0) {
+                                                                reply(findAndLockFlow, onSuccessCallback);
+                                                            }
                                                         }
                                                     }
-                                                }
-                                        );
-                                    }
-                                });
+                                            );
+                                        }
+                                    });
+                                    pending.set(pending.get() + 1);
+                                }
                             }
 
                             if (pending.get() == 0) {

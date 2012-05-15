@@ -20,10 +20,9 @@ package archimulator.sim.uncore.coherence.flow.llc;
 
 import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
-import archimulator.sim.uncore.coherence.common.FirstLevelCache;
-import archimulator.sim.uncore.coherence.common.LastLevelCache;
-import archimulator.sim.uncore.coherence.common.LastLevelCacheLine;
-import archimulator.sim.uncore.coherence.common.LastLevelCacheLineState;
+import archimulator.sim.uncore.cache.FindCacheLineResult;
+import archimulator.sim.uncore.cache.FindCacheLineResultType;
+import archimulator.sim.uncore.coherence.common.*;
 import archimulator.sim.uncore.coherence.event.LastLevelCacheLineEvictedByMemWriteProcessEvent;
 import archimulator.sim.uncore.coherence.flow.FindAndLockFlow;
 import archimulator.sim.uncore.coherence.flow.LockingFlow;
@@ -41,25 +40,32 @@ public class LastLevelCacheFindAndLockFlow extends FindAndLockFlow<LastLevelCach
         final Reference<Integer> pending = new Reference<Integer>(0);
 
         for (final FirstLevelCache sharer : getCacheAccess().getLine().getDirectoryEntry().getSharers()) {
-            getCache().sendRequest(sharer, 8, new Action() {
-                @Override
-                public void apply() {
-                    L2UpwardWriteFlow l2UpwardWriteFlow = new L2UpwardWriteFlow(LastLevelCacheFindAndLockFlow.this, sharer, getCache(), access, getCacheAccess().getReference().getTag());
-                    l2UpwardWriteFlow.start(
-                            new Action() {
-                                @Override
-                                public void apply() {
-                                    pending.set(pending.get() - 1);
+//            if(sharer.getCache().findLine(getCacheAccess().getReference().getTag()) == null) {
+//                throw new IllegalArgumentException(); //TODO: to be uncommented or ensured, temp workaround
+//            }
 
-                                    if (pending.get() == 0) {
-                                        doEvict(onSuccessCallback);
+            FindCacheLineResult<FirstLevelCacheLine> findCacheLineResult = sharer.getCache().findLine(getCacheAccess().getReference().getTag());
+            if(findCacheLineResult.getType() == FindCacheLineResultType.CACHE_HIT) {
+                getCache().sendRequest(sharer, 8, new Action() {
+                    @Override
+                    public void apply() {
+                        L2UpwardWriteFlow l2UpwardWriteFlow = new L2UpwardWriteFlow(LastLevelCacheFindAndLockFlow.this, sharer, getCache(), access, getCacheAccess().getReference().getTag());
+                        l2UpwardWriteFlow.start(
+                                new Action() {
+                                    @Override
+                                    public void apply() {
+                                        pending.set(pending.get() - 1);
+
+                                        if (pending.get() == 0) {
+                                            doEvict(onSuccessCallback);
+                                        }
                                     }
                                 }
-                            }
-                    );
-                }
-            });
-            pending.set(pending.get() + 1);
+                        );
+                    }
+                });
+                pending.set(pending.get() + 1);
+            }
         }
 
         if (pending.get() == 0) {

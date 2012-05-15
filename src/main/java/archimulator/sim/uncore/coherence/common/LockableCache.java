@@ -19,9 +19,7 @@
 package archimulator.sim.uncore.coherence.common;
 
 import archimulator.sim.base.simulation.SimulationObject;
-import archimulator.sim.uncore.cache.Cache;
-import archimulator.sim.uncore.cache.CacheGeometry;
-import archimulator.sim.uncore.cache.EvictableCache;
+import archimulator.sim.uncore.cache.*;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
 import archimulator.util.action.Function3;
 
@@ -33,19 +31,19 @@ public class LockableCache<StateT extends Serializable, LineT extends LockableCa
     }
 
     @Override
-    public LineT findLine(int address) {
+    public FindCacheLineResult<LineT> findLine(int address) {
         int tag = this.getTag(address);
         int set = this.getSet(address);
 
         for (int way = 0; way < this.getAssociativity(); way++) {
             LineT line = this.getLine(set, way);
             if (!line.isLocked() && line.getTag() == tag && line.getState() != line.getInitialState()) {
-                return line;
+                return new FindCacheLineResult<LineT>(FindCacheLineResultType.CACHE_HIT, line);
             } else if (line.isLocked() && line.getTransientTag() == tag) {
-                return line;
+                return new FindCacheLineResult<LineT>(FindCacheLineResultType.MSHR_HIT, line);
             }
         }
 
-        return null;
+        return new FindCacheLineResult<LineT>(FindCacheLineResultType.CACHE_MISS, null);
     }
 }
