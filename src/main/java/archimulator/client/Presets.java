@@ -43,8 +43,8 @@ public class Presets {
 //                "100");
 //                "200");
 //                "400");
-                "1024");
-//                "2000");
+//                "1024");
+                "2000");
 //                "4000");
         program.setHelperThreadedProgram(true);
         program.setHtLookahead(lookahead);

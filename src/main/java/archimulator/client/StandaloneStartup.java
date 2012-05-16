@@ -24,6 +24,7 @@ import archimulator.sim.base.experiment.profile.ProcessorProfile;
 import archimulator.sim.base.simulation.SimulatedProgram;
 import archimulator.sim.base.simulation.Simulation;
 import archimulator.sim.ext.uncore.cache.eviction.LLCHTAwareLRUPolicy;
+import archimulator.sim.uncore.cache.eviction.LRUPolicy;
 import archimulator.util.DateHelper;
 import archimulator.util.action.Action1;
 
@@ -43,9 +44,9 @@ public class StandaloneStartup {
 //        SimulatedProgram simulatedProgram = Presets.SIMULATED_PROGRAM_MST_HT(20, 10);
         SimulatedProgram simulatedProgram = Presets.SIMULATED_PROGRAM_MST_HT(640, 320);
 //        ProcessorProfile processorProfile = Presets.processor(1024 * 4, 8, 2, 2, "LRU", LRUPolicy.class);
-//        ProcessorProfile processorProfile = Presets.processor(1024 / 4, 8, 2, 2, "LRU", LRUPolicy.class); //256K L2
+        ProcessorProfile processorProfile = Presets.processor(1024 / 2, 8, 2, 2, "LRU", LRUPolicy.class); //256K L2
 //        ProcessorProfile processorProfile = Presets.processor(1024 / 4, 8, 2, 2, "LLCHTAwareLRU", LLCHTAwareLRUPolicy.class); //256K L2
-        ProcessorProfile processorProfile = Presets.processor(1024 * 2, 8, 2, 2, "LLCHTAwareLRU", LLCHTAwareLRUPolicy.class); //256K L2
+//        ProcessorProfile processorProfile = Presets.processor(1024 / 2, 8, 2, 2, "LLCHTAwareLRU", LLCHTAwareLRUPolicy.class); //256K L2
 //        final ExperimentProfile experimentProfile = Presets.baseline_lru(pthreadSpawnedIndex, maxInsts, processorProfile, simulatedProgram);
         final ExperimentProfile experimentProfile = Presets.ht_lru(pthreadSpawnedIndex, maxInsts, processorProfile, simulatedProgram);
 
