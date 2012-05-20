@@ -25,6 +25,7 @@ import archimulator.sim.uncore.CacheHierarchy;
 import archimulator.sim.uncore.MemoryDevice;
 import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.coherence.config.CoherentCacheConfig;
+import archimulator.sim.uncore.dram.MainMemory;
 import archimulator.util.action.Action1;
 
 import java.io.Serializable;
@@ -38,14 +39,14 @@ public abstract class CoherentCache<StateT extends Serializable, LineT extends L
 
     private Random random;
 
-    private long downwardReadHits;
-    private long downwardReadMisses;
-    private long downwardReadBypasses;
-    private long downwardWriteHits;
-    private long downwardWriteMisses;
-    private long downwardWriteBypasses;
+    private long numDownwardReadHits;
+    private long numDownwardReadMisses;
+    private long numDownwardReadBypasses;
+    private long numDownwardWriteHits;
+    private long numDownwardWriteMisses;
+    private long numDownwardWriteBypasses;
 
-    private long evictions;
+    private long numEvictions;
 
     public CoherentCache(CacheHierarchy cacheHierarchy, String name, CoherentCacheConfig config, LockableCache<StateT, LineT> cache) {
         super(cacheHierarchy, name);
@@ -56,20 +57,16 @@ public abstract class CoherentCache<StateT extends Serializable, LineT extends L
 
         this.random = new Random(13);
 
-        this.init();
-    }
-
-    private void init() {
         this.getBlockingEventDispatcher().addListener(ResetStatEvent.class, new Action1<ResetStatEvent>() {
             public void apply(ResetStatEvent event) {
-                downwardReadHits = 0;
-                downwardReadMisses = 0;
-                downwardReadBypasses = 0;
-                downwardWriteHits = 0;
-                downwardWriteMisses = 0;
-                downwardWriteBypasses = 0;
+                numDownwardReadHits = 0;
+                numDownwardReadMisses = 0;
+                numDownwardReadBypasses = 0;
+                numDownwardWriteHits = 0;
+                numDownwardWriteMisses = 0;
+                numDownwardWriteBypasses = 0;
 
-                evictions = 0;
+                numEvictions = 0;
             }
         });
 
@@ -77,54 +74,54 @@ public abstract class CoherentCache<StateT extends Serializable, LineT extends L
             public void apply(DumpStatEvent event) {
                 if (event.getType() == DumpStatEvent.Type.DETAILED_SIMULATION) {
                     event.getStats().put(CoherentCache.this.getName() + ".hitRatio", String.valueOf(getHitRatio()));
-                    event.getStats().put(CoherentCache.this.getName() + ".downwardAccesses", String.valueOf(getDownwardAccesses()));
-                    event.getStats().put(CoherentCache.this.getName() + ".downwardHits", String.valueOf(getDownwardHits()));
-                    event.getStats().put(CoherentCache.this.getName() + ".downwardMisses", String.valueOf(getDownwardMisses()));
-                    event.getStats().put(CoherentCache.this.getName() + ".downwardBypasses", String.valueOf(getDownwardBypasses()));
+                    event.getStats().put(CoherentCache.this.getName() + ".numDownwardAccesses", String.valueOf(getNumDownwardAccesses()));
+                    event.getStats().put(CoherentCache.this.getName() + ".numDownwardHits", String.valueOf(getNumDownwardHits()));
+                    event.getStats().put(CoherentCache.this.getName() + ".numDownwardMisses", String.valueOf(getNumDownwardMisses()));
+                    event.getStats().put(CoherentCache.this.getName() + ".numDownwardBypasses", String.valueOf(getNumDownwardBypasses()));
 
-                    event.getStats().put(CoherentCache.this.getName() + ".downwardReadHits", String.valueOf(downwardReadHits));
-                    event.getStats().put(CoherentCache.this.getName() + ".downwardReadMisses", String.valueOf(downwardReadMisses));
-                    event.getStats().put(CoherentCache.this.getName() + ".downwardReadBypasses", String.valueOf(downwardReadBypasses));
-                    event.getStats().put(CoherentCache.this.getName() + ".downwardWriteHits", String.valueOf(downwardWriteHits));
-                    event.getStats().put(CoherentCache.this.getName() + ".downwardWriteMisses", String.valueOf(downwardWriteMisses));
-                    event.getStats().put(CoherentCache.this.getName() + ".downwardWriteBypasses", String.valueOf(downwardWriteBypasses));
+                    event.getStats().put(CoherentCache.this.getName() + ".numDownwardReadHits", String.valueOf(numDownwardReadHits));
+                    event.getStats().put(CoherentCache.this.getName() + ".numDownwardReadMisses", String.valueOf(numDownwardReadMisses));
+                    event.getStats().put(CoherentCache.this.getName() + ".numDownwardReadBypasses", String.valueOf(numDownwardReadBypasses));
+                    event.getStats().put(CoherentCache.this.getName() + ".numDownwardWriteHits", String.valueOf(numDownwardWriteHits));
+                    event.getStats().put(CoherentCache.this.getName() + ".numDownwardWriteMisses", String.valueOf(numDownwardWriteMisses));
+                    event.getStats().put(CoherentCache.this.getName() + ".numDownwardWriteBypasses", String.valueOf(numDownwardWriteBypasses));
 
-                    event.getStats().put(CoherentCache.this.getName() + ".evictions", String.valueOf(evictions));
+                    event.getStats().put(CoherentCache.this.getName() + ".numEvictions", String.valueOf(numEvictions));
                 }
             }
         });
-    }
-
-    public void incEvictions() {
-        this.evictions++;
     }
 
     public void updateStats(CacheAccessType cacheAccessType, CacheAccess<?, ?> cacheAccess) {
         if (cacheAccessType.isRead()) {
             if (!cacheAccessType.isUpward()) {
                 if (cacheAccess.isHitInCache()) {
-                    downwardReadHits++;
+                    numDownwardReadHits++;
                 } else {
                     if (!cacheAccess.isBypass()) {
-                        downwardReadMisses++;
+                        numDownwardReadMisses++;
                     } else {
-                        downwardReadBypasses++;
+                        numDownwardReadBypasses++;
                     }
                 }
             }
         } else {
             if (!cacheAccessType.isUpward()) {
                 if (cacheAccess.isHitInCache()) {
-                    downwardWriteHits++;
+                    numDownwardWriteHits++;
                 } else {
                     if (!cacheAccess.isBypass()) {
-                        downwardWriteMisses++;
+                        numDownwardWriteMisses++;
                     } else {
-                        downwardWriteBypasses++;
+                        numDownwardWriteBypasses++;
                     }
                 }
             }
         }
+    }
+
+    public void incNumEvictions() {
+        this.numEvictions++;
     }
 
     public int getRetryLatency() {
@@ -145,27 +142,27 @@ public abstract class CoherentCache<StateT extends Serializable, LineT extends L
     }
 
     private double getHitRatio() {
-        return getDownwardAccesses() > 0 ? (double) getDownwardHits() / (getDownwardAccesses()) : 0.0;
+        return getNumDownwardAccesses() > 0 ? (double) getNumDownwardHits() / (getNumDownwardAccesses()) : 0.0;
     }
 
-    private long getDownwardHits() {
-        return downwardReadHits + downwardWriteHits;
+    private long getNumDownwardHits() {
+        return numDownwardReadHits + numDownwardWriteHits;
     }
 
-    private long getDownwardMisses() {
-        return downwardReadMisses + downwardWriteMisses;
+    private long getNumDownwardMisses() {
+        return numDownwardReadMisses + numDownwardWriteMisses;
     }
 
-    private long getDownwardBypasses() {
-        return downwardReadBypasses + downwardWriteBypasses;
+    private long getNumDownwardBypasses() {
+        return numDownwardReadBypasses + numDownwardWriteBypasses;
     }
 
-    private long getDownwardAccesses() {
-        return getDownwardHits() + getDownwardMisses() + getDownwardBypasses();
+    private long getNumDownwardAccesses() {
+        return getNumDownwardHits() + getNumDownwardMisses() + getNumDownwardBypasses();
     }
 
     public boolean isLastLevelCache() {
-        return this.config.getLevelType() == CoherentCacheLevelType.LAST_LEVEL_CACHE;
+        return this.next instanceof MainMemory;
     }
 
     public MemoryDevice getNext() {

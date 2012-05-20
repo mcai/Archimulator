@@ -20,23 +20,16 @@ package archimulator.sim.uncore.coherence.config;
 
 import archimulator.sim.uncore.cache.CacheGeometry;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
-import archimulator.sim.uncore.coherence.common.CoherentCacheLevelType;
 
 public abstract class CoherentCacheConfig {
-    private CoherentCacheLevelType levelType;
     private CacheGeometry geometry;
     private int hitLatency;
     private Class<? extends EvictionPolicy> evictionPolicyClz;
 
-    public CoherentCacheConfig(CoherentCacheLevelType levelType, CacheGeometry geometry, int hitLatency, Class<? extends EvictionPolicy> evictionPolicyClz) {
-        this.levelType = levelType;
+    public CoherentCacheConfig(CacheGeometry geometry, int hitLatency, Class<? extends EvictionPolicy> evictionPolicyClz) {
         this.geometry = geometry;
         this.hitLatency = hitLatency;
         this.evictionPolicyClz = evictionPolicyClz;
-    }
-
-    public CoherentCacheLevelType getLevelType() {
-        return levelType;
     }
 
     public CacheGeometry getGeometry() {

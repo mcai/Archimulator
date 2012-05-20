@@ -20,28 +20,27 @@ package archimulator.sim.uncore.coherence.config;
 
 import archimulator.sim.uncore.cache.CacheGeometry;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
-import archimulator.sim.uncore.coherence.common.CoherentCacheLevelType;
 
 public class FirstLevelCacheConfig extends CoherentCacheConfig {
-    private int readPorts; //TODO: to be clarified, should not be confused with MSHRs
-    private int writePorts; //TODO: to be clarified, should not be confused with MSHRs
+    private int numReadPorts; //TODO: to be clarified, should not be confused with MSHRs
+    private int numWritePorts; //TODO: to be clarified, should not be confused with MSHRs
 
     public FirstLevelCacheConfig(int size, int associativity, Class<? extends EvictionPolicy> evictionPolicyClz) {
-//        this(CoherentCacheLevelType.FIRST_LEVEL_CACHE, new CacheGeometry(size, associativity, 64), 1, 2, 1, evictionPolicyClz);
-        this(CoherentCacheLevelType.FIRST_LEVEL_CACHE, new CacheGeometry(size, associativity, 64), 1, 128, 128, evictionPolicyClz); //TODO: should simulate MSHRs in all levels of cache explicitly
+//        this(new CacheGeometry(size, associativity, 64), 1, 2, 1, evictionPolicyClz);
+        this(new CacheGeometry(size, associativity, 64), 1, 128, 128, evictionPolicyClz); //TODO: should simulate MSHRs in all levels of cache explicitly
     }
 
-    public FirstLevelCacheConfig(CoherentCacheLevelType levelType, CacheGeometry geometry, int hitLatency, int readPorts, int writePorts, Class<? extends EvictionPolicy> evictionPolicyClz) {
-        super(levelType, geometry, hitLatency, evictionPolicyClz);
-        this.readPorts = readPorts;
-        this.writePorts = writePorts;
+    public FirstLevelCacheConfig(CacheGeometry geometry, int hitLatency, int numReadPorts, int numWritePorts, Class<? extends EvictionPolicy> evictionPolicyClz) {
+        super(geometry, hitLatency, evictionPolicyClz);
+        this.numReadPorts = numReadPorts;
+        this.numWritePorts = numWritePorts;
     }
 
-    public int getReadPorts() {
-        return readPorts;
+    public int getNumReadPorts() {
+        return numReadPorts;
     }
 
-    public int getWritePorts() {
-        return writePorts;
+    public int getNumWritePorts() {
+        return numWritePorts;
     }
 }

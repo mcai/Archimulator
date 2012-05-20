@@ -41,8 +41,8 @@ public class FirstLevelCache extends CoherentCache<MESIState, FirstLevelCacheLin
     private List<MemoryHierarchyAccess> pendingAccesses;
     private EnumMap<MemoryHierarchyAccessType, Integer> pendingAccessesPerType;
 
-    private long upwardReads;
-    private long upwardWrites;
+    private long numUpwardReads;
+    private long numUpwardWrites;
 
     public FirstLevelCache(CacheHierarchy cacheHierarchy, String name, CoherentCacheConfig config) {
         super(cacheHierarchy, name, config, new LockableCache<MESIState, FirstLevelCacheLine>(cacheHierarchy, name, config.getGeometry(), config.getEvictionPolicyClz(), new Function3<Cache<?, ?>, Integer, Integer, FirstLevelCacheLine>() {
@@ -64,16 +64,16 @@ public class FirstLevelCache extends CoherentCache<MESIState, FirstLevelCacheLin
 
         this.getBlockingEventDispatcher().addListener(ResetStatEvent.class, new Action1<ResetStatEvent>() {
             public void apply(ResetStatEvent event) {
-                upwardReads = 0;
-                upwardWrites = 0;
+                numUpwardReads = 0;
+                numUpwardWrites = 0;
             }
         });
 
         this.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
             public void apply(DumpStatEvent event) {
                 if (event.getType() == DumpStatEvent.Type.DETAILED_SIMULATION) {
-                    event.getStats().put(FirstLevelCache.this.getName() + ".upwardReads", String.valueOf(upwardReads));
-                    event.getStats().put(FirstLevelCache.this.getName() + ".upwardWrites", String.valueOf(upwardWrites));
+                    event.getStats().put(FirstLevelCache.this.getName() + ".numUpwardReads", String.valueOf(numUpwardReads));
+                    event.getStats().put(FirstLevelCache.this.getName() + ".numUpwardWrites", String.valueOf(numUpwardWrites));
                 }
             }
         });
@@ -85,11 +85,11 @@ public class FirstLevelCache extends CoherentCache<MESIState, FirstLevelCacheLin
 
         if (cacheAccessType.isRead()) {
             if (cacheAccessType.isUpward()) {
-                upwardReads++;
+                numUpwardReads++;
             }
         } else {
             if (cacheAccessType.isUpward()) {
-                upwardWrites++;
+                numUpwardWrites++;
             }
         }
     }
@@ -192,10 +192,10 @@ public class FirstLevelCache extends CoherentCache<MESIState, FirstLevelCacheLin
     }
 
     private int getReadPorts() {
-        return ((FirstLevelCacheConfig) getConfig()).getReadPorts();
+        return ((FirstLevelCacheConfig) getConfig()).getNumReadPorts();
     }
 
     private int getWritePorts() {
-        return ((FirstLevelCacheConfig) getConfig()).getWritePorts();
+        return ((FirstLevelCacheConfig) getConfig()).getNumWritePorts();
     }
 }

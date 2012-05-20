@@ -70,7 +70,7 @@ public abstract class FindAndLockFlow<StateT extends Serializable, LineT extends
                         onDestroy();
                         break;
                     case EVICTING:
-                        getCache().incEvictions();
+                        getCache().incNumEvictions();
                         break;
                     case LOCKED:
                         if(!cacheAccess.isBypass()) {
