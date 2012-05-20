@@ -16,11 +16,8 @@ inline void push_thread_func()
     Vertex volatile tmp;
     HashEntry volatile ent;
 
-    int lookahead = 0;
-    int stride = 0;
-
-    lookahead = LOOKAHEAD;
-    stride = STRIDE;
+    int lookahead = LOOKAHEAD;
+    int stride = STRIDE;
 
     while(1)
     {
