@@ -100,10 +100,6 @@ public abstract class MainMemory extends MemoryDevice {
 
     protected abstract void access(int addr, Action onCompletedCallback);
 
-    public void dumpState() {
-        //TODO
-    }
-
     private long getAccesses() {
         return this.reads + this.writes;
     }

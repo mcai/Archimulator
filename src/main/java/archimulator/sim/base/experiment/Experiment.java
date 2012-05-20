@@ -124,8 +124,6 @@ public abstract class Experiment {
 
         this.blockingEventDispatcher.dispatch(new Simulation.PollStatsCompletedEvent(polledStats));
 
-        this.simulation.getProcessor().getCacheHierarchy().dumpState();
-
         Logger.info(Logger.SIMULATION, "------ END DUMP STATE ------\n", this.cycleAccurateEventQueue.getCurrentCycle());
     }
 

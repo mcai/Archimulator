@@ -20,24 +20,18 @@ package archimulator.sim.uncore.coherence.common;
 
 import archimulator.sim.base.event.DumpStatEvent;
 import archimulator.sim.base.event.ResetStatEvent;
-import archimulator.sim.base.simulation.Logger;
 import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.CacheHierarchy;
 import archimulator.sim.uncore.MemoryDevice;
 import archimulator.sim.uncore.cache.CacheAccess;
-import archimulator.sim.uncore.coherence.action.PendingActionOwner;
 import archimulator.sim.uncore.coherence.config.CoherentCacheConfig;
 import archimulator.util.action.Action1;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 public abstract class CoherentCache<StateT extends Serializable, LineT extends LockableCacheLine<StateT>> extends MemoryDevice {
     private MemoryDevice next;
-
-    private List<PendingActionOwner> pendingProcesses;
 
     private CoherentCacheConfig config;
     private LockableCache<StateT, LineT> cache;
@@ -66,8 +60,6 @@ public abstract class CoherentCache<StateT extends Serializable, LineT extends L
     }
 
     private void init() {
-        this.pendingProcesses = new ArrayList<PendingActionOwner>();
-
         this.getBlockingEventDispatcher().addListener(ResetStatEvent.class, new Action1<ResetStatEvent>() {
             public void apply(ResetStatEvent event) {
                 downwardReadHits = 0;
@@ -131,15 +123,6 @@ public abstract class CoherentCache<StateT extends Serializable, LineT extends L
                         downwardWriteBypasses++;
                     }
                 }
-            }
-        }
-    }
-
-    public void dumpState() {
-        if (!this.pendingProcesses.isEmpty()) {
-            Logger.infof(Logger.COHRENCE, this.getName() + ":", this.getCycleAccurateEventQueue().getCurrentCycle());
-            for (PendingActionOwner pendingProcess : this.pendingProcesses) {
-                Logger.infof(Logger.COHRENCE, "\t%s\n", this.getCycleAccurateEventQueue().getCurrentCycle(), pendingProcess);
             }
         }
     }

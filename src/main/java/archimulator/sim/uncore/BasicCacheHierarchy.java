@@ -92,20 +92,6 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
         this.l2ToMemNetwork = new L2ToMemNet(this);
     }
 
-    public void dumpState() {
-        for (FirstLevelCache cache : this.instructionCaches) {
-            cache.dumpState();
-        }
-
-        for (FirstLevelCache cache : this.dataCaches) {
-            cache.dumpState();
-        }
-
-        this.l2Cache.dumpState();
-
-        this.mainMemory.dumpState();
-    }
-
     public MainMemory getMainMemory() {
         return mainMemory;
     }

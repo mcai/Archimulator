@@ -29,8 +29,6 @@ import archimulator.sim.uncore.tlb.TranslationLookasideBuffer;
 import java.util.List;
 
 public interface CacheHierarchy extends SimulationObject {
-    void dumpState();
-
     MainMemory getMainMemory();
 
     LastLevelCache getL2Cache();
