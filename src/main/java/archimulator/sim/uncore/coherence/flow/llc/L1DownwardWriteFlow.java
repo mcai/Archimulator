@@ -28,8 +28,8 @@ import archimulator.sim.uncore.coherence.common.LastLevelCache;
 import archimulator.sim.uncore.coherence.common.LastLevelCacheLineState;
 import archimulator.sim.uncore.coherence.flow.Flow;
 import archimulator.sim.uncore.coherence.flow.flc.L2UpwardWriteFlow;
-import archimulator.util.Reference;
-import archimulator.util.action.Action;
+import net.pickapack.Reference;
+import net.pickapack.action.Action;
 
 public class L1DownwardWriteFlow extends Flow {
     private LastLevelCache cache;

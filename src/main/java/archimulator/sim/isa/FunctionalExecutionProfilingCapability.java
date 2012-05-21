@@ -22,7 +22,7 @@ import archimulator.sim.base.event.DumpStatEvent;
 import archimulator.sim.base.event.PollStatsEvent;
 import archimulator.sim.base.experiment.capability.KernelCapability;
 import archimulator.sim.os.Kernel;
-import archimulator.util.action.Action1;
+import net.pickapack.action.Action1;
 
 import java.util.EnumSet;
 import java.util.HashSet;

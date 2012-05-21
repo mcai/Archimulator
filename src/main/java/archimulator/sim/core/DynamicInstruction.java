@@ -21,7 +21,7 @@ package archimulator.sim.core;
 import archimulator.sim.base.simulation.Simulation;
 import archimulator.sim.isa.StaticInstruction;
 import archimulator.sim.isa.StaticInstructionType;
-import archimulator.util.StringHelper;
+import net.pickapack.StringHelper;
 
 public class DynamicInstruction {
     private long id;

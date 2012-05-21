@@ -23,7 +23,7 @@ import archimulator.sim.ext.uncore.cache.prediction.CacheBasedPredictor;
 import archimulator.sim.ext.uncore.cache.prediction.Predictor;
 import archimulator.sim.uncore.cache.*;
 import archimulator.sim.uncore.cache.eviction.LRUPolicy;
-import archimulator.util.action.Function3;
+import net.pickapack.action.Function3;
 
 import java.io.Serializable;
 

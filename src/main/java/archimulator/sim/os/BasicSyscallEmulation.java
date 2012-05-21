@@ -22,8 +22,8 @@ import archimulator.sim.base.simulation.Logger;
 import archimulator.sim.isa.ArchitecturalRegisterFile;
 import archimulator.sim.os.event.*;
 import archimulator.sim.os.signal.SignalMask;
-import archimulator.util.action.Predicate;
-import archimulator.util.io.buffer.CircularByteBuffer;
+import net.pickapack.action.Predicate;
+import net.pickapack.io.buffer.CircularByteBuffer;
 import org.jruby.ext.posix.FileStat;
 
 import java.io.FileDescriptor;

@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.os;
 
-import archimulator.util.event.BlockingEvent;
+import net.pickapack.event.BlockingEvent;
 
 public class ContextKilledEvent implements BlockingEvent {
     private Context context;

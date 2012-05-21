@@ -27,7 +27,7 @@ import archimulator.sim.base.experiment.capability.ProcessorCapability;
 import archimulator.sim.base.experiment.capability.SimulationCapability;
 import archimulator.sim.base.simulation.ContextConfig;
 import archimulator.sim.base.simulation.SimulatedProgram;
-import archimulator.util.DateHelper;
+import net.pickapack.DateHelper;
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;

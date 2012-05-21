@@ -18,8 +18,8 @@
  ******************************************************************************/
 package archimulator.sim.core.bpred2;
 
-import archimulator.util.action.Action1;
-import archimulator.util.math.Counter;
+import net.pickapack.action.Action1;
+import net.pickapack.math.Counter;
 
 public class BranchPredictorTest {
     public static void main(String[] args) {

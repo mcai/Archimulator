@@ -22,8 +22,8 @@ import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.cache.*;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
 import archimulator.sim.uncore.cache.eviction.LRUPolicy;
-import archimulator.util.action.Function3;
-import archimulator.util.math.SaturatingCounter;
+import net.pickapack.action.Function3;
+import net.pickapack.math.SaturatingCounter;
 
 public class CacheBasedPredictor<PredictableT extends Comparable<PredictableT>> implements Predictor<PredictableT> {
     private EvictableCache<Boolean, PredictorLine> evictableCache;

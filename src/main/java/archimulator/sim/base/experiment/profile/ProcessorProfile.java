@@ -19,8 +19,8 @@
 package archimulator.sim.base.experiment.profile;
 
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
-import archimulator.util.DateHelper;
-import archimulator.util.StorageUnit;
+import net.pickapack.DateHelper;
+import net.pickapack.StorageUnit;
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;

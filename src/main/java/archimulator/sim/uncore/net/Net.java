@@ -21,7 +21,7 @@ package archimulator.sim.uncore.net;
 import archimulator.sim.base.simulation.BasicSimulationObject;
 import archimulator.sim.uncore.CacheHierarchy;
 import archimulator.sim.uncore.MemoryDevice;
-import archimulator.util.action.Action;
+import net.pickapack.action.Action;
 
 import java.util.ArrayList;
 import java.util.HashMap;

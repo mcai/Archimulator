@@ -18,8 +18,8 @@
  ******************************************************************************/
 package archimulator.sim.core.bpred2;
 
-import archimulator.util.io.trace.TraceTester;
-import archimulator.util.math.MathHelper;
+import net.pickapack.io.trace.TraceTester;
+import net.pickapack.math.MathHelper;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

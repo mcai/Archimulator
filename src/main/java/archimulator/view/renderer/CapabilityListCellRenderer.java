@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.view.renderer;
 
-import archimulator.util.Pair;
+import net.pickapack.Pair;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zul.Checkbox;

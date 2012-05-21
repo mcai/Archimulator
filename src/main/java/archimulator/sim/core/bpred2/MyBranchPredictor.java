@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.core.bpred2;
 
-import archimulator.util.math.SaturatingCounter;
+import net.pickapack.math.SaturatingCounter;
 
 import java.util.ArrayList;
 import java.util.List;

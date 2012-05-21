@@ -24,7 +24,7 @@ import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.ext.uncore.cache.eviction.rd.AbstractRDPredictionEvictionPolicy;
 import archimulator.sim.uncore.cache.*;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
-import archimulator.util.action.Action1;
+import net.pickapack.action.Action1;
 
 import java.io.Serializable;
 import java.util.Map;

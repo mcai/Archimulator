@@ -19,7 +19,7 @@
 package archimulator.sim.uncore.coherence.event;
 
 import archimulator.sim.uncore.coherence.common.CoherentCache;
-import archimulator.util.event.BlockingEvent;
+import net.pickapack.event.BlockingEvent;
 
 public abstract class CoherentCacheEvent implements BlockingEvent {
     private CoherentCache cache;

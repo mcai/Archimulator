@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.view.renderer;
 
-import archimulator.util.Pair;
+import net.pickapack.Pair;
 import org.zkoss.zul.Listcell;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.ListitemRenderer;

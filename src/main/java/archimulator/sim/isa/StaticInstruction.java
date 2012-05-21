@@ -23,7 +23,7 @@ import archimulator.sim.base.simulation.Logger;
 import archimulator.sim.core.FunctionalUnitOperationType;
 import archimulator.sim.os.Context;
 import archimulator.sim.os.FunctionCallContext;
-import archimulator.util.math.MathHelper;
+import net.pickapack.math.MathHelper;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

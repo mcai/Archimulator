@@ -30,9 +30,9 @@ import archimulator.sim.isa.StaticInstructionType;
 import archimulator.sim.os.ContextState;
 import archimulator.sim.uncore.MemoryHierarchyThread;
 import archimulator.sim.uncore.coherence.flow.Flow;
-import archimulator.util.Reference;
-import archimulator.util.action.Action;
-import archimulator.util.action.Action1;
+import net.pickapack.Reference;
+import net.pickapack.action.Action;
+import net.pickapack.action.Action1;
 
 import java.lang.*;
 import java.util.*;

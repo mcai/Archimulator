@@ -21,8 +21,8 @@ package archimulator.sim.ext.uncore.cache.eviction.rd;
 import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.cache.*;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
-import archimulator.util.action.Function3;
-import archimulator.util.math.Quantizer;
+import net.pickapack.action.Function3;
+import net.pickapack.math.Quantizer;
 
 import java.io.Serializable;
 

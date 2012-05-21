@@ -27,9 +27,9 @@ import archimulator.sim.uncore.net.L1sToL2Net;
 import archimulator.sim.uncore.net.L2ToMemNet;
 import archimulator.sim.uncore.net.Net;
 import archimulator.sim.uncore.tlb.TranslationLookasideBuffer;
-import archimulator.util.event.BlockingEvent;
-import archimulator.util.event.BlockingEventDispatcher;
-import archimulator.util.event.CycleAccurateEventQueue;
+import net.pickapack.event.BlockingEvent;
+import net.pickapack.event.BlockingEventDispatcher;
+import net.pickapack.event.CycleAccurateEventQueue;
 
 import java.util.ArrayList;
 import java.util.List;

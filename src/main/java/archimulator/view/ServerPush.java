@@ -1,6 +1,6 @@
 package archimulator.view;
 
-import archimulator.util.action.Action1;
+import net.pickapack.action.Action1;
 import org.zkoss.lang.Threads;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Desktop;

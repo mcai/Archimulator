@@ -36,8 +36,8 @@ import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.MemoryHierarchyAccessType;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.coherence.event.CoherentCacheServiceNonblockingRequestEvent;
-import archimulator.util.Reference;
-import archimulator.util.action.Action1;
+import net.pickapack.Reference;
+import net.pickapack.action.Action1;
 
 import java.util.*;
 

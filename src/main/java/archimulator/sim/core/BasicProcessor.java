@@ -27,10 +27,10 @@ import archimulator.sim.os.ContextKilledEvent;
 import archimulator.sim.os.ContextState;
 import archimulator.sim.os.Kernel;
 import archimulator.sim.uncore.CacheHierarchy;
-import archimulator.util.action.Action1;
-import archimulator.util.event.BlockingEvent;
-import archimulator.util.event.BlockingEventDispatcher;
-import archimulator.util.event.CycleAccurateEventQueue;
+import net.pickapack.action.Action1;
+import net.pickapack.event.BlockingEvent;
+import net.pickapack.event.BlockingEventDispatcher;
+import net.pickapack.event.CycleAccurateEventQueue;
 
 import java.util.*;
 

@@ -20,8 +20,8 @@ package archimulator.sim.core;
 
 import archimulator.sim.base.event.DumpStatEvent;
 import archimulator.sim.base.event.ResetStatEvent;
-import archimulator.util.action.Action;
-import archimulator.util.action.Action1;
+import net.pickapack.action.Action;
+import net.pickapack.action.Action1;
 
 import java.util.EnumMap;
 import java.util.EnumSet;

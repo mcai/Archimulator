@@ -27,7 +27,7 @@ import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.cache.CacheMiss;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.eviction.LRUPolicy;
-import archimulator.util.action.Action1;
+import net.pickapack.action.Action1;
 
 import java.io.Serializable;
 

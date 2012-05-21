@@ -20,7 +20,7 @@ package archimulator.sim.core;
 
 import archimulator.sim.uncore.MemoryHierarchyCore;
 import archimulator.sim.uncore.coherence.common.FirstLevelCache;
-import archimulator.util.action.Action;
+import net.pickapack.action.Action;
 
 import java.util.List;
 

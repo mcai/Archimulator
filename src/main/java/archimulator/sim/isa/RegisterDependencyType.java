@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.isa;
 
-import archimulator.util.Pair;
+import net.pickapack.Pair;
 
 public enum RegisterDependencyType {
     INTEGER, FLOAT, MISC;

@@ -20,7 +20,7 @@ package archimulator.sim.os.event;
 
 import archimulator.sim.os.Context;
 import archimulator.sim.os.ContextKilledEvent;
-import archimulator.util.action.Action1;
+import net.pickapack.action.Action1;
 
 public class WaitPidCriterion implements SystemEventCriterion {
     private int pid;

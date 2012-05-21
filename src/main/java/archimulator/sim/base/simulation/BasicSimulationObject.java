@@ -18,9 +18,9 @@
  ******************************************************************************/
 package archimulator.sim.base.simulation;
 
-import archimulator.util.event.BlockingEvent;
-import archimulator.util.event.BlockingEventDispatcher;
-import archimulator.util.event.CycleAccurateEventQueue;
+import net.pickapack.event.BlockingEvent;
+import net.pickapack.event.BlockingEventDispatcher;
+import net.pickapack.event.CycleAccurateEventQueue;
 
 public class BasicSimulationObject implements SimulationObject {
     private BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher;

@@ -20,7 +20,7 @@ package archimulator.sim.core.bpred;
 
 import archimulator.sim.core.Thread;
 import archimulator.sim.isa.Mnemonic;
-import archimulator.util.Reference;
+import net.pickapack.Reference;
 
 public class PerfectBranchPredictor extends BranchPredictor {
     public PerfectBranchPredictor(Thread thread, String name) {

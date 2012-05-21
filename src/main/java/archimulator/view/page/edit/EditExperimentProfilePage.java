@@ -30,7 +30,7 @@ import archimulator.sim.base.experiment.profile.ExperimentProfileType;
 import archimulator.sim.base.experiment.profile.ProcessorProfile;
 import archimulator.sim.base.simulation.ContextConfig;
 import archimulator.sim.base.simulation.SimulatedProgram;
-import archimulator.util.Pair;
+import net.pickapack.Pair;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;

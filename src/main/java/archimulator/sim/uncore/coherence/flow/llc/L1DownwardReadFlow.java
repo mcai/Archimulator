@@ -25,8 +25,8 @@ import archimulator.sim.uncore.cache.FindCacheLineResultType;
 import archimulator.sim.uncore.coherence.common.*;
 import archimulator.sim.uncore.coherence.flow.Flow;
 import archimulator.sim.uncore.coherence.flow.flc.L2UpwardReadFlow;
-import archimulator.util.Reference;
-import archimulator.util.action.Action;
+import net.pickapack.Reference;
+import net.pickapack.action.Action;
 
 public class L1DownwardReadFlow extends Flow {
     private LastLevelCache cache;

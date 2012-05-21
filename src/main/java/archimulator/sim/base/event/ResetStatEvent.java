@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.base.event;
 
-import archimulator.util.event.BlockingEvent;
+import net.pickapack.event.BlockingEvent;
 
 public class ResetStatEvent implements BlockingEvent {
     public ResetStatEvent() {

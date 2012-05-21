@@ -24,7 +24,7 @@ import archimulator.sim.uncore.coherence.common.FirstLevelCache;
 import archimulator.sim.uncore.coherence.common.MESICondition;
 import archimulator.sim.uncore.coherence.flow.Flow;
 import archimulator.sim.uncore.coherence.flow.llc.L1DownwardReadFlow;
-import archimulator.util.action.Action;
+import net.pickapack.action.Action;
 
 public class LoadFlow extends Flow {
     private FirstLevelCache cache;

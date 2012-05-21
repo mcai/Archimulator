@@ -22,8 +22,8 @@ import archimulator.sim.base.event.DumpStatEvent;
 import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.core.Thread;
 import archimulator.sim.isa.Mnemonic;
-import archimulator.util.Reference;
-import archimulator.util.action.Action1;
+import net.pickapack.Reference;
+import net.pickapack.action.Action1;
 
 public abstract class BranchPredictor {
     private String name;

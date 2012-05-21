@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache;
 
-import archimulator.util.action.Function3;
+import net.pickapack.action.Function3;
 
 import java.io.Serializable;
 import java.util.ArrayList;

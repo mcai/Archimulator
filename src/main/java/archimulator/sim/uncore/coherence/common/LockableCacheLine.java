@@ -21,7 +21,7 @@ package archimulator.sim.uncore.coherence.common;
 import archimulator.sim.uncore.cache.Cache;
 import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.coherence.flow.Flow;
-import archimulator.util.action.Action;
+import net.pickapack.action.Action;
 
 import java.io.Serializable;
 import java.util.ArrayList;

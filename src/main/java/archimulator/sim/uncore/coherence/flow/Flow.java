@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore.coherence.flow;
 
-import archimulator.util.tree.Node;
+import net.pickapack.tree.Node;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

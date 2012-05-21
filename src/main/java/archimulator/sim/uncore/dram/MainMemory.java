@@ -25,8 +25,8 @@ import archimulator.sim.uncore.CacheHierarchy;
 import archimulator.sim.uncore.MemoryDevice;
 import archimulator.sim.uncore.coherence.common.LastLevelCache;
 import archimulator.sim.uncore.net.Net;
-import archimulator.util.action.Action;
-import archimulator.util.action.Action1;
+import net.pickapack.action.Action;
+import net.pickapack.action.Action1;
 
 import java.util.Map;
 

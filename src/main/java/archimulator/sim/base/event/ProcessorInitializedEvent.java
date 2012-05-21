@@ -19,7 +19,7 @@
 package archimulator.sim.base.event;
 
 import archimulator.sim.core.Processor;
-import archimulator.util.event.BlockingEvent;
+import net.pickapack.event.BlockingEvent;
 
 public class ProcessorInitializedEvent implements BlockingEvent {
     private Processor processor;

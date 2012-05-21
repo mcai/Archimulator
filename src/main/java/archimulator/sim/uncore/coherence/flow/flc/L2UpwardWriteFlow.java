@@ -25,7 +25,7 @@ import archimulator.sim.uncore.cache.FindCacheLineResultType;
 import archimulator.sim.uncore.coherence.common.*;
 import archimulator.sim.uncore.coherence.event.FirstLevelCacheLineEvictedByL2UpwardWriteProcessEvent;
 import archimulator.sim.uncore.coherence.flow.Flow;
-import archimulator.util.action.Action;
+import net.pickapack.action.Action;
 
 public class L2UpwardWriteFlow extends Flow {
     private FirstLevelCache cache;

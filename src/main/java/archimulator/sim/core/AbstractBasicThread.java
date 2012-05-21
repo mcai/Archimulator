@@ -28,7 +28,7 @@ import archimulator.sim.os.Context;
 import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.coherence.event.CoherentCacheBeginCacheAccessEvent;
 import archimulator.sim.uncore.tlb.TranslationLookasideBuffer;
-import archimulator.util.action.Action1;
+import net.pickapack.action.Action1;
 
 public abstract class AbstractBasicThread extends BasicSimulationObject implements Thread {
     protected int num;

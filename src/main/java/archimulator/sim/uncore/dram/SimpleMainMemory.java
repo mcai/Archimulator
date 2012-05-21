@@ -19,7 +19,7 @@
 package archimulator.sim.uncore.dram;
 
 import archimulator.sim.uncore.CacheHierarchy;
-import archimulator.util.action.Action;
+import net.pickapack.action.Action;
 
 public class SimpleMainMemory extends MainMemory {
     private SimpleMainMemoryConfig config;

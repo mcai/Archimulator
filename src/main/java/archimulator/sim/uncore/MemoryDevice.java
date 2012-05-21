@@ -21,7 +21,7 @@ package archimulator.sim.uncore;
 import archimulator.sim.base.simulation.BasicSimulationObject;
 import archimulator.sim.base.simulation.SimulationObject;
 import archimulator.sim.uncore.net.Net;
-import archimulator.util.action.Action;
+import net.pickapack.action.Action;
 
 import java.io.Serializable;
 

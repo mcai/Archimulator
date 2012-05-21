@@ -21,8 +21,8 @@ package archimulator.sim.core.bpred;
 import archimulator.sim.core.Thread;
 import archimulator.sim.isa.Mnemonic;
 import archimulator.sim.isa.StaticInstructionType;
-import archimulator.util.Reference;
-import archimulator.util.math.SaturatingCounter;
+import net.pickapack.Reference;
+import net.pickapack.math.SaturatingCounter;
 
 public class TwoLevelBranchPredictor extends DynamicBranchPredictor {
     private int l1Size;

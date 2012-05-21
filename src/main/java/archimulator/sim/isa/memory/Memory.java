@@ -23,7 +23,7 @@ import archimulator.sim.base.simulation.BasicSimulationObject;
 import archimulator.sim.base.simulation.Simulation;
 import archimulator.sim.os.Kernel;
 import archimulator.sim.uncore.cache.CacheGeometry;
-import archimulator.util.action.Action1;
+import net.pickapack.action.Action1;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

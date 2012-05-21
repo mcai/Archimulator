@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.os;
 
-import archimulator.util.io.buffer.CircularByteBuffer;
+import net.pickapack.io.buffer.CircularByteBuffer;
 
 public class Pipe {
     private int[] fd;

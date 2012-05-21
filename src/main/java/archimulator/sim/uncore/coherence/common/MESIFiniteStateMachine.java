@@ -18,9 +18,9 @@
  ******************************************************************************/
 package archimulator.sim.uncore.coherence.common;
 
-import archimulator.util.action.Function1X;
-import archimulator.util.fsm.BasicFiniteStateMachine;
-import archimulator.util.fsm.FiniteStateMachineFactory;
+import net.pickapack.action.Function1X;
+import net.pickapack.fsm.BasicFiniteStateMachine;
+import net.pickapack.fsm.FiniteStateMachineFactory;
 
 public class MESIFiniteStateMachine extends BasicFiniteStateMachine<MESIState, MESICondition> {
     private FirstLevelCacheLine cacheLine;

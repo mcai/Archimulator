@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore.net;
 
-import archimulator.util.action.Action;
+import net.pickapack.action.Action;
 
 import java.util.ArrayList;
 import java.util.List;

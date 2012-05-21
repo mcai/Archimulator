@@ -22,8 +22,8 @@ import archimulator.sim.isa.BasicMipsInstructionExecutor;
 import archimulator.sim.isa.StaticInstructionType;
 import archimulator.sim.os.elf.ElfFile;
 import archimulator.sim.os.elf.Symbol;
-import archimulator.util.DateHelper;
-import archimulator.util.StringHelper;
+import net.pickapack.DateHelper;
+import net.pickapack.StringHelper;
 
 import java.io.IOException;
 import java.io.PrintWriter;

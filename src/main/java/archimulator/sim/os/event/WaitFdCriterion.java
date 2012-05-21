@@ -19,7 +19,7 @@
 package archimulator.sim.os.event;
 
 import archimulator.sim.os.Context;
-import archimulator.util.io.buffer.CircularByteBuffer;
+import net.pickapack.io.buffer.CircularByteBuffer;
 
 public class WaitFdCriterion implements SystemEventCriterion {
     private CircularByteBuffer buffer;

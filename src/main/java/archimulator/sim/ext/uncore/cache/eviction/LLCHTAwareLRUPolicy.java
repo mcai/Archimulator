@@ -28,7 +28,7 @@ import archimulator.sim.uncore.cache.CacheMiss;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.eviction.LRUPolicy;
 import archimulator.sim.uncore.coherence.event.CoherentCacheServiceNonblockingRequestEvent;
-import archimulator.util.action.Action1;
+import net.pickapack.action.Action1;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
 import java.io.Serializable;

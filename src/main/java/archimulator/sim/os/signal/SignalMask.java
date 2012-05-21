@@ -20,7 +20,7 @@ package archimulator.sim.os.signal;
 
 import archimulator.sim.isa.memory.Memory;
 import archimulator.sim.os.Kernel;
-import archimulator.util.math.MathHelper;
+import net.pickapack.math.MathHelper;
 
 public class SignalMask implements Cloneable {
     private int[] signals = new int[Kernel.MAX_SIGNAL / 32];

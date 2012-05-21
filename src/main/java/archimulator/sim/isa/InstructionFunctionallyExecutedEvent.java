@@ -19,7 +19,7 @@
 package archimulator.sim.isa;
 
 import archimulator.sim.os.Context;
-import archimulator.util.event.BlockingEvent;
+import net.pickapack.event.BlockingEvent;
 
 public class InstructionFunctionallyExecutedEvent implements BlockingEvent {
     private int pc;

@@ -24,7 +24,7 @@ import archimulator.sim.uncore.coherence.common.FirstLevelCache;
 import archimulator.sim.uncore.coherence.common.LastLevelCache;
 import archimulator.sim.uncore.coherence.common.LastLevelCacheLineState;
 import archimulator.sim.uncore.coherence.flow.Flow;
-import archimulator.util.action.Action;
+import net.pickapack.action.Action;
 
 public class L1EvictFlow extends Flow {
     private LastLevelCache cache;

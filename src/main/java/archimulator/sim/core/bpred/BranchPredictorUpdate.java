@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.core.bpred;
 
-import archimulator.util.math.SaturatingCounter;
+import net.pickapack.math.SaturatingCounter;
 
 public class BranchPredictorUpdate {
     private SaturatingCounter counterDir1;

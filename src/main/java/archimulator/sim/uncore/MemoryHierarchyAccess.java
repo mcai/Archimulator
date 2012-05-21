@@ -20,7 +20,7 @@ package archimulator.sim.uncore;
 
 import archimulator.sim.base.simulation.Simulation;
 import archimulator.sim.core.DynamicInstruction;
-import archimulator.util.action.Action;
+import net.pickapack.action.Action;
 
 import java.util.ArrayList;
 import java.util.List;

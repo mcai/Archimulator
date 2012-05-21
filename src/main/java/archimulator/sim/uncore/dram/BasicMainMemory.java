@@ -19,8 +19,8 @@
 package archimulator.sim.uncore.dram;
 
 import archimulator.sim.uncore.CacheHierarchy;
-import archimulator.util.action.Action;
-import archimulator.util.math.Counter;
+import net.pickapack.action.Action;
+import net.pickapack.math.Counter;
 
 import java.util.ArrayList;
 import java.util.List;

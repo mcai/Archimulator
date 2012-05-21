@@ -24,7 +24,7 @@ import archimulator.sim.base.experiment.capability.ProcessorCapability;
 import archimulator.sim.core.Core;
 import archimulator.sim.core.Processor;
 import archimulator.sim.core.Thread;
-import archimulator.util.action.Action1;
+import net.pickapack.action.Action1;
 
 import java.util.HashMap;
 import java.util.List;

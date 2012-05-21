@@ -19,7 +19,7 @@
 package archimulator.sim.uncore.net;
 
 import archimulator.sim.base.simulation.Simulation;
-import archimulator.util.action.Action;
+import net.pickapack.action.Action;
 
 public class NetMessage {
     private long id;

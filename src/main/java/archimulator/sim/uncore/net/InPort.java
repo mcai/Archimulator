@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore.net;
 
-import archimulator.util.action.Action;
+import net.pickapack.action.Action;
 
 public class InPort extends NetPort {
     private InBuffer buffer;

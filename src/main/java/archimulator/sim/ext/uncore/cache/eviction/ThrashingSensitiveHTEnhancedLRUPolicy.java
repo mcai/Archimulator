@@ -23,9 +23,9 @@ import archimulator.sim.core.BasicThread;
 import archimulator.sim.core.Processor;
 import archimulator.sim.uncore.cache.*;
 import archimulator.sim.uncore.cache.eviction.LRUPolicy;
-import archimulator.util.IntegerIntegerPair;
-import archimulator.util.action.Action1;
-import archimulator.util.action.Function3;
+import net.pickapack.IntegerIntegerPair;
+import net.pickapack.action.Action1;
+import net.pickapack.action.Function3;
 
 import java.io.Serializable;
 import java.util.ArrayList;

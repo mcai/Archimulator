@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.isa;
 
-import archimulator.util.Pair;
+import net.pickapack.Pair;
 
 import java.util.Arrays;
 

@@ -19,7 +19,7 @@
 package archimulator.sim.core.event;
 
 import archimulator.sim.core.DynamicInstruction;
-import archimulator.util.event.BlockingEvent;
+import net.pickapack.event.BlockingEvent;
 
 public class InstructionCommittedEvent implements BlockingEvent {
     private DynamicInstruction dynamicInst;

@@ -21,8 +21,8 @@ package archimulator.client;
 import archimulator.service.ArchimulatorService;
 import archimulator.sim.base.experiment.profile.ExperimentProfile;
 import archimulator.sim.base.experiment.profile.ExperimentProfileState;
-import archimulator.util.DateHelper;
-import archimulator.util.action.Predicate;
+import net.pickapack.DateHelper;
+import net.pickapack.action.Predicate;
 import com.caucho.hessian.client.HessianProxyFactory;
 
 import java.net.MalformedURLException;

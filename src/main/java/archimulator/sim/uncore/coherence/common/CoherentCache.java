@@ -26,7 +26,7 @@ import archimulator.sim.uncore.MemoryDevice;
 import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.coherence.config.CoherentCacheConfig;
 import archimulator.sim.uncore.dram.MainMemory;
-import archimulator.util.action.Action1;
+import net.pickapack.action.Action1;
 
 import java.io.Serializable;
 import java.util.Random;

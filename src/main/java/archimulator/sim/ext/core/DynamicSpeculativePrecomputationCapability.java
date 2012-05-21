@@ -39,9 +39,9 @@ import archimulator.sim.uncore.cache.*;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
 import archimulator.sim.uncore.cache.eviction.LRUPolicy;
 import archimulator.sim.uncore.coherence.event.CoherentCacheBeginCacheAccessEvent;
-import archimulator.util.action.Action1;
-import archimulator.util.action.Function3;
-import archimulator.util.action.Predicate;
+import net.pickapack.action.Action1;
+import net.pickapack.action.Function3;
+import net.pickapack.action.Predicate;
 
 import java.util.*;
 

@@ -25,8 +25,8 @@ import archimulator.sim.base.simulation.SimulatedProgram;
 import archimulator.sim.base.simulation.Simulation;
 import archimulator.sim.ext.uncore.cache.eviction.LLCHTAwareLRUPolicy;
 import archimulator.sim.uncore.cache.eviction.LRUPolicy;
-import archimulator.util.DateHelper;
-import archimulator.util.action.Action1;
+import net.pickapack.DateHelper;
+import net.pickapack.action.Action1;
 
 import java.io.FileWriter;
 import java.io.IOException;

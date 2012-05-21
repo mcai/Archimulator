@@ -21,7 +21,7 @@ package archimulator.sim.core.bpred;
 import archimulator.sim.core.Thread;
 import archimulator.sim.isa.Mnemonic;
 import archimulator.sim.isa.StaticInstructionType;
-import archimulator.util.Reference;
+import net.pickapack.Reference;
 
 public class NotTakenBranchPredictor extends BranchPredictor {
     public NotTakenBranchPredictor(Thread thread, String name) {

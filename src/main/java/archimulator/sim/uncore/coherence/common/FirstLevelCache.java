@@ -29,9 +29,9 @@ import archimulator.sim.uncore.coherence.config.FirstLevelCacheConfig;
 import archimulator.sim.uncore.coherence.flow.flc.LoadFlow;
 import archimulator.sim.uncore.coherence.flow.flc.StoreFlow;
 import archimulator.sim.uncore.net.Net;
-import archimulator.util.action.Action;
-import archimulator.util.action.Action1;
-import archimulator.util.action.Function3;
+import net.pickapack.action.Action;
+import net.pickapack.action.Action1;
+import net.pickapack.action.Function3;
 
 import java.util.ArrayList;
 import java.util.EnumMap;

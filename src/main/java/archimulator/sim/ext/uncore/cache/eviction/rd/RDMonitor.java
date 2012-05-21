@@ -23,7 +23,7 @@ import archimulator.sim.ext.uncore.cache.prediction.Predictor;
 import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.cache.Cache;
 import archimulator.sim.uncore.cache.CacheGeometry;
-import archimulator.util.math.Quantizer;
+import net.pickapack.math.Quantizer;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -26,13 +26,13 @@ import archimulator.sim.uncore.coherence.common.LockableCacheLine;
 import archimulator.sim.uncore.coherence.event.CoherentCacheBeginCacheAccessEvent;
 import archimulator.sim.uncore.coherence.event.CoherentCacheNonblockingRequestHitToTransientTagEvent;
 import archimulator.sim.uncore.coherence.event.CoherentCacheServiceNonblockingRequestEvent;
-import archimulator.util.action.Action;
-import archimulator.util.action.Action1;
-import archimulator.util.action.Function1X;
-import archimulator.util.fsm.BasicFiniteStateMachine;
-import archimulator.util.fsm.FiniteStateMachine;
-import archimulator.util.fsm.FiniteStateMachineFactory;
-import archimulator.util.fsm.event.EnterStateEvent;
+import net.pickapack.action.Action;
+import net.pickapack.action.Action1;
+import net.pickapack.action.Function1X;
+import net.pickapack.fsm.BasicFiniteStateMachine;
+import net.pickapack.fsm.FiniteStateMachine;
+import net.pickapack.fsm.FiniteStateMachineFactory;
+import net.pickapack.fsm.event.EnterStateEvent;
 
 import java.io.Serializable;
 

@@ -10,6 +10,9 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Maven: net.pickapack:pickapack:1.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: javax.mail:mail:1.4.4" level="project" />
+    <orderEntry type="library" name="Maven: javax.activation:activation:1.1" level="project" />
     <orderEntry type="library" name="Maven: net.sourceforge.htmlunit:htmlunit:2.9" level="project" />
     <orderEntry type="library" name="Maven: xalan:xalan:2.7.1" level="project" />
     <orderEntry type="library" name="Maven: xalan:serializer:2.7.1" level="project" />
@@ -29,16 +32,9 @@
     <orderEntry type="library" name="Maven: commons-io:commons-io:1.3.1" level="project" />
     <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.0" level="project" />
     <orderEntry type="library" name="Maven: com.caucho:hessian:4.0.7" level="project" />
+    <orderEntry type="library" name="Maven: commons-net:commons-net:3.1" level="project" />
     <orderEntry type="library" name="Maven: commons-math:commons-math:1.2" level="project" />
-    <orderEntry type="library" name="Maven: org.zkoss.zk:zul:6.0.0" level="project" />
-    <orderEntry type="library" name="Maven: org.zkoss.zk:zk:6.0.0" level="project" />
-    <orderEntry type="library" name="Maven: org.zkoss.common:zweb:6.0.0" level="project" />
-    <orderEntry type="library" name="Maven: org.zkoss.common:zcommon:6.0.0" level="project" />
-    <orderEntry type="library" name="Maven: commons-fileupload:commons-fileupload:1.2.1" level="project" />
-    <orderEntry type="library" name="Maven: org.zkoss.common:zel:2.2.1" level="project" />
-    <orderEntry type="library" name="Maven: org.beanshell:bsh:2.0b4" level="project" />
-    <orderEntry type="library" name="Maven: org.zkoss.zk:zkplus:6.0.0" level="project" />
-    <orderEntry type="library" name="Maven: org.zkoss.zk:zhtml:6.0.0" level="project" />
+    <orderEntry type="library" name="Maven: commons-httpclient:commons-httpclient:3.1" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-webapp:7.2.0.v20101020" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-xml:7.2.0.v20101020" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-util:7.2.0.v20101020" level="project" />
@@ -51,13 +47,43 @@
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-io:7.2.0.v20101020" level="project" />
     <orderEntry type="library" name="Maven: net.java.dev.jna:jna:platform:3.3.0" level="project" />
     <orderEntry type="library" name="Maven: net.java.dev.jna:jna:3.3.0" level="project" />
-    <orderEntry type="library" name="Maven: org.jruby.ext.posix:jna-posix:1.0.3" level="project" />
-    <orderEntry type="library" name="Maven: jpathwatch:jpathwatch:0.94" level="project" />
     <orderEntry type="library" name="Maven: com.j256.ormlite:ormlite-jdbc:4.38" level="project" />
     <orderEntry type="library" name="Maven: com.j256.ormlite:ormlite-core:4.38" level="project" />
     <orderEntry type="library" name="Maven: com.h2database:h2:1.3.165" level="project" />
-    <orderEntry type="library" name="Maven: com.jcraft:jsch:0.1.45" level="project" />
     <orderEntry type="library" name="Maven: net.sf.cron4j:cron4j:2.2.5" level="project" />
+    <orderEntry type="library" name="Maven: org.subethamail:subethasmtp:3.1.3" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.5.6" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:slf4j-simple:1.5.6" level="project" />
+    <orderEntry type="library" name="Maven: org.bouncycastle:bcprov-jdk16:1.45" level="project" />
+    <orderEntry type="library" name="Maven: net.schmizz:sshj:0.7.0" level="project" />
+    <orderEntry type="library" name="Maven: rome:rome:1.0" level="project" />
+    <orderEntry type="library" name="Maven: jdom:jdom:1.0" level="project" />
+    <orderEntry type="library" name="Maven: xom:xom:1.2.5" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.wicket:wicket-core:1.5.5" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.wicket:wicket-util:1.5.5" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.wicket:wicket-request:1.5.5" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.wicket:wicket-auth-roles:1.5.5" level="project" />
+    <orderEntry type="library" name="Maven: com.gravity:goose:2.1.17" level="project" />
+    <orderEntry type="library" name="Maven: org.jsoup:jsoup:1.5.2" level="project" />
+    <orderEntry type="library" name="Maven: org.scala-lang:scala-compiler:2.9.0-1" level="project" />
+    <orderEntry type="library" name="Maven: org.scala-lang:scala-library:2.9.0-1" level="project" />
+    <orderEntry type="library" name="Maven: de.l3s.boilerpipe:boilerpipe:1.2.0" level="project" />
+    <orderEntry type="library" name="Maven: net.sourceforge.htmlcleaner:htmlcleaner:2.2" level="project" />
+    <orderEntry type="library" name="Maven: org.jdom:jdom:1.1" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.ant:ant:1.7.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.ant:ant-launcher:1.7.0" level="project" />
+    <orderEntry type="library" name="Maven: com.jcraft:jsch:0.1.45" level="project" />
+    <orderEntry type="library" name="Maven: org.zkoss.zk:zul:6.0.0" level="project" />
+    <orderEntry type="library" name="Maven: org.zkoss.zk:zk:6.0.0" level="project" />
+    <orderEntry type="library" name="Maven: org.zkoss.common:zweb:6.0.0" level="project" />
+    <orderEntry type="library" name="Maven: org.zkoss.common:zcommon:6.0.0" level="project" />
+    <orderEntry type="library" name="Maven: commons-fileupload:commons-fileupload:1.2.1" level="project" />
+    <orderEntry type="library" name="Maven: org.zkoss.common:zel:2.2.1" level="project" />
+    <orderEntry type="library" name="Maven: org.beanshell:bsh:2.0b4" level="project" />
+    <orderEntry type="library" name="Maven: org.zkoss.zk:zkplus:6.0.0" level="project" />
+    <orderEntry type="library" name="Maven: org.zkoss.zk:zhtml:6.0.0" level="project" />
+    <orderEntry type="library" name="Maven: org.jruby.ext.posix:jna-posix:1.0.3" level="project" />
+    <orderEntry type="library" name="Maven: jpathwatch:jpathwatch:0.94" level="project" />
     <orderEntry type="library" name="Maven: org.jfree:jfreechart:1.0.14" level="project" />
     <orderEntry type="library" name="Maven: org.jfree:jcommon:1.0.17" level="project" />
     <orderEntry type="library" name="Maven: com.lowagie:itext:2.1.5" level="project" />

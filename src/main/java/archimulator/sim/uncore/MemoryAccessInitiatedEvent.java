@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore;
 
-import archimulator.util.event.BlockingEvent;
+import net.pickapack.event.BlockingEvent;
 
 public class MemoryAccessInitiatedEvent implements BlockingEvent {
     private int threadId;

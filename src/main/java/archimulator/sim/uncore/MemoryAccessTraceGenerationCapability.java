@@ -20,7 +20,7 @@ package archimulator.sim.uncore;
 
 import archimulator.sim.base.experiment.capability.SimulationCapability;
 import archimulator.sim.base.simulation.Simulation;
-import archimulator.util.action.Action1;
+import net.pickapack.action.Action1;
 
 import java.io.PrintWriter;
 

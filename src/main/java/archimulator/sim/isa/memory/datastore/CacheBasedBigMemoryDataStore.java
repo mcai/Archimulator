@@ -26,8 +26,8 @@ import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.cache.*;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
 import archimulator.sim.uncore.cache.eviction.LRUPolicy;
-import archimulator.util.action.Action1;
-import archimulator.util.action.Function3;
+import net.pickapack.action.Action1;
+import net.pickapack.action.Function3;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;

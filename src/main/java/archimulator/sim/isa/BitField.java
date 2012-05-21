@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.isa;
 
-import archimulator.util.math.MathHelper;
+import net.pickapack.math.MathHelper;
 
 import java.lang.reflect.Field;
 

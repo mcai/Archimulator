@@ -19,7 +19,7 @@
 package archimulator.sim.isa;
 
 import archimulator.sim.os.Context;
-import archimulator.util.event.BlockingEvent;
+import net.pickapack.event.BlockingEvent;
 
 public class FunctionalCallEvent implements BlockingEvent {
     private Context context;

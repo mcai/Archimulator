@@ -27,9 +27,9 @@ import archimulator.sim.isa.ArchitecturalRegisterFile;
 import archimulator.sim.isa.StaticInstruction;
 import archimulator.sim.os.event.SystemEvent;
 import archimulator.sim.os.signal.SignalAction;
-import archimulator.util.action.Predicate;
-import archimulator.util.event.BlockingEvent;
-import archimulator.util.io.buffer.CircularByteBuffer;
+import net.pickapack.action.Predicate;
+import net.pickapack.event.BlockingEvent;
+import net.pickapack.io.buffer.CircularByteBuffer;
 
 import java.util.*;
 

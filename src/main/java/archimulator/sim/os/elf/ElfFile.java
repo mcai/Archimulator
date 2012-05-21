@@ -19,10 +19,10 @@
 package archimulator.sim.os.elf;
 
 import archimulator.sim.base.experiment.profile.ExperimentProfile;
-import archimulator.util.io.buffer.BigEndianBufferAccessor;
-import archimulator.util.io.buffer.BufferAccessor;
-import archimulator.util.io.buffer.LittleEndianBufferAccessor;
-import archimulator.util.io.buffer.RandomAccessFileBuffer;
+import net.pickapack.io.buffer.BigEndianBufferAccessor;
+import net.pickapack.io.buffer.BufferAccessor;
+import net.pickapack.io.buffer.LittleEndianBufferAccessor;
+import net.pickapack.io.buffer.RandomAccessFileBuffer;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;

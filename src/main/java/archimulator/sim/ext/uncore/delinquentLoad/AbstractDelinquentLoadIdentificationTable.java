@@ -22,7 +22,7 @@ import archimulator.sim.core.Thread;
 import archimulator.sim.core.event.InstructionCommittedEvent;
 import archimulator.sim.os.FunctionCallContext;
 import archimulator.sim.uncore.coherence.event.CoherentCacheBeginCacheAccessEvent;
-import archimulator.util.action.Action1;
+import net.pickapack.action.Action1;
 
 import java.util.ArrayList;
 import java.util.Iterator;

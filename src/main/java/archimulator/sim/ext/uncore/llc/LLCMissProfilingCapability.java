@@ -26,10 +26,10 @@ import archimulator.sim.base.simulation.Simulation;
 import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.coherence.event.CoherentCacheBeginCacheAccessEvent;
 import archimulator.sim.uncore.coherence.event.CoherentCacheEndCacheAccessEvent;
-import archimulator.util.IntegerIntegerPair;
-import archimulator.util.Triple;
-import archimulator.util.action.Action1;
-import archimulator.util.math.FrequencyCalculator;
+import net.pickapack.IntegerIntegerPair;
+import net.pickapack.Triple;
+import net.pickapack.action.Action1;
+import net.pickapack.math.FrequencyCalculator;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;

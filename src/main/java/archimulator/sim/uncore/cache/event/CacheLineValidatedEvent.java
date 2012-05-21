@@ -19,7 +19,7 @@
 package archimulator.sim.uncore.cache.event;
 
 import archimulator.sim.uncore.cache.CacheLine;
-import archimulator.util.event.BlockingEvent;
+import net.pickapack.event.BlockingEvent;
 
 public class CacheLineValidatedEvent implements BlockingEvent {
     private CacheLine<?> line;

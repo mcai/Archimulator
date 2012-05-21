@@ -25,7 +25,7 @@ import archimulator.sim.base.experiment.profile.ProcessorProfile;
 import archimulator.sim.base.simulation.SimulatedProgram;
 import archimulator.sim.ext.uncore.cache.eviction.LLCHTAwareLRUPolicy;
 import archimulator.sim.uncore.cache.eviction.LRUPolicy;
-import archimulator.util.DateHelper;
+import net.pickapack.DateHelper;
 import com.caucho.hessian.client.HessianProxyFactory;
 
 import java.net.MalformedURLException;

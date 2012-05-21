@@ -20,7 +20,7 @@ package archimulator.sim.base.simulation.strategy;
 
 import archimulator.sim.base.event.PseudocallEncounteredEvent;
 import archimulator.sim.base.simulation.Logger;
-import archimulator.util.action.Action1;
+import net.pickapack.action.Action1;
 
 import java.util.concurrent.CyclicBarrier;
 

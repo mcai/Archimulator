@@ -26,7 +26,7 @@ import archimulator.sim.uncore.cache.FindCacheLineResultType;
 import archimulator.sim.uncore.coherence.config.CoherentCacheConfig;
 import archimulator.sim.uncore.dram.MainMemory;
 import archimulator.sim.uncore.net.Net;
-import archimulator.util.action.Function3;
+import net.pickapack.action.Function3;
 
 import java.util.ArrayList;
 import java.util.List;

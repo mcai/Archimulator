@@ -19,8 +19,8 @@
 package archimulator.sim.ext.uncore.cache.eviction.rd;
 
 import archimulator.sim.uncore.cache.Cache;
-import archimulator.util.math.MathHelper;
-import archimulator.util.math.SaturatingCounter;
+import net.pickapack.math.MathHelper;
+import net.pickapack.math.SaturatingCounter;
 
 import java.util.ArrayList;
 import java.util.List;

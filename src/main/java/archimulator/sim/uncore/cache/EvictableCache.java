@@ -24,7 +24,7 @@ import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicyFactory;
 import archimulator.sim.uncore.coherence.common.CoherentCache;
-import archimulator.util.action.Function3;
+import net.pickapack.action.Function3;
 
 import java.io.Serializable;
 

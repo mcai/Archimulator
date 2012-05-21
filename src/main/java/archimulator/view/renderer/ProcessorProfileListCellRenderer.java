@@ -21,7 +21,7 @@ package archimulator.view.renderer;
 import archimulator.service.ArchimulatorService;
 import archimulator.service.ArchimulatorServletContextListener;
 import archimulator.sim.base.experiment.profile.ProcessorProfile;
-import archimulator.util.StorageUnit;
+import net.pickapack.StorageUnit;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Session;
 import org.zkoss.zk.ui.event.Event;

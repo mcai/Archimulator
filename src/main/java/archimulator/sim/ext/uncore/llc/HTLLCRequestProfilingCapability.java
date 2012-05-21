@@ -29,10 +29,10 @@ import archimulator.sim.uncore.cache.*;
 import archimulator.sim.uncore.cache.eviction.LRUPolicy;
 import archimulator.sim.uncore.coherence.event.CoherentCacheNonblockingRequestHitToTransientTagEvent;
 import archimulator.sim.uncore.coherence.event.CoherentCacheServiceNonblockingRequestEvent;
-import archimulator.util.action.Action1;
-import archimulator.util.action.Function3;
-import archimulator.util.event.BlockingEvent;
-import archimulator.util.event.BlockingEventDispatcher;
+import net.pickapack.action.Action1;
+import net.pickapack.action.Function3;
+import net.pickapack.event.BlockingEvent;
+import net.pickapack.event.BlockingEventDispatcher;
 
 import java.util.HashMap;
 import java.util.Map;

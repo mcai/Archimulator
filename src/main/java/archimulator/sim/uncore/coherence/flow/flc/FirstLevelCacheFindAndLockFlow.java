@@ -26,7 +26,7 @@ import archimulator.sim.uncore.coherence.common.MESIState;
 import archimulator.sim.uncore.coherence.flow.FindAndLockFlow;
 import archimulator.sim.uncore.coherence.flow.Flow;
 import archimulator.sim.uncore.coherence.flow.llc.L1EvictFlow;
-import archimulator.util.action.Action;
+import net.pickapack.action.Action;
 
 public class FirstLevelCacheFindAndLockFlow extends FindAndLockFlow<MESIState, FirstLevelCacheLine> {
     public FirstLevelCacheFindAndLockFlow(Flow producerFlow, FirstLevelCache cache, MemoryHierarchyAccess access, int tag, CacheAccessType cacheAccessType) {

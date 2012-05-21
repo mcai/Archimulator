@@ -27,8 +27,8 @@ import archimulator.sim.uncore.coherence.event.LastLevelCacheLineEvictedByMemWri
 import archimulator.sim.uncore.coherence.flow.FindAndLockFlow;
 import archimulator.sim.uncore.coherence.flow.Flow;
 import archimulator.sim.uncore.coherence.flow.flc.L2UpwardWriteFlow;
-import archimulator.util.Reference;
-import archimulator.util.action.Action;
+import net.pickapack.Reference;
+import net.pickapack.action.Action;
 
 public class LastLevelCacheFindAndLockFlow extends FindAndLockFlow<LastLevelCacheLineState, LastLevelCacheLine> {
     public LastLevelCacheFindAndLockFlow(Flow lockingFlow, LastLevelCache cache, MemoryHierarchyAccess access, int tag, CacheAccessType cacheAccessType) {

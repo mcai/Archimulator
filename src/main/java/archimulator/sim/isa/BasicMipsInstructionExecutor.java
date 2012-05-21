@@ -19,8 +19,8 @@
 package archimulator.sim.isa;
 
 import archimulator.sim.os.Context;
-import archimulator.util.Reference;
-import archimulator.util.math.MathHelper;
+import net.pickapack.Reference;
+import net.pickapack.math.MathHelper;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
