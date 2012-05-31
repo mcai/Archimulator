@@ -23,7 +23,7 @@ import archimulator.sim.base.event.PollStatsEvent;
 import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.uncore.CacheHierarchy;
 import archimulator.sim.uncore.MemoryDevice;
-import archimulator.sim.uncore.coherence.common.LastLevelCache;
+import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.net.Net;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
@@ -70,6 +70,7 @@ public abstract class MainMemory extends MemoryDevice {
         return this.getCacheHierarchy().getL2ToMemNetwork();
     }
 
+    //TODO: to be called from directory controller
     public void memReadRequestReceive(final MemoryDevice source, int tag, final Action onSuccessCallback) {
         this.reads++;
 
@@ -77,13 +78,14 @@ public abstract class MainMemory extends MemoryDevice {
             public void apply() {
                 new Action() {
                     public void apply() {
-                        sendReply(source, ((LastLevelCache) source).getCache().getLineSize() + 8, onSuccessCallback);
+                        transfer(source, ((DirectoryController) source).getCache().getLineSize() + 8, onSuccessCallback);
                     }
                 }.apply();
             }
         });
     }
 
+    //TODO: to be called from directory controller
     public void memWriteRequestReceive(final MemoryDevice source, int tag, final Action onSuccessCallback) {
         this.writes++;
 
@@ -91,7 +93,7 @@ public abstract class MainMemory extends MemoryDevice {
             public void apply() {
                 new Action() {
                     public void apply() {
-                        sendReply(source, 8, onSuccessCallback);
+                        transfer(source, 8, onSuccessCallback);
                     }
                 }.apply();
             }

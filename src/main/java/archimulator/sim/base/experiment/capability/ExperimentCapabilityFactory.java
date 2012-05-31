@@ -20,11 +20,6 @@ package archimulator.sim.base.experiment.capability;
 
 import archimulator.sim.base.simulation.Simulation;
 import archimulator.sim.core.Processor;
-import archimulator.sim.ext.core.DynamicSpeculativePrecomputationCapability;
-import archimulator.sim.ext.uncore.delinquentLoad.DelinquentLoadIdentificationCapability;
-import archimulator.sim.ext.uncore.llc.HTLLCRequestProfilingCapability;
-import archimulator.sim.ext.uncore.llc.LLCMissProfilingCapability;
-import archimulator.sim.ext.uncore.llc.LLCReuseDistanceProfilingCapability;
 import archimulator.sim.isa.FunctionalExecutionProfilingCapability;
 import archimulator.sim.os.Kernel;
 import archimulator.sim.uncore.MemoryAccessTraceGenerationCapability;
@@ -40,12 +35,6 @@ public class ExperimentCapabilityFactory {
 
     static {
         simulationCapabilityClasses.add(MemoryAccessTraceGenerationCapability.class);
-        simulationCapabilityClasses.add(LLCMissProfilingCapability.class);
-        simulationCapabilityClasses.add(LLCReuseDistanceProfilingCapability.class);
-        simulationCapabilityClasses.add(HTLLCRequestProfilingCapability.class);
-
-        processorCapabilityClasses.add(DelinquentLoadIdentificationCapability.class);
-        processorCapabilityClasses.add(DynamicSpeculativePrecomputationCapability.class);
 
         kernelCapabilityClasses.add(FunctionalExecutionProfilingCapability.class);
     }

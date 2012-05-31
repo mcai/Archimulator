@@ -21,13 +21,14 @@ package archimulator.sim.uncore.tlb;
 import archimulator.sim.base.event.DumpStatEvent;
 import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.base.simulation.SimulationObject;
-import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
-import archimulator.sim.uncore.cache.Cache;
-import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.eviction.LRUPolicy;
+import archimulator.sim.uncore.coherence.msi.fsm.CacheControllerFiniteStateMachine;
+import archimulator.sim.uncore.coherence.msi.state.CacheControllerState;
+import archimulator.util.ValueProvider;
+import archimulator.util.ValueProviderFactory;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
 import net.pickapack.action.Function3;
@@ -36,7 +37,7 @@ public class TranslationLookasideBuffer {
     private String name;
     private TranslationLookasideBufferConfig config;
 
-    private EvictableCache<Boolean, CacheLine<Boolean>> cache;
+    private EvictableCache<Boolean> cache;
 
     private long accesses;
     private long hits;
@@ -46,11 +47,21 @@ public class TranslationLookasideBuffer {
         this.name = name;
         this.config = config;
 
-        this.cache = new EvictableCache<Boolean, CacheLine<Boolean>>(parent, name, config.getGeometry(), LRUPolicy.class, new Function3<Cache<?, ?>, Integer, Integer, CacheLine<Boolean>>() {
-            public CacheLine<Boolean> apply(Cache<?, ?> cache, Integer set, Integer way) {
-                return new CacheLine<Boolean>(cache, set, way, false);
+        ValueProviderFactory<Boolean, ValueProvider<Boolean>> cacheLineStateProviderFactory = new ValueProviderFactory<Boolean, ValueProvider<Boolean>>() {
+            @Override
+            public ValueProvider<Boolean> createValueProvider(Object... args) {
+                if (args.length != 2) {
+                    throw new IllegalArgumentException();
+                }
+
+                int set = (Integer) args[0];
+                int way = (Integer) args[1];
+
+                return new BooleanValueProvider(set, way);
             }
-        });
+        };
+
+        this.cache = new EvictableCache<Boolean>(name, config.getGeometry(), LRUPolicy.class, cacheLineStateProviderFactory);
 
         parent.getBlockingEventDispatcher().addListener(ResetStatEvent.class, new Action1<ResetStatEvent>() {
             public void apply(ResetStatEvent event) {
@@ -75,23 +86,32 @@ public class TranslationLookasideBuffer {
     }
 
     public void access(MemoryHierarchyAccess access, Action onCompletedCallback) {
-        CacheAccess<Boolean, CacheLine<Boolean>> cacheAccess = this.cache.newAccess(null, access, access.getPhysicalAddress(), CacheAccessType.UNKNOWN);
-
         this.accesses++;
 
-        if (cacheAccess.isHitInCache()) {
-            cacheAccess.commit();
-            this.hits++;
-        } else {
-            if (cacheAccess.isEviction()) {
-                this.evictions++;
-            }
+        int address = access.getPhysicalAddress();
+        int set = this.cache.getSet(address);
 
-            cacheAccess.getLine().setNonInitialState(true);
-            cacheAccess.commit();
+        int way = this.cache.findWay(address);
+
+        if(way != -1) {
+            this.hits++;
+            this.cache.handlePromotionOnHit(set, way);
+        }
+        else {
+            int victimWay = this.cache.findVictim(address);
+            CacheLine<Boolean> victimLine = this.cache.getLine(set, victimWay);
+            BooleanValueProvider victimLineStateProvider = (BooleanValueProvider) victimLine.getStateProvider();
+            if(victimLine.getState()) {
+                this.evictions++;
+                victimLine.setTag(CacheLine.INVALID_TAG);
+                victimLineStateProvider.setState(false);
+            }
+            this.cache.handleInsertionOnMiss(set, victimWay);
+            victimLine.setTag(this.cache.getTag(address));
+            victimLineStateProvider.setState(true);
         }
 
-        access.getThread().getCycleAccurateEventQueue().schedule(this, onCompletedCallback, cacheAccess.isHitInCache() ? this.config.getHitLatency() : this.config.getMissLatency());
+        access.getThread().getCycleAccurateEventQueue().schedule(this, onCompletedCallback, way != -1 ? this.config.getHitLatency() : this.config.getMissLatency());
     }
 
     public String getName() {
@@ -110,7 +130,32 @@ public class TranslationLookasideBuffer {
         return this.accesses > 0 ? (double) this.hits / this.accesses : 0.0;
     }
 
-    public EvictableCache<Boolean, CacheLine<Boolean>> getCache() {
+    public EvictableCache<Boolean> getCache() {
         return cache;
+    }
+
+    private class BooleanValueProvider implements ValueProvider<Boolean> {
+        private final int set;
+        private final int way;
+        protected boolean state;
+
+        public BooleanValueProvider(int set, int way) {
+            this.set = set;
+            this.way = way;
+        }
+
+        @Override
+        public Boolean get() {
+            return state;
+        }
+
+        public void setState(boolean state) {
+            this.state = state;
+        }
+
+        @Override
+        public Boolean getInitialValue() {
+            return false;
+        }
     }
 }

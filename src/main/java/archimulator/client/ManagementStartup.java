@@ -23,7 +23,6 @@ import archimulator.service.ArchimulatorServiceImpl;
 import archimulator.sim.base.experiment.profile.ExperimentProfile;
 import archimulator.sim.base.experiment.profile.ProcessorProfile;
 import archimulator.sim.base.simulation.SimulatedProgram;
-import archimulator.sim.ext.uncore.cache.eviction.LLCHTAwareLRUPolicy;
 import archimulator.sim.uncore.cache.eviction.LRUPolicy;
 import net.pickapack.DateHelper;
 import com.caucho.hessian.client.HessianProxyFactory;
@@ -90,7 +89,7 @@ public class ManagementStartup {
                 int numCores = 2;
                 int numThreadsPerCore = 2;
                 this.archimulatorService.addProcessorProfile(Presets.processor(l2SizeInKByte, l2Associativity, numCores, numThreadsPerCore, "LRU", LRUPolicy.class));
-                this.archimulatorService.addProcessorProfile(Presets.processor(l2SizeInKByte, l2Associativity, numCores, numThreadsPerCore, "LLCHTAwareLRU", LLCHTAwareLRUPolicy.class));
+//                this.archimulatorService.addProcessorProfile(Presets.processor(l2SizeInKByte, l2Associativity, numCores, numThreadsPerCore, "LLCHTAwareLRU", LLCHTAwareLRUPolicy.class));
             }
         }
     }
@@ -115,13 +114,14 @@ public class ManagementStartup {
                         experimentProfiles.add(Presets.ht_lru(pthreadSpawnedIndex, maxInsts, processorProfile, simulatedProgram));
                     }
                 }
-            } else if (processorProfile.getL2EvictionPolicyClz().equals(LLCHTAwareLRUPolicy.class)) {
-                for (SimulatedProgram simulatedProgram : simulatedPrograms) {
-                    if (simulatedProgram.getTitle().startsWith("mst_ht")) {
-                        experimentProfiles.add(Presets.ht_ht_aware_lru(pthreadSpawnedIndex, maxInsts, processorProfile, simulatedProgram));
-                    }
-                }
             }
+//            else if (processorProfile.getL2EvictionPolicyClz().equals(LLCHTAwareLRUPolicy.class)) {
+//                for (SimulatedProgram simulatedProgram : simulatedPrograms) {
+//                    if (simulatedProgram.getTitle().startsWith("mst_ht")) {
+//                        experimentProfiles.add(Presets.ht_ht_aware_lru(pthreadSpawnedIndex, maxInsts, processorProfile, simulatedProgram));
+//                    }
+//                }
+//            }
         }
 
         ///////////////////

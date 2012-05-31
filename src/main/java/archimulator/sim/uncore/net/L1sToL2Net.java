@@ -19,7 +19,7 @@
 package archimulator.sim.uncore.net;
 
 import archimulator.sim.uncore.CacheHierarchy;
-import archimulator.sim.uncore.coherence.common.FirstLevelCache;
+import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 
 public class L1sToL2Net extends Net {
     public L1sToL2Net(CacheHierarchy cacheHierarchy) {
@@ -37,13 +37,13 @@ public class L1sToL2Net extends Net {
                 cacheHierarchy.getInstructionCaches().size() + cacheHierarchy.getDataCaches().size() + 1,
                 (l2CacheLineSize + 8) * 2, 8);
 
-        for (FirstLevelCache intructionCache : cacheHierarchy.getInstructionCaches()) {
+        for (CacheController intructionCache : cacheHierarchy.getInstructionCaches()) {
             EndPointNode instructionCacheNode = new EndPointNode(this, intructionCache.getName());
             this.endPointNodes.put(intructionCache, instructionCacheNode);
             this.createBidirectionalLink(instructionCacheNode, this.switchNode, 32);
         }
 
-        for (FirstLevelCache dataCache : cacheHierarchy.getDataCaches()) {
+        for (CacheController dataCache : cacheHierarchy.getDataCaches()) {
             EndPointNode dataCacheNode = new EndPointNode(this, dataCache.getName());
             this.endPointNodes.put(dataCache, dataCacheNode);
             this.createBidirectionalLink(dataCacheNode, this.switchNode, 32);

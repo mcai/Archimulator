@@ -1,4 +1,4 @@
-/*******************************************************************************
+package archimulator.sim.uncore.cache; /*******************************************************************************
  * Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).
  *
  * This file is part of the Archimulator multicore architectural simulator.
@@ -16,47 +16,43 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.cache;
 
-import archimulator.sim.base.simulation.BasicSimulationObject;
-import archimulator.sim.base.simulation.SimulationObject;
+import archimulator.util.ValueProvider;
+import archimulator.util.ValueProviderFactory;
 import net.pickapack.action.Action1;
-import net.pickapack.action.Function3;
 import net.pickapack.action.Predicate;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Cache<StateT extends Serializable, LineT extends CacheLine<StateT>> extends BasicSimulationObject implements SimulationObject, Serializable {
+public class Cache<StateT extends Serializable> implements Serializable {
     protected String name;
     protected CacheGeometry geometry;
-    protected List<CacheSet<StateT, LineT>> sets;
+    protected List<CacheSet<StateT>> sets;
 
-    public Cache(SimulationObject parent, String name, CacheGeometry geometry, Function3<Cache<?, ?>, Integer, Integer, LineT> createLine) {
-        super(parent);
-
+    public Cache(String name, CacheGeometry geometry, ValueProviderFactory<StateT, ValueProvider<StateT>> cacheLineStateProviderFactory) {
         this.name = name;
         this.geometry = geometry;
 
-        this.sets = new ArrayList<CacheSet<StateT, LineT>>();
+        this.sets = new ArrayList<CacheSet<StateT>>();
         for (int i = 0; i < this.getNumSets(); i++) {
-            this.sets.add(new CacheSet<StateT, LineT>(this, this.getAssociativity(), i, createLine));
+            this.sets.add(new CacheSet<StateT>(this, this.getAssociativity(), i, cacheLineStateProviderFactory));
         }
     }
 
-    public void forAll(int set, Predicate<LineT> predicate, Action1<LineT> action) {
+    public void forAll(int set, Predicate<CacheLine<StateT>> predicate, Action1<CacheLine<StateT>> action) {
         for (int way = 0; way < this.getAssociativity(); way++) {
-            LineT line = this.getLine(set, way);
+            CacheLine<StateT> line = this.getLine(set, way);
             if (predicate.apply(line)) {
                 action.apply(line);
             }
         }
     }
 
-    public void forAny(int set, Predicate<LineT> predicate, Action1<LineT> action) {
+    public void forAny(int set, Predicate<CacheLine<StateT>> predicate, Action1<CacheLine<StateT>> action) {
         for (int way = 0; way < this.getAssociativity(); way++) {
-            LineT line = this.getLine(set, way);
+            CacheLine<StateT> line = this.getLine(set, way);
             if (predicate.apply(line)) {
                 action.apply(line);
                 return;
@@ -64,9 +60,9 @@ public class Cache<StateT extends Serializable, LineT extends CacheLine<StateT>>
         }
     }
 
-    public void forExact(int set, Predicate<LineT> predicate, Action1<LineT> action) {
+    public void forExact(int set, Predicate<CacheLine<StateT>> predicate, Action1<CacheLine<StateT>> action) {
         for (int way = 0; way < this.getAssociativity(); way++) {
-            LineT line = this.getLine(set, way);
+            CacheLine<StateT> line = this.getLine(set, way);
             if (predicate.apply(line)) {
                 action.apply(line);
                 return;
@@ -76,7 +72,7 @@ public class Cache<StateT extends Serializable, LineT extends CacheLine<StateT>>
         throw new IllegalArgumentException();
     }
 
-    public int count(int set, Predicate<LineT> predicate) {
+    public int count(int set, Predicate<CacheLine<StateT>> predicate) {
         int count = 0;
 
         for (int way = 0; way < this.getAssociativity(); way++) {
@@ -88,7 +84,7 @@ public class Cache<StateT extends Serializable, LineT extends CacheLine<StateT>>
         return count;
     }
 
-    public boolean containsAny(int set, Predicate<LineT> predicate) {
+    public boolean containsAny(int set, Predicate<CacheLine<StateT>> predicate) {
         for (int way = 0; way < this.getAssociativity(); way++) {
             if (predicate.apply(this.getLine(set, way))) {
                 return true;
@@ -98,7 +94,7 @@ public class Cache<StateT extends Serializable, LineT extends CacheLine<StateT>>
         return false;
     }
 
-    public boolean containsAll(int set, Predicate<LineT> predicate) {
+    public boolean containsAll(int set, Predicate<CacheLine<StateT>> predicate) {
         for (int way = 0; way < this.getAssociativity(); way++) {
             if (!predicate.apply(this.getLine(set, way))) {
                 return false;
@@ -108,7 +104,7 @@ public class Cache<StateT extends Serializable, LineT extends CacheLine<StateT>>
         return true;
     }
 
-    public List<LineT> getLines(int set) {
+    public List<CacheLine<StateT>> getLines(int set) {
         if (set < 0 || set >= this.getNumSets()) {
             throw new IllegalArgumentException(String.format("set: %d, this.numSets: %d", set, this.getNumSets()));
         }
@@ -116,25 +112,25 @@ public class Cache<StateT extends Serializable, LineT extends CacheLine<StateT>>
         return this.sets.get(set).getLines();
     }
 
-    public LineT getLine(int set, int way) {
+    public CacheLine<StateT> getLine(int set, int way) {
         if (way < 0 || way >= this.getAssociativity()) {
-            throw new IllegalArgumentException(String.format("way: %d, this.associativity: %d", way, this.getAssociativity()));
+            throw new IllegalArgumentException(String.format("set: %d, way: %d, this.associativity: %d", set, way, this.getAssociativity()));
         }
 
         return this.getLines(set).get(way);
     }
 
-    public FindCacheLineResult<LineT> findLine(int address) {
+    public int findWay(int address) {
         int tag = this.getTag(address);
         int set = this.getSet(address);
 
-        for (LineT line : this.getLines(set)) {
+        for (CacheLine<StateT> line : this.getLines(set)) {
             if (line.getTag() == tag && line.getState() != line.getInitialState()) {
-                return new FindCacheLineResult<LineT>(FindCacheLineResultType.CACHE_HIT, line);
+                return line.getWay();
             }
         }
 
-        return new FindCacheLineResult<LineT>(FindCacheLineResultType.CACHE_MISS, null);
+        return -1;
     }
 
     public int getTag(int addr) {

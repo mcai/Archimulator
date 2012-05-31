@@ -22,7 +22,7 @@ import archimulator.sim.base.simulation.BasicSimulationObject;
 import archimulator.sim.uncore.MemoryAccessInitiatedEvent;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.MemoryHierarchyAccessType;
-import archimulator.sim.uncore.coherence.common.FirstLevelCache;
+import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import net.pickapack.action.Action;
 import net.pickapack.math.Counter;
 
@@ -37,8 +37,8 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
 
     protected List<Thread> threads;
 
-    protected FirstLevelCache instructionCache;
-    protected FirstLevelCache dataCache;
+    protected CacheController instructionCache;
+    protected CacheController dataCache;
 
     protected FunctionalUnitPool fuPool;
 
@@ -328,19 +328,19 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
         return oooEventQueue;
     }
 
-    public FirstLevelCache getInstructionCache() {
+    public CacheController getInstructionCache() {
         return instructionCache;
     }
 
-    public void setInstructionCache(FirstLevelCache instructionCache) {
+    public void setInstructionCache(CacheController instructionCache) {
         this.instructionCache = instructionCache;
     }
 
-    public FirstLevelCache getDataCache() {
+    public CacheController getDataCache() {
         return dataCache;
     }
 
-    public void setDataCache(FirstLevelCache dataCache) {
+    public void setDataCache(CacheController dataCache) {
         this.dataCache = dataCache;
     }
 }

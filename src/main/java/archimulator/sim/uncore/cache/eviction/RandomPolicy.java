@@ -18,30 +18,30 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache.eviction;
 
-import archimulator.sim.uncore.cache.*;
+import archimulator.sim.uncore.cache.EvictableCache;
 
 import java.io.Serializable;
 import java.util.Random;
 
-public class RandomPolicy<StateT extends Serializable, LineT extends CacheLine<StateT>> extends EvictionPolicy<StateT, LineT> {
+public class RandomPolicy<StateT extends Serializable> extends EvictionPolicy<StateT> {
     private Random random;
 
-    public RandomPolicy(EvictableCache<StateT, LineT> cache) {
+    public RandomPolicy(EvictableCache<StateT> cache) {
         super(cache);
 
         this.random = new Random(13);
     }
 
     @Override
-    public CacheMiss<StateT, LineT> handleReplacement(CacheReference reference) {
-        return new CacheMiss<StateT, LineT>(this.getCache(), reference, this.random.nextInt(this.getCache().getAssociativity()));
+    public int getVictim(int set) {
+        return this.random.nextInt(this.getCache().getAssociativity());
     }
 
     @Override
-    public void handlePromotionOnHit(CacheHit<StateT, LineT> hit) {
+    public void handlePromotionOnHit(int set, int way) {
     }
 
     @Override
-    public void handleInsertionOnMiss(CacheMiss<StateT, LineT> miss) {
+    public void handleInsertionOnMiss(int set, int way) {
     }
 }

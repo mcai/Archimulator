@@ -25,8 +25,6 @@ import archimulator.sim.core.bpred.*;
 import archimulator.sim.isa.ArchitecturalRegisterFile;
 import archimulator.sim.isa.RegisterDependencyType;
 import archimulator.sim.os.Context;
-import archimulator.sim.uncore.CacheAccessType;
-import archimulator.sim.uncore.coherence.event.CoherentCacheBeginCacheAccessEvent;
 import archimulator.sim.uncore.tlb.TranslationLookasideBuffer;
 import net.pickapack.action.Action1;
 
@@ -53,9 +51,6 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
     protected PhysicalRegisterFile miscPhysicalRegisterFile;
 
     protected long totalInsts;
-
-    private long llcReadMisses;
-    private long llcWriteMisses;
 
     protected long decodeBufferFull;
     protected long reorderBufferFull;
@@ -139,28 +134,9 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
         this.reorderBuffer = new PipelineBuffer<ReorderBufferEntry>(this.core.getProcessor().getConfig().getReorderBufferCapacity());
         this.loadStoreQueue = new PipelineBuffer<LoadStoreQueueEntry>(this.core.getProcessor().getConfig().getLoadStoreQueueCapacity());
 
-        this.getBlockingEventDispatcher().addListener(CoherentCacheBeginCacheAccessEvent.class, new Action1<CoherentCacheBeginCacheAccessEvent>() {
-            public void apply(CoherentCacheBeginCacheAccessEvent event) {
-                if (!event.getCacheAccess().isHitInCache() && event.getCache().isLastLevelCache()) {
-                    if (event.getAccess().getThread() == AbstractBasicThread.this) {
-                        CacheAccessType accessType = event.getCacheAccess().getReference().getAccessType();
-                        if (!accessType.isUpward()) {
-                            if (accessType.isDownwardRead() || accessType.isDownwardWrite()) {
-                                llcReadMisses++;
-                            } else if (accessType.isWriteback()) {
-                                llcWriteMisses++;
-                            }
-                        }
-                    }
-                }
-            }
-        });
-
         this.getBlockingEventDispatcher().addListener(ResetStatEvent.class, new Action1<ResetStatEvent>() {
             public void apply(ResetStatEvent event) {
                 AbstractBasicThread.this.totalInsts = 0;
-                AbstractBasicThread.this.llcReadMisses = 0;
-                AbstractBasicThread.this.llcWriteMisses = 0;
 
                 AbstractBasicThread.this.decodeBufferFull = 0;
                 AbstractBasicThread.this.reorderBufferFull = 0;
@@ -187,9 +163,6 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
                 event.getStats().put(AbstractBasicThread.this.getName() + ".totalInsts", String.valueOf(AbstractBasicThread.this.totalInsts));
 
                 if (event.getType() == DumpStatEvent.Type.DETAILED_SIMULATION) {
-                    event.getStats().put(AbstractBasicThread.this.getName() + ".llcReadMisses", String.valueOf(AbstractBasicThread.this.llcReadMisses));
-                    event.getStats().put(AbstractBasicThread.this.getName() + ".llcWriteMisses", String.valueOf(AbstractBasicThread.this.llcWriteMisses));
-
                     event.getStats().put(AbstractBasicThread.this.getName() + ".decodeBufferFull", String.valueOf(AbstractBasicThread.this.decodeBufferFull));
                     event.getStats().put(AbstractBasicThread.this.getName() + ".reorderBufferFull", String.valueOf(AbstractBasicThread.this.reorderBufferFull));
                     event.getStats().put(AbstractBasicThread.this.getName() + ".loadStoreQueueFull", String.valueOf(AbstractBasicThread.this.loadStoreQueueFull));
@@ -292,14 +265,6 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
 
     public void setContext(Context context) {
         this.context = context;
-    }
-
-    public long getLlcReadMisses() {
-        return llcReadMisses;
-    }
-
-    public long getLlcWriteMisses() {
-        return llcWriteMisses;
     }
 
     public void incRegisterRenameStallsOnDecodeBufferIsEmpty() {

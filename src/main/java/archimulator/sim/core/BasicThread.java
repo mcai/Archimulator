@@ -29,7 +29,7 @@ import archimulator.sim.isa.StaticInstruction;
 import archimulator.sim.isa.StaticInstructionType;
 import archimulator.sim.os.ContextState;
 import archimulator.sim.uncore.MemoryHierarchyThread;
-import archimulator.sim.uncore.coherence.flow.Flow;
+import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import net.pickapack.Reference;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
@@ -394,9 +394,9 @@ public class BasicThread extends AbstractBasicThread {
 
         if (this.getCycleAccurateEventQueue().getCurrentCycle() - this.lastCommitCycle > COMMIT_TIMEOUT) {
             if (noInstructionCommittedCounterThreshold > 5) {
-                Flow.dumpTree();
+                CacheCoherenceFlow.dumpTree();
 
-                Logger.fatalf(Logger.THREAD, "%s: No instruction committed for %d cycles, %d committed.", this.getCycleAccurateEventQueue().getCurrentCycle(), this.getName(), COMMIT_TIMEOUT, this.totalInsts);
+//                Logger.fatalf(Logger.THREAD, "%s: No instruction committed for %d cycles, %d committed.", this.getCycleAccurateEventQueue().getCurrentCycle(), this.getName(), COMMIT_TIMEOUT, this.totalInsts);
             } else {
                 this.lastCommitCycle = this.getCycleAccurateEventQueue().getCurrentCycle();
                 this.noInstructionCommittedCounterThreshold++;

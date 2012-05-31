@@ -20,8 +20,9 @@ package archimulator.sim.uncore;
 
 import archimulator.sim.base.simulation.BasicSimulationObject;
 import archimulator.sim.core.ProcessorConfig;
-import archimulator.sim.uncore.coherence.common.FirstLevelCache;
-import archimulator.sim.uncore.coherence.common.LastLevelCache;
+import archimulator.sim.uncore.coherence.msi.controller.CacheController;
+import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
+import archimulator.sim.uncore.coherence.msi.controller.MyCycleAccurateEventQueue;
 import archimulator.sim.uncore.dram.*;
 import archimulator.sim.uncore.net.L1sToL2Net;
 import archimulator.sim.uncore.net.L2ToMemNet;
@@ -29,16 +30,15 @@ import archimulator.sim.uncore.net.Net;
 import archimulator.sim.uncore.tlb.TranslationLookasideBuffer;
 import net.pickapack.event.BlockingEvent;
 import net.pickapack.event.BlockingEventDispatcher;
-import net.pickapack.event.CycleAccurateEventQueue;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class BasicCacheHierarchy extends BasicSimulationObject implements CacheHierarchy {
     private MainMemory mainMemory;
-    private LastLevelCache l2Cache;
-    private List<FirstLevelCache> instructionCaches;
-    private List<FirstLevelCache> dataCaches;
+    private DirectoryController l2Cache;
+    private List<CacheController> instructionCaches;
+    private List<CacheController> dataCaches;
 
     private List<TranslationLookasideBuffer> itlbs;
     private List<TranslationLookasideBuffer> dtlbs;
@@ -46,7 +46,7 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
     private L1sToL2Net l1sToL2Network;
     private L2ToMemNet l2ToMemNetwork;
 
-    public BasicCacheHierarchy(BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, ProcessorConfig processorConfig) {
+    public BasicCacheHierarchy(BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, MyCycleAccurateEventQueue cycleAccurateEventQueue, ProcessorConfig processorConfig) {
         super(blockingEventDispatcher, cycleAccurateEventQueue);
 
         switch (processorConfig.getMemoryHierarchyConfig().getMainMemory().getType()) {
@@ -61,21 +61,21 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
                 break;
         }
 
-        this.l2Cache = new LastLevelCache(this, "llc", processorConfig.getMemoryHierarchyConfig().getL2Cache());
+        this.l2Cache = new DirectoryController(this, "llc", processorConfig.getMemoryHierarchyConfig().getL2Cache());
         this.l2Cache.setNext(this.mainMemory);
 
-        this.instructionCaches = new ArrayList<FirstLevelCache>();
-        this.dataCaches = new ArrayList<FirstLevelCache>();
+        this.instructionCaches = new ArrayList<CacheController>();
+        this.dataCaches = new ArrayList<CacheController>();
 
         this.itlbs = new ArrayList<TranslationLookasideBuffer>();
         this.dtlbs = new ArrayList<TranslationLookasideBuffer>();
 
         for (int i = 0; i < processorConfig.getNumCores(); i++) {
-            FirstLevelCache instructionCache = new FirstLevelCache(this, "c" + i + ".icache", processorConfig.getMemoryHierarchyConfig().getInstructionCache());
+            CacheController instructionCache = new CacheController(this, "c" + i + ".icache", processorConfig.getMemoryHierarchyConfig().getInstructionCache());
             instructionCache.setNext(this.l2Cache);
             this.instructionCaches.add(instructionCache);
 
-            FirstLevelCache dataCache = new FirstLevelCache(this, "c" + i + ".dcache", processorConfig.getMemoryHierarchyConfig().getDataCache());
+            CacheController dataCache = new CacheController(this, "c" + i + ".dcache", processorConfig.getMemoryHierarchyConfig().getDataCache());
             dataCache.setNext(this.l2Cache);
             this.dataCaches.add(dataCache);
 
@@ -96,15 +96,15 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
         return mainMemory;
     }
 
-    public LastLevelCache getL2Cache() {
+    public DirectoryController getL2Cache() {
         return l2Cache;
     }
 
-    public List<FirstLevelCache> getInstructionCaches() {
+    public List<CacheController> getInstructionCaches() {
         return instructionCaches;
     }
 
-    public List<FirstLevelCache> getDataCaches() {
+    public List<CacheController> getDataCaches() {
         return dataCaches;
     }
 

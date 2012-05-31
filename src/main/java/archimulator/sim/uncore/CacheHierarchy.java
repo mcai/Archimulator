@@ -19,8 +19,8 @@
 package archimulator.sim.uncore;
 
 import archimulator.sim.base.simulation.SimulationObject;
-import archimulator.sim.uncore.coherence.common.FirstLevelCache;
-import archimulator.sim.uncore.coherence.common.LastLevelCache;
+import archimulator.sim.uncore.coherence.msi.controller.CacheController;
+import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.dram.MainMemory;
 import archimulator.sim.uncore.net.L2ToMemNet;
 import archimulator.sim.uncore.net.Net;
@@ -31,11 +31,11 @@ import java.util.List;
 public interface CacheHierarchy extends SimulationObject {
     MainMemory getMainMemory();
 
-    LastLevelCache getL2Cache();
+    DirectoryController getL2Cache();
 
-    List<FirstLevelCache> getInstructionCaches();
+    List<CacheController> getInstructionCaches();
 
-    List<FirstLevelCache> getDataCaches();
+    List<CacheController> getDataCaches();
 
     List<TranslationLookasideBuffer> getItlbs();
 

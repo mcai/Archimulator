@@ -3,8 +3,6 @@ package archimulator.client;
 import archimulator.sim.base.experiment.profile.ExperimentProfile;
 import archimulator.sim.base.experiment.profile.ProcessorProfile;
 import archimulator.sim.base.simulation.SimulatedProgram;
-import archimulator.sim.ext.uncore.llc.HTLLCRequestProfilingCapability;
-import archimulator.sim.ext.uncore.llc.LLCReuseDistanceProfilingCapability;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
 
 public class Presets {
@@ -44,8 +42,8 @@ public class Presets {
 //                "200");
 //                "400");
 //                "1024");
-                "2000");
-//                "4000");
+//                "2000");
+                "4000");
         program.setHelperThreadedProgram(true);
         program.setHtLookahead(lookahead);
         program.setHtStride(stride);
@@ -62,8 +60,8 @@ public class Presets {
 //        experimentProfile.functionallyToEnd();
 //        experimentProfile.fastForwardToPseudoCallAndInDetailForMaxInsts(pthreadSpawnedIndex, maxInsts);
         experimentProfile.inDetailToEnd();
-        experimentProfile.addSimulationCapabilityClass(LLCReuseDistanceProfilingCapability.class);
-        experimentProfile.addSimulationCapabilityClass(HTLLCRequestProfilingCapability.class);
+//        experimentProfile.addSimulationCapabilityClass(LLCReuseDistanceProfilingCapability.class);
+//        experimentProfile.addSimulationCapabilityClass(HTLLCRequestProfilingCapability.class);
         return experimentProfile;
     }
 
@@ -73,8 +71,8 @@ public class Presets {
 //        experimentProfile.functionallyToEnd();
 //        experimentProfile.fastForwardToPseudoCallAndInDetailForMaxInsts(pthreadSpawnedIndex, maxInsts);
         experimentProfile.inDetailToEnd();
-        experimentProfile.addSimulationCapabilityClass(LLCReuseDistanceProfilingCapability.class);
-        experimentProfile.addSimulationCapabilityClass(HTLLCRequestProfilingCapability.class);
+//        experimentProfile.addSimulationCapabilityClass(LLCReuseDistanceProfilingCapability.class);
+//        experimentProfile.addSimulationCapabilityClass(HTLLCRequestProfilingCapability.class);
         return experimentProfile;
     }
 
@@ -84,7 +82,7 @@ public class Presets {
 //        experimentProfile.functionallyToEnd();
 //        experimentProfile.fastForwardToPseudoCallAndInDetailForMaxInsts(pthreadSpawnedIndex, maxInsts);
         experimentProfile.inDetailToEnd();
-        experimentProfile.addSimulationCapabilityClass(LLCReuseDistanceProfilingCapability.class);
+//        experimentProfile.addSimulationCapabilityClass(LLCReuseDistanceProfilingCapability.class);
         return experimentProfile;
     }
 }

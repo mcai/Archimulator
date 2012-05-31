@@ -1,4 +1,4 @@
-/*******************************************************************************
+package archimulator.sim.uncore.cache; /*******************************************************************************
  * Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).
  *
  * This file is part of the Archimulator multicore architectural simulator.
@@ -16,65 +16,39 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.cache;
 
-import archimulator.sim.base.simulation.SimulationObject;
-import archimulator.sim.uncore.CacheAccessType;
-import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicyFactory;
-import archimulator.sim.uncore.coherence.common.CoherentCache;
-import net.pickapack.action.Function3;
+import archimulator.util.ValueProvider;
+import archimulator.util.ValueProviderFactory;
 
 import java.io.Serializable;
 
-public class EvictableCache<StateT extends Serializable, LineT extends CacheLine<StateT>> extends Cache<StateT, LineT> {
-    protected EvictionPolicy<StateT, LineT> evictionPolicy;
+public class EvictableCache<StateT extends Serializable> extends Cache<StateT> {
+    protected EvictionPolicy<StateT> evictionPolicy;
 
-    public EvictableCache(SimulationObject parent, String name, CacheGeometry geometry, Class<? extends EvictionPolicy> evictionPolicyClz, Function3<Cache<?, ?>, Integer, Integer, LineT> createLine) {
-        super(parent, name, geometry, createLine);
+    public EvictableCache(String name, CacheGeometry geometry, Class<? extends EvictionPolicy> evictionPolicyClz, ValueProviderFactory<StateT, ValueProvider<StateT>> cacheLineStateProviderFactory) {
+        super(name, geometry, cacheLineStateProviderFactory);
 
         this.evictionPolicy = EvictionPolicyFactory.createEvictionPolicy(evictionPolicyClz, this);
     }
 
-    public CacheAccess<StateT, LineT> newAccess(int address, CacheAccessType accessType) {
-        return this.newAccess(null, null, address, accessType);
-    }
-
-    public CacheAccess<StateT, LineT> newAccess(MemoryHierarchyAccess access, int address, CacheAccessType accessType) {
-        return this.newAccess(null, access, address, accessType);
-    }
-
-    public CacheAccess<StateT, LineT> newAccess(CoherentCache coherentCache, MemoryHierarchyAccess access, int address, CacheAccessType accessType) {
-        LineT line = this.findLine(address).getLine();
-
+    public int findVictim(int address) {
         int set = this.getSet(address);
-
-        if (line != null) {
-            return this.newHit(coherentCache, access, set, address, accessType, line.getWay());
-        } else {
-            return this.newMiss(coherentCache, access, set, address, accessType);
-        }
-    }
-
-    private CacheHit<StateT, LineT> newHit(CoherentCache coherentCache, MemoryHierarchyAccess access, int set, int address, CacheAccessType accessType, int way) {
-        return new CacheHit<StateT, LineT>(this, new CacheReference(coherentCache, access, address, this.getTag(address), accessType, set), way);
-    }
-
-    private CacheMiss<StateT, LineT> newMiss(CoherentCache coherentCache, MemoryHierarchyAccess access, int set, int address, CacheAccessType accessType) {
-        CacheReference reference = new CacheReference(coherentCache, access, address, this.getTag(address), accessType, set);
-
         for (int way = 0; way < this.getAssociativity(); way++) {
-            LineT line = this.getLine(set, way);
+            CacheLine<StateT> line = this.getLine(set, way);
             if (line.getState() == line.getInitialState()) {
-                return new CacheMiss<StateT, LineT>(this, reference, way);
+                return way;
             }
         }
-
-        return this.evictionPolicy.handleReplacement(reference);
+        return this.evictionPolicy.getVictim(set);
     }
 
-    public EvictionPolicy<StateT, LineT> getEvictionPolicy() {
-        return evictionPolicy;
+    public void handlePromotionOnHit(int set, int way) {
+        this.evictionPolicy.handlePromotionOnHit(set, way);
+    }
+
+    public void handleInsertionOnMiss(int set, int way) {
+        this.evictionPolicy.handleInsertionOnMiss(set, way);
     }
 }

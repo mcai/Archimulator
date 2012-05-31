@@ -30,13 +30,13 @@ import archimulator.sim.core.Processor;
 import archimulator.sim.core.Thread;
 import archimulator.sim.os.Context;
 import archimulator.sim.os.Kernel;
+import archimulator.sim.uncore.coherence.msi.controller.MyCycleAccurateEventQueue;
 import net.pickapack.StorageUnit;
 import net.pickapack.StringHelper;
 import net.pickapack.action.Action1;
 import net.pickapack.action.Predicate;
 import net.pickapack.event.BlockingEvent;
 import net.pickapack.event.BlockingEventDispatcher;
-import net.pickapack.event.CycleAccurateEventQueue;
 import net.pickapack.io.file.FileHelper;
 import net.pickapack.io.serialization.MapHelper;
 import org.apache.commons.lang.time.DurationFormatUtils;
@@ -65,9 +65,9 @@ public class Simulation implements SimulationObject {
 
     private BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher;
 
-    private CycleAccurateEventQueue cycleAccurateEventQueue;
+    private MyCycleAccurateEventQueue cycleAccurateEventQueue;
 
-    public Simulation(SimulationConfig config, SimulationStrategy strategy, List<Class<? extends SimulationCapability>> capabilityClasses, BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
+    public Simulation(SimulationConfig config, SimulationStrategy strategy, List<Class<? extends SimulationCapability>> capabilityClasses, BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, MyCycleAccurateEventQueue cycleAccurateEventQueue) {
         this.blockingEventDispatcher = blockingEventDispatcher;
         this.cycleAccurateEventQueue = cycleAccurateEventQueue;
 
@@ -92,20 +92,14 @@ public class Simulation implements SimulationObject {
                 stats.put("totalCycles", MessageFormat.format("{0}", getCycleAccurateEventQueue().getCurrentCycle()));
 
                 List<String> totalInstsPerThread = new ArrayList<String>();
-                List<String> llcReadMissesPerThread = new ArrayList<String>();
-                List<String> llcWriteMissesPerThread = new ArrayList<String>();
 
                 for (int i = 0; i < getConfig().getProcessorConfig().getNumCores(); i++) {
                     for (int j = 0; j < getConfig().getProcessorConfig().getNumThreadsPerCore(); j++) {
                         totalInstsPerThread.add("c" + i + "t" + j + ": " + getProcessor().getCores().get(i).getThreads().get(j).getTotalInsts());
-                        llcReadMissesPerThread.add("c" + i + "t" + j + ": " + getProcessor().getCores().get(i).getThreads().get(j).getLlcReadMisses());
-                        llcWriteMissesPerThread.add("c" + i + "t" + j + ": " + getProcessor().getCores().get(i).getThreads().get(j).getLlcWriteMisses());
                     }
                 }
 
                 stats.put("totalInsts", MessageFormat.format("{0}", getTotalInsts()) + " (" + StringHelper.join(totalInstsPerThread, ", ") + ")");
-                stats.put("llcReadMisses", MessageFormat.format("{0}", getLlcReadMisses()) + " (" + StringHelper.join(llcReadMissesPerThread, ", ") + ")");
-                stats.put("llcWriteMisses", MessageFormat.format("{0}", getLlcWriteMisses()) + " (" + StringHelper.join(llcWriteMissesPerThread, ", ") + ")");
 
                 stats.put("instsPerCycle", MessageFormat.format("{0}", getInstsPerCycle()));
                 stats.put("cyclesPerSecond", MessageFormat.format("{0}", getCyclesPerSecond()));
@@ -263,30 +257,6 @@ public class Simulation implements SimulationObject {
         return totalInsts;
     }
 
-    public long getLlcReadMisses() {
-        long llcReadMisses = 0;
-
-        for (Core core : this.processor.getCores()) {
-            for (Thread thread : core.getThreads()) {
-                llcReadMisses += thread.getLlcReadMisses();
-            }
-        }
-
-        return llcReadMisses;
-    }
-
-    public long getLlcWriteMisses() {
-        long llcWriteMisses = 0;
-
-        for (Core core : this.processor.getCores()) {
-            for (Thread thread : core.getThreads()) {
-                llcWriteMisses += thread.getLlcWriteMisses();
-            }
-        }
-
-        return llcWriteMisses;
-    }
-
     public double getInstsPerCycle() {
         return (double) this.getTotalInsts() / this.getCycleAccurateEventQueue().getCurrentCycle();
     }
@@ -331,7 +301,7 @@ public class Simulation implements SimulationObject {
         return this.capabilities;
     }
 
-    public CycleAccurateEventQueue getCycleAccurateEventQueue() {
+    public MyCycleAccurateEventQueue getCycleAccurateEventQueue() {
         return this.cycleAccurateEventQueue;
     }
 

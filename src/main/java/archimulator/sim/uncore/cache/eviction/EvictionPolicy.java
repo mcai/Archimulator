@@ -18,24 +18,24 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache.eviction;
 
-import archimulator.sim.uncore.cache.*;
+import archimulator.sim.uncore.cache.EvictableCache;
 
 import java.io.Serializable;
 
-public abstract class EvictionPolicy<StateT extends Serializable, LineT extends CacheLine<StateT>> {
-    private EvictableCache<StateT, LineT> cache;
+public abstract class EvictionPolicy<StateT extends Serializable> {
+    private EvictableCache<StateT> cache;
 
-    public EvictionPolicy(EvictableCache<StateT, LineT> cache) {
+    public EvictionPolicy(EvictableCache<StateT> cache) {
         this.cache = cache;
     }
 
-    public abstract CacheMiss<StateT, LineT> handleReplacement(CacheReference reference); // victim selection
+    public abstract int getVictim(int set);
 
-    public abstract void handlePromotionOnHit(CacheHit<StateT, LineT> hit); // => promotion of referenced line
+    public abstract void handlePromotionOnHit(int set, int way);
 
-    public abstract void handleInsertionOnMiss(CacheMiss<StateT, LineT> miss); // => insertion of fetched line
+    public abstract void handleInsertionOnMiss(int set, int way);
 
-    public EvictableCache<StateT, LineT> getCache() {
+    public EvictableCache<StateT> getCache() {
         return cache;
     }
 }

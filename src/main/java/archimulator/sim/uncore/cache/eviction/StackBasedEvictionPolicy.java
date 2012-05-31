@@ -1,4 +1,4 @@
-/*******************************************************************************
+package archimulator.sim.uncore.cache.eviction; /*******************************************************************************
  * Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).
  *
  * This file is part of the Archimulator multicore architectural simulator.
@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.cache.eviction;
 
 import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.cache.EvictableCache;
@@ -25,10 +24,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class StackBasedEvictionPolicy<StateT extends Serializable, LineT extends CacheLine<StateT>> extends EvictionPolicy<StateT, LineT> {
+public abstract class StackBasedEvictionPolicy<StateT extends Serializable> extends EvictionPolicy<StateT> {
     private List<List<StackEntry>> stackEntries;
 
-    public StackBasedEvictionPolicy(EvictableCache<StateT, LineT> cache) {
+    public StackBasedEvictionPolicy(EvictableCache<StateT> cache) {
         super(cache);
 
         this.stackEntries = new ArrayList<List<StackEntry>>();
@@ -62,7 +61,7 @@ public abstract class StackBasedEvictionPolicy<StateT extends Serializable, Line
         return this.getCacheLineInStackPosition(set, stackPosition).getWay();
     }
 
-    public LineT getCacheLineInStackPosition(int set, int stackPosition) {
+    public CacheLine<StateT> getCacheLineInStackPosition(int set, int stackPosition) {
         return this.stackEntries.get(set).get(stackPosition).cacheLine;
     }
 
@@ -90,9 +89,9 @@ public abstract class StackBasedEvictionPolicy<StateT extends Serializable, Line
     }
 
     private class StackEntry {
-        private LineT cacheLine;
+        private CacheLine<StateT> cacheLine;
 
-        private StackEntry(LineT cacheLine) {
+        private StackEntry(CacheLine<StateT> cacheLine) {
             this.cacheLine = cacheLine;
         }
     }

@@ -56,10 +56,6 @@ public interface Thread extends MemoryHierarchyThread {
 
     boolean isLastDecodedDynamicInstCommitted();
 
-    long getLlcReadMisses();
-
-    long getLlcWriteMisses();
-
     void updatePerCycleStats();
 
     void incRegisterRenameStallsOnDecodeBufferIsEmpty();

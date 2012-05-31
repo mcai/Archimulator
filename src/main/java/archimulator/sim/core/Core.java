@@ -19,7 +19,7 @@
 package archimulator.sim.core;
 
 import archimulator.sim.uncore.MemoryHierarchyCore;
-import archimulator.sim.uncore.coherence.common.FirstLevelCache;
+import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import net.pickapack.action.Action;
 
 import java.util.List;
@@ -65,13 +65,13 @@ public interface Core extends MemoryHierarchyCore {
 
     void doMeasurementOneCycle();
 
-    FirstLevelCache getInstructionCache();
+    CacheController getInstructionCache();
 
-    void setInstructionCache(FirstLevelCache instructionCache);
+    void setInstructionCache(CacheController instructionCache);
 
-    FirstLevelCache getDataCache();
+    CacheController getDataCache();
 
-    void setDataCache(FirstLevelCache dataCache);
+    void setDataCache(CacheController dataCache);
 
     void updatePerCycleStats();
 }

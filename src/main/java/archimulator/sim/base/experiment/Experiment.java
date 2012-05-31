@@ -33,12 +33,13 @@ import archimulator.sim.base.simulation.strategy.SimulationStrategy;
 import archimulator.sim.core.ProcessorConfig;
 import archimulator.sim.uncore.MemoryHierarchyConfig;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
+import archimulator.sim.uncore.coherence.msi.controller.MyCycleAccurateEventQueue;
+import net.pickapack.Params;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
-import net.pickapack.action.Function1X;
+import net.pickapack.action.Action4;
 import net.pickapack.event.BlockingEvent;
 import net.pickapack.event.BlockingEventDispatcher;
-import net.pickapack.event.CycleAccurateEventQueue;
 import net.pickapack.fsm.BasicFiniteStateMachine;
 import net.pickapack.fsm.FiniteStateMachine;
 import net.pickapack.fsm.FiniteStateMachineFactory;
@@ -61,7 +62,7 @@ public abstract class Experiment {
     private String beginTime;
 
     private BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher;
-    private CycleAccurateEventQueue cycleAccurateEventQueue;
+    private MyCycleAccurateEventQueue cycleAccurateEventQueue;
 
     private CyclicBarrier phaser;
 
@@ -88,7 +89,7 @@ public abstract class Experiment {
         this.beginTime = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date());
 
         this.blockingEventDispatcher = new BlockingEventDispatcher<BlockingEvent>();
-        this.cycleAccurateEventQueue = new CycleAccurateEventQueue();
+        this.cycleAccurateEventQueue = new MyCycleAccurateEventQueue();
 
         this.blockingEventDispatcher.addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
             public void apply(DumpStatEvent event) {
@@ -143,21 +144,21 @@ public abstract class Experiment {
     }
 
     public void start() {
-        fsmFactory.fireTransition(this.fsm, ExperimentCondition.START);
+        fsmFactory.fireTransition(this.fsm, this, ExperimentCondition.START, new Params());
     }
 
     protected abstract void doStart();
 
     public void pause() {
-        fsmFactory.fireTransition(this.fsm, ExperimentCondition.PAUSE);
+        fsmFactory.fireTransition(this.fsm, this, ExperimentCondition.PAUSE, new Params());
     }
 
     public void resume() {
-        fsmFactory.fireTransition(this.fsm, ExperimentCondition.RESUME);
+        fsmFactory.fireTransition(this.fsm, this, ExperimentCondition.RESUME, new Params());
     }
 
     public void stop() {
-        fsmFactory.fireTransition(this.fsm, ExperimentCondition.STOP);
+        fsmFactory.fireTransition(this.fsm, this, ExperimentCondition.STOP, new Params());
     }
 
     public void join() {
@@ -175,7 +176,7 @@ public abstract class Experiment {
         this.join();
     }
 
-    protected void doSimulation(String title, SimulationStrategy strategy, BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
+    protected void doSimulation(String title, SimulationStrategy strategy, BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, MyCycleAccurateEventQueue cycleAccurateEventQueue) {
         this.simulation = new Simulation(new SimulationConfig(title, this.processorConfig, this.contextConfigs), strategy, this.simulationCapabilityClasses, blockingEventDispatcher, cycleAccurateEventQueue);
         this.simulation.simulate();
     }
@@ -192,7 +193,7 @@ public abstract class Experiment {
         return this.blockingEventDispatcher;
     }
 
-    protected CycleAccurateEventQueue getCycleAccurateEventQueue() {
+    protected MyCycleAccurateEventQueue getCycleAccurateEventQueue() {
         return this.cycleAccurateEventQueue;
     }
 
@@ -224,10 +225,10 @@ public abstract class Experiment {
 
         fsmFactory.inState(ExperimentState.NOT_STARTED)
                 .ignoreCondition(ExperimentCondition.STOP)
-                .onCondition(ExperimentCondition.START, new Function1X<FiniteStateMachine<ExperimentState, ExperimentCondition>, ExperimentState>() {
-                    @SuppressWarnings("unchecked")
-                    public ExperimentState apply(final FiniteStateMachine<ExperimentState, ExperimentCondition> from, Object... params) {
-                        final Experiment experiment = (Experiment) ((BasicFiniteStateMachine)from).get(Experiment.class, "experiment");
+                .onCondition(ExperimentCondition.START, new Action4<FiniteStateMachine<ExperimentState, ExperimentCondition>, Object, ExperimentCondition, Params>() {
+                    @Override
+                    public void apply(final FiniteStateMachine<ExperimentState, ExperimentCondition> from, Object param2, ExperimentCondition param3, Params param4) {
+                        final Experiment experiment = ((BasicFiniteStateMachine) from).get(Experiment.class, "experiment");
 
                         Thread threadStartExperiment = new Thread() {
                             @Override
@@ -260,7 +261,7 @@ public abstract class Experiment {
                                     throw new RuntimeException(e);
                                 }
 
-                                fsmFactory.fireTransition(from, ExperimentCondition.STOP);
+                                fsmFactory.fireTransition(from, from, ExperimentCondition.STOP, new Params());
 
                                 System.gc();
                             }
@@ -270,51 +271,46 @@ public abstract class Experiment {
                         threadStartExperiment.start();
 
                         experiment.threadStartExperiment = threadStartExperiment;
-
-                        return ExperimentState.RUNNING;
                     }
-                });
+                }, ExperimentState.RUNNING);
 
         fsmFactory.inState(ExperimentState.RUNNING)
                 .ignoreCondition(ExperimentCondition.START)
-                .onCondition(ExperimentCondition.PAUSE, new Function1X<FiniteStateMachine<ExperimentState, ExperimentCondition>, ExperimentState>() {
-                    @SuppressWarnings("unchecked")
-                    public ExperimentState apply(FiniteStateMachine<ExperimentState, ExperimentCondition> from, Object... params) {
-                        final Experiment experiment = (Experiment) ((BasicFiniteStateMachine)from).get(Experiment.class, "experiment");
+                .onCondition(ExperimentCondition.PAUSE, new Action4<FiniteStateMachine<ExperimentState, ExperimentCondition>, Object, ExperimentCondition, Params>() {
+                    @Override
+                    public void apply(FiniteStateMachine<ExperimentState, ExperimentCondition> from, Object param2, ExperimentCondition param3, Params param4) {
+                        final Experiment experiment = ((BasicFiniteStateMachine) from).get(Experiment.class, "experiment");
                         experiment.getBlockingEventDispatcher().dispatch(new PauseExperimentEvent());
-                        return ExperimentState.PAUSED;
                     }
-                })
-                .onCondition(ExperimentCondition.STOP, new Function1X<FiniteStateMachine<ExperimentState, ExperimentCondition>, ExperimentState>() {
-                    @SuppressWarnings("unchecked")
-                    public ExperimentState apply(FiniteStateMachine<ExperimentState, ExperimentCondition> from, Object... params) {
-                        final Experiment experiment = (Experiment) ((BasicFiniteStateMachine)from).get(Experiment.class, "experiment");
+                }, ExperimentState.PAUSED)
+                .onCondition(ExperimentCondition.STOP, new Action4<FiniteStateMachine<ExperimentState, ExperimentCondition>, Object, ExperimentCondition, Params>() {
+                    @Override
+                    public void apply(FiniteStateMachine<ExperimentState, ExperimentCondition> from, Object param2, ExperimentCondition param3, Params param4) {
+                        final Experiment experiment = ((BasicFiniteStateMachine) from).get(Experiment.class, "experiment");
                         experiment.getBlockingEventDispatcher().dispatch(new StopExperimentEvent());
                         experiment.getBlockingEventDispatcher().clearListeners();
-                        return ExperimentState.STOPPED;
                     }
-                });
+                }, ExperimentState.STOPPED);
 
         fsmFactory.inState(ExperimentState.PAUSED)
                 .ignoreCondition(ExperimentCondition.PAUSE)
-                .onCondition(ExperimentCondition.RESUME, new Function1X<FiniteStateMachine<ExperimentState, ExperimentCondition>, ExperimentState>() {
-                    @SuppressWarnings("unchecked")
-                    public ExperimentState apply(FiniteStateMachine<ExperimentState, ExperimentCondition> from, Object... params) {
+                .onCondition(ExperimentCondition.RESUME, new Action4<FiniteStateMachine<ExperimentState, ExperimentCondition>, Object, ExperimentCondition, Params>() {
+                    @Override
+                    public void apply(FiniteStateMachine<ExperimentState, ExperimentCondition> from, Object param2, ExperimentCondition param3, Params param4) {
                         try {
-                            final Experiment experiment = (Experiment) ((BasicFiniteStateMachine)from).get(Experiment.class, "experiment");
+                            final Experiment experiment = ((BasicFiniteStateMachine) from).get(Experiment.class, "experiment");
                             experiment.getPhaser().await();
                         } catch (InterruptedException e) {
                             throw new RuntimeException(e);
                         } catch (BrokenBarrierException e) {
                             throw new RuntimeException(e);
                         }
-                        return ExperimentState.RUNNING;
                     }
-                })
-                .onCondition(ExperimentCondition.STOP, new Function1X<FiniteStateMachine<ExperimentState, ExperimentCondition>, ExperimentState>() {
-                    @SuppressWarnings("unchecked")
-                    public ExperimentState apply(FiniteStateMachine<ExperimentState, ExperimentCondition> from, Object... params) {
-                        final Experiment experiment = (Experiment) ((BasicFiniteStateMachine)from).get(Experiment.class, "experiment");
+                }, ExperimentState.RUNNING)
+                .onCondition(ExperimentCondition.STOP, new Action4<FiniteStateMachine<ExperimentState, ExperimentCondition>, Object, ExperimentCondition, Params>() {
+                    @Override
+                    public void apply(FiniteStateMachine<ExperimentState, ExperimentCondition> from, Object param2, ExperimentCondition param3, Params param4) {
+                        final Experiment experiment = (Experiment) ((BasicFiniteStateMachine) from).get(Experiment.class, "experiment");
                         try {
                             experiment.getPhaser().await();
                         } catch (InterruptedException e) {
@@ -331,9 +327,8 @@ public abstract class Experiment {
 
                         experiment.getBlockingEventDispatcher().dispatch(new StopExperimentEvent());
                         experiment.getBlockingEventDispatcher().clearListeners();
-                        return ExperimentState.STOPPED;
                     }
-                });
+                }, ExperimentState.STOPPED);
 
         fsmFactory.inState(ExperimentState.STOPPED)
                 .ignoreCondition(ExperimentCondition.STOP);

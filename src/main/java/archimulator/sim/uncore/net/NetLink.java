@@ -71,7 +71,7 @@ public class NetLink {
                 }
             }
         } else {
-            message.complete(this.srcPort.getNode().getNet().getCycleAccurateEventQueue().getCurrentCycle());
+            message.complete(srcPort.getNode().getNet().getCycleAccurateEventQueue().getCurrentCycle());
         }
     }
 

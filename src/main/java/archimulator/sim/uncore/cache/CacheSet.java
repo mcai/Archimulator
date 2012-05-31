@@ -1,4 +1,4 @@
-/*******************************************************************************
+package archimulator.sim.uncore.cache; /*******************************************************************************
  * Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).
  *
  * This file is part of the Archimulator multicore architectural simulator.
@@ -16,34 +16,34 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.cache;
 
-import net.pickapack.action.Function3;
+import archimulator.util.ValueProvider;
+import archimulator.util.ValueProviderFactory;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CacheSet<StateT extends Serializable, LineT extends CacheLine<StateT>> {
-    private Cache<StateT, LineT> cache;
-    private List<LineT> lines;
+public class CacheSet<StateT extends Serializable> {
+    private Cache<StateT> cache;
+    private List<CacheLine<StateT>> lines;
     private int num;
 
-    public CacheSet(Cache<StateT, LineT> cache, int associativity, int num, Function3<Cache<?, ?>, Integer, Integer, LineT> createLine) {
+    public CacheSet(Cache<StateT> cache, int associativity, int num, ValueProviderFactory<StateT, ValueProvider<StateT>> cacheLineStateProviderFactory) {
         this.cache = cache;
         this.num = num;
 
-        this.lines = new ArrayList<LineT>();
+        this.lines = new ArrayList<CacheLine<StateT>>();
         for (int i = 0; i < associativity; i++) {
-            this.lines.add(createLine.apply(cache, this.num, i));
+            this.lines.add(new CacheLine<StateT>(cache, this.num, i, cacheLineStateProviderFactory.createValueProvider(this.num, i)));
         }
     }
 
-    public Cache<StateT, LineT> getCache() {
+    public Cache<StateT> getCache() {
         return cache;
     }
 
-    public List<LineT> getLines() {
+    public List<CacheLine<StateT>> getLines() {
         return lines;
     }
 
