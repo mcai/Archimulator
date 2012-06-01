@@ -27,10 +27,10 @@ import archimulator.sim.os.ContextKilledEvent;
 import archimulator.sim.os.ContextState;
 import archimulator.sim.os.Kernel;
 import archimulator.sim.uncore.CacheHierarchy;
-import archimulator.sim.uncore.coherence.msi.controller.MyCycleAccurateEventQueue;
 import net.pickapack.action.Action1;
 import net.pickapack.event.BlockingEvent;
 import net.pickapack.event.BlockingEventDispatcher;
+import net.pickapack.event.CycleAccurateEventQueue;
 
 import java.util.*;
 
@@ -47,7 +47,7 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
 
     private Map<Context, Thread> contextToThreadMappings;
 
-    public BasicProcessor(BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, MyCycleAccurateEventQueue cycleAccurateEventQueue, ProcessorConfig processorConfig, Kernel kernel, CacheHierarchy cacheHierarchy, List<Class<? extends ProcessorCapability>> capabilityClasses) {
+    public BasicProcessor(BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, ProcessorConfig processorConfig, Kernel kernel, CacheHierarchy cacheHierarchy, List<Class<? extends ProcessorCapability>> capabilityClasses) {
         super(blockingEventDispatcher, cycleAccurateEventQueue);
 
         this.config = processorConfig;

@@ -33,13 +33,13 @@ import archimulator.sim.base.simulation.strategy.SimulationStrategy;
 import archimulator.sim.core.ProcessorConfig;
 import archimulator.sim.uncore.MemoryHierarchyConfig;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
-import archimulator.sim.uncore.coherence.msi.controller.MyCycleAccurateEventQueue;
 import net.pickapack.Params;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
 import net.pickapack.action.Action4;
 import net.pickapack.event.BlockingEvent;
 import net.pickapack.event.BlockingEventDispatcher;
+import net.pickapack.event.CycleAccurateEventQueue;
 import net.pickapack.fsm.BasicFiniteStateMachine;
 import net.pickapack.fsm.FiniteStateMachine;
 import net.pickapack.fsm.FiniteStateMachineFactory;
@@ -62,7 +62,7 @@ public abstract class Experiment {
     private String beginTime;
 
     private BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher;
-    private MyCycleAccurateEventQueue cycleAccurateEventQueue;
+    private CycleAccurateEventQueue cycleAccurateEventQueue;
 
     private CyclicBarrier phaser;
 
@@ -89,7 +89,7 @@ public abstract class Experiment {
         this.beginTime = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date());
 
         this.blockingEventDispatcher = new BlockingEventDispatcher<BlockingEvent>();
-        this.cycleAccurateEventQueue = new MyCycleAccurateEventQueue();
+        this.cycleAccurateEventQueue = new CycleAccurateEventQueue();
 
         this.blockingEventDispatcher.addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
             public void apply(DumpStatEvent event) {
@@ -176,7 +176,7 @@ public abstract class Experiment {
         this.join();
     }
 
-    protected void doSimulation(String title, SimulationStrategy strategy, BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, MyCycleAccurateEventQueue cycleAccurateEventQueue) {
+    protected void doSimulation(String title, SimulationStrategy strategy, BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
         this.simulation = new Simulation(new SimulationConfig(title, this.processorConfig, this.contextConfigs), strategy, this.simulationCapabilityClasses, blockingEventDispatcher, cycleAccurateEventQueue);
         this.simulation.simulate();
     }
@@ -193,7 +193,7 @@ public abstract class Experiment {
         return this.blockingEventDispatcher;
     }
 
-    protected MyCycleAccurateEventQueue getCycleAccurateEventQueue() {
+    protected CycleAccurateEventQueue getCycleAccurateEventQueue() {
         return this.cycleAccurateEventQueue;
     }
 

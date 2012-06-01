@@ -22,12 +22,7 @@ public abstract class Controller extends MemoryDevice {
             throw new IllegalArgumentException();
         }
 
-        this.getNet(to).transfer(this, to, size, new Action() {
-            @Override
-            public void apply() {
-                getCycleAccurateEventQueue().schedule(Controller.this, to, message, 0);
-            }
-        });
+        this.getCacheHierarchy().transfer(this, to, size, message);
     }
 
     //TODO: to be called from controller

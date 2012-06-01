@@ -18,34 +18,54 @@
  ******************************************************************************/
 package archimulator.sim.uncore;
 
-import archimulator.sim.base.simulation.SimulationObject;
-import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.controller.Controller;
-import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.coherence.msi.message.CoherenceMessage;
-import archimulator.sim.uncore.dram.MainMemory;
-import archimulator.sim.uncore.net.L2ToMemNet;
-import archimulator.sim.uncore.net.Net;
-import archimulator.sim.uncore.tlb.TranslationLookasideBuffer;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public interface CacheHierarchy extends SimulationObject {
-    void transfer(Controller from, Controller to, int size, CoherenceMessage message);
+public class PointToPointReorderBuffer {
+    private List<CoherenceMessage> messages;
+    private final Controller from;
+    private final Controller to;
 
-    MainMemory getMainMemory();
+    public PointToPointReorderBuffer(Controller from, Controller to) {
+        this.from = from;
+        this.to = to;
+        this.messages = new ArrayList<CoherenceMessage>();
+    }
 
-    DirectoryController getL2Cache();
+    public void transfer(CoherenceMessage message) {
+        this.messages.add(message);
+    }
 
-    List<CacheController> getInstructionCaches();
+    public void onDestinationArrived(CoherenceMessage message) {
+        message.onDestinationArrived();
+        this.commit();
+    }
 
-    List<CacheController> getDataCaches();
+    public void commit() {
+        while(!this.messages.isEmpty()) {
+            CoherenceMessage message = this.messages.get(0);
+            if(!message.isDestinationArrived()) {
+                break;
+            }
 
-    List<TranslationLookasideBuffer> getItlbs();
+            message.onCompleted();
+            this.messages.remove(message);
+            to.receive(message);
+        }
+    }
 
-    List<TranslationLookasideBuffer> getDtlbs();
+    public List<CoherenceMessage> getMessages() {
+        return messages;
+    }
 
-    Net getL1sToL2Network();
+    public Controller getFrom() {
+        return from;
+    }
 
-    L2ToMemNet getL2ToMemNetwork();
+    public Controller getTo() {
+        return to;
+    }
 }

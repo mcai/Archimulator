@@ -21,18 +21,23 @@ package archimulator.sim.uncore;
 import archimulator.sim.base.simulation.BasicSimulationObject;
 import archimulator.sim.core.ProcessorConfig;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
+import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
-import archimulator.sim.uncore.coherence.msi.controller.MyCycleAccurateEventQueue;
+import archimulator.sim.uncore.coherence.msi.message.CoherenceMessage;
 import archimulator.sim.uncore.dram.*;
 import archimulator.sim.uncore.net.L1sToL2Net;
 import archimulator.sim.uncore.net.L2ToMemNet;
 import archimulator.sim.uncore.net.Net;
 import archimulator.sim.uncore.tlb.TranslationLookasideBuffer;
+import net.pickapack.action.Action;
 import net.pickapack.event.BlockingEvent;
 import net.pickapack.event.BlockingEventDispatcher;
+import net.pickapack.event.CycleAccurateEventQueue;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class BasicCacheHierarchy extends BasicSimulationObject implements CacheHierarchy {
     private MainMemory mainMemory;
@@ -46,7 +51,9 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
     private L1sToL2Net l1sToL2Network;
     private L2ToMemNet l2ToMemNetwork;
 
-    public BasicCacheHierarchy(BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, MyCycleAccurateEventQueue cycleAccurateEventQueue, ProcessorConfig processorConfig) {
+    private Map<Controller, Map<Controller, PointToPointReorderBuffer>> p2pReorderBuffers;
+
+    public BasicCacheHierarchy(BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, ProcessorConfig processorConfig) {
         super(blockingEventDispatcher, cycleAccurateEventQueue);
 
         switch (processorConfig.getMemoryHierarchyConfig().getMainMemory().getType()) {
@@ -90,6 +97,32 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
 
         this.l1sToL2Network = new L1sToL2Net(this);
         this.l2ToMemNetwork = new L2ToMemNet(this);
+
+        this.p2pReorderBuffers = new HashMap<Controller, Map<Controller, PointToPointReorderBuffer>>();
+    }
+
+    @Override
+    public void transfer(final Controller from, final Controller to, int size, final CoherenceMessage message) {
+        if(!this.p2pReorderBuffers.containsKey(from)) {
+            this.p2pReorderBuffers.put(from, new HashMap<Controller, PointToPointReorderBuffer>());
+        }
+
+        if(!this.p2pReorderBuffers.get(from).containsKey(to)) {
+            this.p2pReorderBuffers.get(from).put(to, new PointToPointReorderBuffer(from, to));
+        }
+
+        this.p2pReorderBuffers.get(from).get(to).transfer(message);
+
+        from.getNet(to).transfer(from, to, size, new Action() {
+            @Override
+            public void apply() {
+                onDestinationArrived(from, to, message);
+            }
+        });
+    }
+
+    private void onDestinationArrived(Controller from, Controller to, CoherenceMessage message) {
+        this.p2pReorderBuffers.get(from).get(to).onDestinationArrived(message);
     }
 
     public MainMemory getMainMemory() {

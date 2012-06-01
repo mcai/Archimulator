@@ -30,13 +30,13 @@ import archimulator.sim.core.Processor;
 import archimulator.sim.core.Thread;
 import archimulator.sim.os.Context;
 import archimulator.sim.os.Kernel;
-import archimulator.sim.uncore.coherence.msi.controller.MyCycleAccurateEventQueue;
 import net.pickapack.StorageUnit;
 import net.pickapack.StringHelper;
 import net.pickapack.action.Action1;
 import net.pickapack.action.Predicate;
 import net.pickapack.event.BlockingEvent;
 import net.pickapack.event.BlockingEventDispatcher;
+import net.pickapack.event.CycleAccurateEventQueue;
 import net.pickapack.io.file.FileHelper;
 import net.pickapack.io.serialization.MapHelper;
 import org.apache.commons.lang.time.DurationFormatUtils;
@@ -65,9 +65,9 @@ public class Simulation implements SimulationObject {
 
     private BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher;
 
-    private MyCycleAccurateEventQueue cycleAccurateEventQueue;
+    private CycleAccurateEventQueue cycleAccurateEventQueue;
 
-    public Simulation(SimulationConfig config, SimulationStrategy strategy, List<Class<? extends SimulationCapability>> capabilityClasses, BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, MyCycleAccurateEventQueue cycleAccurateEventQueue) {
+    public Simulation(SimulationConfig config, SimulationStrategy strategy, List<Class<? extends SimulationCapability>> capabilityClasses, BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
         this.blockingEventDispatcher = blockingEventDispatcher;
         this.cycleAccurateEventQueue = cycleAccurateEventQueue;
 
@@ -301,7 +301,7 @@ public class Simulation implements SimulationObject {
         return this.capabilities;
     }
 
-    public MyCycleAccurateEventQueue getCycleAccurateEventQueue() {
+    public CycleAccurateEventQueue getCycleAccurateEventQueue() {
         return this.cycleAccurateEventQueue;
     }
 

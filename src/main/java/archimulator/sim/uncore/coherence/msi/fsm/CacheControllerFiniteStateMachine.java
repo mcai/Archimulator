@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<CacheControllerState, CacheControllerEventType> implements ValueProvider<CacheControllerState> {
+    public static final int NUM_MAX_TRANSITION_HISTORY = 100;
+
     private CacheController cacheController;
     private CacheControllerState oldState;
     private int set;
@@ -32,7 +34,7 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
 
     private List<Action> stalledEvents = new ArrayList<Action>();
 
-    private List<String> transitionHistory = new ArrayList<String>(10);
+    private List<String> transitionHistory = new ArrayList<String>();
 
     private Action onCompletedCallback;
 
@@ -66,14 +68,14 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
             public void apply(EnterStateEvent enterStateEvent) {
                 CacheLine<CacheControllerState> line = cacheController.getCache().getLine(getSet(), getWay());
 
-                if (getState() != oldState) {
+//                if (getState() != oldState) {
                     String transitionText = String.format("[%d] %s.[%d,%d] {%s} %s: %s.%s -> %s", cacheController.getCycleAccurateEventQueue().getCurrentCycle(), getName(), getSet(), getWay(), line.getTag() != CacheLine.INVALID_TAG ? String.format("0x%08x", line.getTag()) : "N/A", oldState, enterStateEvent.getSender() != null ? enterStateEvent.getSender() : "<N/A>", enterStateEvent.getCondition(), getState());
-                    if (transitionHistory.size() >= 10) {
+                    if (transitionHistory.size() >= NUM_MAX_TRANSITION_HISTORY) {
                         transitionHistory.remove(0);
                     }
 
                     transitionHistory.add(transitionText);
-                }
+//                }
             }
         });
     }

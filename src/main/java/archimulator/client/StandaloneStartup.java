@@ -26,6 +26,9 @@ import archimulator.sim.base.simulation.Simulation;
 import archimulator.sim.uncore.cache.eviction.LRUPolicy;
 import net.pickapack.DateHelper;
 import net.pickapack.action.Action1;
+import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.args4j.CmdLineParser;
+import org.kohsuke.args4j.Option;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -35,17 +38,56 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class StandaloneStartup {
+    @Option(name = "-s", usage = "L2 cache size in KBytes", metaVar = "<l2SizeInKByte>", required = true)
+    private int l2SizeInKByte;
+
+    @Option(name = "-a", usage = "L2 cache associativity", metaVar = "<l2Associativity>", required = true)
+    private int l2Associativity;
+
+    @Option(name = "-c", usage = "number of processor cores", metaVar = "<numCores>", required = true)
+    private int numCores;
+
+    @Option(name = "-t", usage = "number of threads per core", metaVar = "<numThreadsPerCore>", required = true)
+    private int numThreadsPerCore;
+
+    @Option(name = "-e", usage = "class name of L2 eviction policy", metaVar = "<l2EvictionPolicyClassName>", required = true)
+    private String l2EvictionPolicyClassName;
+
+    public void parseArgs(String[] args) throws IOException {
+        CmdLineParser parser = new CmdLineParser(this);
+        try {
+            parser.parseArgument(args);
+        } catch (CmdLineException e) {
+            System.err.println("java -cp <path/to/achimulator.jar> archimulator.client.StandaloneStartup [options]");
+            parser.printUsage(System.err);
+            System.err.println();
+            throw new IOException();
+        }
+    }
+
     public static void main(String[] args) {
+        StandaloneStartup standaloneStartup = new StandaloneStartup();
+//        try {
+//            standaloneStartup.parseArgs(args);
+            standaloneStartup.run();
+//        } catch (IOException e) {
+//            System.out.println(e);
+//        }
+    }
+
+    private void run() {
         int pthreadSpawnedIndex = 3720;
         int maxInsts = 200000000;
 
-//        SimulatedProgram simulatedProgram = Presets.SIMULATED_PROGRAM_MST_BASELINE;
+        //        SimulatedProgram simulatedProgram = Presets.SIMULATED_PROGRAM_MST_BASELINE;
 //        SimulatedProgram simulatedProgram = Presets.SIMULATED_PROGRAM_MST_HT(20, 10);
         SimulatedProgram simulatedProgram = Presets.SIMULATED_PROGRAM_MST_HT(640, 320);
+
 //        ProcessorProfile processorProfile = Presets.processor(1024 * 4, 8, 2, 2, "LRU", LRUPolicy.class);
         ProcessorProfile processorProfile = Presets.processor(1024 / 2, 8, 2, 2, "LRU", LRUPolicy.class); //256K L2
 //        ProcessorProfile processorProfile = Presets.processor(1024 / 4, 8, 2, 2, "LLCHTAwareLRU", LLCHTAwareLRUPolicy.class); //256K L2
 //        ProcessorProfile processorProfile = Presets.processor(1024 / 2, 8, 2, 2, "LLCHTAwareLRU", LLCHTAwareLRUPolicy.class); //256K L2
+
 //        final ExperimentProfile experimentProfile = Presets.baseline_lru(pthreadSpawnedIndex, maxInsts, processorProfile, simulatedProgram);
         final ExperimentProfile experimentProfile = Presets.ht_lru(pthreadSpawnedIndex, maxInsts, processorProfile, simulatedProgram);
 

@@ -32,7 +32,7 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
 
     private List<Action> stalledEvents = new ArrayList<Action>();
 
-    private List<String> transitionHistory = new ArrayList<String>(10);
+    private List<String> transitionHistory = new ArrayList<String>();
 
     private Action onCompletedCallback;
 
@@ -67,16 +67,16 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
             public void apply(EnterStateEvent enterStateEvent) {
                 CacheLine<DirectoryControllerState> line = directoryController.getCache().getLine(getSet(), getWay());
 
-                if (getState() != oldState) {
+//                if (getState() != oldState) {
                     String transitionText = String.format("[%d] %s.[%d,%d] {%s} %s: %s.%s -> %s (owner: %s, sharers: %s)",
                             directoryController.getCycleAccurateEventQueue().getCurrentCycle(), getName(), getSet(), getWay(), line.getTag() != CacheLine.INVALID_TAG ? String.format("0x%08x", line.getTag()) : "N/A", oldState, enterStateEvent.getSender() != null ? enterStateEvent.getSender() : "<N/A>", enterStateEvent.getCondition(), getState(),
                             getDirectoryEntry().getOwner() != null ? getDirectoryEntry().getOwner() : "N/A", getDirectoryEntry().getSharers().toString().replace("[", "").replace("]", ""));
-                    if (transitionHistory.size() >= 10) {
+                    if (transitionHistory.size() >= CacheControllerFiniteStateMachine.NUM_MAX_TRANSITION_HISTORY) {
                         transitionHistory.remove(0);
                     }
 
                     transitionHistory.add(transitionText);
-                }
+//                }
             }
         });
     }

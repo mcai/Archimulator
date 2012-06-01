@@ -18,15 +18,15 @@
  ******************************************************************************/
 package archimulator.sim.base.simulation;
 
-import archimulator.sim.uncore.coherence.msi.controller.MyCycleAccurateEventQueue;
 import net.pickapack.event.BlockingEvent;
 import net.pickapack.event.BlockingEventDispatcher;
+import net.pickapack.event.CycleAccurateEventQueue;
 
-public class BasicSimulationObject implements SimulationObject {
+public abstract class BasicSimulationObject implements SimulationObject {
     private BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher;
-    private MyCycleAccurateEventQueue cycleAccurateEventQueue;
+    private CycleAccurateEventQueue cycleAccurateEventQueue;
 
-    public BasicSimulationObject(BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, MyCycleAccurateEventQueue cycleAccurateEventQueue) {
+    public BasicSimulationObject(BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
         this.blockingEventDispatcher = blockingEventDispatcher;
         this.cycleAccurateEventQueue = cycleAccurateEventQueue;
     }
@@ -39,7 +39,7 @@ public class BasicSimulationObject implements SimulationObject {
         return blockingEventDispatcher;
     }
 
-    public MyCycleAccurateEventQueue getCycleAccurateEventQueue() {
+    public CycleAccurateEventQueue getCycleAccurateEventQueue() {
         return cycleAccurateEventQueue;
     }
 }
