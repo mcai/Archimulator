@@ -17,6 +17,7 @@ package archimulator.sim.uncore.cache; /****************************************
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import archimulator.util.ValueProvider;
 import archimulator.util.ValueProviderFactory;
 import net.pickapack.action.Action1;
@@ -114,6 +115,14 @@ public class Cache<StateT extends Serializable> implements Serializable {
 
     public CacheLine<StateT> getLine(int set, int way) {
         if (way < 0 || way >= this.getAssociativity()) {
+            CacheCoherenceFlow.dumpTree();
+
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
             throw new IllegalArgumentException(String.format("set: %d, way: %d, this.associativity: %d", set, way, this.getAssociativity()));
         }
 
