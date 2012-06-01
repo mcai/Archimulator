@@ -116,13 +116,7 @@ public class Cache<StateT extends Serializable> implements Serializable {
     public CacheLine<StateT> getLine(int set, int way) {
         if (way < 0 || way >= this.getAssociativity()) {
             CacheCoherenceFlow.dumpTree();
-
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-
+            System.out.flush();
             throw new IllegalArgumentException(String.format("set: %d, way: %d, this.associativity: %d", set, way, this.getAssociativity()));
         }
 

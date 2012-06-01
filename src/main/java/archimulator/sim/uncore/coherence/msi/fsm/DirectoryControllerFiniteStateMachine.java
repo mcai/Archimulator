@@ -15,7 +15,6 @@ import net.pickapack.action.Action1;
 import net.pickapack.action.Action4;
 import net.pickapack.fsm.BasicFiniteStateMachine;
 import net.pickapack.fsm.FiniteStateMachineFactory;
-import net.pickapack.fsm.event.EnterStateEvent;
 import net.pickapack.fsm.event.ExitStateEvent;
 
 import java.util.ArrayList;
@@ -31,8 +30,6 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
     private int numRecallAcks = 0;
 
     private List<Action> stalledEvents = new ArrayList<Action>();
-
-    private List<String> transitionHistory = new ArrayList<String>();
 
     private Action onCompletedCallback;
 
@@ -61,24 +58,6 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
                 oldState = getState();
             }
         });
-
-        this.addListener(EnterStateEvent.class, new Action1<EnterStateEvent>() {
-            @Override
-            public void apply(EnterStateEvent enterStateEvent) {
-                CacheLine<DirectoryControllerState> line = directoryController.getCache().getLine(getSet(), getWay());
-
-//                if (getState() != oldState) {
-                    String transitionText = String.format("[%d] %s.[%d,%d] {%s} %s: %s.%s -> %s (owner: %s, sharers: %s)",
-                            directoryController.getCycleAccurateEventQueue().getCurrentCycle(), getName(), getSet(), getWay(), line.getTag() != CacheLine.INVALID_TAG ? String.format("0x%08x", line.getTag()) : "N/A", oldState, enterStateEvent.getSender() != null ? enterStateEvent.getSender() : "<N/A>", enterStateEvent.getCondition(), getState(),
-                            getDirectoryEntry().getOwner() != null ? getDirectoryEntry().getOwner() : "N/A", getDirectoryEntry().getSharers().toString().replace("[", "").replace("]", ""));
-                    if (transitionHistory.size() >= CacheControllerFiniteStateMachine.NUM_MAX_TRANSITION_HISTORY) {
-                        transitionHistory.remove(0);
-                    }
-
-                    transitionHistory.add(transitionText);
-//                }
-            }
-        });
     }
 
     public void onEventGetS(CacheCoherenceFlow producerFlow, CacheController req, int tag, Action onStalledCallback) {
@@ -89,7 +68,7 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
         Params params = new Params();
         GetSEvent getSEvent = new GetSEvent(directoryController, producerFlow, req, tag, set, way, onStalledCallback);
         params.put("event", getSEvent);
-        this.fireTransition(req + "." + String.format("0x%08x", tag), DirectoryControllerEventType.GETS, params, getSEvent);
+        this.fireTransition(req + "." + String.format("0x%08x", tag), params, getSEvent);
     }
 
     public void onEventGetM(CacheCoherenceFlow producerFlow, CacheController req, int tag, Action onStalledCallback) {
@@ -100,7 +79,7 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
         Params params = new Params();
         GetMEvent getMEvent = new GetMEvent(directoryController, producerFlow, req, tag, set, way, onStalledCallback);
         params.put("event", getMEvent);
-        this.fireTransition(req + "." + String.format("0x%08x", tag), DirectoryControllerEventType.GETM, params, getMEvent);
+        this.fireTransition(req + "." + String.format("0x%08x", tag), params, getMEvent);
     }
 
     public void onEventReplacement(CacheCoherenceFlow producerFlow, int tag, Action onCompletedCallback, Action onStalledCallback) {
@@ -111,7 +90,7 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
         Params params = new Params();
         ReplacementEvent replacementEvent = new ReplacementEvent(directoryController, producerFlow, tag, set, way, onCompletedCallback, onStalledCallback);
         params.put("event", replacementEvent);
-        this.fireTransition("<core>" + "." + String.format("0x%08x", tag), DirectoryControllerEventType.REPLACEMENT, params, replacementEvent);
+        this.fireTransition("<core>" + "." + String.format("0x%08x", tag), params, replacementEvent);
     }
 
     public void onEventRecallAck(CacheCoherenceFlow producerFlow, CacheController sender, int tag) {
@@ -122,13 +101,13 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
         Params params = new Params();
         RecallAckEvent recallAckEvent = new RecallAckEvent(directoryController, producerFlow, sender, tag);
         params.put("event", recallAckEvent);
-        this.fireTransition(sender + "." + String.format("0x%08x", tag), DirectoryControllerEventType.RECALL_ACK, params, recallAckEvent);
+        this.fireTransition(sender + "." + String.format("0x%08x", tag), params, recallAckEvent);
 
         if (this.numRecallAcks == 0) {
             Params params2 = new Params();
             LastRecallAckEvent lastRecallAckEvent = new LastRecallAckEvent(directoryController, producerFlow, tag);
             params2.put("event", lastRecallAckEvent);
-            this.fireTransition(sender + "." + String.format("0x%08x", tag), DirectoryControllerEventType.LAST_RECALL_ACK, params2, lastRecallAckEvent);
+            this.fireTransition(sender + "." + String.format("0x%08x", tag), params2, lastRecallAckEvent);
         }
     }
 
@@ -141,12 +120,12 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
             Params params = new Params();
             PutSNotLastEvent putSNotLastEvent = new PutSNotLastEvent(directoryController, producerFlow, req, tag);
             params.put("event", putSNotLastEvent);
-            this.fireTransition(req + "." + String.format("0x%08x", tag), DirectoryControllerEventType.PUTS_NOT_LAST, params, putSNotLastEvent);
+            this.fireTransition(req + "." + String.format("0x%08x", tag), params, putSNotLastEvent);
         } else {
             Params params = new Params();
             PutSLastEvent putSLastEvent = new PutSLastEvent(directoryController, producerFlow, req, tag);
             params.put("event", putSLastEvent);
-            this.fireTransition(req + "." + String.format("0x%08x", tag), DirectoryControllerEventType.PUTS_LAST, params, putSLastEvent);
+            this.fireTransition(req + "." + String.format("0x%08x", tag), params, putSLastEvent);
         }
     }
 
@@ -159,12 +138,12 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
             Params params = new Params();
             PutMAndDataFromOwnerEvent putMAndDataFromOwnerEvent = new PutMAndDataFromOwnerEvent(directoryController, producerFlow, req, tag);
             params.put("event", putMAndDataFromOwnerEvent);
-            this.fireTransition(req + "." + String.format("0x%08x", tag), DirectoryControllerEventType.PUTM_AND_DATA_FROM_OWNER, params, putMAndDataFromOwnerEvent);
+            this.fireTransition(req + "." + String.format("0x%08x", tag), params, putMAndDataFromOwnerEvent);
         } else {
             Params params = new Params();
             PutMAndDataFromNonOwnerEvent putMAndDataFromNonOwnerEvent = new PutMAndDataFromNonOwnerEvent(directoryController, producerFlow, req, tag);
             params.put("event", putMAndDataFromNonOwnerEvent);
-            this.fireTransition(req + "." + String.format("0x%08x", tag), DirectoryControllerEventType.PUTM_AND_DATA_FROM_NONOWNER, params, putMAndDataFromNonOwnerEvent);
+            this.fireTransition(req + "." + String.format("0x%08x", tag), params, putMAndDataFromNonOwnerEvent);
         }
     }
 
@@ -176,19 +155,19 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
         Params params = new Params();
         DataEvent dataEvent = new DataEvent(directoryController, producerFlow, sender, tag);
         params.put("event", dataEvent);
-        this.fireTransition(sender + "." + String.format("0x%08x", tag), DirectoryControllerEventType.DATA, params, dataEvent);
+        this.fireTransition(sender + "." + String.format("0x%08x", tag), params, dataEvent);
     }
 
-    private void fireTransition(Object sender, DirectoryControllerEventType eventType, Params params, DirectoryControllerEvent event) {
+    private void fireTransition(Object sender, Params params, DirectoryControllerEvent event) {
         event.onCompleted();
-        fsmFactory.fireTransition(this, sender, eventType, params);
+        fsmFactory.fireTransition(this, sender, event.getType(), params);
     }
 
-    private void stall(final Object sender, final DirectoryControllerEventType eventType, final Params params, final DirectoryControllerEvent event) {
+    private void stall(final Object sender, final Params params, final DirectoryControllerEvent event) {
         Action action = new Action() {
             @Override
             public void apply() {
-                fireTransition(sender, eventType, params, event);
+                fireTransition(sender, params, event);
             }
         };
         stall(action);
@@ -700,7 +679,7 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
                         ReplacementEvent replacementEvent = params.get(ReplacementEvent.class, "event");
-                        fsm.stall(sender, eventType, params, replacementEvent);
+                        fsm.stall(sender, params, replacementEvent);
                     }
                 }, DirectoryControllerState.MI_A)
                 .onCondition(DirectoryControllerEventType.RECALL_ACK, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
@@ -751,7 +730,7 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
                         ReplacementEvent replacementEvent = params.get(ReplacementEvent.class, "event");
-                        fsm.stall(sender, eventType, params, replacementEvent);
+                        fsm.stall(sender, params, replacementEvent);
                     }
                 }, DirectoryControllerState.SI_A)
                 .onCondition(DirectoryControllerEventType.RECALL_ACK, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
@@ -794,6 +773,8 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
                 .onCondition(DirectoryControllerEventType.PUTM_AND_DATA_FROM_NONOWNER, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
+                        //TODO: is it correct?
+                        throw new UnsupportedOperationException();
 //                        PutMAndDataFromNonOwnerEvent putMAndDataFromNonOwnerEvent = params.get(PutMAndDataFromNonOwnerEvent.class, "event");
 //                        final CacheController req = putMAndDataFromNonOwnerEvent.getReq();
 //                        final int tag = putMAndDataFromNonOwnerEvent.getTag();

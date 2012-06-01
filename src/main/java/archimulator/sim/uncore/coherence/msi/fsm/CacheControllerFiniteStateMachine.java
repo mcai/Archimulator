@@ -4,7 +4,6 @@ import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
-import archimulator.sim.uncore.coherence.msi.event.ControllerEvent;
 import archimulator.sim.uncore.coherence.msi.event.cache.*;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import archimulator.sim.uncore.coherence.msi.message.*;
@@ -16,25 +15,20 @@ import net.pickapack.action.Action1;
 import net.pickapack.action.Action4;
 import net.pickapack.fsm.BasicFiniteStateMachine;
 import net.pickapack.fsm.FiniteStateMachineFactory;
-import net.pickapack.fsm.event.EnterStateEvent;
 import net.pickapack.fsm.event.ExitStateEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<CacheControllerState, CacheControllerEventType> implements ValueProvider<CacheControllerState> {
-    public static final int NUM_MAX_TRANSITION_HISTORY = 100;
-
     private CacheController cacheController;
-    private CacheControllerState oldState;
+    private CacheControllerState previousState;
     private int set;
     private int way;
 
     private int numInvAcks = 0;
 
     private List<Action> stalledEvents = new ArrayList<Action>();
-
-    private List<String> transitionHistory = new ArrayList<String>();
 
     private Action onCompletedCallback;
 
@@ -59,23 +53,7 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
         this.addListener(ExitStateEvent.class, new Action1<ExitStateEvent>() {
             @Override
             public void apply(ExitStateEvent exitStateEvent) {
-                oldState = getState();
-            }
-        });
-
-        this.addListener(EnterStateEvent.class, new Action1<EnterStateEvent>() {
-            @Override
-            public void apply(EnterStateEvent enterStateEvent) {
-                CacheLine<CacheControllerState> line = cacheController.getCache().getLine(getSet(), getWay());
-
-//                if (getState() != oldState) {
-                    String transitionText = String.format("[%d] %s.[%d,%d] {%s} %s: %s.%s -> %s", cacheController.getCycleAccurateEventQueue().getCurrentCycle(), getName(), getSet(), getWay(), line.getTag() != CacheLine.INVALID_TAG ? String.format("0x%08x", line.getTag()) : "N/A", oldState, enterStateEvent.getSender() != null ? enterStateEvent.getSender() : "<N/A>", enterStateEvent.getCondition(), getState());
-                    if (transitionHistory.size() >= NUM_MAX_TRANSITION_HISTORY) {
-                        transitionHistory.remove(0);
-                    }
-
-                    transitionHistory.add(transitionText);
-//                }
+                previousState = getState();
             }
         });
     }
@@ -88,7 +66,7 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
         Params params = new Params();
         LoadEvent loadEvent = new LoadEvent(cacheController, producerFlow, tag, set, way, onCompletedCallback, onStalledCallback);
         params.put("event", loadEvent);
-        this.fireTransition("<core>" + "." + String.format("0x%08x", tag), CacheControllerEventType.LOAD, params, loadEvent);
+        this.fireTransition("<core>" + "." + String.format("0x%08x", tag), params, loadEvent);
     }
 
     public void onEventStore(CacheCoherenceFlow producerFlow, int tag, Action onCompletedCallback, Action onStalledCallback) {
@@ -99,7 +77,7 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
         Params params = new Params();
         StoreEvent storeEvent = new StoreEvent(cacheController, producerFlow, tag, set, way, onCompletedCallback, onStalledCallback);
         params.put("event", storeEvent);
-        this.fireTransition("<core>" + "." + String.format("0x%08x", tag), CacheControllerEventType.STORE, params, storeEvent);
+        this.fireTransition("<core>" + "." + String.format("0x%08x", tag), params, storeEvent);
     }
 
     public void onEventReplacement(CacheCoherenceFlow producerFlow, int tag, Action onCompletedCallback, Action onStalledCallback) {
@@ -110,7 +88,7 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
         Params params = new Params();
         ReplacementEvent replacementEvent = new ReplacementEvent(cacheController, producerFlow, tag, set, way, onCompletedCallback, onStalledCallback);
         params.put("event", replacementEvent);
-        this.fireTransition("<core>" + "." + String.format("0x%08x", tag), CacheControllerEventType.REPLACEMENT, params, replacementEvent);
+        this.fireTransition("<core>" + "." + String.format("0x%08x", tag), params, replacementEvent);
     }
 
     public void onEventFwdGetS(CacheCoherenceFlow producerFlow, CacheController req, int tag) {
@@ -121,7 +99,7 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
         Params params = new Params();
         FwdGetSEvent fwdGetSEvent = new FwdGetSEvent(cacheController, producerFlow, req, tag);
         params.put("event", fwdGetSEvent);
-        this.fireTransition(req + "." + String.format("0x%08x", tag), CacheControllerEventType.FWD_GETS, params, fwdGetSEvent);
+        this.fireTransition(req + "." + String.format("0x%08x", tag), params, fwdGetSEvent);
     }
 
     public void onEventFwdGetM(CacheCoherenceFlow producerFlow, CacheController req, int tag) {
@@ -132,7 +110,7 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
         Params params = new Params();
         FwdGetMEvent fwdGetMEvent = new FwdGetMEvent(cacheController, producerFlow, req, tag);
         params.put("event", fwdGetMEvent);
-        this.fireTransition(req + "." + String.format("0x%08x", tag), CacheControllerEventType.FWD_GETM, params, fwdGetMEvent);
+        this.fireTransition(req + "." + String.format("0x%08x", tag), params, fwdGetMEvent);
     }
 
     public void onEventInv(CacheCoherenceFlow producerFlow, CacheController req, int tag) {
@@ -143,7 +121,7 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
         Params params = new Params();
         InvEvent invEvent = new InvEvent(cacheController, producerFlow, req, tag);
         params.put("event", invEvent);
-        this.fireTransition(req + "." + String.format("0x%08x", tag), CacheControllerEventType.INV, params, invEvent);
+        this.fireTransition(req + "." + String.format("0x%08x", tag), params, invEvent);
     }
 
     public void onEventRecall(CacheCoherenceFlow producerFlow, int tag) {
@@ -154,7 +132,7 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
         Params params = new Params();
         RecallEvent recallEvent = new RecallEvent(cacheController, producerFlow, tag);
         params.put("event", recallEvent);
-        this.fireTransition("<dir>" + "." + String.format("0x%08x", tag), CacheControllerEventType.RECALL, params, recallEvent);
+        this.fireTransition("<dir>" + "." + String.format("0x%08x", tag), params, recallEvent);
     }
 
     public void onEventPutAck(CacheCoherenceFlow producerFlow, int tag) {
@@ -165,7 +143,7 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
         Params params = new Params();
         PutAckEvent putAckEvent = new PutAckEvent(cacheController, producerFlow, tag);
         params.put("event", putAckEvent);
-        this.fireTransition(cacheController.getDirectoryController() + "." + String.format("0x%08x", tag), CacheControllerEventType.PUT_ACK, params, putAckEvent);
+        this.fireTransition(cacheController.getDirectoryController() + "." + String.format("0x%08x", tag), params, putAckEvent);
     }
 
     public void onEventData(CacheCoherenceFlow producerFlow, Controller sender, int tag, int numAcks) {
@@ -180,12 +158,12 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
                 Params params = new Params();
                 DataFromDirAckEq0Event dataFromDirAckEq0Event = new DataFromDirAckEq0Event(cacheController, producerFlow, sender, tag);
                 params.put("event", dataFromDirAckEq0Event);
-                this.fireTransition(sender + "." + String.format("0x%08x", tag), CacheControllerEventType.DATA_FROM_DIR_ACK_EQ_0, params, dataFromDirAckEq0Event);
+                this.fireTransition(sender + "." + String.format("0x%08x", tag), params, dataFromDirAckEq0Event);
             } else {
                 Params params = new Params();
                 DataFromDirAckGt0Event dataFromDirAckGt0Event = new DataFromDirAckGt0Event(cacheController, producerFlow, sender, tag);
                 params.put("event", dataFromDirAckGt0Event);
-                this.fireTransition(sender + "." + String.format("0x%08x", tag), CacheControllerEventType.DATA_FROM_DIR_ACK_GT_0, params, dataFromDirAckGt0Event);
+                this.fireTransition(sender + "." + String.format("0x%08x", tag), params, dataFromDirAckGt0Event);
 
                 if (this.numInvAcks == 0) {
                     onEventLastInvAck(producerFlow, tag);
@@ -195,7 +173,7 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
             Params params = new Params();
             DataFromOwnerEvent dataFromOwnerEvent = new DataFromOwnerEvent(cacheController, producerFlow, sender, tag);
             params.put("event", dataFromOwnerEvent);
-            this.fireTransition(sender + "." + String.format("0x%08x", tag), CacheControllerEventType.DATA_FROM_OWNER, params, dataFromOwnerEvent);
+            this.fireTransition(sender + "." + String.format("0x%08x", tag), params, dataFromOwnerEvent);
         }
     }
 
@@ -207,7 +185,7 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
         Params params = new Params();
         InvAckEvent invAckEvent = new InvAckEvent(cacheController, producerFlow, sender, tag);
         params.put("event", invAckEvent);
-        this.fireTransition(sender + "." + String.format("0x%08x", tag), CacheControllerEventType.INV_ACK, params, invAckEvent);
+        this.fireTransition(sender + "." + String.format("0x%08x", tag), params, invAckEvent);
 
         if (this.numInvAcks == 0) {
             onEventLastInvAck(producerFlow, tag);
@@ -218,14 +196,14 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
         Params params2 = new Params();
         LastInvAckEvent lastInvAckEvent = new LastInvAckEvent(cacheController, producerFlow, tag);
         params2.put("event", lastInvAckEvent);
-        this.fireTransition("<N/A>" + "." + String.format("0x%08x", tag), CacheControllerEventType.LAST_INV_ACK, params2, lastInvAckEvent);
+        this.fireTransition("<N/A>" + "." + String.format("0x%08x", tag), params2, lastInvAckEvent);
 
         this.numInvAcks = 0;
     }
 
-    private void fireTransition(Object sender, CacheControllerEventType eventType, Params params, ControllerEvent event) {
+    private void fireTransition(Object sender, Params params, CacheControllerEvent event) {
         event.onCompleted();
-        fsmFactory.fireTransition(this, sender, eventType, params);
+        fsmFactory.fireTransition(this, sender, event.getType(), params);
     }
 
     private void sendGetSToDir(CacheCoherenceFlow producerFlow, int tag) {
@@ -305,11 +283,11 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
         this.cacheController.getCache().handlePromotionOnHit(set, way);
     }
 
-    private void stall(final Object sender, final CacheControllerEventType eventType, final Params params, final CacheControllerEvent event) {
+    private void stall(final Object sender, final Params params, final CacheControllerEvent event) {
         Action action = new Action() {
             @Override
             public void apply() {
-                fireTransition(sender, eventType, params, event);
+                fireTransition(sender, params, event);
             }
         };
         stall(action);
@@ -344,15 +322,15 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
     private static Action1<CacheControllerFiniteStateMachine> actionWhenStateChanged = new Action1<CacheControllerFiniteStateMachine>() {
         @Override
         public void apply(CacheControllerFiniteStateMachine fsm) {
-            if (fsm.oldState != fsm.getState() && fsm.getState().isStable()) {
-                final Action onCompletedCallback = fsm.getOnCompletedCallback();
-                if (onCompletedCallback != null) {
-                    fsm.setOnCompletedCallback(null);
-                    onCompletedCallback.apply();
+            if (fsm.previousState != fsm.getState()) {
+                if (fsm.getState().isStable()) {
+                    final Action onCompletedCallback = fsm.getOnCompletedCallback();
+                    if (onCompletedCallback != null) {
+                        fsm.setOnCompletedCallback(null);
+                        onCompletedCallback.apply();
+                    }
                 }
-            }
 
-            if (fsm.oldState != fsm.getState()) {
                 List<Action> stalledEventsToProcess = new ArrayList<Action>();
                 for (Action stalledEvent : fsm.stalledEvents) {
                     stalledEventsToProcess.add(stalledEvent);
@@ -432,7 +410,7 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
                     @Override
                     public void apply(final CacheControllerFiniteStateMachine fsm, Object sender, final CacheControllerEventType eventType, final Params params) {
                         InvEvent invEvent = params.get(InvEvent.class, "event");
-                        fsm.stall(sender, eventType, params, invEvent);
+                        fsm.stall(sender, params, invEvent);
                     }
                 }, CacheControllerState.IS_D)
                 .onCondition(CacheControllerEventType.DATA_FROM_DIR_ACK_EQ_0, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
@@ -473,14 +451,14 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
                         FwdGetSEvent fwdGetSEvent = params.get(FwdGetSEvent.class, "event");
-                        fsm.stall(sender, eventType, params, fwdGetSEvent);
+                        fsm.stall(sender, params, fwdGetSEvent);
                     }
                 }, CacheControllerState.IM_AD)
                 .onCondition(CacheControllerEventType.FWD_GETM, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
                         FwdGetMEvent fwdGetMEvent = params.get(FwdGetMEvent.class, "event");
-                        fsm.stall(sender, eventType, params, fwdGetMEvent);
+                        fsm.stall(sender, params, fwdGetMEvent);
                     }
                 }, CacheControllerState.IM_AD)
                 .onCondition(CacheControllerEventType.DATA_FROM_DIR_ACK_EQ_0, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
@@ -533,14 +511,14 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
                         FwdGetSEvent fwdGetSEvent = params.get(FwdGetSEvent.class, "event");
-                        fsm.stall(sender, eventType, params, fwdGetSEvent);
+                        fsm.stall(sender, params, fwdGetSEvent);
                     }
                 }, CacheControllerState.IM_A)
                 .onCondition(CacheControllerEventType.FWD_GETM, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
                         FwdGetMEvent fwdGetMEvent = params.get(FwdGetMEvent.class, "event");
-                        fsm.stall(sender, eventType, params, fwdGetMEvent);
+                        fsm.stall(sender, params, fwdGetMEvent);
                     }
                 }, CacheControllerState.IM_A)
                 .onCondition(CacheControllerEventType.INV_ACK, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
@@ -631,14 +609,14 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
                         FwdGetSEvent fwdGetSEvent = params.get(FwdGetSEvent.class, "event");
-                        fsm.stall(sender, eventType, params, fwdGetSEvent);
+                        fsm.stall(sender, params, fwdGetSEvent);
                     }
                 }, CacheControllerState.SM_AD)
                 .onCondition(CacheControllerEventType.FWD_GETM, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
                         FwdGetMEvent fwdGetMEvent = params.get(FwdGetMEvent.class, "event");
-                        fsm.stall(sender, eventType, params, fwdGetMEvent);
+                        fsm.stall(sender, params, fwdGetMEvent);
                     }
                 }, CacheControllerState.SM_AD)
                 .onCondition(CacheControllerEventType.INV, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
@@ -709,14 +687,14 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
                         FwdGetSEvent fwdGetSEvent = params.get(FwdGetSEvent.class, "event");
-                        fsm.stall(sender, eventType, params, fwdGetSEvent);
+                        fsm.stall(sender, params, fwdGetSEvent);
                     }
                 }, CacheControllerState.SM_A)
                 .onCondition(CacheControllerEventType.FWD_GETM, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
                         FwdGetMEvent fwdGetMEvent = params.get(FwdGetMEvent.class, "event");
-                        fsm.stall(sender, eventType, params, fwdGetMEvent);
+                        fsm.stall(sender, params, fwdGetMEvent);
                     }
                 }, CacheControllerState.SM_A)
                 .onCondition(CacheControllerEventType.INV_ACK, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
