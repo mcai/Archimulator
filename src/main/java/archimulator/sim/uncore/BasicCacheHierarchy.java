@@ -18,11 +18,14 @@
  ******************************************************************************/
 package archimulator.sim.uncore;
 
+import archimulator.sim.base.event.DumpStatEvent;
 import archimulator.sim.base.simulation.BasicSimulationObject;
 import archimulator.sim.core.ProcessorConfig;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
+import archimulator.sim.uncore.coherence.msi.fsm.CacheControllerFiniteStateMachine;
+import archimulator.sim.uncore.coherence.msi.fsm.DirectoryControllerFiniteStateMachine;
 import archimulator.sim.uncore.coherence.msi.message.CoherenceMessage;
 import archimulator.sim.uncore.dram.*;
 import archimulator.sim.uncore.net.L1sToL2Net;
@@ -30,6 +33,7 @@ import archimulator.sim.uncore.net.L2ToMemNet;
 import archimulator.sim.uncore.net.Net;
 import archimulator.sim.uncore.tlb.TranslationLookasideBuffer;
 import net.pickapack.action.Action;
+import net.pickapack.action.Action1;
 import net.pickapack.event.BlockingEvent;
 import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
@@ -99,6 +103,27 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
         this.l2ToMemNetwork = new L2ToMemNet(this);
 
         this.p2pReorderBuffers = new HashMap<Controller, Map<Controller, PointToPointReorderBuffer>>();
+
+        this.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
+            public void apply(DumpStatEvent event) {
+                if (event.getType() == DumpStatEvent.Type.DETAILED_SIMULATION) {
+                    dumpStats(event.getStats());
+                }
+            }
+        });
+    }
+
+    private void dumpStats(Map<String, Object> stats) {
+        System.out.println("Cache Controller FSM: ");
+        System.out.println("------------------------------------------------------------------------");
+        CacheControllerFiniteStateMachine.fsmFactory.dump();
+
+        System.out.println();
+        System.out.println();
+
+        System.out.println("Directory Controller FSM: ");
+        System.out.println("------------------------------------------------------------------------");
+        DirectoryControllerFiniteStateMachine.fsmFactory.dump();
     }
 
     @Override
