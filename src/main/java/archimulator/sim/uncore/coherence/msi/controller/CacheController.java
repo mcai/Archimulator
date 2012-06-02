@@ -10,12 +10,14 @@ import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import archimulator.sim.uncore.coherence.msi.flow.LoadFlow;
 import archimulator.sim.uncore.coherence.msi.flow.StoreFlow;
 import archimulator.sim.uncore.coherence.msi.fsm.CacheControllerFiniteStateMachine;
+import archimulator.sim.uncore.coherence.msi.fsm.CacheControllerFiniteStateMachineFactory;
 import archimulator.sim.uncore.coherence.msi.message.*;
 import archimulator.sim.uncore.coherence.msi.state.CacheControllerState;
 import archimulator.sim.uncore.net.Net;
 import archimulator.util.ValueProvider;
 import archimulator.util.ValueProviderFactory;
 import net.pickapack.action.Action;
+import net.pickapack.action.Action1;
 import net.pickapack.action.Action2;
 
 import java.util.ArrayList;
@@ -26,6 +28,7 @@ public class CacheController extends Controller {
     private EvictableCache<CacheControllerState> cache;
     private List<MemoryHierarchyAccess> pendingAccesses;
     private EnumMap<MemoryHierarchyAccessType, Integer> pendingAccessesPerType;
+    private CacheControllerFiniteStateMachineFactory fsmFactory;
 
     public CacheController(CacheHierarchy cacheHierarchy, final String name, CoherentCacheConfig config) {
         super(cacheHierarchy, name, config);
@@ -42,16 +45,38 @@ public class CacheController extends Controller {
 
         this.cache = new EvictableCache<CacheControllerState>(name, config.getGeometry(), config.getEvictionPolicyClz(), cacheLineStateProviderFactory);
 
-        this.init();
-    }
-
-    private void init() {
         this.pendingAccesses = new ArrayList<MemoryHierarchyAccess>();
 
         this.pendingAccessesPerType = new EnumMap<MemoryHierarchyAccessType, Integer>(MemoryHierarchyAccessType.class);
         this.pendingAccessesPerType.put(MemoryHierarchyAccessType.IFETCH, 0);
         this.pendingAccessesPerType.put(MemoryHierarchyAccessType.LOAD, 0);
         this.pendingAccessesPerType.put(MemoryHierarchyAccessType.STORE, 0);
+
+        this.fsmFactory = new CacheControllerFiniteStateMachineFactory(new Action1<CacheControllerFiniteStateMachine>() {
+                @Override
+                public void apply(CacheControllerFiniteStateMachine fsm) {
+                    if (fsm.getPreviousState() != fsm.getState()) {
+                        if (fsm.getState().isStable()) {
+                            final Action onCompletedCallback = fsm.getOnCompletedCallback();
+                            if (onCompletedCallback != null) {
+                                fsm.setOnCompletedCallback(null);
+                                onCompletedCallback.apply();
+                            }
+                        }
+
+                        List<Action> stalledEventsToProcess = new ArrayList<Action>();
+                        for (Action stalledEvent : fsm.getStalledEvents()) {
+                            stalledEventsToProcess.add(stalledEvent);
+                        }
+
+                        fsm.getStalledEvents().clear();
+
+                        for (Action stalledEvent : stalledEventsToProcess) {
+                            stalledEvent.apply();
+                        }
+                    }
+                }
+            });
     }
 
     public boolean canAccess(MemoryHierarchyAccessType type, int physicalTag) {
@@ -317,6 +342,10 @@ public class CacheController extends Controller {
 
     public DirectoryController getDirectoryController() {
         return this.getNext();
+    }
+
+    public CacheControllerFiniteStateMachineFactory getFsmFactory() {
+        return fsmFactory;
     }
 
     @Override

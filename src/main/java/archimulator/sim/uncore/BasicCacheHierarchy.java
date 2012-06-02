@@ -114,16 +114,27 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
     }
 
     private void dumpStats(Map<String, Object> stats) {
-        System.out.println("Cache Controller FSM: ");
-        System.out.println("------------------------------------------------------------------------");
-        CacheControllerFiniteStateMachine.fsmFactory.dump();
+        for(CacheController instructionCache : this.instructionCaches) {
+            System.out.println("Cache Controller " + instructionCache.getName() + " FSM: ");
+            System.out.println("------------------------------------------------------------------------");
+            instructionCache.getFsmFactory().dump();
+        }
 
         System.out.println();
         System.out.println();
 
-        System.out.println("Directory Controller FSM: ");
+        for(CacheController dataCache : this.dataCaches) {
+            System.out.println("Cache Controller " + dataCache.getName() + " FSM: ");
+            System.out.println("------------------------------------------------------------------------");
+            dataCache.getFsmFactory().dump();
+        }
+
+        System.out.println();
+        System.out.println();
+
         System.out.println("------------------------------------------------------------------------");
-        DirectoryControllerFiniteStateMachine.fsmFactory.dump();
+        System.out.println("Directory Controller " + this.l2Cache.getName() + " FSM: ");
+        this.l2Cache.getFsmFactory().dump();
     }
 
     @Override
