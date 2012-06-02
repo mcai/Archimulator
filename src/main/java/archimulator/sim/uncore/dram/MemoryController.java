@@ -30,11 +30,11 @@ import net.pickapack.action.Action1;
 
 import java.util.Map;
 
-public abstract class MainMemory extends MemoryDevice {
+public abstract class MemoryController extends MemoryDevice {
     private long reads;
     private long writes;
 
-    public MainMemory(CacheHierarchy cacheHierarchy) {
+    public MemoryController(CacheHierarchy cacheHierarchy) {
         super(cacheHierarchy, "mainMemory");
 
         this.getBlockingEventDispatcher().addListener(ResetStatEvent.class, new Action1<ResetStatEvent>() {
@@ -70,7 +70,6 @@ public abstract class MainMemory extends MemoryDevice {
         return this.getCacheHierarchy().getL2ToMemNetwork();
     }
 
-    //TODO: to be called from directory controller
     public void memReadRequestReceive(final MemoryDevice source, int tag, final Action onSuccessCallback) {
         this.reads++;
 
@@ -85,7 +84,6 @@ public abstract class MainMemory extends MemoryDevice {
         });
     }
 
-    //TODO: to be called from directory controller
     public void memWriteRequestReceive(final MemoryDevice source, int tag, final Action onSuccessCallback) {
         this.writes++;
 

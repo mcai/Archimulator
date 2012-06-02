@@ -25,14 +25,14 @@ import net.pickapack.math.Counter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BasicMainMemory extends MainMemory {
+public class BasicMemoryController extends MemoryController {
     private BasicMainMemoryConfig config;
 
     private int rowBits;
     private List<Bank> banks;
     private int previousBank = 0;
 
-    public BasicMainMemory(CacheHierarchy cacheHierarchy, BasicMainMemoryConfig config) {
+    public BasicMemoryController(CacheHierarchy cacheHierarchy, BasicMainMemoryConfig config) {
         super(cacheHierarchy);
 
         this.config = config;

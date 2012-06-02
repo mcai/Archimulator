@@ -10,5 +10,6 @@ public enum DirectoryControllerEventType {
     PUTS_LAST,
     PUTM_AND_DATA_FROM_OWNER,
     PUTM_AND_DATA_FROM_NONOWNER,
-    DATA
+    DATA,
+    DATA_FROM_MEMORY
 }

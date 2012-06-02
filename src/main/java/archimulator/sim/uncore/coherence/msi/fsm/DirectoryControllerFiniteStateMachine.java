@@ -61,10 +61,6 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
     }
 
     public void onEventGetS(CacheCoherenceFlow producerFlow, CacheController req, int tag, Action onStalledCallback) {
-        if (req == null || tag == CacheLine.INVALID_TAG) {
-            throw new IllegalArgumentException();
-        }
-
         Params params = new Params();
         GetSEvent getSEvent = new GetSEvent(directoryController, producerFlow, req, tag, set, way, onStalledCallback);
         params.put("event", getSEvent);
@@ -72,10 +68,6 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
     }
 
     public void onEventGetM(CacheCoherenceFlow producerFlow, CacheController req, int tag, Action onStalledCallback) {
-        if (req == null || tag == CacheLine.INVALID_TAG) {
-            throw new IllegalArgumentException();
-        }
-
         Params params = new Params();
         GetMEvent getMEvent = new GetMEvent(directoryController, producerFlow, req, tag, set, way, onStalledCallback);
         params.put("event", getMEvent);
@@ -83,10 +75,6 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
     }
 
     public void onEventReplacement(CacheCoherenceFlow producerFlow, int tag, Action onCompletedCallback, Action onStalledCallback) {
-        if (tag == CacheLine.INVALID_TAG || onCompletedCallback == null) {
-            throw new IllegalArgumentException();
-        }
-
         Params params = new Params();
         ReplacementEvent replacementEvent = new ReplacementEvent(directoryController, producerFlow, tag, set, way, onCompletedCallback, onStalledCallback);
         params.put("event", replacementEvent);
@@ -94,10 +82,6 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
     }
 
     public void onEventRecallAck(CacheCoherenceFlow producerFlow, CacheController sender, int tag) {
-        if (sender == null || tag == CacheLine.INVALID_TAG) {
-            throw new IllegalArgumentException();
-        }
-
         Params params = new Params();
         RecallAckEvent recallAckEvent = new RecallAckEvent(directoryController, producerFlow, sender, tag);
         params.put("event", recallAckEvent);
@@ -112,10 +96,6 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
     }
 
     public void onEventPutS(CacheCoherenceFlow producerFlow, CacheController req, int tag) {
-        if (req == null || tag == CacheLine.INVALID_TAG) {
-            throw new IllegalArgumentException();
-        }
-
         if (this.getDirectoryEntry().getSharers().size() > 1) {
             Params params = new Params();
             PutSNotLastEvent putSNotLastEvent = new PutSNotLastEvent(directoryController, producerFlow, req, tag);
@@ -130,10 +110,6 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
     }
 
     public void onEventPutMAndData(CacheCoherenceFlow producerFlow, CacheController req, int tag) {
-        if (req == null || tag == CacheLine.INVALID_TAG) {
-            throw new IllegalArgumentException();
-        }
-
         if (req == this.getDirectoryEntry().getOwner()) {
             Params params = new Params();
             PutMAndDataFromOwnerEvent putMAndDataFromOwnerEvent = new PutMAndDataFromOwnerEvent(directoryController, producerFlow, req, tag);
@@ -148,10 +124,6 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
     }
 
     public void onEventData(CacheCoherenceFlow producerFlow, CacheController sender, int tag) {
-        if (sender == null || tag == CacheLine.INVALID_TAG) {
-            throw new IllegalArgumentException();
-        }
-
         Params params = new Params();
         DataEvent dataEvent = new DataEvent(directoryController, producerFlow, sender, tag);
         params.put("event", dataEvent);
@@ -178,10 +150,6 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
     }
 
     private void sendDataToReq(CacheCoherenceFlow producerFlow, final CacheController req, final int tag, int numAcks) {
-        if (req == null || tag == CacheLine.INVALID_TAG) {
-            throw new IllegalArgumentException();
-        }
-
         directoryController.transfer(req, directoryController.getCache().getLineSize() + 8, new DataMessage(directoryController, producerFlow, directoryController, tag, numAcks));
     }
 
@@ -190,50 +158,28 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
     }
 
     public static void sendPutAckToReq(CacheCoherenceFlow producerFlow, DirectoryController directoryController, final CacheController req, final int tag) {
-        if (req == null || tag == CacheLine.INVALID_TAG) {
-            throw new IllegalArgumentException();
-        }
-
         directoryController.transfer(req, 8, new PutAckMessage(directoryController, producerFlow, tag));
     }
 
     private void copyDataToMemory(int tag) {
-        //TODO: add dram read latency
+        directoryController.getNext().memWriteRequestReceive(directoryController, tag, new Action() {
+            @Override
+            public void apply() {
+            }
+        });
     }
 
     private void sendFwdGetSToOwner(CacheCoherenceFlow producerFlow, final CacheController req, final int tag) {
-        if (req == null || tag == CacheLine.INVALID_TAG) {
-            throw new IllegalArgumentException();
-        }
-
         final CacheController owner = getDirectoryEntry().getOwner();
-
-        if (owner == null) {
-            throw new IllegalArgumentException();
-        }
-
         directoryController.transfer(owner, 8, new FwdGetSMessage(directoryController, producerFlow, req, tag));
     }
 
     private void sendFwdGetMToOwner(CacheCoherenceFlow producerFlow, final CacheController req, final int tag) {
-        if (req == null || tag == CacheLine.INVALID_TAG) {
-            throw new IllegalArgumentException();
-        }
-
         final CacheController owner = getDirectoryEntry().getOwner();
-
-        if (owner == null) {
-            throw new IllegalArgumentException();
-        }
-
         directoryController.transfer(owner, 8, new FwdGetMMessage(directoryController, producerFlow, req, tag));
     }
 
     private void sendInvToSharers(CacheCoherenceFlow producerFlow, final CacheController req, final int tag) {
-        if (req == null || tag == CacheLine.INVALID_TAG) {
-            throw new IllegalArgumentException();
-        }
-
         for (final CacheController sharer : this.getDirectoryEntry().getSharers()) {
             if (req != sharer) {
                 directoryController.transfer(sharer, 8, new InvMessage(directoryController, producerFlow, req, tag));
@@ -242,67 +188,34 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
     }
 
     private void sendRecallToOwner(CacheCoherenceFlow producerFlow, int tag) {
-        if (tag == CacheLine.INVALID_TAG) {
-            throw new IllegalArgumentException();
-        }
-
         final CacheController owner = getDirectoryEntry().getOwner();
-
-        if (owner == null) {
-            throw new IllegalArgumentException();
-        }
-
         directoryController.transfer(owner, 8, new RecallMessage(directoryController, producerFlow, tag));
     }
 
     private void sendRecallToSharers(CacheCoherenceFlow producerFlow, int tag) {
-        if (tag == CacheLine.INVALID_TAG) {
-            throw new IllegalArgumentException();
-        }
-
         for (final CacheController sharer : this.getDirectoryEntry().getSharers()) {
             directoryController.transfer(sharer, 8, new RecallMessage(directoryController, producerFlow, tag));
         }
     }
 
     private void decrementRecallAck(CacheController sender, int tag) {
-        if (sender == null || tag == CacheLine.INVALID_TAG || this.numRecallAcks <= 0) {
-            throw new IllegalArgumentException();
-        }
-
         this.numRecallAcks--;
     }
 
     private void addReqAndOwnerToSharers(CacheController req) {
-        if (req == null) {
-            throw new IllegalArgumentException();
-        }
-
         this.getDirectoryEntry().getSharers().add(req);
         this.getDirectoryEntry().getSharers().add(this.getDirectoryEntry().getOwner());
     }
 
     private void addReqToSharers(CacheController req) {
-        if (req == null) {
-            throw new IllegalArgumentException();
-        }
-
         this.getDirectoryEntry().getSharers().add(req);
     }
 
     private void removeReqFromSharers(CacheController req) {
-        if (req == null) {
-            throw new IllegalArgumentException();
-        }
-
         this.getDirectoryEntry().getSharers().remove(req);
     }
 
     private void setOwnerToReq(CacheController req) {
-        if (req == null) {
-            throw new IllegalArgumentException();
-        }
-
         this.getDirectoryEntry().setOwner(req);
     }
 
@@ -375,71 +288,156 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
                 .setOnCompletedCallback(actionWhenStateChanged)
                 .onCondition(DirectoryControllerEventType.GETS, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
-                    public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        //TODO: add dram read latency
-                        GetSEvent getSEvent = params.get(GetSEvent.class, "event");
+                    public void apply(final DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
+                        final GetSEvent getSEvent = params.get(GetSEvent.class, "event");
                         final CacheController req = getSEvent.getReq();
                         final int tag = getSEvent.getTag();
 
-                        fsm.sendDataToReq(getSEvent, req, tag, 0);
-                        fsm.addReqToSharers(req);
-                        fsm.getLine().setTag(getSEvent.getTag());
-                        fsm.directoryController.getCache().handleInsertionOnMiss(fsm.getSet(), fsm.getWay());
+                        fsm.directoryController.transfer(fsm.directoryController.getNext(), 8, new Action() {
+                            @Override
+                            public void apply() {
+                                fsm.directoryController.getNext().memReadRequestReceive(fsm.directoryController, tag, new Action() {
+                                    @Override
+                                    public void apply() {
+                                        fsm.directoryController.getCycleAccurateEventQueue().schedule(fsm.directoryController, new Action() {
+                                            @Override
+                                            public void apply() {
+                                                Params params1 = new Params();
+                                                DataFromMemoryEvent dataFromMemoryEvent = new DataFromMemoryEvent(fsm.directoryController, getSEvent, req, tag);
+                                                params1.put("event", dataFromMemoryEvent);
+                                                fsm.fireTransition(fsm.directoryController.getNext() + "." + String.format("0x%08x", tag), params1, dataFromMemoryEvent);
+                                            }
+                                        }, fsm.directoryController.getHitLatency());
+                                    }
+                                });
+                            }
+                        });
                     }
-                }, DirectoryControllerState.S)
+                }, DirectoryControllerState.IS_D)
                 .onCondition(DirectoryControllerEventType.GETM, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
-                    public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        //TODO: add dram read latency
-                        GetMEvent getMEvent = params.get(GetMEvent.class, "event");
+                    public void apply(final DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
+                        final GetMEvent getMEvent = params.get(GetMEvent.class, "event");
                         final CacheController req = getMEvent.getReq();
                         final int tag = getMEvent.getTag();
 
-                        int numAcks = 0;
-                        for (CacheController sharer : fsm.getDirectoryEntry().getSharers()) {
-                            if (sharer != req) {
-                                numAcks++;
+                        fsm.directoryController.transfer(fsm.directoryController.getNext(), 8, new Action() {
+                            @Override
+                            public void apply() {
+                                fsm.directoryController.getNext().memReadRequestReceive(fsm.directoryController, tag, new Action() {
+                                    @Override
+                                    public void apply() {
+                                        fsm.directoryController.getCycleAccurateEventQueue().schedule(fsm.directoryController, new Action() {
+                                            @Override
+                                            public void apply() {
+                                                Params params1 = new Params();
+                                                DataFromMemoryEvent dataFromMemoryEvent = new DataFromMemoryEvent(fsm.directoryController, getMEvent, req, tag);
+                                                params1.put("event", dataFromMemoryEvent);
+                                                fsm.fireTransition(fsm.directoryController.getNext() + "." + String.format("0x%08x", tag), params1, dataFromMemoryEvent);
+                                            }
+                                        }, fsm.directoryController.getHitLatency());
+                                    }
+                                });
                             }
-                        }
+                        });
+                    }
+                }, DirectoryControllerState.IM_D);
 
-                        fsm.sendDataToReq(getMEvent, req, tag, numAcks);
-                        fsm.setOwnerToReq(req);
-                        fsm.getLine().setTag(getMEvent.getTag());
+        fsmFactory.inState(DirectoryControllerState.IS_D)
+                .setOnCompletedCallback(actionWhenStateChanged)
+                .onCondition(DirectoryControllerEventType.GETS, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
+                    @Override
+                    public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
+                        GetSEvent getSEvent = params.get(GetSEvent.class, "event");
+                        fsm.stall(getSEvent.getOnStalledCallback());
+                    }
+                }, DirectoryControllerState.IS_D)
+                .onCondition(DirectoryControllerEventType.GETM, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
+                    @Override
+                    public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
+                        GetMEvent getMEvent = params.get(GetMEvent.class, "event");
+                        fsm.stall(getMEvent.getOnStalledCallback());
+                    }
+                }, DirectoryControllerState.IS_D)
+                .onCondition(DirectoryControllerEventType.PUTS_NOT_LAST, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
+                    @Override
+                    public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
+                        PutSNotLastEvent putSNotLastEvent = params.get(PutSNotLastEvent.class, "event");
+                        fsm.stall(sender, params, putSNotLastEvent);
+                    }
+                }, DirectoryControllerState.IS_D)
+                .onCondition(DirectoryControllerEventType.PUTS_LAST, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
+                    @Override
+                    public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
+                        PutSLastEvent putSNotLastEvent = params.get(PutSLastEvent.class, "event");
+                        fsm.stall(sender, params, putSNotLastEvent);
+                    }
+                }, DirectoryControllerState.IS_D)
+                .onCondition(DirectoryControllerEventType.PUTM_AND_DATA_FROM_NONOWNER, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
+                    @Override
+                    public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
+                        PutMAndDataFromNonOwnerEvent putMAndDataFromNonOwnerEvent = params.get(PutMAndDataFromNonOwnerEvent.class, "event");
+                        fsm.stall(sender, params, putMAndDataFromNonOwnerEvent);
+                    }
+                }, DirectoryControllerState.IS_D)
+                .onCondition(DirectoryControllerEventType.DATA_FROM_MEMORY, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
+                    @Override
+                    public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
+                        DataFromMemoryEvent dataFromMemoryEvent = params.get(DataFromMemoryEvent.class, "event");
+                        fsm.sendDataToReq(dataFromMemoryEvent, dataFromMemoryEvent.getReq(), dataFromMemoryEvent.getTag(), 0);
+                        fsm.addReqToSharers(dataFromMemoryEvent.getReq());
+                        fsm.getLine().setTag(dataFromMemoryEvent.getTag());
                         fsm.directoryController.getCache().handleInsertionOnMiss(fsm.getSet(), fsm.getWay());
                     }
-                }, DirectoryControllerState.M)
-        //TODO: hint: select one victim line, and to be integrated into FSM, etc.
-//                .onCondition(DirectoryControllerEventType.PUTS_NOT_LAST, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
-//                    @Override
-//                    public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-//                        PutSNotLastEvent putSNotLastEvent = params.get(PutSNotLastEvent.class, "event");
-//                        final CacheController req = putSNotLastEvent.getReq();
-//                        final int tag = putSNotLastEvent.getTag();
-//
-//                        fsm.sendPutAckToReq(req, tag);
-//                    }
-//                }, DirectoryControllerState.I)
-//                .onCondition(DirectoryControllerEventType.PUTS_LAST, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
-//                    @Override
-//                    public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-//                        PutSLastEvent putSLastEvent = params.get(PutSLastEvent.class, "event");
-//                        final CacheController req = putSLastEvent.getReq();
-//                        final int tag = putSLastEvent.getTag();
-//
-//                        fsm.sendPutAckToReq(req, tag);
-//                    }
-//                }, DirectoryControllerState.I)
-//                .onCondition(DirectoryControllerEventType.PUTM_AND_DATA_FROM_NONOWNER, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
-//                    @Override
-//                    public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-//                        PutMAndDataFromNonOwnerEvent putMAndDataFromNonOwnerEvent = params.get(PutMAndDataFromNonOwnerEvent.class, "event");
-//                        final CacheController req = putMAndDataFromNonOwnerEvent.getReq();
-//                        final int tag = putMAndDataFromNonOwnerEvent.getTag();
-//
-//                        fsm.sendPutAckToReq(req, tag);
-//                    }
-//                }, DirectoryControllerState.I)
-        ;
+                }, DirectoryControllerState.S);
+
+        fsmFactory.inState(DirectoryControllerState.IM_D)
+                .setOnCompletedCallback(actionWhenStateChanged)
+                .onCondition(DirectoryControllerEventType.GETS, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
+                    @Override
+                    public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
+                        GetSEvent getSEvent = params.get(GetSEvent.class, "event");
+                        fsm.stall(getSEvent.getOnStalledCallback());
+                    }
+                }, DirectoryControllerState.IM_D)
+                .onCondition(DirectoryControllerEventType.GETM, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
+                    @Override
+                    public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
+                        GetMEvent getMEvent = params.get(GetMEvent.class, "event");
+                        fsm.stall(getMEvent.getOnStalledCallback());
+                    }
+                }, DirectoryControllerState.IM_D)
+                .onCondition(DirectoryControllerEventType.PUTS_NOT_LAST, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
+                    @Override
+                    public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
+                        PutSNotLastEvent putSNotLastEvent = params.get(PutSNotLastEvent.class, "event");
+                        fsm.stall(sender, params, putSNotLastEvent);
+                    }
+                }, DirectoryControllerState.IM_D)
+                .onCondition(DirectoryControllerEventType.PUTS_LAST, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
+                    @Override
+                    public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
+                        PutSLastEvent putSNotLastEvent = params.get(PutSLastEvent.class, "event");
+                        fsm.stall(sender, params, putSNotLastEvent);
+                    }
+                }, DirectoryControllerState.IM_D)
+                .onCondition(DirectoryControllerEventType.PUTM_AND_DATA_FROM_NONOWNER, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
+                    @Override
+                    public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
+                        PutMAndDataFromNonOwnerEvent putMAndDataFromNonOwnerEvent = params.get(PutMAndDataFromNonOwnerEvent.class, "event");
+                        fsm.stall(sender, params, putMAndDataFromNonOwnerEvent);
+                    }
+                }, DirectoryControllerState.IM_D)
+                .onCondition(DirectoryControllerEventType.DATA_FROM_MEMORY, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
+                    @Override
+                    public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
+                        DataFromMemoryEvent dataFromMemoryEvent = params.get(DataFromMemoryEvent.class, "event");
+                        fsm.sendDataToReq(dataFromMemoryEvent, dataFromMemoryEvent.getReq(), dataFromMemoryEvent.getTag(), 0);
+                        fsm.setOwnerToReq(dataFromMemoryEvent.getReq());
+                        fsm.getLine().setTag(dataFromMemoryEvent.getTag());
+                        fsm.directoryController.getCache().handleInsertionOnMiss(fsm.getSet(), fsm.getWay());
+                    }
+                }, DirectoryControllerState.M);
 
         fsmFactory.inState(DirectoryControllerState.S)
                 .setOnCompletedCallback(actionWhenStateChanged)

@@ -33,10 +33,6 @@ public class CacheController extends Controller {
         ValueProviderFactory<CacheControllerState, ValueProvider<CacheControllerState>> cacheLineStateProviderFactory = new ValueProviderFactory<CacheControllerState, ValueProvider<CacheControllerState>>() {
             @Override
             public ValueProvider<CacheControllerState> createValueProvider(Object... args) {
-                if (args.length != 2) {
-                    throw new IllegalArgumentException();
-                }
-
                 int set = (Integer) args[0];
                 int way = (Integer) args[1];
 
@@ -112,15 +108,30 @@ public class CacheController extends Controller {
     }
 
     public void receiveIfetch(final MemoryHierarchyAccess access, final Action onCompletedCallback) {
-        load(access.getPhysicalTag(), onCompletedCallback);
+        this.getCycleAccurateEventQueue().schedule(this, new Action() {
+            @Override
+            public void apply() {
+                load(access.getPhysicalTag(), onCompletedCallback);
+            }
+        }, this.getHitLatency());
     }
 
     public void receiveLoad(final MemoryHierarchyAccess access, final Action onCompletedCallback) {
-        load(access.getPhysicalTag(), onCompletedCallback);
+        this.getCycleAccurateEventQueue().schedule(this, new Action() {
+            @Override
+            public void apply() {
+                load(access.getPhysicalTag(), onCompletedCallback);
+            }
+        }, this.getHitLatency());
     }
 
     public void receiveStore(final MemoryHierarchyAccess access, final Action onCompletedCallback) {
-        store(access.getPhysicalTag(), onCompletedCallback);
+        this.getCycleAccurateEventQueue().schedule(this, new Action() {
+            @Override
+            public void apply() {
+                store(access.getPhysicalTag(), onCompletedCallback);
+            }
+        }, this.getHitLatency());
     }
 
     public void setNext(DirectoryController next) {

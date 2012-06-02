@@ -21,10 +21,10 @@ package archimulator.sim.uncore.dram;
 import archimulator.sim.uncore.CacheHierarchy;
 import net.pickapack.action.Action;
 
-public class SimpleMainMemory extends MainMemory {
-    private SimpleMainMemoryConfig config;
+public class FixedLatencyMemoryController extends MemoryController {
+    private FixedLatencyMainMemoryConfig config;
 
-    public SimpleMainMemory(CacheHierarchy cacheHierarchy, SimpleMainMemoryConfig config) {
+    public FixedLatencyMemoryController(CacheHierarchy cacheHierarchy, FixedLatencyMainMemoryConfig config) {
         super(cacheHierarchy);
 
         this.config = config;
@@ -36,13 +36,6 @@ public class SimpleMainMemory extends MainMemory {
             public void apply() {
                 onCompletedCallback.apply();
             }
-        }, this.getLatency());
-    }
-
-    private int getLatency() {
-        int chunks = (this.config.getLineSize() - (this.config.getBusWidth() - 1)) / this.config.getBusWidth();
-        assert (chunks > 0);
-
-        return this.config.getMemoryLatency() + (this.config.getMemoryTrunkLatency() * (chunks - 1));
+        }, this.config.getLatency());
     }
 }

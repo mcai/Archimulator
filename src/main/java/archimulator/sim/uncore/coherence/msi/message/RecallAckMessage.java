@@ -11,11 +11,6 @@ public class RecallAckMessage extends CoherenceMessage {
 
     public RecallAckMessage(Controller generator, CacheCoherenceFlow producerFlow, CacheController sender, int tag) {
         super(generator, producerFlow, CoherenceMessageType.RECALL_ACK);
-
-        if (sender == null || tag == CacheLine.INVALID_TAG) {
-            throw new IllegalArgumentException();
-        }
-
         this.sender = sender;
         this.tag = tag;
     }

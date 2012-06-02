@@ -11,11 +11,6 @@ public class FwdGetMMessage extends CoherenceMessage {
 
     public FwdGetMMessage(Controller generator, CacheCoherenceFlow producerFlow, CacheController req, int tag) {
         super(generator, producerFlow, CoherenceMessageType.FWD_GETM);
-
-        if (req == null || tag == CacheLine.INVALID_TAG) {
-            throw new IllegalArgumentException();
-        }
-
         this.req = req;
         this.tag = tag;
     }

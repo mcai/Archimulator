@@ -40,7 +40,7 @@ import java.util.List;
 import java.util.Map;
 
 public class BasicCacheHierarchy extends BasicSimulationObject implements CacheHierarchy {
-    private MainMemory mainMemory;
+    private MemoryController mainMemory;
     private DirectoryController l2Cache;
     private List<CacheController> instructionCaches;
     private List<CacheController> dataCaches;
@@ -58,13 +58,13 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
 
         switch (processorConfig.getMemoryHierarchyConfig().getMainMemory().getType()) {
             case SIMPLE:
-                this.mainMemory = new SimpleMainMemory(this, (SimpleMainMemoryConfig) processorConfig.getMemoryHierarchyConfig().getMainMemory());
+                this.mainMemory = new SimpleMemoryController(this, (SimpleMainMemoryConfig) processorConfig.getMemoryHierarchyConfig().getMainMemory());
                 break;
             case BASIC:
-                this.mainMemory = new BasicMainMemory(this, (BasicMainMemoryConfig) processorConfig.getMemoryHierarchyConfig().getMainMemory());
+                this.mainMemory = new BasicMemoryController(this, (BasicMainMemoryConfig) processorConfig.getMemoryHierarchyConfig().getMainMemory());
                 break;
             default:
-                this.mainMemory = new FixedLatencyMainMemory(this, (FixedLatencyMainMemoryConfig) processorConfig.getMemoryHierarchyConfig().getMainMemory());
+                this.mainMemory = new FixedLatencyMemoryController(this, (FixedLatencyMainMemoryConfig) processorConfig.getMemoryHierarchyConfig().getMainMemory());
                 break;
         }
 
@@ -125,7 +125,7 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
         this.p2pReorderBuffers.get(from).get(to).onDestinationArrived(message);
     }
 
-    public MainMemory getMainMemory() {
+    public MemoryController getMainMemory() {
         return mainMemory;
     }
 

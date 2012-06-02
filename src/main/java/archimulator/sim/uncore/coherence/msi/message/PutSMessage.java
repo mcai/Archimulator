@@ -11,11 +11,6 @@ public class PutSMessage extends CoherenceMessage {
 
     public PutSMessage(Controller generator, CacheCoherenceFlow producerFlow, CacheController req, int tag) {
         super(generator, producerFlow, CoherenceMessageType.PUTS);
-
-        if (req == null || tag == CacheLine.INVALID_TAG) {
-            throw new IllegalArgumentException();
-        }
-
         this.req = req;
         this.tag = tag;
     }

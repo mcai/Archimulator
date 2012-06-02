@@ -59,10 +59,6 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
     }
 
     public void onEventLoad(CacheCoherenceFlow producerFlow, int tag, Action onCompletedCallback, Action onStalledCallback) {
-        if (tag == CacheLine.INVALID_TAG) {
-            throw new IllegalArgumentException();
-        }
-
         Params params = new Params();
         LoadEvent loadEvent = new LoadEvent(cacheController, producerFlow, tag, set, way, onCompletedCallback, onStalledCallback);
         params.put("event", loadEvent);
@@ -70,10 +66,6 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
     }
 
     public void onEventStore(CacheCoherenceFlow producerFlow, int tag, Action onCompletedCallback, Action onStalledCallback) {
-        if (tag == CacheLine.INVALID_TAG) {
-            throw new IllegalArgumentException();
-        }
-
         Params params = new Params();
         StoreEvent storeEvent = new StoreEvent(cacheController, producerFlow, tag, set, way, onCompletedCallback, onStalledCallback);
         params.put("event", storeEvent);
@@ -81,10 +73,6 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
     }
 
     public void onEventReplacement(CacheCoherenceFlow producerFlow, int tag, Action onCompletedCallback, Action onStalledCallback) {
-        if (tag == CacheLine.INVALID_TAG || onCompletedCallback == null) {
-            throw new IllegalArgumentException();
-        }
-
         Params params = new Params();
         ReplacementEvent replacementEvent = new ReplacementEvent(cacheController, producerFlow, tag, set, way, onCompletedCallback, onStalledCallback);
         params.put("event", replacementEvent);
@@ -92,10 +80,6 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
     }
 
     public void onEventFwdGetS(CacheCoherenceFlow producerFlow, CacheController req, int tag) {
-        if (req == null || req == cacheController || tag == CacheLine.INVALID_TAG) {
-            throw new IllegalArgumentException();
-        }
-
         Params params = new Params();
         FwdGetSEvent fwdGetSEvent = new FwdGetSEvent(cacheController, producerFlow, req, tag);
         params.put("event", fwdGetSEvent);
@@ -103,10 +87,6 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
     }
 
     public void onEventFwdGetM(CacheCoherenceFlow producerFlow, CacheController req, int tag) {
-        if (req == null || req == cacheController || tag == CacheLine.INVALID_TAG) {
-            throw new IllegalArgumentException();
-        }
-
         Params params = new Params();
         FwdGetMEvent fwdGetMEvent = new FwdGetMEvent(cacheController, producerFlow, req, tag);
         params.put("event", fwdGetMEvent);
@@ -114,10 +94,6 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
     }
 
     public void onEventInv(CacheCoherenceFlow producerFlow, CacheController req, int tag) {
-        if (req == null || req == cacheController || tag == CacheLine.INVALID_TAG) {
-            throw new IllegalArgumentException();
-        }
-
         Params params = new Params();
         InvEvent invEvent = new InvEvent(cacheController, producerFlow, req, tag);
         params.put("event", invEvent);
@@ -125,10 +101,6 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
     }
 
     public void onEventRecall(CacheCoherenceFlow producerFlow, int tag) {
-        if (tag == CacheLine.INVALID_TAG) {
-            throw new IllegalArgumentException();
-        }
-
         Params params = new Params();
         RecallEvent recallEvent = new RecallEvent(cacheController, producerFlow, tag);
         params.put("event", recallEvent);
@@ -136,10 +108,6 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
     }
 
     public void onEventPutAck(CacheCoherenceFlow producerFlow, int tag) {
-        if (tag == CacheLine.INVALID_TAG) {
-            throw new IllegalArgumentException();
-        }
-
         Params params = new Params();
         PutAckEvent putAckEvent = new PutAckEvent(cacheController, producerFlow, tag);
         params.put("event", putAckEvent);
@@ -147,10 +115,6 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
     }
 
     public void onEventData(CacheCoherenceFlow producerFlow, Controller sender, int tag, int numAcks) {
-        if (sender == null || sender == cacheController || tag == CacheLine.INVALID_TAG) {
-            throw new IllegalArgumentException();
-        }
-
         this.numInvAcks += numAcks;
 
         if (sender instanceof DirectoryController) {
@@ -178,10 +142,6 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
     }
 
     public void onEventInvAck(CacheCoherenceFlow producerFlow, CacheController sender, int tag) {
-        if (sender == null || sender == cacheController || tag == CacheLine.INVALID_TAG) {
-            throw new IllegalArgumentException();
-        }
-
         Params params = new Params();
         InvAckEvent invAckEvent = new InvAckEvent(cacheController, producerFlow, sender, tag);
         params.put("event", invAckEvent);
@@ -193,10 +153,10 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
     }
 
     private void onEventLastInvAck(CacheCoherenceFlow producerFlow, int tag) {
-        Params params2 = new Params();
+        Params params = new Params();
         LastInvAckEvent lastInvAckEvent = new LastInvAckEvent(cacheController, producerFlow, tag);
-        params2.put("event", lastInvAckEvent);
-        this.fireTransition("<N/A>" + "." + String.format("0x%08x", tag), params2, lastInvAckEvent);
+        params.put("event", lastInvAckEvent);
+        this.fireTransition("<N/A>" + "." + String.format("0x%08x", tag), params, lastInvAckEvent);
 
         this.numInvAcks = 0;
     }
@@ -207,75 +167,39 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
     }
 
     private void sendGetSToDir(CacheCoherenceFlow producerFlow, int tag) {
-        if (tag == CacheLine.INVALID_TAG) {
-            throw new IllegalArgumentException();
-        }
-
         cacheController.transfer(cacheController.getDirectoryController(), 8, new GetSMessage(cacheController, producerFlow, cacheController, tag));
     }
 
     private void sendGetMToDir(CacheCoherenceFlow producerFlow, int tag) {
-        if (tag == CacheLine.INVALID_TAG) {
-            throw new IllegalArgumentException();
-        }
-
         cacheController.transfer(cacheController.getDirectoryController(), 8, new GetMMessage(cacheController, producerFlow, cacheController, tag));
     }
 
     private void sendPutSToDir(CacheCoherenceFlow producerFlow, int tag) {
-        if (tag == CacheLine.INVALID_TAG) {
-            throw new IllegalArgumentException();
-        }
-
         cacheController.transfer(cacheController.getDirectoryController(), 8, new PutSMessage(cacheController, producerFlow, cacheController, tag));
     }
 
     private void sendPutMAndDataToDir(CacheCoherenceFlow producerFlow, int tag) {
-        if (tag == CacheLine.INVALID_TAG) {
-            throw new IllegalArgumentException();
-        }
-
         cacheController.transfer(cacheController.getDirectoryController(), cacheController.getCache().getLineSize() + 8, new PutMAndDataMessage(cacheController, producerFlow, cacheController, tag));
     }
 
     private void sendDataToReqAndDir(CacheCoherenceFlow producerFlow, final CacheController req, final int tag) {
-        if (req == null || req == cacheController || tag == CacheLine.INVALID_TAG) {
-            throw new IllegalArgumentException();
-        }
-
         cacheController.transfer(req, 10, new DataMessage(cacheController, producerFlow, cacheController, tag, 0));
         cacheController.transfer(cacheController.getDirectoryController(), cacheController.getCache().getLineSize() + 8, new DataMessage(cacheController, producerFlow, cacheController, tag, 0));
     }
 
     private void sendDataToReq(CacheCoherenceFlow producerFlow, final CacheController req, final int tag) {
-        if (req == null || req == cacheController || tag == CacheLine.INVALID_TAG) {
-            throw new IllegalArgumentException();
-        }
-
         cacheController.transfer(req, cacheController.getCache().getLineSize() + 8, new DataMessage(cacheController, producerFlow, cacheController, tag, 0));
     }
 
     private void sendInvAckToReq(CacheCoherenceFlow producerFlow, final CacheController req, final int tag) {
-        if (req == null || req == cacheController || tag == CacheLine.INVALID_TAG) {
-            throw new IllegalArgumentException();
-        }
-
         cacheController.transfer(req, 8, new InvAckMessage(cacheController, producerFlow, cacheController, tag));
     }
 
     private void sendRecallAckToDir(CacheCoherenceFlow producerFlow, final int tag, int size) {
-        if (tag == CacheLine.INVALID_TAG) {
-            throw new IllegalArgumentException();
-        }
-
         cacheController.transfer(cacheController.getDirectoryController(), size, new RecallAckMessage(cacheController, producerFlow, cacheController, tag));
     }
 
     private void decrementInvAck(CacheController sender, int tag) {
-        if (sender == null || sender == cacheController || tag == CacheLine.INVALID_TAG) {
-            throw new IllegalArgumentException();
-        }
-
         this.numInvAcks--;
     }
 

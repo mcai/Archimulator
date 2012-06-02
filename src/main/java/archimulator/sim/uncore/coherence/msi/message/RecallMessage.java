@@ -9,11 +9,6 @@ public class RecallMessage extends CoherenceMessage {
 
     public RecallMessage(Controller generator, CacheCoherenceFlow producerFlow, int tag) {
         super(generator, producerFlow, CoherenceMessageType.RECALL);
-
-        if (tag == CacheLine.INVALID_TAG) {
-            throw new IllegalArgumentException();
-        }
-
         this.tag = tag;
     }
 

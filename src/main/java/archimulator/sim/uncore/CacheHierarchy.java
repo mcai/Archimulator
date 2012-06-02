@@ -23,7 +23,7 @@ import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.coherence.msi.message.CoherenceMessage;
-import archimulator.sim.uncore.dram.MainMemory;
+import archimulator.sim.uncore.dram.MemoryController;
 import archimulator.sim.uncore.net.L2ToMemNet;
 import archimulator.sim.uncore.net.Net;
 import archimulator.sim.uncore.tlb.TranslationLookasideBuffer;
@@ -33,7 +33,7 @@ import java.util.List;
 public interface CacheHierarchy extends SimulationObject {
     void transfer(Controller from, Controller to, int size, CoherenceMessage message);
 
-    MainMemory getMainMemory();
+    MemoryController getMainMemory();
 
     DirectoryController getL2Cache();
 

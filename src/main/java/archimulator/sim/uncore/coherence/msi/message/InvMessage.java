@@ -11,11 +11,6 @@ public class InvMessage extends CoherenceMessage {
 
     public InvMessage(Controller generator, CacheCoherenceFlow producerFlow, CacheController req, int tag) {
         super(generator, producerFlow, CoherenceMessageType.INV);
-
-        if (req == null || tag == CacheLine.INVALID_TAG) {
-            throw new IllegalArgumentException();
-        }
-
         this.req = req;
         this.tag = tag;
     }

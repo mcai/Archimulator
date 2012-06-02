@@ -11,11 +11,6 @@ public class PutMAndDataMessage extends CoherenceMessage {
 
     public PutMAndDataMessage(Controller generator, CacheCoherenceFlow producerFlow, CacheController req, int tag) {
         super(generator, producerFlow, CoherenceMessageType.PUTM_AND_DATA);
-
-        if (req == null || tag == CacheLine.INVALID_TAG) {
-            throw new IllegalArgumentException();
-        }
-
         this.req = req;
         this.tag = tag;
     }

@@ -139,7 +139,6 @@ public class BasicProcess extends Process {
     private void predecode(String sectionName, Memory memory, int pc) {
         int machInst = memory.readWord(pc);
 
-        assert (!this.pcsToMachInsts.containsKey(pc));
         this.pcsToMachInsts.put(pc, machInst);
 
         if (!this.machInstsToStaticInsts.containsKey(machInst)) {
@@ -156,9 +155,6 @@ public class BasicProcess extends Process {
 
     @Override
     public StaticInstruction getStaticInst(int pc) {
-        if ((!this.pcsToMachInsts.containsKey(pc))) {
-            throw new IllegalArgumentException();
-        }
         return this.machInstsToStaticInsts.get(this.pcsToMachInsts.get(pc));
     }
 

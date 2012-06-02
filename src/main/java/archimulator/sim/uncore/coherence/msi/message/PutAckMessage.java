@@ -9,11 +9,6 @@ public class PutAckMessage extends CoherenceMessage {
 
     public PutAckMessage(Controller generator, CacheCoherenceFlow producerFlow, int tag) {
         super(generator, producerFlow, CoherenceMessageType.PUT_ACK);
-
-        if (tag == CacheLine.INVALID_TAG) {
-            throw new IllegalArgumentException();
-        }
-
         this.tag = tag;
     }
 

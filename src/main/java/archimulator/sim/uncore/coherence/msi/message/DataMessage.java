@@ -11,11 +11,6 @@ public class DataMessage extends CoherenceMessage {
 
     public DataMessage(Controller generator, CacheCoherenceFlow producerFlow, Controller sender, int tag, int numAcks) {
         super(generator, producerFlow, CoherenceMessageType.DATA);
-
-        if (sender == null || sender instanceof DirectoryController && numAcks < 0 || tag == -1) {
-            throw new IllegalArgumentException();
-        }
-
         this.sender = sender;
         this.tag = tag;
         this.numAcks = numAcks;

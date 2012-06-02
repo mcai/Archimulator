@@ -9,7 +9,7 @@ import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import archimulator.sim.uncore.coherence.msi.fsm.DirectoryControllerFiniteStateMachine;
 import archimulator.sim.uncore.coherence.msi.message.*;
 import archimulator.sim.uncore.coherence.msi.state.DirectoryControllerState;
-import archimulator.sim.uncore.dram.MainMemory;
+import archimulator.sim.uncore.dram.MemoryController;
 import archimulator.sim.uncore.net.Net;
 import archimulator.util.ValueProvider;
 import archimulator.util.ValueProviderFactory;
@@ -21,7 +21,6 @@ import java.util.List;
 
 public class DirectoryController extends Controller {
     private EvictableCache<DirectoryControllerState> cache;
-    private int hitLatency;
     private List<CacheController> cacheControllers;
 
     public DirectoryController(CacheHierarchy cacheHierarchy, final String name, CoherentCacheConfig config) {
@@ -30,10 +29,6 @@ public class DirectoryController extends Controller {
         ValueProviderFactory<DirectoryControllerState, ValueProvider<DirectoryControllerState>> cacheLineStateProviderFactory = new ValueProviderFactory<DirectoryControllerState, ValueProvider<DirectoryControllerState>>() {
             @Override
             public ValueProvider<DirectoryControllerState> createValueProvider(Object... args) {
-                if (args.length != 2) {
-                    throw new IllegalArgumentException();
-                }
-
                 int set = (Integer) args[0];
                 int way = (Integer) args[1];
 
@@ -47,15 +42,15 @@ public class DirectoryController extends Controller {
 
     @Override
     protected Net getNet(MemoryDevice to) {
-        return to instanceof MainMemory ? this.getCacheHierarchy().getL2ToMemNetwork() : this.getCacheHierarchy().getL1sToL2Network();
+        return to instanceof MemoryController ? this.getCacheHierarchy().getL2ToMemNetwork() : this.getCacheHierarchy().getL1sToL2Network();
     }
 
-    public void setNext(MainMemory next) {
+    public void setNext(MemoryController next) {
         super.setNext(next);
     }
 
-    public MainMemory getNext() {
-        return (MainMemory) super.getNext();
+    public MemoryController getNext() {
+        return (MemoryController) super.getNext();
     }
 
     @Override
@@ -164,11 +159,7 @@ public class DirectoryController extends Controller {
 
         int way = this.cache.findWay(tag);
         CacheLine<DirectoryControllerState> line = this.cache.getLine(this.cache.getSet(tag), way);
-        DirectoryControllerFiniteStateMachine fsm = line != null ? (DirectoryControllerFiniteStateMachine) line.getStateProvider() : null;
-
-        if (fsm == null) {
-            throw new IllegalArgumentException();
-        }
+        DirectoryControllerFiniteStateMachine fsm = (DirectoryControllerFiniteStateMachine) line.getStateProvider();
         fsm.onEventRecallAck(message, sender, tag);
     }
 
@@ -182,11 +173,7 @@ public class DirectoryController extends Controller {
             DirectoryControllerFiniteStateMachine.sendPutAckToReq(message, this, req, tag);
         } else {
             CacheLine<DirectoryControllerState> line = this.cache.getLine(this.cache.getSet(tag), way);
-            DirectoryControllerFiniteStateMachine fsm = line != null ? (DirectoryControllerFiniteStateMachine) line.getStateProvider() : null;
-
-            if (fsm == null) {
-                throw new IllegalArgumentException();
-            }
+            DirectoryControllerFiniteStateMachine fsm = (DirectoryControllerFiniteStateMachine) line.getStateProvider();
             fsm.onEventPutS(message, req, tag);
         }
     }
@@ -201,11 +188,7 @@ public class DirectoryController extends Controller {
             DirectoryControllerFiniteStateMachine.sendPutAckToReq(message, this, req, tag);
         } else {
             CacheLine<DirectoryControllerState> line = this.cache.getLine(this.cache.getSet(tag), way);
-            DirectoryControllerFiniteStateMachine fsm = line != null ? (DirectoryControllerFiniteStateMachine) line.getStateProvider() : null;
-
-            if (fsm == null) {
-                throw new IllegalArgumentException();
-            }
+            DirectoryControllerFiniteStateMachine fsm = (DirectoryControllerFiniteStateMachine) line.getStateProvider();
             fsm.onEventPutMAndData(message, req, tag);
         }
     }
@@ -216,20 +199,12 @@ public class DirectoryController extends Controller {
 
         int way = this.cache.findWay(tag);
         CacheLine<DirectoryControllerState> line = this.cache.getLine(this.cache.getSet(tag), way);
-        DirectoryControllerFiniteStateMachine fsm = line != null ? (DirectoryControllerFiniteStateMachine) line.getStateProvider() : null;
-
-        if (fsm == null) {
-            throw new IllegalArgumentException();
-        }
+        DirectoryControllerFiniteStateMachine fsm =(DirectoryControllerFiniteStateMachine) line.getStateProvider();
         fsm.onEventData(message, sender, tag);
     }
 
     public EvictableCache<DirectoryControllerState> getCache() {
         return cache;
-    }
-
-    public int getHitLatency() {
-        return hitLatency;
     }
 
     public List<CacheController> getCacheControllers() {

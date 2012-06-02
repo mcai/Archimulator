@@ -20,6 +20,7 @@ package archimulator.sim.uncore;
 
 import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import archimulator.sim.uncore.coherence.msi.message.CoherenceMessage;
+import net.pickapack.action.Action;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,14 +47,20 @@ public class PointToPointReorderBuffer {
 
     public void commit() {
         while(!this.messages.isEmpty()) {
-            CoherenceMessage message = this.messages.get(0);
+            final CoherenceMessage message = this.messages.get(0);
             if(!message.isDestinationArrived()) {
                 break;
             }
 
             message.onCompleted();
             this.messages.remove(message);
-            to.receive(message);
+
+            to.getCycleAccurateEventQueue().schedule(this, new Action() {
+                @Override
+                public void apply() {
+                    to.receive(message);
+                }
+            }, to.getHitLatency());
         }
     }
 

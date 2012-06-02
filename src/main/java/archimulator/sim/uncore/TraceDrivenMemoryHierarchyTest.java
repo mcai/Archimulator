@@ -45,7 +45,7 @@
 //
 //    private CycleAccurateEventQueue cycleAccurateEventQueue;
 //
-//    private MainMemory mainMemory;
+//    private MemoryController mainMemory;
 //    private LastLevelCache l2Cache;
 //
 //    public TraceDrivenMemoryHierarchyTest(String title, MemoryHierarchyConfig memoryHierarchyConfig, int numCores, int numThreadsPerCore) {
@@ -58,13 +58,13 @@
 //
 //        switch (memoryHierarchyConfig.getMainMemory().getType()) {
 //            case SIMPLE:
-//                this.mainMemory = new SimpleMainMemory(this, (SimpleMainMemoryConfig) memoryHierarchyConfig.getMainMemory());
+//                this.mainMemory = new SimpleMemoryController(this, (SimpleMainMemoryConfig) memoryHierarchyConfig.getMainMemory());
 //                break;
 //            case BASIC:
-//                this.mainMemory = new BasicMainMemory(this, (BasicMainMemoryConfig) memoryHierarchyConfig.getMainMemory());
+//                this.mainMemory = new BasicMemoryController(this, (BasicMainMemoryConfig) memoryHierarchyConfig.getMainMemory());
 //                break;
 //            default:
-//                this.mainMemory = new FixedLatencyMainMemory(this, (FixedLatencyMainMemoryConfig) memoryHierarchyConfig.getMainMemory());
+//                this.mainMemory = new FixedLatencyMemoryController(this, (FixedLatencyMainMemoryConfig) memoryHierarchyConfig.getMainMemory());
 //                break;
 //        }
 //
@@ -236,7 +236,7 @@
 //        return this.cycleAccurateEventQueue;
 //    }
 //
-//    public MainMemory getMainMemory() {
+//    public MemoryController getMainMemory() {
 //        return mainMemory;
 //    }
 //

@@ -25,13 +25,10 @@ import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.eviction.LRUPolicy;
-import archimulator.sim.uncore.coherence.msi.fsm.CacheControllerFiniteStateMachine;
-import archimulator.sim.uncore.coherence.msi.state.CacheControllerState;
 import archimulator.util.ValueProvider;
 import archimulator.util.ValueProviderFactory;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
-import net.pickapack.action.Function3;
 
 public class TranslationLookasideBuffer {
     private String name;
@@ -50,10 +47,6 @@ public class TranslationLookasideBuffer {
         ValueProviderFactory<Boolean, ValueProvider<Boolean>> cacheLineStateProviderFactory = new ValueProviderFactory<Boolean, ValueProvider<Boolean>>() {
             @Override
             public ValueProvider<Boolean> createValueProvider(Object... args) {
-                if (args.length != 2) {
-                    throw new IllegalArgumentException();
-                }
-
                 int set = (Integer) args[0];
                 int way = (Integer) args[1];
 

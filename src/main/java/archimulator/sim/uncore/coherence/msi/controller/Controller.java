@@ -18,15 +18,10 @@ public abstract class Controller extends MemoryDevice {
     public abstract void receive(CoherenceMessage message);
 
     public void transfer(final Controller to, int size, final CoherenceMessage message) {
-        if (to == null || this == to) {
-            throw new IllegalArgumentException();
-        }
-
         this.getCacheHierarchy().transfer(this, to, size, message);
     }
 
-    //TODO: to be called from controller
-    protected int getHitLatency() {
+    public int getHitLatency() {
         return config.getHitLatency();
     }
 
