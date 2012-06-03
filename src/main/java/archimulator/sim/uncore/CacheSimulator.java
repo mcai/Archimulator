@@ -54,26 +54,30 @@ public class CacheSimulator {
 
     private static void read(final CacheController cacheController, int addr) {
         final int tag = cacheController.getCache().getTag(addr);
-        cacheController.onLoad(tag, new Action() {
-            @Override
-            public void apply() {
-                numPendingReads--;
-                numCompletedReads++;
-            }
-        });
-        numPendingReads++;
+        if(cacheController.canAccess(MemoryHierarchyAccessType.LOAD, addr)) {
+            cacheController.onLoad(tag, new Action() {
+                @Override
+                public void apply() {
+                    numPendingReads--;
+                    numCompletedReads++;
+                }
+            });
+            numPendingReads++;
+        }
     }
 
     private static void write(final CacheController cacheController, int addr) {
         final int tag = cacheController.getCache().getTag(addr);
-        cacheController.onStore(tag, new Action() {
-            @Override
-            public void apply() {
-                numPendingWrites--;
-                numCompletedWrites++;
-            }
-        });
-        numPendingWrites++;
+        if(cacheController.canAccess(MemoryHierarchyAccessType.STORE, addr)) {
+            cacheController.onStore(tag, new Action() {
+                @Override
+                public void apply() {
+                    numPendingWrites--;
+                    numCompletedWrites++;
+                }
+            });
+            numPendingWrites++;
+        }
     }
 
     public static class MemoryAccessLine {
