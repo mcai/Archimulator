@@ -49,28 +49,28 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
             }
         });
 
-        this.addListener(EnterStateEvent.class, new Action1<EnterStateEvent>() {
-            @Override
-            public void apply(EnterStateEvent enterStateEvent) {
-                CacheLine<DirectoryControllerState> line = directoryController.getCache().getLine(getSet(), getWay());
-
-                if (getState() != previousState) {
-                    String transitionText = String.format("[%d] %s.[%d,%d] {%s} %s: %s.%s -> %s (owner: %s, sharers: %s)",
-                            directoryController.getCycleAccurateEventQueue().getCurrentCycle(), getName(), getSet(), getWay(), line.getTag() != CacheLine.INVALID_TAG ? String.format("0x%08x", line.getTag()) : "N/A", previousState, enterStateEvent.getSender() != null ? enterStateEvent.getSender() : "<N/A>", enterStateEvent.getCondition(), getState(),
-                            getDirectoryEntry().getOwner() != null ? getDirectoryEntry().getOwner() : "N/A", getDirectoryEntry().getSharers().toString().replace("[", "").replace("]", ""));
-                    if (transitionHistory.size() >= 10) {
-                        transitionHistory.remove(0);
-                    }
-
-                    transitionHistory.add(transitionText);
-
-                    if (CacheSimulator.logEnabled) {
-                        CacheSimulator.pw.println(transitionText);
-                        CacheSimulator.pw.flush();
-                    }
-                }
-            }
-        });
+//        this.addListener(EnterStateEvent.class, new Action1<EnterStateEvent>() {
+//            @Override
+//            public void apply(EnterStateEvent enterStateEvent) {
+//                CacheLine<DirectoryControllerState> line = directoryController.getCache().getLine(getSet(), getWay());
+//
+//                if (getState() != previousState) {
+//                    String transitionText = String.format("[%d] %s.[%d,%d] {%s} %s: %s.%s -> %s (owner: %s, sharers: %s)",
+//                            directoryController.getCycleAccurateEventQueue().getCurrentCycle(), getName(), getSet(), getWay(), line.getTag() != CacheLine.INVALID_TAG ? String.format("0x%08x", line.getTag()) : "N/A", previousState, enterStateEvent.getSender() != null ? enterStateEvent.getSender() : "<N/A>", enterStateEvent.getCondition(), getState(),
+//                            getDirectoryEntry().getOwner() != null ? getDirectoryEntry().getOwner() : "N/A", getDirectoryEntry().getSharers().toString().replace("[", "").replace("]", ""));
+//                    if (transitionHistory.size() >= 10) {
+//                        transitionHistory.remove(0);
+//                    }
+//
+//                    transitionHistory.add(transitionText);
+//
+//                    if (CacheSimulator.logEnabled) {
+//                        CacheSimulator.pw.println(transitionText);
+//                        CacheSimulator.pw.flush();
+//                    }
+//                }
+//            }
+//        });
     }
 
     public DirectoryControllerState getPreviousState() {
