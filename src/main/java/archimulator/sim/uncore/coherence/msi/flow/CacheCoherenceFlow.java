@@ -1,13 +1,14 @@
 package archimulator.sim.uncore.coherence.msi.flow;
 
 import archimulator.sim.uncore.coherence.msi.controller.Controller;
+import net.pickapack.Params;
 import net.pickapack.tree.Node;
 import net.pickapack.tree.NodeHelper;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class CacheCoherenceFlow implements Node {
+public abstract class CacheCoherenceFlow extends Params implements Node {
     private long id;
     private Controller generator;
     private CacheCoherenceFlow producerFlow;

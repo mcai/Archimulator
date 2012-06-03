@@ -82,7 +82,7 @@ public abstract class Experiment {
         this.numThreadsPerCore = numThreadsPerCore;
         this.contextConfigs = contextConfigs;
 
-        this.processorConfig = ProcessorConfig.createDefaultProcessorConfig(MemoryHierarchyConfig.createDefaultMemoryHierarchyConfig(l2Size, l2Associativity, l2EvictionPolicyClz), processorCapabilityClasses, kernelCapabilityClasses, this.numCores, this.numThreadsPerCore);
+        this.processorConfig = ProcessorConfig.createDefaultProcessorConfig(MemoryHierarchyConfig.createDefaultMemoryHierarchyConfig(32768, 4, 32768, 8, l2Size, l2Associativity, l2EvictionPolicyClz), processorCapabilityClasses, kernelCapabilityClasses, this.numCores, this.numThreadsPerCore);
 
         this.simulationCapabilityClasses = simulationCapabilityClasses;
 

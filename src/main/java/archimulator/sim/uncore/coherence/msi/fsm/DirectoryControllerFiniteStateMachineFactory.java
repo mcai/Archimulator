@@ -17,7 +17,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                 .onCondition(DirectoryControllerEventType.GETS, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(final DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        final GetSEvent getSEvent = params.get(GetSEvent.class, "event");
+                        final GetSEvent getSEvent = (GetSEvent) params;
                         final CacheController req = getSEvent.getReq();
                         final int tag = getSEvent.getTag();
 
@@ -30,10 +30,8 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                                         fsm.getDirectoryController().getCycleAccurateEventQueue().schedule(fsm.getDirectoryController(), new Action() {
                                             @Override
                                             public void apply() {
-                                                Params params1 = new Params();
                                                 DataFromMemoryEvent dataFromMemoryEvent = new DataFromMemoryEvent(fsm.getDirectoryController(), getSEvent, req, tag);
-                                                params1.put("event", dataFromMemoryEvent);
-                                                fsm.fireTransition(fsm.getDirectoryController().getNext() + "." + String.format("0x%08x", tag), params1, dataFromMemoryEvent);
+                                                fsm.fireTransition(fsm.getDirectoryController().getNext() + "." + String.format("0x%08x", tag), dataFromMemoryEvent);
                                             }
                                         }, fsm.getDirectoryController().getHitLatency());
                                     }
@@ -45,7 +43,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                 .onCondition(DirectoryControllerEventType.GETM, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(final DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        final GetMEvent getMEvent = params.get(GetMEvent.class, "event");
+                        final GetMEvent getMEvent = (GetMEvent) params;
                         final CacheController req = getMEvent.getReq();
                         final int tag = getMEvent.getTag();
 
@@ -58,10 +56,8 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                                         fsm.getDirectoryController().getCycleAccurateEventQueue().schedule(fsm.getDirectoryController(), new Action() {
                                             @Override
                                             public void apply() {
-                                                Params params1 = new Params();
                                                 DataFromMemoryEvent dataFromMemoryEvent = new DataFromMemoryEvent(fsm.getDirectoryController(), getMEvent, req, tag);
-                                                params1.put("event", dataFromMemoryEvent);
-                                                fsm.fireTransition(fsm.getDirectoryController().getNext() + "." + String.format("0x%08x", tag), params1, dataFromMemoryEvent);
+                                                fsm.fireTransition(fsm.getDirectoryController().getNext() + "." + String.format("0x%08x", tag), dataFromMemoryEvent);
                                             }
                                         }, fsm.getDirectoryController().getHitLatency());
                                     }
@@ -76,42 +72,49 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                 .onCondition(DirectoryControllerEventType.GETS, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        GetSEvent getSEvent = params.get(GetSEvent.class, "event");
+                        GetSEvent getSEvent = (GetSEvent) params;
                         fsm.stall(getSEvent.getOnStalledCallback());
                     }
                 }, DirectoryControllerState.IS_D)
                 .onCondition(DirectoryControllerEventType.GETM, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        GetMEvent getMEvent = params.get(GetMEvent.class, "event");
+                        GetMEvent getMEvent = (GetMEvent) params;
+                        fsm.stall(getMEvent.getOnStalledCallback());
+                    }
+                }, DirectoryControllerState.IS_D)
+                .onCondition(DirectoryControllerEventType.REPLACEMENT, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
+                    @Override
+                    public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
+                        ReplacementEvent getMEvent = (ReplacementEvent) params;
                         fsm.stall(getMEvent.getOnStalledCallback());
                     }
                 }, DirectoryControllerState.IS_D)
                 .onCondition(DirectoryControllerEventType.PUTS_NOT_LAST, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        PutSNotLastEvent putSNotLastEvent = params.get(PutSNotLastEvent.class, "event");
+                        PutSNotLastEvent putSNotLastEvent = (PutSNotLastEvent) params;
                         fsm.stall(sender, params, putSNotLastEvent);
                     }
                 }, DirectoryControllerState.IS_D)
                 .onCondition(DirectoryControllerEventType.PUTS_LAST, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        PutSLastEvent putSNotLastEvent = params.get(PutSLastEvent.class, "event");
+                        PutSLastEvent putSNotLastEvent = (PutSLastEvent) params;
                         fsm.stall(sender, params, putSNotLastEvent);
                     }
                 }, DirectoryControllerState.IS_D)
                 .onCondition(DirectoryControllerEventType.PUTM_AND_DATA_FROM_NONOWNER, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        PutMAndDataFromNonOwnerEvent putMAndDataFromNonOwnerEvent = params.get(PutMAndDataFromNonOwnerEvent.class, "event");
+                        PutMAndDataFromNonOwnerEvent putMAndDataFromNonOwnerEvent = (PutMAndDataFromNonOwnerEvent) params;
                         fsm.stall(sender, params, putMAndDataFromNonOwnerEvent);
                     }
                 }, DirectoryControllerState.IS_D)
                 .onCondition(DirectoryControllerEventType.DATA_FROM_MEMORY, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        DataFromMemoryEvent dataFromMemoryEvent = params.get(DataFromMemoryEvent.class, "event");
+                        DataFromMemoryEvent dataFromMemoryEvent = (DataFromMemoryEvent) params;
                         fsm.sendDataToReq(dataFromMemoryEvent, dataFromMemoryEvent.getReq(), dataFromMemoryEvent.getTag(), 0);
                         fsm.addReqToSharers(dataFromMemoryEvent.getReq());
                         fsm.getLine().setTag(dataFromMemoryEvent.getTag());
@@ -124,42 +127,49 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                 .onCondition(DirectoryControllerEventType.GETS, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        GetSEvent getSEvent = params.get(GetSEvent.class, "event");
+                        GetSEvent getSEvent = (GetSEvent) params;
                         fsm.stall(getSEvent.getOnStalledCallback());
                     }
                 }, DirectoryControllerState.IM_D)
                 .onCondition(DirectoryControllerEventType.GETM, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        GetMEvent getMEvent = params.get(GetMEvent.class, "event");
+                        GetMEvent getMEvent = (GetMEvent) params;
+                        fsm.stall(getMEvent.getOnStalledCallback());
+                    }
+                }, DirectoryControllerState.IM_D)
+                .onCondition(DirectoryControllerEventType.REPLACEMENT, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
+                    @Override
+                    public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
+                        ReplacementEvent getMEvent = (ReplacementEvent) params;
                         fsm.stall(getMEvent.getOnStalledCallback());
                     }
                 }, DirectoryControllerState.IM_D)
                 .onCondition(DirectoryControllerEventType.PUTS_NOT_LAST, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        PutSNotLastEvent putSNotLastEvent = params.get(PutSNotLastEvent.class, "event");
+                        PutSNotLastEvent putSNotLastEvent = (PutSNotLastEvent) params;
                         fsm.stall(sender, params, putSNotLastEvent);
                     }
                 }, DirectoryControllerState.IM_D)
                 .onCondition(DirectoryControllerEventType.PUTS_LAST, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        PutSLastEvent putSNotLastEvent = params.get(PutSLastEvent.class, "event");
+                        PutSLastEvent putSNotLastEvent = (PutSLastEvent) params;
                         fsm.stall(sender, params, putSNotLastEvent);
                     }
                 }, DirectoryControllerState.IM_D)
                 .onCondition(DirectoryControllerEventType.PUTM_AND_DATA_FROM_NONOWNER, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        PutMAndDataFromNonOwnerEvent putMAndDataFromNonOwnerEvent = params.get(PutMAndDataFromNonOwnerEvent.class, "event");
+                        PutMAndDataFromNonOwnerEvent putMAndDataFromNonOwnerEvent = (PutMAndDataFromNonOwnerEvent) params;
                         fsm.stall(sender, params, putMAndDataFromNonOwnerEvent);
                     }
                 }, DirectoryControllerState.IM_D)
                 .onCondition(DirectoryControllerEventType.DATA_FROM_MEMORY, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        DataFromMemoryEvent dataFromMemoryEvent = params.get(DataFromMemoryEvent.class, "event");
+                        DataFromMemoryEvent dataFromMemoryEvent = (DataFromMemoryEvent) params;
                         fsm.sendDataToReq(dataFromMemoryEvent, dataFromMemoryEvent.getReq(), dataFromMemoryEvent.getTag(), 0);
                         fsm.setOwnerToReq(dataFromMemoryEvent.getReq());
                         fsm.getLine().setTag(dataFromMemoryEvent.getTag());
@@ -172,7 +182,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                 .onCondition(DirectoryControllerEventType.GETS, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        GetSEvent getSEvent = params.get(GetSEvent.class, "event");
+                        GetSEvent getSEvent = (GetSEvent) params;
                         final CacheController req = getSEvent.getReq();
                         final int tag = getSEvent.getTag();
 
@@ -183,7 +193,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                 .onCondition(DirectoryControllerEventType.GETM, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        GetMEvent getMEvent = params.get(GetMEvent.class, "event");
+                        GetMEvent getMEvent = (GetMEvent) params;
                         final CacheController req = getMEvent.getReq();
                         final int tag = getMEvent.getTag();
 
@@ -203,7 +213,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                 .onCondition(DirectoryControllerEventType.REPLACEMENT, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        ReplacementEvent replacementEvent = params.get(ReplacementEvent.class, "event");
+                        ReplacementEvent replacementEvent = (ReplacementEvent) params;
                         CacheLine<DirectoryControllerState> line = fsm.getDirectoryController().getCache().getLine(replacementEvent.getSet(), replacementEvent.getWay());
                         fsm.setNumRecallAcks(fsm.getDirectoryEntry().getSharers().size());
                         fsm.sendRecallToSharers(replacementEvent, line.getTag());
@@ -214,7 +224,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                 .onCondition(DirectoryControllerEventType.PUTS_NOT_LAST, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        PutSNotLastEvent putSNotLastEvent = params.get(PutSNotLastEvent.class, "event");
+                        PutSNotLastEvent putSNotLastEvent = (PutSNotLastEvent) params;
                         final CacheController req = putSNotLastEvent.getReq();
                         final int tag = putSNotLastEvent.getTag();
 
@@ -225,7 +235,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                 .onCondition(DirectoryControllerEventType.PUTS_LAST, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        PutSLastEvent putSLastEvent = params.get(PutSLastEvent.class, "event");
+                        PutSLastEvent putSLastEvent = (PutSLastEvent) params;
                         final CacheController req = putSLastEvent.getReq();
                         final int tag = putSLastEvent.getTag();
 
@@ -237,7 +247,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                 .onCondition(DirectoryControllerEventType.PUTM_AND_DATA_FROM_NONOWNER, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        PutMAndDataFromNonOwnerEvent putMAndDataFromNonOwnerEvent = params.get(PutMAndDataFromNonOwnerEvent.class, "event");
+                        PutMAndDataFromNonOwnerEvent putMAndDataFromNonOwnerEvent = (PutMAndDataFromNonOwnerEvent) params;
                         final CacheController req = putMAndDataFromNonOwnerEvent.getReq();
                         final int tag = putMAndDataFromNonOwnerEvent.getTag();
 
@@ -251,7 +261,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                 .onCondition(DirectoryControllerEventType.GETS, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        GetSEvent getSEvent = params.get(GetSEvent.class, "event");
+                        GetSEvent getSEvent = (GetSEvent) params;
                         final CacheController req = getSEvent.getReq();
                         final int tag = getSEvent.getTag();
 
@@ -263,7 +273,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                 .onCondition(DirectoryControllerEventType.GETM, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        GetMEvent getMEvent = params.get(GetMEvent.class, "event");
+                        GetMEvent getMEvent = (GetMEvent) params;
                         final CacheController req = getMEvent.getReq();
                         final int tag = getMEvent.getTag();
 
@@ -274,7 +284,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                 .onCondition(DirectoryControllerEventType.REPLACEMENT, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        ReplacementEvent replacementEvent = params.get(ReplacementEvent.class, "event");
+                        ReplacementEvent replacementEvent = (ReplacementEvent) params;
                         CacheLine<DirectoryControllerState> line = fsm.getDirectoryController().getCache().getLine(replacementEvent.getSet(), replacementEvent.getWay());
                         fsm.setNumRecallAcks(1);
                         fsm.sendRecallToOwner(replacementEvent, line.getTag());
@@ -285,7 +295,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                 .onCondition(DirectoryControllerEventType.PUTS_NOT_LAST, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        PutSNotLastEvent putSNotLastEvent = params.get(PutSNotLastEvent.class, "event");
+                        PutSNotLastEvent putSNotLastEvent = (PutSNotLastEvent) params;
                         final CacheController req = putSNotLastEvent.getReq();
                         final int tag = putSNotLastEvent.getTag();
 
@@ -295,7 +305,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                 .onCondition(DirectoryControllerEventType.PUTS_LAST, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        PutSLastEvent putSLastEvent = params.get(PutSLastEvent.class, "event");
+                        PutSLastEvent putSLastEvent = (PutSLastEvent) params;
                         final CacheController req = putSLastEvent.getReq();
                         final int tag = putSLastEvent.getTag();
 
@@ -305,7 +315,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                 .onCondition(DirectoryControllerEventType.PUTM_AND_DATA_FROM_OWNER, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        PutMAndDataFromOwnerEvent putMAndDataFromOwnerEvent = params.get(PutMAndDataFromOwnerEvent.class, "event");
+                        PutMAndDataFromOwnerEvent putMAndDataFromOwnerEvent = (PutMAndDataFromOwnerEvent) params;
                         final CacheController req = putMAndDataFromOwnerEvent.getReq();
                         final int tag = putMAndDataFromOwnerEvent.getTag();
 
@@ -318,7 +328,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                 .onCondition(DirectoryControllerEventType.PUTM_AND_DATA_FROM_NONOWNER, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        PutMAndDataFromNonOwnerEvent putMAndDataFromNonOwnerEvent = params.get(PutMAndDataFromNonOwnerEvent.class, "event");
+                        PutMAndDataFromNonOwnerEvent putMAndDataFromNonOwnerEvent = (PutMAndDataFromNonOwnerEvent) params;
                         final CacheController req = putMAndDataFromNonOwnerEvent.getReq();
                         final int tag = putMAndDataFromNonOwnerEvent.getTag();
 
@@ -331,21 +341,21 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                 .onCondition(DirectoryControllerEventType.GETS, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        GetSEvent getSEvent = params.get(GetSEvent.class, "event");
+                        GetSEvent getSEvent = (GetSEvent) params;
                         fsm.stall(getSEvent.getOnStalledCallback());
                     }
                 }, DirectoryControllerState.S_D)
                 .onCondition(DirectoryControllerEventType.GETM, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        GetMEvent getMEvent = params.get(GetMEvent.class, "event");
+                        GetMEvent getMEvent = (GetMEvent) params;
                         fsm.stall(getMEvent.getOnStalledCallback());
                     }
                 }, DirectoryControllerState.S_D)
                 .onCondition(DirectoryControllerEventType.PUTS_NOT_LAST, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        PutSNotLastEvent putSNotLastEvent = params.get(PutSNotLastEvent.class, "event");
+                        PutSNotLastEvent putSNotLastEvent = (PutSNotLastEvent) params;
                         final CacheController req = putSNotLastEvent.getReq();
                         final int tag = putSNotLastEvent.getTag();
 
@@ -356,7 +366,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                 .onCondition(DirectoryControllerEventType.PUTS_LAST, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        PutSLastEvent putSLastEvent = params.get(PutSLastEvent.class, "event");
+                        PutSLastEvent putSLastEvent = (PutSLastEvent) params;
                         final CacheController req = putSLastEvent.getReq();
                         final int tag = putSLastEvent.getTag();
 
@@ -367,7 +377,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                 .onCondition(DirectoryControllerEventType.PUTM_AND_DATA_FROM_NONOWNER, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        PutMAndDataFromNonOwnerEvent putMAndDataFromNonOwnerEvent = params.get(PutMAndDataFromNonOwnerEvent.class, "event");
+                        PutMAndDataFromNonOwnerEvent putMAndDataFromNonOwnerEvent = (PutMAndDataFromNonOwnerEvent) params;
                         final CacheController req = putMAndDataFromNonOwnerEvent.getReq();
                         final int tag = putMAndDataFromNonOwnerEvent.getTag();
 
@@ -378,7 +388,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                 .onCondition(DirectoryControllerEventType.DATA, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        DataEvent dataEvent = params.get(DataEvent.class, "event");
+                        DataEvent dataEvent = (DataEvent) params;
                         final int tag = dataEvent.getTag();
 
                         fsm.copyDataToMemory(tag);
@@ -390,21 +400,21 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                 .onCondition(DirectoryControllerEventType.GETS, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        GetSEvent getSEvent = params.get(GetSEvent.class, "event");
+                        GetSEvent getSEvent = (GetSEvent) params;
                         fsm.stall(getSEvent.getOnStalledCallback());
                     }
                 }, DirectoryControllerState.MI_A)
                 .onCondition(DirectoryControllerEventType.GETM, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        GetMEvent getMEvent = params.get(GetMEvent.class, "event");
+                        GetMEvent getMEvent = (GetMEvent) params;
                         fsm.stall(getMEvent.getOnStalledCallback());
                     }
                 }, DirectoryControllerState.MI_A)
                 .onCondition(DirectoryControllerEventType.REPLACEMENT, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        ReplacementEvent replacementEvent = params.get(ReplacementEvent.class, "event");
+                        ReplacementEvent replacementEvent = (ReplacementEvent) params;
                         fsm.stall(sender, params, replacementEvent);
                     }
                 }, DirectoryControllerState.MI_A)
@@ -417,19 +427,39 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                 .onCondition(DirectoryControllerEventType.LAST_RECALL_ACK, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        LastRecallAckEvent lastRecallAckEvent = params.get(LastRecallAckEvent.class, "event");
+                        LastRecallAckEvent lastRecallAckEvent = (LastRecallAckEvent) params;
                         final int tag = lastRecallAckEvent.getTag();
                         fsm.copyDataToMemory(tag);
                         fsm.getLine().setTag(CacheLine.INVALID_TAG);
                     }
                 }, DirectoryControllerState.I)
+                .onCondition(DirectoryControllerEventType.PUTS_NOT_LAST, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
+                    @Override
+                    public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
+                        PutSNotLastEvent putSNotLastEvent = (PutSNotLastEvent) params;
+                        final CacheController req = putSNotLastEvent.getReq();
+                        final int tag = putSNotLastEvent.getTag();
+
+                        fsm.sendPutAckToReq(putSNotLastEvent, req, tag);
+                    }
+                }, DirectoryControllerState.MI_A)
+                .onCondition(DirectoryControllerEventType.PUTS_LAST, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
+                    @Override
+                    public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
+                        PutSLastEvent putSLastEvent = (PutSLastEvent) params;
+                        final CacheController req = putSLastEvent.getReq();
+                        final int tag = putSLastEvent.getTag();
+
+                        fsm.sendPutAckToReq(putSLastEvent, req, tag);
+                    }
+                }, DirectoryControllerState.MI_A)
                 .onCondition(DirectoryControllerEventType.PUTM_AND_DATA_FROM_NONOWNER, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        PutMAndDataFromNonOwnerEvent putMAndDataFromNonOwnerEvent = params.get(PutMAndDataFromNonOwnerEvent.class, "event");
+                        PutMAndDataFromNonOwnerEvent putMAndDataFromNonOwnerEvent = (PutMAndDataFromNonOwnerEvent) params;
                         final CacheController req = putMAndDataFromNonOwnerEvent.getReq();
                         final int tag = putMAndDataFromNonOwnerEvent.getTag();
-//
+
                         fsm.sendPutAckToReq(putMAndDataFromNonOwnerEvent, req, tag);
                     }
                 }, DirectoryControllerState.MI_A);
@@ -439,21 +469,21 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                 .onCondition(DirectoryControllerEventType.GETS, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        GetSEvent getSEvent = params.get(GetSEvent.class, "event");
+                        GetSEvent getSEvent = (GetSEvent) params;
                         fsm.stall(getSEvent.getOnStalledCallback());
                     }
                 }, DirectoryControllerState.SI_A)
                 .onCondition(DirectoryControllerEventType.GETM, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        GetMEvent getMEvent = params.get(GetMEvent.class, "event");
+                        GetMEvent getMEvent = (GetMEvent) params;
                         fsm.stall(getMEvent.getOnStalledCallback());
                     }
                 }, DirectoryControllerState.SI_A)
                 .onCondition(DirectoryControllerEventType.REPLACEMENT, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        ReplacementEvent replacementEvent = params.get(ReplacementEvent.class, "event");
+                        ReplacementEvent replacementEvent = (ReplacementEvent) params;
                         fsm.stall(sender, params, replacementEvent);
                     }
                 }, DirectoryControllerState.SI_A)
@@ -472,36 +502,31 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                 .onCondition(DirectoryControllerEventType.PUTS_NOT_LAST, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        PutSNotLastEvent putSNotLastEvent = params.get(PutSNotLastEvent.class, "event");
+                        PutSNotLastEvent putSNotLastEvent = (PutSNotLastEvent) params;
                         final CacheController req = putSNotLastEvent.getReq();
                         final int tag = putSNotLastEvent.getTag();
 
-//                        fsm.removeReqFromSharers(req);
                         fsm.sendPutAckToReq(putSNotLastEvent, req, tag);
                     }
                 }, DirectoryControllerState.SI_A)
                 .onCondition(DirectoryControllerEventType.PUTS_LAST, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        PutSLastEvent putSLastEvent = params.get(PutSLastEvent.class, "event");
+                        PutSLastEvent putSLastEvent = (PutSLastEvent) params;
                         final CacheController req = putSLastEvent.getReq();
                         final int tag = putSLastEvent.getTag();
 
-//                        fsm.removeReqFromSharers(req);
                         fsm.sendPutAckToReq(putSLastEvent, req, tag);
-//                        fsm.getLine().setTag(CacheLine.INVALID_TAG);
                     }
-                }, DirectoryControllerState.SI_A)
+                }, DirectoryControllerState.I)
                 .onCondition(DirectoryControllerEventType.PUTM_AND_DATA_FROM_NONOWNER, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        //TODO: is it correct?
-                        throw new UnsupportedOperationException();
-//                        PutMAndDataFromNonOwnerEvent putMAndDataFromNonOwnerEvent = params.get(PutMAndDataFromNonOwnerEvent.class, "event");
-//                        final CacheController req = putMAndDataFromNonOwnerEvent.getReq();
-//                        final int tag = putMAndDataFromNonOwnerEvent.getTag();
+                        PutMAndDataFromNonOwnerEvent putMAndDataFromNonOwnerEvent = (PutMAndDataFromNonOwnerEvent) params;
+                        final CacheController req = putMAndDataFromNonOwnerEvent.getReq();
+                        final int tag = putMAndDataFromNonOwnerEvent.getTag();
 //
-//                        fsm.sendPutAckToReq(req, tag);
+                        fsm.sendPutAckToReq(putMAndDataFromNonOwnerEvent, req, tag);
                     }
                 }, DirectoryControllerState.SI_A);
         

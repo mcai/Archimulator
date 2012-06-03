@@ -1,5 +1,6 @@
 package archimulator.sim.uncore.coherence.msi.fsm;
 
+import archimulator.sim.uncore.CacheSimulator;
 import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
@@ -12,9 +13,8 @@ import archimulator.util.ValueProvider;
 import net.pickapack.Params;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
-import net.pickapack.action.Action4;
 import net.pickapack.fsm.BasicFiniteStateMachine;
-import net.pickapack.fsm.FiniteStateMachineFactory;
+import net.pickapack.fsm.event.EnterStateEvent;
 import net.pickapack.fsm.event.ExitStateEvent;
 
 import java.util.ArrayList;
@@ -23,7 +23,7 @@ import java.util.List;
 public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachine<DirectoryControllerState, DirectoryControllerEventType> implements ValueProvider<DirectoryControllerState> {
     private DirectoryController directoryController;
     private DirectoryEntry directoryEntry;
-    private DirectoryControllerState oldState;
+    private DirectoryControllerState previousState;
     private int set;
     private int way;
 
@@ -32,6 +32,8 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
     private List<Action> stalledEvents = new ArrayList<Action>();
 
     private Action onCompletedCallback;
+
+    private List<String> transitionHistory = new ArrayList<String>(10);
 
     public DirectoryControllerFiniteStateMachine(String name, int set, int way, final DirectoryController directoryController) {
         super(name, DirectoryControllerState.I);
@@ -43,13 +45,36 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
         this.addListener(ExitStateEvent.class, new Action1<ExitStateEvent>() {
             @Override
             public void apply(ExitStateEvent exitStateEvent) {
-                oldState = getState();
+                previousState = getState();
+            }
+        });
+
+        this.addListener(EnterStateEvent.class, new Action1<EnterStateEvent>() {
+            @Override
+            public void apply(EnterStateEvent enterStateEvent) {
+                CacheLine<DirectoryControllerState> line = directoryController.getCache().getLine(getSet(), getWay());
+
+//                if (getState() != previousState) {
+                    String transitionText = String.format("[%d] %s.[%d,%d] {%s} %s: %s.%s -> %s (owner: %s, sharers: %s)",
+                            directoryController.getCycleAccurateEventQueue().getCurrentCycle(), getName(), getSet(), getWay(), line.getTag() != CacheLine.INVALID_TAG ? String.format("0x%08x", line.getTag()) : "N/A", previousState, enterStateEvent.getSender() != null ? enterStateEvent.getSender() : "<N/A>", enterStateEvent.getCondition(), getState(),
+                            getDirectoryEntry().getOwner() != null ? getDirectoryEntry().getOwner() : "N/A", getDirectoryEntry().getSharers().toString().replace("[", "").replace("]", ""));
+                    if (transitionHistory.size() >= 10) {
+                        transitionHistory.remove(0);
+                    }
+
+                    transitionHistory.add(transitionText);
+
+                    if (CacheSimulator.logEnabled) {
+                        CacheSimulator.pw.println(transitionText);
+                        CacheSimulator.pw.flush();
+                    }
+//                }
             }
         });
     }
 
-    public DirectoryControllerState getOldState() {
-        return oldState;
+    public DirectoryControllerState getPreviousState() {
+        return previousState;
     }
 
     public List<Action> getStalledEvents() {
@@ -57,85 +82,65 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
     }
 
     public void onEventGetS(CacheCoherenceFlow producerFlow, CacheController req, int tag, Action onStalledCallback) {
-        Params params = new Params();
         GetSEvent getSEvent = new GetSEvent(directoryController, producerFlow, req, tag, set, way, onStalledCallback);
-        params.put("event", getSEvent);
-        this.fireTransition(req + "." + String.format("0x%08x", tag), params, getSEvent);
+        this.fireTransition(req + "." + String.format("0x%08x", tag), getSEvent);
     }
 
     public void onEventGetM(CacheCoherenceFlow producerFlow, CacheController req, int tag, Action onStalledCallback) {
-        Params params = new Params();
         GetMEvent getMEvent = new GetMEvent(directoryController, producerFlow, req, tag, set, way, onStalledCallback);
-        params.put("event", getMEvent);
-        this.fireTransition(req + "." + String.format("0x%08x", tag), params, getMEvent);
+        this.fireTransition(req + "." + String.format("0x%08x", tag), getMEvent);
     }
 
     public void onEventReplacement(CacheCoherenceFlow producerFlow, int tag, Action onCompletedCallback, Action onStalledCallback) {
-        Params params = new Params();
         ReplacementEvent replacementEvent = new ReplacementEvent(directoryController, producerFlow, tag, set, way, onCompletedCallback, onStalledCallback);
-        params.put("event", replacementEvent);
-        this.fireTransition("<core>" + "." + String.format("0x%08x", tag), params, replacementEvent);
+        this.fireTransition("<core>" + "." + String.format("0x%08x", tag), replacementEvent);
     }
 
     public void onEventRecallAck(CacheCoherenceFlow producerFlow, CacheController sender, int tag) {
-        Params params = new Params();
         RecallAckEvent recallAckEvent = new RecallAckEvent(directoryController, producerFlow, sender, tag);
-        params.put("event", recallAckEvent);
-        this.fireTransition(sender + "." + String.format("0x%08x", tag), params, recallAckEvent);
+        this.fireTransition(sender + "." + String.format("0x%08x", tag), recallAckEvent);
 
         if (this.numRecallAcks == 0) {
-            Params params2 = new Params();
             LastRecallAckEvent lastRecallAckEvent = new LastRecallAckEvent(directoryController, producerFlow, tag);
-            params2.put("event", lastRecallAckEvent);
-            this.fireTransition(sender + "." + String.format("0x%08x", tag), params2, lastRecallAckEvent);
+            this.fireTransition(sender + "." + String.format("0x%08x", tag), lastRecallAckEvent);
         }
     }
 
     public void onEventPutS(CacheCoherenceFlow producerFlow, CacheController req, int tag) {
         if (this.getDirectoryEntry().getSharers().size() > 1) {
-            Params params = new Params();
             PutSNotLastEvent putSNotLastEvent = new PutSNotLastEvent(directoryController, producerFlow, req, tag);
-            params.put("event", putSNotLastEvent);
-            this.fireTransition(req + "." + String.format("0x%08x", tag), params, putSNotLastEvent);
+            this.fireTransition(req + "." + String.format("0x%08x", tag), putSNotLastEvent);
         } else {
-            Params params = new Params();
             PutSLastEvent putSLastEvent = new PutSLastEvent(directoryController, producerFlow, req, tag);
-            params.put("event", putSLastEvent);
-            this.fireTransition(req + "." + String.format("0x%08x", tag), params, putSLastEvent);
+            this.fireTransition(req + "." + String.format("0x%08x", tag), putSLastEvent);
         }
     }
 
     public void onEventPutMAndData(CacheCoherenceFlow producerFlow, CacheController req, int tag) {
         if (req == this.getDirectoryEntry().getOwner()) {
-            Params params = new Params();
             PutMAndDataFromOwnerEvent putMAndDataFromOwnerEvent = new PutMAndDataFromOwnerEvent(directoryController, producerFlow, req, tag);
-            params.put("event", putMAndDataFromOwnerEvent);
-            this.fireTransition(req + "." + String.format("0x%08x", tag), params, putMAndDataFromOwnerEvent);
+            this.fireTransition(req + "." + String.format("0x%08x", tag), putMAndDataFromOwnerEvent);
         } else {
-            Params params = new Params();
             PutMAndDataFromNonOwnerEvent putMAndDataFromNonOwnerEvent = new PutMAndDataFromNonOwnerEvent(directoryController, producerFlow, req, tag);
-            params.put("event", putMAndDataFromNonOwnerEvent);
-            this.fireTransition(req + "." + String.format("0x%08x", tag), params, putMAndDataFromNonOwnerEvent);
+            this.fireTransition(req + "." + String.format("0x%08x", tag), putMAndDataFromNonOwnerEvent);
         }
     }
 
     public void onEventData(CacheCoherenceFlow producerFlow, CacheController sender, int tag) {
-        Params params = new Params();
         DataEvent dataEvent = new DataEvent(directoryController, producerFlow, sender, tag);
-        params.put("event", dataEvent);
-        this.fireTransition(sender + "." + String.format("0x%08x", tag), params, dataEvent);
+        this.fireTransition(sender + "." + String.format("0x%08x", tag), dataEvent);
     }
 
-    public void fireTransition(Object sender, Params params, DirectoryControllerEvent event) {
+    public void fireTransition(Object sender, DirectoryControllerEvent event) {
         event.onCompleted();
-        directoryController.getFsmFactory().fireTransition(this, sender, event.getType(), params);
+        directoryController.getFsmFactory().fireTransition(this, sender, event.getType(), event);
     }
 
     public void stall(final Object sender, final Params params, final DirectoryControllerEvent event) {
         Action action = new Action() {
             @Override
             public void apply() {
-                fireTransition(sender, params, event);
+                fireTransition(sender, event);
             }
         };
         stall(action);

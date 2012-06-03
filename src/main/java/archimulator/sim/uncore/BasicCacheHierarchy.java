@@ -24,8 +24,6 @@ import archimulator.sim.core.ProcessorConfig;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
-import archimulator.sim.uncore.coherence.msi.fsm.CacheControllerFiniteStateMachine;
-import archimulator.sim.uncore.coherence.msi.fsm.DirectoryControllerFiniteStateMachine;
 import archimulator.sim.uncore.coherence.msi.message.CoherenceMessage;
 import archimulator.sim.uncore.dram.*;
 import archimulator.sim.uncore.net.L1sToL2Net;
@@ -107,13 +105,13 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
         this.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
             public void apply(DumpStatEvent event) {
                 if (event.getType() == DumpStatEvent.Type.DETAILED_SIMULATION) {
-                    dumpStats(event.getStats());
+                    dumpStats();
                 }
             }
         });
     }
 
-    private void dumpStats(Map<String, Object> stats) {
+    public void dumpStats() {
         for(CacheController instructionCache : this.instructionCaches) {
             System.out.println("Cache Controller " + instructionCache.getName() + " FSM: ");
             System.out.println("------------------------------------------------------------------------");

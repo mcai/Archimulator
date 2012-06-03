@@ -103,6 +103,11 @@ public abstract class MemoryController extends MemoryDevice {
     private long getAccesses() {
         return this.reads + this.writes;
     }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
 }
 
 

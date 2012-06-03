@@ -25,18 +25,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class StackBasedEvictionPolicy<StateT extends Serializable> extends EvictionPolicy<StateT> {
-    private List<List<StackEntry>> stackEntries;
+    private List<List<Integer>> stackEntries;
 
     public StackBasedEvictionPolicy(EvictableCache<StateT> cache) {
         super(cache);
 
-        this.stackEntries = new ArrayList<List<StackEntry>>();
+        this.stackEntries = new ArrayList<List<Integer>>();
 
         for (int set = 0; set < this.getCache().getNumSets(); set++) {
-            this.stackEntries.add(new ArrayList<StackEntry>());
+            this.stackEntries.add(new ArrayList<Integer>());
 
             for (int way = 0; way < this.getCache().getAssociativity(); way++) {
-                this.stackEntries.get(set).add(new StackEntry(this.getCache().getLine(set, way)));
+                this.stackEntries.get(set).add(way);
             }
         }
     }
@@ -62,37 +62,29 @@ public abstract class StackBasedEvictionPolicy<StateT extends Serializable> exte
     }
 
     public CacheLine<StateT> getCacheLineInStackPosition(int set, int stackPosition) {
-        return this.stackEntries.get(set).get(stackPosition).cacheLine;
+        return this.getCache().getLine(set, this.stackEntries.get(set).get(stackPosition));
     }
 
     public int getStackPosition(int set, int way) {
-        StackEntry stackEntryFound = this.getStackEntry(set, way);
+        Integer stackEntryFound = this.getStackEntry(set, way);
         return this.stackEntries.get(set).indexOf(stackEntryFound);
     }
 
     public void setStackPosition(int set, int way, int newStackPosition) {
-        StackEntry stackEntryFound = this.getStackEntry(set, way);
+        Integer stackEntryFound = this.getStackEntry(set, way);
         this.stackEntries.get(set).remove(stackEntryFound);
         this.stackEntries.get(set).add(newStackPosition, stackEntryFound);
     }
 
-    private StackEntry getStackEntry(int set, int way) {
-        List<StackEntry> lineReplacementStatesPerSet = this.stackEntries.get(set);
+    private Integer getStackEntry(int set, int way) {
+        List<Integer> stackEntriesPerSet = this.stackEntries.get(set);
 
-        for (StackEntry stackEntry : lineReplacementStatesPerSet) {
-            if (stackEntry.cacheLine.getWay() == way) {
+        for (Integer stackEntry : stackEntriesPerSet) {
+            if (stackEntry == way) {
                 return stackEntry;
             }
         }
 
         throw new IllegalArgumentException();
-    }
-
-    private class StackEntry {
-        private CacheLine<StateT> cacheLine;
-
-        private StackEntry(CacheLine<StateT> cacheLine) {
-            this.cacheLine = cacheLine;
-        }
     }
 }

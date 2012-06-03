@@ -136,7 +136,7 @@ public class CacheController extends Controller {
         this.getCycleAccurateEventQueue().schedule(this, new Action() {
             @Override
             public void apply() {
-                load(access.getPhysicalTag(), onCompletedCallback);
+                onLoad(access.getPhysicalTag(), onCompletedCallback);
             }
         }, this.getHitLatency());
     }
@@ -145,7 +145,7 @@ public class CacheController extends Controller {
         this.getCycleAccurateEventQueue().schedule(this, new Action() {
             @Override
             public void apply() {
-                load(access.getPhysicalTag(), onCompletedCallback);
+                onLoad(access.getPhysicalTag(), onCompletedCallback);
             }
         }, this.getHitLatency());
     }
@@ -154,7 +154,7 @@ public class CacheController extends Controller {
         this.getCycleAccurateEventQueue().schedule(this, new Action() {
             @Override
             public void apply() {
-                store(access.getPhysicalTag(), onCompletedCallback);
+                onStore(access.getPhysicalTag(), onCompletedCallback);
             }
         }, this.getHitLatency());
     }
@@ -203,6 +203,50 @@ public class CacheController extends Controller {
             default:
                 throw new IllegalArgumentException();
         }
+    }
+
+    public void onLoad(final int tag, final Action onCompletedCallback) {
+        final LoadFlow loadFlow = new LoadFlow(this, tag, onCompletedCallback);
+
+        final Action onStalledCallback = new Action() {
+            @Override
+            public void apply() {
+                onLoad(tag, loadFlow.getOnCompletedCallback2());
+            }
+        };
+
+        this.access(loadFlow, tag,
+                new Action2<Integer, Integer>() {
+                    @Override
+                    public void apply(Integer set, Integer way) {
+                        CacheLine<CacheControllerState> line = getCache().getLine(set, way);
+                        final CacheControllerFiniteStateMachine fsm = (CacheControllerFiniteStateMachine) line.getStateProvider();
+                        fsm.onEventLoad(loadFlow, tag, loadFlow.getOnCompletedCallback2(), onStalledCallback);
+                    }
+                }, onStalledCallback
+        );
+    }
+
+    public void onStore(final int tag, final Action onCompletedCallback) {
+        final StoreFlow storeFlow = new StoreFlow(this, tag, onCompletedCallback);
+
+        final Action onStalledCallback = new Action() {
+            @Override
+            public void apply() {
+                onStore(tag, storeFlow.getOnCompletedCallback2());
+            }
+        };
+
+        this.access(storeFlow, tag,
+                new Action2<Integer, Integer>() {
+                    @Override
+                    public void apply(Integer set, Integer way) {
+                        CacheLine<CacheControllerState> line = getCache().getLine(set, way);
+                        final CacheControllerFiniteStateMachine fsm = (CacheControllerFiniteStateMachine) line.getStateProvider();
+                        fsm.onEventStore(storeFlow, tag, storeFlow.getOnCompletedCallback2(), onStalledCallback);
+                    }
+                }, onStalledCallback
+        );
     }
 
     private void onFwdGetS(FwdGetSMessage message) {
@@ -294,50 +338,6 @@ public class CacheController extends Controller {
         } else {
             onReplacementCompletedCallback.apply(set, way);
         }
-    }
-
-    public void load(final int tag, final Action onCompletedCallback) {
-        final LoadFlow loadFlow = new LoadFlow(this, tag, onCompletedCallback);
-
-        final Action onStalledCallback = new Action() {
-            @Override
-            public void apply() {
-                load(tag, loadFlow.getOnCompletedCallback2());
-            }
-        };
-
-        this.access(loadFlow, tag,
-                new Action2<Integer, Integer>() {
-                    @Override
-                    public void apply(Integer set, Integer way) {
-                        CacheLine<CacheControllerState> line = getCache().getLine(set, way);
-                        final CacheControllerFiniteStateMachine fsm = (CacheControllerFiniteStateMachine) line.getStateProvider();
-                        fsm.onEventLoad(loadFlow, tag, loadFlow.getOnCompletedCallback2(), onStalledCallback);
-                    }
-                }, onStalledCallback
-        );
-    }
-
-    public void store(final int tag, final Action onCompletedCallback) {
-        final StoreFlow storeFlow = new StoreFlow(this, tag, onCompletedCallback);
-
-        final Action onStalledCallback = new Action() {
-            @Override
-            public void apply() {
-                store(tag, storeFlow.getOnCompletedCallback2());
-            }
-        };
-
-        this.access(storeFlow, tag,
-                new Action2<Integer, Integer>() {
-                    @Override
-                    public void apply(Integer set, Integer way) {
-                        CacheLine<CacheControllerState> line = getCache().getLine(set, way);
-                        final CacheControllerFiniteStateMachine fsm = (CacheControllerFiniteStateMachine) line.getStateProvider();
-                        fsm.onEventStore(storeFlow, tag, storeFlow.getOnCompletedCallback2(), onStalledCallback);
-                    }
-                }, onStalledCallback
-        );
     }
 
     public DirectoryController getDirectoryController() {

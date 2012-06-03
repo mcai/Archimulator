@@ -45,7 +45,7 @@ public class DirectoryController extends Controller {
         this.fsmFactory = new DirectoryControllerFiniteStateMachineFactory(new Action1<DirectoryControllerFiniteStateMachine>() {
                 @Override
                 public void apply(DirectoryControllerFiniteStateMachine fsm) {
-                    if (fsm.getOldState() != fsm.getState() && fsm.getState().isStable()) {
+                    if (fsm.getPreviousState() != fsm.getState() && fsm.getState().isStable()) {
                         final Action onCompletedCallback = fsm.getOnCompletedCallback();
                         if (onCompletedCallback != null) {
                             fsm.setOnCompletedCallback(null);
@@ -53,7 +53,7 @@ public class DirectoryController extends Controller {
                         }
                     }
 
-                    if (fsm.getOldState() != fsm.getState()) {
+                    if (fsm.getPreviousState() != fsm.getState()) {
                         List<Action> stalledEventsToProcess = new ArrayList<Action>();
                         for (Action stalledEvent : fsm.getStalledEvents()) {
                             stalledEventsToProcess.add(stalledEvent);
