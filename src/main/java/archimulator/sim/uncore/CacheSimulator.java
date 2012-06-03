@@ -30,8 +30,8 @@ public class CacheSimulator {
     private static int numCompletedReads = 0;
     private static int numCompletedWrites = 0;
 
-        public static boolean logEnabled = true;
-//    public static boolean logEnabled = false;
+//        public static boolean logEnabled = true;
+    public static boolean logEnabled = false;
 
     private static boolean reached;
 
@@ -106,8 +106,8 @@ public class CacheSimulator {
         }
     }
 
-//    private static boolean useTrace = false;
-    private static boolean useTrace = true;
+    private static boolean useTrace = false;
+//    private static boolean useTrace = true;
 
     public static PrintWriter pw;
 
@@ -124,7 +124,7 @@ public class CacheSimulator {
         pw = new PrintWriter(new FileWriter(FileUtils.getUserDirectoryPath() + "/trace.txt"));
 
         MemoryHierarchyConfig memoryHierarchyConfig = MemoryHierarchyConfig.createDefaultMemoryHierarchyConfig(64, 1, 64, 1, 64, 1, LRUPolicy.class);
-        ProcessorConfig processorConfig = ProcessorConfig.createDefaultProcessorConfig(memoryHierarchyConfig, null, null, 2, 2);
+        ProcessorConfig processorConfig = ProcessorConfig.createDefaultProcessorConfig(memoryHierarchyConfig, null, null, 8, 2);
         BasicCacheHierarchy cacheHierarchy = new BasicCacheHierarchy(new BlockingEventDispatcher<BlockingEvent>(), cycleAccurateEventQueue, processorConfig);
 
         CacheController l10 = cacheHierarchy.getDataCaches().get(0);
@@ -170,8 +170,9 @@ public class CacheSimulator {
                     break;
                 }
 
-                issueRequests(l10);
-                issueRequests(l11);
+                for(CacheController dataCache : cacheHierarchy.getDataCaches()) {
+                    issueRequests(dataCache);
+                }
 
                 if(!reached) {
                     if(cycleAccurateEventQueue.getCurrentCycle() % 1000 == 0) {
@@ -201,8 +202,9 @@ public class CacheSimulator {
 
         CacheCoherenceFlow.dumpTree();
 
+        cacheHierarchy.dumpStats();
+
         if(numPendingReads != 0 || numPendingWrites != 0) {
-            cacheHierarchy.dumpStats();
             System.out.flush();
             throw new IllegalArgumentException();
         }

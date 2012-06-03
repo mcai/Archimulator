@@ -64,7 +64,7 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
             public void apply(EnterStateEvent enterStateEvent) {
                 CacheLine<CacheControllerState> line = cacheController.getCache().getLine(getSet(), getWay());
 
-//                if (getState() != previousState) {
+                if (getState() != previousState) {
                     String transitionText = String.format("[%d] %s.[%d,%d] {%s} %s: %s.%s -> %s", cacheController.getCycleAccurateEventQueue().getCurrentCycle(), getName(), getSet(), getWay(), line.getTag() != CacheLine.INVALID_TAG ? String.format("0x%08x", line.getTag()) : "N/A", previousState, enterStateEvent.getSender() != null ? enterStateEvent.getSender() : "<N/A>", enterStateEvent.getCondition(), getState());
                     if (transitionHistory.size() >= 10) {
                         transitionHistory.remove(0);
@@ -76,7 +76,7 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
                         CacheSimulator.pw.println(transitionText);
                         CacheSimulator.pw.flush();
                     }
-//                }
+                }
             }
         });
     }

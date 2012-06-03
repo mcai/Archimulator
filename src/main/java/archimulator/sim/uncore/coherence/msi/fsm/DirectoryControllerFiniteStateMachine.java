@@ -54,7 +54,7 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
             public void apply(EnterStateEvent enterStateEvent) {
                 CacheLine<DirectoryControllerState> line = directoryController.getCache().getLine(getSet(), getWay());
 
-//                if (getState() != previousState) {
+                if (getState() != previousState) {
                     String transitionText = String.format("[%d] %s.[%d,%d] {%s} %s: %s.%s -> %s (owner: %s, sharers: %s)",
                             directoryController.getCycleAccurateEventQueue().getCurrentCycle(), getName(), getSet(), getWay(), line.getTag() != CacheLine.INVALID_TAG ? String.format("0x%08x", line.getTag()) : "N/A", previousState, enterStateEvent.getSender() != null ? enterStateEvent.getSender() : "<N/A>", enterStateEvent.getCondition(), getState(),
                             getDirectoryEntry().getOwner() != null ? getDirectoryEntry().getOwner() : "N/A", getDirectoryEntry().getSharers().toString().replace("[", "").replace("]", ""));
@@ -68,7 +68,7 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
                         CacheSimulator.pw.println(transitionText);
                         CacheSimulator.pw.flush();
                     }
-//                }
+                }
             }
         });
     }
@@ -91,9 +91,9 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
         this.fireTransition(req + "." + String.format("0x%08x", tag), getMEvent);
     }
 
-    public void onEventReplacement(CacheCoherenceFlow producerFlow, int tag, Action onCompletedCallback, Action onStalledCallback) {
+    public void onEventReplacement(CacheCoherenceFlow producerFlow, CacheController req, int tag, Action onCompletedCallback, Action onStalledCallback) {
         ReplacementEvent replacementEvent = new ReplacementEvent(directoryController, producerFlow, tag, set, way, onCompletedCallback, onStalledCallback);
-        this.fireTransition("<core>" + "." + String.format("0x%08x", tag), replacementEvent);
+        this.fireTransition(req + "." + String.format("0x%08x", tag), replacementEvent);
     }
 
     public void onEventRecallAck(CacheCoherenceFlow producerFlow, CacheController sender, int tag) {

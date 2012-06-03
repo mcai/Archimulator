@@ -108,7 +108,7 @@ public class DirectoryController extends Controller {
         }
     }
 
-    public void access(CacheCoherenceFlow producerFlow, final int tag, final Action2<Integer, Integer> onReplacementCompletedCallback, final Action onReplacementStalledCallback) {
+    public void access(CacheCoherenceFlow producerFlow, CacheController req, final int tag, final Action2<Integer, Integer> onReplacementCompletedCallback, final Action onReplacementStalledCallback) {
         final int set = this.cache.getSet(tag);
         int way = this.getCache().findWay(tag);
         if (way == -1) {
@@ -127,7 +127,7 @@ public class DirectoryController extends Controller {
                 final CacheLine<DirectoryControllerState> line = this.getCache().getLine(set, way);
                 final DirectoryControllerFiniteStateMachine fsm = (DirectoryControllerFiniteStateMachine) line.getStateProvider();
                 final int finalWay = way;
-                fsm.onEventReplacement(producerFlow, tag,
+                fsm.onEventReplacement(producerFlow, req, tag,
                         new Action() {
                             @Override
                             public void apply() {
@@ -154,7 +154,7 @@ public class DirectoryController extends Controller {
             }
         };
 
-        this.access(message, message.getTag(), new Action2<Integer, Integer>() {
+        this.access(message, message.getReq(), message.getTag(), new Action2<Integer, Integer>() {
             @Override
             public void apply(Integer set, Integer way) {
                 CacheLine<DirectoryControllerState> line = getCache().getLine(set, way);
@@ -172,7 +172,7 @@ public class DirectoryController extends Controller {
             }
         };
 
-        this.access(message, message.getTag(), new Action2<Integer, Integer>() {
+        this.access(message, message.getReq(), message.getTag(), new Action2<Integer, Integer>() {
             @Override
             public void apply(Integer set, Integer way) {
                 CacheLine<DirectoryControllerState> line = getCache().getLine(set, way);

@@ -518,7 +518,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
 
                         fsm.sendPutAckToReq(putSLastEvent, req, tag);
                     }
-                }, DirectoryControllerState.I)
+                }, DirectoryControllerState.SI_A)
                 .onCondition(DirectoryControllerEventType.PUTM_AND_DATA_FROM_NONOWNER, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
