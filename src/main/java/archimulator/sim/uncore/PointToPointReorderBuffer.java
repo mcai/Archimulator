@@ -29,6 +29,7 @@ public class PointToPointReorderBuffer {
     private List<CoherenceMessage> messages;
     private final Controller from;
     private final Controller to;
+    private long lastCompletedMessageId = -1;
 
     public PointToPointReorderBuffer(Controller from, Controller to) {
         this.from = from;
@@ -52,12 +53,16 @@ public class PointToPointReorderBuffer {
                 break;
             }
 
-            message.onCompleted();
             this.messages.remove(message);
 
             to.getCycleAccurateEventQueue().schedule(this, new Action() {
                 @Override
                 public void apply() {
+                    message.onCompleted();
+                    if(message.getId() < lastCompletedMessageId) {
+                        throw new IllegalArgumentException();
+                    }
+                    lastCompletedMessageId = message.getId();
                     to.receive(message);
                 }
             }, to.getHitLatency());

@@ -16,6 +16,7 @@ public abstract class CacheCoherenceFlow extends Params implements Node {
     private List<CacheCoherenceFlow> childFlows;
     private int numPendingDescendantFlows;
     private long beginCycle;
+    private long endCycle;
     private boolean completed;
 
     public CacheCoherenceFlow(Controller generator, CacheCoherenceFlow producerFlow) {
@@ -48,6 +49,7 @@ public abstract class CacheCoherenceFlow extends Params implements Node {
 
     public void onCompleted() {
         this.completed = true;
+        this.endCycle = this.generator.getCycleAccurateEventQueue().getCurrentCycle();
         this.ancestorFlow.numPendingDescendantFlows--;
 
         if (this.ancestorFlow.numPendingDescendantFlows == 0) {
@@ -75,6 +77,10 @@ public abstract class CacheCoherenceFlow extends Params implements Node {
         return beginCycle;
     }
 
+    public long getEndCycle() {
+        return endCycle;
+    }
+
     public Object getGenerator() {
         return generator;
     }
@@ -85,7 +91,7 @@ public abstract class CacheCoherenceFlow extends Params implements Node {
 
     @Override
     public Object getValue() {
-        return this + (this.completed ? " -> completed" : "");
+        return String.format("%s%s", this, this.completed ? " -> completed at " + endCycle : "");
     }
 
     @Override
