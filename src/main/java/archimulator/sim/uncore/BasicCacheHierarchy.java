@@ -150,13 +150,9 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
         from.getNet(to).transfer(from, to, size, new Action() {
             @Override
             public void apply() {
-                onDestinationArrived(from, to, message);
+                p2pReorderBuffers.get(from).get(to).onDestinationArrived(message);
             }
         });
-    }
-
-    private void onDestinationArrived(Controller from, Controller to, CoherenceMessage message) {
-        this.p2pReorderBuffers.get(from).get(to).onDestinationArrived(message);
     }
 
     public MemoryController getMainMemory() {
