@@ -18,7 +18,14 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache.eviction;
 
-import archimulator.sim.uncore.cache.CacheLine;
+import archimulator.sim.ext.uncore.cache.eviction.LLCHTAwareLRUPolicy;
+import archimulator.sim.ext.uncore.cache.eviction.TestPolicy1;
+import archimulator.sim.ext.uncore.cache.eviction.TestPolicy2;
+import archimulator.sim.ext.uncore.cache.eviction.ThrashingSensitiveHTEnhancedLRUPolicy;
+import archimulator.sim.ext.uncore.cache.eviction.rd.RDPredictionWithSelectiveCachingPolicy;
+import archimulator.sim.ext.uncore.cache.eviction.rd.RDPredictionWithoutSelectiveCachingPolicy;
+import archimulator.sim.ext.uncore.cache.eviction.rd.RRIPPolicy;
+import archimulator.sim.ext.uncore.cache.eviction.rd.evaluator.RDBasedEvaluatorPolicy;
 import archimulator.sim.uncore.cache.EvictableCache;
 
 import java.io.Serializable;
@@ -31,10 +38,26 @@ public class EvictionPolicyFactory {
 
     static {
         evictionPolicyClasses.add(LRUPolicy.class);
+//        evictionPolicyClasses.add(LFUPolicy.class);
+        evictionPolicyClasses.add(RandomPolicy.class);
+
+        evictionPolicyClasses.add(RRIPPolicy.class);
+
+        evictionPolicyClasses.add(RDBasedEvaluatorPolicy.class);
+
+        evictionPolicyClasses.add(RDPredictionWithoutSelectiveCachingPolicy.class);
+        evictionPolicyClasses.add(RDPredictionWithSelectiveCachingPolicy.class);
+
+        evictionPolicyClasses.add(LLCHTAwareLRUPolicy.class);
+
+        evictionPolicyClasses.add(ThrashingSensitiveHTEnhancedLRUPolicy.class);
+
+        evictionPolicyClasses.add(TestPolicy1.class);
+        evictionPolicyClasses.add(TestPolicy2.class);
     }
 
     @SuppressWarnings("unchecked")
-    public static <StateT extends Serializable, LineT extends CacheLine<StateT>> EvictionPolicy<StateT> createEvictionPolicy(Class<? extends EvictionPolicy> evictionPolicyClz, EvictableCache<StateT> cache) {
+    public static <StateT extends Serializable> EvictionPolicy<StateT> createEvictionPolicy(Class<? extends EvictionPolicy> evictionPolicyClz, EvictableCache<StateT> cache) {
         try {
             return evictionPolicyClz.getConstructor(new Class[]{EvictableCache.class}).newInstance(cache);
         } catch (InstantiationException e) {

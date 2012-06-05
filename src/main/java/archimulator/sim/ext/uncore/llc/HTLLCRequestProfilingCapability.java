@@ -332,6 +332,7 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
         public HTLLCRequestVictimCacheLineStateValueProvider(int set, int way) {
             this.set = set;
             this.way = way;
+            this.state = HTLLCRequestVictimCacheLineState.INVALID;
         }
 
         @Override

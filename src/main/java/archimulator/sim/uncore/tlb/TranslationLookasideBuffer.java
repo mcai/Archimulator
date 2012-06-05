@@ -124,6 +124,7 @@ public class TranslationLookasideBuffer {
         protected boolean state;
 
         public BooleanValueProvider() {
+            this.state = false;
         }
 
         @Override

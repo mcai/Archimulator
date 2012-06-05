@@ -50,10 +50,6 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
 
     private Map<CacheAccessType, Map<Integer, Long>> reuseDistances;
 
-    private long numDownwardReads = 0;
-    private long numDownwardWrites = 0;
-    private long numL1Evicts = 0;
-
     private String hotspotFunctionName = "HashLookup"; //TODO: should not be hardcoded!!!
 //    private String hotspotFunctionName = "push_thread_func"; //TODO: should not be hardcoded!!!
 
@@ -110,20 +106,6 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
         llc.getBlockingEventDispatcher().addListener(CoherentCacheServiceNonblockingRequestEvent.class, new Action1<CoherentCacheServiceNonblockingRequestEvent>() {
             public void apply(CoherentCacheServiceNonblockingRequestEvent event) {
                 if (event.getCacheController().equals(LLCReuseDistanceProfilingCapability.this.llc)) {
-                    switch (event.getAccessType()) {
-                        case DOWNWARD_READ:
-                            numDownwardReads++;
-                            break;
-                        case DOWNWARD_WRITE:
-                            numDownwardWrites++;
-                            break;
-                        case EVICT:
-                            numL1Evicts++;
-                            break;
-                        default:
-                            throw new IllegalArgumentException();
-                    }
-
                     handleServicingRequest(event);
                 }
             }
@@ -132,10 +114,6 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
         llc.getBlockingEventDispatcher().addListener(ResetStatEvent.class, new Action1<ResetStatEvent>() {
             public void apply(ResetStatEvent event) {
                 reuseDistances.clear();
-
-                numDownwardReads = 0;
-                numDownwardWrites = 0;
-                numL1Evicts = 0;
             }
         });
 
@@ -155,10 +133,6 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
     }
 
     private void dumpStats(Map<String, Object> stats) {
-        stats.put("llcReuseDistanceProfilingCapability." + this.llc.getName() + ".numDownwardReads", this.numDownwardReads);
-        stats.put("llcReuseDistanceProfilingCapability." + this.llc.getName() + ".numDownwardWrites", this.numDownwardWrites);
-        stats.put("llcReuseDistanceProfilingCapability." + this.llc.getName() + ".numL1Evicts", this.numL1Evicts);
-
         if (this.loadsInHotspotFunction != null) {
             for (int pc : this.loadsInHotspotFunction.keySet()) {
                 LoadEntry loadEntry = this.loadsInHotspotFunction.get(pc);
