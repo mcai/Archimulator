@@ -285,6 +285,8 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
             int way = lru.getWayInStackPosition(set, i);
             CacheLine<HTLLCRequestVictimCacheLineState> line = this.htLLCRequestVictimCache.getLine(set, way);
             if (!line.getState().equals(HTLLCRequestVictimCacheLineState.INVALID)) {
+                HTLLCRequestVictimCacheLineStateValueProvider stateProvider = (HTLLCRequestVictimCacheLineStateValueProvider) line.getStateProvider();
+                stateProvider.setState(HTLLCRequestVictimCacheLineState.INVALID);
                 line.setTag(CacheLine.INVALID_TAG);
                 return;
             }
