@@ -38,6 +38,8 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                                 });
                             }
                         });
+
+                        fsm.fireServiceNonblockingRequestEvent(getSEvent.getAccess(), getSEvent.getTag());
                     }
                 }, DirectoryControllerState.IS_D)
                 .onCondition(DirectoryControllerEventType.GETM, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
@@ -64,6 +66,8 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                                 });
                             }
                         });
+
+                        fsm.fireServiceNonblockingRequestEvent(getMEvent.getAccess(), getMEvent.getTag());
                     }
                 }, DirectoryControllerState.IM_D);
 
@@ -74,6 +78,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
                         GetSEvent getSEvent = (GetSEvent) params;
                         fsm.stall(getSEvent.getOnStalledCallback());
+                        fsm.fireNonblockingRequestHitToTransientTagEvent(getSEvent.getAccess(), getSEvent.getTag());
                     }
                 }, DirectoryControllerState.IS_D)
                 .onCondition(DirectoryControllerEventType.GETM, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
@@ -81,34 +86,35 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
                         GetMEvent getMEvent = (GetMEvent) params;
                         fsm.stall(getMEvent.getOnStalledCallback());
+                        fsm.fireNonblockingRequestHitToTransientTagEvent(getMEvent.getAccess(), getMEvent.getTag());
                     }
                 }, DirectoryControllerState.IS_D)
                 .onCondition(DirectoryControllerEventType.REPLACEMENT, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        ReplacementEvent getMEvent = (ReplacementEvent) params;
-                        fsm.stall(getMEvent.getOnStalledCallback());
+                        ReplacementEvent replacementEvent = (ReplacementEvent) params;
+                        fsm.stall(replacementEvent.getOnStalledCallback());
                     }
                 }, DirectoryControllerState.IS_D)
                 .onCondition(DirectoryControllerEventType.PUTS_NOT_LAST, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
                         PutSNotLastEvent putSNotLastEvent = (PutSNotLastEvent) params;
-                        fsm.stall(sender, params, putSNotLastEvent);
+                        fsm.stall(sender, putSNotLastEvent);
                     }
                 }, DirectoryControllerState.IS_D)
                 .onCondition(DirectoryControllerEventType.PUTS_LAST, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
                         PutSLastEvent putSNotLastEvent = (PutSLastEvent) params;
-                        fsm.stall(sender, params, putSNotLastEvent);
+                        fsm.stall(sender, putSNotLastEvent);
                     }
                 }, DirectoryControllerState.IS_D)
                 .onCondition(DirectoryControllerEventType.PUTM_AND_DATA_FROM_NONOWNER, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
                         PutMAndDataFromNonOwnerEvent putMAndDataFromNonOwnerEvent = (PutMAndDataFromNonOwnerEvent) params;
-                        fsm.stall(sender, params, putMAndDataFromNonOwnerEvent);
+                        fsm.stall(sender, putMAndDataFromNonOwnerEvent);
                     }
                 }, DirectoryControllerState.IS_D)
                 .onCondition(DirectoryControllerEventType.DATA_FROM_MEMORY, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
@@ -118,7 +124,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                         fsm.sendDataToReq(dataFromMemoryEvent, dataFromMemoryEvent.getReq(), dataFromMemoryEvent.getTag(), 0);
                         fsm.addReqToSharers(dataFromMemoryEvent.getReq());
                         fsm.getLine().setTag(dataFromMemoryEvent.getTag());
-                        fsm.getDirectoryController().getCache().handleInsertionOnMiss(fsm.getSet(), fsm.getWay());
+                        fsm.getDirectoryController().getCache().getLine(fsm.getSet(), fsm.getWay()).getCacheAccess().commit();
                     }
                 }, DirectoryControllerState.S);
 
@@ -129,6 +135,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
                         GetSEvent getSEvent = (GetSEvent) params;
                         fsm.stall(getSEvent.getOnStalledCallback());
+                        fsm.fireNonblockingRequestHitToTransientTagEvent(getSEvent.getAccess(), getSEvent.getTag());
                     }
                 }, DirectoryControllerState.IM_D)
                 .onCondition(DirectoryControllerEventType.GETM, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
@@ -136,34 +143,35 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
                         GetMEvent getMEvent = (GetMEvent) params;
                         fsm.stall(getMEvent.getOnStalledCallback());
+                        fsm.fireNonblockingRequestHitToTransientTagEvent(getMEvent.getAccess(), getMEvent.getTag());
                     }
                 }, DirectoryControllerState.IM_D)
                 .onCondition(DirectoryControllerEventType.REPLACEMENT, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
-                        ReplacementEvent getMEvent = (ReplacementEvent) params;
-                        fsm.stall(getMEvent.getOnStalledCallback());
+                        ReplacementEvent replacementEvent = (ReplacementEvent) params;
+                        fsm.stall(replacementEvent.getOnStalledCallback());
                     }
                 }, DirectoryControllerState.IM_D)
                 .onCondition(DirectoryControllerEventType.PUTS_NOT_LAST, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
                         PutSNotLastEvent putSNotLastEvent = (PutSNotLastEvent) params;
-                        fsm.stall(sender, params, putSNotLastEvent);
+                        fsm.stall(sender, putSNotLastEvent);
                     }
                 }, DirectoryControllerState.IM_D)
                 .onCondition(DirectoryControllerEventType.PUTS_LAST, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
                         PutSLastEvent putSNotLastEvent = (PutSLastEvent) params;
-                        fsm.stall(sender, params, putSNotLastEvent);
+                        fsm.stall(sender, putSNotLastEvent);
                     }
                 }, DirectoryControllerState.IM_D)
                 .onCondition(DirectoryControllerEventType.PUTM_AND_DATA_FROM_NONOWNER, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
                         PutMAndDataFromNonOwnerEvent putMAndDataFromNonOwnerEvent = (PutMAndDataFromNonOwnerEvent) params;
-                        fsm.stall(sender, params, putMAndDataFromNonOwnerEvent);
+                        fsm.stall(sender, putMAndDataFromNonOwnerEvent);
                     }
                 }, DirectoryControllerState.IM_D)
                 .onCondition(DirectoryControllerEventType.DATA_FROM_MEMORY, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
@@ -173,7 +181,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                         fsm.sendDataToReq(dataFromMemoryEvent, dataFromMemoryEvent.getReq(), dataFromMemoryEvent.getTag(), 0);
                         fsm.setOwnerToReq(dataFromMemoryEvent.getReq());
                         fsm.getLine().setTag(dataFromMemoryEvent.getTag());
-                        fsm.getDirectoryController().getCache().handleInsertionOnMiss(fsm.getSet(), fsm.getWay());
+                        fsm.getDirectoryController().getCache().getLine(fsm.getSet(), fsm.getWay()).getCacheAccess().commit();
                     }
                 }, DirectoryControllerState.M);
 
@@ -188,7 +196,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
 
                         fsm.sendDataToReq(getSEvent, req, tag, 0);
                         fsm.addReqToSharers(req);
-                        fsm.hit(getSEvent.getSet(), getSEvent.getWay());
+                        fsm.hit(getSEvent.getAccess(), getSEvent.getTag(), getSEvent.getSet(), getSEvent.getWay());
                     }
                 }, DirectoryControllerState.S)
                 .onCondition(DirectoryControllerEventType.GETM, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
@@ -209,7 +217,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                         fsm.sendInvToSharers(getMEvent, req, tag);
                         fsm.clearSharers();
                         fsm.setOwnerToReq(req);
-                        fsm.hit(getMEvent.getSet(), getMEvent.getWay());
+                        fsm.hit(getMEvent.getAccess(), getMEvent.getTag(), getMEvent.getSet(), getMEvent.getWay());
                     }
                 }, DirectoryControllerState.M)
                 .onCondition(DirectoryControllerEventType.REPLACEMENT, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
@@ -221,6 +229,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                         fsm.sendRecallToSharers(replacementEvent, line.getTag());
                         fsm.clearSharers();
                         fsm.setOnCompletedCallback(replacementEvent.getOnCompletedCallback());
+                        fsm.fireServiceNonblockingRequestEvent(replacementEvent.getAccess(), replacementEvent.getTag());
                     }
                 }, DirectoryControllerState.SI_A)
                 .onCondition(DirectoryControllerEventType.PUTS_NOT_LAST, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
@@ -270,7 +279,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                         fsm.sendFwdGetSToOwner(getSEvent, req, tag);
                         fsm.addReqAndOwnerToSharers(req);
                         fsm.clearOwner();
-                        fsm.hit(getSEvent.getSet(), getSEvent.getWay());
+                        fsm.hit(getSEvent.getAccess(), getSEvent.getTag(), getSEvent.getSet(), getSEvent.getWay());
                     }
                 }, DirectoryControllerState.S_D)
                 .onCondition(DirectoryControllerEventType.GETM, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
@@ -282,7 +291,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
 
                         fsm.sendFwdGetMToOwner(getMEvent, req, tag);
                         fsm.setOwnerToReq(req);
-                        fsm.hit(getMEvent.getSet(), getMEvent.getWay());
+                        fsm.hit(getMEvent.getAccess(), getMEvent.getTag(), getMEvent.getSet(), getMEvent.getWay());
                     }
                 }, DirectoryControllerState.M)
                 .onCondition(DirectoryControllerEventType.REPLACEMENT, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
@@ -294,6 +303,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                         fsm.sendRecallToOwner(replacementEvent, line.getTag());
                         fsm.clearOwner();
                         fsm.setOnCompletedCallback(replacementEvent.getOnCompletedCallback());
+                        fsm.fireServiceNonblockingRequestEvent(replacementEvent.getAccess(), replacementEvent.getTag());
                     }
                 }, DirectoryControllerState.MI_A)
                 .onCondition(DirectoryControllerEventType.PUTS_NOT_LAST, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
@@ -419,7 +429,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
                         ReplacementEvent replacementEvent = (ReplacementEvent) params;
-                        fsm.stall(sender, params, replacementEvent);
+                        fsm.stall(sender, replacementEvent);
                     }
                 }, DirectoryControllerState.MI_A)
                 .onCondition(DirectoryControllerEventType.RECALL_ACK, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
@@ -488,7 +498,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
                         ReplacementEvent replacementEvent = (ReplacementEvent) params;
-                        fsm.stall(sender, params, replacementEvent);
+                        fsm.stall(sender, replacementEvent);
                     }
                 }, DirectoryControllerState.SI_A)
                 .onCondition(DirectoryControllerEventType.RECALL_ACK, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {

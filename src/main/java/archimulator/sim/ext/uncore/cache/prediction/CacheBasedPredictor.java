@@ -48,6 +48,7 @@ public class CacheBasedPredictor<PredictableT extends Comparable<PredictableT>> 
         if (!access.isHitInCache()) {
             CacheLine<Boolean> line = access.getLine();
             BooleanValueProvider stateProvider = (BooleanValueProvider) line.getStateProvider();
+            line.setTag(this.evictableCache.getTag(address));
             stateProvider.state = true;
         }
         access.commit();

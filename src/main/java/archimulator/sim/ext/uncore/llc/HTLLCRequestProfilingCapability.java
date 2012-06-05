@@ -261,6 +261,7 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
         CacheLine<HTLLCRequestVictimCacheLineState> line = newMiss.getLine();
         HTLLCRequestVictimCacheLineStateValueProvider stateProvider = (HTLLCRequestVictimCacheLineStateValueProvider) line.getStateProvider();
         stateProvider.setState(HTLLCRequestVictimCacheLineState.DATA);
+        line.setTag(tag);
         newMiss.commit();
     }
 
@@ -269,6 +270,7 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
         CacheLine<HTLLCRequestVictimCacheLineState> line = newMiss.getLine();
         HTLLCRequestVictimCacheLineStateValueProvider stateProvider = (HTLLCRequestVictimCacheLineStateValueProvider) line.getStateProvider();
         stateProvider.setState(HTLLCRequestVictimCacheLineState.NULL);
+        line.setTag(0);
         newMiss.commit();
     }
 

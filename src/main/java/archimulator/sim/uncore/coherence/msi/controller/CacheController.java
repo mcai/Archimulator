@@ -207,12 +207,14 @@ public class CacheController extends GeneralCacheController {
     }
 
     public void onLoad(final MemoryHierarchyAccess access, final int tag, final Action onCompletedCallback) {
-        final LoadFlow loadFlow = new LoadFlow(this, tag, onCompletedCallback, access);
+        onLoad(access, tag, new LoadFlow(this, tag, onCompletedCallback, access));
+    }
 
+    private void onLoad(final MemoryHierarchyAccess access, final int tag, final LoadFlow loadFlow) {
         final Action onStalledCallback = new Action() {
             @Override
             public void apply() {
-                onLoad(access, tag, loadFlow.getOnCompletedCallback2());
+                onLoad(access, tag, loadFlow);
             }
         };
 
@@ -229,12 +231,14 @@ public class CacheController extends GeneralCacheController {
     }
 
     public void onStore(final MemoryHierarchyAccess access, final int tag, final Action onCompletedCallback) {
-        final StoreFlow storeFlow = new StoreFlow(this, tag, onCompletedCallback, access);
+        onStore(access, tag, new StoreFlow(this, tag, onCompletedCallback, access));
+    }
 
+    private void onStore(final MemoryHierarchyAccess access, final int tag, final StoreFlow storeFlow) {
         final Action onStalledCallback = new Action() {
             @Override
             public void apply() {
-                onStore(access, tag, storeFlow.getOnCompletedCallback2());
+                onStore(access, tag, storeFlow);
             }
         };
 
@@ -307,7 +311,7 @@ public class CacheController extends GeneralCacheController {
     private void access(CacheCoherenceFlow producerFlow, MemoryHierarchyAccess access, final int tag, final Action2<Integer, Integer> onReplacementCompletedCallback, final Action onReplacementStalledCallback) {
         final int set = this.cache.getSet(tag);
 
-        final CacheAccess<CacheControllerState> cacheAccess = this.getCache().newAccess(this, access, tag, CacheAccessType.UNKNOWN);
+        final CacheAccess<CacheControllerState> cacheAccess = this.getCache().newAccess(this, access, tag, producerFlow instanceof LoadFlow ? CacheAccessType.DOWNWARD_READ : CacheAccessType.DOWNWARD_WRITE);
         if(cacheAccess.isHitInCache()) {
             onReplacementCompletedCallback.apply(set, cacheAccess.getWay());
         }

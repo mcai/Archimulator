@@ -37,16 +37,6 @@ public class EvictableCache<StateT extends Serializable> extends Cache<StateT> {
         this.evictionPolicy = EvictionPolicyFactory.createEvictionPolicy(evictionPolicyClz, this);
     }
 
-    public void handlePromotionOnHit(int set, int way) {
-        CacheLine<StateT> line = this.getLine(set, way);
-        this.evictionPolicy.handlePromotionOnHit((CacheHit<StateT>) line.getCacheAccess());
-    }
-
-    public void handleInsertionOnMiss(int set, int way) {
-        CacheLine<StateT> line = this.getLine(set, way);
-        this.evictionPolicy.handleInsertionOnMiss((CacheMiss<StateT>) line.getCacheAccess());
-    }
-
     public CacheAccess<StateT> newAccess(GeneralCacheController cacheController, MemoryHierarchyAccess access, int address, CacheAccessType accessType) {
         CacheLine<StateT> line = this.findLine(address);
 

@@ -1,6 +1,11 @@
 package archimulator.sim.uncore.coherence.msi.fsm;
 
+import archimulator.sim.uncore.MemoryHierarchyAccess;
+import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.cache.CacheLine;
+import archimulator.sim.uncore.coherence.event.CoherentCacheBeginCacheAccessEvent;
+import archimulator.sim.uncore.coherence.event.CoherentCacheNonblockingRequestHitToTransientTagEvent;
+import archimulator.sim.uncore.coherence.event.CoherentCacheServiceNonblockingRequestEvent;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryEntry;
@@ -9,7 +14,6 @@ import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import archimulator.sim.uncore.coherence.msi.message.*;
 import archimulator.sim.uncore.coherence.msi.state.DirectoryControllerState;
 import archimulator.util.ValueProvider;
-import net.pickapack.Params;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
 import net.pickapack.fsm.BasicFiniteStateMachine;
@@ -134,11 +138,12 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
         this.directoryController.getFsmFactory().fireTransition(this, sender, event.getType(), event);
     }
 
-    public void hit(int set, int way) {
-        this.directoryController.getCache().handlePromotionOnHit(set, way);
+    public void hit(MemoryHierarchyAccess access, int tag, int set, int way) {
+        this.directoryController.getCache().getLine(set, way).getCacheAccess().commit();
+        this.fireServiceNonblockingRequestEvent(access, tag);
     }
 
-    public void stall(final Object sender, final Params params, final DirectoryControllerEvent event) {
+    public void stall(final Object sender, final DirectoryControllerEvent event) {
         Action action = new Action() {
             @Override
             public void apply() {
@@ -150,6 +155,17 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
 
     public void stall(Action action) {
         stalledEvents.add(action);
+    }
+
+    public void fireServiceNonblockingRequestEvent(MemoryHierarchyAccess access, int tag) {
+        CacheAccess<DirectoryControllerState> cacheAccess = this.getLine().getCacheAccess();
+        this.getDirectoryController().getBlockingEventDispatcher().dispatch(new CoherentCacheServiceNonblockingRequestEvent(this.getDirectoryController(), access, tag, cacheAccess.getLine(), cacheAccess.isHitInCache(), cacheAccess.isEviction(), cacheAccess.getReference().getAccessType()));
+        this.getDirectoryController().getBlockingEventDispatcher().dispatch(new CoherentCacheBeginCacheAccessEvent(this.getDirectoryController(), access, cacheAccess));
+    }
+
+    public void fireNonblockingRequestHitToTransientTagEvent(MemoryHierarchyAccess access, int tag) {
+        CacheAccess<DirectoryControllerState> cacheAccess = this.getLine().getCacheAccess();
+        this.getDirectoryController().getBlockingEventDispatcher().dispatch(new CoherentCacheNonblockingRequestHitToTransientTagEvent(this.getDirectoryController(), access, tag, cacheAccess.getLine()));
     }
 
     public void sendDataToReq(CacheCoherenceFlow producerFlow, final CacheController req, final int tag, int numAcks) {

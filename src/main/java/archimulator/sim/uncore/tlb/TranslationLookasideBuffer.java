@@ -93,6 +93,7 @@ public class TranslationLookasideBuffer {
             CacheLine<Boolean> line = cacheAccess.getLine();
             BooleanValueProvider stateProvider = (BooleanValueProvider) line.getStateProvider();
             stateProvider.state = true;
+            line.setTag(access.getPhysicalTag());
             cacheAccess.commit();
         }
 

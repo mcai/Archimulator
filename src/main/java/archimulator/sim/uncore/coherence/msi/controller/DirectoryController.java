@@ -111,37 +111,6 @@ public class DirectoryController extends GeneralCacheController {
         }
     }
 
-    public void access(CacheCoherenceFlow producerFlow, MemoryHierarchyAccess access, CacheController req, final int tag, final Action2<Integer, Integer> onReplacementCompletedCallback, final Action onReplacementStalledCallback) {
-        final int set = this.cache.getSet(tag);
-
-        final CacheAccess<DirectoryControllerState> cacheAccess = this.cache.newAccess(this, access, tag, CacheAccessType.UNKNOWN);
-        if(cacheAccess.isHitInCache()) {
-            onReplacementCompletedCallback.apply(set, cacheAccess.getWay());
-        }
-        else {
-            if(cacheAccess.isEviction()) {
-                final CacheLine<DirectoryControllerState> line = this.getCache().getLine(set, cacheAccess.getWay());
-                final DirectoryControllerFiniteStateMachine fsm = (DirectoryControllerFiniteStateMachine) line.getStateProvider();
-                fsm.onEventReplacement(producerFlow, req, tag,
-                        new Action() {
-                            @Override
-                            public void apply() {
-                                onReplacementCompletedCallback.apply(set, cacheAccess.getWay());
-                            }
-                        }, new Action() {
-                            @Override
-                            public void apply() {
-                                getCycleAccurateEventQueue().schedule(DirectoryController.this, onReplacementStalledCallback, 1);
-                            }
-                        }
-                );
-            }
-            else {
-                onReplacementCompletedCallback.apply(set, cacheAccess.getWay());
-            }
-        }
-    }
-
     private void onGetS(final GetSMessage message) {
         final Action onStalledCallback = new Action() {
             @Override
@@ -226,6 +195,37 @@ public class DirectoryController extends GeneralCacheController {
         CacheLine<DirectoryControllerState> line = this.cache.getLine(this.cache.getSet(tag), way);
         DirectoryControllerFiniteStateMachine fsm =(DirectoryControllerFiniteStateMachine) line.getStateProvider();
         fsm.onEventData(message, sender, tag);
+    }
+
+    private void access(CacheCoherenceFlow producerFlow, MemoryHierarchyAccess access, CacheController req, final int tag, final Action2<Integer, Integer> onReplacementCompletedCallback, final Action onReplacementStalledCallback) {
+        final int set = this.cache.getSet(tag);
+
+        final CacheAccess<DirectoryControllerState> cacheAccess = this.cache.newAccess(this, access, tag, producerFlow instanceof GetSMessage ? CacheAccessType.DOWNWARD_READ : CacheAccessType.DOWNWARD_WRITE);
+        if(cacheAccess.isHitInCache()) {
+            onReplacementCompletedCallback.apply(set, cacheAccess.getWay());
+        }
+        else {
+            if(cacheAccess.isEviction()) {
+                final CacheLine<DirectoryControllerState> line = this.getCache().getLine(set, cacheAccess.getWay());
+                final DirectoryControllerFiniteStateMachine fsm = (DirectoryControllerFiniteStateMachine) line.getStateProvider();
+                fsm.onEventReplacement(producerFlow, req, tag,
+                        new Action() {
+                            @Override
+                            public void apply() {
+                                onReplacementCompletedCallback.apply(set, cacheAccess.getWay());
+                            }
+                        }, new Action() {
+                            @Override
+                            public void apply() {
+                                getCycleAccurateEventQueue().schedule(DirectoryController.this, onReplacementStalledCallback, 1);
+                            }
+                        }
+                );
+            }
+            else {
+                onReplacementCompletedCallback.apply(set, cacheAccess.getWay());
+            }
+        }
     }
 
     @Override

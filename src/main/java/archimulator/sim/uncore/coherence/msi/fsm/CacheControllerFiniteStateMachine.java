@@ -1,6 +1,11 @@
 package archimulator.sim.uncore.coherence.msi.fsm;
 
+import archimulator.sim.uncore.MemoryHierarchyAccess;
+import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.cache.CacheLine;
+import archimulator.sim.uncore.coherence.event.CoherentCacheBeginCacheAccessEvent;
+import archimulator.sim.uncore.coherence.event.CoherentCacheNonblockingRequestHitToTransientTagEvent;
+import archimulator.sim.uncore.coherence.event.CoherentCacheServiceNonblockingRequestEvent;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
@@ -9,7 +14,6 @@ import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import archimulator.sim.uncore.coherence.msi.message.*;
 import archimulator.sim.uncore.coherence.msi.state.CacheControllerState;
 import archimulator.util.ValueProvider;
-import net.pickapack.Params;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
 import net.pickapack.fsm.BasicFiniteStateMachine;
@@ -198,11 +202,12 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
         this.numInvAcks--;
     }
 
-    public void hit(int set, int way) {
-        this.cacheController.getCache().handlePromotionOnHit(set, way);
+    public void hit(MemoryHierarchyAccess access, int tag, int set, int way) {
+        this.cacheController.getCache().getLine(set, way).getCacheAccess().commit();
+        this.fireServiceNonblockingRequestEvent(access, tag);
     }
 
-    public void stall(final Object sender, final Params params, final CacheControllerEvent event) {
+    public void stall(final Object sender, final CacheControllerEvent event) {
         Action action = new Action() {
             @Override
             public void apply() {
@@ -214,6 +219,17 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
 
     public void stall(Action action) {
         stalledEvents.add(action);
+    }
+
+    public void fireServiceNonblockingRequestEvent(MemoryHierarchyAccess access, int tag) {
+        CacheAccess<CacheControllerState> cacheAccess = this.getLine().getCacheAccess();
+        this.getCacheController().getBlockingEventDispatcher().dispatch(new CoherentCacheServiceNonblockingRequestEvent(this.getCacheController(), access, tag, cacheAccess.getLine(), cacheAccess.isHitInCache(), cacheAccess.isEviction(), cacheAccess.getReference().getAccessType()));
+        this.getCacheController().getBlockingEventDispatcher().dispatch(new CoherentCacheBeginCacheAccessEvent(this.getCacheController(), access, cacheAccess));
+    }
+
+    public void fireNonblockingRequestHitToTransientTagEvent(MemoryHierarchyAccess access, int tag) {
+        CacheAccess<CacheControllerState> cacheAccess = this.getLine().getCacheAccess();
+        this.getCacheController().getBlockingEventDispatcher().dispatch(new CoherentCacheNonblockingRequestHitToTransientTagEvent(this.getCacheController(), access, tag, cacheAccess.getLine()));
     }
 
     @Override

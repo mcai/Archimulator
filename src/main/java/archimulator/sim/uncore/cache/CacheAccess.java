@@ -41,10 +41,6 @@ public abstract class CacheAccess<StateT extends Serializable> {
         if (this.way != -1) {
             this.line = this.cache.getLine(this.reference.getSet(), this.way);
         }
-
-        if (this.reference.getCacheController() != null && this.reference.getAccess() != null) {
-            this.reference.getCacheController().getBlockingEventDispatcher().dispatch(new CoherentCacheBeginCacheAccessEvent(this.reference.getCacheController(), this.reference.getAccess(), this));
-        }
     }
 
     public long getId() {

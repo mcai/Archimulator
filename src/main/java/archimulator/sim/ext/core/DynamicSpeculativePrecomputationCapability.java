@@ -413,6 +413,7 @@ public class DynamicSpeculativePrecomputationCapability implements ProcessorCapa
                 CacheLine<Boolean> line = miss.getLine();
                 BooleanValueProvider stateProvider = (BooleanValueProvider) line.getStateProvider();
 
+                line.setTag(sliceCache.getTag(slice.triggerPc));
                 stateProvider.state = true;
                 miss.commit();
 
