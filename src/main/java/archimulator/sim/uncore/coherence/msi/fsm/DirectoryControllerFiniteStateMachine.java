@@ -161,6 +161,7 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
         CacheAccess<DirectoryControllerState> cacheAccess = this.getLine().getCacheAccess();
         this.getDirectoryController().getBlockingEventDispatcher().dispatch(new CoherentCacheServiceNonblockingRequestEvent(this.getDirectoryController(), access, tag, cacheAccess.getLine(), cacheAccess.isHitInCache(), cacheAccess.isEviction(), cacheAccess.getReference().getAccessType()));
         this.getDirectoryController().getBlockingEventDispatcher().dispatch(new CoherentCacheBeginCacheAccessEvent(this.getDirectoryController(), access, cacheAccess));
+        this.getDirectoryController().updateStats(cacheAccess);
     }
 
     public void fireNonblockingRequestHitToTransientTagEvent(MemoryHierarchyAccess access, int tag) {

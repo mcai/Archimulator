@@ -105,10 +105,6 @@ public abstract class AbstractRDPredictionEvictionPolicy<StateT extends Serializ
     }
 
     protected boolean isPolluting(CacheMiss<StateT> miss) {
-        if (miss.isBypass()) {
-            return false;
-        }
-
         int predictedRequesterReuseDistance = this.rdMonitor.lookup(miss.getReference().getAccess().getVirtualPc()); //TODO: thread awareness: threadId-pc pair??!!
         CacheLine<Boolean> line = this.mirrorCache.getLine(miss.getReference().getSet(), miss.getWay());
         BooleanValueProvider stateProvider = (BooleanValueProvider) line.getStateProvider();

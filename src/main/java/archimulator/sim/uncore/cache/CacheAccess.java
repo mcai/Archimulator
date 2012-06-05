@@ -65,8 +65,6 @@ public abstract class CacheAccess<StateT extends Serializable> {
 
     public abstract boolean isHitInCache();
 
-    public abstract boolean isBypass();
-
     public abstract boolean isEviction();
 
     public CacheAccess<StateT> commit() {
@@ -79,6 +77,6 @@ public abstract class CacheAccess<StateT extends Serializable> {
 
     @Override
     public String toString() {
-        return String.format("[%d, %d] %s {id=%d, hitInCache=%s, bypass=%s, eviction=%s}", reference.getSet(), way, reference.getAccessType(), id, isHitInCache(), isBypass(), isEviction());
+        return String.format("[%d, %d] %s {id=%d, hitInCache=%s, eviction=%s}", reference.getSet(), way, reference.getAccessType(), id, isHitInCache(), isEviction());
     }
 }

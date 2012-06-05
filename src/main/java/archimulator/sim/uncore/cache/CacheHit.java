@@ -31,11 +31,6 @@ public class CacheHit<StateT extends Serializable> extends CacheAccess<StateT> {
     }
 
     @Override
-    public boolean isBypass() {
-        return false;
-    }
-
-    @Override
     public boolean isEviction() {
         return false;
     }

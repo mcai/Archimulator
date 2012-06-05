@@ -229,6 +229,7 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
                         fsm.sendPutSToDir(replacementEvent, line.getTag());
                         fsm.setOnCompletedCallback(replacementEvent.getOnCompletedCallback());
                         fsm.fireServiceNonblockingRequestEvent(replacementEvent.getAccess(), replacementEvent.getTag());
+                        fsm.getCacheController().incNumEvictions();
                     }
                 }, CacheControllerState.SI_A)
                 .onCondition(CacheControllerEventType.INV, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
@@ -404,6 +405,7 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
                         fsm.sendPutMAndDataToDir(replacementEvent, line.getTag());
                         fsm.setOnCompletedCallback(replacementEvent.getOnCompletedCallback());
                         fsm.fireServiceNonblockingRequestEvent(replacementEvent.getAccess(), replacementEvent.getTag());
+                        fsm.getCacheController().incNumEvictions();
                     }
                 }, CacheControllerState.MI_A)
                 .onCondition(CacheControllerEventType.FWD_GETS, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {

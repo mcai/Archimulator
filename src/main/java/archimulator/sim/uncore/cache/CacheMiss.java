@@ -30,20 +30,14 @@ public class CacheMiss<StateT extends Serializable> extends CacheAccess<StateT> 
         return false;
     }
 
-    public boolean isBypass() {
-        return this.getWay() == -1;
-    }
-
     @Override
     public boolean isEviction() {
-        return !isBypass() && this.getLine().getState() != getLine().getInitialState();
+        return this.getLine().getState() != getLine().getInitialState();
     }
 
     @Override
     public CacheAccess<StateT> commit() {
-        if (!this.isBypass()) {
-            this.getCache().getEvictionPolicy().handleInsertionOnMiss(this);
-        }
+        this.getCache().getEvictionPolicy().handleInsertionOnMiss(this);
         return super.commit();
     }
 }

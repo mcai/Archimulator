@@ -225,6 +225,7 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
         CacheAccess<CacheControllerState> cacheAccess = this.getLine().getCacheAccess();
         this.getCacheController().getBlockingEventDispatcher().dispatch(new CoherentCacheServiceNonblockingRequestEvent(this.getCacheController(), access, tag, cacheAccess.getLine(), cacheAccess.isHitInCache(), cacheAccess.isEviction(), cacheAccess.getReference().getAccessType()));
         this.getCacheController().getBlockingEventDispatcher().dispatch(new CoherentCacheBeginCacheAccessEvent(this.getCacheController(), access, cacheAccess));
+        this.getCacheController().updateStats(cacheAccess);
     }
 
     public void fireNonblockingRequestHitToTransientTagEvent(MemoryHierarchyAccess access, int tag) {

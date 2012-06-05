@@ -35,13 +35,7 @@ public abstract class RDPredictionEvictionPolicy<StateT extends Serializable> ex
 
     @Override
     public CacheMiss<StateT> handleReplacement(CacheReference reference) {
-        CacheMiss<StateT> miss = handleReplacementBasedOnRDPrediction(reference, this.selectiveCaching);
-
-        if (miss.isBypass()) {
-            this.updateOnEveryAccess(reference.getAccess().getVirtualPc(), reference.getAddress(), reference.getAccessType());
-        }
-
-        return miss;
+        return handleReplacementBasedOnRDPrediction(reference, this.selectiveCaching);
     }
 
     public boolean isSelectiveCaching() {
