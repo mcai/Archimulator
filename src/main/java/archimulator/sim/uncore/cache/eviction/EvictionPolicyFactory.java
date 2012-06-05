@@ -38,7 +38,7 @@ public class EvictionPolicyFactory {
 
     static {
         evictionPolicyClasses.add(LRUPolicy.class);
-//        evictionPolicyClasses.add(LFUPolicy.class);
+        evictionPolicyClasses.add(LFUPolicy.class);
         evictionPolicyClasses.add(RandomPolicy.class);
 
         evictionPolicyClasses.add(RRIPPolicy.class);
