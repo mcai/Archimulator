@@ -52,17 +52,19 @@ public abstract class GeneralCacheController<StateT extends Serializable> extend
     }
 
     private void dumpStats(Map<String, Object> stats) {
-        stats.put(this.getName() + ".hitRatio", String.valueOf(getHitRatio()));
-        stats.put(this.getName() + ".numDownwardAccesses", String.valueOf(getNumDownwardAccesses()));
-        stats.put(this.getName() + ".numDownwardHits", String.valueOf(getNumDownwardHits()));
-        stats.put(this.getName() + ".numDownwardMisses", String.valueOf(getNumDownwardMisses()));
+        if(getNumDownwardAccesses() > 0) {
+            stats.put(this.getName() + ".hitRatio", String.valueOf(getHitRatio()));
+            stats.put(this.getName() + ".numDownwardAccesses", String.valueOf(getNumDownwardAccesses()));
+            stats.put(this.getName() + ".numDownwardHits", String.valueOf(getNumDownwardHits()));
+            stats.put(this.getName() + ".numDownwardMisses", String.valueOf(getNumDownwardMisses()));
 
-        stats.put(this.getName() + ".numDownwardReadHits", String.valueOf(numDownwardReadHits));
-        stats.put(this.getName() + ".numDownwardReadMisses", String.valueOf(numDownwardReadMisses));
-        stats.put(this.getName() + ".numDownwardWriteHits", String.valueOf(numDownwardWriteHits));
-        stats.put(this.getName() + ".numDownwardWriteMisses", String.valueOf(numDownwardWriteMisses));
+            stats.put(this.getName() + ".numDownwardReadHits", String.valueOf(numDownwardReadHits));
+            stats.put(this.getName() + ".numDownwardReadMisses", String.valueOf(numDownwardReadMisses));
+            stats.put(this.getName() + ".numDownwardWriteHits", String.valueOf(numDownwardWriteHits));
+            stats.put(this.getName() + ".numDownwardWriteMisses", String.valueOf(numDownwardWriteMisses));
 
-        stats.put(this.getName() + ".numEvictions", String.valueOf(numEvictions));
+            stats.put(this.getName() + ".numEvictions", String.valueOf(numEvictions));
+        }
     }
 
     public boolean isLastLevelCache() {
