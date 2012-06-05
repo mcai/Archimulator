@@ -188,6 +188,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
 
                         fsm.sendDataToReq(getSEvent, req, tag, 0);
                         fsm.addReqToSharers(req);
+                        fsm.hit(getSEvent.getSet(), getSEvent.getWay());
                     }
                 }, DirectoryControllerState.S)
                 .onCondition(DirectoryControllerEventType.GETM, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
@@ -208,6 +209,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                         fsm.sendInvToSharers(getMEvent, req, tag);
                         fsm.clearSharers();
                         fsm.setOwnerToReq(req);
+                        fsm.hit(getMEvent.getSet(), getMEvent.getWay());
                     }
                 }, DirectoryControllerState.M)
                 .onCondition(DirectoryControllerEventType.REPLACEMENT, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
@@ -268,6 +270,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                         fsm.sendFwdGetSToOwner(getSEvent, req, tag);
                         fsm.addReqAndOwnerToSharers(req);
                         fsm.clearOwner();
+                        fsm.hit(getSEvent.getSet(), getSEvent.getWay());
                     }
                 }, DirectoryControllerState.S_D)
                 .onCondition(DirectoryControllerEventType.GETM, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
@@ -279,6 +282,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
 
                         fsm.sendFwdGetMToOwner(getMEvent, req, tag);
                         fsm.setOwnerToReq(req);
+                        fsm.hit(getMEvent.getSet(), getMEvent.getWay());
                     }
                 }, DirectoryControllerState.M)
                 .onCondition(DirectoryControllerEventType.REPLACEMENT, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {

@@ -16,32 +16,35 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.cache.eviction;
+package archimulator.sim.ext.uncore.cache.eviction.rd;
 
-import archimulator.sim.uncore.cache.*;
+import archimulator.sim.uncore.cache.CacheMiss;
+import archimulator.sim.uncore.cache.CacheReference;
+import archimulator.sim.uncore.cache.EvictableCache;
 
 import java.io.Serializable;
-import java.util.Random;
 
-public class RandomPolicy<StateT extends Serializable> extends EvictionPolicy<StateT> {
-    private Random random;
+public abstract class RDPredictionEvictionPolicy<StateT extends Serializable> extends AbstractRDPredictionEvictionPolicy<StateT> {
+    private boolean selectiveCaching;
 
-    public RandomPolicy(EvictableCache<StateT> cache) {
+    public RDPredictionEvictionPolicy(EvictableCache<StateT> cache, boolean selectiveCaching) {
         super(cache);
 
-        this.random = new Random(13);
+        this.selectiveCaching = selectiveCaching;
     }
 
     @Override
     public CacheMiss<StateT> handleReplacement(CacheReference reference) {
-        return new CacheMiss<StateT>(this.getCache(), reference, this.random.nextInt(this.getCache().getAssociativity()));
+        CacheMiss<StateT> miss = handleReplacementBasedOnRDPrediction(reference, this.selectiveCaching);
+
+        if (miss.isBypass()) {
+            this.updateOnEveryAccess(reference.getAccess().getVirtualPc(), reference.getAddress(), reference.getAccessType());
+        }
+
+        return miss;
     }
 
-    @Override
-    public void handlePromotionOnHit(CacheHit<StateT> hit) {
-    }
-
-    @Override
-    public void handleInsertionOnMiss(CacheMiss<StateT> miss) {
+    public boolean isSelectiveCaching() {
+        return selectiveCaching;
     }
 }

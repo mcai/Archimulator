@@ -29,6 +29,7 @@ public class CacheLine<StateT extends Serializable> extends Params {
 
     private int tag;
     private ValueProvider<StateT> stateProvider;
+    private CacheAccess<StateT> cacheAccess;
 
     public CacheLine(Cache<StateT> cache, int set, int way, ValueProvider<StateT> stateProvider) {
         this.cache = cache;
@@ -77,4 +78,12 @@ public class CacheLine<StateT extends Serializable> extends Params {
     }
 
     public static final int INVALID_TAG = -1;
+
+    public void setCacheAccess(CacheAccess<StateT> cacheAccess) {
+        this.cacheAccess = cacheAccess;
+    }
+
+    public CacheAccess<StateT> getCacheAccess() {
+        return cacheAccess;
+    }
 }

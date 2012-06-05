@@ -16,32 +16,33 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.cache.eviction;
+package archimulator.sim.uncore.coherence.event;
 
-import archimulator.sim.uncore.cache.*;
+import archimulator.sim.uncore.MemoryHierarchyAccess;
+import archimulator.sim.uncore.cache.CacheAccess;
+import archimulator.sim.uncore.coherence.msi.controller.GeneralCacheController;
 
-import java.io.Serializable;
-import java.util.Random;
+public class CoherentCacheBeginCacheAccessEvent extends CoherentCacheEvent {
+    private MemoryHierarchyAccess access;
+    private CacheAccess<?> cacheAccess;
 
-public class RandomPolicy<StateT extends Serializable> extends EvictionPolicy<StateT> {
-    private Random random;
+    public CoherentCacheBeginCacheAccessEvent(GeneralCacheController cacheController, MemoryHierarchyAccess access, CacheAccess<?> cacheAccess) {
+        super(cacheController);
 
-    public RandomPolicy(EvictableCache<StateT> cache) {
-        super(cache);
+        this.cacheAccess = cacheAccess;
+        this.access = access;
+    }
 
-        this.random = new Random(13);
+    public MemoryHierarchyAccess getAccess() {
+        return access;
+    }
+
+    public CacheAccess<?> getCacheAccess() {
+        return cacheAccess;
     }
 
     @Override
-    public CacheMiss<StateT> handleReplacement(CacheReference reference) {
-        return new CacheMiss<StateT>(this.getCache(), reference, this.random.nextInt(this.getCache().getAssociativity()));
-    }
-
-    @Override
-    public void handlePromotionOnHit(CacheHit<StateT> hit) {
-    }
-
-    @Override
-    public void handleInsertionOnMiss(CacheMiss<StateT> miss) {
+    public String toString() {
+        return String.format("CoherentCacheBeginCacheAccessEvent{access=%s, cache.name=%s}", access, getCacheController().getCache().getName());
     }
 }

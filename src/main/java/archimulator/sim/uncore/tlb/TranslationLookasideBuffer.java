@@ -21,7 +21,9 @@ package archimulator.sim.uncore.tlb;
 import archimulator.sim.base.event.DumpStatEvent;
 import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.base.simulation.SimulationObject;
+import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
+import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.eviction.LRUPolicy;
@@ -47,14 +49,11 @@ public class TranslationLookasideBuffer {
         ValueProviderFactory<Boolean, ValueProvider<Boolean>> cacheLineStateProviderFactory = new ValueProviderFactory<Boolean, ValueProvider<Boolean>>() {
             @Override
             public ValueProvider<Boolean> createValueProvider(Object... args) {
-                int set = (Integer) args[0];
-                int way = (Integer) args[1];
-
-                return new BooleanValueProvider(set, way);
+                return new BooleanValueProvider();
             }
         };
 
-        this.cache = new EvictableCache<Boolean>(name, config.getGeometry(), LRUPolicy.class, cacheLineStateProviderFactory);
+        this.cache = new EvictableCache<Boolean>(parent, name, config.getGeometry(), LRUPolicy.class, cacheLineStateProviderFactory);
 
         parent.getBlockingEventDispatcher().addListener(ResetStatEvent.class, new Action1<ResetStatEvent>() {
             public void apply(ResetStatEvent event) {
@@ -79,32 +78,25 @@ public class TranslationLookasideBuffer {
     }
 
     public void access(MemoryHierarchyAccess access, Action onCompletedCallback) {
+        CacheAccess<Boolean> cacheAccess = this.cache.newAccess(null, access, access.getPhysicalAddress(), CacheAccessType.UNKNOWN);
+
         this.accesses++;
 
-        int address = access.getPhysicalAddress();
-        int set = this.cache.getSet(address);
-
-        int way = this.cache.findWay(address);
-
-        if(way != -1) {
+        if (cacheAccess.isHitInCache()) {
+            cacheAccess.commit();
             this.hits++;
-            this.cache.handlePromotionOnHit(set, way);
-        }
-        else {
-            int victimWay = this.cache.findVictim(address);
-            CacheLine<Boolean> victimLine = this.cache.getLine(set, victimWay);
-            BooleanValueProvider victimLineStateProvider = (BooleanValueProvider) victimLine.getStateProvider();
-            if(victimLine.getState()) {
+        } else {
+            if (cacheAccess.isEviction()) {
                 this.evictions++;
-                victimLine.setTag(CacheLine.INVALID_TAG);
-                victimLineStateProvider.setState(false);
             }
-            this.cache.handleInsertionOnMiss(set, victimWay);
-            victimLine.setTag(this.cache.getTag(address));
-            victimLineStateProvider.setState(true);
+
+            CacheLine<Boolean> line = cacheAccess.getLine();
+            BooleanValueProvider stateProvider = (BooleanValueProvider) line.getStateProvider();
+            stateProvider.state = true;
+            cacheAccess.commit();
         }
 
-        access.getThread().getCycleAccurateEventQueue().schedule(this, onCompletedCallback, way != -1 ? this.config.getHitLatency() : this.config.getMissLatency());
+        access.getThread().getCycleAccurateEventQueue().schedule(this, onCompletedCallback, cacheAccess.isHitInCache() ? this.config.getHitLatency() : this.config.getMissLatency());
     }
 
     public String getName() {
@@ -128,22 +120,14 @@ public class TranslationLookasideBuffer {
     }
 
     private class BooleanValueProvider implements ValueProvider<Boolean> {
-        private final int set;
-        private final int way;
         protected boolean state;
 
-        public BooleanValueProvider(int set, int way) {
-            this.set = set;
-            this.way = way;
+        public BooleanValueProvider() {
         }
 
         @Override
         public Boolean get() {
             return state;
-        }
-
-        public void setState(boolean state) {
-            this.state = state;
         }
 
         @Override

@@ -16,32 +16,34 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.cache.eviction;
+package archimulator.sim.uncore.coherence.event;
 
-import archimulator.sim.uncore.cache.*;
+import archimulator.sim.uncore.MemoryHierarchyAccess;
+import archimulator.sim.uncore.cache.CacheLine;
+import archimulator.sim.uncore.coherence.msi.controller.GeneralCacheController;
 
-import java.io.Serializable;
-import java.util.Random;
+public class CoherentCacheNonblockingRequestHitToTransientTagEvent extends CoherentCacheEvent {
+    private int address;
+    private MemoryHierarchyAccess requesterAccess;
+    private CacheLine<?> lineFound;
 
-public class RandomPolicy<StateT extends Serializable> extends EvictionPolicy<StateT> {
-    private Random random;
+    public CoherentCacheNonblockingRequestHitToTransientTagEvent(GeneralCacheController cacheController, int address, MemoryHierarchyAccess requesterAccess, CacheLine<?> lineFound) {
+        super(cacheController);
 
-    public RandomPolicy(EvictableCache<StateT> cache) {
-        super(cache);
-
-        this.random = new Random(13);
+        this.address = address;
+        this.requesterAccess = requesterAccess;
+        this.lineFound = lineFound;
     }
 
-    @Override
-    public CacheMiss<StateT> handleReplacement(CacheReference reference) {
-        return new CacheMiss<StateT>(this.getCache(), reference, this.random.nextInt(this.getCache().getAssociativity()));
+    public int getAddress() {
+        return address;
     }
 
-    @Override
-    public void handlePromotionOnHit(CacheHit<StateT> hit) {
+    public MemoryHierarchyAccess getRequesterAccess() {
+        return requesterAccess;
     }
 
-    @Override
-    public void handleInsertionOnMiss(CacheMiss<StateT> miss) {
+    public CacheLine<?> getLineFound() {
+        return lineFound;
     }
 }

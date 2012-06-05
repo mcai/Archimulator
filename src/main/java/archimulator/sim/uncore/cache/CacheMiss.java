@@ -16,32 +16,35 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.cache.eviction;
-
-import archimulator.sim.uncore.cache.*;
+package archimulator.sim.uncore.cache;
 
 import java.io.Serializable;
-import java.util.Random;
 
-public class RandomPolicy<StateT extends Serializable> extends EvictionPolicy<StateT> {
-    private Random random;
-
-    public RandomPolicy(EvictableCache<StateT> cache) {
-        super(cache);
-
-        this.random = new Random(13);
+public class CacheMiss<StateT extends Serializable> extends CacheAccess<StateT> {
+    public CacheMiss(EvictableCache<StateT> cache, CacheReference reference, int victimWay) {
+        super(cache, reference, victimWay);
     }
 
     @Override
-    public CacheMiss<StateT> handleReplacement(CacheReference reference) {
-        return new CacheMiss<StateT>(this.getCache(), reference, this.random.nextInt(this.getCache().getAssociativity()));
+    public boolean isHitInCache() {
+        return false;
+    }
+
+    public boolean isBypass() {
+        return this.getWay() == -1;
     }
 
     @Override
-    public void handlePromotionOnHit(CacheHit<StateT> hit) {
+    public boolean isEviction() {
+        return !isBypass() && this.getLine().getState() != getLine().getInitialState();
     }
 
     @Override
-    public void handleInsertionOnMiss(CacheMiss<StateT> miss) {
+    public CacheAccess<StateT> commit() {
+        if (!this.isBypass()) {
+            this.getLine().setTag(this.getReference().getTag()); //TODO: should notify cache's eviction policy
+            this.getCache().getEvictionPolicy().handleInsertionOnMiss(this);
+        }
+        return super.commit();
     }
 }

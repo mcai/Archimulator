@@ -16,32 +16,47 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.cache.eviction;
+package archimulator.sim.uncore;
 
-import archimulator.sim.uncore.cache.*;
+public enum CacheAccessType {
+    LOAD,
+    STORE,
+    DOWNWARD_READ,
+    DOWNWARD_WRITE,
 
-import java.io.Serializable;
-import java.util.Random;
+    EVICT,
 
-public class RandomPolicy<StateT extends Serializable> extends EvictionPolicy<StateT> {
-    private Random random;
+    UPWARD_READ,
+    UPWARD_WRITE,
 
-    public RandomPolicy(EvictableCache<StateT> cache) {
-        super(cache);
+    PREFETCH,
+    UNKNOWN;
 
-        this.random = new Random(13);
+    public boolean isDownwardRead() {
+        return this == LOAD || this == DOWNWARD_READ;
     }
 
-    @Override
-    public CacheMiss<StateT> handleReplacement(CacheReference reference) {
-        return new CacheMiss<StateT>(this.getCache(), reference, this.random.nextInt(this.getCache().getAssociativity()));
+    public boolean isDownwardWrite() {
+        return this == STORE || this == DOWNWARD_WRITE;
     }
 
-    @Override
-    public void handlePromotionOnHit(CacheHit<StateT> hit) {
+    public boolean isDownwardReadOrWrite() {
+        return this.isDownwardRead() || this.isDownwardWrite();
     }
 
-    @Override
-    public void handleInsertionOnMiss(CacheMiss<StateT> miss) {
+    public boolean isUpward() {
+        return this == UPWARD_READ || this == UPWARD_WRITE;
+    }
+
+    public boolean isDownward() {
+        return !this.isUpward();
+    }
+
+    public boolean isRead() {
+        return this == LOAD || this == DOWNWARD_READ || this == UPWARD_READ;
+    }
+
+    public boolean isWriteback() {
+        return this == EVICT;
     }
 }

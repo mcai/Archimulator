@@ -1,7 +1,9 @@
 package archimulator.sim.uncore.coherence.msi.controller;
 
+import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.CacheHierarchy;
 import archimulator.sim.uncore.MemoryDevice;
+import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.coherence.config.CoherentCacheConfig;
@@ -21,7 +23,7 @@ import net.pickapack.action.Action2;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DirectoryController extends Controller {
+public class DirectoryController extends GeneralCacheController {
     private EvictableCache<DirectoryControllerState> cache;
     private List<CacheController> cacheControllers;
     private DirectoryControllerFiniteStateMachineFactory fsmFactory;
@@ -39,7 +41,7 @@ public class DirectoryController extends Controller {
             }
         };
 
-        this.cache = new EvictableCache<DirectoryControllerState>(name, config.getGeometry(), config.getEvictionPolicyClz(), cacheLineStateProviderFactory);
+        this.cache = new EvictableCache<DirectoryControllerState>(cacheHierarchy, name, config.getGeometry(), config.getEvictionPolicyClz(), cacheLineStateProviderFactory);
         this.cacheControllers = new ArrayList<CacheController>();
 
         this.fsmFactory = new DirectoryControllerFiniteStateMachineFactory(new Action1<DirectoryControllerFiniteStateMachine>() {
@@ -110,28 +112,20 @@ public class DirectoryController extends Controller {
 
     public void access(CacheCoherenceFlow producerFlow, CacheController req, final int tag, final Action2<Integer, Integer> onReplacementCompletedCallback, final Action onReplacementStalledCallback) {
         final int set = this.cache.getSet(tag);
-        int way = this.getCache().findWay(tag);
-        if (way == -1) {
-            for (int wayFound = 0; wayFound < this.getCache().getAssociativity(); wayFound++) {
-                CacheLine<DirectoryControllerState> lineFound = this.getCache().getLine(set, wayFound);
-                if (lineFound.getState() == lineFound.getInitialState()) {
-                    way = wayFound;
-                    break;
-                }
-            }
 
-            if (way != -1) {
-                onReplacementCompletedCallback.apply(set, way);
-            } else {
-                way = this.getCache().findVictim(set);
-                final CacheLine<DirectoryControllerState> line = this.getCache().getLine(set, way);
+        final CacheAccess<DirectoryControllerState> cacheAccess = this.cache.newAccess(tag, CacheAccessType.UNKNOWN);
+        if(cacheAccess.isHitInCache()) {
+            onReplacementCompletedCallback.apply(set, cacheAccess.getWay());
+        }
+        else {
+            if(cacheAccess.isEviction()) {
+                final CacheLine<DirectoryControllerState> line = this.getCache().getLine(set, cacheAccess.getWay());
                 final DirectoryControllerFiniteStateMachine fsm = (DirectoryControllerFiniteStateMachine) line.getStateProvider();
-                final int finalWay = way;
                 fsm.onEventReplacement(producerFlow, req, tag,
                         new Action() {
                             @Override
                             public void apply() {
-                                onReplacementCompletedCallback.apply(set, finalWay);
+                                onReplacementCompletedCallback.apply(set, cacheAccess.getWay());
                             }
                         }, new Action() {
                             @Override
@@ -141,8 +135,9 @@ public class DirectoryController extends Controller {
                         }
                 );
             }
-        } else {
-            onReplacementCompletedCallback.apply(set, way);
+            else {
+                onReplacementCompletedCallback.apply(set, cacheAccess.getWay());
+            }
         }
     }
 
@@ -232,6 +227,7 @@ public class DirectoryController extends Controller {
         fsm.onEventData(message, sender, tag);
     }
 
+    @Override
     public EvictableCache<DirectoryControllerState> getCache() {
         return cache;
     }

@@ -2,6 +2,7 @@ package archimulator.sim.uncore.coherence.msi.controller;
 
 import archimulator.sim.core.DynamicInstruction;
 import archimulator.sim.uncore.*;
+import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.coherence.config.CoherentCacheConfig;
@@ -24,7 +25,7 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 
-public class CacheController extends Controller {
+public class CacheController extends GeneralCacheController {
     private EvictableCache<CacheControllerState> cache;
     private List<MemoryHierarchyAccess> pendingAccesses;
     private EnumMap<MemoryHierarchyAccessType, Integer> pendingAccessesPerType;
@@ -43,7 +44,7 @@ public class CacheController extends Controller {
             }
         };
 
-        this.cache = new EvictableCache<CacheControllerState>(name, config.getGeometry(), config.getEvictionPolicyClz(), cacheLineStateProviderFactory);
+        this.cache = new EvictableCache<CacheControllerState>(cacheHierarchy, name, config.getGeometry(), config.getEvictionPolicyClz(), cacheLineStateProviderFactory);
 
         this.pendingAccesses = new ArrayList<MemoryHierarchyAccess>();
 
@@ -298,34 +299,27 @@ public class CacheController extends Controller {
         fsm.onEventInvAck(message, message.getSender(), message.getTag());
     }
 
+    @Override
     public EvictableCache<CacheControllerState> getCache() {
         return cache;
     }
 
     public void access(CacheCoherenceFlow producerFlow, final int tag, final Action2<Integer, Integer> onReplacementCompletedCallback, final Action onReplacementStalledCallback) {
         final int set = this.cache.getSet(tag);
-        int way = this.getCache().findWay(tag);
-        if (way == -1) {
-            for (int wayFound = 0; wayFound < this.getCache().getAssociativity(); wayFound++) {
-                CacheLine<CacheControllerState> lineFound = this.getCache().getLine(set, wayFound);
-                if (lineFound.getState() == lineFound.getInitialState()) {
-                    way = wayFound;
-                    break;
-                }
-            }
 
-            if (way != -1) {
-                onReplacementCompletedCallback.apply(set, way);
-            } else {
-                way = this.getCache().findVictim(set);
-                final CacheLine<CacheControllerState> line = this.getCache().getLine(set, way);
+        final CacheAccess<CacheControllerState> cacheAccess = this.getCache().newAccess(tag, CacheAccessType.UNKNOWN);
+        if(cacheAccess.isHitInCache()) {
+            onReplacementCompletedCallback.apply(set, cacheAccess.getWay());
+        }
+        else {
+            if(cacheAccess.isEviction()) {
+                final CacheLine<CacheControllerState> line = this.getCache().getLine(set, cacheAccess.getWay());
                 final CacheControllerFiniteStateMachine fsm = (CacheControllerFiniteStateMachine) line.getStateProvider();
-                final int finalWay = way;
                 fsm.onEventReplacement(producerFlow, tag,
                         new Action() {
                             @Override
                             public void apply() {
-                                onReplacementCompletedCallback.apply(set, finalWay);
+                                onReplacementCompletedCallback.apply(set, cacheAccess.getWay());
                             }
                         }, new Action() {
                             @Override
@@ -335,8 +329,9 @@ public class CacheController extends Controller {
                         }
                 );
             }
-        } else {
-            onReplacementCompletedCallback.apply(set, way);
+            else {
+                onReplacementCompletedCallback.apply(set, cacheAccess.getWay());
+            }
         }
     }
 

@@ -1,4 +1,4 @@
-package archimulator.sim.uncore.cache.eviction; /*******************************************************************************
+/*******************************************************************************
  * Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).
  *
  * This file is part of the Archimulator multicore architectural simulator.
@@ -16,8 +16,9 @@ package archimulator.sim.uncore.cache.eviction; /*******************************
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+package archimulator.sim.uncore.cache.eviction;
 
-import archimulator.sim.uncore.cache.EvictableCache;
+import archimulator.sim.uncore.cache.*;
 
 import java.io.Serializable;
 
@@ -27,17 +28,17 @@ public class LRUPolicy<StateT extends Serializable> extends StackBasedEvictionPo
     }
 
     @Override
-    public int getVictim(int set) {
-        return this.getLRU(set);
+    public CacheMiss<StateT> handleReplacement(CacheReference reference) {
+        return new CacheMiss<StateT>(this.getCache(), reference, this.getLRU(reference.getSet()));
     }
 
     @Override
-    public void handlePromotionOnHit(int set, int way) {
-        this.setMRU(set, way);
+    public void handlePromotionOnHit(CacheHit<StateT> hit) {
+        this.setMRU(hit.getReference().getSet(), hit.getWay());
     }
 
     @Override
-    public void handleInsertionOnMiss(int set, int way) {
-        this.setMRU(set, way);
+    public void handleInsertionOnMiss(CacheMiss<StateT> miss) {
+        this.setMRU(miss.getReference().getSet(), miss.getWay());
     }
 }

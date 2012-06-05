@@ -17,6 +17,8 @@ package archimulator.sim.uncore.cache; /****************************************
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+import archimulator.sim.base.simulation.BasicSimulationObject;
+import archimulator.sim.base.simulation.SimulationObject;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import archimulator.util.ValueProvider;
 import archimulator.util.ValueProviderFactory;
@@ -27,12 +29,14 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Cache<StateT extends Serializable> implements Serializable {
+public class Cache<StateT extends Serializable> extends BasicSimulationObject implements Serializable {
     protected String name;
     protected CacheGeometry geometry;
     protected List<CacheSet<StateT>> sets;
 
-    public Cache(String name, CacheGeometry geometry, ValueProviderFactory<StateT, ValueProvider<StateT>> cacheLineStateProviderFactory) {
+    public Cache(SimulationObject parent, String name, CacheGeometry geometry, ValueProviderFactory<StateT, ValueProvider<StateT>> cacheLineStateProviderFactory) {
+        super(parent);
+
         this.name = name;
         this.geometry = geometry;
 
@@ -134,6 +138,12 @@ public class Cache<StateT extends Serializable> implements Serializable {
         }
 
         return -1;
+    }
+
+    public CacheLine<StateT> findLine(int address) {
+        int set = this.getSet(address);
+        int way = this.findWay(address);
+        return way != -1 ? this.getLine(set, way) : null;
     }
 
     public int getTag(int addr) {
