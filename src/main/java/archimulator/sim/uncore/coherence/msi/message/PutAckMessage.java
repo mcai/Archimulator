@@ -1,14 +1,14 @@
 package archimulator.sim.uncore.coherence.msi.message;
 
-import archimulator.sim.uncore.cache.CacheLine;
+import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
 public class PutAckMessage extends CoherenceMessage {
     private int tag;
 
-    public PutAckMessage(Controller generator, CacheCoherenceFlow producerFlow, int tag) {
-        super(generator, producerFlow, CoherenceMessageType.PUT_ACK);
+    public PutAckMessage(Controller generator, CacheCoherenceFlow producerFlow, int tag, MemoryHierarchyAccess access) {
+        super(generator, producerFlow, CoherenceMessageType.PUT_ACK, access);
         this.tag = tag;
     }
 

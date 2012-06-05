@@ -30,7 +30,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                                         fsm.getDirectoryController().getCycleAccurateEventQueue().schedule(fsm.getDirectoryController(), new Action() {
                                             @Override
                                             public void apply() {
-                                                DataFromMemoryEvent dataFromMemoryEvent = new DataFromMemoryEvent(fsm.getDirectoryController(), getSEvent, req, tag);
+                                                DataFromMemoryEvent dataFromMemoryEvent = new DataFromMemoryEvent(fsm.getDirectoryController(), getSEvent, req, tag, getSEvent.getAccess());
                                                 fsm.fireTransition(fsm.getDirectoryController().getNext() + "." + String.format("0x%08x", tag), dataFromMemoryEvent);
                                             }
                                         }, fsm.getDirectoryController().getHitLatency());
@@ -56,7 +56,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                                         fsm.getDirectoryController().getCycleAccurateEventQueue().schedule(fsm.getDirectoryController(), new Action() {
                                             @Override
                                             public void apply() {
-                                                DataFromMemoryEvent dataFromMemoryEvent = new DataFromMemoryEvent(fsm.getDirectoryController(), getMEvent, req, tag);
+                                                DataFromMemoryEvent dataFromMemoryEvent = new DataFromMemoryEvent(fsm.getDirectoryController(), getMEvent, req, tag, getMEvent.getAccess());
                                                 fsm.fireTransition(fsm.getDirectoryController().getNext() + "." + String.format("0x%08x", tag), dataFromMemoryEvent);
                                             }
                                         }, fsm.getDirectoryController().getHitLatency());

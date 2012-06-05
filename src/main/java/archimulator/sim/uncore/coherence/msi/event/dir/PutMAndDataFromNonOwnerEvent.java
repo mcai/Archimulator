@@ -1,5 +1,6 @@
 package archimulator.sim.uncore.coherence.msi.event.dir;
 
+import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
@@ -8,8 +9,8 @@ public class PutMAndDataFromNonOwnerEvent extends DirectoryControllerEvent {
     private final CacheController req;
     private final int tag;
 
-    public PutMAndDataFromNonOwnerEvent(DirectoryController generator, CacheCoherenceFlow producerFlow, CacheController req, int tag) {
-        super(generator, producerFlow, DirectoryControllerEventType.PUTM_AND_DATA_FROM_NONOWNER);
+    public PutMAndDataFromNonOwnerEvent(DirectoryController generator, CacheCoherenceFlow producerFlow, CacheController req, int tag, MemoryHierarchyAccess access) {
+        super(generator, producerFlow, DirectoryControllerEventType.PUTM_AND_DATA_FROM_NONOWNER, access);
         this.req = req;
         this.tag = tag;
     }

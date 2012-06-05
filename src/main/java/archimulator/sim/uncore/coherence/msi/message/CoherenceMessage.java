@@ -1,5 +1,6 @@
 package archimulator.sim.uncore.coherence.msi.message;
 
+import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
@@ -7,8 +8,8 @@ public abstract class CoherenceMessage extends CacheCoherenceFlow {
     private CoherenceMessageType type;
     private boolean destinationArrived;
 
-    public CoherenceMessage(Controller generator, CacheCoherenceFlow producerFlow, CoherenceMessageType type) {
-        super(generator, producerFlow);
+    public CoherenceMessage(Controller generator, CacheCoherenceFlow producerFlow, CoherenceMessageType type, MemoryHierarchyAccess access) {
+        super(generator, producerFlow, access);
         this.type = type;
     }
 

@@ -1,5 +1,6 @@
 package archimulator.sim.uncore.coherence.msi.event.dir;
 
+import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
@@ -12,8 +13,8 @@ public class GetMEvent extends DirectoryControllerEvent {
     private int way;
     private Action onStalledCallback;
 
-    public GetMEvent(DirectoryController generator, CacheCoherenceFlow producerFlow, CacheController req, int tag, int set, int way, Action onStalledCallback) {
-        super(generator, producerFlow, DirectoryControllerEventType.GETM);
+    public GetMEvent(DirectoryController generator, CacheCoherenceFlow producerFlow, CacheController req, int tag, int set, int way, Action onStalledCallback, MemoryHierarchyAccess access) {
+        super(generator, producerFlow, DirectoryControllerEventType.GETM, access);
         this.req = req;
         this.tag = tag;
         this.set = set;

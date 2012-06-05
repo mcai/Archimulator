@@ -47,14 +47,6 @@ public class EvictableCache<StateT extends Serializable> extends Cache<StateT> {
         this.evictionPolicy.handleInsertionOnMiss((CacheMiss<StateT>) line.getCacheAccess());
     }
 
-    public CacheAccess<StateT> newAccess(int address, CacheAccessType accessType) {
-        return this.newAccess(null, null, address, accessType);
-    }
-
-    public CacheAccess<StateT> newAccess(MemoryHierarchyAccess access, int address, CacheAccessType accessType) {
-        return this.newAccess(null, access, address, accessType);
-    }
-
     public CacheAccess<StateT> newAccess(GeneralCacheController cacheController, MemoryHierarchyAccess access, int address, CacheAccessType accessType) {
         CacheLine<StateT> line = this.findLine(address);
 

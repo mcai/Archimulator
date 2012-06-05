@@ -1,5 +1,6 @@
 package archimulator.sim.uncore.coherence.msi.flow;
 
+import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import net.pickapack.action.Action;
 
@@ -8,8 +9,8 @@ public class StoreFlow extends CacheCoherenceFlow {
     private Action onCompletedCallback;
     private final Action onCompletedCallback2;
 
-    public StoreFlow(final CacheController generator, int tag, final Action onCompletedCallback) {
-        super(generator, null);
+    public StoreFlow(final CacheController generator, int tag, final Action onCompletedCallback, MemoryHierarchyAccess access) {
+        super(generator, null, access);
         this.tag = tag;
         this.onCompletedCallback = onCompletedCallback;
 

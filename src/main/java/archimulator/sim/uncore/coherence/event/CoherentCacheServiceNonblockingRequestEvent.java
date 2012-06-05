@@ -24,30 +24,30 @@ import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.coherence.msi.controller.GeneralCacheController;
 
 public class CoherentCacheServiceNonblockingRequestEvent extends CoherentCacheEvent {
-    private int address;
     private MemoryHierarchyAccess requesterAccess;
+    private int address;
     private CacheLine<?> lineFound;
     private boolean hitInCache;
     private boolean eviction;
     private CacheAccessType accessType;
 
-    public CoherentCacheServiceNonblockingRequestEvent(GeneralCacheController cacheController, int address, MemoryHierarchyAccess requesterAccess, CacheLine<?> lineFound, boolean hitInCache, boolean eviction, CacheAccessType accessType) {
+    public CoherentCacheServiceNonblockingRequestEvent(GeneralCacheController cacheController, MemoryHierarchyAccess requesterAccess, int address, CacheLine<?> lineFound, boolean hitInCache, boolean eviction, CacheAccessType accessType) {
         super(cacheController);
 
-        this.address = address;
         this.requesterAccess = requesterAccess;
+        this.address = address;
         this.lineFound = lineFound;
         this.hitInCache = hitInCache;
         this.eviction = eviction;
         this.accessType = accessType;
     }
 
-    public int getAddress() {
-        return address;
-    }
-
     public MemoryHierarchyAccess getRequesterAccess() {
         return requesterAccess;
+    }
+
+    public int getAddress() {
+        return address;
     }
 
     public CacheLine<?> getLineFound() {

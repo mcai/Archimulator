@@ -1,13 +1,14 @@
 package archimulator.sim.uncore.coherence.msi.event.cache;
 
+import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
 public class LastInvAckEvent extends CacheControllerEvent {
     private final int tag;
 
-    public LastInvAckEvent(CacheController generator, CacheCoherenceFlow producerFlow, int tag) {
-        super(generator, producerFlow, CacheControllerEventType.LAST_INV_ACK);
+    public LastInvAckEvent(CacheController generator, CacheCoherenceFlow producerFlow, int tag, MemoryHierarchyAccess access) {
+        super(generator, producerFlow, CacheControllerEventType.LAST_INV_ACK, access);
         this.tag = tag;
     }
 

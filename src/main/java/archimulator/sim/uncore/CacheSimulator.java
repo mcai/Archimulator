@@ -55,7 +55,7 @@ public class CacheSimulator {
     private static void read(final CacheController cacheController, int addr) {
         final int tag = cacheController.getCache().getTag(addr);
         if(cacheController.canAccess(MemoryHierarchyAccessType.LOAD, addr)) {
-            cacheController.onLoad(tag, new Action() {
+            cacheController.onLoad(null, tag, new Action() {
                 @Override
                 public void apply() {
                     numPendingReads--;
@@ -69,7 +69,7 @@ public class CacheSimulator {
     private static void write(final CacheController cacheController, int addr) {
         final int tag = cacheController.getCache().getTag(addr);
         if(cacheController.canAccess(MemoryHierarchyAccessType.STORE, addr)) {
-            cacheController.onStore(tag, new Action() {
+            cacheController.onStore(null, tag, new Action() {
                 @Override
                 public void apply() {
                     numPendingWrites--;

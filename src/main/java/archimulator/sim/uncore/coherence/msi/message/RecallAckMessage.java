@@ -1,6 +1,6 @@
 package archimulator.sim.uncore.coherence.msi.message;
 
-import archimulator.sim.uncore.cache.CacheLine;
+import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
@@ -9,8 +9,8 @@ public class RecallAckMessage extends CoherenceMessage {
     private CacheController sender;
     private int tag;
 
-    public RecallAckMessage(Controller generator, CacheCoherenceFlow producerFlow, CacheController sender, int tag) {
-        super(generator, producerFlow, CoherenceMessageType.RECALL_ACK);
+    public RecallAckMessage(Controller generator, CacheCoherenceFlow producerFlow, CacheController sender, int tag, MemoryHierarchyAccess access) {
+        super(generator, producerFlow, CoherenceMessageType.RECALL_ACK, access);
         this.sender = sender;
         this.tag = tag;
     }

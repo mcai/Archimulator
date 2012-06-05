@@ -1,6 +1,6 @@
 package archimulator.sim.uncore.coherence.msi.message;
 
-import archimulator.sim.uncore.cache.CacheLine;
+import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
@@ -9,8 +9,8 @@ public class PutMAndDataMessage extends CoherenceMessage {
     private CacheController req;
     private int tag;
 
-    public PutMAndDataMessage(Controller generator, CacheCoherenceFlow producerFlow, CacheController req, int tag) {
-        super(generator, producerFlow, CoherenceMessageType.PUTM_AND_DATA);
+    public PutMAndDataMessage(Controller generator, CacheCoherenceFlow producerFlow, CacheController req, int tag, MemoryHierarchyAccess access) {
+        super(generator, producerFlow, CoherenceMessageType.PUTM_AND_DATA, access);
         this.req = req;
         this.tag = tag;
     }

@@ -1,6 +1,5 @@
 package archimulator.sim.uncore.coherence.msi.fsm;
 
-import archimulator.sim.uncore.CacheSimulator;
 import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
@@ -14,7 +13,6 @@ import net.pickapack.Params;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
 import net.pickapack.fsm.BasicFiniteStateMachine;
-import net.pickapack.fsm.event.EnterStateEvent;
 import net.pickapack.fsm.event.ExitStateEvent;
 
 import java.util.ArrayList;
@@ -82,52 +80,52 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
     }
 
     public void onEventGetS(CacheCoherenceFlow producerFlow, CacheController req, int tag, Action onStalledCallback) {
-        GetSEvent getSEvent = new GetSEvent(this.directoryController, producerFlow, req, tag, set, way, onStalledCallback);
+        GetSEvent getSEvent = new GetSEvent(this.directoryController, producerFlow, req, tag, set, way, onStalledCallback, producerFlow.getAccess());
         this.fireTransition(req + "." + String.format("0x%08x", tag), getSEvent);
     }
 
     public void onEventGetM(CacheCoherenceFlow producerFlow, CacheController req, int tag, Action onStalledCallback) {
-        GetMEvent getMEvent = new GetMEvent(this.directoryController, producerFlow, req, tag, set, way, onStalledCallback);
+        GetMEvent getMEvent = new GetMEvent(this.directoryController, producerFlow, req, tag, set, way, onStalledCallback, producerFlow.getAccess());
         this.fireTransition(req + "." + String.format("0x%08x", tag), getMEvent);
     }
 
     public void onEventReplacement(CacheCoherenceFlow producerFlow, CacheController req, int tag, Action onCompletedCallback, Action onStalledCallback) {
-        ReplacementEvent replacementEvent = new ReplacementEvent(this.directoryController, producerFlow, tag, set, way, onCompletedCallback, onStalledCallback);
+        ReplacementEvent replacementEvent = new ReplacementEvent(this.directoryController, producerFlow, tag, set, way, onCompletedCallback, onStalledCallback, producerFlow.getAccess());
         this.fireTransition(req + "." + String.format("0x%08x", tag), replacementEvent);
     }
 
     public void onEventRecallAck(CacheCoherenceFlow producerFlow, CacheController sender, int tag) {
-        RecallAckEvent recallAckEvent = new RecallAckEvent(this.directoryController, producerFlow, sender, tag);
+        RecallAckEvent recallAckEvent = new RecallAckEvent(this.directoryController, producerFlow, sender, tag, producerFlow.getAccess());
         this.fireTransition(sender + "." + String.format("0x%08x", tag), recallAckEvent);
 
         if (this.numRecallAcks == 0) {
-            LastRecallAckEvent lastRecallAckEvent = new LastRecallAckEvent(this.directoryController, producerFlow, tag);
+            LastRecallAckEvent lastRecallAckEvent = new LastRecallAckEvent(this.directoryController, producerFlow, tag, producerFlow.getAccess());
             this.fireTransition(sender + "." + String.format("0x%08x", tag), lastRecallAckEvent);
         }
     }
 
     public void onEventPutS(CacheCoherenceFlow producerFlow, CacheController req, int tag) {
         if (this.getDirectoryEntry().getSharers().size() > 1) {
-            PutSNotLastEvent putSNotLastEvent = new PutSNotLastEvent(this.directoryController, producerFlow, req, tag);
+            PutSNotLastEvent putSNotLastEvent = new PutSNotLastEvent(this.directoryController, producerFlow, req, tag, producerFlow.getAccess());
             this.fireTransition(req + "." + String.format("0x%08x", tag), putSNotLastEvent);
         } else {
-            PutSLastEvent putSLastEvent = new PutSLastEvent(this.directoryController, producerFlow, req, tag);
+            PutSLastEvent putSLastEvent = new PutSLastEvent(this.directoryController, producerFlow, req, tag, producerFlow.getAccess());
             this.fireTransition(req + "." + String.format("0x%08x", tag), putSLastEvent);
         }
     }
 
     public void onEventPutMAndData(CacheCoherenceFlow producerFlow, CacheController req, int tag) {
         if (req == this.getDirectoryEntry().getOwner()) {
-            PutMAndDataFromOwnerEvent putMAndDataFromOwnerEvent = new PutMAndDataFromOwnerEvent(this.directoryController, producerFlow, req, tag);
+            PutMAndDataFromOwnerEvent putMAndDataFromOwnerEvent = new PutMAndDataFromOwnerEvent(this.directoryController, producerFlow, req, tag, producerFlow.getAccess());
             this.fireTransition(req + "." + String.format("0x%08x", tag), putMAndDataFromOwnerEvent);
         } else {
-            PutMAndDataFromNonOwnerEvent putMAndDataFromNonOwnerEvent = new PutMAndDataFromNonOwnerEvent(this.directoryController, producerFlow, req, tag);
+            PutMAndDataFromNonOwnerEvent putMAndDataFromNonOwnerEvent = new PutMAndDataFromNonOwnerEvent(this.directoryController, producerFlow, req, tag, producerFlow.getAccess());
             this.fireTransition(req + "." + String.format("0x%08x", tag), putMAndDataFromNonOwnerEvent);
         }
     }
 
     public void onEventData(CacheCoherenceFlow producerFlow, CacheController sender, int tag) {
-        DataEvent dataEvent = new DataEvent(this.directoryController, producerFlow, sender, tag);
+        DataEvent dataEvent = new DataEvent(this.directoryController, producerFlow, sender, tag, producerFlow.getAccess());
         this.fireTransition(sender + "." + String.format("0x%08x", tag), dataEvent);
     }
 
@@ -155,7 +153,7 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
     }
 
     public void sendDataToReq(CacheCoherenceFlow producerFlow, final CacheController req, final int tag, int numAcks) {
-        this.directoryController.transfer(req, this.directoryController.getCache().getLineSize() + 8, new DataMessage(this.directoryController, producerFlow, this.directoryController, tag, numAcks));
+        this.directoryController.transfer(req, this.directoryController.getCache().getLineSize() + 8, new DataMessage(this.directoryController, producerFlow, this.directoryController, tag, numAcks, producerFlow.getAccess()));
     }
 
     public void sendPutAckToReq(CacheCoherenceFlow producerFlow, final CacheController req, final int tag) {
@@ -163,7 +161,7 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
     }
 
     public static void sendPutAckToReq(CacheCoherenceFlow producerFlow, DirectoryController directoryController, final CacheController req, final int tag) {
-        directoryController.transfer(req, 8, new PutAckMessage(directoryController, producerFlow, tag));
+        directoryController.transfer(req, 8, new PutAckMessage(directoryController, producerFlow, tag, producerFlow.getAccess()));
     }
 
     public void copyDataToMemory(int tag) {
@@ -176,30 +174,30 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
 
     public void sendFwdGetSToOwner(CacheCoherenceFlow producerFlow, final CacheController req, final int tag) {
         final CacheController owner = getDirectoryEntry().getOwner();
-        this.directoryController.transfer(owner, 8, new FwdGetSMessage(this.directoryController, producerFlow, req, tag));
+        this.directoryController.transfer(owner, 8, new FwdGetSMessage(this.directoryController, producerFlow, req, tag, producerFlow.getAccess()));
     }
 
     public void sendFwdGetMToOwner(CacheCoherenceFlow producerFlow, final CacheController req, final int tag) {
         final CacheController owner = getDirectoryEntry().getOwner();
-        this.directoryController.transfer(owner, 8, new FwdGetMMessage(this.directoryController, producerFlow, req, tag));
+        this.directoryController.transfer(owner, 8, new FwdGetMMessage(this.directoryController, producerFlow, req, tag, producerFlow.getAccess()));
     }
 
     public void sendInvToSharers(CacheCoherenceFlow producerFlow, final CacheController req, final int tag) {
         for (final CacheController sharer : this.getDirectoryEntry().getSharers()) {
             if (req != sharer) {
-                this.directoryController.transfer(sharer, 8, new InvMessage(this.directoryController, producerFlow, req, tag));
+                this.directoryController.transfer(sharer, 8, new InvMessage(this.directoryController, producerFlow, req, tag, producerFlow.getAccess()));
             }
         }
     }
 
     public void sendRecallToOwner(CacheCoherenceFlow producerFlow, int tag) {
         final CacheController owner = getDirectoryEntry().getOwner();
-        this.directoryController.transfer(owner, 8, new RecallMessage(this.directoryController, producerFlow, tag));
+        this.directoryController.transfer(owner, 8, new RecallMessage(this.directoryController, producerFlow, tag, producerFlow.getAccess()));
     }
 
     public void sendRecallToSharers(CacheCoherenceFlow producerFlow, int tag) {
         for (final CacheController sharer : this.getDirectoryEntry().getSharers()) {
-            this.directoryController.transfer(sharer, 8, new RecallMessage(this.directoryController, producerFlow, tag));
+            this.directoryController.transfer(sharer, 8, new RecallMessage(this.directoryController, producerFlow, tag, producerFlow.getAccess()));
         }
     }
 

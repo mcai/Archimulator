@@ -1,5 +1,6 @@
 package archimulator.sim.uncore.coherence.msi.event.cache;
 
+import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import net.pickapack.action.Action;
@@ -11,8 +12,8 @@ public class LoadEvent extends CacheControllerEvent {
     private Action onCompletedCallback;
     private Action onStalledCallback;
 
-    public LoadEvent(CacheController generator, CacheCoherenceFlow producerFlow, int tag, int set, int way, Action onCompletedCallback, Action onStalledCallback) {
-        super(generator, producerFlow, CacheControllerEventType.LOAD);
+    public LoadEvent(CacheController generator, CacheCoherenceFlow producerFlow, int tag, int set, int way, Action onCompletedCallback, Action onStalledCallback, MemoryHierarchyAccess access) {
+        super(generator, producerFlow, CacheControllerEventType.LOAD, access);
 
         this.tag = tag;
         this.set = set;

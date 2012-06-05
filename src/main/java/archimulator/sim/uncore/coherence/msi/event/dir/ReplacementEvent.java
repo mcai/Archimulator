@@ -1,5 +1,6 @@
 package archimulator.sim.uncore.coherence.msi.event.dir;
 
+import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import net.pickapack.action.Action;
@@ -11,8 +12,8 @@ public class ReplacementEvent extends DirectoryControllerEvent {
     private Action onCompletedCallback;
     private Action onStalledCallback;
 
-    public ReplacementEvent(DirectoryController generator, CacheCoherenceFlow producerFlow, int tag, int set, int way, Action onCompletedCallback, Action onStalledCallback) {
-        super(generator, producerFlow, DirectoryControllerEventType.REPLACEMENT);
+    public ReplacementEvent(DirectoryController generator, CacheCoherenceFlow producerFlow, int tag, int set, int way, Action onCompletedCallback, Action onStalledCallback, MemoryHierarchyAccess access) {
+        super(generator, producerFlow, DirectoryControllerEventType.REPLACEMENT, access);
         this.tag = tag;
         this.set = set;
         this.way = way;

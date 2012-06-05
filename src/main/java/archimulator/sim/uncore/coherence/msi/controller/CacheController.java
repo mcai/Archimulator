@@ -137,7 +137,7 @@ public class CacheController extends GeneralCacheController {
         this.getCycleAccurateEventQueue().schedule(this, new Action() {
             @Override
             public void apply() {
-                onLoad(access.getPhysicalTag(), onCompletedCallback);
+                onLoad(access, access.getPhysicalTag(), onCompletedCallback);
             }
         }, this.getHitLatency());
     }
@@ -146,7 +146,7 @@ public class CacheController extends GeneralCacheController {
         this.getCycleAccurateEventQueue().schedule(this, new Action() {
             @Override
             public void apply() {
-                onLoad(access.getPhysicalTag(), onCompletedCallback);
+                onLoad(access, access.getPhysicalTag(), onCompletedCallback);
             }
         }, this.getHitLatency());
     }
@@ -155,7 +155,7 @@ public class CacheController extends GeneralCacheController {
         this.getCycleAccurateEventQueue().schedule(this, new Action() {
             @Override
             public void apply() {
-                onStore(access.getPhysicalTag(), onCompletedCallback);
+                onStore(access, access.getPhysicalTag(), onCompletedCallback);
             }
         }, this.getHitLatency());
     }
@@ -206,17 +206,17 @@ public class CacheController extends GeneralCacheController {
         }
     }
 
-    public void onLoad(final int tag, final Action onCompletedCallback) {
-        final LoadFlow loadFlow = new LoadFlow(this, tag, onCompletedCallback);
+    public void onLoad(final MemoryHierarchyAccess access, final int tag, final Action onCompletedCallback) {
+        final LoadFlow loadFlow = new LoadFlow(this, tag, onCompletedCallback, access);
 
         final Action onStalledCallback = new Action() {
             @Override
             public void apply() {
-                onLoad(tag, loadFlow.getOnCompletedCallback2());
+                onLoad(access, tag, loadFlow.getOnCompletedCallback2());
             }
         };
 
-        this.access(loadFlow, tag,
+        this.access(loadFlow, access, tag,
                 new Action2<Integer, Integer>() {
                     @Override
                     public void apply(Integer set, Integer way) {
@@ -228,17 +228,17 @@ public class CacheController extends GeneralCacheController {
         );
     }
 
-    public void onStore(final int tag, final Action onCompletedCallback) {
-        final StoreFlow storeFlow = new StoreFlow(this, tag, onCompletedCallback);
+    public void onStore(final MemoryHierarchyAccess access, final int tag, final Action onCompletedCallback) {
+        final StoreFlow storeFlow = new StoreFlow(this, tag, onCompletedCallback, access);
 
         final Action onStalledCallback = new Action() {
             @Override
             public void apply() {
-                onStore(tag, storeFlow.getOnCompletedCallback2());
+                onStore(access, tag, storeFlow.getOnCompletedCallback2());
             }
         };
 
-        this.access(storeFlow, tag,
+        this.access(storeFlow, access, tag,
                 new Action2<Integer, Integer>() {
                     @Override
                     public void apply(Integer set, Integer way) {
@@ -304,10 +304,10 @@ public class CacheController extends GeneralCacheController {
         return cache;
     }
 
-    public void access(CacheCoherenceFlow producerFlow, final int tag, final Action2<Integer, Integer> onReplacementCompletedCallback, final Action onReplacementStalledCallback) {
+    private void access(CacheCoherenceFlow producerFlow, MemoryHierarchyAccess access, final int tag, final Action2<Integer, Integer> onReplacementCompletedCallback, final Action onReplacementStalledCallback) {
         final int set = this.cache.getSet(tag);
 
-        final CacheAccess<CacheControllerState> cacheAccess = this.getCache().newAccess(tag, CacheAccessType.UNKNOWN);
+        final CacheAccess<CacheControllerState> cacheAccess = this.getCache().newAccess(this, access, tag, CacheAccessType.UNKNOWN);
         if(cacheAccess.isHitInCache()) {
             onReplacementCompletedCallback.apply(set, cacheAccess.getWay());
         }

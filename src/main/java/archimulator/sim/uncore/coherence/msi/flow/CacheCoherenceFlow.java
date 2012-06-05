@@ -1,5 +1,6 @@
 package archimulator.sim.uncore.coherence.msi.flow;
 
+import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import net.pickapack.Params;
 import net.pickapack.tree.Node;
@@ -18,14 +19,16 @@ public abstract class CacheCoherenceFlow extends Params implements Node {
     private long beginCycle;
     private long endCycle;
     private boolean completed;
+    protected MemoryHierarchyAccess access;
 
-    public CacheCoherenceFlow(Controller generator, CacheCoherenceFlow producerFlow) {
+    public CacheCoherenceFlow(Controller generator, CacheCoherenceFlow producerFlow, MemoryHierarchyAccess access) {
         this.id = currentId++;
         this.generator = generator;
         this.producerFlow = producerFlow;
         this.ancestorFlow = producerFlow == null ? this : producerFlow.ancestorFlow;
         this.childFlows = new ArrayList<CacheCoherenceFlow>();
         this.onCreate(this.generator.getCycleAccurateEventQueue().getCurrentCycle());
+        this.access = access;
     }
 
     public static void dumpTree() {
@@ -87,6 +90,10 @@ public abstract class CacheCoherenceFlow extends Params implements Node {
 
     public boolean isCompleted() {
         return completed;
+    }
+
+    public MemoryHierarchyAccess getAccess() {
+        return access;
     }
 
     @Override

@@ -19,6 +19,7 @@
 package archimulator.sim.uncore.cache;
 
 import archimulator.sim.base.simulation.Simulation;
+import archimulator.sim.uncore.coherence.event.CoherentCacheBeginCacheAccessEvent;
 import archimulator.sim.uncore.coherence.event.CoherentCacheEndCacheAccessEvent;
 
 import java.io.Serializable;
@@ -31,8 +32,6 @@ public abstract class CacheAccess<StateT extends Serializable> {
 
     private CacheLine<StateT> line;
 
-    private boolean committed;
-
     public CacheAccess(EvictableCache<StateT> cache, CacheReference reference, int way) {
         this.id = Simulation.currentCacheAccessId++;
         this.cache = cache;
@@ -41,6 +40,10 @@ public abstract class CacheAccess<StateT extends Serializable> {
 
         if (this.way != -1) {
             this.line = this.cache.getLine(this.reference.getSet(), this.way);
+        }
+
+        if (this.reference.getCacheController() != null && this.reference.getAccess() != null) {
+            this.reference.getCacheController().getBlockingEventDispatcher().dispatch(new CoherentCacheBeginCacheAccessEvent(this.reference.getCacheController(), this.reference.getAccess(), this));
         }
     }
 
@@ -70,13 +73,7 @@ public abstract class CacheAccess<StateT extends Serializable> {
 
     public abstract boolean isEviction();
 
-    public void abort() {
-    }
-
     public CacheAccess<StateT> commit() {
-        assert (!this.committed);
-        this.committed = true;
-
         if (this.reference.getCacheController() != null && this.reference.getAccess() != null) {
             this.reference.getCacheController().getBlockingEventDispatcher().dispatch(new CoherentCacheEndCacheAccessEvent(this.reference.getCacheController(), this.reference.getAccess(), this));
         }

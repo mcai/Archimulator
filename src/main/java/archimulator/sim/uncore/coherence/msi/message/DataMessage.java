@@ -1,7 +1,7 @@
 package archimulator.sim.uncore.coherence.msi.message;
 
+import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.msi.controller.Controller;
-import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
 public class DataMessage extends CoherenceMessage {
@@ -9,8 +9,8 @@ public class DataMessage extends CoherenceMessage {
     private int tag;
     private int numAcks;
 
-    public DataMessage(Controller generator, CacheCoherenceFlow producerFlow, Controller sender, int tag, int numAcks) {
-        super(generator, producerFlow, CoherenceMessageType.DATA);
+    public DataMessage(Controller generator, CacheCoherenceFlow producerFlow, Controller sender, int tag, int numAcks, MemoryHierarchyAccess access) {
+        super(generator, producerFlow, CoherenceMessageType.DATA, access);
         this.sender = sender;
         this.tag = tag;
         this.numAcks = numAcks;

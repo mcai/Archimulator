@@ -3,6 +3,7 @@ package archimulator.sim.uncore.coherence.msi.controller;
 import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.CacheHierarchy;
 import archimulator.sim.uncore.MemoryDevice;
+import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.cache.EvictableCache;
@@ -110,10 +111,10 @@ public class DirectoryController extends GeneralCacheController {
         }
     }
 
-    public void access(CacheCoherenceFlow producerFlow, CacheController req, final int tag, final Action2<Integer, Integer> onReplacementCompletedCallback, final Action onReplacementStalledCallback) {
+    public void access(CacheCoherenceFlow producerFlow, MemoryHierarchyAccess access, CacheController req, final int tag, final Action2<Integer, Integer> onReplacementCompletedCallback, final Action onReplacementStalledCallback) {
         final int set = this.cache.getSet(tag);
 
-        final CacheAccess<DirectoryControllerState> cacheAccess = this.cache.newAccess(tag, CacheAccessType.UNKNOWN);
+        final CacheAccess<DirectoryControllerState> cacheAccess = this.cache.newAccess(this, access, tag, CacheAccessType.UNKNOWN);
         if(cacheAccess.isHitInCache()) {
             onReplacementCompletedCallback.apply(set, cacheAccess.getWay());
         }
@@ -149,7 +150,7 @@ public class DirectoryController extends GeneralCacheController {
             }
         };
 
-        this.access(message, message.getReq(), message.getTag(), new Action2<Integer, Integer>() {
+        this.access(message, message.getAccess(), message.getReq(), message.getTag(), new Action2<Integer, Integer>() {
             @Override
             public void apply(Integer set, Integer way) {
                 CacheLine<DirectoryControllerState> line = getCache().getLine(set, way);
@@ -167,7 +168,7 @@ public class DirectoryController extends GeneralCacheController {
             }
         };
 
-        this.access(message, message.getReq(), message.getTag(), new Action2<Integer, Integer>() {
+        this.access(message, message.getAccess(), message.getReq(), message.getTag(), new Action2<Integer, Integer>() {
             @Override
             public void apply(Integer set, Integer way) {
                 CacheLine<DirectoryControllerState> line = getCache().getLine(set, way);

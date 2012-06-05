@@ -23,24 +23,24 @@ import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.coherence.msi.controller.GeneralCacheController;
 
 public class CoherentCacheNonblockingRequestHitToTransientTagEvent extends CoherentCacheEvent {
-    private int address;
     private MemoryHierarchyAccess requesterAccess;
+    private int address;
     private CacheLine<?> lineFound;
 
-    public CoherentCacheNonblockingRequestHitToTransientTagEvent(GeneralCacheController cacheController, int address, MemoryHierarchyAccess requesterAccess, CacheLine<?> lineFound) {
+    public CoherentCacheNonblockingRequestHitToTransientTagEvent(GeneralCacheController cacheController, MemoryHierarchyAccess requesterAccess, int address, CacheLine<?> lineFound) {
         super(cacheController);
 
-        this.address = address;
         this.requesterAccess = requesterAccess;
+        this.address = address;
         this.lineFound = lineFound;
-    }
-
-    public int getAddress() {
-        return address;
     }
 
     public MemoryHierarchyAccess getRequesterAccess() {
         return requesterAccess;
+    }
+
+    public int getAddress() {
+        return address;
     }
 
     public CacheLine<?> getLineFound() {
