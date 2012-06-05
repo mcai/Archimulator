@@ -19,6 +19,7 @@
 package archimulator.client;
 
 import archimulator.service.ArchimulatorService;
+import archimulator.sim.base.event.MyBlockingEventDispatcher;
 import archimulator.sim.base.experiment.Experiment;
 import archimulator.sim.base.experiment.profile.ExperimentProfile;
 import archimulator.sim.base.simulation.Simulation;
@@ -151,7 +152,7 @@ public class GuestStartup {
 
                 final Experiment experiment = experimentProfile.createExperiment();
 
-                experiment.getBlockingEventDispatcher().addListener(Simulation.PollStatsCompletedEvent.class, new Action1<Simulation.PollStatsCompletedEvent>() {
+                experiment.getBlockingEventDispatcher().addListener2(Simulation.PollStatsCompletedEvent.class, MyBlockingEventDispatcher.ListenerType.EXPERIMENT_WIDE, new Action1<Simulation.PollStatsCompletedEvent>() {
                     @Override
                     public void apply(final Simulation.PollStatsCompletedEvent event) {
                         try {
@@ -165,15 +166,15 @@ public class GuestStartup {
                             archimulatorService.updateExperimentStatsById(experimentProfile.getId(), stats1);
                         } catch (SQLException e) {
                             recordException(e);
-//                        throw new RuntimeException(e);
+                            //                        throw new RuntimeException(e);
                         } catch (Exception e) {
                             recordException(e);
-//                        throw new RuntimeException(e);
+                            //                        throw new RuntimeException(e);
                         }
                     }
                 });
 
-                experiment.getBlockingEventDispatcher().addListener(Simulation.DumpStatsCompletedEvent.class, new Action1<Simulation.DumpStatsCompletedEvent>() {
+                experiment.getBlockingEventDispatcher().addListener2(Simulation.DumpStatsCompletedEvent.class, MyBlockingEventDispatcher.ListenerType.EXPERIMENT_WIDE, new Action1<Simulation.DumpStatsCompletedEvent>() {
                     @Override
                     public void apply(final Simulation.DumpStatsCompletedEvent event) {
                         try {
@@ -187,10 +188,10 @@ public class GuestStartup {
                             archimulatorService.updateExperimentStatsById(experimentProfile.getId(), stats1);
                         } catch (SQLException e) {
                             recordException(e);
-//                        throw new RuntimeException(e);
+                            //                        throw new RuntimeException(e);
                         } catch (Exception e) {
                             recordException(e);
-//                        throw new RuntimeException(e);
+                            //                        throw new RuntimeException(e);
                         }
                     }
                 });

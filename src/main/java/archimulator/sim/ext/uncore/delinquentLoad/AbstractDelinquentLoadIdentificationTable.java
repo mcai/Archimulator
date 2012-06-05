@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.ext.uncore.delinquentLoad;
 
+import archimulator.sim.base.event.MyBlockingEventDispatcher;
 import archimulator.sim.core.Thread;
 import archimulator.sim.core.event.InstructionCommittedEvent;
 import archimulator.sim.os.FunctionCallContext;
@@ -37,7 +38,7 @@ public abstract class AbstractDelinquentLoadIdentificationTable {
         this.thread = thread;
         this.delinquentLoads = new ArrayList<DelinquentLoadImpl>();
 
-        thread.getBlockingEventDispatcher().addListener(InstructionCommittedEvent.class, new Action1<InstructionCommittedEvent>() {
+        thread.getBlockingEventDispatcher().addListener2(InstructionCommittedEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<InstructionCommittedEvent>() {
             public void apply(InstructionCommittedEvent event) {
                 if (event.getDynamicInst().getThread() == AbstractDelinquentLoadIdentificationTable.this.thread) {
                     Stack<FunctionCallContext> functionCallContextStack = event.getDynamicInst().getThread().getContext().getFunctionCallContextStack();
@@ -85,7 +86,7 @@ public abstract class AbstractDelinquentLoadIdentificationTable {
             }
         });
 
-        thread.getBlockingEventDispatcher().addListener(CoherentCacheBeginCacheAccessEvent.class, new Action1<CoherentCacheBeginCacheAccessEvent>() {
+        thread.getBlockingEventDispatcher().addListener2(CoherentCacheBeginCacheAccessEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<CoherentCacheBeginCacheAccessEvent>() {
             public void apply(CoherentCacheBeginCacheAccessEvent event) {
                 if (!event.getCacheAccess().isHitInCache() && event.getAccess().getThread() == AbstractDelinquentLoadIdentificationTable.this.thread && event.getCacheController().isLastLevelCache() && event.getCacheAccess().getReference().getAccessType().isDownwardRead()) {
                     if (event.getAccess().getDynamicInst() != null) {

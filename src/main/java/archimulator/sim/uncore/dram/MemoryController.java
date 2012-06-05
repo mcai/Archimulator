@@ -19,6 +19,7 @@
 package archimulator.sim.uncore.dram;
 
 import archimulator.sim.base.event.DumpStatEvent;
+import archimulator.sim.base.event.MyBlockingEventDispatcher;
 import archimulator.sim.base.event.PollStatsEvent;
 import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.uncore.CacheHierarchy;
@@ -37,20 +38,19 @@ public abstract class MemoryController extends MemoryDevice {
     public MemoryController(CacheHierarchy cacheHierarchy) {
         super(cacheHierarchy, "mainMemory");
 
-        this.getBlockingEventDispatcher().addListener(ResetStatEvent.class, new Action1<ResetStatEvent>() {
+        this.getBlockingEventDispatcher().addListener2(ResetStatEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<ResetStatEvent>() {
             public void apply(ResetStatEvent event) {
-                reads = 0;
-                writes = 0;
+                reads = 0;                     writes = 0;
             }
         });
 
-        this.getBlockingEventDispatcher().addListener(PollStatsEvent.class, new Action1<PollStatsEvent>() {
+        this.getBlockingEventDispatcher().addListener2(PollStatsEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<PollStatsEvent>() {
             public void apply(PollStatsEvent event) {
                 dumpStats(event.getStats());
             }
         });
 
-        this.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
+        this.getBlockingEventDispatcher().addListener2(DumpStatEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<DumpStatEvent>() {
             public void apply(DumpStatEvent event) {
                 if (event.getType() == DumpStatEvent.Type.DETAILED_SIMULATION) {
                     dumpStats(event.getStats());

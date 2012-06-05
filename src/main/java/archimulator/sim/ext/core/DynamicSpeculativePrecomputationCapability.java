@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.ext.core;
 
+import archimulator.sim.base.event.MyBlockingEventDispatcher;
 import archimulator.sim.base.experiment.capability.ProcessorCapability;
 import archimulator.sim.base.simulation.Logger;
 import archimulator.sim.core.Core;
@@ -142,7 +143,7 @@ public class DynamicSpeculativePrecomputationCapability implements ProcessorCapa
 
             this.state = RetiredInstructionBufferState.IDLE;
 
-            this.thread.getBlockingEventDispatcher().addListener(InstructionCommittedEvent.class, new Action1<InstructionCommittedEvent>() {
+            this.thread.getBlockingEventDispatcher().addListener2(InstructionCommittedEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<InstructionCommittedEvent>() {
                 public void apply(InstructionCommittedEvent event) {
                     if (event.getDynamicInst().getThread() == RetiredInstructionBuffer.this.thread) {
                         if (state == RetiredInstructionBufferState.IDLE && delinquentLoad != null && event.getDynamicInst().getPc() == delinquentLoad.getPc() && !event.getDynamicInst().getThread().getContext().getFunctionCallContextStack().isEmpty() && event.getDynamicInst().getThread().getContext().getFunctionCallContextStack().peek().getPc() == delinquentLoad.getFunctionCallPc()) {
@@ -335,7 +336,7 @@ public class DynamicSpeculativePrecomputationCapability implements ProcessorCapa
 
             this.slices = new ArrayList<Slice>();
 
-            this.thread.getBlockingEventDispatcher().addListener(InstructionDecodedEvent.class, new Action1<InstructionDecodedEvent>() {
+            this.thread.getBlockingEventDispatcher().addListener2(InstructionDecodedEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<InstructionDecodedEvent>() {
                 public void apply(InstructionDecodedEvent event) {
                     for (Slice slice : slices) {
                         if (event.getDynamicInst().getPc() == slice.triggerPc && slice.spawnedThreadContext == null) {
@@ -353,7 +354,7 @@ public class DynamicSpeculativePrecomputationCapability implements ProcessorCapa
                 }
             });
 
-            this.thread.getBlockingEventDispatcher().addListener(InstructionCommittedEvent.class, new Action1<InstructionCommittedEvent>() {
+            this.thread.getBlockingEventDispatcher().addListener2(InstructionCommittedEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<InstructionCommittedEvent>() {
                 public void apply(InstructionCommittedEvent event) {
                     if (SliceInformationTable.this.thread.getTotalInsts() % INSTRUCTIONS_PER_PHASE == 0) {
                         for (Iterator<Slice> it = slices.iterator(); it.hasNext(); ) {
@@ -368,7 +369,7 @@ public class DynamicSpeculativePrecomputationCapability implements ProcessorCapa
                 }
             });
 
-            this.thread.getBlockingEventDispatcher().addListener(ContextKilledEvent.class, new Action1<ContextKilledEvent>() {
+            this.thread.getBlockingEventDispatcher().addListener2(ContextKilledEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<ContextKilledEvent>() {
                 public void apply(ContextKilledEvent event) {
                     for (Iterator<Slice> iterator = slices.iterator(); iterator.hasNext(); ) {
                         Slice slice = iterator.next();
@@ -386,7 +387,7 @@ public class DynamicSpeculativePrecomputationCapability implements ProcessorCapa
                 }
             });
 
-            this.thread.getBlockingEventDispatcher().addListener(CoherentCacheBeginCacheAccessEvent.class, new Action1<CoherentCacheBeginCacheAccessEvent>() {
+            this.thread.getBlockingEventDispatcher().addListener2(CoherentCacheBeginCacheAccessEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<CoherentCacheBeginCacheAccessEvent>() {
                 public void apply(CoherentCacheBeginCacheAccessEvent event) {
                     if (!event.getCacheAccess().isHitInCache() && event.getCacheController().isLastLevelCache() && event.getCacheAccess().getReference().getAccessType().isDownwardRead()) {
                         for (Slice slice : slices) {

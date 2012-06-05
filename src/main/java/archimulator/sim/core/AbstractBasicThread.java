@@ -19,6 +19,7 @@
 package archimulator.sim.core;
 
 import archimulator.sim.base.event.DumpStatEvent;
+import archimulator.sim.base.event.MyBlockingEventDispatcher;
 import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.base.simulation.BasicSimulationObject;
 import archimulator.sim.core.bpred.*;
@@ -134,7 +135,7 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
         this.reorderBuffer = new PipelineBuffer<ReorderBufferEntry>(this.core.getProcessor().getConfig().getReorderBufferCapacity());
         this.loadStoreQueue = new PipelineBuffer<LoadStoreQueueEntry>(this.core.getProcessor().getConfig().getLoadStoreQueueCapacity());
 
-        this.getBlockingEventDispatcher().addListener(ResetStatEvent.class, new Action1<ResetStatEvent>() {
+        this.getBlockingEventDispatcher().addListener2(ResetStatEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<ResetStatEvent>() {
             public void apply(ResetStatEvent event) {
                 AbstractBasicThread.this.totalInsts = 0;
 
@@ -158,7 +159,7 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
             }
         });
 
-        this.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
+        this.getBlockingEventDispatcher().addListener2(DumpStatEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<DumpStatEvent>() {
             public void apply(DumpStatEvent event) {
                 event.getStats().put(AbstractBasicThread.this.getName() + ".totalInsts", String.valueOf(AbstractBasicThread.this.totalInsts));
 

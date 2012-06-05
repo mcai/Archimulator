@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.base.simulation.strategy;
 
+import archimulator.sim.base.event.MyBlockingEventDispatcher;
 import archimulator.sim.base.event.PseudocallEncounteredEvent;
 import archimulator.sim.base.simulation.SimulationStartingImage;
 import net.pickapack.action.Action1;
@@ -60,7 +61,7 @@ public class ToRoiFastForwardSimulationStrategy extends SequentialSimulationStra
     public void beginSimulation() {
         this.pthreadHasSpawned = false;
 
-        this.getSimulation().getProcessor().getKernel().getBlockingEventDispatcher().addListener(PseudocallEncounteredEvent.class, new Action1<PseudocallEncounteredEvent>() {
+        this.getSimulation().getProcessor().getKernel().getBlockingEventDispatcher().addListener2(PseudocallEncounteredEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<PseudocallEncounteredEvent>() {
             public void apply(PseudocallEncounteredEvent event) {
                 if (event.getImm() == ToRoiFastForwardSimulationStrategy.this.pthreadSpawnedIndex) {
                     pthreadHasSpawned = true;

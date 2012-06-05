@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.isa.memory.datastore;
 
+import archimulator.sim.base.event.MyBlockingEventDispatcher;
 import archimulator.sim.base.event.PollStatsEvent;
 import archimulator.sim.base.simulation.BasicSimulationObject;
 import archimulator.sim.isa.memory.Memory;
@@ -55,7 +56,7 @@ public class SimpleCacheBasedNewBigMemoryDataStore extends BasicSimulationObject
         super(memory);
         this.memory = memory;
 
-        this.getBlockingEventDispatcher().addListener(PollStatsEvent.class, new Action1<PollStatsEvent>() {
+        this.getBlockingEventDispatcher().addListener2(PollStatsEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<PollStatsEvent>() {
             public void apply(PollStatsEvent event) {
                 event.getStats().put("mem-" + memory.getProcessId() + ".bigMemory", String.format("accesses: %d, hits: %d, misses: %d, evictions: %d, hitRatio: %.4f\n", getAccesses(), getHits(), getMisses(), getEvictions(), getHitRatio()));
             }

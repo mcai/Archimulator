@@ -18,10 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.base.experiment;
 
-import archimulator.sim.base.event.DumpStatEvent;
-import archimulator.sim.base.event.PauseExperimentEvent;
-import archimulator.sim.base.event.PollStatsEvent;
-import archimulator.sim.base.event.StopExperimentEvent;
+import archimulator.sim.base.event.*;
 import archimulator.sim.base.experiment.capability.KernelCapability;
 import archimulator.sim.base.experiment.capability.ProcessorCapability;
 import archimulator.sim.base.experiment.capability.SimulationCapability;
@@ -38,7 +35,6 @@ import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
 import net.pickapack.action.Action4;
 import net.pickapack.event.BlockingEvent;
-import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
 import net.pickapack.fsm.BasicFiniteStateMachine;
 import net.pickapack.fsm.FiniteStateMachine;
@@ -61,7 +57,7 @@ public abstract class Experiment {
 
     private String beginTime;
 
-    private BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher;
+    private MyBlockingEventDispatcher<BlockingEvent> blockingEventDispatcher;
     private CycleAccurateEventQueue cycleAccurateEventQueue;
 
     private CyclicBarrier phaser;
@@ -88,10 +84,10 @@ public abstract class Experiment {
 
         this.beginTime = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date());
 
-        this.blockingEventDispatcher = new BlockingEventDispatcher<BlockingEvent>();
+        this.blockingEventDispatcher = new MyBlockingEventDispatcher<BlockingEvent>();
         this.cycleAccurateEventQueue = new CycleAccurateEventQueue();
 
-        this.blockingEventDispatcher.addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
+        this.blockingEventDispatcher.addListener2(DumpStatEvent.class, MyBlockingEventDispatcher.ListenerType.EXPERIMENT_WIDE, new Action1<DumpStatEvent>() {
             public void apply(DumpStatEvent event) {
                 pollSimulationState();
                 dumpStats(event.getStats(), event.getType() == DumpStatEvent.Type.DETAILED_SIMULATION);
@@ -176,7 +172,7 @@ public abstract class Experiment {
         this.join();
     }
 
-    protected void doSimulation(String title, SimulationStrategy strategy, BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
+    protected void doSimulation(String title, SimulationStrategy strategy, MyBlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
         this.simulation = new Simulation(new SimulationConfig(title, this.processorConfig, this.contextConfigs), strategy, this.simulationCapabilityClasses, blockingEventDispatcher, cycleAccurateEventQueue);
         this.simulation.simulate();
     }
@@ -189,7 +185,7 @@ public abstract class Experiment {
         return this.title;
     }
 
-    public BlockingEventDispatcher<BlockingEvent> getBlockingEventDispatcher() {
+    public MyBlockingEventDispatcher<BlockingEvent> getBlockingEventDispatcher() {
         return this.blockingEventDispatcher;
     }
 

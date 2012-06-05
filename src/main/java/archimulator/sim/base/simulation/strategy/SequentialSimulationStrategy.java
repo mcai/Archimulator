@@ -18,10 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.base.simulation.strategy;
 
-import archimulator.sim.base.event.DumpStatEvent;
-import archimulator.sim.base.event.PauseExperimentEvent;
-import archimulator.sim.base.event.ResetStatEvent;
-import archimulator.sim.base.event.StopExperimentEvent;
+import archimulator.sim.base.event.*;
 import archimulator.sim.base.simulation.Logger;
 import archimulator.sim.core.Core;
 import net.pickapack.action.Action1;
@@ -103,13 +100,13 @@ public abstract class SequentialSimulationStrategy extends SimulationStrategy {
 
     @Override
     public void execute() {
-        getSimulation().getBlockingEventDispatcher().addListener(PauseExperimentEvent.class, new Action1<PauseExperimentEvent>() {
+        getSimulation().getBlockingEventDispatcher().addListener2(PauseExperimentEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<PauseExperimentEvent>() {
             public void apply(PauseExperimentEvent event) {
                 requestPause = true;
             }
         });
 
-        getSimulation().getBlockingEventDispatcher().addListener(StopExperimentEvent.class, new Action1<StopExperimentEvent>() {
+        getSimulation().getBlockingEventDispatcher().addListener2(StopExperimentEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<StopExperimentEvent>() {
             public void apply(StopExperimentEvent event) {
                 requestStop = true;
             }

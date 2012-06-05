@@ -19,6 +19,7 @@
 package archimulator.sim.ext.uncore.delinquentLoad;
 
 import archimulator.sim.base.event.DumpStatEvent;
+import archimulator.sim.base.event.MyBlockingEventDispatcher;
 import archimulator.sim.base.event.PollStatsEvent;
 import archimulator.sim.base.experiment.capability.ProcessorCapability;
 import archimulator.sim.core.Core;
@@ -45,13 +46,13 @@ public class DelinquentLoadIdentificationCapability implements ProcessorCapabili
             }
         }
 
-        processor.getBlockingEventDispatcher().addListener(PollStatsEvent.class, new Action1<PollStatsEvent>() {
+        processor.getBlockingEventDispatcher().addListener2(PollStatsEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<PollStatsEvent>() {
             public void apply(PollStatsEvent event) {
                 dumpStats(event.getStats());
             }
         });
 
-        processor.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
+        processor.getBlockingEventDispatcher().addListener2(DumpStatEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<DumpStatEvent>() {
             public void apply(DumpStatEvent event) {
                 if (event.getType() == DumpStatEvent.Type.DETAILED_SIMULATION) {
                     dumpStats(event.getStats());

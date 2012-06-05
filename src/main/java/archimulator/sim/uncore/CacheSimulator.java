@@ -1,5 +1,6 @@
 package archimulator.sim.uncore;
 
+import archimulator.sim.base.event.MyBlockingEventDispatcher;
 import archimulator.sim.core.ProcessorConfig;
 import archimulator.sim.uncore.cache.eviction.LRUPolicy;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
@@ -129,7 +130,7 @@ public class CacheSimulator {
 
         MemoryHierarchyConfig memoryHierarchyConfig = MemoryHierarchyConfig.createDefaultMemoryHierarchyConfig(64, 1, 64, 1, 64, 1, LRUPolicy.class);
         ProcessorConfig processorConfig = ProcessorConfig.createDefaultProcessorConfig(memoryHierarchyConfig, null, null, 8, 2);
-        BasicCacheHierarchy cacheHierarchy = new BasicCacheHierarchy(new BlockingEventDispatcher<BlockingEvent>(), cycleAccurateEventQueue, processorConfig);
+        BasicCacheHierarchy cacheHierarchy = new BasicCacheHierarchy(new MyBlockingEventDispatcher<BlockingEvent>(), cycleAccurateEventQueue, processorConfig);
 
         CacheController l10 = cacheHierarchy.getDataCaches().get(0);
         CacheController l11 = cacheHierarchy.getDataCaches().get(1);

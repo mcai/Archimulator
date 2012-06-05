@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore;
 
+import archimulator.sim.base.event.MyBlockingEventDispatcher;
 import archimulator.sim.base.experiment.capability.SimulationCapability;
 import archimulator.sim.base.simulation.Simulation;
 import net.pickapack.action.Action1;
@@ -40,7 +41,7 @@ public class MemoryAccessTraceGenerationCapability implements SimulationCapabili
 
         this.fileWriter = new PrintWriter(System.out);
 
-        simulation.getBlockingEventDispatcher().addListener(MemoryAccessInitiatedEvent.class, new Action1<MemoryAccessInitiatedEvent>() {
+        simulation.getBlockingEventDispatcher().addListener2(MemoryAccessInitiatedEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<MemoryAccessInitiatedEvent>() {
             public void apply(MemoryAccessInitiatedEvent event) {
                 writeTraceLine(new MemoryAccessTraceLine(event.getThreadId(), event.getVirtualPc(), event.getPhysicalAddress(), event.getType()));
             }

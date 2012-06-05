@@ -19,6 +19,7 @@
 package archimulator.sim.base.simulation;
 
 import archimulator.sim.base.event.DumpStatEvent;
+import archimulator.sim.base.event.MyBlockingEventDispatcher;
 import archimulator.sim.base.event.PollStatsEvent;
 import archimulator.sim.base.event.ProcessorInitializedEvent;
 import archimulator.sim.base.experiment.capability.ExperimentCapabilityFactory;
@@ -35,7 +36,6 @@ import net.pickapack.StringHelper;
 import net.pickapack.action.Action1;
 import net.pickapack.action.Predicate;
 import net.pickapack.event.BlockingEvent;
-import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
 import net.pickapack.io.file.FileHelper;
 import net.pickapack.io.serialization.MapHelper;
@@ -63,11 +63,11 @@ public class Simulation implements SimulationObject {
 
     private Map<String, Object> statsInMeasurement;
 
-    private BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher;
+    private MyBlockingEventDispatcher<BlockingEvent> blockingEventDispatcher;
 
     private CycleAccurateEventQueue cycleAccurateEventQueue;
 
-    public Simulation(SimulationConfig config, SimulationStrategy strategy, List<Class<? extends SimulationCapability>> capabilityClasses, BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
+    public Simulation(SimulationConfig config, SimulationStrategy strategy, List<Class<? extends SimulationCapability>> capabilityClasses, MyBlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
         this.blockingEventDispatcher = blockingEventDispatcher;
         this.cycleAccurateEventQueue = cycleAccurateEventQueue;
 
@@ -83,7 +83,7 @@ public class Simulation implements SimulationObject {
 
         this.capabilities = new HashMap<Class<? extends SimulationCapability>, SimulationCapability>();
 
-        this.getBlockingEventDispatcher().addListener(PollStatsEvent.class, new Action1<PollStatsEvent>() {
+        this.getBlockingEventDispatcher().addListener2(PollStatsEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<PollStatsEvent>() {
             public void apply(PollStatsEvent event) {
                 Map<String, Object> stats = event.getStats();
 
@@ -111,7 +111,7 @@ public class Simulation implements SimulationObject {
             }
         });
 
-        this.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
+        this.getBlockingEventDispatcher().addListener2(DumpStatEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<DumpStatEvent>() {
             public void apply(DumpStatEvent event) {
                 dumpStat(event.getStats());
             }
@@ -305,7 +305,7 @@ public class Simulation implements SimulationObject {
         return this.cycleAccurateEventQueue;
     }
 
-    public BlockingEventDispatcher<BlockingEvent> getBlockingEventDispatcher() {
+    public MyBlockingEventDispatcher<BlockingEvent> getBlockingEventDispatcher() {
         return this.blockingEventDispatcher;
     }
 

@@ -19,6 +19,7 @@
 package archimulator.sim.ext.uncore.cache.eviction;
 
 import archimulator.sim.base.event.DumpStatEvent;
+import archimulator.sim.base.event.MyBlockingEventDispatcher;
 import archimulator.sim.base.event.PollStatsEvent;
 import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.core.BasicThread;
@@ -61,28 +62,28 @@ public class LLCHTAwareLRUPolicy extends LRUPolicy<DirectoryControllerState> {
         this.badHtRequests = new IntervalStat();
         this.lateHtRequests = new IntervalStat();
 
-        this.llcHtRequestProfilingCapability.getEventDispatcher().addListener(HTLLCRequestProfilingCapability.HTLLCRequestEvent.class, new Action1<HTLLCRequestProfilingCapability.HTLLCRequestEvent>() {
+        this.llcHtRequestProfilingCapability.getEventDispatcher().addListener2(HTLLCRequestProfilingCapability.HTLLCRequestEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<HTLLCRequestProfilingCapability.HTLLCRequestEvent>() {
             @Override
             public void apply(HTLLCRequestProfilingCapability.HTLLCRequestEvent event) {
                 totalHtRequests.inc();
             }
         });
 
-        this.llcHtRequestProfilingCapability.getEventDispatcher().addListener(HTLLCRequestProfilingCapability.BadHTLLCRequestEvent.class, new Action1<HTLLCRequestProfilingCapability.BadHTLLCRequestEvent>() {
+        this.llcHtRequestProfilingCapability.getEventDispatcher().addListener2(HTLLCRequestProfilingCapability.BadHTLLCRequestEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<HTLLCRequestProfilingCapability.BadHTLLCRequestEvent>() {
             @Override
             public void apply(HTLLCRequestProfilingCapability.BadHTLLCRequestEvent event) {
                 badHtRequests.inc();
             }
         });
 
-        this.llcHtRequestProfilingCapability.getEventDispatcher().addListener(HTLLCRequestProfilingCapability.LateHTLLCRequestEvent.class, new Action1<HTLLCRequestProfilingCapability.LateHTLLCRequestEvent>() {
+        this.llcHtRequestProfilingCapability.getEventDispatcher().addListener2(HTLLCRequestProfilingCapability.LateHTLLCRequestEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<HTLLCRequestProfilingCapability.LateHTLLCRequestEvent>() {
             @Override
             public void apply(HTLLCRequestProfilingCapability.LateHTLLCRequestEvent event) {
                 lateHtRequests.inc();
             }
         });
 
-        directoryController.getBlockingEventDispatcher().addListener(CoherentCacheServiceNonblockingRequestEvent.class, new Action1<CoherentCacheServiceNonblockingRequestEvent>() {
+        directoryController.getBlockingEventDispatcher().addListener2(CoherentCacheServiceNonblockingRequestEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<CoherentCacheServiceNonblockingRequestEvent>() {
             public void apply(CoherentCacheServiceNonblockingRequestEvent event) {
                 if (event.getCacheController().getCache().equals(getCache()) && !event.isHitInCache() &&
                         event.isEviction() &&
@@ -99,12 +100,12 @@ public class LLCHTAwareLRUPolicy extends LRUPolicy<DirectoryControllerState> {
             }
         });
 
-        directoryController.getBlockingEventDispatcher().addListener(ResetStatEvent.class, new Action1<ResetStatEvent>() {
+        directoryController.getBlockingEventDispatcher().addListener2(ResetStatEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<ResetStatEvent>() {
             public void apply(ResetStatEvent event) {
             }
         });
 
-        directoryController.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
+        directoryController.getBlockingEventDispatcher().addListener2(DumpStatEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<DumpStatEvent>() {
             public void apply(DumpStatEvent event) {
                 if (event.getType() == DumpStatEvent.Type.DETAILED_SIMULATION) {
                     dumpStats(event.getStats());
@@ -112,7 +113,7 @@ public class LLCHTAwareLRUPolicy extends LRUPolicy<DirectoryControllerState> {
             }
         });
 
-        directoryController.getBlockingEventDispatcher().addListener(PollStatsEvent.class, new Action1<PollStatsEvent>() {
+        directoryController.getBlockingEventDispatcher().addListener2(PollStatsEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<PollStatsEvent>() {
             public void apply(PollStatsEvent event) {
                 dumpStats(event.getStats());
             }

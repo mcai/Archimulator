@@ -19,6 +19,7 @@
 package archimulator.sim.core.bpred;
 
 import archimulator.sim.base.event.DumpStatEvent;
+import archimulator.sim.base.event.MyBlockingEventDispatcher;
 import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.core.Thread;
 import archimulator.sim.isa.Mnemonic;
@@ -40,14 +41,14 @@ public abstract class BranchPredictor {
         this.name = name;
         this.type = type;
 
-        this.thread.getBlockingEventDispatcher().addListener(ResetStatEvent.class, new Action1<ResetStatEvent>() {
+        this.thread.getBlockingEventDispatcher().addListener2(ResetStatEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<ResetStatEvent>() {
             public void apply(ResetStatEvent event) {
                 BranchPredictor.this.accesses = 0;
                 BranchPredictor.this.hits = 0;
             }
         });
 
-        this.thread.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
+        this.thread.getBlockingEventDispatcher().addListener2(DumpStatEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<DumpStatEvent>() {
             public void apply(DumpStatEvent event) {
                 if (event.getType() == DumpStatEvent.Type.DETAILED_SIMULATION) {
                     event.getStats().put(BranchPredictor.this.name + ".type", BranchPredictor.this.type.toString());

@@ -19,6 +19,7 @@
 package archimulator.sim.uncore.tlb;
 
 import archimulator.sim.base.event.DumpStatEvent;
+import archimulator.sim.base.event.MyBlockingEventDispatcher;
 import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.base.simulation.SimulationObject;
 import archimulator.sim.uncore.CacheAccessType;
@@ -55,7 +56,7 @@ public class TranslationLookasideBuffer {
 
         this.cache = new EvictableCache<Boolean>(parent, name, config.getGeometry(), LRUPolicy.class, cacheLineStateProviderFactory);
 
-        parent.getBlockingEventDispatcher().addListener(ResetStatEvent.class, new Action1<ResetStatEvent>() {
+        parent.getBlockingEventDispatcher().addListener2(ResetStatEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<ResetStatEvent>() {
             public void apply(ResetStatEvent event) {
                 TranslationLookasideBuffer.this.accesses = 0;
                 TranslationLookasideBuffer.this.hits = 0;
@@ -63,7 +64,7 @@ public class TranslationLookasideBuffer {
             }
         });
 
-        parent.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
+        parent.getBlockingEventDispatcher().addListener2(DumpStatEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<DumpStatEvent>() {
             public void apply(DumpStatEvent event) {
                 if (event.getType() == DumpStatEvent.Type.DETAILED_SIMULATION) {
                     event.getStats().put(TranslationLookasideBuffer.this.name + ".hitRatio", String.valueOf(TranslationLookasideBuffer.this.getHitRatio()));

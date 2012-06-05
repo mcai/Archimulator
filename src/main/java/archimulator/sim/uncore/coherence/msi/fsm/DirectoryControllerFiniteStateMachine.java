@@ -51,7 +51,7 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
             }
         });
 
-//        this.addListener(EnterStateEvent.class, new Action1<EnterStateEvent>() {
+//        this.addListener2(EnterStateEvent.class, new Action1<EnterStateEvent>() {
 //            @Override
 //            public void apply(EnterStateEvent enterStateEvent) {
 //                CacheLine<DirectoryControllerState> line = directoryController.getCache().getLine(getSet(), getWay());

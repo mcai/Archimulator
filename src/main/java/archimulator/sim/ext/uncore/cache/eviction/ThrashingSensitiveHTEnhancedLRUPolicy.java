@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.ext.uncore.cache.eviction;
 
+import archimulator.sim.base.event.MyBlockingEventDispatcher;
 import archimulator.sim.base.event.ProcessorInitializedEvent;
 import archimulator.sim.core.BasicThread;
 import archimulator.sim.core.Processor;
@@ -48,7 +49,7 @@ public class ThrashingSensitiveHTEnhancedLRUPolicy<StateT extends Serializable> 
             }
         });
 
-        cache.getBlockingEventDispatcher().addListener(ProcessorInitializedEvent.class, new Action1<ProcessorInitializedEvent>() {
+        cache.getBlockingEventDispatcher().addListener2(ProcessorInitializedEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<ProcessorInitializedEvent>() {
             public void apply(ProcessorInitializedEvent event) {
                 ThrashingSensitiveHTEnhancedLRUPolicy.this.processor = event.getProcessor();
             }

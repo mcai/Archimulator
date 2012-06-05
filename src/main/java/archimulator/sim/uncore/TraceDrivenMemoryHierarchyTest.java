@@ -29,7 +29,7 @@
 //import archimulator.sim.base.simulation.Logger;
 //import net.pickapack.action.Action;
 //import net.pickapack.event.BlockingEvent;
-//import net.pickapack.event.BlockingEventDispatcher;
+//import net.pickapack.event.MyBlockingEventDispatcher;
 //import net.pickapack.event.CycleAccurateEventQueue;
 //import net.pickapack.io.file.IterableBigTextFile;
 //import net.pickapack.math.Counter;
@@ -41,7 +41,7 @@
 //    private String title;
 //    private List<TestMemoryHierarchyCore> cores;
 //
-//    private BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher;
+//    private MyBlockingEventDispatcher<BlockingEvent> blockingEventDispatcher;
 //
 //    private CycleAccurateEventQueue cycleAccurateEventQueue;
 //
@@ -49,7 +49,7 @@
 //    private LastLevelCache l2Cache;
 //
 //    public TraceDrivenMemoryHierarchyTest(String title, MemoryHierarchyConfig memoryHierarchyConfig, int numCores, int numThreadsPerCore) {
-//        this.blockingEventDispatcher = new BlockingEventDispatcher<BlockingEvent>();
+//        this.blockingEventDispatcher = new MyBlockingEventDispatcher<BlockingEvent>();
 //        this.cycleAccurateEventQueue = new CycleAccurateEventQueue();
 //
 //        this.title = title;
@@ -228,7 +228,7 @@
 //        return new MemoryAccessTraceLine(threadId, (int) virtualPc, (int) physicalAddress, type);
 //    }
 //
-//    public BlockingEventDispatcher<BlockingEvent> getBlockingEventDispatcher() {
+//    public MyBlockingEventDispatcher<BlockingEvent> getBlockingEventDispatcher() {
 //        return this.blockingEventDispatcher;
 //    }
 //

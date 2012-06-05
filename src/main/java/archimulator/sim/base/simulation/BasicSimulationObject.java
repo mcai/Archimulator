@@ -18,15 +18,16 @@
  ******************************************************************************/
 package archimulator.sim.base.simulation;
 
+import archimulator.sim.base.event.MyBlockingEventDispatcher;
 import net.pickapack.event.BlockingEvent;
 import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
 
 public abstract class BasicSimulationObject implements SimulationObject {
-    private BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher;
+    private MyBlockingEventDispatcher<BlockingEvent> blockingEventDispatcher;
     private CycleAccurateEventQueue cycleAccurateEventQueue;
 
-    public BasicSimulationObject(BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
+    public BasicSimulationObject(MyBlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
         this.blockingEventDispatcher = blockingEventDispatcher;
         this.cycleAccurateEventQueue = cycleAccurateEventQueue;
     }
@@ -35,7 +36,7 @@ public abstract class BasicSimulationObject implements SimulationObject {
         this(parent.getBlockingEventDispatcher(), parent.getCycleAccurateEventQueue());
     }
 
-    public BlockingEventDispatcher<BlockingEvent> getBlockingEventDispatcher() {
+    public MyBlockingEventDispatcher<BlockingEvent> getBlockingEventDispatcher() {
         return blockingEventDispatcher;
     }
 

@@ -19,6 +19,7 @@
 package archimulator.sim.ext.uncore.llc;
 
 import archimulator.sim.base.event.DumpStatEvent;
+import archimulator.sim.base.event.MyBlockingEventDispatcher;
 import archimulator.sim.base.event.PollStatsEvent;
 import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.base.experiment.capability.SimulationCapability;
@@ -34,8 +35,11 @@ import archimulator.util.ValueProvider;
 import archimulator.util.ValueProviderFactory;
 import net.pickapack.action.Action1;
 import net.pickapack.event.BlockingEvent;
-import net.pickapack.event.BlockingEventDispatcher;
+import org.apache.commons.io.FileUtils;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,7 +60,7 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
 
     private long numLateHTLLCRequests;
 
-    private BlockingEventDispatcher<HTLLCRequestProfilingCapabilityEvent> eventDispatcher;
+    private MyBlockingEventDispatcher<HTLLCRequestProfilingCapabilityEvent> eventDispatcher;
 
     public HTLLCRequestProfilingCapability(Simulation simulation) {
         this(simulation.getProcessor().getCacheHierarchy().getL2Cache());
@@ -87,9 +91,9 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
 
         this.htLLCRequestVictimCache = new EvictableCache<HTLLCRequestVictimCacheLineState>(llc, llc.getName() + ".htLLCRequestVictimCache", llc.getCache().getGeometry(), LRUPolicy.class, cacheLineStateProviderFactory);
 
-        this.eventDispatcher = new BlockingEventDispatcher<HTLLCRequestProfilingCapabilityEvent>();
+        this.eventDispatcher = new MyBlockingEventDispatcher<HTLLCRequestProfilingCapabilityEvent>();
 
-        llc.getBlockingEventDispatcher().addListener(CoherentCacheServiceNonblockingRequestEvent.class, new Action1<CoherentCacheServiceNonblockingRequestEvent>() {
+        llc.getBlockingEventDispatcher().addListener2(CoherentCacheServiceNonblockingRequestEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<CoherentCacheServiceNonblockingRequestEvent>() {
             public void apply(CoherentCacheServiceNonblockingRequestEvent event) {
                 if (event.getCacheController().equals(HTLLCRequestProfilingCapability.this.llc)) {
                     handleServicingRequest(event);
@@ -97,7 +101,7 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
             }
         });
 
-        llc.getBlockingEventDispatcher().addListener(CoherentCacheNonblockingRequestHitToTransientTagEvent.class, new Action1<CoherentCacheNonblockingRequestHitToTransientTagEvent>() {
+        llc.getBlockingEventDispatcher().addListener2(CoherentCacheNonblockingRequestHitToTransientTagEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<CoherentCacheNonblockingRequestHitToTransientTagEvent>() {
             @SuppressWarnings("Unchecked")
             public void apply(CoherentCacheNonblockingRequestHitToTransientTagEvent event) {
                 if (event.getCacheController().equals(HTLLCRequestProfilingCapability.this.llc)) {
@@ -106,7 +110,7 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
             }
         });
 
-        llc.getBlockingEventDispatcher().addListener(ResetStatEvent.class, new Action1<ResetStatEvent>() {
+        llc.getBlockingEventDispatcher().addListener2(ResetStatEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<ResetStatEvent>() {
             public void apply(ResetStatEvent event) {
                 numMTLLCMisses = 0;
 
@@ -121,13 +125,13 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
             }
         });
 
-        llc.getBlockingEventDispatcher().addListener(PollStatsEvent.class, new Action1<PollStatsEvent>() {
+        llc.getBlockingEventDispatcher().addListener2(PollStatsEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<PollStatsEvent>() {
             public void apply(PollStatsEvent event) {
                 dumpStats(event.getStats());
             }
         });
 
-        llc.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
+        llc.getBlockingEventDispatcher().addListener2(DumpStatEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<DumpStatEvent>() {
             public void apply(DumpStatEvent event) {
                 if (event.getType() == DumpStatEvent.Type.DETAILED_SIMULATION) {
                     dumpStats(event.getStats());
@@ -167,7 +171,35 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
         }
     }
 
+    private static PrintWriter pw;
+
+    static {
+        try {
+            pw = new PrintWriter(new FileWriter(FileUtils.getUserDirectoryPath() + "/event_trace.txt"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private void handleServicingRequest(CoherentCacheServiceNonblockingRequestEvent event) {
+        pw.printf(
+                "[%d] llc [%d,%d] {%s} %s: %s by %s {%s} %s 0x%08x: 0x%08x\n",
+                llc.getCycleAccurateEventQueue().getCurrentCycle(),
+                event.getLineFound().getSet(),
+                event.getLineFound().getWay(),
+                event.getLineFound().getState(),
+                (event.getLineFound().getState() != event.getLineFound().getInitialState() ? String.format("0x%08x", event.getLineFound().getTag()) : "N/A"),
+                event.isHitInCache() ? "hit" : "miss",
+                event.getRequesterAccess().getThread().getName(),
+                event.getRequesterAccess().getId(),
+                event.getRequesterAccess().getType(),
+                event.getRequesterAccess().getVirtualPc(),
+                event.getRequesterAccess().getPhysicalTag()
+
+        );
+//        pw.println(event);
+        pw.flush();
+
         boolean requesterIsHT = BasicThread.isHelperThread(event.getRequesterAccess().getThread());
         CacheLine<?> llcLine = event.getLineFound();
 
@@ -316,7 +348,7 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
         return this.htLLCRequestVictimCache.findLine(tag);
     }
 
-    public BlockingEventDispatcher<HTLLCRequestProfilingCapabilityEvent> getEventDispatcher() {
+    public MyBlockingEventDispatcher<HTLLCRequestProfilingCapabilityEvent> getEventDispatcher() {
         return eventDispatcher;
     }
 

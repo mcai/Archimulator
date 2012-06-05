@@ -18,14 +18,14 @@
  ******************************************************************************/
 package archimulator.sim.base.simulation;
 
+import archimulator.sim.base.event.MyBlockingEventDispatcher;
 import net.pickapack.event.BlockingEvent;
-import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
 
 import java.io.Serializable;
 
 public interface SimulationObject extends Serializable {
-    BlockingEventDispatcher<BlockingEvent> getBlockingEventDispatcher();
+    MyBlockingEventDispatcher<BlockingEvent> getBlockingEventDispatcher();
 
     CycleAccurateEventQueue getCycleAccurateEventQueue();
 }

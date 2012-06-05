@@ -61,7 +61,7 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
             }
         });
 
-//        this.addListener(EnterStateEvent.class, new Action1<EnterStateEvent>() {
+//        this.addListener2(EnterStateEvent.class, new Action1<EnterStateEvent>() {
 //            @Override
 //            public void apply(EnterStateEvent enterStateEvent) {
 //                CacheLine<CacheControllerState> line = cacheController.getCache().getLine(getSet(), getWay());

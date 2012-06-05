@@ -21,10 +21,7 @@ package archimulator.sim.ext.uncore.llc;
 import archimulator.sim.analysis.BasicBlock;
 import archimulator.sim.analysis.Function;
 import archimulator.sim.analysis.Instruction;
-import archimulator.sim.base.event.DumpStatEvent;
-import archimulator.sim.base.event.PollStatsEvent;
-import archimulator.sim.base.event.PseudocallEncounteredEvent;
-import archimulator.sim.base.event.ResetStatEvent;
+import archimulator.sim.base.event.*;
 import archimulator.sim.base.experiment.capability.SimulationCapability;
 import archimulator.sim.base.simulation.Simulation;
 import archimulator.sim.core.BasicThread;
@@ -81,7 +78,7 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
 
         final Reference<Integer> savedRegisterValue = new Reference<Integer>(-1);
 
-        llc.getBlockingEventDispatcher().addListener(PseudocallEncounteredEvent.class, new Action1<PseudocallEncounteredEvent>() {
+        llc.getBlockingEventDispatcher().addListener2(PseudocallEncounteredEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<PseudocallEncounteredEvent>() {
             public void apply(PseudocallEncounteredEvent event) {
                 if (event.getImm() == 3820) {
                     savedRegisterValue.set(event.getContext().getRegs().getGpr(event.getRs()));
@@ -103,7 +100,7 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
             }
         });
 
-        llc.getBlockingEventDispatcher().addListener(CoherentCacheServiceNonblockingRequestEvent.class, new Action1<CoherentCacheServiceNonblockingRequestEvent>() {
+        llc.getBlockingEventDispatcher().addListener2(CoherentCacheServiceNonblockingRequestEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<CoherentCacheServiceNonblockingRequestEvent>() {
             public void apply(CoherentCacheServiceNonblockingRequestEvent event) {
                 if (event.getCacheController().equals(LLCReuseDistanceProfilingCapability.this.llc)) {
                     handleServicingRequest(event);
@@ -111,19 +108,19 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
             }
         });
 
-        llc.getBlockingEventDispatcher().addListener(ResetStatEvent.class, new Action1<ResetStatEvent>() {
+        llc.getBlockingEventDispatcher().addListener2(ResetStatEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<ResetStatEvent>() {
             public void apply(ResetStatEvent event) {
                 reuseDistances.clear();
             }
         });
 
-        llc.getBlockingEventDispatcher().addListener(PollStatsEvent.class, new Action1<PollStatsEvent>() {
+        llc.getBlockingEventDispatcher().addListener2(PollStatsEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<PollStatsEvent>() {
             public void apply(PollStatsEvent event) {
                 dumpStats(event.getStats());
             }
         });
 
-        llc.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
+        llc.getBlockingEventDispatcher().addListener2(DumpStatEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<DumpStatEvent>() {
             public void apply(DumpStatEvent event) {
                 if (event.getType() == DumpStatEvent.Type.DETAILED_SIMULATION) {
                     dumpStats(event.getStats());

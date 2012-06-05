@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.base.simulation.strategy;
 
+import archimulator.sim.base.event.MyBlockingEventDispatcher;
 import archimulator.sim.base.event.PseudocallEncounteredEvent;
 import archimulator.sim.base.simulation.Logger;
 import net.pickapack.action.Action1;
@@ -54,7 +55,7 @@ public class RunToEndFunctionalSimulationStrategy extends SequentialSimulationSt
 
     @Override
     public void beginSimulation() {
-        this.getSimulation().getBlockingEventDispatcher().addListener(PseudocallEncounteredEvent.class, new Action1<PseudocallEncounteredEvent>() {
+        this.getSimulation().getBlockingEventDispatcher().addListener2(PseudocallEncounteredEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<PseudocallEncounteredEvent>() {
             public void apply(PseudocallEncounteredEvent event) {
                 if (event.getImm() == RunToEndFunctionalSimulationStrategy.this.pthreadSpawnedIndex) {
                     Logger.infof(Logger.SIMULATION, "%s encountered pseudocall %d", getSimulation().getCycleAccurateEventQueue().getCurrentCycle(), event.getContext().getThread(getSimulation().getProcessor()).getName(), event.getImm());
