@@ -170,7 +170,7 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
             });
         }
 
-        this.getBlockingEventDispatcher().dispatch(new MemoryAccessInitiatedEvent(thread.getId(), virtualPc, physicalAddress, physicalTag, MemoryHierarchyAccessType.IFETCH));
+        this.getBlockingEventDispatcher().dispatch(new MemoryAccessInitiatedEvent(thread, virtualPc, physicalAddress, physicalTag, MemoryHierarchyAccessType.IFETCH));
     }
 
     public void load(DynamicInstruction dynamicInst, int virtualAddress, int virtualPc, final Action onCompletedCallback) {
@@ -217,7 +217,7 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
             });
         }
 
-        this.getBlockingEventDispatcher().dispatch(new MemoryAccessInitiatedEvent(dynamicInst.getThread().getId(), virtualPc, physicalAddress, physicalTag, MemoryHierarchyAccessType.LOAD));
+        this.getBlockingEventDispatcher().dispatch(new MemoryAccessInitiatedEvent(dynamicInst.getThread(), virtualPc, physicalAddress, physicalTag, MemoryHierarchyAccessType.LOAD));
     }
 
     public void store(DynamicInstruction dynamicInst, int virtualAddress, int virtualPc, final Action onCompletedCallback) {
@@ -259,7 +259,7 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
             });
         }
 
-        this.getBlockingEventDispatcher().dispatch(new MemoryAccessInitiatedEvent(dynamicInst.getThread().getId(), virtualPc, physicalAddress, physicalTag, MemoryHierarchyAccessType.STORE));
+        this.getBlockingEventDispatcher().dispatch(new MemoryAccessInitiatedEvent(dynamicInst.getThread(), virtualPc, physicalAddress, physicalTag, MemoryHierarchyAccessType.STORE));
     }
 
     public void removeFromQueues(AbstractReorderBufferEntry reorderBufferEntry) {

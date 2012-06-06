@@ -19,7 +19,6 @@
 package archimulator.sim.ext.uncore.cache.eviction.rd.evaluator;
 
 import archimulator.sim.base.event.DumpStatEvent;
-import archimulator.sim.base.event.MyBlockingEventDispatcher;
 import archimulator.sim.base.event.PollStatsEvent;
 import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.ext.uncore.cache.eviction.rd.AbstractRDPredictionEvictionPolicy;
@@ -42,7 +41,7 @@ public class RDBasedEvaluatorPolicy<StateT extends Serializable> extends Abstrac
 
         this.evictionPolicy = evictionPolicy;
 
-        cache.getBlockingEventDispatcher().addListener2(ResetStatEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<ResetStatEvent>() {
+        cache.getBlockingEventDispatcher().addListener(ResetStatEvent.class, new Action1<ResetStatEvent>() {
             public void apply(ResetStatEvent event) {
                 totalReplacements = 0;
                 pollutingReplacements = 0;
@@ -50,7 +49,7 @@ public class RDBasedEvaluatorPolicy<StateT extends Serializable> extends Abstrac
             }
         });
 
-        cache.getBlockingEventDispatcher().addListener2(DumpStatEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<DumpStatEvent>() {
+        cache.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
             public void apply(DumpStatEvent event) {
                 if (event.getType() == DumpStatEvent.Type.DETAILED_SIMULATION) {
                     dumpStats(event.getStats());
@@ -58,7 +57,7 @@ public class RDBasedEvaluatorPolicy<StateT extends Serializable> extends Abstrac
             }
         });
 
-        cache.getBlockingEventDispatcher().addListener2(PollStatsEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<PollStatsEvent>() {
+        cache.getBlockingEventDispatcher().addListener(PollStatsEvent.class, new Action1<PollStatsEvent>() {
             public void apply(PollStatsEvent event) {
                 dumpStats(event.getStats());
             }

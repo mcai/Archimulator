@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.base.simulation.strategy;
 
+import archimulator.sim.base.experiment.Experiment;
 import archimulator.sim.base.simulation.Simulation;
 import archimulator.sim.os.Kernel;
 import archimulator.sim.uncore.BasicCacheHierarchy;
@@ -29,7 +30,7 @@ public abstract class SimulationStrategy {
     public SimulationStrategy() {
     }
 
-    public abstract void execute();
+    public abstract void execute(Experiment experiment);
 
     public void doHouseKeeping() {
         this.simulation.getProcessor().getKernel().advanceOneCycle();

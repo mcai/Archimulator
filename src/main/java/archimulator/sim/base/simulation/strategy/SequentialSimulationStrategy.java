@@ -19,6 +19,7 @@
 package archimulator.sim.base.simulation.strategy;
 
 import archimulator.sim.base.event.*;
+import archimulator.sim.base.experiment.Experiment;
 import archimulator.sim.base.simulation.Logger;
 import archimulator.sim.core.Core;
 import net.pickapack.action.Action1;
@@ -99,14 +100,14 @@ public abstract class SequentialSimulationStrategy extends SimulationStrategy {
     }
 
     @Override
-    public void execute() {
-        getSimulation().getBlockingEventDispatcher().addListener2(PauseExperimentEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<PauseExperimentEvent>() {
+    public void execute(Experiment experiment) {
+        experiment.getBlockingEventDispatcher().addListener(PauseExperimentEvent.class, new Action1<PauseExperimentEvent>() {
             public void apply(PauseExperimentEvent event) {
                 requestPause = true;
             }
         });
 
-        getSimulation().getBlockingEventDispatcher().addListener2(StopExperimentEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<StopExperimentEvent>() {
+        experiment.getBlockingEventDispatcher().addListener(StopExperimentEvent.class, new Action1<StopExperimentEvent>() {
             public void apply(StopExperimentEvent event) {
                 requestStop = true;
             }
@@ -119,32 +120,32 @@ public abstract class SequentialSimulationStrategy extends SimulationStrategy {
         if (this.isSupportFastForward()) {
             this.doFastForward();
 
-            this.getSimulation().getBlockingEventDispatcher().dispatch(new DumpStatEvent(DumpStatEvent.Type.FUNCTIONAL_SIMULATION, this.getSimulation().getStatsInFastForward()));
-            this.getSimulation().getBlockingEventDispatcher().dispatch(new ResetStatEvent());
+            this.getSimulation().getBlockingEventDispatcher().dispatch(new DumpStatEvent(this.getSimulation(), DumpStatEvent.Type.FUNCTIONAL_SIMULATION, this.getSimulation().getStatsInFastForward()));
+            this.getSimulation().getBlockingEventDispatcher().dispatch(new ResetStatEvent(this.getSimulation()));
         }
 
         if (this.isSupportCacheWarmup()) {
-            this.getSimulation().getBlockingEventDispatcher().dispatch(new ResetStatEvent());
+            this.getSimulation().getBlockingEventDispatcher().dispatch(new ResetStatEvent(this.getSimulation()));
 
             this.getSimulation().getStopWatch().reset();
             this.getSimulation().getStopWatch().start();
 
             this.doCacheWarmup();
 
-            this.getSimulation().getBlockingEventDispatcher().dispatch(new DumpStatEvent(DumpStatEvent.Type.DETAILED_SIMULATION, this.getSimulation().getStatsInWarmup()));
-            this.getSimulation().getBlockingEventDispatcher().dispatch(new ResetStatEvent());
+            this.getSimulation().getBlockingEventDispatcher().dispatch(new DumpStatEvent(this.getSimulation(), DumpStatEvent.Type.DETAILED_SIMULATION, this.getSimulation().getStatsInWarmup()));
+            this.getSimulation().getBlockingEventDispatcher().dispatch(new ResetStatEvent(this.getSimulation()));
         }
 
         if (this.isSupportMeasurement()) {
-            this.getSimulation().getBlockingEventDispatcher().dispatch(new ResetStatEvent());
+            this.getSimulation().getBlockingEventDispatcher().dispatch(new ResetStatEvent(this.getSimulation()));
 
             this.getSimulation().getStopWatch().reset();
             this.getSimulation().getStopWatch().start();
 
             this.doMeasurement();
 
-            this.getSimulation().getBlockingEventDispatcher().dispatch(new DumpStatEvent(DumpStatEvent.Type.DETAILED_SIMULATION, this.getSimulation().getStatsInMeasurement()));
-            this.getSimulation().getBlockingEventDispatcher().dispatch(new ResetStatEvent());
+            this.getSimulation().getBlockingEventDispatcher().dispatch(new DumpStatEvent(this.getSimulation(), DumpStatEvent.Type.DETAILED_SIMULATION, this.getSimulation().getStatsInMeasurement()));
+            this.getSimulation().getBlockingEventDispatcher().dispatch(new ResetStatEvent(this.getSimulation()));
         }
 
         this.getSimulation().getStopWatch().stop();

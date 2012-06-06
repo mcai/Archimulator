@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.base.experiment;
 
+import archimulator.sim.base.event.SimulationEvent;
 import archimulator.sim.base.experiment.capability.KernelCapability;
 import archimulator.sim.base.experiment.capability.ProcessorCapability;
 import archimulator.sim.base.experiment.capability.SimulationCapability;
@@ -26,6 +27,7 @@ import archimulator.sim.base.simulation.SimulationStartingImage;
 import archimulator.sim.base.simulation.strategy.FromRoiDetailedSimulationStrategy;
 import archimulator.sim.base.simulation.strategy.ToRoiFastForwardSimulationStrategy;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
+import net.pickapack.event.BlockingEventDispatcher;
 
 import java.util.List;
 
@@ -43,11 +45,12 @@ public class CheckpointedExperiment extends Experiment {
     protected void doStart() {
         SimulationStartingImage simulationStartingImage = new SimulationStartingImage();
 
-        this.doSimulation(this.getTitle() + "/checkpointedSimulation/phase0", new ToRoiFastForwardSimulationStrategy(this.getPhaser(), this.pthreadSpawnedIndex, simulationStartingImage), getBlockingEventDispatcher(), getCycleAccurateEventQueue());
+        BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher = new BlockingEventDispatcher<SimulationEvent>();
 
-        this.getBlockingEventDispatcher().clearSimulationWideListeners();
+        this.doSimulation(this.getTitle() + "/checkpointedSimulation/phase0", new ToRoiFastForwardSimulationStrategy(this.getPhaser(), this.pthreadSpawnedIndex, simulationStartingImage), blockingEventDispatcher, getCycleAccurateEventQueue());
+
         this.getCycleAccurateEventQueue().resetCurrentCycle();
 
-        this.doSimulation(this.getTitle() + "/checkpointedSimulation/phase1", new FromRoiDetailedSimulationStrategy(this.getPhaser(), this.maxInsts, simulationStartingImage), getBlockingEventDispatcher(), getCycleAccurateEventQueue());
+        this.doSimulation(this.getTitle() + "/checkpointedSimulation/phase1", new FromRoiDetailedSimulationStrategy(this.getPhaser(), this.maxInsts, simulationStartingImage), blockingEventDispatcher, getCycleAccurateEventQueue());
     }
 }

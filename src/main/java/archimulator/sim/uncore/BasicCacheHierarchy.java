@@ -19,7 +19,7 @@
 package archimulator.sim.uncore;
 
 import archimulator.sim.base.event.DumpStatEvent;
-import archimulator.sim.base.event.MyBlockingEventDispatcher;
+import archimulator.sim.base.event.SimulationEvent;
 import archimulator.sim.base.simulation.BasicSimulationObject;
 import archimulator.sim.core.ProcessorConfig;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
@@ -34,6 +34,7 @@ import archimulator.sim.uncore.tlb.TranslationLookasideBuffer;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
 import net.pickapack.event.BlockingEvent;
+import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
 
 import java.util.ArrayList;
@@ -55,7 +56,7 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
 
     private Map<Controller, Map<Controller, PointToPointReorderBuffer>> p2pReorderBuffers;
 
-    public BasicCacheHierarchy(MyBlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, ProcessorConfig processorConfig) {
+    public BasicCacheHierarchy(BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, ProcessorConfig processorConfig) {
         super(blockingEventDispatcher, cycleAccurateEventQueue);
 
         switch (processorConfig.getMemoryHierarchyConfig().getMainMemory().getType()) {
@@ -102,7 +103,7 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
 
         this.p2pReorderBuffers = new HashMap<Controller, Map<Controller, PointToPointReorderBuffer>>();
 
-        this.getBlockingEventDispatcher().addListener2(DumpStatEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<DumpStatEvent>() {
+        this.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
             public void apply(DumpStatEvent event) {
                 if (event.getType() == DumpStatEvent.Type.DETAILED_SIMULATION) {
                     dumpStats();

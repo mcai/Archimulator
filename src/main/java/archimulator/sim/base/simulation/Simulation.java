@@ -18,10 +18,8 @@
  ******************************************************************************/
 package archimulator.sim.base.simulation;
 
-import archimulator.sim.base.event.DumpStatEvent;
-import archimulator.sim.base.event.MyBlockingEventDispatcher;
-import archimulator.sim.base.event.PollStatsEvent;
-import archimulator.sim.base.event.ProcessorInitializedEvent;
+import archimulator.sim.base.event.*;
+import archimulator.sim.base.experiment.Experiment;
 import archimulator.sim.base.experiment.capability.ExperimentCapabilityFactory;
 import archimulator.sim.base.experiment.capability.SimulationCapability;
 import archimulator.sim.base.simulation.strategy.SimulationStrategy;
@@ -35,7 +33,7 @@ import net.pickapack.StorageUnit;
 import net.pickapack.StringHelper;
 import net.pickapack.action.Action1;
 import net.pickapack.action.Predicate;
-import net.pickapack.event.BlockingEvent;
+import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
 import net.pickapack.io.file.FileHelper;
 import net.pickapack.io.serialization.MapHelper;
@@ -63,11 +61,11 @@ public class Simulation implements SimulationObject {
 
     private Map<String, Object> statsInMeasurement;
 
-    private MyBlockingEventDispatcher<BlockingEvent> blockingEventDispatcher;
+    private BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher;
 
     private CycleAccurateEventQueue cycleAccurateEventQueue;
 
-    public Simulation(SimulationConfig config, SimulationStrategy strategy, List<Class<? extends SimulationCapability>> capabilityClasses, MyBlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
+    public Simulation(SimulationConfig config, SimulationStrategy strategy, List<Class<? extends SimulationCapability>> capabilityClasses, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
         this.blockingEventDispatcher = blockingEventDispatcher;
         this.cycleAccurateEventQueue = cycleAccurateEventQueue;
 
@@ -83,7 +81,7 @@ public class Simulation implements SimulationObject {
 
         this.capabilities = new HashMap<Class<? extends SimulationCapability>, SimulationCapability>();
 
-        this.getBlockingEventDispatcher().addListener2(PollStatsEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<PollStatsEvent>() {
+        this.getBlockingEventDispatcher().addListener(PollStatsEvent.class, new Action1<PollStatsEvent>() {
             public void apply(PollStatsEvent event) {
                 Map<String, Object> stats = event.getStats();
 
@@ -111,7 +109,7 @@ public class Simulation implements SimulationObject {
             }
         });
 
-        this.getBlockingEventDispatcher().addListener2(DumpStatEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<DumpStatEvent>() {
+        this.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
             public void apply(DumpStatEvent event) {
                 dumpStat(event.getStats());
             }
@@ -151,20 +149,20 @@ public class Simulation implements SimulationObject {
         return kernel;
     }
 
-    public void simulate() {
+    public void simulate(Experiment experiment) {
         try {
             Logger.infof(Logger.SIMULATOR, "run simulation: %s", this.cycleAccurateEventQueue.getCurrentCycle(), this.getConfig().getTitle());
 
             Logger.info(Logger.SIMULATOR, "", this.cycleAccurateEventQueue.getCurrentCycle());
 
-            this.getStrategy().execute();
+            this.getStrategy().execute(experiment);
 
             if (!this.getStatsInFastForward().isEmpty()) {
                 MapHelper.save(this.getStatsInFastForward(), this.getConfig().getCwd() + "/stat_fastForward.txt");
 
                 this.statsInFastForward = getStatsWithSimulationPrefix(this.getStatsInFastForward());
 
-                this.blockingEventDispatcher.dispatch(new DumpStatsCompletedEvent(this.getStatsInFastForward()));
+                this.blockingEventDispatcher.dispatch(new DumpStatsCompletedEvent(this, this.getStatsInFastForward()));
             }
 
             if (!this.getStatsInWarmup().isEmpty()) {
@@ -172,7 +170,7 @@ public class Simulation implements SimulationObject {
 
                 this.statsInWarmup = getStatsWithSimulationPrefix(this.getStatsInWarmup());
 
-                this.blockingEventDispatcher.dispatch(new DumpStatsCompletedEvent(this.getStatsInWarmup()));
+                this.blockingEventDispatcher.dispatch(new DumpStatsCompletedEvent(this, this.getStatsInWarmup()));
             }
 
             if (!this.getStatsInMeasurement().isEmpty()) {
@@ -180,37 +178,13 @@ public class Simulation implements SimulationObject {
 
                 this.statsInMeasurement = getStatsWithSimulationPrefix(this.getStatsInMeasurement());
 
-                this.blockingEventDispatcher.dispatch(new DumpStatsCompletedEvent(this.getStatsInMeasurement()));
+                this.blockingEventDispatcher.dispatch(new DumpStatsCompletedEvent(this, this.getStatsInMeasurement()));
             }
 
             resetIdCounters();
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(-1);
-        }
-    }
-
-    public static class PollStatsCompletedEvent implements BlockingEvent {
-        private Map<String, Object> stats;
-
-        public PollStatsCompletedEvent(Map<String, Object> stats) {
-            this.stats = stats;
-        }
-
-        public Map<String, Object> getStats() {
-            return stats;
-        }
-    }
-
-    public static class DumpStatsCompletedEvent implements BlockingEvent {
-        private Map<String, Object> stats;
-
-        public DumpStatsCompletedEvent(Map<String, Object> stats) {
-            this.stats = stats;
-        }
-
-        public Map<String, Object> getStats() {
-            return stats;
         }
     }
 
@@ -305,7 +279,7 @@ public class Simulation implements SimulationObject {
         return this.cycleAccurateEventQueue;
     }
 
-    public MyBlockingEventDispatcher<BlockingEvent> getBlockingEventDispatcher() {
+    public BlockingEventDispatcher<SimulationEvent> getBlockingEventDispatcher() {
         return this.blockingEventDispatcher;
     }
 

@@ -19,7 +19,6 @@
 package archimulator.sim.ext.uncore.llc;
 
 import archimulator.sim.base.event.DumpStatEvent;
-import archimulator.sim.base.event.MyBlockingEventDispatcher;
 import archimulator.sim.base.event.PollStatsEvent;
 import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.base.experiment.capability.SimulationCapability;
@@ -37,11 +36,8 @@ import archimulator.util.ValueProvider;
 import archimulator.util.ValueProviderFactory;
 import net.pickapack.action.Action1;
 import net.pickapack.event.BlockingEvent;
-import org.apache.commons.io.FileUtils;
+import net.pickapack.event.BlockingEventDispatcher;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -62,7 +58,7 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
 
     private long numLateHTLLCRequests;
 
-    private MyBlockingEventDispatcher<HTLLCRequestProfilingCapabilityEvent> eventDispatcher;
+    private BlockingEventDispatcher<HTLLCRequestProfilingCapabilityEvent> eventDispatcher;
 
     public HTLLCRequestProfilingCapability(Simulation simulation) {
         this(simulation.getProcessor().getCacheHierarchy().getL2Cache());
@@ -93,31 +89,81 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
 
         this.htLLCRequestVictimCache = new EvictableCache<HTLLCRequestVictimCacheLineState>(llc, llc.getName() + ".htLLCRequestVictimCache", llc.getCache().getGeometry(), LRUPolicy.class, cacheLineStateProviderFactory);
 
-        this.eventDispatcher = new MyBlockingEventDispatcher<HTLLCRequestProfilingCapabilityEvent>();
+        this.eventDispatcher = new BlockingEventDispatcher<HTLLCRequestProfilingCapabilityEvent>();
 
-        llc.getBlockingEventDispatcher().addListener2(CoherentCacheServiceNonblockingRequestEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<CoherentCacheServiceNonblockingRequestEvent>() {
+        llc.getBlockingEventDispatcher().addListener(CoherentCacheServiceNonblockingRequestEvent.class, new Action1<CoherentCacheServiceNonblockingRequestEvent>() {
             public void apply(CoherentCacheServiceNonblockingRequestEvent event) {
                 if (event.getCacheController().equals(HTLLCRequestProfilingCapability.this.llc)) {
-                    handleServicingRequest(event);
+//                    pw.printf(
+//                            "[%d] llc.[%d,%d] {%s} %s: %s {%s} %s 0x%08x: 0x%08x (%s)\n",
+//                            HTLLCRequestProfilingCapability.this.llc.getCycleAccurateEventQueue().getCurrentCycle(),
+//                            event.getLineFound().getSet(),
+//                            event.getLineFound().getWay(),
+//                            event.getLineFound().getState(),
+//                            (event.getLineFound().getState() != event.getLineFound().getInitialState() ? String.format("0x%08x", event.getLineFound().getTag()) : "N/A"),
+//                            event.getRequesterAccess().getThread().getName(),
+//                            event.getRequesterAccess().getId(),
+//                            event.getRequesterAccess().getType(),
+//                            event.getRequesterAccess().getVirtualPc(),
+//                            event.getRequesterAccess().getPhysicalTag(),
+//                            event.isHitInCache() ? "hit" : "miss"
+//                    );
+//                    pw.flush();
+
+                    boolean requesterIsHT = BasicThread.isHelperThread(event.getRequesterAccess().getThread());
+                    CacheLine<?> llcLine = event.getLineFound();
+
+                    int set = llcLine.getSet();
+
+                    boolean lineFoundIsHT = HTLLCRequestProfilingCapability.this.getLLCLineBroughterThreadId(set, llcLine.getWay()) == BasicThread.getHelperThreadId();
+
+                    handleLineFill(event, requesterIsHT, llcLine, set, lineFoundIsHT);
+
+                    handleRequest(event, requesterIsHT, llcLine, set, lineFoundIsHT);
                 }
             }
         });
 
-        llc.getBlockingEventDispatcher().addListener2(CoherentCacheLineReplacementEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<CoherentCacheLineReplacementEvent>() {
+        llc.getBlockingEventDispatcher().addListener(CoherentCacheLineReplacementEvent.class, new Action1<CoherentCacheLineReplacementEvent>() {
             @Override
             public void apply(CoherentCacheLineReplacementEvent event) {
                 handleReplacement(event);
             }
         });
 
-        llc.getBlockingEventDispatcher().addListener2(CoherentCacheLastPutSOrPutMAndDataFromOwnerEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<CoherentCacheLastPutSOrPutMAndDataFromOwnerEvent>() {
+        llc.getBlockingEventDispatcher().addListener(CoherentCacheLastPutSOrPutMAndDataFromOwnerEvent.class, new Action1<CoherentCacheLastPutSOrPutMAndDataFromOwnerEvent>() {
             @Override
             public void apply(CoherentCacheLastPutSOrPutMAndDataFromOwnerEvent event) {
-                handleLastPutSOrPutMAndDataFromOwner(event);
+//                pw.printf(
+//                        "[%d] llc.[%d,%d] {%s} %s: %s {%s} %s 0x%08x: 0x%08x LAST_PUTS or PUTM_AND_DATA_FROM_OWNER\n",
+//                        HTLLCRequestProfilingCapability.this.llc.getCycleAccurateEventQueue().getCurrentCycle(),
+//                        event.getLineFound().getSet(),
+//                        event.getLineFound().getWay(),
+//                        event.getLineFound().getState(),
+//                        (event.getLineFound().getState() != event.getLineFound().getInitialState() ? String.format("0x%08x", event.getLineFound().getTag()) : "N/A"),
+//                        event.getRequesterAccess().getThread().getName(),
+//                        event.getRequesterAccess().getId(),
+//                        event.getRequesterAccess().getType(),
+//                        event.getRequesterAccess().getVirtualPc(),
+//                        event.getRequesterAccess().getPhysicalTag()
+//                );
+//                pw.flush();
+
+                CacheLine<?> llcLine = event.getLineFound();
+
+                int set = llcLine.getSet();
+
+                boolean lineFoundIsHT = HTLLCRequestProfilingCapability.this.getLLCLineBroughterThreadId(set, llcLine.getWay()) == BasicThread.getHelperThreadId();
+
+                markInvalid(set, llcLine.getWay());
+
+                if(lineFoundIsHT) {
+                    removeLRU(set);
+                }
             }
         });
 
-        llc.getBlockingEventDispatcher().addListener2(CoherentCacheNonblockingRequestHitToTransientTagEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<CoherentCacheNonblockingRequestHitToTransientTagEvent>() {
+        llc.getBlockingEventDispatcher().addListener(CoherentCacheNonblockingRequestHitToTransientTagEvent.class, new Action1<CoherentCacheNonblockingRequestHitToTransientTagEvent>() {
             @SuppressWarnings("Unchecked")
             public void apply(CoherentCacheNonblockingRequestHitToTransientTagEvent event) {
                 if (event.getCacheController().equals(HTLLCRequestProfilingCapability.this.llc)) {
@@ -126,7 +172,7 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
             }
         });
 
-        llc.getBlockingEventDispatcher().addListener2(ResetStatEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<ResetStatEvent>() {
+        llc.getBlockingEventDispatcher().addListener(ResetStatEvent.class, new Action1<ResetStatEvent>() {
             public void apply(ResetStatEvent event) {
                 numMTLLCMisses = 0;
 
@@ -141,13 +187,13 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
             }
         });
 
-        llc.getBlockingEventDispatcher().addListener2(PollStatsEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<PollStatsEvent>() {
+        llc.getBlockingEventDispatcher().addListener(PollStatsEvent.class, new Action1<PollStatsEvent>() {
             public void apply(PollStatsEvent event) {
                 dumpStats(event.getStats());
             }
         });
 
-        llc.getBlockingEventDispatcher().addListener2(DumpStatEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<DumpStatEvent>() {
+        llc.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
             public void apply(DumpStatEvent event) {
                 if (event.getType() == DumpStatEvent.Type.DETAILED_SIMULATION) {
                     dumpStats(event.getStats());
@@ -187,41 +233,17 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
         }
     }
 
-    private static PrintWriter pw;
+//    private static PrintWriter pw;
 
     static {
-        try {
-            pw = new PrintWriter(new FileWriter(FileUtils.getUserDirectoryPath() + "/event_trace.txt"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+//        try {
+//            pw = new PrintWriter(new FileWriter(FileUtils.getUserDirectoryPath() + "/event_trace.txt"));
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
     }
 
-    private void handleServicingRequest(CoherentCacheServiceNonblockingRequestEvent event) {
-        pw.printf(
-                "[%d] llc.[%d,%d] {%s} %s: %s {%s} %s 0x%08x: 0x%08x (%s)\n",
-                llc.getCycleAccurateEventQueue().getCurrentCycle(),
-                event.getLineFound().getSet(),
-                event.getLineFound().getWay(),
-                event.getLineFound().getState(),
-                (event.getLineFound().getState() != event.getLineFound().getInitialState() ? String.format("0x%08x", event.getLineFound().getTag()) : "N/A"),
-                event.getRequesterAccess().getThread().getName(),
-                event.getRequesterAccess().getId(),
-                event.getRequesterAccess().getType(),
-                event.getRequesterAccess().getVirtualPc(),
-                event.getRequesterAccess().getPhysicalTag(),
-                event.isHitInCache() ? "hit" : "miss"
-        );
-//        pw.println(event);
-        pw.flush();
-
-        boolean requesterIsHT = BasicThread.isHelperThread(event.getRequesterAccess().getThread());
-        CacheLine<?> llcLine = event.getLineFound();
-
-        int set = llcLine.getSet();
-
-        boolean lineFoundIsHT = this.getLLCLineBroughterThreadId(set, llcLine.getWay()) == BasicThread.getHelperThreadId();
-
+    private void handleLineFill(CoherentCacheServiceNonblockingRequestEvent event, boolean requesterIsHT, CacheLine<?> llcLine, int set, boolean lineFoundIsHT) {
         if (!event.isHitInCache()) {
             if (requesterIsHT) {
                 this.numTotalHTLLCRequests++;
@@ -262,7 +284,9 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
                 this.insertDataEntry(set, llcLine.getTag());
             }
         }
+    }
 
+    private void handleRequest(CoherentCacheServiceNonblockingRequestEvent event, boolean requesterIsHT, CacheLine<?> llcLine, int set, boolean lineFoundIsHT) {
         boolean mtHit = event.isHitInCache() && !requesterIsHT && !lineFoundIsHT;
         boolean htHit = event.isHitInCache() && !requesterIsHT && lineFoundIsHT;
 
@@ -288,39 +312,24 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
     }
 
     private void handleReplacement(CoherentCacheLineReplacementEvent event) {
-        pw.printf(
-                "[%d] llc.[%d,%d] {%s} %s: %s {%s} %s 0x%08x: 0x%08x REPLACEMENT\n",
-                llc.getCycleAccurateEventQueue().getCurrentCycle(),
-                event.getLineFound().getSet(),
-                event.getLineFound().getWay(),
-                event.getLineFound().getState(),
-                (event.getLineFound().getState() != event.getLineFound().getInitialState() ? String.format("0x%08x", event.getLineFound().getTag()) : "N/A"),
-                event.getRequesterAccess().getThread().getName(),
-                event.getRequesterAccess().getId(),
-                event.getRequesterAccess().getType(),
-                event.getRequesterAccess().getVirtualPc(),
-                event.getRequesterAccess().getPhysicalTag()
-        );
-//        pw.println(event);
-        pw.flush();
+//        pw.printf(
+//                "[%d] llc.[%d,%d] {%s} %s: %s {%s} %s 0x%08x: 0x%08x REPLACEMENT\n",
+//                llc.getCycleAccurateEventQueue().getCurrentCycle(),
+//                event.getLineFound().getSet(),
+//                event.getLineFound().getWay(),
+//                event.getLineFound().getState(),
+//                (event.getLineFound().getState() != event.getLineFound().getInitialState() ? String.format("0x%08x", event.getLineFound().getTag()) : "N/A"),
+//                event.getRequesterAccess().getThread().getName(),
+//                event.getRequesterAccess().getId(),
+//                event.getRequesterAccess().getType(),
+//                event.getRequesterAccess().getVirtualPc(),
+//                event.getRequesterAccess().getPhysicalTag()
+//        );
+//        pw.flush();
     }
 
-    private void handleLastPutSOrPutMAndDataFromOwner(CoherentCacheLastPutSOrPutMAndDataFromOwnerEvent event) {
-        pw.printf(
-                "[%d] llc.[%d,%d] {%s} %s: %s {%s} %s 0x%08x: 0x%08x LAST_PUTS or PUTM_AND_DATA_FROM_OWNER\n",
-                llc.getCycleAccurateEventQueue().getCurrentCycle(),
-                event.getLineFound().getSet(),
-                event.getLineFound().getWay(),
-                event.getLineFound().getState(),
-                (event.getLineFound().getState() != event.getLineFound().getInitialState() ? String.format("0x%08x", event.getLineFound().getTag()) : "N/A"),
-                event.getRequesterAccess().getThread().getName(),
-                event.getRequesterAccess().getId(),
-                event.getRequesterAccess().getType(),
-                event.getRequesterAccess().getVirtualPc(),
-                event.getRequesterAccess().getPhysicalTag()
-        );
-//        pw.println(event);
-        pw.flush();
+    private void markInvalid(int set, int way) {
+        this.setLLCLineBroughterThreadId(set, way, -1);
     }
 
     private void markHT(int set, int way) {
@@ -336,6 +345,8 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
     }
 
     private void setLLCLineBroughterThreadId(int set, int way, int llcLineBroughterThreadId) {
+//        pw.printf("[%d] llcLineBroughterThreadIds[%d,%d] = %d\n", llc.getCycleAccurateEventQueue().getCurrentCycle(), set, way, llcLineBroughterThreadId);
+//        pw.flush();
         this.llcLineBroughterThreadIds.get(set).put(way, llcLineBroughterThreadId);
     }
 
@@ -345,6 +356,8 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
         HTLLCRequestVictimCacheLineStateValueProvider stateProvider = (HTLLCRequestVictimCacheLineStateValueProvider) line.getStateProvider();
         stateProvider.setState(HTLLCRequestVictimCacheLineState.DATA);
         line.setTag(tag);
+//        pw.printf("[%d] htLLCRequestVictimCache[%d,%d]: insertDataEntry(0x%08x)\n", llc.getCycleAccurateEventQueue().getCurrentCycle(), set, line.getWay(), tag);
+//        pw.flush();
         newMiss.commit();
     }
 
@@ -354,11 +367,15 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
         HTLLCRequestVictimCacheLineStateValueProvider stateProvider = (HTLLCRequestVictimCacheLineStateValueProvider) line.getStateProvider();
         stateProvider.setState(HTLLCRequestVictimCacheLineState.NULL);
         line.setTag(0);
+//        pw.printf("[%d] htLLCRequestVictimCache[%d,%d]: insertNullEntry(0x%08x)\n", llc.getCycleAccurateEventQueue().getCurrentCycle(), set, line.getWay(), 0);
+//        pw.flush();
         newMiss.commit();
     }
 
     private void setLRU(int set, int way) {
         this.getLruPolicyForHtRequestVictimCache().setLRU(set, way);
+//        pw.printf("[%d] htLLCRequestVictimCache[%d,%d]: setLRU\n", llc.getCycleAccurateEventQueue().getCurrentCycle(), set, way);
+//        pw.flush();
     }
 
     private void removeLRU(int set) {
@@ -371,6 +388,8 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
                 HTLLCRequestVictimCacheLineStateValueProvider stateProvider = (HTLLCRequestVictimCacheLineStateValueProvider) line.getStateProvider();
                 stateProvider.setState(HTLLCRequestVictimCacheLineState.INVALID);
                 line.setTag(CacheLine.INVALID_TAG);
+//                pw.printf("[%d] htLLCRequestVictimCache[%d,%d]: removeLRU\n", llc.getCycleAccurateEventQueue().getCurrentCycle(), set, way);
+//                pw.flush();
                 return;
             }
         }
@@ -399,7 +418,7 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
         return this.htLLCRequestVictimCache.findLine(tag);
     }
 
-    public MyBlockingEventDispatcher<HTLLCRequestProfilingCapabilityEvent> getEventDispatcher() {
+    public BlockingEventDispatcher<HTLLCRequestProfilingCapabilityEvent> getEventDispatcher() {
         return eventDispatcher;
     }
 

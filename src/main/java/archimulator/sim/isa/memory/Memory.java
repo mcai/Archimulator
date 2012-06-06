@@ -18,7 +18,6 @@
  ******************************************************************************/
 package archimulator.sim.isa.memory;
 
-import archimulator.sim.base.event.MyBlockingEventDispatcher;
 import archimulator.sim.base.event.PollStatsEvent;
 import archimulator.sim.base.simulation.BasicSimulationObject;
 import archimulator.sim.base.simulation.Simulation;
@@ -64,7 +63,7 @@ public abstract class Memory extends BasicSimulationObject {
         this.speculative = false;
         this.specBlks = new TreeMap<Integer, List<SpeculativeMemoryBlock>>();
 
-        this.kernel.getBlockingEventDispatcher().addListener2(PollStatsEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<PollStatsEvent>() {
+        this.kernel.getBlockingEventDispatcher().addListener(PollStatsEvent.class, new Action1<PollStatsEvent>() {
             public void apply(PollStatsEvent event) {
                 event.getStats().put("mem-" + id + ".numPages", numPages);
             }

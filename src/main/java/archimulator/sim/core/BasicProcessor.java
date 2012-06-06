@@ -18,8 +18,8 @@
  ******************************************************************************/
 package archimulator.sim.core;
 
-import archimulator.sim.base.event.MyBlockingEventDispatcher;
 import archimulator.sim.base.event.ResetStatEvent;
+import archimulator.sim.base.event.SimulationEvent;
 import archimulator.sim.base.experiment.capability.ExperimentCapabilityFactory;
 import archimulator.sim.base.experiment.capability.ProcessorCapability;
 import archimulator.sim.base.simulation.BasicSimulationObject;
@@ -29,7 +29,7 @@ import archimulator.sim.os.ContextState;
 import archimulator.sim.os.Kernel;
 import archimulator.sim.uncore.CacheHierarchy;
 import net.pickapack.action.Action1;
-import net.pickapack.event.BlockingEvent;
+import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
 
 import java.util.*;
@@ -47,7 +47,7 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
 
     private Map<Context, Thread> contextToThreadMappings;
 
-    public BasicProcessor(MyBlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, ProcessorConfig processorConfig, Kernel kernel, CacheHierarchy cacheHierarchy, List<Class<? extends ProcessorCapability>> capabilityClasses) {
+    public BasicProcessor(BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, ProcessorConfig processorConfig, Kernel kernel, CacheHierarchy cacheHierarchy, List<Class<? extends ProcessorCapability>> capabilityClasses) {
         super(blockingEventDispatcher, cycleAccurateEventQueue);
 
         this.config = processorConfig;
@@ -80,7 +80,7 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
 
         this.updateContextToThreadAssignments();
 
-        this.getBlockingEventDispatcher().addListener2(ResetStatEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<ResetStatEvent>() {
+        this.getBlockingEventDispatcher().addListener(ResetStatEvent.class, new Action1<ResetStatEvent>() {
             public void apply(ResetStatEvent event) {
                 resetStat();
             }

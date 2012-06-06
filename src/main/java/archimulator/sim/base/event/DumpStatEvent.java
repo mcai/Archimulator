@@ -18,11 +18,11 @@
  ******************************************************************************/
 package archimulator.sim.base.event;
 
-import net.pickapack.event.BlockingEvent;
+import archimulator.sim.base.simulation.Simulation;
 
 import java.util.Map;
 
-public class DumpStatEvent implements BlockingEvent {
+public class DumpStatEvent extends SimulationEvent {
     public static enum Type {
         FUNCTIONAL_SIMULATION,
         DETAILED_SIMULATION
@@ -31,7 +31,8 @@ public class DumpStatEvent implements BlockingEvent {
     private Type type;
     private Map<String, Object> stats;
 
-    public DumpStatEvent(Type type, Map<String, Object> stats) {
+    public DumpStatEvent(Simulation simulation, Type type, Map<String, Object> stats) {
+        super(simulation);
         this.type = type;
         this.stats = stats;
     }

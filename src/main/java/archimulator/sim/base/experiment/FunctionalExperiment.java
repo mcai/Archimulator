@@ -18,12 +18,14 @@
  ******************************************************************************/
 package archimulator.sim.base.experiment;
 
+import archimulator.sim.base.event.SimulationEvent;
 import archimulator.sim.base.experiment.capability.KernelCapability;
 import archimulator.sim.base.experiment.capability.ProcessorCapability;
 import archimulator.sim.base.experiment.capability.SimulationCapability;
 import archimulator.sim.base.simulation.ContextConfig;
 import archimulator.sim.base.simulation.strategy.RunToEndFunctionalSimulationStrategy;
 import archimulator.sim.uncore.cache.eviction.LRUPolicy;
+import net.pickapack.event.BlockingEventDispatcher;
 
 import java.util.List;
 
@@ -34,6 +36,7 @@ public class FunctionalExperiment extends Experiment {
 
     @Override
     protected void doStart() {
-        this.doSimulation(this.getTitle() + "/functionalSimulation", new RunToEndFunctionalSimulationStrategy(this.getPhaser()), this.getBlockingEventDispatcher(), this.getCycleAccurateEventQueue());
+        BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher = new BlockingEventDispatcher<SimulationEvent>();
+        this.doSimulation(this.getTitle() + "/functionalSimulation", new RunToEndFunctionalSimulationStrategy(this.getPhaser()), blockingEventDispatcher, this.getCycleAccurateEventQueue());
     }
 }

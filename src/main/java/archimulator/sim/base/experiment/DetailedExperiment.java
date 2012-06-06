@@ -18,12 +18,14 @@
  ******************************************************************************/
 package archimulator.sim.base.experiment;
 
+import archimulator.sim.base.event.SimulationEvent;
 import archimulator.sim.base.experiment.capability.KernelCapability;
 import archimulator.sim.base.experiment.capability.ProcessorCapability;
 import archimulator.sim.base.experiment.capability.SimulationCapability;
 import archimulator.sim.base.simulation.ContextConfig;
 import archimulator.sim.base.simulation.strategy.RunToEndDetailedSimulationStrategy;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
+import net.pickapack.event.BlockingEventDispatcher;
 
 import java.util.List;
 
@@ -34,6 +36,7 @@ public class DetailedExperiment extends Experiment {
 
     @Override
     protected void doStart() {
-        doSimulation(getTitle() + "/detailedSimulation", new RunToEndDetailedSimulationStrategy(this.getPhaser()), getBlockingEventDispatcher(), getCycleAccurateEventQueue());
+        BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher = new BlockingEventDispatcher<SimulationEvent>();
+        doSimulation(getTitle() + "/detailedSimulation", new RunToEndDetailedSimulationStrategy(this.getPhaser()), blockingEventDispatcher, getCycleAccurateEventQueue());
     }
 }

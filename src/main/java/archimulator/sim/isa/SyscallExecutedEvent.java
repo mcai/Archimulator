@@ -18,14 +18,15 @@
  ******************************************************************************/
 package archimulator.sim.isa;
 
+import archimulator.sim.base.event.SimulationEvent;
 import archimulator.sim.os.Context;
-import net.pickapack.event.BlockingEvent;
 
-public class SyscallExecutedEvent implements BlockingEvent {
+public class SyscallExecutedEvent extends SimulationEvent {
     private String syscallName;
     private Context context;
 
     public SyscallExecutedEvent(String syscallName, Context context) {
+        super(context);
         this.syscallName = syscallName;
         this.context = context;
     }

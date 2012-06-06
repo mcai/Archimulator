@@ -19,14 +19,14 @@
 package archimulator.sim.base.event;
 
 import archimulator.sim.os.Context;
-import net.pickapack.event.BlockingEvent;
 
-public class PseudocallEncounteredEvent implements BlockingEvent {
+public class PseudocallEncounteredEvent extends SimulationEvent {
     private Context context;
     private int rs;
     private int imm;
 
     public PseudocallEncounteredEvent(Context context, int rs, int imm) {
+        super(context);
         this.context = context;
         this.rs = rs;
         this.imm = imm;

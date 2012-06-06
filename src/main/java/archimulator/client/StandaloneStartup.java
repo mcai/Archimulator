@@ -18,12 +18,13 @@
  ******************************************************************************/
 package archimulator.client;
 
-import archimulator.sim.base.event.MyBlockingEventDispatcher;
+import archimulator.sim.base.event.DumpStatsCompletedEvent;
+import archimulator.sim.base.event.PollStatsCompletedEvent;
+import archimulator.sim.base.event.SimulationCreatedEvent;
 import archimulator.sim.base.experiment.Experiment;
 import archimulator.sim.base.experiment.profile.ExperimentProfile;
 import archimulator.sim.base.experiment.profile.ProcessorProfile;
 import archimulator.sim.base.simulation.SimulatedProgram;
-import archimulator.sim.base.simulation.Simulation;
 import archimulator.sim.uncore.cache.eviction.LRUPolicy;
 import net.pickapack.DateHelper;
 import net.pickapack.action.Action1;
@@ -96,15 +97,20 @@ public class StandaloneStartup {
 
         final Map<String, String> stats1 = new LinkedHashMap<String, String>();
 
-        experiment.getBlockingEventDispatcher().addListener2(Simulation.PollStatsCompletedEvent.class, MyBlockingEventDispatcher.ListenerType.EXPERIMENT_WIDE, new Action1<Simulation.PollStatsCompletedEvent>() {
-            @Override
-            public void apply(final Simulation.PollStatsCompletedEvent event) {
-                try {
-                    Map<String, Object> stats = event.getStats();
+        experiment.start();
 
-                    for (String key : stats.keySet()) {
-                        stats1.put(key, stats.get(key) + "");
-                    }
+        experiment.getBlockingEventDispatcher().addListener(SimulationCreatedEvent.class, new Action1<SimulationCreatedEvent>() {
+            @Override
+            public void apply(SimulationCreatedEvent event) {
+                experiment.getSimulation().getBlockingEventDispatcher().addListener(PollStatsCompletedEvent.class, new Action1<PollStatsCompletedEvent>() {
+                    @Override
+                    public void apply(final PollStatsCompletedEvent event) {
+                        try {
+                            Map<String, Object> stats = event.getStats();
+
+                            for (String key : stats.keySet()) {
+                                stats1.put(key, stats.get(key) + "");
+                            }
 
 //                    Context context = experiment.getSimulation().getProcessor().getCores().get(0).getThreads().get(0).getContext();
 //                    if(context != null) {
@@ -112,30 +118,32 @@ public class StandaloneStartup {
 //                        ((BasicProcess) context.getProcess()).getElfAnalyzer().dumpAnalysisResult(out);
 //                        out.close();
 //                    }
-                } catch (Exception e) {
-                    recordException(e);
+                        } catch (Exception e) {
+                            recordException(e);
 //                        throw new RuntimeException(e);
-                }
-            }
-        });
-
-        experiment.getBlockingEventDispatcher().addListener2(Simulation.DumpStatsCompletedEvent.class, MyBlockingEventDispatcher.ListenerType.EXPERIMENT_WIDE, new Action1<Simulation.DumpStatsCompletedEvent>() {
-            @Override
-            public void apply(final Simulation.DumpStatsCompletedEvent event) {
-                try {
-                    Map<String, Object> stats = event.getStats();
-
-                    for (String key : stats.keySet()) {
-                        stats1.put(key, stats.get(key) + "");
+                        }
                     }
-                } catch (Exception e) {
-                    recordException(e);
+                });
+
+                experiment.getSimulation().getBlockingEventDispatcher().addListener(DumpStatsCompletedEvent.class, new Action1<DumpStatsCompletedEvent>() {
+                    @Override
+                    public void apply(final DumpStatsCompletedEvent event) {
+                        try {
+                            Map<String, Object> stats = event.getStats();
+
+                            for (String key : stats.keySet()) {
+                                stats1.put(key, stats.get(key) + "");
+                            }
+                        } catch (Exception e) {
+                            recordException(e);
 //                        throw new RuntimeException(e);
-                }
+                        }
+                    }
+                });
             }
         });
 
-        experiment.runToEnd();
+        experiment.join();
 
         try {
             PrintWriter pw = new PrintWriter(new FileWriter("/home/itecgo/Desktop/stats.txt"));

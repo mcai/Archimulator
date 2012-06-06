@@ -19,7 +19,6 @@
 package archimulator.sim.ext.uncore.llc;
 
 import archimulator.sim.base.event.DumpStatEvent;
-import archimulator.sim.base.event.MyBlockingEventDispatcher;
 import archimulator.sim.base.event.PollStatsEvent;
 import archimulator.sim.base.event.PseudocallEncounteredEvent;
 import archimulator.sim.base.experiment.capability.SimulationCapability;
@@ -72,7 +71,7 @@ public class LLCMissProfilingCapability implements SimulationCapability {
             throw new RuntimeException(e);
         }
 
-        this.simulation.getBlockingEventDispatcher().addListener2(CoherentCacheBeginCacheAccessEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<CoherentCacheBeginCacheAccessEvent>() {
+        this.simulation.getBlockingEventDispatcher().addListener(CoherentCacheBeginCacheAccessEvent.class, new Action1<CoherentCacheBeginCacheAccessEvent>() {
             public void apply(CoherentCacheBeginCacheAccessEvent event) {
                 if (event.getCacheController().isLastLevelCache() && event.getCacheAccess().getReference().getAccessType().isDownwardRead()) {
                     IntegerIntegerPair sample = new IntegerIntegerPair(event.getAccess().getThread().getId(), event.getAccess().getVirtualPc());
@@ -85,7 +84,7 @@ public class LLCMissProfilingCapability implements SimulationCapability {
             }
         });
 
-        this.simulation.getBlockingEventDispatcher().addListener2(CoherentCacheBeginCacheAccessEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<CoherentCacheBeginCacheAccessEvent>() {
+        this.simulation.getBlockingEventDispatcher().addListener(CoherentCacheBeginCacheAccessEvent.class, new Action1<CoherentCacheBeginCacheAccessEvent>() {
             public void apply(CoherentCacheBeginCacheAccessEvent event) {
                 if (!event.getCacheAccess().isHitInCache() && event.getCacheController().isLastLevelCache()) {
                     beginMiss(event);
@@ -98,7 +97,7 @@ public class LLCMissProfilingCapability implements SimulationCapability {
             }
         });
 
-        this.simulation.getBlockingEventDispatcher().addListener2(CoherentCacheEndCacheAccessEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<CoherentCacheEndCacheAccessEvent>() {
+        this.simulation.getBlockingEventDispatcher().addListener(CoherentCacheEndCacheAccessEvent.class, new Action1<CoherentCacheEndCacheAccessEvent>() {
             public void apply(CoherentCacheEndCacheAccessEvent event) {
                 if (!event.getCacheAccess().isHitInCache() && event.getCacheController().isLastLevelCache()) {
                     endMiss(event);
@@ -107,13 +106,13 @@ public class LLCMissProfilingCapability implements SimulationCapability {
             }
         });
 
-        this.simulation.getBlockingEventDispatcher().addListener2(PollStatsEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<PollStatsEvent>() {
+        this.simulation.getBlockingEventDispatcher().addListener(PollStatsEvent.class, new Action1<PollStatsEvent>() {
             public void apply(PollStatsEvent event) {
                 dumpStats(event.getStats(), false);
             }
         });
 
-        this.simulation.getBlockingEventDispatcher().addListener2(DumpStatEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<DumpStatEvent>() {
+        this.simulation.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
             public void apply(DumpStatEvent event) {
                 if (event.getType() == DumpStatEvent.Type.DETAILED_SIMULATION) {
                     dumpStats(event.getStats(), true);
@@ -123,7 +122,7 @@ public class LLCMissProfilingCapability implements SimulationCapability {
             }
         });
 
-        this.simulation.getBlockingEventDispatcher().addListener2(PseudocallEncounteredEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<PseudocallEncounteredEvent>() {
+        this.simulation.getBlockingEventDispatcher().addListener(PseudocallEncounteredEvent.class, new Action1<PseudocallEncounteredEvent>() {
             public void apply(PseudocallEncounteredEvent event) {
 //                if (BasicThread.isHelperThread(event.getContext().getThread()))
 //                    System.out.println("pseudocall: " + event.getContext().getThread().getName() + " - " + event.getImm());

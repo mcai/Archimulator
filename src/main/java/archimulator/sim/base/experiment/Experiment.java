@@ -35,6 +35,7 @@ import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
 import net.pickapack.action.Action4;
 import net.pickapack.event.BlockingEvent;
+import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
 import net.pickapack.fsm.BasicFiniteStateMachine;
 import net.pickapack.fsm.FiniteStateMachine;
@@ -57,7 +58,7 @@ public abstract class Experiment {
 
     private String beginTime;
 
-    private MyBlockingEventDispatcher<BlockingEvent> blockingEventDispatcher;
+    private BlockingEventDispatcher<ExperimentEvent> blockingEventDispatcher;
     private CycleAccurateEventQueue cycleAccurateEventQueue;
 
     private CyclicBarrier phaser;
@@ -84,15 +85,8 @@ public abstract class Experiment {
 
         this.beginTime = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date());
 
-        this.blockingEventDispatcher = new MyBlockingEventDispatcher<BlockingEvent>();
+        this.blockingEventDispatcher = new BlockingEventDispatcher<ExperimentEvent>();
         this.cycleAccurateEventQueue = new CycleAccurateEventQueue();
-
-        this.blockingEventDispatcher.addListener2(DumpStatEvent.class, MyBlockingEventDispatcher.ListenerType.EXPERIMENT_WIDE, new Action1<DumpStatEvent>() {
-            public void apply(DumpStatEvent event) {
-                pollSimulationState();
-                dumpStats(event.getStats(), event.getType() == DumpStatEvent.Type.DETAILED_SIMULATION);
-            }
-        });
 
         this.phaser = new CyclicBarrier(2);
 
@@ -111,7 +105,7 @@ public abstract class Experiment {
 
         Map<String, Object> polledStats = new LinkedHashMap<String, Object>();
 
-        this.getBlockingEventDispatcher().dispatch(new PollStatsEvent(polledStats));
+        this.simulation.getBlockingEventDispatcher().dispatch(new PollStatsEvent(this.simulation, polledStats));
 
         polledStats = this.simulation.getStatsWithSimulationPrefix(polledStats);
 
@@ -119,7 +113,7 @@ public abstract class Experiment {
             Logger.infof(Logger.SIMULATION, "\t%s: %s", this.cycleAccurateEventQueue.getCurrentCycle(), entry.getKey(), entry.getValue());
         }
 
-        this.blockingEventDispatcher.dispatch(new Simulation.PollStatsCompletedEvent(polledStats));
+        this.simulation.getBlockingEventDispatcher().dispatch(new PollStatsCompletedEvent(this.simulation, polledStats));
 
         Logger.info(Logger.SIMULATION, "------ END DUMP STATE ------\n", this.cycleAccurateEventQueue.getCurrentCycle());
     }
@@ -167,14 +161,19 @@ public abstract class Experiment {
         }
     }
 
-    public void runToEnd() {
-        this.start();
-        this.join();
-    }
-
-    protected void doSimulation(String title, SimulationStrategy strategy, MyBlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
+    protected void doSimulation(String title, SimulationStrategy strategy, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
         this.simulation = new Simulation(new SimulationConfig(title, this.processorConfig, this.contextConfigs), strategy, this.simulationCapabilityClasses, blockingEventDispatcher, cycleAccurateEventQueue);
-        this.simulation.simulate();
+
+        this.blockingEventDispatcher.dispatch(new SimulationCreatedEvent(this));
+
+        this.simulation.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
+            public void apply(DumpStatEvent event) {
+                pollSimulationState();
+                dumpStats(event.getStats(), event.getType() == DumpStatEvent.Type.DETAILED_SIMULATION);
+            }
+        });
+
+        this.simulation.simulate(this);
     }
 
     public long getId() {
@@ -185,7 +184,7 @@ public abstract class Experiment {
         return this.title;
     }
 
-    public MyBlockingEventDispatcher<BlockingEvent> getBlockingEventDispatcher() {
+    public BlockingEventDispatcher<ExperimentEvent> getBlockingEventDispatcher() {
         return this.blockingEventDispatcher;
     }
 
@@ -276,14 +275,14 @@ public abstract class Experiment {
                     @Override
                     public void apply(FiniteStateMachine<ExperimentState, ExperimentCondition> from, Object param2, ExperimentCondition param3, Params param4) {
                         final Experiment experiment = ((BasicFiniteStateMachine) from).get(Experiment.class, "experiment");
-                        experiment.getBlockingEventDispatcher().dispatch(new PauseExperimentEvent());
+                        experiment.getBlockingEventDispatcher().dispatch(new PauseExperimentEvent(experiment));
                     }
                 }, ExperimentState.PAUSED)
                 .onCondition(ExperimentCondition.STOP, new Action4<FiniteStateMachine<ExperimentState, ExperimentCondition>, Object, ExperimentCondition, Params>() {
                     @Override
                     public void apply(FiniteStateMachine<ExperimentState, ExperimentCondition> from, Object param2, ExperimentCondition param3, Params param4) {
                         final Experiment experiment = ((BasicFiniteStateMachine) from).get(Experiment.class, "experiment");
-                        experiment.getBlockingEventDispatcher().dispatch(new StopExperimentEvent());
+                        experiment.getBlockingEventDispatcher().dispatch(new StopExperimentEvent(experiment));
                         experiment.getBlockingEventDispatcher().clearListeners();
                     }
                 }, ExperimentState.STOPPED);
@@ -321,7 +320,7 @@ public abstract class Experiment {
                             throw new RuntimeException(e);
                         }
 
-                        experiment.getBlockingEventDispatcher().dispatch(new StopExperimentEvent());
+                        experiment.getBlockingEventDispatcher().dispatch(new StopExperimentEvent(experiment));
                         experiment.getBlockingEventDispatcher().clearListeners();
                     }
                 }, ExperimentState.STOPPED);

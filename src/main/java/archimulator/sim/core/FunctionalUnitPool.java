@@ -19,7 +19,6 @@
 package archimulator.sim.core;
 
 import archimulator.sim.base.event.DumpStatEvent;
-import archimulator.sim.base.event.MyBlockingEventDispatcher;
 import archimulator.sim.base.event.ResetStatEvent;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
@@ -123,7 +122,7 @@ public class FunctionalUnitPool {
             this.acquireFailedOnNoFreeFu.put(fuOperationType, 0L);
         }
 
-        this.core.getBlockingEventDispatcher().addListener2(ResetStatEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<ResetStatEvent>() {
+        this.core.getBlockingEventDispatcher().addListener(ResetStatEvent.class, new Action1<ResetStatEvent>() {
             public void apply(ResetStatEvent event) {
                 for (FunctionalUnitType fuType : FunctionalUnitPool.this.noFreeFu.keySet()) {
                     FunctionalUnitPool.this.noFreeFu.put(fuType, 0L);
@@ -135,7 +134,7 @@ public class FunctionalUnitPool {
             }
         });
 
-        this.core.getBlockingEventDispatcher().addListener2(DumpStatEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<DumpStatEvent>() {
+        this.core.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
             public void apply(DumpStatEvent event) {
                 if (event.getType() == DumpStatEvent.Type.DETAILED_SIMULATION) {
                     for (FunctionalUnitType fuType : FunctionalUnitPool.this.noFreeFu.keySet()) {

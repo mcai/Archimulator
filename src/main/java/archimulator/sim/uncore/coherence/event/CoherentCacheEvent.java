@@ -18,13 +18,14 @@
  ******************************************************************************/
 package archimulator.sim.uncore.coherence.event;
 
+import archimulator.sim.base.event.SimulationEvent;
 import archimulator.sim.uncore.coherence.msi.controller.GeneralCacheController;
-import net.pickapack.event.BlockingEvent;
 
-public abstract class CoherentCacheEvent implements BlockingEvent {
+public abstract class CoherentCacheEvent extends SimulationEvent {
     private GeneralCacheController cacheController;
 
     public CoherentCacheEvent(GeneralCacheController cacheController) {
+        super(cacheController);
         this.cacheController = cacheController;
     }
 

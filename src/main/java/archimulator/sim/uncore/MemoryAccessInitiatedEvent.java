@@ -18,17 +18,19 @@
  ******************************************************************************/
 package archimulator.sim.uncore;
 
-import net.pickapack.event.BlockingEvent;
+import archimulator.sim.base.event.SimulationEvent;
+import archimulator.sim.core.Thread;
 
-public class MemoryAccessInitiatedEvent implements BlockingEvent {
+public class MemoryAccessInitiatedEvent extends SimulationEvent {
     private int threadId;
     private int virtualPc;
     private int physicalAddress;
     private int physicalTag;
     private MemoryHierarchyAccessType type;
 
-    public MemoryAccessInitiatedEvent(int threadId, int virtualPc, int physicalAddress, int physicalTag, MemoryHierarchyAccessType type) {
-        this.threadId = threadId;
+    public MemoryAccessInitiatedEvent(Thread thread, int virtualPc, int physicalAddress, int physicalTag, MemoryHierarchyAccessType type) {
+        super(thread);
+        this.threadId = thread.getId();
         this.physicalAddress = physicalAddress;
         this.virtualPc = virtualPc;
         this.physicalTag = physicalTag;

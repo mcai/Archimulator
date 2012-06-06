@@ -18,7 +18,6 @@
  ******************************************************************************/
 package archimulator.sim.os.event;
 
-import archimulator.sim.base.event.MyBlockingEventDispatcher;
 import archimulator.sim.os.Context;
 import archimulator.sim.os.ContextKilledEvent;
 import net.pickapack.action.Action1;
@@ -33,7 +32,7 @@ public class WaitPidCriterion implements SystemEventCriterion {
         this.hasPidKilled = false;
 
         if (this.pid == -1) {
-            context.getBlockingEventDispatcher().addListener2(ContextKilledEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<ContextKilledEvent>() {
+            context.getBlockingEventDispatcher().addListener(ContextKilledEvent.class, new Action1<ContextKilledEvent>() {
                 public void apply(ContextKilledEvent event) {
                     hasPidKilled = true;
                 }

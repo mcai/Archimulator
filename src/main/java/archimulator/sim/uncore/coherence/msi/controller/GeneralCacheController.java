@@ -1,7 +1,6 @@
 package archimulator.sim.uncore.coherence.msi.controller;
 
 import archimulator.sim.base.event.DumpStatEvent;
-import archimulator.sim.base.event.MyBlockingEventDispatcher;
 import archimulator.sim.base.event.PollStatsEvent;
 import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.uncore.CacheAccessType;
@@ -25,7 +24,7 @@ public abstract class GeneralCacheController<StateT extends Serializable> extend
     public GeneralCacheController(CacheHierarchy cacheHierarchy, String name, CoherentCacheConfig config) {
         super(cacheHierarchy, name, config);
 
-        this.getBlockingEventDispatcher().addListener2(ResetStatEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<ResetStatEvent>() {
+        this.getBlockingEventDispatcher().addListener(ResetStatEvent.class, new Action1<ResetStatEvent>() {
             public void apply(ResetStatEvent event) {
                 numDownwardReadHits = 0;
                 numDownwardReadMisses = 0;
@@ -36,14 +35,14 @@ public abstract class GeneralCacheController<StateT extends Serializable> extend
             }
         });
 
-        this.getBlockingEventDispatcher().addListener2(PollStatsEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<PollStatsEvent>() {
+        this.getBlockingEventDispatcher().addListener(PollStatsEvent.class, new Action1<PollStatsEvent>() {
             @Override
             public void apply(PollStatsEvent event) {
                 dumpStats(event.getStats());
             }
         });
 
-        this.getBlockingEventDispatcher().addListener2(DumpStatEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<DumpStatEvent>() {
+        this.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
             public void apply(DumpStatEvent event) {
                 if (event.getType() == DumpStatEvent.Type.DETAILED_SIMULATION) {
                     dumpStats(event.getStats());

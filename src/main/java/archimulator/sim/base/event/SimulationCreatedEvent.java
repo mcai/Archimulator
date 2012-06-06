@@ -2,8 +2,8 @@ package archimulator.sim.base.event;
 
 import archimulator.sim.base.experiment.Experiment;
 
-public class PauseExperimentEvent extends ExperimentEvent {
-    public PauseExperimentEvent(Experiment experiment) {
+public class SimulationCreatedEvent extends ExperimentEvent {
+    public SimulationCreatedEvent(Experiment experiment) {
         super(experiment);
     }
 }

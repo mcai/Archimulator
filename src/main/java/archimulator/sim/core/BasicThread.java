@@ -18,7 +18,6 @@
  ******************************************************************************/
 package archimulator.sim.core;
 
-import archimulator.sim.base.event.MyBlockingEventDispatcher;
 import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.core.bpred.BranchPredictorUpdate;
 import archimulator.sim.core.bpred.DynamicBranchPredictor;
@@ -61,7 +60,7 @@ public class BasicThread extends AbstractBasicThread {
 
         this.lineSizeOfIcache = this.core.getInstructionCache().getConfig().getGeometry().getLineSize();
 
-        this.getBlockingEventDispatcher().addListener2(ResetStatEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<ResetStatEvent>() {
+        this.getBlockingEventDispatcher().addListener(ResetStatEvent.class, new Action1<ResetStatEvent>() {
             public void apply(ResetStatEvent event) {
                 BasicThread.this.noInstructionCommittedCounterThreshold = 0;
             }

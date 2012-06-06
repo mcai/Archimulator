@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.os;
 
+import archimulator.sim.base.event.SimulationEvent;
 import archimulator.sim.base.experiment.capability.ExperimentCapabilityFactory;
 import archimulator.sim.base.experiment.capability.KernelCapability;
 import archimulator.sim.base.simulation.BasicSimulationObject;
@@ -28,7 +29,6 @@ import archimulator.sim.isa.StaticInstruction;
 import archimulator.sim.os.event.SystemEvent;
 import archimulator.sim.os.signal.SignalAction;
 import net.pickapack.action.Predicate;
-import net.pickapack.event.BlockingEvent;
 import net.pickapack.io.buffer.CircularByteBuffer;
 
 import java.util.*;
@@ -75,10 +75,13 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
             this.capabilities.put(capabilityClz, ExperimentCapabilityFactory.createKernelCapability(capabilityClz, this));
         }
 
-        simulation.getBlockingEventDispatcher().dispatch(new KernelCapabilitiesInitializedEvent());
+        simulation.getBlockingEventDispatcher().dispatch(new KernelCapabilitiesInitializedEvent(simulation));
     }
 
-    public class KernelCapabilitiesInitializedEvent implements BlockingEvent {
+    public class KernelCapabilitiesInitializedEvent extends SimulationEvent {
+        public KernelCapabilitiesInitializedEvent(Simulation simulation) {
+            super(simulation);
+        }
     }
 
     public Process getProcessFromId(int id) {

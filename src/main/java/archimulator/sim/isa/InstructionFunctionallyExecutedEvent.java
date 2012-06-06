@@ -18,15 +18,16 @@
  ******************************************************************************/
 package archimulator.sim.isa;
 
+import archimulator.sim.base.event.SimulationEvent;
 import archimulator.sim.os.Context;
-import net.pickapack.event.BlockingEvent;
 
-public class InstructionFunctionallyExecutedEvent implements BlockingEvent {
+public class InstructionFunctionallyExecutedEvent extends SimulationEvent {
     private int pc;
     private StaticInstruction staticInst;
     private Context context;
 
     public InstructionFunctionallyExecutedEvent(int pc, StaticInstruction staticInst, Context context) {
+        super(context);
         this.pc = pc;
         this.staticInst = staticInst;
         this.context = context;

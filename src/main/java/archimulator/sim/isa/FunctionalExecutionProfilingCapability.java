@@ -19,7 +19,6 @@
 package archimulator.sim.isa;
 
 import archimulator.sim.base.event.DumpStatEvent;
-import archimulator.sim.base.event.MyBlockingEventDispatcher;
 import archimulator.sim.base.event.PollStatsEvent;
 import archimulator.sim.base.experiment.capability.KernelCapability;
 import archimulator.sim.os.Kernel;
@@ -41,9 +40,9 @@ public class FunctionalExecutionProfilingCapability implements KernelCapability 
         this.executedMnemonics = EnumSet.noneOf(Mnemonic.class);
         this.executedSyscalls = new HashSet<String>();
 
-        kernel.getBlockingEventDispatcher().addListener2(Kernel.KernelCapabilitiesInitializedEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<Kernel.KernelCapabilitiesInitializedEvent>() {
+        kernel.getBlockingEventDispatcher().addListener(Kernel.KernelCapabilitiesInitializedEvent.class, new Action1<Kernel.KernelCapabilitiesInitializedEvent>() {
             public void apply(Kernel.KernelCapabilitiesInitializedEvent event) {
-                kernel.getBlockingEventDispatcher().addListener2(InstructionFunctionallyExecutedEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<InstructionFunctionallyExecutedEvent>() {
+                kernel.getBlockingEventDispatcher().addListener(InstructionFunctionallyExecutedEvent.class, new Action1<InstructionFunctionallyExecutedEvent>() {
                     public void apply(InstructionFunctionallyExecutedEvent event1) {
                         Mnemonic mnemonic = event1.getStaticInst().getMnemonic();
                         if (!executedMnemonics.contains(mnemonic)) {
@@ -54,7 +53,7 @@ public class FunctionalExecutionProfilingCapability implements KernelCapability 
             }
         });
 
-        kernel.getBlockingEventDispatcher().addListener2(SyscallExecutedEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<SyscallExecutedEvent>() {
+        kernel.getBlockingEventDispatcher().addListener(SyscallExecutedEvent.class, new Action1<SyscallExecutedEvent>() {
             public void apply(SyscallExecutedEvent event) {
 //                System.out.println(event.getContext().getRegs().dump());
 
@@ -67,13 +66,13 @@ public class FunctionalExecutionProfilingCapability implements KernelCapability 
             }
         });
 
-        kernel.getBlockingEventDispatcher().addListener2(PollStatsEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<PollStatsEvent>() {
+        kernel.getBlockingEventDispatcher().addListener(PollStatsEvent.class, new Action1<PollStatsEvent>() {
             public void apply(PollStatsEvent event) {
                 dumpStats(event.getStats());
             }
         });
 
-        kernel.getBlockingEventDispatcher().addListener2(DumpStatEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<DumpStatEvent>() {
+        kernel.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
             public void apply(DumpStatEvent event) {
                 dumpStats(event.getStats());
             }

@@ -19,10 +19,11 @@
 package archimulator.client;
 
 import archimulator.service.ArchimulatorService;
-import archimulator.sim.base.event.MyBlockingEventDispatcher;
+import archimulator.sim.base.event.DumpStatsCompletedEvent;
+import archimulator.sim.base.event.PollStatsCompletedEvent;
+import archimulator.sim.base.event.SimulationCreatedEvent;
 import archimulator.sim.base.experiment.Experiment;
 import archimulator.sim.base.experiment.profile.ExperimentProfile;
-import archimulator.sim.base.simulation.Simulation;
 import net.pickapack.DateHelper;
 import archimulator.util.UpdateHelper;
 import net.pickapack.action.Action1;
@@ -152,52 +153,61 @@ public class GuestStartup {
 
                 final Experiment experiment = experimentProfile.createExperiment();
 
-                experiment.getBlockingEventDispatcher().addListener2(Simulation.PollStatsCompletedEvent.class, MyBlockingEventDispatcher.ListenerType.EXPERIMENT_WIDE, new Action1<Simulation.PollStatsCompletedEvent>() {
-                    @Override
-                    public void apply(final Simulation.PollStatsCompletedEvent event) {
-                        try {
-                            Map<String, Object> stats = event.getStats();
-
-                            Map<String, String> stats1 = new LinkedHashMap<String, String>();
-                            for (String key : stats.keySet()) {
-                                stats1.put(key, stats.get(key) + "");
-                            }
-
-                            archimulatorService.updateExperimentStatsById(experimentProfile.getId(), stats1);
-                        } catch (SQLException e) {
-                            recordException(e);
-                            //                        throw new RuntimeException(e);
-                        } catch (Exception e) {
-                            recordException(e);
-                            //                        throw new RuntimeException(e);
-                        }
-                    }
-                });
-
-                experiment.getBlockingEventDispatcher().addListener2(Simulation.DumpStatsCompletedEvent.class, MyBlockingEventDispatcher.ListenerType.EXPERIMENT_WIDE, new Action1<Simulation.DumpStatsCompletedEvent>() {
-                    @Override
-                    public void apply(final Simulation.DumpStatsCompletedEvent event) {
-                        try {
-                            Map<String, Object> stats = event.getStats();
-
-                            Map<String, String> stats1 = new LinkedHashMap<String, String>();
-                            for (String key : stats.keySet()) {
-                                stats1.put(key, stats.get(key) + "");
-                            }
-
-                            archimulatorService.updateExperimentStatsById(experimentProfile.getId(), stats1);
-                        } catch (SQLException e) {
-                            recordException(e);
-                            //                        throw new RuntimeException(e);
-                        } catch (Exception e) {
-                            recordException(e);
-                            //                        throw new RuntimeException(e);
-                        }
-                    }
-                });
-
                 this.experimentProfileIdsToExperiments.put(experimentProfile.getId(), experiment);
-                experiment.runToEnd();
+
+                experiment.start();
+
+                experiment.getBlockingEventDispatcher().addListener(SimulationCreatedEvent.class, new Action1<SimulationCreatedEvent>() {
+                    @Override
+                    public void apply(SimulationCreatedEvent event) {
+                        experiment.getSimulation().getBlockingEventDispatcher().addListener(PollStatsCompletedEvent.class, new Action1<PollStatsCompletedEvent>() {
+                            @Override
+                            public void apply(final PollStatsCompletedEvent event) {
+                                try {
+                                    Map<String, Object> stats = event.getStats();
+
+                                    Map<String, String> stats1 = new LinkedHashMap<String, String>();
+                                    for (String key : stats.keySet()) {
+                                        stats1.put(key, stats.get(key) + "");
+                                    }
+
+                                    archimulatorService.updateExperimentStatsById(experimentProfile.getId(), stats1);
+                                } catch (SQLException e) {
+                                    recordException(e);
+                                    //                        throw new RuntimeException(e);
+                                } catch (Exception e) {
+                                    recordException(e);
+                                    //                        throw new RuntimeException(e);
+                                }
+                            }
+                        });
+
+                        experiment.getSimulation().getBlockingEventDispatcher().addListener(DumpStatsCompletedEvent.class, new Action1<DumpStatsCompletedEvent>() {
+                            @Override
+                            public void apply(final DumpStatsCompletedEvent event) {
+                                try {
+                                    Map<String, Object> stats = event.getStats();
+
+                                    Map<String, String> stats1 = new LinkedHashMap<String, String>();
+                                    for (String key : stats.keySet()) {
+                                        stats1.put(key, stats.get(key) + "");
+                                    }
+
+                                    archimulatorService.updateExperimentStatsById(experimentProfile.getId(), stats1);
+                                } catch (SQLException e) {
+                                    recordException(e);
+                                    //                        throw new RuntimeException(e);
+                                } catch (Exception e) {
+                                    recordException(e);
+                                    //                        throw new RuntimeException(e);
+                                }
+                            }
+                        });
+                    }
+                });
+
+                experiment.join();
+
                 this.stopExperiment(experimentProfile.getId());
                 return true;
             } else {

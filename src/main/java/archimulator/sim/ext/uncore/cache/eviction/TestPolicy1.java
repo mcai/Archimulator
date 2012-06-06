@@ -18,7 +18,6 @@
  ******************************************************************************/
 package archimulator.sim.ext.uncore.cache.eviction;
 
-import archimulator.sim.base.event.MyBlockingEventDispatcher;
 import archimulator.sim.base.event.ProcessorInitializedEvent;
 import archimulator.sim.core.BasicThread;
 import archimulator.sim.core.Processor;
@@ -37,7 +36,7 @@ public class TestPolicy1<StateT extends Serializable> extends LRUPolicy<StateT> 
     public TestPolicy1(EvictableCache<StateT> cache) {
         super(cache);
 
-        cache.getBlockingEventDispatcher().addListener2(ProcessorInitializedEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<ProcessorInitializedEvent>() {
+        cache.getBlockingEventDispatcher().addListener(ProcessorInitializedEvent.class, new Action1<ProcessorInitializedEvent>() {
             public void apply(ProcessorInitializedEvent event) {
                 TestPolicy1.this.processor = event.getProcessor();
             }

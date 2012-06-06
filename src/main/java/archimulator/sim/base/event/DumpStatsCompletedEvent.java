@@ -4,10 +4,10 @@ import archimulator.sim.base.simulation.Simulation;
 
 import java.util.Map;
 
-public class PollStatsEvent extends SimulationEvent {
+public class DumpStatsCompletedEvent extends SimulationEvent {
     private Map<String, Object> stats;
 
-    public PollStatsEvent(Simulation simulation, Map<String, Object> stats) {
+    public DumpStatsCompletedEvent(Simulation simulation, Map<String, Object> stats) {
         super(simulation);
         this.stats = stats;
     }

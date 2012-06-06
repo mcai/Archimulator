@@ -18,13 +18,14 @@
  ******************************************************************************/
 package archimulator.sim.core.event;
 
+import archimulator.sim.base.event.SimulationEvent;
 import archimulator.sim.core.DynamicInstruction;
-import net.pickapack.event.BlockingEvent;
 
-public class InstructionCommittedEvent implements BlockingEvent {
+public class InstructionCommittedEvent extends SimulationEvent {
     private DynamicInstruction dynamicInst;
 
     public InstructionCommittedEvent(DynamicInstruction dynamicInst) {
+        super(dynamicInst.getThread());
         this.dynamicInst = dynamicInst;
     }
 
