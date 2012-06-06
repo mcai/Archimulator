@@ -28,6 +28,8 @@ import archimulator.sim.core.BasicThread;
 import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.cache.*;
 import archimulator.sim.uncore.cache.eviction.LRUPolicy;
+import archimulator.sim.uncore.coherence.event.CoherentCacheLastPutSOrPutMAndDataFromOwnerEvent;
+import archimulator.sim.uncore.coherence.event.CoherentCacheLineReplacementEvent;
 import archimulator.sim.uncore.coherence.event.CoherentCacheNonblockingRequestHitToTransientTagEvent;
 import archimulator.sim.uncore.coherence.event.CoherentCacheServiceNonblockingRequestEvent;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
@@ -98,6 +100,20 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
                 if (event.getCacheController().equals(HTLLCRequestProfilingCapability.this.llc)) {
                     handleServicingRequest(event);
                 }
+            }
+        });
+
+        llc.getBlockingEventDispatcher().addListener2(CoherentCacheLineReplacementEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<CoherentCacheLineReplacementEvent>() {
+            @Override
+            public void apply(CoherentCacheLineReplacementEvent event) {
+                handleReplacement(event);
+            }
+        });
+
+        llc.getBlockingEventDispatcher().addListener2(CoherentCacheLastPutSOrPutMAndDataFromOwnerEvent.class, MyBlockingEventDispatcher.ListenerType.SIMULATION_WIDE, new Action1<CoherentCacheLastPutSOrPutMAndDataFromOwnerEvent>() {
+            @Override
+            public void apply(CoherentCacheLastPutSOrPutMAndDataFromOwnerEvent event) {
+                handleLastPutSOrPutMAndDataFromOwner(event);
             }
         });
 
@@ -183,19 +199,18 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
 
     private void handleServicingRequest(CoherentCacheServiceNonblockingRequestEvent event) {
         pw.printf(
-                "[%d] llc [%d,%d] {%s} %s: %s by %s {%s} %s 0x%08x: 0x%08x\n",
+                "[%d] llc.[%d,%d] {%s} %s: %s {%s} %s 0x%08x: 0x%08x (%s)\n",
                 llc.getCycleAccurateEventQueue().getCurrentCycle(),
                 event.getLineFound().getSet(),
                 event.getLineFound().getWay(),
                 event.getLineFound().getState(),
                 (event.getLineFound().getState() != event.getLineFound().getInitialState() ? String.format("0x%08x", event.getLineFound().getTag()) : "N/A"),
-                event.isHitInCache() ? "hit" : "miss",
                 event.getRequesterAccess().getThread().getName(),
                 event.getRequesterAccess().getId(),
                 event.getRequesterAccess().getType(),
                 event.getRequesterAccess().getVirtualPc(),
-                event.getRequesterAccess().getPhysicalTag()
-
+                event.getRequesterAccess().getPhysicalTag(),
+                event.isHitInCache() ? "hit" : "miss"
         );
 //        pw.println(event);
         pw.flush();
@@ -270,6 +285,42 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
         } else if (mtHit && vtHit) {
             this.setLRU(set, vtLine.getWay());
         }
+    }
+
+    private void handleReplacement(CoherentCacheLineReplacementEvent event) {
+        pw.printf(
+                "[%d] llc.[%d,%d] {%s} %s: %s {%s} %s 0x%08x: 0x%08x REPLACEMENT\n",
+                llc.getCycleAccurateEventQueue().getCurrentCycle(),
+                event.getLineFound().getSet(),
+                event.getLineFound().getWay(),
+                event.getLineFound().getState(),
+                (event.getLineFound().getState() != event.getLineFound().getInitialState() ? String.format("0x%08x", event.getLineFound().getTag()) : "N/A"),
+                event.getRequesterAccess().getThread().getName(),
+                event.getRequesterAccess().getId(),
+                event.getRequesterAccess().getType(),
+                event.getRequesterAccess().getVirtualPc(),
+                event.getRequesterAccess().getPhysicalTag()
+        );
+//        pw.println(event);
+        pw.flush();
+    }
+
+    private void handleLastPutSOrPutMAndDataFromOwner(CoherentCacheLastPutSOrPutMAndDataFromOwnerEvent event) {
+        pw.printf(
+                "[%d] llc.[%d,%d] {%s} %s: %s {%s} %s 0x%08x: 0x%08x LAST_PUTS or PUTM_AND_DATA_FROM_OWNER\n",
+                llc.getCycleAccurateEventQueue().getCurrentCycle(),
+                event.getLineFound().getSet(),
+                event.getLineFound().getWay(),
+                event.getLineFound().getState(),
+                (event.getLineFound().getState() != event.getLineFound().getInitialState() ? String.format("0x%08x", event.getLineFound().getTag()) : "N/A"),
+                event.getRequesterAccess().getThread().getName(),
+                event.getRequesterAccess().getId(),
+                event.getRequesterAccess().getType(),
+                event.getRequesterAccess().getVirtualPc(),
+                event.getRequesterAccess().getPhysicalTag()
+        );
+//        pw.println(event);
+        pw.flush();
     }
 
     private void markHT(int set, int way) {

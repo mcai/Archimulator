@@ -4,6 +4,7 @@ import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.coherence.event.CoherentCacheBeginCacheAccessEvent;
+import archimulator.sim.uncore.coherence.event.CoherentCacheLineReplacementEvent;
 import archimulator.sim.uncore.coherence.event.CoherentCacheNonblockingRequestHitToTransientTagEvent;
 import archimulator.sim.uncore.coherence.event.CoherentCacheServiceNonblockingRequestEvent;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
@@ -226,6 +227,11 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
         this.getCacheController().getBlockingEventDispatcher().dispatch(new CoherentCacheServiceNonblockingRequestEvent(this.getCacheController(), access, tag, cacheAccess.getLine(), cacheAccess.isHitInCache(), cacheAccess.isEviction(), cacheAccess.getReference().getAccessType()));
         this.getCacheController().getBlockingEventDispatcher().dispatch(new CoherentCacheBeginCacheAccessEvent(this.getCacheController(), access, cacheAccess));
         this.getCacheController().updateStats(cacheAccess);
+    }
+
+    public void fireReplacementEvent(MemoryHierarchyAccess access, int tag) {
+        CacheAccess<CacheControllerState> cacheAccess = this.getLine().getCacheAccess();
+        this.getCacheController().getBlockingEventDispatcher().dispatch(new CoherentCacheLineReplacementEvent(this.getCacheController(), access, tag, cacheAccess.getLine(), cacheAccess.isHitInCache(), cacheAccess.isEviction(), cacheAccess.getReference().getAccessType()));
     }
 
     public void fireNonblockingRequestHitToTransientTagEvent(MemoryHierarchyAccess access, int tag) {

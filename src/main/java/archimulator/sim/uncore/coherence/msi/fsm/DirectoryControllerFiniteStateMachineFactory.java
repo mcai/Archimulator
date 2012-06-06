@@ -229,7 +229,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                         fsm.sendRecallToSharers(replacementEvent, line.getTag());
                         fsm.clearSharers();
                         fsm.setOnCompletedCallback(replacementEvent.getOnCompletedCallback());
-                        fsm.fireServiceNonblockingRequestEvent(replacementEvent.getAccess(), replacementEvent.getTag());
+                        fsm.fireReplacementEvent(replacementEvent.getAccess(), replacementEvent.getTag());
                         fsm.getDirectoryController().incNumEvictions();
                     }
                 }, DirectoryControllerState.SI_A)
@@ -253,6 +253,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
 
                         fsm.removeReqFromSharers(req);
                         fsm.sendPutAckToReq(putSLastEvent, req, tag);
+                        fsm.firePutSOrPutMAndDataFromOwnerEvent(putSLastEvent.getAccess(), putSLastEvent.getTag());
                         fsm.getLine().setTag(CacheLine.INVALID_TAG);
                     }
                 }, DirectoryControllerState.I)
@@ -304,7 +305,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                         fsm.sendRecallToOwner(replacementEvent, line.getTag());
                         fsm.clearOwner();
                         fsm.setOnCompletedCallback(replacementEvent.getOnCompletedCallback());
-                        fsm.fireServiceNonblockingRequestEvent(replacementEvent.getAccess(), replacementEvent.getTag());
+                        fsm.fireReplacementEvent(replacementEvent.getAccess(), replacementEvent.getTag());
                         fsm.getDirectoryController().incNumEvictions();
                     }
                 }, DirectoryControllerState.MI_A)
@@ -338,6 +339,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                         fsm.copyDataToMemory(tag);
                         fsm.clearOwner();
                         fsm.sendPutAckToReq(putMAndDataFromOwnerEvent, req, tag);
+                        fsm.firePutSOrPutMAndDataFromOwnerEvent(putMAndDataFromOwnerEvent.getAccess(), putMAndDataFromOwnerEvent.getTag());
                         fsm.getLine().setTag(CacheLine.INVALID_TAG);
                     }
                 }, DirectoryControllerState.I)

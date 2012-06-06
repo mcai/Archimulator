@@ -3,9 +3,7 @@ package archimulator.sim.uncore.coherence.msi.fsm;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.cache.CacheLine;
-import archimulator.sim.uncore.coherence.event.CoherentCacheBeginCacheAccessEvent;
-import archimulator.sim.uncore.coherence.event.CoherentCacheNonblockingRequestHitToTransientTagEvent;
-import archimulator.sim.uncore.coherence.event.CoherentCacheServiceNonblockingRequestEvent;
+import archimulator.sim.uncore.coherence.event.*;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryEntry;
@@ -162,6 +160,16 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
         this.getDirectoryController().getBlockingEventDispatcher().dispatch(new CoherentCacheServiceNonblockingRequestEvent(this.getDirectoryController(), access, tag, cacheAccess.getLine(), cacheAccess.isHitInCache(), cacheAccess.isEviction(), cacheAccess.getReference().getAccessType()));
         this.getDirectoryController().getBlockingEventDispatcher().dispatch(new CoherentCacheBeginCacheAccessEvent(this.getDirectoryController(), access, cacheAccess));
         this.getDirectoryController().updateStats(cacheAccess);
+    }
+
+    public void fireReplacementEvent(MemoryHierarchyAccess access, int tag) {
+        CacheAccess<DirectoryControllerState> cacheAccess = this.getLine().getCacheAccess();
+        this.getDirectoryController().getBlockingEventDispatcher().dispatch(new CoherentCacheLineReplacementEvent(this.getDirectoryController(), access, tag, cacheAccess.getLine(), cacheAccess.isHitInCache(), cacheAccess.isEviction(), cacheAccess.getReference().getAccessType()));
+    }
+
+    public void firePutSOrPutMAndDataFromOwnerEvent(MemoryHierarchyAccess access, int tag) {
+        CacheAccess<DirectoryControllerState> cacheAccess = this.getLine().getCacheAccess();
+        this.getDirectoryController().getBlockingEventDispatcher().dispatch(new CoherentCacheLastPutSOrPutMAndDataFromOwnerEvent(this.getDirectoryController(), access, tag, cacheAccess.getLine()));
     }
 
     public void fireNonblockingRequestHitToTransientTagEvent(MemoryHierarchyAccess access, int tag) {
