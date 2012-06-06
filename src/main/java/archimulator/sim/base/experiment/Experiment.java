@@ -34,7 +34,6 @@ import net.pickapack.Params;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
 import net.pickapack.action.Action4;
-import net.pickapack.event.BlockingEvent;
 import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
 import net.pickapack.fsm.BasicFiniteStateMachine;
