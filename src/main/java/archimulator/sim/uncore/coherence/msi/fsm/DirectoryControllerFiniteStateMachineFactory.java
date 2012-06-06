@@ -38,8 +38,8 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                                 });
                             }
                         });
-                        fsm.getLine().setTag(getSEvent.getTag());
                         fsm.fireServiceNonblockingRequestEvent(getSEvent.getAccess(), getSEvent.getTag());
+                        fsm.getLine().setTag(getSEvent.getTag());
                     }
                 }, DirectoryControllerState.IS_D)
                 .onCondition(DirectoryControllerEventType.GETM, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
@@ -66,8 +66,8 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                                 });
                             }
                         });
-                        fsm.getLine().setTag(getMEvent.getTag());
                         fsm.fireServiceNonblockingRequestEvent(getMEvent.getAccess(), getMEvent.getTag());
+                        fsm.getLine().setTag(getMEvent.getTag());
                     }
                 }, DirectoryControllerState.IM_D);
 

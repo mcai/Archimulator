@@ -19,6 +19,7 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
                     public void apply(final CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
                         final LoadEvent loadEvent = (LoadEvent) params;
                         fsm.sendGetSToDir(loadEvent, loadEvent.getTag());
+                        fsm.fireServiceNonblockingRequestEvent(loadEvent.getAccess(), loadEvent.getTag());
                         fsm.getLine().setTag(loadEvent.getTag());
                         fsm.setOnCompletedCallback(new Action() {
                             @Override
@@ -27,7 +28,6 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
                                 loadEvent.getOnCompletedCallback().apply();
                             }
                         });
-                        fsm.fireServiceNonblockingRequestEvent(loadEvent.getAccess(), loadEvent.getTag());
                     }
                 }, CacheControllerState.IS_D)
                 .onCondition(CacheControllerEventType.STORE, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
@@ -35,6 +35,7 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
                     public void apply(final CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
                         final StoreEvent storeEvent = (StoreEvent) params;
                         fsm.sendGetMToDir(storeEvent, storeEvent.getTag());
+                        fsm.fireServiceNonblockingRequestEvent(storeEvent.getAccess(), storeEvent.getTag());
                         fsm.getLine().setTag(storeEvent.getTag());
                         fsm.setOnCompletedCallback(new Action() {
                             @Override
@@ -43,7 +44,6 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
                                 storeEvent.getOnCompletedCallback().apply();
                             }
                         });
-                        fsm.fireServiceNonblockingRequestEvent(storeEvent.getAccess(), storeEvent.getTag());
                     }
                 }, CacheControllerState.IM_AD);
 

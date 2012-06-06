@@ -65,13 +65,47 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
 
     private long numLateHTLLCRequests;
 
+    private Map<Integer, CacheSetStat> cacheSetStats;
+
     private BlockingEventDispatcher<HTLLCRequestProfilingCapabilityEvent> eventDispatcher;
+
+    private boolean printTrace = false;
+
+    private class CacheSetStat {
+        private long numMTLLCMisses;
+
+        private long numTotalHTLLCRequests;
+
+        private long numUsefulHTLLCRequests;
+
+        private long numGoodHTLLCRequests;
+        private long numBadHTLLCRequests;
+
+        private long numLateHTLLCRequests;
+
+        private void reset() {
+            numMTLLCMisses = 0;
+
+            numTotalHTLLCRequests = 0;
+
+            numUsefulHTLLCRequests = 0;
+
+            numGoodHTLLCRequests = 0;
+            numBadHTLLCRequests = 0;
+
+            numLateHTLLCRequests = 0;
+        }
+
+        private long getNumUglyHTLLCRequests() {
+            return numTotalHTLLCRequests - numGoodHTLLCRequests - numBadHTLLCRequests;
+        }
+    }
 
     public HTLLCRequestProfilingCapability(Simulation simulation) {
         this(simulation.getProcessor().getCacheHierarchy().getL2Cache());
     }
 
-    public HTLLCRequestProfilingCapability(DirectoryController llc) {
+    public HTLLCRequestProfilingCapability(final DirectoryController llc) {
         this.llc = llc;
 
         this.llcLineBroughterThreadIds = new HashMap<Integer, Map<Integer, Integer>>();
@@ -82,6 +116,11 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
             for (int way = 0; way < this.llc.getCache().getAssociativity(); way++) {
                 llcLineBroughterThreadIdsPerSet.put(way, -1);
             }
+        }
+
+        this.cacheSetStats = new HashMap<Integer, CacheSetStat>();
+        for (int set = 0; set < this.llc.getCache().getNumSets(); set++) {
+            this.cacheSetStats.put(set, new CacheSetStat());
         }
 
         ValueProviderFactory<HTLLCRequestVictimCacheLineState, ValueProvider<HTLLCRequestVictimCacheLineState>> cacheLineStateProviderFactory = new ValueProviderFactory<HTLLCRequestVictimCacheLineState, ValueProvider<HTLLCRequestVictimCacheLineState>>() {
@@ -101,21 +140,23 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
         llc.getBlockingEventDispatcher().addListener(CoherentCacheServiceNonblockingRequestEvent.class, new Action1<CoherentCacheServiceNonblockingRequestEvent>() {
             public void apply(CoherentCacheServiceNonblockingRequestEvent event) {
                 if (event.getCacheController().equals(HTLLCRequestProfilingCapability.this.llc)) {
-                    pw.printf(
-                            "[%d] llc.[%d,%d] {%s} %s: %s {%s} %s 0x%08x: 0x%08x (%s)\n",
-                            HTLLCRequestProfilingCapability.this.llc.getCycleAccurateEventQueue().getCurrentCycle(),
-                            event.getLineFound().getSet(),
-                            event.getLineFound().getWay(),
-                            event.getLineFound().getState(),
-                            (event.getLineFound().getState() != event.getLineFound().getInitialState() ? String.format("0x%08x", event.getLineFound().getTag()) : "N/A"),
-                            event.getRequesterAccess().getThread().getName(),
-                            event.getRequesterAccess().getId(),
-                            event.getRequesterAccess().getType(),
-                            event.getRequesterAccess().getVirtualPc(),
-                            event.getRequesterAccess().getPhysicalTag(),
-                            event.isHitInCache() ? "hit" : "miss"
-                    );
-                    pw.flush();
+                    if(printTrace) {
+                        pw.printf(
+                                "[%d] llc.[%d,%d] {%s} %s: %s {%s} %s 0x%08x: 0x%08x (%s)\n",
+                                HTLLCRequestProfilingCapability.this.llc.getCycleAccurateEventQueue().getCurrentCycle(),
+                                event.getLineFound().getSet(),
+                                event.getLineFound().getWay(),
+                                event.getLineFound().getState(),
+                                (event.getLineFound().getState() != event.getLineFound().getInitialState() ? String.format("0x%08x", event.getLineFound().getTag()) : "N/A"),
+                                event.getRequesterAccess().getThread().getName(),
+                                event.getRequesterAccess().getId(),
+                                event.getRequesterAccess().getType(),
+                                event.getRequesterAccess().getVirtualPc(),
+                                event.getRequesterAccess().getPhysicalTag(),
+                                event.isHitInCache() ? "hit" : "miss"
+                        );
+                        pw.flush();
+                    }
 
                     boolean requesterIsHT = BasicThread.isHelperThread(event.getRequesterAccess().getThread());
                     CacheLine<?> llcLine = event.getLineFound();
@@ -141,20 +182,22 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
         llc.getBlockingEventDispatcher().addListener(CoherentCacheLastPutSOrPutMAndDataFromOwnerEvent.class, new Action1<CoherentCacheLastPutSOrPutMAndDataFromOwnerEvent>() {
             @Override
             public void apply(CoherentCacheLastPutSOrPutMAndDataFromOwnerEvent event) {
-                pw.printf(
-                        "[%d] llc.[%d,%d] {%s} %s: %s {%s} %s 0x%08x: 0x%08x LAST_PUTS or PUTM_AND_DATA_FROM_OWNER\n",
-                        HTLLCRequestProfilingCapability.this.llc.getCycleAccurateEventQueue().getCurrentCycle(),
-                        event.getLineFound().getSet(),
-                        event.getLineFound().getWay(),
-                        event.getLineFound().getState(),
-                        (event.getLineFound().getState() != event.getLineFound().getInitialState() ? String.format("0x%08x", event.getLineFound().getTag()) : "N/A"),
-                        event.getRequesterAccess().getThread().getName(),
-                        event.getRequesterAccess().getId(),
-                        event.getRequesterAccess().getType(),
-                        event.getRequesterAccess().getVirtualPc(),
-                        event.getRequesterAccess().getPhysicalTag()
-                );
-                pw.flush();
+                if(printTrace) {
+                    pw.printf(
+                            "[%d] llc.[%d,%d] {%s} %s: %s {%s} %s 0x%08x: 0x%08x LAST_PUTS or PUTM_AND_DATA_FROM_OWNER\n",
+                            HTLLCRequestProfilingCapability.this.llc.getCycleAccurateEventQueue().getCurrentCycle(),
+                            event.getLineFound().getSet(),
+                            event.getLineFound().getWay(),
+                            event.getLineFound().getState(),
+                            (event.getLineFound().getState() != event.getLineFound().getInitialState() ? String.format("0x%08x", event.getLineFound().getTag()) : "N/A"),
+                            event.getRequesterAccess().getThread().getName(),
+                            event.getRequesterAccess().getId(),
+                            event.getRequesterAccess().getType(),
+                            event.getRequesterAccess().getVirtualPc(),
+                            event.getRequesterAccess().getPhysicalTag()
+                    );
+                    pw.flush();
+                }
 
                 CacheLine<?> llcLine = event.getLineFound();
 
@@ -191,6 +234,10 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
                 numBadHTLLCRequests = 0;
 
                 numLateHTLLCRequests = 0;
+
+                for (int set = 0; set < llc.getCache().getNumSets(); set++) {
+                    cacheSetStats.get(set).reset();
+                }
             }
         });
 
@@ -238,6 +285,7 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
 
         if (!requesterIsHT && lineFoundIsHT) {
             this.numLateHTLLCRequests++;
+            this.cacheSetStats.get(set).numLateHTLLCRequests++;
             this.eventDispatcher.dispatch(new LateHTLLCRequestEvent());
         }
     }
@@ -256,6 +304,22 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
         if (!event.isHitInCache()) {
             if (requesterIsHT) {
                 this.numTotalHTLLCRequests++;
+                this.cacheSetStats.get(set).numTotalHTLLCRequests++;
+
+                if(printTrace) {
+                    pw.printf(
+                            "[%d] llc.[%d,%d] {%s} %s numTotalHTLLCRequests++ = %d, numUglyHTLLCRequests = %d\n",
+                            HTLLCRequestProfilingCapability.this.llc.getCycleAccurateEventQueue().getCurrentCycle(),
+                            event.getLineFound().getSet(),
+                            event.getLineFound().getWay(),
+                            event.getLineFound().getState(),
+                            (event.getLineFound().getState() != event.getLineFound().getInitialState() ? String.format("0x%08x", event.getLineFound().getTag()) : "N/A"),
+                            this.cacheSetStats.get(set).numTotalHTLLCRequests,
+                            this.cacheSetStats.get(set).getNumUglyHTLLCRequests()
+                    );
+                    pw.flush();
+                }
+
                 this.eventDispatcher.dispatch(new HTLLCRequestEvent());
             }
         }
@@ -263,8 +327,10 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
         if (!requesterIsHT) {
             if (!event.isHitInCache()) {
                 this.numMTLLCMisses++;
+                this.cacheSetStats.get(set).numMTLLCMisses++;
             } else if (event.isHitInCache() && lineFoundIsHT) {
                 this.numUsefulHTLLCRequests++;
+                this.cacheSetStats.get(set).numUsefulHTLLCRequests++;
             }
         }
 
@@ -304,32 +370,47 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
         boolean vtHit = !requesterIsHT && vtLine != null;
 
         if (!mtHit && !htHit && vtHit) {
-            pw.printf(
-                    "[%d] llc.[%d,%d] {%s} %s numBadHTLLCRequests++ (mtHit: %s, htHit: %s, vtHit: %s)\n",
-                    HTLLCRequestProfilingCapability.this.llc.getCycleAccurateEventQueue().getCurrentCycle(),
-                    event.getLineFound().getSet(),
-                    event.getLineFound().getWay(),
-                    event.getLineFound().getState(),
-                    (event.getLineFound().getState() != event.getLineFound().getInitialState() ? String.format("0x%08x", event.getLineFound().getTag()) : "N/A"),
-                    mtHit, htHit, vtHit
-            );
-            pw.flush();
             this.numBadHTLLCRequests++;
+            this.cacheSetStats.get(set).numBadHTLLCRequests++;
+
+            if(printTrace) {
+                pw.printf(
+                        "[%d] llc.[%d,%d] {%s} %s numBadHTLLCRequests++ = %d, numUglyHTLLCRequests = %d (mtHit: %s, htHit: %s, vtHit: %s)\n",
+                        HTLLCRequestProfilingCapability.this.llc.getCycleAccurateEventQueue().getCurrentCycle(),
+                        event.getLineFound().getSet(),
+                        event.getLineFound().getWay(),
+                        event.getLineFound().getState(),
+                        (event.getLineFound().getState() != event.getLineFound().getInitialState() ? String.format("0x%08x", event.getLineFound().getTag()) : "N/A"),
+                        this.cacheSetStats.get(set).numBadHTLLCRequests,
+                        this.cacheSetStats.get(set).getNumUglyHTLLCRequests(),
+                        mtHit, htHit, vtHit
+                );
+                pw.flush();
+            }
+
             this.eventDispatcher.dispatch(new BadHTLLCRequestEvent());
             this.setLRU(set, vtLine.getWay());
         } else if (!mtHit && htHit && !vtHit) {
             this.markMT(set, llcLine.getWay());
-            pw.printf(
-                    "[%d] llc.[%d,%d] {%s} %s numGoodHTLLCRequests++ (mtHit: %s, htHit: %s, vtHit: %s)\n",
-                    HTLLCRequestProfilingCapability.this.llc.getCycleAccurateEventQueue().getCurrentCycle(),
-                    event.getLineFound().getSet(),
-                    event.getLineFound().getWay(),
-                    event.getLineFound().getState(),
-                    (event.getLineFound().getState() != event.getLineFound().getInitialState() ? String.format("0x%08x", event.getLineFound().getTag()) : "N/A"),
-                    mtHit, htHit, vtHit
-            );
-            pw.flush();
+
             this.numGoodHTLLCRequests++;
+            this.cacheSetStats.get(set).numGoodHTLLCRequests++;
+
+            if(printTrace) {
+                pw.printf(
+                        "[%d] llc.[%d,%d] {%s} %s numGoodHTLLCRequests++ = %d, numUglyHTLLCRequests = %d (mtHit: %s, htHit: %s, vtHit: %s)\n",
+                        HTLLCRequestProfilingCapability.this.llc.getCycleAccurateEventQueue().getCurrentCycle(),
+                        event.getLineFound().getSet(),
+                        event.getLineFound().getWay(),
+                        event.getLineFound().getState(),
+                        (event.getLineFound().getState() != event.getLineFound().getInitialState() ? String.format("0x%08x", event.getLineFound().getTag()) : "N/A"),
+                        this.cacheSetStats.get(set).numGoodHTLLCRequests,
+                        this.cacheSetStats.get(set).getNumUglyHTLLCRequests(),
+                        mtHit, htHit, vtHit
+                );
+                pw.flush();
+            }
+
             this.removeLRU(set);
         } else if (!mtHit && htHit && vtHit) {
             this.markMT(set, llcLine.getWay());
@@ -374,8 +455,10 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
     }
 
     private void setLLCLineBroughterThreadId(int set, int way, int llcLineBroughterThreadId) {
-        pw.printf("[%d] llcLineBroughterThreadIds[%d,%d] = %d\n", llc.getCycleAccurateEventQueue().getCurrentCycle(), set, way, llcLineBroughterThreadId);
-        pw.flush();
+        if(printTrace) {
+            pw.printf("[%d] llcLineBroughterThreadIds[%d,%d] = %d\n", llc.getCycleAccurateEventQueue().getCurrentCycle(), set, way, llcLineBroughterThreadId);
+            pw.flush();
+        }
         this.llcLineBroughterThreadIds.get(set).put(way, llcLineBroughterThreadId);
     }
 
@@ -385,8 +468,10 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
         HTLLCRequestVictimCacheLineStateValueProvider stateProvider = (HTLLCRequestVictimCacheLineStateValueProvider) line.getStateProvider();
         stateProvider.setState(HTLLCRequestVictimCacheLineState.DATA);
         line.setTag(tag);
-        pw.printf("[%d] htLLCRequestVictimCache[%d,%d]: insertDataEntry(0x%08x)\n", llc.getCycleAccurateEventQueue().getCurrentCycle(), set, line.getWay(), tag);
-        pw.flush();
+        if(printTrace) {
+            pw.printf("[%d] htLLCRequestVictimCache[%d,%d]: insertDataEntry(0x%08x)\n", llc.getCycleAccurateEventQueue().getCurrentCycle(), set, line.getWay(), tag);
+            pw.flush();
+        }
         newMiss.commit();
     }
 
@@ -395,16 +480,20 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
         CacheLine<HTLLCRequestVictimCacheLineState> line = newMiss.getLine();
         HTLLCRequestVictimCacheLineStateValueProvider stateProvider = (HTLLCRequestVictimCacheLineStateValueProvider) line.getStateProvider();
         stateProvider.setState(HTLLCRequestVictimCacheLineState.NULL);
-        line.setTag(0);
-        pw.printf("[%d] htLLCRequestVictimCache[%d,%d]: insertNullEntry(0x%08x)\n", llc.getCycleAccurateEventQueue().getCurrentCycle(), set, line.getWay(), 0);
-        pw.flush();
+        line.setTag(CacheLine.INVALID_TAG);
+        if(printTrace) {
+            pw.printf("[%d] htLLCRequestVictimCache[%d,%d]: insertNullEntry(%s)\n", llc.getCycleAccurateEventQueue().getCurrentCycle(), set, line.getWay(), "N/A");
+            pw.flush();
+        }
         newMiss.commit();
     }
 
     private void setLRU(int set, int way) {
         this.getLruPolicyForHtRequestVictimCache().setLRU(set, way);
-        pw.printf("[%d] htLLCRequestVictimCache[%d,%d]: setLRU\n", llc.getCycleAccurateEventQueue().getCurrentCycle(), set, way);
-        pw.flush();
+        if(printTrace) {
+            pw.printf("[%d] htLLCRequestVictimCache[%d,%d]: setLRU\n", llc.getCycleAccurateEventQueue().getCurrentCycle(), set, way);
+            pw.flush();
+        }
     }
 
     private void removeLRU(int set) {
@@ -417,8 +506,10 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
                 HTLLCRequestVictimCacheLineStateValueProvider stateProvider = (HTLLCRequestVictimCacheLineStateValueProvider) line.getStateProvider();
                 stateProvider.setState(HTLLCRequestVictimCacheLineState.INVALID);
                 line.setTag(CacheLine.INVALID_TAG);
-                pw.printf("[%d] htLLCRequestVictimCache[%d,%d]: removeLRU\n", llc.getCycleAccurateEventQueue().getCurrentCycle(), set, way);
-                pw.flush();
+                if(printTrace) {
+                    pw.printf("[%d] htLLCRequestVictimCache[%d,%d]: removeLRU\n", llc.getCycleAccurateEventQueue().getCurrentCycle(), set, way);
+                    pw.flush();
+                }
                 return;
             }
         }
