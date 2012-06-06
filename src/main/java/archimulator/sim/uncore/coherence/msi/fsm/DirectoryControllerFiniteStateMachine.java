@@ -1,5 +1,6 @@
 package archimulator.sim.uncore.coherence.msi.fsm;
 
+import archimulator.sim.uncore.CacheSimulator;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.cache.CacheLine;
@@ -15,6 +16,7 @@ import archimulator.util.ValueProvider;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
 import net.pickapack.fsm.BasicFiniteStateMachine;
+import net.pickapack.fsm.event.EnterStateEvent;
 import net.pickapack.fsm.event.ExitStateEvent;
 
 import java.util.ArrayList;
@@ -33,7 +35,7 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
 
     private Action onCompletedCallback;
 
-    private List<String> transitionHistory = new ArrayList<String>(10);
+//    private List<String> transitionHistory = new ArrayList<String>(10);
 
     public DirectoryControllerFiniteStateMachine(String name, int set, int way, final DirectoryController directoryController) {
         super(name, DirectoryControllerState.I);
@@ -49,28 +51,34 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
             }
         });
 
-//        this.addListener(EnterStateEvent.class, new Action1<EnterStateEvent>() {
-//            @Override
-//            public void apply(EnterStateEvent enterStateEvent) {
-//                CacheLine<DirectoryControllerState> line = directoryController.getCache().getLine(getSet(), getWay());
-//
+        this.addListener(EnterStateEvent.class, new Action1<EnterStateEvent>() {
+            @Override
+            public void apply(EnterStateEvent enterStateEvent) {
+                CacheLine<DirectoryControllerState> line = directoryController.getCache().getLine(getSet(), getWay());
+
 //                if (getState() != previousState) {
-//                    String transitionText = String.format("[%d] %s.[%d,%d] {%s} %s: %s.%s -> %s (owner: %s, sharers: %s)",
-//                            directoryController.getCycleAccurateEventQueue().getCurrentCycle(), getName(), getSet(), getWay(), line.getTag() != CacheLine.INVALID_TAG ? String.format("0x%08x", line.getTag()) : "N/A", previousState, enterStateEvent.getSender() != null ? enterStateEvent.getSender() : "<N/A>", enterStateEvent.getCondition(), getState(),
-//                            getDirectoryEntry().getOwner() != null ? getDirectoryEntry().getOwner() : "N/A", getDirectoryEntry().getSharers().toString().replace("[", "").replace("]", ""));
+                    String transitionText = String.format("[%d] %s.[%d,%d] {%s} %s: %s.%s -> %s (owner: %s, sharers: %s)",
+                            directoryController.getCycleAccurateEventQueue().getCurrentCycle(), getName(), getSet(), getWay(), line.getTag() != CacheLine.INVALID_TAG ? String.format("0x%08x", line.getTag()) : "N/A", previousState, enterStateEvent.getSender() != null ? enterStateEvent.getSender() : "<N/A>", enterStateEvent.getCondition(), getState(),
+                            getDirectoryEntry().getOwner() != null ? getDirectoryEntry().getOwner() : "N/A", getDirectoryEntry().getSharers().toString().replace("[", "").replace("]", ""));
 //                    if (transitionHistory.size() >= 10) {
 //                        transitionHistory.remove(0);
 //                    }
 //
 //                    transitionHistory.add(transitionText);
-//
-//                    if (CacheSimulator.logEnabled) {
-//                        CacheSimulator.pw.println(transitionText);
-//                        CacheSimulator.pw.flush();
-//                    }
+
+                    if (CacheSimulator.logEnabled) {
+                        CacheSimulator.pw.println(transitionText);
+                        CacheSimulator.pw.flush();
+                    }
 //                }
-//            }
-//        });
+
+                if(getState() == DirectoryControllerState.I) {
+                    if(getDirectoryEntry().getOwner() != null || !getDirectoryEntry().getSharers().isEmpty()) {
+                        throw new IllegalArgumentException();
+                    }
+                }
+            }
+        });
     }
 
     public DirectoryControllerState getPreviousState() {
@@ -217,11 +225,19 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
 
     public void sendRecallToOwner(CacheCoherenceFlow producerFlow, int tag) {
         final CacheController owner = getDirectoryEntry().getOwner();
+        if(owner.getCache().findWay(tag) == -1) {
+            throw new IllegalArgumentException();
+        }
+
         this.directoryController.transfer(owner, 8, new RecallMessage(this.directoryController, producerFlow, tag, producerFlow.getAccess()));
     }
 
     public void sendRecallToSharers(CacheCoherenceFlow producerFlow, int tag) {
         for (final CacheController sharer : this.getDirectoryEntry().getSharers()) {
+            if(sharer.getCache().findWay(tag) == -1) {
+                throw new IllegalArgumentException();
+            }
+
             this.directoryController.transfer(sharer, 8, new RecallMessage(this.directoryController, producerFlow, tag, producerFlow.getAccess()));
         }
     }
@@ -235,15 +251,27 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
     }
 
     public void addReqAndOwnerToSharers(CacheController req) {
+        if(this.getDirectoryEntry().getSharers().contains(req) || this.getDirectoryEntry().getSharers().contains(this.getDirectoryEntry().getOwner())) {
+            throw new IllegalArgumentException();
+        }
+
         this.getDirectoryEntry().getSharers().add(req);
         this.getDirectoryEntry().getSharers().add(this.getDirectoryEntry().getOwner());
     }
 
     public void addReqToSharers(CacheController req) {
+        if(this.getDirectoryEntry().getSharers().contains(req)) {
+            throw new IllegalArgumentException();
+        }
+
         this.getDirectoryEntry().getSharers().add(req);
     }
 
     public void removeReqFromSharers(CacheController req) {
+        if(!this.getDirectoryEntry().getSharers().contains(req)) {
+            throw new IllegalArgumentException();
+        }
+
         this.getDirectoryEntry().getSharers().remove(req);
     }
 

@@ -45,12 +45,10 @@ public class CheckpointedExperiment extends Experiment {
     protected void doStart() {
         SimulationStartingImage simulationStartingImage = new SimulationStartingImage();
 
-        BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher = new BlockingEventDispatcher<SimulationEvent>();
-
-        this.doSimulation(this.getTitle() + "/checkpointedSimulation/phase0", new ToRoiFastForwardSimulationStrategy(this.getPhaser(), this.pthreadSpawnedIndex, simulationStartingImage), blockingEventDispatcher, getCycleAccurateEventQueue());
+        this.doSimulation(this.getTitle() + "/checkpointedSimulation/phase0", new ToRoiFastForwardSimulationStrategy(this.getPhaser(), this.pthreadSpawnedIndex, simulationStartingImage), new BlockingEventDispatcher<SimulationEvent>(), getCycleAccurateEventQueue());
 
         this.getCycleAccurateEventQueue().resetCurrentCycle();
 
-        this.doSimulation(this.getTitle() + "/checkpointedSimulation/phase1", new FromRoiDetailedSimulationStrategy(this.getPhaser(), this.maxInsts, simulationStartingImage), blockingEventDispatcher, getCycleAccurateEventQueue());
+        this.doSimulation(this.getTitle() + "/checkpointedSimulation/phase1", new FromRoiDetailedSimulationStrategy(this.getPhaser(), this.maxInsts, simulationStartingImage), new BlockingEventDispatcher<SimulationEvent>(), getCycleAccurateEventQueue());
     }
 }

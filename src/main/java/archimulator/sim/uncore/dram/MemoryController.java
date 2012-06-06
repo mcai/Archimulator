@@ -59,9 +59,11 @@ public abstract class MemoryController extends MemoryDevice {
     }
 
     private void dumpStats(Map<String, Object> stats) {
-        stats.put(getName() + ".accesses", String.valueOf(getAccesses()));
-        stats.put(getName() + ".reads", String.valueOf(reads));
-        stats.put(getName() + ".writes", String.valueOf(writes));
+        if(getAccesses() > 0) {
+            stats.put(getName() + ".accesses", String.valueOf(getAccesses()));
+            stats.put(getName() + ".reads", String.valueOf(reads));
+            stats.put(getName() + ".writes", String.valueOf(writes));
+        }
     }
 
     @Override

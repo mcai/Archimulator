@@ -77,9 +77,4 @@ public class FromRoiDetailedSimulationStrategy extends SequentialSimulationStrat
     public Kernel prepareKernel() {
         return this.simulationStartingImage.getKernel();
     }
-
-    @Override
-    public CacheHierarchy prepareCacheHierarchy() {
-        return this.simulationStartingImage.getCacheHierarchy();
-    }
 }

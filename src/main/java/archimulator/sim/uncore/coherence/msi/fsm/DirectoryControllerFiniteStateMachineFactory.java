@@ -38,7 +38,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                                 });
                             }
                         });
-
+                        fsm.getLine().setTag(getSEvent.getTag());
                         fsm.fireServiceNonblockingRequestEvent(getSEvent.getAccess(), getSEvent.getTag());
                     }
                 }, DirectoryControllerState.IS_D)
@@ -66,7 +66,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                                 });
                             }
                         });
-
+                        fsm.getLine().setTag(getMEvent.getTag());
                         fsm.fireServiceNonblockingRequestEvent(getMEvent.getAccess(), getMEvent.getTag());
                     }
                 }, DirectoryControllerState.IM_D);
@@ -123,7 +123,6 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                         DataFromMemoryEvent dataFromMemoryEvent = (DataFromMemoryEvent) params;
                         fsm.sendDataToReq(dataFromMemoryEvent, dataFromMemoryEvent.getReq(), dataFromMemoryEvent.getTag(), 0);
                         fsm.addReqToSharers(dataFromMemoryEvent.getReq());
-                        fsm.getLine().setTag(dataFromMemoryEvent.getTag());
                         fsm.getDirectoryController().getCache().getLine(fsm.getSet(), fsm.getWay()).getCacheAccess().commit();
                     }
                 }, DirectoryControllerState.S);
@@ -180,7 +179,6 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                         DataFromMemoryEvent dataFromMemoryEvent = (DataFromMemoryEvent) params;
                         fsm.sendDataToReq(dataFromMemoryEvent, dataFromMemoryEvent.getReq(), dataFromMemoryEvent.getTag(), 0);
                         fsm.setOwnerToReq(dataFromMemoryEvent.getReq());
-                        fsm.getLine().setTag(dataFromMemoryEvent.getTag());
                         fsm.getDirectoryController().getCache().getLine(fsm.getSet(), fsm.getWay()).getCacheAccess().commit();
                     }
                 }, DirectoryControllerState.M);

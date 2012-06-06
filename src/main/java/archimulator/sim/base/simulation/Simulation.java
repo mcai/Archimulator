@@ -27,8 +27,8 @@ import archimulator.sim.core.BasicProcessor;
 import archimulator.sim.core.Core;
 import archimulator.sim.core.Processor;
 import archimulator.sim.core.Thread;
-import archimulator.sim.os.Context;
-import archimulator.sim.os.Kernel;
+import archimulator.sim.os.*;
+import archimulator.sim.os.Process;
 import net.pickapack.StorageUnit;
 import net.pickapack.StringHelper;
 import net.pickapack.action.Action1;
@@ -81,6 +81,26 @@ public class Simulation implements SimulationObject {
 
         this.capabilities = new HashMap<Class<? extends SimulationCapability>, SimulationCapability>();
 
+        Kernel kernel = this.getStrategy().prepareKernel();
+
+        if(!this.blockingEventDispatcher.isEmpty()) {
+            throw new IllegalArgumentException();
+        }
+
+        this.processor = new BasicProcessor(this.blockingEventDispatcher, this.cycleAccurateEventQueue, this.config.getProcessorConfig(), kernel, this.getStrategy().prepareCacheHierarchy(), this.config.getProcessorConfig().getProcessorCapabilityClasses());
+
+        this.getBlockingEventDispatcher().dispatch(new ProcessorInitializedEvent(this.processor));
+
+        this.stopWatch = new StopWatch();
+
+        this.statsInFastForward = new LinkedHashMap<String, Object>();
+        this.statsInWarmup = new LinkedHashMap<String, Object>();
+        this.statsInMeasurement = new LinkedHashMap<String, Object>();
+
+        for (Class<? extends SimulationCapability> capabilityClz : capabilityClasses) {
+            this.capabilities.put(capabilityClz, ExperimentCapabilityFactory.createSimulationCapability(capabilityClz, this));
+        }
+
         this.getBlockingEventDispatcher().addListener(PollStatsEvent.class, new Action1<PollStatsEvent>() {
             public void apply(PollStatsEvent event) {
                 Map<String, Object> stats = event.getStats();
@@ -103,6 +123,10 @@ public class Simulation implements SimulationObject {
                 stats.put("cyclesPerSecond", MessageFormat.format("{0}", getCyclesPerSecond()));
                 stats.put("instsPerSecond", MessageFormat.format("{0}", getInstsPerSecond()));
 
+                for(Process process : getProcessor().getKernel().getProcesses()) {
+                    process.getMemory().dumpStats(stats);
+                }
+
                 stats.put("max memory", MessageFormat.format("{0}", StorageUnit.toString(Runtime.getRuntime().maxMemory())));
                 stats.put("total memory", MessageFormat.format("{0}", StorageUnit.toString(Runtime.getRuntime().totalMemory())));
                 stats.put("used memory", MessageFormat.format("{0}", StorageUnit.toString(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())));
@@ -114,20 +138,6 @@ public class Simulation implements SimulationObject {
                 dumpStat(event.getStats());
             }
         });
-
-        this.processor = new BasicProcessor(this.blockingEventDispatcher, this.cycleAccurateEventQueue, this.config.getProcessorConfig(), this.getStrategy().prepareKernel(), this.getStrategy().prepareCacheHierarchy(), this.config.getProcessorConfig().getProcessorCapabilityClasses());
-
-        this.getBlockingEventDispatcher().dispatch(new ProcessorInitializedEvent(this.processor));
-
-        this.stopWatch = new StopWatch();
-
-        this.statsInFastForward = new LinkedHashMap<String, Object>();
-        this.statsInWarmup = new LinkedHashMap<String, Object>();
-        this.statsInMeasurement = new LinkedHashMap<String, Object>();
-
-        for (Class<? extends SimulationCapability> capabilityClz : capabilityClasses) {
-            this.capabilities.put(capabilityClz, ExperimentCapabilityFactory.createSimulationCapability(capabilityClz, this));
-        }
     }
 
     public Kernel createKernel() {

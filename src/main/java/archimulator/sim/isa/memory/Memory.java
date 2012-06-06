@@ -62,12 +62,10 @@ public abstract class Memory extends BasicSimulationObject {
 
         this.speculative = false;
         this.specBlks = new TreeMap<Integer, List<SpeculativeMemoryBlock>>();
+    }
 
-        this.kernel.getBlockingEventDispatcher().addListener(PollStatsEvent.class, new Action1<PollStatsEvent>() {
-            public void apply(PollStatsEvent event) {
-                event.getStats().put("mem-" + id + ".numPages", numPages);
-            }
-        });
+    public void dumpStats(Map<String, Object> stats) {
+        stats.put("mem-" + id + ".numPages", numPages);
     }
 
     public byte readByte(int addr) {

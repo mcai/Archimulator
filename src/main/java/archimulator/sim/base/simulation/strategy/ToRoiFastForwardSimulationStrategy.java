@@ -72,7 +72,6 @@ public class ToRoiFastForwardSimulationStrategy extends SequentialSimulationStra
     @Override
     public void endSimulation() {
         this.simulationStartingImage.setKernel(this.getSimulation().getProcessor().getKernel());
-        this.simulationStartingImage.setCacheHierarchy(this.getSimulation().getProcessor().getCacheHierarchy());
     }
 
     @Override

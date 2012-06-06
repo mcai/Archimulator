@@ -114,9 +114,17 @@ public class CacheSimulator {
     private static boolean useTrace = false;
 //    private static boolean useTrace = true;
 
+    static {
+        try {
+            pw = new PrintWriter(new FileWriter(FileUtils.getUserDirectoryPath() + "/trace.txt"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static PrintWriter pw;
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         if(args.length != 1) {
             numMaxPendingAccesses = 300;
         }
@@ -125,8 +133,6 @@ public class CacheSimulator {
         }
 
         System.out.printf("[%s] numMaxPendingAccesses: %d%n", DateHelper.toString(new Date()),numMaxPendingAccesses);
-
-        pw = new PrintWriter(new FileWriter(FileUtils.getUserDirectoryPath() + "/trace.txt"));
 
         MemoryHierarchyConfig memoryHierarchyConfig = MemoryHierarchyConfig.createDefaultMemoryHierarchyConfig(64, 1, 64, 1, 64, 1, LRUPolicy.class);
         ProcessorConfig processorConfig = ProcessorConfig.createDefaultProcessorConfig(memoryHierarchyConfig, null, null, 8, 2);

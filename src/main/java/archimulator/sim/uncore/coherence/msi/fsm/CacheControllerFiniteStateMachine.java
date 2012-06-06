@@ -1,5 +1,6 @@
 package archimulator.sim.uncore.coherence.msi.fsm;
 
+import archimulator.sim.uncore.CacheSimulator;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.cache.CacheLine;
@@ -18,6 +19,7 @@ import archimulator.util.ValueProvider;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
 import net.pickapack.fsm.BasicFiniteStateMachine;
+import net.pickapack.fsm.event.EnterStateEvent;
 import net.pickapack.fsm.event.ExitStateEvent;
 
 import java.util.ArrayList;
@@ -35,7 +37,7 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
 
     private Action onCompletedCallback;
 
-    private List<String> transitionHistory = new ArrayList<String>(10);
+//    private List<String> transitionHistory = new ArrayList<String>(10);
 
     public Action getOnCompletedCallback() {
         return onCompletedCallback;
@@ -62,26 +64,26 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
             }
         });
 
-//        this.addListener(EnterStateEvent.class, new Action1<EnterStateEvent>() {
-//            @Override
-//            public void apply(EnterStateEvent enterStateEvent) {
-//                CacheLine<CacheControllerState> line = cacheController.getCache().getLine(getSet(), getWay());
-//
+        this.addListener(EnterStateEvent.class, new Action1<EnterStateEvent>() {
+            @Override
+            public void apply(EnterStateEvent enterStateEvent) {
+                CacheLine<CacheControllerState> line = cacheController.getCache().getLine(getSet(), getWay());
+
 //                if (getState() != previousState) {
-//                    String transitionText = String.format("[%d] %s.[%d,%d] {%s} %s: %s.%s -> %s", cacheController.getCycleAccurateEventQueue().getCurrentCycle(), getName(), getSet(), getWay(), line.getTag() != CacheLine.INVALID_TAG ? String.format("0x%08x", line.getTag()) : "N/A", previousState, enterStateEvent.getSender() != null ? enterStateEvent.getSender() : "<N/A>", enterStateEvent.getCondition(), getState());
+                    String transitionText = String.format("[%d] %s.[%d,%d] {%s} %s: %s.%s -> %s", cacheController.getCycleAccurateEventQueue().getCurrentCycle(), getName(), getSet(), getWay(), line.getTag() != CacheLine.INVALID_TAG ? String.format("0x%08x", line.getTag()) : "N/A", previousState, enterStateEvent.getSender() != null ? enterStateEvent.getSender() : "<N/A>", enterStateEvent.getCondition(), getState());
 //                    if (transitionHistory.size() >= 10) {
 //                        transitionHistory.remove(0);
 //                    }
 //
 //                    transitionHistory.add(transitionText);
-//
-//                    if (CacheSimulator.logEnabled) {
-//                        CacheSimulator.pw.println(transitionText);
-//                        CacheSimulator.pw.flush();
-//                    }
+
+                    if (CacheSimulator.logEnabled) {
+                        CacheSimulator.pw.println(transitionText);
+                        CacheSimulator.pw.flush();
+                    }
 //                }
-//            }
-//        });
+            }
+        });
     }
 
     public void onEventLoad(CacheCoherenceFlow producerFlow, int tag, Action onCompletedCallback, Action onStalledCallback) {

@@ -19,11 +19,9 @@
 package archimulator.sim.base.simulation;
 
 import archimulator.sim.os.Kernel;
-import archimulator.sim.uncore.CacheHierarchy;
 
 public class SimulationStartingImage {
     private Kernel kernel;
-    private CacheHierarchy cacheHierarchy;
 
     public Kernel getKernel() {
         return kernel;
@@ -31,13 +29,5 @@ public class SimulationStartingImage {
 
     public void setKernel(Kernel kernel) {
         this.kernel = kernel;
-    }
-
-    public CacheHierarchy getCacheHierarchy() {
-        return cacheHierarchy;
-    }
-
-    public void setCacheHierarchy(CacheHierarchy cacheHierarchy) {
-        this.cacheHierarchy = cacheHierarchy;
     }
 }
