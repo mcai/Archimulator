@@ -1,5 +1,6 @@
 package archimulator.sim.uncore.coherence.msi.fsm;
 
+import archimulator.sim.uncore.cache.CacheHit;
 import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.event.dir.*;
@@ -20,6 +21,10 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                         final GetSEvent getSEvent = (GetSEvent) params;
                         final CacheController req = getSEvent.getReq();
                         final int tag = getSEvent.getTag();
+
+                        if(fsm.getLine().getCacheAccess() instanceof CacheHit) {
+                            throw new IllegalArgumentException();
+                        }
 
                         fsm.getDirectoryController().transfer(fsm.getDirectoryController().getNext(), 8, new Action() {
                             @Override
@@ -48,6 +53,10 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                         final GetMEvent getMEvent = (GetMEvent) params;
                         final CacheController req = getMEvent.getReq();
                         final int tag = getMEvent.getTag();
+
+                        if(fsm.getLine().getCacheAccess() instanceof CacheHit) {
+                            throw new IllegalArgumentException();
+                        }
 
                         fsm.getDirectoryController().transfer(fsm.getDirectoryController().getNext(), 8, new Action() {
                             @Override
@@ -123,6 +132,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                         DataFromMemoryEvent dataFromMemoryEvent = (DataFromMemoryEvent) params;
                         fsm.sendDataToReq(dataFromMemoryEvent, dataFromMemoryEvent.getReq(), dataFromMemoryEvent.getTag(), 0);
                         fsm.addReqToSharers(dataFromMemoryEvent.getReq());
+                        fsm.fireCacheLineFillEvent(dataFromMemoryEvent.getAccess(), dataFromMemoryEvent.getTag());
                         fsm.getDirectoryController().getCache().getLine(fsm.getSet(), fsm.getWay()).getCacheAccess().commit();
                     }
                 }, DirectoryControllerState.S);
@@ -179,6 +189,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                         DataFromMemoryEvent dataFromMemoryEvent = (DataFromMemoryEvent) params;
                         fsm.sendDataToReq(dataFromMemoryEvent, dataFromMemoryEvent.getReq(), dataFromMemoryEvent.getTag(), 0);
                         fsm.setOwnerToReq(dataFromMemoryEvent.getReq());
+                        fsm.fireCacheLineFillEvent(dataFromMemoryEvent.getAccess(), dataFromMemoryEvent.getTag());
                         fsm.getDirectoryController().getCache().getLine(fsm.getSet(), fsm.getWay()).getCacheAccess().commit();
                     }
                 }, DirectoryControllerState.M);

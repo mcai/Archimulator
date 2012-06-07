@@ -31,6 +31,7 @@ public abstract class CacheAccess<StateT extends Serializable> {
     private int way;
 
     private CacheLine<StateT> line;
+    private boolean completed;
 
     public CacheAccess(EvictableCache<StateT> cache, CacheReference reference, int way) {
         this.id = Simulation.currentCacheAccessId++;
@@ -68,15 +69,25 @@ public abstract class CacheAccess<StateT extends Serializable> {
     public abstract boolean isEviction();
 
     public CacheAccess<StateT> commit() {
+        if(this.completed) {
+           throw new IllegalArgumentException();
+        }
+
         if (this.reference.getCacheController() != null && this.reference.getAccess() != null) {
             this.reference.getCacheController().getBlockingEventDispatcher().dispatch(new CoherentCacheEndCacheAccessEvent(this.reference.getCacheController(), this.reference.getAccess(), this));
         }
 
+        this.completed = true;
+
         return this;
+    }
+
+    public boolean isCompleted() {
+        return completed;
     }
 
     @Override
     public String toString() {
-        return String.format("[%d, %d] %s {id=%d, hitInCache=%s, eviction=%s}", reference.getSet(), way, reference.getAccessType(), id, isHitInCache(), isEviction());
+        return String.format("[%d, %d] %s {id=%d, hitInCache=%s, eviction=%s, completed=%s}", reference.getSet(), way, reference.getAccessType(), id, isHitInCache(), isEviction(), isCompleted());
     }
 }

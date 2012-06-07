@@ -21,13 +21,24 @@ package archimulator.sim.uncore.cache;
 import java.io.Serializable;
 
 public class CacheMiss<StateT extends Serializable> extends CacheAccess<StateT> {
+    private int victimTag = CacheLine.INVALID_TAG;
+
     public CacheMiss(EvictableCache<StateT> cache, CacheReference reference, int victimWay) {
         super(cache, reference, victimWay);
+        this.victimTag = getLine().getTag();
+
+        if(this.getLine().getState() != getLine().getInitialState() && this.victimTag == -1) {
+            throw new IllegalArgumentException();
+        }
     }
 
     @Override
     public boolean isHitInCache() {
         return false;
+    }
+
+    public int getVictimTag() {
+        return victimTag;
     }
 
     @Override

@@ -80,6 +80,10 @@ public class CacheLine<StateT extends Serializable> extends Params {
     public static final int INVALID_TAG = -1;
 
     public void setCacheAccess(CacheAccess<StateT> cacheAccess) {
+        if(this.cacheAccess != null && !this.cacheAccess.isCompleted()) {
+            throw new IllegalArgumentException();
+        }
+
         this.cacheAccess = cacheAccess;
     }
 
