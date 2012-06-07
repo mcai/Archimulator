@@ -12,6 +12,8 @@ import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.coherence.msi.event.cache.*;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
+import archimulator.sim.uncore.coherence.msi.flow.LoadFlow;
+import archimulator.sim.uncore.coherence.msi.flow.StoreFlow;
 import archimulator.sim.uncore.coherence.msi.message.*;
 import archimulator.sim.uncore.coherence.msi.state.CacheControllerState;
 import archimulator.util.ValueProvider;
@@ -68,7 +70,7 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
             public void apply(EnterStateEvent enterStateEvent) {
                 CacheLine<CacheControllerState> line = cacheController.getCache().getLine(getSet(), getWay());
 
-//                if (getState() != previousState) {
+                if (getState() != previousState) {
                     String transitionText = String.format("[%d] %s.[%d,%d] {%s} %s: %s.%s -> %s", cacheController.getCycleAccurateEventQueue().getCurrentCycle(), getName(), getSet(), getWay(), line.getTag() != CacheLine.INVALID_TAG ? String.format("0x%08x", line.getTag()) : "N/A", previousState, enterStateEvent.getSender() != null ? enterStateEvent.getSender() : "<N/A>", enterStateEvent.getCondition(), getState());
 //                    if (transitionHistory.size() >= 100) {
 //                        transitionHistory.remove(0);
@@ -80,24 +82,30 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
                         CacheSimulator.pw.println(transitionText);
                         CacheSimulator.pw.flush();
                     }
-//                }
+                }
+
+                if(getState() == CacheControllerState.I) {
+                    if(getLine().getTag() != CacheLine.INVALID_TAG) {
+                        throw new IllegalArgumentException();
+                    }
+                }
             }
         });
     }
 
-    public void onEventLoad(CacheCoherenceFlow producerFlow, int tag, Action onCompletedCallback, Action onStalledCallback) {
+    public void onEventLoad(LoadFlow producerFlow, int tag, Action onCompletedCallback, Action onStalledCallback) {
         LoadEvent loadEvent = new LoadEvent(cacheController, producerFlow, tag, set, way, onCompletedCallback, onStalledCallback, producerFlow.getAccess());
-        this.fireTransition("<core>" + "." + String.format("0x%08x", tag), loadEvent);
+        this.fireTransition(producerFlow.getAccess().getThread().getName() + "." + String.format("0x%08x", tag), loadEvent);
     }
 
-    public void onEventStore(CacheCoherenceFlow producerFlow, int tag, Action onCompletedCallback, Action onStalledCallback) {
+    public void onEventStore(StoreFlow producerFlow, int tag, Action onCompletedCallback, Action onStalledCallback) {
         StoreEvent storeEvent = new StoreEvent(cacheController, producerFlow, tag, set, way, onCompletedCallback, onStalledCallback, producerFlow.getAccess());
-        this.fireTransition("<core>" + "." + String.format("0x%08x", tag), storeEvent);
+        this.fireTransition(producerFlow.getAccess().getThread().getName() + "." + String.format("0x%08x", tag), storeEvent);
     }
 
     public void onEventReplacement(CacheCoherenceFlow producerFlow, int tag, CacheAccess<CacheControllerState> cacheAccess, Action onCompletedCallback, Action onStalledCallback) {
         ReplacementEvent replacementEvent = new ReplacementEvent(cacheController, producerFlow, tag, cacheAccess, set, way, onCompletedCallback, onStalledCallback, producerFlow.getAccess());
-        this.fireTransition("<core>" + "." + String.format("0x%08x", tag), replacementEvent);
+        this.fireTransition(producerFlow.getAccess().getThread().getName() + "." + String.format("0x%08x", tag), replacementEvent);
     }
 
     public void onEventFwdGetS(CacheCoherenceFlow producerFlow, CacheController req, int tag) {

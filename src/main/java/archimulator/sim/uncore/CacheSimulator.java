@@ -2,12 +2,13 @@ package archimulator.sim.uncore;
 
 import archimulator.sim.base.event.SimulationEvent;
 import archimulator.sim.core.ProcessorConfig;
+import archimulator.sim.ext.uncore.HTLLCRequestProfilingCapability;
 import archimulator.sim.uncore.cache.eviction.LRUPolicy;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
+import archimulator.sim.uncore.tlb.TranslationLookasideBuffer;
 import net.pickapack.DateHelper;
 import net.pickapack.action.Action;
-import net.pickapack.event.BlockingEvent;
 import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
 import org.apache.commons.io.FileUtils;
@@ -15,10 +16,7 @@ import org.apache.commons.io.FileUtils;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class CacheSimulator {
     public static CycleAccurateEventQueue cycleAccurateEventQueue = new CycleAccurateEventQueue();
@@ -31,32 +29,35 @@ public class CacheSimulator {
     private static int numCompletedReads = 0;
     private static int numCompletedWrites = 0;
 
-//        public static boolean logEnabled = true;
-    public static boolean logEnabled = false;
+        public static boolean logEnabled = true;
+//    public static boolean logEnabled = false;
+
+//    private static boolean useTrace = false;
+    private static boolean useTrace = true;
 
     private static boolean reached;
 
     private static int numMaxPendingAccesses;
 
-    private static void issueRequests(final CacheController cacheController) {
+    private static void issueRequests(int threadId, final CacheController cacheController) {
         if(!reached && (numPendingReads + numPendingWrites > numMaxPendingAccesses)) {
             System.out.printf("[%s] [%s] reached -> numPendingReads: %d, numPendingWrites: %d%n", DateHelper.toString(new Date()), cycleAccurateEventQueue.getCurrentCycle(), numPendingReads, numPendingWrites);
             reached = true;
         }
 
         if(!reached) {
-            read(cacheController, random.nextInt(10000000));
+            read(threadId, cacheController, random.nextInt(10000000));
 //        }
 
-            write(cacheController, random.nextInt(10000000));
+            write(threadId, cacheController, random.nextInt(10000000));
 //        }
         }
     }
 
-    private static void read(final CacheController cacheController, int addr) {
+    private static void read(int threadId, final CacheController cacheController, int addr) {
         final int tag = cacheController.getCache().getTag(addr);
         if(cacheController.canAccess(MemoryHierarchyAccessType.LOAD, addr)) {
-            cacheController.onLoad(null, tag, new Action() {
+            cacheController.onLoad(new MemoryHierarchyAccess(null, new MockThread(threadId), MemoryHierarchyAccessType.LOAD, 0, addr, tag, null, cycleAccurateEventQueue.getCurrentCycle()), tag, new Action() {
                 @Override
                 public void apply() {
                     numPendingReads--;
@@ -67,10 +68,10 @@ public class CacheSimulator {
         }
     }
 
-    private static void write(final CacheController cacheController, int addr) {
+    private static void write(int threadId, final CacheController cacheController, int addr) {
         final int tag = cacheController.getCache().getTag(addr);
         if(cacheController.canAccess(MemoryHierarchyAccessType.STORE, addr)) {
-            cacheController.onStore(null, tag, new Action() {
+            cacheController.onStore(new MemoryHierarchyAccess(null, new MockThread(threadId), MemoryHierarchyAccessType.STORE, 0, addr, tag, null, cycleAccurateEventQueue.getCurrentCycle()), tag, new Action() {
                 @Override
                 public void apply() {
                     numPendingWrites--;
@@ -111,9 +112,6 @@ public class CacheSimulator {
         }
     }
 
-    private static boolean useTrace = false;
-//    private static boolean useTrace = true;
-
     static {
         try {
             pw = new PrintWriter(new FileWriter(FileUtils.getUserDirectoryPath() + "/trace.txt"));
@@ -135,24 +133,30 @@ public class CacheSimulator {
         System.out.printf("[%s] numMaxPendingAccesses: %d%n", DateHelper.toString(new Date()),numMaxPendingAccesses);
 
         MemoryHierarchyConfig memoryHierarchyConfig = MemoryHierarchyConfig.createDefaultMemoryHierarchyConfig(64, 1, 64, 1, 64, 1, LRUPolicy.class);
-        ProcessorConfig processorConfig = ProcessorConfig.createDefaultProcessorConfig(memoryHierarchyConfig, null, null, 8, 2);
+        ProcessorConfig processorConfig = ProcessorConfig.createDefaultProcessorConfig(memoryHierarchyConfig, null, null, 2, 2);
         BasicCacheHierarchy cacheHierarchy = new BasicCacheHierarchy(new BlockingEventDispatcher<SimulationEvent>(), cycleAccurateEventQueue, processorConfig);
 
-        CacheController l10 = cacheHierarchy.getDataCaches().get(0);
-        CacheController l11 = cacheHierarchy.getDataCaches().get(1);
+        HTLLCRequestProfilingCapability htllcRequestProfilingCapability = new HTLLCRequestProfilingCapability(cacheHierarchy.getL2Cache());
+
+        CacheController l1D0 = cacheHierarchy.getDataCaches().get(0);
+        CacheController l1D2 = cacheHierarchy.getDataCaches().get(1);
+
+        final Map<CacheController, Integer> cacheControllerToThreadIdMap = new HashMap<CacheController, Integer>();
+        cacheControllerToThreadIdMap.put(l1D0, 0);
+        cacheControllerToThreadIdMap.put(l1D2, 2);
 
         List<MemoryAccessLine> memoryAccessLines = new ArrayList<MemoryAccessLine>();
 
-        memoryAccessLines.add(new MemoryAccessLine(0, l10, 0x00100000, false));
-        memoryAccessLines.add(new MemoryAccessLine(995, l11, 0x00200000, false));
-        memoryAccessLines.add(new MemoryAccessLine(1000, l10, 0x00100000, true));
-        memoryAccessLines.add(new MemoryAccessLine(1060, l11, 0x00200000, false));
-        memoryAccessLines.add(new MemoryAccessLine(1105, l10, 0x00100000, true));
-        memoryAccessLines.add(new MemoryAccessLine(1110, l11, 0x00100000, false));
-        memoryAccessLines.add(new MemoryAccessLine(1170, l10, 0x00200000, true));
+        memoryAccessLines.add(new MemoryAccessLine(0, l1D0, 0x00100000, false));
+        memoryAccessLines.add(new MemoryAccessLine(995, l1D2, 0x00200000, false));
+        memoryAccessLines.add(new MemoryAccessLine(1000, l1D0, 0x00100000, true));
+        memoryAccessLines.add(new MemoryAccessLine(1060, l1D2, 0x00200000, false));
+        memoryAccessLines.add(new MemoryAccessLine(1105, l1D0, 0x00100000, true));
+        memoryAccessLines.add(new MemoryAccessLine(1110, l1D2, 0x00100000, false));
+        memoryAccessLines.add(new MemoryAccessLine(1170, l1D0, 0x00200000, true));
 
-        memoryAccessLines.add(new MemoryAccessLine(1245, l11, 0x00100000, false));
-        memoryAccessLines.add(new MemoryAccessLine(1250, l10, 0x00300000, false));
+        memoryAccessLines.add(new MemoryAccessLine(1245, l1D2, 0x00100000, false));
+        memoryAccessLines.add(new MemoryAccessLine(1250, l1D0, 0x00300000, false));
 
         int maxCycle = 100000000;
 
@@ -162,10 +166,10 @@ public class CacheSimulator {
                     @Override
                     public void apply() {
                         if(!memoryAccessLine.isWrite()) {
-                            read(memoryAccessLine.getL1(), memoryAccessLine.getTag());
+                            read(cacheControllerToThreadIdMap.get(memoryAccessLine.getL1()), memoryAccessLine.getL1(), memoryAccessLine.getTag());
                         }
                         else {
-                            write(memoryAccessLine.getL1(), memoryAccessLine.getTag());
+                            write(cacheControllerToThreadIdMap.get(memoryAccessLine.getL1()), memoryAccessLine.getL1(), memoryAccessLine.getTag());
                         }
                     }
                 }, memoryAccessLine.getBeginCycle());
@@ -182,7 +186,7 @@ public class CacheSimulator {
                 }
 
                 for(CacheController dataCache : cacheHierarchy.getDataCaches()) {
-                    issueRequests(dataCache);
+                    issueRequests(cacheControllerToThreadIdMap.get(dataCache), dataCache);
                 }
 
                 if(!reached) {
@@ -215,9 +219,69 @@ public class CacheSimulator {
 
         cacheHierarchy.dumpStats();
 
+        htllcRequestProfilingCapability.dumpStats();
+
         if(numPendingReads != 0 || numPendingWrites != 0) {
             System.out.flush();
             throw new IllegalArgumentException();
+        }
+    }
+
+    private static class MockThread implements MemoryHierarchyThread {
+        private int threadId;
+
+        public MockThread(int threadId) {
+            this.threadId = threadId;
+        }
+
+        @Override
+        public int getNum() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public int getId() {
+            return threadId;
+        }
+
+        @Override
+        public String getName() {
+            return "T" + threadId + "";
+        }
+
+        @Override
+        public TranslationLookasideBuffer getItlb() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void setItlb(TranslationLookasideBuffer itlb) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public TranslationLookasideBuffer getDtlb() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void setDtlb(TranslationLookasideBuffer dtlb) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public MemoryHierarchyCore getCore() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public BlockingEventDispatcher<SimulationEvent> getBlockingEventDispatcher() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public CycleAccurateEventQueue getCycleAccurateEventQueue() {
+            throw new UnsupportedOperationException();
         }
     }
 }
