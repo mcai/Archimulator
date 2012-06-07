@@ -35,6 +35,7 @@ import archimulator.sim.uncore.coherence.event.CoherentCacheLineReplacementEvent
 import archimulator.sim.uncore.coherence.event.CoherentCacheNonblockingRequestHitToTransientTagEvent;
 import archimulator.sim.uncore.coherence.event.CoherentCacheServiceNonblockingRequestEvent;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
+import archimulator.sim.uncore.coherence.msi.state.DirectoryControllerState;
 import archimulator.util.ValueProvider;
 import archimulator.util.ValueProviderFactory;
 import net.pickapack.action.Action1;
@@ -48,6 +49,21 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
+//on last puts or putm from owner:
+//  RemoveLRU
+//
+//on replacement:
+//	1. HT replaces INVALID => insert NULL
+//	2. HT replaces MT => insert DATA
+//	3. HT replaces HT => No action
+//	4. MT replaces HT => Remove LRU
+//	5. MT replaces MT, Exists HT => Remove LRU, Insert DATA
+//
+//on reference:
+//	1. MT miss + HT miss + VT Hit => ; Bad HT, VT.setLRU
+//	2. MT miss + HT hit + VT miss => MT to HT; Good HT, removeLRU
+//	3. MT miss + HT hit + VT hit => MT to HT; VT.setLRU, removeLRU
+//	4. MT hit + HT miss + VT hit => ; VT.setLRU
 public class HTLLCRequestProfilingCapability implements SimulationCapability {
     private DirectoryController llc;
 
@@ -70,6 +86,7 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
     private BlockingEventDispatcher<HTLLCRequestProfilingCapabilityEvent> eventDispatcher;
 
     private boolean printTrace = false;
+//    private boolean printTrace = true;
 
     private class CacheSetStat {
         private long numMTLLCMisses;
@@ -210,6 +227,8 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
                 if (lineFoundIsHT) {
                     removeLRU(set);
                 }
+
+                checkInvariants(set);
             }
         });
 
@@ -335,16 +354,21 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
         }
 
         if (requesterIsHT && !event.isHitInCache() && !event.isEviction()) {
+            // case 1
             this.markHT(set, llcLine.getWay());
             this.insertNullEntry(set);
         } else if (requesterIsHT && !event.isHitInCache() && event.isEviction() && !lineFoundIsHT) {
+            // case 2
             this.markHT(set, llcLine.getWay());
             this.insertDataEntry(set, llcLine.getTag());
         } else if (requesterIsHT && !event.isHitInCache() && event.isEviction() && lineFoundIsHT) {
+            // case 3
         } else if (!requesterIsHT && !event.isHitInCache() && event.isEviction() && lineFoundIsHT) {
+            // case 4
             this.markMT(set, llcLine.getWay());
             this.removeLRU(set);
         } else if (!requesterIsHT && !lineFoundIsHT) {
+            //case 5
             boolean htLLCRequestFound = false;
 
             for (int way = 0; way < this.htLLCRequestVictimCache.getAssociativity(); way++) {
@@ -359,6 +383,8 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
                 this.insertDataEntry(set, llcLine.getTag());
             }
         }
+
+        checkInvariants(set);
     }
 
     private void handleRequest(CoherentCacheServiceNonblockingRequestEvent event, boolean requesterIsHT, CacheLine<?> llcLine, int set, boolean lineFoundIsHT) {
@@ -418,6 +444,40 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
             this.removeLRU(set);
         } else if (mtHit && vtHit) {
             this.setLRU(set, vtLine.getWay());
+        }
+
+        checkInvariants(set);
+    }
+
+    private void checkInvariants(int set) {
+        int numHTLinesInLLC = 0;
+        int numNonHTLinesInLLC = 0;
+        int numVictimEntriesInVictimCache = 0;
+
+        for(CacheLine<DirectoryControllerState> llcLine : this.llc.getCache().getLines(set)) {
+            if(llcLine.getState() != DirectoryControllerState.I) {
+                int llcLineBroughterThreadId = getLLCLineBroughterThreadId(set, llcLine.getWay());
+                if(llcLineBroughterThreadId == BasicThread.getHelperThreadId()) {
+                    numHTLinesInLLC++;
+                }
+                else {
+                    numNonHTLinesInLLC++;
+                }
+            }
+        }
+
+        for(CacheLine<HTLLCRequestVictimCacheLineState> victimEntry : this.htLLCRequestVictimCache.getLines(set)) {
+            if(victimEntry.getState() != HTLLCRequestVictimCacheLineState.INVALID) {
+                numVictimEntriesInVictimCache++;
+            }
+        }
+
+        if(numHTLinesInLLC != numVictimEntriesInVictimCache) {
+            throw new IllegalArgumentException();
+        }
+
+        if(numVictimEntriesInVictimCache + numNonHTLinesInLLC > this.llc.getCache().getAssociativity()) {
+            throw new IllegalArgumentException();
         }
     }
 
