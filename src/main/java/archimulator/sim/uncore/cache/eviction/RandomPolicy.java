@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache.eviction;
 
+import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.*;
 
 import java.io.Serializable;
@@ -33,15 +34,15 @@ public class RandomPolicy<StateT extends Serializable> extends EvictionPolicy<St
     }
 
     @Override
-    public CacheMiss<StateT> handleReplacement(CacheReference reference) {
-        return new CacheMiss<StateT>(this.getCache(), reference, this.random.nextInt(this.getCache().getAssociativity()));
+    public CacheAccess<StateT> handleReplacement(MemoryHierarchyAccess access, int set, int tag) {
+        return new CacheAccess<StateT>(this.getCache(), access, set, this.random.nextInt(this.getCache().getAssociativity()), tag);
     }
 
     @Override
-    public void handlePromotionOnHit(CacheHit<StateT> hit) {
+    public void handlePromotionOnHit(int set, int way) {
     }
 
     @Override
-    public void handleInsertionOnMiss(CacheMiss<StateT> miss) {
+    public void handleInsertionOnMiss(int set, int way) {
     }
 }

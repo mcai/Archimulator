@@ -1,20 +1,24 @@
 package archimulator.sim.uncore.coherence.msi.event.cache;
 
 import archimulator.sim.uncore.MemoryHierarchyAccess;
+import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
+import archimulator.sim.uncore.coherence.msi.state.CacheControllerState;
 import net.pickapack.action.Action;
 
 public class ReplacementEvent extends CacheControllerEvent {
     private int tag;
+    private CacheAccess<CacheControllerState> cacheAccess;
     private int set;
     private int way;
     private Action onCompletedCallback;
     private Action onStalledCallback;
 
-    public ReplacementEvent(CacheController generator, CacheCoherenceFlow producerFlow, int tag, int set, int way, Action onCompletedCallback, Action onStalledCallback, MemoryHierarchyAccess access) {
+    public ReplacementEvent(CacheController generator, CacheCoherenceFlow producerFlow, int tag, CacheAccess<CacheControllerState> cacheAccess, int set, int way, Action onCompletedCallback, Action onStalledCallback, MemoryHierarchyAccess access) {
         super(generator, producerFlow, CacheControllerEventType.REPLACEMENT, access);
         this.tag = tag;
+        this.cacheAccess = cacheAccess;
         this.set = set;
         this.way = way;
         this.onCompletedCallback = onCompletedCallback;
@@ -23,6 +27,10 @@ public class ReplacementEvent extends CacheControllerEvent {
 
     public int getTag() {
         return tag;
+    }
+
+    public CacheAccess<CacheControllerState> getCacheAccess() {
+        return cacheAccess;
     }
 
     public int getSet() {

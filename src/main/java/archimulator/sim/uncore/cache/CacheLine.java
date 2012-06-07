@@ -17,6 +17,7 @@ package archimulator.sim.uncore.cache; /****************************************
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.util.ValueProvider;
 import net.pickapack.Params;
 
@@ -28,8 +29,8 @@ public class CacheLine<StateT extends Serializable> extends Params {
     private int way;
 
     private int tag;
+    private MemoryHierarchyAccess access;
     private ValueProvider<StateT> stateProvider;
-    private CacheAccess<StateT> cacheAccess;
 
     public CacheLine(Cache<StateT> cache, int set, int way, ValueProvider<StateT> stateProvider) {
         this.cache = cache;
@@ -68,8 +69,20 @@ public class CacheLine<StateT extends Serializable> extends Params {
         this.tag = tag;
     }
 
+    public MemoryHierarchyAccess getAccess() {
+        return access;
+    }
+
+    public void setAccess(MemoryHierarchyAccess access) {
+        this.access = access;
+    }
+
     public StateT getState() {
         return getStateProvider().get();
+    }
+
+    public boolean isValid() {
+        return this.getState() != this.getInitialState();
     }
 
     @Override
@@ -78,16 +91,4 @@ public class CacheLine<StateT extends Serializable> extends Params {
     }
 
     public static final int INVALID_TAG = -1;
-
-    public void setCacheAccess(CacheAccess<StateT> cacheAccess) {
-        if(this.cacheAccess != null && !this.cacheAccess.isCompleted()) {
-            throw new IllegalArgumentException();
-        }
-
-        this.cacheAccess = cacheAccess;
-    }
-
-    public CacheAccess<StateT> getCacheAccess() {
-        return cacheAccess;
-    }
 }

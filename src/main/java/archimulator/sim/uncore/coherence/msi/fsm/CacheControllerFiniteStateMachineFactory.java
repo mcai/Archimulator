@@ -19,12 +19,13 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
                     public void apply(final CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
                         final LoadEvent loadEvent = (LoadEvent) params;
                         fsm.sendGetSToDir(loadEvent, loadEvent.getTag());
-                        fsm.fireServiceNonblockingRequestEvent(loadEvent.getAccess(), loadEvent.getTag());
+                        fsm.fireServiceNonblockingRequestEvent(loadEvent.getAccess(), loadEvent.getTag(), false);
+                        fsm.getLine().setAccess(loadEvent.getAccess());
                         fsm.getLine().setTag(loadEvent.getTag());
                         fsm.setOnCompletedCallback(new Action() {
                             @Override
                             public void apply() {
-                                fsm.getCacheController().getCache().getLine(fsm.getSet(), fsm.getWay()).getCacheAccess().commit();
+                                fsm.getCacheController().getCache().getEvictionPolicy().handleInsertionOnMiss(fsm.getSet(), fsm.getWay());
                                 loadEvent.getOnCompletedCallback().apply();
                             }
                         });
@@ -35,12 +36,13 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
                     public void apply(final CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
                         final StoreEvent storeEvent = (StoreEvent) params;
                         fsm.sendGetMToDir(storeEvent, storeEvent.getTag());
-                        fsm.fireServiceNonblockingRequestEvent(storeEvent.getAccess(), storeEvent.getTag());
+                        fsm.fireServiceNonblockingRequestEvent(storeEvent.getAccess(), storeEvent.getTag(), false);
+                        fsm.getLine().setAccess(storeEvent.getAccess());
                         fsm.getLine().setTag(storeEvent.getTag());
                         fsm.setOnCompletedCallback(new Action() {
                             @Override
                             public void apply() {
-                                fsm.getCacheController().getCache().getLine(fsm.getSet(), fsm.getWay()).getCacheAccess().commit();
+                                fsm.getCacheController().getCache().getEvictionPolicy().handleInsertionOnMiss(fsm.getSet(), fsm.getWay());
                                 storeEvent.getOnCompletedCallback().apply();
                             }
                         });
@@ -218,7 +220,7 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
                         StoreEvent storeEvent = (StoreEvent) params;
                         fsm.sendGetMToDir(storeEvent, storeEvent.getTag());
                         fsm.setOnCompletedCallback(storeEvent.getOnCompletedCallback());
-                        fsm.fireServiceNonblockingRequestEvent(storeEvent.getAccess(), storeEvent.getTag());
+                        fsm.fireServiceNonblockingRequestEvent(storeEvent.getAccess(), storeEvent.getTag(), true);
                     }
                 }, CacheControllerState.SM_AD)
                 .onCondition(CacheControllerEventType.REPLACEMENT, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
@@ -239,6 +241,7 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
                         final CacheController req = invEvent.getReq();
                         int tag = invEvent.getTag();
                         fsm.sendInvAckToReq(invEvent, req, tag);
+                        fsm.getLine().setAccess(null);
                         fsm.getLine().setTag(CacheLine.INVALID_TAG);
                     }
                 }, CacheControllerState.I)
@@ -248,6 +251,7 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
                         RecallEvent recallEvent = (RecallEvent) params;
                         int tag = recallEvent.getTag();
                         fsm.sendRecallAckToDir(recallEvent, tag, 8);
+                        fsm.getLine().setAccess(null);
                         fsm.getLine().setTag(CacheLine.INVALID_TAG);
                     }
                 }, CacheControllerState.I);
@@ -424,6 +428,7 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
                         final CacheController req = fwdGetMEvent.getReq();
                         int tag = fwdGetMEvent.getTag();
                         fsm.sendDataToReq(fwdGetMEvent, req, tag);
+                        fsm.getLine().setAccess(null);
                         fsm.getLine().setTag(CacheLine.INVALID_TAG);
                     }
                 }, CacheControllerState.I)
@@ -433,6 +438,7 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
                         RecallEvent recallEvent = (RecallEvent) params;
                         int tag = recallEvent.getTag();
                         fsm.sendRecallAckToDir(recallEvent, tag, fsm.getCacheController().getCache().getLineSize() + 8);
+                        fsm.getLine().setAccess(null);
                         fsm.getLine().setTag(CacheLine.INVALID_TAG);
                     }
                 }, CacheControllerState.I);
@@ -489,6 +495,7 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
                 .onCondition(CacheControllerEventType.PUT_ACK, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
+                        fsm.getLine().setAccess(null);
                         fsm.getLine().setTag(CacheLine.INVALID_TAG);
                     }
                 }, CacheControllerState.I);
@@ -536,6 +543,7 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
                 .onCondition(CacheControllerEventType.PUT_ACK, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
+                        fsm.getLine().setAccess(null);
                         fsm.getLine().setTag(CacheLine.INVALID_TAG);
                     }
                 }, CacheControllerState.I);
@@ -566,6 +574,7 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
                 .onCondition(CacheControllerEventType.PUT_ACK, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
+                        fsm.getLine().setAccess(null);
                         fsm.getLine().setTag(CacheLine.INVALID_TAG);
                     }
                 }, CacheControllerState.I);

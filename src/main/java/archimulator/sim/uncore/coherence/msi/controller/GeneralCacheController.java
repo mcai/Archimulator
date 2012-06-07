@@ -3,9 +3,7 @@ package archimulator.sim.uncore.coherence.msi.controller;
 import archimulator.sim.base.event.DumpStatEvent;
 import archimulator.sim.base.event.PollStatsEvent;
 import archimulator.sim.base.event.ResetStatEvent;
-import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.CacheHierarchy;
-import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.coherence.config.CoherentCacheConfig;
 import net.pickapack.action.Action1;
@@ -67,29 +65,20 @@ public abstract class GeneralCacheController<StateT extends Serializable> extend
         }
     }
 
-    public boolean isLastLevelCache() {
-        return this instanceof DirectoryController;
-    }
-
     public abstract EvictableCache<StateT> getCache();
 
-    public void updateStats(CacheAccess<?> cacheAccess) {
-        CacheAccessType cacheAccessType = cacheAccess.getReference().getAccessType();
-        if (cacheAccessType.isRead()) {
-            if (!cacheAccessType.isUpward()) {
-                if (cacheAccess.isHitInCache()) {
-                    numDownwardReadHits++;
-                } else {
-                    numDownwardReadMisses++;
-                }
+    public void updateStats(boolean read, boolean hitInCache) {
+        if (read) {
+            if (hitInCache) {
+                numDownwardReadHits++;
+            } else {
+                numDownwardReadMisses++;
             }
         } else {
-            if (!cacheAccessType.isUpward()) {
-                if (cacheAccess.isHitInCache()) {
-                    numDownwardWriteHits++;
-                } else {
-                    numDownwardWriteMisses++;
-                }
+            if (hitInCache) {
+                numDownwardWriteHits++;
+            } else {
+                numDownwardWriteMisses++;
             }
         }
     }

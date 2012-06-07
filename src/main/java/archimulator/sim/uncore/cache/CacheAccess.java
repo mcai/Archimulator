@@ -18,42 +18,41 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache;
 
-import archimulator.sim.base.simulation.Simulation;
-import archimulator.sim.uncore.coherence.event.CoherentCacheBeginCacheAccessEvent;
-import archimulator.sim.uncore.coherence.event.CoherentCacheEndCacheAccessEvent;
+import archimulator.sim.uncore.MemoryHierarchyAccess;
 
 import java.io.Serializable;
 
-public abstract class CacheAccess<StateT extends Serializable> {
-    private long id;
-    private EvictableCache<StateT> cache;
-    private CacheReference reference;
+public class CacheAccess<StateT extends Serializable> {
+    private MemoryHierarchyAccess access;
+    private int set;
     private int way;
 
     private CacheLine<StateT> line;
-    private boolean completed;
 
-    public CacheAccess(EvictableCache<StateT> cache, CacheReference reference, int way) {
-        this.id = Simulation.currentCacheAccessId++;
-        this.cache = cache;
-        this.reference = reference;
+    private boolean hitInCache;
+    private boolean eviction;
+
+    public CacheAccess(EvictableCache<StateT> cache, MemoryHierarchyAccess access, int set, int way, int tag) {
+        this.access = access;
+        this.set = set;
         this.way = way;
 
-        if (this.way != -1) {
-            this.line = this.cache.getLine(this.reference.getSet(), this.way);
+        if(this.way == CacheLine.INVALID_TAG) {
+            throw new IllegalArgumentException();
         }
+
+        this.line = cache.getLine(this.set, this.way);
+
+        this.hitInCache = this.line.getTag() == tag;
+        this.eviction = this.line.isValid();
     }
 
-    public long getId() {
-        return id;
+    public MemoryHierarchyAccess getAccess() {
+        return access;
     }
 
-    public EvictableCache<StateT> getCache() {
-        return cache;
-    }
-
-    public CacheReference getReference() {
-        return reference;
+    public int getSet() {
+        return set;
     }
 
     public int getWay() {
@@ -64,30 +63,16 @@ public abstract class CacheAccess<StateT extends Serializable> {
         return line;
     }
 
-    public abstract boolean isHitInCache();
-
-    public abstract boolean isEviction();
-
-    public CacheAccess<StateT> commit() {
-        if(this.completed) {
-           throw new IllegalArgumentException();
-        }
-
-        if (this.reference.getCacheController() != null && this.reference.getAccess() != null) {
-            this.reference.getCacheController().getBlockingEventDispatcher().dispatch(new CoherentCacheEndCacheAccessEvent(this.reference.getCacheController(), this.reference.getAccess(), this));
-        }
-
-        this.completed = true;
-
-        return this;
+    public boolean isHitInCache() {
+        return hitInCache;
     }
 
-    public boolean isCompleted() {
-        return completed;
+    public boolean isEviction() {
+        return eviction;
     }
 
     @Override
     public String toString() {
-        return String.format("[%d, %d] %s {id=%d, hitInCache=%s, eviction=%s, completed=%s}", reference.getSet(), way, reference.getAccessType(), id, isHitInCache(), isEviction(), isCompleted());
+        return String.format("[%d, %d] %s {hitInCache=%s, eviction=%s}", set, way, access.getType(), isHitInCache(), isEviction());
     }
 }

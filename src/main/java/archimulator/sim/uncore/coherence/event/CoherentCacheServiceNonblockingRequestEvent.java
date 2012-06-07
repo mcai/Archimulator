@@ -18,56 +18,48 @@
  ******************************************************************************/
 package archimulator.sim.uncore.coherence.event;
 
-import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
-import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.coherence.msi.controller.GeneralCacheController;
 
 public class CoherentCacheServiceNonblockingRequestEvent extends CoherentCacheEvent {
-    private MemoryHierarchyAccess requesterAccess;
-    private int address;
-    private CacheLine<?> lineFound;
-    private boolean hitInCache;
-    private boolean eviction;
-    private CacheAccessType accessType;
+    private final MemoryHierarchyAccess access;
+    private final int tag;
+    private final int set;
+    private final int way;
+    private final boolean hitInCache;
 
-    public CoherentCacheServiceNonblockingRequestEvent(GeneralCacheController cacheController, MemoryHierarchyAccess requesterAccess, int address, CacheLine<?> lineFound, boolean hitInCache, boolean eviction, CacheAccessType accessType) {
+    public CoherentCacheServiceNonblockingRequestEvent(GeneralCacheController cacheController, MemoryHierarchyAccess access, int tag, int set, int way, boolean hitInCache) {
         super(cacheController);
 
-        this.requesterAccess = requesterAccess;
-        this.address = address;
-        this.lineFound = lineFound;
+        this.access = access;
+        this.tag = tag;
+        this.set = set;
+        this.way = way;
         this.hitInCache = hitInCache;
-        this.eviction = eviction;
-        this.accessType = accessType;
     }
 
-    public MemoryHierarchyAccess getRequesterAccess() {
-        return requesterAccess;
+    public MemoryHierarchyAccess getAccess() {
+        return access;
     }
 
-    public int getAddress() {
-        return address;
+    public int getTag() {
+        return tag;
     }
 
-    public CacheLine<?> getLineFound() {
-        return lineFound;
+    public int getSet() {
+        return set;
+    }
+
+    public int getWay() {
+        return way;
     }
 
     public boolean isHitInCache() {
         return hitInCache;
     }
 
-    public boolean isEviction() {
-        return eviction;
-    }
-
-    public CacheAccessType getAccessType() {
-        return accessType;
-    }
-
     @Override
     public String toString() {
-        return String.format("CoherentCacheServiceNonblockingRequestEvent{address=0x%08x, requesterAccess=%s, lineFound=%s, hitInCache=%s, eviction=%s, accessType=%s}", address, requesterAccess, lineFound, hitInCache, eviction, accessType);
+        return String.format("CoherentCacheServiceNonblockingRequestEvent{tag=0x%08x, access=%s, set=%d, way=%d, hitInCache=%s, accessType=%s}", tag, access, set, way, hitInCache, access.getType());
     }
 }

@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache.eviction;
 
+import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.*;
 
 import java.io.Serializable;
@@ -29,11 +30,11 @@ public abstract class EvictionPolicy<StateT extends Serializable> {
         this.cache = cache;
     }
 
-    public abstract CacheMiss<StateT> handleReplacement(CacheReference reference); // victim selection
+    public abstract CacheAccess<StateT> handleReplacement(MemoryHierarchyAccess access, int set, int tag); // victim selection
 
-    public abstract void handlePromotionOnHit(CacheHit<StateT> hit); // => promotion of referenced line
+    public abstract void handlePromotionOnHit(int set, int way); // => promotion of referenced line
 
-    public abstract void handleInsertionOnMiss(CacheMiss<StateT> miss); // => insertion of fetched line
+    public abstract void handleInsertionOnMiss(int set, int way); // => insertion of fetched line
 
     public EvictableCache<StateT> getCache() {
         return cache;

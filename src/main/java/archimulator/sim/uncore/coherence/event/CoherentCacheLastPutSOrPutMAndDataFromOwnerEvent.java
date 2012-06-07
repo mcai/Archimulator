@@ -19,36 +19,41 @@
 package archimulator.sim.uncore.coherence.event;
 
 import archimulator.sim.uncore.MemoryHierarchyAccess;
-import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.coherence.msi.controller.GeneralCacheController;
 
 public class CoherentCacheLastPutSOrPutMAndDataFromOwnerEvent extends CoherentCacheEvent {
-    private MemoryHierarchyAccess requesterAccess;
-    private int address;
-    private CacheLine<?> lineFound;
+    private final MemoryHierarchyAccess access;
+    private final int tag;
+    private final int set;
+    private final int way;
 
-    public CoherentCacheLastPutSOrPutMAndDataFromOwnerEvent(GeneralCacheController cacheController, MemoryHierarchyAccess requesterAccess, int address, CacheLine<?> lineFound) {
+    public CoherentCacheLastPutSOrPutMAndDataFromOwnerEvent(GeneralCacheController cacheController, MemoryHierarchyAccess access, int tag, int set, int way) {
         super(cacheController);
 
-        this.requesterAccess = requesterAccess;
-        this.address = address;
-        this.lineFound = lineFound;
+        this.access = access;
+        this.tag = tag;
+        this.set = set;
+        this.way = way;
     }
 
-    public MemoryHierarchyAccess getRequesterAccess() {
-        return requesterAccess;
+    public MemoryHierarchyAccess getAccess() {
+        return access;
     }
 
-    public int getAddress() {
-        return address;
+    public int getTag() {
+        return tag;
     }
 
-    public CacheLine<?> getLineFound() {
-        return lineFound;
+    public int getSet() {
+        return set;
+    }
+
+    public int getWay() {
+        return way;
     }
 
     @Override
     public String toString() {
-        return String.format("CoherentCacheLastPutSOrPutMAndDataFromOwnerEvent{address=0x%08x, requesterAccess=%s, lineFound=%s}", address, requesterAccess, lineFound);
+        return String.format("CoherentCacheLastPutSOrPutMAndDataFromOwnerEvent{access=%s, tag=0x%08x, set=%d, way=%d}", access, tag, set, way);
     }
 }

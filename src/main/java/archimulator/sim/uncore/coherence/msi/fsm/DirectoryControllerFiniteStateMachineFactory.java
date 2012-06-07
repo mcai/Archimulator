@@ -1,6 +1,5 @@
 package archimulator.sim.uncore.coherence.msi.fsm;
 
-import archimulator.sim.uncore.cache.CacheHit;
 import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.event.dir.*;
@@ -22,10 +21,6 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                         final CacheController req = getSEvent.getReq();
                         final int tag = getSEvent.getTag();
 
-                        if(fsm.getLine().getCacheAccess() instanceof CacheHit) {
-                            throw new IllegalArgumentException();
-                        }
-
                         fsm.getDirectoryController().transfer(fsm.getDirectoryController().getNext(), 8, new Action() {
                             @Override
                             public void apply() {
@@ -43,7 +38,8 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                                 });
                             }
                         });
-                        fsm.fireServiceNonblockingRequestEvent(getSEvent.getAccess(), getSEvent.getTag());
+                        fsm.fireServiceNonblockingRequestEvent(getSEvent.getAccess(), getSEvent.getTag(), false);
+                        fsm.getLine().setAccess(getSEvent.getAccess());
                         fsm.getLine().setTag(getSEvent.getTag());
                     }
                 }, DirectoryControllerState.IS_D)
@@ -53,10 +49,6 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                         final GetMEvent getMEvent = (GetMEvent) params;
                         final CacheController req = getMEvent.getReq();
                         final int tag = getMEvent.getTag();
-
-                        if(fsm.getLine().getCacheAccess() instanceof CacheHit) {
-                            throw new IllegalArgumentException();
-                        }
 
                         fsm.getDirectoryController().transfer(fsm.getDirectoryController().getNext(), 8, new Action() {
                             @Override
@@ -75,7 +67,8 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                                 });
                             }
                         });
-                        fsm.fireServiceNonblockingRequestEvent(getMEvent.getAccess(), getMEvent.getTag());
+                        fsm.fireServiceNonblockingRequestEvent(getMEvent.getAccess(), getMEvent.getTag(), false);
+                        fsm.getLine().setAccess(getMEvent.getAccess());
                         fsm.getLine().setTag(getMEvent.getTag());
                     }
                 }, DirectoryControllerState.IM_D);
@@ -132,8 +125,9 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                         DataFromMemoryEvent dataFromMemoryEvent = (DataFromMemoryEvent) params;
                         fsm.sendDataToReq(dataFromMemoryEvent, dataFromMemoryEvent.getReq(), dataFromMemoryEvent.getTag(), 0);
                         fsm.addReqToSharers(dataFromMemoryEvent.getReq());
-                        fsm.fireCacheLineFillEvent(dataFromMemoryEvent.getAccess(), dataFromMemoryEvent.getTag());
-                        fsm.getDirectoryController().getCache().getLine(fsm.getSet(), fsm.getWay()).getCacheAccess().commit();
+                        fsm.fireCacheLineFillEvent(dataFromMemoryEvent.getAccess(), dataFromMemoryEvent.getTag(), fsm.victimTag);
+                        fsm.victimTag = CacheLine.INVALID_TAG;
+                        fsm.getDirectoryController().getCache().getEvictionPolicy().handleInsertionOnMiss(fsm.getSet(), fsm.getWay());
                     }
                 }, DirectoryControllerState.S);
 
@@ -189,8 +183,9 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                         DataFromMemoryEvent dataFromMemoryEvent = (DataFromMemoryEvent) params;
                         fsm.sendDataToReq(dataFromMemoryEvent, dataFromMemoryEvent.getReq(), dataFromMemoryEvent.getTag(), 0);
                         fsm.setOwnerToReq(dataFromMemoryEvent.getReq());
-                        fsm.fireCacheLineFillEvent(dataFromMemoryEvent.getAccess(), dataFromMemoryEvent.getTag());
-                        fsm.getDirectoryController().getCache().getLine(fsm.getSet(), fsm.getWay()).getCacheAccess().commit();
+                        fsm.fireCacheLineFillEvent(dataFromMemoryEvent.getAccess(), dataFromMemoryEvent.getTag(), fsm.victimTag);
+                        fsm.victimTag = CacheLine.INVALID_TAG;
+                        fsm.getDirectoryController().getCache().getEvictionPolicy().handleInsertionOnMiss(fsm.getSet(), fsm.getWay());
                     }
                 }, DirectoryControllerState.M);
 
@@ -239,6 +234,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                         fsm.clearSharers();
                         fsm.setOnCompletedCallback(replacementEvent.getOnCompletedCallback());
                         fsm.fireReplacementEvent(replacementEvent.getAccess(), replacementEvent.getTag());
+                        fsm.victimTag = fsm.getLine().getTag();
                         fsm.getDirectoryController().incNumEvictions();
                     }
                 }, DirectoryControllerState.SI_A)
@@ -263,6 +259,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                         fsm.removeReqFromSharers(req);
                         fsm.sendPutAckToReq(putSLastEvent, req, tag);
                         fsm.firePutSOrPutMAndDataFromOwnerEvent(putSLastEvent.getAccess(), putSLastEvent.getTag());
+                        fsm.getLine().setAccess(null);
                         fsm.getLine().setTag(CacheLine.INVALID_TAG);
                     }
                 }, DirectoryControllerState.I)
@@ -315,6 +312,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                         fsm.clearOwner();
                         fsm.setOnCompletedCallback(replacementEvent.getOnCompletedCallback());
                         fsm.fireReplacementEvent(replacementEvent.getAccess(), replacementEvent.getTag());
+                        fsm.victimTag = fsm.getLine().getTag();
                         fsm.getDirectoryController().incNumEvictions();
                     }
                 }, DirectoryControllerState.MI_A)
@@ -349,6 +347,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                         fsm.clearOwner();
                         fsm.sendPutAckToReq(putMAndDataFromOwnerEvent, req, tag);
                         fsm.firePutSOrPutMAndDataFromOwnerEvent(putMAndDataFromOwnerEvent.getAccess(), putMAndDataFromOwnerEvent.getTag());
+                        fsm.getLine().setAccess(null);
                         fsm.getLine().setTag(CacheLine.INVALID_TAG);
                     }
                 }, DirectoryControllerState.I)
@@ -457,6 +456,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                         LastRecallAckEvent lastRecallAckEvent = (LastRecallAckEvent) params;
                         final int tag = lastRecallAckEvent.getTag();
                         fsm.copyDataToMemory(tag);
+                        fsm.getLine().setAccess(null);
                         fsm.getLine().setTag(CacheLine.INVALID_TAG);
                     }
                 }, DirectoryControllerState.I)
@@ -523,6 +523,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                 .onCondition(DirectoryControllerEventType.LAST_RECALL_ACK, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, Params>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, Params params) {
+                        fsm.getLine().setAccess(null);
                         fsm.getLine().setTag(CacheLine.INVALID_TAG);
                     }
                 }, DirectoryControllerState.I)

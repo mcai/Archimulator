@@ -3,8 +3,8 @@ package archimulator.client;
 import archimulator.sim.base.experiment.profile.ExperimentProfile;
 import archimulator.sim.base.experiment.profile.ProcessorProfile;
 import archimulator.sim.base.simulation.SimulatedProgram;
-import archimulator.sim.ext.uncore.llc.HTLLCRequestProfilingCapability;
-import archimulator.sim.ext.uncore.llc.LLCReuseDistanceProfilingCapability;
+import archimulator.sim.ext.uncore.HTLLCRequestProfilingCapability;
+import archimulator.sim.ext.uncore.LLCReuseDistanceProfilingCapability;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
 
 public class Presets {

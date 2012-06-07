@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.ext.uncore.llc;
+package archimulator.sim.ext.uncore;
 
 import archimulator.sim.analysis.BasicBlock;
 import archimulator.sim.analysis.Function;
@@ -29,7 +29,6 @@ import archimulator.sim.core.DynamicInstruction;
 import archimulator.sim.core.Processor;
 import archimulator.sim.isa.StaticInstructionType;
 import archimulator.sim.os.BasicProcess;
-import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.MemoryHierarchyAccessType;
 import archimulator.sim.uncore.coherence.event.CoherentCacheServiceNonblockingRequestEvent;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
@@ -45,7 +44,7 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
 
     private List<List<StackEntry>> stackEntries;
 
-    private Map<CacheAccessType, Map<Integer, Long>> reuseDistances;
+    private Map<MemoryHierarchyAccessType, Map<Integer, Long>> reuseDistances;
 
     private String hotspotFunctionName = "HashLookup"; //TODO: should not be hardcoded!!!
 //    private String hotspotFunctionName = "push_thread_func"; //TODO: should not be hardcoded!!!
@@ -72,7 +71,7 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
             }
         }
 
-        this.reuseDistances = new TreeMap<CacheAccessType, Map<Integer, Long>>();
+        this.reuseDistances = new TreeMap<MemoryHierarchyAccessType, Map<Integer, Long>>();
 
         final Random random = new Random();
 
@@ -139,7 +138,7 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
             }
         }
 
-        for (CacheAccessType accessType : this.reuseDistances.keySet()) {
+        for (MemoryHierarchyAccessType accessType : this.reuseDistances.keySet()) {
             for (int reuseDistance : this.reuseDistances.get(accessType).keySet()) {
                 stats.put("llcReuseDistanceProfilingCapability." + this.llc.getName() + ".ht_mt_inter-thread_reuseDistances[" + accessType + "][" + reuseDistance + "]", String.valueOf(this.reuseDistances.get(accessType).get(reuseDistance)));
             }
@@ -147,10 +146,10 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
     }
 
     private void handleServicingRequest(CoherentCacheServiceNonblockingRequestEvent event) {
-        if (event.getRequesterAccess().getType() == MemoryHierarchyAccessType.LOAD) {
+        if (event.getAccess().getType() == MemoryHierarchyAccessType.LOAD) {
             if (loadsInHotspotFunction == null) {
                 loadsInHotspotFunction = new TreeMap<Integer, LoadEntry>();
-                Processor processor = event.getRequesterAccess().getDynamicInst().getThread().getCore().getProcessor();
+                Processor processor = event.getAccess().getDynamicInst().getThread().getCore().getProcessor();
                 BasicProcess process = (BasicProcess) processor.getCores().get(0).getThreads().get(0).getContext().getProcess();
 
                 for (Function function : process.getElfAnalyzer().getProgram().getFunctions()) {
@@ -168,7 +167,7 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
                 }
             }
 
-            DynamicInstruction dynamicInst = event.getRequesterAccess().getDynamicInst();
+            DynamicInstruction dynamicInst = event.getAccess().getDynamicInst();
 
             if (loadsInHotspotFunction.containsKey(dynamicInst.getPc()) && dynamicInst.getThread().getContext().getThreadId() == hotspotThreadId) {
                 loadsInHotspotFunction.get(dynamicInst.getPc()).accesses++;
@@ -178,10 +177,10 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
             }
         }
 
-        this.setLRU(event.getLineFound().getSet(), this.llc.getCache().getTag(event.getAddress()), event.getRequesterAccess().getThread().getId(), event.getAccessType());
+        this.setLRU(event.getSet(), this.llc.getCache().getTag(event.getTag()), event.getAccess().getThread().getId(), event.getAccess().getType());
     }
 
-    private void setLRU(int set, int tag, int broughterThreadId, CacheAccessType accessType) {
+    private void setLRU(int set, int tag, int broughterThreadId, MemoryHierarchyAccessType accessType) {
         StackEntry stackEntryFound = this.getStackEntry(set, tag);
 
         int reuseDistance = -1;
@@ -227,7 +226,7 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
         return this.stackEntries.get(set).get(this.maxReuseDistance - 1);
     }
 
-    private void incReuseDistanceStat(int reuseDistance, CacheAccessType accessType) {
+    private void incReuseDistanceStat(int reuseDistance, MemoryHierarchyAccessType accessType) {
         if (!this.reuseDistances.containsKey(accessType)) {
             this.reuseDistances.put(accessType, new TreeMap<Integer, Long>());
         }
@@ -273,12 +272,12 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
     private static class StackEntry {
         private int broughterThreadId;
         private int tag;
-        private CacheAccessType accessType;
+        private MemoryHierarchyAccessType accessType;
 
         private StackEntry() {
             this.broughterThreadId = -1;
             this.tag = -1;
-            this.accessType = CacheAccessType.UNKNOWN;
+            this.accessType = MemoryHierarchyAccessType.UNKNOWN;
         }
     }
 }

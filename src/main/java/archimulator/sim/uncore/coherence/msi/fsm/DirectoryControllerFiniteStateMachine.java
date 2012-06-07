@@ -35,7 +35,9 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
 
     private Action onCompletedCallback;
 
-//    private List<String> transitionHistory = new ArrayList<String>(10);
+    public int victimTag = CacheLine.INVALID_TAG;
+
+//    private List<String> transitionHistory = new ArrayList<String>();
 
     public DirectoryControllerFiniteStateMachine(String name, int set, int way, final DirectoryController directoryController) {
         super(name, DirectoryControllerState.I);
@@ -60,7 +62,7 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
                     String transitionText = String.format("[%d] %s.[%d,%d] {%s} %s: %s.%s -> %s (owner: %s, sharers: %s)",
                             directoryController.getCycleAccurateEventQueue().getCurrentCycle(), getName(), getSet(), getWay(), line.getTag() != CacheLine.INVALID_TAG ? String.format("0x%08x", line.getTag()) : "N/A", previousState, enterStateEvent.getSender() != null ? enterStateEvent.getSender() : "<N/A>", enterStateEvent.getCondition(), getState(),
                             getDirectoryEntry().getOwner() != null ? getDirectoryEntry().getOwner() : "N/A", getDirectoryEntry().getSharers().toString().replace("[", "").replace("]", ""));
-//                    if (transitionHistory.size() >= 10) {
+//                    if (transitionHistory.size() >= 100) {
 //                        transitionHistory.remove(0);
 //                    }
 //
@@ -99,8 +101,8 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
         this.fireTransition(req + "." + String.format("0x%08x", tag), getMEvent);
     }
 
-    public void onEventReplacement(CacheCoherenceFlow producerFlow, CacheController req, int tag, Action onCompletedCallback, Action onStalledCallback) {
-        ReplacementEvent replacementEvent = new ReplacementEvent(this.directoryController, producerFlow, tag, set, way, onCompletedCallback, onStalledCallback, producerFlow.getAccess());
+    public void onEventReplacement(CacheCoherenceFlow producerFlow, CacheController req, int tag, CacheAccess<DirectoryControllerState> cacheAccess, Action onCompletedCallback, Action onStalledCallback) {
+        ReplacementEvent replacementEvent = new ReplacementEvent(this.directoryController, producerFlow, tag, cacheAccess, set, way, onCompletedCallback, onStalledCallback, producerFlow.getAccess());
         this.fireTransition(req + "." + String.format("0x%08x", tag), replacementEvent);
     }
 
@@ -145,8 +147,8 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
     }
 
     public void hit(MemoryHierarchyAccess access, int tag, int set, int way) {
-        this.directoryController.getCache().getLine(set, way).getCacheAccess().commit();
-        this.fireServiceNonblockingRequestEvent(access, tag);
+        this.directoryController.getCache().getEvictionPolicy().handlePromotionOnHit(set, way);
+        this.fireServiceNonblockingRequestEvent(access, tag, true);
     }
 
     public void stall(final Object sender, final DirectoryControllerEvent event) {
@@ -163,31 +165,25 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
         stalledEvents.add(action);
     }
 
-    public void fireServiceNonblockingRequestEvent(MemoryHierarchyAccess access, int tag) {
-        CacheAccess<DirectoryControllerState> cacheAccess = this.getLine().getCacheAccess();
-        this.getDirectoryController().getBlockingEventDispatcher().dispatch(new CoherentCacheServiceNonblockingRequestEvent(this.getDirectoryController(), access, tag, cacheAccess.getLine(), cacheAccess.isHitInCache(), cacheAccess.isEviction(), cacheAccess.getReference().getAccessType()));
-        this.getDirectoryController().getBlockingEventDispatcher().dispatch(new CoherentCacheBeginCacheAccessEvent(this.getDirectoryController(), access, cacheAccess));
-        this.getDirectoryController().updateStats(cacheAccess);
+    public void fireServiceNonblockingRequestEvent(MemoryHierarchyAccess access, int tag, boolean hitInCache) {
+        this.getDirectoryController().getBlockingEventDispatcher().dispatch(new CoherentCacheServiceNonblockingRequestEvent(this.getDirectoryController(), access, tag, getSet(), getWay(), hitInCache));
+        this.getDirectoryController().updateStats(access.getType().isRead(), hitInCache);
     }
 
-    public void fireCacheLineFillEvent(MemoryHierarchyAccess access, int tag) {
-        CacheAccess<DirectoryControllerState> cacheAccess = this.getLine().getCacheAccess();
-        this.getDirectoryController().getBlockingEventDispatcher().dispatch(new LastLevelCacheLineFillEvent(this.getDirectoryController(), access, cacheAccess));
+    public void fireCacheLineFillEvent(MemoryHierarchyAccess access, int tag, int victimTag) {
+        this.getDirectoryController().getBlockingEventDispatcher().dispatch(new LastLevelCacheLineFillEvent(this.getDirectoryController(), access, tag, getSet(), getWay(), victimTag));
     }
 
     public void fireReplacementEvent(MemoryHierarchyAccess access, int tag) {
-        CacheAccess<DirectoryControllerState> cacheAccess = this.getLine().getCacheAccess();
-        this.getDirectoryController().getBlockingEventDispatcher().dispatch(new CoherentCacheLineReplacementEvent(this.getDirectoryController(), access, tag, cacheAccess.getLine(), cacheAccess.isHitInCache(), cacheAccess.isEviction(), cacheAccess.getReference().getAccessType()));
+        this.getDirectoryController().getBlockingEventDispatcher().dispatch(new CoherentCacheLineReplacementEvent(this.getDirectoryController(), access, tag, getSet(), getWay()));
     }
 
     public void firePutSOrPutMAndDataFromOwnerEvent(MemoryHierarchyAccess access, int tag) {
-        CacheAccess<DirectoryControllerState> cacheAccess = this.getLine().getCacheAccess();
-        this.getDirectoryController().getBlockingEventDispatcher().dispatch(new CoherentCacheLastPutSOrPutMAndDataFromOwnerEvent(this.getDirectoryController(), access, tag, cacheAccess.getLine()));
+        this.getDirectoryController().getBlockingEventDispatcher().dispatch(new CoherentCacheLastPutSOrPutMAndDataFromOwnerEvent(this.getDirectoryController(), access, tag, getSet(), getWay()));
     }
 
     public void fireNonblockingRequestHitToTransientTagEvent(MemoryHierarchyAccess access, int tag) {
-        CacheAccess<DirectoryControllerState> cacheAccess = this.getLine().getCacheAccess();
-        this.getDirectoryController().getBlockingEventDispatcher().dispatch(new CoherentCacheNonblockingRequestHitToTransientTagEvent(this.getDirectoryController(), access, tag, cacheAccess.getLine()));
+        this.getDirectoryController().getBlockingEventDispatcher().dispatch(new CoherentCacheNonblockingRequestHitToTransientTagEvent(this.getDirectoryController(), access, tag, getSet(), getWay()));
     }
 
     public void sendDataToReq(CacheCoherenceFlow producerFlow, final CacheController req, final int tag, int numAcks) {

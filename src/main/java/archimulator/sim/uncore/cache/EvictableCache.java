@@ -18,11 +18,9 @@ package archimulator.sim.uncore.cache; /****************************************
  ******************************************************************************/
 
 import archimulator.sim.base.simulation.SimulationObject;
-import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicyFactory;
-import archimulator.sim.uncore.coherence.msi.controller.GeneralCacheController;
 import archimulator.util.ValueProvider;
 import archimulator.util.ValueProviderFactory;
 
@@ -37,38 +35,33 @@ public class EvictableCache<StateT extends Serializable> extends Cache<StateT> {
         this.evictionPolicy = EvictionPolicyFactory.createEvictionPolicy(evictionPolicyClz, this);
     }
 
-    public CacheAccess<StateT> newAccess(GeneralCacheController cacheController, MemoryHierarchyAccess access, int address, CacheAccessType accessType) {
+    public CacheAccess<StateT> newAccess(MemoryHierarchyAccess access, int address) {
         CacheLine<StateT> line = this.findLine(address);
 
         int set = this.getSet(address);
 
         if (line != null) {
-            CacheHit<StateT> cacheHit = this.newHit(cacheController, access, set, address, accessType, line.getWay());
-            line.setCacheAccess(cacheHit);
-            return cacheHit;
+            return this.newHit(access, set, address, line.getWay());
         } else {
-            CacheMiss<StateT> cacheMiss = this.newMiss(cacheController, access, set, address, accessType);
-            line = this.getLine(set, cacheMiss.getWay());
-            line.setCacheAccess(cacheMiss);
-            return cacheMiss;
+            return this.newMiss(access, set, address);
         }
     }
 
-    private CacheHit<StateT> newHit(GeneralCacheController coherentCache, MemoryHierarchyAccess access, int set, int address, CacheAccessType accessType, int way) {
-        return new CacheHit<StateT>(this, new CacheReference(coherentCache, access, address, this.getTag(address), accessType, set), way);
+    private CacheAccess<StateT> newHit(MemoryHierarchyAccess access, int set, int address, int way) {
+        return new CacheAccess<StateT>(this, access, set, way, this.getTag(address));
     }
 
-    private CacheMiss<StateT> newMiss(GeneralCacheController coherentCache, MemoryHierarchyAccess access, int set, int address, CacheAccessType accessType) {
-        CacheReference reference = new CacheReference(coherentCache, access, address, this.getTag(address), accessType, set);
+    private CacheAccess<StateT> newMiss(MemoryHierarchyAccess access, int set, int address) {
+        int tag = this.getTag(address);
 
         for (int way = 0; way < this.getAssociativity(); way++) {
             CacheLine<StateT> line = this.getLine(set, way);
             if (line.getState() == line.getInitialState()) {
-                return new CacheMiss<StateT>(this, reference, way);
+                return new CacheAccess<StateT>(this, access, set, way, tag);
             }
         }
 
-        return this.evictionPolicy.handleReplacement(reference);
+        return this.evictionPolicy.handleReplacement(access, set, tag);
     }
 
     public EvictionPolicy<StateT> getEvictionPolicy() {

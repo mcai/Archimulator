@@ -21,13 +21,14 @@ package archimulator.sim.uncore;
 public enum MemoryHierarchyAccessType {
     IFETCH,
     LOAD,
-    STORE;
+    STORE,
+    UNKNOWN;
 
     public boolean isRead() {
         return this == IFETCH || this == LOAD;
     }
 
     public boolean isWrite() {
-        return !this.isRead();
+        return this == STORE;
     }
 }

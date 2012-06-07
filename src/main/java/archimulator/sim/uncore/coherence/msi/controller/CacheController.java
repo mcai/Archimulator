@@ -311,7 +311,7 @@ public class CacheController extends GeneralCacheController {
     private void access(CacheCoherenceFlow producerFlow, MemoryHierarchyAccess access, final int tag, final Action2<Integer, Integer> onReplacementCompletedCallback, final Action onReplacementStalledCallback) {
         final int set = this.cache.getSet(tag);
 
-        final CacheAccess<CacheControllerState> cacheAccess = this.getCache().newAccess(this, access, tag, producerFlow instanceof LoadFlow ? CacheAccessType.DOWNWARD_READ : CacheAccessType.DOWNWARD_WRITE);
+        final CacheAccess<CacheControllerState> cacheAccess = this.getCache().newAccess(access, tag);
         if(cacheAccess.isHitInCache()) {
             onReplacementCompletedCallback.apply(set, cacheAccess.getWay());
         }
@@ -319,7 +319,7 @@ public class CacheController extends GeneralCacheController {
             if(cacheAccess.isEviction()) {
                 final CacheLine<CacheControllerState> line = this.getCache().getLine(set, cacheAccess.getWay());
                 final CacheControllerFiniteStateMachine fsm = (CacheControllerFiniteStateMachine) line.getStateProvider();
-                fsm.onEventReplacement(producerFlow, tag,
+                fsm.onEventReplacement(producerFlow, tag, cacheAccess,
                         new Action() {
                             @Override
                             public void apply() {

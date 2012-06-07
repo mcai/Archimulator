@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache.eviction;
 
+import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.*;
 import archimulator.util.ValueProvider;
 import archimulator.util.ValueProviderFactory;
@@ -39,11 +40,11 @@ public class LFUPolicy<StateT extends Serializable> extends EvictionPolicy<State
     }
 
     @Override
-    public CacheMiss<StateT> handleReplacement(CacheReference reference) {
+    public CacheAccess<StateT> handleReplacement(MemoryHierarchyAccess access, int set, int tag) {
         int minFrequency = Integer.MAX_VALUE;
         int victimWay = getCache().getAssociativity() - 1;
 
-        for (CacheLine<Boolean> mirrorCacheLine : this.mirrorCache.getLines(reference.getSet())) {
+        for (CacheLine<Boolean> mirrorCacheLine : this.mirrorCache.getLines(set)) {
             BooleanValueProvider stateProvider = (BooleanValueProvider) mirrorCacheLine.getStateProvider();
             int frequency = stateProvider.frequency;
 
@@ -53,19 +54,19 @@ public class LFUPolicy<StateT extends Serializable> extends EvictionPolicy<State
             }
         }
 
-        return new CacheMiss<StateT>(this.getCache(), reference, victimWay);
+        return new CacheAccess<StateT>(this.getCache(), access, set, victimWay, tag);
     }
 
     @Override
-    public void handlePromotionOnHit(CacheHit<StateT> hit) {
-        CacheLine<Boolean> line = this.getMirrorCacheLine(hit.getLine());
+    public void handlePromotionOnHit(int set, int way) {
+        CacheLine<Boolean> line = this.mirrorCache.getLine(set, way);
         BooleanValueProvider stateProvider = (BooleanValueProvider) line.getStateProvider();
         stateProvider.frequency++;
     }
 
     @Override
-    public void handleInsertionOnMiss(CacheMiss<StateT> miss) {
-        CacheLine<Boolean> line = this.getMirrorCacheLine(miss.getLine());
+    public void handleInsertionOnMiss(int set, int way) {
+        CacheLine<Boolean> line = this.mirrorCache.getLine(set, way);
         BooleanValueProvider stateProvider = (BooleanValueProvider) line.getStateProvider();
         stateProvider.frequency = 0;
     }
@@ -87,9 +88,5 @@ public class LFUPolicy<StateT extends Serializable> extends EvictionPolicy<State
         public Boolean getInitialValue() {
             return false;
         }
-    }
-
-    private CacheLine<Boolean> getMirrorCacheLine(CacheLine<?> ownerCacheLine) {
-        return this.mirrorCache.getLine(ownerCacheLine.getSet(), ownerCacheLine.getWay());
     }
 }

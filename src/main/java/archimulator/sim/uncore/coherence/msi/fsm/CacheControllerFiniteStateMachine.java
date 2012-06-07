@@ -4,7 +4,6 @@ import archimulator.sim.uncore.CacheSimulator;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.cache.CacheLine;
-import archimulator.sim.uncore.coherence.event.CoherentCacheBeginCacheAccessEvent;
 import archimulator.sim.uncore.coherence.event.CoherentCacheLineReplacementEvent;
 import archimulator.sim.uncore.coherence.event.CoherentCacheNonblockingRequestHitToTransientTagEvent;
 import archimulator.sim.uncore.coherence.event.CoherentCacheServiceNonblockingRequestEvent;
@@ -37,7 +36,7 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
 
     private Action onCompletedCallback;
 
-//    private List<String> transitionHistory = new ArrayList<String>(10);
+//    private List<String> transitionHistory = new ArrayList<String>();
 
     public Action getOnCompletedCallback() {
         return onCompletedCallback;
@@ -71,7 +70,7 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
 
 //                if (getState() != previousState) {
                     String transitionText = String.format("[%d] %s.[%d,%d] {%s} %s: %s.%s -> %s", cacheController.getCycleAccurateEventQueue().getCurrentCycle(), getName(), getSet(), getWay(), line.getTag() != CacheLine.INVALID_TAG ? String.format("0x%08x", line.getTag()) : "N/A", previousState, enterStateEvent.getSender() != null ? enterStateEvent.getSender() : "<N/A>", enterStateEvent.getCondition(), getState());
-//                    if (transitionHistory.size() >= 10) {
+//                    if (transitionHistory.size() >= 100) {
 //                        transitionHistory.remove(0);
 //                    }
 //
@@ -96,8 +95,8 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
         this.fireTransition("<core>" + "." + String.format("0x%08x", tag), storeEvent);
     }
 
-    public void onEventReplacement(CacheCoherenceFlow producerFlow, int tag, Action onCompletedCallback, Action onStalledCallback) {
-        ReplacementEvent replacementEvent = new ReplacementEvent(cacheController, producerFlow, tag, set, way, onCompletedCallback, onStalledCallback, producerFlow.getAccess());
+    public void onEventReplacement(CacheCoherenceFlow producerFlow, int tag, CacheAccess<CacheControllerState> cacheAccess, Action onCompletedCallback, Action onStalledCallback) {
+        ReplacementEvent replacementEvent = new ReplacementEvent(cacheController, producerFlow, tag, cacheAccess, set, way, onCompletedCallback, onStalledCallback, producerFlow.getAccess());
         this.fireTransition("<core>" + "." + String.format("0x%08x", tag), replacementEvent);
     }
 
@@ -206,8 +205,8 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
     }
 
     public void hit(MemoryHierarchyAccess access, int tag, int set, int way) {
-        this.cacheController.getCache().getLine(set, way).getCacheAccess().commit();
-        this.fireServiceNonblockingRequestEvent(access, tag);
+        this.cacheController.getCache().getEvictionPolicy().handlePromotionOnHit(set, way);
+        this.fireServiceNonblockingRequestEvent(access, tag, true);
     }
 
     public void stall(final Object sender, final CacheControllerEvent event) {
@@ -224,21 +223,17 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
         stalledEvents.add(action);
     }
 
-    public void fireServiceNonblockingRequestEvent(MemoryHierarchyAccess access, int tag) {
-        CacheAccess<CacheControllerState> cacheAccess = this.getLine().getCacheAccess();
-        this.getCacheController().getBlockingEventDispatcher().dispatch(new CoherentCacheServiceNonblockingRequestEvent(this.getCacheController(), access, tag, cacheAccess.getLine(), cacheAccess.isHitInCache(), cacheAccess.isEviction(), cacheAccess.getReference().getAccessType()));
-        this.getCacheController().getBlockingEventDispatcher().dispatch(new CoherentCacheBeginCacheAccessEvent(this.getCacheController(), access, cacheAccess));
-        this.getCacheController().updateStats(cacheAccess);
+    public void fireServiceNonblockingRequestEvent(MemoryHierarchyAccess access, int tag, boolean hitInCache) {
+        this.getCacheController().getBlockingEventDispatcher().dispatch(new CoherentCacheServiceNonblockingRequestEvent(this.getCacheController(), access, tag, getSet(), getWay(), hitInCache));
+        this.getCacheController().updateStats(access.getType().isRead(), hitInCache);
     }
 
     public void fireReplacementEvent(MemoryHierarchyAccess access, int tag) {
-        CacheAccess<CacheControllerState> cacheAccess = this.getLine().getCacheAccess();
-        this.getCacheController().getBlockingEventDispatcher().dispatch(new CoherentCacheLineReplacementEvent(this.getCacheController(), access, tag, cacheAccess.getLine(), cacheAccess.isHitInCache(), cacheAccess.isEviction(), cacheAccess.getReference().getAccessType()));
+        this.getCacheController().getBlockingEventDispatcher().dispatch(new CoherentCacheLineReplacementEvent(this.getCacheController(), access, tag, getSet(), getWay()));
     }
 
     public void fireNonblockingRequestHitToTransientTagEvent(MemoryHierarchyAccess access, int tag) {
-        CacheAccess<CacheControllerState> cacheAccess = this.getLine().getCacheAccess();
-        this.getCacheController().getBlockingEventDispatcher().dispatch(new CoherentCacheNonblockingRequestHitToTransientTagEvent(this.getCacheController(), access, tag, cacheAccess.getLine()));
+        this.getCacheController().getBlockingEventDispatcher().dispatch(new CoherentCacheNonblockingRequestHitToTransientTagEvent(this.getCacheController(), access, tag, getSet(), getWay()));
     }
 
     @Override

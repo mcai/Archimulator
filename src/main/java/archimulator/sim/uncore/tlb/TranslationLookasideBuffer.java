@@ -21,11 +21,8 @@ package archimulator.sim.uncore.tlb;
 import archimulator.sim.base.event.DumpStatEvent;
 import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.base.simulation.SimulationObject;
-import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
-import archimulator.sim.uncore.cache.CacheAccess;
-import archimulator.sim.uncore.cache.CacheLine;
-import archimulator.sim.uncore.cache.EvictableCache;
+import archimulator.sim.uncore.cache.*;
 import archimulator.sim.uncore.cache.eviction.LRUPolicy;
 import archimulator.util.ValueProvider;
 import archimulator.util.ValueProviderFactory;
@@ -78,23 +75,25 @@ public class TranslationLookasideBuffer {
     }
 
     public void access(MemoryHierarchyAccess access, Action onCompletedCallback) {
-        CacheAccess<Boolean> cacheAccess = this.cache.newAccess(null, access, access.getPhysicalAddress(), CacheAccessType.UNKNOWN);
+        int set = this.cache.getSet(access.getPhysicalAddress());
+        CacheAccess<Boolean> cacheAccess = this.cache.newAccess(access, access.getPhysicalAddress());
 
         this.accesses++;
 
         if (cacheAccess.isHitInCache()) {
-            cacheAccess.commit();
+            getCache().getEvictionPolicy().handlePromotionOnHit(set, cacheAccess.getWay());
             this.hits++;
         } else {
             if (cacheAccess.isEviction()) {
                 this.evictions++;
             }
 
-            CacheLine<Boolean> line = cacheAccess.getLine();
+            CacheLine<Boolean> line = this.cache.getLine(set, cacheAccess.getWay());
             BooleanValueProvider stateProvider = (BooleanValueProvider) line.getStateProvider();
             stateProvider.state = true;
+            line.setAccess(access);
             line.setTag(access.getPhysicalTag());
-            cacheAccess.commit();
+            getCache().getEvictionPolicy().handleInsertionOnMiss(set,  cacheAccess.getWay());
         }
 
         access.getThread().getCycleAccurateEventQueue().schedule(this, onCompletedCallback, cacheAccess.isHitInCache() ? this.config.getHitLatency() : this.config.getMissLatency());

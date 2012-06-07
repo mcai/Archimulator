@@ -1,6 +1,5 @@
 package archimulator.sim.uncore.coherence.msi.controller;
 
-import archimulator.sim.uncore.CacheAccessType;
 import archimulator.sim.uncore.CacheHierarchy;
 import archimulator.sim.uncore.MemoryDevice;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
@@ -200,7 +199,7 @@ public class DirectoryController extends GeneralCacheController {
     private void access(CacheCoherenceFlow producerFlow, MemoryHierarchyAccess access, CacheController req, final int tag, final Action2<Integer, Integer> onReplacementCompletedCallback, final Action onReplacementStalledCallback) {
         final int set = this.cache.getSet(tag);
 
-        final CacheAccess<DirectoryControllerState> cacheAccess = this.cache.newAccess(this, access, tag, producerFlow instanceof GetSMessage ? CacheAccessType.DOWNWARD_READ : CacheAccessType.DOWNWARD_WRITE);
+        final CacheAccess<DirectoryControllerState> cacheAccess = this.cache.newAccess(access, tag);
         if(cacheAccess.isHitInCache()) {
             onReplacementCompletedCallback.apply(set, cacheAccess.getWay());
         }
@@ -208,7 +207,7 @@ public class DirectoryController extends GeneralCacheController {
             if(cacheAccess.isEviction()) {
                 final CacheLine<DirectoryControllerState> line = this.getCache().getLine(set, cacheAccess.getWay());
                 final DirectoryControllerFiniteStateMachine fsm = (DirectoryControllerFiniteStateMachine) line.getStateProvider();
-                fsm.onEventReplacement(producerFlow, req, tag,
+                fsm.onEventReplacement(producerFlow, req, tag, cacheAccess,
                         new Action() {
                             @Override
                             public void apply() {
