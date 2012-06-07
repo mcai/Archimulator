@@ -131,8 +131,8 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
         System.out.println();
         System.out.println();
 
-        System.out.println("------------------------------------------------------------------------");
         System.out.println("Directory Controller " + this.l2Cache.getName() + " FSM: ");
+        System.out.println("------------------------------------------------------------------------");
         this.l2Cache.getFsmFactory().dump();
     }
 
