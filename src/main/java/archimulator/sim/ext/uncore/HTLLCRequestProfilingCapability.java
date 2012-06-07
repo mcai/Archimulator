@@ -308,7 +308,7 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
     }
 
     public void dumpStats() {
-        if(this.numMTLLCMisses > 0) {
+        if(this.numTotalHTLLCRequests > 0) {
             System.out.printf("llcHTRequestProfilingCapability." + this.llc.getName() + ".numMTLLCMisses: %s\n", String.valueOf(this.numMTLLCMisses));
 
             System.out.printf("llcHTRequestProfilingCapability." + this.llc.getName() + ".numTotalHTLLCRequests: %s\n", String.valueOf(this.numTotalHTLLCRequests));
@@ -328,8 +328,12 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
 
     private void markLateHTRequest(CoherentCacheNonblockingRequestHitToTransientTagEvent event) {
         int set = event.getSet();
-        boolean requesterIsHT = BasicThread.isHelperThread(event.getAccess().getThread());
-        boolean lineFoundIsHT = this.getLLCLineBroughterThreadId(set, event.getWay()) == BasicThread.getHelperThreadId();
+
+        int requesterThreadId = event.getAccess().getThread().getId();
+        int lineFoundThreadId = this.getLLCLineBroughterThreadId(set, event.getWay());
+
+        boolean requesterIsHT = BasicThread.isHelperThread(requesterThreadId);
+        boolean lineFoundIsHT = BasicThread.isHelperThread(lineFoundThreadId);
 
         if (!requesterIsHT && lineFoundIsHT) {
             this.numLateHTLLCRequests++;
