@@ -5,10 +5,12 @@ import archimulator.sim.core.ProcessorConfig;
 import archimulator.sim.ext.uncore.HTLLCRequestProfilingCapability;
 import archimulator.sim.uncore.cache.eviction.LRUPolicy;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
+import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import archimulator.sim.uncore.tlb.TranslationLookasideBuffer;
 import net.pickapack.DateHelper;
 import net.pickapack.action.Action;
+import net.pickapack.action.UntypedPredicate;
 import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
 import org.apache.commons.io.FileUtils;
@@ -29,8 +31,8 @@ public class CacheSimulator {
     private static int numCompletedReads = 0;
     private static int numCompletedWrites = 0;
 
-        public static boolean logEnabled = true;
-//    public static boolean logEnabled = false;
+//        public static boolean logEnabled = true;
+    public static boolean logEnabled = false;
 
 //    private static boolean useTrace = false;
     private static boolean useTrace = true;
@@ -79,6 +81,24 @@ public class CacheSimulator {
                 }
             });
             numPendingWrites++;
+        }
+    }
+
+    public static class CacheAssertionLine {
+        private int beginCycle;
+        private UntypedPredicate pred;
+
+        public CacheAssertionLine(int beginCycle, UntypedPredicate pred) {
+            this.beginCycle = beginCycle;
+            this.pred = pred;
+        }
+
+        public int getBeginCycle() {
+            return beginCycle;
+        }
+
+        public UntypedPredicate getPred() {
+            return pred;
         }
     }
 
@@ -138,31 +158,41 @@ public class CacheSimulator {
 
         HTLLCRequestProfilingCapability htllcRequestProfilingCapability = new HTLLCRequestProfilingCapability(cacheHierarchy.getL2Cache());
 
-        CacheController l1D0 = cacheHierarchy.getDataCaches().get(0);
-        CacheController l1D2 = cacheHierarchy.getDataCaches().get(1);
+        final DirectoryController l2 = cacheHierarchy.getL2Cache();
+        final CacheController l1D0 = cacheHierarchy.getDataCaches().get(0);
+        final CacheController l1D2 = cacheHierarchy.getDataCaches().get(1);
 
         final Map<CacheController, Integer> cacheControllerToThreadIdMap = new HashMap<CacheController, Integer>();
         cacheControllerToThreadIdMap.put(l1D0, 0);
         cacheControllerToThreadIdMap.put(l1D2, 2);
 
+        List<CacheAssertionLine> cacheAssertionLines = new ArrayList<CacheAssertionLine>();
         List<MemoryAccessLine> memoryAccessLines = new ArrayList<MemoryAccessLine>();
 
-        memoryAccessLines.add(new MemoryAccessLine(0, l1D0, 0x00100000, false));
-        memoryAccessLines.add(new MemoryAccessLine(995, l1D2, 0x00200000, false));
-        memoryAccessLines.add(new MemoryAccessLine(1000, l1D0, 0x00100000, true));
-        memoryAccessLines.add(new MemoryAccessLine(1060, l1D2, 0x00200000, false));
-        memoryAccessLines.add(new MemoryAccessLine(1105, l1D0, 0x00100000, true));
-        memoryAccessLines.add(new MemoryAccessLine(1110, l1D2, 0x00100000, false));
-        memoryAccessLines.add(new MemoryAccessLine(1170, l1D0, 0x00200000, true));
+        memoryAccessLines.add(new MemoryAccessLine(0, l1D2, 0x00100000, false));
+        memoryAccessLines.add(new MemoryAccessLine(5, l1D0, 0x00100000, false));
+        memoryAccessLines.add(new MemoryAccessLine(1005, l1D0, 0x00200000, false));
 
-        memoryAccessLines.add(new MemoryAccessLine(1245, l1D2, 0x00100000, false));
-        memoryAccessLines.add(new MemoryAccessLine(1250, l1D0, 0x00300000, false));
+        memoryAccessLines.add(new MemoryAccessLine(2000, l1D2, 0x00300000, false));
+
+        cacheAssertionLines.add(new CacheAssertionLine(3000, new UntypedPredicate() {
+            @Override
+            public boolean apply() {
+                return l1D0.getCache().findLine(0x00200000) == null && l1D0.getCache().findLine(0x00300000) == null && l1D2.getCache().findLine(0x00300000) != null && l2.getCache().findLine(0x00300000) != null;
+            }
+        }));
+//
+        memoryAccessLines.add(new MemoryAccessLine(4000, l1D0, 0x00200000, false));
+
+        memoryAccessLines.add(new MemoryAccessLine(5000, l1D2, 0x00300000, false));
+
+        memoryAccessLines.add(new MemoryAccessLine(6000, l1D0, 0x00100000, false));
 
         int maxCycle = 100000000;
 
         if(useTrace) {
             for(final MemoryAccessLine memoryAccessLine : memoryAccessLines) {
-                cycleAccurateEventQueue.schedule(null, new Action() {
+                cycleAccurateEventQueue.schedule(memoryAccessLine, new Action() {
                     @Override
                     public void apply() {
                         if(!memoryAccessLine.isWrite()) {
@@ -173,6 +203,17 @@ public class CacheSimulator {
                         }
                     }
                 }, memoryAccessLine.getBeginCycle());
+            }
+
+            for(final CacheAssertionLine cacheAssertionLine : cacheAssertionLines) {
+                cycleAccurateEventQueue.schedule(cacheAssertionLine, new Action() {
+                    @Override
+                    public void apply() {
+                        if(!cacheAssertionLine.getPred().apply()) {
+                            throw new IllegalArgumentException();
+                        }
+                    }
+                }, cacheAssertionLine.getBeginCycle());
             }
         }
 
