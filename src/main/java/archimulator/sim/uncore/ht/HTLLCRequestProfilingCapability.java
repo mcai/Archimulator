@@ -165,7 +165,7 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
                 int set = (Integer) args[0];
                 int way = (Integer) args[1];
 
-                return new HTLLCRequestVictimCacheLineStateValueProvider(set, way);
+                return new HTLLCRequestVictimCacheLineStateValueProvider();
             }
         };
 
@@ -357,7 +357,7 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
         int requesterThreadId = event.getAccess().getThread().getId();
         int lineFoundThreadId = getLLCLineHTRequestState(set, event.getWay()).inFlightThreadId;
 
-        if(lineFoundThreadId == -1) {
+        if (lineFoundThreadId == -1) {
             throw new IllegalArgumentException();
         }
 
@@ -419,9 +419,9 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
         }
 
         if (!mtHit && !htHit && vtHit) {
-            handleRequestCase1(event, set, mtHit, htHit, vtLine, vtHit);
+            handleRequestCase1(event, set, vtLine);
         } else if (!mtHit && htHit && !vtHit) {
-            handleRequestCase2(event, set, llcWay, mtHit, htHit, vtHit);
+            handleRequestCase2(event, set, llcWay);
         } else if (!mtHit && htHit && vtHit) {
             handleRequestCase3(event, set, llcWay, vtLine);
         } else if (mtHit && vtHit) {
@@ -429,7 +429,7 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
         }
     }
 
-    private void handleRequestCase1(CoherentCacheServiceNonblockingRequestEvent event, int set, boolean mtHit, boolean htHit, CacheLine<HTLLCRequestVictimCacheLineState> vtLine, boolean vtHit) {
+    private void handleRequestCase1(CoherentCacheServiceNonblockingRequestEvent event, int set, CacheLine<HTLLCRequestVictimCacheLineState> vtLine) {
         this.numBadHTLLCRequests++;
         this.cacheSetStats.get(set).numBadHTLLCRequests++;
 
@@ -455,7 +455,7 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
         checkInvariants(set);
     }
 
-    private void handleRequestCase2(CoherentCacheServiceNonblockingRequestEvent event, int set, int llcWay, boolean mtHit, boolean htHit, boolean vtHit) {
+    private void handleRequestCase2(CoherentCacheServiceNonblockingRequestEvent event, int set, int llcWay) {
         this.markMT(set, llcWay);
 
         this.numGoodHTLLCRequests++;
@@ -534,10 +534,9 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
 
         int victimTag = event.getVictimTag();
 
-        if(requesterIsHT) {
+        if (requesterIsHT) {
             markHT(set, llcWay);
-        }
-        else {
+        } else {
             markMT(set, llcWay);
         }
 
@@ -692,7 +691,7 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
         }
 
         CacheSetStat cacheSetStat = this.cacheSetStats.get(set);
-        if(cacheSetStat.getNumUglyHTLLCRequests() < 0) {
+        if (cacheSetStat.getNumUglyHTLLCRequests() < 0) {
             throw new IllegalArgumentException();
         }
     }
@@ -725,10 +724,9 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
 
         CacheLineHTRequestState htRequestState = getLLCLineHTRequestState(set, way);
 
-        if(inFlight) {
+        if (inFlight) {
             htRequestState.inFlightThreadId = llcLineBroughterThreadId;
-        }
-        else {
+        } else {
             htRequestState.inFlightThreadId = -1;
             htRequestState.threadId = llcLineBroughterThreadId;
         }
@@ -742,7 +740,7 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
         CacheAccess<HTLLCRequestVictimCacheLineState> newMiss = this.newMiss(tag, set);
         CacheLine<HTLLCRequestVictimCacheLineState> line = newMiss.getLine();
         HTLLCRequestVictimCacheLineStateValueProvider stateProvider = (HTLLCRequestVictimCacheLineStateValueProvider) line.getStateProvider();
-        stateProvider.setState(HTLLCRequestVictimCacheLineState.DATA);
+        stateProvider.state = HTLLCRequestVictimCacheLineState.DATA;
         line.setTag(tag);
         if (printTrace) {
             pw.printf("[%d] hvc.[%d,%d] {%s} %s: insertDataEntry(0x%08x)\n", llc.getCycleAccurateEventQueue().getCurrentCycle(), set, line.getWay(),
@@ -758,7 +756,7 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
         CacheAccess<HTLLCRequestVictimCacheLineState> newMiss = this.newMiss(0, set);
         CacheLine<HTLLCRequestVictimCacheLineState> line = newMiss.getLine();
         HTLLCRequestVictimCacheLineStateValueProvider stateProvider = (HTLLCRequestVictimCacheLineStateValueProvider) line.getStateProvider();
-        stateProvider.setState(HTLLCRequestVictimCacheLineState.NULL);
+        stateProvider.state = HTLLCRequestVictimCacheLineState.NULL;
         line.setTag(CacheLine.INVALID_TAG);
         if (printTrace) {
             pw.printf("[%d] hvc.[%d,%d] {%s} %s: insertNullEntry(%s)\n", llc.getCycleAccurateEventQueue().getCurrentCycle(), set, line.getWay(),
@@ -790,7 +788,7 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
             CacheLine<HTLLCRequestVictimCacheLineState> line = this.htLLCRequestVictimCache.getLine(set, way);
             if (!line.getState().equals(HTLLCRequestVictimCacheLineState.INVALID)) {
                 HTLLCRequestVictimCacheLineStateValueProvider stateProvider = (HTLLCRequestVictimCacheLineStateValueProvider) line.getStateProvider();
-                stateProvider.setState(HTLLCRequestVictimCacheLineState.INVALID);
+                stateProvider.state = HTLLCRequestVictimCacheLineState.INVALID;
                 line.setTag(CacheLine.INVALID_TAG);
                 if (printTrace) {
                     pw.printf("[%d] hvc.[%d,%d] {%s} %s: removeLRU\n", llc.getCycleAccurateEventQueue().getCurrentCycle(), set, way,
@@ -836,13 +834,9 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
     }
 
     private static class HTLLCRequestVictimCacheLineStateValueProvider implements ValueProvider<HTLLCRequestVictimCacheLineState> {
-        private final int set;
-        private final int way;
         private HTLLCRequestVictimCacheLineState state;
 
-        public HTLLCRequestVictimCacheLineStateValueProvider(int set, int way) {
-            this.set = set;
-            this.way = way;
+        public HTLLCRequestVictimCacheLineStateValueProvider() {
             this.state = HTLLCRequestVictimCacheLineState.INVALID;
         }
 
@@ -851,25 +845,9 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
             return state;
         }
 
-        public HTLLCRequestVictimCacheLineState getState() {
-            return state;
-        }
-
-        public void setState(HTLLCRequestVictimCacheLineState state) {
-            this.state = state;
-        }
-
         @Override
         public HTLLCRequestVictimCacheLineState getInitialValue() {
             return HTLLCRequestVictimCacheLineState.INVALID;
-        }
-
-        public int getSet() {
-            return set;
-        }
-
-        public int getWay() {
-            return way;
         }
     }
 
