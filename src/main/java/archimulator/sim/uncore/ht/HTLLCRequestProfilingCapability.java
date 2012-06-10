@@ -575,7 +575,7 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
         }
 
         //            this.markHT(set, llcWay);
-        this.insertNullEntry(set);
+        this.insertNullEntry(set, event.getTag());
         checkInvariants(set);
     }
 
@@ -598,7 +598,7 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
         }
 
         //                this.markHT(set, llcWay);
-        this.insertDataEntry(set, victimTag);
+        this.insertDataEntry(set, victimTag, event.getTag());
         checkInvariants(set);
     }
 
@@ -658,7 +658,6 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
 
         if (htLLCRequestFound) {
             //case 5
-
             if (printTrace) {
                 pw.printf(
                         "[%d] llc.[%d,%d] {%s} %s: handleLineFillCase5 (totalHT = %d, goodHT = %d, badHT = %d, uglyHT = %d)\n",
@@ -676,7 +675,7 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
             }
 
             this.removeLRU(set);
-            this.insertDataEntry(set, victimTag);
+            this.insertDataEntry(set, victimTag, event.getTag());
         }
         checkInvariants(set);
     }
@@ -732,7 +731,7 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
         }
     }
 
-    private void insertDataEntry(int set, int tag) {
+    private void insertDataEntry(int set, int tag, int htRequestTag) {
         if (tag == CacheLine.INVALID_TAG) {
             throw new IllegalArgumentException();
         }
@@ -741,10 +740,12 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
         CacheLine<HTLLCRequestVictimCacheLineState> line = newMiss.getLine();
         HTLLCRequestVictimCacheLineStateValueProvider stateProvider = (HTLLCRequestVictimCacheLineStateValueProvider) line.getStateProvider();
         stateProvider.state = HTLLCRequestVictimCacheLineState.DATA;
+        stateProvider.htRequestTag = htRequestTag;
         line.setTag(tag);
         if (printTrace) {
-            pw.printf("[%d] hvc.[%d,%d] {%s} %s: insertDataEntry(0x%08x)\n", llc.getCycleAccurateEventQueue().getCurrentCycle(), set, line.getWay(),
+            pw.printf("[%d] hvc.[%d,%d] {%s (htRequestTag: %s)} %s: insertDataEntry(0x%08x)\n", llc.getCycleAccurateEventQueue().getCurrentCycle(), set, line.getWay(),
                     line.getTag() != CacheLine.INVALID_TAG ? String.format("0x%08x", line.getTag()) : "N/A",
+                    stateProvider.htRequestTag != CacheLine.INVALID_TAG ? String.format("0x%08x", stateProvider.htRequestTag) : "N/A",
                     line.getState(),
                     tag);
             pw.flush();
@@ -752,15 +753,17 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
         htLLCRequestVictimCache.getEvictionPolicy().handleInsertionOnMiss(set, newMiss.getWay());
     }
 
-    private void insertNullEntry(int set) {
+    private void insertNullEntry(int set, int htRequestTag) {
         CacheAccess<HTLLCRequestVictimCacheLineState> newMiss = this.newMiss(0, set);
         CacheLine<HTLLCRequestVictimCacheLineState> line = newMiss.getLine();
         HTLLCRequestVictimCacheLineStateValueProvider stateProvider = (HTLLCRequestVictimCacheLineStateValueProvider) line.getStateProvider();
         stateProvider.state = HTLLCRequestVictimCacheLineState.NULL;
+        stateProvider.htRequestTag = htRequestTag;
         line.setTag(CacheLine.INVALID_TAG);
         if (printTrace) {
-            pw.printf("[%d] hvc.[%d,%d] {%s} %s: insertNullEntry(%s)\n", llc.getCycleAccurateEventQueue().getCurrentCycle(), set, line.getWay(),
+            pw.printf("[%d] hvc.[%d,%d] {%s (htRequestTag: %s)} %s: insertNullEntry(%s)\n", llc.getCycleAccurateEventQueue().getCurrentCycle(), set, line.getWay(),
                     line.getTag() != CacheLine.INVALID_TAG ? String.format("0x%08x", line.getTag()) : "N/A",
+                    stateProvider.htRequestTag != CacheLine.INVALID_TAG ? String.format("0x%08x", stateProvider.htRequestTag) : "N/A",
                     line.getState(),
                     "N/A");
             pw.flush();
@@ -771,9 +774,11 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
     private void setLRU(int set, int way) {
         this.getLruPolicyForHtRequestVictimCache().setLRU(set, way);
         CacheLine<HTLLCRequestVictimCacheLineState> line = this.htLLCRequestVictimCache.getLine(set, way);
+        HTLLCRequestVictimCacheLineStateValueProvider stateProvider = (HTLLCRequestVictimCacheLineStateValueProvider) line.getStateProvider();
         if (printTrace) {
-            pw.printf("[%d] hvc.[%d,%d] {%s} %s: setLRU\n", llc.getCycleAccurateEventQueue().getCurrentCycle(), set, way,
+            pw.printf("[%d] hvc.[%d,%d] {%s (htRequestTag: %s)} %s: setLRU\n", llc.getCycleAccurateEventQueue().getCurrentCycle(), set, way,
                     line.getTag() != CacheLine.INVALID_TAG ? String.format("0x%08x", line.getTag()) : "N/A",
+                    stateProvider.htRequestTag != CacheLine.INVALID_TAG ? String.format("0x%08x", stateProvider.htRequestTag) : "N/A",
                     line.getState()
             );
             pw.flush();
@@ -789,10 +794,12 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
             if (!line.getState().equals(HTLLCRequestVictimCacheLineState.INVALID)) {
                 HTLLCRequestVictimCacheLineStateValueProvider stateProvider = (HTLLCRequestVictimCacheLineStateValueProvider) line.getStateProvider();
                 stateProvider.state = HTLLCRequestVictimCacheLineState.INVALID;
+                stateProvider.htRequestTag = CacheLine.INVALID_TAG;
                 line.setTag(CacheLine.INVALID_TAG);
                 if (printTrace) {
-                    pw.printf("[%d] hvc.[%d,%d] {%s} %s: removeLRU\n", llc.getCycleAccurateEventQueue().getCurrentCycle(), set, way,
+                    pw.printf("[%d] hvc.[%d,%d] {%s (htRequestTag: %s)} %s: removeLRU\n", llc.getCycleAccurateEventQueue().getCurrentCycle(), set, way,
                             line.getTag() != CacheLine.INVALID_TAG ? String.format("0x%08x", line.getTag()) : "N/A",
+                            stateProvider.htRequestTag != CacheLine.INVALID_TAG ? String.format("0x%08x", stateProvider.htRequestTag) : "N/A",
                             line.getState()
                     );
                     pw.flush();
@@ -835,9 +842,11 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
 
     private static class HTLLCRequestVictimCacheLineStateValueProvider implements ValueProvider<HTLLCRequestVictimCacheLineState> {
         private HTLLCRequestVictimCacheLineState state;
+        private int htRequestTag;
 
         public HTLLCRequestVictimCacheLineStateValueProvider() {
             this.state = HTLLCRequestVictimCacheLineState.INVALID;
+            this.htRequestTag = CacheLine.INVALID_TAG;
         }
 
         @Override
