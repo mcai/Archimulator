@@ -22,8 +22,6 @@ import archimulator.sim.base.simulation.SimulationObject;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import archimulator.util.ValueProvider;
 import archimulator.util.ValueProviderFactory;
-import net.pickapack.action.Action1;
-import net.pickapack.action.Predicate;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -44,69 +42,6 @@ public class Cache<StateT extends Serializable> extends BasicSimulationObject im
         for (int i = 0; i < this.getNumSets(); i++) {
             this.sets.add(new CacheSet<StateT>(this, this.getAssociativity(), i, cacheLineStateProviderFactory));
         }
-    }
-
-    public void forAll(int set, Predicate<CacheLine<StateT>> predicate, Action1<CacheLine<StateT>> action) {
-        for (int way = 0; way < this.getAssociativity(); way++) {
-            CacheLine<StateT> line = this.getLine(set, way);
-            if (predicate.apply(line)) {
-                action.apply(line);
-            }
-        }
-    }
-
-    public void forAny(int set, Predicate<CacheLine<StateT>> predicate, Action1<CacheLine<StateT>> action) {
-        for (int way = 0; way < this.getAssociativity(); way++) {
-            CacheLine<StateT> line = this.getLine(set, way);
-            if (predicate.apply(line)) {
-                action.apply(line);
-                return;
-            }
-        }
-    }
-
-    public void forExact(int set, Predicate<CacheLine<StateT>> predicate, Action1<CacheLine<StateT>> action) {
-        for (int way = 0; way < this.getAssociativity(); way++) {
-            CacheLine<StateT> line = this.getLine(set, way);
-            if (predicate.apply(line)) {
-                action.apply(line);
-                return;
-            }
-        }
-
-        throw new IllegalArgumentException();
-    }
-
-    public int count(int set, Predicate<CacheLine<StateT>> predicate) {
-        int count = 0;
-
-        for (int way = 0; way < this.getAssociativity(); way++) {
-            if (predicate.apply(this.getLine(set, way))) {
-                count++;
-            }
-        }
-
-        return count;
-    }
-
-    public boolean containsAny(int set, Predicate<CacheLine<StateT>> predicate) {
-        for (int way = 0; way < this.getAssociativity(); way++) {
-            if (predicate.apply(this.getLine(set, way))) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public boolean containsAll(int set, Predicate<CacheLine<StateT>> predicate) {
-        for (int way = 0; way < this.getAssociativity(); way++) {
-            if (!predicate.apply(this.getLine(set, way))) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     public List<CacheLine<StateT>> getLines(int set) {

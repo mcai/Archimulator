@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.ext.uncore;
+package archimulator.sim.uncore.ht;
 
 import archimulator.sim.analysis.BasicBlock;
 import archimulator.sim.analysis.Function;

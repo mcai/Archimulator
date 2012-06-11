@@ -3,8 +3,8 @@ package archimulator.client;
 import archimulator.sim.base.experiment.profile.ExperimentProfile;
 import archimulator.sim.base.experiment.profile.ProcessorProfile;
 import archimulator.sim.base.simulation.SimulatedProgram;
-import archimulator.sim.ext.uncore.HTLLCRequestProfilingCapability;
-import archimulator.sim.ext.uncore.LLCReuseDistanceProfilingCapability;
+import archimulator.sim.uncore.ht.HTLLCRequestProfilingCapability;
+import archimulator.sim.uncore.ht.LLCReuseDistanceProfilingCapability;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
 
 public class Presets {
@@ -15,9 +15,9 @@ public class Presets {
 //            "100");
 //            "200");
 //            "400");
-//            "1024");
+            "1024");
     //            "2000");
-            "4000");
+//            "4000");
     public static final SimulatedProgram SIMULATED_PROGRAM_EM3D_BASELINE = new SimulatedProgram(
             "em3d_baseline", ExperimentProfile.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/em3d/baseline",
             "em3d.mips",
@@ -43,17 +43,21 @@ public class Presets {
 //                "100");
 //                "200");
 //                "400");
-//                "1024");
+                "1024");
 //                "2000");
-                "4000");
+//                "4000");
         program.setHelperThreadedProgram(true);
         program.setHtLookahead(lookahead);
         program.setHtStride(stride);
         return program;
     }
 
-    public static ProcessorProfile processor(int l2SizeInKByte, int l2Associativity, int numCores, int numThreadsPerCore, String l2EvictionPolicyName, Class<? extends EvictionPolicy> l2EvictionPolicyClz) {
-        return new ProcessorProfile("C" + numCores + "T" + numThreadsPerCore + "-" + "L2_" + l2SizeInKByte + "KB" + "_" + "Assoc" + l2Associativity + "_" + l2EvictionPolicyName, numCores, numThreadsPerCore, 1024 * l2SizeInKByte, l2Associativity, l2EvictionPolicyClz);
+    public static ProcessorProfile processor(int numThreadsPerCore, int numCores, int l1ISizeInKByte, int l1IAssociativity, int l1DSizeInKByte, int l1DAssociativity, int l2SizeInKByte, int l2Associativity, String l2EvictionPolicyName, Class<? extends EvictionPolicy> l2EvictionPolicyClz) {
+        return new ProcessorProfile("C" + numCores + "T" + numThreadsPerCore
+                + "-" + "L1I_" + l1ISizeInKByte + "KB" + "_" + "Assoc" + l1IAssociativity
+                + "-" + "L2_" + l1DSizeInKByte + "KB" + "_" + "Assoc" + l1DAssociativity
+                + "-" + "L2_" + l2SizeInKByte + "KB" + "_" + "Assoc" + l2Associativity + "_" + l2EvictionPolicyName
+                , numCores, numThreadsPerCore, 1024 * l1ISizeInKByte, l1IAssociativity, 1024 * l1DSizeInKByte, l1DAssociativity, 1024 * l2SizeInKByte, l2Associativity, l2EvictionPolicyClz);
     }
 
     public static ExperimentProfile baseline_lru(int pthreadSpawnedIndex, int maxInsts, ProcessorProfile processorProfile, SimulatedProgram simulatedProgram) {
@@ -71,8 +75,8 @@ public class Presets {
         ExperimentProfile experimentProfile = new ExperimentProfile(simulatedProgram.getTitle() + "-" + processorProfile.getTitle(), processorProfile);
         experimentProfile.addWorkload(simulatedProgram);
 //        experimentProfile.functionallyToEnd();
-//        experimentProfile.fastForwardToPseudoCallAndInDetailForMaxInsts(pthreadSpawnedIndex, maxInsts);
-        experimentProfile.inDetailToEnd();
+        experimentProfile.fastForwardToPseudoCallAndInDetailForMaxInsts(pthreadSpawnedIndex, maxInsts);
+//        experimentProfile.inDetailToEnd();
         experimentProfile.addSimulationCapabilityClass(LLCReuseDistanceProfilingCapability.class);
         experimentProfile.addSimulationCapabilityClass(HTLLCRequestProfilingCapability.class);
         return experimentProfile;

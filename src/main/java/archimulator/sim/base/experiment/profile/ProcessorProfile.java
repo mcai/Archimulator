@@ -43,6 +43,18 @@ public class ProcessorProfile implements Serializable {
     private int numThreadsPerCore;
 
     @DatabaseField
+    private int l1ISize;
+
+    @DatabaseField
+    private int l1IAssociativity;
+
+    @DatabaseField
+    private int l1DSize;
+
+    @DatabaseField
+    private int l1DAssociativity;
+
+    @DatabaseField
     private int l2Size;
 
     @DatabaseField
@@ -57,10 +69,14 @@ public class ProcessorProfile implements Serializable {
     public ProcessorProfile() {
     }
 
-    public ProcessorProfile(String title, int numCores, int numThreadsPerCore, int l2Size, int l2Associativity, Class<? extends EvictionPolicy> l2EvictionPolicyClz) {
+    public ProcessorProfile(String title, int numCores, int numThreadsPerCore, int l1ISize, int l1IAssociativity, int l1DSize, int l1DAssociativity, int l2Size, int l2Associativity, Class<? extends EvictionPolicy> l2EvictionPolicyClz) {
         this.title = title;
         this.numCores = numCores;
         this.numThreadsPerCore = numThreadsPerCore;
+        this.l1ISize = l1ISize;
+        this.l1IAssociativity = l1IAssociativity;
+        this.l1DSize = l1DSize;
+        this.l1DAssociativity = l1DAssociativity;
         this.l2Size = l2Size;
         this.l2Associativity = l2Associativity;
         this.l2EvictionPolicyClz = l2EvictionPolicyClz;
@@ -82,6 +98,22 @@ public class ProcessorProfile implements Serializable {
 
     public int getNumThreadsPerCore() {
         return numThreadsPerCore;
+    }
+
+    public int getL1ISize() {
+        return l1ISize;
+    }
+
+    public int getL1IAssociativity() {
+        return l1IAssociativity;
+    }
+
+    public int getL1DSize() {
+        return l1DSize;
+    }
+
+    public int getL1DAssociativity() {
+        return l1DAssociativity;
     }
 
     public int getL2Size() {

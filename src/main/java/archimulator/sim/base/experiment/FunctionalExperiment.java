@@ -30,8 +30,8 @@ import net.pickapack.event.BlockingEventDispatcher;
 import java.util.List;
 
 public class FunctionalExperiment extends Experiment {
-    public FunctionalExperiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs, List<Class<? extends SimulationCapability>> simulationCapabilityClasses, List<Class<? extends ProcessorCapability>> processorCapabilityClasses, List<Class<? extends KernelCapability>> kernelCapabilityClasses) {
-        super(title, numCores, numThreadsPerCore, contextConfigs, 524288 * 8, 8, LRUPolicy.class, simulationCapabilityClasses, processorCapabilityClasses, kernelCapabilityClasses);
+    public FunctionalExperiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs, int l1ISize, int l1IAssociativity, int l1DSize, int l1DAssociativity, int l2Size, int l2Associativity, List<Class<? extends SimulationCapability>> simulationCapabilityClasses, List<Class<? extends ProcessorCapability>> processorCapabilityClasses, List<Class<? extends KernelCapability>> kernelCapabilityClasses) {
+        super(title, numCores, numThreadsPerCore, contextConfigs, l1ISize, l1IAssociativity, l1DSize, l1DAssociativity, l2Size, l2Associativity, LRUPolicy.class, simulationCapabilityClasses, processorCapabilityClasses, kernelCapabilityClasses);
     }
 
     @Override

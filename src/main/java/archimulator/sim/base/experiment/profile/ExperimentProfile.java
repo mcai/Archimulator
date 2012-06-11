@@ -141,12 +141,14 @@ public class ExperimentProfile implements Serializable {
         switch (this.type) {
             case FUNCTIONAL_EXPERIMENT:
                 return new FunctionalExperiment(this.title, this.processorProfile.getNumCores(), this.processorProfile.getNumThreadsPerCore(), this.contextConfigs,
-                        this.simulationCapabilityClasses, this.processorCapabilityClasses, this.kernelCapabilityClasses);
+                        32768, 4, 32768, 8, this.processorProfile.getL2Size(), this.processorProfile.getL2Associativity(), this.simulationCapabilityClasses, this.processorCapabilityClasses, this.kernelCapabilityClasses);
             case DETAILED_EXPERIMENT:
-                return new DetailedExperiment(this.title, this.processorProfile.getNumCores(), this.processorProfile.getNumThreadsPerCore(), this.contextConfigs, this.processorProfile.getL2Size(), this.processorProfile.getL2Associativity(), this.processorProfile.getL2EvictionPolicyClz(),
+                return new DetailedExperiment(this.title, this.processorProfile.getNumCores(), this.processorProfile.getNumThreadsPerCore(), this.contextConfigs,
+                        32768, 4, 32768, 8, this.processorProfile.getL2Size(), this.processorProfile.getL2Associativity(), this.processorProfile.getL2EvictionPolicyClz(),
                         this.simulationCapabilityClasses, this.processorCapabilityClasses, this.kernelCapabilityClasses);
             case CHECKPOINTED_EXPERIMENT:
-                return new CheckpointedExperiment(this.title, this.processorProfile.getNumCores(), this.processorProfile.getNumThreadsPerCore(), this.contextConfigs, this.processorProfile.getL2Size(), this.processorProfile.getL2Associativity(), this.processorProfile.getL2EvictionPolicyClz(), this.maxInsts, this.pthreadSpawnedIndex,
+                return new CheckpointedExperiment(this.title, this.processorProfile.getNumCores(), this.processorProfile.getNumThreadsPerCore(), this.contextConfigs,
+                        32768, 4, 32768, 8, this.processorProfile.getL2Size(), this.processorProfile.getL2Associativity(), this.processorProfile.getL2EvictionPolicyClz(), this.maxInsts, this.pthreadSpawnedIndex,
                         this.simulationCapabilityClasses, this.processorCapabilityClasses, this.kernelCapabilityClasses);
             default:
                 throw new IllegalArgumentException();

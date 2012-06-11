@@ -88,7 +88,7 @@ public class ManagementStartup {
             for (int l2Associativity : l2Associativities) {
                 int numCores = 2;
                 int numThreadsPerCore = 2;
-                this.archimulatorService.addProcessorProfile(Presets.processor(l2SizeInKByte, l2Associativity, numCores, numThreadsPerCore, "LRU", LRUPolicy.class));
+                this.archimulatorService.addProcessorProfile(Presets.processor(numThreadsPerCore, numCores, 64, 4, 64, 8, l2SizeInKByte, l2Associativity, "LRU", LRUPolicy.class));
 //                this.archimulatorService.addProcessorProfile(Presets.processor(l2SizeInKByte, l2Associativity, numCores, numThreadsPerCore, "LLCHTAwareLRU", LLCHTAwareLRUPolicy.class));
             }
         }

@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.view.page;
 
-import archimulator.sim.base.experiment.profile.ProcessorProfile;
+import archimulator.client.Presets;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
 import archimulator.sim.uncore.cache.eviction.LRUPolicy;
 import org.zkoss.zk.ui.Executions;
@@ -30,7 +30,6 @@ import org.zkoss.zul.Window;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 public class ProcessorProfilesPage extends GenericForwardComposer<Window> {
     private Button buttonAddProcessorProfile;
@@ -40,7 +39,7 @@ public class ProcessorProfilesPage extends GenericForwardComposer<Window> {
 
         arg.put("create", true);
         Class<? extends EvictionPolicy> l2EvictionPolicyClz = LRUPolicy.class;
-        arg.put("processorProfile", new ProcessorProfile(UUID.randomUUID().toString(), 2, 2, 1024 * 1024 * 4, 8, l2EvictionPolicyClz));
+        arg.put("processorProfile", Presets.processor(2, 2, 64, 4, 64, 8, 1024* 4, 8, l2EvictionPolicyClz.getName(), l2EvictionPolicyClz));
 
         Window win = (Window) Executions.createComponents("/edit/editProcessorProfile.zul", null, arg);
         win.doModal();

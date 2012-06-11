@@ -2,11 +2,11 @@ package archimulator.sim.uncore;
 
 import archimulator.sim.base.event.SimulationEvent;
 import archimulator.sim.core.ProcessorConfig;
-import archimulator.sim.ext.uncore.HTLLCRequestProfilingCapability;
 import archimulator.sim.uncore.cache.eviction.LRUPolicy;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
+import archimulator.sim.uncore.ht.HTLLCRequestProfilingCapability;
 import archimulator.sim.uncore.tlb.TranslationLookasideBuffer;
 import net.pickapack.DateHelper;
 import net.pickapack.action.Action;
@@ -132,6 +132,8 @@ public class CacheSimulator {
         }
     }
 
+    public static PrintWriter pw;
+
     static {
         try {
             pw = new PrintWriter(new FileWriter(FileUtils.getUserDirectoryPath() + "/trace.txt"));
@@ -139,8 +141,6 @@ public class CacheSimulator {
             throw new RuntimeException(e);
         }
     }
-
-    public static PrintWriter pw;
 
     public static void main(String[] args) {
         if(args.length != 1) {

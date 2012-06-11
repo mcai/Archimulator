@@ -70,7 +70,7 @@ public abstract class Experiment {
 
     private Simulation simulation;
 
-    public Experiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs, int l2Size, int l2Associativity, Class<? extends EvictionPolicy> l2EvictionPolicyClz, List<Class<? extends SimulationCapability>> simulationCapabilityClasses, List<Class<? extends ProcessorCapability>> processorCapabilityClasses, List<Class<? extends KernelCapability>> kernelCapabilityClasses) {
+    public Experiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs, int l1ISize, int l1IAssociativity, int l1DSize, int l1DAssociativity, int l2Size, int l2Associativity, Class<? extends EvictionPolicy> l2EvictionPolicyClz, List<Class<? extends SimulationCapability>> simulationCapabilityClasses, List<Class<? extends ProcessorCapability>> processorCapabilityClasses, List<Class<? extends KernelCapability>> kernelCapabilityClasses) {
         this.id = currentId++;
 
         this.title = title;
@@ -78,7 +78,7 @@ public abstract class Experiment {
         this.numThreadsPerCore = numThreadsPerCore;
         this.contextConfigs = contextConfigs;
 
-        this.processorConfig = ProcessorConfig.createDefaultProcessorConfig(MemoryHierarchyConfig.createDefaultMemoryHierarchyConfig(32768, 4, 32768, 8, l2Size, l2Associativity, l2EvictionPolicyClz), processorCapabilityClasses, kernelCapabilityClasses, this.numCores, this.numThreadsPerCore);
+        this.processorConfig = ProcessorConfig.createDefaultProcessorConfig(MemoryHierarchyConfig.createDefaultMemoryHierarchyConfig(l1ISize, l1IAssociativity, l1DSize, l1DAssociativity, l2Size, l2Associativity, l2EvictionPolicyClz), processorCapabilityClasses, kernelCapabilityClasses, this.numCores, this.numThreadsPerCore);
 
         this.simulationCapabilityClasses = simulationCapabilityClasses;
 

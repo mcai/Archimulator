@@ -35,8 +35,8 @@ public class CheckpointedExperiment extends Experiment {
     private int maxInsts;
     private int pthreadSpawnedIndex;
 
-    public CheckpointedExperiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs, int l2Size, int l2Associativity, Class<? extends EvictionPolicy> l2EvictionPolicyClz, int maxInsts, int pthreadSpawnedIndex, List<Class<? extends SimulationCapability>> simulationCapabilityClasses, List<Class<? extends ProcessorCapability>> processorCapabilityClasses, List<Class<? extends KernelCapability>> kernelCapabilityClasses) {
-        super(title, numCores, numThreadsPerCore, contextConfigs, l2Size, l2Associativity, l2EvictionPolicyClz, simulationCapabilityClasses, processorCapabilityClasses, kernelCapabilityClasses);
+    public CheckpointedExperiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs, int l1ISize, int l1IAssociativity, int l1DSize, int l1DAssociativity, int l2Size, int l2Associativity, Class<? extends EvictionPolicy> l2EvictionPolicyClz, int maxInsts, int pthreadSpawnedIndex, List<Class<? extends SimulationCapability>> simulationCapabilityClasses, List<Class<? extends ProcessorCapability>> processorCapabilityClasses, List<Class<? extends KernelCapability>> kernelCapabilityClasses) {
+        super(title, numCores, numThreadsPerCore, contextConfigs, l1ISize, l1IAssociativity, l1DSize, l1DAssociativity, l2Size, l2Associativity, l2EvictionPolicyClz, simulationCapabilityClasses, processorCapabilityClasses, kernelCapabilityClasses);
         this.maxInsts = maxInsts;
         this.pthreadSpawnedIndex = pthreadSpawnedIndex;
     }

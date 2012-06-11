@@ -20,8 +20,8 @@ package archimulator.sim.base.experiment.capability;
 
 import archimulator.sim.base.simulation.Simulation;
 import archimulator.sim.core.Processor;
-import archimulator.sim.ext.uncore.HTLLCRequestProfilingCapability;
-import archimulator.sim.ext.uncore.LLCReuseDistanceProfilingCapability;
+import archimulator.sim.uncore.ht.HTLLCRequestProfilingCapability;
+import archimulator.sim.uncore.ht.LLCReuseDistanceProfilingCapability;
 import archimulator.sim.isa.FunctionalExecutionProfilingCapability;
 import archimulator.sim.os.Kernel;
 import archimulator.sim.uncore.MemoryAccessTraceGenerationCapability;
