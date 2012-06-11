@@ -42,6 +42,7 @@ import net.pickapack.event.BlockingEventDispatcher;
 
 import java.io.PrintWriter;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static ch.lambdaj.Lambda.*;
@@ -313,10 +314,25 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
         llc.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
             public void apply(DumpStatEvent event) {
                 if (event.getType() == DumpStatEvent.Type.DETAILED_SIMULATION) {
+                    sumUpUnstableHTLLCRequests();
                     dumpStats(event.getStats());
                 }
             }
         });
+    }
+
+    private void sumUpUnstableHTLLCRequests() {
+        for(int set = 0; set < llc.getCache().getNumSets(); set++) {
+            for(int way = 0; way < llc.getCache().getAssociativity(); way++) {
+                CacheLineHTRequestState cacheLineHTRequestState = llcLineBroughterThreadIds.get(set).get(way);
+                if(cacheLineHTRequestState.quality == HTRequestQuality.BAD) {
+                    incBadHTLLCRequests(set);
+                }
+                else if(cacheLineHTRequestState.quality == HTRequestQuality.UGLY) {
+                    incUglyHTLLCRequests(set);
+                }
+            }
+        }
     }
 
     private void dumpStats(Map<String, Object> stats) {
@@ -340,22 +356,11 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
     }
 
     public void dumpStats() {
-        if (this.numTotalHTLLCRequests > 0) {
-            System.out.printf("llcHTRequestProfilingCapability." + this.llc.getName() + ".numMTLLCHits: %s\n", String.valueOf(this.numMTLLCHits));
-            System.out.printf("llcHTRequestProfilingCapability." + this.llc.getName() + ".numMTLLCMisses: %s\n", String.valueOf(this.numMTLLCMisses));
-
-            System.out.printf("llcHTRequestProfilingCapability." + this.llc.getName() + ".numTotalHTLLCRequests: %s\n", String.valueOf(this.numTotalHTLLCRequests));
-
-            System.out.printf("llcHTRequestProfilingCapability." + this.llc.getName() + ".numUsefulHTLLCRequests: %s\n", String.valueOf(this.numUsefulHTLLCRequests));
-
-            System.out.printf("llcHTRequestProfilingCapability." + this.llc.getName() + ".htLLCRequestAccuracy: %s\n", String.valueOf(100.0 * (double) this.numUsefulHTLLCRequests / this.numTotalHTLLCRequests) + "%");
-            System.out.printf("llcHTRequestProfilingCapability." + this.llc.getName() + ".htLLCRequestCoverage: %s\n", String.valueOf(100.0 * (double) this.numUsefulHTLLCRequests / (this.numMTLLCMisses + this.numUsefulHTLLCRequests)) + "%");
-
-            System.out.printf("llcHTRequestProfilingCapability." + this.llc.getName() + ".numGoodHTLLCRequests: %s\n", String.valueOf(this.numGoodHTLLCRequests));
-            System.out.printf("llcHTRequestProfilingCapability." + this.llc.getName() + ".numBadHTLLCRequests: %s\n", String.valueOf(this.numBadHTLLCRequests));
-            System.out.printf("llcHTRequestProfilingCapability." + this.llc.getName() + ".numUglyHTLLCRequests: %s\n", String.valueOf(this.numUglyHTLLCRequests));
-
-            System.out.printf("llcHTRequestProfilingCapability." + this.llc.getName() + ".numLateHTLLCRequests: %s\n", String.valueOf(this.numLateHTLLCRequests));
+        this.sumUpUnstableHTLLCRequests();
+        Map<String, Object> stats = new LinkedHashMap<String, Object>();
+        this.dumpStats(stats);
+        for(String key : stats.keySet()) {
+            System.out.println(key + ": " + stats.get(key));
         }
     }
 
@@ -546,12 +551,10 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
             HTRequestQuality quality = llcLineBroughterThreadIds.get(event.getSet()).get(event.getWay()).quality;
 
             if(quality == HTRequestQuality.BAD) {
-                this.numBadHTLLCRequests++;
-                this.cacheSetStats.get(event.getSet()).numBadHTLLCRequests++;
+                this.incBadHTLLCRequests(event.getSet());
             }
             else if(quality == HTRequestQuality.UGLY) {
-                this.numUglyHTLLCRequests++;
-                this.cacheSetStats.get(event.getSet()).numUglyHTLLCRequests++;
+                this.incUglyHTLLCRequests(event.getSet());
             }
             else {
                 throw new IllegalArgumentException();
@@ -716,6 +719,16 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
         if (cacheSetStat.numUglyHTLLCRequests < 0) {
             throw new IllegalArgumentException();
         }
+    }
+
+    private void incUglyHTLLCRequests(int set) {
+        this.numUglyHTLLCRequests++;
+        this.cacheSetStats.get(set).numUglyHTLLCRequests++;
+    }
+
+    private void incBadHTLLCRequests(int set) {
+        this.numBadHTLLCRequests++;
+        this.cacheSetStats.get(set).numBadHTLLCRequests++;
     }
 
     private void markInvalid(int set, int way) {

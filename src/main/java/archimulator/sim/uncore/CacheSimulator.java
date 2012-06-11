@@ -31,11 +31,13 @@ public class CacheSimulator {
     private static int numCompletedReads = 0;
     private static int numCompletedWrites = 0;
 
-//        public static boolean logEnabled = true;
-    public static boolean logEnabled = false;
+        public static boolean logEnabled = true;
+//    public static boolean logEnabled = false;
 
 //    private static boolean useTrace = false;
     private static boolean useTrace = true;
+//    public static boolean logSameState = false;
+    public static boolean logSameState = true;
 
     private static boolean reached;
 
@@ -159,34 +161,33 @@ public class CacheSimulator {
         HTLLCRequestProfilingCapability htllcRequestProfilingCapability = new HTLLCRequestProfilingCapability(cacheHierarchy.getL2Cache());
 
         final DirectoryController l2 = cacheHierarchy.getL2Cache();
-        final CacheController l1D0 = cacheHierarchy.getDataCaches().get(0);
-        final CacheController l1D2 = cacheHierarchy.getDataCaches().get(1);
+        final CacheController mt = cacheHierarchy.getDataCaches().get(0);
+        final CacheController ht = cacheHierarchy.getDataCaches().get(1);
 
         final Map<CacheController, Integer> cacheControllerToThreadIdMap = new HashMap<CacheController, Integer>();
-        cacheControllerToThreadIdMap.put(l1D0, 0);
-        cacheControllerToThreadIdMap.put(l1D2, 2);
+        cacheControllerToThreadIdMap.put(mt, 0);
+        cacheControllerToThreadIdMap.put(ht, 2);
 
         List<CacheAssertionLine> cacheAssertionLines = new ArrayList<CacheAssertionLine>();
         List<MemoryAccessLine> memoryAccessLines = new ArrayList<MemoryAccessLine>();
 
-        memoryAccessLines.add(new MemoryAccessLine(0, l1D2, 0x00100000, false));
-        memoryAccessLines.add(new MemoryAccessLine(5, l1D0, 0x00100000, false));
-        memoryAccessLines.add(new MemoryAccessLine(1005, l1D0, 0x00200000, false));
+        memoryAccessLines.add(new MemoryAccessLine(0, ht, 0x00200000, false));
+        memoryAccessLines.add(new MemoryAccessLine(5, mt, 0x00200000, false));
 
-        memoryAccessLines.add(new MemoryAccessLine(2000, l1D2, 0x00300000, false));
+        memoryAccessLines.add(new MemoryAccessLine(2000, ht, 0x00300000, false));
 
-        cacheAssertionLines.add(new CacheAssertionLine(3000, new UntypedPredicate() {
-            @Override
-            public boolean apply() {
-                return l1D0.getCache().findLine(0x00200000) == null && l1D0.getCache().findLine(0x00300000) == null && l1D2.getCache().findLine(0x00300000) != null && l2.getCache().findLine(0x00300000) != null;
-            }
-        }));
+        memoryAccessLines.add(new MemoryAccessLine(4000, mt, 0x00200000, false));
+
+        memoryAccessLines.add(new MemoryAccessLine(5000, mt, 0x00100000, false));
+
+//        cacheAssertionLines.add(new CacheAssertionLine(5000, new UntypedPredicate() {
+//            @Override
+//            public boolean apply() {
+//                return mt.getCache().findLine(0x00200000) == null && mt.getCache().findLine(0x00300000) == null && ht.getCache().findLine(0x00300000) != null && l2.getCache().findLine(0x00300000) != null;
+//            }
+//        }));
 //
-        memoryAccessLines.add(new MemoryAccessLine(4000, l1D0, 0x00200000, false));
-
-        memoryAccessLines.add(new MemoryAccessLine(5000, l1D2, 0x00300000, false));
-
-        memoryAccessLines.add(new MemoryAccessLine(6000, l1D0, 0x00100000, false));
+        memoryAccessLines.add(new MemoryAccessLine(5050, ht, 0x00100000, false));
 
         int maxCycle = 100000000;
 
