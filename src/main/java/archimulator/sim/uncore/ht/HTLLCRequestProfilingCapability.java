@@ -170,9 +170,6 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
         ValueProviderFactory<HTLLCRequestVictimCacheLineState, ValueProvider<HTLLCRequestVictimCacheLineState>> cacheLineStateProviderFactory = new ValueProviderFactory<HTLLCRequestVictimCacheLineState, ValueProvider<HTLLCRequestVictimCacheLineState>>() {
             @Override
             public ValueProvider<HTLLCRequestVictimCacheLineState> createValueProvider(Object... args) {
-                int set = (Integer) args[0];
-                int way = (Integer) args[1];
-
                 return new HTLLCRequestVictimCacheLineStateValueProvider();
             }
         };
