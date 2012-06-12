@@ -31,13 +31,13 @@ public class CacheSimulator {
     private static int numCompletedReads = 0;
     private static int numCompletedWrites = 0;
 
-        public static boolean logEnabled = true;
-//    public static boolean logEnabled = false;
+//        public static boolean logEnabled = true;
+    public static boolean logEnabled = false;
 
-//    private static boolean useTrace = false;
-    private static boolean useTrace = true;
-//    public static boolean logSameState = false;
-    public static boolean logSameState = true;
+    private static boolean useTrace = false;
+//    private static boolean useTrace = true;
+    public static boolean logSameState = false;
+//    public static boolean logSameState = true;
 
     private static boolean reached;
 
