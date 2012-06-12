@@ -34,8 +34,8 @@ public class CacheSimulator {
 //        public static boolean logEnabled = true;
     public static boolean logEnabled = false;
 
-    private static boolean useTrace = false;
-//    private static boolean useTrace = true;
+//    private static boolean useTrace = false;
+    private static boolean useTrace = true;
     public static boolean logSameState = false;
 //    public static boolean logSameState = true;
 
