@@ -87,7 +87,7 @@ public class StandaloneStartup {
 
 //        ProcessorProfile processorProfile = Presets.processor(1024 * 4, 8, 2, 2, "LRU", LRUPolicy.class);
 //        ProcessorProfile processorProfile = Presets.processor(1024 / 4, 8, 2, 2, "LRU", LRUPolicy.class); //256K L2
-        ProcessorProfile processorProfile = Presets.processor(2, 2, 64, 4, 64, 8, 256, 8, "LRU", LRUPolicy.class); //256K L2
+        ProcessorProfile processorProfile = Presets.processor(2, 2, 64, 4, 64, 8, 192, 8, "LRU", LRUPolicy.class); //256K L2
 //        ProcessorProfile processorProfile = Presets.processor(1024 / 4, 8, 2, 2, "LLCHTAwareLRU", LLCHTAwareLRUPolicy.class); //256K L2
 //        ProcessorProfile processorProfile = Presets.processor(1024 / 2, 8, 2, 2, "LLCHTAwareLRU", LLCHTAwareLRUPolicy.class); //256K L2
 
