@@ -37,8 +37,6 @@ import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.util.ValueProvider;
 import archimulator.util.ValueProviderFactory;
 import net.pickapack.action.Action1;
-import net.pickapack.event.BlockingEvent;
-import net.pickapack.event.BlockingEventDispatcher;
 
 import java.io.PrintWriter;
 import java.util.HashMap;
@@ -84,9 +82,7 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
 
     private Map<Integer, CacheSetStat> cacheSetStats;
 
-    private BlockingEventDispatcher<HTLLCRequestProfilingCapabilityEvent> eventDispatcher;
-
-        private boolean printTrace = false;
+    private boolean printTrace = false;
 //    private boolean printTrace = true;
 
     public static enum HTRequestQuality {
@@ -175,8 +171,6 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
         };
 
         this.htLLCRequestVictimCache = new EvictableCache<HTLLCRequestVictimCacheLineState>(llc, llc.getName() + ".htLLCRequestVictimCache", llc.getCache().getGeometry(), LRUPolicy.class, cacheLineStateProviderFactory);
-
-        this.eventDispatcher = new BlockingEventDispatcher<HTLLCRequestProfilingCapabilityEvent>();
 
         llc.getBlockingEventDispatcher().addListener(CoherentCacheServiceNonblockingRequestEvent.class, new Action1<CoherentCacheServiceNonblockingRequestEvent>() {
             public void apply(CoherentCacheServiceNonblockingRequestEvent event) {
@@ -319,13 +313,12 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
     }
 
     private void sumUpUnstableHTLLCRequests() {
-        for(int set = 0; set < llc.getCache().getNumSets(); set++) {
-            for(int way = 0; way < llc.getCache().getAssociativity(); way++) {
+        for (int set = 0; set < llc.getCache().getNumSets(); set++) {
+            for (int way = 0; way < llc.getCache().getAssociativity(); way++) {
                 CacheLineHTRequestState cacheLineHTRequestState = llcLineBroughterThreadIds.get(set).get(way);
-                if(cacheLineHTRequestState.quality == HTRequestQuality.BAD) {
+                if (cacheLineHTRequestState.quality == HTRequestQuality.BAD) {
                     incBadHTLLCRequests(set);
-                }
-                else if(cacheLineHTRequestState.quality == HTRequestQuality.UGLY) {
+                } else if (cacheLineHTRequestState.quality == HTRequestQuality.UGLY) {
                     incUglyHTLLCRequests(set);
                 }
             }
@@ -356,7 +349,7 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
         this.sumUpUnstableHTLLCRequests();
         Map<String, Object> stats = new LinkedHashMap<String, Object>();
         this.dumpStats(stats);
-        for(String key : stats.keySet()) {
+        for (String key : stats.keySet()) {
             System.out.println(key + ": " + stats.get(key));
         }
     }
@@ -377,7 +370,6 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
         if (!requesterIsHT && lineFoundIsHT) {
             this.numLateHTLLCRequests++;
             this.cacheSetStats.get(set).numLateHTLLCRequests++;
-            this.eventDispatcher.dispatch(new LateHTLLCRequestEvent());
         }
     }
 
@@ -407,7 +399,6 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
             if (requesterIsHT) {
                 this.numTotalHTLLCRequests++;
                 this.cacheSetStats.get(event.getSet()).numTotalHTLLCRequests++;
-                this.eventDispatcher.dispatch(new HTLLCRequestEvent());
             }
 
             this.markTransientThreadId(event.getSet(), event.getWay(), event.getAccess().getThread().getId());
@@ -458,7 +449,6 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
             pw.flush();
         }
 
-        this.eventDispatcher.dispatch(new BadHTLLCRequestEvent());
         this.setLRU(event.getSet(), vtLine.getWay());
 
         checkInvariants(event.getSet());
@@ -544,16 +534,14 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
 
         int victimTag = event.getVictimTag();
 
-        if(lineFoundIsHT) {
+        if (lineFoundIsHT) {
             HTRequestQuality quality = llcLineBroughterThreadIds.get(event.getSet()).get(event.getWay()).quality;
 
-            if(quality == HTRequestQuality.BAD) {
+            if (quality == HTRequestQuality.BAD) {
                 this.incBadHTLLCRequests(event.getSet());
-            }
-            else if(quality == HTRequestQuality.UGLY) {
+            } else if (quality == HTRequestQuality.UGLY) {
                 this.incUglyHTLLCRequests(event.getSet());
-            }
-            else {
+            } else {
                 throw new IllegalArgumentException();
             }
         }
@@ -862,10 +850,6 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
         throw new IllegalArgumentException();
     }
 
-    public BlockingEventDispatcher<HTLLCRequestProfilingCapabilityEvent> getEventDispatcher() {
-        return eventDispatcher;
-    }
-
     public static enum HTLLCRequestVictimCacheLineState {
         INVALID,
         NULL,
@@ -890,17 +874,5 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
         public HTLLCRequestVictimCacheLineState getInitialValue() {
             return HTLLCRequestVictimCacheLineState.INVALID;
         }
-    }
-
-    public abstract class HTLLCRequestProfilingCapabilityEvent implements BlockingEvent {
-    }
-
-    public class HTLLCRequestEvent extends HTLLCRequestProfilingCapabilityEvent {
-    }
-
-    public class BadHTLLCRequestEvent extends HTLLCRequestProfilingCapabilityEvent {
-    }
-
-    public class LateHTLLCRequestEvent extends HTLLCRequestProfilingCapabilityEvent {
     }
 }
