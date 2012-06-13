@@ -26,7 +26,17 @@
 \index_command default
 \paperfontsize default
 \spacing single
-\use_hyperref false
+\use_hyperref true
+\pdf_title "Taxonomy for Helper Threaded Inter-Core Data Prefetching"
+\pdf_bookmarks true
+\pdf_bookmarksnumbered false
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks false
+\pdf_pdfborder false
+\pdf_colorlinks false
+\pdf_backref false
+\pdf_pdfusetitle true
 \papersize default
 \use_geometry false
 \use_amsmath 1
@@ -61,7 +71,7 @@
 \begin_body
 
 \begin_layout Title
-A Prefetch Taxonomy for Helper Threaded Inter-Core Data Prefetching
+Taxonomy for Helper Threaded Inter-Core Data Prefetching
 \end_layout
 
 \begin_layout Author
