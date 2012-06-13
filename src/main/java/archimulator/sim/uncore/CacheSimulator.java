@@ -171,23 +171,27 @@ public class CacheSimulator {
         List<CacheAssertionLine> cacheAssertionLines = new ArrayList<CacheAssertionLine>();
         List<MemoryAccessLine> memoryAccessLines = new ArrayList<MemoryAccessLine>();
 
-        memoryAccessLines.add(new MemoryAccessLine(0, ht, 0x00200000, false));
-        memoryAccessLines.add(new MemoryAccessLine(5, mt, 0x00200000, false));
-
-        memoryAccessLines.add(new MemoryAccessLine(2000, ht, 0x00300000, false));
-
-        memoryAccessLines.add(new MemoryAccessLine(4000, mt, 0x00200000, false));
-
-        memoryAccessLines.add(new MemoryAccessLine(5000, mt, 0x00100000, false));
-
 //        cacheAssertionLines.add(new CacheAssertionLine(5000, new UntypedPredicate() {
 //            @Override
 //            public boolean apply() {
 //                return mt.getCache().findLine(0x00200000) == null && mt.getCache().findLine(0x00300000) == null && ht.getCache().findLine(0x00300000) != null && l2.getCache().findLine(0x00300000) != null;
 //            }
 //        }));
+
+        int tag1 = 0x00100000;
+        int tag2 = 0x00200000;
+        int tag3 = 0x00300000;
+
+        memoryAccessLines.add(new MemoryAccessLine(0, ht, tag1, false));
+        memoryAccessLines.add(new MemoryAccessLine(5, mt, tag1, false));
+
+        memoryAccessLines.add(new MemoryAccessLine(2000, ht, tag2, false));
+
+        memoryAccessLines.add(new MemoryAccessLine(4000, mt, tag1, false));
+
+        memoryAccessLines.add(new MemoryAccessLine(5000, mt, tag3, false));
 //
-        memoryAccessLines.add(new MemoryAccessLine(5050, ht, 0x00100000, false));
+        memoryAccessLines.add(new MemoryAccessLine(5050, ht, tag3, false));
 
         int maxCycle = 100000000;
 
