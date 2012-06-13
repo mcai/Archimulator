@@ -182,16 +182,15 @@ public class CacheSimulator {
         int tag2 = 0x00200000;
         int tag3 = 0x00300000;
 
-        memoryAccessLines.add(new MemoryAccessLine(0, ht, tag1, false));
+//        memoryAccessLines.add(new MemoryAccessLine(0, ht, tag1, false));
         memoryAccessLines.add(new MemoryAccessLine(5, mt, tag1, false));
 
         memoryAccessLines.add(new MemoryAccessLine(2000, ht, tag2, false));
 
-        memoryAccessLines.add(new MemoryAccessLine(4000, mt, tag1, false));
+        memoryAccessLines.add(new MemoryAccessLine(3000, mt, tag1, false));
 
-        memoryAccessLines.add(new MemoryAccessLine(5000, mt, tag3, false));
-//
-        memoryAccessLines.add(new MemoryAccessLine(5050, ht, tag3, false));
+//        memoryAccessLines.add(new MemoryAccessLine(4000, mt, tag3, false));
+//        memoryAccessLines.add(new MemoryAccessLine(4050, ht, tag3, false));
 
         int maxCycle = 100000000;
 

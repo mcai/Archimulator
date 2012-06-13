@@ -55,15 +55,17 @@ public class ManagementStartup {
 
         this.archimulatorService.clearData();
 
-        List<SimulatedProgram> simulatedPrograms = new ArrayList<SimulatedProgram>();
-        simulatedPrograms.add(Presets.SIMULATED_PROGRAM_MST_BASELINE);
+        String args = "4000";
 
-        simulatedPrograms.add(Presets.SIMULATED_PROGRAM_MST_HT(10, 10));
-        simulatedPrograms.add(Presets.SIMULATED_PROGRAM_MST_HT(20, 10));
-        simulatedPrograms.add(Presets.SIMULATED_PROGRAM_MST_HT(20, 20));
-        simulatedPrograms.add(Presets.SIMULATED_PROGRAM_MST_HT(320, 320));
-        simulatedPrograms.add(Presets.SIMULATED_PROGRAM_MST_HT(640, 320));
-        simulatedPrograms.add(Presets.SIMULATED_PROGRAM_MST_HT(640, 640));
+        List<SimulatedProgram> simulatedPrograms = new ArrayList<SimulatedProgram>();
+        simulatedPrograms.add(Presets.SIMULATED_PROGRAM_MST_BASELINE(args));
+
+        simulatedPrograms.add(Presets.SIMULATED_PROGRAM_MST_HT(args, 10, 10));
+        simulatedPrograms.add(Presets.SIMULATED_PROGRAM_MST_HT(args, 20, 10));
+        simulatedPrograms.add(Presets.SIMULATED_PROGRAM_MST_HT(args, 20, 20));
+        simulatedPrograms.add(Presets.SIMULATED_PROGRAM_MST_HT(args, 320, 320));
+        simulatedPrograms.add(Presets.SIMULATED_PROGRAM_MST_HT(args, 640, 320));
+        simulatedPrograms.add(Presets.SIMULATED_PROGRAM_MST_HT(args, 640, 640));
 
         simulatedPrograms.add(Presets.SIMULATED_PROGRAM_EM3D_BASELINE);
         simulatedPrograms.add(Presets.SIMULATED_PROGRAM_EM3D_HT);
