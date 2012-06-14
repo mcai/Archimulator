@@ -71,6 +71,10 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
 
     private long numTotalHTLLCRequests;
 
+    private long numRedundantHitToCacheHTLLCRequests;
+
+    private long numRedundantHitToTransientTagHTLLCRequests;
+
     private long numUsefulHTLLCRequests;
 
     private long numGoodHTLLCRequests;
@@ -116,6 +120,10 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
 
         private long numTotalHTLLCRequests;
 
+        private long numRedundantHitToCacheHTLLCRequests;
+
+        private long numRedundantHitToTransientTagHTLLCRequests;
+
         private long numUsefulHTLLCRequests;
 
         private long numGoodHTLLCRequests;
@@ -129,6 +137,10 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
             numMTLLCMisses = 0;
 
             numTotalHTLLCRequests = 0;
+
+            numRedundantHitToCacheHTLLCRequests = 0;
+
+            numRedundantHitToTransientTagHTLLCRequests = 0;
 
             numUsefulHTLLCRequests = 0;
 
@@ -285,6 +297,10 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
                         HTLLCRequestProfilingCapability.this.numLateHTLLCRequests++;
                         HTLLCRequestProfilingCapability.this.cacheSetStats.get(set).numLateHTLLCRequests++;
                     }
+                    else if(requesterIsHT && !lineFoundIsHT) {
+                        HTLLCRequestProfilingCapability.this.numRedundantHitToTransientTagHTLLCRequests++;
+                        HTLLCRequestProfilingCapability.this.cacheSetStats.get(set).numRedundantHitToTransientTagHTLLCRequests++;
+                    }
                 }
             }
         });
@@ -295,6 +311,10 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
                 numMTLLCMisses = 0;
 
                 numTotalHTLLCRequests = 0;
+
+                numRedundantHitToCacheHTLLCRequests = 0;
+
+                numRedundantHitToTransientTagHTLLCRequests = 0;
 
                 numUsefulHTLLCRequests = 0;
 
@@ -346,6 +366,10 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
 
             stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numTotalHTLLCRequests", String.valueOf(this.numTotalHTLLCRequests));
 
+            stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numRedundantHitToCacheHTLLCRequests", String.valueOf(this.numRedundantHitToCacheHTLLCRequests));
+
+            stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numRedundantHitToTransientTagHTLLCRequests", String.valueOf(this.numRedundantHitToTransientTagHTLLCRequests));
+
             stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numUsefulHTLLCRequests", String.valueOf(this.numUsefulHTLLCRequests));
 
             stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".htLLCRequestAccuracy", String.valueOf(100.0 * (double) this.numUsefulHTLLCRequests / this.numTotalHTLLCRequests) + "%");
@@ -379,11 +403,6 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
         boolean vtHit = !requesterIsHT && vtLine != null;
 
         if (!event.isHitInCache()) {
-            if (requesterIsHT) {
-                this.numTotalHTLLCRequests++;
-                this.cacheSetStats.get(event.getSet()).numTotalHTLLCRequests++;
-            }
-
             this.markTransientThreadId(event.getSet(), event.getWay(), event.getAccess().getThread().getId());
         }
 
@@ -399,6 +418,15 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
                     this.numUsefulHTLLCRequests++;
                     this.cacheSetStats.get(event.getSet()).numUsefulHTLLCRequests++;
                 }
+            }
+        }
+        else {
+            this.numTotalHTLLCRequests++;
+            this.cacheSetStats.get(event.getSet()).numTotalHTLLCRequests++;
+
+            if(event.isHitInCache() && !lineFoundIsHT) {
+                this.numRedundantHitToCacheHTLLCRequests++;
+                this.cacheSetStats.get(event.getSet()).numRedundantHitToCacheHTLLCRequests++;
             }
         }
 
