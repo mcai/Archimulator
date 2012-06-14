@@ -125,7 +125,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                         DataFromMemoryEvent dataFromMemoryEvent = (DataFromMemoryEvent) params;
                         fsm.sendDataToReq(dataFromMemoryEvent, dataFromMemoryEvent.getReq(), dataFromMemoryEvent.getTag(), 0);
                         fsm.addReqToSharers(dataFromMemoryEvent.getReq());
-                        fsm.fireCacheLineFillEvent(dataFromMemoryEvent.getAccess(), dataFromMemoryEvent.getTag(), fsm.victimTag);
+                        fsm.fireCacheLineInsertEvent(dataFromMemoryEvent.getAccess(), dataFromMemoryEvent.getTag(), fsm.victimTag);
                         fsm.victimTag = CacheLine.INVALID_TAG;
                         fsm.getDirectoryController().getCache().getEvictionPolicy().handleInsertionOnMiss(fsm.getSet(), fsm.getWay());
                     }
@@ -183,7 +183,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                         DataFromMemoryEvent dataFromMemoryEvent = (DataFromMemoryEvent) params;
                         fsm.sendDataToReq(dataFromMemoryEvent, dataFromMemoryEvent.getReq(), dataFromMemoryEvent.getTag(), 0);
                         fsm.setOwnerToReq(dataFromMemoryEvent.getReq());
-                        fsm.fireCacheLineFillEvent(dataFromMemoryEvent.getAccess(), dataFromMemoryEvent.getTag(), fsm.victimTag);
+                        fsm.fireCacheLineInsertEvent(dataFromMemoryEvent.getAccess(), dataFromMemoryEvent.getTag(), fsm.victimTag);
                         fsm.victimTag = CacheLine.INVALID_TAG;
                         fsm.getDirectoryController().getCache().getEvictionPolicy().handleInsertionOnMiss(fsm.getSet(), fsm.getWay());
                     }

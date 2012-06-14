@@ -3,9 +3,9 @@ package archimulator.client;
 import archimulator.sim.base.experiment.profile.ExperimentProfile;
 import archimulator.sim.base.experiment.profile.ProcessorProfile;
 import archimulator.sim.base.simulation.SimulatedProgram;
-import archimulator.sim.uncore.ht.HTLLCRequestProfilingCapability;
-import archimulator.sim.uncore.ht.LLCReuseDistanceProfilingCapability;
+import archimulator.sim.uncore.ht.EnhancedHTLLCRequestProfilingCapability;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
+import archimulator.sim.uncore.ht.LLCReuseDistanceProfilingCapability;
 
 public class Presets {
     public static SimulatedProgram SIMULATED_PROGRAM_MST_BASELINE(String args) {
@@ -59,7 +59,7 @@ public class Presets {
 //        experimentProfile.fastForwardToPseudoCallAndInDetailForMaxInsts(pthreadSpawnedIndex, maxInsts);
         experimentProfile.inDetailToEnd();
         experimentProfile.addSimulationCapabilityClass(LLCReuseDistanceProfilingCapability.class);
-        experimentProfile.addSimulationCapabilityClass(HTLLCRequestProfilingCapability.class);
+        experimentProfile.addSimulationCapabilityClass(EnhancedHTLLCRequestProfilingCapability.class);
         return experimentProfile;
     }
 
@@ -70,7 +70,7 @@ public class Presets {
         experimentProfile.fastForwardToPseudoCallAndInDetailForMaxInsts(pthreadSpawnedIndex, maxInsts);
 //        experimentProfile.inDetailToEnd();
         experimentProfile.addSimulationCapabilityClass(LLCReuseDistanceProfilingCapability.class);
-        experimentProfile.addSimulationCapabilityClass(HTLLCRequestProfilingCapability.class);
+        experimentProfile.addSimulationCapabilityClass(EnhancedHTLLCRequestProfilingCapability.class);
         return experimentProfile;
     }
 

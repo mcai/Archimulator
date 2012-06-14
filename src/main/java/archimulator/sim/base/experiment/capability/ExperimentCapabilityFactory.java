@@ -20,6 +20,7 @@ package archimulator.sim.base.experiment.capability;
 
 import archimulator.sim.base.simulation.Simulation;
 import archimulator.sim.core.Processor;
+import archimulator.sim.uncore.ht.EnhancedHTLLCRequestProfilingCapability;
 import archimulator.sim.uncore.ht.HTLLCRequestProfilingCapability;
 import archimulator.sim.uncore.ht.LLCReuseDistanceProfilingCapability;
 import archimulator.sim.isa.FunctionalExecutionProfilingCapability;
@@ -38,6 +39,7 @@ public class ExperimentCapabilityFactory {
     static {
         simulationCapabilityClasses.add(MemoryAccessTraceGenerationCapability.class);
         simulationCapabilityClasses.add(LLCReuseDistanceProfilingCapability.class);
+        simulationCapabilityClasses.add(EnhancedHTLLCRequestProfilingCapability.class);
         simulationCapabilityClasses.add(HTLLCRequestProfilingCapability.class);
 
         kernelCapabilityClasses.add(FunctionalExecutionProfilingCapability.class);

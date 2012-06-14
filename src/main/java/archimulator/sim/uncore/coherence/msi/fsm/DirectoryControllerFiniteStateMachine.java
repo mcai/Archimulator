@@ -170,8 +170,8 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
         this.getDirectoryController().updateStats(access.getType().isRead(), hitInCache);
     }
 
-    public void fireCacheLineFillEvent(MemoryHierarchyAccess access, int tag, int victimTag) {
-        this.getDirectoryController().getBlockingEventDispatcher().dispatch(new LastLevelCacheLineFillEvent(this.getDirectoryController(), access, tag, getSet(), getWay(), victimTag));
+    public void fireCacheLineInsertEvent(MemoryHierarchyAccess access, int tag, int victimTag) {
+        this.getDirectoryController().getBlockingEventDispatcher().dispatch(new LastLevelCacheLineInsertEvent(this.getDirectoryController(), access, tag, getSet(), getWay(), victimTag));
     }
 
     public void fireReplacementEvent(MemoryHierarchyAccess access, int tag) {
