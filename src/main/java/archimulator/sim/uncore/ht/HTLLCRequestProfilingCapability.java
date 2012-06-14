@@ -366,14 +366,14 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
 
             stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numTotalHTLLCRequests", String.valueOf(this.numTotalHTLLCRequests));
 
-            stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numRedundantHitToCacheHTLLCRequests", String.valueOf(this.numRedundantHitToCacheHTLLCRequests));
-
-            stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numRedundantHitToTransientTagHTLLCRequests", String.valueOf(this.numRedundantHitToTransientTagHTLLCRequests));
-
             stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numUsefulHTLLCRequests", String.valueOf(this.numUsefulHTLLCRequests));
 
             stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".htLLCRequestAccuracy", String.valueOf(100.0 * (double) this.numUsefulHTLLCRequests / this.numTotalHTLLCRequests) + "%");
             stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".htLLCRequestCoverage", String.valueOf(100.0 * (double) this.numUsefulHTLLCRequests / (this.numMTLLCMisses + this.numUsefulHTLLCRequests)) + "%");
+
+            stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numRedundantHitToCacheHTLLCRequests", String.valueOf(this.numRedundantHitToCacheHTLLCRequests));
+
+            stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numRedundantHitToTransientTagHTLLCRequests", String.valueOf(this.numRedundantHitToTransientTagHTLLCRequests));
 
             stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numGoodHTLLCRequests", String.valueOf(this.numGoodHTLLCRequests));
             stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numBadHTLLCRequests", String.valueOf(this.numBadHTLLCRequests));
