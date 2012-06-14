@@ -32,7 +32,7 @@ public class Presets {
             "429.mcf.mips",
             ExperimentProfile.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht/data/ref/input/inp.in");
 
-    public static SimulatedProgram SIMULATED_PROGRAM_MST_HT(String args, int lookahead, int stride) {
+    public static SimulatedProgram SIMULATED_PROGRAM_MST_HT(String args, int lookahead, int stride, boolean dynamicHtParams) {
         SimulatedProgram program = new SimulatedProgram(
                 "mst_ht" + "(" + args + ")" + "-lookahead_" + lookahead + "-stride_" + stride, ExperimentProfile.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/ht",
                 "mst.mips",
@@ -40,6 +40,7 @@ public class Presets {
         program.setHelperThreadedProgram(true);
         program.setHtLookahead(lookahead);
         program.setHtStride(stride);
+        program.setDynamicHtParams(dynamicHtParams);
         return program;
     }
 

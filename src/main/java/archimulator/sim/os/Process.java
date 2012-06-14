@@ -55,8 +55,12 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
 
     private int id;
 
+    private ContextConfig contextConfig;
+
     public Process(Kernel kernel, String simulationDirectory, ContextConfig contextConfig) {
         super(kernel);
+
+        this.contextConfig = contextConfig;
 
         this.id = Simulation.currentProcessId++;
         kernel.getProcesses().add(this);
@@ -189,6 +193,10 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
 
     public Memory getMemory() {
         return memory;
+    }
+
+    public ContextConfig getContextConfig() {
+        return contextConfig;
     }
 
     public static final int TEXT_BASE = 0x00400000;

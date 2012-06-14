@@ -98,7 +98,7 @@ public class StandaloneStartup {
     }
 
     private void run(int numCores, int numThreadsPerCore, int l1ISizeInKByte, int l1IAssociativity, int l1DSizeInKByte, int l1DAssociativity, int l2SizeInKByte, int l2Associativity, String args, int lookahead, int stride) {
-        SimulatedProgram simulatedProgram = Presets.SIMULATED_PROGRAM_MST_HT(args, lookahead, stride);
+        SimulatedProgram simulatedProgram = Presets.SIMULATED_PROGRAM_MST_HT(args, lookahead, stride, false);
         ProcessorProfile processorProfile = Presets.processor(numCores, numThreadsPerCore, l1ISizeInKByte, l1IAssociativity, l1DSizeInKByte, l1DAssociativity, l2SizeInKByte, l2Associativity, "LRU", LRUPolicy.class);
         ExperimentProfile experimentProfile = Presets.ht_lru(3720, 200000000, processorProfile, simulatedProgram);
         Experiment experiment = experimentProfile.createExperiment();

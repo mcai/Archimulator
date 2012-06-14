@@ -61,6 +61,9 @@ public class SimulatedProgram implements Serializable {
     @DatabaseField
     private int htStride;
 
+    @DatabaseField
+    private boolean dynamicHtParams;
+
     public SimulatedProgram() {
     }
 
@@ -178,8 +181,16 @@ public class SimulatedProgram implements Serializable {
         this.htStride = htStride;
     }
 
+    public boolean isDynamicHtParams() {
+        return dynamicHtParams;
+    }
+
+    public void setDynamicHtParams(boolean dynamicHtParams) {
+        this.dynamicHtParams = dynamicHtParams;
+    }
+
     @Override
     public String toString() {
-        return String.format("SimulatedProgram{id=%d, title='%s', cwd='%s', exe='%s', args='%s', stdin='%s', createdTime=%s, helperThreadedProgram=%s, htLookahead=%d, htStride=%d}", id, title, cwd, exe, args, stdin, DateHelper.toString(createdTime), helperThreadedProgram, htLookahead, htStride);
+        return String.format("SimulatedProgram{id=%d, title='%s', cwd='%s', exe='%s', args='%s', stdin='%s', createdTime=%s, helperThreadedProgram=%s, htLookahead=%d, htStride=%d, dynamicHtParams=%s}", id, title, cwd, exe, args, stdin, DateHelper.toString(createdTime), helperThreadedProgram, htLookahead, htStride, dynamicHtParams);
     }
 }
