@@ -54,6 +54,8 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
 
     private Map<Integer, LoadEntry> loadsInHotspotFunction;
 
+    private boolean dynamicHtParams = false;
+
     public LLCReuseDistanceProfilingCapability(Simulation simulation) {
         this(simulation.getProcessor().getCacheHierarchy().getL2Cache());
     }
@@ -79,20 +81,22 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
 
         llc.getBlockingEventDispatcher().addListener(PseudocallEncounteredEvent.class, new Action1<PseudocallEncounteredEvent>() {
             public void apply(PseudocallEncounteredEvent event) {
-                if (event.getImm() == 3820) {
-                    savedRegisterValue.set(event.getContext().getRegs().getGpr(event.getRs()));
+                if(dynamicHtParams) {
+                    if (event.getImm() == 3820) {
+                        savedRegisterValue.set(event.getContext().getRegs().getGpr(event.getRs()));
 //                    event.getContext().getRegs().setGpr(event.getRs(), random.nextInt(100)); //TODO: incorporate lookahead and stride calculation algorithm
 //                    event.getContext().getRegs().setGpr(event.getRs(), 640); //TODO: incorporate lookahead and stride calculation algorithm
-                    event.getContext().getRegs().setGpr(event.getRs(), 20); //TODO: incorporate lookahead and stride calculation algorithm
-                } else if (event.getImm() == 3821) {
-                    event.getContext().getRegs().setGpr(event.getRs(), savedRegisterValue.get());
-                } else if (event.getImm() == 3822) {
-                    savedRegisterValue.set(event.getContext().getRegs().getGpr(event.getRs()));
+                        event.getContext().getRegs().setGpr(event.getRs(), 20); //TODO: incorporate lookahead and stride calculation algorithm
+                    } else if (event.getImm() == 3821) {
+                        event.getContext().getRegs().setGpr(event.getRs(), savedRegisterValue.get());
+                    } else if (event.getImm() == 3822) {
+                        savedRegisterValue.set(event.getContext().getRegs().getGpr(event.getRs()));
 //                    event.getContext().getRegs().setGpr(event.getRs(), random.nextInt(100)); //TODO: incorporate lookahead and stride calculation algorithm
 //                    event.getContext().getRegs().setGpr(event.getRs(), 320); //TODO: incorporate lookahead and stride calculation algorithm
-                    event.getContext().getRegs().setGpr(event.getRs(), 10); //TODO: incorporate lookahead and stride calculation algorithm
-                } else if (event.getImm() == 3823) {
-                    event.getContext().getRegs().setGpr(event.getRs(), savedRegisterValue.get());
+                        event.getContext().getRegs().setGpr(event.getRs(), 10); //TODO: incorporate lookahead and stride calculation algorithm
+                    } else if (event.getImm() == 3823) {
+                        event.getContext().getRegs().setGpr(event.getRs(), savedRegisterValue.get());
+                    }
                 }
 //                if (BasicThread.isHelperThread(event.getContext().getThread()))
 //                    System.out.println("pseudocall: " + event.getContext().getThread().getName() + " - " + event.getImm());

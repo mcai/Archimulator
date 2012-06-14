@@ -43,7 +43,7 @@ public class Presets {
         return program;
     }
 
-    public static ProcessorProfile processor(int numThreadsPerCore, int numCores, int l1ISizeInKByte, int l1IAssociativity, int l1DSizeInKByte, int l1DAssociativity, int l2SizeInKByte, int l2Associativity, String l2EvictionPolicyName, Class<? extends EvictionPolicy> l2EvictionPolicyClz) {
+    public static ProcessorProfile processor(int numCores, int numThreadsPerCore, int l1ISizeInKByte, int l1IAssociativity, int l1DSizeInKByte, int l1DAssociativity, int l2SizeInKByte, int l2Associativity, String l2EvictionPolicyName, Class<? extends EvictionPolicy> l2EvictionPolicyClz) {
         return new ProcessorProfile("C" + numCores + "T" + numThreadsPerCore
                 + "-" + "L1I_" + l1ISizeInKByte + "KB" + "_" + "Assoc" + l1IAssociativity
                 + "-" + "L2_" + l1DSizeInKByte + "KB" + "_" + "Assoc" + l1DAssociativity

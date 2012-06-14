@@ -18,42 +18,50 @@
  ******************************************************************************/
 package archimulator.client;
 
-import archimulator.sim.base.event.DumpStatsCompletedEvent;
-import archimulator.sim.base.event.PollStatsCompletedEvent;
-import archimulator.sim.base.event.SimulationCreatedEvent;
 import archimulator.sim.base.experiment.Experiment;
 import archimulator.sim.base.experiment.profile.ExperimentProfile;
 import archimulator.sim.base.experiment.profile.ProcessorProfile;
 import archimulator.sim.base.simulation.SimulatedProgram;
 import archimulator.sim.uncore.cache.eviction.LRUPolicy;
-import net.pickapack.DateHelper;
-import net.pickapack.action.Action1;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 public class StandaloneStartup {
-    @Option(name = "-s", usage = "L2 cache size in KBytes", metaVar = "<l2SizeInKByte>", required = true)
-    private int l2SizeInKByte;
+    @Option(name = "-c", usage = "number of processor cores", metaVar = "<numCores>", required = false)
+    private int numCores = 2;
 
-    @Option(name = "-a", usage = "L2 cache associativity", metaVar = "<l2Associativity>", required = true)
-    private int l2Associativity;
+    @Option(name = "-t", usage = "number of threads per core", metaVar = "<numThreadsPerCore>", required = false)
+    private int numThreadsPerCore = 2;
 
-    @Option(name = "-c", usage = "number of processor cores", metaVar = "<numCores>", required = true)
-    private int numCores;
+    @Option(name = "-is", usage = "L1I cache size in KBytes", metaVar = "<l1ISizeInKByte>", required = false)
+    private int l1ISizeInKByte = 32;
 
-    @Option(name = "-t", usage = "number of threads per core", metaVar = "<numThreadsPerCore>", required = true)
-    private int numThreadsPerCore;
+    @Option(name = "-ia", usage = "L1I cache associativity", metaVar = "<l1IAssociativity>", required = false)
+    private int l1IAssociativity = 4;
 
-    @Option(name = "-e", usage = "class name of L2 eviction policy", metaVar = "<l2EvictionPolicyClassName>", required = true)
-    private String l2EvictionPolicyClassName;
+    @Option(name = "-ds", usage = "L1D cache size in KBytes", metaVar = "<l1DSizeInKByte>", required = false)
+    private int l1DSizeInKByte = 32;
+
+    @Option(name = "-da", usage = "L1D cache associativity", metaVar = "<l1DAssociativity>", required = false)
+    private int l1DAssociativity = 4;
+
+    @Option(name = "-2s", usage = "L2 cache size in KBytes", metaVar = "<l2SizeInKByte>", required = false)
+    private int l2SizeInKByte = 96;
+
+    @Option(name = "-2a", usage = "L2 cache associativity", metaVar = "<l2Associativity>", required = false)
+    private int l2Associativity = 4;
+
+    @Option(name = "-a", usage = "Arguments passed to mst", metaVar = "<args>", required = false)
+    private String args = "4000";
+
+    @Option(name = "-l", usage = "HT lookahead parameter", metaVar = "<lookahead>", required = false)
+    private int lookahead = 20;
+
+    @Option(name = "-s", usage = "HT stride parameter", metaVar = "<stride>", required = false)
+    private int stride = 10;
 
     public void parseArgs(String[] args) throws IOException {
         CmdLineParser parser = new CmdLineParser(this);
@@ -69,94 +77,32 @@ public class StandaloneStartup {
 
     public static void main(String[] args) {
         StandaloneStartup standaloneStartup = new StandaloneStartup();
-//        try {
-//            standaloneStartup.parseArgs(args);
-            standaloneStartup.run();
-//        } catch (IOException e) {
-//            System.out.println(e);
-//        }
-    }
-
-    private void run() {
-        int pthreadSpawnedIndex = 3720;
-        int maxInsts = 200000000;
-
-        //        SimulatedProgram simulatedProgram = Presets.SIMULATED_PROGRAM_MST_BASELINE("4000");
-        SimulatedProgram simulatedProgram = Presets.SIMULATED_PROGRAM_MST_HT("4000", 640, 320);
-
-        ProcessorProfile processorProfile = Presets.processor(2, 2, 32, 4, 32, 4, 96, 4, "LRU", LRUPolicy.class); //256K L2
-//        ProcessorProfile processorProfile = Presets.processor(1024 / 2, 8, 2, 2, "LLCHTAwareLRU", LLCHTAwareLRUPolicy.class); //256K L2
-
-//        final ExperimentProfile experimentProfile = Presets.baseline_lru(pthreadSpawnedIndex, maxInsts, processorProfile, simulatedProgram);
-        final ExperimentProfile experimentProfile = Presets.ht_lru(pthreadSpawnedIndex, maxInsts, processorProfile, simulatedProgram);
-
-        final Experiment experiment = experimentProfile.createExperiment();
-
-        final Map<String, String> stats1 = new LinkedHashMap<String, String>();
-
-        experiment.start();
-
-        experiment.getBlockingEventDispatcher().addListener(SimulationCreatedEvent.class, new Action1<SimulationCreatedEvent>() {
-            @Override
-            public void apply(SimulationCreatedEvent event) {
-                experiment.getSimulation().getBlockingEventDispatcher().addListener(PollStatsCompletedEvent.class, new Action1<PollStatsCompletedEvent>() {
-                    @Override
-                    public void apply(final PollStatsCompletedEvent event) {
-                        try {
-                            Map<String, Object> stats = event.getStats();
-
-                            for (String key : stats.keySet()) {
-                                stats1.put(key, stats.get(key) + "");
-                            }
-
-//                    Context context = experiment.getSimulation().getProcessor().getCores().get(0).getThreads().get(0).getContext();
-//                    if(context != null) {
-//                        FileWriter out = new FileWriter("/home/itecgo/Desktop/dis.txt");          e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-//                        ((BasicProcess) context.getProcess()).getElfAnalyzer().dumpAnalysisResult(out);
-//                        out.close();
-//                    }
-                        } catch (Exception e) {
-                            recordException(e);
-//                        throw new RuntimeException(e);
-                        }
-                    }
-                });
-
-                experiment.getSimulation().getBlockingEventDispatcher().addListener(DumpStatsCompletedEvent.class, new Action1<DumpStatsCompletedEvent>() {
-                    @Override
-                    public void apply(final DumpStatsCompletedEvent event) {
-                        try {
-                            Map<String, Object> stats = event.getStats();
-
-                            for (String key : stats.keySet()) {
-                                stats1.put(key, stats.get(key) + "");
-                            }
-                        } catch (Exception e) {
-                            recordException(e);
-//                        throw new RuntimeException(e);
-                        }
-                    }
-                });
-            }
-        });
-
-        experiment.join();
-
         try {
-            PrintWriter pw = new PrintWriter(new FileWriter("/home/itecgo/Desktop/stats.txt"));
-
-            for (String key : stats1.keySet()) {
-                pw.println(key + ": " + stats1.get(key) + "");
-            }
-
-            pw.close();
+            standaloneStartup.parseArgs(args);
+            standaloneStartup.run(
+                    standaloneStartup.numCores,
+                    standaloneStartup.numThreadsPerCore,
+                    standaloneStartup.l1ISizeInKByte,
+                    standaloneStartup.l1IAssociativity,
+                    standaloneStartup.l1DSizeInKByte,
+                    standaloneStartup.l1DAssociativity,
+                    standaloneStartup.l2SizeInKByte,
+                    standaloneStartup.l2Associativity,
+                    standaloneStartup.args,
+                    standaloneStartup.lookahead,
+                    standaloneStartup.stride
+            );
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println(e);
         }
     }
 
-    private static void recordException(Exception e) {
-        System.out.print(String.format("[%s Exception] %s\r\n", DateHelper.toString(new Date()), e));
-        e.printStackTrace();
+    private void run(int numCores, int numThreadsPerCore, int l1ISizeInKByte, int l1IAssociativity, int l1DSizeInKByte, int l1DAssociativity, int l2SizeInKByte, int l2Associativity, String args, int lookahead, int stride) {
+        SimulatedProgram simulatedProgram = Presets.SIMULATED_PROGRAM_MST_HT(args, lookahead, stride);
+        ProcessorProfile processorProfile = Presets.processor(numCores, numThreadsPerCore, l1ISizeInKByte, l1IAssociativity, l1DSizeInKByte, l1DAssociativity, l2SizeInKByte, l2Associativity, "LRU", LRUPolicy.class);
+        ExperimentProfile experimentProfile = Presets.ht_lru(3720, 200000000, processorProfile, simulatedProgram);
+        Experiment experiment = experimentProfile.createExperiment();
+        experiment.start();
+        experiment.join();
     }
 }
