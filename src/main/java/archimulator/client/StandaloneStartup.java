@@ -30,37 +30,37 @@ import org.kohsuke.args4j.Option;
 import java.io.IOException;
 
 public class StandaloneStartup {
-    @Option(name = "-c", usage = "number of processor cores", metaVar = "<numCores>", required = false)
+    @Option(name = "-c", usage = "number of processor cores (default: 2)", metaVar = "<numCores>", required = false)
     private int numCores = 2;
 
-    @Option(name = "-t", usage = "number of threads per core", metaVar = "<numThreadsPerCore>", required = false)
+    @Option(name = "-t", usage = "number of threads per core (default: 2)", metaVar = "<numThreadsPerCore>", required = false)
     private int numThreadsPerCore = 2;
 
-    @Option(name = "-is", usage = "L1I cache size in KBytes", metaVar = "<l1ISizeInKByte>", required = false)
+    @Option(name = "-is", usage = "L1I cache size in KBytes (default: 32)", metaVar = "<l1ISizeInKByte>", required = false)
     private int l1ISizeInKByte = 32;
 
-    @Option(name = "-ia", usage = "L1I cache associativity", metaVar = "<l1IAssociativity>", required = false)
+    @Option(name = "-ia", usage = "L1I cache associativity (default: 4)", metaVar = "<l1IAssociativity>", required = false)
     private int l1IAssociativity = 4;
 
-    @Option(name = "-ds", usage = "L1D cache size in KBytes", metaVar = "<l1DSizeInKByte>", required = false)
+    @Option(name = "-ds", usage = "L1D cache size in KBytes (default: 32)", metaVar = "<l1DSizeInKByte>", required = false)
     private int l1DSizeInKByte = 32;
 
-    @Option(name = "-da", usage = "L1D cache associativity", metaVar = "<l1DAssociativity>", required = false)
+    @Option(name = "-da", usage = "L1D cache associativity (default: 4)", metaVar = "<l1DAssociativity>", required = false)
     private int l1DAssociativity = 4;
 
-    @Option(name = "-2s", usage = "L2 cache size in KBytes", metaVar = "<l2SizeInKByte>", required = false)
+    @Option(name = "-2s", usage = "L2 cache size in KBytes (default: 96)", metaVar = "<l2SizeInKByte>", required = false)
     private int l2SizeInKByte = 96;
 
-    @Option(name = "-2a", usage = "L2 cache associativity", metaVar = "<l2Associativity>", required = false)
+    @Option(name = "-2a", usage = "L2 cache associativity (default: 4)", metaVar = "<l2Associativity>", required = false)
     private int l2Associativity = 4;
 
-    @Option(name = "-a", usage = "Arguments passed to mst", metaVar = "<args>", required = false)
+    @Option(name = "-a", usage = "Arguments passed to mst (default: 4000)", metaVar = "<args>", required = false)
     private String args = "4000";
 
-    @Option(name = "-l", usage = "HT lookahead parameter", metaVar = "<lookahead>", required = false)
+    @Option(name = "-l", usage = "HT lookahead parameter (default: 20)", metaVar = "<lookahead>", required = false)
     private int lookahead = 20;
 
-    @Option(name = "-s", usage = "HT stride parameter", metaVar = "<stride>", required = false)
+    @Option(name = "-s", usage = "HT stride parameter (default: 10)", metaVar = "<stride>", required = false)
     private int stride = 10;
 
     public void parseArgs(String[] args) throws IOException {
