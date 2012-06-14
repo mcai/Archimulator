@@ -84,7 +84,7 @@ public class StandaloneStartup {
         //        SimulatedProgram simulatedProgram = Presets.SIMULATED_PROGRAM_MST_BASELINE("4000");
         SimulatedProgram simulatedProgram = Presets.SIMULATED_PROGRAM_MST_HT("4000", 640, 320);
 
-        ProcessorProfile processorProfile = Presets.processor(2, 2, 32, 1, 32, 1, 96, 1, "LRU", LRUPolicy.class); //256K L2
+        ProcessorProfile processorProfile = Presets.processor(2, 2, 32, 4, 32, 4, 96, 4, "LRU", LRUPolicy.class); //256K L2
 //        ProcessorProfile processorProfile = Presets.processor(1024 / 2, 8, 2, 2, "LLCHTAwareLRU", LLCHTAwareLRUPolicy.class); //256K L2
 
 //        final ExperimentProfile experimentProfile = Presets.baseline_lru(pthreadSpawnedIndex, maxInsts, processorProfile, simulatedProgram);
