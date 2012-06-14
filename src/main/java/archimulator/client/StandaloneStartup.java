@@ -29,6 +29,7 @@ import org.kohsuke.args4j.Option;
 
 import java.io.IOException;
 
+//TODO: Q6600: 32KB, 8-way L1 Cache; 4MB, 16-way shared L2 Cache
 public class StandaloneStartup {
     @Option(name = "-c", usage = "number of processor cores (default: 2)", metaVar = "<numCores>", required = false)
     private int numCores = 2;
