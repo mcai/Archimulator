@@ -165,13 +165,9 @@ et al.
 
 \begin_layout Abstract
 For applications exhibiting irregular memory access patterns, helper threaded
- inter-core data prefetching on shared cache chip multiprocessors (CMPs),
- in its most basic form, (1) uses the shared cache enabled fast inter-thread
- communication when both the main core and the otherwise idle neighboring
- helper core access the same cache line; (2) constructs a helper thread
- in the software running on the helper core to speculatively issue LLC prefetch
- requests to the predicted memory addresses before the computation core
- access these addresses.
+ inter-core data prefetching on shared cache chip multiprocessors (CMPs)
+ speculatively issue LLC requests to the predicted memory addresses before
+ the computation core access these addresses.
  Effective helper threaded inter-core data prefetching demands that the
  helper thread (HT) should issue correct and timely LLC requests just before
  the main thread (MT) requests them.
@@ -670,6 +666,51 @@ HT\: LLC\: Request\: Lateness=\frac{Number\: of\: Late\: HT\: LLC\: Requests}{Nu
 Pollution Aware Taxonomy of HT LLC Requests
 \end_layout
 
+\begin_layout Standard
+\align center
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename prefetch_timeline.pdf
+	scale 30
+	BoundingBox 30bp 38bp 810bp 538bp
+	clip
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Taxonomy of HT LLC Requests
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:taxonomy_ht_llc_requests"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Subsection
 The Notion of Inter-Thread Reuse Distance in the HT Scheme
 \end_layout
@@ -1087,12 +1128,12 @@ There are two invariants that should be maintained
 # of HT Lines in the LLC Set = # of Victim Entries in the HTRVC Set;
 \end_layout
 
-\begin_deeper
 \begin_layout Enumerate
 # of Victim Entries in HTRVC Set + # of Valid MT LLC Lines in Set ≤ LLC
  Set Associativity.
 \end_layout
 
+\begin_deeper
 \begin_layout Standard
 HT lines refer to the cache lines that are brought by HT requests.
  From the above two invariants, we can easily conclude that: # of HT Lines
@@ -1101,6 +1142,7 @@ HT lines refer to the cache lines that are brought by HT requests.
  an incoming LLC request.
 \end_layout
 
+\end_deeper
 \begin_layout Subsubsection
 Actions taken on Filling an LLC Line
 \end_layout
@@ -1530,7 +1572,6 @@ name "fig:Servicing-MT-and-HT-requests"
 
 \end_layout
 
-\end_deeper
 \begin_layout Section
 
 \color red
