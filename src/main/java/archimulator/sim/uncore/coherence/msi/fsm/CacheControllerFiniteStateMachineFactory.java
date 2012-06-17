@@ -17,16 +17,16 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
                 .onCondition(CacheControllerEventType.LOAD, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(final CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        final LoadEvent loadEvent = (LoadEvent) params;
-                        fsm.sendGetSToDir(loadEvent, loadEvent.getTag());
-                        fsm.fireServiceNonblockingRequestEvent(loadEvent.getAccess(), loadEvent.getTag(), false);
-                        fsm.getLine().setAccess(loadEvent.getAccess());
-                        fsm.getLine().setTag(loadEvent.getTag());
+                        final LoadEvent event = (LoadEvent) params;
+                        fsm.sendGetSToDir(event, event.getTag());
+                        fsm.fireServiceNonblockingRequestEvent(event.getAccess(), event.getTag(), false);
+                        fsm.getLine().setAccess(event.getAccess());
+                        fsm.getLine().setTag(event.getTag());
                         fsm.setOnCompletedCallback(new Action() {
                             @Override
                             public void apply() {
                                 fsm.getCacheController().getCache().getEvictionPolicy().handleInsertionOnMiss(fsm.getSet(), fsm.getWay());
-                                loadEvent.getOnCompletedCallback().apply();
+                                event.getOnCompletedCallback().apply();
                             }
                         });
                     }
@@ -34,16 +34,16 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
                 .onCondition(CacheControllerEventType.STORE, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(final CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        final StoreEvent storeEvent = (StoreEvent) params;
-                        fsm.sendGetMToDir(storeEvent, storeEvent.getTag());
-                        fsm.fireServiceNonblockingRequestEvent(storeEvent.getAccess(), storeEvent.getTag(), false);
-                        fsm.getLine().setAccess(storeEvent.getAccess());
-                        fsm.getLine().setTag(storeEvent.getTag());
+                        final StoreEvent event = (StoreEvent) params;
+                        fsm.sendGetMToDir(event, event.getTag());
+                        fsm.fireServiceNonblockingRequestEvent(event.getAccess(), event.getTag(), false);
+                        fsm.getLine().setAccess(event.getAccess());
+                        fsm.getLine().setTag(event.getTag());
                         fsm.setOnCompletedCallback(new Action() {
                             @Override
                             public void apply() {
                                 fsm.getCacheController().getCache().getEvictionPolicy().handleInsertionOnMiss(fsm.getSet(), fsm.getWay());
-                                storeEvent.getOnCompletedCallback().apply();
+                                event.getOnCompletedCallback().apply();
                             }
                         });
                     }
@@ -53,32 +53,32 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
                 .setOnCompletedCallback(actionWhenStateChanged)
                 .onCondition(CacheControllerEventType.LOAD, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
-                    public void apply(final CacheControllerFiniteStateMachine fsm, Object sender, final CacheControllerEventType eventType, final Params params) {
-                        LoadEvent loadEvent = (LoadEvent) params;
-                        fsm.stall(loadEvent.getOnStalledCallback());
-                        fsm.fireNonblockingRequestHitToTransientTagEvent(loadEvent.getAccess(), loadEvent.getTag());
+                    public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
+                        LoadEvent event = (LoadEvent) params;
+                        fsm.stall(event.getOnStalledCallback());
+                        fsm.fireNonblockingRequestHitToTransientTagEvent(event.getAccess(), event.getTag());
                     }
                 }, CacheControllerState.IS_D)
                 .onCondition(CacheControllerEventType.STORE, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
-                    public void apply(final CacheControllerFiniteStateMachine fsm, Object sender, final CacheControllerEventType eventType, final Params params) {
-                        StoreEvent storeEvent = (StoreEvent) params;
-                        fsm.stall(storeEvent.getOnStalledCallback());
-                        fsm.fireNonblockingRequestHitToTransientTagEvent(storeEvent.getAccess(), storeEvent.getTag());
+                    public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
+                        StoreEvent event = (StoreEvent) params;
+                        fsm.stall(event.getOnStalledCallback());
+                        fsm.fireNonblockingRequestHitToTransientTagEvent(event.getAccess(), event.getTag());
                     }
                 }, CacheControllerState.IS_D)
                 .onCondition(CacheControllerEventType.REPLACEMENT, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
-                    public void apply(final CacheControllerFiniteStateMachine fsm, Object sender, final CacheControllerEventType eventType, final Params params) {
-                        ReplacementEvent replacementEvent = (ReplacementEvent) params;
-                        replacementEvent.getOnStalledCallback().apply();
+                    public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
+                        ReplacementEvent event = (ReplacementEvent) params;
+                        event.getOnStalledCallback().apply();
                     }
                 }, CacheControllerState.IS_D)
                 .onCondition(CacheControllerEventType.INV, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
-                    public void apply(final CacheControllerFiniteStateMachine fsm, Object sender, final CacheControllerEventType eventType, final Params params) {
-                        InvEvent invEvent = (InvEvent) params;
-                        fsm.stall(sender, invEvent);
+                    public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
+                        InvEvent event = (InvEvent) params;
+                        fsm.stall(sender, event);
                     }
                 }, CacheControllerState.IS_D)
                 .onCondition(CacheControllerEventType.DATA_FROM_DIR_ACK_EQ_0, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
@@ -97,38 +97,38 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
                 .onCondition(CacheControllerEventType.LOAD, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        LoadEvent loadEvent = (LoadEvent) params;
-                        fsm.stall(loadEvent.getOnStalledCallback());
-                        fsm.fireNonblockingRequestHitToTransientTagEvent(loadEvent.getAccess(), loadEvent.getTag());
+                        LoadEvent event = (LoadEvent) params;
+                        fsm.stall(event.getOnStalledCallback());
+                        fsm.fireNonblockingRequestHitToTransientTagEvent(event.getAccess(), event.getTag());
                     }
                 }, CacheControllerState.IM_AD)
                 .onCondition(CacheControllerEventType.STORE, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        StoreEvent storeEvent = (StoreEvent) params;
-                        fsm.stall(storeEvent.getOnStalledCallback());
-                        fsm.fireNonblockingRequestHitToTransientTagEvent(storeEvent.getAccess(), storeEvent.getTag());
+                        StoreEvent event = (StoreEvent) params;
+                        fsm.stall(event.getOnStalledCallback());
+                        fsm.fireNonblockingRequestHitToTransientTagEvent(event.getAccess(), event.getTag());
                     }
                 }, CacheControllerState.IM_AD)
                 .onCondition(CacheControllerEventType.REPLACEMENT, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        ReplacementEvent replacementEvent = (ReplacementEvent) params;
-                        replacementEvent.getOnStalledCallback().apply();
+                        ReplacementEvent event = (ReplacementEvent) params;
+                        event.getOnStalledCallback().apply();
                     }
                 }, CacheControllerState.IM_AD)
                 .onCondition(CacheControllerEventType.FWD_GETS, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        FwdGetSEvent fwdGetSEvent = (FwdGetSEvent) params;
-                        fsm.stall(sender, fwdGetSEvent);
+                        FwdGetSEvent event = (FwdGetSEvent) params;
+                        fsm.stall(sender, event);
                     }
                 }, CacheControllerState.IM_AD)
                 .onCondition(CacheControllerEventType.FWD_GETM, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        FwdGetMEvent fwdGetMEvent = (FwdGetMEvent) params;
-                        fsm.stall(sender, fwdGetMEvent);
+                        FwdGetMEvent event = (FwdGetMEvent) params;
+                        fsm.stall(sender, event);
                     }
                 }, CacheControllerState.IM_AD)
                 .onCondition(CacheControllerEventType.DATA_FROM_DIR_ACK_EQ_0, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
@@ -158,38 +158,38 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
                 .onCondition(CacheControllerEventType.LOAD, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        LoadEvent loadEvent = (LoadEvent) params;
-                        fsm.stall(loadEvent.getOnStalledCallback());
-                        fsm.fireNonblockingRequestHitToTransientTagEvent(loadEvent.getAccess(), loadEvent.getTag());
+                        LoadEvent event = (LoadEvent) params;
+                        fsm.stall(event.getOnStalledCallback());
+                        fsm.fireNonblockingRequestHitToTransientTagEvent(event.getAccess(), event.getTag());
                     }
                 }, CacheControllerState.IM_A)
                 .onCondition(CacheControllerEventType.STORE, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        StoreEvent storeEvent = (StoreEvent) params;
-                        fsm.stall(storeEvent.getOnStalledCallback());
-                        fsm.fireNonblockingRequestHitToTransientTagEvent(storeEvent.getAccess(), storeEvent.getTag());
+                        StoreEvent event = (StoreEvent) params;
+                        fsm.stall(event.getOnStalledCallback());
+                        fsm.fireNonblockingRequestHitToTransientTagEvent(event.getAccess(), event.getTag());
                     }
                 }, CacheControllerState.IM_A)
                 .onCondition(CacheControllerEventType.REPLACEMENT, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        ReplacementEvent replacementEvent = (ReplacementEvent) params;
-                        replacementEvent.getOnStalledCallback().apply();
+                        ReplacementEvent event = (ReplacementEvent) params;
+                        event.getOnStalledCallback().apply();
                     }
                 }, CacheControllerState.IM_A)
                 .onCondition(CacheControllerEventType.FWD_GETS, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        FwdGetSEvent fwdGetSEvent = (FwdGetSEvent) params;
-                        fsm.stall(sender, fwdGetSEvent);
+                        FwdGetSEvent event = (FwdGetSEvent) params;
+                        fsm.stall(sender, event);
                     }
                 }, CacheControllerState.IM_A)
                 .onCondition(CacheControllerEventType.FWD_GETM, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        FwdGetMEvent fwdGetMEvent = (FwdGetMEvent) params;
-                        fsm.stall(sender, fwdGetMEvent);
+                        FwdGetMEvent event = (FwdGetMEvent) params;
+                        fsm.stall(sender, event);
                     }
                 }, CacheControllerState.IM_A)
                 .onCondition(CacheControllerEventType.INV_ACK, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
@@ -209,38 +209,37 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
                 .onCondition(CacheControllerEventType.LOAD, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        LoadEvent loadEvent = (LoadEvent) params;
-                        fsm.hit(loadEvent.getAccess(), loadEvent.getTag(), loadEvent.getSet(), loadEvent.getWay());
-                        fsm.getCacheController().getCycleAccurateEventQueue().schedule(fsm.getCacheController(), loadEvent.getOnCompletedCallback(), 0);
+                        LoadEvent event = (LoadEvent) params;
+                        fsm.hit(event.getAccess(), event.getTag(), event.getSet(), event.getWay());
+                        fsm.getCacheController().getCycleAccurateEventQueue().schedule(fsm.getCacheController(), event.getOnCompletedCallback(), 0);
                     }
                 }, CacheControllerState.S)
                 .onCondition(CacheControllerEventType.STORE, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        StoreEvent storeEvent = (StoreEvent) params;
-                        fsm.sendGetMToDir(storeEvent, storeEvent.getTag());
-                        fsm.setOnCompletedCallback(storeEvent.getOnCompletedCallback());
-                        fsm.fireServiceNonblockingRequestEvent(storeEvent.getAccess(), storeEvent.getTag(), true);
+                        StoreEvent event = (StoreEvent) params;
+                        fsm.sendGetMToDir(event, event.getTag());
+                        fsm.setOnCompletedCallback(event.getOnCompletedCallback());
+                        fsm.fireServiceNonblockingRequestEvent(event.getAccess(), event.getTag(), true);
                     }
                 }, CacheControllerState.SM_AD)
                 .onCondition(CacheControllerEventType.REPLACEMENT, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        ReplacementEvent replacementEvent = (ReplacementEvent) params;
-                        CacheLine<CacheControllerState> line = fsm.getCacheController().getCache().getLine(replacementEvent.getSet(), replacementEvent.getWay());
-                        fsm.sendPutSToDir(replacementEvent, line.getTag());
-                        fsm.setOnCompletedCallback(replacementEvent.getOnCompletedCallback());
-                        fsm.fireReplacementEvent(replacementEvent.getAccess(), replacementEvent.getTag());
+                        ReplacementEvent event = (ReplacementEvent) params;
+                        fsm.sendPutSToDir(event, fsm.getLine().getTag());
+                        fsm.setOnCompletedCallback(event.getOnCompletedCallback());
+                        fsm.fireReplacementEvent(event.getAccess(), event.getTag());
                         fsm.getCacheController().incNumEvictions();
                     }
                 }, CacheControllerState.SI_A)
                 .onCondition(CacheControllerEventType.INV, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        InvEvent invEvent = (InvEvent) params;
-                        final CacheController req = invEvent.getReq();
-                        int tag = invEvent.getTag();
-                        fsm.sendInvAckToReq(invEvent, req, tag);
+                        InvEvent event = (InvEvent) params;
+                        CacheController req = event.getReq();
+                        int tag = event.getTag();
+                        fsm.sendInvAckToReq(event, req, tag);
                         fsm.getLine().setAccess(null);
                         fsm.getLine().setTag(CacheLine.INVALID_TAG);
                     }
@@ -248,9 +247,9 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
                 .onCondition(CacheControllerEventType.RECALL, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        RecallEvent recallEvent = (RecallEvent) params;
-                        int tag = recallEvent.getTag();
-                        fsm.sendRecallAckToDir(recallEvent, tag, 8);
+                        RecallEvent event = (RecallEvent) params;
+                        int tag = event.getTag();
+                        fsm.sendRecallAckToDir(event, tag, 8);
                         fsm.getLine().setAccess(null);
                         fsm.getLine().setTag(CacheLine.INVALID_TAG);
                     }
@@ -261,54 +260,54 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
                 .onCondition(CacheControllerEventType.LOAD, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        LoadEvent loadEvent = (LoadEvent) params;
-                        fsm.hit(loadEvent.getAccess(), loadEvent.getTag(), loadEvent.getSet(), loadEvent.getWay());
-                        fsm.getCacheController().getCycleAccurateEventQueue().schedule(fsm.getCacheController(), loadEvent.getOnCompletedCallback(), 0);
+                        LoadEvent event = (LoadEvent) params;
+                        fsm.hit(event.getAccess(), event.getTag(), event.getSet(), event.getWay());
+                        fsm.getCacheController().getCycleAccurateEventQueue().schedule(fsm.getCacheController(), event.getOnCompletedCallback(), 0);
                     }
                 }, CacheControllerState.SM_AD)
                 .onCondition(CacheControllerEventType.STORE, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        StoreEvent storeEvent = (StoreEvent) params;
-                        fsm.stall(storeEvent.getOnStalledCallback());
+                        StoreEvent event = (StoreEvent) params;
+                        fsm.stall(event.getOnStalledCallback());
                     }
                 }, CacheControllerState.SM_AD)
                 .onCondition(CacheControllerEventType.REPLACEMENT, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        ReplacementEvent replacementEvent = (ReplacementEvent) params;
-                        replacementEvent.getOnStalledCallback().apply();
+                        ReplacementEvent event = (ReplacementEvent) params;
+                        event.getOnStalledCallback().apply();
                     }
                 }, CacheControllerState.SM_AD)
                 .onCondition(CacheControllerEventType.FWD_GETS, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        FwdGetSEvent fwdGetSEvent = (FwdGetSEvent) params;
-                        fsm.stall(sender, fwdGetSEvent);
+                        FwdGetSEvent event = (FwdGetSEvent) params;
+                        fsm.stall(sender, event);
                     }
                 }, CacheControllerState.SM_AD)
                 .onCondition(CacheControllerEventType.FWD_GETM, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        FwdGetMEvent fwdGetMEvent = (FwdGetMEvent) params;
-                        fsm.stall(sender, fwdGetMEvent);
+                        FwdGetMEvent event = (FwdGetMEvent) params;
+                        fsm.stall(sender, event);
                     }
                 }, CacheControllerState.SM_AD)
                 .onCondition(CacheControllerEventType.INV, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        InvEvent invEvent = (InvEvent) params;
-                        final CacheController req = invEvent.getReq();
-                        int tag = invEvent.getTag();
-                        fsm.sendInvAckToReq(invEvent, req, tag);
+                        InvEvent event = (InvEvent) params;
+                        CacheController req = event.getReq();
+                        int tag = event.getTag();
+                        fsm.sendInvAckToReq(event, req, tag);
                     }
                 }, CacheControllerState.IM_AD)
                 .onCondition(CacheControllerEventType.RECALL, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        RecallEvent recallEvent = (RecallEvent) params;
-                        int tag = recallEvent.getTag();
-                        fsm.sendRecallAckToDir(recallEvent, tag, 8);
+                        RecallEvent event = (RecallEvent) params;
+                        int tag = event.getTag();
+                        fsm.sendRecallAckToDir(event, tag, 8);
                     }
                 }, CacheControllerState.IM_AD)
                 .onCondition(CacheControllerEventType.DATA_FROM_DIR_ACK_EQ_0, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
@@ -338,37 +337,37 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
                 .onCondition(CacheControllerEventType.LOAD, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        LoadEvent loadEvent = (LoadEvent) params;
-                        fsm.hit(loadEvent.getAccess(), loadEvent.getTag(), loadEvent.getSet(), loadEvent.getWay());
-                        fsm.getCacheController().getCycleAccurateEventQueue().schedule(fsm.getCacheController(), loadEvent.getOnCompletedCallback(), 0);
+                        LoadEvent event = (LoadEvent) params;
+                        fsm.hit(event.getAccess(), event.getTag(), event.getSet(), event.getWay());
+                        fsm.getCacheController().getCycleAccurateEventQueue().schedule(fsm.getCacheController(), event.getOnCompletedCallback(), 0);
                     }
                 }, CacheControllerState.SM_A)
                 .onCondition(CacheControllerEventType.STORE, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        StoreEvent storeEvent = (StoreEvent) params;
-                        fsm.stall(storeEvent.getOnStalledCallback());
+                        StoreEvent event = (StoreEvent) params;
+                        fsm.stall(event.getOnStalledCallback());
                     }
                 }, CacheControllerState.SM_A)
                 .onCondition(CacheControllerEventType.REPLACEMENT, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        ReplacementEvent replacementEvent = (ReplacementEvent) params;
-                        replacementEvent.getOnStalledCallback().apply();
+                        ReplacementEvent event = (ReplacementEvent) params;
+                        event.getOnStalledCallback().apply();
                     }
                 }, CacheControllerState.SM_A)
                 .onCondition(CacheControllerEventType.FWD_GETS, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        FwdGetSEvent fwdGetSEvent = (FwdGetSEvent) params;
-                        fsm.stall(sender, fwdGetSEvent);
+                        FwdGetSEvent event = (FwdGetSEvent) params;
+                        fsm.stall(sender, event);
                     }
                 }, CacheControllerState.SM_A)
                 .onCondition(CacheControllerEventType.FWD_GETM, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        FwdGetMEvent fwdGetMEvent = (FwdGetMEvent) params;
-                        fsm.stall(sender, fwdGetMEvent);
+                        FwdGetMEvent event = (FwdGetMEvent) params;
+                        fsm.stall(sender, event);
                     }
                 }, CacheControllerState.SM_A)
                 .onCondition(CacheControllerEventType.INV_ACK, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
@@ -396,46 +395,45 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
                 .onCondition(CacheControllerEventType.LOAD, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        LoadEvent loadEvent = (LoadEvent) params;
-                        fsm.hit(loadEvent.getAccess(), loadEvent.getTag(), loadEvent.getSet(), loadEvent.getWay());
-                        fsm.getCacheController().getCycleAccurateEventQueue().schedule(fsm.getCacheController(), loadEvent.getOnCompletedCallback(), 0);
+                        LoadEvent event = (LoadEvent) params;
+                        fsm.hit(event.getAccess(), event.getTag(), event.getSet(), event.getWay());
+                        fsm.getCacheController().getCycleAccurateEventQueue().schedule(fsm.getCacheController(), event.getOnCompletedCallback(), 0);
                     }
                 }, CacheControllerState.M)
                 .onCondition(CacheControllerEventType.STORE, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        StoreEvent storeEvent = (StoreEvent) params;
-                        fsm.hit(storeEvent.getAccess(), storeEvent.getTag(), storeEvent.getSet(), storeEvent.getWay());
-                        fsm.getCacheController().getCycleAccurateEventQueue().schedule(fsm.getCacheController(), storeEvent.getOnCompletedCallback(), 0);
+                        StoreEvent event = (StoreEvent) params;
+                        fsm.hit(event.getAccess(), event.getTag(), event.getSet(), event.getWay());
+                        fsm.getCacheController().getCycleAccurateEventQueue().schedule(fsm.getCacheController(), event.getOnCompletedCallback(), 0);
                     }
                 }, CacheControllerState.M)
                 .onCondition(CacheControllerEventType.REPLACEMENT, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        ReplacementEvent replacementEvent = (ReplacementEvent) params;
-                        CacheLine<CacheControllerState> line = fsm.getCacheController().getCache().getLine(replacementEvent.getSet(), replacementEvent.getWay());
-                        fsm.sendPutMAndDataToDir(replacementEvent, line.getTag());
-                        fsm.setOnCompletedCallback(replacementEvent.getOnCompletedCallback());
-                        fsm.fireReplacementEvent(replacementEvent.getAccess(), replacementEvent.getTag());
+                        ReplacementEvent event = (ReplacementEvent) params;
+                        fsm.sendPutMAndDataToDir(event, fsm.getLine().getTag());
+                        fsm.setOnCompletedCallback(event.getOnCompletedCallback());
+                        fsm.fireReplacementEvent(event.getAccess(), event.getTag());
                         fsm.getCacheController().incNumEvictions();
                     }
                 }, CacheControllerState.MI_A)
                 .onCondition(CacheControllerEventType.FWD_GETS, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        FwdGetSEvent fwdGetSEvent = (FwdGetSEvent) params;
-                        final CacheController req = fwdGetSEvent.getReq();
-                        int tag = fwdGetSEvent.getTag();
-                        fsm.sendDataToReqAndDir(fwdGetSEvent, req, tag);
+                        FwdGetSEvent event = (FwdGetSEvent) params;
+                        CacheController req = event.getReq();
+                        int tag = event.getTag();
+                        fsm.sendDataToReqAndDir(event, req, tag);
                     }
                 }, CacheControllerState.S)
                 .onCondition(CacheControllerEventType.FWD_GETM, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        FwdGetMEvent fwdGetMEvent = (FwdGetMEvent) params;
-                        final CacheController req = fwdGetMEvent.getReq();
-                        int tag = fwdGetMEvent.getTag();
-                        fsm.sendDataToReq(fwdGetMEvent, req, tag);
+                        FwdGetMEvent event = (FwdGetMEvent) params;
+                        CacheController req = event.getReq();
+                        int tag = event.getTag();
+                        fsm.sendDataToReq(event, req, tag);
                         fsm.getLine().setAccess(null);
                         fsm.getLine().setTag(CacheLine.INVALID_TAG);
                     }
@@ -443,9 +441,9 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
                 .onCondition(CacheControllerEventType.RECALL, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        RecallEvent recallEvent = (RecallEvent) params;
-                        int tag = recallEvent.getTag();
-                        fsm.sendRecallAckToDir(recallEvent, tag, fsm.getCacheController().getCache().getLineSize() + 8);
+                        RecallEvent event = (RecallEvent) params;
+                        int tag = event.getTag();
+                        fsm.sendRecallAckToDir(event, tag, fsm.getCacheController().getCache().getLineSize() + 8);
                         fsm.getLine().setAccess(null);
                         fsm.getLine().setTag(CacheLine.INVALID_TAG);
                     }
@@ -456,48 +454,48 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
                 .onCondition(CacheControllerEventType.LOAD, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        LoadEvent loadEvent = (LoadEvent) params;
-                        fsm.stall(loadEvent.getOnStalledCallback());
+                        LoadEvent event = (LoadEvent) params;
+                        fsm.stall(event.getOnStalledCallback());
                     }
                 }, CacheControllerState.MI_A)
                 .onCondition(CacheControllerEventType.STORE, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        StoreEvent storeEvent = (StoreEvent) params;
-                        fsm.stall(storeEvent.getOnStalledCallback());
+                        StoreEvent event = (StoreEvent) params;
+                        fsm.stall(event.getOnStalledCallback());
                     }
                 }, CacheControllerState.MI_A)
                 .onCondition(CacheControllerEventType.REPLACEMENT, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        ReplacementEvent replacementEvent = (ReplacementEvent) params;
-                        replacementEvent.getOnStalledCallback().apply();
+                        ReplacementEvent event = (ReplacementEvent) params;
+                        event.getOnStalledCallback().apply();
                     }
                 }, CacheControllerState.MI_A)
                 .onCondition(CacheControllerEventType.RECALL, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        RecallEvent recallEvent = (RecallEvent) params;
-                        int tag = recallEvent.getTag();
-                        fsm.sendRecallAckToDir(recallEvent, tag, 8);
+                        RecallEvent event = (RecallEvent) params;
+                        int tag = event.getTag();
+                        fsm.sendRecallAckToDir(event, tag, 8);
                     }
                 }, CacheControllerState.II_A)
                 .onCondition(CacheControllerEventType.FWD_GETS, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        FwdGetSEvent fwdGetSEvent = (FwdGetSEvent) params;
-                        final CacheController req = fwdGetSEvent.getReq();
-                        int tag = fwdGetSEvent.getTag();
-                        fsm.sendDataToReqAndDir(fwdGetSEvent, req, tag);
+                        FwdGetSEvent event = (FwdGetSEvent) params;
+                        CacheController req = event.getReq();
+                        int tag = event.getTag();
+                        fsm.sendDataToReqAndDir(event, req, tag);
                     }
                 }, CacheControllerState.SI_A)
                 .onCondition(CacheControllerEventType.FWD_GETM, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        FwdGetMEvent fwdGetMEvent = (FwdGetMEvent) params;
-                        final CacheController req = fwdGetMEvent.getReq();
-                        int tag = fwdGetMEvent.getTag();
-                        fsm.sendDataToReq(fwdGetMEvent, req, tag);
+                        FwdGetMEvent event = (FwdGetMEvent) params;
+                        CacheController req = event.getReq();
+                        int tag = event.getTag();
+                        fsm.sendDataToReq(event, req, tag);
                     }
                 }, CacheControllerState.II_A)
                 .onCondition(CacheControllerEventType.PUT_ACK, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
@@ -513,39 +511,39 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
                 .onCondition(CacheControllerEventType.LOAD, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        LoadEvent loadEvent = (LoadEvent) params;
-                        fsm.stall(loadEvent.getOnStalledCallback());
+                        LoadEvent event = (LoadEvent) params;
+                        fsm.stall(event.getOnStalledCallback());
                     }
                 }, CacheControllerState.SI_A)
                 .onCondition(CacheControllerEventType.STORE, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        StoreEvent storeEvent = (StoreEvent) params;
-                        fsm.stall(storeEvent.getOnStalledCallback());
+                        StoreEvent event = (StoreEvent) params;
+                        fsm.stall(event.getOnStalledCallback());
                     }
                 }, CacheControllerState.SI_A)
                 .onCondition(CacheControllerEventType.REPLACEMENT, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        ReplacementEvent replacementEvent = (ReplacementEvent) params;
-                        replacementEvent.getOnStalledCallback().apply();
+                        ReplacementEvent event = (ReplacementEvent) params;
+                        event.getOnStalledCallback().apply();
                     }
                 }, CacheControllerState.SI_A)
                 .onCondition(CacheControllerEventType.INV, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        InvEvent invEvent = (InvEvent) params;
-                        final CacheController req = invEvent.getReq();
-                        int tag = invEvent.getTag();
-                        fsm.sendInvAckToReq(invEvent, req, tag);
+                        InvEvent event = (InvEvent) params;
+                        CacheController req = event.getReq();
+                        int tag = event.getTag();
+                        fsm.sendInvAckToReq(event, req, tag);
                     }
                 }, CacheControllerState.II_A)
                 .onCondition(CacheControllerEventType.RECALL, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        RecallEvent recallEvent = (RecallEvent) params;
-                        int tag = recallEvent.getTag();
-                        fsm.sendRecallAckToDir(recallEvent, tag, 8);
+                        RecallEvent event = (RecallEvent) params;
+                        int tag = event.getTag();
+                        fsm.sendRecallAckToDir(event, tag, 8);
                     }
                 }, CacheControllerState.II_A)
                 .onCondition(CacheControllerEventType.PUT_ACK, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
@@ -561,22 +559,22 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
                 .onCondition(CacheControllerEventType.LOAD, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        LoadEvent loadEvent = (LoadEvent) params;
-                        fsm.stall(loadEvent.getOnStalledCallback());
+                        LoadEvent event = (LoadEvent) params;
+                        fsm.stall(event.getOnStalledCallback());
                     }
                 }, CacheControllerState.II_A)
                 .onCondition(CacheControllerEventType.STORE, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        StoreEvent storeEvent = (StoreEvent) params;
-                        fsm.stall(storeEvent.getOnStalledCallback());
+                        StoreEvent event = (StoreEvent) params;
+                        fsm.stall(event.getOnStalledCallback());
                     }
                 }, CacheControllerState.II_A)
                 .onCondition(CacheControllerEventType.REPLACEMENT, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, Params params) {
-                        ReplacementEvent replacementEvent = (ReplacementEvent) params;
-                        replacementEvent.getOnStalledCallback().apply();
+                        ReplacementEvent event = (ReplacementEvent) params;
+                        event.getOnStalledCallback().apply();
                     }
                 }, CacheControllerState.II_A)
                 .onCondition(CacheControllerEventType.PUT_ACK, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, Params>() {
