@@ -6,24 +6,18 @@ import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import net.pickapack.action.Action;
 
 public class LoadEvent extends CacheControllerEvent {
-    private int tag;
     private int set;
     private int way;
     private Action onCompletedCallback;
     private Action onStalledCallback;
 
     public LoadEvent(CacheController generator, CacheCoherenceFlow producerFlow, int tag, int set, int way, Action onCompletedCallback, Action onStalledCallback, MemoryHierarchyAccess access) {
-        super(generator, producerFlow, CacheControllerEventType.LOAD, access);
+        super(generator, producerFlow, CacheControllerEventType.LOAD, access, tag);
 
-        this.tag = tag;
         this.set = set;
         this.way = way;
         this.onCompletedCallback = onCompletedCallback;
         this.onStalledCallback = onStalledCallback;
-    }
-
-    public int getTag() {
-        return tag;
     }
 
     public int getSet() {
@@ -44,6 +38,6 @@ public class LoadEvent extends CacheControllerEvent {
 
     @Override
     public String toString() {
-        return String.format("[%d] %s: LoadEvent{id=%d, tag=0x%08x, set=%d, way=%d}", getBeginCycle(), getGenerator(), getId(), tag, set, way);
+        return String.format("[%d] %s: LoadEvent{id=%d, tag=0x%08x, set=%d, way=%d}", getBeginCycle(), getGenerator(), getId(), getTag(), set, way);
     }
 }

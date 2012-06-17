@@ -8,8 +8,8 @@ import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 public abstract class CacheControllerEvent extends ControllerEvent {
     private CacheControllerEventType type;
 
-    public CacheControllerEvent(CacheController generator, CacheCoherenceFlow producerFlow, CacheControllerEventType type, MemoryHierarchyAccess access) {
-        super(generator, producerFlow, access);
+    public CacheControllerEvent(CacheController generator, CacheCoherenceFlow producerFlow, CacheControllerEventType type, MemoryHierarchyAccess access, int tag) {
+        super(generator, producerFlow, access, tag);
         this.type = type;
     }
 

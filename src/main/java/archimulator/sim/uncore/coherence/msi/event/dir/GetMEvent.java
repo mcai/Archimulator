@@ -8,15 +8,13 @@ import net.pickapack.action.Action;
 
 public class GetMEvent extends DirectoryControllerEvent {
     private CacheController req;
-    private int tag;
     private int set;
     private int way;
     private Action onStalledCallback;
 
     public GetMEvent(DirectoryController generator, CacheCoherenceFlow producerFlow, CacheController req, int tag, int set, int way, Action onStalledCallback, MemoryHierarchyAccess access) {
-        super(generator, producerFlow, DirectoryControllerEventType.GETM, access);
+        super(generator, producerFlow, DirectoryControllerEventType.GETM, access, tag);
         this.req = req;
-        this.tag = tag;
         this.set = set;
         this.way = way;
         this.onStalledCallback = onStalledCallback;
@@ -24,10 +22,6 @@ public class GetMEvent extends DirectoryControllerEvent {
 
     public CacheController getReq() {
         return req;
-    }
-
-    public int getTag() {
-        return tag;
     }
 
     public int getSet() {
@@ -44,6 +38,6 @@ public class GetMEvent extends DirectoryControllerEvent {
 
     @Override
     public String toString() {
-        return String.format("[%d] %s: GetMEvent{id=%d, req=%s, tag=0x%08x, set=%d, way=%d}", getBeginCycle(), getGenerator(), getId(), req, tag, set, way);
+        return String.format("[%d] %s: GetMEvent{id=%d, req=%s, tag=0x%08x, set=%d, way=%d}", getBeginCycle(), getGenerator(), getId(), req, getTag(), set, way);
     }
 }

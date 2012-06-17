@@ -5,13 +5,11 @@ import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import net.pickapack.action.Action;
 
 public class StoreFlow extends CacheCoherenceFlow {
-    private int tag;
     private Action onCompletedCallback;
-    private final Action onCompletedCallback2;
+    private Action onCompletedCallback2;
 
     public StoreFlow(final CacheController generator, int tag, final Action onCompletedCallback, MemoryHierarchyAccess access) {
-        super(generator, null, access);
-        this.tag = tag;
+        super(generator, null, access, tag);
         this.onCompletedCallback = onCompletedCallback;
 
         this.onCompletedCallback2 = new Action() {
@@ -21,10 +19,6 @@ public class StoreFlow extends CacheCoherenceFlow {
                 onCompleted();
             }
         };
-    }
-
-    public int getTag() {
-        return tag;
     }
 
     public Action getOnCompletedCallback() {
@@ -37,6 +31,6 @@ public class StoreFlow extends CacheCoherenceFlow {
 
     @Override
     public String toString() {
-        return String.format("[%d] %s: StoreFlow{id=%d, tag=0x%08x}", getBeginCycle(), getGenerator(), getId(), tag);
+        return String.format("[%d] %s: StoreFlow{id=%d, tag=0x%08x}", getBeginCycle(), getGenerator(), getId(), getTag());
     }
 }

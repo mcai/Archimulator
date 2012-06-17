@@ -6,25 +6,19 @@ import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
 public class PutMAndDataFromNonOwnerEvent extends DirectoryControllerEvent {
-    private final CacheController req;
-    private final int tag;
+    private CacheController req;
 
     public PutMAndDataFromNonOwnerEvent(DirectoryController generator, CacheCoherenceFlow producerFlow, CacheController req, int tag, MemoryHierarchyAccess access) {
-        super(generator, producerFlow, DirectoryControllerEventType.PUTM_AND_DATA_FROM_NONOWNER, access);
+        super(generator, producerFlow, DirectoryControllerEventType.PUTM_AND_DATA_FROM_NONOWNER, access, tag);
         this.req = req;
-        this.tag = tag;
     }
 
     public CacheController getReq() {
         return req;
     }
 
-    public int getTag() {
-        return tag;
-    }
-
     @Override
     public String toString() {
-        return String.format("[%d] %s: PutMAndDataFromNonOwnerEvent{id=%d, req=%s, tag=0x%08x}", getBeginCycle(), getGenerator(), getId(), req, tag);
+        return String.format("[%d] %s: PutMAndDataFromNonOwnerEvent{id=%d, req=%s, tag=0x%08x}", getBeginCycle(), getGenerator(), getId(), req, getTag());
     }
 }

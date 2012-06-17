@@ -6,25 +6,19 @@ import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
 public class DataFromOwnerEvent extends CacheControllerEvent {
-    private final Controller sender;
-    private final int tag;
+    private Controller sender;
 
     public DataFromOwnerEvent(CacheController generator, CacheCoherenceFlow producerFlow, Controller sender, int tag, MemoryHierarchyAccess access) {
-        super(generator, producerFlow, CacheControllerEventType.DATA_FROM_OWNER, access);
+        super(generator, producerFlow, CacheControllerEventType.DATA_FROM_OWNER, access, tag);
         this.sender = sender;
-        this.tag = tag;
     }
 
     public Controller getSender() {
         return sender;
     }
 
-    public int getTag() {
-        return tag;
-    }
-
     @Override
     public String toString() {
-        return String.format("[%d] %s: DataFromOwnerEvent{id=%d, sender=%s, tag=0x%08x}", getBeginCycle(), getGenerator(), getId(), sender, tag);
+        return String.format("[%d] %s: DataFromOwnerEvent{id=%d, sender=%s, tag=0x%08x}", getBeginCycle(), getGenerator(), getId(), sender, getTag());
     }
 }

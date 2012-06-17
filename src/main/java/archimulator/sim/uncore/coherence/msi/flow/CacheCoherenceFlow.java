@@ -19,9 +19,10 @@ public abstract class CacheCoherenceFlow extends Params implements Node {
     private long beginCycle;
     private long endCycle;
     private boolean completed;
-    protected MemoryHierarchyAccess access;
+    private MemoryHierarchyAccess access;
+    private int tag;
 
-    public CacheCoherenceFlow(Controller generator, CacheCoherenceFlow producerFlow, MemoryHierarchyAccess access) {
+    public CacheCoherenceFlow(Controller generator, CacheCoherenceFlow producerFlow, MemoryHierarchyAccess access, int tag) {
         this.id = currentId++;
         this.generator = generator;
         this.producerFlow = producerFlow;
@@ -29,6 +30,7 @@ public abstract class CacheCoherenceFlow extends Params implements Node {
         this.childFlows = new ArrayList<CacheCoherenceFlow>();
         this.onCreate(this.generator.getCycleAccurateEventQueue().getCurrentCycle());
         this.access = access;
+        this.tag = tag;
     }
 
     public static void dumpTree() {
@@ -111,5 +113,9 @@ public abstract class CacheCoherenceFlow extends Params implements Node {
 
     public static List<CacheCoherenceFlow> getPendingFlows() {
         return pendingFlows;
+    }
+
+    public int getTag() {
+        return tag;
     }
 }

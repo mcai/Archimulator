@@ -8,7 +8,6 @@ import archimulator.sim.uncore.coherence.msi.state.CacheControllerState;
 import net.pickapack.action.Action;
 
 public class ReplacementEvent extends CacheControllerEvent {
-    private int tag;
     private CacheAccess<CacheControllerState> cacheAccess;
     private int set;
     private int way;
@@ -16,17 +15,12 @@ public class ReplacementEvent extends CacheControllerEvent {
     private Action onStalledCallback;
 
     public ReplacementEvent(CacheController generator, CacheCoherenceFlow producerFlow, int tag, CacheAccess<CacheControllerState> cacheAccess, int set, int way, Action onCompletedCallback, Action onStalledCallback, MemoryHierarchyAccess access) {
-        super(generator, producerFlow, CacheControllerEventType.REPLACEMENT, access);
-        this.tag = tag;
+        super(generator, producerFlow, CacheControllerEventType.REPLACEMENT, access, tag);
         this.cacheAccess = cacheAccess;
         this.set = set;
         this.way = way;
         this.onCompletedCallback = onCompletedCallback;
         this.onStalledCallback = onStalledCallback;
-    }
-
-    public int getTag() {
-        return tag;
     }
 
     public CacheAccess<CacheControllerState> getCacheAccess() {
@@ -51,6 +45,6 @@ public class ReplacementEvent extends CacheControllerEvent {
 
     @Override
     public String toString() {
-        return String.format("[%d] %s: ReplacementEvent{id=%d, tag=0x%08x, set=%d, way=%d}", getBeginCycle(), getGenerator(), getId(), tag, set, way);
+        return String.format("[%d] %s: ReplacementEvent{id=%d, tag=0x%08x, set=%d, way=%d}", getBeginCycle(), getGenerator(), getId(), getTag(), set, way);
     }
 }

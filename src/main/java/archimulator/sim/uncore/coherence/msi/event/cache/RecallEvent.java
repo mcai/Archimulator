@@ -5,19 +5,12 @@ import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
 public class RecallEvent extends CacheControllerEvent {
-    private final int tag;
-
     public RecallEvent(CacheController generator, CacheCoherenceFlow producerFlow, int tag, MemoryHierarchyAccess access) {
-        super(generator, producerFlow, CacheControllerEventType.RECALL, access);
-        this.tag = tag;
-    }
-
-    public int getTag() {
-        return tag;
+        super(generator, producerFlow, CacheControllerEventType.RECALL, access, tag);
     }
 
     @Override
     public String toString() {
-        return String.format("[%d] %s: RecallEvent{id=%d, tag=0x%08x}", getBeginCycle(), getGenerator(), getId(), tag);
+        return String.format("[%d] %s: RecallEvent{id=%d, tag=0x%08x}", getBeginCycle(), getGenerator(), getId(), getTag());
     }
 }

@@ -8,8 +8,8 @@ import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 public abstract class DirectoryControllerEvent extends ControllerEvent {
     private DirectoryControllerEventType type;
 
-    public DirectoryControllerEvent(DirectoryController generator, CacheCoherenceFlow producerFlow, DirectoryControllerEventType type, MemoryHierarchyAccess access) {
-        super(generator, producerFlow, access);
+    public DirectoryControllerEvent(DirectoryController generator, CacheCoherenceFlow producerFlow, DirectoryControllerEventType type, MemoryHierarchyAccess access, int tag) {
+        super(generator, producerFlow, access, tag);
         this.type = type;
     }
 

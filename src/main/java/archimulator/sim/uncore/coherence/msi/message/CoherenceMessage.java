@@ -8,8 +8,8 @@ public abstract class CoherenceMessage extends CacheCoherenceFlow {
     private CoherenceMessageType type;
     private boolean destinationArrived;
 
-    public CoherenceMessage(Controller generator, CacheCoherenceFlow producerFlow, CoherenceMessageType type, MemoryHierarchyAccess access) {
-        super(generator, producerFlow, access);
+    public CoherenceMessage(Controller generator, CacheCoherenceFlow producerFlow, CoherenceMessageType type, MemoryHierarchyAccess access, int tag) {
+        super(generator, producerFlow, access, tag);
         this.type = type;
     }
 
