@@ -19,6 +19,8 @@ public abstract class GeneralCacheController<StateT extends Serializable> extend
 
     private long numEvictions;
 
+    private double warmupRatio;
+
     public GeneralCacheController(CacheHierarchy cacheHierarchy, String name, CoherentCacheConfig config) {
         super(cacheHierarchy, name, config);
 
@@ -30,6 +32,8 @@ public abstract class GeneralCacheController<StateT extends Serializable> extend
                 numDownwardWriteMisses = 0;
 
                 numEvictions = 0;
+
+                warmupRatio = 0;
             }
         });
 
@@ -62,12 +66,14 @@ public abstract class GeneralCacheController<StateT extends Serializable> extend
             stats.put(this.getName() + ".numDownwardWriteMisses", String.valueOf(numDownwardWriteMisses));
 
             stats.put(this.getName() + ".numEvictions", String.valueOf(numEvictions));
+
+            stats.put(this.getName() + ".warmupRatio", String.valueOf(warmupRatio));
         }
     }
 
     public abstract EvictableCache<StateT> getCache();
 
-    public void updateStats(boolean read, boolean hitInCache) {
+    public void updateStats(EvictableCache<?> cache, boolean read, boolean hitInCache) {
         if (read) {
             if (hitInCache) {
                 numDownwardReadHits++;
@@ -81,6 +87,8 @@ public abstract class GeneralCacheController<StateT extends Serializable> extend
                 numDownwardWriteMisses++;
             }
         }
+
+        warmupRatio = cache.getWarmupRatio();
     }
 
     public void incNumEvictions() {

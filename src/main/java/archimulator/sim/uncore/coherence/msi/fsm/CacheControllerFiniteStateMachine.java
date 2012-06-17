@@ -233,7 +233,7 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
 
     public void fireServiceNonblockingRequestEvent(MemoryHierarchyAccess access, int tag, boolean hitInCache) {
         this.getCacheController().getBlockingEventDispatcher().dispatch(new CoherentCacheServiceNonblockingRequestEvent(this.getCacheController(), access, tag, getSet(), getWay(), hitInCache));
-        this.getCacheController().updateStats(access.getType().isRead(), hitInCache);
+        this.getCacheController().updateStats(this.getCacheController().getCache(), access.getType().isRead(), hitInCache);
     }
 
     public void fireReplacementEvent(MemoryHierarchyAccess access, int tag) {

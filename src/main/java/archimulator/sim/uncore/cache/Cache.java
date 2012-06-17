@@ -31,6 +31,7 @@ public class Cache<StateT extends Serializable> extends BasicSimulationObject im
     protected String name;
     protected CacheGeometry geometry;
     protected List<CacheSet<StateT>> sets;
+    private int numTagsInUse;
 
     public Cache(SimulationObject parent, String name, CacheGeometry geometry, ValueProviderFactory<StateT, ValueProvider<StateT>> cacheLineStateProviderFactory) {
         super(parent);
@@ -117,5 +118,21 @@ public class Cache<StateT extends Serializable> extends BasicSimulationObject im
 
     public CacheGeometry getGeometry() {
         return geometry;
+    }
+
+    public int getNumTagsInUse() {
+        return numTagsInUse;
+    }
+
+    public void setNumTagsInUse(int numTagsInUse) {
+        this.numTagsInUse = numTagsInUse;
+    }
+
+    public double getWarmupRatio() {
+        return (double) numTagsInUse / this.getGeometry().getNumLines();
+    }
+
+    public boolean isWarmedUp() {
+        return getWarmupRatio() >= 1;
     }
 }

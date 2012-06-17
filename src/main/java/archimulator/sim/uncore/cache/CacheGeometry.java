@@ -63,6 +63,10 @@ public final class CacheGeometry {
         return numSetsInLog2;
     }
 
+    public int getNumLines() {
+        return this.size / this.lineSize;
+    }
+
     public static int getDisplacement(int addr, CacheGeometry cacheGeometry) {
         return addr & (cacheGeometry.getLineSize() - 1);
     }
