@@ -128,11 +128,7 @@ public class Cache<StateT extends Serializable> extends BasicSimulationObject im
         this.numTagsInUse = numTagsInUse;
     }
 
-    public double getWarmupRatio() {
+    public double getOccupancyRatio() {
         return (double) numTagsInUse / this.getGeometry().getNumLines();
-    }
-
-    public boolean isWarmedUp() {
-        return getWarmupRatio() >= 1;
     }
 }
