@@ -29,6 +29,7 @@ public final class CacheGeometry {
     private int lineSizeInLog2;
     private int numSets;
     private int numSetsInLog2;
+    private int numLines;
 
     public CacheGeometry(int size, int associativity, int lineSize) {
         this.size = size;
@@ -37,6 +38,7 @@ public final class CacheGeometry {
         this.lineSizeInLog2 = (int) (Math.log(this.lineSize) / Math.log(2));
         this.numSets = this.size / this.associativity / this.lineSize;
         this.numSetsInLog2 = (int) (Math.log(this.numSets) / Math.log(2));
+        this.numLines = this.size / this.lineSize;
     }
 
     public int getSize() {
@@ -64,7 +66,7 @@ public final class CacheGeometry {
     }
 
     public int getNumLines() {
-        return this.size / this.lineSize;
+        return numLines;
     }
 
     public static int getDisplacement(int addr, CacheGeometry cacheGeometry) {
