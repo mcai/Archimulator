@@ -30,7 +30,7 @@ public abstract class SimulationStrategy {
     public SimulationStrategy() {
     }
 
-    public abstract void execute(Experiment experiment);
+    public abstract boolean execute(Experiment experiment);
 
     public void doHouseKeeping() {
         this.simulation.getProcessor().getKernel().advanceOneCycle();

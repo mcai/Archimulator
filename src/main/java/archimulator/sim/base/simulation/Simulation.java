@@ -160,40 +160,42 @@ public class Simulation implements SimulationObject {
     }
 
     public void simulate(Experiment experiment) {
-        try {
-            Logger.infof(Logger.SIMULATOR, "run simulation: %s", this.cycleAccurateEventQueue.getCurrentCycle(), this.getConfig().getTitle());
+        Logger.infof(Logger.SIMULATOR, "run simulation: %s", this.cycleAccurateEventQueue.getCurrentCycle(), this.getConfig().getTitle());
 
-            Logger.info(Logger.SIMULATOR, "", this.cycleAccurateEventQueue.getCurrentCycle());
+        Logger.info(Logger.SIMULATOR, "", this.cycleAccurateEventQueue.getCurrentCycle());
 
-            this.getStrategy().execute(experiment);
+        boolean noErrors = this.getStrategy().execute(experiment);
 
-            if (!this.getStatsInFastForward().isEmpty()) {
-                MapHelper.save(this.getStatsInFastForward(), this.getConfig().getCwd() + "/stat_fastForward.txt");
+        if (!this.getStatsInFastForward().isEmpty()) {
+            MapHelper.save(this.getStatsInFastForward(), this.getConfig().getCwd() + "/stat_fastForward.txt");
 
-                this.statsInFastForward = getStatsWithSimulationPrefix(this.getStatsInFastForward());
+            this.statsInFastForward = getStatsWithSimulationPrefix(this.getStatsInFastForward());
 
-                this.blockingEventDispatcher.dispatch(new DumpStatsCompletedEvent(this, this.getStatsInFastForward()));
-            }
+            this.blockingEventDispatcher.dispatch(new DumpStatsCompletedEvent(this, this.getStatsInFastForward()));
+        }
 
-            if (!this.getStatsInWarmup().isEmpty()) {
-                MapHelper.save(this.getStatsInWarmup(), this.getConfig().getCwd() + "/stat_cacheWarmup.txt");
+        if (!this.getStatsInWarmup().isEmpty()) {
+            MapHelper.save(this.getStatsInWarmup(), this.getConfig().getCwd() + "/stat_cacheWarmup.txt");
 
-                this.statsInWarmup = getStatsWithSimulationPrefix(this.getStatsInWarmup());
+            this.statsInWarmup = getStatsWithSimulationPrefix(this.getStatsInWarmup());
 
-                this.blockingEventDispatcher.dispatch(new DumpStatsCompletedEvent(this, this.getStatsInWarmup()));
-            }
+            this.blockingEventDispatcher.dispatch(new DumpStatsCompletedEvent(this, this.getStatsInWarmup()));
+        }
 
-            if (!this.getStatsInMeasurement().isEmpty()) {
-                MapHelper.save(this.getStatsInMeasurement(), this.getConfig().getCwd() + "/stat_measurement.txt");
+        if (!this.getStatsInMeasurement().isEmpty()) {
+            MapHelper.save(this.getStatsInMeasurement(), this.getConfig().getCwd() + "/stat_measurement.txt");
 
-                this.statsInMeasurement = getStatsWithSimulationPrefix(this.getStatsInMeasurement());
+            this.statsInMeasurement = getStatsWithSimulationPrefix(this.getStatsInMeasurement());
 
-                this.blockingEventDispatcher.dispatch(new DumpStatsCompletedEvent(this, this.getStatsInMeasurement()));
-            }
+            this.blockingEventDispatcher.dispatch(new DumpStatsCompletedEvent(this, this.getStatsInMeasurement()));
+        }
 
-            resetIdCounters();
-        } catch (Exception e) {
-            e.printStackTrace();
+        resetIdCounters();
+
+        System.out.println();
+
+        if (!noErrors) {
+            System.err.println("Simulation completed with errors");
             System.exit(-1);
         }
     }
