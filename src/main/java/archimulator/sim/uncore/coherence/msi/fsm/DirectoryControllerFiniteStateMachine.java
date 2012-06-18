@@ -29,13 +29,13 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
     private int set;
     private int way;
 
-    private int numRecallAcks = 0;
+    private int numRecallAcks;
 
-    private List<Action> stalledEvents = new ArrayList<Action>();
+    private List<Action> stalledEvents;
 
     private Action onCompletedCallback;
 
-    public int victimTag = CacheLine.INVALID_TAG;
+    private int victimTag;
 
 //    private List<String> transitionHistory = new ArrayList<String>();
 
@@ -45,6 +45,8 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
         this.way = way;
         this.directoryController = directoryController;
         this.directoryEntry = new DirectoryEntry();
+        this.stalledEvents = new ArrayList<Action>();
+        this.victimTag = CacheLine.INVALID_TAG;
 
         this.addListener(ExitStateEvent.class, new Action1<ExitStateEvent>() {
             @Override
@@ -186,15 +188,15 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
         this.getDirectoryController().getBlockingEventDispatcher().dispatch(new CoherentCacheNonblockingRequestHitToTransientTagEvent(this.getDirectoryController(), access, tag, getSet(), getWay()));
     }
 
-    public void sendDataToReq(CacheCoherenceFlow producerFlow, final CacheController req, final int tag, int numAcks) {
+    public void sendDataToReq(CacheCoherenceFlow producerFlow, CacheController req, int tag, int numAcks) {
         this.directoryController.transfer(req, this.directoryController.getCache().getLineSize() + 8, new DataMessage(this.directoryController, producerFlow, this.directoryController, tag, numAcks, producerFlow.getAccess()));
     }
 
-    public void sendPutAckToReq(CacheCoherenceFlow producerFlow, final CacheController req, final int tag) {
+    public void sendPutAckToReq(CacheCoherenceFlow producerFlow, CacheController req, int tag) {
         sendPutAckToReq(producerFlow, this.directoryController, req, tag);
     }
 
-    public static void sendPutAckToReq(CacheCoherenceFlow producerFlow, DirectoryController directoryController, final CacheController req, final int tag) {
+    public static void sendPutAckToReq(CacheCoherenceFlow producerFlow, DirectoryController directoryController, CacheController req, int tag) {
         directoryController.transfer(req, 8, new PutAckMessage(directoryController, producerFlow, tag, producerFlow.getAccess()));
     }
 
@@ -206,18 +208,16 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
         });
     }
 
-    public void sendFwdGetSToOwner(CacheCoherenceFlow producerFlow, final CacheController req, final int tag) {
-        final CacheController owner = getDirectoryEntry().getOwner();
-        this.directoryController.transfer(owner, 8, new FwdGetSMessage(this.directoryController, producerFlow, req, tag, producerFlow.getAccess()));
+    public void sendFwdGetSToOwner(CacheCoherenceFlow producerFlow, CacheController req, int tag) {
+        this.directoryController.transfer(getDirectoryEntry().getOwner(), 8, new FwdGetSMessage(this.directoryController, producerFlow, req, tag, producerFlow.getAccess()));
     }
 
-    public void sendFwdGetMToOwner(CacheCoherenceFlow producerFlow, final CacheController req, final int tag) {
-        final CacheController owner = getDirectoryEntry().getOwner();
-        this.directoryController.transfer(owner, 8, new FwdGetMMessage(this.directoryController, producerFlow, req, tag, producerFlow.getAccess()));
+    public void sendFwdGetMToOwner(CacheCoherenceFlow producerFlow, CacheController req, int tag) {
+        this.directoryController.transfer(getDirectoryEntry().getOwner(), 8, new FwdGetMMessage(this.directoryController, producerFlow, req, tag, producerFlow.getAccess()));
     }
 
-    public void sendInvToSharers(CacheCoherenceFlow producerFlow, final CacheController req, final int tag) {
-        for (final CacheController sharer : this.getDirectoryEntry().getSharers()) {
+    public void sendInvToSharers(CacheCoherenceFlow producerFlow, CacheController req, int tag) {
+        for (CacheController sharer : this.getDirectoryEntry().getSharers()) {
             if (req != sharer) {
                 this.directoryController.transfer(sharer, 8, new InvMessage(this.directoryController, producerFlow, req, tag, producerFlow.getAccess()));
             }
@@ -225,7 +225,7 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
     }
 
     public void sendRecallToOwner(CacheCoherenceFlow producerFlow, int tag) {
-        final CacheController owner = getDirectoryEntry().getOwner();
+        CacheController owner = getDirectoryEntry().getOwner();
         if(owner.getCache().findWay(tag) == -1) {
             throw new IllegalArgumentException();
         }
@@ -234,7 +234,7 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
     }
 
     public void sendRecallToSharers(CacheCoherenceFlow producerFlow, int tag) {
-        for (final CacheController sharer : this.getDirectoryEntry().getSharers()) {
+        for (CacheController sharer : this.getDirectoryEntry().getSharers()) {
             if(sharer.getCache().findWay(tag) == -1) {
                 throw new IllegalArgumentException();
             }
@@ -328,5 +328,13 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
 
     public DirectoryController getDirectoryController() {
         return directoryController;
+    }
+
+    public int getVictimTag() {
+        return victimTag;
+    }
+
+    public void setVictimTag(int victimTag) {
+        this.victimTag = victimTag;
     }
 }
