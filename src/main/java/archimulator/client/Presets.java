@@ -10,7 +10,7 @@ import archimulator.sim.uncore.ht.LLCReuseDistanceProfilingCapability;
 public class Presets {
     public static SimulatedProgram SIMULATED_PROGRAM_MST_BASELINE(String args) {
         return new SimulatedProgram(
-                "mst_baseline" + "(" + args + ")", ExperimentProfile.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/baseline",
+                "mst_baseline" + "_" + args, ExperimentProfile.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/baseline",
                 "mst.mips",
                 args);
     }
@@ -34,7 +34,7 @@ public class Presets {
 
     public static SimulatedProgram SIMULATED_PROGRAM_MST_HT(String args, int lookahead, int stride, boolean dynamicHtParams) {
         SimulatedProgram program = new SimulatedProgram(
-                "mst_ht" + "(" + args + ")" + "-lookahead_" + lookahead + "-stride_" + stride, ExperimentProfile.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/ht",
+                "mst_ht" + "_" + args + "-lookahead_" + lookahead + "-stride_" + stride, ExperimentProfile.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/ht",
                 "mst.mips",
                 args);
         program.setHelperThreadedProgram(true);
