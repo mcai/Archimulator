@@ -38,7 +38,7 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
 
     private Action onCompletedCallback;
 
-//    private List<String> transitionHistory = new ArrayList<String>();
+    private List<String> transitionHistory = new ArrayList<String>();
 
     public Action getOnCompletedCallback() {
         return onCompletedCallback;
@@ -72,11 +72,14 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
 
                 if (CacheSimulator.logSameState || getState() != previousState) {
                     String transitionText = String.format("[%d] %s.[%d,%d] {%s} %s: %s.%s -> %s", cacheController.getCycleAccurateEventQueue().getCurrentCycle(), getName(), getSet(), getWay(), line.getTag() != CacheLine.INVALID_TAG ? String.format("0x%08x", line.getTag()) : "N/A", previousState, enterStateEvent.getSender() != null ? enterStateEvent.getSender() : "<N/A>", enterStateEvent.getCondition(), getState());
-//                    if (transitionHistory.size() >= 100) {
-//                        transitionHistory.remove(0);
-//                    }
-//
-//                    transitionHistory.add(transitionText);
+
+                    if(CacheSimulator.recordTransitionHistory) {
+                        if (transitionHistory.size() >= 100) {
+                            transitionHistory.remove(0);
+                        }
+
+                        transitionHistory.add(transitionText);
+                    }
 
                     if (CacheSimulator.logEnabled) {
                         CacheSimulator.pw.println(transitionText);

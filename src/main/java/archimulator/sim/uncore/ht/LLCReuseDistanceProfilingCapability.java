@@ -23,10 +23,8 @@ import archimulator.sim.analysis.Function;
 import archimulator.sim.analysis.Instruction;
 import archimulator.sim.base.event.DumpStatEvent;
 import archimulator.sim.base.event.PollStatsEvent;
-import archimulator.sim.base.event.PseudocallEncounteredEvent;
 import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.base.experiment.capability.SimulationCapability;
-import archimulator.sim.base.simulation.SimulatedProgram;
 import archimulator.sim.base.simulation.Simulation;
 import archimulator.sim.core.BasicThread;
 import archimulator.sim.core.DynamicInstruction;
@@ -36,7 +34,6 @@ import archimulator.sim.os.BasicProcess;
 import archimulator.sim.uncore.MemoryHierarchyAccessType;
 import archimulator.sim.uncore.coherence.event.CoherentCacheServiceNonblockingRequestEvent;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
-import net.pickapack.Reference;
 import net.pickapack.action.Action1;
 
 import java.util.ArrayList;
@@ -79,26 +76,6 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
         }
 
         this.reuseDistances = new TreeMap<MemoryHierarchyAccessType, Map<Integer, Long>>();
-
-        final Reference<Integer> savedRegisterValue = new Reference<Integer>(-1);
-
-        llc.getBlockingEventDispatcher().addListener(PseudocallEncounteredEvent.class, new Action1<PseudocallEncounteredEvent>() {
-            public void apply(PseudocallEncounteredEvent event) {
-                SimulatedProgram simulatedProgram = event.getContext().getProcess().getContextConfig().getSimulatedProgram();
-
-                if (event.getImm() == 3820) {
-                    savedRegisterValue.set(event.getContext().getRegs().getGpr(event.getRs()));
-                    event.getContext().getRegs().setGpr(event.getRs(), getHtLookahead(simulatedProgram));
-                } else if (event.getImm() == 3821) {
-                    event.getContext().getRegs().setGpr(event.getRs(), savedRegisterValue.get());
-                } else if (event.getImm() == 3822) {
-                    savedRegisterValue.set(event.getContext().getRegs().getGpr(event.getRs()));
-                    event.getContext().getRegs().setGpr(event.getRs(), getHtStride(simulatedProgram));
-                } else if (event.getImm() == 3823) {
-                    event.getContext().getRegs().setGpr(event.getRs(), savedRegisterValue.get());
-                }
-            }
-        });
 
         llc.getBlockingEventDispatcher().addListener(CoherentCacheServiceNonblockingRequestEvent.class, new Action1<CoherentCacheServiceNonblockingRequestEvent>() {
             public void apply(CoherentCacheServiceNonblockingRequestEvent event) {
@@ -249,22 +226,6 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
         }
 
         return null;
-    }
-
-    protected int getHtLookahead(SimulatedProgram simulatedProgram) {
-        if (simulatedProgram.isHelperThreadedProgram()) {
-            return simulatedProgram.isDynamicHtParams() ? 20 : simulatedProgram.getHtLookahead();
-        }
-
-        throw new IllegalArgumentException();
-    }
-
-    protected int getHtStride(SimulatedProgram simulatedProgram) {
-        if (simulatedProgram.isHelperThreadedProgram()) {
-            return simulatedProgram.isDynamicHtParams() ? 10 : simulatedProgram.getHtStride();
-        }
-
-        throw new IllegalArgumentException();
     }
 
     private static class LoadEntry {

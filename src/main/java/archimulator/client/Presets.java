@@ -5,6 +5,7 @@ import archimulator.sim.base.experiment.profile.ProcessorProfile;
 import archimulator.sim.base.simulation.SimulatedProgram;
 import archimulator.sim.uncore.ht.EnhancedHTLLCRequestProfilingCapability;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
+import archimulator.sim.uncore.ht.HelperThreadParamsDynamicTuningCapability;
 import archimulator.sim.uncore.ht.LLCReuseDistanceProfilingCapability;
 
 public class Presets {
@@ -58,8 +59,8 @@ public class Presets {
 //        experimentProfile.functionallyToEnd();
 //        experimentProfile.fastForwardToPseudoCallAndInDetailForMaxInsts(pthreadSpawnedIndex, maxInsts);
         experimentProfile.inDetailToEnd();
-        experimentProfile.addSimulationCapabilityClass(LLCReuseDistanceProfilingCapability.class);
-        experimentProfile.addSimulationCapabilityClass(EnhancedHTLLCRequestProfilingCapability.class);
+//        experimentProfile.addSimulationCapabilityClass(LLCReuseDistanceProfilingCapability.class);
+//        experimentProfile.addSimulationCapabilityClass(EnhancedHTLLCRequestProfilingCapability.class);
         return experimentProfile;
     }
 
@@ -69,8 +70,9 @@ public class Presets {
 //        experimentProfile.functionallyToEnd();
         experimentProfile.fastForwardToPseudoCallAndInDetailForMaxInsts(pthreadSpawnedIndex, maxInsts);
 //        experimentProfile.inDetailToEnd();
-        experimentProfile.addSimulationCapabilityClass(LLCReuseDistanceProfilingCapability.class);
-        experimentProfile.addSimulationCapabilityClass(EnhancedHTLLCRequestProfilingCapability.class);
+        experimentProfile.addSimulationCapabilityClass(HelperThreadParamsDynamicTuningCapability.class);
+//        experimentProfile.addSimulationCapabilityClass(LLCReuseDistanceProfilingCapability.class);
+//        experimentProfile.addSimulationCapabilityClass(EnhancedHTLLCRequestProfilingCapability.class);
         return experimentProfile;
     }
 
@@ -80,6 +82,7 @@ public class Presets {
 //        experimentProfile.functionallyToEnd();
 //        experimentProfile.fastForwardToPseudoCallAndInDetailForMaxInsts(pthreadSpawnedIndex, maxInsts);
         experimentProfile.inDetailToEnd();
+        experimentProfile.addSimulationCapabilityClass(HelperThreadParamsDynamicTuningCapability.class);
         experimentProfile.addSimulationCapabilityClass(LLCReuseDistanceProfilingCapability.class);
         return experimentProfile;
     }
