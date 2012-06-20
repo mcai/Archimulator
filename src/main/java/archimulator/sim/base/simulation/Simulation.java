@@ -213,6 +213,7 @@ public class Simulation implements SimulationObject {
     }
 
     private void dumpStat(Map<String, Object> stats) {
+        stats.put("title", this.config.getTitle());
         stats.put("duration", this.getFormattedDuration());
 
         stats.put("totalCycles", String.valueOf(this.getCycleAccurateEventQueue().getCurrentCycle()));
