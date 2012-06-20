@@ -106,7 +106,7 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
         this.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
             public void apply(DumpStatEvent event) {
                 if (event.getType() == DumpStatEvent.Type.DETAILED_SIMULATION) {
-                    dumpStats();
+                    dumpStats(event.getStats());
                 }
             }
         });
@@ -134,6 +134,17 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
         System.out.println("Directory Controller " + this.l2Cache.getName() + " FSM: ");
         System.out.println("------------------------------------------------------------------------");
         this.l2Cache.getFsmFactory().dump();
+    }
+
+    public void dumpStats(Map<String, Object> stats) {
+        for(CacheController instructionCache : this.instructionCaches) {
+            instructionCache.getFsmFactory().dump(instructionCache.getName(), stats);
+        }
+
+        for(CacheController dataCache : this.dataCaches) {
+            dataCache.getFsmFactory().dump(dataCache.getName(), stats);
+        }
+        this.l2Cache.getFsmFactory().dump(this.l2Cache.getName(), stats);
     }
 
     @Override
