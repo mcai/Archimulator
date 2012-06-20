@@ -66,7 +66,15 @@ public class CacheLine<StateT extends Serializable> extends Params {
     }
 
     public void setTag(int tag) {
-        if(this.tag ==INVALID_TAG && tag != INVALID_TAG) {
+        if(tag != INVALID_TAG) {
+            for(CacheLine<StateT> line : this.cache.getLines(this.set)) {
+                if(line.getTag() == tag) {
+                    throw new IllegalArgumentException();
+                }
+            }
+        }
+
+        if(this.tag == INVALID_TAG && tag != INVALID_TAG) {
             this.cache.setNumTagsInUse(this.cache.getNumTagsInUse() + 1);
         }
         else if(this.tag != INVALID_TAG && tag == INVALID_TAG) {

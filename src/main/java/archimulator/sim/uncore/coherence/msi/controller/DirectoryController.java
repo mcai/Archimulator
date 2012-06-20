@@ -199,6 +199,14 @@ public class DirectoryController extends GeneralCacheController {
     private void access(CacheCoherenceFlow producerFlow, MemoryHierarchyAccess access, CacheController req, final int tag, final Action2<Integer, Integer> onReplacementCompletedCallback, final Action onReplacementStalledCallback) {
         final int set = this.cache.getSet(tag);
 
+        for (CacheLine<DirectoryControllerState> line : this.cache.getLines(set)) {
+            DirectoryControllerFiniteStateMachine fsm = (DirectoryControllerFiniteStateMachine) line.getStateProvider();
+            if (line.getState() == DirectoryControllerState.MI_A || line.getState() == DirectoryControllerState.SI_A && fsm.getEvicterTag() == tag) {
+                fsm.stall(onReplacementStalledCallback);
+                return;
+            }
+        }
+
         final CacheAccess<DirectoryControllerState> cacheAccess = this.cache.newAccess(access, tag);
         if(cacheAccess.isHitInCache()) {
             onReplacementCompletedCallback.apply(set, cacheAccess.getWay());

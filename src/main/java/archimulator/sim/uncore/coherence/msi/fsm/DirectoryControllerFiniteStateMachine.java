@@ -35,6 +35,8 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
 
     private Action onCompletedCallback;
 
+    private int evicterTag;
+
     private int victimTag;
 
     private List<String> transitionHistory = new ArrayList<String>();
@@ -46,6 +48,7 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
         this.directoryController = directoryController;
         this.directoryEntry = new DirectoryEntry();
         this.stalledEvents = new ArrayList<Action>();
+        this.evicterTag = CacheLine.INVALID_TAG;
         this.victimTag = CacheLine.INVALID_TAG;
 
         this.addListener(ExitStateEvent.class, new Action1<ExitStateEvent>() {
@@ -331,6 +334,14 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
 
     public DirectoryController getDirectoryController() {
         return directoryController;
+    }
+
+    public int getEvicterTag() {
+        return evicterTag;
+    }
+
+    public void setEvicterTag(int evicterTag) {
+        this.evicterTag = evicterTag;
     }
 
     public int getVictimTag() {

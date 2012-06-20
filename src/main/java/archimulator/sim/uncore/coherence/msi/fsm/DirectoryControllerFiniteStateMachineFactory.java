@@ -130,6 +130,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                         fsm.sendDataToReq(event, event.getReq(), event.getTag(), 0);
                         fsm.addReqToSharers(event.getReq());
                         fsm.fireCacheLineInsertEvent(event.getAccess(), event.getTag(), fsm.getVictimTag());
+                        fsm.setEvicterTag(CacheLine.INVALID_TAG);
                         fsm.setVictimTag(CacheLine.INVALID_TAG);
                         fsm.getDirectoryController().getCache().getEvictionPolicy().handleInsertionOnMiss(fsm.getSet(), fsm.getWay());
                     }
@@ -181,6 +182,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                         fsm.sendDataToReq(event, event.getReq(), event.getTag(), 0);
                         fsm.setOwnerToReq(event.getReq());
                         fsm.fireCacheLineInsertEvent(event.getAccess(), event.getTag(), fsm.getVictimTag());
+                        fsm.setEvicterTag(CacheLine.INVALID_TAG);
                         fsm.setVictimTag(CacheLine.INVALID_TAG);
                         fsm.getDirectoryController().getCache().getEvictionPolicy().handleInsertionOnMiss(fsm.getSet(), fsm.getWay());
                     }
@@ -214,6 +216,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                         fsm.clearSharers();
                         fsm.setOnCompletedCallback(event.getOnCompletedCallback());
                         fsm.fireReplacementEvent(event.getAccess(), event.getTag());
+                        fsm.setEvicterTag(event.getTag());
                         fsm.setVictimTag(fsm.getLine().getTag());
                         fsm.getDirectoryController().incNumEvictions();
                     }
@@ -270,6 +273,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                         fsm.clearOwner();
                         fsm.setOnCompletedCallback(event.getOnCompletedCallback());
                         fsm.fireReplacementEvent(event.getAccess(), event.getTag());
+                        fsm.setEvicterTag(event.getTag());
                         fsm.setVictimTag(fsm.getLine().getTag());
                         fsm.getDirectoryController().incNumEvictions();
                     }
@@ -363,7 +367,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                 .onCondition(DirectoryControllerEventType.REPLACEMENT, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, ReplacementEvent>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, ReplacementEvent event) {
-                        fsm.stall(sender, event);
+                        fsm.stall(event.getOnStalledCallback());
                     }
                 }, DirectoryControllerState.MI_A)
                 .onCondition(DirectoryControllerEventType.RECALL_ACK, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, RecallAckEvent>() {
@@ -416,7 +420,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                 .onCondition(DirectoryControllerEventType.REPLACEMENT, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, ReplacementEvent>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, ReplacementEvent event) {
-                        fsm.stall(sender, event);
+                        fsm.stall(event.getOnStalledCallback());
                     }
                 }, DirectoryControllerState.SI_A)
                 .onCondition(DirectoryControllerEventType.RECALL_ACK, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, RecallAckEvent>() {

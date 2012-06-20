@@ -71,8 +71,8 @@ public class Presets {
         experimentProfile.fastForwardToPseudoCallAndInDetailForMaxInsts(pthreadSpawnedIndex, maxInsts);
 //        experimentProfile.inDetailToEnd();
         experimentProfile.addSimulationCapabilityClass(HelperThreadParamsDynamicTuningCapability.class);
-//        experimentProfile.addSimulationCapabilityClass(LLCReuseDistanceProfilingCapability.class);
-//        experimentProfile.addSimulationCapabilityClass(EnhancedHTLLCRequestProfilingCapability.class);
+        experimentProfile.addSimulationCapabilityClass(LLCReuseDistanceProfilingCapability.class);
+        experimentProfile.addSimulationCapabilityClass(EnhancedHTLLCRequestProfilingCapability.class);
         return experimentProfile;
     }
 
