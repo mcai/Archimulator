@@ -22,73 +22,24 @@ import archimulator.client.ManagementStartup;
 import archimulator.service.ArchimulatorService;
 import archimulator.sim.base.experiment.profile.ExperimentProfile;
 import archimulator.sim.base.experiment.profile.ExperimentProfileState;
+import com.caucho.hessian.client.HessianProxyFactory;
 import net.pickapack.DateHelper;
 import net.pickapack.action.Function;
 import net.pickapack.action.Predicate;
-import com.caucho.hessian.client.HessianProxyFactory;
+import net.pickapack.chart.LinePlot;
+import net.pickapack.chart.LinePlotFrame;
+import net.pickapack.chart.SubLinePlot;
+import net.pickapack.chart.SubLinePlotLine;
 import org.jfree.ui.RefineryUtilities;
 
 import java.net.MalformedURLException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class ExperimentLinePlot {
-    private String title;
-    private List<ExperimentSubLinePlot> subLinePlots;
-
-    public ExperimentLinePlot(String title) {
-        this.title = title;
-        this.subLinePlots = new ArrayList<ExperimentSubLinePlot>();
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public List<ExperimentSubLinePlot> getSubLinePlots() {
-        return subLinePlots;
-    }
-
-    public static class ExperimentSubLinePlot {
-        private String titleY;
-        private List<ExperimentSubLinePlotLine> lines;
-
-        public ExperimentSubLinePlot(String titleY) {
-            this.titleY = titleY;
-            this.lines = new ArrayList<ExperimentSubLinePlotLine>();
-        }
-
-        public String getTitleY() {
-            return titleY;
-        }
-
-        public List<ExperimentSubLinePlotLine> getLines() {
-            return lines;
-        }
-    }
-
-    public static class ExperimentSubLinePlotLine {
-        private String title;
-        private Function<Double> getValueCallback;
-
-        public ExperimentSubLinePlotLine(String title, Function<Double> getValueCallback) {
-            this.title = title;
-            this.getValueCallback = getValueCallback;
-        }
-
-        public String getTitle() {
-            return title;
-        }
-
-        public Function<Double> getGetValueCallback() {
-            return getValueCallback;
-        }
-    }
-
-    public static void addExperimentSubLinePlot(final ArchimulatorService archimulatorService, ExperimentLinePlot experimentLinePlot, String titleY, final String key) throws SQLException {
-        addExperimentSubLinePlot(archimulatorService, experimentLinePlot, titleY, key, new Predicate<ExperimentProfile>() {
+public class ExperimentLinePlotHelper {
+    public static void addExperimentSubLinePlot(final ArchimulatorService archimulatorService, LinePlot linePlot, String titleY, final String key) throws SQLException {
+        addExperimentSubLinePlot(archimulatorService, linePlot, titleY, key, new Predicate<ExperimentProfile>() {
             @Override
             public boolean apply(ExperimentProfile experimentProfile) {
                 return true;
@@ -96,13 +47,13 @@ public class ExperimentLinePlot {
         });
     }
 
-    public static void addExperimentSubLinePlot(final ArchimulatorService archimulatorService, ExperimentLinePlot experimentLinePlot, String titleY, final String key, Predicate<ExperimentProfile> experimentProfilePred) throws SQLException {
-        ExperimentSubLinePlot experimentSubLinePlot = new ExperimentSubLinePlot(titleY);
+    public static void addExperimentSubLinePlot(final ArchimulatorService archimulatorService, LinePlot linePlot, String titleY, final String key, Predicate<ExperimentProfile> experimentProfilePred) throws SQLException {
+        SubLinePlot subLinePlot = new SubLinePlot(titleY);
 
         List<ExperimentProfile> experimentProfiles = archimulatorService.getExperimentProfilesAsList();
         for (final ExperimentProfile experimentProfile : experimentProfiles) {
             if (experimentProfilePred.apply(experimentProfile)) {
-                experimentSubLinePlot.getLines().add(new ExperimentSubLinePlotLine("Exp #" + experimentProfile.getId(), new Function<Double>() {
+                subLinePlot.getLines().add(new SubLinePlotLine("Exp #" + experimentProfile.getId(), new Function<Double>() {
                     @Override
                     public Double apply() {
                         try {
@@ -120,7 +71,7 @@ public class ExperimentLinePlot {
                 }));
             }
         }
-        experimentLinePlot.getSubLinePlots().add(experimentSubLinePlot);
+        linePlot.getSubLinePlots().add(subLinePlot);
     }
 
     private static void recordException(Exception e) {
@@ -136,24 +87,24 @@ public class ExperimentLinePlot {
 
         ArchimulatorService archimulatorService = (ArchimulatorService) factory.create(ArchimulatorService.class, ManagementStartup.SERVICE_URL);
 
-        ExperimentLinePlot experimentLinePlot = new ExperimentLinePlot("Experiment Stats - Archimulator");
+        LinePlot linePlot = new LinePlot("Experiment Stats - Archimulator");
 
-        addExperimentSubLinePlot(archimulatorService, experimentLinePlot, "Insts per Second", "checkpointedSimulation/phase1.instsPerSecond", new Predicate<ExperimentProfile>() {
+        addExperimentSubLinePlot(archimulatorService, linePlot, "Insts per Second", "checkpointedSimulation/phase1.instsPerSecond", new Predicate<ExperimentProfile>() {
             @Override
             public boolean apply(ExperimentProfile experimentProfile) {
                 return experimentProfile.getState() == ExperimentProfileState.STOPPED;
             }
         });
-        addExperimentSubLinePlot(archimulatorService, experimentLinePlot, "Cycles per Second", "checkpointedSimulation/phase1.cyclesPerSecond", new Predicate<ExperimentProfile>() {
+        addExperimentSubLinePlot(archimulatorService, linePlot, "Cycles per Second", "checkpointedSimulation/phase1.cyclesPerSecond", new Predicate<ExperimentProfile>() {
             @Override
             public boolean apply(ExperimentProfile experimentProfile) {
                 return experimentProfile.getState() == ExperimentProfileState.STOPPED;
             }
         });
 
-        ExperimentLinePlotFrame experimentLinePlotFrame = new ExperimentLinePlotFrame(experimentLinePlot);
-        experimentLinePlotFrame.pack();
-        RefineryUtilities.centerFrameOnScreen(experimentLinePlotFrame);
-        experimentLinePlotFrame.setVisible(true);
+        LinePlotFrame linePlotFrame = new LinePlotFrame(linePlot, 500, 470);
+        linePlotFrame.pack();
+        RefineryUtilities.centerFrameOnScreen(linePlotFrame);
+        linePlotFrame.setVisible(true);
     }
 }
