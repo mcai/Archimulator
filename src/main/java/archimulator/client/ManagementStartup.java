@@ -102,8 +102,7 @@ public class ManagementStartup {
         List<SimulatedProgram> simulatedPrograms = this.archimulatorService.getSimulatedProgramsAsList();
 
         int pthreadSpawnedIndex = 3720;
-        int maxInsts = 200000000;
-//        int maxInsts = 20000;
+        int maxInsts = 2000000000;
 
         List<ProcessorProfile> processorProfiles = this.archimulatorService.getProcessorProfilesAsList();
 
