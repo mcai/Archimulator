@@ -35,7 +35,7 @@ public class StandaloneStartup {
     private int numCores = 2;
 
     @Option(name = "-t", usage = "number of threads per core (default: 2)", metaVar = "<numThreadsPerCore>", required = false)
-    private int numThreadsPerCore = 2;
+    private int numThreadsPerCore = 4;
 
     @Option(name = "-is", usage = "L1I cache size in KBytes (default: 32)", metaVar = "<l1ISizeInKByte>", required = false)
     private int l1ISizeInKByte = 32;
@@ -50,10 +50,10 @@ public class StandaloneStartup {
     private int l1DAssociativity = 4;
 
     @Option(name = "-2s", usage = "L2 cache size in KBytes (default: 96)", metaVar = "<l2SizeInKByte>", required = false)
-    private int l2SizeInKByte = 96;
+    private int l2SizeInKByte = 128;
 
     @Option(name = "-2a", usage = "L2 cache associativity (default: 4)", metaVar = "<l2Associativity>", required = false)
-    private int l2Associativity = 4;
+    private int l2Associativity = 8;
 
     @Option(name = "-a", usage = "Arguments passed to mst (default: 4000)", metaVar = "<args>", required = false)
     private String args = "4000";
