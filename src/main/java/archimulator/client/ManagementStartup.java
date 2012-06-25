@@ -109,11 +109,7 @@ public class ManagementStartup {
         for (ProcessorProfile processorProfile : processorProfiles) {
             if (processorProfile.getL2EvictionPolicyClz().equals(LRUPolicy.class)) {
                 for (SimulatedProgram simulatedProgram : simulatedPrograms) {
-                    if (simulatedProgram.getTitle().startsWith("mst_baseline")) {
-                        experimentProfiles.add(Presets.baseline_lru(pthreadSpawnedIndex, maxInsts, processorProfile, simulatedProgram));
-                    } else if (simulatedProgram.getTitle().startsWith("mst_ht")) {
-                        experimentProfiles.add(Presets.ht_lru(pthreadSpawnedIndex, maxInsts, processorProfile, simulatedProgram));
-                    }
+                    experimentProfiles.add(Presets.experiment(pthreadSpawnedIndex, maxInsts, processorProfile, simulatedProgram));
                 }
             }
 //            else if (processorProfile.getL2EvictionPolicyClz().equals(LLCHTAwareLRUPolicy.class)) {

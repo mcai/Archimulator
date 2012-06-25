@@ -699,22 +699,27 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
         checkInvariants(event.getSet());
     }
 
+//    private boolean checkInvariantsEnabled = true;
+    private boolean checkInvariantsEnabled = false;
+
     private void checkInvariants(int set) {
-        int numHTLinesInLLC = select(this.llcLineHTRequestStates.get(set).values(), having(on(CacheLineHTRequestState.class).getThreadId(), equalTo(BasicThread.getHelperThreadId()))).size();
-        int numNonHTLinesInLLC = select(this.llcLineHTRequestStates.get(set).values(), having(on(CacheLineHTRequestState.class).getThreadId(), not(BasicThread.getHelperThreadId()))).size();
-        int numVictimEntriesInVictimCache = select(this.htLLCRequestVictimCache.getLines(set), having(on(CacheLine.class).getState(), not(HTLLCRequestVictimCacheLineState.INVALID))).size();
+        if(checkInvariantsEnabled) {
+            int numHTLinesInLLC = select(this.llcLineHTRequestStates.get(set).values(), having(on(CacheLineHTRequestState.class).getThreadId(), equalTo(BasicThread.getHelperThreadId()))).size();
+            int numNonHTLinesInLLC = select(this.llcLineHTRequestStates.get(set).values(), having(on(CacheLineHTRequestState.class).getThreadId(), not(BasicThread.getHelperThreadId()))).size();
+            int numVictimEntriesInVictimCache = select(this.htLLCRequestVictimCache.getLines(set), having(on(CacheLine.class).getState(), not(HTLLCRequestVictimCacheLineState.INVALID))).size();
 
-        if (numHTLinesInLLC != numVictimEntriesInVictimCache || numVictimEntriesInVictimCache + numNonHTLinesInLLC > this.llc.getCache().getAssociativity()) {
-            throw new IllegalArgumentException();
-        }
+            if (numHTLinesInLLC != numVictimEntriesInVictimCache || numVictimEntriesInVictimCache + numNonHTLinesInLLC > this.llc.getCache().getAssociativity()) {
+                throw new IllegalArgumentException();
+            }
 
-        for (int i = 0; i < this.llc.getCache().getAssociativity(); i++) {
-            CacheLine<DirectoryControllerState> line = this.llc.getCache().getLine(set, i);
-            if (line.getState().isStable() && line.isValid() && this.llcLineHTRequestStates.get(set).get(i).getThreadId() == BasicThread.getHelperThreadId()) {
-                int wayOfVictimCacheLine = this.findWayOfVictimCacheLineByHtRequestTag(set, line.getTag(), true);
+            for (int i = 0; i < this.llc.getCache().getAssociativity(); i++) {
+                CacheLine<DirectoryControllerState> line = this.llc.getCache().getLine(set, i);
+                if (line.getState().isStable() && line.isValid() && this.llcLineHTRequestStates.get(set).get(i).getThreadId() == BasicThread.getHelperThreadId()) {
+                    int wayOfVictimCacheLine = this.findWayOfVictimCacheLineByHtRequestTag(set, line.getTag(), true);
 
-                if (wayOfVictimCacheLine == -1) {
-                    throw new IllegalArgumentException();
+                    if (wayOfVictimCacheLine == -1) {
+                        throw new IllegalArgumentException();
+                    }
                 }
             }
         }

@@ -42,16 +42,18 @@ public class HelperThreadParamsDynamicTuningCapability implements SimulationCapa
             public void apply(PseudocallEncounteredEvent event) {
                 SimulatedProgram simulatedProgram = event.getContext().getProcess().getContextConfig().getSimulatedProgram();
 
-                if (event.getImm() == 3820) {
-                    savedRegisterValue.set(event.getContext().getRegs().getGpr(event.getRs()));
-                    event.getContext().getRegs().setGpr(event.getRs(), getHtLookahead(simulatedProgram));
-                } else if (event.getImm() == 3821) {
-                    event.getContext().getRegs().setGpr(event.getRs(), savedRegisterValue.get());
-                } else if (event.getImm() == 3822) {
-                    savedRegisterValue.set(event.getContext().getRegs().getGpr(event.getRs()));
-                    event.getContext().getRegs().setGpr(event.getRs(), getHtStride(simulatedProgram));
-                } else if (event.getImm() == 3823) {
-                    event.getContext().getRegs().setGpr(event.getRs(), savedRegisterValue.get());
+                if(simulatedProgram.isHelperThreadedProgram()) {
+                    if (event.getImm() == 3820) {
+                        savedRegisterValue.set(event.getContext().getRegs().getGpr(event.getRs()));
+                        event.getContext().getRegs().setGpr(event.getRs(), getHtLookahead(simulatedProgram));
+                    } else if (event.getImm() == 3821) {
+                        event.getContext().getRegs().setGpr(event.getRs(), savedRegisterValue.get());
+                    } else if (event.getImm() == 3822) {
+                        savedRegisterValue.set(event.getContext().getRegs().getGpr(event.getRs()));
+                        event.getContext().getRegs().setGpr(event.getRs(), getHtStride(simulatedProgram));
+                    } else if (event.getImm() == 3823) {
+                        event.getContext().getRegs().setGpr(event.getRs(), savedRegisterValue.get());
+                    }
                 }
             }
         });

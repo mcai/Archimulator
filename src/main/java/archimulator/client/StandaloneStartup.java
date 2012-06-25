@@ -35,7 +35,7 @@ public class StandaloneStartup {
     private int numCores = 2;
 
     @Option(name = "-t", usage = "number of threads per core (default: 2)", metaVar = "<numThreadsPerCore>", required = false)
-    private int numThreadsPerCore = 4;
+    private int numThreadsPerCore = 2;
 
     @Option(name = "-is", usage = "L1I cache size in KBytes (default: 32)", metaVar = "<l1ISizeInKByte>", required = false)
     private int l1ISizeInKByte = 32;
@@ -57,6 +57,9 @@ public class StandaloneStartup {
 
     @Option(name = "-a", usage = "Arguments passed to mst (default: 4000)", metaVar = "<args>", required = false)
     private String args = "4000";
+
+    @Option(name = "-ht", usage = "Whether helper threading is enabled (default: true)", metaVar = "<ht>", required = false)
+    private String ht = "true";
 
     @Option(name = "-l", usage = "HT lookahead parameter (default: 20)", metaVar = "<lookahead>", required = false)
     private int lookahead = 20;
@@ -81,27 +84,20 @@ public class StandaloneStartup {
         try {
             standaloneStartup.parseArgs(args);
             standaloneStartup.run(
-                    standaloneStartup.numCores,
-                    standaloneStartup.numThreadsPerCore,
-                    standaloneStartup.l1ISizeInKByte,
-                    standaloneStartup.l1IAssociativity,
-                    standaloneStartup.l1DSizeInKByte,
-                    standaloneStartup.l1DAssociativity,
-                    standaloneStartup.l2SizeInKByte,
-                    standaloneStartup.l2Associativity,
-                    standaloneStartup.args,
-                    standaloneStartup.lookahead,
-                    standaloneStartup.stride
+                    standaloneStartup.numCores, standaloneStartup.numThreadsPerCore,
+                    standaloneStartup.l1ISizeInKByte, standaloneStartup.l1IAssociativity, standaloneStartup.l1DSizeInKByte, standaloneStartup.l1DAssociativity,
+                    standaloneStartup.l2SizeInKByte, standaloneStartup.l2Associativity,
+                    standaloneStartup.args, Boolean.parseBoolean(standaloneStartup.ht),  standaloneStartup.lookahead, standaloneStartup.stride
             );
         } catch (IOException e) {
             System.out.println(e);
         }
     }
 
-    private void run(int numCores, int numThreadsPerCore, int l1ISizeInKByte, int l1IAssociativity, int l1DSizeInKByte, int l1DAssociativity, int l2SizeInKByte, int l2Associativity, String args, int lookahead, int stride) {
-        SimulatedProgram simulatedProgram = Presets.SIMULATED_PROGRAM_MST_HT(args, lookahead, stride, false);
+    private void run(int numCores, int numThreadsPerCore, int l1ISizeInKByte, int l1IAssociativity, int l1DSizeInKByte, int l1DAssociativity, int l2SizeInKByte, int l2Associativity, String args, boolean ht, int lookahead, int stride) {
+        SimulatedProgram simulatedProgram = ht ? Presets.SIMULATED_PROGRAM_MST_HT(args, lookahead, stride, false) : Presets.SIMULATED_PROGRAM_MST_BASELINE(args);
         ProcessorProfile processorProfile = Presets.processor(numCores, numThreadsPerCore, l1ISizeInKByte, l1IAssociativity, l1DSizeInKByte, l1DAssociativity, l2SizeInKByte, l2Associativity, "LRU", LRUPolicy.class);
-        ExperimentProfile experimentProfile = Presets.ht_lru(3720, 2000000000, processorProfile, simulatedProgram);
+        ExperimentProfile experimentProfile = Presets.experiment(3720, 2000000000, processorProfile, simulatedProgram);
         Experiment experiment = experimentProfile.createExperiment();
         experiment.start();
         experiment.join();

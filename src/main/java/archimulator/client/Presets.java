@@ -3,8 +3,8 @@ package archimulator.client;
 import archimulator.sim.base.experiment.profile.ExperimentProfile;
 import archimulator.sim.base.experiment.profile.ProcessorProfile;
 import archimulator.sim.base.simulation.SimulatedProgram;
-import archimulator.sim.uncore.ht.EnhancedHTLLCRequestProfilingCapability;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
+import archimulator.sim.uncore.ht.HTLLCRequestProfilingCapability;
 import archimulator.sim.uncore.ht.HelperThreadParamsDynamicTuningCapability;
 import archimulator.sim.uncore.ht.LLCReuseDistanceProfilingCapability;
 
@@ -53,18 +53,7 @@ public class Presets {
                 , numCores, numThreadsPerCore, 1024 * l1ISizeInKByte, l1IAssociativity, 1024 * l1DSizeInKByte, l1DAssociativity, 1024 * l2SizeInKByte, l2Associativity, l2EvictionPolicyClz);
     }
 
-    public static ExperimentProfile baseline_lru(int pthreadSpawnedIndex, int maxInsts, ProcessorProfile processorProfile, SimulatedProgram simulatedProgram) {
-        ExperimentProfile experimentProfile = new ExperimentProfile(simulatedProgram.getTitle() + "-" + processorProfile.getTitle(), processorProfile);
-        experimentProfile.addWorkload(simulatedProgram);
-//        experimentProfile.functionallyToEnd();
-//        experimentProfile.fastForwardToPseudoCallAndInDetailForMaxInsts(pthreadSpawnedIndex, maxInsts);
-        experimentProfile.inDetailToEnd();
-//        experimentProfile.addSimulationCapabilityClass(LLCReuseDistanceProfilingCapability.class);
-//        experimentProfile.addSimulationCapabilityClass(EnhancedHTLLCRequestProfilingCapability.class);
-        return experimentProfile;
-    }
-
-    public static ExperimentProfile ht_lru(int pthreadSpawnedIndex, int maxInsts, ProcessorProfile processorProfile, SimulatedProgram simulatedProgram) {
+    public static ExperimentProfile experiment(int pthreadSpawnedIndex, int maxInsts, ProcessorProfile processorProfile, SimulatedProgram simulatedProgram) {
         ExperimentProfile experimentProfile = new ExperimentProfile(simulatedProgram.getTitle() + "-" + processorProfile.getTitle(), processorProfile);
         experimentProfile.addWorkload(simulatedProgram);
 //        experimentProfile.functionallyToEnd();
@@ -72,18 +61,7 @@ public class Presets {
 //        experimentProfile.inDetailToEnd();
         experimentProfile.addSimulationCapabilityClass(HelperThreadParamsDynamicTuningCapability.class);
         experimentProfile.addSimulationCapabilityClass(LLCReuseDistanceProfilingCapability.class);
-        experimentProfile.addSimulationCapabilityClass(EnhancedHTLLCRequestProfilingCapability.class);
-        return experimentProfile;
-    }
-
-    public static ExperimentProfile ht_ht_aware_lru(int pthreadSpawnedIndex, int maxInsts, ProcessorProfile processorProfile, SimulatedProgram simulatedProgram) {
-        ExperimentProfile experimentProfile = new ExperimentProfile(simulatedProgram.getTitle() + "-" + processorProfile.getTitle(), processorProfile);
-        experimentProfile.addWorkload(simulatedProgram);
-//        experimentProfile.functionallyToEnd();
-//        experimentProfile.fastForwardToPseudoCallAndInDetailForMaxInsts(pthreadSpawnedIndex, maxInsts);
-        experimentProfile.inDetailToEnd();
-        experimentProfile.addSimulationCapabilityClass(HelperThreadParamsDynamicTuningCapability.class);
-        experimentProfile.addSimulationCapabilityClass(LLCReuseDistanceProfilingCapability.class);
+        experimentProfile.addSimulationCapabilityClass(HTLLCRequestProfilingCapability.class);
         return experimentProfile;
     }
 }
