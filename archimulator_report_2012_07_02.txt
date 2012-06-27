@@ -12,7 +12,6 @@
 	llc.htLLCRequestAccuracy=93.01249266833383%
 	llc.htLLCRequestCoverage=52.68366592740784%
 
-
 2. mst_ht:4000; lookahead:20; stride:10; 2 cores * 2 threads/core; L1I:32KB,4-way; L2:32KB,4-way; L2:96KB,8-way,LRU  //l2assoc: 2->4
 	llc.numMTLLCHits=25808589
 	llc.numMTLLCMisses=20518602
@@ -26,7 +25,6 @@
 	llc.numUglyHTLLCRequests=54911
 	llc.htLLCRequestAccuracy=97.36928232364676%
 	llc.htLLCRequestCoverage=55.1799868938401%
-
 
 3. mst_ht:4000; lookahead:20; stride:10; 2 cores * 2 threads/core; L1I:32KB,4-way; L2:32KB,4-way; L2:128KB,4-way,LRU  //l2size: 96->128
 	llc.numMTLLCHits=9404098
@@ -42,7 +40,6 @@
 	llc.htLLCRequestAccuracy=95.95936622193386%
 	llc.htLLCRequestCoverage=54.27216286693024%
 
-
 4. mst_ht:4000; lookahead:20; stride:10; 2 cores * 2 threads/core; L1I:32KB,4-way; L2:32KB,4-way; L2:128KB,8-way,LRU  //l2assoc: 4->8
 	llc.numMTLLCHits=25692904
 	llc.numMTLLCMisses=20450472
@@ -56,7 +53,6 @@
 	llc.numUglyHTLLCRequests=646
 	llc.htLLCRequestAccuracy=97.72672060206553%
 	llc.htLLCRequestCoverage=55.149212166393504%
-
 
 5. mst_ht:4000; lookahead:20; stride:10; 2 cores * 2 threads/core; L1I:32KB,4-way; L2:32KB,4-way; L2:256KB,4-way,LRU  //l2size: 128->256
 	llc.numMTLLCHits=9552131
@@ -87,7 +83,6 @@
 	llc.htLLCRequestAccuracy=97.72920480738541%
 	llc.htLLCRequestCoverage=55.18388046300803%
 
-
 7. mst_ht:4000; lookahead:20; stride:10; 2 cores * 2 threads/core; L1I:32KB,4-way; L2:32KB,4-way; L2:512KB,4-way,LRU  //l2size: 256->512
 	llc.numMTLLCHits=9546778
 	llc.numMTLLCMisses=7500637
@@ -117,7 +112,6 @@
 	llc.htLLCRequestAccuracy=97.9466091413031%
 	llc.htLLCRequestCoverage=55.54704708537349%
 
-
 9. mst_ht:4000; lookahead:20; stride:10; 2 cores * 2 threads/core; L1I:32KB,8-way; L2:32KB,8-way; L2:128KB,16-way,LRU  //l2assoc: 4->16
 	llc.numMTLLCHits=25793549
 	llc.numMTLLCMisses=20347445
@@ -132,7 +126,6 @@
 	llc.htLLCRequestAccuracy=98.00356921781358%
 	llc.htLLCRequestCoverage=55.37520023370102%
 
-
 10. mst_ht:4000; lookahead:640; stride:320; 2 cores * 2 threads/core; L1I:32KB,2-way; L2:32KB,2-way; L2:96KB,4-way,LRU  //lookahead: 640, stride: 320, l2assoc: 2
 	llc.numMTLLCHits=3230525
 	llc.numMTLLCMisses=44786935
@@ -146,7 +139,6 @@
 	llc.numUglyHTLLCRequests=5288648
 	llc.htLLCRequestAccuracy=4.384564878625939%
 	llc.htLLCRequestCoverage=3.2640832586273163%
-
 
 11. mst_ht:4000; lookahead:640; stride:320; 2 cores * 2 threads/core; L1I:32KB,4-way; L2:32KB,4-way; L2:96KB,8-way,LRU  //l2assoc: 2->4
 	llc.numMTLLCHits=3972039
