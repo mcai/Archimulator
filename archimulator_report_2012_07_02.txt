@@ -1,0 +1,163 @@
+1. mst_ht:4000; lookahead:20; stride:10; 2 cores * 2 threads/core; L1I:32KB,2-way; L2:32KB,2-way; L2:96KB,4-way,LRU  //l2assoc: 2, l2size: 96
+	llc.numMTLLCHits=24830918
+	llc.numMTLLCMisses=21785202
+	llc.numTotalHTLLCRequests=26078656
+	llc.numUsefulHTLLCRequests=24256408
+	llc.numRedundantHitToTransientTagHTLLCRequests=41439
+	llc.numRedundantHitToCacheHTLLCRequests=549152
+	llc.numTimelyHTLLCRequests=24158507
+	llc.numLateHTLLCRequests=97901
+	llc.numBadHTLLCRequests=2730
+	llc.numUglyHTLLCRequests=230286
+	llc.htLLCRequestAccuracy=93.01249266833383%
+	llc.htLLCRequestCoverage=52.68366592740784%
+
+
+2. mst_ht:4000; lookahead:20; stride:10; 2 cores * 2 threads/core; L1I:32KB,4-way; L2:32KB,4-way; L2:96KB,8-way,LRU  //l2assoc: 2->4
+	llc.numMTLLCHits=25808589
+	llc.numMTLLCMisses=20518602
+	llc.numTotalHTLLCRequests=25943909
+	llc.numUsefulHTLLCRequests=25261398
+	llc.numRedundantHitToTransientTagHTLLCRequests=20611
+	llc.numRedundantHitToCacheHTLLCRequests=518831
+	llc.numTimelyHTLLCRequests=24705780
+	llc.numLateHTLLCRequests=555618
+	llc.numBadHTLLCRequests=889
+	llc.numUglyHTLLCRequests=54911
+	llc.htLLCRequestAccuracy=97.36928232364676%
+	llc.htLLCRequestCoverage=55.1799868938401%
+
+
+3. mst_ht:4000; lookahead:20; stride:10; 2 cores * 2 threads/core; L1I:32KB,4-way; L2:32KB,4-way; L2:128KB,4-way,LRU  //l2size: 96->128
+	llc.numMTLLCHits=9404098
+	llc.numMTLLCMisses=7770942
+	llc.numTotalHTLLCRequests=9611314
+	llc.numUsefulHTLLCRequests=9222956
+	llc.numRedundantHitToTransientTagHTLLCRequests=20763
+	llc.numRedundantHitToCacheHTLLCRequests=180375
+	llc.numTimelyHTLLCRequests=9181462
+	llc.numLateHTLLCRequests=41494
+	llc.numBadHTLLCRequests=7370
+	llc.numUglyHTLLCRequests=161630
+	llc.htLLCRequestAccuracy=95.95936622193386%
+	llc.htLLCRequestCoverage=54.27216286693024%
+
+
+4. mst_ht:4000; lookahead:20; stride:10; 2 cores * 2 threads/core; L1I:32KB,4-way; L2:32KB,4-way; L2:128KB,8-way,LRU  //l2assoc: 4->8
+	llc.numMTLLCHits=25692904
+	llc.numMTLLCMisses=20450472
+	llc.numTotalHTLLCRequests=25731153
+	llc.numUsefulHTLLCRequests=25146212
+	llc.numRedundantHitToTransientTagHTLLCRequests=7885
+	llc.numRedundantHitToCacheHTLLCRequests=501685
+	llc.numTimelyHTLLCRequests=24826029
+	llc.numLateHTLLCRequests=320183
+	llc.numBadHTLLCRequests=101
+	llc.numUglyHTLLCRequests=646
+	llc.htLLCRequestAccuracy=97.72672060206553%
+	llc.htLLCRequestCoverage=55.149212166393504%
+
+
+5. mst_ht:4000; lookahead:20; stride:10; 2 cores * 2 threads/core; L1I:32KB,4-way; L2:32KB,4-way; L2:256KB,4-way,LRU  //l2size: 128->256
+	llc.numMTLLCHits=9552131
+	llc.numMTLLCMisses=7515609
+	llc.numTotalHTLLCRequests=9583481
+	llc.numUsefulHTLLCRequests=9376909
+	llc.numRedundantHitToTransientTagHTLLCRequests=4344
+	llc.numRedundantHitToCacheHTLLCRequests=171896
+	llc.numGoodHTLLCRequests=9376909
+	llc.numBadHTLLCRequests=83
+	llc.numUglyHTLLCRequests=3724
+	llc.numLateHTLLCRequests=245646
+	llc.htLLCRequestAccuracy=97.84449930041077%
+	llc.htLLCRequestCoverage=55.50924379657313%
+
+
+6. mst_ht:4000; lookahead:20; stride:10; 2 cores * 2 threads/core; L1I:32KB,4-way; L2:32KB,4-way; L2:256KB,8-way,LRU  //l2assoc: 4->8
+	llc.numMTLLCHits=25704565
+	llc.numMTLLCMisses=20431266
+	llc.numTotalHTLLCRequests=25742392
+	llc.numUsefulHTLLCRequests=25157835
+	llc.numRedundantHitToTransientTagHTLLCRequests=7901
+	llc.numRedundantHitToCacheHTLLCRequests=500754
+	llc.numTimelyHTLLCRequests=24808543
+	llc.numLateHTLLCRequests=349292
+	llc.numBadHTLLCRequests=9
+	llc.numUglyHTLLCRequests=129
+	llc.htLLCRequestAccuracy=97.72920480738541%
+	llc.htLLCRequestCoverage=55.18388046300803%
+
+
+7. mst_ht:4000; lookahead:20; stride:10; 2 cores * 2 threads/core; L1I:32KB,4-way; L2:32KB,4-way; L2:512KB,4-way,LRU  //l2size: 256->512
+	llc.numMTLLCHits=9546778
+	llc.numMTLLCMisses=7500637
+	llc.numTotalHTLLCRequests=9567763
+	llc.numUsefulHTLLCRequests=9371544
+	llc.numRedundantHitToTransientTagHTLLCRequests=3322
+	llc.numRedundantHitToCacheHTLLCRequests=165719
+	llc.numGoodHTLLCRequests=9371544
+	llc.numBadHTLLCRequests=0
+	llc.numUglyHTLLCRequests=78
+	llc.numLateHTLLCRequests=240935
+	llc.htLLCRequestAccuracy=97.94916533781199%
+	llc.htLLCRequestCoverage=55.54435434280844%
+
+
+8. mst_ht:4000; lookahead:20; stride:10; 2 cores * 2 threads/core; L1I:32KB,4-way; L2:32KB,4-way; L2:1024KB,4-way,LRU  //l2size: 512->1024
+	llc.numMTLLCHits=9547153
+	llc.numMTLLCMisses=7500136
+	llc.numTotalHTLLCRequests=9568417
+	llc.numUsefulHTLLCRequests=9371940
+	llc.numRedundantHitToTransientTagHTLLCRequests=3253
+	llc.numRedundantHitToCacheHTLLCRequests=165586
+	llc.numGoodHTLLCRequests=9371940
+	llc.numBadHTLLCRequests=0
+	llc.numUglyHTLLCRequests=72
+	llc.numLateHTLLCRequests=242083
+	llc.htLLCRequestAccuracy=97.9466091413031%
+	llc.htLLCRequestCoverage=55.54704708537349%
+
+
+9. mst_ht:4000; lookahead:20; stride:10; 2 cores * 2 threads/core; L1I:32KB,8-way; L2:32KB,8-way; L2:128KB,16-way,LRU  //l2assoc: 4->16
+	llc.numMTLLCHits=25793549
+	llc.numMTLLCMisses=20347445
+	llc.numTotalHTLLCRequests=25763628
+	llc.numUsefulHTLLCRequests=25249275
+	llc.numRedundantHitToTransientTagHTLLCRequests=10995
+	llc.numRedundantHitToCacheHTLLCRequests=499603
+	llc.numTimelyHTLLCRequests=24783074
+	llc.numLateHTLLCRequests=466201
+	llc.numBadHTLLCRequests=0
+	llc.numUglyHTLLCRequests=54
+	llc.htLLCRequestAccuracy=98.00356921781358%
+	llc.htLLCRequestCoverage=55.37520023370102%
+
+
+10. mst_ht:4000; lookahead:640; stride:320; 2 cores * 2 threads/core; L1I:32KB,2-way; L2:32KB,2-way; L2:96KB,4-way,LRU  //lookahead: 640, stride: 320, l2assoc: 2
+	llc.numMTLLCHits=3230525
+	llc.numMTLLCMisses=44786935
+	llc.numTotalHTLLCRequests=34466590
+	llc.numUsefulHTLLCRequests=1511210
+	llc.numRedundantHitToTransientTagHTLLCRequests=108559
+	llc.numRedundantHitToCacheHTLLCRequests=1555285
+	llc.numTimelyHTLLCRequests=1494595
+	llc.numLateHTLLCRequests=16615
+	llc.numBadHTLLCRequests=129759
+	llc.numUglyHTLLCRequests=5288648
+	llc.htLLCRequestAccuracy=4.384564878625939%
+	llc.htLLCRequestCoverage=3.2640832586273163%
+
+
+11. mst_ht:4000; lookahead:640; stride:320; 2 cores * 2 threads/core; L1I:32KB,4-way; L2:32KB,4-way; L2:96KB,8-way,LRU  //l2assoc: 2->4
+	llc.numMTLLCHits=3972039
+	llc.numMTLLCMisses=43656103
+	llc.numTotalHTLLCRequests=33765716
+	llc.numUsefulHTLLCRequests=2262120
+	llc.numRedundantHitToTransientTagHTLLCRequests=6521
+	llc.numRedundantHitToCacheHTLLCRequests=1611693
+	llc.numTimelyHTLLCRequests=2255696
+	llc.numLateHTLLCRequests=6424
+	llc.numBadHTLLCRequests=21896
+	llc.numUglyHTLLCRequests=720854
+	llc.htLLCRequestAccuracy=6.699458113075405%
+	llc.htLLCRequestCoverage=4.926410153110672%
