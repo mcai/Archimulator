@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <library>
 <manage_target braces="false" utf8="false">ref.bib</manage_target>
-<library_folder monitor="true"></library_folder>
+<library_folder monitor="false"></library_folder>
 <taglist>
 </taglist>
 <doclist>
@@ -487,7 +487,7 @@
   <doc>
     <filename></filename>
     <relative_filename></relative_filename>
-    <key>Newman2O03</key>
+    <key>Newman2003</key>
     <notes></notes>
     <bib_type>Article</bib_type>
     <bib_doi></bib_doi>
@@ -657,6 +657,69 @@
     <bib_extra key="Numpages">6</bib_extra>
     <bib_extra key="publisher">IEEE Computer Society</bib_extra>
     <bib_extra key="Series">ISPAN ’08</bib_extra>
+  </doc>
+  <doc>
+    <filename></filename>
+    <relative_filename></relative_filename>
+    <key>Wang2002</key>
+    <notes></notes>
+    <bib_type>InProceedings</bib_type>
+    <bib_doi></bib_doi>
+    <bib_title>Using the Compiler to Improve Cache Replacement Decisions</bib_title>
+    <bib_authors>Wang, Zhenlin and McKinley, Kathryn S. and Rosenberg, Arnold L. and Weems, Charles C.</bib_authors>
+    <bib_journal></bib_journal>
+    <bib_volume></bib_volume>
+    <bib_number></bib_number>
+    <bib_pages>199</bib_pages>
+    <bib_year>2002</bib_year>
+    <bib_extra key="Address">Charlottesville, Virginia, USA</bib_extra>
+    <bib_extra key="BookTitle">Proc. 2002 International Conference on Parallel Architectures and Compilation Techniques (11th PACT’02)</bib_extra>
+    <bib_extra key="Keywords">memory performance,</bib_extra>
+    <bib_extra key="Month">sep</bib_extra>
+    <bib_extra key="Publisher">IEEE Computer Society</bib_extra>
+  </doc>
+  <doc>
+    <filename></filename>
+    <relative_filename></relative_filename>
+    <key>Chen1995</key>
+    <notes></notes>
+    <bib_type>article</bib_type>
+    <bib_doi>http://dx.doi.org/10.1109/12.381947</bib_doi>
+    <bib_title>Effective hardware-based data prefetching for high-performance processors</bib_title>
+    <bib_authors>Chen, Tien-Fu and Baer, Jean-Loup</bib_authors>
+    <bib_journal>IEEE Transactions on Computers</bib_journal>
+    <bib_volume>44</bib_volume>
+    <bib_number>5</bib_number>
+    <bib_pages>609-623</bib_pages>
+    <bib_year>1995</bib_year>
+    <bib_extra key="Acknowledgement">Nelson H. F. Beebe, University of Utah, Department of Mathematics, 110 LCB, 155 S 1400 E RM 233, Salt Lake City, UT 84112-0090, USA, Tel: +1 801 581 5254, FAX: +1 801 581 4148, e-mail: \path|beebe@math.utah.edu|, \path|beebe@acm.org|, \path|beebe@computer.org| (Internet), URL: \path|http://www.math.utah.edu/ beebe/|</bib_extra>
+    <bib_extra key="Bibdate">Wed Jul 6 08:01:27 MDT 2011</bib_extra>
+    <bib_extra key="Bibsource">http://www.computer.org/tc/; http://www.math.utah.edu/pub/tex/bib/ieeetranscomput1990.bib</bib_extra>
+    <bib_extra key="Coden">ITCOB4</bib_extra>
+    <bib_extra key="Doi-url">http://dx.doi.org/10.1109/12.381947</bib_extra>
+    <bib_extra key="Fjournal">IEEE Transactions on Computers</bib_extra>
+    <bib_extra key="Issn">0018-9340 (print), 1557-9956 (electronic)</bib_extra>
+    <bib_extra key="Issn-l">0018-9340</bib_extra>
+    <bib_extra key="Month">may</bib_extra>
+  </doc>
+  <doc>
+    <filename></filename>
+    <relative_filename></relative_filename>
+    <key>Lai2001</key>
+    <notes></notes>
+    <bib_type>InProceedings</bib_type>
+    <bib_doi></bib_doi>
+    <bib_title>Dead-Block Prediction and Dead-Block Correlating Prefetchers</bib_title>
+    <bib_authors>Lai, An-Chow and Fide, Cem and Falsafi, Babak</bib_authors>
+    <bib_journal></bib_journal>
+    <bib_volume></bib_volume>
+    <bib_number></bib_number>
+    <bib_pages>144-154</bib_pages>
+    <bib_year>2001</bib_year>
+    <bib_extra key="Address">Göteborg, Sweden</bib_extra>
+    <bib_extra key="Author:corp">IEEE Computer Society and ACM SIGARCH</bib_extra>
+    <bib_extra key="BookTitle">Proceedings of the 28th Annual International Symposium on Computer Architecture</bib_extra>
+    <bib_extra key="Month">jun 30–jul 4,</bib_extra>
   </doc>
 </doclist>
 </library>

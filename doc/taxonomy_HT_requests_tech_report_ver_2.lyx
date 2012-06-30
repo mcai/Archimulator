@@ -196,14 +196,14 @@ et al.
 For workloads exhibiting irregular memory access patterns, helper threaded
  data prefetching on shared cache chip multiprocessors (CMPs) speculatively
  issue last-level cache (LLC) requests to the predicted memory addresses
- ahead of computation core references.
+ ahead of main thread references.
  Effective helper threaded data prefetching on CMPs demands that the helper
  thread (HT) should issue correct and timely LLC requests just before the
  main thread (MT) references them.
  Unfortunately, this ideal case can not be fulfilled in the practical implementa
 tions of helper threaded data prefetching on CMPs: inaccurate and/or untimely
- LLC requests coming from helper thread could not contribute to the main
- thread performance, but instead stress and pollute LLC if no effective
+ LLC requests coming from the helper thread could not contribute to the
+ main thread performance, but instead stress and pollute LLC if no effective
  LLC replacement and pollution-aware feedback techniques are employed.
 \end_layout
 
@@ -211,10 +211,11 @@ tions of helper threaded data prefetching on CMPs: inaccurate and/or untimely
 This paper characterizes the degree by which intra-application LLC interference
  is caused by inter-core data prefetches in the above helper threaded data
  prefetching scheme.
- Based on cycle-accurate architectural simulation of the memory intensive
- benchmark mst from Olden, we first adapt traditional approaches to characterizi
-ng hardware prefetches such as prefetch accuracy, coverage and lateness,
- useful vs.
+ Since hardware performance counter based measurement on real machines cannot provide required
+ finegrained metrics, using cycle-accurate architectural simulation of the
+ memory intensive benchmark mst from Olden, we first adapt traditional approache
+s to characterizing hardware prefetches such as prefetch accuracy, coverage
+ and lateness, useful vs.
  useless prefetches to characterize helper threaded data prefetching on
  CMPs.
  Based on the insights from these characterizations, we then propose a fine-grai
@@ -302,15 +303,15 @@ key "Kim2004,Byna2008,Lee2009"
 \end_inset
 
  on shared cache chip multiprocessors (CMPs) speculatively issue last-level
- cache (LLC) requests to the predicted memory addresses ahead of computation
- core references.
+ cache (LLC) requests to the predicted memory addresses ahead of main thread
+ references.
  Effective helper threaded data prefetching on CMPs demands that the helper
  thread (HT) should issue correct and timely LLC requests just before the
  main thread (MT) references them.
  Unfortunately, this ideal case can not be fulfilled in the practical implementa
 tions of helper threaded data prefetching on CMPs: inaccurate and/or untimely
- LLC requests coming from helper thread could not contribute to the main
- thread performance, but instead stress and pollute LLC if no effective
+ LLC requests coming from the helper thread could not contribute to the
+ main thread performance, but instead stress and pollute LLC if no effective
  LLC replacement and pollution-aware feedback techniques are employed.
 \end_layout
 
@@ -406,8 +407,10 @@ useless
 This paper characterizes the degree by which intra-application LLC interference
  is caused by inter-core data prefetches in the above helper threaded data
  prefetching scheme.
- Based on cycle-accurate architectural simulation of the memory intensive
- benchmark mst from the Olden pointer traversing benchmark suite 
+ Since hardware performance counter based measurement on real machines cannot provide required
+ finegrained metrics, using cycle-accurate architectural simulation of the
+ memory intensive benchmark mst from the Olden pointer traversing benchmark
+ suite 
 \begin_inset CommandInset citation
 LatexCommand cite
 key "Rogers1995"
@@ -1541,8 +1544,7 @@ Benchmarks and Input Sets
 
 \begin_layout Standard
 We perform our evaluation using the original version and manually coded
- helper threaded version of mst in the Olden pointer traversal benchmark
- suite.
+ helper thread version of mst in the Olden pointer traversal benchmark suite.
  All applications are cross-compiled using gcc flag “-O3” and run until
  completion using cycle-accurate simulation.
  Input set for mst is 
@@ -1622,8 +1624,8 @@ After all the prefetching work is done, the helper thread is destroyed in
 \end_layout
 
 \begin_layout Standard
-Two parameters in the helper threaded prefetching scheme controls its aggressive
-ness: (1) the number of loop iterations of pointer traversals that the helper
+Two parameters in the helper threaded prefetching scheme control its aggressiven
+ess: (1) the number of loop iterations of pointer traversals that the helper
  thread code skip after synchronizing with the main thread in the prelude
  is called 
 \shape italic
@@ -1645,7 +1647,7 @@ In the traditional helper threaded prefetching configuration, the values
  in the presence of helper thread requests.
  Based on our following characterization of helper thread L2 requests, a
  dynamic feedback directed mechanism can be built in which the processor
- changes the value of lookahead and stride using some temporary register
+ changes the value of lookahead and stride using some temporary registers
  to adjust the aggressiveness of the helper threaded prefetching scheme.
 \end_layout
 
@@ -1700,7 +1702,14 @@ Adapting Traditional Hardware Prefetching Metrics to Helper Threaded Prefetching
 
 \begin_layout Standard
 Traditionally, prefetch accuracy, coverage and lateness are used to evaluate
- the effectiveness of hardware prefetchers.
+ the effectiveness of hardware prefetchers 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Srinivasan2004"
+
+\end_inset
+
+.
  In this section, we adapt the metrics to the helper threaded prefetching
  scheme and describe what the metrics mean under the helper threaded prefetching
  scheme.
@@ -1713,14 +1722,7 @@ Useful vs.
 
 \begin_layout Standard
 Helper thread requests can be categorized into useful and useless helper
- thread requests 
-\begin_inset CommandInset citation
-LatexCommand cite
-key "Srinivasan2004"
-
-\end_inset
-
-.
+ thread requests.
  A 
 \shape italic
 useful helper thread request
@@ -1778,8 +1780,9 @@ Helper Thread LLC Request Coverage
 \shape italic
 Helper thread LLC request coverage
 \shape default
- is a measure of the fraction of all main thread LLC misses that can be
- eliminated by issuing helper thread LLC misses ahead.
+ is a measure of the fraction of all main thread LLC misses in the baseline
+ version where helper thread is switched off that can be converted into
+ hits by issuing helper thread LLC misses ahead in the helper thread version.
  It is defined as below
 \end_layout
 
@@ -2468,7 +2471,7 @@ rThread) {
 
 \begin_layout Plain Layout
 
-  htrvc.removeLRU(set);
+  htrvc.invalidateVictimLine(set, wayOfVictimLine);
 \end_layout
 
 \begin_layout Plain Layout
@@ -2865,7 +2868,7 @@ status open
 \begin_inset Caption
 
 \begin_layout Plain Layout
-mst Helper Threaded Prefetching Performance
+mst Helper Thread Performance
 \begin_inset CommandInset label
 LatexCommand label
 name "tab:mst-Helper-Threaded-Prefetching-Performance"
@@ -3016,9 +3019,9 @@ reference "tab:mst-Helper-Threaded-Prefetching-Performance"
  About 1%-3% reductions of execution time are achieved in these basic experiment
 s of mst benchmark helper threaded prefetching versions.
  A maximum 22% reduction of execution is achieved between baseline and helper
- threaded versions of mst in these basic experiments, which shows our implemente
-d helper threaded prefetching scheme is non-trivially effective for the
- mst benchmark.
+ thread versions of mst in these basic experiments, which shows our implemented
+ helper threaded prefetching scheme is non-trivially effective for the mst
+ benchmark.
 \end_layout
 
 \begin_layout Subsection
@@ -3037,7 +3040,7 @@ reference "fig:Impact-of-L2-Size-mst-ht"
  breakdown for the mst helper threaded prefetching version when the L2 size
  is increased from 96 KB to 2 MB.
  For clarity, execution times are normalized to the first case in the figure
- where L2 size is 96 KB, where the 128 KB working set limit of mst 
+ where L2 size is 96 KB, The 128 KB working set limit of mst 
 \begin_inset Quotes eld
 \end_inset
 
@@ -3142,8 +3145,7 @@ status open
 \begin_inset Caption
 
 \begin_layout Plain Layout
-Impact of L2 Size on mst Helper Threaded Prefetching Performance (lookahead=20,
- stride=10)
+Impact of L2 Size on mst Helper Thread Performance (lookahead=20, stride=10)
 \begin_inset CommandInset label
 LatexCommand label
 name "fig:Impact-of-L2-Size-mst-ht"
@@ -3203,7 +3205,6 @@ reference "fig:Impact-of-L2-Size-mst-ht"
 \end_inset
 
  and Fig.
- 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "fig:Impact-of-L2-Assoc-mst-ht"
@@ -3305,8 +3306,8 @@ status open
 \begin_inset Caption
 
 \begin_layout Plain Layout
-Impact of L2 Associativity on mst Helper Threaded Prefetching Performance
- (lookahead=20, stride=10)
+Impact of L2 Associativity on mst Helper Thread Performance (lookahead=20,
+ stride=10)
 \begin_inset CommandInset label
 LatexCommand label
 name "fig:Impact-of-L2-Assoc-mst-ht"
@@ -3332,7 +3333,7 @@ Impact of Prefetching Lookahead
 
 \begin_layout Standard
 Below we see how the two parameters lookahead and stride of the helper threaded
- prefetching scheme affects the helper thread L2 request breakdown and thus
+ prefetching scheme affect the helper thread L2 request breakdown and thus
  the overall performance.
  Fig.
 \begin_inset CommandInset ref
@@ -3892,7 +3893,7 @@ status open
 \begin_inset Caption
 
 \begin_layout Plain Layout
-Impact of Prefetching Lookahead on mst Helper Threaded Prefetching Performance
+Impact of Prefetching Lookahead on mst Helper Thread Performance
 \begin_inset CommandInset label
 LatexCommand label
 name "fig:Impact-of-Lookahead-mst-ht"
@@ -3941,7 +3942,7 @@ We can see the relationship between the values of stride and the overall
 When the lookahead is less than 40, the execution time increases monotonically
  as the stride is increased from 10 to 640.
  It can be obviously interpreted as the harmful impacts of the increasing
- prohibitively large portion of late prefetches shown in red in the figure;
+ prohibitively large portion of late prefetches;
 \end_layout
 
 \begin_layout Enumerate
@@ -4486,7 +4487,7 @@ status open
 \begin_inset Caption
 
 \begin_layout Plain Layout
-Impact of Prefetching Stride on mst Helper Threaded Prefetching Performance
+Impact of Prefetching Stride on mst Helper Thread Performance
 \begin_inset CommandInset label
 LatexCommand label
 name "fig:Impact-of-Stride-mst-ht"
@@ -4582,9 +4583,29 @@ Prefetch Aware Cache Content Management
 \end_layout
 
 \begin_layout Standard
-Some previous works have studied the problem of cache content management
- in the presence of data prefetching, which are in the forms of software,
- hardware and hybrid.
+The problem of cache content management in the presence of data prefetching,
+ are studied in the previous works in the forms of software 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Wang2002"
+
+\end_inset
+
+, hardware 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Lai2001,Chen1995"
+
+\end_inset
+
+ and hybrid 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Srinivasan2004"
+
+\end_inset
+
+.
  
 \begin_inset CommandInset citation
 LatexCommand cite
@@ -4593,9 +4614,9 @@ key "Chen1991"
 \end_inset
 
  proposed a prefetch buffer that can be attached to the L2 cache to filter
- the prefetched data from polluting the L2 cache, which is similar but different
- from our proposed HTRVC cache structure whose sole function is for profiling
- helper thread L2 requests' victims.
+ the prefetched data from polluting the L2 cache, which is similar to but
+ different from our proposed HTRVC cache structure whose sole function is
+ for profiling helper thread L2 requests' victims.
  
 \begin_inset CommandInset citation
 LatexCommand cite
@@ -4605,7 +4626,7 @@ key "WuJMSE2011"
 
  characterized the performance of state-of-the-art LLC management policies
  in the presence and absence of hardware prefetching.
- Prefetch-Aware Cache Management (PACMan) is proposed to dynamically estimates
+ Prefetch-Aware Cache Management (PACMan) was proposed to dynamically estimates
  and mitigates the degree of prefetch-induced cache interference by modifying
  the cache insertion and hit promotion policies to treat demand and prefetch
  requests differently.
@@ -4628,8 +4649,8 @@ Conclusion
 
 \begin_layout Standard
 This paper first discusses the intra-application reuse distances in the
- helper threaded prefetching on shared cache CMPs and its implications on
- helper thread performance.
+ helper threaded data prefetching on shared cache CMPs and their implications
+ on helper thread performance.
  Based on this, we then proposes the intra-application interference aware
  taxonomy of helper thread LLC requests and its implementation details on
  a cycle-accurate CMP architectural simulator.
