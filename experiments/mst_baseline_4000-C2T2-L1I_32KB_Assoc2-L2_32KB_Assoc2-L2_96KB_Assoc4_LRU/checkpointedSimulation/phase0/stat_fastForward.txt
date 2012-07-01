@@ -1,0 +1,14 @@
+c0t0.totalInsts=2660847276
+c0t1.totalInsts=0
+c1t0.totalInsts=0
+c1t1.totalInsts=0
+title=mst_baseline_4000-C2T2-L1I_32KB_Assoc2-L2_32KB_Assoc2-L2_96KB_Assoc4_LRU/checkpointedSimulation/phase0
+duration=0:16:23.726
+totalCycles=2660847276
+totalInsts=2660847276
+instsPerCycle=1.0
+cyclesPerSecond=2706863.963377416
+instsPerSecond=2706863.963377416
+experiment.beginTime=2012/06/27 22:17:26
+experiment.workloads.size=1
+experiment.workload.0=mst.mips_4000

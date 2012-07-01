@@ -1,0 +1,14 @@
+c0t0.totalInsts=2661652787
+c0t1.totalInsts=855
+c1t0.totalInsts=97
+c1t1.totalInsts=0
+title=mst_ht_4000-lookahead_20-stride_10-C2T2-L1I_32KB_Assoc4-L2_32KB_Assoc4-L2_128KB_Assoc8_LRU/checkpointedSimulation/phase0
+duration=0:18:26.302
+totalCycles=2661653451
+totalInsts=2661653739
+instsPerCycle=1.0000001082034176
+cyclesPerSecond=2406558.273960217
+instsPerSecond=2406558.534358047
+experiment.beginTime=2012/06/26 05:39:38
+experiment.workloads.size=1
+experiment.workload.0=mst.mips_4000
