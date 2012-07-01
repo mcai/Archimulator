@@ -18,11 +18,12 @@
  ******************************************************************************/
 package archimulator.sim.uncore.tlb;
 
-import archimulator.sim.base.event.DumpStatEvent;
 import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.base.simulation.SimulationObject;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
-import archimulator.sim.uncore.cache.*;
+import archimulator.sim.uncore.cache.CacheAccess;
+import archimulator.sim.uncore.cache.CacheLine;
+import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.eviction.LRUPolicy;
 import archimulator.util.ValueProvider;
 import archimulator.util.ValueProviderFactory;
@@ -57,19 +58,6 @@ public class TranslationLookasideBuffer {
                 TranslationLookasideBuffer.this.accesses = 0;
                 TranslationLookasideBuffer.this.hits = 0;
                 TranslationLookasideBuffer.this.evictions = 0;
-            }
-        });
-
-        parent.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
-            public void apply(DumpStatEvent event) {
-                if (event.getType() == DumpStatEvent.Type.DETAILED_SIMULATION) {
-                    event.getStats().put(TranslationLookasideBuffer.this.name + ".hitRatio", String.valueOf(TranslationLookasideBuffer.this.getHitRatio()));
-                    event.getStats().put(TranslationLookasideBuffer.this.name + ".accesses", String.valueOf(TranslationLookasideBuffer.this.accesses));
-                    event.getStats().put(TranslationLookasideBuffer.this.name + ".hits", String.valueOf(TranslationLookasideBuffer.this.hits));
-                    event.getStats().put(TranslationLookasideBuffer.this.name + ".misses", String.valueOf(TranslationLookasideBuffer.this.getMisses()));
-
-                    event.getStats().put(TranslationLookasideBuffer.this.name + ".evictions", String.valueOf(TranslationLookasideBuffer.this.evictions));
-                }
             }
         });
     }
@@ -107,12 +95,24 @@ public class TranslationLookasideBuffer {
         return config;
     }
 
-    private long getMisses() {
+    public long getMisses() {
         return this.accesses - this.hits;
     }
 
-    private double getHitRatio() {
+    public double getHitRatio() {
         return this.accesses > 0 ? (double) this.hits / this.accesses : 0.0;
+    }
+
+    public long getAccesses() {
+        return accesses;
+    }
+
+    public long getHits() {
+        return hits;
+    }
+
+    public long getEvictions() {
+        return evictions;
     }
 
     public EvictableCache<Boolean> getCache() {

@@ -21,8 +21,6 @@ package archimulator.sim.uncore.ht;
 import archimulator.sim.analysis.BasicBlock;
 import archimulator.sim.analysis.Function;
 import archimulator.sim.analysis.Instruction;
-import archimulator.sim.base.event.DumpStatEvent;
-import archimulator.sim.base.event.PollStatsEvent;
 import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.base.experiment.capability.SimulationCapability;
 import archimulator.sim.base.simulation.Simulation;
@@ -48,6 +46,8 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
 
     private List<List<StackEntry>> stackEntries;
 
+    private Map<Integer, LoadEntry> loadsInHotspotFunction;
+
     private Map<MemoryHierarchyAccessType, Map<Integer, Long>> reuseDistances;
 
     private String hotspotFunctionName = "HashLookup"; //TODO: should not be hardcoded!!!
@@ -56,10 +56,8 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
     private int hotspotThreadId = BasicThread.getMainThreadId();
 //    private int hotspotThreadId = BasicThread.getHelperThreadId();
 
-    private Map<Integer, LoadEntry> loadsInHotspotFunction;
-
     public LLCReuseDistanceProfilingCapability(Simulation simulation) {
-        this(simulation.getProcessor().getCacheHierarchy().getL2Cache());
+        this(simulation.getProcessor().getCacheHierarchy().getL2CacheController());
     }
 
     public LLCReuseDistanceProfilingCapability(DirectoryController llc) {
@@ -90,23 +88,9 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
                 reuseDistances.clear();
             }
         });
-
-        llc.getBlockingEventDispatcher().addListener(PollStatsEvent.class, new Action1<PollStatsEvent>() {
-            public void apply(PollStatsEvent event) {
-                dumpStats(event.getStats());
-            }
-        });
-
-        llc.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
-            public void apply(DumpStatEvent event) {
-                if (event.getType() == DumpStatEvent.Type.DETAILED_SIMULATION) {
-                    dumpStats(event.getStats());
-                }
-            }
-        });
     }
 
-    private void dumpStats(Map<String, Object> stats) {
+    public void dumpStats(Map<String, Object> stats) {
         if (this.loadsInHotspotFunction != null) {
             for (int pc : this.loadsInHotspotFunction.keySet()) {
                 LoadEntry loadEntry = this.loadsInHotspotFunction.get(pc);
@@ -226,6 +210,14 @@ public class LLCReuseDistanceProfilingCapability implements SimulationCapability
         }
 
         return null;
+    }
+
+    public Map<Integer, LoadEntry> getLoadsInHotspotFunction() {
+        return loadsInHotspotFunction;
+    }
+
+    public Map<MemoryHierarchyAccessType, Map<Integer, Long>> getReuseDistances() {
+        return reuseDistances;
     }
 
     private static class LoadEntry {

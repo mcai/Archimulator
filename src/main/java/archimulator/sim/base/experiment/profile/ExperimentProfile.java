@@ -22,8 +22,6 @@ import archimulator.sim.base.experiment.CheckpointedExperiment;
 import archimulator.sim.base.experiment.DetailedExperiment;
 import archimulator.sim.base.experiment.Experiment;
 import archimulator.sim.base.experiment.FunctionalExperiment;
-import archimulator.sim.base.experiment.capability.KernelCapability;
-import archimulator.sim.base.experiment.capability.ProcessorCapability;
 import archimulator.sim.base.experiment.capability.SimulationCapability;
 import archimulator.sim.base.simulation.ContextConfig;
 import archimulator.sim.base.simulation.SimulatedProgram;
@@ -54,12 +52,6 @@ public class ExperimentProfile implements Serializable {
 
     @DatabaseField(dataType = DataType.SERIALIZABLE)
     private ArrayList<Class<? extends SimulationCapability>> simulationCapabilityClasses;
-
-    @DatabaseField(dataType = DataType.SERIALIZABLE)
-    private ArrayList<Class<? extends ProcessorCapability>> processorCapabilityClasses;
-
-    @DatabaseField(dataType = DataType.SERIALIZABLE)
-    private ArrayList<Class<? extends KernelCapability>> kernelCapabilityClasses;
 
     @DatabaseField
     private ExperimentProfileType type = ExperimentProfileType.FUNCTIONAL_EXPERIMENT;
@@ -94,8 +86,6 @@ public class ExperimentProfile implements Serializable {
         this.createdTime = DateHelper.toTick(new Date());
 
         this.simulationCapabilityClasses = new ArrayList<Class<? extends SimulationCapability>>();
-        this.processorCapabilityClasses = new ArrayList<Class<? extends ProcessorCapability>>();
-        this.kernelCapabilityClasses = new ArrayList<Class<? extends KernelCapability>>();
     }
 
     public ExperimentProfile addWorkload(SimulatedProgram simulatedProgram) {
@@ -142,15 +132,15 @@ public class ExperimentProfile implements Serializable {
             case FUNCTIONAL_EXPERIMENT:
                 return new FunctionalExperiment(this.title, this.processorProfile.getNumCores(), this.processorProfile.getNumThreadsPerCore(), this.contextConfigs,
                         this.processorProfile.getL1ISize(), this.processorProfile.getL1IAssociativity(), this.processorProfile.getL1DSize(), this.processorProfile.getL1DAssociativity(), this.processorProfile.getL2Size(), this.processorProfile.getL2Associativity(), this.processorProfile.getL2EvictionPolicyClz(),
-                        this.simulationCapabilityClasses, this.processorCapabilityClasses, this.kernelCapabilityClasses);
+                        this.simulationCapabilityClasses);
             case DETAILED_EXPERIMENT:
                 return new DetailedExperiment(this.title, this.processorProfile.getNumCores(), this.processorProfile.getNumThreadsPerCore(), this.contextConfigs,
                         this.processorProfile.getL1ISize(), this.processorProfile.getL1IAssociativity(), this.processorProfile.getL1DSize(), this.processorProfile.getL1DAssociativity(), this.processorProfile.getL2Size(), this.processorProfile.getL2Associativity(), this.processorProfile.getL2EvictionPolicyClz(),
-                        this.simulationCapabilityClasses, this.processorCapabilityClasses, this.kernelCapabilityClasses);
+                        this.simulationCapabilityClasses);
             case CHECKPOINTED_EXPERIMENT:
                 return new CheckpointedExperiment(this.title, this.processorProfile.getNumCores(), this.processorProfile.getNumThreadsPerCore(), this.contextConfigs,
                         this.processorProfile.getL1ISize(), this.processorProfile.getL1IAssociativity(), this.processorProfile.getL1DSize(), this.processorProfile.getL1DAssociativity(), this.processorProfile.getL2Size(), this.processorProfile.getL2Associativity(), this.processorProfile.getL2EvictionPolicyClz(), this.maxInsts, this.pthreadSpawnedIndex,
-                        this.simulationCapabilityClasses, this.processorCapabilityClasses, this.kernelCapabilityClasses);
+                        this.simulationCapabilityClasses);
             default:
                 throw new IllegalArgumentException();
         }
@@ -158,14 +148,6 @@ public class ExperimentProfile implements Serializable {
 
     public ArrayList<Class<? extends SimulationCapability>> getSimulationCapabilityClasses() {
         return simulationCapabilityClasses;
-    }
-
-    public ArrayList<Class<? extends ProcessorCapability>> getProcessorCapabilityClasses() {
-        return processorCapabilityClasses;
-    }
-
-    public ArrayList<Class<? extends KernelCapability>> getKernelCapabilityClasses() {
-        return kernelCapabilityClasses;
     }
 
     public ExperimentProfileType getType() {

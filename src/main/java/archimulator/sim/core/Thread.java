@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.core;
 
+import archimulator.sim.core.bpred.BranchPredictor;
 import archimulator.sim.os.Context;
 import archimulator.sim.uncore.MemoryHierarchyThread;
 
@@ -41,6 +42,8 @@ public interface Thread extends MemoryHierarchyThread {
     void squash();
 
     Core getCore();
+
+    BranchPredictor getBpred();
 
     PipelineBuffer<DecodeBufferEntry> getDecodeBuffer();
 
@@ -67,4 +70,30 @@ public interface Thread extends MemoryHierarchyThread {
     void incSelectionStallOnCanNotStore();
 
     void incSelectionStallOnNoFreeFunctionalUnit();
+
+    long getDecodeBufferFull();
+
+    long getReorderBufferFull();
+
+    long getLoadStoreQueueFull();
+
+    long getIntPhysicalRegisterFileFull();
+
+    long getFpPhysicalRegisterFileFull();
+
+    long getMiscPhysicalRegisterFileFull();
+
+    long getFetchStallsOnDecodeBufferIsFull();
+
+    long getRegisterRenameStallsOnDecodeBufferIsEmpty();
+
+    long getRegisterRenameStallsOnReorderBufferIsFull();
+
+    long getRegisterRenameStallsOnLoadStoreQueueFull();
+
+    long getSelectionStallOnCanNotLoad();
+
+    long getSelectionStallOnCanNotStore();
+
+    long getSelectionStallOnNoFreeFunctionalUnit();
 }

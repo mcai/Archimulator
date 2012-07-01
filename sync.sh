@@ -13,3 +13,7 @@ rsync --recursive --progress -avz -e "sshpass -p 1026@ustc ssh -l customer" /hom
 
 if ipv6 unavailable:
 rsync --recursive --progress -avz -e "sshpass -p 1026@ustc ssh -l customer" /home/itecgo/Archimulator/ customer@173.208.185.58:/home/itecgo/Archimulator/
+
+copy back experiment results:
+rsync --recursive --progress --delete -avz -e "sshpass -p 1026@ustc ssh -l customer" customer@173.208.185.58:/home/itecgo/Archimulator/experiments/ /home/itecgo/Archimulator/experiments/
+rsync --recursive --progress --delete -avz -e "sshpass -p 1026@ustc ssh -l root" root@[2400:8900::f03c:91ff:feae:ff27]:/home/itecgo/Archimulator/experiments/ /home/itecgo/Archimulator/experiments/

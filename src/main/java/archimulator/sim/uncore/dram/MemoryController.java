@@ -18,8 +18,6 @@
  ******************************************************************************/
 package archimulator.sim.uncore.dram;
 
-import archimulator.sim.base.event.DumpStatEvent;
-import archimulator.sim.base.event.PollStatsEvent;
 import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.uncore.CacheHierarchy;
 import archimulator.sim.uncore.MemoryDevice;
@@ -27,8 +25,6 @@ import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.net.Net;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
-
-import java.util.Map;
 
 public abstract class MemoryController extends MemoryDevice {
     private long reads;
@@ -39,31 +35,10 @@ public abstract class MemoryController extends MemoryDevice {
 
         this.getBlockingEventDispatcher().addListener(ResetStatEvent.class, new Action1<ResetStatEvent>() {
             public void apply(ResetStatEvent event) {
-                reads = 0;                     writes = 0;
+                reads = 0;
+                writes = 0;
             }
         });
-
-        this.getBlockingEventDispatcher().addListener(PollStatsEvent.class, new Action1<PollStatsEvent>() {
-            public void apply(PollStatsEvent event) {
-                dumpStats(event.getStats());
-            }
-        });
-
-        this.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
-            public void apply(DumpStatEvent event) {
-                if (event.getType() == DumpStatEvent.Type.DETAILED_SIMULATION) {
-                    dumpStats(event.getStats());
-                }
-            }
-        });
-    }
-
-    private void dumpStats(Map<String, Object> stats) {
-        if(getAccesses() > 0) {
-            stats.put(getName() + ".accesses", String.valueOf(getAccesses()));
-            stats.put(getName() + ".reads", String.valueOf(reads));
-            stats.put(getName() + ".writes", String.valueOf(writes));
-        }
     }
 
     @Override
@@ -101,8 +76,16 @@ public abstract class MemoryController extends MemoryDevice {
 
     protected abstract void access(int addr, Action onCompletedCallback);
 
-    private long getAccesses() {
+    public long getAccesses() {
         return this.reads + this.writes;
+    }
+
+    public long getReads() {
+        return reads;
+    }
+
+    public long getWrites() {
+        return writes;
     }
 
     @Override

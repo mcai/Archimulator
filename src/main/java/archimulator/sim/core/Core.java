@@ -65,13 +65,13 @@ public interface Core extends MemoryHierarchyCore {
 
     void doMeasurementOneCycle();
 
-    CacheController getInstructionCache();
+    CacheController getL1ICacheController();
 
-    void setInstructionCache(CacheController instructionCache);
+    void setL1ICacheController(CacheController l1ICacheController);
 
-    CacheController getDataCache();
+    CacheController getL1DCacheController();
 
-    void setDataCache(CacheController dataCache);
+    void setL1DCacheController(CacheController l1DCacheController);
 
     void updatePerCycleStats();
 }

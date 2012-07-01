@@ -30,7 +30,7 @@ public class MemoryAccessTraceGenerationCapability implements SimulationCapabili
     private PrintWriter fileWriter;
 
     public MemoryAccessTraceGenerationCapability(Simulation simulation) {
-        this.traceFileName = simulation.getConfig().getCwd() + "/memTrace";
+        this.traceFileName = simulation.getCwd() + "/memTrace";
 
 //        try {
 //            this.fileWriter = new PrintWriter(new BufferedWriter(new FileWriter(traceFileName)));

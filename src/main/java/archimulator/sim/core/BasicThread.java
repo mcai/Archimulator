@@ -58,7 +58,7 @@ public class BasicThread extends AbstractBasicThread {
 
         this.commitWidth = this.core.getProcessor().getConfig().getCommitWidth();
 
-        this.lineSizeOfIcache = this.core.getInstructionCache().getConfig().getGeometry().getLineSize();
+        this.lineSizeOfIcache = this.core.getL1ICacheController().getConfig().getGeometry().getLineSize();
 
         this.getBlockingEventDispatcher().addListener(ResetStatEvent.class, new Action1<ResetStatEvent>() {
             public void apply(ResetStatEvent event) {

@@ -18,14 +18,10 @@
  ******************************************************************************/
 package archimulator.sim.core;
 
-import archimulator.sim.base.experiment.capability.KernelCapability;
-import archimulator.sim.base.experiment.capability.ProcessorCapability;
 import archimulator.sim.core.bpred.BranchPredictorConfig;
 import archimulator.sim.core.bpred.PerfectBranchPredictorConfig;
 import archimulator.sim.uncore.MemoryHierarchyConfig;
 import archimulator.sim.uncore.tlb.TranslationLookasideBufferConfig;
-
-import java.util.List;
 
 public class ProcessorConfig {
     private int numCores;
@@ -44,14 +40,11 @@ public class ProcessorConfig {
 
     private MemoryHierarchyConfig memoryHierarchyConfig;
 
-    private List<Class<? extends ProcessorCapability>> processorCapabilityClasses;
-    private List<Class<? extends KernelCapability>> kernelCapabilityClasses;
-
-    public ProcessorConfig(int numCores, int numThreadsPerCore, MemoryHierarchyConfig memoryHierarchyConfig, List<Class<? extends ProcessorCapability>> processorCapabilityClasses, List<Class<? extends KernelCapability>> kernelCapabilityClasses) {
-        this(numCores, numThreadsPerCore, 128, 4, 4, 4, 96, 96, 48, memoryHierarchyConfig, processorCapabilityClasses, kernelCapabilityClasses);
+    public ProcessorConfig(int numCores, int numThreadsPerCore, MemoryHierarchyConfig memoryHierarchyConfig) {
+        this(numCores, numThreadsPerCore, 128, 4, 4, 4, 96, 96, 48, memoryHierarchyConfig);
     }
 
-    public ProcessorConfig(int numCores, int numThreadsPerCore, int physicalRegisterFileCapacity, int decodeWidth, int issueWidth, int commitWidth, int decodeBufferCapacity, int reorderBufferCapacity, int loadStoreQueueCapacity, MemoryHierarchyConfig memoryHierarchyConfig, List<Class<? extends ProcessorCapability>> processorCapabilityClasses, List<Class<? extends KernelCapability>> kernelCapabilityClasses) {
+    public ProcessorConfig(int numCores, int numThreadsPerCore, int physicalRegisterFileCapacity, int decodeWidth, int issueWidth, int commitWidth, int decodeBufferCapacity, int reorderBufferCapacity, int loadStoreQueueCapacity, MemoryHierarchyConfig memoryHierarchyConfig) {
         this.numCores = numCores;
         this.numThreadsPerCore = numThreadsPerCore;
 
@@ -64,9 +57,6 @@ public class ProcessorConfig {
         this.loadStoreQueueCapacity = loadStoreQueueCapacity;
 
         this.memoryHierarchyConfig = memoryHierarchyConfig;
-
-        this.processorCapabilityClasses = processorCapabilityClasses;
-        this.kernelCapabilityClasses = kernelCapabilityClasses;
     }
 
     public int getNumCores() {
@@ -125,16 +115,8 @@ public class ProcessorConfig {
         return memoryHierarchyConfig;
     }
 
-    public List<Class<? extends ProcessorCapability>> getProcessorCapabilityClasses() {
-        return processorCapabilityClasses;
-    }
-
-    public List<Class<? extends KernelCapability>> getKernelCapabilityClasses() {
-        return kernelCapabilityClasses;
-    }
-
-    public static ProcessorConfig createDefaultProcessorConfig(MemoryHierarchyConfig memoryHierarchyConfig, List<Class<? extends ProcessorCapability>> processorCapabilityClasses, List<Class<? extends KernelCapability>> kernelCapabilityClasses, int numCores, int numThreadsPerCore) {
-        ProcessorConfig processorConfig = new ProcessorConfig(numCores, numThreadsPerCore, memoryHierarchyConfig, processorCapabilityClasses, kernelCapabilityClasses);
+    public static ProcessorConfig createDefaultProcessorConfig(MemoryHierarchyConfig memoryHierarchyConfig, int numCores, int numThreadsPerCore) {
+        ProcessorConfig processorConfig = new ProcessorConfig(numCores, numThreadsPerCore, memoryHierarchyConfig);
         processorConfig.setBpred(new PerfectBranchPredictorConfig());
         processorConfig.setTlb(new TranslationLookasideBufferConfig(32768, 4));
         return processorConfig;

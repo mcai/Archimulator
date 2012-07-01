@@ -19,13 +19,11 @@
 package archimulator.sim.base.experiment.capability;
 
 import archimulator.sim.base.simulation.Simulation;
-import archimulator.sim.core.Processor;
+import archimulator.sim.isa.FunctionalExecutionProfilingCapability;
+import archimulator.sim.uncore.MemoryAccessTraceGenerationCapability;
 import archimulator.sim.uncore.ht.HTLLCRequestProfilingCapability;
 import archimulator.sim.uncore.ht.HelperThreadParamsDynamicTuningCapability;
 import archimulator.sim.uncore.ht.LLCReuseDistanceProfilingCapability;
-import archimulator.sim.isa.FunctionalExecutionProfilingCapability;
-import archimulator.sim.os.Kernel;
-import archimulator.sim.uncore.MemoryAccessTraceGenerationCapability;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -33,16 +31,13 @@ import java.util.List;
 
 public class ExperimentCapabilityFactory {
     private static List<Class<? extends SimulationCapability>> simulationCapabilityClasses = new ArrayList<Class<? extends SimulationCapability>>();
-    private static List<Class<? extends ProcessorCapability>> processorCapabilityClasses = new ArrayList<Class<? extends ProcessorCapability>>();
-    private static List<Class<? extends KernelCapability>> kernelCapabilityClasses = new ArrayList<Class<? extends KernelCapability>>();
 
     static {
         simulationCapabilityClasses.add(MemoryAccessTraceGenerationCapability.class);
         simulationCapabilityClasses.add(HelperThreadParamsDynamicTuningCapability.class);
         simulationCapabilityClasses.add(LLCReuseDistanceProfilingCapability.class);
         simulationCapabilityClasses.add(HTLLCRequestProfilingCapability.class);
-
-        kernelCapabilityClasses.add(FunctionalExecutionProfilingCapability.class);
+        simulationCapabilityClasses.add(FunctionalExecutionProfilingCapability.class);
     }
 
     public static <SimulationCapabilityT extends SimulationCapability> SimulationCapabilityT createSimulationCapability(Class<SimulationCapabilityT> simulationCapabilityClz, Simulation simulation) {
@@ -59,43 +54,7 @@ public class ExperimentCapabilityFactory {
         }
     }
 
-    public static <ProcessorCapabilityT extends ProcessorCapability> ProcessorCapabilityT createProcessorCapability(Class<ProcessorCapabilityT> processorCapabilityClz, Processor processor) {
-        try {
-            return processorCapabilityClz.getConstructor(new Class[]{Processor.class}).newInstance(processor);
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static <KernelCapabilityT extends KernelCapability> KernelCapabilityT createKernelCapability(Class<KernelCapabilityT> kernelCapabilityClz, Kernel kernel) {
-        try {
-            return kernelCapabilityClz.getConstructor(new Class[]{Kernel.class}).newInstance(kernel);
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public static List<Class<? extends SimulationCapability>> getSimulationCapabilityClasses() {
         return simulationCapabilityClasses;
-    }
-
-    public static List<Class<? extends ProcessorCapability>> getProcessorCapabilityClasses() {
-        return processorCapabilityClasses;
-    }
-
-    public static List<Class<? extends KernelCapability>> getKernelCapabilityClasses() {
-        return kernelCapabilityClasses;
     }
 }

@@ -37,8 +37,8 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
 
     protected List<Thread> threads;
 
-    protected CacheController instructionCache;
-    protected CacheController dataCache;
+    protected CacheController l1ICacheController;
+    protected CacheController l1DCacheController;
 
     protected FunctionalUnitPool fuPool;
 
@@ -117,30 +117,30 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
     protected abstract void commit();
 
     public boolean canIfetch(Thread thread, int virtualAddress) {
-        int physicalTag = this.instructionCache.getCache().getTag(thread.getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress));
-        return this.instructionCache.canAccess(MemoryHierarchyAccessType.IFETCH, physicalTag);
+        int physicalTag = this.l1ICacheController.getCache().getTag(thread.getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress));
+        return this.l1ICacheController.canAccess(MemoryHierarchyAccessType.IFETCH, physicalTag);
     }
 
     public boolean canLoad(Thread thread, int virtualAddress) {
-        int physicalTag = this.dataCache.getCache().getTag(thread.getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress));
-        return this.dataCache.canAccess(MemoryHierarchyAccessType.LOAD, physicalTag);
+        int physicalTag = this.l1DCacheController.getCache().getTag(thread.getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress));
+        return this.l1DCacheController.canAccess(MemoryHierarchyAccessType.LOAD, physicalTag);
     }
 
     public boolean canStore(Thread thread, int virtualAddress) {
-        int physicalTag = this.dataCache.getCache().getTag(thread.getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress));
-        return this.dataCache.canAccess(MemoryHierarchyAccessType.STORE, physicalTag);
+        int physicalTag = this.l1DCacheController.getCache().getTag(thread.getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress));
+        return this.l1DCacheController.canAccess(MemoryHierarchyAccessType.STORE, physicalTag);
     }
 
     public void ifetch(Thread thread, int virtualAddress, int virtualPc, final Action onCompletedCallback) {
         final int physicalAddress = thread.getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress);
-        final int physicalTag = this.instructionCache.getCache().getTag(physicalAddress);
+        final int physicalTag = this.l1ICacheController.getCache().getTag(physicalAddress);
 
         final Counter counterPending = new Counter(0);
 
         counterPending.inc();
 
-        MemoryHierarchyAccess alias = this.instructionCache.findAccess(physicalTag);
-        MemoryHierarchyAccess access = this.instructionCache.beginAccess(null, thread, MemoryHierarchyAccessType.IFETCH, virtualPc, physicalAddress, physicalTag, new Action() {
+        MemoryHierarchyAccess alias = this.l1ICacheController.findAccess(physicalTag);
+        MemoryHierarchyAccess access = this.l1ICacheController.beginAccess(null, thread, MemoryHierarchyAccessType.IFETCH, virtualPc, physicalAddress, physicalTag, new Action() {
             public void apply() {
                 counterPending.dec();
 
@@ -163,9 +163,9 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
                 }
             });
 
-            this.instructionCache.receiveIfetch(access, new Action() {
+            this.l1ICacheController.receiveIfetch(access, new Action() {
                 public void apply() {
-                    instructionCache.endAccess(physicalTag);
+                    l1ICacheController.endAccess(physicalTag);
                 }
             });
         }
@@ -175,14 +175,14 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
 
     public void load(DynamicInstruction dynamicInst, int virtualAddress, int virtualPc, final Action onCompletedCallback) {
         final int physicalAddress = dynamicInst.getThread().getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress);
-        final int physicalTag = this.dataCache.getCache().getTag(physicalAddress);
+        final int physicalTag = this.l1DCacheController.getCache().getTag(physicalAddress);
 
         final Counter counterPending = new Counter(0);
 
         counterPending.inc();
 
-        MemoryHierarchyAccess alias = this.dataCache.findAccess(physicalTag);
-        MemoryHierarchyAccess access = this.dataCache.beginAccess(dynamicInst, dynamicInst.getThread(), MemoryHierarchyAccessType.LOAD, virtualPc, physicalAddress, physicalTag, new Action() {
+        MemoryHierarchyAccess alias = this.l1DCacheController.findAccess(physicalTag);
+        MemoryHierarchyAccess access = this.l1DCacheController.beginAccess(dynamicInst, dynamicInst.getThread(), MemoryHierarchyAccessType.LOAD, virtualPc, physicalAddress, physicalTag, new Action() {
             public void apply() {
                 counterPending.dec();
 
@@ -205,9 +205,9 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
                 }
             });
 
-            this.dataCache.receiveLoad(access, new Action() {
+            this.l1DCacheController.receiveLoad(access, new Action() {
                 public void apply() {
-                    dataCache.endAccess(physicalTag);
+                    l1DCacheController.endAccess(physicalTag);
                 }
 
                 @Override
@@ -222,14 +222,14 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
 
     public void store(DynamicInstruction dynamicInst, int virtualAddress, int virtualPc, final Action onCompletedCallback) {
         final int physicalAddress = dynamicInst.getThread().getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress);
-        final int physicalTag = this.dataCache.getCache().getTag(physicalAddress);
+        final int physicalTag = this.l1DCacheController.getCache().getTag(physicalAddress);
 
         final Counter counterPending = new Counter(0);
 
         counterPending.inc();
 
-        MemoryHierarchyAccess alias = this.dataCache.findAccess(physicalTag);
-        MemoryHierarchyAccess access = this.dataCache.beginAccess(dynamicInst, dynamicInst.getThread(), MemoryHierarchyAccessType.STORE, virtualPc, physicalAddress, physicalTag, new Action() {
+        MemoryHierarchyAccess alias = this.l1DCacheController.findAccess(physicalTag);
+        MemoryHierarchyAccess access = this.l1DCacheController.beginAccess(dynamicInst, dynamicInst.getThread(), MemoryHierarchyAccessType.STORE, virtualPc, physicalAddress, physicalTag, new Action() {
             public void apply() {
                 counterPending.dec();
 
@@ -252,9 +252,9 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
                 }
             });
 
-            this.dataCache.receiveStore(access, new Action() {
+            this.l1DCacheController.receiveStore(access, new Action() {
                 public void apply() {
-                    dataCache.endAccess(physicalTag);
+                    l1DCacheController.endAccess(physicalTag);
                 }
             });
         }
@@ -328,19 +328,19 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
         return oooEventQueue;
     }
 
-    public CacheController getInstructionCache() {
-        return instructionCache;
+    public CacheController getL1ICacheController() {
+        return l1ICacheController;
     }
 
-    public void setInstructionCache(CacheController instructionCache) {
-        this.instructionCache = instructionCache;
+    public void setL1ICacheController(CacheController l1ICacheController) {
+        this.l1ICacheController = l1ICacheController;
     }
 
-    public CacheController getDataCache() {
-        return dataCache;
+    public CacheController getL1DCacheController() {
+        return l1DCacheController;
     }
 
-    public void setDataCache(CacheController dataCache) {
-        this.dataCache = dataCache;
+    public void setL1DCacheController(CacheController l1DCacheController) {
+        this.l1DCacheController = l1DCacheController;
     }
 }

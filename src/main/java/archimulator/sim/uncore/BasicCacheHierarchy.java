@@ -18,13 +18,13 @@
  ******************************************************************************/
 package archimulator.sim.uncore;
 
-import archimulator.sim.base.event.DumpStatEvent;
 import archimulator.sim.base.event.SimulationEvent;
 import archimulator.sim.base.simulation.BasicSimulationObject;
 import archimulator.sim.core.ProcessorConfig;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
+import archimulator.sim.uncore.coherence.msi.controller.GeneralCacheController;
 import archimulator.sim.uncore.coherence.msi.message.CoherenceMessage;
 import archimulator.sim.uncore.dram.*;
 import archimulator.sim.uncore.net.L1sToL2Net;
@@ -32,8 +32,6 @@ import archimulator.sim.uncore.net.L2ToMemNet;
 import archimulator.sim.uncore.net.Net;
 import archimulator.sim.uncore.tlb.TranslationLookasideBuffer;
 import net.pickapack.action.Action;
-import net.pickapack.action.Action1;
-import net.pickapack.event.BlockingEvent;
 import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
 
@@ -43,10 +41,10 @@ import java.util.List;
 import java.util.Map;
 
 public class BasicCacheHierarchy extends BasicSimulationObject implements CacheHierarchy {
-    private MemoryController mainMemory;
-    private DirectoryController l2Cache;
-    private List<CacheController> instructionCaches;
-    private List<CacheController> dataCaches;
+    private MemoryController memoryController;
+    private DirectoryController l2CacheController;
+    private List<CacheController> l1ICacheControllers;
+    private List<CacheController> l1DCacheControllers;
 
     private List<TranslationLookasideBuffer> itlbs;
     private List<TranslationLookasideBuffer> dtlbs;
@@ -59,35 +57,35 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
     public BasicCacheHierarchy(BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, ProcessorConfig processorConfig) {
         super(blockingEventDispatcher, cycleAccurateEventQueue);
 
-        switch (processorConfig.getMemoryHierarchyConfig().getMainMemory().getType()) {
+        switch (processorConfig.getMemoryHierarchyConfig().getMemoryController().getType()) {
             case SIMPLE:
-                this.mainMemory = new SimpleMemoryController(this, (SimpleMainMemoryConfig) processorConfig.getMemoryHierarchyConfig().getMainMemory());
+                this.memoryController = new SimpleMemoryController(this, (SimpleMainMemoryConfig) processorConfig.getMemoryHierarchyConfig().getMemoryController());
                 break;
             case BASIC:
-                this.mainMemory = new BasicMemoryController(this, (BasicMainMemoryConfig) processorConfig.getMemoryHierarchyConfig().getMainMemory());
+                this.memoryController = new BasicMemoryController(this, (BasicMainMemoryConfig) processorConfig.getMemoryHierarchyConfig().getMemoryController());
                 break;
             default:
-                this.mainMemory = new FixedLatencyMemoryController(this, (FixedLatencyMainMemoryConfig) processorConfig.getMemoryHierarchyConfig().getMainMemory());
+                this.memoryController = new FixedLatencyMemoryController(this, (FixedLatencyMainMemoryConfig) processorConfig.getMemoryHierarchyConfig().getMemoryController());
                 break;
         }
 
-        this.l2Cache = new DirectoryController(this, "llc", processorConfig.getMemoryHierarchyConfig().getL2Cache());
-        this.l2Cache.setNext(this.mainMemory);
+        this.l2CacheController = new DirectoryController(this, "llc", processorConfig.getMemoryHierarchyConfig().getL2CacheController());
+        this.l2CacheController.setNext(this.memoryController);
 
-        this.instructionCaches = new ArrayList<CacheController>();
-        this.dataCaches = new ArrayList<CacheController>();
+        this.l1ICacheControllers = new ArrayList<CacheController>();
+        this.l1DCacheControllers = new ArrayList<CacheController>();
 
         this.itlbs = new ArrayList<TranslationLookasideBuffer>();
         this.dtlbs = new ArrayList<TranslationLookasideBuffer>();
 
         for (int i = 0; i < processorConfig.getNumCores(); i++) {
-            CacheController instructionCache = new CacheController(this, "c" + i + ".icache", processorConfig.getMemoryHierarchyConfig().getInstructionCache());
-            instructionCache.setNext(this.l2Cache);
-            this.instructionCaches.add(instructionCache);
+            CacheController l1ICacheController = new CacheController(this, "c" + i + ".icache", processorConfig.getMemoryHierarchyConfig().getL1ICacheController());
+            l1ICacheController.setNext(this.l2CacheController);
+            this.l1ICacheControllers.add(l1ICacheController);
 
-            CacheController dataCache = new CacheController(this, "c" + i + ".dcache", processorConfig.getMemoryHierarchyConfig().getDataCache());
-            dataCache.setNext(this.l2Cache);
-            this.dataCaches.add(dataCache);
+            CacheController l1DCacheController = new CacheController(this, "c" + i + ".dcache", processorConfig.getMemoryHierarchyConfig().getL1DCacheController());
+            l1DCacheController.setNext(this.l2CacheController);
+            this.l1DCacheControllers.add(l1DCacheController);
 
             for (int j = 0; j < processorConfig.getNumThreadsPerCore(); j++) {
                 TranslationLookasideBuffer itlb = new TranslationLookasideBuffer(this, "c" + i + "t" + j + ".itlb", processorConfig.getTlb());
@@ -102,49 +100,42 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
         this.l2ToMemNetwork = new L2ToMemNet(this);
 
         this.p2pReorderBuffers = new HashMap<Controller, Map<Controller, PointToPointReorderBuffer>>();
-
-        this.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
-            public void apply(DumpStatEvent event) {
-                if (event.getType() == DumpStatEvent.Type.DETAILED_SIMULATION) {
-                    dumpStats(event.getStats());
-                }
-            }
-        });
     }
 
-    public void dumpStats() {
-        for(CacheController instructionCache : this.instructionCaches) {
-            System.out.println("Cache Controller " + instructionCache.getName() + " FSM: ");
+    public void dumpCacheControllerFsmStats() {
+        for(CacheController l1ICacheController : this.l1ICacheControllers) {
+            System.out.println("Cache Controller " + l1ICacheController.getName() + " FSM: ");
             System.out.println("------------------------------------------------------------------------");
-            instructionCache.getFsmFactory().dump();
+            l1ICacheController.getFsmFactory().dump();
         }
 
         System.out.println();
         System.out.println();
 
-        for(CacheController dataCache : this.dataCaches) {
-            System.out.println("Cache Controller " + dataCache.getName() + " FSM: ");
+        for(CacheController l1DCacheController : this.l1DCacheControllers) {
+            System.out.println("Cache Controller " + l1DCacheController.getName() + " FSM: ");
             System.out.println("------------------------------------------------------------------------");
-            dataCache.getFsmFactory().dump();
+            l1DCacheController.getFsmFactory().dump();
         }
 
         System.out.println();
         System.out.println();
 
-        System.out.println("Directory Controller " + this.l2Cache.getName() + " FSM: ");
+        System.out.println("Directory Controller " + this.l2CacheController.getName() + " FSM: ");
         System.out.println("------------------------------------------------------------------------");
-        this.l2Cache.getFsmFactory().dump();
+        this.l2CacheController.getFsmFactory().dump();
     }
 
-    public void dumpStats(Map<String, Object> stats) {
-        for(CacheController instructionCache : this.instructionCaches) {
-            instructionCache.getFsmFactory().dump(instructionCache.getName(), stats);
+    @Override
+    public void dumpCacheControllerFsmStats(Map<String, Object> stats) {
+        for(CacheController l1ICacheController : this.l1ICacheControllers) {
+            l1ICacheController.getFsmFactory().dump(l1ICacheController.getName(), stats);
         }
 
-        for(CacheController dataCache : this.dataCaches) {
-            dataCache.getFsmFactory().dump(dataCache.getName(), stats);
+        for(CacheController l1DCacheController : this.l1DCacheControllers) {
+            l1DCacheController.getFsmFactory().dump(l1DCacheController.getName(), stats);
         }
-        this.l2Cache.getFsmFactory().dump(this.l2Cache.getName(), stats);
+        this.l2CacheController.getFsmFactory().dump(this.l2CacheController.getName(), stats);
     }
 
     @Override
@@ -167,20 +158,28 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
         });
     }
 
-    public MemoryController getMainMemory() {
-        return mainMemory;
+    public MemoryController getMemoryController() {
+        return memoryController;
     }
 
-    public DirectoryController getL2Cache() {
-        return l2Cache;
+    public DirectoryController getL2CacheController() {
+        return l2CacheController;
     }
 
-    public List<CacheController> getInstructionCaches() {
-        return instructionCaches;
+    public List<CacheController> getL1ICacheControllers() {
+        return l1ICacheControllers;
     }
 
-    public List<CacheController> getDataCaches() {
-        return dataCaches;
+    public List<CacheController> getL1DCacheControllers() {
+        return l1DCacheControllers;
+    }
+
+    public List<GeneralCacheController> getCacheControllers() {
+        List<GeneralCacheController> cacheControllers = new ArrayList<GeneralCacheController>();
+        cacheControllers.add(l2CacheController);
+        cacheControllers.addAll(getL1ICacheControllers());
+        cacheControllers.addAll(getL1DCacheControllers());
+        return cacheControllers;
     }
 
     public List<TranslationLookasideBuffer> getItlbs() {

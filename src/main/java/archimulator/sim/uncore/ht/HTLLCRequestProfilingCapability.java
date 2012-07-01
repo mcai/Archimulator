@@ -18,8 +18,6 @@
  ******************************************************************************/
 package archimulator.sim.uncore.ht;
 
-import archimulator.sim.base.event.DumpStatEvent;
-import archimulator.sim.base.event.PollStatsEvent;
 import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.base.experiment.capability.SimulationCapability;
 import archimulator.sim.base.simulation.Simulation;
@@ -40,7 +38,6 @@ import archimulator.util.ValueProviderFactory;
 import net.pickapack.action.Action1;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static ch.lambdaj.Lambda.*;
@@ -132,7 +129,7 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
     }
 
     public HTLLCRequestProfilingCapability(Simulation simulation) {
-        this(simulation.getProcessor().getCacheHierarchy().getL2Cache());
+        this(simulation.getProcessor().getCacheHierarchy().getL2CacheController());
     }
 
     public HTLLCRequestProfilingCapability(final DirectoryController llc) {
@@ -302,21 +299,6 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
                 numUglyHTLLCRequests = 0;
             }
         });
-
-        llc.getBlockingEventDispatcher().addListener(PollStatsEvent.class, new Action1<PollStatsEvent>() {
-            public void apply(PollStatsEvent event) {
-                dumpStats(event.getStats());
-            }
-        });
-
-        llc.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
-            public void apply(DumpStatEvent event) {
-                if (event.getType() == DumpStatEvent.Type.DETAILED_SIMULATION) {
-                    sumUpUnstableHTLLCRequests();
-                    dumpStats(event.getStats());
-                }
-            }
-        });
     }
 
     private void sumUpUnstableHTLLCRequests() {
@@ -329,38 +311,6 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
                     incUglyHTLLCRequests();
                 }
             }
-        }
-    }
-
-    private void dumpStats(Map<String, Object> stats) {
-        if (this.numTotalHTLLCRequests > 0) {
-            stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numMTLLCHits", String.valueOf(this.numMTLLCHits));
-            stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numMTLLCMisses", String.valueOf(this.numMTLLCMisses));
-
-            stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numTotalHTLLCRequests", String.valueOf(this.numTotalHTLLCRequests));
-
-            stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numUsefulHTLLCRequests", String.valueOf(this.numUsefulHTLLCRequests));
-
-            stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numRedundantHitToTransientTagHTLLCRequests", String.valueOf(this.numRedundantHitToTransientTagHTLLCRequests));
-            stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numRedundantHitToCacheHTLLCRequests", String.valueOf(this.numRedundantHitToCacheHTLLCRequests));
-
-            stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numTimelyHTLLCRequests", String.valueOf(this.numTimelyHTLLCRequests));
-            stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numLateHTLLCRequests", String.valueOf(this.numLateHTLLCRequests));
-
-            stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numBadHTLLCRequests", String.valueOf(this.numBadHTLLCRequests));
-            stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".numUglyHTLLCRequests", String.valueOf(this.numUglyHTLLCRequests));
-
-            stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".htLLCRequestAccuracy", String.valueOf(100.0 * (double) this.numUsefulHTLLCRequests / this.numTotalHTLLCRequests) + "%");
-            stats.put("llcHTRequestProfilingCapability." + this.llc.getName() + ".htLLCRequestCoverage", String.valueOf(100.0 * (double) this.numUsefulHTLLCRequests / (this.numMTLLCMisses + this.numUsefulHTLLCRequests)) + "%");
-        }
-    }
-
-    public void dumpStats() {
-        this.sumUpUnstableHTLLCRequests();
-        Map<String, Object> stats = new LinkedHashMap<String, Object>();
-        this.dumpStats(stats);
-        for (String key : stats.keySet()) {
-            System.out.println(key + ": " + stats.get(key));
         }
     }
 
@@ -912,6 +862,63 @@ public class HTLLCRequestProfilingCapability implements SimulationCapability {
         }
 
         throw new IllegalArgumentException();
+    }
+
+    public double getHtLLCRequestCoverage() {
+        return (double) this.numUsefulHTLLCRequests / (this.numMTLLCMisses + this.numUsefulHTLLCRequests);
+    }
+
+    public double getHtLLCRequestAccuracy() {
+        return (double) this.numUsefulHTLLCRequests / this.numTotalHTLLCRequests;
+    }
+
+    public boolean getSummedUpUnstableHTLLCRequests() {
+        this.sumUpUnstableHTLLCRequests();
+        return true;
+    }
+
+    public long getNumMTLLCHits() {
+        return numMTLLCHits;
+    }
+
+    public long getNumMTLLCMisses() {
+        return numMTLLCMisses;
+    }
+
+    public long getNumTotalHTLLCRequests() {
+        return numTotalHTLLCRequests;
+    }
+
+    public long getNumRedundantHitToTransientTagHTLLCRequests() {
+        return numRedundantHitToTransientTagHTLLCRequests;
+    }
+
+    public long getNumRedundantHitToCacheHTLLCRequests() {
+        return numRedundantHitToCacheHTLLCRequests;
+    }
+
+    public long getNumUsefulHTLLCRequests() {
+        return numUsefulHTLLCRequests;
+    }
+
+    public long getNumTimelyHTLLCRequests() {
+        return numTimelyHTLLCRequests;
+    }
+
+    public long getNumLateHTLLCRequests() {
+        return numLateHTLLCRequests;
+    }
+
+    public long getNumBadHTLLCRequests() {
+        return numBadHTLLCRequests;
+    }
+
+    public long getNumUglyHTLLCRequests() {
+        return numUglyHTLLCRequests;
+    }
+
+    public boolean isCheckInvariantsEnabled() {
+        return checkInvariantsEnabled;
     }
 
     public static enum HTLLCRequestVictimCacheLineState {

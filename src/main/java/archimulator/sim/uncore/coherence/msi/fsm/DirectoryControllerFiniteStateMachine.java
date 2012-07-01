@@ -1,6 +1,5 @@
 package archimulator.sim.uncore.coherence.msi.fsm;
 
-import archimulator.sim.uncore.CacheSimulator;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.cache.CacheLine;
@@ -16,7 +15,6 @@ import archimulator.util.ValueProvider;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
 import net.pickapack.fsm.BasicFiniteStateMachine;
-import net.pickapack.fsm.event.EnterStateEvent;
 import net.pickapack.fsm.event.ExitStateEvent;
 
 import java.util.ArrayList;
@@ -58,37 +56,36 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
             }
         });
 
-        this.addListener(EnterStateEvent.class, new Action1<EnterStateEvent>() {
-            @Override
-            public void apply(EnterStateEvent enterStateEvent) {
-                CacheLine<DirectoryControllerState> line = directoryController.getCache().getLine(getSet(), getWay());
-
-                if (CacheSimulator.logSameState || getState() != previousState) {
-                    String transitionText = String.format("[%d] %s.[%d,%d] {%s} %s: %s.%s -> %s (owner: %s, sharers: %s)",
-                            directoryController.getCycleAccurateEventQueue().getCurrentCycle(), getName(), getSet(), getWay(), line.getTag() != CacheLine.INVALID_TAG ? String.format("0x%08x", line.getTag()) : "N/A", previousState, enterStateEvent.getSender() != null ? enterStateEvent.getSender() : "<N/A>", enterStateEvent.getCondition(), getState(),
-                            getDirectoryEntry().getOwner() != null ? getDirectoryEntry().getOwner() : "N/A", getDirectoryEntry().getSharers().toString().replace("[", "").replace("]", ""));
-
-                    if(CacheSimulator.recordTransitionHistory) {
-                        if (transitionHistory.size() >= 100) {
-                            transitionHistory.remove(0);
-                        }
-
-                        transitionHistory.add(transitionText);
-                    }
-
-                    if (CacheSimulator.logEnabled) {
-                        CacheSimulator.pw.println(transitionText);
-                        CacheSimulator.pw.flush();
-                    }
-                }
-
-                if(getState() == DirectoryControllerState.I) {
-                    if(getLine().getTag() != CacheLine.INVALID_TAG || getDirectoryEntry().getOwner() != null || !getDirectoryEntry().getSharers().isEmpty()) {
-                        throw new IllegalArgumentException();
-                    }
-                }
-            }
-        });
+//        this.addListener(EnterStateEvent.class, new Action1<EnterStateEvent>() {
+//            @Override
+//            public void apply(EnterStateEvent enterStateEvent) {
+//                if ((CacheSimulator.recordTransitionHistory || CacheSimulator.logEnabled) && CacheSimulator.logSameState || getState() != previousState) {
+//                    CacheLine<DirectoryControllerState> line = directoryController.getCache().getLine(getSet(), getWay());
+//                    String transitionText = String.format("[%d] %s.[%d,%d] {%s} %s: %s.%s -> %s (owner: %s, sharers: %s)",
+//                            directoryController.getCycleAccurateEventQueue().getCurrentCycle(), getName(), getSet(), getWay(), line.getTag() != CacheLine.INVALID_TAG ? String.format("0x%08x", line.getTag()) : "N/A", previousState, enterStateEvent.getSender() != null ? enterStateEvent.getSender() : "<N/A>", enterStateEvent.getCondition(), getState(),
+//                            getDirectoryEntry().getOwner() != null ? getDirectoryEntry().getOwner() : "N/A", getDirectoryEntry().getSharers().toString().replace("[", "").replace("]", ""));
+//
+//                    if(CacheSimulator.recordTransitionHistory) {
+//                        if (transitionHistory.size() >= 100) {
+//                            transitionHistory.remove(0);
+//                        }
+//
+//                        transitionHistory.add(transitionText);
+//                    }
+//
+//                    if (CacheSimulator.logEnabled) {
+//                        CacheSimulator.pw.println(transitionText);
+//                        CacheSimulator.pw.flush();
+//                    }
+//                }
+//
+//                if(getState() == DirectoryControllerState.I) {
+//                    if(getLine().getTag() != CacheLine.INVALID_TAG || getDirectoryEntry().getOwner() != null || !getDirectoryEntry().getSharers().isEmpty()) {
+//                        throw new IllegalArgumentException();
+//                    }
+//                }
+//            }
+//        });
     }
 
     public DirectoryControllerState getPreviousState() {

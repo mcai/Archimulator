@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.base.simulation;
 
+import archimulator.util.JaxenHelper;
 import archimulator.sim.base.event.*;
 import archimulator.sim.base.experiment.Experiment;
 import archimulator.sim.base.experiment.capability.ExperimentCapabilityFactory;
@@ -27,10 +28,10 @@ import archimulator.sim.core.BasicProcessor;
 import archimulator.sim.core.Core;
 import archimulator.sim.core.Processor;
 import archimulator.sim.core.Thread;
-import archimulator.sim.os.*;
+import archimulator.sim.os.Context;
+import archimulator.sim.os.Kernel;
 import archimulator.sim.os.Process;
 import net.pickapack.StorageUnit;
-import net.pickapack.StringHelper;
 import net.pickapack.action.Action1;
 import net.pickapack.action.Predicate;
 import net.pickapack.event.BlockingEventDispatcher;
@@ -45,7 +46,9 @@ import java.text.MessageFormat;
 import java.util.*;
 
 public class Simulation implements SimulationObject {
-    private SimulationConfig config;
+    private Experiment experiment;
+
+    private String title;
 
     private SimulationStrategy strategy;
 
@@ -65,14 +68,15 @@ public class Simulation implements SimulationObject {
 
     private CycleAccurateEventQueue cycleAccurateEventQueue;
 
-    public Simulation(SimulationConfig config, SimulationStrategy strategy, List<Class<? extends SimulationCapability>> capabilityClasses, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
+    public Simulation(final Experiment experiment, String title, SimulationStrategy strategy, List<Class<? extends SimulationCapability>> capabilityClasses, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
+        this.experiment = experiment;
         this.blockingEventDispatcher = blockingEventDispatcher;
         this.cycleAccurateEventQueue = cycleAccurateEventQueue;
 
-        this.config = config;
+        this.title = title;
         this.strategy = strategy;
 
-        File cwdFile = new File(this.config.getCwd());
+        File cwdFile = new File(this.getCwd());
         if (cwdFile.exists() && !FileHelper.deleteDir(cwdFile) || !cwdFile.mkdirs()) {
             throw new RuntimeException();
         }
@@ -83,13 +87,11 @@ public class Simulation implements SimulationObject {
 
         Kernel kernel = this.getStrategy().prepareKernel();
 
-        if(!this.blockingEventDispatcher.isEmpty()) {
+        if (!this.blockingEventDispatcher.isEmpty()) {
             throw new IllegalArgumentException();
         }
 
-        this.processor = new BasicProcessor(this.blockingEventDispatcher, this.cycleAccurateEventQueue, this.config.getProcessorConfig(), kernel, this.getStrategy().prepareCacheHierarchy(), this.config.getProcessorConfig().getProcessorCapabilityClasses());
-
-        this.getBlockingEventDispatcher().dispatch(new ProcessorInitializedEvent(this.processor));
+        this.processor = new BasicProcessor(this.blockingEventDispatcher, this.cycleAccurateEventQueue, this.experiment.getProcessorConfig(), kernel, this.getStrategy().prepareCacheHierarchy());
 
         this.stopWatch = new StopWatch();
 
@@ -103,48 +105,16 @@ public class Simulation implements SimulationObject {
 
         this.getBlockingEventDispatcher().addListener(PollStatsEvent.class, new Action1<PollStatsEvent>() {
             public void apply(PollStatsEvent event) {
-                Map<String, Object> stats = event.getStats();
-
-                stats.put("duration", getFormattedDuration());
-
-                stats.put("totalCycles", MessageFormat.format("{0}", getCycleAccurateEventQueue().getCurrentCycle()));
-
-                List<String> totalInstsPerThread = new ArrayList<String>();
-
-                for (int i = 0; i < getConfig().getProcessorConfig().getNumCores(); i++) {
-                    for (int j = 0; j < getConfig().getProcessorConfig().getNumThreadsPerCore(); j++) {
-                        totalInstsPerThread.add("c" + i + "t" + j + ": " + getProcessor().getCores().get(i).getThreads().get(j).getTotalInsts());
-                    }
-                }
-
-                stats.put("totalInsts", MessageFormat.format("{0}", getTotalInsts()) + " (" + StringHelper.join(totalInstsPerThread, ", ") + ")");
-
-                stats.put("instsPerCycle", MessageFormat.format("{0}", getInstsPerCycle()));
-                stats.put("cyclesPerSecond", MessageFormat.format("{0}", getCyclesPerSecond()));
-                stats.put("instsPerSecond", MessageFormat.format("{0}", getInstsPerSecond()));
-
-                for(Process process : getProcessor().getKernel().getProcesses()) {
-                    process.getMemory().dumpStats(stats);
-                }
-
-                stats.put("max memory", MessageFormat.format("{0}", StorageUnit.toString(Runtime.getRuntime().maxMemory())));
-                stats.put("total memory", MessageFormat.format("{0}", StorageUnit.toString(Runtime.getRuntime().totalMemory())));
-                stats.put("used memory", MessageFormat.format("{0}", StorageUnit.toString(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())));
-            }
-        });
-
-        this.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
-            public void apply(DumpStatEvent event) {
-                dumpStat(event.getStats());
+                pollStats(event.getStats());
             }
         });
     }
 
     public Kernel createKernel() {
-        Kernel kernel = new Kernel(this, this.config.getProcessorConfig().getNumCores(), this.config.getProcessorConfig().getNumThreadsPerCore(), this.config.getProcessorConfig().getKernelCapabilityClasses());
+        Kernel kernel = new Kernel(this, this.experiment.getProcessorConfig().getNumCores(), this.experiment.getProcessorConfig().getNumThreadsPerCore());
 
-        for (final ContextConfig contextConfig : this.config.getContextConfigs()) {
-            final Context context = Context.load(kernel, this.config.getCwd(), contextConfig);
+        for (final ContextConfig contextConfig : this.experiment.getContextConfigs()) {
+            final Context context = Context.load(kernel, this.getCwd(), contextConfig);
 
             if (!kernel.map(context, new Predicate<Integer>() {
                 public boolean apply(Integer candidateThreadId) {
@@ -160,14 +130,14 @@ public class Simulation implements SimulationObject {
     }
 
     public void simulate(Experiment experiment) {
-        Logger.infof(Logger.SIMULATOR, "run simulation: %s", this.cycleAccurateEventQueue.getCurrentCycle(), this.getConfig().getTitle());
+        Logger.infof(Logger.SIMULATOR, "run simulation: %s", this.cycleAccurateEventQueue.getCurrentCycle(), this.getTitle());
 
         Logger.info(Logger.SIMULATOR, "", this.cycleAccurateEventQueue.getCurrentCycle());
 
         boolean noErrors = this.getStrategy().execute(experiment);
 
         if (!this.getStatsInFastForward().isEmpty()) {
-            MapHelper.save(this.getStatsInFastForward(), this.getConfig().getCwd() + "/stat_fastForward.txt");
+            MapHelper.save(this.getStatsInFastForward(), this.getCwd() + "/stat_fastForward.txt");
 
             this.statsInFastForward = getStatsWithSimulationPrefix(this.getStatsInFastForward());
 
@@ -175,7 +145,7 @@ public class Simulation implements SimulationObject {
         }
 
         if (!this.getStatsInWarmup().isEmpty()) {
-            MapHelper.save(this.getStatsInWarmup(), this.getConfig().getCwd() + "/stat_cacheWarmup.txt");
+            MapHelper.save(this.getStatsInWarmup(), this.getCwd() + "/stat_cacheWarmup.txt");
 
             this.statsInWarmup = getStatsWithSimulationPrefix(this.getStatsInWarmup());
 
@@ -183,7 +153,7 @@ public class Simulation implements SimulationObject {
         }
 
         if (!this.getStatsInMeasurement().isEmpty()) {
-            MapHelper.save(this.getStatsInMeasurement(), this.getConfig().getCwd() + "/stat_measurement.txt");
+            MapHelper.save(this.getStatsInMeasurement(), this.getCwd() + "/stat_measurement.txt");
 
             this.statsInMeasurement = getStatsWithSimulationPrefix(this.getStatsInMeasurement());
 
@@ -201,7 +171,7 @@ public class Simulation implements SimulationObject {
     }
 
     public Map<String, Object> getStatsWithSimulationPrefix(Map<String, Object> stats) {
-        String title = this.getConfig().getTitle();
+        String title = this.getTitle();
         String simulationPrefix = title.substring(title.indexOf("/") + 1);
 
         Map<String, Object> result = new LinkedHashMap<String, Object>();
@@ -212,23 +182,33 @@ public class Simulation implements SimulationObject {
         return result;
     }
 
-    private void dumpStat(Map<String, Object> stats) {
-        stats.put("title", this.config.getTitle());
-        stats.put("duration", this.getFormattedDuration());
+    private void pollStats(Map<String, Object> stats) { //TODO: to be removed!!!
+        JaxenHelper.dumpSingleStatFromXPath(stats, this, "duration");
+        JaxenHelper.dumpSingleStatFromXPath(stats, this, "cycleAccurateEventQueue/currentCycle");
+        JaxenHelper.dumpSingleStatFromXPath(stats, this, "totalInsts");
 
-        stats.put("totalCycles", String.valueOf(this.getCycleAccurateEventQueue().getCurrentCycle()));
-        stats.put("totalInsts", String.valueOf(this.getTotalInsts()));
+        for (Thread thread : JaxenHelper.<Thread>selectNodes(this, "processor/cores/threads[totalInsts > 0]")) {
+            JaxenHelper.dumpSingleStatFromXPath(stats, this, "processor/cores/threads[name ='" + thread.getName() + "']/totalInsts");
+        }
 
-        stats.put("instsPerCycle", String.valueOf(this.getInstsPerCycle()));
-        stats.put("cyclesPerSecond", String.valueOf(this.getCyclesPerSecond()));
-        stats.put("instsPerSecond", String.valueOf(this.getInstsPerSecond()));
+        JaxenHelper.dumpSingleStatFromXPath(stats, this, "instsPerCycle");
+        JaxenHelper.dumpSingleStatFromXPath(stats, this, "cyclesPerSecond");
+        JaxenHelper.dumpSingleStatFromXPath(stats, this, "instsPerSecond");
+
+        for (Process process : JaxenHelper.<Process>selectNodes(this, "processor/kernel/processes")) {
+            process.getMemory().dumpStats(stats);
+        }
+
+        stats.put("max memory", MessageFormat.format("{0}", StorageUnit.toString(Runtime.getRuntime().maxMemory())));
+        stats.put("total memory", MessageFormat.format("{0}", StorageUnit.toString(Runtime.getRuntime().totalMemory())));
+        stats.put("used memory", MessageFormat.format("{0}", StorageUnit.toString(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())));
     }
 
     public long getDurationInSeconds() {
         return this.stopWatch.getTime() / 1000;
     }
 
-    public String getFormattedDuration() {
+    public String getDuration() {
         return DurationFormatUtils.formatDurationHMS(this.stopWatch.getTime());
     }
 
@@ -256,8 +236,16 @@ public class Simulation implements SimulationObject {
         return (double) this.getTotalInsts() / this.getDurationInSeconds();
     }
 
-    public SimulationConfig getConfig() {
-        return this.config;
+    public Experiment getExperiment() {
+        return experiment;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getCwd() {
+        return "experiments" + File.separator + this.title;
     }
 
     public SimulationStrategy getStrategy() {
@@ -284,8 +272,8 @@ public class Simulation implements SimulationObject {
         return this.statsInMeasurement;
     }
 
-    public Map<Class<? extends SimulationCapability>, SimulationCapability> getCapabilities() {
-        return this.capabilities;
+    public Collection<SimulationCapability> getCapabilities() {
+        return this.capabilities.values();
     }
 
     public CycleAccurateEventQueue getCycleAccurateEventQueue() {

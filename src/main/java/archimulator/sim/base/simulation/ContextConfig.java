@@ -49,6 +49,6 @@ public class ContextConfig implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("thread %d -> '%s'", threadId, simulatedProgram.getTitle());
+        return String.format("thread_%d->'%s'", threadId, simulatedProgram.getTitle());
     }
 }

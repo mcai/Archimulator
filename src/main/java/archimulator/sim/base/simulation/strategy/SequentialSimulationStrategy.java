@@ -127,7 +127,7 @@ public abstract class SequentialSimulationStrategy extends SimulationStrategy {
                 hasError = true;
             }
 
-            this.getSimulation().getBlockingEventDispatcher().dispatch(new DumpStatEvent(this.getSimulation(), DumpStatEvent.Type.FUNCTIONAL_SIMULATION, this.getSimulation().getStatsInFastForward()));
+            this.getSimulation().getExperiment().dumpStats(this.getSimulation().getStatsInFastForward(), false);
             this.getSimulation().getBlockingEventDispatcher().dispatch(new ResetStatEvent(this.getSimulation()));
 
             if(hasError) {
@@ -150,7 +150,7 @@ public abstract class SequentialSimulationStrategy extends SimulationStrategy {
                 hasError = true;
             }
 
-            this.getSimulation().getBlockingEventDispatcher().dispatch(new DumpStatEvent(this.getSimulation(), DumpStatEvent.Type.DETAILED_SIMULATION, this.getSimulation().getStatsInWarmup()));
+            this.getSimulation().getExperiment().dumpStats(this.getSimulation().getStatsInWarmup(), true);
             this.getSimulation().getBlockingEventDispatcher().dispatch(new ResetStatEvent(this.getSimulation()));
 
             if(hasError) {
@@ -173,7 +173,7 @@ public abstract class SequentialSimulationStrategy extends SimulationStrategy {
                 hasError = true;
             }
 
-            this.getSimulation().getBlockingEventDispatcher().dispatch(new DumpStatEvent(this.getSimulation(), DumpStatEvent.Type.DETAILED_SIMULATION, this.getSimulation().getStatsInMeasurement()));
+            this.getSimulation().getExperiment().dumpStats(this.getSimulation().getStatsInMeasurement(), true);
             this.getSimulation().getBlockingEventDispatcher().dispatch(new ResetStatEvent(this.getSimulation()));
 
             if(hasError) {

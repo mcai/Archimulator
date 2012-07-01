@@ -20,8 +20,6 @@ package archimulator.sim.core;
 
 import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.base.event.SimulationEvent;
-import archimulator.sim.base.experiment.capability.ExperimentCapabilityFactory;
-import archimulator.sim.base.experiment.capability.ProcessorCapability;
 import archimulator.sim.base.simulation.BasicSimulationObject;
 import archimulator.sim.os.Context;
 import archimulator.sim.os.ContextKilledEvent;
@@ -43,11 +41,9 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
 
     private CacheHierarchy cacheHierarchy;
 
-    private Map<Class<? extends ProcessorCapability>, ProcessorCapability> capabilities;
-
     private Map<Context, Thread> contextToThreadMappings;
 
-    public BasicProcessor(BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, ProcessorConfig processorConfig, Kernel kernel, CacheHierarchy cacheHierarchy, List<Class<? extends ProcessorCapability>> capabilityClasses) {
+    public BasicProcessor(BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, ProcessorConfig processorConfig, Kernel kernel, CacheHierarchy cacheHierarchy) {
         super(blockingEventDispatcher, cycleAccurateEventQueue);
 
         this.config = processorConfig;
@@ -61,8 +57,8 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
         for (int i = 0; i < this.config.getNumCores(); i++) {
             Core core = new BasicCore(this, i);
 
-            core.setInstructionCache(cacheHierarchy.getInstructionCaches().get(i));
-            core.setDataCache(cacheHierarchy.getDataCaches().get(i));
+            core.setL1ICacheController(cacheHierarchy.getL1ICacheControllers().get(i));
+            core.setL1DCacheController(cacheHierarchy.getL1DCacheControllers().get(i));
 
             for (int j = 0; j < this.config.getNumThreadsPerCore(); j++) {
                 BasicThread thread = new BasicThread(core, j);
@@ -85,12 +81,6 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
                 resetStat();
             }
         });
-
-        this.capabilities = new HashMap<Class<? extends ProcessorCapability>, ProcessorCapability>();
-
-        for (Class<? extends ProcessorCapability> capabilityClz : capabilityClasses) {
-            this.capabilities.put(capabilityClz, ExperimentCapabilityFactory.createProcessorCapability(capabilityClz, this));
-        }
     }
 
     public void updateContextToThreadAssignments() {
@@ -159,8 +149,4 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
         return cacheHierarchy;
     }
 
-    @SuppressWarnings("unchecked")
-    public <CapabilityT extends ProcessorCapability> CapabilityT getCapability(Class<? extends CapabilityT> clz) {
-        return (CapabilityT) this.capabilities.get(clz);
-    }
 }

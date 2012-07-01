@@ -159,14 +159,14 @@ public class CacheSimulator {
         System.out.printf("[%s] numMaxPendingAccesses: %d%n", DateHelper.toString(new Date()),numMaxPendingAccesses);
 
         MemoryHierarchyConfig memoryHierarchyConfig = MemoryHierarchyConfig.createDefaultMemoryHierarchyConfig(64, 1, 64, 1, 64, 1, LRUPolicy.class);
-        ProcessorConfig processorConfig = ProcessorConfig.createDefaultProcessorConfig(memoryHierarchyConfig, null, null, 2, 2);
+        ProcessorConfig processorConfig = ProcessorConfig.createDefaultProcessorConfig(memoryHierarchyConfig, 2, 2);
         BasicCacheHierarchy cacheHierarchy = new BasicCacheHierarchy(new BlockingEventDispatcher<SimulationEvent>(), cycleAccurateEventQueue, processorConfig);
 
-        HTLLCRequestProfilingCapability htllcRequestProfilingCapability = new HTLLCRequestProfilingCapability(cacheHierarchy.getL2Cache());
+        HTLLCRequestProfilingCapability htllcRequestProfilingCapability = new HTLLCRequestProfilingCapability(cacheHierarchy.getL2CacheController());
 
-        final DirectoryController l2 = cacheHierarchy.getL2Cache();
-        final CacheController mt = cacheHierarchy.getDataCaches().get(0);
-        final CacheController ht = cacheHierarchy.getDataCaches().get(1);
+        final DirectoryController l2 = cacheHierarchy.getL2CacheController();
+        final CacheController mt = cacheHierarchy.getL1DCacheControllers().get(0);
+        final CacheController ht = cacheHierarchy.getL1DCacheControllers().get(1);
 
         final Map<CacheController, Integer> cacheControllerToThreadIdMap = new HashMap<CacheController, Integer>();
         cacheControllerToThreadIdMap.put(mt, 0);
@@ -234,8 +234,8 @@ public class CacheSimulator {
                     break;
                 }
 
-                for(CacheController dataCache : cacheHierarchy.getDataCaches()) {
-                    issueRequests(cacheControllerToThreadIdMap.get(dataCache), dataCache);
+                for(CacheController l1DCacheController : cacheHierarchy.getL1DCacheControllers()) {
+                    issueRequests(cacheControllerToThreadIdMap.get(l1DCacheController), l1DCacheController);
                 }
 
                 if(!reached) {
@@ -266,9 +266,9 @@ public class CacheSimulator {
 
         CacheCoherenceFlow.dumpTree();
 
-        cacheHierarchy.dumpStats();
+        cacheHierarchy.dumpCacheControllerFsmStats();
 
-        htllcRequestProfilingCapability.dumpStats();
+//        htllcRequestProfilingCapability.dumpCacheControllerFsmStats(); //TODO
 
         if(numPendingReads != 0 || numPendingWrites != 0) {
             System.out.flush();

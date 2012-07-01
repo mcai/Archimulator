@@ -19,8 +19,6 @@
 package archimulator.sim.base.experiment;
 
 import archimulator.sim.base.event.SimulationEvent;
-import archimulator.sim.base.experiment.capability.KernelCapability;
-import archimulator.sim.base.experiment.capability.ProcessorCapability;
 import archimulator.sim.base.experiment.capability.SimulationCapability;
 import archimulator.sim.base.simulation.ContextConfig;
 import archimulator.sim.base.simulation.SimulationStartingImage;
@@ -35,8 +33,8 @@ public class CheckpointedExperiment extends Experiment {
     private int maxInsts;
     private int pthreadSpawnedIndex;
 
-    public CheckpointedExperiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs, int l1ISize, int l1IAssociativity, int l1DSize, int l1DAssociativity, int l2Size, int l2Associativity, Class<? extends EvictionPolicy> l2EvictionPolicyClz, int maxInsts, int pthreadSpawnedIndex, List<Class<? extends SimulationCapability>> simulationCapabilityClasses, List<Class<? extends ProcessorCapability>> processorCapabilityClasses, List<Class<? extends KernelCapability>> kernelCapabilityClasses) {
-        super(title, numCores, numThreadsPerCore, contextConfigs, l1ISize, l1IAssociativity, l1DSize, l1DAssociativity, l2Size, l2Associativity, l2EvictionPolicyClz, simulationCapabilityClasses, processorCapabilityClasses, kernelCapabilityClasses);
+    public CheckpointedExperiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs, int l1ISize, int l1IAssociativity, int l1DSize, int l1DAssociativity, int l2Size, int l2Associativity, Class<? extends EvictionPolicy> l2EvictionPolicyClz, int maxInsts, int pthreadSpawnedIndex, List<Class<? extends SimulationCapability>> simulationCapabilityClasses) {
+        super(title, numCores, numThreadsPerCore, contextConfigs, l1ISize, l1IAssociativity, l1DSize, l1DAssociativity, l2Size, l2Associativity, l2EvictionPolicyClz, simulationCapabilityClasses);
         this.maxInsts = maxInsts;
         this.pthreadSpawnedIndex = pthreadSpawnedIndex;
     }
@@ -45,10 +43,14 @@ public class CheckpointedExperiment extends Experiment {
     protected void doStart() {
         SimulationStartingImage simulationStartingImage = new SimulationStartingImage();
 
-        this.doSimulation(this.getTitle() + "/checkpointedSimulation/phase0", new ToRoiFastForwardSimulationStrategy(this.getPhaser(), this.pthreadSpawnedIndex, simulationStartingImage), new BlockingEventDispatcher<SimulationEvent>(), getCycleAccurateEventQueue());
+        BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher = new BlockingEventDispatcher<SimulationEvent>();
+
+        this.doSimulation(this.getTitle() + "/checkpointedSimulation/phase0", new ToRoiFastForwardSimulationStrategy(this.getPhaser(), this.pthreadSpawnedIndex, simulationStartingImage), blockingEventDispatcher, getCycleAccurateEventQueue());
+
+        blockingEventDispatcher.clearListeners();
 
         this.getCycleAccurateEventQueue().resetCurrentCycle();
 
-        this.doSimulation(this.getTitle() + "/checkpointedSimulation/phase1", new FromRoiDetailedSimulationStrategy(this.getPhaser(), this.maxInsts, simulationStartingImage), new BlockingEventDispatcher<SimulationEvent>(), getCycleAccurateEventQueue());
+        this.doSimulation(this.getTitle() + "/checkpointedSimulation/phase1", new FromRoiDetailedSimulationStrategy(this.getPhaser(), this.maxInsts, simulationStartingImage), blockingEventDispatcher, getCycleAccurateEventQueue());
     }
 }

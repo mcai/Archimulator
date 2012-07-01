@@ -21,8 +21,6 @@ package archimulator.view.page.edit;
 import archimulator.service.ArchimulatorService;
 import archimulator.service.ArchimulatorServletContextListener;
 import archimulator.sim.base.experiment.capability.ExperimentCapabilityFactory;
-import archimulator.sim.base.experiment.capability.KernelCapability;
-import archimulator.sim.base.experiment.capability.ProcessorCapability;
 import archimulator.sim.base.experiment.capability.SimulationCapability;
 import archimulator.sim.base.experiment.profile.ExperimentProfile;
 import archimulator.sim.base.experiment.profile.ExperimentProfileState;
@@ -54,12 +52,8 @@ public class EditExperimentProfilePage extends GenericForwardComposer<Window> {
     private Textbox textboxMaxInsts;
 
     private Listbox listboxSimulationCapabilities;
-    private Listbox listboxProcessorCapabilities;
-    private Listbox listboxKernelCapabilities;
 
     private ListModelList<Pair<Class<? extends SimulationCapability>, Boolean>> listModelSimulationCapabilities;
-    private ListModelList<Pair<Class<? extends ProcessorCapability>, Boolean>> listModelProcessorCapabilities;
-    private ListModelList<Pair<Class<? extends KernelCapability>, Boolean>> listModelKernelCapabilities;
 
     private Label labelState;
 
@@ -107,8 +101,6 @@ public class EditExperimentProfilePage extends GenericForwardComposer<Window> {
         this.textboxMaxInsts.setValue(this.experimentProfile.getMaxInsts() + "");
 
         this.populateListSimulatonCapabilities();
-        this.populateListProcessorCapabilities();
-        this.populateListKernelCapabilities();
 
         this.populateExperimentProfileTypes();
 
@@ -131,30 +123,6 @@ public class EditExperimentProfilePage extends GenericForwardComposer<Window> {
 
         this.listModelSimulationCapabilities = new ListModelList<Pair<Class<? extends SimulationCapability>, Boolean>>(listSimulationCapabilityClasses);
         this.listboxSimulationCapabilities.setModel(this.listModelSimulationCapabilities);
-    }
-
-    private void populateListProcessorCapabilities() {
-        List<Pair<Class<? extends ProcessorCapability>, Boolean>> listProcessorCapabilityClasses = new ArrayList<Pair<Class<? extends ProcessorCapability>, Boolean>>();
-        List<Class<? extends ProcessorCapability>> allProcessorCapabilityClasses = ExperimentCapabilityFactory.getProcessorCapabilityClasses();
-        List<Class<? extends ProcessorCapability>> processorCapabilityClasses = this.experimentProfile.getProcessorCapabilityClasses();
-        for (Class<? extends ProcessorCapability> clz : allProcessorCapabilityClasses) {
-            listProcessorCapabilityClasses.add(new Pair<Class<? extends ProcessorCapability>, Boolean>(clz, processorCapabilityClasses.contains(clz)));
-        }
-
-        this.listModelProcessorCapabilities = new ListModelList<Pair<Class<? extends ProcessorCapability>, Boolean>>(listProcessorCapabilityClasses);
-        this.listboxProcessorCapabilities.setModel(this.listModelProcessorCapabilities);
-    }
-
-    private void populateListKernelCapabilities() {
-        List<Pair<Class<? extends KernelCapability>, Boolean>> listKernelCapabilityClasses = new ArrayList<Pair<Class<? extends KernelCapability>, Boolean>>();
-        List<Class<? extends KernelCapability>> allKernelCapabilityClasses = ExperimentCapabilityFactory.getKernelCapabilityClasses();
-        List<Class<? extends KernelCapability>> kernelCapabilityClasses = this.experimentProfile.getKernelCapabilityClasses();
-        for (Class<? extends KernelCapability> clz : allKernelCapabilityClasses) {
-            listKernelCapabilityClasses.add(new Pair<Class<? extends KernelCapability>, Boolean>(clz, kernelCapabilityClasses.contains(clz)));
-        }
-
-        this.listModelKernelCapabilities = new ListModelList<Pair<Class<? extends KernelCapability>, Boolean>>(listKernelCapabilityClasses);
-        this.listboxKernelCapabilities.setModel(this.listModelKernelCapabilities);
     }
 
     public void onSelect$comboboxProcessorProfiles(SelectEvent event) throws SQLException {
@@ -223,20 +191,6 @@ public class EditExperimentProfilePage extends GenericForwardComposer<Window> {
             for (Pair<Class<? extends SimulationCapability>, Boolean> entry : this.listModelSimulationCapabilities.getInnerList()) {
                 if (entry.getSecond()) {
                     this.experimentProfile.getSimulationCapabilityClasses().add(entry.getFirst());
-                }
-            }
-
-            this.experimentProfile.getProcessorCapabilityClasses().clear();
-            for (Pair<Class<? extends ProcessorCapability>, Boolean> entry : this.listModelProcessorCapabilities.getInnerList()) {
-                if (entry.getSecond()) {
-                    this.experimentProfile.getProcessorCapabilityClasses().add(entry.getFirst());
-                }
-            }
-
-            this.experimentProfile.getKernelCapabilityClasses().clear();
-            for (Pair<Class<? extends KernelCapability>, Boolean> entry : this.listModelKernelCapabilities.getInnerList()) {
-                if (entry.getSecond()) {
-                    this.experimentProfile.getKernelCapabilityClasses().add(entry.getFirst());
                 }
             }
 

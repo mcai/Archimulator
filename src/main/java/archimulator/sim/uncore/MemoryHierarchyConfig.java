@@ -20,48 +20,48 @@ package archimulator.sim.uncore;
 
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
 import archimulator.sim.uncore.cache.eviction.LRUPolicy;
-import archimulator.sim.uncore.coherence.config.FirstLevelCacheConfig;
+import archimulator.sim.uncore.coherence.config.L1CacheControllerConfig;
 import archimulator.sim.uncore.coherence.config.LastLevelCacheConfig;
 import archimulator.sim.uncore.dram.FixedLatencyMainMemoryConfig;
 import archimulator.sim.uncore.dram.MainMemoryConfig;
 
 public class MemoryHierarchyConfig {
-    private FirstLevelCacheConfig instructionCache;
-    private FirstLevelCacheConfig dataCache;
-    private LastLevelCacheConfig l2Cache;
-    private MainMemoryConfig mainMemory;
+    private L1CacheControllerConfig l1ICacheController;
+    private L1CacheControllerConfig l1DCacheController;
+    private LastLevelCacheConfig l2CacheController;
+    private MainMemoryConfig memoryController;
 
-    public MemoryHierarchyConfig(FirstLevelCacheConfig instructionCache, FirstLevelCacheConfig dataCache, LastLevelCacheConfig l2Cache, MainMemoryConfig mainMemory) {
-        this.instructionCache = instructionCache;
-        this.dataCache = dataCache;
-        this.l2Cache = l2Cache;
-        this.mainMemory = mainMemory;
+    public MemoryHierarchyConfig(L1CacheControllerConfig l1ICacheController, L1CacheControllerConfig l1DCacheController, LastLevelCacheConfig l2CacheController, MainMemoryConfig memoryController) {
+        this.l1ICacheController = l1ICacheController;
+        this.l1DCacheController = l1DCacheController;
+        this.l2CacheController = l2CacheController;
+        this.memoryController = memoryController;
     }
 
-    public FirstLevelCacheConfig getInstructionCache() {
-        return instructionCache;
+    public L1CacheControllerConfig getL1ICacheController() {
+        return l1ICacheController;
     }
 
-    public FirstLevelCacheConfig getDataCache() {
-        return dataCache;
+    public L1CacheControllerConfig getL1DCacheController() {
+        return l1DCacheController;
     }
 
-    public LastLevelCacheConfig getL2Cache() {
-        return l2Cache;
+    public LastLevelCacheConfig getL2CacheController() {
+        return l2CacheController;
     }
 
-    public MainMemoryConfig getMainMemory() {
-        return mainMemory;
+    public MainMemoryConfig getMemoryController() {
+        return memoryController;
     }
 
     public static MemoryHierarchyConfig createDefaultMemoryHierarchyConfig(int l1ISize, int l1IAssociativity, int l1DSize, int l1DAssociativity, int l2Size, int l2Associativity, Class<? extends EvictionPolicy> l2EvictionPolicyClz) {
-        FirstLevelCacheConfig l1ICacheConfig = new FirstLevelCacheConfig(l1ISize, l1IAssociativity, LRUPolicy.class);
-        FirstLevelCacheConfig l1DCacheConfig = new FirstLevelCacheConfig(l1DSize, l1DAssociativity, LRUPolicy.class);
+        L1CacheControllerConfig l1ICacheControllerConfig = new L1CacheControllerConfig(l1ISize, l1IAssociativity, LRUPolicy.class);
+        L1CacheControllerConfig l1DCacheControllerConfig = new L1CacheControllerConfig(l1DSize, l1DAssociativity, LRUPolicy.class);
 
         LastLevelCacheConfig l2CacheConfig = new LastLevelCacheConfig(l2Size, l2Associativity, l2EvictionPolicyClz);
 
         MainMemoryConfig mainMemoryConfig = new FixedLatencyMainMemoryConfig();
 
-        return new MemoryHierarchyConfig(l1ICacheConfig, l1DCacheConfig, l2CacheConfig, mainMemoryConfig);
+        return new MemoryHierarchyConfig(l1ICacheControllerConfig, l1DCacheControllerConfig, l2CacheConfig, mainMemoryConfig);
     }
 }

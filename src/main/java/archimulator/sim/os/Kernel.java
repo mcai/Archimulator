@@ -18,9 +18,6 @@
  ******************************************************************************/
 package archimulator.sim.os;
 
-import archimulator.sim.base.event.SimulationEvent;
-import archimulator.sim.base.experiment.capability.ExperimentCapabilityFactory;
-import archimulator.sim.base.experiment.capability.KernelCapability;
 import archimulator.sim.base.simulation.BasicSimulationObject;
 import archimulator.sim.base.simulation.Simulation;
 import archimulator.sim.base.simulation.SimulationObject;
@@ -31,7 +28,9 @@ import archimulator.sim.os.signal.SignalAction;
 import net.pickapack.action.Predicate;
 import net.pickapack.io.buffer.CircularByteBuffer;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class Kernel extends BasicSimulationObject implements SimulationObject {
     private List<Pipe> pipes;
@@ -48,9 +47,7 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
     private int numCores;
     private int numThreadsPerCore;
 
-    private Map<Class<? extends KernelCapability>, KernelCapability> capabilities;
-
-    public Kernel(Simulation simulation, int numCores, int numThreadsPerCore, List<Class<? extends KernelCapability>> capabilityClasses) {
+    public Kernel(Simulation simulation, int numCores, int numThreadsPerCore) {
         super(simulation);
 
         this.numCores = numCores;
@@ -68,20 +65,6 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
         this.processes = new ArrayList<Process>();
 
         this.syscallEmulation = new BasicSyscallEmulation(this);
-
-        this.capabilities = new HashMap<Class<? extends KernelCapability>, KernelCapability>();
-
-        for (Class<? extends KernelCapability> capabilityClz : capabilityClasses) {
-            this.capabilities.put(capabilityClz, ExperimentCapabilityFactory.createKernelCapability(capabilityClz, this));
-        }
-
-        simulation.getBlockingEventDispatcher().dispatch(new KernelCapabilitiesInitializedEvent(simulation));
-    }
-
-    public class KernelCapabilitiesInitializedEvent extends SimulationEvent {
-        public KernelCapabilitiesInitializedEvent(Simulation simulation) {
-            super(simulation);
-        }
     }
 
     public Process getProcessFromId(int id) {
@@ -269,11 +252,6 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
 
     public SyscallEmulation getSyscallEmulation() {
         return syscallEmulation;
-    }
-
-    @SuppressWarnings("unchecked")
-    public <CapabilityT extends KernelCapability> CapabilityT getCapability(Class<? extends CapabilityT> clz) {
-        return (CapabilityT) this.capabilities.get(clz);
     }
 
     public static final int MAX_SIGNAL = 64;

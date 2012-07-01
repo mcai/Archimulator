@@ -21,16 +21,16 @@ package archimulator.sim.uncore.coherence.config;
 import archimulator.sim.uncore.cache.CacheGeometry;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
 
-public class FirstLevelCacheConfig extends CoherentCacheConfig {
+public class L1CacheControllerConfig extends CoherentCacheConfig {
     private int numReadPorts; //TODO: to be clarified, should not be confused with MSHRs
     private int numWritePorts; //TODO: to be clarified, should not be confused with MSHRs
 
-    public FirstLevelCacheConfig(int size, int associativity, Class<? extends EvictionPolicy> evictionPolicyClz) {
+    public L1CacheControllerConfig(int size, int associativity, Class<? extends EvictionPolicy> evictionPolicyClz) {
 //        this(new CacheGeometry(size, associativity, 64), 1, 2, 1, evictionPolicyClz);
         this(new CacheGeometry(size, associativity, 64), 1, 128, 128, evictionPolicyClz); //TODO: should simulate MSHRs in all levels of cache explicitly
     }
 
-    public FirstLevelCacheConfig(CacheGeometry geometry, int hitLatency, int numReadPorts, int numWritePorts, Class<? extends EvictionPolicy> evictionPolicyClz) {
+    public L1CacheControllerConfig(CacheGeometry geometry, int hitLatency, int numReadPorts, int numWritePorts, Class<? extends EvictionPolicy> evictionPolicyClz) {
         super(geometry, hitLatency, evictionPolicyClz);
         this.numReadPorts = numReadPorts;
         this.numWritePorts = numWritePorts;

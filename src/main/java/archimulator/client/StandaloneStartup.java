@@ -40,19 +40,19 @@ public class StandaloneStartup {
     @Option(name = "-is", usage = "L1I cache size in KBytes (default: 32)", metaVar = "<l1ISizeInKByte>", required = false)
     private int l1ISizeInKByte = 32;
 
-    @Option(name = "-ia", usage = "L1I cache associativity (default: 4)", metaVar = "<l1IAssociativity>", required = false)
+    @Option(name = "-ia", usage = "L1I cache associativity (default: 8)", metaVar = "<l1IAssociativity>", required = false)
     private int l1IAssociativity = 4;
 
     @Option(name = "-ds", usage = "L1D cache size in KBytes (default: 32)", metaVar = "<l1DSizeInKByte>", required = false)
     private int l1DSizeInKByte = 32;
 
-    @Option(name = "-da", usage = "L1D cache associativity (default: 4)", metaVar = "<l1DAssociativity>", required = false)
+    @Option(name = "-da", usage = "L1D cache associativity (default: 8)", metaVar = "<l1DAssociativity>", required = false)
     private int l1DAssociativity = 4;
 
     @Option(name = "-2s", usage = "L2 cache size in KBytes (default: 96)", metaVar = "<l2SizeInKByte>", required = false)
-    private int l2SizeInKByte = 128;
+    private int l2SizeInKByte = 96;
 
-    @Option(name = "-2a", usage = "L2 cache associativity (default: 4)", metaVar = "<l2Associativity>", required = false)
+    @Option(name = "-2a", usage = "L2 cache associativity (default: 16)", metaVar = "<l2Associativity>", required = false)
     private int l2Associativity = 8;
 
     @Option(name = "-a", usage = "Arguments passed to mst (default: 4000)", metaVar = "<args>", required = false)

@@ -30,7 +30,7 @@ public class HelperThreadParamsDynamicTuningCapability implements SimulationCapa
     private DirectoryController llc;
 
     public HelperThreadParamsDynamicTuningCapability(Simulation simulation) {
-        this(simulation.getProcessor().getCacheHierarchy().getL2Cache());
+        this(simulation.getProcessor().getCacheHierarchy().getL2CacheController());
     }
 
     public HelperThreadParamsDynamicTuningCapability(DirectoryController llc) {

@@ -29,17 +29,18 @@ import archimulator.sim.uncore.net.Net;
 import archimulator.sim.uncore.tlb.TranslationLookasideBuffer;
 
 import java.util.List;
+import java.util.Map;
 
 public interface CacheHierarchy extends SimulationObject {
     void transfer(Controller from, Controller to, int size, CoherenceMessage message);
 
-    MemoryController getMainMemory();
+    MemoryController getMemoryController();
 
-    DirectoryController getL2Cache();
+    DirectoryController getL2CacheController();
 
-    List<CacheController> getInstructionCaches();
+    List<CacheController> getL1ICacheControllers();
 
-    List<CacheController> getDataCaches();
+    List<CacheController> getL1DCacheControllers();
 
     List<TranslationLookasideBuffer> getItlbs();
 
@@ -48,4 +49,6 @@ public interface CacheHierarchy extends SimulationObject {
     Net getL1sToL2Network();
 
     L2ToMemNet getL2ToMemNetwork();
+
+    void dumpCacheControllerFsmStats(Map<String, Object> stats);
 }

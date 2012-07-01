@@ -18,7 +18,6 @@
  ******************************************************************************/
 package archimulator.sim.core;
 
-import archimulator.sim.base.event.DumpStatEvent;
 import archimulator.sim.base.event.ResetStatEvent;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
@@ -133,22 +132,6 @@ public class FunctionalUnitPool {
                 }
             }
         });
-
-        this.core.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
-            public void apply(DumpStatEvent event) {
-                if (event.getType() == DumpStatEvent.Type.DETAILED_SIMULATION) {
-                    for (FunctionalUnitType fuType : FunctionalUnitPool.this.noFreeFu.keySet()) {
-                        event.getStats().put(FunctionalUnitPool.this.core.getName() + ".noFreeFu." + fuType,
-                                String.valueOf(FunctionalUnitPool.this.noFreeFu.get(fuType)));
-                    }
-
-                    for (FunctionalUnitOperationType fuOperationType : FunctionalUnitPool.this.acquireFailedOnNoFreeFu.keySet()) {
-                        event.getStats().put(FunctionalUnitPool.this.core.getName() + ".acquireFailedOnNoFreeFu." + fuOperationType,
-                                String.valueOf(FunctionalUnitPool.this.acquireFailedOnNoFreeFu.get(fuOperationType)));
-                    }
-                }
-            }
-        });
     }
 
     private FunctionalUnitDescriptor addFunctionalUnitDescriptor(FunctionalUnitType type, int quantity) {
@@ -201,5 +184,13 @@ public class FunctionalUnitPool {
                 this.noFreeFu.put(fuType, this.noFreeFu.get(fuType) + 1);
             }
         }
+    }
+
+    public EnumMap<FunctionalUnitType, Long> getNoFreeFu() {
+        return noFreeFu;
+    }
+
+    public EnumMap<FunctionalUnitOperationType, Long> getAcquireFailedOnNoFreeFu() {
+        return acquireFailedOnNoFreeFu;
     }
 }

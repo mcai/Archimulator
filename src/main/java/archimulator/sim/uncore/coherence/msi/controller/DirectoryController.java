@@ -48,7 +48,7 @@ public class DirectoryController extends GeneralCacheController {
                 @Override
                 public void apply(DirectoryControllerFiniteStateMachine fsm) {
                     if (fsm.getPreviousState() != fsm.getState() && fsm.getState().isStable()) {
-                        final Action onCompletedCallback = fsm.getOnCompletedCallback();
+                        Action onCompletedCallback = fsm.getOnCompletedCallback();
                         if (onCompletedCallback != null) {
                             fsm.setOnCompletedCallback(null);
                             onCompletedCallback.apply();

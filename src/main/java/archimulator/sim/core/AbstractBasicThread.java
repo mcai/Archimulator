@@ -18,7 +18,6 @@
  ******************************************************************************/
 package archimulator.sim.core;
 
-import archimulator.sim.base.event.DumpStatEvent;
 import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.base.simulation.BasicSimulationObject;
 import archimulator.sim.core.bpred.*;
@@ -27,6 +26,9 @@ import archimulator.sim.isa.RegisterDependencyType;
 import archimulator.sim.os.Context;
 import archimulator.sim.uncore.tlb.TranslationLookasideBuffer;
 import net.pickapack.action.Action1;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class AbstractBasicThread extends BasicSimulationObject implements Thread {
     protected int num;
@@ -157,32 +159,6 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
                 AbstractBasicThread.this.selectionStallOnNoFreeFunctionalUnit = 0;
             }
         });
-
-        this.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
-            public void apply(DumpStatEvent event) {
-                event.getStats().put(AbstractBasicThread.this.getName() + ".totalInsts", String.valueOf(AbstractBasicThread.this.totalInsts));
-
-                if (event.getType() == DumpStatEvent.Type.DETAILED_SIMULATION) {
-                    event.getStats().put(AbstractBasicThread.this.getName() + ".decodeBufferFull", String.valueOf(AbstractBasicThread.this.decodeBufferFull));
-                    event.getStats().put(AbstractBasicThread.this.getName() + ".reorderBufferFull", String.valueOf(AbstractBasicThread.this.reorderBufferFull));
-                    event.getStats().put(AbstractBasicThread.this.getName() + ".loadStoreQueueFull", String.valueOf(AbstractBasicThread.this.loadStoreQueueFull));
-
-                    event.getStats().put(AbstractBasicThread.this.getName() + ".intPhysicalRegisterFileFull", String.valueOf(AbstractBasicThread.this.intPhysicalRegisterFileFull));
-                    event.getStats().put(AbstractBasicThread.this.getName() + ".fpPhysicalRegisterFileFull", String.valueOf(AbstractBasicThread.this.fpPhysicalRegisterFileFull));
-                    event.getStats().put(AbstractBasicThread.this.getName() + ".miscPhysicalRegisterFileFull", String.valueOf(AbstractBasicThread.this.miscPhysicalRegisterFileFull));
-
-                    event.getStats().put(AbstractBasicThread.this.getName() + ".fetchStallsOnDecodeBufferIsFull", String.valueOf(AbstractBasicThread.this.fetchStallsOnDecodeBufferIsFull));
-
-                    event.getStats().put(AbstractBasicThread.this.getName() + ".registerRenameStallsOnDecodeBufferIsEmpty", String.valueOf(AbstractBasicThread.this.registerRenameStallsOnDecodeBufferIsEmpty));
-                    event.getStats().put(AbstractBasicThread.this.getName() + ".registerRenameStallsOnReorderBufferIsFull", String.valueOf(AbstractBasicThread.this.registerRenameStallsOnReorderBufferIsFull));
-                    event.getStats().put(AbstractBasicThread.this.getName() + ".registerRenameStallsOnLoadStoreQueueFull", String.valueOf(AbstractBasicThread.this.registerRenameStallsOnLoadStoreQueueFull));
-
-                    event.getStats().put(AbstractBasicThread.this.getName() + ".selectionStallOnCanNotLoad", String.valueOf(AbstractBasicThread.this.selectionStallOnCanNotLoad));
-                    event.getStats().put(AbstractBasicThread.this.getName() + ".selectionStallOnCanNotStore", String.valueOf(AbstractBasicThread.this.selectionStallOnCanNotStore));
-                    event.getStats().put(AbstractBasicThread.this.getName() + ".selectionStallOnNoFreeFunctionalUnit", String.valueOf(AbstractBasicThread.this.selectionStallOnNoFreeFunctionalUnit));
-                }
-            }
-        });
     }
 
     public void updatePerCycleStats() {
@@ -227,6 +203,11 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
         return core;
     }
 
+    @Override
+    public BranchPredictor getBpred() {
+        return bpred;
+    }
+
     public PipelineBuffer<DecodeBufferEntry> getDecodeBuffer() {
         return decodeBuffer;
     }
@@ -259,6 +240,13 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
         this.dtlb = dtlb;
     }
 
+    public List<TranslationLookasideBuffer> getTlbs() {
+        List<TranslationLookasideBuffer> tlbs = new ArrayList<TranslationLookasideBuffer>();
+        tlbs.add(getItlb());
+        tlbs.add(getDtlb());
+        return tlbs;
+    }
+
     public Context getContext() {
         return context;
     }
@@ -285,5 +273,70 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
 
     public void incSelectionStallOnNoFreeFunctionalUnit() {
         this.selectionStallOnNoFreeFunctionalUnit++;
+    }
+
+    @Override
+    public long getDecodeBufferFull() {
+        return decodeBufferFull;
+    }
+
+    @Override
+    public long getReorderBufferFull() {
+        return reorderBufferFull;
+    }
+
+    @Override
+    public long getLoadStoreQueueFull() {
+        return loadStoreQueueFull;
+    }
+
+    @Override
+    public long getIntPhysicalRegisterFileFull() {
+        return intPhysicalRegisterFileFull;
+    }
+
+    @Override
+    public long getFpPhysicalRegisterFileFull() {
+        return fpPhysicalRegisterFileFull;
+    }
+
+    @Override
+    public long getMiscPhysicalRegisterFileFull() {
+        return miscPhysicalRegisterFileFull;
+    }
+
+    @Override
+    public long getFetchStallsOnDecodeBufferIsFull() {
+        return fetchStallsOnDecodeBufferIsFull;
+    }
+
+    @Override
+    public long getRegisterRenameStallsOnDecodeBufferIsEmpty() {
+        return registerRenameStallsOnDecodeBufferIsEmpty;
+    }
+
+    @Override
+    public long getRegisterRenameStallsOnReorderBufferIsFull() {
+        return registerRenameStallsOnReorderBufferIsFull;
+    }
+
+    @Override
+    public long getRegisterRenameStallsOnLoadStoreQueueFull() {
+        return registerRenameStallsOnLoadStoreQueueFull;
+    }
+
+    @Override
+    public long getSelectionStallOnCanNotLoad() {
+        return selectionStallOnCanNotLoad;
+    }
+
+    @Override
+    public long getSelectionStallOnCanNotStore() {
+        return selectionStallOnCanNotStore;
+    }
+
+    @Override
+    public long getSelectionStallOnNoFreeFunctionalUnit() {
+        return selectionStallOnNoFreeFunctionalUnit;
     }
 }

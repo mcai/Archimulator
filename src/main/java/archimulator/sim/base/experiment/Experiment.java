@@ -18,27 +18,31 @@
  ******************************************************************************/
 package archimulator.sim.base.experiment;
 
+import archimulator.util.JaxenHelper;
 import archimulator.sim.base.event.*;
-import archimulator.sim.base.experiment.capability.KernelCapability;
-import archimulator.sim.base.experiment.capability.ProcessorCapability;
 import archimulator.sim.base.experiment.capability.SimulationCapability;
 import archimulator.sim.base.simulation.ContextConfig;
 import archimulator.sim.base.simulation.Logger;
 import archimulator.sim.base.simulation.Simulation;
-import archimulator.sim.base.simulation.SimulationConfig;
 import archimulator.sim.base.simulation.strategy.SimulationStrategy;
+import archimulator.sim.core.Core;
 import archimulator.sim.core.ProcessorConfig;
+import archimulator.sim.core.Thread;
+import archimulator.sim.uncore.CacheHierarchy;
 import archimulator.sim.uncore.MemoryHierarchyConfig;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
+import archimulator.sim.uncore.coherence.msi.controller.GeneralCacheController;
+import archimulator.sim.uncore.ht.LLCReuseDistanceProfilingCapability;
+import archimulator.sim.uncore.tlb.TranslationLookasideBuffer;
 import net.pickapack.Params;
 import net.pickapack.action.Action;
-import net.pickapack.action.Action1;
 import net.pickapack.action.Action4;
 import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
 import net.pickapack.fsm.BasicFiniteStateMachine;
 import net.pickapack.fsm.FiniteStateMachine;
 import net.pickapack.fsm.FiniteStateMachineFactory;
+import net.pickapack.io.serialization.MapHelper;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -50,8 +54,6 @@ public abstract class Experiment {
     private long id;
 
     private String title;
-    private int numCores;
-    private int numThreadsPerCore;
     private List<ContextConfig> contextConfigs;
     private ProcessorConfig processorConfig;
 
@@ -64,21 +66,19 @@ public abstract class Experiment {
 
     private BasicFiniteStateMachine<ExperimentState, ExperimentCondition> fsm;
 
-    private Thread threadStartExperiment;
+    private java.lang.Thread threadStartExperiment;
 
     private ScheduledExecutorService scheduledExecutorPollState;
 
     private Simulation simulation;
 
-    public Experiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs, int l1ISize, int l1IAssociativity, int l1DSize, int l1DAssociativity, int l2Size, int l2Associativity, Class<? extends EvictionPolicy> l2EvictionPolicyClz, List<Class<? extends SimulationCapability>> simulationCapabilityClasses, List<Class<? extends ProcessorCapability>> processorCapabilityClasses, List<Class<? extends KernelCapability>> kernelCapabilityClasses) {
+    public Experiment(String title, int numCores, int numThreadsPerCore, List<ContextConfig> contextConfigs, int l1ISize, int l1IAssociativity, int l1DSize, int l1DAssociativity, int l2Size, int l2Associativity, Class<? extends EvictionPolicy> l2EvictionPolicyClz, List<Class<? extends SimulationCapability>> simulationCapabilityClasses) {
         this.id = currentId++;
 
         this.title = title;
-        this.numCores = numCores;
-        this.numThreadsPerCore = numThreadsPerCore;
         this.contextConfigs = contextConfigs;
 
-        this.processorConfig = ProcessorConfig.createDefaultProcessorConfig(MemoryHierarchyConfig.createDefaultMemoryHierarchyConfig(l1ISize, l1IAssociativity, l1DSize, l1DAssociativity, l2Size, l2Associativity, l2EvictionPolicyClz), processorCapabilityClasses, kernelCapabilityClasses, this.numCores, this.numThreadsPerCore);
+        this.processorConfig = ProcessorConfig.createDefaultProcessorConfig(MemoryHierarchyConfig.createDefaultMemoryHierarchyConfig(l1ISize, l1IAssociativity, l1DSize, l1DAssociativity, l2Size, l2Associativity, l2EvictionPolicyClz), numCores, numThreadsPerCore);
 
         this.simulationCapabilityClasses = simulationCapabilityClasses;
 
@@ -100,7 +100,7 @@ public abstract class Experiment {
             return;
         }
 
-        Logger.infof(Logger.SIMULATION, "------ Simulation %s: BEGIN DUMP STATE at %s ------", this.cycleAccurateEventQueue.getCurrentCycle(), this.simulation.getConfig().getTitle(), new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(new Date()));
+        Logger.infof(Logger.SIMULATION, "------ Simulation %s: BEGIN DUMP STATE at %s ------", this.cycleAccurateEventQueue.getCurrentCycle(), this.simulation.getTitle(), new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(new Date()));
 
         Map<String, Object> polledStats = new LinkedHashMap<String, Object>();
 
@@ -117,18 +117,135 @@ public abstract class Experiment {
         Logger.info(Logger.SIMULATION, "------ END DUMP STATE ------\n", this.cycleAccurateEventQueue.getCurrentCycle());
     }
 
-    private void dumpStats(Map<String, Object> stats, boolean detailedSimulation) {
-        stats.put("experiment.beginTime", this.beginTime);
-        stats.put("experiment.workloads.size", this.contextConfigs.size());
+    public void dumpStats(Map<String, Object> stats, boolean detailedSimulation) {
+        pollSimulationState();
 
-        for (ContextConfig contextConfig : this.contextConfigs) {
-            stats.put("experiment.workload." + contextConfig.getThreadId(), contextConfig.getSimulatedProgram().getExe() + "_" + contextConfig.getSimulatedProgram().getArgs());
-        }
+        JaxenHelper.dumpSingleStatFromXPath(stats, this, "title");
+        JaxenHelper.dumpSingleStatFromXPath(stats, this, "beginTime");
+
+        JaxenHelper.dumpStatsFromXPath(stats, this, "contextConfigs");
 
         if (detailedSimulation) {
-            stats.put("experiment.numCores", this.numCores);
-            stats.put("experiment.numThreadsPerCore", this.numThreadsPerCore);
-            stats.put("experiment.l2EvictionPolicy", this.processorConfig.getMemoryHierarchyConfig().getL2Cache().getEvictionPolicyClz().getName());
+            JaxenHelper.dumpSingleStatFromXPath(stats, this, "processorConfig/numCores");
+            JaxenHelper.dumpSingleStatFromXPath(stats, this, "processorConfig/numThreadsPerCore");
+            JaxenHelper.dumpSingleStatFromXPath(stats, this, "processorConfig/memmoryHierarchyConfig/l2Cache/evictionPolicyClz/name");
+        }
+
+        JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/title");
+        JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/duration");
+        JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/cycleAccurateEventQueue/currentCycle");
+        JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/totalInsts");
+
+        JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/instsPerCycle");
+        JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/cyclesPerSecond");
+        JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/instsPerSecond");
+
+        for (Core core : JaxenHelper.<Core>selectNodes(this, "simulation/processor/cores[threads[totalInsts > 0]]")) {
+            JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/processor/cores[name ='" + core.getName() + "']/itlb/noFreeFu");
+
+            if(detailedSimulation) {
+                JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/processor/cores[name ='" + core.getName() + "']/fuPool/noFreeFu");
+                JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/processor/cores[name ='" + core.getName() + "']/fuPool/acquireFailedOnNoFreeFu");
+            }
+        }
+
+        for (Thread thread : JaxenHelper.<Thread>selectNodes(this, "simulation/processor/cores/threads[totalInsts > 0]")) {
+            JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/processor/cores/threads[name ='" + thread.getName() + "']/totalInsts");
+
+            if(detailedSimulation) {
+                for (TranslationLookasideBuffer tlb : JaxenHelper.<TranslationLookasideBuffer>selectNodes(this, "simulation/processor/cores/threads[name ='" + thread.getName() + "']/tlbs")) {
+                    JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/processor/cores/threads[name ='" + thread.getName() + "']/tlbs[name ='" + tlb.getName() + "']/hitRatio");
+                    JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/processor/cores/threads[name ='" + thread.getName() + "']/tlbs[name ='" + tlb.getName() + "']/accesses");
+                    JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/processor/cores/threads[name ='" + thread.getName() + "']/tlbs[name ='" + tlb.getName() + "']/hits");
+                    JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/processor/cores/threads[name ='" + thread.getName() + "']/tlbs[name ='" + tlb.getName() + "']/misses");
+                    JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/processor/cores/threads[name ='" + thread.getName() + "']/tlbs[name ='" + tlb.getName() + "']/evictions");
+                }
+
+                JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/processor/cores/threads[name ='" + thread.getName() + "']/bpred/type");
+                JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/processor/cores/threads[name ='" + thread.getName() + "']/bpred/accesses");
+                JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/processor/cores/threads[name ='" + thread.getName() + "']/bpred/hits");
+                JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/processor/cores/threads[name ='" + thread.getName() + "']/bpred/misses");
+                JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/processor/cores/threads[name ='" + thread.getName() + "']/bpred/hitRatio");
+
+                JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/processor/cores/threads[name ='" + thread.getName() + "']/decodeBufferFull");
+                JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/processor/cores/threads[name ='" + thread.getName() + "']/reorderBufferFull");
+                JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/processor/cores/threads[name ='" + thread.getName() + "']/loadStoreQueueFull");
+
+                JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/processor/cores/threads[name ='" + thread.getName() + "']/intPhysicalRegisterFileFull");
+                JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/processor/cores/threads[name ='" + thread.getName() + "']/fpPhysicalRegisterFileFull");
+                JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/processor/cores/threads[name ='" + thread.getName() + "']/miscPhysicalRegisterFileFull");
+
+                JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/processor/cores/threads[name ='" + thread.getName() + "']/fetchStallsOnDecodeBufferIsFull");
+
+                JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/processor/cores/threads[name ='" + thread.getName() + "']/registerRenameStallsOnDecodeBufferIsEmpty");
+                JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/processor/cores/threads[name ='" + thread.getName() + "']/registerRenameStallsOnReorderBufferIsFull");
+                JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/processor/cores/threads[name ='" + thread.getName() + "']/registerRenameStallsOnLoadStoreQueueFull");
+
+                JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/processor/cores/threads[name ='" + thread.getName() + "']/selectionStallOnCanNotLoad");
+                JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/processor/cores/threads[name ='" + thread.getName() + "']/selectionStallOnCanNotStore");
+                JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/processor/cores/threads[name ='" + thread.getName() + "']/selectionStallOnNoFreeFunctionalUnit");
+            }
+        }
+
+        for (GeneralCacheController cacheController : JaxenHelper.<GeneralCacheController>selectNodes(this, "simulation/processor/cacheHierarchy/cacheControllers[numDownwardAccesses > 0]")) {
+            JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/processor/cacheHierarchy/cacheControllers[name ='" + cacheController.getName() + "']/hitRatio");
+            JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/processor/cacheHierarchy/cacheControllers[name ='" + cacheController.getName() + "']/numDownwardAccesses");
+            JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/processor/cacheHierarchy/cacheControllers[name ='" + cacheController.getName() + "']/numDownwardHits");
+            JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/processor/cacheHierarchy/cacheControllers[name ='" + cacheController.getName() + "']/numDownwardMisses");
+
+            JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/processor/cacheHierarchy/cacheControllers[name ='" + cacheController.getName() + "']/numDownwardReadHits");
+            JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/processor/cacheHierarchy/cacheControllers[name ='" + cacheController.getName() + "']/numDownwardReadMisses");
+            JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/processor/cacheHierarchy/cacheControllers[name ='" + cacheController.getName() + "']/numDownwardWriteHits");
+            JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/processor/cacheHierarchy/cacheControllers[name ='" + cacheController.getName() + "']/numDownwardWriteMisses");
+
+            JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/processor/cacheHierarchy/cacheControllers[name ='" + cacheController.getName() + "']/numEvictions");
+
+            JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/processor/cacheHierarchy/cacheControllers[name ='" + cacheController.getName() + "']/occupancyRatio");
+        }
+
+        if(detailedSimulation) {
+            JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/processor/cacheHierarchy/memoryController/accesses");
+            JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/processor/cacheHierarchy/memoryController/reads");
+            JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/processor/cacheHierarchy/memoryController/writes");
+        }
+
+        JaxenHelper.dumpStatsFromXPath(stats, this, "simulation/capabilities[class/simpleName='FunctionalExecutionProfilingCapability']/executedMnemonics");
+        JaxenHelper.dumpStatsFromXPath(stats, this, "simulation/capabilities[class/simpleName='FunctionalExecutionProfilingCapability']/executedSyscalls");
+
+        if(detailedSimulation) {
+            //should be called only when simulation ends
+            JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/capabilities[class/simpleName='HTLLCRequestProfilingCapability']/summedUpUnstableHTLLCRequests");
+
+            JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/capabilities[class/simpleName='HTLLCRequestProfilingCapability']/numMTLLCHits");
+            JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/capabilities[class/simpleName='HTLLCRequestProfilingCapability']/numMTLLCMisses");
+
+            JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/capabilities[class/simpleName='HTLLCRequestProfilingCapability']/numTotalHTLLCRequests");
+
+            JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/capabilities[class/simpleName='HTLLCRequestProfilingCapability']/numUsefulHTLLCRequests");
+
+            JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/capabilities[class/simpleName='HTLLCRequestProfilingCapability']/numRedundantHitToTransientTagHTLLCRequests");
+            JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/capabilities[class/simpleName='HTLLCRequestProfilingCapability']/numRedundantHitToCacheHTLLCRequests");
+
+            JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/capabilities[class/simpleName='HTLLCRequestProfilingCapability']/numTimelyHTLLCRequests");
+            JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/capabilities[class/simpleName='HTLLCRequestProfilingCapability']/numLateHTLLCRequests");
+
+            JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/capabilities[class/simpleName='HTLLCRequestProfilingCapability']/numBadHTLLCRequests");
+            JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/capabilities[class/simpleName='HTLLCRequestProfilingCapability']/numUglyHTLLCRequests");
+
+            JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/capabilities[class/simpleName='HTLLCRequestProfilingCapability']/htLLCRequestAccuracy");
+            JaxenHelper.dumpSingleStatFromXPath(stats, this, "simulation/capabilities[class/simpleName='HTLLCRequestProfilingCapability']/htLLCRequestCoverage");
+        }
+
+        if(detailedSimulation) {
+            Map<String, Object> statsCacheControllerFsms = new LinkedHashMap<String, Object>();
+            JaxenHelper.<CacheHierarchy>selectSingleNode(this, "simulation/processor/cacheHierarchy").dumpCacheControllerFsmStats(statsCacheControllerFsms);
+            MapHelper.save(statsCacheControllerFsms, simulation.getCwd() + "/stats_cacheControllerFsms.txt");
+        }
+
+        if(detailedSimulation) {
+            Map<String, Object> statsLLCReuseDistanceProfilingCapability = new LinkedHashMap<String, Object>();
+            JaxenHelper.<LLCReuseDistanceProfilingCapability>selectSingleNode(this, "simulation/capabilities[class/simpleName='LLCReuseDistanceProfilingCapability']").dumpStats(statsLLCReuseDistanceProfilingCapability);
+            MapHelper.save(statsLLCReuseDistanceProfilingCapability, simulation.getCwd() + "/stats_llcReuseDistanceProfilingCapability.txt");
         }
     }
 
@@ -161,17 +278,8 @@ public abstract class Experiment {
     }
 
     protected void doSimulation(String title, SimulationStrategy strategy, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
-        this.simulation = new Simulation(new SimulationConfig(title, this.processorConfig, this.contextConfigs), strategy, this.simulationCapabilityClasses, blockingEventDispatcher, cycleAccurateEventQueue);
-
+        this.simulation = new Simulation(this, title, strategy, this.simulationCapabilityClasses, blockingEventDispatcher, cycleAccurateEventQueue);
         this.blockingEventDispatcher.dispatch(new SimulationCreatedEvent(this));
-
-        this.simulation.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
-            public void apply(DumpStatEvent event) {
-                pollSimulationState();
-                dumpStats(event.getStats(), event.getType() == DumpStatEvent.Type.DETAILED_SIMULATION);
-            }
-        });
-
         this.simulation.simulate(this);
     }
 
@@ -203,6 +311,18 @@ public abstract class Experiment {
         return simulation;
     }
 
+    public List<ContextConfig> getContextConfigs() {
+        return contextConfigs;
+    }
+
+    public ProcessorConfig getProcessorConfig() {
+        return processorConfig;
+    }
+
+    public String getBeginTime() {
+        return beginTime;
+    }
+
     private enum ExperimentCondition {
         START,
         STOP,
@@ -224,7 +344,7 @@ public abstract class Experiment {
                     public void apply(final FiniteStateMachine<ExperimentState, ExperimentCondition> from, Object param2, ExperimentCondition param3, Params param4) {
                         final Experiment experiment = ((BasicFiniteStateMachine) from).get(Experiment.class, "experiment");
 
-                        Thread threadStartExperiment = new Thread() {
+                        java.lang.Thread threadStartExperiment = new java.lang.Thread() {
                             @Override
                             public void run() {
                                 experiment.scheduledExecutorPollState.scheduleWithFixedDelay(new Runnable() {

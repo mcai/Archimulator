@@ -6,7 +6,7 @@ import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.coherence.config.CoherentCacheConfig;
-import archimulator.sim.uncore.coherence.config.FirstLevelCacheConfig;
+import archimulator.sim.uncore.coherence.config.L1CacheControllerConfig;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import archimulator.sim.uncore.coherence.msi.flow.LoadFlow;
 import archimulator.sim.uncore.coherence.msi.flow.StoreFlow;
@@ -58,7 +58,7 @@ public class CacheController extends GeneralCacheController {
                 public void apply(CacheControllerFiniteStateMachine fsm) {
                     if (fsm.getPreviousState() != fsm.getState()) {
                         if (fsm.getState().isStable()) {
-                            final Action onCompletedCallback = fsm.getOnCompletedCallback();
+                            Action onCompletedCallback = fsm.getOnCompletedCallback();
                             if (onCompletedCallback != null) {
                                 fsm.setOnCompletedCallback(null);
                                 onCompletedCallback.apply();
@@ -170,11 +170,11 @@ public class CacheController extends GeneralCacheController {
     }
 
     private int getReadPorts() {
-        return ((FirstLevelCacheConfig) getConfig()).getNumReadPorts();
+        return ((L1CacheControllerConfig) getConfig()).getNumReadPorts();
     }
 
     private int getWritePorts() {
-        return ((FirstLevelCacheConfig) getConfig()).getNumWritePorts();
+        return ((L1CacheControllerConfig) getConfig()).getNumWritePorts();
     }
 
     @Override

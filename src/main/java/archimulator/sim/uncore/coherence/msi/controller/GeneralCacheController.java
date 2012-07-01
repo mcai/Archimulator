@@ -1,7 +1,5 @@
 package archimulator.sim.uncore.coherence.msi.controller;
 
-import archimulator.sim.base.event.DumpStatEvent;
-import archimulator.sim.base.event.PollStatsEvent;
 import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.uncore.CacheHierarchy;
 import archimulator.sim.uncore.cache.EvictableCache;
@@ -9,7 +7,6 @@ import archimulator.sim.uncore.coherence.config.CoherentCacheConfig;
 import net.pickapack.action.Action1;
 
 import java.io.Serializable;
-import java.util.Map;
 
 public abstract class GeneralCacheController<StateT extends Serializable> extends Controller {
     private long numDownwardReadHits;
@@ -36,39 +33,6 @@ public abstract class GeneralCacheController<StateT extends Serializable> extend
                 occupancyRatio = 0;
             }
         });
-
-        this.getBlockingEventDispatcher().addListener(PollStatsEvent.class, new Action1<PollStatsEvent>() {
-            @Override
-            public void apply(PollStatsEvent event) {
-                dumpStats(event.getStats());
-            }
-        });
-
-        this.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
-            public void apply(DumpStatEvent event) {
-                if (event.getType() == DumpStatEvent.Type.DETAILED_SIMULATION) {
-                    dumpStats(event.getStats());
-                }
-            }
-        });
-    }
-
-    private void dumpStats(Map<String, Object> stats) {
-        if(getNumDownwardAccesses() > 0) {
-            stats.put(this.getName() + ".hitRatio", String.valueOf(getHitRatio()));
-            stats.put(this.getName() + ".numDownwardAccesses", String.valueOf(getNumDownwardAccesses()));
-            stats.put(this.getName() + ".numDownwardHits", String.valueOf(getNumDownwardHits()));
-            stats.put(this.getName() + ".numDownwardMisses", String.valueOf(getNumDownwardMisses()));
-
-            stats.put(this.getName() + ".numDownwardReadHits", String.valueOf(numDownwardReadHits));
-            stats.put(this.getName() + ".numDownwardReadMisses", String.valueOf(numDownwardReadMisses));
-            stats.put(this.getName() + ".numDownwardWriteHits", String.valueOf(numDownwardWriteHits));
-            stats.put(this.getName() + ".numDownwardWriteMisses", String.valueOf(numDownwardWriteMisses));
-
-            stats.put(this.getName() + ".numEvictions", String.valueOf(numEvictions));
-
-            stats.put(this.getName() + ".occupancyRatio", String.valueOf(occupancyRatio));
-        }
     }
 
     public abstract EvictableCache<StateT> getCache();
@@ -95,19 +59,43 @@ public abstract class GeneralCacheController<StateT extends Serializable> extend
         this.numEvictions++;
     }
 
-    private double getHitRatio() {
+    public double getHitRatio() {
         return getNumDownwardAccesses() > 0 ? (double) getNumDownwardHits() / (getNumDownwardAccesses()) : 0.0;
     }
 
-    private long getNumDownwardHits() {
+    public long getNumDownwardHits() {
         return numDownwardReadHits + numDownwardWriteHits;
     }
 
-    private long getNumDownwardMisses() {
+    public long getNumDownwardMisses() {
         return numDownwardReadMisses + numDownwardWriteMisses;
     }
 
-    private long getNumDownwardAccesses() {
+    public long getNumDownwardAccesses() {
         return getNumDownwardHits() + getNumDownwardMisses();
+    }
+
+    public long getNumDownwardReadHits() {
+        return numDownwardReadHits;
+    }
+
+    public long getNumDownwardReadMisses() {
+        return numDownwardReadMisses;
+    }
+
+    public long getNumDownwardWriteHits() {
+        return numDownwardWriteHits;
+    }
+
+    public long getNumDownwardWriteMisses() {
+        return numDownwardWriteMisses;
+    }
+
+    public long getNumEvictions() {
+        return numEvictions;
+    }
+
+    public double getOccupancyRatio() {
+        return occupancyRatio;
     }
 }

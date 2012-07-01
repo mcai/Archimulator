@@ -3,6 +3,7 @@ package archimulator.client;
 import archimulator.sim.base.experiment.profile.ExperimentProfile;
 import archimulator.sim.base.experiment.profile.ProcessorProfile;
 import archimulator.sim.base.simulation.SimulatedProgram;
+import archimulator.sim.isa.FunctionalExecutionProfilingCapability;
 import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
 import archimulator.sim.uncore.ht.HTLLCRequestProfilingCapability;
 import archimulator.sim.uncore.ht.HelperThreadParamsDynamicTuningCapability;
@@ -62,6 +63,7 @@ public class Presets {
         experimentProfile.addSimulationCapabilityClass(HelperThreadParamsDynamicTuningCapability.class);
         experimentProfile.addSimulationCapabilityClass(LLCReuseDistanceProfilingCapability.class);
         experimentProfile.addSimulationCapabilityClass(HTLLCRequestProfilingCapability.class);
+        experimentProfile.addSimulationCapabilityClass(FunctionalExecutionProfilingCapability.class);
         return experimentProfile;
     }
 }

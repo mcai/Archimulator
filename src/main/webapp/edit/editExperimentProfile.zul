@@ -73,28 +73,6 @@
                     </listbox>
                 </row>
                 <row>
-                    Processor Capabilities
-                    <listbox id="listboxProcessorCapabilities" vflex="true"
-                             itemRenderer="archimulator.view.renderer.CapabilityListCellRenderer"
-                             emptyMessage="Processor capability list is empty" multiple="true" mold="paging"
-                             pageSize="5" pagingPosition="bottom" height="220px">
-                        <listhead>
-                            <listheader label="Implementation Class" width="620px"/>
-                        </listhead>
-                    </listbox>
-                </row>
-                <row>
-                    Kernel Capabilities
-                    <listbox id="listboxKernelCapabilities" vflex="true"
-                             itemRenderer="archimulator.view.renderer.CapabilityListCellRenderer"
-                             emptyMessage="Kernel capability list is empty" multiple="true" mold="paging"
-                             pageSize="5" pagingPosition="bottom" height="220px">
-                        <listhead>
-                            <listheader label="Implementation Class" width="620px"/>
-                        </listhead>
-                    </listbox>
-                </row>
-                <row>
                     State
                     <label id="labelState" width="150px"/>
                 </row>

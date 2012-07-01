@@ -18,47 +18,33 @@
  ******************************************************************************/
 package archimulator.sim.isa;
 
-import archimulator.sim.base.event.DumpStatEvent;
-import archimulator.sim.base.event.PollStatsEvent;
-import archimulator.sim.base.experiment.capability.KernelCapability;
-import archimulator.sim.os.Kernel;
+import archimulator.sim.base.event.ResetStatEvent;
+import archimulator.sim.base.experiment.capability.SimulationCapability;
+import archimulator.sim.base.simulation.Simulation;
 import net.pickapack.action.Action1;
 
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
-public class FunctionalExecutionProfilingCapability implements KernelCapability {
-    private Kernel kernel;
-    private EnumSet<Mnemonic> executedMnemonics;
-    private Set<String> executedSyscalls;
+public class FunctionalExecutionProfilingCapability implements SimulationCapability {
+    private List<Mnemonic> executedMnemonics;
+    private List<String> executedSyscalls;
 
-    public FunctionalExecutionProfilingCapability(final Kernel kernel) {
-        this.kernel = kernel;
+    public FunctionalExecutionProfilingCapability(Simulation simulation) {
+        this.executedMnemonics = new ArrayList<Mnemonic>();
+        this.executedSyscalls = new ArrayList<String>();
 
-        this.executedMnemonics = EnumSet.noneOf(Mnemonic.class);
-        this.executedSyscalls = new HashSet<String>();
-
-        kernel.getBlockingEventDispatcher().addListener(Kernel.KernelCapabilitiesInitializedEvent.class, new Action1<Kernel.KernelCapabilitiesInitializedEvent>() {
-            public void apply(Kernel.KernelCapabilitiesInitializedEvent event) {
-                kernel.getBlockingEventDispatcher().addListener(InstructionFunctionallyExecutedEvent.class, new Action1<InstructionFunctionallyExecutedEvent>() {
-                    public void apply(InstructionFunctionallyExecutedEvent event1) {
-                        Mnemonic mnemonic = event1.getStaticInst().getMnemonic();
-                        if (!executedMnemonics.contains(mnemonic)) {
-                            executedMnemonics.add(mnemonic);
-                        }
-                    }
-                });
+        simulation.getBlockingEventDispatcher().addListener(InstructionFunctionallyExecutedEvent.class, new Action1<InstructionFunctionallyExecutedEvent>() {
+            public void apply(InstructionFunctionallyExecutedEvent event) {
+                Mnemonic mnemonic = event.getStaticInst().getMnemonic();
+                if (!executedMnemonics.contains(mnemonic)) {
+                    executedMnemonics.add(mnemonic);
+                }
             }
         });
 
-        kernel.getBlockingEventDispatcher().addListener(SyscallExecutedEvent.class, new Action1<SyscallExecutedEvent>() {
+        simulation.getBlockingEventDispatcher().addListener(SyscallExecutedEvent.class, new Action1<SyscallExecutedEvent>() {
             public void apply(SyscallExecutedEvent event) {
-//                System.out.println(event.getContext().getRegs().dump());
-
-                System.out.printf("0x%08x: syscall %s\n", event.getContext().getRegs().getPc(), event.getSyscallName());
-
                 String syscallName = event.getSyscallName();
                 if (!executedSyscalls.contains(syscallName)) {
                     executedSyscalls.add(syscallName);
@@ -66,30 +52,20 @@ public class FunctionalExecutionProfilingCapability implements KernelCapability 
             }
         });
 
-        kernel.getBlockingEventDispatcher().addListener(PollStatsEvent.class, new Action1<PollStatsEvent>() {
-            public void apply(PollStatsEvent event) {
-                dumpStats(event.getStats());
-            }
-        });
-
-        kernel.getBlockingEventDispatcher().addListener(DumpStatEvent.class, new Action1<DumpStatEvent>() {
-            public void apply(DumpStatEvent event) {
-                dumpStats(event.getStats());
+        simulation.getBlockingEventDispatcher().addListener(ResetStatEvent.class, new Action1<ResetStatEvent>() {
+            @Override
+            public void apply(ResetStatEvent event) {
+                executedMnemonics.clear();
+                executedSyscalls.clear();
             }
         });
     }
 
-    private void dumpStats(Map<String, Object> stats) {
-        stats.put("FunctionalExecutionProfilingCapability" + ".executedMnemonics.size", executedMnemonics.size());
+    public List<Mnemonic> getExecutedMnemonics() {
+        return executedMnemonics;
+    }
 
-        for (Mnemonic mnemonic : this.executedMnemonics) {
-            stats.put("FunctionalExecutionProfilingCapability" + ".executedMnemonics." + mnemonic, "");
-        }
-
-        stats.put("FunctionalExecutionProfilingCapability" + ".executedSyscalls.size", executedSyscalls.size());
-
-        for (String syscallName : this.executedSyscalls) {
-            stats.put("FunctionalExecutionProfilingCapability" + ".executedSyscalls." + syscallName, "");
-        }
+    public List<String> getExecutedSyscalls() {
+        return executedSyscalls;
     }
 }
