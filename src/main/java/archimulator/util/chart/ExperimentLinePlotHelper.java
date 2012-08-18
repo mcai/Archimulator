@@ -18,61 +18,52 @@
  ******************************************************************************/
 package archimulator.util.chart;
 
-import archimulator.client.ManagementStartup;
-import archimulator.service.ArchimulatorService;
-import archimulator.sim.base.experiment.profile.ExperimentProfile;
-import archimulator.sim.base.experiment.profile.ExperimentProfileState;
-import com.caucho.hessian.client.HessianProxyFactory;
-import net.pickapack.DateHelper;
-import net.pickapack.action.Function;
-import net.pickapack.action.Predicate;
+import archimulator.service.ExperimentService;
+import archimulator.service.ServiceManager;
+import net.pickapack.dateTime.DateHelper;
 import net.pickapack.chart.LinePlot;
-import net.pickapack.chart.LinePlotFrame;
-import net.pickapack.chart.SubLinePlot;
-import net.pickapack.chart.SubLinePlotLine;
-import org.jfree.ui.RefineryUtilities;
 
 import java.net.MalformedURLException;
 import java.sql.SQLException;
 import java.util.Date;
-import java.util.List;
 
+//TODO
 public class ExperimentLinePlotHelper {
-    public static void addExperimentSubLinePlot(final ArchimulatorService archimulatorService, LinePlot linePlot, String titleY, final String key) throws SQLException {
-        addExperimentSubLinePlot(archimulatorService, linePlot, titleY, key, new Predicate<ExperimentProfile>() {
-            @Override
-            public boolean apply(ExperimentProfile experimentProfile) {
-                return true;
-            }
-        });
-    }
+//    public static void addExperimentSubLinePlot(final ExperimentService archimulatorService, LinePlot linePlot, String titleY, final String key) throws SQLException {
+//        addExperimentSubLinePlot(archimulatorService, linePlot, titleY, key, new Predicate<ExperimentProfile>() {
+//            @Override
+//            public boolean apply(ExperimentProfile experimentProfile) {
+//                return true;
+//            }
+//        });
+//    }
 
-    public static void addExperimentSubLinePlot(final ArchimulatorService archimulatorService, LinePlot linePlot, String titleY, final String key, Predicate<ExperimentProfile> experimentProfilePred) throws SQLException {
-        SubLinePlot subLinePlot = new SubLinePlot(titleY);
-
-        List<ExperimentProfile> experimentProfiles = archimulatorService.getExperimentProfilesAsList();
-        for (final ExperimentProfile experimentProfile : experimentProfiles) {
-            if (experimentProfilePred.apply(experimentProfile)) {
-                subLinePlot.getLines().add(new SubLinePlotLine("Exp #" + experimentProfile.getId(), new Function<Double>() {
-                    @Override
-                    public Double apply() {
-                        try {
-                            String value = archimulatorService.getExperimentStatById(experimentProfile.getId(), key);
-                            if (value != null) {
-                                value = value.replaceAll(",", "");
-                                return (double) (int) (Double.valueOf(value).doubleValue());
-                            }
-                            return 0.0;
-                        } catch (SQLException e) {
-                            recordException(e);
-                            return 0.0;
-                        }
-                    }
-                }));
-            }
-        }
-        linePlot.getSubLinePlots().add(subLinePlot);
-    }
+//    public static void addExperimentSubLinePlot(final ExperimentService archimulatorService, LinePlot linePlot, String titleY, final String key, Predicate<ExperimentProfile> experimentProfilePred) throws SQLException {
+//        SubLinePlot subLinePlot = new SubLinePlot(titleY);
+//
+//        List<ExperimentProfile> experimentProfiles = archimulatorService.getExperimentProfilesAsList();
+//        for (final ExperimentProfile experimentProfile : experimentProfiles) {
+//            if (experimentProfilePred.apply(experimentProfile)) {
+//                subLinePlot.getLines().add(new SubLinePlotLine("Exp #" + experimentProfile.getId(), new Function<Double>() {
+//                    @Override
+//                    public Double apply() {
+//                        try {
+//                            String value = archimulatorService.getExperimentStatByExperimentId(experimentProfile.getId(), key);
+//                            if (value != null) {
+//                                value = value.replaceAll(",", "");
+//                                return (double) (int) (Double.valueOf(value).doubleValue());
+//                            }
+//                            return 0.0;
+//                        } catch (SQLException e) {
+//                            recordException(e);
+//                            return 0.0;
+//                        }
+//                    }
+//                }));
+//            }
+//        }
+//        linePlot.getSubLinePlots().add(subLinePlot);
+//    }
 
     private static void recordException(Exception e) {
         System.out.print(String.format("[%s Exception] %s\r\n", DateHelper.toString(new Date()), e));
@@ -80,31 +71,26 @@ public class ExperimentLinePlotHelper {
     }
 
     public static void main(String[] args) throws MalformedURLException, SQLException {
-        HessianProxyFactory factory = new HessianProxyFactory();
-        factory.setReadTimeout(30000);
-        factory.setConnectTimeout(20000);
-        factory.setOverloadEnabled(true);
-
-        ArchimulatorService archimulatorService = (ArchimulatorService) factory.create(ArchimulatorService.class, ManagementStartup.SERVICE_URL);
+        ExperimentService experimentService = ServiceManager.getExperimentService();
 
         LinePlot linePlot = new LinePlot("Experiment Stats - Archimulator");
 
-        addExperimentSubLinePlot(archimulatorService, linePlot, "Insts per Second", "checkpointedSimulation/phase1.instsPerSecond", new Predicate<ExperimentProfile>() {
-            @Override
-            public boolean apply(ExperimentProfile experimentProfile) {
-                return experimentProfile.getState() == ExperimentProfileState.STOPPED;
-            }
-        });
-        addExperimentSubLinePlot(archimulatorService, linePlot, "Cycles per Second", "checkpointedSimulation/phase1.cyclesPerSecond", new Predicate<ExperimentProfile>() {
-            @Override
-            public boolean apply(ExperimentProfile experimentProfile) {
-                return experimentProfile.getState() == ExperimentProfileState.STOPPED;
-            }
-        });
-
-        LinePlotFrame linePlotFrame = new LinePlotFrame(linePlot, 500, 470);
-        linePlotFrame.pack();
-        RefineryUtilities.centerFrameOnScreen(linePlotFrame);
-        linePlotFrame.setVisible(true);
+//        addExperimentSubLinePlot(experimentService, linePlot, "Insts per Second", "checkpointedSimulation/phase1.instsPerSecond", new Predicate<ExperimentProfile>() {
+//            @Override
+//            public boolean apply(ExperimentProfile experimentProfile) {
+//                return experimentProfile.getState() == ExperimentProfileState.STOPPED;
+//            }
+//        });
+//        addExperimentSubLinePlot(experimentService, linePlot, "Cycles per Second", "checkpointedSimulation/phase1.cyclesPerSecond", new Predicate<ExperimentProfile>() {
+//            @Override
+//            public boolean apply(ExperimentProfile experimentProfile) {
+//                return experimentProfile.getState() == ExperimentProfileState.STOPPED;
+//            }
+//        });
+//
+//        LinePlotFrame linePlotFrame = new LinePlotFrame(linePlot, 500, 470);
+//        linePlotFrame.pack();
+//        RefineryUtilities.centerFrameOnScreen(linePlotFrame);
+//        linePlotFrame.setVisible(true);
     }
 }

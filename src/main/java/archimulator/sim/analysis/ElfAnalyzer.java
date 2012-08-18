@@ -18,12 +18,12 @@
  ******************************************************************************/
 package archimulator.sim.analysis;
 
-import archimulator.sim.isa.BasicMipsInstructionExecutor;
+import archimulator.sim.isa.StaticInstruction;
 import archimulator.sim.isa.StaticInstructionType;
 import archimulator.sim.os.elf.ElfFile;
 import archimulator.sim.os.elf.Symbol;
-import net.pickapack.DateHelper;
-import net.pickapack.StringHelper;
+import net.pickapack.dateTime.DateHelper;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -210,7 +210,7 @@ public class ElfAnalyzer {
                     preds.add("bb" + incomingEdge.getFrom().getNum());
                 }
 
-                bw.println(StringHelper.join(preds, ", "));
+                bw.println(StringUtils.join(preds, ", "));
 
                 for (Instruction instruction : basicBlock.getInstructions()) {
                     bw.println("\t\t" + instruction + (instruction.isLeader() ? " <leader:" + instruction.getLeaderType() + ">" : ""));
@@ -229,7 +229,7 @@ public class ElfAnalyzer {
     }
 
     private Instruction getTargetInstruction(Function function, Instruction instruction) {
-        int targetPc = BasicMipsInstructionExecutor.getTargetPcForControl(instruction.getPc() + 4, instruction.getStaticInstruction().getMachInst(), instruction.getStaticInstruction().getMnemonic());
+        int targetPc = StaticInstruction.getTargetPcForControl(instruction.getPc() + 4, instruction.getStaticInstruction().getMachInst(), instruction.getStaticInstruction().getMnemonic());
         return this.insts.get(function.getSectionName()).get(targetPc);
     }
 

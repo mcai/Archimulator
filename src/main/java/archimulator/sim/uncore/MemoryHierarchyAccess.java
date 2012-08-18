@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore;
 
-import archimulator.sim.base.simulation.Simulation;
+import archimulator.sim.common.Simulation;
 import archimulator.sim.core.DynamicInstruction;
 import net.pickapack.action.Action;
 

@@ -18,9 +18,9 @@
  ******************************************************************************/
 package archimulator.sim.os;
 
-import archimulator.sim.base.simulation.BasicSimulationObject;
-import archimulator.sim.base.simulation.ContextConfig;
-import archimulator.sim.base.simulation.SimulationObject;
+import archimulator.model.ContextMapping;
+import archimulator.sim.common.BasicSimulationObject;
+import archimulator.sim.common.SimulationObject;
 import archimulator.sim.core.Processor;
 import archimulator.sim.core.Thread;
 import archimulator.sim.isa.ArchitecturalRegisterFile;
@@ -56,15 +56,14 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
 
     private Stack<FunctionCallContext> functionCallContextStack;
 
-    private boolean pseudocallEncounteredInLastInstructionExecution;
+    private boolean pseudoCallEncounteredInLastInstructionExecution;
 
     private boolean speculative;
 
     private ArchitecturalRegisterFile speculativeRegs;
 
-    public static Context load(Kernel kernel, String simulationDirectory, ContextConfig contextConfig) {
-        Process process = new BasicProcess(kernel, simulationDirectory, contextConfig);
-//        Process process = new NativeEmulatorEnhancedProcess(kernel, simulationDirectory, contextConfig);
+    public static Context load(Kernel kernel, String simulationDirectory, ContextMapping contextMapping) {
+        Process process = new BasicProcess(kernel, simulationDirectory, contextMapping);
 
         ArchitecturalRegisterFile regs = new ArchitecturalRegisterFile(process.isLittleEndian());
         regs.setNpc(process.getProgramEntry());
@@ -90,10 +89,10 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
 
         this.id = kernel.currentContextId++;
 
-        this.uid = (int) NativeSyscalls.LIBC.getuid();
-        this.euid = (int) NativeSyscalls.LIBC.geteuid();
-        this.gid = (int) NativeSyscalls.LIBC.getgid();
-        this.egid = (int) NativeSyscalls.LIBC.getegid();
+        this.uid = (int) NativeSystemCalls.LIBC.getuid();
+        this.euid = (int) NativeSystemCalls.LIBC.geteuid();
+        this.gid = (int) NativeSystemCalls.LIBC.getgid();
+        this.egid = (int) NativeSystemCalls.LIBC.getegid();
 
         this.pid = kernel.currentPid++;
 
@@ -128,7 +127,7 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
         this.getRegs().setNnpc(this.getRegs().getNnpc() + 4);
         this.getRegs().setGpr(ArchitecturalRegisterFile.REG_ZERO, 0);
 
-        this.pseudocallEncounteredInLastInstructionExecution = false;
+        this.pseudoCallEncounteredInLastInstructionExecution = false;
 
         return this.decode(this.getRegs().getPc());
     }
@@ -258,11 +257,11 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
         return true;
     }
 
-    public boolean isPseudocallEncounteredInLastInstructionExecution() {
-        return pseudocallEncounteredInLastInstructionExecution;
+    public boolean isPseudoCallEncounteredInLastInstructionExecution() {
+        return pseudoCallEncounteredInLastInstructionExecution;
     }
 
-    public void setPseudocallEncounteredInLastInstructionExecution(boolean pseudocallEncounteredInLastInstructionExecution) {
-        this.pseudocallEncounteredInLastInstructionExecution = pseudocallEncounteredInLastInstructionExecution;
+    public void setPseudoCallEncounteredInLastInstructionExecution(boolean pseudoCallEncounteredInLastInstructionExecution) {
+        this.pseudoCallEncounteredInLastInstructionExecution = pseudoCallEncounteredInLastInstructionExecution;
     }
 }

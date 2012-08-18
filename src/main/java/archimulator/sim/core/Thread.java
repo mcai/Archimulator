@@ -19,8 +19,11 @@
 package archimulator.sim.core;
 
 import archimulator.sim.core.bpred.BranchPredictor;
+import archimulator.sim.isa.Mnemonic;
 import archimulator.sim.os.Context;
 import archimulator.sim.uncore.MemoryHierarchyThread;
+
+import java.util.List;
 
 public interface Thread extends MemoryHierarchyThread {
     void fastForwardOneCycle();
@@ -96,4 +99,8 @@ public interface Thread extends MemoryHierarchyThread {
     long getSelectionStallOnCanNotStore();
 
     long getSelectionStallOnNoFreeFunctionalUnit();
+
+    List<Mnemonic> getExecutedMnemonics();
+
+    List<String> getExecutedSystemCalls();
 }

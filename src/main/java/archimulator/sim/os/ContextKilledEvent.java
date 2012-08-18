@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.os;
 
-import archimulator.sim.base.event.SimulationEvent;
+import archimulator.sim.common.SimulationEvent;
 
 public class ContextKilledEvent extends SimulationEvent {
     private Context context;

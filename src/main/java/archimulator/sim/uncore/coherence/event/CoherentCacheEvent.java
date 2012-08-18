@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore.coherence.event;
 
-import archimulator.sim.base.event.SimulationEvent;
+import archimulator.sim.common.SimulationEvent;
 import archimulator.sim.uncore.coherence.msi.controller.GeneralCacheController;
 
 public abstract class CoherentCacheEvent extends SimulationEvent {

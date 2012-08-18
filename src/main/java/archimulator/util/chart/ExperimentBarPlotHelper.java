@@ -18,29 +18,18 @@
  ******************************************************************************/
 package archimulator.util.chart;
 
-import archimulator.client.ManagementStartup;
-import archimulator.service.ArchimulatorService;
-import archimulator.sim.base.experiment.profile.ExperimentProfile;
-import archimulator.sim.base.experiment.profile.ExperimentProfileState;
-import archimulator.sim.base.simulation.SimulatedProgram;
-import com.caucho.hessian.client.HessianProxyFactory;
-import net.pickapack.DateHelper;
-import net.pickapack.StorageUnit;
-import net.pickapack.action.Function1;
-import net.pickapack.action.Predicate;
-import net.pickapack.chart.BarPlot;
-import net.pickapack.chart.BarPlotFrame;
-import net.pickapack.chart.SubBarPlot;
-import org.jfree.ui.RefineryUtilities;
+import archimulator.service.ExperimentService;
+import archimulator.service.ServiceManager;
+import net.pickapack.dateTime.DateHelper;
 
 import java.net.MalformedURLException;
 import java.sql.SQLException;
 import java.util.Date;
 
 public class ExperimentBarPlotHelper {
-    private static Double getExperimentProfileStat(ExperimentProfile experimentProfile, ArchimulatorService archimulatorService, String key) {
+    private static Double getExperimentProfileStat(ExperimentService experimentService, String key, long experimentId) {
         try {
-            String value = archimulatorService.getExperimentStatById(experimentProfile.getId(), key);
+            String value = experimentService.getExperimentById(experimentId).getStats().get(key);
             if (value != null) {
                 value = value.replaceAll(",", "");
                 return (double) (int) (Double.valueOf(value).doubleValue());
@@ -57,70 +46,65 @@ public class ExperimentBarPlotHelper {
         e.printStackTrace();
     }
 
-    private static BarPlot<ExperimentProfile> createHTLLCRequestDistributionBarPlot(final ArchimulatorService archimulatorService) throws SQLException {
-        BarPlot<ExperimentProfile> barPlot = new BarPlot<ExperimentProfile>("HT LLC Request Distribution", "# HT LLC Requests", new Predicate<ExperimentProfile>() {
-            @Override
-            public boolean apply(ExperimentProfile experimentProfile) {
-                return experimentProfile.getState() == ExperimentProfileState.STOPPED && experimentProfile.getTitle().contains("_LRU") && experimentProfile.getTitle().contains("mst_ht");
-            }
-        }, archimulatorService.getExperimentProfilesAsList());
-
-        Function1<ExperimentProfile, String> getTitleCallback = new Function1<ExperimentProfile, String>() {
-            @Override
-            public String apply(ExperimentProfile experimentProfile) {
-//                return "Exp #" + experimentProfile.getId();
-                SimulatedProgram simulatedProgram = experimentProfile.getContextConfigs().get(0).getSimulatedProgram();
-                return simulatedProgram.getHtLookahead() + ", " + simulatedProgram.getHtStride() + ", " + StorageUnit.toString(experimentProfile.getProcessorProfile().getL2Size()) + ", " + experimentProfile.getProcessorProfile().getL2Associativity();
-            }
-        };
-
-        barPlot.getSubBarPlots().add(new SubBarPlot<ExperimentProfile>("Total HT LLC Request", new Function1<ExperimentProfile, Double>() {
-            @Override
-            public Double apply(ExperimentProfile experimentProfile) {
-                return getExperimentProfileStat(experimentProfile, archimulatorService, "checkpointedSimulation/phase1.llcHTRequestProfilingCapability.llc.numTotalHtRequests");
-            }
-        }, getTitleCallback));
-
-        barPlot.getSubBarPlots().add(new SubBarPlot<ExperimentProfile>("Good HT LLC Request", new Function1<ExperimentProfile, Double>() {
-            @Override
-            public Double apply(ExperimentProfile experimentProfile) {
-                return getExperimentProfileStat(experimentProfile, archimulatorService, "checkpointedSimulation/phase1.llcHTRequestProfilingCapability.llc.numGoodHtRequests");
-            }
-        }, getTitleCallback));
-        barPlot.getSubBarPlots().add(new SubBarPlot<ExperimentProfile>("Bad HT LLC Request", new Function1<ExperimentProfile, Double>() {
-            @Override
-            public Double apply(ExperimentProfile experimentProfile) {
-                return getExperimentProfileStat(experimentProfile, archimulatorService, "checkpointedSimulation/phase1.llcHTRequestProfilingCapability.llc.numBadHtRequests");
-            }
-        }, getTitleCallback));
-        barPlot.getSubBarPlots().add(new SubBarPlot<ExperimentProfile>("Ugly HT LLC Request", new Function1<ExperimentProfile, Double>() {
-            @Override
-            public Double apply(ExperimentProfile experimentProfile) {
-                return getExperimentProfileStat(experimentProfile, archimulatorService, "checkpointedSimulation/phase1.llcHTRequestProfilingCapability.llc.numUglyHtRequests");
-            }
-        }, getTitleCallback));
-        barPlot.getSubBarPlots().add(new SubBarPlot<ExperimentProfile>("Late HT LLC Request", new Function1<ExperimentProfile, Double>() {
-            @Override
-            public Double apply(ExperimentProfile experimentProfile) {
-                return getExperimentProfileStat(experimentProfile, archimulatorService, "checkpointedSimulation/phase1.llcHTRequestProfilingCapability.llc.numLateHtRequests");
-            }
-        }, getTitleCallback));
-        return barPlot;
-    }
+    //TODO
+//    private static BarPlot<ExperimentProfile> createHTLLCRequestDistributionBarPlot(final ExperimentService archimulatorService) throws SQLException {
+//        BarPlot<ExperimentProfile> barPlot = new BarPlot<>("HT LLC Request Distribution", "# HT LLC Requests", new Predicate<ExperimentProfile>() {
+//            @Override
+//            public boolean apply(ExperimentProfile experimentProfile) {
+//                return experimentProfile.getState() == ExperimentProfileState.STOPPED && experimentProfile.getTitle().contains("_LRU") && experimentProfile.getTitle().contains("mst_ht");
+//            }
+//        }, archimulatorService.getExperimentProfilesAsList());
+//
+//        Function1<ExperimentProfile, String> getTitleCallback = new Function1<ExperimentProfile, String>() {
+//            @Override
+//            public String apply(ExperimentProfile experimentProfile) {
+//                SimulatedProgram simulatedProgram = experimentProfile.getContextMappings().get(0).getSimulatedProgram();
+//                return simulatedProgram.getHtLookahead() + ", " + simulatedProgram.getHtStride() + ", " + StorageUnit.toString(PropertiesEnhancedBlockingEventDispatcher.getL2Size()) + ", " + PropertiesEnhancedBlockingEventDispatcher.getL2Assoc();
+//            }
+//        };
+//
+//        barPlot.getSubBarPlots().add(new SubBarPlot<>("Total HT LLC Request", new Function1<ExperimentProfile, Double>() {
+//            @Override
+//            public Double apply(ExperimentProfile experimentProfile) {
+//                return getExperimentProfileStat(experimentProfile, archimulatorService, "checkpointedSimulation/phase1.llcHTRequestProfilingCapability.llc.numTotalHtRequests");
+//            }
+//        }, getTitleCallback));
+//
+//        barPlot.getSubBarPlots().add(new SubBarPlot<>("Good HT LLC Request", new Function1<ExperimentProfile, Double>() {
+//            @Override
+//            public Double apply(ExperimentProfile experimentProfile) {
+//                return getExperimentProfileStat(experimentProfile, archimulatorService, "checkpointedSimulation/phase1.llcHTRequestProfilingCapability.llc.numGoodHtRequests");
+//            }
+//        }, getTitleCallback));
+//        barPlot.getSubBarPlots().add(new SubBarPlot<>("Bad HT LLC Request", new Function1<ExperimentProfile, Double>() {
+//            @Override
+//            public Double apply(ExperimentProfile experimentProfile) {
+//                return getExperimentProfileStat(experimentProfile, archimulatorService, "checkpointedSimulation/phase1.llcHTRequestProfilingCapability.llc.numBadHtRequests");
+//            }
+//        }, getTitleCallback));
+//        barPlot.getSubBarPlots().add(new SubBarPlot<>("Ugly HT LLC Request", new Function1<ExperimentProfile, Double>() {
+//            @Override
+//            public Double apply(ExperimentProfile experimentProfile) {
+//                return getExperimentProfileStat(experimentProfile, archimulatorService, "checkpointedSimulation/phase1.llcHTRequestProfilingCapability.llc.numUglyHtRequests");
+//            }
+//        }, getTitleCallback));
+//        barPlot.getSubBarPlots().add(new SubBarPlot<>("Late HT LLC Request", new Function1<ExperimentProfile, Double>() {
+//            @Override
+//            public Double apply(ExperimentProfile experimentProfile) {
+//                return getExperimentProfileStat(experimentProfile, archimulatorService, "checkpointedSimulation/phase1.llcHTRequestProfilingCapability.llc.numLateHtRequests");
+//            }
+//        }, getTitleCallback));
+//        return barPlot;
+//    }
 
     public static void main(String[] args) throws MalformedURLException, SQLException {
-        HessianProxyFactory factory = new HessianProxyFactory();
-        factory.setReadTimeout(30000);
-        factory.setConnectTimeout(20000);
-        factory.setOverloadEnabled(true);
+        ExperimentService experimentService = ServiceManager.getExperimentService();
 
-        ArchimulatorService archimulatorService = (ArchimulatorService) factory.create(ArchimulatorService.class, ManagementStartup.SERVICE_URL);
-
-        BarPlot<ExperimentProfile> barPlot = createHTLLCRequestDistributionBarPlot(archimulatorService);
-
-        BarPlotFrame<ExperimentProfile> barPlotFrame = new BarPlotFrame<ExperimentProfile>(barPlot, "Experiment", 500, 470);
-        barPlotFrame.pack();
-        RefineryUtilities.centerFrameOnScreen(barPlotFrame);
-        barPlotFrame.setVisible(true);
+        //TODO
+//        BarPlot<ExperimentProfile> barPlot = createHTLLCRequestDistributionBarPlot(experimentService);
+//        BarPlotFrame<ExperimentProfile> barPlotFrame = new BarPlotFrame<ExperimentProfile>(barPlot, "Experiment", 500, 470);
+//        barPlotFrame.pack();
+//        RefineryUtilities.centerFrameOnScreen(barPlotFrame);
+//        barPlotFrame.setVisible(true);
     }
 }

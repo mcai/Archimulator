@@ -18,11 +18,12 @@
  ******************************************************************************/
 package archimulator.sim.core;
 
-import archimulator.sim.base.event.ResetStatEvent;
+import archimulator.model.ContextMapping;
 import archimulator.sim.core.bpred.BranchPredictorUpdate;
 import archimulator.sim.core.bpred.DynamicBranchPredictor;
 import archimulator.sim.core.event.InstructionCommittedEvent;
 import archimulator.sim.core.event.InstructionDecodedEvent;
+import archimulator.sim.isa.PseudoCallEncounteredEvent;
 import archimulator.sim.isa.RegisterDependencyType;
 import archimulator.sim.isa.StaticInstruction;
 import archimulator.sim.isa.StaticInstructionType;
@@ -33,11 +34,11 @@ import net.pickapack.Reference;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
 
-import java.lang.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class BasicThread extends AbstractBasicThread {
-    private int commitWidth;
     private int lineSizeOfIcache;
 
     private int fetchNpc;
@@ -56,15 +57,47 @@ public class BasicThread extends AbstractBasicThread {
     public BasicThread(Core core, int num) {
         super(core, num);
 
-        this.commitWidth = this.core.getProcessor().getConfig().getCommitWidth();
+        this.lineSizeOfIcache = this.core.getL1ICacheController().getCache().getGeometry().getLineSize();
 
-        this.lineSizeOfIcache = this.core.getL1ICacheController().getConfig().getGeometry().getLineSize();
+        final Reference<Integer> savedRegisterValue = new Reference<Integer>(-1);
 
-        this.getBlockingEventDispatcher().addListener(ResetStatEvent.class, new Action1<ResetStatEvent>() {
-            public void apply(ResetStatEvent event) {
-                BasicThread.this.noInstructionCommittedCounterThreshold = 0;
+        this.getBlockingEventDispatcher().addListener(PseudoCallEncounteredEvent.class, new Action1<PseudoCallEncounteredEvent>() {
+            public void apply(PseudoCallEncounteredEvent event) {
+                if (event.getContext() == getContext()) {
+                    ContextMapping contextMapping = event.getContext().getProcess().getContextMapping();
+
+                    if (contextMapping.getSimulatedProgram().isHt()) {
+                        if (event.getImm() == 3820) {
+                            savedRegisterValue.set(event.getContext().getRegs().getGpr(event.getRs()));
+                            event.getContext().getRegs().setGpr(event.getRs(), getHtLookahead(contextMapping));
+                        } else if (event.getImm() == 3821) {
+                            event.getContext().getRegs().setGpr(event.getRs(), savedRegisterValue.get());
+                        } else if (event.getImm() == 3822) {
+                            savedRegisterValue.set(event.getContext().getRegs().getGpr(event.getRs()));
+                            event.getContext().getRegs().setGpr(event.getRs(), getHtStride(contextMapping));
+                        } else if (event.getImm() == 3823) {
+                            event.getContext().getRegs().setGpr(event.getRs(), savedRegisterValue.get());
+                        }
+                    }
+                }
             }
         });
+    }
+
+    protected int getHtLookahead(ContextMapping contextMapping) {
+        if (contextMapping.getSimulatedProgram().isHt()) {
+            return contextMapping.isDynamicHtParams() ? 20 : contextMapping.getHtLookahead();
+        }
+
+        throw new IllegalArgumentException();
+    }
+
+    protected int getHtStride(ContextMapping contextMapping) {
+        if (contextMapping.getSimulatedProgram().isHt()) {
+            return contextMapping.isDynamicHtParams() ? 10 : contextMapping.getHtStride();
+        }
+
+        throw new IllegalArgumentException();
     }
 
     public void fastForwardOneCycle() {
@@ -74,12 +107,12 @@ public class BasicThread extends AbstractBasicThread {
                 staticInst = this.context.decodeNextInstruction();
                 StaticInstruction.execute(staticInst, this.context);
 
-                if (!this.context.isPseudocallEncounteredInLastInstructionExecution() && staticInst.getMnemonic().getType() != StaticInstructionType.NOP) {
+                if (!this.context.isPseudoCallEncounteredInLastInstructionExecution() && staticInst.getMnemonic().getType() != StaticInstructionType.NOP) {
                     this.totalInsts++;
                 }
 
             }
-            while (this.context != null && this.context.getState() == ContextState.RUNNING && (this.context.isPseudocallEncounteredInLastInstructionExecution() || staticInst.getMnemonic().getType() == StaticInstructionType.NOP));
+            while (this.context != null && this.context.getState() == ContextState.RUNNING && (this.context.isPseudoCallEncounteredInLastInstructionExecution() || staticInst.getMnemonic().getType() == StaticInstructionType.NOP));
         }
     }
 
@@ -92,11 +125,11 @@ public class BasicThread extends AbstractBasicThread {
                     this.nextInstructionInCacheWarmupPhase = new DynamicInstruction(this, this.context.getRegs().getPc(), staticInst);
                     StaticInstruction.execute(staticInst, this.context);
 
-                    if (!this.context.isPseudocallEncounteredInLastInstructionExecution() && staticInst.getMnemonic().getType() != StaticInstructionType.NOP) {
+                    if (!this.context.isPseudoCallEncounteredInLastInstructionExecution() && staticInst.getMnemonic().getType() != StaticInstructionType.NOP) {
                         this.totalInsts++;
                     }
                 }
-                while (this.context != null && this.context.getState() == ContextState.RUNNING && !this.fetchStalled && (this.context.isPseudocallEncounteredInLastInstructionExecution() || staticInst.getMnemonic().getType() == StaticInstructionType.NOP));
+                while (this.context != null && this.context.getState() == ContextState.RUNNING && !this.fetchStalled && (this.context.isPseudoCallEncounteredInLastInstructionExecution() || staticInst.getMnemonic().getType() == StaticInstructionType.NOP));
             }
 
             int pc = this.nextInstructionInCacheWarmupPhase.getPc();
@@ -213,12 +246,12 @@ public class BasicThread extends AbstractBasicThread {
                 dynamicInst = new DynamicInstruction(this, this.context.getRegs().getPc(), staticInst);
                 StaticInstruction.execute(staticInst, this.context);
 
-                if (this.context.isPseudocallEncounteredInLastInstructionExecution() || dynamicInst.getStaticInst().getMnemonic().getType() == StaticInstructionType.NOP) {
+                if (this.context.isPseudoCallEncounteredInLastInstructionExecution() || dynamicInst.getStaticInst().getMnemonic().getType() == StaticInstructionType.NOP) {
                     this.updateFetchNpcAndNnpcFromRegs();
                 }
 
             }
-            while (this.context.isPseudocallEncounteredInLastInstructionExecution() || dynamicInst.getStaticInst().getMnemonic().getType() == StaticInstructionType.NOP);
+            while (this.context.isPseudoCallEncounteredInLastInstructionExecution() || dynamicInst.getStaticInst().getMnemonic().getType() == StaticInstructionType.NOP);
 
             this.fetchNpc = this.fetchNnpc;
 
@@ -404,7 +437,7 @@ public class BasicThread extends AbstractBasicThread {
 
         int numCommitted = 0;
 
-        while (!this.reorderBuffer.isEmpty() && numCommitted < this.commitWidth) {
+        while (!this.reorderBuffer.isEmpty() && numCommitted < getExperiment().getArchitecture().getCommitWidth()) {
             ReorderBufferEntry reorderBufferEntry = this.reorderBuffer.getEntries().get(0);
 
             if (!reorderBufferEntry.isCompleted()) {

@@ -18,19 +18,23 @@
  ******************************************************************************/
 package archimulator.sim.isa;
 
-import archimulator.sim.base.event.SimulationEvent;
+import archimulator.sim.common.SimulationEvent;
 import archimulator.sim.os.Context;
 
 public class InstructionFunctionallyExecutedEvent extends SimulationEvent {
+    private Context context;
     private int pc;
     private StaticInstruction staticInst;
-    private Context context;
 
-    public InstructionFunctionallyExecutedEvent(int pc, StaticInstruction staticInst, Context context) {
+    public InstructionFunctionallyExecutedEvent(Context context, int pc, StaticInstruction staticInst) {
         super(context);
         this.pc = pc;
         this.staticInst = staticInst;
         this.context = context;
+    }
+
+    public Context getContext() {
+        return context;
     }
 
     public int getPc() {
@@ -39,9 +43,5 @@ public class InstructionFunctionallyExecutedEvent extends SimulationEvent {
 
     public StaticInstruction getStaticInst() {
         return staticInst;
-    }
-
-    public Context getContext() {
-        return context;
     }
 }

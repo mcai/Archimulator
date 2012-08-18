@@ -18,13 +18,13 @@
  ******************************************************************************/
 package archimulator.sim.os;
 
+import archimulator.service.ServiceManager;
 import archimulator.sim.analysis.ElfAnalyzer;
 import archimulator.sim.analysis.Instruction;
-import archimulator.sim.base.experiment.profile.ExperimentProfile;
-import archimulator.sim.base.simulation.ContextConfig;
+import archimulator.model.ContextMapping;
 import archimulator.sim.isa.StaticInstruction;
 import archimulator.sim.isa.dissembler.MipsDissembler;
-import archimulator.sim.isa.memory.Memory;
+import archimulator.sim.isa.Memory;
 import archimulator.sim.os.elf.ElfFile;
 import archimulator.sim.os.elf.ElfSectionHeader;
 
@@ -38,18 +38,18 @@ public class BasicProcess extends Process {
     private Map<String, SortedMap<Integer, Instruction>> instructions;
     private ElfAnalyzer elfAnalyzer;
 
-    public BasicProcess(Kernel kernel, String simulationDirectory, ContextConfig contextConfig) {
-        super(kernel, simulationDirectory, contextConfig);
+    public BasicProcess(Kernel kernel, String simulationDirectory, ContextMapping contextMapping) {
+        super(kernel, simulationDirectory, contextMapping);
     }
 
     @Override
-    protected void loadProgram(Kernel kernel, String simulationDirectory, ContextConfig contextConfig) {
+    protected void loadProgram(Kernel kernel, String simulationDirectory, ContextMapping contextMapping) {
         this.pcsToMachInsts = new TreeMap<Integer, Integer>();
         this.machInstsToStaticInsts = new TreeMap<Integer, StaticInstruction>();
 
         this.instructions = new HashMap<String, SortedMap<Integer, Instruction>>();
 
-        List<String> cmdArgList = Arrays.asList((contextConfig.getSimulatedProgram().getCwd() + File.separator + contextConfig.getSimulatedProgram().getExe() + " " + contextConfig.getSimulatedProgram().getArgs()).replaceAll(ExperimentProfile.USER_HOME_TEMPLATE_ARG, System.getProperty("user.home")).split(" "));
+        List<String> cmdArgList = Arrays.asList((contextMapping.getSimulatedProgram().getCwd() + File.separator + contextMapping.getSimulatedProgram().getExe() + " " + contextMapping.getSimulatedProgram().getArgs()).replaceAll(ServiceManager.USER_HOME_TEMPLATE_ARG, System.getProperty("user.home")).split(" "));
 
         String elfFileName = cmdArgList.get(0);
 

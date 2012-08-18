@@ -17,22 +17,23 @@ package archimulator.sim.uncore.cache; /****************************************
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-import archimulator.sim.base.simulation.SimulationObject;
+import archimulator.sim.common.SimulationObject;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
-import archimulator.sim.uncore.cache.eviction.EvictionPolicy;
-import archimulator.sim.uncore.cache.eviction.EvictionPolicyFactory;
+import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicy;
+import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyFactory;
+import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
 import archimulator.util.ValueProvider;
 import archimulator.util.ValueProviderFactory;
 
 import java.io.Serializable;
 
 public class EvictableCache<StateT extends Serializable> extends Cache<StateT> {
-    protected EvictionPolicy<StateT> evictionPolicy;
+    protected CacheReplacementPolicy<StateT> replacementPolicy;
 
-    public EvictableCache(SimulationObject parent, String name, CacheGeometry geometry, Class<? extends EvictionPolicy> evictionPolicyClz, ValueProviderFactory<StateT, ValueProvider<StateT>> cacheLineStateProviderFactory) {
+    public EvictableCache(SimulationObject parent, String name, CacheGeometry geometry, CacheReplacementPolicyType replacementPolicyType, ValueProviderFactory<StateT, ValueProvider<StateT>> cacheLineStateProviderFactory) {
         super(parent, name, geometry, cacheLineStateProviderFactory);
 
-        this.evictionPolicy = EvictionPolicyFactory.createEvictionPolicy(evictionPolicyClz, this);
+        this.replacementPolicy = CacheReplacementPolicyFactory.createCacheReplacementPolicy(replacementPolicyType, this);
     }
 
     public CacheAccess<StateT> newAccess(MemoryHierarchyAccess access, int address) {
@@ -61,10 +62,10 @@ public class EvictableCache<StateT extends Serializable> extends Cache<StateT> {
             }
         }
 
-        return this.evictionPolicy.handleReplacement(access, set, tag);
+        return this.replacementPolicy.handleReplacement(access, set, tag);
     }
 
-    public EvictionPolicy<StateT> getEvictionPolicy() {
-        return evictionPolicy;
+    public CacheReplacementPolicy<StateT> getReplacementPolicy() {
+        return replacementPolicy;
     }
 }

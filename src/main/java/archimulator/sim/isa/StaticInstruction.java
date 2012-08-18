@@ -18,15 +18,17 @@
  ******************************************************************************/
 package archimulator.sim.isa;
 
-import archimulator.sim.base.event.PseudocallEncounteredEvent;
-import archimulator.sim.base.simulation.Logger;
+import archimulator.sim.common.Logger;
 import archimulator.sim.core.FunctionalUnitOperationType;
 import archimulator.sim.os.Context;
 import archimulator.sim.os.FunctionCallContext;
+import net.pickapack.Reference;
 import net.pickapack.math.MathHelper;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -223,13 +225,11 @@ public class StaticInstruction {
         registerInstruction(Mnemonic.SWC1);
         registerInstruction(Mnemonic.SWL);
         registerInstruction(Mnemonic.SWR);
-        registerInstruction(Mnemonic.SYSCALL);
+        registerInstruction(Mnemonic.SYSTEM_CALL);
         registerInstruction(Mnemonic.TRUNC_W);
         registerInstruction(Mnemonic.XOR);
         registerInstruction(Mnemonic.XORI);
     }
-
-    private static MipsInstructionExecutor executor = new BasicMipsInstructionExecutor();
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.ADD, fuOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags(StaticInstructionFlag.INTEGER_COMPUTATION)
@@ -237,7 +237,7 @@ public class StaticInstruction {
     @Ideps({Dep.RS, Dep.RT})
     @Odeps(Dep.RD)
     private static void add(Context context, int machInst) {
-        executor.add_impl(context, machInst);
+        context.getRegs().setGpr(BitField.RD.valueOf(machInst), context.getRegs().getGpr(BitField.RS.valueOf(machInst)) + context.getRegs().getGpr(BitField.RT.valueOf(machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.ADDI, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -246,7 +246,7 @@ public class StaticInstruction {
     @Ideps(Dep.RS)
     @Odeps(Dep.RT)
     private static void addi(Context context, int machInst) {
-        executor.addi_impl(context, machInst);
+        context.getRegs().setGpr(BitField.RT.valueOf(machInst), context.getRegs().getGpr(BitField.RS.valueOf(machInst)) + MathHelper.signExtend(BitField.INTIMM.valueOf(machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.ADDIU, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -256,10 +256,10 @@ public class StaticInstruction {
     @Odeps(Dep.RT)
     private static void addiu(Context context, int machInst) {
         if (BitField.RT.valueOf(machInst) == 0 && MathHelper.signExtend(BitField.INTIMM.valueOf(machInst)) != 0 && !context.isSpeculative()) {
-            context.setPseudocallEncounteredInLastInstructionExecution(true);
-            context.getBlockingEventDispatcher().dispatch(new PseudocallEncounteredEvent(context, BitField.RS.valueOf(machInst), MathHelper.signExtend(BitField.INTIMM.valueOf(machInst))));
+            context.setPseudoCallEncounteredInLastInstructionExecution(true);
+            context.getBlockingEventDispatcher().dispatch(new PseudoCallEncounteredEvent(context, BitField.RS.valueOf(machInst), MathHelper.signExtend(BitField.INTIMM.valueOf(machInst))));
         } else {
-            executor.addiu_impl(context, machInst);
+            context.getRegs().setGpr(BitField.RT.valueOf(machInst), context.getRegs().getGpr(BitField.RS.valueOf(machInst)) + MathHelper.signExtend(BitField.INTIMM.valueOf(machInst)));
         }
     }
 
@@ -269,7 +269,7 @@ public class StaticInstruction {
     @Ideps({Dep.RS, Dep.RT})
     @Odeps(Dep.RD)
     private static void addu(Context context, int machInst) {
-        executor.addu_impl(context, machInst);
+        context.getRegs().setGpr(BitField.RD.valueOf(machInst), context.getRegs().getGpr(BitField.RS.valueOf(machInst)) + context.getRegs().getGpr(BitField.RT.valueOf(machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.AND, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -278,7 +278,7 @@ public class StaticInstruction {
     @Ideps({Dep.RS, Dep.RT})
     @Odeps(Dep.RD)
     private static void and(Context context, int machInst) {
-        executor.and_impl(context, machInst);
+        context.getRegs().setGpr(BitField.RD.valueOf(machInst), context.getRegs().getGpr(BitField.RS.valueOf(machInst)) & context.getRegs().getGpr(BitField.RT.valueOf(machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.ANDI, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -287,7 +287,7 @@ public class StaticInstruction {
     @Ideps(Dep.RS)
     @Odeps(Dep.RT)
     private static void andi(Context context, int machInst) {
-        executor.andi_impl(context, machInst);
+        context.getRegs().setGpr(BitField.RT.valueOf(machInst), context.getRegs().getGpr(BitField.RS.valueOf(machInst)) & MathHelper.zeroExtend(BitField.INTIMM.valueOf(machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.DIV, fuOperationType = FunctionalUnitOperationType.INT_DIVIDE)
@@ -296,7 +296,11 @@ public class StaticInstruction {
     @Ideps({Dep.RS, Dep.RT})
     @Odeps({Dep.REG_HI, Dep.REG_LO})
     private static void div(Context context, int machInst) {
-        executor.div_impl(context, machInst);
+        int rs = context.getRegs().getGpr(BitField.RS.valueOf(machInst));
+        int rt = context.getRegs().getGpr(BitField.RT.valueOf(machInst));
+
+        context.getRegs().setHi(rt != 0 ? rs % rt : 0);
+        context.getRegs().setLo(rt != 0 ? rs / rt : 0);
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.DIVU, fuOperationType = FunctionalUnitOperationType.INT_DIVIDE)
@@ -305,7 +309,11 @@ public class StaticInstruction {
     @Ideps({Dep.RS, Dep.RT})
     @Odeps({Dep.REG_HI, Dep.REG_LO})
     private static void divu(Context context, int machInst) {
-        executor.divu_impl(context, machInst);
+        long rs = ((long) context.getRegs().getGpr(BitField.RS.valueOf(machInst))) << 32 >>> 32;
+        long rt = ((long) context.getRegs().getGpr(BitField.RT.valueOf(machInst))) << 32 >>> 32;
+
+        context.getRegs().setHi(rt != 0 ? (int) (((rs % rt) << 32) >> 32) : 0);
+        context.getRegs().setLo(rt != 0 ? (int) (((rs / rt) << 32) >> 32) : 0);
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.LUI, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -314,7 +322,7 @@ public class StaticInstruction {
     @Ideps({})
     @Odeps(Dep.RT)
     private static void lui(Context context, int machInst) {
-        executor.lui_impl(context, machInst);
+        context.getRegs().setGpr(BitField.RT.valueOf(machInst), BitField.INTIMM.valueOf(machInst) << 16);
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.MADD, fuOperationType = FunctionalUnitOperationType.INT_MULTIPLY)
@@ -323,7 +331,10 @@ public class StaticInstruction {
     @Ideps({Dep.RS, Dep.RT, Dep.REG_HI, Dep.REG_LO})
     @Odeps({Dep.REG_HI, Dep.REG_LO})
     private static void madd(Context context, int machInst) {
-        executor.madd_impl(context, machInst);
+        long temp = (long) context.getRegs().getHi() << 32 | (long) context.getRegs().getLo() + context.getRegs().getGpr(BitField.RS.valueOf(machInst)) * context.getRegs().getGpr(BitField.RT.valueOf(machInst));
+
+        context.getRegs().setHi((int) (temp >> 32));
+        context.getRegs().setLo((int) ((temp << 32) >> 32));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.MFHI, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -332,7 +343,7 @@ public class StaticInstruction {
     @Ideps(Dep.REG_HI)
     @Odeps(Dep.RD)
     private static void mfhi(Context context, int machInst) {
-        executor.mfhi_impl(context, machInst);
+        context.getRegs().setGpr(BitField.RD.valueOf(machInst), context.getRegs().getHi());
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.MFLO, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -341,7 +352,7 @@ public class StaticInstruction {
     @Ideps(Dep.REG_LO)
     @Odeps(Dep.RD)
     private static void mflo(Context context, int machInst) {
-        executor.mflo_impl(context, machInst);
+        context.getRegs().setGpr(BitField.RD.valueOf(machInst), context.getRegs().getLo());
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.MSUB, fuOperationType = FunctionalUnitOperationType.INT_MULTIPLY)
@@ -350,7 +361,10 @@ public class StaticInstruction {
     @Ideps({Dep.RS, Dep.RT, Dep.REG_HI, Dep.REG_LO})
     @Odeps({Dep.REG_HI, Dep.REG_LO})
     private static void msub(Context context, int machInst) {
-        executor.msub_impl(context, machInst);
+        long temp = (long) context.getRegs().getHi() << 32 | (long) context.getRegs().getLo() - context.getRegs().getGpr(BitField.RS.valueOf(machInst)) * context.getRegs().getGpr(BitField.RT.valueOf(machInst));
+
+        context.getRegs().setHi((int) (temp >> 32));
+        context.getRegs().setLo((int) ((temp << 32) >> 32));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.MTHI, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -359,7 +373,7 @@ public class StaticInstruction {
     @Ideps(Dep.RD)
     @Odeps(Dep.REG_HI)
     private static void mthi(Context context, int machInst) {
-        executor.mthi_impl(context, machInst);
+        context.getRegs().setHi(context.getRegs().getGpr(BitField.RD.valueOf(machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.MTLO, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -368,7 +382,7 @@ public class StaticInstruction {
     @Ideps(Dep.RD)
     @Odeps(Dep.REG_LO)
     private static void mtlo(Context context, int machInst) {
-        executor.mtlo_impl(context, machInst);
+        context.getRegs().setLo(context.getRegs().getGpr(BitField.RD.valueOf(machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.MULT, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -377,7 +391,10 @@ public class StaticInstruction {
     @Ideps({Dep.RS, Dep.RT})
     @Odeps({Dep.REG_LO, Dep.REG_HI})
     private static void mult(Context context, int machInst) {
-        executor.mult_impl(context, machInst);
+        long product = (long) (context.getRegs().getGpr(BitField.RS.valueOf(machInst))) * (long) (context.getRegs().getGpr(BitField.RT.valueOf(machInst)));
+
+        context.getRegs().setHi((int) (product >> 32));
+        context.getRegs().setLo((int) ((product << 32) >> 32));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.MULTU, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -386,7 +403,10 @@ public class StaticInstruction {
     @Ideps({Dep.RS, Dep.RT})
     @Odeps({Dep.REG_LO, Dep.REG_HI})
     private static void multu(Context context, int machInst) {
-        executor.multu_impl(context, machInst);
+        long product = (((long) context.getRegs().getGpr(BitField.RS.valueOf(machInst))) << 32 >>> 32) * (((long) context.getRegs().getGpr(BitField.RT.valueOf(machInst))) << 32 >>> 32);
+
+        context.getRegs().setHi((int) (product >> 32));
+        context.getRegs().setLo((int) ((product << 32) >> 32));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.NOR, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -395,7 +415,7 @@ public class StaticInstruction {
     @Ideps({Dep.RS, Dep.RT})
     @Odeps(Dep.RD)
     private static void nor(Context context, int machInst) {
-        executor.nor_impl(context, machInst);
+        context.getRegs().setGpr(BitField.RD.valueOf(machInst), ~(context.getRegs().getGpr(BitField.RS.valueOf(machInst)) | context.getRegs().getGpr(BitField.RT.valueOf(machInst))));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.OR, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -404,7 +424,7 @@ public class StaticInstruction {
     @Ideps({Dep.RS, Dep.RT})
     @Odeps(Dep.RD)
     private static void or(Context context, int machInst) {
-        executor.or_impl(context, machInst);
+        context.getRegs().setGpr(BitField.RD.valueOf(machInst), context.getRegs().getGpr(BitField.RS.valueOf(machInst)) | context.getRegs().getGpr(BitField.RT.valueOf(machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.ORI, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -413,7 +433,7 @@ public class StaticInstruction {
     @Ideps(Dep.RS)
     @Odeps(Dep.RT)
     private static void ori(Context context, int machInst) {
-        executor.ori_impl(context, machInst);
+        context.getRegs().setGpr(BitField.RT.valueOf(machInst), context.getRegs().getGpr(BitField.RS.valueOf(machInst)) | MathHelper.zeroExtend(BitField.INTIMM.valueOf(machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SLL, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -422,7 +442,7 @@ public class StaticInstruction {
     @Ideps(Dep.RT)
     @Odeps(Dep.RD)
     private static void sll(Context context, int machInst) {
-        executor.sll_impl(context, machInst);
+        context.getRegs().setGpr(BitField.RD.valueOf(machInst), context.getRegs().getGpr(BitField.RT.valueOf(machInst)) << BitField.SHIFT.valueOf(machInst));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SLLV, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -431,7 +451,7 @@ public class StaticInstruction {
     @Ideps({Dep.RS, Dep.RT})
     @Odeps(Dep.RD)
     private static void sllv(Context context, int machInst) {
-        executor.sllv_impl(context, machInst);
+        context.getRegs().setGpr(BitField.RD.valueOf(machInst), context.getRegs().getGpr(BitField.RT.valueOf(machInst)) << MathHelper.bits(context.getRegs().getGpr(BitField.RS.valueOf(machInst)), 4, 0));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SLT, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -440,7 +460,7 @@ public class StaticInstruction {
     @Ideps({Dep.RS, Dep.RT})
     @Odeps(Dep.RD)
     private static void slt(Context context, int machInst) {
-        executor.slt_impl(context, machInst);
+        context.getRegs().setGpr(BitField.RD.valueOf(machInst), (context.getRegs().getGpr(BitField.RS.valueOf(machInst)) < context.getRegs().getGpr(BitField.RT.valueOf(machInst))) ? 1 : 0);
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SLTI, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -449,7 +469,7 @@ public class StaticInstruction {
     @Ideps(Dep.RS)
     @Odeps(Dep.RT)
     private static void slti(Context context, int machInst) {
-        executor.slti_impl(context, machInst);
+        context.getRegs().setGpr(BitField.RT.valueOf(machInst), (context.getRegs().getGpr(BitField.RS.valueOf(machInst)) < MathHelper.signExtend(BitField.INTIMM.valueOf(machInst))) ? 1 : 0);
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SLTIU, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -458,7 +478,14 @@ public class StaticInstruction {
     @Ideps(Dep.RS)
     @Odeps(Dep.RT)
     private static void sltiu(Context context, int machInst) {
-        executor.sltiu_impl(context, machInst);
+        int rs = context.getRegs().getGpr(BitField.RS.valueOf(machInst));
+        int imm = MathHelper.signExtend(BitField.INTIMM.valueOf(machInst));
+
+        if (rs >= 0 && imm >= 0 || rs < 0 && imm < 0) {
+            context.getRegs().setGpr(BitField.RT.valueOf(machInst), (rs < imm) ? 1 : 0);
+        } else {
+            context.getRegs().setGpr(BitField.RT.valueOf(machInst), (rs >= 0) ? 1 : 0);
+        }
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SLTU, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -467,7 +494,14 @@ public class StaticInstruction {
     @Ideps({Dep.RS, Dep.RT})
     @Odeps(Dep.RD)
     private static void sltu(Context context, int machInst) {
-        executor.sltu_impl(context, machInst);
+        int rs = context.getRegs().getGpr(BitField.RS.valueOf(machInst));
+        int rt = context.getRegs().getGpr(BitField.RT.valueOf(machInst));
+
+        if (rs >= 0 && rt >= 0 || rs < 0 && rt < 0) {
+            context.getRegs().setGpr(BitField.RD.valueOf(machInst), (rs < rt) ? 1 : 0);
+        } else {
+            context.getRegs().setGpr(BitField.RD.valueOf(machInst), (rs >= 0) ? 1 : 0);
+        }
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SRA, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -476,7 +510,7 @@ public class StaticInstruction {
     @Ideps(Dep.RT)
     @Odeps(Dep.RD)
     private static void sra(Context context, int machInst) {
-        executor.sra_impl(context, machInst);
+        context.getRegs().setGpr(BitField.RD.valueOf(machInst), context.getRegs().getGpr(BitField.RT.valueOf(machInst)) >> BitField.SHIFT.valueOf(machInst));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SRAV, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -485,7 +519,7 @@ public class StaticInstruction {
     @Ideps({Dep.RS, Dep.RT})
     @Odeps(Dep.RD)
     private static void srav(Context context, int machInst) {
-        executor.srav_impl(context, machInst);
+        context.getRegs().setGpr(BitField.RD.valueOf(machInst), context.getRegs().getGpr(BitField.RT.valueOf(machInst)) >> MathHelper.bits(context.getRegs().getGpr(BitField.RS.valueOf(machInst)), 4, 0));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SRL, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -494,7 +528,7 @@ public class StaticInstruction {
     @Ideps(Dep.RT)
     @Odeps(Dep.RD)
     private static void srl(Context context, int machInst) {
-        executor.srl_impl(context, machInst);
+        context.getRegs().setGpr(BitField.RD.valueOf(machInst), context.getRegs().getGpr(BitField.RT.valueOf(machInst)) >>> BitField.SHIFT.valueOf(machInst));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SRLV, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -503,7 +537,7 @@ public class StaticInstruction {
     @Ideps({Dep.RS, Dep.RT})
     @Odeps(Dep.RD)
     private static void srlv(Context context, int machInst) {
-        executor.srlv_impl(context, machInst);
+        context.getRegs().setGpr(BitField.RD.valueOf(machInst), context.getRegs().getGpr(BitField.RT.valueOf(machInst)) >>> MathHelper.bits(context.getRegs().getGpr(BitField.RS.valueOf(machInst)), 4, 0));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SUB, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -512,7 +546,7 @@ public class StaticInstruction {
     @Ideps({Dep.RS, Dep.RT})
     @Odeps(Dep.RD)
     private static void sub(Context context, int machInst) {
-        executor.sub_impl(context, machInst);
+        context.getRegs().setGpr(BitField.RD.valueOf(machInst), context.getRegs().getGpr(BitField.RS.valueOf(machInst)) - context.getRegs().getGpr(BitField.RT.valueOf(machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SUBU, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -521,7 +555,7 @@ public class StaticInstruction {
     @Ideps({Dep.RS, Dep.RT})
     @Odeps(Dep.RD)
     private static void subu(Context context, int machInst) {
-        executor.subu_impl(context, machInst);
+        context.getRegs().setGpr(BitField.RD.valueOf(machInst), context.getRegs().getGpr(BitField.RS.valueOf(machInst)) - context.getRegs().getGpr(BitField.RT.valueOf(machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.XOR, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -530,7 +564,7 @@ public class StaticInstruction {
     @Ideps({Dep.RS, Dep.RT})
     @Odeps(Dep.RD)
     private static void xor(Context context, int machInst) {
-        executor.xor_impl(context, machInst);
+        context.getRegs().setGpr(BitField.RD.valueOf(machInst), context.getRegs().getGpr(BitField.RS.valueOf(machInst)) ^ context.getRegs().getGpr(BitField.RT.valueOf(machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.XORI, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -539,7 +573,7 @@ public class StaticInstruction {
     @Ideps(Dep.RS)
     @Odeps(Dep.RT)
     private static void xori(Context context, int machInst) {
-        executor.xori_impl(context, machInst);
+        context.getRegs().setGpr(BitField.RT.valueOf(machInst), context.getRegs().getGpr(BitField.RS.valueOf(machInst)) ^ MathHelper.zeroExtend(BitField.INTIMM.valueOf(machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.ABS_D, fuOperationType = FunctionalUnitOperationType.FLOAT_COMPARE)
@@ -549,7 +583,7 @@ public class StaticInstruction {
     @Ideps(Dep.FS)
     @Odeps(Dep.FD)
     private static void abs_d(Context context, int machInst) {
-        executor.abs_d_impl(context, machInst);
+        context.getRegs().getFpr().setDouble(BitField.FD.valueOf(machInst), Math.abs(context.getRegs().getFpr().getDouble(BitField.FS.valueOf(machInst))));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.ABS_S, fuOperationType = FunctionalUnitOperationType.FLOAT_COMPARE)
@@ -559,7 +593,7 @@ public class StaticInstruction {
     @Ideps(Dep.FS)
     @Odeps(Dep.FD)
     private static void abs_s(Context context, int machInst) {
-        executor.abs_s_impl(context, machInst);
+        context.getRegs().getFpr().setFloat(BitField.FD.valueOf(machInst), Math.abs(context.getRegs().getFpr().getFloat(BitField.FS.valueOf(machInst))));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.ADD_D, fuOperationType = FunctionalUnitOperationType.FLOAT_ADD)
@@ -569,7 +603,7 @@ public class StaticInstruction {
     @Ideps({Dep.FS, Dep.FT})
     @Odeps(Dep.FD)
     private static void add_d(Context context, int machInst) {
-        executor.add_d_impl(context, machInst);
+        context.getRegs().getFpr().setDouble(BitField.FD.valueOf(machInst), context.getRegs().getFpr().getDouble(BitField.FS.valueOf(machInst)) + context.getRegs().getFpr().getDouble(BitField.FT.valueOf(machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.ADD_S, fuOperationType = FunctionalUnitOperationType.FLOAT_ADD)
@@ -579,7 +613,7 @@ public class StaticInstruction {
     @Ideps({Dep.FS, Dep.FT})
     @Odeps(Dep.FD)
     private static void add_s(Context context, int machInst) {
-        executor.add_s_impl(context, machInst);
+        context.getRegs().getFpr().setFloat(BitField.FD.valueOf(machInst), context.getRegs().getFpr().getFloat(BitField.FS.valueOf(machInst)) + context.getRegs().getFpr().getFloat(BitField.FT.valueOf(machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.C_COND_D, fuOperationType = FunctionalUnitOperationType.FLOAT_COMPARE)
@@ -589,7 +623,12 @@ public class StaticInstruction {
     @Ideps({Dep.FS, Dep.FT, Dep.REG_FCSR})
     @Odeps(Dep.REG_FCSR)
     private static void c_cond_d(Context context, int machInst) {
-        executor.c_cond_d_impl(context, machInst);
+        double fs = context.getRegs().getFpr().getDouble(BitField.FS.valueOf(machInst));
+        double ft = context.getRegs().getFpr().getDouble(BitField.FT.valueOf(machInst));
+
+        boolean unordered = Double.isNaN(fs) || Double.isNaN(ft);
+
+        c_cond(context, machInst, unordered, !unordered && fs < ft, !unordered && fs == ft);
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.C_COND_S, fuOperationType = FunctionalUnitOperationType.FLOAT_COMPARE)
@@ -599,7 +638,26 @@ public class StaticInstruction {
     @Ideps({Dep.FS, Dep.FT, Dep.REG_FCSR})
     @Odeps(Dep.REG_FCSR)
     private static void c_cond_s(Context context, int machInst) {
-        executor.c_cond_s_impl(context, machInst);
+        float fs = context.getRegs().getFpr().getFloat(BitField.FS.valueOf(machInst));
+        float ft = context.getRegs().getFpr().getFloat(BitField.FT.valueOf(machInst));
+
+        boolean unordered = Float.isNaN(fs) || Float.isNaN(ft);
+
+        c_cond(context, machInst, unordered, !unordered && fs < ft, !unordered && fs == ft);
+    }
+
+    private static void c_cond(Context context, int machInst, boolean unordered, boolean less, boolean equal) {
+        int cond = BitField.COND.valueOf(machInst);
+
+        Reference<Integer> fcsrRef = new Reference<Integer>(context.getRegs().getFcsr());
+
+        if ((((cond & 0x4) != 0) && less) || (((cond & 0x2) != 0) && equal) || (((cond & 0x1) != 0) && unordered)) {
+            setFCC(fcsrRef, BitField.CC.valueOf(machInst));
+        } else {
+            clearFCC(fcsrRef, BitField.CC.valueOf(machInst));
+        }
+
+        context.getRegs().setFcsr(fcsrRef.get());
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.CVT_D_L, fuOperationType = FunctionalUnitOperationType.FLOAT_CONVERT)
@@ -609,7 +667,7 @@ public class StaticInstruction {
     @Ideps(Dep.FS)
     @Odeps(Dep.FD)
     private static void cvt_d_l(Context context, int machInst) {
-        executor.cvt_d_l_impl(context, machInst);
+        context.getRegs().getFpr().setDouble(BitField.FD.valueOf(machInst), context.getRegs().getFpr().getLong(BitField.FS.valueOf(machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.CVT_D_S, fuOperationType = FunctionalUnitOperationType.FLOAT_CONVERT)
@@ -619,7 +677,7 @@ public class StaticInstruction {
     @Ideps(Dep.FS)
     @Odeps(Dep.FD)
     private static void cvt_d_s(Context context, int machInst) {
-        executor.cvt_d_s_impl(context, machInst);
+        context.getRegs().getFpr().setDouble(BitField.FD.valueOf(machInst), context.getRegs().getFpr().getFloat(BitField.FS.valueOf(machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.CVT_D_W, fuOperationType = FunctionalUnitOperationType.FLOAT_CONVERT)
@@ -629,7 +687,7 @@ public class StaticInstruction {
     @Ideps(Dep.FS)
     @Odeps(Dep.FD)
     private static void cvt_d_w(Context context, int machInst) {
-        executor.cvt_d_w_impl(context, machInst);
+        context.getRegs().getFpr().setDouble(BitField.FD.valueOf(machInst), context.getRegs().getFpr().getInt(BitField.FS.valueOf(machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.CVT_L_D, fuOperationType = FunctionalUnitOperationType.FLOAT_CONVERT)
@@ -638,7 +696,7 @@ public class StaticInstruction {
     @Ideps(Dep.FS)
     @Odeps(Dep.FD)
     private static void cvt_l_d(Context context, int machInst) {
-        executor.cvt_l_d_impl(context, machInst);
+        context.getRegs().getFpr().setLong(BitField.FD.valueOf(machInst), (long) context.getRegs().getFpr().getDouble(BitField.FS.valueOf(machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.CVT_L_S, fuOperationType = FunctionalUnitOperationType.FLOAT_CONVERT)
@@ -647,7 +705,7 @@ public class StaticInstruction {
     @Ideps(Dep.FS)
     @Odeps(Dep.FD)
     private static void cvt_l_s(Context context, int machInst) {
-        executor.cvt_l_s_impl(context, machInst);
+        context.getRegs().getFpr().setLong(BitField.FD.valueOf(machInst), (long) context.getRegs().getFpr().getFloat(BitField.FS.valueOf(machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.CVT_S_D, fuOperationType = FunctionalUnitOperationType.FLOAT_CONVERT)
@@ -657,7 +715,7 @@ public class StaticInstruction {
     @Ideps(Dep.FS)
     @Odeps(Dep.FD)
     private static void cvt_s_d(Context context, int machInst) {
-        executor.cvt_s_d_impl(context, machInst);
+        context.getRegs().getFpr().setFloat(BitField.FD.valueOf(machInst), (float) context.getRegs().getFpr().getDouble(BitField.FS.valueOf(machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.CVT_S_L, fuOperationType = FunctionalUnitOperationType.FLOAT_CONVERT)
@@ -667,7 +725,7 @@ public class StaticInstruction {
     @Ideps(Dep.FS)
     @Odeps(Dep.FD)
     private static void cvt_s_l(Context context, int machInst) {
-        executor.cvt_s_l_impl(context, machInst);
+        context.getRegs().getFpr().setFloat(BitField.FD.valueOf(machInst), context.getRegs().getFpr().getLong(BitField.FS.valueOf(machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.CVT_S_W, fuOperationType = FunctionalUnitOperationType.FLOAT_CONVERT)
@@ -677,7 +735,7 @@ public class StaticInstruction {
     @Ideps(Dep.FS)
     @Odeps(Dep.FD)
     private static void cvt_s_w(Context context, int machInst) {
-        executor.cvt_s_w_impl(context, machInst);
+        context.getRegs().getFpr().setFloat(BitField.FD.valueOf(machInst), context.getRegs().getFpr().getInt(BitField.FS.valueOf(machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.CVT_W_D, fuOperationType = FunctionalUnitOperationType.FLOAT_CONVERT)
@@ -687,7 +745,7 @@ public class StaticInstruction {
     @Ideps(Dep.FS)
     @Odeps(Dep.FD)
     private static void cvt_w_d(Context context, int machInst) {
-        executor.cvt_w_d_impl(context, machInst);
+        context.getRegs().getFpr().setInt(BitField.FD.valueOf(machInst), (int) context.getRegs().getFpr().getDouble(BitField.FS.valueOf(machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.CVT_W_S, fuOperationType = FunctionalUnitOperationType.FLOAT_CONVERT)
@@ -697,7 +755,7 @@ public class StaticInstruction {
     @Ideps(Dep.FS)
     @Odeps(Dep.FD)
     private static void cvt_w_s(Context context, int machInst) {
-        executor.cvt_w_s_impl(context, machInst);
+        context.getRegs().getFpr().setInt(BitField.FD.valueOf(machInst), (int) context.getRegs().getFpr().getFloat(BitField.FS.valueOf(machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.DIV_D, fuOperationType = FunctionalUnitOperationType.FLOAT_DIVIDE)
@@ -707,7 +765,7 @@ public class StaticInstruction {
     @Ideps({Dep.FS, Dep.FT})
     @Odeps(Dep.FD)
     private static void div_d(Context context, int machInst) {
-        executor.div_d_impl(context, machInst);
+        context.getRegs().getFpr().setDouble(BitField.FD.valueOf(machInst), context.getRegs().getFpr().getDouble(BitField.FS.valueOf(machInst)) / context.getRegs().getFpr().getDouble(BitField.FT.valueOf(machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.DIV_S, fuOperationType = FunctionalUnitOperationType.FLOAT_DIVIDE)
@@ -717,7 +775,7 @@ public class StaticInstruction {
     @Ideps({Dep.FS, Dep.FT})
     @Odeps(Dep.FD)
     private static void div_s(Context context, int machInst) {
-        executor.div_s_impl(context, machInst);
+        context.getRegs().getFpr().setFloat(BitField.FD.valueOf(machInst), context.getRegs().getFpr().getFloat(BitField.FS.valueOf(machInst)) / context.getRegs().getFpr().getFloat(BitField.FT.valueOf(machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.MOV_D, fuOperationType = FunctionalUnitOperationType.NONE)
@@ -727,7 +785,7 @@ public class StaticInstruction {
     @Ideps(Dep.FS)
     @Odeps(Dep.FD)
     private static void mov_d(Context context, int machInst) {
-        executor.mov_d_impl(context, machInst);
+        context.getRegs().getFpr().setDouble(BitField.FD.valueOf(machInst), context.getRegs().getFpr().getDouble(BitField.FS.valueOf(machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.MOV_S, fuOperationType = FunctionalUnitOperationType.NONE)
@@ -737,70 +795,70 @@ public class StaticInstruction {
     @Ideps(Dep.FS)
     @Odeps(Dep.FD)
     private static void mov_s(Context context, int machInst) {
-        executor.mov_s_impl(context, machInst);
+        context.getRegs().getFpr().setFloat(BitField.FD.valueOf(machInst), context.getRegs().getFpr().getFloat(BitField.FS.valueOf(machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.MOVF, fuOperationType = FunctionalUnitOperationType.NONE)
     @StaticInstructionFlags({StaticInstructionFlag.UNIMPLEMENTED})
     @DecodeMethod(bits = 0x00000001, mask = 0xfc0307ff)
     private static void movf(Context context, int machInst) {
-        executor.movf_impl(context, machInst);
+        throw new UnsupportedOperationException(); //TODO: movf
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic._MOVF, fuOperationType = FunctionalUnitOperationType.NONE)
     @StaticInstructionFlags({StaticInstructionFlag.UNIMPLEMENTED})
     @DecodeMethod(bits = 0x44000011, mask = 0xfc03003f)
     private static void _movf(Context context, int machInst) {
-        executor._movf_impl(context, machInst);
+        throw new UnsupportedOperationException(); //TODO: _movf
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.MOVN, fuOperationType = FunctionalUnitOperationType.NONE)
     @StaticInstructionFlags({StaticInstructionFlag.UNIMPLEMENTED})
     @DecodeMethod(bits = 0x0000000b, mask = 0xfc0007ff)
     private static void movn(Context context, int machInst) {
-        executor.movn_impl(context, machInst);
+        throw new UnsupportedOperationException(); //TODO: movn
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic._MOVN, fuOperationType = FunctionalUnitOperationType.NONE)
     @StaticInstructionFlags({StaticInstructionFlag.UNIMPLEMENTED})
     @DecodeMethod(bits = 0x44000013, mask = 0xfc00003f)
     private static void _movn(Context context, int machInst) {
-        executor._movn_impl(context, machInst);
+        throw new UnsupportedOperationException(); //TODO: _movn
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic._MOVT, fuOperationType = FunctionalUnitOperationType.NONE)
     @StaticInstructionFlags({StaticInstructionFlag.UNIMPLEMENTED})
     @DecodeMethod(bits = 0x44010011, mask = 0xfc03003f)
     private static void _movt(Context context, int machInst) {
-        executor._movt_impl(context, machInst);
+        throw new UnsupportedOperationException(); //TODO: _movt
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.MOVZ, fuOperationType = FunctionalUnitOperationType.NONE)
     @StaticInstructionFlags({StaticInstructionFlag.UNIMPLEMENTED})
     @DecodeMethod(bits = 0x0000000a, mask = 0xfc0007ff)
     private static void movz(Context context, int machInst) {
-        executor.movz_impl(context, machInst);
+        throw new UnsupportedOperationException(); //TODO: movz
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic._MOVZ, fuOperationType = FunctionalUnitOperationType.NONE)
     @StaticInstructionFlags({StaticInstructionFlag.UNIMPLEMENTED})
     @DecodeMethod(bits = 0x44000012, mask = 0xfc00003f)
     private static void _movz(Context context, int machInst) {
-        executor._movz_impl(context, machInst);
+        throw new UnsupportedOperationException(); //TODO: _movz
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.MUL, fuOperationType = FunctionalUnitOperationType.NONE)
     @StaticInstructionFlags({StaticInstructionFlag.UNIMPLEMENTED})
     @DecodeMethod(bits = 0x70000002, mask = 0xfc0007ff)
     private static void mul(Context context, int machInst) {
-        executor.mul_impl(context, machInst);
+        throw new UnsupportedOperationException(); //TODO: mul
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.TRUNC_W, fuOperationType = FunctionalUnitOperationType.NONE)
     @StaticInstructionFlags({StaticInstructionFlag.UNIMPLEMENTED})
     @DecodeMethod(bits = 0x4400000d, mask = 0xfc1f003f)
     private static void trunc_w(Context context, int machInst) {
-        executor.trunc_w_impl(context, machInst);
+        throw new UnsupportedOperationException(); //TODO: trunc_w
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.MUL_D, fuOperationType = FunctionalUnitOperationType.FLOAT_MULTIPLY)
@@ -810,7 +868,7 @@ public class StaticInstruction {
     @Ideps({Dep.FS, Dep.FT})
     @Odeps(Dep.FD)
     private static void mul_d(Context context, int machInst) {
-        executor.mul_d_impl(context, machInst);
+        context.getRegs().getFpr().setDouble(BitField.FD.valueOf(machInst), context.getRegs().getFpr().getDouble(BitField.FS.valueOf(machInst)) * context.getRegs().getFpr().getDouble(BitField.FT.valueOf(machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.MUL_S, fuOperationType = FunctionalUnitOperationType.FLOAT_MULTIPLY)
@@ -820,7 +878,7 @@ public class StaticInstruction {
     @Ideps({Dep.FS, Dep.FT})
     @Odeps(Dep.FD)
     private static void mul_s(Context context, int machInst) {
-        executor.mul_s_impl(context, machInst);
+        context.getRegs().getFpr().setFloat(BitField.FD.valueOf(machInst), context.getRegs().getFpr().getFloat(BitField.FS.valueOf(machInst)) * context.getRegs().getFpr().getFloat(BitField.FT.valueOf(machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.NEG_D, fuOperationType = FunctionalUnitOperationType.FLOAT_COMPARE)
@@ -830,7 +888,7 @@ public class StaticInstruction {
     @Ideps(Dep.FS)
     @Odeps(Dep.FD)
     private static void neg_d(Context context, int machInst) {
-        executor.neg_d_impl(context, machInst);
+        context.getRegs().getFpr().setDouble(BitField.FD.valueOf(machInst), -context.getRegs().getFpr().getDouble(BitField.FS.valueOf(machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.NEG_S, fuOperationType = FunctionalUnitOperationType.FLOAT_COMPARE)
@@ -840,7 +898,7 @@ public class StaticInstruction {
     @Ideps(Dep.FS)
     @Odeps(Dep.FD)
     private static void neg_s(Context context, int machInst) {
-        executor.neg_s_impl(context, machInst);
+        context.getRegs().getFpr().setFloat(BitField.FD.valueOf(machInst), -context.getRegs().getFpr().getFloat(BitField.FS.valueOf(machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SQRT_D, fuOperationType = FunctionalUnitOperationType.FLOAT_SQRT)
@@ -850,7 +908,7 @@ public class StaticInstruction {
     @Ideps(Dep.FS)
     @Odeps(Dep.FD)
     private static void sqrt_d(Context context, int machInst) {
-        executor.sqrt_d_impl(context, machInst);
+        context.getRegs().getFpr().setDouble(BitField.FD.valueOf(machInst), Math.sqrt(context.getRegs().getFpr().getDouble(BitField.FS.valueOf(machInst))));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SQRT_S, fuOperationType = FunctionalUnitOperationType.FLOAT_SQRT)
@@ -860,7 +918,7 @@ public class StaticInstruction {
     @Ideps(Dep.FS)
     @Odeps(Dep.FD)
     private static void sqrt_s(Context context, int machInst) {
-        executor.sqrt_s_impl(context, machInst);
+        context.getRegs().getFpr().setFloat(BitField.FD.valueOf(machInst), (float) Math.sqrt(context.getRegs().getFpr().getFloat(BitField.FS.valueOf(machInst))));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SUB_D, fuOperationType = FunctionalUnitOperationType.FLOAT_ADD)
@@ -870,7 +928,7 @@ public class StaticInstruction {
     @Ideps({Dep.FS, Dep.FT})
     @Odeps(Dep.FD)
     private static void sub_d(Context context, int machInst) {
-        executor.sub_d_impl(context, machInst);
+        context.getRegs().getFpr().setDouble(BitField.FD.valueOf(machInst), context.getRegs().getFpr().getDouble(BitField.FS.valueOf(machInst)) - context.getRegs().getFpr().getDouble(BitField.FT.valueOf(machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SUB_S, fuOperationType = FunctionalUnitOperationType.FLOAT_ADD)
@@ -880,7 +938,7 @@ public class StaticInstruction {
     @Ideps({Dep.FS, Dep.FT})
     @Odeps(Dep.FD)
     private static void sub_s(Context context, int machInst) {
-        executor.sub_s_impl(context, machInst);
+        context.getRegs().getFpr().setFloat(BitField.FD.valueOf(machInst), context.getRegs().getFpr().getFloat(BitField.FS.valueOf(machInst)) - context.getRegs().getFpr().getFloat(BitField.FT.valueOf(machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.J, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -889,7 +947,7 @@ public class StaticInstruction {
     @Ideps({})
     @Odeps({})
     private static void j(Context context, int machInst) {
-        executor.j_impl(context, machInst);
+        doJump(context, getTargetPcForJ(context.getRegs().getNpc(), machInst));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.JAL, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -898,7 +956,8 @@ public class StaticInstruction {
     @Ideps({})
     @Odeps(Dep.REG_RA)
     private static void jal(Context context, int machInst) {
-        executor.jal_impl(context, machInst);
+        context.getRegs().setGpr(ArchitecturalRegisterFile.REG_RA, context.getRegs().getNnpc());
+        doJump(context, getTargetPcForJal(context.getRegs().getNpc(), machInst));
 
         if (!context.isSpeculative()) {
             onFunctionCall(context, false);
@@ -911,7 +970,8 @@ public class StaticInstruction {
     @Ideps(Dep.RS)
     @Odeps(Dep.RD)
     private static void jalr(Context context, int machInst) {
-        executor.jalr_impl(context, machInst);
+        context.getRegs().setGpr(BitField.RD.valueOf(machInst), context.getRegs().getNnpc());
+        doJump(context, getTargetPcForJalr(context, machInst));
 
         if (!context.isSpeculative()) {
             onFunctionCall(context, true);
@@ -924,7 +984,7 @@ public class StaticInstruction {
     @Ideps(Dep.RS)
     @Odeps({})
     private static void jr(Context context, int machInst) {
-        executor.jr_impl(context, machInst);
+        doJump(context, getTargetPcForJr(context, machInst));
 
         if (!context.isSpeculative() && BitField.RS.valueOf(machInst) == ArchitecturalRegisterFile.REG_RA) {
             onFunctionReturn(context);
@@ -937,7 +997,7 @@ public class StaticInstruction {
     @Ideps({})
     @Odeps({})
     private static void b(Context context, int machInst) {
-        executor.b_impl(context, machInst);
+        doBranch(context, machInst);
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BAL, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -946,7 +1006,8 @@ public class StaticInstruction {
     @Ideps({})
     @Odeps(Dep.REG_RA)
     private static void bal(Context context, int machInst) {
-        executor.bal_impl(context, machInst);
+        context.getRegs().setGpr(ArchitecturalRegisterFile.REG_RA, context.getRegs().getNnpc());
+        doBranch(context, machInst);
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BC1F, fuOperationType = FunctionalUnitOperationType.NONE)
@@ -955,7 +1016,9 @@ public class StaticInstruction {
     @Ideps(Dep.REG_FCSR)
     @Odeps({})
     private static void bc1f(Context context, int machInst) {
-        executor.bc1f_impl(context, machInst);
+        if (!getFCC(context.getRegs().getFcsr(), BitField.BRANCH_CC.valueOf(machInst))) {
+            doBranch(context, machInst);
+        }
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BC1FL, fuOperationType = FunctionalUnitOperationType.NONE)
@@ -964,7 +1027,11 @@ public class StaticInstruction {
     @Ideps(Dep.REG_FCSR)
     @Odeps({})
     private static void bc1fl(Context context, int machInst) {
-        executor.bc1fl_impl(context, machInst);
+        if (!getFCC(context.getRegs().getFcsr(), BitField.BRANCH_CC.valueOf(machInst))) {
+            doBranch(context, machInst);
+        } else {
+            skipDelaySlot(context);
+        }
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BC1T, fuOperationType = FunctionalUnitOperationType.NONE)
@@ -973,7 +1040,9 @@ public class StaticInstruction {
     @Ideps(Dep.REG_FCSR)
     @Odeps({})
     private static void bc1t(Context context, int machInst) {
-        executor.bc1t_impl(context, machInst);
+        if (getFCC(context.getRegs().getFcsr(), BitField.BRANCH_CC.valueOf(machInst))) {
+            doBranch(context, machInst);
+        }
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BC1TL, fuOperationType = FunctionalUnitOperationType.NONE)
@@ -982,7 +1051,11 @@ public class StaticInstruction {
     @Ideps(Dep.REG_FCSR)
     @Odeps({})
     private static void bc1tl(Context context, int machInst) {
-        executor.bc1tl_impl(context, machInst);
+        if (getFCC(context.getRegs().getFcsr(), BitField.BRANCH_CC.valueOf(machInst))) {
+            doBranch(context, machInst);
+        } else {
+            skipDelaySlot(context);
+        }
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BEQ, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -991,7 +1064,9 @@ public class StaticInstruction {
     @Ideps({Dep.RS, Dep.RT})
     @Odeps({})
     private static void beq(Context context, int machInst) {
-        executor.beq_impl(context, machInst);
+        if (context.getRegs().getGpr(BitField.RS.valueOf(machInst)) == context.getRegs().getGpr(BitField.RT.valueOf(machInst))) {
+            doBranch(context, machInst);
+        }
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BEQL, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -1000,7 +1075,11 @@ public class StaticInstruction {
     @Ideps({Dep.RS, Dep.RT})
     @Odeps({})
     private static void beql(Context context, int machInst) {
-        executor.beql_impl(context, machInst);
+        if (context.getRegs().getGpr(BitField.RS.valueOf(machInst)) == context.getRegs().getGpr(BitField.RT.valueOf(machInst))) {
+            doBranch(context, machInst);
+        } else {
+            skipDelaySlot(context);
+        }
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BGEZ, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -1009,7 +1088,9 @@ public class StaticInstruction {
     @Ideps(Dep.RS)
     @Odeps({})
     private static void bgez(Context context, int machInst) {
-        executor.bgez_impl(context, machInst);
+        if (context.getRegs().getGpr(BitField.RS.valueOf(machInst)) >= 0) {
+            doBranch(context, machInst);
+        }
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BGEZAL, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -1018,7 +1099,11 @@ public class StaticInstruction {
     @Ideps(Dep.RS)
     @Odeps(Dep.REG_RA)
     private static void bgezal(Context context, int machInst) {
-        executor.bgezal_impl(context, machInst);
+        context.getRegs().setGpr(ArchitecturalRegisterFile.REG_RA, context.getRegs().getNnpc());
+
+        if (context.getRegs().getGpr(BitField.RS.valueOf(machInst)) >= 0) {
+            doBranch(context, machInst);
+        }
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BGEZALL, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -1027,7 +1112,13 @@ public class StaticInstruction {
     @Ideps(Dep.RS)
     @Odeps(Dep.REG_RA)
     private static void bgezall(Context context, int machInst) {
-        executor.bgezall_impl(context, machInst);
+        context.getRegs().setGpr(ArchitecturalRegisterFile.REG_RA, context.getRegs().getNnpc());
+
+        if (context.getRegs().getGpr(BitField.RS.valueOf(machInst)) >= 0) {
+            doBranch(context, machInst);
+        } else {
+            skipDelaySlot(context);
+        }
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BGEZL, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -1036,7 +1127,11 @@ public class StaticInstruction {
     @Ideps(Dep.RS)
     @Odeps({})
     private static void bgezl(Context context, int machInst) {
-        executor.bgezl_impl(context, machInst);
+        if (context.getRegs().getGpr(BitField.RS.valueOf(machInst)) >= 0) {
+            doBranch(context, machInst);
+        } else {
+            skipDelaySlot(context);
+        }
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BGTZ, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -1045,7 +1140,9 @@ public class StaticInstruction {
     @Ideps(Dep.RS)
     @Odeps({})
     private static void bgtz(Context context, int machInst) {
-        executor.bgtz_impl(context, machInst);
+        if (context.getRegs().getGpr(BitField.RS.valueOf(machInst)) > 0) {
+            doBranch(context, machInst);
+        }
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BGTZL, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -1054,7 +1151,11 @@ public class StaticInstruction {
     @Ideps(Dep.RS)
     @Odeps({})
     private static void bgtzl(Context context, int machInst) {
-        executor.bgtzl_impl(context, machInst);
+        if (context.getRegs().getGpr(BitField.RS.valueOf(machInst)) > 0) {
+            doBranch(context, machInst);
+        } else {
+            skipDelaySlot(context);
+        }
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BLEZ, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -1063,7 +1164,9 @@ public class StaticInstruction {
     @Ideps(Dep.RS)
     @Odeps({})
     private static void blez(Context context, int machInst) {
-        executor.blez_impl(context, machInst);
+        if (context.getRegs().getGpr(BitField.RS.valueOf(machInst)) <= 0) {
+            doBranch(context, machInst);
+        }
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BLEZL, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -1072,7 +1175,11 @@ public class StaticInstruction {
     @Ideps(Dep.RS)
     @Odeps({})
     private static void blezl(Context context, int machInst) {
-        executor.blezl_impl(context, machInst);
+        if (context.getRegs().getGpr(BitField.RS.valueOf(machInst)) <= 0) {
+            doBranch(context, machInst);
+        } else {
+            skipDelaySlot(context);
+        }
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BLTZ, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -1081,7 +1188,9 @@ public class StaticInstruction {
     @Ideps(Dep.RS)
     @Odeps({})
     private static void bltz(Context context, int machInst) {
-        executor.bltz_impl(context, machInst);
+        if (context.getRegs().getGpr(BitField.RS.valueOf(machInst)) < 0) {
+            doBranch(context, machInst);
+        }
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BLTZAL, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -1090,7 +1199,11 @@ public class StaticInstruction {
     @Ideps(Dep.RS)
     @Odeps(Dep.REG_RA)
     private static void bltzal(Context context, int machInst) {
-        executor.bltzal_impl(context, machInst);
+        context.getRegs().setGpr(ArchitecturalRegisterFile.REG_RA, context.getRegs().getNnpc());
+
+        if (context.getRegs().getGpr(BitField.RS.valueOf(machInst)) < 0) {
+            doBranch(context, machInst);
+        }
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BLTZALL, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -1099,7 +1212,13 @@ public class StaticInstruction {
     @Ideps(Dep.RS)
     @Odeps(Dep.REG_RA)
     private static void bltzall(Context context, int machInst) {
-        executor.bltzall_impl(context, machInst);
+        context.getRegs().setGpr(ArchitecturalRegisterFile.REG_RA, context.getRegs().getNnpc());
+
+        if (context.getRegs().getGpr(BitField.RS.valueOf(machInst)) < 0) {
+            doBranch(context, machInst);
+        } else {
+            skipDelaySlot(context);
+        }
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BLTZL, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -1108,7 +1227,9 @@ public class StaticInstruction {
     @Ideps(Dep.RS)
     @Odeps({})
     private static void bltzl(Context context, int machInst) {
-        executor.bltzl_impl(context, machInst);
+        if (context.getRegs().getGpr(BitField.RS.valueOf(machInst)) < 0) {
+            doBranch(context, machInst);
+        }
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BNE, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -1117,7 +1238,9 @@ public class StaticInstruction {
     @Ideps({Dep.RS, Dep.RT})
     @Odeps({})
     private static void bne(Context context, int machInst) {
-        executor.bne_impl(context, machInst);
+        if (context.getRegs().getGpr(BitField.RS.valueOf(machInst)) != context.getRegs().getGpr(BitField.RT.valueOf(machInst))) {
+            doBranch(context, machInst);
+        }
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BNEL, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -1126,7 +1249,11 @@ public class StaticInstruction {
     @Ideps({Dep.RS, Dep.RT})
     @Odeps({})
     private static void bnel(Context context, int machInst) {
-        executor.bnel_impl(context, machInst);
+        if (context.getRegs().getGpr(BitField.RS.valueOf(machInst)) != context.getRegs().getGpr(BitField.RT.valueOf(machInst))) {
+            doBranch(context, machInst);
+        } else {
+            skipDelaySlot(context);
+        }
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.LB, fuOperationType = FunctionalUnitOperationType.READ_PORT)
@@ -1136,7 +1263,7 @@ public class StaticInstruction {
     @Odeps(Dep.RT)
     @NonEffectiveAddressBaseDep(Dep.RT)
     private static void lb(Context context, int machInst) {
-        executor.lb_impl(context, machInst);
+        context.getRegs().setGpr(BitField.RT.valueOf(machInst), context.getProcess().getMemory().readByte(getEffectiveAddress(context, machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.LBU, fuOperationType = FunctionalUnitOperationType.READ_PORT)
@@ -1146,7 +1273,7 @@ public class StaticInstruction {
     @Odeps(Dep.RT)
     @NonEffectiveAddressBaseDep(Dep.RT)
     private static void lbu(Context context, int machInst) {
-        executor.lbu_impl(context, machInst);
+        context.getRegs().setGpr(BitField.RT.valueOf(machInst), context.getProcess().getMemory().readByte(getEffectiveAddress(context, machInst)) & 0xff);
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.LDC1, fuOperationType = FunctionalUnitOperationType.READ_PORT)
@@ -1156,7 +1283,7 @@ public class StaticInstruction {
     @Odeps(Dep.FT)
     @NonEffectiveAddressBaseDep(Dep.FT)
     private static void ldc1(Context context, int machInst) {
-        executor.ldc1_impl(context, machInst);
+        context.getRegs().getFpr().setLong(BitField.FT.valueOf(machInst), context.getProcess().getMemory().readDoubleWord(getEffectiveAddress(context, machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.LH, fuOperationType = FunctionalUnitOperationType.READ_PORT)
@@ -1166,7 +1293,7 @@ public class StaticInstruction {
     @Odeps(Dep.RT)
     @NonEffectiveAddressBaseDep(Dep.RT)
     private static void lh(Context context, int machInst) {
-        executor.lh_impl(context, machInst);
+        context.getRegs().setGpr(BitField.RT.valueOf(machInst), context.getProcess().getMemory().readHalfWord(getEffectiveAddress(context, machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.LHU, fuOperationType = FunctionalUnitOperationType.READ_PORT)
@@ -1176,7 +1303,7 @@ public class StaticInstruction {
     @Odeps(Dep.RT)
     @NonEffectiveAddressBaseDep(Dep.RT)
     private static void lhu(Context context, int machInst) {
-        executor.lhu_impl(context, machInst);
+        context.getRegs().setGpr(BitField.RT.valueOf(machInst), context.getProcess().getMemory().readHalfWord(getEffectiveAddress(context, machInst)) & 0xffff);
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.LL, fuOperationType = FunctionalUnitOperationType.READ_PORT)
@@ -1186,7 +1313,7 @@ public class StaticInstruction {
     @Odeps(Dep.RT)
     @NonEffectiveAddressBaseDep(Dep.RT)
     private static void ll(Context context, int machInst) {
-        executor.ll_impl(context, machInst);
+        context.getRegs().setGpr(BitField.RT.valueOf(machInst), context.getProcess().getMemory().readWord(getEffectiveAddress(context, machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.LW, fuOperationType = FunctionalUnitOperationType.READ_PORT)
@@ -1196,7 +1323,7 @@ public class StaticInstruction {
     @Odeps(Dep.RT)
     @NonEffectiveAddressBaseDep(Dep.RT)
     private static void lw(Context context, int machInst) {
-        executor.lw_impl(context, machInst);
+        context.getRegs().setGpr(BitField.RT.valueOf(machInst), context.getProcess().getMemory().readWord(getEffectiveAddress(context, machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.LWC1, fuOperationType = FunctionalUnitOperationType.READ_PORT)
@@ -1206,7 +1333,7 @@ public class StaticInstruction {
     @Odeps(Dep.FT)
     @NonEffectiveAddressBaseDep(Dep.FT)
     private static void lwc1(Context context, int machInst) {
-        executor.lwc1_impl(context, machInst);
+        context.getRegs().getFpr().setInt(BitField.FT.valueOf(machInst), context.getProcess().getMemory().readWord(getEffectiveAddress(context, machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.LWL, fuOperationType = FunctionalUnitOperationType.READ_PORT)
@@ -1216,7 +1343,21 @@ public class StaticInstruction {
     @Odeps(Dep.RT)
     @NonEffectiveAddressBaseDep(Dep.RT)
     private static void lwl(Context context, int machInst) {
-        executor.lwl_impl(context, machInst);
+        int addr = getEffectiveAddress(context, machInst);
+        int size = 4 - (addr & 3);
+
+        byte[] src = new byte[4];
+        ByteBuffer.wrap(src).order(context.getProcess().isLittleEndian() ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN).put(context.getProcess().getMemory().readBlock(addr, size));
+
+        byte[] dst = new byte[4];
+        ByteBuffer.wrap(dst).order(ByteOrder.LITTLE_ENDIAN).putInt(context.getRegs().getGpr(BitField.RT.valueOf(machInst)));
+
+        for (int i = 0; i < size; i++) {
+            dst[3 - i] = src[i];
+        }
+
+        int rt = ByteBuffer.wrap(dst).order(ByteOrder.LITTLE_ENDIAN).getInt();
+        context.getRegs().setGpr(BitField.RT.valueOf(machInst), rt);
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.LWR, fuOperationType = FunctionalUnitOperationType.READ_PORT)
@@ -1226,7 +1367,21 @@ public class StaticInstruction {
     @Odeps(Dep.RT)
     @NonEffectiveAddressBaseDep(Dep.RT)
     private static void lwr(Context context, int machInst) {
-        executor.lwr_impl(context, machInst);
+        int addr = getEffectiveAddress(context, machInst);
+        int size = 1 + (addr & 3);
+
+        byte[] src = new byte[4];
+        ByteBuffer.wrap(src).order(context.getProcess().isLittleEndian() ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN).put(context.getProcess().getMemory().readBlock(addr - size + 1, size));
+
+        byte[] dst = new byte[4];
+        ByteBuffer.wrap(dst).order(ByteOrder.LITTLE_ENDIAN).putInt(context.getRegs().getGpr(BitField.RT.valueOf(machInst)));
+
+        for (int i = 0; i < size; i++) {
+            dst[size - i - 1] = src[i];
+        }
+
+        int rt = ByteBuffer.wrap(dst).order(ByteOrder.LITTLE_ENDIAN).getInt();
+        context.getRegs().setGpr(BitField.RT.valueOf(machInst), rt);
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SB, fuOperationType = FunctionalUnitOperationType.WRITE_PORT)
@@ -1236,7 +1391,7 @@ public class StaticInstruction {
     @Odeps({})
     @NonEffectiveAddressBaseDep(Dep.RT)
     private static void sb(Context context, int machInst) {
-        executor.sb_impl(context, machInst);
+        context.getProcess().getMemory().writeByte(getEffectiveAddress(context, machInst), (byte) MathHelper.bits(context.getRegs().getGpr(BitField.RT.valueOf(machInst)), 7, 0));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SC, fuOperationType = FunctionalUnitOperationType.WRITE_PORT)
@@ -1246,7 +1401,8 @@ public class StaticInstruction {
     @Odeps(Dep.RT)
     @NonEffectiveAddressBaseDep(Dep.RT)
     private static void sc(Context context, int machInst) {
-        executor.sc_impl(context, machInst);
+        context.getProcess().getMemory().writeWord(getEffectiveAddress(context, machInst), context.getRegs().getGpr(BitField.RT.valueOf(machInst)));
+        context.getRegs().setGpr(BitField.RT.valueOf(machInst), 1);
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SDC1, fuOperationType = FunctionalUnitOperationType.WRITE_PORT)
@@ -1256,7 +1412,7 @@ public class StaticInstruction {
     @Odeps({})
     @NonEffectiveAddressBaseDep(Dep.FT)
     private static void sdc1(Context context, int machInst) {
-        executor.sdc1_impl(context, machInst);
+        context.getProcess().getMemory().writeDoubleWord(getEffectiveAddress(context, machInst), context.getRegs().getFpr().getLong(BitField.FT.valueOf(machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SH, fuOperationType = FunctionalUnitOperationType.WRITE_PORT)
@@ -1266,7 +1422,7 @@ public class StaticInstruction {
     @Odeps({})
     @NonEffectiveAddressBaseDep(Dep.RT)
     private static void sh(Context context, int machInst) {
-        executor.sh_impl(context, machInst);
+        context.getProcess().getMemory().writeHalfWord(getEffectiveAddress(context, machInst), (short) MathHelper.bits(context.getRegs().getGpr(BitField.RT.valueOf(machInst)), 15, 0));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SW, fuOperationType = FunctionalUnitOperationType.WRITE_PORT)
@@ -1276,7 +1432,7 @@ public class StaticInstruction {
     @Odeps({})
     @NonEffectiveAddressBaseDep(Dep.RT)
     private static void sw(Context context, int machInst) {
-        executor.sw_impl(context, machInst);
+        context.getProcess().getMemory().writeWord(getEffectiveAddress(context, machInst), context.getRegs().getGpr(BitField.RT.valueOf(machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SWC1, fuOperationType = FunctionalUnitOperationType.WRITE_PORT)
@@ -1286,7 +1442,7 @@ public class StaticInstruction {
     @Odeps({})
     @NonEffectiveAddressBaseDep(Dep.FT)
     private static void swc1(Context context, int machInst) {
-        executor.swc1_impl(context, machInst);
+        context.getProcess().getMemory().writeWord(getEffectiveAddress(context, machInst), context.getRegs().getFpr().getInt(BitField.FT.valueOf(machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SWL, fuOperationType = FunctionalUnitOperationType.WRITE_PORT)
@@ -1296,7 +1452,18 @@ public class StaticInstruction {
     @Odeps({})
     @NonEffectiveAddressBaseDep(Dep.RT)
     private static void swl(Context context, int machInst) {
-        executor.swl_impl(context, machInst);
+        int addr = getEffectiveAddress(context, machInst);
+        int size = 4 - (addr & 3);
+
+        byte[] src = new byte[4];
+        ByteBuffer.wrap(src).order(ByteOrder.LITTLE_ENDIAN).putInt(context.getRegs().getGpr(BitField.RT.valueOf(machInst)));
+
+        byte[] dst = new byte[4];
+        for (int i = 0; i < size; i++) {
+            dst[i] = src[3 - i];
+        }
+
+        context.getProcess().getMemory().writeBlock(addr, size, dst);
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SWR, fuOperationType = FunctionalUnitOperationType.WRITE_PORT)
@@ -1306,7 +1473,18 @@ public class StaticInstruction {
     @Odeps({})
     @NonEffectiveAddressBaseDep(Dep.RT)
     private static void swr(Context context, int machInst) {
-        executor.swr_impl(context, machInst);
+        int addr = getEffectiveAddress(context, machInst);
+        int size = 1 + (addr & 3);
+
+        byte[] src = new byte[4];
+        ByteBuffer.wrap(src).order(ByteOrder.LITTLE_ENDIAN).putInt(context.getRegs().getGpr(BitField.RT.valueOf(machInst)));
+
+        byte[] dst = new byte[4];
+        for (int i = 0; i < size; i++) {
+            dst[i] = src[size - i - 1];
+        }
+
+        context.getProcess().getMemory().writeBlock(addr - size + 1, size, dst);
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.CFC1, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -1315,7 +1493,9 @@ public class StaticInstruction {
     @Ideps(Dep.REG_FCSR)
     @Odeps(Dep.RT)
     private static void cfc1(Context context, int machInst) {
-        executor.cfc1_impl(context, machInst);
+        if (BitField.FS.valueOf(machInst) == 31) {
+            context.getRegs().setGpr(BitField.RT.valueOf(machInst), context.getRegs().getFcsr());
+        }
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.CTC1, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -1324,7 +1504,9 @@ public class StaticInstruction {
     @Ideps(Dep.RT)
     @Odeps(Dep.REG_FCSR)
     private static void ctc1(Context context, int machInst) {
-        executor.ctc1_impl(context, machInst);
+        if (BitField.FS.valueOf(machInst) != 0) {
+            context.getRegs().setFcsr(context.getRegs().getGpr(BitField.RT.valueOf(machInst)));
+        }
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.MFC1, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -1333,7 +1515,7 @@ public class StaticInstruction {
     @Ideps(Dep.FS)
     @Odeps(Dep.RT)
     private static void mfc1(Context context, int machInst) {
-        executor.mfc1_impl(context, machInst);
+        context.getRegs().setGpr(BitField.RT.valueOf(machInst), context.getRegs().getFpr().getInt(BitField.FS.valueOf(machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.MTC1, fuOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -1342,7 +1524,7 @@ public class StaticInstruction {
     @Ideps(Dep.RT)
     @Odeps(Dep.FS)
     private static void mtc1(Context context, int machInst) {
-        executor.mtc1_impl(context, machInst);
+        context.getRegs().getFpr().setInt(BitField.FS.valueOf(machInst), context.getRegs().getGpr(BitField.RT.valueOf(machInst)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BREAK, fuOperationType = FunctionalUnitOperationType.NONE)
@@ -1356,14 +1538,14 @@ public class StaticInstruction {
         }
     }
 
-    @StaticInstructionIntrinsic(mnemonic = Mnemonic.SYSCALL, fuOperationType = FunctionalUnitOperationType.NONE)
+    @StaticInstructionIntrinsic(mnemonic = Mnemonic.SYSTEM_CALL, fuOperationType = FunctionalUnitOperationType.NONE)
     @StaticInstructionFlags({StaticInstructionFlag.TRAP})
     @DecodeMethod(bits = 0x0000000c, mask = 0xfc00003f)
     @Ideps(Dep.REG_V0)
     @Odeps({})
-    private static void syscall(Context context, int machInst) {
+    private static void system_call(Context context, int machInst) {
         if (!context.isSpeculative()) {
-            context.getKernel().getSyscallEmulation().doSyscall(context.getRegs().getGpr(ArchitecturalRegisterFile.REG_V0), context);
+            context.getKernel().getSystemCallEmulation().doSystemCall(context.getRegs().getGpr(ArchitecturalRegisterFile.REG_V0), context);
         }
     }
 
@@ -1388,7 +1570,7 @@ public class StaticInstruction {
 
     private static void onFunctionCall(Context context, boolean jalr) {
         StaticInstruction staticInst = context.getProcess().getStaticInst(context.getRegs().getPc());
-        int targetPc = jalr ? BasicMipsInstructionExecutor.getTargetPcForJalr(context, staticInst.getMachInst()) : BasicMipsInstructionExecutor.getTargetPcForJr(context, staticInst.getMachInst());
+        int targetPc = jalr ? getTargetPcForJalr(context, staticInst.getMachInst()) : getTargetPcForJr(context, staticInst.getMachInst());
         context.getFunctionCallContextStack().push(new FunctionCallContext(context.getRegs().getPc(), targetPc));
         context.getBlockingEventDispatcher().dispatch(new FunctionalCallEvent(context));
     }
@@ -1430,20 +1612,76 @@ public class StaticInstruction {
         return getEffectiveAddressBase(context, machInst) + getEffectiveAddressDisplacement(machInst);
     }
 
-    public static void execute(StaticInstruction staticInst, Context context) {
-        int oldPc = context.getRegs().getPc();
-        execute(staticInst.mnemonic, context, staticInst.machInst);
-        context.getBlockingEventDispatcher().dispatch(new InstructionFunctionallyExecutedEvent(oldPc, staticInst, context));
+    private static boolean getFCC(int fcsr, int ccIdx) {
+        return ((fcsr >> ((ccIdx == 0) ? 23 : ccIdx + 24)) & 0x00000001) != 0;
     }
 
-    private static void execute(Mnemonic mnemonic, Context context, int machInst) {
+    private static void setFCC(Reference<Integer> fcsr, int cc) {
+        fcsr.set(fcsr.get() | (cc == 0 ? 0x800000 : 0x1000000 << cc));
+    }
+
+    private static void clearFCC(Reference<Integer> fcsr, int cc) {
+        fcsr.set(fcsr.get() & (cc == 0 ? 0xFF7FFFFF : 0xFEFFFFFF << cc));
+    }
+
+    private static void doJump(Context context, int targetPc) {
+        context.getRegs().setNnpc(targetPc);
+    }
+
+    private static void doBranch(Context context, int machInst) {
+        context.getRegs().setNnpc(getTargetPcForBranch(context.getRegs().getNpc(), machInst));
+    }
+
+    private static void skipDelaySlot(Context context) {
+        context.getRegs().setNpc(context.getRegs().getNnpc());
+        context.getRegs().setNnpc(context.getRegs().getNnpc() + 4);
+    }
+
+    public static int getTargetPcForControl(int pc, int machInst, Mnemonic mnemonic) {
+        switch (mnemonic) {
+            case J:
+                return getTargetPcForJ(pc, machInst);
+            case JAL:
+                return getTargetPcForJal(pc, machInst);
+            case JALR:
+                throw new IllegalArgumentException();
+            case JR:
+                throw new IllegalArgumentException();
+            default:
+                return getTargetPcForBranch(pc, machInst);
+        }
+    }
+
+    private static int getTargetPcForBranch(int pc, int machInst) {
+        return pc + MathHelper.signExtend(BitField.INTIMM.valueOf(machInst) << 2);
+    }
+
+    private static int getTargetPcForJ(int pc, int machInst) {
+        return MathHelper.mbits(pc, 32, 28) | (BitField.TARGET.valueOf(machInst) << 2);
+    }
+
+    private static int getTargetPcForJal(int pc, int machInst) {
+        return MathHelper.mbits(pc, 32, 28) | (BitField.TARGET.valueOf(machInst) << 2);
+    }
+
+    public static int getTargetPcForJalr(Context context, int machInst) {
+        return context.getRegs().getGpr(BitField.RS.valueOf(machInst));
+    }
+
+    public static int getTargetPcForJr(Context context, int machInst) {
+        return context.getRegs().getGpr(BitField.RS.valueOf(machInst));
+    }
+
+    public static void execute(StaticInstruction staticInst, Context context) {
+        int oldPc = context.getRegs().getPc();
         try {
-            mnemonic.getMethod().invoke(null, context, machInst);
+            staticInst.mnemonic.getMethod().invoke(null, context, staticInst.machInst);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (InvocationTargetException e) {
             throw new RuntimeException(e);
         }
+        context.getBlockingEventDispatcher().dispatch(new InstructionFunctionallyExecutedEvent(context, oldPc, staticInst));
     }
 
     public static final StaticInstruction NOP = new StaticInstruction(Mnemonic.NOP, 0x0);

@@ -18,13 +18,11 @@
  ******************************************************************************/
 package archimulator.sim.uncore.dram;
 
-import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.uncore.CacheHierarchy;
 import archimulator.sim.uncore.MemoryDevice;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.net.Net;
 import net.pickapack.action.Action;
-import net.pickapack.action.Action1;
 
 public abstract class MemoryController extends MemoryDevice {
     private long reads;
@@ -32,13 +30,6 @@ public abstract class MemoryController extends MemoryDevice {
 
     public MemoryController(CacheHierarchy cacheHierarchy) {
         super(cacheHierarchy, "mainMemory");
-
-        this.getBlockingEventDispatcher().addListener(ResetStatEvent.class, new Action1<ResetStatEvent>() {
-            public void apply(ResetStatEvent event) {
-                reads = 0;
-                writes = 0;
-            }
-        });
     }
 
     @Override
@@ -50,12 +41,9 @@ public abstract class MemoryController extends MemoryDevice {
         this.reads++;
 
         this.access(tag, new Action() {
+            @Override
             public void apply() {
-                new Action() {
-                    public void apply() {
-                        transfer(source, ((DirectoryController) source).getCache().getLineSize() + 8, onSuccessCallback);
-                    }
-                }.apply();
+                transfer(source, ((DirectoryController) source).getCache().getLineSize() + 8, onSuccessCallback);
             }
         });
     }
@@ -63,18 +51,15 @@ public abstract class MemoryController extends MemoryDevice {
     public void memWriteRequestReceive(final MemoryDevice source, int tag, final Action onSuccessCallback) {
         this.writes++;
 
-        this.access(tag, (new Action() {
+        this.access(tag, new Action() {
+            @Override
             public void apply() {
-                new Action() {
-                    public void apply() {
-                        transfer(source, 8, onSuccessCallback);
-                    }
-                }.apply();
+                transfer(source, 8, onSuccessCallback);
             }
-        }));
+        });
     }
 
-    protected abstract void access(int addr, Action onCompletedCallback);
+    protected abstract void access(int address, Action onCompletedCallback);
 
     public long getAccesses() {
         return this.reads + this.writes;
@@ -86,6 +71,10 @@ public abstract class MemoryController extends MemoryDevice {
 
     public long getWrites() {
         return writes;
+    }
+
+    public int getLineSize() {
+        return getExperiment().getArchitecture().getMainMemoryLineSize();
     }
 
     @Override

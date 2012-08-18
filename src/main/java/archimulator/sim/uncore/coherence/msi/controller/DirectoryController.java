@@ -1,12 +1,31 @@
+/*******************************************************************************
+ * Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).
+ *
+ * This file is part of the Archimulator multicore architectural simulator.
+ *
+ * Archimulator is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Archimulator is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
 package archimulator.sim.uncore.coherence.msi.controller;
 
 import archimulator.sim.uncore.CacheHierarchy;
 import archimulator.sim.uncore.MemoryDevice;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.CacheAccess;
+import archimulator.sim.uncore.cache.CacheGeometry;
 import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.cache.EvictableCache;
-import archimulator.sim.uncore.coherence.config.CoherentCacheConfig;
+import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import archimulator.sim.uncore.coherence.msi.fsm.DirectoryControllerFiniteStateMachine;
 import archimulator.sim.uncore.coherence.msi.fsm.DirectoryControllerFiniteStateMachineFactory;
@@ -24,12 +43,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DirectoryController extends GeneralCacheController {
+    private CacheGeometry cacheGeometry;
     private EvictableCache<DirectoryControllerState> cache;
     private List<CacheController> cacheControllers;
     private DirectoryControllerFiniteStateMachineFactory fsmFactory;
 
-    public DirectoryController(CacheHierarchy cacheHierarchy, final String name, CoherentCacheConfig config) {
-        super(cacheHierarchy, name, config);
+    public DirectoryController(CacheHierarchy cacheHierarchy, final String name) {
+        super(cacheHierarchy, name);
+
+        this.cacheGeometry = new CacheGeometry(getExperiment().getArchitecture().getL2Size(), getExperiment().getArchitecture().getL2Assoc(), getExperiment().getArchitecture().getL2LineSize());
 
         ValueProviderFactory<DirectoryControllerState, ValueProvider<DirectoryControllerState>> cacheLineStateProviderFactory = new ValueProviderFactory<DirectoryControllerState, ValueProvider<DirectoryControllerState>>() {
             @Override
@@ -41,34 +63,34 @@ public class DirectoryController extends GeneralCacheController {
             }
         };
 
-        this.cache = new EvictableCache<DirectoryControllerState>(cacheHierarchy, name, config.getGeometry(), config.getEvictionPolicyClz(), cacheLineStateProviderFactory);
+        this.cache = new EvictableCache<DirectoryControllerState>(cacheHierarchy, name, getGeometry(), getReplacementPolicyType(), cacheLineStateProviderFactory);
         this.cacheControllers = new ArrayList<CacheController>();
 
         this.fsmFactory = new DirectoryControllerFiniteStateMachineFactory(new Action1<DirectoryControllerFiniteStateMachine>() {
-                @Override
-                public void apply(DirectoryControllerFiniteStateMachine fsm) {
-                    if (fsm.getPreviousState() != fsm.getState() && fsm.getState().isStable()) {
-                        Action onCompletedCallback = fsm.getOnCompletedCallback();
-                        if (onCompletedCallback != null) {
-                            fsm.setOnCompletedCallback(null);
-                            onCompletedCallback.apply();
-                        }
-                    }
-
-                    if (fsm.getPreviousState() != fsm.getState()) {
-                        List<Action> stalledEventsToProcess = new ArrayList<Action>();
-                        for (Action stalledEvent : fsm.getStalledEvents()) {
-                            stalledEventsToProcess.add(stalledEvent);
-                        }
-
-                        fsm.getStalledEvents().clear();
-
-                        for (Action stalledEvent : stalledEventsToProcess) {
-                            stalledEvent.apply();
-                        }
+            @Override
+            public void apply(DirectoryControllerFiniteStateMachine fsm) {
+                if (fsm.getPreviousState() != fsm.getState() && fsm.getState().isStable()) {
+                    Action onCompletedCallback = fsm.getOnCompletedCallback();
+                    if (onCompletedCallback != null) {
+                        fsm.setOnCompletedCallback(null);
+                        onCompletedCallback.apply();
                     }
                 }
-            });
+
+                if (fsm.getPreviousState() != fsm.getState()) {
+                    List<Action> stalledEventsToProcess = new ArrayList<Action>();
+                    for (Action stalledEvent : fsm.getStalledEvents()) {
+                        stalledEventsToProcess.add(stalledEvent);
+                    }
+
+                    fsm.getStalledEvents().clear();
+
+                    for (Action stalledEvent : stalledEventsToProcess) {
+                        stalledEvent.apply();
+                    }
+                }
+            }
+        });
     }
 
     @Override
@@ -122,7 +144,7 @@ public class DirectoryController extends GeneralCacheController {
             @Override
             public void apply(Integer set, Integer way) {
                 CacheLine<DirectoryControllerState> line = getCache().getLine(set, way);
-                final DirectoryControllerFiniteStateMachine fsm = (DirectoryControllerFiniteStateMachine) line.getStateProvider();
+                DirectoryControllerFiniteStateMachine fsm = (DirectoryControllerFiniteStateMachine) line.getStateProvider();
                 fsm.onEventGetS(message, message.getReq(), message.getTag(), onStalledCallback);
             }
         }, onStalledCallback);
@@ -140,7 +162,7 @@ public class DirectoryController extends GeneralCacheController {
             @Override
             public void apply(Integer set, Integer way) {
                 CacheLine<DirectoryControllerState> line = getCache().getLine(set, way);
-                final DirectoryControllerFiniteStateMachine fsm = (DirectoryControllerFiniteStateMachine) line.getStateProvider();
+                DirectoryControllerFiniteStateMachine fsm = (DirectoryControllerFiniteStateMachine) line.getStateProvider();
                 fsm.onEventGetM(message, message.getReq(), message.getTag(), onStalledCallback);
             }
         }, onStalledCallback);
@@ -192,7 +214,7 @@ public class DirectoryController extends GeneralCacheController {
 
         int way = this.cache.findWay(tag);
         CacheLine<DirectoryControllerState> line = this.cache.getLine(this.cache.getSet(tag), way);
-        DirectoryControllerFiniteStateMachine fsm =(DirectoryControllerFiniteStateMachine) line.getStateProvider();
+        DirectoryControllerFiniteStateMachine fsm = (DirectoryControllerFiniteStateMachine) line.getStateProvider();
         fsm.onEventData(message, sender, tag);
     }
 
@@ -208,28 +230,27 @@ public class DirectoryController extends GeneralCacheController {
         }
 
         final CacheAccess<DirectoryControllerState> cacheAccess = this.cache.newAccess(access, tag);
-        if(cacheAccess.isHitInCache()) {
+        if (cacheAccess.isHitInCache()) {
             onReplacementCompletedCallback.apply(set, cacheAccess.getWay());
-        }
-        else {
-            if(cacheAccess.isEviction()) {
-                final CacheLine<DirectoryControllerState> line = this.getCache().getLine(set, cacheAccess.getWay());
-                final DirectoryControllerFiniteStateMachine fsm = (DirectoryControllerFiniteStateMachine) line.getStateProvider();
+        } else {
+            if (cacheAccess.isReplacement()) {
+                CacheLine<DirectoryControllerState> line = this.getCache().getLine(set, cacheAccess.getWay());
+                DirectoryControllerFiniteStateMachine fsm = (DirectoryControllerFiniteStateMachine) line.getStateProvider();
                 fsm.onEventReplacement(producerFlow, req, tag, cacheAccess,
                         new Action() {
                             @Override
                             public void apply() {
                                 onReplacementCompletedCallback.apply(set, cacheAccess.getWay());
                             }
-                        }, new Action() {
+                        },
+                        new Action() {
                             @Override
                             public void apply() {
                                 getCycleAccurateEventQueue().schedule(DirectoryController.this, onReplacementStalledCallback, 1);
                             }
                         }
                 );
-            }
-            else {
+            } else {
                 onReplacementCompletedCallback.apply(set, cacheAccess.getWay());
             }
         }
@@ -246,6 +267,21 @@ public class DirectoryController extends GeneralCacheController {
 
     public DirectoryControllerFiniteStateMachineFactory getFsmFactory() {
         return fsmFactory;
+    }
+
+    @Override
+    public CacheGeometry getGeometry() {
+        return cacheGeometry;
+    }
+
+    @Override
+    public int getHitLatency() {
+        return getExperiment().getArchitecture().getL2HitLatency();
+    }
+
+    @Override
+    public CacheReplacementPolicyType getReplacementPolicyType() {
+        return getExperiment().getArchitecture().getL2ReplacementPolicyType();
     }
 
     @Override

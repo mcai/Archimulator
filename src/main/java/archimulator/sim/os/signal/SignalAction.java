@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.os.signal;
 
-import archimulator.sim.isa.memory.Memory;
+import archimulator.sim.isa.Memory;
 
 public class SignalAction {
     private int flags;

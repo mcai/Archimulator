@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.isa;
 
-import archimulator.sim.base.event.SimulationEvent;
+import archimulator.sim.common.SimulationEvent;
 import archimulator.sim.os.Context;
 
 public class FunctionReturnEvent extends SimulationEvent {

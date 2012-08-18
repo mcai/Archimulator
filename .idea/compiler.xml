@@ -15,7 +15,9 @@
       <entry name="?*.tld" />
       <entry name="?*.ftl" />
     </wildcardResourcePatterns>
-    <annotationProcessing enabled="false" useClasspath="true" />
+    <bytecodeTargetLevel>
+      <module name="archimulator" target="1.6" />
+    </bytecodeTargetLevel>
   </component>
 </project>
 

@@ -18,15 +18,15 @@
  ******************************************************************************/
 package archimulator.sim.uncore;
 
-import archimulator.sim.base.event.SimulationEvent;
-import archimulator.sim.base.simulation.BasicSimulationObject;
-import archimulator.sim.core.ProcessorConfig;
-import archimulator.sim.uncore.coherence.msi.controller.CacheController;
-import archimulator.sim.uncore.coherence.msi.controller.Controller;
-import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
-import archimulator.sim.uncore.coherence.msi.controller.GeneralCacheController;
+import archimulator.model.Experiment;
+import archimulator.sim.common.SimulationEvent;
+import archimulator.sim.common.BasicSimulationObject;
+import archimulator.sim.uncore.coherence.msi.controller.*;
 import archimulator.sim.uncore.coherence.msi.message.CoherenceMessage;
-import archimulator.sim.uncore.dram.*;
+import archimulator.sim.uncore.dram.BasicMemoryController;
+import archimulator.sim.uncore.dram.FixedLatencyMemoryController;
+import archimulator.sim.uncore.dram.MemoryController;
+import archimulator.sim.uncore.dram.SimpleMemoryController;
 import archimulator.sim.uncore.net.L1sToL2Net;
 import archimulator.sim.uncore.net.L2ToMemNet;
 import archimulator.sim.uncore.net.Net;
@@ -54,22 +54,22 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
 
     private Map<Controller, Map<Controller, PointToPointReorderBuffer>> p2pReorderBuffers;
 
-    public BasicCacheHierarchy(BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, ProcessorConfig processorConfig) {
-        super(blockingEventDispatcher, cycleAccurateEventQueue);
+    public BasicCacheHierarchy(Experiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
+        super(experiment, blockingEventDispatcher, cycleAccurateEventQueue);
 
-        switch (processorConfig.getMemoryHierarchyConfig().getMemoryController().getType()) {
+        switch (getExperiment().getArchitecture().getMainMemoryType()) {
             case SIMPLE:
-                this.memoryController = new SimpleMemoryController(this, (SimpleMainMemoryConfig) processorConfig.getMemoryHierarchyConfig().getMemoryController());
+                this.memoryController = new SimpleMemoryController(this);
                 break;
             case BASIC:
-                this.memoryController = new BasicMemoryController(this, (BasicMainMemoryConfig) processorConfig.getMemoryHierarchyConfig().getMemoryController());
+                this.memoryController = new BasicMemoryController(this);
                 break;
             default:
-                this.memoryController = new FixedLatencyMemoryController(this, (FixedLatencyMainMemoryConfig) processorConfig.getMemoryHierarchyConfig().getMemoryController());
+                this.memoryController = new FixedLatencyMemoryController(this);
                 break;
         }
 
-        this.l2CacheController = new DirectoryController(this, "llc", processorConfig.getMemoryHierarchyConfig().getL2CacheController());
+        this.l2CacheController = new DirectoryController(this, "llc");
         this.l2CacheController.setNext(this.memoryController);
 
         this.l1ICacheControllers = new ArrayList<CacheController>();
@@ -78,20 +78,20 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
         this.itlbs = new ArrayList<TranslationLookasideBuffer>();
         this.dtlbs = new ArrayList<TranslationLookasideBuffer>();
 
-        for (int i = 0; i < processorConfig.getNumCores(); i++) {
-            CacheController l1ICacheController = new CacheController(this, "c" + i + ".icache", processorConfig.getMemoryHierarchyConfig().getL1ICacheController());
+        for (int i = 0; i < getExperiment().getArchitecture().getNumCores(); i++) {
+            CacheController l1ICacheController = new L1ICacheController(this, "c" + i + ".icache");
             l1ICacheController.setNext(this.l2CacheController);
             this.l1ICacheControllers.add(l1ICacheController);
 
-            CacheController l1DCacheController = new CacheController(this, "c" + i + ".dcache", processorConfig.getMemoryHierarchyConfig().getL1DCacheController());
+            CacheController l1DCacheController = new L1DCacheController(this, "c" + i + ".dcache");
             l1DCacheController.setNext(this.l2CacheController);
             this.l1DCacheControllers.add(l1DCacheController);
 
-            for (int j = 0; j < processorConfig.getNumThreadsPerCore(); j++) {
-                TranslationLookasideBuffer itlb = new TranslationLookasideBuffer(this, "c" + i + "t" + j + ".itlb", processorConfig.getTlb());
+            for (int j = 0; j < getExperiment().getArchitecture().getNumThreadsPerCore(); j++) {
+                TranslationLookasideBuffer itlb = new TranslationLookasideBuffer(this, "c" + i + "t" + j + ".itlb");
                 this.itlbs.add(itlb);
 
-                TranslationLookasideBuffer dtlb = new TranslationLookasideBuffer(this, "c" + i + "t" + j + ".dtlb", processorConfig.getTlb());
+                TranslationLookasideBuffer dtlb = new TranslationLookasideBuffer(this, "c" + i + "t" + j + ".dtlb");
                 this.dtlbs.add(dtlb);
             }
         }
@@ -103,7 +103,7 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
     }
 
     public void dumpCacheControllerFsmStats() {
-        for(CacheController l1ICacheController : this.l1ICacheControllers) {
+        for (CacheController l1ICacheController : this.l1ICacheControllers) {
             System.out.println("Cache Controller " + l1ICacheController.getName() + " FSM: ");
             System.out.println("------------------------------------------------------------------------");
             l1ICacheController.getFsmFactory().dump();
@@ -112,7 +112,7 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
         System.out.println();
         System.out.println();
 
-        for(CacheController l1DCacheController : this.l1DCacheControllers) {
+        for (CacheController l1DCacheController : this.l1DCacheControllers) {
             System.out.println("Cache Controller " + l1DCacheController.getName() + " FSM: ");
             System.out.println("------------------------------------------------------------------------");
             l1DCacheController.getFsmFactory().dump();
@@ -127,12 +127,12 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
     }
 
     @Override
-    public void dumpCacheControllerFsmStats(Map<String, Object> stats) {
-        for(CacheController l1ICacheController : this.l1ICacheControllers) {
+    public void dumpCacheControllerFsmStats(Map<String, String> stats) {
+        for (CacheController l1ICacheController : this.l1ICacheControllers) {
             l1ICacheController.getFsmFactory().dump(l1ICacheController.getName(), stats);
         }
 
-        for(CacheController l1DCacheController : this.l1DCacheControllers) {
+        for (CacheController l1DCacheController : this.l1DCacheControllers) {
             l1DCacheController.getFsmFactory().dump(l1DCacheController.getName(), stats);
         }
         this.l2CacheController.getFsmFactory().dump(this.l2CacheController.getName(), stats);
@@ -140,11 +140,11 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
 
     @Override
     public void transfer(final Controller from, final Controller to, int size, final CoherenceMessage message) {
-        if(!this.p2pReorderBuffers.containsKey(from)) {
+        if (!this.p2pReorderBuffers.containsKey(from)) {
             this.p2pReorderBuffers.put(from, new HashMap<Controller, PointToPointReorderBuffer>());
         }
 
-        if(!this.p2pReorderBuffers.get(from).containsKey(to)) {
+        if (!this.p2pReorderBuffers.get(from).containsKey(to)) {
             this.p2pReorderBuffers.get(from).put(to, new PointToPointReorderBuffer(from, to));
         }
 
@@ -174,6 +174,7 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
         return l1DCacheControllers;
     }
 
+    @SuppressWarnings("unchecked")
     public List<GeneralCacheController> getCacheControllers() {
         List<GeneralCacheController> cacheControllers = new ArrayList<GeneralCacheController>();
         cacheControllers.add(l2CacheController);

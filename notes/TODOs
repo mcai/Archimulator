@@ -6,7 +6,7 @@ TODOs:
 * multithreaded simulation support; especial support for software-based helper threads
 
 * add Apache Commons Math based statistics support to existing code
-* add predefined pseudocalls to aid simulation control and notification
+* add predefined pseudo calls to aid simulation control and notification
 * support sampled simulations
 
 * ETA calculation

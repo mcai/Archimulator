@@ -18,7 +18,6 @@
  ******************************************************************************/
 package archimulator.sim.core;
 
-import archimulator.sim.base.event.ResetStatEvent;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
 
@@ -120,18 +119,6 @@ public class FunctionalUnitPool {
         for (FunctionalUnitOperationType fuOperationType : fuOperationTypes) {
             this.acquireFailedOnNoFreeFu.put(fuOperationType, 0L);
         }
-
-        this.core.getBlockingEventDispatcher().addListener(ResetStatEvent.class, new Action1<ResetStatEvent>() {
-            public void apply(ResetStatEvent event) {
-                for (FunctionalUnitType fuType : FunctionalUnitPool.this.noFreeFu.keySet()) {
-                    FunctionalUnitPool.this.noFreeFu.put(fuType, 0L);
-                }
-
-                for (FunctionalUnitOperationType fuOperationType : FunctionalUnitPool.this.acquireFailedOnNoFreeFu.keySet()) {
-                    FunctionalUnitPool.this.acquireFailedOnNoFreeFu.put(fuOperationType, 0L);
-                }
-            }
-        });
     }
 
     private FunctionalUnitDescriptor addFunctionalUnitDescriptor(FunctionalUnitType type, int quantity) {
@@ -155,11 +142,13 @@ public class FunctionalUnitPool {
 
         this.core.getCycleAccurateEventQueue()
                 .schedule(this, new Action() {
+                    @Override
                     public void apply() {
                         fuDescriptor.numFree++;
                     }
                 }, fuOperation.issueLatency)
                 .schedule(this, new Action() {
+                    @Override
                     public void apply() {
                         if (!reorderBufferEntry.isSquashed()) {
                             onCompletedCallback.apply(reorderBufferEntry);

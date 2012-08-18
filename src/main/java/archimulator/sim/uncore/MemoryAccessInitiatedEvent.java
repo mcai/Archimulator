@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore;
 
-import archimulator.sim.base.event.SimulationEvent;
+import archimulator.sim.common.SimulationEvent;
 import archimulator.sim.core.Thread;
 
 public class MemoryAccessInitiatedEvent extends SimulationEvent {

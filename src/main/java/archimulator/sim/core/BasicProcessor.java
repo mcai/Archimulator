@@ -18,15 +18,14 @@
  ******************************************************************************/
 package archimulator.sim.core;
 
-import archimulator.sim.base.event.ResetStatEvent;
-import archimulator.sim.base.event.SimulationEvent;
-import archimulator.sim.base.simulation.BasicSimulationObject;
+import archimulator.model.Experiment;
+import archimulator.sim.common.SimulationEvent;
+import archimulator.sim.common.BasicSimulationObject;
 import archimulator.sim.os.Context;
 import archimulator.sim.os.ContextKilledEvent;
 import archimulator.sim.os.ContextState;
 import archimulator.sim.os.Kernel;
 import archimulator.sim.uncore.CacheHierarchy;
-import net.pickapack.action.Action1;
 import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
 
@@ -35,18 +34,14 @@ import java.util.*;
 public class BasicProcessor extends BasicSimulationObject implements Processor {
     private List<Core> cores;
 
-    private ProcessorConfig config;
-
     private Kernel kernel;
 
     private CacheHierarchy cacheHierarchy;
 
     private Map<Context, Thread> contextToThreadMappings;
 
-    public BasicProcessor(BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, ProcessorConfig processorConfig, Kernel kernel, CacheHierarchy cacheHierarchy) {
-        super(blockingEventDispatcher, cycleAccurateEventQueue);
-
-        this.config = processorConfig;
+    public BasicProcessor(Experiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, Kernel kernel, CacheHierarchy cacheHierarchy) {
+        super(experiment, blockingEventDispatcher, cycleAccurateEventQueue);
 
         this.kernel = kernel;
 
@@ -54,13 +49,13 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
 
         this.cores = new ArrayList<Core>();
 
-        for (int i = 0; i < this.config.getNumCores(); i++) {
+        for (int i = 0; i < getExperiment().getArchitecture().getNumCores(); i++) {
             Core core = new BasicCore(this, i);
 
             core.setL1ICacheController(cacheHierarchy.getL1ICacheControllers().get(i));
             core.setL1DCacheController(cacheHierarchy.getL1DCacheControllers().get(i));
 
-            for (int j = 0; j < this.config.getNumThreadsPerCore(); j++) {
+            for (int j = 0; j < getExperiment().getArchitecture().getNumThreadsPerCore(); j++) {
                 BasicThread thread = new BasicThread(core, j);
                 core.getThreads().add(thread);
 
@@ -75,12 +70,6 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
         this.contextToThreadMappings = new HashMap<Context, Thread>();
 
         this.updateContextToThreadAssignments();
-
-        this.getBlockingEventDispatcher().addListener(ResetStatEvent.class, new Action1<ResetStatEvent>() {
-            public void apply(ResetStatEvent event) {
-                resetStat();
-            }
-        });
     }
 
     public void updateContextToThreadAssignments() {
@@ -90,8 +79,8 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
             if (context.getThreadId() != -1 && this.contextToThreadMappings.get(context) == null) {
                 context.setState(ContextState.RUNNING);
 
-                int coreNum = context.getThreadId() / this.config.getNumThreadsPerCore();
-                int threadNum = context.getThreadId() % this.config.getNumThreadsPerCore();
+                int coreNum = context.getThreadId() / getExperiment().getArchitecture().getNumThreadsPerCore();
+                int threadNum = context.getThreadId() % getExperiment().getArchitecture().getNumThreadsPerCore();
 
                 Thread candidateThread = this.getCores().get(coreNum).getThreads().get(threadNum);
 
@@ -129,14 +118,6 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
         this.getBlockingEventDispatcher().dispatch(new ContextKilledEvent(context));
     }
 
-    private void resetStat() {
-        this.getCycleAccurateEventQueue().resetCurrentCycle();
-    }
-
-    public ProcessorConfig getConfig() {
-        return config;
-    }
-
     public List<Core> getCores() {
         return cores;
     }
@@ -148,5 +129,4 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
     public CacheHierarchy getCacheHierarchy() {
         return cacheHierarchy;
     }
-
 }

@@ -34,12 +34,12 @@ public class JaxenHelper {
     public static <T> List<T> selectNodes(Object obj, String expr) {
         try {
             List<Element> result = new JavaBeanXPath(expr).selectNodes(obj);
-            return convert(result, new Converter<Element, T>() {
+            return result != null ? convert(result, new Converter<Element, T>() {
                 @Override
                 public T convert(Element from) {
                     return (T) from.getObject();
                 }
-            });
+            }) : null;
         } catch (JaxenException e) {
             throw new RuntimeException(e);
         }
@@ -55,33 +55,45 @@ public class JaxenHelper {
         }
     }
 
-    public static void dumpSingleStatFromXPath(Map<String, Object> stats, Object obj, String expr) {
+    public static void dumpValueFromXPath(Map<String, String> stats, Object obj, String expr) {
         Object resultObj = selectSingleNode(obj, expr);
-        if(resultObj != null) {
+        if (resultObj != null) {
             if (resultObj instanceof Map) {
                 Map resultMap = (Map) resultObj;
 
-                for(Object key : resultMap.keySet()) {
-                    stats.put(expr + "[" + key + "]", toString(resultMap.get(key)));
+                for (Object key : resultMap.keySet()) {
+                    stats.put(escape(expr) + "[" + key + "]", toString(resultMap.get(key)));
                 }
             } else {
-                stats.put(expr, toString(resultObj));
+                stats.put(escape(expr), toString(resultObj));
             }
+        }
+        else {
+            throw new IllegalArgumentException();
         }
     }
 
-    public static void dumpStatsFromXPath(Map<String, Object> stats, Object obj, String expr) {
+    public static void dumpValuesFromXPath(Map<String, String> stats, Object obj, String expr) {
         List<Object> result = selectNodes(obj, expr);
-        for (int i = 0; i < result.size(); i++) {
-            Object resultObj = result.get(i);
-            stats.put(expr + "[" + i + "]", toString(resultObj));
+        if (result != null) {
+            for (int i = 0; i < result.size(); i++) {
+                Object resultObj = result.get(i);
+                stats.put(escape(expr) + "[" + i + "]", toString(resultObj));
+            }
         }
+        else {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    private static String escape(String str) {
+        return str.replaceAll("'", "").replaceAll("\\[", "\\[").replaceAll("\\]", "\\]");
     }
 
     private static String toString(Object resultObj) {
-        if(resultObj instanceof Integer || resultObj instanceof Long || resultObj instanceof Float || resultObj instanceof Double) {
+        if (resultObj instanceof Integer || resultObj instanceof Long || resultObj instanceof Float || resultObj instanceof Double) {
             return MessageFormat.format("{0}", resultObj);
         }
-        return resultObj + "";
+        return escape(resultObj + "");
     }
 }

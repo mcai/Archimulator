@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.owasp:proxy:1.1-20120719_0005">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/owasp/proxy/1.1-20120719_0005/proxy-1.1-20120719_0005.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/owasp/proxy/1.1-20120719_0005/proxy-1.1-20120719_0005-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/owasp/proxy/1.1-20120719_0005/proxy-1.1-20120719_0005-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

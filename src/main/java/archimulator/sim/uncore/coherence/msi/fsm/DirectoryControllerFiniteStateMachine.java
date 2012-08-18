@@ -1,3 +1,21 @@
+/*******************************************************************************
+ * Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).
+ *
+ * This file is part of the Archimulator multicore architectural simulator.
+ *
+ * Archimulator is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Archimulator is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
 package archimulator.sim.uncore.coherence.msi.fsm;
 
 import archimulator.sim.uncore.MemoryHierarchyAccess;
@@ -152,7 +170,7 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
     }
 
     public void hit(MemoryHierarchyAccess access, int tag, int set, int way) {
-        this.directoryController.getCache().getEvictionPolicy().handlePromotionOnHit(set, way);
+        this.directoryController.getCache().getReplacementPolicy().handlePromotionOnHit(set, way);
         this.fireServiceNonblockingRequestEvent(access, tag, true);
     }
 
@@ -229,7 +247,7 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
 
     public void sendRecallToOwner(CacheCoherenceFlow producerFlow, int tag) {
         CacheController owner = getDirectoryEntry().getOwner();
-        if(owner.getCache().findWay(tag) == -1) {
+        if (owner.getCache().findWay(tag) == -1) {
             throw new IllegalArgumentException();
         }
 
@@ -238,7 +256,7 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
 
     public void sendRecallToSharers(CacheCoherenceFlow producerFlow, int tag) {
         for (CacheController sharer : this.getDirectoryEntry().getSharers()) {
-            if(sharer.getCache().findWay(tag) == -1) {
+            if (sharer.getCache().findWay(tag) == -1) {
                 throw new IllegalArgumentException();
             }
 
@@ -255,7 +273,7 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
     }
 
     public void addReqAndOwnerToSharers(CacheController req) {
-        if(this.getDirectoryEntry().getSharers().contains(req) || this.getDirectoryEntry().getSharers().contains(this.getDirectoryEntry().getOwner())) {
+        if (this.getDirectoryEntry().getSharers().contains(req) || this.getDirectoryEntry().getSharers().contains(this.getDirectoryEntry().getOwner())) {
             throw new IllegalArgumentException();
         }
 
@@ -264,7 +282,7 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
     }
 
     public void addReqToSharers(CacheController req) {
-        if(this.getDirectoryEntry().getSharers().contains(req)) {
+        if (this.getDirectoryEntry().getSharers().contains(req)) {
             throw new IllegalArgumentException();
         }
 
@@ -272,7 +290,7 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
     }
 
     public void removeReqFromSharers(CacheController req) {
-        if(!this.getDirectoryEntry().getSharers().contains(req)) {
+        if (!this.getDirectoryEntry().getSharers().contains(req)) {
             throw new IllegalArgumentException();
         }
 

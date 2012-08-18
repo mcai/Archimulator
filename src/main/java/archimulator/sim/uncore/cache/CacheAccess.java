@@ -30,21 +30,21 @@ public class CacheAccess<StateT extends Serializable> {
     private CacheLine<StateT> line;
 
     private boolean hitInCache;
-    private boolean eviction;
+    private boolean replacement;
 
     public CacheAccess(EvictableCache<StateT> cache, MemoryHierarchyAccess access, int set, int way, int tag) {
         this.access = access;
         this.set = set;
         this.way = way;
 
-        if(this.way == CacheLine.INVALID_TAG) {
+        if (this.way == CacheLine.INVALID_TAG) {
             throw new IllegalArgumentException();
         }
 
         this.line = cache.getLine(this.set, this.way);
 
         this.hitInCache = this.line.getTag() == tag;
-        this.eviction = this.line.isValid();
+        this.replacement = this.line.isValid();
     }
 
     public MemoryHierarchyAccess getAccess() {
@@ -67,12 +67,12 @@ public class CacheAccess<StateT extends Serializable> {
         return hitInCache;
     }
 
-    public boolean isEviction() {
-        return eviction;
+    public boolean isReplacement() {
+        return replacement;
     }
 
     @Override
     public String toString() {
-        return String.format("[%d, %d] %s {hitInCache=%s, eviction=%s}", set, way, access.getType(), isHitInCache(), isEviction());
+        return String.format("[%d, %d] %s {hitInCache=%s, replacement=%s}", set, way, access.getType(), isHitInCache(), isReplacement());
     }
 }

@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.os.signal;
 
-import archimulator.sim.isa.memory.Memory;
+import archimulator.sim.isa.Memory;
 import archimulator.sim.os.Kernel;
 import net.pickapack.math.MathHelper;
 

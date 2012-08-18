@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore.net;
 
-import archimulator.sim.base.simulation.BasicSimulationObject;
+import archimulator.sim.common.BasicSimulationObject;
 import archimulator.sim.uncore.CacheHierarchy;
 import archimulator.sim.uncore.MemoryDevice;
 import net.pickapack.action.Action;

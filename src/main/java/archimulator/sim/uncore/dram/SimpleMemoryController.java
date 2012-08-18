@@ -22,27 +22,33 @@ import archimulator.sim.uncore.CacheHierarchy;
 import net.pickapack.action.Action;
 
 public class SimpleMemoryController extends MemoryController {
-    private SimpleMainMemoryConfig config;
-
-    public SimpleMemoryController(CacheHierarchy cacheHierarchy, SimpleMainMemoryConfig config) {
+    public SimpleMemoryController(CacheHierarchy cacheHierarchy) {
         super(cacheHierarchy);
-
-        this.config = config;
     }
 
     @Override
-    protected void access(int addr, final Action onCompletedCallback) {
-        this.getCycleAccurateEventQueue().schedule(this, new Action() {
-            public void apply() {
-                onCompletedCallback.apply();
-            }
-        }, this.getLatency());
+    protected void access(int address, Action onCompletedCallback) {
+        this.getCycleAccurateEventQueue().schedule(this, onCompletedCallback, this.getLatency());
     }
 
     private int getLatency() {
-        int chunks = (this.config.getLineSize() - (this.config.getBusWidth() - 1)) / this.config.getBusWidth();
-        assert (chunks > 0);
+        int chunks = (this.getLineSize() - (this.getBusWidth() - 1)) / this.getBusWidth();
+        if ((chunks <= 0)) {
+            throw new IllegalArgumentException();
+        }
 
-        return this.config.getMemoryLatency() + (this.config.getMemoryTrunkLatency() * (chunks - 1));
+        return this.getMemoryLatency() + (this.getMemoryTrunkLatency() * (chunks - 1));
+    }
+
+    public int getMemoryLatency() {
+        return getExperiment().getArchitecture().getSimpleMainMemoryMemoryLatency();
+    }
+
+    public int getMemoryTrunkLatency() {
+        return getExperiment().getArchitecture().getSimpleMainMemoryMemoryTrunkLatency();
+    }
+
+    public int getBusWidth() {
+        return getExperiment().getArchitecture().getSimpleMainMemoryBusWidth();
     }
 }

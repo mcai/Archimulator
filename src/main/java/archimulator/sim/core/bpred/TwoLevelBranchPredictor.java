@@ -50,8 +50,8 @@ public class TwoLevelBranchPredictor extends DynamicBranchPredictor {
         }
     }
 
-    public TwoLevelBranchPredictor(Thread thread, String name, TwoLevelBranchPredictorConfig config) {
-        this(thread, name, config.getL1Size(), config.getL2Size(), config.getShiftWidth(), config.isXor(), config.getBtbSets(), config.getBtbAssoc(), config.getRetStackSize());
+    public TwoLevelBranchPredictor(Thread thread, String name) {
+        this(thread, name, thread.getExperiment().getArchitecture().getTwoLevelBpredL1Size(), thread.getExperiment().getArchitecture().getTwoLevelBpredL2Size(), thread.getExperiment().getArchitecture().getTwoLevelBpredShiftWidth(), thread.getExperiment().getArchitecture().isTwoLevelBpredXor(), thread.getExperiment().getArchitecture().getTwoLevelBpredBtbSets(), thread.getExperiment().getArchitecture().getTwoLevelBpredBtbAssoc(), thread.getExperiment().getArchitecture().getTwoLevelBpredRetStackSize());
     }
 
     @Override

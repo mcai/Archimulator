@@ -60,7 +60,7 @@ Inter-Thread Reuse Distance Prediction Based Shared LLC Replacement for Feedback
 		
 5. Inter-Thread Reuse Distance Based feedback directed synchronization triggering and aggressiveness adjustment for the HT scheme
 	hardware triggered synchronization of HT with MT: 
-		based on the already implemented pseudocall mechanism that pass parameters between the program and the processor in some unused registers by the ADDU MIPS instruction with predefined special parameters
+		based on the already implemented pseudo call mechanism that pass parameters between the program and the processor in some unused registers by the ADDU MIPS instruction with predefined special parameters
 		A register based polling process is used to let the HT periodically ask the processor if it need to synchronize with MT		
 	
 	dynamic HT aggressivenss adjustment: 

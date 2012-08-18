@@ -132,7 +132,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                         fsm.fireCacheLineInsertEvent(event.getAccess(), event.getTag(), fsm.getVictimTag());
                         fsm.setEvicterTag(CacheLine.INVALID_TAG);
                         fsm.setVictimTag(CacheLine.INVALID_TAG);
-                        fsm.getDirectoryController().getCache().getEvictionPolicy().handleInsertionOnMiss(fsm.getSet(), fsm.getWay());
+                        fsm.getDirectoryController().getCache().getReplacementPolicy().handleInsertionOnMiss(fsm.getSet(), fsm.getWay());
                     }
                 }, DirectoryControllerState.S);
 
@@ -184,7 +184,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                         fsm.fireCacheLineInsertEvent(event.getAccess(), event.getTag(), fsm.getVictimTag());
                         fsm.setEvicterTag(CacheLine.INVALID_TAG);
                         fsm.setVictimTag(CacheLine.INVALID_TAG);
-                        fsm.getDirectoryController().getCache().getEvictionPolicy().handleInsertionOnMiss(fsm.getSet(), fsm.getWay());
+                        fsm.getDirectoryController().getCache().getReplacementPolicy().handleInsertionOnMiss(fsm.getSet(), fsm.getWay());
                     }
                 }, DirectoryControllerState.M);
 

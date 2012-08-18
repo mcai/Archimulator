@@ -18,11 +18,9 @@
  ******************************************************************************/
 package archimulator.sim.core.bpred;
 
-import archimulator.sim.base.event.ResetStatEvent;
 import archimulator.sim.core.Thread;
 import archimulator.sim.isa.Mnemonic;
 import net.pickapack.Reference;
-import net.pickapack.action.Action1;
 
 public abstract class BranchPredictor {
     private String name;
@@ -38,13 +36,6 @@ public abstract class BranchPredictor {
         this.thread = thread;
         this.name = name;
         this.type = type;
-
-        this.thread.getBlockingEventDispatcher().addListener(ResetStatEvent.class, new Action1<ResetStatEvent>() {
-            public void apply(ResetStatEvent event) {
-                BranchPredictor.this.accesses = 0;
-                BranchPredictor.this.hits = 0;
-            }
-        });
     }
 
     public abstract int predict(int baddr, int btarget, Mnemonic mnemonic, BranchPredictorUpdate dirUpdate, Reference<Integer> returnAddressStackRecoverIndex);

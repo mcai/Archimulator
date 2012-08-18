@@ -17,8 +17,8 @@ package archimulator.sim.uncore.cache; /****************************************
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-import archimulator.sim.base.simulation.BasicSimulationObject;
-import archimulator.sim.base.simulation.SimulationObject;
+import archimulator.sim.common.BasicSimulationObject;
+import archimulator.sim.common.SimulationObject;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import archimulator.util.ValueProvider;
 import archimulator.util.ValueProviderFactory;

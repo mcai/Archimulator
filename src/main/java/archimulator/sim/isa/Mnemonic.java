@@ -30,7 +30,7 @@ public enum Mnemonic {
     NOP,
     BREAK,
 
-    SYSCALL,
+    SYSTEM_CALL,
 
     ADD,
     ADDI,

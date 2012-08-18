@@ -18,15 +18,15 @@
  ******************************************************************************/
 package archimulator.sim.os;
 
-import archimulator.sim.base.simulation.BasicSimulationObject;
-import archimulator.sim.base.simulation.ContextConfig;
-import archimulator.sim.base.simulation.Simulation;
-import archimulator.sim.base.simulation.SimulationObject;
+import archimulator.model.ContextMapping;
+import archimulator.sim.common.BasicSimulationObject;
+import archimulator.sim.common.Simulation;
+import archimulator.sim.common.SimulationObject;
 import archimulator.sim.isa.BitField;
 import archimulator.sim.isa.Mnemonic;
 import archimulator.sim.isa.StaticInstruction;
-import archimulator.sim.isa.memory.BasicMemory;
-import archimulator.sim.isa.memory.Memory;
+import archimulator.sim.isa.Memory;
+import archimulator.util.SimulatedProgramBuildHelper;
 
 import java.io.File;
 import java.io.Serializable;
@@ -55,33 +55,31 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
 
     private int id;
 
-    private ContextConfig contextConfig;
+    private ContextMapping contextMapping;
 
-    public Process(Kernel kernel, String simulationDirectory, ContextConfig contextConfig) {
+    public Process(Kernel kernel, String simulationDirectory, ContextMapping contextMapping) {
         super(kernel);
 
-        this.contextConfig = contextConfig;
+        this.contextMapping = contextMapping;
 
         this.id = Simulation.currentProcessId++;
         kernel.getProcesses().add(this);
 
-        this.stdinFileDescriptor = contextConfig.getSimulatedProgram().getStdin().length() > 0 ? NativeSyscalls.LIBC.open(simulationDirectory + File.separator + contextConfig.getSimulatedProgram().getStdin(), OpenFlags.O_RDONLY) : 0;
-        this.stdoutFileDescriptor = contextConfig.getStdout().length() > 0 ? NativeSyscalls.LIBC.open(simulationDirectory + File.separator + contextConfig.getStdout(), OpenFlags.O_CREAT | OpenFlags.O_APPEND | OpenFlags.O_TRUNC | OpenFlags.O_WRONLY, 0660) : 1;
+        this.stdinFileDescriptor = contextMapping.getSimulatedProgram().getStdin().length() > 0 ? NativeSystemCalls.LIBC.open(simulationDirectory + File.separator + contextMapping.getSimulatedProgram().getStdin(), OpenFlags.O_RDONLY) : 0;
+        this.stdoutFileDescriptor = contextMapping.getStdout().length() > 0 ? NativeSystemCalls.LIBC.open(simulationDirectory + File.separator + contextMapping.getStdout(), OpenFlags.O_CREAT | OpenFlags.O_APPEND | OpenFlags.O_TRUNC | OpenFlags.O_WRONLY, 0660) : 1;
 
         this.envs = new ArrayList<String>();
 
-//        ElfFile elfFile = new ElfFile(contextConfig.toCmdArgList().get(0)); //TODO
-
         this.littleEndian = false;
 
-        this.memory = new BasicMemory(kernel, simulationDirectory, this.littleEndian, this.id);
+        this.memory = new Memory(kernel, this.littleEndian, this.id);
 
-        contextConfig.getSimulatedProgram().build();
+        SimulatedProgramBuildHelper.build(contextMapping.getSimulatedProgram().getCwd(), contextMapping.getSimulatedProgram().isHt(), contextMapping.getHtLookahead(), contextMapping.getHtStride());
 
-        this.loadProgram(kernel, simulationDirectory, contextConfig);
+        this.loadProgram(kernel, simulationDirectory, contextMapping);
     }
 
-    protected abstract void loadProgram(Kernel kernel, String simulationDirectory, ContextConfig contextConfig);
+    protected abstract void loadProgram(Kernel kernel, String simulationDirectory, ContextMapping contextMapping);
 
     public int translateFileDescriptor(int fileDescriptor) {
         if (fileDescriptor == 1 || fileDescriptor == 2) {
@@ -95,10 +93,10 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
 
     public void closeProgram() {
         if (this.stdinFileDescriptor != 0) {
-            NativeSyscalls.LIBC.close(this.stdinFileDescriptor);
+            NativeSystemCalls.LIBC.close(this.stdinFileDescriptor);
         }
         if (this.stdoutFileDescriptor > 2) {
-            NativeSyscalls.LIBC.close(this.stdoutFileDescriptor);
+            NativeSystemCalls.LIBC.close(this.stdoutFileDescriptor);
         }
     }
 
@@ -195,8 +193,8 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
         return memory;
     }
 
-    public ContextConfig getContextConfig() {
-        return contextConfig;
+    public ContextMapping getContextMapping() {
+        return contextMapping;
     }
 
     public static final int TEXT_BASE = 0x00400000;

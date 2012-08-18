@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.core;
 
-import archimulator.sim.base.simulation.SimulationObject;
+import archimulator.sim.common.SimulationObject;
 import archimulator.sim.os.Kernel;
 import archimulator.sim.uncore.CacheHierarchy;
 
@@ -26,8 +26,6 @@ import java.util.List;
 
 public interface Processor extends SimulationObject {
     List<Core> getCores();
-
-    ProcessorConfig getConfig();
 
     Kernel getKernel();
 

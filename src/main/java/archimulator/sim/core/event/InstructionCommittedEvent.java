@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.core.event;
 
-import archimulator.sim.base.event.SimulationEvent;
+import archimulator.sim.common.SimulationEvent;
 import archimulator.sim.core.DynamicInstruction;
 
 public class InstructionCommittedEvent extends SimulationEvent {

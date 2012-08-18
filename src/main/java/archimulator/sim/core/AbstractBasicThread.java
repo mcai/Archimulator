@@ -18,11 +18,9 @@
  ******************************************************************************/
 package archimulator.sim.core;
 
-import archimulator.sim.base.event.ResetStatEvent;
-import archimulator.sim.base.simulation.BasicSimulationObject;
+import archimulator.sim.common.BasicSimulationObject;
 import archimulator.sim.core.bpred.*;
-import archimulator.sim.isa.ArchitecturalRegisterFile;
-import archimulator.sim.isa.RegisterDependencyType;
+import archimulator.sim.isa.*;
 import archimulator.sim.os.Context;
 import archimulator.sim.uncore.tlb.TranslationLookasideBuffer;
 import net.pickapack.action.Action1;
@@ -72,17 +70,20 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
     protected long selectionStallOnCanNotStore;
     protected long selectionStallOnNoFreeFunctionalUnit;
 
+    private List<Mnemonic> executedMnemonics;
+    private List<String> executedSystemCalls;
+
     public AbstractBasicThread(Core core, int num) {
         super(core);
 
         this.core = core;
 
         this.num = num;
-        this.id = this.core.getNum() * this.core.getProcessor().getConfig().getNumThreadsPerCore() + this.num;
+        this.id = this.core.getNum() * getExperiment().getArchitecture().getNumThreadsPerCore() + this.num;
 
         this.name = "c" + this.core.getNum() + "t" + this.num;
 
-        switch (core.getProcessor().getConfig().getBpred().getType()) {
+        switch (getExperiment().getArchitecture().getBpredType()) {
             case PERFECT:
                 this.bpred = new PerfectBranchPredictor(this, this.name + ".bpred");
                 break;
@@ -93,21 +94,21 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
                 this.bpred = new NotTakenBranchPredictor(this, this.name + ".bpred");
                 break;
             case TWO_BIT:
-                this.bpred = new TwoBitBranchPredictor(this, this.name + ".bpred", (TwoBitBranchPredictorConfig) core.getProcessor().getConfig().getBpred());
+                this.bpred = new TwoBitBranchPredictor(this, this.name + ".bpred");
                 break;
             case TWO_LEVEL:
-                this.bpred = new TwoLevelBranchPredictor(this, this.name + ".bpred", (TwoLevelBranchPredictorConfig) core.getProcessor().getConfig().getBpred());
+                this.bpred = new TwoLevelBranchPredictor(this, this.name + ".bpred");
                 break;
             case COMBINED:
-                this.bpred = new CombinedBranchPredictor(this, this.name + ".bpred", (CombinedBranchPredictorConfig) core.getProcessor().getConfig().getBpred());
+                this.bpred = new CombinedBranchPredictor(this, this.name + ".bpred");
                 break;
             default:
                 throw new IllegalArgumentException();
         }
 
-        this.intPhysicalRegisterFile = new PhysicalRegisterFile(this.name + ".intPhysicalRegisterFile", core.getProcessor().getConfig().getPhysicalRegisterFileCapacity());
-        this.fpPhysicalRegisterFile = new PhysicalRegisterFile(this.name + ".fpPhysicalRegisterFile", core.getProcessor().getConfig().getPhysicalRegisterFileCapacity());
-        this.miscPhysicalRegisterFile = new PhysicalRegisterFile(this.name + ".miscPhysicalRegisterFile", core.getProcessor().getConfig().getPhysicalRegisterFileCapacity());
+        this.intPhysicalRegisterFile = new PhysicalRegisterFile(this.name + ".intPhysicalRegisterFile", getExperiment().getArchitecture().getPhysicalRegisterFileCapacity());
+        this.fpPhysicalRegisterFile = new PhysicalRegisterFile(this.name + ".fpPhysicalRegisterFile", getExperiment().getArchitecture().getPhysicalRegisterFileCapacity());
+        this.miscPhysicalRegisterFile = new PhysicalRegisterFile(this.name + ".miscPhysicalRegisterFile", getExperiment().getArchitecture().getPhysicalRegisterFileCapacity());
 
         this.renameTable = new RegisterRenameTable(this.name + ".renameTable");
 
@@ -132,31 +133,34 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
             this.renameTable.put(dep, physReg);
         }
 
-        this.decodeBuffer = new PipelineBuffer<DecodeBufferEntry>(this.core.getProcessor().getConfig().getDecodeBufferCapacity());
-        this.reorderBuffer = new PipelineBuffer<ReorderBufferEntry>(this.core.getProcessor().getConfig().getReorderBufferCapacity());
-        this.loadStoreQueue = new PipelineBuffer<LoadStoreQueueEntry>(this.core.getProcessor().getConfig().getLoadStoreQueueCapacity());
+        this.decodeBuffer = new PipelineBuffer<DecodeBufferEntry>(getExperiment().getArchitecture().getDecodeBufferCapacity());
+        this.reorderBuffer = new PipelineBuffer<ReorderBufferEntry>(getExperiment().getArchitecture().getReorderBufferCapacity());
+        this.loadStoreQueue = new PipelineBuffer<LoadStoreQueueEntry>(getExperiment().getArchitecture().getLoadStoreQueueCapacity());
 
-        this.getBlockingEventDispatcher().addListener(ResetStatEvent.class, new Action1<ResetStatEvent>() {
-            public void apply(ResetStatEvent event) {
-                AbstractBasicThread.this.totalInsts = 0;
+        this.executedMnemonics = new ArrayList<Mnemonic>();
+        this.executedSystemCalls = new ArrayList<String>();
 
-                AbstractBasicThread.this.decodeBufferFull = 0;
-                AbstractBasicThread.this.reorderBufferFull = 0;
-                AbstractBasicThread.this.loadStoreQueueFull = 0;
+        this.getBlockingEventDispatcher().addListener(InstructionFunctionallyExecutedEvent.class, new Action1<InstructionFunctionallyExecutedEvent>() {
+            @Override
+            public void apply(InstructionFunctionallyExecutedEvent event) {
+                if (event.getContext() == context) {
+                    Mnemonic mnemonic = event.getStaticInst().getMnemonic();
+                    if (!executedMnemonics.contains(mnemonic)) {
+                        executedMnemonics.add(mnemonic);
+                    }
+                }
+            }
+        });
 
-                AbstractBasicThread.this.intPhysicalRegisterFileFull = 0;
-                AbstractBasicThread.this.fpPhysicalRegisterFileFull = 0;
-                AbstractBasicThread.this.miscPhysicalRegisterFileFull = 0;
-
-                AbstractBasicThread.this.fetchStallsOnDecodeBufferIsFull = 0;
-
-                AbstractBasicThread.this.registerRenameStallsOnDecodeBufferIsEmpty = 0;
-                AbstractBasicThread.this.registerRenameStallsOnReorderBufferIsFull = 0;
-                AbstractBasicThread.this.registerRenameStallsOnLoadStoreQueueFull = 0;
-
-                AbstractBasicThread.this.selectionStallOnCanNotLoad = 0;
-                AbstractBasicThread.this.selectionStallOnCanNotStore = 0;
-                AbstractBasicThread.this.selectionStallOnNoFreeFunctionalUnit = 0;
+        this.getBlockingEventDispatcher().addListener(SystemCallExecutedEvent.class, new Action1<SystemCallExecutedEvent>() {
+            @Override
+            public void apply(SystemCallExecutedEvent event) {
+                if (event.getContext() == context) {
+                    String systemCallName = event.getSystemCallName();
+                    if (!executedSystemCalls.contains(systemCallName)) {
+                        executedSystemCalls.add(systemCallName);
+                    }
+                }
             }
         });
     }
@@ -338,5 +342,15 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
     @Override
     public long getSelectionStallOnNoFreeFunctionalUnit() {
         return selectionStallOnNoFreeFunctionalUnit;
+    }
+
+    @Override
+    public List<Mnemonic> getExecutedMnemonics() {
+        return executedMnemonics;
+    }
+
+    @Override
+    public List<String> getExecutedSystemCalls() {
+        return executedSystemCalls;
     }
 }

@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.core;
 
-import archimulator.sim.base.simulation.Simulation;
+import archimulator.sim.common.Simulation;
 import archimulator.sim.core.bpred.BranchPredictorUpdate;
 
 public class DecodeBufferEntry {

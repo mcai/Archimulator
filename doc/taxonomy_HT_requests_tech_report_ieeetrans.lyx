@@ -1779,7 +1779,7 @@ Hardware triggered synchronization of HT with MT
 
 \begin_deeper
 \begin_layout Itemize
-Based on the already implemented pseudocall mechanism that pass parameters
+Based on the already implemented pseudo call mechanism that pass parameters
  between the program and the processor in some unused registers by the ADDIU
  MIPS instruction with predefined special parameters
 \end_layout
@@ -3085,7 +3085,7 @@ HT Spawn
 \begin_inset Quotes erd
 \end_inset
 
- pseudocall is encountered.
+ pseudo call is encountered.
 \end_layout
 
 \begin_layout Section

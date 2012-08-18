@@ -18,9 +18,9 @@
  ******************************************************************************/
 package archimulator.sim.os;
 
-import archimulator.sim.base.simulation.BasicSimulationObject;
-import archimulator.sim.base.simulation.Simulation;
-import archimulator.sim.base.simulation.SimulationObject;
+import archimulator.sim.common.BasicSimulationObject;
+import archimulator.sim.common.Simulation;
+import archimulator.sim.common.SimulationObject;
 import archimulator.sim.isa.ArchitecturalRegisterFile;
 import archimulator.sim.isa.StaticInstruction;
 import archimulator.sim.os.event.SystemEvent;
@@ -40,7 +40,7 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
     private List<Context> contexts;
     private List<Process> processes;
 
-    private SyscallEmulation syscallEmulation;
+    private SystemCallEmulation systemCallEmulation;
 
     private long currentCycle;
 
@@ -64,7 +64,7 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
         this.contexts = new ArrayList<Context>();
         this.processes = new ArrayList<Process>();
 
-        this.syscallEmulation = new BasicSyscallEmulation(this);
+        this.systemCallEmulation = new SystemCallEmulation(this);
     }
 
     public Process getProcessFromId(int id) {
@@ -250,8 +250,8 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
         return currentCycle;
     }
 
-    public SyscallEmulation getSyscallEmulation() {
-        return syscallEmulation;
+    public SystemCallEmulation getSystemCallEmulation() {
+        return systemCallEmulation;
     }
 
     public static final int MAX_SIGNAL = 64;

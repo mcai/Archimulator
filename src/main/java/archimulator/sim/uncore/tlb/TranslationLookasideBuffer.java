@@ -18,21 +18,19 @@
  ******************************************************************************/
 package archimulator.sim.uncore.tlb;
 
-import archimulator.sim.base.event.ResetStatEvent;
-import archimulator.sim.base.simulation.SimulationObject;
+import archimulator.sim.common.SimulationObject;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.CacheAccess;
+import archimulator.sim.uncore.cache.CacheGeometry;
 import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.cache.EvictableCache;
-import archimulator.sim.uncore.cache.eviction.LRUPolicy;
+import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
 import archimulator.util.ValueProvider;
 import archimulator.util.ValueProviderFactory;
 import net.pickapack.action.Action;
-import net.pickapack.action.Action1;
 
 public class TranslationLookasideBuffer {
     private String name;
-    private TranslationLookasideBufferConfig config;
 
     private EvictableCache<Boolean> cache;
 
@@ -40,9 +38,8 @@ public class TranslationLookasideBuffer {
     private long hits;
     private long evictions;
 
-    public TranslationLookasideBuffer(SimulationObject parent, String name, TranslationLookasideBufferConfig config) {
+    public TranslationLookasideBuffer(SimulationObject parent, String name) {
         this.name = name;
-        this.config = config;
 
         ValueProviderFactory<Boolean, ValueProvider<Boolean>> cacheLineStateProviderFactory = new ValueProviderFactory<Boolean, ValueProvider<Boolean>>() {
             @Override
@@ -51,15 +48,7 @@ public class TranslationLookasideBuffer {
             }
         };
 
-        this.cache = new EvictableCache<Boolean>(parent, name, config.getGeometry(), LRUPolicy.class, cacheLineStateProviderFactory);
-
-        parent.getBlockingEventDispatcher().addListener(ResetStatEvent.class, new Action1<ResetStatEvent>() {
-            public void apply(ResetStatEvent event) {
-                TranslationLookasideBuffer.this.accesses = 0;
-                TranslationLookasideBuffer.this.hits = 0;
-                TranslationLookasideBuffer.this.evictions = 0;
-            }
-        });
+        this.cache = new EvictableCache<Boolean>(parent, name, new CacheGeometry(parent.getExperiment().getArchitecture().getTlbSize(), parent.getExperiment().getArchitecture().getTlbAssoc(), parent.getExperiment().getArchitecture().getTlbLineSize()), CacheReplacementPolicyType.LRU, cacheLineStateProviderFactory);
     }
 
     public void access(MemoryHierarchyAccess access, Action onCompletedCallback) {
@@ -69,10 +58,10 @@ public class TranslationLookasideBuffer {
         this.accesses++;
 
         if (cacheAccess.isHitInCache()) {
-            getCache().getEvictionPolicy().handlePromotionOnHit(set, cacheAccess.getWay());
+            getCache().getReplacementPolicy().handlePromotionOnHit(set, cacheAccess.getWay());
             this.hits++;
         } else {
-            if (cacheAccess.isEviction()) {
+            if (cacheAccess.isReplacement()) {
                 this.evictions++;
             }
 
@@ -81,18 +70,14 @@ public class TranslationLookasideBuffer {
             stateProvider.state = true;
             line.setAccess(access);
             line.setTag(access.getPhysicalTag());
-            getCache().getEvictionPolicy().handleInsertionOnMiss(set,  cacheAccess.getWay());
+            getCache().getReplacementPolicy().handleInsertionOnMiss(set, cacheAccess.getWay());
         }
 
-        access.getThread().getCycleAccurateEventQueue().schedule(this, onCompletedCallback, cacheAccess.isHitInCache() ? this.config.getHitLatency() : this.config.getMissLatency());
+        access.getThread().getCycleAccurateEventQueue().schedule(this, onCompletedCallback, cacheAccess.isHitInCache() ? this.getHitLatency() : this.getMissLatency());
     }
 
     public String getName() {
         return name;
-    }
-
-    public TranslationLookasideBufferConfig getConfig() {
-        return config;
     }
 
     public long getMisses() {
@@ -117,6 +102,14 @@ public class TranslationLookasideBuffer {
 
     public EvictableCache<Boolean> getCache() {
         return cache;
+    }
+
+    public int getHitLatency() {
+        return getCache().getExperiment().getArchitecture().getTlbHitLatency();
+    }
+
+    public int getMissLatency() {
+        return getCache().getExperiment().getArchitecture().getTlbMissLatency();
     }
 
     private class BooleanValueProvider implements ValueProvider<Boolean> {

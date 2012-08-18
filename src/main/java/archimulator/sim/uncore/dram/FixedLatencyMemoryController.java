@@ -22,20 +22,16 @@ import archimulator.sim.uncore.CacheHierarchy;
 import net.pickapack.action.Action;
 
 public class FixedLatencyMemoryController extends MemoryController {
-    private FixedLatencyMainMemoryConfig config;
-
-    public FixedLatencyMemoryController(CacheHierarchy cacheHierarchy, FixedLatencyMainMemoryConfig config) {
+    public FixedLatencyMemoryController(CacheHierarchy cacheHierarchy) {
         super(cacheHierarchy);
-
-        this.config = config;
     }
 
     @Override
-    protected void access(int addr, final Action onCompletedCallback) {
-        this.getCycleAccurateEventQueue().schedule(this, new Action() {
-            public void apply() {
-                onCompletedCallback.apply();
-            }
-        }, this.config.getLatency());
+    protected void access(int address, Action onCompletedCallback) {
+        this.getCycleAccurateEventQueue().schedule(this, onCompletedCallback, this.getLatency());
+    }
+
+    public int getLatency() {
+        return getExperiment().getArchitecture().getFixedLatencyMainMemoryLatency();
     }
 }

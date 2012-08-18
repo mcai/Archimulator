@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore;
 
-import archimulator.sim.base.simulation.SimulationObject;
+import archimulator.sim.common.SimulationObject;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
@@ -50,5 +50,5 @@ public interface CacheHierarchy extends SimulationObject {
 
     L2ToMemNet getL2ToMemNetwork();
 
-    void dumpCacheControllerFsmStats(Map<String, Object> stats);
+    void dumpCacheControllerFsmStats(Map<String, String> stats);
 }

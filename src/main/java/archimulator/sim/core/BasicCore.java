@@ -34,14 +34,8 @@ public class BasicCore extends AbstractBasicCore {
     private RoundRobinScheduler<Thread> registerRenameScheduler;
     private RoundRobinScheduler<Thread> dispatchScheduler;
 
-    private int decodeWidth;
-    private int issueWidth;
-
     public BasicCore(Processor processor, int num) {
         super(processor, num);
-
-        this.decodeWidth = this.processor.getConfig().getDecodeWidth();
-        this.issueWidth = this.processor.getConfig().getIssueWidth();
 
         this.registerRenameScheduler = new RoundRobinScheduler<Thread>(this.threads, new Predicate<Thread>() {
             public boolean apply(Thread thread) {
@@ -61,7 +55,7 @@ public class BasicCore extends AbstractBasicCore {
             public Boolean apply(Thread thread) {
                 return thread.registerRenameOne();
             }
-        }, this.decodeWidth
+        }, getExperiment().getArchitecture().getDecodeWidth()
         );
 
         this.dispatchScheduler = new RoundRobinScheduler<Thread>(this.threads, new Predicate<Thread>() {
@@ -72,7 +66,7 @@ public class BasicCore extends AbstractBasicCore {
             public Boolean apply(Thread thread) {
                 return thread.dispatchOne();
             }
-        }, this.decodeWidth
+        }, getExperiment().getArchitecture().getDecodeWidth()
         );
     }
 
@@ -97,11 +91,11 @@ public class BasicCore extends AbstractBasicCore {
 
     @Override
     protected void wakeUp() {
-        this.wakeup(this.waitingInstructionQueue, this.readyInstructionQueue);
-        this.wakeup(this.waitingStoreQueue, this.readyStoreQueue);
+        this.wakeUp(this.waitingInstructionQueue, this.readyInstructionQueue);
+        this.wakeUp(this.waitingStoreQueue, this.readyStoreQueue);
     }
 
-    private void wakeup(List<AbstractReorderBufferEntry> waitingQueue, List<AbstractReorderBufferEntry> readyQueue) {
+    private void wakeUp(List<AbstractReorderBufferEntry> waitingQueue, List<AbstractReorderBufferEntry> readyQueue) {
         for (Iterator<AbstractReorderBufferEntry> it = waitingQueue.iterator(); it.hasNext(); ) {
             AbstractReorderBufferEntry waitingQueueEntry = it.next();
 
@@ -114,7 +108,7 @@ public class BasicCore extends AbstractBasicCore {
 
     @Override
     protected void issue() {
-        Reference<Integer> quant = new Reference<Integer>(this.issueWidth);
+        Reference<Integer> quant = new Reference<Integer>(getExperiment().getArchitecture().getIssueWidth());
 
         this.issueInstructionQueue(quant);
         this.issueLoadQueue(quant);

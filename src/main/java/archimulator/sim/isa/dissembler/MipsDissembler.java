@@ -107,7 +107,7 @@ public class MipsDissembler {
         return (rs == 8);
     }
 
-    public static boolean isSyscall(int machInst) {
+    public static boolean isSystemCall(int machInst) {
         return (BitField.OPCODE_LO.valueOf(machInst) == 0x0 && BitField.FUNC_HI.valueOf(machInst) == 0x1 && BitField.FUNC_LO.valueOf(machInst) == 0x4);
     }
 
@@ -169,7 +169,7 @@ public class MipsDissembler {
                 }
                 break;
             case R:
-                if (isSyscall(machInst)) {
+                if (isSystemCall(machInst)) {
                 } else if (isShift(machInst)) {
                     buf.append(String.format("$%s, $%s, %d", mips_gpr_names[rd], mips_gpr_names[rt], shift));
                 } else if (isROneOp(machInst)) {

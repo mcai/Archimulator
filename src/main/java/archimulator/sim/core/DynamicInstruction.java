@@ -18,10 +18,10 @@
  ******************************************************************************/
 package archimulator.sim.core;
 
-import archimulator.sim.base.simulation.Simulation;
+import archimulator.sim.common.Simulation;
 import archimulator.sim.isa.StaticInstruction;
 import archimulator.sim.isa.StaticInstructionType;
-import net.pickapack.StringHelper;
+import org.apache.commons.lang.StringUtils;
 
 public class DynamicInstruction {
     private long id;
@@ -110,7 +110,7 @@ public class DynamicInstruction {
                 "DynamicInstruction{id=%d, thread.name=%s, pc=0x%08x, mnemonic=%s, ideps={%s}, odeps={%s}, " +
                         "effectiveAddress=0x%08x, effectiveAddressBase=0x%08x, effectiveAddressDisplacement=0x%08x, useStackPointerAsEffectiveAddressBase=%s}",
                 id, thread.getName(), pc, staticInst.getMnemonic(),
-                StringHelper.join(staticInst.getIdeps(), ", "), StringHelper.join(staticInst.getOdeps(), ", "),
+                StringUtils.join(staticInst.getIdeps(), ", "), StringUtils.join(staticInst.getOdeps(), ", "),
                 effectiveAddress, effectiveAddressBase, effectiveAddressDisplacement, useStackPointerAsEffectiveAddressBase);
     }
 

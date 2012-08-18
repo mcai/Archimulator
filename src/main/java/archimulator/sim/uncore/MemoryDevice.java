@@ -18,10 +18,8 @@
  ******************************************************************************/
 package archimulator.sim.uncore;
 
-import archimulator.sim.base.simulation.BasicSimulationObject;
-import archimulator.sim.base.simulation.SimulationObject;
-import archimulator.sim.uncore.coherence.msi.controller.Controller;
-import archimulator.sim.uncore.coherence.msi.message.CoherenceMessage;
+import archimulator.sim.common.BasicSimulationObject;
+import archimulator.sim.common.SimulationObject;
 import archimulator.sim.uncore.net.Net;
 import net.pickapack.action.Action;
 
@@ -38,7 +36,7 @@ public abstract class MemoryDevice extends BasicSimulationObject implements Simu
         this.name = name;
     }
 
-    public void transfer(final MemoryDevice to, final int size, final Action action) {
+    public void transfer(MemoryDevice to, int size, Action action) {
         this.getNet(to).transfer(this, to, size, action);
     }
 

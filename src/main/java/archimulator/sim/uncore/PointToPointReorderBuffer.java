@@ -47,9 +47,9 @@ public class PointToPointReorderBuffer {
     }
 
     public void commit() {
-        while(!this.messages.isEmpty()) {
+        while (!this.messages.isEmpty()) {
             final CoherenceMessage message = this.messages.get(0);
-            if(!message.isDestinationArrived()) {
+            if (!message.isDestinationArrived()) {
                 break;
             }
 
@@ -59,7 +59,7 @@ public class PointToPointReorderBuffer {
                 @Override
                 public void apply() {
                     message.onCompleted();
-                    if(message.getId() < lastCompletedMessageId) {
+                    if (message.getId() < lastCompletedMessageId) {
                         throw new IllegalArgumentException();
                     }
                     lastCompletedMessageId = message.getId();

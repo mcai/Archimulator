@@ -42,8 +42,8 @@ public class TwoBitBranchPredictor extends DynamicBranchPredictor {
         }
     }
 
-    public TwoBitBranchPredictor(Thread thread, String name, TwoBitBranchPredictorConfig config) {
-        this(thread, name, config.getBimodSize(), config.getBtbSets(), config.getBtbAssoc(), config.getRetStackSize());
+    public TwoBitBranchPredictor(Thread thread, String name) {
+        this(thread, name, thread.getExperiment().getArchitecture().getTwoBitBpredBimodSize(), thread.getExperiment().getArchitecture().getTwoBitBpredBtbSets(), thread.getExperiment().getArchitecture().getTwoBitBpredBtbAssoc(), thread.getExperiment().getArchitecture().getTwoBitBpredRetStackSize());
     }
 
     @Override

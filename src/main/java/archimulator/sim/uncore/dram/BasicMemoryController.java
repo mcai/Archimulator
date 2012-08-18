@@ -26,24 +26,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BasicMemoryController extends MemoryController {
-    private BasicMainMemoryConfig config;
-
     private int rowBits;
     private List<Bank> banks;
     private int previousBank = 0;
 
-    public BasicMemoryController(CacheHierarchy cacheHierarchy, BasicMainMemoryConfig config) {
+    public BasicMemoryController(CacheHierarchy cacheHierarchy) {
         super(cacheHierarchy);
-
-        this.config = config;
 
         this.banks = new ArrayList<Bank>();
 
-        for (int i = 0; i < this.config.getNumBanks(); i++) {
+        for (int i = 0; i < this.getNumBanks(); i++) {
             this.banks.add(new Bank());
         }
 
-        int rowSize = this.config.getRowSize();
+        int rowSize = this.getRowSize();
 
         this.rowBits = 0;
 
@@ -54,20 +50,22 @@ public class BasicMemoryController extends MemoryController {
     }
 
     @Override
-    protected void access(int addr, final Action onCompletedCallback) {
+    protected void access(int address, final Action onCompletedCallback) {
         final Counter counterPending = new Counter(0);
 
         int offset = 0;
 
-        int size = this.config.getLineSize();
+        int size = this.getLineSize();
 
         while (size > 0) {
-            size -= this.config.getBusWidth();
+            size -= this.getBusWidth();
 
-            final int currentAddr = addr + offset;
+            final int currentAddress = address + offset;
             this.getCycleAccurateEventQueue().schedule(this, new Action() {
+                @Override
                 public void apply() {
-                    accessDram(currentAddr, new Action() {
+                    accessDram(currentAddress,new Action() {
+                        @Override
                         public void apply() {
                             counterPending.dec();
 
@@ -77,27 +75,60 @@ public class BasicMemoryController extends MemoryController {
                         }
                     });
                 }
-            }, this.config.getToDramLatency());
+            }, this.getToDramLatency());
 
             counterPending.inc();
 
-            offset += this.config.getBusWidth();
+            offset += this.getBusWidth();
         }
     }
 
     private void accessDram(int addr, final Action onCompletedCallback) {
-        final int targetRow = (addr >> this.rowBits) / this.config.getNumBanks();
-        final int targetBank = (addr >> this.rowBits) % this.config.getNumBanks();
+        final int targetRow = (addr >> this.rowBits) / this.getNumBanks();
+        final int targetBank = (addr >> this.rowBits) % this.getNumBanks();
 
         final boolean contiguous = (targetBank == previousBank);
 
         this.banks.get(targetBank).startAccess(targetRow, contiguous, new Action() {
+            @Override
             public void apply() {
-                getCycleAccurateEventQueue().schedule(this, onCompletedCallback, config.getFromDramLatency());
+                getCycleAccurateEventQueue().schedule(this, onCompletedCallback, getFromDramLatency());
             }
         });
 
         previousBank = targetBank;
+    }
+
+    public int getToDramLatency() {
+        return getExperiment().getArchitecture().getBasicMainMemoryToDramLatency();
+    }
+
+    public int getFromDramLatency() {
+        return getExperiment().getArchitecture().getBasicMainMemoryFromDramLatency();
+    }
+
+    public int getPrechargeLatency() {
+        return getExperiment().getArchitecture().getBasicMainMemoryPrechargeLatency();
+    }
+
+    public int getClosedLatency() {
+        return getExperiment().getArchitecture().getBasicMainMemoryClosedLatency();
+    }
+
+    public int getConflictLatency() {
+        return getExperiment().getArchitecture().getBasicMainMemoryConflictLatency();
+    }
+
+    public int getBusWidth() {
+        return getExperiment().getArchitecture().getBasicMainMemoryBusWidth();
+    }
+
+    public int getNumBanks() {
+        return getExperiment().getArchitecture().getBasicMainMemoryNumBanks();
+    }
+
+    public int getRowSize() {
+        return getExperiment().getArchitecture().getBasicMainMemoryRowSize();
     }
 
     private enum BankStatus {
@@ -134,12 +165,12 @@ public class BasicMemoryController extends MemoryController {
 
         private void precharge(final Action onCompletedCallback) {
             getCycleAccurateEventQueue().schedule(this, new Action() {
+                @Override
                 public void apply() {
                     status = BankStatus.PRECHARGED;
-
                     onCompletedCallback.apply();
                 }
-            }, config.getClosedLatency());
+            }, getClosedLatency());
         }
 
         private void refresh() {
@@ -147,6 +178,7 @@ public class BasicMemoryController extends MemoryController {
                 final PendingAccess pendingAccess = this.pendingAccesses.get(0);
 
                 access(pendingAccess.row, pendingAccess.contiguous, new Action() {
+                    @Override
                     public void apply() {
                         pendingAccess.complete();
                         pendingAccesses.remove(0);
@@ -169,6 +201,7 @@ public class BasicMemoryController extends MemoryController {
         private void access(final int row, final boolean contiguous, final Action onCompletedCallback) {
             if (this.status == BankStatus.CLOSED) {
                 this.precharge(new Action() {
+                    @Override
                     public void apply() {
                         access(row, contiguous, onCompletedCallback);
                     }
@@ -176,12 +209,13 @@ public class BasicMemoryController extends MemoryController {
             } else {
                 if (currentRow == row) {
                     if (contiguous) {
-                        getCycleAccurateEventQueue().schedule(this, onCompletedCallback, config.getFromDramLatency());
+                        getCycleAccurateEventQueue().schedule(this, onCompletedCallback, getFromDramLatency());
                     } else {
-                        getCycleAccurateEventQueue().schedule(this, onCompletedCallback, (config.getPrechargeLatency() + config.getFromDramLatency()));
+                        getCycleAccurateEventQueue().schedule(this, onCompletedCallback, getPrechargeLatency() + getFromDramLatency());
                     }
                 } else {
                     getCycleAccurateEventQueue().schedule(this, new Action() {
+                        @Override
                         public void apply() {
                             currentRow = row;
 
@@ -191,7 +225,7 @@ public class BasicMemoryController extends MemoryController {
                                 }
                             });
                         }
-                    }, config.getConflictLatency());
+                    }, getConflictLatency());
                 }
             }
         }

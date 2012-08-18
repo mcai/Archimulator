@@ -1,3 +1,21 @@
+/*******************************************************************************
+ * Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).
+ *
+ * This file is part of the Archimulator multicore architectural simulator.
+ *
+ * Archimulator is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Archimulator is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
 package archimulator.sim.uncore.coherence.msi.controller;
 
 import archimulator.sim.core.DynamicInstruction;
@@ -5,8 +23,7 @@ import archimulator.sim.uncore.*;
 import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.cache.EvictableCache;
-import archimulator.sim.uncore.coherence.config.CoherentCacheConfig;
-import archimulator.sim.uncore.coherence.config.L1CacheControllerConfig;
+import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import archimulator.sim.uncore.coherence.msi.flow.LoadFlow;
 import archimulator.sim.uncore.coherence.msi.flow.StoreFlow;
@@ -21,18 +38,16 @@ import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
 import net.pickapack.action.Action2;
 
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.List;
+import java.util.*;
 
-public class CacheController extends GeneralCacheController {
+public abstract class CacheController extends GeneralCacheController {
     private EvictableCache<CacheControllerState> cache;
-    private List<MemoryHierarchyAccess> pendingAccesses;
+    private Map<Integer, MemoryHierarchyAccess> pendingAccesses;
     private EnumMap<MemoryHierarchyAccessType, Integer> pendingAccessesPerType;
     private CacheControllerFiniteStateMachineFactory fsmFactory;
 
-    public CacheController(CacheHierarchy cacheHierarchy, final String name, CoherentCacheConfig config) {
-        super(cacheHierarchy, name, config);
+    public CacheController(CacheHierarchy cacheHierarchy, final String name) {
+        super(cacheHierarchy, name);
 
         ValueProviderFactory<CacheControllerState, ValueProvider<CacheControllerState>> cacheLineStateProviderFactory = new ValueProviderFactory<CacheControllerState, ValueProvider<CacheControllerState>>() {
             @Override
@@ -44,9 +59,9 @@ public class CacheController extends GeneralCacheController {
             }
         };
 
-        this.cache = new EvictableCache<CacheControllerState>(cacheHierarchy, name, config.getGeometry(), config.getEvictionPolicyClz(), cacheLineStateProviderFactory);
+        this.cache = new EvictableCache<CacheControllerState>(cacheHierarchy, name, getGeometry(), getReplacementPolicyType(), cacheLineStateProviderFactory);
 
-        this.pendingAccesses = new ArrayList<MemoryHierarchyAccess>();
+        this.pendingAccesses = new HashMap<Integer, MemoryHierarchyAccess>();
 
         this.pendingAccessesPerType = new EnumMap<MemoryHierarchyAccessType, Integer>(MemoryHierarchyAccessType.class);
         this.pendingAccessesPerType.put(MemoryHierarchyAccessType.IFETCH, 0);
@@ -54,47 +69,38 @@ public class CacheController extends GeneralCacheController {
         this.pendingAccessesPerType.put(MemoryHierarchyAccessType.STORE, 0);
 
         this.fsmFactory = new CacheControllerFiniteStateMachineFactory(new Action1<CacheControllerFiniteStateMachine>() {
-                @Override
-                public void apply(CacheControllerFiniteStateMachine fsm) {
-                    if (fsm.getPreviousState() != fsm.getState()) {
-                        if (fsm.getState().isStable()) {
-                            Action onCompletedCallback = fsm.getOnCompletedCallback();
-                            if (onCompletedCallback != null) {
-                                fsm.setOnCompletedCallback(null);
-                                onCompletedCallback.apply();
-                            }
-                        }
-
-                        List<Action> stalledEventsToProcess = new ArrayList<Action>();
-                        for (Action stalledEvent : fsm.getStalledEvents()) {
-                            stalledEventsToProcess.add(stalledEvent);
-                        }
-
-                        fsm.getStalledEvents().clear();
-
-                        for (Action stalledEvent : stalledEventsToProcess) {
-                            stalledEvent.apply();
+            @Override
+            public void apply(CacheControllerFiniteStateMachine fsm) {
+                if (fsm.getPreviousState() != fsm.getState()) {
+                    if (fsm.getState().isStable()) {
+                        Action onCompletedCallback = fsm.getOnCompletedCallback();
+                        if (onCompletedCallback != null) {
+                            fsm.setOnCompletedCallback(null);
+                            onCompletedCallback.apply();
                         }
                     }
+
+                    List<Action> stalledEventsToProcess = new ArrayList<Action>();
+                    stalledEventsToProcess.addAll(fsm.getStalledEvents());
+                    fsm.getStalledEvents().clear();
+
+                    for (Action stalledEvent : stalledEventsToProcess) {
+                        stalledEvent.apply();
+                    }
                 }
-            });
+            }
+        });
     }
 
     public boolean canAccess(MemoryHierarchyAccessType type, int physicalTag) {
         MemoryHierarchyAccess access = this.findAccess(physicalTag);
         return access == null ?
-                this.pendingAccessesPerType.get(type) < (type == MemoryHierarchyAccessType.STORE ? this.getWritePorts() : this.getReadPorts()) :
+                this.pendingAccessesPerType.get(type) < (type == MemoryHierarchyAccessType.STORE ? this.getNumWritePorts() : this.getNumReadPorts()) :
                 type != MemoryHierarchyAccessType.STORE && access.getType() != MemoryHierarchyAccessType.STORE;
     }
 
     public MemoryHierarchyAccess findAccess(int physicalTag) {
-        for (MemoryHierarchyAccess access : this.pendingAccesses) {
-            if (access.getPhysicalTag() == physicalTag) {
-                return access;
-            }
-        }
-
-        return null;
+        return this.pendingAccesses.containsKey(physicalTag) ? this.pendingAccesses.get(physicalTag) : null;
     }
 
     public MemoryHierarchyAccess beginAccess(DynamicInstruction dynamicInst, MemoryHierarchyThread thread, MemoryHierarchyAccessType type, int virtualPc, int physicalAddress, int physicalTag, Action onCompletedCallback) {
@@ -105,7 +111,7 @@ public class CacheController extends GeneralCacheController {
         if (access != null) {
             access.getAliases().add(0, newAccess);
         } else {
-            this.pendingAccesses.add(newAccess);
+            this.pendingAccesses.put(physicalTag, newAccess);
             this.pendingAccessesPerType.put(type, this.pendingAccessesPerType.get(type) + 1);
         }
 
@@ -114,7 +120,6 @@ public class CacheController extends GeneralCacheController {
 
     public void endAccess(int physicalTag) {
         MemoryHierarchyAccess access = this.findAccess(physicalTag);
-        assert (access != null);
 
         access.complete(this.getCycleAccurateEventQueue().getCurrentCycle());
 
@@ -125,7 +130,7 @@ public class CacheController extends GeneralCacheController {
         MemoryHierarchyAccessType type = access.getType();
         this.pendingAccessesPerType.put(type, this.pendingAccessesPerType.get(type) - 1);
 
-        this.pendingAccesses.remove(access);
+        this.pendingAccesses.remove(physicalTag);
     }
 
     @Override
@@ -169,14 +174,6 @@ public class CacheController extends GeneralCacheController {
         return (DirectoryController) super.getNext();
     }
 
-    private int getReadPorts() {
-        return ((L1CacheControllerConfig) getConfig()).getNumReadPorts();
-    }
-
-    private int getWritePorts() {
-        return ((L1CacheControllerConfig) getConfig()).getNumWritePorts();
-    }
-
     @Override
     public void receive(CoherenceMessage message) {
         switch (message.getType()) {
@@ -218,19 +215,17 @@ public class CacheController extends GeneralCacheController {
             }
         };
 
-        this.access(loadFlow, access, tag,
-                new Action2<Integer, Integer>() {
-                    @Override
-                    public void apply(Integer set, Integer way) {
-                        CacheLine<CacheControllerState> line = getCache().getLine(set, way);
-                        final CacheControllerFiniteStateMachine fsm = (CacheControllerFiniteStateMachine) line.getStateProvider();
-                        fsm.onEventLoad(loadFlow, tag, loadFlow.getOnCompletedCallback2(), onStalledCallback);
-                    }
-                }, onStalledCallback
-        );
+        this.access(loadFlow, access, tag, new Action2<Integer, Integer>() {
+            @Override
+            public void apply(Integer set, Integer way) {
+                CacheLine<CacheControllerState> line = getCache().getLine(set, way);
+                CacheControllerFiniteStateMachine fsm = (CacheControllerFiniteStateMachine) line.getStateProvider();
+                fsm.onEventLoad(loadFlow, tag, loadFlow.getOnCompletedCallback2(), onStalledCallback);
+            }
+        }, onStalledCallback);
     }
 
-    public void onStore(final MemoryHierarchyAccess access, final int tag, final Action onCompletedCallback) {
+    public void onStore(MemoryHierarchyAccess access, int tag, Action onCompletedCallback) {
         onStore(access, tag, new StoreFlow(this, tag, onCompletedCallback, access));
     }
 
@@ -242,16 +237,14 @@ public class CacheController extends GeneralCacheController {
             }
         };
 
-        this.access(storeFlow, access, tag,
-                new Action2<Integer, Integer>() {
-                    @Override
-                    public void apply(Integer set, Integer way) {
-                        CacheLine<CacheControllerState> line = getCache().getLine(set, way);
-                        final CacheControllerFiniteStateMachine fsm = (CacheControllerFiniteStateMachine) line.getStateProvider();
-                        fsm.onEventStore(storeFlow, tag, storeFlow.getOnCompletedCallback2(), onStalledCallback);
-                    }
-                }, onStalledCallback
-        );
+        this.access(storeFlow, access, tag, new Action2<Integer, Integer>() {
+            @Override
+            public void apply(Integer set, Integer way) {
+                CacheLine<CacheControllerState> line = getCache().getLine(set, way);
+                CacheControllerFiniteStateMachine fsm = (CacheControllerFiniteStateMachine) line.getStateProvider();
+                fsm.onEventStore(storeFlow, tag, storeFlow.getOnCompletedCallback2(), onStalledCallback);
+            }
+        }, onStalledCallback);
     }
 
     private void onFwdGetS(FwdGetSMessage message) {
@@ -308,32 +301,31 @@ public class CacheController extends GeneralCacheController {
         return cache;
     }
 
-    private void access(CacheCoherenceFlow producerFlow, MemoryHierarchyAccess access, final int tag, final Action2<Integer, Integer> onReplacementCompletedCallback, final Action onReplacementStalledCallback) {
+    private void access(CacheCoherenceFlow producerFlow, MemoryHierarchyAccess access, int tag, final Action2<Integer, Integer> onReplacementCompletedCallback, final Action onReplacementStalledCallback) {
         final int set = this.cache.getSet(tag);
 
         final CacheAccess<CacheControllerState> cacheAccess = this.getCache().newAccess(access, tag);
-        if(cacheAccess.isHitInCache()) {
+        if (cacheAccess.isHitInCache()) {
             onReplacementCompletedCallback.apply(set, cacheAccess.getWay());
-        }
-        else {
-            if(cacheAccess.isEviction()) {
-                final CacheLine<CacheControllerState> line = this.getCache().getLine(set, cacheAccess.getWay());
-                final CacheControllerFiniteStateMachine fsm = (CacheControllerFiniteStateMachine) line.getStateProvider();
+        } else {
+            if (cacheAccess.isReplacement()) {
+                CacheLine<CacheControllerState> line = this.getCache().getLine(set, cacheAccess.getWay());
+                CacheControllerFiniteStateMachine fsm = (CacheControllerFiniteStateMachine) line.getStateProvider();
                 fsm.onEventReplacement(producerFlow, tag, cacheAccess,
                         new Action() {
                             @Override
                             public void apply() {
                                 onReplacementCompletedCallback.apply(set, cacheAccess.getWay());
                             }
-                        }, new Action() {
+                        },
+                        new Action() {
                             @Override
                             public void apply() {
                                 getCycleAccurateEventQueue().schedule(CacheController.this, onReplacementStalledCallback, 1);
                             }
                         }
                 );
-            }
-            else {
+            } else {
                 onReplacementCompletedCallback.apply(set, cacheAccess.getWay());
             }
         }
@@ -346,6 +338,16 @@ public class CacheController extends GeneralCacheController {
     public CacheControllerFiniteStateMachineFactory getFsmFactory() {
         return fsmFactory;
     }
+
+    public abstract int getNumReadPorts();
+
+    public abstract int getNumWritePorts();
+
+    @Override
+    public abstract int getHitLatency();
+
+    @Override
+    public abstract CacheReplacementPolicyType getReplacementPolicyType();
 
     @Override
     public String toString() {

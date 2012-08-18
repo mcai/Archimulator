@@ -1082,7 +1082,7 @@ Hardware triggered synchronization of HT with MT
 
 \begin_deeper
 \begin_layout Itemize
-Based on the already implemented pseudocall mechanism that pass parameters
+Based on the already implemented pseudo call mechanism that pass parameters
  between the program and the processor in some unused registers by the ADDU
  MIPS instruction with predefined special parameters
 \end_layout

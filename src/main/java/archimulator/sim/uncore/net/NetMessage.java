@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore.net;
 
-import archimulator.sim.base.simulation.Simulation;
+import archimulator.sim.common.Simulation;
 import net.pickapack.action.Action;
 
 public class NetMessage {
