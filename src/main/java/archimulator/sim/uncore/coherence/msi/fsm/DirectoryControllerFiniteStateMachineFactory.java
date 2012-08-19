@@ -7,29 +7,12 @@ import archimulator.sim.uncore.coherence.msi.state.DirectoryControllerState;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
 import net.pickapack.action.Action4;
-import net.pickapack.fsm.FiniteStateMachineAction;
 import net.pickapack.fsm.FiniteStateMachineFactory;
 
 import static ch.lambdaj.Lambda.*;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.not;
 
 public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMachineFactory<DirectoryControllerState, DirectoryControllerEventType, DirectoryControllerFiniteStateMachine> {
-    //TODO...
-    public static FiniteStateMachineAction<DirectoryControllerFiniteStateMachine, DirectoryControllerEventType, DirectoryControllerEvent> ACTION_SET_ACCESS =
-            new FiniteStateMachineAction<DirectoryControllerFiniteStateMachine, DirectoryControllerEventType, DirectoryControllerEvent>("SET_ACCESS") {
-        @Override
-        public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, final DirectoryControllerEvent event) {
-            fsm.getLine().setAccess(event.getAccess());
-        }
-    };
-    public static FiniteStateMachineAction<DirectoryControllerFiniteStateMachine, DirectoryControllerEventType, DirectoryControllerEvent> ACTION_SET_TAG =
-            new FiniteStateMachineAction<DirectoryControllerFiniteStateMachine, DirectoryControllerEventType, DirectoryControllerEvent>("SET_TAG") {
-        @Override
-        public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, final DirectoryControllerEvent event) {
-            fsm.getLine().setTag(event.getTag());
-        }
-    };
-
     public DirectoryControllerFiniteStateMachineFactory(Action1<DirectoryControllerFiniteStateMachine> actionWhenStateChanged) {
         this.inState(DirectoryControllerState.I)
                 .setOnCompletedCallback(actionWhenStateChanged)
