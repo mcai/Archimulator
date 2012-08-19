@@ -113,6 +113,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         JaxenHelper.dumpValueFromXPath(configs, experiment, "title");
         JaxenHelper.dumpValueFromXPath(configs, experiment, "createTimeAsString");
         JaxenHelper.dumpValueFromXPath(configs, experiment, "type");
+        JaxenHelper.dumpValueFromXPath(configs, experiment, "state");
         JaxenHelper.dumpValueFromXPath(configs, experiment, "numMaxInsts");
         JaxenHelper.dumpValuesFromXPath(configs, experiment, "contextMappings");
 
