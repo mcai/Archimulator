@@ -19,8 +19,9 @@
 package archimulator.sim.uncore;
 
 import archimulator.model.Experiment;
-import archimulator.sim.common.SimulationEvent;
 import archimulator.sim.common.BasicSimulationObject;
+import archimulator.sim.common.Simulation;
+import archimulator.sim.common.SimulationEvent;
 import archimulator.sim.uncore.coherence.msi.controller.*;
 import archimulator.sim.uncore.coherence.msi.message.CoherenceMessage;
 import archimulator.sim.uncore.dram.BasicMemoryController;
@@ -54,8 +55,8 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
 
     private Map<Controller, Map<Controller, PointToPointReorderBuffer>> p2pReorderBuffers;
 
-    public BasicCacheHierarchy(Experiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
-        super(experiment, blockingEventDispatcher, cycleAccurateEventQueue);
+    public BasicCacheHierarchy(Experiment experiment, Simulation simulation, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
+        super(experiment, simulation, blockingEventDispatcher, cycleAccurateEventQueue);
 
         switch (getExperiment().getArchitecture().getMainMemoryType()) {
             case SIMPLE:

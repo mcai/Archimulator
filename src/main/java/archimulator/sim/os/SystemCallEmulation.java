@@ -77,10 +77,10 @@ public class SystemCallEmulation extends BasicSimulationObject implements Simula
 
     private static final int MAX_BUFFER_SIZE = 1024;
 
-    private static Map<Integer, SystemCallHandler> handlers = new TreeMap<Integer, SystemCallHandler>();
-    private static int errno;
+    private Map<Integer, SystemCallHandler> handlers = new TreeMap<Integer, SystemCallHandler>();
+    private int errno;
 
-    private static int stackLimit = 0x800000;
+    private int stackLimit = 0x800000;
 
     private boolean error;
 

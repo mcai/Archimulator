@@ -19,8 +19,9 @@
 package archimulator.sim.core;
 
 import archimulator.model.Experiment;
-import archimulator.sim.common.SimulationEvent;
 import archimulator.sim.common.BasicSimulationObject;
+import archimulator.sim.common.Simulation;
+import archimulator.sim.common.SimulationEvent;
 import archimulator.sim.os.Context;
 import archimulator.sim.os.ContextKilledEvent;
 import archimulator.sim.os.ContextState;
@@ -40,8 +41,8 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
 
     private Map<Context, Thread> contextToThreadMappings;
 
-    public BasicProcessor(Experiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, Kernel kernel, CacheHierarchy cacheHierarchy) {
-        super(experiment, blockingEventDispatcher, cycleAccurateEventQueue);
+    public BasicProcessor(Experiment experiment, Simulation simulation, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, Kernel kernel, CacheHierarchy cacheHierarchy) {
+        super(experiment, simulation, blockingEventDispatcher, cycleAccurateEventQueue);
 
         this.kernel = kernel;
 

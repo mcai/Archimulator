@@ -20,56 +20,54 @@ package archimulator.client;
 
 import archimulator.model.*;
 import archimulator.service.ServiceManager;
-import org.kohsuke.args4j.CmdLineException;
-import org.kohsuke.args4j.CmdLineParser;
-import org.kohsuke.args4j.Option;
+import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
+import net.pickapack.JsonSerializationHelper;
+import org.parboiled.common.FileUtils;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Startup {
-    @Option(name = "-p", usage = "Program title (default: mst_ht)", metaVar = "<programTitle>", required = false)
-    private String programTitle = "mst_ht";
+    public static void main(String[] args) throws IOException {
+        if(args.length == 0) {
+            System.err.println("No experiment pack specified");
+            return;
+        }
 
-    @Option(name = "-a", usage = "Architecture title (default: default)", metaVar = "<architectureTitle>", required = false)
-    private String architectureTitle = "default";
+        for(String arg : args) {
+            ExperimentPackSpec experimentPackSpec = JsonSerializationHelper.deserialize(ExperimentPackSpec.class, FileUtils.readAllText(arg));
 
-    @Option(name = "-l", usage = "Helper threading lookahead parameter (default: 20)", metaVar = "<htLookahead>", required = false)
-    private int htLookahead = 20;
+            if(ServiceManager.getExperimentService().getExperimentPackByTitle(experimentPackSpec.getTitle()) != null) {
+                System.err.println("Experiment pack \"" + experimentPackSpec.getTitle() + "\" already exists in the database");
+                ExperimentPack experimentPack = ServiceManager.getExperimentService().getExperimentPackByTitle(experimentPackSpec.getTitle());
+                ServiceManager.getExperimentService().waitForExperimentPackStopped(experimentPack);
+                continue;
+            }
 
-    @Option(name = "-s", usage = "Helper threading stride parameter (default: 10)", metaVar = "<htStride>", required = false)
-    private int htStride = 10;
+            ExperimentPack experimentPack = new ExperimentPack(experimentPackSpec.getTitle());
+            ServiceManager.getExperimentService().addExperimentPack(experimentPack);
 
-    public void parseArgs(String[] args) throws IOException {
-        CmdLineParser parser = new CmdLineParser(this);
-        try {
-            parser.parseArgument(args);
-        } catch (CmdLineException e) {
-            System.err.println("java -cp <path/to/achimulator.jar> archimulator.client.Startup [options]");
-            parser.printUsage(System.err);
-            System.err.println();
-            throw new IOException();
+            for(ExperimentSpec experimentSpec : experimentPackSpec.getExperiments()) {
+                ServiceManager.getExperimentService().addExperiment(createExperiment(
+                        experimentPack,
+                        experimentSpec.getProgramTitle(),
+                        experimentSpec.getHtLookahead(), experimentSpec.getHtStride(),
+                        experimentSpec.getNumCores(), experimentSpec.getNumThreadsPerCore(),
+                        experimentSpec.getL1ISize(), experimentSpec.getL1IAssoc(),
+                        experimentSpec.getL1DSize(), experimentSpec.getL1DAssoc(),
+                        experimentSpec.getL2Size(), experimentSpec.getL2Assoc(), experimentSpec.getL2ReplacementPolicyType()
+                ));
+            }
+
+            ServiceManager.getExperimentService().waitForExperimentPackStopped(experimentPack);
         }
     }
 
-    public static void main(String[] args) throws SQLException, InterruptedException {
-        Startup startup = new Startup();
-        try {
-            startup.parseArgs(args);
-            startup.run(startup.programTitle, startup.architectureTitle, startup.htLookahead, startup.htStride);
-        } catch (IOException e) {
-            System.out.println(e);
-        }
-    }
-
-    public void run(String programTitle, String architectureTitle, int htLookahead, int htStride) throws SQLException {
+    private static Experiment createExperiment(ExperimentPack parent, String programTitle, int htLookahead, int htStride, int numCores, int numThreadsPerCore, int l1ISize, int l1IAssoc, int l1DSize, int l1DAssoc, int l2Size, int l2Assoc, CacheReplacementPolicyType l2ReplacementPolicyType) {
         SimulatedProgram simulatedProgram = ServiceManager.getSimulatedProgramService().getSimulatedProgramByTitle(programTitle);
 
-        Architecture architecture = ServiceManager.getArchitectureService().getArchitectureByTitle(architectureTitle);
-
-        String title = simulatedProgram.getTitle() + "_" + simulatedProgram.getArgs() + "-" + architecture.getProcessorPropertiesTitle();
+        Architecture architecture = ServiceManager.getArchitectureService().getOrAddArchitecture(true, numCores, numThreadsPerCore, l1ISize, l1IAssoc, l1DSize, l1DAssoc, l2Size, l2Assoc, l2ReplacementPolicyType);
 
         List<ContextMapping> contextMappings = new ArrayList<ContextMapping>();
 
@@ -79,8 +77,6 @@ public class Startup {
         contextMapping.setDynamicHtParams(false);
         contextMappings.add(contextMapping);
 
-        Experiment experiment = new Experiment(title, ExperimentType.DETAILED, architecture, -1, contextMappings);
-        ServiceManager.getExperimentService().addExperiment(experiment);
-        ServiceManager.getExperimentService().waitForExperimentStopped(experiment);
+        return new Experiment(parent, simulatedProgram.getTitle() + "_" + simulatedProgram.getArgs() + "-" + architecture.getTitle(), ExperimentType.DETAILED, architecture, -1, contextMappings);
     }
 }

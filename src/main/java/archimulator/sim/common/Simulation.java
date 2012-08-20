@@ -45,7 +45,6 @@ import net.pickapack.io.serialization.MapHelper;
 import org.apache.commons.lang.time.DurationFormatUtils;
 
 import java.io.File;
-import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -89,7 +88,7 @@ public abstract class Simulation implements SimulationObject {
             throw new IllegalArgumentException();
         }
 
-        this.processor = new BasicProcessor(this.experiment, this.blockingEventDispatcher, this.cycleAccurateEventQueue, kernel, this.prepareCacheHierarchy());
+        this.processor = new BasicProcessor(this.experiment, this, this.blockingEventDispatcher, this.cycleAccurateEventQueue, kernel, this.prepareCacheHierarchy());
 
         if (getExperiment().getArchitecture().getHtLLCRequestProfilingEnabled()) {
             this.htllcRequestProfilingHelper = new HTLLCRequestProfilingHelper(this);
@@ -145,12 +144,8 @@ public abstract class Simulation implements SimulationObject {
             this.experiment.setState(ExperimentState.ABORTED);
             this.experiment.setFailedReason(e.toString());
 
-            try {
-                ServiceManager.getExperimentService().updateExperiment(this.experiment);
-                ServiceManager.getExperimentService().dumpExperiment(experiment);
-            } catch (SQLException e1) {
-                throw new RuntimeException(e);
-            }
+            ServiceManager.getExperimentService().updateExperiment(this.experiment);
+            this.experiment.dump();
 
             System.err.println("Simulation aborted with errors");
             System.exit(-1);
@@ -160,8 +155,6 @@ public abstract class Simulation implements SimulationObject {
         this.collectStats(true);
 
         this.endSimulation();
-
-        resetIdCounters();
 
         System.out.println();
     }
@@ -370,11 +363,7 @@ public abstract class Simulation implements SimulationObject {
         if(this.getCycleAccurateEventQueue().getCurrentCycle() % (this.type == SimulationType.FAST_FORWARD ? 100000000 : 10000000) == 0) {
             this.endTime = DateHelper.toTick(new Date());
             this.collectStats(false);
-            try {
-                ServiceManager.getExperimentService().updateExperiment(this.experiment);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
+            ServiceManager.getExperimentService().updateExperiment(this.experiment);
         }
     }
 
@@ -388,7 +377,7 @@ public abstract class Simulation implements SimulationObject {
     }
 
     public CacheHierarchy prepareCacheHierarchy() {
-        return new BasicCacheHierarchy(this.getExperiment(), this.getBlockingEventDispatcher(), this.getCycleAccurateEventQueue());
+        return new BasicCacheHierarchy(this.getExperiment(), this, this.getBlockingEventDispatcher(), this.getCycleAccurateEventQueue());
     }
 
     public SimulationType getType() {
@@ -459,6 +448,11 @@ public abstract class Simulation implements SimulationObject {
         return experiment;
     }
 
+    @Override
+    public Simulation getSimulation() {
+        return this;
+    }
+
     public CycleAccurateEventQueue getCycleAccurateEventQueue() {
         return this.cycleAccurateEventQueue;
     }
@@ -471,29 +465,10 @@ public abstract class Simulation implements SimulationObject {
         return htllcRequestProfilingHelper;
     }
 
-    public static int currentMemoryPageId = 0;
-    public static int currentProcessId = 0;
-
-    public static long currentDynamicInstructionId = 0;
-    public static long currentReorderBufferEntryId = 0;
-    public static long currentDecodeBufferEntryId = 0;
-    public static long currentMemoryHierarchyAccessId = 0;
-
-    public static long currentCacheAccessId = 0;
-    public static long currentNetMessageId;
-    public static long currentCoherentCacheProcessId = 0;
-
-    private static void resetIdCounters() {
-        currentMemoryPageId = 0;
-        currentProcessId = 0;
-
-        currentDynamicInstructionId = 0;
-        currentReorderBufferEntryId = 0;
-        currentDecodeBufferEntryId = 0;
-        currentMemoryHierarchyAccessId = 0;
-
-        currentCacheAccessId = 0;
-        currentNetMessageId = 0;
-        currentCoherentCacheProcessId = 0;
-    }
+    public long currentDynamicInstructionId;
+    public long currentReorderBufferEntryId;
+    public long currentDecodeBufferEntryId;
+    public long currentMemoryHierarchyAccessId;
+    public long currentNetMessageId;
+    public long currentCacheCoherenceFlowId;
 }

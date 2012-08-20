@@ -20,12 +20,11 @@ package archimulator.sim.os;
 
 import archimulator.model.ContextMapping;
 import archimulator.sim.common.BasicSimulationObject;
-import archimulator.sim.common.Simulation;
 import archimulator.sim.common.SimulationObject;
 import archimulator.sim.isa.BitField;
+import archimulator.sim.isa.Memory;
 import archimulator.sim.isa.Mnemonic;
 import archimulator.sim.isa.StaticInstruction;
-import archimulator.sim.isa.Memory;
 import archimulator.util.SimulatedProgramBuildHelper;
 
 import java.io.File;
@@ -62,7 +61,7 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
 
         this.contextMapping = contextMapping;
 
-        this.id = Simulation.currentProcessId++;
+        this.id = getExperiment().currentProcessId++;
         kernel.getProcesses().add(this);
 
         this.stdinFileDescriptor = contextMapping.getSimulatedProgram().getStdin().length() > 0 ? NativeSystemCalls.LIBC.open(simulationDirectory + File.separator + contextMapping.getSimulatedProgram().getStdin(), OpenFlags.O_RDONLY) : 0;

@@ -26,19 +26,17 @@ public abstract class BasicSimulationObject implements SimulationObject {
     private BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher;
     private CycleAccurateEventQueue cycleAccurateEventQueue;
     private Experiment experiment;
+    private Simulation simulation;
 
-    public BasicSimulationObject(Experiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
+    public BasicSimulationObject(Experiment experiment, Simulation simulation, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
         this.experiment = experiment;
+        this.simulation = simulation;
         this.blockingEventDispatcher = blockingEventDispatcher;
         this.cycleAccurateEventQueue = cycleAccurateEventQueue;
     }
 
     public BasicSimulationObject(SimulationObject parent) {
-        this(parent.getExperiment(), parent.getBlockingEventDispatcher(), parent.getCycleAccurateEventQueue());
-    }
-
-    public Experiment getExperiment() {
-        return experiment;
+        this(parent.getExperiment(), parent.getSimulation(), parent.getBlockingEventDispatcher(), parent.getCycleAccurateEventQueue());
     }
 
     public BlockingEventDispatcher<SimulationEvent> getBlockingEventDispatcher() {
@@ -47,5 +45,13 @@ public abstract class BasicSimulationObject implements SimulationObject {
 
     public CycleAccurateEventQueue getCycleAccurateEventQueue() {
         return cycleAccurateEventQueue;
+    }
+
+    public Experiment getExperiment() {
+        return experiment;
+    }
+
+    public Simulation getSimulation() {
+        return simulation;
     }
 }

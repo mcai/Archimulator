@@ -18,11 +18,8 @@
  ******************************************************************************/
 package archimulator.service;
 
-import archimulator.model.Architecture;
 import archimulator.model.SimulatedProgram;
-import archimulator.sim.core.bpred.BranchPredictorType;
 import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
-import archimulator.sim.uncore.dram.MainMemoryType;
 
 public class ServiceManager {
     public static final String USER_HOME_TEMPLATE_ARG = "<user.home>";
@@ -83,101 +80,8 @@ public class ServiceManager {
     }
 
     private static void initializeArchitectureServiceData() {
-        if(architectureService.getFirstArchitecture() == null) {
-            architectureService.addArchitecture(createArchitecture("default", true, 32768, 4, 32768, 4, 32768 * 3, 8, CacheReplacementPolicyType.LRU));
-            architectureService.addArchitecture(createArchitecture("q6600", true, 32 * 1024, 8, 32 * 1024, 8, 4 * 1024 * 1024, 16, CacheReplacementPolicyType.LRU));
-        }
-    }
-
-    private static Architecture createArchitecture(String title, boolean htLLCRequestProfilingEnabled, int l1ISize, int l1IAssoc, int l1DSize, int l1DAssoc, int l2Size, int l2Assoc, CacheReplacementPolicyType l2ReplacementPolicyType) {
-        Architecture architecture = new Architecture(title);
-
-        architecture.setHtPthreadSpawnIndex(3720);
-        architecture.setHtLLCRequestProfilingEnabled(htLLCRequestProfilingEnabled);
-
-        architecture.setNumCores(2);
-        architecture.setNumThreadsPerCore(2);
-
-        architecture.setPhysicalRegisterFileCapacity(128);
-        architecture.setDecodeWidth(4);
-        architecture.setIssueWidth(4);
-        architecture.setCommitWidth(4);
-        architecture.setDecodeBufferCapacity(96);
-        architecture.setReorderBufferCapacity(96);
-        architecture.setLoadStoreQueueCapacity(48);
-
-        architecture.setBpredType(BranchPredictorType.PERFECT);
-
-        architecture.setTwoBitBpredBimodSize(2048);
-        architecture.setTwoBitBpredBtbSets(512);
-        architecture.setTwoBitBpredBtbAssoc(4);
-        architecture.setTwoBitBpredRetStackSize(8);
-
-        architecture.setTwoLevelBpredL1Size(1);
-        architecture.setTwoLevelBpredL2Size(1024);
-        architecture.setTwoLevelBpredShiftWidth(8);
-        architecture.setTwoLevelBpredXor(false);
-        architecture.setTwoLevelBpredBtbSets(512);
-        architecture.setTwoLevelBpredBtbAssoc(4);
-        architecture.setTwoLevelBpredRetStackSize(8);
-
-        architecture.setCombinedBpredBimodSize(2048);
-        architecture.setCombinedBpredL1Size(1);
-        architecture.setCombinedBpredL2Size(1024);
-        architecture.setCombinedBpredMetaSize(1024);
-        architecture.setCombinedBpredShiftWidth(8);
-        architecture.setCombinedBpredXor(false);
-        architecture.setCombinedBpredBtbSets(512);
-        architecture.setCombinedBpredBtbAssoc(4);
-        architecture.setCombinedBpredBtbRetStackSize(8);
-
-        architecture.setTlbSize(32768);
-        architecture.setTlbAssoc(4);
-        architecture.setTlbLineSize(64);
-        architecture.setTlbHitLatency(2);
-        architecture.setTlbMissLatency(30);
-
-        architecture.setL1ISize(l1ISize);
-        architecture.setL1IAssoc(l1IAssoc);
-        architecture.setL1ILineSize(64);
-        architecture.setL1IHitLatency(1);
-        architecture.setL1INumReadPorts(128);
-        architecture.setL1INumWritePorts(128);
-        architecture.setL1IReplacementPolicyType(CacheReplacementPolicyType.LRU);
-
-        architecture.setL1DSize(l1DSize);
-        architecture.setL1DAssoc(l1DAssoc);
-        architecture.setL1DLineSize(64);
-        architecture.setL1DHitLatency(1);
-        architecture.setL1DNumReadPorts(128);
-        architecture.setL1DNumWritePorts(128);
-        architecture.setL1DReplacementPolicyType(CacheReplacementPolicyType.LRU);
-
-        architecture.setL2Size(l2Size);
-        architecture.setL2Assoc(l2Assoc);
-        architecture.setL2LineSize(64);
-        architecture.setL2HitLatency(10);
-        architecture.setL2ReplacementPolicyType(l2ReplacementPolicyType);
-
-        architecture.setMainMemoryType(MainMemoryType.FIXED_LATENCY);
-        architecture.setMainMemoryLineSize(64);
-
-        architecture.setFixedLatencyMainMemoryLatency(200);
-
-        architecture.setSimpleMainMemoryMemoryLatency(200);
-        architecture.setSimpleMainMemoryMemoryTrunkLatency(2);
-        architecture.setSimpleMainMemoryBusWidth(4);
-
-        architecture.setBasicMainMemoryToDramLatency(6);
-        architecture.setBasicMainMemoryFromDramLatency(12);
-        architecture.setBasicMainMemoryPrechargeLatency(90);
-        architecture.setBasicMainMemoryClosedLatency(90);
-        architecture.setBasicMainMemoryConflictLatency(90);
-        architecture.setBasicMainMemoryBusWidth(4);
-        architecture.setBasicMainMemoryNumBanks(8);
-        architecture.setBasicMainMemoryRowSize(2048);
-
-        return architecture;
+//        architectureService.getOrAddArchitecture("default", true, 32 * 1024, 4, 32 * 1024, 4, 96 * 1024, 8, CacheReplacementPolicyType.LRU);
+        architectureService.getOrAddArchitecture(true, 2, 2, 32 * 1024, 8, 32 * 1024, 8, 4 * 1024 * 1024, 16, CacheReplacementPolicyType.LRU);
     }
 
     public static SimulatedProgramService getSimulatedProgramService() {

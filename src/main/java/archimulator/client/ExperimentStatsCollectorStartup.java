@@ -18,21 +18,34 @@
  ******************************************************************************/
 package archimulator.client;
 
-import archimulator.model.Experiment;
-import archimulator.service.ExperimentService;
+import archimulator.model.ExperimentPack;
 import archimulator.service.ServiceManager;
+import net.pickapack.JsonSerializationHelper;
+import org.parboiled.common.FileUtils;
 
-import java.sql.SQLException;
-import java.util.List;
+import java.io.File;
 
 public class ExperimentStatsCollectorStartup {
-    public static void main(String[] args) throws SQLException {
-        ExperimentService experimentService = ServiceManager.getExperimentService();
-        List<Experiment> experiments = experimentService.getAllExperiments();
+    public static void main(String[] args) {
+        if (args.length == 1) {
+            String arg = args[0];
+            if (new File(arg).exists()) {
+                ExperimentPackSpec experimentPackSpec = JsonSerializationHelper.deserialize(ExperimentPackSpec.class, FileUtils.readAllText(arg));
+                arg = experimentPackSpec.getTitle();
+            }
 
-        for (Experiment experiment : experiments) {
-            experimentService.dumpExperiment(experiment);
-            System.out.println();
+            ExperimentPack experimentPack = ServiceManager.getExperimentService().getExperimentPackByTitle(arg);
+            if(experimentPack != null) {
+                experimentPack.dump();
+            }
+            else {
+                System.err.println("Experiment pack \"" + arg + "\" do not exist");
+            }
+        } else {
+            for (ExperimentPack experimentPack : ServiceManager.getExperimentService().getAllExperimentPacks()) {
+                experimentPack.dump();
+                System.out.println();
+            }
         }
     }
 }

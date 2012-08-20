@@ -1,6 +1,5 @@
 package archimulator.sim.core;
 
-import archimulator.sim.common.Simulation;
 import archimulator.sim.core.bpred.BranchPredictorUpdate;
 
 import java.util.Map;
@@ -35,7 +34,7 @@ public abstract class AbstractReorderBufferEntry {
     private int numNotReadyOperands;
 
     public AbstractReorderBufferEntry(Thread thread, DynamicInstruction dynamicInst, int npc, int nnpc, int predNnpc, int returnAddressStackRecoverIndex, BranchPredictorUpdate dirUpdate, boolean speculative) {
-        this.id = Simulation.currentReorderBufferEntryId++;
+        this.id = thread.getSimulation().currentReorderBufferEntryId++;
 
         this.thread = thread;
 

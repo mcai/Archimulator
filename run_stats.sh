@@ -1,2 +1,2 @@
 cd ~/Archimulator
-java -cp target/archimulator.jar archimulator.client.ExperimentStatsCollectorStartup
+java -cp target/archimulator.jar archimulator.client.ExperimentStatsCollectorStartup $*

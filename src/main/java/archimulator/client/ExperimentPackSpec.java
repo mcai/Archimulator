@@ -16,20 +16,26 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.common;
-
-import archimulator.model.Experiment;
-import net.pickapack.event.BlockingEventDispatcher;
-import net.pickapack.event.CycleAccurateEventQueue;
+package archimulator.client;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
-public interface SimulationObject extends Serializable {
-    BlockingEventDispatcher<SimulationEvent> getBlockingEventDispatcher();
+public class ExperimentPackSpec implements Serializable {
+    private String title;
+    private List<ExperimentSpec> experiments;
 
-    CycleAccurateEventQueue getCycleAccurateEventQueue();
+    public ExperimentPackSpec(String title) {
+        this.title = title;
+        this.experiments = new ArrayList<ExperimentSpec>();
+    }
 
-    Experiment getExperiment();
+    public String getTitle() {
+        return title;
+    }
 
-    Simulation getSimulation();
+    public List<ExperimentSpec> getExperiments() {
+        return experiments;
+    }
 }

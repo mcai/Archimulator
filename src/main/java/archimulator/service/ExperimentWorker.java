@@ -21,17 +21,11 @@ package archimulator.service;
 import archimulator.model.Experiment;
 import archimulator.model.ExperimentState;
 import archimulator.model.ExperimentType;
-import archimulator.sim.common.SimulationEvent;
-import archimulator.sim.common.DetailedSimulation;
-import archimulator.sim.common.FromRoiDetailedSimulation;
-import archimulator.sim.common.FunctionalSimulation;
-import archimulator.sim.common.ToRoiFastForwardSimulation;
+import archimulator.sim.common.*;
 import archimulator.sim.os.Kernel;
 import net.pickapack.Reference;
 import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
-
-import java.sql.SQLException;
 
 public class ExperimentWorker {
     private boolean running;
@@ -41,16 +35,12 @@ public class ExperimentWorker {
             @Override
             public void run() {
                 for(;;) {
-                    try {
-                        if(!doMonitor()) {
-                            try {
-                                Thread.sleep(100);
-                            } catch (InterruptedException e) {
-                                throw new RuntimeException(e);
-                            }
+                    if(!doMonitor()) {
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
                         }
-                    } catch (SQLException e) {
-                        throw new RuntimeException(e);
                     }
                 }
             }
@@ -59,7 +49,7 @@ public class ExperimentWorker {
         threadMonitor.start();
     }
 
-    private boolean doMonitor() throws SQLException {
+    private boolean doMonitor() {
         Experiment experiment = ServiceManager.getExperimentService().getFirstExperimentToRun();
 
         if(experiment != null) {
@@ -71,7 +61,7 @@ public class ExperimentWorker {
         return false;
     }
 
-    public void runExperiment(Experiment experiment) throws SQLException {
+    public void runExperiment(Experiment experiment) {
         experiment.setState(ExperimentState.RUNNING);
         ServiceManager.getExperimentService().updateExperiment(experiment);
 
@@ -101,7 +91,7 @@ public class ExperimentWorker {
         experiment.setFailedReason("");
 
         ServiceManager.getExperimentService().updateExperiment(experiment);
-        ServiceManager.getExperimentService().dumpExperiment(experiment);
+        experiment.dump();
     }
 
     public boolean isRunning() {

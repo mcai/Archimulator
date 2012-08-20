@@ -19,7 +19,6 @@
 package archimulator.sim.isa;
 
 import archimulator.sim.common.BasicSimulationObject;
-import archimulator.sim.common.Simulation;
 import archimulator.sim.os.Kernel;
 import archimulator.sim.uncore.cache.CacheGeometry;
 
@@ -301,7 +300,7 @@ public class Memory extends BasicSimulationObject {
         int index = getIndex(addr);
 
         this.numPages++;
-        Page page = new Page(Simulation.currentMemoryPageId++);
+        Page page = new Page(getExperiment().currentMemoryPageId++);
 
         this.pages.put(index, page);
 
@@ -403,7 +402,7 @@ public class Memory extends BasicSimulationObject {
         private static final int COUNT = 1024;
     }
 
-    private static CacheGeometry geometry = new CacheGeometry(-1, 1, 1 << 12);
+    private static final CacheGeometry geometry = new CacheGeometry(-1, 1, 1 << 12);
 
     public static int getDisplacement(int addr) {
         return CacheGeometry.getDisplacement(addr, geometry);

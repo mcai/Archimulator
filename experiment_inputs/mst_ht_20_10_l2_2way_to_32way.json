@@ -1,0 +1,69 @@
+{
+    "title": "mst_ht_20_10_l2_2way_to_32way",
+    "experiments": [{
+        "programTitle": "mst_ht",
+        "htLookahead": 20,
+        "htStride": 10,
+        "numCores": 2,
+        "numThreadsPerCore": 2,
+        "l1ISize": "32 KB",
+        "l1IAssoc": 4,
+        "l1DSize": "32 KB",
+        "l1DAssoc": 4,
+        "l2Size": "96 KB",
+        "l2Assoc": 2,
+        "l2ReplacementPolicyType": "LRU"
+    }, {
+        "programTitle": "mst_ht",
+        "htLookahead": 20,
+        "htStride": 10,
+        "numCores": 2,
+        "numThreadsPerCore": 2,
+        "l1ISize": "32 KB",
+        "l1IAssoc": 4,
+        "l1DSize": "32 KB",
+        "l1DAssoc": 4,
+        "l2Size": "96 KB",
+        "l2Assoc": 4,
+        "l2ReplacementPolicyType": "LRU"
+    }, {
+        "programTitle": "mst_ht",
+        "htLookahead": 20,
+        "htStride": 10,
+        "numCores": 2,
+        "numThreadsPerCore": 2,
+        "l1ISize": "32 KB",
+        "l1IAssoc": 4,
+        "l1DSize": "32 KB",
+        "l1DAssoc": 4,
+        "l2Size": "96 KB",
+        "l2Assoc": 8,
+        "l2ReplacementPolicyType": "LRU"
+    }, {
+        "programTitle": "mst_ht",
+        "htLookahead": 20,
+        "htStride": 10,
+        "numCores": 2,
+        "numThreadsPerCore": 2,
+        "l1ISize": "32 KB",
+        "l1IAssoc": 4,
+        "l1DSize": "32 KB",
+        "l1DAssoc": 4,
+        "l2Size": "96 KB",
+        "l2Assoc": 16,
+        "l2ReplacementPolicyType": "LRU"
+    }, {
+        "programTitle": "mst_ht",
+        "htLookahead": 20,
+        "htStride": 10,
+        "numCores": 2,
+        "numThreadsPerCore": 2,
+        "l1ISize": "32 KB",
+        "l1IAssoc": 4,
+        "l1DSize": "32 KB",
+        "l1DAssoc": 4,
+        "l2Size": "96 KB",
+        "l2Assoc": 32,
+        "l2ReplacementPolicyType": "LRU"
+    }]
+}

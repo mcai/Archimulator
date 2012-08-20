@@ -22,9 +22,7 @@ import com.sun.jna.Library;
 import com.sun.jna.Native;
 
 public class NativeSystemCalls {
-    public static final int CLOCKS_PER_SEC = 1000000;
-
-    public static interface LibC extends Library {
+    public interface LibC extends Library {
         long getuid();
 
         long geteuid();
@@ -48,19 +46,20 @@ public class NativeSystemCalls {
         int ioctl(int fd, int request, byte[] buf);
     }
 
-    public static int CPU_FREQUENCY = 300000;
+    public static final int CLOCKS_PER_SEC = 1000000;
+    public static final int CPU_FREQUENCY = 300000;
+
+    private static final String LINUX = "linux";
+
+    private static final String OS_NAME = System.getProperty("os.name");
+    private static final String OS_NAME_LC = OS_NAME.toLowerCase();
+    private static final boolean IS_LINUX = OS_NAME_LC.startsWith(LINUX);
+
+    private static final String LIBC_NAME = IS_LINUX ? "libc.so.6" : "c";
+
+    public static final LibC LIBC = (LibC) Native.loadLibrary(LIBC_NAME, LibC.class);
 
     public static long clock(long totalCycles) {
         return CLOCKS_PER_SEC * totalCycles / CPU_FREQUENCY;
     }
-
-    private static final String LINUX = "linux";
-
-    public static final String OS_NAME = System.getProperty("os.name");
-    public static final String OS_NAME_LC = OS_NAME.toLowerCase();
-    public static final boolean IS_LINUX = OS_NAME_LC.startsWith(LINUX);
-
-    static final String LIBC_NAME = IS_LINUX ? "libc.so.6" : "c";
-
-    public static LibC LIBC = (LibC) Native.loadLibrary(LIBC_NAME, LibC.class);
 }

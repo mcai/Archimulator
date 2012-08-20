@@ -1,2 +1,2 @@
 cd ~/Archimulator
-java -jar target/archimulator.jar
+java -jar target/archimulator.jar $*

@@ -20,34 +20,50 @@ package archimulator.service;
 
 import archimulator.model.Architecture;
 import archimulator.model.Experiment;
+import archimulator.model.ExperimentPack;
 import archimulator.model.SimulatedProgram;
 import net.pickapack.service.Service;
 
-import java.sql.SQLException;
 import java.util.List;
 
 public interface ExperimentService extends Service {
-    List<Experiment> getAllExperiments() throws SQLException;
+    List<Experiment> getAllExperiments();
 
-    Experiment getExperimentById(long id) throws SQLException;
+    Experiment getExperimentById(long id);
 
-    List<Experiment> getExperimentsByTitle(String title) throws SQLException;
+    List<Experiment> getExperimentsByTitle(String title);
 
-    Experiment getLatestExperimentByTitle(String title) throws SQLException;
+    Experiment getLatestExperimentByTitle(String title);
 
-    List<Experiment> getExperimentsBySimulatedProgram(SimulatedProgram simulatedProgram) throws SQLException;
+    List<Experiment> getExperimentsBySimulatedProgram(SimulatedProgram simulatedProgram);
 
-    List<Experiment> getExperimentsByArchitecture(Architecture architecture) throws SQLException;
+    List<Experiment> getExperimentsByArchitecture(Architecture architecture);
 
-    void addExperiment(Experiment experiment) throws SQLException;
+    List<Experiment> getExperimentsByParent(ExperimentPack parent);
 
-    void removeExperimentById(long id) throws SQLException;
+    void addExperiment(Experiment experiment);
 
-    void updateExperiment(Experiment experiment) throws SQLException;
+    void removeExperimentById(long id);
 
-    void dumpExperiment(Experiment experiment) throws SQLException;
+    void updateExperiment(Experiment experiment);
 
-    Experiment getFirstExperimentToRun() throws SQLException;
+    void dumpExperiment(Experiment experiment);
 
-    void waitForExperimentStopped(Experiment experiment) throws SQLException;
+    Experiment getFirstExperimentToRun();
+
+    void waitForExperimentStopped(Experiment experiment);
+
+    List<ExperimentPack> getAllExperimentPacks();
+
+    ExperimentPack getExperimentPackById(long id);
+
+    ExperimentPack getExperimentPackByTitle(String title);
+
+    void addExperimentPack(ExperimentPack experimentPack);
+
+    void removeExperimentPack(long id);
+
+    void updateExperimentPack(ExperimentPack experimentPack);
+
+    void waitForExperimentPackStopped(ExperimentPack experimentPack);
 }

@@ -18,7 +18,6 @@
  ******************************************************************************/
 package archimulator.sim.uncore.net;
 
-import archimulator.sim.common.Simulation;
 import net.pickapack.action.Action;
 
 public class NetMessage {
@@ -30,8 +29,8 @@ public class NetMessage {
 
     private long beginCycle;
 
-    public NetMessage(NetNode srcNode, NetNode destNode, int size, Action onCompletedCallback, long beginCycle) {
-        this.id = Simulation.currentNetMessageId++;
+    public NetMessage(Net net, NetNode srcNode, NetNode destNode, int size, Action onCompletedCallback, long beginCycle) {
+        this.id = net.getSimulation().currentNetMessageId++;
 
         this.srcNode = srcNode;
         this.destNode = destNode;

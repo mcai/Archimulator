@@ -32,7 +32,10 @@ public class Experiment implements ModelElement {
     @DatabaseField(generatedId = true)
     private long id;
 
-    @DatabaseField
+    @DatabaseField(index = true)
+    private long parentId;
+
+    @DatabaseField(index = true)
     private String title;
 
     @DatabaseField
@@ -50,8 +53,6 @@ public class Experiment implements ModelElement {
     @DatabaseField
     private long architectureId;
 
-    private transient Architecture architecture;
-
     @DatabaseField
     private int numMaxInsts;
 
@@ -61,10 +62,18 @@ public class Experiment implements ModelElement {
     @DatabaseField(dataType = DataType.SERIALIZABLE)
     private LinkedHashMap<String, String> stats;
 
+    private transient Architecture architecture;
+
+    private transient ExperimentPack parent;
+
+    public transient int currentMemoryPageId;
+    public transient int currentProcessId;
+
     public Experiment() {
     }
 
-    public Experiment(String title, ExperimentType type, Architecture architecture, int numMaxInsts, List<ContextMapping> contextMappings) {
+    public Experiment(ExperimentPack parent, String title, ExperimentType type, Architecture architecture, int numMaxInsts, List<ContextMapping> contextMappings) {
+        this.parentId = parent == null ? -1 : parent.getId();
         this.title = title;
         this.type = type;
         this.state = ExperimentState.PENDING;
@@ -81,7 +90,7 @@ public class Experiment implements ModelElement {
 
     @Override
     public long getParentId() {
-        return -1;
+        return parentId;
     }
 
     public String getTitle() {
@@ -132,6 +141,14 @@ public class Experiment implements ModelElement {
         return stats;
     }
 
+    public ExperimentPack getParent() {
+        if(parent == null) {
+            parent = ServiceManager.getExperimentService().getExperimentPackById(this.parentId);
+        }
+
+        return parent;
+    }
+
     public Architecture getArchitecture() {
         if(architecture == null) {
             architecture = ServiceManager.getArchitectureService().getArchitectureById(this.architectureId);
@@ -142,6 +159,10 @@ public class Experiment implements ModelElement {
 
     public boolean isStopped() {
         return this.state == ExperimentState.COMPLETED || this.state == ExperimentState.ABORTED;
+    }
+
+    public void dump() {
+        ServiceManager.getExperimentService().dumpExperiment(this);
     }
 
     @Override

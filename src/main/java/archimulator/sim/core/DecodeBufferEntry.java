@@ -18,7 +18,6 @@
  ******************************************************************************/
 package archimulator.sim.core;
 
-import archimulator.sim.common.Simulation;
 import archimulator.sim.core.bpred.BranchPredictorUpdate;
 
 public class DecodeBufferEntry {
@@ -32,7 +31,7 @@ public class DecodeBufferEntry {
     private boolean speculative;
 
     public DecodeBufferEntry(DynamicInstruction dynamicInstruction, int npc, int nnpc, int predNnpc, int returnAddressStackRecoverIndex, BranchPredictorUpdate dirUpdate, boolean speculative) {
-        this.id = Simulation.currentDecodeBufferEntryId++;
+        this.id = dynamicInstruction.getThread().getSimulation().currentDecodeBufferEntryId++;
         this.dynamicInst = dynamicInstruction;
         this.npc = npc;
         this.nnpc = nnpc;

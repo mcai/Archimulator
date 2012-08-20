@@ -18,93 +18,86 @@
  ******************************************************************************/
 package archimulator.util.chart;
 
+import archimulator.model.ContextMapping;
+import archimulator.model.Experiment;
+import archimulator.model.ExperimentState;
 import archimulator.service.ExperimentService;
 import archimulator.service.ServiceManager;
-import net.pickapack.dateTime.DateHelper;
-
-import java.net.MalformedURLException;
-import java.sql.SQLException;
-import java.util.Date;
+import net.pickapack.StorageUnit;
+import net.pickapack.action.Function1;
+import net.pickapack.action.Predicate;
+import net.pickapack.chart.BarPlot;
+import net.pickapack.chart.BarPlotFrame;
+import net.pickapack.chart.SubBarPlot;
+import org.jfree.ui.RefineryUtilities;
 
 public class ExperimentBarPlotHelper {
-    private static Double getExperimentProfileStat(ExperimentService experimentService, String key, long experimentId) {
-        try {
-            String value = experimentService.getExperimentById(experimentId).getStats().get(key);
-            if (value != null) {
-                value = value.replaceAll(",", "");
-                return (double) (int) (Double.valueOf(value).doubleValue());
-            }
-            return 0.0;
-        } catch (SQLException e) {
-            recordException(e);
-            return 0.0;
+    private static Double getExperimentProfileStat(Experiment experiment, String key) {
+        String value = experiment.getStats().get(key);
+        if (value != null) {
+            value = value.replaceAll(",", "");
+            return (double) (int) (Double.valueOf(value).doubleValue());
         }
+        return 0.0;
     }
 
-    private static void recordException(Exception e) {
-        System.out.print(String.format("[%s Exception] %s\r\n", DateHelper.toString(new Date()), e));
-        e.printStackTrace();
+    private static BarPlot<Experiment> createHTLLCRequestDistributionBarPlot(final ExperimentService experimentService) {
+        BarPlot<Experiment> barPlot = new BarPlot<Experiment>("HT LLC Request Distribution", "# HT LLC Requests", new Predicate<Experiment>() {
+            @Override
+            public boolean apply(Experiment experiment) {
+                return experiment.getState() == ExperimentState.COMPLETED && experiment.getTitle().contains("_LRU") && experiment.getTitle().contains("mst_ht");
+            }
+        }, experimentService.getAllExperiments());
+
+        Function1<Experiment, String> getTitleCallback = new Function1<Experiment, String>() {
+            @Override
+            public String apply(Experiment experiment) {
+                ContextMapping contextMapping = experiment.getContextMappings().get(0);
+                return contextMapping.getHtLookahead() + ", " + contextMapping.getHtStride() + ", " + StorageUnit.toString(experiment.getArchitecture().getL2Size()) + ", " + experiment.getArchitecture().getL2Assoc();
+            }
+        };
+
+        barPlot.getSubBarPlots().add(new SubBarPlot<Experiment>("Total HT LLC Request", new Function1<Experiment, Double>() {
+            @Override
+            public Double apply(Experiment experiment) {
+                return getExperimentProfileStat(experiment, "detailed/htllcRequestProfilingHelper/numTotalHTLLCRequests");
+            }
+        }, getTitleCallback));
+
+        barPlot.getSubBarPlots().add(new SubBarPlot<Experiment>("Good HT LLC Request", new Function1<Experiment, Double>() {
+            @Override
+            public Double apply(Experiment experimentProfile) {
+                return getExperimentProfileStat(experimentProfile, "detailed/htllcRequestProfilingHelper/numTimelyHTLLCRequests");
+            }
+        }, getTitleCallback));
+        barPlot.getSubBarPlots().add(new SubBarPlot<Experiment>("Late HT LLC Request", new Function1<Experiment, Double>() {
+            @Override
+            public Double apply(Experiment experimentProfile) {
+                return getExperimentProfileStat(experimentProfile, "detailed/htllcRequestProfilingHelper/numLateHTLLCRequests");
+            }
+        }, getTitleCallback));
+        barPlot.getSubBarPlots().add(new SubBarPlot<Experiment>("Bad HT LLC Request", new Function1<Experiment, Double>() {
+            @Override
+            public Double apply(Experiment experimentProfile) {
+                return getExperimentProfileStat(experimentProfile, "detailed/htllcRequestProfilingHelper/numBadHTLLCRequests");
+            }
+        }, getTitleCallback));
+        barPlot.getSubBarPlots().add(new SubBarPlot<Experiment>("Ugly HT LLC Request", new Function1<Experiment, Double>() {
+            @Override
+            public Double apply(Experiment experimentProfile) {
+                return getExperimentProfileStat(experimentProfile, "detailed/htllcRequestProfilingHelper/numUglyHTLLCRequests");
+            }
+        }, getTitleCallback));
+        return barPlot;
     }
 
-    //TODO
-//    private static BarPlot<ExperimentProfile> createHTLLCRequestDistributionBarPlot(final ExperimentService archimulatorService) throws SQLException {
-//        BarPlot<ExperimentProfile> barPlot = new BarPlot<>("HT LLC Request Distribution", "# HT LLC Requests", new Predicate<ExperimentProfile>() {
-//            @Override
-//            public boolean apply(ExperimentProfile experimentProfile) {
-//                return experimentProfile.getState() == ExperimentProfileState.STOPPED && experimentProfile.getTitle().contains("_LRU") && experimentProfile.getTitle().contains("mst_ht");
-//            }
-//        }, archimulatorService.getExperimentProfilesAsList());
-//
-//        Function1<ExperimentProfile, String> getTitleCallback = new Function1<ExperimentProfile, String>() {
-//            @Override
-//            public String apply(ExperimentProfile experimentProfile) {
-//                SimulatedProgram simulatedProgram = experimentProfile.getContextMappings().get(0).getSimulatedProgram();
-//                return simulatedProgram.getHtLookahead() + ", " + simulatedProgram.getHtStride() + ", " + StorageUnit.toString(PropertiesEnhancedBlockingEventDispatcher.getL2Size()) + ", " + PropertiesEnhancedBlockingEventDispatcher.getL2Assoc();
-//            }
-//        };
-//
-//        barPlot.getSubBarPlots().add(new SubBarPlot<>("Total HT LLC Request", new Function1<ExperimentProfile, Double>() {
-//            @Override
-//            public Double apply(ExperimentProfile experimentProfile) {
-//                return getExperimentProfileStat(experimentProfile, archimulatorService, "checkpointedSimulation/phase1.llcHTRequestProfilingCapability.llc.numTotalHtRequests");
-//            }
-//        }, getTitleCallback));
-//
-//        barPlot.getSubBarPlots().add(new SubBarPlot<>("Good HT LLC Request", new Function1<ExperimentProfile, Double>() {
-//            @Override
-//            public Double apply(ExperimentProfile experimentProfile) {
-//                return getExperimentProfileStat(experimentProfile, archimulatorService, "checkpointedSimulation/phase1.llcHTRequestProfilingCapability.llc.numGoodHtRequests");
-//            }
-//        }, getTitleCallback));
-//        barPlot.getSubBarPlots().add(new SubBarPlot<>("Bad HT LLC Request", new Function1<ExperimentProfile, Double>() {
-//            @Override
-//            public Double apply(ExperimentProfile experimentProfile) {
-//                return getExperimentProfileStat(experimentProfile, archimulatorService, "checkpointedSimulation/phase1.llcHTRequestProfilingCapability.llc.numBadHtRequests");
-//            }
-//        }, getTitleCallback));
-//        barPlot.getSubBarPlots().add(new SubBarPlot<>("Ugly HT LLC Request", new Function1<ExperimentProfile, Double>() {
-//            @Override
-//            public Double apply(ExperimentProfile experimentProfile) {
-//                return getExperimentProfileStat(experimentProfile, archimulatorService, "checkpointedSimulation/phase1.llcHTRequestProfilingCapability.llc.numUglyHtRequests");
-//            }
-//        }, getTitleCallback));
-//        barPlot.getSubBarPlots().add(new SubBarPlot<>("Late HT LLC Request", new Function1<ExperimentProfile, Double>() {
-//            @Override
-//            public Double apply(ExperimentProfile experimentProfile) {
-//                return getExperimentProfileStat(experimentProfile, archimulatorService, "checkpointedSimulation/phase1.llcHTRequestProfilingCapability.llc.numLateHtRequests");
-//            }
-//        }, getTitleCallback));
-//        return barPlot;
-//    }
-
-    public static void main(String[] args) throws MalformedURLException, SQLException {
+    public static void main(String[] args) {
         ExperimentService experimentService = ServiceManager.getExperimentService();
 
-        //TODO
-//        BarPlot<ExperimentProfile> barPlot = createHTLLCRequestDistributionBarPlot(experimentService);
-//        BarPlotFrame<ExperimentProfile> barPlotFrame = new BarPlotFrame<ExperimentProfile>(barPlot, "Experiment", 500, 470);
-//        barPlotFrame.pack();
-//        RefineryUtilities.centerFrameOnScreen(barPlotFrame);
-//        barPlotFrame.setVisible(true);
+        BarPlot<Experiment> barPlot = createHTLLCRequestDistributionBarPlot(experimentService);
+        BarPlotFrame<Experiment> barPlotFrame = new BarPlotFrame<Experiment>(barPlot, "Experiment", 500, 470);
+        barPlotFrame.pack();
+        RefineryUtilities.centerFrameOnScreen(barPlotFrame);
+        barPlotFrame.setVisible(true);
     }
 }

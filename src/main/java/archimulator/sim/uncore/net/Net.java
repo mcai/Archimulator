@@ -122,6 +122,6 @@ public abstract class Net extends BasicSimulationObject {
         EndPointNode srcNode = this.endPointNodes.get(srcDevice);
         EndPointNode destNode = this.endPointNodes.get(destDevice);
         OutPort port = srcNode.getPort(destNode);
-        port.toLink(new NetMessage(srcNode, destNode, size, onCompletedCallback, this.getCycleAccurateEventQueue().getCurrentCycle()));
+        port.toLink(new NetMessage(this, srcNode, destNode, size, onCompletedCallback, this.getCycleAccurateEventQueue().getCurrentCycle()));
     }
 }

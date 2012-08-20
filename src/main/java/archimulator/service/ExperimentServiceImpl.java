@@ -25,43 +25,44 @@ import net.pickapack.dateTime.DateHelper;
 import net.pickapack.model.ModelElement;
 import net.pickapack.service.AbstractService;
 
-import java.sql.SQLException;
 import java.util.*;
 
 public class ExperimentServiceImpl extends AbstractService implements ExperimentService {
     private Dao<Experiment, Long> experiments;
+    private Dao<ExperimentPack, Long> experimentPacks;
 
     @SuppressWarnings("unchecked")
     public ExperimentServiceImpl(){
-        super(ServiceManager.DATABASE_DIRECTORY, ServiceManager.DATABASE_URL, Arrays.<Class<? extends ModelElement>>asList(Experiment.class));
+        super(ServiceManager.DATABASE_DIRECTORY, ServiceManager.DATABASE_URL, Arrays.<Class<? extends ModelElement>>asList(Experiment.class, ExperimentPack.class));
 
         this.experiments = createDao(Experiment.class);
+        this.experimentPacks = createDao(ExperimentPack.class);
 
         new ExperimentWorker();
     }
 
     @Override
-    public List<Experiment> getAllExperiments() throws SQLException {
+    public List<Experiment> getAllExperiments() {
         return this.getAllItems(this.experiments);
     }
 
     @Override
-    public Experiment getExperimentById(long id) throws SQLException {
+    public Experiment getExperimentById(long id) {
         return this.getItemById(this.experiments, id);
     }
 
     @Override
-    public List<Experiment> getExperimentsByTitle(String title) throws SQLException {
+    public List<Experiment> getExperimentsByTitle(String title) {
         return this.getItemsByTitle(this.experiments, title);
     }
 
     @Override
-    public Experiment getLatestExperimentByTitle(String title) throws SQLException {
+    public Experiment getLatestExperimentByTitle(String title) {
         return this.getLatestItemByTitle(this.experiments, title);
     }
 
     @Override
-    public List<Experiment> getExperimentsBySimulatedProgram(SimulatedProgram simulatedProgram) throws SQLException {
+    public List<Experiment> getExperimentsBySimulatedProgram(SimulatedProgram simulatedProgram) {
         List<Experiment> result = new ArrayList<Experiment>();
 
         for(Experiment experiment : getAllExperiments()) {
@@ -77,7 +78,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     @Override
-    public List<Experiment> getExperimentsByArchitecture(Architecture architecture) throws SQLException {
+    public List<Experiment> getExperimentsByArchitecture(Architecture architecture) {
         List<Experiment> result = new ArrayList<Experiment>();
 
         for(Experiment experiment : getAllExperiments()) {
@@ -90,23 +91,28 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     @Override
-    public void addExperiment(Experiment experiment) throws SQLException {
+    public List<Experiment> getExperimentsByParent(ExperimentPack parent) {
+        return this.getItemsByParent(this.experiments, parent);
+    }
+
+    @Override
+    public void addExperiment(Experiment experiment) {
         this.addItem(this.experiments, Experiment.class, experiment);
     }
 
     @Override
-    public void removeExperimentById(long id) throws SQLException {
+    public void removeExperimentById(long id) {
         this.removeItemById(this.experiments, Experiment.class, id);
     }
 
     @Override
-    public void updateExperiment(Experiment experiment) throws SQLException {
+    public void updateExperiment(Experiment experiment) {
         this.updateItem(this.experiments, Experiment.class, experiment);
     }
 
     @Override
-    public void dumpExperiment(Experiment experiment) throws SQLException {
-        System.out.printf("[%s] %s\n", DateHelper.toString(experiment.getCreateTime()), experiment);
+    public void dumpExperiment(Experiment experiment) {
+        System.out.printf("[%s] experiment %s\n", DateHelper.toString(experiment.getCreateTime()), experiment);
 
         Map<String, String> configs = new LinkedHashMap<String, String>();
 
@@ -233,7 +239,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     @Override
-    public Experiment getFirstExperimentToRun() throws SQLException {
+    public Experiment getFirstExperimentToRun() {
         for(Experiment experiment : getAllExperiments()) {
             if(experiment.getState() == ExperimentState.PENDING) {
                 return experiment;
@@ -244,13 +250,69 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     @Override
-    public void waitForExperimentStopped(Experiment experiment) throws SQLException {
+    public void waitForExperimentStopped(Experiment experiment) {
         long id = experiment.getId();
 
         try {
             for(;;) {
                 if(getExperimentById(id).isStopped()) {
                     break;
+                }
+
+                Thread.sleep(1000);
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<ExperimentPack> getAllExperimentPacks() {
+        return this.getAllItems(this.experimentPacks);
+    }
+
+    @Override
+    public ExperimentPack getExperimentPackById(long id) {
+        return this.getItemById(this.experimentPacks, id);
+    }
+
+    @Override
+    public ExperimentPack getExperimentPackByTitle(String title) {
+        return this.getFirstItemByTitle(this.experimentPacks, title);
+    }
+
+    @Override
+    public void addExperimentPack(ExperimentPack experimentPack) {
+        this.addItem(this.experimentPacks, ExperimentPack.class, experimentPack);
+    }
+
+    @Override
+    public void removeExperimentPack(long id) {
+        this.removeItemById(this.experimentPacks, ExperimentPack.class, id);
+    }
+
+    @Override
+    public void updateExperimentPack(ExperimentPack experimentPack) {
+        this.updateItem(this.experimentPacks, ExperimentPack.class, experimentPack);
+    }
+
+    @Override
+    public void waitForExperimentPackStopped(ExperimentPack experimentPack) {
+        long id = experimentPack.getId();
+
+        try {
+            for(;;) {
+                boolean allStopped = true;
+
+                for(Experiment experiment : getExperimentsByParent(getExperimentPackById(id))) {
+                    if(!experiment.isStopped()) {
+                        allStopped = false;
+                        break;
+                    }
+                }
+
+                if(allStopped) {
+                    return;
                 }
 
                 Thread.sleep(1000);

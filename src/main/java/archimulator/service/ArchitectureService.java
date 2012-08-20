@@ -19,6 +19,7 @@
 package archimulator.service;
 
 import archimulator.model.Architecture;
+import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
 import net.pickapack.service.Service;
 
 import java.util.List;
@@ -39,4 +40,6 @@ public interface ArchitectureService extends Service {
     void clearArchitectures();
 
     void updateArchitecture(Architecture architecture);
+
+    Architecture getOrAddArchitecture(boolean htLLCRequestProfilingEnabled, int numCores, int numThreadsPerCore, int l1ISize, int l1IAssoc, int l1DSize, int l1DAssoc, int l2Size, int l2Assoc, CacheReplacementPolicyType l2ReplacementPolicyType);
 }

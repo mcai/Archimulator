@@ -41,7 +41,7 @@ public abstract class CacheCoherenceFlow extends Params implements Node {
     private int tag;
 
     public CacheCoherenceFlow(Controller generator, CacheCoherenceFlow producerFlow, MemoryHierarchyAccess access, int tag) {
-        this.id = currentId++;
+        this.id = generator.getSimulation().currentCacheCoherenceFlowId++;
         this.generator = generator;
         this.producerFlow = producerFlow;
         this.ancestorFlow = producerFlow == null ? this : producerFlow.ancestorFlow;
@@ -126,7 +126,6 @@ public abstract class CacheCoherenceFlow extends Params implements Node {
         return this.childFlows;
     }
 
-    private static long currentId = 0;
     private static List<CacheCoherenceFlow> pendingFlows = new ArrayList<CacheCoherenceFlow>();
 
     public static List<CacheCoherenceFlow> getPendingFlows() {

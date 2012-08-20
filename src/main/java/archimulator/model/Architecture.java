@@ -559,14 +559,6 @@ public class Architecture implements ModelElement {
         return basicMainMemoryRowSize;
     }
 
-    public String getProcessorPropertiesTitle() {
-        return "C" + getNumCores() + "T" + getNumThreadsPerCore()
-                + "-" + "L1I_" + getL1ISize() / 1024 + "KB" + "_" + "Assoc" + getL1IAssoc()
-                + "-" + "L2_" + getL1DSize() / 1024 + "KB" + "_" + "Assoc" + getL1DAssoc()
-                + "-" + "L2_" + getL2Size() / 1024 + "KB" + "_" + "Assoc" + getL2Assoc()
-                + "_" + getL2ReplacementPolicyType();
-    }
-
     public void setHtPthreadSpawnIndex(int htPthreadSpawnIndex) {
         this.htPthreadSpawnIndex = htPthreadSpawnIndex;
     }

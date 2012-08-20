@@ -18,7 +18,6 @@
  ******************************************************************************/
 package archimulator.sim.core;
 
-import archimulator.sim.common.Simulation;
 import archimulator.sim.isa.StaticInstruction;
 import archimulator.sim.isa.StaticInstructionType;
 import org.apache.commons.lang.StringUtils;
@@ -39,7 +38,7 @@ public class DynamicInstruction {
     private int cyclesSpentAtHeadOfReorderBuffer;
 
     public DynamicInstruction(Thread thread, int pc, StaticInstruction staticInst) {
-        this.id = Simulation.currentDynamicInstructionId++;
+        this.id = thread.getSimulation().currentDynamicInstructionId++;
         this.thread = thread;
         this.pc = pc;
         this.staticInst = staticInst;

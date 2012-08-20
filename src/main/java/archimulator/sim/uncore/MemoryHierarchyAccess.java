@@ -18,7 +18,6 @@
  ******************************************************************************/
 package archimulator.sim.uncore;
 
-import archimulator.sim.common.Simulation;
 import archimulator.sim.core.DynamicInstruction;
 import net.pickapack.action.Action;
 
@@ -42,7 +41,7 @@ public class MemoryHierarchyAccess {
     private long endCycle;
 
     public MemoryHierarchyAccess(DynamicInstruction dynamicInst, MemoryHierarchyThread thread, MemoryHierarchyAccessType type, int virtualPc, int physicalAddress, int physicalTag, Action onCompletedCallback, long beginCycle) {
-        this.id = Simulation.currentMemoryHierarchyAccessId++;
+        this.id = thread.getSimulation().currentMemoryHierarchyAccessId++;
 
         this.dynamicInst = dynamicInst;
 
