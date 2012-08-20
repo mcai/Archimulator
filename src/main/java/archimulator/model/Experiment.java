@@ -77,6 +77,7 @@ public class Experiment implements ModelElement {
         this.title = title;
         this.type = type;
         this.state = ExperimentState.PENDING;
+        this.failedReason = "";
         this.numMaxInsts = numMaxInsts;
         this.contextMappings = new ArrayList<ContextMapping>(contextMappings);
         this.architectureId = architecture.getId();

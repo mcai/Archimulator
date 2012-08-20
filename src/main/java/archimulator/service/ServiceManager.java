@@ -18,8 +18,8 @@
  ******************************************************************************/
 package archimulator.service;
 
-import archimulator.model.SimulatedProgram;
-import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
+import archimulator.model.Experiment;
+import archimulator.model.ExperimentState;
 
 public class ServiceManager {
     public static final String USER_HOME_TEMPLATE_ARG = "<user.home>";
@@ -32,56 +32,28 @@ public class ServiceManager {
     private static ArchitectureService architectureService;
     private static ExperimentService experimentService;
 
+    public static boolean runningExperiments = false;
+
     static {
         simulatedProgramService = new SimulatedProgramServiceImpl();
         architectureService = new ArchitectureServiceImpl();
         experimentService = new ExperimentServiceImpl();
 
-        initializeData();
-    }
-
-    private static void initializeData() {
-        initializeSimulatedProgramServiceData();
-        initializeArchitectureServiceData();
-    }
-
-    private static void initializeSimulatedProgramServiceData() {
-        if(simulatedProgramService.getFirstSimulatedProgram() == null) {
-            simulatedProgramService.addSimulatedProgram(new SimulatedProgram(
-                    "mst_baseline", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/baseline",
-                    "mst.mips",
-                    "4000"));
-
-            simulatedProgramService.addSimulatedProgram(new SimulatedProgram(
-                    "mst_ht", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/ht",
-                    "mst.mips",
-                    "4000", "", true));
-
-            simulatedProgramService.addSimulatedProgram(new SimulatedProgram(
-                    "em3d_baseline", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/em3d/baseline",
-                    "em3d.mips",
-                    "400000 128 75 1"));
-
-            simulatedProgramService.addSimulatedProgram(new SimulatedProgram(
-                    "em3d_ht", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/em3d/ht",
-                    "em3d.mips",
-                    "400000 128 75 1", "", true));
-
-            simulatedProgramService.addSimulatedProgram(new SimulatedProgram(
-                    "429_mcf_baseline", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline",
-                    "429.mcf.mips",
-                    ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline/data/ref/input/inp.in"));
-
-            simulatedProgramService.addSimulatedProgram(new SimulatedProgram(
-                    "429_mcf_ht", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht",
-                    "429.mcf.mips",
-                    ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht/data/ref/input/inp.in", "", true));
-        }
-    }
-
-    private static void initializeArchitectureServiceData() {
-//        architectureService.getOrAddArchitecture("default", true, 32 * 1024, 4, 32 * 1024, 4, 96 * 1024, 8, CacheReplacementPolicyType.LRU);
-        architectureService.getOrAddArchitecture(true, 2, 2, 32 * 1024, 8, 32 * 1024, 8, 4 * 1024 * 1024, 16, CacheReplacementPolicyType.LRU);
+        Runtime.getRuntime().addShutdownHook(new Thread(){
+            @Override
+            public void run() {
+                if(runningExperiments) {
+                    for(Experiment experiment : experimentService.getAllExperiments()) {
+                        if(experiment.getState() == ExperimentState.RUNNING) {
+                            experiment.setFailedReason("");
+                            experiment.setState(ExperimentState.PENDING);
+                            experiment.getStats().clear();
+                            experimentService.updateExperiment(experiment);
+                        }
+                    }
+                }
+            }
+        });
     }
 
     public static SimulatedProgramService getSimulatedProgramService() {

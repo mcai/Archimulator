@@ -35,6 +35,8 @@ public class Startup {
             return;
         }
 
+        ServiceManager.runningExperiments = true;
+
         for(String arg : args) {
             ExperimentPackSpec experimentPackSpec = JsonSerializationHelper.deserialize(ExperimentPackSpec.class, FileUtils.readAllText(arg));
 

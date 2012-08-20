@@ -35,7 +35,7 @@ public class ExperimentWorker {
             @Override
             public void run() {
                 for(;;) {
-                    if(!doMonitor()) {
+                    if(!ServiceManager.runningExperiments || !doRunExperiment()) {
                         try {
                             Thread.sleep(100);
                         } catch (InterruptedException e) {
@@ -49,7 +49,7 @@ public class ExperimentWorker {
         threadMonitor.start();
     }
 
-    private boolean doMonitor() {
+    private boolean doRunExperiment() {
         Experiment experiment = ServiceManager.getExperimentService().getFirstExperimentToRun();
 
         if(experiment != null) {

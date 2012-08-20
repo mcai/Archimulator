@@ -34,6 +34,38 @@ public class SimulatedProgramServiceImpl extends AbstractService implements Simu
         super(ServiceManager.DATABASE_DIRECTORY, ServiceManager.DATABASE_URL, Arrays.<Class<? extends ModelElement>>asList(SimulatedProgram.class));
 
         this.simulatedPrograms = createDao(SimulatedProgram.class);
+
+        if(this.getFirstSimulatedProgram() == null) {
+            this.addSimulatedProgram(new SimulatedProgram(
+                    "mst_baseline", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/baseline",
+                    "mst.mips",
+                    "4000"));
+
+            this.addSimulatedProgram(new SimulatedProgram(
+                    "mst_ht", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/ht",
+                    "mst.mips",
+                    "4000", "", true));
+
+            this.addSimulatedProgram(new SimulatedProgram(
+                    "em3d_baseline", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/em3d/baseline",
+                    "em3d.mips",
+                    "400000 128 75 1"));
+
+            this.addSimulatedProgram(new SimulatedProgram(
+                    "em3d_ht", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/em3d/ht",
+                    "em3d.mips",
+                    "400000 128 75 1", "", true));
+
+            this.addSimulatedProgram(new SimulatedProgram(
+                    "429_mcf_baseline", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline",
+                    "429.mcf.mips",
+                    ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline/data/ref/input/inp.in"));
+
+            this.addSimulatedProgram(new SimulatedProgram(
+                    "429_mcf_ht", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht",
+                    "429.mcf.mips",
+                    ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht/data/ref/input/inp.in", "", true));
+        }
     }
 
     @Override

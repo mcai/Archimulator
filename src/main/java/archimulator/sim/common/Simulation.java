@@ -263,28 +263,30 @@ public abstract class Simulation implements SimulationObject {
         }
 
         if (this.getType() == SimulationType.MEASUREMENT || this.getType() == SimulationType.CACHE_WARMUP) {
-            if(endOfSimulation) {
-                JaxenHelper.dumpValueFromXPath(stats, this, "htllcRequestProfilingHelper/summedUpUnstableHTLLCRequests");
+            if ((Long) JaxenHelper.selectSingleNode(this, "htllcRequestProfilingHelper/numTotalHTLLCRequests") > 0) {
+                if(endOfSimulation) {
+                    JaxenHelper.dumpValueFromXPath(stats, this, "htllcRequestProfilingHelper/summedUpUnstableHTLLCRequests");
+                }
+
+                JaxenHelper.dumpValueFromXPath(stats, this, "htllcRequestProfilingHelper/numMTLLCHits");
+                JaxenHelper.dumpValueFromXPath(stats, this, "htllcRequestProfilingHelper/numMTLLCMisses");
+
+                JaxenHelper.dumpValueFromXPath(stats, this, "htllcRequestProfilingHelper/numTotalHTLLCRequests");
+
+                JaxenHelper.dumpValueFromXPath(stats, this, "htllcRequestProfilingHelper/numUsefulHTLLCRequests");
+
+                JaxenHelper.dumpValueFromXPath(stats, this, "htllcRequestProfilingHelper/numRedundantHitToTransientTagHTLLCRequests");
+                JaxenHelper.dumpValueFromXPath(stats, this, "htllcRequestProfilingHelper/numRedundantHitToCacheHTLLCRequests");
+
+                JaxenHelper.dumpValueFromXPath(stats, this, "htllcRequestProfilingHelper/numTimelyHTLLCRequests");
+                JaxenHelper.dumpValueFromXPath(stats, this, "htllcRequestProfilingHelper/numLateHTLLCRequests");
+
+                JaxenHelper.dumpValueFromXPath(stats, this, "htllcRequestProfilingHelper/numBadHTLLCRequests");
+                JaxenHelper.dumpValueFromXPath(stats, this, "htllcRequestProfilingHelper/numUglyHTLLCRequests");
+
+                JaxenHelper.dumpValueFromXPath(stats, this, "htllcRequestProfilingHelper/htLLCRequestAccuracy");
+                JaxenHelper.dumpValueFromXPath(stats, this, "htllcRequestProfilingHelper/htLLCRequestCoverage");
             }
-
-            JaxenHelper.dumpValueFromXPath(stats, this, "htllcRequestProfilingHelper/numMTLLCHits");
-            JaxenHelper.dumpValueFromXPath(stats, this, "htllcRequestProfilingHelper/numMTLLCMisses");
-
-            JaxenHelper.dumpValueFromXPath(stats, this, "htllcRequestProfilingHelper/numTotalHTLLCRequests");
-
-            JaxenHelper.dumpValueFromXPath(stats, this, "htllcRequestProfilingHelper/numUsefulHTLLCRequests");
-
-            JaxenHelper.dumpValueFromXPath(stats, this, "htllcRequestProfilingHelper/numRedundantHitToTransientTagHTLLCRequests");
-            JaxenHelper.dumpValueFromXPath(stats, this, "htllcRequestProfilingHelper/numRedundantHitToCacheHTLLCRequests");
-
-            JaxenHelper.dumpValueFromXPath(stats, this, "htllcRequestProfilingHelper/numTimelyHTLLCRequests");
-            JaxenHelper.dumpValueFromXPath(stats, this, "htllcRequestProfilingHelper/numLateHTLLCRequests");
-
-            JaxenHelper.dumpValueFromXPath(stats, this, "htllcRequestProfilingHelper/numBadHTLLCRequests");
-            JaxenHelper.dumpValueFromXPath(stats, this, "htllcRequestProfilingHelper/numUglyHTLLCRequests");
-
-            JaxenHelper.dumpValueFromXPath(stats, this, "htllcRequestProfilingHelper/htLLCRequestAccuracy");
-            JaxenHelper.dumpValueFromXPath(stats, this, "htllcRequestProfilingHelper/htLLCRequestCoverage");
         }
 
         if (this.getType() == SimulationType.MEASUREMENT || this.getType() == SimulationType.CACHE_WARMUP) {
