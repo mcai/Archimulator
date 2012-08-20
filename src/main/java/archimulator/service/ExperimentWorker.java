@@ -99,7 +99,7 @@ public class ExperimentWorker {
     }
 
     static {
-        System.out.println("Archimulator - A Cloud Enabled Multicore Architectural Simulator Written in Java.\n");
+        System.out.println("Archimulator - Multicore Architectural Simulator Written in Java.\n");
         System.out.println("Version: 3.0.\n");
         System.out.println("Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).\n");
     }
