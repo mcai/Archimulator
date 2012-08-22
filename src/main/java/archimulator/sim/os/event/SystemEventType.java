@@ -23,5 +23,5 @@ public enum SystemEventType {
     RESUME,
     WAIT,
     POLL,
-    SIG_SUSPEND
+    SIGNAL_SUSPEND
 }

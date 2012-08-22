@@ -22,31 +22,31 @@ import archimulator.sim.isa.ArchitecturalRegisterFile;
 import archimulator.sim.os.Context;
 
 public class WaitEvent extends SystemEvent {
-    private WaitPidCriterion waitPidCriterion;
+    private WaitProcessIdCriterion waitProcessIdCriterion;
     private SignalCriterion signalCriterion;
 
     public WaitEvent(Context context, int pid) {
         super(context, SystemEventType.WAIT);
 
-        this.waitPidCriterion = new WaitPidCriterion(context, pid);
+        this.waitProcessIdCriterion = new WaitProcessIdCriterion(context, pid);
         this.signalCriterion = new SignalCriterion();
     }
 
     @Override
     public boolean needProcess() {
-        return this.waitPidCriterion.needProcess(this.getContext()) || this.signalCriterion.needProcess(this.getContext());
+        return this.waitProcessIdCriterion.needProcess(this.getContext()) || this.signalCriterion.needProcess(this.getContext());
     }
 
     @Override
     public void process() {
         this.getContext().resume();
 
-        this.getContext().getRegs().setGpr(ArchitecturalRegisterFile.REG_V0, this.waitPidCriterion.getPid());
-        this.getContext().getRegs().setGpr(ArchitecturalRegisterFile.REG_A3, 0);
+        this.getContext().getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_V0, this.waitProcessIdCriterion.getProcessId());
+        this.getContext().getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_A3, 0);
     }
 
-    public WaitPidCriterion getWaitPidCriterion() {
-        return waitPidCriterion;
+    public WaitProcessIdCriterion getWaitProcessIdCriterion() {
+        return waitProcessIdCriterion;
     }
 
     public SignalCriterion getSignalCriterion() {

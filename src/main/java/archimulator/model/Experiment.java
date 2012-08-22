@@ -54,7 +54,7 @@ public class Experiment implements ModelElement {
     private long architectureId;
 
     @DatabaseField
-    private int numMaxInsts;
+    private int numMaxInstructions;
 
     @DatabaseField(dataType = DataType.SERIALIZABLE)
     private ArrayList<ContextMapping> contextMappings;
@@ -72,13 +72,13 @@ public class Experiment implements ModelElement {
     public Experiment() {
     }
 
-    public Experiment(ExperimentPack parent, String title, ExperimentType type, Architecture architecture, int numMaxInsts, List<ContextMapping> contextMappings) {
+    public Experiment(ExperimentPack parent, String title, ExperimentType type, Architecture architecture, int numMaxInstructions, List<ContextMapping> contextMappings) {
         this.parentId = parent == null ? -1 : parent.getId();
         this.title = title;
         this.type = type;
         this.state = ExperimentState.PENDING;
         this.failedReason = "";
-        this.numMaxInsts = numMaxInsts;
+        this.numMaxInstructions = numMaxInstructions;
         this.contextMappings = new ArrayList<ContextMapping>(contextMappings);
         this.architectureId = architecture.getId();
         this.stats = new LinkedHashMap<String, String>();
@@ -130,8 +130,8 @@ public class Experiment implements ModelElement {
         return architectureId;
     }
 
-    public int getNumMaxInsts() {
-        return numMaxInsts;
+    public int getNumMaxInstructions() {
+        return numMaxInstructions;
     }
 
     public List<ContextMapping> getContextMappings() {
@@ -143,7 +143,7 @@ public class Experiment implements ModelElement {
     }
 
     public ExperimentPack getParent() {
-        if(parent == null) {
+        if (parent == null) {
             parent = ServiceManager.getExperimentService().getExperimentPackById(this.parentId);
         }
 
@@ -151,7 +151,7 @@ public class Experiment implements ModelElement {
     }
 
     public Architecture getArchitecture() {
-        if(architecture == null) {
+        if (architecture == null) {
             architecture = ServiceManager.getArchitectureService().getArchitectureById(this.architectureId);
         }
 

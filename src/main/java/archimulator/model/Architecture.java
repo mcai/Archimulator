@@ -40,10 +40,10 @@ public class Architecture implements ModelElement {
     private long createTime;
 
     @DatabaseField
-    private int htPthreadSpawnIndex;
+    private int helperThreadPthreadSpawnIndex;
 
     @DatabaseField
-    private boolean htLLCRequestProfilingEnabled;
+    private boolean helperThreadL2CacheRequestProfilingEnabled;
 
     @DatabaseField
     private int numCores;
@@ -73,73 +73,73 @@ public class Architecture implements ModelElement {
     private int loadStoreQueueCapacity;
 
     @DatabaseField
-    private BranchPredictorType bpredType;
+    private BranchPredictorType branchPredictorType;
 
     @DatabaseField
-    private int twoBitBpredBimodSize;
+    private int twoBitBranchPredictorBimodSize;
 
     @DatabaseField
-    private int twoBitBpredBtbSets;
+    private int twoBitBranchPredictorBranchTargetBufferNumSets;
 
     @DatabaseField
-    private int twoBitBpredBtbAssoc;
+    private int twoBitBranchPredictorBranchTargetBufferAssociativity;
 
     @DatabaseField
-    private int twoBitBpredRetStackSize;
+    private int twoBitBranchPredictorReturnAddressStackSize;
 
     @DatabaseField
-    private int twoLevelBpredL1Size;
+    private int twoLevelBranchPredictorL1Size;
 
     @DatabaseField
-    private int twoLevelBpredL2Size;
+    private int twoLevelBranchPredictorL2Size;
 
     @DatabaseField
-    private int twoLevelBpredShiftWidth;
+    private int twoLevelBranchPredictorShiftWidth;
 
     @DatabaseField
-    private boolean twoLevelBpredXor;
+    private boolean twoLevelBranchPredictorXor;
 
     @DatabaseField
-    private int twoLevelBpredBtbSets;
+    private int twoLevelBranchPredictorBranchTargetBufferNumSets;
 
     @DatabaseField
-    private int twoLevelBpredBtbAssoc;
+    private int twoLevelBranchPredictorBranchTargetBufferAssociativity;
 
     @DatabaseField
-    private int twoLevelBpredRetStackSize;
+    private int twoLevelBranchPredictorReturnAddressStackSize;
 
     @DatabaseField
-    private int combinedBpredBimodSize;
+    private int combinedBranchPredictorBimodSize;
 
     @DatabaseField
-    private int combinedBpredL1Size;
+    private int combinedBranchPredictorL1Size;
 
     @DatabaseField
-    private int combinedBpredL2Size;
+    private int combinedBranchPredictorL2Size;
 
     @DatabaseField
-    private int combinedBpredMetaSize;
+    private int combinedBranchPredictorMetaSize;
 
     @DatabaseField
-    private int combinedBpredShiftWidth;
+    private int combinedBranchPredictorShiftWidth;
 
     @DatabaseField
-    private boolean combinedBpredXor;
+    private boolean combinedBranchPredictorXor;
 
     @DatabaseField
-    private int combinedBpredBtbSets;
+    private int combinedBranchPredictorBranchTargetBufferNumSets;
 
     @DatabaseField
-    private int combinedBpredBtbAssoc;
+    private int combinedBranchPredictorBranchTargetBufferAssociativity;
 
     @DatabaseField
-    private int combinedBpredBtbRetStackSize;
+    private int combinedBranchPredictorReturnAddressStackSize;
 
     @DatabaseField
     private int tlbSize;
 
     @DatabaseField
-    private int tlbAssoc;
+    private int tlbAssociativity;
 
     @DatabaseField
     private int tlbLineSize;
@@ -154,7 +154,7 @@ public class Architecture implements ModelElement {
     private int l1ISize;
 
     @DatabaseField
-    private int l1IAssoc;
+    private int l1IAssociativity;
 
     @DatabaseField
     private int l1ILineSize;
@@ -175,7 +175,7 @@ public class Architecture implements ModelElement {
     private int l1DSize;
 
     @DatabaseField
-    private int l1DAssoc;
+    private int l1DAssociativity;
 
     @DatabaseField
     private int l1DLineSize;
@@ -196,7 +196,7 @@ public class Architecture implements ModelElement {
     private int l2Size;
 
     @DatabaseField
-    private int l2Assoc;
+    private int l2Associativity;
 
     @DatabaseField
     private int l2LineSize;
@@ -271,10 +271,6 @@ public class Architecture implements ModelElement {
         return title;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
     public long getCreateTime() {
         return createTime;
     }
@@ -283,12 +279,12 @@ public class Architecture implements ModelElement {
         return DateHelper.toString(createTime);
     }
 
-    public int getHtPthreadSpawnIndex() {
-        return htPthreadSpawnIndex;
+    public int getHelperThreadPthreadSpawnIndex() {
+        return helperThreadPthreadSpawnIndex;
     }
 
-    public boolean getHtLLCRequestProfilingEnabled() {
-        return htLLCRequestProfilingEnabled;
+    public boolean getHelperThreadL2CacheRequestProfilingEnabled() {
+        return helperThreadL2CacheRequestProfilingEnabled;
     }
 
     public int getNumCores() {
@@ -327,96 +323,96 @@ public class Architecture implements ModelElement {
         return loadStoreQueueCapacity;
     }
 
-    public BranchPredictorType getBpredType() {
-        return bpredType;
+    public BranchPredictorType getBranchPredictorType() {
+        return branchPredictorType;
     }
 
-    public int getTwoBitBpredBimodSize() {
-        return twoBitBpredBimodSize;
+    public int getTwoBitBranchPredictorBimodSize() {
+        return twoBitBranchPredictorBimodSize;
     }
 
-    public int getTwoBitBpredBtbSets() {
-        return twoBitBpredBtbSets;
+    public int getTwoBitBranchPredictorBranchTargetBufferNumSets() {
+        return twoBitBranchPredictorBranchTargetBufferNumSets;
     }
 
-    public int getTwoBitBpredBtbAssoc() {
-        return twoBitBpredBtbAssoc;
+    public int getTwoBitBranchPredictorBranchTargetBufferAssociativity() {
+        return twoBitBranchPredictorBranchTargetBufferAssociativity;
     }
 
-    public int getTwoBitBpredRetStackSize() {
-        return twoBitBpredRetStackSize;
+    public int getTwoBitBranchPredictorReturnAddressStackSize() {
+        return twoBitBranchPredictorReturnAddressStackSize;
     }
 
-    public int getTwoLevelBpredL1Size() {
-        return twoLevelBpredL1Size;
+    public int getTwoLevelBranchPredictorL1Size() {
+        return twoLevelBranchPredictorL1Size;
     }
 
-    public int getTwoLevelBpredL2Size() {
-        return twoLevelBpredL2Size;
+    public int getTwoLevelBranchPredictorL2Size() {
+        return twoLevelBranchPredictorL2Size;
     }
 
-    public int getTwoLevelBpredShiftWidth() {
-        return twoLevelBpredShiftWidth;
+    public int getTwoLevelBranchPredictorShiftWidth() {
+        return twoLevelBranchPredictorShiftWidth;
     }
 
-    public boolean isTwoLevelBpredXor() {
-        return twoLevelBpredXor;
+    public boolean getTwoLevelBranchPredictorXor() {
+        return twoLevelBranchPredictorXor;
     }
 
-    public int getTwoLevelBpredBtbSets() {
-        return twoLevelBpredBtbSets;
+    public int getTwoLevelBranchPredictorBranchTargetBufferNumSets() {
+        return twoLevelBranchPredictorBranchTargetBufferNumSets;
     }
 
-    public int getTwoLevelBpredBtbAssoc() {
-        return twoLevelBpredBtbAssoc;
+    public int getTwoLevelBranchPredictorBranchTargetBufferAssociativity() {
+        return twoLevelBranchPredictorBranchTargetBufferAssociativity;
     }
 
-    public int getTwoLevelBpredRetStackSize() {
-        return twoLevelBpredRetStackSize;
+    public int getTwoLevelBranchPredictorReturnAddressStackSize() {
+        return twoLevelBranchPredictorReturnAddressStackSize;
     }
 
-    public int getCombinedBpredBimodSize() {
-        return combinedBpredBimodSize;
+    public int getCombinedBranchPredictorBimodSize() {
+        return combinedBranchPredictorBimodSize;
     }
 
-    public int getCombinedBpredL1Size() {
-        return combinedBpredL1Size;
+    public int getCombinedBranchPredictorL1Size() {
+        return combinedBranchPredictorL1Size;
     }
 
-    public int getCombinedBpredL2Size() {
-        return combinedBpredL2Size;
+    public int getCombinedBranchPredictorL2Size() {
+        return combinedBranchPredictorL2Size;
     }
 
-    public int getCombinedBpredMetaSize() {
-        return combinedBpredMetaSize;
+    public int getCombinedBranchPredictorMetaSize() {
+        return combinedBranchPredictorMetaSize;
     }
 
-    public int getCombinedBpredShiftWidth() {
-        return combinedBpredShiftWidth;
+    public int getCombinedBranchPredictorShiftWidth() {
+        return combinedBranchPredictorShiftWidth;
     }
 
-    public boolean isCombinedBpredXor() {
-        return combinedBpredXor;
+    public boolean getCombinedBranchPredictorXor() {
+        return combinedBranchPredictorXor;
     }
 
-    public int getCombinedBpredBtbSets() {
-        return combinedBpredBtbSets;
+    public int getCombinedBranchPredictorBranchTargetBufferNumSets() {
+        return combinedBranchPredictorBranchTargetBufferNumSets;
     }
 
-    public int getCombinedBpredBtbAssoc() {
-        return combinedBpredBtbAssoc;
+    public int getCombinedBranchPredictorBranchTargetBufferAssociativity() {
+        return combinedBranchPredictorBranchTargetBufferAssociativity;
     }
 
-    public int getCombinedBpredBtbRetStackSize() {
-        return combinedBpredBtbRetStackSize;
+    public int getCombinedBranchPredictorReturnAddressStackSize() {
+        return combinedBranchPredictorReturnAddressStackSize;
     }
 
     public int getTlbSize() {
         return tlbSize;
     }
 
-    public int getTlbAssoc() {
-        return tlbAssoc;
+    public int getTlbAssociativity() {
+        return tlbAssociativity;
     }
 
     public int getTlbLineSize() {
@@ -435,8 +431,8 @@ public class Architecture implements ModelElement {
         return l1ISize;
     }
 
-    public int getL1IAssoc() {
-        return l1IAssoc;
+    public int getL1IAssociativity() {
+        return l1IAssociativity;
     }
 
     public int getL1ILineSize() {
@@ -463,8 +459,8 @@ public class Architecture implements ModelElement {
         return l1DSize;
     }
 
-    public int getL1DAssoc() {
-        return l1DAssoc;
+    public int getL1DAssociativity() {
+        return l1DAssociativity;
     }
 
     public int getL1DLineSize() {
@@ -491,8 +487,8 @@ public class Architecture implements ModelElement {
         return l2Size;
     }
 
-    public int getL2Assoc() {
-        return l2Assoc;
+    public int getL2Associativity() {
+        return l2Associativity;
     }
 
     public int getL2LineSize() {
@@ -559,12 +555,12 @@ public class Architecture implements ModelElement {
         return basicMainMemoryRowSize;
     }
 
-    public void setHtPthreadSpawnIndex(int htPthreadSpawnIndex) {
-        this.htPthreadSpawnIndex = htPthreadSpawnIndex;
+    public void setHelperThreadPthreadSpawnIndex(int helperThreadPthreadSpawnIndex) {
+        this.helperThreadPthreadSpawnIndex = helperThreadPthreadSpawnIndex;
     }
 
-    public void setHtLLCRequestProfilingEnabled(boolean htLLCRequestProfilingEnabled) {
-        this.htLLCRequestProfilingEnabled = htLLCRequestProfilingEnabled;
+    public void setHelperThreadL2CacheRequestProfilingEnabled(boolean helperThreadL2CacheRequestProfilingEnabled) {
+        this.helperThreadL2CacheRequestProfilingEnabled = helperThreadL2CacheRequestProfilingEnabled;
     }
 
     public void setNumCores(int numCores) {
@@ -603,96 +599,96 @@ public class Architecture implements ModelElement {
         this.loadStoreQueueCapacity = loadStoreQueueCapacity;
     }
 
-    public void setBpredType(BranchPredictorType bpredType) {
-        this.bpredType = bpredType;
+    public void setBranchPredictorType(BranchPredictorType branchPredictorType) {
+        this.branchPredictorType = branchPredictorType;
     }
 
-    public void setTwoBitBpredBimodSize(int twoBitBpredBimodSize) {
-        this.twoBitBpredBimodSize = twoBitBpredBimodSize;
+    public void setTwoBitBranchPredictorBimodSize(int twoBitBranchPredictorBimodSize) {
+        this.twoBitBranchPredictorBimodSize = twoBitBranchPredictorBimodSize;
     }
 
-    public void setTwoBitBpredBtbSets(int twoBitBpredBtbSets) {
-        this.twoBitBpredBtbSets = twoBitBpredBtbSets;
+    public void setTwoBitBranchPredictorBranchTargetBufferNumSets(int twoBitBranchPredictorBranchTargetBufferNumSets) {
+        this.twoBitBranchPredictorBranchTargetBufferNumSets = twoBitBranchPredictorBranchTargetBufferNumSets;
     }
 
-    public void setTwoBitBpredBtbAssoc(int twoBitBpredBtbAssoc) {
-        this.twoBitBpredBtbAssoc = twoBitBpredBtbAssoc;
+    public void setTwoBitBranchPredictorBranchTargetBufferAssociativity(int twoBitBranchPredictorBranchTargetBufferAssociativity) {
+        this.twoBitBranchPredictorBranchTargetBufferAssociativity = twoBitBranchPredictorBranchTargetBufferAssociativity;
     }
 
-    public void setTwoBitBpredRetStackSize(int twoBitBpredRetStackSize) {
-        this.twoBitBpredRetStackSize = twoBitBpredRetStackSize;
+    public void setTwoBitBranchPredictorReturnAddressStackSize(int twoBitBranchPredictorReturnAddressStackSize) {
+        this.twoBitBranchPredictorReturnAddressStackSize = twoBitBranchPredictorReturnAddressStackSize;
     }
 
-    public void setTwoLevelBpredL1Size(int twoLevelBpredL1Size) {
-        this.twoLevelBpredL1Size = twoLevelBpredL1Size;
+    public void setTwoLevelBranchPredictorL1Size(int twoLevelBranchPredictorL1Size) {
+        this.twoLevelBranchPredictorL1Size = twoLevelBranchPredictorL1Size;
     }
 
-    public void setTwoLevelBpredL2Size(int twoLevelBpredL2Size) {
-        this.twoLevelBpredL2Size = twoLevelBpredL2Size;
+    public void setTwoLevelBranchPredictorL2Size(int twoLevelBranchPredictorL2Size) {
+        this.twoLevelBranchPredictorL2Size = twoLevelBranchPredictorL2Size;
     }
 
-    public void setTwoLevelBpredShiftWidth(int twoLevelBpredShiftWidth) {
-        this.twoLevelBpredShiftWidth = twoLevelBpredShiftWidth;
+    public void setTwoLevelBranchPredictorShiftWidth(int twoLevelBranchPredictorShiftWidth) {
+        this.twoLevelBranchPredictorShiftWidth = twoLevelBranchPredictorShiftWidth;
     }
 
-    public void setTwoLevelBpredXor(boolean twoLevelBpredXor) {
-        this.twoLevelBpredXor = twoLevelBpredXor;
+    public void setTwoLevelBranchPredictorXor(boolean twoLevelBranchPredictorXor) {
+        this.twoLevelBranchPredictorXor = twoLevelBranchPredictorXor;
     }
 
-    public void setTwoLevelBpredBtbSets(int twoLevelBpredBtbSets) {
-        this.twoLevelBpredBtbSets = twoLevelBpredBtbSets;
+    public void setTwoLevelBranchPredictorBranchTargetBufferNumSets(int twoLevelBranchPredictorBranchTargetBufferNumSets) {
+        this.twoLevelBranchPredictorBranchTargetBufferNumSets = twoLevelBranchPredictorBranchTargetBufferNumSets;
     }
 
-    public void setTwoLevelBpredBtbAssoc(int twoLevelBpredBtbAssoc) {
-        this.twoLevelBpredBtbAssoc = twoLevelBpredBtbAssoc;
+    public void setTwoLevelBranchPredictorBranchTargetBufferAssociativity(int twoLevelBranchPredictorBranchTargetBufferAssociativity) {
+        this.twoLevelBranchPredictorBranchTargetBufferAssociativity = twoLevelBranchPredictorBranchTargetBufferAssociativity;
     }
 
-    public void setTwoLevelBpredRetStackSize(int twoLevelBpredRetStackSize) {
-        this.twoLevelBpredRetStackSize = twoLevelBpredRetStackSize;
+    public void setTwoLevelBranchPredictorReturnAddressStackSize(int twoLevelBranchPredictorReturnAddressStackSize) {
+        this.twoLevelBranchPredictorReturnAddressStackSize = twoLevelBranchPredictorReturnAddressStackSize;
     }
 
-    public void setCombinedBpredBimodSize(int combinedBpredBimodSize) {
-        this.combinedBpredBimodSize = combinedBpredBimodSize;
+    public void setCombinedBranchPredictorBimodSize(int combinedBranchPredictorBimodSize) {
+        this.combinedBranchPredictorBimodSize = combinedBranchPredictorBimodSize;
     }
 
-    public void setCombinedBpredL1Size(int combinedBpredL1Size) {
-        this.combinedBpredL1Size = combinedBpredL1Size;
+    public void setCombinedBranchPredictorL1Size(int combinedBranchPredictorL1Size) {
+        this.combinedBranchPredictorL1Size = combinedBranchPredictorL1Size;
     }
 
-    public void setCombinedBpredL2Size(int combinedBpredL2Size) {
-        this.combinedBpredL2Size = combinedBpredL2Size;
+    public void setCombinedBranchPredictorL2Size(int combinedBranchPredictorL2Size) {
+        this.combinedBranchPredictorL2Size = combinedBranchPredictorL2Size;
     }
 
-    public void setCombinedBpredMetaSize(int combinedBpredMetaSize) {
-        this.combinedBpredMetaSize = combinedBpredMetaSize;
+    public void setCombinedBranchPredictorMetaSize(int combinedBranchPredictorMetaSize) {
+        this.combinedBranchPredictorMetaSize = combinedBranchPredictorMetaSize;
     }
 
-    public void setCombinedBpredShiftWidth(int combinedBpredShiftWidth) {
-        this.combinedBpredShiftWidth = combinedBpredShiftWidth;
+    public void setCombinedBranchPredictorShiftWidth(int combinedBranchPredictorShiftWidth) {
+        this.combinedBranchPredictorShiftWidth = combinedBranchPredictorShiftWidth;
     }
 
-    public void setCombinedBpredXor(boolean combinedBpredXor) {
-        this.combinedBpredXor = combinedBpredXor;
+    public void setCombinedBranchPredictorXor(boolean combinedBranchPredictorXor) {
+        this.combinedBranchPredictorXor = combinedBranchPredictorXor;
     }
 
-    public void setCombinedBpredBtbSets(int combinedBpredBtbSets) {
-        this.combinedBpredBtbSets = combinedBpredBtbSets;
+    public void setCombinedBranchPredictorBranchTargetBufferNumSets(int combinedBranchPredictorBranchTargetBufferNumSets) {
+        this.combinedBranchPredictorBranchTargetBufferNumSets = combinedBranchPredictorBranchTargetBufferNumSets;
     }
 
-    public void setCombinedBpredBtbAssoc(int combinedBpredBtbAssoc) {
-        this.combinedBpredBtbAssoc = combinedBpredBtbAssoc;
+    public void setCombinedBranchPredictorBranchTargetBufferAssociativity(int combinedBranchPredictorBranchTargetBufferAssociativity) {
+        this.combinedBranchPredictorBranchTargetBufferAssociativity = combinedBranchPredictorBranchTargetBufferAssociativity;
     }
 
-    public void setCombinedBpredBtbRetStackSize(int combinedBpredBtbRetStackSize) {
-        this.combinedBpredBtbRetStackSize = combinedBpredBtbRetStackSize;
+    public void setCombinedBranchPredictorReturnAddressStackSize(int combinedBranchPredictorReturnAddressStackSize) {
+        this.combinedBranchPredictorReturnAddressStackSize = combinedBranchPredictorReturnAddressStackSize;
     }
 
     public void setTlbSize(int tlbSize) {
         this.tlbSize = tlbSize;
     }
 
-    public void setTlbAssoc(int tlbAssoc) {
-        this.tlbAssoc = tlbAssoc;
+    public void setTlbAssociativity(int tlbAssociativity) {
+        this.tlbAssociativity = tlbAssociativity;
     }
 
     public void setTlbLineSize(int tlbLineSize) {
@@ -711,8 +707,8 @@ public class Architecture implements ModelElement {
         this.l1ISize = l1ISize;
     }
 
-    public void setL1IAssoc(int l1IAssoc) {
-        this.l1IAssoc = l1IAssoc;
+    public void setL1IAssociativity(int l1IAssociativity) {
+        this.l1IAssociativity = l1IAssociativity;
     }
 
     public void setL1ILineSize(int l1ILineSize) {
@@ -739,8 +735,8 @@ public class Architecture implements ModelElement {
         this.l1DSize = l1DSize;
     }
 
-    public void setL1DAssoc(int l1DAssoc) {
-        this.l1DAssoc = l1DAssoc;
+    public void setL1DAssociativity(int l1DAssociativity) {
+        this.l1DAssociativity = l1DAssociativity;
     }
 
     public void setL1DLineSize(int l1DLineSize) {
@@ -767,8 +763,8 @@ public class Architecture implements ModelElement {
         this.l2Size = l2Size;
     }
 
-    public void setL2Assoc(int l2Assoc) {
-        this.l2Assoc = l2Assoc;
+    public void setL2Associativity(int l2Associativity) {
+        this.l2Associativity = l2Associativity;
     }
 
     public void setL2LineSize(int l2LineSize) {

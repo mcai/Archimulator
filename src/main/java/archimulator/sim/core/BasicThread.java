@@ -39,15 +39,15 @@ import java.util.List;
 import java.util.Map;
 
 public class BasicThread extends AbstractBasicThread {
-    private int lineSizeOfIcache;
+    private int lineSizeOfICache;
 
     private int fetchNpc;
     private int fetchNnpc;
     private boolean fetchStalled;
     private int lastFetchedCacheLine;
 
-    private DynamicInstruction lastDecodedDynamicInst;
-    private boolean lastDecodedDynamicInstCommitted;
+    private DynamicInstruction lastDecodedDynamicInstruction;
+    private boolean lastDecodedDynamicInstructionCommitted;
 
     private long lastCommitCycle;
     private int noInstructionCommittedCounterThreshold;
@@ -57,7 +57,7 @@ public class BasicThread extends AbstractBasicThread {
     public BasicThread(Core core, int num) {
         super(core, num);
 
-        this.lineSizeOfIcache = this.core.getL1ICacheController().getCache().getGeometry().getLineSize();
+        this.lineSizeOfICache = this.core.getL1ICacheController().getCache().getGeometry().getLineSize();
 
         final Reference<Integer> savedRegisterValue = new Reference<Integer>(-1);
 
@@ -66,17 +66,17 @@ public class BasicThread extends AbstractBasicThread {
                 if (event.getContext() == getContext()) {
                     ContextMapping contextMapping = event.getContext().getProcess().getContextMapping();
 
-                    if (contextMapping.getSimulatedProgram().isHt()) {
+                    if (contextMapping.getSimulatedProgram().getHelperThreadEnabled()) {
                         if (event.getImm() == 3820) {
-                            savedRegisterValue.set(event.getContext().getRegs().getGpr(event.getRs()));
-                            event.getContext().getRegs().setGpr(event.getRs(), getHtLookahead(contextMapping));
+                            savedRegisterValue.set(event.getContext().getRegisterFile().getGpr(event.getRs()));
+                            event.getContext().getRegisterFile().setGpr(event.getRs(), getHelperThreadLookahead(contextMapping));
                         } else if (event.getImm() == 3821) {
-                            event.getContext().getRegs().setGpr(event.getRs(), savedRegisterValue.get());
+                            event.getContext().getRegisterFile().setGpr(event.getRs(), savedRegisterValue.get());
                         } else if (event.getImm() == 3822) {
-                            savedRegisterValue.set(event.getContext().getRegs().getGpr(event.getRs()));
-                            event.getContext().getRegs().setGpr(event.getRs(), getHtStride(contextMapping));
+                            savedRegisterValue.set(event.getContext().getRegisterFile().getGpr(event.getRs()));
+                            event.getContext().getRegisterFile().setGpr(event.getRs(), getHelperThreadStride(contextMapping));
                         } else if (event.getImm() == 3823) {
-                            event.getContext().getRegs().setGpr(event.getRs(), savedRegisterValue.get());
+                            event.getContext().getRegisterFile().setGpr(event.getRs(), savedRegisterValue.get());
                         }
                     }
                 }
@@ -84,17 +84,17 @@ public class BasicThread extends AbstractBasicThread {
         });
     }
 
-    protected int getHtLookahead(ContextMapping contextMapping) {
-        if (contextMapping.getSimulatedProgram().isHt()) {
-            return contextMapping.isDynamicHtParams() ? 20 : contextMapping.getHtLookahead();
+    protected int getHelperThreadLookahead(ContextMapping contextMapping) {
+        if (contextMapping.getSimulatedProgram().getHelperThreadEnabled()) {
+            return contextMapping.getDynamicHelperThreadParams() ? 20 : contextMapping.getHelperThreadLookahead();
         }
 
         throw new IllegalArgumentException();
     }
 
-    protected int getHtStride(ContextMapping contextMapping) {
-        if (contextMapping.getSimulatedProgram().isHt()) {
-            return contextMapping.isDynamicHtParams() ? 10 : contextMapping.getHtStride();
+    protected int getHelperThreadStride(ContextMapping contextMapping) {
+        if (contextMapping.getSimulatedProgram().getHelperThreadEnabled()) {
+            return contextMapping.getDynamicHelperThreadParams() ? 10 : contextMapping.getHelperThreadStride();
         }
 
         throw new IllegalArgumentException();
@@ -102,39 +102,39 @@ public class BasicThread extends AbstractBasicThread {
 
     public void fastForwardOneCycle() {
         if (this.context != null && this.context.getState() == ContextState.RUNNING) {
-            StaticInstruction staticInst;
+            StaticInstruction staticInstruction;
             do {
-                staticInst = this.context.decodeNextInstruction();
-                StaticInstruction.execute(staticInst, this.context);
+                staticInstruction = this.context.decodeNextInstruction();
+                StaticInstruction.execute(staticInstruction, this.context);
 
-                if (!this.context.isPseudoCallEncounteredInLastInstructionExecution() && staticInst.getMnemonic().getType() != StaticInstructionType.NOP) {
-                    this.totalInsts++;
+                if (!this.context.isPseudoCallEncounteredInLastInstructionExecution() && staticInstruction.getMnemonic().getType() != StaticInstructionType.NOP) {
+                    this.totalInstructions++;
                 }
 
             }
-            while (this.context != null && this.context.getState() == ContextState.RUNNING && (this.context.isPseudoCallEncounteredInLastInstructionExecution() || staticInst.getMnemonic().getType() == StaticInstructionType.NOP));
+            while (this.context != null && this.context.getState() == ContextState.RUNNING && (this.context.isPseudoCallEncounteredInLastInstructionExecution() || staticInstruction.getMnemonic().getType() == StaticInstructionType.NOP));
         }
     }
 
     public void warmupCacheOneCycle() {
         if (this.context != null && this.context.getState() == ContextState.RUNNING && !this.fetchStalled) {
             if (this.nextInstructionInCacheWarmupPhase == null) {
-                StaticInstruction staticInst;
+                StaticInstruction staticInstruction;
                 do {
-                    staticInst = this.context.decodeNextInstruction();
-                    this.nextInstructionInCacheWarmupPhase = new DynamicInstruction(this, this.context.getRegs().getPc(), staticInst);
-                    StaticInstruction.execute(staticInst, this.context);
+                    staticInstruction = this.context.decodeNextInstruction();
+                    this.nextInstructionInCacheWarmupPhase = new DynamicInstruction(this, this.context.getRegisterFile().getPc(), staticInstruction);
+                    StaticInstruction.execute(staticInstruction, this.context);
 
-                    if (!this.context.isPseudoCallEncounteredInLastInstructionExecution() && staticInst.getMnemonic().getType() != StaticInstructionType.NOP) {
-                        this.totalInsts++;
+                    if (!this.context.isPseudoCallEncounteredInLastInstructionExecution() && staticInstruction.getMnemonic().getType() != StaticInstructionType.NOP) {
+                        this.totalInstructions++;
                     }
                 }
-                while (this.context != null && this.context.getState() == ContextState.RUNNING && !this.fetchStalled && (this.context.isPseudoCallEncounteredInLastInstructionExecution() || staticInst.getMnemonic().getType() == StaticInstructionType.NOP));
+                while (this.context != null && this.context.getState() == ContextState.RUNNING && !this.fetchStalled && (this.context.isPseudoCallEncounteredInLastInstructionExecution() || staticInstruction.getMnemonic().getType() == StaticInstructionType.NOP));
             }
 
             int pc = this.nextInstructionInCacheWarmupPhase.getPc();
 
-            int cacheLineToFetch = aligned(pc, this.lineSizeOfIcache);
+            int cacheLineToFetch = aligned(pc, this.lineSizeOfICache);
             if (cacheLineToFetch != this.lastFetchedCacheLine) {
                 if (this.core.canIfetch(this, pc)) {
                     this.core.ifetch(this, pc, pc, new Action() {
@@ -152,7 +152,7 @@ public class BasicThread extends AbstractBasicThread {
 
             int effectiveAddress = this.nextInstructionInCacheWarmupPhase.getEffectiveAddress();
 
-            if (this.nextInstructionInCacheWarmupPhase.getStaticInst().getMnemonic().getType() == StaticInstructionType.LOAD) {
+            if (this.nextInstructionInCacheWarmupPhase.getStaticInstruction().getMnemonic().getType() == StaticInstructionType.LOAD) {
                 if (this.core.canLoad(this, effectiveAddress)) {
                     this.core.load(this.nextInstructionInCacheWarmupPhase, effectiveAddress, pc, new Action() {
                         public void apply() {
@@ -161,7 +161,7 @@ public class BasicThread extends AbstractBasicThread {
 
                     this.nextInstructionInCacheWarmupPhase = null;
                 }
-            } else if (this.nextInstructionInCacheWarmupPhase.getStaticInst().getMnemonic().getType() == StaticInstructionType.STORE) {
+            } else if (this.nextInstructionInCacheWarmupPhase.getStaticInstruction().getMnemonic().getType() == StaticInstructionType.STORE) {
                 if (this.core.canStore(this, effectiveAddress)) {
                     this.core.store(this.nextInstructionInCacheWarmupPhase, effectiveAddress, pc, new Action() {
                         public void apply() {
@@ -177,22 +177,22 @@ public class BasicThread extends AbstractBasicThread {
     }
 
     public void updateFetchNpcAndNnpcFromRegs() {
-        this.fetchNpc = this.context.getRegs().getNpc();
-        this.fetchNnpc = this.context.getRegs().getNnpc();
+        this.fetchNpc = this.context.getRegisterFile().getNpc();
+        this.fetchNnpc = this.context.getRegisterFile().getNnpc();
 
         this.lastCommitCycle = this.getCycleAccurateEventQueue().getCurrentCycle();
     }
 
     private boolean canFetch() {
         if (!this.context.useICache()) {
-            this.lastFetchedCacheLine = aligned(this.fetchNpc, this.lineSizeOfIcache);
+            this.lastFetchedCacheLine = aligned(this.fetchNpc, this.lineSizeOfICache);
             return true;
         } else {
             if (this.fetchStalled) {
                 return false;
             }
 
-            int cacheLineToFetch = aligned(this.fetchNpc, this.lineSizeOfIcache);
+            int cacheLineToFetch = aligned(this.fetchNpc, this.lineSizeOfICache);
             if (cacheLineToFetch != this.lastFetchedCacheLine) {
                 if (!this.core.canIfetch(this, this.fetchNpc)) {
                     return false;
@@ -231,122 +231,122 @@ public class BasicThread extends AbstractBasicThread {
                 break;
             }
 
-            if (this.context.getRegs().getNpc() != this.fetchNpc) {
+            if (this.context.getRegisterFile().getNpc() != this.fetchNpc) {
                 if (this.context.isSpeculative()) {
-                    this.context.getRegs().setNpc(this.fetchNpc);
+                    this.context.getRegisterFile().setNpc(this.fetchNpc);
                 } else {
                     this.context.enterSpeculativeState();
                 }
             }
 
-            DynamicInstruction dynamicInst;
+            DynamicInstruction dynamicInstruction;
 
             do {
-                StaticInstruction staticInst = this.context.decodeNextInstruction();
-                dynamicInst = new DynamicInstruction(this, this.context.getRegs().getPc(), staticInst);
-                StaticInstruction.execute(staticInst, this.context);
+                StaticInstruction staticInstruction = this.context.decodeNextInstruction();
+                dynamicInstruction = new DynamicInstruction(this, this.context.getRegisterFile().getPc(), staticInstruction);
+                StaticInstruction.execute(staticInstruction, this.context);
 
-                if (this.context.isPseudoCallEncounteredInLastInstructionExecution() || dynamicInst.getStaticInst().getMnemonic().getType() == StaticInstructionType.NOP) {
+                if (this.context.isPseudoCallEncounteredInLastInstructionExecution() || dynamicInstruction.getStaticInstruction().getMnemonic().getType() == StaticInstructionType.NOP) {
                     this.updateFetchNpcAndNnpcFromRegs();
                 }
 
             }
-            while (this.context.isPseudoCallEncounteredInLastInstructionExecution() || dynamicInst.getStaticInst().getMnemonic().getType() == StaticInstructionType.NOP);
+            while (this.context.isPseudoCallEncounteredInLastInstructionExecution() || dynamicInstruction.getStaticInstruction().getMnemonic().getType() == StaticInstructionType.NOP);
 
             this.fetchNpc = this.fetchNnpc;
 
             if (!this.context.isSpeculative() && this.context.getState() != ContextState.RUNNING) {
-                this.lastDecodedDynamicInst = dynamicInst;
-                this.lastDecodedDynamicInstCommitted = false;
+                this.lastDecodedDynamicInstruction = dynamicInstruction;
+                this.lastDecodedDynamicInstructionCommitted = false;
             }
 
-            this.getBlockingEventDispatcher().dispatch(new InstructionDecodedEvent(dynamicInst));
+            this.getBlockingEventDispatcher().dispatch(new InstructionDecodedEvent(dynamicInstruction));
 
-            if ((this.fetchNpc + 4) % this.lineSizeOfIcache == 0) {
+            if ((this.fetchNpc + 4) % this.lineSizeOfICache == 0) {
                 hasDone = true;
             }
 
-            BranchPredictorUpdate dirUpdate = new BranchPredictorUpdate();
+            BranchPredictorUpdate branchPredictorUpdate = new BranchPredictorUpdate();
 
             Reference<Integer> returnAddressStackRecoverIndexRef = new Reference<Integer>(0);
-            int dest = dynamicInst.getStaticInst().getMnemonic().isControl() ? this.bpred.predict(this.fetchNpc, 0, dynamicInst.getStaticInst().getMnemonic(), dirUpdate, returnAddressStackRecoverIndexRef) : this.fetchNpc + 4;
+            int destination = dynamicInstruction.getStaticInstruction().getMnemonic().isControl() ? this.branchPredictor.predict(this.fetchNpc, 0, dynamicInstruction.getStaticInstruction().getMnemonic(), branchPredictorUpdate, returnAddressStackRecoverIndexRef) : this.fetchNpc + 4;
 
-            this.fetchNnpc = dest <= 1 ? this.fetchNpc + 4 : dest;
+            this.fetchNnpc = destination <= 1 ? this.fetchNpc + 4 : destination;
 
             if (this.fetchNnpc != this.fetchNpc + 4) {
                 hasDone = true;
             }
 
-            this.decodeBuffer.getEntries().add(new DecodeBufferEntry(dynamicInst, this.context.getRegs().getNpc(), this.context.getRegs().getNnpc(), this.fetchNnpc, returnAddressStackRecoverIndexRef.get(), dirUpdate, this.context.isSpeculative()));
+            this.decodeBuffer.getEntries().add(new DecodeBufferEntry(dynamicInstruction, this.context.getRegisterFile().getNpc(), this.context.getRegisterFile().getNnpc(), this.fetchNnpc, returnAddressStackRecoverIndexRef.get(), branchPredictorUpdate, this.context.isSpeculative()));
         }
     }
 
     public boolean registerRenameOne() {
         DecodeBufferEntry decodeBufferEntry = this.decodeBuffer.getEntries().get(0);
 
-        DynamicInstruction dynamicInst = decodeBufferEntry.getDynamicInst();
+        DynamicInstruction dynamicInstruction = decodeBufferEntry.getDynamicInstruction();
 
-        for (Map.Entry<RegisterDependencyType, Integer> entry : dynamicInst.getStaticInst().getNumFreePhysRegsToAllocate().entrySet()) {
-            if (this.getPhysicalRegisterFile(entry.getKey()).getNumFreePhysicalRegs() < entry.getValue()) {
+        for (Map.Entry<RegisterDependencyType, Integer> entry : dynamicInstruction.getStaticInstruction().getNumFreePhysicalRegistersToAllocate().entrySet()) {
+            if (this.getPhysicalRegisterFile(entry.getKey()).getNumFreePhysicalRegisters() < entry.getValue()) {
                 return false;
             }
         }
 
-        if ((dynamicInst.getStaticInst().getMnemonic().getType() == StaticInstructionType.LOAD || dynamicInst.getStaticInst().getMnemonic().getType() == StaticInstructionType.STORE) && this.getLoadStoreQueue().isFull()) {
+        if ((dynamicInstruction.getStaticInstruction().getMnemonic().getType() == StaticInstructionType.LOAD || dynamicInstruction.getStaticInstruction().getMnemonic().getType() == StaticInstructionType.STORE) && this.getLoadStoreQueue().isFull()) {
             this.registerRenameStallsOnLoadStoreQueueFull++;
             return false;
         }
 
-        ReorderBufferEntry reorderBufferEntry = new ReorderBufferEntry(this, dynamicInst, decodeBufferEntry.getNpc(), decodeBufferEntry.getNnpc(), decodeBufferEntry.getPredNnpc(), decodeBufferEntry.getReturnAddressStackRecoverIndex(), decodeBufferEntry.getDirUpdate(), decodeBufferEntry.isSpeculative());
-        reorderBufferEntry.setEffectiveAddressComputation(dynamicInst.getStaticInst().getMnemonic().getType() == StaticInstructionType.LOAD || dynamicInst.getStaticInst().getMnemonic().getType() == StaticInstructionType.STORE);
+        ReorderBufferEntry reorderBufferEntry = new ReorderBufferEntry(this, dynamicInstruction, decodeBufferEntry.getNpc(), decodeBufferEntry.getNnpc(), decodeBufferEntry.getPredictedNnpc(), decodeBufferEntry.getReturnAddressStackRecoverIndex(), decodeBufferEntry.getBranchPredictorUpdate(), decodeBufferEntry.isSpeculative());
+        reorderBufferEntry.setEffectiveAddressComputation(dynamicInstruction.getStaticInstruction().getMnemonic().getType() == StaticInstructionType.LOAD || dynamicInstruction.getStaticInstruction().getMnemonic().getType() == StaticInstructionType.STORE);
 
-        for (int idep : reorderBufferEntry.getDynamicInst().getStaticInst().getIdeps()) {
-            reorderBufferEntry.getSrcPhysRegs().put(idep, this.renameTable.get(idep));
+        for (int inputDependency : reorderBufferEntry.getDynamicInstruction().getStaticInstruction().getInputDependencies()) {
+            reorderBufferEntry.getSourcePhysicalRegisters().put(inputDependency, this.renameTable.get(inputDependency));
         }
 
-        for (int odep : reorderBufferEntry.getDynamicInst().getStaticInst().getOdeps()) {
-            if (odep != 0) {
-                reorderBufferEntry.getOldPhysRegs().put(odep, this.renameTable.get(odep));
-                PhysicalRegisterFile.PhysicalRegister physReg = this.getPhysicalRegisterFile(RegisterDependencyType.getType(odep)).allocate(odep);
-                this.renameTable.put(odep, physReg);
-                reorderBufferEntry.getPhysRegs().put(odep, physReg);
+        for (int outputDependency : reorderBufferEntry.getDynamicInstruction().getStaticInstruction().getOutputDependencies()) {
+            if (outputDependency != 0) {
+                reorderBufferEntry.getOldPhysicalRegisters().put(outputDependency, this.renameTable.get(outputDependency));
+                PhysicalRegisterFile.PhysicalRegister physReg = this.getPhysicalRegisterFile(RegisterDependencyType.getType(outputDependency)).allocate(outputDependency);
+                this.renameTable.put(outputDependency, physReg);
+                reorderBufferEntry.getTargetPhysicalRegisters().put(outputDependency, physReg);
             }
         }
 
-        for (PhysicalRegisterFile.PhysicalRegister physReg : reorderBufferEntry.getSrcPhysRegs().values()) {
-            if (!physReg.isReady()) {
+        for (PhysicalRegisterFile.PhysicalRegister physicalRegister : reorderBufferEntry.getSourcePhysicalRegisters().values()) {
+            if (!physicalRegister.isReady()) {
                 reorderBufferEntry.setNumNotReadyOperands(reorderBufferEntry.getNumNotReadyOperands() + 1);
-                physReg.getDependents().add(reorderBufferEntry);
+                physicalRegister.getDependents().add(reorderBufferEntry);
             }
         }
 
         if (reorderBufferEntry.isEffectiveAddressComputation()) {
-            PhysicalRegisterFile.PhysicalRegister physReg = reorderBufferEntry.getSrcPhysRegs().get(reorderBufferEntry.getDynamicInst().getStaticInst().getIdeps().get(0));
-            if (!physReg.isReady()) {
-                physReg.getEffectiveAddressComputationOperandDependents().add(reorderBufferEntry);
+            PhysicalRegisterFile.PhysicalRegister physicalRegister = reorderBufferEntry.getSourcePhysicalRegisters().get(reorderBufferEntry.getDynamicInstruction().getStaticInstruction().getInputDependencies().get(0));
+            if (!physicalRegister.isReady()) {
+                physicalRegister.getEffectiveAddressComputationOperandDependents().add(reorderBufferEntry);
             } else {
                 reorderBufferEntry.setEffectiveAddressComputationOperandReady(true);
             }
         }
 
-        if (dynamicInst.getStaticInst().getMnemonic().getType() == StaticInstructionType.LOAD || dynamicInst.getStaticInst().getMnemonic().getType() == StaticInstructionType.STORE) {
-            LoadStoreQueueEntry loadStoreQueueEntry = new LoadStoreQueueEntry(this, dynamicInst, decodeBufferEntry.getNpc(), decodeBufferEntry.getNnpc(), decodeBufferEntry.getPredNnpc(), 0, null, false);
-            loadStoreQueueEntry.setEffectiveAddress(dynamicInst.getEffectiveAddress());
+        if (dynamicInstruction.getStaticInstruction().getMnemonic().getType() == StaticInstructionType.LOAD || dynamicInstruction.getStaticInstruction().getMnemonic().getType() == StaticInstructionType.STORE) {
+            LoadStoreQueueEntry loadStoreQueueEntry = new LoadStoreQueueEntry(this, dynamicInstruction, decodeBufferEntry.getNpc(), decodeBufferEntry.getNnpc(), decodeBufferEntry.getPredictedNnpc(), 0, null, false);
+            loadStoreQueueEntry.setEffectiveAddress(dynamicInstruction.getEffectiveAddress());
 
-            loadStoreQueueEntry.setSrcPhysRegs(reorderBufferEntry.getSrcPhysRegs());
-            loadStoreQueueEntry.setPhysRegs(reorderBufferEntry.getPhysRegs());
+            loadStoreQueueEntry.setSourcePhysicalRegisters(reorderBufferEntry.getSourcePhysicalRegisters());
+            loadStoreQueueEntry.setTargetPhysicalRegisters(reorderBufferEntry.getTargetPhysicalRegisters());
 
-            for (PhysicalRegisterFile.PhysicalRegister physReg : loadStoreQueueEntry.getSrcPhysRegs().values()) {
-                if (!physReg.isReady()) {
-                    physReg.getDependents().add(loadStoreQueueEntry);
+            for (PhysicalRegisterFile.PhysicalRegister physicalRegister : loadStoreQueueEntry.getSourcePhysicalRegisters().values()) {
+                if (!physicalRegister.isReady()) {
+                    physicalRegister.getDependents().add(loadStoreQueueEntry);
                 }
             }
 
             loadStoreQueueEntry.setNumNotReadyOperands(reorderBufferEntry.getNumNotReadyOperands());
 
-            PhysicalRegisterFile.PhysicalRegister storeAddressPhysReg = loadStoreQueueEntry.getSrcPhysRegs().get(loadStoreQueueEntry.getDynamicInst().getStaticInst().getIdeps().get(0));
-            if (!storeAddressPhysReg.isReady()) {
-                storeAddressPhysReg.getStoreAddressDependents().add(loadStoreQueueEntry);
+            PhysicalRegisterFile.PhysicalRegister storeAddressPhysicalRegister = loadStoreQueueEntry.getSourcePhysicalRegisters().get(loadStoreQueueEntry.getDynamicInstruction().getStaticInstruction().getInputDependencies().get(0));
+            if (!storeAddressPhysicalRegister.isReady()) {
+                storeAddressPhysicalRegister.getStoreAddressDependents().add(loadStoreQueueEntry);
             } else {
                 loadStoreQueueEntry.setStoreAddressReady(true);
             }
@@ -377,7 +377,7 @@ public class BasicThread extends AbstractBasicThread {
                 if (reorderBufferEntry.getLoadStoreQueueEntry() != null) {
                     LoadStoreQueueEntry loadStoreQueueEntry = reorderBufferEntry.getLoadStoreQueueEntry();
 
-                    if (loadStoreQueueEntry.getDynamicInst().getStaticInst().getMnemonic().getType() == StaticInstructionType.STORE) {
+                    if (loadStoreQueueEntry.getDynamicInstruction().getStaticInstruction().getMnemonic().getType() == StaticInstructionType.STORE) {
                         if (loadStoreQueueEntry.isAllOperandReady()) {//TODO: is it correct or efficient?
                             this.core.getReadyStoreQueue().add(loadStoreQueueEntry);
                         } else {
@@ -399,7 +399,7 @@ public class BasicThread extends AbstractBasicThread {
         List<Integer> stdUnknowns = new ArrayList<Integer>();
 
         for (LoadStoreQueueEntry loadStoreQueueEntry : this.loadStoreQueue.getEntries()) {
-            if (loadStoreQueueEntry.getDynamicInst().getStaticInst().getMnemonic().getType() == StaticInstructionType.STORE) {
+            if (loadStoreQueueEntry.getDynamicInstruction().getStaticInstruction().getMnemonic().getType() == StaticInstructionType.STORE) {
                 if (loadStoreQueueEntry.isStoreAddressReady()) {
                     break;
                 } else if (!loadStoreQueueEntry.isAllOperandReady()) {
@@ -413,7 +413,7 @@ public class BasicThread extends AbstractBasicThread {
                 }
             }
 
-            if (loadStoreQueueEntry.getDynamicInst().getStaticInst().getMnemonic().getType() == StaticInstructionType.LOAD && loadStoreQueueEntry.isDispatched() && !this.core.getReadyLoadQueue().contains(loadStoreQueueEntry) && !loadStoreQueueEntry.isIssued() && !loadStoreQueueEntry.isCompleted() && loadStoreQueueEntry.isAllOperandReady()) {
+            if (loadStoreQueueEntry.getDynamicInstruction().getStaticInstruction().getMnemonic().getType() == StaticInstructionType.LOAD && loadStoreQueueEntry.isDispatched() && !this.core.getReadyLoadQueue().contains(loadStoreQueueEntry) && !loadStoreQueueEntry.isIssued() && !loadStoreQueueEntry.isCompleted() && loadStoreQueueEntry.isAllOperandReady()) {
                 if (!stdUnknowns.contains(loadStoreQueueEntry.getEffectiveAddress())) {
                     this.core.getReadyLoadQueue().add(loadStoreQueueEntry);
                 }
@@ -428,7 +428,7 @@ public class BasicThread extends AbstractBasicThread {
             if (noInstructionCommittedCounterThreshold > 5) {
                 CacheCoherenceFlow.dumpTree();
 
-//                Logger.fatalf(Logger.THREAD, "%s: No instruction committed for %d cycles, %d committed.", this.getCycleAccurateEventQueue().getCurrentCycle(), this.getName(), COMMIT_TIMEOUT, this.totalInsts);
+//                Logger.fatalf(Logger.THREAD, "%s: No instruction committed for %d cycles, %d committed.", this.getCycleAccurateEventQueue().getCurrentCycle(), this.getName(), COMMIT_TIMEOUT, this.totalInstructions);
             } else {
                 this.lastCommitCycle = this.getCycleAccurateEventQueue().getCurrentCycle();
                 this.noInstructionCommittedCounterThreshold++;
@@ -441,19 +441,19 @@ public class BasicThread extends AbstractBasicThread {
             ReorderBufferEntry reorderBufferEntry = this.reorderBuffer.getEntries().get(0);
 
             if (!reorderBufferEntry.isCompleted()) {
-                reorderBufferEntry.getDynamicInst().setCyclesSpentAtHeadOfReorderBuffer(reorderBufferEntry.getDynamicInst().getCyclesSpentAtHeadOfReorderBuffer() + 1);
+                reorderBufferEntry.getDynamicInstruction().setCyclesSpentAtHeadOfReorderBuffer(reorderBufferEntry.getDynamicInstruction().getCyclesSpentAtHeadOfReorderBuffer() + 1);
                 break;
             }
 
             if (reorderBufferEntry.isSpeculative()) {
-                if (this.bpred.isDynamic()) {
-                    ((DynamicBranchPredictor) this.bpred).getReturnAddressStack().recover(reorderBufferEntry.getReturnAddressStackRecoverIndex());
+                if (this.branchPredictor.isDynamic()) {
+                    ((DynamicBranchPredictor) this.branchPredictor).getReturnAddressStack().recover(reorderBufferEntry.getReturnAddressStackRecoverIndex());
                 }
 
                 this.context.exitSpeculativeState();
 
-                this.fetchNpc = this.context.getRegs().getNpc();
-                this.fetchNnpc = this.context.getRegs().getNnpc();
+                this.fetchNpc = this.context.getRegisterFile().getNpc();
+                this.fetchNnpc = this.context.getRegisterFile().getNnpc();
 
                 this.squash();
                 break;
@@ -471,36 +471,36 @@ public class BasicThread extends AbstractBasicThread {
                 this.loadStoreQueue.getEntries().remove(loadStoreQueueEntry);
             }
 
-            for (int odep : reorderBufferEntry.getDynamicInst().getStaticInst().getOdeps()) {
-                if (odep != 0) {
-                    reorderBufferEntry.getOldPhysRegs().get(odep).reclaim();
-                    reorderBufferEntry.getPhysRegs().get(odep).commit();
+            for (int outputDependency : reorderBufferEntry.getDynamicInstruction().getStaticInstruction().getOutputDependencies()) {
+                if (outputDependency != 0) {
+                    reorderBufferEntry.getOldPhysicalRegisters().get(outputDependency).reclaim();
+                    reorderBufferEntry.getTargetPhysicalRegisters().get(outputDependency).commit();
                 }
             }
 
-            if (reorderBufferEntry.getDynamicInst().getStaticInst().getMnemonic().isControl()) {
-                this.bpred.update(
-                        reorderBufferEntry.getDynamicInst().getPc(),
+            if (reorderBufferEntry.getDynamicInstruction().getStaticInstruction().getMnemonic().isControl()) {
+                this.branchPredictor.update(
+                        reorderBufferEntry.getDynamicInstruction().getPc(),
                         reorderBufferEntry.getNnpc(),
                         reorderBufferEntry.getNnpc() != (reorderBufferEntry.getNpc() + 4),
-                        reorderBufferEntry.getPredNnpc() != (reorderBufferEntry.getNpc() + 4),
-                        reorderBufferEntry.getPredNnpc() == reorderBufferEntry.getNnpc(),
-                        reorderBufferEntry.getDynamicInst().getStaticInst().getMnemonic(),
-                        reorderBufferEntry.getDirUpdate()
+                        reorderBufferEntry.getPredictedNnpc() != (reorderBufferEntry.getNpc() + 4),
+                        reorderBufferEntry.getPredictedNnpc() == reorderBufferEntry.getNnpc(),
+                        reorderBufferEntry.getDynamicInstruction().getStaticInstruction().getMnemonic(),
+                        reorderBufferEntry.getBranchPredictorUpdate()
                 );
             }
 
             this.core.removeFromQueues(reorderBufferEntry);
 
-            this.getBlockingEventDispatcher().dispatch(new InstructionCommittedEvent(reorderBufferEntry.getDynamicInst()));
+            this.getBlockingEventDispatcher().dispatch(new InstructionCommittedEvent(reorderBufferEntry.getDynamicInstruction()));
 
-            if (this.context.getState() == ContextState.FINISHED && reorderBufferEntry.getDynamicInst() == this.lastDecodedDynamicInst) {
-                this.lastDecodedDynamicInstCommitted = true;
+            if (this.context.getState() == ContextState.FINISHED && reorderBufferEntry.getDynamicInstruction() == this.lastDecodedDynamicInstruction) {
+                this.lastDecodedDynamicInstructionCommitted = true;
             }
 
             this.reorderBuffer.getEntries().remove(0);
 
-            this.totalInsts++;
+            this.totalInstructions++;
 
             this.lastCommitCycle = this.getCycleAccurateEventQueue().getCurrentCycle();
 
@@ -526,22 +526,23 @@ public class BasicThread extends AbstractBasicThread {
 
             this.core.removeFromQueues(reorderBufferEntry);
 
-            for (int odep : reorderBufferEntry.getDynamicInst().getStaticInst().getOdeps()) {
-                if (odep != 0) {
-                    reorderBufferEntry.getPhysRegs().get(odep).recover();
-                    this.renameTable.put(odep, reorderBufferEntry.getOldPhysRegs().get(odep));
+            for (int outputDependency : reorderBufferEntry.getDynamicInstruction().getStaticInstruction().getOutputDependencies()) {
+                if (outputDependency != 0) {
+                    reorderBufferEntry.getTargetPhysicalRegisters().get(outputDependency).recover();
+                    this.renameTable.put(outputDependency, reorderBufferEntry.getOldPhysicalRegisters().get(outputDependency));
                 }
             }
 
-            reorderBufferEntry.getPhysRegs().clear();
+            reorderBufferEntry.getTargetPhysicalRegisters().clear();
 
             this.reorderBuffer.getEntries().remove(reorderBufferEntry);
         }
 
-        assert (this.reorderBuffer.getEntries().isEmpty());
-        assert (this.loadStoreQueue.getEntries().isEmpty());
+        if (!this.reorderBuffer.getEntries().isEmpty() || !this.loadStoreQueue.getEntries().isEmpty()) {
+            throw new IllegalArgumentException();
+        }
 
-        this.core.getFuPool().releaseAll(); //TODO: is it correct or just release those FUs that this thread uses?
+        this.core.getFunctionalUnitPool().releaseAll(); //TODO: is it correct or just release those FUs that this thread uses?
 
         this.decodeBuffer.getEntries().clear();
     }
@@ -557,8 +558,8 @@ public class BasicThread extends AbstractBasicThread {
         }
     }
 
-    public boolean isLastDecodedDynamicInstCommitted() {
-        return this.lastDecodedDynamicInst == null || lastDecodedDynamicInstCommitted;
+    public boolean isLastDecodedDynamicInstructionCommitted() {
+        return this.lastDecodedDynamicInstruction == null || lastDecodedDynamicInstructionCommitted;
     }
 
     private static int aligned(int n, int alignment) {

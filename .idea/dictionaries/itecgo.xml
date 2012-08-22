@@ -1,7 +1,42 @@
 <component name="ProjectDictionaryState">
   <dictionary name="itecgo">
     <words>
+      <w>addr</w>
+      <w>archimulator</w>
+      <w>bimod</w>
+      <w>bpred</w>
+      <w>broughter</w>
+      <w>disassembly</w>
+      <w>dtlb</w>
+      <w>dtlbs</w>
+      <w>endian</w>
+      <w>evictable</w>
+      <w>evicter</w>
+      <w>fcsr</w>
+      <w>getm</w>
+      <w>ifetch</w>
+      <w>insts</w>
+      <w>itlb</w>
+      <w>itlbs</w>
+      <w>lookahead</w>
+      <w>lookaside</w>
+      <w>mult</w>
+      <w>multicore</w>
+      <w>nnpc</w>
+      <w>nonblocking</w>
+      <w>nonowner</w>
+      <w>opcode</w>
       <w>precharge</w>
+      <w>precharged</w>
+      <w>predecode</w>
+      <w>pthread</w>
+      <w>putm</w>
+      <w>quant</w>
+      <w>sqrt</w>
+      <w>tlbs</w>
+      <w>unmap</w>
+      <w>warmup</w>
+      <w>writeback</w>
     </words>
   </dictionary>
 </component>

@@ -33,17 +33,17 @@ public abstract class NetNode {
 
     private Map<NetNode, RoutingEntry> routingEntries;
 
-    public NetNode(Net net, String name, int inPortCount, int inBufferSize, int outPortCount, int outBufferSize, int bandwidth) {
+    public NetNode(Net net, String name, int numInPorts, int inBufferSize, int numOutPorts, int outBufferSize, int bandwidth) {
         this.net = net;
         this.name = name;
 
         this.inPorts = new ArrayList<InPort>();
-        for (int i = 0; i < inPortCount; i++) {
+        for (int i = 0; i < numInPorts; i++) {
             this.inPorts.add(new InPort(this, i, inBufferSize));
         }
 
         this.outPorts = new ArrayList<OutPort>();
-        for (int i = 0; i < outPortCount; i++) {
+        for (int i = 0; i < numOutPorts; i++) {
             this.outPorts.add(new OutPort(this, i, outBufferSize));
         }
 
@@ -70,8 +70,8 @@ public abstract class NetNode {
         return null;
     }
 
-    public OutPort getPort(NetNode destNode) {
-        return this.routingEntries.get(destNode).getOutPort();
+    public OutPort getPort(NetNode destinationNode) {
+        return this.routingEntries.get(destinationNode).getOutPort();
     }
 
     public Net getNet() {

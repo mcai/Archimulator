@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.os;
 
-class OpenFlagMapping {
+public class OpenFlagMapping {
     private int targetFlag;
     private int hostFlag;
 

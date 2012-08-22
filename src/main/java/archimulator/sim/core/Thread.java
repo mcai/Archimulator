@@ -46,7 +46,7 @@ public interface Thread extends MemoryHierarchyThread {
 
     Core getCore();
 
-    BranchPredictor getBpred();
+    BranchPredictor getBranchPredictor();
 
     PipelineBuffer<DecodeBufferEntry> getDecodeBuffer();
 
@@ -54,25 +54,25 @@ public interface Thread extends MemoryHierarchyThread {
 
     PipelineBuffer<LoadStoreQueueEntry> getLoadStoreQueue();
 
-    long getTotalInsts();
+    long getTotalInstructions();
 
     Context getContext();
 
     void setContext(Context context);
 
-    boolean isLastDecodedDynamicInstCommitted();
+    boolean isLastDecodedDynamicInstructionCommitted();
 
     void updatePerCycleStats();
 
-    void incRegisterRenameStallsOnDecodeBufferIsEmpty();
+    void incrementRegisterRenameStallsOnDecodeBufferIsEmpty();
 
-    void incRegisterRenameStallsOnReorderBufferIsFull();
+    void incrementRegisterRenameStallsOnReorderBufferIsFull();
 
-    void incSelectionStallOnCanNotLoad();
+    void incrementSelectionStallOnCanNotLoad();
 
-    void incSelectionStallOnCanNotStore();
+    void incrementSelectionStallOnCanNotStore();
 
-    void incSelectionStallOnNoFreeFunctionalUnit();
+    void incrementSelectionStallOnNoFreeFunctionalUnit();
 
     long getDecodeBufferFull();
 

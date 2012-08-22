@@ -37,35 +37,35 @@ public class SimulatedProgram implements ModelElement {
     private long createTime;
 
     @DatabaseField
-    private String cwd;
+    private String workingDirectory;
 
     @DatabaseField
-    private String exe;
+    private String executable;
 
     @DatabaseField
-    private String args;
+    private String arguments;
 
     @DatabaseField
-    private String stdin;
+    private String standardIn;
 
     @DatabaseField
-    private boolean ht;
+    private boolean helperThreadEnabled;
 
     public SimulatedProgram() {
     }
 
-    public SimulatedProgram(String title, String cwd, String exe, String args) {
-        this(title, cwd, exe, args, "", false);
+    public SimulatedProgram(String title, String workingDirectory, String executable, String arguments) {
+        this(title, workingDirectory, executable, arguments, "", false);
     }
 
-    public SimulatedProgram(String title, String cwd, String exe, String args, String stdin, boolean ht) {
+    public SimulatedProgram(String title, String workingDirectory, String executable, String arguments, String standardIn, boolean helperThreadEnabled) {
         this.title = title;
-        this.cwd = cwd;
-        this.exe = exe;
-        this.args = args;
-        this.stdin = stdin;
+        this.workingDirectory = workingDirectory;
+        this.executable = executable;
+        this.arguments = arguments;
+        this.standardIn = standardIn;
 
-        this.ht = ht;
+        this.helperThreadEnabled = helperThreadEnabled;
 
         this.createTime = DateHelper.toTick(new Date());
     }
@@ -87,28 +87,28 @@ public class SimulatedProgram implements ModelElement {
         return createTime;
     }
 
-    public String getCwd() {
-        return cwd;
+    public String getWorkingDirectory() {
+        return workingDirectory;
     }
 
-    public String getExe() {
-        return exe;
+    public String getExecutable() {
+        return executable;
     }
 
-    public String getArgs() {
-        return args;
+    public String getArguments() {
+        return arguments;
     }
 
-    public String getStdin() {
-        return stdin;
+    public String getStandardIn() {
+        return standardIn;
     }
 
-    public boolean isHt() {
-        return ht;
+    public boolean getHelperThreadEnabled() {
+        return helperThreadEnabled;
     }
 
     @Override
     public String toString() {
-        return String.format("SimulatedProgram{id=%d, title='%s', cwd='%s', exe='%s', args='%s', stdin='%s', ht=%s}", id, title, cwd, exe, args, stdin, ht);
+        return String.format("SimulatedProgram{id=%d, title='%s', workingDirectory='%s', executable='%s', arguments='%s', standardIn='%s', helperThreadEnabled=%s}", id, title, workingDirectory, executable, arguments, standardIn, helperThreadEnabled);
     }
 }

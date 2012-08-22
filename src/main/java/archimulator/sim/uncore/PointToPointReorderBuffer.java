@@ -27,8 +27,8 @@ import java.util.List;
 
 public class PointToPointReorderBuffer {
     private List<CoherenceMessage> messages;
-    private final Controller from;
-    private final Controller to;
+    private Controller from;
+    private Controller to;
     private long lastCompletedMessageId = -1;
 
     public PointToPointReorderBuffer(Controller from, Controller to) {

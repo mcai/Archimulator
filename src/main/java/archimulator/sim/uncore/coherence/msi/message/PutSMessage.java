@@ -24,19 +24,19 @@ import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
 public class PutSMessage extends CoherenceMessage {
-    private CacheController req;
+    private CacheController requester;
 
-    public PutSMessage(Controller generator, CacheCoherenceFlow producerFlow, CacheController req, int tag, MemoryHierarchyAccess access) {
+    public PutSMessage(Controller generator, CacheCoherenceFlow producerFlow, CacheController requester, int tag, MemoryHierarchyAccess access) {
         super(generator, producerFlow, CoherenceMessageType.PUTS, access, tag);
-        this.req = req;
+        this.requester = requester;
     }
 
-    public CacheController getReq() {
-        return req;
+    public CacheController getRequester() {
+        return requester;
     }
 
     @Override
     public String toString() {
-        return String.format("[%d] %s: PutSMessage{id=%d, req=%s, tag=0x%08x}", getBeginCycle(), getGenerator(), getId(), req, getTag());
+        return String.format("[%d] %s: PutSMessage{id=%d, requester=%s, tag=0x%08x}", getBeginCycle(), getGenerator(), getId(), requester, getTag());
     }
 }

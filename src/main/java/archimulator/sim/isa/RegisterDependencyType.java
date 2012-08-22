@@ -28,29 +28,29 @@ public enum RegisterDependencyType {
             case INTEGER:
                 return num;
             case FLOAT:
-                return ArchitecturalRegisterFile.NUM_INT_REGS + num;
+                return ArchitecturalRegisterFile.NUM_INT_REGISTERS + num;
             case MISC:
-                return ArchitecturalRegisterFile.NUM_INT_REGS + ArchitecturalRegisterFile.NUM_FLOAT_REGS + num;
+                return ArchitecturalRegisterFile.NUM_INT_REGISTERS + ArchitecturalRegisterFile.NUM_FLOAT_REGISTERS + num;
             default:
                 throw new IllegalArgumentException();
         }
     }
 
-    public static Pair<RegisterDependencyType, Integer> parse(int dep) {
-        if (dep < ArchitecturalRegisterFile.NUM_INT_REGS) {
-            return new Pair<RegisterDependencyType, Integer>(RegisterDependencyType.INTEGER, dep);
-        } else if (dep < ArchitecturalRegisterFile.NUM_INT_REGS + ArchitecturalRegisterFile.NUM_FLOAT_REGS) {
-            return new Pair<RegisterDependencyType, Integer>(RegisterDependencyType.FLOAT, dep - ArchitecturalRegisterFile.NUM_INT_REGS);
+    public static Pair<RegisterDependencyType, Integer> parse(int dependency) {
+        if (dependency < ArchitecturalRegisterFile.NUM_INT_REGISTERS) {
+            return new Pair<RegisterDependencyType, Integer>(RegisterDependencyType.INTEGER, dependency);
+        } else if (dependency < ArchitecturalRegisterFile.NUM_INT_REGISTERS + ArchitecturalRegisterFile.NUM_FLOAT_REGISTERS) {
+            return new Pair<RegisterDependencyType, Integer>(RegisterDependencyType.FLOAT, dependency - ArchitecturalRegisterFile.NUM_INT_REGISTERS);
         } else {
-            return new Pair<RegisterDependencyType, Integer>(RegisterDependencyType.MISC, dep - ArchitecturalRegisterFile.NUM_INT_REGS - ArchitecturalRegisterFile.NUM_FLOAT_REGS);
+            return new Pair<RegisterDependencyType, Integer>(RegisterDependencyType.MISC, dependency - ArchitecturalRegisterFile.NUM_INT_REGISTERS - ArchitecturalRegisterFile.NUM_FLOAT_REGISTERS);
         }
     }
 
-    public static RegisterDependencyType getType(int dep) {
-        return parse(dep).getFirst();
+    public static RegisterDependencyType getType(int dependency) {
+        return parse(dependency).getFirst();
     }
 
-    public static int getNum(int dep) {
-        return parse(dep).getSecond();
+    public static int getNum(int dependency) {
+        return parse(dependency).getSecond();
     }
 }

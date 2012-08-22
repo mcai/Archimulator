@@ -169,30 +169,30 @@ public enum Mnemonic {
     private int extraBitFieldValue;
 
     private StaticInstructionType type;
-    private FunctionalUnitOperationType fuOperationType;
+    private FunctionalUnitOperationType functionalUnitOperationType;
 
-    public List<Integer> getIdeps(int machInst) {
-        List<Integer> ideps = new ArrayList<Integer>();
+    public List<Integer> getInputDependencies(int machineInstruction) {
+        List<Integer> inputDependencies = new ArrayList<Integer>();
 
-        for (StaticInstruction.Dep depA : this.getMethod().getAnnotation(Ideps.class).value()) {
-            ideps.add(toRegisterDependency(depA, machInst));
+        for (StaticInstruction.Dependency dependencyA : this.getMethod().getAnnotation(InputDependencies.class).value()) {
+            inputDependencies.add(toRegisterDependency(dependencyA, machineInstruction));
         }
 
-        return ideps;
+        return inputDependencies;
     }
 
-    public List<Integer> getOdeps(int machInst) {
-        List<Integer> odeps = new ArrayList<Integer>();
+    public List<Integer> getOutputDependencies(int machineInstruction) {
+        List<Integer> outputDependencies = new ArrayList<Integer>();
 
-        for (StaticInstruction.Dep depA : this.getMethod().getAnnotation(Odeps.class).value()) {
-            odeps.add(toRegisterDependency(depA, machInst));
+        for (StaticInstruction.Dependency dependencyA : this.getMethod().getAnnotation(OutputDependencies.class).value()) {
+            outputDependencies.add(toRegisterDependency(dependencyA, machineInstruction));
         }
 
-        return odeps;
+        return outputDependencies;
     }
 
-    public int getNonEffectiveAddressBaseDep(int machInst) {
-        return toRegisterDependency(this.getMethod().getAnnotation(NonEffectiveAddressBaseDep.class).value(), machInst);
+    public int getNonEffectiveAddressBaseDep(int machineInstruction) {
+        return toRegisterDependency(this.getMethod().getAnnotation(NonEffectiveAddressBaseDependency.class).value(), machineInstruction);
     }
 
     public Method getMethod() {
@@ -213,13 +213,13 @@ public enum Mnemonic {
             this.extraBitFieldValue = decodeCondition.value();
         }
 
-        StaticInstructionIntrinsic staticInstIntrinsic = method.getAnnotation(StaticInstructionIntrinsic.class);
+        StaticInstructionIntrinsic staticInstructionIntrinsic = method.getAnnotation(StaticInstructionIntrinsic.class);
 
         Collection<StaticInstructionFlag> flags = Arrays.asList(method.getAnnotation(StaticInstructionFlags.class).value());
 
         this.determineInstructionType(flags);
 
-        this.fuOperationType = staticInstIntrinsic.fuOperationType();
+        this.functionalUnitOperationType = staticInstructionIntrinsic.functionalUnitOperationType();
 
     }
 
@@ -273,38 +273,38 @@ public enum Mnemonic {
         return this.type;
     }
 
-    public FunctionalUnitOperationType getFuOperationType() {
-        return this.fuOperationType;
+    public FunctionalUnitOperationType getFunctionalUnitOperationType() {
+        return this.functionalUnitOperationType;
     }
 
     public boolean isControl() {
         return this.getType() == StaticInstructionType.CONDITIONAL || this.getType() == StaticInstructionType.FUNCTION_CALL || this.getType() == StaticInstructionType.UNCONDITIONAL || this.getType() == StaticInstructionType.FUNCTION_RETURN;
     }
 
-    private static int toRegisterDependency(StaticInstruction.Dep depA, int machInst) {
-        switch (depA) {
+    private static int toRegisterDependency(StaticInstruction.Dependency dependencyA, int machineInstruction) {
+        switch (dependencyA) {
             case RS:
-                return RegisterDependencyType.toRegisterDependency(RegisterDependencyType.INTEGER, BitField.RS.valueOf(machInst));
+                return RegisterDependencyType.toRegisterDependency(RegisterDependencyType.INTEGER, BitField.RS.valueOf(machineInstruction));
             case RT:
-                return RegisterDependencyType.toRegisterDependency(RegisterDependencyType.INTEGER, BitField.RT.valueOf(machInst));
+                return RegisterDependencyType.toRegisterDependency(RegisterDependencyType.INTEGER, BitField.RT.valueOf(machineInstruction));
             case RD:
-                return RegisterDependencyType.toRegisterDependency(RegisterDependencyType.INTEGER, BitField.RD.valueOf(machInst));
+                return RegisterDependencyType.toRegisterDependency(RegisterDependencyType.INTEGER, BitField.RD.valueOf(machineInstruction));
             case FS:
-                return RegisterDependencyType.toRegisterDependency(RegisterDependencyType.FLOAT, BitField.FS.valueOf(machInst));
+                return RegisterDependencyType.toRegisterDependency(RegisterDependencyType.FLOAT, BitField.FS.valueOf(machineInstruction));
             case FT:
-                return RegisterDependencyType.toRegisterDependency(RegisterDependencyType.FLOAT, BitField.FT.valueOf(machInst));
+                return RegisterDependencyType.toRegisterDependency(RegisterDependencyType.FLOAT, BitField.FT.valueOf(machineInstruction));
             case FD:
-                return RegisterDependencyType.toRegisterDependency(RegisterDependencyType.FLOAT, BitField.FD.valueOf(machInst));
-            case REG_RA:
-                return RegisterDependencyType.toRegisterDependency(RegisterDependencyType.INTEGER, ArchitecturalRegisterFile.REG_RA);
-            case REG_V0:
-                return RegisterDependencyType.toRegisterDependency(RegisterDependencyType.INTEGER, ArchitecturalRegisterFile.REG_V0);
-            case REG_HI:
-                return RegisterDependencyType.toRegisterDependency(RegisterDependencyType.MISC, ArchitecturalRegisterFile.MISC_REG_HI);
-            case REG_LO:
-                return RegisterDependencyType.toRegisterDependency(RegisterDependencyType.MISC, ArchitecturalRegisterFile.MISC_REG_LO);
-            case REG_FCSR:
-                return RegisterDependencyType.toRegisterDependency(RegisterDependencyType.FLOAT, ArchitecturalRegisterFile.MISC_REG_FCSR);
+                return RegisterDependencyType.toRegisterDependency(RegisterDependencyType.FLOAT, BitField.FD.valueOf(machineInstruction));
+            case REGISTER_RA:
+                return RegisterDependencyType.toRegisterDependency(RegisterDependencyType.INTEGER, ArchitecturalRegisterFile.REGISTER_RA);
+            case REGISTER_V0:
+                return RegisterDependencyType.toRegisterDependency(RegisterDependencyType.INTEGER, ArchitecturalRegisterFile.REGISTER_V0);
+            case REGISTER_HI:
+                return RegisterDependencyType.toRegisterDependency(RegisterDependencyType.MISC, ArchitecturalRegisterFile.REGISTER_MISC_HI);
+            case REGISTER_LO:
+                return RegisterDependencyType.toRegisterDependency(RegisterDependencyType.MISC, ArchitecturalRegisterFile.REGISTER_MISC_LO);
+            case REGISTER_FCSR:
+                return RegisterDependencyType.toRegisterDependency(RegisterDependencyType.FLOAT, ArchitecturalRegisterFile.REGISTER_MISC_FCSR);
             default:
                 throw new IllegalArgumentException();
         }

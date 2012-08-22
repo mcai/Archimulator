@@ -31,11 +31,11 @@ public class ExperimentWorker {
     private boolean running;
 
     public ExperimentWorker() {
-        Thread threadMonitor = new Thread(){
+        Thread threadMonitor = new Thread() {
             @Override
             public void run() {
-                for(;;) {
-                    if(!ServiceManager.runningExperiments || !doRunExperiment()) {
+                for (; ; ) {
+                    if (!ServiceManager.runningExperiments || !doRunExperiment()) {
                         try {
                             Thread.sleep(100);
                         } catch (InterruptedException e) {
@@ -52,7 +52,7 @@ public class ExperimentWorker {
     private boolean doRunExperiment() {
         Experiment experiment = ServiceManager.getExperimentService().getFirstExperimentToRun();
 
-        if(experiment != null) {
+        if (experiment != null) {
             running = true;
             runExperiment(experiment);
             running = false;
@@ -69,22 +69,22 @@ public class ExperimentWorker {
 
         if (experiment.getType() == ExperimentType.FUNCTIONAL) {
             BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher = new BlockingEventDispatcher<SimulationEvent>();
-            new FunctionalSimulation(experiment.getTitle() + "/functional", experiment, blockingEventDispatcher, cycleAccurateEventQueue, experiment.getNumMaxInsts()).simulate();
+            new FunctionalSimulation(experiment.getTitle() + "/functional", experiment, blockingEventDispatcher, cycleAccurateEventQueue, experiment.getNumMaxInstructions()).simulate();
         } else if (experiment.getType() == ExperimentType.DETAILED) {
             BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher = new BlockingEventDispatcher<SimulationEvent>();
-            new DetailedSimulation(experiment.getTitle() + "/detailed", experiment, blockingEventDispatcher, cycleAccurateEventQueue, experiment.getNumMaxInsts()).simulate();
+            new DetailedSimulation(experiment.getTitle() + "/detailed", experiment, blockingEventDispatcher, cycleAccurateEventQueue, experiment.getNumMaxInstructions()).simulate();
         } else if (experiment.getType() == ExperimentType.TWO_PHASE) {
             Reference<Kernel> kernelRef = new Reference<Kernel>();
 
             BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher = new BlockingEventDispatcher<SimulationEvent>();
 
-            new ToRoiFastForwardSimulation(experiment.getTitle() + "/twoPhase/phase0", experiment, blockingEventDispatcher, cycleAccurateEventQueue, experiment.getArchitecture().getHtPthreadSpawnIndex(), kernelRef).simulate();
+            new ToRoiFastForwardSimulation(experiment.getTitle() + "/twoPhase/phase0", experiment, blockingEventDispatcher, cycleAccurateEventQueue, experiment.getArchitecture().getHelperThreadPthreadSpawnIndex(), kernelRef).simulate();
 
             blockingEventDispatcher.clearListeners();
 
             cycleAccurateEventQueue.resetCurrentCycle();
 
-            new FromRoiDetailedSimulation(experiment.getTitle() + "/twoPhase/phase1", experiment, blockingEventDispatcher, cycleAccurateEventQueue, experiment.getNumMaxInsts(), kernelRef).simulate();
+            new FromRoiDetailedSimulation(experiment.getTitle() + "/twoPhase/phase1", experiment, blockingEventDispatcher, cycleAccurateEventQueue, experiment.getNumMaxInstructions(), kernelRef).simulate();
         }
 
         experiment.setState(ExperimentState.COMPLETED);

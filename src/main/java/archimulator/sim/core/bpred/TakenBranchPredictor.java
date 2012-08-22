@@ -28,8 +28,8 @@ public class TakenBranchPredictor extends BranchPredictor {
     }
 
     @Override
-    public int predict(int baddr, int btarget, Mnemonic mnemonic, BranchPredictorUpdate dirUpdate, Reference<Integer> returnAddressStackRecoverIndex) {
-        return btarget;
+    public int predict(int branchAddress, int branchTarget, Mnemonic mnemonic, BranchPredictorUpdate branchPredictorUpdate, Reference<Integer> returnAddressStackRecoverIndex) {
+        return branchTarget;
     }
 
     @Override

@@ -59,16 +59,16 @@ public class ElfSectionHeader {
     public ElfSectionHeader(ElfFile elfFile) throws IOException {
         this.elfFile = elfFile;
 
-        this.sh_name = elfFile.readUWord();
-        this.sh_type = elfFile.readUWord();
-        this.sh_flags = elfFile.readUWord();
-        this.sh_addr = elfFile.readUWord();
-        this.sh_offset = elfFile.readUWord();
-        this.sh_size = elfFile.readUWord();
-        this.sh_link = elfFile.readUWord();
-        this.sh_info = elfFile.readUWord();
-        this.sh_addralign = elfFile.readUWord();
-        this.sh_entsize = elfFile.readUWord();
+        this.sh_name = elfFile.readUnsignedWord();
+        this.sh_type = elfFile.readUnsignedWord();
+        this.sh_flags = elfFile.readUnsignedWord();
+        this.sh_addr = elfFile.readUnsignedWord();
+        this.sh_offset = elfFile.readUnsignedWord();
+        this.sh_size = elfFile.readUnsignedWord();
+        this.sh_link = elfFile.readUnsignedWord();
+        this.sh_info = elfFile.readUnsignedWord();
+        this.sh_addralign = elfFile.readUnsignedWord();
+        this.sh_entsize = elfFile.readUnsignedWord();
     }
 
     public byte[] readContent(ElfFile elfFile) {

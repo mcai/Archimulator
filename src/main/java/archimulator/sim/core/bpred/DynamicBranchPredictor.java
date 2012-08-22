@@ -24,11 +24,11 @@ public abstract class DynamicBranchPredictor extends BranchPredictor {
     private BranchTargetBuffer branchTargetBuffer;
     private ReturnAddressStack returnAddressStack;
 
-    public DynamicBranchPredictor(Thread thread, String name, BranchPredictorType type, int btbSets, int btbAssoc, int retStackSize) {
+    public DynamicBranchPredictor(Thread thread, String name, BranchPredictorType type, int branchTargetBufferNumSets, int branchTargetBufferAssociativity, int returnAddressStackSize) {
         super(thread, name, type);
 
-        this.branchTargetBuffer = new BranchTargetBuffer(btbSets, btbAssoc);
-        this.returnAddressStack = new ReturnAddressStack(retStackSize);
+        this.branchTargetBuffer = new BranchTargetBuffer(branchTargetBufferNumSets, branchTargetBufferAssociativity);
+        this.returnAddressStack = new ReturnAddressStack(returnAddressStackSize);
     }
 
     @Override

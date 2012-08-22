@@ -31,8 +31,8 @@ public class BitField {
         this.lo = lo;
     }
 
-    public int valueOf(int machInst) {
-        return MathHelper.bits(machInst, this.hi, this.lo);
+    public int valueOf(int machineInstruction) {
+        return MathHelper.bits(machineInstruction, this.hi, this.lo);
     }
 
     public static final BitField OPCODE = new BitField(31, 26);

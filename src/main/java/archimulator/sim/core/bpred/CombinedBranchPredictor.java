@@ -30,80 +30,80 @@ public class CombinedBranchPredictor extends DynamicBranchPredictor {
     private TwoLevelBranchPredictor twoLevel;
 
     public CombinedBranchPredictor(Thread thread, String name) {
-        super(thread, name, BranchPredictorType.COMBINED, thread.getExperiment().getArchitecture().getCombinedBpredBtbSets(), thread.getExperiment().getArchitecture().getCombinedBpredBtbAssoc(), thread.getExperiment().getArchitecture().getCombinedBpredBtbRetStackSize());
+        super(thread, name, BranchPredictorType.COMBINED, thread.getExperiment().getArchitecture().getCombinedBranchPredictorBranchTargetBufferNumSets(), thread.getExperiment().getArchitecture().getCombinedBranchPredictorBranchTargetBufferAssociativity(), thread.getExperiment().getArchitecture().getCombinedBranchPredictorReturnAddressStackSize());
 
-        this.bimod = new TwoBitBranchPredictor(thread, name + ".twoBit", thread.getExperiment().getArchitecture().getCombinedBpredBimodSize(), 0, 0, 0);
-        this.meta = new TwoBitBranchPredictor(thread, name + ".meta", thread.getExperiment().getArchitecture().getCombinedBpredMetaSize(), 0, 0, 0);
-        this.twoLevel = new TwoLevelBranchPredictor(thread, name + ".twoLevel", thread.getExperiment().getArchitecture().getCombinedBpredL1Size(), thread.getExperiment().getArchitecture().getCombinedBpredL2Size(), thread.getExperiment().getArchitecture().getCombinedBpredShiftWidth(), thread.getExperiment().getArchitecture().isCombinedBpredXor(), 0, 0, 0);
+        this.bimod = new TwoBitBranchPredictor(thread, name + ".twoBit", thread.getExperiment().getArchitecture().getCombinedBranchPredictorBimodSize(), 0, 0, 0);
+        this.meta = new TwoBitBranchPredictor(thread, name + ".meta", thread.getExperiment().getArchitecture().getCombinedBranchPredictorMetaSize(), 0, 0, 0);
+        this.twoLevel = new TwoLevelBranchPredictor(thread, name + ".twoLevel", thread.getExperiment().getArchitecture().getCombinedBranchPredictorL1Size(), thread.getExperiment().getArchitecture().getCombinedBranchPredictorL2Size(), thread.getExperiment().getArchitecture().getCombinedBranchPredictorShiftWidth(), thread.getExperiment().getArchitecture().getCombinedBranchPredictorXor(), 0, 0, 0);
     }
 
     @Override
-    public int predict(int baddr, int btarget, Mnemonic mnemonic, BranchPredictorUpdate dirUpdate, Reference<Integer> returnAddressStackRecoverIndex) {
+    public int predict(int branchAddress, int branchTarget, Mnemonic mnemonic, BranchPredictorUpdate branchPredictorUpdate, Reference<Integer> returnAddressStackRecoverIndex) {
         if (mnemonic.getType() == StaticInstructionType.CONDITIONAL) {
-            SaturatingCounter counterBimod = this.bimod.getIndex(baddr);
-            SaturatingCounter counterMeta = this.meta.getIndex(baddr);
-            SaturatingCounter counterTwoLevel = this.twoLevel.getIndex(baddr);
+            SaturatingCounter counterBimod = this.bimod.getIndex(branchAddress);
+            SaturatingCounter counterMeta = this.meta.getIndex(branchAddress);
+            SaturatingCounter counterTwoLevel = this.twoLevel.getIndex(branchAddress);
 
-            dirUpdate.setCounterMeta(counterMeta);
-            dirUpdate.setMeta(counterMeta.isTaken());
-            dirUpdate.setBimod(counterBimod.isTaken());
-            dirUpdate.setTwoLevel(counterTwoLevel.isTaken());
+            branchPredictorUpdate.setCounterMeta(counterMeta);
+            branchPredictorUpdate.setMeta(counterMeta.isTaken());
+            branchPredictorUpdate.setBimod(counterBimod.isTaken());
+            branchPredictorUpdate.setTwoLevel(counterTwoLevel.isTaken());
 
             if (counterMeta.isTaken()) {
-                dirUpdate.setCounterDir1(counterTwoLevel);
-                dirUpdate.setCounterDir2(counterBimod);
+                branchPredictorUpdate.setCounterDir1(counterTwoLevel);
+                branchPredictorUpdate.setCounterDir2(counterBimod);
             } else {
-                dirUpdate.setCounterDir1(counterBimod);
-                dirUpdate.setCounterDir2(counterTwoLevel);
+                branchPredictorUpdate.setCounterDir1(counterBimod);
+                branchPredictorUpdate.setCounterDir2(counterTwoLevel);
             }
         }
 
         returnAddressStackRecoverIndex.set(this.getReturnAddressStack().getTopOfStack());
 
         if (mnemonic.getType() == StaticInstructionType.FUNCTION_RETURN && this.getReturnAddressStack().getSize() > 0) {
-            dirUpdate.setRas(true);
+            branchPredictorUpdate.setRas(true);
             return this.getReturnAddressStack().pop();
         }
 
         if (mnemonic.getType() == StaticInstructionType.FUNCTION_CALL && this.getReturnAddressStack().getSize() > 0) {
-            this.getReturnAddressStack().push(baddr);
+            this.getReturnAddressStack().push(branchAddress);
         }
 
-        BranchTargetBufferEntry btbEntry = this.getBranchTargetBuffer().lookup(baddr);
+        BranchTargetBufferEntry branchTargetBufferEntry = this.getBranchTargetBuffer().lookup(branchAddress);
 
         if (mnemonic.getType() != StaticInstructionType.CONDITIONAL) {
-            return btbEntry != null ? btbEntry.getTarget() : 1;
+            return branchTargetBufferEntry != null ? branchTargetBufferEntry.getTarget() : 1;
         }
 
-        if (!dirUpdate.getCounterDir1().isTaken()) {
+        if (!branchPredictorUpdate.getCounterDir1().isTaken()) {
             return 0;
         }
 
-        return btbEntry != null ? btbEntry.getTarget() : 1;
+        return branchTargetBufferEntry != null ? branchTargetBufferEntry.getTarget() : 1;
     }
 
     @Override
-    public void update(int baddr, int btarget, boolean taken, boolean predTaken, boolean correct, Mnemonic mnemonic, BranchPredictorUpdate dirUpdate) {
-        super.update(baddr, btarget, taken, predTaken, correct, mnemonic, dirUpdate);
+    public void update(int branchAddress, int branchTarget, boolean taken, boolean predictedTaken, boolean correct, Mnemonic mnemonic, BranchPredictorUpdate branchPredictorUpdate) {
+        super.update(branchAddress, branchTarget, taken, predictedTaken, correct, mnemonic, branchPredictorUpdate);
 
         if (mnemonic.getType() == StaticInstructionType.FUNCTION_RETURN) {
-            if (!dirUpdate.isRas()) {
+            if (!branchPredictorUpdate.isRas()) {
                 return;
             }
         }
 
-        this.twoLevel.updateTable(baddr, taken);
+        this.twoLevel.updateTable(branchAddress, taken);
 
-        dirUpdate.getCounterDir1().update(taken);
-        dirUpdate.getCounterDir2().update(taken);
+        branchPredictorUpdate.getCounterDir1().update(taken);
+        branchPredictorUpdate.getCounterDir2().update(taken);
 
-        if (dirUpdate.getCounterMeta() != null) {
-            if (dirUpdate.isBimod() != dirUpdate.isTwoLevel()) {
-                dirUpdate.getCounterMeta().update(dirUpdate.isTwoLevel() == taken);
+        if (branchPredictorUpdate.getCounterMeta() != null) {
+            if (branchPredictorUpdate.isBimod() != branchPredictorUpdate.isTwoLevel()) {
+                branchPredictorUpdate.getCounterMeta().update(branchPredictorUpdate.isTwoLevel() == taken);
             }
         }
 
-        this.getBranchTargetBuffer().update(baddr, btarget, taken);
+        this.getBranchTargetBuffer().update(branchAddress, branchTarget, taken);
     }
 
     public TwoBitBranchPredictor getBimod() {

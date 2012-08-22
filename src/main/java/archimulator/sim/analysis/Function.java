@@ -28,7 +28,7 @@ public class Function implements Comparable<Function> {
     private String sectionName;
     private Symbol symbol;
 
-    private int numInsts;
+    private int numInstructions;
     private List<BasicBlock> basicBlocks;
 
     public Function(Program program, String sectionName, Symbol symbol) {
@@ -50,12 +50,12 @@ public class Function implements Comparable<Function> {
         return symbol;
     }
 
-    public int getNumInsts() {
-        return numInsts;
+    public int getNumInstructions() {
+        return numInstructions;
     }
 
-    public void setNumInsts(int numInsts) {
-        this.numInsts = numInsts;
+    public void setNumInstructions(int numInstructions) {
+        this.numInstructions = numInstructions;
     }
 
     public List<BasicBlock> getBasicBlocks() {

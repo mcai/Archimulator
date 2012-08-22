@@ -24,12 +24,12 @@ import archimulator.sim.os.Context;
 public class InstructionFunctionallyExecutedEvent extends SimulationEvent {
     private Context context;
     private int pc;
-    private StaticInstruction staticInst;
+    private StaticInstruction staticInstruction;
 
-    public InstructionFunctionallyExecutedEvent(Context context, int pc, StaticInstruction staticInst) {
+    public InstructionFunctionallyExecutedEvent(Context context, int pc, StaticInstruction staticInstruction) {
         super(context);
         this.pc = pc;
-        this.staticInst = staticInst;
+        this.staticInstruction = staticInstruction;
         this.context = context;
     }
 
@@ -41,7 +41,7 @@ public class InstructionFunctionallyExecutedEvent extends SimulationEvent {
         return pc;
     }
 
-    public StaticInstruction getStaticInst() {
-        return staticInst;
+    public StaticInstruction getStaticInstruction() {
+        return staticInstruction;
     }
 }

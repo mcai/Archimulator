@@ -34,9 +34,10 @@ public class TranslationLookasideBuffer {
 
     private EvictableCache<Boolean> cache;
 
-    private long accesses;
-    private long hits;
-    private long evictions;
+    private long numHits;
+    private long numMisses;
+
+    private long numEvictions;
 
     public TranslationLookasideBuffer(SimulationObject parent, String name) {
         this.name = name;
@@ -48,21 +49,20 @@ public class TranslationLookasideBuffer {
             }
         };
 
-        this.cache = new EvictableCache<Boolean>(parent, name, new CacheGeometry(parent.getExperiment().getArchitecture().getTlbSize(), parent.getExperiment().getArchitecture().getTlbAssoc(), parent.getExperiment().getArchitecture().getTlbLineSize()), CacheReplacementPolicyType.LRU, cacheLineStateProviderFactory);
+        this.cache = new EvictableCache<Boolean>(parent, name, new CacheGeometry(parent.getExperiment().getArchitecture().getTlbSize(), parent.getExperiment().getArchitecture().getTlbAssociativity(), parent.getExperiment().getArchitecture().getTlbLineSize()), CacheReplacementPolicyType.LRU, cacheLineStateProviderFactory);
     }
 
     public void access(MemoryHierarchyAccess access, Action onCompletedCallback) {
         int set = this.cache.getSet(access.getPhysicalAddress());
         CacheAccess<Boolean> cacheAccess = this.cache.newAccess(access, access.getPhysicalAddress());
 
-        this.accesses++;
-
         if (cacheAccess.isHitInCache()) {
             getCache().getReplacementPolicy().handlePromotionOnHit(set, cacheAccess.getWay());
-            this.hits++;
+
+            this.numHits++;
         } else {
             if (cacheAccess.isReplacement()) {
-                this.evictions++;
+                this.numEvictions++;
             }
 
             CacheLine<Boolean> line = this.cache.getLine(set, cacheAccess.getWay());
@@ -71,6 +71,8 @@ public class TranslationLookasideBuffer {
             line.setAccess(access);
             line.setTag(access.getPhysicalTag());
             getCache().getReplacementPolicy().handleInsertionOnMiss(set, cacheAccess.getWay());
+
+            this.numMisses++;
         }
 
         access.getThread().getCycleAccurateEventQueue().schedule(this, onCompletedCallback, cacheAccess.isHitInCache() ? this.getHitLatency() : this.getMissLatency());
@@ -80,24 +82,28 @@ public class TranslationLookasideBuffer {
         return name;
     }
 
-    public long getMisses() {
-        return this.accesses - this.hits;
+    public long getNumMisses() {
+        return this.numMisses;
     }
 
     public double getHitRatio() {
-        return this.accesses > 0 ? (double) this.hits / this.accesses : 0.0;
+        return this.getNumAccesses() > 0 ? (double) this.numHits / this.getNumAccesses() : 0.0;
     }
 
-    public long getAccesses() {
-        return accesses;
+    public long getNumAccesses() {
+        return numHits + numMisses;
     }
 
-    public long getHits() {
-        return hits;
+    public long getNumHits() {
+        return numHits;
     }
 
-    public long getEvictions() {
-        return evictions;
+    public long getNumEvictions() {
+        return numEvictions;
+    }
+
+    public double getOccupancyRatio() {
+        return getCache().getOccupancyRatio();
     }
 
     public EvictableCache<Boolean> getCache() {

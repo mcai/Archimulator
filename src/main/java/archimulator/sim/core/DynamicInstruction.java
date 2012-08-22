@@ -26,7 +26,7 @@ public class DynamicInstruction {
     private long id;
     private Thread thread;
     private int pc;
-    private StaticInstruction staticInst;
+    private StaticInstruction staticInstruction;
 
     private int effectiveAddress;
     private int effectiveAddressBase;
@@ -34,24 +34,24 @@ public class DynamicInstruction {
 
     private boolean useStackPointerAsEffectiveAddressBase;
 
-    private boolean hasL2Miss;
+    private boolean missedInL2Cache;
     private int cyclesSpentAtHeadOfReorderBuffer;
 
-    public DynamicInstruction(Thread thread, int pc, StaticInstruction staticInst) {
+    public DynamicInstruction(Thread thread, int pc, StaticInstruction staticInstruction) {
         this.id = thread.getSimulation().currentDynamicInstructionId++;
         this.thread = thread;
         this.pc = pc;
-        this.staticInst = staticInst;
+        this.staticInstruction = staticInstruction;
 
-        if (this.getStaticInst().getMnemonic().getType() == StaticInstructionType.LOAD || this.getStaticInst().getMnemonic().getType() == StaticInstructionType.STORE) {
-            this.effectiveAddress = StaticInstruction.getEffectiveAddress(this.thread.getContext(), this.staticInst.getMachInst());
-            this.effectiveAddressBase = StaticInstruction.getEffectiveAddressBase(this.thread.getContext(), this.staticInst.getMachInst());
-            this.effectiveAddressDisplacement = StaticInstruction.getEffectiveAddressDisplacement(this.staticInst.getMachInst());
+        if (this.getStaticInstruction().getMnemonic().getType() == StaticInstructionType.LOAD || this.getStaticInstruction().getMnemonic().getType() == StaticInstructionType.STORE) {
+            this.effectiveAddress = StaticInstruction.getEffectiveAddress(this.thread.getContext(), this.staticInstruction.getMachineInstruction());
+            this.effectiveAddressBase = StaticInstruction.getEffectiveAddressBase(this.thread.getContext(), this.staticInstruction.getMachineInstruction());
+            this.effectiveAddressDisplacement = StaticInstruction.getEffectiveAddressDisplacement(this.staticInstruction.getMachineInstruction());
 
-            this.useStackPointerAsEffectiveAddressBase = StaticInstruction.useStackPointerAsEffectiveAddressBase(this.staticInst.getMachInst());
+            this.useStackPointerAsEffectiveAddressBase = StaticInstruction.useStackPointerAsEffectiveAddressBase(this.staticInstruction.getMachineInstruction());
         }
 
-        this.hasL2Miss = false;
+        this.missedInL2Cache = false;
         this.cyclesSpentAtHeadOfReorderBuffer = 0;
     }
 
@@ -67,8 +67,8 @@ public class DynamicInstruction {
         return pc;
     }
 
-    public StaticInstruction getStaticInst() {
-        return staticInst;
+    public StaticInstruction getStaticInstruction() {
+        return staticInstruction;
     }
 
     public int getEffectiveAddress() {
@@ -87,12 +87,13 @@ public class DynamicInstruction {
         return useStackPointerAsEffectiveAddressBase;
     }
 
-    public boolean isHasL2Miss() {
-        return hasL2Miss;
+    public boolean isMissedInL2Cache() {
+        return missedInL2Cache;
     }
 
-    public void setHasL2Miss(boolean hasL2Miss) {
-        this.hasL2Miss = hasL2Miss;
+    //TODO: set value
+    public void setMissedInL2Cache(boolean missedInL2Cache) {
+        this.missedInL2Cache = missedInL2Cache;
     }
 
     public int getCyclesSpentAtHeadOfReorderBuffer() {
@@ -108,8 +109,8 @@ public class DynamicInstruction {
         return String.format(
                 "DynamicInstruction{id=%d, thread.name=%s, pc=0x%08x, mnemonic=%s, ideps={%s}, odeps={%s}, " +
                         "effectiveAddress=0x%08x, effectiveAddressBase=0x%08x, effectiveAddressDisplacement=0x%08x, useStackPointerAsEffectiveAddressBase=%s}",
-                id, thread.getName(), pc, staticInst.getMnemonic(),
-                StringUtils.join(staticInst.getIdeps(), ", "), StringUtils.join(staticInst.getOdeps(), ", "),
+                id, thread.getName(), pc, staticInstruction.getMnemonic(),
+                StringUtils.join(staticInstruction.getInputDependencies(), ", "), StringUtils.join(staticInstruction.getOutputDependencies(), ", "),
                 effectiveAddress, effectiveAddressBase, effectiveAddressDisplacement, useStackPointerAsEffectiveAddressBase);
     }
 

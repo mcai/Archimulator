@@ -59,38 +59,38 @@ public class Memory extends BasicSimulationObject {
         this.speculativeMemoryBlocks = new TreeMap<Integer, List<SpeculativeMemoryBlock>>();
     }
 
-    public byte readByte(int addr) {
-        byte[] buf = new byte[1];
-        this.access(addr, 1, buf, false, true);
-        return buf[0];
+    public byte readByte(int address) {
+        byte[] buffer = new byte[1];
+        this.access(address, 1, buffer, false, true);
+        return buffer[0];
     }
 
-    public short readHalfWord(int addr) {
-        byte[] buf = new byte[2];
-        this.access(addr, 2, buf, false, true);
-        return ByteBuffer.wrap(buf).order(this.littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN).getShort();
+    public short readHalfWord(int address) {
+        byte[] buffer = new byte[2];
+        this.access(address, 2, buffer, false, true);
+        return ByteBuffer.wrap(buffer).order(this.littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN).getShort();
     }
 
-    public int readWord(int addr) {
-        byte[] buf = new byte[4];
-        this.access(addr, 4, buf, false, true);
-        return ByteBuffer.wrap(buf).order(this.littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN).getInt();
+    public int readWord(int address) {
+        byte[] buffer = new byte[4];
+        this.access(address, 4, buffer, false, true);
+        return ByteBuffer.wrap(buffer).order(this.littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN).getInt();
     }
 
-    public long readDoubleWord(int addr) {
-        byte[] buf = new byte[8];
-        this.access(addr, 8, buf, false, true);
-        return ByteBuffer.wrap(buf).order(this.littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN).getLong();
+    public long readDoubleWord(int address) {
+        byte[] buffer = new byte[8];
+        this.access(address, 8, buffer, false, true);
+        return ByteBuffer.wrap(buffer).order(this.littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN).getLong();
     }
 
-    public byte[] readBlock(int addr, int size) {
-        byte[] buf = new byte[size];
-        this.access(addr, size, buf, false, true);
-        return buf;
+    public byte[] readBlock(int address, int size) {
+        byte[] buffer = new byte[size];
+        this.access(address, size, buffer, false, true);
+        return buffer;
     }
 
-    public String readString(int addr, int size) {
-        byte[] data = this.readBlock(addr, size);
+    public String readString(int address, int size) {
+        byte[] data = this.readBlock(address, size);
 
         StringBuilder sb = new StringBuilder();
         for (int i = 0; data[i] != '\0'; i++) {
@@ -100,54 +100,54 @@ public class Memory extends BasicSimulationObject {
         return sb.toString();
     }
 
-    public void writeByte(int addr, byte data) {
-        byte[] buf = new byte[]{data};
-        this.access(addr, 1, buf, true, true);
+    public void writeByte(int address, byte data) {
+        byte[] buffer = new byte[]{data};
+        this.access(address, 1, buffer, true, true);
     }
 
-    public void writeHalfWord(int addr, short data) {
-        byte[] buf = new byte[2];
-        ByteBuffer.wrap(buf).order(this.littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN).putShort(data);
-        this.access(addr, 2, buf, true, true);
+    public void writeHalfWord(int address, short data) {
+        byte[] buffer = new byte[2];
+        ByteBuffer.wrap(buffer).order(this.littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN).putShort(data);
+        this.access(address, 2, buffer, true, true);
     }
 
-    public void writeWord(int addr, int data) {
-        byte[] buf = new byte[4];
-        ByteBuffer.wrap(buf).order(this.littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN).putInt(data);
-        this.access(addr, 4, buf, true, true);
+    public void writeWord(int address, int data) {
+        byte[] buffer = new byte[4];
+        ByteBuffer.wrap(buffer).order(this.littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN).putInt(data);
+        this.access(address, 4, buffer, true, true);
     }
 
-    public void writeDoubleWord(int addr, long data) {
-        byte[] buf = new byte[8];
-        ByteBuffer.wrap(buf).order(this.littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN).putLong(data);
-        this.access(addr, 8, buf, true, true);
+    public void writeDoubleWord(int address, long data) {
+        byte[] buffer = new byte[8];
+        ByteBuffer.wrap(buffer).order(this.littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN).putLong(data);
+        this.access(address, 8, buffer, true, true);
     }
 
-    public int writeString(int addr, String data) {
-        byte[] buf = (data + "\0").getBytes();
-        int bytesCount = buf.length;
-        this.access(addr, bytesCount, buf, true, true);
+    public int writeString(int address, String data) {
+        byte[] buffer = (data + "\0").getBytes();
+        int bytesCount = buffer.length;
+        this.access(address, bytesCount, buffer, true, true);
         return bytesCount;
     }
 
-    public void writeBlock(int addr, int size, byte[] data) {
-        this.access(addr, size, data, true, true);
+    public void writeBlock(int address, int size, byte[] data) {
+        this.access(address, size, data, true, true);
     }
 
-    public void zero(int addr, int size) {
-        this.writeBlock(addr, size, new byte[size]);
+    public void zero(int address, int size) {
+        this.writeBlock(address, size, new byte[size]);
     }
 
-    public void access(int addr, int size, byte[] buf, boolean write, boolean createNewPageIfNecessary) {
+    public void access(int address, int size, byte[] buffer, boolean write, boolean createNewPageIfNecessary) {
         if (this.speculative) {
-            this.doSpeculativeAccess(addr, size, buf, write);
+            this.doSpeculativeAccess(address, size, buffer, write);
         } else {
-            this.doNonSpeculativeAccess(addr, size, buf, write, createNewPageIfNecessary);
+            this.doNonSpeculativeAccess(address, size, buffer, write, createNewPageIfNecessary);
         }
     }
 
-    private void doSpeculativeAccess(int addr, int size, byte[] buf, boolean write) {
-        int tag = addr >> SpeculativeMemoryBlock.BLOCK_LOGSIZE;
+    private void doSpeculativeAccess(int address, int size, byte[] buffer, boolean write) {
+        int tag = address >> SpeculativeMemoryBlock.BLOCK_LOGSIZE;
         int index = tag % SpeculativeMemoryBlock.COUNT;
 
         SpeculativeMemoryBlock blockFound = null;
@@ -170,19 +170,19 @@ public class Memory extends BasicSimulationObject {
 
             this.speculativeMemoryBlocks.get(index).add(0, blockFound);
 
-            this.doNonSpeculativeAccess(addr & ~(SpeculativeMemoryBlock.BLOCK_SIZE - 1), SpeculativeMemoryBlock.BLOCK_SIZE, blockFound.data, write, false);
+            this.doNonSpeculativeAccess(address & ~(SpeculativeMemoryBlock.BLOCK_SIZE - 1), SpeculativeMemoryBlock.BLOCK_SIZE, blockFound.data, write, false);
         }
 
-        if ((size & (size - 1)) != 0 || size > SpeculativeMemoryBlock.BLOCK_SIZE || (addr & (size - 1)) != 0) {
+        if ((size & (size - 1)) != 0 || size > SpeculativeMemoryBlock.BLOCK_SIZE || (address & (size - 1)) != 0) {
             return;
         }
 
-        int displacement = addr & (SpeculativeMemoryBlock.BLOCK_SIZE - 1);
+        int displacement = address & (SpeculativeMemoryBlock.BLOCK_SIZE - 1);
 
         if (!write) {
-            System.arraycopy(blockFound.data, displacement, buf, 0, size);
+            System.arraycopy(blockFound.data, displacement, buffer, 0, size);
         } else {
-            System.arraycopy(buf, 0, blockFound.data, displacement, size);
+            System.arraycopy(buffer, 0, blockFound.data, displacement, size);
         }
     }
 
@@ -195,29 +195,29 @@ public class Memory extends BasicSimulationObject {
         this.speculative = false;
     }
 
-    private void doNonSpeculativeAccess(int addr, int size, byte[] buf, boolean write, boolean createNewPageIfNecessary) {
+    private void doNonSpeculativeAccess(int address, int size, byte[] buffer, boolean write, boolean createNewPageIfNecessary) {
         int offset = 0;
 
         int pageSize = getPageSize();
 
         while (size > 0) {
-            int chunkSize = Math.min(size, pageSize - getDisplacement(addr));
-            this.accessPageBoundary(addr, chunkSize, buf, offset, write, createNewPageIfNecessary);
+            int chunkSize = Math.min(size, pageSize - getDisplacement(address));
+            this.accessPageBoundary(address, chunkSize, buffer, offset, write, createNewPageIfNecessary);
 
             size -= chunkSize;
             offset += chunkSize;
-            addr += chunkSize;
+            address += chunkSize;
         }
     }
 
-    public int map(int addr, int size) {
+    public int map(int address, int size) {
         int tagStart, tagEnd;
 
-        tagStart = tagEnd = getTag(addr);
+        tagStart = tagEnd = getTag(address);
 
         int pageSize = getPageSize();
 
-        for (int pageCount = (getTag(addr + size - 1) - tagStart) / pageSize + 1; ; ) {
+        for (int pageCount = (getTag(address + size - 1) - tagStart) / pageSize + 1; ; ) {
             if (tagEnd == 0) {
                 return -1;
             }
@@ -244,9 +244,9 @@ public class Memory extends BasicSimulationObject {
     }
 
     //TODO: fixme, and fix mmap and brk system call implementations!!!, see: http://www.makelinux.net/ldd3/chp-15-sect-1
-//    public void map2(int addr, int size) {
-//        int tagStart = getTag(addr);
-//        int tagEnd = getTag(addr + size - 1);
+//    public void map2(int address, int size) {
+//        int tagStart = getTag(address);
+//        int tagEnd = getTag(address + size - 1);
 //
 //        int pageSize = getPageSize();
 //
@@ -257,9 +257,9 @@ public class Memory extends BasicSimulationObject {
 //        }
 //    }
 
-    public void unmap(int addr, int size) {
-        int tagStart = getTag(addr);
-        int tagEnd = getTag(addr + size - 1);
+    public void unmap(int address, int size) {
+        int tagStart = getTag(address);
+        int tagEnd = getTag(address + size - 1);
 
         int pageSize = getPageSize();
 
@@ -279,10 +279,10 @@ public class Memory extends BasicSimulationObject {
         return start;
     }
 
-    private void copyPages(int tagDest, int tagSrc, int numPages) {
+    private void copyPages(int tagDestination, int tagSource, int numPages) {
         throw new UnsupportedOperationException(); //TODO: support it using BigMemory
 //        for (int i = 0; i < numPages; i++) {
-//            this.getPage(tagDest + i * getPageSize()).bb = this.getPage(tagSrc + i * getPageSize()).bb;
+//            this.getPage(tagDestination + i * getPageSize()).bb = this.getPage(tagSource + i * getPageSize()).bb;
 //        }
     }
 
@@ -290,14 +290,14 @@ public class Memory extends BasicSimulationObject {
         return this.getPage(virtualAddress).physicalAddress + getDisplacement(virtualAddress);
     }
 
-    private Page getPage(int addr) {
-        int index = getIndex(addr);
+    private Page getPage(int address) {
+        int index = getIndex(address);
 
         return this.pages.containsKey(index) ? this.pages.get(index) : null;
     }
 
-    private Page addPage(int addr) {
-        int index = getIndex(addr);
+    private Page addPage(int address) {
+        int index = getIndex(address);
 
         this.numPages++;
         Page page = new Page(getExperiment().currentMemoryPageId++);
@@ -307,21 +307,21 @@ public class Memory extends BasicSimulationObject {
         return page;
     }
 
-    private void removePage(int addr) {
-        int index = getIndex(addr);
+    private void removePage(int address) {
+        int index = getIndex(address);
 
         this.pages.remove(index);
     }
 
-    private void accessPageBoundary(int addr, int size, byte[] buf, int offset, boolean write, boolean createNewPageIfNecessary) {
-        Page page = this.getPage(addr);
+    private void accessPageBoundary(int address, int size, byte[] buffer, int offset, boolean write, boolean createNewPageIfNecessary) {
+        Page page = this.getPage(address);
 
         if (page == null && createNewPageIfNecessary) {
-            page = this.addPage(getTag(addr));
+            page = this.addPage(getTag(address));
         }
 
         if (page != null) {
-            page.doAccess(addr, buf, offset, size, write);
+            page.doAccess(address, buffer, offset, size, write);
         }
     }
 
@@ -329,14 +329,14 @@ public class Memory extends BasicSimulationObject {
         this.byteBuffers.put(id, ByteBuffer.allocate(Memory.getPageSize()).order(isLittleEndian() ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN));
     }
 
-    protected void doPageAccess(int pageId, int displacement, byte[] buf, int offset, int size, boolean write) {
+    protected void doPageAccess(int pageId, int displacement, byte[] buffer, int offset, int size, boolean write) {
         ByteBuffer bb = getByteBuffer(pageId);
         bb.position(displacement);
 
         if (write) {
-            bb.put(buf, offset, size);
+            bb.put(buffer, offset, size);
         } else {
-            bb.get(buf, offset, size);
+            bb.get(buffer, offset, size);
         }
     }
 
@@ -383,8 +383,8 @@ public class Memory extends BasicSimulationObject {
             onPageCreated(id);
         }
 
-        private void doAccess(int addr, byte[] buf, int offset, int size, boolean write) {
-            doPageAccess(id, getDisplacement(addr), buf, offset, size, write);
+        private void doAccess(int address, byte[] buffer, int offset, int size, boolean write) {
+            doPageAccess(id, getDisplacement(address), buffer, offset, size, write);
         }
     }
 
@@ -404,16 +404,16 @@ public class Memory extends BasicSimulationObject {
 
     private static final CacheGeometry geometry = new CacheGeometry(-1, 1, 1 << 12);
 
-    public static int getDisplacement(int addr) {
-        return CacheGeometry.getDisplacement(addr, geometry);
+    public static int getDisplacement(int address) {
+        return CacheGeometry.getDisplacement(address, geometry);
     }
 
-    private static int getTag(int addr) {
-        return CacheGeometry.getTag(addr, geometry);
+    private static int getTag(int address) {
+        return CacheGeometry.getTag(address, geometry);
     }
 
-    private static int getIndex(int addr) {
-        return CacheGeometry.getLineId(addr, geometry);
+    private static int getIndex(int address) {
+        return CacheGeometry.getLineId(address, geometry);
     }
 
     public static int getPageSizeInLog2() {

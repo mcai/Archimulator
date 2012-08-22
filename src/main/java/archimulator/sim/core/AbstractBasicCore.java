@@ -40,7 +40,7 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
     protected CacheController l1ICacheController;
     protected CacheController l1DCacheController;
 
-    protected FunctionalUnitPool fuPool;
+    protected FunctionalUnitPool functionalUnitPool;
 
     protected List<AbstractReorderBufferEntry> waitingInstructionQueue;
     protected List<AbstractReorderBufferEntry> readyInstructionQueue;
@@ -62,7 +62,7 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
 
         this.threads = new ArrayList<Thread>();
 
-        this.fuPool = new FunctionalUnitPool(this);
+        this.functionalUnitPool = new FunctionalUnitPool(this);
 
         this.waitingInstructionQueue = new ArrayList<AbstractReorderBufferEntry>();
         this.readyInstructionQueue = new ArrayList<AbstractReorderBufferEntry>();
@@ -281,7 +281,7 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
             thread.updatePerCycleStats();
         }
 
-        this.fuPool.updatePerCycleStats();
+        this.functionalUnitPool.updatePerCycleStats();
     }
 
     public String getName() {
@@ -300,8 +300,8 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
         return threads;
     }
 
-    public FunctionalUnitPool getFuPool() {
-        return fuPool;
+    public FunctionalUnitPool getFunctionalUnitPool() {
+        return functionalUnitPool;
     }
 
     public List<AbstractReorderBufferEntry> getWaitingInstructionQueue() {

@@ -64,7 +64,7 @@ public class BasicMemoryController extends MemoryController {
             this.getCycleAccurateEventQueue().schedule(this, new Action() {
                 @Override
                 public void apply() {
-                    accessDram(currentAddress,new Action() {
+                    accessDram(currentAddress, new Action() {
                         @Override
                         public void apply() {
                             counterPending.dec();

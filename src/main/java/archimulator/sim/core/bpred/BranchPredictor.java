@@ -26,9 +26,8 @@ public abstract class BranchPredictor {
     private String name;
     private BranchPredictorType type;
 
-    protected long accesses;
-    protected long hits;
-    protected long misses;
+    protected long numHits;
+    protected long numMisses;
 
     private Thread thread;
 
@@ -38,15 +37,13 @@ public abstract class BranchPredictor {
         this.type = type;
     }
 
-    public abstract int predict(int baddr, int btarget, Mnemonic mnemonic, BranchPredictorUpdate dirUpdate, Reference<Integer> returnAddressStackRecoverIndex);
+    public abstract int predict(int branchAddress, int branchTarget, Mnemonic mnemonic, BranchPredictorUpdate dirUpdate, Reference<Integer> returnAddressStackRecoverIndex);
 
-    public void update(int baddr, int btarget, boolean taken, boolean predTaken, boolean correct, Mnemonic mnemonic, BranchPredictorUpdate dirUpdate) {
-        this.accesses++;
-
+    public void update(int branchAddress, int branchTarget, boolean taken, boolean predictedTaken, boolean correct, Mnemonic mnemonic, BranchPredictorUpdate branchPredictorUpdate) {
         if (correct) {
-            this.hits++;
+            this.numHits++;
         } else {
-            this.misses++;
+            this.numMisses++;
         }
     }
 
@@ -60,20 +57,20 @@ public abstract class BranchPredictor {
         return type;
     }
 
-    public long getAccesses() {
-        return accesses;
+    public long getNumAccesses() {
+        return numHits + numMisses;
     }
 
-    public long getHits() {
-        return hits;
+    public long getNumHits() {
+        return numHits;
     }
 
-    public long getMisses() {
-        return misses;
+    public long getNumMisses() {
+        return numMisses;
     }
 
     public double getHitRatio() {
-        return this.accesses > 0 ? (double) this.hits / this.accesses : 0.0;
+        return this.getNumAccesses() > 0 ? (double) this.numHits / this.getNumAccesses() : 0.0;
     }
 
     public Thread getThread() {

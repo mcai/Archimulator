@@ -93,7 +93,7 @@ public abstract class NetBuffer {
 
     private void doPendingFullActions() {
         if (!this.pendingFullActions.isEmpty()) {
-            final Action action = this.pendingFullActions.get(0);
+            Action action = this.pendingFullActions.get(0);
             action.apply();
             this.pendingFullActions.remove(action);
         }
@@ -107,10 +107,6 @@ public abstract class NetBuffer {
 
     public int getCount() {
         return count;
-    }
-
-    public void setCount(int count) {
-        this.count = count;
     }
 
     public boolean isReadBusy() {

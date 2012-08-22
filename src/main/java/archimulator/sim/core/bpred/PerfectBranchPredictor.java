@@ -28,8 +28,8 @@ public class PerfectBranchPredictor extends BranchPredictor {
     }
 
     @Override
-    public int predict(int baddr, int btarget, Mnemonic mnemonic, BranchPredictorUpdate dirUpdate, Reference<Integer> returnAddressStackRecoverIndex) {
-        return this.getThread().getContext().getRegs().getNnpc();
+    public int predict(int branchAddress, int branchTarget, Mnemonic mnemonic, BranchPredictorUpdate branchPredictorUpdate, Reference<Integer> returnAddressStackRecoverIndex) {
+        return this.getThread().getContext().getRegisterFile().getNnpc();
     }
 
     @Override

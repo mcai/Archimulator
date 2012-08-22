@@ -26,11 +26,11 @@ import java.util.EnumSet;
 
 public class FunctionalUnitPool {
     private EnumMap<FunctionalUnitType, FunctionalUnitDescriptor> descriptors;
-    private EnumMap<FunctionalUnitOperationType, FunctionalUnitType> fuOperationToFuMap;
+    private EnumMap<FunctionalUnitOperationType, FunctionalUnitType> functionalUnitOperationToFunctionalUnitMap;
     private AbstractBasicCore core;
 
-    private EnumMap<FunctionalUnitType, Long> noFreeFu;
-    private EnumMap<FunctionalUnitOperationType, Long> acquireFailedOnNoFreeFu;
+    private EnumMap<FunctionalUnitType, Long> noFreeFunctionalUnit;
+    private EnumMap<FunctionalUnitOperationType, Long> acquireFailedOnNoFreeFunctionalUnit;
 
     private enum FunctionalUnitType {
         INTEGER_ALU,
@@ -57,7 +57,7 @@ public class FunctionalUnitPool {
 
         private FunctionalUnitDescriptor addFunctionalUnitOperation(FunctionalUnitOperationType fuOperationType, int operationLatency, int issueLatency) {
             this.operations.put(fuOperationType, new FunctionalUnitOperation(operationLatency, issueLatency));
-            fuOperationToFuMap.put(fuOperationType, this.type);
+            functionalUnitOperationToFunctionalUnitMap.put(fuOperationType, this.type);
             return this;
         }
 
@@ -85,7 +85,7 @@ public class FunctionalUnitPool {
 
         this.descriptors = new EnumMap<FunctionalUnitType, FunctionalUnitDescriptor>(FunctionalUnitType.class);
 
-        this.fuOperationToFuMap = new EnumMap<FunctionalUnitOperationType, FunctionalUnitType>(FunctionalUnitOperationType.class);
+        this.functionalUnitOperationToFunctionalUnitMap = new EnumMap<FunctionalUnitOperationType, FunctionalUnitType>(FunctionalUnitOperationType.class);
 
         this.addFunctionalUnitDescriptor(FunctionalUnitType.INTEGER_ALU, 8)
                 .addFunctionalUnitOperation(FunctionalUnitOperationType.INT_ALU, 2, 1);
@@ -108,16 +108,16 @@ public class FunctionalUnitPool {
                 .addFunctionalUnitOperation(FunctionalUnitOperationType.READ_PORT, 1, 1)
                 .addFunctionalUnitOperation(FunctionalUnitOperationType.WRITE_PORT, 1, 1);
 
-        this.noFreeFu = new EnumMap<FunctionalUnitType, Long>(FunctionalUnitType.class);
+        this.noFreeFunctionalUnit = new EnumMap<FunctionalUnitType, Long>(FunctionalUnitType.class);
         EnumSet<FunctionalUnitType> fuTypes = EnumSet.allOf(FunctionalUnitType.class);
         for (FunctionalUnitType fuTye : fuTypes) {
-            this.noFreeFu.put(fuTye, 0L);
+            this.noFreeFunctionalUnit.put(fuTye, 0L);
         }
 
-        this.acquireFailedOnNoFreeFu = new EnumMap<FunctionalUnitOperationType, Long>(FunctionalUnitOperationType.class);
+        this.acquireFailedOnNoFreeFunctionalUnit = new EnumMap<FunctionalUnitOperationType, Long>(FunctionalUnitOperationType.class);
         EnumSet<FunctionalUnitOperationType> fuOperationTypes = EnumSet.allOf(FunctionalUnitOperationType.class);
         for (FunctionalUnitOperationType fuOperationType : fuOperationTypes) {
-            this.acquireFailedOnNoFreeFu.put(fuOperationType, 0L);
+            this.acquireFailedOnNoFreeFunctionalUnit.put(fuOperationType, 0L);
         }
     }
 
@@ -128,14 +128,14 @@ public class FunctionalUnitPool {
     }
 
     public boolean acquire(final ReorderBufferEntry reorderBufferEntry, final Action1<ReorderBufferEntry> onCompletedCallback) {
-        FunctionalUnitOperationType fuOperationType = reorderBufferEntry.getDynamicInst().getStaticInst().getMnemonic().getFuOperationType();
-        FunctionalUnitType fuType = this.fuOperationToFuMap.get(fuOperationType);
-        FunctionalUnitOperation fuOperation = this.descriptors.get(fuType).operations.get(fuOperationType);
+        FunctionalUnitOperationType functionalUnitOperationType = reorderBufferEntry.getDynamicInstruction().getStaticInstruction().getMnemonic().getFunctionalUnitOperationType();
+        FunctionalUnitType functionalUnitType = this.functionalUnitOperationToFunctionalUnitMap.get(functionalUnitOperationType);
+        FunctionalUnitOperation functionalUnitOperation = this.descriptors.get(functionalUnitType).operations.get(functionalUnitOperationType);
 
-        final FunctionalUnitDescriptor fuDescriptor = this.descriptors.get(fuType);
+        final FunctionalUnitDescriptor functionalUnitDescriptor = this.descriptors.get(functionalUnitType);
 
-        if (fuDescriptor.isFull()) {
-            this.acquireFailedOnNoFreeFu.put(fuOperationType, this.acquireFailedOnNoFreeFu.get(fuOperationType) + 1);
+        if (functionalUnitDescriptor.isFull()) {
+            this.acquireFailedOnNoFreeFunctionalUnit.put(functionalUnitOperationType, this.acquireFailedOnNoFreeFunctionalUnit.get(functionalUnitOperationType) + 1);
 
             return false;
         }
@@ -144,9 +144,9 @@ public class FunctionalUnitPool {
                 .schedule(this, new Action() {
                     @Override
                     public void apply() {
-                        fuDescriptor.numFree++;
+                        functionalUnitDescriptor.numFree++;
                     }
-                }, fuOperation.issueLatency)
+                }, functionalUnitOperation.issueLatency)
                 .schedule(this, new Action() {
                     @Override
                     public void apply() {
@@ -154,9 +154,9 @@ public class FunctionalUnitPool {
                             onCompletedCallback.apply(reorderBufferEntry);
                         }
                     }
-                }, fuOperation.operationLatency);
+                }, functionalUnitOperation.operationLatency);
 
-        fuDescriptor.numFree--;
+        functionalUnitDescriptor.numFree--;
 
         return true;
     }
@@ -168,18 +168,18 @@ public class FunctionalUnitPool {
     }
 
     public void updatePerCycleStats() {
-        for (FunctionalUnitType fuType : FunctionalUnitPool.this.noFreeFu.keySet()) {
+        for (FunctionalUnitType fuType : FunctionalUnitPool.this.noFreeFunctionalUnit.keySet()) {
             if (this.descriptors.get(fuType).isFull()) {
-                this.noFreeFu.put(fuType, this.noFreeFu.get(fuType) + 1);
+                this.noFreeFunctionalUnit.put(fuType, this.noFreeFunctionalUnit.get(fuType) + 1);
             }
         }
     }
 
-    public EnumMap<FunctionalUnitType, Long> getNoFreeFu() {
-        return noFreeFu;
+    public EnumMap<FunctionalUnitType, Long> getNoFreeFunctionalUnit() {
+        return noFreeFunctionalUnit;
     }
 
-    public EnumMap<FunctionalUnitOperationType, Long> getAcquireFailedOnNoFreeFu() {
-        return acquireFailedOnNoFreeFu;
+    public EnumMap<FunctionalUnitOperationType, Long> getAcquireFailedOnNoFreeFunctionalUnit() {
+        return acquireFailedOnNoFreeFunctionalUnit;
     }
 }

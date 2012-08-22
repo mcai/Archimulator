@@ -37,19 +37,19 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
 
     private SignalMasks signalMasks;
 
-    private int sigFinish;
+    private int signalFinish;
 
-    private ArchitecturalRegisterFile regs;
+    private ArchitecturalRegisterFile registerFile;
 
     private Kernel kernel;
 
     private int threadId = -1;
 
-    private int uid;
-    private int euid;
-    private int gid;
-    private int egid;
-    private int pid;
+    private int userId;
+    private int effectiveUserId;
+    private int groupId;
+    private int effectiveGroupId;
+    private int processId;
 
     private Process process;
     private Context parent;
@@ -60,7 +60,7 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
 
     private boolean speculative;
 
-    private ArchitecturalRegisterFile speculativeRegs;
+    private ArchitecturalRegisterFile speculativeRegisterFile;
 
     public static Context load(Kernel kernel, String simulationDirectory, ContextMapping contextMapping) {
         Process process = new BasicProcess(kernel, simulationDirectory, contextMapping);
@@ -68,33 +68,33 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
         ArchitecturalRegisterFile regs = new ArchitecturalRegisterFile(process.isLittleEndian());
         regs.setNpc(process.getProgramEntry());
         regs.setNnpc(regs.getNpc() + 4);
-        regs.setGpr(ArchitecturalRegisterFile.REG_SP, process.getEnvironBase());
+        regs.setGpr(ArchitecturalRegisterFile.REGISTER_SP, process.getEnvironmentBase());
 
         return new Context(kernel, process, null, regs, 0);
     }
 
-    public Context(Context parent, ArchitecturalRegisterFile regs, int sigFinish) {
-        this(parent.kernel, parent.process, parent, regs, sigFinish);
+    public Context(Context parent, ArchitecturalRegisterFile registerFile, int signalFinish) {
+        this(parent.kernel, parent.process, parent, registerFile, signalFinish);
     }
 
-    public Context(Kernel kernel, Process process, Context parent, ArchitecturalRegisterFile regs, int sigFinish) {
+    public Context(Kernel kernel, Process process, Context parent, ArchitecturalRegisterFile registerFile, int signalFinish) {
         super(kernel);
 
         this.kernel = kernel;
 
         this.parent = parent;
 
-        this.regs = regs;
-        this.sigFinish = sigFinish;
+        this.registerFile = registerFile;
+        this.signalFinish = signalFinish;
 
         this.id = kernel.currentContextId++;
 
-        this.uid = (int) NativeSystemCalls.LIBC.getuid();
-        this.euid = (int) NativeSystemCalls.LIBC.geteuid();
-        this.gid = (int) NativeSystemCalls.LIBC.getgid();
-        this.egid = (int) NativeSystemCalls.LIBC.getegid();
+        this.userId = (int) NativeSystemCalls.LIBC.getuid();
+        this.effectiveUserId = (int) NativeSystemCalls.LIBC.geteuid();
+        this.groupId = (int) NativeSystemCalls.LIBC.getgid();
+        this.effectiveGroupId = (int) NativeSystemCalls.LIBC.getegid();
 
-        this.pid = kernel.currentPid++;
+        this.processId = kernel.currentPid++;
 
         this.signalMasks = new SignalMasks();
 
@@ -108,7 +108,7 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
     public void enterSpeculativeState() {
         try {
             this.process.getMemory().enterSpeculativeState();
-            this.speculativeRegs = (ArchitecturalRegisterFile) this.regs.clone();
+            this.speculativeRegisterFile = (ArchitecturalRegisterFile) this.registerFile.clone();
             this.speculative = true;
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException(e);
@@ -117,34 +117,38 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
 
     public void exitSpeculativeState() {
         this.process.getMemory().exitSpeculativeState();
-        this.speculativeRegs = null;
+        this.speculativeRegisterFile = null;
         this.speculative = false;
     }
 
     public StaticInstruction decodeNextInstruction() {
-        this.getRegs().setPc(this.getRegs().getNpc());
-        this.getRegs().setNpc(this.getRegs().getNnpc());
-        this.getRegs().setNnpc(this.getRegs().getNnpc() + 4);
-        this.getRegs().setGpr(ArchitecturalRegisterFile.REG_ZERO, 0);
+        this.getRegisterFile().setPc(this.getRegisterFile().getNpc());
+        this.getRegisterFile().setNpc(this.getRegisterFile().getNnpc());
+        this.getRegisterFile().setNnpc(this.getRegisterFile().getNnpc() + 4);
+        this.getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_ZERO, 0);
 
         this.pseudoCallEncounteredInLastInstructionExecution = false;
 
-        return this.decode(this.getRegs().getPc());
+        return this.decode(this.getRegisterFile().getPc());
     }
 
     protected StaticInstruction decode(int mappedPc) {
-        return this.process.getStaticInst(mappedPc);
+        return this.process.getStaticInstruction(mappedPc);
     }
 
     public void suspend() {
-        assert (this.state != ContextState.BLOCKED);
+        if ((this.state == ContextState.BLOCKED)) {
+            throw new IllegalArgumentException();
+        }
         this.state = ContextState.BLOCKED;
 
 //        Logger.infof(Logger.THREAD, "%s: thread suspended\n", this.getThread().getName());
     }
 
     public void resume() {
-        assert (this.state == ContextState.BLOCKED);
+        if ((this.state != ContextState.BLOCKED)) {
+            throw new IllegalArgumentException();
+        }
         this.state = ContextState.RUNNING;
 
 //        Logger.infof(Logger.THREAD, "%s: thread resumed\n", this.getThread().getName());
@@ -152,7 +156,7 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
 
     public void finish() {
         if (this.state == ContextState.FINISHED) {
-            throw new RuntimeException();
+            throw new IllegalArgumentException();
         }
 
         this.state = ContextState.FINISHED;
@@ -163,8 +167,8 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
             }
         }
 
-        if (this.sigFinish != 0 && this.parent != null) {
-            this.parent.getSignalMasks().getPending().set(this.sigFinish);
+        if (this.signalFinish != 0 && this.parent != null) {
+            this.parent.getSignalMasks().getPending().set(this.signalFinish);
         }
 
 //        Logger.infof(Logger.THREAD, "%s: thread finished\n", this.getThread().getName());
@@ -182,12 +186,12 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
         this.state = state;
     }
 
-    public ArchitecturalRegisterFile getRegs() {
-        return !speculative ? regs : speculativeRegs;
+    public ArchitecturalRegisterFile getRegisterFile() {
+        return !speculative ? registerFile : speculativeRegisterFile;
     }
 
-    public void setRegs(ArchitecturalRegisterFile regs) {
-        this.regs = regs;
+    public void setRegisterFile(ArchitecturalRegisterFile registerFile) {
+        this.registerFile = registerFile;
     }
 
     public SignalMasks getSignalMasks() {
@@ -221,28 +225,28 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
         return process;
     }
 
-    public int getUid() {
-        return uid;
+    public int getUserId() {
+        return userId;
     }
 
-    public int getEuid() {
-        return euid;
+    public int getEffectiveUserId() {
+        return effectiveUserId;
     }
 
-    public int getGid() {
-        return gid;
+    public int getGroupId() {
+        return groupId;
     }
 
-    public int getEgid() {
-        return egid;
+    public int getEffectiveGroupId() {
+        return effectiveGroupId;
     }
 
-    public int getPid() {
-        return pid;
+    public int getProcessId() {
+        return processId;
     }
 
-    public int getPpid() {
-        return parent == null ? 1 : parent.getPid();
+    public int getParentProcessId() {
+        return parent == null ? 1 : parent.getProcessId();
     }
 
     public Stack<FunctionCallContext> getFunctionCallContextStack() {

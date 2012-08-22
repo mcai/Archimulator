@@ -39,12 +39,12 @@ public class ServiceManager {
         architectureService = new ArchitectureServiceImpl();
         experimentService = new ExperimentServiceImpl();
 
-        Runtime.getRuntime().addShutdownHook(new Thread(){
+        Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
-                if(runningExperiments) {
-                    for(Experiment experiment : experimentService.getAllExperiments()) {
-                        if(experiment.getState() == ExperimentState.RUNNING) {
+                if (runningExperiments) {
+                    for (Experiment experiment : experimentService.getAllExperiments()) {
+                        if (experiment.getState() == ExperimentState.RUNNING) {
                             experiment.setFailedReason("");
                             experiment.setState(ExperimentState.PENDING);
                             experiment.getStats().clear();

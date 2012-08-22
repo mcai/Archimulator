@@ -22,20 +22,20 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class RegisterRenameTable {
-    private final String name;
-    private final Map<Integer, PhysicalRegisterFile.PhysicalRegister> entries;
+    private String name;
+    private Map<Integer, PhysicalRegisterFile.PhysicalRegister> entries;
 
     public RegisterRenameTable(String name) {
         this.name = name;
         this.entries = new TreeMap<Integer, PhysicalRegisterFile.PhysicalRegister>();
     }
 
-    public PhysicalRegisterFile.PhysicalRegister get(int dep) {
-        return this.entries.get(dep);
+    public PhysicalRegisterFile.PhysicalRegister get(int dependency) {
+        return this.entries.get(dependency);
     }
 
-    public void put(int dep, PhysicalRegisterFile.PhysicalRegister physReg) {
-        this.entries.put(dep, physReg);
+    public void put(int dependency, PhysicalRegisterFile.PhysicalRegister physicalRegister) {
+        this.entries.put(dependency, physicalRegister);
     }
 
     public String getName() {

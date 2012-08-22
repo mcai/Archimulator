@@ -23,17 +23,17 @@ import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
 
 public class FunctionalSimulation extends Simulation {
-    private long numMaxInsts;
+    private long numMaxInstructions;
 
-    public FunctionalSimulation(String title, Experiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, int numMaxInsts) {
+    public FunctionalSimulation(String title, Experiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, int numMaxInstructions) {
         super(title, SimulationType.FAST_FORWARD, experiment, blockingEventDispatcher, cycleAccurateEventQueue);
 
-        this.numMaxInsts = numMaxInsts;
+        this.numMaxInstructions = numMaxInstructions;
     }
 
     @Override
     public boolean canDoFastForwardOneCycle() {
-        return numMaxInsts == -1 || this.getProcessor().getCores().get(0).getThreads().get(0).getTotalInsts() < this.numMaxInsts;
+        return numMaxInstructions == -1 || this.getProcessor().getCores().get(0).getThreads().get(0).getTotalInstructions() < this.numMaxInstructions;
     }
 
     @Override

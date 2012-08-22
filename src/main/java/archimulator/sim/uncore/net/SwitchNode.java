@@ -19,7 +19,7 @@
 package archimulator.sim.uncore.net;
 
 public class SwitchNode extends NetNode {
-    public SwitchNode(Net net, String name, int inPortCount, int inBufferSize, int outPortCount, int outBufferSize, int bandwidth) {
-        super(net, name, inPortCount, inBufferSize, outPortCount, outBufferSize, bandwidth);
+    public SwitchNode(Net net, String name, int numInPorts, int inBufferSize, int numOutPorts, int outBufferSize, int bandwidth) {
+        super(net, name, numInPorts, inBufferSize, numOutPorts, outBufferSize, bandwidth);
     }
 }

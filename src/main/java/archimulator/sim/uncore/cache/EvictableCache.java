@@ -1,4 +1,4 @@
-package archimulator.sim.uncore.cache; /*******************************************************************************
+/*******************************************************************************
  * Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).
  *
  * This file is part of the Archimulator multicore architectural simulator.
@@ -16,6 +16,7 @@ package archimulator.sim.uncore.cache; /****************************************
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+package archimulator.sim.uncore.cache;
 
 import archimulator.sim.common.SimulationObject;
 import archimulator.sim.uncore.MemoryHierarchyAccess;

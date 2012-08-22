@@ -23,26 +23,21 @@ import org.apache.commons.io.FileUtils;
 public class StorageUnitHelper {
     public static long displaySizeToByteCount(String displaySize) {
         String[] parts = displaySize.split(" ");
-        if(parts.length == 2) {
+        if (parts.length == 2) {
             double scale = Double.parseDouble(parts[0]);
             String unit = parts[1];
 
-            if(unit.equals("KB")) {
+            if (unit.equals("KB")) {
                 return (long) (scale * FileUtils.ONE_KB);
-            }
-            else if(unit.equals("MB")) {
+            } else if (unit.equals("MB")) {
                 return (long) (scale * FileUtils.ONE_MB);
-            }
-            else if(unit.equals("GB")) {
+            } else if (unit.equals("GB")) {
                 return (long) (scale * FileUtils.ONE_GB);
-            }
-            else if(unit.equals("TB")) {
+            } else if (unit.equals("TB")) {
                 return (long) (scale * FileUtils.ONE_TB);
-            }
-            else if(unit.equals("PB")) {
+            } else if (unit.equals("PB")) {
                 return (long) (scale * FileUtils.ONE_PB);
-            }
-            else if(unit.equals("EB")) {
+            } else if (unit.equals("EB")) {
                 return (long) (scale * FileUtils.ONE_EB);
             }
         }

@@ -91,7 +91,7 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
                 candidateThread.updateFetchNpcAndNnpcFromRegs();
             } else if (context.getState() == ContextState.FINISHED) {
                 Thread thread = this.contextToThreadMappings.get(context);
-                if (thread.isLastDecodedDynamicInstCommitted() && thread.getReorderBuffer().isEmpty()) {
+                if (thread.isLastDecodedDynamicInstructionCommitted() && thread.getReorderBuffer().isEmpty()) {
                     this.kill(context);
                     it.remove();
                 }

@@ -28,43 +28,43 @@ public class TwoBitBranchPredictor extends DynamicBranchPredictor {
     private int size;
     private SaturatingCounter[] table;
 
-    public TwoBitBranchPredictor(Thread thread, String name, int bimodSize, int btbSets, int btbAssoc, int retStackSize) {
-        super(thread, name, BranchPredictorType.TWO_BIT, btbSets, btbAssoc, retStackSize);
+    public TwoBitBranchPredictor(Thread thread, String name, int bimodSize, int branchTargetBufferNumSets, int branchTargetBufferAssociativity, int returnAddressStackSize) {
+        super(thread, name, BranchPredictorType.TWO_BIT, branchTargetBufferNumSets, branchTargetBufferAssociativity, returnAddressStackSize);
 
         this.size = bimodSize;
 
         this.table = new SaturatingCounter[this.size];
 
-        int flipflop = 1;
+        int flipFlop = 1;
         for (int i = 0; i < this.size; i++) {
-            this.table[i] = new SaturatingCounter(0, 2, 3, flipflop);
-            flipflop = 3 - flipflop;
+            this.table[i] = new SaturatingCounter(0, 2, 3, flipFlop);
+            flipFlop = 3 - flipFlop;
         }
     }
 
     public TwoBitBranchPredictor(Thread thread, String name) {
-        this(thread, name, thread.getExperiment().getArchitecture().getTwoBitBpredBimodSize(), thread.getExperiment().getArchitecture().getTwoBitBpredBtbSets(), thread.getExperiment().getArchitecture().getTwoBitBpredBtbAssoc(), thread.getExperiment().getArchitecture().getTwoBitBpredRetStackSize());
+        this(thread, name, thread.getExperiment().getArchitecture().getTwoBitBranchPredictorBimodSize(), thread.getExperiment().getArchitecture().getTwoBitBranchPredictorBranchTargetBufferNumSets(), thread.getExperiment().getArchitecture().getTwoBitBranchPredictorBranchTargetBufferAssociativity(), thread.getExperiment().getArchitecture().getTwoBitBranchPredictorReturnAddressStackSize());
     }
 
     @Override
-    public int predict(int baddr, int btarget, Mnemonic mnemonic, BranchPredictorUpdate dirUpdate, Reference<Integer> returnAddressStackRecoverIndex) {
+    public int predict(int branchAddress, int branchTarget, Mnemonic mnemonic, BranchPredictorUpdate branchPredictorUpdate, Reference<Integer> returnAddressStackRecoverIndex) {
         if (mnemonic.getType() == StaticInstructionType.CONDITIONAL) {
-            dirUpdate.setCounterDir1(getIndex(baddr));
+            branchPredictorUpdate.setCounterDir1(getIndex(branchAddress));
         }
 
         returnAddressStackRecoverIndex.set(this.getReturnAddressStack().getTopOfStack());
 
         if (mnemonic.getType() == StaticInstructionType.FUNCTION_RETURN && this.getReturnAddressStack().getSize() > 0) {
-            dirUpdate.setRas(true);
+            branchPredictorUpdate.setRas(true);
             return this.getReturnAddressStack().pop();
         }
 
         if (mnemonic.getType() == StaticInstructionType.FUNCTION_CALL && this.getReturnAddressStack().getSize() > 0) {
-            this.getReturnAddressStack().push(baddr);
+            this.getReturnAddressStack().push(branchAddress);
         }
 
-        if (mnemonic.getType() != StaticInstructionType.CONDITIONAL || dirUpdate.getCounterDir1().isTaken()) {
-            BranchTargetBufferEntry branchTargetBufferEntry = this.getBranchTargetBuffer().lookup(baddr);
+        if (mnemonic.getType() != StaticInstructionType.CONDITIONAL || branchPredictorUpdate.getCounterDir1().isTaken()) {
+            BranchTargetBufferEntry branchTargetBufferEntry = this.getBranchTargetBuffer().lookup(branchAddress);
             return branchTargetBufferEntry != null ? branchTargetBufferEntry.getTarget() : 1;
         } else {
             return 0;
@@ -72,27 +72,27 @@ public class TwoBitBranchPredictor extends DynamicBranchPredictor {
     }
 
     @Override
-    public void update(int baddr, int btarget, boolean taken, boolean predTaken, boolean correct, Mnemonic mnemonic, BranchPredictorUpdate dirUpdate) {
-        super.update(baddr, btarget, taken, predTaken, correct, mnemonic, dirUpdate);
+    public void update(int branchAddress, int branchTarget, boolean taken, boolean predictedTaken, boolean correct, Mnemonic mnemonic, BranchPredictorUpdate branchPredictorUpdate) {
+        super.update(branchAddress, branchTarget, taken, predictedTaken, correct, mnemonic, branchPredictorUpdate);
 
         if (mnemonic.getType() == StaticInstructionType.FUNCTION_RETURN) {
-            if (!dirUpdate.isRas()) {
+            if (!branchPredictorUpdate.isRas()) {
                 return;
             }
         }
 
         if (mnemonic.getType() == StaticInstructionType.CONDITIONAL) {
-            dirUpdate.getCounterDir1().update(taken);
+            branchPredictorUpdate.getCounterDir1().update(taken);
         }
 
-        this.getBranchTargetBuffer().update(baddr, btarget, taken);
+        this.getBranchTargetBuffer().update(branchAddress, branchTarget, taken);
     }
 
-    public SaturatingCounter getIndex(int baddr) {
-        return this.table[this.hash(baddr)];
+    public SaturatingCounter getIndex(int branchAddress) {
+        return this.table[this.hash(branchAddress)];
     }
 
-    private int hash(int baddr) {
-        return (baddr >> 19) ^ (baddr >> BranchPredictor.BRANCH_SHIFT) & (this.size - 1);
+    private int hash(int branchAddress) {
+        return (branchAddress >> 19) ^ (branchAddress >> BranchPredictor.BRANCH_SHIFT) & (this.size - 1);
     }
 }

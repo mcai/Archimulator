@@ -29,22 +29,22 @@ public class ContextMapping implements Serializable {
 
     private transient SimulatedProgram simulatedProgram;
 
-    private String stdout;
+    private String standardOut;
 
-    private int htLookahead;
+    private int helperThreadLookahead;
 
-    private int htStride;
+    private int helperThreadStride;
 
-    private boolean dynamicHtParams;
+    private boolean dynamicHelperThreadParams;
 
     public ContextMapping(int threadId, SimulatedProgram simulatedProgram) {
         this(threadId, simulatedProgram, "ctx" + threadId + "_out.txt");
     }
 
-    public ContextMapping(int threadId, SimulatedProgram simulatedProgram, String stdout) {
+    public ContextMapping(int threadId, SimulatedProgram simulatedProgram, String standardOut) {
         this.simulatedProgramId = simulatedProgram.getId();
         this.threadId = threadId;
-        this.stdout = stdout;
+        this.standardOut = standardOut;
     }
 
     public int getThreadId() {
@@ -56,43 +56,43 @@ public class ContextMapping implements Serializable {
     }
 
     public SimulatedProgram getSimulatedProgram() {
-        if(simulatedProgram == null) {
+        if (simulatedProgram == null) {
             simulatedProgram = ServiceManager.getSimulatedProgramService().getSimulatedProgramById(simulatedProgramId);
         }
 
         return simulatedProgram;
     }
 
-    public String getStdout() {
-        return stdout;
+    public String getStandardOut() {
+        return standardOut;
     }
 
-    public int getHtLookahead() {
-        return htLookahead;
+    public int getHelperThreadLookahead() {
+        return helperThreadLookahead;
     }
 
-    public void setHtLookahead(int htLookahead) {
-        this.htLookahead = htLookahead;
+    public void setHelperThreadLookahead(int helperThreadLookahead) {
+        this.helperThreadLookahead = helperThreadLookahead;
     }
 
-    public int getHtStride() {
-        return htStride;
+    public int getHelperThreadStride() {
+        return helperThreadStride;
     }
 
-    public void setHtStride(int htStride) {
-        this.htStride = htStride;
+    public void setHelperThreadStride(int helperThreadStride) {
+        this.helperThreadStride = helperThreadStride;
     }
 
-    public boolean isDynamicHtParams() {
-        return dynamicHtParams;
+    public boolean getDynamicHelperThreadParams() {
+        return dynamicHelperThreadParams;
     }
 
-    public void setDynamicHtParams(boolean dynamicHtParams) {
-        this.dynamicHtParams = dynamicHtParams;
+    public void setDynamicHelperThreadParams(boolean dynamicHelperThreadParams) {
+        this.dynamicHelperThreadParams = dynamicHelperThreadParams;
     }
 
     @Override
     public String toString() {
-        return String.format("thread_%d->'%s'", threadId, getSimulatedProgram().getTitle());
+        return String.format("thread #%d->'%s'", threadId, getSimulatedProgram().getTitle());
     }
 }

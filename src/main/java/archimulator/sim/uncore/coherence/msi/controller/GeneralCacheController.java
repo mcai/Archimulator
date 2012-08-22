@@ -32,8 +32,6 @@ public abstract class GeneralCacheController<StateT extends Serializable> extend
 
     private long numEvictions;
 
-    private double occupancyRatio;
-
     public GeneralCacheController(CacheHierarchy cacheHierarchy, String name) {
         super(cacheHierarchy, name);
     }
@@ -54,11 +52,9 @@ public abstract class GeneralCacheController<StateT extends Serializable> extend
                 numDownwardWriteMisses++;
             }
         }
-
-        occupancyRatio = cache.getOccupancyRatio();
     }
 
-    public void incNumEvictions() {
+    public void incrementNumEvictions() {
         this.numEvictions++;
     }
 
@@ -99,7 +95,7 @@ public abstract class GeneralCacheController<StateT extends Serializable> extend
     }
 
     public double getOccupancyRatio() {
-        return occupancyRatio;
+        return getCache().getOccupancyRatio();
     }
 
     public abstract CacheGeometry getGeometry();

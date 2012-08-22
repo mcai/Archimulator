@@ -36,12 +36,12 @@ public class L2ToMemNet extends Net {
                 2,
                 (memBlockSize + 8) * 2, 8);
 
-        EndPointNode l2CacheNode = new EndPointNode(this, cacheHierarchy.getL2CacheController().getName());
-        this.endPointNodes.put(cacheHierarchy.getL2CacheController(), l2CacheNode);
-        this.createBidirectionalLink(l2CacheNode, this.switchNode, 32);
+        EndPointNode l2CacheControllerNode = new EndPointNode(this, cacheHierarchy.getL2CacheController().getName());
+        this.endPointNodes.put(cacheHierarchy.getL2CacheController(), l2CacheControllerNode);
+        this.createBidirectionalLink(l2CacheControllerNode, this.switchNode, 32);
 
-        EndPointNode memNode = new EndPointNode(this, cacheHierarchy.getMemoryController().getName());
-        this.endPointNodes.put(cacheHierarchy.getMemoryController(), memNode);
-        this.createBidirectionalLink(memNode, this.switchNode, 32);
+        EndPointNode memoryControllerNode = new EndPointNode(this, cacheHierarchy.getMemoryController().getName());
+        this.endPointNodes.put(cacheHierarchy.getMemoryController(), memoryControllerNode);
+        this.createBidirectionalLink(memoryControllerNode, this.switchNode, 32);
     }
 }

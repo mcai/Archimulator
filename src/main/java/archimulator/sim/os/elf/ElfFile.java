@@ -50,6 +50,8 @@ public class ElfFile {
     private Map<Integer, Symbol> localObjectSymbols;
     private Map<Integer, Symbol> commonObjectSymbols;
 
+    private long position;
+
     public ElfFile(String filename) {
         try {
             this.file = new RandomAccessFile(filename.replaceAll(ServiceManager.USER_HOME_TEMPLATE_ARG, System.getProperty("user.home")), "r");
@@ -119,12 +121,12 @@ public class ElfFile {
                 this.setPosition(offset);
 
                 Symbol symbol = new Symbol(this, sectionHeader);
-                symbol.st_name = this.readUWord();
-                symbol.st_value = this.readUWord();
-                symbol.st_size = this.readUWord();
+                symbol.st_name = this.readUnsignedWord();
+                symbol.st_value = this.readUnsignedWord();
+                symbol.st_size = this.readUnsignedWord();
                 symbol.st_info = this.read();
                 symbol.st_other = this.read();
-                symbol.st_shndx = this.readUHalf();
+                symbol.st_shndx = this.readUnsignedHalfWord();
 
                 this.symbols.put((int) symbol.st_value, symbol);
             }
@@ -133,9 +135,9 @@ public class ElfFile {
         }
     }
 
-    public Symbol getSymbol(long addr) {
+    public Symbol getSymbol(long address) {
         for (Symbol symbol : this.symbols.values()) {
-            if (symbol.st_value == addr) {
+            if (symbol.st_value == address) {
                 return symbol;
             }
         }
@@ -207,8 +209,6 @@ public class ElfFile {
         this.close();
     }
 
-    long position;
-
     public long getPosition() {
         return this.position;
     }
@@ -255,25 +255,25 @@ public class ElfFile {
         return this.file.read();
     }
 
-    public long readUWord() throws IOException {
-        long data = this.readUWord(this.position);
+    public long readUnsignedWord() throws IOException {
+        long data = this.readUnsignedWord(this.position);
         this.position += 4;
         return data;
     }
 
-    public long readUWord(long offset) throws IOException {
+    public long readUnsignedWord(long offset) throws IOException {
         return this.getBufferAccessor().getU4(this.buffer, offset);
     }
 
-    public int readUHalf() throws IOException {
-        int data = this.readUHalf(this.position);
+    public int readUnsignedHalfWord() throws IOException {
+        int data = this.readUnsignedHalfWorld(this.position);
 
         this.position += 2;
 
         return data;
     }
 
-    public int readUHalf(long offset) throws IOException {
+    public int readUnsignedHalfWorld(long offset) throws IOException {
         return this.getBufferAccessor().getU2(this.buffer, offset);
     }
 

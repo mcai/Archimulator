@@ -22,10 +22,10 @@ import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.msi.controller.GeneralCacheController;
 
 public class CoherentCacheLastPutSOrPutMAndDataFromOwnerEvent extends CoherentCacheEvent {
-    private final MemoryHierarchyAccess access;
-    private final int tag;
-    private final int set;
-    private final int way;
+    private MemoryHierarchyAccess access;
+    private int tag;
+    private int set;
+    private int way;
 
     public CoherentCacheLastPutSOrPutMAndDataFromOwnerEvent(GeneralCacheController cacheController, MemoryHierarchyAccess access, int tag, int set, int way) {
         super(cacheController);

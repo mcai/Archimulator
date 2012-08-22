@@ -44,14 +44,8 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
 
     private long currentCycle;
 
-    private int numCores;
-    private int numThreadsPerCore;
-
-    public Kernel(Simulation simulation, int numCores, int numThreadsPerCore) {
+    public Kernel(Simulation simulation) {
         super(simulation);
-
-        this.numCores = numCores;
-        this.numThreadsPerCore = numThreadsPerCore;
 
         this.pipes = new ArrayList<Pipe>();
         this.systemEvents = new ArrayList<SystemEvent>();
@@ -87,9 +81,9 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
         return null;
     }
 
-    public Context getContextFromPid(int pid) {
+    public Context getContextFromProcessId(int processId) {
         for (Context context : this.contexts) {
-            if (context.getPid() == pid) {
+            if (context.getProcessId() == processId) {
                 return context;
             }
         }
@@ -98,11 +92,13 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
     }
 
     public boolean map(Context contextToMap, Predicate<Integer> predicate) {
-        assert (contextToMap.getThreadId() == -1);
+        if (contextToMap.getThreadId() != -1) {
+            throw new IllegalArgumentException();
+        }
 
-        for (int coreNum = 0; coreNum < this.numCores; coreNum++) {
-            for (int threadNum = 0; threadNum < this.numThreadsPerCore; threadNum++) {
-                int threadId = coreNum * this.numThreadsPerCore + threadNum;
+        for (int coreNum = 0; coreNum < this.getExperiment().getArchitecture().getNumCores(); coreNum++) {
+            for (int threadNum = 0; threadNum < this.getExperiment().getArchitecture().getNumThreadsPerCore(); threadNum++) {
+                int threadId = coreNum * this.getExperiment().getArchitecture().getNumThreadsPerCore() + threadNum;
 
                 boolean hasMapped = false;
 
@@ -141,9 +137,9 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
     public void processSignals() {
         for (Context context : this.contexts) {
             if ((context.getState() == ContextState.RUNNING || context.getState() == ContextState.BLOCKED) && !context.isSpeculative()) {
-                for (int sig = 1; sig <= MAX_SIGNAL; sig++) {
-                    if (this.mustProcessSignal(context, sig)) {
-                        this.runSignalHandler(context, sig);
+                for (int signal = 1; signal <= MAX_SIGNAL; signal++) {
+                    if (this.mustProcessSignal(context, signal)) {
+                        this.runSignalHandler(context, signal);
                     }
                 }
             }
@@ -160,30 +156,30 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
         for (Iterator<Pipe> it = this.pipes.iterator(); it.hasNext(); ) {
             Pipe pipe = it.next();
 
-            if (pipe.getFd()[0] == fileDescriptor) {
-                pipe.getFd()[0] = -1;
+            if (pipe.getFileDescriptors()[0] == fileDescriptor) {
+                pipe.getFileDescriptors()[0] = -1;
             }
-            if (pipe.getFd()[1] == fileDescriptor) {
-                pipe.getFd()[1] = -1;
+            if (pipe.getFileDescriptors()[1] == fileDescriptor) {
+                pipe.getFileDescriptors()[1] = -1;
             }
 
-            if (pipe.getFd()[0] == -1 && pipe.getFd()[1] == -1) {
+            if (pipe.getFileDescriptors()[0] == -1 && pipe.getFileDescriptors()[1] == -1) {
                 it.remove();
             }
         }
     }
 
-    public CircularByteBuffer getReadBuffer(int fd) {
-        return this.getBuffer(fd, 0);
+    public CircularByteBuffer getReadBuffer(int fileDescriptor) {
+        return this.getBuffer(fileDescriptor, 0);
     }
 
-    public CircularByteBuffer getWriteBuffer(int fd) {
-        return this.getBuffer(fd, 1);
+    public CircularByteBuffer getWriteBuffer(int fileDescriptor) {
+        return this.getBuffer(fileDescriptor, 1);
     }
 
-    private CircularByteBuffer getBuffer(int fd, int index) {
+    private CircularByteBuffer getBuffer(int fileDescriptor, int index) {
         for (Pipe pipe : this.pipes) {
-            if (pipe.getFd()[index] == fd) {
+            if (pipe.getFileDescriptors()[index] == fileDescriptor) {
                 return pipe.getBuffer();
             }
         }
@@ -191,38 +187,38 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
         return null;
     }
 
-    public void runSignalHandler(Context context, int sig) {
+    public void runSignalHandler(Context context, int signal) {
         try {
-            if (signalActions.get(sig - 1).getHandler() == 0) {
+            if (signalActions.get(signal - 1).getHandler() == 0) {
                 throw new RuntimeException();
             }
 
-//            System.out.printf("%s 0x%08x: executing signal %d handler\n", context.getThread().getName(), signalActions[sig - 1].getHandler(), sig);
+//            System.out.printf("%s 0x%08x: executing signal %d handler\n", context.getThread().getName(), signalActions[signal - 1].getHandler(), signal);
 
-            context.getSignalMasks().getPending().clear(sig);
+            context.getSignalMasks().getPending().clear(signal);
 
-            ArchitecturalRegisterFile oldRegs = (ArchitecturalRegisterFile) context.getRegs().clone();
+            ArchitecturalRegisterFile oldRegisterFile = (ArchitecturalRegisterFile) context.getRegisterFile().clone();
 
-            context.getRegs().setGpr(ArchitecturalRegisterFile.REG_A0, sig);
-            context.getRegs().setGpr(ArchitecturalRegisterFile.REG_T9, signalActions.get(sig - 1).getHandler());
-            context.getRegs().setGpr(ArchitecturalRegisterFile.REG_RA, 0xffffffff);
-            context.getRegs().setNpc(signalActions.get(sig - 1).getHandler());
-            context.getRegs().setNnpc(context.getRegs().getNpc() + 4);
+            context.getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_A0, signal);
+            context.getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_T9, signalActions.get(signal - 1).getHandler());
+            context.getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_RA, 0xffffffff);
+            context.getRegisterFile().setNpc(signalActions.get(signal - 1).getHandler());
+            context.getRegisterFile().setNnpc(context.getRegisterFile().getNpc() + 4);
 
-            while (context.getState() == ContextState.RUNNING && context.getRegs().getNpc() != 0xffffffff) {
+            while (context.getState() == ContextState.RUNNING && context.getRegisterFile().getNpc() != 0xffffffff) {
                 StaticInstruction.execute(context.decodeNextInstruction(), context);
             }
 
-            context.setRegs(oldRegs);
+            context.setRegisterFile(oldRegisterFile);
 
-//            System.out.printf("%s 0x%08x: return from signal %d handler\n", context.getThread().getName(), context.getRegs().getNpc(), sig);
+//            System.out.printf("%s 0x%08x: return from signal %d handler\n", context.getThread().getName(), context.getRegisterFile().getNpc(), signal);
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public boolean mustProcessSignal(Context context, int sig) {
-        return context.getSignalMasks().getPending().contains(sig) && !context.getSignalMasks().getBlocked().contains(sig);
+    public boolean mustProcessSignal(Context context, int signal) {
+        return context.getSignalMasks().getPending().contains(signal) && !context.getSignalMasks().getBlocked().contains(signal);
     }
 
     public void advanceOneCycle() {

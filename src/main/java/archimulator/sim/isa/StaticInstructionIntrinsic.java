@@ -30,5 +30,5 @@ import java.lang.annotation.Target;
 public @interface StaticInstructionIntrinsic {
     Mnemonic mnemonic();
 
-    FunctionalUnitOperationType fuOperationType();
+    FunctionalUnitOperationType functionalUnitOperationType();
 }

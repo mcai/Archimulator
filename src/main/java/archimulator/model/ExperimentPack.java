@@ -54,19 +54,20 @@ public class ExperimentPack implements ModelElement {
         System.out.printf("[%s] experiment pack %s\n", DateHelper.toString(getCreateTime()), getTitle());
         System.out.println();
 
-        for(Experiment experiment : getExperiments()) {
+        for (Experiment experiment : getExperiments()) {
             experiment.dump();
 
             System.out.println();
         }
     }
 
+    //TODO: to be extended and integrated!!!
     public List<Double> getSpeedups(Experiment baselineExperiment) {
         long baselineTotalCycles = Long.parseLong(baselineExperiment.getStats().get("detailed/cycleAccurateEventQueue/currentCycle"));
 
         List<Double> speedups = new ArrayList<Double>();
 
-        for(Experiment experiment : getExperiments()) {
+        for (Experiment experiment : getExperiments()) {
             long totalCycles = Long.parseLong(experiment.getStats().get("detailed/cycleAccurateEventQueue/currentCycle"));
             speedups.add((double) baselineTotalCycles / totalCycles);
         }

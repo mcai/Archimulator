@@ -23,25 +23,25 @@ import java.util.List;
 
 public class PhysicalRegisterFile {
     private String name;
-    private List<PhysicalRegister> entries;
+    private List<PhysicalRegister> registers;
 
-    private int numFreePhysicalRegs;
+    private int numFreePhysicalRegisters;
 
     public PhysicalRegisterFile(String name, int capacity) {
         this.name = name;
 
-        this.entries = new ArrayList<PhysicalRegister>();
+        this.registers = new ArrayList<PhysicalRegister>();
         for (int i = 0; i < capacity; i++) {
-            this.entries.add(new PhysicalRegister());
+            this.registers.add(new PhysicalRegister());
         }
 
-        this.numFreePhysicalRegs = capacity;
+        this.numFreePhysicalRegisters = capacity;
     }
 
-    public PhysicalRegister allocate(int dep) {
-        for (PhysicalRegister physReg : this.entries) {
+    public PhysicalRegister allocate(int dependency) {
+        for (PhysicalRegister physReg : this.registers) {
             if (physReg.getState() == PhysicalRegisterState.AVAILABLE) {
-                physReg.allocate(dep);
+                physReg.allocate(dependency);
                 return physReg;
             }
         }
@@ -50,25 +50,25 @@ public class PhysicalRegisterFile {
     }
 
     public boolean isFull() {
-        return this.numFreePhysicalRegs == 0;
+        return this.numFreePhysicalRegisters == 0;
     }
 
     public String getName() {
         return name;
     }
 
-    public List<PhysicalRegister> getEntries() {
-        return entries;
+    public List<PhysicalRegister> getRegisters() {
+        return registers;
     }
 
-    public int getNumFreePhysicalRegs() {
-        return numFreePhysicalRegs;
+    public int getNumFreePhysicalRegisters() {
+        return numFreePhysicalRegisters;
     }
 
     public class PhysicalRegister {
         private PhysicalRegisterState state;
 
-        private int dep;
+        private int dependency;
 
         private List<ReorderBufferEntry> effectiveAddressComputationOperandDependents;
         private List<LoadStoreQueueEntry> storeAddressDependents;
@@ -82,26 +82,32 @@ public class PhysicalRegisterFile {
             this.dependents = new ArrayList<AbstractReorderBufferEntry>();
         }
 
-        public void reserve(int dep) {
-            assert (this.state == PhysicalRegisterState.AVAILABLE);
+        public void reserve(int dependency) {
+            if (this.state != PhysicalRegisterState.AVAILABLE) {
+                throw new IllegalArgumentException();
+            }
 
-            this.dep = dep;
+            this.dependency = dependency;
             this.state = PhysicalRegisterState.ARCHITECTURAL_REGISTER;
 
-            numFreePhysicalRegs--;
+            numFreePhysicalRegisters--;
         }
 
-        public void allocate(int dep) {
-            assert (this.state == PhysicalRegisterState.AVAILABLE);
+        public void allocate(int dependency) {
+            if (this.state != PhysicalRegisterState.AVAILABLE) {
+                throw new IllegalArgumentException();
+            }
 
-            this.dep = dep;
+            this.dependency = dependency;
             this.state = PhysicalRegisterState.RENAME_BUFFER_NOT_VALID;
 
-            numFreePhysicalRegs--;
+            numFreePhysicalRegisters--;
         }
 
         public void writeback() {
-            assert (this.state == PhysicalRegisterState.RENAME_BUFFER_NOT_VALID);
+            if (this.state != PhysicalRegisterState.RENAME_BUFFER_NOT_VALID) {
+                throw new IllegalArgumentException();
+            }
 
             this.state = PhysicalRegisterState.RENAME_BUFFER_VALID;
 
@@ -123,35 +129,41 @@ public class PhysicalRegisterFile {
         }
 
         public void commit() {
-            assert (this.state == PhysicalRegisterState.RENAME_BUFFER_VALID);
+            if (this.state != PhysicalRegisterState.RENAME_BUFFER_VALID) {
+                throw new IllegalArgumentException();
+            }
 
             this.state = PhysicalRegisterState.ARCHITECTURAL_REGISTER;
         }
 
         public void recover() {
-            assert (this.state == PhysicalRegisterState.RENAME_BUFFER_NOT_VALID || this.state == PhysicalRegisterState.RENAME_BUFFER_VALID);
+            if (this.state != PhysicalRegisterState.RENAME_BUFFER_NOT_VALID && this.state != PhysicalRegisterState.RENAME_BUFFER_VALID) {
+                throw new IllegalArgumentException();
+            }
 
-            this.dep = -1;
+            this.dependency = -1;
             this.state = PhysicalRegisterState.AVAILABLE;
 
-            numFreePhysicalRegs++;
+            numFreePhysicalRegisters++;
         }
 
         public void reclaim() {
-            assert (this.state == PhysicalRegisterState.ARCHITECTURAL_REGISTER);
+            if (this.state != PhysicalRegisterState.ARCHITECTURAL_REGISTER) {
+                throw new IllegalArgumentException();
+            }
 
-            this.dep = -1;
+            this.dependency = -1;
             this.state = PhysicalRegisterState.AVAILABLE;
 
-            numFreePhysicalRegs++;
+            numFreePhysicalRegisters++;
         }
 
         public boolean isReady() {
             return this.state == PhysicalRegisterState.RENAME_BUFFER_VALID || this.state == PhysicalRegisterState.ARCHITECTURAL_REGISTER;
         }
 
-        public int getDep() {
-            return dep;
+        public int getDependency() {
+            return dependency;
         }
 
         public PhysicalRegisterState getState() {

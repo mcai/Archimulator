@@ -24,24 +24,24 @@ import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
 public class DataMessage extends CoherenceMessage {
     private Controller sender;
-    private int numAcks;
+    private int numInvalidationAcknowledgements;
 
-    public DataMessage(Controller generator, CacheCoherenceFlow producerFlow, Controller sender, int tag, int numAcks, MemoryHierarchyAccess access) {
+    public DataMessage(Controller generator, CacheCoherenceFlow producerFlow, Controller sender, int tag, int numInvalidationAcknowledgements, MemoryHierarchyAccess access) {
         super(generator, producerFlow, CoherenceMessageType.DATA, access, tag);
         this.sender = sender;
-        this.numAcks = numAcks;
+        this.numInvalidationAcknowledgements = numInvalidationAcknowledgements;
     }
 
     public Controller getSender() {
         return sender;
     }
 
-    public int getNumAcks() {
-        return numAcks;
+    public int getNumInvalidationAcknowledgements() {
+        return numInvalidationAcknowledgements;
     }
 
     @Override
     public String toString() {
-        return String.format("[%d] %s: DataMessage{%d, sender=%s, tag=0x%08x, numAcks=%d}", getBeginCycle(), getGenerator(), getId(), sender, getTag(), numAcks);
+        return String.format("[%d] %s: DataMessage{%d, sender=%s, tag=0x%08x, numInvalidationAcknowledgements=%d}", getBeginCycle(), getGenerator(), getId(), sender, getTag(), numInvalidationAcknowledgements);
     }
 }

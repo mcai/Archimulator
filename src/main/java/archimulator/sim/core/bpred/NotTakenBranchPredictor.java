@@ -29,8 +29,8 @@ public class NotTakenBranchPredictor extends BranchPredictor {
     }
 
     @Override
-    public int predict(int baddr, int btarget, Mnemonic mnemonic, BranchPredictorUpdate dirUpdate, Reference<Integer> returnAddressStackRecoverIndex) {
-        return mnemonic.getType() != StaticInstructionType.CONDITIONAL ? btarget : baddr + 4;
+    public int predict(int branchAddress, int branchTarget, Mnemonic mnemonic, BranchPredictorUpdate branchPredictorUpdate, Reference<Integer> returnAddressStackRecoverIndex) {
+        return mnemonic.getType() != StaticInstructionType.CONDITIONAL ? branchTarget : branchAddress + 4;
     }
 
     @Override

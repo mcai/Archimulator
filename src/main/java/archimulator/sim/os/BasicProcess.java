@@ -18,13 +18,13 @@
  ******************************************************************************/
 package archimulator.sim.os;
 
+import archimulator.model.ContextMapping;
 import archimulator.service.ServiceManager;
 import archimulator.sim.analysis.ElfAnalyzer;
 import archimulator.sim.analysis.Instruction;
-import archimulator.model.ContextMapping;
-import archimulator.sim.isa.StaticInstruction;
-import archimulator.sim.isa.dissembler.MipsDissembler;
 import archimulator.sim.isa.Memory;
+import archimulator.sim.isa.StaticInstruction;
+import archimulator.sim.isa.dissembler.MipsDisassembler;
 import archimulator.sim.os.elf.ElfFile;
 import archimulator.sim.os.elf.ElfSectionHeader;
 
@@ -32,8 +32,8 @@ import java.io.File;
 import java.util.*;
 
 public class BasicProcess extends Process {
-    private Map<Integer, Integer> pcsToMachInsts;
-    private Map<Integer, StaticInstruction> machInstsToStaticInsts;
+    private Map<Integer, Integer> pcsToMachineInstructions;
+    private Map<Integer, StaticInstruction> machineInstructionsToStaticInstructions;
 
     private Map<String, SortedMap<Integer, Instruction>> instructions;
     private ElfAnalyzer elfAnalyzer;
@@ -44,20 +44,18 @@ public class BasicProcess extends Process {
 
     @Override
     protected void loadProgram(Kernel kernel, String simulationDirectory, ContextMapping contextMapping) {
-        this.pcsToMachInsts = new TreeMap<Integer, Integer>();
-        this.machInstsToStaticInsts = new TreeMap<Integer, StaticInstruction>();
+        this.pcsToMachineInstructions = new TreeMap<Integer, Integer>();
+        this.machineInstructionsToStaticInstructions = new TreeMap<Integer, StaticInstruction>();
 
         this.instructions = new HashMap<String, SortedMap<Integer, Instruction>>();
 
-        List<String> cmdArgList = Arrays.asList((contextMapping.getSimulatedProgram().getCwd() + File.separator + contextMapping.getSimulatedProgram().getExe() + " " + contextMapping.getSimulatedProgram().getArgs()).replaceAll(ServiceManager.USER_HOME_TEMPLATE_ARG, System.getProperty("user.home")).split(" "));
+        List<String> commandLineArgumentList = Arrays.asList((contextMapping.getSimulatedProgram().getWorkingDirectory() + File.separator + contextMapping.getSimulatedProgram().getExecutable() + " " + contextMapping.getSimulatedProgram().getArguments()).replaceAll(ServiceManager.USER_HOME_TEMPLATE_ARG, System.getProperty("user.home")).split(" "));
 
-        String elfFileName = cmdArgList.get(0);
+        String elfFileName = commandLineArgumentList.get(0);
 
         ElfFile elfFile = new ElfFile(elfFileName);
 
         for (ElfSectionHeader sectionHeader : elfFile.getSectionHeaders()) {
-//                System.out.printf("section '%s'; addr=0x%08x; size=%d\n", sectionHeader.getName(), sectionHeader.getSh_addr(), sectionHeader.getSh_size());
-
             if (sectionHeader.getName().equals(".dynamic")) {
                 throw new IllegalArgumentException("dynamic linking is not supported");
             }
@@ -67,10 +65,8 @@ public class BasicProcess extends Process {
 //                        this.memory.map((int) sectionHeader.getSh_addr(), (int) sectionHeader.getSh_size()));
 
                     if (sectionHeader.getSh_type() == ElfSectionHeader.SHT_NOBITS) {
-//                            System.out.printf("zero section '%s'; addr=0x%08x; size=%d\n", sectionHeader.getName(), sectionHeader.getSh_addr(), sectionHeader.getSh_size());
                         this.getMemory().zero((int) sectionHeader.getSh_addr(), (int) sectionHeader.getSh_size());
                     } else {
-//                            System.out.printf("writeblock section '%s'; addr=0x%08x; size=%d\n", sectionHeader.getName(), sectionHeader.getSh_addr(), sectionHeader.getSh_size());
                         this.getMemory().writeBlock((int) sectionHeader.getSh_addr(), (int) sectionHeader.getSh_size(), sectionHeader.readContent(elfFile));
 
                         if ((sectionHeader.getSh_flags() & ElfSectionHeader.SHF_EXECINSTR) != 0) {
@@ -85,7 +81,6 @@ public class BasicProcess extends Process {
 
                     if (sectionHeader.getSh_addr() >= DATA_BASE) {
                         this.setDataTop((int) Math.max(this.getDataTop(), sectionHeader.getSh_addr() + sectionHeader.getSh_size() - 1));
-//                            System.out.printf("%s: set dataTop to 0x%08x\n", sectionHeader.getName(), this.dataTop);
                     }
                 }
             }
@@ -101,34 +96,34 @@ public class BasicProcess extends Process {
         this.setStackBase(STACK_BASE);
 //            this.stackSize = STACK_SIZE; //TODO
         this.setStackSize(MAX_ENVIRON);
-        this.setEnvironBase(STACK_BASE - MAX_ENVIRON);
+        this.setEnvironmentBase(STACK_BASE - MAX_ENVIRON);
 
 //            this.memory.map(this.stackBase - this.stackSize, this.stackSize);
         this.getMemory().zero(this.getStackBase() - this.getStackSize(), this.getStackSize());
 
-        int stackPtr = this.getEnvironBase();
-        this.getMemory().writeWord(stackPtr, cmdArgList.size());
-        stackPtr += 4;
+        int stackPointer = this.getEnvironmentBase();
+        this.getMemory().writeWord(stackPointer, commandLineArgumentList.size());
+        stackPointer += 4;
 
-        int argAddr = stackPtr;
-        stackPtr += (cmdArgList.size() + 1) * 4;
+        int argAddress = stackPointer;
+        stackPointer += (commandLineArgumentList.size() + 1) * 4;
 
-        int envAddr = stackPtr;
-        stackPtr += (this.getEnvs().size() + 1) * 4;
+        int environmentAddress = stackPointer;
+        stackPointer += (this.getEnvironments().size() + 1) * 4;
 
-        for (int i = 0; i < cmdArgList.size(); i++) {
-            this.getMemory().writeWord(argAddr + i * 4, stackPtr);
-            stackPtr += this.getMemory().writeString(stackPtr, cmdArgList.get(i));
+        for (int i = 0; i < commandLineArgumentList.size(); i++) {
+            this.getMemory().writeWord(argAddress + i * 4, stackPointer);
+            stackPointer += this.getMemory().writeString(stackPointer, commandLineArgumentList.get(i));
         }
-        this.getMemory().writeWord(argAddr + cmdArgList.size() * 4, 0);
+        this.getMemory().writeWord(argAddress + commandLineArgumentList.size() * 4, 0);
 
-        for (int i = 0; i < this.getEnvs().size(); i++) {
-            this.getMemory().writeWord(envAddr + i * 4, stackPtr);
-            stackPtr += this.getMemory().writeString(stackPtr, this.getEnvs().get(i));
+        for (int i = 0; i < this.getEnvironments().size(); i++) {
+            this.getMemory().writeWord(environmentAddress + i * 4, stackPointer);
+            stackPointer += this.getMemory().writeString(stackPointer, this.getEnvironments().get(i));
         }
-        this.getMemory().writeWord(envAddr + this.getEnvs().size() * 4, 0);
+        this.getMemory().writeWord(environmentAddress + this.getEnvironments().size() * 4, 0);
 
-        if (stackPtr > this.getStackBase()) {
+        if (stackPointer > this.getStackBase()) {
             throw new IllegalArgumentException("'environ' overflow, increment MAX_ENVIRON");
         }
 
@@ -137,25 +132,25 @@ public class BasicProcess extends Process {
     }
 
     private void predecode(String sectionName, Memory memory, int pc) {
-        int machInst = memory.readWord(pc);
+        int machineInstruction = memory.readWord(pc);
 
-        this.pcsToMachInsts.put(pc, machInst);
+        this.pcsToMachineInstructions.put(pc, machineInstruction);
 
-        if (!this.machInstsToStaticInsts.containsKey(machInst)) {
-            StaticInstruction staticInst = this.decode(machInst);
-            this.machInstsToStaticInsts.put(machInst, staticInst);
+        if (!this.machineInstructionsToStaticInstructions.containsKey(machineInstruction)) {
+            StaticInstruction staticInstruction = this.decode(machineInstruction);
+            this.machineInstructionsToStaticInstructions.put(machineInstruction, staticInstruction);
         }
 
-        this.instructions.get(sectionName).put(pc, new Instruction(this, pc, this.getStaticInst(pc)));
+        this.instructions.get(sectionName).put(pc, new Instruction(this, pc, this.getStaticInstruction(pc)));
     }
 
-    public static String getDissemblyInstruction(Process process, int pc) {
-        return MipsDissembler.disassemble(pc, process.getStaticInst(pc));
+    public static String getDisassemblyInstruction(Process process, int pc) {
+        return MipsDisassembler.disassemble(pc, process.getStaticInstruction(pc));
     }
 
     @Override
-    public StaticInstruction getStaticInst(int pc) {
-        return this.machInstsToStaticInsts.get(this.pcsToMachInsts.get(pc));
+    public StaticInstruction getStaticInstruction(int pc) {
+        return this.machineInstructionsToStaticInstructions.get(this.pcsToMachineInstructions.get(pc));
     }
 
     public ElfAnalyzer getElfAnalyzer() {

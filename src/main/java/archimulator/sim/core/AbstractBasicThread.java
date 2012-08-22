@@ -35,7 +35,7 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
     protected String name;
     protected Core core;
 
-    protected BranchPredictor bpred;
+    protected BranchPredictor branchPredictor;
 
     protected RegisterRenameTable renameTable;
 
@@ -50,7 +50,7 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
     protected PhysicalRegisterFile fpPhysicalRegisterFile;
     protected PhysicalRegisterFile miscPhysicalRegisterFile;
 
-    protected long totalInsts;
+    protected long totalInstructions;
 
     protected long decodeBufferFull;
     protected long reorderBufferFull;
@@ -83,24 +83,24 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
 
         this.name = "c" + this.core.getNum() + "t" + this.num;
 
-        switch (getExperiment().getArchitecture().getBpredType()) {
+        switch (getExperiment().getArchitecture().getBranchPredictorType()) {
             case PERFECT:
-                this.bpred = new PerfectBranchPredictor(this, this.name + ".bpred");
+                this.branchPredictor = new PerfectBranchPredictor(this, this.name + ".branchPredictor");
                 break;
             case TAKEN:
-                this.bpred = new TakenBranchPredictor(this, this.name + ".bpred");
+                this.branchPredictor = new TakenBranchPredictor(this, this.name + ".branchPredictor");
                 break;
             case NOT_TAKEN:
-                this.bpred = new NotTakenBranchPredictor(this, this.name + ".bpred");
+                this.branchPredictor = new NotTakenBranchPredictor(this, this.name + ".branchPredictor");
                 break;
             case TWO_BIT:
-                this.bpred = new TwoBitBranchPredictor(this, this.name + ".bpred");
+                this.branchPredictor = new TwoBitBranchPredictor(this, this.name + ".branchPredictor");
                 break;
             case TWO_LEVEL:
-                this.bpred = new TwoLevelBranchPredictor(this, this.name + ".bpred");
+                this.branchPredictor = new TwoLevelBranchPredictor(this, this.name + ".branchPredictor");
                 break;
             case COMBINED:
-                this.bpred = new CombinedBranchPredictor(this, this.name + ".bpred");
+                this.branchPredictor = new CombinedBranchPredictor(this, this.name + ".branchPredictor");
                 break;
             default:
                 throw new IllegalArgumentException();
@@ -112,23 +112,23 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
 
         this.renameTable = new RegisterRenameTable(this.name + ".renameTable");
 
-        for (int i = 0; i < ArchitecturalRegisterFile.NUM_INT_REGS; i++) {
+        for (int i = 0; i < ArchitecturalRegisterFile.NUM_INT_REGISTERS; i++) {
             int dep = RegisterDependencyType.toRegisterDependency(RegisterDependencyType.INTEGER, i);
-            PhysicalRegisterFile.PhysicalRegister physReg = this.intPhysicalRegisterFile.getEntries().get(i);
+            PhysicalRegisterFile.PhysicalRegister physReg = this.intPhysicalRegisterFile.getRegisters().get(i);
             physReg.reserve(dep);
             this.renameTable.put(dep, physReg);
         }
 
-        for (int i = 0; i < ArchitecturalRegisterFile.NUM_FLOAT_REGS; i++) {
+        for (int i = 0; i < ArchitecturalRegisterFile.NUM_FLOAT_REGISTERS; i++) {
             int dep = RegisterDependencyType.toRegisterDependency(RegisterDependencyType.FLOAT, i);
-            PhysicalRegisterFile.PhysicalRegister physReg = this.fpPhysicalRegisterFile.getEntries().get(i);
+            PhysicalRegisterFile.PhysicalRegister physReg = this.fpPhysicalRegisterFile.getRegisters().get(i);
             physReg.reserve(dep);
             this.renameTable.put(dep, physReg);
         }
 
-        for (int i = 0; i < ArchitecturalRegisterFile.NUM_MISC_REGS; i++) {
+        for (int i = 0; i < ArchitecturalRegisterFile.NUM_MISC_REGISTERS; i++) {
             int dep = RegisterDependencyType.toRegisterDependency(RegisterDependencyType.MISC, i);
-            PhysicalRegisterFile.PhysicalRegister physReg = this.miscPhysicalRegisterFile.getEntries().get(i);
+            PhysicalRegisterFile.PhysicalRegister physReg = this.miscPhysicalRegisterFile.getRegisters().get(i);
             physReg.reserve(dep);
             this.renameTable.put(dep, physReg);
         }
@@ -144,7 +144,7 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
             @Override
             public void apply(InstructionFunctionallyExecutedEvent event) {
                 if (event.getContext() == context) {
-                    Mnemonic mnemonic = event.getStaticInst().getMnemonic();
+                    Mnemonic mnemonic = event.getStaticInstruction().getMnemonic();
                     if (!executedMnemonics.contains(mnemonic)) {
                         executedMnemonics.add(mnemonic);
                     }
@@ -208,8 +208,8 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
     }
 
     @Override
-    public BranchPredictor getBpred() {
-        return bpred;
+    public BranchPredictor getBranchPredictor() {
+        return branchPredictor;
     }
 
     public PipelineBuffer<DecodeBufferEntry> getDecodeBuffer() {
@@ -224,8 +224,8 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
         return loadStoreQueue;
     }
 
-    public long getTotalInsts() {
-        return totalInsts;
+    public long getTotalInstructions() {
+        return totalInstructions;
     }
 
     public TranslationLookasideBuffer getItlb() {
@@ -259,23 +259,23 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
         this.context = context;
     }
 
-    public void incRegisterRenameStallsOnDecodeBufferIsEmpty() {
+    public void incrementRegisterRenameStallsOnDecodeBufferIsEmpty() {
         this.registerRenameStallsOnDecodeBufferIsEmpty++;
     }
 
-    public void incRegisterRenameStallsOnReorderBufferIsFull() {
+    public void incrementRegisterRenameStallsOnReorderBufferIsFull() {
         this.registerRenameStallsOnReorderBufferIsFull++;
     }
 
-    public void incSelectionStallOnCanNotLoad() {
+    public void incrementSelectionStallOnCanNotLoad() {
         this.selectionStallOnCanNotLoad++;
     }
 
-    public void incSelectionStallOnCanNotStore() {
+    public void incrementSelectionStallOnCanNotStore() {
         this.selectionStallOnCanNotStore++;
     }
 
-    public void incSelectionStallOnNoFreeFunctionalUnit() {
+    public void incrementSelectionStallOnNoFreeFunctionalUnit() {
         this.selectionStallOnNoFreeFunctionalUnit++;
     }
 

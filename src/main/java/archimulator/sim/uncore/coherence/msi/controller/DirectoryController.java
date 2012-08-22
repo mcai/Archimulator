@@ -51,7 +51,7 @@ public class DirectoryController extends GeneralCacheController {
     public DirectoryController(CacheHierarchy cacheHierarchy, final String name) {
         super(cacheHierarchy, name);
 
-        this.cacheGeometry = new CacheGeometry(getExperiment().getArchitecture().getL2Size(), getExperiment().getArchitecture().getL2Assoc(), getExperiment().getArchitecture().getL2LineSize());
+        this.cacheGeometry = new CacheGeometry(getExperiment().getArchitecture().getL2Size(), getExperiment().getArchitecture().getL2Associativity(), getExperiment().getArchitecture().getL2LineSize());
 
         ValueProviderFactory<DirectoryControllerState, ValueProvider<DirectoryControllerState>> cacheLineStateProviderFactory = new ValueProviderFactory<DirectoryControllerState, ValueProvider<DirectoryControllerState>>() {
             @Override
@@ -115,8 +115,8 @@ public class DirectoryController extends GeneralCacheController {
             case GETM:
                 onGetM((GetMMessage) message);
                 break;
-            case RECALL_ACK:
-                onRecallAck((RecallAckMessage) message);
+            case RECALL_ACKNOWLEDGEMENT:
+                onRecallAck((RecallAcknowledgementMessage) message);
                 break;
             case PUTS:
                 onPutS((PutSMessage) message);
@@ -140,12 +140,12 @@ public class DirectoryController extends GeneralCacheController {
             }
         };
 
-        this.access(message, message.getAccess(), message.getReq(), message.getTag(), new Action2<Integer, Integer>() {
+        this.access(message, message.getAccess(), message.getRequester(), message.getTag(), new Action2<Integer, Integer>() {
             @Override
             public void apply(Integer set, Integer way) {
                 CacheLine<DirectoryControllerState> line = getCache().getLine(set, way);
                 DirectoryControllerFiniteStateMachine fsm = (DirectoryControllerFiniteStateMachine) line.getStateProvider();
-                fsm.onEventGetS(message, message.getReq(), message.getTag(), onStalledCallback);
+                fsm.onEventGetS(message, message.getRequester(), message.getTag(), onStalledCallback);
             }
         }, onStalledCallback);
     }
@@ -158,17 +158,17 @@ public class DirectoryController extends GeneralCacheController {
             }
         };
 
-        this.access(message, message.getAccess(), message.getReq(), message.getTag(), new Action2<Integer, Integer>() {
+        this.access(message, message.getAccess(), message.getRequester(), message.getTag(), new Action2<Integer, Integer>() {
             @Override
             public void apply(Integer set, Integer way) {
                 CacheLine<DirectoryControllerState> line = getCache().getLine(set, way);
                 DirectoryControllerFiniteStateMachine fsm = (DirectoryControllerFiniteStateMachine) line.getStateProvider();
-                fsm.onEventGetM(message, message.getReq(), message.getTag(), onStalledCallback);
+                fsm.onEventGetM(message, message.getRequester(), message.getTag(), onStalledCallback);
             }
         }, onStalledCallback);
     }
 
-    private void onRecallAck(RecallAckMessage message) {
+    private void onRecallAck(RecallAcknowledgementMessage message) {
         CacheController sender = message.getSender();
         int tag = message.getTag();
 
@@ -179,7 +179,7 @@ public class DirectoryController extends GeneralCacheController {
     }
 
     private void onPutS(PutSMessage message) {
-        CacheController req = message.getReq();
+        CacheController req = message.getRequester();
         int tag = message.getTag();
 
         int way = this.cache.findWay(tag);
@@ -194,7 +194,7 @@ public class DirectoryController extends GeneralCacheController {
     }
 
     private void onPutMAndData(PutMAndDataMessage message) {
-        CacheController req = message.getReq();
+        CacheController req = message.getRequester();
         int tag = message.getTag();
 
         int way = this.cache.findWay(tag);

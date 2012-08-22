@@ -65,15 +65,15 @@ public class SignalMask implements Cloneable {
         return MathHelper.containsBit(this.signals[signal / 32], signal % 32);
     }
 
-    public void loadFrom(Memory memory, int addr) {
+    public void loadFrom(Memory memory, int address) {
         for (int i = 0; i < Kernel.MAX_SIGNAL / 32; i++) {
-            this.signals[i] = memory.readWord(addr + i * 4);
+            this.signals[i] = memory.readWord(address + i * 4);
         }
     }
 
-    public void saveTo(Memory memory, int addr) {
+    public void saveTo(Memory memory, int address) {
         for (int i = 0; i < Kernel.MAX_SIGNAL / 32; i++) {
-            memory.writeWord(addr + i * 4, this.signals[i]);
+            memory.writeWord(address + i * 4, this.signals[i]);
         }
     }
 }

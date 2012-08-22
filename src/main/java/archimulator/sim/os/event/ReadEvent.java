@@ -22,34 +22,34 @@ import archimulator.sim.isa.ArchitecturalRegisterFile;
 import archimulator.sim.os.Context;
 
 public class ReadEvent extends SystemEvent {
-    private WaitFdCriterion waitFdCriterion;
+    private WaitFileDescriptorCriterion waitFileDescriptorCriterion;
 
     public ReadEvent(Context context) {
         super(context, SystemEventType.READ);
 
-        this.waitFdCriterion = new WaitFdCriterion();
+        this.waitFileDescriptorCriterion = new WaitFileDescriptorCriterion();
     }
 
     @Override
     public boolean needProcess() {
-        return this.waitFdCriterion.needProcess(this.getContext());
+        return this.waitFileDescriptorCriterion.needProcess(this.getContext());
     }
 
     @Override
     public void process() {
         this.getContext().resume();
 
-        byte[] buf = new byte[this.waitFdCriterion.getSize()];
+        byte[] buf = new byte[this.waitFileDescriptorCriterion.getSize()];
 
-        int nRead = this.waitFdCriterion.getBuffer().read(buf, 0, buf.length);
+        int numRead = this.waitFileDescriptorCriterion.getBuffer().read(buf, 0, buf.length);
 
-        this.getContext().getRegs().setGpr(ArchitecturalRegisterFile.REG_V0, nRead);
-        this.getContext().getRegs().setGpr(ArchitecturalRegisterFile.REG_A3, 0);
+        this.getContext().getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_V0, numRead);
+        this.getContext().getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_A3, 0);
 
-        this.getContext().getProcess().getMemory().writeBlock(this.waitFdCriterion.getAddress(), nRead, buf);
+        this.getContext().getProcess().getMemory().writeBlock(this.waitFileDescriptorCriterion.getAddress(), numRead, buf);
     }
 
-    public WaitFdCriterion getWaitFdCriterion() {
-        return waitFdCriterion;
+    public WaitFileDescriptorCriterion getWaitFileDescriptorCriterion() {
+        return waitFileDescriptorCriterion;
     }
 }

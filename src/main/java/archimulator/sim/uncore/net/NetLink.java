@@ -24,55 +24,55 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NetLink {
-    private OutPort srcPort;
-    private InPort destPort;
+    private OutPort sourcePort;
+    private InPort destinationPort;
     private int bandwidth;
     private boolean busy;
     private List<Action> pendingActions;
 
-    public NetLink(NetNode srcNode, NetNode destNode, int bandwidth) {
-        this.srcPort = srcNode.findFreeOutPort();
-        this.destPort = destNode.findFreeInPort();
+    public NetLink(NetNode sourceNode, NetNode destinationNode, int bandwidth) {
+        this.sourcePort = sourceNode.findFreeOutPort();
+        this.destinationPort = destinationNode.findFreeInPort();
 
         this.bandwidth = bandwidth;
 
-        this.srcPort.setLink(this);
-        this.destPort.setLink(this);
+        this.sourcePort.setLink(this);
+        this.destinationPort.setLink(this);
 
         this.pendingActions = new ArrayList<Action>();
     }
 
     public void toInBuffer(final NetMessage message) {
-        if (this.destPort.getBuffer() != null) {
-            if (this.destPort.getBuffer().isWriteBusy()) {
-                this.destPort.getBuffer().addPendingWriteAction(new Action() {
+        if (this.destinationPort.getBuffer() != null) {
+            if (this.destinationPort.getBuffer().isWriteBusy()) {
+                this.destinationPort.getBuffer().addPendingWriteAction(new Action() {
                     public void apply() {
                         toInBuffer(message);
                     }
                 });
-            } else if (this.destPort.getBuffer().getCount() + message.getSize() > this.destPort.getBuffer().getSize()) {
-                this.destPort.getBuffer().addPendingFullAction(new Action() {
+            } else if (this.destinationPort.getBuffer().getCount() + message.getSize() > this.destinationPort.getBuffer().getSize()) {
+                this.destinationPort.getBuffer().addPendingFullAction(new Action() {
                     public void apply() {
                         toInBuffer(message);
                     }
                 });
             } else {
-                if (this.destPort.getBuffer() != null) {
-                    if (destPort.getBuffer().getCount() + message.getSize() > destPort.getBuffer().getSize()) {
+                if (this.destinationPort.getBuffer() != null) {
+                    if (destinationPort.getBuffer().getCount() + message.getSize() > destinationPort.getBuffer().getSize()) {
                         throw new IllegalArgumentException();
                     }
 
-                    this.destPort.getBuffer().beginWrite();
-                    this.srcPort.getNode().getNet().getCycleAccurateEventQueue().schedule(this, new Action() {
+                    this.destinationPort.getBuffer().beginWrite();
+                    this.sourcePort.getNode().getNet().getCycleAccurateEventQueue().schedule(this, new Action() {
                         @Override
                         public void apply() {
-                            destPort.getBuffer().endWrite(message);
+                            destinationPort.getBuffer().endWrite(message);
                         }
                     }, 1); //TODO: latency
                 }
             }
         } else {
-            message.complete(srcPort.getNode().getNet().getCycleAccurateEventQueue().getCurrentCycle());
+            message.complete(sourcePort.getNode().getNet().getCycleAccurateEventQueue().getCurrentCycle());
         }
     }
 
@@ -99,12 +99,12 @@ public class NetLink {
         }
     }
 
-    public NetPort getSrcPort() {
-        return srcPort;
+    public NetPort getSourcePort() {
+        return sourcePort;
     }
 
-    public NetPort getDestPort() {
-        return destPort;
+    public NetPort getDestinationPort() {
+        return destinationPort;
     }
 
     public int getBandwidth() {

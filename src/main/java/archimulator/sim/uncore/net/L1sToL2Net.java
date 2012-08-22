@@ -49,8 +49,8 @@ public class L1sToL2Net extends Net {
             this.createBidirectionalLink(l1DCacheControllerNode, this.switchNode, 32);
         }
 
-        EndPointNode l2CacheNode = new EndPointNode(this, cacheHierarchy.getL2CacheController().getName());
-        this.endPointNodes.put(cacheHierarchy.getL2CacheController(), l2CacheNode);
-        this.createBidirectionalLink(l2CacheNode, this.switchNode, 32);
+        EndPointNode l2CacheControllerNode = new EndPointNode(this, cacheHierarchy.getL2CacheController().getName());
+        this.endPointNodes.put(cacheHierarchy.getL2CacheController(), l2CacheControllerNode);
+        this.createBidirectionalLink(l2CacheControllerNode, this.switchNode, 32);
     }
 }

@@ -22,9 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ReturnAddressStack {
-    private final int size;
+    private int size;
     private int topOfStack;
-    private final List<BranchTargetBufferEntry> entries;
+    private List<BranchTargetBufferEntry> entries;
 
     public ReturnAddressStack(int size) {
         this.size = size;
@@ -41,9 +41,9 @@ public class ReturnAddressStack {
         this.topOfStack = returnAddressStackRecoverIndex;
     }
 
-    public void push(int baddr) {
+    public void push(int branchAddress) {
         this.topOfStack = (this.topOfStack + 1) % this.size;
-        this.entries.get(this.topOfStack).setTarget(baddr + 8);
+        this.entries.get(this.topOfStack).setTarget(branchAddress + 8);
     }
 
     public int pop() {

@@ -30,20 +30,20 @@ public class SignalAction {
         this.mask = new SignalMask();
     }
 
-    public void loadFrom(Memory memory, int addr) {
-        this.flags = memory.readWord(addr);
-        this.handler = memory.readWord(addr + HANDLER_OFFSET);
-        this.restorer = memory.readWord(addr + RESTORER_OFFSET);
+    public void loadFrom(Memory memory, int address) {
+        this.flags = memory.readWord(address);
+        this.handler = memory.readWord(address + HANDLER_OFFSET);
+        this.restorer = memory.readWord(address + RESTORER_OFFSET);
 
-        this.mask.loadFrom(memory, addr + MASK_OFFSET);
+        this.mask.loadFrom(memory, address + MASK_OFFSET);
     }
 
-    public void saveTo(Memory memory, int addr) {
-        memory.writeWord(addr, this.flags);
-        memory.writeWord(addr + HANDLER_OFFSET, this.handler);
-        memory.writeWord(addr + RESTORER_OFFSET, this.restorer);
+    public void saveTo(Memory memory, int address) {
+        memory.writeWord(address, this.flags);
+        memory.writeWord(address + HANDLER_OFFSET, this.handler);
+        memory.writeWord(address + RESTORER_OFFSET, this.restorer);
 
-        this.mask.saveTo(memory, addr + MASK_OFFSET);
+        this.mask.saveTo(memory, address + MASK_OFFSET);
     }
 
     public int getFlags() {

@@ -22,18 +22,18 @@ import net.pickapack.action.Action;
 
 public class NetMessage {
     private long id;
-    private NetNode srcNode;
-    private NetNode destNode;
+    private NetNode sourceNode;
+    private NetNode destinationNode;
     private int size;
     private Action onCompletedCallback;
 
     private long beginCycle;
 
-    public NetMessage(Net net, NetNode srcNode, NetNode destNode, int size, Action onCompletedCallback, long beginCycle) {
+    public NetMessage(Net net, NetNode sourceNode, NetNode destinationNode, int size, Action onCompletedCallback, long beginCycle) {
         this.id = net.getSimulation().currentNetMessageId++;
 
-        this.srcNode = srcNode;
-        this.destNode = destNode;
+        this.sourceNode = sourceNode;
+        this.destinationNode = destinationNode;
         this.size = size;
         this.onCompletedCallback = onCompletedCallback;
 
@@ -43,19 +43,19 @@ public class NetMessage {
     public void complete(long endCycle) {
         this.onCompletedCallback.apply();
 
-//        System.out.printf("%s -> %s: size: %d, latency: %d%n", srcNode.getName(), destNode.getName(), size, (endCycle - beginCycle));
+//        System.out.printf("%s -> %s: size: %d, latency: %d%n", sourceNode.getName(), destinationNode.getName(), size, (endCycle - beginCycle));
     }
 
     public long getId() {
         return id;
     }
 
-    public NetNode getSrcNode() {
-        return srcNode;
+    public NetNode getSourceNode() {
+        return sourceNode;
     }
 
-    public NetNode getDestNode() {
-        return destNode;
+    public NetNode getDestinationNode() {
+        return destinationNode;
     }
 
     public int getSize() {

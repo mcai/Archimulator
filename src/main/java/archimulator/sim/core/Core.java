@@ -33,11 +33,11 @@ public interface Core extends MemoryHierarchyCore {
 
     boolean canStore(Thread thread, int virtualAddress);
 
-    void ifetch(Thread thread, int virtualAddress, int virtualPc, final Action onCompletedCallback);
+    void ifetch(Thread thread, int virtualAddress, int virtualPc, Action onCompletedCallback);
 
-    void load(DynamicInstruction dynamicInst, int virtualAddress, int virtualPc, final Action onCompletedCallback);
+    void load(DynamicInstruction dynamicInst, int virtualAddress, int virtualPc, Action onCompletedCallback);
 
-    void store(DynamicInstruction dynamicInst, int virtualAddress, int virtualPc, final Action onCompletedCallback);
+    void store(DynamicInstruction dynamicInst, int virtualAddress, int virtualPc, Action onCompletedCallback);
 
     String getName();
 
@@ -45,7 +45,7 @@ public interface Core extends MemoryHierarchyCore {
 
     List<Thread> getThreads();
 
-    FunctionalUnitPool getFuPool();
+    FunctionalUnitPool getFunctionalUnitPool();
 
     List<AbstractReorderBufferEntry> getWaitingInstructionQueue();
 

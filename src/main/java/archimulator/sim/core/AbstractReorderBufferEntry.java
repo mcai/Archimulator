@@ -10,21 +10,21 @@ public abstract class AbstractReorderBufferEntry {
 
     protected int npc;
     protected int nnpc;
-    protected int predNnpc;
+    protected int predictedNnpc;
 
     protected Thread thread;
 
-    protected DynamicInstruction dynamicInst;
+    protected DynamicInstruction dynamicInstruction;
 
-    protected Map<Integer, PhysicalRegisterFile.PhysicalRegister> oldPhysRegs;
+    protected Map<Integer, PhysicalRegisterFile.PhysicalRegister> oldPhysicalRegisters;
 
-    protected Map<Integer, PhysicalRegisterFile.PhysicalRegister> physRegs;
-    protected Map<Integer, PhysicalRegisterFile.PhysicalRegister> srcPhysRegs;
+    protected Map<Integer, PhysicalRegisterFile.PhysicalRegister> targetPhysicalRegisters;
+    protected Map<Integer, PhysicalRegisterFile.PhysicalRegister> sourcePhysicalRegisters;
 
     protected boolean speculative;
 
     protected int returnAddressStackRecoverIndex;
-    protected BranchPredictorUpdate dirUpdate;
+    protected BranchPredictorUpdate branchPredictorUpdate;
 
     protected boolean dispatched;
     protected boolean issued;
@@ -33,23 +33,23 @@ public abstract class AbstractReorderBufferEntry {
 
     private int numNotReadyOperands;
 
-    public AbstractReorderBufferEntry(Thread thread, DynamicInstruction dynamicInst, int npc, int nnpc, int predNnpc, int returnAddressStackRecoverIndex, BranchPredictorUpdate dirUpdate, boolean speculative) {
+    public AbstractReorderBufferEntry(Thread thread, DynamicInstruction dynamicInstruction, int npc, int nnpc, int predictedNnpc, int returnAddressStackRecoverIndex, BranchPredictorUpdate branchPredictorUpdate, boolean speculative) {
         this.id = thread.getSimulation().currentReorderBufferEntryId++;
 
         this.thread = thread;
 
-        this.dynamicInst = dynamicInst;
+        this.dynamicInstruction = dynamicInstruction;
 
         this.npc = npc;
         this.nnpc = nnpc;
-        this.predNnpc = predNnpc;
+        this.predictedNnpc = predictedNnpc;
         this.returnAddressStackRecoverIndex = returnAddressStackRecoverIndex;
-        this.dirUpdate = dirUpdate;
+        this.branchPredictorUpdate = branchPredictorUpdate;
         this.speculative = speculative;
 
-        this.oldPhysRegs = new TreeMap<Integer, PhysicalRegisterFile.PhysicalRegister>();
-        this.physRegs = new TreeMap<Integer, PhysicalRegisterFile.PhysicalRegister>();
-        this.srcPhysRegs = new TreeMap<Integer, PhysicalRegisterFile.PhysicalRegister>();
+        this.oldPhysicalRegisters = new TreeMap<Integer, PhysicalRegisterFile.PhysicalRegister>();
+        this.targetPhysicalRegisters = new TreeMap<Integer, PhysicalRegisterFile.PhysicalRegister>();
+        this.sourcePhysicalRegisters = new TreeMap<Integer, PhysicalRegisterFile.PhysicalRegister>();
     }
 
     public void writeBack() {
@@ -61,7 +61,7 @@ public abstract class AbstractReorderBufferEntry {
     protected abstract boolean isNeedWriteBack();
 
     private void doWriteBack() {
-        for (Map.Entry<Integer, PhysicalRegisterFile.PhysicalRegister> entry : this.physRegs.entrySet()) {
+        for (Map.Entry<Integer, PhysicalRegisterFile.PhysicalRegister> entry : this.targetPhysicalRegisters.entrySet()) {
             if (entry.getKey() != 0) {
                 entry.getValue().writeback();
             }
@@ -90,36 +90,36 @@ public abstract class AbstractReorderBufferEntry {
         return nnpc;
     }
 
-    public int getPredNnpc() {
-        return predNnpc;
+    public int getPredictedNnpc() {
+        return predictedNnpc;
     }
 
     public Thread getThread() {
         return thread;
     }
 
-    public DynamicInstruction getDynamicInst() {
-        return dynamicInst;
+    public DynamicInstruction getDynamicInstruction() {
+        return dynamicInstruction;
     }
 
-    public Map<Integer, PhysicalRegisterFile.PhysicalRegister> getOldPhysRegs() {
-        return oldPhysRegs;
+    public Map<Integer, PhysicalRegisterFile.PhysicalRegister> getOldPhysicalRegisters() {
+        return oldPhysicalRegisters;
     }
 
-    public Map<Integer, PhysicalRegisterFile.PhysicalRegister> getPhysRegs() {
-        return physRegs;
+    public Map<Integer, PhysicalRegisterFile.PhysicalRegister> getTargetPhysicalRegisters() {
+        return targetPhysicalRegisters;
     }
 
-    public void setPhysRegs(Map<Integer, PhysicalRegisterFile.PhysicalRegister> physRegs) {
-        this.physRegs = physRegs;
+    public void setTargetPhysicalRegisters(Map<Integer, PhysicalRegisterFile.PhysicalRegister> targetPhysicalRegisters) {
+        this.targetPhysicalRegisters = targetPhysicalRegisters;
     }
 
-    public Map<Integer, PhysicalRegisterFile.PhysicalRegister> getSrcPhysRegs() {
-        return srcPhysRegs;
+    public Map<Integer, PhysicalRegisterFile.PhysicalRegister> getSourcePhysicalRegisters() {
+        return sourcePhysicalRegisters;
     }
 
-    public void setSrcPhysRegs(Map<Integer, PhysicalRegisterFile.PhysicalRegister> srcPhysRegs) {
-        this.srcPhysRegs = srcPhysRegs;
+    public void setSourcePhysicalRegisters(Map<Integer, PhysicalRegisterFile.PhysicalRegister> sourcePhysicalRegisters) {
+        this.sourcePhysicalRegisters = sourcePhysicalRegisters;
     }
 
     public boolean isDispatched() {
@@ -154,8 +154,8 @@ public abstract class AbstractReorderBufferEntry {
         return returnAddressStackRecoverIndex;
     }
 
-    public BranchPredictorUpdate getDirUpdate() {
-        return dirUpdate;
+    public BranchPredictorUpdate getBranchPredictorUpdate() {
+        return branchPredictorUpdate;
     }
 
     public boolean isSquashed() {

@@ -202,11 +202,11 @@ public final class ArchitecturalRegisterFile implements Cloneable {
                 this.fpr.setFloat(num, theOtherRegisterFile.fpr.getFloat(num));
                 break;
             case MISC:
-                if (num == MISC_REG_LO) {
+                if (num == REGISTER_MISC_LO) {
                     this.lo = theOtherRegisterFile.lo;
-                } else if (num == MISC_REG_HI) {
+                } else if (num == REGISTER_MISC_HI) {
                     this.hi = theOtherRegisterFile.hi;
-                } else if (num == MISC_REG_FCSR) {
+                } else if (num == REGISTER_MISC_FCSR) {
                     this.fcsr = theOtherRegisterFile.fcsr;
                 }
                 break;
@@ -300,44 +300,44 @@ public final class ArchitecturalRegisterFile implements Cloneable {
             "t8", "t9", "k0", "k1", "gp", "sp", "fp", "ra"
     };
 
-    public static final int NUM_INT_REGS = 32;
-    public static final int NUM_FLOAT_REGS = 32;
-    public static final int NUM_MISC_REGS = 3;
+    public static final int NUM_INT_REGISTERS = 32;
+    public static final int NUM_FLOAT_REGISTERS = 32;
+    public static final int NUM_MISC_REGISTERS = 3;
 
-    public static final int REG_ZERO = 0;
-    public static final int REG_AT = 1;
-    public static final int REG_V0 = 2;
-    public static final int REG_V1 = 3;
-    public static final int REG_A0 = 4;
-    public static final int REG_A1 = 5;
-    public static final int REG_A2 = 6;
-    public static final int REG_A3 = 7;
-    public static final int REG_T0 = 8;
-    public static final int REG_T1 = 9;
-    public static final int REG_T2 = 10;
-    public static final int REG_T3 = 11;
-    public static final int REG_T4 = 12;
-    public static final int REG_T5 = 13;
-    public static final int REG_T6 = 14;
-    public static final int REG_T7 = 15;
-    public static final int REG_S0 = 16;
-    public static final int REG_S1 = 17;
-    public static final int REG_S2 = 18;
-    public static final int REG_S3 = 19;
-    public static final int REG_S4 = 20;
-    public static final int REG_S5 = 21;
-    public static final int REG_S6 = 22;
-    public static final int REG_S7 = 23;
-    public static final int REG_T8 = 24;
-    public static final int REG_T9 = 25;
-    public static final int REG_K0 = 26;
-    public static final int REG_K1 = 27;
-    public static final int REG_GP = 28;
-    public static final int REG_SP = 29;
-    public static final int REG_FP = 30;
-    public static final int REG_RA = 31;
+    public static final int REGISTER_ZERO = 0;
+    public static final int REGISTER_AT = 1;
+    public static final int REGISTER_V0 = 2;
+    public static final int REGISTER_V1 = 3;
+    public static final int REGISTER_A0 = 4;
+    public static final int REGISTER_A1 = 5;
+    public static final int REGISTER_A2 = 6;
+    public static final int REGISTER_A3 = 7;
+    public static final int REGISTER_T0 = 8;
+    public static final int REGISTER_T1 = 9;
+    public static final int REGISTER_T2 = 10;
+    public static final int REGISTER_T3 = 11;
+    public static final int REGISTER_T4 = 12;
+    public static final int REGISTER_T5 = 13;
+    public static final int REGISTER_T6 = 14;
+    public static final int REGISTER_T7 = 15;
+    public static final int REGISTER_S0 = 16;
+    public static final int REGISTER_S1 = 17;
+    public static final int REGISTER_S2 = 18;
+    public static final int REGISTER_S3 = 19;
+    public static final int REGISTER_S4 = 20;
+    public static final int REGISTER_S5 = 21;
+    public static final int REGISTER_S6 = 22;
+    public static final int REGISTER_S7 = 23;
+    public static final int REGISTER_T8 = 24;
+    public static final int REGISTER_T9 = 25;
+    public static final int REGISTER_K0 = 26;
+    public static final int REGISTER_K1 = 27;
+    public static final int REGISTER_GP = 28;
+    public static final int REGISTER_SP = 29;
+    public static final int REGISTER_FP = 30;
+    public static final int REGISTER_RA = 31;
 
-    public static final int MISC_REG_LO = 0;
-    public static final int MISC_REG_HI = 1;
-    public static final int MISC_REG_FCSR = 2;
+    public static final int REGISTER_MISC_LO = 0;
+    public static final int REGISTER_MISC_HI = 1;
+    public static final int REGISTER_MISC_FCSR = 2;
 }

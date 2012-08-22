@@ -103,30 +103,6 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
         this.p2pReorderBuffers = new HashMap<Controller, Map<Controller, PointToPointReorderBuffer>>();
     }
 
-    public void dumpCacheControllerFsmStats() {
-        for (CacheController l1ICacheController : this.l1ICacheControllers) {
-            System.out.println("Cache Controller " + l1ICacheController.getName() + " FSM: ");
-            System.out.println("------------------------------------------------------------------------");
-            l1ICacheController.getFsmFactory().dump();
-        }
-
-        System.out.println();
-        System.out.println();
-
-        for (CacheController l1DCacheController : this.l1DCacheControllers) {
-            System.out.println("Cache Controller " + l1DCacheController.getName() + " FSM: ");
-            System.out.println("------------------------------------------------------------------------");
-            l1DCacheController.getFsmFactory().dump();
-        }
-
-        System.out.println();
-        System.out.println();
-
-        System.out.println("Directory Controller " + this.l2CacheController.getName() + " FSM: ");
-        System.out.println("------------------------------------------------------------------------");
-        this.l2CacheController.getFsmFactory().dump();
-    }
-
     @Override
     public void dumpCacheControllerFsmStats(Map<String, String> stats) {
         for (CacheController l1ICacheController : this.l1ICacheControllers) {

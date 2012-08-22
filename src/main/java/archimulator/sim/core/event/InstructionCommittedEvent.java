@@ -22,19 +22,19 @@ import archimulator.sim.common.SimulationEvent;
 import archimulator.sim.core.DynamicInstruction;
 
 public class InstructionCommittedEvent extends SimulationEvent {
-    private DynamicInstruction dynamicInst;
+    private DynamicInstruction dynamicInstruction;
 
-    public InstructionCommittedEvent(DynamicInstruction dynamicInst) {
-        super(dynamicInst.getThread());
-        this.dynamicInst = dynamicInst;
+    public InstructionCommittedEvent(DynamicInstruction dynamicInstruction) {
+        super(dynamicInstruction.getThread());
+        this.dynamicInstruction = dynamicInstruction;
     }
 
-    public DynamicInstruction getDynamicInst() {
-        return dynamicInst;
+    public DynamicInstruction getDynamicInstruction() {
+        return dynamicInstruction;
     }
 
     @Override
     public String toString() {
-        return String.format("InstructionCommittedEvent{dynamicInst=%s}", dynamicInst);
+        return String.format("InstructionCommittedEvent{dynamicInstruction=%s}", dynamicInstruction);
     }
 }

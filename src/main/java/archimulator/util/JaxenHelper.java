@@ -67,8 +67,7 @@ public class JaxenHelper {
             } else {
                 stats.put(escape(expr), toString(resultObj));
             }
-        }
-        else {
+        } else {
             throw new IllegalArgumentException();
         }
     }
@@ -80,8 +79,7 @@ public class JaxenHelper {
                 Object resultObj = result.get(i);
                 stats.put(escape(expr) + "[" + i + "]", toString(resultObj));
             }
-        }
-        else {
+        } else {
             throw new IllegalArgumentException();
         }
     }

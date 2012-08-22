@@ -44,29 +44,29 @@ public class Utsname {
             byte[] machine_buf = (this.machine + "\0").getBytes(charSet);
             byte[] domainname_buf = (this.domainname + "\0").getBytes(charSet);
 
-            byte[] buf = new byte[sizeof];
+            byte[] buffer = new byte[sizeof];
 
-            ByteBuffer bb = ByteBuffer.wrap(buf).order(littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
+            ByteBuffer byteBuffer = ByteBuffer.wrap(buffer).order(littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
 
-            bb.position(0);
-            bb.put(sysname_buf);
+            byteBuffer.position(0);
+            byteBuffer.put(sysname_buf);
 
-            bb.position(_SYSNAME_SIZE);
-            bb.put(nodename_buf);
+            byteBuffer.position(_SYSNAME_SIZE);
+            byteBuffer.put(nodename_buf);
 
-            bb.position(_SYSNAME_SIZE * 2);
-            bb.put(release_buf);
+            byteBuffer.position(_SYSNAME_SIZE * 2);
+            byteBuffer.put(release_buf);
 
-            bb.position(_SYSNAME_SIZE * 3);
-            bb.put(version_buf);
+            byteBuffer.position(_SYSNAME_SIZE * 3);
+            byteBuffer.put(version_buf);
 
-            bb.position(_SYSNAME_SIZE * 4);
-            bb.put(machine_buf);
+            byteBuffer.position(_SYSNAME_SIZE * 4);
+            byteBuffer.put(machine_buf);
 
-            bb.position(_SYSNAME_SIZE * 5);
-            bb.put(domainname_buf);
+            byteBuffer.position(_SYSNAME_SIZE * 5);
+            byteBuffer.put(domainname_buf);
 
-            return buf;
+            return buffer;
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }

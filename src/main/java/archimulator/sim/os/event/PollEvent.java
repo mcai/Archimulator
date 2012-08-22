@@ -23,30 +23,30 @@ import archimulator.sim.os.Context;
 
 public class PollEvent extends SystemEvent {
     private TimeCriterion timeCriterion;
-    private WaitFdCriterion waitFdCriterion;
+    private WaitFileDescriptorCriterion waitFileDescriptorCriterion;
 
     public PollEvent(Context context) {
         super(context, SystemEventType.POLL);
 
         this.timeCriterion = new TimeCriterion();
-        this.waitFdCriterion = new WaitFdCriterion();
+        this.waitFileDescriptorCriterion = new WaitFileDescriptorCriterion();
     }
 
     @Override
     public boolean needProcess() {
-        return this.timeCriterion.needProcess(this.getContext()) || this.waitFdCriterion.needProcess(this.getContext());
+        return this.timeCriterion.needProcess(this.getContext()) || this.waitFileDescriptorCriterion.needProcess(this.getContext());
     }
 
     @Override
     public void process() {
-        if (!this.waitFdCriterion.getBuffer().isEmpty()) {
-            this.getContext().getProcess().getMemory().writeHalfWord(this.waitFdCriterion.getPufds() + 6, (short) 1);
-            this.getContext().getRegs().setGpr(ArchitecturalRegisterFile.REG_V0, 1);
+        if (!this.waitFileDescriptorCriterion.getBuffer().isEmpty()) {
+            this.getContext().getProcess().getMemory().writeHalfWord(this.waitFileDescriptorCriterion.getPufds() + 6, (short) 1);
+            this.getContext().getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_V0, 1);
         } else {
-            this.getContext().getRegs().setGpr(ArchitecturalRegisterFile.REG_V0, 0);
+            this.getContext().getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_V0, 0);
         }
 
-        this.getContext().getRegs().setGpr(ArchitecturalRegisterFile.REG_A3, 0);
+        this.getContext().getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_A3, 0);
         this.getContext().resume();
     }
 
@@ -54,7 +54,7 @@ public class PollEvent extends SystemEvent {
         return timeCriterion;
     }
 
-    public WaitFdCriterion getWaitFdCriterion() {
-        return waitFdCriterion;
+    public WaitFileDescriptorCriterion getWaitFileDescriptorCriterion() {
+        return waitFileDescriptorCriterion;
     }
 }

@@ -26,7 +26,7 @@ import java.util.List;
 
 public class MemoryHierarchyAccess {
     private long id;
-    private DynamicInstruction dynamicInst;
+    private DynamicInstruction dynamicInstruction;
     private MemoryHierarchyThread thread;
     private MemoryHierarchyAccessType type;
 
@@ -40,10 +40,10 @@ public class MemoryHierarchyAccess {
     private long beginCycle;
     private long endCycle;
 
-    public MemoryHierarchyAccess(DynamicInstruction dynamicInst, MemoryHierarchyThread thread, MemoryHierarchyAccessType type, int virtualPc, int physicalAddress, int physicalTag, Action onCompletedCallback, long beginCycle) {
+    public MemoryHierarchyAccess(DynamicInstruction dynamicInstruction, MemoryHierarchyThread thread, MemoryHierarchyAccessType type, int virtualPc, int physicalAddress, int physicalTag, Action onCompletedCallback, long beginCycle) {
         this.id = thread.getSimulation().currentMemoryHierarchyAccessId++;
 
-        this.dynamicInst = dynamicInst;
+        this.dynamicInstruction = dynamicInstruction;
 
         this.thread = thread;
         this.type = type;
@@ -68,8 +68,8 @@ public class MemoryHierarchyAccess {
         return id;
     }
 
-    public DynamicInstruction getDynamicInst() {
-        return dynamicInst;
+    public DynamicInstruction getDynamicInstruction() {
+        return dynamicInstruction;
     }
 
     public MemoryHierarchyThread getThread() {
@@ -110,7 +110,7 @@ public class MemoryHierarchyAccess {
 
     @Override
     public String toString() {
-//        return String.format("%d %s %s @ {virtualPc=0x%08x, physicalAddress=0x%08x, physicalTag=0x%08x, dynamicInst=%s}", id, thread.getName(), type, virtualPc, physicalAddress, physicalTag, dynamicInst);
+//        return String.format("%d %s %s @ {virtualPc=0x%08x, physicalAddress=0x%08x, physicalTag=0x%08x, dynamicInstruction=%s}", id, thread.getName(), type, virtualPc, physicalAddress, physicalTag, dynamicInstruction);
 //        return String.format("%s 0x%08x %s {id=%d, physicalTag=0x%08x}", thread.getName(), virtualPc, type, id, physicalTag);
         return String.format("%s {%d} 0x%08x: 0x%08x %s", thread.getName(), id, virtualPc, physicalTag, type);
     }

@@ -51,11 +51,11 @@ public abstract class Net extends BasicSimulationObject {
         nodes.addAll(this.endPointNodes.values());
 
         /* Initialize table with infinite costs */
-        for (NetNode srcNode : nodes) {
-            for (NetNode destNode : nodes) {
-                RoutingEntry routingEntry = new RoutingEntry(srcNode, destNode);
-                routingEntry.setCost(srcNode == destNode ? 0 : nodes.size());
-                srcNode.getRoutingEntries().put(routingEntry.getDestNode(), routingEntry);
+        for (NetNode sourceNode : nodes) {
+            for (NetNode destinationNode : nodes) {
+                RoutingEntry routingEntry = new RoutingEntry(sourceNode, destinationNode);
+                routingEntry.setCost(sourceNode == destinationNode ? 0 : nodes.size());
+                sourceNode.getRoutingEntries().put(routingEntry.getDestinationNode(), routingEntry);
             }
         }
 
@@ -64,9 +64,9 @@ public abstract class Net extends BasicSimulationObject {
             for (OutPort outPort : node.getOutPorts()) {
                 if (outPort.getLink() != null) {
                     NetLink link = outPort.getLink();
-                    final RoutingEntry routingEntry = node.getRoutingEntries().get(link.getDestPort().getNode());
+                    final RoutingEntry routingEntry = node.getRoutingEntries().get(link.getDestinationPort().getNode());
                     routingEntry.setCost(1);
-                    routes.put(routingEntry, link.getDestPort().getNode());
+                    routes.put(routingEntry, link.getDestinationPort().getNode());
                 }
             }
         }
@@ -104,7 +104,7 @@ public abstract class Net extends BasicSimulationObject {
 
                 for (OutPort port : nodeI.getOutPorts()) {
                     NetLink link = port.getLink();
-                    if (link != null && link.getDestPort().getNode() == nodeNext) {
+                    if (link != null && link.getDestinationPort().getNode() == nodeNext) {
                         routingEntry.setOutPort(port);
                         break;
                     }
@@ -118,10 +118,10 @@ public abstract class Net extends BasicSimulationObject {
         new NetLink(node2, node1, bandwidth);
     }
 
-    public void transfer(final MemoryDevice srcDevice, final MemoryDevice destDevice, final int size, final Action onCompletedCallback) {
-        EndPointNode srcNode = this.endPointNodes.get(srcDevice);
-        EndPointNode destNode = this.endPointNodes.get(destDevice);
-        OutPort port = srcNode.getPort(destNode);
-        port.toLink(new NetMessage(this, srcNode, destNode, size, onCompletedCallback, this.getCycleAccurateEventQueue().getCurrentCycle()));
+    public void transfer(MemoryDevice sourceDevice, MemoryDevice destinationDevice, int size, Action onCompletedCallback) {
+        EndPointNode sourceNode = this.endPointNodes.get(sourceDevice);
+        EndPointNode destinationNode = this.endPointNodes.get(destinationDevice);
+        OutPort port = sourceNode.getPort(destinationNode);
+        port.toLink(new NetMessage(this, sourceNode, destinationNode, size, onCompletedCallback, this.getCycleAccurateEventQueue().getCurrentCycle()));
     }
 }

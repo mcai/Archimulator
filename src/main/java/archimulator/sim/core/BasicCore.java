@@ -42,10 +42,10 @@ public class BasicCore extends AbstractBasicCore {
                 if (thread.getContext() == null) {
                     return false;
                 } else if (thread.getDecodeBuffer().isEmpty()) {
-                    thread.incRegisterRenameStallsOnDecodeBufferIsEmpty();
+                    thread.incrementRegisterRenameStallsOnDecodeBufferIsEmpty();
                     return false;
                 } else if (thread.getReorderBuffer().isFull()) {
-                    thread.incRegisterRenameStallsOnReorderBufferIsFull();
+                    thread.incrementRegisterRenameStallsOnReorderBufferIsFull();
                     return false;
                 } else {
                     return true;
@@ -119,15 +119,15 @@ public class BasicCore extends AbstractBasicCore {
         for (Iterator<AbstractReorderBufferEntry> it = this.readyInstructionQueue.iterator(); quant.get() > 0 && it.hasNext(); ) {
             final ReorderBufferEntry reorderBufferEntry = (ReorderBufferEntry) it.next();
 
-            if (reorderBufferEntry.getDynamicInst().getStaticInst().getMnemonic().getFuOperationType() != FunctionalUnitOperationType.NONE) {
-                if (this.fuPool.acquire(reorderBufferEntry, new Action1<ReorderBufferEntry>() {
+            if (reorderBufferEntry.getDynamicInstruction().getStaticInstruction().getMnemonic().getFunctionalUnitOperationType() != FunctionalUnitOperationType.NONE) {
+                if (this.functionalUnitPool.acquire(reorderBufferEntry, new Action1<ReorderBufferEntry>() {
                     public void apply(ReorderBufferEntry readyQueueEntry1) {
                         reorderBufferEntry.signalCompleted();
                     }
                 })) {
                     reorderBufferEntry.setIssued();
                 } else {
-                    reorderBufferEntry.getThread().incSelectionStallOnNoFreeFunctionalUnit();
+                    reorderBufferEntry.getThread().incrementSelectionStallOnNoFreeFunctionalUnit();
                     continue;
                 }
             } else {
@@ -149,7 +149,7 @@ public class BasicCore extends AbstractBasicCore {
             boolean hitInLoadStoreQueue = false;
 
             for (LoadStoreQueueEntry loadStoreQueueEntry1 : loadStoreQueueEntry.getThread().getLoadStoreQueue().getEntries()) {
-                if (loadStoreQueueEntry1.getDynamicInst().getStaticInst().getMnemonic().getType() == StaticInstructionType.STORE && loadStoreQueueEntry1.getEffectiveAddress() == loadStoreQueueEntry.getEffectiveAddress()) {
+                if (loadStoreQueueEntry1.getDynamicInstruction().getStaticInstruction().getMnemonic().getType() == StaticInstructionType.STORE && loadStoreQueueEntry1.getEffectiveAddress() == loadStoreQueueEntry.getEffectiveAddress()) {
                     hitInLoadStoreQueue = true;
                     break;
                 }
@@ -160,11 +160,11 @@ public class BasicCore extends AbstractBasicCore {
                 loadStoreQueueEntry.signalCompleted();
             } else {
                 if (!this.canLoad(loadStoreQueueEntry.getThread(), loadStoreQueueEntry.getEffectiveAddress())) {
-                    loadStoreQueueEntry.getThread().incSelectionStallOnCanNotLoad();
+                    loadStoreQueueEntry.getThread().incrementSelectionStallOnCanNotLoad();
                     break;
                 }
 
-                this.load(loadStoreQueueEntry.getDynamicInst(), loadStoreQueueEntry.getEffectiveAddress(), loadStoreQueueEntry.getDynamicInst().getPc(), new Action() {
+                this.load(loadStoreQueueEntry.getDynamicInstruction(), loadStoreQueueEntry.getEffectiveAddress(), loadStoreQueueEntry.getDynamicInstruction().getPc(), new Action() {
                     public void apply() {
                         loadStoreQueueEntry.signalCompleted();
                     }
@@ -183,11 +183,11 @@ public class BasicCore extends AbstractBasicCore {
             final LoadStoreQueueEntry loadStoreQueueEntry = (LoadStoreQueueEntry) it.next();
 
             if (!this.canStore(loadStoreQueueEntry.getThread(), loadStoreQueueEntry.getEffectiveAddress())) {
-                loadStoreQueueEntry.getThread().incSelectionStallOnCanNotStore();
+                loadStoreQueueEntry.getThread().incrementSelectionStallOnCanNotStore();
                 break;
             }
 
-            this.store(loadStoreQueueEntry.getDynamicInst(), loadStoreQueueEntry.getEffectiveAddress(), loadStoreQueueEntry.getDynamicInst().getPc(), new Action() {
+            this.store(loadStoreQueueEntry.getDynamicInstruction(), loadStoreQueueEntry.getEffectiveAddress(), loadStoreQueueEntry.getDynamicInstruction().getPc(), new Action() {
                 public void apply() {
 //                    loadStoreQueueEntry.signalCompleted(); //TODO: should we need to wait for store to complete?
                 }

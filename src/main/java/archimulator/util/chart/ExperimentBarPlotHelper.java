@@ -53,7 +53,7 @@ public class ExperimentBarPlotHelper {
             @Override
             public String apply(Experiment experiment) {
                 ContextMapping contextMapping = experiment.getContextMappings().get(0);
-                return contextMapping.getHtLookahead() + ", " + contextMapping.getHtStride() + ", " + StorageUnit.toString(experiment.getArchitecture().getL2Size()) + ", " + experiment.getArchitecture().getL2Assoc();
+                return contextMapping.getHelperThreadLookahead() + ", " + contextMapping.getHelperThreadStride() + ", " + StorageUnit.toString(experiment.getArchitecture().getL2Size()) + ", " + experiment.getArchitecture().getL2Associativity();
             }
         };
 

@@ -25,8 +25,8 @@ import archimulator.sim.uncore.net.Net;
 import net.pickapack.action.Action;
 
 public abstract class MemoryController extends MemoryDevice {
-    private long reads;
-    private long writes;
+    private long numReads;
+    private long numWrites;
 
     public MemoryController(CacheHierarchy cacheHierarchy) {
         super(cacheHierarchy, "mainMemory");
@@ -38,7 +38,7 @@ public abstract class MemoryController extends MemoryDevice {
     }
 
     public void memReadRequestReceive(final MemoryDevice source, int tag, final Action onSuccessCallback) {
-        this.reads++;
+        this.numReads++;
 
         this.access(tag, new Action() {
             @Override
@@ -49,7 +49,7 @@ public abstract class MemoryController extends MemoryDevice {
     }
 
     public void memWriteRequestReceive(final MemoryDevice source, int tag, final Action onSuccessCallback) {
-        this.writes++;
+        this.numWrites++;
 
         this.access(tag, new Action() {
             @Override
@@ -61,16 +61,16 @@ public abstract class MemoryController extends MemoryDevice {
 
     protected abstract void access(int address, Action onCompletedCallback);
 
-    public long getAccesses() {
-        return this.reads + this.writes;
+    public long getNumAccesses() {
+        return this.numReads + this.numWrites;
     }
 
-    public long getReads() {
-        return reads;
+    public long getNumReads() {
+        return numReads;
     }
 
-    public long getWrites() {
-        return writes;
+    public long getNumWrites() {
+        return numWrites;
     }
 
     public int getLineSize() {

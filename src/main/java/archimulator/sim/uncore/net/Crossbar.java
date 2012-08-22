@@ -36,31 +36,31 @@ public class Crossbar {
     }
 
     public void toOutBuffer(final NetMessage message) {
-        final OutPort destPort = this.node.getPort(message.getDestNode());
+        final OutPort destinationPort = this.node.getPort(message.getDestinationNode());
 
-        if (destPort.getBuffer() != null) {
-            if (destPort.getBuffer().isWriteBusy()) {
-                destPort.getBuffer().addPendingWriteAction(new Action() {
+        if (destinationPort.getBuffer() != null) {
+            if (destinationPort.getBuffer().isWriteBusy()) {
+                destinationPort.getBuffer().addPendingWriteAction(new Action() {
                     public void apply() {
                         toOutBuffer(message);
                     }
                 });
-            } else if (destPort.getBuffer().getCount() + message.getSize() > destPort.getBuffer().getSize()) {
-                destPort.getBuffer().addPendingFullAction(new Action() {
+            } else if (destinationPort.getBuffer().getCount() + message.getSize() > destinationPort.getBuffer().getSize()) {
+                destinationPort.getBuffer().addPendingFullAction(new Action() {
                     public void apply() {
                         toOutBuffer(message);
                     }
                 });
             } else {
-                if (destPort.getBuffer() != null) {
-                    if (destPort.getBuffer().getCount() + message.getSize() > destPort.getBuffer().getSize()) {
+                if (destinationPort.getBuffer() != null) {
+                    if (destinationPort.getBuffer().getCount() + message.getSize() > destinationPort.getBuffer().getSize()) {
                         throw new IllegalArgumentException();
                     }
 
-                    destPort.getBuffer().beginWrite();
+                    destinationPort.getBuffer().beginWrite();
                     this.node.getNet().getCycleAccurateEventQueue().schedule(this, new Action() {
                         public void apply() {
-                            destPort.getBuffer().endWrite(message);
+                            destinationPort.getBuffer().endWrite(message);
                         }
                     }, 1); //TODO: latency
                 }

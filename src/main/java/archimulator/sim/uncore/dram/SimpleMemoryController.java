@@ -32,12 +32,12 @@ public class SimpleMemoryController extends MemoryController {
     }
 
     private int getLatency() {
-        int chunks = (this.getLineSize() - (this.getBusWidth() - 1)) / this.getBusWidth();
-        if ((chunks <= 0)) {
+        int numChunks = (this.getLineSize() - (this.getBusWidth() - 1)) / this.getBusWidth();
+        if ((numChunks <= 0)) {
             throw new IllegalArgumentException();
         }
 
-        return this.getMemoryLatency() + (this.getMemoryTrunkLatency() * (chunks - 1));
+        return this.getMemoryLatency() + (this.getMemoryTrunkLatency() * (numChunks - 1));
     }
 
     public int getMemoryLatency() {

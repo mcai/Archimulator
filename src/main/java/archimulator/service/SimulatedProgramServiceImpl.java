@@ -18,9 +18,9 @@
  ******************************************************************************/
 package archimulator.service;
 
-import net.pickapack.model.ModelElement;
 import archimulator.model.SimulatedProgram;
 import com.j256.ormlite.dao.Dao;
+import net.pickapack.model.ModelElement;
 import net.pickapack.service.AbstractService;
 
 import java.util.Arrays;
@@ -35,7 +35,7 @@ public class SimulatedProgramServiceImpl extends AbstractService implements Simu
 
         this.simulatedPrograms = createDao(SimulatedProgram.class);
 
-        if(this.getFirstSimulatedProgram() == null) {
+        if (this.getFirstSimulatedProgram() == null) {
             this.addSimulatedProgram(new SimulatedProgram(
                     "mst_baseline", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/baseline",
                     "mst.mips",

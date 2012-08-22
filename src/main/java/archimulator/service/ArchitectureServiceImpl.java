@@ -22,8 +22,8 @@ import archimulator.model.Architecture;
 import archimulator.sim.core.bpred.BranchPredictorType;
 import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
 import archimulator.sim.uncore.dram.MainMemoryType;
-import net.pickapack.model.ModelElement;
 import com.j256.ormlite.dao.Dao;
+import net.pickapack.model.ModelElement;
 import net.pickapack.service.AbstractService;
 
 import java.util.Arrays;
@@ -89,14 +89,14 @@ public class ArchitectureServiceImpl extends AbstractService implements Architec
                 + "-" + "L2_" + l2Size / 1024 + "KB" + "_" + "Assoc" + l2Assoc
                 + "_" + l2ReplacementPolicyType;
 
-        if(getArchitectureByTitle(title) != null) {
+        if (getArchitectureByTitle(title) != null) {
             return getArchitectureByTitle(title);
         }
 
         Architecture architecture = new Architecture(title);
 
-        architecture.setHtPthreadSpawnIndex(3720);
-        architecture.setHtLLCRequestProfilingEnabled(htLLCRequestProfilingEnabled);
+        architecture.setHelperThreadPthreadSpawnIndex(3720);
+        architecture.setHelperThreadL2CacheRequestProfilingEnabled(htLLCRequestProfilingEnabled);
 
         architecture.setNumCores(numCores);
         architecture.setNumThreadsPerCore(numThreadsPerCore);
@@ -109,39 +109,39 @@ public class ArchitectureServiceImpl extends AbstractService implements Architec
         architecture.setReorderBufferCapacity(96);
         architecture.setLoadStoreQueueCapacity(48);
 
-        architecture.setBpredType(BranchPredictorType.PERFECT);
+        architecture.setBranchPredictorType(BranchPredictorType.PERFECT);
 
-        architecture.setTwoBitBpredBimodSize(2048);
-        architecture.setTwoBitBpredBtbSets(512);
-        architecture.setTwoBitBpredBtbAssoc(4);
-        architecture.setTwoBitBpredRetStackSize(8);
+        architecture.setTwoBitBranchPredictorBimodSize(2048);
+        architecture.setTwoBitBranchPredictorBranchTargetBufferNumSets(512);
+        architecture.setTwoBitBranchPredictorBranchTargetBufferAssociativity(4);
+        architecture.setTwoBitBranchPredictorReturnAddressStackSize(8);
 
-        architecture.setTwoLevelBpredL1Size(1);
-        architecture.setTwoLevelBpredL2Size(1024);
-        architecture.setTwoLevelBpredShiftWidth(8);
-        architecture.setTwoLevelBpredXor(false);
-        architecture.setTwoLevelBpredBtbSets(512);
-        architecture.setTwoLevelBpredBtbAssoc(4);
-        architecture.setTwoLevelBpredRetStackSize(8);
+        architecture.setTwoLevelBranchPredictorL1Size(1);
+        architecture.setTwoLevelBranchPredictorL2Size(1024);
+        architecture.setTwoLevelBranchPredictorShiftWidth(8);
+        architecture.setTwoLevelBranchPredictorXor(false);
+        architecture.setTwoLevelBranchPredictorBranchTargetBufferNumSets(512);
+        architecture.setTwoLevelBranchPredictorBranchTargetBufferAssociativity(4);
+        architecture.setTwoLevelBranchPredictorReturnAddressStackSize(8);
 
-        architecture.setCombinedBpredBimodSize(2048);
-        architecture.setCombinedBpredL1Size(1);
-        architecture.setCombinedBpredL2Size(1024);
-        architecture.setCombinedBpredMetaSize(1024);
-        architecture.setCombinedBpredShiftWidth(8);
-        architecture.setCombinedBpredXor(false);
-        architecture.setCombinedBpredBtbSets(512);
-        architecture.setCombinedBpredBtbAssoc(4);
-        architecture.setCombinedBpredBtbRetStackSize(8);
+        architecture.setCombinedBranchPredictorBimodSize(2048);
+        architecture.setCombinedBranchPredictorL1Size(1);
+        architecture.setCombinedBranchPredictorL2Size(1024);
+        architecture.setCombinedBranchPredictorMetaSize(1024);
+        architecture.setCombinedBranchPredictorShiftWidth(8);
+        architecture.setCombinedBranchPredictorXor(false);
+        architecture.setCombinedBranchPredictorBranchTargetBufferNumSets(512);
+        architecture.setCombinedBranchPredictorBranchTargetBufferAssociativity(4);
+        architecture.setCombinedBranchPredictorReturnAddressStackSize(8);
 
         architecture.setTlbSize(32768);
-        architecture.setTlbAssoc(4);
+        architecture.setTlbAssociativity(4);
         architecture.setTlbLineSize(64);
         architecture.setTlbHitLatency(2);
         architecture.setTlbMissLatency(30);
 
         architecture.setL1ISize(l1ISize);
-        architecture.setL1IAssoc(l1IAssoc);
+        architecture.setL1IAssociativity(l1IAssoc);
         architecture.setL1ILineSize(64);
         architecture.setL1IHitLatency(1);
         architecture.setL1INumReadPorts(128);
@@ -149,7 +149,7 @@ public class ArchitectureServiceImpl extends AbstractService implements Architec
         architecture.setL1IReplacementPolicyType(CacheReplacementPolicyType.LRU);
 
         architecture.setL1DSize(l1DSize);
-        architecture.setL1DAssoc(l1DAssoc);
+        architecture.setL1DAssociativity(l1DAssoc);
         architecture.setL1DLineSize(64);
         architecture.setL1DHitLatency(1);
         architecture.setL1DNumReadPorts(128);
@@ -157,7 +157,7 @@ public class ArchitectureServiceImpl extends AbstractService implements Architec
         architecture.setL1DReplacementPolicyType(CacheReplacementPolicyType.LRU);
 
         architecture.setL2Size(l2Size);
-        architecture.setL2Assoc(l2Assoc);
+        architecture.setL2Associativity(l2Assoc);
         architecture.setL2LineSize(64);
         architecture.setL2HitLatency(10);
         architecture.setL2ReplacementPolicyType(l2ReplacementPolicyType);

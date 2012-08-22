@@ -30,17 +30,17 @@ import java.util.List;
 
 public class Startup {
     public static void main(String[] args) throws IOException {
-        if(args.length == 0) {
+        if (args.length == 0) {
             System.err.println("No experiment pack specified");
             return;
         }
 
         ServiceManager.runningExperiments = true;
 
-        for(String arg : args) {
+        for (String arg : args) {
             ExperimentPackSpec experimentPackSpec = JsonSerializationHelper.deserialize(ExperimentPackSpec.class, FileUtils.readAllText(arg));
 
-            if(ServiceManager.getExperimentService().getExperimentPackByTitle(experimentPackSpec.getTitle()) != null) {
+            if (ServiceManager.getExperimentService().getExperimentPackByTitle(experimentPackSpec.getTitle()) != null) {
                 System.err.println("Experiment pack \"" + experimentPackSpec.getTitle() + "\" already exists in the database");
                 ExperimentPack experimentPack = ServiceManager.getExperimentService().getExperimentPackByTitle(experimentPackSpec.getTitle());
                 ServiceManager.getExperimentService().waitForExperimentPackStopped(experimentPack);
@@ -50,15 +50,15 @@ public class Startup {
             ExperimentPack experimentPack = new ExperimentPack(experimentPackSpec.getTitle());
             ServiceManager.getExperimentService().addExperimentPack(experimentPack);
 
-            for(ExperimentSpec experimentSpec : experimentPackSpec.getExperiments()) {
+            for (ExperimentSpec experimentSpec : experimentPackSpec.getExperiments()) {
                 ServiceManager.getExperimentService().addExperiment(createExperiment(
                         experimentPack,
                         experimentSpec.getProgramTitle(),
-                        experimentSpec.getHtLookahead(), experimentSpec.getHtStride(),
+                        experimentSpec.getHelperThreadLookahead(), experimentSpec.getHelperThreadStride(),
                         experimentSpec.getNumCores(), experimentSpec.getNumThreadsPerCore(),
-                        experimentSpec.getL1ISize(), experimentSpec.getL1IAssoc(),
-                        experimentSpec.getL1DSize(), experimentSpec.getL1DAssoc(),
-                        experimentSpec.getL2Size(), experimentSpec.getL2Assoc(), experimentSpec.getL2ReplacementPolicyType()
+                        experimentSpec.getL1ISize(), experimentSpec.getL1IAssociativity(),
+                        experimentSpec.getL1DSize(), experimentSpec.getL1DAssociativity(),
+                        experimentSpec.getL2Size(), experimentSpec.getL2Associativity(), experimentSpec.getL2ReplacementPolicyType()
                 ));
             }
 
@@ -66,7 +66,7 @@ public class Startup {
         }
     }
 
-    private static Experiment createExperiment(ExperimentPack parent, String programTitle, int htLookahead, int htStride, int numCores, int numThreadsPerCore, int l1ISize, int l1IAssoc, int l1DSize, int l1DAssoc, int l2Size, int l2Assoc, CacheReplacementPolicyType l2ReplacementPolicyType) {
+    private static Experiment createExperiment(ExperimentPack parent, String programTitle, int helperThreadLookahead, int helperThreadStride, int numCores, int numThreadsPerCore, int l1ISize, int l1IAssoc, int l1DSize, int l1DAssoc, int l2Size, int l2Assoc, CacheReplacementPolicyType l2ReplacementPolicyType) {
         SimulatedProgram simulatedProgram = ServiceManager.getSimulatedProgramService().getSimulatedProgramByTitle(programTitle);
 
         Architecture architecture = ServiceManager.getArchitectureService().getOrAddArchitecture(true, numCores, numThreadsPerCore, l1ISize, l1IAssoc, l1DSize, l1DAssoc, l2Size, l2Assoc, l2ReplacementPolicyType);
@@ -74,11 +74,11 @@ public class Startup {
         List<ContextMapping> contextMappings = new ArrayList<ContextMapping>();
 
         ContextMapping contextMapping = new ContextMapping(0, simulatedProgram);
-        contextMapping.setHtLookahead(htLookahead);
-        contextMapping.setHtStride(htStride);
-        contextMapping.setDynamicHtParams(false);
+        contextMapping.setHelperThreadLookahead(helperThreadLookahead);
+        contextMapping.setHelperThreadStride(helperThreadStride);
+        contextMapping.setDynamicHelperThreadParams(false);
         contextMappings.add(contextMapping);
 
-        return new Experiment(parent, simulatedProgram.getTitle() + "_" + simulatedProgram.getArgs() + "-" + architecture.getTitle(), ExperimentType.DETAILED, architecture, -1, contextMappings);
+        return new Experiment(parent, simulatedProgram.getTitle() + "_" + simulatedProgram.getArguments() + "-" + architecture.getTitle(), ExperimentType.DETAILED, architecture, -1, contextMappings);
     }
 }

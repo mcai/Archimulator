@@ -32,7 +32,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     private Dao<ExperimentPack, Long> experimentPacks;
 
     @SuppressWarnings("unchecked")
-    public ExperimentServiceImpl(){
+    public ExperimentServiceImpl() {
         super(ServiceManager.DATABASE_DIRECTORY, ServiceManager.DATABASE_URL, Arrays.<Class<? extends ModelElement>>asList(Experiment.class, ExperimentPack.class));
 
         this.experiments = createDao(Experiment.class);
@@ -65,9 +65,9 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     public List<Experiment> getExperimentsBySimulatedProgram(SimulatedProgram simulatedProgram) {
         List<Experiment> result = new ArrayList<Experiment>();
 
-        for(Experiment experiment : getAllExperiments()) {
-            for(ContextMapping contextMapping : experiment.getContextMappings()) {
-                if(contextMapping.getSimulatedProgramId() == simulatedProgram.getId()) {
+        for (Experiment experiment : getAllExperiments()) {
+            for (ContextMapping contextMapping : experiment.getContextMappings()) {
+                if (contextMapping.getSimulatedProgramId() == simulatedProgram.getId()) {
                     result.add(experiment);
                     break;
                 }
@@ -81,8 +81,8 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     public List<Experiment> getExperimentsByArchitecture(Architecture architecture) {
         List<Experiment> result = new ArrayList<Experiment>();
 
-        for(Experiment experiment : getAllExperiments()) {
-            if(experiment.getArchitectureId() == architecture.getId()) {
+        for (Experiment experiment : getAllExperiments()) {
+            if (experiment.getArchitectureId() == architecture.getId()) {
                 result.add(experiment);
             }
         }
@@ -120,13 +120,13 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         JaxenHelper.dumpValueFromXPath(configs, experiment, "createTimeAsString");
         JaxenHelper.dumpValueFromXPath(configs, experiment, "type");
         JaxenHelper.dumpValueFromXPath(configs, experiment, "state");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "numMaxInsts");
+        JaxenHelper.dumpValueFromXPath(configs, experiment, "numMaxInstructions");
         JaxenHelper.dumpValuesFromXPath(configs, experiment, "contextMappings");
 
         JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/title");
         JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/createTimeAsString");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/htPthreadSpawnIndex");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/htLLCRequestProfilingEnabled");
+        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/helperThreadPthreadSpawnIndex");
+        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/helperThreadL2CacheRequestProfilingEnabled");
         JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/numCores");
         JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/numThreadsPerCore");
 
@@ -138,8 +138,8 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/reorderBufferCapacity");
         JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/loadStoreQueueCapacity");
 
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/bpredType");
-        switch (experiment.getArchitecture().getBpredType()) {
+        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/branchPredictorType");
+        switch (experiment.getArchitecture().getBranchPredictorType()) {
             case PERFECT:
                 break;
             case TAKEN:
@@ -147,41 +147,41 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
             case NOT_TAKEN:
                 break;
             case TWO_BIT:
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/twoBitBpredBimodSize");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/twoBitBpredBtbSets");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/twoBitBpredBtbAssoc");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/twoBitBpredRetStackSize");
+                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/twoBitBranchPredictorBimodSize");
+                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/twoBitBranchPredictorBranchTargetBufferNumSets");
+                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/twoBitBranchPredictorBranchTargetBufferAssociativity");
+                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/twoBitBranchPredictorReturnAddressStackSize");
                 break;
             case TWO_LEVEL:
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/twoLevelBpredL1Size");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/twoLevelBpredL2Size");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/twoLevelBpredShiftWidth");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/twoLevelBpredXor");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/twoLevelBpredBtbSets");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/twoLevelBpredBtbAssoc");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/twoLevelBpredRetStackSize");
+                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/twoLevelBranchPredictorL1Size");
+                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/twoLevelBranchPredictorL2Size");
+                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/twoLevelBranchPredictorShiftWidth");
+                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/twoLevelBranchPredictorXor");
+                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/twoLevelBranchPredictorBranchTargetBufferNumSets");
+                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/twoLevelBranchPredictorBranchTargetBufferAssociativity");
+                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/twoLevelBranchPredictorReturnAddressStackSize");
                 break;
             case COMBINED:
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/combinedBpredBimodSize");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/combinedBpredL1Size");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/combinedBpredL2Size");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/combinedBpredMetaSize");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/combinedBpredShiftWidth");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/combinedBpredXor");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/combinedBpredBtbSets");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/combinedBpredBtbAssoc");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/combinedBpredBtbRetStackSize");
+                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/combinedBranchPredictorBimodSize");
+                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/combinedBranchPredictorL1Size");
+                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/combinedBranchPredictorL2Size");
+                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/combinedBranchPredictorMetaSize");
+                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/combinedBranchPredictorShiftWidth");
+                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/combinedBranchPredictorXor");
+                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/combinedBranchPredictorBranchTargetBufferNumSets");
+                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/combinedBranchPredictorBranchTargetBufferAssociativity");
+                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/combinedBranchPredictorReturnAddressStackSize");
                 break;
         }
 
         JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/tlbSize");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/tlbAssoc");
+        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/tlbAssociativity");
         JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/tlbLineSize");
         JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/tlbHitLatency");
         JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/tlbMissLatency");
 
         JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/l1ISize");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/l1IAssoc");
+        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/l1IAssociativity");
         JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/l1ILineSize");
         JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/l1IHitLatency");
         JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/l1INumReadPorts");
@@ -189,7 +189,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/l1IReplacementPolicyType");
 
         JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/l1DSize");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/l1DAssoc");
+        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/l1DAssociativity");
         JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/l1DLineSize");
         JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/l1DHitLatency");
         JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/l1DNumReadPorts");
@@ -197,7 +197,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/l1DReplacementPolicyType");
 
         JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/l2Size");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/l2Assoc");
+        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/l2Associativity");
         JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/l2LineSize");
         JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/l2HitLatency");
         JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/l2ReplacementPolicyType");
@@ -240,8 +240,8 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
     @Override
     public Experiment getFirstExperimentToRun() {
-        for(Experiment experiment : getAllExperiments()) {
-            if(experiment.getState() == ExperimentState.PENDING) {
+        for (Experiment experiment : getAllExperiments()) {
+            if (experiment.getState() == ExperimentState.PENDING) {
                 return experiment;
             }
         }
@@ -254,8 +254,8 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         long id = experiment.getId();
 
         try {
-            for(;;) {
-                if(getExperimentById(id).isStopped()) {
+            for (; ; ) {
+                if (getExperimentById(id).isStopped()) {
                     break;
                 }
 
@@ -301,17 +301,17 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         long id = experimentPack.getId();
 
         try {
-            for(;;) {
+            for (; ; ) {
                 boolean allStopped = true;
 
-                for(Experiment experiment : getExperimentsByParent(getExperimentPackById(id))) {
-                    if(!experiment.isStopped()) {
+                for (Experiment experiment : getExperimentsByParent(getExperimentPackById(id))) {
+                    if (!experiment.isStopped()) {
                         allStopped = false;
                         break;
                     }
                 }
 
-                if(allStopped) {
+                if (allStopped) {
                     return;
                 }
 

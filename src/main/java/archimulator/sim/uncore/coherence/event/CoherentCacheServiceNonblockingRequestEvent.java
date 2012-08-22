@@ -22,11 +22,11 @@ import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.msi.controller.GeneralCacheController;
 
 public class CoherentCacheServiceNonblockingRequestEvent extends CoherentCacheEvent {
-    private final MemoryHierarchyAccess access;
-    private final int tag;
-    private final int set;
-    private final int way;
-    private final boolean hitInCache;
+    private MemoryHierarchyAccess access;
+    private int tag;
+    private int set;
+    private int way;
+    private boolean hitInCache;
 
     public CoherentCacheServiceNonblockingRequestEvent(GeneralCacheController cacheController, MemoryHierarchyAccess access, int tag, int set, int way, boolean hitInCache) {
         super(cacheController);

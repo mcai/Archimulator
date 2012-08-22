@@ -27,7 +27,7 @@ import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
 
 public class ToRoiFastForwardSimulation extends Simulation {
-    private int pthreadSpawnedIndex;
+    private int helperThreadPthreadSpawnIndex;
     private Reference<Kernel> kernelRef;
 
     private boolean pthreadHasSpawned;
@@ -36,10 +36,10 @@ public class ToRoiFastForwardSimulation extends Simulation {
         this(title, experiment, blockingEventDispatcher, cycleAccurateEventQueue, 3720, kernelRef);
     }
 
-    public ToRoiFastForwardSimulation(String title, Experiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, int pthreadSpawnedIndex, Reference<Kernel> kernelRef) {
+    public ToRoiFastForwardSimulation(String title, Experiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, int helperThreadPthreadSpawnIndex, Reference<Kernel> kernelRef) {
         super(title, SimulationType.FAST_FORWARD, experiment, blockingEventDispatcher, cycleAccurateEventQueue);
 
-        this.pthreadSpawnedIndex = pthreadSpawnedIndex;
+        this.helperThreadPthreadSpawnIndex = helperThreadPthreadSpawnIndex;
         this.kernelRef = kernelRef;
     }
 
@@ -64,7 +64,7 @@ public class ToRoiFastForwardSimulation extends Simulation {
 
         this.getProcessor().getKernel().getBlockingEventDispatcher().addListener(PseudoCallEncounteredEvent.class, new Action1<PseudoCallEncounteredEvent>() {
             public void apply(PseudoCallEncounteredEvent event) {
-                if (event.getImm() == ToRoiFastForwardSimulation.this.pthreadSpawnedIndex) {
+                if (event.getImm() == ToRoiFastForwardSimulation.this.helperThreadPthreadSpawnIndex) {
                     pthreadHasSpawned = true;
                 }
             }

@@ -22,22 +22,22 @@ import archimulator.sim.core.bpred.BranchPredictorUpdate;
 
 public class DecodeBufferEntry {
     private long id;
-    private DynamicInstruction dynamicInst;
+    private DynamicInstruction dynamicInstruction;
     private int npc;
     private int nnpc;
-    private int predNnpc;
+    private int predictedNnpc;
     private int returnAddressStackRecoverIndex;
-    private BranchPredictorUpdate dirUpdate;
+    private BranchPredictorUpdate branchPredictorUpdate;
     private boolean speculative;
 
-    public DecodeBufferEntry(DynamicInstruction dynamicInstruction, int npc, int nnpc, int predNnpc, int returnAddressStackRecoverIndex, BranchPredictorUpdate dirUpdate, boolean speculative) {
+    public DecodeBufferEntry(DynamicInstruction dynamicInstruction, int npc, int nnpc, int predictedNnpc, int returnAddressStackRecoverIndex, BranchPredictorUpdate branchPredictorUpdate, boolean speculative) {
         this.id = dynamicInstruction.getThread().getSimulation().currentDecodeBufferEntryId++;
-        this.dynamicInst = dynamicInstruction;
+        this.dynamicInstruction = dynamicInstruction;
         this.npc = npc;
         this.nnpc = nnpc;
-        this.predNnpc = predNnpc;
+        this.predictedNnpc = predictedNnpc;
         this.returnAddressStackRecoverIndex = returnAddressStackRecoverIndex;
-        this.dirUpdate = dirUpdate;
+        this.branchPredictorUpdate = branchPredictorUpdate;
         this.speculative = speculative;
     }
 
@@ -45,8 +45,8 @@ public class DecodeBufferEntry {
         return id;
     }
 
-    public DynamicInstruction getDynamicInst() {
-        return dynamicInst;
+    public DynamicInstruction getDynamicInstruction() {
+        return dynamicInstruction;
     }
 
     public int getNpc() {
@@ -57,16 +57,16 @@ public class DecodeBufferEntry {
         return nnpc;
     }
 
-    public int getPredNnpc() {
-        return predNnpc;
+    public int getPredictedNnpc() {
+        return predictedNnpc;
     }
 
     public int getReturnAddressStackRecoverIndex() {
         return returnAddressStackRecoverIndex;
     }
 
-    public BranchPredictorUpdate getDirUpdate() {
-        return dirUpdate;
+    public BranchPredictorUpdate getBranchPredictorUpdate() {
+        return branchPredictorUpdate;
     }
 
     public boolean isSpeculative() {

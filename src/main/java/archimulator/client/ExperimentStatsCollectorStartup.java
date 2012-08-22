@@ -35,10 +35,9 @@ public class ExperimentStatsCollectorStartup {
             }
 
             ExperimentPack experimentPack = ServiceManager.getExperimentService().getExperimentPackByTitle(arg);
-            if(experimentPack != null) {
+            if (experimentPack != null) {
                 experimentPack.dump();
-            }
-            else {
+            } else {
                 System.err.println("Experiment pack \"" + arg + "\" do not exist");
             }
         } else {

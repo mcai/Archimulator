@@ -19,8 +19,8 @@
 package archimulator.sim.os;
 
 public abstract class SystemCallHandler {
-    private final int index;
-    private final String name;
+    private int index;
+    private String name;
 
     public SystemCallHandler(int index, String name) {
         this.index = index;

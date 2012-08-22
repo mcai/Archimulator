@@ -1,5 +1,3 @@
-package archimulator.sim.uncore.cache;
-
 /**
  * ****************************************************************************
  * Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).
@@ -20,8 +18,9 @@ package archimulator.sim.uncore.cache;
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  * ****************************************************************************
  */
+package archimulator.sim.uncore.cache;
 
-public final class CacheGeometry {
+public class CacheGeometry {
     private int size;
     private int associativity;
     private int lineSize;
@@ -69,23 +68,23 @@ public final class CacheGeometry {
         return numLines;
     }
 
-    public static int getDisplacement(int addr, CacheGeometry cacheGeometry) {
-        return addr & (cacheGeometry.getLineSize() - 1);
+    public static int getDisplacement(int address, CacheGeometry cacheGeometry) {
+        return address & (cacheGeometry.getLineSize() - 1);
     }
 
-    public static int getTag(int addr, CacheGeometry cacheGeometry) {
-        return addr & ~(cacheGeometry.getLineSize() - 1);
+    public static int getTag(int address, CacheGeometry cacheGeometry) {
+        return address & ~(cacheGeometry.getLineSize() - 1);
     }
 
-    public static int getSet(int addr, CacheGeometry cacheGeometry) {
-        return getLineId(addr, cacheGeometry) % cacheGeometry.getNumSets();
+    public static int getSet(int address, CacheGeometry cacheGeometry) {
+        return getLineId(address, cacheGeometry) % cacheGeometry.getNumSets();
     }
 
-    public static int getLineId(int addr, CacheGeometry cacheGeometry) {
-        return (addr >> cacheGeometry.getLineSizeInLog2());
+    public static int getLineId(int address, CacheGeometry cacheGeometry) {
+        return (address >> cacheGeometry.getLineSizeInLog2());
     }
 
-    public static boolean isAligned(int addr, CacheGeometry cacheGeometry) {
-        return getDisplacement(addr, cacheGeometry) == 0;
+    public static boolean isAligned(int address, CacheGeometry cacheGeometry) {
+        return getDisplacement(address, cacheGeometry) == 0;
     }
 }

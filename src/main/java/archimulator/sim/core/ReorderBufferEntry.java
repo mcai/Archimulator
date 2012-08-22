@@ -26,8 +26,8 @@ public class ReorderBufferEntry extends AbstractReorderBufferEntry {
 
     private boolean effectiveAddressComputationOperandReady;
 
-    public ReorderBufferEntry(Thread thread, DynamicInstruction dynamicInst, int npc, int nnpc, int predNnpc, int returnAddressStackRecoverIndex, BranchPredictorUpdate dirUpdate, boolean speculative) {
-        super(thread, dynamicInst, npc, nnpc, predNnpc, returnAddressStackRecoverIndex, dirUpdate, speculative);
+    public ReorderBufferEntry(Thread thread, DynamicInstruction dynamicInst, int npc, int nnpc, int predictedNnpc, int returnAddressStackRecoverIndex, BranchPredictorUpdate branchPredictorUpdate, boolean speculative) {
+        super(thread, dynamicInst, npc, nnpc, predictedNnpc, returnAddressStackRecoverIndex, branchPredictorUpdate, speculative);
     }
 
     @Override
@@ -69,7 +69,9 @@ public class ReorderBufferEntry extends AbstractReorderBufferEntry {
         super.setNumNotReadyOperands(numNotReadyOperands);
 
         if (numNotReadyOperands == 0) {
-            assert !this.effectiveAddressComputation || this.effectiveAddressComputationOperandReady;
+            if (this.effectiveAddressComputation && !this.effectiveAddressComputationOperandReady) {
+                throw new IllegalArgumentException();
+            }
         }
     }
 }

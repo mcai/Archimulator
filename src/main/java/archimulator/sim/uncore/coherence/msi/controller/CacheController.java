@@ -103,8 +103,8 @@ public abstract class CacheController extends GeneralCacheController {
         return this.pendingAccesses.containsKey(physicalTag) ? this.pendingAccesses.get(physicalTag) : null;
     }
 
-    public MemoryHierarchyAccess beginAccess(DynamicInstruction dynamicInst, MemoryHierarchyThread thread, MemoryHierarchyAccessType type, int virtualPc, int physicalAddress, int physicalTag, Action onCompletedCallback) {
-        MemoryHierarchyAccess newAccess = new MemoryHierarchyAccess(dynamicInst, thread, type, virtualPc, physicalAddress, physicalTag, onCompletedCallback, this.getCycleAccurateEventQueue().getCurrentCycle());
+    public MemoryHierarchyAccess beginAccess(DynamicInstruction dynamicInstruction, MemoryHierarchyThread thread, MemoryHierarchyAccessType type, int virtualPc, int physicalAddress, int physicalTag, Action onCompletedCallback) {
+        MemoryHierarchyAccess newAccess = new MemoryHierarchyAccess(dynamicInstruction, thread, type, virtualPc, physicalAddress, physicalTag, onCompletedCallback, this.getCycleAccurateEventQueue().getCurrentCycle());
 
         MemoryHierarchyAccess access = this.findAccess(physicalTag);
 
@@ -177,33 +177,33 @@ public abstract class CacheController extends GeneralCacheController {
     @Override
     public void receive(CoherenceMessage message) {
         switch (message.getType()) {
-            case FWD_GETS:
-                onFwdGetS((FwdGetSMessage) message);
+            case FORWARD_GETS:
+                onFwdGetS((ForwardGetSMessage) message);
                 break;
-            case FWD_GETM:
-                onFwdGetM((FwdGetMMessage) message);
+            case FORWARD_GETM:
+                onFwdGetM((ForwardGetMMessage) message);
                 break;
-            case INV:
-                onInv((InvMessage) message);
+            case INVALIDATION:
+                onInvalidation((InvalidationMessage) message);
                 break;
             case RECALL:
                 onRecall((RecallMessage) message);
                 break;
-            case PUT_ACK:
-                onPutAck((PutAckMessage) message);
+            case PUT_ACKNOWLEDGEMENT:
+                onPutAck((PutAcknowledgementMessage) message);
                 break;
             case DATA:
                 onData((DataMessage) message);
                 break;
-            case INV_ACK:
-                onInvAck((InvAckMessage) message);
+            case INVALIDATION_ACKNOWLEDGEMENT:
+                onInvalidationAcknowledgement((InvalidationAcknowledgementMessage) message);
                 break;
             default:
                 throw new IllegalArgumentException();
         }
     }
 
-    public void onLoad(final MemoryHierarchyAccess access, final int tag, final Action onCompletedCallback) {
+    public void onLoad(MemoryHierarchyAccess access, int tag, Action onCompletedCallback) {
         onLoad(access, tag, new LoadFlow(this, tag, onCompletedCallback, access));
     }
 
@@ -247,25 +247,25 @@ public abstract class CacheController extends GeneralCacheController {
         }, onStalledCallback);
     }
 
-    private void onFwdGetS(FwdGetSMessage message) {
+    private void onFwdGetS(ForwardGetSMessage message) {
         int way = this.cache.findWay(message.getTag());
         CacheLine<CacheControllerState> line = this.getCache().getLine(this.getCache().getSet(message.getTag()), way);
         CacheControllerFiniteStateMachine fsm = (CacheControllerFiniteStateMachine) line.getStateProvider();
-        fsm.onEventFwdGetS(message, message.getReq(), message.getTag());
+        fsm.onEventForwardGetS(message, message.getRequester(), message.getTag());
     }
 
-    private void onFwdGetM(FwdGetMMessage message) {
+    private void onFwdGetM(ForwardGetMMessage message) {
         int way = this.cache.findWay(message.getTag());
         CacheLine<CacheControllerState> line = this.getCache().getLine(this.getCache().getSet(message.getTag()), way);
         CacheControllerFiniteStateMachine fsm = (CacheControllerFiniteStateMachine) line.getStateProvider();
-        fsm.onEventFwdGetM(message, message.getReq(), message.getTag());
+        fsm.onEventForwardGetM(message, message.getRequester(), message.getTag());
     }
 
-    private void onInv(InvMessage message) {
+    private void onInvalidation(InvalidationMessage message) {
         int way = this.cache.findWay(message.getTag());
         CacheLine<CacheControllerState> line = this.getCache().getLine(this.getCache().getSet(message.getTag()), way);
         CacheControllerFiniteStateMachine fsm = (CacheControllerFiniteStateMachine) line.getStateProvider();
-        fsm.onEventInv(message, message.getReq(), message.getTag());
+        fsm.onEventInvalidation(message, message.getRequester(), message.getTag());
     }
 
     private void onRecall(RecallMessage message) {
@@ -275,25 +275,25 @@ public abstract class CacheController extends GeneralCacheController {
         fsm.onEventRecall(message, message.getTag());
     }
 
-    private void onPutAck(PutAckMessage message) {
+    private void onPutAck(PutAcknowledgementMessage message) {
         int way = this.cache.findWay(message.getTag());
         CacheLine<CacheControllerState> line = this.getCache().getLine(this.getCache().getSet(message.getTag()), way);
         CacheControllerFiniteStateMachine fsm = (CacheControllerFiniteStateMachine) line.getStateProvider();
-        fsm.onEventPutAck(message, message.getTag());
+        fsm.onEventPutAcknowledgement(message, message.getTag());
     }
 
     private void onData(DataMessage message) {
         int way = this.cache.findWay(message.getTag());
         CacheLine<CacheControllerState> line = this.getCache().getLine(this.getCache().getSet(message.getTag()), way);
         CacheControllerFiniteStateMachine fsm = (CacheControllerFiniteStateMachine) line.getStateProvider();
-        fsm.onEventData(message, message.getSender(), message.getTag(), message.getNumAcks());
+        fsm.onEventData(message, message.getSender(), message.getTag(), message.getNumInvalidationAcknowledgements());
     }
 
-    private void onInvAck(InvAckMessage message) {
+    private void onInvalidationAcknowledgement(InvalidationAcknowledgementMessage message) {
         int way = this.cache.findWay(message.getTag());
         CacheLine<CacheControllerState> line = this.getCache().getLine(this.getCache().getSet(message.getTag()), way);
         CacheControllerFiniteStateMachine fsm = (CacheControllerFiniteStateMachine) line.getStateProvider();
-        fsm.onEventInvAck(message, message.getSender(), message.getTag());
+        fsm.onEventInvalidationAcknowledgement(message, message.getSender(), message.getTag());
     }
 
     @Override

@@ -25,30 +25,40 @@ import java.io.Serializable;
 
 public class ExperimentSpec implements Serializable {
     private String programTitle;
-    private int htLookahead;
-    private int htStride;
+
+    private int helperThreadLookahead;
+    private int helperThreadStride;
+
     private int numCores;
     private int numThreadsPerCore;
+
     private String l1ISize;
-    private int l1IAssoc;
+    private int l1IAssociativity;
+
     private String l1DSize;
-    private int l1DAssoc;
+    private int l1DAssociativity;
+
     private String l2Size;
-    private int l2Assoc;
+    private int l2Associativity;
     private CacheReplacementPolicyType l2ReplacementPolicyType;
 
-    public ExperimentSpec(String programTitle, int htLookahead, int htStride, int numCores, int numThreadsPerCore, String l1ISize, int l1IAssoc, String l1DSize, int l1DAssoc, String l2Size, int l2Assoc, CacheReplacementPolicyType l2ReplacementPolicyType) {
+    public ExperimentSpec(String programTitle, int helperThreadLookahead, int helperThreadStride, int numCores, int numThreadsPerCore, String l1ISize, int l1IAssociativity, String l1DSize, int l1DAssociativity, String l2Size, int l2Associativity, CacheReplacementPolicyType l2ReplacementPolicyType) {
         this.programTitle = programTitle;
-        this.htLookahead = htLookahead;
-        this.htStride = htStride;
+
+        this.helperThreadLookahead = helperThreadLookahead;
+        this.helperThreadStride = helperThreadStride;
+
         this.numCores = numCores;
         this.numThreadsPerCore = numThreadsPerCore;
+
         this.l1ISize = l1ISize;
-        this.l1IAssoc = l1IAssoc;
+        this.l1IAssociativity = l1IAssociativity;
+
         this.l1DSize = l1DSize;
-        this.l1DAssoc = l1DAssoc;
+        this.l1DAssociativity = l1DAssociativity;
+
         this.l2Size = l2Size;
-        this.l2Assoc = l2Assoc;
+        this.l2Associativity = l2Associativity;
         this.l2ReplacementPolicyType = l2ReplacementPolicyType;
     }
 
@@ -56,12 +66,12 @@ public class ExperimentSpec implements Serializable {
         return programTitle;
     }
 
-    public int getHtLookahead() {
-        return htLookahead;
+    public int getHelperThreadLookahead() {
+        return helperThreadLookahead;
     }
 
-    public int getHtStride() {
-        return htStride;
+    public int getHelperThreadStride() {
+        return helperThreadStride;
     }
 
     public int getNumCores() {
@@ -76,24 +86,24 @@ public class ExperimentSpec implements Serializable {
         return (int) StorageUnitHelper.displaySizeToByteCount(l1ISize);
     }
 
-    public int getL1IAssoc() {
-        return l1IAssoc;
+    public int getL1IAssociativity() {
+        return l1IAssociativity;
     }
 
     public int getL1DSize() {
         return (int) StorageUnitHelper.displaySizeToByteCount(l1DSize);
     }
 
-    public int getL1DAssoc() {
-        return l1DAssoc;
+    public int getL1DAssociativity() {
+        return l1DAssociativity;
     }
 
     public int getL2Size() {
         return (int) StorageUnitHelper.displaySizeToByteCount(l2Size);
     }
 
-    public int getL2Assoc() {
-        return l2Assoc;
+    public int getL2Associativity() {
+        return l2Associativity;
     }
 
     public CacheReplacementPolicyType getL2ReplacementPolicyType() {

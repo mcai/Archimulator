@@ -19,30 +19,34 @@
 package archimulator.sim.os;
 
 import archimulator.model.ContextMapping;
+import archimulator.service.ServiceManager;
 import archimulator.sim.common.BasicSimulationObject;
 import archimulator.sim.common.SimulationObject;
 import archimulator.sim.isa.BitField;
 import archimulator.sim.isa.Memory;
 import archimulator.sim.isa.Mnemonic;
 import archimulator.sim.isa.StaticInstruction;
-import archimulator.util.SimulatedProgramBuildHelper;
+import net.pickapack.dateTime.DateHelper;
+import net.pickapack.io.cmd.CommandLineHelper;
+import net.pickapack.io.cmd.SedHelper;
 
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public abstract class Process extends BasicSimulationObject implements SimulationObject, Serializable {
-    private List<String> envs;
+    private List<String> environments;
 
-    private int stdinFileDescriptor;
-    private int stdoutFileDescriptor;
+    private int standardInFileDescriptor;
+    private int standardOutFileDescriptor;
 
     private int stackBase;
     private int stackSize;
     private int textSize;
 
-    private int environBase;
+    private int environmentBase;
     private int heapTop;
     private int dataTop;
 
@@ -64,16 +68,16 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
         this.id = getExperiment().currentProcessId++;
         kernel.getProcesses().add(this);
 
-        this.stdinFileDescriptor = contextMapping.getSimulatedProgram().getStdin().length() > 0 ? NativeSystemCalls.LIBC.open(simulationDirectory + File.separator + contextMapping.getSimulatedProgram().getStdin(), OpenFlags.O_RDONLY) : 0;
-        this.stdoutFileDescriptor = contextMapping.getStdout().length() > 0 ? NativeSystemCalls.LIBC.open(simulationDirectory + File.separator + contextMapping.getStdout(), OpenFlags.O_CREAT | OpenFlags.O_APPEND | OpenFlags.O_TRUNC | OpenFlags.O_WRONLY, 0660) : 1;
+        this.standardInFileDescriptor = contextMapping.getSimulatedProgram().getStandardIn().length() > 0 ? NativeSystemCalls.LIBC.open(simulationDirectory + File.separator + contextMapping.getSimulatedProgram().getStandardIn(), OpenFlags.O_RDONLY) : 0;
+        this.standardOutFileDescriptor = contextMapping.getStandardOut().length() > 0 ? NativeSystemCalls.LIBC.open(simulationDirectory + File.separator + contextMapping.getStandardOut(), OpenFlags.O_CREAT | OpenFlags.O_APPEND | OpenFlags.O_TRUNC | OpenFlags.O_WRONLY, 0660) : 1;
 
-        this.envs = new ArrayList<String>();
+        this.environments = new ArrayList<String>();
 
         this.littleEndian = false;
 
         this.memory = new Memory(kernel, this.littleEndian, this.id);
 
-        SimulatedProgramBuildHelper.build(contextMapping.getSimulatedProgram().getCwd(), contextMapping.getSimulatedProgram().isHt(), contextMapping.getHtLookahead(), contextMapping.getHtStride());
+        buildSimulatedProgram(contextMapping.getSimulatedProgram().getWorkingDirectory(), contextMapping.getSimulatedProgram().getHelperThreadEnabled(), contextMapping.getHelperThreadLookahead(), contextMapping.getHelperThreadStride());
 
         this.loadProgram(kernel, simulationDirectory, contextMapping);
     }
@@ -82,50 +86,50 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
 
     public int translateFileDescriptor(int fileDescriptor) {
         if (fileDescriptor == 1 || fileDescriptor == 2) {
-            return this.stdoutFileDescriptor;
+            return this.standardOutFileDescriptor;
         } else if (fileDescriptor == 0) {
-            return this.stdinFileDescriptor;
+            return this.standardInFileDescriptor;
         } else {
             return fileDescriptor;
         }
     }
 
     public void closeProgram() {
-        if (this.stdinFileDescriptor != 0) {
-            NativeSystemCalls.LIBC.close(this.stdinFileDescriptor);
+        if (this.standardInFileDescriptor != 0) {
+            NativeSystemCalls.LIBC.close(this.standardInFileDescriptor);
         }
-        if (this.stdoutFileDescriptor > 2) {
-            NativeSystemCalls.LIBC.close(this.stdoutFileDescriptor);
+        if (this.standardOutFileDescriptor > 2) {
+            NativeSystemCalls.LIBC.close(this.standardOutFileDescriptor);
         }
     }
 
-    protected StaticInstruction decode(int machInst) {
-        for (Mnemonic mnemonic : StaticInstruction.machInstDecoderInfos) {
+    protected StaticInstruction decode(int machineInstruction) {
+        for (Mnemonic mnemonic : StaticInstruction.machineInstructionDecoderInfos) {
             BitField extraBitField = mnemonic.getExtraBitField();
-            if ((machInst & mnemonic.getMask()) == mnemonic.getBits() && (extraBitField == null || extraBitField.valueOf(machInst) == mnemonic.getExtraBitFieldValue())) {
-                return new StaticInstruction(mnemonic, machInst);
+            if ((machineInstruction & mnemonic.getMask()) == mnemonic.getBits() && (extraBitField == null || extraBitField.valueOf(machineInstruction) == mnemonic.getExtraBitFieldValue())) {
+                return new StaticInstruction(mnemonic, machineInstruction);
             }
         }
 
         throw new IllegalArgumentException();
     }
 
-    public abstract StaticInstruction getStaticInst(int pc);
+    public abstract StaticInstruction getStaticInstruction(int pc);
 
     public int getId() {
         return id;
     }
 
-    public int getStdinFileDescriptor() {
-        return stdinFileDescriptor;
+    public int getStandardInFileDescriptor() {
+        return standardInFileDescriptor;
     }
 
-    public int getStdoutFileDescriptor() {
-        return stdoutFileDescriptor;
+    public int getStandardOutFileDescriptor() {
+        return standardOutFileDescriptor;
     }
 
-    public List<String> getEnvs() {
-        return envs;
+    public List<String> getEnvironments() {
+        return environments;
     }
 
     public int getStackBase() {
@@ -152,12 +156,12 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
         this.textSize = textSize;
     }
 
-    public int getEnvironBase() {
-        return environBase;
+    public int getEnvironmentBase() {
+        return environmentBase;
     }
 
-    public void setEnvironBase(int environBase) {
-        this.environBase = environBase;
+    public void setEnvironmentBase(int environmentBase) {
+        this.environmentBase = environmentBase;
     }
 
     public int getHeapTop() {
@@ -204,5 +208,30 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
 
     protected static int roundUp(int n, int alignment) {
         return (n + alignment - 1) & ~(alignment - 1);
+    }
+
+    private static void buildSimulatedProgram(String workingDirectory, boolean helperThreadEnabled, int helperThreadLookahead, int helperThreadStride) {
+        if (helperThreadEnabled) {
+            pushMacroDefineArg(workingDirectory, "push_params.h", "LOOKAHEAD", helperThreadLookahead + "");
+            pushMacroDefineArg(workingDirectory, "push_params.h", "STRIDE", helperThreadStride + "");
+        }
+        buildWithMakeFile(workingDirectory);
+    }
+
+    private static void pushMacroDefineArg(String workingDirectory, String fileName, String key, String value) {
+        fileName = workingDirectory.replaceAll(ServiceManager.USER_HOME_TEMPLATE_ARG, System.getProperty("user.home")) + "/" + fileName;
+        System.out.printf("[%s] Pushing Macro Define Arg in %s: %s, %s\n", DateHelper.toString(new Date()), fileName, key, value);
+        List<String> result = SedHelper.sedInPlace(fileName, "#define " + key, "#define " + key + " " + value);
+        for (String line : result) {
+            System.out.println(line);
+        }
+    }
+
+    private static void buildWithMakeFile(String workingDirectory) {
+        System.out.printf("[%s] Building with Makefile\n", DateHelper.toString(new Date()));
+        List<String> result = CommandLineHelper.invokeShellCommandAndGetResult("sh -c 'cd " + workingDirectory.replaceAll(ServiceManager.USER_HOME_TEMPLATE_ARG, System.getProperty("user.home")) + ";make -f Makefile.mips -B'");
+        for (String line : result) {
+            System.out.println(line);
+        }
     }
 }

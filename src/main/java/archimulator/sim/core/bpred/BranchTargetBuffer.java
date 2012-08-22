@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BranchTargetBuffer {
-    private final List<List<BranchTargetBufferEntry>> entries;
+    private List<List<BranchTargetBufferEntry>> entries;
 
     public BranchTargetBuffer(int numSets, int associativity) {
         this.entries = new ArrayList<List<BranchTargetBufferEntry>>();
@@ -38,11 +38,11 @@ public class BranchTargetBuffer {
         }
     }
 
-    public BranchTargetBufferEntry lookup(int baddr) {
-        int set = this.getSet(baddr);
+    public BranchTargetBufferEntry lookup(int branchAddress) {
+        int set = this.getSet(branchAddress);
 
         for (BranchTargetBufferEntry btbEntry : this.entries.get(set)) {
-            if (btbEntry.getSource() == baddr) {
+            if (btbEntry.getSource() == branchAddress) {
                 return btbEntry;
             }
         }
@@ -50,40 +50,40 @@ public class BranchTargetBuffer {
         return null;
     }
 
-    public BranchTargetBufferEntry update(int baddr, int btarget, boolean taken) {
+    public BranchTargetBufferEntry update(int branchAddress, int branchTarget, boolean taken) {
         if (!taken) {
             return null;
         }
 
-        int set = this.getSet(baddr);
+        int set = this.getSet(branchAddress);
 
         if (this.entries.get(set).size() == 1) {
             return this.entries.get(set).get(0);
         }
 
-        BranchTargetBufferEntry btbEntryFound = null;
+        BranchTargetBufferEntry entryFound = null;
 
-        for (BranchTargetBufferEntry btbEntry : this.entries.get(set)) {
-            if (btbEntry.getSource() == baddr) {
-                btbEntryFound = btbEntry;
+        for (BranchTargetBufferEntry entry : this.entries.get(set)) {
+            if (entry.getSource() == branchAddress) {
+                entryFound = entry;
                 break;
             }
         }
 
-        if (btbEntryFound == null) {
-            btbEntryFound = this.entries.get(set).get(this.entries.get(set).size() - 1); //LRU
-            btbEntryFound.setSource(baddr);
+        if (entryFound == null) {
+            entryFound = this.entries.get(set).get(this.entries.get(set).size() - 1); //LRU
+            entryFound.setSource(branchAddress);
         }
 
-        btbEntryFound.setTarget(btarget);
+        entryFound.setTarget(branchTarget);
 
-        this.entries.get(set).remove(btbEntryFound);
-        this.entries.get(set).add(0, btbEntryFound); //MRU
+        this.entries.get(set).remove(entryFound);
+        this.entries.get(set).add(0, entryFound); //MRU
 
-        return btbEntryFound;
+        return entryFound;
     }
 
-    private int getSet(int baddr) {
-        return (baddr >> BranchPredictor.BRANCH_SHIFT) & (this.entries.size() - 1);
+    private int getSet(int branchAddress) {
+        return (branchAddress >> BranchPredictor.BRANCH_SHIFT) & (this.entries.size() - 1);
     }
 }

@@ -32,8 +32,8 @@ public class TwoLevelBranchPredictor extends DynamicBranchPredictor {
     private int[] shiftRegs;
     private SaturatingCounter[] l2Table;
 
-    public TwoLevelBranchPredictor(Thread thread, String name, int l1Size, int l2Size, int shiftWidth, boolean xor, int btbSets, int btbAssoc, int retStackSize) {
-        super(thread, name, BranchPredictorType.TWO_LEVEL, btbSets, btbAssoc, retStackSize);
+    public TwoLevelBranchPredictor(Thread thread, String name, int l1Size, int l2Size, int shiftWidth, boolean xor, int branchTargetBufferNumSets, int branchTargetBufferAssociativity, int returnAddressStackSize) {
+        super(thread, name, BranchPredictorType.TWO_LEVEL, branchTargetBufferNumSets, branchTargetBufferAssociativity, returnAddressStackSize);
 
         this.l1Size = l1Size;
         this.l2Size = l2Size;
@@ -43,74 +43,74 @@ public class TwoLevelBranchPredictor extends DynamicBranchPredictor {
         this.shiftRegs = new int[this.l1Size];
         this.l2Table = new SaturatingCounter[this.l2Size];
 
-        int flipflop = 1;
+        int flipFlop = 1;
         for (int cnt = 0; cnt < this.l2Size; cnt++) {
-            this.l2Table[cnt] = new SaturatingCounter(0, 2, 3, flipflop);
-            flipflop = 3 - flipflop;
+            this.l2Table[cnt] = new SaturatingCounter(0, 2, 3, flipFlop);
+            flipFlop = 3 - flipFlop;
         }
     }
 
     public TwoLevelBranchPredictor(Thread thread, String name) {
-        this(thread, name, thread.getExperiment().getArchitecture().getTwoLevelBpredL1Size(), thread.getExperiment().getArchitecture().getTwoLevelBpredL2Size(), thread.getExperiment().getArchitecture().getTwoLevelBpredShiftWidth(), thread.getExperiment().getArchitecture().isTwoLevelBpredXor(), thread.getExperiment().getArchitecture().getTwoLevelBpredBtbSets(), thread.getExperiment().getArchitecture().getTwoLevelBpredBtbAssoc(), thread.getExperiment().getArchitecture().getTwoLevelBpredRetStackSize());
+        this(thread, name, thread.getExperiment().getArchitecture().getTwoLevelBranchPredictorL1Size(), thread.getExperiment().getArchitecture().getTwoLevelBranchPredictorL2Size(), thread.getExperiment().getArchitecture().getTwoLevelBranchPredictorShiftWidth(), thread.getExperiment().getArchitecture().getTwoLevelBranchPredictorXor(), thread.getExperiment().getArchitecture().getTwoLevelBranchPredictorBranchTargetBufferNumSets(), thread.getExperiment().getArchitecture().getTwoLevelBranchPredictorBranchTargetBufferAssociativity(), thread.getExperiment().getArchitecture().getTwoLevelBranchPredictorReturnAddressStackSize());
     }
 
     @Override
-    public int predict(int baddr, int btarget, Mnemonic mnemonic, BranchPredictorUpdate dirUpdate, Reference<Integer> returnAddressStackRecoverIndex) {
+    public int predict(int branchAddress, int branchTarget, Mnemonic mnemonic, BranchPredictorUpdate branchPredictorUpdate, Reference<Integer> returnAddressStackRecoverIndex) {
         if (mnemonic.getType() == StaticInstructionType.CONDITIONAL) {
-            dirUpdate.setCounterDir1(getIndex(baddr));
+            branchPredictorUpdate.setCounterDir1(getIndex(branchAddress));
         }
 
         returnAddressStackRecoverIndex.set(this.getReturnAddressStack().getTopOfStack());
 
         if (mnemonic.getType() == StaticInstructionType.FUNCTION_RETURN && this.getReturnAddressStack().getSize() > 0) {
-            dirUpdate.setRas(true);
+            branchPredictorUpdate.setRas(true);
             return this.getReturnAddressStack().pop();
         }
 
         if (mnemonic.getType() == StaticInstructionType.FUNCTION_CALL && this.getReturnAddressStack().getSize() > 0) {
-            this.getReturnAddressStack().push(baddr);
+            this.getReturnAddressStack().push(branchAddress);
         }
 
-        BranchTargetBufferEntry btbEntry = this.getBranchTargetBuffer().lookup(baddr);
+        BranchTargetBufferEntry branchTargetBufferEntry = this.getBranchTargetBuffer().lookup(branchAddress);
 
         if (mnemonic.getType() != StaticInstructionType.CONDITIONAL) {
-            return btbEntry != null ? btbEntry.getTarget() : 1;
+            return branchTargetBufferEntry != null ? branchTargetBufferEntry.getTarget() : 1;
         }
 
-        if (!dirUpdate.getCounterDir1().isTaken()) {
+        if (!branchPredictorUpdate.getCounterDir1().isTaken()) {
             return 0;
         }
 
-        return btbEntry != null ? btbEntry.getTarget() : 1;
+        return branchTargetBufferEntry != null ? branchTargetBufferEntry.getTarget() : 1;
     }
 
     @Override
-    public void update(int baddr, int btarget, boolean taken, boolean predTaken, boolean correct, Mnemonic mnemonic, BranchPredictorUpdate dirUpdate) {
-        super.update(baddr, btarget, taken, predTaken, correct, mnemonic, dirUpdate);
+    public void update(int branchAddress, int branchTarget, boolean taken, boolean predictedTaken, boolean correct, Mnemonic mnemonic, BranchPredictorUpdate branchPredictorUpdate) {
+        super.update(branchAddress, branchTarget, taken, predictedTaken, correct, mnemonic, branchPredictorUpdate);
 
         if (mnemonic.getType() == StaticInstructionType.FUNCTION_RETURN) {
-            if (!dirUpdate.isRas()) {
+            if (!branchPredictorUpdate.isRas()) {
                 return;
             }
         }
 
         if (mnemonic.getType() == StaticInstructionType.CONDITIONAL) {
-            this.updateTable(baddr, taken);
+            this.updateTable(branchAddress, taken);
         }
 
-        dirUpdate.getCounterDir1().update(taken);
+        branchPredictorUpdate.getCounterDir1().update(taken);
 
-        this.getBranchTargetBuffer().update(baddr, btarget, taken);
+        this.getBranchTargetBuffer().update(branchAddress, branchTarget, taken);
     }
 
-    private int hash(int baddr) {
-        int l1Index = (baddr >> BranchPredictor.BRANCH_SHIFT) & (this.l1Size - 1);
+    private int hash(int branchAddress) {
+        int l1Index = (branchAddress >> BranchPredictor.BRANCH_SHIFT) & (this.l1Size - 1);
         int l2Index = this.shiftRegs[l1Index];
 
         if (this.xor) {
-            l2Index = (l2Index ^ (baddr >> BranchPredictor.BRANCH_SHIFT)) & ((1 << this.shiftWidth) - 1) | ((baddr >> BranchPredictor.BRANCH_SHIFT) << this.shiftWidth);
+            l2Index = (l2Index ^ (branchAddress >> BranchPredictor.BRANCH_SHIFT)) & ((1 << this.shiftWidth) - 1) | ((branchAddress >> BranchPredictor.BRANCH_SHIFT) << this.shiftWidth);
         } else {
-            l2Index |= (baddr >> BranchPredictor.BRANCH_SHIFT) << this.shiftWidth;
+            l2Index |= (branchAddress >> BranchPredictor.BRANCH_SHIFT) << this.shiftWidth;
         }
 
         l2Index &= (this.l2Size - 1);
@@ -118,12 +118,12 @@ public class TwoLevelBranchPredictor extends DynamicBranchPredictor {
         return l2Index;
     }
 
-    public SaturatingCounter getIndex(int baddr) {
-        return this.l2Table[this.hash(baddr)];
+    public SaturatingCounter getIndex(int branchAddress) {
+        return this.l2Table[this.hash(branchAddress)];
     }
 
-    public void updateTable(int baddr, boolean taken) {
-        int l1Index = (baddr >> BranchPredictor.BRANCH_SHIFT) & (this.l1Size - 1);
+    public void updateTable(int branchAddress, boolean taken) {
+        int l1Index = (branchAddress >> BranchPredictor.BRANCH_SHIFT) & (this.l1Size - 1);
         int shiftReg = (this.shiftRegs[l1Index] << 1) | (taken ? 1 : 0);
         this.shiftRegs[l1Index] = shiftReg & ((1 << this.shiftWidth) - 1);
     }

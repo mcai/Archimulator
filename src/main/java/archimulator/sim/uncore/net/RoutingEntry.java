@@ -19,22 +19,22 @@
 package archimulator.sim.uncore.net;
 
 public class RoutingEntry {
-    private NetNode srcNode;
-    private NetNode destNode;
+    private NetNode sourceNode;
+    private NetNode destinationNode;
     private int cost;
     private OutPort outPort;
 
-    public RoutingEntry(NetNode srcNode, NetNode destNode) {
-        this.srcNode = srcNode;
-        this.destNode = destNode;
+    public RoutingEntry(NetNode sourceNode, NetNode destinationNode) {
+        this.sourceNode = sourceNode;
+        this.destinationNode = destinationNode;
     }
 
-    public NetNode getSrcNode() {
-        return srcNode;
+    public NetNode getSourceNode() {
+        return sourceNode;
     }
 
-    public NetNode getDestNode() {
-        return destNode;
+    public NetNode getDestinationNode() {
+        return destinationNode;
     }
 
     public int getCost() {

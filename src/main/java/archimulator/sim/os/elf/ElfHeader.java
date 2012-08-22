@@ -38,21 +38,21 @@ public class ElfHeader {
     private int e_shstrndx;
 
     public ElfHeader(ElfFile elfFile) throws IOException {
-        this.e_type = elfFile.readUHalf();
+        this.e_type = elfFile.readUnsignedHalfWord();
 
-        this.e_machine = elfFile.readUHalf();
-        this.e_version = elfFile.readUWord();
-        this.e_entry = elfFile.readUWord();
-        this.e_phoff = elfFile.readUWord();
-        this.e_shoff = elfFile.readUWord();
-        this.e_flags = elfFile.readUWord();
+        this.e_machine = elfFile.readUnsignedHalfWord();
+        this.e_version = elfFile.readUnsignedWord();
+        this.e_entry = elfFile.readUnsignedWord();
+        this.e_phoff = elfFile.readUnsignedWord();
+        this.e_shoff = elfFile.readUnsignedWord();
+        this.e_flags = elfFile.readUnsignedWord();
 
-        this.e_ehsize = elfFile.readUHalf();
-        this.e_phentsize = elfFile.readUHalf();
-        this.e_phnum = elfFile.readUHalf();
-        this.e_shentsize = elfFile.readUHalf();
-        this.e_shnum = elfFile.readUHalf();
-        this.e_shstrndx = elfFile.readUHalf();
+        this.e_ehsize = elfFile.readUnsignedHalfWord();
+        this.e_phentsize = elfFile.readUnsignedHalfWord();
+        this.e_phnum = elfFile.readUnsignedHalfWord();
+        this.e_shentsize = elfFile.readUnsignedHalfWord();
+        this.e_shnum = elfFile.readUnsignedHalfWord();
+        this.e_shstrndx = elfFile.readUnsignedHalfWord();
     }
 
     public int getE_type() {

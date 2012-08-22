@@ -39,7 +39,7 @@ public class L1DCacheController extends CacheController {
 
     @Override
     public CacheGeometry getGeometry() {
-        return new CacheGeometry(getExperiment().getArchitecture().getL1DSize(), getExperiment().getArchitecture().getL1DAssoc(), getExperiment().getArchitecture().getL1DLineSize());
+        return new CacheGeometry(getExperiment().getArchitecture().getL1DSize(), getExperiment().getArchitecture().getL1DAssociativity(), getExperiment().getArchitecture().getL1DLineSize());
     }
 
     @Override

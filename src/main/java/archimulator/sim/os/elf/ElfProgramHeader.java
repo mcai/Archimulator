@@ -31,14 +31,14 @@ public class ElfProgramHeader {
     private long p_align;
 
     public ElfProgramHeader(ElfFile elfFile) throws IOException {
-        this.p_type = elfFile.readUWord();
-        this.p_offset = elfFile.readUWord();
-        this.p_vaddr = elfFile.readUWord();
-        this.p_paddr = elfFile.readUWord();
-        this.p_filesz = elfFile.readUWord();
-        this.p_memsz = elfFile.readUWord();
-        this.p_flags = elfFile.readUWord();
-        this.p_align = elfFile.readUWord();
+        this.p_type = elfFile.readUnsignedWord();
+        this.p_offset = elfFile.readUnsignedWord();
+        this.p_vaddr = elfFile.readUnsignedWord();
+        this.p_paddr = elfFile.readUnsignedWord();
+        this.p_filesz = elfFile.readUnsignedWord();
+        this.p_memsz = elfFile.readUnsignedWord();
+        this.p_flags = elfFile.readUnsignedWord();
+        this.p_align = elfFile.readUnsignedWord();
     }
 
     public byte[] readContent(ElfFile elfFile) throws IOException {

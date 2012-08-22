@@ -24,8 +24,8 @@ public class LoadStoreQueueEntry extends AbstractReorderBufferEntry {
     protected int effectiveAddress;
     private boolean storeAddressReady;
 
-    public LoadStoreQueueEntry(Thread thread, DynamicInstruction dynamicInst, int npc, int nnpc, int predNnpc, int returnAddressStackRecoverIndex, BranchPredictorUpdate dirUpdate, boolean speculative) {
-        super(thread, dynamicInst, npc, nnpc, predNnpc, returnAddressStackRecoverIndex, dirUpdate, speculative);
+    public LoadStoreQueueEntry(Thread thread, DynamicInstruction dynamicInstruction, int npc, int nnpc, int predictedNnpc, int returnAddressStackRecoverIndex, BranchPredictorUpdate branchPredictorUpdate, boolean speculative) {
+        super(thread, dynamicInstruction, npc, nnpc, predictedNnpc, returnAddressStackRecoverIndex, branchPredictorUpdate, speculative);
     }
 
     @Override
