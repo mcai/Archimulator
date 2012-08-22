@@ -93,6 +93,6 @@ public class ContextMapping implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("thread #%d->'%s'", threadId, getSimulatedProgram().getTitle());
+        return String.format("thread #%d->'%s'", threadId, getSimulatedProgram().getTitle() + "_" + getSimulatedProgram().getArguments() + "-lookahead_" + helperThreadLookahead + "-stride_" + helperThreadStride);
     }
 }

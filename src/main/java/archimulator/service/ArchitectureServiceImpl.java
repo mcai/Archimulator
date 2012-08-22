@@ -85,7 +85,7 @@ public class ArchitectureServiceImpl extends AbstractService implements Architec
     public Architecture getOrAddArchitecture(boolean htLLCRequestProfilingEnabled, int numCores, int numThreadsPerCore, int l1ISize, int l1IAssoc, int l1DSize, int l1DAssoc, int l2Size, int l2Assoc, CacheReplacementPolicyType l2ReplacementPolicyType) {
         String title = "C" + numCores + "T" + numThreadsPerCore
                 + "-" + "L1I_" + l1ISize / 1024 + "KB" + "_" + "Assoc" + l1IAssoc
-                + "-" + "L2_" + l1DSize / 1024 + "KB" + "_" + "Assoc" + l1DAssoc
+                + "-" + "l1D_" + l1DSize / 1024 + "KB" + "_" + "Assoc" + l1DAssoc
                 + "-" + "L2_" + l2Size / 1024 + "KB" + "_" + "Assoc" + l2Assoc
                 + "_" + l2ReplacementPolicyType;
 

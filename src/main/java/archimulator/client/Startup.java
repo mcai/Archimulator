@@ -79,6 +79,6 @@ public class Startup {
         contextMapping.setDynamicHelperThreadParams(false);
         contextMappings.add(contextMapping);
 
-        return new Experiment(parent, simulatedProgram.getTitle() + "_" + simulatedProgram.getArguments() + "-" + architecture.getTitle(), ExperimentType.DETAILED, architecture, -1, contextMappings);
+        return new Experiment(parent, simulatedProgram.getTitle() + "_" + simulatedProgram.getArguments() + "-lookahead_" + helperThreadLookahead + "-stride_" + helperThreadStride + "-" + architecture.getTitle(), ExperimentType.DETAILED, architecture, -1, contextMappings);
     }
 }
