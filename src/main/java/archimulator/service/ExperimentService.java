@@ -65,5 +65,5 @@ public interface ExperimentService extends Service {
 
     void updateExperimentPack(ExperimentPack experimentPack);
 
-    void waitForExperimentPackStopped(ExperimentPack experimentPack);
+    void runExperiments();
 }

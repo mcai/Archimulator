@@ -18,42 +18,18 @@
  ******************************************************************************/
 package archimulator.service;
 
-import archimulator.model.Experiment;
-import archimulator.model.ExperimentState;
-
 public class ServiceManager {
     public static final String USER_HOME_TEMPLATE_ARG = "<user.home>";
-
-    public static final String DATABASE_REVISION = "1";
-    public static final String DATABASE_DIRECTORY = System.getProperty("user.dir") + "/" + "experiments";
-    public static final String DATABASE_URL = "jdbc:sqlite:" + DATABASE_DIRECTORY + "/v" + DATABASE_REVISION + ".sqlite";
+    public static final String DATABASE_URL = "jdbc:mysql://localhost/archimulator?user=root&password=1026@ustc";
 
     private static SimulatedProgramService simulatedProgramService;
     private static ArchitectureService architectureService;
     private static ExperimentService experimentService;
 
-    public static boolean runningExperiments = false;
-
     static {
         simulatedProgramService = new SimulatedProgramServiceImpl();
         architectureService = new ArchitectureServiceImpl();
         experimentService = new ExperimentServiceImpl();
-
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                if (runningExperiments) {
-                    for (Experiment experiment : experimentService.getAllExperiments()) {
-                        if (experiment.getState() == ExperimentState.RUNNING) {
-                            experiment.setFailedReason("");
-                            experiment.setState(ExperimentState.PENDING);
-                            experiment.getStats().clear();
-                            experimentService.updateExperiment(experiment);
-                        }
-                    }
-                }
-            }
-        });
     }
 
     public static SimulatedProgramService getSimulatedProgramService() {
@@ -66,5 +42,11 @@ public class ServiceManager {
 
     public static ExperimentService getExperimentService() {
         return experimentService;
+    }
+
+    static {
+        System.out.println("Archimulator - Multicore Architectural Simulator Written in Java.\n");
+        System.out.println("Version: 3.0.\n");
+        System.out.println("Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).\n");
     }
 }

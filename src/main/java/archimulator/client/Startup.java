@@ -30,40 +30,28 @@ import java.util.List;
 
 public class Startup {
     public static void main(String[] args) throws IOException {
-        if (args.length == 0) {
-            System.err.println("No experiment pack specified");
-            return;
-        }
-
-        ServiceManager.runningExperiments = true;
-
         for (String arg : args) {
             ExperimentPackSpec experimentPackSpec = JsonSerializationHelper.deserialize(ExperimentPackSpec.class, FileUtils.readAllText(arg));
 
-            if (ServiceManager.getExperimentService().getExperimentPackByTitle(experimentPackSpec.getTitle()) != null) {
-                System.err.println("Experiment pack \"" + experimentPackSpec.getTitle() + "\" already exists in the database");
-                ExperimentPack experimentPack = ServiceManager.getExperimentService().getExperimentPackByTitle(experimentPackSpec.getTitle());
-                ServiceManager.getExperimentService().waitForExperimentPackStopped(experimentPack);
-                continue;
+            if (ServiceManager.getExperimentService().getExperimentPackByTitle(experimentPackSpec.getTitle()) == null) {
+                ExperimentPack experimentPack = new ExperimentPack(experimentPackSpec.getTitle());
+                ServiceManager.getExperimentService().addExperimentPack(experimentPack);
+
+                for (ExperimentSpec experimentSpec : experimentPackSpec.getExperiments()) {
+                    ServiceManager.getExperimentService().addExperiment(createExperiment(
+                            experimentPack,
+                            experimentSpec.getProgramTitle(),
+                            experimentSpec.getHelperThreadLookahead(), experimentSpec.getHelperThreadStride(),
+                            experimentSpec.getNumCores(), experimentSpec.getNumThreadsPerCore(),
+                            experimentSpec.getL1ISize(), experimentSpec.getL1IAssociativity(),
+                            experimentSpec.getL1DSize(), experimentSpec.getL1DAssociativity(),
+                            experimentSpec.getL2Size(), experimentSpec.getL2Associativity(), experimentSpec.getL2ReplacementPolicyType()
+                    ));
+                }
             }
-
-            ExperimentPack experimentPack = new ExperimentPack(experimentPackSpec.getTitle());
-            ServiceManager.getExperimentService().addExperimentPack(experimentPack);
-
-            for (ExperimentSpec experimentSpec : experimentPackSpec.getExperiments()) {
-                ServiceManager.getExperimentService().addExperiment(createExperiment(
-                        experimentPack,
-                        experimentSpec.getProgramTitle(),
-                        experimentSpec.getHelperThreadLookahead(), experimentSpec.getHelperThreadStride(),
-                        experimentSpec.getNumCores(), experimentSpec.getNumThreadsPerCore(),
-                        experimentSpec.getL1ISize(), experimentSpec.getL1IAssociativity(),
-                        experimentSpec.getL1DSize(), experimentSpec.getL1DAssociativity(),
-                        experimentSpec.getL2Size(), experimentSpec.getL2Associativity(), experimentSpec.getL2ReplacementPolicyType()
-                ));
-            }
-
-            ServiceManager.getExperimentService().waitForExperimentPackStopped(experimentPack);
         }
+
+        ServiceManager.getExperimentService().runExperiments();
     }
 
     private static Experiment createExperiment(ExperimentPack parent, String programTitle, int helperThreadLookahead, int helperThreadStride, int numCores, int numThreadsPerCore, int l1ISize, int l1IAssoc, int l1DSize, int l1DAssoc, int l2Size, int l2Assoc, CacheReplacementPolicyType l2ReplacementPolicyType) {

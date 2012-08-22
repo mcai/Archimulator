@@ -32,10 +32,10 @@ public class Experiment implements ModelElement {
     @DatabaseField(generatedId = true)
     private long id;
 
-    @DatabaseField(index = true)
+    @DatabaseField
     private long parentId;
 
-    @DatabaseField(index = true)
+    @DatabaseField
     private String title;
 
     @DatabaseField

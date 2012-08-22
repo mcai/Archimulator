@@ -33,12 +33,10 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
     @SuppressWarnings("unchecked")
     public ExperimentServiceImpl() {
-        super(ServiceManager.DATABASE_DIRECTORY, ServiceManager.DATABASE_URL, Arrays.<Class<? extends ModelElement>>asList(Experiment.class, ExperimentPack.class));
+        super(ServiceManager.DATABASE_URL, Arrays.<Class<? extends ModelElement>>asList(Experiment.class, ExperimentPack.class));
 
         this.experiments = createDao(Experiment.class);
         this.experimentPacks = createDao(ExperimentPack.class);
-
-        new ExperimentWorker();
     }
 
     @Override
@@ -297,28 +295,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     @Override
-    public void waitForExperimentPackStopped(ExperimentPack experimentPack) {
-        long id = experimentPack.getId();
-
-        try {
-            for (; ; ) {
-                boolean allStopped = true;
-
-                for (Experiment experiment : getExperimentsByParent(getExperimentPackById(id))) {
-                    if (!experiment.isStopped()) {
-                        allStopped = false;
-                        break;
-                    }
-                }
-
-                if (allStopped) {
-                    return;
-                }
-
-                Thread.sleep(1000);
-            }
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+    public void runExperiments() {
+        new ExperimentWorker().run();
     }
 }

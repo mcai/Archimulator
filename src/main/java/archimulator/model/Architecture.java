@@ -33,7 +33,7 @@ public class Architecture implements ModelElement {
     @DatabaseField(generatedId = true)
     private long id;
 
-    @DatabaseField(index = true)
+    @DatabaseField
     private String title;
 
     @DatabaseField

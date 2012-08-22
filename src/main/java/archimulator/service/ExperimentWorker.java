@@ -27,41 +27,50 @@ import net.pickapack.Reference;
 import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
 
-public class ExperimentWorker {
-    private boolean running;
+public class ExperimentWorker implements Runnable {
+    private Experiment experiment;
 
     public ExperimentWorker() {
-        Thread threadMonitor = new Thread() {
+        Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
-                for (; ; ) {
-                    if (!ServiceManager.runningExperiments || !doRunExperiment()) {
-                        try {
-                            Thread.sleep(100);
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
+                if (experiment != null) {
+                    if (experiment.getState() == ExperimentState.RUNNING) {
+                        experiment.setFailedReason("");
+                        experiment.setState(ExperimentState.PENDING);
+                        experiment.getStats().clear();
+                        ServiceManager.getExperimentService().updateExperiment(experiment);
                     }
                 }
             }
-        };
-        threadMonitor.setDaemon(true);
-        threadMonitor.start();
+        });
+    }
+
+    @Override
+    public void run() {
+        for (; ; ) {
+            if (!doRunExperiment()) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
     }
 
     private boolean doRunExperiment() {
-        Experiment experiment = ServiceManager.getExperimentService().getFirstExperimentToRun();
+        this.experiment = ServiceManager.getExperimentService().getFirstExperimentToRun();
 
-        if (experiment != null) {
-            running = true;
-            runExperiment(experiment);
-            running = false;
+        if (this.experiment != null) {
+            runExperiment(this.experiment);
+            this.experiment = null;
         }
 
         return false;
     }
 
-    public void runExperiment(Experiment experiment) {
+    private void runExperiment(Experiment experiment) {
         experiment.setState(ExperimentState.RUNNING);
         ServiceManager.getExperimentService().updateExperiment(experiment);
 
@@ -95,12 +104,6 @@ public class ExperimentWorker {
     }
 
     public boolean isRunning() {
-        return running;
-    }
-
-    static {
-        System.out.println("Archimulator - Multicore Architectural Simulator Written in Java.\n");
-        System.out.println("Version: 3.0.\n");
-        System.out.println("Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).\n");
+        return this.experiment != null;
     }
 }

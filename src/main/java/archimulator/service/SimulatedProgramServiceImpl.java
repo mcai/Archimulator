@@ -31,7 +31,7 @@ public class SimulatedProgramServiceImpl extends AbstractService implements Simu
 
     @SuppressWarnings("unchecked")
     public SimulatedProgramServiceImpl() {
-        super(ServiceManager.DATABASE_DIRECTORY, ServiceManager.DATABASE_URL, Arrays.<Class<? extends ModelElement>>asList(SimulatedProgram.class));
+        super(ServiceManager.DATABASE_URL, Arrays.<Class<? extends ModelElement>>asList(SimulatedProgram.class));
 
         this.simulatedPrograms = createDao(SimulatedProgram.class);
 
