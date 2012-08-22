@@ -27,8 +27,6 @@ public class ContextMapping implements Serializable {
 
     private long simulatedProgramId;
 
-    private transient SimulatedProgram simulatedProgram;
-
     private String standardOut;
 
     private int helperThreadLookahead;
@@ -36,6 +34,8 @@ public class ContextMapping implements Serializable {
     private int helperThreadStride;
 
     private boolean dynamicHelperThreadParams;
+
+    private transient SimulatedProgram simulatedProgram;
 
     public ContextMapping(int threadId, SimulatedProgram simulatedProgram) {
         this(threadId, simulatedProgram, "ctx" + threadId + "_out.txt");
