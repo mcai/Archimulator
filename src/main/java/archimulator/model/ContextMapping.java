@@ -27,6 +27,8 @@ public class ContextMapping implements Serializable {
 
     private long simulatedProgramId;
 
+    private String arguments;
+
     private String standardOut;
 
     private int helperThreadLookahead;
@@ -37,13 +39,14 @@ public class ContextMapping implements Serializable {
 
     private transient SimulatedProgram simulatedProgram;
 
-    public ContextMapping(int threadId, SimulatedProgram simulatedProgram) {
-        this(threadId, simulatedProgram, "ctx" + threadId + "_out.txt");
+    public ContextMapping(int threadId, SimulatedProgram simulatedProgram, String arguments) {
+        this(threadId, simulatedProgram, arguments, "ctx" + threadId + "_out.txt");
     }
 
-    public ContextMapping(int threadId, SimulatedProgram simulatedProgram, String standardOut) {
-        this.simulatedProgramId = simulatedProgram.getId();
+    public ContextMapping(int threadId, SimulatedProgram simulatedProgram, String arguments, String standardOut) {
         this.threadId = threadId;
+        this.simulatedProgramId = simulatedProgram.getId();
+        this.arguments = arguments;
         this.standardOut = standardOut;
     }
 
@@ -61,6 +64,10 @@ public class ContextMapping implements Serializable {
         }
 
         return simulatedProgram;
+    }
+
+    public String getArguments() {
+        return arguments;
     }
 
     public String getStandardOut() {
@@ -93,6 +100,6 @@ public class ContextMapping implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("thread #%d->'%s'", threadId, getSimulatedProgram().getTitle() + "_" + getSimulatedProgram().getArguments() + "-lookahead_" + helperThreadLookahead + "-stride_" + helperThreadStride);
+        return String.format("thread #%d->'%s'", threadId, getSimulatedProgram().getTitle() + "_" + arguments + "-lookahead_" + helperThreadLookahead + "-stride_" + helperThreadStride);
     }
 }

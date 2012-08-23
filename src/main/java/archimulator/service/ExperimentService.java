@@ -18,10 +18,8 @@
  ******************************************************************************/
 package archimulator.service;
 
-import archimulator.model.Architecture;
-import archimulator.model.Experiment;
-import archimulator.model.ExperimentPack;
-import archimulator.model.SimulatedProgram;
+import archimulator.model.*;
+import archimulator.util.IndentedPrintWriter;
 import net.pickapack.action.Function1;
 import net.pickapack.service.Service;
 
@@ -51,6 +49,8 @@ public interface ExperimentService extends Service {
 
     void dumpExperiment(Experiment experiment);
 
+    void dumpExperiment(Experiment experiment, IndentedPrintWriter writer);
+
     Experiment getFirstExperimentToRun();
 
     List<ExperimentPack> getAllExperimentPacks();
@@ -67,27 +67,95 @@ public interface ExperimentService extends Service {
 
     void runExperiments();
 
-    List<Double> getNormalizedStats(List<Experiment> experiments, Experiment baselineExperiment, Function1<Experiment, Double> function);
-
     List<Map<String, Double>> getBreakdowns(List<Experiment> experiments, Function1<Experiment, List<String>> keysFunction);
 
     Map<String, Double> getBreakdown(Experiment experiment, Function1<Experiment, List<String>> keysFunction);
 
-    List<Map<String,Double>> getNormalizedBreakdowns(List<Experiment> experiments, Experiment baselineExperiment, Function1<Experiment, List<String>> keysFunction);
-
-    List<Map<String, Double>> getBreakdownRatios(List<Experiment> experiments, Function1<Experiment, List<String>> keysFunction, Function1<Experiment, String> totalKeyFunction);
-
     List<Double> getSpeedups(Experiment baselineExperiment, List<Experiment> experiments);
 
-    List<Double> getNormalizedTotalCycles(Experiment baselineExperiment, List<Experiment> experiments);
+    void plotSpeedups(ExperimentPack experimentPack, Experiment baselineExperiment, List<Experiment> experiments);
 
-    List<Long> getNumL2DownwardReadMisses(List<Experiment> experiments);
+    List<Double> getTotalCycles(List<Experiment> experiments);
+
+    void plotTotalCycles(ExperimentPack experimentPack, List<Experiment> experiments);
+
+    List<Double> getNormalizedTotalCycles(List<Experiment> experiments);
+
+    void plotNormalizedTotalCycles(ExperimentPack experimentPack, List<Experiment> experiments);
+
+    List<Double> getNumL2DownwardReadMisses(List<Experiment> experiments);
+
+    void plotNumL2DownwardReadMisses(ExperimentPack experimentPack, List<Experiment> experiments);
+
+    List<Double> getNormalizedNumL2DownwardReadMisses(List<Experiment> experiments);
+
+    void plotNormalizedNumL2DownwardReadMisses(ExperimentPack experimentPack, List<Experiment> experiments);
+
+    List<Double> getNumMainThreadL2CacheHits(ExperimentPack experimentPack, List<Experiment> experiments);
+
+    List<Double> getNumMainThreadL2CacheMisses(ExperimentPack experimentPack, List<Experiment> experiments);
+
+    List<Double> getNumHelperThreadL2CacheHits(ExperimentPack experimentPack, List<Experiment> experiments);
+
+    List<Double> getNumHelperThreadL2CacheMisses(ExperimentPack experimentPack, List<Experiment> experiments);
+
+    List<Double> getNormalizedNumMainThreadL2CacheHits(ExperimentPack experimentPack, List<Experiment> experiments);
+
+    List<Double> getNormalizedNumMainThreadL2CacheMisses(ExperimentPack experimentPack, List<Experiment> experiments);
+
+    List<Double> getNormalizedNumHelperThreadL2CacheHits(ExperimentPack experimentPack, List<Experiment> experiments);
+
+    List<Double> getNormalizedNumHelperThreadL2CacheMisses(ExperimentPack experimentPack, List<Experiment> experiments);
+
+    void plotNumMainThreadL2CacheHits(ExperimentPack experimentPack, List<Experiment> experiments);
+
+    void plotNumMainThreadL2CacheMisses(ExperimentPack experimentPack, List<Experiment> experiments);
+
+    void plotNumHelperThreadL2CacheHits(ExperimentPack experimentPack, List<Experiment> experiments);
+
+    void plotNumHelperThreadL2CacheMisses(ExperimentPack experimentPack, List<Experiment> experiments);
+
+    void plotNormalizedNumMainThreadL2CacheHits(ExperimentPack experimentPack, List<Experiment> experiments);
+
+    void plotNormalizedNumMainThreadL2CacheMisses(ExperimentPack experimentPack, List<Experiment> experiments);
+
+    void plotNormalizedNumHelperThreadL2CacheHits(ExperimentPack experimentPack, List<Experiment> experiments);
+
+    void plotNormalizedNumHelperThreadL2CacheMisses(ExperimentPack experimentPack, List<Experiment> experiments);
+
+    List<Double> getHelperThreadL2CacheRequestCoverage(ExperimentPack experimentPack, List<Experiment> experiments);
+
+    List<Double> getHelperThreadL2CacheRequestAccuracy(ExperimentPack experimentPack, List<Experiment> experiments);
+
+    List<Double> getNormalizedHelperThreadL2CacheRequestCoverage(ExperimentPack experimentPack, List<Experiment> experiments);
+
+    List<Double> getNormalizedHelperThreadL2CacheRequestAccuracy(ExperimentPack experimentPack, List<Experiment> experiments);
+
+    void plotHelperThreadL2CacheRequestCoverage(ExperimentPack experimentPack, List<Experiment> experiments);
+
+    void plotHelperThreadL2CacheRequestAccuracy(ExperimentPack experimentPack, List<Experiment> experiments);
+
+    void plotNormalizedHelperThreadL2CacheRequestCoverage(ExperimentPack experimentPack, List<Experiment> experiments);
+
+    void plotNormalizedHelperThreadL2CacheRequestAccuracy(ExperimentPack experimentPack, List<Experiment> experiments);
 
     List<Double> getL2DownwardReadMPKIs(List<Experiment> experiments);
 
+    void plotL2DownwardReadMPKIs(ExperimentPack experimentPack, List<Experiment> experiments);
+
+    List<Double> getNormalizedL2DownwardReadMPKIs(List<Experiment> experiments);
+
+    void plotNormalizedL2DownwardReadMPKIs(ExperimentPack experimentPack, List<Experiment> experiments);
+
     List<Map<String, Double>> getHelperThreadL2CacheRequestBreakdowns(List<Experiment> experiments);
 
-    List<Map<String, Double>> getHelperThreadL2CacheRequestNormalizedBreakdowns(Experiment baselineExperiment, List<Experiment> experiments);
+    void plotHelperThreadL2CacheRequestBreakdowns(ExperimentPack experimentPack, List<Experiment> experiments);
 
-    List<Map<String, Double>> getHelperThreadL2CacheRequestBreakdownRatios(List<Experiment> experiments);
+    List<Experiment> getStoppedExperimentsByExperimentPack(ExperimentPack experimentPack);
+
+    Experiment getFirstStoppedExperimentByExperimentPack(ExperimentPack experimentPack);
+
+    void dumpExperimentPack(ExperimentPack experimentPack, boolean detailed);
+
+    void dumpExperimentPack(ExperimentPack experimentPack, boolean detailed, IndentedPrintWriter writer);
 }

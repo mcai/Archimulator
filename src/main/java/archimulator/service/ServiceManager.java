@@ -25,11 +25,13 @@ public class ServiceManager {
     private static SimulatedProgramService simulatedProgramService;
     private static ArchitectureService architectureService;
     private static ExperimentService experimentService;
+    private static SystemSettingService systemSettingService;
 
     static {
         simulatedProgramService = new SimulatedProgramServiceImpl();
         architectureService = new ArchitectureServiceImpl();
         experimentService = new ExperimentServiceImpl();
+        systemSettingService = new SystemSettingServiceImpl();
     }
 
     public static SimulatedProgramService getSimulatedProgramService() {
@@ -42,6 +44,10 @@ public class ServiceManager {
 
     public static ExperimentService getExperimentService() {
         return experimentService;
+    }
+
+    public static SystemSettingService getSystemSettingService() {
+        return systemSettingService;
     }
 
     static {

@@ -16,31 +16,15 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.service;
+package archimulator.model;
 
-import archimulator.model.SimulatedProgram;
-import net.pickapack.service.Service;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import java.util.List;
-
-public interface SimulatedProgramService extends Service {
-    List<SimulatedProgram> getAllSimulatedPrograms();
-
-    SimulatedProgram getSimulatedProgramById(long id);
-
-    SimulatedProgram getSimulatedProgramByTitle(String title);
-
-    SimulatedProgram getFirstSimulatedProgram();
-
-    long addSimulatedProgram(SimulatedProgram simulatedProgram);
-
-    void removeSimulatedProgramById(long id);
-
-    void clearSimulatedPrograms();
-
-    void updateSimulatedProgram(SimulatedProgram simulatedProgram);
-
-    void lockSimulatedProgram(SimulatedProgram simulatedProgram);
-
-    void unlockSimulatedProgram(SimulatedProgram simulatedProgram);
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.FIELD)
+public @interface Description {
+    String value();
 }

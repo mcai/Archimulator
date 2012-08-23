@@ -77,9 +77,13 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
 
         this.memory = new Memory(kernel, this.littleEndian, this.id);
 
+        ServiceManager.getSimulatedProgramService().lockSimulatedProgram(contextMapping.getSimulatedProgram());
+
         buildSimulatedProgram(contextMapping.getSimulatedProgram().getWorkingDirectory(), contextMapping.getSimulatedProgram().getHelperThreadEnabled(), contextMapping.getHelperThreadLookahead(), contextMapping.getHelperThreadStride());
 
         this.loadProgram(kernel, simulationDirectory, contextMapping);
+
+        ServiceManager.getSimulatedProgramService().unlockSimulatedProgram(contextMapping.getSimulatedProgram());
     }
 
     protected abstract void loadProgram(Kernel kernel, String simulationDirectory, ContextMapping contextMapping);
@@ -220,18 +224,18 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
 
     private static void pushMacroDefineArg(String workingDirectory, String fileName, String key, String value) {
         fileName = workingDirectory.replaceAll(ServiceManager.USER_HOME_TEMPLATE_ARG, System.getProperty("user.home")) + "/" + fileName;
-        System.out.printf("[%s] Pushing Macro Define Arg in %s: %s, %s\n", DateHelper.toString(new Date()), fileName, key, value);
+        System.err.printf("[%s] Pushing Macro Define Arg in %s: %s, %s\n", DateHelper.toString(new Date()), fileName, key, value);
         List<String> result = SedHelper.sedInPlace(fileName, "#define " + key, "#define " + key + " " + value);
         for (String line : result) {
-            System.out.println(line);
+            System.err.println(line);
         }
     }
 
     private static void buildWithMakeFile(String workingDirectory) {
-        System.out.printf("[%s] Building with Makefile\n", DateHelper.toString(new Date()));
+        System.err.printf("[%s] Building with Makefile\n", DateHelper.toString(new Date()));
         List<String> result = CommandLineHelper.invokeShellCommandAndGetResult("sh -c 'cd " + workingDirectory.replaceAll(ServiceManager.USER_HOME_TEMPLATE_ARG, System.getProperty("user.home")) + ";make -f Makefile.mips -B'");
         for (String line : result) {
-            System.out.println(line);
+            System.err.println(line);
         }
     }
 }

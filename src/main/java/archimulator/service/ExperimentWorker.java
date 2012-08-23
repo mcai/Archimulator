@@ -95,7 +95,7 @@ public class ExperimentWorker implements Runnable {
         experiment.setFailedReason("");
 
         ServiceManager.getExperimentService().updateExperiment(experiment);
-        experiment.dump();
+        ServiceManager.getExperimentService().dumpExperiment(experiment);
     }
 
     public boolean isRunning() {

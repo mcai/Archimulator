@@ -18,29 +18,11 @@
  ******************************************************************************/
 package archimulator.service;
 
-import archimulator.model.SimulatedProgram;
+import archimulator.model.SystemSetting;
 import net.pickapack.service.Service;
 
-import java.util.List;
+public interface SystemSettingService extends Service {
+    SystemSetting getSystemSettingSingleton();
 
-public interface SimulatedProgramService extends Service {
-    List<SimulatedProgram> getAllSimulatedPrograms();
-
-    SimulatedProgram getSimulatedProgramById(long id);
-
-    SimulatedProgram getSimulatedProgramByTitle(String title);
-
-    SimulatedProgram getFirstSimulatedProgram();
-
-    long addSimulatedProgram(SimulatedProgram simulatedProgram);
-
-    void removeSimulatedProgramById(long id);
-
-    void clearSimulatedPrograms();
-
-    void updateSimulatedProgram(SimulatedProgram simulatedProgram);
-
-    void lockSimulatedProgram(SimulatedProgram simulatedProgram);
-
-    void unlockSimulatedProgram(SimulatedProgram simulatedProgram);
+    void updateSystemSettingSingleton(SystemSetting systemSetting);
 }

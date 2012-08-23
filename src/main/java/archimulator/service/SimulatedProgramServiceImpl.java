@@ -107,4 +107,25 @@ public class SimulatedProgramServiceImpl extends AbstractService implements Simu
     public void updateSimulatedProgram(SimulatedProgram simulatedProgram) {
         this.updateItem(this.simulatedPrograms, SimulatedProgram.class, simulatedProgram);
     }
+
+    @Override
+    public void lockSimulatedProgram(SimulatedProgram simulatedProgram) {
+        long simulatedProgramId = simulatedProgram.getId();
+        while (getSimulatedProgramById(simulatedProgramId).getLocked()) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        simulatedProgram.setLocked(true);
+        updateSimulatedProgram(simulatedProgram);
+    }
+
+    @Override
+    public void unlockSimulatedProgram(SimulatedProgram simulatedProgram) {
+        simulatedProgram.setLocked(false);
+        updateSimulatedProgram(simulatedProgram);
+    }
 }

@@ -21,6 +21,7 @@ package archimulator.util;
 import net.pickapack.Pair;
 import net.pickapack.action.Function1;
 import net.pickapack.action.Function2;
+import net.pickapack.action.Function3;
 import net.pickapack.action.Predicate;
 
 import java.util.ArrayList;
@@ -80,11 +81,32 @@ public class CollectionHelper {
         });
     }
 
+    public static <E, T> List<T> transform(List<E> elements, Function2<Integer, ? super E, T> function) {
+        List<T> results = new ArrayList<T>();
+
+        int i = 0;
+        for(E element : elements) {
+            results.add(function.apply(i++, element));
+        }
+
+        return results;
+    }
+
     public static <K, V, T> Map<K, T> transform(Map<K, V> elements, final Function2<? super K, V, T> function) {
+        return transform(elements, new Function3<Integer, K, V, T>() {
+            @Override
+            public T apply(Integer index, K key, V value) {
+                return function.apply(key, value);
+            }
+        });
+    }
+
+    public static <K, V, T> Map<K, T> transform(Map<K, V> elements, final Function3<Integer, ? super K, V, T> function) {
         Map<K, T> results = new LinkedHashMap<K, T>();
 
+        int i = 0;
         for(K key : elements.keySet()) {
-            results.put(key, function.apply(key, elements.get(key)));
+            results.put(key, function.apply(i++, key, elements.get(key)));
         }
 
         return results;
@@ -96,16 +118,5 @@ public class CollectionHelper {
             result.put(element.getFirst(), element.getSecond());
         }
         return result;
-    }
-
-    public static <E, T> List<T> transform(List<E> elements, Function2<Integer, ? super E, T> function) {
-        List<T> results = new ArrayList<T>();
-
-        int i = 0;
-        for(E element : elements) {
-            results.add(function.apply(i++, element));
-        }
-
-        return results;
     }
 }

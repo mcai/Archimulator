@@ -43,7 +43,7 @@ public class SimulatedProgram implements ModelElement {
     private String executable;
 
     @DatabaseField
-    private String arguments;
+    private String defaultArguments;
 
     @DatabaseField
     private String standardIn;
@@ -51,18 +51,21 @@ public class SimulatedProgram implements ModelElement {
     @DatabaseField
     private boolean helperThreadEnabled;
 
+    @DatabaseField
+    private boolean locked;
+
     public SimulatedProgram() {
     }
 
-    public SimulatedProgram(String title, String workingDirectory, String executable, String arguments) {
-        this(title, workingDirectory, executable, arguments, "", false);
+    public SimulatedProgram(String title, String workingDirectory, String executable, String defaultArguments) {
+        this(title, workingDirectory, executable, defaultArguments, "", false);
     }
 
-    public SimulatedProgram(String title, String workingDirectory, String executable, String arguments, String standardIn, boolean helperThreadEnabled) {
+    public SimulatedProgram(String title, String workingDirectory, String executable, String defaultArguments, String standardIn, boolean helperThreadEnabled) {
         this.title = title;
         this.workingDirectory = workingDirectory;
         this.executable = executable;
-        this.arguments = arguments;
+        this.defaultArguments = defaultArguments;
         this.standardIn = standardIn;
 
         this.helperThreadEnabled = helperThreadEnabled;
@@ -95,8 +98,8 @@ public class SimulatedProgram implements ModelElement {
         return executable;
     }
 
-    public String getArguments() {
-        return arguments;
+    public String getDefaultArguments() {
+        return defaultArguments;
     }
 
     public String getStandardIn() {
@@ -107,8 +110,16 @@ public class SimulatedProgram implements ModelElement {
         return helperThreadEnabled;
     }
 
+    public boolean getLocked() {
+        return locked;
+    }
+
+    public void setLocked(boolean locked) {
+        this.locked = locked;
+    }
+
     @Override
     public String toString() {
-        return String.format("SimulatedProgram{id=%d, title='%s', workingDirectory='%s', executable='%s', arguments='%s', standardIn='%s', helperThreadEnabled=%s}", id, title, workingDirectory, executable, arguments, standardIn, helperThreadEnabled);
+        return String.format("SimulatedProgram{id=%d, title='%s', workingDirectory='%s', executable='%s', standardIn='%s', helperThreadEnabled=%s, locked=%s}", id, title, workingDirectory, executable, standardIn, helperThreadEnabled, locked);
     }
 }

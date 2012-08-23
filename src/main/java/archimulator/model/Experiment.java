@@ -181,10 +181,6 @@ public class Experiment implements ModelElement {
         return type == ExperimentType.TWO_PHASE ? "twoPhase/phase1" : "detailed/";
     }
 
-    public void dump() {
-        ServiceManager.getExperimentService().dumpExperiment(this);
-    }
-
     public void reset() {
         this.failedReason = "";
         this.state = ExperimentState.PENDING;

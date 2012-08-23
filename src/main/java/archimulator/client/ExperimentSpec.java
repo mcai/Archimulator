@@ -18,32 +18,58 @@
  ******************************************************************************/
 package archimulator.client;
 
+import archimulator.model.Description;
 import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
 import archimulator.util.StorageUnitHelper;
 
 import java.io.Serializable;
 
 public class ExperimentSpec implements Serializable {
-    private String programTitle;
+    @Description("Benchmark")
+    private String simulatedProgramTitle;
 
+    @Description("Input")
+    private String simulatedProgramArguments;
+
+    @Description("HT Lookahead")
     private int helperThreadLookahead;
+
+    @Description("HT Stride")
     private int helperThreadStride;
 
+    @Description("# Cores")
     private int numCores;
+
+    @Description("# Threads per Core")
     private int numThreadsPerCore;
 
+    @Description("L1I Size")
     private String l1ISize;
+
+    @Description("L1I Associativity")
     private int l1IAssociativity;
 
+    @Description("L1D Size")
     private String l1DSize;
+
+    @Description("L1D Associativity")
     private int l1DAssociativity;
 
+    @Description("L2 Size")
     private String l2Size;
+
+    @Description("L2 Associativity")
     private int l2Associativity;
+
+    @Description("L2 Replacement Policy")
     private CacheReplacementPolicyType l2ReplacementPolicyType;
 
-    public ExperimentSpec(String programTitle, int helperThreadLookahead, int helperThreadStride, int numCores, int numThreadsPerCore, String l1ISize, int l1IAssociativity, String l1DSize, int l1DAssociativity, String l2Size, int l2Associativity, CacheReplacementPolicyType l2ReplacementPolicyType) {
-        this.programTitle = programTitle;
+    public ExperimentSpec() {
+    }
+
+    public ExperimentSpec(String simulatedProgramTitle, String simulatedProgramArguments, int helperThreadLookahead, int helperThreadStride, int numCores, int numThreadsPerCore, String l1ISize, int l1IAssociativity, String l1DSize, int l1DAssociativity, String l2Size, int l2Associativity, CacheReplacementPolicyType l2ReplacementPolicyType) {
+        this.simulatedProgramTitle = simulatedProgramTitle;
+        this.simulatedProgramArguments = simulatedProgramArguments;
 
         this.helperThreadLookahead = helperThreadLookahead;
         this.helperThreadStride = helperThreadStride;
@@ -62,8 +88,12 @@ public class ExperimentSpec implements Serializable {
         this.l2ReplacementPolicyType = l2ReplacementPolicyType;
     }
 
-    public String getProgramTitle() {
-        return programTitle;
+    public String getSimulatedProgramTitle() {
+        return simulatedProgramTitle;
+    }
+
+    public String getSimulatedProgramArguments() {
+        return simulatedProgramArguments;
     }
 
     public int getHelperThreadLookahead() {
@@ -82,7 +112,7 @@ public class ExperimentSpec implements Serializable {
         return numThreadsPerCore;
     }
 
-    public int getL1ISize() {
+    public int getL1ISizeAsInt() {
         return (int) StorageUnitHelper.displaySizeToByteCount(l1ISize);
     }
 
@@ -90,7 +120,7 @@ public class ExperimentSpec implements Serializable {
         return l1IAssociativity;
     }
 
-    public int getL1DSize() {
+    public int getL1DSizeAsInt() {
         return (int) StorageUnitHelper.displaySizeToByteCount(l1DSize);
     }
 
@@ -98,7 +128,7 @@ public class ExperimentSpec implements Serializable {
         return l1DAssociativity;
     }
 
-    public int getL2Size() {
+    public int getL2SizeAsInt() {
         return (int) StorageUnitHelper.displaySizeToByteCount(l2Size);
     }
 
@@ -109,4 +139,70 @@ public class ExperimentSpec implements Serializable {
     public CacheReplacementPolicyType getL2ReplacementPolicyType() {
         return l2ReplacementPolicyType;
     }
+
+    public String getL1ISize() {
+        return l1ISize;
+    }
+
+    public String getL1DSize() {
+        return l1DSize;
+    }
+
+    public String getL2Size() {
+        return l2Size;
+    }
+
+    public void setSimulatedProgramTitle(String simulatedProgramTitle) {
+        this.simulatedProgramTitle = simulatedProgramTitle;
+    }
+
+    public void setSimulatedProgramArguments(String simulatedProgramArguments) {
+        this.simulatedProgramArguments = simulatedProgramArguments;
+    }
+
+    public void setHelperThreadLookahead(int helperThreadLookahead) {
+        this.helperThreadLookahead = helperThreadLookahead;
+    }
+
+    public void setHelperThreadStride(int helperThreadStride) {
+        this.helperThreadStride = helperThreadStride;
+    }
+
+    public void setNumCores(int numCores) {
+        this.numCores = numCores;
+    }
+
+    public void setNumThreadsPerCore(int numThreadsPerCore) {
+        this.numThreadsPerCore = numThreadsPerCore;
+    }
+
+    public void setL1ISize(String l1ISize) {
+        this.l1ISize = l1ISize;
+    }
+
+    public void setL1IAssociativity(int l1IAssociativity) {
+        this.l1IAssociativity = l1IAssociativity;
+    }
+
+    public void setL1DSize(String l1DSize) {
+        this.l1DSize = l1DSize;
+    }
+
+    public void setL1DAssociativity(int l1DAssociativity) {
+        this.l1DAssociativity = l1DAssociativity;
+    }
+
+    public void setL2Size(String l2Size) {
+        this.l2Size = l2Size;
+    }
+
+    public void setL2Associativity(int l2Associativity) {
+        this.l2Associativity = l2Associativity;
+    }
+
+    public void setL2ReplacementPolicyType(CacheReplacementPolicyType l2ReplacementPolicyType) {
+        this.l2ReplacementPolicyType = l2ReplacementPolicyType;
+    }
+
+
 }

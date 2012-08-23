@@ -66,7 +66,8 @@ public class HelperThreadL2CacheRequestProfilingHelper {
     private long numMainThreadL2CacheHits;
     private long numMainThreadL2CacheMisses;
 
-    private long numTotalHelperThreadL2CacheRequests;
+    private long numHelperThreadL2CacheHits;
+    private long numHelperThreadL2CacheMisses;
 
     private long numRedundantHitToTransientTagHelperThreadL2CacheRequests;
     private long numRedundantHitToCacheHelperThreadL2CacheRequests;
@@ -252,7 +253,11 @@ public class HelperThreadL2CacheRequestProfilingHelper {
                 }
             }
         } else {
-            this.numTotalHelperThreadL2CacheRequests++;
+            if (!event.isHitInCache()) {
+                this.numHelperThreadL2CacheMisses++;
+            } else {
+                this.numHelperThreadL2CacheHits++;
+            }
 
             if (event.isHitInCache() && !lineFoundIsHelperThread) {
                 if (this.helperThreadL2CacheRequestStates.get(event.getSet()).get(event.getWay()).hitToTransientTag) {
@@ -607,7 +612,7 @@ public class HelperThreadL2CacheRequestProfilingHelper {
     }
 
     public double getHelperThreadL2CacheRequestAccuracy() {
-        return this.numTotalHelperThreadL2CacheRequests == 0 ? 0 : (double) this.numUsefulHelperThreadL2CacheRequests / this.numTotalHelperThreadL2CacheRequests;
+        return this.getNumTotalHelperThreadL2CacheRequests() == 0 ? 0 : (double) this.numUsefulHelperThreadL2CacheRequests / this.getNumTotalHelperThreadL2CacheRequests();
     }
 
     public boolean getSummedUpUnstableHelperThreadL2CacheRequests() {
@@ -623,8 +628,16 @@ public class HelperThreadL2CacheRequestProfilingHelper {
         return numMainThreadL2CacheMisses;
     }
 
+    public long getNumHelperThreadL2CacheHits() {
+        return numHelperThreadL2CacheHits;
+    }
+
+    public long getNumHelperThreadL2CacheMisses() {
+        return numHelperThreadL2CacheMisses;
+    }
+
     public long getNumTotalHelperThreadL2CacheRequests() {
-        return numTotalHelperThreadL2CacheRequests;
+        return numHelperThreadL2CacheHits + numHelperThreadL2CacheMisses;
     }
 
     public long getNumRedundantHitToTransientTagHelperThreadL2CacheRequests() {

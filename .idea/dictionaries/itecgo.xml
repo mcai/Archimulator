@@ -21,6 +21,7 @@
       <w>itlbs</w>
       <w>lookahead</w>
       <w>lookaside</w>
+      <w>mshr</w>
       <w>mult</w>
       <w>multicore</w>
       <w>nnpc</w>

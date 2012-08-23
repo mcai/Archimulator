@@ -18,24 +18,73 @@
  ******************************************************************************/
 package archimulator.client;
 
+import org.apache.commons.beanutils.BeanUtils;
+
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ExperimentPackSpec implements Serializable {
     private String title;
-    private List<ExperimentSpec> experiments;
+
+    private ExperimentSpec baselineExperiment;
+
+    private String variablePropertyName;
+    private List<String> variablePropertyValues;
 
     public ExperimentPackSpec(String title) {
         this.title = title;
-        this.experiments = new ArrayList<ExperimentSpec>();
+        this.variablePropertyValues = new ArrayList<String>();
     }
 
     public String getTitle() {
         return title;
     }
 
+    public ExperimentSpec getBaselineExperiment() {
+        return baselineExperiment;
+    }
+
+    public void setBaselineExperiment(ExperimentSpec baselineExperiment) {
+        this.baselineExperiment = baselineExperiment;
+    }
+
+    public String getVariablePropertyName() {
+        return variablePropertyName;
+    }
+
+    public void setVariablePropertyName(String variablePropertyName) {
+        this.variablePropertyName = variablePropertyName;
+    }
+
+    public List<String> getVariablePropertyValues() {
+        return variablePropertyValues;
+    }
+
+    public void setVariablePropertyValues(List<String> variablePropertyValues) {
+        this.variablePropertyValues = variablePropertyValues;
+    }
+
     public List<ExperimentSpec> getExperiments() {
-        return experiments;
+        try {
+            List<ExperimentSpec> experiments = new ArrayList<ExperimentSpec>();
+
+            for(Object variablePropertyValue : variablePropertyValues) {
+                ExperimentSpec experimentSpec = (ExperimentSpec) BeanUtils.cloneBean(this.baselineExperiment);
+                BeanUtils.setProperty(experimentSpec, this.variablePropertyName, variablePropertyValue);
+                experiments.add(experimentSpec);
+            }
+
+            return experiments;
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (InstantiationException e) {
+            throw new RuntimeException(e);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(e);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

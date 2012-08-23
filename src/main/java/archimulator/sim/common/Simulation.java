@@ -68,6 +68,13 @@ public abstract class Simulation implements SimulationObject {
 
     private HelperThreadL2CacheRequestProfilingHelper helperThreadL2CacheRequestProfilingHelper;
 
+    public long currentDynamicInstructionId;
+    public long currentReorderBufferEntryId;
+    public long currentDecodeBufferEntryId;
+    public long currentMemoryHierarchyAccessId;
+    public long currentNetMessageId;
+    public long currentCacheCoherenceFlowId;
+
     public Simulation(String title, SimulationType type, Experiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
         this.experiment = experiment;
         this.blockingEventDispatcher = blockingEventDispatcher;
@@ -144,7 +151,7 @@ public abstract class Simulation implements SimulationObject {
             this.experiment.setFailedReason(e.toString());
 
             ServiceManager.getExperimentService().updateExperiment(this.experiment);
-            this.experiment.dump();
+            ServiceManager.getExperimentService().dumpExperiment(this.experiment);
 
             System.err.println("Simulation aborted with errors");
             System.exit(-1);
@@ -269,6 +276,9 @@ public abstract class Simulation implements SimulationObject {
 
                 JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/numMainThreadL2CacheHits");
                 JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/numMainThreadL2CacheMisses");
+
+                JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/numHelperThreadL2CacheHits");
+                JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/numHelperThreadL2CacheMisses");
 
                 JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/numTotalHelperThreadL2CacheRequests");
 
@@ -463,11 +473,4 @@ public abstract class Simulation implements SimulationObject {
     public HelperThreadL2CacheRequestProfilingHelper getHelperThreadL2CacheRequestProfilingHelper() {
         return helperThreadL2CacheRequestProfilingHelper;
     }
-
-    public long currentDynamicInstructionId;
-    public long currentReorderBufferEntryId;
-    public long currentDecodeBufferEntryId;
-    public long currentMemoryHierarchyAccessId;
-    public long currentNetMessageId;
-    public long currentCacheCoherenceFlowId;
 }
