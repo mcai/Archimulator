@@ -30,3 +30,12 @@ rsync --recursive --progress -avz -e "sshpass -p 1026@ustc ssh -l ubuntu" /home/
 copy back experiment results:
 rsync --recursive --progress --delete -avz -e "sshpass -p 1026@ustc ssh -l ubuntu" ubuntu@61.129.33.163:/home/itecgo/Archimulator/experiments/ /home/itecgo/Archimulator/experiments/
 rsync --recursive --progress --delete -avz -e "sshpass -p 1026@ustc ssh -l root" root@[2400:8900::f03c:91ff:feae:ff27]:/home/itecgo/Archimulator/experiments/ /home/itecgo/Archimulator/experiments/
+
+
+new
+--------------------------------------------------------------------------------------
+rsync --recursive --progress -avz -e "sshpass -p 1026@ustc ssh -l ubuntu" /home/itecgo/Archimulator/target/lib/ ubuntu@61.129.33.163:/home/itecgo/Archimulator/target/lib/
+rsync --recursive --progress -avz -e "sshpass -p 1026@ustc ssh -l ubuntu" /home/itecgo/Archimulator/tools/ ubuntu@61.129.33.163:/home/itecgo/Archimulator/tools/
+rsync --recursive --progress -avz -e "sshpass -p 1026@ustc ssh -l ubuntu" /home/itecgo/Archimulator/experiment_inputs/ ubuntu@61.129.33.163:/home/itecgo/Archimulator/experiment_inputs/
+rsync --recursive --progress -avz -e "sshpass -p 1026@ustc ssh -l ubuntu" /home/itecgo/Archimulator/target/archimulator.jar ubuntu@61.129.33.163:/home/itecgo/Archimulator/target/archimulator.jar
+
