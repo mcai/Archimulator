@@ -611,10 +611,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
                         "helperThreadL2CacheRequestProfilingHelper/numRedundantHitToTransientTagHelperThreadL2CacheRequests",
                         experiment.getMeasurementTitlePrefix() +
                                 "helperThreadL2CacheRequestProfilingHelper/numRedundantHitToCacheHelperThreadL2CacheRequests",
-
-                        experiment.getMeasurementTitlePrefix() +
-                                "helperThreadL2CacheRequestProfilingHelper/numUsefulHelperThreadL2CacheRequests",
-
                         experiment.getMeasurementTitlePrefix() +
                                 "helperThreadL2CacheRequestProfilingHelper/numTimelyHelperThreadL2CacheRequests",
                         experiment.getMeasurementTitlePrefix() +
@@ -644,18 +640,15 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
                             output.put("Redundant Cache", input.get(key));
                             break;
                         case 2:
-                            output.put("Useful", input.get(key));
-                            break;
-                        case 3:
                             output.put("Timely", input.get(key));
                             break;
-                        case 4:
+                        case 3:
                             output.put("Late", input.get(key));
                             break;
-                        case 5:
+                        case 4:
                             output.put("Bad", input.get(key));
                             break;
-                        case 6:
+                        case 5:
                             output.put("Ugly", input.get(key));
                             break;
                         default:
