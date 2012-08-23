@@ -19,9 +19,11 @@
 package archimulator.model;
 
 import archimulator.service.ServiceManager;
+import archimulator.util.CollectionHelper;
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+import net.pickapack.action.Function1;
 import net.pickapack.dateTime.DateHelper;
 import net.pickapack.model.ModelElement;
 
@@ -142,6 +144,19 @@ public class Experiment implements ModelElement {
         return stats;
     }
 
+    public String getStatValue(String key) {
+        return stats.containsKey(key) ? stats.get(key).replaceAll(",", "") : null;
+    }
+
+    public List<String> getStatValues(List<String> keys) {
+        return CollectionHelper.transform(keys, new Function1<String, String>() {
+            @Override
+            public String apply(String key) {
+                return getStatValue(key);
+            }
+        });
+    }
+
     public ExperimentPack getParent() {
         if (parent == null) {
             parent = ServiceManager.getExperimentService().getExperimentPackById(this.parentId);
@@ -162,8 +177,18 @@ public class Experiment implements ModelElement {
         return this.state == ExperimentState.COMPLETED || this.state == ExperimentState.ABORTED;
     }
 
+    public String getMeasurementTitlePrefix() {
+        return type == ExperimentType.TWO_PHASE ? "twoPhase/phase1" : "detailed/";
+    }
+
     public void dump() {
         ServiceManager.getExperimentService().dumpExperiment(this);
+    }
+
+    public void reset() {
+        this.failedReason = "";
+        this.state = ExperimentState.PENDING;
+        stats.clear();
     }
 
     @Override

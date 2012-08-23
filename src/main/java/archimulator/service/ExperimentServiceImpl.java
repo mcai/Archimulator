@@ -21,11 +21,17 @@ package archimulator.service;
 import archimulator.model.*;
 import archimulator.util.JaxenHelper;
 import com.j256.ormlite.dao.Dao;
+import net.pickapack.Pair;
+import net.pickapack.action.Function1;
+import net.pickapack.action.Function2;
 import net.pickapack.dateTime.DateHelper;
 import net.pickapack.model.ModelElement;
 import net.pickapack.service.AbstractService;
 
 import java.util.*;
+
+import static archimulator.util.CollectionHelper.toMap;
+import static archimulator.util.CollectionHelper.transform;
 
 public class ExperimentServiceImpl extends AbstractService implements ExperimentService {
     private Dao<Experiment, Long> experiments;
@@ -234,6 +240,8 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         for (Map.Entry<String, String> entry : experiment.getStats().entrySet()) {
             System.out.printf("\t%s: %s\n", entry.getKey(), entry.getValue());
         }
+
+        System.out.println();
     }
 
     @Override
@@ -245,23 +253,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         }
 
         return null;
-    }
-
-    @Override
-    public void waitForExperimentStopped(Experiment experiment) {
-        long id = experiment.getId();
-
-        try {
-            for (; ; ) {
-                if (getExperimentById(id).isStopped()) {
-                    break;
-                }
-
-                Thread.sleep(1000);
-            }
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @Override
@@ -297,5 +288,174 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     @Override
     public void runExperiments() {
         new ExperimentWorker().run();
+    }
+
+    @Override
+    public List<Double> getNormalizedStats(List<Experiment> experiments, Experiment baselineExperiment, Function1<Experiment, Double> function) {
+        double baseline = function.apply(baselineExperiment);
+
+        List<Double> result = new ArrayList<Double>();
+
+        for (Experiment experiment : experiments) {
+            double value = function.apply(experiment);
+            result.add(value / baseline);
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<Map<String, Double>> getBreakdowns(List<Experiment> experiments, final Function1<Experiment, List<String>> keysFunction) {
+        return transform(experiments, new Function1<Experiment, Map<String, Double>>() {
+            @Override
+            public Map<String, Double> apply(Experiment experiment) {
+                return getBreakdown(experiment, keysFunction);
+            }
+        });
+    }
+
+    @Override
+    public Map<String, Double> getBreakdown(Experiment experiment, Function1<Experiment, List<String>> keysFunction) {
+        final List<String> keys = keysFunction.apply(experiment);
+        return toMap(transform(experiment.getStatValues(keys), new Function2<Integer, String, Pair<String, Double>>() {
+            @Override
+            public Pair<String, Double> apply(Integer index, String param) {
+                return new Pair<String, Double>(keys.get(index), Double.parseDouble(param));
+            }
+        }));
+    }
+
+    @Override
+    public List<Map<String, Double>> getNormalizedBreakdowns(List<Experiment> experiments, Experiment baselineExperiment, final Function1<Experiment, List<String>> keysFunction) {
+        final Map<String, Double> baselineBreakdown = getBreakdown(baselineExperiment, keysFunction);
+        List<Map<String, Double>> breakdowns = getBreakdowns(experiments, keysFunction);
+
+        return transform(breakdowns, new Function1<Map<String, Double>, Map<String, Double>>() {
+            @Override
+            public Map<String, Double> apply(Map<String, Double> breakdown) {
+                return transform(breakdown, new Function2<String, Double, Double>() {
+                    @Override
+                    public Double apply(String key, Double value) {
+                        return value / baselineBreakdown.get(key);
+                    }
+                });
+            }
+        });
+    }
+
+    @Override
+    public List<Map<String, Double>> getBreakdownRatios(List<Experiment> experiments, Function1<Experiment, List<String>> keysFunction, final Function1<Experiment, String> totalKeyFunction) {
+        final List<Double> totalValues = transform(experiments, new Function1<Experiment, Double>() {
+            @Override
+            public Double apply(Experiment experiment) {
+                return Double.parseDouble(experiment.getStatValue(totalKeyFunction.apply(experiment)));
+            }
+        });
+
+        List<Map<String, Double>> breakdowns = getBreakdowns(experiments, keysFunction);
+        return transform(breakdowns, new Function2<Integer, Map<String, Double>, Map<String, Double>>() {
+            @Override
+            public Map<String, Double> apply(final Integer index, Map<String, Double> breakdown) {
+                final Double totalValue = totalValues.get(index);
+                return transform(breakdown, new Function2<String, Double, Double>() {
+                    @Override
+                    public Double apply(String key, Double value) {
+                        return value / totalValue;
+                    }
+                });
+            }
+        });
+    }
+
+    @Override
+    public List<Double> getSpeedups(Experiment baselineExperiment, List<Experiment> experiments) {
+        long baselineTotalCycles = Long.parseLong(baselineExperiment.getStatValue(baselineExperiment.getMeasurementTitlePrefix() + "cycleAccurateEventQueue/currentCycle"));
+
+        List<Double> speedups = new ArrayList<Double>();
+
+        for (Experiment experiment : experiments) {
+            long totalCycles = Long.parseLong(experiment.getStatValue(experiment.getMeasurementTitlePrefix() + "cycleAccurateEventQueue/currentCycle"));
+            speedups.add((double) baselineTotalCycles / totalCycles);
+        }
+
+        return speedups;
+    }
+
+    @Override
+    public List<Double> getNormalizedTotalCycles(Experiment baselineExperiment, List<Experiment> experiments) {
+        return getNormalizedStats(experiments, baselineExperiment, new Function1<Experiment, Double>() {
+            @Override
+            public Double apply(Experiment experiment) {
+                return Double.parseDouble(experiment.getStatValue(experiment.getMeasurementTitlePrefix() + "cycleAccurateEventQueue/currentCycle"));
+            }
+        });
+    }
+
+    @Override
+    public List<Long> getNumL2DownwardReadMisses(List<Experiment> experiments) {
+        return transform(experiments, new Function1<Experiment, Long>() {
+            @Override
+            public Long apply(Experiment experiment) {
+                return Long.parseLong(experiment.getStatValue(experiment.getMeasurementTitlePrefix() + "processor/cacheHierarchy/cacheControllers[name=l2]/numDownwardReadMisses"));
+            }
+        });
+    }
+
+    @Override
+    public List<Double> getL2DownwardReadMPKIs(List<Experiment> experiments) {
+        return transform(experiments, new Function1<Experiment, Double>() {
+            @Override
+            public Double apply(Experiment experiment) {
+                long numL2DownwardReadMisses = Long.parseLong(experiment.getStatValue(experiment.getMeasurementTitlePrefix() + "processor/cacheHierarchy/cacheControllers[name=l2]/numDownwardReadMisses"));
+                long totalInstructions = Long.parseLong(experiment.getStatValue(experiment.getMeasurementTitlePrefix() + "totalInstructions"));
+                return (double) numL2DownwardReadMisses / totalInstructions;
+            }
+        });
+    }
+
+    @Override
+    public List<Map<String, Double>> getHelperThreadL2CacheRequestBreakdowns(List<Experiment> experiments) {
+        return getBreakdowns(experiments, getHelperThreadL2CacheRequestBreakdownKeysFunction());
+    }
+
+    @Override
+    public List<Map<String, Double>> getHelperThreadL2CacheRequestNormalizedBreakdowns(Experiment baselineExperiment, List<Experiment> experiments) {
+        return getNormalizedBreakdowns(experiments, baselineExperiment, getHelperThreadL2CacheRequestBreakdownKeysFunction());
+    }
+
+    @Override
+    public List<Map<String, Double>> getHelperThreadL2CacheRequestBreakdownRatios(List<Experiment> experiments) {
+        return getBreakdownRatios(experiments, getHelperThreadL2CacheRequestBreakdownKeysFunction(), new Function1<Experiment, String>() {
+            @Override
+            public String apply(Experiment experiment) {
+                return experiment.getMeasurementTitlePrefix() +
+                        "helperThreadL2CacheRequestProfilingHelper/numTotalHelperThreadL2CacheRequests";
+            }
+        });
+    }
+
+    private Function1<Experiment, List<String>> getHelperThreadL2CacheRequestBreakdownKeysFunction() {
+        return new Function1<Experiment, List<String>>() {
+            @Override
+            public List<String> apply(Experiment experiment) {
+                return Arrays.asList(experiment.getMeasurementTitlePrefix() +
+                        "helperThreadL2CacheRequestProfilingHelper/numRedundantHitToTransientTagHelperThreadL2CacheRequests",
+                        experiment.getMeasurementTitlePrefix() +
+                                "helperThreadL2CacheRequestProfilingHelper/numRedundantHitToCacheHelperThreadL2CacheRequests",
+
+                        experiment.getMeasurementTitlePrefix() +
+                                "helperThreadL2CacheRequestProfilingHelper/numUsefulHelperThreadL2CacheRequests",
+
+                        experiment.getMeasurementTitlePrefix() +
+                                "helperThreadL2CacheRequestProfilingHelper/numTimelyHelperThreadL2CacheRequests",
+                        experiment.getMeasurementTitlePrefix() +
+                                "helperThreadL2CacheRequestProfilingHelper/numLateHelperThreadL2CacheRequests",
+
+                        experiment.getMeasurementTitlePrefix() +
+                                "helperThreadL2CacheRequestProfilingHelper/numBadHelperThreadL2CacheRequests",
+                        experiment.getMeasurementTitlePrefix() +
+                                "helperThreadL2CacheRequestProfilingHelper/numUglyHelperThreadL2CacheRequests");
+            }
+        };
     }
 }

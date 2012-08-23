@@ -214,7 +214,7 @@ public class HelperThreadL2CacheRequestProfilingHelper {
         });
     }
 
-    private void sumUpUnstableHTLLCRequests() {
+    private void sumUpUnstableHelperThreadL2CacheRequests() {
         for (int set = 0; set < l2CacheController.getCache().getNumSets(); set++) {
             for (int way = 0; way < l2CacheController.getCache().getAssociativity(); way++) {
                 HelperThreadL2CacheRequestState helperThreadL2CacheRequestState = helperThreadL2CacheRequestStates.get(set).get(way);
@@ -482,30 +482,30 @@ public class HelperThreadL2CacheRequestProfilingHelper {
     }
 
     private void markInvalid(int set, int way) {
-        this.setLLCLineBroughterThreadId(set, way, -1, false);
+        this.setL2CacheLineBroughterThreadId(set, way, -1, false);
         this.markLate(set, way, false);
     }
 
     private void markHelperThread(int set, int way) {
-        this.setLLCLineBroughterThreadId(set, way, BasicThread.getHelperThreadId(), false);
+        this.setL2CacheLineBroughterThreadId(set, way, BasicThread.getHelperThreadId(), false);
     }
 
     private void markMainThread(int set, int way) {
-        this.setLLCLineBroughterThreadId(set, way, BasicThread.getMainThreadId(), false);
+        this.setL2CacheLineBroughterThreadId(set, way, BasicThread.getMainThreadId(), false);
     }
 
     private void markTransientThreadId(int set, int way, int threadId) {
-        this.setLLCLineBroughterThreadId(set, way, threadId, true);
+        this.setL2CacheLineBroughterThreadId(set, way, threadId, true);
     }
 
-    private void setLLCLineBroughterThreadId(int set, int way, int llcLineBroughterThreadId, boolean inFlight) {
+    private void setL2CacheLineBroughterThreadId(int set, int way, int l2CacheLineBroughterThreadId, boolean inFlight) {
         HelperThreadL2CacheRequestState helperThreadL2CacheRequestState = this.helperThreadL2CacheRequestStates.get(set).get(way);
 
         if (inFlight) {
-            helperThreadL2CacheRequestState.inFlightThreadId = llcLineBroughterThreadId;
+            helperThreadL2CacheRequestState.inFlightThreadId = l2CacheLineBroughterThreadId;
         } else {
             helperThreadL2CacheRequestState.inFlightThreadId = -1;
-            helperThreadL2CacheRequestState.threadId = llcLineBroughterThreadId;
+            helperThreadL2CacheRequestState.threadId = l2CacheLineBroughterThreadId;
         }
     }
 
@@ -611,7 +611,7 @@ public class HelperThreadL2CacheRequestProfilingHelper {
     }
 
     public boolean getSummedUpUnstableHelperThreadL2CacheRequests() {
-        this.sumUpUnstableHTLLCRequests();
+        this.sumUpUnstableHelperThreadL2CacheRequests();
         return true;
     }
 

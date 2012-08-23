@@ -22,9 +22,11 @@ import archimulator.model.Architecture;
 import archimulator.model.Experiment;
 import archimulator.model.ExperimentPack;
 import archimulator.model.SimulatedProgram;
+import net.pickapack.action.Function1;
 import net.pickapack.service.Service;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ExperimentService extends Service {
     List<Experiment> getAllExperiments();
@@ -51,8 +53,6 @@ public interface ExperimentService extends Service {
 
     Experiment getFirstExperimentToRun();
 
-    void waitForExperimentStopped(Experiment experiment);
-
     List<ExperimentPack> getAllExperimentPacks();
 
     ExperimentPack getExperimentPackById(long id);
@@ -66,4 +66,28 @@ public interface ExperimentService extends Service {
     void updateExperimentPack(ExperimentPack experimentPack);
 
     void runExperiments();
+
+    List<Double> getNormalizedStats(List<Experiment> experiments, Experiment baselineExperiment, Function1<Experiment, Double> function);
+
+    List<Map<String, Double>> getBreakdowns(List<Experiment> experiments, Function1<Experiment, List<String>> keysFunction);
+
+    Map<String, Double> getBreakdown(Experiment experiment, Function1<Experiment, List<String>> keysFunction);
+
+    List<Map<String,Double>> getNormalizedBreakdowns(List<Experiment> experiments, Experiment baselineExperiment, Function1<Experiment, List<String>> keysFunction);
+
+    List<Map<String, Double>> getBreakdownRatios(List<Experiment> experiments, Function1<Experiment, List<String>> keysFunction, Function1<Experiment, String> totalKeyFunction);
+
+    List<Double> getSpeedups(Experiment baselineExperiment, List<Experiment> experiments);
+
+    List<Double> getNormalizedTotalCycles(Experiment baselineExperiment, List<Experiment> experiments);
+
+    List<Long> getNumL2DownwardReadMisses(List<Experiment> experiments);
+
+    List<Double> getL2DownwardReadMPKIs(List<Experiment> experiments);
+
+    List<Map<String, Double>> getHelperThreadL2CacheRequestBreakdowns(List<Experiment> experiments);
+
+    List<Map<String, Double>> getHelperThreadL2CacheRequestNormalizedBreakdowns(Experiment baselineExperiment, List<Experiment> experiments);
+
+    List<Map<String, Double>> getHelperThreadL2CacheRequestBreakdownRatios(List<Experiment> experiments);
 }

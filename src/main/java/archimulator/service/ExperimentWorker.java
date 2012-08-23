@@ -36,9 +36,7 @@ public class ExperimentWorker implements Runnable {
             public void run() {
                 if (experiment != null) {
                     if (experiment.getState() == ExperimentState.RUNNING) {
-                        experiment.setFailedReason("");
-                        experiment.setState(ExperimentState.PENDING);
-                        experiment.getStats().clear();
+                        experiment.reset();
                         ServiceManager.getExperimentService().updateExperiment(experiment);
                     }
                 }
@@ -50,11 +48,7 @@ public class ExperimentWorker implements Runnable {
     public void run() {
         for (; ; ) {
             if (!doRunExperiment()) {
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
+                break;
             }
         }
     }
@@ -65,6 +59,7 @@ public class ExperimentWorker implements Runnable {
         if (this.experiment != null) {
             runExperiment(this.experiment);
             this.experiment = null;
+            return true;
         }
 
         return false;

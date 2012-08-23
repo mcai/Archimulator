@@ -16,6 +16,7 @@
       <w>getm</w>
       <w>ifetch</w>
       <w>insts</w>
+      <w>iterable</w>
       <w>itlb</w>
       <w>itlbs</w>
       <w>lookahead</w>
@@ -32,6 +33,7 @@
       <w>pthread</w>
       <w>putm</w>
       <w>quant</w>
+      <w>sqlite</w>
       <w>sqrt</w>
       <w>tlbs</w>
       <w>unmap</w>

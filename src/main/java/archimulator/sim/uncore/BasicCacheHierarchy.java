@@ -70,7 +70,7 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
                 break;
         }
 
-        this.l2CacheController = new DirectoryController(this, "llc");
+        this.l2CacheController = new DirectoryController(this, "l2");
         this.l2CacheController.setNext(this.memoryController);
 
         this.l1ICacheControllers = new ArrayList<CacheController>();
