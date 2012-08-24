@@ -384,7 +384,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
     @Override
     public void plotNormalizedTotalCycles(ExperimentPack experimentPack, List<Experiment> experiments) {
-        plot(experimentPack, "normalizedTotalCycles", "Normalized Total Cycles", getNormalizedTotalCycles(experiments));
+        plot(experimentPack, "totalCycles_normalized", "Normalized Total Cycles", getNormalizedTotalCycles(experiments));
     }
 
     @Override
@@ -409,7 +409,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
     @Override
     public void plotNormalizedNumL2DownwardReadMisses(ExperimentPack experimentPack, List<Experiment> experiments) {
-        plot(experimentPack, "normalizedNumL2DownwardReadMisses", "# Normalized L2 Downward Read Misses", getNormalizedNumL2DownwardReadMisses(experiments));
+        plot(experimentPack, "numL2DownwardReadMisses_normalized", "# Normalized L2 Downward Read Misses", getNormalizedNumL2DownwardReadMisses(experiments));
     }
 
     @Override
@@ -494,22 +494,22 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
     @Override
     public void plotNormalizedNumMainThreadL2CacheHits(ExperimentPack experimentPack, List<Experiment> experiments) {
-        plot(experimentPack, "normalizedNumMainThreadL2CacheHits", "# Normalized Main Thread L2 Cache Hits", getNormalizedNumMainThreadL2CacheHits(experimentPack, experiments));
+        plot(experimentPack, "numMainThreadL2CacheHits_normalized", "# Normalized Main Thread L2 Cache Hits", getNormalizedNumMainThreadL2CacheHits(experimentPack, experiments));
     }
 
     @Override
     public void plotNormalizedNumMainThreadL2CacheMisses(ExperimentPack experimentPack, List<Experiment> experiments) {
-        plot(experimentPack, "normalizedNumMainThreadL2CacheMisses", "# Normalized Main Thread L2 Cache Misses", getNormalizedNumMainThreadL2CacheMisses(experimentPack, experiments));
+        plot(experimentPack, "numMainThreadL2CacheMisses_normalized", "# Normalized Main Thread L2 Cache Misses", getNormalizedNumMainThreadL2CacheMisses(experimentPack, experiments));
     }
 
     @Override
     public void plotNormalizedNumHelperThreadL2CacheHits(ExperimentPack experimentPack, List<Experiment> experiments) {
-        plot(experimentPack, "normalizedNumHelperThreadL2CacheHits", "# Normalized Helper Thread L2 Cache Hits", getNormalizedNumHelperThreadL2CacheHits(experimentPack, experiments));
+        plot(experimentPack, "numHelperThreadL2CacheHits_normalized", "# Normalized Helper Thread L2 Cache Hits", getNormalizedNumHelperThreadL2CacheHits(experimentPack, experiments));
     }
 
     @Override
     public void plotNormalizedNumHelperThreadL2CacheMisses(ExperimentPack experimentPack, List<Experiment> experiments) {
-        plot(experimentPack, "normalizedNumHelperThreadL2CacheMisses", "# Normalized Helper Thread L2 Cache Misses", getNormalizedNumHelperThreadL2CacheMisses(experimentPack, experiments));
+        plot(experimentPack, "numHelperThreadL2CacheMisses_normalized", "# Normalized Helper Thread L2 Cache Misses", getNormalizedNumHelperThreadL2CacheMisses(experimentPack, experiments));
     }
 
     @Override
@@ -554,12 +554,12 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
     @Override
     public void plotNormalizedHelperThreadL2CacheRequestCoverage(ExperimentPack experimentPack, List<Experiment> experiments) {
-        plot(experimentPack, "normalizedHelperThreadL2CacheRequestCoverage", "Normalized Helper Thread L2 Cache Request Coverage", getNormalizedHelperThreadL2CacheRequestCoverage(experimentPack, experiments));
+        plot(experimentPack, "helperThreadL2CacheRequestCoverage_normalized", "Normalized Helper Thread L2 Cache Request Coverage", getNormalizedHelperThreadL2CacheRequestCoverage(experimentPack, experiments));
     }
 
     @Override
     public void plotNormalizedHelperThreadL2CacheRequestAccuracy(ExperimentPack experimentPack, List<Experiment> experiments) {
-        plot(experimentPack, "normalizedHelperThreadL2CacheRequestAccuracy", "Normalized Helper Thread L2 Cache Request Accuracy", getNormalizedHelperThreadL2CacheRequestAccuracy(experimentPack, experiments));
+        plot(experimentPack, "helperThreadL2CacheRequestAccuracy_normalized", "Normalized Helper Thread L2 Cache Request Accuracy", getNormalizedHelperThreadL2CacheRequestAccuracy(experimentPack, experiments));
     }
 
     @Override
@@ -586,7 +586,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
     @Override
     public void plotNormalizedL2DownwardReadMPKIs(ExperimentPack experimentPack, List<Experiment> experiments) {
-        plot(experimentPack, "normalizedL2DownwardReadMPKIs", "# Normalized L2 Downward Read MPKIs", getNormalizedL2DownwardReadMPKIs(experiments));
+        plot(experimentPack, "l2DownwardReadMPKIs_normalized", "# Normalized L2 Downward Read MPKIs", getNormalizedL2DownwardReadMPKIs(experiments));
     }
 
     @Override
