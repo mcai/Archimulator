@@ -178,7 +178,16 @@ public class Experiment implements ModelElement {
     }
 
     public String getMeasurementTitlePrefix() {
-        return type == ExperimentType.TWO_PHASE ? "twoPhase/phase1" : "detailed/";
+        switch (type) {
+            case TWO_PHASE:
+                return "twoPhase/phase1/";
+            case FUNCTIONAL:
+                return "functional/";
+            case DETAILED:
+                return "detailed/";
+            default:
+                throw new IllegalArgumentException();
+        }
     }
 
     public void reset() {

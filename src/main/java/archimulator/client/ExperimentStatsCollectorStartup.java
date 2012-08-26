@@ -20,29 +20,21 @@ package archimulator.client;
 
 import archimulator.model.ExperimentPack;
 import archimulator.service.ServiceManager;
-import net.pickapack.JsonSerializationHelper;
-import org.parboiled.common.FileUtils;
-
-import java.io.File;
 
 public class ExperimentStatsCollectorStartup {
     public static void main(String[] args) {
-        if (args.length == 1) {
-            String arg = args[0];
-            if (new File(arg).exists()) {
-                ExperimentPackSpec experimentPackSpec = JsonSerializationHelper.deserialize(ExperimentPackSpec.class, FileUtils.readAllText(arg));
-                arg = experimentPackSpec.getTitle();
-            }
-
-            ExperimentPack experimentPack = ServiceManager.getExperimentService().getExperimentPackByTitle(arg);
-            if (experimentPack != null) {
-                ServiceManager.getExperimentService().dumpExperimentPack(experimentPack, false);
-            } else {
-                System.err.println("Experiment pack \"" + arg + "\" do not exist");
+        if (args.length >= 1) {
+            for(String arg : args) {
+                ExperimentPack experimentPack = ServiceManager.getExperimentService().getExperimentPackByTitle(arg);
+                if (experimentPack != null) {
+                    ServiceManager.getExperimentService().dumpExperimentPack(experimentPack, true, true);
+                } else {
+                    System.err.println("Experiment pack \"" + arg + "\" do not exist");
+                }
             }
         } else {
             for (ExperimentPack experimentPack : ServiceManager.getExperimentService().getAllExperimentPacks()) {
-                ServiceManager.getExperimentService().dumpExperimentPack(experimentPack, false);
+                ServiceManager.getExperimentService().dumpExperimentPack(experimentPack, true, true);
                 System.out.println();
             }
         }

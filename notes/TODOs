@@ -16,7 +16,7 @@ TODOs:
 * java command line interface / option parsing
 
 * compile and test all the benchmarks, Olden and CPU2006, original version, MIPS big endian
-* compile and test selected benchmarks, Olden and CPU2006, prepush version, MIPS big endian
+* compile and test selected benchmarks, Olden and CPU2006, prefetch version, MIPS big endian
 * examine memory subsystem performance metrics
 
 
@@ -25,8 +25,8 @@ TODOs:
 	total instructions (per thread)
 	total cycles
 	cache misses per level, cache request/miss latencies and mlp based costs
-	inter-thread prepushes coverage, accuracy?
-* compare mst original and mst prepush
+	inter-thread prefetches coverage, accuracy?
+* compare mst original and mst prefetch
 
 * use HexDemp, EndianUtils from org.apache.commons.io.
 
@@ -59,26 +59,26 @@ TODOs:
 * support conceptual simulation.
 
 
-* prepush coverage and accuracy calculation;; to be exposed to statistics report
+* prefetch coverage and accuracy calculation;; to be exposed to statistics report
 
 * cache subblock support.
 
 
 * implement and examine a few existing and recent cache replacement policies (LRU, NRU, DIP, S/D-RRIP, MLP-Aware, etc.) and mechanisms.
 
-* prepush oriented rereference interval predection: set dueling for prepush identification, ...
+* prefetch oriented rereference interval prediction: set dueling for prefetch identification, ...
 
-* provide hintful items in statistics summary report: cxtx.ipc, cpi, insts; cachex.readHits, readMisses, writeHits, writeMisses, evictions.
+* provide hintful items in statistics summary report: ctx-x.ipc, cpi, insts; cache-x.readHits, readMisses, writeHits, writeMisses, evictions. done.
 
-* cache pollution measurement, especially of prepushes brought by helper threads.
+* cache pollution measurement, especially of prefetches brought by helper threads.
 
 * examine the reasons about low IPC during simulation: the ooo pipeline's fault or the cache system's fault?
 
-    1. measure l1 cache access statistics, like L2 stastistics in summary report.
+    1. measure l1 cache access statistics, like L2 statistics in summary report.
 
     1. measure per set cache access distribution statistics.
 
-    2. measure and reduce the latency of each memory acccesses.
+    2. measure and reduce the latency of each memory accesses.
 
     3. measure and reduce the dispatch stall cycles.
 

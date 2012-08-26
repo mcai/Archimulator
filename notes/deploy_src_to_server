@@ -1,8 +1,0 @@
-on laptop: 
-make src.tar.gz
-
-on server: 
-tar -zxvf src.tar.gz src
-cd tools
-ant clean; ant
-nohup ./ant.sh run-server &

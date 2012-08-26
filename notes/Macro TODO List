@@ -2,15 +2,15 @@ Macro TODO List (blueprint) for my Ph.D study:
 
 (priority listing: 1 -> 3: critical -> trivial)
 
-a. For prepush threading:
+a. For helper threaded prefetching:
 
-	1. identification of good, bad and ugly prepushes (via mechanisms such as prepush evictee table)
+	1. identification of good, bad and ugly prefetches (via mechanisms such as prefetch evictee table)
 		priority: 1
-		my previous work: extending GEMS to support measurement of prepush coverage and accuracy
-		current state of my work: progressing
+		my previous work: extending GEMS to support measurement of prefetch coverage and accuracy
+		current state of my work: first committed
 		
-	2. cache replacement/prepush filtering(bypassing)/prepush thread progress control(throttling & synchronization with main thread)
-		(based on the history and prediction of good, bad and ugly prepushes)
+	2. cache replacement/prefetch filtering(bypassing)/prefetch thread progress control(throttling & synchronization with main thread)
+		(based on the history and prediction of good, bad and ugly prefetches)
 		priority: 1
 		my previous work: clone of rereference prediction based cache replacement policies in Archimulator
 		current state of my work: pending
@@ -22,10 +22,10 @@ a. For prepush threading:
 			
 	4. MLP-awareness to the above all
 		priority: 2
-		my previous work: extending GEMS to support MLP & BLP-related metrics collection and for prepush threading scheme in specific
+		my previous work: extending GEMS to support MLP & BLP-related metrics collection and for prefetch threading scheme in specific
 		current state of my work: pending
 		
-	5. define and support collecting/predicting appropriate metrics for evaluating memory subsystem in general and prepush threading in special
+	5. define and support collecting/predicting appropriate metrics for evaluating memory subsystem in general and prefetch threading in special
 		priority: 1
 		my previous work:
 		current state of my work: literature study

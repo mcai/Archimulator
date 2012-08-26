@@ -113,6 +113,10 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         return this.getItemsByParent(this.experiments, parent);
     }
 
+    public Experiment getFirstExperimentByParent(ExperimentPack parent) {
+        return this.getFirstItemByParent(this.experiments, parent);
+    }
+
     @Override
     public void addExperiment(Experiment experiment) {
         this.addItem(this.experiments, Experiment.class, experiment);
@@ -283,6 +287,33 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     @Override
+    public Experiment getFirstExperimentToRunByExperimentPackTitles(String[] experimentPackTitles) {
+        for (Experiment experiment : getAllExperiments()) {
+            if (Arrays.asList(experimentPackTitles).contains(experiment.getParent().getTitle()) && experiment.getState() == ExperimentState.PENDING) {
+                return experiment;
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public List<Experiment> getStoppedExperimentsByParent(ExperimentPack experimentPack) {
+        return CollectionHelper.filter(experimentPack.getExperiments(), new Predicate<Experiment>() {
+            @Override
+            public boolean apply(Experiment experiment) {
+                return experiment.isStopped();
+            }
+        });
+    }
+
+    @Override
+    public Experiment getFirstStoppedExperimentByParent(ExperimentPack experimentPack) {
+        List<Experiment> stoppedExperimentsByExperimentPack = getStoppedExperimentsByParent(experimentPack);
+        return stoppedExperimentsByExperimentPack.isEmpty() ? null : stoppedExperimentsByExperimentPack.get(0);
+    }
+
+    @Override
     public List<ExperimentPack> getAllExperimentPacks() {
         return this.getAllItems(this.experimentPacks);
     }
@@ -313,9 +344,9 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     @Override
-    public void runExperiments() {
+    public void runExperiments(String... experimentPackTitles) {
         if(ServiceManager.getSystemSettingService().getSystemSettingSingleton().isRunningExperimentsEnabled()) {
-            new ExperimentWorker().run();
+            new ExperimentWorker(experimentPackTitles).run();
         }
         else {
             System.err.println("Running experiments is disabled at the moment, please enable running experiments first");
@@ -591,20 +622,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
     @Override
     public List<Map<String, Double>> getHelperThreadL2CacheRequestBreakdowns(List<Experiment> experiments) {
-        return getBreakdowns(experiments, getHelperThreadL2CacheRequestBreakdownKeysFunction());
-    }
-
-    @Override
-    public void plotHelperThreadL2CacheRequestBreakdowns(ExperimentPack experimentPack, List<Experiment> experiments) {
-        List<Map<String, Double>> breakdowns = getHelperThreadL2CacheRequestBreakdowns(experiments);
-
-        List<Map<String, Double>> transformedBreakdowns = transform(breakdowns, getHelperThreadL2CacheRequestBreakdownDescriptionsFunction());
-
-        plot(experimentPack, "helperThreadL2CacheRequestBreakdowns", "# Helper Thread L2 Request Breakdowns", transformedBreakdowns);
-    }
-
-    private Function1<Experiment, List<String>> getHelperThreadL2CacheRequestBreakdownKeysFunction() {
-        return new Function1<Experiment, List<String>>() {
+        return getBreakdowns(experiments, new Function1<Experiment, List<String>>() {
             @Override
             public List<String> apply(Experiment experiment) {
                 return Arrays.asList(experiment.getMeasurementTitlePrefix() +
@@ -621,17 +639,19 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
                         experiment.getMeasurementTitlePrefix() +
                                 "helperThreadL2CacheRequestProfilingHelper/numUglyHelperThreadL2CacheRequests");
             }
-        };
+        });
     }
 
-    private Function1<Map<String, Double>, Map<String, Double>> getHelperThreadL2CacheRequestBreakdownDescriptionsFunction() {
-        return new Function1<Map<String, Double>, Map<String, Double>>() {
+    @Override
+    public void plotHelperThreadL2CacheRequestBreakdowns(ExperimentPack experimentPack, List<Experiment> experiments) {
+        List<Map<String, Double>> breakdowns = getHelperThreadL2CacheRequestBreakdowns(experiments);
+        List<Map<String, Double>> transformedBreakdowns = transform(breakdowns, new Function1<Map<String, Double>, Map<String, Double>>() {
             @Override
             public Map<String, Double> apply(Map<String, Double> input) {
                 Map<String, Double> output = new LinkedHashMap<String, Double>();
 
                 int i = 0;
-                for(String key : input.keySet()) {
+                for (String key : input.keySet()) {
                     switch (i++) {
                         case 0:
                             output.put("Redundant MSHR", input.get(key));
@@ -658,41 +678,80 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
                 return output;
             }
-        };
+        });
+        plot(experimentPack, "helperThreadL2CacheRequestBreakdowns", "# Helper Thread L2 Request Breakdowns", transformedBreakdowns);
     }
 
     @Override
-    public List<Experiment> getStoppedExperimentsByExperimentPack(ExperimentPack experimentPack) {
-        return CollectionHelper.filter(experimentPack.getExperiments(), new Predicate<Experiment>() {
+    public List<Map<String, Double>> getL2CacheRequestBreakdowns(List<Experiment> experiments) {
+        return getBreakdowns(experiments, new Function1<Experiment, List<String>>() {
             @Override
-            public boolean apply(Experiment experiment) {
-                return experiment.isStopped();
+            public List<String> apply(Experiment experiment) {
+                return Arrays.asList(experiment.getMeasurementTitlePrefix() +
+                        "helperThreadL2CacheRequestProfilingHelper/numMainThreadL2CacheHits",
+                        experiment.getMeasurementTitlePrefix() +
+                                "helperThreadL2CacheRequestProfilingHelper/numMainThreadL2CacheMisses",
+                        experiment.getMeasurementTitlePrefix() +
+                                "helperThreadL2CacheRequestProfilingHelper/numHelperThreadL2CacheHits",
+                        experiment.getMeasurementTitlePrefix() +
+                                "helperThreadL2CacheRequestProfilingHelper/numHelperThreadL2CacheMisses");
             }
         });
     }
 
     @Override
-    public Experiment getFirstStoppedExperimentByExperimentPack(ExperimentPack experimentPack) {
-        List<Experiment> stoppedExperimentsByExperimentPack = getStoppedExperimentsByExperimentPack(experimentPack);
-        return stoppedExperimentsByExperimentPack.isEmpty() ? null : stoppedExperimentsByExperimentPack.get(0);
+    public void plotL2CacheRequestBreakdowns(ExperimentPack experimentPack, List<Experiment> experiments) {
+        List<Map<String, Double>> breakdowns = getL2CacheRequestBreakdowns(experiments);
+        List<Map<String, Double>> transformedBreakdowns = transform(breakdowns, new Function1<Map<String, Double>, Map<String, Double>>() {
+            @Override
+            public Map<String, Double> apply(Map<String, Double> input) {
+                Map<String, Double> output = new LinkedHashMap<String, Double>();
+
+                int i = 0;
+                for (String key : input.keySet()) {
+                    switch (i++) {
+                        case 0:
+                            output.put("Main Thread L2 Hits", input.get(key));
+                            break;
+                        case 1:
+                            output.put("Main Thread L2 Misses", input.get(key));
+                            break;
+                        case 2:
+                            output.put("Helper Thread L2 Hits", input.get(key));
+                            break;
+                        case 3:
+                            output.put("Helper Thread L2 Misses", input.get(key));
+                            break;
+                        default:
+                            throw new IllegalArgumentException();
+                    }
+                }
+
+                return output;
+            }
+        });
+        plot(experimentPack, "l2CacheRequestBreakdowns", "# L2 Request Breakdowns", transformedBreakdowns);
     }
 
     @Override
-    public void dumpExperimentPack(ExperimentPack experimentPack, boolean detailed) {
-        dumpExperimentPack(experimentPack, detailed, new IndentedPrintWriter(new PrintWriter(System.out), true));
+    public void dumpExperimentPack(ExperimentPack experimentPack, boolean detailed, boolean stoppedExperimentsOnly) {
+        dumpExperimentPack(experimentPack, detailed, new IndentedPrintWriter(new PrintWriter(System.out), true), stoppedExperimentsOnly);
     }
 
     @Override
-    public void dumpExperimentPack(ExperimentPack experimentPack, boolean detailed, IndentedPrintWriter writer) {
+    public void dumpExperimentPack(ExperimentPack experimentPack, boolean detailed, IndentedPrintWriter writer, boolean stoppedExperimentsOnly) {
         writer.printf("[%s] experiment pack %s\n", DateHelper.toString(experimentPack.getCreateTime()), experimentPack.getTitle());
         writer.println();
 
         writer.incrementIndentation();
 
-        if(getFirstStoppedExperimentByExperimentPack(experimentPack) != null) {
+        List<Experiment> experimentsByExperimentPack = stoppedExperimentsOnly ? getStoppedExperimentsByParent(experimentPack) : getExperimentsByParent(experimentPack);
+        Experiment firstExperimentByExperimentPack = stoppedExperimentsOnly ? getFirstStoppedExperimentByParent(experimentPack) : getFirstExperimentByParent(experimentPack);
+
+        if(firstExperimentByExperimentPack != null) {
             writer.println("experiment titles: ");
             writer.incrementIndentation();
-            writer.println(JsonSerializationHelper.toJson(transform(getStoppedExperimentsByExperimentPack(experimentPack), new Function1<Experiment, String>() {
+            writer.println(JsonSerializationHelper.toJson(transform(experimentsByExperimentPack, new Function1<Experiment, String>() {
                 @Override
                 public String apply(Experiment experiment) {
                     return experiment.getTitle();
@@ -703,7 +762,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
             writer.println("simulation times in seconds: ");
             writer.incrementIndentation();
-            writer.println(JsonSerializationHelper.toJson(transform(getStoppedExperimentsByExperimentPack(experimentPack), new Function1<Experiment, Double>() {
+            writer.println(JsonSerializationHelper.toJson(transform(experimentsByExperimentPack, new Function1<Experiment, Double>() {
                 @Override
                 public Double apply(Experiment experiment) {
                     return Double.parseDouble(experiment.getStatValue(experiment.getMeasurementTitlePrefix() + "durationInSeconds"));
@@ -714,161 +773,93 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
             writer.println("speedups: ");
             writer.incrementIndentation();
-            writer.println(JsonSerializationHelper.toJson(ServiceManager.getExperimentService().getSpeedups(getFirstStoppedExperimentByExperimentPack(experimentPack), getStoppedExperimentsByExperimentPack(experimentPack)), true));
+            writer.println(JsonSerializationHelper.toJson(ServiceManager.getExperimentService().getSpeedups(firstExperimentByExperimentPack, experimentsByExperimentPack), true));
             writer.println();
             writer.decrementIndentation();
 
-            ServiceManager.getExperimentService().plotSpeedups(experimentPack, getFirstStoppedExperimentByExperimentPack(experimentPack), getStoppedExperimentsByExperimentPack(experimentPack));
+            ServiceManager.getExperimentService().plotSpeedups(experimentPack, firstExperimentByExperimentPack, experimentsByExperimentPack);
 
             writer.println("total cycles: ");
             writer.incrementIndentation();
-            writer.println(JsonSerializationHelper.toJson(ServiceManager.getExperimentService().getTotalCycles(getStoppedExperimentsByExperimentPack(experimentPack)), true));
+            writer.println(JsonSerializationHelper.toJson(ServiceManager.getExperimentService().getTotalCycles(experimentsByExperimentPack), true));
             writer.println();
             writer.decrementIndentation();
 
-            ServiceManager.getExperimentService().plotTotalCycles(experimentPack, getStoppedExperimentsByExperimentPack(experimentPack));
+            ServiceManager.getExperimentService().plotTotalCycles(experimentPack, experimentsByExperimentPack);
 
-            writer.println("normalized total cycles: ");
-            writer.incrementIndentation();
-            writer.println(JsonSerializationHelper.toJson(ServiceManager.getExperimentService().getNormalizedTotalCycles(getStoppedExperimentsByExperimentPack(experimentPack)), true));
-            writer.println();
-            writer.decrementIndentation();
+            if(firstExperimentByExperimentPack.getType() != ExperimentType.FUNCTIONAL) {
+                writer.println("normalized total cycles: ");
+                writer.incrementIndentation();
+                writer.println(JsonSerializationHelper.toJson(ServiceManager.getExperimentService().getNormalizedTotalCycles(experimentsByExperimentPack), true));
+                writer.println();
+                writer.decrementIndentation();
 
-            ServiceManager.getExperimentService().plotNormalizedTotalCycles(experimentPack, getStoppedExperimentsByExperimentPack(experimentPack));
+                ServiceManager.getExperimentService().plotNormalizedTotalCycles(experimentPack, experimentsByExperimentPack);
 
-            writer.println("# l2 downward read misses: ");
-            writer.incrementIndentation();
-            writer.println(JsonSerializationHelper.toJson(ServiceManager.getExperimentService().getNumL2DownwardReadMisses(getStoppedExperimentsByExperimentPack(experimentPack)), true));
-            writer.println();
-            writer.decrementIndentation();
+                writer.println("l2 request breakdowns: ");
+                writer.incrementIndentation();
+                writer.println(JsonSerializationHelper.toJson(ServiceManager.getExperimentService().getL2CacheRequestBreakdowns(experimentsByExperimentPack), true));
+                writer.println();
+                writer.decrementIndentation();
 
-            ServiceManager.getExperimentService().plotNumL2DownwardReadMisses(experimentPack, getStoppedExperimentsByExperimentPack(experimentPack));
+                ServiceManager.getExperimentService().plotL2CacheRequestBreakdowns(experimentPack, experimentsByExperimentPack);
 
-            writer.println("# normalized l2 downward read misses: ");
-            writer.incrementIndentation();
-            writer.println(JsonSerializationHelper.toJson(ServiceManager.getExperimentService().getNormalizedNumL2DownwardReadMisses(getStoppedExperimentsByExperimentPack(experimentPack)), true));
-            writer.println();
-            writer.decrementIndentation();
+                writer.println("# l2 downward read MPKIs: ");
+                writer.incrementIndentation();
+                writer.println(JsonSerializationHelper.toJson(ServiceManager.getExperimentService().getL2DownwardReadMPKIs(experimentsByExperimentPack), true));
+                writer.println();
+                writer.decrementIndentation();
 
-            ServiceManager.getExperimentService().plotNormalizedNumL2DownwardReadMisses(experimentPack, getStoppedExperimentsByExperimentPack(experimentPack));
+                ServiceManager.getExperimentService().plotL2DownwardReadMPKIs(experimentPack, experimentsByExperimentPack);
 
-            writer.println("# l2 downward read MPKIs: ");
-            writer.incrementIndentation();
-            writer.println(JsonSerializationHelper.toJson(ServiceManager.getExperimentService().getL2DownwardReadMPKIs(getStoppedExperimentsByExperimentPack(experimentPack)), true));
-            writer.println();
-            writer.decrementIndentation();
+                writer.println("# normalized l2 downward read MPKIs: ");
+                writer.incrementIndentation();
+                writer.println(JsonSerializationHelper.toJson(ServiceManager.getExperimentService().getNormalizedL2DownwardReadMPKIs(experimentsByExperimentPack), true));
+                writer.println();
+                writer.decrementIndentation();
 
-            ServiceManager.getExperimentService().plotL2DownwardReadMPKIs(experimentPack, getStoppedExperimentsByExperimentPack(experimentPack));
+                ServiceManager.getExperimentService().plotNormalizedL2DownwardReadMPKIs(experimentPack, experimentsByExperimentPack);
 
-            writer.println("# normalized l2 downward read MPKIs: ");
-            writer.incrementIndentation();
-            writer.println(JsonSerializationHelper.toJson(ServiceManager.getExperimentService().getNormalizedL2DownwardReadMPKIs(getStoppedExperimentsByExperimentPack(experimentPack)), true));
-            writer.println();
-            writer.decrementIndentation();
+                writer.println("helper thread L2 request breakdowns: ");
+                writer.incrementIndentation();
+                writer.println(JsonSerializationHelper.toJson(ServiceManager.getExperimentService().getHelperThreadL2CacheRequestBreakdowns(experimentsByExperimentPack), true));
+                writer.println();
+                writer.decrementIndentation();
 
-            ServiceManager.getExperimentService().plotNormalizedL2DownwardReadMPKIs(experimentPack, getStoppedExperimentsByExperimentPack(experimentPack));
+                ServiceManager.getExperimentService().plotHelperThreadL2CacheRequestBreakdowns(experimentPack, experimentsByExperimentPack);
 
-            writer.println("helper thread L2 cache Request breakdowns: ");
-            writer.incrementIndentation();
-            writer.println(JsonSerializationHelper.toJson(ServiceManager.getExperimentService().getHelperThreadL2CacheRequestBreakdowns(getStoppedExperimentsByExperimentPack(experimentPack)), true));
-            writer.println();
-            writer.decrementIndentation();
+                writer.println("helper thread L2 request coverage: ");
+                writer.incrementIndentation();
+                writer.println(JsonSerializationHelper.toJson(ServiceManager.getExperimentService().getHelperThreadL2CacheRequestCoverage(experimentPack, experimentsByExperimentPack), true));
+                writer.decrementIndentation();
 
-            ServiceManager.getExperimentService().plotHelperThreadL2CacheRequestBreakdowns(experimentPack, getStoppedExperimentsByExperimentPack(experimentPack));
+                ServiceManager.getExperimentService().plotHelperThreadL2CacheRequestCoverage(experimentPack, experimentsByExperimentPack);
 
-            writer.println("# main thread L2 cache hits: ");
-            writer.incrementIndentation();
-            writer.println(JsonSerializationHelper.toJson(ServiceManager.getExperimentService().getNumMainThreadL2CacheHits(experimentPack, getStoppedExperimentsByExperimentPack(experimentPack)), true));
-            writer.println();
-            writer.decrementIndentation();
+                writer.println("helper thread L2 request accuracy: ");
+                writer.incrementIndentation();
+                writer.println(JsonSerializationHelper.toJson(ServiceManager.getExperimentService().getHelperThreadL2CacheRequestAccuracy(experimentPack, experimentsByExperimentPack), true));
+                writer.println();
+                writer.decrementIndentation();
 
-            ServiceManager.getExperimentService().plotNumMainThreadL2CacheHits(experimentPack, getStoppedExperimentsByExperimentPack(experimentPack));
+                ServiceManager.getExperimentService().plotHelperThreadL2CacheRequestAccuracy(experimentPack, experimentsByExperimentPack);
 
-            writer.println("# main thread L2 cache misses: ");
-            writer.incrementIndentation();
-            writer.println(JsonSerializationHelper.toJson(ServiceManager.getExperimentService().getNumMainThreadL2CacheMisses(experimentPack, getStoppedExperimentsByExperimentPack(experimentPack)), true));
-            writer.println();
-            writer.decrementIndentation();
+                writer.println("normalized helper thread L2 request coverage: ");
+                writer.incrementIndentation();
+                writer.println(JsonSerializationHelper.toJson(ServiceManager.getExperimentService().getNormalizedHelperThreadL2CacheRequestCoverage(experimentPack, experimentsByExperimentPack), true));
+                writer.decrementIndentation();
 
-            ServiceManager.getExperimentService().plotNumMainThreadL2CacheMisses(experimentPack, getStoppedExperimentsByExperimentPack(experimentPack));
+                ServiceManager.getExperimentService().plotNormalizedHelperThreadL2CacheRequestCoverage(experimentPack, experimentsByExperimentPack);
 
-            writer.println("# main thread L2 cache normalized hits: ");
-            writer.incrementIndentation();
-            writer.println(JsonSerializationHelper.toJson(ServiceManager.getExperimentService().getNormalizedNumMainThreadL2CacheHits(experimentPack, getStoppedExperimentsByExperimentPack(experimentPack)), true));
-            writer.println();
-            writer.decrementIndentation();
+                writer.println("normalized helper thread L2 request accuracy: ");
+                writer.incrementIndentation();
+                writer.println(JsonSerializationHelper.toJson(ServiceManager.getExperimentService().getNormalizedHelperThreadL2CacheRequestAccuracy(experimentPack, experimentsByExperimentPack), true));
+                writer.println();
+                writer.decrementIndentation();
 
-            ServiceManager.getExperimentService().plotNormalizedNumMainThreadL2CacheHits(experimentPack, getStoppedExperimentsByExperimentPack(experimentPack));
+                ServiceManager.getExperimentService().plotNormalizedHelperThreadL2CacheRequestAccuracy(experimentPack, experimentsByExperimentPack);
 
-            writer.println("# main thread L2 cache normalized misses: ");
-            writer.incrementIndentation();
-            writer.println(JsonSerializationHelper.toJson(ServiceManager.getExperimentService().getNormalizedNumMainThreadL2CacheMisses(experimentPack, getStoppedExperimentsByExperimentPack(experimentPack)), true));
-            writer.println();
-            writer.decrementIndentation();
-
-            ServiceManager.getExperimentService().plotNormalizedNumMainThreadL2CacheMisses(experimentPack, getStoppedExperimentsByExperimentPack(experimentPack));
-
-            writer.println("# helper thread L2 cache hits: ");
-            writer.incrementIndentation();
-            writer.println(JsonSerializationHelper.toJson(ServiceManager.getExperimentService().getNumHelperThreadL2CacheHits(experimentPack, getStoppedExperimentsByExperimentPack(experimentPack)), true));
-            writer.println();
-            writer.decrementIndentation();
-
-            ServiceManager.getExperimentService().plotNumHelperThreadL2CacheHits(experimentPack, getStoppedExperimentsByExperimentPack(experimentPack));
-
-            writer.println("# helper thread L2 cache misses: ");
-            writer.incrementIndentation();
-            writer.println(JsonSerializationHelper.toJson(ServiceManager.getExperimentService().getNumHelperThreadL2CacheMisses(experimentPack, getStoppedExperimentsByExperimentPack(experimentPack)), true));
-            writer.println();
-            writer.decrementIndentation();
-
-            ServiceManager.getExperimentService().plotNumHelperThreadL2CacheMisses(experimentPack, getStoppedExperimentsByExperimentPack(experimentPack));
-
-            writer.println("# helper thread L2 cache normalized hits: ");
-            writer.incrementIndentation();
-            writer.println(JsonSerializationHelper.toJson(ServiceManager.getExperimentService().getNormalizedNumHelperThreadL2CacheHits(experimentPack, getStoppedExperimentsByExperimentPack(experimentPack)), true));
-            writer.println();
-            writer.decrementIndentation();
-
-            ServiceManager.getExperimentService().plotNormalizedNumHelperThreadL2CacheHits(experimentPack, getStoppedExperimentsByExperimentPack(experimentPack));
-
-            writer.println("# helper thread L2 cache normalized misses: ");
-            writer.incrementIndentation();
-            writer.println(JsonSerializationHelper.toJson(ServiceManager.getExperimentService().getNormalizedNumHelperThreadL2CacheMisses(experimentPack, getStoppedExperimentsByExperimentPack(experimentPack)), true));
-            writer.println();
-            writer.decrementIndentation();
-
-            ServiceManager.getExperimentService().plotNormalizedNumHelperThreadL2CacheMisses(experimentPack, getStoppedExperimentsByExperimentPack(experimentPack));
-
-            writer.println("helper thread L2 cache request coverage: ");
-            writer.incrementIndentation();
-            writer.println(JsonSerializationHelper.toJson(ServiceManager.getExperimentService().getHelperThreadL2CacheRequestCoverage(experimentPack, getStoppedExperimentsByExperimentPack(experimentPack)), true));
-            writer.decrementIndentation();
-
-            ServiceManager.getExperimentService().plotHelperThreadL2CacheRequestCoverage(experimentPack, getStoppedExperimentsByExperimentPack(experimentPack));
-
-            writer.println("helper thread L2 cache request accuracy: ");
-            writer.incrementIndentation();
-            writer.println(JsonSerializationHelper.toJson(ServiceManager.getExperimentService().getHelperThreadL2CacheRequestAccuracy(experimentPack, getStoppedExperimentsByExperimentPack(experimentPack)), true));
-            writer.println();
-            writer.decrementIndentation();
-
-            ServiceManager.getExperimentService().plotHelperThreadL2CacheRequestAccuracy(experimentPack, getStoppedExperimentsByExperimentPack(experimentPack));
-
-            writer.println("normalized helper thread L2 cache request coverage: ");
-            writer.incrementIndentation();
-            writer.println(JsonSerializationHelper.toJson(ServiceManager.getExperimentService().getNormalizedHelperThreadL2CacheRequestCoverage(experimentPack, getStoppedExperimentsByExperimentPack(experimentPack)), true));
-            writer.decrementIndentation();
-
-            ServiceManager.getExperimentService().plotNormalizedHelperThreadL2CacheRequestCoverage(experimentPack, getStoppedExperimentsByExperimentPack(experimentPack));
-
-            writer.println("normalized helper thread L2 cache request accuracy: ");
-            writer.incrementIndentation();
-            writer.println(JsonSerializationHelper.toJson(ServiceManager.getExperimentService().getNormalizedHelperThreadL2CacheRequestAccuracy(experimentPack, getStoppedExperimentsByExperimentPack(experimentPack)), true));
-            writer.println();
-            writer.decrementIndentation();
-
-            ServiceManager.getExperimentService().plotNormalizedHelperThreadL2CacheRequestAccuracy(experimentPack, getStoppedExperimentsByExperimentPack(experimentPack));
+                //TODO: cache request/miss latencies and mlp based costs (and breakdowns)!!!
+            }
         }
 
         writer.decrementIndentation();
@@ -891,7 +882,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
             PrintWriter pw = new PrintWriter(fileInput);
 
-            String variablePropertyDescription = ExperimentSpec.class.getDeclaredField(experimentPack.getVariablePropertyName()).getAnnotation(Description.class).value();
+            String variablePropertyDescription = experimentPack.getVariablePropertyName() == null ? "" : ExperimentSpec.class.getDeclaredField(experimentPack.getVariablePropertyName()).getAnnotation(Description.class).value();
 
             pw.println("yformat=%g");
             pw.println("=nogridy");
@@ -912,7 +903,8 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
             int i = 0;
             for(Object row : rows) {
-                pw.println(experimentPack.getVariablePropertyValues().get(i++).replaceAll(" ", "_") + "\t" + ((row instanceof Map) ? StringUtils.join(((Map) row).values(), '\t') : row));
+                String title = experimentPack.getVariablePropertyName() == null ? "" : experimentPack.getVariablePropertyValues().get(i++);
+                pw.println(title.replaceAll(" ", "_") + "\t" + ((row instanceof Map) ? StringUtils.join(((Map) row).values(), '\t') : row));
             }
 
             pw.close();

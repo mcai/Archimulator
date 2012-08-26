@@ -28,9 +28,12 @@ import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
 
 public class ExperimentWorker implements Runnable {
+    private String[] experimentPackTitles;
     private Experiment experiment;
 
-    public ExperimentWorker() {
+    public ExperimentWorker(String... experimentPackTitles) {
+        this.experimentPackTitles = experimentPackTitles;
+
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
@@ -54,7 +57,7 @@ public class ExperimentWorker implements Runnable {
     }
 
     private boolean doRunExperiment() {
-        this.experiment = ServiceManager.getExperimentService().getFirstExperimentToRun();
+        this.experiment = experimentPackTitles == null || experimentPackTitles.length == 0 ? ServiceManager.getExperimentService().getFirstExperimentToRun() : ServiceManager.getExperimentService().getFirstExperimentToRunByExperimentPackTitles(experimentPackTitles);
 
         if (this.experiment != null) {
             runExperiment(this.experiment);

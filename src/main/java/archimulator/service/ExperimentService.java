@@ -53,6 +53,12 @@ public interface ExperimentService extends Service {
 
     Experiment getFirstExperimentToRun();
 
+    Experiment getFirstExperimentToRunByExperimentPackTitles(String[] experimentPackTitles);
+
+    List<Experiment> getStoppedExperimentsByParent(ExperimentPack experimentPack);
+
+    Experiment getFirstStoppedExperimentByParent(ExperimentPack experimentPack);
+
     List<ExperimentPack> getAllExperimentPacks();
 
     ExperimentPack getExperimentPackById(long id);
@@ -65,7 +71,7 @@ public interface ExperimentService extends Service {
 
     void updateExperimentPack(ExperimentPack experimentPack);
 
-    void runExperiments();
+    void runExperiments(String... experimentPackTitles);
 
     List<Map<String, Double>> getBreakdowns(List<Experiment> experiments, Function1<Experiment, List<String>> keysFunction);
 
@@ -151,11 +157,11 @@ public interface ExperimentService extends Service {
 
     void plotHelperThreadL2CacheRequestBreakdowns(ExperimentPack experimentPack, List<Experiment> experiments);
 
-    List<Experiment> getStoppedExperimentsByExperimentPack(ExperimentPack experimentPack);
+    List<Map<String, Double>> getL2CacheRequestBreakdowns(List<Experiment> experiments);
 
-    Experiment getFirstStoppedExperimentByExperimentPack(ExperimentPack experimentPack);
+    void plotL2CacheRequestBreakdowns(ExperimentPack experimentPack, List<Experiment> experiments);
 
-    void dumpExperimentPack(ExperimentPack experimentPack, boolean detailed);
+    void dumpExperimentPack(ExperimentPack experimentPack, boolean detailed, boolean stoppedExperimentsOnly);
 
-    void dumpExperimentPack(ExperimentPack experimentPack, boolean detailed, IndentedPrintWriter writer);
+    void dumpExperimentPack(ExperimentPack experimentPack, boolean detailed, IndentedPrintWriter writer, boolean stoppedExperimentsOnly);
 }

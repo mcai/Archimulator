@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.client;
 
+import archimulator.model.ExperimentType;
 import org.apache.commons.beanutils.BeanUtils;
 
 import java.io.Serializable;
@@ -28,6 +29,8 @@ import java.util.List;
 public class ExperimentPackSpec implements Serializable {
     private String title;
 
+    private ExperimentType experimentType;
+
     private ExperimentSpec baselineExperiment;
 
     private String variablePropertyName;
@@ -35,11 +38,18 @@ public class ExperimentPackSpec implements Serializable {
 
     public ExperimentPackSpec(String title) {
         this.title = title;
-        this.variablePropertyValues = new ArrayList<String>();
     }
 
     public String getTitle() {
         return title;
+    }
+
+    public ExperimentType getExperimentType() {
+        return experimentType;
+    }
+
+    public void setExperimentType(ExperimentType experimentType) {
+        this.experimentType = experimentType;
     }
 
     public ExperimentSpec getBaselineExperiment() {
@@ -70,10 +80,15 @@ public class ExperimentPackSpec implements Serializable {
         try {
             List<ExperimentSpec> experiments = new ArrayList<ExperimentSpec>();
 
-            for(Object variablePropertyValue : variablePropertyValues) {
-                ExperimentSpec experimentSpec = (ExperimentSpec) BeanUtils.cloneBean(this.baselineExperiment);
-                BeanUtils.setProperty(experimentSpec, this.variablePropertyName, variablePropertyValue);
-                experiments.add(experimentSpec);
+            if(variablePropertyName != null) {
+                for(Object variablePropertyValue : variablePropertyValues) {
+                    ExperimentSpec experimentSpec = (ExperimentSpec) BeanUtils.cloneBean(this.baselineExperiment);
+                    BeanUtils.setProperty(experimentSpec, this.variablePropertyName, variablePropertyValue);
+                    experiments.add(experimentSpec);
+                }
+            }
+            else {
+                experiments.add(this.baselineExperiment);
             }
 
             return experiments;

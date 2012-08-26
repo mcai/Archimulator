@@ -40,6 +40,7 @@
     <orderEntry type="library" name="Maven: commons-net:commons-net:3.1" level="project" />
     <orderEntry type="library" name="Maven: commons-math:commons-math:1.2" level="project" />
     <orderEntry type="library" name="Maven: commons-httpclient:commons-httpclient:3.1" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.commons:commons-exec:1.1" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-webapp:7.2.0.v20101020" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-xml:7.2.0.v20101020" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-util:7.2.0.v20101020" level="project" />

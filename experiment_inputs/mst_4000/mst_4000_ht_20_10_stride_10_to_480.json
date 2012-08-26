@@ -1,0 +1,29 @@
+{
+    "title":"mst_4000_ht_20_10_stride_10_to_480",
+    "experimentType":"DETAILED",
+    "baselineExperiment":{
+        "simulatedProgramTitle":"mst_ht",
+        "simulatedProgramArguments":"4000",
+        "helperThreadLookahead":20,
+        "helperThreadStride":10,
+        "numCores":2,
+        "numThreadsPerCore":2,
+        "l1ISize":"32 KB",
+        "l1IAssociativity":4,
+        "l1DSize":"32 KB",
+        "l1DAssociativity":4,
+        "l2Size":"96 KB",
+        "l2Associativity":8,
+        "l2ReplacementPolicyType":"LRU"
+    },
+    "variablePropertyName":"helperThreadStride",
+    "variablePropertyValues":[
+        "10",
+        "20",
+        "40",
+        "80",
+        "160",
+        "320",
+        "480"
+    ]
+}

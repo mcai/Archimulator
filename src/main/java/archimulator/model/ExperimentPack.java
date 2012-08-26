@@ -34,7 +34,7 @@ public class ExperimentPack implements ModelElement {
     public ExperimentPack(String title, String variablePropertyName, List<String> variablePropertyValues) {
         this.title = title;
         this.variablePropertyName = variablePropertyName;
-        this.variablePropertyValues = new ArrayList<String>(variablePropertyValues);
+        this.variablePropertyValues = variablePropertyName == null ? null : new ArrayList<String>(variablePropertyValues);
         this.createTime = DateHelper.toTick(new Date());
     }
 

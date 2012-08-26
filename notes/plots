@@ -1,7 +1,7 @@
 HT plots & tables:
 
 1. Effectiveness of helper threaded shared-cache CMP prefetching
-    stack bar plots, prefetch breakdowns: timely/early/bad/ugly/late...
+    stack bar plots, prefetch breakdowns: timely/early/bad/ugly/late... done.
 
 2. Traffic distribution of shared L2 cache
-    stack bar plots, main thread requests vs helper thread requests
+    stack bar plots, main thread requests vs helper thread requests. done.

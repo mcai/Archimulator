@@ -14,6 +14,8 @@
       <w>evicter</w>
       <w>fcsr</w>
       <w>getm</w>
+      <w>hintful</w>
+      <w>hotspots</w>
       <w>ifetch</w>
       <w>insts</w>
       <w>iterable</w>
@@ -21,6 +23,7 @@
       <w>itlbs</w>
       <w>lookahead</w>
       <w>lookaside</w>
+      <w>microarchitecture</w>
       <w>mshr</w>
       <w>mult</w>
       <w>multicore</w>
@@ -31,11 +34,16 @@
       <w>precharge</w>
       <w>precharged</w>
       <w>predecode</w>
+      <w>prefetches</w>
+      <w>prefetching</w>
+      <w>profilers</w>
       <w>pthread</w>
       <w>putm</w>
       <w>quant</w>
+      <w>rereference</w>
       <w>sqlite</w>
       <w>sqrt</w>
+      <w>strided</w>
       <w>tlbs</w>
       <w>unmap</w>
       <w>warmup</w>

@@ -193,6 +193,8 @@ http://code.google.com/p/cache-coherence-simulator/
 add ratio to fu/... occupancies
 read: A Hardware-based Cache Pollution Filtering Mechanism for Aggressive Prefetches
 
+* em3d, mcf support (functional -> two-phase -> detailed)
+
 
 
 

@@ -1,5 +1,6 @@
 {
     "title":"mst_2000_ht_20_10_stride_10_to_480",
+    "experimentType":"DETAILED",
     "baselineExperiment":{
         "simulatedProgramTitle":"mst_ht",
         "simulatedProgramArguments":"2000",

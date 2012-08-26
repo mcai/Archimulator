@@ -113,7 +113,7 @@ public class ExperimentSpec implements Serializable {
     }
 
     public int getL1ISizeAsInt() {
-        return (int) StorageUnitHelper.displaySizeToByteCount(l1ISize);
+        return l1ISize == null ? 0 : (int) StorageUnitHelper.displaySizeToByteCount(l1ISize);
     }
 
     public int getL1IAssociativity() {
@@ -121,7 +121,7 @@ public class ExperimentSpec implements Serializable {
     }
 
     public int getL1DSizeAsInt() {
-        return (int) StorageUnitHelper.displaySizeToByteCount(l1DSize);
+        return l1DSize == null ? 0 : (int) StorageUnitHelper.displaySizeToByteCount(l1DSize);
     }
 
     public int getL1DAssociativity() {
@@ -129,7 +129,7 @@ public class ExperimentSpec implements Serializable {
     }
 
     public int getL2SizeAsInt() {
-        return (int) StorageUnitHelper.displaySizeToByteCount(l2Size);
+        return l2Size == null ? 0 : (int) StorageUnitHelper.displaySizeToByteCount(l2Size);
     }
 
     public int getL2Associativity() {
@@ -203,6 +203,4 @@ public class ExperimentSpec implements Serializable {
     public void setL2ReplacementPolicyType(CacheReplacementPolicyType l2ReplacementPolicyType) {
         this.l2ReplacementPolicyType = l2ReplacementPolicyType;
     }
-
-
 }
