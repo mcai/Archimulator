@@ -394,6 +394,31 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     @Override
+    public List<Double> getTotalInstructions(List<Experiment> experiments) {
+        return transform(experiments, new Function1<Experiment, Double>() {
+            @Override
+            public Double apply(Experiment experiment) {
+                return Double.parseDouble(experiment.getStatValue(experiment.getMeasurementTitlePrefix() + "totalInstructions"));
+            }
+        });
+    }
+
+    @Override
+    public void plotTotalInstructions(ExperimentPack experimentPack, List<Experiment> experiments) {
+        plot(experimentPack, "totalInstructions", "Total Instructions", getTotalCycles(experiments));
+    }
+
+    @Override
+    public List<Double> getNormalizedTotalInstructions(List<Experiment> experiments) {
+        return normalize(getTotalInstructions(experiments));
+    }
+
+    @Override
+    public void plotNormalizedTotalInstructions(ExperimentPack experimentPack, List<Experiment> experiments) {
+        plot(experimentPack, "totalInstructions_normalized", "Normalized Total Instructions", getNormalizedTotalCycles(experiments));
+    }
+
+    @Override
     public List<Double> getTotalCycles(List<Experiment> experiments) {
         return transform(experiments, new Function1<Experiment, Double>() {
             @Override
@@ -779,6 +804,22 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
             ServiceManager.getExperimentService().plotSpeedups(experimentPack, firstExperimentByExperimentPack, experimentsByExperimentPack);
 
+            writer.println("total instructions: ");
+            writer.incrementIndentation();
+            writer.println(JsonSerializationHelper.toJson(ServiceManager.getExperimentService().getTotalInstructions(experimentsByExperimentPack), true));
+            writer.println();
+            writer.decrementIndentation();
+
+            ServiceManager.getExperimentService().plotTotalInstructions(experimentPack, experimentsByExperimentPack);
+
+            writer.println("normalized total instructions: ");
+            writer.incrementIndentation();
+            writer.println(JsonSerializationHelper.toJson(ServiceManager.getExperimentService().getNormalizedTotalInstructions(experimentsByExperimentPack), true));
+            writer.println();
+            writer.decrementIndentation();
+
+            ServiceManager.getExperimentService().plotNormalizedTotalInstructions(experimentPack, experimentsByExperimentPack);
+
             writer.println("total cycles: ");
             writer.incrementIndentation();
             writer.println(JsonSerializationHelper.toJson(ServiceManager.getExperimentService().getTotalCycles(experimentsByExperimentPack), true));
@@ -787,15 +828,15 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
             ServiceManager.getExperimentService().plotTotalCycles(experimentPack, experimentsByExperimentPack);
 
+            writer.println("normalized total cycles: ");
+            writer.incrementIndentation();
+            writer.println(JsonSerializationHelper.toJson(ServiceManager.getExperimentService().getNormalizedTotalCycles(experimentsByExperimentPack), true));
+            writer.println();
+            writer.decrementIndentation();
+
+            ServiceManager.getExperimentService().plotNormalizedTotalCycles(experimentPack, experimentsByExperimentPack);
+
             if(firstExperimentByExperimentPack.getType() != ExperimentType.FUNCTIONAL) {
-                writer.println("normalized total cycles: ");
-                writer.incrementIndentation();
-                writer.println(JsonSerializationHelper.toJson(ServiceManager.getExperimentService().getNormalizedTotalCycles(experimentsByExperimentPack), true));
-                writer.println();
-                writer.decrementIndentation();
-
-                ServiceManager.getExperimentService().plotNormalizedTotalCycles(experimentPack, experimentsByExperimentPack);
-
                 writer.println("l2 request breakdowns: ");
                 writer.incrementIndentation();
                 writer.println(JsonSerializationHelper.toJson(ServiceManager.getExperimentService().getL2CacheRequestBreakdowns(experimentsByExperimentPack), true));

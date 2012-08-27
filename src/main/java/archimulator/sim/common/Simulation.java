@@ -245,57 +245,53 @@ public abstract class Simulation implements SimulationObject {
         }
 
         if (this.getType() == SimulationType.MEASUREMENT || this.getType() == SimulationType.CACHE_WARMUP) {
-            if ((Long) JaxenHelper.selectSingleNode(this, "processor/cacheHierarchy/memoryController/numAccesses") > 0) {
-                for (GeneralCacheController cacheController : JaxenHelper.<GeneralCacheController>selectNodes(this, "processor/cacheHierarchy/cacheControllers[numDownwardAccesses>0]")) {
-                    JaxenHelper.dumpValueFromXPath(stats, this, "processor/cacheHierarchy/cacheControllers[name='" + cacheController.getName() + "']/hitRatio");
-                    JaxenHelper.dumpValueFromXPath(stats, this, "processor/cacheHierarchy/cacheControllers[name='" + cacheController.getName() + "']/numDownwardAccesses");
-                    JaxenHelper.dumpValueFromXPath(stats, this, "processor/cacheHierarchy/cacheControllers[name='" + cacheController.getName() + "']/numDownwardHits");
-                    JaxenHelper.dumpValueFromXPath(stats, this, "processor/cacheHierarchy/cacheControllers[name='" + cacheController.getName() + "']/numDownwardMisses");
+            for (GeneralCacheController cacheController : JaxenHelper.<GeneralCacheController>selectNodes(this, "processor/cacheHierarchy/cacheControllers[numDownwardAccesses>0]")) {
+                JaxenHelper.dumpValueFromXPath(stats, this, "processor/cacheHierarchy/cacheControllers[name='" + cacheController.getName() + "']/hitRatio");
+                JaxenHelper.dumpValueFromXPath(stats, this, "processor/cacheHierarchy/cacheControllers[name='" + cacheController.getName() + "']/numDownwardAccesses");
+                JaxenHelper.dumpValueFromXPath(stats, this, "processor/cacheHierarchy/cacheControllers[name='" + cacheController.getName() + "']/numDownwardHits");
+                JaxenHelper.dumpValueFromXPath(stats, this, "processor/cacheHierarchy/cacheControllers[name='" + cacheController.getName() + "']/numDownwardMisses");
 
-                    JaxenHelper.dumpValueFromXPath(stats, this, "processor/cacheHierarchy/cacheControllers[name='" + cacheController.getName() + "']/numDownwardReadHits");
-                    JaxenHelper.dumpValueFromXPath(stats, this, "processor/cacheHierarchy/cacheControllers[name='" + cacheController.getName() + "']/numDownwardReadMisses");
-                    JaxenHelper.dumpValueFromXPath(stats, this, "processor/cacheHierarchy/cacheControllers[name='" + cacheController.getName() + "']/numDownwardWriteHits");
-                    JaxenHelper.dumpValueFromXPath(stats, this, "processor/cacheHierarchy/cacheControllers[name='" + cacheController.getName() + "']/numDownwardWriteMisses");
+                JaxenHelper.dumpValueFromXPath(stats, this, "processor/cacheHierarchy/cacheControllers[name='" + cacheController.getName() + "']/numDownwardReadHits");
+                JaxenHelper.dumpValueFromXPath(stats, this, "processor/cacheHierarchy/cacheControllers[name='" + cacheController.getName() + "']/numDownwardReadMisses");
+                JaxenHelper.dumpValueFromXPath(stats, this, "processor/cacheHierarchy/cacheControllers[name='" + cacheController.getName() + "']/numDownwardWriteHits");
+                JaxenHelper.dumpValueFromXPath(stats, this, "processor/cacheHierarchy/cacheControllers[name='" + cacheController.getName() + "']/numDownwardWriteMisses");
 
-                    JaxenHelper.dumpValueFromXPath(stats, this, "processor/cacheHierarchy/cacheControllers[name='" + cacheController.getName() + "']/numEvictions");
+                JaxenHelper.dumpValueFromXPath(stats, this, "processor/cacheHierarchy/cacheControllers[name='" + cacheController.getName() + "']/numEvictions");
 
-                    JaxenHelper.dumpValueFromXPath(stats, this, "processor/cacheHierarchy/cacheControllers[name='" + cacheController.getName() + "']/occupancyRatio");
-                }
-
-                JaxenHelper.dumpValueFromXPath(stats, this, "processor/cacheHierarchy/memoryController/numAccesses");
-                JaxenHelper.dumpValueFromXPath(stats, this, "processor/cacheHierarchy/memoryController/numReads");
-                JaxenHelper.dumpValueFromXPath(stats, this, "processor/cacheHierarchy/memoryController/numWrites");
+                JaxenHelper.dumpValueFromXPath(stats, this, "processor/cacheHierarchy/cacheControllers[name='" + cacheController.getName() + "']/occupancyRatio");
             }
+
+            JaxenHelper.dumpValueFromXPath(stats, this, "processor/cacheHierarchy/memoryController/numAccesses");
+            JaxenHelper.dumpValueFromXPath(stats, this, "processor/cacheHierarchy/memoryController/numReads");
+            JaxenHelper.dumpValueFromXPath(stats, this, "processor/cacheHierarchy/memoryController/numWrites");
         }
 
         if (this.getType() == SimulationType.MEASUREMENT || this.getType() == SimulationType.CACHE_WARMUP) {
-            if ((Long) JaxenHelper.selectSingleNode(this, "helperThreadL2CacheRequestProfilingHelper/numTotalHelperThreadL2CacheRequests") > 0) {
-                if (endOfSimulation) {
-                    JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/summedUpUnstableHelperThreadL2CacheRequests");
-                }
-
-                JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/numMainThreadL2CacheHits");
-                JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/numMainThreadL2CacheMisses");
-
-                JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/numHelperThreadL2CacheHits");
-                JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/numHelperThreadL2CacheMisses");
-
-                JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/numTotalHelperThreadL2CacheRequests");
-
-                JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/numRedundantHitToTransientTagHelperThreadL2CacheRequests");
-                JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/numRedundantHitToCacheHelperThreadL2CacheRequests");
-
-                JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/numUsefulHelperThreadL2CacheRequests");
-
-                JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/numTimelyHelperThreadL2CacheRequests");
-                JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/numLateHelperThreadL2CacheRequests");
-
-                JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/numBadHelperThreadL2CacheRequests");
-                JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/numUglyHelperThreadL2CacheRequests");
-
-                JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/helperThreadL2CacheRequestCoverage");
-                JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/helperThreadL2CacheRequestAccuracy");
+            if (endOfSimulation) {
+                JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/summedUpUnstableHelperThreadL2CacheRequests");
             }
+
+            JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/numMainThreadL2CacheHits");
+            JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/numMainThreadL2CacheMisses");
+
+            JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/numHelperThreadL2CacheHits");
+            JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/numHelperThreadL2CacheMisses");
+
+            JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/numTotalHelperThreadL2CacheRequests");
+
+            JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/numRedundantHitToTransientTagHelperThreadL2CacheRequests");
+            JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/numRedundantHitToCacheHelperThreadL2CacheRequests");
+
+            JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/numUsefulHelperThreadL2CacheRequests");
+
+            JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/numTimelyHelperThreadL2CacheRequests");
+            JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/numLateHelperThreadL2CacheRequests");
+
+            JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/numBadHelperThreadL2CacheRequests");
+            JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/numUglyHelperThreadL2CacheRequests");
+
+            JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/helperThreadL2CacheRequestCoverage");
+            JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/helperThreadL2CacheRequestAccuracy");
         }
 
         if (this.getType() == SimulationType.MEASUREMENT || this.getType() == SimulationType.CACHE_WARMUP) {

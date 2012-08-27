@@ -81,6 +81,14 @@ public interface ExperimentService extends Service {
 
     void plotSpeedups(ExperimentPack experimentPack, Experiment baselineExperiment, List<Experiment> experiments);
 
+    List<Double> getTotalInstructions(List<Experiment> experiments);
+
+    void plotTotalInstructions(ExperimentPack experimentPack, List<Experiment> experiments);
+
+    List<Double> getNormalizedTotalInstructions(List<Experiment> experiments);
+
+    void plotNormalizedTotalInstructions(ExperimentPack experimentPack, List<Experiment> experiments);
+
     List<Double> getTotalCycles(List<Experiment> experiments);
 
     void plotTotalCycles(ExperimentPack experimentPack, List<Experiment> experiments);
