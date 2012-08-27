@@ -23,8 +23,8 @@ import archimulator.sim.uncore.cache.Cache;
 import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.cache.EvictableCache;
-import archimulator.util.ValueProvider;
-import archimulator.util.ValueProviderFactory;
+import net.pickapack.util.ValueProvider;
+import net.pickapack.util.ValueProviderFactory;
 
 import java.io.Serializable;
 

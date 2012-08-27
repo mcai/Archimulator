@@ -29,7 +29,7 @@ import archimulator.sim.uncore.coherence.msi.event.directory.*;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import archimulator.sim.uncore.coherence.msi.message.*;
 import archimulator.sim.uncore.coherence.msi.state.DirectoryControllerState;
-import archimulator.util.ValueProvider;
+import net.pickapack.util.ValueProvider;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
 import net.pickapack.fsm.BasicFiniteStateMachine;

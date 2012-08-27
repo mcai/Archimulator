@@ -21,8 +21,8 @@ package archimulator.sim.uncore.cache;
 import archimulator.sim.common.BasicSimulationObject;
 import archimulator.sim.common.SimulationObject;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
-import archimulator.util.ValueProvider;
-import archimulator.util.ValueProviderFactory;
+import net.pickapack.util.ValueProvider;
+import net.pickapack.util.ValueProviderFactory;
 
 import java.io.Serializable;
 import java.util.ArrayList;

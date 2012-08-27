@@ -23,8 +23,8 @@ import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicy;
 import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyFactory;
 import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
-import archimulator.util.ValueProvider;
-import archimulator.util.ValueProviderFactory;
+import net.pickapack.util.ValueProvider;
+import net.pickapack.util.ValueProviderFactory;
 
 import java.io.Serializable;
 

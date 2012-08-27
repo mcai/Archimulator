@@ -18,8 +18,8 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache;
 
-import archimulator.util.ValueProvider;
-import archimulator.util.ValueProviderFactory;
+import net.pickapack.util.ValueProvider;
+import net.pickapack.util.ValueProviderFactory;
 
 import java.io.Serializable;
 import java.util.ArrayList;

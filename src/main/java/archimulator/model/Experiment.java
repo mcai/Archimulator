@@ -19,13 +19,13 @@
 package archimulator.model;
 
 import archimulator.service.ServiceManager;
-import archimulator.util.CollectionHelper;
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import net.pickapack.action.Function1;
 import net.pickapack.dateTime.DateHelper;
 import net.pickapack.model.ModelElement;
+import net.pickapack.util.CollectionHelper;
 
 import java.util.*;
 

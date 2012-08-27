@@ -20,7 +20,7 @@ package archimulator.client;
 
 import archimulator.model.Description;
 import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
-import archimulator.util.StorageUnitHelper;
+import net.pickapack.util.StorageUnitHelper;
 
 import java.io.Serializable;
 

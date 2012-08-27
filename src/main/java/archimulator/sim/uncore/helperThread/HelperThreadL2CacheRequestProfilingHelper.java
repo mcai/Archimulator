@@ -31,9 +31,9 @@ import archimulator.sim.uncore.coherence.event.CoherentCacheServiceNonblockingRe
 import archimulator.sim.uncore.coherence.event.LastLevelCacheLineInsertEvent;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.coherence.msi.state.DirectoryControllerState;
-import archimulator.util.ValueProvider;
-import archimulator.util.ValueProviderFactory;
 import net.pickapack.action.Action1;
+import net.pickapack.util.ValueProvider;
+import net.pickapack.util.ValueProviderFactory;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -19,7 +19,7 @@
 package archimulator.service;
 
 import archimulator.model.*;
-import archimulator.util.IndentedPrintWriter;
+import net.pickapack.util.IndentedPrintWriter;
 import net.pickapack.action.Function1;
 import net.pickapack.service.Service;
 

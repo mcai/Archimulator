@@ -34,13 +34,13 @@ import archimulator.sim.uncore.CacheHierarchy;
 import archimulator.sim.uncore.coherence.msi.controller.GeneralCacheController;
 import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestProfilingHelper;
 import archimulator.sim.uncore.tlb.TranslationLookasideBuffer;
-import archimulator.util.JaxenHelper;
 import net.pickapack.StorageUnit;
 import net.pickapack.action.Predicate;
 import net.pickapack.dateTime.DateHelper;
 import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
 import net.pickapack.io.file.FileHelper;
+import net.pickapack.util.JaxenHelper;
 import org.apache.commons.lang.time.DurationFormatUtils;
 
 import java.io.File;

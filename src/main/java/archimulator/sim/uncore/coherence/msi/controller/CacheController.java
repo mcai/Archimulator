@@ -32,11 +32,11 @@ import archimulator.sim.uncore.coherence.msi.fsm.CacheControllerFiniteStateMachi
 import archimulator.sim.uncore.coherence.msi.message.*;
 import archimulator.sim.uncore.coherence.msi.state.CacheControllerState;
 import archimulator.sim.uncore.net.Net;
-import archimulator.util.ValueProvider;
-import archimulator.util.ValueProviderFactory;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
 import net.pickapack.action.Action2;
+import net.pickapack.util.ValueProvider;
+import net.pickapack.util.ValueProviderFactory;
 
 import java.util.*;
 
