@@ -18,18 +18,24 @@
  ******************************************************************************/
 package archimulator.client;
 
+import archimulator.model.Experiment;
 import archimulator.model.ExperimentPack;
 import archimulator.service.ServiceManager;
 
 public class ExperimentStatsCollectorStartup {
     public static void main(String[] args) {
         if (args.length >= 1) {
-            for(String arg : args) {
+            for (String arg : args) {
                 ExperimentPack experimentPack = ServiceManager.getExperimentService().getExperimentPackByTitle(arg);
                 if (experimentPack != null) {
                     ServiceManager.getExperimentService().dumpExperimentPack(experimentPack, true, true);
                 } else {
-                    System.err.println("Experiment pack \"" + arg + "\" do not exist");
+                    Experiment experiment = ServiceManager.getExperimentService().getFirstExperimentByTitle(arg);
+                    if (experiment != null) {
+                        ServiceManager.getExperimentService().dumpExperiment(experiment);
+                    } else {
+                        System.err.println("Experiment pack or experiment \"" + arg + "\" do not exist");
+                    }
                 }
             }
         } else {

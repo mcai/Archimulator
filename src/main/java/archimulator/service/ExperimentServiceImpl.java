@@ -75,6 +75,11 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     @Override
+    public Experiment getFirstExperimentByTitle(String title) {
+        return this.getFirstItemByTitle(this.experiments, title);
+    }
+
+    @Override
     public Experiment getLatestExperimentByTitle(String title) {
         return this.getLatestItemByTitle(this.experiments, title);
     }
@@ -287,9 +292,9 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     @Override
-    public Experiment getFirstExperimentToRunByExperimentPackTitles(String[] experimentPackTitles) {
+    public Experiment getFirstExperimentToRunByExperimentPackTitle(String experimentPackTitle) {
         for (Experiment experiment : getAllExperiments()) {
-            if (Arrays.asList(experimentPackTitles).contains(experiment.getParent().getTitle()) && experiment.getState() == ExperimentState.PENDING) {
+            if (experimentPackTitle.equals(experiment.getParent().getTitle()) && experiment.getState() == ExperimentState.PENDING) {
                 return experiment;
             }
         }
@@ -344,9 +349,9 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     @Override
-    public void runExperiments(String... experimentPackTitles) {
+    public void runExperiments(String... args) {
         if(ServiceManager.getSystemSettingService().getSystemSettingSingleton().isRunningExperimentsEnabled()) {
-            new ExperimentWorker(experimentPackTitles).run();
+            new ExperimentWorker(args).run();
         }
         else {
             System.err.println("Running experiments is disabled at the moment, please enable running experiments first");
@@ -899,7 +904,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
                 ServiceManager.getExperimentService().plotNormalizedHelperThreadL2CacheRequestAccuracy(experimentPack, experimentsByExperimentPack);
 
-                //TODO: cache request/miss latencies and mlp based costs (and breakdowns)!!!
+                //TODO: dump and plot 3C misses/cache request/miss latencies and mlp based costs (and breakdowns)!!!
             }
         }
 

@@ -19,6 +19,7 @@
 package archimulator.service;
 
 import archimulator.model.Experiment;
+import archimulator.model.ExperimentPack;
 import archimulator.model.ExperimentState;
 import archimulator.model.ExperimentType;
 import archimulator.sim.common.*;
@@ -28,11 +29,11 @@ import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
 
 public class ExperimentWorker implements Runnable {
-    private String[] experimentPackTitles;
+    private String[] args;
     private Experiment experiment;
 
-    public ExperimentWorker(String... experimentPackTitles) {
-        this.experimentPackTitles = experimentPackTitles;
+    public ExperimentWorker(String... args) {
+        this.args = args;
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
@@ -57,7 +58,31 @@ public class ExperimentWorker implements Runnable {
     }
 
     private boolean doRunExperiment() {
-        this.experiment = experimentPackTitles == null || experimentPackTitles.length == 0 ? ServiceManager.getExperimentService().getFirstExperimentToRun() : ServiceManager.getExperimentService().getFirstExperimentToRunByExperimentPackTitles(experimentPackTitles);
+        if(this.args == null || this.args.length == 0) {
+            this.experiment = ServiceManager.getExperimentService().getFirstExperimentToRun();
+        }
+        else {
+            for(String arg : this.args) {
+                ExperimentPack experimentPack = ServiceManager.getExperimentService().getExperimentPackByTitle(arg);
+                if (experimentPack != null) {
+                    Experiment experiment = ServiceManager.getExperimentService().getFirstExperimentToRunByExperimentPackTitle(arg);
+                    if(experiment != null) {
+                        this.experiment = experiment;
+                        break;
+                    }
+                } else {
+                    Experiment experiment = ServiceManager.getExperimentService().getFirstExperimentByTitle(arg);
+                    if (experiment != null) {
+                        if (experiment.getState() == ExperimentState.PENDING) {
+                            this.experiment = experiment;
+                            break;
+                        }
+                    } else {
+                        System.err.println("Experiment pack or experiment \"" + arg + "\" do not exist");
+                    }
+                }
+            }
+        }
 
         if (this.experiment != null) {
             runExperiment(this.experiment);

@@ -33,6 +33,8 @@ public interface ExperimentService extends Service {
 
     List<Experiment> getExperimentsByTitle(String title);
 
+    Experiment getFirstExperimentByTitle(String title);
+
     Experiment getLatestExperimentByTitle(String title);
 
     List<Experiment> getExperimentsBySimulatedProgram(SimulatedProgram simulatedProgram);
@@ -53,7 +55,7 @@ public interface ExperimentService extends Service {
 
     Experiment getFirstExperimentToRun();
 
-    Experiment getFirstExperimentToRunByExperimentPackTitles(String[] experimentPackTitles);
+    Experiment getFirstExperimentToRunByExperimentPackTitle(String experimentPackTitle);
 
     List<Experiment> getStoppedExperimentsByParent(ExperimentPack experimentPack);
 
@@ -71,7 +73,7 @@ public interface ExperimentService extends Service {
 
     void updateExperimentPack(ExperimentPack experimentPack);
 
-    void runExperiments(String... experimentPackTitles);
+    void runExperiments(String... args);
 
     List<Map<String, Double>> getBreakdowns(List<Experiment> experiments, Function1<Experiment, List<String>> keysFunction);
 
