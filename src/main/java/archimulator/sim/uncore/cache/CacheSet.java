@@ -29,6 +29,8 @@ public class CacheSet<StateT extends Serializable> {
     private Cache<StateT> cache;
     private List<CacheLine<StateT>> lines;
     private int num;
+    private List<Integer> tagsSeen;
+    private List<Integer> lruStack;
 
     public CacheSet(Cache<StateT> cache, int associativity, int num, ValueProviderFactory<StateT, ValueProvider<StateT>> cacheLineStateProviderFactory) {
         this.cache = cache;
@@ -38,6 +40,9 @@ public class CacheSet<StateT extends Serializable> {
         for (int i = 0; i < associativity; i++) {
             this.lines.add(new CacheLine<StateT>(cache, this.num, i, cacheLineStateProviderFactory.createValueProvider(this.num, i)));
         }
+
+        this.tagsSeen = new ArrayList<Integer>();
+        this.lruStack = new ArrayList<Integer>();
     }
 
     public Cache<StateT> getCache() {
@@ -50,5 +55,13 @@ public class CacheSet<StateT extends Serializable> {
 
     public int getNum() {
         return num;
+    }
+
+    public List<Integer> getTagsSeen() {
+        return tagsSeen;
+    }
+
+    public List<Integer> getLruStack() {
+        return lruStack;
     }
 }

@@ -18,8 +18,8 @@
  ******************************************************************************/
 package archimulator.service;
 
+import archimulator.client.ExperimentPack;
 import archimulator.model.Experiment;
-import archimulator.model.ExperimentPack;
 import archimulator.model.ExperimentState;
 import archimulator.model.ExperimentType;
 import archimulator.sim.common.*;
@@ -65,7 +65,7 @@ public class ExperimentWorker implements Runnable {
             for(String arg : this.args) {
                 ExperimentPack experimentPack = ServiceManager.getExperimentService().getExperimentPackByTitle(arg);
                 if (experimentPack != null) {
-                    Experiment experiment = ServiceManager.getExperimentService().getFirstExperimentToRunByExperimentPackTitle(arg);
+                    Experiment experiment = ServiceManager.getExperimentService().getFirstExperimentToRunByParent(experimentPack);
                     if(experiment != null) {
                         this.experiment = experiment;
                         break;

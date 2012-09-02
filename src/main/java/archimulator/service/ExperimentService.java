@@ -18,10 +18,13 @@
  ******************************************************************************/
 package archimulator.service;
 
-import archimulator.model.*;
-import net.pickapack.util.IndentedPrintWriter;
+import archimulator.client.ExperimentPack;
+import archimulator.model.Architecture;
+import archimulator.model.Experiment;
+import archimulator.model.SimulatedProgram;
 import net.pickapack.action.Function1;
 import net.pickapack.service.Service;
+import net.pickapack.util.IndentedPrintWriter;
 
 import java.util.List;
 import java.util.Map;
@@ -41,8 +44,6 @@ public interface ExperimentService extends Service {
 
     List<Experiment> getExperimentsByArchitecture(Architecture architecture);
 
-    List<Experiment> getExperimentsByParent(ExperimentPack parent);
-
     void addExperiment(Experiment experiment);
 
     void removeExperimentById(long id);
@@ -55,7 +56,7 @@ public interface ExperimentService extends Service {
 
     Experiment getFirstExperimentToRun();
 
-    Experiment getFirstExperimentToRunByExperimentPackTitle(String experimentPackTitle);
+    Experiment getFirstExperimentToRunByParent(ExperimentPack parent);
 
     List<Experiment> getStoppedExperimentsByParent(ExperimentPack experimentPack);
 
@@ -63,23 +64,19 @@ public interface ExperimentService extends Service {
 
     List<ExperimentPack> getAllExperimentPacks();
 
-    ExperimentPack getExperimentPackById(long id);
-
     ExperimentPack getExperimentPackByTitle(String title);
 
-    void addExperimentPack(ExperimentPack experimentPack);
-
-    void removeExperimentPack(long id);
-
-    void updateExperimentPack(ExperimentPack experimentPack);
-
     void runExperiments(String... args);
+
+    void tableSummary(ExperimentPack experimentPack);
 
     List<Map<String, Double>> getBreakdowns(List<Experiment> experiments, Function1<Experiment, List<String>> keysFunction);
 
     Map<String, Double> getBreakdown(Experiment experiment, Function1<Experiment, List<String>> keysFunction);
 
     List<Double> getSpeedups(Experiment baselineExperiment, List<Experiment> experiments);
+
+    double getSpeedup(Experiment baselineExperiment, Experiment experiment);
 
     void plotSpeedups(ExperimentPack experimentPack, Experiment baselineExperiment, List<Experiment> experiments);
 

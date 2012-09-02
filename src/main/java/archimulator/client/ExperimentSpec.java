@@ -18,7 +18,8 @@
  ******************************************************************************/
 package archimulator.client;
 
-import archimulator.model.Description;
+import archimulator.model.*;
+import archimulator.service.ServiceManager;
 import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
 import net.pickapack.util.StorageUnitHelper;
 
@@ -64,6 +65,18 @@ public class ExperimentSpec implements Serializable {
     @Description("L2 Replacement Policy")
     private CacheReplacementPolicyType l2ReplacementPolicyType;
 
+    private transient ExperimentPack parent;
+
+    private transient Architecture architecture;
+
+    private transient SimulatedProgram simulatedProgram;
+
+    private transient String arguments;
+
+    private transient String title;
+
+    private transient Experiment experiment;
+
     public ExperimentSpec() {
     }
 
@@ -86,6 +99,14 @@ public class ExperimentSpec implements Serializable {
         this.l2Size = l2Size;
         this.l2Associativity = l2Associativity;
         this.l2ReplacementPolicyType = l2ReplacementPolicyType;
+    }
+
+    public ExperimentPack getParent() {
+        return parent;
+    }
+
+    public void setParent(ExperimentPack parent) {
+        this.parent = parent;
     }
 
     public String getSimulatedProgramTitle() {
@@ -202,5 +223,62 @@ public class ExperimentSpec implements Serializable {
 
     public void setL2ReplacementPolicyType(CacheReplacementPolicyType l2ReplacementPolicyType) {
         this.l2ReplacementPolicyType = l2ReplacementPolicyType;
+    }
+
+    public Architecture getArchitecture() {
+        if(architecture == null) {
+            architecture = ServiceManager.getArchitectureService().getOrAddArchitecture(true, getNumCores(), getNumThreadsPerCore(), getL1ISizeAsInt(), getL1IAssociativity(), getL1DSizeAsInt(), getL1DAssociativity(), getL2SizeAsInt(), getL2Associativity(), getL2ReplacementPolicyType());
+        }
+
+        return architecture;
+    }
+
+    public SimulatedProgram getSimulatedProgram() {
+        if(simulatedProgram == null) {
+            simulatedProgram = ServiceManager.getSimulatedProgramService().getSimulatedProgramByTitle(simulatedProgramTitle);
+        }
+
+        return simulatedProgram;
+    }
+
+    public String getArguments() {
+        if(arguments == null) {
+            String simulatedProgramArguments = getSimulatedProgramArguments();
+            arguments = simulatedProgramArguments == null ? getSimulatedProgram().getDefaultArguments() : simulatedProgramArguments;
+        }
+
+        return arguments;
+    }
+
+    public String getTitle() {
+        if(title == null) {
+            title = buildExperimentTitle(getParent().getExperimentType(), helperThreadLookahead, helperThreadStride, getArchitecture().getTitle(), simulatedProgramTitle, getArguments());
+        }
+
+        return title;
+    }
+
+    public Experiment getExperiment() {
+        return experiment;
+    }
+
+    public void setExperiment(Experiment experiment) {
+        this.experiment = experiment;
+    }
+
+    private static String buildExperimentTitle(ExperimentType experimentType, int helperThreadLookahead, int helperThreadStride, String architectureTitle, String simulatedProgramTitle, String contextMappingArguments) {
+        String title = simulatedProgramTitle.replaceAll(" ", "_") + "_" + contextMappingArguments.replaceAll(" ", "_");
+
+        if (experimentType == ExperimentType.FUNCTIONAL) {
+            title += "-functional";
+        }
+        else {
+            if(helperThreadLookahead != -1) {
+                title += "-lookahead_" + helperThreadLookahead + "-stride_" + helperThreadStride;
+            }
+
+            title += "-" + architectureTitle;
+        }
+        return title;
     }
 }

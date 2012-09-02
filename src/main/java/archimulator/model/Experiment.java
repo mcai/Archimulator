@@ -35,9 +35,6 @@ public class Experiment implements ModelElement {
     private long id;
 
     @DatabaseField
-    private long parentId;
-
-    @DatabaseField
     private String title;
 
     @DatabaseField
@@ -66,16 +63,13 @@ public class Experiment implements ModelElement {
 
     private transient Architecture architecture;
 
-    private transient ExperimentPack parent;
-
     public transient int currentMemoryPageId;
     public transient int currentProcessId;
 
     public Experiment() {
     }
 
-    public Experiment(ExperimentPack parent, String title, ExperimentType type, Architecture architecture, int numMaxInstructions, List<ContextMapping> contextMappings) {
-        this.parentId = parent == null ? -1 : parent.getId();
+    public Experiment(String title, ExperimentType type, Architecture architecture, int numMaxInstructions, List<ContextMapping> contextMappings) {
         this.title = title;
         this.type = type;
         this.state = ExperimentState.PENDING;
@@ -93,7 +87,7 @@ public class Experiment implements ModelElement {
 
     @Override
     public long getParentId() {
-        return parentId;
+        return -1;
     }
 
     public String getTitle() {
@@ -155,14 +149,6 @@ public class Experiment implements ModelElement {
                 return getStatValue(key);
             }
         });
-    }
-
-    public ExperimentPack getParent() {
-        if (parent == null) {
-            parent = ServiceManager.getExperimentService().getExperimentPackById(this.parentId);
-        }
-
-        return parent;
     }
 
     public Architecture getArchitecture() {

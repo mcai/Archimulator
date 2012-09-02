@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.client;
 
+import archimulator.model.Experiment;
 import archimulator.model.ExperimentType;
 import org.apache.commons.beanutils.BeanUtils;
 
@@ -26,7 +27,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ExperimentPackSpec implements Serializable {
+public class ExperimentPack implements Serializable {
     private String title;
 
     private ExperimentType experimentType;
@@ -36,7 +37,9 @@ public class ExperimentPackSpec implements Serializable {
     private String variablePropertyName;
     private List<String> variablePropertyValues;
 
-    public ExperimentPackSpec(String title) {
+    private transient List<Experiment> experiments;
+
+    public ExperimentPack(String title) {
         this.title = title;
     }
 
@@ -53,6 +56,10 @@ public class ExperimentPackSpec implements Serializable {
     }
 
     public ExperimentSpec getBaselineExperiment() {
+        if(baselineExperiment != null && baselineExperiment.getParent() == null) {
+            baselineExperiment.setParent(this);
+        }
+
         return baselineExperiment;
     }
 
@@ -76,19 +83,19 @@ public class ExperimentPackSpec implements Serializable {
         this.variablePropertyValues = variablePropertyValues;
     }
 
-    public List<ExperimentSpec> getExperiments() {
+    public List<ExperimentSpec> getExperimentSpecs() {
         try {
             List<ExperimentSpec> experiments = new ArrayList<ExperimentSpec>();
 
             if(variablePropertyName != null) {
                 for(Object variablePropertyValue : variablePropertyValues) {
-                    ExperimentSpec experimentSpec = (ExperimentSpec) BeanUtils.cloneBean(this.baselineExperiment);
+                    ExperimentSpec experimentSpec = (ExperimentSpec) BeanUtils.cloneBean(this.getBaselineExperiment());
                     BeanUtils.setProperty(experimentSpec, this.variablePropertyName, variablePropertyValue);
                     experiments.add(experimentSpec);
                 }
             }
             else {
-                experiments.add(this.baselineExperiment);
+                experiments.add(this.getBaselineExperiment());
             }
 
             return experiments;
@@ -101,5 +108,13 @@ public class ExperimentPackSpec implements Serializable {
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public List<Experiment> getExperiments() {
+        return experiments;
+    }
+
+    public void setExperiments(List<Experiment> experiments) {
+        this.experiments = experiments;
     }
 }

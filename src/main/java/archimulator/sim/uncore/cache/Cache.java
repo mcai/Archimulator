@@ -64,6 +64,14 @@ public class Cache<StateT extends Serializable> extends BasicSimulationObject im
         return this.getLines(set).get(way);
     }
 
+    public CacheSet<StateT> get(int set) {
+        if (set < 0 || set >= this.getNumSets()) {
+            throw new IllegalArgumentException(String.format("set: %d, this.numSets: %d", set, this.getNumSets()));
+        }
+
+        return this.sets.get(set);
+    }
+
     public int findWay(int address) {
         int tag = this.getTag(address);
         int set = this.getSet(address);

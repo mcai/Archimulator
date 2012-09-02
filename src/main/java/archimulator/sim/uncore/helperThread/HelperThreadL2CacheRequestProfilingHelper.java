@@ -20,8 +20,10 @@ package archimulator.sim.uncore.helperThread;
 
 import archimulator.sim.common.Simulation;
 import archimulator.sim.core.BasicThread;
+import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.cache.CacheLine;
+import archimulator.sim.uncore.cache.CacheMissType;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
 import archimulator.sim.uncore.cache.replacement.LRUPolicy;
@@ -31,12 +33,13 @@ import archimulator.sim.uncore.coherence.event.CoherentCacheServiceNonblockingRe
 import archimulator.sim.uncore.coherence.event.LastLevelCacheLineInsertEvent;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.coherence.msi.state.DirectoryControllerState;
+import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
 import net.pickapack.util.ValueProvider;
 import net.pickapack.util.ValueProviderFactory;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static ch.lambdaj.Lambda.*;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -80,6 +83,16 @@ public class HelperThreadL2CacheRequestProfilingHelper {
     private long numBadHelperThreadL2CacheRequests;
 
     private long numUglyHelperThreadL2CacheRequests;
+
+    private Map<Integer, PendingL2Miss> pendingL2Misses;
+
+    private Map<CacheMissType, Long> numL2CacheMissesPerType;
+
+    private DescriptiveStatistics statL2CacheMissNumCycles;
+    private DescriptiveStatistics statL2CacheMissMlpCosts;
+    private DescriptiveStatistics statL2CacheMissAverageMlps;
+
+    private boolean l2MissLatencyStatsEnabled;
 
     private class HelperThreadL2CacheRequestState {
         private int inFlightThreadId;
@@ -136,15 +149,25 @@ public class HelperThreadL2CacheRequestProfilingHelper {
 
         this.helperThreadL2CacheRequestVictimCache = new EvictableCache<HelperThreadL2CacheRequestVictimCacheLineState>(l2CacheController, l2CacheController.getName() + ".helperThreadL2CacheRequestVictimCache", l2CacheController.getCache().getGeometry(), CacheReplacementPolicyType.LRU, cacheLineStateProviderFactory);
 
+        this.pendingL2Misses = new LinkedHashMap<Integer, PendingL2Miss>();
+
+        this.numL2CacheMissesPerType = new EnumMap<CacheMissType, Long>(CacheMissType.class);
+        this.numL2CacheMissesPerType.put(CacheMissType.COMPULSORY, 0L);
+        this.numL2CacheMissesPerType.put(CacheMissType.CAPACITY, 0L);
+        this.numL2CacheMissesPerType.put(CacheMissType.CONFLICT, 0L);
+
+        this.statL2CacheMissNumCycles = new DescriptiveStatistics();
+        this.statL2CacheMissMlpCosts = new DescriptiveStatistics();
+        this.statL2CacheMissAverageMlps = new DescriptiveStatistics();
+
         l2CacheController.getBlockingEventDispatcher().addListener(CoherentCacheServiceNonblockingRequestEvent.class, new Action1<CoherentCacheServiceNonblockingRequestEvent>() {
             public void apply(CoherentCacheServiceNonblockingRequestEvent event) {
                 if (event.getCacheController().equals(HelperThreadL2CacheRequestProfilingHelper.this.l2CacheController)) {
                     int set = event.getSet();
                     boolean requesterIsHelperThread = BasicThread.isHelperThread(event.getAccess().getThread());
-
                     boolean lineFoundIsHelperThread = helperThreadL2CacheRequestStates.get(set).get(event.getWay()).getThreadId() == BasicThread.getHelperThreadId();
 
-                    handleRequest(event, requesterIsHelperThread, lineFoundIsHelperThread);
+                    handleL2CacheRequest(event, requesterIsHelperThread, lineFoundIsHelperThread);
                 }
             }
         });
@@ -157,7 +180,7 @@ public class HelperThreadL2CacheRequestProfilingHelper {
                     boolean requesterIsHelperThread = BasicThread.isHelperThread(event.getAccess().getThread());
                     boolean lineFoundIsHelperThread = HelperThreadL2CacheRequestProfilingHelper.this.helperThreadL2CacheRequestStates.get(set).get(event.getWay()).getThreadId() == BasicThread.getHelperThreadId();
 
-                    handleLineInsert(event, requesterIsHelperThread, lineFoundIsHelperThread);
+                    handleL2CacheLineInsert(event, requesterIsHelperThread, lineFoundIsHelperThread);
                 }
             }
         });
@@ -213,6 +236,84 @@ public class HelperThreadL2CacheRequestProfilingHelper {
                 }
             }
         });
+
+        l2CacheController.getCycleAccurateEventQueue().getPerCycleEvents().add(new Action() {
+            @Override
+            public void apply() {
+                updateL2CacheMlpCostsPerCycle();
+            }
+        });
+    }
+
+    private void updateL2CacheMlpCostsPerCycle() {
+        if(!this.l2MissLatencyStatsEnabled) {
+            return;
+        }
+
+        for (Integer tag : this.pendingL2Misses.keySet()) {
+            PendingL2Miss pendingL2Miss = this.pendingL2Misses.get(tag);
+            pendingL2Miss.setMlpCost(pendingL2Miss.getMlpCost() + 1 / (double) this.pendingL2Misses.size());
+            pendingL2Miss.setNumMlpSamples(pendingL2Miss.getNumMlpSamples() + 1);
+            pendingL2Miss.setMlpSum(pendingL2Miss.getMlpSum() + this.pendingL2Misses.size());
+        }
+    }
+
+    private void profileL2MissBeginServicing(MemoryHierarchyAccess access) {
+        if(!this.l2MissLatencyStatsEnabled) {
+            return;
+        }
+
+        int tag = access.getPhysicalTag();
+        int set = this.l2CacheController.getCache().getSet(tag);
+
+        List<Integer> tagsSeen = this.l2CacheController.getCache().get(set).getTagsSeen();
+        List<Integer> lruStack = this.l2CacheController.getCache().get(set).getLruStack();
+
+        CacheMissType missType;
+
+        if(!tagsSeen.contains(tag)) {
+            tagsSeen.add(tag);
+            missType = CacheMissType.COMPULSORY;
+        }
+        else {
+            boolean inLruStack = lruStack.contains(tag);
+
+            missType = inLruStack ? CacheMissType.CONFLICT : CacheMissType.CAPACITY;
+
+            if(inLruStack) {
+                lruStack.remove((Integer) tag);
+            }
+            else if(lruStack.size() >= this.l2CacheController.getCache().getAssociativity()) {
+                lruStack.remove(0);
+            }
+
+            lruStack.add(tag);
+        }
+
+
+        PendingL2Miss pendingL2Miss = new PendingL2Miss(access, l2CacheController.getCycleAccurateEventQueue().getCurrentCycle(), missType);
+        this.pendingL2Misses.put(tag, pendingL2Miss);
+    }
+
+    private void profileL2MissEndServicing(MemoryHierarchyAccess access) {
+        if(!this.l2MissLatencyStatsEnabled) {
+            return;
+        }
+
+        int tag = access.getPhysicalTag();
+
+        PendingL2Miss pendingL2Miss = this.pendingL2Misses.get(tag);
+        pendingL2Miss.setEndCycle(this.l2CacheController.getCycleAccurateEventQueue().getCurrentCycle());
+
+        this.pendingL2Misses.remove(tag);
+
+        this.numL2CacheMissesPerType.put(pendingL2Miss.getMissType(), this.numL2CacheMissesPerType.get(pendingL2Miss.getMissType()) + 1);
+
+        this.statL2CacheMissNumCycles.addValue(pendingL2Miss.getNumCycles());
+        this.statL2CacheMissMlpCosts.addValue(pendingL2Miss.getMlpCost());
+        this.statL2CacheMissAverageMlps.addValue(pendingL2Miss.getAverageMlp());
+
+        //TODO: error, tracking pending accesses precisely from directory controller/fsm/fsmFactory!!!
     }
 
     private void sumUpUnstableHelperThreadL2CacheRequests() {
@@ -228,7 +329,9 @@ public class HelperThreadL2CacheRequestProfilingHelper {
         }
     }
 
-    private void handleRequest(CoherentCacheServiceNonblockingRequestEvent event, boolean requesterIsHelperThread, boolean lineFoundIsHelperThread) {
+    private void handleL2CacheRequest(CoherentCacheServiceNonblockingRequestEvent event, boolean requesterIsHelperThread, boolean lineFoundIsHelperThread) {
+        profileL2MissBeginServicing(event.getAccess());
+
         checkInvariants(event.getSet());
 
         boolean mainThreadHit = event.isHitInCache() && !requesterIsHelperThread && !lineFoundIsHelperThread;
@@ -347,7 +450,9 @@ public class HelperThreadL2CacheRequestProfilingHelper {
         checkInvariants(event.getSet());
     }
 
-    private void handleLineInsert(LastLevelCacheLineInsertEvent event, boolean requesterIsHelperThread, boolean lineFoundIsHelperThread) {
+    private void handleL2CacheLineInsert(LastLevelCacheLineInsertEvent event, boolean requesterIsHelperThread, boolean lineFoundIsHelperThread) {
+        profileL2MissEndServicing(event.getAccess());
+
         checkInvariants(event.getSet());
 
         CacheLine<HelperThreadL2CacheRequestVictimCacheLineState> victimLine = this.helperThreadL2CacheRequestVictimCache.findLine(event.getTag());
@@ -670,6 +775,30 @@ public class HelperThreadL2CacheRequestProfilingHelper {
 
     public boolean isCheckInvariantsEnabled() {
         return checkInvariantsEnabled;
+    }
+
+    public Map<CacheMissType, Long> getNumL2CacheMissesPerType() {
+        return numL2CacheMissesPerType;
+    }
+
+    public DescriptiveStatistics getStatL2CacheMissNumCycles() {
+        return statL2CacheMissNumCycles;
+    }
+
+    public DescriptiveStatistics getStatL2CacheMissMlpCosts() {
+        return statL2CacheMissMlpCosts;
+    }
+
+    public DescriptiveStatistics getFrequencyL2CacheMissAverageMlps() {
+        return statL2CacheMissAverageMlps;
+    }
+
+    public boolean isL2MissLatencyStatsEnabled() {
+        return l2MissLatencyStatsEnabled;
+    }
+
+    public void setL2MissLatencyStatsEnabled(boolean l2MissLatencyStatsEnabled) {
+        this.l2MissLatencyStatsEnabled = l2MissLatencyStatsEnabled;
     }
 
     public static enum HelperThreadL2CacheRequestVictimCacheLineState {

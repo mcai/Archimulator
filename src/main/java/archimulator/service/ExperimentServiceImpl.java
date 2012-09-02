@@ -18,14 +18,13 @@
  ******************************************************************************/
 package archimulator.service;
 
+import archimulator.client.ExperimentPack;
 import archimulator.client.ExperimentSpec;
 import archimulator.model.*;
-import net.pickapack.util.CollectionHelper;
-import net.pickapack.util.IndentedPrintWriter;
-import net.pickapack.util.JaxenHelper;
 import com.j256.ormlite.dao.Dao;
 import net.pickapack.JsonSerializationHelper;
 import net.pickapack.Pair;
+import net.pickapack.StorageUnit;
 import net.pickapack.action.Function1;
 import net.pickapack.action.Function2;
 import net.pickapack.action.Predicate;
@@ -33,6 +32,10 @@ import net.pickapack.dateTime.DateHelper;
 import net.pickapack.io.cmd.CommandLineHelper;
 import net.pickapack.model.ModelElement;
 import net.pickapack.service.AbstractService;
+import net.pickapack.util.CollectionHelper;
+import net.pickapack.util.IndentedPrintWriter;
+import net.pickapack.util.JaxenHelper;
+import net.pickapack.util.TableHelper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
@@ -49,14 +52,58 @@ import static net.pickapack.util.CollectionHelper.transform;
 
 public class ExperimentServiceImpl extends AbstractService implements ExperimentService {
     private Dao<Experiment, Long> experiments;
-    private Dao<ExperimentPack, Long> experimentPacks;
+    private Map<String, ExperimentPack> experimentPacks;
 
     @SuppressWarnings("unchecked")
     public ExperimentServiceImpl() {
-        super(ServiceManager.DATABASE_URL, Arrays.<Class<? extends ModelElement>>asList(Experiment.class, ExperimentPack.class));
+        super(ServiceManager.DATABASE_URL, Arrays.<Class<? extends ModelElement>>asList(Experiment.class));
 
         this.experiments = createDao(Experiment.class);
-        this.experimentPacks = createDao(ExperimentPack.class);
+
+        try {
+            experimentPacks = new LinkedHashMap<String, ExperimentPack>();
+
+            for (File file : FileUtils.listFiles(new File("experiment_inputs"), null, true)) {
+                ExperimentPack experimentPack = JsonSerializationHelper.deserialize(ExperimentPack.class, FileUtils.readFileToString(file));
+                if (experimentPack != null) {
+//                    if (experimentPacks.containsKey(experimentPack.getTitle())) {
+//                        throw new IllegalArgumentException("Duplicate experiment pack found: " + experimentPack.getTitle() + " in " + file.getAbsolutePath());
+//                    }
+
+                    experimentPacks.put(experimentPack.getTitle(), experimentPack);
+                }
+            }
+
+            for (ExperimentPack experimentPack : experimentPacks.values()) {
+                List<Experiment> experimentsPerExperimentPack = new ArrayList<Experiment>();
+                for (ExperimentSpec experimentSpec : experimentPack.getExperimentSpecs()) {
+                    Experiment experiment = getFirstExperimentByTitle(experimentSpec.getTitle());
+                    if (experiment == null) {
+                        ExperimentType experimentType = experimentPack.getExperimentType();
+                        SimulatedProgram simulatedProgram = experimentSpec.getSimulatedProgram();
+                        Architecture architecture = experimentSpec.getArchitecture();
+                        String arguments = experimentSpec.getArguments();
+
+                        List<ContextMapping> contextMappings = new ArrayList<ContextMapping>();
+
+                        ContextMapping contextMapping = new ContextMapping(0, simulatedProgram, arguments);
+                        contextMapping.setHelperThreadLookahead(experimentSpec.getHelperThreadLookahead());
+                        contextMapping.setHelperThreadStride(experimentSpec.getHelperThreadStride());
+                        contextMapping.setDynamicHelperThreadParams(false);
+                        contextMappings.add(contextMapping);
+
+                        experiment = new Experiment(experimentSpec.getTitle(), experimentType, architecture, -1, contextMappings);
+                        addExperiment(experiment);
+                    }
+                    experimentSpec.setExperiment(experiment);
+                    experimentsPerExperimentPack.add(experimentSpec.getExperiment());
+                }
+                experimentPack.setExperiments(experimentsPerExperimentPack);
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -111,15 +158,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         }
 
         return result;
-    }
-
-    @Override
-    public List<Experiment> getExperimentsByParent(ExperimentPack parent) {
-        return this.getItemsByParent(this.experiments, parent);
-    }
-
-    public Experiment getFirstExperimentByParent(ExperimentPack parent) {
-        return this.getFirstItemByParent(this.experiments, parent);
     }
 
     @Override
@@ -292,9 +330,9 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     @Override
-    public Experiment getFirstExperimentToRunByExperimentPackTitle(String experimentPackTitle) {
-        for (Experiment experiment : getAllExperiments()) {
-            if (experimentPackTitle.equals(experiment.getParent().getTitle()) && experiment.getState() == ExperimentState.PENDING) {
+    public Experiment getFirstExperimentToRunByParent(ExperimentPack parent) {
+        for (Experiment experiment : parent.getExperiments()) {
+            if (experiment.getState() == ExperimentState.PENDING) {
                 return experiment;
             }
         }
@@ -320,42 +358,85 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
     @Override
     public List<ExperimentPack> getAllExperimentPacks() {
-        return this.getAllItems(this.experimentPacks);
-    }
-
-    @Override
-    public ExperimentPack getExperimentPackById(long id) {
-        return this.getItemById(this.experimentPacks, id);
+        return new ArrayList<ExperimentPack>(experimentPacks.values());
     }
 
     @Override
     public ExperimentPack getExperimentPackByTitle(String title) {
-        return this.getFirstItemByTitle(this.experimentPacks, title);
-    }
-
-    @Override
-    public void addExperimentPack(ExperimentPack experimentPack) {
-        this.addItem(this.experimentPacks, ExperimentPack.class, experimentPack);
-    }
-
-    @Override
-    public void removeExperimentPack(long id) {
-        this.removeItemById(this.experimentPacks, ExperimentPack.class, id);
-    }
-
-    @Override
-    public void updateExperimentPack(ExperimentPack experimentPack) {
-        this.updateItem(this.experimentPacks, ExperimentPack.class, experimentPack);
+        return this.experimentPacks.containsKey(title) ? this.experimentPacks.get(title) : null;
     }
 
     @Override
     public void runExperiments(String... args) {
-        if(ServiceManager.getSystemSettingService().getSystemSettingSingleton().isRunningExperimentsEnabled()) {
+        if (ServiceManager.getSystemSettingService().getSystemSettingSingleton().isRunningExperimentsEnabled()) {
             new ExperimentWorker(args).run();
-        }
-        else {
+        } else {
             System.err.println("Running experiments is disabled at the moment, please enable running experiments first");
         }
+    }
+
+    @Override
+    public void tableSummary(ExperimentPack experimentPack) {
+        Experiment baselineExperiment = experimentPack.getExperiments().get(0);
+        boolean helperThreadEnabled = baselineExperiment.getContextMappings().get(0).getSimulatedProgram().getHelperThreadEnabled();
+
+        List<String> columns = helperThreadEnabled ? Arrays.asList(
+                "L2 Size", "L2 Assoc",
+                "Lookahead", "Stride",
+                "Total Cycles", "Speedup",
+                "Main Thread Hit", "Main Thread Miss", "Helper Thread Hit", "Helper Thread Miss", "Redundant MSHR", "Redundant Cache", "Timely", "Late", "Bad", "Ugly"
+        ) : Arrays.asList(
+                "L2 Size", "L2 Assoc",
+                "Total Cycles", "Speedup",
+                "Main Thread Hit", "Main Thread Miss"
+        );
+
+        List<List<String>> rows = new ArrayList<List<String>>();
+
+        for (Experiment experiment : experimentPack.getExperiments()) {
+            List<String> row = new ArrayList<String>();
+
+            if(helperThreadEnabled) {
+                row.add(experiment.getContextMappings().get(0).getHelperThreadLookahead() + "");
+                row.add(experiment.getContextMappings().get(0).getHelperThreadStride() + "");
+            }
+
+            row.add(StorageUnit.toString(experiment.getArchitecture().getL2Size()));
+            row.add(experiment.getArchitecture().getL2Associativity() + "");
+
+            row.add(experiment.getStatValue(experiment.getMeasurementTitlePrefix() + "cycleAccurateEventQueue/currentCycle"));
+
+            row.add(String.format("%.4f", getSpeedup(baselineExperiment, experiment)));
+
+            row.add(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
+                    "helperThreadL2CacheRequestProfilingHelper/numMainThreadL2CacheHits"));
+            row.add(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
+                    "helperThreadL2CacheRequestProfilingHelper/numMainThreadL2CacheMisses"));
+
+            if(helperThreadEnabled) {
+                row.add(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
+                        "helperThreadL2CacheRequestProfilingHelper/numHelperThreadL2CacheHits"));
+                row.add(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
+                        "helperThreadL2CacheRequestProfilingHelper/numHelperThreadL2CacheMisses"));
+
+                row.add(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
+                        "helperThreadL2CacheRequestProfilingHelper/numRedundantHitToTransientTagHelperThreadL2CacheRequests"));
+                row.add(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
+                        "helperThreadL2CacheRequestProfilingHelper/numRedundantHitToCacheHelperThreadL2CacheRequests"));
+                row.add(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
+                        "helperThreadL2CacheRequestProfilingHelper/numTimelyHelperThreadL2CacheRequests"));
+                row.add(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
+                        "helperThreadL2CacheRequestProfilingHelper/numLateHelperThreadL2CacheRequests"));
+                row.add(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
+                        "helperThreadL2CacheRequestProfilingHelper/numBadHelperThreadL2CacheRequests"));
+                row.add(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
+                        "helperThreadL2CacheRequestProfilingHelper/numUglyHelperThreadL2CacheRequests"));
+            }
+
+            rows.add(row);
+        }
+
+        table(experimentPack, "summary", columns, rows);
     }
 
     @Override
@@ -391,6 +472,13 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         }
 
         return speedups;
+    }
+
+    @Override
+    public double getSpeedup(Experiment baselineExperiment, Experiment experiment) {
+        long baselineTotalCycles = Long.parseLong(baselineExperiment.getStatValue(baselineExperiment.getMeasurementTitlePrefix() + "cycleAccurateEventQueue/currentCycle"));
+        long totalCycles = Long.parseLong(experiment.getStatValue(experiment.getMeasurementTitlePrefix() + "cycleAccurateEventQueue/currentCycle"));
+        return (double) baselineTotalCycles / totalCycles;
     }
 
     @Override
@@ -663,7 +751,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
                                 "helperThreadL2CacheRequestProfilingHelper/numTimelyHelperThreadL2CacheRequests",
                         experiment.getMeasurementTitlePrefix() +
                                 "helperThreadL2CacheRequestProfilingHelper/numLateHelperThreadL2CacheRequests",
-
                         experiment.getMeasurementTitlePrefix() +
                                 "helperThreadL2CacheRequestProfilingHelper/numBadHelperThreadL2CacheRequests",
                         experiment.getMeasurementTitlePrefix() +
@@ -770,15 +857,15 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
     @Override
     public void dumpExperimentPack(ExperimentPack experimentPack, boolean detailed, IndentedPrintWriter writer, boolean stoppedExperimentsOnly) {
-        writer.printf("[%s] experiment pack %s\n", DateHelper.toString(experimentPack.getCreateTime()), experimentPack.getTitle());
+        writer.printf("experiment pack %s\n", experimentPack.getTitle());
         writer.println();
 
         writer.incrementIndentation();
 
-        List<Experiment> experimentsByExperimentPack = stoppedExperimentsOnly ? getStoppedExperimentsByParent(experimentPack) : getExperimentsByParent(experimentPack);
-        Experiment firstExperimentByExperimentPack = stoppedExperimentsOnly ? getFirstStoppedExperimentByParent(experimentPack) : getFirstExperimentByParent(experimentPack);
+        List<Experiment> experimentsByExperimentPack = stoppedExperimentsOnly ? getStoppedExperimentsByParent(experimentPack) : experimentPack.getExperiments();
+        Experiment firstExperimentByExperimentPack = stoppedExperimentsOnly ? getFirstStoppedExperimentByParent(experimentPack) : experimentPack.getExperiments().get(0);
 
-        if(firstExperimentByExperimentPack != null) {
+        if (firstExperimentByExperimentPack != null) {
             writer.println("experiment titles: ");
             writer.incrementIndentation();
             writer.println(JsonSerializationHelper.toJson(transform(experimentsByExperimentPack, new Function1<Experiment, String>() {
@@ -789,6 +876,8 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
             }), true));
             writer.println();
             writer.decrementIndentation();
+
+            ServiceManager.getExperimentService().tableSummary(experimentPack);
 
             writer.println("simulation times in seconds: ");
             writer.incrementIndentation();
@@ -841,7 +930,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
             ServiceManager.getExperimentService().plotNormalizedTotalCycles(experimentPack, experimentsByExperimentPack);
 
-            if(firstExperimentByExperimentPack.getType() != ExperimentType.FUNCTIONAL) {
+            if (firstExperimentByExperimentPack.getType() != ExperimentType.FUNCTIONAL) {
                 writer.println("l2 request breakdowns: ");
                 writer.incrementIndentation();
                 writer.println(JsonSerializationHelper.toJson(ServiceManager.getExperimentService().getL2CacheRequestBreakdowns(experimentsByExperimentPack), true));
@@ -910,13 +999,20 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
         writer.decrementIndentation();
 
-        if(detailed) {
+        if (detailed) {
             writer.incrementIndentation();
-            for (Experiment experiment : getExperimentsByParent(experimentPack)) {
+            for (Experiment experiment : experimentPack.getExperiments()) {
                 ServiceManager.getExperimentService().dumpExperiment(experiment, writer);
             }
             writer.decrementIndentation();
         }
+    }
+
+    private void table(ExperimentPack experimentPack, String tableFileNameSuffix, List<String> columns, List<List<String>> rows) {
+        String fileNamePdf = "experiment_tables" + File.separator + experimentPack.getTitle() + "_" + tableFileNameSuffix + ".pdf";
+        new File(fileNamePdf).getParentFile().mkdirs();
+
+        TableHelper.generateTable(fileNamePdf, columns, rows);
     }
 
     private void plot(ExperimentPack experimentPack, String plotFileNameSuffix, String yLabel, List<?> rows) {
@@ -938,8 +1034,9 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
             pw.println("legendy=center");
             pw.println("=nolegoutline");
             pw.println("legendfill=");
+            pw.println("legendfontsz=13");
 
-            if(rows.get(0) instanceof Map) {
+            if (rows.get(0) instanceof Map) {
                 pw.println("=stacked;" + StringUtils.join(((Map) (rows.get(0))).keySet(), ';'));
                 pw.println("=table");
             }
@@ -948,7 +1045,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
             pw.println("ylabel=" + yLabel);
 
             int i = 0;
-            for(Object row : rows) {
+            for (Object row : rows) {
                 String title = experimentPack.getVariablePropertyName() == null ? "" : experimentPack.getVariablePropertyValues().get(i++);
                 pw.println(title.replaceAll(" ", "_") + "\t" + ((row instanceof Map) ? StringUtils.join(((Map) row).values(), '\t') : row));
             }
@@ -957,7 +1054,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
             System.err.println(StringUtils.join(CommandLineHelper.invokeShellCommandAndGetResult("tools/bargraph.pl" + " -pdf " + fileInput + " > " + fileNamePdf), IOUtils.LINE_SEPARATOR));
 
-            if(!fileInput.delete()) {
+            if (!fileInput.delete()) {
                 throw new IllegalArgumentException();
             }
         } catch (IOException e) {
@@ -970,7 +1067,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     private List<Double> normalize(List<Double> input) {
         double[] resultArray = StatUtils.normalize(ArrayUtils.toPrimitive(input.toArray(new Double[input.size()])));
         List<Double> result = new ArrayList<Double>();
-        for(double d : resultArray) {
+        for (double d : resultArray) {
             result.add(d);
         }
 

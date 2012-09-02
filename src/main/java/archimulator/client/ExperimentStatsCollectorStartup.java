@@ -19,11 +19,20 @@
 package archimulator.client;
 
 import archimulator.model.Experiment;
-import archimulator.model.ExperimentPack;
 import archimulator.service.ServiceManager;
+
+import java.util.List;
 
 public class ExperimentStatsCollectorStartup {
     public static void main(String[] args) {
+        for(Experiment experiment : ServiceManager.getExperimentService().getAllExperiments()) {
+            List<Experiment> duplicates = ServiceManager.getExperimentService().getExperimentsByTitle(experiment.getTitle());
+            if(duplicates.size() > 1) {
+                System.out.println(experiment.getTitle() + ": " + duplicates.size() + " duplicates");
+                System.out.println();
+            }
+        }
+
         if (args.length >= 1) {
             for (String arg : args) {
                 ExperimentPack experimentPack = ServiceManager.getExperimentService().getExperimentPackByTitle(arg);
