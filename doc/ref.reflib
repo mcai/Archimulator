@@ -527,7 +527,7 @@
     <relative_filename></relative_filename>
     <key>WuJMSE2011</key>
     <notes></notes>
-    <bib_type>InProceedings</bib_type>
+    <bib_type>inproceedings</bib_type>
     <bib_doi></bib_doi>
     <bib_title>PACMan: prefetch-aware cache management for high performance caching</bib_title>
     <bib_authors>Wu, Carole-Jean and Jaleel, Aamer and Martonosi, Margaret and , Simon C. Steely Jr. and Emer, Joel S.</bib_authors>
@@ -538,12 +538,102 @@
     <bib_year>2011</bib_year>
     <bib_extra key="Bibdate">2012-03-02</bib_extra>
     <bib_extra key="Bibsource">DBLP, http://dblp.uni-trier.de/db/conf/micro/micro2011.html#WuJMSE11</bib_extra>
-    <bib_extra key="BookTitle">MICRO</bib_extra>
-    <bib_extra key="Editor">Galuzzi, Carlo and Carro, Luigi and Moshovos, Andreas and Prvulovic, Milos</bib_extra>
+    <bib_extra key="booktitle">MICRO</bib_extra>
+    <bib_extra key="editor">Galuzzi, Carlo and Carro, Luigi and Moshovos, Andreas and Prvulovic, Milos</bib_extra>
     <bib_extra key="Isbn">978-1-4503-1053-6</bib_extra>
-    <bib_extra key="Publisher">ACM</bib_extra>
+    <bib_extra key="publisher">ACM</bib_extra>
     <bib_extra key="Series">44rd Annual IEEE/ACM International Symposium on Microarchitecture, MICRO 2011, 3-7 December 2011, Porto Alegre, Brazil</bib_extra>
-    <bib_extra key="Url">http://doi.acm.org/10.1145/2155620.2155672</bib_extra>
+  </doc>
+  <doc>
+    <filename></filename>
+    <relative_filename></relative_filename>
+    <key>Rogers1995</key>
+    <notes></notes>
+    <bib_type>article</bib_type>
+    <bib_doi></bib_doi>
+    <bib_title>Supporting Dynamic Data Structures on Distributed-Memory Machines</bib_title>
+    <bib_authors>Rogers, Anne and Carlisle, Martin C. and Reppy, John H. and Hendren, L. J.</bib_authors>
+    <bib_journal>ACM Transactions on Programming Languages and Systems</bib_journal>
+    <bib_volume>17</bib_volume>
+    <bib_number>2</bib_number>
+    <bib_pages>233-263</bib_pages>
+    <bib_year>1995</bib_year>
+    <bib_extra key="Abstract">Compiling for distributed-memory machines has been a very active research area in recent years. Much of this work has concentrated on programs that use arrays as their primary data structures. To date, little work has been done to address the problem of supporting programs that use pointer-based dynamic data structures. The techniques developed for supporting SPMD execution of array-based programs rely on the fact that arrays are statically defined and directly addressable. Recursive data structures do not have these properties, so new techniques must be developed. In this article, we describe an execution model for supporting programs that use pointer-based dynamic data structures. This model uses a simple mechanism for migrating a thread of control based on the layout of heap-allocated data and introduces parallelism using a technique based on futures and lazy task creation. We intend to exploit this execution model using compiler analyses and automatic parallelization techniques. We have implemented a prototype system, which we call \em Olden, that runs on the Intel iPSC/860 and the Thinking Machines CM-5. We discuss our implementation and report on experiments with five benchmarks.</bib_extra>
+    <bib_extra key="Acknowledgement">Nelson H. F. Beebe, University of Utah, Department of Mathematics, 110 LCB, 155 S 1400 E RM 233, Salt Lake City, UT 84112-0090, USA, Tel: +1 801 581 5254, FAX: +1 801 581 4148, e-mail: \path|beebe@math.utah.edu|, \path|beebe@acm.org|, \path|beebe@computer.org| (Internet), URL: \path|http://www.math.utah.edu/ beebe/|</bib_extra>
+    <bib_extra key="Bibdate">Fri Jan 5 07:58:42 MST 1996</bib_extra>
+    <bib_extra key="Bibsource">http://www.math.utah.edu/pub/tex/bib/toplas.bib</bib_extra>
+    <bib_extra key="Coden">ATPSDT</bib_extra>
+    <bib_extra key="Fjournal">ACM Transactions on Programming Languages and Systems</bib_extra>
+    <bib_extra key="Issn">0164-0925 (print), 1558-4593 (electronic)</bib_extra>
+    <bib_extra key="Issn-l">0164-0925</bib_extra>
+    <bib_extra key="Keywords">experimentation; languages; measurement; performance</bib_extra>
+    <bib_extra key="Month">mar</bib_extra>
+    <bib_extra key="Subject">\bf D.3.4: Software, PROGRAMMING LANGUAGES, Processors, Run-time environments. \bf D.1.3: Software, PROGRAMMING TECHNIQUES, Concurrent Programming, Parallel programming. \bf D.3.4: Software, PROGRAMMING LANGUAGES, Processors, Compilers. \bf D.3.3: Software, PROGRAMMING LANGUAGES, Language Constructs and Features, Data types and structures. \bf D.3.3: Software, PROGRAMMING LANGUAGES, Language Constructs and Features, Dynamic storage management.</bib_extra>
+  </doc>
+  <doc>
+    <filename></filename>
+    <relative_filename></relative_filename>
+    <key>Kim2004</key>
+    <notes></notes>
+    <bib_type>inproceedings</bib_type>
+    <bib_doi></bib_doi>
+    <bib_title>Physical Experimentation with Prefetching Helper Threads on Intel’s Hyper-Threaded Processors</bib_title>
+    <bib_authors>Kim, Dongkeun and Liao, Shih-Wei and Wang, Perry H. and Cuvillo, Juan del and Tian, Xinmin and Zou, Xiang and 0003, Hong Wang and Yeung, Donald and Girkar, Milind and Shen, John Paul</bib_authors>
+    <bib_journal></bib_journal>
+    <bib_volume></bib_volume>
+    <bib_number></bib_number>
+    <bib_pages>27-38</bib_pages>
+    <bib_year>2004</bib_year>
+    <bib_extra key="Bibdate">2011-10-26</bib_extra>
+    <bib_extra key="Bibsource">DBLP, http://dblp.uni-trier.de/db/conf/cgo/cgo2004.html#KimLWCTZWYGS04</bib_extra>
+    <bib_extra key="booktitle">CGO</bib_extra>
+    <bib_extra key="Crossref">conf/cgo/2004</bib_extra>
+    <bib_extra key="Isbn">0-7695-2102-9</bib_extra>
+    <bib_extra key="publisher">IEEE Computer Society</bib_extra>
+  </doc>
+  <doc>
+    <filename></filename>
+    <relative_filename></relative_filename>
+    <key>Lee2009</key>
+    <notes></notes>
+    <bib_type>Article</bib_type>
+    <bib_doi></bib_doi>
+    <bib_title>Prefetching with Helper Threads for Loosely Coupled Multiprocessor Systems</bib_title>
+    <bib_authors>Lee, Jaejin and Jung, Changhee and Lim, Daeseob and Solihin, Yan</bib_authors>
+    <bib_journal>IEEE Transactions on Parallel and Distributed Systems</bib_journal>
+    <bib_volume>20</bib_volume>
+    <bib_number>9</bib_number>
+    <bib_pages>1309-1324</bib_pages>
+    <bib_year>2009</bib_year>
+    <bib_extra key="Acknowledgement">Nelson H. F. Beebe, University of Utah, Department of Mathematics, 110 LCB, 155 S 1400 E RM 233, Salt Lake City, UT 84112-0090, USA, Tel: +1 801 581 5254, FAX: +1 801 581 4148, e-mail: \path|beebe@math.utah.edu|, \path|beebe@acm.org|, \path|beebe@computer.org| (Internet), URL: \path|http://www.math.utah.edu/ beebe/|</bib_extra>
+    <bib_extra key="Bibdate">Thu May 13 12:06:56 2010</bib_extra>
+    <bib_extra key="Bibsource">http://www.computer.org/tpds/; http://www.math.utah.edu/pub/tex/bib/ieeetranspardistsys.bib</bib_extra>
+    <bib_extra key="Coden">ITDSEO</bib_extra>
+    <bib_extra key="Doi">http://doi.ieeecomputersociety.org/10.1109/TPDS.2008.224</bib_extra>
+    <bib_extra key="Doi-url">http://dx.doi.org/10.1109/TPDS.2008.224</bib_extra>
+    <bib_extra key="Fjournal">IEEE Transactions on Parallel and Distributed Systems</bib_extra>
+    <bib_extra key="Issn">1045-9219 (print), 1558-2183 (electronic)</bib_extra>
+    <bib_extra key="Issn-l">1045-9219</bib_extra>
+    <bib_extra key="Month">sep</bib_extra>
+  </doc>
+  <doc>
+    <filename></filename>
+    <relative_filename></relative_filename>
+    <key>Chen1991</key>
+    <notes></notes>
+    <bib_type>InProceedings</bib_type>
+    <bib_doi></bib_doi>
+    <bib_title>Data Access Microarchitectures for Superscalar Processors with Compiler-Assisted Data Prefetching</bib_title>
+    <bib_authors>Chen, William Y. and Mahlke, Scott A. and Chang, Pohua P. and Hwu, Wen-mei W.</bib_authors>
+    <bib_journal></bib_journal>
+    <bib_volume></bib_volume>
+    <bib_number></bib_number>
+    <bib_pages>69-73</bib_pages>
+    <bib_year>1991</bib_year>
+    <bib_extra key="Address">Albuquerque, New Mexico</bib_extra>
+    <bib_extra key="Author:corp">ACM SIGMICRO and IEEE Computer Society TC-MICRO</bib_extra>
+    <bib_extra key="BookTitle">Proceedings of the 24th Annual International Symposium on Microarchitecture</bib_extra>
+    <bib_extra key="Month">nov 18–20,</bib_extra>
   </doc>
 </doclist>
 </library>

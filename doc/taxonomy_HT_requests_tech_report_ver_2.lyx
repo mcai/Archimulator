@@ -182,9 +182,16 @@ Introduction
 
 \begin_layout Standard
 For workloads exhibiting irregular memory access patterns, helper threaded
- data prefetching on shared cache chip multiprocessors (CMPs) speculatively
- issue last-level cache (LLC) requests to the predicted memory addresses
- ahead of computation core references.
+ data prefetching 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Kim2004,Lee2009"
+
+\end_inset
+
+ on shared cache chip multiprocessors (CMPs) speculatively issue last-level
+ cache (LLC) requests to the predicted memory addresses ahead of computation
+ core references.
  Effective helper threaded data prefetching on CMPs demands that the helper
  thread (HT) should issue correct and timely LLC requests just before the
  main thread (MT) references them.
@@ -196,13 +203,107 @@ tions of helper threaded data prefetching on CMPs: inaccurate and/or untimely
 \end_layout
 
 \begin_layout Standard
+Several metrics have been proposed in the past for evaluating the effectiveness
+ of hardware based data prefetching, among which prefetch accuracy and coverage
+ are the most intuitive ones 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Srinivasan2004"
+
+\end_inset
+
+.
+ We can easily adapt the definitions of accuracy and coverage for hardware
+ based data prefetching to the helper threaded prefetching scheme.
+ Helper thread request accuracy is defined as the ratio of the number of
+ useful helper thread requests to the number of total helper thread requests.
+ And helper thread request coverage is defined as the ratio of the number
+ of useful helper thread requests to the number of main thread misses plus
+ main thread hits to helper thread requested data.
+ Here, a helper thread request is called useful when its requested data
+ is referenced by main thread before evicted.
+ Furthermore, similar to the approach to hardware prefetching, to measure
+ coverage and accuracy, all helper thread requests can be categorized into
+ 
+\begin_inset Quotes eld
+\end_inset
+
+useful
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+useless
+\begin_inset Quotes erd
+\end_inset
+
+ helper thread requests 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Srinivasan2004"
+
+\end_inset
+
+.
+ A 
+\begin_inset Quotes eld
+\end_inset
+
+useful
+\begin_inset Quotes erd
+\end_inset
+
+ helper thread request is one whose brought data is hit by a main thread
+ request before it is replaced, while a 
+\begin_inset Quotes eld
+\end_inset
+
+useless
+\begin_inset Quotes erd
+\end_inset
+
+ helper thread request is one whose brought data is replaced before it is
+ hit by a main thread request.
+ However the above traditional accuracy and coverage metrics for helper
+ thread requests and the classification of 
+\begin_inset Quotes eld
+\end_inset
+
+useful
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+useless
+\begin_inset Quotes erd
+\end_inset
+
+ helper thread requests don't care about the LLC pollution and inter-thread
+ interference caused by helper thread LLC requests, which are two kinds
+ of deficiencies in the helper threaded prefetching scheme.
+ 
+\end_layout
+
+\begin_layout Standard
 This paper characterizes the degree by which intra-application LLC interference
  is caused by inter-core data prefetches in the above helper threaded data
  prefetching scheme.
  Based on cycle-accurate architectural simulation of the memory intensive
- benchmark mst from Olden, we first adapt traditional approaches to characterizi
-ng hardware prefetches such as prefetch accuracy coverage and lateness,
- useful vs.
+ benchmark mst from the Olden pointer traversing benchmark suite 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Rogers1995"
+
+\end_inset
+
+, we first adapt traditional approaches to characterizing hardware prefetches
+ such as prefetch accuracy coverage and lateness, useful vs.
  useless prefetches to characterize helper threaded data prefetching on
  CMPs.
  Based on the insights from these characterizations, we then propose a fine-grai
@@ -219,13 +320,36 @@ s of the helper threaded data prefetching scheme.
 e architectural simulation, and highlighting the opportunities and challenges
  of optimizing helper threaded data prefetching on CMPs in a dynamic and
  feedback-directed way.
+ We assume here a two level cache hierarchy where L1 caches are private
+ and the L2 cache is shared among all processor cores on a single chip.
+ 
 \end_layout
 
 \begin_layout Standard
+The main contributions of this paper can be summarized as answers for the
+ following two questions:
+\end_layout
 
-\shape italic
-\color red
-(to be expanded)
+\begin_layout Enumerate
+What is the relationship between the shared cache behavior and the overall
+ performance improvement in helper threaded data prefetching on CMPs;
+\end_layout
+
+\begin_layout Enumerate
+How can the helper thread LLC requests be classified to reflect the inter-thread
+ LLC interference caused by helper thread LLC requests in helper threaded
+ data prefetching on CMPs.
+\end_layout
+
+\begin_layout Standard
+The rest of this paper is structured as follows.
+ Section 2 describes the cycle-accurate simulation framework for the target
+ CMP architecture and experimental setup.
+ Section 3 presents the characterization of LLC interference caused by helper
+ threaded data prefetching on CMPs.
+ Section 4 discusses the performance results on the detailed experiments.
+ Section 5 provides related work.
+ Section 6 concludes the paper.
 \end_layout
 
 \begin_layout Section
@@ -249,6 +373,7 @@ reference "fig:Simulated-CMP-Architecture"
  32KB 4-way instruction caches).
  Both cores share a 96KB 8-way L2 cache.
  MESI inclusive directory coherence is maintained between L1 caches.
+ Both L1 and L2 caches use LRU replacement policy.
  An LRU cache called HTRVC is attached to the L2 cache to implement the
  taxonomy of helper thread LLC requests, as will be explained in the next
  section.
@@ -262,12 +387,47 @@ reference "tab:Baseline-Hardware-Configurations"
 .
 \end_layout
 
+\begin_layout Subsection
+Simulation Framework
+\end_layout
+
+\begin_layout Standard
+We use the open source Archimulator
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+See 
+\begin_inset CommandInset href
+LatexCommand href
+target "http://github.com/mcai/archimulator/"
+
+\end_inset
+
+ for details.
+\end_layout
+
+\end_inset
+
+ CMP architectural simulation environment in our experiments mentioned in
+ this work.
+ Archimulator is an object-oriented execution-driven application-only architectu
+ral simulator written completely in Java and running on 32 and 64 bit Linux
+ based operating systems.
+ It provides three modes of functional simulation, cycle-accurate simulation
+ and two-phase fast forward and measurement simulation of MIPS II executables
+ on CMP architectures consisting of out-of-order super-scalar cores and
+ configurable memory hierarchies with directory-based MESI coherence.
+ It supports simulating Pthreads based multithreaded workloads.
+ 
+\end_layout
+
 \begin_layout Standard
 \align center
 \begin_inset Float figure
 wide false
 sideways false
-status open
+status collapsed
 
 \begin_layout Plain Layout
 \align center
@@ -305,6 +465,45 @@ name "fig:Simulated-CMP-Architecture"
 \end_inset
 
 
+\end_layout
+
+\begin_layout Paragraph
+Static Software Context to Hardware Thread Mappings
+\end_layout
+
+\begin_layout Standard
+In a typical Pthreads based helper thread program, there are three threads
+ when running: main thread, helper thread and the Pthreads manager thread.
+ The Pthreads manager thread takes the role of spawning, suspending and
+ resuming helper thread by passing signals to helper thread.
+ Consider a simulated target CMP machine which has two cores where each
+ core supports two hardware threads.
+ In our application-only simulation using Archimulator, without the OS intervent
+ion, one hardware thread can only run at least one software context (or
+ simply called thread).
+ Therefore, the typical software context to hardware thread mappings can
+ be: C0T0 
+\begin_inset Formula $\rightarrow$
+\end_inset
+
+ main thread, C0T1 
+\begin_inset Formula $\rightarrow$
+\end_inset
+
+ Pthreads manager thread, C1T0 
+\begin_inset Formula $\rightarrow$
+\end_inset
+
+ helper thread (C = core, T = thread), as shown in Fig.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Simulated-CMP-Architecture"
+
+\end_inset
+
+.
+ We use this context mapping in the following discussions.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -1124,7 +1323,7 @@ Hit Lat.
 \begin_layout Plain Layout
 
 \size small
-ICache
+I Cache
 \end_layout
 
 \end_inset
@@ -1181,7 +1380,7 @@ ICache
 \begin_layout Plain Layout
 
 \size small
-DCache
+D Cache
 \end_layout
 
 \end_inset
@@ -1381,68 +1580,12 @@ name "tab:Baseline-Hardware-Configurations"
 \end_layout
 
 \begin_layout Subsection
-Simulation Framework
-\end_layout
-
-\begin_layout Standard
-We use an in-house CMP architectural simulator named Archimulator in our
- experiments mentioned in this work.
- Archimulator is a flexible execution-driven architectural simulator written
- in Java and running on Linux.
- It provides fast forward functional simulation and cycle-accurate application-o
-nly simulation of MIPS II executables on multicore architectures consisting
- of out-of-order super-scalar cores and configurable memory hierarchy of
- directory-based MESI coherence.
- It has basic support of simulating Pthreads based multithreaded workloads.
- 
-\end_layout
-
-\begin_layout Paragraph
-Static Software Context to Hardware Thread Mappings
-\end_layout
-
-\begin_layout Standard
-In a typical Pthreads based helper thread program, there are three threads
- when running: main thread, helper thread and the Pthreads manager thread.
- The Pthreads manager thread takes the role of spawning, suspending and
- resuming helper thread by passing signals to helper thread.
- Consider a simulated target multicore machine which has two cores where
- each core supports two hardware threads.
- In our application-only simulation using Archimulator, without the OS intervent
-ion, one hardware thread can only run at least one software context (or
- simply called thread).
- Therefore, the typical software context to hardware thread mappings can
- be: C0T0 
-\begin_inset Formula $\rightarrow$
-\end_inset
-
- main thread, C0T1 
-\begin_inset Formula $\rightarrow$
-\end_inset
-
- Pthreads manager thread, C1T0 
-\begin_inset Formula $\rightarrow$
-\end_inset
-
- helper thread (C = core, T = thread), as shown in Fig.
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:Simulated-CMP-Architecture"
-
-\end_inset
-
-.
- We use this context mapping in the following discussions.
- 
-\end_layout
-
-\begin_layout Subsection
 Benchmarks and Input Sets
 \end_layout
 
 \begin_layout Standard
 We perform our evaluation using the original version and manually coded
- helper threaded version of mst in the Olden pointer-traveral benchmark
+ helper threaded version of mst in the Olden pointer traversal benchmark
  suite.
  All applications are cross-compiled using gcc flag “-O3” and run until
  completion using cycle-accurate simulation.
@@ -1475,7 +1618,7 @@ reference "fig:Helper-Threaded-Inter-Core-Data-Prefetching"
 
 \end_inset
 
-, the workflow of helper threaded data prefetching on shared-cache CMPs
+, the work flow of helper threaded data prefetching on shared-cache CMPs
  we implement here can be described as follows.
  
 \end_layout
@@ -1504,7 +1647,7 @@ prelude
 \begin_layout Enumerate
 The helper thread enters a 
 \shape italic
-steady state
+stable state
 \shape default
  of issuing LLC prefetch requests in loop iterations of pointer traversals
  ahead of the main thread until the execution of the program has passed
@@ -1526,26 +1669,28 @@ After all the prefetching work is done, the helper thread is destroyed in
 Two parameters in the helper threaded prefetching scheme controls its aggressive
 ness: (1) the number of loop iterations of pointer traversals that the helper
  thread code skip after synchronizing with the main thread in the prelude
- is called lookahead; (2) the number of loop iterations of pointer traversals
- in which helper thread code issue LLC prefetch requests in the steady state
- is called stride.
+ is called 
+\shape italic
+lookahead
+\shape default
+; (2) the number of loop iterations of pointer traversals in which helper
+ thread code issue LLC prefetch requests in the stable state is called 
+\shape italic
+stride
+\shape default
+.
  
 \end_layout
 
 \begin_layout Standard
-In a traditional helper threaded prefetching scheme configuration, the values
- of 
-\shape italic
-lookahead
-\shape default
- and 
-\shape italic
-stride
-\shape default
- are hard coded.
- In our following proposed feedback directed mechanism, the processor changes
- the value of lookahead and stride using some temporary register to adjust
- the aggressiveness of the helper threaded prefetching scheme.
+In the traditional helper threaded prefetching configuration, the values
+ of lookahead and stride are selected empirically and hard coded, which
+ is unable to accommodate the unpredictable nature of L2 cache runtime behavior
+ in the presence of helper thread requests.
+ Based on our following characterization of helper thread L2 requests, a
+ dynamic feedback directed mechanism can be built in which the processor
+ changes the value of lookahead and stride using some temporary register
+ to adjust the aggressiveness of the helper threaded prefetching scheme.
 \end_layout
 
 \begin_layout Standard
@@ -1651,7 +1796,7 @@ Helper thread LLC request accuracy
 
 \begin_layout Standard
 
-\size scriptsize
+\size footnotesize
 \begin_inset Formula 
 \[
 Helper\: Threaded\: Prefetch\: Accuracy=\frac{Number\: of\: Useful\: Helper\: Thread\: LLC\: Requests}{Number\: of\: Helper\: Thread\: LLC\: Requests}
@@ -1685,10 +1830,10 @@ Helper thread LLC request coverage
 
 \begin_layout Standard
 
-\size scriptsize
+\size footnotesize
 \begin_inset Formula 
 \[
-Helper\: Threaded\: Prefetch\: Coverage=\frac{Number\: of\: Useful\: Helper\: Thread\: LLC\: Requests}{Number\: of\: Main\: Thread\: LLC\: Requests\: WIthout\: No\: Prefetch}
+Helper\: Threaded\: Prefetch\: Coverage=\frac{Number\: of\: Useful\: Helper\: Thread\: LLC\: Requests}{Number\: of\: Main\: Thread\: LLC\: Requests\: WIthout\: Helper\: Threaded\: Prefetch}
 \]
 
 \end_inset
@@ -1709,7 +1854,7 @@ Helper thread LLC request lateness
  are with respect to the LLC requests generated in the main thread that
  need the data brought by the helper thread.
  A helper thread LLC request is said to be late if its requested data has
- not yet returned from the main memory by the time an main thread LLC request
+ not yet returned from the main memory by the time a main thread LLC request
  references the data.
  Therefore, even though the helper thread LLC request is accurate, it can
  only partially hide the latency incurred by an LLC miss in the main thread.
@@ -1722,7 +1867,7 @@ Helper thread LLC request lateness
 
 \begin_layout Standard
 
-\size scriptsize
+\size footnotesize
 \begin_inset Formula 
 \[
 Helper\: Threaded\: Prefetch\: Lateness=\frac{Number\: of\: Late\: Helper\: Thread\: LLC\: Requests}{Number\: of\: Useful\: Helper\: Thread\: LLC\: Requests}
@@ -1757,6 +1902,8 @@ The notion of reuse distance can shed light on how a pollution-aware taxonomy
 rd < k indicates it is a 
 \shape italic
 conflict miss
+\shape default
+;
 \end_layout
 
 \begin_layout Enumerate
@@ -1767,6 +1914,8 @@ k<= rd <
  indicates it is a 
 \shape italic
 capacity miss
+\shape default
+;
 \end_layout
 
 \begin_layout Enumerate
@@ -1776,11 +1925,11 @@ rd =
 
  indicates it is a 
 \shape italic
-cold miss
+cold miss.
 \end_layout
 
 \begin_layout Standard
-To accomodate the case where one thread Tb accesses data element x that
+To accommodate the case where one thread Tb accesses data element x that
  has been previously brought into the cache by another thread Ta, we introduce
  the notion of Ta-Tb inter-thread reuse distance, as compared to the traditional
  intra-thread reuse distance applied to either Ta or Tb.
@@ -1824,7 +1973,7 @@ inter-thread reuse distance
 
  in helper thread LLC requests should be very small when the helper threaded
  prefetching scheme is efficient to reduce LLC misses in main thread where
- for most helper thread LLC miss, an immediate followup main thread LLC
+ for most helper thread LLC miss, an immediate follow-up main thread LLC
  request will access the data brought by the previous LLC request and hit
  in the LLC.
  Otherwise, large values of 
@@ -1868,12 +2017,12 @@ Based on the notions of HT-MT inter-thread reuse distance (
 ), we can construct a pollution aware taxonomy of helper thread LLC requests
  where helper thread LLC requests are classified into three types: good,
  bad and ugly.
- Let's assume when an helper thread LLC request referencing data h evicts
- an LLC line containing the victim data v which is brought by main thread,
- and afterwards the LLC line containing h is evicted by an main thread LLC
- request with data m.
- Therefore, there are two LLC replacement involved: first h evicts v and
- then m evicts h.
+ Let's assume when a helper thread LLC request referencing data H evicts
+ an LLC line containing the victim data V which is brought by main thread,
+ and afterwards the LLC line containing H is evicted by a main thread LLC
+ request with data M.
+ Therefore, there are two LLC replacement involved: first H evicts V and
+ then M evicts H.
  We use 
 \begin_inset Formula $RD_{MT}(v)$
 \end_inset
@@ -1887,7 +2036,7 @@ Based on the notions of HT-MT inter-thread reuse distance (
 \end_inset
 
  to denote the number of distinct data elements that have been referenced
- between the time when h evicts v and the time v, h and m is accessed again,
+ between the time when H evicts V and the time V, H and M is accessed again,
  respectively.
  The greater the reuse distance of the data, the farther the data will be
  referenced again in time.
@@ -1899,15 +2048,15 @@ Based on the notions of HT-MT inter-thread reuse distance (
 
 \begin_layout Enumerate
 if 
-\begin_inset Formula $ITRD_{HT-MT}(h)$
+\begin_inset Formula $ITRD_{HT-MT}(H)$
 \end_inset
 
  < 
-\begin_inset Formula $RD_{MT}(v)$
+\begin_inset Formula $RD_{MT}(V)$
 \end_inset
 
  < 
-\begin_inset Formula $RD_{MT}(m)$
+\begin_inset Formula $RD_{MT}(M)$
 \end_inset
 
 , then the helper thread LLC request is considered as 
@@ -1916,21 +2065,21 @@ good
 \shape default
 because it evicts the data that has larger reuse distance than its own.
  Its data is hit by the main thread before evicted.
- It has posive impact on the main thread performance since it reduce one
+ It has positive impact on the main thread performance since it reduce one
  main thread miss;
 \end_layout
 
 \begin_layout Enumerate
 if 
-\begin_inset Formula $RD_{MT}(v)$
+\begin_inset Formula $RD_{MT}(V)$
 \end_inset
 
  < 
-\begin_inset Formula $ITRD_{HT-MT}(h)$
+\begin_inset Formula $ITRD_{HT-MT}(H)$
 \end_inset
 
  < 
-\begin_inset Formula $RD_{MT}(m)$
+\begin_inset Formula $RD_{MT}(M)$
 \end_inset
 
 , then the helper thread LLC request is considered as
@@ -1945,15 +2094,15 @@ if
 
 \begin_layout Enumerate
 if 
-\begin_inset Formula $RD_{MT}(m)$
+\begin_inset Formula $RD_{MT}(M)$
 \end_inset
 
  < 
-\begin_inset Formula $RD_{MT}(v)$
+\begin_inset Formula $RD_{MT}(V)$
 \end_inset
 
  and 
-\begin_inset Formula $ITRD_{HT-MT}(h)$
+\begin_inset Formula $ITRD_{HT-MT}(H)$
 \end_inset
 
 , then the helper thread LLC request is considered 
@@ -1961,15 +2110,22 @@ if
 ugly
 \shape default
  because both its data and its victim data have larger reuse distances than
- the data h.
+ the data H.
  It has little performance impact on main thread performance because the
  requested data is not referenced by main thread before evicted and it does
  not evict any data that will be used by main thread.
 \end_layout
 
 \begin_layout Standard
-We can see that, good and bad helper thread LLC requests are caused by the
- optimal and non-optimal LLC replacement in the presence of helper threaded
+As depicted in Fig.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:taxonomy_ht_llc_requests"
+
+\end_inset
+
+, We can see that, good and bad helper thread LLC requests are caused by
+ the optimal and non-optimal LLC replacement in the presence of helper threaded
  data prefetching on CMPs, respectively.
  We can conclude that
 \end_layout
@@ -2003,61 +2159,12 @@ High
  well between the main thread and helper thread.
 \end_layout
 
-\begin_layout Subsubsection
-The Refined Taxonomy of Helper Thread LLC Requests
-\end_layout
-
-\begin_layout Standard
-As noted in the previous section, good helper thread LLC requests can be
- further divided into timely requests and late requests.
- A helper thread request is called 
-\shape italic
-late helper thread request 
-\shape default
-if its requested data has not yet returned from the main memory by the time
- an main thread LLC request references the data.
- Late helper thread requests only partially hide the LLC miss latency in
- main thread requests, but they are good indicators for potential performance
- improvement of the helper threaded prefetching scheme because late helper
- thread requests may be converted to timely helper thread requests by adjusting
- the aggressiveness parameters of the helper threaded prefetching scheme,
- i.e., lookahead and stride.
- 
-\end_layout
-
-\begin_layout Standard
-As we can observe that, if the helper thread request is too late, then when
- the request arrives at LLC, it find its referenced data is already present
- in either LLC or LLC MSHRs.
- Therefore, we can add 
-\shape italic
-redundant_mshr helper thread request 
-\shape default
-and
-\shape italic
- redundant_cache helper thread request 
-\shape default
-to the taxonomy.
- The final refined taxonomy of helper thread LLC requests is summarized
- in Fig.
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:taxonomy_ht_llc_requests"
-
-\end_inset
-
-.
-\shape italic
-\color red
-(to be explained in detail)
-\end_layout
-
 \begin_layout Standard
 \align center
 \begin_inset Float figure
 wide false
 sideways false
-status open
+status collapsed
 
 \begin_layout Plain Layout
 \align center
@@ -2095,6 +2202,50 @@ name "fig:taxonomy_ht_llc_requests"
 \end_inset
 
 
+\end_layout
+
+\begin_layout Subsubsection
+Add Lateness to the Taxonomy of Helper Thread LLC Requests
+\end_layout
+
+\begin_layout Standard
+As noted in the previous section, good helper thread LLC requests can be
+ further divided into timely requests and late requests.
+ A helper thread request is called 
+\shape italic
+late helper thread request 
+\shape default
+if its requested data has not yet returned from the main memory by the time
+ a main thread LLC request references the data.
+ Late helper thread requests only partially hide the LLC miss latency in
+ main thread requests, but they are good indicators for potential performance
+ improvement of the helper threaded prefetching scheme because late helper
+ thread requests may be converted to timely helper thread requests by adjusting
+ the aggressiveness parameters of the helper threaded prefetching scheme,
+ i.e., lookahead and stride.
+ 
+\end_layout
+
+\begin_layout Standard
+As we can observe that, if the helper thread request is too late, then when
+ the request arrives at LLC, it find its referenced data is already present
+ in either LLC or LLC MSHRs.
+ Therefore, we can add 
+\shape italic
+redundant_mshr helper thread request 
+\shape default
+and
+\shape italic
+ redundant_cache helper thread request 
+\shape default
+to the taxonomy, as shown in Fig.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:taxonomy_ht_llc_requests"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsection
@@ -2174,15 +2325,15 @@ Detecting Late Helper Thread LLC Requests
 
 \begin_layout Standard
 Lastly, in order to measure late helper thread requests, we need to identify
- the event when an main thread request hits to an LLC line which is being
- brought by an inflight helper thread request coming from the upper level
+ the event when a main thread request hits to an LLC line which is being
+ brought by an in-flight helper thread request coming from the upper level
  cache.
  This can be accomplished by monitoring the LLC Miss Status Holding Register
  (MSHR).
  MSHR is a hardware structure that keeps track of all in-flight memory requests.
- An helper thread LLC request is late if an main thread LLC request for
- the same address is generated while the helper thread LLC request is in
- the LLC MSHR waiting for main memory.
+ An helper thread LLC request is late if a main thread LLC request for the
+ same address is generated while the helper thread LLC request is in the
+ LLC MSHR waiting for main memory.
 \end_layout
 
 \begin_layout Subsubsection
@@ -2190,28 +2341,29 @@ Tracking Helper Thread LLC Requests and Victims
 \end_layout
 
 \begin_layout Standard
-There are two invariants that should be maintained
+There are two following invariants that should be maintained between LLC
+ and HTRVC per set
 \end_layout
 
 \begin_layout Enumerate
-# of helper thread Lines in the LLC Set = # of Victim Entries in the HTRVC
- Set;
+Number of helper thread Lines in the LLC Set = Number of Victim Entries
+ in the HTRVC Set;
 \end_layout
 
 \begin_layout Enumerate
-# of Victim Entries in HTRVC Set + # of Valid main thread LLC Lines in Set
- ≤ LLC Set Associativity.
+Number of Victim Entries in HTRVC Set + Number of Valid main thread LLC
+ Lines in Set ≤ LLC Set Associativity.
 \end_layout
 
 \begin_deeper
 \begin_layout Standard
-Helper thread lines refer to the cache lines that are brought by helper
- thread requests.
- From the above two invariants, we can easily conclude that: # of helper
- thread Lines in the LLC Set+ # of Valid main thread LLC Lines in Set ≤
- LLC Set Associativity.
- Actions should be taken in LLC and HTRVC when filling an LLC line or servicing
- an incoming LLC request.
+Helper thread lines refer to the LLC lines that are brought by helper thread
+ requests.
+ From the above two invariants, we can easily conclude that: Number of helper
+ thread Lines in the LLC Set+ Number of Valid main thread LLC Lines in Set
+ ≤ LLC Associativity.
+ Actions should be taken in LLC and HTRVC when filling an LLC line and servicing
+ an incoming LLC request either from the main thread or the helper thread.
 \end_layout
 
 \end_deeper
@@ -2225,43 +2377,43 @@ When filling an LLC line, we should consider four cases
 
 \begin_layout Enumerate
 An helper thread request evicts an INVALID line.
- In this case, no eviction is needed.
+ In this case, no eviction is needed;
 \end_layout
 
 \begin_layout Enumerate
 An helper thread request evicts an LLC line which is previously brought
- by an main thread request.
+ by a main thread request.
  In this case, eviction is needed to make room for the incoming helper thread
- request.
+ request;
 \end_layout
 
 \begin_layout Enumerate
 An helper thread request evicts an LLC line which is previously brought
- by an helper thread request.
+ by a helper thread request.
  In this case, eviction is needed to make room for the incoming helper thread
- request.
+ request;
 \end_layout
 
 \begin_layout Enumerate
 An main thread request evicts an LLC line which is previously brought by
- an helper thread request.
+ a helper thread request.
  In this case, eviction is needed to make room for the incoming main thread
  request.
 \end_layout
 
 \begin_layout Standard
-Specific actions taken on the above five cases are listed in Fig.
+Specific actions taken on the above four cases are listed in Fig.
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "fig:inserting-an-LLC-line"
 
 \end_inset
 
-, where hitInLLC: whether the request hits in LLC or not, requesterIsHT:
- whether the request comes from helper thread or not, hasEviction: whether
- the request needs to evict some data, lineFoundIsHT: whether the LLC line
- found is brought by helper thread or not, and htRequestFound(): whether
- there is at least one line in the LLC set that is brought by helper thread.
+, where hitInLLC indicates whether the request hits in LLC or not; requesterIsHe
+lperThread indicates whether the request comes from helper thread or not;
+ hasEviction indicates whether the request needs to evict some data; lineFoundIs
+HelperThread indicates whether the LLC line found is brought by helper thread
+ or not.
 \end_layout
 
 \begin_layout Standard
@@ -2409,39 +2561,39 @@ When servicing an incoming LLC request, either hit or miss, we should consider
 
 \begin_layout Enumerate
 LLC miss and victim hit, which indicates a bad helper thread request.
- This happens when helper thread request evicts useful data.
+ This happens when helper thread request evicts useful data;
 \end_layout
 
 \begin_layout Enumerate
 Helper thread LLC hit, which indicates a good helper thread request.
  This happens when helper thread requested data is hit by main thread request
- before evicted data.
+ before evicted data;
 \end_layout
 
 \begin_layout Enumerate
 Helper thread LLC hit and victim hit.
  This happens when useful data is evicted and brought back in by helper
- thread request.
+ thread request;
 \end_layout
 
 \begin_layout Enumerate
 Main thread LLC hit and victim hit.
  This happens when useful data is evicted and brought back in by helper
- thread request and hit to by main thread request.
+ thread request and hit to by main thread request;
 \end_layout
 
 \begin_layout Standard
-Specific actions taken on the above five cases are listed in Fig.
+Specific actions taken on the above four cases are listed in Fig.
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "fig:Servicing-an-LLC-Request"
 
 \end_inset
 
-, where mtHit: whether the request comes from main thread and hits in the
- LLC, htHit: whether the request comes from helper thread and hits in the
- LLC, and vtHit: whether the request comes from main thread and hits in
- the HTRVC.
+, where mainThreadHit indicates whether the request comes from main thread
+ and hits in the LLC; helperThreadHit indicates whether the request comes
+ from helper thread and hits in the LLC; and victimHit indicates whether
+ the request comes from main thread and hits in the HTRVC.
 \end_layout
 
 \begin_layout Standard
@@ -2589,11 +2741,56 @@ name "fig:Servicing-an-LLC-Request"
 
 \end_layout
 
+\begin_layout Section
+Performance Results
+\end_layout
+
 \begin_layout Subsection
-Results Overview
-\shape italic
-\color red
-(to be expanded)
+Basic Results
+\end_layout
+
+\begin_layout Standard
+Tab.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "tab:mst-Baseline-Performance"
+
+\end_inset
+
+ shows the overall performance of mst benchmark baseline version, in which
+ L2 size is varied from 96 KB to 2 MB and L2 associativity is varied from
+ 2 to 16, respectively.
+ In Tab.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "tab:mst-Baseline-Performance"
+
+\end_inset
+
+ (a), we can see that when the L2 size is greater than 128 KB, there is
+ no difference in execution time, implying the working set of mst 
+\begin_inset Quotes eld
+\end_inset
+
+2048 1
+\begin_inset Quotes erd
+\end_inset
+
+ with helper threaded prefetching switched off is near 128 KB.
+ L2 sizes larger than 128 KB contribute little to the overall performance.
+ Tab.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "tab:mst-Baseline-Performance"
+
+\end_inset
+
+ (b) shows that the execution time is insensitive to the L2 associativity
+ when the latter is greater than 4.
+ Trivial speedups are observed in these basic experiments of mst benchmark
+ baseline versions, which is however in contrast to the results observed
+ in mst helper threaded prefetching versions as we will discuss shortly
+ after.
 \end_layout
 
 \begin_layout Standard
@@ -2634,10 +2831,8 @@ status open
 
 \begin_layout Plain Layout
 
-\size small
-(a) 
-\size default
-Impact of L2 Size
+\size footnotesize
+(a) Impact of L2 Size
 \end_layout
 
 \end_inset
@@ -2668,10 +2863,8 @@ Impact of L2 Size
 
 \begin_layout Plain Layout
 
-\size small
-(b) 
-\size default
-Impact of L2 Associativity
+\size footnotesize
+(b) Impact of L2 Associativity
 \end_layout
 
 \end_inset
@@ -2686,6 +2879,13 @@ Impact of L2 Associativity
 
 \begin_layout Plain Layout
 mst Baseline Performance
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:mst-Baseline-Performance"
+
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -2736,10 +2936,8 @@ status open
 
 \begin_layout Plain Layout
 
-\size small
-(a) 
-\size default
-Impact of L2 Size
+\size footnotesize
+(a) Impact of L2 Size
 \end_layout
 
 \end_inset
@@ -2770,10 +2968,8 @@ Impact of L2 Size
 
 \begin_layout Plain Layout
 
-\size small
-(b) 
-\size default
-Impact of L2 Associativity
+\size footnotesize
+(b) Impact of L2 Associativity
 \end_layout
 
 \end_inset
@@ -2788,7 +2984,9 @@ Impact of L2 Associativity
 
 \begin_layout Plain Layout
 mst Helper Threaded Prefetching Performance
-\end_layout
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:mst-Helper-Threaded-Prefetching-Performance"
 
 \end_inset
 
@@ -2798,13 +2996,106 @@ mst Helper Threaded Prefetching Performance
 \end_inset
 
 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Tab.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "tab:mst-Helper-Threaded-Prefetching-Performance"
+
+\end_inset
+
+ shows the overall performance of mst benchmark helper threaded prefetching
+ version, in which L2 size is varied from 96 KB to 2 MB and L2 associativity
+ is varied from 2 to 16, respectively.
+ In Tab.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "tab:mst-Helper-Threaded-Prefetching-Performance"
+
+\end_inset
+
+ (a), we can see that when the L2 size is greater than 512 KB, there is
+ no difference in execution time, implying the working set of mst 
+\begin_inset Quotes eld
+\end_inset
+
+2048 1
+\begin_inset Quotes erd
+\end_inset
+
+ with helper threaded prefetching switched on is near 512 KB.
+ L2 sizes larger than 512 KB contribute little to the overall performance.
+ Tab.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "tab:mst-Helper-Threaded-Prefetching-Performance"
+
+\end_inset
+
+ (b) shows that the execution time is reduced slightly as the L2 associativity
+ is increased from 2 to 32.
+ The presence of helper threaded prefetching increases the working set of
+ mst 
+\begin_inset Quotes eld
+\end_inset
+
+2048 1
+\begin_inset Quotes erd
+\end_inset
+
+ from 128 KB in the baseline version to 512 KB, and also incur much more
+ conflict misses.
+ The number of bad prefetches is reduced from 3M to zero when L2 size is
+ increased from 96 KB to 512 KB (the working set limit).
+ The increase of L2 associativity can also reduce the number of bad prefetches
+ as well.
+ We can see that bad prefetches are in the forms of capacity and conflict
+ misses in this scenario.
+ About 1%-3% reductions of execution time are achieved in these basic experiment
+s of mst benchmark helper threaded prefetching versions.
+ A maximum 22% reduction of execution is achieved between baseline and helper
+ threaded versions of mst in these basic experiments, which shows our implemente
+d helper threaded prefetching scheme is non-trivially effective for the
+ mst benchmark.
 \end_layout
 
 \begin_layout Subsection
 Impact of L2 Size
-\shape italic
-\color red
-(to be expanded)
+\end_layout
+
+\begin_layout Standard
+Fig.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Impact-of-L2-Size-mst-ht"
+
+\end_inset
+
+ shows the normalized execution times in cycles and helper threaded L2 request
+ breakdown for the mst helper threaded prefetching version when the L2 size
+ is increased from 96 KB to 2 MB.
+ For clarity, execution times are normalized to the first case in the figure
+ where L2 size is 96 KB, where the 128 KB working set limit of mst 
+\begin_inset Quotes eld
+\end_inset
+
+2048
+\begin_inset Quotes erd
+\end_inset
+
+ helper threaded prefetching version is reiterated.
+ A few ugly helper thread L2 requests are observed when the L2 size is as
+ small as 96 KB, which results from where the helper thread first prefetch
+ some potentially useful data into the L2 cache, but due to the limited
+ capacity of the L2 cache, these data are evicted too early from the L2
+ cache before the main thread uses them.
 \end_layout
 
 \begin_layout Standard
@@ -2812,7 +3103,7 @@ Impact of L2 Size
 \begin_inset Float figure
 wide false
 sideways false
-status open
+status collapsed
 
 \begin_layout Plain Layout
 \align center
@@ -2863,7 +3154,7 @@ status open
 
 \begin_layout Plain Layout
 
-\size small
+\size footnotesize
 (a) Normalized Total Cycles
 \end_layout
 
@@ -2874,7 +3165,7 @@ status open
 
 \begin_layout Plain Layout
 
-\size small
+\size footnotesize
 (b) Helper Thread L2 Request Breakdown
 \end_layout
 
@@ -2898,6 +3189,13 @@ status open
 \begin_layout Plain Layout
 Impact of L2 Size on mst Helper Threaded Prefetching Performance (lookahead=20,
  stride=10)
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Impact-of-L2-Size-mst-ht"
+
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -2916,9 +3214,52 @@ Impact of L2 Size on mst Helper Threaded Prefetching Performance (lookahead=20,
 
 \begin_layout Subsection
 Impact of L2 Associativity
-\shape italic
-\color red
-(to be expanded)
+\end_layout
+
+\begin_layout Standard
+Fig.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Impact-of-L2-Assoc-mst-ht"
+
+\end_inset
+
+ shows the normalized execution times in cycles and helper threaded L2 request
+ breakdown for the mst helper threaded prefetching version when the L2 associati
+vity is varied from 2 to 16.
+ For clarity, execution times are normalized to the first case in the figure
+ where L2 associativity is 2.
+ A few ugly helper thread L2 requests are observed when the L2 associativity
+ is smaller than 16, which results from where the helper thread first prefetch
+ some potentially useful data into the L2 cache, but due to the limited
+ associativity of the L2 cache, these data are evicted too early from the
+ L2 cache before the main thread uses them.
+ 
+\end_layout
+
+\begin_layout Standard
+One important point to notice is that, a few redundant hit-to-cache helper
+ thread L2 requests are constantly observed among the experiments shown
+ in Fig.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Impact-of-L2-Size-mst-ht"
+
+\end_inset
+
+ and Fig.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Impact-of-L2-Assoc-mst-ht"
+
+\end_inset
+
+, which implies the helper thread is sometimes initiated too late to prefetch
+ the data, as the data is already put in the L2 cache by the main thread,
+ thus leading to the waste of cache resource and on-chip interconnect bandwidth.
+ This deficiency can only be improved by fine-tuning the helper threaded
+ prefetching program code, which is out of the scope of this work.
 \end_layout
 
 \begin_layout Standard
@@ -2926,7 +3267,7 @@ Impact of L2 Associativity
 \begin_inset Float figure
 wide false
 sideways false
-status open
+status collapsed
 
 \begin_layout Plain Layout
 \align center
@@ -2975,9 +3316,9 @@ status open
 \begin_inset Text
 
 \begin_layout Plain Layout
-(a) 
-\size small
-Normalized Total Cycles
+
+\size footnotesize
+(a) Normalized Total Cycles
 \end_layout
 
 \end_inset
@@ -2987,7 +3328,7 @@ Normalized Total Cycles
 
 \begin_layout Plain Layout
 
-\size small
+\size footnotesize
 (b) Helper Thread L2 Request Breakdown
 \end_layout
 
@@ -3011,6 +3352,13 @@ Normalized Total Cycles
 \begin_layout Plain Layout
 Impact of L2 Associativity on mst Helper Threaded Prefetching Performance
  (lookahead=20, stride=10)
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Impact-of-L2-Assoc-mst-ht"
+
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -3025,9 +3373,42 @@ Impact of L2 Associativity on mst Helper Threaded Prefetching Performance
 
 \begin_layout Subsection
 Impact of Prefetching Lookahead
-\shape italic
-\color red
-(to be expanded)
+\end_layout
+
+\begin_layout Standard
+Below we see how the two parameters lookahead and stride of the helper threaded
+ prefetching scheme affects the helper thread L2 request breakdown and thus
+ the overall performance.
+ Fig.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Impact-of-Lookahead-mst-ht"
+
+\end_inset
+
+ shows the normalized execution times in cycles and helper threaded L2 request
+ breakdown for the mst helper threaded prefetching version when the lookahead
+ is varied from 10 to 480.
+ For clarity, execution times are normalized to the first case in the figure
+ where the lookahead is 10.
+ We can see that when the stride is less than 40, the execution time increases
+ monotonically as the lookahead is increased from 10 to 640.
+ But this is not the case when the stride is greater than 40, where the
+ maximum reduction in execution time is achieved in the middle value of
+ the lookahead.
+ 
+\end_layout
+
+\begin_layout Standard
+We must note that when the lookahead is small and the stride is large, there
+ is a large portion of late helper thread L2 requests which can be explained
+ intuitively as the helper thread skips too little in the prelude and prefetches
+ too much in the stable state to keep running ahead of the main thread to
+ fetch the data.
+ In the other hand, when the lookahead is increased from 10 to 480 and the
+ stride is large, the number of timely helper thread L2 requests diminishes,
+ which implies the helper thread does too little prefetching work to provide
+ tangible overall performance improvement.
 \end_layout
 
 \begin_layout Standard
@@ -3035,7 +3416,7 @@ Impact of Prefetching Lookahead
 \begin_inset Float figure
 wide false
 sideways false
-status open
+status collapsed
 
 \begin_layout Plain Layout
 \align center
@@ -3084,11 +3465,9 @@ status open
 \begin_inset Text
 
 \begin_layout Plain Layout
-(1a) 
-\size small
-Normalized Total Cycles 
-\size default
-(stride=10)
+
+\size footnotesize
+(1a) Normalized Total Cycles (stride=10)
 \end_layout
 
 \end_inset
@@ -3098,10 +3477,8 @@ Normalized Total Cycles
 
 \begin_layout Plain Layout
 
-\size small
-(1b) Helper Thread L2 Request Breakdown 
-\size default
-(stride=10)
+\size footnotesize
+(1b) Helper Thread L2 Request Breakdown (stride=10)
 \end_layout
 
 \end_inset
@@ -3161,11 +3538,9 @@ Normalized Total Cycles
 \begin_inset Text
 
 \begin_layout Plain Layout
-(2a) 
-\size small
-Normalized Total Cycles 
-\size default
-(stride=20)
+
+\size footnotesize
+(2a) Normalized Total Cycles (stride=20)
 \end_layout
 
 \end_inset
@@ -3175,10 +3550,8 @@ Normalized Total Cycles
 
 \begin_layout Plain Layout
 
-\size small
-(2b) Helper Thread L2 Request Breakdown 
-\size default
-(stride=20)
+\size footnotesize
+(2b) Helper Thread L2 Request Breakdown (stride=20)
 \end_layout
 
 \end_inset
@@ -3238,11 +3611,9 @@ Normalized Total Cycles
 \begin_inset Text
 
 \begin_layout Plain Layout
-(3a) 
-\size small
-Normalized Total Cycles 
-\size default
-(stride=40)
+
+\size footnotesize
+(3a) Normalized Total Cycles (stride=40)
 \end_layout
 
 \end_inset
@@ -3252,10 +3623,8 @@ Normalized Total Cycles
 
 \begin_layout Plain Layout
 
-\size small
-(3b) Helper Thread L2 Request Breakdown 
-\size default
-(stride=40)
+\size footnotesize
+(3b) Helper Thread L2 Request Breakdown (stride=40)
 \end_layout
 
 \end_inset
@@ -3315,11 +3684,9 @@ Normalized Total Cycles
 \begin_inset Text
 
 \begin_layout Plain Layout
-(4a) 
-\size small
-Normalized Total Cycles 
-\size default
-(stride=80)
+
+\size footnotesize
+(4a) Normalized Total Cycles (stride=80)
 \end_layout
 
 \end_inset
@@ -3329,10 +3696,8 @@ Normalized Total Cycles
 
 \begin_layout Plain Layout
 
-\size small
-(4b) Helper Thread L2 Request Breakdown 
-\size default
-(stride=80)
+\size footnotesize
+(4b) Helper Thread L2 Request Breakdown (stride=80)
 \end_layout
 
 \end_inset
@@ -3392,11 +3757,9 @@ Normalized Total Cycles
 \begin_inset Text
 
 \begin_layout Plain Layout
-(5a) 
-\size small
-Normalized Total Cycles 
-\size default
-(stride=160)
+
+\size footnotesize
+(5a) Normalized Total Cycles (stride=160)
 \end_layout
 
 \end_inset
@@ -3406,10 +3769,8 @@ Normalized Total Cycles
 
 \begin_layout Plain Layout
 
-\size small
-(5b) Helper Thread L2 Request Breakdown 
-\size default
-(stride=160)
+\size footnotesize
+(5b) Helper Thread L2 Request Breakdown (stride=160)
 \end_layout
 
 \end_inset
@@ -3469,11 +3830,9 @@ Normalized Total Cycles
 \begin_inset Text
 
 \begin_layout Plain Layout
-(6a) 
-\size small
-Normalized Total Cycles 
-\size default
-(stride=320)
+
+\size footnotesize
+(6a) Normalized Total Cycles (stride=320)
 \end_layout
 
 \end_inset
@@ -3483,10 +3842,8 @@ Normalized Total Cycles
 
 \begin_layout Plain Layout
 
-\size small
-(4b) Helper Thread L2 Request Breakdown 
-\size default
-(stride=320)
+\size footnotesize
+(6b) Helper Thread L2 Request Breakdown (stride=320)
 \end_layout
 
 \end_inset
@@ -3546,11 +3903,9 @@ Normalized Total Cycles
 \begin_inset Text
 
 \begin_layout Plain Layout
-(7a) 
-\size small
-Normalized Total Cycles 
-\size default
-(stride=480)
+
+\size footnotesize
+(7a) Normalized Total Cycles (stride=480)
 \end_layout
 
 \end_inset
@@ -3560,10 +3915,8 @@ Normalized Total Cycles
 
 \begin_layout Plain Layout
 
-\size small
-(5b) Helper Thread L2 Request Breakdown 
-\size default
-(stride=480)
+\size footnotesize
+(7b) Helper Thread L2 Request Breakdown (stride=480)
 \end_layout
 
 \end_inset
@@ -3585,6 +3938,13 @@ Normalized Total Cycles
 
 \begin_layout Plain Layout
 Impact of Prefetching Lookahead on mst Helper Threaded Prefetching Performance
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Impact-of-Lookahead-mst-ht"
+
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -3599,9 +3959,50 @@ Impact of Prefetching Lookahead on mst Helper Threaded Prefetching Performance
 
 \begin_layout Subsection
 Impact of Prefetching Stride
-\shape italic
-\color red
-(to be expanded)
+\end_layout
+
+\begin_layout Standard
+Fig.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Impact-of-Stride-mst-ht"
+
+\end_inset
+
+ shows the normalized execution times in cycles and helper threaded L2 request
+ breakdown for the mst helper threaded prefetching version when the stride
+ is varied from 10 to 480.
+ For clarity, execution times are normalized to the first case in the figure
+ where the stride is 10.
+ 
+\end_layout
+
+\begin_layout Standard
+We can see the relationship between the values of stride and the overall
+ performance varies under different values of lookahead:
+\end_layout
+
+\begin_layout Enumerate
+When the lookahead is less than 40, the execution time increases monotonically
+ as the stride is increased from 10 to 640.
+ It can be obviously interpreted as the harmful impacts of the increasing
+ prohibitively large portion of late prefetches shown in red in the figure;
+\end_layout
+
+\begin_layout Enumerate
+When the lookahead are 40 and 80, the greatest speedups are achieved when
+ the stride is in the middle values of 80 and 320, respectively.
+ It reflects the ongoing battle between the positive and negative performance
+ gains from timely and late helper thread prefetches, respectively;
+\end_layout
+
+\begin_layout Enumerate
+When the lookahead is greater than 160, the number of late helper thread
+ prefetches diminishes to zero.
+ This can be explained as the large value of lookahead in the prelude prevents
+ the helper thread from lagging behind the main thread in the stable state.
+ However, in this case, the execution time increases monotonically again
+ as the value of lookahead becomes greater.
 \end_layout
 
 \begin_layout Standard
@@ -3658,11 +4059,9 @@ status open
 \begin_inset Text
 
 \begin_layout Plain Layout
-(1a) 
-\size small
-Normalized Total Cycles 
-\size default
-(lookahead=10)
+
+\size footnotesize
+(1a) Normalized Total Cycles (lookahead=10)
 \end_layout
 
 \end_inset
@@ -3672,10 +4071,8 @@ Normalized Total Cycles
 
 \begin_layout Plain Layout
 
-\size small
-(1b) Helper Thread L2 Request Breakdown 
-\size default
-(lookahead=10)
+\size footnotesize
+(1b) Helper Thread L2 Request Breakdown (lookahead=10)
 \end_layout
 
 \end_inset
@@ -3735,11 +4132,9 @@ Normalized Total Cycles
 \begin_inset Text
 
 \begin_layout Plain Layout
-(2a) 
-\size small
-Normalized Total Cycles 
-\size default
-(lookahead=20)
+
+\size footnotesize
+(2a) Normalized Total Cycles (lookahead=20)
 \end_layout
 
 \end_inset
@@ -3749,10 +4144,8 @@ Normalized Total Cycles
 
 \begin_layout Plain Layout
 
-\size small
-(2b) Helper Thread L2 Request Breakdown 
-\size default
-(lookahead=20)
+\size footnotesize
+(2b) Helper Thread L2 Request Breakdown (lookahead=20)
 \end_layout
 
 \end_inset
@@ -3812,11 +4205,9 @@ Normalized Total Cycles
 \begin_inset Text
 
 \begin_layout Plain Layout
-(3a) 
-\size small
-Normalized Total Cycles 
-\size default
-(lookahead=40)
+
+\size footnotesize
+(3a) Normalized Total Cycles (lookahead=40)
 \end_layout
 
 \end_inset
@@ -3826,10 +4217,8 @@ Normalized Total Cycles
 
 \begin_layout Plain Layout
 
-\size small
-(3b) Helper Thread L2 Request Breakdown 
-\size default
-(lookahead=40)
+\size footnotesize
+(3b) Helper Thread L2 Request Breakdown (lookahead=40)
 \end_layout
 
 \end_inset
@@ -3889,11 +4278,9 @@ Normalized Total Cycles
 \begin_inset Text
 
 \begin_layout Plain Layout
-(4a) 
-\size small
-Normalized Total Cycles 
-\size default
-(lookahead=80)
+
+\size footnotesize
+(4a) Normalized Total Cycles (lookahead=80)
 \end_layout
 
 \end_inset
@@ -3903,10 +4290,8 @@ Normalized Total Cycles
 
 \begin_layout Plain Layout
 
-\size small
-(4b) Helper Thread L2 Request Breakdown 
-\size default
-(lookahead=80)
+\size footnotesize
+(4b) Helper Thread L2 Request Breakdown (lookahead=80)
 \end_layout
 
 \end_inset
@@ -3966,11 +4351,9 @@ Normalized Total Cycles
 \begin_inset Text
 
 \begin_layout Plain Layout
-(5a) 
-\size small
-Normalized Total Cycles 
-\size default
-(lookahead=160)
+
+\size footnotesize
+(5a) Normalized Total Cycles (lookahead=160)
 \end_layout
 
 \end_inset
@@ -3980,10 +4363,8 @@ Normalized Total Cycles
 
 \begin_layout Plain Layout
 
-\size small
-(5b) Helper Thread L2 Request Breakdown 
-\size default
-(lookahead=160)
+\size footnotesize
+(5b) Helper Thread L2 Request Breakdown (lookahead=160)
 \end_layout
 
 \end_inset
@@ -4043,11 +4424,9 @@ Normalized Total Cycles
 \begin_inset Text
 
 \begin_layout Plain Layout
-(6a) 
-\size small
-Normalized Total Cycles 
-\size default
-(lookahead=320)
+
+\size footnotesize
+(6a) Normalized Total Cycles (lookahead=320)
 \end_layout
 
 \end_inset
@@ -4057,10 +4436,8 @@ Normalized Total Cycles
 
 \begin_layout Plain Layout
 
-\size small
-(4b) Helper Thread L2 Request Breakdown 
-\size default
-(lookahead=320)
+\size footnotesize
+(6b) Helper Thread L2 Request Breakdown (lookahead=320)
 \end_layout
 
 \end_inset
@@ -4120,11 +4497,9 @@ Normalized Total Cycles
 \begin_inset Text
 
 \begin_layout Plain Layout
-(7a) 
-\size small
-Normalized Total Cycles 
-\size default
-(lookahead=480)
+
+\size footnotesize
+(7a) Normalized Total Cycles (lookahead=480)
 \end_layout
 
 \end_inset
@@ -4134,10 +4509,8 @@ Normalized Total Cycles
 
 \begin_layout Plain Layout
 
-\size small
-(5b) Helper Thread L2 Request Breakdown 
-\size default
-(lookahead=480)
+\size footnotesize
+(7b) Helper Thread L2 Request Breakdown (lookahead=480)
 \end_layout
 
 \end_inset
@@ -4159,7 +4532,9 @@ Normalized Total Cycles
 
 \begin_layout Plain Layout
 Impact of Prefetching Stride on mst Helper Threaded Prefetching Performance
-\end_layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Impact-of-Stride-mst-ht"
 
 \end_inset
 
@@ -4169,13 +4544,39 @@ Impact of Prefetching Stride on mst Helper Threaded Prefetching Performance
 \end_inset
 
 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Summary
+\end_layout
+
+\begin_layout Standard
+From the above discussion on experimental results, we can conclude that,
+ (1) too much late prefetches do great harm to the performance improvement
+ of helper threaded prefetching; (2) the helper threaded prefetching parameters
+ of lookahead and stride should and can be dynamically changed to balance
+ the portions of timely and late prefetches using feedback directed mechanisms,
+ thus leading to the maximal performance of helper threaded prefetching
+ on CMPs; (3) there is little bad prefetches observed in our experiments
+ on mst 
+\begin_inset Quotes eld
+\end_inset
+
+2048 1
+\begin_inset Quotes erd
+\end_inset
+
+, but it is expected to be prevalent in larger input set of the mst benchmark
+ and other memory-intensive workloads.
 \end_layout
 
 \begin_layout Section
-Related Work 
-\shape italic
-\color red
-(to be expanded)
+Related Work
 \end_layout
 
 \begin_layout Subsection
@@ -4184,9 +4585,9 @@ Prefetch Taxonomies
 
 \begin_layout Standard
 Even though helper threaded data prefetching mechanisms have been studied
- for a long time, LLC interferece and taxonomy of helper thread LLC requests
+ for a long time, LLC interference and taxonomy of helper thread LLC requests
  have not been studied before.
- Here we briefly describe previous work in the context of hardware prefething.
+ Here we briefly describe previous work in the context of hardware prefetching.
  Our taxonomy of helper thread LLC requests is mostly similar to the work
  in 
 \begin_inset CommandInset citation
@@ -4195,7 +4596,7 @@ key "Mehta2004"
 
 \end_inset
 
-, which presents a taxonomy of hardware prefetches based on the idea of
+, which presented a taxonomy of hardware prefetches based on the idea of
  shared cache pollution in the hardware based data prefetching for shared
  L2 CMP.
  A hardware structure called the 
@@ -4206,7 +4607,7 @@ Evict Table
  caused by hardware prefetching.
  The HTRVC in our proposal is similar to the evict table, however it is
  used for tracking helper thread request victims instead of hardware prefetch
- victims .
+ victims.
  Good, bad and ugly requests are identified based on cache replacement activitie
 s involved by hardware prefetches.
  
@@ -4216,8 +4617,9 @@ key "Jerger2006"
 
 \end_inset
 
- developed a multiprocessor prefetch traffic and miss taxonomy that builds
- on existing uniprocessor taxonomy.
+ took the bandwidth consumption into account, and developed a multiprocessor
+ prefetch traffic and miss taxonomy that builds on an existing uniprocessor
+ prefetch taxonomy.
 \end_layout
 
 \begin_layout Subsection
@@ -4225,17 +4627,32 @@ Prefetch Aware Cache Content Management
 \end_layout
 
 \begin_layout Standard
+Some previous works have studied the problem of cache content management
+ in the presence of data prefetching, which are in the forms of software,
+ hardware and hybrid.
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Chen1991"
+
+\end_inset
+
+ proposed a prefetch buffer that can be attached to the L2 cache to filter
+ the prefetched data from polluting the L2 cache, which is similar but different
+ from our proposed HTRVC cache structure whose sole function is for profiling
+ helper thread L2 requests' victims.
+ 
 \begin_inset CommandInset citation
 LatexCommand cite
 key "WuJMSE2011"
 
 \end_inset
 
- characterizes the performance of state-of-the-art LLC management policies
+ characterized the performance of state-of-the-art LLC management policies
  in the presence and absence of hardware prefetching.
  Prefetch-Aware Cache Management (PACMan) is proposed to dynamically estimates
  and mitigates the degree of prefetch-induced cache interference by modifying
- the cache insertion and hit promotion policies to treat domand and prefetch
+ the cache insertion and hit promotion policies to treat demand and prefetch
  requests differently.
  
 \begin_inset CommandInset citation
@@ -4244,21 +4661,35 @@ key "Srinath2007"
 
 \end_inset
 
- proposes a low-cost feedback directed mechanism for hardware prefetching.
+ proposed a low-cost feedback directed mechanism for hardware prefetching.
  The mechanism can be applied to any hardware prefetchers such as sequential
  prefetchers, stream-based prefetchers, GHB based prefetchers and PC-based
  stride prefetchers.
 \end_layout
 
 \begin_layout Section
-Conclusion 
-\shape italic
-\color red
-(to be filled)
+Conclusion
+\end_layout
+
+\begin_layout Standard
+This paper first discusses the intra-application reuse distances in the
+ helper threaded prefetching on shared cache CMPs and its implications on
+ helper thread performance.
+ Based on this, we then proposes the intra-application interference aware
+ taxonomy of helper thread LLC requests and its implementation details on
+ a cycle-accurate CMP architectural simulator.
+ Detailed experimental results of the memory intensive benchmark mst show
+ that: (1) too much late prefetches do great harm to the performance improvement
+ of helper threaded prefetching; and (2) the helper threading parameters
+ of lookahead and stride should and can be dynamically changed to balance
+ the portions of timely and late prefetches, thus leading to the maximal
+ exploitation of helper threaded prefetching in improving the performance
+ of irregular memory access workloads on shared cache CMPs.
+ It can be part of our future work.
 \end_layout
 
 \begin_layout Section*
-Acknowlegments
+Acknowledgments
 \end_layout
 
 \begin_layout Standard
