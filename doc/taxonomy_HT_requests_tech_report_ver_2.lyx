@@ -36,7 +36,7 @@
 \paperfontsize default
 \spacing single
 \use_hyperref true
-\pdf_title "LLC Partitioning for Helper Threaded Data Prefetching on CMPs"
+\pdf_title "Interactions between Shared Cache Partitioning and Helper Threading on CMPs"
 \pdf_author "Min Cai, Zhimin Gu"
 \pdf_keywords "Chip multiprocessors, helper threaded inter-core data prefetching, cache replacement, cache pollution, intra-application LLC interference"
 \pdf_bookmarks true
@@ -86,7 +86,7 @@
 \begin_body
 
 \begin_layout Title
-Shared Cache Partitioning for Helper Threaded Data Prefetching on CMPs
+Interactions between Shared Cache Partitioning and Helper Threading on CMPs
 \end_layout
 
 \begin_layout Author
@@ -108,6 +108,7 @@ Min Cai, School of Computer Science and Technology, Beijing Institute of
 \begin_inset CommandInset href
 LatexCommand href
 target "min.cai.china@gmail.com"
+type "mailto:"
 
 \end_inset
 
@@ -126,6 +127,7 @@ Zhimin Gu, School of Computer Science and Technology, Beijing Institute
 \begin_inset CommandInset href
 LatexCommand href
 target "zmgu@x263.net"
+type "mailto:"
 
 \end_inset
 
@@ -139,11 +141,12 @@ target "zmgu@x263.net"
 status open
 
 \begin_layout Plain Layout
-Xianhe Sun, School of Computer Science and Technology, Illinois Institute
- of Technology, Illinois, USA, e-mail: 
+Xianhe Sun, Department of Computer Science, Illinois Institute of Technology,
+ Chicago, Illinois, USA, e-mail: 
 \begin_inset CommandInset href
 LatexCommand href
-target "xxx"
+target "sun@iit.edu"
+type "mailto:"
 
 \end_inset
 
@@ -231,8 +234,8 @@ e architectural simulation, and highlighting the opportunities and challenges
 \end_layout
 
 \begin_layout Keywords
-Chip multiprocessors, helper thread, cache partitioning, intra-application
- cache pollution
+Chip multiprocessors, helper thread, shared cache partitioning, intra-applicatio
+n cache pollution
 \end_layout
 
 \begin_layout Section
@@ -294,7 +297,7 @@ status open
  data prefetching 
 \begin_inset CommandInset citation
 LatexCommand cite
-key "Kim2004,Lee2009"
+key "Kim2004,Byna2008,Lee2009"
 
 \end_inset
 

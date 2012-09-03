@@ -596,7 +596,7 @@
     <relative_filename></relative_filename>
     <key>Lee2009</key>
     <notes></notes>
-    <bib_type>Article</bib_type>
+    <bib_type>article</bib_type>
     <bib_doi></bib_doi>
     <bib_title>Prefetching with Helper Threads for Loosely Coupled Multiprocessor Systems</bib_title>
     <bib_authors>Lee, Jaejin and Jung, Changhee and Lim, Daeseob and Solihin, Yan</bib_authors>
@@ -634,6 +634,29 @@
     <bib_extra key="Author:corp">ACM SIGMICRO and IEEE Computer Society TC-MICRO</bib_extra>
     <bib_extra key="BookTitle">Proceedings of the 24th Annual International Symposium on Microarchitecture</bib_extra>
     <bib_extra key="Month">nov 18–20,</bib_extra>
+  </doc>
+  <doc>
+    <filename></filename>
+    <relative_filename></relative_filename>
+    <key>Byna2008</key>
+    <notes></notes>
+    <bib_type>inproceedings</bib_type>
+    <bib_doi>10.1109/I-SPAN.2008.24</bib_doi>
+    <bib_title>A Taxonomy of Data Prefetching Mechanisms</bib_title>
+    <bib_authors>Byna, Surendra and Chen, Yong and Sun, Xian-He</bib_authors>
+    <bib_journal></bib_journal>
+    <bib_volume></bib_volume>
+    <bib_number></bib_number>
+    <bib_pages>19-24</bib_pages>
+    <bib_year>2008</bib_year>
+    <bib_extra key="Acmid">1397185</bib_extra>
+    <bib_extra key="address">Washington, DC, USA</bib_extra>
+    <bib_extra key="booktitle">Proceedings of the The International Symposium on Parallel Architectures, Algorithms, and Networks</bib_extra>
+    <bib_extra key="Isbn">978-0-7695-3125-0</bib_extra>
+    <bib_extra key="Keywords">Data Prefetching, Prefetching Taxonomy, Prefetching Survey</bib_extra>
+    <bib_extra key="Numpages">6</bib_extra>
+    <bib_extra key="publisher">IEEE Computer Society</bib_extra>
+    <bib_extra key="Series">ISPAN ’08</bib_extra>
   </doc>
 </doclist>
 </library>
