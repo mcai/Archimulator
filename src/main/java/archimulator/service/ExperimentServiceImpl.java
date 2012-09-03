@@ -1029,6 +1029,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
             pw.println("yformat=%g");
             pw.println("=nogridy");
             pw.println("=norotate");
+//            pw.println("=patterns");
 
             pw.println("legendx=right");
             pw.println("legendy=center");

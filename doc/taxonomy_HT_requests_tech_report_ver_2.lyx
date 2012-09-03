@@ -2,7 +2,15 @@
 \lyxformat 413
 \begin_document
 \begin_header
-\textclass paper
+\textclass IEEEtran
+\begin_preamble
+% for subfigures/subtables
+\ifCLASSOPTIONcompsoc
+\usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
+\else
+\usepackage[caption=false,font=footnotesize]{subfig}
+\fi
+\end_preamble
 \use_default_options true
 \maintain_unincluded_children false
 \language english
@@ -26,9 +34,9 @@
 \index_command default
 \float_placement tbph
 \paperfontsize default
-\spacing onehalf
+\spacing single
 \use_hyperref true
-\pdf_title "Characterizing Intra-Application LLC Interference Caused by Helper Threaded Data Prefetching on CMPs"
+\pdf_title "LLC Partitioning for Helper Threaded Data Prefetching on CMPs"
 \pdf_author "Min Cai, Zhimin Gu"
 \pdf_keywords "Chip multiprocessors, helper threaded inter-core data prefetching, cache replacement, cache pollution, intra-application LLC interference"
 \pdf_bookmarks true
@@ -41,7 +49,7 @@
 \pdf_backref false
 \pdf_pdfusetitle true
 \papersize default
-\use_geometry true
+\use_geometry false
 \use_amsmath 1
 \use_esint 1
 \use_mhchem 1
@@ -78,8 +86,7 @@
 \begin_body
 
 \begin_layout Title
-Characterizing Intra-Application LLC Interference Caused by Helper Threaded
- Data Prefetching on CMPs
+Shared Cache Partitioning for Helper Threaded Data Prefetching on CMPs
 \end_layout
 
 \begin_layout Author
@@ -91,7 +98,7 @@ Cai, Zhimin
 \begin_inset space ~
 \end_inset
 
-Gu
+Gu, Xianhe Sun
 \begin_inset Foot
 status open
 
@@ -128,6 +135,58 @@ target "zmgu@x263.net"
 \end_inset
 
 
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+Xianhe Sun, School of Computer Science and Technology, Illinois Institute
+ of Technology, Illinois, USA, e-mail: 
+\begin_inset CommandInset href
+LatexCommand href
+target "xxx"
+
+\end_inset
+
+.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Page headings
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Proceedings of XXX
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+}{
+\end_layout
+
+\end_inset
+
+Min Cai 
+\begin_inset Flex Lowercase
+status open
+
+\begin_layout Plain Layout
+et al.
+\end_layout
+
+\end_inset
+
+: Shared Cache Partitioning for Helper Threaded Data Prefetching on CMPs
 \end_layout
 
 \begin_layout Abstract
@@ -172,8 +231,8 @@ e architectural simulation, and highlighting the opportunities and challenges
 \end_layout
 
 \begin_layout Keywords
-Chip multiprocessors, helper threaded data prefetching on CMPs, cache replacemen
-t, cache pollution, intra-application LLC interference
+Chip multiprocessors, helper thread, cache partitioning, intra-application
+ cache pollution
 \end_layout
 
 \begin_layout Section
@@ -181,7 +240,57 @@ Introduction
 \end_layout
 
 \begin_layout Standard
-For workloads exhibiting irregular memory access patterns, helper threaded
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+The 
+\series bold
+
+\backslash
+IEEEPARstart
+\series default
+ command is needed in the first paragraph fo the document.
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+IEEEPARstart{
+\end_layout
+
+\end_inset
+
+ F
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+}{
+\end_layout
+
+\end_inset
+
+or
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+ workloads exhibiting irregular memory access patterns, helper threaded
  data prefetching 
 \begin_inset CommandInset citation
 LatexCommand cite
@@ -394,7 +503,7 @@ Simulation Framework
 \begin_layout Standard
 We use the open source Archimulator
 \begin_inset Foot
-status collapsed
+status open
 
 \begin_layout Plain Layout
 See 
@@ -425,15 +534,15 @@ ral simulator written completely in Java and running on 32 and 64 bit Linux
 \begin_layout Standard
 \align center
 \begin_inset Float figure
-wide false
+wide true
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
 	filename /home/itecgo/Archimulator/doc/res/cacheconfig.pdf
-	scale 80
+	scale 72
 	BoundingBox 26bp 480bp 575bp 750bp
 	clip
 
@@ -509,14 +618,36 @@ reference "fig:Simulated-CMP-Architecture"
 \begin_layout Standard
 \align center
 \begin_inset Float table
-wide false
+wide true
 sideways false
 status open
 
 \begin_layout Plain Layout
 \align center
+\begin_inset Caption
 
-\size small
+\begin_layout Plain Layout
+Baseline Hardware Configurations
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:Baseline-Hardware-Configurations"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="10" columns="2">
 <features tabularvalignment="middle">
@@ -527,8 +658,6 @@ status open
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 Pipeline
 \end_layout
 
@@ -538,8 +667,6 @@ Pipeline
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 4-wide superscalar out-of-order core; 2 cores, 2 threads per core
 \end_layout
 
@@ -560,8 +687,6 @@ Pipeline
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 Physical register file capacity: 128
 \end_layout
 
@@ -582,8 +707,6 @@ Physical register file capacity: 128
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 Decode buffer capacity: 96
 \end_layout
 
@@ -604,8 +727,6 @@ Decode buffer capacity: 96
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 Reorder buffer capacity: 96
 \end_layout
 
@@ -626,8 +747,6 @@ Reorder buffer capacity: 96
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 Load store queue capacity: 48
 \end_layout
 
@@ -639,8 +758,6 @@ Load store queue capacity: 48
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 Branch Predictors
 \end_layout
 
@@ -650,8 +767,6 @@ Branch Predictors
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 Perfect branch predictor
 \end_layout
 
@@ -663,9 +778,7 @@ Perfect branch predictor
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
-Execution Units
+Functional Units
 \end_layout
 
 \end_inset
@@ -674,8 +787,6 @@ Execution Units
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 \begin_inset Tabular
 <lyxtabular version="3" rows="12" columns="4">
 <features tabularvalignment="middle">
@@ -688,9 +799,7 @@ Execution Units
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
-Name
+FU Name
 \end_layout
 
 \end_inset
@@ -699,8 +808,6 @@ Name
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 Count
 \end_layout
 
@@ -710,8 +817,6 @@ Count
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 Operation Lat.
 \end_layout
 
@@ -721,8 +826,6 @@ Operation Lat.
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 Issue Lat.
 \end_layout
 
@@ -734,9 +837,7 @@ Issue Lat.
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
-Int ALU
+Integer ALU
 \end_layout
 
 \end_inset
@@ -745,8 +846,6 @@ Int ALU
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 8
 \end_layout
 
@@ -756,8 +855,6 @@ Int ALU
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 2
 \end_layout
 
@@ -767,8 +864,6 @@ Int ALU
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 1
 \end_layout
 
@@ -780,9 +875,7 @@ Int ALU
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
-Int Multiply
+Intger Multiply
 \end_layout
 
 \end_inset
@@ -791,8 +884,6 @@ Int Multiply
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 2
 \end_layout
 
@@ -802,8 +893,6 @@ Int Multiply
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 3
 \end_layout
 
@@ -813,8 +902,6 @@ Int Multiply
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 1
 \end_layout
 
@@ -826,9 +913,7 @@ Int Multiply
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
-Int Division
+Integer Division
 \end_layout
 
 \end_inset
@@ -846,8 +931,6 @@ Int Division
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 20
 \end_layout
 
@@ -857,8 +940,6 @@ Int Division
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 19
 \end_layout
 
@@ -870,9 +951,7 @@ Int Division
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
-Fp Add
+Floating Point Add
 \end_layout
 
 \end_inset
@@ -881,8 +960,6 @@ Fp Add
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 8
 \end_layout
 
@@ -892,8 +969,6 @@ Fp Add
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 4
 \end_layout
 
@@ -903,8 +978,6 @@ Fp Add
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 1
 \end_layout
 
@@ -916,9 +989,7 @@ Fp Add
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
-Fp Compare
+Floating Point Compare
 \end_layout
 
 \end_inset
@@ -936,8 +1007,6 @@ Fp Compare
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 4
 \end_layout
 
@@ -947,8 +1016,6 @@ Fp Compare
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 1
 \end_layout
 
@@ -960,9 +1027,7 @@ Fp Compare
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
-Fp Convert
+Floating Point Convert
 \end_layout
 
 \end_inset
@@ -980,8 +1045,6 @@ Fp Convert
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 4
 \end_layout
 
@@ -991,8 +1054,6 @@ Fp Convert
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 1
 \end_layout
 
@@ -1004,9 +1065,7 @@ Fp Convert
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
-Fp Multiply
+Floating Point Multiply
 \end_layout
 
 \end_inset
@@ -1015,8 +1074,6 @@ Fp Multiply
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 2
 \end_layout
 
@@ -1026,8 +1083,6 @@ Fp Multiply
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 8
 \end_layout
 
@@ -1037,8 +1092,6 @@ Fp Multiply
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 1
 \end_layout
 
@@ -1050,9 +1103,7 @@ Fp Multiply
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
-Fp Division
+Floating Point Division
 \end_layout
 
 \end_inset
@@ -1070,8 +1121,6 @@ Fp Division
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 40
 \end_layout
 
@@ -1081,8 +1130,6 @@ Fp Division
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 20
 \end_layout
 
@@ -1094,9 +1141,7 @@ Fp Division
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
-Fp Square Root
+Floating Point Square Root
 \end_layout
 
 \end_inset
@@ -1114,8 +1159,6 @@ Fp Square Root
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 80
 \end_layout
 
@@ -1125,8 +1168,6 @@ Fp Square Root
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 40
 \end_layout
 
@@ -1138,8 +1179,6 @@ Fp Square Root
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 Read Port
 \end_layout
 
@@ -1149,8 +1188,6 @@ Read Port
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 4
 \end_layout
 
@@ -1160,8 +1197,6 @@ Read Port
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 1
 \end_layout
 
@@ -1171,8 +1206,6 @@ Read Port
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 1
 \end_layout
 
@@ -1184,8 +1217,6 @@ Read Port
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 Write Port
 \end_layout
 
@@ -1204,8 +1235,6 @@ Write Port
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 1
 \end_layout
 
@@ -1215,8 +1244,6 @@ Write Port
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 1
 \end_layout
 
@@ -1238,8 +1265,6 @@ Write Port
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 Cache Geometries
 \end_layout
 
@@ -1249,8 +1274,6 @@ Cache Geometries
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 \begin_inset Tabular
 <lyxtabular version="3" rows="4" columns="5">
 <features tabularvalignment="middle">
@@ -1264,8 +1287,6 @@ Cache Geometries
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 Name
 \end_layout
 
@@ -1275,8 +1296,6 @@ Name
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 Size
 \end_layout
 
@@ -1286,8 +1305,6 @@ Size
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 Associativity
 \end_layout
 
@@ -1297,8 +1314,6 @@ Associativity
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 Line Size
 \end_layout
 
@@ -1308,8 +1323,6 @@ Line Size
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 Hit Lat.
 \end_layout
 
@@ -1321,8 +1334,6 @@ Hit Lat.
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 I Cache
 \end_layout
 
@@ -1332,8 +1343,6 @@ I Cache
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 32KB
 \end_layout
 
@@ -1343,8 +1352,6 @@ I Cache
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 4
 \end_layout
 
@@ -1354,8 +1361,6 @@ I Cache
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 64B
 \end_layout
 
@@ -1365,8 +1370,6 @@ I Cache
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 1
 \end_layout
 
@@ -1378,8 +1381,6 @@ I Cache
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 D Cache
 \end_layout
 
@@ -1389,8 +1390,6 @@ D Cache
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 32KB
 \end_layout
 
@@ -1400,8 +1399,6 @@ D Cache
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 4
 \end_layout
 
@@ -1411,8 +1408,6 @@ D Cache
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 64B
 \end_layout
 
@@ -1422,8 +1417,6 @@ D Cache
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 1
 \end_layout
 
@@ -1435,8 +1428,6 @@ D Cache
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 L2 Cache
 \end_layout
 
@@ -1446,8 +1437,6 @@ L2 Cache
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 96KB
 \end_layout
 
@@ -1457,8 +1446,6 @@ L2 Cache
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 8
 \end_layout
 
@@ -1468,8 +1455,6 @@ L2 Cache
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 64B
 \end_layout
 
@@ -1479,8 +1464,6 @@ L2 Cache
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 10
 \end_layout
 
@@ -1502,8 +1485,6 @@ L2 Cache
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 Interconnect
 \end_layout
 
@@ -1513,8 +1494,6 @@ Interconnect
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 Switch based P2P topology, 32B link width
 \end_layout
 
@@ -1526,8 +1505,6 @@ Switch based P2P topology, 32B link width
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 Main Memory
 \end_layout
 
@@ -1537,8 +1514,6 @@ Main Memory
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\size small
 4GB, 200-cycle fixed latency
 \end_layout
 
@@ -1546,28 +1521,6 @@ Main Memory
 </cell>
 </row>
 </lyxtabular>
-
-\end_inset
-
-
-\size default
-
-\begin_inset VSpace defskip
-\end_inset
-
-
-\begin_inset Caption
-
-\begin_layout Plain Layout
-Baseline Hardware Configurations
-\begin_inset CommandInset label
-LatexCommand label
-name "tab:Baseline-Hardware-Configurations"
-
-\end_inset
-
-
-\end_layout
 
 \end_inset
 
@@ -1696,7 +1649,7 @@ In the traditional helper threaded prefetching configuration, the values
 \begin_layout Standard
 \align center
 \begin_inset Float figure
-wide false
+wide true
 sideways false
 status open
 
@@ -1704,7 +1657,7 @@ status open
 \align center
 \begin_inset Graphics
 	filename /home/itecgo/Archimulator/doc/ht_scheme.pdf
-	scale 50
+	scale 45
 	BoundingBox 30bp 38bp 810bp 538bp
 	clip
 
@@ -1796,19 +1749,18 @@ Helper thread LLC request accuracy
 
 \begin_layout Standard
 
-\size footnotesize
+\size scriptsize
 \begin_inset Formula 
-\[
-Helper\: Threaded\: Prefetch\: Accuracy=\frac{Number\: of\: Useful\: Helper\: Thread\: LLC\: Requests}{Number\: of\: Helper\: Thread\: LLC\: Requests}
-\]
+\begin{equation}
+Accuracy=\frac{\#\: Useful\: Helper\: Thread\: LLC\: Requests}{\#\: Helper\: Thread\: LLC\: Requests}
+\end{equation}
 
 \end_inset
 
 
 \size default
-where Number of Useful helper thread LLC Requests is the number of LLC lines
- brought by helper thread requests that are later on hit by helper thread
- requests.
+where # Useful helper thread LLC Requests is the number of LLC lines brought
+ by helper thread requests that are later on hit by helper thread requests.
  For benchmarks with high helper thread LLC request accuracy, performance
  increases as the aggressiveness of the helper threaded prefetching scheme
  is increased.
@@ -1830,11 +1782,11 @@ Helper thread LLC request coverage
 
 \begin_layout Standard
 
-\size footnotesize
+\size scriptsize
 \begin_inset Formula 
-\[
-Helper\: Threaded\: Prefetch\: Coverage=\frac{Number\: of\: Useful\: Helper\: Thread\: LLC\: Requests}{Number\: of\: Main\: Thread\: LLC\: Requests\: WIthout\: Helper\: Threaded\: Prefetch}
-\]
+\begin{equation}
+Coverage=\frac{\#\: Useful\: Helper\: Thread\: LLC\: Requests}{\#\: Main\: Thread\: LLC\: Requests\: w/o\: Helper\: Thread}
+\end{equation}
 
 \end_inset
 
@@ -1869,9 +1821,9 @@ Helper thread LLC request lateness
 
 \size footnotesize
 \begin_inset Formula 
-\[
-Helper\: Threaded\: Prefetch\: Lateness=\frac{Number\: of\: Late\: Helper\: Thread\: LLC\: Requests}{Number\: of\: Useful\: Helper\: Thread\: LLC\: Requests}
-\]
+\begin{equation}
+Lateness=\frac{\#\: Late\: Helper\: Thread\: LLC\: Requests}{\#\: Useful\: Helper\: Thread\: LLC\: Requests}
+\end{equation}
 
 \end_inset
 
@@ -2162,15 +2114,15 @@ High
 \begin_layout Standard
 \align center
 \begin_inset Float figure
-wide false
+wide true
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
 	filename prefetch_timeline.pdf
-	scale 50
+	scale 45
 	BoundingBox 30bp 25bp 810bp 530bp
 	clip
 
@@ -2796,12 +2748,28 @@ reference "tab:mst-Baseline-Performance"
 \begin_layout Standard
 \align center
 \begin_inset Float table
-wide false
+wide true
 sideways false
 status open
 
 \begin_layout Plain Layout
 \align center
+\begin_inset Caption
+
+\begin_layout Plain Layout
+mst Baseline Performance
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:mst-Baseline-Performance"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
 \begin_inset Tabular
 <lyxtabular version="3" rows="4" columns="1">
 <features tabularvalignment="middle">
@@ -2813,7 +2781,7 @@ status open
 \begin_layout Plain Layout
 \begin_inset Graphics
 	filename /home/itecgo/Archimulator/experiment_tables/mst_2048_baseline_l2_96KB_to_2MB_summary.pdf
-	scale 58
+	scale 62
 	BoundingBox 30bp 1035bp 810bp 1165bp
 	clip
 
@@ -2845,7 +2813,7 @@ status open
 \begin_layout Plain Layout
 \begin_inset Graphics
 	filename /home/itecgo/Archimulator/experiment_tables/mst_2048_baseline_l2_2way_to_32way_summary.pdf
-	scale 58
+	scale 62
 	BoundingBox 30bp 1050bp 810bp 1165bp
 	clip
 
@@ -2875,22 +2843,6 @@ status open
 \end_inset
 
 
-\begin_inset Caption
-
-\begin_layout Plain Layout
-mst Baseline Performance
-\begin_inset CommandInset label
-LatexCommand label
-name "tab:mst-Baseline-Performance"
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
 \end_layout
 
 \end_inset
@@ -2901,12 +2853,28 @@ name "tab:mst-Baseline-Performance"
 \begin_layout Standard
 \align center
 \begin_inset Float table
-wide false
+wide true
 sideways false
 status open
 
 \begin_layout Plain Layout
 \align center
+\begin_inset Caption
+
+\begin_layout Plain Layout
+mst Helper Threaded Prefetching Performance
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:mst-Helper-Threaded-Prefetching-Performance"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
 \begin_inset Tabular
 <lyxtabular version="3" rows="4" columns="1">
 <features tabularvalignment="middle">
@@ -2918,7 +2886,7 @@ status open
 \begin_layout Plain Layout
 \begin_inset Graphics
 	filename /home/itecgo/Archimulator/experiment_tables/mst_2048_ht_20_10_l2_96KB_to_2MB_summary.pdf
-	scale 58
+	scale 62
 	BoundingBox 30bp 935bp 810bp 1165bp
 	clip
 
@@ -2950,7 +2918,7 @@ status open
 \begin_layout Plain Layout
 \begin_inset Graphics
 	filename /home/itecgo/Archimulator/experiment_tables/mst_2048_ht_20_10_l2_2way_to_32way_summary.pdf
-	scale 58
+	scale 62
 	BoundingBox 30bp 965bp 810bp 1165bp
 	clip
 
@@ -2976,22 +2944,6 @@ status open
 </cell>
 </row>
 </lyxtabular>
-
-\end_inset
-
-
-\begin_inset Caption
-
-\begin_layout Plain Layout
-mst Helper Threaded Prefetching Performance
-\begin_inset CommandInset label
-LatexCommand label
-name "tab:mst-Helper-Threaded-Prefetching-Performance"
-
-\end_inset
-
-
-\end_layout
 
 \end_inset
 
@@ -3101,9 +3053,9 @@ reference "fig:Impact-of-L2-Size-mst-ht"
 \begin_layout Standard
 \align center
 \begin_inset Float figure
-wide false
+wide true
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \align center
@@ -3265,9 +3217,9 @@ reference "fig:Impact-of-L2-Assoc-mst-ht"
 \begin_layout Standard
 \align center
 \begin_inset Float figure
-wide false
+wide true
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \align center
@@ -3414,9 +3366,9 @@ We must note that when the lookahead is small and the stride is large, there
 \begin_layout Standard
 \align center
 \begin_inset Float figure
-wide false
+wide true
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \align center
@@ -4008,7 +3960,7 @@ When the lookahead is greater than 160, the number of late helper thread
 \begin_layout Standard
 \align center
 \begin_inset Float figure
-wide false
+wide true
 sideways false
 status open
 
