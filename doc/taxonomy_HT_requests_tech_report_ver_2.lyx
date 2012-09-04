@@ -36,9 +36,9 @@
 \paperfontsize default
 \spacing single
 \use_hyperref true
-\pdf_title "Interactions between Shared Cache Partitioning and Helper Threading on CMPs"
+\pdf_title "Parameter Selection Based on Prefetch Breakdown for Helper Threading on CMPs"
 \pdf_author "Min Cai, Zhimin Gu"
-\pdf_keywords "Chip multiprocessors, helper threaded inter-core data prefetching, cache replacement, cache pollution, intra-application LLC interference"
+\pdf_keywords "Chip multiprocessors, helper thread, prefetch breakdown, intra-application cache pollution"
 \pdf_bookmarks true
 \pdf_bookmarksnumbered false
 \pdf_bookmarksopen false
@@ -86,7 +86,8 @@
 \begin_body
 
 \begin_layout Title
-Interactions between Shared Cache Partitioning and Helper Threading on CMPs
+Parameter Selection Based on Prefetch Breakdown for Helper Threading on
+ CMPs
 \end_layout
 
 \begin_layout Author
@@ -211,11 +212,11 @@ tions of helper threaded data prefetching on CMPs: inaccurate and/or untimely
 This paper characterizes the degree by which intra-application LLC interference
  is caused by inter-core data prefetches in the above helper threaded data
  prefetching scheme.
- Since hardware performance counter based measurement on real machines cannot provide required
- finegrained metrics, using cycle-accurate architectural simulation of the
- memory intensive benchmark mst from Olden, we first adapt traditional approache
-s to characterizing hardware prefetches such as prefetch accuracy, coverage
- and lateness, useful vs.
+ Since hardware performance counter based measurement on real machines cannot
+ provide required fine-grained metrics, using cycle-accurate architectural
+ simulation of the memory intensive benchmark mst from Olden, we first adapt
+ traditional approaches to characterizing hardware prefetches such as prefetch
+ accuracy, coverage and lateness, useful vs.
  useless prefetches to characterize helper threaded data prefetching on
  CMPs.
  Based on the insights from these characterizations, we then propose a fine-grai
@@ -235,8 +236,8 @@ e architectural simulation, and highlighting the opportunities and challenges
 \end_layout
 
 \begin_layout Keywords
-Chip multiprocessors, helper thread, shared cache partitioning, intra-applicatio
-n cache pollution
+Chip multiprocessors, helper thread, prefetch breakdown, intra-application
+ cache pollution
 \end_layout
 
 \begin_layout Section
@@ -407,10 +408,10 @@ useless
 This paper characterizes the degree by which intra-application LLC interference
  is caused by inter-core data prefetches in the above helper threaded data
  prefetching scheme.
- Since hardware performance counter based measurement on real machines cannot provide required
- finegrained metrics, using cycle-accurate architectural simulation of the
- memory intensive benchmark mst from the Olden pointer traversing benchmark
- suite 
+ Since hardware performance counter based measurement on real machines cannot
+ provide required finegrained metrics, using cycle-accurate architectural
+ simulation of the memory intensive benchmark mst from the Olden pointer
+ traversing benchmark suite 
 \begin_inset CommandInset citation
 LatexCommand cite
 key "Rogers1995"
@@ -3387,7 +3388,7 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_10_10_lookahead_10_to_480_totalCycles_normalized.pdf
+	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_0_10_lookahead_0_to_640_totalCycles_normalized.pdf
 	scale 38
 	clip
 
@@ -3403,7 +3404,7 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_10_10_lookahead_10_to_480_helperThreadL2CacheRequestBreakdowns.pdf
+	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_0_10_lookahead_0_to_640_helperThreadL2CacheRequestBreakdowns.pdf
 	scale 38
 	BoundingBox 0bp 0bp 455bp 211bp
 	clip
@@ -3460,7 +3461,7 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_10_20_lookahead_10_to_480_totalCycles_normalized.pdf
+	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_0_20_lookahead_0_to_640_totalCycles_normalized.pdf
 	scale 38
 	clip
 
@@ -3476,7 +3477,7 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_10_20_lookahead_10_to_480_helperThreadL2CacheRequestBreakdowns.pdf
+	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_0_20_lookahead_0_to_640_helperThreadL2CacheRequestBreakdowns.pdf
 	scale 38
 	BoundingBox 0bp 0bp 455bp 211bp
 	clip
@@ -3533,7 +3534,7 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_10_40_lookahead_10_to_480_totalCycles_normalized.pdf
+	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_0_40_lookahead_0_to_640_totalCycles_normalized.pdf
 	scale 38
 	clip
 
@@ -3549,7 +3550,7 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_10_40_lookahead_10_to_480_helperThreadL2CacheRequestBreakdowns.pdf
+	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_0_40_lookahead_0_to_640_helperThreadL2CacheRequestBreakdowns.pdf
 	scale 38
 	BoundingBox 0bp 0bp 455bp 211bp
 	clip
@@ -3606,7 +3607,7 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_10_80_lookahead_10_to_480_totalCycles_normalized.pdf
+	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_0_80_lookahead_0_to_640_totalCycles_normalized.pdf
 	scale 38
 	clip
 
@@ -3622,7 +3623,7 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_10_80_lookahead_10_to_480_helperThreadL2CacheRequestBreakdowns.pdf
+	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_0_80_lookahead_0_to_640_helperThreadL2CacheRequestBreakdowns.pdf
 	scale 38
 	BoundingBox 0bp 0bp 455bp 211bp
 	clip
@@ -3679,7 +3680,7 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_10_160_lookahead_10_to_480_totalCycles_normalized.pdf
+	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_0_160_lookahead_0_to_640_totalCycles_normalized.pdf
 	scale 38
 	clip
 
@@ -3695,7 +3696,7 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_10_160_lookahead_10_to_480_helperThreadL2CacheRequestBreakdowns.pdf
+	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_0_160_lookahead_0_to_640_helperThreadL2CacheRequestBreakdowns.pdf
 	scale 38
 	BoundingBox 0bp 0bp 455bp 211bp
 	clip
@@ -3752,7 +3753,7 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_10_320_lookahead_10_to_480_totalCycles_normalized.pdf
+	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_0_320_lookahead_0_to_640_totalCycles_normalized.pdf
 	scale 38
 	clip
 
@@ -3768,7 +3769,7 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_10_320_lookahead_10_to_480_helperThreadL2CacheRequestBreakdowns.pdf
+	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_0_320_lookahead_0_to_640_helperThreadL2CacheRequestBreakdowns.pdf
 	scale 38
 	BoundingBox 0bp 0bp 455bp 211bp
 	clip
@@ -3825,7 +3826,7 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_10_480_lookahead_10_to_480_totalCycles_normalized.pdf
+	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_0_640_lookahead_0_to_640_totalCycles_normalized.pdf
 	scale 38
 	clip
 
@@ -3841,7 +3842,7 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_10_480_lookahead_10_to_480_helperThreadL2CacheRequestBreakdowns.pdf
+	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_0_640_lookahead_0_to_640_helperThreadL2CacheRequestBreakdowns.pdf
 	scale 38
 	BoundingBox 0bp 0bp 455bp 211bp
 	clip
@@ -3981,7 +3982,7 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_10_10_stride_10_to_480_totalCycles_normalized.pdf
+	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_10_5_stride_5_to_640_totalCycles_normalized.pdf
 	scale 38
 	clip
 
@@ -3997,7 +3998,7 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_10_10_stride_10_to_480_helperThreadL2CacheRequestBreakdowns.pdf
+	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_10_5_stride_5_to_640_helperThreadL2CacheRequestBreakdowns.pdf
 	scale 38
 	BoundingBox 0bp 0bp 455bp 211bp
 	clip
@@ -4054,7 +4055,7 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_20_10_stride_10_to_480_totalCycles_normalized.pdf
+	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_20_5_stride_5_to_640_totalCycles_normalized.pdf
 	scale 38
 	clip
 
@@ -4070,7 +4071,7 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_20_10_stride_10_to_480_helperThreadL2CacheRequestBreakdowns.pdf
+	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_20_5_stride_5_to_640_helperThreadL2CacheRequestBreakdowns.pdf
 	scale 38
 	BoundingBox 0bp 0bp 455bp 211bp
 	clip
@@ -4127,7 +4128,8 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_40_10_stride_10_to_480_totalCycles_normalized.pdf
+	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_40_5_stride_5_to_640_totalCycles_normalized.pdf
+	display false
 	scale 38
 	clip
 
@@ -4143,7 +4145,8 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_40_10_stride_10_to_480_helperThreadL2CacheRequestBreakdowns.pdf
+	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_40_5_stride_5_to_640_helperThreadL2CacheRequestBreakdowns.pdf
+	display false
 	scale 38
 	BoundingBox 0bp 0bp 455bp 211bp
 	clip
@@ -4200,7 +4203,8 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_80_10_stride_10_to_480_totalCycles_normalized.pdf
+	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_80_5_stride_5_to_640_totalCycles_normalized.pdf
+	display false
 	scale 38
 	clip
 
@@ -4216,7 +4220,8 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_80_10_stride_10_to_480_helperThreadL2CacheRequestBreakdowns.pdf
+	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_80_5_stride_5_to_640_helperThreadL2CacheRequestBreakdowns.pdf
+	display false
 	scale 38
 	BoundingBox 0bp 0bp 455bp 211bp
 	clip
@@ -4273,7 +4278,8 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_160_10_stride_10_to_480_totalCycles_normalized.pdf
+	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_160_5_stride_5_to_640_totalCycles_normalized.pdf
+	display false
 	scale 38
 	clip
 
@@ -4289,7 +4295,8 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_160_10_stride_10_to_480_helperThreadL2CacheRequestBreakdowns.pdf
+	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_160_5_stride_5_to_640_helperThreadL2CacheRequestBreakdowns.pdf
+	display false
 	scale 38
 	BoundingBox 0bp 0bp 455bp 211bp
 	clip
@@ -4346,7 +4353,8 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_320_10_stride_10_to_480_totalCycles_normalized.pdf
+	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_320_5_stride_5_to_640_totalCycles_normalized.pdf
+	display false
 	scale 38
 	clip
 
@@ -4362,7 +4370,8 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_320_10_stride_10_to_480_helperThreadL2CacheRequestBreakdowns.pdf
+	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_320_5_stride_5_to_640_helperThreadL2CacheRequestBreakdowns.pdf
+	display false
 	scale 38
 	BoundingBox 0bp 0bp 455bp 211bp
 	clip
@@ -4419,7 +4428,8 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_480_10_stride_10_to_480_totalCycles_normalized.pdf
+	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_640_5_stride_5_to_640_totalCycles_normalized.pdf
+	display false
 	scale 38
 	clip
 
@@ -4435,7 +4445,8 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_480_10_stride_10_to_480_helperThreadL2CacheRequestBreakdowns.pdf
+	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_640_5_stride_5_to_640_helperThreadL2CacheRequestBreakdowns.pdf
+	display false
 	scale 38
 	BoundingBox 0bp 0bp 455bp 211bp
 	clip

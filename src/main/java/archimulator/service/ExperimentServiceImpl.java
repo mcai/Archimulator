@@ -122,6 +122,19 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     @Override
+    public List<Experiment> getExperimentsByTitlePrefix(String titlePrefix, boolean stoppedExperimentsOnly) {
+        List<Experiment> result = new ArrayList<Experiment>();
+
+        for(Experiment experiment : this.getAllExperiments()) {
+            if(experiment.getTitle().startsWith(titlePrefix) && (!stoppedExperimentsOnly || experiment.isStopped())) {
+                result.add(experiment);
+            }
+        }
+
+        return result;
+    }
+
+    @Override
     public Experiment getFirstExperimentByTitle(String title) {
         return this.getFirstItemByTitle(this.experiments, title);
     }
@@ -330,8 +343,8 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     @Override
-    public Experiment getFirstExperimentToRunByParent(ExperimentPack parent) {
-        for (Experiment experiment : parent.getExperiments()) {
+    public Experiment getFirstExperimentToRunByExperimentPack(ExperimentPack experimentPack) {
+        for (Experiment experiment : experimentPack.getExperiments()) {
             if (experiment.getState() == ExperimentState.PENDING) {
                 return experiment;
             }
@@ -341,7 +354,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     @Override
-    public List<Experiment> getStoppedExperimentsByParent(ExperimentPack experimentPack) {
+    public List<Experiment> getStoppedExperimentsByExperimentPack(ExperimentPack experimentPack) {
         return CollectionHelper.filter(experimentPack.getExperiments(), new Predicate<Experiment>() {
             @Override
             public boolean apply(Experiment experiment) {
@@ -351,8 +364,8 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     @Override
-    public Experiment getFirstStoppedExperimentByParent(ExperimentPack experimentPack) {
-        List<Experiment> stoppedExperimentsByExperimentPack = getStoppedExperimentsByParent(experimentPack);
+    public Experiment getFirstStoppedExperimentByExperimentPack(ExperimentPack experimentPack) {
+        List<Experiment> stoppedExperimentsByExperimentPack = getStoppedExperimentsByExperimentPack(experimentPack);
         return stoppedExperimentsByExperimentPack.isEmpty() ? null : stoppedExperimentsByExperimentPack.get(0);
     }
 
@@ -367,6 +380,19 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     @Override
+    public List<ExperimentPack> getExperimentPacksByTitlePrefix(String titlePrefix) {
+        List<ExperimentPack> result = new ArrayList<ExperimentPack>();
+
+        for(String experimentPackTitle : this.experimentPacks.keySet()) {
+            if(experimentPackTitle.startsWith(titlePrefix)) {
+                result.add(this.experimentPacks.get(experimentPackTitle));
+            }
+        }
+
+        return result;
+    }
+
+    @Override
     public void runExperiments(String... args) {
         if (ServiceManager.getSystemSettingService().getSystemSettingSingleton().isRunningExperimentsEnabled()) {
             new ExperimentWorker(args).run();
@@ -376,8 +402,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     @Override
-    public void tableSummary(ExperimentPack experimentPack) {
-        Experiment baselineExperiment = experimentPack.getExperiments().get(0);
+    public void tableSummary(String title, Experiment baselineExperiment, List<Experiment> experiments) {
         boolean helperThreadEnabled = baselineExperiment.getContextMappings().get(0).getSimulatedProgram().getHelperThreadEnabled();
 
         List<String> columns = helperThreadEnabled ? Arrays.asList(
@@ -393,16 +418,16 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
         List<List<String>> rows = new ArrayList<List<String>>();
 
-        for (Experiment experiment : experimentPack.getExperiments()) {
+        for (Experiment experiment : experiments) {
             List<String> row = new ArrayList<String>();
+
+            row.add(StorageUnit.toString(experiment.getArchitecture().getL2Size()));
+            row.add(experiment.getArchitecture().getL2Associativity() + "");
 
             if(helperThreadEnabled) {
                 row.add(experiment.getContextMappings().get(0).getHelperThreadLookahead() + "");
                 row.add(experiment.getContextMappings().get(0).getHelperThreadStride() + "");
             }
-
-            row.add(StorageUnit.toString(experiment.getArchitecture().getL2Size()));
-            row.add(experiment.getArchitecture().getL2Associativity() + "");
 
             row.add(experiment.getStatValue(experiment.getMeasurementTitlePrefix() + "cycleAccurateEventQueue/currentCycle"));
 
@@ -436,7 +461,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
             rows.add(row);
         }
 
-        table(experimentPack, "summary", columns, rows);
+        table(title, "summary", columns, rows);
     }
 
     @Override
@@ -862,8 +887,8 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
         writer.incrementIndentation();
 
-        List<Experiment> experimentsByExperimentPack = stoppedExperimentsOnly ? getStoppedExperimentsByParent(experimentPack) : experimentPack.getExperiments();
-        Experiment firstExperimentByExperimentPack = stoppedExperimentsOnly ? getFirstStoppedExperimentByParent(experimentPack) : experimentPack.getExperiments().get(0);
+        List<Experiment> experimentsByExperimentPack = stoppedExperimentsOnly ? getStoppedExperimentsByExperimentPack(experimentPack) : experimentPack.getExperiments();
+        Experiment firstExperimentByExperimentPack = stoppedExperimentsOnly ? getFirstStoppedExperimentByExperimentPack(experimentPack) : experimentPack.getExperiments().get(0);
 
         if (firstExperimentByExperimentPack != null) {
             writer.println("experiment titles: ");
@@ -877,7 +902,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
             writer.println();
             writer.decrementIndentation();
 
-            ServiceManager.getExperimentService().tableSummary(experimentPack);
+            ServiceManager.getExperimentService().tableSummary(experimentPack.getTitle(), experimentsByExperimentPack.get(0), experimentsByExperimentPack);
 
             writer.println("simulation times in seconds: ");
             writer.incrementIndentation();
@@ -1008,8 +1033,8 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         }
     }
 
-    private void table(ExperimentPack experimentPack, String tableFileNameSuffix, List<String> columns, List<List<String>> rows) {
-        String fileNamePdf = "experiment_tables" + File.separator + experimentPack.getTitle() + "_" + tableFileNameSuffix + ".pdf";
+    private void table(String title, String tableFileNameSuffix, List<String> columns, List<List<String>> rows) {
+        String fileNamePdf = "experiment_tables" + File.separator + title + "_" + tableFileNameSuffix + ".pdf";
         new File(fileNamePdf).getParentFile().mkdirs();
 
         TableHelper.generateTable(fileNamePdf, columns, rows);

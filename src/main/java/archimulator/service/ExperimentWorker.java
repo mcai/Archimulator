@@ -59,13 +59,19 @@ public class ExperimentWorker implements Runnable {
 
     private boolean doRunExperiment() {
         if(this.args == null || this.args.length == 0) {
-            this.experiment = ServiceManager.getExperimentService().getFirstExperimentToRun();
+            for(ExperimentPack experimentPack : ServiceManager.getExperimentService().getAllExperimentPacks()) {
+                Experiment experiment = ServiceManager.getExperimentService().getFirstExperimentToRunByExperimentPack(experimentPack);
+                if(experiment != null) {
+                    this.experiment = experiment;
+                    break;
+                }
+            }
         }
         else {
             for(String arg : this.args) {
                 ExperimentPack experimentPack = ServiceManager.getExperimentService().getExperimentPackByTitle(arg);
                 if (experimentPack != null) {
-                    Experiment experiment = ServiceManager.getExperimentService().getFirstExperimentToRunByParent(experimentPack);
+                    Experiment experiment = ServiceManager.getExperimentService().getFirstExperimentToRunByExperimentPack(experimentPack);
                     if(experiment != null) {
                         this.experiment = experiment;
                         break;

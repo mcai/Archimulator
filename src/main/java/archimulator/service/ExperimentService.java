@@ -36,6 +36,8 @@ public interface ExperimentService extends Service {
 
     List<Experiment> getExperimentsByTitle(String title);
 
+    List<Experiment> getExperimentsByTitlePrefix(String titlePrefix, boolean stoppedExperimentsOnly);
+
     Experiment getFirstExperimentByTitle(String title);
 
     Experiment getLatestExperimentByTitle(String title);
@@ -56,19 +58,21 @@ public interface ExperimentService extends Service {
 
     Experiment getFirstExperimentToRun();
 
-    Experiment getFirstExperimentToRunByParent(ExperimentPack parent);
+    Experiment getFirstExperimentToRunByExperimentPack(ExperimentPack experimentPack);
 
-    List<Experiment> getStoppedExperimentsByParent(ExperimentPack experimentPack);
+    List<Experiment> getStoppedExperimentsByExperimentPack(ExperimentPack experimentPack);
 
-    Experiment getFirstStoppedExperimentByParent(ExperimentPack experimentPack);
+    Experiment getFirstStoppedExperimentByExperimentPack(ExperimentPack experimentPack);
 
     List<ExperimentPack> getAllExperimentPacks();
 
     ExperimentPack getExperimentPackByTitle(String title);
 
+    List<ExperimentPack> getExperimentPacksByTitlePrefix(String titlePrefix);
+
     void runExperiments(String... args);
 
-    void tableSummary(ExperimentPack experimentPack);
+    void tableSummary(String title, Experiment baselineExperiment, List<Experiment> experiments);
 
     List<Map<String, Double>> getBreakdowns(List<Experiment> experiments, Function1<Experiment, List<String>> keysFunction);
 
