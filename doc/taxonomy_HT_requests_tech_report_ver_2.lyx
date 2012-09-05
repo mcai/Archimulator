@@ -32,11 +32,10 @@
 \output_sync 0
 \bibtex_command default
 \index_command default
-\float_placement tbph
-\paperfontsize default
+\paperfontsize 10
 \spacing single
 \use_hyperref true
-\pdf_title "Parameter Selection Based on Prefetch Breakdown for Helper Threading on CMPs"
+\pdf_title "Prefetch Breakdown for Helper Threading on CMPs"
 \pdf_author "Min Cai, Zhimin Gu"
 \pdf_keywords "Chip multiprocessors, helper thread, prefetch breakdown, intra-application cache pollution"
 \pdf_bookmarks true
@@ -86,8 +85,7 @@
 \begin_body
 
 \begin_layout Title
-Parameter Selection Based on Prefetch Breakdown for Helper Threading on
- CMPs
+Prefetch Breakdown for Helper Threading on CMPs
 \end_layout
 
 \begin_layout Author
@@ -190,54 +188,53 @@ et al.
 
 \end_inset
 
-: Shared Cache Partitioning for Helper Threaded Data Prefetching on CMPs
+: Prefetch Breakdown for Helper Threading on CMPs
 \end_layout
 
 \begin_layout Abstract
-For workloads exhibiting irregular memory access patterns, helper threaded
- data prefetching on shared cache chip multiprocessors (CMPs) speculatively
- issue last-level cache (LLC) requests to the predicted memory addresses
- ahead of main thread references.
- Effective helper threaded data prefetching on CMPs demands that the helper
- thread (HT) should issue correct and timely LLC requests just before the
- main thread (MT) references them.
+For workloads exhibiting irregular memory access patterns, helper threading
+ on shared cache chip multiprocessors (CMPs) speculatively issue last-level
+ cache (LLC) requests to the predicted memory addresses ahead of main thread
+ references.
+ Effective helper threading on CMPs demands that the helper thread (HT)
+ should issue correct and timely LLC requests just before the main thread
+ (MT) references them.
  Unfortunately, this ideal case can not be fulfilled in the practical implementa
-tions of helper threaded data prefetching on CMPs: inaccurate and/or untimely
- LLC requests coming from the helper thread could not contribute to the
- main thread performance, but instead stress and pollute LLC if no effective
- LLC replacement and pollution-aware feedback techniques are employed.
+tions of helper threading on CMPs: inaccurate and/or untimely LLC requests
+ coming from the helper thread could not contribute to the main thread performan
+ce, but instead stress and pollute LLC if no effective LLC replacement and
+ pollution-aware feedback techniques are employed.
 \end_layout
 
 \begin_layout Abstract
 This paper characterizes the degree by which intra-application LLC interference
- is caused by inter-core data prefetches in the above helper threaded data
- prefetching scheme.
+ is caused by inter-core data prefetches in the above helper threading scheme.
  Since hardware performance counter based measurement on real machines cannot
  provide required fine-grained metrics, using cycle-accurate architectural
  simulation of the memory intensive benchmark mst from Olden, we first adapt
  traditional approaches to characterizing hardware prefetches such as prefetch
  accuracy, coverage and lateness, useful vs.
- useless prefetches to characterize helper threaded data prefetching on
- CMPs.
+ useless prefetches to characterize helper threading on CMPs.
  Based on the insights from these characterizations, we then propose a fine-grai
-ned taxonomy of helper threaded inter-core data prefetches to study the
- intricate interactions between intra-application LLC interference and parameter
-s of the helper threaded data prefetching scheme.
- Experimental results show that: (1) there is non-trivial intra-application
- LLC interference caused by inter-core data prefetches in helper-threaded
- data prefetching on CMPs; (2) selecting proper parameters, such as lookahead
- and stride, of the helper threaded data prefetching scheme play a key role
- in maximizing the performance of the scheme.
+ned breakdown of helper thread L2 requests to study the intricate interactions
+ between intra-application LLC interference and parameters of the helper
+ threading scheme.
+ Experimental results show that there exists an optimal value of lookahead,
+ where values of lookhead both greater and smaller than that lead to lesser
+ timely and greater late requests, thus lowering the overall performance.
+ The position of optimal value of lookahead varies depending on the value
+ of stride.
+ Selecting proper parameters, such as lookahead and stride, of the helper
+ threading scheme play a key role in maximizing the performance of the scheme.
  Overall, our characterizations are important in interpreting the effectiveness
- of software-initiated helper threaded data prefetching on CMPs by cycle-accurat
-e architectural simulation, and highlighting the opportunities and challenges
- of optimizing helper threaded data prefetching on CMPs in a dynamic and
- feedback-directed way.
+ of helper threading on CMPs by cycle-accurate architectural simulation,
+ and highlighting the opportunities and challenges of optimizing helper
+ threading on CMPs in a dynamic and feedback-directed way.
 \end_layout
 
 \begin_layout Keywords
 Chip multiprocessors, helper thread, prefetch breakdown, intra-application
- cache pollution
+ cache interference
 \end_layout
 
 \begin_layout Section
@@ -296,7 +293,7 @@ status open
 \end_inset
 
  workloads exhibiting irregular memory access patterns, helper threaded
- data prefetching 
+ data prefetching, or simply called helper threading,
 \begin_inset CommandInset citation
 LatexCommand cite
 key "Kim2004,Byna2008,Lee2009"
@@ -306,14 +303,14 @@ key "Kim2004,Byna2008,Lee2009"
  on shared cache chip multiprocessors (CMPs) speculatively issue last-level
  cache (LLC) requests to the predicted memory addresses ahead of main thread
  references.
- Effective helper threaded data prefetching on CMPs demands that the helper
- thread (HT) should issue correct and timely LLC requests just before the
- main thread (MT) references them.
+ Effective helper threading on CMPs demands that the helper thread (HT)
+ should issue correct and timely LLC requests just before the main thread
+ (MT) references them.
  Unfortunately, this ideal case can not be fulfilled in the practical implementa
-tions of helper threaded data prefetching on CMPs: inaccurate and/or untimely
- LLC requests coming from the helper thread could not contribute to the
- main thread performance, but instead stress and pollute LLC if no effective
- LLC replacement and pollution-aware feedback techniques are employed.
+tions of helper threading on CMPs: inaccurate and/or untimely LLC requests
+ coming from the helper thread could not contribute to the main thread performan
+ce, but instead stress and pollute LLC if no effective LLC replacement and
+ pollution-aware feedback techniques are employed.
 \end_layout
 
 \begin_layout Standard
@@ -328,7 +325,7 @@ key "Srinivasan2004"
 
 .
  We can easily adapt the definitions of accuracy and coverage for hardware
- based data prefetching to the helper threaded prefetching scheme.
+ based data prefetching to the helper threading scheme.
  Helper thread request accuracy is defined as the ratio of the number of
  useful helper thread requests to the number of total helper thread requests.
  And helper thread request coverage is defined as the ratio of the number
@@ -400,14 +397,13 @@ useless
 
  helper thread requests don't care about the LLC pollution and inter-thread
  interference caused by helper thread LLC requests, which are two kinds
- of deficiencies in the helper threaded prefetching scheme.
+ of deficiencies in the helper threading scheme.
  
 \end_layout
 
 \begin_layout Standard
 This paper characterizes the degree by which intra-application LLC interference
- is caused by inter-core data prefetches in the above helper threaded data
- prefetching scheme.
+ is caused by inter-core data prefetches in the above helper threading scheme.
  Since hardware performance counter based measurement on real machines cannot
  provide required finegrained metrics, using cycle-accurate architectural
  simulation of the memory intensive benchmark mst from the Olden pointer
@@ -420,22 +416,22 @@ key "Rogers1995"
 
 , we first adapt traditional approaches to characterizing hardware prefetches
  such as prefetch accuracy coverage and lateness, useful vs.
- useless prefetches to characterize helper threaded data prefetching on
- CMPs.
+ useless prefetches to characterize helper threading on CMPs.
  Based on the insights from these characterizations, we then propose a fine-grai
-ned taxonomy of helper threaded inter-core data prefetches to study the
- intricate interactions between intra-application LLC interference and parameter
-s of the helper threaded data prefetching scheme.
- Experimental results show that: (1) there is non-trivial intra-application
- LLC interference caused by inter-core data prefetches in helper-threaded
- data prefetching on CMPs; (2) selecting proper parameters, such as lookahead
- and stride, of the helper threaded data prefetching scheme play a key role
- in maximizing the performance of the scheme.
+ned breakdown of helper thread L2 requests to study the intricate interactions
+ between intra-application LLC interference and parameters of the helper
+ threading scheme.
+ Experimental results show that there exists an optimal value of lookahead,
+ where values of lookhead both greater and smaller than that lead to lesser
+ timely and greater late requests, thus lowering the overall performance.
+ The position of optimal value of lookahead varies depending on the value
+ of stride.
+ Selecting proper parameters, such as lookahead and stride, of the helper
+ threading scheme play a key role in maximizing the performance of the scheme.
  Overall, our characterizations are important in interpreting the effectiveness
- of software-initiated helper threaded data prefetching on CMPs by cycle-accurat
-e architectural simulation, and highlighting the opportunities and challenges
- of optimizing helper threaded data prefetching on CMPs in a dynamic and
- feedback-directed way.
+ of software-initiated helper threading on CMPs by cycle-accurate architectural
+ simulation, and highlighting the opportunities and challenges of optimizing
+ helper threading on CMPs in a dynamic and feedback-directed way.
  We assume here a two level cache hierarchy where L1 caches are private
  and the L2 cache is shared among all processor cores on a single chip.
  
@@ -448,13 +444,13 @@ The main contributions of this paper can be summarized as answers for the
 
 \begin_layout Enumerate
 What is the relationship between the shared cache behavior and the overall
- performance improvement in helper threaded data prefetching on CMPs;
+ performance improvement in helper threading on CMPs;
 \end_layout
 
 \begin_layout Enumerate
 How can the helper thread LLC requests be classified to reflect the inter-thread
- LLC interference caused by helper thread LLC requests in helper threaded
- data prefetching on CMPs.
+ LLC interference caused by helper thread LLC requests in helper threading
+ on CMPs.
 \end_layout
 
 \begin_layout Standard
@@ -462,7 +458,7 @@ The rest of this paper is structured as follows.
  Section 2 describes the cycle-accurate simulation framework for the target
  CMP architecture and experimental setup.
  Section 3 presents the characterization of LLC interference caused by helper
- threaded data prefetching on CMPs.
+ threading on CMPs.
  Section 4 discusses the performance results on the detailed experiments.
  Section 5 provides related work.
  Section 6 concludes the paper.
@@ -491,7 +487,7 @@ reference "fig:Simulated-CMP-Architecture"
  MESI inclusive directory coherence is maintained between L1 caches.
  Both L1 and L2 caches use LRU replacement policy.
  An LRU cache called HTRVC is attached to the L2 cache to implement the
- taxonomy of helper thread LLC requests, as will be explained in the next
+ breakdown of helper thread LLC requests, as will be explained in the next
  section.
  Detailed microarchitecture parameters are listed in Tab.
 \begin_inset CommandInset ref
@@ -538,51 +534,6 @@ ral simulator written completely in Java and running on 32 and 64 bit Linux
  
 \end_layout
 
-\begin_layout Standard
-\align center
-\begin_inset Float figure
-wide true
-sideways false
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename /home/itecgo/Archimulator/doc/res/cacheconfig.pdf
-	scale 72
-	BoundingBox 26bp 480bp 575bp 750bp
-	clip
-
-\end_inset
-
-
-\begin_inset VSpace defskip
-\end_inset
-
-
-\begin_inset Caption
-
-\begin_layout Plain Layout
-Target CMP Architecture
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:Simulated-CMP-Architecture"
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
 \begin_layout Paragraph
 Static Software Context to Hardware Thread Mappings
 \end_layout
@@ -622,12 +573,79 @@ reference "fig:Simulated-CMP-Architecture"
  
 \end_layout
 
+\begin_layout Subsection
+Benchmarks and Input Sets
+\end_layout
+
+\begin_layout Standard
+We perform our evaluation using the original version and manually coded
+ helper thread version of mst in the Olden pointer traversal benchmark suite.
+ All applications are cross-compiled using gcc flag “-O3” and run until
+ completion using cycle-accurate simulation.
+ Input set for mst is 
+\begin_inset Quotes eld
+\end_inset
+
+2048 1
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Default Values of helper threading lookahead and stride parameters are
+ 20 and 10, respectively, if not specified explicitly.
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename /home/itecgo/Archimulator/doc/cacheconfig.pdf
+	scale 42
+	BoundingBox 50bp 60bp 555bp 725bp
+	clip
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Target CMP Architecture
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Simulated-CMP-Architecture"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
 \align center
 \begin_inset Float table
-wide true
+wide false
 sideways false
-status open
+status collapsed
 
 \begin_layout Plain Layout
 \align center
@@ -655,8 +673,10 @@ name "tab:Baseline-Hardware-Configurations"
 
 \begin_layout Plain Layout
 \align center
+
+\size scriptsize
 \begin_inset Tabular
-<lyxtabular version="3" rows="10" columns="2">
+<lyxtabular version="3" rows="7" columns="2">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0">
 <column alignment="left" valignment="top" width="0">
@@ -665,6 +685,8 @@ name "tab:Baseline-Hardware-Configurations"
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 Pipeline
 \end_layout
 
@@ -674,7 +696,9 @@ Pipeline
 \begin_inset Text
 
 \begin_layout Plain Layout
-4-wide superscalar out-of-order core; 2 cores, 2 threads per core
+
+\size scriptsize
+4-wide superscalar out-of-order core
 \end_layout
 
 \end_inset
@@ -694,14 +718,16 @@ Pipeline
 \begin_inset Text
 
 \begin_layout Plain Layout
-Physical register file capacity: 128
+
+\size scriptsize
+2 cores, 2 threads per core
 \end_layout
 
 \end_inset
 </cell>
 </row>
 <row>
-<cell multirow="4" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell multirow="4" alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -714,47 +740,138 @@ Physical register file capacity: 128
 \begin_inset Text
 
 \begin_layout Plain Layout
-Decode buffer capacity: 96
+
+\size scriptsize
+\begin_inset Tabular
+<lyxtabular version="3" rows="5" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0">
+<column alignment="left" valignment="top" width="0">
+<row>
+<cell alignment="left" valignment="top" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size scriptsize
+Physical register file capacity
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size scriptsize
+128
 \end_layout
 
 \end_inset
 </cell>
 </row>
 <row>
-<cell multirow="4" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 
+\size scriptsize
+Decode buffer capacity
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" bottomline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-Reorder buffer capacity: 96
+
+\size scriptsize
+96
 \end_layout
 
 \end_inset
 </cell>
 </row>
 <row>
-<cell multirow="4" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 
+\size scriptsize
+Reorder buffer capacity
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" bottomline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-Load store queue capacity: 48
+
+\size scriptsize
+96
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size scriptsize
+Load store queue capacity
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size scriptsize
+48
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size scriptsize
+Branch predictor
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size scriptsize
+Perfect
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -765,7 +882,9 @@ Load store queue capacity: 48
 \begin_inset Text
 
 \begin_layout Plain Layout
-Branch Predictors
+
+\size scriptsize
+FUs
 \end_layout
 
 \end_inset
@@ -774,26 +893,8 @@ Branch Predictors
 \begin_inset Text
 
 \begin_layout Plain Layout
-Perfect branch predictor
-\end_layout
 
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Functional Units
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
+\size scriptsize
 \begin_inset Tabular
 <lyxtabular version="3" rows="12" columns="4">
 <features tabularvalignment="middle">
@@ -806,6 +907,8 @@ Functional Units
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 FU Name
 \end_layout
 
@@ -815,6 +918,8 @@ FU Name
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 Count
 \end_layout
 
@@ -824,7 +929,9 @@ Count
 \begin_inset Text
 
 \begin_layout Plain Layout
-Operation Lat.
+
+\size scriptsize
+Operation Lat
 \end_layout
 
 \end_inset
@@ -833,7 +940,9 @@ Operation Lat.
 \begin_inset Text
 
 \begin_layout Plain Layout
-Issue Lat.
+
+\size scriptsize
+Issue Lat
 \end_layout
 
 \end_inset
@@ -844,7 +953,10 @@ Issue Lat.
 \begin_inset Text
 
 \begin_layout Plain Layout
-Integer ALU
+
+\size scriptsize
+Int.
+ ALU
 \end_layout
 
 \end_inset
@@ -853,6 +965,8 @@ Integer ALU
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 8
 \end_layout
 
@@ -862,6 +976,8 @@ Integer ALU
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 2
 \end_layout
 
@@ -871,6 +987,8 @@ Integer ALU
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 1
 \end_layout
 
@@ -882,7 +1000,10 @@ Integer ALU
 \begin_inset Text
 
 \begin_layout Plain Layout
-Intger Multiply
+
+\size scriptsize
+Int.
+ Multiply
 \end_layout
 
 \end_inset
@@ -891,6 +1012,8 @@ Intger Multiply
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 2
 \end_layout
 
@@ -900,6 +1023,8 @@ Intger Multiply
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 3
 \end_layout
 
@@ -909,6 +1034,8 @@ Intger Multiply
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 1
 \end_layout
 
@@ -920,7 +1047,10 @@ Intger Multiply
 \begin_inset Text
 
 \begin_layout Plain Layout
-Integer Division
+
+\size scriptsize
+Int.
+ Division
 \end_layout
 
 \end_inset
@@ -938,6 +1068,8 @@ Integer Division
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 20
 \end_layout
 
@@ -947,6 +1079,8 @@ Integer Division
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 19
 \end_layout
 
@@ -958,7 +1092,10 @@ Integer Division
 \begin_inset Text
 
 \begin_layout Plain Layout
-Floating Point Add
+
+\size scriptsize
+Fp.
+ Add
 \end_layout
 
 \end_inset
@@ -967,6 +1104,8 @@ Floating Point Add
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 8
 \end_layout
 
@@ -976,6 +1115,8 @@ Floating Point Add
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 4
 \end_layout
 
@@ -985,6 +1126,8 @@ Floating Point Add
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 1
 \end_layout
 
@@ -996,7 +1139,10 @@ Floating Point Add
 \begin_inset Text
 
 \begin_layout Plain Layout
-Floating Point Compare
+
+\size scriptsize
+Fp.
+ Compare
 \end_layout
 
 \end_inset
@@ -1014,6 +1160,8 @@ Floating Point Compare
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 4
 \end_layout
 
@@ -1023,6 +1171,8 @@ Floating Point Compare
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 1
 \end_layout
 
@@ -1034,7 +1184,10 @@ Floating Point Compare
 \begin_inset Text
 
 \begin_layout Plain Layout
-Floating Point Convert
+
+\size scriptsize
+Fp.
+ Convert
 \end_layout
 
 \end_inset
@@ -1052,6 +1205,8 @@ Floating Point Convert
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 4
 \end_layout
 
@@ -1061,6 +1216,8 @@ Floating Point Convert
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 1
 \end_layout
 
@@ -1072,7 +1229,10 @@ Floating Point Convert
 \begin_inset Text
 
 \begin_layout Plain Layout
-Floating Point Multiply
+
+\size scriptsize
+Fp.
+ Multiply
 \end_layout
 
 \end_inset
@@ -1081,6 +1241,8 @@ Floating Point Multiply
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 2
 \end_layout
 
@@ -1090,6 +1252,8 @@ Floating Point Multiply
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 8
 \end_layout
 
@@ -1099,6 +1263,8 @@ Floating Point Multiply
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 1
 \end_layout
 
@@ -1110,7 +1276,10 @@ Floating Point Multiply
 \begin_inset Text
 
 \begin_layout Plain Layout
-Floating Point Division
+
+\size scriptsize
+Fp.
+ Division
 \end_layout
 
 \end_inset
@@ -1128,6 +1297,8 @@ Floating Point Division
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 40
 \end_layout
 
@@ -1137,6 +1308,8 @@ Floating Point Division
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 20
 \end_layout
 
@@ -1148,7 +1321,10 @@ Floating Point Division
 \begin_inset Text
 
 \begin_layout Plain Layout
-Floating Point Square Root
+
+\size scriptsize
+Fp.
+ Sqrt
 \end_layout
 
 \end_inset
@@ -1166,6 +1342,8 @@ Floating Point Square Root
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 80
 \end_layout
 
@@ -1175,6 +1353,8 @@ Floating Point Square Root
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 40
 \end_layout
 
@@ -1186,6 +1366,8 @@ Floating Point Square Root
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 Read Port
 \end_layout
 
@@ -1195,6 +1377,8 @@ Read Port
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 4
 \end_layout
 
@@ -1204,6 +1388,8 @@ Read Port
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 1
 \end_layout
 
@@ -1213,6 +1399,8 @@ Read Port
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 1
 \end_layout
 
@@ -1224,6 +1412,8 @@ Read Port
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 Write Port
 \end_layout
 
@@ -1242,6 +1432,8 @@ Write Port
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 1
 \end_layout
 
@@ -1251,6 +1443,8 @@ Write Port
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 1
 \end_layout
 
@@ -1272,7 +1466,9 @@ Write Port
 \begin_inset Text
 
 \begin_layout Plain Layout
-Cache Geometries
+
+\size scriptsize
+Cache
 \end_layout
 
 \end_inset
@@ -1281,6 +1477,8 @@ Cache Geometries
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 \begin_inset Tabular
 <lyxtabular version="3" rows="4" columns="5">
 <features tabularvalignment="middle">
@@ -1294,6 +1492,8 @@ Cache Geometries
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 Name
 \end_layout
 
@@ -1303,6 +1503,8 @@ Name
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 Size
 \end_layout
 
@@ -1312,7 +1514,9 @@ Size
 \begin_inset Text
 
 \begin_layout Plain Layout
-Associativity
+
+\size scriptsize
+Assoc
 \end_layout
 
 \end_inset
@@ -1321,6 +1525,8 @@ Associativity
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 Line Size
 \end_layout
 
@@ -1330,6 +1536,8 @@ Line Size
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 Hit Lat.
 \end_layout
 
@@ -1341,6 +1549,8 @@ Hit Lat.
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 I Cache
 \end_layout
 
@@ -1350,6 +1560,8 @@ I Cache
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 32KB
 \end_layout
 
@@ -1359,6 +1571,8 @@ I Cache
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 4
 \end_layout
 
@@ -1368,6 +1582,8 @@ I Cache
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 64B
 \end_layout
 
@@ -1377,6 +1593,8 @@ I Cache
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 1
 \end_layout
 
@@ -1388,6 +1606,8 @@ I Cache
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 D Cache
 \end_layout
 
@@ -1397,6 +1617,8 @@ D Cache
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 32KB
 \end_layout
 
@@ -1406,6 +1628,8 @@ D Cache
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 4
 \end_layout
 
@@ -1415,6 +1639,8 @@ D Cache
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 64B
 \end_layout
 
@@ -1424,6 +1650,8 @@ D Cache
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 1
 \end_layout
 
@@ -1435,6 +1663,8 @@ D Cache
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 L2 Cache
 \end_layout
 
@@ -1444,6 +1674,8 @@ L2 Cache
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 96KB
 \end_layout
 
@@ -1453,6 +1685,8 @@ L2 Cache
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 8
 \end_layout
 
@@ -1462,6 +1696,8 @@ L2 Cache
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 64B
 \end_layout
 
@@ -1471,6 +1707,8 @@ L2 Cache
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 10
 \end_layout
 
@@ -1492,7 +1730,9 @@ L2 Cache
 \begin_inset Text
 
 \begin_layout Plain Layout
-Interconnect
+
+\size scriptsize
+Network
 \end_layout
 
 \end_inset
@@ -1501,6 +1741,8 @@ Interconnect
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 Switch based P2P topology, 32B link width
 \end_layout
 
@@ -1512,7 +1754,9 @@ Switch based P2P topology, 32B link width
 \begin_inset Text
 
 \begin_layout Plain Layout
-Main Memory
+
+\size scriptsize
+Memory
 \end_layout
 
 \end_inset
@@ -1521,6 +1765,8 @@ Main Memory
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\size scriptsize
 4GB, 200-cycle fixed latency
 \end_layout
 
@@ -1539,34 +1785,12 @@ Main Memory
 
 \end_layout
 
-\begin_layout Subsection
-Benchmarks and Input Sets
-\end_layout
-
-\begin_layout Standard
-We perform our evaluation using the original version and manually coded
- helper thread version of mst in the Olden pointer traversal benchmark suite.
- All applications are cross-compiled using gcc flag “-O3” and run until
- completion using cycle-accurate simulation.
- Input set for mst is 
-\begin_inset Quotes eld
-\end_inset
-
-2048 1
-\begin_inset Quotes erd
-\end_inset
-
-.
- Default helper threaded prefetching lookahead and stride are 20 and 10,
- respectively.
-\end_layout
-
 \begin_layout Section
-Characterizing LLC Interference Caused by Helper Threaded Prefetching
+Characterizing LLC Interference Caused by Helper Threading
 \end_layout
 
 \begin_layout Subsection
-The Scheme of Helper Threaded Data Prefetching on Shared-Cache CMPs
+The Scheme of Helper Threading on Shared-Cache CMPs
 \end_layout
 
 \begin_layout Standard
@@ -1577,8 +1801,8 @@ reference "fig:Helper-Threaded-Inter-Core-Data-Prefetching"
 
 \end_inset
 
-, the work flow of helper threaded data prefetching on shared-cache CMPs
- we implement here can be described as follows.
+, the work flow of helper threading on shared-cache CMPs we implement here
+ can be described as follows.
  
 \end_layout
 
@@ -1625,37 +1849,43 @@ After all the prefetching work is done, the helper thread is destroyed in
 \end_layout
 
 \begin_layout Standard
-Two parameters in the helper threaded prefetching scheme control its aggressiven
-ess: (1) the number of loop iterations of pointer traversals that the helper
+Two parameters in the helper threading scheme control its aggressiveness:
+ (1) the number of loop iterations of pointer traversals that the helper
  thread code skip after synchronizing with the main thread in the prelude
  is called 
 \shape italic
 lookahead
 \shape default
-; (2) the number of loop iterations of pointer traversals in which helper
- thread code issue LLC prefetch requests in the stable state is called 
+, which is necessary given that the helper thread needs to stay ahead of
+ the main thread in the beginning in each turn to amortize the difference
+ of amount of work to do in the main thread and the helper thread in CPU
+ time; (2) the number of loop iterations of pointer traversals in which
+ helper thread code issue LLC prefetch requests in the stable state is called
+ 
 \shape italic
 stride
 \shape default
-.
+, which implies how much data prefetching work can be done in the helper
+ thread in each turn in the attempt to not lag behind the main thread and
+ pollute the LLC too much .
  
 \end_layout
 
 \begin_layout Standard
-In the traditional helper threaded prefetching configuration, the values
- of lookahead and stride are selected empirically and hard coded, which
- is unable to accommodate the unpredictable nature of L2 cache runtime behavior
- in the presence of helper thread requests.
+In the traditional helper threading configuration, the values of lookahead
+ and stride are selected empirically and hard coded, which is unable to
+ accommodate the unpredictable nature of L2 cache runtime behavior in the
+ presence of helper thread requests.
  Based on our following characterization of helper thread L2 requests, a
  dynamic feedback directed mechanism can be built in which the processor
  changes the value of lookahead and stride using some temporary registers
- to adjust the aggressiveness of the helper threaded prefetching scheme.
+ to adjust the aggressiveness of the helper threading scheme.
 \end_layout
 
 \begin_layout Standard
 \align center
 \begin_inset Float figure
-wide true
+wide false
 sideways false
 status open
 
@@ -1663,7 +1893,7 @@ status open
 \align center
 \begin_inset Graphics
 	filename /home/itecgo/Archimulator/doc/ht_scheme.pdf
-	scale 45
+	scale 31
 	BoundingBox 30bp 38bp 810bp 538bp
 	clip
 
@@ -1677,7 +1907,7 @@ status open
 \begin_inset Caption
 
 \begin_layout Plain Layout
-The Scheme of Helper Threaded Data Prefetching on CMPs
+The Scheme of Helper Threading on CMPs
 \begin_inset CommandInset label
 LatexCommand label
 name "fig:Helper-Threaded-Inter-Core-Data-Prefetching"
@@ -1698,7 +1928,7 @@ name "fig:Helper-Threaded-Inter-Core-Data-Prefetching"
 \end_layout
 
 \begin_layout Subsection
-Adapting Traditional Hardware Prefetching Metrics to Helper Threaded Prefetching
+Adapting Traditional Hardware Prefetching Metrics to Helper Threading
 \end_layout
 
 \begin_layout Standard
@@ -1711,9 +1941,8 @@ key "Srinivasan2004"
 \end_inset
 
 .
- In this section, we adapt the metrics to the helper threaded prefetching
- scheme and describe what the metrics mean under the helper threaded prefetching
- scheme.
+ In this section, we adapt the metrics to the helper threading scheme and
+ describe what the metrics mean under the helper threading scheme.
 \end_layout
 
 \begin_layout Paragraph
@@ -1747,9 +1976,9 @@ Helper Thread LLC Request Accuracy
 \shape italic
 Helper thread LLC request accuracy
 \shape default
- is a measure of how accurately the helper threaded prefetching scheme can
- predict and issue prefetch requests for the memory addresses that will
- be accessed by the main thread.
+ is a measure of how accurately the helper threading scheme can predict
+ and issue prefetch requests for the memory addresses that will be accessed
+ by the main thread.
  It is defined as below
 \end_layout
 
@@ -1768,8 +1997,7 @@ Accuracy=\frac{\#\: Useful\: Helper\: Thread\: LLC\: Requests}{\#\: Helper\: Thr
 where # Useful helper thread LLC Requests is the number of LLC lines brought
  by helper thread requests that are later on hit by helper thread requests.
  For benchmarks with high helper thread LLC request accuracy, performance
- increases as the aggressiveness of the helper threaded prefetching scheme
- is increased.
+ increases as the aggressiveness of the helper threading scheme is increased.
 \end_layout
 
 \begin_layout Paragraph
@@ -1842,12 +2070,11 @@ Characterizing Intra-application LLC interference
 \end_layout
 
 \begin_layout Subsubsection
-Intra-Application Reuse Distances in Helper Threaded Data Prefetching on
- CMPs
+Intra-Application Reuse Distances in Helper Threading on CMPs
 \end_layout
 
 \begin_layout Standard
-The notion of reuse distance can shed light on how a pollution-aware taxonomy
+The notion of reuse distance can shed light on how a pollution-aware breakdown
  of helper thread LLC requests can be constructed.
  The traditional intra-thread reuse distance of a reference to data element
  x is defined as the number of unique memory references between two consecutive
@@ -1896,9 +2123,8 @@ To accommodate the case where one thread Tb accesses data element x that
 
 \begin_layout Standard
 To show why the notion of inter-thread reuse distance is important in the
- helper threaded prefetching scheme as compared to the traditional notion
- of intra-thread reuse distance, we can consider the mst benchmark in the
- Olden suite.
+ helper threading scheme as compared to the traditional notion of intra-thread
+ reuse distance, we can consider the mst benchmark in the Olden suite.
  Its pointer traversing code structure inherently exhibits irregular memory
  access pattern in its original, single threaded version, which renders
  the common LRU replacement policy inefficient to reduce LLC misses.
@@ -1930,17 +2156,17 @@ inter-thread reuse distance
 \begin_inset Formula $ITRD_{HT-MT}$
 \end_inset
 
- in helper thread LLC requests should be very small when the helper threaded
- prefetching scheme is efficient to reduce LLC misses in main thread where
- for most helper thread LLC miss, an immediate follow-up main thread LLC
- request will access the data brought by the previous LLC request and hit
- in the LLC.
+ in helper thread LLC requests should be very small when the helper threading
+ scheme is efficient to reduce LLC misses in main thread where for most
+ helper thread LLC miss, an immediate follow-up main thread LLC request
+ will access the data brought by the previous LLC request and hit in the
+ LLC.
  Otherwise, large values of 
 \begin_inset Formula $ITRD_{HT-MT}$
 \end_inset
 
- indicate the inefficiency of the helper threaded prefetching scheme where
- most data brought by helper thread is replaced before used by main thread.
+ indicate the inefficiency of the helper threading scheme where most data
+ brought by helper thread is replaced before used by main thread.
 \end_layout
 
 \begin_layout Standard
@@ -1960,7 +2186,7 @@ t useless for mst with helper thread.
 \end_layout
 
 \begin_layout Subsubsection
-A Simple Taxonomy of Helper Thread LLC Requests Based on Intra-Application
+A Simple Breakdown of Helper Thread LLC Requests Based on Intra-Application
  Reuse Distances
 \end_layout
 
@@ -1973,7 +2199,7 @@ Based on the notions of HT-MT inter-thread reuse distance (
 \begin_inset Formula $RD_{MT}$
 \end_inset
 
-), we can construct a pollution aware taxonomy of helper thread LLC requests
+), we can construct a pollution aware breakdown of helper thread LLC requests
  where helper thread LLC requests are classified into three types: good,
  bad and ugly.
  Let's assume when a helper thread LLC request referencing data H evicts
@@ -2084,8 +2310,8 @@ reference "fig:taxonomy_ht_llc_requests"
 \end_inset
 
 , We can see that, good and bad helper thread LLC requests are caused by
- the optimal and non-optimal LLC replacement in the presence of helper threaded
- data prefetching on CMPs, respectively.
+ the optimal and non-optimal LLC replacement in the presence of helper threading
+ on CMPs, respectively.
  We can conclude that
 \end_layout
 
@@ -2094,8 +2320,7 @@ Low
 \begin_inset Formula $ITRD_{HT-MT}$
 \end_inset
 
- is an indicator of good performance of the helper threaded prefetching
- scheme;
+ is an indicator of good performance of the helper threading scheme;
 \end_layout
 
 \begin_layout Enumerate
@@ -2121,7 +2346,7 @@ High
 \begin_layout Standard
 \align center
 \begin_inset Float figure
-wide true
+wide false
 sideways false
 status open
 
@@ -2129,8 +2354,8 @@ status open
 \align center
 \begin_inset Graphics
 	filename prefetch_timeline.pdf
-	scale 45
-	BoundingBox 30bp 25bp 810bp 530bp
+	scale 29
+	BoundingBox 35bp 25bp 790bp 585bp
 	clip
 
 \end_inset
@@ -2143,7 +2368,7 @@ status open
 \begin_inset Caption
 
 \begin_layout Plain Layout
-Taxonomy of Helper Thread LLC Requests
+Timeline for Breakdown of Helper Thread LLC Requests
 \begin_inset CommandInset label
 LatexCommand label
 name "fig:taxonomy_ht_llc_requests"
@@ -2164,7 +2389,7 @@ name "fig:taxonomy_ht_llc_requests"
 \end_layout
 
 \begin_layout Subsubsection
-Add Lateness to the Taxonomy of Helper Thread LLC Requests
+Add Lateness to the Breakdown of Helper Thread LLC Requests
 \end_layout
 
 \begin_layout Standard
@@ -2178,10 +2403,9 @@ if its requested data has not yet returned from the main memory by the time
  a main thread LLC request references the data.
  Late helper thread requests only partially hide the LLC miss latency in
  main thread requests, but they are good indicators for potential performance
- improvement of the helper threaded prefetching scheme because late helper
- thread requests may be converted to timely helper thread requests by adjusting
- the aggressiveness parameters of the helper threaded prefetching scheme,
- i.e., lookahead and stride.
+ improvement of the helper threading scheme because late helper thread requests
+ may be converted to timely helper thread requests by adjusting the aggressivene
+ss parameters of the helper threading scheme, i.e., lookahead and stride.
  
 \end_layout
 
@@ -2197,7 +2421,7 @@ and
 \shape italic
  redundant_cache helper thread request 
 \shape default
-to the taxonomy, as shown in Fig.
+to the breakdown, as shown in Fig.
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "fig:taxonomy_ht_llc_requests"
@@ -2208,10 +2432,14 @@ reference "fig:taxonomy_ht_llc_requests"
 \end_layout
 
 \begin_layout Subsection
-Mechanisms and Algorithms for Implementing the Taxonomy
+Mechanisms and Algorithms for Implementing the Breakdown
 \end_layout
 
 \begin_layout Subsubsection
+Mechanisms
+\end_layout
+
+\begin_layout Paragraph
 LLC request and replacement event tracking
 \end_layout
 
@@ -2234,7 +2462,7 @@ key "Mehta2004"
 .
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Paragraph
 Helper Thread LLC request state tracking
 \end_layout
 
@@ -2253,7 +2481,7 @@ reference "fig:Simulated-CMP-Architecture"
  
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Paragraph
 Helper Thread LLC request victim state tracking
 \end_layout
 
@@ -2278,7 +2506,7 @@ reference "fig:Simulated-CMP-Architecture"
  HTRVC has the sole purpose of profiling, so it has no impact on performance.
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Paragraph
 Detecting Late Helper Thread LLC Requests
 \end_layout
 
@@ -2296,7 +2524,7 @@ Lastly, in order to measure late helper thread requests, we need to identify
 \end_layout
 
 \begin_layout Subsubsection
-Tracking Helper Thread LLC Requests and Victims
+Algorithms for Tracking Helper Thread LLC Requests and Victims
 \end_layout
 
 \begin_layout Standard
@@ -2383,7 +2611,7 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset listings
-lstparams "basicstyle={\small},breaklines=true,frame=single,language=Java"
+lstparams "basicstyle={\scriptsize\ttfamily},breaklines=true,frame=single,language=Java"
 inline false
 status open
 
@@ -2563,7 +2791,7 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset listings
-lstparams "basicstyle={\small},breaklines=true,frame=single,language=Java"
+lstparams "basicstyle={\scriptsize\ttfamily},breaklines=true,frame=single,language=Java"
 inline false
 status open
 
@@ -2727,7 +2955,8 @@ reference "tab:mst-Baseline-Performance"
 \end_inset
 
  (a), we can see that when the L2 size is greater than 128 KB, there is
- no difference in execution time, implying the working set of mst 
+ no difference in execution time and there is no eviction observed in the
+ L2 cache, implying the working set of mst 
 \begin_inset Quotes eld
 \end_inset
 
@@ -2735,7 +2964,7 @@ reference "tab:mst-Baseline-Performance"
 \begin_inset Quotes erd
 \end_inset
 
- with helper threaded prefetching switched off is near 128 KB.
+ with helper threading switched off is near 128 KB.
  L2 sizes larger than 128 KB contribute little to the overall performance.
  Tab.
 \begin_inset CommandInset ref
@@ -2748,8 +2977,7 @@ reference "tab:mst-Baseline-Performance"
  when the latter is greater than 4.
  Trivial speedups are observed in these basic experiments of mst benchmark
  baseline versions, which is however in contrast to the results observed
- in mst helper threaded prefetching versions as we will discuss shortly
- after.
+ in mst helper threading versions as we will discuss shortly after.
 \end_layout
 
 \begin_layout Standard
@@ -2788,8 +3016,8 @@ name "tab:mst-Baseline-Performance"
 \begin_layout Plain Layout
 \begin_inset Graphics
 	filename /home/itecgo/Archimulator/experiment_tables/mst_2048_baseline_l2_96KB_to_2MB_summary.pdf
-	scale 62
-	BoundingBox 30bp 1035bp 810bp 1165bp
+	scale 53
+	BoundingBox 30bp 1210bp 812bp 1370bp
 	clip
 
 \end_inset
@@ -2820,8 +3048,8 @@ name "tab:mst-Baseline-Performance"
 \begin_layout Plain Layout
 \begin_inset Graphics
 	filename /home/itecgo/Archimulator/experiment_tables/mst_2048_baseline_l2_2way_to_32way_summary.pdf
-	scale 62
-	BoundingBox 30bp 1050bp 810bp 1165bp
+	scale 53
+	BoundingBox 30bp 1230bp 812bp 1371bp
 	clip
 
 \end_inset
@@ -2893,8 +3121,8 @@ name "tab:mst-Helper-Threaded-Prefetching-Performance"
 \begin_layout Plain Layout
 \begin_inset Graphics
 	filename /home/itecgo/Archimulator/experiment_tables/mst_2048_ht_20_10_l2_96KB_to_2MB_summary.pdf
-	scale 62
-	BoundingBox 30bp 935bp 810bp 1165bp
+	scale 53
+	BoundingBox 30bp 1120bp 812bp 1371bp
 	clip
 
 \end_inset
@@ -2925,8 +3153,8 @@ name "tab:mst-Helper-Threaded-Prefetching-Performance"
 \begin_layout Plain Layout
 \begin_inset Graphics
 	filename /home/itecgo/Archimulator/experiment_tables/mst_2048_ht_20_10_l2_2way_to_32way_summary.pdf
-	scale 62
-	BoundingBox 30bp 965bp 810bp 1165bp
+	scale 53
+	BoundingBox 30bp 1150bp 812bp 1371bp
 	clip
 
 \end_inset
@@ -2970,9 +3198,9 @@ reference "tab:mst-Helper-Threaded-Prefetching-Performance"
 
 \end_inset
 
- shows the overall performance of mst benchmark helper threaded prefetching
- version, in which L2 size is varied from 96 KB to 2 MB and L2 associativity
- is varied from 2 to 16, respectively.
+ shows the overall performance of mst benchmark helper threading version,
+ in which L2 size is varied from 96 KB to 2 MB and L2 associativity is varied
+ from 2 to 16, respectively.
  In Tab.
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -2981,7 +3209,8 @@ reference "tab:mst-Helper-Threaded-Prefetching-Performance"
 \end_inset
 
  (a), we can see that when the L2 size is greater than 512 KB, there is
- no difference in execution time, implying the working set of mst 
+ no difference in execution time and no eviction observed in the L2 cache,
+ implying the working set of mst 
 \begin_inset Quotes eld
 \end_inset
 
@@ -2989,7 +3218,7 @@ reference "tab:mst-Helper-Threaded-Prefetching-Performance"
 \begin_inset Quotes erd
 \end_inset
 
- with helper threaded prefetching switched on is near 512 KB.
+ with helper threading switched on is near 512 KB.
  L2 sizes larger than 512 KB contribute little to the overall performance.
  Tab.
 \begin_inset CommandInset ref
@@ -3000,8 +3229,7 @@ reference "tab:mst-Helper-Threaded-Prefetching-Performance"
 
  (b) shows that the execution time is reduced slightly as the L2 associativity
  is increased from 2 to 32.
- The presence of helper threaded prefetching increases the working set of
- mst 
+ The presence of helper threading increases the working set of mst 
 \begin_inset Quotes eld
 \end_inset
 
@@ -3018,11 +3246,34 @@ reference "tab:mst-Helper-Threaded-Prefetching-Performance"
  We can see that bad prefetches are in the forms of capacity and conflict
  misses in this scenario.
  About 1%-3% reductions of execution time are achieved in these basic experiment
-s of mst benchmark helper threaded prefetching versions.
- A maximum 22% reduction of execution is achieved between baseline and helper
- thread versions of mst in these basic experiments, which shows our implemented
- helper threaded prefetching scheme is non-trivially effective for the mst
- benchmark.
+s of mst benchmark helper threading versions.
+ 
+\end_layout
+
+\begin_layout Standard
+Overall, low IPCs are observed among the experiments shown in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "tab:mst-Baseline-Performance"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "tab:mst-Helper-Threaded-Prefetching-Performance"
+
+\end_inset
+
+, which is due to the inefficiency of LRU replacement policy adopted in
+ the shared L2 cache to accommodate the irregular thrashing access pattern
+ exposed by mst, as we discussed previously.
+ A maximum 22% reduction of execution is achieved when the lookahead is
+ 20 and stride is 10 under L2 size greater than 512MB and L2 associativity
+ greater than 16, between baseline and helper thread versions of mst in
+ these basic experiments, which shows our implemented helper threading scheme
+ is non-trivially effective for the mst benchmark.
+ 
 \end_layout
 
 \begin_layout Subsection
@@ -3037,9 +3288,9 @@ reference "fig:Impact-of-L2-Size-mst-ht"
 
 \end_inset
 
- shows the normalized execution times in cycles and helper threaded L2 request
- breakdown for the mst helper threaded prefetching version when the L2 size
- is increased from 96 KB to 2 MB.
+ shows the normalized execution times in cycles and helper thread L2 request
+ breakdown for the mst helper threading version when the L2 size is increased
+ from 96 KB to 2 MB.
  For clarity, execution times are normalized to the first case in the figure
  where L2 size is 96 KB, The 128 KB working set limit of mst 
 \begin_inset Quotes eld
@@ -3049,125 +3300,12 @@ reference "fig:Impact-of-L2-Size-mst-ht"
 \begin_inset Quotes erd
 \end_inset
 
- helper threaded prefetching version is reiterated.
+ helper threading version is reiterated.
  A few ugly helper thread L2 requests are observed when the L2 size is as
  small as 96 KB, which results from where the helper thread first prefetch
  some potentially useful data into the L2 cache, but due to the limited
  capacity of the L2 cache, these data are evicted too early from the L2
  cache before the main thread uses them.
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset Float figure
-wide true
-sideways false
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Tabular
-<lyxtabular version="3" rows="2" columns="2">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<row>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_20_10_l2_96KB_to_2MB_totalCycles_normalized.pdf
-	scale 58
-	BoundingBox 0bp 0bp 347bp 211bp
-	clip
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_20_10_l2_96KB_to_2MB_helperThreadL2CacheRequestBreakdowns.pdf
-	scale 58
-	BoundingBox 0bp 0bp 455bp 211bp
-	clip
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size footnotesize
-(a) Normalized Total Cycles
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size footnotesize
-(b) Helper Thread L2 Request Breakdown
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-Impact of L2 Size on mst Helper Thread Performance (lookahead=20, stride=10)
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:Impact-of-L2-Size-mst-ht"
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout Subsection
@@ -3182,9 +3320,9 @@ reference "fig:Impact-of-L2-Assoc-mst-ht"
 
 \end_inset
 
- shows the normalized execution times in cycles and helper threaded L2 request
- breakdown for the mst helper threaded prefetching version when the L2 associati
-vity is varied from 2 to 16.
+ shows the normalized execution times in cycles and helper thread L2 request
+ breakdown for the mst helper threading version when the L2 associativity
+ is varied from 2 to 16.
  For clarity, execution times are normalized to the first case in the figure
  where L2 associativity is 2.
  A few ugly helper thread L2 requests are observed when the L2 associativity
@@ -3215,89 +3353,38 @@ reference "fig:Impact-of-L2-Assoc-mst-ht"
 , which implies the helper thread is sometimes initiated too late to prefetch
  the data, as the data is already put in the L2 cache by the main thread,
  thus leading to the waste of cache resource and on-chip interconnect bandwidth.
- This deficiency can only be improved by fine-tuning the helper threaded
- prefetching program code, which is out of the scope of this work.
+ This deficiency can only be improved by fine-tuning the helper threading
+ program code, which is out of the scope of this work.
 \end_layout
 
 \begin_layout Standard
 \align center
 \begin_inset Float figure
-wide true
+wide false
 sideways false
 status open
 
 \begin_layout Plain Layout
 \align center
-\begin_inset Tabular
-<lyxtabular version="3" rows="2" columns="2">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<row>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
 \begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_20_10_l2_2way_to_32way_totalCycles_normalized.pdf
-	scale 58
+	filename /home/itecgo/Archimulator/experiment_tables/mst_2048_ht_20_10_l2_96KB_to_2MB_summary_plot.pdf
+	scale 13
 	clip
 
 \end_inset
 
 
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
+\begin_inset Note Note
+status open
 
 \begin_layout Plain Layout
-\begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_20_10_l2_2way_to_32way_helperThreadL2CacheRequestBreakdowns.pdf
-	scale 58
-	BoundingBox 0bp 0bp 455bp 211bp
-	clip
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size footnotesize
-(a) Normalized Total Cycles
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size footnotesize
-(b) Helper Thread L2 Request Breakdown
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
+\align center
 \begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
 \end_inset
 
 
@@ -3307,8 +3394,66 @@ status open
 \begin_inset Caption
 
 \begin_layout Plain Layout
-Impact of L2 Associativity on mst Helper Thread Performance (lookahead=20,
+Impact of L2 Size on mst Helper Thread L2 Request Breakdown (lookahead=20,
  stride=10)
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Impact-of-L2-Size-mst-ht"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename /home/itecgo/Archimulator/experiment_tables/mst_2048_ht_20_10_l2_2way_to_32way_summary_plot.pdf
+	scale 13
+	clip
+
+\end_inset
+
+
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Impact of L2 Associativity on mst Helper Thread L2 Request Breakdown (lookahead=
+20, stride=10)
 \begin_inset CommandInset label
 LatexCommand label
 name "fig:Impact-of-L2-Assoc-mst-ht"
@@ -3333,9 +3478,16 @@ Impact of Prefetching Lookahead
 \end_layout
 
 \begin_layout Standard
-Below we see how the two parameters lookahead and stride of the helper threaded
- prefetching scheme affect the helper thread L2 request breakdown and thus
- the overall performance.
+In the below presentation of extended experiments, we discuss how the helper
+ threading parameters of lookahead and stride interact to change the breakdown
+ of helper thread L2 requests and thus affect the overall performance.
+ 
+\end_layout
+
+\begin_layout Standard
+Below we see how the two parameters lookahead and stride of the helper threading
+ scheme affect the helper thread L2 request breakdown and thus the overall
+ performance.
  Fig.
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -3343,9 +3495,9 @@ reference "fig:Impact-of-Lookahead-mst-ht"
 
 \end_inset
 
- shows the normalized execution times in cycles and helper threaded L2 request
- breakdown for the mst helper threaded prefetching version when the lookahead
- is varied from 10 to 480.
+ shows the normalized execution times in cycles and helper thread L2 request
+ breakdown for the mst helper threading version when the lookahead is varied
+ from 10 to 320.
  For clarity, execution times are normalized to the first case in the figure
  where the lookahead is 10.
  We can see that when the stride is less than 40, the execution time increases
@@ -3362,556 +3514,12 @@ We must note that when the lookahead is small and the stride is large, there
  intuitively as the helper thread skips too little in the prelude and prefetches
  too much in the stable state to keep running ahead of the main thread to
  fetch the data.
- In the other hand, when the lookahead is increased from 10 to 480 and the
+ Too much late prefetches do great harm to the performance improvement of
+ helper threading.
+ In the other hand, when the lookahead is increased from 10 to 320 and the
  stride is large, the number of timely helper thread L2 requests diminishes,
  which implies the helper thread does too little prefetching work to provide
  tangible overall performance improvement.
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset Float figure
-wide true
-sideways false
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Tabular
-<lyxtabular version="3" rows="2" columns="2">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<row>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_0_10_lookahead_0_to_640_totalCycles_normalized.pdf
-	scale 38
-	clip
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_0_10_lookahead_0_to_640_helperThreadL2CacheRequestBreakdowns.pdf
-	scale 38
-	BoundingBox 0bp 0bp 455bp 211bp
-	clip
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size footnotesize
-(1a) Normalized Total Cycles (stride=10)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size footnotesize
-(1b) Helper Thread L2 Request Breakdown (stride=10)
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Tabular
-<lyxtabular version="3" rows="2" columns="2">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<row>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_0_20_lookahead_0_to_640_totalCycles_normalized.pdf
-	scale 38
-	clip
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_0_20_lookahead_0_to_640_helperThreadL2CacheRequestBreakdowns.pdf
-	scale 38
-	BoundingBox 0bp 0bp 455bp 211bp
-	clip
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size footnotesize
-(2a) Normalized Total Cycles (stride=20)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size footnotesize
-(2b) Helper Thread L2 Request Breakdown (stride=20)
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Tabular
-<lyxtabular version="3" rows="2" columns="2">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<row>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_0_40_lookahead_0_to_640_totalCycles_normalized.pdf
-	scale 38
-	clip
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_0_40_lookahead_0_to_640_helperThreadL2CacheRequestBreakdowns.pdf
-	scale 38
-	BoundingBox 0bp 0bp 455bp 211bp
-	clip
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size footnotesize
-(3a) Normalized Total Cycles (stride=40)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size footnotesize
-(3b) Helper Thread L2 Request Breakdown (stride=40)
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Tabular
-<lyxtabular version="3" rows="2" columns="2">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<row>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_0_80_lookahead_0_to_640_totalCycles_normalized.pdf
-	scale 38
-	clip
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_0_80_lookahead_0_to_640_helperThreadL2CacheRequestBreakdowns.pdf
-	scale 38
-	BoundingBox 0bp 0bp 455bp 211bp
-	clip
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size footnotesize
-(4a) Normalized Total Cycles (stride=80)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size footnotesize
-(4b) Helper Thread L2 Request Breakdown (stride=80)
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Tabular
-<lyxtabular version="3" rows="2" columns="2">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<row>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_0_160_lookahead_0_to_640_totalCycles_normalized.pdf
-	scale 38
-	clip
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_0_160_lookahead_0_to_640_helperThreadL2CacheRequestBreakdowns.pdf
-	scale 38
-	BoundingBox 0bp 0bp 455bp 211bp
-	clip
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size footnotesize
-(5a) Normalized Total Cycles (stride=160)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size footnotesize
-(5b) Helper Thread L2 Request Breakdown (stride=160)
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Tabular
-<lyxtabular version="3" rows="2" columns="2">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<row>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_0_320_lookahead_0_to_640_totalCycles_normalized.pdf
-	scale 38
-	clip
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_0_320_lookahead_0_to_640_helperThreadL2CacheRequestBreakdowns.pdf
-	scale 38
-	BoundingBox 0bp 0bp 455bp 211bp
-	clip
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size footnotesize
-(6a) Normalized Total Cycles (stride=320)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size footnotesize
-(6b) Helper Thread L2 Request Breakdown (stride=320)
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Tabular
-<lyxtabular version="3" rows="2" columns="2">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<row>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_0_640_lookahead_0_to_640_totalCycles_normalized.pdf
-	scale 38
-	clip
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_0_640_lookahead_0_to_640_helperThreadL2CacheRequestBreakdowns.pdf
-	scale 38
-	BoundingBox 0bp 0bp 455bp 211bp
-	clip
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size footnotesize
-(7a) Normalized Total Cycles (stride=480)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size footnotesize
-(7b) Helper Thread L2 Request Breakdown (stride=480)
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-Impact of Prefetching Lookahead on mst Helper Thread Performance
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:Impact-of-Lookahead-mst-ht"
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout Subsection
@@ -3919,23 +3527,14 @@ Impact of Prefetching Stride
 \end_layout
 
 \begin_layout Standard
-Fig.
+From Fig.
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "fig:Impact-of-Stride-mst-ht"
 
 \end_inset
 
- shows the normalized execution times in cycles and helper threaded L2 request
- breakdown for the mst helper threaded prefetching version when the stride
- is varied from 10 to 480.
- For clarity, execution times are normalized to the first case in the figure
- where the stride is 10.
- 
-\end_layout
-
-\begin_layout Standard
-We can see the relationship between the values of stride and the overall
+, we can see the relationship between the values of stride and the overall
  performance varies under different values of lookahead:
 \end_layout
 
@@ -3965,16 +3564,15 @@ When the lookahead is greater than 160, the number of late helper thread
 \begin_layout Standard
 \align center
 \begin_inset Float figure
-wide true
+wide false
 sideways false
-status open
+status collapsed
 
 \begin_layout Plain Layout
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="2" columns="2">
+<lyxtabular version="3" rows="2" columns="1">
 <features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <row>
 <cell alignment="center" valignment="top" usebox="none">
@@ -3982,25 +3580,9 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_10_5_stride_5_to_640_totalCycles_normalized.pdf
-	scale 38
-	clip
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_10_5_stride_5_to_640_helperThreadL2CacheRequestBreakdowns.pdf
-	scale 38
-	BoundingBox 0bp 0bp 455bp 211bp
+	filename /home/itecgo/Archimulator/experiment_tables/mst_2048_ht_0_10_lookahead_0_to_640_summary_plot.pdf
+	scale 13
+	BoundingBox 0bp 0bp 1440bp 507bp
 	clip
 
 \end_inset
@@ -4018,18 +3600,7 @@ status open
 \begin_layout Plain Layout
 
 \size footnotesize
-(1a) Normalized Total Cycles (lookahead=10)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size footnotesize
-(1b) Helper Thread L2 Request Breakdown (lookahead=10)
+(a) Helper Thread L2 Request Breakdown (stride=10)
 \end_layout
 
 \end_inset
@@ -4045,9 +3616,8 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="2" columns="2">
+<lyxtabular version="3" rows="2" columns="1">
 <features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <row>
 <cell alignment="center" valignment="top" usebox="none">
@@ -4055,25 +3625,8 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_20_5_stride_5_to_640_totalCycles_normalized.pdf
-	scale 38
-	clip
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_20_5_stride_5_to_640_helperThreadL2CacheRequestBreakdowns.pdf
-	scale 38
-	BoundingBox 0bp 0bp 455bp 211bp
+	filename /home/itecgo/Archimulator/experiment_tables/mst_2048_ht_0_20_lookahead_0_to_640_summary_plot.pdf
+	scale 13
 	clip
 
 \end_inset
@@ -4091,18 +3644,7 @@ status open
 \begin_layout Plain Layout
 
 \size footnotesize
-(2a) Normalized Total Cycles (lookahead=20)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size footnotesize
-(2b) Helper Thread L2 Request Breakdown (lookahead=20)
+(b) Helper Thread L2 Request Breakdown (stride=20)
 \end_layout
 
 \end_inset
@@ -4118,9 +3660,8 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="2" columns="2">
+<lyxtabular version="3" rows="2" columns="1">
 <features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <row>
 <cell alignment="center" valignment="top" usebox="none">
@@ -4128,27 +3669,8 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_40_5_stride_5_to_640_totalCycles_normalized.pdf
-	display false
-	scale 38
-	clip
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_40_5_stride_5_to_640_helperThreadL2CacheRequestBreakdowns.pdf
-	display false
-	scale 38
-	BoundingBox 0bp 0bp 455bp 211bp
+	filename /home/itecgo/Archimulator/experiment_tables/mst_2048_ht_0_40_lookahead_0_to_640_summary_plot.pdf
+	scale 13
 	clip
 
 \end_inset
@@ -4166,18 +3688,7 @@ status open
 \begin_layout Plain Layout
 
 \size footnotesize
-(3a) Normalized Total Cycles (lookahead=40)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size footnotesize
-(3b) Helper Thread L2 Request Breakdown (lookahead=40)
+(c) Helper Thread L2 Request Breakdown (stride=40)
 \end_layout
 
 \end_inset
@@ -4193,9 +3704,8 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="2" columns="2">
+<lyxtabular version="3" rows="2" columns="1">
 <features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <row>
 <cell alignment="center" valignment="top" usebox="none">
@@ -4203,27 +3713,8 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_80_5_stride_5_to_640_totalCycles_normalized.pdf
-	display false
-	scale 38
-	clip
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_80_5_stride_5_to_640_helperThreadL2CacheRequestBreakdowns.pdf
-	display false
-	scale 38
-	BoundingBox 0bp 0bp 455bp 211bp
+	filename /home/itecgo/Archimulator/experiment_tables/mst_2048_ht_0_80_lookahead_0_to_640_summary_plot.pdf
+	scale 13
 	clip
 
 \end_inset
@@ -4241,18 +3732,7 @@ status open
 \begin_layout Plain Layout
 
 \size footnotesize
-(4a) Normalized Total Cycles (lookahead=80)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size footnotesize
-(4b) Helper Thread L2 Request Breakdown (lookahead=80)
+(d) Helper Thread L2 Request Breakdown (stride=80)
 \end_layout
 
 \end_inset
@@ -4268,9 +3748,8 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="2" columns="2">
+<lyxtabular version="3" rows="2" columns="1">
 <features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <row>
 <cell alignment="center" valignment="top" usebox="none">
@@ -4278,27 +3757,8 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_160_5_stride_5_to_640_totalCycles_normalized.pdf
-	display false
-	scale 38
-	clip
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_160_5_stride_5_to_640_helperThreadL2CacheRequestBreakdowns.pdf
-	display false
-	scale 38
-	BoundingBox 0bp 0bp 455bp 211bp
+	filename /home/itecgo/Archimulator/experiment_tables/mst_2048_ht_0_160_lookahead_0_to_640_summary_plot.pdf
+	scale 13
 	clip
 
 \end_inset
@@ -4316,18 +3776,7 @@ status open
 \begin_layout Plain Layout
 
 \size footnotesize
-(5a) Normalized Total Cycles (lookahead=160)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size footnotesize
-(5b) Helper Thread L2 Request Breakdown (lookahead=160)
+(e) Helper Thread L2 Request Breakdown (stride=160)
 \end_layout
 
 \end_inset
@@ -4343,9 +3792,8 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="2" columns="2">
+<lyxtabular version="3" rows="2" columns="1">
 <features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <row>
 <cell alignment="center" valignment="top" usebox="none">
@@ -4353,27 +3801,8 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_320_5_stride_5_to_640_totalCycles_normalized.pdf
-	display false
-	scale 38
-	clip
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_320_5_stride_5_to_640_helperThreadL2CacheRequestBreakdowns.pdf
-	display false
-	scale 38
-	BoundingBox 0bp 0bp 455bp 211bp
+	filename /home/itecgo/Archimulator/experiment_tables/mst_2048_ht_0_320_lookahead_0_to_640_summary_plot.pdf
+	scale 13
 	clip
 
 \end_inset
@@ -4391,18 +3820,83 @@ status open
 \begin_layout Plain Layout
 
 \size footnotesize
-(6a) Normalized Total Cycles (lookahead=320)
+(f) Helper Thread L2 Request Breakdown (stride=320)
 \end_layout
 
 \end_inset
 </cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Impact of Prefetching Lookahead on mst Helper Thread Performance
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Impact-of-Lookahead-mst-ht"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="1">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename /home/itecgo/Archimulator/experiment_tables/mst_2048_ht_10_5_stride_5_to_640_summary_plot.pdf
+	scale 13
+	BoundingBox 0bp 0bp 1440bp 507bp
+	clip
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
 <cell alignment="center" valignment="top" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 
 \size footnotesize
-(6b) Helper Thread L2 Request Breakdown (lookahead=320)
+(a) Helper Thread L2 Request Breakdown (lookahead=10)
 \end_layout
 
 \end_inset
@@ -4418,9 +3912,8 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="2" columns="2">
+<lyxtabular version="3" rows="2" columns="1">
 <features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <row>
 <cell alignment="center" valignment="top" usebox="none">
@@ -4428,27 +3921,8 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_640_5_stride_5_to_640_totalCycles_normalized.pdf
-	display false
-	scale 38
-	clip
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename /home/itecgo/Archimulator/experiment_plots/mst_2048_ht_640_5_stride_5_to_640_helperThreadL2CacheRequestBreakdowns.pdf
-	display false
-	scale 38
-	BoundingBox 0bp 0bp 455bp 211bp
+	filename /home/itecgo/Archimulator/experiment_tables/mst_2048_ht_20_5_stride_5_to_640_summary_plot.pdf
+	scale 13
 	clip
 
 \end_inset
@@ -4466,18 +3940,7 @@ status open
 \begin_layout Plain Layout
 
 \size footnotesize
-(7a) Normalized Total Cycles (lookahead=480)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size footnotesize
-(7b) Helper Thread L2 Request Breakdown (lookahead=480)
+(b) Helper Thread L2 Request Breakdown (lookahead=20)
 \end_layout
 
 \end_inset
@@ -4488,7 +3951,179 @@ status open
 \end_inset
 
 
-\begin_inset VSpace defskip
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="1">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename /home/itecgo/Archimulator/experiment_tables/mst_2048_ht_40_5_stride_5_to_640_summary_plot.pdf
+	scale 13
+	clip
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size footnotesize
+(c) Helper Thread L2 Request Breakdown (lookahead=40)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="1">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename /home/itecgo/Archimulator/experiment_tables/mst_2048_ht_80_5_stride_5_to_640_summary_plot.pdf
+	scale 13
+	clip
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size footnotesize
+(d) Helper Thread L2 Request Breakdown (lookahead=80)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="1">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename /home/itecgo/Archimulator/experiment_tables/mst_2048_ht_160_5_stride_5_to_640_summary_plot.pdf
+	scale 13
+	clip
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size footnotesize
+(e) Helper Thread L2 Request Breakdown (lookahead=160)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="1">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename /home/itecgo/Archimulator/experiment_tables/mst_2048_ht_320_5_stride_5_to_640_summary_plot.pdf
+	scale 13
+	clip
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size footnotesize
+(f) Helper Thread L2 Request Breakdown (lookahead=320)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
 \end_inset
 
 
@@ -4519,18 +4154,32 @@ name "fig:Impact-of-Stride-mst-ht"
 \end_layout
 
 \begin_layout Subsection
-Summary
+Selecting Proper Values of Prefetching Lookahead and Stride
 \end_layout
 
 \begin_layout Standard
-From the above discussion on experimental results, we can conclude that,
- (1) too much late prefetches do great harm to the performance improvement
- of helper threaded prefetching; (2) the helper threaded prefetching parameters
- of lookahead and stride should and can be dynamically changed to balance
- the portions of timely and late prefetches using feedback directed mechanisms,
- thus leading to the maximal performance of helper threaded prefetching
- on CMPs; (3) there is little bad prefetches observed in our experiments
- on mst 
+Furthermore, among the experiments exhibited in Fig.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Impact-of-Lookahead-mst-ht"
+
+\end_inset
+
+, there exists an optimal value of lookahead, where values of lookhead both
+ greater and smaller than that lead to lesser timely and greater late requests,
+ thus lowering the overall performance.
+ The position of optimal value of lookahead varies depending on the value
+ of stride.
+ Specifically, the optimal value of lookahead becomes greater as the value
+ of stride increases.
+ Among our experiments of mst "2048 1", the combination of small values
+ of lookahead=20, stride=10 achieves the maximum performance, which fits
+ well to our above observation.
+ The helper threading parameters of lookahead and stride should and can
+ be dynamically changed to balance the portions of timely and late prefetches
+ using feedback directed mechanisms, thus leading to the maximal performance
+ of helper threading on CMPs.
+ There is little bad prefetches observed in our experiments on mst 
 \begin_inset Quotes eld
 \end_inset
 
@@ -4540,6 +4189,9 @@ From the above discussion on experimental results, we can conclude that,
 
 , but it is expected to be prevalent in larger input set of the mst benchmark
  and other memory-intensive workloads.
+ Furthermore, very little hit-to-cache and hit-to-MSHR prefetches are observed
+ which show that they are minories in the breakdown of helper thread L2
+ requests, and do little impact on overall performance.
 \end_layout
 
 \begin_layout Section
@@ -4547,15 +4199,15 @@ Related Work
 \end_layout
 
 \begin_layout Subsection
-Prefetch Taxonomies
+Prefetch Breakdowns
 \end_layout
 
 \begin_layout Standard
-Even though helper threaded data prefetching mechanisms have been studied
- for a long time, LLC interference and taxonomy of helper thread LLC requests
- have not been studied before.
+Even though helper threading mechanisms have been studied for a long time,
+ LLC interference and breakdown of helper thread LLC requests have not been
+ studied before.
  Here we briefly describe previous work in the context of hardware prefetching.
- Our taxonomy of helper thread LLC requests is mostly similar to the work
+ Our breakdown of helper thread LLC requests is mostly similar to the work
  in 
 \begin_inset CommandInset citation
 LatexCommand cite
@@ -4660,18 +4312,22 @@ Conclusion
 
 \begin_layout Standard
 This paper first discusses the intra-application reuse distances in the
- helper threaded data prefetching on shared cache CMPs and their implications
- on helper thread performance.
+ helper threading on shared cache CMPs and their implications on helper
+ thread performance.
  Based on this, we then proposes the intra-application interference aware
- taxonomy of helper thread LLC requests and its implementation details on
- a cycle-accurate CMP architectural simulator.
+ breakdown of helper thread LLC requests and its implementation details
+ on a cycle-accurate CMP architectural simulator.
  Detailed experimental results of the memory intensive benchmark mst show
- that: (1) too much late prefetches do great harm to the performance improvement
- of helper threaded prefetching; and (2) the helper threading parameters
- of lookahead and stride should and can be dynamically changed to balance
- the portions of timely and late prefetches, thus leading to the maximal
- exploitation of helper threaded prefetching in improving the performance
- of irregular memory access workloads on shared cache CMPs.
+ that: (1) there exists an optimal value of lookahead, where values of lookhead
+ both greater and smaller than that lead to lesser timely and greater late
+ requests, thus lowering the overall performance.
+ The position of optimal value of lookahead varies depending on the value
+ of stride; (2) too much late prefetches do great harm to the performance
+ improvement of helper threading.
+ The helper threading parameters of lookahead and stride should and can
+ be dynamically changed to balance the portions of timely and late prefetches,
+ thus leading to the maximal exploitation of helper threading in improving
+ the performance of irregular memory access workloads on shared cache CMPs.
  It can be part of our future work.
 \end_layout
 

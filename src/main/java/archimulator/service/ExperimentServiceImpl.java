@@ -21,10 +21,10 @@ package archimulator.service;
 import archimulator.client.ExperimentPack;
 import archimulator.client.ExperimentSpec;
 import archimulator.model.*;
+import com.Ostermiller.util.CSVPrinter;
 import com.j256.ormlite.dao.Dao;
 import net.pickapack.JsonSerializationHelper;
 import net.pickapack.Pair;
-import net.pickapack.StorageUnit;
 import net.pickapack.action.Function1;
 import net.pickapack.action.Function2;
 import net.pickapack.action.Predicate;
@@ -43,6 +43,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.math3.stat.StatUtils;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
@@ -126,7 +127,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         List<Experiment> result = new ArrayList<Experiment>();
 
         for(Experiment experiment : this.getAllExperiments()) {
-            if(experiment.getTitle().startsWith(titlePrefix) && (!stoppedExperimentsOnly || experiment.isStopped())) {
+            if(experiment.getTitle().startsWith(titlePrefix) && getLatestExperimentByTitle(experiment.getTitle()).getId() == experiment.getId() && (!stoppedExperimentsOnly || experiment.isStopped())) {
                 result.add(experiment);
             }
         }
@@ -408,12 +409,12 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         List<String> columns = helperThreadEnabled ? Arrays.asList(
                 "L2 Size", "L2 Assoc",
                 "Lookahead", "Stride",
-                "Total Cycles", "Speedup",
-                "Main Thread Hit", "Main Thread Miss", "Helper Thread Hit", "Helper Thread Miss", "Redundant MSHR", "Redundant Cache", "Timely", "Late", "Bad", "Ugly"
+                "Total Cycles", "Speedup", "IPC",
+                "Main Thread Hit", "Main Thread Miss", "L2 Hit Ratio", "L2 Evictions", "L2 Occupancy Ratio", "Helper Thread Hit", "Helper Thread Miss", "Redundant MSHR", "Redundant Cache", "Timely", "Late", "Bad", "Ugly"
         ) : Arrays.asList(
                 "L2 Size", "L2 Assoc",
-                "Total Cycles", "Speedup",
-                "Main Thread Hit", "Main Thread Miss"
+                "Total Cycles", "Speedup", "IPC",
+                "Main Thread Hit", "Main Thread Miss", "L2 Hit Ratio", "L2 Evictions", "L2 Occupancy Ratio"
         );
 
         List<List<String>> rows = new ArrayList<List<String>>();
@@ -421,7 +422,9 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         for (Experiment experiment : experiments) {
             List<String> row = new ArrayList<String>();
 
-            row.add(StorageUnit.toString(experiment.getArchitecture().getL2Size()));
+//            row.add(StorageUnit.toString(experiment.getArchitecture().getL2Size()));
+            row.add(experiment.getArchitecture().getL2Size() + "");
+
             row.add(experiment.getArchitecture().getL2Associativity() + "");
 
             if(helperThreadEnabled) {
@@ -433,10 +436,20 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
             row.add(String.format("%.4f", getSpeedup(baselineExperiment, experiment)));
 
+            row.add(String.format("%.4f", Double.parseDouble(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
+                    "instructionsPerCycle"))));
+
             row.add(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
                     "helperThreadL2CacheRequestProfilingHelper/numMainThreadL2CacheHits"));
             row.add(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
                     "helperThreadL2CacheRequestProfilingHelper/numMainThreadL2CacheMisses"));
+
+            row.add(String.format("%.4f", Double.parseDouble(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
+                    "processor/cacheHierarchy/cacheControllers[name=l2]/hitRatio"))));
+            row.add(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
+                    "processor/cacheHierarchy/cacheControllers[name=l2]/numEvictions"));
+            row.add(String.format("%.4f", Double.parseDouble(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
+                    "processor/cacheHierarchy/cacheControllers[name=l2]/occupancyRatio"))));
 
             if(helperThreadEnabled) {
                 row.add(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
@@ -1034,10 +1047,22 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     private void table(String title, String tableFileNameSuffix, List<String> columns, List<List<String>> rows) {
-        String fileNamePdf = "experiment_tables" + File.separator + title + "_" + tableFileNameSuffix + ".pdf";
-        new File(fileNamePdf).getParentFile().mkdirs();
+        String fileNamePrefix = "experiment_tables" + File.separator + title + "_" + tableFileNameSuffix;
+        new File(fileNamePrefix).getParentFile().mkdirs();
 
-        TableHelper.generateTable(fileNamePdf, columns, rows);
+        TableHelper.generateTable(fileNamePrefix + ".pdf", columns, rows);
+
+        try {
+            CSVPrinter csvPrinter = new CSVPrinter(new FileOutputStream(fileNamePrefix + ".csv"));
+
+            csvPrinter.writeln(columns.toArray(new String[columns.size()]));
+
+            for(List<String> row : rows) {
+                csvPrinter.writeln(row.toArray(new String[row.size()]));
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void plot(ExperimentPack experimentPack, String plotFileNameSuffix, String yLabel, List<?> rows) {
@@ -1056,11 +1081,13 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
             pw.println("=norotate");
 //            pw.println("=patterns");
 
-            pw.println("legendx=right");
-            pw.println("legendy=center");
-            pw.println("=nolegoutline");
-            pw.println("legendfill=");
-            pw.println("legendfontsz=13");
+            pw.println("xscale=1.2");
+
+//            pw.println("legendx=right");
+//            pw.println("legendy=top");
+//            pw.println("=nolegoutline");
+//            pw.println("legendfill=");
+//            pw.println("legendfontsz=13");
 
             if (rows.get(0) instanceof Map) {
                 pw.println("=stacked;" + StringUtils.join(((Map) (rows.get(0))).keySet(), ';'));

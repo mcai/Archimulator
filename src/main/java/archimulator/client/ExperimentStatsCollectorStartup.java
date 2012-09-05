@@ -32,14 +32,14 @@ public class ExperimentStatsCollectorStartup {
             if(duplicates.size() > 1) {
                 System.out.println(experiment.getTitle() + ": " + duplicates.size() + " duplicates");
                 System.out.println();
-//
-//                Experiment lastExperiment = duplicates.get(duplicates.size() - 1);
-//
-//                for(Experiment duplicate : duplicates) {
-//                    if(duplicate != lastExperiment) {
-//                        ServiceManager.getExperimentService().removeExperimentById(duplicate.getId());
-//                    }
-//                }
+
+                Experiment lastExperiment = duplicates.get(duplicates.size() - 1);
+
+                for(Experiment duplicate : duplicates) {
+                    if(duplicate != lastExperiment && duplicate.isStopped()) {
+                        ServiceManager.getExperimentService().removeExperimentById(duplicate.getId());
+                    }
+                }
             }
         }
 
@@ -64,19 +64,23 @@ public class ExperimentStatsCollectorStartup {
             }
 
             //TODO: "mst_ht_2048" should not be hardcoded!!!
-            List<Experiment> experiments = ServiceManager.getExperimentService().getExperimentsByTitlePrefix("mst_ht_2048", true);
-
-            Collections.sort(experiments, new Comparator<Experiment>() {
-                @Override
-                public int compare(Experiment o1, Experiment o2) {
-                    long totalCycle1 = Long.parseLong(o1.getStatValue(o1.getMeasurementTitlePrefix() + "cycleAccurateEventQueue/currentCycle"));
-                    long totalCycle2 = Long.parseLong(o2.getStatValue(o2.getMeasurementTitlePrefix() + "cycleAccurateEventQueue/currentCycle"));
-                    return (int) (totalCycle1 - totalCycle2);
-                }
-            });
-
-
-            ServiceManager.getExperimentService().tableSummary("mst_ht_2048", experiments.get(0), experiments);
+            tableSummary("mst_baseline_2048");
+            tableSummary("mst_ht_2048");
         }
+    }
+
+    private static void tableSummary(String titlePrefix) {
+        List<Experiment> experiments = ServiceManager.getExperimentService().getExperimentsByTitlePrefix(titlePrefix, true);
+
+        Collections.sort(experiments, new Comparator<Experiment>() {
+            @Override
+            public int compare(Experiment o1, Experiment o2) {
+                long totalCycle1 = Long.parseLong(o1.getStatValue(o1.getMeasurementTitlePrefix() + "cycleAccurateEventQueue/currentCycle"));
+                long totalCycle2 = Long.parseLong(o2.getStatValue(o2.getMeasurementTitlePrefix() + "cycleAccurateEventQueue/currentCycle"));
+                return (int) (totalCycle1 - totalCycle2);
+            }
+        });
+
+        ServiceManager.getExperimentService().tableSummary(titlePrefix, experiments.get(0), experiments);
     }
 }
