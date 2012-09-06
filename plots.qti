@@ -376,19 +376,19 @@ AxesColors	#000000	#000000	#000000	#000000
 AxesNumberColors	#3c3c3c	#3c3c3c	#3c3c3c	#3c3c3c
 AxesBaseline	0	0	0	0	
 CanvasBackground	#ffffff	0
-curve	mst_2048_ht_20_10_l2_96KB_to_2MB_summary_L2Size	mst_2048_ht_20_10_l2_96KB_to_2MB_summary_RedundantMSHR	3	1	#000000	0	3	7	0	#ff80ff	#ff80ff	1	#ca2a93	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_20_10_l2_96KB_to_2MB_summary_L2Size	mst_2048_ht_20_10_l2_96KB_to_2MB_summary_RedundantMSHR	3	1	#000000	0	3	7	0	#ff80ff	#ff80ff	1	#ca2a93	1	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_20_10_l2_96KB_to_2MB_summary_L2Size	mst_2048_ht_20_10_l2_96KB_to_2MB_summary_RedundantCache	3	1	#000000	0	3	7	0	#ff0000	#ff0000	1	#480000	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_20_10_l2_96KB_to_2MB_summary_L2Size	mst_2048_ht_20_10_l2_96KB_to_2MB_summary_RedundantCache	3	1	#000000	0	3	7	0	#ff0000	#ff0000	1	#480000	2	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_20_10_l2_96KB_to_2MB_summary_L2Size	mst_2048_ht_20_10_l2_96KB_to_2MB_summary_Timely	3	1	#000000	0	3	7	0	#ff0000	#ff0000	1	#b80224	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_20_10_l2_96KB_to_2MB_summary_L2Size	mst_2048_ht_20_10_l2_96KB_to_2MB_summary_Timely	3	1	#000000	0	3	7	0	#ff0000	#ff0000	1	#b80224	3	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_20_10_l2_96KB_to_2MB_summary_L2Size	mst_2048_ht_20_10_l2_96KB_to_2MB_summary_Late	3	1	#000000	0	3	7	0	#ff0000	#ff0000	1	#fa9a04	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_20_10_l2_96KB_to_2MB_summary_L2Size	mst_2048_ht_20_10_l2_96KB_to_2MB_summary_Late	3	1	#000000	0	3	7	0	#ff0000	#ff0000	1	#fa9a04	4	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_20_10_l2_96KB_to_2MB_summary_L2Size	mst_2048_ht_20_10_l2_96KB_to_2MB_summary_Bad	3	1	#000000	0	3	7	0	#ff0000	#ff0000	1	#89b54f	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_20_10_l2_96KB_to_2MB_summary_L2Size	mst_2048_ht_20_10_l2_96KB_to_2MB_summary_Bad	3	1	#000000	0	3	7	0	#ff0000	#ff0000	1	#89b54f	5	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_20_10_l2_96KB_to_2MB_summary_L2Size	mst_2048_ht_20_10_l2_96KB_to_2MB_summary_Ugly	3	1	#000000	0	3	7	0	#ff0000	#ff0000	1	#738571	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_20_10_l2_96KB_to_2MB_summary_L2Size	mst_2048_ht_20_10_l2_96KB_to_2MB_summary_Ugly	3	1	#000000	0	3	7	0	#ff0000	#ff0000	1	#738571	6	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_20_10_l2_96KB_to_2MB_summary_L2Size	mst_2048_ht_20_10_l2_96KB_to_2MB_summary_TotalCycles	2	1	#80ffff	0	3	7	2	#480000	#80ffff	0	#000000	14	1	2	1	0	5	1
+curve	mst_2048_ht_20_10_l2_96KB_to_2MB_summary_L2Size	mst_2048_ht_20_10_l2_96KB_to_2MB_summary_TotalCycles	2	1	#000000	0	3	21	2	#480000	#000000	0	#000000	14	3	2	1	0	5	1
 scale	0	0	6000000	0	7	5	0	0
 scale	1	3270000000	3330000000	0	7	5	0	0
 scale	2	0	7	0	8	5	0	0
@@ -475,19 +475,19 @@ AxesColors	#000000	#000000	#000000	#000000
 AxesNumberColors	#3c3c3c	#3c3c3c	#3c3c3c	#3c3c3c
 AxesBaseline	0	0	0	0	
 CanvasBackground	#ffffff	0
-curve	mst_2048_ht_20_10_l2_2way_to_32way_summary_L2Assoc	mst_2048_ht_20_10_l2_2way_to_32way_summary_RedundantMSHR	3	1	#000000	0	3	7	0	#ca2a93	#ca2a93	1	#ca2a93	0	20	0	2	0	0	4	1
+curve	mst_2048_ht_20_10_l2_2way_to_32way_summary_L2Assoc	mst_2048_ht_20_10_l2_2way_to_32way_summary_RedundantMSHR	3	1	#000000	0	3	7	0	#ca2a93	#ca2a93	1	#ca2a93	1	20	0	2	0	0	4	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_20_10_l2_2way_to_32way_summary_L2Assoc	mst_2048_ht_20_10_l2_2way_to_32way_summary_RedundantCache	3	1	#000000	0	3	7	0	#480000	#480000	1	#480000	0	20	0	2	0	0	4	1
+curve	mst_2048_ht_20_10_l2_2way_to_32way_summary_L2Assoc	mst_2048_ht_20_10_l2_2way_to_32way_summary_RedundantCache	3	1	#000000	0	3	7	0	#480000	#480000	1	#480000	2	20	0	2	0	0	4	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_20_10_l2_2way_to_32way_summary_L2Assoc	mst_2048_ht_20_10_l2_2way_to_32way_summary_Timely	3	1	#000000	0	3	7	0	#480000	#480000	1	#b80224	0	20	0	2	0	0	4	1
+curve	mst_2048_ht_20_10_l2_2way_to_32way_summary_L2Assoc	mst_2048_ht_20_10_l2_2way_to_32way_summary_Timely	3	1	#000000	0	3	7	0	#480000	#480000	1	#b80224	3	20	0	2	0	0	4	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_20_10_l2_2way_to_32way_summary_L2Assoc	mst_2048_ht_20_10_l2_2way_to_32way_summary_Late	3	1	#000000	0	3	7	0	#480000	#480000	1	#fa9a04	0	20	0	2	0	0	4	1
+curve	mst_2048_ht_20_10_l2_2way_to_32way_summary_L2Assoc	mst_2048_ht_20_10_l2_2way_to_32way_summary_Late	3	1	#000000	0	3	7	0	#480000	#480000	1	#fa9a04	4	20	0	2	0	0	4	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_20_10_l2_2way_to_32way_summary_L2Assoc	mst_2048_ht_20_10_l2_2way_to_32way_summary_Bad	3	1	#000000	0	3	7	0	#480000	#480000	1	#89b54f	0	20	0	2	0	0	4	1
+curve	mst_2048_ht_20_10_l2_2way_to_32way_summary_L2Assoc	mst_2048_ht_20_10_l2_2way_to_32way_summary_Bad	3	1	#000000	0	3	7	0	#480000	#480000	1	#89b54f	5	20	0	2	0	0	4	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_20_10_l2_2way_to_32way_summary_L2Assoc	mst_2048_ht_20_10_l2_2way_to_32way_summary_Ugly	3	1	#000000	0	3	7	0	#480000	#480000	1	#738571	0	20	0	2	0	0	4	1
+curve	mst_2048_ht_20_10_l2_2way_to_32way_summary_L2Assoc	mst_2048_ht_20_10_l2_2way_to_32way_summary_Ugly	3	1	#000000	0	3	7	0	#480000	#480000	1	#738571	6	20	0	2	0	0	4	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_20_10_l2_2way_to_32way_summary_L2Assoc	mst_2048_ht_20_10_l2_2way_to_32way_summary_TotalCycles	2	1	#80ffff	0	3	7	2	#480000	#80ffff	0	#000000	14	1	2	1	0	4	1
+curve	mst_2048_ht_20_10_l2_2way_to_32way_summary_L2Assoc	mst_2048_ht_20_10_l2_2way_to_32way_summary_TotalCycles	2	1	#000000	0	3	21	2	#480000	#000000	0	#000000	14	3	2	1	0	4	1
 scale	0	0	7000000	0	8	5	0	0
 scale	1	3260000000	3380000000	0	7	5	0	0
 scale	2	0	6	0	7	5	0	0
@@ -575,19 +575,19 @@ AxesColors	#000000	#000000	#000000	#000000
 AxesNumberColors	#3c3c3c	#3c3c3c	#3c3c3c	#3c3c3c
 AxesBaseline	0	0	0	0	
 CanvasBackground	#ffffff	0
-curve	mst_2048_ht_0_10_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_10_lookahead_0_to_640_summary_RedundantMSHR	3	1	#000000	0	3	7	0	#ca2a93	#ca2a93	1	#ca2a93	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_0_10_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_10_lookahead_0_to_640_summary_RedundantMSHR	3	1	#000000	0	3	7	0	#ca2a93	#ca2a93	1	#ca2a93	1	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_0_10_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_10_lookahead_0_to_640_summary_RedundantCache	3	1	#000000	0	3	7	0	#480000	#480000	1	#480000	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_0_10_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_10_lookahead_0_to_640_summary_RedundantCache	3	1	#000000	0	3	7	0	#480000	#480000	1	#480000	2	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_0_10_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_10_lookahead_0_to_640_summary_Timely	3	1	#000000	0	3	7	0	#480000	#480000	1	#b80224	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_0_10_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_10_lookahead_0_to_640_summary_Timely	3	1	#000000	0	3	7	0	#480000	#480000	1	#b80224	3	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_0_10_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_10_lookahead_0_to_640_summary_Late	3	1	#000000	0	3	7	0	#480000	#480000	1	#fa9a04	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_0_10_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_10_lookahead_0_to_640_summary_Late	3	1	#000000	0	3	7	0	#480000	#480000	1	#fa9a04	4	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_0_10_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_10_lookahead_0_to_640_summary_Bad	3	1	#000000	0	3	7	0	#480000	#480000	1	#89b54f	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_0_10_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_10_lookahead_0_to_640_summary_Bad	3	1	#000000	0	3	7	0	#480000	#480000	1	#89b54f	5	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_0_10_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_10_lookahead_0_to_640_summary_Ugly	3	1	#000000	0	3	7	0	#480000	#480000	1	#738571	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_0_10_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_10_lookahead_0_to_640_summary_Ugly	3	1	#000000	0	3	7	0	#480000	#480000	1	#738571	6	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_0_10_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_10_lookahead_0_to_640_summary_TotalCycles	2	1	#80ffff	0	3	7	2	#480000	#80ffff	0	#000000	14	1	2	1	0	5	1
+curve	mst_2048_ht_0_10_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_10_lookahead_0_to_640_summary_TotalCycles	2	1	#000000	0	3	21	2	#480000	#000000	0	#000000	14	3	2	1	0	5	1
 scale	0	0	6000000	0	7	5	0	0
 scale	1	3300000000	4000000000	0	8	5	0	0
 scale	2	0	7	0	8	5	0	0
@@ -610,8 +610,8 @@ EnabledTickLabels	1	1	1	1
 <Color>#000000</Color>
 <FrameWidth>1</FrameWidth>
 <LineStyle>0</LineStyle>
-<x>3.6273990734613</x>
-<y>4085343.2282004</y>
+<x>2.6406353408339</x>
+<y>6055658.6270872</y>
 <right>1.95792079207921</right>
 <bottom>5450000</bottom>
 <attachTo>1</attachTo>
@@ -636,7 +636,7 @@ EnabledTickLabels	1	1	1	1
 </multiLayer>
 <multiLayer>
 mst_2048_ht_0_20_lookahead_0_to_640_summary_plot	1	1	5 Sep 2012 18:51:44
-geometry	0	0	510	430	
+geometry	maximized	active
 WindowLabel		2
 Margins	5	5	5	5
 Spacing	5	5
@@ -645,8 +645,8 @@ Alignement	0	0
 <AlignPolicy>0</AlignPolicy>
 <CommonAxes>0</CommonAxes>
 <graph>
-ggeometry	1	3	499	375
-<PageGeometry>0.00199203	0.0078534	0.994024	0.981675</PageGeometry>
+ggeometry	4	5	1909	665
+<PageGeometry>0.00208333	0.00738552	0.994271	0.982275</PageGeometry>
 PlotTitle		#000000	4228
 <Antialiasing>1</Antialiasing>
 <Autoscaling>1</Autoscaling>
@@ -662,32 +662,32 @@ AxesTitles	Lookahead	# Helper Thread L2 Requests		Total Cycles
 AxesTitleColors	#000000	#000000	#000000	#000000	
 AxesTitleAlignment	5124	4	5124	4
 AxesTitleDistance	2	2	2	-1
-TitleFont	Ubuntu	35	75	0	0	0
-ScaleFont0	Ubuntu	35	75	0	0	0
-ScaleFont1	Ubuntu	35	75	0	0	0
-ScaleFont2	Ubuntu	35	75	0	0	0
-ScaleFont3	Ubuntu	35	75	0	0	0
-AxisFont0	Ubuntu	31	50	0	0	0
-AxisFont1	Ubuntu	31	50	0	0	0
-AxisFont2	Ubuntu	31	50	0	0	0
-AxisFont3	Ubuntu	31	50	0	0	0
+TitleFont	Ubuntu	20	75	0	0	0
+ScaleFont0	Ubuntu	20	75	0	0	0
+ScaleFont1	Ubuntu	36	75	0	0	0
+ScaleFont2	Ubuntu	36	75	0	0	0
+ScaleFont3	Ubuntu	20	75	0	0	0
+AxisFont0	Ubuntu	18	75	1	0	0
+AxisFont1	Ubuntu	28	50	0	0	0
+AxisFont2	Ubuntu	28	50	0	0	0
+AxisFont3	Ubuntu	18	75	1	0	0
 AxesColors	#000000	#000000	#000000	#000000
 AxesNumberColors	#3c3c3c	#3c3c3c	#3c3c3c	#3c3c3c
 AxesBaseline	0	0	0	0	
 CanvasBackground	#ffffff	0
-curve	mst_2048_ht_0_20_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_20_lookahead_0_to_640_summary_RedundantMSHR	3	1	#000000	0	3	7	0	#ca2a93	#ca2a93	1	#ca2a93	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_0_20_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_20_lookahead_0_to_640_summary_RedundantMSHR	3	1	#000000	0	3	7	0	#ca2a93	#ca2a93	1	#ca2a93	1	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_0_20_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_20_lookahead_0_to_640_summary_RedundantCache	3	1	#000000	0	3	7	0	#480000	#480000	1	#480000	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_0_20_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_20_lookahead_0_to_640_summary_RedundantCache	3	1	#000000	0	3	7	0	#480000	#480000	1	#480000	2	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_0_20_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_20_lookahead_0_to_640_summary_Timely	3	1	#000000	0	3	7	0	#480000	#480000	1	#b80224	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_0_20_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_20_lookahead_0_to_640_summary_Timely	3	1	#000000	0	3	7	0	#480000	#480000	1	#b80224	3	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_0_20_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_20_lookahead_0_to_640_summary_Late	3	1	#000000	0	3	7	0	#480000	#480000	1	#fa9a04	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_0_20_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_20_lookahead_0_to_640_summary_Late	3	1	#000000	0	3	7	0	#480000	#480000	1	#fa9a04	4	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_0_20_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_20_lookahead_0_to_640_summary_Bad	3	1	#000000	0	3	7	0	#480000	#480000	1	#89b54f	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_0_20_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_20_lookahead_0_to_640_summary_Bad	3	1	#000000	0	3	7	0	#480000	#480000	1	#89b54f	5	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_0_20_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_20_lookahead_0_to_640_summary_Ugly	3	1	#000000	0	3	7	0	#480000	#480000	1	#738571	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_0_20_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_20_lookahead_0_to_640_summary_Ugly	3	1	#000000	0	3	7	0	#480000	#480000	1	#738571	6	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_0_20_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_20_lookahead_0_to_640_summary_TotalCycles	2	1	#80ffff	0	3	7	2	#480000	#80ffff	0	#000000	14	1	2	1	0	5	1
+curve	mst_2048_ht_0_20_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_20_lookahead_0_to_640_summary_TotalCycles	2	1	#000000	0	3	21	2	#480000	#000000	0	#000000	14	3	2	1	0	5	1
 scale	0	0	7000000	0	8	5	0	0
 scale	1	3300000000	4000000000	0	8	5	0	0
 scale	2	0	7	0	8	5	0	0
@@ -710,10 +710,10 @@ EnabledTickLabels	1	1	1	1
 <Color>#000000</Color>
 <FrameWidth>1</FrameWidth>
 <LineStyle>0</LineStyle>
-<x>2.5248180013236</x>
-<y>6506493.5064935</y>
-<right>0.441652707984366</right>
-<bottom>6685664.93955095</bottom>
+<x>1.7379310344828</x>
+<y>7086267.6056338</y>
+<right>5.07774294670846</right>
+<bottom>5360915.49295775</bottom>
 <attachTo>1</attachTo>
 <onTop>1</onTop>
 <visible>1</visible>
@@ -722,7 +722,7 @@ EnabledTickLabels	1	1	1	1
 \l(3)%(3)  \l(4)%(4)  \l(5)%(5)  \l(6)%(6)
 \l(7)%(7)
 </Text>
-<Font>Ubuntu	35	50	0	0	0</Font>
+<Font>Ubuntu	28	50	0	0	0</Font>
 <TextColor>#000000</TextColor>
 <Background>#ffffff</Background>
 <Alpha>0</Alpha>
@@ -775,19 +775,19 @@ AxesColors	#000000	#000000	#000000	#000000
 AxesNumberColors	#3c3c3c	#3c3c3c	#3c3c3c	#3c3c3c
 AxesBaseline	0	0	0	0	
 CanvasBackground	#ffffff	0
-curve	mst_2048_ht_0_40_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_40_lookahead_0_to_640_summary_RedundantMSHR	3	1	#000000	0	3	7	0	#ca2a93	#ca2a93	1	#ca2a93	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_0_40_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_40_lookahead_0_to_640_summary_RedundantMSHR	3	1	#000000	0	3	7	0	#ca2a93	#ca2a93	1	#ca2a93	1	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_0_40_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_40_lookahead_0_to_640_summary_RedundantCache	3	1	#000000	0	3	7	0	#480000	#480000	1	#480000	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_0_40_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_40_lookahead_0_to_640_summary_RedundantCache	3	1	#000000	0	3	7	0	#480000	#480000	1	#480000	2	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_0_40_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_40_lookahead_0_to_640_summary_Timely	3	1	#000000	0	3	7	0	#480000	#480000	1	#b80224	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_0_40_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_40_lookahead_0_to_640_summary_Timely	3	1	#000000	0	3	7	0	#480000	#480000	1	#b80224	3	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_0_40_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_40_lookahead_0_to_640_summary_Late	3	1	#000000	0	3	7	0	#480000	#480000	1	#fa9a04	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_0_40_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_40_lookahead_0_to_640_summary_Late	3	1	#000000	0	3	7	0	#480000	#480000	1	#fa9a04	4	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_0_40_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_40_lookahead_0_to_640_summary_Bad	3	1	#000000	0	3	7	0	#480000	#480000	1	#89b54f	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_0_40_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_40_lookahead_0_to_640_summary_Bad	3	1	#000000	0	3	7	0	#480000	#480000	1	#89b54f	5	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_0_40_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_40_lookahead_0_to_640_summary_Ugly	3	1	#000000	0	3	7	0	#480000	#480000	1	#738571	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_0_40_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_40_lookahead_0_to_640_summary_Ugly	3	1	#000000	0	3	7	0	#480000	#480000	1	#738571	6	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_0_40_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_40_lookahead_0_to_640_summary_TotalCycles	2	1	#80ffff	0	3	7	2	#480000	#80ffff	0	#000000	14	1	2	1	0	5	1
+curve	mst_2048_ht_0_40_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_40_lookahead_0_to_640_summary_TotalCycles	2	1	#000000	0	3	21	2	#480000	#000000	0	#000000	14	3	2	1	0	5	1
 scale	0	0	10000000	0	6	5	0	0
 scale	1	3200000000	4000000000	0	5	5	0	0
 scale	2	0	7	0	8	5	0	0
@@ -810,8 +810,8 @@ EnabledTickLabels	1	1	1	1
 <Color>#000000</Color>
 <FrameWidth>1</FrameWidth>
 <LineStyle>0</LineStyle>
-<x>1.5704831237591</x>
-<y>10185528.756957</y>
+<x>1.6168100595632</x>
+<y>9814471.2430427</y>
 <right>1.95792079207921</right>
 <bottom>9083333.33333333</bottom>
 <attachTo>1</attachTo>
@@ -875,19 +875,19 @@ AxesColors	#000000	#000000	#000000	#000000
 AxesNumberColors	#3c3c3c	#3c3c3c	#3c3c3c	#3c3c3c
 AxesBaseline	0	0	0	0	
 CanvasBackground	#ffffff	0
-curve	mst_2048_ht_0_80_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_80_lookahead_0_to_640_summary_RedundantMSHR	3	1	#000000	0	3	7	0	#ca2a93	#ca2a93	1	#ca2a93	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_0_80_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_80_lookahead_0_to_640_summary_RedundantMSHR	3	1	#000000	0	3	7	0	#ca2a93	#ca2a93	1	#ca2a93	1	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_0_80_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_80_lookahead_0_to_640_summary_RedundantCache	3	1	#000000	0	3	7	0	#480000	#480000	1	#480000	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_0_80_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_80_lookahead_0_to_640_summary_RedundantCache	3	1	#000000	0	3	7	0	#480000	#480000	1	#480000	2	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_0_80_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_80_lookahead_0_to_640_summary_Timely	3	1	#000000	0	3	7	0	#480000	#480000	1	#b80224	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_0_80_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_80_lookahead_0_to_640_summary_Timely	3	1	#000000	0	3	7	0	#480000	#480000	1	#b80224	3	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_0_80_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_80_lookahead_0_to_640_summary_Late	3	1	#000000	0	3	7	0	#480000	#480000	1	#fa9a04	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_0_80_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_80_lookahead_0_to_640_summary_Late	3	1	#000000	0	3	7	0	#480000	#480000	1	#fa9a04	4	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_0_80_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_80_lookahead_0_to_640_summary_Bad	3	1	#000000	0	3	7	0	#480000	#480000	1	#89b54f	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_0_80_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_80_lookahead_0_to_640_summary_Bad	3	1	#000000	0	3	7	0	#480000	#480000	1	#89b54f	5	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_0_80_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_80_lookahead_0_to_640_summary_Ugly	3	1	#000000	0	3	7	0	#480000	#480000	1	#738571	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_0_80_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_80_lookahead_0_to_640_summary_Ugly	3	1	#000000	0	3	7	0	#480000	#480000	1	#738571	6	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_0_80_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_80_lookahead_0_to_640_summary_TotalCycles	2	1	#80ffff	0	3	7	2	#480000	#80ffff	0	#000000	14	2	2	1	0	5	1
+curve	mst_2048_ht_0_80_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_80_lookahead_0_to_640_summary_TotalCycles	2	1	#000000	0	3	21	2	#480000	#000000	0	#000000	14	3	2	1	0	5	1
 scale	0	0	12000000	0	7	5	0	0
 scale	1	3300000000	4000000000	0	8	5	0	0
 scale	2	0	7	0	8	5	0	0
@@ -910,8 +910,8 @@ EnabledTickLabels	1	1	1	1
 <Color>#000000</Color>
 <FrameWidth>1</FrameWidth>
 <LineStyle>0</LineStyle>
-<x>1.5399061032864</x>
-<y>12112781.954887</y>
+<x>1.4976525821596</x>
+<y>12135338.345865</y>
 <right>0.443385650224215</right>
 <bottom>11432727.2727273</bottom>
 <attachTo>1</attachTo>
@@ -975,19 +975,19 @@ AxesColors	#000000	#000000	#000000	#000000
 AxesNumberColors	#3c3c3c	#3c3c3c	#3c3c3c	#3c3c3c
 AxesBaseline	0	0	0	0	
 CanvasBackground	#ffffff	0
-curve	mst_2048_ht_0_160_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_160_lookahead_0_to_640_summary_RedundantMSHR	3	1	#000000	0	3	7	0	#ca2a93	#ca2a93	1	#ca2a93	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_0_160_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_160_lookahead_0_to_640_summary_RedundantMSHR	3	1	#000000	0	3	7	0	#ca2a93	#ca2a93	1	#ca2a93	1	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_0_160_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_160_lookahead_0_to_640_summary_RedundantCache	3	1	#000000	0	3	7	0	#480000	#480000	1	#480000	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_0_160_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_160_lookahead_0_to_640_summary_RedundantCache	3	1	#000000	0	3	7	0	#480000	#480000	1	#480000	2	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_0_160_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_160_lookahead_0_to_640_summary_Timely	3	1	#000000	0	3	7	0	#480000	#480000	1	#b80224	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_0_160_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_160_lookahead_0_to_640_summary_Timely	3	1	#000000	0	3	7	0	#480000	#480000	1	#b80224	3	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_0_160_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_160_lookahead_0_to_640_summary_Late	3	1	#000000	0	3	7	0	#480000	#480000	1	#fa9a04	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_0_160_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_160_lookahead_0_to_640_summary_Late	3	1	#000000	0	3	7	0	#480000	#480000	1	#fa9a04	4	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_0_160_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_160_lookahead_0_to_640_summary_Bad	3	1	#000000	0	3	7	0	#480000	#480000	1	#89b54f	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_0_160_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_160_lookahead_0_to_640_summary_Bad	3	1	#000000	0	3	7	0	#480000	#480000	1	#89b54f	5	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_0_160_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_160_lookahead_0_to_640_summary_Ugly	3	1	#000000	0	3	7	0	#480000	#480000	1	#738571	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_0_160_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_160_lookahead_0_to_640_summary_Ugly	3	1	#000000	0	3	7	0	#480000	#480000	1	#738571	6	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_0_160_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_160_lookahead_0_to_640_summary_TotalCycles	2	1	#80ffff	0	3	7	2	#480000	#80ffff	0	#000000	14	1	2	1	0	5	1
+curve	mst_2048_ht_0_160_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_160_lookahead_0_to_640_summary_TotalCycles	2	1	#000000	0	3	21	2	#480000	#000000	0	#000000	14	3	2	1	0	5	1
 scale	0	0	14000000	0	8	5	0	0
 scale	1	3500000000	4000000000	0	6	5	0	0
 scale	2	0	7	0	8	5	0	0
@@ -1075,19 +1075,19 @@ AxesColors	#000000	#000000	#000000	#000000
 AxesNumberColors	#3c3c3c	#3c3c3c	#3c3c3c	#3c3c3c
 AxesBaseline	0	0	0	0	
 CanvasBackground	#ffffff	0
-curve	mst_2048_ht_10_5_stride_5_to_640_summary_Stride	mst_2048_ht_10_5_stride_5_to_640_summary_RedundantMSHR	3	1	#000000	0	3	7	0	#ca2a93	#ca2a93	1	#ca2a93	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_10_5_stride_5_to_640_summary_Stride	mst_2048_ht_10_5_stride_5_to_640_summary_RedundantMSHR	3	1	#000000	0	3	7	0	#ca2a93	#ca2a93	1	#ca2a93	1	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_10_5_stride_5_to_640_summary_Stride	mst_2048_ht_10_5_stride_5_to_640_summary_RedundantCache	3	1	#000000	0	3	7	0	#480000	#480000	1	#480000	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_10_5_stride_5_to_640_summary_Stride	mst_2048_ht_10_5_stride_5_to_640_summary_RedundantCache	3	1	#000000	0	3	7	0	#480000	#480000	1	#480000	2	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_10_5_stride_5_to_640_summary_Stride	mst_2048_ht_10_5_stride_5_to_640_summary_Timely	3	1	#000000	0	3	7	0	#480000	#480000	1	#b80224	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_10_5_stride_5_to_640_summary_Stride	mst_2048_ht_10_5_stride_5_to_640_summary_Timely	3	1	#000000	0	3	7	0	#480000	#480000	1	#b80224	3	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_10_5_stride_5_to_640_summary_Stride	mst_2048_ht_10_5_stride_5_to_640_summary_Late	3	1	#000000	0	3	7	0	#480000	#480000	1	#fa9a04	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_10_5_stride_5_to_640_summary_Stride	mst_2048_ht_10_5_stride_5_to_640_summary_Late	3	1	#000000	0	3	7	0	#480000	#480000	1	#fa9a04	4	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_10_5_stride_5_to_640_summary_Stride	mst_2048_ht_10_5_stride_5_to_640_summary_Bad	3	1	#000000	0	3	7	0	#480000	#480000	1	#89b54f	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_10_5_stride_5_to_640_summary_Stride	mst_2048_ht_10_5_stride_5_to_640_summary_Bad	3	1	#000000	0	3	7	0	#480000	#480000	1	#89b54f	5	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_10_5_stride_5_to_640_summary_Stride	mst_2048_ht_10_5_stride_5_to_640_summary_Ugly	3	1	#000000	0	3	7	0	#480000	#480000	1	#738571	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_10_5_stride_5_to_640_summary_Stride	mst_2048_ht_10_5_stride_5_to_640_summary_Ugly	3	1	#000000	0	3	7	0	#480000	#480000	1	#738571	6	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_10_5_stride_5_to_640_summary_Stride	mst_2048_ht_10_5_stride_5_to_640_summary_TotalCycles	2	1	#80ffff	0	3	7	2	#480000	#80ffff	0	#000000	14	1	2	1	0	5	1
+curve	mst_2048_ht_10_5_stride_5_to_640_summary_Stride	mst_2048_ht_10_5_stride_5_to_640_summary_TotalCycles	2	1	#000000	0	3	21	2	#480000	#000000	0	#000000	14	3	2	1	0	5	1
 scale	0	0	16000000	0	9	5	0	0
 scale	1	3300000000	4100000000	0	9	5	0	0
 scale	2	0	7	0	8	5	0	0
@@ -1175,19 +1175,19 @@ AxesColors	#000000	#000000	#000000	#000000
 AxesNumberColors	#3c3c3c	#3c3c3c	#3c3c3c	#3c3c3c
 AxesBaseline	0	0	0	0	
 CanvasBackground	#ffffff	0
-curve	mst_2048_ht_20_5_stride_5_to_640_summary_Stride	mst_2048_ht_20_5_stride_5_to_640_summary_RedundantMSHR	3	1	#000000	0	3	7	0	#ca2a93	#ca2a93	1	#ca2a93	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_20_5_stride_5_to_640_summary_Stride	mst_2048_ht_20_5_stride_5_to_640_summary_RedundantMSHR	3	1	#000000	0	3	7	0	#ca2a93	#ca2a93	1	#ca2a93	1	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_20_5_stride_5_to_640_summary_Stride	mst_2048_ht_20_5_stride_5_to_640_summary_RedundantCache	3	1	#000000	0	3	7	0	#480000	#480000	1	#480000	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_20_5_stride_5_to_640_summary_Stride	mst_2048_ht_20_5_stride_5_to_640_summary_RedundantCache	3	1	#000000	0	3	7	0	#480000	#480000	1	#480000	2	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_20_5_stride_5_to_640_summary_Stride	mst_2048_ht_20_5_stride_5_to_640_summary_Timely	3	1	#000000	0	3	7	0	#480000	#480000	1	#b80224	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_20_5_stride_5_to_640_summary_Stride	mst_2048_ht_20_5_stride_5_to_640_summary_Timely	3	1	#000000	0	3	7	0	#480000	#480000	1	#b80224	3	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_20_5_stride_5_to_640_summary_Stride	mst_2048_ht_20_5_stride_5_to_640_summary_Late	3	1	#000000	0	3	7	0	#480000	#480000	1	#fa9a04	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_20_5_stride_5_to_640_summary_Stride	mst_2048_ht_20_5_stride_5_to_640_summary_Late	3	1	#000000	0	3	7	0	#480000	#480000	1	#fa9a04	4	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_20_5_stride_5_to_640_summary_Stride	mst_2048_ht_20_5_stride_5_to_640_summary_Bad	3	1	#000000	0	3	7	0	#480000	#480000	1	#89b54f	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_20_5_stride_5_to_640_summary_Stride	mst_2048_ht_20_5_stride_5_to_640_summary_Bad	3	1	#000000	0	3	7	0	#480000	#480000	1	#89b54f	5	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_20_5_stride_5_to_640_summary_Stride	mst_2048_ht_20_5_stride_5_to_640_summary_Ugly	3	1	#000000	0	3	7	0	#480000	#480000	1	#738571	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_20_5_stride_5_to_640_summary_Stride	mst_2048_ht_20_5_stride_5_to_640_summary_Ugly	3	1	#000000	0	3	7	0	#480000	#480000	1	#738571	6	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_20_5_stride_5_to_640_summary_Stride	mst_2048_ht_20_5_stride_5_to_640_summary_TotalCycles	2	1	#80ffff	0	3	7	2	#480000	#80ffff	0	#000000	14	1	2	1	0	5	1
+curve	mst_2048_ht_20_5_stride_5_to_640_summary_Stride	mst_2048_ht_20_5_stride_5_to_640_summary_TotalCycles	2	1	#000000	0	3	21	2	#480000	#000000	0	#000000	14	3	2	1	0	5	1
 scale	0	0	14000000	0	8	5	0	0
 scale	1	3300000000	4000000000	0	8	5	0	0
 scale	2	0	7	0	8	5	0	0
@@ -1275,19 +1275,19 @@ AxesColors	#000000	#000000	#000000	#000000
 AxesNumberColors	#3c3c3c	#3c3c3c	#3c3c3c	#3c3c3c
 AxesBaseline	0	0	0	0	
 CanvasBackground	#ffffff	0
-curve	mst_2048_ht_40_5_stride_5_to_640_summary_Stride	mst_2048_ht_40_5_stride_5_to_640_summary_RedundantMSHR	3	1	#000000	0	3	7	0	#ca2a93	#ca2a93	1	#ca2a93	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_40_5_stride_5_to_640_summary_Stride	mst_2048_ht_40_5_stride_5_to_640_summary_RedundantMSHR	3	1	#000000	0	3	7	0	#ca2a93	#ca2a93	1	#ca2a93	1	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_40_5_stride_5_to_640_summary_Stride	mst_2048_ht_40_5_stride_5_to_640_summary_RedundantCache	3	1	#000000	0	3	7	0	#480000	#480000	1	#480000	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_40_5_stride_5_to_640_summary_Stride	mst_2048_ht_40_5_stride_5_to_640_summary_RedundantCache	3	1	#000000	0	3	7	0	#480000	#480000	1	#480000	2	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_40_5_stride_5_to_640_summary_Stride	mst_2048_ht_40_5_stride_5_to_640_summary_Timely	3	1	#000000	0	3	7	0	#480000	#480000	1	#b80224	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_40_5_stride_5_to_640_summary_Stride	mst_2048_ht_40_5_stride_5_to_640_summary_Timely	3	1	#000000	0	3	7	0	#480000	#480000	1	#b80224	3	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_40_5_stride_5_to_640_summary_Stride	mst_2048_ht_40_5_stride_5_to_640_summary_Late	3	1	#000000	0	3	7	0	#480000	#480000	1	#fa9a04	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_40_5_stride_5_to_640_summary_Stride	mst_2048_ht_40_5_stride_5_to_640_summary_Late	3	1	#000000	0	3	7	0	#480000	#480000	1	#fa9a04	4	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_40_5_stride_5_to_640_summary_Stride	mst_2048_ht_40_5_stride_5_to_640_summary_Bad	3	1	#000000	0	3	7	0	#480000	#480000	1	#89b54f	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_40_5_stride_5_to_640_summary_Stride	mst_2048_ht_40_5_stride_5_to_640_summary_Bad	3	1	#000000	0	3	7	0	#480000	#480000	1	#89b54f	5	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_40_5_stride_5_to_640_summary_Stride	mst_2048_ht_40_5_stride_5_to_640_summary_Ugly	3	1	#000000	0	3	7	0	#480000	#480000	1	#738571	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_40_5_stride_5_to_640_summary_Stride	mst_2048_ht_40_5_stride_5_to_640_summary_Ugly	3	1	#000000	0	3	7	0	#480000	#480000	1	#738571	6	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_40_5_stride_5_to_640_summary_Stride	mst_2048_ht_40_5_stride_5_to_640_summary_TotalCycles	2	1	#80ffff	0	3	7	2	#480000	#80ffff	0	#000000	14	1	2	1	0	5	1
+curve	mst_2048_ht_40_5_stride_5_to_640_summary_Stride	mst_2048_ht_40_5_stride_5_to_640_summary_TotalCycles	2	1	#000000	0	3	21	2	#480000	#000000	0	#000000	14	3	2	1	0	5	1
 scale	0	0	10000000	0	6	5	0	0
 scale	1	3300000000	3800000000	0	6	5	0	0
 scale	2	0	7	0	8	5	0	0
@@ -1336,7 +1336,7 @@ EnabledTickLabels	1	1	1	1
 </multiLayer>
 <multiLayer>
 mst_2048_ht_80_5_stride_5_to_640_summary_plot	1	1	5 Sep 2012 21:16:56
-geometry	maximized	active
+geometry	0	0	510	430	
 WindowLabel		2
 Margins	5	5	5	5
 Spacing	5	5
@@ -1345,8 +1345,8 @@ Alignement	0	0
 <AlignPolicy>0</AlignPolicy>
 <CommonAxes>0</CommonAxes>
 <graph>
-ggeometry	3	5	1910	666
-<PageGeometry>0.0015625	0.00738552	0.994792	0.983752</PageGeometry>
+ggeometry	1	3	499	375
+<PageGeometry>0.00199203	0.0078534	0.994024	0.981675</PageGeometry>
 PlotTitle		#000000	4228
 <Antialiasing>1</Antialiasing>
 <Autoscaling>1</Autoscaling>
@@ -1362,32 +1362,32 @@ AxesTitles	Stride	# Helper Thread L2 Requests		Total Cycles
 AxesTitleColors	#000000	#000000	#000000	#000000	
 AxesTitleAlignment	5124	4	5124	4
 AxesTitleDistance	2	2	2	-1
-TitleFont	Ubuntu	31	75	0	0	0
-ScaleFont0	Ubuntu	31	75	0	0	0
-ScaleFont1	Ubuntu	31	75	0	0	0
-ScaleFont2	Ubuntu	31	75	0	0	0
-ScaleFont3	Ubuntu	31	75	0	0	0
-AxisFont0	Ubuntu	28	50	0	0	0
-AxisFont1	Ubuntu	28	50	0	0	0
-AxisFont2	Ubuntu	28	50	0	0	0
-AxisFont3	Ubuntu	28	50	0	0	0
+TitleFont	Ubuntu	11	75	0	0	0
+ScaleFont0	Ubuntu	11	75	0	0	0
+ScaleFont1	Ubuntu	20	75	0	0	0
+ScaleFont2	Ubuntu	11	75	0	0	0
+ScaleFont3	Ubuntu	11	75	0	0	0
+AxisFont0	Ubuntu	10	50	0	0	0
+AxisFont1	Ubuntu	16	50	0	0	0
+AxisFont2	Ubuntu	10	50	0	0	0
+AxisFont3	Ubuntu	10	50	0	0	0
 AxesColors	#000000	#000000	#000000	#000000
 AxesNumberColors	#3c3c3c	#3c3c3c	#3c3c3c	#3c3c3c
 AxesBaseline	0	0	0	0	
 CanvasBackground	#ffffff	0
-curve	mst_2048_ht_80_5_stride_5_to_640_summary_Stride	mst_2048_ht_80_5_stride_5_to_640_summary_RedundantMSHR	3	1	#000000	0	3	7	0	#ca2a93	#ca2a93	1	#ca2a93	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_80_5_stride_5_to_640_summary_Stride	mst_2048_ht_80_5_stride_5_to_640_summary_RedundantMSHR	3	1	#000000	0	3	7	0	#ca2a93	#ca2a93	1	#ca2a93	1	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_80_5_stride_5_to_640_summary_Stride	mst_2048_ht_80_5_stride_5_to_640_summary_RedundantCache	3	1	#000000	0	3	7	0	#480000	#480000	1	#480000	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_80_5_stride_5_to_640_summary_Stride	mst_2048_ht_80_5_stride_5_to_640_summary_RedundantCache	3	1	#000000	0	3	7	0	#480000	#480000	1	#480000	2	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_80_5_stride_5_to_640_summary_Stride	mst_2048_ht_80_5_stride_5_to_640_summary_Timely	3	1	#000000	0	3	7	0	#480000	#480000	1	#b80224	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_80_5_stride_5_to_640_summary_Stride	mst_2048_ht_80_5_stride_5_to_640_summary_Timely	3	1	#000000	0	3	7	0	#480000	#480000	1	#b80224	3	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_80_5_stride_5_to_640_summary_Stride	mst_2048_ht_80_5_stride_5_to_640_summary_Late	3	1	#000000	0	3	7	0	#480000	#480000	1	#fa9a04	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_80_5_stride_5_to_640_summary_Stride	mst_2048_ht_80_5_stride_5_to_640_summary_Late	3	1	#000000	0	3	7	0	#480000	#480000	1	#fa9a04	4	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_80_5_stride_5_to_640_summary_Stride	mst_2048_ht_80_5_stride_5_to_640_summary_Bad	3	1	#000000	0	3	7	0	#480000	#480000	1	#89b54f	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_80_5_stride_5_to_640_summary_Stride	mst_2048_ht_80_5_stride_5_to_640_summary_Bad	3	1	#000000	0	3	7	0	#480000	#480000	1	#89b54f	5	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_80_5_stride_5_to_640_summary_Stride	mst_2048_ht_80_5_stride_5_to_640_summary_Ugly	3	1	#000000	0	3	7	0	#480000	#480000	1	#738571	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_80_5_stride_5_to_640_summary_Stride	mst_2048_ht_80_5_stride_5_to_640_summary_Ugly	3	1	#000000	0	3	7	0	#480000	#480000	1	#738571	6	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_80_5_stride_5_to_640_summary_Stride	mst_2048_ht_80_5_stride_5_to_640_summary_TotalCycles	2	1	#80ffff	0	3	7	2	#480000	#80ffff	0	#000000	14	1	2	1	0	5	1
+curve	mst_2048_ht_80_5_stride_5_to_640_summary_Stride	mst_2048_ht_80_5_stride_5_to_640_summary_TotalCycles	2	1	#000000	0	3	21	2	#480000	#000000	0	#000000	14	3	2	1	0	5	1
 scale	0	0	3000000	0	7	5	0	0
 scale	1	3680000000	3800000000	0	7	5	0	0
 scale	2	0	7	0	8	5	0	0
@@ -1410,10 +1410,10 @@ EnabledTickLabels	1	1	1	1
 <Color>#000000</Color>
 <FrameWidth>1</FrameWidth>
 <LineStyle>0</LineStyle>
-<x>0.13415468856947</x>
-<y>3094619.6660482</y>
-<right>1.86556603773585</right>
-<bottom>2725000</bottom>
+<x>0.22479126525369</x>
+<y>3126760.5633803</y>
+<right>5.538856775851</right>
+<bottom>2487676.05633803</bottom>
 <attachTo>1</attachTo>
 <onTop>1</onTop>
 <visible>1</visible>
@@ -1421,7 +1421,7 @@ EnabledTickLabels	1	1	1	1
 \l(1)%(1)  \l(2)%(2)
 \l(3)%(3)  \l(4)%(4)  \l(5)%(5)  \l(6)%(6)  \l(7)%(7)
 </Text>
-<Font>Ubuntu	31	50	0	0	0</Font>
+<Font>Ubuntu	20	50	0	0	0</Font>
 <TextColor>#000000</TextColor>
 <Background>#ffffff</Background>
 <Alpha>0</Alpha>
@@ -1439,13 +1439,13 @@ geometry	781	0	553	487
 WindowLabel		2
 Margins	5	5	5	5
 Spacing	5	5
-LayerCanvasSize	1441	541
+LayerCanvasSize	1441	540
 Alignement	0	0
 <AlignPolicy>0</AlignPolicy>
 <CommonAxes>0</CommonAxes>
 <graph>
-ggeometry	1	13	542	423
-<PageGeometry>0.00183486	0.0296128	0.994495	0.963554</PageGeometry>
+ggeometry	1	24	542	411
+<PageGeometry>0.00183486	0.0546697	0.994495	0.936219</PageGeometry>
 PlotTitle		#000000	4228
 <Antialiasing>1</Antialiasing>
 <Autoscaling>1</Autoscaling>
@@ -1474,19 +1474,19 @@ AxesColors	#000000	#000000	#000000	#000000
 AxesNumberColors	#3c3c3c	#3c3c3c	#3c3c3c	#3c3c3c
 AxesBaseline	0	0	0	0	
 CanvasBackground	#ffffff	0
-curve	mst_2048_ht_160_5_stride_5_to_640_summary_Stride	mst_2048_ht_160_5_stride_5_to_640_summary_RedundantMSHR	3	1	#000000	0	3	7	0	#ca2a93	#ca2a93	1	#ca2a93	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_160_5_stride_5_to_640_summary_Stride	mst_2048_ht_160_5_stride_5_to_640_summary_RedundantMSHR	3	1	#000000	0	3	7	0	#ca2a93	#ca2a93	1	#ca2a93	1	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_160_5_stride_5_to_640_summary_Stride	mst_2048_ht_160_5_stride_5_to_640_summary_RedundantCache	3	1	#000000	0	3	7	0	#480000	#480000	1	#480000	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_160_5_stride_5_to_640_summary_Stride	mst_2048_ht_160_5_stride_5_to_640_summary_RedundantCache	3	1	#000000	0	3	7	0	#480000	#480000	1	#480000	2	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_160_5_stride_5_to_640_summary_Stride	mst_2048_ht_160_5_stride_5_to_640_summary_Timely	3	1	#000000	0	3	7	0	#480000	#480000	1	#b80224	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_160_5_stride_5_to_640_summary_Stride	mst_2048_ht_160_5_stride_5_to_640_summary_Timely	3	1	#000000	0	3	7	0	#480000	#480000	1	#b80224	3	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_160_5_stride_5_to_640_summary_Stride	mst_2048_ht_160_5_stride_5_to_640_summary_Late	3	1	#000000	0	3	7	0	#480000	#480000	1	#fa9a04	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_160_5_stride_5_to_640_summary_Stride	mst_2048_ht_160_5_stride_5_to_640_summary_Late	3	1	#000000	0	3	7	0	#480000	#480000	1	#fa9a04	4	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_160_5_stride_5_to_640_summary_Stride	mst_2048_ht_160_5_stride_5_to_640_summary_Bad	3	1	#000000	0	3	7	0	#480000	#480000	1	#89b54f	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_160_5_stride_5_to_640_summary_Stride	mst_2048_ht_160_5_stride_5_to_640_summary_Bad	3	1	#000000	0	3	7	0	#480000	#480000	1	#89b54f	5	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_160_5_stride_5_to_640_summary_Stride	mst_2048_ht_160_5_stride_5_to_640_summary_Ugly	3	1	#000000	0	3	7	0	#480000	#480000	1	#738571	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_160_5_stride_5_to_640_summary_Stride	mst_2048_ht_160_5_stride_5_to_640_summary_Ugly	3	1	#000000	0	3	7	0	#480000	#480000	1	#738571	6	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_160_5_stride_5_to_640_summary_Stride	mst_2048_ht_160_5_stride_5_to_640_summary_TotalCycles	2	1	#80ffff	0	3	7	2	#480000	#80ffff	0	#000000	14	1	2	1	0	5	1
+curve	mst_2048_ht_160_5_stride_5_to_640_summary_Stride	mst_2048_ht_160_5_stride_5_to_640_summary_TotalCycles	2	1	#000000	0	3	21	2	#480000	#000000	0	#000000	14	3	2	1	0	5	1
 scale	0	0	2000000	0	5	5	0	0
 scale	1	3873000000	3879000000	0	7	5	0	0
 scale	2	0	7	0	8	5	0	0
@@ -1509,16 +1509,16 @@ EnabledTickLabels	1	1	1	1
 <Color>#000000</Color>
 <FrameWidth>1</FrameWidth>
 <LineStyle>0</LineStyle>
-<x>2.5958333333333</x>
-<y>2133333.3333333</y>
+<x>1.4486111111111</x>
+<y>2224852.0710059</y>
 <right>1.86556603773585</right>
-<bottom>1811965.81196581</bottom>
+<bottom>1805309.73451327</bottom>
 <attachTo>1</attachTo>
 <onTop>1</onTop>
 <visible>1</visible>
 <Text>
-\l(1)%(1)  \l(2)%(2)  
-\l(3)%(3)  \l(4)%(4)  \l(5)%(5)  \l(6)%(6) \l(7)%(7)
+\l(1)%(1)  \l(2)%(2)  \l(3)%(3)  \l(4)%(4)  
+\l(5)%(5)  \l(6)%(6) \l(7)%(7)
 </Text>
 <Font>Ubuntu	15	50	0	0	0</Font>
 <TextColor>#000000</TextColor>
@@ -1573,19 +1573,19 @@ AxesColors	#000000	#000000	#000000	#000000
 AxesNumberColors	#3c3c3c	#3c3c3c	#3c3c3c	#3c3c3c
 AxesBaseline	0	0	0	0	
 CanvasBackground	#ffffff	0
-curve	mst_2048_ht_320_5_stride_5_to_640_summary_Stride	mst_2048_ht_320_5_stride_5_to_640_summary_RedundantMSHR	3	1	#000000	0	3	7	0	#ca2a93	#ca2a93	1	#ca2a93	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_320_5_stride_5_to_640_summary_Stride	mst_2048_ht_320_5_stride_5_to_640_summary_RedundantMSHR	3	1	#000000	0	3	7	0	#ca2a93	#ca2a93	1	#ca2a93	1	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_320_5_stride_5_to_640_summary_Stride	mst_2048_ht_320_5_stride_5_to_640_summary_RedundantCache	3	1	#000000	0	3	7	0	#480000	#480000	1	#480000	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_320_5_stride_5_to_640_summary_Stride	mst_2048_ht_320_5_stride_5_to_640_summary_RedundantCache	3	1	#000000	0	3	7	0	#480000	#480000	1	#480000	2	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_320_5_stride_5_to_640_summary_Stride	mst_2048_ht_320_5_stride_5_to_640_summary_Timely	3	1	#000000	0	3	7	0	#480000	#480000	1	#b80224	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_320_5_stride_5_to_640_summary_Stride	mst_2048_ht_320_5_stride_5_to_640_summary_Timely	3	1	#000000	0	3	7	0	#480000	#480000	1	#b80224	3	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_320_5_stride_5_to_640_summary_Stride	mst_2048_ht_320_5_stride_5_to_640_summary_Late	3	1	#000000	0	3	7	0	#480000	#480000	1	#fa9a04	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_320_5_stride_5_to_640_summary_Stride	mst_2048_ht_320_5_stride_5_to_640_summary_Late	3	1	#000000	0	3	7	0	#480000	#480000	1	#fa9a04	4	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_320_5_stride_5_to_640_summary_Stride	mst_2048_ht_320_5_stride_5_to_640_summary_Bad	3	1	#000000	0	3	7	0	#480000	#480000	1	#89b54f	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_320_5_stride_5_to_640_summary_Stride	mst_2048_ht_320_5_stride_5_to_640_summary_Bad	3	1	#000000	0	3	7	0	#480000	#480000	1	#89b54f	5	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_320_5_stride_5_to_640_summary_Stride	mst_2048_ht_320_5_stride_5_to_640_summary_Ugly	3	1	#000000	0	3	7	0	#480000	#480000	1	#738571	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_320_5_stride_5_to_640_summary_Stride	mst_2048_ht_320_5_stride_5_to_640_summary_Ugly	3	1	#000000	0	3	7	0	#480000	#480000	1	#738571	6	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_320_5_stride_5_to_640_summary_Stride	mst_2048_ht_320_5_stride_5_to_640_summary_TotalCycles	2	1	#80ffff	0	3	7	2	#480000	#80ffff	0	#000000	14	1	2	1	0	5	1
+curve	mst_2048_ht_320_5_stride_5_to_640_summary_Stride	mst_2048_ht_320_5_stride_5_to_640_summary_TotalCycles	2	1	#000000	0	3	21	2	#480000	#000000	0	#000000	14	3	2	1	0	5	1
 scale	0	0	2000000	0	5	5	0	0
 scale	1	3946000000	3958000000	0	7	5	0	0
 scale	2	0	7	0	8	5	0	0
@@ -1659,32 +1659,32 @@ AxesTitles	Lookahead	# Helper Thread L2 Requests		Total Cycles
 AxesTitleColors	#000000	#000000	#000000	#000000	
 AxesTitleAlignment	4	4	5124	4
 AxesTitleDistance	2	2	2	-1
-TitleFont	Ubuntu	20	75	0	0	0
-ScaleFont0	Ubuntu	16	75	0	0	0
-ScaleFont1	Ubuntu	16	75	0	0	0
-ScaleFont2	Ubuntu	16	75	0	0	0
-ScaleFont3	Ubuntu	16	75	0	0	0
-AxisFont0	Ubuntu	16	50	0	0	0
-AxisFont1	Ubuntu	16	50	0	0	0
-AxisFont2	Ubuntu	16	50	0	0	0
-AxisFont3	Ubuntu	16	50	0	0	0
+TitleFont	Ubuntu	39	75	0	0	0
+ScaleFont0	Ubuntu	31	75	0	0	0
+ScaleFont1	Ubuntu	31	75	0	0	0
+ScaleFont2	Ubuntu	31	75	0	0	0
+ScaleFont3	Ubuntu	31	75	0	0	0
+AxisFont0	Ubuntu	31	50	0	0	0
+AxisFont1	Ubuntu	31	50	0	0	0
+AxisFont2	Ubuntu	31	50	0	0	0
+AxisFont3	Ubuntu	31	50	0	0	0
 AxesColors	#000000	#000000	#000000	#000000
 AxesNumberColors	#3c3c3c	#3c3c3c	#3c3c3c	#3c3c3c
 AxesBaseline	0	0	0	0	
 CanvasBackground	#ffffff	0
-curve	mst_2048_ht_0_320_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_320_lookahead_0_to_640_summary_RedundantMSHR	3	1	#000000	0	3	7	0	#ca2a93	#ca2a93	1	#ca2a93	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_0_320_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_320_lookahead_0_to_640_summary_RedundantMSHR	3	1	#000000	0	3	7	0	#ca2a93	#ca2a93	1	#ca2a93	1	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_0_320_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_320_lookahead_0_to_640_summary_RedundantCache	3	1	#000000	0	3	7	0	#480000	#480000	1	#480000	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_0_320_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_320_lookahead_0_to_640_summary_RedundantCache	3	1	#000000	0	3	7	0	#480000	#480000	1	#480000	2	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_0_320_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_320_lookahead_0_to_640_summary_Timely	3	1	#000000	0	3	7	0	#480000	#480000	1	#b80224	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_0_320_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_320_lookahead_0_to_640_summary_Timely	3	1	#000000	0	3	7	0	#480000	#480000	1	#b80224	3	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_0_320_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_320_lookahead_0_to_640_summary_Late	3	1	#000000	0	3	7	0	#480000	#480000	1	#fa9a04	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_0_320_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_320_lookahead_0_to_640_summary_Late	3	1	#000000	0	3	7	0	#480000	#480000	1	#fa9a04	4	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_0_320_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_320_lookahead_0_to_640_summary_Bad	3	1	#000000	0	3	7	0	#480000	#480000	1	#89b54f	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_0_320_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_320_lookahead_0_to_640_summary_Bad	3	1	#000000	0	3	7	0	#480000	#480000	1	#89b54f	5	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_0_320_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_320_lookahead_0_to_640_summary_Ugly	3	1	#000000	0	3	7	0	#480000	#480000	1	#738571	0	20	0	2	0	0	5	1
+curve	mst_2048_ht_0_320_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_320_lookahead_0_to_640_summary_Ugly	3	1	#000000	0	3	7	0	#480000	#480000	1	#738571	6	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_0_320_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_320_lookahead_0_to_640_summary_TotalCycles	2	1	#80ffff	0	3	7	2	#480000	#80ffff	0	#000000	14	1	2	1	0	5	1
+curve	mst_2048_ht_0_320_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_320_lookahead_0_to_640_summary_TotalCycles	2	1	#000000	0	3	21	2	#480000	#000000	0	#000000	14	3	2	1	0	5	1
 scale	0	0	14000000	0	8	5	0	0
 scale	1	3650000000	4100000000	0	10	5	0	0
 scale	2	0	7	0	8	5	0	0
@@ -1707,10 +1707,10 @@ EnabledTickLabels	1	1	1	1
 <Color>#000000</Color>
 <FrameWidth>1</FrameWidth>
 <LineStyle>0</LineStyle>
-<x>2.422236102436</x>
-<y>13636048.526863</y>
+<x>2.5716180371353</x>
+<y>13637037.037037</y>
 <right>2.0761154855643</right>
-<bottom>12403908.7947883</bottom>
+<bottom>12821052.6315789</bottom>
 <attachTo>1</attachTo>
 <onTop>1</onTop>
 <visible>1</visible>
@@ -1719,7 +1719,7 @@ EnabledTickLabels	1	1	1	1
 \l(3)%(3)  \l(4)%(4)  \l(5)%(5)  \l(6)%(6)
 \l(7)%(7)
 </Text>
-<Font>Ubuntu	16	50	0	0	0</Font>
+<Font>Ubuntu	31	50	0	0	0</Font>
 <TextColor>#000000</TextColor>
 <Background>#ffffff</Background>
 <Alpha>0</Alpha>
