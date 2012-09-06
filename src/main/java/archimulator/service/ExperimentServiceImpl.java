@@ -25,6 +25,7 @@ import com.Ostermiller.util.CSVPrinter;
 import com.j256.ormlite.dao.Dao;
 import net.pickapack.JsonSerializationHelper;
 import net.pickapack.Pair;
+import net.pickapack.StorageUnit;
 import net.pickapack.action.Function1;
 import net.pickapack.action.Function2;
 import net.pickapack.action.Predicate;
@@ -422,8 +423,8 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         for (Experiment experiment : experiments) {
             List<String> row = new ArrayList<String>();
 
-//            row.add(StorageUnit.toString(experiment.getArchitecture().getL2Size()));
-            row.add(experiment.getArchitecture().getL2Size() + "");
+            row.add(StorageUnit.toString(experiment.getArchitecture().getL2Size()));
+//            row.add(experiment.getArchitecture().getL2Size() + "");
 
             row.add(experiment.getArchitecture().getL2Associativity() + "");
 

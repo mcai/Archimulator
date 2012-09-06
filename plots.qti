@@ -388,7 +388,7 @@ curve	mst_2048_ht_20_10_l2_96KB_to_2MB_summary_L2Size	mst_2048_ht_20_10_l2_96KB_
 <StackWhiteOut>1</StackWhiteOut>
 curve	mst_2048_ht_20_10_l2_96KB_to_2MB_summary_L2Size	mst_2048_ht_20_10_l2_96KB_to_2MB_summary_Ugly	3	1	#000000	0	3	7	0	#ff0000	#ff0000	1	#738571	0	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_20_10_l2_96KB_to_2MB_summary_L2Size	mst_2048_ht_20_10_l2_96KB_to_2MB_summary_TotalCycles	2	1	#80ffff	0	3	7	2	#480000	#80ffff	0	#000000	14	3	2	1	0	5	1
+curve	mst_2048_ht_20_10_l2_96KB_to_2MB_summary_L2Size	mst_2048_ht_20_10_l2_96KB_to_2MB_summary_TotalCycles	2	1	#80ffff	0	3	7	2	#480000	#80ffff	0	#000000	14	1	2	1	0	5	1
 scale	0	0	6000000	0	7	5	0	0
 scale	1	3270000000	3330000000	0	7	5	0	0
 scale	2	0	7	0	8	5	0	0
@@ -413,8 +413,8 @@ EnabledTickLabels	1	1	1	1
 <LineStyle>0</LineStyle>
 <x>1.8296382730455</x>
 <y>5912087.9120879</y>
-<right>6.23220536756126</right>
-<bottom>4670329.67032967</bottom>
+<right>1.6723044397463</right>
+<bottom>4015748.03149606</bottom>
 <attachTo>1</attachTo>
 <onTop>1</onTop>
 <visible>1</visible>
@@ -487,7 +487,7 @@ curve	mst_2048_ht_20_10_l2_2way_to_32way_summary_L2Assoc	mst_2048_ht_20_10_l2_2w
 <StackWhiteOut>1</StackWhiteOut>
 curve	mst_2048_ht_20_10_l2_2way_to_32way_summary_L2Assoc	mst_2048_ht_20_10_l2_2way_to_32way_summary_Ugly	3	1	#000000	0	3	7	0	#480000	#480000	1	#738571	0	20	0	2	0	0	4	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_20_10_l2_2way_to_32way_summary_L2Assoc	mst_2048_ht_20_10_l2_2way_to_32way_summary_TotalCycles	2	1	#80ffff	0	3	7	2	#480000	#80ffff	0	#000000	14	3	2	1	0	4	1
+curve	mst_2048_ht_20_10_l2_2way_to_32way_summary_L2Assoc	mst_2048_ht_20_10_l2_2way_to_32way_summary_TotalCycles	2	1	#80ffff	0	3	7	2	#480000	#80ffff	0	#000000	14	1	2	1	0	4	1
 scale	0	0	7000000	0	8	5	0	0
 scale	1	3260000000	3380000000	0	7	5	0	0
 scale	2	0	6	0	7	5	0	0
@@ -512,8 +512,8 @@ EnabledTickLabels	1	1	1	1
 <LineStyle>0</LineStyle>
 <x>2.5587044534413</x>
 <y>7052141.5270019</y>
-<right>5.78542510121457</right>
-<bottom>5148975.79143389</bottom>
+<right>1.4364406779661</right>
+<bottom>4704000</bottom>
 <attachTo>1</attachTo>
 <onTop>1</onTop>
 <visible>1</visible>
@@ -612,8 +612,8 @@ EnabledTickLabels	1	1	1	1
 <LineStyle>0</LineStyle>
 <x>3.6273990734613</x>
 <y>4085343.2282004</y>
-<right>6.79616148246195</right>
-<bottom>2660482.37476809</bottom>
+<right>1.95792079207921</right>
+<bottom>5450000</bottom>
 <attachTo>1</attachTo>
 <onTop>1</onTop>
 <visible>1</visible>
@@ -636,7 +636,7 @@ EnabledTickLabels	1	1	1	1
 </multiLayer>
 <multiLayer>
 mst_2048_ht_0_20_lookahead_0_to_640_summary_plot	1	1	5 Sep 2012 18:51:44
-geometry	maximized	active
+geometry	0	0	510	430	
 WindowLabel		2
 Margins	5	5	5	5
 Spacing	5	5
@@ -645,8 +645,8 @@ Alignement	0	0
 <AlignPolicy>0</AlignPolicy>
 <CommonAxes>0</CommonAxes>
 <graph>
-ggeometry	4	5	1909	666
-<PageGeometry>0.00208333	0.00738552	0.994271	0.983752</PageGeometry>
+ggeometry	1	3	499	375
+<PageGeometry>0.00199203	0.0078534	0.994024	0.981675</PageGeometry>
 PlotTitle		#000000	4228
 <Antialiasing>1</Antialiasing>
 <Autoscaling>1</Autoscaling>
@@ -662,15 +662,15 @@ AxesTitles	Lookahead	# Helper Thread L2 Requests		Total Cycles
 AxesTitleColors	#000000	#000000	#000000	#000000	
 AxesTitleAlignment	5124	4	5124	4
 AxesTitleDistance	2	2	2	-1
-TitleFont	Ubuntu	31	75	0	0	0
-ScaleFont0	Ubuntu	31	75	0	0	0
-ScaleFont1	Ubuntu	31	75	0	0	0
-ScaleFont2	Ubuntu	31	75	0	0	0
-ScaleFont3	Ubuntu	31	75	0	0	0
-AxisFont0	Ubuntu	28	50	0	0	0
-AxisFont1	Ubuntu	28	50	0	0	0
-AxisFont2	Ubuntu	28	50	0	0	0
-AxisFont3	Ubuntu	28	50	0	0	0
+TitleFont	Ubuntu	35	75	0	0	0
+ScaleFont0	Ubuntu	35	75	0	0	0
+ScaleFont1	Ubuntu	35	75	0	0	0
+ScaleFont2	Ubuntu	35	75	0	0	0
+ScaleFont3	Ubuntu	35	75	0	0	0
+AxisFont0	Ubuntu	31	50	0	0	0
+AxisFont1	Ubuntu	31	50	0	0	0
+AxisFont2	Ubuntu	31	50	0	0	0
+AxisFont3	Ubuntu	31	50	0	0	0
 AxesColors	#000000	#000000	#000000	#000000
 AxesNumberColors	#3c3c3c	#3c3c3c	#3c3c3c	#3c3c3c
 AxesBaseline	0	0	0	0	
@@ -712,8 +712,8 @@ EnabledTickLabels	1	1	1	1
 <LineStyle>0</LineStyle>
 <x>2.5248180013236</x>
 <y>6506493.5064935</y>
-<right>6.41164791528789</right>
-<bottom>4532467.53246753</bottom>
+<right>0.441652707984366</right>
+<bottom>6685664.93955095</bottom>
 <attachTo>1</attachTo>
 <onTop>1</onTop>
 <visible>1</visible>
@@ -722,7 +722,7 @@ EnabledTickLabels	1	1	1	1
 \l(3)%(3)  \l(4)%(4)  \l(5)%(5)  \l(6)%(6)
 \l(7)%(7)
 </Text>
-<Font>Ubuntu	31	50	0	0	0</Font>
+<Font>Ubuntu	35	50	0	0	0</Font>
 <TextColor>#000000</TextColor>
 <Background>#ffffff</Background>
 <Alpha>0</Alpha>
@@ -787,7 +787,7 @@ curve	mst_2048_ht_0_40_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_40_loo
 <StackWhiteOut>1</StackWhiteOut>
 curve	mst_2048_ht_0_40_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_40_lookahead_0_to_640_summary_Ugly	3	1	#000000	0	3	7	0	#480000	#480000	1	#738571	0	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_0_40_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_40_lookahead_0_to_640_summary_TotalCycles	2	1	#80ffff	0	3	7	2	#80ffff	#480000	0	#000000	14	3	2	1	0	5	1
+curve	mst_2048_ht_0_40_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_40_lookahead_0_to_640_summary_TotalCycles	2	1	#80ffff	0	3	7	2	#480000	#80ffff	0	#000000	14	1	2	1	0	5	1
 scale	0	0	10000000	0	6	5	0	0
 scale	1	3200000000	4000000000	0	5	5	0	0
 scale	2	0	7	0	8	5	0	0
@@ -812,8 +812,8 @@ EnabledTickLabels	1	1	1	1
 <LineStyle>0</LineStyle>
 <x>1.5704831237591</x>
 <y>10185528.756957</y>
-<right>5.45731303772336</right>
-<bottom>7365491.65120594</bottom>
+<right>1.95792079207921</right>
+<bottom>9083333.33333333</bottom>
 <attachTo>1</attachTo>
 <onTop>1</onTop>
 <visible>1</visible>
@@ -887,7 +887,7 @@ curve	mst_2048_ht_0_80_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_80_loo
 <StackWhiteOut>1</StackWhiteOut>
 curve	mst_2048_ht_0_80_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_80_lookahead_0_to_640_summary_Ugly	3	1	#000000	0	3	7	0	#480000	#480000	1	#738571	0	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_0_80_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_80_lookahead_0_to_640_summary_TotalCycles	2	1	#80ffff	0	3	7	2	#480000	#80ffff	0	#000000	14	3	2	1	0	5	1
+curve	mst_2048_ht_0_80_lookahead_0_to_640_summary_Lookahead	mst_2048_ht_0_80_lookahead_0_to_640_summary_TotalCycles	2	1	#80ffff	0	3	7	2	#480000	#80ffff	0	#000000	14	2	2	1	0	5	1
 scale	0	0	12000000	0	7	5	0	0
 scale	1	3300000000	4000000000	0	8	5	0	0
 scale	2	0	7	0	8	5	0	0
@@ -912,8 +912,8 @@ EnabledTickLabels	1	1	1	1
 <LineStyle>0</LineStyle>
 <x>1.5399061032864</x>
 <y>12112781.954887</y>
-<right>5.6056338028169</right>
-<bottom>8548872.18045113</bottom>
+<right>0.443385650224215</right>
+<bottom>11432727.2727273</bottom>
 <attachTo>1</attachTo>
 <onTop>1</onTop>
 <visible>1</visible>
@@ -1012,8 +1012,8 @@ EnabledTickLabels	1	1	1	1
 <LineStyle>0</LineStyle>
 <x>1.9360667129951</x>
 <y>13339622.641509</y>
-<right>5.26337734537874</right>
-<bottom>9958490.56603774</bottom>
+<right>0.446640316205534</right>
+<bottom>13350649.3506494</bottom>
 <attachTo>1</attachTo>
 <onTop>1</onTop>
 <visible>1</visible>
@@ -1087,7 +1087,7 @@ curve	mst_2048_ht_10_5_stride_5_to_640_summary_Stride	mst_2048_ht_10_5_stride_5_
 <StackWhiteOut>1</StackWhiteOut>
 curve	mst_2048_ht_10_5_stride_5_to_640_summary_Stride	mst_2048_ht_10_5_stride_5_to_640_summary_Ugly	3	1	#000000	0	3	7	0	#480000	#480000	1	#738571	0	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_10_5_stride_5_to_640_summary_Stride	mst_2048_ht_10_5_stride_5_to_640_summary_TotalCycles	2	1	#80ffff	0	3	7	2	#480000	#80ffff	0	#000000	14	3	2	1	0	5	1
+curve	mst_2048_ht_10_5_stride_5_to_640_summary_Stride	mst_2048_ht_10_5_stride_5_to_640_summary_TotalCycles	2	1	#80ffff	0	3	7	2	#480000	#80ffff	0	#000000	14	1	2	1	0	5	1
 scale	0	0	16000000	0	9	5	0	0
 scale	1	3300000000	4100000000	0	9	5	0	0
 scale	2	0	7	0	8	5	0	0
@@ -1112,7 +1112,7 @@ EnabledTickLabels	1	1	1	1
 <LineStyle>0</LineStyle>
 <x>0.21900826446281</x>
 <y>15363636.363636</y>
-<right>1.66176470588235</right>
+<right>1.86997635933806</right>
 <bottom>14533333.3333333</bottom>
 <attachTo>1</attachTo>
 <onTop>1</onTop>
@@ -1187,7 +1187,7 @@ curve	mst_2048_ht_20_5_stride_5_to_640_summary_Stride	mst_2048_ht_20_5_stride_5_
 <StackWhiteOut>1</StackWhiteOut>
 curve	mst_2048_ht_20_5_stride_5_to_640_summary_Stride	mst_2048_ht_20_5_stride_5_to_640_summary_Ugly	3	1	#000000	0	3	7	0	#480000	#480000	1	#738571	0	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_20_5_stride_5_to_640_summary_Stride	mst_2048_ht_20_5_stride_5_to_640_summary_TotalCycles	2	1	#80ffff	0	3	7	2	#480000	#80ffff	0	#000000	14	3	2	1	0	5	1
+curve	mst_2048_ht_20_5_stride_5_to_640_summary_Stride	mst_2048_ht_20_5_stride_5_to_640_summary_TotalCycles	2	1	#80ffff	0	3	7	2	#480000	#80ffff	0	#000000	14	1	2	1	0	5	1
 scale	0	0	14000000	0	8	5	0	0
 scale	1	3300000000	4000000000	0	8	5	0	0
 scale	2	0	7	0	8	5	0	0
@@ -1212,8 +1212,8 @@ EnabledTickLabels	1	1	1	1
 <LineStyle>0</LineStyle>
 <x>0.30722484807562</x>
 <y>13012987.012987</y>
-<right>4.26333558406482</right>
-<bottom>9064935.06493507</bottom>
+<right>1.86997635933806</right>
+<bottom>12716666.6666667</bottom>
 <attachTo>1</attachTo>
 <onTop>1</onTop>
 <visible>1</visible>
@@ -1287,7 +1287,7 @@ curve	mst_2048_ht_40_5_stride_5_to_640_summary_Stride	mst_2048_ht_40_5_stride_5_
 <StackWhiteOut>1</StackWhiteOut>
 curve	mst_2048_ht_40_5_stride_5_to_640_summary_Stride	mst_2048_ht_40_5_stride_5_to_640_summary_Ugly	3	1	#000000	0	3	7	0	#480000	#480000	1	#738571	0	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_40_5_stride_5_to_640_summary_Stride	mst_2048_ht_40_5_stride_5_to_640_summary_TotalCycles	2	1	#80ffff	0	3	7	2	#480000	#80ffff	0	#000000	14	3	2	1	0	5	1
+curve	mst_2048_ht_40_5_stride_5_to_640_summary_Stride	mst_2048_ht_40_5_stride_5_to_640_summary_TotalCycles	2	1	#80ffff	0	3	7	2	#480000	#80ffff	0	#000000	14	1	2	1	0	5	1
 scale	0	0	10000000	0	6	5	0	0
 scale	1	3300000000	3800000000	0	6	5	0	0
 scale	2	0	7	0	8	5	0	0
@@ -1312,8 +1312,8 @@ EnabledTickLabels	1	1	1	1
 <LineStyle>0</LineStyle>
 <x>0.51422898742555</x>
 <y>9350649.3506493</y>
-<right>4.39179351422899</right>
-<bottom>6530612.24489796</bottom>
+<right>1.95792079207921</right>
+<bottom>9083333.33333333</bottom>
 <attachTo>1</attachTo>
 <onTop>1</onTop>
 <visible>1</visible>
@@ -1336,7 +1336,7 @@ EnabledTickLabels	1	1	1	1
 </multiLayer>
 <multiLayer>
 mst_2048_ht_80_5_stride_5_to_640_summary_plot	1	1	5 Sep 2012 21:16:56
-geometry	1213	0	553	487	
+geometry	maximized	active
 WindowLabel		2
 Margins	5	5	5	5
 Spacing	5	5
@@ -1345,8 +1345,8 @@ Alignement	0	0
 <AlignPolicy>0</AlignPolicy>
 <CommonAxes>0</CommonAxes>
 <graph>
-ggeometry	1	3	542	432
-<PageGeometry>0.00183486	0.00683371	0.994495	0.984055</PageGeometry>
+ggeometry	3	5	1910	666
+<PageGeometry>0.0015625	0.00738552	0.994792	0.983752</PageGeometry>
 PlotTitle		#000000	4228
 <Antialiasing>1</Antialiasing>
 <Autoscaling>1</Autoscaling>
@@ -1362,15 +1362,15 @@ AxesTitles	Stride	# Helper Thread L2 Requests		Total Cycles
 AxesTitleColors	#000000	#000000	#000000	#000000	
 AxesTitleAlignment	5124	4	5124	4
 AxesTitleDistance	2	2	2	-1
-TitleFont	Ubuntu	20	75	0	0	0
-ScaleFont0	Ubuntu	20	75	0	0	0
-ScaleFont1	Ubuntu	20	75	0	0	0
-ScaleFont2	Ubuntu	20	75	0	0	0
-ScaleFont3	Ubuntu	20	75	0	0	0
-AxisFont0	Ubuntu	18	50	0	0	0
-AxisFont1	Ubuntu	18	50	0	0	0
-AxisFont2	Ubuntu	18	50	0	0	0
-AxisFont3	Ubuntu	18	50	0	0	0
+TitleFont	Ubuntu	31	75	0	0	0
+ScaleFont0	Ubuntu	31	75	0	0	0
+ScaleFont1	Ubuntu	31	75	0	0	0
+ScaleFont2	Ubuntu	31	75	0	0	0
+ScaleFont3	Ubuntu	31	75	0	0	0
+AxisFont0	Ubuntu	28	50	0	0	0
+AxisFont1	Ubuntu	28	50	0	0	0
+AxisFont2	Ubuntu	28	50	0	0	0
+AxisFont3	Ubuntu	28	50	0	0	0
 AxesColors	#000000	#000000	#000000	#000000
 AxesNumberColors	#3c3c3c	#3c3c3c	#3c3c3c	#3c3c3c
 AxesBaseline	0	0	0	0	
@@ -1387,7 +1387,7 @@ curve	mst_2048_ht_80_5_stride_5_to_640_summary_Stride	mst_2048_ht_80_5_stride_5_
 <StackWhiteOut>1</StackWhiteOut>
 curve	mst_2048_ht_80_5_stride_5_to_640_summary_Stride	mst_2048_ht_80_5_stride_5_to_640_summary_Ugly	3	1	#000000	0	3	7	0	#480000	#480000	1	#738571	0	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_80_5_stride_5_to_640_summary_Stride	mst_2048_ht_80_5_stride_5_to_640_summary_TotalCycles	2	1	#80ffff	0	3	7	2	#480000	#80ffff	0	#000000	14	3	2	1	0	5	1
+curve	mst_2048_ht_80_5_stride_5_to_640_summary_Stride	mst_2048_ht_80_5_stride_5_to_640_summary_TotalCycles	2	1	#80ffff	0	3	7	2	#480000	#80ffff	0	#000000	14	1	2	1	0	5	1
 scale	0	0	3000000	0	7	5	0	0
 scale	1	3680000000	3800000000	0	7	5	0	0
 scale	2	0	7	0	8	5	0	0
@@ -1412,8 +1412,8 @@ EnabledTickLabels	1	1	1	1
 <LineStyle>0</LineStyle>
 <x>0.13415468856947</x>
 <y>3094619.6660482</y>
-<right>5.04517453798768</right>
-<bottom>2510204.08163265</bottom>
+<right>1.86556603773585</right>
+<bottom>2725000</bottom>
 <attachTo>1</attachTo>
 <onTop>1</onTop>
 <visible>1</visible>
@@ -1421,7 +1421,7 @@ EnabledTickLabels	1	1	1	1
 \l(1)%(1)  \l(2)%(2)
 \l(3)%(3)  \l(4)%(4)  \l(5)%(5)  \l(6)%(6)  \l(7)%(7)
 </Text>
-<Font>Ubuntu	20	50	0	0	0</Font>
+<Font>Ubuntu	31	50	0	0	0</Font>
 <TextColor>#000000</TextColor>
 <Background>#ffffff</Background>
 <Alpha>0</Alpha>
@@ -1511,8 +1511,8 @@ EnabledTickLabels	1	1	1	1
 <LineStyle>0</LineStyle>
 <x>2.5958333333333</x>
 <y>2133333.3333333</y>
-<right>6.32430555555556</right>
-<bottom>1824761.9047619</bottom>
+<right>1.86556603773585</right>
+<bottom>1811965.81196581</bottom>
 <attachTo>1</attachTo>
 <onTop>1</onTop>
 <visible>1</visible>
@@ -1585,7 +1585,7 @@ curve	mst_2048_ht_320_5_stride_5_to_640_summary_Stride	mst_2048_ht_320_5_stride_
 <StackWhiteOut>1</StackWhiteOut>
 curve	mst_2048_ht_320_5_stride_5_to_640_summary_Stride	mst_2048_ht_320_5_stride_5_to_640_summary_Ugly	3	1	#000000	0	3	7	0	#480000	#480000	1	#738571	0	20	0	2	0	0	5	1
 <StackWhiteOut>1</StackWhiteOut>
-curve	mst_2048_ht_320_5_stride_5_to_640_summary_Stride	mst_2048_ht_320_5_stride_5_to_640_summary_TotalCycles	2	1	#80ffff	0	3	7	2	#480000	#80ffff	0	#000000	14	3	2	1	0	5	1
+curve	mst_2048_ht_320_5_stride_5_to_640_summary_Stride	mst_2048_ht_320_5_stride_5_to_640_summary_TotalCycles	2	1	#80ffff	0	3	7	2	#480000	#80ffff	0	#000000	14	1	2	1	0	5	1
 scale	0	0	2000000	0	5	5	0	0
 scale	1	3946000000	3958000000	0	7	5	0	0
 scale	2	0	7	0	8	5	0	0
@@ -1610,8 +1610,8 @@ EnabledTickLabels	1	1	1	1
 <LineStyle>0</LineStyle>
 <x>1.8131944444444</x>
 <y>2081632.6530612</y>
-<right>6.78125</right>
-<bottom>1692022.26345083</bottom>
+<right>1.86556603773585</right>
+<bottom>1816666.66666667</bottom>
 <attachTo>1</attachTo>
 <onTop>1</onTop>
 <visible>1</visible>
@@ -1709,8 +1709,8 @@ EnabledTickLabels	1	1	1	1
 <LineStyle>0</LineStyle>
 <x>2.422236102436</x>
 <y>13636048.526863</y>
-<right>4.84884447220487</right>
-<bottom>11112651.6464471</bottom>
+<right>2.0761154855643</right>
+<bottom>12403908.7947883</bottom>
 <attachTo>1</attachTo>
 <onTop>1</onTop>
 <visible>1</visible>
