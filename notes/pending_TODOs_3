@@ -1,6 +1,5 @@
 TODOs
-	1. simplify and refactor HtRequestL2VictimTrackingCapability: HtRequest breakdown
-	2. em3d and mcf: change builtin prefetch calls to volatile variable
+	1. em3d and mcf: change builtin prefetch calls to volatile variable
 	2. add verification for MESI coherence:
 		verify LRU eviction policy:
 			1. L1 read result => L2 valid

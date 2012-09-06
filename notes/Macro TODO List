@@ -7,7 +7,7 @@ a. For helper threaded prefetching:
 	1. identification of good, bad and ugly prefetches (via mechanisms such as prefetch evictee table)
 		priority: 1
 		my previous work: extending GEMS to support measurement of prefetch coverage and accuracy
-		current state of my work: first committed
+		current state of my work: initial work done
 		
 	2. cache replacement/prefetch filtering(bypassing)/prefetch thread progress control(throttling & synchronization with main thread)
 		(based on the history and prediction of good, bad and ugly prefetches)
