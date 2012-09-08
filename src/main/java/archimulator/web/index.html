@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Welcome to Archimulator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <link href="css/bootstrap-2.1.1.min.css" rel="stylesheet">
+
+    <style type="text/css">
+        body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+        }
+    </style>
+
+    <link href="css/bootstrap-responsive-2.1.1.min.css" rel="stylesheet">
+
+    <!--[if lt IE 9]>
+    <script src="js/html5-pre3.6.js" type="javascript"></script>
+    <![endif]-->
+</head>
+<body>
+<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </a>
+            <a class="brand" href="#">Archimulator</a>
+
+            <div class="nav-collapse collapse">
+                <ul class="nav">
+                    <li class="active"><a href="#">Home</a></li>
+                    <li><a href="#benchmarks">Benchmarks</a></li>
+                    <li><a href="#architectures">Architectures</a></li>
+                    <li><a href="#experiments">Experiments</a></li>
+                    <li><a href="#news">News</a></li>
+                </ul>
+
+                <form class="navbar-form pull-right">
+                    <input class="span2" placeholder="Email" type="text">
+                    <input class="span2" placeholder="Password" type="password">
+                    <button type="submit" class="btn">Sign in</button>
+                    <a href="#">Sign Up</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="hero-unit">
+        <h1>Archimulator</h1>
+
+        <p>CMP architectural simulator written in 100% Java and running on popular Linux/Unix distros.</p>
+
+        <a class="btn btn-large btn-primary" href="https://github.com/mcai/Archimulator/zipball/master">Download Archimulator 3.0</a>
+        <a class="btn btn-large">Simulate Online</a>
+
+        <hr class="soften">
+
+        <a href="https://github.com/mcai/Archimulator" target="_blank">Visit Github Project</a>
+    </div>
+</div>
+
+<div class="container">
+    <div class="marketing">
+        <h1>Introducing Archimulator.</h1>
+
+        <p class="marketing-byline">Need reasons to love Archimulator? Look no further.</p>
+
+        <div class="row-fluid">
+            <div class="span4">
+                <h2>Functional simulation.</h2>
+                <ul>
+                    <li>Program loading for statically-linked MIPS32 ELF executables, either Little Endian or Big
+                        Endian;
+                    </li>
+                    <li>Functional execution of common integer and floating-point instructions of MIPS32 ISA;</li>
+                    <li>Emulation of common POSIX system calls;</li>
+                    <li>Execution of Pthreads based multithreaded programs.</li>
+                </ul>
+            </div>
+
+            <div class="span4">
+                <h2>Performance simulation.</h2>
+                <ul>
+                    <li>Separate pipeline structures such as the reorder buffer, separate integer and floating point
+                        physical register files;
+                    </li>
+                    <li>Explicit register renaming based on the merged architectural and rename register file model;
+                    </li>
+                    <li>Single-threaded superscalar out-of-order execution, multithreaded SMT and CMP execution model;
+                    </li>
+                    <li>Multi-level inclusive cache hierarchy with the directory-based MESI coherence protocol;</li>
+                    <li>Simple cycle-accurate DRAM controller model;</li>
+                    <li>Various kinds of static and dynamic branch predictors, checkpointing-based pipeline recovery on
+                        branch misprediction.
+                    </li>
+                </ul>
+            </div>
+
+            <div class="span4">
+                <h2>Simulation Infrastructure.</h2>
+                <ul>
+                    <li>Support measurement of instructions, pipeline structures and the cache hierarchy;</li>
+                    <li>Support generation of instruction traces;</li>
+                    <li>Support both execution-driven and trace-driven memory subsystem simulation;</li>
+                    <li>Support complex simulation strategies: cycle count based, instruction count based, and hotspot
+                        oriented simulation;
+                    </li>
+                    <li>Support seamless switching between functional simulation and performance simulation mode;</li>
+                    <li>Support software based helper threading on CMPs</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p><a href="mailto:min.cai.china@gmail.com">© Min Cai 2008-2012</a></p>
+    </footer>
+</div>
+
+<script src="js/jquery-1.8.1.min.js" type="javascript"></script>
+<script src="js/bootstrap-2.1.1.min.js" type="javascript"></script>
+</body>
+</html>

@@ -45,21 +45,6 @@ import static ch.lambdaj.Lambda.*;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 
-//on last puts or putm from owner:
-//  RemoveLRU
-//
-//on replacement:
-//	1. HT replaces INVALID => insert NULL
-//	2. HT replaces MT => insert DATA
-//	3. HT replaces HT => No action
-//	4. MT replaces HT => Remove LRU
-//	5. MT replaces MT, Exists HT => Remove LRU, Insert DATA
-//
-//on reference:
-//	1. MT miss + HT miss + VT Hit => ; Bad HT, VT.setLRU
-//	2. MT miss + HT hit + VT miss => MT to HT; Good HT, removeLRU
-//	3. MT miss + HT hit + VT hit => MT to HT; VT.setLRU, removeLRU
-//	4. MT hit + HT miss + VT hit => ; VT.setLRU
 public class HelperThreadL2CacheRequestProfilingHelper {
     private DirectoryController l2CacheController;
 
