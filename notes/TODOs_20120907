@@ -1,1 +1,7 @@
-Late Prefetch Prediction and Mitigation for Helper Threading on CMPs
+hint:
+    Isolation, Prediction and Mitigation of Non-optimal Prefetches for Helper Threading on CMPs:
+        1. any non-trivial bad prefetches exhibited in larger scale of mst helper threaded version?
+        2. allocate more resources to late prefetches based on pc correlation??
+
+title:
+    Prefetch Breakdown Based Dynamic LLC Partitioning for Helper Threading on CMPs
