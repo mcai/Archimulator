@@ -655,6 +655,22 @@
   institution = {ACM}
 }
 
+@INPROCEEDINGS{Ebrahimi2011,
+  author = {Eiman Ebrahimi and Chang Joo Lee and Onur Mutlu and Yale N. Patt},
+  title = {Prefetch-aware shared resource management for multi-core systems},
+  booktitle = {ISCA},
+  year = {2011},
+  editor = {Ravi Iyer and Qing Yang and Antonio Gonz{\'a}lez},
+  pages = {141--152},
+  publisher = {ACM},
+  bibdate = {2011-06-27},
+  bibsource = {DBLP, http://dblp.uni-trier.de/db/conf/isca/isca2011.html#EbrahimiLMP11},
+  isbn = {978-1-4503-0472-6},
+  owner = {itecgo},
+  timestamp = {2012.09.10},
+  url = {http://doi.acm.org/10.1145/2000064.2000081}
+}
+
 @INPROCEEDINGS{Ebrahimi2009a,
   author = {Ebrahimi, Eiman and Mutlu, Onur and Lee, Chang Joo and Patt, Yale
 	N.},
@@ -1102,6 +1118,7 @@
   __markedentry = {[itecgo:1]},
   bibdate = {2011-09-06},
   bibsource = {DBLP, http://dblp.uni-trier.de/db/conf/dac/dac2011.html#KandemirYK11},
+  file = {Kandemir2011.pdf:Kandemir2011.pdf:PDF},
   isbn = {978-1-4503-0636-2},
   url = {http://dl.acm.org/citation.cfm?id=2024724}
 }
@@ -1139,6 +1156,7 @@
   journal = {Computer Design, 2007. {\ldots{}}},
   year = {2008},
   __markedentry = {[itecgo:1]},
+  file = {Keramidas2008.pdf:Keramidas2008.pdf:PDF},
   url = {http://ieeexplore.ieee.org/xpls/abs\_all.jsp?arnumber=4601909}
 }
 
@@ -2182,6 +2200,22 @@
   file = {Saez2010.pdf:Saez2010.pdf:PDF}
 }
 
+@INPROCEEDINGS{Sanchez2011,
+  author = {Daniel Sanchez and Christos Kozyrakis},
+  title = {Vantage: scalable and efficient fine-grain cache partitioning},
+  booktitle = {ISCA},
+  year = {2011},
+  editor = {Ravi Iyer and Qing Yang and Antonio Gonz{\'a}lez},
+  pages = {57--68},
+  publisher = {ACM},
+  bibdate = {2011-06-27},
+  bibsource = {DBLP, http://dblp.uni-trier.de/db/conf/isca/isca2011.html#SanchezK11},
+  file = {Sanchez2011.pdf:Sanchez2011.pdf:PDF},
+  isbn = {978-1-4503-0472-6},
+  owner = {itecgo},
+  timestamp = {2012.09.10}
+}
+
 @ARTICLE{Schneider2007,
   author = {Schneider, Florian T. and Payer, Mathias and Gross, Thomas R.},
   title = {Online optimizations driven by hardware performance monitoring},
@@ -2556,7 +2590,7 @@
   month = {jun}
 }
 
-@INPROCEEDINGS{WuJMSE2011,
+@INPROCEEDINGS{Wu2011,
   author = {Wu, Carole-Jean and Jaleel, Aamer and Martonosi, Margaret and , Simon
 	C. Steely Jr. and Emer, Joel S.},
   title = {PACMan: prefetch-aware cache management for high performance caching},
@@ -2571,6 +2605,7 @@
   __markedentry = {[itecgo:1]},
   bibdate = {2012-03-02},
   bibsource = {DBLP, http://dblp.uni-trier.de/db/conf/micro/micro2011.html#WuJMSE11},
+  file = {Wu2011.pdf:Wu2011.pdf:PDF},
   isbn = {978-1-4503-1053-6}
 }
 
