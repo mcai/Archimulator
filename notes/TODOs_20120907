@@ -5,3 +5,19 @@ hint:
 
 title:
     Prefetch Breakdown Based Dynamic LLC Partitioning for Helper Threading on CMPs
+
+basic statement:
+    1. a partitioned shared cache is the solution to exploit data sharing and at the same
+    time inhibit destructive inter-thread interactions
+    2. cache space partition is in terms of eviction control but not placement control
+
+content:
+    1. stack distance histograms, 1-k way, > k.
+    2. intra-thread (baseline: MT; ht: MT, HT) and inter-thread (baseline: N/A; ht: HT-MT, MT-HT) stack distance histograms
+    3. way granularity; dynamic set profiling of SDHs
+    4. latency oriented intra-application inter-thread constructive sharing
+    5. evaluation: unpartitioned l2, statically partitioned l2 and dynamically partitioned l2
+        we observe that our technique achieves application speedups up to XX% over an unpartitioned shared cache,
+        up to XX% over a statically partitioned cache, and up to XX% over a prior throughput-oriented scheme.
+    6. main thread request latency reduction per miss
+    7. breakdown of cache interactions: intra-MT access, intra-HT access, inter HT-MT access and inter MT-HT access.

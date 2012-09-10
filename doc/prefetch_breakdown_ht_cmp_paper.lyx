@@ -4339,7 +4339,7 @@ This work was supported by the National Natural Science Foundation of China
 \begin_layout Standard
 \begin_inset CommandInset bibtex
 LatexCommand bibtex
-bibfiles "ref"
+bibfiles "/home/itecgo/Archimulator/refs_classified/ref"
 options "IEEEtran"
 
 \end_inset

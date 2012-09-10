@@ -47,6 +47,7 @@
       <w>strided</w>
       <w>tlbs</w>
       <w>unmap</w>
+      <w>unpartitioned</w>
       <w>warmup</w>
       <w>writeback</w>
     </words>
