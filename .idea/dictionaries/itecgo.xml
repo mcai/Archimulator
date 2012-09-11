@@ -18,6 +18,7 @@
       <w>hotspots</w>
       <w>ifetch</w>
       <w>insts</w>
+      <w>intra</w>
       <w>iterable</w>
       <w>itlb</w>
       <w>itlbs</w>
@@ -28,6 +29,7 @@
       <w>mshr</w>
       <w>mult</w>
       <w>multicore</w>
+      <w>multithreaded</w>
       <w>nnpc</w>
       <w>nonblocking</w>
       <w>nonowner</w>
@@ -46,6 +48,7 @@
       <w>sqrt</w>
       <w>strided</w>
       <w>tlbs</w>
+      <w>tradeoff</w>
       <w>unmap</w>
       <w>unpartitioned</w>
       <w>warmup</w>

@@ -1,7 +1,7 @@
 hint:
     Isolation, Prediction and Mitigation of Non-optimal Prefetches for Helper Threading on CMPs:
         1. any non-trivial bad prefetches exhibited in larger scale of mst helper threaded version?
-        2. allocate more resources to late prefetches based on pc correlation??
+        2. allocate more resources to late or ugly prefetches with short inter HT-MT reuse distances based on pc correlation??
 
 title:
     Prefetch Breakdown Based Dynamic LLC Partitioning for Helper Threading on CMPs
@@ -22,3 +22,13 @@ content:
         up to XX% over a statically partitioned cache, and up to XX% over a prior throughput-oriented scheme.
     6. main thread request latency reduction per miss
     7. breakdown of cache interactions: intra-MT access, intra-HT access, inter HT-MT access and inter MT-HT access.
+
+excerpts from other papers:
+    Muralidhara2011:
+        The effects of cache interference can be more complex when interfering threads
+        belong to the same application. To start with, threads from the same application
+        can share data. Consequently, an application can fetch data into the shared cache
+        and this data can potentially be used by the other thread later in the execution.
+        In this case, shared cache leads to constructive cache sharing. Therefore, in the
+        multithreaded application case, there is a tradeoff between negative effects of inter-
+        thread interference and the positive impact of cache sharing.
