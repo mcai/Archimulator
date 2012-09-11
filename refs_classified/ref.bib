@@ -1332,17 +1332,18 @@
   file = {Lee2008.pdf:Lee2008.pdf:PDF}
 }
 
-@INPROCEEDINGS{Lee2009b,
+@INPROCEEDINGS{Lee2009,
   author = {Lee, Chang Joo and Narasiman, Veynu and Mutlu, Onur and Patt, Yale
 	N.},
   title = {Improving Memory Bank-Level Parallelism in the Presence of Prefetching},
   booktitle = {Proceedings of 42nd Annual International Symposium on Microarchitecture
 	(MICRO)},
   year = {2009},
-  month = {dec}
+  month = {dec},
+  file = {Lee2009.pdf:Lee2009.pdf:PDF}
 }
 
-@ARTICLE{Lee2009,
+@ARTICLE{Lee2009b,
   author = {Lee, Jaejin and Jung, Changhee and Lim, Daeseob and Solihin, Yan},
   title = {Prefetching with Helper Threads for Loosely Coupled Multiprocessor
 	Systems},
@@ -1363,7 +1364,6 @@
   coden = {ITDSEO},
   doi = {http://doi.ieeecomputersociety.org/10.1109/TPDS.2008.224},
   doi-url = {http://dx.doi.org/10.1109/TPDS.2008.224},
-  file = {Lee2009.pdf:Lee2009.pdf:PDF},
   fjournal = {IEEE Transactions on Parallel and Distributed Systems},
   issn = {1045-9219 (print), 1558-2183 (electronic)},
   issn-l = {1045-9219}
@@ -1651,6 +1651,65 @@
   pages = {87-106},
   number = {2},
   month = {jun}
+}
+
+@PHDTHESIS{Muralidhara2011,
+  author = {Sai Prashanth Muralidhara},
+  title = {Reducing Interference in Memory Hierarchy Resources Using Application
+	Aware Management},
+  school = {Penn State},
+  year = {2011},
+  month = aug # {~13},
+  __markedentry = {[itecgo:1]},
+  abstract = {Aggressive technology scaling has resulted in an increase in number
+	of cores being integrated on-chip. While on-chip cores are increasing
+	at a fast rate, the memory hierarchy resources are scaling at a much
+	slower pace. The memory resources, such as different levels of on-chip
+	cache and the off-chip memory bandwidth, are costly and are often
+	shared across multiple on-chip cores. This leads to multiple applications
+	contending for access to these common resources. In the process,
+	these applications can harmfully interfere with one another, and,
+	this interference can result in significant degradation of both system
+	throughput and individual application performance. Therefore, intelligently
+	managing the shared memory resources by mitigating inter-application
+	interference is vitally important in emerging multicore systems.
+	This dissertation makes three key contributions towards addressing
+	the above problem of interference in shared memory resources. First,
+	this dissertation considers the last-level shared cache and the off-chip
+	memory as instances of shared memory resources, and, studies the
+	causes and different ways in which applications interfere with one
+	another while contending for a resource. Second, this dissertation
+	studies the negative impact of resource contention on application
+	and system performances. Third, this dissertation proposes novel
+	schemes to mitigate inter-application interference and thereby improve
+	system and application performance. These schemes aim to efficiently
+	manage the resources in an application aware manner with the goal
+	of mitigating the overall inter-application interference. An application
+	aware resource management scheme considers the memory access characteristics
+	of all the contending applications and uses this information to manage
+	the shared resource. The resource management decisions are based
+	on two key principles: 1) isolating applications/threads that harmfully
+	interfere from each other by partitioning the resources between the
+	interfering applications, and, 2) deciding the size of the resource
+	partition that an application gets based on its memory access characteristics
+	and requirements. The trend of integrating increasing number of cores
+	on a single chip is projected to continue into the future. This continued
+	scaling is propelling the parallel computation capability of emerging
+	multicore systems. Efficient management of shared memory hierarchy
+	resources will become ever more important in the future if we are
+	to ensure that applications extract the maximum possible parallelism
+	from these multicore systems. This dissertation takes an important
+	step towards addressing this problem by proposing novel schemes to
+	efficiently manage multiple memory hierarchy resources. These schemes
+	are very effective in practice, improving both system performance
+	and individual application performance.},
+  bibsource = {OAI-PMH server at etda.libraries.psu.edu},
+  contributor = {Mahmut Kandemir and Padma Raghavan and Mary Jane Irwin and Qian Wang},
+  file = {Muralidhara2011.pdf:Muralidhara2011.pdf:PDF},
+  language = {en},
+  rights = {WorldWide; Copyright information available at source archive},
+  subject = {Computer Science and Engineering},
+  url = {http://etda.libraries.psu.edu/theses/approved/WorldWideIndex/ETD-6696/index.html}
 }
 
 @INPROCEEDINGS{Muralidhara2010,
