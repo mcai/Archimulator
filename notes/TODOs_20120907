@@ -9,8 +9,9 @@ title:
 basic statement:
     1. a partitioned shared cache is the solution to exploit data sharing and at the same
     time inhibit destructive inter-thread interactions
-    2. cache space partition is in terms of eviction control but not placement control
-
+    2. cache space partition is in terms of eviction control but not placement control:
+         * To implicitly partition the cache by modifying the cache replacement algorithm used by the shared cache
+         * Essentially, cache partitions are maintained by controlling which thread can evict which cache line.
 content:
     1. stack distance histograms, 1-k way, > k.
     2. intra-thread (baseline: MT; ht: MT, HT) and inter-thread (baseline: N/A; ht: HT-MT, MT-HT) stack distance histograms
