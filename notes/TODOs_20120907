@@ -2,6 +2,9 @@ hint:
     Isolation, Prediction and Mitigation of Non-optimal Prefetches for Helper Threading on CMPs:
         1. any non-trivial bad prefetches exhibited in larger scale of mst helper threaded version?
         2. allocate more resources to late or ugly prefetches with short inter HT-MT reuse distances based on pc correlation??
+            late: helper thread is too slow -> feedback directed mechanism
+            ugly: low locality main thread data evicts high locality helper thread data -> cache partitioning
+
 
 title:
     Prefetch Breakdown Based Dynamic LLC Partitioning for Helper Threading on CMPs
