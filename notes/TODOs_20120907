@@ -32,3 +32,8 @@ excerpts from other papers:
         In this case, shared cache leads to constructive cache sharing. Therefore, in the
         multithreaded application case, there is a tradeoff between negative effects of inter-
         thread interference and the positive impact of cache sharing.
+
+    xie_yuejian_201108_phd.pdf:
+        a program with a large memory footprint with frequent accesses, but low reuse characteristics which end up
+        evicting a large number of cache lines used by other cores
+
