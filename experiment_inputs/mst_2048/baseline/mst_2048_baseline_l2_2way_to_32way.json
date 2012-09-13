@@ -1,7 +1,7 @@
 {
     "title":"mst_2048_baseline_l2_2way_to_32way",
     "experimentType":"DETAILED",
-    "baselineExperiment":{
+    "baselineExperimentSpec":{
         "simulatedProgramTitle":"mst_baseline",
         "simulatedProgramArguments":"2048 1",
         "helperThreadLookahead":-1,
@@ -16,12 +16,16 @@
         "l2Associativity":8,
         "l2ReplacementPolicyType":"LRU"
     },
-    "variablePropertyName":"l2Associativity",
-    "variablePropertyValues":[
-        "2",
-        "4",
-        "8",
-        "16",
-        "32"
+    "variables": [
+        {
+            "name":"l2Associativity",
+            "values":[
+                "2",
+                "4",
+                "8",
+                "16",
+                "32"
+            ]
+        }
     ]
 }

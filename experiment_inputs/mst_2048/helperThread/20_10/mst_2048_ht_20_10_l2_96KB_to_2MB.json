@@ -1,7 +1,7 @@
 {
     "title":"mst_2048_ht_20_10_l2_96KB_to_2MB",
     "experimentType":"DETAILED",
-    "baselineExperiment":{
+    "baselineExperimentSpec":{
         "simulatedProgramTitle":"mst_ht",
         "simulatedProgramArguments":"2048 1",
         "helperThreadLookahead":20,
@@ -16,13 +16,17 @@
         "l2Associativity":8,
         "l2ReplacementPolicyType":"LRU"
     },
-    "variablePropertyName":"l2Size",
-    "variablePropertyValues":[
-        "96 KB",
-        "128 KB",
-        "256 KB",
-        "512 KB",
-        "1 MB",
-        "2 MB"
+    "variables": [
+        {
+            "name":"l2Size",
+            "values":[
+                "96 KB",
+                "128 KB",
+                "256 KB",
+                "512 KB",
+                "1 MB",
+                "2 MB"
+            ]
+        }
     ]
 }

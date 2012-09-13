@@ -1075,7 +1075,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
             PrintWriter pw = new PrintWriter(fileInput);
 
-            String variablePropertyDescription = experimentPack.getVariablePropertyName() == null ? "" : ExperimentSpec.class.getDeclaredField(experimentPack.getVariablePropertyName()).getAnnotation(Description.class).value();
+            String variablePropertyDescription = StringUtils.isEmpty(experimentPack.getVariablePropertyName()) ? "" : ExperimentSpec.class.getDeclaredField(experimentPack.getVariablePropertyName()).getAnnotation(Description.class).value();
 
             pw.println("yformat=%g");
             pw.println("=nogridy");
@@ -1100,7 +1100,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
             int i = 0;
             for (Object row : rows) {
-                String title = experimentPack.getVariablePropertyName() == null ? "" : experimentPack.getVariablePropertyValues().get(i++);
+                String title = StringUtils.isEmpty(experimentPack.getVariablePropertyName()) ? "" : experimentPack.getVariablePropertyValues().get(i++);
                 pw.println(title.replaceAll(" ", "_") + "\t" + ((row instanceof Map) ? StringUtils.join(((Map) row).values(), '\t') : row));
             }
 

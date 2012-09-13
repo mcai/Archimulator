@@ -1,7 +1,7 @@
 {
     "title":"em3d_6000_baseline_l2_96KB_to_2MB",
     "experimentType":"DETAILED",
-    "baselineExperiment":{
+    "baselineExperimentSpec":{
         "simulatedProgramTitle":"em3d_baseline",
         "simulatedProgramArguments":"6000 100 100",
         "helperThreadLookahead":-1,
@@ -16,13 +16,17 @@
         "l2Associativity":8,
         "l2ReplacementPolicyType":"LRU"
     },
-    "variablePropertyName":"l2Size",
-    "variablePropertyValues":[
-        "96 KB",
-        "128 KB",
-        "256 KB",
-        "512 KB",
-        "1 MB",
-        "2 MB"
+    "variables": [
+        {
+            "name":"l2Size",
+            "values":[
+                "96 KB",
+                "128 KB",
+                "256 KB",
+                "512 KB",
+                "1 MB",
+                "2 MB"
+            ]
+        }
     ]
 }

@@ -20,7 +20,12 @@ package archimulator.client;
 
 import archimulator.model.Experiment;
 import archimulator.model.ExperimentType;
+import net.pickapack.action.Function1;
+import net.pickapack.util.CollectionHelper;
+import net.pickapack.util.CombinationHelper;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
@@ -32,12 +37,14 @@ public class ExperimentPack implements Serializable {
 
     private ExperimentType experimentType;
 
-    private ExperimentSpec baselineExperiment;
+    private ExperimentSpec baselineExperimentSpec;
 
-    private String variablePropertyName;
-    private List<String> variablePropertyValues;
+    private List<ExperimentPackVariable> variables;
 
     private transient List<Experiment> experiments;
+
+    private transient String variablePropertyName;
+    private transient List<String> variablePropertyValues;
 
     public ExperimentPack(String title) {
         this.title = title;
@@ -55,50 +62,78 @@ public class ExperimentPack implements Serializable {
         this.experimentType = experimentType;
     }
 
-    public ExperimentSpec getBaselineExperiment() {
-        if(baselineExperiment != null && baselineExperiment.getParent() == null) {
-            baselineExperiment.setParent(this);
+    public ExperimentSpec getBaselineExperimentSpec() {
+        if (baselineExperimentSpec != null && baselineExperimentSpec.getParent() == null) {
+            baselineExperimentSpec.setParent(this);
         }
 
-        return baselineExperiment;
+        return baselineExperimentSpec;
     }
 
-    public void setBaselineExperiment(ExperimentSpec baselineExperiment) {
-        this.baselineExperiment = baselineExperiment;
+    public void setBaselineExperimentSpec(ExperimentSpec baselineExperimentSpec) {
+        this.baselineExperimentSpec = baselineExperimentSpec;
     }
 
     public String getVariablePropertyName() {
+        if (variablePropertyName == null && !CollectionUtils.isEmpty(this.variables)) {
+            List<String> names = CollectionHelper.transform(this.variables, new Function1<ExperimentPackVariable, String>() {
+                @Override
+                public String apply(ExperimentPackVariable variable) {
+                    return variable.getName();
+                }
+            });
+
+            variablePropertyName = StringUtils.join(names, "_");
+        }
+
         return variablePropertyName;
     }
 
-    public void setVariablePropertyName(String variablePropertyName) {
-        this.variablePropertyName = variablePropertyName;
-    }
-
     public List<String> getVariablePropertyValues() {
+        if (variablePropertyValues == null) {
+            variablePropertyValues = CollectionHelper.transform(this.variables, new Function1<ExperimentPackVariable, String>() {
+                @Override
+                public String apply(ExperimentPackVariable variable) {
+                    return StringUtils.join(variable.getValues(), "_");
+                }
+            });
+        }
+
         return variablePropertyValues;
     }
 
-    public void setVariablePropertyValues(List<String> variablePropertyValues) {
-        this.variablePropertyValues = variablePropertyValues;
+    public List<ExperimentPackVariable> getVariables() {
+        return variables;
+    }
+
+    public void setVariables(List<ExperimentPackVariable> variables) {
+        this.variables = variables;
     }
 
     public List<ExperimentSpec> getExperimentSpecs() {
         try {
-            List<ExperimentSpec> experiments = new ArrayList<ExperimentSpec>();
+            List<ExperimentSpec> experimentSpecs = new ArrayList<ExperimentSpec>();
 
-            if(variablePropertyName != null) {
-                for(Object variablePropertyValue : variablePropertyValues) {
-                    ExperimentSpec experimentSpec = (ExperimentSpec) BeanUtils.cloneBean(this.getBaselineExperiment());
-                    BeanUtils.setProperty(experimentSpec, this.variablePropertyName, variablePropertyValue);
-                    experiments.add(experimentSpec);
+            if (!CollectionUtils.isEmpty(this.variables)) {
+                for (List<String> combination : CombinationHelper.getCombinations(CollectionHelper.transform(this.variables, new Function1<ExperimentPackVariable, List<String>>() {
+                    @Override
+                    public List<String> apply(ExperimentPackVariable variable) {
+                        return variable.getValues();
+                    }
+                }))) {
+                    ExperimentSpec experimentSpec = (ExperimentSpec) BeanUtils.cloneBean(this.getBaselineExperimentSpec());
+                    int i = 0;
+                    for (String value : combination) {
+                        String name = this.getVariables().get(i++).getName();
+                        BeanUtils.setProperty(experimentSpec, name, value);
+                    }
+                    experimentSpecs.add(experimentSpec);
                 }
-            }
-            else {
-                experiments.add(this.getBaselineExperiment());
+            } else {
+                experimentSpecs.add(this.getBaselineExperimentSpec());
             }
 
-            return experiments;
+            return experimentSpecs;
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (InstantiationException e) {
