@@ -63,7 +63,7 @@ public class ExperimentSpec implements Serializable {
     private int l2Associativity;
 
     @Description("L2 Replacement Policy")
-    private CacheReplacementPolicyType l2ReplacementPolicyType;
+    private String l2ReplacementPolicyType;
 
     private transient ExperimentPack parent;
 
@@ -80,7 +80,7 @@ public class ExperimentSpec implements Serializable {
     public ExperimentSpec() {
     }
 
-    public ExperimentSpec(String simulatedProgramTitle, String simulatedProgramArguments, int helperThreadLookahead, int helperThreadStride, int numCores, int numThreadsPerCore, String l1ISize, int l1IAssociativity, String l1DSize, int l1DAssociativity, String l2Size, int l2Associativity, CacheReplacementPolicyType l2ReplacementPolicyType) {
+    public ExperimentSpec(String simulatedProgramTitle, String simulatedProgramArguments, int helperThreadLookahead, int helperThreadStride, int numCores, int numThreadsPerCore, String l1ISize, int l1IAssociativity, String l1DSize, int l1DAssociativity, String l2Size, int l2Associativity, String l2ReplacementPolicyType) {
         this.simulatedProgramTitle = simulatedProgramTitle;
         this.simulatedProgramArguments = simulatedProgramArguments;
 
@@ -157,7 +157,7 @@ public class ExperimentSpec implements Serializable {
         return l2Associativity;
     }
 
-    public CacheReplacementPolicyType getL2ReplacementPolicyType() {
+    public String getL2ReplacementPolicyType() {
         return l2ReplacementPolicyType;
     }
 
@@ -221,13 +221,13 @@ public class ExperimentSpec implements Serializable {
         this.l2Associativity = l2Associativity;
     }
 
-    public void setL2ReplacementPolicyType(CacheReplacementPolicyType l2ReplacementPolicyType) {
+    public void setL2ReplacementPolicyType(String l2ReplacementPolicyType) {
         this.l2ReplacementPolicyType = l2ReplacementPolicyType;
     }
 
     public Architecture getArchitecture() {
         if(architecture == null) {
-            architecture = ServiceManager.getArchitectureService().getOrAddArchitecture(true, getNumCores(), getNumThreadsPerCore(), getL1ISizeAsInt(), getL1IAssociativity(), getL1DSizeAsInt(), getL1DAssociativity(), getL2SizeAsInt(), getL2Associativity(), getL2ReplacementPolicyType());
+            architecture = ServiceManager.getArchitectureService().getOrAddArchitecture(true, getNumCores(), getNumThreadsPerCore(), getL1ISizeAsInt(), getL1IAssociativity(), getL1DSizeAsInt(), getL1DAssociativity(), getL2SizeAsInt(), getL2Associativity(), Enum.valueOf(CacheReplacementPolicyType.class, getL2ReplacementPolicyType()));
         }
 
         return architecture;

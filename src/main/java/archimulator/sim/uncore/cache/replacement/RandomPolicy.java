@@ -40,10 +40,10 @@ public class RandomPolicy<StateT extends Serializable> extends CacheReplacementP
     }
 
     @Override
-    public void handlePromotionOnHit(int set, int way) {
+    public void handlePromotionOnHit(MemoryHierarchyAccess access, int set, int way) {
     }
 
     @Override
-    public void handleInsertionOnMiss(int set, int way) {
+    public void handleInsertionOnMiss(MemoryHierarchyAccess access, int set, int way) {
     }
 }

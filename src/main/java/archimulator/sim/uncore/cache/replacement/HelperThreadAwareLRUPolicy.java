@@ -18,29 +18,41 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache.replacement;
 
+import archimulator.sim.core.BasicThread;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
-import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.cache.EvictableCache;
 
 import java.io.Serializable;
 
-public class LRUPolicy<StateT extends Serializable> extends StackBasedCacheReplacementPolicy<StateT> {
-    public LRUPolicy(EvictableCache<StateT> cache) {
+public class HelperThreadAwareLRUPolicy<StateT extends Serializable> extends LRUPolicy<StateT> {
+    public HelperThreadAwareLRUPolicy(EvictableCache<StateT> cache) {
         super(cache);
     }
 
     @Override
-    public CacheAccess<StateT> handleReplacement(MemoryHierarchyAccess access, int set, int tag) {
-        return new CacheAccess<StateT>(this.getCache(), access, set, this.getLRU(set), tag);
-    }
-
-    @Override
     public void handlePromotionOnHit(MemoryHierarchyAccess access, int set, int way) {
-        this.setMRU(set, way);
+        if (access.getType().isRead() && BasicThread.isMainThread(access.getThread())) {
+            if(!access.getThread().getExperiment().getArchitecture().getHelperThreadL2CacheRequestProfilingEnabled()) {
+                super.handlePromotionOnHit(access, set, way);
+                return;
+            }
+
+            if (BasicThread.isHelperThread(access.getThread().getSimulation().getHelperThreadL2CacheRequestProfilingHelper().getHelperThreadL2CacheRequestStates().get(set).get(way).getThreadId())) {
+                this.setLRU(set, way);  // HT-MT inter-thread hit, never used again: low locality => Demote to LRU position
+            } else {
+                super.handlePromotionOnHit(access, set, way);
+            }
+        } else {
+            super.handlePromotionOnHit(access, set, way);
+        }
     }
 
     @Override
     public void handleInsertionOnMiss(MemoryHierarchyAccess access, int set, int way) {
-        this.setMRU(set, way);
+        if (access.getType().isRead() && BasicThread.isMainThread(access.getThread())) {
+            this.setLRU(set, way); // MT miss, prevented from thrashing: low locality => insert in LRU position
+        } else {
+            super.handleInsertionOnMiss(access, set, way);
+        }
     }
 }

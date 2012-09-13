@@ -41,7 +41,7 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
                         fsm.setOnCompletedCallback(new Action() {
                             @Override
                             public void apply() {
-                                fsm.getCacheController().getCache().getReplacementPolicy().handleInsertionOnMiss(fsm.getSet(), fsm.getWay());
+                                fsm.getCacheController().getCache().getReplacementPolicy().handleInsertionOnMiss(event.getAccess(), fsm.getSet(), fsm.getWay());
                                 event.getOnCompletedCallback().apply();
                             }
                         });
@@ -57,7 +57,7 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
                         fsm.setOnCompletedCallback(new Action() {
                             @Override
                             public void apply() {
-                                fsm.getCacheController().getCache().getReplacementPolicy().handleInsertionOnMiss(fsm.getSet(), fsm.getWay());
+                                fsm.getCacheController().getCache().getReplacementPolicy().handleInsertionOnMiss(event.getAccess(), fsm.getSet(), fsm.getWay());
                                 event.getOnCompletedCallback().apply();
                             }
                         });

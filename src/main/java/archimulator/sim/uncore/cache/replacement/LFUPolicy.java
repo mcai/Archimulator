@@ -61,14 +61,14 @@ public class LFUPolicy<StateT extends Serializable> extends CacheReplacementPoli
     }
 
     @Override
-    public void handlePromotionOnHit(int set, int way) {
+    public void handlePromotionOnHit(MemoryHierarchyAccess access, int set, int way) {
         CacheLine<Boolean> line = this.mirrorCache.getLine(set, way);
         BooleanValueProvider stateProvider = (BooleanValueProvider) line.getStateProvider();
         stateProvider.frequency++;
     }
 
     @Override
-    public void handleInsertionOnMiss(int set, int way) {
+    public void handleInsertionOnMiss(MemoryHierarchyAccess access, int set, int way) {
         CacheLine<Boolean> line = this.mirrorCache.getLine(set, way);
         BooleanValueProvider stateProvider = (BooleanValueProvider) line.getStateProvider();
         stateProvider.frequency = 0;

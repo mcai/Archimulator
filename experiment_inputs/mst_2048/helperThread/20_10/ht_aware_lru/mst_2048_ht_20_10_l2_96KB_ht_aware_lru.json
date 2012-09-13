@@ -1,0 +1,24 @@
+{
+    "title":"mst_2048_ht_20_10_l2_96KB_ht_aware_lru",
+    "experimentType":"DETAILED",
+    "baselineExperiment":{
+        "simulatedProgramTitle":"mst_ht",
+        "simulatedProgramArguments":"2048 1",
+        "helperThreadLookahead":20,
+        "helperThreadStride":10,
+        "numCores":2,
+        "numThreadsPerCore":2,
+        "l1ISize":"32 KB",
+        "l1IAssociativity":4,
+        "l1DSize":"32 KB",
+        "l1DAssociativity":4,
+        "l2Size":"96 KB",
+        "l2Associativity":8,
+        "l2ReplacementPolicyType":"LRU"
+    },
+    "variablePropertyName":"l2ReplacementPolicyType",
+    "variablePropertyValues":[
+        "LRU",
+        "HELPER_THREAD_AWARE_LRU"
+    ]
+}

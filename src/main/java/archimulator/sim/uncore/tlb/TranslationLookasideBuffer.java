@@ -57,7 +57,7 @@ public class TranslationLookasideBuffer {
         CacheAccess<Boolean> cacheAccess = this.cache.newAccess(access, access.getPhysicalAddress());
 
         if (cacheAccess.isHitInCache()) {
-            getCache().getReplacementPolicy().handlePromotionOnHit(set, cacheAccess.getWay());
+            getCache().getReplacementPolicy().handlePromotionOnHit(access, set, cacheAccess.getWay());
 
             this.numHits++;
         } else {
@@ -70,7 +70,7 @@ public class TranslationLookasideBuffer {
             stateProvider.state = true;
             line.setAccess(access);
             line.setTag(access.getPhysicalTag());
-            getCache().getReplacementPolicy().handleInsertionOnMiss(set, cacheAccess.getWay());
+            getCache().getReplacementPolicy().handleInsertionOnMiss(access, set, cacheAccess.getWay());
 
             this.numMisses++;
         }

@@ -21,5 +21,6 @@ package archimulator.sim.uncore.cache.replacement;
 public enum CacheReplacementPolicyType {
     LRU,
     LFU,
-    RANDOM
+    RANDOM,
+    HELPER_THREAD_AWARE_LRU
 }

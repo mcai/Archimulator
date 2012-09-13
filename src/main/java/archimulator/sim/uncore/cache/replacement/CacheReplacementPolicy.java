@@ -33,9 +33,9 @@ public abstract class CacheReplacementPolicy<StateT extends Serializable> {
 
     public abstract CacheAccess<StateT> handleReplacement(MemoryHierarchyAccess access, int set, int tag);
 
-    public abstract void handlePromotionOnHit(int set, int way);
+    public abstract void handlePromotionOnHit(MemoryHierarchyAccess access, int set, int way);
 
-    public abstract void handleInsertionOnMiss(int set, int way);
+    public abstract void handleInsertionOnMiss(MemoryHierarchyAccess access, int set, int way);
 
     public EvictableCache<StateT> getCache() {
         return cache;

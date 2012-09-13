@@ -79,35 +79,6 @@ public class HelperThreadL2CacheRequestProfilingHelper {
 
     private boolean l2MissLatencyStatsEnabled;
 
-    private class HelperThreadL2CacheRequestState {
-        private int inFlightThreadId;
-        private int threadId;
-        private HelperThreadL2CacheRequestQuality quality;
-        public boolean hitToTransientTag;
-
-        private HelperThreadL2CacheRequestState() {
-            this.inFlightThreadId = -1;
-            this.threadId = -1;
-            this.quality = HelperThreadL2CacheRequestQuality.INVALID;
-        }
-
-        public int getInFlightThreadId() {
-            return inFlightThreadId;
-        }
-
-        public int getThreadId() {
-            return threadId;
-        }
-
-        private void setQuality(HelperThreadL2CacheRequestQuality quality) {
-            if (this.quality != HelperThreadL2CacheRequestQuality.INVALID && quality != HelperThreadL2CacheRequestQuality.INVALID && !this.quality.isModifiable()) {
-                throw new IllegalArgumentException();
-            }
-
-            this.quality = quality;
-        }
-    }
-
     public HelperThreadL2CacheRequestProfilingHelper(Simulation simulation) {
         this(simulation.getProcessor().getCacheHierarchy().getL2CacheController());
     }
@@ -204,7 +175,7 @@ public class HelperThreadL2CacheRequestProfilingHelper {
                     int set = event.getSet();
 
                     int requesterThreadId = event.getAccess().getThread().getId();
-                    int lineFoundThreadId = HelperThreadL2CacheRequestProfilingHelper.this.helperThreadL2CacheRequestStates.get(set).get(event.getWay()).inFlightThreadId;
+                    int lineFoundThreadId = HelperThreadL2CacheRequestProfilingHelper.this.helperThreadL2CacheRequestStates.get(set).get(event.getWay()).getInFlightThreadId();
 
                     if (lineFoundThreadId == -1) {
                         throw new IllegalArgumentException();
@@ -305,9 +276,9 @@ public class HelperThreadL2CacheRequestProfilingHelper {
         for (int set = 0; set < l2CacheController.getCache().getNumSets(); set++) {
             for (int way = 0; way < l2CacheController.getCache().getAssociativity(); way++) {
                 HelperThreadL2CacheRequestState helperThreadL2CacheRequestState = helperThreadL2CacheRequestStates.get(set).get(way);
-                if (helperThreadL2CacheRequestState.quality == HelperThreadL2CacheRequestQuality.BAD) {
+                if (helperThreadL2CacheRequestState.getQuality() == HelperThreadL2CacheRequestQuality.BAD) {
                     incrementBadHelperThreadL2CacheRequests();
-                } else if (helperThreadL2CacheRequestState.quality == HelperThreadL2CacheRequestQuality.UGLY) {
+                } else if (helperThreadL2CacheRequestState.getQuality() == HelperThreadL2CacheRequestQuality.UGLY) {
                     incrementUglyHelperThreadL2CacheRequests();
                 }
             }
@@ -348,7 +319,7 @@ public class HelperThreadL2CacheRequestProfilingHelper {
             }
 
             if (event.isHitInCache() && !lineFoundIsHelperThread) {
-                if (this.helperThreadL2CacheRequestStates.get(event.getSet()).get(event.getWay()).hitToTransientTag) {
+                if (this.helperThreadL2CacheRequestStates.get(event.getSet()).get(event.getWay()).isHitToTransientTag()) {
                     this.numRedundantHitToTransientTagHelperThreadL2CacheRequests++;
                 } else {
                     this.numRedundantHitToCacheHelperThreadL2CacheRequests++;
@@ -385,7 +356,7 @@ public class HelperThreadL2CacheRequestProfilingHelper {
     }
 
     private void handleRequestCase2(CoherentCacheServiceNonblockingRequestEvent event) {
-        if (this.helperThreadL2CacheRequestStates.get(event.getSet()).get(event.getWay()).hitToTransientTag) {
+        if (this.helperThreadL2CacheRequestStates.get(event.getSet()).get(event.getWay()).isHitToTransientTag()) {
             this.helperThreadL2CacheRequestStates.get(event.getSet()).get(event.getWay()).setQuality(HelperThreadL2CacheRequestQuality.LATE);
             this.numLateHelperThreadL2CacheRequests++;
         } else {
@@ -447,7 +418,7 @@ public class HelperThreadL2CacheRequestProfilingHelper {
         }
 
         if (lineFoundIsHelperThread) {
-            HelperThreadL2CacheRequestQuality quality = helperThreadL2CacheRequestStates.get(event.getSet()).get(event.getWay()).quality;
+            HelperThreadL2CacheRequestQuality quality = helperThreadL2CacheRequestStates.get(event.getSet()).get(event.getWay()).getQuality();
 
             if (quality == HelperThreadL2CacheRequestQuality.BAD) {
                 this.incrementBadHelperThreadL2CacheRequests();
@@ -487,14 +458,14 @@ public class HelperThreadL2CacheRequestProfilingHelper {
 
     private void handleLineInsert1(LastLevelCacheLineInsertEvent event) {
         // case 1
-        this.insertNullEntry(event.getSet(), event.getTag());
+        this.insertNullEntry(event.getAccess(), event.getSet(), event.getTag());
 
         checkInvariants(event.getSet());
     }
 
     private void handleLineInsert2(LastLevelCacheLineInsertEvent event) {
         // case 2
-        this.insertDataEntry(event.getSet(), event.getVictimTag(), event.getTag());
+        this.insertDataEntry(event.getAccess(), event.getSet(), event.getVictimTag(), event.getTag());
 
         checkInvariants(event.getSet());
     }
@@ -597,19 +568,19 @@ public class HelperThreadL2CacheRequestProfilingHelper {
         HelperThreadL2CacheRequestState helperThreadL2CacheRequestState = this.helperThreadL2CacheRequestStates.get(set).get(way);
 
         if (inFlight) {
-            helperThreadL2CacheRequestState.inFlightThreadId = l2CacheLineBroughterThreadId;
+            helperThreadL2CacheRequestState.setInFlightThreadId(l2CacheLineBroughterThreadId);
         } else {
-            helperThreadL2CacheRequestState.inFlightThreadId = -1;
-            helperThreadL2CacheRequestState.threadId = l2CacheLineBroughterThreadId;
+            helperThreadL2CacheRequestState.setInFlightThreadId(-1);
+            helperThreadL2CacheRequestState.setThreadId(l2CacheLineBroughterThreadId);
         }
     }
 
     private void markLate(int set, int way, boolean late) {
         HelperThreadL2CacheRequestState helperThreadL2CacheRequestState = this.helperThreadL2CacheRequestStates.get(set).get(way);
-        helperThreadL2CacheRequestState.hitToTransientTag = late;
+        helperThreadL2CacheRequestState.setHitToTransientTag(late);
     }
 
-    private void insertDataEntry(int set, int tag, int helperThreadRequestTag) {
+    private void insertDataEntry(MemoryHierarchyAccess access, int set, int tag, int helperThreadRequestTag) {
         if (tag == CacheLine.INVALID_TAG) {
             throw new IllegalArgumentException();
         }
@@ -620,17 +591,17 @@ public class HelperThreadL2CacheRequestProfilingHelper {
         stateProvider.state = HelperThreadL2CacheRequestVictimCacheLineState.DATA;
         stateProvider.helperThreadRequestTag = helperThreadRequestTag;
         line.setTag(tag);
-        helperThreadL2CacheRequestVictimCache.getReplacementPolicy().handleInsertionOnMiss(set, newMiss.getWay());
+        helperThreadL2CacheRequestVictimCache.getReplacementPolicy().handleInsertionOnMiss(access, set, newMiss.getWay());
     }
 
-    private void insertNullEntry(int set, int helperThreadRequestTag) {
+    private void insertNullEntry(MemoryHierarchyAccess access, int set, int helperThreadRequestTag) {
         CacheAccess<HelperThreadL2CacheRequestVictimCacheLineState> newMiss = this.newMiss(0, set);
         CacheLine<HelperThreadL2CacheRequestVictimCacheLineState> line = newMiss.getLine();
         HelperThreadL2CacheRequestVictimCacheLineStateValueProvider stateProvider = (HelperThreadL2CacheRequestVictimCacheLineStateValueProvider) line.getStateProvider();
         stateProvider.state = HelperThreadL2CacheRequestVictimCacheLineState.NULL;
         stateProvider.helperThreadRequestTag = helperThreadRequestTag;
         line.setTag(CacheLine.INVALID_TAG);
-        helperThreadL2CacheRequestVictimCache.getReplacementPolicy().handleInsertionOnMiss(set, newMiss.getWay());
+        helperThreadL2CacheRequestVictimCache.getReplacementPolicy().handleInsertionOnMiss(access, set, newMiss.getWay());
     }
 
 //    private void setLRU(int set, int way) {
@@ -708,6 +679,14 @@ public class HelperThreadL2CacheRequestProfilingHelper {
     public boolean getSummedUpUnstableHelperThreadL2CacheRequests() {
         this.sumUpUnstableHelperThreadL2CacheRequests();
         return true;
+    }
+
+    public Map<Integer, Map<Integer, HelperThreadL2CacheRequestState>> getHelperThreadL2CacheRequestStates() {
+        return helperThreadL2CacheRequestStates;
+    }
+
+    public EvictableCache<HelperThreadL2CacheRequestVictimCacheLineState> getHelperThreadL2CacheRequestVictimCache() {
+        return helperThreadL2CacheRequestVictimCache;
     }
 
     public long getNumMainThreadL2CacheHits() {

@@ -31,6 +31,8 @@ public class CacheReplacementPolicyFactory {
                 return new LFUPolicy<StateT>(cache);
             case RANDOM:
                 return new RandomPolicy<StateT>(cache);
+            case HELPER_THREAD_AWARE_LRU:
+                return new HelperThreadAwareLRUPolicy<StateT>(cache);
             default:
                 throw new IllegalArgumentException();
         }
