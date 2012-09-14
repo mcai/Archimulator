@@ -56,8 +56,6 @@ public interface ExperimentService extends Service {
 
     void dumpExperiment(Experiment experiment, IndentedPrintWriter writer);
 
-    Experiment getFirstExperimentToRun();
-
     Experiment getFirstExperimentToRunByExperimentPack(ExperimentPack experimentPack);
 
     List<Experiment> getStoppedExperimentsByExperimentPack(ExperimentPack experimentPack);

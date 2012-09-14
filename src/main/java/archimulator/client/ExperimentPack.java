@@ -43,7 +43,7 @@ public class ExperimentPack implements Serializable {
 
     private transient List<Experiment> experiments;
 
-    private transient String variablePropertyName;
+    private transient List<String> variablePropertyNames;
     private transient List<String> variablePropertyValues;
 
     public ExperimentPack(String title) {
@@ -74,27 +74,25 @@ public class ExperimentPack implements Serializable {
         this.baselineExperimentSpec = baselineExperimentSpec;
     }
 
-    public String getVariablePropertyName() {
-        if (variablePropertyName == null && !CollectionUtils.isEmpty(this.variables)) {
-            List<String> names = CollectionHelper.transform(this.variables, new Function1<ExperimentPackVariable, String>() {
+    public List<String> getVariablePropertyNames() {
+        if (variablePropertyNames == null && !CollectionUtils.isEmpty(this.variables)) {
+            variablePropertyNames = CollectionHelper.transform(this.variables, new Function1<ExperimentPackVariable, String>() {
                 @Override
                 public String apply(ExperimentPackVariable variable) {
                     return variable.getName();
                 }
             });
-
-            variablePropertyName = StringUtils.join(names, "_");
         }
 
-        return variablePropertyName;
+        return variablePropertyNames;
     }
 
     public List<String> getVariablePropertyValues() {
         if (variablePropertyValues == null) {
-            variablePropertyValues = CollectionHelper.transform(this.variables, new Function1<ExperimentPackVariable, String>() {
+            variablePropertyValues = CollectionHelper.transform(getCombinations(), new Function1<List<String>, String>() {
                 @Override
-                public String apply(ExperimentPackVariable variable) {
-                    return StringUtils.join(variable.getValues(), "_");
+                public String apply(List<String> combination) {
+                    return StringUtils.join(combination, "_");
                 }
             });
         }
@@ -115,12 +113,7 @@ public class ExperimentPack implements Serializable {
             List<ExperimentSpec> experimentSpecs = new ArrayList<ExperimentSpec>();
 
             if (!CollectionUtils.isEmpty(this.variables)) {
-                for (List<String> combination : CombinationHelper.getCombinations(CollectionHelper.transform(this.variables, new Function1<ExperimentPackVariable, List<String>>() {
-                    @Override
-                    public List<String> apply(ExperimentPackVariable variable) {
-                        return variable.getValues();
-                    }
-                }))) {
+                for (List<String> combination : getCombinations()) {
                     ExperimentSpec experimentSpec = (ExperimentSpec) BeanUtils.cloneBean(this.getBaselineExperimentSpec());
                     int i = 0;
                     for (String value : combination) {
@@ -143,6 +136,15 @@ public class ExperimentPack implements Serializable {
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private List<List<String>> getCombinations() {
+        return CombinationHelper.getCombinations(CollectionHelper.transform(this.variables, new Function1<ExperimentPackVariable, List<String>>() {
+            @Override
+            public List<String> apply(ExperimentPackVariable variable) {
+                return variable.getValues();
+            }
+        }));
     }
 
     public List<Experiment> getExperiments() {

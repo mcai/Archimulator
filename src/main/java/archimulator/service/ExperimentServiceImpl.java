@@ -37,11 +37,13 @@ import net.pickapack.util.CollectionHelper;
 import net.pickapack.util.IndentedPrintWriter;
 import net.pickapack.util.JaxenHelper;
 import net.pickapack.util.TableHelper;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.math3.stat.StatUtils;
+import org.jsoup.helper.StringUtil;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -334,20 +336,11 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     @Override
-    public Experiment getFirstExperimentToRun() {
-        for (Experiment experiment : getAllExperiments()) {
-            if (experiment.getState() == ExperimentState.PENDING) {
-                return experiment;
-            }
-        }
-
-        return null;
-    }
-
-    @Override
     public Experiment getFirstExperimentToRunByExperimentPack(ExperimentPack experimentPack) {
         for (Experiment experiment : experimentPack.getExperiments()) {
             if (experiment.getState() == ExperimentState.PENDING) {
+                experiment.setState(ExperimentState.RUNNING);
+                updateExperiment(experiment);
                 return experiment;
             }
         }
@@ -408,12 +401,12 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         boolean helperThreadEnabled = baselineExperiment.getContextMappings().get(0).getSimulatedProgram().getHelperThreadEnabled();
 
         List<String> columns = helperThreadEnabled ? Arrays.asList(
-                "L2 Size", "L2 Assoc",
+                "L2 Size", "L2 Assoc", "L2 Repl",
                 "Lookahead", "Stride",
                 "Total Cycles", "Speedup", "IPC",
-                "Main Thread Hit", "Main Thread Miss", "L2 Hit Ratio", "L2 Evictions", "L2 Occupancy Ratio", "Helper Thread Hit", "Helper Thread Miss", "Redundant MSHR", "Redundant Cache", "Timely", "Late", "Bad", "Ugly"
+                "Main Thread Hit", "Main Thread Miss", "L2 Hit Ratio", "L2 Evictions", "L2 Occupancy Ratio", "Helper Thread Hit", "Helper Thread Miss", "Helper Thread Coverage", "Helper Thread Accuracy", "Redundant MSHR", "Redundant Cache", "Timely", "Late", "Bad", "Ugly"
         ) : Arrays.asList(
-                "L2 Size", "L2 Assoc",
+                "L2 Size", "L2 Assoc", "L2 Repl",
                 "Total Cycles", "Speedup", "IPC",
                 "Main Thread Hit", "Main Thread Miss", "L2 Hit Ratio", "L2 Evictions", "L2 Occupancy Ratio"
         );
@@ -427,6 +420,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 //            row.add(experiment.getArchitecture().getL2Size() + "");
 
             row.add(experiment.getArchitecture().getL2Associativity() + "");
+            row.add(experiment.getArchitecture().getL2ReplacementPolicyType() + "");
 
             if(helperThreadEnabled) {
                 row.add(experiment.getContextMappings().get(0).getHelperThreadLookahead() + "");
@@ -457,6 +451,11 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
                         "helperThreadL2CacheRequestProfilingHelper/numHelperThreadL2CacheHits"));
                 row.add(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
                         "helperThreadL2CacheRequestProfilingHelper/numHelperThreadL2CacheMisses"));
+
+                row.add(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
+                        "helperThreadL2CacheRequestProfilingHelper/helperThreadL2CacheRequestCoverage"));
+                row.add(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
+                        "helperThreadL2CacheRequestProfilingHelper/helperThreadL2CacheRequestAccuracy"));
 
                 row.add(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
                         "helperThreadL2CacheRequestProfilingHelper/numRedundantHitToTransientTagHelperThreadL2CacheRequests"));
@@ -1066,7 +1065,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         }
     }
 
-    private void plot(ExperimentPack experimentPack, String plotFileNameSuffix, String yLabel, List<?> rows) {
+    private void plot(final ExperimentPack experimentPack, String plotFileNameSuffix, String yLabel, List<?> rows) {
         try {
             String fileNamePdf = "experiment_plots" + File.separator + experimentPack.getTitle() + "_" + plotFileNameSuffix + ".pdf";
             new File(fileNamePdf).getParentFile().mkdirs();
@@ -1075,7 +1074,16 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
             PrintWriter pw = new PrintWriter(fileInput);
 
-            String variablePropertyDescription = StringUtils.isEmpty(experimentPack.getVariablePropertyName()) ? "" : ExperimentSpec.class.getDeclaredField(experimentPack.getVariablePropertyName()).getAnnotation(Description.class).value();
+            String variablePropertyDescription = CollectionUtils.isEmpty(experimentPack.getVariablePropertyNames()) ? "" : StringUtil.join(transform(experimentPack.getVariablePropertyNames(), new Function1<String, Object>() {
+                @Override
+                public Object apply(String variablePropertyName) {
+                    try {
+                        return ExperimentSpec.class.getDeclaredField(variablePropertyName).getAnnotation(Description.class).value();
+                    } catch (NoSuchFieldException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }), "_");
 
             pw.println("yformat=%g");
             pw.println("=nogridy");
@@ -1100,7 +1108,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
             int i = 0;
             for (Object row : rows) {
-                String title = StringUtils.isEmpty(experimentPack.getVariablePropertyName()) ? "" : experimentPack.getVariablePropertyValues().get(i++);
+                String title = CollectionUtils.isEmpty(experimentPack.getVariablePropertyValues()) ? "" : experimentPack.getVariablePropertyValues().get(i++);
                 pw.println(title.replaceAll(" ", "_") + "\t" + ((row instanceof Map) ? StringUtils.join(((Map) row).values(), '\t') : row));
             }
 
@@ -1112,8 +1120,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
                 throw new IllegalArgumentException();
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchFieldException e) {
             throw new RuntimeException(e);
         }
     }

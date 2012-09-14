@@ -100,9 +100,6 @@ public class ExperimentWorker implements Runnable {
     }
 
     private void runExperiment(Experiment experiment) {
-        experiment.setState(ExperimentState.RUNNING);
-        ServiceManager.getExperimentService().updateExperiment(experiment);
-
         CycleAccurateEventQueue cycleAccurateEventQueue = new CycleAccurateEventQueue();
 
         if (experiment.getType() == ExperimentType.FUNCTIONAL) {
