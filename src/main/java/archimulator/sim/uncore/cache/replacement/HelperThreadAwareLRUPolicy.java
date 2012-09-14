@@ -31,7 +31,7 @@ public class HelperThreadAwareLRUPolicy<StateT extends Serializable> extends LRU
 
     @Override
     public void handlePromotionOnHit(MemoryHierarchyAccess access, int set, int way) {
-        if (isEnabled() && access.getType().isRead() && requesterIsMainThread(access) && lineFoundIsHelperThread(set, way)) {
+        if (isAwarenessEnabled() && access.getType().isRead() && requesterIsMainThread(access) && lineFoundIsHelperThread(set, way)) {
             this.setLRU(set, way);  // HT-MT inter-thread hit, never used again: low locality => Demote to LRU position
             return;
         }
@@ -41,7 +41,7 @@ public class HelperThreadAwareLRUPolicy<StateT extends Serializable> extends LRU
 
     @Override
     public void handleInsertionOnMiss(MemoryHierarchyAccess access, int set, int way) {
-        if (isEnabled() && access.getType().isRead() && requesterIsMainThread(access)) {
+        if (isAwarenessEnabled() && access.getType().isRead() && requesterIsMainThread(access)) {
             this.setLRU(set, way); // MT miss, prevented from thrashing: low locality => insert in LRU position
             return;
         }
@@ -49,7 +49,7 @@ public class HelperThreadAwareLRUPolicy<StateT extends Serializable> extends LRU
         super.handleInsertionOnMiss(access, set, way);
     }
 
-    private boolean isEnabled() {
+    private boolean isAwarenessEnabled() {
         return getCache().getExperiment().getArchitecture().getHelperThreadL2CacheRequestProfilingEnabled();
     }
 
