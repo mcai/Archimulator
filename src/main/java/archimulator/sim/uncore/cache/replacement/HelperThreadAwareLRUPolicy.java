@@ -31,28 +31,33 @@ public class HelperThreadAwareLRUPolicy<StateT extends Serializable> extends LRU
 
     @Override
     public void handlePromotionOnHit(MemoryHierarchyAccess access, int set, int way) {
-        if (access.getType().isRead() && BasicThread.isMainThread(access.getThread())) {
-            if(!access.getThread().getExperiment().getArchitecture().getHelperThreadL2CacheRequestProfilingEnabled()) {
-                super.handlePromotionOnHit(access, set, way);
-                return;
-            }
-
-            if (BasicThread.isHelperThread(access.getThread().getSimulation().getHelperThreadL2CacheRequestProfilingHelper().getHelperThreadL2CacheRequestStates().get(set).get(way).getThreadId())) {
-                this.setLRU(set, way);  // HT-MT inter-thread hit, never used again: low locality => Demote to LRU position
-            } else {
-                super.handlePromotionOnHit(access, set, way);
-            }
-        } else {
-            super.handlePromotionOnHit(access, set, way);
+        if (isEnabled() && access.getType().isRead() && requesterIsMainThread(access) && lineFoundIsHelperThread(set, way)) {
+            this.setLRU(set, way);  // HT-MT inter-thread hit, never used again: low locality => Demote to LRU position
+            return;
         }
+
+        super.handlePromotionOnHit(access, set, way);
     }
 
     @Override
     public void handleInsertionOnMiss(MemoryHierarchyAccess access, int set, int way) {
-        if (access.getType().isRead() && BasicThread.isMainThread(access.getThread())) {
+        if (isEnabled() && access.getType().isRead() && requesterIsMainThread(access)) {
             this.setLRU(set, way); // MT miss, prevented from thrashing: low locality => insert in LRU position
-        } else {
-            super.handleInsertionOnMiss(access, set, way);
+            return;
         }
+
+        super.handleInsertionOnMiss(access, set, way);
+    }
+
+    private boolean isEnabled() {
+        return getCache().getExperiment().getArchitecture().getHelperThreadL2CacheRequestProfilingEnabled();
+    }
+
+    private boolean requesterIsMainThread(MemoryHierarchyAccess access) {
+        return BasicThread.isMainThread(access.getThread());
+    }
+
+    private boolean lineFoundIsHelperThread(int set, int way) {
+        return BasicThread.isHelperThread(getCache().getSimulation().getHelperThreadL2CacheRequestProfilingHelper().getHelperThreadL2CacheRequestStates().get(set).get(way).getThreadId());
     }
 }

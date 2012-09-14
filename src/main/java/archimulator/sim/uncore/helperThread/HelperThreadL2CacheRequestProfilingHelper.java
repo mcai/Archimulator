@@ -134,7 +134,7 @@ public class HelperThreadL2CacheRequestProfilingHelper {
                 if (event.getCacheController().equals(HelperThreadL2CacheRequestProfilingHelper.this.l2CacheController)) {
                     int set = event.getSet();
                     boolean requesterIsHelperThread = BasicThread.isHelperThread(event.getAccess().getThread());
-                    boolean lineFoundIsHelperThread = HelperThreadL2CacheRequestProfilingHelper.this.helperThreadL2CacheRequestStates.get(set).get(event.getWay()).getThreadId() == BasicThread.getHelperThreadId();
+                    boolean lineFoundIsHelperThread = helperThreadL2CacheRequestStates.get(set).get(event.getWay()).getThreadId() == BasicThread.getHelperThreadId();
 
                     handleL2CacheLineInsert(event, requesterIsHelperThread, lineFoundIsHelperThread);
                 }
@@ -149,7 +149,7 @@ public class HelperThreadL2CacheRequestProfilingHelper {
 
                     checkInvariants(set);
 
-                    boolean lineFoundIsHelperThread = HelperThreadL2CacheRequestProfilingHelper.this.helperThreadL2CacheRequestStates.get(set).get(event.getWay()).getThreadId() == BasicThread.getHelperThreadId();
+                    boolean lineFoundIsHelperThread = helperThreadL2CacheRequestStates.get(set).get(event.getWay()).getThreadId() == BasicThread.getHelperThreadId();
 
                     markInvalid(set, event.getWay());
 
@@ -175,7 +175,7 @@ public class HelperThreadL2CacheRequestProfilingHelper {
                     int set = event.getSet();
 
                     int requesterThreadId = event.getAccess().getThread().getId();
-                    int lineFoundThreadId = HelperThreadL2CacheRequestProfilingHelper.this.helperThreadL2CacheRequestStates.get(set).get(event.getWay()).getInFlightThreadId();
+                    int lineFoundThreadId = helperThreadL2CacheRequestStates.get(set).get(event.getWay()).getInFlightThreadId();
 
                     if (lineFoundThreadId == -1) {
                         throw new IllegalArgumentException();
