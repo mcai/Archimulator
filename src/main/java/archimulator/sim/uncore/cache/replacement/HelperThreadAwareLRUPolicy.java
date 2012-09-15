@@ -20,18 +20,24 @@ package archimulator.sim.uncore.cache.replacement;
 
 import archimulator.sim.core.BasicThread;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
+import archimulator.sim.uncore.MemoryHierarchyAccessType;
 import archimulator.sim.uncore.cache.EvictableCache;
+import archimulator.sim.uncore.cache.prediction.Predictor;
+import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestQuality;
 
 import java.io.Serializable;
 
 public class HelperThreadAwareLRUPolicy<StateT extends Serializable> extends LRUPolicy<StateT> {
-    public HelperThreadAwareLRUPolicy(EvictableCache<StateT> cache) {
+    private boolean useBreakdown;
+
+    public HelperThreadAwareLRUPolicy(EvictableCache<StateT> cache, boolean useBreakdown) {
         super(cache);
+        this.useBreakdown = useBreakdown;
     }
 
     @Override
     public void handlePromotionOnHit(MemoryHierarchyAccess access, int set, int way) {
-        if (isAwarenessEnabled() && access.getType().isRead() && requesterIsMainThread(access) && lineFoundIsHelperThread(set, way)) {
+        if (isAwarenessEnabled() && access.getType() == MemoryHierarchyAccessType.LOAD && requesterIsMainThread(access) && lineFoundIsHelperThread(set, way)) {
             this.setLRU(set, way);  // HT-MT inter-thread hit, never used again: low locality => Demote to LRU position
             return;
         }
@@ -41,9 +47,49 @@ public class HelperThreadAwareLRUPolicy<StateT extends Serializable> extends LRU
 
     @Override
     public void handleInsertionOnMiss(MemoryHierarchyAccess access, int set, int way) {
-        if (isAwarenessEnabled() && access.getType().isRead() && requesterIsMainThread(access)) {
-            this.setLRU(set, way); // MT miss, prevented from thrashing: low locality => insert in LRU position
-            return;
+        if (isAwarenessEnabled()) {
+            if (access.getType() == MemoryHierarchyAccessType.LOAD && requesterIsMainThread(access)) {
+                //TODO: setLRU(..) only when the access is from delinquent PC only
+                this.setLRU(set, way); // MT miss, prevented from thrashing: low locality => insert in LRU position
+                return;
+            }
+            else if (access.getType() == MemoryHierarchyAccessType.LOAD && requesterIsHelperThread(access)) {
+                if(!this.useBreakdown) {
+                    setMRU(set, way); // HT miss: expected high HT-MT inter-thread reuse in most cases => insert in MRU position
+                    return;
+                }
+
+                Predictor<HelperThreadL2CacheRequestQuality> predictor = getCache().getSimulation().getHelperThreadL2CacheRequestProfilingHelper().getHelperThreadL2CacheRequestQualityPredictor();
+                HelperThreadL2CacheRequestQuality predictedQuality = predictor.predict(access.getVirtualPc(), HelperThreadL2CacheRequestQuality.UGLY);
+
+                switch (predictedQuality) {
+                    case REDUNDANT_HIT_TO_TRANSIENT_TAG:
+                        this.setMRU(set, way);
+                        break;
+                    case REDUNDANT_HIT_TO_CACHE:
+                        this.setMRU(set, way);
+                        break;
+                    case TIMELY:
+                        this.setMRU(set, way);
+                        break;
+                    case LATE:
+                        this.setMRU(set, way);
+                        break;
+                    case BAD:
+                        this.setLRU(set, way);
+                        break;
+                    case UGLY:
+                        this.setMRU(set, way); //TODO: it is evicted too early? setMRU : setLRU
+                        break;
+                    case INVALID:
+                        this.setLRU(set, way); //TODO: set to middle stack position
+                        break;
+                    default:
+                        throw new IllegalArgumentException();
+                }
+
+                return;
+            }
         }
 
         super.handleInsertionOnMiss(access, set, way);
@@ -57,7 +103,15 @@ public class HelperThreadAwareLRUPolicy<StateT extends Serializable> extends LRU
         return BasicThread.isMainThread(access.getThread());
     }
 
+    private boolean requesterIsHelperThread(MemoryHierarchyAccess access) {
+        return BasicThread.isHelperThread(access.getThread());
+    }
+
     private boolean lineFoundIsHelperThread(int set, int way) {
         return BasicThread.isHelperThread(getCache().getSimulation().getHelperThreadL2CacheRequestProfilingHelper().getHelperThreadL2CacheRequestStates().get(set).get(way).getThreadId());
+    }
+
+    public boolean isUseBreakdown() {
+        return useBreakdown;
     }
 }

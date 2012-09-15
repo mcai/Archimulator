@@ -19,6 +19,8 @@
 package archimulator.sim.uncore.helperThread;
 
 public enum HelperThreadL2CacheRequestQuality {
+    REDUNDANT_HIT_TO_TRANSIENT_TAG,
+    REDUNDANT_HIT_TO_CACHE,
     TIMELY,
     LATE,
     BAD,

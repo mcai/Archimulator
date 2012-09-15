@@ -84,9 +84,9 @@ public class ArchitectureServiceImpl extends AbstractService implements Architec
     @Override
     public Architecture getOrAddArchitecture(boolean htLLCRequestProfilingEnabled, int numCores, int numThreadsPerCore, int l1ISize, int l1IAssoc, int l1DSize, int l1DAssoc, int l2Size, int l2Assoc, CacheReplacementPolicyType l2ReplacementPolicyType) {
         String title = "C" + numCores + "T" + numThreadsPerCore
-                + "-" + "L1I_" + l1ISize / 1024 + "KB" + "_" + "Assoc" + l1IAssoc
-                + "-" + "l1D_" + l1DSize / 1024 + "KB" + "_" + "Assoc" + l1DAssoc
-                + "-" + "L2_" + l2Size / 1024 + "KB" + "_" + "Assoc" + l2Assoc
+                + "-" + "L1I_" + l1ISize / 1024 + "KB" + "_" + "Assoc" + l1IAssoc //TODO: use StorageUnit.toString(..) instead
+                + "-" + "l1D_" + l1DSize / 1024 + "KB" + "_" + "Assoc" + l1DAssoc //TODO: use StorageUnit.toString(..) instead
+                + "-" + "L2_" + l2Size / 1024 + "KB" + "_" + "Assoc" + l2Assoc //TODO: use StorageUnit.toString(..) instead
                 + "_" + l2ReplacementPolicyType;
 
         if (getArchitectureByTitle(title) != null) {

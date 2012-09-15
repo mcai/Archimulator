@@ -21,12 +21,14 @@ package archimulator.sim.uncore.helperThread;
 public class HelperThreadL2CacheRequestState {
     private int inFlightThreadId;
     private int threadId;
+    private int pc;
     private HelperThreadL2CacheRequestQuality quality;
     private boolean hitToTransientTag;
 
     public HelperThreadL2CacheRequestState() {
         this.inFlightThreadId = -1;
         this.threadId = -1;
+        this.pc = -1;
         this.quality = HelperThreadL2CacheRequestQuality.INVALID;
     }
 
@@ -44,6 +46,14 @@ public class HelperThreadL2CacheRequestState {
 
     public void setThreadId(int threadId) {
         this.threadId = threadId;
+    }
+
+    public int getPc() {
+        return pc;
+    }
+
+    public void setPc(int pc) {
+        this.pc = pc;
     }
 
     public void setQuality(HelperThreadL2CacheRequestQuality quality) {
