@@ -360,14 +360,13 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, LastInvalidationAcknowledgementEvent event) {
                     }
-                }, CacheControllerState.M);
-//                .onCondition(CacheControllerEventType.RECALL, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, RecallEvent>() {
-//                    @Override
-//                    public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, RecallEvent event) {
-//                        int tag = recallEvent.getTag();
-//                        fsm.sendRecallAcknowledgementToDirectory(recallEvent, tag, 8);
-//                    }
-//                }, CacheControllerState.IM_A);
+                }, CacheControllerState.M)
+                .onCondition(CacheControllerEventType.RECALL, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, RecallEvent>() {
+                    @Override
+                    public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, RecallEvent event) {
+                        fsm.sendRecallAcknowledgementToDirectory(event, event.getTag(), 8);
+                    }
+                }, CacheControllerState.IM_A);
 
         this.inState(CacheControllerState.M)
                 .setOnCompletedCallback(actionWhenStateChanged)
