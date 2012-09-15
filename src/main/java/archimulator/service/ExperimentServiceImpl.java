@@ -403,11 +403,11 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         List<String> columns = helperThreadEnabled ? Arrays.asList(
                 "L2 Size", "L2 Assoc", "L2 Repl",
                 "Lookahead", "Stride",
-                "Total Cycles", "Speedup", "IPC",
+                "Total Cycles", "Speedup", "IPC", "CPI",
                 "Main Thread Hit", "Main Thread Miss", "L2 Hit Ratio", "L2 Evictions", "L2 Occupancy Ratio", "Helper Thread Hit", "Helper Thread Miss", "Helper Thread Coverage", "Helper Thread Accuracy", "Redundant MSHR", "Redundant Cache", "Timely", "Late", "Bad", "Ugly"
         ) : Arrays.asList(
                 "L2 Size", "L2 Assoc", "L2 Repl",
-                "Total Cycles", "Speedup", "IPC",
+                "Total Cycles", "Speedup", "IPC", "CPI",
                 "Main Thread Hit", "Main Thread Miss", "L2 Hit Ratio", "L2 Evictions", "L2 Occupancy Ratio"
         );
 
@@ -433,6 +433,9 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
             row.add(String.format("%.4f", Double.parseDouble(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
                     "instructionsPerCycle"))));
+
+            row.add(String.format("%.4f", Double.parseDouble(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
+                    "cyclesPerInstruction"))));
 
             row.add(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
                     "helperThreadL2CacheRequestProfilingHelper/numMainThreadL2CacheHits"));

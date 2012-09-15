@@ -184,6 +184,7 @@ public abstract class Simulation implements SimulationObject {
         JaxenHelper.dumpValueFromXPath(stats, this, "totalInstructions");
 
         JaxenHelper.dumpValueFromXPath(stats, this, "instructionsPerCycle");
+        JaxenHelper.dumpValueFromXPath(stats, this, "cyclesPerInstruction");
         JaxenHelper.dumpValueFromXPath(stats, this, "cyclesPerSecond");
         JaxenHelper.dumpValueFromXPath(stats, this, "instructionsPerSecond");
 
@@ -427,6 +428,10 @@ public abstract class Simulation implements SimulationObject {
 
     public double getInstructionsPerCycle() {
         return (double) this.getTotalInstructions() / this.getCycleAccurateEventQueue().getCurrentCycle();
+    }
+
+    public double getCyclesPerInstruction() {
+        return (double) this.getCycleAccurateEventQueue().getCurrentCycle() / this.getTotalInstructions();
     }
 
     public double getCyclesPerSecond() {
