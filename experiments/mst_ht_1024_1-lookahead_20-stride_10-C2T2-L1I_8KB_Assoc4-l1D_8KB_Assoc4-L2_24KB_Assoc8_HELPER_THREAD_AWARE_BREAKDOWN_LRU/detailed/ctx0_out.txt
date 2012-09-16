@@ -1,8 +1,8 @@
-Making graph of size 2048
+Making graph of size 1024
 Make phase 2
 Make phase 3
 Make phase 4
 Make returning
 Compute phase 1
 Compute phase 2
-MST has cost 13615
+MST has cost 12121

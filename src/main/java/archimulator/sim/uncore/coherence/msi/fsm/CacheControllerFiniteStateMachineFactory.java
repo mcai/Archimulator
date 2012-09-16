@@ -364,9 +364,11 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
                 .onCondition(CacheControllerEventType.RECALL, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, RecallEvent>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, RecallEvent event) {
-                        fsm.sendRecallAcknowledgementToDirectory(event, event.getTag(), 8);
+//                        fsm.sendRecallAcknowledgementToDirectory(event, event.getTag(), 8);
+                        fsm.stall(sender, event);
                     }
-                }, CacheControllerState.IM_A);
+//                }, CacheControllerState.IM_A);
+                }, CacheControllerState.SM_A);
 
         this.inState(CacheControllerState.M)
                 .setOnCompletedCallback(actionWhenStateChanged)
@@ -439,8 +441,7 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
                 .onCondition(CacheControllerEventType.RECALL, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, RecallEvent>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, RecallEvent event) {
-                        int tag = event.getTag();
-                        fsm.sendRecallAcknowledgementToDirectory(event, tag, 8);
+                        fsm.sendRecallAcknowledgementToDirectory(event, event.getTag(), 8);
                     }
                 }, CacheControllerState.II_A)
                 .onCondition(CacheControllerEventType.FORWARD_GETS, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, ForwardGetSEvent>() {

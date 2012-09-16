@@ -42,7 +42,10 @@
             "name":"l2ReplacementPolicyType",
             "values":[
                 "LRU",
-                "HELPER_THREAD_AWARE_LRU"
+                "LFU",
+                "RANDOM",
+                "HELPER_THREAD_AWARE_LRU",
+                "HELPER_THREAD_AWARE_BREAKDOWN_LRU"
             ]
         }
     ]
