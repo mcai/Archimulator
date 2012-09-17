@@ -31,6 +31,7 @@
       <w>mult</w>
       <w>multicore</w>
       <w>multithreaded</w>
+      <w>navbar</w>
       <w>nnpc</w>
       <w>nonblocking</w>
       <w>nonowner</w>
@@ -54,6 +55,7 @@
       <w>unmap</w>
       <w>unpartitioned</w>
       <w>warmup</w>
+      <w>weibo</w>
       <w>writeback</w>
     </words>
   </dictionary>

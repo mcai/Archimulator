@@ -1,0 +1,75 @@
+/*******************************************************************************
+ * Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).
+ *
+ * This file is part of the Archimulator multicore architectural simulator.
+ *
+ * Archimulator is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Archimulator is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
+package archimulator.web.pages;
+
+import archimulator.web.assets.base.FixBootstrapStylesCssResourceReference;
+import archimulator.web.components.site.Footer;
+import de.agilecoders.wicket.markup.html.bootstrap.behavior.BootstrapBaseBehavior;
+import de.agilecoders.wicket.markup.html.bootstrap.html.ChromeFrameMetaTag;
+import de.agilecoders.wicket.markup.html.bootstrap.html.HtmlTag;
+import de.agilecoders.wicket.markup.html.bootstrap.html.MetaTag;
+import de.agilecoders.wicket.markup.html.bootstrap.html.OptimizedMobileViewportMetaTag;
+import org.apache.wicket.markup.head.CssHeaderItem;
+import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.html.GenericWebPage;
+import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.PasswordTextField;
+import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
+
+public abstract class BasePage<T> extends GenericWebPage<T> {
+    public BasePage() {
+        init();
+    }
+
+    public BasePage(IModel<T> model) {
+        super(model);
+        init();
+    }
+
+    public BasePage(PageParameters parameters) {
+        super(parameters);
+        init();
+    }
+
+    private void init() {
+        add(new HtmlTag("html"));
+
+        add(new OptimizedMobileViewportMetaTag("viewport"));
+        add(new ChromeFrameMetaTag("chrome-frame"));
+        add(new MetaTag("description", Model.of("description"), Model.of("Archimulator")));
+        add(new MetaTag("author", Model.of("author"), Model.of("Min Cai <min.cai.china@gmail.com>")));
+
+        add(new TextField<String>("input_email", Model.of(" ")));
+        add(new PasswordTextField("input_password", Model.of(" ")));
+        add(new Label("button_sign_in", Model.of("Sign In")));
+
+        add(new Footer("footer"));
+
+        add(new BootstrapBaseBehavior());
+    }
+
+    @Override
+    public void renderHead(IHeaderResponse response) {
+        super.renderHead(response);
+        response.render(CssHeaderItem.forReference(FixBootstrapStylesCssResourceReference.INSTANCE));
+    }
+}

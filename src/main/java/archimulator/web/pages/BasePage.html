@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html wicket:id="html" xmlns:wicket="http://wicket.apache.org">
+<head>
+    <meta charset="utf-8">
+    <title>Archimulator</title>
+    <meta wicket:id="viewport">
+    <meta wicket:id="description">
+    <meta wicket:id="author">
+    <meta wicket:id="chrome-frame">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+    <script src="../assets/base/html5-pre3.6.js" type="javascript"/>
+    <![endif]-->
+</head>
+
+<body data-offset="50" data-spy="scroll" data-twttr-rendered="true">
+
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <ul class="nav">
+                <li><a class="brand" href="#">Archimulator</a></li>
+                <li class="active"><a href="#">Home</a></li>
+                <li><a href="#benchmarks">Benchmarks</a></li>
+                <li><a href="#architectures">Architectures</a></li>
+                <li><a href="#experiments">Experiments</a></li>
+                <li><a href="#news">News</a></li>
+            </ul>
+
+            <form class="navbar-form pull-right">
+                <input class="span2" placeholder="Email" type="text" wicket:id="input_email">
+                <input class="span2" placeholder="Password" type="password" wicket:id="input_password">
+                <button type="submit" class="btn" wicket:id="button_sign_in">Sign in</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<wicket:child/>
+<wicket:panel wicket:id="footer"/>
+
+</body>
+</html>

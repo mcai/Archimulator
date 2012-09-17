@@ -18,6 +18,8 @@
  ******************************************************************************/
 package archimulator.service;
 
+import archimulator.util.PropertiesHelper;
+
 public class ServiceManager {
     public static final String USER_HOME_TEMPLATE_ARG = "<user.home>";
     public static final String DATABASE_URL = "jdbc:mysql://localhost/archimulator?user=root&password=1026@ustc";
@@ -51,8 +53,7 @@ public class ServiceManager {
     }
 
     static {
-        System.out.println("Archimulator - Multicore Architectural Simulator Written in Java.\n");
-        System.out.println("Version: 3.0.\n");
+        System.out.println("Archimulator (version: " + PropertiesHelper.getVersion() + ") - CMP Architectural Simulator Written in Java.\n");
         System.out.println("Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).\n");
     }
 }
