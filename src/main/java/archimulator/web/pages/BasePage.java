@@ -19,7 +19,8 @@
 package archimulator.web.pages;
 
 import archimulator.web.assets.base.FixBootstrapStylesCssResourceReference;
-import archimulator.web.components.site.Footer;
+import archimulator.web.components.Footer;
+import archimulator.web.components.ListItemNav;
 import de.agilecoders.wicket.markup.html.bootstrap.behavior.BootstrapBaseBehavior;
 import de.agilecoders.wicket.markup.html.bootstrap.html.ChromeFrameMetaTag;
 import de.agilecoders.wicket.markup.html.bootstrap.html.HtmlTag;
@@ -31,32 +32,41 @@ import org.apache.wicket.markup.html.GenericWebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.PasswordTextField;
 import org.apache.wicket.markup.html.form.TextField;
-import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 
 public abstract class BasePage<T> extends GenericWebPage<T> {
-    public BasePage() {
-        init();
-    }
+    private PageType pageType;
 
-    public BasePage(IModel<T> model) {
-        super(model);
-        init();
-    }
-
-    public BasePage(PageParameters parameters) {
+    public BasePage(PageType pageType, PageParameters parameters) {
         super(parameters);
-        init();
-    }
 
-    private void init() {
+        this.pageType = pageType;
+
         add(new HtmlTag("html"));
 
         add(new OptimizedMobileViewportMetaTag("viewport"));
         add(new ChromeFrameMetaTag("chrome-frame"));
         add(new MetaTag("description", Model.of("description"), Model.of("Archimulator")));
         add(new MetaTag("author", Model.of("author"), Model.of("Min Cai <min.cai.china@gmail.com>")));
+
+        ListItemNav listItemNavHome = new ListItemNav("li_nav_home", 0);
+        ListItemNav listItemNavSimulatedPrograms = new ListItemNav("li_nav_simulated_programs", 1);
+        ListItemNav listItemNavArchitectures = new ListItemNav("li_nav_architectures", 2);
+        ListItemNav listItemNavExperiments = new ListItemNav("li_nav_experiments", 3);
+        ListItemNav listItemNavNews = new ListItemNav("li_nav_news", 4);
+
+        listItemNavHome.setActive(this.pageType == PageType.HOME);
+        listItemNavSimulatedPrograms.setActive(this.pageType == PageType.SIMULATED_PROGRAMS);
+        listItemNavArchitectures.setActive(this.pageType == PageType.ARCHITECTURES);
+        listItemNavExperiments.setActive(this.pageType == PageType.EXPERIMENTS);
+        listItemNavNews.setActive(this.pageType == PageType.NEWS);
+
+        add(listItemNavHome);
+        add(listItemNavSimulatedPrograms);
+        add(listItemNavArchitectures);
+        add(listItemNavExperiments);
+        add(listItemNavNews);
 
         add(new TextField<String>("input_email", Model.of(" ")));
         add(new PasswordTextField("input_password", Model.of(" ")));
@@ -71,5 +81,9 @@ public abstract class BasePage<T> extends GenericWebPage<T> {
     public void renderHead(IHeaderResponse response) {
         super.renderHead(response);
         response.render(CssHeaderItem.forReference(FixBootstrapStylesCssResourceReference.INSTANCE));
+    }
+
+    public PageType getPageType() {
+        return pageType;
     }
 }

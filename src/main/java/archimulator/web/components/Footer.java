@@ -16,12 +16,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.web.components.site;
+package archimulator.web.components;
 
 import org.apache.wicket.markup.html.panel.Panel;
 
 public class Footer extends Panel {
-    public Footer(String markupId) {
-        super(markupId);
+    public Footer(String id) {
+        super(id);
     }
 }

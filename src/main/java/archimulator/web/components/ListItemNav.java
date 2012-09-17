@@ -16,22 +16,21 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.web.pages;
+package archimulator.web.components;
 
-import archimulator.util.PropertiesHelper;
-import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.model.Model;
-import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.wicketstuff.annotation.mount.MountPath;
+import de.agilecoders.wicket.markup.html.bootstrap.behavior.CssClassNameAppender;
+import org.apache.wicket.markup.html.list.ListItem;
 
-@MountPath(value = "/", alt = "/home")
-public class HomePage extends BasePage {
-    public HomePage(PageParameters parameters) {
-        super(PageType.HOME, parameters);
+public class ListItemNav extends ListItem<String> {
+    private CssClassNameAppender appender = new CssClassNameAppender("active");
 
-        Label labelVersion = new Label("label_version", Model.of("Version " + PropertiesHelper.getVersion()));
-        labelVersion.setEscapeModelStrings(false);
+    public ListItemNav(String id, int index) {
+        super(id, index);
+    }
 
-        add(labelVersion);
+    public void setActive(boolean active) {
+        if(active) {
+            this.add(this.appender);
+        }
     }
 }

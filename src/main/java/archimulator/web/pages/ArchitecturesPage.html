@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html wicket:id="html" xmlns:wicket="http://wicket.apache.org">
+<head>
+    <meta charset="utf-8"/>
+    <title>Architectures - Archimulator</title>
+</head>
+<body>
+<wicket:extend>
+
+    <div class="container">
+        <section>
+            <div class="page-header">
+                <h1>
+                    Architectures
+                </h1>
+            </div>
+
+            <table class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th># Cores</th>
+                    <th># Threads Per Core</th>
+                    <th>L1I Size</th>
+                    <th>L1I Assoc</th>
+                    <th>L1D Size</th>
+                    <th>L1D Assoc</th>
+                    <th>L2 Size</th>
+                    <th>L2 Assoc</th>
+                    <th>L2 Repl</th>
+                    <th>Create Time</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr wicket:id="row_architecture">
+                    <td wicket:id="cell_id"></td>
+                    <td wicket:id="cell_title"></td>
+                    <td wicket:id="cell_num_cores"></td>
+                    <td wicket:id="cell_num_threads_per_core"></td>
+                    <td wicket:id="cell_l1I_size"></td>
+                    <td wicket:id="cell_l1I_associativity"></td>
+                    <td wicket:id="cell_l1D_size"></td>
+                    <td wicket:id="cell_l1D_associativity"></td>
+                    <td wicket:id="cell_l2_size"></td>
+                    <td wicket:id="cell_l2_associativity"></td>
+                    <td wicket:id="cell_l2_repl"></td>
+                    <td wicket:id="cell_create_time"></td>
+                </tr>
+                </tbody>
+            </table>
+
+        </section>
+    </div>
+
+</wicket:extend>
+</body>
+</html>
