@@ -275,7 +275,7 @@ public class HelperThreadL2CacheRequestProfilingHelper {
         //TODO: error, tracking pending accesses precisely from directory controller/fsm/fsmFactory!!!
     }
 
-    private void sumUpUnstableHelperThreadL2CacheRequests() {
+    public void sumUpUnstableHelperThreadL2CacheRequests() {
         for (int set = 0; set < l2CacheController.getCache().getNumSets(); set++) {
             for (int way = 0; way < l2CacheController.getCache().getAssociativity(); way++) {
                 HelperThreadL2CacheRequestState helperThreadL2CacheRequestState = helperThreadL2CacheRequestStates.get(set).get(way);
@@ -661,11 +661,6 @@ public class HelperThreadL2CacheRequestProfilingHelper {
 
     public double getHelperThreadL2CacheRequestAccuracy() {
         return this.getNumTotalHelperThreadL2CacheRequests() == 0 ? 0 : (double) this.numUsefulHelperThreadL2CacheRequests / this.getNumTotalHelperThreadL2CacheRequests();
-    }
-
-    public boolean getSummedUpUnstableHelperThreadL2CacheRequests() {
-        this.sumUpUnstableHelperThreadL2CacheRequests();
-        return true;
     }
 
     public Map<Integer, Map<Integer, HelperThreadL2CacheRequestState>> getHelperThreadL2CacheRequestStates() {

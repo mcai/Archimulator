@@ -267,9 +267,9 @@ public abstract class Simulation implements SimulationObject {
             JaxenHelper.dumpValueFromXPath(stats, this, "processor/cacheHierarchy/memoryController/numWrites");
         }
 
-        if (this.getType() == SimulationType.MEASUREMENT || this.getType() == SimulationType.CACHE_WARMUP) {
+        if (this.getExperiment().getArchitecture().getHelperThreadL2CacheRequestProfilingEnabled() && (this.getType() == SimulationType.MEASUREMENT || this.getType() == SimulationType.CACHE_WARMUP)) {
             if (endOfSimulation) {
-                JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/summedUpUnstableHelperThreadL2CacheRequests");
+                this.getHelperThreadL2CacheRequestProfilingHelper().sumUpUnstableHelperThreadL2CacheRequests();
             }
 
             JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/numMainThreadL2CacheHits");
