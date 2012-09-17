@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: commons-vfs:commons-vfs:20050307052300">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/commons-vfs/commons-vfs/20050307052300/commons-vfs-20050307052300.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/commons-vfs/commons-vfs/20050307052300/commons-vfs-20050307052300-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/commons-vfs/commons-vfs/20050307052300/commons-vfs-20050307052300-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
