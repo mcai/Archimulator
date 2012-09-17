@@ -29,9 +29,9 @@ public class HomePage extends BasePage {
     public HomePage(PageParameters parameters) {
         super(parameters);
 
-        Label downloadButton = new Label("label_version", Model.of("(" + PropertiesHelper.getVersion() + ")"));
-        downloadButton.setEscapeModelStrings(false);
+        Label labelVersion = new Label("label_version", Model.of("Version " + PropertiesHelper.getVersion()));
+        labelVersion.setEscapeModelStrings(false);
 
-        add(downloadButton);
+        add(labelVersion);
     }
 }

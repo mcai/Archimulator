@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>archimulator</groupId>
     <artifactId>archimulator</artifactId>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <version>3.0-SNAPSHOT</version>
     <name>archimulator</name>
     <url>http://maven.apache.org</url>
@@ -258,6 +258,13 @@
                             <maxIdleTime>3600000</maxIdleTime>
                         </connector>
                     </connectors>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.1.1</version>
+                <configuration>
+                    <archiveClasses>true</archiveClasses>
                 </configuration>
             </plugin>
         </plugins>
