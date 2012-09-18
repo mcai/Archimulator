@@ -16,30 +16,17 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.service;
+package archimulator.web.pages;
 
-import archimulator.model.Architecture;
-import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
-import net.pickapack.service.Service;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.wicketstuff.annotation.mount.MountPath;
 
-import java.util.List;
+@MountPath(value = "/", alt = "/sign_out")
+public class SignOutPage extends BasePage {
+    public SignOutPage(PageParameters parameters) {
+        super(PageType.SIGN_OUT, parameters);
 
-public interface ArchitectureService extends Service {
-    List<Architecture> getAllArchitectures();
-
-    Architecture getArchitectureById(long id);
-
-    Architecture getArchitectureByTitle(String title);
-
-    Architecture getFirstArchitecture();
-
-    void addArchitecture(Architecture architecture);
-
-    void removeArchitectureById(long id);
-
-    void clearArchitectures();
-
-    void updateArchitecture(Architecture architecture);
-
-    Architecture getOrAddArchitecture(boolean htLLCRequestProfilingEnabled, int numCores, int numThreadsPerCore, int l1ISize, int l1IAssoc, int l1DSize, int l1DAssoc, int l2Size, int l2Assoc, CacheReplacementPolicyType l2ReplacementPolicyType);
+        getSession().invalidate();
+        setResponsePage(getApplication().getHomePage());
+    }
 }

@@ -158,6 +158,11 @@
             <artifactId>bootstrap</artifactId>
             <version>0.6.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.wicket</groupId>
+            <artifactId>wicket-auth-roles</artifactId>
+            <version>6.0.0</version>
+        </dependency>
     </dependencies>
 
     <build>

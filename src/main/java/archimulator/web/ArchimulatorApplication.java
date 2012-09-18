@@ -18,24 +18,32 @@
  ******************************************************************************/
 package archimulator.web;
 
+import archimulator.web.pages.AuthenticatedWebPage;
 import archimulator.web.pages.HomePage;
+import archimulator.web.pages.SignInPage;
 import de.agilecoders.wicket.Bootstrap;
 import de.agilecoders.wicket.settings.BootstrapSettings;
 import de.agilecoders.wicket.settings.BootswatchThemeProvider;
 import org.apache.wicket.Application;
 import org.apache.wicket.Page;
 import org.apache.wicket.RuntimeConfigurationType;
+import org.apache.wicket.Session;
+import org.apache.wicket.authorization.IAuthorizationStrategy;
+import org.apache.wicket.authorization.strategies.page.SimplePageAuthorizationStrategy;
 import org.apache.wicket.markup.html.IPackageResourceGuard;
 import org.apache.wicket.markup.html.SecurePackageResourceGuard;
 import org.apache.wicket.protocol.http.WebApplication;
+import org.apache.wicket.request.Request;
+import org.apache.wicket.request.Response;
+import org.apache.wicket.settings.IRequestCycleSettings;
 import org.wicketstuff.annotation.scan.AnnotatedMountScanner;
 
-public class WicketApplication extends WebApplication {
-    public static WicketApplication get() {
-        return (WicketApplication) Application.get();
+public class ArchimulatorApplication extends WebApplication {
+    public static ArchimulatorApplication get() {
+        return (ArchimulatorApplication) Application.get();
     }
 
-    public WicketApplication() {
+    public ArchimulatorApplication() {
         setConfigurationType(RuntimeConfigurationType.DEVELOPMENT);
     }
 
@@ -45,8 +53,25 @@ public class WicketApplication extends WebApplication {
     }
 
     @Override
+    public Session newSession(Request request, Response response) {
+        return new ArchimulatorSession(request);
+    }
+
+    @Override
     public void init() {
         super.init();
+
+        getResourceSettings().setThrowExceptionOnMissingResource(false);
+        getRequestCycleSettings().setRenderStrategy(IRequestCycleSettings.RenderStrategy.REDIRECT_TO_RENDER);
+
+        IAuthorizationStrategy authorizationStrategy = new SimplePageAuthorizationStrategy(
+                AuthenticatedWebPage.class, SignInPage.class) {
+            @Override
+            protected boolean isAuthorized() {
+                return (((ArchimulatorSession) Session.get()).isSignedIn());
+            }
+        };
+        getSecuritySettings().setAuthorizationStrategy(authorizationStrategy);
 
         getMarkupSettings().setStripWicketTags(true);
 

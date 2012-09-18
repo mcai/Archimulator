@@ -62,8 +62,8 @@ public class ArchitectureServiceImpl extends AbstractService implements Architec
     }
 
     @Override
-    public long addArchitecture(Architecture architecture) {
-        return this.addItem(this.architectures, Architecture.class, architecture);
+    public void addArchitecture(Architecture architecture) {
+        this.addItem(this.architectures, Architecture.class, architecture);
     }
 
     @Override

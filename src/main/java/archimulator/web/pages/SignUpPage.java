@@ -16,30 +16,20 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.service;
+package archimulator.web.pages;
 
-import archimulator.model.Architecture;
-import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
-import net.pickapack.service.Service;
+import org.apache.wicket.markup.html.form.PasswordTextField;
+import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.wicketstuff.annotation.mount.MountPath;
 
-import java.util.List;
+@MountPath(value = "/", alt = "/sign_up")
+public class SignUpPage extends BasePage {
+    public SignUpPage(PageParameters parameters) {
+        super(PageType.SIGN_UP, parameters);
 
-public interface ArchitectureService extends Service {
-    List<Architecture> getAllArchitectures();
-
-    Architecture getArchitectureById(long id);
-
-    Architecture getArchitectureByTitle(String title);
-
-    Architecture getFirstArchitecture();
-
-    void addArchitecture(Architecture architecture);
-
-    void removeArchitectureById(long id);
-
-    void clearArchitectures();
-
-    void updateArchitecture(Architecture architecture);
-
-    Architecture getOrAddArchitecture(boolean htLLCRequestProfilingEnabled, int numCores, int numThreadsPerCore, int l1ISize, int l1IAssoc, int l1DSize, int l1DAssoc, int l2Size, int l2Assoc, CacheReplacementPolicyType l2ReplacementPolicyType);
+        add(new TextField<String>("input_email", Model.of(" ")));
+        add(new PasswordTextField("input_password", Model.of(" ")));
+    }
 }

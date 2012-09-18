@@ -28,7 +28,7 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.wicketstuff.annotation.mount.MountPath;
 
 @MountPath(value = "/", alt = "/simulated_programs")
-public class SimulatedProgramsPage extends BasePage {
+public class SimulatedProgramsPage extends AuthenticatedWebPage {
     public SimulatedProgramsPage(PageParameters parameters) {
         super(PageType.SIMULATED_PROGRAMS, parameters);
 

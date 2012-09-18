@@ -7,6 +7,7 @@
       <w>bpred</w>
       <w>broughter</w>
       <w>disassembly</w>
+      <w>dropdown</w>
       <w>dtlb</w>
       <w>dtlbs</w>
       <w>endian</w>
@@ -49,6 +50,7 @@
       <w>sqlite</w>
       <w>sqrt</w>
       <w>strided</w>
+      <w>subnav</w>
       <w>tlbs</w>
       <w>tradeoff</w>
       <w>tuple</w>

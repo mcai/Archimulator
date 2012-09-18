@@ -18,10 +18,12 @@
  ******************************************************************************/
 package archimulator.web.pages;
 
+import archimulator.model.User;
+import archimulator.web.ArchimulatorSession;
 import archimulator.web.assets.base.FixBootstrapStylesCssResourceReference;
 import archimulator.web.components.Footer;
-import archimulator.web.components.ListItemNav;
 import de.agilecoders.wicket.markup.html.bootstrap.behavior.BootstrapBaseBehavior;
+import de.agilecoders.wicket.markup.html.bootstrap.behavior.CssClassNameAppender;
 import de.agilecoders.wicket.markup.html.bootstrap.html.ChromeFrameMetaTag;
 import de.agilecoders.wicket.markup.html.bootstrap.html.HtmlTag;
 import de.agilecoders.wicket.markup.html.bootstrap.html.MetaTag;
@@ -29,10 +31,11 @@ import de.agilecoders.wicket.markup.html.bootstrap.html.OptimizedMobileViewportM
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.GenericWebPage;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.form.PasswordTextField;
-import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 
 public abstract class BasePage<T> extends GenericWebPage<T> {
@@ -50,27 +53,57 @@ public abstract class BasePage<T> extends GenericWebPage<T> {
         add(new MetaTag("description", Model.of("description"), Model.of("Archimulator")));
         add(new MetaTag("author", Model.of("author"), Model.of("Min Cai <min.cai.china@gmail.com>")));
 
-        ListItemNav listItemNavHome = new ListItemNav("li_nav_home", 0);
-        ListItemNav listItemNavSimulatedPrograms = new ListItemNav("li_nav_simulated_programs", 1);
-        ListItemNav listItemNavArchitectures = new ListItemNav("li_nav_architectures", 2);
-        ListItemNav listItemNavExperiments = new ListItemNav("li_nav_experiments", 3);
-        ListItemNav listItemNavNews = new ListItemNav("li_nav_news", 4);
+        ListItem listItemNavHome = new ListItem("li_nav_home", 0);
+        ListItem listItemNavSimulatedPrograms = new ListItem("li_nav_simulated_programs", 1);
+        ListItem listItemNavArchitectures = new ListItem("li_nav_architectures", 2);
+        ListItem listItemNavExperiments = new ListItem("li_nav_experiments", 3);
+        ListItem listItemNavFaq = new ListItem("li_nav_faq", 4);
 
-        listItemNavHome.setActive(this.pageType == PageType.HOME);
-        listItemNavSimulatedPrograms.setActive(this.pageType == PageType.SIMULATED_PROGRAMS);
-        listItemNavArchitectures.setActive(this.pageType == PageType.ARCHITECTURES);
-        listItemNavExperiments.setActive(this.pageType == PageType.EXPERIMENTS);
-        listItemNavNews.setActive(this.pageType == PageType.NEWS);
+        if (this.pageType == PageType.HOME) {
+            listItemNavHome.add(new CssClassNameAppender("active"));
+        }
+
+        if (this.pageType == PageType.SIMULATED_PROGRAMS) {
+            listItemNavSimulatedPrograms.add(new CssClassNameAppender("active"));
+        }
+
+        if (this.pageType == PageType.ARCHITECTURES) {
+            listItemNavArchitectures.add(new CssClassNameAppender("active"));
+        }
+
+        if (this.pageType == PageType.EXPERIMENTS) {
+            listItemNavExperiments.add(new CssClassNameAppender("active"));
+        }
+
+        if (this.pageType == PageType.FAQ) {
+            listItemNavFaq.add(new CssClassNameAppender("active"));
+        }
 
         add(listItemNavHome);
         add(listItemNavSimulatedPrograms);
         add(listItemNavArchitectures);
         add(listItemNavExperiments);
-        add(listItemNavNews);
+        add(listItemNavFaq);
 
-        add(new TextField<String>("input_email", Model.of(" ")));
-        add(new PasswordTextField("input_password", Model.of(" ")));
-        add(new Label("button_sign_in", Model.of("Sign In")));
+        WebMarkupContainer divNavSignIn = new WebMarkupContainer("div_nav_sign_in");
+        add(divNavSignIn);
+        divNavSignIn.setVisible(!ArchimulatorSession.get().isSignedIn());
+
+        WebMarkupContainer divNavSignUp = new WebMarkupContainer("div_nav_sign_up");
+        add(divNavSignUp);
+        divNavSignUp.setVisible(!ArchimulatorSession.get().isSignedIn());
+
+        WebMarkupContainer divNavUser = new WebMarkupContainer("div_nav_user");
+        add(divNavUser);
+        divNavUser.setVisible(ArchimulatorSession.get().isSignedIn());
+
+        Label buttonNavUser = new Label("button_nav_user", new PropertyModel<User>(this, "session.user.name"));
+        divNavUser.add(buttonNavUser);
+        buttonNavUser.setVisible(ArchimulatorSession.get().isSignedIn());
+
+        WebMarkupContainer divNavSignOut = new WebMarkupContainer("div_nav_sign_out");
+        add(divNavSignOut);
+        divNavSignOut.setVisible(ArchimulatorSession.get().isSignedIn());
 
         add(new Footer("footer"));
 

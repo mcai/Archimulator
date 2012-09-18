@@ -16,21 +16,25 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.web.components;
+package archimulator.service;
 
-import de.agilecoders.wicket.markup.html.bootstrap.behavior.CssClassNameAppender;
-import org.apache.wicket.markup.html.list.ListItem;
+import archimulator.model.User;
+import net.pickapack.service.Service;
 
-public class ListItemNav extends ListItem<String> {
-    private CssClassNameAppender appender = new CssClassNameAppender("active");
+import java.util.List;
 
-    public ListItemNav(String id, int index) {
-        super(id, index);
-    }
+public interface UserService extends Service {
+    List<User> getAllUsers();
 
-    public void setActive(boolean active) {
-        if(active) {
-            this.add(this.appender);
-        }
-    }
+    User getUserById(long id);
+
+    User getUserByName(String name);
+
+    User getFirstUser();
+
+    void addUser(User user);
+
+    void removeUserById(long id);
+
+    void updateUser(User user);
 }

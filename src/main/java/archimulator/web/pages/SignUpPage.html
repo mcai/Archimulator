@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html wicket:id="html" xmlns:wicket="http://wicket.apache.org">
+<head>
+    <meta charset="utf-8"/>
+    <title>Sign Up - Archimulator</title>
+</head>
+<body>
+<wicket:extend>
+
+    <div class="container">
+
+        <form class="form-horizontal" action="">
+            <legend>Sign Up</legend>
+
+            <div class="control-group">
+                <label class="control-label" for="input_email">Email</label>
+
+                <div class="controls">
+                    <input type="text" placeholder="Email" id="input_email" wicket:id="input_email"/>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label" for="input_password">Password</label>
+
+                <div class="controls">
+                    <input type="password" placeholder="Password" id="input_password" wicket:id="input_password"/>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <div class="controls">
+                    <button class="btn btn-large btn-primary" type="submit">Sign Up</button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+
+</wicket:extend>
+</body>
+</html>

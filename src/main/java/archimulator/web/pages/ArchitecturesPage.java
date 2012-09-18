@@ -29,7 +29,7 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.wicketstuff.annotation.mount.MountPath;
 
 @MountPath(value = "/", alt = "/architectures")
-public class ArchitecturesPage extends BasePage {
+public class ArchitecturesPage extends AuthenticatedWebPage {
     public ArchitecturesPage(PageParameters parameters) {
         super(PageType.ARCHITECTURES, parameters);
 
