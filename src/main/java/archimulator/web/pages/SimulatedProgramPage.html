@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html wicket:id="html" xmlns:wicket="http://wicket.apache.org">
+<head>
+    <meta charset="utf-8"/>
+    <title>Simulated Program - Archimulator</title>
+</head>
+<body>
+<wicket:extend>
+
+    <div class="container">
+        <section>
+            <div class="page-header">
+                <h1>
+                    Simulated Program
+                </h1>
+            </div>
+
+            <div class="row">
+
+                <form class="form-horizontal span12">
+
+                    <div class="row">
+                        <div class="span9">
+
+                            <div class="control-group">
+                                <label for="input_id" class="control-label">Id:</label>
+
+                                <div class="controls">
+                                    <input id="input_id" type="text" class="span1" disabled wicket:id="input_id"/>
+                                </div>
+                            </div>
+
+                            <div class="control-group">
+                                <label for="input_title" class="control-label">Title:</label>
+
+                                <div class="controls">
+                                    <input type="text" id="input_title" class="span9" wicket:id="input_title"/>
+                                </div>
+                            </div>
+
+                            <div class="control-group">
+                                <label for="input_executable" class="control-label">Exe:</label>
+
+                                <div class="controls">
+                                    <input type="text" id="input_executable" class="span9" wicket:id="input_executable"/>
+                                </div>
+                            </div>
+
+                            <div class="control-group">
+                                <label for="input_default_arguments" class="control-label">Default Args:</label>
+
+                                <div class="controls">
+                                    <input type="text" id="input_default_arguments" class="span9" wicket:id="input_default_arguments"/>
+                                </div>
+                            </div>
+
+                            <div class="control-group">
+                                <label for="input_stdin" class="control-label">Stdin:</label>
+
+                                <div class="controls">
+                                    <input type="text" id="input_stdin" class="span9" wicket:id="input_stdin"/>
+                                </div>
+                            </div>
+
+                            <div class="control-group">
+                                <label for="input_helper_thread" class="control-label">HT:</label>
+
+                                <div class="controls">
+                                    <input type="text" id="input_helper_thread" wicket:id="input_helper_thread"/>
+                                </div>
+                            </div>
+
+                            <div class="control-group">
+                                <label for="input_create_time" class="control-label">Create Time:</label>
+
+                                <div class="controls">
+                                    <input type="text" id="input_create_time" disabled wicket:id="input_create_time"/>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <a href="#" class="btn btn-primary save">Save</a>
+                        <a href="./simulated_programs" class="btn">Cancel</a>
+                        <a href="#" class="btn btn-danger">Remove</a>
+                    </div>
+
+                </form>
+
+            </div>
+
+            <div class="row status-bar">
+                <div class="span12">
+                    <div class="alert alert-success" style="display: none">
+                        <b>Success!</b> Saved successfully
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </div>
+
+</wicket:extend>
+</body>
+</html>

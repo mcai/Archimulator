@@ -6,7 +6,10 @@ public enum PageType {
     SIGN_OUT,
     SIGN_UP,
     SIMULATED_PROGRAMS,
+    SIMULATED_PROGRAM,
     ARCHITECTURES,
+    ARCHITECTURE,
     EXPERIMENTS,
+    EXPERIMENT,
     FAQ
 }

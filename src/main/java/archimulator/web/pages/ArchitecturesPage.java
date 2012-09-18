@@ -22,7 +22,9 @@ import archimulator.model.Architecture;
 import archimulator.service.ServiceManager;
 import net.pickapack.StorageUnit;
 import net.pickapack.dateTime.DateHelper;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -35,7 +37,7 @@ public class ArchitecturesPage extends AuthenticatedWebPage {
 
         ListView<Architecture> rowArchitecture = new ListView<Architecture>("row_architecture", ServiceManager.getArchitectureService().getAllArchitectures()) {
             protected void populateItem(ListItem item) {
-                Architecture architecture = (Architecture) item.getModelObject();
+                final Architecture architecture = (Architecture) item.getModelObject();
 
                 item.add(new Label("cell_id", architecture.getId() + ""));
                 item.add(new Label("cell_title", architecture.getTitle()));
@@ -49,6 +51,19 @@ public class ArchitecturesPage extends AuthenticatedWebPage {
                 item.add(new Label("cell_l2_associativity", architecture.getL2Associativity() + ""));
                 item.add(new Label("cell_l2_repl", architecture.getL2ReplacementPolicyType() + ""));
                 item.add(new Label("cell_create_time", DateHelper.toString(architecture.getCreateTime())));
+
+                WebMarkupContainer cellOperations = new WebMarkupContainer("cell_operations");
+
+                cellOperations.add(new Link<Void>("button_edit") {
+                    @Override
+                    public void onClick() {
+                        PageParameters params = new PageParameters();
+                        params.set("architecture_id", architecture.getId());
+                        setResponsePage(ArchitecturePage.class, params);
+                    }
+                });
+
+                item.add(cellOperations);
             }
         };
         add(rowArchitecture);

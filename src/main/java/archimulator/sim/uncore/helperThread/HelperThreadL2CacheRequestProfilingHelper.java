@@ -541,7 +541,7 @@ public class HelperThreadL2CacheRequestProfilingHelper {
 
     private void updateHelperThreadL2CacheRequestQualityPredictor(int threadId, int pc, HelperThreadL2CacheRequestQuality helperThreadL2CacheRequestQuality) {
         if(threadId != BasicThread.getHelperThreadId()) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(String.format("ctx: %d: pc: 0x%08x, quality: %s", threadId, pc, helperThreadL2CacheRequestQuality));
         }
 
         this.helperThreadL2CacheRequestQualityPredictor.update(pc, helperThreadL2CacheRequestQuality);

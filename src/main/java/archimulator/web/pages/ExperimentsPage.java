@@ -21,7 +21,9 @@ package archimulator.web.pages;
 import archimulator.model.Experiment;
 import archimulator.service.ServiceManager;
 import net.pickapack.dateTime.DateHelper;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -34,17 +36,28 @@ public class ExperimentsPage extends AuthenticatedWebPage {
 
         ListView<Experiment> rowExperiment = new ListView<Experiment>("row_experiment", ServiceManager.getExperimentService().getAllExperiments()) {
             protected void populateItem(ListItem item) {
-                Experiment experiment = (Experiment) item.getModelObject();
+                final Experiment experiment = (Experiment) item.getModelObject();
 
                 item.add(new Label("cell_id", experiment.getId() + ""));
                 item.add(new Label("cell_title", experiment.getTitle()));
-
                 item.add(new Label("cell_type", experiment.getType() + ""));
                 item.add(new Label("cell_state", experiment.getState() + ""));
                 item.add(new Label("cell_architecture", experiment.getArchitecture().getTitle()));
                 item.add(new Label("cell_num_max_instructions", experiment.getNumMaxInstructions() + ""));
-
                 item.add(new Label("cell_create_time", DateHelper.toString(experiment.getCreateTime())));
+
+                WebMarkupContainer cellOperations = new WebMarkupContainer("cell_operations");
+
+                cellOperations.add(new Link<Void>("button_edit") {
+                    @Override
+                    public void onClick() {
+                        PageParameters params = new PageParameters();
+                        params.set("experiment_id", experiment.getId());
+                        setResponsePage(ExperimentPage.class, params);
+                    }
+                });
+
+                item.add(cellOperations);
             }
         };
         add(rowExperiment);

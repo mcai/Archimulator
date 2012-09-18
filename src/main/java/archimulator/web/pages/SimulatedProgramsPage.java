@@ -21,7 +21,9 @@ package archimulator.web.pages;
 import archimulator.model.SimulatedProgram;
 import archimulator.service.ServiceManager;
 import net.pickapack.dateTime.DateHelper;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -34,7 +36,7 @@ public class SimulatedProgramsPage extends AuthenticatedWebPage {
 
         ListView<SimulatedProgram> rowSimulatedProgram = new ListView<SimulatedProgram>("row_simulated_program", ServiceManager.getSimulatedProgramService().getAllSimulatedPrograms()) {
             protected void populateItem(ListItem item) {
-                SimulatedProgram simulatedProgram = (SimulatedProgram) item.getModelObject();
+                final SimulatedProgram simulatedProgram = (SimulatedProgram) item.getModelObject();
 
                 item.add(new Label("cell_id", simulatedProgram.getId() + ""));
                 item.add(new Label("cell_title", simulatedProgram.getTitle()));
@@ -43,6 +45,19 @@ public class SimulatedProgramsPage extends AuthenticatedWebPage {
                 item.add(new Label("cell_stdin", simulatedProgram.getStandardIn()));
                 item.add(new Label("cell_helper_thread_enabled", simulatedProgram.getHelperThreadEnabled() + ""));
                 item.add(new Label("cell_create_time", DateHelper.toString(simulatedProgram.getCreateTime())));
+
+                WebMarkupContainer cellOperations = new WebMarkupContainer("cell_operations");
+
+                cellOperations.add(new Link<Void>("button_edit") {
+                    @Override
+                    public void onClick() {
+                        PageParameters params = new PageParameters();
+                        params.set("simulated_program_id", simulatedProgram.getId());
+                        setResponsePage(SimulatedProgramPage.class, params);
+                    }
+                });
+
+                item.add(cellOperations);
             }
         };
         add(rowSimulatedProgram);
