@@ -278,14 +278,24 @@ public class HelperThreadL2CacheRequestProfilingHelper {
     public void sumUpUnstableHelperThreadL2CacheRequests() {
         for (int set = 0; set < l2CacheController.getCache().getNumSets(); set++) {
             for (int way = 0; way < l2CacheController.getCache().getAssociativity(); way++) {
-                HelperThreadL2CacheRequestState helperThreadL2CacheRequestState = helperThreadL2CacheRequestStates.get(set).get(way);
-                if (helperThreadL2CacheRequestState.getQuality() == HelperThreadL2CacheRequestQuality.BAD) {
-                    incrementBadHelperThreadL2CacheRequests(helperThreadL2CacheRequestState.getThreadId(), helperThreadL2CacheRequestState.getPc());
-                } else if (helperThreadL2CacheRequestState.getQuality() == HelperThreadL2CacheRequestQuality.UGLY) {
-                    incrementUglyHelperThreadL2CacheRequests(helperThreadL2CacheRequestState.getThreadId(), helperThreadL2CacheRequestState.getPc());
-                }
+                this.sumUpUnstableHelperThreadL2CacheRequest(set, way);
             }
         }
+    }
+
+    private void sumUpUnstableHelperThreadL2CacheRequest(int set, int way) {
+        HelperThreadL2CacheRequestState helperThreadL2CacheRequestState = helperThreadL2CacheRequestStates.get(set).get(way);
+        if (helperThreadL2CacheRequestState.getQuality() == HelperThreadL2CacheRequestQuality.BAD) {
+            this.incrementBadHelperThreadL2CacheRequests(helperThreadL2CacheRequestState.getThreadId(), helperThreadL2CacheRequestState.getPc());
+        } else if (helperThreadL2CacheRequestState.getQuality() == HelperThreadL2CacheRequestQuality.UGLY) {
+            this.incrementUglyHelperThreadL2CacheRequests(helperThreadL2CacheRequestState.getThreadId(), helperThreadL2CacheRequestState.getPc());
+        }
+
+        helperThreadL2CacheRequestState.setQuality(HelperThreadL2CacheRequestQuality.INVALID);
+
+        this.setL2CacheLineBroughterThreadId(set, way, -1, -1, false);
+        helperThreadL2CacheRequestState.setPc(-1);
+        this.markLate(set, way, false);
     }
 
     private void handleL2CacheRequest(CoherentCacheServiceNonblockingRequestEvent event, boolean requesterIsHelperThread, boolean lineFoundIsHelperThread) {
@@ -548,8 +558,7 @@ public class HelperThreadL2CacheRequestProfilingHelper {
     }
 
     private void markInvalid(int set, int way) {
-        this.setL2CacheLineBroughterThreadId(set, way, -1, -1, false);
-        this.markLate(set, way, false);
+        this.sumUpUnstableHelperThreadL2CacheRequest(set,  way);
     }
 
     private void markHelperThread(int set, int way, int pc) {
