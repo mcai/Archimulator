@@ -66,6 +66,10 @@ public class ExperimentsPage extends AuthenticatedWebPage {
 
             @Override
             public long size() {
+                if (!StringUtils.isEmpty(experimentType)) {
+                    return 0; //TODO
+                }
+
                 return ServiceManager.getExperimentService().getNumAllExperiments();
             }
 
