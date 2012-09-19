@@ -20,23 +20,50 @@ package archimulator.web.pages;
 
 import archimulator.model.SimulatedProgram;
 import archimulator.service.ServiceManager;
+import archimulator.web.components.PagingNavigator;
 import net.pickapack.dateTime.DateHelper;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.Link;
-import org.apache.wicket.markup.html.list.ListItem;
-import org.apache.wicket.markup.html.list.ListView;
+import org.apache.wicket.markup.repeater.Item;
+import org.apache.wicket.markup.repeater.data.DataView;
+import org.apache.wicket.markup.repeater.data.IDataProvider;
+import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.wicketstuff.annotation.mount.MountPath;
+
+import java.util.Iterator;
 
 @MountPath(value = "/", alt = "/simulated_programs")
 public class SimulatedProgramsPage extends AuthenticatedWebPage {
     public SimulatedProgramsPage(PageParameters parameters) {
         super(PageType.SIMULATED_PROGRAMS, parameters);
 
-        ListView<SimulatedProgram> rowSimulatedProgram = new ListView<SimulatedProgram>("row_simulated_program", ServiceManager.getSimulatedProgramService().getAllSimulatedPrograms()) {
-            protected void populateItem(ListItem item) {
-                final SimulatedProgram simulatedProgram = (SimulatedProgram) item.getModelObject();
+        IDataProvider<SimulatedProgram> dataProvider = new IDataProvider<SimulatedProgram>() {
+            @Override
+            public Iterator<? extends SimulatedProgram> iterator(long first, long count) {
+                return ServiceManager.getSimulatedProgramService().getAllSimulatedPrograms(first, count).iterator();
+            }
+
+            @Override
+            public long size() {
+                return ServiceManager.getSimulatedProgramService().getNumAllSimulatedPrograms();
+            }
+
+            @Override
+            public IModel<SimulatedProgram> model(SimulatedProgram object) {
+                return new Model<SimulatedProgram>(object);
+            }
+
+            @Override
+            public void detach() {
+            }
+        };
+
+        DataView<SimulatedProgram> rowSimulatedProgram = new DataView<SimulatedProgram>("row_simulated_program", dataProvider) {
+            protected void populateItem(Item<SimulatedProgram> item) {
+                final SimulatedProgram simulatedProgram = item.getModelObject();
 
                 item.add(new Label("cell_id", simulatedProgram.getId() + ""));
                 item.add(new Label("cell_title", simulatedProgram.getTitle()));
@@ -60,6 +87,9 @@ public class SimulatedProgramsPage extends AuthenticatedWebPage {
                 item.add(cellOperations);
             }
         };
+        rowSimulatedProgram.setItemsPerPage(10);
         add(rowSimulatedProgram);
+
+        add(new PagingNavigator("navigator", rowSimulatedProgram));
     }
 }

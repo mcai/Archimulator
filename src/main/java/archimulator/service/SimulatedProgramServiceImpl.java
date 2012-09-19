@@ -74,6 +74,16 @@ public class SimulatedProgramServiceImpl extends AbstractService implements Simu
     }
 
     @Override
+    public List<SimulatedProgram> getAllSimulatedPrograms(long first, long count) {
+        return this.getAllItems(this.simulatedPrograms, first, count);
+    }
+
+    @Override
+    public long getNumAllSimulatedPrograms() {
+        return this.getNumAllItems(this.simulatedPrograms);
+    }
+
+    @Override
     public SimulatedProgram getSimulatedProgramById(long id) {
         return this.getItemById(this.simulatedPrograms, id);
     }

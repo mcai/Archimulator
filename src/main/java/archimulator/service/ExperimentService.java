@@ -32,6 +32,10 @@ import java.util.Map;
 public interface ExperimentService extends Service {
     List<Experiment> getAllExperiments();
 
+    List<Experiment> getAllExperiments(long first, long count);
+
+    long getNumAllExperiments();
+
     Experiment getExperimentById(long id);
 
     List<Experiment> getExperimentsByTitle(String title);

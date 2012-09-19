@@ -27,6 +27,10 @@ import java.util.List;
 public interface ArchitectureService extends Service {
     List<Architecture> getAllArchitectures();
 
+    List<Architecture> getAllArchitectures(long first, long count);
+
+    long getNumAllArchitectures();
+
     Architecture getArchitectureById(long id);
 
     Architecture getArchitectureByTitle(String title);

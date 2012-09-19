@@ -116,6 +116,16 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     @Override
+    public List<Experiment> getAllExperiments(long first, long count) {
+        return this.getAllItems(this.experiments, first, count);
+    }
+
+    @Override
+    public long getNumAllExperiments() {
+        return this.getNumAllItems(this.experiments);
+    }
+
+    @Override
     public Experiment getExperimentById(long id) {
         return this.getItemById(this.experiments, id);
     }

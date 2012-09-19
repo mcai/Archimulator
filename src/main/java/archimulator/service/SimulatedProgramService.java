@@ -26,6 +26,10 @@ import java.util.List;
 public interface SimulatedProgramService extends Service {
     List<SimulatedProgram> getAllSimulatedPrograms();
 
+    List<SimulatedProgram> getAllSimulatedPrograms(long first, long count);
+
+    long getNumAllSimulatedPrograms();
+
     SimulatedProgram getSimulatedProgramById(long id);
 
     SimulatedProgram getSimulatedProgramByTitle(String title);

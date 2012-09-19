@@ -47,6 +47,16 @@ public class ArchitectureServiceImpl extends AbstractService implements Architec
     }
 
     @Override
+    public List<Architecture> getAllArchitectures(long first, long count) {
+        return this.getAllItems(this.architectures, first, count);
+    }
+
+    @Override
+    public long getNumAllArchitectures() {
+        return this.getNumAllItems(this.architectures);
+    }
+
+    @Override
     public Architecture getArchitectureById(long id) {
         return this.getItemById(this.architectures, id);
     }

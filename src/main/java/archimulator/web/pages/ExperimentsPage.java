@@ -20,23 +20,50 @@ package archimulator.web.pages;
 
 import archimulator.model.Experiment;
 import archimulator.service.ServiceManager;
+import archimulator.web.components.PagingNavigator;
 import net.pickapack.dateTime.DateHelper;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.Link;
-import org.apache.wicket.markup.html.list.ListItem;
-import org.apache.wicket.markup.html.list.ListView;
+import org.apache.wicket.markup.repeater.Item;
+import org.apache.wicket.markup.repeater.data.DataView;
+import org.apache.wicket.markup.repeater.data.IDataProvider;
+import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.wicketstuff.annotation.mount.MountPath;
+
+import java.util.Iterator;
 
 @MountPath(value = "/", alt = "/experiments")
 public class ExperimentsPage extends AuthenticatedWebPage {
     public ExperimentsPage(PageParameters parameters) {
         super(PageType.EXPERIMENTS, parameters);
 
-        ListView<Experiment> rowExperiment = new ListView<Experiment>("row_experiment", ServiceManager.getExperimentService().getAllExperiments()) {
-            protected void populateItem(ListItem item) {
-                final Experiment experiment = (Experiment) item.getModelObject();
+        IDataProvider<Experiment> dataProvider = new IDataProvider<Experiment>() {
+            @Override
+            public Iterator<? extends Experiment> iterator(long first, long count) {
+                return ServiceManager.getExperimentService().getAllExperiments(first, count).iterator();
+            }
+
+            @Override
+            public long size() {
+                return ServiceManager.getExperimentService().getNumAllExperiments();
+            }
+
+            @Override
+            public IModel<Experiment> model(Experiment object) {
+                return new Model<Experiment>(object);
+            }
+
+            @Override
+            public void detach() {
+            }
+        };
+
+        DataView<Experiment> rowExperiment = new DataView<Experiment>("row_experiment", dataProvider) {
+            protected void populateItem(Item<Experiment> item) {
+                final Experiment experiment = item.getModelObject();
 
                 item.add(new Label("cell_id", experiment.getId() + ""));
                 item.add(new Label("cell_title", experiment.getTitle()));
@@ -60,6 +87,9 @@ public class ExperimentsPage extends AuthenticatedWebPage {
                 item.add(cellOperations);
             }
         };
+        rowExperiment.setItemsPerPage(10);
         add(rowExperiment);
+
+        add(new PagingNavigator("navigator", rowExperiment));
     }
 }
