@@ -22,27 +22,45 @@ import archimulator.model.Experiment;
 import archimulator.service.ServiceManager;
 import archimulator.web.components.PagingNavigator;
 import net.pickapack.dateTime.DateHelper;
+import org.apache.commons.lang.StringUtils;
+import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.link.Link;
+import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.markup.repeater.data.DataView;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
+import org.apache.wicket.model.LoadableDetachableModel;
+import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.wicketstuff.annotation.mount.MountPath;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 @MountPath(value = "/", alt = "/experiments")
 public class ExperimentsPage extends AuthenticatedWebPage {
+    private String experimentId;
+    private String experimentType;
+    private String experimentState;
+    private String experimentArchitecture;
+
     public ExperimentsPage(PageParameters parameters) {
         super(PageType.EXPERIMENTS, parameters);
+
+        experimentId = getPageParameters().get("experimentId").toString();
+        experimentType = getPageParameters().get("experimentType").toString();
+        experimentState = getPageParameters().get("experimentState").toString();
+        experimentArchitecture = getPageParameters().get("experimentArchitecture").toString();
 
         IDataProvider<Experiment> dataProvider = new IDataProvider<Experiment>() {
             @Override
             public Iterator<? extends Experiment> iterator(long first, long count) {
+                if (!StringUtils.isEmpty(experimentType)) {
+                    return new ArrayList<Experiment>().iterator(); //TODO
+                }
+
                 return ServiceManager.getExperimentService().getAllExperiments(first, count).iterator();
             }
 
@@ -52,8 +70,13 @@ public class ExperimentsPage extends AuthenticatedWebPage {
             }
 
             @Override
-            public IModel<Experiment> model(Experiment object) {
-                return new Model<Experiment>(object);
+            public IModel<Experiment> model(final Experiment object) {
+                return new LoadableDetachableModel<Experiment>(object) {
+                    @Override
+                    protected Experiment load() {
+                        return object;
+                    }
+                };
             }
 
             @Override
@@ -61,7 +84,7 @@ public class ExperimentsPage extends AuthenticatedWebPage {
             }
         };
 
-        DataView<Experiment> rowExperiment = new DataView<Experiment>("row_experiment", dataProvider) {
+        final DataView<Experiment> rowExperiment = new DataView<Experiment>("row_experiment", dataProvider) {
             protected void populateItem(Item<Experiment> item) {
                 final Experiment experiment = item.getModelObject();
 
@@ -75,21 +98,57 @@ public class ExperimentsPage extends AuthenticatedWebPage {
 
                 WebMarkupContainer cellOperations = new WebMarkupContainer("cell_operations");
 
-                cellOperations.add(new Link<Void>("button_edit") {
-                    @Override
-                    public void onClick() {
-                        PageParameters params = new PageParameters();
-                        params.set("experiment_id", experiment.getId());
-                        setResponsePage(ExperimentPage.class, params);
-                    }
-                });
+                cellOperations.add(new Label("button_edit", "Edit") {{
+                    add(new AttributeAppender("href", "./experiment?experiment_id=" + experiment.getId()));
+                }});
 
                 item.add(cellOperations);
             }
         };
         rowExperiment.setItemsPerPage(10);
-        add(rowExperiment);
+
+        final WebMarkupContainer tableExperiments = new WebMarkupContainer("table_experiments");
+        add(tableExperiments);
+
+        tableExperiments.add(rowExperiment);
+
+        add(new TextField<String>("experimentId", new PropertyModel<String>(ExperimentsPage.this, "experimentId")));
+        add(new TextField<String>("experimentType", new PropertyModel<String>(ExperimentsPage.this, "experimentType")));
+        add(new TextField<String>("experimentState", new PropertyModel<String>(ExperimentsPage.this, "experimentState")));
+        add(new TextField<String>("experimentArchitecture", new PropertyModel<String>(ExperimentsPage.this, "experimentArchitecture")));
 
         add(new PagingNavigator("navigator", rowExperiment));
+    }
+
+    public String getExperimentId() {
+        return experimentId;
+    }
+
+    public void setExperimentId(String experimentId) {
+        this.experimentId = experimentId;
+    }
+
+    public String getExperimentType() {
+        return experimentType;
+    }
+
+    public void setExperimentType(String experimentType) {
+        this.experimentType = experimentType;
+    }
+
+    public String getExperimentState() {
+        return experimentState;
+    }
+
+    public void setExperimentState(String experimentState) {
+        this.experimentState = experimentState;
+    }
+
+    public String getExperimentArchitecture() {
+        return experimentArchitecture;
+    }
+
+    public void setExperimentArchitecture(String experimentArchitecture) {
+        this.experimentArchitecture = experimentArchitecture;
     }
 }

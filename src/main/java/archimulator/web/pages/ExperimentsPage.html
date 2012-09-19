@@ -15,7 +15,16 @@
                 </h1>
             </div>
 
-            <table class="table table-bordered table-striped">
+            <form class="form-inline" action="./experiments" method="get">
+                <input type="text" placeholder="Id" class="search-query span2" name="experimentId" wicket:id="experimentId">
+                <input type="text" placeholder="Type" class="search-query span2" name="experimentType" wicket:id="experimentType">
+                <input type="text" placeholder="State" class="search-query span2" name="experimentState" wicket:id="experimentState">
+                <input type="text" placeholder="Architecture" class="search-query span4" name="experimentArchitecture" wicket:id="experimentArchitecture">
+                <input type="submit" value="Search" class="btn"/>
+                <a class="btn" href="./experiments"><i class="icon-trash"></i>Clear</a>
+            </form>
+
+            <table class="table table-bordered table-striped" wicket:id="table_experiments">
                 <thead>
                 <tr>
                     <th>ID</th>
@@ -38,7 +47,7 @@
                     <td wicket:id="cell_num_max_instructions"></td>
                     <td wicket:id="cell_create_time"></td>
                     <td wicket:id="cell_operations">
-                        <a class="btn" wicket:id="button_edit">Edit</a>
+                        <a class="btn" wicket:id="button_edit"><i class="icon-edit"></i>Edit</a>
                     </td>
                 </tr>
                 </tbody>

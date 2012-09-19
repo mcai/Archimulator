@@ -9,10 +9,6 @@
       <sourceFolder url="file://$MODULE_DIR$/src/main/resources" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/target/generated-sources/annotations" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target/classes" />
-      <excludeFolder url="file://$MODULE_DIR$/target/lib" />
-      <excludeFolder url="file://$MODULE_DIR$/target/maven-archiver" />
-      <excludeFolder url="file://$MODULE_DIR$/target/surefire" />
-      <excludeFolder url="file://$MODULE_DIR$/target/test-classes" />
       <excludeFolder url="file://$MODULE_DIR$/target/tmp" />
     </content>
     <orderEntry type="inheritedJdk" />
@@ -131,6 +127,7 @@
     <orderEntry type="library" name="Maven: org.springframework:spring-core:3.0.6.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-asm:3.0.6.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.apache.wicket:wicket-auth-roles:6.0.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.wicket:wicket-extensions:6.0.0" level="project" />
   </component>
 </module>
 

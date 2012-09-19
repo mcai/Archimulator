@@ -23,9 +23,9 @@ import archimulator.service.ServiceManager;
 import archimulator.web.components.PagingNavigator;
 import net.pickapack.StorageUnit;
 import net.pickapack.dateTime.DateHelper;
+import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.markup.repeater.data.DataView;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
@@ -82,14 +82,9 @@ public class ArchitecturesPage extends AuthenticatedWebPage {
 
                 WebMarkupContainer cellOperations = new WebMarkupContainer("cell_operations");
 
-                cellOperations.add(new Link<Void>("button_edit") {
-                    @Override
-                    public void onClick() {
-                        PageParameters params = new PageParameters();
-                        params.set("architecture_id", architecture.getId());
-                        setResponsePage(ArchitecturePage.class, params);
-                    }
-                });
+                cellOperations.add(new Label("button_edit", "Edit"){{
+                    add(new AttributeAppender("href", "./architecture?architecture_id=" + architecture.getId()));
+                }});
 
                 item.add(cellOperations);
             }
