@@ -16,42 +16,72 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.client;
+package archimulator.model;
 
-import archimulator.model.Experiment;
-import archimulator.model.ExperimentType;
+import com.j256.ormlite.field.DataType;
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
 import net.pickapack.action.Function1;
+import net.pickapack.dateTime.DateHelper;
+import net.pickapack.model.ModelElement;
 import net.pickapack.util.CollectionHelper;
 import net.pickapack.util.CombinationHelper;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
-import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-public class ExperimentPack implements Serializable {
+@DatabaseTable(tableName = "ExperimentPack")
+public class ExperimentPack implements ModelElement {
+    @DatabaseField(generatedId = true)
+    private long id;
+
+    @DatabaseField
     private String title;
 
+    @DatabaseField
+    private long createTime;
+
+    @DatabaseField
     private ExperimentType experimentType;
 
+    @DatabaseField(dataType = DataType.SERIALIZABLE)
     private ExperimentSpec baselineExperimentSpec;
 
-    private List<ExperimentPackVariable> variables;
+    @DatabaseField(dataType = DataType.SERIALIZABLE)
+    private ArrayList<ExperimentPackVariable> variables;
 
-    private transient List<Experiment> experiments;
+    @DatabaseField(dataType = DataType.SERIALIZABLE)
+    private ArrayList<String> experimentTitles;
 
-    private transient List<String> variablePropertyNames;
-    private transient List<String> variablePropertyValues;
+    public ExperimentPack() {
+        this.createTime = DateHelper.toTick(new Date());
+        this.experimentTitles = new ArrayList<String>();
+    }
 
-    public ExperimentPack(String title) {
-        this.title = title;
+    public long getId() {
+        return id;
+    }
+
+    @Override
+    public long getParentId() {
+        return -1;
     }
 
     public String getTitle() {
         return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public long getCreateTime() {
+        return createTime;
     }
 
     public ExperimentType getExperimentType() {
@@ -75,29 +105,21 @@ public class ExperimentPack implements Serializable {
     }
 
     public List<String> getVariablePropertyNames() {
-        if (variablePropertyNames == null && !CollectionUtils.isEmpty(this.variables)) {
-            variablePropertyNames = CollectionHelper.transform(this.variables, new Function1<ExperimentPackVariable, String>() {
-                @Override
-                public String apply(ExperimentPackVariable variable) {
-                    return variable.getName();
-                }
-            });
-        }
-
-        return variablePropertyNames;
+        return CollectionHelper.transform(this.variables, new Function1<ExperimentPackVariable, String>() {
+            @Override
+            public String apply(ExperimentPackVariable variable) {
+                return variable.getName();
+            }
+        });
     }
 
     public List<String> getVariablePropertyValues() {
-        if (variablePropertyValues == null) {
-            variablePropertyValues = CollectionHelper.transform(getCombinations(), new Function1<List<String>, String>() {
-                @Override
-                public String apply(List<String> combination) {
-                    return StringUtils.join(combination, "_");
-                }
-            });
-        }
-
-        return variablePropertyValues;
+        return CollectionHelper.transform(getCombinations(), new Function1<List<String>, String>() {
+            @Override
+            public String apply(List<String> combination) {
+                return StringUtils.join(combination, "_");
+            }
+        });
     }
 
     public List<ExperimentPackVariable> getVariables() {
@@ -105,7 +127,7 @@ public class ExperimentPack implements Serializable {
     }
 
     public void setVariables(List<ExperimentPackVariable> variables) {
-        this.variables = variables;
+        this.variables = new ArrayList<ExperimentPackVariable>(variables);
     }
 
     public List<ExperimentSpec> getExperimentSpecs() {
@@ -147,11 +169,7 @@ public class ExperimentPack implements Serializable {
         }));
     }
 
-    public List<Experiment> getExperiments() {
-        return experiments;
-    }
-
-    public void setExperiments(List<Experiment> experiments) {
-        this.experiments = experiments;
+    public List<String> getExperimentTitles() {
+        return experimentTitles;
     }
 }

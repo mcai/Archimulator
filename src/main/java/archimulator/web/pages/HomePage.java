@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.web.pages;
 
-import archimulator.client.ExperimentPack;
+import archimulator.model.ExperimentPack;
 import archimulator.model.Experiment;
 import archimulator.model.ExperimentState;
 import archimulator.service.ServiceManager;
@@ -93,11 +93,11 @@ public class HomePage extends BasePage {
                 protected void populateItem(Item<ExperimentPack> item) {
                     final ExperimentPack experimentPack = item.getModelObject();
 
-                    int numTotal = experimentPack.getExperiments().size();
+                    int numTotal = ServiceManager.getExperimentService().getExperimentsByExperimentPack(experimentPack).size();
                     int numRunning = 0;
                     int numStopped = 0;
 
-                    for(Experiment experiment : experimentPack.getExperiments()) {
+                    for(Experiment experiment : ServiceManager.getExperimentService().getExperimentsByExperimentPack(experimentPack)) {
                         if(experiment.getState() == ExperimentState.RUNNING) {
                             numRunning++;
                         }

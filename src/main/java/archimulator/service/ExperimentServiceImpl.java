@@ -18,9 +18,15 @@
  ******************************************************************************/
 package archimulator.service;
 
-import archimulator.client.ExperimentPack;
-import archimulator.client.ExperimentSpec;
-import archimulator.model.*;
+import archimulator.model.ExperimentPack;
+import archimulator.model.ExperimentSpec;
+import archimulator.model.Architecture;
+import archimulator.model.Description;
+import archimulator.model.ContextMapping;
+import archimulator.model.Experiment;
+import archimulator.model.ExperimentState;
+import archimulator.model.ExperimentType;
+import archimulator.model.SimulatedProgram;
 import com.Ostermiller.util.CSVPrinter;
 import com.j256.ormlite.dao.Dao;
 import net.pickapack.JsonSerializationHelper;
@@ -56,13 +62,14 @@ import static net.pickapack.util.CollectionHelper.transform;
 
 public class ExperimentServiceImpl extends AbstractService implements ExperimentService {
     private Dao<Experiment, Long> experiments;
-    private Map<String, ExperimentPack> experimentPacks;
+    private Dao<ExperimentPack, Long> experimentPacks;
 
     @SuppressWarnings("unchecked")
     public ExperimentServiceImpl() {
-        super(ServiceManager.DATABASE_URL, Arrays.<Class<? extends ModelElement>>asList(Experiment.class));
+        super(ServiceManager.DATABASE_URL, Arrays.<Class<? extends ModelElement>>asList(Experiment.class, ExperimentPack.class));
 
         this.experiments = createDao(Experiment.class);
+        this.experimentPacks = createDao(ExperimentPack.class);
 
         for(Experiment experiment : getAllExperiments()) {
             if(experiment.getState() == ExperimentState.READY_TO_RUN || experiment.getState() == ExperimentState.RUNNING) {
@@ -71,47 +78,39 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
             }
         }
 
+        //TODO: to be exposed as import/upload experiment pack via web UI
         try {
-            experimentPacks = new LinkedHashMap<String, ExperimentPack>();
-
             for (File file : FileUtils.listFiles(new File("experiment_inputs"), null, true)) {
                 ExperimentPack experimentPack = JsonSerializationHelper.deserialize(ExperimentPack.class, FileUtils.readFileToString(file));
-                if (experimentPack != null) {
-//                    if (experimentPacks.containsKey(experimentPack.getTitle())) {
-//                        throw new IllegalArgumentException("Duplicate experiment pack found: " + experimentPack.getTitle() + " in " + file.getAbsolutePath());
-//                    }
+                if (experimentPack != null && getExperimentPackByTitle(experimentPack.getTitle()) == null) {
+                    addExperimentPack(experimentPack);
 
-                    experimentPacks.put(experimentPack.getTitle(), experimentPack);
-                }
-            }
+                    for (ExperimentSpec experimentSpec : experimentPack.getExperimentSpecs()) {
+                        Experiment experiment = getFirstExperimentByTitle(experimentSpec.getTitle());
+                        if (experiment == null) {
+                            ExperimentType experimentType = experimentPack.getExperimentType();
+                            SimulatedProgram simulatedProgram = experimentSpec.getSimulatedProgram();
+                            Architecture architecture = experimentSpec.getArchitecture();
+                            String arguments = experimentSpec.getArguments();
 
-            for (ExperimentPack experimentPack : experimentPacks.values()) {
-                List<Experiment> experimentsPerExperimentPack = new ArrayList<Experiment>();
-                for (ExperimentSpec experimentSpec : experimentPack.getExperimentSpecs()) {
-                    Experiment experiment = getFirstExperimentByTitle(experimentSpec.getTitle());
-                    if (experiment == null) {
-                        ExperimentType experimentType = experimentPack.getExperimentType();
-                        SimulatedProgram simulatedProgram = experimentSpec.getSimulatedProgram();
-                        Architecture architecture = experimentSpec.getArchitecture();
-                        String arguments = experimentSpec.getArguments();
+                            List<ContextMapping> contextMappings = new ArrayList<ContextMapping>();
 
-                        List<ContextMapping> contextMappings = new ArrayList<ContextMapping>();
+                            ContextMapping contextMapping = new ContextMapping(0, simulatedProgram, arguments);
+                            contextMapping.setHelperThreadLookahead(experimentSpec.getHelperThreadLookahead());
+                            contextMapping.setHelperThreadStride(experimentSpec.getHelperThreadStride());
+                            contextMapping.setDynamicHelperThreadParams(false);
+                            contextMappings.add(contextMapping);
 
-                        ContextMapping contextMapping = new ContextMapping(0, simulatedProgram, arguments);
-                        contextMapping.setHelperThreadLookahead(experimentSpec.getHelperThreadLookahead());
-                        contextMapping.setHelperThreadStride(experimentSpec.getHelperThreadStride());
-                        contextMapping.setDynamicHelperThreadParams(false);
-                        contextMappings.add(contextMapping);
+                            experiment = new Experiment(experimentSpec.getTitle(), experimentType, architecture, -1, contextMappings);
+                            addExperiment(experiment);
+                        }
 
-                        experiment = new Experiment(experimentSpec.getTitle(), experimentType, architecture, -1, contextMappings);
-                        addExperiment(experiment);
+                        experimentPack.getExperimentTitles().add(experiment.getTitle());
                     }
-                    experimentSpec.setExperiment(experiment);
-                    experimentsPerExperimentPack.add(experimentSpec.getExperiment());
-                }
-                experimentPack.setExperiments(experimentsPerExperimentPack);
-            }
 
+                    updateExperimentPack(experimentPack);
+                }
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -194,6 +193,20 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
         for (Experiment experiment : getAllExperiments()) {
             if (experiment.getArchitectureId() == architecture.getId()) {
+                result.add(experiment);
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<Experiment> getExperimentsByExperimentPack(ExperimentPack experimentPack) {
+        List<Experiment> result = new ArrayList<Experiment>();
+
+        for (String experimentTitle : experimentPack.getExperimentTitles()) {
+            Experiment experiment = getLatestExperimentByTitle(experimentTitle);
+            if(experiment != null) {
                 result.add(experiment);
             }
         }
@@ -372,7 +385,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
     @Override
     public List<Experiment> getStoppedExperimentsByExperimentPack(ExperimentPack experimentPack) {
-        return CollectionHelper.filter(experimentPack.getExperiments(), new Predicate<Experiment>() {
+        return CollectionHelper.filter(ServiceManager.getExperimentService().getExperimentsByExperimentPack(experimentPack), new Predicate<Experiment>() {
             @Override
             public boolean apply(Experiment experiment) {
                 return experiment.isStopped();
@@ -388,25 +401,27 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
     @Override
     public List<ExperimentPack> getAllExperimentPacks() {
-        return new ArrayList<ExperimentPack>(experimentPacks.values());
+        return this.getAllItems(this.experimentPacks);
     }
 
     @Override
     public ExperimentPack getExperimentPackByTitle(String title) {
-        return this.experimentPacks.containsKey(title) ? this.experimentPacks.get(title) : null;
+        return this.getFirstItemByTitle(this.experimentPacks, title);
     }
 
     @Override
-    public List<ExperimentPack> getExperimentPacksByTitlePrefix(String titlePrefix) {
-        List<ExperimentPack> result = new ArrayList<ExperimentPack>();
+    public void addExperimentPack(ExperimentPack experimentPack) {
+        this.addItem(this.experimentPacks, ExperimentPack.class, experimentPack);
+    }
 
-        for(String experimentPackTitle : this.experimentPacks.keySet()) {
-            if(experimentPackTitle.startsWith(titlePrefix)) {
-                result.add(this.experimentPacks.get(experimentPackTitle));
-            }
-        }
+    @Override
+    public void removeExperimentPackById(long id) {
+        this.removeItemById(this.experimentPacks, ExperimentPack.class, id);
+    }
 
-        return result;
+    @Override
+    public void updateExperimentPack(ExperimentPack experimentPack) {
+        this.updateItem(this.experimentPacks, ExperimentPack.class, experimentPack);
     }
 
     @Override
@@ -416,7 +431,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
             return;
         }
 
-        for(Experiment experiment : experimentPack.getExperiments()) {
+        for(Experiment experiment : ServiceManager.getExperimentService().getExperimentsByExperimentPack(experimentPack)) {
             if(experiment.getState() == ExperimentState.PENDING) {
                 experiment.setState(ExperimentState.READY_TO_RUN);
                 updateExperiment(experiment);
@@ -944,8 +959,8 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
         writer.incrementIndentation();
 
-        List<Experiment> experimentsByExperimentPack = stoppedExperimentsOnly ? getStoppedExperimentsByExperimentPack(experimentPack) : experimentPack.getExperiments();
-        Experiment firstExperimentByExperimentPack = stoppedExperimentsOnly ? getFirstStoppedExperimentByExperimentPack(experimentPack) : experimentPack.getExperiments().get(0);
+        List<Experiment> experimentsByExperimentPack = stoppedExperimentsOnly ? getStoppedExperimentsByExperimentPack(experimentPack) : ServiceManager.getExperimentService().getExperimentsByExperimentPack(experimentPack);
+        Experiment firstExperimentByExperimentPack = stoppedExperimentsOnly ? getFirstStoppedExperimentByExperimentPack(experimentPack) : ServiceManager.getExperimentService().getExperimentsByExperimentPack(experimentPack).get(0);
 
         if (firstExperimentByExperimentPack != null) {
             writer.println("experiment titles: ");
@@ -1083,7 +1098,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
         if (detailed) {
             writer.incrementIndentation();
-            for (Experiment experiment : experimentPack.getExperiments()) {
+            for (Experiment experiment : ServiceManager.getExperimentService().getExperimentsByExperimentPack(experimentPack)) {
                 ServiceManager.getExperimentService().dumpExperiment(experiment, writer);
             }
             writer.decrementIndentation();

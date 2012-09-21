@@ -16,9 +16,8 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.client;
+package archimulator.model;
 
-import archimulator.model.*;
 import archimulator.service.ServiceManager;
 import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
 import net.pickapack.util.StorageUnitHelper;
@@ -74,8 +73,6 @@ public class ExperimentSpec implements Serializable {
     private transient String arguments;
 
     private transient String title;
-
-    private transient Experiment experiment;
 
     public ExperimentSpec() {
     }
@@ -256,14 +253,6 @@ public class ExperimentSpec implements Serializable {
         }
 
         return title;
-    }
-
-    public Experiment getExperiment() {
-        return experiment;
-    }
-
-    public void setExperiment(Experiment experiment) {
-        this.experiment = experiment;
     }
 
     private static String buildExperimentTitle(ExperimentType experimentType, int helperThreadLookahead, int helperThreadStride, String architectureTitle, String simulatedProgramTitle, String contextMappingArguments) {

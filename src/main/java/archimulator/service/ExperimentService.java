@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.service;
 
-import archimulator.client.ExperimentPack;
+import archimulator.model.ExperimentPack;
 import archimulator.model.Architecture;
 import archimulator.model.Experiment;
 import archimulator.model.SimulatedProgram;
@@ -50,6 +50,8 @@ public interface ExperimentService extends Service {
 
     List<Experiment> getExperimentsByArchitecture(Architecture architecture);
 
+    List<Experiment> getExperimentsByExperimentPack(ExperimentPack experimentPack);
+
     void addExperiment(Experiment experiment);
 
     void removeExperimentById(long id);
@@ -70,7 +72,11 @@ public interface ExperimentService extends Service {
 
     ExperimentPack getExperimentPackByTitle(String title);
 
-    List<ExperimentPack> getExperimentPacksByTitlePrefix(String titlePrefix);
+    void addExperimentPack(ExperimentPack experimentPack);
+
+    void removeExperimentPackById(long id);
+
+    void updateExperimentPack(ExperimentPack experimentPack);
 
     void runExperimentPackByTitle(String experimentPackTitle);
 

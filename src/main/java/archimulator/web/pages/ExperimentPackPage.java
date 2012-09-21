@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.web.pages;
 
-import archimulator.client.ExperimentPack;
+import archimulator.model.ExperimentPack;
 import archimulator.service.ServiceManager;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.Model;

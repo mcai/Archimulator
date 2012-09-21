@@ -20,6 +20,7 @@ package archimulator.client;
 
 import archimulator.model.Experiment;
 import archimulator.model.ExperimentState;
+import archimulator.model.ExperimentPack;
 import archimulator.service.ServiceManager;
 
 import java.io.IOException;
