@@ -20,6 +20,7 @@ package archimulator.model;
 
 public enum ExperimentState {
     PENDING,
+    READY_TO_RUN,
     RUNNING,
     COMPLETED,
     ABORTED

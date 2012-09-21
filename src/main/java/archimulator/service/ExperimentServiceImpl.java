@@ -64,6 +64,13 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
         this.experiments = createDao(Experiment.class);
 
+        for(Experiment experiment : getAllExperiments()) {
+            if(experiment.getState() == ExperimentState.READY_TO_RUN || experiment.getState() == ExperimentState.RUNNING) {
+                experiment.reset();
+                updateExperiment(experiment);
+            }
+        }
+
         try {
             experimentPacks = new LinkedHashMap<String, ExperimentPack>();
 
@@ -108,6 +115,13 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void start() {
+        new Thread(new ExperimentWorker()){{
+            setDaemon(true);
+        }}.start();
     }
 
     @Override
@@ -346,11 +360,9 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     @Override
-    public Experiment getFirstExperimentToRunByExperimentPack(ExperimentPack experimentPack) {
-        for (Experiment experiment : experimentPack.getExperiments()) {
-            if (experiment.getState() == ExperimentState.PENDING) {
-                experiment.setState(ExperimentState.RUNNING);
-                updateExperiment(experiment);
+    public Experiment getFirstExperimentToRun() {
+        for (Experiment experiment : getAllExperiments()) {
+            if (experiment.getState() == ExperimentState.READY_TO_RUN) {
                 return experiment;
             }
         }
@@ -398,11 +410,30 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     @Override
-    public void runExperiments(String... args) {
-        if (ServiceManager.getSystemSettingService().getSystemSettingSingleton().isRunningExperimentsEnabled()) {
-            new ExperimentWorker(args).run();
-        } else {
-            System.err.println("Running experiments is disabled at the moment, please enable running experiments first");
+    public void runExperimentPackByTitle(String experimentPackTitle) {
+        ExperimentPack experimentPack = getExperimentPackByTitle(experimentPackTitle);
+        if(experimentPack == null) {
+            return;
+        }
+
+        for(Experiment experiment : experimentPack.getExperiments()) {
+            if(experiment.getState() == ExperimentState.PENDING) {
+                experiment.setState(ExperimentState.READY_TO_RUN);
+                updateExperiment(experiment);
+            }
+        }
+    }
+
+    @Override
+    public void runExperimentByTitle(String experimentTitle) {
+        Experiment experiment = getLatestExperimentByTitle(experimentTitle);
+        if(experiment == null) {
+            return;
+        }
+
+        if(experiment.getState() == ExperimentState.PENDING) {
+            experiment.setState(ExperimentState.READY_TO_RUN);
+            updateExperiment(experiment);
         }
     }
 

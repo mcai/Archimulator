@@ -16,30 +16,28 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.client;
+package archimulator.web.pages;
 
-import archimulator.model.Experiment;
-import archimulator.model.ExperimentState;
+import archimulator.client.ExperimentPack;
 import archimulator.service.ServiceManager;
+import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.wicketstuff.annotation.mount.MountPath;
 
-import java.io.IOException;
+@MountPath(value = "/", alt = "/experiment_pack")
+public class ExperimentPackPage extends AuthenticatedWebPage {
+    public ExperimentPackPage(PageParameters parameters) {
+        super(PageType.SIMULATED_PROGRAM, parameters);
 
-public class Startup { //TODO: to be removed, only exposed by web UI
-    public static void main(String[] args) throws IOException {
-        if(args == null || args.length == 0) {
+        String experimentPackTitle = parameters.get("experiment_pack_title").toString();
+        ExperimentPack experimentPack = ServiceManager.getExperimentService().getExperimentPackByTitle(experimentPackTitle);
+
+        if(experimentPack == null) {
+            setResponsePage(HomePage.class);
             return;
         }
 
-        for(String arg : args) {
-            ExperimentPack experimentPack = ServiceManager.getExperimentService().getExperimentPackByTitle(arg);
-            if (experimentPack != null) {
-                ServiceManager.getExperimentService().runExperimentPackByTitle(arg);
-            } else {
-                Experiment experiment = ServiceManager.getExperimentService().getFirstExperimentByTitle(arg);
-                if (experiment != null && experiment.getState() == ExperimentState.READY_TO_RUN) {
-                    ServiceManager.getExperimentService().runExperimentByTitle(arg);
-                }
-            }
-        }
+        this.add(new TextField<String>("input_title", Model.of(experimentPack.getTitle())));
     }
 }

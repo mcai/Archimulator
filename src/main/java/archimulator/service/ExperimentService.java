@@ -60,7 +60,7 @@ public interface ExperimentService extends Service {
 
     void dumpExperiment(Experiment experiment, IndentedPrintWriter writer);
 
-    Experiment getFirstExperimentToRunByExperimentPack(ExperimentPack experimentPack);
+    Experiment getFirstExperimentToRun();
 
     List<Experiment> getStoppedExperimentsByExperimentPack(ExperimentPack experimentPack);
 
@@ -72,7 +72,9 @@ public interface ExperimentService extends Service {
 
     List<ExperimentPack> getExperimentPacksByTitlePrefix(String titlePrefix);
 
-    void runExperiments(String... args);
+    void runExperimentPackByTitle(String experimentPackTitle);
+
+    void runExperimentByTitle(String experimentTitle);
 
     void tableSummary(String title, Experiment baselineExperiment, List<Experiment> experiments);
 
@@ -177,4 +179,6 @@ public interface ExperimentService extends Service {
     void dumpExperimentPack(ExperimentPack experimentPack, boolean detailed, boolean stoppedExperimentsOnly);
 
     void dumpExperimentPack(ExperimentPack experimentPack, boolean detailed, IndentedPrintWriter writer, boolean stoppedExperimentsOnly);
+
+    void start();
 }

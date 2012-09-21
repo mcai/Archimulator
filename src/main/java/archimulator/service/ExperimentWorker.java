@@ -18,7 +18,6 @@
  ******************************************************************************/
 package archimulator.service;
 
-import archimulator.client.ExperimentPack;
 import archimulator.model.Experiment;
 import archimulator.model.ExperimentState;
 import archimulator.model.ExperimentType;
@@ -29,74 +28,37 @@ import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
 
 public class ExperimentWorker implements Runnable {
-    private String[] args;
-    private Experiment experiment;
-
-    public ExperimentWorker(String... args) {
-        this.args = args;
-
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                if (experiment != null) {
-                    if (experiment.getState() == ExperimentState.RUNNING) {
-                        experiment.reset();
-                        ServiceManager.getExperimentService().updateExperiment(experiment);
-                    }
-                }
-            }
-        });
-    }
-
     @Override
     public void run() {
-        for (; ; ) {
-            if (!doRunExperiment()) {
-                break;
-            }
-        }
-    }
-
-    private boolean doRunExperiment() {
-        if(this.args == null || this.args.length == 0) {
-            for(ExperimentPack experimentPack : ServiceManager.getExperimentService().getAllExperimentPacks()) {
-                Experiment experiment = ServiceManager.getExperimentService().getFirstExperimentToRunByExperimentPack(experimentPack);
-                if(experiment != null) {
-                    this.experiment = experiment;
-                    break;
-                }
-            }
-        }
-        else {
-            for(String arg : this.args) {
-                ExperimentPack experimentPack = ServiceManager.getExperimentService().getExperimentPackByTitle(arg);
-                if (experimentPack != null) {
-                    Experiment experiment = ServiceManager.getExperimentService().getFirstExperimentToRunByExperimentPack(experimentPack);
-                    if(experiment != null) {
-                        this.experiment = experiment;
-                        break;
-                    }
-                } else {
-                    Experiment experiment = ServiceManager.getExperimentService().getFirstExperimentByTitle(arg);
-                    if (experiment != null) {
-                        if (experiment.getState() == ExperimentState.PENDING) {
-                            this.experiment = experiment;
-                            break;
+        Repeater.run(new Runnable() {
+            @Override
+            public void run() {
+                for(;;) {
+                    while (!ServiceManager.getSystemSettingService().getSystemSettingSingleton().isRunningExperimentsEnabled()) {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
                         }
-                    } else {
-                        System.err.println("Experiment pack or experiment \"" + arg + "\" do not exist");
+                    }
+
+                    Experiment experiment = ServiceManager.getExperimentService().getFirstExperimentToRun();
+                    if (experiment != null) {
+                        experiment.setState(ExperimentState.RUNNING);
+                        ServiceManager.getExperimentService().updateExperiment(experiment);
+
+                        runExperiment(experiment);
+                    }
+                    else {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
                 }
             }
-        }
-
-        if (this.experiment != null) {
-            runExperiment(this.experiment);
-            this.experiment = null;
-            return true;
-        }
-
-        return false;
+        }, 1);
     }
 
     private void runExperiment(Experiment experiment) {
@@ -126,10 +88,5 @@ public class ExperimentWorker implements Runnable {
         experiment.setFailedReason("");
 
         ServiceManager.getExperimentService().updateExperiment(experiment);
-        ServiceManager.getExperimentService().dumpExperiment(experiment);
-    }
-
-    public boolean isRunning() {
-        return this.experiment != null;
     }
 }
