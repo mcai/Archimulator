@@ -24,7 +24,7 @@ import java.nio.ByteOrder;
 
 public class Utsname {
     private static final int _SYSNAME_SIZE = 64 + 1;
-    private static final int sizeof = _SYSNAME_SIZE * 6;
+    private static final int SIZE_OF = _SYSNAME_SIZE * 6;
 
     public String sysname;
     public String nodename;
@@ -44,7 +44,7 @@ public class Utsname {
             byte[] machine_buf = (this.machine + "\0").getBytes(charSet);
             byte[] domainname_buf = (this.domainname + "\0").getBytes(charSet);
 
-            byte[] buffer = new byte[sizeof];
+            byte[] buffer = new byte[SIZE_OF];
 
             ByteBuffer byteBuffer = ByteBuffer.wrap(buffer).order(littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
 

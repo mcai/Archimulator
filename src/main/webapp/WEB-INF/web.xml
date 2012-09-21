@@ -10,6 +10,10 @@
         <listener-class>archimulator.web.ArchimulatorServletContextListener</listener-class>
     </listener>
 
+    <listener>
+        <listener-class>org.quartz.ee.servlet.QuartzInitializerListener</listener-class>
+    </listener>
+
     <filter>
         <filter-name>archimulator</filter-name>
         <filter-class>org.apache.wicket.protocol.http.WicketFilter</filter-class>

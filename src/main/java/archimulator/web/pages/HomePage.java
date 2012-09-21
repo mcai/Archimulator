@@ -18,16 +18,18 @@
  ******************************************************************************/
 package archimulator.web.pages;
 
-import archimulator.model.ExperimentPack;
 import archimulator.model.Experiment;
+import archimulator.model.ExperimentPack;
 import archimulator.model.ExperimentState;
 import archimulator.service.ServiceManager;
 import archimulator.util.PropertiesHelper;
 import archimulator.web.ArchimulatorSession;
 import archimulator.web.components.PagingNavigator;
+import de.agilecoders.wicket.markup.html.bootstrap.behavior.CssClassNameAppender;
 import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.markup.repeater.data.DataView;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
@@ -37,16 +39,14 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.wicketstuff.annotation.mount.MountPath;
 
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 @MountPath(value = "/", alt = "/home")
 public class HomePage extends BasePage {
     public HomePage(PageParameters parameters) {
         super(PageType.HOME, parameters);
 
-        add(new WebMarkupContainer("div_welcome"){{
+        add(new WebMarkupContainer("div_welcome") {{
             add(new Label("label_version", Model.of("Version " + PropertiesHelper.getVersion())) {{
                 setEscapeModelStrings(false);
             }});
@@ -62,16 +62,7 @@ public class HomePage extends BasePage {
             IDataProvider<ExperimentPack> dataProvider = new IDataProvider<ExperimentPack>() {
                 @Override
                 public Iterator<? extends ExperimentPack> iterator(long first, long count) {
-//                return ServiceManager.getExperimentService().getAllExperimentPacks(first, count).iterator();
-                    List<ExperimentPack> experimentPacks = ServiceManager.getExperimentService().getAllExperimentPacks();
-
-                    List<ExperimentPack> result = new ArrayList<ExperimentPack>();
-
-                    for(long i = first; i < first + count; i++) {
-                        result.add(experimentPacks.get((int) i));
-                    }
-
-                    return result.iterator();
+                    return ServiceManager.getExperimentService().getAllExperimentPacks(first, count).iterator();
                 }
 
                 @Override
@@ -97,11 +88,10 @@ public class HomePage extends BasePage {
                     int numRunning = 0;
                     int numStopped = 0;
 
-                    for(Experiment experiment : ServiceManager.getExperimentService().getExperimentsByExperimentPack(experimentPack)) {
-                        if(experiment.getState() == ExperimentState.RUNNING) {
+                    for (Experiment experiment : ServiceManager.getExperimentService().getExperimentsByExperimentPack(experimentPack)) {
+                        if (experiment.getState() == ExperimentState.RUNNING) {
                             numRunning++;
-                        }
-                        else if(experiment.isStopped()) {
+                        } else if (experiment.isStopped()) {
                             numStopped++;
                         }
                     }
@@ -112,23 +102,65 @@ public class HomePage extends BasePage {
                             experimentPack.getExperimentType(),
                             numTotal, numRunning, numStopped,
                             NumberFormat.getPercentInstance().format((double) numStopped / numTotal)
-                            )));
+                    )));
 
-                    WebMarkupContainer cellOperations = new WebMarkupContainer("cell_operations");
+                    item.add(new WebMarkupContainer("cell_operations_1") {{
+                        add(new Link<Void>("button_start") {
+                            {
+                                if (!(ServiceManager.getExperimentService().getNumExperimentsByExperimentPackAndState(experimentPack, ExperimentState.PENDING) > 0)) {
+                                    add(new CssClassNameAppender("disabled"));
+                                    setEnabled(false);
+                                }
+                            }
 
-                    cellOperations.add(new Label("button_start_stop", "Start/Stop"){{
-//                    add(new AttributeAppender("href", "./simulated_program?simulated_program_id=" + experimentPack.getId()));
+                            @Override
+                            public void onClick() {
+                                ServiceManager.getExperimentService().startExperimentPack(experimentPack);
+                            }
+                        });
+
+                        add(new Link<Void>("button_stop") {
+                            {
+                                if (!(ServiceManager.getExperimentService().getNumExperimentsByExperimentPackAndState(experimentPack, ExperimentState.READY_TO_RUN) > 0)) {
+                                    add(new CssClassNameAppender("disabled"));
+                                    setEnabled(false);
+                                }
+                            }
+
+                            @Override
+                            public void onClick() {
+                                ServiceManager.getExperimentService().stopExperimentPack(experimentPack);
+                            }
+                        });
+
+                        add(new Link<Void>("button_reset_stopped_experiments") {
+                            {
+                                if (!(ServiceManager.getExperimentService().getNumExperimentsByExperimentPackAndState(experimentPack, ExperimentState.COMPLETED) > 0 ||
+                                        ServiceManager.getExperimentService().getNumExperimentsByExperimentPackAndState(experimentPack, ExperimentState.ABORTED) > 0)) {
+                                    add(new CssClassNameAppender("disabled"));
+                                    setEnabled(false);
+                                }
+                            }
+
+                            @Override
+                            public void onClick() {
+                                ServiceManager.getExperimentService().resetExperimentsByExperimentPack(experimentPack);
+                            }
+                        });
                     }});
 
-                    cellOperations.add(new Label("button_edit", "Edit"){{
-                    add(new AttributeAppender("href", "./experiment_pack?experiment_pack_title=" + experimentPack.getTitle()));
-                    }});
+                    item.add(new WebMarkupContainer("cell_operations_2") {{
+                        add(new Label("button_edit", "Edit") {{
+                            add(new AttributeAppender("href", "./experiment_pack?experiment_pack_title=" + experimentPack.getTitle()));
+                        }});
 
-                    cellOperations.add(new Label("button_remove", "Remove"){{
-//                    add(new AttributeAppender("href", "./simulated_program?simulated_program_id=" + experimentPack.getId()));
+                        add(new Link<Void>("button_remove") {
+                            @Override
+                            public void onClick() {
+                                ServiceManager.getExperimentService().removeExperimentPackById(experimentPack.getId());
+                            }
+                        });
                     }});
-
-                    item.add(cellOperations);
                 }
             };
             rowExperimentPack.setItemsPerPage(12);

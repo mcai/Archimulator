@@ -24,41 +24,32 @@ import archimulator.model.ExperimentType;
 import archimulator.sim.common.*;
 import archimulator.sim.os.Kernel;
 import net.pickapack.Reference;
+import net.pickapack.dateTime.DateHelper;
 import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
+import org.quartz.Job;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 
-public class ExperimentWorker implements Runnable {
-    @Override
-    public void run() {
-        Repeater.run(new Runnable() {
-            @Override
-            public void run() {
-                for(;;) {
-                    while (!ServiceManager.getSystemSettingService().getSystemSettingSingleton().isRunningExperimentsEnabled()) {
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
+import java.util.Date;
 
-                    Experiment experiment = ServiceManager.getExperimentService().getFirstExperimentToRun();
-                    if (experiment != null) {
-                        experiment.setState(ExperimentState.RUNNING);
-                        ServiceManager.getExperimentService().updateExperiment(experiment);
+public class RunExperimentJob implements Job {
+    public void execute(JobExecutionContext context) throws JobExecutionException {
+        System.out.printf("[%s] RunExperimentJob is executing.\n", DateHelper.toString(new Date()));
 
-                        runExperiment(experiment);
-                    }
-                    else {
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                }
-            }
-        }, 1);
+        if (!ServiceManager.getSystemSettingService().getSystemSettingSingleton().isRunningExperimentsEnabled()) {
+            return;
+        }
+
+        Experiment experiment = ServiceManager.getExperimentService().getFirstExperimentToRun();
+        if (experiment != null) {
+            experiment.setState(ExperimentState.RUNNING);
+            ServiceManager.getExperimentService().updateExperiment(experiment);
+
+            runExperiment(experiment);
+        }
+
+        System.out.printf("[%s] RunExperimentJob is done.\n", DateHelper.toString(new Date()));
     }
 
     private void runExperiment(Experiment experiment) {

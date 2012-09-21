@@ -22,7 +22,6 @@ import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import net.pickapack.Params;
 import net.pickapack.tree.Node;
-import net.pickapack.tree.NodeHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,19 +50,10 @@ public abstract class CacheCoherenceFlow extends Params implements Node {
         this.tag = tag;
     }
 
-    public static void dumpTree() {
-        for (CacheCoherenceFlow pendingFlow : pendingFlows) {
-            NodeHelper.print(pendingFlow);
-            System.out.println();
-        }
-
-        System.out.println();
-    }
-
     public void onCreate(long beginCycle) {
         this.beginCycle = beginCycle;
         if (this.producerFlow == null) {
-            pendingFlows.add(this);
+            this.generator.getSimulation().pendingFlows.add(this);
         } else {
             this.producerFlow.childFlows.add(this);
         }
@@ -76,7 +66,7 @@ public abstract class CacheCoherenceFlow extends Params implements Node {
         this.ancestorFlow.numPendingDescendantFlows--;
 
         if (this.ancestorFlow.numPendingDescendantFlows == 0) {
-            pendingFlows.remove(this.ancestorFlow);
+            this.generator.getSimulation().pendingFlows.remove(this.ancestorFlow);
         }
     }
 
@@ -124,12 +114,6 @@ public abstract class CacheCoherenceFlow extends Params implements Node {
     @Override
     public List<CacheCoherenceFlow> getChildren() {
         return this.childFlows;
-    }
-
-    private static List<CacheCoherenceFlow> pendingFlows = new ArrayList<CacheCoherenceFlow>();
-
-    public static List<CacheCoherenceFlow> getPendingFlows() {
-        return pendingFlows;
     }
 
     public int getTag() {

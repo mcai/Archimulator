@@ -18,10 +18,7 @@
  ******************************************************************************/
 package archimulator.service;
 
-import archimulator.model.ExperimentPack;
-import archimulator.model.Architecture;
-import archimulator.model.Experiment;
-import archimulator.model.SimulatedProgram;
+import archimulator.model.*;
 import net.pickapack.action.Function1;
 import net.pickapack.service.Service;
 import net.pickapack.util.IndentedPrintWriter;
@@ -70,6 +67,8 @@ public interface ExperimentService extends Service {
 
     List<ExperimentPack> getAllExperimentPacks();
 
+    List<ExperimentPack> getAllExperimentPacks(long first, long count);
+
     ExperimentPack getExperimentPackByTitle(String title);
 
     void addExperimentPack(ExperimentPack experimentPack);
@@ -78,7 +77,13 @@ public interface ExperimentService extends Service {
 
     void updateExperimentPack(ExperimentPack experimentPack);
 
-    void runExperimentPackByTitle(String experimentPackTitle);
+    long getNumExperimentsByExperimentPackAndState(ExperimentPack experimentPack, ExperimentState experimentState);
+
+    void startExperimentPack(ExperimentPack experimentPack);
+
+    void stopExperimentPack(ExperimentPack experimentPack);
+
+    void resetExperimentsByExperimentPack(ExperimentPack experimentPack);
 
     void runExperimentByTitle(String experimentTitle);
 

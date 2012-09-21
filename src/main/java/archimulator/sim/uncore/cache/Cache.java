@@ -20,7 +20,6 @@ package archimulator.sim.uncore.cache;
 
 import archimulator.sim.common.BasicSimulationObject;
 import archimulator.sim.common.SimulationObject;
-import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import net.pickapack.util.ValueProvider;
 import net.pickapack.util.ValueProviderFactory;
 
@@ -56,7 +55,7 @@ public class Cache<StateT extends Serializable> extends BasicSimulationObject im
 
     public CacheLine<StateT> getLine(int set, int way) {
         if (way < 0 || way >= this.getAssociativity()) {
-            CacheCoherenceFlow.dumpTree();
+            getSimulation().dumpPendingFlowTree();
             System.out.flush();
             throw new IllegalArgumentException(String.format("set: %d, way: %d, this.associativity: %d", set, way, this.getAssociativity()));
         }

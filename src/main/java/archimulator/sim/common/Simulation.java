@@ -32,6 +32,7 @@ import archimulator.sim.os.Kernel;
 import archimulator.sim.uncore.BasicCacheHierarchy;
 import archimulator.sim.uncore.CacheHierarchy;
 import archimulator.sim.uncore.coherence.msi.controller.GeneralCacheController;
+import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestProfilingHelper;
 import archimulator.sim.uncore.tlb.TranslationLookasideBuffer;
 import net.pickapack.StorageUnit;
@@ -40,14 +41,13 @@ import net.pickapack.dateTime.DateHelper;
 import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
 import net.pickapack.io.file.FileHelper;
+import net.pickapack.tree.NodeHelper;
 import net.pickapack.util.JaxenHelper;
 import org.apache.commons.lang.time.DurationFormatUtils;
 
 import java.io.File;
 import java.text.MessageFormat;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 public abstract class Simulation implements SimulationObject {
     private String title;
@@ -74,6 +74,8 @@ public abstract class Simulation implements SimulationObject {
     public long currentMemoryHierarchyAccessId;
     public long currentNetMessageId;
     public long currentCacheCoherenceFlowId;
+
+    public List<CacheCoherenceFlow> pendingFlows = new ArrayList<CacheCoherenceFlow>();
 
     public Simulation(String title, SimulationType type, Experiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
         this.experiment = experiment;
@@ -384,6 +386,15 @@ public abstract class Simulation implements SimulationObject {
 
     public CacheHierarchy prepareCacheHierarchy() {
         return new BasicCacheHierarchy(this.getExperiment(), this, this.getBlockingEventDispatcher(), this.getCycleAccurateEventQueue());
+    }
+
+    public void dumpPendingFlowTree() {
+        for (CacheCoherenceFlow pendingFlow : pendingFlows) {
+            NodeHelper.print(pendingFlow);
+            System.out.println();
+        }
+
+        System.out.println();
     }
 
     public SimulationType getType() {

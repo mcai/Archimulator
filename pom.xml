@@ -168,6 +168,11 @@
             <artifactId>wicket-extensions</artifactId>
             <version>6.0.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.quartz-scheduler</groupId>
+            <artifactId>quartz</artifactId>
+            <version>2.1.6</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -227,7 +232,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>archimulator.client.Startup</mainClass>
+                            <mainClass>archimulator.client.ExperimentStatsCollectorStartup</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

@@ -18,17 +18,13 @@
  ******************************************************************************/
 package archimulator.service;
 
-import archimulator.model.ExperimentPack;
-import archimulator.model.ExperimentSpec;
-import archimulator.model.Architecture;
-import archimulator.model.Description;
-import archimulator.model.ContextMapping;
-import archimulator.model.Experiment;
-import archimulator.model.ExperimentState;
-import archimulator.model.ExperimentType;
-import archimulator.model.SimulatedProgram;
+import archimulator.model.*;
 import com.Ostermiller.util.CSVPrinter;
 import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.stmt.PreparedQuery;
+import com.j256.ormlite.stmt.PreparedUpdate;
+import com.j256.ormlite.stmt.UpdateBuilder;
+import com.j256.ormlite.stmt.Where;
 import net.pickapack.JsonSerializationHelper;
 import net.pickapack.Pair;
 import net.pickapack.StorageUnit;
@@ -55,6 +51,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 import java.util.*;
 
 import static net.pickapack.util.CollectionHelper.toMap;
@@ -71,8 +68,8 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         this.experiments = createDao(Experiment.class);
         this.experimentPacks = createDao(ExperimentPack.class);
 
-        for(Experiment experiment : getAllExperiments()) {
-            if(experiment.getState() == ExperimentState.READY_TO_RUN || experiment.getState() == ExperimentState.RUNNING) {
+        for (Experiment experiment : getAllExperiments()) {
+            if (experiment.getState() == ExperimentState.READY_TO_RUN || experiment.getState() == ExperimentState.RUNNING) {
                 experiment.reset();
                 updateExperiment(experiment);
             }
@@ -118,9 +115,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
     @Override
     public void start() {
-        new Thread(new ExperimentWorker()){{
-            setDaemon(true);
-        }}.start();
     }
 
     @Override
@@ -152,8 +146,8 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     public List<Experiment> getExperimentsByTitlePrefix(String titlePrefix, boolean stoppedExperimentsOnly) {
         List<Experiment> result = new ArrayList<Experiment>();
 
-        for(Experiment experiment : this.getAllExperiments()) {
-            if(experiment.getTitle().startsWith(titlePrefix) && getLatestExperimentByTitle(experiment.getTitle()).getId() == experiment.getId() && (!stoppedExperimentsOnly || experiment.isStopped())) {
+        for (Experiment experiment : this.getAllExperiments()) {
+            if (experiment.getTitle().startsWith(titlePrefix) && getLatestExperimentByTitle(experiment.getTitle()).getId() == experiment.getId() && (!stoppedExperimentsOnly || experiment.isStopped())) {
                 result.add(experiment);
             }
         }
@@ -172,7 +166,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     @Override
-    public List<Experiment> getExperimentsBySimulatedProgram(SimulatedProgram simulatedProgram) {
+    public List<Experiment> getExperimentsBySimulatedProgram(SimulatedProgram simulatedProgram) { //TODO: to be optimized
         List<Experiment> result = new ArrayList<Experiment>();
 
         for (Experiment experiment : getAllExperiments()) {
@@ -189,15 +183,12 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
     @Override
     public List<Experiment> getExperimentsByArchitecture(Architecture architecture) {
-        List<Experiment> result = new ArrayList<Experiment>();
-
-        for (Experiment experiment : getAllExperiments()) {
-            if (experiment.getArchitectureId() == architecture.getId()) {
-                result.add(experiment);
-            }
+        try {
+            PreparedQuery<Experiment> query = this.experiments.queryBuilder().where().eq("architectureId", architecture.getId()).prepare();
+            return this.experiments.query(query);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-
-        return result;
     }
 
     @Override
@@ -206,7 +197,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
         for (String experimentTitle : experimentPack.getExperimentTitles()) {
             Experiment experiment = getLatestExperimentByTitle(experimentTitle);
-            if(experiment != null) {
+            if (experiment != null) {
                 result.add(experiment);
             }
         }
@@ -374,13 +365,12 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
     @Override
     public Experiment getFirstExperimentToRun() {
-        for (Experiment experiment : getAllExperiments()) {
-            if (experiment.getState() == ExperimentState.READY_TO_RUN) {
-                return experiment;
-            }
+        try {
+            PreparedQuery<Experiment> query = this.experiments.queryBuilder().where().eq("state", ExperimentState.READY_TO_RUN).prepare();
+            return this.experiments.queryForFirst(query);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-
-        return null;
     }
 
     @Override
@@ -405,6 +395,11 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     @Override
+    public List<ExperimentPack> getAllExperimentPacks(long first, long count) {
+        return this.getAllItems(this.experimentPacks, first, count);
+    }
+
+    @Override
     public ExperimentPack getExperimentPackByTitle(String title) {
         return this.getFirstItemByTitle(this.experimentPacks, title);
     }
@@ -425,30 +420,76 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     @Override
-    public void runExperimentPackByTitle(String experimentPackTitle) {
-        ExperimentPack experimentPack = getExperimentPackByTitle(experimentPackTitle);
-        if(experimentPack == null) {
-            return;
+    public long getNumExperimentsByExperimentPackAndState(ExperimentPack experimentPack, ExperimentState experimentState) {
+        try {
+            PreparedQuery<Experiment> query = this.experiments.queryBuilder().setCountOf(true).where()
+                    .in("title", experimentPack.getExperimentTitles())
+                    .and()
+                    .eq("state", experimentState)
+                    .prepare();
+            return this.experiments.countOf(query);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
+    }
 
-        for(Experiment experiment : ServiceManager.getExperimentService().getExperimentsByExperimentPack(experimentPack)) {
-            if(experiment.getState() == ExperimentState.PENDING) {
-                experiment.setState(ExperimentState.READY_TO_RUN);
-                updateExperiment(experiment);
-            }
+    @Override
+    public void startExperimentPack(ExperimentPack experimentPack) {
+        try {
+            UpdateBuilder<Experiment,Long> updateBuilder = this.experiments.updateBuilder();
+            updateBuilder.where().in("title", experimentPack.getExperimentTitles()).and().eq("state", ExperimentState.PENDING);
+            updateBuilder.updateColumnValue("state", ExperimentState.READY_TO_RUN);
+            PreparedUpdate<Experiment> update = updateBuilder.prepare();
+            this.experiments.update(update);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void stopExperimentPack(ExperimentPack experimentPack) {
+        try {
+            UpdateBuilder<Experiment,Long> updateBuilder = this.experiments.updateBuilder();
+            updateBuilder.where().in("title", experimentPack.getExperimentTitles()).and().eq("state", ExperimentState.READY_TO_RUN);
+            updateBuilder.updateColumnValue("state", ExperimentState.PENDING);
+            PreparedUpdate<Experiment> update = updateBuilder.prepare();
+            this.experiments.update(update);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void resetExperimentsByExperimentPack(ExperimentPack experimentPack) {
+        try {
+            UpdateBuilder<Experiment,Long> updateBuilder = this.experiments.updateBuilder();
+
+            Where<Experiment,Long> where = updateBuilder.where();
+            where.and(
+                    where.in("title", experimentPack.getExperimentTitles()),
+                    where.eq("state", ExperimentState.COMPLETED).or().eq("state", ExperimentState.ABORTED)
+            );
+
+            updateBuilder.updateColumnValue("state", ExperimentState.PENDING);
+
+            PreparedUpdate<Experiment> update = updateBuilder.prepare();
+            this.experiments.update(update);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
     @Override
     public void runExperimentByTitle(String experimentTitle) {
-        Experiment experiment = getLatestExperimentByTitle(experimentTitle);
-        if(experiment == null) {
-            return;
-        }
-
-        if(experiment.getState() == ExperimentState.PENDING) {
-            experiment.setState(ExperimentState.READY_TO_RUN);
-            updateExperiment(experiment);
+        try {
+            UpdateBuilder<Experiment,Long> updateBuilder = this.experiments.updateBuilder();
+            updateBuilder.where().eq("title", experimentTitle).and().eq("state", ExperimentState.PENDING);
+            updateBuilder.updateColumnValue("state", ExperimentState.READY_TO_RUN);
+            PreparedUpdate<Experiment> update = updateBuilder.prepare();
+            this.experiments.update(update);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -478,7 +519,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
             row.add(experiment.getArchitecture().getL2Associativity() + "");
             row.add(experiment.getArchitecture().getL2ReplacementPolicyType() + "");
 
-            if(helperThreadEnabled) {
+            if (helperThreadEnabled) {
                 row.add(experiment.getContextMappings().get(0).getHelperThreadLookahead() + "");
                 row.add(experiment.getContextMappings().get(0).getHelperThreadStride() + "");
             }
@@ -505,7 +546,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
             row.add(String.format("%.4f", Double.parseDouble(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
                     "processor/cacheHierarchy/cacheControllers[name=l2]/occupancyRatio"))));
 
-            if(helperThreadEnabled) {
+            if (helperThreadEnabled) {
                 row.add(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
                         "helperThreadL2CacheRequestProfilingHelper/numHelperThreadL2CacheHits"));
                 row.add(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
@@ -1116,7 +1157,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
             csvPrinter.writeln(columns.toArray(new String[columns.size()]));
 
-            for(List<String> row : rows) {
+            for (List<String> row : rows) {
                 csvPrinter.writeln(row.toArray(new String[row.size()]));
             }
         } catch (IOException e) {

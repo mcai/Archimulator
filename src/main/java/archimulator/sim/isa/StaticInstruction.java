@@ -107,7 +107,7 @@ public class StaticInstruction {
         RS, RT, RD, FS, FT, FD, REGISTER_RA, REGISTER_V0, REGISTER_HI, REGISTER_LO, REGISTER_FCSR
     }
 
-    public static List<Mnemonic> machineInstructionDecoderInfos = new ArrayList<Mnemonic>();
+    public static final List<Mnemonic> machineInstructionDecoderInfos = new ArrayList<Mnemonic>();
 
     private static void registerInstruction(Mnemonic mnemonic) {
         machineInstructionDecoderInfos.add(mnemonic);

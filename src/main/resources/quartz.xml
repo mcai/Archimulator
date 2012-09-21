@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job-scheduling-data
+        xmlns="http://www.quartz-scheduler.org/xml/JobSchedulingData"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.quartz-scheduler.org/xml/JobSchedulingData http://www.quartz-scheduler.org/xml/job_scheduling_data_1_8.xsd"
+        version="1.8">
+
+    <pre-processing-commands>
+        <delete-jobs-in-group>*</delete-jobs-in-group>
+        <delete-triggers-in-group>*</delete-triggers-in-group>
+    </pre-processing-commands>
+
+    <processing-directives>
+        <overwrite-existing-data>true</overwrite-existing-data>
+        <ignore-duplicates>false</ignore-duplicates>
+    </processing-directives>
+
+    <schedule>
+        <job>
+            <name>MyJob</name>
+            <job-class>archimulator.service.RunExperimentJob</job-class>
+        </job>
+        <trigger>
+            <simple>
+                <name>TenSecondIntervals</name>
+                <job-name>MyJob</job-name>
+                <repeat-count>-1</repeat-count>
+                <repeat-interval>10000</repeat-interval>
+            </simple>
+        </trigger>
+
+    </schedule>
+</job-scheduling-data>
