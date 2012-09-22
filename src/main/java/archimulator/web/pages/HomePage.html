@@ -6,71 +6,42 @@
 </head>
 <body>
 <wicket:extend>
+    <div class="container">
+        <div class="hero-unit">
+            <h1>Archimulator <label wicket:id="label_version"></label></h1>
 
-    <div class="jumbotron masthead" wicket:id="div_welcome">
-        <div class="container">
-            <h1>Archimulator</h1>
+            <p>Easy-to-use, feature-rich, and extensible CMP architectural simulator powered by Java on 32/64 bit
+                Linux/Unix.</p>
 
-            <p>Easy-to-use, feature-rich, and extensible CMP architectural simulator powered by Java on 32/64 bit Linux/Unix.</p>
-
-            <p class="download-info">
-                <a href="https://github.com/mcai/Archimulator/zipball/master" name="download"
-                   class="btn btn-primary btn-large">Download Archimulator
-                </a>
+            <p>
+                <a href="https://github.com/mcai/Archimulator/zipball/master" class="btn btn-success btn-large">Download
+                    Archimulator</a>
+                <a href="https://github.com/mcai/Archimulator" class="btn btn-large" target="_blank">Github project</a>
+                <a href="./experiments" class="btn btn-large">Try Online</a>
             </p>
-
-            <ul class="masthead-links">
-                <li><a href="https://github.com/mcai/Archimulator" target="_blank">Github project</a></li>
-                <li><a href="./experiments">Try Online</a></li>
-                <li wicket:id="label_version">Version</li>
-            </ul>
         </div>
-    </div>
 
-    <div class="bs-docs-social" wicket:id="div_social">
-        <div class="container">
-            <ul class="bs-docs-social-buttons">
-                <li><a href="#">Like It on Facebook</a></li>
-                <li><a href="#">Like It on Twitter</a></li>
-                <li><a href="#">Like It on LinkedIn</a></li>
-                <li><a href="#">Like It on Weibo</a></li>
-            </ul>
-        </div>
-    </div>
-
-    <div class="container" wicket:id="div_experiment_packs">
         <section>
             <div class="page-header">
                 <h1>
-                    Experiment Packs
+                    A First Look
                 </h1>
             </div>
 
-            <div class="row">
-                <ul class="thumbnails">
-                    <li class="span4"  wicket:id="row_experiment_pack">
-                        <div class="thumbnail">
-                            <div class="caption">
-                                <h5 wicket:id="cell_title"></h5>
-                                <p wicket:id="cell_description">Experiment pack description here.</p>
-                                <p wicket:id="cell_operations_1">
-                                    <a class="btn" wicket:id="button_start">Start</a>
-                                    <a class="btn" wicket:id="button_stop">Stop</a>
-                                    <a class="btn btn-warning" wicket:id="button_reset_stopped_experiments">Reset Stopped Experiments</a>
-                                </p>
-                                <p wicket:id="cell_operations_2">
-                                    <a class="btn" wicket:id="button_edit">Edit</a>
-                                    <a class="btn btn-danger" wicket:id="button_remove">Remove</a>
-                                </p>
-                            </div>
-                        </div>
-                    </li>
-                </ul>
-            </div>
+        <pre class="prettyprint lang-java">
+public void doMeasurementOneCycle() {
+    this.commit();
+    this.writeBack();
+    this.refreshLoadStoreQueue();
+    this.wakeUp();
+    this.issue();
+    this.dispatch();
+    this.registerRename();
+    this.fetch();
 
-            <div style="margin-top: 1em">
-                <span wicket:id="navigator"></span>
-            </div>
+    this.updatePerCycleStats();
+}
+        </pre>
 
         </section>
     </div>

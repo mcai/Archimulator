@@ -41,7 +41,7 @@ public class PagingNavigator extends Panel {
         this.labelProvider = labelProvider;
     }
 
-    public final IPageable getPageable() {
+    public IPageable getPageable() {
         return pageable;
     }
 
@@ -54,10 +54,13 @@ public class PagingNavigator extends Panel {
 
         add(newPagingNavigationLink("first", pageable, 0).add(
                 new TitleAppender("PagingNavigator.first")));
+
         add(newPagingNavigationIncrementLink("prev", pageable, -1).add(
                 new TitleAppender("PagingNavigator.previous")));
+
         add(newPagingNavigationIncrementLink("next", pageable, 1).add(
                 new TitleAppender("PagingNavigator.next")));
+
         add(newPagingNavigationLink("last", pageable, -1).add(
                 new TitleAppender("PagingNavigator.last")));
     }

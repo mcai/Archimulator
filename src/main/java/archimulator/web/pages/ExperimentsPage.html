@@ -19,7 +19,7 @@
                 <input type="text" placeholder="Id" class="search-query span2" name="experimentId" wicket:id="experimentId">
                 <input type="text" placeholder="Type" class="search-query span2" name="experimentType" wicket:id="experimentType">
                 <input type="text" placeholder="State" class="search-query span2" name="experimentState" wicket:id="experimentState">
-                <input type="text" placeholder="Architecture" class="search-query span4" name="experimentArchitecture" wicket:id="experimentArchitecture">
+                <input type="text" placeholder="Architecture" class="search-query span3" name="experimentArchitecture" wicket:id="experimentArchitecture">
                 <input type="submit" value="Search" class="btn"/>
                 <a class="btn" href="./experiments"><i class="icon-trash"></i>Clear</a>
             </form>
@@ -53,9 +53,7 @@
                 </tbody>
             </table>
 
-            <div style="margin-top: 1em">
-                <span wicket:id="navigator"></span>
-            </div>
+            <wicket:panel wicket:id="navigator"/>
 
         </section>
     </div>

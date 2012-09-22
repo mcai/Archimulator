@@ -15,6 +15,7 @@
       <w>evicter</w>
       <w>fcsr</w>
       <w>getm</w>
+      <w>gmail</w>
       <w>hintful</w>
       <w>hotspots</w>
       <w>ifetch</w>
@@ -37,6 +38,7 @@
       <w>nonblocking</w>
       <w>nonowner</w>
       <w>opcode</w>
+      <w>pageable</w>
       <w>precharge</w>
       <w>precharged</w>
       <w>predecode</w>
@@ -57,6 +59,7 @@
       <w>tuple</w>
       <w>unmap</w>
       <w>unpartitioned</w>
+      <w>viewport</w>
       <w>warmup</w>
       <w>weibo</w>
       <w>writeback</w>

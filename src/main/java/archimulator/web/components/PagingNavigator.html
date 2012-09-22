@@ -1,17 +1,17 @@
 <html xmlns:wicket="http://wicket.apache.org">
 <body>
 <wicket:panel>
-    <div class="pagination">
+    <div class="pagination pagination-centered">
         <ul>
-            <li><a wicket:id="first">First</a></li>
-            <li><a wicket:id="prev">Prev</a></li>
+            <li><button class="btn" wicket:id="first">First</button></li>
+            <li><button class="btn" wicket:id="prev">Prev</button></li>
 
             <li wicket:id="navigation">
-                <a wicket:id="pageLink"><span wicket:id="pageNumber"></span></a>
+                <button class="btn" wicket:id="pageLink"><span wicket:id="pageNumber"></span></button>
             </li>
 
-            <li><a wicket:id="next">Next</a></li>
-            <li><a wicket:id="last">Last</a></li>
+            <li><button class="btn" wicket:id="next">Next</button></li>
+            <li><button class="btn" wicket:id="last">Last</button></li>
         </ul>
     </div>
 </wicket:panel>

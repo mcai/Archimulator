@@ -28,9 +28,15 @@ import org.wicketstuff.annotation.mount.MountPath;
 @MountPath(value = "/", alt = "/experiment_pack")
 public class ExperimentPackPage extends AuthenticatedWebPage {
     public ExperimentPackPage(PageParameters parameters) {
-        super(PageType.SIMULATED_PROGRAM, parameters);
+        super(PageType.EXPERIMENT_PACK, parameters);
 
         String experimentPackTitle = parameters.get("experiment_pack_title").toString();
+
+        if(experimentPackTitle == null) {
+            setResponsePage(HomePage.class);
+            return;
+        }
+
         ExperimentPack experimentPack = ServiceManager.getExperimentService().getExperimentPackByTitle(experimentPackTitle);
 
         if(experimentPack == null) {

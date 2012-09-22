@@ -77,7 +77,6 @@ public class Experiment implements ModelElement {
         this.numMaxInstructions = numMaxInstructions;
         this.contextMappings = new ArrayList<ContextMapping>(contextMappings);
         this.architectureId = architecture.getId();
-        this.stats = new LinkedHashMap<String, String>();
         this.createTime = DateHelper.toTick(new Date());
     }
 
@@ -135,11 +134,15 @@ public class Experiment implements ModelElement {
     }
 
     public Map<String, String> getStats() {
+        if(stats == null) {
+            stats = new LinkedHashMap<String, String>();
+        }
+
         return stats;
     }
 
     public String getStatValue(String key) {
-        return stats.containsKey(key) ? stats.get(key).replaceAll(",", "") : null;
+        return getStats().containsKey(key) ? getStats().get(key).replaceAll(",", "") : null;
     }
 
     public List<String> getStatValues(List<String> keys) {
@@ -174,12 +177,6 @@ public class Experiment implements ModelElement {
             default:
                 throw new IllegalArgumentException();
         }
-    }
-
-    public void reset() {
-        this.failedReason = "";
-        this.state = ExperimentState.PENDING;
-        stats.clear();
     }
 
     @Override

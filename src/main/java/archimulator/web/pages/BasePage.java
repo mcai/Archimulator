@@ -18,105 +18,69 @@
  ******************************************************************************/
 package archimulator.web.pages;
 
-import archimulator.model.User;
 import archimulator.web.ArchimulatorSession;
-import archimulator.web.assets.base.FixBootstrapStylesCssResourceReference;
-import archimulator.web.components.Footer;
-import de.agilecoders.wicket.markup.html.bootstrap.behavior.BootstrapBaseBehavior;
 import de.agilecoders.wicket.markup.html.bootstrap.behavior.CssClassNameAppender;
-import de.agilecoders.wicket.markup.html.bootstrap.html.ChromeFrameMetaTag;
-import de.agilecoders.wicket.markup.html.bootstrap.html.HtmlTag;
-import de.agilecoders.wicket.markup.html.bootstrap.html.MetaTag;
-import de.agilecoders.wicket.markup.html.bootstrap.html.OptimizedMobileViewportMetaTag;
-import org.apache.wicket.markup.head.CssHeaderItem;
-import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.GenericWebPage;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.list.ListItem;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 
 public abstract class BasePage<T> extends GenericWebPage<T> {
-    private PageType pageType;
-
-    public BasePage(PageType pageType, PageParameters parameters) {
+    public BasePage(final PageType pageType, PageParameters parameters) {
         super(parameters);
 
-        this.pageType = pageType;
+        add(new ListItem("li_nav_home", 0) {{
+            if (pageType == PageType.HOME) {
+                add(new CssClassNameAppender("active"));
+            }
+        }});
 
-        add(new HtmlTag("html"));
+        add(new ListItem("li_nav_simulated_programs", 1){{
+            if (pageType == PageType.SIMULATED_PROGRAMS) {
+                add(new CssClassNameAppender("active"));
+            }
+        }});
 
-        add(new OptimizedMobileViewportMetaTag("viewport"));
-        add(new ChromeFrameMetaTag("chrome-frame"));
-        add(new MetaTag("description", Model.of("description"), Model.of("Archimulator")));
-        add(new MetaTag("author", Model.of("author"), Model.of("Min Cai <min.cai.china@gmail.com>")));
+        add(new ListItem("li_nav_architectures", 2){{
+            if (pageType == PageType.ARCHITECTURES) {
+                add(new CssClassNameAppender("active"));
+            }
+        }});
 
-        ListItem listItemNavHome = new ListItem("li_nav_home", 0);
-        ListItem listItemNavSimulatedPrograms = new ListItem("li_nav_simulated_programs", 1);
-        ListItem listItemNavArchitectures = new ListItem("li_nav_architectures", 2);
-        ListItem listItemNavExperiments = new ListItem("li_nav_experiments", 3);
-        ListItem listItemNavFaq = new ListItem("li_nav_faq", 4);
+        add(new ListItem("li_nav_experiments", 3){{
+            if (pageType == PageType.EXPERIMENTS) {
+                add(new CssClassNameAppender("active"));
+            }
+        }});
 
-        if (this.pageType == PageType.HOME) {
-            listItemNavHome.add(new CssClassNameAppender("active"));
-        }
+        add(new ListItem("li_nav_experiment_packs", 4){{
+            if (pageType == PageType.EXPERIMENT_PACKS) {
+                add(new CssClassNameAppender("active"));
+            }
+        }});
 
-        if (this.pageType == PageType.SIMULATED_PROGRAMS) {
-            listItemNavSimulatedPrograms.add(new CssClassNameAppender("active"));
-        }
+        add(new ListItem("li_nav_faq", 5){{
+            if (pageType == PageType.FAQ) {
+                add(new CssClassNameAppender("active"));
+            }
+        }});
 
-        if (this.pageType == PageType.ARCHITECTURES) {
-            listItemNavArchitectures.add(new CssClassNameAppender("active"));
-        }
+        add(new WebMarkupContainer("div_nav_sign_in"){{
+            setVisible(!ArchimulatorSession.get().isSignedIn());
+        }});
 
-        if (this.pageType == PageType.EXPERIMENTS) {
-            listItemNavExperiments.add(new CssClassNameAppender("active"));
-        }
+        add(new WebMarkupContainer("div_nav_sign_out") {{
+            add(new Label("button_nav_user", new PropertyModel<String>(BasePage.this, "userName")) {{
+                setVisible(ArchimulatorSession.get().isSignedIn());
+            }});
 
-        if (this.pageType == PageType.FAQ) {
-            listItemNavFaq.add(new CssClassNameAppender("active"));
-        }
-
-        add(listItemNavHome);
-        add(listItemNavSimulatedPrograms);
-        add(listItemNavArchitectures);
-        add(listItemNavExperiments);
-        add(listItemNavFaq);
-
-        WebMarkupContainer divNavSignIn = new WebMarkupContainer("div_nav_sign_in");
-        add(divNavSignIn);
-        divNavSignIn.setVisible(!ArchimulatorSession.get().isSignedIn());
-
-        WebMarkupContainer divNavSignUp = new WebMarkupContainer("div_nav_sign_up");
-        add(divNavSignUp);
-        divNavSignUp.setVisible(!ArchimulatorSession.get().isSignedIn());
-
-        WebMarkupContainer divNavUser = new WebMarkupContainer("div_nav_user");
-        add(divNavUser);
-        divNavUser.setVisible(ArchimulatorSession.get().isSignedIn());
-
-        Label buttonNavUser = new Label("button_nav_user", new PropertyModel<User>(this, "session.user.name"));
-        divNavUser.add(buttonNavUser);
-        buttonNavUser.setVisible(ArchimulatorSession.get().isSignedIn());
-
-        WebMarkupContainer divNavSignOut = new WebMarkupContainer("div_nav_sign_out");
-        add(divNavSignOut);
-        divNavSignOut.setVisible(ArchimulatorSession.get().isSignedIn());
-
-        add(new Footer("footer"));
-
-        add(new BootstrapBaseBehavior());
+            setVisible(ArchimulatorSession.get().isSignedIn());
+        }});
     }
 
-    @Override
-    public void renderHead(IHeaderResponse response) {
-        super.renderHead(response);
-        response.render(CssHeaderItem.forReference(FixBootstrapStylesCssResourceReference.INSTANCE));
-    }
-
-    public PageType getPageType() {
-        return pageType;
+    public String getUserName() {
+        return getSession() != null ? "Logout as: " + ((ArchimulatorSession)getSession()).getUser().getName() : null;
     }
 }

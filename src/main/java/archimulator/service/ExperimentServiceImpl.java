@@ -68,12 +68,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         this.experiments = createDao(Experiment.class);
         this.experimentPacks = createDao(ExperimentPack.class);
 
-        for (Experiment experiment : getAllExperiments()) {
-            if (experiment.getState() == ExperimentState.READY_TO_RUN || experiment.getState() == ExperimentState.RUNNING) {
-                experiment.reset();
-                updateExperiment(experiment);
-            }
-        }
+        this.cleanUpExperiments();
 
         //TODO: to be exposed as import/upload experiment pack via web UI
         try {
@@ -109,6 +104,21 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
                 }
             }
         } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void cleanUpExperiments() {
+        try {
+            UpdateBuilder<Experiment,Long> updateBuilder = this.experiments.updateBuilder();
+            updateBuilder.where().eq("state", ExperimentState.READY_TO_RUN).or().eq("state", ExperimentState.RUNNING);
+            updateBuilder.updateColumnValue("state", ExperimentState.PENDING);
+            updateBuilder.updateColumnValue("failedReason", "");
+            updateBuilder.updateColumnValue("stats", null);
+
+            PreparedUpdate<Experiment> update = updateBuilder.prepare();
+            this.experiments.update(update);
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
