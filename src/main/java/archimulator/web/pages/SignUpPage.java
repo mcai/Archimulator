@@ -29,6 +29,8 @@ public class SignUpPage extends BasePage {
     public SignUpPage(PageParameters parameters) {
         super(PageType.SIGN_UP, parameters);
 
+        setTitle("Sign Up - Archimulator");
+
         add(new TextField<String>("input_email", Model.of(" ")));
         add(new PasswordTextField("input_password", Model.of(" ")));
     }

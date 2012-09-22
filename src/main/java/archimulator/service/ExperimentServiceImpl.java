@@ -410,6 +410,11 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     @Override
+    public ExperimentPack getExperimentPackById(long id) {
+        return this.getItemById(this.experimentPacks, id);
+    }
+
+    @Override
     public ExperimentPack getExperimentPackByTitle(String title) {
         return this.getFirstItemByTitle(this.experimentPacks, title);
     }

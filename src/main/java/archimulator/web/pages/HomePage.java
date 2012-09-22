@@ -29,6 +29,8 @@ public class HomePage extends BasePage {
     public HomePage(PageParameters parameters) {
         super(PageType.HOME, parameters);
 
+        setTitle("Home - Archimulator");
+
         add(new Label("label_version", Model.of("Version " + PropertiesHelper.getVersion())) {{
             setEscapeModelStrings(false);
         }});

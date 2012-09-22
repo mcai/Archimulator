@@ -41,6 +41,8 @@ public class ArchitecturesPage extends AuthenticatedWebPage {
     public ArchitecturesPage(PageParameters parameters) {
         super(PageType.ARCHITECTURES, parameters);
 
+        setTitle("Architectures - Archimulator");
+
         IDataProvider<Architecture> dataProvider = new IDataProvider<Architecture>() {
             @Override
             public Iterator<? extends Architecture> iterator(long first, long count) {

@@ -27,6 +27,8 @@ public class SignInPage extends BasePage {
     public SignInPage(PageParameters parameters) {
         super(PageType.SIGN_IN, parameters);
 
+        setTitle("Sign In - Archimulator");
+
         add(new SignInPanel("div_sign_in", true));
     }
 }

@@ -49,6 +49,8 @@ public class ExperimentsPage extends AuthenticatedWebPage {
     public ExperimentsPage(PageParameters parameters) {
         super(PageType.EXPERIMENTS, parameters);
 
+        setTitle("Experiments - Archimulator");
+
         experimentId = getPageParameters().get("experimentId").toString();
         experimentType = getPageParameters().get("experimentType").toString();
         experimentState = getPageParameters().get("experimentState").toString();

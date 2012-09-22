@@ -25,5 +25,7 @@ import org.wicketstuff.annotation.mount.MountPath;
 public class FaqPage extends BasePage {
     public FaqPage(PageParameters parameters) {
         super(PageType.FAQ, parameters);
+
+        setTitle("Frequently Asked Questions - Archimulator");
     }
 }

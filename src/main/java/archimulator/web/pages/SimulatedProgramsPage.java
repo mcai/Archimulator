@@ -40,6 +40,8 @@ public class SimulatedProgramsPage extends AuthenticatedWebPage {
     public SimulatedProgramsPage(PageParameters parameters) {
         super(PageType.SIMULATED_PROGRAMS, parameters);
 
+        setTitle("Simulated Programs - Archimulator");
+
         IDataProvider<SimulatedProgram> dataProvider = new IDataProvider<SimulatedProgram>() {
             @Override
             public Iterator<? extends SimulatedProgram> iterator(long first, long count) {
@@ -76,7 +78,7 @@ public class SimulatedProgramsPage extends AuthenticatedWebPage {
                 WebMarkupContainer cellOperations = new WebMarkupContainer("cell_operations");
 
                 cellOperations.add(new Label("button_edit", "Edit"){{
-                    add(new AttributeAppender("href", "./simulated_program?simulated_program_id=" + simulatedProgram.getId()));
+                    add(new AttributeAppender("href", "./simulated_program?action=edit&simulated_program_id=" + simulatedProgram.getId()));
                 }});
 
                 item.add(cellOperations);

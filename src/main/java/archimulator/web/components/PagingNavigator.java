@@ -27,8 +27,8 @@ import org.apache.wicket.markup.html.panel.Panel;
 
 public class PagingNavigator extends Panel {
     private PagingNavigation pagingNavigation;
-    private final IPageable pageable;
-    private final IPagingLabelProvider labelProvider;
+    private IPageable pageable;
+    private IPagingLabelProvider labelProvider;
 
     public PagingNavigator(final String id, final IPageable pageable) {
         this(id, pageable, null);
@@ -79,13 +79,11 @@ public class PagingNavigator extends Panel {
         return new PagingNavigation(id, pageable, labelProvider);
     }
 
-    public final PagingNavigation getPagingNavigation() {
+    public PagingNavigation getPagingNavigation() {
         return pagingNavigation;
     }
 
-    private final class TitleAppender extends Behavior {
-        private static final long serialVersionUID = 1L;
-
+    private class TitleAppender extends Behavior {
         private final String resourceKey;
 
         public TitleAppender(String resourceKey) {

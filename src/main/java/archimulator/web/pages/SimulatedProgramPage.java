@@ -21,8 +21,14 @@ package archimulator.web.pages;
 import archimulator.model.SimulatedProgram;
 import archimulator.service.ServiceManager;
 import net.pickapack.dateTime.DateHelper;
+import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.Button;
+import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.RequiredTextField;
 import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.wicketstuff.annotation.mount.MountPath;
 
@@ -31,20 +37,63 @@ public class SimulatedProgramPage extends AuthenticatedWebPage {
     public SimulatedProgramPage(PageParameters parameters) {
         super(PageType.SIMULATED_PROGRAM, parameters);
 
-        long simulatedProgramId = parameters.get("simulated_program_id").toLong();
-        SimulatedProgram simulatedProgram = ServiceManager.getSimulatedProgramService().getSimulatedProgramById(simulatedProgramId);
+        final SimulatedProgram simulatedProgram;
 
-        if(simulatedProgram == null) {
+        final String action = parameters.get("action").toString();
+
+        if (action.equals("add")) {
+            simulatedProgram = new SimulatedProgram("", "", "", "");
+        } else if (action.equals("edit")) {
+            long simulatedProgramId = parameters.get("simulated_program_id").toLong();
+            simulatedProgram = ServiceManager.getSimulatedProgramService().getSimulatedProgramById(simulatedProgramId);
+        } else {
+            throw new IllegalArgumentException();
+        }
+
+        if (simulatedProgram == null) {
             setResponsePage(HomePage.class);
             return;
         }
 
-        this.add(new TextField<String>("input_id", Model.of(simulatedProgram.getId() + "")));
-        this.add(new TextField<String>("input_title", Model.of(simulatedProgram.getTitle())));
-        this.add(new TextField<String>("input_executable", Model.of(simulatedProgram.getExecutable())));
-        this.add(new TextField<String>("input_default_arguments", Model.of(simulatedProgram.getDefaultArguments())));
-        this.add(new TextField<String>("input_stdin", Model.of(simulatedProgram.getStandardIn())));
-        this.add(new TextField<String>("input_helper_thread", Model.of(simulatedProgram.getHelperThreadEnabled() + "")));
-        this.add(new TextField<String>("input_create_time", Model.of(DateHelper.toString(simulatedProgram.getCreateTime()))));
+        setTitle((action.equals("add") ? "Add" : "Edit") + " Simulated Program - Archimulator");
+
+        this.add(new Label("section_header_simulated_program", (action.equals("add") ? "Add" : "Edit") + " Simulated Program"));
+
+        add(new FeedbackPanel("span_feedback"));
+
+        this.add(new Form("form_simulated_program") {{
+            this.add(new TextField<Long>("input_id", Model.of(simulatedProgram.getId())));
+            this.add(new RequiredTextField<String>("input_title", new PropertyModel<String>(simulatedProgram, "title")));
+            this.add(new RequiredTextField<String>("input_executable", new PropertyModel<String>(simulatedProgram, "executable")));
+            this.add(new TextField<String>("input_default_arguments", new PropertyModel<String>(simulatedProgram, "defaultArguments")));
+            this.add(new TextField<String>("input_stdin", new PropertyModel<String>(simulatedProgram, "standardIn")));
+            this.add(new RequiredTextField<Boolean>("input_helper_thread", new PropertyModel<Boolean>(simulatedProgram, "helperThreadEnabled")));
+            this.add(new TextField<String>("input_create_time", Model.of(DateHelper.toString(simulatedProgram.getCreateTime()))));
+
+            this.add(new Button("button_save", Model.of(action.equals("add") ? "Add" : "Save")) {
+                @Override
+                public void onSubmit() {
+                    if(action.equals("add")) {
+                        ServiceManager.getSimulatedProgramService().addSimulatedProgram(simulatedProgram);
+                    }
+                    else {
+                        ServiceManager.getSimulatedProgramService().updateSimulatedProgram(simulatedProgram);
+                    }
+                    setResponsePage(SimulatedProgramsPage.class);
+                }
+            });
+
+            this.add(new Button("button_remove") {
+                {
+                    setVisible(action.equals("edit"));
+                }
+
+                @Override
+                public void onSubmit() {
+                    ServiceManager.getSimulatedProgramService().removeSimulatedProgramById(simulatedProgram.getId());
+                    setResponsePage(SimulatedProgramsPage.class);
+                }
+            });
+        }});
     }
 }

@@ -69,6 +69,8 @@ public interface ExperimentService extends Service {
 
     List<ExperimentPack> getAllExperimentPacks(long first, long count);
 
+    ExperimentPack getExperimentPackById(long id);
+
     ExperimentPack getExperimentPackByTitle(String title);
 
     void addExperimentPack(ExperimentPack experimentPack);

@@ -39,6 +39,8 @@ public class ExperimentPage extends AuthenticatedWebPage {
             return;
         }
 
+        setTitle((experimentId == -1 ? "Add" : "Edit") + " Experiment - Archimulator");
+
         this.add(new TextField<String>("input_id", Model.of(experiment.getId() + "")));
         this.add(new TextField<String>("input_title", Model.of(experiment.getTitle())));
         this.add(new TextField<String>("input_type", Model.of(experiment.getType() + "")));

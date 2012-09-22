@@ -33,12 +33,15 @@ public class ArchitecturePage extends AuthenticatedWebPage {
         super(PageType.ARCHITECTURE, parameters);
 
         long architectureId = parameters.get("architecture_id").toLong();
+
         Architecture architecture = ServiceManager.getArchitectureService().getArchitectureById(architectureId);
 
         if(architecture == null) {
             setResponsePage(HomePage.class);
             return;
         }
+
+        setTitle((architectureId == -1 ? "Add" : "Edit") + " Architecture - Archimulator");
 
         this.add(new TextField<String>("input_id", Model.of(architecture.getId() + "")));
         this.add(new TextField<String>("input_title", Model.of(architecture.getTitle())));

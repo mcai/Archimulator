@@ -30,19 +30,16 @@ public class ExperimentPackPage extends AuthenticatedWebPage {
     public ExperimentPackPage(PageParameters parameters) {
         super(PageType.EXPERIMENT_PACK, parameters);
 
-        String experimentPackTitle = parameters.get("experiment_pack_title").toString();
+        long experimentPackId = parameters.get("experiment_pack_id").toLong();
 
-        if(experimentPackTitle == null) {
-            setResponsePage(HomePage.class);
-            return;
-        }
-
-        ExperimentPack experimentPack = ServiceManager.getExperimentService().getExperimentPackByTitle(experimentPackTitle);
+        ExperimentPack experimentPack = ServiceManager.getExperimentService().getExperimentPackById(experimentPackId);
 
         if(experimentPack == null) {
             setResponsePage(HomePage.class);
             return;
         }
+
+        setTitle((experimentPackId == -1 ? "Add" : "Edit") + " Experiment Pack - Archimulator");
 
         this.add(new TextField<String>("input_title", Model.of(experimentPack.getTitle())));
     }

@@ -1,23 +1,19 @@
 <!DOCTYPE html>
 <html wicket:id="html" xmlns:wicket="http://wicket.apache.org">
-<head>
-    <meta charset="utf-8"/>
-    <title>Simulated Program - Archimulator</title>
-</head>
 <body>
 <wicket:extend>
 
     <div class="container">
         <section>
             <div class="page-header">
-                <h1>
-                    Simulated Program
-                </h1>
+                <h1 wicket:id="section_header_simulated_program"></h1>
             </div>
+
+            <span wicket:id="span_feedback"></span>
 
             <div class="row">
 
-                <form class="form-horizontal span12">
+                <form class="form-horizontal span12" wicket:id="form_simulated_program">
 
                     <div class="row">
                         <div class="span9">
@@ -82,9 +78,9 @@
                     </div>
 
                     <div class="form-actions">
-                        <a href="#" class="btn btn-primary save">Save</a>
+                        <input type="submit" value="Save" class="btn btn-primary save" wicket:id="button_save"/>
                         <a href="./simulated_programs" class="btn">Cancel</a>
-                        <a href="#" class="btn btn-danger">Remove</a>
+                        <input type="submit" value="Remove" class="btn btn-danger" wicket:id="button_remove"/>
                     </div>
 
                 </form>

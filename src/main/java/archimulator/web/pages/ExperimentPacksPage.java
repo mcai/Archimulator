@@ -44,6 +44,8 @@ public class ExperimentPacksPage extends AuthenticatedWebPage {
     public ExperimentPacksPage(PageParameters parameters) {
         super(PageType.EXPERIMENT_PACKS, parameters);
 
+        setTitle("Experiment Packs - Archimulator");
+
         IDataProvider<ExperimentPack> dataProvider = new IDataProvider<ExperimentPack>() {
             @Override
             public Iterator<? extends ExperimentPack> iterator(long first, long count) {
@@ -136,7 +138,7 @@ public class ExperimentPacksPage extends AuthenticatedWebPage {
 
                 item.add(new WebMarkupContainer("cell_operations_2") {{
                     add(new Label("button_edit", "Edit") {{
-                        add(new AttributeAppender("href", "./experiment_pack?experiment_pack_title=" + experimentPack.getTitle()));
+                        add(new AttributeAppender("href", "./experiment_pack?experiment_pack_id=" + experimentPack.getId()));
                     }});
 
                     add(new Link<Void>("button_remove") {

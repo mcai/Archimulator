@@ -28,8 +28,12 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 
 public abstract class BasePage<T> extends GenericWebPage<T> {
+    private String title = "Archimulator";
+
     public BasePage(final PageType pageType, PageParameters parameters) {
         super(parameters);
+
+        add(new Label("title", new PropertyModel<String>(this, "title")));
 
         add(new ListItem("li_nav_home", 0) {{
             if (pageType == PageType.HOME) {
@@ -82,5 +86,13 @@ public abstract class BasePage<T> extends GenericWebPage<T> {
 
     public String getUserName() {
         return getSession() != null ? "Logout as: " + ((ArchimulatorSession)getSession()).getUser().getName() : null;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 }

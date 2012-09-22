@@ -26,6 +26,8 @@ public class SignOutPage extends BasePage {
     public SignOutPage(PageParameters parameters) {
         super(PageType.SIGN_OUT, parameters);
 
+        setTitle("Sign Out - Archimulator");
+
         getSession().invalidate();
         setResponsePage(getApplication().getHomePage());
     }
