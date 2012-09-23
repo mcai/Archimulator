@@ -98,14 +98,14 @@ public class ExperimentsPage extends AuthenticatedWebPage {
                 item.add(new Label("cell_title", experiment.getTitle()));
                 item.add(new Label("cell_type", experiment.getType() + ""));
                 item.add(new Label("cell_state", experiment.getState() + ""));
-                item.add(new Label("cell_architecture", experiment.getArchitecture().getTitle()));
+                item.add(new Label("cell_architecture", String.format("{%d} %s", experiment.getArchitecture().getId(), experiment.getArchitecture().getTitle())));
                 item.add(new Label("cell_num_max_instructions", experiment.getNumMaxInstructions() + ""));
                 item.add(new Label("cell_create_time", DateHelper.toString(experiment.getCreateTime())));
 
                 WebMarkupContainer cellOperations = new WebMarkupContainer("cell_operations");
 
                 cellOperations.add(new Label("button_edit", "Edit") {{
-                    add(new AttributeAppender("href", "./experiment?experiment_id=" + experiment.getId()));
+                    add(new AttributeAppender("href", "./experiment?action=edit&experiment_id=" + experiment.getId()));
                 }});
 
                 item.add(cellOperations);

@@ -6,14 +6,14 @@
     <div class="container">
         <section>
             <div class="page-header">
-                <h1>
-                    Architecture
-                </h1>
+                <h1 wicket:id="section_header_architecture"></h1>
             </div>
+
+            <span wicket:id="span_feedback"></span>
 
             <div class="row">
 
-                <form class="form-horizontal span12">
+                <form class="form-horizontal span12" wicket:id="form_architecture">
 
                     <div class="row">
                         <div class="span9">
@@ -30,23 +30,31 @@
                                 <label for="input_title" class="control-label">Title:</label>
 
                                 <div class="controls">
-                                    <input type="text" id="input_title" class="span9" wicket:id="input_title"/>
+                                    <input type="text" id="input_title" class="span9" disabled wicket:id="input_title"/>
                                 </div>
                             </div>
 
                             <div class="control-group">
-                                <label for="input_num_cores" class="control-label"># Cores:</label>
+                                <label for="input_ht_llc_request_profiling_enabled" class="control-label">HT LLC Request Profiling Enabled:</label>
 
                                 <div class="controls">
-                                    <input type="text" id="input_num_cores" wicket:id="input_num_cores"/>
+                                    <input type="checkbox" id="input_ht_llc_request_profiling_enabled" wicket:id="input_ht_llc_request_profiling_enabled" />
                                 </div>
                             </div>
 
                             <div class="control-group">
-                                <label for="input_num_threads_per_core" class="control-label"># Threads Per Core:</label>
+                                <label for="input_num_cores" class="control-label">Number of Cores:</label>
 
                                 <div class="controls">
-                                    <input type="text" id="input_num_threads_per_core" wicket:id="input_num_threads_per_core"/>
+                                    <input type="number" id="input_num_cores" wicket:id="input_num_cores"/>
+                                </div>
+                            </div>
+
+                            <div class="control-group">
+                                <label for="input_num_threads_per_core" class="control-label">Number of Threads Per Core:</label>
+
+                                <div class="controls">
+                                    <input type="number" id="input_num_threads_per_core" wicket:id="input_num_threads_per_core"/>
                                 </div>
                             </div>
 
@@ -59,10 +67,10 @@
                             </div>
 
                             <div class="control-group">
-                                <label for="input_l1I_associativity" class="control-label">L1I Assoc:</label>
+                                <label for="input_l1I_associativity" class="control-label">L1I Associativity:</label>
 
                                 <div class="controls">
-                                    <input type="text" id="input_l1I_associativity" wicket:id="input_l1I_associativity"/>
+                                    <input type="number" id="input_l1I_associativity" wicket:id="input_l1I_associativity"/>
                                 </div>
                             </div>
 
@@ -75,10 +83,10 @@
                             </div>
 
                             <div class="control-group">
-                                <label for="input_l1D_associativity" class="control-label">L1D Assoc:</label>
+                                <label for="input_l1D_associativity" class="control-label">L1D Associativity:</label>
 
                                 <div class="controls">
-                                    <input type="text" id="input_l1D_associativity" wicket:id="input_l1D_associativity"/>
+                                    <input type="number" id="input_l1D_associativity" wicket:id="input_l1D_associativity"/>
                                 </div>
                             </div>
 
@@ -91,18 +99,18 @@
                             </div>
 
                             <div class="control-group">
-                                <label for="input_l2_associativity" class="control-label">L2 Assoc:</label>
+                                <label for="input_l2_associativity" class="control-label">L2 Associativity:</label>
 
                                 <div class="controls">
-                                    <input type="text" id="input_l2_associativity" wicket:id="input_l2_associativity"/>
+                                    <input type="number" id="input_l2_associativity" wicket:id="input_l2_associativity"/>
                                 </div>
                             </div>
 
                             <div class="control-group">
-                                <label for="input_l2_repl" class="control-label">L2 Repl:</label>
+                                <label for="select_l2_repl" class="control-label">L2 Replacement Policy:</label>
 
                                 <div class="controls">
-                                    <input type="text" id="input_l2_repl" class="span9" wicket:id="input_l2_repl"/>
+                                    <select id="select_l2_repl" wicket:id="select_l2_repl"></select>
                                 </div>
                             </div>
 
@@ -118,9 +126,9 @@
                     </div>
 
                     <div class="form-actions">
-                        <a href="#" class="btn btn-primary save">Save</a>
+                        <input type="submit" value="Save" class="btn btn-primary save" wicket:id="button_save"/>
                         <a href="./architectures" class="btn">Cancel</a>
-                        <a href="#" class="btn btn-danger">Remove</a>
+                        <input type="submit" value="Remove" class="btn btn-danger" wicket:id="button_remove"/>
                     </div>
 
                 </form>

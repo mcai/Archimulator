@@ -18,35 +18,111 @@
  ******************************************************************************/
 package archimulator.web.pages;
 
-import archimulator.model.Experiment;
+import archimulator.model.*;
 import archimulator.service.ServiceManager;
 import net.pickapack.dateTime.DateHelper;
-import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.*;
+import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.wicketstuff.annotation.mount.MountPath;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @MountPath(value = "/", alt = "/experiment")
 public class ExperimentPage extends AuthenticatedWebPage {
     public ExperimentPage(PageParameters parameters) {
         super(PageType.EXPERIMENT, parameters);
 
-        long experimentId = parameters.get("experiment_id").toLong();
-        Experiment experiment = ServiceManager.getExperimentService().getExperimentById(experimentId);
+        final String action = parameters.get("action").toString();
+
+        final Experiment experiment;
+
+        if (action.equals("add")) {
+            List<ContextMapping> contextMappings = new ArrayList<ContextMapping>();
+            SimulatedProgram simulatedProgram = ServiceManager.getSimulatedProgramService().getFirstSimulatedProgram();
+            contextMappings.add(new ContextMapping(0, simulatedProgram, simulatedProgram.getDefaultArguments()));
+
+            experiment = new Experiment(ExperimentType.DETAILED, ServiceManager.getArchitectureService().getFirstArchitecture(), -1, contextMappings);
+        } else if (action.equals("edit")) {
+            long experimentId = parameters.get("experiment_id").toLong();
+            experiment = ServiceManager.getExperimentService().getExperimentById(experimentId);
+        } else {
+            throw new IllegalArgumentException();
+        }
 
         if(experiment == null) {
             setResponsePage(HomePage.class);
             return;
         }
 
-        setTitle((experimentId == -1 ? "Add" : "Edit") + " Experiment - Archimulator");
+        setTitle((action.equals("add") ? "Add" : "Edit") + " Experiment - Archimulator");
 
-        this.add(new TextField<String>("input_id", Model.of(experiment.getId() + "")));
-        this.add(new TextField<String>("input_title", Model.of(experiment.getTitle())));
-        this.add(new TextField<String>("input_type", Model.of(experiment.getType() + "")));
-        this.add(new TextField<String>("input_state", Model.of(experiment.getState() + "")));
-        this.add(new TextField<String>("input_architecture", Model.of(experiment.getArchitecture().getTitle())));
-        this.add(new TextField<String>("input_num_max_instructions", Model.of(experiment.getNumMaxInstructions() + "")));
-        this.add(new TextField<String>("input_create_time", Model.of(DateHelper.toString(experiment.getCreateTime()))));
+        this.add(new Label("section_header_experiment", (action.equals("add") ? "Add" : "Edit") + " Experiment"));
+
+        add(new FeedbackPanel("span_feedback"));
+
+        this.add(new Form("form_experiment") {{
+            this.add(new TextField<String>("input_id", Model.of(experiment.getId() + "")));
+            this.add(new TextField<String>("input_title", Model.of(experiment.getTitle())));
+
+            this.add(new DropDownChoice<ExperimentType>("select_type", new PropertyModel<ExperimentType>(experiment, "type"), Arrays.asList(ExperimentType.values())));
+            this.add(new DropDownChoice<ExperimentState>("select_state", new PropertyModel<ExperimentState>(experiment, "state"), Arrays.asList(ExperimentState.values())));
+
+            this.add(new DropDownChoice<Architecture>("select_architecture", new PropertyModel<Architecture>(experiment, "architecture"), ServiceManager.getArchitectureService().getAllArchitectures(), new IChoiceRenderer<Architecture>() {
+                @Override
+                public Object getDisplayValue(Architecture architecture) {
+                    return String.format("{%d} %s", architecture.getId(), architecture.getTitle());
+                }
+
+                @Override
+                public String getIdValue(Architecture architecture, int index) {
+                    return architecture.getTitle();
+                }
+            }));
+
+            this.add(new NumberTextField<Integer>("input_num_max_instructions", new PropertyModel<Integer>(experiment, "numMaxInstructions")));
+            this.add(new TextField<String>("input_create_time", Model.of(DateHelper.toString(experiment.getCreateTime()))));
+
+            this.add(new Button("button_save", Model.of(action.equals("add") ? "Add" : "Save")) {
+                @Override
+                public void onSubmit() {
+                    if (action.equals("add")) {
+                        experiment.updateTitle();
+
+                        if(ServiceManager.getExperimentService().getLatestExperimentByTitle(experiment.getTitle()) == null) {
+                            ServiceManager.getExperimentService().addExperiment(experiment);
+                        }
+                    } else {
+                        experiment.updateTitle();
+
+                        Experiment experimentWithSameTitle = ServiceManager.getExperimentService().getLatestExperimentByTitle(experiment.getTitle());
+                        if(experimentWithSameTitle != null && experimentWithSameTitle.getId() != experiment.getId()) {
+                            ServiceManager.getExperimentService().removeExperimentById(experiment.getId());
+                        }
+                        else {
+                            ServiceManager.getExperimentService().updateExperiment(experiment);
+                        }
+                    }
+                    setResponsePage(ExperimentsPage.class);
+                }
+            });
+
+            this.add(new Button("button_remove") {
+                {
+                    setVisible(action.equals("edit"));
+                }
+
+                @Override
+                public void onSubmit() {
+                    ServiceManager.getExperimentService().removeExperimentById(experiment.getId());
+                    setResponsePage(ExperimentsPage.class);
+                }
+            });
+        }});
     }
 }

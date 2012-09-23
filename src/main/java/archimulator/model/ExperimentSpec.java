@@ -72,8 +72,6 @@ public class ExperimentSpec implements Serializable {
 
     private transient String arguments;
 
-    private transient String title;
-
     public ExperimentSpec() {
     }
 
@@ -245,29 +243,5 @@ public class ExperimentSpec implements Serializable {
         }
 
         return arguments;
-    }
-
-    public String getTitle() {
-        if(title == null) {
-            title = buildExperimentTitle(getParent().getExperimentType(), helperThreadLookahead, helperThreadStride, getArchitecture().getTitle(), simulatedProgramTitle, getArguments());
-        }
-
-        return title;
-    }
-
-    private static String buildExperimentTitle(ExperimentType experimentType, int helperThreadLookahead, int helperThreadStride, String architectureTitle, String simulatedProgramTitle, String contextMappingArguments) {
-        String title = simulatedProgramTitle.replaceAll(" ", "_") + "_" + contextMappingArguments.replaceAll(" ", "_");
-
-        if (experimentType == ExperimentType.FUNCTIONAL) {
-            title += "-functional";
-        }
-        else {
-            if(helperThreadLookahead != -1) {
-                title += "-lookahead_" + helperThreadLookahead + "-stride_" + helperThreadStride;
-            }
-
-            title += "-" + architectureTitle;
-        }
-        return title;
     }
 }

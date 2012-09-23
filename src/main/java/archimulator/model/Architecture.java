@@ -23,8 +23,10 @@ import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
 import archimulator.sim.uncore.dram.MainMemoryType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+import net.pickapack.StorageUnit;
 import net.pickapack.dateTime.DateHelper;
 import net.pickapack.model.ModelElement;
+import net.pickapack.util.StorageUnitHelper;
 
 import java.util.Date;
 
@@ -252,9 +254,101 @@ public class Architecture implements ModelElement {
     public Architecture() {
     }
 
-    public Architecture(String title) {
-        this.title = title;
+    public Architecture(boolean htLLCRequestProfilingEnabled, int numCores, int numThreadsPerCore, int l1ISize, int l1IAssoc, int l1DSize, int l1DAssoc, int l2Size, int l2Assoc, CacheReplacementPolicyType l2ReplacementPolicyType) {
         this.createTime = DateHelper.toTick(new Date());
+
+        this.helperThreadPthreadSpawnIndex = 3720;
+        this.helperThreadL2CacheRequestProfilingEnabled = htLLCRequestProfilingEnabled;
+
+        this.numCores = numCores;
+        this.numThreadsPerCore = numThreadsPerCore;
+
+        this.physicalRegisterFileCapacity = 128;
+        this.decodeWidth = 4;
+        this.issueWidth = 4;
+        this.commitWidth = 4;
+        this.decodeBufferCapacity = 96;
+        this.reorderBufferCapacity = 96;
+        this.loadStoreQueueCapacity = 48;
+
+        this.branchPredictorType = BranchPredictorType.PERFECT;
+
+        this.twoBitBranchPredictorBimodSize = 2048;
+        this.twoBitBranchPredictorBranchTargetBufferNumSets = 512;
+        this.twoBitBranchPredictorBranchTargetBufferAssociativity = 4;
+        this.twoBitBranchPredictorReturnAddressStackSize = 8;
+
+        this.twoLevelBranchPredictorL1Size = 1;
+        this.twoLevelBranchPredictorL2Size = 1024;
+        this.twoLevelBranchPredictorShiftWidth = 8;
+        this.twoLevelBranchPredictorXor = false;
+        this.twoLevelBranchPredictorBranchTargetBufferNumSets = 512;
+        this.twoLevelBranchPredictorBranchTargetBufferAssociativity = 4;
+        this.twoLevelBranchPredictorReturnAddressStackSize = 8;
+
+        this.combinedBranchPredictorBimodSize = 2048;
+        this.combinedBranchPredictorL1Size = 1;
+        this.combinedBranchPredictorL2Size = 1024;
+        this.combinedBranchPredictorMetaSize = 1024;
+        this.combinedBranchPredictorShiftWidth = 8;
+        this.combinedBranchPredictorXor = false;
+        this.combinedBranchPredictorBranchTargetBufferNumSets = 512;
+        this.combinedBranchPredictorBranchTargetBufferAssociativity = 4;
+        this.combinedBranchPredictorReturnAddressStackSize = 8;
+
+        this.tlbSize = 32768;
+        this.tlbAssociativity = 4;
+        this.tlbLineSize = 64;
+        this.tlbHitLatency = 2;
+        this.tlbMissLatency = 30;
+
+        this.l1ISize = l1ISize;
+        this.l1IAssociativity = l1IAssoc;
+        this.l1ILineSize = 64;
+        this.l1IHitLatency = 1;
+        this.l1INumReadPorts = 128;
+        this.l1INumWritePorts = 128;
+        this.l1IReplacementPolicyType = CacheReplacementPolicyType.LRU;
+
+        this.l1DSize = l1DSize;
+        this.l1DAssociativity = l1DAssoc;
+        this.l1DLineSize = 64;
+        this.l1DHitLatency = 1;
+        this.l1DNumReadPorts = 128;
+        this.l1DNumWritePorts = 128;
+        this.l1DReplacementPolicyType = CacheReplacementPolicyType.LRU;
+
+        this.l2Size = l2Size;
+        this.l2Associativity = l2Assoc;
+        this.l2LineSize = 64;
+        this.l2HitLatency = 10;
+        this.l2ReplacementPolicyType = l2ReplacementPolicyType;
+
+        this.mainMemoryType = MainMemoryType.FIXED_LATENCY;
+        this.mainMemoryLineSize = 64;
+
+        this.fixedLatencyMainMemoryLatency = 200;
+
+        this.simpleMainMemoryMemoryLatency = 200;
+        this.simpleMainMemoryMemoryTrunkLatency = 2;
+        this.simpleMainMemoryBusWidth = 4;
+
+        this.basicMainMemoryToDramLatency = 6;
+        this.basicMainMemoryFromDramLatency = 12;
+        this.basicMainMemoryPrechargeLatency = 90;
+        this.basicMainMemoryClosedLatency = 90;
+        this.basicMainMemoryConflictLatency = 90;
+        this.basicMainMemoryBusWidth = 4;
+        this.basicMainMemoryNumBanks = 8;
+        this.basicMainMemoryRowSize = 2048;
+    }
+
+    public void updateTitle() {
+        this.title = "C" + this.numCores + "T" + this.numThreadsPerCore
+                + "-" + "L1I_" + this.l1ISize / 1024 + "KB" + "_" + "Assoc" + this.l1IAssociativity //TODO: use StorageUnit.toString(..) instead
+                + "-" + "l1D_" + this.l1DSize / 1024 + "KB" + "_" + "Assoc" + this.l1DAssociativity //TODO: use StorageUnit.toString(..) instead
+                + "-" + "L2_" + this.l2Size / 1024 + "KB" + "_" + "Assoc" + this.l2Associativity //TODO: use StorageUnit.toString(..) instead
+                + "_" + this.l2ReplacementPolicyType;
     }
 
     @Override
@@ -268,6 +362,10 @@ public class Architecture implements ModelElement {
     }
 
     public String getTitle() {
+        if(title == null) {
+            updateTitle();
+        }
+
         return title;
     }
 
@@ -837,6 +935,30 @@ public class Architecture implements ModelElement {
 
     public void setBasicMainMemoryRowSize(int basicMainMemoryRowSize) {
         this.basicMainMemoryRowSize = basicMainMemoryRowSize;
+    }
+
+    public String getL1ISizeInStorageUnit() {
+        return StorageUnit.toString(l1ISize);
+    }
+
+    public void setL1ISizeInStorageUnit(String l1ISizeInStorageUnit) {
+        this.l1ISize = (int) StorageUnitHelper.displaySizeToByteCount(l1ISizeInStorageUnit);
+    }
+
+    public String getL1DSizeInStorageUnit() {
+        return StorageUnit.toString(l1DSize);
+    }
+
+    public void setL1DSizeInStorageUnit(String l1DSizeInStorageUnit) {
+        this.l1DSize = (int) StorageUnitHelper.displaySizeToByteCount(l1DSizeInStorageUnit);
+    }
+
+    public String getL2SizeInStorageUnit() {
+        return StorageUnit.toString(l2Size);
+    }
+
+    public void setL2SizeInStorageUnit(String l2SizeInStorageUnit) {
+        this.l2Size = (int) StorageUnitHelper.displaySizeToByteCount(l2SizeInStorageUnit);
     }
 
     @Override

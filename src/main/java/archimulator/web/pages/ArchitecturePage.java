@@ -20,40 +20,115 @@ package archimulator.web.pages;
 
 import archimulator.model.Architecture;
 import archimulator.service.ServiceManager;
-import net.pickapack.StorageUnit;
+import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
 import net.pickapack.dateTime.DateHelper;
-import org.apache.wicket.markup.html.form.TextField;
+import net.pickapack.util.StorageUnitHelper;
+import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.*;
+import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.wicketstuff.annotation.mount.MountPath;
+
+import java.util.Arrays;
 
 @MountPath(value = "/", alt = "/architecture")
 public class ArchitecturePage extends AuthenticatedWebPage {
     public ArchitecturePage(PageParameters parameters) {
         super(PageType.ARCHITECTURE, parameters);
 
-        long architectureId = parameters.get("architecture_id").toLong();
+        final String action = parameters.get("action").toString();
 
-        Architecture architecture = ServiceManager.getArchitectureService().getArchitectureById(architectureId);
+        final Architecture architecture;
 
-        if(architecture == null) {
+        if (action.equals("add")) {
+            architecture = new Architecture(false, 2, 2,
+                    (int) StorageUnitHelper.displaySizeToByteCount("32 KB"),
+                    4,
+                    (int) StorageUnitHelper.displaySizeToByteCount("32 KB"),
+                    4,
+                    (int) StorageUnitHelper.displaySizeToByteCount("96 KB"),
+                    8,
+                    CacheReplacementPolicyType.LRU);
+        } else if (action.equals("edit")) {
+            long architectureId = parameters.get("architecture_id").toLong();
+            architecture = ServiceManager.getArchitectureService().getArchitectureById(architectureId);
+        } else {
+            throw new IllegalArgumentException();
+        }
+
+        if (architecture == null) {
             setResponsePage(HomePage.class);
             return;
         }
 
-        setTitle((architectureId == -1 ? "Add" : "Edit") + " Architecture - Archimulator");
+        setTitle((action.equals("add") ? "Add" : "Edit") + " Architecture - Archimulator");
 
-        this.add(new TextField<String>("input_id", Model.of(architecture.getId() + "")));
-        this.add(new TextField<String>("input_title", Model.of(architecture.getTitle())));
-        this.add(new TextField<String>("input_num_cores", Model.of(architecture.getNumCores() + "")));
-        this.add(new TextField<String>("input_num_threads_per_core", Model.of(architecture.getNumThreadsPerCore() + "")));
-        this.add(new TextField<String>("input_l1I_size", Model.of(StorageUnit.toString(architecture.getL1ISize()))));
-        this.add(new TextField<String>("input_l1I_associativity", Model.of(architecture.getL1IAssociativity() + "")));
-        this.add(new TextField<String>("input_l1D_size", Model.of(StorageUnit.toString(architecture.getL1DSize()))));
-        this.add(new TextField<String>("input_l1D_associativity", Model.of(architecture.getL1DAssociativity() + "")));
-        this.add(new TextField<String>("input_l2_size", Model.of(StorageUnit.toString(architecture.getL2Size()))));
-        this.add(new TextField<String>("input_l2_associativity", Model.of(architecture.getL2Associativity() + "")));
-        this.add(new TextField<String>("input_l2_repl", Model.of(architecture.getL2ReplacementPolicyType() + "")));
-        this.add(new TextField<String>("input_create_time", Model.of(DateHelper.toString(architecture.getCreateTime()))));
+        this.add(new Label("section_header_architecture", (action.equals("add") ? "Add" : "Edit") + " Architecture"));
+
+        add(new FeedbackPanel("span_feedback"));
+
+        this.add(new Form("form_architecture") {{
+            this.add(new TextField<String>("input_id", Model.of(architecture.getId() + "")));
+            this.add(new TextField<String>("input_title", Model.of(architecture.getTitle())));
+
+            this.add(new NumberTextField<Integer>("input_num_cores", new PropertyModel<Integer>(architecture, "numCores")));
+            this.add(new NumberTextField<Integer>("input_num_threads_per_core", new PropertyModel<Integer>(architecture, "numThreadsPerCore")));
+
+            this.add(new CheckBox(
+                    "input_ht_llc_request_profiling_enabled",
+                    new PropertyModel<Boolean>(architecture, "helperThreadL2CacheRequestProfilingEnabled")));
+
+            this.add(new RequiredTextField<String>("input_l1I_size", new PropertyModel<String>(architecture, "l1ISizeInStorageUnit")));
+            this.add(new NumberTextField<Integer>("input_l1I_associativity", new PropertyModel<Integer>(architecture, "l1IAssociativity")));
+            this.add(new RequiredTextField<String>("input_l1D_size", new PropertyModel<String>(architecture, "l1DSizeInStorageUnit")));
+            this.add(new NumberTextField<Integer>("input_l1D_associativity", new PropertyModel<Integer>(architecture, "l1DAssociativity")));
+            this.add(new RequiredTextField<String>("input_l2_size", new PropertyModel<String>(architecture, "l2SizeInStorageUnit")));
+            this.add(new NumberTextField<Integer>("input_l2_associativity", new PropertyModel<Integer>(architecture, "l2Associativity")));
+
+            this.add(new DropDownChoice<CacheReplacementPolicyType>(
+                    "select_l2_repl",
+                    new PropertyModel<CacheReplacementPolicyType>(architecture, "l2ReplacementPolicyType"),
+                    Arrays.asList(CacheReplacementPolicyType.values())));
+
+            this.add(new TextField<String>("input_create_time", Model.of(DateHelper.toString(architecture.getCreateTime()))));
+
+            this.add(new Button("button_save", Model.of(action.equals("add") ? "Add" : "Save")) {
+                @Override
+                public void onSubmit() {
+                    if (action.equals("add")) {
+                        architecture.updateTitle();
+
+                        if(ServiceManager.getArchitectureService().getArchitectureByTitle(architecture.getTitle()) == null) {
+                            ServiceManager.getArchitectureService().addArchitecture(architecture);
+                        }
+                    } else {
+                        architecture.updateTitle();
+
+                        Architecture architectureWithSameTitle = ServiceManager.getArchitectureService().getArchitectureByTitle(architecture.getTitle());
+                        if(architectureWithSameTitle != null && architectureWithSameTitle.getId() != architecture.getId()) {
+                            ServiceManager.getArchitectureService().removeArchitectureById(architecture.getId());
+                        }
+                        else {
+                            ServiceManager.getArchitectureService().updateArchitecture(architecture);
+                        }
+                    }
+                    setResponsePage(ArchitecturesPage.class);
+                }
+            });
+
+            this.add(new Button("button_remove") {
+                {
+                    setVisible(action.equals("edit"));
+                }
+
+                @Override
+                public void onSubmit() {
+                    ServiceManager.getArchitectureService().removeArchitectureById(architecture.getId());
+                    setResponsePage(ArchitecturesPage.class);
+                }
+            });
+        }});
     }
 }

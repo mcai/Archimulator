@@ -85,7 +85,7 @@ public class ArchitecturesPage extends AuthenticatedWebPage {
                 WebMarkupContainer cellOperations = new WebMarkupContainer("cell_operations");
 
                 cellOperations.add(new Label("button_edit", "Edit"){{
-                    add(new AttributeAppender("href", "./architecture?architecture_id=" + architecture.getId()));
+                    add(new AttributeAppender("href", "./architecture?action=edit&architecture_id=" + architecture.getId()));
                 }});
 
                 item.add(cellOperations);

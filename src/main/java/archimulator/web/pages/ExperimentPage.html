@@ -6,14 +6,14 @@
     <div class="container">
         <section>
             <div class="page-header">
-                <h1>
-                    Experiment
-                </h1>
+                <h1 wicket:id="section_header_experiment"></h1>
             </div>
+
+            <span wicket:id="span_feedback"></span>
 
             <div class="row">
 
-                <form class="form-horizontal span12">
+                <form class="form-horizontal span12" wicket:id="form_experiment">
 
                     <div class="row">
                         <div class="span9">
@@ -30,31 +30,31 @@
                                 <label for="input_title" class="control-label">Title:</label>
 
                                 <div class="controls">
-                                    <input type="text" id="input_title" class="span9" wicket:id="input_title"/>
+                                    <input type="text" id="input_title" class="span9" disabled wicket:id="input_title"/>
                                 </div>
                             </div>
 
                             <div class="control-group">
-                                <label for="input_type" class="control-label">Type:</label>
+                                <label for="select_type" class="control-label">Type:</label>
 
                                 <div class="controls">
-                                    <input type="text" id="input_type" wicket:id="input_type"/>
+                                    <select id="select_type" wicket:id="select_type"></select>
                                 </div>
                             </div>
 
                             <div class="control-group">
-                                <label for="input_state" class="control-label">State:</label>
+                                <label for="select_state" class="control-label">State:</label>
 
                                 <div class="controls">
-                                    <input type="text" id="input_state" wicket:id="input_state"/>
+                                    <select id="select_state" wicket:id="select_state"></select>
                                 </div>
                             </div>
 
                             <div class="control-group">
-                                <label for="input_architecture" class="control-label">Architecture:</label>
+                                <label for="select_architecture" class="control-label">Architecture:</label>
 
                                 <div class="controls">
-                                    <input type="text" id="input_architecture" class="span9" wicket:id="input_architecture"/>
+                                    <select id="select_architecture" class="span9" wicket:id="select_architecture"></select>
                                 </div>
                             </div>
 
@@ -62,7 +62,7 @@
                                 <label for="input_num_max_instructions" class="control-label"># Max Insts:</label>
 
                                 <div class="controls">
-                                    <input type="text" id="input_num_max_instructions" wicket:id="input_num_max_instructions"/>
+                                    <input type="number" id="input_num_max_instructions" wicket:id="input_num_max_instructions"/>
                                 </div>
                             </div>
 
@@ -78,9 +78,9 @@
                     </div>
 
                     <div class="form-actions">
-                        <a href="#" class="btn btn-primary save">Save</a>
+                        <input type="submit" value="Save" class="btn btn-primary save" wicket:id="button_save"/>
                         <a href="./experiments" class="btn">Cancel</a>
-                        <a href="#" class="btn btn-danger">Remove</a>
+                        <input type="submit" value="Remove" class="btn btn-danger" wicket:id="button_remove"/>
                     </div>
 
                 </form>

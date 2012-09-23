@@ -69,8 +69,7 @@ public class Experiment implements ModelElement {
     public Experiment() {
     }
 
-    public Experiment(String title, ExperimentType type, Architecture architecture, int numMaxInstructions, List<ContextMapping> contextMappings) {
-        this.title = title;
+    public Experiment(ExperimentType type, Architecture architecture, int numMaxInstructions, List<ContextMapping> contextMappings) {
         this.type = type;
         this.state = ExperimentState.PENDING;
         this.failedReason = "";
@@ -78,6 +77,28 @@ public class Experiment implements ModelElement {
         this.contextMappings = new ArrayList<ContextMapping>(contextMappings);
         this.architectureId = architecture.getId();
         this.createTime = DateHelper.toTick(new Date());
+    }
+
+    public void updateTitle() {
+        ContextMapping contextMapping = this.contextMappings.get(0);
+        SimulatedProgram simulatedProgram = contextMapping.getSimulatedProgram();
+
+        this.title = simulatedProgram.getTitle().replaceAll(" ", "_") + "_" + contextMapping.getArguments().replaceAll(" ", "_");
+
+        if (this.type == ExperimentType.FUNCTIONAL) {
+            this.title += "-functional";
+        }
+        else {
+            if(this.type == ExperimentType.TWO_PHASE) {
+                this.title += "-two_phase";
+            }
+
+            if(contextMapping.getSimulatedProgram().getHelperThreadEnabled()) {
+                this.title += "-lookahead_" + contextMapping.getHelperThreadLookahead() + "-stride_" + contextMapping.getHelperThreadStride();
+            }
+
+            this.title += "-" + this.getArchitecture().getTitle();
+        }
     }
 
     public long getId() {
@@ -90,6 +111,10 @@ public class Experiment implements ModelElement {
     }
 
     public String getTitle() {
+        if(title == null) {
+            updateTitle();
+        }
+
         return title;
     }
 

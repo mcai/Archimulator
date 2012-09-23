@@ -78,22 +78,22 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
                     addExperimentPack(experimentPack);
 
                     for (ExperimentSpec experimentSpec : experimentPack.getExperimentSpecs()) {
-                        Experiment experiment = getFirstExperimentByTitle(experimentSpec.getTitle());
-                        if (experiment == null) {
-                            ExperimentType experimentType = experimentPack.getExperimentType();
-                            SimulatedProgram simulatedProgram = experimentSpec.getSimulatedProgram();
-                            Architecture architecture = experimentSpec.getArchitecture();
-                            String arguments = experimentSpec.getArguments();
+                        ExperimentType experimentType = experimentPack.getExperimentType();
+                        SimulatedProgram simulatedProgram = experimentSpec.getSimulatedProgram();
+                        Architecture architecture = experimentSpec.getArchitecture();
+                        String arguments = experimentSpec.getArguments();
 
-                            List<ContextMapping> contextMappings = new ArrayList<ContextMapping>();
+                        List<ContextMapping> contextMappings = new ArrayList<ContextMapping>();
 
-                            ContextMapping contextMapping = new ContextMapping(0, simulatedProgram, arguments);
-                            contextMapping.setHelperThreadLookahead(experimentSpec.getHelperThreadLookahead());
-                            contextMapping.setHelperThreadStride(experimentSpec.getHelperThreadStride());
-                            contextMapping.setDynamicHelperThreadParams(false);
-                            contextMappings.add(contextMapping);
+                        ContextMapping contextMapping = new ContextMapping(0, simulatedProgram, arguments);
+                        contextMapping.setHelperThreadLookahead(experimentSpec.getHelperThreadLookahead());
+                        contextMapping.setHelperThreadStride(experimentSpec.getHelperThreadStride());
+                        contextMapping.setDynamicHelperThreadParams(false);
+                        contextMappings.add(contextMapping);
 
-                            experiment = new Experiment(experimentSpec.getTitle(), experimentType, architecture, -1, contextMappings);
+                        Experiment experiment = new Experiment(experimentType, architecture, -1, contextMappings);
+
+                        if(getLatestExperimentByTitle(experiment.getTitle()) == null) {
                             addExperiment(experiment);
                         }
 

@@ -22,10 +22,7 @@ import archimulator.model.SimulatedProgram;
 import archimulator.service.ServiceManager;
 import net.pickapack.dateTime.DateHelper;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.form.Button;
-import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.form.RequiredTextField;
-import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.markup.html.form.*;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
@@ -37,9 +34,9 @@ public class SimulatedProgramPage extends AuthenticatedWebPage {
     public SimulatedProgramPage(PageParameters parameters) {
         super(PageType.SIMULATED_PROGRAM, parameters);
 
-        final SimulatedProgram simulatedProgram;
-
         final String action = parameters.get("action").toString();
+
+        final SimulatedProgram simulatedProgram;
 
         if (action.equals("add")) {
             simulatedProgram = new SimulatedProgram("", "", "", "");
@@ -66,8 +63,8 @@ public class SimulatedProgramPage extends AuthenticatedWebPage {
             this.add(new RequiredTextField<String>("input_title", new PropertyModel<String>(simulatedProgram, "title")));
             this.add(new RequiredTextField<String>("input_executable", new PropertyModel<String>(simulatedProgram, "executable")));
             this.add(new TextField<String>("input_default_arguments", new PropertyModel<String>(simulatedProgram, "defaultArguments")));
-            this.add(new TextField<String>("input_stdin", new PropertyModel<String>(simulatedProgram, "standardIn")));
-            this.add(new RequiredTextField<Boolean>("input_helper_thread", new PropertyModel<Boolean>(simulatedProgram, "helperThreadEnabled")));
+            this.add(new TextField<String>("input_standard_in", new PropertyModel<String>(simulatedProgram, "standardIn")));
+            this.add(new CheckBox("input_helper_thread_enabled", new PropertyModel<Boolean>(simulatedProgram, "helperThreadEnabled")));
             this.add(new TextField<String>("input_create_time", Model.of(DateHelper.toString(simulatedProgram.getCreateTime()))));
 
             this.add(new Button("button_save", Model.of(action.equals("add") ? "Add" : "Save")) {
