@@ -30,12 +30,12 @@ public class ExperimentPackPage extends AuthenticatedWebPage {
     public ExperimentPackPage(PageParameters parameters) {
         super(PageType.EXPERIMENT_PACK, parameters);
 
-        long experimentPackId = parameters.get("experiment_pack_id").toLong();
+        long experimentPackId = parameters.get("experiment_pack_id").toLong(-1);
 
         ExperimentPack experimentPack = ServiceManager.getExperimentService().getExperimentPackById(experimentPackId);
 
         if(experimentPack == null) {
-            setResponsePage(HomePage.class);
+            setResponsePage(getApplication().getHomePage());
             return;
         }
 

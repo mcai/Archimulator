@@ -38,17 +38,21 @@ public class SimulatedProgramPage extends AuthenticatedWebPage {
 
         final SimulatedProgram simulatedProgram;
 
-        if (action.equals("add")) {
+        if(action == null) {
+            setResponsePage(getApplication().getHomePage());
+            return;
+        }
+        else if (action.equals("add")) {
             simulatedProgram = new SimulatedProgram("", "", "", "");
         } else if (action.equals("edit")) {
-            long simulatedProgramId = parameters.get("simulated_program_id").toLong();
+            long simulatedProgramId = parameters.get("simulated_program_id").toLong(-1);
             simulatedProgram = ServiceManager.getSimulatedProgramService().getSimulatedProgramById(simulatedProgramId);
         } else {
             throw new IllegalArgumentException();
         }
 
         if (simulatedProgram == null) {
-            setResponsePage(HomePage.class);
+            setResponsePage(getApplication().getHomePage());
             return;
         }
 

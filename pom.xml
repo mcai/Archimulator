@@ -188,6 +188,10 @@
                 <directory>src/main/resources</directory>
             </resource>
             <resource>
+                <filtering>true</filtering>
+                <directory>src/main/html</directory>
+            </resource>
+            <resource>
                 <filtering>false</filtering>
                 <directory>src/main/java</directory>
                 <includes>

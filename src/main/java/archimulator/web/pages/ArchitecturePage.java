@@ -42,7 +42,11 @@ public class ArchitecturePage extends AuthenticatedWebPage {
 
         final Architecture architecture;
 
-        if (action.equals("add")) {
+        if(action == null) {
+            setResponsePage(getApplication().getHomePage());
+            return;
+        }
+        else if (action.equals("add")) {
             architecture = new Architecture(false, 2, 2,
                     (int) StorageUnitHelper.displaySizeToByteCount("32 KB"),
                     4,
@@ -52,14 +56,14 @@ public class ArchitecturePage extends AuthenticatedWebPage {
                     8,
                     CacheReplacementPolicyType.LRU);
         } else if (action.equals("edit")) {
-            long architectureId = parameters.get("architecture_id").toLong();
+            long architectureId = parameters.get("architecture_id").toLong(-1);
             architecture = ServiceManager.getArchitectureService().getArchitectureById(architectureId);
         } else {
             throw new IllegalArgumentException();
         }
 
         if (architecture == null) {
-            setResponsePage(HomePage.class);
+            setResponsePage(getApplication().getHomePage());
             return;
         }
 

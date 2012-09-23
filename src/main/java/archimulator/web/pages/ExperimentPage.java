@@ -42,21 +42,25 @@ public class ExperimentPage extends AuthenticatedWebPage {
 
         final Experiment experiment;
 
-        if (action.equals("add")) {
+        if(action == null) {
+            setResponsePage(getApplication().getHomePage());
+            return;
+        }
+        else if (action.equals("add")) {
             List<ContextMapping> contextMappings = new ArrayList<ContextMapping>();
             SimulatedProgram simulatedProgram = ServiceManager.getSimulatedProgramService().getFirstSimulatedProgram();
             contextMappings.add(new ContextMapping(0, simulatedProgram, simulatedProgram.getDefaultArguments()));
 
             experiment = new Experiment(ExperimentType.DETAILED, ServiceManager.getArchitectureService().getFirstArchitecture(), -1, contextMappings);
         } else if (action.equals("edit")) {
-            long experimentId = parameters.get("experiment_id").toLong();
+            long experimentId = parameters.get("experiment_id").toLong(-1);
             experiment = ServiceManager.getExperimentService().getExperimentById(experimentId);
         } else {
             throw new IllegalArgumentException();
         }
 
         if(experiment == null) {
-            setResponsePage(HomePage.class);
+            setResponsePage(getApplication().getHomePage());
             return;
         }
 
