@@ -1,42 +1,52 @@
 <html xmlns:wicket="http://wicket.apache.org">
 <body>
 <wicket:panel>
-    <span wicket:id="span_feedback"></span>
-
-    <form class="form-horizontal" wicket:id="form_sign_in">
-        <legend>Sign In</legend>
-
-        <div class="control-group">
-            <label class="control-label" for="input_user_id">User Id</label>
-
-            <div class="controls">
-                <input type="text" placeholder="User Id" id="input_user_id" wicket:id="input_user_id"/>
-            </div>
+    <section>
+        <div class="page-header">
+            <h1>Sign In to your Archimulator account</h1>
         </div>
 
-        <div class="control-group">
-            <label class="control-label" for="input_password">Password</label>
+        <p>
+            Don't have an account yet?
+            <strong><a href="./help">Learn more</a></strong> about Archimulator
+            or <strong><a href="./sign_up">Sign Up</a></strong>.
+        </p>
 
-            <div class="controls">
-                <input type="password" placeholder="Password" id="input_password" wicket:id="input_password"/>
-            </div>
-        </div>
+        <br/>
 
-        <div class="control-group">
-            <div class="controls">
-                <div wicket:id="div_remember_me">
-                    <label class="checkbox">
-                        <input type="checkbox" wicket:id="checkbox_remember_me"/>Remember me
-                    </label>
+        <span wicket:id="span_feedback"></span>
+
+        <form class="form-horizontal" wicket:id="form_sign_in">
+            <div class="control-group">
+                <label class="control-label" for="input_email">Email</label>
+
+                <div class="controls">
+                    <input type="email" placeholder="Email" id="input_email" wicket:id="input_email"/>
                 </div>
-
-                <button class="btn btn-large btn-primary" type="submit">Sign In</button>
-                <button class="btn btn-large" type="reset" value="Reset">Reset</button>
-
-                <a class="btn btn-large" href="./sign_up">Sign Up</a>
             </div>
-        </div>
-    </form>
+
+            <div class="control-group">
+                <label class="control-label" for="input_password">Password</label>
+
+                <div class="controls">
+                    <input type="password" placeholder="Password" id="input_password" wicket:id="input_password"/>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <div class="controls">
+                    <div wicket:id="div_remember_me">
+                        <label class="checkbox">
+                            <input type="checkbox" wicket:id="checkbox_remember_me"/>Remember me
+                        </label>
+                    </div>
+
+                    <button class="btn btn-primary" type="submit">Sign In</button>
+                    <button class="btn" type="reset" value="Reset">Reset</button>
+                </div>
+            </div>
+        </form>
+    </section>
 </wicket:panel>
 </body>
 </html>

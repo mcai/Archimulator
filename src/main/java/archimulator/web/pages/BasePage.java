@@ -65,8 +65,8 @@ public abstract class BasePage<T> extends GenericWebPage<T> {
             }
         }});
 
-        add(new ListItem("li_nav_faq", 5){{
-            if (pageType == PageType.FAQ) {
+        add(new ListItem("li_nav_help", 5){{
+            if (pageType == PageType.HELP) {
                 add(new CssClassNameAppender("active"));
             }
         }});
@@ -85,7 +85,7 @@ public abstract class BasePage<T> extends GenericWebPage<T> {
     }
 
     public String getUserName() {
-        return getSession() != null ? "Logout as: " + ((ArchimulatorSession)getSession()).getUser().getName() : null;
+        return getSession() != null ? "Logout as: " + ((ArchimulatorSession)getSession()).getUser().getEmail() : null;
     }
 
     public String getTitle() {

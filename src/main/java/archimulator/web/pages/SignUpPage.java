@@ -18,8 +18,8 @@
  ******************************************************************************/
 package archimulator.web.pages;
 
+import org.apache.wicket.markup.html.form.EmailTextField;
 import org.apache.wicket.markup.html.form.PasswordTextField;
-import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.wicketstuff.annotation.mount.MountPath;
@@ -31,7 +31,8 @@ public class SignUpPage extends BasePage {
 
         setTitle("Sign Up - Archimulator");
 
-        add(new TextField<String>("input_email", Model.of(" ")));
+        add(new EmailTextField("input_email", Model.of(" ")));
         add(new PasswordTextField("input_password", Model.of(" ")));
+        add(new PasswordTextField("input_password2", Model.of(" ")));
     }
 }

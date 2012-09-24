@@ -39,11 +39,10 @@ public class SimulatedProgramPage extends AuthenticatedWebPage {
 
         final SimulatedProgram simulatedProgram;
 
-        if(action == null) {
+        if (action == null) {
             setResponsePage(getApplication().getHomePage());
             return;
-        }
-        else if (action.equals("add")) {
+        } else if (action.equals("add")) {
             simulatedProgram = new SimulatedProgram("", "", "", "");
         } else if (action.equals("edit")) {
             long simulatedProgramId = parameters.get("simulated_program_id").toLong(-1);
@@ -75,10 +74,9 @@ public class SimulatedProgramPage extends AuthenticatedWebPage {
             this.add(new Button("button_save", Model.of(action.equals("add") ? "Add" : "Save")) {
                 @Override
                 public void onSubmit() {
-                    if(action.equals("add")) {
+                    if (action.equals("add")) {
                         ServiceManager.getSimulatedProgramService().addSimulatedProgram(simulatedProgram);
-                    }
-                    else {
+                    } else {
                         ServiceManager.getSimulatedProgramService().updateSimulatedProgram(simulatedProgram);
                     }
 
@@ -87,6 +85,10 @@ public class SimulatedProgramPage extends AuthenticatedWebPage {
             });
 
             this.add(new Button("button_cancel") {
+                {
+                    setDefaultFormProcessing(false);
+                }
+
                 @Override
                 public void onSubmit() {
                     back(parameters);
@@ -95,6 +97,7 @@ public class SimulatedProgramPage extends AuthenticatedWebPage {
 
             this.add(new Button("button_remove") {
                 {
+                    setDefaultFormProcessing(false);
                     setVisible(action.equals("edit"));
                 }
 
@@ -110,10 +113,9 @@ public class SimulatedProgramPage extends AuthenticatedWebPage {
 
     private void back(PageParameters parameters) {
         int backPageId = parameters.get("back_page_id").toInt(-1);
-        if(backPageId != -1) {
+        if (backPageId != -1) {
             setResponsePage(new PageReference(backPageId).getPage());
-        }
-        else {
+        } else {
             setResponsePage(SimulatedProgramsPage.class);
         }
     }

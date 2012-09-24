@@ -18,7 +18,6 @@
  ******************************************************************************/
 package archimulator.web.pages;
 
-import archimulator.model.Experiment;
 import archimulator.model.ExperimentPack;
 import archimulator.model.ExperimentState;
 import archimulator.service.ServiceManager;
@@ -70,19 +69,12 @@ public class ExperimentPacksPage extends AuthenticatedWebPage {
             protected void populateItem(Item<ExperimentPack> item) {
                 final ExperimentPack experimentPack = item.getModelObject();
 
-                int numTotal = ServiceManager.getExperimentService().getExperimentsByExperimentPack(experimentPack).size();
-                int numRunning = 0;
-                int numStopped = 0;
+                long numTotal = ServiceManager.getExperimentService().getNumExperimentsByExperimentPack(experimentPack);
+                long numRunning = ServiceManager.getExperimentService().getNumExperimentsByExperimentPackAndState(experimentPack, ExperimentState.RUNNING);
+                long numStopped = ServiceManager.getExperimentService().getNumExperimentsByExperimentPackAndState(experimentPack, ExperimentState.COMPLETED) +
+                        ServiceManager.getExperimentService().getNumExperimentsByExperimentPackAndState(experimentPack, ExperimentState.ABORTED);
 
-                for (Experiment experiment : ServiceManager.getExperimentService().getExperimentsByExperimentPack(experimentPack)) {
-                    if (experiment.getState() == ExperimentState.RUNNING) {
-                        numRunning++;
-                    } else if (experiment.isStopped()) {
-                        numStopped++;
-                    }
-                }
-
-                item.add(new Label("cell_title", experimentPack.getTitle()));
+                item.add(new Label("cell_title", String.format("{%d} %s", experimentPack.getId(), experimentPack.getTitle())));
                 item.add(new Label("cell_description", String.format(
                         "%s; total: %d, running: %d, stopped: %d (%s)",
                         experimentPack.getExperimentType(),
@@ -130,7 +122,7 @@ public class ExperimentPacksPage extends AuthenticatedWebPage {
 
                         @Override
                         public void onClick() {
-                            ServiceManager.getExperimentService().resetExperimentsByExperimentPack(experimentPack);
+                            ServiceManager.getExperimentService().resetStoppedExperimentsByExperimentPack(experimentPack);
                         }
                     });
                 }});

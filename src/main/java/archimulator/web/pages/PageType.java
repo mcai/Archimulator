@@ -13,5 +13,5 @@ public enum PageType {
     EXPERIMENT,
     EXPERIMENT_PACKS,
     EXPERIMENT_PACK,
-    FAQ
+    HELP
 }

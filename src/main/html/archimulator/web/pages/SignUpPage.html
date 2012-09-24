@@ -4,32 +4,50 @@
 <wicket:extend>
 
     <div class="container">
-
-        <form class="form-horizontal" action="">
-            <legend>Sign Up</legend>
-
-            <div class="control-group">
-                <label class="control-label" for="input_email">Email</label>
-
-                <div class="controls">
-                    <input type="text" placeholder="Email" id="input_email" wicket:id="input_email"/>
-                </div>
+        <section>
+            <div class="page-header">
+                <h1>Create your Archimulator account</h1>
             </div>
 
-            <div class="control-group">
-                <label class="control-label" for="input_password">Password</label>
+            <p>
+                Already have an account?
+                <strong><a href="./sign_in">Sign In</a></strong>.
+            </p>
 
-                <div class="controls">
-                    <input type="password" placeholder="Password" id="input_password" wicket:id="input_password"/>
-                </div>
-            </div>
+            <br/>
 
-            <div class="control-group">
-                <div class="controls">
-                    <button class="btn btn-large btn-primary" type="submit">Sign Up</button>
+            <form class="form-horizontal" action="">
+                <div class="control-group">
+                    <label class="control-label" for="input_email">Email</label>
+
+                    <div class="controls">
+                        <input type="email" placeholder="Email" id="input_email" wicket:id="input_email"/>
+                    </div>
                 </div>
-            </div>
-        </form>
+
+                <div class="control-group">
+                    <label class="control-label" for="input_password">Password</label>
+
+                    <div class="controls">
+                        <input type="password" placeholder="Password" id="input_password" wicket:id="input_password"/>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" for="input_password2">Password (Again)</label>
+
+                    <div class="controls">
+                        <input type="password" placeholder="Password Again" id="input_password2" wicket:id="input_password2"/>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <div class="controls">
+                        <button class="btn btn-primary" type="submit">Sign Up</button>
+                    </div>
+                </div>
+            </form>
+        </section>
 
     </div>
 

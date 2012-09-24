@@ -119,6 +119,10 @@ public class ExperimentPage extends AuthenticatedWebPage {
             });
 
             this.add(new Button("button_cancel") {
+                {
+                    setDefaultFormProcessing(false);
+                }
+
                 @Override
                 public void onSubmit() {
                     back(parameters);
@@ -127,6 +131,7 @@ public class ExperimentPage extends AuthenticatedWebPage {
 
             this.add(new Button("button_remove") {
                 {
+                    setDefaultFormProcessing(false);
                     setVisible(action.equals("edit"));
                 }
 

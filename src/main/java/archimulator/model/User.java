@@ -13,7 +13,7 @@ public class User implements ModelElement {
     private long id;
 
     @DatabaseField
-    private String name;
+    private String email;
 
     @DatabaseField
     private long createTime;
@@ -24,8 +24,8 @@ public class User implements ModelElement {
     public User() {
     }
 
-    public User(String name, String password) {
-        this.name = name;
+    public User(String email, String password) {
+        this.email = email;
         this.password = password;
         this.createTime = DateHelper.toTick(new Date());
     }
@@ -41,11 +41,11 @@ public class User implements ModelElement {
 
     @Override
     public String getTitle() {
-        return name;
+        return email;
     }
 
-    public String getName() {
-        return name;
+    public String getEmail() {
+        return email;
     }
 
     public long getCreateTime() {

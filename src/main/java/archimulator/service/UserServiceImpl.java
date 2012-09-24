@@ -36,7 +36,7 @@ public class UserServiceImpl extends AbstractService implements UserService {
         this.users = createDao(User.class);
 
         if(this.getFirstUser() == null) {
-            this.addUser(new User("itecgo", "1026@ustc")); //TODO: should not be hardcoded
+            this.addUser(new User("min.cai.china@gmail.com", "1026@ustc")); //TODO: should not be hardcoded
         }
     }
 
@@ -53,7 +53,7 @@ public class UserServiceImpl extends AbstractService implements UserService {
     @Override
     public User getUserByName(String name) {
         for(User user : getAllUsers()) {
-            if(user.getName().equals(name)) {
+            if(user.getEmail().equals(name)) {
                 return user;
             }
         }

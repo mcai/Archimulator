@@ -19,48 +19,38 @@
 package archimulator.web.pages;
 
 import archimulator.model.Experiment;
+import archimulator.model.ExperimentPack;
 import archimulator.service.ServiceManager;
 import archimulator.web.components.PagingNavigator;
 import net.pickapack.dateTime.DateHelper;
-import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.markup.repeater.data.DataView;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LoadableDetachableModel;
-import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.wicketstuff.annotation.mount.MountPath;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 
 @MountPath(value = "/", alt = "/experiments")
 public class ExperimentsPage extends AuthenticatedWebPage {
-    private String experimentId;
-    private String experimentType;
-    private String experimentState;
-    private String experimentArchitecture;
-
     public ExperimentsPage(PageParameters parameters) {
         super(PageType.EXPERIMENTS, parameters);
 
         setTitle("Experiments - Archimulator");
 
-        experimentId = getPageParameters().get("experimentId").toString();
-        experimentType = getPageParameters().get("experimentType").toString();
-        experimentState = getPageParameters().get("experimentState").toString();
-        experimentArchitecture = getPageParameters().get("experimentArchitecture").toString();
+        final long experimentPackId = parameters.get("experiment_pack_id").toLong(-1);
 
         IDataProvider<Experiment> dataProvider = new IDataProvider<Experiment>() {
             @Override
             public Iterator<? extends Experiment> iterator(long first, long count) {
-                if (!StringUtils.isEmpty(experimentType)) {
-                    return new ArrayList<Experiment>().iterator(); //TODO
+                if (experimentPackId != -1) {
+                    ExperimentPack experimentPack = ServiceManager.getExperimentService().getExperimentPackById(experimentPackId);
+                    return ServiceManager.getExperimentService().getExperimentsByExperimentPack(experimentPack, first, count).iterator();
                 }
 
                 return ServiceManager.getExperimentService().getAllExperiments(first, count).iterator();
@@ -68,8 +58,9 @@ public class ExperimentsPage extends AuthenticatedWebPage {
 
             @Override
             public long size() {
-                if (!StringUtils.isEmpty(experimentType)) {
-                    return 0; //TODO
+                if (experimentPackId != -1) {
+                    ExperimentPack experimentPack = ServiceManager.getExperimentService().getExperimentPackById(experimentPackId);
+                    return ServiceManager.getExperimentService().getNumExperimentsByExperimentPack(experimentPack);
                 }
 
                 return ServiceManager.getExperimentService().getNumAllExperiments();
@@ -124,43 +115,6 @@ public class ExperimentsPage extends AuthenticatedWebPage {
 
         tableExperiments.add(rowExperiment);
 
-        add(new TextField<String>("experimentId", new PropertyModel<String>(ExperimentsPage.this, "experimentId")));
-        add(new TextField<String>("experimentType", new PropertyModel<String>(ExperimentsPage.this, "experimentType")));
-        add(new TextField<String>("experimentState", new PropertyModel<String>(ExperimentsPage.this, "experimentState")));
-        add(new TextField<String>("experimentArchitecture", new PropertyModel<String>(ExperimentsPage.this, "experimentArchitecture")));
-
         add(new PagingNavigator("navigator", rowExperiment));
-    }
-
-    public String getExperimentId() {
-        return experimentId;
-    }
-
-    public void setExperimentId(String experimentId) {
-        this.experimentId = experimentId;
-    }
-
-    public String getExperimentType() {
-        return experimentType;
-    }
-
-    public void setExperimentType(String experimentType) {
-        this.experimentType = experimentType;
-    }
-
-    public String getExperimentState() {
-        return experimentState;
-    }
-
-    public void setExperimentState(String experimentState) {
-        this.experimentState = experimentState;
-    }
-
-    public String getExperimentArchitecture() {
-        return experimentArchitecture;
-    }
-
-    public void setExperimentArchitecture(String experimentArchitecture) {
-        this.experimentArchitecture = experimentArchitecture;
     }
 }

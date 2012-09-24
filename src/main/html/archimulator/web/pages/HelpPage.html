@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html wicket:id="html" xmlns:wicket="http://wicket.apache.org">
+<body>
+<wicket:extend>
+
+    <div class="container">
+        <section wicket:id="section_system_status">
+            <div class="page-header">
+                <h1>
+                    System Status
+                </h1>
+            </div>
+
+            <table class="table table-bordered table-striped" wicket:id="table_system_status">
+                <thead>
+
+                <tr>
+                    <th>Key</th>
+                    <th>Value</th>
+                </tr>
+
+                </thead>
+
+                <tbody>
+
+                <tr wicket:id="row_system_status">
+                    <td wicket:id="cell_key"></td>
+                    <td wicket:id="cell_value"></td>
+                </tr>
+
+                </tbody>
+            </table>
+
+        </section>
+
+        <section>
+            <div class="page-header">
+                <h1>
+                    Archimulator Features
+                </h1>
+            </div>
+
+            <section>
+                <div class="page-header">
+                    <h2>
+                        Functional Simulation
+                    </h2>
+                </div>
+
+                <ul>
+                    <li>Program loading for statically-linked MIPS32 ELF executables, either Little Endian or Big
+                        Endian;
+                    </li>
+                    <li>Functional execution of common integer and floating-point instructions of MIPS32 ISA;</li>
+                    <li>Emulation of common POSIX system calls;</li>
+                    <li>Execution of Pthreads based multithreaded programs.</li>
+                </ul>
+
+            </section>
+
+            <section>
+                <div class="page-header">
+                    <h2>
+                        Performance simulation
+                    </h2>
+                </div>
+
+                <ul>
+                    <li>Separate pipeline structures such as the reorder buffer, separate integer and floating point
+                        physical register files;
+                    </li>
+                    <li>Explicit register renaming based on the merged architectural and rename register file model;
+                    </li>
+                    <li>Single-threaded superscalar out-of-order execution, multithreaded SMT and CMP execution model;
+                    </li>
+                    <li>Multi-level inclusive cache hierarchy with the directory-based MESI coherence protocol;</li>
+                    <li>Simple cycle-accurate DRAM controller model;</li>
+                    <li>Various kinds of static and dynamic branch predictors, checkpointing-based pipeline recovery on
+                        branch misprediction.
+                    </li>
+                </ul>
+
+            </section>
+
+            <section>
+                <div class="page-header">
+                    <h2>
+                        Simulation Infrastructure
+                    </h2>
+                </div>
+
+                <ul>
+                    <li>Support measurement of instructions, pipeline structures and the cache hierarchy;</li>
+                    <li>Support generation of instruction traces;</li>
+                    <li>Support both execution-driven and trace-driven memory subsystem simulation;</li>
+                    <li>Support complex simulation strategies: cycle count based, instruction count based, and hotspot
+                        oriented simulation;
+                    </li>
+                    <li>Support seamless switching between functional simulation and performance simulation mode;</li>
+                    <li>Support software based helper threading on CMPs</li>
+                </ul>
+
+            </section>
+
+        </section>
+
+    </div>
+
+</wicket:extend>
+</body>
+</html>

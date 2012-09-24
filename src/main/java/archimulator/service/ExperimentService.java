@@ -33,6 +33,8 @@ public interface ExperimentService extends Service {
 
     long getNumAllExperiments();
 
+    long getNumAllExperimentsByState(ExperimentState experimentState);
+
     Experiment getExperimentById(long id);
 
     List<Experiment> getExperimentsByTitle(String title);
@@ -48,6 +50,8 @@ public interface ExperimentService extends Service {
     List<Experiment> getExperimentsByArchitecture(Architecture architecture);
 
     List<Experiment> getExperimentsByExperimentPack(ExperimentPack experimentPack);
+
+    List<Experiment> getExperimentsByExperimentPack(ExperimentPack experimentPack, long first, long count);
 
     void addExperiment(Experiment experiment);
 
@@ -79,13 +83,15 @@ public interface ExperimentService extends Service {
 
     void updateExperimentPack(ExperimentPack experimentPack);
 
+    long getNumExperimentsByExperimentPack(ExperimentPack experimentPack);
+
     long getNumExperimentsByExperimentPackAndState(ExperimentPack experimentPack, ExperimentState experimentState);
 
     void startExperimentPack(ExperimentPack experimentPack);
 
     void stopExperimentPack(ExperimentPack experimentPack);
 
-    void resetExperimentsByExperimentPack(ExperimentPack experimentPack);
+    void resetStoppedExperimentsByExperimentPack(ExperimentPack experimentPack);
 
     void runExperimentByTitle(String experimentTitle);
 

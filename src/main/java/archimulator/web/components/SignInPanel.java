@@ -22,10 +22,7 @@ import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.authentication.IAuthenticationStrategy;
 import org.apache.wicket.authroles.authentication.AuthenticatedWebSession;
 import org.apache.wicket.markup.html.WebMarkupContainer;
-import org.apache.wicket.markup.html.form.CheckBox;
-import org.apache.wicket.markup.html.form.PasswordTextField;
-import org.apache.wicket.markup.html.form.StatelessForm;
-import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.markup.html.form.*;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.CompoundPropertyModel;
@@ -34,7 +31,7 @@ import org.apache.wicket.model.PropertyModel;
 public class SignInPanel extends Panel {
     private boolean includeRememberMe = true;
     private boolean rememberMe = true;
-    private String userId;
+    private String email;
     private String password;
 
     public SignInPanel(String id) {
@@ -59,7 +56,7 @@ public class SignInPanel extends Panel {
 
             if ((data != null) && (data.length > 1)) {
                 if (signIn(data[0], data[1])) {
-                    userId = data[0];
+                    email = data[0];
                     password = data[1];
 
                     continueToOriginalDestination();
@@ -74,8 +71,8 @@ public class SignInPanel extends Panel {
         super.onBeforeRender();
     }
 
-    private boolean signIn(String username, String password) {
-        return AuthenticatedWebSession.get().signIn(username, password);
+    private boolean signIn(String email, String password) {
+        return AuthenticatedWebSession.get().signIn(email, password);
     }
 
     private boolean isSignedIn() {
@@ -115,12 +112,12 @@ public class SignInPanel extends Panel {
         this.password = password;
     }
 
-    public String getUserId() {
-        return userId;
+    public String getEmail() {
+        return email;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public final class SignInForm extends StatelessForm<SignInPanel> {
@@ -129,7 +126,7 @@ public class SignInPanel extends Panel {
 
             setModel(new CompoundPropertyModel<SignInPanel>(SignInPanel.this));
 
-            add(new TextField<String>("input_user_id", new PropertyModel<String>(SignInPanel.this, "userId")));
+            add(new EmailTextField("input_email", new PropertyModel<String>(SignInPanel.this, "email")));
             add(new PasswordTextField("input_password", new PropertyModel<String>(SignInPanel.this, "password")));
 
             WebMarkupContainer divRememberMe = new WebMarkupContainer("div_remember_me");
@@ -144,9 +141,9 @@ public class SignInPanel extends Panel {
             IAuthenticationStrategy strategy = getApplication().getSecuritySettings()
                     .getAuthenticationStrategy();
 
-            if (signIn(getUserId(), getPassword())) {
+            if (signIn(getEmail(), getPassword())) {
                 if (rememberMe) {
-                    strategy.save(userId, password);
+                    strategy.save(email, password);
                 } else {
                     strategy.remove();
                 }
