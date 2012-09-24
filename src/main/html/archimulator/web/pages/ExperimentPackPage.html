@@ -11,57 +11,84 @@
                 </h1>
             </div>
 
-            <div class="row">
+            <form class="form-horizontal span12" wicket:id="form_experiment_pack">
 
-                <form class="form-horizontal span12" wicket:id="form_experiment_pack">
+                <ul class="nav nav-tabs" id="myTab">
+                    <li class="active"><a data-toggle="tab" href="#tab_general">General</a></li>
+                    <li><a data-toggle="tab" href="#tab_page_baseline_experiment_spec">Baseline</a></li>
+                    <li><a data-toggle="tab" href="#tab_page_variables">Variables</a></li>
+                    <li><a data-toggle="tab" href="#tab_page_experiments">Generated Experiments</a></li>
+                </ul>
 
-                    <div class="row">
-                        <div class="span9">
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab_general">
 
-                            <div class="control-group">
-                                <label for="input_id" class="control-label">Id:</label>
+                        <div class="row">
+                            <div class="span9">
 
-                                <div class="controls">
-                                    <input id="input_id" type="text" class="span1" disabled wicket:id="input_id"/>
+                                <div class="control-group">
+                                    <label for="input_id" class="control-label">Id:</label>
+
+                                    <div class="controls">
+                                        <input id="input_id" type="text" class="span1" disabled wicket:id="input_id"/>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div class="control-group">
-                                <label for="input_title" class="control-label">Title:</label>
+                                <div class="control-group">
+                                    <label for="input_title" class="control-label">Title:</label>
 
-                                <div class="controls">
-                                    <input type="text" id="input_title" class="span9" disabled wicket:id="input_title"/>
+                                    <div class="controls">
+                                        <input type="text" id="input_title" class="span9" disabled wicket:id="input_title"/>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div class="control-group">
-                                <label for="select_type" class="control-label">Type:</label>
+                                <div class="control-group">
+                                    <label for="select_type" class="control-label">Type:</label>
 
-                                <div class="controls">
-                                    <select id="select_type" wicket:id="select_type"></select>
+                                    <div class="controls">
+                                        <select id="select_type" wicket:id="select_type"></select>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div class="control-group">
-                                <label for="input_create_time" class="control-label">Create Time:</label>
+                                <div class="control-group">
+                                    <label for="input_create_time" class="control-label">Create Time:</label>
 
-                                <div class="controls">
-                                    <input type="text" id="input_create_time" disabled wicket:id="input_create_time"/>
+                                    <div class="controls">
+                                        <input type="text" id="input_create_time" disabled wicket:id="input_create_time"/>
+                                    </div>
                                 </div>
-                            </div>
 
+                            </div>
                         </div>
+
                     </div>
 
-                    <div class="form-actions">
-                        <!--<a href="#" class="btn btn-primary save">Save</a>-->
-                        <input type="submit" value="Cancel" class="btn" wicket:id="button_cancel"/>
-                        <!--<a href="#" class="btn btn-danger">Remove</a>-->
+                    <div class="tab-pane" id="tab_page_baseline_experiment_spec">
+
+                        <p>TODO: placeholder</p>
+
                     </div>
 
-                </form>
+                    <div class="tab-pane" id="tab_page_variables">
 
-            </div>
+                        <p>TODO: placeholder</p>
+
+                    </div>
+
+                    <div class="tab-pane" id="tab_page_experiments">
+
+                        <p>TODO: placeholder</p>
+
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <a href="#" class="btn btn-primary save">Save</a>
+                    <input type="submit" value="Cancel" class="btn" wicket:id="button_cancel"/>
+                    <a href="#" class="btn btn-danger">Remove</a>
+                </div>
+
+            </form>
 
             <div class="row status-bar">
                 <div class="span12">

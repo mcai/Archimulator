@@ -4,104 +4,134 @@
 <wicket:extend>
 
     <div class="container">
-        <section wicket:id="section_system_status">
-            <div class="page-header">
-                <h1>
-                    System Status
-                </h1>
-            </div>
-
-            <table class="table table-bordered table-striped" wicket:id="table_system_status">
-                <thead>
-
-                <tr>
-                    <th>Key</th>
-                    <th>Value</th>
-                </tr>
-
-                </thead>
-
-                <tbody>
-
-                <tr wicket:id="row_system_status">
-                    <td wicket:id="cell_key"></td>
-                    <td wicket:id="cell_value"></td>
-                </tr>
-
-                </tbody>
-            </table>
-
-        </section>
-
         <section>
             <div class="page-header">
                 <h1>
-                    Archimulator Features
+                    Archimulator Help
                 </h1>
             </div>
 
-            <section>
-                <div class="page-header">
-                    <h2>
-                        Functional Simulation
-                    </h2>
+            <ul class="nav nav-tabs" id="myTab">
+                <li class="active"><a data-toggle="tab" href="#tab_page_status">System Status</a></li>
+                <li><a data-toggle="tab" href="#tab_page_features">Features</a></li>
+                <li><a data-toggle="tab" href="#tab_page_usages">Usages</a></li>
+                <li><a data-toggle="tab" href="#tab_page_resources">Resources</a></li>
+            </ul>
+
+            <div class="tab-content">
+                <div class="tab-pane active" id="tab_page_status">
+
+                    <table class="table table-bordered table-striped" wicket:id="table_system_status">
+                        <thead>
+
+                        <tr>
+                            <th>Key</th>
+                            <th>Value</th>
+                        </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                        <tr wicket:id="row_system_status">
+                            <td wicket:id="cell_key"></td>
+                            <td wicket:id="cell_value"></td>
+                        </tr>
+
+                        </tbody>
+                    </table>
+
                 </div>
 
-                <ul>
-                    <li>Program loading for statically-linked MIPS32 ELF executables, either Little Endian or Big
-                        Endian;
-                    </li>
-                    <li>Functional execution of common integer and floating-point instructions of MIPS32 ISA;</li>
-                    <li>Emulation of common POSIX system calls;</li>
-                    <li>Execution of Pthreads based multithreaded programs.</li>
-                </ul>
+                <div class="tab-pane" id="tab_page_features">
 
-            </section>
+                    <section>
+                        <div class="page-header">
+                            <h2>
+                                Functional Simulation
+                            </h2>
+                        </div>
 
-            <section>
-                <div class="page-header">
-                    <h2>
-                        Performance simulation
-                    </h2>
+                        <ul>
+                            <li>Program loading for statically-linked MIPS32 ELF executables, either Little Endian or
+                                Big
+                                Endian;
+                            </li>
+                            <li>Functional execution of common integer and floating-point instructions of MIPS32 ISA;
+                            </li>
+                            <li>Emulation of common POSIX system calls;</li>
+                            <li>Execution of Pthreads based multithreaded programs.</li>
+                        </ul>
+
+                    </section>
+
+                    <section>
+                        <div class="page-header">
+                            <h2>
+                                Performance simulation
+                            </h2>
+                        </div>
+
+                        <ul>
+                            <li>Separate pipeline structures such as the reorder buffer, separate integer and floating
+                                point
+                                physical register files;
+                            </li>
+                            <li>Explicit register renaming based on the merged architectural and rename register file
+                                model;
+                            </li>
+                            <li>Single-threaded superscalar out-of-order execution, multithreaded SMT and CMP execution
+                                model;
+                            </li>
+                            <li>Multi-level inclusive cache hierarchy with the directory-based MESI coherence
+                                protocol;
+                            </li>
+                            <li>Simple cycle-accurate DRAM controller model;</li>
+                            <li>Various kinds of static and dynamic branch predictors, checkpointing-based pipeline
+                                recovery on
+                                branch misprediction.
+                            </li>
+                        </ul>
+
+                    </section>
+
+                    <section>
+                        <div class="page-header">
+                            <h2>
+                                Simulation Infrastructure
+                            </h2>
+                        </div>
+
+                        <ul>
+                            <li>Support measurement of instructions, pipeline structures and the cache hierarchy;</li>
+                            <li>Support generation of instruction traces;</li>
+                            <li>Support both execution-driven and trace-driven memory subsystem simulation;</li>
+                            <li>Support complex simulation strategies: cycle count based, instruction count based, and
+                                hotspot
+                                oriented simulation;
+                            </li>
+                            <li>Support seamless switching between functional simulation and performance simulation
+                                mode;
+                            </li>
+                            <li>Support software based helper threading on CMPs</li>
+                        </ul>
+
+                    </section>
+
                 </div>
 
-                <ul>
-                    <li>Separate pipeline structures such as the reorder buffer, separate integer and floating point
-                        physical register files;
-                    </li>
-                    <li>Explicit register renaming based on the merged architectural and rename register file model;
-                    </li>
-                    <li>Single-threaded superscalar out-of-order execution, multithreaded SMT and CMP execution model;
-                    </li>
-                    <li>Multi-level inclusive cache hierarchy with the directory-based MESI coherence protocol;</li>
-                    <li>Simple cycle-accurate DRAM controller model;</li>
-                    <li>Various kinds of static and dynamic branch predictors, checkpointing-based pipeline recovery on
-                        branch misprediction.
-                    </li>
-                </ul>
+                <div class="tab-pane" id="tab_page_usages">
 
-            </section>
+                    <p>TODO: placeholder</p>
 
-            <section>
-                <div class="page-header">
-                    <h2>
-                        Simulation Infrastructure
-                    </h2>
                 </div>
 
-                <ul>
-                    <li>Support measurement of instructions, pipeline structures and the cache hierarchy;</li>
-                    <li>Support generation of instruction traces;</li>
-                    <li>Support both execution-driven and trace-driven memory subsystem simulation;</li>
-                    <li>Support complex simulation strategies: cycle count based, instruction count based, and hotspot
-                        oriented simulation;
-                    </li>
-                    <li>Support seamless switching between functional simulation and performance simulation mode;</li>
-                    <li>Support software based helper threading on CMPs</li>
-                </ul>
+                <div class="tab-pane" id="tab_page_resources">
 
-            </section>
+                    <p>TODO: placeholder</p>
 
+                </div>
+            </div>
         </section>
 
     </div>

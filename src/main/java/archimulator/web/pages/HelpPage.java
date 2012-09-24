@@ -56,7 +56,10 @@ public class HelpPage extends BasePage {
         systemStatusList.add(new Pair<String, String>("JVM Max Memory", StorageUnit.toString(Runtime.getRuntime().maxMemory())));
         systemStatusList.add(new Pair<String, String>("JVM Total Memory", StorageUnit.toString(Runtime.getRuntime().totalMemory())));
         systemStatusList.add(new Pair<String, String>("JVM Free Memory", StorageUnit.toString(Runtime.getRuntime().freeMemory())));
-        systemStatusList.add(new Pair<String, String>("# Running Experiments", ServiceManager.getExperimentService().getNumAllExperimentsByState(ExperimentState.RUNNING) + ""));
+
+        if(ArchimulatorSession.get().isSignedIn()) {
+            systemStatusList.add(new Pair<String, String>("# Running Experiments", ServiceManager.getExperimentService().getNumAllExperimentsByState(ExperimentState.RUNNING) + ""));
+        }
 
         IDataProvider<Pair<String, String>> dataProvider = new IDataProvider<Pair<String, String>>() {
             @Override
@@ -86,20 +89,16 @@ public class HelpPage extends BasePage {
 
         final DataView<Pair<String, String>> rowExperiment = new DataView<Pair<String, String>>("row_system_status", dataProvider) {
             protected void populateItem(Item<Pair<String, String>> item) {
-                Pair<String, String> experiment = item.getModelObject();
+                Pair<String, String> pair = item.getModelObject();
 
-                item.add(new Label("cell_key", experiment.getFirst() + ""));
-                item.add(new Label("cell_value", experiment.getSecond() + ""));
+                item.add(new Label("cell_key", pair.getFirst()));
+                item.add(new Label("cell_value", pair.getSecond()));
             }
         };
         rowExperiment.setItemsPerPage(10);
 
-        add(new WebMarkupContainer("section_system_status") {{
-            add(new WebMarkupContainer("table_system_status") {{
-                add(rowExperiment);
-            }});
-
-            setVisible(ArchimulatorSession.get().isSignedIn());
+        add(new WebMarkupContainer("table_system_status") {{
+            add(rowExperiment);
         }});
     }
 }
