@@ -24,7 +24,6 @@ import archimulator.model.ExperimentState;
 import archimulator.service.ServiceManager;
 import archimulator.web.components.PagingNavigator;
 import de.agilecoders.wicket.markup.html.bootstrap.behavior.CssClassNameAppender;
-import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.Link;
@@ -137,9 +136,17 @@ public class ExperimentPacksPage extends AuthenticatedWebPage {
                 }});
 
                 item.add(new WebMarkupContainer("cell_operations_2") {{
-                    add(new Label("button_edit", "Edit") {{
-                        add(new AttributeAppender("href", "./experiment_pack?experiment_pack_id=" + experimentPack.getId()));
-                    }});
+                    add(new Link<Void>("button_edit") {
+                        @Override
+                        public void onClick() {
+                            PageParameters pageParameters1 = new PageParameters();
+                            pageParameters1.set("action", "edit");
+                            pageParameters1.set("experiment_pack_id", experimentPack.getId());
+                            pageParameters1.set("back_page_id", getPageId());
+
+                            setResponsePage(ExperimentPackPage.class, pageParameters1);
+                        }
+                    });
 
                     add(new Link<Void>("button_remove") {
                         @Override

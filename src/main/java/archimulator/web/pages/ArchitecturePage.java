@@ -23,6 +23,7 @@ import archimulator.service.ServiceManager;
 import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
 import net.pickapack.dateTime.DateHelper;
 import net.pickapack.util.StorageUnitHelper;
+import org.apache.wicket.PageReference;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.*;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
@@ -35,7 +36,7 @@ import java.util.Arrays;
 
 @MountPath(value = "/", alt = "/architecture")
 public class ArchitecturePage extends AuthenticatedWebPage {
-    public ArchitecturePage(PageParameters parameters) {
+    public ArchitecturePage(final PageParameters parameters) {
         super(PageType.ARCHITECTURE, parameters);
 
         final String action = parameters.get("action").toString();
@@ -118,7 +119,15 @@ public class ArchitecturePage extends AuthenticatedWebPage {
                             ServiceManager.getArchitectureService().updateArchitecture(architecture);
                         }
                     }
-                    setResponsePage(ArchitecturesPage.class);
+
+                    back(parameters);
+                }
+            });
+
+            this.add(new Button("button_cancel") {
+                @Override
+                public void onSubmit() {
+                    back(parameters);
                 }
             });
 
@@ -130,9 +139,20 @@ public class ArchitecturePage extends AuthenticatedWebPage {
                 @Override
                 public void onSubmit() {
                     ServiceManager.getArchitectureService().removeArchitectureById(architecture.getId());
-                    setResponsePage(ArchitecturesPage.class);
+
+                    back(parameters);
                 }
             });
         }});
+    }
+
+    private void back(PageParameters parameters) {
+        int backPageId = parameters.get("back_page_id").toInt(-1);
+        if(backPageId != -1) {
+            setResponsePage(new PageReference(backPageId).getPage());
+        }
+        else {
+            setResponsePage(ArchitecturesPage.class);
+        }
     }
 }

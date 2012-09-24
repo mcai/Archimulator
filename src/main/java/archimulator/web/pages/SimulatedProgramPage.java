@@ -21,6 +21,7 @@ package archimulator.web.pages;
 import archimulator.model.SimulatedProgram;
 import archimulator.service.ServiceManager;
 import net.pickapack.dateTime.DateHelper;
+import org.apache.wicket.PageReference;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.*;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
@@ -31,7 +32,7 @@ import org.wicketstuff.annotation.mount.MountPath;
 
 @MountPath(value = "/", alt = "/simulated_program")
 public class SimulatedProgramPage extends AuthenticatedWebPage {
-    public SimulatedProgramPage(PageParameters parameters) {
+    public SimulatedProgramPage(final PageParameters parameters) {
         super(PageType.SIMULATED_PROGRAM, parameters);
 
         final String action = parameters.get("action").toString();
@@ -80,7 +81,15 @@ public class SimulatedProgramPage extends AuthenticatedWebPage {
                     else {
                         ServiceManager.getSimulatedProgramService().updateSimulatedProgram(simulatedProgram);
                     }
-                    setResponsePage(SimulatedProgramsPage.class);
+
+                    back(parameters);
+                }
+            });
+
+            this.add(new Button("button_cancel") {
+                @Override
+                public void onSubmit() {
+                    back(parameters);
                 }
             });
 
@@ -92,9 +101,20 @@ public class SimulatedProgramPage extends AuthenticatedWebPage {
                 @Override
                 public void onSubmit() {
                     ServiceManager.getSimulatedProgramService().removeSimulatedProgramById(simulatedProgram.getId());
-                    setResponsePage(SimulatedProgramsPage.class);
+
+                    back(parameters);
                 }
             });
         }});
+    }
+
+    private void back(PageParameters parameters) {
+        int backPageId = parameters.get("back_page_id").toInt(-1);
+        if(backPageId != -1) {
+            setResponsePage(new PageReference(backPageId).getPage());
+        }
+        else {
+            setResponsePage(SimulatedProgramsPage.class);
+        }
     }
 }

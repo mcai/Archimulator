@@ -23,10 +23,10 @@ import archimulator.service.ServiceManager;
 import archimulator.web.components.PagingNavigator;
 import net.pickapack.dateTime.DateHelper;
 import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.markup.repeater.data.DataView;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
@@ -102,13 +102,19 @@ public class ExperimentsPage extends AuthenticatedWebPage {
                 item.add(new Label("cell_num_max_instructions", experiment.getNumMaxInstructions() + ""));
                 item.add(new Label("cell_create_time", DateHelper.toString(experiment.getCreateTime())));
 
-                WebMarkupContainer cellOperations = new WebMarkupContainer("cell_operations");
+                item.add(new WebMarkupContainer("cell_operations") {{
+                    add(new Link<Void>("button_edit") {
+                        @Override
+                        public void onClick() {
+                            PageParameters pageParameters1 = new PageParameters();
+                            pageParameters1.set("action", "edit");
+                            pageParameters1.set("experiment_id", experiment.getId());
+                            pageParameters1.set("back_page_id", getPageId());
 
-                cellOperations.add(new Label("button_edit", "Edit") {{
-                    add(new AttributeAppender("href", "./experiment?action=edit&experiment_id=" + experiment.getId()));
+                            setResponsePage(ExperimentPage.class, pageParameters1);
+                        }
+                    });
                 }});
-
-                item.add(cellOperations);
             }
         };
         rowExperiment.setItemsPerPage(10);

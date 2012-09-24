@@ -22,9 +22,9 @@ import archimulator.model.SimulatedProgram;
 import archimulator.service.ServiceManager;
 import archimulator.web.components.PagingNavigator;
 import net.pickapack.dateTime.DateHelper;
-import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.markup.repeater.data.DataView;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
@@ -75,13 +75,19 @@ public class SimulatedProgramsPage extends AuthenticatedWebPage {
                 item.add(new Label("cell_helper_thread_enabled", simulatedProgram.getHelperThreadEnabled() + ""));
                 item.add(new Label("cell_create_time", DateHelper.toString(simulatedProgram.getCreateTime())));
 
-                WebMarkupContainer cellOperations = new WebMarkupContainer("cell_operations");
+                item.add(new WebMarkupContainer("cell_operations") {{
+                    add(new Link<Void>("button_edit") {
+                        @Override
+                        public void onClick() {
+                            PageParameters pageParameters1 = new PageParameters();
+                            pageParameters1.set("action", "edit");
+                            pageParameters1.set("simulated_program_id", simulatedProgram.getId());
+                            pageParameters1.set("back_page_id", getPageId());
 
-                cellOperations.add(new Label("button_edit", "Edit"){{
-                    add(new AttributeAppender("href", "./simulated_program?action=edit&simulated_program_id=" + simulatedProgram.getId()));
+                            setResponsePage(SimulatedProgramPage.class, pageParameters1);
+                        }
+                    });
                 }});
-
-                item.add(cellOperations);
             }
         };
         rowSimulatedProgram.setItemsPerPage(10);

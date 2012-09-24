@@ -20,6 +20,9 @@ package archimulator.web.pages;
 
 import archimulator.model.ExperimentPack;
 import archimulator.service.ServiceManager;
+import org.apache.wicket.PageReference;
+import org.apache.wicket.markup.html.form.Button;
+import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -27,12 +30,12 @@ import org.wicketstuff.annotation.mount.MountPath;
 
 @MountPath(value = "/", alt = "/experiment_pack")
 public class ExperimentPackPage extends AuthenticatedWebPage {
-    public ExperimentPackPage(PageParameters parameters) {
+    public ExperimentPackPage(final PageParameters parameters) {
         super(PageType.EXPERIMENT_PACK, parameters);
 
         long experimentPackId = parameters.get("experiment_pack_id").toLong(-1);
 
-        ExperimentPack experimentPack = ServiceManager.getExperimentService().getExperimentPackById(experimentPackId);
+        final ExperimentPack experimentPack = ServiceManager.getExperimentService().getExperimentPackById(experimentPackId);
 
         if(experimentPack == null) {
             setResponsePage(getApplication().getHomePage());
@@ -41,6 +44,25 @@ public class ExperimentPackPage extends AuthenticatedWebPage {
 
         setTitle((experimentPackId == -1 ? "Add" : "Edit") + " Experiment Pack - Archimulator");
 
-        this.add(new TextField<String>("input_title", Model.of(experimentPack.getTitle())));
+        this.add(new Form("form_experiment_pack") {{
+            this.add(new TextField<String>("input_title", Model.of(experimentPack.getTitle())));
+
+            this.add(new Button("button_cancel") {
+                @Override
+                public void onSubmit() {
+                    back(parameters);
+                }
+            });
+        }});
+    }
+
+    private void back(PageParameters parameters) {
+        int backPageId = parameters.get("back_page_id").toInt(-1);
+        if(backPageId != -1) {
+            setResponsePage(new PageReference(backPageId).getPage());
+        }
+        else {
+            setResponsePage(ExperimentPacksPage.class);
+        }
     }
 }

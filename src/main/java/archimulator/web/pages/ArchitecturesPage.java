@@ -23,9 +23,9 @@ import archimulator.service.ServiceManager;
 import archimulator.web.components.PagingNavigator;
 import net.pickapack.StorageUnit;
 import net.pickapack.dateTime.DateHelper;
-import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.markup.repeater.data.DataView;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
@@ -82,13 +82,19 @@ public class ArchitecturesPage extends AuthenticatedWebPage {
                 item.add(new Label("cell_l2_repl", architecture.getL2ReplacementPolicyType() + ""));
                 item.add(new Label("cell_create_time", DateHelper.toString(architecture.getCreateTime())));
 
-                WebMarkupContainer cellOperations = new WebMarkupContainer("cell_operations");
+                item.add(new WebMarkupContainer("cell_operations") {{
+                    add(new Link<Void>("button_edit") {
+                        @Override
+                        public void onClick() {
+                            PageParameters pageParameters1 = new PageParameters();
+                            pageParameters1.set("action", "edit");
+                            pageParameters1.set("architecture_id", architecture.getId());
+                            pageParameters1.set("back_page_id", getPageId());
 
-                cellOperations.add(new Label("button_edit", "Edit"){{
-                    add(new AttributeAppender("href", "./architecture?action=edit&architecture_id=" + architecture.getId()));
+                            setResponsePage(ArchitecturePage.class, pageParameters1);
+                        }
+                    });
                 }});
-
-                item.add(cellOperations);
             }
         };
         rowArchitecture.setItemsPerPage(10);
