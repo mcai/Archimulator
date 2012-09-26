@@ -23,7 +23,7 @@ import archimulator.service.ServiceManager;
 import java.io.Serializable;
 
 public class ContextMapping implements Serializable {
-    private int threadId;
+    private Integer threadId;
 
     private long benchmarkId;
 
@@ -40,7 +40,7 @@ public class ContextMapping implements Serializable {
     private transient Benchmark benchmark;
 
     public ContextMapping(int threadId, Benchmark benchmark, String arguments) {
-        this(threadId, benchmark, arguments, "ctx" + threadId + "_out.txt");
+        this(threadId, benchmark, arguments, getDefaultStandardOut(threadId));
     }
 
     public ContextMapping(int threadId, Benchmark benchmark, String arguments, String standardOut) {
@@ -50,28 +50,45 @@ public class ContextMapping implements Serializable {
         this.standardOut = standardOut;
     }
 
-    public int getThreadId() {
+    public Integer getThreadId() {
         return threadId;
+    }
+
+    public void setThreadId(Integer threadId) {
+        this.threadId = threadId;
     }
 
     public long getBenchmarkId() {
         return benchmarkId;
     }
 
-    public Benchmark getBenchmark() {
-        if (benchmark == null) {
-            benchmark = ServiceManager.getBenchmarkService().getBenchmarkById(benchmarkId);
-        }
-
-        return benchmark;
+    public void setBenchmarkId(long benchmarkId) {
+        this.benchmarkId = benchmarkId;
+        this.benchmark = ServiceManager.getBenchmarkService().getBenchmarkById(benchmarkId);
     }
 
     public String getArguments() {
+        if(arguments == null) {
+            arguments = "";
+        }
+
         return arguments;
     }
 
+    public void setArguments(String arguments) {
+        this.arguments = arguments;
+    }
+
     public String getStandardOut() {
+        if(standardOut == null) {
+            standardOut = "";
+        }
+
         return standardOut;
+    }
+
+    public void setStandardOut(String standardOut) {
+        this.standardOut = standardOut;
     }
 
     public int getHelperThreadLookahead() {
@@ -98,8 +115,20 @@ public class ContextMapping implements Serializable {
         this.dynamicHelperThreadParams = dynamicHelperThreadParams;
     }
 
+    public Benchmark getBenchmark() {
+        if (benchmark == null) {
+            benchmark = ServiceManager.getBenchmarkService().getBenchmarkById(benchmarkId);
+        }
+
+        return benchmark;
+    }
+
     @Override
     public String toString() {
         return String.format("thread #%d->'%s'", threadId, getBenchmark().getTitle() + "_" + arguments + "-lookahead_" + helperThreadLookahead + "-stride_" + helperThreadStride);
+    }
+
+    public static String getDefaultStandardOut(Integer threadId) {
+        return "ctx" + threadId + "_out.txt";
     }
 }

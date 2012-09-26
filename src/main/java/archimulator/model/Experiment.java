@@ -26,6 +26,7 @@ import net.pickapack.action.Function1;
 import net.pickapack.dateTime.DateHelper;
 import net.pickapack.model.ModelElement;
 import net.pickapack.util.CollectionHelper;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.*;
 
@@ -83,7 +84,7 @@ public class Experiment implements ModelElement {
         ContextMapping contextMapping = this.contextMappings.get(0);
         Benchmark benchmark = contextMapping.getBenchmark();
 
-        this.title = benchmark.getTitle().replaceAll(" ", "_") + "_" + contextMapping.getArguments().replaceAll(" ", "_");
+        this.title = benchmark.getTitle().replaceAll(" ", "_") + (StringUtils.isEmpty(contextMapping.getArguments()) ? "" : "_" + contextMapping.getArguments().replaceAll(" ", "_"));
 
         if (this.type == ExperimentType.FUNCTIONAL) {
             this.title += "-functional";

@@ -19,22 +19,13 @@
 package archimulator.web.pages;
 
 import archimulator.model.Architecture;
-import archimulator.service.ServiceManager;
 import archimulator.web.components.PagingNavigator;
-import net.pickapack.StorageUnit;
-import net.pickapack.dateTime.DateHelper;
-import org.apache.wicket.markup.html.WebMarkupContainer;
-import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.link.Link;
-import org.apache.wicket.markup.repeater.Item;
+import archimulator.web.data.provider.ArchitectureDataProvider;
+import archimulator.web.data.view.ArchitectureDataView;
 import org.apache.wicket.markup.repeater.data.DataView;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
-import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.wicketstuff.annotation.mount.MountPath;
-
-import java.util.Iterator;
 
 @MountPath(value = "/", alt = "/architectures")
 public class ArchitecturesPage extends AuthenticatedWebPage {
@@ -43,60 +34,9 @@ public class ArchitecturesPage extends AuthenticatedWebPage {
 
         setTitle("Architectures - Archimulator");
 
-        IDataProvider<Architecture> dataProvider = new IDataProvider<Architecture>() {
-            @Override
-            public Iterator<? extends Architecture> iterator(long first, long count) {
-                return ServiceManager.getArchitectureService().getAllArchitectures(first, count).iterator();
-            }
+        IDataProvider<Architecture> dataProvider = new ArchitectureDataProvider();
 
-            @Override
-            public long size() {
-                return ServiceManager.getArchitectureService().getNumAllArchitectures();
-            }
-
-            @Override
-            public IModel<Architecture> model(Architecture object) {
-                return new Model<Architecture>(object);
-            }
-
-            @Override
-            public void detach() {
-            }
-        };
-
-        DataView<Architecture> rowArchitecture = new DataView<Architecture>("row_architecture", dataProvider) {
-            @Override
-            protected void populateItem(Item<Architecture> item) {
-                final Architecture architecture = item.getModelObject();
-
-                item.add(new Label("cell_id", architecture.getId() + ""));
-                item.add(new Label("cell_title", architecture.getTitle()));
-                item.add(new Label("cell_num_cores", architecture.getNumCores() + ""));
-                item.add(new Label("cell_num_threads_per_core", architecture.getNumThreadsPerCore() + ""));
-                item.add(new Label("cell_l1I_size", StorageUnit.toString(architecture.getL1ISize())));
-                item.add(new Label("cell_l1I_associativity", architecture.getL1IAssociativity() + ""));
-                item.add(new Label("cell_l1D_size", StorageUnit.toString(architecture.getL1DSize())));
-                item.add(new Label("cell_l1D_associativity", architecture.getL1DAssociativity() + ""));
-                item.add(new Label("cell_l2_size", StorageUnit.toString(architecture.getL2Size())));
-                item.add(new Label("cell_l2_associativity", architecture.getL2Associativity() + ""));
-                item.add(new Label("cell_l2_repl", architecture.getL2ReplacementPolicyType() + ""));
-                item.add(new Label("cell_create_time", DateHelper.toString(architecture.getCreateTime())));
-
-                item.add(new WebMarkupContainer("cell_operations") {{
-                    add(new Link<Void>("button_edit") {
-                        @Override
-                        public void onClick() {
-                            PageParameters pageParameters1 = new PageParameters();
-                            pageParameters1.set("action", "edit");
-                            pageParameters1.set("architecture_id", architecture.getId());
-                            pageParameters1.set("back_page_id", getPageId());
-
-                            setResponsePage(ArchitecturePage.class, pageParameters1);
-                        }
-                    });
-                }});
-            }
-        };
+        DataView<Architecture> rowArchitecture = new ArchitectureDataView(this, "row_architecture", dataProvider);
         rowArchitecture.setItemsPerPage(10);
         add(rowArchitecture);
 

@@ -15,65 +15,149 @@
 
                 <form class="form-horizontal span12" wicket:id="form_experiment">
 
-                    <div class="row">
-                        <div class="span9">
+                    <ul class="nav nav-tabs" id="myTab">
+                        <li class="active"><a data-toggle="tab" href="#tab_general">General</a></li>
+                        <li><a data-toggle="tab" href="#tab_context_mappings">Context Mappings</a></li>
+                        <li><a data-toggle="tab" href="#tab_stats">Statistics</a></li>
+                    </ul>
 
-                            <div class="control-group">
-                                <label for="input_id" class="control-label">Id:</label>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="tab_general">
+                            <div class="row">
+                                <div class="span9">
 
-                                <div class="controls">
-                                    <input id="input_id" type="text" class="span1" readonly wicket:id="input_id"/>
+                                    <div class="control-group">
+                                        <label for="input_id" class="control-label">Id:</label>
+
+                                        <div class="controls">
+                                            <input id="input_id" type="text" class="span1" readonly
+                                                   wicket:id="input_id"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="control-group">
+                                        <label for="input_title" class="control-label">Title:</label>
+
+                                        <div class="controls">
+                                            <input type="text" id="input_title" class="span9" readonly
+                                                   wicket:id="input_title"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="control-group">
+                                        <label for="select_type" class="control-label">Type:</label>
+
+                                        <div class="controls">
+                                            <select id="select_type" wicket:id="select_type"></select>
+                                        </div>
+                                    </div>
+
+                                    <div class="control-group">
+                                        <label for="select_state" class="control-label">State:</label>
+
+                                        <div class="controls">
+                                            <select id="select_state" wicket:id="select_state"></select>
+                                        </div>
+                                    </div>
+
+                                    <div class="control-group">
+                                        <label for="input_failedReason" class="control-label">Failed Reason:</label>
+
+                                        <div class="controls">
+                                            <textarea id="input_failedReason" class="span9" readonly rows="6" cols="40"
+                                                      wicket:id="textArea_failedReason"></textarea>
+                                        </div>
+                                    </div>
+
+                                    <div class="control-group">
+                                        <label for="select_architecture" class="control-label">Architecture:</label>
+
+                                        <div class="controls">
+                                            <select id="select_architecture" class="span9"
+                                                    wicket:id="select_architecture"></select>
+                                        </div>
+                                    </div>
+
+                                    <div class="control-group">
+                                        <label for="input_num_max_instructions" class="control-label"># Max
+                                            Insts:</label>
+
+                                        <div class="controls">
+                                            <input type="number" id="input_num_max_instructions"
+                                                   wicket:id="input_num_max_instructions"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="control-group">
+                                        <label for="input_create_time" class="control-label">Create Time:</label>
+
+                                        <div class="controls">
+                                            <input type="text" id="input_create_time" readonly
+                                                   wicket:id="input_create_time"/>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane" id="tab_context_mappings">
+
+                            <div class="row" wicket:id="form_context_mappings_add">
+                                <div class="span9">
+
+                                    <a class="btn btn-primary" wicket:id="button_add_context_mapping">Add Context Mapping</a>
+
                                 </div>
                             </div>
 
-                            <div class="control-group">
-                                <label for="input_title" class="control-label">Title:</label>
+                            <br/>
 
-                                <div class="controls">
-                                    <input type="text" id="input_title" class="span9" readonly wicket:id="input_title"/>
-                                </div>
-                            </div>
+                            <table class="table table-bordered table-striped" wicket:id="table_context_mappings">
+                                <thead>
+                                <tr>
+                                    <th>Thread Id</th>
+                                    <th>Benchmark</th>
+                                    <th>Arguments</th>
+                                    <th>Standard out</th>
+                                    <th>HT Lookahead</th>
+                                    <th>HT Stride</th>
+                                    <th>Dynamic HT Params</th>
+                                    <th>Operations</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr wicket:id="row_context_mapping">
+                                    <td>
+                                        <select id="select_thread_id" class="span1" wicket:id="select_thread_id"></select>
+                                    </td>
+                                    <td>
+                                        <select id="select_benchmark" class="span2" wicket:id="select_benchmark"></select>
+                                    </td>
+                                    <td>
+                                        <input type="text" id="input_arguments" class="span2" wicket:id="input_arguments"/>
+                                    </td>
+                                    <td>
+                                        <input type="text" id="input_standard_out" class="span2" wicket:id="input_standard_out"/>
+                                    </td>
+                                    <td>
+                                        <input type="text" id="input_helper_thread_lookahead" class="span1" wicket:id="input_helper_thread_lookahead"/>
+                                    </td>
+                                    <td>
+                                        <input type="text" id="input_helper_thread_stride" class="span1" wicket:id="input_helper_thread_stride"/>
+                                    </td>
+                                    <td>
+                                        <input type="checkbox" id="input_dynamic_helper_thread_params" class="span1" wicket:id="input_dynamic_helper_thread_params"/>
+                                    </td>
+                                    <td wicket:id="cell_operations">
+                                        <a class="btn" wicket:id="button_remove"><i class="icon-trash"></i>Remove</a>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
 
-                            <div class="control-group">
-                                <label for="select_type" class="control-label">Type:</label>
-
-                                <div class="controls">
-                                    <select id="select_type" wicket:id="select_type"></select>
-                                </div>
-                            </div>
-
-                            <div class="control-group">
-                                <label for="select_state" class="control-label">State:</label>
-
-                                <div class="controls">
-                                    <select id="select_state" wicket:id="select_state"></select>
-                                </div>
-                            </div>
-
-                            <div class="control-group">
-                                <label for="select_architecture" class="control-label">Architecture:</label>
-
-                                <div class="controls">
-                                    <select id="select_architecture" class="span9" wicket:id="select_architecture"></select>
-                                </div>
-                            </div>
-
-                            <div class="control-group">
-                                <label for="input_num_max_instructions" class="control-label"># Max Insts:</label>
-
-                                <div class="controls">
-                                    <input type="number" id="input_num_max_instructions" wicket:id="input_num_max_instructions"/>
-                                </div>
-                            </div>
-
-                            <div class="control-group">
-                                <label for="input_create_time" class="control-label">Create Time:</label>
-
-                                <div class="controls">
-                                    <input type="text" id="input_create_time" readonly wicket:id="input_create_time"/>
-                                </div>
-                            </div>
-
+                        <div class="tab-pane" id="tab_stats">
                         </div>
                     </div>
 

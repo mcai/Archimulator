@@ -1,4 +1,4 @@
-package archimulator.web;
+package archimulator.web.application;
 
 import archimulator.model.User;
 import archimulator.service.ServiceManager;

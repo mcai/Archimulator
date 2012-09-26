@@ -16,30 +16,38 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.web.pages;
+package archimulator.web.data.provider;
 
 import archimulator.model.ExperimentPack;
-import archimulator.web.components.PagingNavigator;
-import archimulator.web.data.provider.ExperimentPackDataProvider;
-import archimulator.web.data.view.ExperimentPackDataView;
-import org.apache.wicket.markup.repeater.data.DataView;
+import archimulator.service.ServiceManager;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
-import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.wicketstuff.annotation.mount.MountPath;
+import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.LoadableDetachableModel;
 
-@MountPath(value = "/", alt = "/experiment_packs")
-public class ExperimentPacksPage extends AuthenticatedWebPage {
-    public ExperimentPacksPage(PageParameters parameters) {
-        super(PageType.EXPERIMENT_PACKS, parameters);
+import java.util.Iterator;
 
-        setTitle("Experiment Packs - Archimulator");
+public class ExperimentPackDataProvider implements IDataProvider<ExperimentPack> {
+    @Override
+    public Iterator<? extends ExperimentPack> iterator(long first, long count) {
+        return ServiceManager.getExperimentService().getAllExperimentPacks(first, count).iterator();
+    }
 
-        IDataProvider<ExperimentPack> dataProvider = new ExperimentPackDataProvider();
+    @Override
+    public long size() {
+        return ServiceManager.getExperimentService().getAllExperimentPacks().size();
+    }
 
-        DataView<ExperimentPack> rowExperimentPack = new ExperimentPackDataView(this, "row_experiment_pack", dataProvider);
-        rowExperimentPack.setItemsPerPage(12);
-        add(rowExperimentPack);
+    @Override
+    public IModel<ExperimentPack> model(final ExperimentPack object) {
+        return new LoadableDetachableModel<ExperimentPack>(object) {
+            @Override
+            protected ExperimentPack load() {
+                return object;
+            }
+        };
+    }
 
-        add(new PagingNavigator("navigator", rowExperimentPack));
+    @Override
+    public void detach() {
     }
 }

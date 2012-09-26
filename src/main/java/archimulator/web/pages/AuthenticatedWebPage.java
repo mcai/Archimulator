@@ -1,6 +1,6 @@
 package archimulator.web.pages;
 
-import archimulator.web.ArchimulatorSession;
+import archimulator.web.application.ArchimulatorSession;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 
 public abstract class AuthenticatedWebPage extends BasePage {

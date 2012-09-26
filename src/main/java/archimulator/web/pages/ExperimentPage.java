@@ -20,10 +20,15 @@ package archimulator.web.pages;
 
 import archimulator.model.*;
 import archimulator.service.ServiceManager;
+import archimulator.web.data.view.ContextMappingDataView;
 import net.pickapack.dateTime.DateHelper;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.AjaxFallbackLink;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.*;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
+import org.apache.wicket.markup.repeater.data.DataView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -42,11 +47,10 @@ public class ExperimentPage extends AuthenticatedWebPage {
 
         final Experiment experiment;
 
-        if(action == null) {
+        if (action == null) {
             setResponsePage(getApplication().getHomePage());
             return;
-        }
-        else if (action.equals("add")) {
+        } else if (action.equals("add")) {
             List<ContextMapping> contextMappings = new ArrayList<ContextMapping>();
             Benchmark benchmark = ServiceManager.getBenchmarkService().getFirstBenchmark();
             contextMappings.add(new ContextMapping(0, benchmark, benchmark.getDefaultArguments()));
@@ -59,7 +63,7 @@ public class ExperimentPage extends AuthenticatedWebPage {
             throw new IllegalArgumentException();
         }
 
-        if(experiment == null) {
+        if (experiment == null) {
             setResponsePage(getApplication().getHomePage());
             return;
         }
@@ -76,6 +80,7 @@ public class ExperimentPage extends AuthenticatedWebPage {
 
             this.add(new DropDownChoice<ExperimentType>("select_type", new PropertyModel<ExperimentType>(experiment, "type"), Arrays.asList(ExperimentType.values())));
             this.add(new DropDownChoice<ExperimentState>("select_state", new PropertyModel<ExperimentState>(experiment, "state"), Arrays.asList(ExperimentState.values())));
+            this.add(new TextArea<String>("textArea_failedReason", Model.of(experiment.getFailedReason())));
 
             this.add(new DropDownChoice<Architecture>("select_architecture", new PropertyModel<Architecture>(experiment, "architecture"), ServiceManager.getArchitectureService().getAllArchitectures(), new IChoiceRenderer<Architecture>() {
                 @Override
@@ -85,12 +90,34 @@ public class ExperimentPage extends AuthenticatedWebPage {
 
                 @Override
                 public String getIdValue(Architecture architecture, int index) {
-                    return architecture.getTitle();
+                    return architecture.getId() + "";
                 }
             }));
 
             this.add(new NumberTextField<Integer>("input_num_max_instructions", new PropertyModel<Integer>(experiment, "numMaxInstructions")));
             this.add(new TextField<String>("input_create_time", Model.of(DateHelper.toString(experiment.getCreateTime()))));
+
+            final WebMarkupContainer tableContextMappings = new WebMarkupContainer("table_context_mappings");
+            tableContextMappings.setOutputMarkupId(true);
+            add(tableContextMappings);
+
+            add(new WebMarkupContainer("form_context_mappings_add") {{
+                add(new AjaxFallbackLink("button_add_context_mapping") {
+                    @Override
+                    public void onClick(AjaxRequestTarget target) {
+                        Integer threadId = 0;
+                        Benchmark benchmark = ServiceManager.getBenchmarkService().getFirstBenchmark();
+                        ContextMapping contextMapping = new ContextMapping(threadId, benchmark, benchmark.getDefaultArguments(), ContextMapping.getDefaultStandardOut(threadId));
+                        experiment.getContextMappings().add(contextMapping);
+
+                        target.add(tableContextMappings);
+                    }
+                });
+            }});
+
+            final DataView<ContextMapping> rowContextMapping = new ContextMappingDataView("row_context_mapping", experiment, tableContextMappings);
+
+            tableContextMappings.add(rowContextMapping);
 
             this.add(new Button("button_save", Model.of(action.equals("add") ? "Add" : "Save")) {
                 @Override
@@ -98,17 +125,16 @@ public class ExperimentPage extends AuthenticatedWebPage {
                     if (action.equals("add")) {
                         experiment.updateTitle();
 
-                        if(ServiceManager.getExperimentService().getLatestExperimentByTitle(experiment.getTitle()) == null) {
+                        if (ServiceManager.getExperimentService().getLatestExperimentByTitle(experiment.getTitle()) == null) {
                             ServiceManager.getExperimentService().addExperiment(experiment);
                         }
                     } else {
                         experiment.updateTitle();
 
                         Experiment experimentWithSameTitle = ServiceManager.getExperimentService().getLatestExperimentByTitle(experiment.getTitle());
-                        if(experimentWithSameTitle != null && experimentWithSameTitle.getId() != experiment.getId()) {
+                        if (experimentWithSameTitle != null && experimentWithSameTitle.getId() != experiment.getId()) {
                             ServiceManager.getExperimentService().removeExperimentById(experiment.getId());
-                        }
-                        else {
+                        } else {
                             ServiceManager.getExperimentService().updateExperiment(experiment);
                         }
                     }

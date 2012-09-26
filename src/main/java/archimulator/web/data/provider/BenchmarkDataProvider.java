@@ -16,30 +16,38 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.web.pages;
+package archimulator.web.data.provider;
 
 import archimulator.model.Benchmark;
-import archimulator.web.components.PagingNavigator;
-import archimulator.web.data.provider.BenchmarkDataProvider;
-import archimulator.web.data.view.BenchmarkDataView;
-import org.apache.wicket.markup.repeater.data.DataView;
+import archimulator.service.ServiceManager;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
-import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.wicketstuff.annotation.mount.MountPath;
+import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.LoadableDetachableModel;
 
-@MountPath(value = "/", alt = "/benchmarks")
-public class BenchmarksPage extends AuthenticatedWebPage {
-    public BenchmarksPage(PageParameters parameters) {
-        super(PageType.BENCHMARKS, parameters);
+import java.util.Iterator;
 
-        setTitle("Benchmarks - Archimulator");
+public class BenchmarkDataProvider implements IDataProvider<Benchmark> {
+    @Override
+    public Iterator<? extends Benchmark> iterator(long first, long count) {
+        return ServiceManager.getBenchmarkService().getAllBenchmarks(first, count).iterator();
+    }
 
-        IDataProvider<Benchmark> dataProvider = new BenchmarkDataProvider();
+    @Override
+    public long size() {
+        return ServiceManager.getBenchmarkService().getNumAllBenchmarks();
+    }
 
-        DataView<Benchmark> rowBenchmark = new BenchmarkDataView(this, "row_benchmark", dataProvider);
-        rowBenchmark.setItemsPerPage(10);
-        add(rowBenchmark);
+    @Override
+    public IModel<Benchmark> model(final Benchmark object) {
+        return new LoadableDetachableModel<Benchmark>(object) {
+            @Override
+            protected Benchmark load() {
+                return object;
+            }
+        };
+    }
 
-        add(new PagingNavigator("navigator", rowBenchmark));
+    @Override
+    public void detach() {
     }
 }

@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.web.pages;
 
-import archimulator.web.ArchimulatorSession;
+import archimulator.web.application.ArchimulatorSession;
 import de.agilecoders.wicket.markup.html.bootstrap.behavior.CssClassNameAppender;
 import org.apache.wicket.PageReference;
 import org.apache.wicket.Session;

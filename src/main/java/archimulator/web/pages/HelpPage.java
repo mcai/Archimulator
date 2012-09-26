@@ -20,7 +20,7 @@ package archimulator.web.pages;
 
 import archimulator.model.ExperimentState;
 import archimulator.service.ServiceManager;
-import archimulator.web.ArchimulatorSession;
+import archimulator.web.application.ArchimulatorSession;
 import net.pickapack.Pair;
 import net.pickapack.StorageUnit;
 import net.pickapack.dateTime.DateHelper;

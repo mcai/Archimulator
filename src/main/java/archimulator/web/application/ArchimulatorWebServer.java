@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.web;
+package archimulator.web.application;
 
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
