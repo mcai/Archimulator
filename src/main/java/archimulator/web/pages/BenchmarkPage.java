@@ -21,7 +21,6 @@ package archimulator.web.pages;
 import archimulator.model.Benchmark;
 import archimulator.service.ServiceManager;
 import net.pickapack.dateTime.DateHelper;
-import org.apache.wicket.PageReference;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.*;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
@@ -82,7 +81,7 @@ public class BenchmarkPage extends AuthenticatedWebPage {
                         ServiceManager.getBenchmarkService().updateBenchmark(benchmark);
                     }
 
-                    back(parameters);
+                    back(parameters, BenchmarksPage.class);
                 }
             });
 
@@ -93,7 +92,7 @@ public class BenchmarkPage extends AuthenticatedWebPage {
 
                 @Override
                 public void onSubmit() {
-                    back(parameters);
+                    back(parameters, BenchmarksPage.class);
                 }
             });
 
@@ -107,18 +106,9 @@ public class BenchmarkPage extends AuthenticatedWebPage {
                 public void onSubmit() {
                     ServiceManager.getBenchmarkService().removeBenchmarkById(benchmark.getId());
 
-                    back(parameters);
+                    back(parameters, BenchmarksPage.class);
                 }
             });
         }});
-    }
-
-    private void back(PageParameters parameters) {
-        int backPageId = parameters.get("back_page_id").toInt(-1);
-        if (backPageId != -1) {
-            setResponsePage(new PageReference(backPageId).getPage());
-        } else {
-            setResponsePage(BenchmarksPage.class);
-        }
     }
 }

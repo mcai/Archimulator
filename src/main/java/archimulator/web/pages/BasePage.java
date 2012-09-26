@@ -20,11 +20,14 @@ package archimulator.web.pages;
 
 import archimulator.web.ArchimulatorSession;
 import de.agilecoders.wicket.markup.html.bootstrap.behavior.CssClassNameAppender;
+import org.apache.wicket.PageReference;
+import org.apache.wicket.Session;
 import org.apache.wicket.markup.html.GenericWebPage;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.request.component.IRequestablePage;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 
 public abstract class BasePage<T> extends GenericWebPage<T> {
@@ -94,5 +97,15 @@ public abstract class BasePage<T> extends GenericWebPage<T> {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    protected void back(PageParameters parameters, Class<? extends IRequestablePage> defaultPageClz) {
+        int backPageId = parameters.get("back_page_id").toInt(-1);
+        if(backPageId != -1 && Session.get().getPageManager().getPage(backPageId) != null) {
+            setResponsePage(new PageReference(backPageId).getPage());
+        }
+        else {
+            setResponsePage(defaultPageClz);
+        }
     }
 }

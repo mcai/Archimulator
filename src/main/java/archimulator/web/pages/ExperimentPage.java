@@ -21,7 +21,6 @@ package archimulator.web.pages;
 import archimulator.model.*;
 import archimulator.service.ServiceManager;
 import net.pickapack.dateTime.DateHelper;
-import org.apache.wicket.PageReference;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.*;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
@@ -114,7 +113,7 @@ public class ExperimentPage extends AuthenticatedWebPage {
                         }
                     }
 
-                    back(parameters);
+                    back(parameters, ExperimentsPage.class);
                 }
             });
 
@@ -125,7 +124,7 @@ public class ExperimentPage extends AuthenticatedWebPage {
 
                 @Override
                 public void onSubmit() {
-                    back(parameters);
+                    back(parameters, ExperimentsPage.class);
                 }
             });
 
@@ -139,19 +138,9 @@ public class ExperimentPage extends AuthenticatedWebPage {
                 public void onSubmit() {
                     ServiceManager.getExperimentService().removeExperimentById(experiment.getId());
 
-                    back(parameters);
+                    back(parameters, ExperimentsPage.class);
                 }
             });
         }});
-    }
-
-    private void back(PageParameters parameters) {
-        int backPageId = parameters.get("back_page_id").toInt(-1);
-        if(backPageId != -1) {
-            setResponsePage(new PageReference(backPageId).getPage());
-        }
-        else {
-            setResponsePage(ExperimentsPage.class);
-        }
     }
 }

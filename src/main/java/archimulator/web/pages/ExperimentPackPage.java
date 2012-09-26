@@ -22,7 +22,6 @@ import archimulator.model.ExperimentPack;
 import archimulator.model.ExperimentType;
 import archimulator.service.ServiceManager;
 import net.pickapack.dateTime.DateHelper;
-import org.apache.wicket.PageReference;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
@@ -65,19 +64,9 @@ public class ExperimentPackPage extends AuthenticatedWebPage {
 
                 @Override
                 public void onSubmit() {
-                    back(parameters);
+                    back(parameters, ExperimentPacksPage.class);
                 }
             });
         }});
-    }
-
-    private void back(PageParameters parameters) {
-        int backPageId = parameters.get("back_page_id").toInt(-1);
-        if(backPageId != -1) {
-            setResponsePage(new PageReference(backPageId).getPage());
-        }
-        else {
-            setResponsePage(ExperimentPacksPage.class);
-        }
     }
 }

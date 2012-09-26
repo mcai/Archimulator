@@ -345,9 +345,9 @@ public class Architecture implements ModelElement {
 
     public void updateTitle() {
         this.title = "C" + this.numCores + "T" + this.numThreadsPerCore
-                + "-" + "L1I_" + this.l1ISize / 1024 + "KB" + "_" + "Assoc" + this.l1IAssociativity //TODO: use StorageUnit.toString(..) instead
-                + "-" + "l1D_" + this.l1DSize / 1024 + "KB" + "_" + "Assoc" + this.l1DAssociativity //TODO: use StorageUnit.toString(..) instead
-                + "-" + "L2_" + this.l2Size / 1024 + "KB" + "_" + "Assoc" + this.l2Associativity //TODO: use StorageUnit.toString(..) instead
+                + "-" + "L1I_" + StorageUnit.toString(this.l1ISize) + "_" + "Assoc" + this.l1IAssociativity
+                + "-" + "l1D_" + StorageUnit.toString(this.l1DSize) + "_" + "Assoc" + this.l1DAssociativity
+                + "-" + "L2_" + StorageUnit.toString(this.l2Size) + "_" + "Assoc" + this.l2Associativity
                 + "_" + this.l2ReplacementPolicyType;
     }
 
@@ -935,6 +935,14 @@ public class Architecture implements ModelElement {
 
     public void setBasicMainMemoryRowSize(int basicMainMemoryRowSize) {
         this.basicMainMemoryRowSize = basicMainMemoryRowSize;
+    }
+
+    public String getTlbSizeInStorageUnit() {
+        return StorageUnit.toString(tlbSize);
+    }
+
+    public void setTlbSizeInStorageUnit(String tlbSizeInStorageUnit) {
+        this.tlbSize = (int) StorageUnitHelper.displaySizeToByteCount(tlbSizeInStorageUnit);
     }
 
     public String getL1ISizeInStorageUnit() {
