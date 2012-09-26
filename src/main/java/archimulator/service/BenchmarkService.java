@@ -18,33 +18,33 @@
  ******************************************************************************/
 package archimulator.service;
 
-import archimulator.model.SimulatedProgram;
+import archimulator.model.Benchmark;
 import net.pickapack.service.Service;
 
 import java.util.List;
 
-public interface SimulatedProgramService extends Service {
-    List<SimulatedProgram> getAllSimulatedPrograms();
+public interface BenchmarkService extends Service {
+    List<Benchmark> getAllBenchmarks();
 
-    List<SimulatedProgram> getAllSimulatedPrograms(long first, long count);
+    List<Benchmark> getAllBenchmarks(long first, long count);
 
-    long getNumAllSimulatedPrograms();
+    long getNumAllBenchmarks();
 
-    SimulatedProgram getSimulatedProgramById(long id);
+    Benchmark getBenchmarkById(long id);
 
-    SimulatedProgram getSimulatedProgramByTitle(String title);
+    Benchmark getBenchmarkByTitle(String title);
 
-    SimulatedProgram getFirstSimulatedProgram();
+    Benchmark getFirstBenchmark();
 
-    long addSimulatedProgram(SimulatedProgram simulatedProgram);
+    long addBenchmark(Benchmark benchmark);
 
-    void removeSimulatedProgramById(long id);
+    void removeBenchmarkById(long id);
 
-    void clearSimulatedPrograms();
+    void clearBenchmarks();
 
-    void updateSimulatedProgram(SimulatedProgram simulatedProgram);
+    void updateBenchmark(Benchmark benchmark);
 
-    void lockSimulatedProgram(SimulatedProgram simulatedProgram);
+    void lockBenchmark(Benchmark benchmark);
 
-    void unlockSimulatedProgram(SimulatedProgram simulatedProgram);
+    void unlockBenchmark(Benchmark benchmark);
 }

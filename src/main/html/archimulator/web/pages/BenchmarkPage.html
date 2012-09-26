@@ -6,14 +6,14 @@
     <div class="container">
         <section>
             <div class="page-header">
-                <h1 wicket:id="section_header_simulated_program"></h1>
+                <h1 wicket:id="section_header_benchmark"></h1>
             </div>
 
             <span wicket:id="span_feedback"></span>
 
             <div class="row">
 
-                <form class="form-horizontal span12" wicket:id="form_simulated_program">
+                <form class="form-horizontal span12" wicket:id="form_benchmark">
 
                     <div class="row">
                         <div class="span9">
@@ -22,7 +22,7 @@
                                 <label for="input_id" class="control-label">Id:</label>
 
                                 <div class="controls">
-                                    <input id="input_id" type="text" class="span1" disabled wicket:id="input_id"/>
+                                    <input id="input_id" type="text" class="span1" readonly wicket:id="input_id"/>
                                 </div>
                             </div>
 
@@ -31,6 +31,14 @@
 
                                 <div class="controls">
                                     <input type="text" id="input_title" class="span9" wicket:id="input_title"/>
+                                </div>
+                            </div>
+
+                            <div class="control-group">
+                                <label for="input_working_directory" class="control-label">Working Directory:</label>
+
+                                <div class="controls">
+                                    <input type="text" id="input_working_directory" class="span9" wicket:id="input_working_directory"/>
                                 </div>
                             </div>
 
@@ -67,10 +75,18 @@
                             </div>
 
                             <div class="control-group">
+                                <label for="input_locked_for_building" class="control-label">Locked for Building:</label>
+
+                                <div class="controls">
+                                    <input type="checkbox" id="input_locked_for_building" readonly wicket:id="input_locked_for_building"/>
+                                </div>
+                            </div>
+
+                            <div class="control-group">
                                 <label for="input_create_time" class="control-label">Create Time:</label>
 
                                 <div class="controls">
-                                    <input type="text" id="input_create_time" disabled wicket:id="input_create_time"/>
+                                    <input type="text" id="input_create_time" readonly wicket:id="input_create_time"/>
                                 </div>
                             </div>
 

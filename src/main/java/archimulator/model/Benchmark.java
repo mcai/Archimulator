@@ -25,8 +25,8 @@ import net.pickapack.model.ModelElement;
 
 import java.util.Date;
 
-@DatabaseTable(tableName = "SimulatedProgram")
-public class SimulatedProgram implements ModelElement {
+@DatabaseTable(tableName = "Benchmark")
+public class Benchmark implements ModelElement {
     @DatabaseField(generatedId = true)
     private long id;
 
@@ -54,14 +54,14 @@ public class SimulatedProgram implements ModelElement {
     @DatabaseField
     private boolean locked;
 
-    public SimulatedProgram() {
+    public Benchmark() {
     }
 
-    public SimulatedProgram(String title, String workingDirectory, String executable, String defaultArguments) {
+    public Benchmark(String title, String workingDirectory, String executable, String defaultArguments) {
         this(title, workingDirectory, executable, defaultArguments, "", false);
     }
 
-    public SimulatedProgram(String title, String workingDirectory, String executable, String defaultArguments, String standardIn, boolean helperThreadEnabled) {
+    public Benchmark(String title, String workingDirectory, String executable, String defaultArguments, String standardIn, boolean helperThreadEnabled) {
         this.title = title;
         this.workingDirectory = workingDirectory;
         this.executable = executable;
@@ -120,6 +120,6 @@ public class SimulatedProgram implements ModelElement {
 
     @Override
     public String toString() {
-        return String.format("SimulatedProgram{id=%d, title='%s', workingDirectory='%s', executable='%s', standardIn='%s', helperThreadEnabled=%s, locked=%s}", id, title, workingDirectory, executable, standardIn, helperThreadEnabled, locked);
+        return String.format("Benchmark{id=%d, title='%s', workingDirectory='%s', executable='%s', standardIn='%s', helperThreadEnabled=%s, locked=%s}", id, title, workingDirectory, executable, standardIn, helperThreadEnabled, locked);
     }
 }

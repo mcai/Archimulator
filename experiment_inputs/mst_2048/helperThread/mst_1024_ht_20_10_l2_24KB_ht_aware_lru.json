@@ -2,8 +2,8 @@
     "title":"mst_1024_ht_20_10_l2_24KB_ht_aware_lru",
     "experimentType":"DETAILED",
     "baselineExperimentSpec":{
-        "simulatedProgramTitle":"mst_ht",
-        "simulatedProgramArguments":"1024 1",
+        "benchmarkTitle":"mst_ht",
+        "benchmarkArguments":"1024 1",
         "helperThreadLookahead":20,
         "helperThreadStride":10,
         "numCores":2,

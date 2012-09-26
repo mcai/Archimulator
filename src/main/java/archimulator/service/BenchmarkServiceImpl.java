@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.service;
 
-import archimulator.model.SimulatedProgram;
+import archimulator.model.Benchmark;
 import com.j256.ormlite.dao.Dao;
 import net.pickapack.model.ModelElement;
 import net.pickapack.service.AbstractService;
@@ -26,42 +26,42 @@ import net.pickapack.service.AbstractService;
 import java.util.Arrays;
 import java.util.List;
 
-public class SimulatedProgramServiceImpl extends AbstractService implements SimulatedProgramService {
-    private Dao<SimulatedProgram, Long> simulatedPrograms;
+public class BenchmarkServiceImpl extends AbstractService implements BenchmarkService {
+    private Dao<Benchmark, Long> benchmarks;
 
     @SuppressWarnings("unchecked")
-    public SimulatedProgramServiceImpl() {
-        super(ServiceManager.DATABASE_URL, Arrays.<Class<? extends ModelElement>>asList(SimulatedProgram.class));
+    public BenchmarkServiceImpl() {
+        super(ServiceManager.DATABASE_URL, Arrays.<Class<? extends ModelElement>>asList(Benchmark.class));
 
-        this.simulatedPrograms = createDao(SimulatedProgram.class);
+        this.benchmarks = createDao(Benchmark.class);
 
-        if (this.getFirstSimulatedProgram() == null) {
-            this.addSimulatedProgram(new SimulatedProgram(
+        if (this.getFirstBenchmark() == null) {
+            this.addBenchmark(new Benchmark(
                     "mst_baseline", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/baseline",
                     "mst.mips",
                     "4000"));
 
-            this.addSimulatedProgram(new SimulatedProgram(
+            this.addBenchmark(new Benchmark(
                     "mst_ht", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/ht",
                     "mst.mips",
                     "4000", "", true));
 
-            this.addSimulatedProgram(new SimulatedProgram(
+            this.addBenchmark(new Benchmark(
                     "em3d_baseline", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/em3d/baseline",
                     "em3d.mips",
                     "400000 128 75 1"));
 
-            this.addSimulatedProgram(new SimulatedProgram(
+            this.addBenchmark(new Benchmark(
                     "em3d_ht", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/em3d/ht",
                     "em3d.mips",
                     "400000 128 75 1", "", true));
 
-            this.addSimulatedProgram(new SimulatedProgram(
+            this.addBenchmark(new Benchmark(
                     "429_mcf_baseline", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline",
                     "429.mcf.mips",
                     ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline/data/ref/input/inp.in"));
 
-            this.addSimulatedProgram(new SimulatedProgram(
+            this.addBenchmark(new Benchmark(
                     "429_mcf_ht", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht",
                     "429.mcf.mips",
                     ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht/data/ref/input/inp.in", "", true));
@@ -69,59 +69,59 @@ public class SimulatedProgramServiceImpl extends AbstractService implements Simu
     }
 
     @Override
-    public List<SimulatedProgram> getAllSimulatedPrograms() {
-        return this.getAllItems(this.simulatedPrograms);
+    public List<Benchmark> getAllBenchmarks() {
+        return this.getAllItems(this.benchmarks);
     }
 
     @Override
-    public List<SimulatedProgram> getAllSimulatedPrograms(long first, long count) {
-        return this.getAllItems(this.simulatedPrograms, first, count);
+    public List<Benchmark> getAllBenchmarks(long first, long count) {
+        return this.getAllItems(this.benchmarks, first, count);
     }
 
     @Override
-    public long getNumAllSimulatedPrograms() {
-        return this.getNumAllItems(this.simulatedPrograms);
+    public long getNumAllBenchmarks() {
+        return this.getNumAllItems(this.benchmarks);
     }
 
     @Override
-    public SimulatedProgram getSimulatedProgramById(long id) {
-        return this.getItemById(this.simulatedPrograms, id);
+    public Benchmark getBenchmarkById(long id) {
+        return this.getItemById(this.benchmarks, id);
     }
 
     @Override
-    public SimulatedProgram getSimulatedProgramByTitle(String title) {
-        return this.getFirstItemByTitle(this.simulatedPrograms, title);
+    public Benchmark getBenchmarkByTitle(String title) {
+        return this.getFirstItemByTitle(this.benchmarks, title);
     }
 
     @Override
-    public SimulatedProgram getFirstSimulatedProgram() {
-        return this.getFirstItem(this.simulatedPrograms);
+    public Benchmark getFirstBenchmark() {
+        return this.getFirstItem(this.benchmarks);
     }
 
     @Override
-    public long addSimulatedProgram(SimulatedProgram simulatedProgram) {
-        return this.addItem(this.simulatedPrograms, SimulatedProgram.class, simulatedProgram);
+    public long addBenchmark(Benchmark benchmark) {
+        return this.addItem(this.benchmarks, Benchmark.class, benchmark);
     }
 
     @Override
-    public void removeSimulatedProgramById(long id) {
-        this.removeItemById(this.simulatedPrograms, SimulatedProgram.class, id);
+    public void removeBenchmarkById(long id) {
+        this.removeItemById(this.benchmarks, Benchmark.class, id);
     }
 
     @Override
-    public void clearSimulatedPrograms() {
-        this.clearItems(this.simulatedPrograms, SimulatedProgram.class);
+    public void clearBenchmarks() {
+        this.clearItems(this.benchmarks, Benchmark.class);
     }
 
     @Override
-    public void updateSimulatedProgram(SimulatedProgram simulatedProgram) {
-        this.updateItem(this.simulatedPrograms, SimulatedProgram.class, simulatedProgram);
+    public void updateBenchmark(Benchmark benchmark) {
+        this.updateItem(this.benchmarks, Benchmark.class, benchmark);
     }
 
     @Override
-    public void lockSimulatedProgram(SimulatedProgram simulatedProgram) {
-        long simulatedProgramId = simulatedProgram.getId();
-        while (getSimulatedProgramById(simulatedProgramId).getLocked()) {
+    public void lockBenchmark(Benchmark benchmark) {
+        long benchmarkId = benchmark.getId();
+        while (getBenchmarkById(benchmarkId).getLocked()) {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
@@ -129,13 +129,13 @@ public class SimulatedProgramServiceImpl extends AbstractService implements Simu
             }
         }
 
-        simulatedProgram.setLocked(true);
-        updateSimulatedProgram(simulatedProgram);
+        benchmark.setLocked(true);
+        updateBenchmark(benchmark);
     }
 
     @Override
-    public void unlockSimulatedProgram(SimulatedProgram simulatedProgram) {
-        simulatedProgram.setLocked(false);
-        updateSimulatedProgram(simulatedProgram);
+    public void unlockBenchmark(Benchmark benchmark) {
+        benchmark.setLocked(false);
+        updateBenchmark(benchmark);
     }
 }

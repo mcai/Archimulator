@@ -49,8 +49,8 @@ public class ExperimentPage extends AuthenticatedWebPage {
         }
         else if (action.equals("add")) {
             List<ContextMapping> contextMappings = new ArrayList<ContextMapping>();
-            SimulatedProgram simulatedProgram = ServiceManager.getSimulatedProgramService().getFirstSimulatedProgram();
-            contextMappings.add(new ContextMapping(0, simulatedProgram, simulatedProgram.getDefaultArguments()));
+            Benchmark benchmark = ServiceManager.getBenchmarkService().getFirstBenchmark();
+            contextMappings.add(new ContextMapping(0, benchmark, benchmark.getDefaultArguments()));
 
             experiment = new Experiment(ExperimentType.DETAILED, ServiceManager.getArchitectureService().getFirstArchitecture(), -1, contextMappings);
         } else if (action.equals("edit")) {

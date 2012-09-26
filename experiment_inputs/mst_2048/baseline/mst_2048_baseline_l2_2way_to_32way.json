@@ -2,8 +2,8 @@
     "title":"mst_2048_baseline_l2_2way_to_32way",
     "experimentType":"DETAILED",
     "baselineExperimentSpec":{
-        "simulatedProgramTitle":"mst_baseline",
-        "simulatedProgramArguments":"2048 1",
+        "benchmarkTitle":"mst_baseline",
+        "benchmarkArguments":"2048 1",
         "helperThreadLookahead":-1,
         "helperThreadStride":-1,
         "numCores":2,

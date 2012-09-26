@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.web.pages;
 
-import archimulator.model.SimulatedProgram;
+import archimulator.model.Benchmark;
 import archimulator.service.ServiceManager;
 import archimulator.web.components.PagingNavigator;
 import net.pickapack.dateTime.DateHelper;
@@ -35,27 +35,27 @@ import org.wicketstuff.annotation.mount.MountPath;
 
 import java.util.Iterator;
 
-@MountPath(value = "/", alt = "/simulated_programs")
-public class SimulatedProgramsPage extends AuthenticatedWebPage {
-    public SimulatedProgramsPage(PageParameters parameters) {
-        super(PageType.SIMULATED_PROGRAMS, parameters);
+@MountPath(value = "/", alt = "/benchmarks")
+public class BenchmarksPage extends AuthenticatedWebPage {
+    public BenchmarksPage(PageParameters parameters) {
+        super(PageType.BENCHMARKS, parameters);
 
-        setTitle("Simulated Programs - Archimulator");
+        setTitle("Benchmarks - Archimulator");
 
-        IDataProvider<SimulatedProgram> dataProvider = new IDataProvider<SimulatedProgram>() {
+        IDataProvider<Benchmark> dataProvider = new IDataProvider<Benchmark>() {
             @Override
-            public Iterator<? extends SimulatedProgram> iterator(long first, long count) {
-                return ServiceManager.getSimulatedProgramService().getAllSimulatedPrograms(first, count).iterator();
+            public Iterator<? extends Benchmark> iterator(long first, long count) {
+                return ServiceManager.getBenchmarkService().getAllBenchmarks(first, count).iterator();
             }
 
             @Override
             public long size() {
-                return ServiceManager.getSimulatedProgramService().getNumAllSimulatedPrograms();
+                return ServiceManager.getBenchmarkService().getNumAllBenchmarks();
             }
 
             @Override
-            public IModel<SimulatedProgram> model(SimulatedProgram object) {
-                return new Model<SimulatedProgram>(object);
+            public IModel<Benchmark> model(Benchmark object) {
+                return new Model<Benchmark>(object);
             }
 
             @Override
@@ -63,17 +63,17 @@ public class SimulatedProgramsPage extends AuthenticatedWebPage {
             }
         };
 
-        DataView<SimulatedProgram> rowSimulatedProgram = new DataView<SimulatedProgram>("row_simulated_program", dataProvider) {
-            protected void populateItem(Item<SimulatedProgram> item) {
-                final SimulatedProgram simulatedProgram = item.getModelObject();
+        DataView<Benchmark> rowBenchmark = new DataView<Benchmark>("row_benchmark", dataProvider) {
+            protected void populateItem(Item<Benchmark> item) {
+                final Benchmark benchmark = item.getModelObject();
 
-                item.add(new Label("cell_id", simulatedProgram.getId() + ""));
-                item.add(new Label("cell_title", simulatedProgram.getTitle()));
-                item.add(new Label("cell_executable", simulatedProgram.getExecutable()));
-                item.add(new Label("cell_default_arguments", simulatedProgram.getDefaultArguments()));
-                item.add(new Label("cell_stdin", simulatedProgram.getStandardIn()));
-                item.add(new Label("cell_helper_thread_enabled", simulatedProgram.getHelperThreadEnabled() + ""));
-                item.add(new Label("cell_create_time", DateHelper.toString(simulatedProgram.getCreateTime())));
+                item.add(new Label("cell_id", benchmark.getId() + ""));
+                item.add(new Label("cell_title", benchmark.getTitle()));
+                item.add(new Label("cell_executable", benchmark.getExecutable()));
+                item.add(new Label("cell_default_arguments", benchmark.getDefaultArguments()));
+                item.add(new Label("cell_stdin", benchmark.getStandardIn()));
+                item.add(new Label("cell_helper_thread_enabled", benchmark.getHelperThreadEnabled() + ""));
+                item.add(new Label("cell_create_time", DateHelper.toString(benchmark.getCreateTime())));
 
                 item.add(new WebMarkupContainer("cell_operations") {{
                     add(new Link<Void>("button_edit") {
@@ -81,18 +81,18 @@ public class SimulatedProgramsPage extends AuthenticatedWebPage {
                         public void onClick() {
                             PageParameters pageParameters1 = new PageParameters();
                             pageParameters1.set("action", "edit");
-                            pageParameters1.set("simulated_program_id", simulatedProgram.getId());
+                            pageParameters1.set("benchmark_id", benchmark.getId());
                             pageParameters1.set("back_page_id", getPageId());
 
-                            setResponsePage(SimulatedProgramPage.class, pageParameters1);
+                            setResponsePage(BenchmarkPage.class, pageParameters1);
                         }
                     });
                 }});
             }
         };
-        rowSimulatedProgram.setItemsPerPage(10);
-        add(rowSimulatedProgram);
+        rowBenchmark.setItemsPerPage(10);
+        add(rowBenchmark);
 
-        add(new PagingNavigator("navigator", rowSimulatedProgram));
+        add(new PagingNavigator("navigator", rowBenchmark));
     }
 }

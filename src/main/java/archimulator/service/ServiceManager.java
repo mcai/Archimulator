@@ -24,22 +24,22 @@ public class ServiceManager {
     public static final String USER_HOME_TEMPLATE_ARG = "<user.home>";
     public static final String DATABASE_URL = "jdbc:mysql://localhost/archimulator?user=root&password=1026@ustc";
 
-    private static SimulatedProgramService simulatedProgramService;
+    private static BenchmarkService benchmarkService;
     private static ArchitectureService architectureService;
     private static ExperimentService experimentService;
     private static UserService userService;
     private static SystemSettingService systemSettingService;
 
     static {
-        simulatedProgramService = new SimulatedProgramServiceImpl();
+        benchmarkService = new BenchmarkServiceImpl();
         architectureService = new ArchitectureServiceImpl();
         experimentService = new ExperimentServiceImpl();
         userService = new UserServiceImpl();
         systemSettingService = new SystemSettingServiceImpl();
     }
 
-    public static SimulatedProgramService getSimulatedProgramService() {
-        return simulatedProgramService;
+    public static BenchmarkService getBenchmarkService() {
+        return benchmarkService;
     }
 
     public static ArchitectureService getArchitectureService() {

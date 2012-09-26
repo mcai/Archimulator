@@ -15,112 +15,210 @@
 
                 <form class="form-horizontal span12" wicket:id="form_architecture">
 
-                    <div class="row">
-                        <div class="span9">
+                    <ul class="nav nav-tabs" id="myTab">
+                        <li class="active"><a data-toggle="tab" href="#tab_general">General</a></li>
+                        <li><a data-toggle="tab" href="#tab_pipeline">Pipelines</a></li>
+                        <li><a data-toggle="tab" href="#tab_branch_predictors">Branch Predictors</a></li>
+                        <li><a data-toggle="tab" href="#tab_caches">Caches</a></li>
+                        <li><a data-toggle="tab" href="#tab_interconnects">Interconnects</a></li>
+                        <li><a data-toggle="tab" href="#tab_misc">Misc.</a></li>
+                    </ul>
 
-                            <div class="control-group">
-                                <label for="input_id" class="control-label">Id:</label>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="tab_general">
+                            <div class="row">
+                                <div class="span9">
 
-                                <div class="controls">
-                                    <input id="input_id" type="text" class="span1" disabled wicket:id="input_id"/>
+                                    <div class="control-group">
+                                        <label for="input_id" class="control-label">Id:</label>
+
+                                        <div class="controls">
+                                            <input id="input_id" type="text" class="span1" readonly
+                                                   wicket:id="input_id"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="control-group">
+                                        <label for="input_title" class="control-label">Title:</label>
+
+                                        <div class="controls">
+                                            <input type="text" id="input_title" class="span9" readonly
+                                                   wicket:id="input_title"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="control-group">
+                                        <label for="input_ht_llc_request_profiling_enabled" class="control-label">HT LLC
+                                            Request Profiling Enabled:</label>
+
+                                        <div class="controls">
+                                            <input type="checkbox" id="input_ht_llc_request_profiling_enabled"
+                                                   wicket:id="input_ht_llc_request_profiling_enabled"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="control-group">
+                                        <label for="input_num_cores" class="control-label">Number of Cores:</label>
+
+                                        <div class="controls">
+                                            <input type="number" id="input_num_cores" wicket:id="input_num_cores"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="control-group">
+                                        <label for="input_num_threads_per_core" class="control-label">Number of Threads
+                                            Per Core:</label>
+
+                                        <div class="controls">
+                                            <input type="number" id="input_num_threads_per_core"
+                                                   wicket:id="input_num_threads_per_core"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="control-group">
+                                        <label for="input_create_time" class="control-label">Create Time:</label>
+
+                                        <div class="controls">
+                                            <input type="text" id="input_create_time" readonly
+                                                   wicket:id="input_create_time"/>
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="control-group">
-                                <label for="input_title" class="control-label">Title:</label>
+                        <div class="tab-pane" id="tab_pipeline">
+                            <div class="row">
+                                <div class="span9">
 
-                                <div class="controls">
-                                    <input type="text" id="input_title" class="span9" disabled wicket:id="input_title"/>
+                                    <div class="control-group">
+                                        <label for="input_physicalRegisterFileCapacity" class="control-label">L1I
+                                            Physical Register File Capacity:</label>
+
+                                        <div class="controls">
+                                            <input type="number" id="input_physicalRegisterFileCapacity"
+                                                   wicket:id="input_physicalRegisterFileCapacity"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="control-group">
+                                        <label for="input_decodeWidth" class="control-label">L1I
+                                            Decode Width:</label>
+
+                                        <div class="controls">
+                                            <input type="number" id="input_decodeWidth"
+                                                   wicket:id="input_decodeWidth"/>
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="control-group">
-                                <label for="input_ht_llc_request_profiling_enabled" class="control-label">HT LLC Request Profiling Enabled:</label>
+                        <div class="tab-pane" id="tab_branch_predictors">
+                            <div class="row">
+                                <div class="span9">
 
-                                <div class="controls">
-                                    <input type="checkbox" id="input_ht_llc_request_profiling_enabled" wicket:id="input_ht_llc_request_profiling_enabled" />
+                                    <!--<div class="control-group">-->
+                                        <!--<label for="input_l1I_size" class="control-label">L1I Size:</label>-->
+
+                                        <!--<div class="controls">-->
+                                            <!--<input type="text" id="input_l1I_size" wicket:id="input_l1I_size"/>-->
+                                        <!--</div>-->
+                                    <!--</div>-->
+
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="control-group">
-                                <label for="input_num_cores" class="control-label">Number of Cores:</label>
+                        <div class="tab-pane" id="tab_caches">
+                            <div class="row">
+                                <div class="span9">
 
-                                <div class="controls">
-                                    <input type="number" id="input_num_cores" wicket:id="input_num_cores"/>
+                                    <div class="control-group">
+                                        <label for="input_l1I_size" class="control-label">L1I Size:</label>
+
+                                        <div class="controls">
+                                            <input type="text" id="input_l1I_size" wicket:id="input_l1I_size"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="control-group">
+                                        <label for="input_l1I_associativity" class="control-label">L1I
+                                            Associativity:</label>
+
+                                        <div class="controls">
+                                            <input type="number" id="input_l1I_associativity"
+                                                   wicket:id="input_l1I_associativity"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="control-group">
+                                        <label for="input_l1D_size" class="control-label">L1D Size:</label>
+
+                                        <div class="controls">
+                                            <input type="text" id="input_l1D_size" wicket:id="input_l1D_size"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="control-group">
+                                        <label for="input_l1D_associativity" class="control-label">L1D
+                                            Associativity:</label>
+
+                                        <div class="controls">
+                                            <input type="number" id="input_l1D_associativity"
+                                                   wicket:id="input_l1D_associativity"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="control-group">
+                                        <label for="input_l2_size" class="control-label">L2 Size:</label>
+
+                                        <div class="controls">
+                                            <input type="text" id="input_l2_size" wicket:id="input_l2_size"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="control-group">
+                                        <label for="input_l2_associativity" class="control-label">L2
+                                            Associativity:</label>
+
+                                        <div class="controls">
+                                            <input type="number" id="input_l2_associativity"
+                                                   wicket:id="input_l2_associativity"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="control-group">
+                                        <label for="select_l2_repl" class="control-label">L2 Replacement Policy:</label>
+
+                                        <div class="controls">
+                                            <select id="select_l2_repl" wicket:id="select_l2_repl"></select>
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="control-group">
-                                <label for="input_num_threads_per_core" class="control-label">Number of Threads Per Core:</label>
+                        <div class="tab-pane" id="tab_interconnects">
+                            <div class="row">
+                                <div class="span9">
 
-                                <div class="controls">
-                                    <input type="number" id="input_num_threads_per_core" wicket:id="input_num_threads_per_core"/>
+                                    <!--<div class="control-group">-->
+                                        <!--<label for="input_l1I_size" class="control-label">L1I Size:</label>-->
+
+                                        <!--<div class="controls">-->
+                                            <!--<input type="text" id="input_l1I_size" wicket:id="input_l1I_size"/>-->
+                                        <!--</div>-->
+                                    <!--</div>-->
+
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="control-group">
-                                <label for="input_l1I_size" class="control-label">L1I Size:</label>
-
-                                <div class="controls">
-                                    <input type="text" id="input_l1I_size" wicket:id="input_l1I_size"/>
-                                </div>
-                            </div>
-
-                            <div class="control-group">
-                                <label for="input_l1I_associativity" class="control-label">L1I Associativity:</label>
-
-                                <div class="controls">
-                                    <input type="number" id="input_l1I_associativity" wicket:id="input_l1I_associativity"/>
-                                </div>
-                            </div>
-
-                            <div class="control-group">
-                                <label for="input_l1D_size" class="control-label">L1D Size:</label>
-
-                                <div class="controls">
-                                    <input type="text" id="input_l1D_size" wicket:id="input_l1D_size"/>
-                                </div>
-                            </div>
-
-                            <div class="control-group">
-                                <label for="input_l1D_associativity" class="control-label">L1D Associativity:</label>
-
-                                <div class="controls">
-                                    <input type="number" id="input_l1D_associativity" wicket:id="input_l1D_associativity"/>
-                                </div>
-                            </div>
-
-                            <div class="control-group">
-                                <label for="input_l2_size" class="control-label">L2 Size:</label>
-
-                                <div class="controls">
-                                    <input type="text" id="input_l2_size" wicket:id="input_l2_size"/>
-                                </div>
-                            </div>
-
-                            <div class="control-group">
-                                <label for="input_l2_associativity" class="control-label">L2 Associativity:</label>
-
-                                <div class="controls">
-                                    <input type="number" id="input_l2_associativity" wicket:id="input_l2_associativity"/>
-                                </div>
-                            </div>
-
-                            <div class="control-group">
-                                <label for="select_l2_repl" class="control-label">L2 Replacement Policy:</label>
-
-                                <div class="controls">
-                                    <select id="select_l2_repl" wicket:id="select_l2_repl"></select>
-                                </div>
-                            </div>
-
-                            <div class="control-group">
-                                <label for="input_create_time" class="control-label">Create Time:</label>
-
-                                <div class="controls">
-                                    <input type="text" id="input_create_time" disabled wicket:id="input_create_time"/>
-                                </div>
-                            </div>
+                        <div class="tab-pane" id="tab_misc">
 
                         </div>
                     </div>

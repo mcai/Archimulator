@@ -26,10 +26,10 @@ import java.io.Serializable;
 
 public class ExperimentSpec implements Serializable {
     @Description("Benchmark")
-    private String simulatedProgramTitle;
+    private String benchmarkTitle;
 
     @Description("Input")
-    private String simulatedProgramArguments;
+    private String benchmarkArguments;
 
     @Description("HT Lookahead")
     private int helperThreadLookahead;
@@ -68,16 +68,16 @@ public class ExperimentSpec implements Serializable {
 
     private transient Architecture architecture;
 
-    private transient SimulatedProgram simulatedProgram;
+    private transient Benchmark benchmark;
 
     private transient String arguments;
 
     public ExperimentSpec() {
     }
 
-    public ExperimentSpec(String simulatedProgramTitle, String simulatedProgramArguments, int helperThreadLookahead, int helperThreadStride, int numCores, int numThreadsPerCore, String l1ISize, int l1IAssociativity, String l1DSize, int l1DAssociativity, String l2Size, int l2Associativity, String l2ReplacementPolicyType) {
-        this.simulatedProgramTitle = simulatedProgramTitle;
-        this.simulatedProgramArguments = simulatedProgramArguments;
+    public ExperimentSpec(String benchmarkTitle, String benchmarkArguments, int helperThreadLookahead, int helperThreadStride, int numCores, int numThreadsPerCore, String l1ISize, int l1IAssociativity, String l1DSize, int l1DAssociativity, String l2Size, int l2Associativity, String l2ReplacementPolicyType) {
+        this.benchmarkTitle = benchmarkTitle;
+        this.benchmarkArguments = benchmarkArguments;
 
         this.helperThreadLookahead = helperThreadLookahead;
         this.helperThreadStride = helperThreadStride;
@@ -104,12 +104,12 @@ public class ExperimentSpec implements Serializable {
         this.parent = parent;
     }
 
-    public String getSimulatedProgramTitle() {
-        return simulatedProgramTitle;
+    public String getBenchmarkTitle() {
+        return benchmarkTitle;
     }
 
-    public String getSimulatedProgramArguments() {
-        return simulatedProgramArguments;
+    public String getBenchmarkArguments() {
+        return benchmarkArguments;
     }
 
     public int getHelperThreadLookahead() {
@@ -168,12 +168,12 @@ public class ExperimentSpec implements Serializable {
         return l2Size;
     }
 
-    public void setSimulatedProgramTitle(String simulatedProgramTitle) {
-        this.simulatedProgramTitle = simulatedProgramTitle;
+    public void setBenchmarkTitle(String benchmarkTitle) {
+        this.benchmarkTitle = benchmarkTitle;
     }
 
-    public void setSimulatedProgramArguments(String simulatedProgramArguments) {
-        this.simulatedProgramArguments = simulatedProgramArguments;
+    public void setBenchmarkArguments(String benchmarkArguments) {
+        this.benchmarkArguments = benchmarkArguments;
     }
 
     public void setHelperThreadLookahead(int helperThreadLookahead) {
@@ -228,18 +228,18 @@ public class ExperimentSpec implements Serializable {
         return architecture;
     }
 
-    public SimulatedProgram getSimulatedProgram() {
-        if(simulatedProgram == null) {
-            simulatedProgram = ServiceManager.getSimulatedProgramService().getSimulatedProgramByTitle(simulatedProgramTitle);
+    public Benchmark getBenchmark() {
+        if(benchmark == null) {
+            benchmark = ServiceManager.getBenchmarkService().getBenchmarkByTitle(benchmarkTitle);
         }
 
-        return simulatedProgram;
+        return benchmark;
     }
 
     public String getArguments() {
         if(arguments == null) {
-            String simulatedProgramArguments = getSimulatedProgramArguments();
-            arguments = simulatedProgramArguments == null ? getSimulatedProgram().getDefaultArguments() : simulatedProgramArguments;
+            String benchmarkArguments = getBenchmarkArguments();
+            arguments = benchmarkArguments == null ? getBenchmark().getDefaultArguments() : benchmarkArguments;
         }
 
         return arguments;

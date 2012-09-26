@@ -2,8 +2,8 @@
     "title":"em3d_6000_baseline_l2_96KB_to_2MB",
     "experimentType":"DETAILED",
     "baselineExperimentSpec":{
-        "simulatedProgramTitle":"em3d_baseline",
-        "simulatedProgramArguments":"6000 100 100",
+        "benchmarkTitle":"em3d_baseline",
+        "benchmarkArguments":"6000 100 100",
         "helperThreadLookahead":-1,
         "helperThreadStride":-1,
         "numCores":2,

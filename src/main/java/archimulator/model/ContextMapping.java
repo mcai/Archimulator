@@ -25,7 +25,7 @@ import java.io.Serializable;
 public class ContextMapping implements Serializable {
     private int threadId;
 
-    private long simulatedProgramId;
+    private long benchmarkId;
 
     private String arguments;
 
@@ -37,15 +37,15 @@ public class ContextMapping implements Serializable {
 
     private boolean dynamicHelperThreadParams;
 
-    private transient SimulatedProgram simulatedProgram;
+    private transient Benchmark benchmark;
 
-    public ContextMapping(int threadId, SimulatedProgram simulatedProgram, String arguments) {
-        this(threadId, simulatedProgram, arguments, "ctx" + threadId + "_out.txt");
+    public ContextMapping(int threadId, Benchmark benchmark, String arguments) {
+        this(threadId, benchmark, arguments, "ctx" + threadId + "_out.txt");
     }
 
-    public ContextMapping(int threadId, SimulatedProgram simulatedProgram, String arguments, String standardOut) {
+    public ContextMapping(int threadId, Benchmark benchmark, String arguments, String standardOut) {
         this.threadId = threadId;
-        this.simulatedProgramId = simulatedProgram.getId();
+        this.benchmarkId = benchmark.getId();
         this.arguments = arguments;
         this.standardOut = standardOut;
     }
@@ -54,16 +54,16 @@ public class ContextMapping implements Serializable {
         return threadId;
     }
 
-    public long getSimulatedProgramId() {
-        return simulatedProgramId;
+    public long getBenchmarkId() {
+        return benchmarkId;
     }
 
-    public SimulatedProgram getSimulatedProgram() {
-        if (simulatedProgram == null) {
-            simulatedProgram = ServiceManager.getSimulatedProgramService().getSimulatedProgramById(simulatedProgramId);
+    public Benchmark getBenchmark() {
+        if (benchmark == null) {
+            benchmark = ServiceManager.getBenchmarkService().getBenchmarkById(benchmarkId);
         }
 
-        return simulatedProgram;
+        return benchmark;
     }
 
     public String getArguments() {
@@ -100,6 +100,6 @@ public class ContextMapping implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("thread #%d->'%s'", threadId, getSimulatedProgram().getTitle() + "_" + arguments + "-lookahead_" + helperThreadLookahead + "-stride_" + helperThreadStride);
+        return String.format("thread #%d->'%s'", threadId, getBenchmark().getTitle() + "_" + arguments + "-lookahead_" + helperThreadLookahead + "-stride_" + helperThreadStride);
     }
 }

@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.web.pages;
 
-import archimulator.model.SimulatedProgram;
+import archimulator.model.Benchmark;
 import archimulator.service.ServiceManager;
 import net.pickapack.dateTime.DateHelper;
 import org.apache.wicket.PageReference;
@@ -30,54 +30,56 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.wicketstuff.annotation.mount.MountPath;
 
-@MountPath(value = "/", alt = "/simulated_program")
-public class SimulatedProgramPage extends AuthenticatedWebPage {
-    public SimulatedProgramPage(final PageParameters parameters) {
-        super(PageType.SIMULATED_PROGRAM, parameters);
+@MountPath(value = "/", alt = "/benchmark")
+public class BenchmarkPage extends AuthenticatedWebPage {
+    public BenchmarkPage(final PageParameters parameters) {
+        super(PageType.BENCHMARK, parameters);
 
         final String action = parameters.get("action").toString();
 
-        final SimulatedProgram simulatedProgram;
+        final Benchmark benchmark;
 
         if (action == null) {
             setResponsePage(getApplication().getHomePage());
             return;
         } else if (action.equals("add")) {
-            simulatedProgram = new SimulatedProgram("", "", "", "");
+            benchmark = new Benchmark("", "", "", "");
         } else if (action.equals("edit")) {
-            long simulatedProgramId = parameters.get("simulated_program_id").toLong(-1);
-            simulatedProgram = ServiceManager.getSimulatedProgramService().getSimulatedProgramById(simulatedProgramId);
+            long benchmarkId = parameters.get("benchmark_id").toLong(-1);
+            benchmark = ServiceManager.getBenchmarkService().getBenchmarkById(benchmarkId);
         } else {
             throw new IllegalArgumentException();
         }
 
-        if (simulatedProgram == null) {
+        if (benchmark == null) {
             setResponsePage(getApplication().getHomePage());
             return;
         }
 
-        setTitle((action.equals("add") ? "Add" : "Edit") + " Simulated Program - Archimulator");
+        setTitle((action.equals("add") ? "Add" : "Edit") + " Benchmark - Archimulator");
 
-        this.add(new Label("section_header_simulated_program", (action.equals("add") ? "Add" : "Edit") + " Simulated Program"));
+        this.add(new Label("section_header_benchmark", (action.equals("add") ? "Add" : "Edit") + " Benchmark"));
 
         add(new FeedbackPanel("span_feedback"));
 
-        this.add(new Form("form_simulated_program") {{
-            this.add(new TextField<Long>("input_id", Model.of(simulatedProgram.getId())));
-            this.add(new RequiredTextField<String>("input_title", new PropertyModel<String>(simulatedProgram, "title")));
-            this.add(new RequiredTextField<String>("input_executable", new PropertyModel<String>(simulatedProgram, "executable")));
-            this.add(new TextField<String>("input_default_arguments", new PropertyModel<String>(simulatedProgram, "defaultArguments")));
-            this.add(new TextField<String>("input_standard_in", new PropertyModel<String>(simulatedProgram, "standardIn")));
-            this.add(new CheckBox("input_helper_thread_enabled", new PropertyModel<Boolean>(simulatedProgram, "helperThreadEnabled")));
-            this.add(new TextField<String>("input_create_time", Model.of(DateHelper.toString(simulatedProgram.getCreateTime()))));
+        this.add(new Form("form_benchmark") {{
+            this.add(new TextField<Long>("input_id", Model.of(benchmark.getId())));
+            this.add(new RequiredTextField<String>("input_title", new PropertyModel<String>(benchmark, "title")));
+            this.add(new RequiredTextField<String>("input_working_directory", new PropertyModel<String>(benchmark, "workingDirectory")));
+            this.add(new RequiredTextField<String>("input_executable", new PropertyModel<String>(benchmark, "executable")));
+            this.add(new TextField<String>("input_default_arguments", new PropertyModel<String>(benchmark, "defaultArguments")));
+            this.add(new TextField<String>("input_standard_in", new PropertyModel<String>(benchmark, "standardIn")));
+            this.add(new CheckBox("input_helper_thread_enabled", new PropertyModel<Boolean>(benchmark, "helperThreadEnabled")));
+            this.add(new CheckBox("input_locked_for_building", Model.of(benchmark.getLocked())));
+            this.add(new TextField<String>("input_create_time", Model.of(DateHelper.toString(benchmark.getCreateTime()))));
 
             this.add(new Button("button_save", Model.of(action.equals("add") ? "Add" : "Save")) {
                 @Override
                 public void onSubmit() {
                     if (action.equals("add")) {
-                        ServiceManager.getSimulatedProgramService().addSimulatedProgram(simulatedProgram);
+                        ServiceManager.getBenchmarkService().addBenchmark(benchmark);
                     } else {
-                        ServiceManager.getSimulatedProgramService().updateSimulatedProgram(simulatedProgram);
+                        ServiceManager.getBenchmarkService().updateBenchmark(benchmark);
                     }
 
                     back(parameters);
@@ -103,7 +105,7 @@ public class SimulatedProgramPage extends AuthenticatedWebPage {
 
                 @Override
                 public void onSubmit() {
-                    ServiceManager.getSimulatedProgramService().removeSimulatedProgramById(simulatedProgram.getId());
+                    ServiceManager.getBenchmarkService().removeBenchmarkById(benchmark.getId());
 
                     back(parameters);
                 }
@@ -116,7 +118,7 @@ public class SimulatedProgramPage extends AuthenticatedWebPage {
         if (backPageId != -1) {
             setResponsePage(new PageReference(backPageId).getPage());
         } else {
-            setResponsePage(SimulatedProgramsPage.class);
+            setResponsePage(BenchmarksPage.class);
         }
     }
 }

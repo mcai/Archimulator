@@ -74,13 +74,13 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
                     for (ExperimentSpec experimentSpec : experimentPack.getExperimentSpecs()) {
                         ExperimentType experimentType = experimentPack.getExperimentType();
-                        SimulatedProgram simulatedProgram = experimentSpec.getSimulatedProgram();
+                        Benchmark benchmark = experimentSpec.getBenchmark();
                         Architecture architecture = experimentSpec.getArchitecture();
                         String arguments = experimentSpec.getArguments();
 
                         List<ContextMapping> contextMappings = new ArrayList<ContextMapping>();
 
-                        ContextMapping contextMapping = new ContextMapping(0, simulatedProgram, arguments);
+                        ContextMapping contextMapping = new ContextMapping(0, benchmark, arguments);
                         contextMapping.setHelperThreadLookahead(experimentSpec.getHelperThreadLookahead());
                         contextMapping.setHelperThreadStride(experimentSpec.getHelperThreadStride());
                         contextMapping.setDynamicHelperThreadParams(false);
@@ -183,12 +183,12 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     @Override
-    public List<Experiment> getExperimentsBySimulatedProgram(SimulatedProgram simulatedProgram) { //TODO: to be optimized
+    public List<Experiment> getExperimentsByBenchmark(Benchmark benchmark) { //TODO: to be optimized
         List<Experiment> result = new ArrayList<Experiment>();
 
         for (Experiment experiment : getAllExperiments()) {
             for (ContextMapping contextMapping : experiment.getContextMappings()) {
-                if (contextMapping.getSimulatedProgramId() == simulatedProgram.getId()) {
+                if (contextMapping.getBenchmarkId() == benchmark.getId()) {
                     result.add(experiment);
                     break;
                 }
@@ -549,7 +549,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
     @Override
     public void tableSummary(String title, Experiment baselineExperiment, List<Experiment> experiments) {
-        boolean helperThreadEnabled = baselineExperiment.getContextMappings().get(0).getSimulatedProgram().getHelperThreadEnabled();
+        boolean helperThreadEnabled = baselineExperiment.getContextMappings().get(0).getBenchmark().getHelperThreadEnabled();
 
         List<String> columns = helperThreadEnabled ? Arrays.asList(
                 "L2 Size", "L2 Assoc", "L2 Repl",

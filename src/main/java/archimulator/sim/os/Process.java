@@ -68,7 +68,7 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
         this.id = getExperiment().currentProcessId++;
         kernel.getProcesses().add(this);
 
-        this.standardInFileDescriptor = contextMapping.getSimulatedProgram().getStandardIn().length() > 0 ? NativeSystemCalls.LIBC.open(simulationDirectory + File.separator + contextMapping.getSimulatedProgram().getStandardIn(), OpenFlags.O_RDONLY) : 0;
+        this.standardInFileDescriptor = contextMapping.getBenchmark().getStandardIn().length() > 0 ? NativeSystemCalls.LIBC.open(simulationDirectory + File.separator + contextMapping.getBenchmark().getStandardIn(), OpenFlags.O_RDONLY) : 0;
         this.standardOutFileDescriptor = contextMapping.getStandardOut().length() > 0 ? NativeSystemCalls.LIBC.open(simulationDirectory + File.separator + contextMapping.getStandardOut(), OpenFlags.O_CREAT | OpenFlags.O_APPEND | OpenFlags.O_TRUNC | OpenFlags.O_WRONLY, 0660) : 1;
 
         this.environments = new ArrayList<String>();
@@ -77,13 +77,13 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
 
         this.memory = new Memory(kernel, this.littleEndian, this.id);
 
-        ServiceManager.getSimulatedProgramService().lockSimulatedProgram(contextMapping.getSimulatedProgram());
+        ServiceManager.getBenchmarkService().lockBenchmark(contextMapping.getBenchmark());
 
-        buildSimulatedProgram(contextMapping.getSimulatedProgram().getWorkingDirectory(), contextMapping.getSimulatedProgram().getHelperThreadEnabled(), contextMapping.getHelperThreadLookahead(), contextMapping.getHelperThreadStride());
+        buildBenchmark(contextMapping.getBenchmark().getWorkingDirectory(), contextMapping.getBenchmark().getHelperThreadEnabled(), contextMapping.getHelperThreadLookahead(), contextMapping.getHelperThreadStride());
 
         this.loadProgram(kernel, simulationDirectory, contextMapping);
 
-        ServiceManager.getSimulatedProgramService().unlockSimulatedProgram(contextMapping.getSimulatedProgram());
+        ServiceManager.getBenchmarkService().unlockBenchmark(contextMapping.getBenchmark());
     }
 
     protected abstract void loadProgram(Kernel kernel, String simulationDirectory, ContextMapping contextMapping);
@@ -214,7 +214,7 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
         return (n + alignment - 1) & ~(alignment - 1);
     }
 
-    private static void buildSimulatedProgram(String workingDirectory, boolean helperThreadEnabled, int helperThreadLookahead, int helperThreadStride) {
+    private static void buildBenchmark(String workingDirectory, boolean helperThreadEnabled, int helperThreadLookahead, int helperThreadStride) {
         if (helperThreadEnabled) {
             pushMacroDefineArg(workingDirectory, "push_params.h", "LOOKAHEAD", helperThreadLookahead + "");
             pushMacroDefineArg(workingDirectory, "push_params.h", "STRIDE", helperThreadStride + "");

@@ -24,19 +24,14 @@ import archimulator.model.ExperimentType;
 import archimulator.sim.common.*;
 import archimulator.sim.os.Kernel;
 import net.pickapack.Reference;
-import net.pickapack.dateTime.DateHelper;
 import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
-import java.util.Date;
-
 public class RunExperimentJob implements Job {
     public void execute(JobExecutionContext context) throws JobExecutionException {
-        System.out.printf("[%s] RunExperimentJob is executing.\n", DateHelper.toString(new Date()));
-
         if (!ServiceManager.getSystemSettingService().getSystemSettingSingleton().isRunningExperimentsEnabled()) {
             return;
         }
@@ -48,8 +43,6 @@ public class RunExperimentJob implements Job {
 
             runExperiment(experiment);
         }
-
-        System.out.printf("[%s] RunExperimentJob is done.\n", DateHelper.toString(new Date()));
     }
 
     private void runExperiment(Experiment experiment) {

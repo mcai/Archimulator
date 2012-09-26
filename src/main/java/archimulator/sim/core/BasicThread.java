@@ -65,7 +65,7 @@ public class BasicThread extends AbstractBasicThread {
                 if (event.getContext() == getContext()) {
                     ContextMapping contextMapping = event.getContext().getProcess().getContextMapping();
 
-                    if (contextMapping.getSimulatedProgram().getHelperThreadEnabled()) {
+                    if (contextMapping.getBenchmark().getHelperThreadEnabled()) {
                         if (event.getImm() == 3820) {
                             savedRegisterValue.set(event.getContext().getRegisterFile().getGpr(event.getRs()));
                             event.getContext().getRegisterFile().setGpr(event.getRs(), getHelperThreadLookahead(contextMapping));
@@ -84,7 +84,7 @@ public class BasicThread extends AbstractBasicThread {
     }
 
     protected int getHelperThreadLookahead(ContextMapping contextMapping) {
-        if (contextMapping.getSimulatedProgram().getHelperThreadEnabled()) {
+        if (contextMapping.getBenchmark().getHelperThreadEnabled()) {
             return contextMapping.getDynamicHelperThreadParams() ? 20 : contextMapping.getHelperThreadLookahead();
         }
 
@@ -92,7 +92,7 @@ public class BasicThread extends AbstractBasicThread {
     }
 
     protected int getHelperThreadStride(ContextMapping contextMapping) {
-        if (contextMapping.getSimulatedProgram().getHelperThreadEnabled()) {
+        if (contextMapping.getBenchmark().getHelperThreadEnabled()) {
             return contextMapping.getDynamicHelperThreadParams() ? 10 : contextMapping.getHelperThreadStride();
         }
 

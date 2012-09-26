@@ -41,8 +41,8 @@ public abstract class BasePage<T> extends GenericWebPage<T> {
             }
         }});
 
-        add(new ListItem("li_nav_simulated_programs", 1){{
-            if (pageType == PageType.SIMULATED_PROGRAMS) {
+        add(new ListItem("li_nav_benchmarks", 1){{
+            if (pageType == PageType.BENCHMARKS) {
                 add(new CssClassNameAppender("active"));
             }
         }});

@@ -2,8 +2,8 @@
     "title":"mst_2048_ht_20_10_l2_96KB_to_2MB",
     "experimentType":"DETAILED",
     "baselineExperimentSpec":{
-        "simulatedProgramTitle":"mst_ht",
-        "simulatedProgramArguments":"2048 1",
+        "benchmarkTitle":"mst_ht",
+        "benchmarkArguments":"2048 1",
         "helperThreadLookahead":20,
         "helperThreadStride":10,
         "numCores":2,

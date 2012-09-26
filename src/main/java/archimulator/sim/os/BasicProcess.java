@@ -49,7 +49,7 @@ public class BasicProcess extends Process {
 
         this.instructions = new HashMap<String, SortedMap<Integer, Instruction>>();
 
-        List<String> commandLineArgumentList = Arrays.asList((contextMapping.getSimulatedProgram().getWorkingDirectory() + File.separator + contextMapping.getSimulatedProgram().getExecutable() + " " + contextMapping.getArguments()).replaceAll(ServiceManager.USER_HOME_TEMPLATE_ARG, System.getProperty("user.home")).split(" "));
+        List<String> commandLineArgumentList = Arrays.asList((contextMapping.getBenchmark().getWorkingDirectory() + File.separator + contextMapping.getBenchmark().getExecutable() + " " + contextMapping.getArguments()).replaceAll(ServiceManager.USER_HOME_TEMPLATE_ARG, System.getProperty("user.home")).split(" "));
 
         String elfFileName = commandLineArgumentList.get(0);
 

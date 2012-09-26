@@ -81,9 +81,9 @@ public class Experiment implements ModelElement {
 
     public void updateTitle() {
         ContextMapping contextMapping = this.contextMappings.get(0);
-        SimulatedProgram simulatedProgram = contextMapping.getSimulatedProgram();
+        Benchmark benchmark = contextMapping.getBenchmark();
 
-        this.title = simulatedProgram.getTitle().replaceAll(" ", "_") + "_" + contextMapping.getArguments().replaceAll(" ", "_");
+        this.title = benchmark.getTitle().replaceAll(" ", "_") + "_" + contextMapping.getArguments().replaceAll(" ", "_");
 
         if (this.type == ExperimentType.FUNCTIONAL) {
             this.title += "-functional";
@@ -93,7 +93,7 @@ public class Experiment implements ModelElement {
                 this.title += "-two_phase";
             }
 
-            if(contextMapping.getSimulatedProgram().getHelperThreadEnabled()) {
+            if(contextMapping.getBenchmark().getHelperThreadEnabled()) {
                 this.title += "-lookahead_" + contextMapping.getHelperThreadLookahead() + "-stride_" + contextMapping.getHelperThreadStride();
             }
 

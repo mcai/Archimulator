@@ -2,8 +2,8 @@
     "title":"mst_2048_ht_0_5_lookahead_0_to_640",
     "experimentType":"DETAILED",
     "baselineExperimentSpec":{
-        "simulatedProgramTitle":"mst_ht",
-        "simulatedProgramArguments":"2048 1",
+        "benchmarkTitle":"mst_ht",
+        "benchmarkArguments":"2048 1",
         "helperThreadLookahead":0,
         "helperThreadStride":5,
         "numCores":2,

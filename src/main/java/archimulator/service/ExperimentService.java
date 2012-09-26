@@ -45,7 +45,7 @@ public interface ExperimentService extends Service {
 
     Experiment getLatestExperimentByTitle(String title);
 
-    List<Experiment> getExperimentsBySimulatedProgram(SimulatedProgram simulatedProgram);
+    List<Experiment> getExperimentsByBenchmark(Benchmark benchmark);
 
     List<Experiment> getExperimentsByArchitecture(Architecture architecture);
 
