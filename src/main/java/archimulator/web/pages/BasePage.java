@@ -22,6 +22,7 @@ import archimulator.web.application.ArchimulatorSession;
 import de.agilecoders.wicket.markup.html.bootstrap.behavior.CssClassNameAppender;
 import org.apache.wicket.PageReference;
 import org.apache.wicket.Session;
+import org.apache.wicket.devutils.stateless.StatelessComponent;
 import org.apache.wicket.markup.html.GenericWebPage;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
@@ -30,6 +31,7 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.component.IRequestablePage;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 
+@StatelessComponent
 public abstract class BasePage<T> extends GenericWebPage<T> {
     private String title = "Archimulator";
 
@@ -107,5 +109,11 @@ public abstract class BasePage<T> extends GenericWebPage<T> {
         else {
             setResponsePage(defaultPageClz);
         }
+    }
+
+    @Override
+    protected void onBeforeRender() {
+        super.onBeforeRender();
+//        new StatelessChecker().onBeforeRender(this);
     }
 }

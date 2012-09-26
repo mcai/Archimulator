@@ -16,6 +16,7 @@
       <excludeFolder url="file://$MODULE_DIR$/target/surefire" />
       <excludeFolder url="file://$MODULE_DIR$/target/test-classes" />
       <excludeFolder url="file://$MODULE_DIR$/target/tmp" />
+      <excludeFolder url="file://$MODULE_DIR$/target/work" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
@@ -137,6 +138,7 @@
     <orderEntry type="library" name="Maven: org.quartz-scheduler:quartz:2.1.6" level="project" />
     <orderEntry type="library" name="Maven: c3p0:c3p0:0.9.1.1" level="project" />
     <orderEntry type="library" name="Maven: javax.transaction:jta:1.1" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.wicket:wicket-devutils:1.5.5" level="project" />
   </component>
 </module>
 
