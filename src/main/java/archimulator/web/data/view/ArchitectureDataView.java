@@ -24,7 +24,7 @@ import net.pickapack.StorageUnit;
 import net.pickapack.dateTime.DateHelper;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.link.Link;
+import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.markup.repeater.data.DataView;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
@@ -57,17 +57,11 @@ public class ArchitectureDataView extends DataView<Architecture> {
         item.add(new Label("cell_create_time", DateHelper.toString(architecture.getCreateTime())));
 
         item.add(new WebMarkupContainer("cell_operations") {{
-            add(new Link<Void>("button_edit") {
-                @Override
-                public void onClick() {
-                    PageParameters pageParameters1 = new PageParameters();
-                    pageParameters1.set("action", "edit");
-                    pageParameters1.set("architecture_id", architecture.getId());
-                    pageParameters1.set("back_page_id", page.getId());
-
-                    setResponsePage(ArchitecturePage.class, pageParameters1);
-                }
-            });
+            add(new BookmarkablePageLink<Object>("button_edit", ArchitecturePage.class, new PageParameters() {{
+                set("action", "edit");
+                set("architecture_id", architecture.getId());
+                set("back_page_id", page.getId());
+            }}));
         }});
     }
 }

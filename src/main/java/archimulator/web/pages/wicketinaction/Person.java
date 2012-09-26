@@ -5,15 +5,31 @@ import java.util.Iterator;
 import java.util.List;
 
 public class Person {
-    public String name;
-    public List<Phone> phones = new ArrayList<Phone>();
+    private String name;
+    private List<Phone> phones = new ArrayList<Phone>();
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public List<Phone> getPhones() {
+        return phones;
+    }
+
+    public void setPhones(List<Phone> phones) {
+        this.phones = phones;
+    }
 
     @Override
     public String toString() {
         StringBuilder str = new StringBuilder();
-        str.append("[Person name=").append(name);
+        str.append("[Person name=").append(getName());
         str.append(" phones=[");
-        Iterator<Phone> it = phones.iterator();
+        Iterator<Phone> it = getPhones().iterator();
         while (it.hasNext()) {
             str.append(it.next());
             if (it.hasNext()) {

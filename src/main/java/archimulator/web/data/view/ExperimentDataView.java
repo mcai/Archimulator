@@ -23,7 +23,7 @@ import archimulator.web.pages.ExperimentPage;
 import net.pickapack.dateTime.DateHelper;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.link.Link;
+import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.markup.repeater.data.DataView;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
@@ -50,17 +50,11 @@ public class ExperimentDataView extends DataView<Experiment> {
         item.add(new Label("cell_create_time", DateHelper.toString(experiment.getCreateTime())));
 
         item.add(new WebMarkupContainer("cell_operations") {{
-            add(new Link<Void>("button_edit") {
-                @Override
-                public void onClick() {
-                    PageParameters pageParameters1 = new PageParameters();
-                    pageParameters1.set("action", "edit");
-                    pageParameters1.set("experiment_id", experiment.getId());
-                    pageParameters1.set("back_page_id", page.getId());
-
-                    setResponsePage(ExperimentPage.class, pageParameters1);
-                }
-            });
+            add(new BookmarkablePageLink<Object>("button_edit", ExperimentPage.class, new PageParameters() {{
+                set("action", "edit");
+                set("experiment_id", experiment.getId());
+                set("back_page_id", page.getId());
+            }}));
         }});
     }
 }

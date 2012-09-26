@@ -25,6 +25,7 @@ import archimulator.web.pages.ExperimentPackPage;
 import de.agilecoders.wicket.markup.html.bootstrap.behavior.CssClassNameAppender;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.markup.repeater.data.DataView;
@@ -104,17 +105,11 @@ public class ExperimentPackDataView extends DataView<ExperimentPack> {
         }});
 
         item.add(new WebMarkupContainer("cell_operations_2") {{
-            add(new Link<Void>("button_edit") {
-                @Override
-                public void onClick() {
-                    PageParameters pageParameters1 = new PageParameters();
-                    pageParameters1.set("action", "edit");
-                    pageParameters1.set("experiment_pack_id", experimentPack.getId());
-                    pageParameters1.set("back_page_id", page.getId());
-
-                    setResponsePage(ExperimentPackPage.class, pageParameters1);
-                }
-            });
+            add(new BookmarkablePageLink<Object>("button_edit", ExperimentPackPage.class, new PageParameters() {{
+                set("action", "edit");
+                set("experiment_pack_id", experimentPack.getId());
+                set("back_page_id", page.getId());
+            }}));
 
             add(new Link<Void>("button_remove") {
                 @Override

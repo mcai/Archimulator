@@ -63,13 +63,13 @@ public class PersonPage extends BasePage {
                     add(new AjaxFormComponentUpdatingBehavior("onchange") {
                         protected void onUpdate(AjaxRequestTarget target) {
                             Phone phone = item.getModelObject();
-                            phone.ext = phone.threadId + "";
+                            phone.setExt(phone.getThreadId() + "");
 
                             target.add(item);
                         }
                     });
                 }});
-                item.add(new TextField("areacode"));
+                item.add(new TextField("areaCode"));
                 item.add(new TextField("phone"));
                 item.add(new TextField("ext"));
 
