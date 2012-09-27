@@ -1219,6 +1219,30 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         }
     }
 
+    private static Map<String, String> variablePropertyNameDescriptions;
+
+    static {
+        variablePropertyNameDescriptions = new LinkedHashMap<String, String>();
+
+        variablePropertyNameDescriptions.put("benchmarkTitle", "Benchmark");
+        variablePropertyNameDescriptions.put("benchmarkArguments", "");
+        variablePropertyNameDescriptions.put("helperThreadLookahead", "HT Lookahead");
+        variablePropertyNameDescriptions.put("helperThreadStride", "HT Stride");
+        variablePropertyNameDescriptions.put("numCores", "# Cores");
+        variablePropertyNameDescriptions.put("numThreadsPerCore", "# Threads per Core");
+        variablePropertyNameDescriptions.put("l1ISize", "L1I Size");
+        variablePropertyNameDescriptions.put("l1IAssociativity", "L1I Associativity");
+        variablePropertyNameDescriptions.put("l1DSize", "L1D Size");
+        variablePropertyNameDescriptions.put("l1DAssociativity", "L1D Associativity");
+        variablePropertyNameDescriptions.put("l2Size", "L2 Size");
+        variablePropertyNameDescriptions.put("l2Associativity", "L2 Associativity");
+        variablePropertyNameDescriptions.put("l2ReplacementPolicyType", "L2 Replacement Policy");
+    }
+
+    private static String getDescriptionOfVariablePropertyName(String variablePropertyName) {
+        return variablePropertyNameDescriptions.containsKey(variablePropertyName) ? variablePropertyNameDescriptions.get(variablePropertyName) : variablePropertyName;
+    }
+
     private void plot(final ExperimentPack experimentPack, String plotFileNameSuffix, String yLabel, List<?> rows) {
         try {
             String fileNamePdf = "experiment_plots" + File.separator + experimentPack.getTitle() + "_" + plotFileNameSuffix + ".pdf";
@@ -1231,11 +1255,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
             String variablePropertyDescription = CollectionUtils.isEmpty(experimentPack.getVariablePropertyNames()) ? "" : StringUtil.join(transform(experimentPack.getVariablePropertyNames(), new Function1<String, Object>() {
                 @Override
                 public Object apply(String variablePropertyName) {
-                    try {
-                        return ExperimentSpec.class.getDeclaredField(variablePropertyName).getAnnotation(Description.class).value();
-                    } catch (NoSuchFieldException e) {
-                        throw new RuntimeException(e);
-                    }
+                    return getDescriptionOfVariablePropertyName(variablePropertyName);
                 }
             }), "_");
 

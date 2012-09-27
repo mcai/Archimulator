@@ -25,43 +25,23 @@ import net.pickapack.util.StorageUnitHelper;
 import java.io.Serializable;
 
 public class ExperimentSpec implements Serializable {
-    @Description("Benchmark")
     private String benchmarkTitle;
-
-    @Description("Input")
     private String benchmarkArguments;
 
-    @Description("HT Lookahead")
     private int helperThreadLookahead;
-
-    @Description("HT Stride")
     private int helperThreadStride;
 
-    @Description("# Cores")
     private int numCores;
-
-    @Description("# Threads per Core")
     private int numThreadsPerCore;
 
-    @Description("L1I Size")
     private String l1ISize;
-
-    @Description("L1I Associativity")
     private int l1IAssociativity;
 
-    @Description("L1D Size")
     private String l1DSize;
-
-    @Description("L1D Associativity")
     private int l1DAssociativity;
 
-    @Description("L2 Size")
     private String l2Size;
-
-    @Description("L2 Associativity")
     private int l2Associativity;
-
-    @Description("L2 Replacement Policy")
     private String l2ReplacementPolicyType;
 
     private transient ExperimentPack parent;

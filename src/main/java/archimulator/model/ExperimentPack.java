@@ -50,7 +50,7 @@ public class ExperimentPack implements ModelElement {
     private ExperimentType experimentType;
 
     @DatabaseField(dataType = DataType.SERIALIZABLE)
-    private ExperimentSpec baselineExperimentSpec;
+    private ExperimentSpec baselineExperimentSpec; //TODO: to be converted to LinkedHashMap<String, String>
 
     @DatabaseField(dataType = DataType.SERIALIZABLE)
     private ArrayList<ExperimentPackVariable> variables;
