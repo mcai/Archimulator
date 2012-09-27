@@ -103,16 +103,6 @@
 
                         <div class="tab-pane" id="tab_context_mappings">
 
-                            <div class="row" wicket:id="form_context_mappings_add">
-                                <div class="span9">
-
-                                    <a class="btn btn-primary" wicket:id="button_add_context_mapping">Add Context Mapping</a>
-
-                                </div>
-                            </div>
-
-                            <br/>
-
                             <table class="table table-bordered table-striped" wicket:id="table_context_mappings">
                                 <thead>
                                 <tr>
@@ -129,28 +119,33 @@
                                 <tbody>
                                 <tr wicket:id="row_context_mapping">
                                     <td>
-                                        <select id="select_thread_id" class="span1" wicket:id="select_thread_id"></select>
+                                        <select class="span1" wicket:id="threadId"></select>
                                     </td>
                                     <td>
-                                        <select id="select_benchmark" class="span2" wicket:id="select_benchmark"></select>
+                                        <select class="span2" wicket:id="benchmarkId"></select>
                                     </td>
                                     <td>
-                                        <input type="text" id="input_arguments" class="span2" wicket:id="input_arguments"/>
+                                        <input type="text" class="span2" wicket:id="arguments"/>
                                     </td>
                                     <td>
-                                        <input type="text" id="input_standard_out" class="span2" wicket:id="input_standard_out"/>
+                                        <input type="text" class="span2" wicket:id="standardOut"/>
                                     </td>
                                     <td>
-                                        <input type="text" id="input_helper_thread_lookahead" class="span1" wicket:id="input_helper_thread_lookahead"/>
+                                        <input type="text" class="span1" wicket:id="helperThreadLookahead"/>
                                     </td>
                                     <td>
-                                        <input type="text" id="input_helper_thread_stride" class="span1" wicket:id="input_helper_thread_stride"/>
+                                        <input type="text" class="span1" wicket:id="helperThreadStride"/>
                                     </td>
                                     <td>
-                                        <input type="checkbox" id="input_dynamic_helper_thread_params" class="span1" wicket:id="input_dynamic_helper_thread_params"/>
+                                        <input type="checkbox" class="span1" wicket:id="dynamicHelperThreadParams"/>
                                     </td>
-                                    <td wicket:id="cell_operations">
-                                        <a class="btn" wicket:id="button_remove"><i class="icon-trash"></i>Remove</a>
+                                    <td>
+                                        <input type="submit" wicket:id="button_remove_context_mapping" class="btn btn-danger" value="Remove"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4">
+                                        <input type="submit" wicket:id="button_add_context_mapping" class="btn btn-success" value="Add Context Mapping"/>
                                     </td>
                                 </tr>
                                 </tbody>

@@ -22,44 +22,43 @@ import archimulator.model.Benchmark;
 import archimulator.model.ContextMapping;
 import archimulator.model.Experiment;
 import archimulator.service.ServiceManager;
-import archimulator.web.data.provider.ContextMappingDataProvider;
+import archimulator.web.pages.listeditor.ListEditor;
+import archimulator.web.pages.listeditor.ListItem;
+import archimulator.web.pages.listeditor.RemoveButton;
 import net.pickapack.action.Function1;
 import net.pickapack.util.CollectionHelper;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
-import org.apache.wicket.ajax.markup.html.AjaxFallbackLink;
 import org.apache.wicket.markup.html.WebMarkupContainer;
-import org.apache.wicket.markup.html.form.CheckBox;
-import org.apache.wicket.markup.html.form.DropDownChoice;
-import org.apache.wicket.markup.html.form.IChoiceRenderer;
-import org.apache.wicket.markup.html.form.TextField;
-import org.apache.wicket.markup.repeater.Item;
-import org.apache.wicket.markup.repeater.data.DataView;
+import org.apache.wicket.markup.html.form.*;
+import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.PropertyModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ContextMappingDataView extends DataView<ContextMapping> {
-    private final Experiment experiment;
-    private final WebMarkupContainer tableContextMappings;
+public class ContextMappingListEditor extends ListEditor<ContextMapping> {
+    private Experiment experiment;
+    private Form<?> form;
+    private WebMarkupContainer container;
 
-    public ContextMappingDataView(String id, Experiment experiment, WebMarkupContainer tableContextMappings) {
-        super(id, new ContextMappingDataProvider(experiment));
+    public ContextMappingListEditor(String id, Experiment experiment, Form<?> form, WebMarkupContainer container) {
+        super(id, new PropertyModel<List<ContextMapping>>(experiment, "contextMappings"));
         this.experiment = experiment;
-        this.tableContextMappings = tableContextMappings;
+        this.form = form;
+        this.container = container;
     }
 
     @Override
-    protected void populateItem(final Item<ContextMapping> item) {
-        final ContextMapping contextMapping = item.getModelObject();
+    protected void populateItem(final ListItem<ContextMapping> item) {
+        item.setOutputMarkupId(true);
 
-        final TextField<String> inputArguments = new TextField<String>("input_arguments", new PropertyModel<String>(contextMapping, "arguments"));
-        inputArguments.setOutputMarkupId(true);
+        item.setModel(new CompoundPropertyModel<ContextMapping>(item.getModel()));
+
+        final TextField<String> inputArguments = new TextField<String>("arguments");
         item.add(inputArguments);
 
-        final TextField<String> inputStandardOut = new TextField<String>("input_standard_out", new PropertyModel<String>(contextMapping, "standardOut"));
-        inputStandardOut.setOutputMarkupId(true);
+        final TextField<String> inputStandardOut = new TextField<String>("standardOut");
         item.add(inputStandardOut);
 
         List<Integer> threadIds = new ArrayList<Integer>();
@@ -67,15 +66,17 @@ public class ContextMappingDataView extends DataView<ContextMapping> {
             threadIds.add(i);
         }
 
-        item.add(new DropDownChoice<Integer>("select_thread_id", new PropertyModel<Integer>(contextMapping, "threadId"), threadIds) {{
+        item.add(new DropDownChoice<Integer>("threadId", threadIds) {{
             add(new AjaxFormComponentUpdatingBehavior("onchange") {
                 protected void onUpdate(AjaxRequestTarget target) {
+                    ContextMapping contextMapping = item.getModelObject();
                     contextMapping.setStandardOut(ContextMapping.getDefaultStandardOut(contextMapping.getThreadId()));
-                    target.add(inputStandardOut);
+
+                    target.add(item);
                 }
             });
         }});
-        item.add(new DropDownChoice<Long>("select_benchmark", new PropertyModel<Long>(item.getModel(), "benchmarkId"), CollectionHelper.transform(ServiceManager.getBenchmarkService().getAllBenchmarks(), new Function1<Benchmark, Long>() {
+        item.add(new DropDownChoice<Long>("benchmarkId", CollectionHelper.transform(ServiceManager.getBenchmarkService().getAllBenchmarks(), new Function1<Benchmark, Long>() {
             @Override
             public Long apply(Benchmark benchmark) {
                 return benchmark.getId();
@@ -95,30 +96,32 @@ public class ContextMappingDataView extends DataView<ContextMapping> {
             {
                 add(new AjaxFormComponentUpdatingBehavior("onchange") {
                     protected void onUpdate(AjaxRequestTarget target) {
-                        contextMapping.setArguments(contextMapping.getBenchmark().getDefaultArguments());
-
-                        target.add(inputArguments);
+                        item.getModelObject().setArguments(item.getModelObject().getBenchmark().getDefaultArguments());
+                        target.add(item);
                     }
                 });
             }
         });
 
-        item.add(new TextField<Integer>("input_helper_thread_lookahead", new PropertyModel<Integer>(contextMapping, "helperThreadLookahead")));
-        item.add(new TextField<Integer>("input_helper_thread_stride", new PropertyModel<Integer>(contextMapping, "helperThreadStride")));
-        item.add(new CheckBox("input_dynamic_helper_thread_params", new PropertyModel<Boolean>(contextMapping, "dynamicHelperThreadParams")));
+        item.add(new TextField<Integer>("helperThreadLookahead") {
+            @Override
+            public boolean isEnabled() {
+                return super.isEnabled() && item.getModelObject().getBenchmark().getHelperThreadEnabled();
+            }
+        });
+        item.add(new TextField<Integer>("helperThreadStride") {
+            @Override
+            public boolean isEnabled() {
+                return super.isEnabled() && item.getModelObject().getBenchmark().getHelperThreadEnabled();
+            }
+        });
+        item.add(new CheckBox("dynamicHelperThreadParams") {
+            @Override
+            public boolean isEnabled() {
+                return super.isEnabled() && item.getModelObject().getBenchmark().getHelperThreadEnabled();
+            }
+        });
 
-        item.add(new WebMarkupContainer("cell_operations") {{
-            add(new AjaxFallbackLink("button_remove") {
-                @Override
-                public void onClick(AjaxRequestTarget target) {
-                    if (experiment.getContextMappings().size() > 1) {
-                        experiment.getContextMappings().remove(item.getModelObject());
-                        ContextMappingDataView.this.detach();
-
-                        target.add(tableContextMappings);
-                    }
-                }
-            });
-        }});
+        item.add(new RemoveButton("button_remove_context_mapping", form, container));
     }
 }

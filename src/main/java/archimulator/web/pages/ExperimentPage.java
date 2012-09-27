@@ -20,15 +20,14 @@ package archimulator.web.pages;
 
 import archimulator.model.*;
 import archimulator.service.ServiceManager;
-import archimulator.web.data.view.ContextMappingDataView;
+import archimulator.web.data.view.ContextMappingListEditor;
 import net.pickapack.dateTime.DateHelper;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.markup.html.AjaxFallbackLink;
+import org.apache.wicket.ajax.markup.html.form.AjaxFallbackButton;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.*;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
-import org.apache.wicket.markup.repeater.data.DataView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -74,7 +73,13 @@ public class ExperimentPage extends AuthenticatedWebPage {
 
         add(new FeedbackPanel("span_feedback"));
 
-        this.add(new Form("form_experiment") {{
+        this.add(new FormExperiment(experiment, action, parameters));
+    }
+
+    private class FormExperiment extends Form {
+        public FormExperiment(final Experiment experiment, final String action, final PageParameters parameters) {
+            super("form_experiment");
+
             this.add(new TextField<String>("input_id", Model.of(experiment.getId() + "")));
             this.add(new TextField<String>("input_title", Model.of(experiment.getTitle())));
 
@@ -101,23 +106,23 @@ public class ExperimentPage extends AuthenticatedWebPage {
             tableContextMappings.setOutputMarkupId(true);
             add(tableContextMappings);
 
-            add(new WebMarkupContainer("form_context_mappings_add") {{
-                add(new AjaxFallbackLink("button_add_context_mapping") {
-                    @Override
-                    public void onClick(AjaxRequestTarget target) {
-                        Integer threadId = 0;
-                        Benchmark benchmark = ServiceManager.getBenchmarkService().getFirstBenchmark();
-                        ContextMapping contextMapping = new ContextMapping(threadId, benchmark, benchmark.getDefaultArguments(), ContextMapping.getDefaultStandardOut(threadId));
-                        experiment.getContextMappings().add(contextMapping);
+            final ContextMappingListEditor editorContextMappings = new ContextMappingListEditor("row_context_mapping", experiment, this, tableContextMappings);
+            tableContextMappings.add(editorContextMappings);
 
+            tableContextMappings.add(new AjaxFallbackButton("button_add_context_mapping", this) {
+                @Override
+                protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
+                    Integer threadId = 0;
+                    Benchmark benchmark = ServiceManager.getBenchmarkService().getFirstBenchmark();
+                    ContextMapping contextMapping = new ContextMapping(threadId, benchmark, benchmark.getDefaultArguments(), ContextMapping.getDefaultStandardOut(threadId));
+
+                    editorContextMappings.addItem(contextMapping);
+
+                    if (target != null) {
                         target.add(tableContextMappings);
                     }
-                });
-            }});
-
-            final DataView<ContextMapping> rowContextMapping = new ContextMappingDataView("row_context_mapping", experiment, tableContextMappings);
-
-            tableContextMappings.add(rowContextMapping);
+                }
+            });
 
             this.add(new Button("button_save", Model.of(action.equals("add") ? "Add" : "Save")) {
                 @Override
@@ -167,6 +172,6 @@ public class ExperimentPage extends AuthenticatedWebPage {
                     back(parameters, ExperimentsPage.class);
                 }
             });
-        }});
+        }
     }
 }
