@@ -38,8 +38,8 @@ public class ArchimulatorApplication extends WebApplication {
     }
 
     public ArchimulatorApplication() {
-        setConfigurationType(RuntimeConfigurationType.DEVELOPMENT);
-//        setConfigurationType(RuntimeConfigurationType.DEPLOYMENT);
+//        setConfigurationType(RuntimeConfigurationType.DEVELOPMENT);
+        setConfigurationType(RuntimeConfigurationType.DEPLOYMENT);
     }
 
     @Override

@@ -106,19 +106,19 @@ public class ContextMappingListEditor extends ListEditor<ContextMapping> {
         item.add(new TextField<Integer>("helperThreadLookahead") {
             @Override
             public boolean isEnabled() {
-                return super.isEnabled() && item.getModelObject().getBenchmark().getHelperThreadEnabled();
+                return super.isEnabled() && item.getModelObject().getBenchmark() != null && item.getModelObject().getBenchmark().getHelperThreadEnabled();
             }
         });
         item.add(new TextField<Integer>("helperThreadStride") {
             @Override
             public boolean isEnabled() {
-                return super.isEnabled() && item.getModelObject().getBenchmark().getHelperThreadEnabled();
+                return super.isEnabled() && item.getModelObject().getBenchmark() != null && item.getModelObject().getBenchmark().getHelperThreadEnabled();
             }
         });
         item.add(new CheckBox("dynamicHelperThreadParams") {
             @Override
             public boolean isEnabled() {
-                return super.isEnabled() && item.getModelObject().getBenchmark().getHelperThreadEnabled();
+                return super.isEnabled() && item.getModelObject().getBenchmark() != null && item.getModelObject().getBenchmark().getHelperThreadEnabled();
             }
         });
 

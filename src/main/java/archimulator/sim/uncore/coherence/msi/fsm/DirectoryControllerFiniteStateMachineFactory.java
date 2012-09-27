@@ -323,6 +323,12 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                         fsm.stall(event.getOnStalledCallback());
                     }
                 }, DirectoryControllerState.S_D)
+                .onCondition(DirectoryControllerEventType.REPLACEMENT, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, ReplacementEvent>() {
+                    @Override
+                    public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, ReplacementEvent event) {
+                        fsm.stall(event.getOnStalledCallback());
+                    }
+                }, DirectoryControllerState.S_D)
                 .onCondition(DirectoryControllerEventType.PUTS_NOT_LAST, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, PutSNotLastEvent>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, PutSNotLastEvent event) {

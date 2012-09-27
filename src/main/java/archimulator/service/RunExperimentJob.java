@@ -38,6 +38,7 @@ public class RunExperimentJob implements Job {
 
         Experiment experiment = ServiceManager.getExperimentService().getFirstExperimentToRun();
         if (experiment != null) {
+            experiment.getStats().clear();
             experiment.setState(ExperimentState.RUNNING);
             ServiceManager.getExperimentService().updateExperiment(experiment);
 

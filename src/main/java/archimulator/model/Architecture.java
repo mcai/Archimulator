@@ -345,9 +345,9 @@ public class Architecture implements ModelElement {
 
     public void updateTitle() {
         this.title = "C" + this.numCores + "T" + this.numThreadsPerCore
-                + "-" + "L1I_" + StorageUnit.toString(this.l1ISize) + "_" + "Assoc" + this.l1IAssociativity
-                + "-" + "l1D_" + StorageUnit.toString(this.l1DSize) + "_" + "Assoc" + this.l1DAssociativity
-                + "-" + "L2_" + StorageUnit.toString(this.l2Size) + "_" + "Assoc" + this.l2Associativity
+                + "-" + "L1I_" + StorageUnit.toString(this.l1ISize).replaceAll(" ", "") + "_" + "Assoc" + this.l1IAssociativity
+                + "-" + "l1D_" + StorageUnit.toString(this.l1DSize).replaceAll(" ", "") + "_" + "Assoc" + this.l1DAssociativity
+                + "-" + "L2_" + StorageUnit.toString(this.l2Size).replaceAll(" ", "") + "_" + "Assoc" + this.l2Associativity
                 + "_" + this.l2ReplacementPolicyType;
     }
 

@@ -27,15 +27,15 @@ import org.apache.wicket.ajax.markup.html.form.AjaxFallbackButton;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.*;
+import org.apache.wicket.markup.html.list.ListItem;
+import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.wicketstuff.annotation.mount.MountPath;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @MountPath(value = "/", alt = "/experiment")
 public class ExperimentPage extends AuthenticatedWebPage {
@@ -123,6 +123,24 @@ public class ExperimentPage extends AuthenticatedWebPage {
                     }
                 }
             });
+
+
+            List<Map.Entry<String, String>> stats = new ArrayList<Map.Entry<String, String>>(experiment.getStats().entrySet());
+
+            final ListView<Map.Entry<String, String>> rowExperimentStat = new ListView<Map.Entry<String, String>>("row_stat", stats){
+                @Override
+                protected void populateItem(ListItem<Map.Entry<String, String>> item) {
+                    final Map.Entry<String, String> entry = item.getModelObject();
+
+                    item.add(new Label("cell_key", entry.getKey()));
+                    item.add(new Label("cell_value", entry.getValue()));
+                }
+            };
+
+            final WebMarkupContainer tableExperimentStats = new WebMarkupContainer("table_stats");
+            add(tableExperimentStats);
+
+            tableExperimentStats.add(rowExperimentStat);
 
             this.add(new Button("button_save", Model.of(action.equals("add") ? "Add" : "Save")) {
                 @Override
