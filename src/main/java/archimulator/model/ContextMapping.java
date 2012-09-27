@@ -23,7 +23,7 @@ import archimulator.service.ServiceManager;
 import java.io.Serializable;
 
 public class ContextMapping implements Serializable {
-    private Integer threadId;
+    private int threadId;
 
     private long benchmarkId;
 
@@ -50,11 +50,11 @@ public class ContextMapping implements Serializable {
         this.standardOut = standardOut;
     }
 
-    public Integer getThreadId() {
+    public int getThreadId() {
         return threadId;
     }
 
-    public void setThreadId(Integer threadId) {
+    public void setThreadId(int threadId) {
         this.threadId = threadId;
     }
 
@@ -128,7 +128,7 @@ public class ContextMapping implements Serializable {
         return String.format("thread #%d->'%s'", threadId, getBenchmark().getTitle() + "_" + arguments + "-lookahead_" + helperThreadLookahead + "-stride_" + helperThreadStride);
     }
 
-    public static String getDefaultStandardOut(Integer threadId) {
+    public static String getDefaultStandardOut(int threadId) {
         return "ctx" + threadId + "_out.txt";
     }
 }

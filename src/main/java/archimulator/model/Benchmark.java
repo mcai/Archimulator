@@ -103,6 +103,10 @@ public class Benchmark implements ModelElement {
     }
 
     public String getStandardIn() {
+        if(standardIn == null) {
+            standardIn = "";
+        }
+
         return standardIn;
     }
 

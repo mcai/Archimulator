@@ -41,7 +41,11 @@ public class RunExperimentJob implements Job {
             experiment.setState(ExperimentState.RUNNING);
             ServiceManager.getExperimentService().updateExperiment(experiment);
 
-            runExperiment(experiment);
+            try {
+                runExperiment(experiment);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
