@@ -28,7 +28,7 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.wicketstuff.annotation.mount.MountPath;
 
 @MountPath(value = "/", alt = "/benchmarks")
-public class BenchmarksPage extends AuthenticatedWebPage {
+public class BenchmarksPage extends AuthenticatedBasePage {
     public BenchmarksPage(PageParameters parameters) {
         super(PageType.BENCHMARKS, parameters);
 

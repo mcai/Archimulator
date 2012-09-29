@@ -38,7 +38,7 @@ import org.wicketstuff.annotation.mount.MountPath;
 import java.util.*;
 
 @MountPath(value = "/", alt = "/experiment")
-public class ExperimentPage extends AuthenticatedWebPage {
+public class ExperimentPage extends AuthenticatedBasePage {
     public ExperimentPage(final PageParameters parameters) {
         super(PageType.EXPERIMENT, parameters);
 
@@ -69,7 +69,7 @@ public class ExperimentPage extends AuthenticatedWebPage {
 
         setTitle((action.equals("add") ? "Add" : "Edit") + " Experiment - Archimulator");
 
-        this.add(new Label("section_header_experiment", (action.equals("add") ? "Add" : "Edit") + " Experiment"));
+        this.add(new Label("section_header_experiment", String.format("%s Experiment '{%d} %s'", action.equals("add") ? "Add" : "Edit", experiment.getId(), experiment.getTitle())));
 
         add(new FeedbackPanel("span_feedback"));
 

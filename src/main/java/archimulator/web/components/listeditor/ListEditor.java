@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.web.pages.listeditor;
+package archimulator.web.components.listeditor;
 
 import org.apache.wicket.markup.html.form.IFormModelUpdateListener;
 import org.apache.wicket.markup.repeater.RepeatingView;

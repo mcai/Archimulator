@@ -6,9 +6,7 @@
     <div class="container">
         <section>
             <div class="page-header">
-                <h1>
-                    Experiment Pack
-                </h1>
+                <h1 wicket:id="section_header_experiment_pack"></h1>
             </div>
 
             <form class="form-horizontal span12" wicket:id="form_experiment_pack">
@@ -21,7 +19,7 @@
                 </ul>
 
                 <div class="tab-content">
-                    <div class="tab-pane active" id="tab_general">
+                    <div class="tab-pane active" id="tab_general" wicket:id="tab_general">
 
                         <div class="row">
                             <div class="span9">
@@ -63,29 +61,179 @@
 
                     </div>
 
-                    <div class="tab-pane" id="tab_page_baseline_experiment_spec">
+                    <div class="tab-pane" id="tab_page_baseline_experiment_spec" wicket:id="tab_page_baseline_experiment_spec">
 
-                        <p>TODO: placeholder</p>
+                        <div class="row">
+                            <div class="span9">
+
+                                <div class="control-group">
+                                    <label for="input_benchmarkTitle" class="control-label">Benchmark Title:</label>
+
+                                    <div class="controls">
+                                        <input id="input_benchmarkTitle" type="text" class="span9" readonly wicket:id="input_benchmarkTitle"/>
+                                    </div>
+                                </div>
+
+                                <div class="control-group">
+                                    <label for="input_benchmarkArguments" class="control-label">Benchmark Arguments:</label>
+
+                                    <div class="controls">
+                                        <input id="input_benchmarkArguments" type="text" class="span9" readonly wicket:id="input_benchmarkArguments"/>
+                                    </div>
+                                </div>
+
+                                <div class="control-group">
+                                    <label for="input_helperThreadLookahead" class="control-label">Helper Thread Lookahead:</label>
+
+                                    <div class="controls">
+                                        <input id="input_helperThreadLookahead" type="text" class="span1" readonly wicket:id="input_helperThreadLookahead"/>
+                                    </div>
+                                </div>
+
+                                <div class="control-group">
+                                    <label for="input_helperThreadStride" class="control-label">Helper Thread Stride:</label>
+
+                                    <div class="controls">
+                                        <input id="input_helperThreadStride" type="text" class="span1" readonly wicket:id="input_helperThreadStride"/>
+                                    </div>
+                                </div>
+
+                                <div class="control-group">
+                                    <label for="input_numCores" class="control-label">Number of Cores:</label>
+
+                                    <div class="controls">
+                                        <input id="input_numCores" type="text" class="span1" readonly wicket:id="input_numCores"/>
+                                    </div>
+                                </div>
+
+                                <div class="control-group">
+                                    <label for="input_numThreadsPerCore" class="control-label">Number of Threads Per Core:</label>
+
+                                    <div class="controls">
+                                        <input id="input_numThreadsPerCore" type="text" class="span1" readonly wicket:id="input_numThreadsPerCore"/>
+                                    </div>
+                                </div>
+
+                                <div class="control-group">
+                                    <label for="input_l1ISize" class="control-label">L1I Size:</label>
+
+                                    <div class="controls">
+                                        <input id="input_l1ISize" type="text" class="span1" readonly wicket:id="input_l1ISize"/>
+                                    </div>
+                                </div>
+
+                                <div class="control-group">
+                                    <label for="input_l1IAssociativity" class="control-label">L1I Associativity:</label>
+
+                                    <div class="controls">
+                                        <input id="input_l1IAssociativity" type="text" class="span1" readonly wicket:id="input_l1IAssociativity"/>
+                                    </div>
+                                </div>
+
+                                <div class="control-group">
+                                    <label for="input_l1DSize" class="control-label">L1D Size:</label>
+
+                                    <div class="controls">
+                                        <input id="input_l1DSize" type="text" class="span1" readonly wicket:id="input_l1DSize"/>
+                                    </div>
+                                </div>
+
+                                <div class="control-group">
+                                    <label for="input_l1DAssociativity" class="control-label">L1D Associativity:</label>
+
+                                    <div class="controls">
+                                        <input id="input_l1DAssociativity" type="text" class="span1" readonly wicket:id="input_l1DAssociativity"/>
+                                    </div>
+                                </div>
+
+                                <div class="control-group">
+                                    <label for="input_l2Size" class="control-label">L2 Size:</label>
+
+                                    <div class="controls">
+                                        <input id="input_l2Size" type="text" class="span1" readonly wicket:id="input_l2Size"/>
+                                    </div>
+                                </div>
+
+                                <div class="control-group">
+                                    <label for="input_l2Associativity" class="control-label">L2 Associativity:</label>
+
+                                    <div class="controls">
+                                        <input id="input_l2Associativity" type="text" class="span1" readonly wicket:id="input_l2Associativity"/>
+                                    </div>
+                                </div>
+
+                                <div class="control-group">
+                                    <label for="input_l2ReplacementPolicyType" class="control-label">L2 Replacement Policy Type:</label>
+
+                                    <div class="controls">
+                                        <input id="input_l2ReplacementPolicyType" type="text" class="span1" readonly wicket:id="input_l2ReplacementPolicyType"/>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
 
                     </div>
 
-                    <div class="tab-pane" id="tab_page_variables">
+                    <div class="tab-pane" id="tab_page_variables" wicket:id="tab_page_variables">
 
-                        <p>TODO: placeholder</p>
+                        <table class="table table-bordered table-striped" wicket:id="table_variables">
+                            <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Values</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr wicket:id="row_variable">
+                                <td wicket:id="cell_name"></td>
+                                <td wicket:id="cell_values"></td>
+                            </tr>
+                            </tbody>
+                        </table>
 
                     </div>
 
-                    <div class="tab-pane" id="tab_page_experiments">
+                    <div class="tab-pane" id="tab_page_experiments" wicket:id="tab_page_experiments">
 
-                        <p>TODO: placeholder</p>
+                        <table class="table table-bordered table-striped" wicket:id="table_experiments">
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Title</th>
+                                <th>Type</th>
+                                <th>State</th>
+                                <th>Architecture</th>
+                                <th># Max Insts</th>
+                                <th>Create Time</th>
+                                <th>Operations</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr wicket:id="row_experiment">
+                                <td wicket:id="cell_id"></td>
+                                <td wicket:id="cell_title"></td>
+                                <td wicket:id="cell_type"></td>
+                                <td wicket:id="cell_state"></td>
+                                <td wicket:id="cell_architecture"></td>
+                                <td wicket:id="cell_num_max_instructions"></td>
+                                <td wicket:id="cell_create_time"></td>
+                                <td wicket:id="cell_operations">
+                                    <a class="btn" wicket:id="button_edit"><i class="icon-edit"></i>Edit</a>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+                        <wicket:panel wicket:id="navigator_experiments"/>
 
                     </div>
                 </div>
 
                 <div class="form-actions">
-                    <a href="#" class="btn btn-primary save">Save</a>
+                    <a href="#" hidden="hidden" class="btn btn-primary save">Save</a>
                     <input type="submit" value="Cancel" class="btn" wicket:id="button_cancel"/>
-                    <a href="#" class="btn btn-danger">Remove</a>
+                    <a href="#" hidden="hidden" class="btn btn-danger">Remove</a>
                 </div>
 
             </form>

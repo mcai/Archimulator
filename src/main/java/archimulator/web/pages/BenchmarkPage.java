@@ -30,7 +30,7 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.wicketstuff.annotation.mount.MountPath;
 
 @MountPath(value = "/", alt = "/benchmark")
-public class BenchmarkPage extends AuthenticatedWebPage {
+public class BenchmarkPage extends AuthenticatedBasePage {
     public BenchmarkPage(final PageParameters parameters) {
         super(PageType.BENCHMARK, parameters);
 
@@ -55,9 +55,9 @@ public class BenchmarkPage extends AuthenticatedWebPage {
             return;
         }
 
-        setTitle((action.equals("add") ? "Add" : "Edit") + " Benchmark - Archimulator");
+        setTitle(String.format("%s Benchmark - Archimulator", action.equals("add") ? "Add" : "Edit"));
 
-        this.add(new Label("section_header_benchmark", (action.equals("add") ? "Add" : "Edit") + " Benchmark"));
+        this.add(new Label("section_header_benchmark", String.format("%s Benchmark '{%d} %s'", action.equals("add") ? "Add" : "Edit", benchmark.getId(), benchmark.getTitle())));
 
         add(new FeedbackPanel("span_feedback"));
 
@@ -69,7 +69,6 @@ public class BenchmarkPage extends AuthenticatedWebPage {
             this.add(new TextField<String>("input_default_arguments", new PropertyModel<String>(benchmark, "defaultArguments")));
             this.add(new TextField<String>("input_standard_in", new PropertyModel<String>(benchmark, "standardIn")));
             this.add(new CheckBox("input_helper_thread_enabled", new PropertyModel<Boolean>(benchmark, "helperThreadEnabled")));
-            this.add(new CheckBox("input_locked_for_building", Model.of(benchmark.getLocked())));
             this.add(new TextField<String>("input_create_time", Model.of(DateHelper.toString(benchmark.getCreateTime()))));
 
             this.add(new Button("button_save", Model.of(action.equals("add") ? "Add" : "Save")) {

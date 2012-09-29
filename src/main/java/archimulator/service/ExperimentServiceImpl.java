@@ -19,15 +19,21 @@
 package archimulator.service;
 
 import archimulator.model.*;
+import archimulator.sim.common.*;
+import archimulator.sim.os.Kernel;
 import com.Ostermiller.util.CSVPrinter;
 import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.misc.TransactionManager;
 import com.j256.ormlite.stmt.*;
 import net.pickapack.JsonSerializationHelper;
 import net.pickapack.Pair;
+import net.pickapack.Reference;
 import net.pickapack.StorageUnit;
 import net.pickapack.action.Function1;
 import net.pickapack.action.Function2;
 import net.pickapack.dateTime.DateHelper;
+import net.pickapack.event.BlockingEventDispatcher;
+import net.pickapack.event.CycleAccurateEventQueue;
 import net.pickapack.io.cmd.CommandLineHelper;
 import net.pickapack.model.ModelElement;
 import net.pickapack.service.AbstractService;
@@ -48,6 +54,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static net.pickapack.util.CollectionHelper.toMap;
 import static net.pickapack.util.CollectionHelper.transform;
@@ -55,6 +64,7 @@ import static net.pickapack.util.CollectionHelper.transform;
 public class ExperimentServiceImpl extends AbstractService implements ExperimentService {
     private Dao<Experiment, Long> experiments;
     private Dao<ExperimentPack, Long> experimentPacks;
+    private Lock lock = new ReentrantLock();
 
     @SuppressWarnings("unchecked")
     public ExperimentServiceImpl() {
@@ -66,46 +76,58 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         this.cleanUpExperiments();
 
         //TODO: to be exposed as import/upload experiment pack via web UI
+
         try {
-            for (File file : FileUtils.listFiles(new File("experiment_inputs"), null, true)) {
-                ExperimentPack experimentPack = JsonSerializationHelper.deserialize(ExperimentPack.class, FileUtils.readFileToString(file));
-                if (experimentPack != null && getExperimentPackByTitle(experimentPack.getTitle()) == null) {
-                    addExperimentPack(experimentPack);
+            TransactionManager.callInTransaction(getConnectionSource(),
+                    new Callable<Void>() {
+                        public Void call() throws Exception {
+                            try {
+                                for (File file : FileUtils.listFiles(new File("experiment_inputs"), null, true)) {
+                                    ExperimentPack experimentPack = JsonSerializationHelper.deserialize(ExperimentPack.class, FileUtils.readFileToString(file));
+                                    if (experimentPack != null && getExperimentPackByTitle(experimentPack.getTitle()) == null) {
+                                        addExperimentPack(experimentPack);
 
-                    for (ExperimentSpec experimentSpec : experimentPack.getExperimentSpecs()) {
-                        ExperimentType experimentType = experimentPack.getExperimentType();
-                        Benchmark benchmark = experimentSpec.getBenchmark();
-                        Architecture architecture = experimentSpec.getArchitecture();
-                        String arguments = experimentSpec.getArguments();
+                                        for (ExperimentSpec experimentSpec : experimentPack.getExperimentSpecs()) {
+                                            ExperimentType experimentType = experimentPack.getExperimentType();
+                                            Benchmark benchmark = experimentSpec.getBenchmark();
+                                            Architecture architecture = experimentSpec.getArchitecture();
+                                            String arguments = experimentSpec.getArguments();
 
-                        List<ContextMapping> contextMappings = new ArrayList<ContextMapping>();
+                                            List<ContextMapping> contextMappings = new ArrayList<ContextMapping>();
 
-                        ContextMapping contextMapping = new ContextMapping(0, benchmark, arguments);
-                        contextMapping.setHelperThreadLookahead(experimentSpec.getHelperThreadLookahead());
-                        contextMapping.setHelperThreadStride(experimentSpec.getHelperThreadStride());
-                        contextMapping.setDynamicHelperThreadParams(false);
-                        contextMappings.add(contextMapping);
+                                            ContextMapping contextMapping = new ContextMapping(0, benchmark, arguments);
+                                            contextMapping.setHelperThreadLookahead(experimentSpec.getHelperThreadLookahead());
+                                            contextMapping.setHelperThreadStride(experimentSpec.getHelperThreadStride());
+                                            contextMapping.setDynamicHelperThreadParams(false);
+                                            contextMappings.add(contextMapping);
 
-                        Experiment experiment = new Experiment(experimentType, architecture, -1, contextMappings);
+                                            Experiment experiment = new Experiment(experimentType, architecture, -1, contextMappings);
 
-                        if(getLatestExperimentByTitle(experiment.getTitle()) == null) {
-                            addExperiment(experiment);
+                                            if (getLatestExperimentByTitle(experiment.getTitle()) == null) {
+                                                addExperiment(experiment);
+                                            }
+
+                                            experimentPack.getExperimentTitles().add(experiment.getTitle());
+                                        }
+
+                                        updateExperimentPack(experimentPack);
+                                    }
+                                }
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+
+                            return null;
                         }
-
-                        experimentPack.getExperimentTitles().add(experiment.getTitle());
-                    }
-
-                    updateExperimentPack(experimentPack);
-                }
-            }
-        } catch (IOException e) {
+                    });
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
     private void cleanUpExperiments() {
         try {
-            UpdateBuilder<Experiment,Long> updateBuilder = this.experiments.updateBuilder();
+            UpdateBuilder<Experiment, Long> updateBuilder = this.experiments.updateBuilder();
             updateBuilder.where().eq("state", ExperimentState.READY_TO_RUN).or().eq("state", ExperimentState.RUNNING);
             updateBuilder.updateColumnValue("state", ExperimentState.PENDING);
             updateBuilder.updateColumnValue("failedReason", "");
@@ -120,6 +142,65 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
     @Override
     public void start() {
+        for(int i = 0; i < Runtime.getRuntime().availableProcessors(); i++) {
+            Thread thread = new Thread() {
+                public void run() {
+                    try {
+                        for (;;) {
+                            Experiment experiment;
+                            while ((experiment = getFirstExperimentToRun()) == null) {
+                                synchronized (this) {
+                                    wait(500L);
+                                }
+                            }
+                            runExperiment(experiment);
+                        }
+                    } catch (InterruptedException ignored) {
+                    }
+                }
+            };
+            thread.setDaemon(true);
+            thread.start();
+        }
+    }
+
+    private void runExperiment(Experiment experiment) {
+        try {
+            CycleAccurateEventQueue cycleAccurateEventQueue = new CycleAccurateEventQueue();
+
+            if (experiment.getType() == ExperimentType.FUNCTIONAL) {
+                BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher = new BlockingEventDispatcher<SimulationEvent>();
+                new FunctionalSimulation(experiment.getTitle() + "/functional", experiment, blockingEventDispatcher, cycleAccurateEventQueue, experiment.getNumMaxInstructions()).simulate();
+            } else if (experiment.getType() == ExperimentType.DETAILED) {
+                BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher = new BlockingEventDispatcher<SimulationEvent>();
+                new DetailedSimulation(experiment.getTitle() + "/detailed", experiment, blockingEventDispatcher, cycleAccurateEventQueue, experiment.getNumMaxInstructions()).simulate();
+            } else if (experiment.getType() == ExperimentType.TWO_PHASE) {
+                Reference<Kernel> kernelRef = new Reference<Kernel>();
+
+                BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher = new BlockingEventDispatcher<SimulationEvent>();
+
+                new ToRoiFastForwardSimulation(experiment.getTitle() + "/twoPhase/phase0", experiment, blockingEventDispatcher, cycleAccurateEventQueue, experiment.getArchitecture().getHelperThreadPthreadSpawnIndex(), kernelRef).simulate();
+
+                blockingEventDispatcher.clearListeners();
+
+                cycleAccurateEventQueue.resetCurrentCycle();
+
+                new FromRoiDetailedSimulation(experiment.getTitle() + "/twoPhase/phase1", experiment, blockingEventDispatcher, cycleAccurateEventQueue, experiment.getNumMaxInstructions(), kernelRef).simulate();
+            }
+
+            experiment.setState(ExperimentState.COMPLETED);
+            experiment.setFailedReason("");
+        } catch (Exception e) {
+            experiment.setState(ExperimentState.ABORTED);
+            experiment.setFailedReason(e + "");
+        } finally {
+            ServiceManager.getExperimentService().updateExperiment(experiment);
+        }
+    }
+
+    @Override
+    public void stop() {
+        super.stop();
     }
 
     @Override
@@ -393,11 +474,24 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
     @Override
     public Experiment getFirstExperimentToRun() {
+        lock.lock();
         try {
-            PreparedQuery<Experiment> query = this.experiments.queryBuilder().where().eq("state", ExperimentState.READY_TO_RUN).prepare();
-            return this.experiments.queryForFirst(query);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+            try {
+                PreparedQuery<Experiment> query = experiments.queryBuilder().where().eq("state", ExperimentState.READY_TO_RUN).prepare();
+                Experiment experiment = experiments.queryForFirst(query);
+
+                if (experiment != null) {
+                    experiment.getStats().clear();
+                    experiment.setState(ExperimentState.RUNNING);
+                    ServiceManager.getExperimentService().updateExperiment(experiment);
+                }
+
+                return experiment;
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        } finally {
+            lock.unlock();
         }
     }
 
@@ -405,9 +499,9 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     @SuppressWarnings("unchecked")
     public List<Experiment> getStoppedExperimentsByExperimentPack(ExperimentPack experimentPack) {
         try {
-            QueryBuilder<Experiment,Long> queryBuilder = this.experiments.queryBuilder();
+            QueryBuilder<Experiment, Long> queryBuilder = this.experiments.queryBuilder();
 
-            Where<Experiment,Long> where = queryBuilder.where();
+            Where<Experiment, Long> where = queryBuilder.where();
             where.and(
                     where.in("title", experimentPack.getExperimentTitles()),
                     where.eq("state", ExperimentState.COMPLETED).or().eq("state", ExperimentState.ABORTED)
@@ -490,7 +584,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     @Override
     public void startExperimentPack(ExperimentPack experimentPack) {
         try {
-            UpdateBuilder<Experiment,Long> updateBuilder = this.experiments.updateBuilder();
+            UpdateBuilder<Experiment, Long> updateBuilder = this.experiments.updateBuilder();
             updateBuilder.where().in("title", experimentPack.getExperimentTitles()).and().eq("state", ExperimentState.PENDING);
             updateBuilder.updateColumnValue("state", ExperimentState.READY_TO_RUN);
             PreparedUpdate<Experiment> update = updateBuilder.prepare();
@@ -503,7 +597,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     @Override
     public void stopExperimentPack(ExperimentPack experimentPack) {
         try {
-            UpdateBuilder<Experiment,Long> updateBuilder = this.experiments.updateBuilder();
+            UpdateBuilder<Experiment, Long> updateBuilder = this.experiments.updateBuilder();
             updateBuilder.where().in("title", experimentPack.getExperimentTitles()).and().eq("state", ExperimentState.READY_TO_RUN);
             updateBuilder.updateColumnValue("state", ExperimentState.PENDING);
             PreparedUpdate<Experiment> update = updateBuilder.prepare();
@@ -515,14 +609,35 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
     @Override
     @SuppressWarnings("unchecked")
-    public void resetStoppedExperimentsByExperimentPack(ExperimentPack experimentPack) {
+    public void resetCompletedExperimentsByExperimentPack(ExperimentPack experimentPack) {
         try {
-            UpdateBuilder<Experiment,Long> updateBuilder = this.experiments.updateBuilder();
+            UpdateBuilder<Experiment, Long> updateBuilder = this.experiments.updateBuilder();
 
-            Where<Experiment,Long> where = updateBuilder.where();
+            Where<Experiment, Long> where = updateBuilder.where();
             where.and(
                     where.in("title", experimentPack.getExperimentTitles()),
-                    where.eq("state", ExperimentState.COMPLETED).or().eq("state", ExperimentState.ABORTED)
+                    where.eq("state", ExperimentState.COMPLETED)
+            );
+
+            updateBuilder.updateColumnValue("state", ExperimentState.PENDING);
+
+            PreparedUpdate<Experiment> update = updateBuilder.prepare();
+            this.experiments.update(update);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void resetAbortedExperimentsByExperimentPack(ExperimentPack experimentPack) {
+        try {
+            UpdateBuilder<Experiment, Long> updateBuilder = this.experiments.updateBuilder();
+
+            Where<Experiment, Long> where = updateBuilder.where();
+            where.and(
+                    where.in("title", experimentPack.getExperimentTitles()),
+                    where.eq("state", ExperimentState.ABORTED)
             );
 
             updateBuilder.updateColumnValue("state", ExperimentState.PENDING);
@@ -537,7 +652,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     @Override
     public void runExperimentByTitle(String experimentTitle) {
         try {
-            UpdateBuilder<Experiment,Long> updateBuilder = this.experiments.updateBuilder();
+            UpdateBuilder<Experiment, Long> updateBuilder = this.experiments.updateBuilder();
             updateBuilder.where().eq("title", experimentTitle).and().eq("state", ExperimentState.PENDING);
             updateBuilder.updateColumnValue("state", ExperimentState.READY_TO_RUN);
             PreparedUpdate<Experiment> update = updateBuilder.prepare();
@@ -1224,22 +1339,22 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     static {
         variablePropertyNameDescriptions = new LinkedHashMap<String, String>();
 
-        variablePropertyNameDescriptions.put("benchmarkTitle", "Benchmark");
-        variablePropertyNameDescriptions.put("benchmarkArguments", "");
-        variablePropertyNameDescriptions.put("helperThreadLookahead", "HT Lookahead");
-        variablePropertyNameDescriptions.put("helperThreadStride", "HT Stride");
-        variablePropertyNameDescriptions.put("numCores", "# Cores");
-        variablePropertyNameDescriptions.put("numThreadsPerCore", "# Threads per Core");
+        variablePropertyNameDescriptions.put("benchmarkTitle", "Benchmark Title");
+        variablePropertyNameDescriptions.put("benchmarkArguments", "Benchmark Arguments");
+        variablePropertyNameDescriptions.put("helperThreadLookahead", "Helper Thread Lookahead");
+        variablePropertyNameDescriptions.put("helperThreadStride", "Helper Thread Stride");
+        variablePropertyNameDescriptions.put("numCores", "Number of Cores");
+        variablePropertyNameDescriptions.put("numThreadsPerCore", "Number of Threads per Core");
         variablePropertyNameDescriptions.put("l1ISize", "L1I Size");
         variablePropertyNameDescriptions.put("l1IAssociativity", "L1I Associativity");
         variablePropertyNameDescriptions.put("l1DSize", "L1D Size");
         variablePropertyNameDescriptions.put("l1DAssociativity", "L1D Associativity");
         variablePropertyNameDescriptions.put("l2Size", "L2 Size");
         variablePropertyNameDescriptions.put("l2Associativity", "L2 Associativity");
-        variablePropertyNameDescriptions.put("l2ReplacementPolicyType", "L2 Replacement Policy");
+        variablePropertyNameDescriptions.put("l2ReplacementPolicyType", "L2 Replacement Policy Type");
     }
 
-    private static String getDescriptionOfVariablePropertyName(String variablePropertyName) {
+    public static String getDescriptionOfVariablePropertyName(String variablePropertyName) {
         return variablePropertyNameDescriptions.containsKey(variablePropertyName) ? variablePropertyNameDescriptions.get(variablePropertyName) : variablePropertyName;
     }
 

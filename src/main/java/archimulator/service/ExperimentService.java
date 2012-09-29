@@ -91,7 +91,9 @@ public interface ExperimentService extends Service {
 
     void stopExperimentPack(ExperimentPack experimentPack);
 
-    void resetStoppedExperimentsByExperimentPack(ExperimentPack experimentPack);
+    void resetCompletedExperimentsByExperimentPack(ExperimentPack experimentPack);
+
+    void resetAbortedExperimentsByExperimentPack(ExperimentPack experimentPack);
 
     void runExperimentByTitle(String experimentTitle);
 

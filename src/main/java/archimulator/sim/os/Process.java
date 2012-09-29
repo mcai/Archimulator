@@ -77,13 +77,10 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
 
         this.memory = new Memory(kernel, this.littleEndian, this.id);
 
-        ServiceManager.getBenchmarkService().lockBenchmark(contextMapping.getBenchmark());
-
-        buildBenchmark(contextMapping.getBenchmark().getWorkingDirectory(), contextMapping.getBenchmark().getHelperThreadEnabled(), contextMapping.getHelperThreadLookahead(), contextMapping.getHelperThreadStride());
-
-        this.loadProgram(kernel, simulationDirectory, contextMapping);
-
-        ServiceManager.getBenchmarkService().unlockBenchmark(contextMapping.getBenchmark());
+        synchronized (Process.class) {
+            buildBenchmark(contextMapping.getBenchmark().getWorkingDirectory(), contextMapping.getBenchmark().getHelperThreadEnabled(), contextMapping.getHelperThreadLookahead(), contextMapping.getHelperThreadStride());
+            this.loadProgram(kernel, simulationDirectory, contextMapping);
+        }
     }
 
     protected abstract void loadProgram(Kernel kernel, String simulationDirectory, ContextMapping contextMapping);

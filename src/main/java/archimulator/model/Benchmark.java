@@ -51,9 +51,6 @@ public class Benchmark implements ModelElement {
     @DatabaseField
     private boolean helperThreadEnabled;
 
-    @DatabaseField
-    private boolean locked;
-
     public Benchmark() {
     }
 
@@ -114,16 +111,8 @@ public class Benchmark implements ModelElement {
         return helperThreadEnabled;
     }
 
-    public boolean getLocked() {
-        return locked;
-    }
-
-    public void setLocked(boolean locked) {
-        this.locked = locked;
-    }
-
     @Override
     public String toString() {
-        return String.format("Benchmark{id=%d, title='%s', workingDirectory='%s', executable='%s', standardIn='%s', helperThreadEnabled=%s, locked=%s}", id, title, workingDirectory, executable, standardIn, helperThreadEnabled, locked);
+        return String.format("Benchmark{id=%d, title='%s', workingDirectory='%s', executable='%s', standardIn='%s', helperThreadEnabled=%s}", id, title, workingDirectory, executable, standardIn, helperThreadEnabled);
     }
 }

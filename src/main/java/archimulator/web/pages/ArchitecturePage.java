@@ -39,7 +39,7 @@ import org.wicketstuff.annotation.mount.MountPath;
 import java.util.Arrays;
 
 @MountPath(value = "/", alt = "/architecture")
-public class ArchitecturePage extends AuthenticatedWebPage {
+public class ArchitecturePage extends AuthenticatedBasePage {
     public ArchitecturePage(final PageParameters parameters) {
         super(PageType.ARCHITECTURE, parameters);
 
@@ -74,7 +74,7 @@ public class ArchitecturePage extends AuthenticatedWebPage {
 
         setTitle((action.equals("add") ? "Add" : "Edit") + " Architecture - Archimulator");
 
-        this.add(new Label("section_header_architecture", (action.equals("add") ? "Add" : "Edit") + " Architecture"));
+        this.add(new Label("section_header_architecture", String.format("%s Architecture '{%d} %s'", action.equals("add") ? "Add" : "Edit", architecture.getId(), architecture.getTitle())));
 
         add(new FeedbackPanel("span_feedback"));
 

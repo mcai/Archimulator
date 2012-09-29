@@ -45,7 +45,7 @@ public class ExperimentDataView extends DataView<Experiment> {
         item.add(new Label("cell_title", experiment.getTitle()));
         item.add(new Label("cell_type", experiment.getType() + ""));
         item.add(new Label("cell_state", experiment.getState() + ""));
-        item.add(new Label("cell_architecture", String.format("{%d} %s", experiment.getArchitecture().getId(), experiment.getArchitecture().getTitle())));
+        item.add(new Label("cell_architecture", String.format("{%d}", experiment.getArchitecture().getId())));
         item.add(new Label("cell_num_max_instructions", experiment.getNumMaxInstructions() + ""));
         item.add(new Label("cell_create_time", DateHelper.toString(experiment.getCreateTime())));
 

@@ -117,25 +117,4 @@ public class BenchmarkServiceImpl extends AbstractService implements BenchmarkSe
     public void updateBenchmark(Benchmark benchmark) {
         this.updateItem(this.benchmarks, Benchmark.class, benchmark);
     }
-
-    @Override
-    public void lockBenchmark(Benchmark benchmark) {
-        long benchmarkId = benchmark.getId();
-        while (getBenchmarkById(benchmarkId).getLocked()) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        benchmark.setLocked(true);
-        updateBenchmark(benchmark);
-    }
-
-    @Override
-    public void unlockBenchmark(Benchmark benchmark) {
-        benchmark.setLocked(false);
-        updateBenchmark(benchmark);
-    }
 }

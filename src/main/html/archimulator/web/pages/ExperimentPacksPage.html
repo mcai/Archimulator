@@ -17,13 +17,16 @@
                         <div class="thumbnail">
                             <div class="caption">
                                 <h5 wicket:id="cell_title"></h5>
-                                <p wicket:id="cell_description">Experiment pack description here.</p>
+                                <p wicket:id="cell_description"></p>
                                 <p wicket:id="cell_operations_1">
                                     <a class="btn" wicket:id="button_start">Start</a>
                                     <a class="btn" wicket:id="button_stop">Stop</a>
-                                    <a class="btn btn-warning" wicket:id="button_reset_stopped_experiments">Reset Stopped Experiments</a>
                                 </p>
                                 <p wicket:id="cell_operations_2">
+                                    <a class="btn btn-warning" wicket:id="button_reset_completed_experiments">Reset Completed Experiments</a>
+                                    <a class="btn btn-warning" wicket:id="button_reset_aborted_experiments">Reset Aborted Experiments</a>
+                                </p>
+                                <p wicket:id="cell_operations_3">
                                     <a class="btn" wicket:id="button_edit">Edit</a>
                                     <a class="btn btn-danger" wicket:id="button_remove">Remove</a>
                                 </p>

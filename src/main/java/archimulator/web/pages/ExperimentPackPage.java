@@ -18,14 +18,25 @@
  ******************************************************************************/
 package archimulator.web.pages;
 
+import archimulator.model.Experiment;
 import archimulator.model.ExperimentPack;
+import archimulator.model.ExperimentPackVariable;
 import archimulator.model.ExperimentType;
 import archimulator.service.ServiceManager;
+import archimulator.web.components.PagingNavigator;
+import archimulator.web.data.provider.ExperimentDataProvider;
+import archimulator.web.data.view.ExperimentDataView;
+import archimulator.web.data.view.ExperimentPackVariableListView;
 import net.pickapack.dateTime.DateHelper;
+import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.markup.html.list.ListView;
+import org.apache.wicket.markup.repeater.data.DataView;
+import org.apache.wicket.markup.repeater.data.IDataProvider;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -34,30 +45,73 @@ import org.wicketstuff.annotation.mount.MountPath;
 import java.util.Arrays;
 
 @MountPath(value = "/", alt = "/experiment_pack")
-public class ExperimentPackPage extends AuthenticatedWebPage {
+public class ExperimentPackPage extends AuthenticatedBasePage {
     public ExperimentPackPage(final PageParameters parameters) {
         super(PageType.EXPERIMENT_PACK, parameters);
 
-        long experimentPackId = parameters.get("experiment_pack_id").toLong(-1);
+        final long experimentPackId = parameters.get("experiment_pack_id").toLong(-1);
 
         final ExperimentPack experimentPack = ServiceManager.getExperimentService().getExperimentPackById(experimentPackId);
 
-        if(experimentPack == null) {
+        if (experimentPack == null) {
             setResponsePage(getApplication().getHomePage());
             return;
         }
 
         setTitle((experimentPackId == -1 ? "Add" : "Edit") + " Experiment Pack - Archimulator");
 
-        this.add(new Form("form_experiment_pack") {{
-            this.add(new TextField<String>("input_id", Model.of(experimentPack.getId() + "")));
-            this.add(new TextField<String>("input_title", Model.of(experimentPack.getTitle())));
+        this.add(new Label("section_header_experiment_pack", String.format("%s Experiment Pack '{%d} %s'", "Edit", experimentPack.getId(), experimentPack.getTitle())));
 
-            this.add(new DropDownChoice<ExperimentType>("select_type", new PropertyModel<ExperimentType>(experimentPack, "experimentType"), Arrays.asList(ExperimentType.values())));
+        add(new Form("form_experiment_pack") {{
+            add(new WebMarkupContainer("tab_general") {{
+                add(new TextField<String>("input_id", Model.of(experimentPack.getId() + "")));
+                add(new TextField<String>("input_title", Model.of(experimentPack.getTitle())));
 
-            this.add(new TextField<String>("input_create_time", Model.of(DateHelper.toString(experimentPack.getCreateTime()))));
+                add(new DropDownChoice<ExperimentType>("select_type", new PropertyModel<ExperimentType>(experimentPack, "experimentType"), Arrays.asList(ExperimentType.values())));
 
-            this.add(new Button("button_cancel") {
+                add(new TextField<String>("input_create_time", Model.of(DateHelper.toString(experimentPack.getCreateTime()))));
+            }});
+
+            add(new WebMarkupContainer("tab_page_baseline_experiment_spec") {{
+                add(new TextField<String>("input_benchmarkTitle", Model.of(experimentPack.getBaselineExperimentSpec().getBenchmarkTitle())));
+                add(new TextField<String>("input_benchmarkArguments", Model.of(experimentPack.getBaselineExperimentSpec().getBenchmarkArguments())));
+                add(new TextField<String>("input_helperThreadLookahead", Model.of(experimentPack.getBaselineExperimentSpec().getHelperThreadLookahead() + "")));
+                add(new TextField<String>("input_helperThreadStride", Model.of(experimentPack.getBaselineExperimentSpec().getHelperThreadStride() + "")));
+                add(new TextField<String>("input_numCores", Model.of(experimentPack.getBaselineExperimentSpec().getNumCores() + "")));
+                add(new TextField<String>("input_numThreadsPerCore", Model.of(experimentPack.getBaselineExperimentSpec().getNumThreadsPerCore() + "")));
+                add(new TextField<String>("input_l1ISize", Model.of(experimentPack.getBaselineExperimentSpec().getL1ISize())));
+                add(new TextField<String>("input_l1IAssociativity", Model.of(experimentPack.getBaselineExperimentSpec().getL1IAssociativity() + "")));
+                add(new TextField<String>("input_l1DSize", Model.of(experimentPack.getBaselineExperimentSpec().getL1DSize())));
+                add(new TextField<String>("input_l1DAssociativity", Model.of(experimentPack.getBaselineExperimentSpec().getL1DAssociativity() + "")));
+                add(new TextField<String>("input_l2Size", Model.of(experimentPack.getBaselineExperimentSpec().getL2Size())));
+                add(new TextField<String>("input_l2Associativity", Model.of(experimentPack.getBaselineExperimentSpec().getL2Associativity() + "")));
+                add(new TextField<String>("input_l2ReplacementPolicyType", Model.of(experimentPack.getBaselineExperimentSpec().getL2ReplacementPolicyType())));
+            }});
+
+            add(new WebMarkupContainer("tab_page_variables") {{
+                ListView<ExperimentPackVariable> rowExperiment = new ExperimentPackVariableListView(ExperimentPackPage.this, "row_variable", experimentPackId);
+
+                WebMarkupContainer tableExperiments = new WebMarkupContainer("table_variables");
+                add(tableExperiments);
+
+                tableExperiments.add(rowExperiment);
+            }});
+
+            add(new WebMarkupContainer("tab_page_experiments") {{
+                IDataProvider<Experiment> dataProvider = new ExperimentDataProvider(experimentPackId);
+
+                final DataView<Experiment> rowExperiment = new ExperimentDataView(ExperimentPackPage.this, "row_experiment", dataProvider);
+                rowExperiment.setItemsPerPage(10);
+
+                final WebMarkupContainer tableExperiments = new WebMarkupContainer("table_experiments");
+                add(tableExperiments);
+
+                tableExperiments.add(rowExperiment);
+
+                add(new PagingNavigator("navigator_experiments", rowExperiment));
+            }});
+
+            add(new Button("button_cancel") {
                 {
                     setDefaultFormProcessing(false);
                 }

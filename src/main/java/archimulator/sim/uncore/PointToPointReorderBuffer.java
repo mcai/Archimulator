@@ -60,7 +60,7 @@ public class PointToPointReorderBuffer {
                 public void apply() {
                     message.onCompleted();
                     if (message.getId() < lastCompletedMessageId) {
-                        throw new IllegalArgumentException();
+                        throw new IllegalArgumentException(String.format("p2pReorderBuffer[%s->%s] message.id: %d, lastCompletedMessageId: %d", from.getName(), to.getName(), message.getId(), lastCompletedMessageId));
                     }
                     lastCompletedMessageId = message.getId();
                     to.receive(message);

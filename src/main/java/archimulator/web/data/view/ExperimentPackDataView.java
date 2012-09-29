@@ -47,16 +47,27 @@ public class ExperimentPackDataView extends DataView<ExperimentPack> {
         final ExperimentPack experimentPack = item.getModelObject();
 
         long numTotal = ServiceManager.getExperimentService().getNumExperimentsByExperimentPack(experimentPack);
+        long numPending = ServiceManager.getExperimentService().getNumExperimentsByExperimentPackAndState(experimentPack, ExperimentState.PENDING);
+        long numReadyToRun = ServiceManager.getExperimentService().getNumExperimentsByExperimentPackAndState(experimentPack, ExperimentState.READY_TO_RUN);
         long numRunning = ServiceManager.getExperimentService().getNumExperimentsByExperimentPackAndState(experimentPack, ExperimentState.RUNNING);
-        long numStopped = ServiceManager.getExperimentService().getNumExperimentsByExperimentPackAndState(experimentPack, ExperimentState.COMPLETED) +
-                ServiceManager.getExperimentService().getNumExperimentsByExperimentPackAndState(experimentPack, ExperimentState.ABORTED);
+        long numCompleted = ServiceManager.getExperimentService().getNumExperimentsByExperimentPackAndState(experimentPack, ExperimentState.COMPLETED);
+        long numAborted = ServiceManager.getExperimentService().getNumExperimentsByExperimentPackAndState(experimentPack, ExperimentState.ABORTED);
 
         item.add(new Label("cell_title", String.format("{%d} %s", experimentPack.getId(), experimentPack.getTitle())));
         item.add(new Label("cell_description", String.format(
-                "%s; total: %d, running: %d, stopped: %d (%s)",
+                "%s; total: %d, pending: %d (%s), readyToRun: %d (%s), running: %d (%s), completed: %d (%s), aborted: %d (%s)",
                 experimentPack.getExperimentType(),
-                numTotal, numRunning, numStopped,
-                NumberFormat.getPercentInstance().format((double) numStopped / numTotal)
+                numTotal,
+                numPending,
+                NumberFormat.getPercentInstance().format((double) numPending / numTotal),
+                numReadyToRun,
+                NumberFormat.getPercentInstance().format((double) numReadyToRun / numTotal),
+                numRunning,
+                NumberFormat.getPercentInstance().format((double) numRunning / numTotal),
+                numCompleted,
+                NumberFormat.getPercentInstance().format((double) numCompleted / numTotal),
+                numAborted,
+                NumberFormat.getPercentInstance().format((double) numAborted / numTotal)
         )));
 
         item.add(new WebMarkupContainer("cell_operations_1") {{
@@ -87,11 +98,12 @@ public class ExperimentPackDataView extends DataView<ExperimentPack> {
                     ServiceManager.getExperimentService().stopExperimentPack(experimentPack);
                 }
             });
+        }});
 
-            add(new Link<Void>("button_reset_stopped_experiments") {
+        item.add(new WebMarkupContainer("cell_operations_2") {{
+            add(new Link<Void>("button_reset_completed_experiments") {
                 {
-                    if (!(ServiceManager.getExperimentService().getNumExperimentsByExperimentPackAndState(experimentPack, ExperimentState.COMPLETED) > 0 ||
-                            ServiceManager.getExperimentService().getNumExperimentsByExperimentPackAndState(experimentPack, ExperimentState.ABORTED) > 0)) {
+                    if (ServiceManager.getExperimentService().getNumExperimentsByExperimentPackAndState(experimentPack, ExperimentState.COMPLETED) == 0) {
                         add(new CssClassNameAppender("disabled"));
                         setEnabled(false);
                     }
@@ -99,12 +111,26 @@ public class ExperimentPackDataView extends DataView<ExperimentPack> {
 
                 @Override
                 public void onClick() {
-                    ServiceManager.getExperimentService().resetStoppedExperimentsByExperimentPack(experimentPack);
+                    ServiceManager.getExperimentService().resetCompletedExperimentsByExperimentPack(experimentPack);
+                }
+            });
+
+            add(new Link<Void>("button_reset_aborted_experiments") {
+                {
+                    if (ServiceManager.getExperimentService().getNumExperimentsByExperimentPackAndState(experimentPack, ExperimentState.ABORTED) == 0) {
+                        add(new CssClassNameAppender("disabled"));
+                        setEnabled(false);
+                    }
+                }
+
+                @Override
+                public void onClick() {
+                    ServiceManager.getExperimentService().resetAbortedExperimentsByExperimentPack(experimentPack);
                 }
             });
         }});
 
-        item.add(new WebMarkupContainer("cell_operations_2") {{
+        item.add(new WebMarkupContainer("cell_operations_3") {{
             add(new BookmarkablePageLink<Object>("button_edit", ExperimentPackPage.class, new PageParameters() {{
                 set("action", "edit");
                 set("experiment_pack_id", experimentPack.getId());

@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.web.application;
 
-import archimulator.web.pages.AuthenticatedWebPage;
+import archimulator.web.pages.AuthenticatedBasePage;
 import archimulator.web.pages.HomePage;
 import archimulator.web.pages.SignInPage;
 import org.apache.wicket.Application;
@@ -59,7 +59,7 @@ public class ArchimulatorApplication extends WebApplication {
         getMarkupSettings().setAutomaticLinking(true);
 
         IAuthorizationStrategy authorizationStrategy = new SimplePageAuthorizationStrategy(
-                AuthenticatedWebPage.class, SignInPage.class) {
+                AuthenticatedBasePage.class, SignInPage.class) {
             @Override
             protected boolean isAuthorized() {
                 return (((ArchimulatorSession) Session.get()).isSignedIn());

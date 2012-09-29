@@ -43,8 +43,4 @@ public interface BenchmarkService extends Service {
     void clearBenchmarks();
 
     void updateBenchmark(Benchmark benchmark);
-
-    void lockBenchmark(Benchmark benchmark);
-
-    void unlockBenchmark(Benchmark benchmark);
 }

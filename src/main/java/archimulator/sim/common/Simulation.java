@@ -20,7 +20,6 @@ package archimulator.sim.common;
 
 import archimulator.model.ContextMapping;
 import archimulator.model.Experiment;
-import archimulator.model.ExperimentState;
 import archimulator.service.ServiceManager;
 import archimulator.sim.core.BasicProcessor;
 import archimulator.sim.core.Core;
@@ -149,22 +148,15 @@ public abstract class Simulation implements SimulationObject {
             this.endTime = DateHelper.toTick(new Date());
             this.collectStats(true);
 
-            this.experiment.setState(ExperimentState.ABORTED);
-            this.experiment.setFailedReason(e.toString());
+            this.endSimulation();
 
-            ServiceManager.getExperimentService().updateExperiment(this.experiment);
-            ServiceManager.getExperimentService().dumpExperiment(this.experiment);
-
-            System.err.println("Simulation aborted with errors");
-            System.exit(-1);
+            throw new RuntimeException(e);
         }
 
         this.endTime = DateHelper.toTick(new Date());
         this.collectStats(true);
 
         this.endSimulation();
-
-        System.out.println();
     }
 
     private void collectStats(boolean endOfSimulation) {

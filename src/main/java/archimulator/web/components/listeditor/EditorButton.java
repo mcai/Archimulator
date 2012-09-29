@@ -16,43 +16,40 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.web.pages.listeditor;
+package archimulator.web.components.listeditor;
 
-import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.ajax.markup.html.form.AjaxFallbackButton;
 import org.apache.wicket.markup.html.form.Form;
 
-public class RemoveButton extends EditorButton {
-    private WebMarkupContainer container;
+import java.util.List;
 
-    public RemoveButton(String id, Form<?> form, WebMarkupContainer container) {
+public abstract class EditorButton extends AjaxFallbackButton {
+    protected Form<?> form;
+    private transient ListItem<?> parent;
+
+    public EditorButton(String id, Form<?> form) {
         super(id, form);
-        this.container = container;
+        this.form = form;
+    }
+
+    protected final ListItem<?> getItem() {
+        if (parent == null) {
+            parent = findParent(ListItem.class);
+        }
+        return parent;
+    }
+
+    protected final List<?> getList() {
+        return getEditor().items;
+    }
+
+    protected final ListEditor<?> getEditor() {
+        return (ListEditor<?>) getItem().getParent();
     }
 
     @Override
-    protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
-        int idx = getItem().getIndex();
-
-        for (int i = idx + 1; i < getItem().getParent().size(); i++) {
-            ListItem<?> item = (ListItem<?>) getItem().getParent().get(i);
-            item.setIndex(item.getIndex() - 1);
-        }
-
-        getList().remove(idx);
-        getEditor().remove(getItem());
-
-        if(target != null) {
-            target.add(container);
-        }
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return getEditor().checkRemove(getItem());
-    }
-
-    public WebMarkupContainer getContainer() {
-        return container;
+    protected void onDetach() {
+        parent = null;
+        super.onDetach();
     }
 }
