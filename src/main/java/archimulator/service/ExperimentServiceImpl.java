@@ -68,7 +68,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     private Dao<ExperimentPack, Long> experimentPacks;
     private Dao<ExperimentSpec, Long> experimentSpecs;
 
-    private Lock lock = new ReentrantLock();
+    private Lock lockGetFirstExperimentToRun = new ReentrantLock();
 
     @SuppressWarnings("unchecked")
     public ExperimentServiceImpl() {
@@ -154,13 +154,17 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         }
     }
 
+    private boolean running = false;
+
     @Override
     public void start() {
+        running = true;
+
         for (int i = 0; i < Runtime.getRuntime().availableProcessors(); i++) {
             Thread thread = new Thread() {
                 public void run() {
                     try {
-                        for (; ; ) {
+                        for (;running; ) {
                             Experiment experiment;
                             while ((experiment = getFirstExperimentToRun()) == null) {
                                 synchronized (this) {
@@ -217,6 +221,14 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
     @Override
     public void stop() {
+        running = false;
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
         super.stop();
     }
 
@@ -491,7 +503,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
     @Override
     public Experiment getFirstExperimentToRun() {
-        lock.lock();
+        lockGetFirstExperimentToRun.lock();
         try {
             try {
                 PreparedQuery<Experiment> query = experiments.queryBuilder().where().eq("state", ExperimentState.READY_TO_RUN).prepare();
@@ -508,7 +520,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
                 throw new RuntimeException(e);
             }
         } finally {
-            lock.unlock();
+            lockGetFirstExperimentToRun.unlock();
         }
     }
 
