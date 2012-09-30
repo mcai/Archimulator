@@ -19,6 +19,8 @@
 package archimulator.service;
 
 import archimulator.model.*;
+import archimulator.sim.common.*;
+import archimulator.sim.os.Kernel;
 import com.Ostermiller.util.CSVPrinter;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.misc.TransactionManager;
@@ -26,10 +28,13 @@ import com.j256.ormlite.stmt.*;
 import com.jayway.jsonpath.JsonPath;
 import net.pickapack.JsonSerializationHelper;
 import net.pickapack.Pair;
+import net.pickapack.Reference;
 import net.pickapack.StorageUnit;
 import net.pickapack.action.Function1;
 import net.pickapack.action.Function2;
 import net.pickapack.dateTime.DateHelper;
+import net.pickapack.event.BlockingEventDispatcher;
+import net.pickapack.event.CycleAccurateEventQueue;
 import net.pickapack.io.cmd.CommandLineHelper;
 import net.pickapack.model.ModelElement;
 import net.pickapack.service.AbstractService;
@@ -41,16 +46,14 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.math3.stat.StatUtils;
 import org.jsoup.helper.StringUtil;
-import org.xeustechnologies.jcl.JarClassLoader;
-import org.xeustechnologies.jcl.JclObjectFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.Callable;
@@ -67,8 +70,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
     private Lock lock = new ReentrantLock();
 
-    private JarClassLoader jcl;
-
     @SuppressWarnings("unchecked")
     public ExperimentServiceImpl() {
         super(ServiceManager.DATABASE_URL, Arrays.<Class<? extends ModelElement>>asList(Experiment.class, ExperimentPack.class, ExperimentSpec.class));
@@ -76,9 +77,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         this.experiments = createDao(Experiment.class);
         this.experimentPacks = createDao(ExperimentPack.class);
         this.experimentSpecs = createDao(ExperimentSpec.class);
-
-        jcl = new JarClassLoader();
-        jcl.add(FileUtils.getUserDirectoryPath() + "/Archimulator/target/archimulator.jar"); //TODO: class path should not be hardcoded!!!
 
         this.cleanUpExperiments();
 
@@ -184,14 +182,36 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     private void runExperiment(Experiment experiment) {
-        JclObjectFactory factory = JclObjectFactory.getInstance();
-        Object experimentHelper = factory.create(jcl, "archimulator.util.ExperimentHelper");
         try {
-            Method runExperiment = experimentHelper.getClass().getDeclaredMethod("runExperiment", long.class);
-            runExperiment.invoke(experimentHelper, experiment.getId());
+            CycleAccurateEventQueue cycleAccurateEventQueue = new CycleAccurateEventQueue();
+
+            if (experiment.getType() == ExperimentType.FUNCTIONAL) {
+                BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher = new BlockingEventDispatcher<SimulationEvent>();
+                new FunctionalSimulation(experiment.getTitle() + "/functional", experiment, blockingEventDispatcher, cycleAccurateEventQueue, experiment.getNumMaxInstructions()).simulate();
+            } else if (experiment.getType() == ExperimentType.DETAILED) {
+                BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher = new BlockingEventDispatcher<SimulationEvent>();
+                new DetailedSimulation(experiment.getTitle() + "/detailed", experiment, blockingEventDispatcher, cycleAccurateEventQueue, experiment.getNumMaxInstructions()).simulate();
+            } else if (experiment.getType() == ExperimentType.TWO_PHASE) {
+                Reference<Kernel> kernelRef = new Reference<Kernel>();
+
+                BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher = new BlockingEventDispatcher<SimulationEvent>();
+
+                new ToRoiFastForwardSimulation(experiment.getTitle() + "/twoPhase/phase0", experiment, blockingEventDispatcher, cycleAccurateEventQueue, experiment.getArchitecture().getHelperThreadPthreadSpawnIndex(), kernelRef).simulate();
+
+                blockingEventDispatcher.clearListeners();
+
+                cycleAccurateEventQueue.resetCurrentCycle();
+
+                new FromRoiDetailedSimulation(experiment.getTitle() + "/twoPhase/phase1", experiment, blockingEventDispatcher, cycleAccurateEventQueue, experiment.getNumMaxInstructions(), kernelRef).simulate();
+            }
+
+            experiment.setState(ExperimentState.COMPLETED);
+            experiment.setFailedReason("");
         } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(-1);
+            experiment.setState(ExperimentState.ABORTED);
+            experiment.setFailedReason(ExceptionUtils.getStackTrace(e));
+        } finally {
+            ServiceManager.getExperimentService().updateExperiment(experiment);
         }
     }
 

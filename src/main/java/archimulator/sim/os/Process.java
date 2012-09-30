@@ -19,13 +19,13 @@
 package archimulator.sim.os;
 
 import archimulator.model.ContextMapping;
+import archimulator.service.ServiceManager;
 import archimulator.sim.common.BasicSimulationObject;
 import archimulator.sim.common.SimulationObject;
 import archimulator.sim.isa.BitField;
 import archimulator.sim.isa.Memory;
 import archimulator.sim.isa.Mnemonic;
 import archimulator.sim.isa.StaticInstruction;
-import archimulator.util.ExperimentHelper;
 import net.pickapack.dateTime.DateHelper;
 import net.pickapack.io.cmd.CommandLineHelper;
 import net.pickapack.io.cmd.SedHelper;
@@ -269,6 +269,6 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
     }
 
     private static String getTransformedBenchmarkWorkingDirectory(String workingDirectory) {
-        return workingDirectory.replaceAll(ExperimentHelper.USER_HOME_TEMPLATE_ARG, FileUtils.getUserDirectoryPath());
+        return workingDirectory.replaceAll(ServiceManager.USER_HOME_TEMPLATE_ARG, FileUtils.getUserDirectoryPath());
     }
 }

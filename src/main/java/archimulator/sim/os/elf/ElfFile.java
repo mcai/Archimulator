@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.os.elf;
 
-import archimulator.util.ExperimentHelper;
+import archimulator.service.ServiceManager;
 import net.pickapack.io.buffer.BigEndianBufferAccessor;
 import net.pickapack.io.buffer.BufferAccessor;
 import net.pickapack.io.buffer.LittleEndianBufferAccessor;
@@ -54,7 +54,7 @@ public class ElfFile {
 
     public ElfFile(String filename) {
         try {
-            this.file = new RandomAccessFile(filename.replaceAll(ExperimentHelper.USER_HOME_TEMPLATE_ARG, System.getProperty("user.home")), "r");
+            this.file = new RandomAccessFile(filename.replaceAll(ServiceManager.USER_HOME_TEMPLATE_ARG, System.getProperty("user.home")), "r");
             this.buffer = new RandomAccessFileBuffer(this.file);
 
             this.sectionHeaders = new ArrayList<ElfSectionHeader>();
@@ -63,13 +63,17 @@ public class ElfFile {
             this.identification = new ElfIdentification();
             this.identification.read(this);
 
-            assert (this.identification.getEi_class() == ElfIdentification.ElfClass32);
+            if (this.identification.getEi_class() != ElfIdentification.ElfClass32) {
+                throw new IllegalArgumentException();
+            }
 
             this.littleEndian = (this.identification.getEi_data() == ElfIdentification.ElfData2Lsb);
 
             this.header = new ElfHeader(this);
 
-            assert (this.header.getE_machine() == ElfHeader.EM_MIPS);
+            if (this.header.getE_machine() != ElfHeader.EM_MIPS) {
+                throw new IllegalArgumentException();
+            }
 
             this.setPosition(this.header.getE_shoff());
 

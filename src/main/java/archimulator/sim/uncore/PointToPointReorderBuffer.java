@@ -30,7 +30,6 @@ public class PointToPointReorderBuffer {
     private Controller from;
     private Controller to;
     private long lastCompletedMessageId = -1;
-    private CoherenceMessage lastCompletedMessage = null;
 
     public PointToPointReorderBuffer(Controller from, Controller to) {
         this.from = from;
@@ -61,10 +60,9 @@ public class PointToPointReorderBuffer {
                 public void apply() {
                     message.onCompleted();
                     if (message.getId() < lastCompletedMessageId) {
-                        throw new IllegalArgumentException(String.format("p2pReorderBuffer[%s->%s] message: %s, lastCompletedMessage: %s", from.getName(), to.getName(), message, lastCompletedMessage));
+                        throw new IllegalArgumentException(String.format("p2pReorderBuffer[%s->%s] messageId: %d, lastCompletedMessageId: %d", from.getName(), to.getName(), message.getId(), lastCompletedMessageId));
                     }
                     lastCompletedMessageId = message.getId();
-                    lastCompletedMessage = message;
                     to.receive(message);
                 }
             }, to.getHitLatency());

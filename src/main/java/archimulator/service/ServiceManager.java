@@ -22,6 +22,7 @@ import archimulator.util.PropertiesHelper;
 
 public class ServiceManager {
     public static final String DATABASE_URL = "jdbc:mysql://localhost/archimulator?user=root&password=1026@ustc";
+    public static final String USER_HOME_TEMPLATE_ARG = "<user.home>";
 
     private static BenchmarkService benchmarkService;
     private static ArchitectureService architectureService;
