@@ -83,6 +83,12 @@ public interface ExperimentService extends Service {
 
     void updateExperimentPack(ExperimentPack experimentPack);
 
+    void addExperimentSpec(ExperimentSpec experimentSpec);
+
+    void removeExperimentSpecById(long id);
+
+    ExperimentSpec getExperimentSpecByParent(ExperimentPack parent);
+
     long getNumExperimentsByExperimentPack(ExperimentPack experimentPack);
 
     long getNumExperimentsByExperimentPackAndState(ExperimentPack experimentPack, ExperimentState experimentState);

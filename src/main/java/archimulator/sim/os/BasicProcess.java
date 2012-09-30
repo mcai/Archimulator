@@ -19,7 +19,6 @@
 package archimulator.sim.os;
 
 import archimulator.model.ContextMapping;
-import archimulator.service.ServiceManager;
 import archimulator.sim.analysis.ElfAnalyzer;
 import archimulator.sim.analysis.Instruction;
 import archimulator.sim.isa.Memory;
@@ -27,6 +26,7 @@ import archimulator.sim.isa.StaticInstruction;
 import archimulator.sim.isa.dissembler.MipsDisassembler;
 import archimulator.sim.os.elf.ElfFile;
 import archimulator.sim.os.elf.ElfSectionHeader;
+import archimulator.util.ExperimentHelper;
 
 import java.io.File;
 import java.util.*;
@@ -49,7 +49,7 @@ public class BasicProcess extends Process {
 
         this.instructions = new HashMap<String, SortedMap<Integer, Instruction>>();
 
-        List<String> commandLineArgumentList = Arrays.asList((contextMapping.getBenchmark().getWorkingDirectory() + File.separator + contextMapping.getBenchmark().getExecutable() + " " + contextMapping.getArguments()).replaceAll(ServiceManager.USER_HOME_TEMPLATE_ARG, System.getProperty("user.home")).split(" "));
+        List<String> commandLineArgumentList = Arrays.asList((contextMapping.getBenchmark().getWorkingDirectory() + File.separator + contextMapping.getBenchmark().getExecutable() + " " + contextMapping.getArguments()).replaceAll(ExperimentHelper.USER_HOME_TEMPLATE_ARG, System.getProperty("user.home")).split(" "));
 
         String elfFileName = commandLineArgumentList.get(0);
 

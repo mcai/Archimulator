@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.model;
 
+import archimulator.service.ServiceManager;
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -50,13 +51,12 @@ public class ExperimentPack implements ModelElement {
     private ExperimentType experimentType;
 
     @DatabaseField(dataType = DataType.SERIALIZABLE)
-    private ExperimentSpec baselineExperimentSpec; //TODO: to be converted to LinkedHashMap<String, String>
-
-    @DatabaseField(dataType = DataType.SERIALIZABLE)
     private ArrayList<ExperimentPackVariable> variables;
 
     @DatabaseField(dataType = DataType.SERIALIZABLE)
     private ArrayList<String> experimentTitles;
+
+    private transient ExperimentSpec baselineExperimentSpec;
 
     public ExperimentPack() {
         this.createTime = DateHelper.toTick(new Date());
@@ -93,8 +93,8 @@ public class ExperimentPack implements ModelElement {
     }
 
     public ExperimentSpec getBaselineExperimentSpec() {
-        if (baselineExperimentSpec != null && baselineExperimentSpec.getParent() == null) {
-            baselineExperimentSpec.setParent(this);
+        if(baselineExperimentSpec == null) {
+            return ServiceManager.getExperimentService().getExperimentSpecByParent(this);
         }
 
         return baselineExperimentSpec;

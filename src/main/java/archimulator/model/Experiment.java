@@ -19,6 +19,7 @@
 package archimulator.model;
 
 import archimulator.service.ServiceManager;
+import archimulator.util.ArrayListOfContextMappingsJsonSerializableType;
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -56,7 +57,7 @@ public class Experiment implements ModelElement {
     @DatabaseField
     private int numMaxInstructions;
 
-    @DatabaseField(dataType = DataType.SERIALIZABLE)
+    @DatabaseField(persisterClass = ArrayListOfContextMappingsJsonSerializableType.class)
     private ArrayList<ContextMapping> contextMappings;
 
     @DatabaseField(dataType = DataType.SERIALIZABLE)

@@ -20,31 +20,65 @@ package archimulator.model;
 
 import archimulator.service.ServiceManager;
 import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
+import net.pickapack.dateTime.DateHelper;
+import net.pickapack.model.ModelElement;
 import net.pickapack.util.StorageUnitHelper;
 
-import java.io.Serializable;
+import java.util.Date;
 
-public class ExperimentSpec implements Serializable {
+@DatabaseTable(tableName = "ExperimentSpec")
+public class ExperimentSpec implements ModelElement {
+    @DatabaseField(generatedId = true)
+    private long id;
+
+    @DatabaseField
+    private long parentId;
+
+    @DatabaseField
+    private String title;
+
+    @DatabaseField
+    private long createTime;
+
+    @DatabaseField
     private String benchmarkTitle;
+
+    @DatabaseField
     private String benchmarkArguments;
 
+    @DatabaseField
     private int helperThreadLookahead;
+
+    @DatabaseField
     private int helperThreadStride;
 
+    @DatabaseField
     private int numCores;
+
+    @DatabaseField
     private int numThreadsPerCore;
 
+    @DatabaseField
     private String l1ISize;
+
+    @DatabaseField
     private int l1IAssociativity;
 
     private String l1DSize;
+
+    @DatabaseField
     private int l1DAssociativity;
 
+    @DatabaseField
     private String l2Size;
-    private int l2Associativity;
-    private String l2ReplacementPolicyType;
 
-    private transient ExperimentPack parent;
+    @DatabaseField
+    private int l2Associativity;
+
+    @DatabaseField
+    private String l2ReplacementPolicyType;
 
     private transient Architecture architecture;
 
@@ -56,6 +90,9 @@ public class ExperimentSpec implements Serializable {
     }
 
     public ExperimentSpec(String benchmarkTitle, String benchmarkArguments, int helperThreadLookahead, int helperThreadStride, int numCores, int numThreadsPerCore, String l1ISize, int l1IAssociativity, String l1DSize, int l1DAssociativity, String l2Size, int l2Associativity, String l2ReplacementPolicyType) {
+        this.title = "";
+        this.createTime = DateHelper.toTick(new Date());
+
         this.benchmarkTitle = benchmarkTitle;
         this.benchmarkArguments = benchmarkArguments;
 
@@ -76,12 +113,28 @@ public class ExperimentSpec implements Serializable {
         this.l2ReplacementPolicyType = l2ReplacementPolicyType;
     }
 
-    public ExperimentPack getParent() {
-        return parent;
+    @Override
+    public long getId() {
+        return id;
+    }
+
+    @Override
+    public long getParentId() {
+        return parentId;
+    }
+
+    @Override
+    public String getTitle() {
+        return title;
+    }
+
+    @Override
+    public long getCreateTime() {
+        return createTime;
     }
 
     public void setParent(ExperimentPack parent) {
-        this.parent = parent;
+        this.parentId = parent != null ? parent.getId() : -1;
     }
 
     public String getBenchmarkTitle() {

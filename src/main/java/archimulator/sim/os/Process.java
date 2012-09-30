@@ -19,19 +19,25 @@
 package archimulator.sim.os;
 
 import archimulator.model.ContextMapping;
-import archimulator.service.ServiceManager;
 import archimulator.sim.common.BasicSimulationObject;
 import archimulator.sim.common.SimulationObject;
 import archimulator.sim.isa.BitField;
 import archimulator.sim.isa.Memory;
 import archimulator.sim.isa.Mnemonic;
 import archimulator.sim.isa.StaticInstruction;
+import archimulator.util.ExperimentHelper;
 import net.pickapack.dateTime.DateHelper;
 import net.pickapack.io.cmd.CommandLineHelper;
 import net.pickapack.io.cmd.SedHelper;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.math.RandomUtils;
 
 import java.io.File;
+import java.io.RandomAccessFile;
 import java.io.Serializable;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.nio.channels.OverlappingFileLockException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -77,9 +83,35 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
 
         this.memory = new Memory(kernel, this.littleEndian, this.id);
 
-        synchronized (Process.class) {
+        try {
+            File file = new File(getTransformedBenchmarkWorkingDirectory(contextMapping.getBenchmark().getWorkingDirectory()) + "/archimulator_lock");
+            FileChannel channel = new RandomAccessFile(file, "rw").getChannel();
+
+            FileLock lock = null;
+
+            for(;;) {
+                try {
+                    lock = channel.tryLock();
+                } catch (OverlappingFileLockException e) {
+                    // File is already locked in this thread or virtual machine
+                }
+
+                if(lock != null) {
+                    break;
+                }
+
+                Thread.sleep(RandomUtils.nextInt(10) * 1000);
+            }
+
             buildBenchmark(contextMapping.getBenchmark().getWorkingDirectory(), contextMapping.getBenchmark().getHelperThreadEnabled(), contextMapping.getHelperThreadLookahead(), contextMapping.getHelperThreadStride());
             this.loadProgram(kernel, simulationDirectory, contextMapping);
+
+            lock.release();
+
+            channel.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(-1);
         }
     }
 
@@ -220,7 +252,7 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
     }
 
     private static void pushMacroDefineArg(String workingDirectory, String fileName, String key, String value) {
-        fileName = workingDirectory.replaceAll(ServiceManager.USER_HOME_TEMPLATE_ARG, System.getProperty("user.home")) + "/" + fileName;
+        fileName = getTransformedBenchmarkWorkingDirectory(workingDirectory) + "/" + fileName;
         System.err.printf("[%s] Pushing Macro Define Arg in %s: %s, %s\n", DateHelper.toString(new Date()), fileName, key, value);
         List<String> result = SedHelper.sedInPlace(fileName, "#define " + key, "#define " + key + " " + value);
         for (String line : result) {
@@ -230,9 +262,13 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
 
     private static void buildWithMakeFile(String workingDirectory) {
         System.err.printf("[%s] Building with Makefile\n", DateHelper.toString(new Date()));
-        List<String> result = CommandLineHelper.invokeShellCommandAndGetResult("sh -c 'cd " + workingDirectory.replaceAll(ServiceManager.USER_HOME_TEMPLATE_ARG, System.getProperty("user.home")) + ";make -f Makefile.mips -B'");
+        List<String> result = CommandLineHelper.invokeShellCommandAndGetResult("sh -c 'cd " + getTransformedBenchmarkWorkingDirectory(workingDirectory) + ";make -f Makefile.mips -B'");
         for (String line : result) {
             System.err.println(line);
         }
+    }
+
+    private static String getTransformedBenchmarkWorkingDirectory(String workingDirectory) {
+        return workingDirectory.replaceAll(ExperimentHelper.USER_HOME_TEMPLATE_ARG, FileUtils.getUserDirectoryPath());
     }
 }

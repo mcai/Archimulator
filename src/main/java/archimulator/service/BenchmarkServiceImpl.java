@@ -19,6 +19,7 @@
 package archimulator.service;
 
 import archimulator.model.Benchmark;
+import archimulator.util.ExperimentHelper;
 import com.j256.ormlite.dao.Dao;
 import net.pickapack.model.ModelElement;
 import net.pickapack.service.AbstractService;
@@ -37,34 +38,34 @@ public class BenchmarkServiceImpl extends AbstractService implements BenchmarkSe
 
         if (this.getFirstBenchmark() == null) {
             this.addBenchmark(new Benchmark(
-                    "mst_baseline", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/baseline",
+                    "mst_baseline", ExperimentHelper.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/baseline",
                     "mst.mips",
                     "4000"));
 
             this.addBenchmark(new Benchmark(
-                    "mst_ht", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/ht",
+                    "mst_ht", ExperimentHelper.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/ht",
                     "mst.mips",
                     "4000", "", true));
 
             this.addBenchmark(new Benchmark(
-                    "em3d_baseline", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/em3d/baseline",
+                    "em3d_baseline", ExperimentHelper.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/em3d/baseline",
                     "em3d.mips",
                     "400000 128 75 1"));
 
             this.addBenchmark(new Benchmark(
-                    "em3d_ht", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/em3d/ht",
+                    "em3d_ht", ExperimentHelper.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/em3d/ht",
                     "em3d.mips",
                     "400000 128 75 1", "", true));
 
             this.addBenchmark(new Benchmark(
-                    "429_mcf_baseline", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline",
+                    "429_mcf_baseline", ExperimentHelper.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline",
                     "429.mcf.mips",
-                    ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline/data/ref/input/inp.in"));
+                    ExperimentHelper.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline/data/ref/input/inp.in"));
 
             this.addBenchmark(new Benchmark(
-                    "429_mcf_ht", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht",
+                    "429_mcf_ht", ExperimentHelper.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht",
                     "429.mcf.mips",
-                    ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht/data/ref/input/inp.in", "", true));
+                    ExperimentHelper.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht/data/ref/input/inp.in", "", true));
         }
     }
 

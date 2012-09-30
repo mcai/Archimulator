@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.os.elf;
 
-import archimulator.service.ServiceManager;
+import archimulator.util.ExperimentHelper;
 import net.pickapack.io.buffer.BigEndianBufferAccessor;
 import net.pickapack.io.buffer.BufferAccessor;
 import net.pickapack.io.buffer.LittleEndianBufferAccessor;
@@ -54,7 +54,7 @@ public class ElfFile {
 
     public ElfFile(String filename) {
         try {
-            this.file = new RandomAccessFile(filename.replaceAll(ServiceManager.USER_HOME_TEMPLATE_ARG, System.getProperty("user.home")), "r");
+            this.file = new RandomAccessFile(filename.replaceAll(ExperimentHelper.USER_HOME_TEMPLATE_ARG, System.getProperty("user.home")), "r");
             this.buffer = new RandomAccessFileBuffer(this.file);
 
             this.sectionHeaders = new ArrayList<ElfSectionHeader>();
