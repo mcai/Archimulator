@@ -18,26 +18,30 @@
  ******************************************************************************/
 package archimulator.web.pages;
 
-import archimulator.model.*;
+import archimulator.model.Benchmark;
+import archimulator.model.ContextMapping;
+import archimulator.model.Experiment;
+import archimulator.model.ExperimentType;
 import archimulator.service.ServiceManager;
-import archimulator.web.data.view.ContextMappingListEditor;
-import net.pickapack.dateTime.DateHelper;
-import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.markup.html.form.AjaxFallbackButton;
-import org.apache.wicket.markup.html.WebMarkupContainer;
+import archimulator.web.components.experiment.PanelContextMappings;
+import archimulator.web.components.experiment.PanelGeneral;
+import archimulator.web.components.experiment.PanelStats;
+import de.agilecoders.wicket.markup.html.bootstrap.tabs.BootstrapTabbedPanel;
+import org.apache.wicket.extensions.markup.html.tabs.AbstractTab;
+import org.apache.wicket.extensions.markup.html.tabs.ITab;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.form.*;
-import org.apache.wicket.markup.html.list.ListItem;
-import org.apache.wicket.markup.html.list.ListView;
+import org.apache.wicket.markup.html.form.Button;
+import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
+import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.Model;
-import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.wicketstuff.annotation.mount.MountPath;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-@MountPath(value = "/", alt = "/experiment")
+@MountPath(value = "/experiment")
 public class ExperimentPage extends AuthenticatedBasePage {
     public ExperimentPage(final PageParameters parameters) {
         super(parameters);
@@ -80,67 +84,25 @@ public class ExperimentPage extends AuthenticatedBasePage {
         public FormExperiment(final Experiment experiment, final String action, final PageParameters parameters) {
             super("form_experiment");
 
-            this.add(new TextField<String>("input_id", Model.of(experiment.getId() + "")));
-            this.add(new TextField<String>("input_title", Model.of(experiment.getTitle())));
-
-            this.add(new DropDownChoice<ExperimentType>("select_type", new PropertyModel<ExperimentType>(experiment, "type"), Arrays.asList(ExperimentType.values())));
-            this.add(new DropDownChoice<ExperimentState>("select_state", new PropertyModel<ExperimentState>(experiment, "state"), Arrays.asList(ExperimentState.values())));
-            this.add(new TextArea<String>("textArea_failedReason", Model.of(experiment.getFailedReason())));
-
-            this.add(new DropDownChoice<Architecture>("select_architecture", new PropertyModel<Architecture>(experiment, "architecture"), ServiceManager.getArchitectureService().getAllArchitectures(), new IChoiceRenderer<Architecture>() {
-                @Override
-                public Object getDisplayValue(Architecture architecture) {
-                    return String.format("{%d} %s", architecture.getId(), architecture.getTitle());
-                }
-
-                @Override
-                public String getIdValue(Architecture architecture, int index) {
-                    return architecture.getId() + "";
-                }
-            }));
-
-            this.add(new NumberTextField<Integer>("input_num_max_instructions", new PropertyModel<Integer>(experiment, "numMaxInstructions")));
-            this.add(new TextField<String>("input_create_time", Model.of(DateHelper.toString(experiment.getCreateTime()))));
-
-            final WebMarkupContainer tableContextMappings = new WebMarkupContainer("table_context_mappings");
-            tableContextMappings.setOutputMarkupId(true);
-            add(tableContextMappings);
-
-            final ContextMappingListEditor editorContextMappings = new ContextMappingListEditor("row_context_mapping", experiment, this, tableContextMappings);
-            tableContextMappings.add(editorContextMappings);
-
-            tableContextMappings.add(new AjaxFallbackButton("button_add_context_mapping", this) {
-                @Override
-                protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
-                    Integer threadId = 0;
-                    Benchmark benchmark = ServiceManager.getBenchmarkService().getFirstBenchmark();
-                    ContextMapping contextMapping = new ContextMapping(threadId, benchmark, benchmark.getDefaultArguments(), ContextMapping.getDefaultStandardOut(threadId));
-
-                    editorContextMappings.addItem(contextMapping);
-
-                    if (target != null) {
-                        target.add(tableContextMappings);
+            add(new BootstrapTabbedPanel<ITab>("tabs", new ArrayList<ITab>() {{
+                add(new AbstractTab(new Model<String>("General")) {
+                    public Panel getPanel(String panelId) {
+                        return new PanelGeneral(panelId, experiment);
                     }
-                }
-            });
+                });
 
+                add(new AbstractTab(new Model<String>("Context Mappings")) {
+                    public Panel getPanel(String panelId) {
+                        return new PanelContextMappings(panelId, experiment, FormExperiment.this);
+                    }
+                });
 
-            List<Map.Entry<String, String>> stats = new ArrayList<Map.Entry<String, String>>(experiment.getStats().entrySet());
-
-            final ListView<Map.Entry<String, String>> rowExperimentStat = new ListView<Map.Entry<String, String>>("row_stat", stats){
-                @Override
-                protected void populateItem(ListItem<Map.Entry<String, String>> item) {
-                    final Map.Entry<String, String> entry = item.getModelObject();
-
-                    item.add(new Label("cell_key", entry.getKey()));
-                    item.add(new Label("cell_value", entry.getValue()));
-                }
-            };
-
-            final WebMarkupContainer tableExperimentStats = new WebMarkupContainer("table_stats");
-            add(tableExperimentStats);
-
-            tableExperimentStats.add(rowExperimentStat);
+                add(new AbstractTab(new Model<String>("Statistics")) {
+                    public Panel getPanel(String panelId) {
+                        return new PanelStats(panelId, experiment);
+                    }
+                });
+            }}));
 
             this.add(new Button("button_save", Model.of(action.equals("add") ? "Add" : "Save")) {
                 @Override

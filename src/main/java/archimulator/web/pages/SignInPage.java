@@ -22,7 +22,7 @@ import archimulator.web.components.SignInPanel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.wicketstuff.annotation.mount.MountPath;
 
-@MountPath(value = "/", alt = "/sign_in")
+@MountPath(value = "/sign_in")
 public class SignInPage extends BasePage {
     public SignInPage(PageParameters parameters) {
         super(parameters);

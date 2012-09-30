@@ -16,19 +16,13 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.web.pages;
+package archimulator.web.components.architecture;
 
-import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.wicketstuff.annotation.mount.MountPath;
+import archimulator.model.Architecture;
+import org.apache.wicket.markup.html.panel.Panel;
 
-@MountPath(value = "/sign_out")
-public class SignOutPage extends BasePage {
-    public SignOutPage(PageParameters parameters) {
-        super(parameters);
-
-        setTitle("Sign Out - Archimulator");
-
-        getSession().invalidate();
-        setResponsePage(getApplication().getHomePage());
+public class PanelInterconnects extends Panel {
+    public PanelInterconnects(String id, Architecture architecture) {
+        super(id);
     }
 }

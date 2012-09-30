@@ -24,7 +24,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.wicketstuff.annotation.mount.MountPath;
 
-@MountPath(value = "/", alt = "/sign_up")
+@MountPath(value = "/sign_up")
 public class SignUpPage extends BasePage {
     public SignUpPage(PageParameters parameters) {
         super(parameters);

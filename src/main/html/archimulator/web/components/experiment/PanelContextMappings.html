@@ -1,0 +1,53 @@
+<html xmlns:wicket="http://wicket.apache.org">
+<body>
+<wicket:panel>
+    <table class="table table-bordered table-striped" wicket:id="table_context_mappings">
+        <thead>
+        <tr>
+            <th>Thread Id</th>
+            <th>Benchmark</th>
+            <th>Arguments</th>
+            <th>Standard out</th>
+            <th>HT Lookahead</th>
+            <th>HT Stride</th>
+            <th>Dynamic HT Params</th>
+            <th>Operations</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr wicket:id="row_context_mapping">
+            <td>
+                <select class="span1" wicket:id="threadId"></select>
+            </td>
+            <td>
+                <select class="span2" wicket:id="benchmarkId"></select>
+            </td>
+            <td>
+                <input type="text" class="span2" wicket:id="arguments"/>
+            </td>
+            <td>
+                <input type="text" class="span2" wicket:id="standardOut"/>
+            </td>
+            <td>
+                <input type="text" class="span1" wicket:id="helperThreadLookahead"/>
+            </td>
+            <td>
+                <input type="text" class="span1" wicket:id="helperThreadStride"/>
+            </td>
+            <td>
+                <input type="checkbox" class="span1" wicket:id="dynamicHelperThreadParams"/>
+            </td>
+            <td>
+                <input type="submit" wicket:id="button_remove_context_mapping" class="btn btn-danger" value="Remove"/>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="4">
+                <input type="submit" wicket:id="button_add_context_mapping" class="btn btn-success" value="Add Context Mapping"/>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</wicket:panel>
+</body>
+</html>

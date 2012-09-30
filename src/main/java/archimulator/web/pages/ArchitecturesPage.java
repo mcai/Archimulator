@@ -27,7 +27,7 @@ import org.apache.wicket.markup.repeater.data.IDataProvider;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.wicketstuff.annotation.mount.MountPath;
 
-@MountPath(value = "/", alt = "/architectures")
+@MountPath(value = "/architectures")
 public class ArchitecturesPage extends AuthenticatedBasePage {
     public ArchitecturesPage(PageParameters parameters) {
         super(parameters);

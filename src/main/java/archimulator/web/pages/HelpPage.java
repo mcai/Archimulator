@@ -32,7 +32,7 @@ import org.wicketstuff.annotation.mount.MountPath;
 
 import java.util.ArrayList;
 
-@MountPath(value = "/", alt = "/help")
+@MountPath(value = "/help")
 public class HelpPage extends BasePage {
     public HelpPage(PageParameters parameters) {
         super(parameters);

@@ -1,0 +1,76 @@
+<html xmlns:wicket="http://wicket.apache.org">
+<body>
+<wicket:panel>
+    <div class="row">
+        <div class="span9">
+
+            <div class="control-group">
+                <label for="input_id" class="control-label">Id:</label>
+
+                <div class="controls">
+                    <input id="input_id" type="text" class="span1" readonly
+                           wicket:id="input_id"/>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label for="input_title" class="control-label">Title:</label>
+
+                <div class="controls">
+                    <input type="text" id="input_title" class="span9" readonly
+                           wicket:id="input_title"/>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label for="input_helperThreadPthreadSpawnIndex" class="control-label">
+                    Helper Thread Pthread Spawn Index:</label>
+
+                <div class="controls">
+                    <input type="number" id="input_helperThreadPthreadSpawnIndex"
+                           wicket:id="input_helperThreadPthreadSpawnIndex"/>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label for="input_ht_llc_request_profiling_enabled" class="control-label">HT LLC
+                    Request Profiling Enabled:</label>
+
+                <div class="controls">
+                    <input type="checkbox" id="input_ht_llc_request_profiling_enabled"
+                           wicket:id="input_ht_llc_request_profiling_enabled"/>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label for="input_num_cores" class="control-label">Number of Cores:</label>
+
+                <div class="controls">
+                    <input type="number" id="input_num_cores" wicket:id="input_num_cores"/>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label for="input_num_threads_per_core" class="control-label">Number of Threads
+                    Per Core:</label>
+
+                <div class="controls">
+                    <input type="number" id="input_num_threads_per_core"
+                           wicket:id="input_num_threads_per_core"/>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label for="input_create_time" class="control-label">Create Time:</label>
+
+                <div class="controls">
+                    <input type="text" id="input_create_time" readonly
+                           wicket:id="input_create_time"/>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</wicket:panel>
+</body>
+</html>

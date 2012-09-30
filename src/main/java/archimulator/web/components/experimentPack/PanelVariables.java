@@ -16,19 +16,25 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.web.pages;
+package archimulator.web.components.experimentPack;
 
-import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.wicketstuff.annotation.mount.MountPath;
+import archimulator.model.ExperimentPack;
+import archimulator.model.ExperimentPackVariable;
+import archimulator.web.data.view.ExperimentPackVariableListView;
+import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.list.ListView;
+import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.request.component.IRequestablePage;
 
-@MountPath(value = "/sign_out")
-public class SignOutPage extends BasePage {
-    public SignOutPage(PageParameters parameters) {
-        super(parameters);
+public class PanelVariables extends Panel {
+    public PanelVariables(String id, IRequestablePage page, ExperimentPack experimentPack) {
+        super(id);
 
-        setTitle("Sign Out - Archimulator");
+        ListView<ExperimentPackVariable> rowExperiment = new ExperimentPackVariableListView(page, "row_variable", experimentPack.getId());
 
-        getSession().invalidate();
-        setResponsePage(getApplication().getHomePage());
+        WebMarkupContainer tableExperiments = new WebMarkupContainer("table_variables");
+        add(tableExperiments);
+
+        tableExperiments.add(rowExperiment);
     }
 }

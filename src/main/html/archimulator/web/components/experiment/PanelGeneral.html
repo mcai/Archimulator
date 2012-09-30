@@ -1,0 +1,82 @@
+<html xmlns:wicket="http://wicket.apache.org">
+<body>
+<wicket:panel>
+    <div class="row">
+        <div class="span9">
+
+            <div class="control-group">
+                <label for="input_id" class="control-label">Id:</label>
+
+                <div class="controls">
+                    <input id="input_id" type="text" class="span1" readonly
+                           wicket:id="input_id"/>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label for="input_title" class="control-label">Title:</label>
+
+                <div class="controls">
+                    <input type="text" id="input_title" class="span9" readonly
+                           wicket:id="input_title"/>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label for="select_type" class="control-label">Type:</label>
+
+                <div class="controls">
+                    <select id="select_type" wicket:id="select_type"></select>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label for="select_state" class="control-label">State:</label>
+
+                <div class="controls">
+                    <select id="select_state" wicket:id="select_state"></select>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label for="input_failedReason" class="control-label">Failed Reason:</label>
+
+                <div class="controls">
+                    <textarea id="input_failedReason" class="span9" readonly rows="6" cols="40"
+                              wicket:id="textArea_failedReason"></textarea>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label for="select_architecture" class="control-label">Architecture:</label>
+
+                <div class="controls">
+                    <select id="select_architecture" class="span9"
+                            wicket:id="select_architecture"></select>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label for="input_num_max_instructions" class="control-label"># Max
+                    Insts:</label>
+
+                <div class="controls">
+                    <input type="number" id="input_num_max_instructions"
+                           wicket:id="input_num_max_instructions"/>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label for="input_create_time" class="control-label">Create Time:</label>
+
+                <div class="controls">
+                    <input type="text" id="input_create_time" readonly
+                           wicket:id="input_create_time"/>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</wicket:panel>
+</body>
+</html>

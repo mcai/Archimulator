@@ -16,30 +16,33 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.web.pages;
+package archimulator.web.components.experimentPack;
 
+import archimulator.model.Experiment;
 import archimulator.model.ExperimentPack;
-import archimulator.web.data.provider.ExperimentPackDataProvider;
-import archimulator.web.data.view.ExperimentPackDataView;
+import archimulator.web.data.provider.ExperimentDataProvider;
+import archimulator.web.data.view.ExperimentDataView;
 import de.agilecoders.wicket.markup.html.bootstrap.navigation.BootstrapPagingNavigator;
+import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.data.DataView;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
-import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.wicketstuff.annotation.mount.MountPath;
+import org.apache.wicket.request.component.IRequestablePage;
 
-@MountPath(value = "/experiment_packs")
-public class ExperimentPacksPage extends AuthenticatedBasePage {
-    public ExperimentPacksPage(PageParameters parameters) {
-        super(parameters);
+public class PanelExperiments extends Panel {
+    public PanelExperiments(String id, IRequestablePage page, ExperimentPack experimentPack) {
+        super(id);
 
-        setTitle("Experiment Packs - Archimulator");
+        IDataProvider<Experiment> dataProvider = new ExperimentDataProvider(experimentPack.getId());
 
-        IDataProvider<ExperimentPack> dataProvider = new ExperimentPackDataProvider();
+        final DataView<Experiment> rowExperiment = new ExperimentDataView(page, "row_experiment", dataProvider);
+        rowExperiment.setItemsPerPage(10);
 
-        DataView<ExperimentPack> rowExperimentPack = new ExperimentPackDataView(this, "row_experiment_pack", dataProvider);
-        rowExperimentPack.setItemsPerPage(12);
-        add(rowExperimentPack);
+        final WebMarkupContainer tableExperiments = new WebMarkupContainer("table_experiments");
+        add(tableExperiments);
 
-        add(new BootstrapPagingNavigator("navigator", rowExperimentPack));
+        tableExperiments.add(rowExperiment);
+
+        add(new BootstrapPagingNavigator("navigator_experiments", rowExperiment));
     }
 }
