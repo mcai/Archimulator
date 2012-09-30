@@ -47,7 +47,7 @@ public class Experiment implements ModelElement {
     @DatabaseField
     private ExperimentState state;
 
-    @DatabaseField
+    @DatabaseField(dataType = DataType.LONG_STRING)
     private String failedReason;
 
     @DatabaseField

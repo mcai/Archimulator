@@ -45,13 +45,11 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.math3.stat.StatUtils;
 import org.jsoup.helper.StringUtil;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.Callable;
@@ -192,7 +190,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
             experiment.setFailedReason("");
         } catch (Exception e) {
             experiment.setState(ExperimentState.ABORTED);
-            experiment.setFailedReason(e + "");
+            experiment.setFailedReason(ExceptionUtils.getStackTrace(e));
         } finally {
             ServiceManager.getExperimentService().updateExperiment(experiment);
         }
