@@ -18,87 +18,51 @@
  ******************************************************************************/
 package archimulator.web.pages;
 
-import archimulator.model.ExperimentState;
-import archimulator.service.ServiceManager;
-import archimulator.web.application.ArchimulatorSession;
-import net.pickapack.Pair;
-import net.pickapack.StorageUnit;
-import net.pickapack.dateTime.DateHelper;
-import org.apache.wicket.markup.html.WebMarkupContainer;
-import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.repeater.Item;
-import org.apache.wicket.markup.repeater.data.DataView;
-import org.apache.wicket.markup.repeater.data.IDataProvider;
-import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.LoadableDetachableModel;
+import archimulator.web.components.help.PanelFeatures;
+import archimulator.web.components.help.PanelResources;
+import archimulator.web.components.help.PanelSystemStatus;
+import archimulator.web.components.help.PanelUsages;
+import de.agilecoders.wicket.markup.html.bootstrap.tabs.BootstrapTabbedPanel;
+import org.apache.wicket.extensions.markup.html.tabs.AbstractTab;
+import org.apache.wicket.extensions.markup.html.tabs.ITab;
+import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.wicketstuff.annotation.mount.MountPath;
 
-import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
 
 @MountPath(value = "/", alt = "/help")
 public class HelpPage extends BasePage {
     public HelpPage(PageParameters parameters) {
-        super(PageType.HELP, parameters);
+        super(parameters);
 
         setTitle("Help - Archimulator");
 
-        final List<Pair<String, String>> systemStatusList = new ArrayList<Pair<String, String>>();
-        systemStatusList.add(new Pair<String, String>("OS Arch", ManagementFactory.getOperatingSystemMXBean().getArch()));
-        systemStatusList.add(new Pair<String, String>("OS Name", ManagementFactory.getOperatingSystemMXBean().getName()));
-        systemStatusList.add(new Pair<String, String>("OS Version", ManagementFactory.getOperatingSystemMXBean().getVersion()));
-        systemStatusList.add(new Pair<String, String>("Current Time", DateHelper.toString(new Date())));
-        systemStatusList.add(new Pair<String, String>("# Processors", Runtime.getRuntime().availableProcessors() + ""));
-        systemStatusList.add(new Pair<String, String>("JVM Max Memory", StorageUnit.toString(Runtime.getRuntime().maxMemory())));
-        systemStatusList.add(new Pair<String, String>("JVM Total Memory", StorageUnit.toString(Runtime.getRuntime().totalMemory())));
-        systemStatusList.add(new Pair<String, String>("JVM Free Memory", StorageUnit.toString(Runtime.getRuntime().freeMemory())));
+        add(new BootstrapTabbedPanel<ITab>("tabs", new ArrayList<ITab>(){{
+            add(new AbstractTab(new Model<String>("System Status")) {
+                public Panel getPanel(String panelId) {
+                    return new PanelSystemStatus(panelId);
+                }
+            });
 
-        if(ArchimulatorSession.get().isSignedIn()) {
-            systemStatusList.add(new Pair<String, String>("# Running Experiments", ServiceManager.getExperimentService().getNumAllExperimentsByState(ExperimentState.RUNNING) + ""));
-        }
+            add(new AbstractTab(new Model<String>("Features")) {
+                public Panel getPanel(String panelId) {
+                    return new PanelFeatures(panelId);
+                }
+            });
 
-        IDataProvider<Pair<String, String>> dataProvider = new IDataProvider<Pair<String, String>>() {
-            @Override
-            public Iterator<? extends Pair<String, String>> iterator(long first, long count) {
-                return systemStatusList.iterator();
-            }
+            add(new AbstractTab(new Model<String>("Usages")) {
+                public Panel getPanel(String panelId) {
+                    return new PanelUsages(panelId);
+                }
+            });
 
-            @Override
-            public long size() {
-                return systemStatusList.size();
-            }
-
-            @Override
-            public IModel<Pair<String, String>> model(final Pair<String, String> object) {
-                return new LoadableDetachableModel<Pair<String, String>>(object) {
-                    @Override
-                    protected Pair<String, String> load() {
-                        return object;
-                    }
-                };
-            }
-
-            @Override
-            public void detach() {
-            }
-        };
-
-        final DataView<Pair<String, String>> rowExperiment = new DataView<Pair<String, String>>("row_system_status", dataProvider) {
-            protected void populateItem(Item<Pair<String, String>> item) {
-                Pair<String, String> pair = item.getModelObject();
-
-                item.add(new Label("cell_key", pair.getFirst()));
-                item.add(new Label("cell_value", pair.getSecond()));
-            }
-        };
-        rowExperiment.setItemsPerPage(10);
-
-        add(new WebMarkupContainer("table_system_status") {{
-            add(rowExperiment);
-        }});
+            add(new AbstractTab(new Model<String>("Resources")) {
+                public Panel getPanel(String panelId) {
+                    return new PanelResources(panelId);
+                }
+            });
+        }}));
     }
 }

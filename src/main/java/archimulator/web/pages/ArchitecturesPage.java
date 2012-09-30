@@ -19,9 +19,9 @@
 package archimulator.web.pages;
 
 import archimulator.model.Architecture;
-import archimulator.web.components.PagingNavigator;
 import archimulator.web.data.provider.ArchitectureDataProvider;
 import archimulator.web.data.view.ArchitectureDataView;
+import de.agilecoders.wicket.markup.html.bootstrap.navigation.BootstrapPagingNavigator;
 import org.apache.wicket.markup.repeater.data.DataView;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -30,7 +30,7 @@ import org.wicketstuff.annotation.mount.MountPath;
 @MountPath(value = "/", alt = "/architectures")
 public class ArchitecturesPage extends AuthenticatedBasePage {
     public ArchitecturesPage(PageParameters parameters) {
-        super(PageType.ARCHITECTURES, parameters);
+        super(parameters);
 
         setTitle("Architectures - Archimulator");
 
@@ -40,6 +40,6 @@ public class ArchitecturesPage extends AuthenticatedBasePage {
         rowArchitecture.setItemsPerPage(10);
         add(rowArchitecture);
 
-        add(new PagingNavigator("navigator", rowArchitecture));
+        add(new BootstrapPagingNavigator("navigator", rowArchitecture));
     }
 }

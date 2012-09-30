@@ -41,7 +41,7 @@ import java.util.Arrays;
 @MountPath(value = "/", alt = "/architecture")
 public class ArchitecturePage extends AuthenticatedBasePage {
     public ArchitecturePage(final PageParameters parameters) {
-        super(PageType.ARCHITECTURE, parameters);
+        super(parameters);
 
         final String action = parameters.get("action").toString();
 

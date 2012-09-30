@@ -40,7 +40,7 @@ import java.util.*;
 @MountPath(value = "/", alt = "/experiment")
 public class ExperimentPage extends AuthenticatedBasePage {
     public ExperimentPage(final PageParameters parameters) {
-        super(PageType.EXPERIMENT, parameters);
+        super(parameters);
 
         final String action = parameters.get("action").toString();
 

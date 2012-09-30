@@ -27,7 +27,7 @@ import org.wicketstuff.annotation.mount.MountPath;
 @MountPath(value = "/", alt = "/sign_up")
 public class SignUpPage extends BasePage {
     public SignUpPage(PageParameters parameters) {
-        super(PageType.SIGN_UP, parameters);
+        super(parameters);
 
         setTitle("Sign Up - Archimulator");
 

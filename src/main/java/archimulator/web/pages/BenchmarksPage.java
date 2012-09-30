@@ -19,9 +19,9 @@
 package archimulator.web.pages;
 
 import archimulator.model.Benchmark;
-import archimulator.web.components.PagingNavigator;
 import archimulator.web.data.provider.BenchmarkDataProvider;
 import archimulator.web.data.view.BenchmarkDataView;
+import de.agilecoders.wicket.markup.html.bootstrap.navigation.BootstrapPagingNavigator;
 import org.apache.wicket.markup.repeater.data.DataView;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -30,7 +30,7 @@ import org.wicketstuff.annotation.mount.MountPath;
 @MountPath(value = "/", alt = "/benchmarks")
 public class BenchmarksPage extends AuthenticatedBasePage {
     public BenchmarksPage(PageParameters parameters) {
-        super(PageType.BENCHMARKS, parameters);
+        super(parameters);
 
         setTitle("Benchmarks - Archimulator");
 
@@ -40,6 +40,6 @@ public class BenchmarksPage extends AuthenticatedBasePage {
         rowBenchmark.setItemsPerPage(10);
         add(rowBenchmark);
 
-        add(new PagingNavigator("navigator", rowBenchmark));
+        add(new BootstrapPagingNavigator("navigator", rowBenchmark));
     }
 }

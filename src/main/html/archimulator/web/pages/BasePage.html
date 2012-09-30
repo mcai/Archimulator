@@ -1,16 +1,13 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:wicket="http://wicket.apache.org">
+<html wicket:id="html" lang="en" xmlns:wicket="http://wicket.apache.org">
 
 <head>
     <meta charset="utf-8">
     <title wicket:id="title"></title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Archimulator">
-    <meta name="author" content="Min Cai <min.cai.china@gmail.com>">
-    <meta name="X-UA-Compatible" content="IE=edge,chrome=1">
-
-    <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
-    <link href="css/prettify.css" rel="stylesheet" type="text/css"/>
+    <meta wicket:id="viewport">
+    <meta wicket:id="description">
+    <meta wicket:id="author">
+    <meta wicket:id="chrome-frame">
 
     <style type="text/css">
         body {
@@ -18,47 +15,23 @@
         padding-bottom: 40px;
         }
     </style>
-
-    <!--[if IE 6]>
-    <link href="css/ie6.min.css" rel="stylesheet" type="text/css">
-    <![endif]-->
-
-    <!--[if lt IE 9]>
-    <script src="js/html5-pre3.6.js" type="text/javascript"></script>
-    <![endif]-->
-
-    <!--[if IE 6]>
-    <script src="js/ie6.min.js" type="text/javascript"></script>
-    <![endif]-->
 </head>
 
-<body onload="prettyPrint()">
+<body>
 
-<div class="navbar navbar-fixed-top">
-    <div class="navbar-inner">
-        <div class="container">
-            <ul class="nav">
-                <li><a class="brand" href="./home">Archimulator</a></li>
+<a name="top" style="display: none;"></a>
+<div class="container">
+    <div wicket:id="navbar"></div>
+</div>
 
-                <li wicket:id="li_nav_home"><a href="./home"><i class="icon-home icon-white"></i>Home</a></li>
-                <li wicket:id="li_nav_benchmarks"><a href="./benchmarks">Benchmarks</a></li>
-                <li wicket:id="li_nav_architectures"><a href="./architectures">Architectures</a></li>
-                <li wicket:id="li_nav_experiments"><a href="./experiments">Experiments</a></li>
-                <li wicket:id="li_nav_experiment_packs"><a href="./experiment_packs">Experiment Packs</a></li>
-                <li wicket:id="li_nav_help"><a href="./help">Help</a></li>
-            </ul>
+<div class="container">
+    <p class="pull-right" wicket:id="div_nav_sign_in">
+        <a href="./sign_in">Sign In</a>
+    </p>
 
-            <ul class="nav pull-right">
-                <li wicket:id="div_nav_sign_in">
-                    <a href="./sign_in">Sign In</a>
-                </li>
-
-                <li wicket:id="div_nav_sign_out">
-                    <a href="./sign_out" wicket:id="button_nav_user"></a>
-                </li>
-            </ul>
-        </div>
-    </div>
+    <p class="pull-right" wicket:id="div_nav_sign_out">
+        <a href="./sign_out" wicket:id="button_nav_user"></a>
+    </p>
 </div>
 
 <wicket:child/>
@@ -74,10 +47,6 @@
         </div>
     </div>
 </footer>
-
-<script src="js/jquery-1.8.2.min.js" type="text/javascript"></script>
-<script src="js/bootstrap.min.js" type="text/javascript"></script>
-<script src="js/prettify.js" type="text/javascript"></script>
 
 </body>
 </html>

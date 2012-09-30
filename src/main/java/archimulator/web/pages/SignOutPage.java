@@ -24,7 +24,7 @@ import org.wicketstuff.annotation.mount.MountPath;
 @MountPath(value = "/", alt = "/sign_out")
 public class SignOutPage extends BasePage {
     public SignOutPage(PageParameters parameters) {
-        super(PageType.SIGN_OUT, parameters);
+        super(parameters);
 
         setTitle("Sign Out - Archimulator");
 

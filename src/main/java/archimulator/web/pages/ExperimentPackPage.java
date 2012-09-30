@@ -23,10 +23,10 @@ import archimulator.model.ExperimentPack;
 import archimulator.model.ExperimentPackVariable;
 import archimulator.model.ExperimentType;
 import archimulator.service.ServiceManager;
-import archimulator.web.components.PagingNavigator;
 import archimulator.web.data.provider.ExperimentDataProvider;
 import archimulator.web.data.view.ExperimentDataView;
 import archimulator.web.data.view.ExperimentPackVariableListView;
+import de.agilecoders.wicket.markup.html.bootstrap.navigation.BootstrapPagingNavigator;
 import net.pickapack.dateTime.DateHelper;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
@@ -47,7 +47,7 @@ import java.util.Arrays;
 @MountPath(value = "/", alt = "/experiment_pack")
 public class ExperimentPackPage extends AuthenticatedBasePage {
     public ExperimentPackPage(final PageParameters parameters) {
-        super(PageType.EXPERIMENT_PACK, parameters);
+        super(parameters);
 
         final long experimentPackId = parameters.get("experiment_pack_id").toLong(-1);
 
@@ -108,7 +108,7 @@ public class ExperimentPackPage extends AuthenticatedBasePage {
 
                 tableExperiments.add(rowExperiment);
 
-                add(new PagingNavigator("navigator_experiments", rowExperiment));
+                add(new BootstrapPagingNavigator("navigator_experiments", rowExperiment));
             }});
 
             add(new Button("button_cancel") {

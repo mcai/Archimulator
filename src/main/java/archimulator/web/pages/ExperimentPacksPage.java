@@ -19,9 +19,9 @@
 package archimulator.web.pages;
 
 import archimulator.model.ExperimentPack;
-import archimulator.web.components.PagingNavigator;
 import archimulator.web.data.provider.ExperimentPackDataProvider;
 import archimulator.web.data.view.ExperimentPackDataView;
+import de.agilecoders.wicket.markup.html.bootstrap.navigation.BootstrapPagingNavigator;
 import org.apache.wicket.markup.repeater.data.DataView;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -30,7 +30,7 @@ import org.wicketstuff.annotation.mount.MountPath;
 @MountPath(value = "/", alt = "/experiment_packs")
 public class ExperimentPacksPage extends AuthenticatedBasePage {
     public ExperimentPacksPage(PageParameters parameters) {
-        super(PageType.EXPERIMENT_PACKS, parameters);
+        super(parameters);
 
         setTitle("Experiment Packs - Archimulator");
 
@@ -40,6 +40,6 @@ public class ExperimentPacksPage extends AuthenticatedBasePage {
         rowExperimentPack.setItemsPerPage(12);
         add(rowExperimentPack);
 
-        add(new PagingNavigator("navigator", rowExperimentPack));
+        add(new BootstrapPagingNavigator("navigator", rowExperimentPack));
     }
 }

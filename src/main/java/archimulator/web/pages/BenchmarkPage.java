@@ -32,7 +32,7 @@ import org.wicketstuff.annotation.mount.MountPath;
 @MountPath(value = "/", alt = "/benchmark")
 public class BenchmarkPage extends AuthenticatedBasePage {
     public BenchmarkPage(final PageParameters parameters) {
-        super(PageType.BENCHMARK, parameters);
+        super(parameters);
 
         final String action = parameters.get("action").toString();
 

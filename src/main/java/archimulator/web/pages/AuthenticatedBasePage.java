@@ -4,8 +4,8 @@ import archimulator.web.application.ArchimulatorSession;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 
 public abstract class AuthenticatedBasePage extends BasePage {
-    public AuthenticatedBasePage(PageType pageType, PageParameters parameters) {
-        super(pageType, parameters);
+    public AuthenticatedBasePage(PageParameters parameters) {
+        super(parameters);
     }
 
     public ArchimulatorSession getArchimulatorSession() {

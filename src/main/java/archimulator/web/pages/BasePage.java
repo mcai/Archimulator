@@ -19,14 +19,25 @@
 package archimulator.web.pages;
 
 import archimulator.web.application.ArchimulatorSession;
-import de.agilecoders.wicket.markup.html.bootstrap.behavior.CssClassNameAppender;
+import de.agilecoders.wicket.markup.html.bootstrap.behavior.BootstrapResourcesBehavior;
+import de.agilecoders.wicket.markup.html.bootstrap.html.ChromeFrameMetaTag;
+import de.agilecoders.wicket.markup.html.bootstrap.html.HtmlTag;
+import de.agilecoders.wicket.markup.html.bootstrap.html.MetaTag;
+import de.agilecoders.wicket.markup.html.bootstrap.html.OptimizedMobileViewportMetaTag;
+import de.agilecoders.wicket.markup.html.bootstrap.image.Icon;
+import de.agilecoders.wicket.markup.html.bootstrap.image.IconType;
+import de.agilecoders.wicket.markup.html.bootstrap.navbar.AffixBehavior;
+import de.agilecoders.wicket.markup.html.bootstrap.navbar.Navbar;
+import de.agilecoders.wicket.markup.html.bootstrap.navbar.NavbarButton;
+import org.apache.wicket.Component;
 import org.apache.wicket.PageReference;
 import org.apache.wicket.Session;
 import org.apache.wicket.devutils.stateless.StatelessComponent;
+import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.GenericWebPage;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.list.ListItem;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.component.IRequestablePage;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -35,48 +46,22 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 public abstract class BasePage<T> extends GenericWebPage<T> {
     private String title = "Archimulator";
 
-    public BasePage(final PageType pageType, PageParameters parameters) {
+    public BasePage(PageParameters parameters) {
         super(parameters);
+
+        add(new HtmlTag("html"));
 
         add(new Label("title", new PropertyModel<String>(this, "title")));
 
-        add(new ListItem("li_nav_home", 0) {{
-            if (pageType == PageType.HOME) {
-                add(new CssClassNameAppender("active"));
-            }
-        }});
+        add(new OptimizedMobileViewportMetaTag("viewport"));
+        add(new ChromeFrameMetaTag("chrome-frame"));
+        add(new MetaTag("description", Model.of("description"), Model.of("Apache Wicket & Twitter Bootstrap Demo")));
+        add(new MetaTag("author", Model.of("author"), Model.of("Michael Haitz <michael.haitz@agile-coders.de>")));
 
-        add(new ListItem("li_nav_benchmarks", 1){{
-            if (pageType == PageType.BENCHMARKS) {
-                add(new CssClassNameAppender("active"));
-            }
-        }});
+        add(newNavbar("navbar"));
+        add(newNavigation("navigation"));
 
-        add(new ListItem("li_nav_architectures", 2){{
-            if (pageType == PageType.ARCHITECTURES) {
-                add(new CssClassNameAppender("active"));
-            }
-        }});
-
-        add(new ListItem("li_nav_experiments", 3){{
-            if (pageType == PageType.EXPERIMENTS) {
-                add(new CssClassNameAppender("active"));
-            }
-        }});
-
-        add(new ListItem("li_nav_experiment_packs", 4){{
-            if (pageType == PageType.EXPERIMENT_PACKS) {
-                add(new CssClassNameAppender("active"));
-            }
-        }});
-
-        add(new ListItem("li_nav_help", 5){{
-            if (pageType == PageType.HELP) {
-                add(new CssClassNameAppender("active"));
-            }
-        }});
-
-        add(new WebMarkupContainer("div_nav_sign_in"){{
+        add(new WebMarkupContainer("div_nav_sign_in") {{
             setVisible(!ArchimulatorSession.get().isSignedIn());
         }});
 
@@ -87,10 +72,12 @@ public abstract class BasePage<T> extends GenericWebPage<T> {
 
             setVisible(ArchimulatorSession.get().isSignedIn());
         }});
+
+        add(new BootstrapResourcesBehavior());
     }
 
     public String getUserName() {
-        return getSession() != null ? "Logout as: " + ((ArchimulatorSession)getSession()).getUser().getEmail() : null;
+        return getSession() != null ? "Logout as: " + ((ArchimulatorSession) getSession()).getUser().getEmail() : null;
     }
 
     public String getTitle() {
@@ -103,10 +90,9 @@ public abstract class BasePage<T> extends GenericWebPage<T> {
 
     protected void back(PageParameters parameters, Class<? extends IRequestablePage> defaultPageClz) {
         int backPageId = parameters.get("back_page_id").toInt(-1);
-        if(backPageId != -1 && Session.get().getPageManager().getPage(backPageId) != null) {
+        if (backPageId != -1 && Session.get().getPageManager().getPage(backPageId) != null) {
             setResponsePage(new PageReference(backPageId).getPage());
-        }
-        else {
+        } else {
             setResponsePage(defaultPageClz);
         }
     }
@@ -115,5 +101,43 @@ public abstract class BasePage<T> extends GenericWebPage<T> {
     protected void onBeforeRender() {
         super.onBeforeRender();
 //        new StatelessChecker().onBeforeRender(this);
+    }
+
+    @Override
+    public void renderHead(IHeaderResponse response) {
+        super.renderHead(response);
+//        response.render(CssHeaderItem.forReference(FixBootstrapStylesCssResourceReference.INSTANCE));
+    }
+
+    protected Navbar newNavbar(String markupId) {
+        Navbar navbar = new Navbar(markupId);
+
+        navbar.setPosition(Navbar.Position.TOP);
+        navbar.brandName(Model.of("Archimulator"));
+
+        navbar.invert(false);
+
+        navbar.addButton(Navbar.ButtonPosition.LEFT,
+                new NavbarButton<HomePage>(HomePage.class, Model.of("Home")).setIcon(new Icon(IconType.Home)),
+                new NavbarButton<BenchmarksPage>(BenchmarksPage.class, Model.of("Benchmarks")),
+                new NavbarButton<ArchitecturesPage>(ArchitecturesPage.class, Model.of("Architectures")),
+                new NavbarButton<ExperimentsPage>(ExperimentsPage.class, Model.of("Experiments")),
+                new NavbarButton<ExperimentPacksPage>(ExperimentPacksPage.class, Model.of("Experiment Packs")),
+                new NavbarButton<HelpPage>(HelpPage.class, Model.of("Help"))
+        );
+
+        return navbar;
+    }
+
+    protected boolean hasNavigation() {
+        return false;
+    }
+
+    private Component newNavigation(String markupId) {
+        WebMarkupContainer navigation = new WebMarkupContainer(markupId);
+        navigation.add(new AffixBehavior("200"));
+        navigation.setVisible(hasNavigation());
+
+        return navigation;
     }
 }

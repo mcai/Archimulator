@@ -21,12 +21,18 @@ package archimulator.web.application;
 import archimulator.web.pages.AuthenticatedBasePage;
 import archimulator.web.pages.HomePage;
 import archimulator.web.pages.SignInPage;
+import de.agilecoders.wicket.Bootstrap;
+import de.agilecoders.wicket.settings.BootstrapSettings;
+import de.agilecoders.wicket.settings.BootswatchThemeProvider;
+import de.agilecoders.wicket.settings.ThemeProvider;
 import org.apache.wicket.Application;
 import org.apache.wicket.Page;
 import org.apache.wicket.RuntimeConfigurationType;
 import org.apache.wicket.Session;
 import org.apache.wicket.authorization.IAuthorizationStrategy;
 import org.apache.wicket.authorization.strategies.page.SimplePageAuthorizationStrategy;
+import org.apache.wicket.markup.html.IPackageResourceGuard;
+import org.apache.wicket.markup.html.SecurePackageResourceGuard;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.request.Request;
 import org.apache.wicket.request.Response;
@@ -56,7 +62,19 @@ public class ArchimulatorApplication extends WebApplication {
     public void init() {
         super.init();
 
-        getMarkupSettings().setAutomaticLinking(true);
+        getMarkupSettings().setStripWicketTags(true);
+
+        IPackageResourceGuard packageResourceGuard = getResourceSettings().getPackageResourceGuard();
+        if (packageResourceGuard instanceof SecurePackageResourceGuard) {
+            SecurePackageResourceGuard guard = (SecurePackageResourceGuard) packageResourceGuard;
+            guard.addPattern("+*.woff");
+            guard.addPattern("+*.ttf");
+            guard.addPattern("+*.svg");
+        }
+
+        configureBootstrap();
+
+        new AnnotatedMountScanner().scanPackage("archimulator.web.pages").mount(this);
 
         IAuthorizationStrategy authorizationStrategy = new SimplePageAuthorizationStrategy(
                 AuthenticatedBasePage.class, SignInPage.class) {
@@ -66,9 +84,20 @@ public class ArchimulatorApplication extends WebApplication {
             }
         };
         getSecuritySettings().setAuthorizationStrategy(authorizationStrategy);
+    }
 
-        getMarkupSettings().setStripWicketTags(true);
+    private void configureBootstrap() {
+        BootstrapSettings settings = new BootstrapSettings();
+        settings.minify(true)
+                .useJqueryPP(true)
+                .useModernizr(true)
+                .useResponsiveCss(true)
+                .getBootstrapLessCompilerSettings().setUseLessCompiler(true);
 
-        new AnnotatedMountScanner().scanPackage("archimulator.web.pages").mount(this);
+        ThemeProvider themeProvider = new BootswatchThemeProvider() {{
+        }};
+        settings.setThemeProvider(themeProvider);
+
+        Bootstrap.install(this, settings);
     }
 }
