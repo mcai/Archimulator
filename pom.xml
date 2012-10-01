@@ -8,9 +8,13 @@
     <name>archimulator</name>
     <url>http://maven.apache.org</url>
 
+    <prerequisites>
+        <maven>3.0.4</maven>
+    </prerequisites>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jetty.version>7.6.5.v20120716</jetty.version>
+        <jetty.version>8.1.7.v20120910</jetty.version>
     </properties>
 
     <dependencies>
@@ -78,12 +82,12 @@
         <dependency>
             <groupId>com.j256.ormlite</groupId>
             <artifactId>ormlite-core</artifactId>
-            <version>4.41</version>
+            <version>4.42</version>
         </dependency>
         <dependency>
             <groupId>com.j256.ormlite</groupId>
             <artifactId>ormlite-jdbc</artifactId>
-            <version>4.41</version>
+            <version>4.42</version>
         </dependency>
         <dependency>
             <groupId>mysql</groupId>
@@ -277,6 +281,11 @@
                             <maxIdleTime>3600000</maxIdleTime>
                         </connector>
                     </connectors>
+                    <webApp>
+                        <contextPath>/</contextPath>
+                    </webApp>
+                    <stopPort>9966</stopPort>
+                    <stopKey>foo</stopKey>
                 </configuration>
             </plugin>
             <plugin>

@@ -333,11 +333,11 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     @Override
     public List<Experiment> getExperimentsByExperimentPack(ExperimentPack experimentPack, long first, long count) {
         try {
-            PreparedQuery<Experiment> query = this.experiments.queryBuilder().where()
-                    .in("title", experimentPack.getExperimentTitles())
-                    .prepare();
-
-            return this.paging(this.experiments, query, first, count);
+            QueryBuilder<Experiment, Long> queryBuilder = this.experiments.queryBuilder();
+            queryBuilder.offset(first).limit(count);
+            queryBuilder.where().in("title", experimentPack.getExperimentTitles());
+            PreparedQuery<Experiment> query = queryBuilder.prepare();
+            return this.experiments.query(query);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
