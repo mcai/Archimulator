@@ -1,2 +1,1 @@
-cd ~/Archimulator
-java -jar target/archimulator.jar $*
+java -cp target/archimulator.jar archimulator.web.application.ArchimulatorWebServer target/archimulator.war 8080
