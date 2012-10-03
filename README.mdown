@@ -68,7 +68,7 @@ For **developing and running Archimulator**, make sure that:
 
 1. You have Ubuntu Linux 12.04 (or other mainstream Linux distros);
 
-2. To compile and run Java programs: (a) JDK 6.0 or higher and (b) Apache Maven 3.0.4 or higher are installed.
+2. To compile and run Java programs: (a) Oracle JDK 6.0 or higher and (b) Apache Maven 3.0.4 or higher are installed.
 
 Quick Start
 ------------------
