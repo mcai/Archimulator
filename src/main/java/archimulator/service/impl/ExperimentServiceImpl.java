@@ -50,7 +50,6 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.math3.stat.StatUtils;
-import org.jsoup.helper.StringUtil;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -1414,7 +1413,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
             PrintWriter pw = new PrintWriter(fileInput);
 
-            String variablePropertyDescription = CollectionUtils.isEmpty(experimentPack.getVariablePropertyNames()) ? "" : StringUtil.join(transform(experimentPack.getVariablePropertyNames(), new Function1<String, Object>() {
+            String variablePropertyDescription = CollectionUtils.isEmpty(experimentPack.getVariablePropertyNames()) ? "" : StringUtils.join(transform(experimentPack.getVariablePropertyNames(), new Function1<String, Object>() {
                 @Override
                 public Object apply(String variablePropertyName) {
                     return getDescriptionOfVariablePropertyName(variablePropertyName);
