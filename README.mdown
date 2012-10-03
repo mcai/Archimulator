@@ -73,8 +73,7 @@ For **developing and running Archimulator**, make sure that:
 Quick Start
 ------------------
 
-0. sudo apt-get install mysql-server;
-sudo apt-get install phpmyadmin
+0. sudo apt-get install build-essential git-core mysql-server phpmyadmin
 
 1. git clone git://github.com/mcai/Pickapack.Micro.git;
 cd Pickapack.Micro;
