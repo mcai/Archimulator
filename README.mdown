@@ -85,7 +85,7 @@ mvn clean install
 cd Archimulator;
 mvn clean install war:war
 
-4. ./run_web_server.sh run
+4. ./run_web_server.sh
 
 Customizing Archimulator for Your Needs
 ------------------
