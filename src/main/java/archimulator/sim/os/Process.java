@@ -33,6 +33,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.math.RandomUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.Serializable;
 import java.nio.channels.FileChannel;
@@ -89,14 +90,14 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
 
             FileLock lock = null;
 
-            for(;;) {
+            for (; ; ) {
                 try {
                     lock = channel.tryLock();
                 } catch (OverlappingFileLockException e) {
                     // File is already locked in this thread or virtual machine
                 }
 
-                if(lock != null) {
+                if (lock != null) {
                     break;
                 }
 
@@ -262,7 +263,8 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
 
     private static void buildWithMakeFile(String workingDirectory) {
         System.err.printf("[%s] Building with Makefile\n", DateHelper.toString(new Date()));
-        List<String> result = CommandLineHelper.invokeShellCommandAndGetResult("sh -c 'cd " + getTransformedBenchmarkWorkingDirectory(workingDirectory) + ";make -f Makefile.mips -B'");
+        List<String> result = CommandLineHelper.invokeShellCommandAndGetResult("sh -c 'cd " + getTransformedBenchmarkWorkingDirectory(workingDirectory) +
+                        ";make -f Makefile.mips -B" + " CROSS_COMPILER_ROOT=" + getCurrentDirectory() + "/tools/cross_compiler/" + "'");
         for (String line : result) {
             System.err.println(line);
         }
@@ -270,5 +272,13 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
 
     private static String getTransformedBenchmarkWorkingDirectory(String workingDirectory) {
         return workingDirectory.replaceAll(ServiceManager.USER_HOME_TEMPLATE_ARG, FileUtils.getUserDirectoryPath());
+    }
+
+    private static String getCurrentDirectory() {
+        try {
+            return new File(".").getCanonicalPath();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
