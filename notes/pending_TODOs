@@ -1,9 +1,0 @@
-TODOs: 
-	Insertion policy interface and implementation refinement
-
-	Check and find structural stalls in ooo pipelines!!!
-
-	Check and find latency distributions in L1 and L2 requests!!!
-
-Apache Ivy:
-	set ANT_OPTS=-Dhttp.proxyHost=localhost -Dhttp.proxyPort=8888

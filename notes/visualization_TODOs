@@ -1,5 +1,0 @@
-Visualization of Miss Distribution by PC, and by Data Addresses Per PC:
-
-	1. to illustrate the repetitive nature of data accesses by address
-	2. to illustrate that some data are used only once (i.e., its reuse distance is infinity!)
-	

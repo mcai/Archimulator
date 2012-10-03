@@ -1,7 +1,0 @@
-TODOs
-	1. em3d and mcf: change builtin prefetch calls to volatile variable
-	2. add verification for MESI coherence:
-		verify LRU eviction policy:
-			1. L1 read result => L2 valid
-			2. L1 write result => L2 valid
-	
