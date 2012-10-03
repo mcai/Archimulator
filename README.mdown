@@ -73,19 +73,19 @@ For **developing and running Archimulator**, make sure that:
 Quick Start
 ------------------
 
-git clone git://github.com/mcai/Pickapack.Micro.git
-cd Pickapack.Micro
+1. git clone git://github.com/mcai/Pickapack.Micro.git;
+cd Pickapack.Micro;
 mvn clean install
 
-git clone git://github.com/mcai/Pickapack.git
-cd Pickapack
+2. git clone git://github.com/mcai/Pickapack.git;
+cd Pickapack;
 mvn clean install
 
-git clone git://github.com/mcai/Archimulator.git
-cd Archimulator
+3. git clone git://github.com/mcai/Archimulator.git;
+cd Archimulator;
 mvn clean install war:war
 
-./run_web_server.sh run
+4. ./run_web_server.sh run
 
 Customizing Archimulator for Your Needs
 ------------------
