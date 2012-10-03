@@ -27,20 +27,6 @@
             <groupId>net.pickapack</groupId>
             <artifactId>pickapack</artifactId>
             <version>1.0-SNAPSHOT</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.gravity</groupId>
-                    <artifactId>goose</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>de.l3s.boilerpipe</groupId>
-                    <artifactId>boilerpipe</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.owasp</groupId>
-                    <artifactId>proxy</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
