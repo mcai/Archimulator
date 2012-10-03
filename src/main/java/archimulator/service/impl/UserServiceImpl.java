@@ -40,7 +40,7 @@ public class UserServiceImpl extends AbstractService implements UserService {
         this.users = createDao(User.class);
 
         if(this.getFirstUser() == null) {
-            this.addUser(new User("test", "archimulator")); //TODO: should not be hardcoded
+            this.addUser(new User("test@archimulator.com", "archimulator")); //TODO: should not be hardcoded
         }
     }
 
