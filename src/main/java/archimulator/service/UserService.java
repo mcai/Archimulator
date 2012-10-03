@@ -28,7 +28,7 @@ public interface UserService extends Service {
 
     User getUserById(long id);
 
-    User getUserByName(String name);
+    User getUserByEmail(String email);
 
     User getFirstUser();
 

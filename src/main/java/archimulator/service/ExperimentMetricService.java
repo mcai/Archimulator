@@ -16,22 +16,25 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.dram;
+package archimulator.service;
 
-import archimulator.sim.uncore.CacheHierarchy;
-import net.pickapack.action.Action;
+import archimulator.model.metric.ExperimentGauge;
+import net.pickapack.service.Service;
 
-public class FixedLatencyMemoryController extends MemoryController {
-    public FixedLatencyMemoryController(CacheHierarchy cacheHierarchy) {
-        super(cacheHierarchy);
-    }
+import java.util.List;
 
-    @Override
-    protected void access(int address, Action onCompletedCallback) {
-        this.getCycleAccurateEventQueue().schedule(this, onCompletedCallback, this.getLatency());
-    }
+public interface ExperimentMetricService extends Service {
+    List<ExperimentGauge> getAllGauges();
 
-    public int getLatency() {
-        return getExperiment().getArchitecture().getFixedLatencyMemoryControllerLatency();
-    }
+    ExperimentGauge getGaugeById(long id);
+
+    ExperimentGauge getGaugeByTitle(String title);
+
+    ExperimentGauge getFirstGauge();
+
+    void addGauge(ExperimentGauge gauge);
+
+    void removeGaugeById(long id);
+
+    void updateGauge(ExperimentGauge gauge);
 }

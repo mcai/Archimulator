@@ -41,14 +41,14 @@ public class SimpleMemoryController extends MemoryController {
     }
 
     public int getMemoryLatency() {
-        return getExperiment().getArchitecture().getSimpleMainMemoryMemoryLatency();
+        return getExperiment().getArchitecture().getSimpleMemoryControllerMemoryLatency();
     }
 
     public int getMemoryTrunkLatency() {
-        return getExperiment().getArchitecture().getSimpleMainMemoryMemoryTrunkLatency();
+        return getExperiment().getArchitecture().getSimpleMemoryControllerMemoryTrunkLatency();
     }
 
     public int getBusWidth() {
-        return getExperiment().getArchitecture().getSimpleMainMemoryBusWidth();
+        return getExperiment().getArchitecture().getSimpleMemoryControllerBusWidth();
     }
 }

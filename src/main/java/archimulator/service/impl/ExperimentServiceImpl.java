@@ -16,9 +16,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.service;
+package archimulator.service.impl;
 
 import archimulator.model.*;
+import archimulator.service.ExperimentService;
+import archimulator.service.ServiceManager;
 import archimulator.sim.common.*;
 import archimulator.sim.os.Kernel;
 import com.Ostermiller.util.CSVPrinter;
@@ -171,6 +173,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
                                     wait(500L);
                                 }
                             }
+
                             runExperiment(experiment);
                         }
                     } catch (InterruptedException ignored) {
@@ -455,26 +458,26 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/l2HitLatency");
         JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/l2ReplacementPolicyType");
 
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/mainMemoryType");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/mainMemoryLineSize");
-        switch (experiment.getArchitecture().getMainMemoryType()) {
+        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/memoryControllerType");
+        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/memoryControllerLineSize");
+        switch (experiment.getArchitecture().getMemoryControllerType()) {
             case FIXED_LATENCY:
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/fixedLatencyMainMemoryLatency");
+                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/fixedLatencyMemoryControllerLatency");
                 break;
             case SIMPLE:
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/simpleMainMemoryMemoryLatency");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/simpleMainMemoryMemoryTrunkLatency");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/simpleMainMemoryBusWidth");
+                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/simpleMemoryControllerMemoryLatency");
+                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/simpleMemoryControllerMemoryTrunkLatency");
+                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/simpleMemoryControllerBusWidth");
                 break;
             case BASIC:
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/basicMainMemoryToDramLatency");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/basicMainMemoryFromDramLatency");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/basicMainMemoryPrechargeLatency");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/basicMainMemoryClosedLatency");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/basicMainMemoryConflictLatency");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/basicMainMemoryBusWidth");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/basicMainMemoryNumBanks");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/basicMainMemoryRowSize");
+                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/basicMemoryControllerToDramLatency");
+                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/basicMemoryControllerFromDramLatency");
+                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/basicMemoryControllerPrechargeLatency");
+                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/basicMemoryControllerClosedLatency");
+                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/basicMemoryControllerConflictLatency");
+                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/basicMemoryControllerBusWidth");
+                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/basicMemoryControllerNumBanks");
+                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/basicMemoryControllerRowSize");
                 break;
         }
 

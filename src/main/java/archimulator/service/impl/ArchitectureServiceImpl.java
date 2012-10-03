@@ -16,9 +16,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.service;
+package archimulator.service.impl;
 
 import archimulator.model.Architecture;
+import archimulator.service.ArchitectureService;
+import archimulator.service.ServiceManager;
 import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
 import com.j256.ormlite.dao.Dao;
 import net.pickapack.model.ModelElement;

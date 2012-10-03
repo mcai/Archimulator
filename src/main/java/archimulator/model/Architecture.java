@@ -20,7 +20,7 @@ package archimulator.model;
 
 import archimulator.sim.core.bpred.BranchPredictorType;
 import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
-import archimulator.sim.uncore.dram.MainMemoryType;
+import archimulator.sim.uncore.dram.MemoryControllerType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import net.pickapack.StorageUnit;
@@ -210,46 +210,46 @@ public class Architecture implements ModelElement {
     private CacheReplacementPolicyType l2ReplacementPolicyType;
 
     @DatabaseField
-    private MainMemoryType mainMemoryType;
+    private MemoryControllerType memoryControllerType;
 
     @DatabaseField
-    private int mainMemoryLineSize;
+    private int memoryControllerLineSize;
 
     @DatabaseField
-    private int fixedLatencyMainMemoryLatency;
+    private int fixedLatencyMemoryControllerLatency;
 
     @DatabaseField
-    private int simpleMainMemoryMemoryLatency;
+    private int simpleMemoryControllerMemoryLatency;
 
     @DatabaseField
-    private int simpleMainMemoryMemoryTrunkLatency;
+    private int simpleMemoryControllerMemoryTrunkLatency;
 
     @DatabaseField
-    private int simpleMainMemoryBusWidth;
+    private int simpleMemoryControllerBusWidth;
 
     @DatabaseField
-    private int basicMainMemoryToDramLatency;
+    private int basicMemoryControllerToDramLatency;
 
     @DatabaseField
-    private int basicMainMemoryFromDramLatency;
+    private int basicMemoryControllerFromDramLatency;
 
     @DatabaseField
-    private int basicMainMemoryPrechargeLatency;
+    private int basicMemoryControllerPrechargeLatency;
 
     @DatabaseField
-    private int basicMainMemoryClosedLatency;
+    private int basicMemoryControllerClosedLatency;
 
     @DatabaseField
-    private int basicMainMemoryConflictLatency;
+    private int basicMemoryControllerConflictLatency;
 
     @DatabaseField
-    private int basicMainMemoryBusWidth;
+    private int basicMemoryControllerBusWidth;
 
     @DatabaseField
-    private int basicMainMemoryNumBanks;
+    private int basicMemoryControllerNumBanks;
 
     @DatabaseField
-    private int basicMainMemoryRowSize;
+    private int basicMemoryControllerRowSize;
 
     public Architecture() {
     }
@@ -324,23 +324,23 @@ public class Architecture implements ModelElement {
         this.l2HitLatency = 10;
         this.l2ReplacementPolicyType = l2ReplacementPolicyType;
 
-        this.mainMemoryType = MainMemoryType.FIXED_LATENCY;
-        this.mainMemoryLineSize = 64;
+        this.memoryControllerType = MemoryControllerType.FIXED_LATENCY;
+        this.memoryControllerLineSize = 64;
 
-        this.fixedLatencyMainMemoryLatency = 200;
+        this.fixedLatencyMemoryControllerLatency = 200;
 
-        this.simpleMainMemoryMemoryLatency = 200;
-        this.simpleMainMemoryMemoryTrunkLatency = 2;
-        this.simpleMainMemoryBusWidth = 4;
+        this.simpleMemoryControllerMemoryLatency = 200;
+        this.simpleMemoryControllerMemoryTrunkLatency = 2;
+        this.simpleMemoryControllerBusWidth = 4;
 
-        this.basicMainMemoryToDramLatency = 6;
-        this.basicMainMemoryFromDramLatency = 12;
-        this.basicMainMemoryPrechargeLatency = 90;
-        this.basicMainMemoryClosedLatency = 90;
-        this.basicMainMemoryConflictLatency = 90;
-        this.basicMainMemoryBusWidth = 4;
-        this.basicMainMemoryNumBanks = 8;
-        this.basicMainMemoryRowSize = 2048;
+        this.basicMemoryControllerToDramLatency = 6;
+        this.basicMemoryControllerFromDramLatency = 12;
+        this.basicMemoryControllerPrechargeLatency = 90;
+        this.basicMemoryControllerClosedLatency = 90;
+        this.basicMemoryControllerConflictLatency = 90;
+        this.basicMemoryControllerBusWidth = 4;
+        this.basicMemoryControllerNumBanks = 8;
+        this.basicMemoryControllerRowSize = 2048;
     }
 
     public void updateTitle() {
@@ -601,56 +601,56 @@ public class Architecture implements ModelElement {
         return l2ReplacementPolicyType;
     }
 
-    public MainMemoryType getMainMemoryType() {
-        return mainMemoryType;
+    public MemoryControllerType getMemoryControllerType() {
+        return memoryControllerType;
     }
 
-    public int getMainMemoryLineSize() {
-        return mainMemoryLineSize;
+    public int getMemoryControllerLineSize() {
+        return memoryControllerLineSize;
     }
 
-    public int getFixedLatencyMainMemoryLatency() {
-        return fixedLatencyMainMemoryLatency;
+    public int getFixedLatencyMemoryControllerLatency() {
+        return fixedLatencyMemoryControllerLatency;
     }
 
-    public int getSimpleMainMemoryMemoryLatency() {
-        return simpleMainMemoryMemoryLatency;
+    public int getSimpleMemoryControllerMemoryLatency() {
+        return simpleMemoryControllerMemoryLatency;
     }
 
-    public int getSimpleMainMemoryBusWidth() {
-        return simpleMainMemoryBusWidth;
+    public int getSimpleMemoryControllerBusWidth() {
+        return simpleMemoryControllerBusWidth;
     }
 
-    public int getBasicMainMemoryToDramLatency() {
-        return basicMainMemoryToDramLatency;
+    public int getBasicMemoryControllerToDramLatency() {
+        return basicMemoryControllerToDramLatency;
     }
 
-    public int getBasicMainMemoryFromDramLatency() {
-        return basicMainMemoryFromDramLatency;
+    public int getBasicMemoryControllerFromDramLatency() {
+        return basicMemoryControllerFromDramLatency;
     }
 
-    public int getBasicMainMemoryPrechargeLatency() {
-        return basicMainMemoryPrechargeLatency;
+    public int getBasicMemoryControllerPrechargeLatency() {
+        return basicMemoryControllerPrechargeLatency;
     }
 
-    public int getBasicMainMemoryClosedLatency() {
-        return basicMainMemoryClosedLatency;
+    public int getBasicMemoryControllerClosedLatency() {
+        return basicMemoryControllerClosedLatency;
     }
 
-    public int getBasicMainMemoryConflictLatency() {
-        return basicMainMemoryConflictLatency;
+    public int getBasicMemoryControllerConflictLatency() {
+        return basicMemoryControllerConflictLatency;
     }
 
-    public int getBasicMainMemoryBusWidth() {
-        return basicMainMemoryBusWidth;
+    public int getBasicMemoryControllerBusWidth() {
+        return basicMemoryControllerBusWidth;
     }
 
-    public int getBasicMainMemoryNumBanks() {
-        return basicMainMemoryNumBanks;
+    public int getBasicMemoryControllerNumBanks() {
+        return basicMemoryControllerNumBanks;
     }
 
-    public int getBasicMainMemoryRowSize() {
-        return basicMainMemoryRowSize;
+    public int getBasicMemoryControllerRowSize() {
+        return basicMemoryControllerRowSize;
     }
 
     public void setHelperThreadPthreadSpawnIndex(int helperThreadPthreadSpawnIndex) {
@@ -877,64 +877,64 @@ public class Architecture implements ModelElement {
         this.l2ReplacementPolicyType = l2ReplacementPolicyType;
     }
 
-    public void setMainMemoryType(MainMemoryType mainMemoryType) {
-        this.mainMemoryType = mainMemoryType;
+    public void setMemoryControllerType(MemoryControllerType memoryControllerType) {
+        this.memoryControllerType = memoryControllerType;
     }
 
-    public void setMainMemoryLineSize(int mainMemoryLineSize) {
-        this.mainMemoryLineSize = mainMemoryLineSize;
+    public void setMemoryControllerLineSize(int memoryControllerLineSize) {
+        this.memoryControllerLineSize = memoryControllerLineSize;
     }
 
-    public void setFixedLatencyMainMemoryLatency(int fixedLatencyMainMemoryLatency) {
-        this.fixedLatencyMainMemoryLatency = fixedLatencyMainMemoryLatency;
+    public void setFixedLatencyMemoryControllerLatency(int fixedLatencyMemoryControllerLatency) {
+        this.fixedLatencyMemoryControllerLatency = fixedLatencyMemoryControllerLatency;
     }
 
-    public void setSimpleMainMemoryMemoryLatency(int simpleMainMemoryMemoryLatency) {
-        this.simpleMainMemoryMemoryLatency = simpleMainMemoryMemoryLatency;
+    public void setSimpleMemoryControllerMemoryLatency(int simpleMemoryControllerMemoryLatency) {
+        this.simpleMemoryControllerMemoryLatency = simpleMemoryControllerMemoryLatency;
     }
 
-    public int getSimpleMainMemoryMemoryTrunkLatency() {
-        return simpleMainMemoryMemoryTrunkLatency;
+    public int getSimpleMemoryControllerMemoryTrunkLatency() {
+        return simpleMemoryControllerMemoryTrunkLatency;
     }
 
-    public void setSimpleMainMemoryMemoryTrunkLatency(int simpleMainMemoryMemoryTrunkLatency) {
-        this.simpleMainMemoryMemoryTrunkLatency = simpleMainMemoryMemoryTrunkLatency;
+    public void setSimpleMemoryControllerMemoryTrunkLatency(int simpleMemoryControllerMemoryTrunkLatency) {
+        this.simpleMemoryControllerMemoryTrunkLatency = simpleMemoryControllerMemoryTrunkLatency;
     }
 
-    public void setSimpleMainMemoryBusWidth(int simpleMainMemoryBusWidth) {
-        this.simpleMainMemoryBusWidth = simpleMainMemoryBusWidth;
+    public void setSimpleMemoryControllerBusWidth(int simpleMemoryControllerBusWidth) {
+        this.simpleMemoryControllerBusWidth = simpleMemoryControllerBusWidth;
     }
 
-    public void setBasicMainMemoryToDramLatency(int basicMainMemoryToDramLatency) {
-        this.basicMainMemoryToDramLatency = basicMainMemoryToDramLatency;
+    public void setBasicMemoryControllerToDramLatency(int basicMemoryControllerToDramLatency) {
+        this.basicMemoryControllerToDramLatency = basicMemoryControllerToDramLatency;
     }
 
-    public void setBasicMainMemoryFromDramLatency(int basicMainMemoryFromDramLatency) {
-        this.basicMainMemoryFromDramLatency = basicMainMemoryFromDramLatency;
+    public void setBasicMemoryControllerFromDramLatency(int basicMemoryControllerFromDramLatency) {
+        this.basicMemoryControllerFromDramLatency = basicMemoryControllerFromDramLatency;
     }
 
-    public void setBasicMainMemoryPrechargeLatency(int basicMainMemoryPrechargeLatency) {
-        this.basicMainMemoryPrechargeLatency = basicMainMemoryPrechargeLatency;
+    public void setBasicMemoryControllerPrechargeLatency(int basicMemoryControllerPrechargeLatency) {
+        this.basicMemoryControllerPrechargeLatency = basicMemoryControllerPrechargeLatency;
     }
 
-    public void setBasicMainMemoryClosedLatency(int basicMainMemoryClosedLatency) {
-        this.basicMainMemoryClosedLatency = basicMainMemoryClosedLatency;
+    public void setBasicMemoryControllerClosedLatency(int basicMemoryControllerClosedLatency) {
+        this.basicMemoryControllerClosedLatency = basicMemoryControllerClosedLatency;
     }
 
-    public void setBasicMainMemoryConflictLatency(int basicMainMemoryConflictLatency) {
-        this.basicMainMemoryConflictLatency = basicMainMemoryConflictLatency;
+    public void setBasicMemoryControllerConflictLatency(int basicMemoryControllerConflictLatency) {
+        this.basicMemoryControllerConflictLatency = basicMemoryControllerConflictLatency;
     }
 
-    public void setBasicMainMemoryBusWidth(int basicMainMemoryBusWidth) {
-        this.basicMainMemoryBusWidth = basicMainMemoryBusWidth;
+    public void setBasicMemoryControllerBusWidth(int basicMemoryControllerBusWidth) {
+        this.basicMemoryControllerBusWidth = basicMemoryControllerBusWidth;
     }
 
-    public void setBasicMainMemoryNumBanks(int basicMainMemoryNumBanks) {
-        this.basicMainMemoryNumBanks = basicMainMemoryNumBanks;
+    public void setBasicMemoryControllerNumBanks(int basicMemoryControllerNumBanks) {
+        this.basicMemoryControllerNumBanks = basicMemoryControllerNumBanks;
     }
 
-    public void setBasicMainMemoryRowSize(int basicMainMemoryRowSize) {
-        this.basicMainMemoryRowSize = basicMainMemoryRowSize;
+    public void setBasicMemoryControllerRowSize(int basicMemoryControllerRowSize) {
+        this.basicMemoryControllerRowSize = basicMemoryControllerRowSize;
     }
 
     public String getTlbSizeInStorageUnit() {

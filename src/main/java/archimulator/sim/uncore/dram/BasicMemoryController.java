@@ -100,35 +100,35 @@ public class BasicMemoryController extends MemoryController {
     }
 
     public int getToDramLatency() {
-        return getExperiment().getArchitecture().getBasicMainMemoryToDramLatency();
+        return getExperiment().getArchitecture().getBasicMemoryControllerToDramLatency();
     }
 
     public int getFromDramLatency() {
-        return getExperiment().getArchitecture().getBasicMainMemoryFromDramLatency();
+        return getExperiment().getArchitecture().getBasicMemoryControllerFromDramLatency();
     }
 
     public int getPrechargeLatency() {
-        return getExperiment().getArchitecture().getBasicMainMemoryPrechargeLatency();
+        return getExperiment().getArchitecture().getBasicMemoryControllerPrechargeLatency();
     }
 
     public int getClosedLatency() {
-        return getExperiment().getArchitecture().getBasicMainMemoryClosedLatency();
+        return getExperiment().getArchitecture().getBasicMemoryControllerClosedLatency();
     }
 
     public int getConflictLatency() {
-        return getExperiment().getArchitecture().getBasicMainMemoryConflictLatency();
+        return getExperiment().getArchitecture().getBasicMemoryControllerConflictLatency();
     }
 
     public int getBusWidth() {
-        return getExperiment().getArchitecture().getBasicMainMemoryBusWidth();
+        return getExperiment().getArchitecture().getBasicMemoryControllerBusWidth();
     }
 
     public int getNumBanks() {
-        return getExperiment().getArchitecture().getBasicMainMemoryNumBanks();
+        return getExperiment().getArchitecture().getBasicMemoryControllerNumBanks();
     }
 
     public int getRowSize() {
-        return getExperiment().getArchitecture().getBasicMainMemoryRowSize();
+        return getExperiment().getArchitecture().getBasicMemoryControllerRowSize();
     }
 
     private enum BankStatus {

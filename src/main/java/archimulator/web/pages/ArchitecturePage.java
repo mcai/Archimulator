@@ -103,15 +103,15 @@ public class ArchitecturePage extends AuthenticatedBasePage {
                     }
                 });
 
-                add(new AbstractTab(new Model<String>("Caches")) {
+                add(new AbstractTab(new Model<String>("Cache Controllers")) {
                     public Panel getPanel(String panelId) {
-                        return new PanelCaches(panelId, architecture);
+                        return new PanelCacheControllers(panelId, architecture);
                     }
                 });
 
-                add(new AbstractTab(new Model<String>("Main Memory")) {
+                add(new AbstractTab(new Model<String>("Memory Controller")) {
                     public Panel getPanel(String panelId) {
-                        return new PanelMainMemory(panelId, architecture);
+                        return new PanelMemoryController(panelId, architecture);
                     }
                 });
 

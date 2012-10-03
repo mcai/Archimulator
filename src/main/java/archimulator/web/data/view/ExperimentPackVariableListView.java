@@ -19,7 +19,7 @@
 package archimulator.web.data.view;
 
 import archimulator.model.ExperimentPackVariable;
-import archimulator.service.ExperimentServiceImpl;
+import archimulator.service.impl.ExperimentServiceImpl;
 import archimulator.service.ServiceManager;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.markup.html.basic.Label;

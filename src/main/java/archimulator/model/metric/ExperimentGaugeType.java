@@ -16,10 +16,16 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.dram;
+package archimulator.model.metric;
 
-public enum MainMemoryType {
-    FIXED_LATENCY,
-    SIMPLE,
-    BASIC
+public enum ExperimentGaugeType {
+    RUNTIME,
+    SIMULATION,
+    MAIN_MEMORY,
+    CORE,
+    THREAD,
+    TLB,
+    CACHE_CONTROLLER,
+    MEMORY_CONTROLLER,
+    EXTENDED
 }

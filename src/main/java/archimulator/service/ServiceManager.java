@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.service;
 
+import archimulator.service.impl.*;
 import archimulator.util.PropertiesHelper;
 
 public class ServiceManager {
@@ -29,6 +30,7 @@ public class ServiceManager {
     private static ExperimentService experimentService;
     private static UserService userService;
     private static SystemSettingService systemSettingService;
+    private static ExperimentMetricService experimentMetricService;
 
     static {
         benchmarkService = new BenchmarkServiceImpl();
@@ -36,6 +38,7 @@ public class ServiceManager {
         experimentService = new ExperimentServiceImpl();
         userService = new UserServiceImpl();
         systemSettingService = new SystemSettingServiceImpl();
+        experimentMetricService = new ExperimentMetricServiceImpl();
     }
 
     public static BenchmarkService getBenchmarkService() {
@@ -56,6 +59,10 @@ public class ServiceManager {
 
     public static SystemSettingService getSystemSettingService() {
         return systemSettingService;
+    }
+
+    public static ExperimentMetricService getExperimentMetricService() {
+        return experimentMetricService;
     }
 
     static {

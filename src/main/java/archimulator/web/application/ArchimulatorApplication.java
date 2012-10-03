@@ -19,6 +19,7 @@
 package archimulator.web.application;
 
 import archimulator.web.pages.AuthenticatedBasePage;
+import archimulator.web.pages.BasePage;
 import archimulator.web.pages.HomePage;
 import archimulator.web.pages.SignInPage;
 import de.agilecoders.wicket.Bootstrap;
@@ -44,8 +45,8 @@ public class ArchimulatorApplication extends WebApplication {
     }
 
     public ArchimulatorApplication() {
-//        setConfigurationType(RuntimeConfigurationType.DEVELOPMENT);
-        setConfigurationType(RuntimeConfigurationType.DEPLOYMENT);
+        setConfigurationType(RuntimeConfigurationType.DEVELOPMENT);
+//        setConfigurationType(RuntimeConfigurationType.DEPLOYMENT);
     }
 
     @Override
@@ -74,7 +75,7 @@ public class ArchimulatorApplication extends WebApplication {
 
         configureBootstrap();
 
-        new AnnotatedMountScanner().scanPackage("archimulator.web.pages").mount(this);
+        new AnnotatedMountScanner().scanPackage(BasePage.class.getPackage().getName()).mount(this);
 
         IAuthorizationStrategy authorizationStrategy = new SimplePageAuthorizationStrategy(
                 AuthenticatedBasePage.class, SignInPage.class) {

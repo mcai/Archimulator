@@ -1,0 +1,166 @@
+<html xmlns:wicket="http://wicket.apache.org">
+<body>
+<wicket:panel>
+    <div class="row">
+        <div class="span9">
+
+            <div class="control-group">
+                <label for="select_memoryControllerType" class="control-label">Memory Controller Type:</label>
+
+                <div class="controls">
+                    <select id="select_memoryControllerType" wicket:id="select_memoryControllerType"></select>
+                </div>
+            </div>
+
+            <div wicket:id="div_fixedLatencyMemoryController">
+
+                <div class="row">
+                    <div class="span9">
+
+                        <div class="control-group">
+                            <label for="input_fixedLatencyMemoryControllerLatency" class="control-label">
+                                Latency:</label>
+
+                            <div class="controls">
+                                <input type="number" id="input_fixedLatencyMemoryControllerLatency"
+                                       wicket:id="input_fixedLatencyMemoryControllerLatency"/>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div wicket:id="div_simpleMemoryController">
+
+                <div class="row">
+                    <div class="span9">
+
+                        <div class="control-group">
+                            <label for="input_simpleMemoryControllerMemoryLatency" class="control-label">
+                                Memory Latency:</label>
+
+                            <div class="controls">
+                                <input type="number" id="input_simpleMemoryControllerMemoryLatency"
+                                       wicket:id="input_simpleMemoryControllerMemoryLatency"/>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <label for="input_simpleMemoryControllerMemoryTrunkLatency" class="control-label">
+                                Memory Trunk Latency:</label>
+
+                            <div class="controls">
+                                <input type="number" id="input_simpleMemoryControllerMemoryTrunkLatency"
+                                       wicket:id="input_simpleMemoryControllerMemoryTrunkLatency"/>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <label for="input_simpleMemoryControllerBusWidth" class="control-label">
+                                Bus Width:</label>
+
+                            <div class="controls">
+                                <input type="number" id="input_simpleMemoryControllerBusWidth"
+                                       wicket:id="input_simpleMemoryControllerBusWidth"/>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div wicket:id="div_basicMemoryController">
+
+                <div class="row">
+                    <div class="span9">
+
+                        <div class="control-group">
+                            <label for="input_basicMemoryControllerToDramLatency" class="control-label">
+                                To DRAM Latency:</label>
+
+                            <div class="controls">
+                                <input type="number" id="input_basicMemoryControllerToDramLatency"
+                                       wicket:id="input_basicMemoryControllerToDramLatency"/>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <label for="input_basicMemoryControllerFromDramLatency" class="control-label">
+                                From DRAM Latency:</label>
+
+                            <div class="controls">
+                                <input type="number" id="input_basicMemoryControllerFromDramLatency"
+                                       wicket:id="input_basicMemoryControllerFromDramLatency"/>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <label for="input_basicMemoryControllerPrechargeLatency" class="control-label">
+                                Precharge Latency:</label>
+
+                            <div class="controls">
+                                <input type="number" id="input_basicMemoryControllerPrechargeLatency"
+                                       wicket:id="input_basicMemoryControllerPrechargeLatency"/>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <label for="input_basicMemoryControllerClosedLatency" class="control-label">
+                                Closed Latency:</label>
+
+                            <div class="controls">
+                                <input type="number" id="input_basicMemoryControllerClosedLatency"
+                                       wicket:id="input_basicMemoryControllerClosedLatency"/>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <label for="input_basicMemoryControllerConflictLatency" class="control-label">
+                                Conflict Latency:</label>
+
+                            <div class="controls">
+                                <input type="number" id="input_basicMemoryControllerConflictLatency"
+                                       wicket:id="input_basicMemoryControllerConflictLatency"/>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <label for="input_basicMemoryControllerBusWidth" class="control-label">
+                                Bus Width:</label>
+
+                            <div class="controls">
+                                <input type="number" id="input_basicMemoryControllerBusWidth"
+                                       wicket:id="input_basicMemoryControllerBusWidth"/>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <label for="input_basicMemoryControllerNumBanks" class="control-label">
+                                Number of Banks:</label>
+
+                            <div class="controls">
+                                <input type="number" id="input_basicMemoryControllerNumBanks"
+                                       wicket:id="input_basicMemoryControllerNumBanks"/>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <label for="input_basicMemoryControllerRowSize" class="control-label">
+                                Row Size:</label>
+
+                            <div class="controls">
+                                <input type="number" id="input_basicMemoryControllerRowSize"
+                                       wicket:id="input_basicMemoryControllerRowSize"/>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</wicket:panel>
+</body>
+</html>

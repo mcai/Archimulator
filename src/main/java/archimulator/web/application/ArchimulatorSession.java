@@ -20,7 +20,7 @@ public class ArchimulatorSession extends AuthenticatedWebSession {
 
     @Override
     public boolean authenticate(String username, String password) {
-        User userFound = ServiceManager.getUserService().getUserByName(username);
+        User userFound = ServiceManager.getUserService().getUserByEmail(username);
 
         if(userFound != null && userFound.getPassword().equals(password)) {
             user = userFound;

@@ -39,4 +39,10 @@ excerpts from other papers:
     xie_yuejian_201108_phd.pdf:
         a program with a large memory footprint with frequent accesses, but low reuse characteristics which end up
         evicting a large number of cache lines used by other cores
-
+        
+TODO:
+	1. experiment pack edit and add/upload/import UI
+	2. fine-grained statistics rendering
+		(architecture independent metrics, fsms, pipelines, caches, main memories)
+	3. Introduce Benchmark/Architecture/Experiment directories!!!
+	4. learn from taobao UI

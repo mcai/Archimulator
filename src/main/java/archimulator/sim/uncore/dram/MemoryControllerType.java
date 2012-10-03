@@ -18,20 +18,8 @@
  ******************************************************************************/
 package archimulator.sim.uncore.dram;
 
-import archimulator.sim.uncore.CacheHierarchy;
-import net.pickapack.action.Action;
-
-public class FixedLatencyMemoryController extends MemoryController {
-    public FixedLatencyMemoryController(CacheHierarchy cacheHierarchy) {
-        super(cacheHierarchy);
-    }
-
-    @Override
-    protected void access(int address, Action onCompletedCallback) {
-        this.getCycleAccurateEventQueue().schedule(this, onCompletedCallback, this.getLatency());
-    }
-
-    public int getLatency() {
-        return getExperiment().getArchitecture().getFixedLatencyMemoryControllerLatency();
-    }
+public enum MemoryControllerType {
+    FIXED_LATENCY,
+    SIMPLE,
+    BASIC
 }

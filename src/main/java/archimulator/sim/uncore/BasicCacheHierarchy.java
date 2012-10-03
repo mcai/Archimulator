@@ -58,7 +58,7 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
     public BasicCacheHierarchy(Experiment experiment, Simulation simulation, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
         super(experiment, simulation, blockingEventDispatcher, cycleAccurateEventQueue);
 
-        switch (getExperiment().getArchitecture().getMainMemoryType()) {
+        switch (getExperiment().getArchitecture().getMemoryControllerType()) {
             case SIMPLE:
                 this.memoryController = new SimpleMemoryController(this);
                 break;

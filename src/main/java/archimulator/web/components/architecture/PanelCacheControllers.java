@@ -28,8 +28,8 @@ import org.apache.wicket.model.PropertyModel;
 
 import java.util.Arrays;
 
-public class PanelCaches extends Panel {
-    public PanelCaches(String id, Architecture architecture) {
+public class PanelCacheControllers extends Panel {
+    public PanelCacheControllers(String id, Architecture architecture) {
         super(id);
 
         this.add(new RequiredTextField<String>("input_l1I_size", new PropertyModel<String>(architecture, "l1ISizeInStorageUnit")));

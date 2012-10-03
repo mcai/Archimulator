@@ -29,7 +29,7 @@ public abstract class MemoryController extends MemoryDevice {
     private long numWrites;
 
     public MemoryController(CacheHierarchy cacheHierarchy) {
-        super(cacheHierarchy, "mainMemory");
+        super(cacheHierarchy, "memoryController");
     }
 
     @Override
@@ -74,7 +74,7 @@ public abstract class MemoryController extends MemoryDevice {
     }
 
     public int getLineSize() {
-        return getExperiment().getArchitecture().getMainMemoryLineSize();
+        return getExperiment().getArchitecture().getMemoryControllerLineSize();
     }
 
     @Override
