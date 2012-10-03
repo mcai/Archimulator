@@ -1,4 +1,0 @@
-1. static analysis cfg, dfg, loopInfo, ...
-2. static binary instrumentation
-3. data access pattern analysis
-4. prediction & feedback control
