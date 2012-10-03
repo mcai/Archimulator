@@ -14,7 +14,7 @@ Please, read the license file "COPYING" for further information.
 Archimulator in a Glance
 ------------------
 
-Archimulator is an object-oriented architectural simulator written in 100% Java for evaluating multicore processors.
+Archimulator is an easy-to-use, feature-rich, and extensible CMP architectural simulator powered by Java on 32/64 bit Linux/Unix..
 
 Web Site
 ------------------
@@ -62,22 +62,30 @@ Key Features
 System Requirements
 ------------------
 
-Archimulator has been tested on 64 bit **Ubuntu Linux 11.04** on an Intel Core i5 machine.
+Archimulator has been tested on 64 bit **Ubuntu Linux 12.04** on an Intel Core i7 machine with 32 GB memory.
 
 For **developing and running Archimulator**, make sure that:
 
-1. You have Ubuntu Linux 10.04 (or other mainstream Linux distros);
+1. You have Ubuntu Linux 12.04 (or other mainstream Linux distros);
 
-2. To compile and run Java programs: (a) JDK 5.0 or higher and (b) Apache Ant 1.8.0 are installed.
+2. To compile and run Java programs: (a) JDK 6.0 or higher and (b) Apache Maven 3.0.4 or higher are installed.
 
 Quick Start
 ------------------
 
-1. Unpack the zip or tar file containing the Archimulator source;
+git clone git://github.com/mcai/Pickapack.Micro.git
+cd Pickapack.Micro
+mvn clean install
 
-2. Modify the JAVA_HOME environment variable in ./ant.sh to the folder where your selected JDK distribution resides;
+git clone git://github.com/mcai/Pickapack.git
+cd Pickapack
+mvn clean install
 
-3. Type `./ant.sh run` to compile, build jar and run Archimulator.
+git clone git://github.com/mcai/Archimulator.git
+cd Archimulator
+mvn clean install war:war
+
+./run_web_server.sh run
 
 Customizing Archimulator for Your Needs
 ------------------
