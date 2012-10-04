@@ -22,10 +22,6 @@ import archimulator.service.impl.*;
 import archimulator.util.PropertiesHelper;
 
 public class ServiceManager {
-    public static final String DATABASE_USER = "root"; //TODO: to be injected via properties
-    public static final String DATABASE_PASSWORD = "archimulator"; //TODO: to be injected via properties
-
-    public static final String DATABASE_URL = "jdbc:mysql://localhost/archimulator?user=" + DATABASE_USER + "&password=" + DATABASE_PASSWORD;
     public static final String USER_HOME_TEMPLATE_ARG = "<user.home>";
 
     private static BenchmarkService benchmarkService;
@@ -71,5 +67,16 @@ public class ServiceManager {
     static {
         System.out.println("Archimulator (version: " + PropertiesHelper.getVersion() + ") - CMP Architectural Simulator Written in Java.\n");
         System.out.println("Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).\n");
+    }
+
+    public static String getDatabaseUrl() {
+        return "jdbc:mysql://" +
+                PropertiesHelper.getProperties().getProperty("archimulator.database.host") +
+                "/" +
+                PropertiesHelper.getProperties().getProperty("archimulator.database.name") +
+                "?user=" +
+                PropertiesHelper.getProperties().getProperty("archimulator.database.user") +
+                "&password=" +
+                PropertiesHelper.getProperties().getProperty("archimulator.database.password");
     }
 }

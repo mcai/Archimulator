@@ -32,7 +32,7 @@ public class SystemSettingServiceImpl extends AbstractService implements SystemS
 
     @SuppressWarnings("unchecked")
     public SystemSettingServiceImpl() {
-        super(ServiceManager.DATABASE_URL, Arrays.<Class<? extends ModelElement>>asList(SystemSetting.class));
+        super(ServiceManager.getDatabaseUrl(), Arrays.<Class<? extends ModelElement>>asList(SystemSetting.class));
 
         this.systemSettings = createDao(SystemSetting.class);
     }

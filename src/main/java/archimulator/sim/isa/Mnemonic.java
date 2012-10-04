@@ -171,24 +171,20 @@ public enum Mnemonic {
     private StaticInstructionType type;
     private FunctionalUnitOperationType functionalUnitOperationType;
 
-    public List<Integer> getInputDependencies(int machineInstruction) {
-        List<Integer> inputDependencies = new ArrayList<Integer>();
-
-        for (StaticInstruction.Dependency dependencyA : this.getMethod().getAnnotation(InputDependencies.class).value()) {
-            inputDependencies.add(toRegisterDependency(dependencyA, machineInstruction));
-        }
-
-        return inputDependencies;
+    public List<Integer> getInputDependencies(final int machineInstruction) {
+        return new ArrayList<Integer>() {{
+            for (StaticInstruction.Dependency dependency : Mnemonic.this.getMethod().getAnnotation(InputDependencies.class).value()) {
+                add(toRegisterDependency(dependency, machineInstruction));
+            }
+        }};
     }
 
-    public List<Integer> getOutputDependencies(int machineInstruction) {
-        List<Integer> outputDependencies = new ArrayList<Integer>();
-
-        for (StaticInstruction.Dependency dependencyA : this.getMethod().getAnnotation(OutputDependencies.class).value()) {
-            outputDependencies.add(toRegisterDependency(dependencyA, machineInstruction));
-        }
-
-        return outputDependencies;
+    public List<Integer> getOutputDependencies(final int machineInstruction) {
+        return new ArrayList<Integer>() {{
+            for (StaticInstruction.Dependency dependency : Mnemonic.this.getMethod().getAnnotation(OutputDependencies.class).value()) {
+                add(toRegisterDependency(dependency, machineInstruction));
+            }
+        }};
     }
 
     public int getNonEffectiveAddressBaseDep(int machineInstruction) {

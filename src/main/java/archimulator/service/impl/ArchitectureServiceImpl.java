@@ -34,7 +34,7 @@ public class ArchitectureServiceImpl extends AbstractService implements Architec
 
     @SuppressWarnings("unchecked")
     public ArchitectureServiceImpl() {
-        super(ServiceManager.DATABASE_URL, Arrays.<Class<? extends ModelElement>>asList(Architecture.class));
+        super(ServiceManager.getDatabaseUrl(), Arrays.<Class<? extends ModelElement>>asList(Architecture.class));
 
         this.architectures = createDao(Architecture.class);
 

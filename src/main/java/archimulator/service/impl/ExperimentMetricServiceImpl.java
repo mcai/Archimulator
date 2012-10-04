@@ -33,7 +33,7 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
 
     @SuppressWarnings("unchecked")
     public ExperimentMetricServiceImpl() {
-        super(ServiceManager.DATABASE_URL, Arrays.<Class<? extends ModelElement>>asList(ExperimentGauge.class));
+        super(ServiceManager.getDatabaseUrl(), Arrays.<Class<? extends ModelElement>>asList(ExperimentGauge.class));
 
         this.gauges = createDao(ExperimentGauge.class);
 

@@ -138,7 +138,7 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
     }
 
     protected StaticInstruction decode(int machineInstruction) {
-        for (Mnemonic mnemonic : StaticInstruction.machineInstructionDecoderInfos) {
+        for (Mnemonic mnemonic : StaticInstruction.MNEMONICS) {
             BitField extraBitField = mnemonic.getExtraBitField();
             if ((machineInstruction & mnemonic.getMask()) == mnemonic.getBits() && (extraBitField == null || extraBitField.valueOf(machineInstruction) == mnemonic.getExtraBitFieldValue())) {
                 return new StaticInstruction(mnemonic, machineInstruction);

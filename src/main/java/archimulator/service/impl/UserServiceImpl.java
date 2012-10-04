@@ -35,7 +35,7 @@ public class UserServiceImpl extends AbstractService implements UserService {
 
     @SuppressWarnings("unchecked")
     public UserServiceImpl() {
-        super(ServiceManager.DATABASE_URL, Arrays.<Class<? extends ModelElement>>asList(User.class));
+        super(ServiceManager.getDatabaseUrl(), Arrays.<Class<? extends ModelElement>>asList(User.class));
 
         this.users = createDao(User.class);
 

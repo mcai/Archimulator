@@ -38,6 +38,6 @@ public class PropertiesHelper {
     }
 
     public static String getVersion() {
-        return getProperties().getProperty("version");
+        return getProperties().getProperty("project.version");
     }
 }

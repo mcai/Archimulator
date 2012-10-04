@@ -33,7 +33,7 @@ public class BenchmarkServiceImpl extends AbstractService implements BenchmarkSe
 
     @SuppressWarnings("unchecked")
     public BenchmarkServiceImpl() {
-        super(ServiceManager.DATABASE_URL, Arrays.<Class<? extends ModelElement>>asList(Benchmark.class));
+        super(ServiceManager.getDatabaseUrl(), Arrays.<Class<? extends ModelElement>>asList(Benchmark.class));
 
         this.benchmarks = createDao(Benchmark.class);
 
