@@ -92,11 +92,8 @@ mvn clean install war:war
 Customizing Archimulator for Your Needs
 ------------------
 
-Archimulator has embedded in the jar a few benchmark binaries under the directory: `benchmarks/` for your convenience.
+Archimulator has shipped a few benchmark binaries under the directory: `benchmarks/` for your convenience.
 So if you use Archimulator for testing purposes only, there is no need to compile benchmarks for Archimulator by yourself.
-
-In order to customize the simulations for the Archimulator simulator, you will need to set up or edit a few configuration files.
-A few sample configuration files have been provided for your reference under the directory: `experiment_inputs/`.
 
 Contact
 ------------------
