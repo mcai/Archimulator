@@ -1,1 +1,1 @@
-java -cp target/archimulator.jar archimulator.web.application.ArchimulatorWebServer target/archimulator.war 8080
+java -cp target/archimulator.jar archimulator.client.ExperimentStatsCollectorStartup
