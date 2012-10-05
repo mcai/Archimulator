@@ -19,7 +19,8 @@
 package archimulator.model;
 
 import archimulator.service.ServiceManager;
-import com.j256.ormlite.field.DataType;
+import archimulator.util.ExperimentPackVariableArrayListJsonSerializableType;
+import archimulator.util.StringArrayListJsonSerializableType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import net.pickapack.action.Function1;
@@ -50,10 +51,10 @@ public class ExperimentPack implements ModelElement {
     @DatabaseField
     private ExperimentType experimentType;
 
-    @DatabaseField(dataType = DataType.SERIALIZABLE)
+    @DatabaseField(persisterClass = ExperimentPackVariableArrayListJsonSerializableType.class)
     private ArrayList<ExperimentPackVariable> variables;
 
-    @DatabaseField(dataType = DataType.SERIALIZABLE)
+    @DatabaseField(persisterClass = StringArrayListJsonSerializableType.class)
     private ArrayList<String> experimentTitles;
 
     private transient ExperimentSpec baselineExperimentSpec;

@@ -23,15 +23,15 @@ import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
 
-public class ArrayListOfContextMappingsJsonSerializableType extends JsonSerializableType<ArrayList<ContextMapping>> {
-    private static final ArrayListOfContextMappingsJsonSerializableType singleTon = new ArrayListOfContextMappingsJsonSerializableType();
+public class StringArrayListJsonSerializableType extends JsonSerializableType<ArrayList<ContextMapping>> {
+    private static final StringArrayListJsonSerializableType singleTon = new StringArrayListJsonSerializableType();
 
-    public ArrayListOfContextMappingsJsonSerializableType() {
-        super(new TypeToken<ArrayList<ContextMapping>>() {
+    public StringArrayListJsonSerializableType() {
+        super(new TypeToken<ArrayList<String>>() {
         }.getType());
     }
 
-    public static ArrayListOfContextMappingsJsonSerializableType getSingleton() {
+    public static StringArrayListJsonSerializableType getSingleton() {
         return singleTon;
     }
 }

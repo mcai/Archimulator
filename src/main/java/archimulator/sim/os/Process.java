@@ -264,7 +264,7 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
     private static void buildWithMakeFile(String workingDirectory) {
         System.err.printf("[%s] Building with Makefile\n", DateHelper.toString(new Date()));
         List<String> result = CommandLineHelper.invokeShellCommandAndGetResult("sh -c 'cd " + getTransformedBenchmarkWorkingDirectory(workingDirectory) +
-                        ";make -f Makefile.mips -B" + " CROSS_COMPILER_ROOT=" + getCurrentDirectory() + "/tools/cross_compiler/" + "'");
+                ";make -f Makefile.mips -B CROSS_COMPILER_ROOT=" + getCurrentDirectory() + "/tools/cross_compiler'");
         for (String line : result) {
             System.err.println(line);
         }
