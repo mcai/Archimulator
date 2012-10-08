@@ -18,16 +18,40 @@
  ******************************************************************************/
 package archimulator.sim.uncore;
 
+/**
+ *
+ * @author Min Cai
+ */
 public enum MemoryHierarchyAccessType {
+    /**
+     *
+     */
     IFETCH,
+    /**
+     *
+     */
     LOAD,
+    /**
+     *
+     */
     STORE,
+    /**
+     *
+     */
     UNKNOWN;
 
+    /**
+     *
+     * @return
+     */
     public boolean isRead() {
         return this == IFETCH || this == LOAD;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isWrite() {
         return this == STORE;
     }

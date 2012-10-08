@@ -18,48 +18,130 @@
  ******************************************************************************/
 package archimulator.sim.core.bpred2;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class BranchInfo {
     private int address;
     private int opcode;
     private int branchFlags;
 
+    /**
+     *
+     * @param address
+     * @param opcode
+     * @param branchFlags
+     */
     public BranchInfo(int address, int opcode, int branchFlags) {
         this.address = address;
         this.opcode = opcode;
         this.branchFlags = branchFlags;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getAddress() {
         return address;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getOpcode() {
         return opcode;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getBranchFlags() {
         return branchFlags;
     }
 
+    /**
+     *
+     */
     public static final int OP_JO = 0;
+    /**
+     *
+     */
     public static final int OP_JNO = 1;
+    /**
+     *
+     */
     public static final int OP_JC = 2;
+    /**
+     *
+     */
     public static final int OP_JNC = 3;
+    /**
+     *
+     */
     public static final int OP_JZ = 4;
+    /**
+     *
+     */
     public static final int OP_JNZ = 5;
+    /**
+     *
+     */
     public static final int OP_JBE = 6;
+    /**
+     *
+     */
     public static final int OP_JA = 7;
+    /**
+     *
+     */
     public static final int OP_JS = 8;
+    /**
+     *
+     */
     public static final int OP_JNS = 9;
+    /**
+     *
+     */
     public static final int OP_JP = 10;
+    /**
+     *
+     */
     public static final int OP_JNP = 11;
+    /**
+     *
+     */
     public static final int OP_JL = 12;
+    /**
+     *
+     */
     public static final int OP_JGE = 13;
+    /**
+     *
+     */
     public static final int OP_JLE = 14;
+    /**
+     *
+     */
     public static final int OP_JG = 15;
 
+    /**
+     *
+     */
     public static final int BR_CONDITIONAL = 1;
+    /**
+     *
+     */
     public static final int BR_INDIRECT = 2;
+    /**
+     *
+     */
     public static final int BR_CALL = 4;
+    /**
+     *
+     */
     public static final int BR_RETURN = 8;
 }

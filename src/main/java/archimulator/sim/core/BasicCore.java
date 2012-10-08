@@ -30,10 +30,19 @@ import net.pickapack.action.Predicate;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class BasicCore extends AbstractBasicCore {
     private RoundRobinScheduler<Thread> registerRenameScheduler;
     private RoundRobinScheduler<Thread> dispatchScheduler;
 
+    /**
+     *
+     * @param processor
+     * @param num
+     */
     public BasicCore(Processor processor, int num) {
         super(processor, num);
 
@@ -70,6 +79,9 @@ public class BasicCore extends AbstractBasicCore {
         );
     }
 
+    /**
+     *
+     */
     @Override
     protected void fetch() {
         for (Thread thread : this.threads) {
@@ -79,16 +91,25 @@ public class BasicCore extends AbstractBasicCore {
         }
     }
 
+    /**
+     *
+     */
     @Override
     protected void registerRename() {
         this.registerRenameScheduler.consumeNext();
     }
 
+    /**
+     *
+     */
     @Override
     protected void dispatch() {
         this.dispatchScheduler.consumeNext();
     }
 
+    /**
+     *
+     */
     @Override
     protected void wakeUp() {
         this.wakeUp(this.waitingInstructionQueue, this.readyInstructionQueue);
@@ -106,6 +127,9 @@ public class BasicCore extends AbstractBasicCore {
         }
     }
 
+    /**
+     *
+     */
     @Override
     protected void issue() {
         Reference<Integer> quant = new Reference<Integer>(getExperiment().getArchitecture().getIssueWidth());
@@ -201,6 +225,9 @@ public class BasicCore extends AbstractBasicCore {
         }
     }
 
+    /**
+     *
+     */
     @Override
     protected void writeBack() {
         for (AbstractReorderBufferEntry reorderBufferEntry : this.oooEventQueue) {
@@ -211,6 +238,9 @@ public class BasicCore extends AbstractBasicCore {
         this.oooEventQueue.clear();
     }
 
+    /**
+     *
+     */
     @Override
     protected void refreshLoadStoreQueue() {
         for (Thread thread : this.threads) {
@@ -220,6 +250,9 @@ public class BasicCore extends AbstractBasicCore {
         }
     }
 
+    /**
+     *
+     */
     @Override
     protected void commit() {
         for (Thread thread : this.threads) {

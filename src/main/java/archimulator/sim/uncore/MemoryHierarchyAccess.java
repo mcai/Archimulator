@@ -24,6 +24,10 @@ import net.pickapack.action.Action;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class MemoryHierarchyAccess {
     private long id;
     private DynamicInstruction dynamicInstruction;
@@ -40,6 +44,17 @@ public class MemoryHierarchyAccess {
     private long beginCycle;
     private long endCycle;
 
+    /**
+     *
+     * @param dynamicInstruction
+     * @param thread
+     * @param type
+     * @param virtualPc
+     * @param physicalAddress
+     * @param physicalTag
+     * @param onCompletedCallback
+     * @param beginCycle
+     */
     public MemoryHierarchyAccess(DynamicInstruction dynamicInstruction, MemoryHierarchyThread thread, MemoryHierarchyAccessType type, int virtualPc, int physicalAddress, int physicalTag, Action onCompletedCallback, long beginCycle) {
         this.id = thread.getSimulation().currentMemoryHierarchyAccessId++;
 
@@ -58,52 +73,100 @@ public class MemoryHierarchyAccess {
         this.beginCycle = beginCycle;
     }
 
+    /**
+     *
+     * @param currentCycle
+     */
     public void complete(long currentCycle) {
         this.endCycle = currentCycle;
         this.onCompletedCallback.apply();
         this.onCompletedCallback = null;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getId() {
         return id;
     }
 
+    /**
+     *
+     * @return
+     */
     public DynamicInstruction getDynamicInstruction() {
         return dynamicInstruction;
     }
 
+    /**
+     *
+     * @return
+     */
     public MemoryHierarchyThread getThread() {
         return thread;
     }
 
+    /**
+     *
+     * @return
+     */
     public MemoryHierarchyAccessType getType() {
         return type;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getVirtualPc() {
         return virtualPc;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getPhysicalAddress() {
         return physicalAddress;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getPhysicalTag() {
         return physicalTag;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<MemoryHierarchyAccess> getAliases() {
         return aliases;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getBeginCycle() {
         return beginCycle;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getEndCycle() {
         return endCycle;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getCycles() {
         return (int) (endCycle - beginCycle);
     }

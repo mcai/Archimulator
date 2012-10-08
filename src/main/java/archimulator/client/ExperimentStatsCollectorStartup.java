@@ -26,7 +26,17 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ *
+ * @author Min Cai
+ */
+
+@Deprecated
 public class ExperimentStatsCollectorStartup {
+    /**
+     *
+     * @param args
+     */
     public static void main(String[] args) {
         for(Experiment experiment : ServiceManager.getExperimentService().getAllExperiments()) {
             List<Experiment> duplicates = ServiceManager.getExperimentService().getExperimentsByTitle(experiment.getTitle());

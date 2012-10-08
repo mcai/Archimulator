@@ -25,9 +25,18 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author Min Cai
+ * @param <StateT>
+ */
 public abstract class StackBasedCacheReplacementPolicy<StateT extends Serializable> extends CacheReplacementPolicy<StateT> {
     private List<List<Integer>> stackEntries;
 
+    /**
+     *
+     * @param cache
+     */
     public StackBasedCacheReplacementPolicy(EvictableCache<StateT> cache) {
         super(cache);
 
@@ -42,35 +51,79 @@ public abstract class StackBasedCacheReplacementPolicy<StateT extends Serializab
         }
     }
 
+    /**
+     *
+     * @param set
+     * @return
+     */
     public int getMRU(int set) {
         return this.getCacheLineInStackPosition(set, 0).getWay();
     }
 
+    /**
+     *
+     * @param set
+     * @return
+     */
     public int getLRU(int set) {
         return this.getCacheLineInStackPosition(set, this.getCache().getAssociativity() - 1).getWay();
     }
 
+    /**
+     *
+     * @param set
+     * @param way
+     */
     public void setMRU(int set, int way) {
         this.setStackPosition(set, way, 0);
     }
 
+    /**
+     *
+     * @param set
+     * @param way
+     */
     public void setLRU(int set, int way) {
         this.setStackPosition(set, way, this.getCache().getAssociativity() - 1);
     }
 
+    /**
+     *
+     * @param set
+     * @param stackPosition
+     * @return
+     */
     public int getWayInStackPosition(int set, int stackPosition) {
         return this.getCacheLineInStackPosition(set, stackPosition).getWay();
     }
 
+    /**
+     *
+     * @param set
+     * @param stackPosition
+     * @return
+     */
     public CacheLine<StateT> getCacheLineInStackPosition(int set, int stackPosition) {
         return this.getCache().getLine(set, this.stackEntries.get(set).get(stackPosition));
     }
 
+    /**
+     *
+     * @param set
+     * @param way
+     * @return
+     */
     public int getStackPosition(int set, int way) {
         Integer stackEntryFound = this.getStackEntry(set, way);
         return this.stackEntries.get(set).indexOf(stackEntryFound);
     }
 
+    /**
+     *
+     * @param set
+     * @param way
+     * @param newStackPosition
+     */
     public void setStackPosition(int set, int way, int newStackPosition) {
         Integer stackEntryFound = this.getStackEntry(set, way);
         this.stackEntries.get(set).remove(stackEntryFound);

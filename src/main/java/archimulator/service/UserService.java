@@ -23,18 +23,52 @@ import net.pickapack.service.Service;
 
 import java.util.List;
 
+/**
+ *
+ * @author Min Cai
+ */
 public interface UserService extends Service {
+    /**
+     *
+     * @return
+     */
     List<User> getAllUsers();
 
+    /**
+     *
+     * @param id
+     * @return
+     */
     User getUserById(long id);
 
+    /**
+     *
+     * @param email
+     * @return
+     */
     User getUserByEmail(String email);
 
+    /**
+     *
+     * @return
+     */
     User getFirstUser();
 
+    /**
+     *
+     * @param user
+     */
     void addUser(User user);
 
+    /**
+     *
+     * @param id
+     */
     void removeUserById(long id);
 
+    /**
+     *
+     * @param user
+     */
     void updateUser(User user);
 }

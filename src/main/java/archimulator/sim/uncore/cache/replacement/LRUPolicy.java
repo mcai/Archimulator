@@ -24,21 +24,49 @@ import archimulator.sim.uncore.cache.EvictableCache;
 
 import java.io.Serializable;
 
+/**
+ *
+ * @author Min Cai
+ * @param <StateT>
+ */
 public class LRUPolicy<StateT extends Serializable> extends StackBasedCacheReplacementPolicy<StateT> {
+    /**
+     *
+     * @param cache
+     */
     public LRUPolicy(EvictableCache<StateT> cache) {
         super(cache);
     }
 
+    /**
+     *
+     * @param access
+     * @param set
+     * @param tag
+     * @return
+     */
     @Override
     public CacheAccess<StateT> handleReplacement(MemoryHierarchyAccess access, int set, int tag) {
         return new CacheAccess<StateT>(this.getCache(), access, set, this.getLRU(set), tag);
     }
 
+    /**
+     *
+     * @param access
+     * @param set
+     * @param way
+     */
     @Override
     public void handlePromotionOnHit(MemoryHierarchyAccess access, int set, int way) {
         this.setMRU(set, way);
     }
 
+    /**
+     *
+     * @param access
+     * @param set
+     * @param way
+     */
     @Override
     public void handleInsertionOnMiss(MemoryHierarchyAccess access, int set, int way) {
         this.setMRU(set, way);

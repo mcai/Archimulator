@@ -23,10 +23,22 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ *
+ * @author Min Cai
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface DecodeMethod {
+    /**
+     *
+     * @return
+     */
     int bits();
 
+    /**
+     *
+     * @return
+     */
     int mask();
 }

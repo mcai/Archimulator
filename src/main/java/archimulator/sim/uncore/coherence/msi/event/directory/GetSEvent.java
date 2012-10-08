@@ -24,12 +24,27 @@ import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import net.pickapack.action.Action;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class GetSEvent extends DirectoryControllerEvent {
     private CacheController requester;
     private int set;
     private int way;
     private Action onStalledCallback;
 
+    /**
+     *
+     * @param generator
+     * @param producerFlow
+     * @param requester
+     * @param tag
+     * @param set
+     * @param way
+     * @param onStalledCallback
+     * @param access
+     */
     public GetSEvent(DirectoryController generator, CacheCoherenceFlow producerFlow, CacheController requester, int tag, int set, int way, Action onStalledCallback, MemoryHierarchyAccess access) {
         super(generator, producerFlow, DirectoryControllerEventType.GETS, access, tag);
         this.requester = requester;
@@ -38,18 +53,34 @@ public class GetSEvent extends DirectoryControllerEvent {
         this.onStalledCallback = onStalledCallback;
     }
 
+    /**
+     *
+     * @return
+     */
     public CacheController getRequester() {
         return requester;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getSet() {
         return set;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getWay() {
         return way;
     }
 
+    /**
+     *
+     * @return
+     */
     public Action getOnStalledCallback() {
         return onStalledCallback;
     }

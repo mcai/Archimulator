@@ -23,17 +23,31 @@ import net.pickapack.action.Action;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author Min Cai
+ */
 public abstract class NetBuffer {
     private int size;
     private int count;
 
+    /**
+     *
+     */
     protected boolean readBusy;
+    /**
+     *
+     */
     protected boolean writeBusy;
 
     private List<Action> pendingReadActions;
     private List<Action> pendingWriteActions;
     private List<Action> pendingFullActions;
 
+    /**
+     *
+     * @param size
+     */
     public NetBuffer(int size) {
         this.size = size;
 
@@ -42,10 +56,17 @@ public abstract class NetBuffer {
         this.pendingFullActions = new ArrayList<Action>();
     }
 
+    /**
+     *
+     */
     public void beginRead() {
         this.readBusy = true;
     }
 
+    /**
+     *
+     * @param message
+     */
     public void endRead(NetMessage message) {
         this.readBusy = false;
         this.count -= message.getSize();
@@ -53,24 +74,43 @@ public abstract class NetBuffer {
         this.doPendingFullActions();
     }
 
+    /**
+     *
+     */
     public void beginWrite() {
         this.writeBusy = true;
     }
 
+    /**
+     *
+     * @param message
+     */
     public void endWrite(NetMessage message) {
         this.writeBusy = false;
         this.count += message.getSize();
         this.doPendingWriteActions();
     }
 
+    /**
+     *
+     * @param action
+     */
     public void addPendingReadAction(Action action) {
         this.pendingReadActions.add(action);
     }
 
+    /**
+     *
+     * @param action
+     */
     public void addPendingWriteAction(Action action) {
         this.pendingWriteActions.add(action);
     }
 
+    /**
+     *
+     * @param action
+     */
     public void addPendingFullAction(Action action) {
         this.pendingFullActions.add(action);
     }
@@ -99,20 +139,40 @@ public abstract class NetBuffer {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public abstract NetPort getPort();
 
+    /**
+     *
+     * @return
+     */
     public int getSize() {
         return size;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getCount() {
         return count;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isReadBusy() {
         return readBusy;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isWriteBusy() {
         return writeBusy;
     }

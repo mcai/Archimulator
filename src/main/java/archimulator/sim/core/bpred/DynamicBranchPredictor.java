@@ -20,10 +20,23 @@ package archimulator.sim.core.bpred;
 
 import archimulator.sim.core.Thread;
 
+/**
+ *
+ * @author Min Cai
+ */
 public abstract class DynamicBranchPredictor extends BranchPredictor {
     private BranchTargetBuffer branchTargetBuffer;
     private ReturnAddressStack returnAddressStack;
 
+    /**
+     *
+     * @param thread
+     * @param name
+     * @param type
+     * @param branchTargetBufferNumSets
+     * @param branchTargetBufferAssociativity
+     * @param returnAddressStackSize
+     */
     public DynamicBranchPredictor(Thread thread, String name, BranchPredictorType type, int branchTargetBufferNumSets, int branchTargetBufferAssociativity, int returnAddressStackSize) {
         super(thread, name, type);
 
@@ -31,15 +44,27 @@ public abstract class DynamicBranchPredictor extends BranchPredictor {
         this.returnAddressStack = new ReturnAddressStack(returnAddressStackSize);
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public boolean isDynamic() {
         return true;
     }
 
+    /**
+     *
+     * @return
+     */
     public BranchTargetBuffer getBranchTargetBuffer() {
         return branchTargetBuffer;
     }
 
+    /**
+     *
+     * @return
+     */
     public ReturnAddressStack getReturnAddressStack() {
         return returnAddressStack;
     }

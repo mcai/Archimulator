@@ -25,27 +25,47 @@ import net.pickapack.action.Action;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class PointToPointReorderBuffer {
     private List<CoherenceMessage> messages;
     private Controller from;
     private Controller to;
     private long lastCompletedMessageId = -1;
 
+    /**
+     *
+     * @param from
+     * @param to
+     */
     public PointToPointReorderBuffer(Controller from, Controller to) {
         this.from = from;
         this.to = to;
         this.messages = new ArrayList<CoherenceMessage>();
     }
 
+    /**
+     *
+     * @param message
+     */
     public void transfer(CoherenceMessage message) {
         this.messages.add(message);
     }
 
+    /**
+     *
+     * @param message
+     */
     public void onDestinationArrived(CoherenceMessage message) {
         message.onDestinationArrived();
         this.commit();
     }
 
+    /**
+     *
+     */
     public void commit() {
         while (!this.messages.isEmpty()) {
             final CoherenceMessage message = this.messages.get(0);
@@ -69,14 +89,26 @@ public class PointToPointReorderBuffer {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public List<CoherenceMessage> getMessages() {
         return messages;
     }
 
+    /**
+     *
+     * @return
+     */
     public Controller getFrom() {
         return from;
     }
 
+    /**
+     *
+     * @return
+     */
     public Controller getTo() {
         return to;
     }

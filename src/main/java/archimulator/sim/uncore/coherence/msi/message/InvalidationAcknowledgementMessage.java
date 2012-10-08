@@ -23,14 +23,30 @@ import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class InvalidationAcknowledgementMessage extends CoherenceMessage {
     private CacheController sender;
 
+    /**
+     *
+     * @param generator
+     * @param producerFlow
+     * @param sender
+     * @param tag
+     * @param access
+     */
     public InvalidationAcknowledgementMessage(Controller generator, CacheCoherenceFlow producerFlow, CacheController sender, int tag, MemoryHierarchyAccess access) {
         super(generator, producerFlow, CoherenceMessageType.INVALIDATION_ACKNOWLEDGEMENT, access, tag);
         this.sender = sender;
     }
 
+    /**
+     *
+     * @return
+     */
     public CacheController getSender() {
         return sender;
     }

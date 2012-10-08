@@ -20,22 +20,71 @@ package archimulator.sim.os.elf;
 
 import java.io.IOException;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class ElfSectionHeader {
+    /**
+     *
+     */
     public static final int SHT_NULL = 0;
+    /**
+     *
+     */
     public static final int SHT_PROGBITS = 1;
+    /**
+     *
+     */
     public static final int SHT_SYMTAB = 2;
+    /**
+     *
+     */
     public static final int SHT_STRTAB = 3;
+    /**
+     *
+     */
     public static final int SHT_RELA = 4;
+    /**
+     *
+     */
     public static final int SHT_HASH = 5;
+    /**
+     *
+     */
     public static final int SHT_DYNAMIC = 6;
+    /**
+     *
+     */
     public static final int SHT_NOTE = 7;
+    /**
+     *
+     */
     public static final int SHT_NOBITS = 8;
+    /**
+     *
+     */
     public static final int SHT_REL = 9;
+    /**
+     *
+     */
     public static final int SHT_SHLIB = 10;
+    /**
+     *
+     */
     public static final int SHT_DYNSYM = 11;
 
+    /**
+     *
+     */
     public static final int SHF_WRITE = 0x1;
+    /**
+     *
+     */
     public static final int SHF_ALLOC = 0x2;
+    /**
+     *
+     */
     public static final int SHF_EXECINSTR = 0x4;
 
 //    public static final int SEC_ALLOC = 0x001;
@@ -56,6 +105,11 @@ public class ElfSectionHeader {
     private ElfFile elfFile;
     private String name;
 
+    /**
+     *
+     * @param elfFile
+     * @throws IOException
+     */
     public ElfSectionHeader(ElfFile elfFile) throws IOException {
         this.elfFile = elfFile;
 
@@ -71,6 +125,11 @@ public class ElfSectionHeader {
         this.sh_entsize = elfFile.readUnsignedWord();
     }
 
+    /**
+     *
+     * @param elfFile
+     * @return
+     */
     public byte[] readContent(ElfFile elfFile) {
         long position = elfFile.getPosition();
         elfFile.setPosition(this.sh_offset);
@@ -87,6 +146,10 @@ public class ElfSectionHeader {
         return content;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getName() {
         if (this.name == null) {
             this.name = this.elfFile.getStringTable().getString((int) this.sh_name);
@@ -94,42 +157,82 @@ public class ElfSectionHeader {
         return this.name;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getSh_name() {
         return this.sh_name;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getSh_type() {
         return this.sh_type;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getSh_flags() {
         return this.sh_flags;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getSh_addr() {
         return this.sh_addr;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getSh_offset() {
         return this.sh_offset;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getSh_size() {
         return this.sh_size;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getSh_link() {
         return this.sh_link;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getSh_info() {
         return this.sh_info;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getSh_addralign() {
         return this.sh_addralign;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getSh_entsize() {
         return this.sh_entsize;
     }

@@ -18,19 +18,36 @@
  ******************************************************************************/
 package archimulator.sim.uncore.net;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class OutBuffer extends NetBuffer {
     private OutPort port;
 
+    /**
+     *
+     * @param port
+     * @param size
+     */
     public OutBuffer(OutPort port, int size) {
         super(size);
         this.port = port;
     }
 
+    /**
+     *
+     * @param message
+     */
     public void endWrite(NetMessage message) {
         super.endWrite(message);
         this.getPort().toLink(message);
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public OutPort getPort() {
         return port;

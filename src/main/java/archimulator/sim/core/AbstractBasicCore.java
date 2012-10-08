@@ -29,29 +29,77 @@ import net.pickapack.math.Counter;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author Min Cai
+ */
 public abstract class AbstractBasicCore extends BasicSimulationObject implements Core {
+    /**
+     *
+     */
     protected int num;
+    /**
+     *
+     */
     protected String name;
 
+    /**
+     *
+     */
     protected Processor processor;
 
+    /**
+     *
+     */
     protected List<Thread> threads;
 
+    /**
+     *
+     */
     protected CacheController l1ICacheController;
+    /**
+     *
+     */
     protected CacheController l1DCacheController;
 
+    /**
+     *
+     */
     protected FunctionalUnitPool functionalUnitPool;
 
+    /**
+     *
+     */
     protected List<AbstractReorderBufferEntry> waitingInstructionQueue;
+    /**
+     *
+     */
     protected List<AbstractReorderBufferEntry> readyInstructionQueue;
 
+    /**
+     *
+     */
     protected List<AbstractReorderBufferEntry> readyLoadQueue;
 
+    /**
+     *
+     */
     protected List<AbstractReorderBufferEntry> waitingStoreQueue;
+    /**
+     *
+     */
     protected List<AbstractReorderBufferEntry> readyStoreQueue;
 
+    /**
+     *
+     */
     protected List<AbstractReorderBufferEntry> oooEventQueue;
 
+    /**
+     *
+     * @param processor
+     * @param num
+     */
     public AbstractBasicCore(Processor processor, int num) {
         super(processor);
 
@@ -75,18 +123,27 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
         this.oooEventQueue = new ArrayList<AbstractReorderBufferEntry>();
     }
 
+    /**
+     *
+     */
     public void doFastForwardOneCycle() {
         for (Thread thread : this.threads) {
             thread.fastForwardOneCycle();
         }
     }
 
+    /**
+     *
+     */
     public void doCacheWarmupOneCycle() {
         for (Thread thread : this.threads) {
             thread.warmupCacheOneCycle();
         }
     }
 
+    /**
+     *
+     */
     public void doMeasurementOneCycle() {
         this.commit();
         this.writeBack();
@@ -100,37 +157,86 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
         this.updatePerCycleStats();
     }
 
+    /**
+     *
+     */
     protected abstract void fetch();
 
+    /**
+     *
+     */
     protected abstract void registerRename(); //TODO: to be merged with dispatch()
 
+    /**
+     *
+     */
     protected abstract void dispatch();
 
+    /**
+     *
+     */
     protected abstract void wakeUp(); //TODO: to be removed
 
+    /**
+     *
+     */
     protected abstract void issue();
 
+    /**
+     *
+     */
     protected abstract void writeBack();
 
+    /**
+     *
+     */
     protected abstract void refreshLoadStoreQueue();
 
+    /**
+     *
+     */
     protected abstract void commit();
 
+    /**
+     *
+     * @param thread
+     * @param virtualAddress
+     * @return
+     */
     public boolean canIfetch(Thread thread, int virtualAddress) {
         int physicalTag = this.l1ICacheController.getCache().getTag(thread.getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress));
         return this.l1ICacheController.canAccess(MemoryHierarchyAccessType.IFETCH, physicalTag);
     }
 
+    /**
+     *
+     * @param thread
+     * @param virtualAddress
+     * @return
+     */
     public boolean canLoad(Thread thread, int virtualAddress) {
         int physicalTag = this.l1DCacheController.getCache().getTag(thread.getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress));
         return this.l1DCacheController.canAccess(MemoryHierarchyAccessType.LOAD, physicalTag);
     }
 
+    /**
+     *
+     * @param thread
+     * @param virtualAddress
+     * @return
+     */
     public boolean canStore(Thread thread, int virtualAddress) {
         int physicalTag = this.l1DCacheController.getCache().getTag(thread.getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress));
         return this.l1DCacheController.canAccess(MemoryHierarchyAccessType.STORE, physicalTag);
     }
 
+    /**
+     *
+     * @param thread
+     * @param virtualAddress
+     * @param virtualPc
+     * @param onCompletedCallback
+     */
     public void ifetch(Thread thread, int virtualAddress, int virtualPc, final Action onCompletedCallback) {
         final int physicalAddress = thread.getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress);
         final int physicalTag = this.l1ICacheController.getCache().getTag(physicalAddress);
@@ -173,6 +279,13 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
         this.getBlockingEventDispatcher().dispatch(new MemoryAccessInitiatedEvent(thread, virtualPc, physicalAddress, physicalTag, MemoryHierarchyAccessType.IFETCH));
     }
 
+    /**
+     *
+     * @param dynamicInst
+     * @param virtualAddress
+     * @param virtualPc
+     * @param onCompletedCallback
+     */
     public void load(DynamicInstruction dynamicInst, int virtualAddress, int virtualPc, final Action onCompletedCallback) {
         final int physicalAddress = dynamicInst.getThread().getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress);
         final int physicalTag = this.l1DCacheController.getCache().getTag(physicalAddress);
@@ -220,6 +333,13 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
         this.getBlockingEventDispatcher().dispatch(new MemoryAccessInitiatedEvent(dynamicInst.getThread(), virtualPc, physicalAddress, physicalTag, MemoryHierarchyAccessType.LOAD));
     }
 
+    /**
+     *
+     * @param dynamicInst
+     * @param virtualAddress
+     * @param virtualPc
+     * @param onCompletedCallback
+     */
     public void store(DynamicInstruction dynamicInst, int virtualAddress, int virtualPc, final Action onCompletedCallback) {
         final int physicalAddress = dynamicInst.getThread().getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress);
         final int physicalTag = this.l1DCacheController.getCache().getTag(physicalAddress);
@@ -262,6 +382,10 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
         this.getBlockingEventDispatcher().dispatch(new MemoryAccessInitiatedEvent(dynamicInst.getThread(), virtualPc, physicalAddress, physicalTag, MemoryHierarchyAccessType.STORE));
     }
 
+    /**
+     *
+     * @param reorderBufferEntry
+     */
     public void removeFromQueues(AbstractReorderBufferEntry reorderBufferEntry) {
         this.oooEventQueue.remove(reorderBufferEntry);
 
@@ -276,6 +400,9 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
         reorderBufferEntry.setSquashed();
     }
 
+    /**
+     *
+     */
     public void updatePerCycleStats() {
         for (Thread thread : this.getThreads()) {
             thread.updatePerCycleStats();
@@ -284,62 +411,122 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
         this.functionalUnitPool.updatePerCycleStats();
     }
 
+    /**
+     *
+     * @return
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getNum() {
         return num;
     }
 
+    /**
+     *
+     * @return
+     */
     public Processor getProcessor() {
         return processor;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<Thread> getThreads() {
         return threads;
     }
 
+    /**
+     *
+     * @return
+     */
     public FunctionalUnitPool getFunctionalUnitPool() {
         return functionalUnitPool;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<AbstractReorderBufferEntry> getWaitingInstructionQueue() {
         return waitingInstructionQueue;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<AbstractReorderBufferEntry> getReadyInstructionQueue() {
         return readyInstructionQueue;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<AbstractReorderBufferEntry> getReadyLoadQueue() {
         return readyLoadQueue;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<AbstractReorderBufferEntry> getWaitingStoreQueue() {
         return waitingStoreQueue;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<AbstractReorderBufferEntry> getReadyStoreQueue() {
         return readyStoreQueue;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<AbstractReorderBufferEntry> getOooEventQueue() {
         return oooEventQueue;
     }
 
+    /**
+     *
+     * @return
+     */
     public CacheController getL1ICacheController() {
         return l1ICacheController;
     }
 
+    /**
+     *
+     * @param l1ICacheController
+     */
     public void setL1ICacheController(CacheController l1ICacheController) {
         this.l1ICacheController = l1ICacheController;
     }
 
+    /**
+     *
+     * @return
+     */
     public CacheController getL1DCacheController() {
         return l1DCacheController;
     }
 
+    /**
+     *
+     * @param l1DCacheController
+     */
     public void setL1DCacheController(CacheController l1DCacheController) {
         this.l1DCacheController = l1DCacheController;
     }

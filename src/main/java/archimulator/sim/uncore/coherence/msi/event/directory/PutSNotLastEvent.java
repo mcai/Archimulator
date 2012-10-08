@@ -23,14 +23,30 @@ import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class PutSNotLastEvent extends DirectoryControllerEvent {
     private CacheController requester;
 
+    /**
+     *
+     * @param generator
+     * @param producerFlow
+     * @param requester
+     * @param tag
+     * @param access
+     */
     public PutSNotLastEvent(DirectoryController generator, CacheCoherenceFlow producerFlow, CacheController requester, int tag, MemoryHierarchyAccess access) {
         super(generator, producerFlow, DirectoryControllerEventType.PUTS_NOT_LAST, access, tag);
         this.requester = requester;
     }
 
+    /**
+     *
+     * @return
+     */
     public CacheController getRequester() {
         return requester;
     }

@@ -20,6 +20,10 @@ package archimulator.sim.uncore.net;
 
 import net.pickapack.action.Action;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class NetMessage {
     private long id;
     private NetNode sourceNode;
@@ -29,6 +33,15 @@ public class NetMessage {
 
     private long beginCycle;
 
+    /**
+     *
+     * @param net
+     * @param sourceNode
+     * @param destinationNode
+     * @param size
+     * @param onCompletedCallback
+     * @param beginCycle
+     */
     public NetMessage(Net net, NetNode sourceNode, NetNode destinationNode, int size, Action onCompletedCallback, long beginCycle) {
         this.id = net.getSimulation().currentNetMessageId++;
 
@@ -40,28 +53,52 @@ public class NetMessage {
         this.beginCycle = beginCycle;
     }
 
+    /**
+     *
+     * @param endCycle
+     */
     public void complete(long endCycle) {
         this.onCompletedCallback.apply();
 
 //        System.out.printf("%s -> %s: size: %d, latency: %d%n", sourceNode.getName(), destinationNode.getName(), size, (endCycle - beginCycle));
     }
 
+    /**
+     *
+     * @return
+     */
     public long getId() {
         return id;
     }
 
+    /**
+     *
+     * @return
+     */
     public NetNode getSourceNode() {
         return sourceNode;
     }
 
+    /**
+     *
+     * @return
+     */
     public NetNode getDestinationNode() {
         return destinationNode;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getSize() {
         return size;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getBeginCycle() {
         return beginCycle;
     }

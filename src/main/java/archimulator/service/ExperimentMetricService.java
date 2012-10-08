@@ -23,18 +23,54 @@ import net.pickapack.service.Service;
 
 import java.util.List;
 
+/**
+ *
+ * Service for managing experiment metrics.
+ *
+ * @author Min Cai
+ */
 public interface ExperimentMetricService extends Service {
+    /**
+     *
+     * @return
+     */
     List<ExperimentGauge> getAllGauges();
 
+    /**
+     *
+     * @param id
+     * @return
+     */
     ExperimentGauge getGaugeById(long id);
 
+    /**
+     *
+     * @param title
+     * @return
+     */
     ExperimentGauge getGaugeByTitle(String title);
 
+    /**
+     *
+     * @return
+     */
     ExperimentGauge getFirstGauge();
 
+    /**
+     *
+     * @param gauge
+     */
     void addGauge(ExperimentGauge gauge);
 
+    /**
+     *
+     * @param id
+     */
     void removeGaugeById(long id);
 
+    /**
+     *
+     * @param gauge
+     */
     void updateGauge(ExperimentGauge gauge);
 }

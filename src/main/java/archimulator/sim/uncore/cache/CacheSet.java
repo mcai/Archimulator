@@ -25,6 +25,11 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author Min Cai
+ * @param <StateT>
+ */
 public class CacheSet<StateT extends Serializable> {
     private Cache<StateT> cache;
     private List<CacheLine<StateT>> lines;
@@ -32,6 +37,13 @@ public class CacheSet<StateT extends Serializable> {
     private List<Integer> tagsSeen;
     private List<Integer> lruStack;
 
+    /**
+     *
+     * @param cache
+     * @param associativity
+     * @param num
+     * @param cacheLineStateProviderFactory
+     */
     public CacheSet(Cache<StateT> cache, int associativity, int num, ValueProviderFactory<StateT, ValueProvider<StateT>> cacheLineStateProviderFactory) {
         this.cache = cache;
         this.num = num;
@@ -45,22 +57,42 @@ public class CacheSet<StateT extends Serializable> {
         this.lruStack = new ArrayList<Integer>();
     }
 
+    /**
+     *
+     * @return
+     */
     public Cache<StateT> getCache() {
         return cache;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<CacheLine<StateT>> getLines() {
         return lines;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getNum() {
         return num;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<Integer> getTagsSeen() {
         return tagsSeen;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<Integer> getLruStack() {
         return lruStack;
     }

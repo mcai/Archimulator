@@ -22,16 +22,38 @@ import archimulator.sim.core.Thread;
 import archimulator.sim.isa.Mnemonic;
 import net.pickapack.Reference;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class PerfectBranchPredictor extends BranchPredictor {
+    /**
+     *
+     * @param thread
+     * @param name
+     */
     public PerfectBranchPredictor(Thread thread, String name) {
         super(thread, name, BranchPredictorType.PERFECT);
     }
 
+    /**
+     *
+     * @param branchAddress
+     * @param branchTarget
+     * @param mnemonic
+     * @param branchPredictorUpdate
+     * @param returnAddressStackRecoverIndex
+     * @return
+     */
     @Override
     public int predict(int branchAddress, int branchTarget, Mnemonic mnemonic, BranchPredictorUpdate branchPredictorUpdate, Reference<Integer> returnAddressStackRecoverIndex) {
         return this.getThread().getContext().getRegisterFile().getNnpc();
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public boolean isDynamic() {
         return false;

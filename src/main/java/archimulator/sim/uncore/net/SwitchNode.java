@@ -18,7 +18,21 @@
  ******************************************************************************/
 package archimulator.sim.uncore.net;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class SwitchNode extends NetNode {
+    /**
+     *
+     * @param net
+     * @param name
+     * @param numInPorts
+     * @param inBufferSize
+     * @param numOutPorts
+     * @param outBufferSize
+     * @param bandwidth
+     */
     public SwitchNode(Net net, String name, int numInPorts, int inBufferSize, int numOutPorts, int outBufferSize, int bandwidth) {
         super(net, name, numInPorts, inBufferSize, numOutPorts, outBufferSize, bandwidth);
     }

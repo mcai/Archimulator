@@ -24,26 +24,89 @@ import net.pickapack.service.Service;
 
 import java.util.List;
 
+/**
+ *
+ * Service for managing architectures.
+ *
+ * @author Min Cai
+ */
 public interface ArchitectureService extends Service {
+    /**
+     *
+     * @return
+     */
     List<Architecture> getAllArchitectures();
 
+    /**
+     *
+     * @param first
+     * @param count
+     * @return
+     */
     List<Architecture> getAllArchitectures(long first, long count);
 
+    /**
+     *
+     * @return
+     */
     long getNumAllArchitectures();
 
+    /**
+     *
+     * @param id
+     * @return
+     */
     Architecture getArchitectureById(long id);
 
+    /**
+     *
+     * @param title
+     * @return
+     */
     Architecture getArchitectureByTitle(String title);
 
+    /**
+     *
+     * @return
+     */
     Architecture getFirstArchitecture();
 
+    /**
+     *
+     * @param architecture
+     */
     void addArchitecture(Architecture architecture);
 
+    /**
+     *
+     * @param id
+     */
     void removeArchitectureById(long id);
 
+    /**
+     *
+     */
     void clearArchitectures();
 
+    /**
+     *
+     * @param architecture
+     */
     void updateArchitecture(Architecture architecture);
 
+    /**
+     *
+     * @param htLLCRequestProfilingEnabled
+     * @param numCores
+     * @param numThreadsPerCore
+     * @param l1ISize
+     * @param l1IAssoc
+     * @param l1DSize
+     * @param l1DAssoc
+     * @param l2Size
+     * @param l2Assoc
+     * @param l2ReplacementPolicyType
+     * @return
+     */
     Architecture getOrAddArchitecture(boolean htLLCRequestProfilingEnabled, int numCores, int numThreadsPerCore, int l1ISize, int l1IAssoc, int l1DSize, int l1DAssoc, int l2Size, int l2Assoc, CacheReplacementPolicyType l2ReplacementPolicyType);
 }

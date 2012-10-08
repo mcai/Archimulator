@@ -40,12 +40,21 @@ import net.pickapack.util.ValueProviderFactory;
 
 import java.util.*;
 
+/**
+ *
+ * @author Min Cai
+ */
 public abstract class CacheController extends GeneralCacheController {
     private EvictableCache<CacheControllerState> cache;
     private Map<Integer, MemoryHierarchyAccess> pendingAccesses;
     private EnumMap<MemoryHierarchyAccessType, Integer> pendingAccessesPerType;
     private CacheControllerFiniteStateMachineFactory fsmFactory;
 
+    /**
+     *
+     * @param cacheHierarchy
+     * @param name
+     */
     public CacheController(CacheHierarchy cacheHierarchy, final String name) {
         super(cacheHierarchy, name);
 
@@ -92,6 +101,12 @@ public abstract class CacheController extends GeneralCacheController {
         });
     }
 
+    /**
+     *
+     * @param type
+     * @param physicalTag
+     * @return
+     */
     public boolean canAccess(MemoryHierarchyAccessType type, int physicalTag) {
         MemoryHierarchyAccess access = this.findAccess(physicalTag);
         return access == null ?
@@ -99,10 +114,26 @@ public abstract class CacheController extends GeneralCacheController {
                 type != MemoryHierarchyAccessType.STORE && access.getType() != MemoryHierarchyAccessType.STORE;
     }
 
+    /**
+     *
+     * @param physicalTag
+     * @return
+     */
     public MemoryHierarchyAccess findAccess(int physicalTag) {
         return this.pendingAccesses.containsKey(physicalTag) ? this.pendingAccesses.get(physicalTag) : null;
     }
 
+    /**
+     *
+     * @param dynamicInstruction
+     * @param thread
+     * @param type
+     * @param virtualPc
+     * @param physicalAddress
+     * @param physicalTag
+     * @param onCompletedCallback
+     * @return
+     */
     public MemoryHierarchyAccess beginAccess(DynamicInstruction dynamicInstruction, MemoryHierarchyThread thread, MemoryHierarchyAccessType type, int virtualPc, int physicalAddress, int physicalTag, Action onCompletedCallback) {
         MemoryHierarchyAccess newAccess = new MemoryHierarchyAccess(dynamicInstruction, thread, type, virtualPc, physicalAddress, physicalTag, onCompletedCallback, this.getCycleAccurateEventQueue().getCurrentCycle());
 
@@ -118,6 +149,10 @@ public abstract class CacheController extends GeneralCacheController {
         return newAccess;
     }
 
+    /**
+     *
+     * @param physicalTag
+     */
     public void endAccess(int physicalTag) {
         MemoryHierarchyAccess access = this.findAccess(physicalTag);
 
@@ -133,11 +168,21 @@ public abstract class CacheController extends GeneralCacheController {
         this.pendingAccesses.remove(physicalTag);
     }
 
+    /**
+     *
+     * @param to
+     * @return
+     */
     @Override
     protected Net getNet(MemoryDevice to) {
         return this.getCacheHierarchy().getL1sToL2Network();
     }
 
+    /**
+     *
+     * @param access
+     * @param onCompletedCallback
+     */
     public void receiveIfetch(final MemoryHierarchyAccess access, final Action onCompletedCallback) {
         this.getCycleAccurateEventQueue().schedule(this, new Action() {
             @Override
@@ -147,6 +192,11 @@ public abstract class CacheController extends GeneralCacheController {
         }, this.getHitLatency());
     }
 
+    /**
+     *
+     * @param access
+     * @param onCompletedCallback
+     */
     public void receiveLoad(final MemoryHierarchyAccess access, final Action onCompletedCallback) {
         this.getCycleAccurateEventQueue().schedule(this, new Action() {
             @Override
@@ -156,6 +206,11 @@ public abstract class CacheController extends GeneralCacheController {
         }, this.getHitLatency());
     }
 
+    /**
+     *
+     * @param access
+     * @param onCompletedCallback
+     */
     public void receiveStore(final MemoryHierarchyAccess access, final Action onCompletedCallback) {
         this.getCycleAccurateEventQueue().schedule(this, new Action() {
             @Override
@@ -165,15 +220,27 @@ public abstract class CacheController extends GeneralCacheController {
         }, this.getHitLatency());
     }
 
+    /**
+     *
+     * @param next
+     */
     public void setNext(DirectoryController next) {
         next.getCacheControllers().add(this);
         super.setNext(next);
     }
 
+    /**
+     *
+     * @return
+     */
     public DirectoryController getNext() {
         return (DirectoryController) super.getNext();
     }
 
+    /**
+     *
+     * @param message
+     */
     @Override
     public void receive(CoherenceMessage message) {
         switch (message.getType()) {
@@ -203,6 +270,12 @@ public abstract class CacheController extends GeneralCacheController {
         }
     }
 
+    /**
+     *
+     * @param access
+     * @param tag
+     * @param onCompletedCallback
+     */
     public void onLoad(MemoryHierarchyAccess access, int tag, Action onCompletedCallback) {
         onLoad(access, tag, new LoadFlow(this, tag, onCompletedCallback, access));
     }
@@ -225,6 +298,12 @@ public abstract class CacheController extends GeneralCacheController {
         }, onStalledCallback);
     }
 
+    /**
+     *
+     * @param access
+     * @param tag
+     * @param onCompletedCallback
+     */
     public void onStore(MemoryHierarchyAccess access, int tag, Action onCompletedCallback) {
         onStore(access, tag, new StoreFlow(this, tag, onCompletedCallback, access));
     }
@@ -296,6 +375,10 @@ public abstract class CacheController extends GeneralCacheController {
         fsm.onEventInvalidationAcknowledgement(message, message.getSender(), message.getTag());
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public EvictableCache<CacheControllerState> getCache() {
         return cache;
@@ -331,21 +414,45 @@ public abstract class CacheController extends GeneralCacheController {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public DirectoryController getDirectoryController() {
         return this.getNext();
     }
 
+    /**
+     *
+     * @return
+     */
     public CacheControllerFiniteStateMachineFactory getFsmFactory() {
         return fsmFactory;
     }
 
+    /**
+     *
+     * @return
+     */
     public abstract int getNumReadPorts();
 
+    /**
+     *
+     * @return
+     */
     public abstract int getNumWritePorts();
 
+    /**
+     *
+     * @return
+     */
     @Override
     public abstract int getHitLatency();
 
+    /**
+     *
+     * @return
+     */
     @Override
     public abstract CacheReplacementPolicyType getReplacementPolicyType();
 

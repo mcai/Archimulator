@@ -21,14 +21,26 @@ package archimulator.sim.isa;
 import archimulator.sim.common.SimulationEvent;
 import archimulator.sim.os.Context;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class FunctionReturnEvent extends SimulationEvent {
     private Context context;
 
+    /**
+     *
+     * @param context
+     */
     public FunctionReturnEvent(Context context) {
         super(context);
         this.context = context;
     }
 
+    /**
+     *
+     * @return
+     */
     public Context getContext() {
         return context;
     }

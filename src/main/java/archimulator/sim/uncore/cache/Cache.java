@@ -27,12 +27,24 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author Min Cai
+ * @param <StateT>
+ */
 public class Cache<StateT extends Serializable> extends BasicSimulationObject implements Serializable {
     private String name;
     private CacheGeometry geometry;
     private List<CacheSet<StateT>> sets;
     private int numTagsInUse;
 
+    /**
+     *
+     * @param parent
+     * @param name
+     * @param geometry
+     * @param cacheLineStateProviderFactory
+     */
     public Cache(SimulationObject parent, String name, CacheGeometry geometry, ValueProviderFactory<StateT, ValueProvider<StateT>> cacheLineStateProviderFactory) {
         super(parent);
 
@@ -45,6 +57,11 @@ public class Cache<StateT extends Serializable> extends BasicSimulationObject im
         }
     }
 
+    /**
+     *
+     * @param set
+     * @return
+     */
     public List<CacheLine<StateT>> getLines(int set) {
         if (set < 0 || set >= this.getNumSets()) {
             throw new IllegalArgumentException(String.format("set: %d, this.numSets: %d", set, this.getNumSets()));
@@ -53,6 +70,12 @@ public class Cache<StateT extends Serializable> extends BasicSimulationObject im
         return this.sets.get(set).getLines();
     }
 
+    /**
+     *
+     * @param set
+     * @param way
+     * @return
+     */
     public CacheLine<StateT> getLine(int set, int way) {
         if (way < 0 || way >= this.getAssociativity()) {
             getSimulation().dumpPendingFlowTree();
@@ -63,6 +86,11 @@ public class Cache<StateT extends Serializable> extends BasicSimulationObject im
         return this.getLines(set).get(way);
     }
 
+    /**
+     *
+     * @param set
+     * @return
+     */
     public CacheSet<StateT> get(int set) {
         if (set < 0 || set >= this.getNumSets()) {
             throw new IllegalArgumentException(String.format("set: %d, this.numSets: %d", set, this.getNumSets()));
@@ -71,6 +99,11 @@ public class Cache<StateT extends Serializable> extends BasicSimulationObject im
         return this.sets.get(set);
     }
 
+    /**
+     *
+     * @param address
+     * @return
+     */
     public int findWay(int address) {
         int tag = this.getTag(address);
         int set = this.getSet(address);
@@ -84,16 +117,31 @@ public class Cache<StateT extends Serializable> extends BasicSimulationObject im
         return -1;
     }
 
+    /**
+     *
+     * @param address
+     * @return
+     */
     public CacheLine<StateT> findLine(int address) {
         int set = this.getSet(address);
         int way = this.findWay(address);
         return way != -1 ? this.getLine(set, way) : null;
     }
 
+    /**
+     *
+     * @param address
+     * @return
+     */
     public int getTag(int address) {
         return CacheGeometry.getTag(address, this.geometry);
     }
 
+    /**
+     *
+     * @param address
+     * @return
+     */
     public int getSet(int address) {
         int set = CacheGeometry.getSet(address, this.geometry);
 
@@ -104,38 +152,75 @@ public class Cache<StateT extends Serializable> extends BasicSimulationObject im
         return set;
     }
 
+    /**
+     *
+     * @param address
+     * @return
+     */
     public int getLineId(int address) {
         return CacheGeometry.getLineId(address, this.geometry);
     }
 
+    /**
+     *
+     * @return
+     */
     public int getNumSets() {
         return this.geometry.getNumSets();
     }
 
+    /**
+     *
+     * @return
+     */
     public int getAssociativity() {
         return this.geometry.getAssociativity();
     }
 
+    /**
+     *
+     * @return
+     */
     public int getLineSize() {
         return this.geometry.getLineSize();
     }
 
+    /**
+     *
+     * @return
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     *
+     * @return
+     */
     public CacheGeometry getGeometry() {
         return geometry;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getNumTagsInUse() {
         return numTagsInUse;
     }
 
+    /**
+     *
+     * @param numTagsInUse
+     */
     public void setNumTagsInUse(int numTagsInUse) {
         this.numTagsInUse = numTagsInUse;
     }
 
+    /**
+     *
+     * @return
+     */
     public double getOccupancyRatio() {
         return (double) numTagsInUse / this.getGeometry().getNumLines();
     }

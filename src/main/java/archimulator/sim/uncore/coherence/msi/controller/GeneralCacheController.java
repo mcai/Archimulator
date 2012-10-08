@@ -24,6 +24,11 @@ import archimulator.sim.uncore.cache.EvictableCache;
 
 import java.io.Serializable;
 
+/**
+ *
+ * @author Min Cai
+ * @param <StateT>
+ */
 public abstract class GeneralCacheController<StateT extends Serializable> extends Controller {
     private long numDownwardReadHits;
     private long numDownwardReadMisses;
@@ -32,12 +37,27 @@ public abstract class GeneralCacheController<StateT extends Serializable> extend
 
     private long numEvictions;
 
+    /**
+     *
+     * @param cacheHierarchy
+     * @param name
+     */
     public GeneralCacheController(CacheHierarchy cacheHierarchy, String name) {
         super(cacheHierarchy, name);
     }
 
+    /**
+     *
+     * @return
+     */
     public abstract EvictableCache<StateT> getCache();
 
+    /**
+     *
+     * @param cache
+     * @param read
+     * @param hitInCache
+     */
     public void updateStats(EvictableCache<?> cache, boolean read, boolean hitInCache) {
         if (read) {
             if (hitInCache) {
@@ -54,49 +74,96 @@ public abstract class GeneralCacheController<StateT extends Serializable> extend
         }
     }
 
+    /**
+     *
+     */
     public void incrementNumEvictions() {
         this.numEvictions++;
     }
 
+    /**
+     *
+     * @return
+     */
     public double getHitRatio() {
         return getNumDownwardAccesses() > 0 ? (double) getNumDownwardHits() / (getNumDownwardAccesses()) : 0.0;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getNumDownwardHits() {
         return numDownwardReadHits + numDownwardWriteHits;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getNumDownwardMisses() {
         return numDownwardReadMisses + numDownwardWriteMisses;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getNumDownwardAccesses() {
         return getNumDownwardHits() + getNumDownwardMisses();
     }
 
+    /**
+     *
+     * @return
+     */
     public long getNumDownwardReadHits() {
         return numDownwardReadHits;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getNumDownwardReadMisses() {
         return numDownwardReadMisses;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getNumDownwardWriteHits() {
         return numDownwardWriteHits;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getNumDownwardWriteMisses() {
         return numDownwardWriteMisses;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getNumEvictions() {
         return numEvictions;
     }
 
+    /**
+     *
+     * @return
+     */
     public double getOccupancyRatio() {
         return getCache().getOccupancyRatio();
     }
 
+    /**
+     *
+     * @return
+     */
     public abstract CacheGeometry getGeometry();
 }

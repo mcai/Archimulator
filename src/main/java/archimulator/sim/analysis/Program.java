@@ -21,19 +21,35 @@ package archimulator.sim.analysis;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class Program {
     private String fileName;
     private SortedSet<Function> functions;
 
+    /**
+     *
+     * @param fileName
+     */
     public Program(String fileName) {
         this.fileName = fileName;
         this.functions = new TreeSet<Function>();
     }
 
+    /**
+     *
+     * @return
+     */
     public String getFileName() {
         return fileName;
     }
 
+    /**
+     *
+     * @return
+     */
     public SortedSet<Function> getFunctions() {
         return functions;
     }

@@ -21,17 +21,34 @@ package archimulator.sim.os.event;
 import archimulator.sim.os.Context;
 import archimulator.sim.os.NativeSystemCalls;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class TimeCriterion implements SystemEventCriterion {
     private long when;
 
+    /**
+     *
+     * @param context
+     * @return
+     */
     public boolean needProcess(Context context) {
         return this.getWhen() <= NativeSystemCalls.clock(context.getKernel().getCurrentCycle());
     }
 
+    /**
+     *
+     * @return
+     */
     public long getWhen() {
         return when;
     }
 
+    /**
+     *
+     * @param when
+     */
     public void setWhen(long when) {
         this.when = when;
     }

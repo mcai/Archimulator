@@ -23,16 +23,38 @@ import archimulator.sim.isa.Mnemonic;
 import archimulator.sim.isa.StaticInstructionType;
 import net.pickapack.Reference;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class NotTakenBranchPredictor extends BranchPredictor {
+    /**
+     *
+     * @param thread
+     * @param name
+     */
     public NotTakenBranchPredictor(Thread thread, String name) {
         super(thread, name, BranchPredictorType.NOT_TAKEN);
     }
 
+    /**
+     *
+     * @param branchAddress
+     * @param branchTarget
+     * @param mnemonic
+     * @param branchPredictorUpdate
+     * @param returnAddressStackRecoverIndex
+     * @return
+     */
     @Override
     public int predict(int branchAddress, int branchTarget, Mnemonic mnemonic, BranchPredictorUpdate branchPredictorUpdate, Reference<Integer> returnAddressStackRecoverIndex) {
         return mnemonic.getType() != StaticInstructionType.CONDITIONAL ? branchTarget : branchAddress + 4;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public boolean isDynamic() {
         return false;

@@ -22,12 +22,23 @@ import archimulator.model.Experiment;
 import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
 
+/**
+ *
+ * @author Min Cai
+ */
 public abstract class BasicSimulationObject implements SimulationObject {
     private BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher;
     private CycleAccurateEventQueue cycleAccurateEventQueue;
     private Experiment experiment;
     private Simulation simulation;
 
+    /**
+     *
+     * @param experiment
+     * @param simulation
+     * @param blockingEventDispatcher
+     * @param cycleAccurateEventQueue
+     */
     public BasicSimulationObject(Experiment experiment, Simulation simulation, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
         this.experiment = experiment;
         this.simulation = simulation;
@@ -35,22 +46,42 @@ public abstract class BasicSimulationObject implements SimulationObject {
         this.cycleAccurateEventQueue = cycleAccurateEventQueue;
     }
 
+    /**
+     *
+     * @param parent
+     */
     public BasicSimulationObject(SimulationObject parent) {
         this(parent.getExperiment(), parent.getSimulation(), parent.getBlockingEventDispatcher(), parent.getCycleAccurateEventQueue());
     }
 
+    /**
+     *
+     * @return
+     */
     public BlockingEventDispatcher<SimulationEvent> getBlockingEventDispatcher() {
         return blockingEventDispatcher;
     }
 
+    /**
+     *
+     * @return
+     */
     public CycleAccurateEventQueue getCycleAccurateEventQueue() {
         return cycleAccurateEventQueue;
     }
 
+    /**
+     *
+     * @return
+     */
     public Experiment getExperiment() {
         return experiment;
     }
 
+    /**
+     *
+     * @return
+     */
     public Simulation getSimulation() {
         return simulation;
     }

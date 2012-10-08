@@ -23,12 +23,27 @@ import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import net.pickapack.action.Action;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class StoreEvent extends CacheControllerEvent {
     private int set;
     private int way;
     private Action onCompletedCallback;
     private Action onStalledCallback;
 
+    /**
+     *
+     * @param generator
+     * @param producerFlow
+     * @param tag
+     * @param set
+     * @param way
+     * @param onCompletedCallback
+     * @param onStalledCallback
+     * @param access
+     */
     public StoreEvent(CacheController generator, CacheCoherenceFlow producerFlow, int tag, int set, int way, Action onCompletedCallback, Action onStalledCallback, MemoryHierarchyAccess access) {
         super(generator, producerFlow, CacheControllerEventType.STORE, access, tag);
 
@@ -38,18 +53,34 @@ public class StoreEvent extends CacheControllerEvent {
         this.onStalledCallback = onStalledCallback;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getSet() {
         return set;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getWay() {
         return way;
     }
 
+    /**
+     *
+     * @return
+     */
     public Action getOnCompletedCallback() {
         return onCompletedCallback;
     }
 
+    /**
+     *
+     * @return
+     */
     public Action getOnStalledCallback() {
         return onStalledCallback;
     }

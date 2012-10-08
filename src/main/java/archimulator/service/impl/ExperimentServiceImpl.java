@@ -64,6 +64,10 @@ import java.util.concurrent.locks.ReentrantLock;
 import static net.pickapack.util.CollectionHelper.toMap;
 import static net.pickapack.util.CollectionHelper.transform;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class ExperimentServiceImpl extends AbstractService implements ExperimentService {
     private Dao<Experiment, Long> experiments;
     private Dao<ExperimentPack, Long> experimentPacks;
@@ -71,6 +75,9 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
     private Lock lockGetFirstExperimentToRun = new ReentrantLock();
 
+    /**
+     *
+     */
     @SuppressWarnings("unchecked")
     public ExperimentServiceImpl() {
         super(ServiceManager.getDatabaseUrl(), Arrays.<Class<? extends ModelElement>>asList(Experiment.class, ExperimentPack.class, ExperimentSpec.class));
@@ -157,6 +164,9 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
     private boolean running = false;
 
+    /**
+     *
+     */
     @Override
     public void start() {
         running = true;
@@ -221,6 +231,9 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         }
     }
 
+    /**
+     *
+     */
     @Override
     public void stop() {
         running = false;
@@ -234,21 +247,40 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         super.stop();
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public List<Experiment> getAllExperiments() {
         return this.getAllItems(this.experiments);
     }
 
+    /**
+     *
+     * @param first
+     * @param count
+     * @return
+     */
     @Override
     public List<Experiment> getAllExperiments(long first, long count) {
         return this.getAllItems(this.experiments, first, count);
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public long getNumAllExperiments() {
         return this.getNumAllItems(this.experiments);
     }
 
+    /**
+     *
+     * @param experimentState
+     * @return
+     */
     @Override
     public long getNumAllExperimentsByState(ExperimentState experimentState) {
         try {
@@ -261,16 +293,32 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         }
     }
 
+    /**
+     *
+     * @param id
+     * @return
+     */
     @Override
     public Experiment getExperimentById(long id) {
         return this.getItemById(this.experiments, id);
     }
 
+    /**
+     *
+     * @param title
+     * @return
+     */
     @Override
     public List<Experiment> getExperimentsByTitle(String title) {
         return this.getItemsByTitle(this.experiments, title);
     }
 
+    /**
+     *
+     * @param titlePrefix
+     * @param stoppedExperimentsOnly
+     * @return
+     */
     @Override
     public List<Experiment> getExperimentsByTitlePrefix(String titlePrefix, boolean stoppedExperimentsOnly) {
         List<Experiment> result = new ArrayList<Experiment>();
@@ -284,16 +332,31 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         return result;
     }
 
+    /**
+     *
+     * @param title
+     * @return
+     */
     @Override
     public Experiment getFirstExperimentByTitle(String title) {
         return this.getFirstItemByTitle(this.experiments, title);
     }
 
+    /**
+     *
+     * @param title
+     * @return
+     */
     @Override
     public Experiment getLatestExperimentByTitle(String title) {
         return this.getLatestItemByTitle(this.experiments, title);
     }
 
+    /**
+     *
+     * @param benchmark
+     * @return
+     */
     @Override
     public List<Experiment> getExperimentsByBenchmark(Benchmark benchmark) { //TODO: to be optimized
         List<Experiment> result = new ArrayList<Experiment>();
@@ -310,6 +373,11 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         return result;
     }
 
+    /**
+     *
+     * @param architecture
+     * @return
+     */
     @Override
     public List<Experiment> getExperimentsByArchitecture(Architecture architecture) {
         try {
@@ -320,6 +388,11 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         }
     }
 
+    /**
+     *
+     * @param experimentPack
+     * @return
+     */
     @Override
     public List<Experiment> getExperimentsByExperimentPack(ExperimentPack experimentPack) {
         try {
@@ -332,6 +405,13 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         }
     }
 
+    /**
+     *
+     * @param experimentPack
+     * @param first
+     * @param count
+     * @return
+     */
     @Override
     public List<Experiment> getExperimentsByExperimentPack(ExperimentPack experimentPack, long first, long count) {
         try {
@@ -345,26 +425,47 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         }
     }
 
+    /**
+     *
+     * @param experiment
+     */
     @Override
     public void addExperiment(Experiment experiment) {
         this.addItem(this.experiments, Experiment.class, experiment);
     }
 
+    /**
+     *
+     * @param id
+     */
     @Override
     public void removeExperimentById(long id) {
         this.removeItemById(this.experiments, Experiment.class, id);
     }
 
+    /**
+     *
+     * @param experiment
+     */
     @Override
     public void updateExperiment(Experiment experiment) {
         this.updateItem(this.experiments, Experiment.class, experiment);
     }
 
+    /**
+     *
+     * @param experiment
+     */
     @Override
     public void dumpExperiment(Experiment experiment) {
         dumpExperiment(experiment, new IndentedPrintWriter(new PrintWriter(System.out), true));
     }
 
+    /**
+     *
+     * @param experiment
+     * @param writer
+     */
     @Override
     public void dumpExperiment(Experiment experiment, IndentedPrintWriter writer) {
         writer.printf("[%s] experiment %s\n", DateHelper.toString(experiment.getCreateTime()), experiment);
@@ -503,6 +604,10 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         writer.decrementIndentation();
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public Experiment getFirstExperimentToRun() {
         lockGetFirstExperimentToRun.lock();
@@ -526,6 +631,11 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         }
     }
 
+    /**
+     *
+     * @param experimentPack
+     * @return
+     */
     @Override
     @SuppressWarnings("unchecked")
     public List<Experiment> getStoppedExperimentsByExperimentPack(ExperimentPack experimentPack) {
@@ -545,62 +655,117 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         }
     }
 
+    /**
+     *
+     * @param experimentPack
+     * @return
+     */
     @Override
     public Experiment getFirstStoppedExperimentByExperimentPack(ExperimentPack experimentPack) {
         List<Experiment> stoppedExperimentsByExperimentPack = getStoppedExperimentsByExperimentPack(experimentPack);
         return stoppedExperimentsByExperimentPack.isEmpty() ? null : stoppedExperimentsByExperimentPack.get(0);
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public List<ExperimentPack> getAllExperimentPacks() {
         return this.getAllItems(this.experimentPacks);
     }
 
+    /**
+     *
+     * @param first
+     * @param count
+     * @return
+     */
     @Override
     public List<ExperimentPack> getAllExperimentPacks(long first, long count) {
         return this.getAllItems(this.experimentPacks, first, count);
     }
 
+    /**
+     *
+     * @param id
+     * @return
+     */
     @Override
     public ExperimentPack getExperimentPackById(long id) {
         return this.getItemById(this.experimentPacks, id);
     }
 
+    /**
+     *
+     * @param title
+     * @return
+     */
     @Override
     public ExperimentPack getExperimentPackByTitle(String title) {
         return this.getFirstItemByTitle(this.experimentPacks, title);
     }
 
+    /**
+     *
+     * @param experimentPack
+     */
     @Override
     public void addExperimentPack(ExperimentPack experimentPack) {
         this.addItem(this.experimentPacks, ExperimentPack.class, experimentPack);
     }
 
+    /**
+     *
+     * @param id
+     */
     @Override
     public void removeExperimentPackById(long id) {
         this.removeItemById(this.experimentPacks, ExperimentPack.class, id);
     }
 
+    /**
+     *
+     * @param experimentPack
+     */
     @Override
     public void updateExperimentPack(ExperimentPack experimentPack) {
         this.updateItem(this.experimentPacks, ExperimentPack.class, experimentPack);
     }
 
+    /**
+     *
+     * @param experimentSpec
+     */
     @Override
     public void addExperimentSpec(ExperimentSpec experimentSpec) {
         this.addItem(this.experimentSpecs, ExperimentSpec.class, experimentSpec);
     }
 
+    /**
+     *
+     * @param id
+     */
     @Override
     public void removeExperimentSpecById(long id) {
         this.removeItemById(this.experimentSpecs, ExperimentSpec.class, id);
     }
 
+    /**
+     *
+     * @param parent
+     * @return
+     */
     @Override
     public ExperimentSpec getExperimentSpecByParent(ExperimentPack parent) {
         return this.getFirstItemByParent(this.experimentSpecs, parent);
     }
 
+    /**
+     *
+     * @param experimentPack
+     * @return
+     */
     @Override
     public long getNumExperimentsByExperimentPack(ExperimentPack experimentPack) {
         try {
@@ -613,6 +778,12 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         }
     }
 
+    /**
+     *
+     * @param experimentPack
+     * @param experimentState
+     * @return
+     */
     @Override
     public long getNumExperimentsByExperimentPackAndState(ExperimentPack experimentPack, ExperimentState experimentState) {
         try {
@@ -627,6 +798,10 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         }
     }
 
+    /**
+     *
+     * @param experimentPack
+     */
     @Override
     public void startExperimentPack(ExperimentPack experimentPack) {
         try {
@@ -640,6 +815,10 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         }
     }
 
+    /**
+     *
+     * @param experimentPack
+     */
     @Override
     public void stopExperimentPack(ExperimentPack experimentPack) {
         try {
@@ -653,6 +832,10 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         }
     }
 
+    /**
+     *
+     * @param experimentPack
+     */
     @Override
     @SuppressWarnings("unchecked")
     public void resetCompletedExperimentsByExperimentPack(ExperimentPack experimentPack) {
@@ -674,6 +857,10 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         }
     }
 
+    /**
+     *
+     * @param experimentPack
+     */
     @Override
     @SuppressWarnings("unchecked")
     public void resetAbortedExperimentsByExperimentPack(ExperimentPack experimentPack) {
@@ -695,6 +882,10 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         }
     }
 
+    /**
+     *
+     * @param experimentTitle
+     */
     @Override
     public void runExperimentByTitle(String experimentTitle) {
         try {
@@ -708,6 +899,12 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         }
     }
 
+    /**
+     *
+     * @param title
+     * @param baselineExperiment
+     * @param experiments
+     */
     @Override
     public void tableSummary(String title, Experiment baselineExperiment, List<Experiment> experiments) {
         boolean helperThreadEnabled = baselineExperiment.getContextMappings().get(0).getBenchmark().getHelperThreadEnabled();
@@ -792,6 +989,12 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         table(title, "summary", columns, rows);
     }
 
+    /**
+     *
+     * @param experiments
+     * @param keysFunction
+     * @return
+     */
     @Override
     public List<Map<String, Double>> getBreakdowns(List<Experiment> experiments, final Function1<Experiment, List<String>> keysFunction) {
         return transform(experiments, new Function1<Experiment, Map<String, Double>>() {
@@ -802,6 +1005,12 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         });
     }
 
+    /**
+     *
+     * @param experiment
+     * @param keysFunction
+     * @return
+     */
     @Override
     public Map<String, Double> getBreakdown(Experiment experiment, Function1<Experiment, List<String>> keysFunction) {
         final List<String> keys = keysFunction.apply(experiment);
@@ -813,6 +1022,12 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         }));
     }
 
+    /**
+     *
+     * @param baselineExperiment
+     * @param experiments
+     * @return
+     */
     @Override
     public List<Double> getSpeedups(Experiment baselineExperiment, List<Experiment> experiments) {
         long baselineTotalCycles = Long.parseLong(baselineExperiment.getStatValue(baselineExperiment.getMeasurementTitlePrefix() + "cycleAccurateEventQueue/currentCycle"));
@@ -827,6 +1042,12 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         return speedups;
     }
 
+    /**
+     *
+     * @param baselineExperiment
+     * @param experiment
+     * @return
+     */
     @Override
     public double getSpeedup(Experiment baselineExperiment, Experiment experiment) {
         long baselineTotalCycles = Long.parseLong(baselineExperiment.getStatValue(baselineExperiment.getMeasurementTitlePrefix() + "cycleAccurateEventQueue/currentCycle"));
@@ -834,11 +1055,22 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         return (double) baselineTotalCycles / totalCycles;
     }
 
+    /**
+     *
+     * @param experimentPack
+     * @param baselineExperiment
+     * @param experiments
+     */
     @Override
     public void plotSpeedups(ExperimentPack experimentPack, Experiment baselineExperiment, List<Experiment> experiments) {
         plot(experimentPack, "speedups", "Speedups", getSpeedups(baselineExperiment, experiments));
     }
 
+    /**
+     *
+     * @param experiments
+     * @return
+     */
     @Override
     public List<Double> getTotalInstructions(List<Experiment> experiments) {
         return transform(experiments, new Function1<Experiment, Double>() {
@@ -849,21 +1081,41 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         });
     }
 
+    /**
+     *
+     * @param experimentPack
+     * @param experiments
+     */
     @Override
     public void plotTotalInstructions(ExperimentPack experimentPack, List<Experiment> experiments) {
         plot(experimentPack, "totalInstructions", "Total Instructions", getTotalCycles(experiments));
     }
 
+    /**
+     *
+     * @param experiments
+     * @return
+     */
     @Override
     public List<Double> getNormalizedTotalInstructions(List<Experiment> experiments) {
         return normalize(getTotalInstructions(experiments));
     }
 
+    /**
+     *
+     * @param experimentPack
+     * @param experiments
+     */
     @Override
     public void plotNormalizedTotalInstructions(ExperimentPack experimentPack, List<Experiment> experiments) {
         plot(experimentPack, "totalInstructions_normalized", "Normalized Total Instructions", getNormalizedTotalCycles(experiments));
     }
 
+    /**
+     *
+     * @param experiments
+     * @return
+     */
     @Override
     public List<Double> getTotalCycles(List<Experiment> experiments) {
         return transform(experiments, new Function1<Experiment, Double>() {
@@ -874,21 +1126,41 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         });
     }
 
+    /**
+     *
+     * @param experimentPack
+     * @param experiments
+     */
     @Override
     public void plotTotalCycles(ExperimentPack experimentPack, List<Experiment> experiments) {
         plot(experimentPack, "totalCycles", "Total Cycles", getTotalCycles(experiments));
     }
 
+    /**
+     *
+     * @param experiments
+     * @return
+     */
     @Override
     public List<Double> getNormalizedTotalCycles(List<Experiment> experiments) {
         return normalize(getTotalCycles(experiments));
     }
 
+    /**
+     *
+     * @param experimentPack
+     * @param experiments
+     */
     @Override
     public void plotNormalizedTotalCycles(ExperimentPack experimentPack, List<Experiment> experiments) {
         plot(experimentPack, "totalCycles_normalized", "Normalized Total Cycles", getNormalizedTotalCycles(experiments));
     }
 
+    /**
+     *
+     * @param experiments
+     * @return
+     */
     @Override
     public List<Double> getNumL2DownwardReadMisses(List<Experiment> experiments) {
         return transform(experiments, new Function1<Experiment, Double>() {
@@ -899,21 +1171,42 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         });
     }
 
+    /**
+     *
+     * @param experimentPack
+     * @param experiments
+     */
     @Override
     public void plotNumL2DownwardReadMisses(ExperimentPack experimentPack, List<Experiment> experiments) {
         plot(experimentPack, "numL2DownwardReadMisses", "# L2 Downward Read Misses", getNumL2DownwardReadMisses(experiments));
     }
 
+    /**
+     *
+     * @param experiments
+     * @return
+     */
     @Override
     public List<Double> getNormalizedNumL2DownwardReadMisses(List<Experiment> experiments) {
         return normalize(getNumL2DownwardReadMisses(experiments));
     }
 
+    /**
+     *
+     * @param experimentPack
+     * @param experiments
+     */
     @Override
     public void plotNormalizedNumL2DownwardReadMisses(ExperimentPack experimentPack, List<Experiment> experiments) {
         plot(experimentPack, "numL2DownwardReadMisses_normalized", "# Normalized L2 Downward Read Misses", getNormalizedNumL2DownwardReadMisses(experiments));
     }
 
+    /**
+     *
+     * @param experimentPack
+     * @param experiments
+     * @return
+     */
     @Override
     public List<Double> getNumMainThreadL2CacheHits(ExperimentPack experimentPack, List<Experiment> experiments) {
         return transform(experiments, new Function1<Experiment, Double>() {
@@ -924,6 +1217,12 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         });
     }
 
+    /**
+     *
+     * @param experimentPack
+     * @param experiments
+     * @return
+     */
     @Override
     public List<Double> getNumMainThreadL2CacheMisses(ExperimentPack experimentPack, List<Experiment> experiments) {
         return transform(experiments, new Function1<Experiment, Double>() {
@@ -934,6 +1233,12 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         });
     }
 
+    /**
+     *
+     * @param experimentPack
+     * @param experiments
+     * @return
+     */
     @Override
     public List<Double> getNumHelperThreadL2CacheHits(ExperimentPack experimentPack, List<Experiment> experiments) {
         return transform(experiments, new Function1<Experiment, Double>() {
@@ -944,6 +1249,12 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         });
     }
 
+    /**
+     *
+     * @param experimentPack
+     * @param experiments
+     * @return
+     */
     @Override
     public List<Double> getNumHelperThreadL2CacheMisses(ExperimentPack experimentPack, List<Experiment> experiments) {
         return transform(experiments, new Function1<Experiment, Double>() {
@@ -954,66 +1265,136 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         });
     }
 
+    /**
+     *
+     * @param experimentPack
+     * @param experiments
+     * @return
+     */
     @Override
     public List<Double> getNormalizedNumMainThreadL2CacheHits(ExperimentPack experimentPack, List<Experiment> experiments) {
         return normalize(getNumMainThreadL2CacheHits(experimentPack, experiments));
     }
 
+    /**
+     *
+     * @param experimentPack
+     * @param experiments
+     * @return
+     */
     @Override
     public List<Double> getNormalizedNumMainThreadL2CacheMisses(ExperimentPack experimentPack, List<Experiment> experiments) {
         return normalize(getNumMainThreadL2CacheMisses(experimentPack, experiments));
     }
 
+    /**
+     *
+     * @param experimentPack
+     * @param experiments
+     * @return
+     */
     @Override
     public List<Double> getNormalizedNumHelperThreadL2CacheHits(ExperimentPack experimentPack, List<Experiment> experiments) {
         return normalize(getNumHelperThreadL2CacheHits(experimentPack, experiments));
     }
 
+    /**
+     *
+     * @param experimentPack
+     * @param experiments
+     * @return
+     */
     @Override
     public List<Double> getNormalizedNumHelperThreadL2CacheMisses(ExperimentPack experimentPack, List<Experiment> experiments) {
         return normalize(getNumHelperThreadL2CacheMisses(experimentPack, experiments));
     }
 
+    /**
+     *
+     * @param experimentPack
+     * @param experiments
+     */
     @Override
     public void plotNumMainThreadL2CacheHits(ExperimentPack experimentPack, List<Experiment> experiments) {
         plot(experimentPack, "numMainThreadL2CacheHits", "# Main Thread L2 Cache Hits", getNumMainThreadL2CacheHits(experimentPack, experiments));
     }
 
+    /**
+     *
+     * @param experimentPack
+     * @param experiments
+     */
     @Override
     public void plotNumMainThreadL2CacheMisses(ExperimentPack experimentPack, List<Experiment> experiments) {
         plot(experimentPack, "numMainThreadL2CacheMisses", "# Main Thread L2 Cache Misses", getNumMainThreadL2CacheMisses(experimentPack, experiments));
     }
 
+    /**
+     *
+     * @param experimentPack
+     * @param experiments
+     */
     @Override
     public void plotNumHelperThreadL2CacheHits(ExperimentPack experimentPack, List<Experiment> experiments) {
         plot(experimentPack, "numHelperThreadL2CacheHits", "# Helper Thread L2 Cache Hits", getNumHelperThreadL2CacheHits(experimentPack, experiments));
     }
 
+    /**
+     *
+     * @param experimentPack
+     * @param experiments
+     */
     @Override
     public void plotNumHelperThreadL2CacheMisses(ExperimentPack experimentPack, List<Experiment> experiments) {
         plot(experimentPack, "numHelperThreadL2CacheMisses", "# Helper Thread L2 Cache Misses", getNumHelperThreadL2CacheMisses(experimentPack, experiments));
     }
 
+    /**
+     *
+     * @param experimentPack
+     * @param experiments
+     */
     @Override
     public void plotNormalizedNumMainThreadL2CacheHits(ExperimentPack experimentPack, List<Experiment> experiments) {
         plot(experimentPack, "numMainThreadL2CacheHits_normalized", "# Normalized Main Thread L2 Cache Hits", getNormalizedNumMainThreadL2CacheHits(experimentPack, experiments));
     }
 
+    /**
+     *
+     * @param experimentPack
+     * @param experiments
+     */
     @Override
     public void plotNormalizedNumMainThreadL2CacheMisses(ExperimentPack experimentPack, List<Experiment> experiments) {
         plot(experimentPack, "numMainThreadL2CacheMisses_normalized", "# Normalized Main Thread L2 Cache Misses", getNormalizedNumMainThreadL2CacheMisses(experimentPack, experiments));
     }
 
+    /**
+     *
+     * @param experimentPack
+     * @param experiments
+     */
     @Override
     public void plotNormalizedNumHelperThreadL2CacheHits(ExperimentPack experimentPack, List<Experiment> experiments) {
         plot(experimentPack, "numHelperThreadL2CacheHits_normalized", "# Normalized Helper Thread L2 Cache Hits", getNormalizedNumHelperThreadL2CacheHits(experimentPack, experiments));
     }
 
+    /**
+     *
+     * @param experimentPack
+     * @param experiments
+     */
     @Override
     public void plotNormalizedNumHelperThreadL2CacheMisses(ExperimentPack experimentPack, List<Experiment> experiments) {
         plot(experimentPack, "numHelperThreadL2CacheMisses_normalized", "# Normalized Helper Thread L2 Cache Misses", getNormalizedNumHelperThreadL2CacheMisses(experimentPack, experiments));
     }
 
+    /**
+     *
+     * @param experimentPack
+     * @param experiments
+     * @return
+     */
     @Override
     public List<Double> getHelperThreadL2CacheRequestCoverage(ExperimentPack experimentPack, List<Experiment> experiments) {
         return transform(experiments, new Function1<Experiment, Double>() {
@@ -1024,6 +1405,12 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         });
     }
 
+    /**
+     *
+     * @param experimentPack
+     * @param experiments
+     * @return
+     */
     @Override
     public List<Double> getHelperThreadL2CacheRequestAccuracy(ExperimentPack experimentPack, List<Experiment> experiments) {
         return transform(experiments, new Function1<Experiment, Double>() {
@@ -1034,36 +1421,73 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         });
     }
 
+    /**
+     *
+     * @param experimentPack
+     * @param experiments
+     * @return
+     */
     @Override
     public List<Double> getNormalizedHelperThreadL2CacheRequestCoverage(ExperimentPack experimentPack, List<Experiment> experiments) {
         return normalize(getHelperThreadL2CacheRequestCoverage(experimentPack, experiments));
     }
 
+    /**
+     *
+     * @param experimentPack
+     * @param experiments
+     * @return
+     */
     @Override
     public List<Double> getNormalizedHelperThreadL2CacheRequestAccuracy(ExperimentPack experimentPack, List<Experiment> experiments) {
         return normalize(getHelperThreadL2CacheRequestAccuracy(experimentPack, experiments));
     }
 
+    /**
+     *
+     * @param experimentPack
+     * @param experiments
+     */
     @Override
     public void plotHelperThreadL2CacheRequestCoverage(ExperimentPack experimentPack, List<Experiment> experiments) {
         plot(experimentPack, "helperThreadL2CacheRequestCoverage", "Helper Thread L2 Cache Request Coverage", getHelperThreadL2CacheRequestCoverage(experimentPack, experiments));
     }
 
+    /**
+     *
+     * @param experimentPack
+     * @param experiments
+     */
     @Override
     public void plotHelperThreadL2CacheRequestAccuracy(ExperimentPack experimentPack, List<Experiment> experiments) {
         plot(experimentPack, "helperThreadL2CacheRequestAccuracy", "HelperT hread L2 Cache Request Accuracy", getHelperThreadL2CacheRequestAccuracy(experimentPack, experiments));
     }
 
+    /**
+     *
+     * @param experimentPack
+     * @param experiments
+     */
     @Override
     public void plotNormalizedHelperThreadL2CacheRequestCoverage(ExperimentPack experimentPack, List<Experiment> experiments) {
         plot(experimentPack, "helperThreadL2CacheRequestCoverage_normalized", "Normalized Helper Thread L2 Cache Request Coverage", getNormalizedHelperThreadL2CacheRequestCoverage(experimentPack, experiments));
     }
 
+    /**
+     *
+     * @param experimentPack
+     * @param experiments
+     */
     @Override
     public void plotNormalizedHelperThreadL2CacheRequestAccuracy(ExperimentPack experimentPack, List<Experiment> experiments) {
         plot(experimentPack, "helperThreadL2CacheRequestAccuracy_normalized", "Normalized Helper Thread L2 Cache Request Accuracy", getNormalizedHelperThreadL2CacheRequestAccuracy(experimentPack, experiments));
     }
 
+    /**
+     *
+     * @param experiments
+     * @return
+     */
     @Override
     public List<Double> getL2DownwardReadMPKIs(List<Experiment> experiments) {
         return transform(experiments, new Function1<Experiment, Double>() {
@@ -1076,21 +1500,41 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         });
     }
 
+    /**
+     *
+     * @param experimentPack
+     * @param experiments
+     */
     @Override
     public void plotL2DownwardReadMPKIs(ExperimentPack experimentPack, List<Experiment> experiments) {
         plot(experimentPack, "l2DownwardReadMPKIs", "# L2 Downward Read MPKIs", getL2DownwardReadMPKIs(experiments));
     }
 
+    /**
+     *
+     * @param experiments
+     * @return
+     */
     @Override
     public List<Double> getNormalizedL2DownwardReadMPKIs(List<Experiment> experiments) {
         return normalize(getL2DownwardReadMPKIs(experiments));
     }
 
+    /**
+     *
+     * @param experimentPack
+     * @param experiments
+     */
     @Override
     public void plotNormalizedL2DownwardReadMPKIs(ExperimentPack experimentPack, List<Experiment> experiments) {
         plot(experimentPack, "l2DownwardReadMPKIs_normalized", "# Normalized L2 Downward Read MPKIs", getNormalizedL2DownwardReadMPKIs(experiments));
     }
 
+    /**
+     *
+     * @param experiments
+     * @return
+     */
     @Override
     public List<Map<String, Double>> getHelperThreadL2CacheRequestBreakdowns(List<Experiment> experiments) {
         return getBreakdowns(experiments, new Function1<Experiment, List<String>>() {
@@ -1112,6 +1556,11 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         });
     }
 
+    /**
+     *
+     * @param experimentPack
+     * @param experiments
+     */
     @Override
     public void plotHelperThreadL2CacheRequestBreakdowns(ExperimentPack experimentPack, List<Experiment> experiments) {
         List<Map<String, Double>> breakdowns = getHelperThreadL2CacheRequestBreakdowns(experiments);
@@ -1152,6 +1601,11 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         plot(experimentPack, "helperThreadL2CacheRequestBreakdowns", "# Helper Thread L2 Request Breakdowns", transformedBreakdowns);
     }
 
+    /**
+     *
+     * @param experiments
+     * @return
+     */
     @Override
     public List<Map<String, Double>> getL2CacheRequestBreakdowns(List<Experiment> experiments) {
         return getBreakdowns(experiments, new Function1<Experiment, List<String>>() {
@@ -1169,6 +1623,11 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         });
     }
 
+    /**
+     *
+     * @param experimentPack
+     * @param experiments
+     */
     @Override
     public void plotL2CacheRequestBreakdowns(ExperimentPack experimentPack, List<Experiment> experiments) {
         List<Map<String, Double>> breakdowns = getL2CacheRequestBreakdowns(experiments);
@@ -1203,11 +1662,24 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         plot(experimentPack, "l2CacheRequestBreakdowns", "# L2 Request Breakdowns", transformedBreakdowns);
     }
 
+    /**
+     *
+     * @param experimentPack
+     * @param detailed
+     * @param stoppedExperimentsOnly
+     */
     @Override
     public void dumpExperimentPack(ExperimentPack experimentPack, boolean detailed, boolean stoppedExperimentsOnly) {
         dumpExperimentPack(experimentPack, detailed, new IndentedPrintWriter(new PrintWriter(System.out), true), stoppedExperimentsOnly);
     }
 
+    /**
+     *
+     * @param experimentPack
+     * @param detailed
+     * @param writer
+     * @param stoppedExperimentsOnly
+     */
     @Override
     public void dumpExperimentPack(ExperimentPack experimentPack, boolean detailed, IndentedPrintWriter writer, boolean stoppedExperimentsOnly) {
         writer.printf("experiment pack %s\n", experimentPack.getTitle());
@@ -1400,6 +1872,11 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         variablePropertyNameDescriptions.put("l2ReplacementPolicyType", "L2 Replacement Policy Type");
     }
 
+    /**
+     *
+     * @param variablePropertyName
+     * @return
+     */
     public static String getDescriptionOfVariablePropertyName(String variablePropertyName) {
         return variablePropertyNameDescriptions.containsKey(variablePropertyName) ? variablePropertyNameDescriptions.get(variablePropertyName) : variablePropertyName;
     }

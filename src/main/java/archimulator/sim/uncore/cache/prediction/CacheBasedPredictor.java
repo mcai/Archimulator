@@ -25,13 +25,35 @@ import net.pickapack.math.SaturatingCounter;
 import net.pickapack.util.ValueProvider;
 import net.pickapack.util.ValueProviderFactory;
 
+/**
+ *
+ * @author Min Cai
+ * @param <PredictableT>
+ */
 public class CacheBasedPredictor<PredictableT extends Comparable<PredictableT>> implements Predictor<PredictableT> {
     private EvictableCache<Boolean> cache;
 
+    /**
+     *
+     * @param parent
+     * @param name
+     * @param geometry
+     * @param counterThreshold
+     * @param counterMaxValue
+     */
     public CacheBasedPredictor(SimulationObject parent, String name, CacheGeometry geometry, final int counterThreshold, final int counterMaxValue) {
         this(parent, name, geometry, CacheReplacementPolicyType.LRU, counterThreshold, counterMaxValue);
     }
 
+    /**
+     *
+     * @param parent
+     * @param name
+     * @param geometry
+     * @param cacheReplacementPolicyType
+     * @param counterThreshold
+     * @param counterMaxValue
+     */
     public CacheBasedPredictor(SimulationObject parent, String name, CacheGeometry geometry, CacheReplacementPolicyType cacheReplacementPolicyType, final int counterThreshold, final int counterMaxValue) {
         ValueProviderFactory<Boolean, ValueProvider<Boolean>> cacheLineStateProviderFactory = new ValueProviderFactory<Boolean, ValueProvider<Boolean>>() {
             @Override
@@ -43,6 +65,11 @@ public class CacheBasedPredictor<PredictableT extends Comparable<PredictableT>> 
         this.cache = new EvictableCache<Boolean>(parent, name, geometry, cacheReplacementPolicyType, cacheLineStateProviderFactory);
     }
 
+    /**
+     *
+     * @param address
+     * @param observedValue
+     */
     public void update(int address, PredictableT observedValue) {
         int set = this.cache.getSet(address);
         int tag = this.cache.getTag(address);
@@ -75,6 +102,12 @@ public class CacheBasedPredictor<PredictableT extends Comparable<PredictableT>> 
         }
     }
 
+    /**
+     *
+     * @param address
+     * @param defaultValue
+     * @return
+     */
     public PredictableT predict(int address, PredictableT defaultValue) {
         CacheLine<Boolean> lineFound = this.cache.findLine(address);
         BooleanValueProvider stateProvider = lineFound != null ? (BooleanValueProvider) lineFound.getStateProvider() : null;

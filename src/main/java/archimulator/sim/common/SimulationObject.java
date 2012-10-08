@@ -24,12 +24,32 @@ import net.pickapack.event.CycleAccurateEventQueue;
 
 import java.io.Serializable;
 
+/**
+ *
+ * @author Min Cai
+ */
 public interface SimulationObject extends Serializable {
+    /**
+     *
+     * @return
+     */
     BlockingEventDispatcher<SimulationEvent> getBlockingEventDispatcher();
 
+    /**
+     *
+     * @return
+     */
     CycleAccurateEventQueue getCycleAccurateEventQueue();
 
+    /**
+     *
+     * @return
+     */
     Experiment getExperiment();
 
+    /**
+     *
+     * @return
+     */
     Simulation getSimulation();
 }

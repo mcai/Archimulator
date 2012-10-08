@@ -23,18 +23,31 @@ import net.pickapack.action.Action;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class Crossbar {
     private NetNode node;
     private int bandwidth;
     private boolean busy;
     private List<Action> pendingActions;
 
+    /**
+     *
+     * @param node
+     * @param bandwidth
+     */
     public Crossbar(NetNode node, int bandwidth) {
         this.node = node;
         this.bandwidth = bandwidth;
         this.pendingActions = new ArrayList<Action>();
     }
 
+    /**
+     *
+     * @param message
+     */
     public void toOutBuffer(final NetMessage message) {
         final OutPort destinationPort = this.node.getPort(message.getDestinationNode());
 
@@ -68,16 +81,27 @@ public class Crossbar {
         }
     }
 
+    /**
+     *
+     */
     public void beginTransfer() {
         this.busy = true;
     }
 
+    /**
+     *
+     * @param message
+     */
     public void endTransfer(NetMessage message) {
         this.busy = false;
         this.doPendingActions();
         getNode().getCrossbar().toOutBuffer(message);
     }
 
+    /**
+     *
+     * @param action
+     */
     public void addPendingAction(Action action) {
         this.pendingActions.add(action);
     }
@@ -90,14 +114,26 @@ public class Crossbar {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public NetNode getNode() {
         return node;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getBandwidth() {
         return bandwidth;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isBusy() {
         return busy;
     }

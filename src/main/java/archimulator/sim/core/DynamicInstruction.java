@@ -22,6 +22,10 @@ import archimulator.sim.isa.StaticInstruction;
 import archimulator.sim.isa.StaticInstructionType;
 import org.apache.commons.lang.StringUtils;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class DynamicInstruction {
     private long id;
     private Thread thread;
@@ -37,6 +41,12 @@ public class DynamicInstruction {
     private boolean missedInL2Cache;
     private int cyclesSpentAtHeadOfReorderBuffer;
 
+    /**
+     *
+     * @param thread
+     * @param pc
+     * @param staticInstruction
+     */
     public DynamicInstruction(Thread thread, int pc, StaticInstruction staticInstruction) {
         this.id = thread.getSimulation().currentDynamicInstructionId++;
         this.thread = thread;
@@ -55,51 +65,99 @@ public class DynamicInstruction {
         this.cyclesSpentAtHeadOfReorderBuffer = 0;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getId() {
         return id;
     }
 
+    /**
+     *
+     * @return
+     */
     public Thread getThread() {
         return thread;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getPc() {
         return pc;
     }
 
+    /**
+     *
+     * @return
+     */
     public StaticInstruction getStaticInstruction() {
         return staticInstruction;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getEffectiveAddress() {
         return effectiveAddress;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getEffectiveAddressBase() {
         return effectiveAddressBase;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getEffectiveAddressDisplacement() {
         return effectiveAddressDisplacement;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isUseStackPointerAsEffectiveAddressBase() {
         return useStackPointerAsEffectiveAddressBase;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isMissedInL2Cache() {
         return missedInL2Cache;
     }
 
     //TODO: set value
+    /**
+     *
+     * @param missedInL2Cache
+     */
     public void setMissedInL2Cache(boolean missedInL2Cache) {
         this.missedInL2Cache = missedInL2Cache;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getCyclesSpentAtHeadOfReorderBuffer() {
         return cyclesSpentAtHeadOfReorderBuffer;
     }
 
+    /**
+     *
+     * @param cyclesSpentAtHeadOfReorderBuffer
+     */
     public void setCyclesSpentAtHeadOfReorderBuffer(int cyclesSpentAtHeadOfReorderBuffer) {
         this.cyclesSpentAtHeadOfReorderBuffer = cyclesSpentAtHeadOfReorderBuffer;
     }

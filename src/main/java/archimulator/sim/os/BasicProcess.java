@@ -31,6 +31,10 @@ import archimulator.sim.os.elf.ElfSectionHeader;
 import java.io.File;
 import java.util.*;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class BasicProcess extends Process {
     private Map<Integer, Integer> pcsToMachineInstructions;
     private Map<Integer, StaticInstruction> machineInstructionsToStaticInstructions;
@@ -38,10 +42,22 @@ public class BasicProcess extends Process {
     private Map<String, SortedMap<Integer, Instruction>> instructions;
     private ElfAnalyzer elfAnalyzer;
 
+    /**
+     *
+     * @param kernel
+     * @param simulationDirectory
+     * @param contextMapping
+     */
     public BasicProcess(Kernel kernel, String simulationDirectory, ContextMapping contextMapping) {
         super(kernel, simulationDirectory, contextMapping);
     }
 
+    /**
+     *
+     * @param kernel
+     * @param simulationDirectory
+     * @param contextMapping
+     */
     @Override
     protected void loadProgram(Kernel kernel, String simulationDirectory, ContextMapping contextMapping) {
         this.pcsToMachineInstructions = new TreeMap<Integer, Integer>();
@@ -144,15 +160,30 @@ public class BasicProcess extends Process {
         this.instructions.get(sectionName).put(pc, new Instruction(this, pc, this.getStaticInstruction(pc)));
     }
 
+    /**
+     *
+     * @param process
+     * @param pc
+     * @return
+     */
     public static String getDisassemblyInstruction(Process process, int pc) {
         return MipsDisassembler.disassemble(pc, process.getStaticInstruction(pc));
     }
 
+    /**
+     *
+     * @param pc
+     * @return
+     */
     @Override
     public StaticInstruction getStaticInstruction(int pc) {
         return this.machineInstructionsToStaticInstructions.get(this.pcsToMachineInstructions.get(pc));
     }
 
+    /**
+     *
+     * @return
+     */
     public ElfAnalyzer getElfAnalyzer() {
         return elfAnalyzer;
     }

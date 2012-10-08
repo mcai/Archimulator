@@ -28,10 +28,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ *
+ * @author Min Cai
+ */
 public abstract class Net extends BasicSimulationObject {
+    /**
+     *
+     */
     protected Map<MemoryDevice, EndPointNode> endPointNodes;
+    /**
+     *
+     */
     protected SwitchNode switchNode;
 
+    /**
+     *
+     * @param cacheHierarchy
+     */
     public Net(CacheHierarchy cacheHierarchy) {
         super(cacheHierarchy);
 
@@ -41,6 +55,10 @@ public abstract class Net extends BasicSimulationObject {
         this.calculateRoutes();
     }
 
+    /**
+     *
+     * @param cacheHierarchy
+     */
     protected abstract void setup(CacheHierarchy cacheHierarchy);
 
     private void calculateRoutes() {
@@ -113,11 +131,24 @@ public abstract class Net extends BasicSimulationObject {
         }
     }
 
+    /**
+     *
+     * @param node1
+     * @param node2
+     * @param bandwidth
+     */
     protected void createBidirectionalLink(NetNode node1, NetNode node2, int bandwidth) {
         new NetLink(node1, node2, bandwidth);
         new NetLink(node2, node1, bandwidth);
     }
 
+    /**
+     *
+     * @param sourceDevice
+     * @param destinationDevice
+     * @param size
+     * @param onCompletedCallback
+     */
     public void transfer(MemoryDevice sourceDevice, MemoryDevice destinationDevice, int size, Action onCompletedCallback) {
         EndPointNode sourceNode = this.endPointNodes.get(sourceDevice);
         EndPointNode destinationNode = this.endPointNodes.get(destinationDevice);

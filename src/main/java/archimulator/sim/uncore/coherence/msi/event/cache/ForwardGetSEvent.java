@@ -22,14 +22,30 @@ import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class ForwardGetSEvent extends CacheControllerEvent {
     private CacheController requester;
 
+    /**
+     *
+     * @param generator
+     * @param producerFlow
+     * @param requester
+     * @param tag
+     * @param access
+     */
     public ForwardGetSEvent(CacheController generator, CacheCoherenceFlow producerFlow, CacheController requester, int tag, MemoryHierarchyAccess access) {
         super(generator, producerFlow, CacheControllerEventType.FORWARD_GETS, access, tag);
         this.requester = requester;
     }
 
+    /**
+     *
+     * @return
+     */
     public CacheController getRequester() {
         return requester;
     }

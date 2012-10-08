@@ -21,9 +21,18 @@ package archimulator.sim.core.bpred;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class BranchTargetBuffer {
     private List<List<BranchTargetBufferEntry>> entries;
 
+    /**
+     *
+     * @param numSets
+     * @param associativity
+     */
     public BranchTargetBuffer(int numSets, int associativity) {
         this.entries = new ArrayList<List<BranchTargetBufferEntry>>();
 
@@ -38,6 +47,11 @@ public class BranchTargetBuffer {
         }
     }
 
+    /**
+     *
+     * @param branchAddress
+     * @return
+     */
     public BranchTargetBufferEntry lookup(int branchAddress) {
         int set = this.getSet(branchAddress);
 
@@ -50,6 +64,13 @@ public class BranchTargetBuffer {
         return null;
     }
 
+    /**
+     *
+     * @param branchAddress
+     * @param branchTarget
+     * @param taken
+     * @return
+     */
     public BranchTargetBufferEntry update(int branchAddress, int branchTarget, boolean taken) {
         if (!taken) {
             return null;

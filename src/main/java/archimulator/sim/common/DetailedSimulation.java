@@ -22,34 +22,64 @@ import archimulator.model.Experiment;
 import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class DetailedSimulation extends Simulation {
     private long numMaxInstructions;
 
+    /**
+     *
+     * @param title
+     * @param experiment
+     * @param blockingEventDispatcher
+     * @param cycleAccurateEventQueue
+     * @param numMaxInstructions
+     */
     public DetailedSimulation(String title, Experiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, int numMaxInstructions) {
         super(title, SimulationType.MEASUREMENT, experiment, blockingEventDispatcher, cycleAccurateEventQueue);
 
         this.numMaxInstructions = numMaxInstructions;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public boolean canDoFastForwardOneCycle() {
         throw new IllegalArgumentException();
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public boolean canDoCacheWarmupOneCycle() {
         throw new IllegalArgumentException();
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public boolean canDoMeasurementOneCycle() {
         return numMaxInstructions == -1 || this.getProcessor().getCores().get(0).getThreads().get(0).getTotalInstructions() < this.numMaxInstructions;
     }
 
+    /**
+     *
+     */
     @Override
     public void beginSimulation() {
     }
 
+    /**
+     *
+     */
     @Override
     public void endSimulation() {
     }

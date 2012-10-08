@@ -48,6 +48,10 @@ import java.io.File;
 import java.text.MessageFormat;
 import java.util.*;
 
+/**
+ *
+ * @author Min Cai
+ */
 public abstract class Simulation implements SimulationObject {
     private String title;
 
@@ -67,15 +71,44 @@ public abstract class Simulation implements SimulationObject {
 
     private HelperThreadL2CacheRequestProfilingHelper helperThreadL2CacheRequestProfilingHelper;
 
+    /**
+     *
+     */
     public long currentDynamicInstructionId;
+    /**
+     *
+     */
     public long currentReorderBufferEntryId;
+    /**
+     *
+     */
     public long currentDecodeBufferEntryId;
+    /**
+     *
+     */
     public long currentMemoryHierarchyAccessId;
+    /**
+     *
+     */
     public long currentNetMessageId;
+    /**
+     *
+     */
     public long currentCacheCoherenceFlowId;
 
+    /**
+     *
+     */
     public List<CacheCoherenceFlow> pendingFlows = new ArrayList<CacheCoherenceFlow>();
 
+    /**
+     *
+     * @param title
+     * @param type
+     * @param experiment
+     * @param blockingEventDispatcher
+     * @param cycleAccurateEventQueue
+     */
     public Simulation(String title, SimulationType type, Experiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
         this.experiment = experiment;
         this.blockingEventDispatcher = blockingEventDispatcher;
@@ -102,6 +135,10 @@ public abstract class Simulation implements SimulationObject {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public Kernel createKernel() {
         Kernel kernel = new Kernel(this);
 
@@ -122,6 +159,9 @@ public abstract class Simulation implements SimulationObject {
         return kernel;
     }
 
+    /**
+     *
+     */
     public void simulate() {
         Logger.infof(Logger.SIMULATOR, "begin simulation: %s", this.cycleAccurateEventQueue.getCurrentCycle(), this.getTitle());
 
@@ -310,16 +350,37 @@ public abstract class Simulation implements SimulationObject {
         return result;
     }
 
+    /**
+     *
+     * @return
+     */
     protected abstract boolean canDoFastForwardOneCycle();
 
+    /**
+     *
+     * @return
+     */
     protected abstract boolean canDoCacheWarmupOneCycle();
 
+    /**
+     *
+     * @return
+     */
     protected abstract boolean canDoMeasurementOneCycle();
 
+    /**
+     *
+     */
     protected abstract void beginSimulation();
 
+    /**
+     *
+     */
     protected abstract void endSimulation();
 
+    /**
+     *
+     */
     public void doFastForward() {
         Logger.info(Logger.SIMULATION, "Switched to fast forward mode.", this.getCycleAccurateEventQueue().getCurrentCycle());
 
@@ -332,6 +393,9 @@ public abstract class Simulation implements SimulationObject {
         }
     }
 
+    /**
+     *
+     */
     public void doCacheWarmup() {
         Logger.info(Logger.SIMULATION, "Switched to cache warmup mode.", this.getCycleAccurateEventQueue().getCurrentCycle());
 
@@ -344,6 +408,9 @@ public abstract class Simulation implements SimulationObject {
         }
     }
 
+    /**
+     *
+     */
     public void doMeasurement() {
         Logger.info(Logger.SIMULATION, "Switched to measurement mode.", this.getCycleAccurateEventQueue().getCurrentCycle());
 
@@ -367,19 +434,33 @@ public abstract class Simulation implements SimulationObject {
         }
     }
 
+    /**
+     *
+     */
     public void doHouseKeeping() {
         this.getProcessor().getKernel().advanceOneCycle();
         this.getProcessor().updateContextToThreadAssignments();
     }
 
+    /**
+     *
+     * @return
+     */
     public Kernel prepareKernel() {
         return this.createKernel();
     }
 
+    /**
+     *
+     * @return
+     */
     public CacheHierarchy prepareCacheHierarchy() {
         return new BasicCacheHierarchy(this.getExperiment(), this, this.getBlockingEventDispatcher(), this.getCycleAccurateEventQueue());
     }
 
+    /**
+     *
+     */
     public void dumpPendingFlowTree() {
         for (CacheCoherenceFlow pendingFlow : pendingFlows) {
             NodeHelper.print(pendingFlow);
@@ -389,34 +470,66 @@ public abstract class Simulation implements SimulationObject {
         System.out.println();
     }
 
+    /**
+     *
+     * @return
+     */
     public SimulationType getType() {
         return type;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getBeginTime() {
         return beginTime;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getEndTime() {
         return endTime;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getBeginTimeAsString() {
         return DateHelper.toString(beginTime);
     }
 
+    /**
+     *
+     * @return
+     */
     public String getEndTimeAsString() {
         return DateHelper.toString(endTime);
     }
 
+    /**
+     *
+     * @return
+     */
     public long getDurationInSeconds() {
         return (this.getEndTime() - this.getBeginTime()) / 1000;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getDuration() {
         return DurationFormatUtils.formatDurationHMS(this.getEndTime() - this.getBeginTime());
     }
 
+    /**
+     *
+     * @return
+     */
     public long getTotalInstructions() {
         long totalInstructions = 0;
 
@@ -429,51 +542,99 @@ public abstract class Simulation implements SimulationObject {
         return totalInstructions;
     }
 
+    /**
+     *
+     * @return
+     */
     public double getInstructionsPerCycle() {
         return (double) this.getTotalInstructions() / this.getCycleAccurateEventQueue().getCurrentCycle();
     }
 
+    /**
+     *
+     * @return
+     */
     public double getCyclesPerInstruction() {
         return (double) this.getCycleAccurateEventQueue().getCurrentCycle() / this.getTotalInstructions();
     }
 
+    /**
+     *
+     * @return
+     */
     public double getCyclesPerSecond() {
         return (double) this.getCycleAccurateEventQueue().getCurrentCycle() / this.getDurationInSeconds();
     }
 
+    /**
+     *
+     * @return
+     */
     public double getInstructionsPerSecond() {
         return (double) this.getTotalInstructions() / this.getDurationInSeconds();
     }
 
+    /**
+     *
+     * @return
+     */
     public String getTitle() {
         return title;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getWorkingDirectory() {
         return "experiments" + File.separator + this.title;
     }
 
+    /**
+     *
+     * @return
+     */
     public Processor getProcessor() {
         return this.processor;
     }
 
+    /**
+     *
+     * @return
+     */
     public Experiment getExperiment() {
         return experiment;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public Simulation getSimulation() {
         return this;
     }
 
+    /**
+     *
+     * @return
+     */
     public CycleAccurateEventQueue getCycleAccurateEventQueue() {
         return this.cycleAccurateEventQueue;
     }
 
+    /**
+     *
+     * @return
+     */
     public BlockingEventDispatcher<SimulationEvent> getBlockingEventDispatcher() {
         return this.blockingEventDispatcher;
     }
 
+    /**
+     *
+     * @return
+     */
     public HelperThreadL2CacheRequestProfilingHelper getHelperThreadL2CacheRequestProfilingHelper() {
         return helperThreadL2CacheRequestProfilingHelper;
     }

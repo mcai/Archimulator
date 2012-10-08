@@ -18,7 +18,57 @@
  ******************************************************************************/
 package archimulator.sim.core;
 
+/**
+ *
+ * @author Min Cai
+ */
 public enum FunctionalUnitOperationType {
-    NONE, INT_ALU, INT_MULTIPLY, INT_DIVIDE, FLOAT_ADD, FLOAT_COMPARE, FLOAT_CONVERT, FLOAT_MULTIPLY, FLOAT_DIVIDE,
-    FLOAT_SQRT, READ_PORT, WRITE_PORT
+    /**
+     *
+     */
+    NONE,
+    /**
+     *
+     */
+    INT_ALU,
+    /**
+     *
+     */
+    INT_MULTIPLY,
+    /**
+     *
+     */
+    INT_DIVIDE,
+    /**
+     *
+     */
+    FLOAT_ADD,
+    /**
+     *
+     */
+    FLOAT_COMPARE,
+    /**
+     *
+     */
+    FLOAT_CONVERT,
+    /**
+     *
+     */
+    FLOAT_MULTIPLY,
+    /**
+     *
+     */
+    FLOAT_DIVIDE,
+    /**
+     *
+     */
+    FLOAT_SQRT,
+    /**
+     *
+     */
+    READ_PORT,
+    /**
+     *
+     */
+    WRITE_PORT
 }

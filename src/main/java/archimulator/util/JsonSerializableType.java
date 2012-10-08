@@ -29,10 +29,19 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.sql.SQLException;
 
+/**
+ *
+ * @author Min Cai
+ * @param <T>
+ */
 public abstract class JsonSerializableType<T> extends BaseDataType {
     private Type clz;
 
-	protected JsonSerializableType(Type type) {
+	/**
+     *
+     * @param type
+     */
+    protected JsonSerializableType(Type type) {
 		super(SqlType.LONG_STRING, new Class<?>[0]);
         this.clz = type;
     }

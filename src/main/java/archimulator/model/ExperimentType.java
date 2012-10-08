@@ -18,8 +18,21 @@
  ******************************************************************************/
 package archimulator.model;
 
+/**
+ *
+ * @author Min Cai
+ */
 public enum ExperimentType {
+    /**
+     *
+     */
     FUNCTIONAL,
+    /**
+     *
+     */
     DETAILED,
+    /**
+     *
+     */
     TWO_PHASE
 }

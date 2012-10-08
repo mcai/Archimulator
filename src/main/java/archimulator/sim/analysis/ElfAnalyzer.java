@@ -30,12 +30,23 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.*;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class ElfAnalyzer {
     private Program program;
     private ElfFile elfFile;
     private Map<String, SortedMap<Integer, Instruction>> instructions;
     private int programEntry;
 
+    /**
+     *
+     * @param fileName
+     * @param elfFile
+     * @param instructions
+     * @param programEntry
+     */
     public ElfAnalyzer(String fileName, ElfFile elfFile, Map<String, SortedMap<Integer, Instruction>> instructions, int programEntry) {
         this.elfFile = elfFile;
         this.instructions = instructions;
@@ -43,6 +54,9 @@ public class ElfAnalyzer {
         this.program = new Program(fileName);
     }
 
+    /**
+     *
+     */
     public void buildControlFlowGraphs() {
         for (String sectionName : this.instructions.keySet()) {
             SortedMap<Integer, Instruction> instsInSection = this.instructions.get(sectionName);
@@ -194,6 +208,10 @@ public class ElfAnalyzer {
         }
     }
 
+    /**
+     *
+     * @param out
+     */
     public void dumpAnalysisResult(Writer out) {
         PrintWriter bw = new PrintWriter(out);
 
@@ -233,18 +251,34 @@ public class ElfAnalyzer {
         return this.instructions.get(function.getSectionName()).get(targetPc);
     }
 
+    /**
+     *
+     * @return
+     */
     public Program getProgram() {
         return this.program;
     }
 
+    /**
+     *
+     * @return
+     */
     public ElfFile getElfFile() {
         return this.elfFile;
     }
 
+    /**
+     *
+     * @return
+     */
     public Map<String, SortedMap<Integer, Instruction>> getInstructions() {
         return this.instructions;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getProgramEntry() {
         return this.programEntry;
     }

@@ -18,37 +18,68 @@
  ******************************************************************************/
 package archimulator.sim.os.signal;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class SignalMasks {
     private SignalMask pending;
     private SignalMask blocked;
     private SignalMask backup;
 
+    /**
+     *
+     */
     public SignalMasks() {
         this.pending = new SignalMask();
         this.blocked = new SignalMask();
         this.backup = new SignalMask();
     }
 
+    /**
+     *
+     * @return
+     */
     public SignalMask getPending() {
         return pending;
     }
 
+    /**
+     *
+     * @param pending
+     */
     public void setPending(SignalMask pending) {
         this.pending = pending;
     }
 
+    /**
+     *
+     * @return
+     */
     public SignalMask getBlocked() {
         return blocked;
     }
 
+    /**
+     *
+     * @param blocked
+     */
     public void setBlocked(SignalMask blocked) {
         this.blocked = blocked;
     }
 
+    /**
+     *
+     * @return
+     */
     public SignalMask getBackup() {
         return backup;
     }
 
+    /**
+     *
+     * @param backup
+     */
     public void setBackup(SignalMask backup) {
         this.backup = backup;
     }

@@ -20,6 +20,10 @@ package archimulator.sim.core;
 
 import archimulator.sim.core.bpred.BranchPredictorUpdate;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class DecodeBufferEntry {
     private long id;
     private DynamicInstruction dynamicInstruction;
@@ -30,6 +34,16 @@ public class DecodeBufferEntry {
     private BranchPredictorUpdate branchPredictorUpdate;
     private boolean speculative;
 
+    /**
+     *
+     * @param dynamicInstruction
+     * @param npc
+     * @param nnpc
+     * @param predictedNnpc
+     * @param returnAddressStackRecoverIndex
+     * @param branchPredictorUpdate
+     * @param speculative
+     */
     public DecodeBufferEntry(DynamicInstruction dynamicInstruction, int npc, int nnpc, int predictedNnpc, int returnAddressStackRecoverIndex, BranchPredictorUpdate branchPredictorUpdate, boolean speculative) {
         this.id = dynamicInstruction.getThread().getSimulation().currentDecodeBufferEntryId++;
         this.dynamicInstruction = dynamicInstruction;
@@ -41,34 +55,66 @@ public class DecodeBufferEntry {
         this.speculative = speculative;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getId() {
         return id;
     }
 
+    /**
+     *
+     * @return
+     */
     public DynamicInstruction getDynamicInstruction() {
         return dynamicInstruction;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getNpc() {
         return npc;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getNnpc() {
         return nnpc;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getPredictedNnpc() {
         return predictedNnpc;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getReturnAddressStackRecoverIndex() {
         return returnAddressStackRecoverIndex;
     }
 
+    /**
+     *
+     * @return
+     */
     public BranchPredictorUpdate getBranchPredictorUpdate() {
         return branchPredictorUpdate;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isSpeculative() {
         return speculative;
     }

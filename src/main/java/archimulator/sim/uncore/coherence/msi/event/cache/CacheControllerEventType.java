@@ -18,18 +18,61 @@
  ******************************************************************************/
 package archimulator.sim.uncore.coherence.msi.event.cache;
 
+/**
+ *
+ * @author Min Cai
+ */
 public enum CacheControllerEventType {
+    /**
+     *
+     */
     LOAD,
+    /**
+     *
+     */
     STORE,
+    /**
+     *
+     */
     REPLACEMENT,
+    /**
+     *
+     */
     FORWARD_GETS,
+    /**
+     *
+     */
     FORWARD_GETM,
+    /**
+     *
+     */
     INVALIDATION,
+    /**
+     *
+     */
     RECALL,
+    /**
+     *
+     */
     PUT_ACKNOWLEDGEMENT,
+    /**
+     *
+     */
     DATA_FROM_DIRECTORY_ACKNOWLEDGEMENTS_EQUAL_0,
+    /**
+     *
+     */
     DATA_FROM_DIRECTORY_ACKNOWLEDGEMENTS_GREATER_THAN_0,
+    /**
+     *
+     */
     DATA_FROM_OWNER,
+    /**
+     *
+     */
     INVALIDATION_ACKNOWLEDGEMENT,
+    /**
+     *
+     */
     LAST_INVALIDATION_ACKNOWLEDGEMENT
 }

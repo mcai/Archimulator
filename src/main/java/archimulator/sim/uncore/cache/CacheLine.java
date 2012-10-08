@@ -24,6 +24,11 @@ import net.pickapack.util.ValueProvider;
 
 import java.io.Serializable;
 
+/**
+ *
+ * @author Min Cai
+ * @param <StateT>
+ */
 public class CacheLine<StateT extends Serializable> extends Params {
     private Cache<StateT> cache;
     private int set;
@@ -33,6 +38,13 @@ public class CacheLine<StateT extends Serializable> extends Params {
     private MemoryHierarchyAccess access;
     private ValueProvider<StateT> stateProvider;
 
+    /**
+     *
+     * @param cache
+     * @param set
+     * @param way
+     * @param stateProvider
+     */
     public CacheLine(Cache<StateT> cache, int set, int way, ValueProvider<StateT> stateProvider) {
         this.cache = cache;
         this.set = set;
@@ -42,30 +54,58 @@ public class CacheLine<StateT extends Serializable> extends Params {
         this.tag = -1;
     }
 
+    /**
+     *
+     * @return
+     */
     public Cache<StateT> getCache() {
         return cache;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getSet() {
         return set;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getWay() {
         return way;
     }
 
+    /**
+     *
+     * @return
+     */
     public ValueProvider<StateT> getStateProvider() {
         return stateProvider;
     }
 
+    /**
+     *
+     * @return
+     */
     public StateT getInitialState() {
         return getStateProvider().getInitialValue();
     }
 
+    /**
+     *
+     * @return
+     */
     public int getTag() {
         return tag;
     }
 
+    /**
+     *
+     * @param tag
+     */
     public void setTag(int tag) {
         if (tag != INVALID_TAG) {
             for (CacheLine<StateT> line : this.cache.getLines(this.set)) {
@@ -84,18 +124,34 @@ public class CacheLine<StateT extends Serializable> extends Params {
         this.tag = tag;
     }
 
+    /**
+     *
+     * @return
+     */
     public MemoryHierarchyAccess getAccess() {
         return access;
     }
 
+    /**
+     *
+     * @param access
+     */
     public void setAccess(MemoryHierarchyAccess access) {
         this.access = access;
     }
 
+    /**
+     *
+     * @return
+     */
     public StateT getState() {
         return getStateProvider().get();
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isValid() {
         return this.getState() != this.getInitialState();
     }
@@ -105,5 +161,8 @@ public class CacheLine<StateT extends Serializable> extends Params {
         return String.format("%s [%d,%d] {%s} %s", getCache().getName(), getSet(), getWay(), getState(), tag == INVALID_TAG ? "N/A" : String.format("0x%08x", tag));
     }
 
+    /**
+     *
+     */
     public static final int INVALID_TAG = -1;
 }

@@ -24,14 +24,25 @@ import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class ExperimentPackVariableArrayListJsonSerializableType extends JsonSerializableType<ArrayList<ContextMapping>> {
     private static final ExperimentPackVariableArrayListJsonSerializableType singleTon = new ExperimentPackVariableArrayListJsonSerializableType();
 
+    /**
+     *
+     */
     public ExperimentPackVariableArrayListJsonSerializableType() {
         super(new TypeToken<ArrayList<ExperimentPackVariable>>() {
         }.getType());
     }
 
+    /**
+     *
+     * @return
+     */
     public static ExperimentPackVariableArrayListJsonSerializableType getSingleton() {
         return singleTon;
     }

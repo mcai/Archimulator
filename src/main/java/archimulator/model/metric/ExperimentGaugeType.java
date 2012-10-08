@@ -18,14 +18,45 @@
  ******************************************************************************/
 package archimulator.model.metric;
 
+/**
+ *
+ * @author Min Cai
+ */
 public enum ExperimentGaugeType {
+    /**
+     *
+     */
     RUNTIME,
+    /**
+     *
+     */
     SIMULATION,
+    /**
+     *
+     */
     MAIN_MEMORY,
+    /**
+     *
+     */
     CORE,
+    /**
+     *
+     */
     THREAD,
+    /**
+     *
+     */
     TLB,
+    /**
+     *
+     */
     CACHE_CONTROLLER,
+    /**
+     *
+     */
     MEMORY_CONTROLLER,
+    /**
+     *
+     */
     EXTENDED
 }

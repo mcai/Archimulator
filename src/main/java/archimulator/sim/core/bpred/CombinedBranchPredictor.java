@@ -24,11 +24,20 @@ import archimulator.sim.isa.StaticInstructionType;
 import net.pickapack.Reference;
 import net.pickapack.math.SaturatingCounter;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class CombinedBranchPredictor extends DynamicBranchPredictor {
     private TwoBitBranchPredictor bimod;
     private TwoBitBranchPredictor meta;
     private TwoLevelBranchPredictor twoLevel;
 
+    /**
+     *
+     * @param thread
+     * @param name
+     */
     public CombinedBranchPredictor(Thread thread, String name) {
         super(thread, name, BranchPredictorType.COMBINED, thread.getExperiment().getArchitecture().getCombinedBranchPredictorBranchTargetBufferNumSets(), thread.getExperiment().getArchitecture().getCombinedBranchPredictorBranchTargetBufferAssociativity(), thread.getExperiment().getArchitecture().getCombinedBranchPredictorReturnAddressStackSize());
 
@@ -37,6 +46,15 @@ public class CombinedBranchPredictor extends DynamicBranchPredictor {
         this.twoLevel = new TwoLevelBranchPredictor(thread, name + ".twoLevel", thread.getExperiment().getArchitecture().getCombinedBranchPredictorL1Size(), thread.getExperiment().getArchitecture().getCombinedBranchPredictorL2Size(), thread.getExperiment().getArchitecture().getCombinedBranchPredictorShiftWidth(), thread.getExperiment().getArchitecture().getCombinedBranchPredictorXor(), 0, 0, 0);
     }
 
+    /**
+     *
+     * @param branchAddress
+     * @param branchTarget
+     * @param mnemonic
+     * @param branchPredictorUpdate
+     * @param returnAddressStackRecoverIndex
+     * @return
+     */
     @Override
     public int predict(int branchAddress, int branchTarget, Mnemonic mnemonic, BranchPredictorUpdate branchPredictorUpdate, Reference<Integer> returnAddressStackRecoverIndex) {
         if (mnemonic.getType() == StaticInstructionType.CONDITIONAL) {
@@ -82,6 +100,16 @@ public class CombinedBranchPredictor extends DynamicBranchPredictor {
         return branchTargetBufferEntry != null ? branchTargetBufferEntry.getTarget() : 1;
     }
 
+    /**
+     *
+     * @param branchAddress
+     * @param branchTarget
+     * @param taken
+     * @param predictedTaken
+     * @param correct
+     * @param mnemonic
+     * @param branchPredictorUpdate
+     */
     @Override
     public void update(int branchAddress, int branchTarget, boolean taken, boolean predictedTaken, boolean correct, Mnemonic mnemonic, BranchPredictorUpdate branchPredictorUpdate) {
         super.update(branchAddress, branchTarget, taken, predictedTaken, correct, mnemonic, branchPredictorUpdate);
@@ -106,14 +134,26 @@ public class CombinedBranchPredictor extends DynamicBranchPredictor {
         this.getBranchTargetBuffer().update(branchAddress, branchTarget, taken);
     }
 
+    /**
+     *
+     * @return
+     */
     public TwoBitBranchPredictor getBimod() {
         return bimod;
     }
 
+    /**
+     *
+     * @return
+     */
     public TwoBitBranchPredictor getMeta() {
         return meta;
     }
 
+    /**
+     *
+     * @return
+     */
     public TwoLevelBranchPredictor getTwoLevel() {
         return twoLevel;
     }

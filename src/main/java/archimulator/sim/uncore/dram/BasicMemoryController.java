@@ -25,11 +25,19 @@ import net.pickapack.math.Counter;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class BasicMemoryController extends MemoryController {
     private int rowBits;
     private List<Bank> banks;
     private int previousBank = 0;
 
+    /**
+     *
+     * @param cacheHierarchy
+     */
     public BasicMemoryController(CacheHierarchy cacheHierarchy) {
         super(cacheHierarchy);
 
@@ -49,6 +57,11 @@ public class BasicMemoryController extends MemoryController {
         }
     }
 
+    /**
+     *
+     * @param address
+     * @param onCompletedCallback
+     */
     @Override
     protected void access(int address, final Action onCompletedCallback) {
         final Counter counterPending = new Counter(0);
@@ -99,34 +112,66 @@ public class BasicMemoryController extends MemoryController {
         previousBank = targetBank;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getToDramLatency() {
         return getExperiment().getArchitecture().getBasicMemoryControllerToDramLatency();
     }
 
+    /**
+     *
+     * @return
+     */
     public int getFromDramLatency() {
         return getExperiment().getArchitecture().getBasicMemoryControllerFromDramLatency();
     }
 
+    /**
+     *
+     * @return
+     */
     public int getPrechargeLatency() {
         return getExperiment().getArchitecture().getBasicMemoryControllerPrechargeLatency();
     }
 
+    /**
+     *
+     * @return
+     */
     public int getClosedLatency() {
         return getExperiment().getArchitecture().getBasicMemoryControllerClosedLatency();
     }
 
+    /**
+     *
+     * @return
+     */
     public int getConflictLatency() {
         return getExperiment().getArchitecture().getBasicMemoryControllerConflictLatency();
     }
 
+    /**
+     *
+     * @return
+     */
     public int getBusWidth() {
         return getExperiment().getArchitecture().getBasicMemoryControllerBusWidth();
     }
 
+    /**
+     *
+     * @return
+     */
     public int getNumBanks() {
         return getExperiment().getArchitecture().getBasicMemoryControllerNumBanks();
     }
 
+    /**
+     *
+     * @return
+     */
     public int getRowSize() {
         return getExperiment().getArchitecture().getBasicMemoryControllerRowSize();
     }

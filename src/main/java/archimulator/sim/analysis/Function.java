@@ -23,6 +23,10 @@ import archimulator.sim.os.elf.Symbol;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class Function implements Comparable<Function> {
     private Program program;
     private String sectionName;
@@ -31,6 +35,12 @@ public class Function implements Comparable<Function> {
     private int numInstructions;
     private List<BasicBlock> basicBlocks;
 
+    /**
+     *
+     * @param program
+     * @param sectionName
+     * @param symbol
+     */
     public Function(Program program, String sectionName, Symbol symbol) {
         this.program = program;
         this.sectionName = sectionName;
@@ -38,26 +48,50 @@ public class Function implements Comparable<Function> {
         this.basicBlocks = new ArrayList<BasicBlock>();
     }
 
+    /**
+     *
+     * @return
+     */
     public Program getProgram() {
         return program;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getSectionName() {
         return sectionName;
     }
 
+    /**
+     *
+     * @return
+     */
     public Symbol getSymbol() {
         return symbol;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getNumInstructions() {
         return numInstructions;
     }
 
+    /**
+     *
+     * @param numInstructions
+     */
     public void setNumInstructions(int numInstructions) {
         this.numInstructions = numInstructions;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<BasicBlock> getBasicBlocks() {
         return basicBlocks;
     }

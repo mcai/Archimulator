@@ -21,7 +21,15 @@ package archimulator.service;
 import archimulator.service.impl.*;
 import archimulator.util.PropertiesHelper;
 
+/**
+ * Helper class for retrieving services.
+ *
+ * @author Min Cai
+ */
 public class ServiceManager {
+    /**
+     *  To be used in benchmark arguments injection.
+     */
     public static final String USER_HOME_TEMPLATE_ARG = "<user.home>";
 
     private static BenchmarkService benchmarkService;
@@ -38,37 +46,70 @@ public class ServiceManager {
         userService = new UserServiceImpl();
         systemSettingService = new SystemSettingServiceImpl();
         experimentMetricService = new ExperimentMetricServiceImpl();
-    }
 
-    public static BenchmarkService getBenchmarkService() {
-        return benchmarkService;
-    }
-
-    public static ArchitectureService getArchitectureService() {
-        return architectureService;
-    }
-
-    public static ExperimentService getExperimentService() {
-        return experimentService;
-    }
-
-    public static UserService getUserService() {
-        return userService;
-    }
-
-    public static SystemSettingService getSystemSettingService() {
-        return systemSettingService;
-    }
-
-    public static ExperimentMetricService getExperimentMetricService() {
-        return experimentMetricService;
-    }
-
-    static {
         System.out.println("Archimulator (version: " + PropertiesHelper.getVersion() + ") - CMP Architectural Simulator Written in Java.\n");
         System.out.println("Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).\n");
     }
 
+    /**
+     * Return the benchmark service singleton.
+     *
+     * @return benchmark service singleton
+     */
+    public static BenchmarkService getBenchmarkService() {
+        return benchmarkService;
+    }
+
+    /**
+     * Return the architecture service singleton.
+     *
+     * @return architecture service singleton
+     */
+    public static ArchitectureService getArchitectureService() {
+        return architectureService;
+    }
+
+    /**
+     * Return the experiment service singleton.
+     *
+     * @return experiment service singleton
+     */
+    public static ExperimentService getExperimentService() {
+        return experimentService;
+    }
+
+    /**
+     * Return the user service singleton.
+     *
+     * @return user service singleton
+     */
+    public static UserService getUserService() {
+        return userService;
+    }
+
+    /**
+     * Return the system setting service singleton.
+     *
+     * @return system setting service singleton
+     */
+    public static SystemSettingService getSystemSettingService() {
+        return systemSettingService;
+    }
+
+    /**
+     * Return the experiment metric service singleton.
+     *
+     * @return experiment metric service singleton
+     */
+    public static ExperimentMetricService getExperimentMetricService() {
+        return experimentMetricService;
+    }
+
+    /**
+     * Return the database url to be used among archimulator services.
+     *
+     * @return database url
+     */
     public static String getDatabaseUrl() {
         return "jdbc:mysql://" +
                 PropertiesHelper.getProperties().getProperty("archimulator.database.host") +

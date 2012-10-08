@@ -18,19 +18,36 @@
  ******************************************************************************/
 package archimulator.sim.os;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class FunctionCallContext {
     private int pc;
     private int targetPc;
 
+    /**
+     *
+     * @param pc
+     * @param targetPc
+     */
     public FunctionCallContext(int pc, int targetPc) {
         this.pc = pc;
         this.targetPc = targetPc;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getPc() {
         return pc;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getTargetPc() {
         return targetPc;
     }

@@ -21,20 +21,56 @@ package archimulator.sim.uncore;
 import archimulator.sim.common.SimulationObject;
 import archimulator.sim.uncore.tlb.TranslationLookasideBuffer;
 
+/**
+ *
+ * @author Min Cai
+ */
 public interface MemoryHierarchyThread extends SimulationObject {
+    /**
+     *
+     * @return
+     */
     int getNum();
 
+    /**
+     *
+     * @return
+     */
     int getId();
 
+    /**
+     *
+     * @return
+     */
     String getName();
 
+    /**
+     *
+     * @return
+     */
     TranslationLookasideBuffer getItlb();
 
+    /**
+     *
+     * @param itlb
+     */
     void setItlb(TranslationLookasideBuffer itlb);
 
+    /**
+     *
+     * @return
+     */
     TranslationLookasideBuffer getDtlb();
 
+    /**
+     *
+     * @param dtlb
+     */
     void setDtlb(TranslationLookasideBuffer dtlb);
 
+    /**
+     *
+     * @return
+     */
     MemoryHierarchyCore getCore();
 }

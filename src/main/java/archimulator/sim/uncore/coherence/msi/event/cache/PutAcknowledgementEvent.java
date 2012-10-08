@@ -22,7 +22,18 @@ import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class PutAcknowledgementEvent extends CacheControllerEvent {
+    /**
+     *
+     * @param generator
+     * @param producerFlow
+     * @param tag
+     * @param access
+     */
     public PutAcknowledgementEvent(CacheController generator, CacheCoherenceFlow producerFlow, int tag, MemoryHierarchyAccess access) {
         super(generator, producerFlow, CacheControllerEventType.PUT_ACKNOWLEDGEMENT, access, tag);
     }

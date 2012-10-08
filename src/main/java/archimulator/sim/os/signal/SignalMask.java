@@ -22,9 +22,16 @@ import archimulator.sim.isa.Memory;
 import archimulator.sim.os.Kernel;
 import net.pickapack.math.MathHelper;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class SignalMask implements Cloneable {
     private int[] signals = new int[Kernel.MAX_SIGNAL / 32];
 
+    /**
+     *
+     */
     public SignalMask() {
     }
 
@@ -35,6 +42,10 @@ public class SignalMask implements Cloneable {
         return signalMask;
     }
 
+    /**
+     *
+     * @param signal
+     */
     public void set(int signal) {
         if (signal < 1 || signal > Kernel.MAX_SIGNAL) {
             return;
@@ -45,6 +56,10 @@ public class SignalMask implements Cloneable {
         this.signals[signal / 32] = MathHelper.setBit(this.signals[signal / 32], signal % 32);
     }
 
+    /**
+     *
+     * @param signal
+     */
     public void clear(int signal) {
         if (signal < 1 || signal > Kernel.MAX_SIGNAL) {
             return;
@@ -55,6 +70,11 @@ public class SignalMask implements Cloneable {
         this.signals[signal / 32] = MathHelper.clearBit(this.signals[signal / 32], signal % 32);
     }
 
+    /**
+     *
+     * @param signal
+     * @return
+     */
     public boolean contains(int signal) {
         if (signal < 1 || signal > Kernel.MAX_SIGNAL) {
             return false;
@@ -65,12 +85,22 @@ public class SignalMask implements Cloneable {
         return MathHelper.containsBit(this.signals[signal / 32], signal % 32);
     }
 
+    /**
+     *
+     * @param memory
+     * @param address
+     */
     public void loadFrom(Memory memory, int address) {
         for (int i = 0; i < Kernel.MAX_SIGNAL / 32; i++) {
             this.signals[i] = memory.readWord(address + i * 4);
         }
     }
 
+    /**
+     *
+     * @param memory
+     * @param address
+     */
     public void saveTo(Memory memory, int address) {
         for (int i = 0; i < Kernel.MAX_SIGNAL / 32; i++) {
             memory.writeWord(address + i * 4, this.signals[i]);

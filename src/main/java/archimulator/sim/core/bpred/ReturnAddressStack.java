@@ -21,11 +21,19 @@ package archimulator.sim.core.bpred;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class ReturnAddressStack {
     private int size;
     private int topOfStack;
     private List<BranchTargetBufferEntry> entries;
 
+    /**
+     *
+     * @param size
+     */
     public ReturnAddressStack(int size) {
         this.size = size;
 
@@ -37,25 +45,45 @@ public class ReturnAddressStack {
         this.topOfStack = this.size - 1;
     }
 
+    /**
+     *
+     * @param returnAddressStackRecoverIndex
+     */
     public void recover(int returnAddressStackRecoverIndex) {
         this.topOfStack = returnAddressStackRecoverIndex;
     }
 
+    /**
+     *
+     * @param branchAddress
+     */
     public void push(int branchAddress) {
         this.topOfStack = (this.topOfStack + 1) % this.size;
         this.entries.get(this.topOfStack).setTarget(branchAddress + 8);
     }
 
+    /**
+     *
+     * @return
+     */
     public int pop() {
         int target = this.entries.get(this.topOfStack).getTarget();
         this.topOfStack = (this.topOfStack + this.size - 1) % this.size;
         return target;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getSize() {
         return size;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getTopOfStack() {
         return this.size > 0 ? this.topOfStack : 0;
     }

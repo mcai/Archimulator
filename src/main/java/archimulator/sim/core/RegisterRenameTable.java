@@ -21,23 +21,45 @@ package archimulator.sim.core;
 import java.util.Map;
 import java.util.TreeMap;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class RegisterRenameTable {
     private String name;
     private Map<Integer, PhysicalRegisterFile.PhysicalRegister> entries;
 
+    /**
+     *
+     * @param name
+     */
     public RegisterRenameTable(String name) {
         this.name = name;
         this.entries = new TreeMap<Integer, PhysicalRegisterFile.PhysicalRegister>();
     }
 
+    /**
+     *
+     * @param dependency
+     * @return
+     */
     public PhysicalRegisterFile.PhysicalRegister get(int dependency) {
         return this.entries.get(dependency);
     }
 
+    /**
+     *
+     * @param dependency
+     * @param physicalRegister
+     */
     public void put(int dependency, PhysicalRegisterFile.PhysicalRegister physicalRegister) {
         this.entries.put(dependency, physicalRegister);
     }
 
+    /**
+     *
+     * @return
+     */
     public String getName() {
         return name;
     }

@@ -26,6 +26,10 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.*;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class Memory extends BasicSimulationObject {
     private int id;
     private boolean littleEndian;
@@ -42,6 +46,12 @@ public class Memory extends BasicSimulationObject {
     private boolean speculative;
     private Map<Integer, List<SpeculativeMemoryBlock>> speculativeMemoryBlocks;
 
+    /**
+     *
+     * @param kernel
+     * @param littleEndian
+     * @param processId
+     */
     public Memory(Kernel kernel, boolean littleEndian, int processId) {
         super(kernel);
 
@@ -59,36 +69,68 @@ public class Memory extends BasicSimulationObject {
         this.speculativeMemoryBlocks = new TreeMap<Integer, List<SpeculativeMemoryBlock>>();
     }
 
+    /**
+     *
+     * @param address
+     * @return
+     */
     public byte readByte(int address) {
         byte[] buffer = new byte[1];
         this.access(address, 1, buffer, false, true);
         return buffer[0];
     }
 
+    /**
+     *
+     * @param address
+     * @return
+     */
     public short readHalfWord(int address) {
         byte[] buffer = new byte[2];
         this.access(address, 2, buffer, false, true);
         return ByteBuffer.wrap(buffer).order(this.littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN).getShort();
     }
 
+    /**
+     *
+     * @param address
+     * @return
+     */
     public int readWord(int address) {
         byte[] buffer = new byte[4];
         this.access(address, 4, buffer, false, true);
         return ByteBuffer.wrap(buffer).order(this.littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN).getInt();
     }
 
+    /**
+     *
+     * @param address
+     * @return
+     */
     public long readDoubleWord(int address) {
         byte[] buffer = new byte[8];
         this.access(address, 8, buffer, false, true);
         return ByteBuffer.wrap(buffer).order(this.littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN).getLong();
     }
 
+    /**
+     *
+     * @param address
+     * @param size
+     * @return
+     */
     public byte[] readBlock(int address, int size) {
         byte[] buffer = new byte[size];
         this.access(address, size, buffer, false, true);
         return buffer;
     }
 
+    /**
+     *
+     * @param address
+     * @param size
+     * @return
+     */
     public String readString(int address, int size) {
         byte[] data = this.readBlock(address, size);
 
@@ -100,29 +142,55 @@ public class Memory extends BasicSimulationObject {
         return sb.toString();
     }
 
+    /**
+     *
+     * @param address
+     * @param data
+     */
     public void writeByte(int address, byte data) {
         byte[] buffer = new byte[]{data};
         this.access(address, 1, buffer, true, true);
     }
 
+    /**
+     *
+     * @param address
+     * @param data
+     */
     public void writeHalfWord(int address, short data) {
         byte[] buffer = new byte[2];
         ByteBuffer.wrap(buffer).order(this.littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN).putShort(data);
         this.access(address, 2, buffer, true, true);
     }
 
+    /**
+     *
+     * @param address
+     * @param data
+     */
     public void writeWord(int address, int data) {
         byte[] buffer = new byte[4];
         ByteBuffer.wrap(buffer).order(this.littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN).putInt(data);
         this.access(address, 4, buffer, true, true);
     }
 
+    /**
+     *
+     * @param address
+     * @param data
+     */
     public void writeDoubleWord(int address, long data) {
         byte[] buffer = new byte[8];
         ByteBuffer.wrap(buffer).order(this.littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN).putLong(data);
         this.access(address, 8, buffer, true, true);
     }
 
+    /**
+     *
+     * @param address
+     * @param data
+     * @return
+     */
     public int writeString(int address, String data) {
         byte[] buffer = (data + "\0").getBytes();
         int bytesCount = buffer.length;
@@ -130,14 +198,33 @@ public class Memory extends BasicSimulationObject {
         return bytesCount;
     }
 
+    /**
+     *
+     * @param address
+     * @param size
+     * @param data
+     */
     public void writeBlock(int address, int size, byte[] data) {
         this.access(address, size, data, true, true);
     }
 
+    /**
+     *
+     * @param address
+     * @param size
+     */
     public void zero(int address, int size) {
         this.writeBlock(address, size, new byte[size]);
     }
 
+    /**
+     *
+     * @param address
+     * @param size
+     * @param buffer
+     * @param write
+     * @param createNewPageIfNecessary
+     */
     public void access(int address, int size, byte[] buffer, boolean write, boolean createNewPageIfNecessary) {
         if (this.speculative) {
             this.doSpeculativeAccess(address, size, buffer, write);
@@ -186,10 +273,16 @@ public class Memory extends BasicSimulationObject {
         }
     }
 
+    /**
+     *
+     */
     public void enterSpeculativeState() {
         this.speculative = true;
     }
 
+    /**
+     *
+     */
     public void exitSpeculativeState() {
         this.speculativeMemoryBlocks.clear();
         this.speculative = false;
@@ -210,6 +303,12 @@ public class Memory extends BasicSimulationObject {
         }
     }
 
+    /**
+     *
+     * @param address
+     * @param size
+     * @return
+     */
     public int map(int address, int size) {
         int tagStart, tagEnd;
 
@@ -257,6 +356,11 @@ public class Memory extends BasicSimulationObject {
 //        }
 //    }
 
+    /**
+     *
+     * @param address
+     * @param size
+     */
     public void unmap(int address, int size) {
         int tagStart = getTag(address);
         int tagEnd = getTag(address + size - 1);
@@ -268,6 +372,13 @@ public class Memory extends BasicSimulationObject {
         }
     }
 
+    /**
+     *
+     * @param oldAddr
+     * @param oldSize
+     * @param newSize
+     * @return
+     */
     public int remap(int oldAddr, int oldSize, int newSize) {
         int start = this.map(0, newSize);
 
@@ -286,6 +397,11 @@ public class Memory extends BasicSimulationObject {
 //        }
     }
 
+    /**
+     *
+     * @param virtualAddress
+     * @return
+     */
     public int getPhysicalAddress(int virtualAddress) {
         return this.getPage(virtualAddress).physicalAddress + getDisplacement(virtualAddress);
     }
@@ -325,10 +441,23 @@ public class Memory extends BasicSimulationObject {
         }
     }
 
+    /**
+     *
+     * @param id
+     */
     protected void onPageCreated(int id) {
         this.byteBuffers.put(id, ByteBuffer.allocate(Memory.getPageSize()).order(isLittleEndian() ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN));
     }
 
+    /**
+     *
+     * @param pageId
+     * @param displacement
+     * @param buffer
+     * @param offset
+     * @param size
+     * @param write
+     */
     protected void doPageAccess(int pageId, int displacement, byte[] buffer, int offset, int size, boolean write) {
         ByteBuffer bb = getByteBuffer(pageId);
         bb.position(displacement);
@@ -340,30 +469,58 @@ public class Memory extends BasicSimulationObject {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public int getId() {
         return id;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isLittleEndian() {
         return littleEndian;
     }
 
+    /**
+     *
+     * @return
+     */
     public Kernel getKernel() {
         return kernel;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getProcessId() {
         return processId;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isSpeculative() {
         return speculative;
     }
 
+    /**
+     *
+     * @return
+     */
     public static CacheGeometry getGeometry() {
         return geometry;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getNumPages() {
         return numPages;
     }
@@ -404,6 +561,11 @@ public class Memory extends BasicSimulationObject {
 
     private static final CacheGeometry geometry = new CacheGeometry(-1, 1, 1 << 12);
 
+    /**
+     *
+     * @param address
+     * @return
+     */
     public static int getDisplacement(int address) {
         return CacheGeometry.getDisplacement(address, geometry);
     }
@@ -416,10 +578,18 @@ public class Memory extends BasicSimulationObject {
         return CacheGeometry.getLineId(address, geometry);
     }
 
+    /**
+     *
+     * @return
+     */
     public static int getPageSizeInLog2() {
         return geometry.getLineSizeInLog2();
     }
 
+    /**
+     *
+     * @return
+     */
     public static int getPageSize() {
         return geometry.getLineSize();
     }

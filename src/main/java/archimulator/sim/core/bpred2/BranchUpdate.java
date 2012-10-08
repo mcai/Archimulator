@@ -18,27 +18,50 @@
  ******************************************************************************/
 package archimulator.sim.core.bpred2;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class BranchUpdate {
     private boolean predictedDirection;
     private int predictedTarget;
 
+    /**
+     *
+     */
     public BranchUpdate() {
         this.predictedDirection = false;
         this.predictedTarget = 0;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isPredictedDirection() {
         return predictedDirection;
     }
 
+    /**
+     *
+     * @param predictedDirection
+     */
     public void setPredictedDirection(boolean predictedDirection) {
         this.predictedDirection = predictedDirection;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getPredictedTarget() {
         return predictedTarget;
     }
 
+    /**
+     *
+     * @param predictedTarget
+     */
     public void setPredictedTarget(int predictedTarget) {
         this.predictedTarget = predictedTarget;
     }

@@ -18,15 +18,49 @@
  ******************************************************************************/
 package archimulator.sim.os;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class TargetOpenFlags {
+    /**
+     *
+     */
     public static final int O_RDONLY = 0;
+    /**
+     *
+     */
     public static final int O_WRONLY = 1;
+    /**
+     *
+     */
     public static final int O_RDWR = 2;
+    /**
+     *
+     */
     public static final int O_CREAT = 0x100;
+    /**
+     *
+     */
     public static final int O_EXCL = 0x400;
+    /**
+     *
+     */
     public static final int O_NOCTTY = 0x800;
+    /**
+     *
+     */
     public static final int O_TRUNC = 0x200;
+    /**
+     *
+     */
     public static final int O_APPEND = 8;
+    /**
+     *
+     */
     public static final int O_NONBLOCK = 0x80;
+    /**
+     *
+     */
     public static final int O_SYNC = 0x10;
 }

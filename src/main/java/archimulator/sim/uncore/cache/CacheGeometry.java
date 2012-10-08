@@ -20,6 +20,10 @@
  */
 package archimulator.sim.uncore.cache;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class CacheGeometry {
     private int size;
     private int associativity;
@@ -30,6 +34,12 @@ public class CacheGeometry {
     private int numSetsInLog2;
     private int numLines;
 
+    /**
+     *
+     * @param size
+     * @param associativity
+     * @param lineSize
+     */
     public CacheGeometry(int size, int associativity, int lineSize) {
         this.size = size;
         this.associativity = associativity;
@@ -40,50 +50,108 @@ public class CacheGeometry {
         this.numLines = this.size / this.lineSize;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getSize() {
         return size;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getAssociativity() {
         return associativity;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getLineSize() {
         return lineSize;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getLineSizeInLog2() {
         return lineSizeInLog2;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getNumSets() {
         return numSets;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getNumSetsInLog2() {
         return numSetsInLog2;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getNumLines() {
         return numLines;
     }
 
+    /**
+     *
+     * @param address
+     * @param cacheGeometry
+     * @return
+     */
     public static int getDisplacement(int address, CacheGeometry cacheGeometry) {
         return address & (cacheGeometry.getLineSize() - 1);
     }
 
+    /**
+     *
+     * @param address
+     * @param cacheGeometry
+     * @return
+     */
     public static int getTag(int address, CacheGeometry cacheGeometry) {
         return address & ~(cacheGeometry.getLineSize() - 1);
     }
 
+    /**
+     *
+     * @param address
+     * @param cacheGeometry
+     * @return
+     */
     public static int getSet(int address, CacheGeometry cacheGeometry) {
         return getLineId(address, cacheGeometry) % cacheGeometry.getNumSets();
     }
 
+    /**
+     *
+     * @param address
+     * @param cacheGeometry
+     * @return
+     */
     public static int getLineId(int address, CacheGeometry cacheGeometry) {
         return (address >> cacheGeometry.getLineSizeInLog2());
     }
 
+    /**
+     *
+     * @param address
+     * @param cacheGeometry
+     * @return
+     */
     public static boolean isAligned(int address, CacheGeometry cacheGeometry) {
         return getDisplacement(address, cacheGeometry) == 0;
     }

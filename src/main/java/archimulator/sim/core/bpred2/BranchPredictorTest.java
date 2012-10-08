@@ -21,7 +21,15 @@ package archimulator.sim.core.bpred2;
 import net.pickapack.action.Action1;
 import net.pickapack.math.Counter;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class BranchPredictorTest {
+    /**
+     *
+     * @param args
+     */
     public static void main(String[] args) {
         final BranchPredictor2 branchPredictor = new MyBranchPredictor();
 

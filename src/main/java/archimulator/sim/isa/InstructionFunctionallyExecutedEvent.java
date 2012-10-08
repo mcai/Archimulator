@@ -21,11 +21,21 @@ package archimulator.sim.isa;
 import archimulator.sim.common.SimulationEvent;
 import archimulator.sim.os.Context;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class InstructionFunctionallyExecutedEvent extends SimulationEvent {
     private Context context;
     private int pc;
     private StaticInstruction staticInstruction;
 
+    /**
+     *
+     * @param context
+     * @param pc
+     * @param staticInstruction
+     */
     public InstructionFunctionallyExecutedEvent(Context context, int pc, StaticInstruction staticInstruction) {
         super(context);
         this.pc = pc;
@@ -33,14 +43,26 @@ public class InstructionFunctionallyExecutedEvent extends SimulationEvent {
         this.context = context;
     }
 
+    /**
+     *
+     * @return
+     */
     public Context getContext() {
         return context;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getPc() {
         return pc;
     }
 
+    /**
+     *
+     * @return
+     */
     public StaticInstruction getStaticInstruction() {
         return staticInstruction;
     }

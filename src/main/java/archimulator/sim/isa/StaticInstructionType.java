@@ -18,17 +18,57 @@
  ******************************************************************************/
 package archimulator.sim.isa;
 
+/**
+ *
+ * @author Min Cai
+ */
 public enum StaticInstructionType {
+    /**
+     *
+     */
     INTEGER_COMPUTATION,
+    /**
+     *
+     */
     FLOAT_COMPUTATION,
+    /**
+     *
+     */
     CONDITIONAL,
+    /**
+     *
+     */
     UNCONDITIONAL,
+    /**
+     *
+     */
     LOAD,
+    /**
+     *
+     */
     STORE,
+    /**
+     *
+     */
     FUNCTION_CALL,
+    /**
+     *
+     */
     FUNCTION_RETURN,
+    /**
+     *
+     */
     TRAP,
+    /**
+     *
+     */
     NOP,
+    /**
+     *
+     */
     UNIMPLEMENTED,
+    /**
+     *
+     */
     UNKNOWN
 }

@@ -25,6 +25,10 @@ import net.pickapack.model.ModelElement;
 
 import java.util.Date;
 
+/**
+ *
+ * @author Min Cai
+ */
 @DatabaseTable(tableName = "SystemSetting")
 public class SystemSetting implements ModelElement {
     @DatabaseField(generatedId = true)
@@ -39,35 +43,66 @@ public class SystemSetting implements ModelElement {
     @DatabaseField
     private boolean runningExperimentsEnabled;
 
+    /**
+     *
+     */
     public SystemSetting() {
     }
 
+    /**
+     *
+     * @param title
+     */
     public SystemSetting(String title) {
         this.title = title;
         this.createTime = DateHelper.toTick(new Date());
     }
 
+    /**
+     *
+     * @return
+     */
     public long getId() {
         return id;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public long getParentId() {
         return -1;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getTitle() {
         return title;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getCreateTime() {
         return createTime;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isRunningExperimentsEnabled() {
         return runningExperimentsEnabled;
     }
 
+    /**
+     *
+     * @param runningExperimentsEnabled
+     */
     public void setRunningExperimentsEnabled(boolean runningExperimentsEnabled) {
         this.runningExperimentsEnabled = runningExperimentsEnabled;
     }

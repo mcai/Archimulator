@@ -18,10 +18,29 @@
  ******************************************************************************/
 package archimulator.model;
 
+/**
+ *
+ * @author Min Cai
+ */
 public enum ExperimentState {
+    /**
+     *
+     */
     PENDING,
+    /**
+     *
+     */
     READY_TO_RUN,
+    /**
+     *
+     */
     RUNNING,
+    /**
+     *
+     */
     COMPLETED,
+    /**
+     *
+     */
     ABORTED
 }

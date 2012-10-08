@@ -21,11 +21,23 @@ package archimulator.sim.uncore.net;
 import archimulator.sim.uncore.CacheHierarchy;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class L1sToL2Net extends Net {
+    /**
+     *
+     * @param cacheHierarchy
+     */
     public L1sToL2Net(CacheHierarchy cacheHierarchy) {
         super(cacheHierarchy);
     }
 
+    /**
+     *
+     * @param cacheHierarchy
+     */
     @Override
     protected void setup(CacheHierarchy cacheHierarchy) {
         int l2CacheLineSize = 64;

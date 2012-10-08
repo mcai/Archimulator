@@ -30,6 +30,10 @@ import net.pickapack.util.StorageUnitHelper;
 
 import java.util.Date;
 
+/**
+ *
+ * @author Min Cai
+ */
 @DatabaseTable(tableName = "Architecture")
 public class Architecture implements ModelElement {
     @DatabaseField(generatedId = true)
@@ -251,9 +255,25 @@ public class Architecture implements ModelElement {
     @DatabaseField
     private int basicMemoryControllerRowSize;
 
+    /**
+     *
+     */
     public Architecture() {
     }
 
+    /**
+     *
+     * @param htLLCRequestProfilingEnabled
+     * @param numCores
+     * @param numThreadsPerCore
+     * @param l1ISize
+     * @param l1IAssoc
+     * @param l1DSize
+     * @param l1DAssoc
+     * @param l2Size
+     * @param l2Assoc
+     * @param l2ReplacementPolicyType
+     */
     public Architecture(boolean htLLCRequestProfilingEnabled, int numCores, int numThreadsPerCore, int l1ISize, int l1IAssoc, int l1DSize, int l1DAssoc, int l2Size, int l2Assoc, CacheReplacementPolicyType l2ReplacementPolicyType) {
         this.createTime = DateHelper.toTick(new Date());
 
@@ -343,6 +363,9 @@ public class Architecture implements ModelElement {
         this.basicMemoryControllerRowSize = 2048;
     }
 
+    /**
+     *
+     */
     public void updateTitle() {
         this.title = "C" + this.numCores + "T" + this.numThreadsPerCore
                 + "-" + "L1I_" + StorageUnit.toString(this.l1ISize).replaceAll(" ", "") + "_" + "Assoc" + this.l1IAssociativity
@@ -351,16 +374,28 @@ public class Architecture implements ModelElement {
                 + "_" + this.l2ReplacementPolicyType;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public long getId() {
         return id;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public long getParentId() {
         return -1;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getTitle() {
         if(title == null) {
             updateTitle();
@@ -369,602 +404,1202 @@ public class Architecture implements ModelElement {
         return title;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getCreateTime() {
         return createTime;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getCreateTimeAsString() {
         return DateHelper.toString(createTime);
     }
 
+    /**
+     *
+     * @return
+     */
     public int getHelperThreadPthreadSpawnIndex() {
         return helperThreadPthreadSpawnIndex;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean getHelperThreadL2CacheRequestProfilingEnabled() {
         return helperThreadL2CacheRequestProfilingEnabled;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getNumCores() {
         return numCores;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getNumThreadsPerCore() {
         return numThreadsPerCore;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getPhysicalRegisterFileCapacity() {
         return physicalRegisterFileCapacity;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getDecodeWidth() {
         return decodeWidth;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getIssueWidth() {
         return issueWidth;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getCommitWidth() {
         return commitWidth;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getDecodeBufferCapacity() {
         return decodeBufferCapacity;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getReorderBufferCapacity() {
         return reorderBufferCapacity;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getLoadStoreQueueCapacity() {
         return loadStoreQueueCapacity;
     }
 
+    /**
+     *
+     * @return
+     */
     public BranchPredictorType getBranchPredictorType() {
         return branchPredictorType;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getTwoBitBranchPredictorBimodSize() {
         return twoBitBranchPredictorBimodSize;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getTwoBitBranchPredictorBranchTargetBufferNumSets() {
         return twoBitBranchPredictorBranchTargetBufferNumSets;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getTwoBitBranchPredictorBranchTargetBufferAssociativity() {
         return twoBitBranchPredictorBranchTargetBufferAssociativity;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getTwoBitBranchPredictorReturnAddressStackSize() {
         return twoBitBranchPredictorReturnAddressStackSize;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getTwoLevelBranchPredictorL1Size() {
         return twoLevelBranchPredictorL1Size;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getTwoLevelBranchPredictorL2Size() {
         return twoLevelBranchPredictorL2Size;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getTwoLevelBranchPredictorShiftWidth() {
         return twoLevelBranchPredictorShiftWidth;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean getTwoLevelBranchPredictorXor() {
         return twoLevelBranchPredictorXor;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getTwoLevelBranchPredictorBranchTargetBufferNumSets() {
         return twoLevelBranchPredictorBranchTargetBufferNumSets;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getTwoLevelBranchPredictorBranchTargetBufferAssociativity() {
         return twoLevelBranchPredictorBranchTargetBufferAssociativity;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getTwoLevelBranchPredictorReturnAddressStackSize() {
         return twoLevelBranchPredictorReturnAddressStackSize;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getCombinedBranchPredictorBimodSize() {
         return combinedBranchPredictorBimodSize;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getCombinedBranchPredictorL1Size() {
         return combinedBranchPredictorL1Size;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getCombinedBranchPredictorL2Size() {
         return combinedBranchPredictorL2Size;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getCombinedBranchPredictorMetaSize() {
         return combinedBranchPredictorMetaSize;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getCombinedBranchPredictorShiftWidth() {
         return combinedBranchPredictorShiftWidth;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean getCombinedBranchPredictorXor() {
         return combinedBranchPredictorXor;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getCombinedBranchPredictorBranchTargetBufferNumSets() {
         return combinedBranchPredictorBranchTargetBufferNumSets;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getCombinedBranchPredictorBranchTargetBufferAssociativity() {
         return combinedBranchPredictorBranchTargetBufferAssociativity;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getCombinedBranchPredictorReturnAddressStackSize() {
         return combinedBranchPredictorReturnAddressStackSize;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getTlbSize() {
         return tlbSize;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getTlbAssociativity() {
         return tlbAssociativity;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getTlbLineSize() {
         return tlbLineSize;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getTlbHitLatency() {
         return tlbHitLatency;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getTlbMissLatency() {
         return tlbMissLatency;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getL1ISize() {
         return l1ISize;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getL1IAssociativity() {
         return l1IAssociativity;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getL1ILineSize() {
         return l1ILineSize;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getL1IHitLatency() {
         return l1IHitLatency;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getL1INumReadPorts() {
         return l1INumReadPorts;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getL1INumWritePorts() {
         return l1INumWritePorts;
     }
 
+    /**
+     *
+     * @return
+     */
     public CacheReplacementPolicyType getL1IReplacementPolicyType() {
         return l1IReplacementPolicyType;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getL1DSize() {
         return l1DSize;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getL1DAssociativity() {
         return l1DAssociativity;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getL1DLineSize() {
         return l1DLineSize;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getL1DHitLatency() {
         return l1DHitLatency;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getL1DNumReadPorts() {
         return l1DNumReadPorts;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getL1DNumWritePorts() {
         return l1DNumWritePorts;
     }
 
+    /**
+     *
+     * @return
+     */
     public CacheReplacementPolicyType getL1DReplacementPolicyType() {
         return l1DReplacementPolicyType;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getL2Size() {
         return l2Size;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getL2Associativity() {
         return l2Associativity;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getL2LineSize() {
         return l2LineSize;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getL2HitLatency() {
         return l2HitLatency;
     }
 
+    /**
+     *
+     * @return
+     */
     public CacheReplacementPolicyType getL2ReplacementPolicyType() {
         return l2ReplacementPolicyType;
     }
 
+    /**
+     *
+     * @return
+     */
     public MemoryControllerType getMemoryControllerType() {
         return memoryControllerType;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getMemoryControllerLineSize() {
         return memoryControllerLineSize;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getFixedLatencyMemoryControllerLatency() {
         return fixedLatencyMemoryControllerLatency;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getSimpleMemoryControllerMemoryLatency() {
         return simpleMemoryControllerMemoryLatency;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getSimpleMemoryControllerBusWidth() {
         return simpleMemoryControllerBusWidth;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getBasicMemoryControllerToDramLatency() {
         return basicMemoryControllerToDramLatency;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getBasicMemoryControllerFromDramLatency() {
         return basicMemoryControllerFromDramLatency;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getBasicMemoryControllerPrechargeLatency() {
         return basicMemoryControllerPrechargeLatency;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getBasicMemoryControllerClosedLatency() {
         return basicMemoryControllerClosedLatency;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getBasicMemoryControllerConflictLatency() {
         return basicMemoryControllerConflictLatency;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getBasicMemoryControllerBusWidth() {
         return basicMemoryControllerBusWidth;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getBasicMemoryControllerNumBanks() {
         return basicMemoryControllerNumBanks;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getBasicMemoryControllerRowSize() {
         return basicMemoryControllerRowSize;
     }
 
+    /**
+     *
+     * @param helperThreadPthreadSpawnIndex
+     */
     public void setHelperThreadPthreadSpawnIndex(int helperThreadPthreadSpawnIndex) {
         this.helperThreadPthreadSpawnIndex = helperThreadPthreadSpawnIndex;
     }
 
+    /**
+     *
+     * @param helperThreadL2CacheRequestProfilingEnabled
+     */
     public void setHelperThreadL2CacheRequestProfilingEnabled(boolean helperThreadL2CacheRequestProfilingEnabled) {
         this.helperThreadL2CacheRequestProfilingEnabled = helperThreadL2CacheRequestProfilingEnabled;
     }
 
+    /**
+     *
+     * @param numCores
+     */
     public void setNumCores(int numCores) {
         this.numCores = numCores;
     }
 
+    /**
+     *
+     * @param numThreadsPerCore
+     */
     public void setNumThreadsPerCore(int numThreadsPerCore) {
         this.numThreadsPerCore = numThreadsPerCore;
     }
 
+    /**
+     *
+     * @param physicalRegisterFileCapacity
+     */
     public void setPhysicalRegisterFileCapacity(int physicalRegisterFileCapacity) {
         this.physicalRegisterFileCapacity = physicalRegisterFileCapacity;
     }
 
+    /**
+     *
+     * @param decodeWidth
+     */
     public void setDecodeWidth(int decodeWidth) {
         this.decodeWidth = decodeWidth;
     }
 
+    /**
+     *
+     * @param issueWidth
+     */
     public void setIssueWidth(int issueWidth) {
         this.issueWidth = issueWidth;
     }
 
+    /**
+     *
+     * @param commitWidth
+     */
     public void setCommitWidth(int commitWidth) {
         this.commitWidth = commitWidth;
     }
 
+    /**
+     *
+     * @param decodeBufferCapacity
+     */
     public void setDecodeBufferCapacity(int decodeBufferCapacity) {
         this.decodeBufferCapacity = decodeBufferCapacity;
     }
 
+    /**
+     *
+     * @param reorderBufferCapacity
+     */
     public void setReorderBufferCapacity(int reorderBufferCapacity) {
         this.reorderBufferCapacity = reorderBufferCapacity;
     }
 
+    /**
+     *
+     * @param loadStoreQueueCapacity
+     */
     public void setLoadStoreQueueCapacity(int loadStoreQueueCapacity) {
         this.loadStoreQueueCapacity = loadStoreQueueCapacity;
     }
 
+    /**
+     *
+     * @param branchPredictorType
+     */
     public void setBranchPredictorType(BranchPredictorType branchPredictorType) {
         this.branchPredictorType = branchPredictorType;
     }
 
+    /**
+     *
+     * @param twoBitBranchPredictorBimodSize
+     */
     public void setTwoBitBranchPredictorBimodSize(int twoBitBranchPredictorBimodSize) {
         this.twoBitBranchPredictorBimodSize = twoBitBranchPredictorBimodSize;
     }
 
+    /**
+     *
+     * @param twoBitBranchPredictorBranchTargetBufferNumSets
+     */
     public void setTwoBitBranchPredictorBranchTargetBufferNumSets(int twoBitBranchPredictorBranchTargetBufferNumSets) {
         this.twoBitBranchPredictorBranchTargetBufferNumSets = twoBitBranchPredictorBranchTargetBufferNumSets;
     }
 
+    /**
+     *
+     * @param twoBitBranchPredictorBranchTargetBufferAssociativity
+     */
     public void setTwoBitBranchPredictorBranchTargetBufferAssociativity(int twoBitBranchPredictorBranchTargetBufferAssociativity) {
         this.twoBitBranchPredictorBranchTargetBufferAssociativity = twoBitBranchPredictorBranchTargetBufferAssociativity;
     }
 
+    /**
+     *
+     * @param twoBitBranchPredictorReturnAddressStackSize
+     */
     public void setTwoBitBranchPredictorReturnAddressStackSize(int twoBitBranchPredictorReturnAddressStackSize) {
         this.twoBitBranchPredictorReturnAddressStackSize = twoBitBranchPredictorReturnAddressStackSize;
     }
 
+    /**
+     *
+     * @param twoLevelBranchPredictorL1Size
+     */
     public void setTwoLevelBranchPredictorL1Size(int twoLevelBranchPredictorL1Size) {
         this.twoLevelBranchPredictorL1Size = twoLevelBranchPredictorL1Size;
     }
 
+    /**
+     *
+     * @param twoLevelBranchPredictorL2Size
+     */
     public void setTwoLevelBranchPredictorL2Size(int twoLevelBranchPredictorL2Size) {
         this.twoLevelBranchPredictorL2Size = twoLevelBranchPredictorL2Size;
     }
 
+    /**
+     *
+     * @param twoLevelBranchPredictorShiftWidth
+     */
     public void setTwoLevelBranchPredictorShiftWidth(int twoLevelBranchPredictorShiftWidth) {
         this.twoLevelBranchPredictorShiftWidth = twoLevelBranchPredictorShiftWidth;
     }
 
+    /**
+     *
+     * @param twoLevelBranchPredictorXor
+     */
     public void setTwoLevelBranchPredictorXor(boolean twoLevelBranchPredictorXor) {
         this.twoLevelBranchPredictorXor = twoLevelBranchPredictorXor;
     }
 
+    /**
+     *
+     * @param twoLevelBranchPredictorBranchTargetBufferNumSets
+     */
     public void setTwoLevelBranchPredictorBranchTargetBufferNumSets(int twoLevelBranchPredictorBranchTargetBufferNumSets) {
         this.twoLevelBranchPredictorBranchTargetBufferNumSets = twoLevelBranchPredictorBranchTargetBufferNumSets;
     }
 
+    /**
+     *
+     * @param twoLevelBranchPredictorBranchTargetBufferAssociativity
+     */
     public void setTwoLevelBranchPredictorBranchTargetBufferAssociativity(int twoLevelBranchPredictorBranchTargetBufferAssociativity) {
         this.twoLevelBranchPredictorBranchTargetBufferAssociativity = twoLevelBranchPredictorBranchTargetBufferAssociativity;
     }
 
+    /**
+     *
+     * @param twoLevelBranchPredictorReturnAddressStackSize
+     */
     public void setTwoLevelBranchPredictorReturnAddressStackSize(int twoLevelBranchPredictorReturnAddressStackSize) {
         this.twoLevelBranchPredictorReturnAddressStackSize = twoLevelBranchPredictorReturnAddressStackSize;
     }
 
+    /**
+     *
+     * @param combinedBranchPredictorBimodSize
+     */
     public void setCombinedBranchPredictorBimodSize(int combinedBranchPredictorBimodSize) {
         this.combinedBranchPredictorBimodSize = combinedBranchPredictorBimodSize;
     }
 
+    /**
+     *
+     * @param combinedBranchPredictorL1Size
+     */
     public void setCombinedBranchPredictorL1Size(int combinedBranchPredictorL1Size) {
         this.combinedBranchPredictorL1Size = combinedBranchPredictorL1Size;
     }
 
+    /**
+     *
+     * @param combinedBranchPredictorL2Size
+     */
     public void setCombinedBranchPredictorL2Size(int combinedBranchPredictorL2Size) {
         this.combinedBranchPredictorL2Size = combinedBranchPredictorL2Size;
     }
 
+    /**
+     *
+     * @param combinedBranchPredictorMetaSize
+     */
     public void setCombinedBranchPredictorMetaSize(int combinedBranchPredictorMetaSize) {
         this.combinedBranchPredictorMetaSize = combinedBranchPredictorMetaSize;
     }
 
+    /**
+     *
+     * @param combinedBranchPredictorShiftWidth
+     */
     public void setCombinedBranchPredictorShiftWidth(int combinedBranchPredictorShiftWidth) {
         this.combinedBranchPredictorShiftWidth = combinedBranchPredictorShiftWidth;
     }
 
+    /**
+     *
+     * @param combinedBranchPredictorXor
+     */
     public void setCombinedBranchPredictorXor(boolean combinedBranchPredictorXor) {
         this.combinedBranchPredictorXor = combinedBranchPredictorXor;
     }
 
+    /**
+     *
+     * @param combinedBranchPredictorBranchTargetBufferNumSets
+     */
     public void setCombinedBranchPredictorBranchTargetBufferNumSets(int combinedBranchPredictorBranchTargetBufferNumSets) {
         this.combinedBranchPredictorBranchTargetBufferNumSets = combinedBranchPredictorBranchTargetBufferNumSets;
     }
 
+    /**
+     *
+     * @param combinedBranchPredictorBranchTargetBufferAssociativity
+     */
     public void setCombinedBranchPredictorBranchTargetBufferAssociativity(int combinedBranchPredictorBranchTargetBufferAssociativity) {
         this.combinedBranchPredictorBranchTargetBufferAssociativity = combinedBranchPredictorBranchTargetBufferAssociativity;
     }
 
+    /**
+     *
+     * @param combinedBranchPredictorReturnAddressStackSize
+     */
     public void setCombinedBranchPredictorReturnAddressStackSize(int combinedBranchPredictorReturnAddressStackSize) {
         this.combinedBranchPredictorReturnAddressStackSize = combinedBranchPredictorReturnAddressStackSize;
     }
 
+    /**
+     *
+     * @param tlbSize
+     */
     public void setTlbSize(int tlbSize) {
         this.tlbSize = tlbSize;
     }
 
+    /**
+     *
+     * @param tlbAssociativity
+     */
     public void setTlbAssociativity(int tlbAssociativity) {
         this.tlbAssociativity = tlbAssociativity;
     }
 
+    /**
+     *
+     * @param tlbLineSize
+     */
     public void setTlbLineSize(int tlbLineSize) {
         this.tlbLineSize = tlbLineSize;
     }
 
+    /**
+     *
+     * @param tlbHitLatency
+     */
     public void setTlbHitLatency(int tlbHitLatency) {
         this.tlbHitLatency = tlbHitLatency;
     }
 
+    /**
+     *
+     * @param tlbMissLatency
+     */
     public void setTlbMissLatency(int tlbMissLatency) {
         this.tlbMissLatency = tlbMissLatency;
     }
 
+    /**
+     *
+     * @param l1ISize
+     */
     public void setL1ISize(int l1ISize) {
         this.l1ISize = l1ISize;
     }
 
+    /**
+     *
+     * @param l1IAssociativity
+     */
     public void setL1IAssociativity(int l1IAssociativity) {
         this.l1IAssociativity = l1IAssociativity;
     }
 
+    /**
+     *
+     * @param l1ILineSize
+     */
     public void setL1ILineSize(int l1ILineSize) {
         this.l1ILineSize = l1ILineSize;
     }
 
+    /**
+     *
+     * @param l1IHitLatency
+     */
     public void setL1IHitLatency(int l1IHitLatency) {
         this.l1IHitLatency = l1IHitLatency;
     }
 
+    /**
+     *
+     * @param l1INumReadPorts
+     */
     public void setL1INumReadPorts(int l1INumReadPorts) {
         this.l1INumReadPorts = l1INumReadPorts;
     }
 
+    /**
+     *
+     * @param l1INumWritePorts
+     */
     public void setL1INumWritePorts(int l1INumWritePorts) {
         this.l1INumWritePorts = l1INumWritePorts;
     }
 
+    /**
+     *
+     * @param l1IReplacementPolicyType
+     */
     public void setL1IReplacementPolicyType(CacheReplacementPolicyType l1IReplacementPolicyType) {
         this.l1IReplacementPolicyType = l1IReplacementPolicyType;
     }
 
+    /**
+     *
+     * @param l1DSize
+     */
     public void setL1DSize(int l1DSize) {
         this.l1DSize = l1DSize;
     }
 
+    /**
+     *
+     * @param l1DAssociativity
+     */
     public void setL1DAssociativity(int l1DAssociativity) {
         this.l1DAssociativity = l1DAssociativity;
     }
 
+    /**
+     *
+     * @param l1DLineSize
+     */
     public void setL1DLineSize(int l1DLineSize) {
         this.l1DLineSize = l1DLineSize;
     }
 
+    /**
+     *
+     * @param l1DHitLatency
+     */
     public void setL1DHitLatency(int l1DHitLatency) {
         this.l1DHitLatency = l1DHitLatency;
     }
 
+    /**
+     *
+     * @param l1DNumReadPorts
+     */
     public void setL1DNumReadPorts(int l1DNumReadPorts) {
         this.l1DNumReadPorts = l1DNumReadPorts;
     }
 
+    /**
+     *
+     * @param l1DNumWritePorts
+     */
     public void setL1DNumWritePorts(int l1DNumWritePorts) {
         this.l1DNumWritePorts = l1DNumWritePorts;
     }
 
+    /**
+     *
+     * @param l1DReplacementPolicyType
+     */
     public void setL1DReplacementPolicyType(CacheReplacementPolicyType l1DReplacementPolicyType) {
         this.l1DReplacementPolicyType = l1DReplacementPolicyType;
     }
 
+    /**
+     *
+     * @param l2Size
+     */
     public void setL2Size(int l2Size) {
         this.l2Size = l2Size;
     }
 
+    /**
+     *
+     * @param l2Associativity
+     */
     public void setL2Associativity(int l2Associativity) {
         this.l2Associativity = l2Associativity;
     }
 
+    /**
+     *
+     * @param l2LineSize
+     */
     public void setL2LineSize(int l2LineSize) {
         this.l2LineSize = l2LineSize;
     }
 
+    /**
+     *
+     * @param l2HitLatency
+     */
     public void setL2HitLatency(int l2HitLatency) {
         this.l2HitLatency = l2HitLatency;
     }
 
+    /**
+     *
+     * @param l2ReplacementPolicyType
+     */
     public void setL2ReplacementPolicyType(CacheReplacementPolicyType l2ReplacementPolicyType) {
         this.l2ReplacementPolicyType = l2ReplacementPolicyType;
     }
 
+    /**
+     *
+     * @param memoryControllerType
+     */
     public void setMemoryControllerType(MemoryControllerType memoryControllerType) {
         this.memoryControllerType = memoryControllerType;
     }
 
+    /**
+     *
+     * @param memoryControllerLineSize
+     */
     public void setMemoryControllerLineSize(int memoryControllerLineSize) {
         this.memoryControllerLineSize = memoryControllerLineSize;
     }
 
+    /**
+     *
+     * @param fixedLatencyMemoryControllerLatency
+     */
     public void setFixedLatencyMemoryControllerLatency(int fixedLatencyMemoryControllerLatency) {
         this.fixedLatencyMemoryControllerLatency = fixedLatencyMemoryControllerLatency;
     }
 
+    /**
+     *
+     * @param simpleMemoryControllerMemoryLatency
+     */
     public void setSimpleMemoryControllerMemoryLatency(int simpleMemoryControllerMemoryLatency) {
         this.simpleMemoryControllerMemoryLatency = simpleMemoryControllerMemoryLatency;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getSimpleMemoryControllerMemoryTrunkLatency() {
         return simpleMemoryControllerMemoryTrunkLatency;
     }
 
+    /**
+     *
+     * @param simpleMemoryControllerMemoryTrunkLatency
+     */
     public void setSimpleMemoryControllerMemoryTrunkLatency(int simpleMemoryControllerMemoryTrunkLatency) {
         this.simpleMemoryControllerMemoryTrunkLatency = simpleMemoryControllerMemoryTrunkLatency;
     }
 
+    /**
+     *
+     * @param simpleMemoryControllerBusWidth
+     */
     public void setSimpleMemoryControllerBusWidth(int simpleMemoryControllerBusWidth) {
         this.simpleMemoryControllerBusWidth = simpleMemoryControllerBusWidth;
     }
 
+    /**
+     *
+     * @param basicMemoryControllerToDramLatency
+     */
     public void setBasicMemoryControllerToDramLatency(int basicMemoryControllerToDramLatency) {
         this.basicMemoryControllerToDramLatency = basicMemoryControllerToDramLatency;
     }
 
+    /**
+     *
+     * @param basicMemoryControllerFromDramLatency
+     */
     public void setBasicMemoryControllerFromDramLatency(int basicMemoryControllerFromDramLatency) {
         this.basicMemoryControllerFromDramLatency = basicMemoryControllerFromDramLatency;
     }
 
+    /**
+     *
+     * @param basicMemoryControllerPrechargeLatency
+     */
     public void setBasicMemoryControllerPrechargeLatency(int basicMemoryControllerPrechargeLatency) {
         this.basicMemoryControllerPrechargeLatency = basicMemoryControllerPrechargeLatency;
     }
 
+    /**
+     *
+     * @param basicMemoryControllerClosedLatency
+     */
     public void setBasicMemoryControllerClosedLatency(int basicMemoryControllerClosedLatency) {
         this.basicMemoryControllerClosedLatency = basicMemoryControllerClosedLatency;
     }
 
+    /**
+     *
+     * @param basicMemoryControllerConflictLatency
+     */
     public void setBasicMemoryControllerConflictLatency(int basicMemoryControllerConflictLatency) {
         this.basicMemoryControllerConflictLatency = basicMemoryControllerConflictLatency;
     }
 
+    /**
+     *
+     * @param basicMemoryControllerBusWidth
+     */
     public void setBasicMemoryControllerBusWidth(int basicMemoryControllerBusWidth) {
         this.basicMemoryControllerBusWidth = basicMemoryControllerBusWidth;
     }
 
+    /**
+     *
+     * @param basicMemoryControllerNumBanks
+     */
     public void setBasicMemoryControllerNumBanks(int basicMemoryControllerNumBanks) {
         this.basicMemoryControllerNumBanks = basicMemoryControllerNumBanks;
     }
 
+    /**
+     *
+     * @param basicMemoryControllerRowSize
+     */
     public void setBasicMemoryControllerRowSize(int basicMemoryControllerRowSize) {
         this.basicMemoryControllerRowSize = basicMemoryControllerRowSize;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getTlbSizeInStorageUnit() {
         return StorageUnit.toString(tlbSize);
     }
 
+    /**
+     *
+     * @param tlbSizeInStorageUnit
+     */
     public void setTlbSizeInStorageUnit(String tlbSizeInStorageUnit) {
         this.tlbSize = (int) StorageUnitHelper.displaySizeToByteCount(tlbSizeInStorageUnit);
     }
 
+    /**
+     *
+     * @return
+     */
     public String getL1ISizeInStorageUnit() {
         return StorageUnit.toString(l1ISize);
     }
 
+    /**
+     *
+     * @param l1ISizeInStorageUnit
+     */
     public void setL1ISizeInStorageUnit(String l1ISizeInStorageUnit) {
         this.l1ISize = (int) StorageUnitHelper.displaySizeToByteCount(l1ISizeInStorageUnit);
     }
 
+    /**
+     *
+     * @return
+     */
     public String getL1DSizeInStorageUnit() {
         return StorageUnit.toString(l1DSize);
     }
 
+    /**
+     *
+     * @param l1DSizeInStorageUnit
+     */
     public void setL1DSizeInStorageUnit(String l1DSizeInStorageUnit) {
         this.l1DSize = (int) StorageUnitHelper.displaySizeToByteCount(l1DSizeInStorageUnit);
     }
 
+    /**
+     *
+     * @return
+     */
     public String getL2SizeInStorageUnit() {
         return StorageUnit.toString(l2Size);
     }
 
+    /**
+     *
+     * @param l2SizeInStorageUnit
+     */
     public void setL2SizeInStorageUnit(String l2SizeInStorageUnit) {
         this.l2Size = (int) StorageUnitHelper.displaySizeToByteCount(l2SizeInStorageUnit);
     }

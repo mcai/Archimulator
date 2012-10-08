@@ -20,25 +20,44 @@ package archimulator.sim.os.event;
 
 import archimulator.sim.os.Context;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class ResumeEvent extends SystemEvent {
     private TimeCriterion timeCriterion;
 
+    /**
+     *
+     * @param context
+     */
     public ResumeEvent(Context context) {
         super(context, SystemEventType.RESUME);
 
         this.timeCriterion = new TimeCriterion();
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public boolean needProcess() {
         return this.timeCriterion.needProcess(this.getContext());
     }
 
+    /**
+     *
+     */
     @Override
     public void process() {
         this.getContext().resume();
     }
 
+    /**
+     *
+     * @return
+     */
     public TimeCriterion getTimeCriterion() {
         return timeCriterion;
     }

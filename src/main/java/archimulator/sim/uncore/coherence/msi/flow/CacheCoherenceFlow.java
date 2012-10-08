@@ -26,6 +26,10 @@ import net.pickapack.tree.Node;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author Min Cai
+ */
 public abstract class CacheCoherenceFlow extends Params implements Node {
     private long id;
     private Controller generator;
@@ -39,6 +43,13 @@ public abstract class CacheCoherenceFlow extends Params implements Node {
     private MemoryHierarchyAccess access;
     private int tag;
 
+    /**
+     *
+     * @param generator
+     * @param producerFlow
+     * @param access
+     * @param tag
+     */
     public CacheCoherenceFlow(Controller generator, CacheCoherenceFlow producerFlow, MemoryHierarchyAccess access, int tag) {
         this.id = generator.getSimulation().currentCacheCoherenceFlowId++;
         this.generator = generator;
@@ -50,6 +61,10 @@ public abstract class CacheCoherenceFlow extends Params implements Node {
         this.tag = tag;
     }
 
+    /**
+     *
+     * @param beginCycle
+     */
     public void onCreate(long beginCycle) {
         this.beginCycle = beginCycle;
         if (this.producerFlow == null) {
@@ -60,6 +75,9 @@ public abstract class CacheCoherenceFlow extends Params implements Node {
         this.ancestorFlow.numPendingDescendantFlows++;
     }
 
+    /**
+     *
+     */
     public void onCompleted() {
         this.completed = true;
         this.endCycle = this.generator.getCycleAccurateEventQueue().getCurrentCycle();
@@ -70,52 +88,100 @@ public abstract class CacheCoherenceFlow extends Params implements Node {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public long getId() {
         return id;
     }
 
+    /**
+     *
+     * @return
+     */
     public CacheCoherenceFlow getAncestorFlow() {
         return ancestorFlow;
     }
 
+    /**
+     *
+     * @return
+     */
     public CacheCoherenceFlow getProducerFlow() {
         return producerFlow;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<CacheCoherenceFlow> getChildFlows() {
         return childFlows;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getBeginCycle() {
         return beginCycle;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getEndCycle() {
         return endCycle;
     }
 
+    /**
+     *
+     * @return
+     */
     public Object getGenerator() {
         return generator;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isCompleted() {
         return completed;
     }
 
+    /**
+     *
+     * @return
+     */
     public MemoryHierarchyAccess getAccess() {
         return access;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public Object getValue() {
         return String.format("%s%s", this, this.completed ? " -> completed at " + endCycle : "");
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public List<CacheCoherenceFlow> getChildren() {
         return this.childFlows;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getTag() {
         return tag;
     }

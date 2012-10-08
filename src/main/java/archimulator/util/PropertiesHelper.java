@@ -21,6 +21,10 @@ package archimulator.util;
 import java.io.IOException;
 import java.util.Properties;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class PropertiesHelper {
     private static Properties properties;
 
@@ -33,10 +37,18 @@ public class PropertiesHelper {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public static Properties getProperties() {
         return properties;
     }
 
+    /**
+     *
+     * @return
+     */
     public static String getVersion() {
         return getProperties().getProperty("project.version");
     }

@@ -44,6 +44,10 @@ import static ch.lambdaj.Lambda.*;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class HelperThreadL2CacheRequestProfilingHelper {
     private DirectoryController l2CacheController;
 
@@ -80,10 +84,18 @@ public class HelperThreadL2CacheRequestProfilingHelper {
 
     private boolean l2MissLatencyStatsEnabled;
 
+    /**
+     *
+     * @param simulation
+     */
     public HelperThreadL2CacheRequestProfilingHelper(Simulation simulation) {
         this(simulation.getProcessor().getCacheHierarchy().getL2CacheController());
     }
 
+    /**
+     *
+     * @param l2CacheController
+     */
     public HelperThreadL2CacheRequestProfilingHelper(final DirectoryController l2CacheController) {
         this.l2CacheController = l2CacheController;
 
@@ -273,6 +285,9 @@ public class HelperThreadL2CacheRequestProfilingHelper {
         //TODO: error, tracking pending accesses precisely from directory controller/fsm/fsmFactory!!!
     }
 
+    /**
+     *
+     */
     public void sumUpUnstableHelperThreadL2CacheRequests() {
         for (int set = 0; set < l2CacheController.getCache().getNumSets(); set++) {
             for (int way = 0; way < l2CacheController.getCache().getAssociativity(); way++) {
@@ -667,105 +682,213 @@ public class HelperThreadL2CacheRequestProfilingHelper {
         throw new IllegalArgumentException();
     }
 
+    /**
+     *
+     * @return
+     */
     public double getHelperThreadL2CacheRequestCoverage() {
         return (this.numMainThreadL2CacheMisses + this.numUsefulHelperThreadL2CacheRequests) == 0 ? 0 : (double) this.numUsefulHelperThreadL2CacheRequests / (this.numMainThreadL2CacheMisses + this.numUsefulHelperThreadL2CacheRequests);
     }
 
+    /**
+     *
+     * @return
+     */
     public double getHelperThreadL2CacheRequestAccuracy() {
         return this.getNumTotalHelperThreadL2CacheRequests() == 0 ? 0 : (double) this.numUsefulHelperThreadL2CacheRequests / this.getNumTotalHelperThreadL2CacheRequests();
     }
 
+    /**
+     *
+     * @return
+     */
     public Map<Integer, Map<Integer, HelperThreadL2CacheRequestState>> getHelperThreadL2CacheRequestStates() {
         return helperThreadL2CacheRequestStates;
     }
 
+    /**
+     *
+     * @return
+     */
     public EvictableCache<HelperThreadL2CacheRequestVictimCacheLineState> getHelperThreadL2CacheRequestVictimCache() {
         return helperThreadL2CacheRequestVictimCache;
     }
 
+    /**
+     *
+     * @return
+     */
     public Predictor<HelperThreadL2CacheRequestQuality> getHelperThreadL2CacheRequestQualityPredictor() {
         return helperThreadL2CacheRequestQualityPredictor;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getNumMainThreadL2CacheHits() {
         return numMainThreadL2CacheHits;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getNumMainThreadL2CacheMisses() {
         return numMainThreadL2CacheMisses;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getNumHelperThreadL2CacheHits() {
         return numHelperThreadL2CacheHits;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getNumHelperThreadL2CacheMisses() {
         return numHelperThreadL2CacheMisses;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getNumTotalHelperThreadL2CacheRequests() {
         return numHelperThreadL2CacheHits + numHelperThreadL2CacheMisses;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getNumRedundantHitToTransientTagHelperThreadL2CacheRequests() {
         return numRedundantHitToTransientTagHelperThreadL2CacheRequests;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getNumRedundantHitToCacheHelperThreadL2CacheRequests() {
         return numRedundantHitToCacheHelperThreadL2CacheRequests;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getNumUsefulHelperThreadL2CacheRequests() {
         return numUsefulHelperThreadL2CacheRequests;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getNumTimelyHelperThreadL2CacheRequests() {
         return numTimelyHelperThreadL2CacheRequests;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getNumLateHelperThreadL2CacheRequests() {
         return numLateHelperThreadL2CacheRequests;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getNumBadHelperThreadL2CacheRequests() {
         return numBadHelperThreadL2CacheRequests;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getNumUglyHelperThreadL2CacheRequests() {
         return numUglyHelperThreadL2CacheRequests;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isCheckInvariantsEnabled() {
         return checkInvariantsEnabled;
     }
 
+    /**
+     *
+     * @return
+     */
     public Map<CacheMissType, Long> getNumL2CacheMissesPerType() {
         return numL2CacheMissesPerType;
     }
 
+    /**
+     *
+     * @return
+     */
     public DescriptiveStatistics getStatL2CacheMissNumCycles() {
         return statL2CacheMissNumCycles;
     }
 
+    /**
+     *
+     * @return
+     */
     public DescriptiveStatistics getStatL2CacheMissMlpCosts() {
         return statL2CacheMissMlpCosts;
     }
 
+    /**
+     *
+     * @return
+     */
     public DescriptiveStatistics getFrequencyL2CacheMissAverageMlps() {
         return statL2CacheMissAverageMlps;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isL2MissLatencyStatsEnabled() {
         return l2MissLatencyStatsEnabled;
     }
 
+    /**
+     *
+     * @param l2MissLatencyStatsEnabled
+     */
     public void setL2MissLatencyStatsEnabled(boolean l2MissLatencyStatsEnabled) {
         this.l2MissLatencyStatsEnabled = l2MissLatencyStatsEnabled;
     }
 
+    /**
+     *
+     */
     public static enum HelperThreadL2CacheRequestVictimCacheLineState {
+        /**
+         *
+         */
         INVALID,
+        /**
+         *
+         */
         NULL,
+        /**
+         *
+         */
         DATA
     }
 

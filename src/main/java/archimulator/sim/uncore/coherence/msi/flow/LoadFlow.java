@@ -22,10 +22,21 @@ import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import net.pickapack.action.Action;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class LoadFlow extends CacheCoherenceFlow {
     private Action onCompletedCallback;
     private Action onCompletedCallback2;
 
+    /**
+     *
+     * @param generator
+     * @param tag
+     * @param onCompletedCallback
+     * @param access
+     */
     public LoadFlow(final CacheController generator, int tag, final Action onCompletedCallback, MemoryHierarchyAccess access) {
         super(generator, null, access, tag);
         this.onCompletedCallback = onCompletedCallback;
@@ -39,10 +50,18 @@ public class LoadFlow extends CacheCoherenceFlow {
         };
     }
 
+    /**
+     *
+     * @return
+     */
     public Action getOnCompletedCallback() {
         return onCompletedCallback;
     }
 
+    /**
+     *
+     * @return
+     */
     public Action getOnCompletedCallback2() {
         return onCompletedCallback2;
     }

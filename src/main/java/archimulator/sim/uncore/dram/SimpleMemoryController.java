@@ -21,11 +21,24 @@ package archimulator.sim.uncore.dram;
 import archimulator.sim.uncore.CacheHierarchy;
 import net.pickapack.action.Action;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class SimpleMemoryController extends MemoryController {
+    /**
+     *
+     * @param cacheHierarchy
+     */
     public SimpleMemoryController(CacheHierarchy cacheHierarchy) {
         super(cacheHierarchy);
     }
 
+    /**
+     *
+     * @param address
+     * @param onCompletedCallback
+     */
     @Override
     protected void access(int address, Action onCompletedCallback) {
         this.getCycleAccurateEventQueue().schedule(this, onCompletedCallback, this.getLatency());
@@ -40,14 +53,26 @@ public class SimpleMemoryController extends MemoryController {
         return this.getMemoryLatency() + (this.getMemoryTrunkLatency() * (numChunks - 1));
     }
 
+    /**
+     *
+     * @return
+     */
     public int getMemoryLatency() {
         return getExperiment().getArchitecture().getSimpleMemoryControllerMemoryLatency();
     }
 
+    /**
+     *
+     * @return
+     */
     public int getMemoryTrunkLatency() {
         return getExperiment().getArchitecture().getSimpleMemoryControllerMemoryTrunkLatency();
     }
 
+    /**
+     *
+     * @return
+     */
     public int getBusWidth() {
         return getExperiment().getArchitecture().getSimpleMemoryControllerBusWidth();
     }

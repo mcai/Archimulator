@@ -23,24 +23,74 @@ import net.pickapack.service.Service;
 
 import java.util.List;
 
+/**
+ *
+ * Service for managing benchmarks.
+ *
+ * @author Min Cai
+ */
 public interface BenchmarkService extends Service {
+    /**
+     *
+     * @return
+     */
     List<Benchmark> getAllBenchmarks();
 
+    /**
+     *
+     * @param first
+     * @param count
+     * @return
+     */
     List<Benchmark> getAllBenchmarks(long first, long count);
 
+    /**
+     *
+     * @return
+     */
     long getNumAllBenchmarks();
 
+    /**
+     *
+     * @param id
+     * @return
+     */
     Benchmark getBenchmarkById(long id);
 
+    /**
+     *
+     * @param title
+     * @return
+     */
     Benchmark getBenchmarkByTitle(String title);
 
+    /**
+     *
+     * @return
+     */
     Benchmark getFirstBenchmark();
 
+    /**
+     *
+     * @param benchmark
+     * @return
+     */
     long addBenchmark(Benchmark benchmark);
 
+    /**
+     *
+     * @param id
+     */
     void removeBenchmarkById(long id);
 
+    /**
+     *
+     */
     void clearBenchmarks();
 
+    /**
+     *
+     * @param benchmark
+     */
     void updateBenchmark(Benchmark benchmark);
 }

@@ -29,6 +29,10 @@ import net.pickapack.action.Action;
 import net.pickapack.util.ValueProvider;
 import net.pickapack.util.ValueProviderFactory;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class TranslationLookasideBuffer {
     private String name;
 
@@ -39,6 +43,11 @@ public class TranslationLookasideBuffer {
 
     private long numEvictions;
 
+    /**
+     *
+     * @param parent
+     * @param name
+     */
     public TranslationLookasideBuffer(SimulationObject parent, String name) {
         this.name = name;
 
@@ -52,6 +61,11 @@ public class TranslationLookasideBuffer {
         this.cache = new EvictableCache<Boolean>(parent, name, new CacheGeometry(parent.getExperiment().getArchitecture().getTlbSize(), parent.getExperiment().getArchitecture().getTlbAssociativity(), parent.getExperiment().getArchitecture().getTlbLineSize()), CacheReplacementPolicyType.LRU, cacheLineStateProviderFactory);
     }
 
+    /**
+     *
+     * @param access
+     * @param onCompletedCallback
+     */
     public void access(MemoryHierarchyAccess access, Action onCompletedCallback) {
         int set = this.cache.getSet(access.getPhysicalAddress());
         CacheAccess<Boolean> cacheAccess = this.cache.newAccess(access, access.getPhysicalAddress());
@@ -78,42 +92,82 @@ public class TranslationLookasideBuffer {
         access.getThread().getCycleAccurateEventQueue().schedule(this, onCompletedCallback, cacheAccess.isHitInCache() ? this.getHitLatency() : this.getMissLatency());
     }
 
+    /**
+     *
+     * @return
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getNumMisses() {
         return this.numMisses;
     }
 
+    /**
+     *
+     * @return
+     */
     public double getHitRatio() {
         return this.getNumAccesses() > 0 ? (double) this.numHits / this.getNumAccesses() : 0.0;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getNumAccesses() {
         return numHits + numMisses;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getNumHits() {
         return numHits;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getNumEvictions() {
         return numEvictions;
     }
 
+    /**
+     *
+     * @return
+     */
     public double getOccupancyRatio() {
         return getCache().getOccupancyRatio();
     }
 
+    /**
+     *
+     * @return
+     */
     public EvictableCache<Boolean> getCache() {
         return cache;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getHitLatency() {
         return getCache().getExperiment().getArchitecture().getTlbHitLatency();
     }
 
+    /**
+     *
+     * @return
+     */
     public int getMissLatency() {
         return getCache().getExperiment().getArchitecture().getTlbMissLatency();
     }

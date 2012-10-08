@@ -22,15 +22,31 @@ import net.pickapack.Pair;
 
 import java.util.Arrays;
 
+/**
+ *
+ * @author Min Cai
+ */
 public final class ArchitecturalRegisterFile implements Cloneable {
+    /**
+     *
+     */
     public static class Fpr implements Cloneable {
         private int[] data = new int[32];
         private boolean littleEndian;
 
+        /**
+         *
+         * @param littleEndian
+         */
         public Fpr(boolean littleEndian) {
             this.littleEndian = littleEndian;
         }
 
+        /**
+         *
+         * @param littleEndian
+         * @param data
+         */
         public Fpr(boolean littleEndian, int[] data) {
             this.littleEndian = littleEndian;
             this.data = data;
@@ -61,14 +77,29 @@ public final class ArchitecturalRegisterFile implements Cloneable {
             return result;
         }
 
+        /**
+         *
+         * @param index
+         * @return
+         */
         public int getInt(int index) {
             return this.data[index];
         }
 
+        /**
+         *
+         * @param index
+         * @param i
+         */
         public void setInt(int index, int i) {
             this.data[index] = i;
         }
 
+        /**
+         *
+         * @param index
+         * @return
+         */
         public long getLong(int index) {
             int i = (index / 2) * 2;
             int lo = this.getInt(i);
@@ -77,6 +108,11 @@ public final class ArchitecturalRegisterFile implements Cloneable {
             return ((long) (hi) << 32) + (lo & 0xFFFFFFFFL);
         }
 
+        /**
+         *
+         * @param index
+         * @param d
+         */
         public void setLong(int index, long d) {
             int hi = ((int) (d >> 32));
             int lo = ((int) ((d << 32) >> 32));
@@ -86,22 +122,46 @@ public final class ArchitecturalRegisterFile implements Cloneable {
             this.setInt(i + 1, hi);
         }
 
+        /**
+         *
+         * @param index
+         * @return
+         */
         public float getFloat(int index) {
             return Float.intBitsToFloat(this.getInt(index));
         }
 
+        /**
+         *
+         * @param index
+         * @param f
+         */
         public void setFloat(int index, float f) {
             this.setInt(index, Float.floatToRawIntBits(f));
         }
 
+        /**
+         *
+         * @param index
+         * @return
+         */
         public double getDouble(int index) {
             return Double.longBitsToDouble(this.getLong(index));
         }
 
+        /**
+         *
+         * @param index
+         * @param d
+         */
         public void setDouble(int index, double d) {
             this.setLong(index, Double.doubleToRawLongBits(d));
         }
 
+        /**
+         *
+         * @return
+         */
         public boolean isLittleEndian() {
             return littleEndian;
         }
@@ -121,6 +181,10 @@ public final class ArchitecturalRegisterFile implements Cloneable {
     private int lo;
     private int fcsr;
 
+    /**
+     *
+     * @param littleEndian
+     */
     public ArchitecturalRegisterFile(boolean littleEndian) {
         this.littleEndian = littleEndian;
 
@@ -188,6 +252,11 @@ public final class ArchitecturalRegisterFile implements Cloneable {
         return result;
     }
 
+    /**
+     *
+     * @param theOtherRegisterFile
+     * @param dep
+     */
     public void copyRegFrom(ArchitecturalRegisterFile theOtherRegisterFile, int dep) {
         Pair<RegisterDependencyType, Integer> depTypeNumPair = RegisterDependencyType.parse(dep);
 
@@ -213,14 +282,28 @@ public final class ArchitecturalRegisterFile implements Cloneable {
         }
     }
 
+    /**
+     *
+     * @param index
+     * @return
+     */
     public int getGpr(int index) {
         return this.gpr[index];
     }
 
+    /**
+     *
+     * @param index
+     * @param value
+     */
     public void setGpr(int index, int value) {
         this.gpr[index] = value;
     }
 
+    /**
+     *
+     * @return
+     */
     public String dump() {
         StringBuilder sb = new StringBuilder();
 
@@ -233,62 +316,122 @@ public final class ArchitecturalRegisterFile implements Cloneable {
         return sb.toString();
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isLittleEndian() {
         return littleEndian;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getPc() {
         return pc;
     }
 
+    /**
+     *
+     * @param pc
+     */
     public void setPc(int pc) {
         this.pc = pc;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getNpc() {
         return npc;
     }
 
+    /**
+     *
+     * @param npc
+     */
     public void setNpc(int npc) {
         this.npc = npc;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getNnpc() {
         return nnpc;
     }
 
+    /**
+     *
+     * @param nnpc
+     */
     public void setNnpc(int nnpc) {
         this.nnpc = nnpc;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getHi() {
         return hi;
     }
 
+    /**
+     *
+     * @param hi
+     */
     public void setHi(int hi) {
         this.hi = hi;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getLo() {
         return lo;
     }
 
+    /**
+     *
+     * @param lo
+     */
     public void setLo(int lo) {
         this.lo = lo;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getFcsr() {
         return fcsr;
     }
 
+    /**
+     *
+     * @param fcsr
+     */
     public void setFcsr(int fcsr) {
         this.fcsr = fcsr;
     }
 
+    /**
+     *
+     * @return
+     */
     public Fpr getFpr() {
         return fpr;
     }
 
+    /**
+     *
+     * @param fpr
+     */
     public void setFpr(Fpr fpr) {
         this.fpr = fpr;
     }
@@ -300,44 +443,158 @@ public final class ArchitecturalRegisterFile implements Cloneable {
             "t8", "t9", "k0", "k1", "gp", "sp", "fp", "ra"
     };
 
+    /**
+     *
+     */
     public static final int NUM_INT_REGISTERS = 32;
+    /**
+     *
+     */
     public static final int NUM_FLOAT_REGISTERS = 32;
+    /**
+     *
+     */
     public static final int NUM_MISC_REGISTERS = 3;
 
+    /**
+     *
+     */
     public static final int REGISTER_ZERO = 0;
+    /**
+     *
+     */
     public static final int REGISTER_AT = 1;
+    /**
+     *
+     */
     public static final int REGISTER_V0 = 2;
+    /**
+     *
+     */
     public static final int REGISTER_V1 = 3;
+    /**
+     *
+     */
     public static final int REGISTER_A0 = 4;
+    /**
+     *
+     */
     public static final int REGISTER_A1 = 5;
+    /**
+     *
+     */
     public static final int REGISTER_A2 = 6;
+    /**
+     *
+     */
     public static final int REGISTER_A3 = 7;
+    /**
+     *
+     */
     public static final int REGISTER_T0 = 8;
+    /**
+     *
+     */
     public static final int REGISTER_T1 = 9;
+    /**
+     *
+     */
     public static final int REGISTER_T2 = 10;
+    /**
+     *
+     */
     public static final int REGISTER_T3 = 11;
+    /**
+     *
+     */
     public static final int REGISTER_T4 = 12;
+    /**
+     *
+     */
     public static final int REGISTER_T5 = 13;
+    /**
+     *
+     */
     public static final int REGISTER_T6 = 14;
+    /**
+     *
+     */
     public static final int REGISTER_T7 = 15;
+    /**
+     *
+     */
     public static final int REGISTER_S0 = 16;
+    /**
+     *
+     */
     public static final int REGISTER_S1 = 17;
+    /**
+     *
+     */
     public static final int REGISTER_S2 = 18;
+    /**
+     *
+     */
     public static final int REGISTER_S3 = 19;
+    /**
+     *
+     */
     public static final int REGISTER_S4 = 20;
+    /**
+     *
+     */
     public static final int REGISTER_S5 = 21;
+    /**
+     *
+     */
     public static final int REGISTER_S6 = 22;
+    /**
+     *
+     */
     public static final int REGISTER_S7 = 23;
+    /**
+     *
+     */
     public static final int REGISTER_T8 = 24;
+    /**
+     *
+     */
     public static final int REGISTER_T9 = 25;
+    /**
+     *
+     */
     public static final int REGISTER_K0 = 26;
+    /**
+     *
+     */
     public static final int REGISTER_K1 = 27;
+    /**
+     *
+     */
     public static final int REGISTER_GP = 28;
+    /**
+     *
+     */
     public static final int REGISTER_SP = 29;
+    /**
+     *
+     */
     public static final int REGISTER_FP = 30;
+    /**
+     *
+     */
     public static final int REGISTER_RA = 31;
 
+    /**
+     *
+     */
     public static final int REGISTER_MISC_LO = 0;
+    /**
+     *
+     */
     public static final int REGISTER_MISC_HI = 1;
+    /**
+     *
+     */
     public static final int REGISTER_MISC_FCSR = 2;
 }

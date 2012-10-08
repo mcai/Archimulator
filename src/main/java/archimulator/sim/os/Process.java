@@ -43,6 +43,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/**
+ *
+ * @author Min Cai
+ */
 public abstract class Process extends BasicSimulationObject implements SimulationObject, Serializable {
     private List<String> environments;
 
@@ -67,6 +71,12 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
 
     private ContextMapping contextMapping;
 
+    /**
+     *
+     * @param kernel
+     * @param simulationDirectory
+     * @param contextMapping
+     */
     public Process(Kernel kernel, String simulationDirectory, ContextMapping contextMapping) {
         super(kernel);
 
@@ -116,8 +126,19 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
         }
     }
 
+    /**
+     *
+     * @param kernel
+     * @param simulationDirectory
+     * @param contextMapping
+     */
     protected abstract void loadProgram(Kernel kernel, String simulationDirectory, ContextMapping contextMapping);
 
+    /**
+     *
+     * @param fileDescriptor
+     * @return
+     */
     public int translateFileDescriptor(int fileDescriptor) {
         if (fileDescriptor == 1 || fileDescriptor == 2) {
             return this.standardOutFileDescriptor;
@@ -128,6 +149,9 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
         }
     }
 
+    /**
+     *
+     */
     public void closeProgram() {
         if (this.standardInFileDescriptor != 0) {
             NativeSystemCalls.LIBC.close(this.standardInFileDescriptor);
@@ -137,6 +161,11 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
         }
     }
 
+    /**
+     *
+     * @param machineInstruction
+     * @return
+     */
     protected StaticInstruction decode(int machineInstruction) {
         for (Mnemonic mnemonic : StaticInstruction.MNEMONICS) {
             BitField extraBitField = mnemonic.getExtraBitField();
@@ -148,98 +177,208 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
         throw new IllegalArgumentException();
     }
 
+    /**
+     *
+     * @param pc
+     * @return
+     */
     public abstract StaticInstruction getStaticInstruction(int pc);
 
+    /**
+     *
+     * @return
+     */
     public int getId() {
         return id;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getStandardInFileDescriptor() {
         return standardInFileDescriptor;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getStandardOutFileDescriptor() {
         return standardOutFileDescriptor;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<String> getEnvironments() {
         return environments;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getStackBase() {
         return stackBase;
     }
 
+    /**
+     *
+     * @param stackBase
+     */
     public void setStackBase(int stackBase) {
         this.stackBase = stackBase;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getStackSize() {
         return stackSize;
     }
 
+    /**
+     *
+     * @param stackSize
+     */
     public void setStackSize(int stackSize) {
         this.stackSize = stackSize;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getTextSize() {
         return textSize;
     }
 
+    /**
+     *
+     * @param textSize
+     */
     public void setTextSize(int textSize) {
         this.textSize = textSize;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getEnvironmentBase() {
         return environmentBase;
     }
 
+    /**
+     *
+     * @param environmentBase
+     */
     public void setEnvironmentBase(int environmentBase) {
         this.environmentBase = environmentBase;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getHeapTop() {
         return heapTop;
     }
 
+    /**
+     *
+     * @param heapTop
+     */
     public void setHeapTop(int heapTop) {
         this.heapTop = heapTop;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getDataTop() {
         return dataTop;
     }
 
+    /**
+     *
+     * @param dataTop
+     */
     public void setDataTop(int dataTop) {
         this.dataTop = dataTop;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getProgramEntry() {
         return programEntry;
     }
 
+    /**
+     *
+     * @param programEntry
+     */
     public void setProgramEntry(int programEntry) {
         this.programEntry = programEntry;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isLittleEndian() {
         return littleEndian;
     }
 
+    /**
+     *
+     * @return
+     */
     public Memory getMemory() {
         return memory;
     }
 
+    /**
+     *
+     * @return
+     */
     public ContextMapping getContextMapping() {
         return contextMapping;
     }
 
+    /**
+     *
+     */
     public static final int TEXT_BASE = 0x00400000;
+    /**
+     *
+     */
     public static final int DATA_BASE = 0x10000000;
+    /**
+     *
+     */
     public static final int STACK_BASE = 0x7fffc000;
+    /**
+     *
+     */
     public static final int STACK_SIZE = 1024 * 1024;
+    /**
+     *
+     */
     public static final int MAX_ENVIRON = 16 * 1024;
 
+    /**
+     *
+     * @param n
+     * @param alignment
+     * @return
+     */
     protected static int roundUp(int n, int alignment) {
         return (n + alignment - 1) & ~(alignment - 1);
     }

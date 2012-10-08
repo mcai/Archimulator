@@ -23,6 +23,10 @@ import net.pickapack.action.Action;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class NetLink {
     private OutPort sourcePort;
     private InPort destinationPort;
@@ -30,6 +34,12 @@ public class NetLink {
     private boolean busy;
     private List<Action> pendingActions;
 
+    /**
+     *
+     * @param sourceNode
+     * @param destinationNode
+     * @param bandwidth
+     */
     public NetLink(NetNode sourceNode, NetNode destinationNode, int bandwidth) {
         this.sourcePort = sourceNode.findFreeOutPort();
         this.destinationPort = destinationNode.findFreeInPort();
@@ -42,6 +52,10 @@ public class NetLink {
         this.pendingActions = new ArrayList<Action>();
     }
 
+    /**
+     *
+     * @param message
+     */
     public void toInBuffer(final NetMessage message) {
         if (this.destinationPort.getBuffer() != null) {
             if (this.destinationPort.getBuffer().isWriteBusy()) {
@@ -76,10 +90,17 @@ public class NetLink {
         }
     }
 
+    /**
+     *
+     */
     public void beginTransfer() {
         this.busy = true;
     }
 
+    /**
+     *
+     * @param message
+     */
     public void endTransfer(NetMessage message) {
         this.busy = false;
         this.doPendingActions();
@@ -87,6 +108,10 @@ public class NetLink {
         this.toInBuffer(message);
     }
 
+    /**
+     *
+     * @param action
+     */
     public void addPendingAction(Action action) {
         this.pendingActions.add(action);
     }
@@ -99,18 +124,34 @@ public class NetLink {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public NetPort getSourcePort() {
         return sourcePort;
     }
 
+    /**
+     *
+     * @return
+     */
     public NetPort getDestinationPort() {
         return destinationPort;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getBandwidth() {
         return bandwidth;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isBusy() {
         return busy;
     }

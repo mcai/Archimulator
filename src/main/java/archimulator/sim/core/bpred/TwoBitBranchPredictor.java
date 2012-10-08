@@ -24,10 +24,23 @@ import archimulator.sim.isa.StaticInstructionType;
 import net.pickapack.Reference;
 import net.pickapack.math.SaturatingCounter;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class TwoBitBranchPredictor extends DynamicBranchPredictor {
     private int size;
     private SaturatingCounter[] table;
 
+    /**
+     *
+     * @param thread
+     * @param name
+     * @param bimodSize
+     * @param branchTargetBufferNumSets
+     * @param branchTargetBufferAssociativity
+     * @param returnAddressStackSize
+     */
     public TwoBitBranchPredictor(Thread thread, String name, int bimodSize, int branchTargetBufferNumSets, int branchTargetBufferAssociativity, int returnAddressStackSize) {
         super(thread, name, BranchPredictorType.TWO_BIT, branchTargetBufferNumSets, branchTargetBufferAssociativity, returnAddressStackSize);
 
@@ -42,10 +55,24 @@ public class TwoBitBranchPredictor extends DynamicBranchPredictor {
         }
     }
 
+    /**
+     *
+     * @param thread
+     * @param name
+     */
     public TwoBitBranchPredictor(Thread thread, String name) {
         this(thread, name, thread.getExperiment().getArchitecture().getTwoBitBranchPredictorBimodSize(), thread.getExperiment().getArchitecture().getTwoBitBranchPredictorBranchTargetBufferNumSets(), thread.getExperiment().getArchitecture().getTwoBitBranchPredictorBranchTargetBufferAssociativity(), thread.getExperiment().getArchitecture().getTwoBitBranchPredictorReturnAddressStackSize());
     }
 
+    /**
+     *
+     * @param branchAddress
+     * @param branchTarget
+     * @param mnemonic
+     * @param branchPredictorUpdate
+     * @param returnAddressStackRecoverIndex
+     * @return
+     */
     @Override
     public int predict(int branchAddress, int branchTarget, Mnemonic mnemonic, BranchPredictorUpdate branchPredictorUpdate, Reference<Integer> returnAddressStackRecoverIndex) {
         if (mnemonic.getType() == StaticInstructionType.CONDITIONAL) {
@@ -71,6 +98,16 @@ public class TwoBitBranchPredictor extends DynamicBranchPredictor {
         }
     }
 
+    /**
+     *
+     * @param branchAddress
+     * @param branchTarget
+     * @param taken
+     * @param predictedTaken
+     * @param correct
+     * @param mnemonic
+     * @param branchPredictorUpdate
+     */
     @Override
     public void update(int branchAddress, int branchTarget, boolean taken, boolean predictedTaken, boolean correct, Mnemonic mnemonic, BranchPredictorUpdate branchPredictorUpdate) {
         super.update(branchAddress, branchTarget, taken, predictedTaken, correct, mnemonic, branchPredictorUpdate);
@@ -88,6 +125,11 @@ public class TwoBitBranchPredictor extends DynamicBranchPredictor {
         this.getBranchTargetBuffer().update(branchAddress, branchTarget, taken);
     }
 
+    /**
+     *
+     * @param branchAddress
+     * @return
+     */
     public SaturatingCounter getIndex(int branchAddress) {
         return this.table[this.hash(branchAddress)];
     }

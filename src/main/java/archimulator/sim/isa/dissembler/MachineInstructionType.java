@@ -18,9 +18,25 @@
  ******************************************************************************/
 package archimulator.sim.isa.dissembler;
 
+/**
+ *
+ * @author Min Cai
+ */
 public enum MachineInstructionType {
+    /**
+     *
+     */
     R,
+    /**
+     *
+     */
     I,
+    /**
+     *
+     */
     J,
+    /**
+     *
+     */
     F
 }

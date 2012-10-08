@@ -20,31 +20,69 @@ package archimulator.sim.core;
 
 import archimulator.sim.core.bpred.BranchPredictorUpdate;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class LoadStoreQueueEntry extends AbstractReorderBufferEntry {
+    /**
+     *
+     */
     protected int effectiveAddress;
     private boolean storeAddressReady;
 
+    /**
+     *
+     * @param thread
+     * @param dynamicInstruction
+     * @param npc
+     * @param nnpc
+     * @param predictedNnpc
+     * @param returnAddressStackRecoverIndex
+     * @param branchPredictorUpdate
+     * @param speculative
+     */
     public LoadStoreQueueEntry(Thread thread, DynamicInstruction dynamicInstruction, int npc, int nnpc, int predictedNnpc, int returnAddressStackRecoverIndex, BranchPredictorUpdate branchPredictorUpdate, boolean speculative) {
         super(thread, dynamicInstruction, npc, nnpc, predictedNnpc, returnAddressStackRecoverIndex, branchPredictorUpdate, speculative);
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     protected boolean isNeedWriteBack() {
         return true;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isStoreAddressReady() {
         return this.storeAddressReady;
     }
 
+    /**
+     *
+     * @param storeAddressReady
+     */
     public void setStoreAddressReady(boolean storeAddressReady) {
         this.storeAddressReady = storeAddressReady;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getEffectiveAddress() {
         return effectiveAddress;
     }
 
+    /**
+     *
+     * @param effectiveAddress
+     */
     public void setEffectiveAddress(int effectiveAddress) {
         this.effectiveAddress = effectiveAddress;
     }

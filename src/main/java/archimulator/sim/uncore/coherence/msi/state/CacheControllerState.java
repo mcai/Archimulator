@@ -18,23 +18,68 @@
  ******************************************************************************/
 package archimulator.sim.uncore.coherence.msi.state;
 
+/**
+ *
+ * @author Min Cai
+ */
 public enum CacheControllerState {
+    /**
+     *
+     */
     I,
+    /**
+     *
+     */
     IS_D,
+    /**
+     *
+     */
     IM_AD,
+    /**
+     *
+     */
     IM_A,
+    /**
+     *
+     */
     S,
+    /**
+     *
+     */
     SM_AD,
+    /**
+     *
+     */
     SM_A,
+    /**
+     *
+     */
     M,
+    /**
+     *
+     */
     MI_A,
+    /**
+     *
+     */
     SI_A,
+    /**
+     *
+     */
     II_A;
 
+    /**
+     *
+     * @return
+     */
     public boolean isStable() {
         return this == I || this == S || this == M;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isTransient() {
         return !isStable();
     }

@@ -18,15 +18,44 @@
  ******************************************************************************/
 package archimulator.sim.uncore.helperThread;
 
+/**
+ *
+ * @author Min Cai
+ */
 public enum HelperThreadL2CacheRequestQuality {
+    /**
+     *
+     */
     REDUNDANT_HIT_TO_TRANSIENT_TAG,
+    /**
+     *
+     */
     REDUNDANT_HIT_TO_CACHE,
+    /**
+     *
+     */
     TIMELY,
+    /**
+     *
+     */
     LATE,
+    /**
+     *
+     */
     BAD,
+    /**
+     *
+     */
     UGLY,
+    /**
+     *
+     */
     INVALID;
 
+    /**
+     *
+     * @return
+     */
     public boolean isModifiable() {
         return this == UGLY;
     }

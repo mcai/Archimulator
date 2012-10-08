@@ -30,7 +30,15 @@ import net.pickapack.fsm.FiniteStateMachineFactory;
 import static ch.lambdaj.Lambda.*;
 import static org.hamcrest.Matchers.not;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMachineFactory<DirectoryControllerState, DirectoryControllerEventType, DirectoryControllerFiniteStateMachine> {
+    /**
+     *
+     * @param actionWhenStateChanged
+     */
     public DirectoryControllerFiniteStateMachineFactory(Action1<DirectoryControllerFiniteStateMachine> actionWhenStateChanged) {
         this.inState(DirectoryControllerState.I)
                 .setOnCompletedCallback(actionWhenStateChanged)

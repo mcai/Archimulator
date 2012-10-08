@@ -23,14 +23,30 @@ import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class DataFromDirectoryAcknowledgementsEqual0Event extends CacheControllerEvent {
     private Controller sender;
 
+    /**
+     *
+     * @param generator
+     * @param producerFlow
+     * @param sender
+     * @param tag
+     * @param access
+     */
     public DataFromDirectoryAcknowledgementsEqual0Event(CacheController generator, CacheCoherenceFlow producerFlow, Controller sender, int tag, MemoryHierarchyAccess access) {
         super(generator, producerFlow, CacheControllerEventType.DATA_FROM_DIRECTORY_ACKNOWLEDGEMENTS_EQUAL_0, access, tag);
         this.sender = sender;
     }
 
+    /**
+     *
+     * @return
+     */
     public Controller getSender() {
         return sender;
     }

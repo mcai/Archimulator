@@ -20,6 +20,14 @@ package archimulator.sim.uncore;
 
 import archimulator.sim.common.SimulationObject;
 
+/**
+ *
+ * @author Min Cai
+ */
 public interface MemoryHierarchyCore extends SimulationObject {
+    /**
+     *
+     * @return
+     */
     int getNum();
 }

@@ -21,6 +21,10 @@ package archimulator.sim.os.event;
 import archimulator.sim.os.Context;
 import net.pickapack.io.buffer.CircularByteBuffer;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class WaitFileDescriptorCriterion implements SystemEventCriterion {
     private CircularByteBuffer buffer;
 
@@ -28,38 +32,75 @@ public class WaitFileDescriptorCriterion implements SystemEventCriterion {
     private int size;
     private int pufds;
 
+    /**
+     *
+     * @param context
+     * @return
+     */
     public boolean needProcess(Context context) {
         return !this.getBuffer().isEmpty();
     }
 
+    /**
+     *
+     * @return
+     */
     public CircularByteBuffer getBuffer() {
         return buffer;
     }
 
+    /**
+     *
+     * @param buffer
+     */
     public void setBuffer(CircularByteBuffer buffer) {
         this.buffer = buffer;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getAddress() {
         return address;
     }
 
+    /**
+     *
+     * @param address
+     */
     public void setAddress(int address) {
         this.address = address;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getSize() {
         return size;
     }
 
+    /**
+     *
+     * @param size
+     */
     public void setSize(int size) {
         this.size = size;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getPufds() {
         return pufds;
     }
 
+    /**
+     *
+     * @param pufds
+     */
     public void setPufds(int pufds) {
         this.pufds = pufds;
     }

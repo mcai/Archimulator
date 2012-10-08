@@ -31,24 +31,71 @@ import archimulator.sim.uncore.tlb.TranslationLookasideBuffer;
 import java.util.List;
 import java.util.Map;
 
+/**
+ *
+ * @author Min Cai
+ */
 public interface CacheHierarchy extends SimulationObject {
+    /**
+     *
+     * @param from
+     * @param to
+     * @param size
+     * @param message
+     */
     void transfer(Controller from, Controller to, int size, CoherenceMessage message);
 
+    /**
+     *
+     * @return
+     */
     MemoryController getMemoryController();
 
+    /**
+     *
+     * @return
+     */
     DirectoryController getL2CacheController();
 
+    /**
+     *
+     * @return
+     */
     List<CacheController> getL1ICacheControllers();
 
+    /**
+     *
+     * @return
+     */
     List<CacheController> getL1DCacheControllers();
 
+    /**
+     *
+     * @return
+     */
     List<TranslationLookasideBuffer> getItlbs();
 
+    /**
+     *
+     * @return
+     */
     List<TranslationLookasideBuffer> getDtlbs();
 
+    /**
+     *
+     * @return
+     */
     Net getL1sToL2Network();
 
+    /**
+     *
+     * @return
+     */
     L2ToMemNet getL2ToMemNetwork();
 
+    /**
+     *
+     * @param stats
+     */
     void dumpCacheControllerFsmStats(Map<String, String> stats);
 }

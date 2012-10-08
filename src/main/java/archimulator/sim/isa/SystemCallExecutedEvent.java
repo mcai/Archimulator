@@ -21,20 +21,37 @@ package archimulator.sim.isa;
 import archimulator.sim.common.SimulationEvent;
 import archimulator.sim.os.Context;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class SystemCallExecutedEvent extends SimulationEvent {
     private Context context;
     private String systemCallName;
 
+    /**
+     *
+     * @param context
+     * @param systemCallName
+     */
     public SystemCallExecutedEvent(Context context, String systemCallName) {
         super(context);
         this.systemCallName = systemCallName;
         this.context = context;
     }
 
+    /**
+     *
+     * @return
+     */
     public Context getContext() {
         return context;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getSystemCallName() {
         return systemCallName;
     }

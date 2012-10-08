@@ -25,6 +25,10 @@ import net.pickapack.model.ModelElement;
 
 import java.util.Date;
 
+/**
+ *
+ * @author Min Cai
+ */
 @DatabaseTable(tableName = "User")
 public class User implements ModelElement {
     @DatabaseField(generatedId = true)
@@ -39,41 +43,79 @@ public class User implements ModelElement {
     @DatabaseField
     private String password;
 
+    /**
+     *
+     */
     public User() {
     }
 
+    /**
+     *
+     * @param email email
+     * @param password password
+     */
     public User(String email, String password) {
         this.email = email;
         this.password = password;
         this.createTime = DateHelper.toTick(new Date());
     }
 
+    /**
+     *
+     * @return id
+     */
+    @Override
     public long getId() {
         return id;
     }
 
+    /**
+     *
+     * @return parent id
+     */
     @Override
     public long getParentId() {
         return -1;
     }
 
+    /**
+     *
+     * @return title
+     */
     @Override
     public String getTitle() {
         return email;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getEmail() {
         return email;
     }
 
+    /**
+     *
+     * @return
+     */
+    @Override
     public long getCreateTime() {
         return createTime;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getPassword() {
         return password;
     }
 
+    /**
+     *
+     * @param password
+     */
     public void setPassword(String password) {
         this.password = password;
     }

@@ -23,6 +23,10 @@ import net.pickapack.math.SaturatingCounter;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class MyBranchPredictor implements BranchPredictor2 {
     private static final int HISTORY_LENGTH = 15;
     private static final int TABLE_BITS = 15;
@@ -30,6 +34,9 @@ public class MyBranchPredictor implements BranchPredictor2 {
     private int history;
     private List<SaturatingCounter> tab;
 
+    /**
+     *
+     */
     public MyBranchPredictor() {
         this.history = 0;
 
@@ -39,6 +46,11 @@ public class MyBranchPredictor implements BranchPredictor2 {
         }
     }
 
+    /**
+     *
+     * @param branchInfo
+     * @return
+     */
     public BranchUpdate predict(BranchInfo branchInfo) {
         MyBranchUpdate branchUpdate = new MyBranchUpdate();
 
@@ -52,6 +64,13 @@ public class MyBranchPredictor implements BranchPredictor2 {
         return branchUpdate;
     }
 
+    /**
+     *
+     * @param branchInfo
+     * @param branchUpdate
+     * @param taken
+     * @param target
+     */
     public void update(BranchInfo branchInfo, BranchUpdate branchUpdate, boolean taken, int target) {
         assert (branchUpdate instanceof MyBranchUpdate);
 

@@ -18,8 +18,21 @@
  ******************************************************************************/
 package archimulator.sim.uncore.dram;
 
+/**
+ *
+ * @author Min Cai
+ */
 public enum MemoryControllerType {
+    /**
+     *
+     */
     FIXED_LATENCY,
+    /**
+     *
+     */
     SIMPLE,
+    /**
+     *
+     */
     BASIC
 }

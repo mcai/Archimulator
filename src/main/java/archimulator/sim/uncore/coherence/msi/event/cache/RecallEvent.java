@@ -22,7 +22,18 @@ import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class RecallEvent extends CacheControllerEvent {
+    /**
+     *
+     * @param generator
+     * @param producerFlow
+     * @param tag
+     * @param access
+     */
     public RecallEvent(CacheController generator, CacheCoherenceFlow producerFlow, int tag, MemoryHierarchyAccess access) {
         super(generator, producerFlow, CacheControllerEventType.RECALL, access, tag);
     }

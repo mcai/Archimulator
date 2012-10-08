@@ -22,7 +22,18 @@ import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class PutAcknowledgementMessage extends CoherenceMessage {
+    /**
+     *
+     * @param generator
+     * @param producerFlow
+     * @param tag
+     * @param access
+     */
     public PutAcknowledgementMessage(Controller generator, CacheCoherenceFlow producerFlow, int tag, MemoryHierarchyAccess access) {
         super(generator, producerFlow, CoherenceMessageType.PUT_ACKNOWLEDGEMENT, access, tag);
     }

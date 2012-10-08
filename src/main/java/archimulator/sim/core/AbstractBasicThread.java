@@ -28,51 +28,141 @@ import net.pickapack.action.Action1;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author Min Cai
+ */
 public abstract class AbstractBasicThread extends BasicSimulationObject implements Thread {
+    /**
+     *
+     */
     protected int num;
+    /**
+     *
+     */
     protected Context context;
+    /**
+     *
+     */
     protected int id;
+    /**
+     *
+     */
     protected String name;
+    /**
+     *
+     */
     protected Core core;
 
+    /**
+     *
+     */
     protected BranchPredictor branchPredictor;
 
+    /**
+     *
+     */
     protected RegisterRenameTable renameTable;
 
+    /**
+     *
+     */
     protected PipelineBuffer<DecodeBufferEntry> decodeBuffer;
+    /**
+     *
+     */
     protected PipelineBuffer<ReorderBufferEntry> reorderBuffer;
+    /**
+     *
+     */
     protected PipelineBuffer<LoadStoreQueueEntry> loadStoreQueue;
 
     private TranslationLookasideBuffer itlb;
     private TranslationLookasideBuffer dtlb;
 
+    /**
+     *
+     */
     protected PhysicalRegisterFile intPhysicalRegisterFile;
+    /**
+     *
+     */
     protected PhysicalRegisterFile fpPhysicalRegisterFile;
+    /**
+     *
+     */
     protected PhysicalRegisterFile miscPhysicalRegisterFile;
 
+    /**
+     *
+     */
     protected long totalInstructions;
 
+    /**
+     *
+     */
     protected long decodeBufferFull;
+    /**
+     *
+     */
     protected long reorderBufferFull;
+    /**
+     *
+     */
     protected long loadStoreQueueFull;
 
+    /**
+     *
+     */
     protected long intPhysicalRegisterFileFull;
+    /**
+     *
+     */
     protected long fpPhysicalRegisterFileFull;
+    /**
+     *
+     */
     protected long miscPhysicalRegisterFileFull;
 
+    /**
+     *
+     */
     protected long fetchStallsOnDecodeBufferIsFull;
 
+    /**
+     *
+     */
     protected long registerRenameStallsOnDecodeBufferIsEmpty;
+    /**
+     *
+     */
     protected long registerRenameStallsOnReorderBufferIsFull;
+    /**
+     *
+     */
     protected long registerRenameStallsOnLoadStoreQueueFull;
 
+    /**
+     *
+     */
     protected long selectionStallOnCanNotLoad;
+    /**
+     *
+     */
     protected long selectionStallOnCanNotStore;
+    /**
+     *
+     */
     protected long selectionStallOnNoFreeFunctionalUnit;
 
     private List<Mnemonic> executedMnemonics;
     private List<String> executedSystemCalls;
 
+    /**
+     *
+     * @param core
+     * @param num
+     */
     public AbstractBasicThread(Core core, int num) {
         super(core);
 
@@ -165,6 +255,9 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
         });
     }
 
+    /**
+     *
+     */
     public void updatePerCycleStats() {
         if (this.decodeBuffer.isFull()) {
             this.decodeBufferFull++;
@@ -191,59 +284,115 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public int getNum() {
         return num;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getId() {
         return id;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     *
+     * @return
+     */
     public Core getCore() {
         return core;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public BranchPredictor getBranchPredictor() {
         return branchPredictor;
     }
 
+    /**
+     *
+     * @return
+     */
     public PipelineBuffer<DecodeBufferEntry> getDecodeBuffer() {
         return decodeBuffer;
     }
 
+    /**
+     *
+     * @return
+     */
     public PipelineBuffer<ReorderBufferEntry> getReorderBuffer() {
         return reorderBuffer;
     }
 
+    /**
+     *
+     * @return
+     */
     public PipelineBuffer<LoadStoreQueueEntry> getLoadStoreQueue() {
         return loadStoreQueue;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getTotalInstructions() {
         return totalInstructions;
     }
 
+    /**
+     *
+     * @return
+     */
     public TranslationLookasideBuffer getItlb() {
         return itlb;
     }
 
+    /**
+     *
+     * @param itlb
+     */
     public void setItlb(TranslationLookasideBuffer itlb) {
         this.itlb = itlb;
     }
 
+    /**
+     *
+     * @return
+     */
     public TranslationLookasideBuffer getDtlb() {
         return dtlb;
     }
 
+    /**
+     *
+     * @param dtlb
+     */
     public void setDtlb(TranslationLookasideBuffer dtlb) {
         this.dtlb = dtlb;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<TranslationLookasideBuffer> getTlbs() {
         List<TranslationLookasideBuffer> tlbs = new ArrayList<TranslationLookasideBuffer>();
         tlbs.add(getItlb());
@@ -251,104 +400,187 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
         return tlbs;
     }
 
+    /**
+     *
+     * @return
+     */
     public Context getContext() {
         return context;
     }
 
+    /**
+     *
+     * @param context
+     */
     public void setContext(Context context) {
         this.context = context;
     }
 
+    /**
+     *
+     */
     public void incrementRegisterRenameStallsOnDecodeBufferIsEmpty() {
         this.registerRenameStallsOnDecodeBufferIsEmpty++;
     }
 
+    /**
+     *
+     */
     public void incrementRegisterRenameStallsOnReorderBufferIsFull() {
         this.registerRenameStallsOnReorderBufferIsFull++;
     }
 
+    /**
+     *
+     */
     public void incrementSelectionStallOnCanNotLoad() {
         this.selectionStallOnCanNotLoad++;
     }
 
+    /**
+     *
+     */
     public void incrementSelectionStallOnCanNotStore() {
         this.selectionStallOnCanNotStore++;
     }
 
+    /**
+     *
+     */
     public void incrementSelectionStallOnNoFreeFunctionalUnit() {
         this.selectionStallOnNoFreeFunctionalUnit++;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public long getDecodeBufferFull() {
         return decodeBufferFull;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public long getReorderBufferFull() {
         return reorderBufferFull;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public long getLoadStoreQueueFull() {
         return loadStoreQueueFull;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public long getIntPhysicalRegisterFileFull() {
         return intPhysicalRegisterFileFull;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public long getFpPhysicalRegisterFileFull() {
         return fpPhysicalRegisterFileFull;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public long getMiscPhysicalRegisterFileFull() {
         return miscPhysicalRegisterFileFull;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public long getFetchStallsOnDecodeBufferIsFull() {
         return fetchStallsOnDecodeBufferIsFull;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public long getRegisterRenameStallsOnDecodeBufferIsEmpty() {
         return registerRenameStallsOnDecodeBufferIsEmpty;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public long getRegisterRenameStallsOnReorderBufferIsFull() {
         return registerRenameStallsOnReorderBufferIsFull;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public long getRegisterRenameStallsOnLoadStoreQueueFull() {
         return registerRenameStallsOnLoadStoreQueueFull;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public long getSelectionStallOnCanNotLoad() {
         return selectionStallOnCanNotLoad;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public long getSelectionStallOnCanNotStore() {
         return selectionStallOnCanNotStore;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public long getSelectionStallOnNoFreeFunctionalUnit() {
         return selectionStallOnNoFreeFunctionalUnit;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public List<Mnemonic> getExecutedMnemonics() {
         return executedMnemonics;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public List<String> getExecutedSystemCalls() {
         return executedSystemCalls;

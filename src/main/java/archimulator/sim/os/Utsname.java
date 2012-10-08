@@ -22,17 +22,44 @@ import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class Utsname {
     private static final int _SYSNAME_SIZE = 64 + 1;
     private static final int SIZE_OF = _SYSNAME_SIZE * 6;
 
+    /**
+     *
+     */
     public String sysname;
+    /**
+     *
+     */
     public String nodename;
+    /**
+     *
+     */
     public String release;
+    /**
+     *
+     */
     public String version;
+    /**
+     *
+     */
     public String machine;
+    /**
+     *
+     */
     public String domainname;
 
+    /**
+     *
+     * @param littleEndian
+     * @return
+     */
     public byte[] getBytes(boolean littleEndian) {
         try {
             String charSet = "US-ASCII";

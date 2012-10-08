@@ -18,25 +18,48 @@
  ******************************************************************************/
 package archimulator.sim.core.bpred;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class BranchTargetBufferEntry {
     private int source;
     private int target;
 
+    /**
+     *
+     */
     public BranchTargetBufferEntry() {
     }
 
+    /**
+     *
+     * @return
+     */
     public int getSource() {
         return source;
     }
 
+    /**
+     *
+     * @param source
+     */
     public void setSource(int source) {
         this.source = source;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getTarget() {
         return target;
     }
 
+    /**
+     *
+     * @param target
+     */
     public void setTarget(int target) {
         this.target = target;
     }

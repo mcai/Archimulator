@@ -24,19 +24,38 @@ import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.net.Net;
 import net.pickapack.action.Action;
 
+/**
+ *
+ * @author Min Cai
+ */
 public abstract class MemoryController extends MemoryDevice {
     private long numReads;
     private long numWrites;
 
+    /**
+     *
+     * @param cacheHierarchy
+     */
     public MemoryController(CacheHierarchy cacheHierarchy) {
         super(cacheHierarchy, "memoryController");
     }
 
+    /**
+     *
+     * @param to
+     * @return
+     */
     @Override
     protected Net getNet(MemoryDevice to) {
         return this.getCacheHierarchy().getL2ToMemNetwork();
     }
 
+    /**
+     *
+     * @param source
+     * @param tag
+     * @param onSuccessCallback
+     */
     public void memReadRequestReceive(final MemoryDevice source, int tag, final Action onSuccessCallback) {
         this.numReads++;
 
@@ -48,6 +67,12 @@ public abstract class MemoryController extends MemoryDevice {
         });
     }
 
+    /**
+     *
+     * @param source
+     * @param tag
+     * @param onSuccessCallback
+     */
     public void memWriteRequestReceive(final MemoryDevice source, int tag, final Action onSuccessCallback) {
         this.numWrites++;
 
@@ -59,20 +84,41 @@ public abstract class MemoryController extends MemoryDevice {
         });
     }
 
+    /**
+     *
+     * @param address
+     * @param onCompletedCallback
+     */
     protected abstract void access(int address, Action onCompletedCallback);
 
+    /**
+     *
+     * @return
+     */
     public long getNumAccesses() {
         return this.numReads + this.numWrites;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getNumReads() {
         return numReads;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getNumWrites() {
         return numWrites;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getLineSize() {
         return getExperiment().getArchitecture().getMemoryControllerLineSize();
     }

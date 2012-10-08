@@ -23,6 +23,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ *
+ * @author Min Cai
+ */
 public abstract class NetNode {
     private Net net;
     private String name;
@@ -33,6 +37,16 @@ public abstract class NetNode {
 
     private Map<NetNode, RoutingEntry> routingEntries;
 
+    /**
+     *
+     * @param net
+     * @param name
+     * @param numInPorts
+     * @param inBufferSize
+     * @param numOutPorts
+     * @param outBufferSize
+     * @param bandwidth
+     */
     public NetNode(Net net, String name, int numInPorts, int inBufferSize, int numOutPorts, int outBufferSize, int bandwidth) {
         this.net = net;
         this.name = name;
@@ -52,14 +66,28 @@ public abstract class NetNode {
         this.routingEntries = new HashMap<NetNode, RoutingEntry>();
     }
 
+    /**
+     *
+     * @return
+     */
     public InPort findFreeInPort() {
         return this.findFreePort(this.inPorts);
     }
 
+    /**
+     *
+     * @return
+     */
     public OutPort findFreeOutPort() {
         return this.findFreePort(this.outPorts);
     }
 
+    /**
+     *
+     * @param <NetPortT>
+     * @param ports
+     * @return
+     */
     protected <NetPortT extends NetPort> NetPortT findFreePort(List<NetPortT> ports) {
         for (NetPortT port : ports) {
             if (port.getLink() == null) {
@@ -70,30 +98,59 @@ public abstract class NetNode {
         return null;
     }
 
+    /**
+     *
+     * @param destinationNode
+     * @return
+     */
     public OutPort getPort(NetNode destinationNode) {
         return this.routingEntries.get(destinationNode).getOutPort();
     }
 
+    /**
+     *
+     * @return
+     */
     public Net getNet() {
         return net;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<OutPort> getOutPorts() {
         return outPorts;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<InPort> getInPorts() {
         return inPorts;
     }
 
+    /**
+     *
+     * @return
+     */
     public Crossbar getCrossbar() {
         return crossbar;
     }
 
+    /**
+     *
+     * @return
+     */
     public Map<NetNode, RoutingEntry> getRoutingEntries() {
         return routingEntries;
     }

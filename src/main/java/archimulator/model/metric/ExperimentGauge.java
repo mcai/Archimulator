@@ -22,23 +22,44 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import net.pickapack.model.metric.Gauge;
 
+/**
+ *
+ * @author Min Cai
+ */
 @DatabaseTable(tableName = "ExperimentGauge")
 public class ExperimentGauge extends Gauge {
     @DatabaseField
     private ExperimentGaugeType type;
 
+    /**
+     *
+     */
     public ExperimentGauge() {
     }
 
+    /**
+     *
+     * @param title
+     * @param expression
+     * @param type
+     */
     public ExperimentGauge(String title, String expression, ExperimentGaugeType type) {
         super(title, expression);
         this.type = type;
     }
 
+    /**
+     *
+     * @return
+     */
     public ExperimentGaugeType getType() {
         return type;
     }
 
+    /**
+     *
+     * @param type
+     */
     public void setType(ExperimentGaugeType type) {
         this.type = type;
     }

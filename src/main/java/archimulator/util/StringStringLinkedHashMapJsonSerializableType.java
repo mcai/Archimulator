@@ -24,14 +24,25 @@ import com.google.gson.reflect.TypeToken;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class StringStringLinkedHashMapJsonSerializableType extends JsonSerializableType<ArrayList<ContextMapping>> {
     private static final StringStringLinkedHashMapJsonSerializableType singleTon = new StringStringLinkedHashMapJsonSerializableType();
 
+    /**
+     *
+     */
     public StringStringLinkedHashMapJsonSerializableType() {
         super(new TypeToken<LinkedHashMap<String, String>>() {
         }.getType());
     }
 
+    /**
+     *
+     * @return
+     */
     public static StringStringLinkedHashMapJsonSerializableType getSingleton() {
         return singleTon;
     }

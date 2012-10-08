@@ -23,14 +23,30 @@ import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.event.ControllerEvent;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
+/**
+ *
+ * @author Min Cai
+ */
 public abstract class CacheControllerEvent extends ControllerEvent {
     private CacheControllerEventType type;
 
+    /**
+     *
+     * @param generator
+     * @param producerFlow
+     * @param type
+     * @param access
+     * @param tag
+     */
     public CacheControllerEvent(CacheController generator, CacheCoherenceFlow producerFlow, CacheControllerEventType type, MemoryHierarchyAccess access, int tag) {
         super(generator, producerFlow, access, tag);
         this.type = type;
     }
 
+    /**
+     *
+     * @return
+     */
     public CacheControllerEventType getType() {
         return type;
     }

@@ -27,7 +27,15 @@ import net.pickapack.action.Action1;
 import net.pickapack.action.Action4;
 import net.pickapack.fsm.FiniteStateMachineFactory;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachineFactory<CacheControllerState, CacheControllerEventType, CacheControllerFiniteStateMachine> {
+    /**
+     *
+     * @param actionWhenStateChanged
+     */
     public CacheControllerFiniteStateMachineFactory(Action1<CacheControllerFiniteStateMachine> actionWhenStateChanged) {
         this.inState(CacheControllerState.I)
                 .setOnCompletedCallback(actionWhenStateChanged)

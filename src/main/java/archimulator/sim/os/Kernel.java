@@ -32,6 +32,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class Kernel extends BasicSimulationObject implements SimulationObject {
     private List<Pipe> pipes;
     private List<SystemEvent> systemEvents;
@@ -44,6 +48,10 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
 
     private long currentCycle;
 
+    /**
+     *
+     * @param simulation
+     */
     public Kernel(Simulation simulation) {
         super(simulation);
 
@@ -61,6 +69,11 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
         this.systemCallEmulation = new SystemCallEmulation(this);
     }
 
+    /**
+     *
+     * @param id
+     * @return
+     */
     public Process getProcessFromId(int id) {
         for (Process process : this.processes) {
             if (process.getId() == id) {
@@ -71,6 +84,11 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
         return null;
     }
 
+    /**
+     *
+     * @param id
+     * @return
+     */
     public Context getContextFromId(int id) {
         for (Context context : this.contexts) {
             if (context.getId() == id) {
@@ -81,6 +99,11 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
         return null;
     }
 
+    /**
+     *
+     * @param processId
+     * @return
+     */
     public Context getContextFromProcessId(int processId) {
         for (Context context : this.contexts) {
             if (context.getProcessId() == processId) {
@@ -91,6 +114,12 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
         return null;
     }
 
+    /**
+     *
+     * @param contextToMap
+     * @param predicate
+     * @return
+     */
     public boolean map(Context contextToMap, Predicate<Integer> predicate) {
         if (contextToMap.getThreadId() != -1) {
             throw new IllegalArgumentException();
@@ -119,10 +148,17 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
         return false;
     }
 
+    /**
+     *
+     * @param event
+     */
     public void scheduleSystemEvent(SystemEvent event) {
         this.systemEvents.add(event);
     }
 
+    /**
+     *
+     */
     public void processSystemEvents() {
         for (Iterator<SystemEvent> it = this.systemEvents.iterator(); it.hasNext(); ) {
             SystemEvent e = it.next();
@@ -134,6 +170,9 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
         }
     }
 
+    /**
+     *
+     */
     public void processSignals() {
         for (Context context : this.contexts) {
             if ((context.getState() == ContextState.RUNNING || context.getState() == ContextState.BLOCKED) && !context.isSpeculative()) {
@@ -146,12 +185,20 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
         }
     }
 
+    /**
+     *
+     * @param fileDescriptors
+     */
     public void createPipe(int[] fileDescriptors) {
         fileDescriptors[0] = currentFd++;
         fileDescriptors[1] = currentFd++;
         this.pipes.add(new Pipe(fileDescriptors));
     }
 
+    /**
+     *
+     * @param fileDescriptor
+     */
     public void closePipe(int fileDescriptor) {
         for (Iterator<Pipe> it = this.pipes.iterator(); it.hasNext(); ) {
             Pipe pipe = it.next();
@@ -169,10 +216,20 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
         }
     }
 
+    /**
+     *
+     * @param fileDescriptor
+     * @return
+     */
     public CircularByteBuffer getReadBuffer(int fileDescriptor) {
         return this.getBuffer(fileDescriptor, 0);
     }
 
+    /**
+     *
+     * @param fileDescriptor
+     * @return
+     */
     public CircularByteBuffer getWriteBuffer(int fileDescriptor) {
         return this.getBuffer(fileDescriptor, 1);
     }
@@ -187,6 +244,11 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
         return null;
     }
 
+    /**
+     *
+     * @param context
+     * @param signal
+     */
     public void runSignalHandler(Context context, int signal) {
         try {
             if (signalActions.get(signal - 1).getHandler() == 0) {
@@ -217,10 +279,19 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
         }
     }
 
+    /**
+     *
+     * @param context
+     * @param signal
+     * @return
+     */
     public boolean mustProcessSignal(Context context, int signal) {
         return context.getSignalMasks().getPending().contains(signal) && !context.getSignalMasks().getBlocked().contains(signal);
     }
 
+    /**
+     *
+     */
     public void advanceOneCycle() {
         if (this.currentCycle % 1000 == 0) {
             this.processSystemEvents();
@@ -230,30 +301,65 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
         this.currentCycle++;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<SignalAction> getSignalActions() {
         return signalActions;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<Context> getContexts() {
         return contexts;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<Process> getProcesses() {
         return processes;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getCurrentCycle() {
         return currentCycle;
     }
 
+    /**
+     *
+     * @return
+     */
     public SystemCallEmulation getSystemCallEmulation() {
         return systemCallEmulation;
     }
 
+    /**
+     *
+     */
     public static final int MAX_SIGNAL = 64;
 
+    /**
+     *
+     */
     public int currentPid = 1000;
+    /**
+     *
+     */
     public int currentMemoryId = 0;
+    /**
+     *
+     */
     public int currentContextId = 0;
+    /**
+     *
+     */
     public int currentFd = 100;
 }

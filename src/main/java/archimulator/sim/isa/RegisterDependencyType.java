@@ -20,9 +20,30 @@ package archimulator.sim.isa;
 
 import net.pickapack.Pair;
 
+/**
+ *
+ * @author Min Cai
+ */
 public enum RegisterDependencyType {
-    INTEGER, FLOAT, MISC;
+    /**
+     *
+     */
+    INTEGER,
+    /**
+     *
+     */
+    FLOAT,
+    /**
+     *
+     */
+    MISC;
 
+    /**
+     *
+     * @param type
+     * @param num
+     * @return
+     */
     public static int toRegisterDependency(RegisterDependencyType type, int num) {
         switch (type) {
             case INTEGER:
@@ -36,6 +57,11 @@ public enum RegisterDependencyType {
         }
     }
 
+    /**
+     *
+     * @param dependency
+     * @return
+     */
     public static Pair<RegisterDependencyType, Integer> parse(int dependency) {
         if (dependency < ArchitecturalRegisterFile.NUM_INT_REGISTERS) {
             return new Pair<RegisterDependencyType, Integer>(RegisterDependencyType.INTEGER, dependency);
@@ -46,10 +72,20 @@ public enum RegisterDependencyType {
         }
     }
 
+    /**
+     *
+     * @param dependency
+     * @return
+     */
     public static RegisterDependencyType getType(int dependency) {
         return parse(dependency).getFirst();
     }
 
+    /**
+     *
+     * @param dependency
+     * @return
+     */
     public static int getNum(int dependency) {
         return parse(dependency).getSecond();
     }

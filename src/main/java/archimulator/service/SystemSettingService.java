@@ -21,8 +21,20 @@ package archimulator.service;
 import archimulator.model.SystemSetting;
 import net.pickapack.service.Service;
 
+/**
+ *
+ * @author Min Cai
+ */
 public interface SystemSettingService extends Service {
+    /**
+     *
+     * @return
+     */
     SystemSetting getSystemSettingSingleton();
 
+    /**
+     *
+     * @param systemSetting
+     */
     void updateSystemSettingSingleton(SystemSetting systemSetting);
 }

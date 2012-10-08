@@ -21,22 +21,42 @@ package archimulator.model;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class ExperimentPackVariable implements Serializable {
     private String name;
     private List<String> values;
 
+    /**
+     *
+     * @return
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     *
+     * @param name
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<String> getValues() {
         return values;
     }
 
+    /**
+     *
+     * @param values
+     */
     public void setValues(List<String> values) {
         this.values = values;
     }

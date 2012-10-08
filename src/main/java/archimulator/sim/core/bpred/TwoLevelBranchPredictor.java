@@ -24,6 +24,10 @@ import archimulator.sim.isa.StaticInstructionType;
 import net.pickapack.Reference;
 import net.pickapack.math.SaturatingCounter;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class TwoLevelBranchPredictor extends DynamicBranchPredictor {
     private int l1Size;
     private int l2Size;
@@ -32,6 +36,18 @@ public class TwoLevelBranchPredictor extends DynamicBranchPredictor {
     private int[] shiftRegs;
     private SaturatingCounter[] l2Table;
 
+    /**
+     *
+     * @param thread
+     * @param name
+     * @param l1Size
+     * @param l2Size
+     * @param shiftWidth
+     * @param xor
+     * @param branchTargetBufferNumSets
+     * @param branchTargetBufferAssociativity
+     * @param returnAddressStackSize
+     */
     public TwoLevelBranchPredictor(Thread thread, String name, int l1Size, int l2Size, int shiftWidth, boolean xor, int branchTargetBufferNumSets, int branchTargetBufferAssociativity, int returnAddressStackSize) {
         super(thread, name, BranchPredictorType.TWO_LEVEL, branchTargetBufferNumSets, branchTargetBufferAssociativity, returnAddressStackSize);
 
@@ -50,10 +66,24 @@ public class TwoLevelBranchPredictor extends DynamicBranchPredictor {
         }
     }
 
+    /**
+     *
+     * @param thread
+     * @param name
+     */
     public TwoLevelBranchPredictor(Thread thread, String name) {
         this(thread, name, thread.getExperiment().getArchitecture().getTwoLevelBranchPredictorL1Size(), thread.getExperiment().getArchitecture().getTwoLevelBranchPredictorL2Size(), thread.getExperiment().getArchitecture().getTwoLevelBranchPredictorShiftWidth(), thread.getExperiment().getArchitecture().getTwoLevelBranchPredictorXor(), thread.getExperiment().getArchitecture().getTwoLevelBranchPredictorBranchTargetBufferNumSets(), thread.getExperiment().getArchitecture().getTwoLevelBranchPredictorBranchTargetBufferAssociativity(), thread.getExperiment().getArchitecture().getTwoLevelBranchPredictorReturnAddressStackSize());
     }
 
+    /**
+     *
+     * @param branchAddress
+     * @param branchTarget
+     * @param mnemonic
+     * @param branchPredictorUpdate
+     * @param returnAddressStackRecoverIndex
+     * @return
+     */
     @Override
     public int predict(int branchAddress, int branchTarget, Mnemonic mnemonic, BranchPredictorUpdate branchPredictorUpdate, Reference<Integer> returnAddressStackRecoverIndex) {
         if (mnemonic.getType() == StaticInstructionType.CONDITIONAL) {
@@ -84,6 +114,16 @@ public class TwoLevelBranchPredictor extends DynamicBranchPredictor {
         return branchTargetBufferEntry != null ? branchTargetBufferEntry.getTarget() : 1;
     }
 
+    /**
+     *
+     * @param branchAddress
+     * @param branchTarget
+     * @param taken
+     * @param predictedTaken
+     * @param correct
+     * @param mnemonic
+     * @param branchPredictorUpdate
+     */
     @Override
     public void update(int branchAddress, int branchTarget, boolean taken, boolean predictedTaken, boolean correct, Mnemonic mnemonic, BranchPredictorUpdate branchPredictorUpdate) {
         super.update(branchAddress, branchTarget, taken, predictedTaken, correct, mnemonic, branchPredictorUpdate);
@@ -118,10 +158,20 @@ public class TwoLevelBranchPredictor extends DynamicBranchPredictor {
         return l2Index;
     }
 
+    /**
+     *
+     * @param branchAddress
+     * @return
+     */
     public SaturatingCounter getIndex(int branchAddress) {
         return this.l2Table[this.hash(branchAddress)];
     }
 
+    /**
+     *
+     * @param branchAddress
+     * @param taken
+     */
     public void updateTable(int branchAddress, boolean taken) {
         int l1Index = (branchAddress >> BranchPredictor.BRANCH_SHIFT) & (this.l1Size - 1);
         int shiftReg = (this.shiftRegs[l1Index] << 1) | (taken ? 1 : 0);

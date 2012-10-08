@@ -20,10 +20,20 @@ package archimulator.sim.uncore.net;
 
 import net.pickapack.action.Action;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class InPort extends NetPort {
     private InBuffer buffer;
     private int num;
 
+    /**
+     *
+     * @param node
+     * @param num
+     * @param bufferSize
+     */
     public InPort(NetNode node, int num, int bufferSize) {
         super(node);
 
@@ -34,6 +44,10 @@ public class InPort extends NetPort {
         }
     }
 
+    /**
+     *
+     * @param message
+     */
     public void toCrossbar(final NetMessage message) {
         if (this.buffer != null && this.buffer.isReadBusy()) {
             this.buffer.addPendingReadAction(new Action() {
@@ -70,10 +84,18 @@ public class InPort extends NetPort {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public InBuffer getBuffer() {
         return buffer;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getNum() {
         return num;
     }

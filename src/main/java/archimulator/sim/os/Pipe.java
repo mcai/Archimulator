@@ -20,19 +20,35 @@ package archimulator.sim.os;
 
 import net.pickapack.io.buffer.CircularByteBuffer;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class Pipe {
     private int[] fileDescriptors;
     private CircularByteBuffer buffer;
 
+    /**
+     *
+     * @param fileDescriptors
+     */
     public Pipe(int[] fileDescriptors) {
         this.fileDescriptors = fileDescriptors;
         this.buffer = new CircularByteBuffer(1024);
     }
 
+    /**
+     *
+     * @return
+     */
     public int[] getFileDescriptors() {
         return fileDescriptors;
     }
 
+    /**
+     *
+     * @return
+     */
     public CircularByteBuffer getBuffer() {
         return buffer;
     }

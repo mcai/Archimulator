@@ -21,6 +21,10 @@ package archimulator.sim.uncore;
 import archimulator.sim.common.SimulationEvent;
 import archimulator.sim.core.Thread;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class MemoryAccessInitiatedEvent extends SimulationEvent {
     private int threadId;
     private int virtualPc;
@@ -28,6 +32,14 @@ public class MemoryAccessInitiatedEvent extends SimulationEvent {
     private int physicalTag;
     private MemoryHierarchyAccessType type;
 
+    /**
+     *
+     * @param thread
+     * @param virtualPc
+     * @param physicalAddress
+     * @param physicalTag
+     * @param type
+     */
     public MemoryAccessInitiatedEvent(Thread thread, int virtualPc, int physicalAddress, int physicalTag, MemoryHierarchyAccessType type) {
         super(thread);
         this.threadId = thread.getId();
@@ -37,22 +49,42 @@ public class MemoryAccessInitiatedEvent extends SimulationEvent {
         this.type = type;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getThreadId() {
         return threadId;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getVirtualPc() {
         return virtualPc;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getPhysicalAddress() {
         return physicalAddress;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getPhysicalTag() {
         return physicalTag;
     }
 
+    /**
+     *
+     * @return
+     */
     public MemoryHierarchyAccessType getType() {
         return type;
     }

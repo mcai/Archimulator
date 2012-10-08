@@ -24,10 +24,23 @@ import net.pickapack.Reference;
 import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class FromRoiDetailedSimulation extends Simulation {
     private long numMaxInstructions;
     private Reference<Kernel> kernelRef;
 
+    /**
+     *
+     * @param title
+     * @param experiment
+     * @param blockingEventDispatcher
+     * @param cycleAccurateEventQueue
+     * @param numMaxInstructions
+     * @param kernelRef
+     */
     public FromRoiDetailedSimulation(String title, Experiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, long numMaxInstructions, Reference<Kernel> kernelRef) {
         super(title, SimulationType.MEASUREMENT, experiment, blockingEventDispatcher, cycleAccurateEventQueue);
 
@@ -35,29 +48,51 @@ public class FromRoiDetailedSimulation extends Simulation {
         this.kernelRef = kernelRef;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public boolean canDoFastForwardOneCycle() {
         throw new IllegalArgumentException();
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public boolean canDoCacheWarmupOneCycle() {
         throw new IllegalArgumentException();
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public boolean canDoMeasurementOneCycle() {
         return this.getProcessor().getCores().get(0).getThreads().get(0).getTotalInstructions() < this.numMaxInstructions;
     }
 
+    /**
+     *
+     */
     @Override
     public void beginSimulation() {
     }
 
+    /**
+     *
+     */
     @Override
     public void endSimulation() {
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public Kernel prepareKernel() {
         return this.kernelRef.get();

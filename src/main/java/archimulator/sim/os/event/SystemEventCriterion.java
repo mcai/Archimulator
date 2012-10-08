@@ -22,6 +22,15 @@ import archimulator.sim.os.Context;
 
 import java.io.Serializable;
 
+/**
+ *
+ * @author Min Cai
+ */
 public interface SystemEventCriterion extends Serializable {
+    /**
+     *
+     * @param context
+     * @return
+     */
     boolean needProcess(Context context);
 }

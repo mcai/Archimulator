@@ -21,20 +21,35 @@ package archimulator.sim.os.event;
 import archimulator.sim.isa.ArchitecturalRegisterFile;
 import archimulator.sim.os.Context;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class ReadEvent extends SystemEvent {
     private WaitFileDescriptorCriterion waitFileDescriptorCriterion;
 
+    /**
+     *
+     * @param context
+     */
     public ReadEvent(Context context) {
         super(context, SystemEventType.READ);
 
         this.waitFileDescriptorCriterion = new WaitFileDescriptorCriterion();
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public boolean needProcess() {
         return this.waitFileDescriptorCriterion.needProcess(this.getContext());
     }
 
+    /**
+     *
+     */
     @Override
     public void process() {
         this.getContext().resume();
@@ -49,6 +64,10 @@ public class ReadEvent extends SystemEvent {
         this.getContext().getProcess().getMemory().writeBlock(this.waitFileDescriptorCriterion.getAddress(), numRead, buf);
     }
 
+    /**
+     *
+     * @return
+     */
     public WaitFileDescriptorCriterion getWaitFileDescriptorCriterion() {
         return waitFileDescriptorCriterion;
     }

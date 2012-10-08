@@ -20,11 +20,23 @@ package archimulator.sim.uncore.net;
 
 import archimulator.sim.uncore.CacheHierarchy;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class L2ToMemNet extends Net {
+    /**
+     *
+     * @param cacheHierarchy
+     */
     public L2ToMemNet(CacheHierarchy cacheHierarchy) {
         super(cacheHierarchy);
     }
 
+    /**
+     *
+     * @param cacheHierarchy
+     */
     @Override
     protected void setup(CacheHierarchy cacheHierarchy) {
         int memBlockSize = 64;

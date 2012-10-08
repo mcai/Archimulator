@@ -22,7 +22,18 @@ import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class RecallMessage extends CoherenceMessage {
+    /**
+     *
+     * @param generator
+     * @param producerFlow
+     * @param tag
+     * @param access
+     */
     public RecallMessage(Controller generator, CacheCoherenceFlow producerFlow, int tag, MemoryHierarchyAccess access) {
         super(generator, producerFlow, CoherenceMessageType.RECALL, access, tag);
     }

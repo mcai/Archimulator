@@ -21,27 +21,52 @@ package archimulator.sim.core;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author Min Cai
+ * @param <EntryT>
+ */
 public class PipelineBuffer<EntryT> {
     private int capacity;
     private List<EntryT> entries;
 
+    /**
+     *
+     * @param capacity
+     */
     public PipelineBuffer(int capacity) {
         this.capacity = capacity;
         this.entries = new ArrayList<EntryT>();
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isFull() {
         return this.entries.size() >= this.capacity;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isEmpty() {
         return this.entries.isEmpty();
     }
 
+    /**
+     *
+     * @return
+     */
     public int getCapacity() {
         return capacity;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<EntryT> getEntries() {
         return entries;
     }

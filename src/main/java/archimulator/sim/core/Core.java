@@ -24,54 +24,169 @@ import net.pickapack.action.Action;
 
 import java.util.List;
 
+/**
+ *
+ * @author Min Cai
+ */
 public interface Core extends MemoryHierarchyCore {
+    /**
+     *
+     * @param reorderBufferEntry
+     */
     void removeFromQueues(AbstractReorderBufferEntry reorderBufferEntry);
 
+    /**
+     *
+     * @param thread
+     * @param virtualAddress
+     * @return
+     */
     boolean canIfetch(Thread thread, int virtualAddress);
 
+    /**
+     *
+     * @param thread
+     * @param virtualAddress
+     * @return
+     */
     boolean canLoad(Thread thread, int virtualAddress);
 
+    /**
+     *
+     * @param thread
+     * @param virtualAddress
+     * @return
+     */
     boolean canStore(Thread thread, int virtualAddress);
 
+    /**
+     *
+     * @param thread
+     * @param virtualAddress
+     * @param virtualPc
+     * @param onCompletedCallback
+     */
     void ifetch(Thread thread, int virtualAddress, int virtualPc, Action onCompletedCallback);
 
+    /**
+     *
+     * @param dynamicInst
+     * @param virtualAddress
+     * @param virtualPc
+     * @param onCompletedCallback
+     */
     void load(DynamicInstruction dynamicInst, int virtualAddress, int virtualPc, Action onCompletedCallback);
 
+    /**
+     *
+     * @param dynamicInst
+     * @param virtualAddress
+     * @param virtualPc
+     * @param onCompletedCallback
+     */
     void store(DynamicInstruction dynamicInst, int virtualAddress, int virtualPc, Action onCompletedCallback);
 
+    /**
+     *
+     * @return
+     */
     String getName();
 
+    /**
+     *
+     * @return
+     */
     Processor getProcessor();
 
+    /**
+     *
+     * @return
+     */
     List<Thread> getThreads();
 
+    /**
+     *
+     * @return
+     */
     FunctionalUnitPool getFunctionalUnitPool();
 
+    /**
+     *
+     * @return
+     */
     List<AbstractReorderBufferEntry> getWaitingInstructionQueue();
 
+    /**
+     *
+     * @return
+     */
     List<AbstractReorderBufferEntry> getReadyInstructionQueue();
 
+    /**
+     *
+     * @return
+     */
     List<AbstractReorderBufferEntry> getReadyLoadQueue();
 
+    /**
+     *
+     * @return
+     */
     List<AbstractReorderBufferEntry> getWaitingStoreQueue();
 
+    /**
+     *
+     * @return
+     */
     List<AbstractReorderBufferEntry> getReadyStoreQueue();
 
+    /**
+     *
+     * @return
+     */
     List<AbstractReorderBufferEntry> getOooEventQueue();
 
+    /**
+     *
+     */
     void doFastForwardOneCycle();
 
+    /**
+     *
+     */
     void doCacheWarmupOneCycle();
 
+    /**
+     *
+     */
     void doMeasurementOneCycle();
 
+    /**
+     *
+     * @return
+     */
     CacheController getL1ICacheController();
 
+    /**
+     *
+     * @param l1ICacheController
+     */
     void setL1ICacheController(CacheController l1ICacheController);
 
+    /**
+     *
+     * @return
+     */
     CacheController getL1DCacheController();
 
+    /**
+     *
+     * @param l1DCacheController
+     */
     void setL1DCacheController(CacheController l1DCacheController);
 
+    /**
+     *
+     */
     void updatePerCycleStats();
 }

@@ -25,10 +25,19 @@ import net.pickapack.action.Action;
 
 import java.io.Serializable;
 
+/**
+ *
+ * @author Min Cai
+ */
 public abstract class MemoryDevice extends BasicSimulationObject implements SimulationObject, Serializable {
     private CacheHierarchy cacheHierarchy;
     private String name;
 
+    /**
+     *
+     * @param cacheHierarchy
+     * @param name
+     */
     public MemoryDevice(CacheHierarchy cacheHierarchy, String name) {
         super(cacheHierarchy);
 
@@ -36,16 +45,35 @@ public abstract class MemoryDevice extends BasicSimulationObject implements Simu
         this.name = name;
     }
 
+    /**
+     *
+     * @param to
+     * @param size
+     * @param action
+     */
     public void transfer(MemoryDevice to, int size, Action action) {
         this.getNet(to).transfer(this, to, size, action);
     }
 
+    /**
+     *
+     * @param to
+     * @return
+     */
     protected abstract Net getNet(MemoryDevice to);
 
+    /**
+     *
+     * @return
+     */
     public CacheHierarchy getCacheHierarchy() {
         return cacheHierarchy;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getName() {
         return name;
     }

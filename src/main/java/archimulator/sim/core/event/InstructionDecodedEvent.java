@@ -21,14 +21,26 @@ package archimulator.sim.core.event;
 import archimulator.sim.common.SimulationEvent;
 import archimulator.sim.core.DynamicInstruction;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class InstructionDecodedEvent extends SimulationEvent {
     private DynamicInstruction dynamicInstruction;
 
+    /**
+     *
+     * @param dynamicInstruction
+     */
     public InstructionDecodedEvent(DynamicInstruction dynamicInstruction) {
         super(dynamicInstruction.getThread());
         this.dynamicInstruction = dynamicInstruction;
     }
 
+    /**
+     *
+     * @return
+     */
     public DynamicInstruction getDynamicInstruction() {
         return dynamicInstruction;
     }

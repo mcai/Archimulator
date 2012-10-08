@@ -22,20 +22,41 @@ import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class DataMessage extends CoherenceMessage {
     private Controller sender;
     private int numInvalidationAcknowledgements;
 
+    /**
+     *
+     * @param generator
+     * @param producerFlow
+     * @param sender
+     * @param tag
+     * @param numInvalidationAcknowledgements
+     * @param access
+     */
     public DataMessage(Controller generator, CacheCoherenceFlow producerFlow, Controller sender, int tag, int numInvalidationAcknowledgements, MemoryHierarchyAccess access) {
         super(generator, producerFlow, CoherenceMessageType.DATA, access, tag);
         this.sender = sender;
         this.numInvalidationAcknowledgements = numInvalidationAcknowledgements;
     }
 
+    /**
+     *
+     * @return
+     */
     public Controller getSender() {
         return sender;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getNumInvalidationAcknowledgements() {
         return numInvalidationAcknowledgements;
     }

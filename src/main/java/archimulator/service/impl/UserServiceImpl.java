@@ -30,9 +30,16 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class UserServiceImpl extends AbstractService implements UserService {
     private Dao<User, Long> users;
 
+    /**
+     *
+     */
     @SuppressWarnings("unchecked")
     public UserServiceImpl() {
         super(ServiceManager.getDatabaseUrl(), Arrays.<Class<? extends ModelElement>>asList(User.class));
@@ -44,16 +51,30 @@ public class UserServiceImpl extends AbstractService implements UserService {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public List<User> getAllUsers() {
         return this.getAllItems(this.users);
     }
 
+    /**
+     *
+     * @param id
+     * @return
+     */
     @Override
     public User getUserById(long id) {
         return this.getItemById(this.users, id);
     }
 
+    /**
+     *
+     * @param email
+     * @return
+     */
     @Override
     public User getUserByEmail(String email) {
         try {
@@ -64,21 +85,37 @@ public class UserServiceImpl extends AbstractService implements UserService {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public User getFirstUser() {
         return this.getFirstItem(this.users);
     }
 
+    /**
+     *
+     * @param user
+     */
     @Override
     public void addUser(User user) {
         this.addItem(this.users, User.class, user);
     }
 
+    /**
+     *
+     * @param id
+     */
     @Override
     public void removeUserById(long id) {
         this.removeItemById(this.users, User.class, id);
     }
 
+    /**
+     *
+     * @param user
+     */
     @Override
     public void updateUser(User user) {
         this.updateItem(this.users, User.class, user);

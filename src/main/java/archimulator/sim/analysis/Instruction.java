@@ -22,6 +22,10 @@ import archimulator.sim.isa.StaticInstruction;
 import archimulator.sim.os.BasicProcess;
 import archimulator.sim.os.Process;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class Instruction {
     private Process process;
     private int pc;
@@ -32,49 +36,96 @@ public class Instruction {
     private BasicBlock basicBlock;
     private String sectionName;
 
+    /**
+     *
+     * @param process
+     * @param pc
+     * @param staticInstruction
+     */
     public Instruction(Process process, int pc, StaticInstruction staticInstruction) {
         this.process = process;
         this.pc = pc;
         this.staticInstruction = staticInstruction;
     }
 
+    /**
+     *
+     * @return
+     */
     public Process getProcess() {
         return process;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getPc() {
         return pc;
     }
 
+    /**
+     *
+     * @return
+     */
     public StaticInstruction getStaticInstruction() {
         return staticInstruction;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isLeader() {
         return leader;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getLeaderType() {
         return leaderType;
     }
 
+    /**
+     *
+     * @param leader
+     * @param leaderType
+     */
     public void setLeader(boolean leader, int leaderType) {
         this.leader = leader;
         this.leaderType = leaderType;
     }
 
+    /**
+     *
+     * @return
+     */
     public BasicBlock getBasicBlock() {
         return basicBlock;
     }
 
+    /**
+     *
+     * @param basicBlock
+     */
     public void setBasicBlock(BasicBlock basicBlock) {
         this.basicBlock = basicBlock;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getSectionName() {
         return sectionName;
     }
 
+    /**
+     *
+     * @param sectionName
+     */
     public void setSectionName(String sectionName) {
         this.sectionName = sectionName;
     }

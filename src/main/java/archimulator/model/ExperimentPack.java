@@ -37,6 +37,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/**
+ *
+ * @author Min Cai
+ */
 @DatabaseTable(tableName = "ExperimentPack")
 public class ExperimentPack implements ModelElement {
     @DatabaseField(generatedId = true)
@@ -59,40 +63,78 @@ public class ExperimentPack implements ModelElement {
 
     private transient ExperimentSpec baselineExperimentSpec;
 
+    /**
+     *
+     */
     public ExperimentPack() {
         this.createTime = DateHelper.toTick(new Date());
         this.experimentTitles = new ArrayList<String>();
     }
 
+    /**
+     *
+     * @return
+     */
+    @Override
     public long getId() {
         return id;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public long getParentId() {
         return -1;
     }
 
+    /**
+     *
+     * @return
+     */
+    @Override
     public String getTitle() {
         return title;
     }
 
+    /**
+     *
+     * @param title
+     */
     public void setTitle(String title) {
         this.title = title;
     }
 
+    /**
+     *
+     * @return
+     */
+    @Override
     public long getCreateTime() {
         return createTime;
     }
 
+    /**
+     *
+     * @return
+     */
     public ExperimentType getExperimentType() {
         return experimentType;
     }
 
+    /**
+     *
+     * @param experimentType
+     */
     public void setExperimentType(ExperimentType experimentType) {
         this.experimentType = experimentType;
     }
 
+    /**
+     *
+     * @return
+     */
     public ExperimentSpec getBaselineExperimentSpec() {
         if(baselineExperimentSpec == null) {
             return ServiceManager.getExperimentService().getExperimentSpecByParent(this);
@@ -101,10 +143,18 @@ public class ExperimentPack implements ModelElement {
         return baselineExperimentSpec;
     }
 
+    /**
+     *
+     * @param baselineExperimentSpec
+     */
     public void setBaselineExperimentSpec(ExperimentSpec baselineExperimentSpec) {
         this.baselineExperimentSpec = baselineExperimentSpec;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<String> getVariablePropertyNames() {
         return CollectionHelper.transform(this.variables, new Function1<ExperimentPackVariable, String>() {
             @Override
@@ -114,6 +164,10 @@ public class ExperimentPack implements ModelElement {
         });
     }
 
+    /**
+     *
+     * @return
+     */
     public List<String> getVariablePropertyValues() {
         return CollectionHelper.transform(getCombinations(), new Function1<List<String>, String>() {
             @Override
@@ -123,14 +177,26 @@ public class ExperimentPack implements ModelElement {
         });
     }
 
+    /**
+     *
+     * @return
+     */
     public List<ExperimentPackVariable> getVariables() {
         return variables;
     }
 
+    /**
+     *
+     * @param variables
+     */
     public void setVariables(List<ExperimentPackVariable> variables) {
         this.variables = new ArrayList<ExperimentPackVariable>(variables);
     }
 
+    /**
+     *
+     * @return
+     */
     public List<ExperimentSpec> getExperimentSpecs() {
         try {
             List<ExperimentSpec> experimentSpecs = new ArrayList<ExperimentSpec>();
@@ -170,6 +236,10 @@ public class ExperimentPack implements ModelElement {
         }));
     }
 
+    /**
+     *
+     * @return
+     */
     public List<String> getExperimentTitles() {
         return experimentTitles;
     }

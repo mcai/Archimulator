@@ -23,14 +23,30 @@ import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class RecallAcknowledgementEvent extends DirectoryControllerEvent {
     private CacheController sender;
 
+    /**
+     *
+     * @param generator
+     * @param producerFlow
+     * @param sender
+     * @param tag
+     * @param access
+     */
     public RecallAcknowledgementEvent(DirectoryController generator, CacheCoherenceFlow producerFlow, CacheController sender, int tag, MemoryHierarchyAccess access) {
         super(generator, producerFlow, DirectoryControllerEventType.RECALL_ACKNOWLEDGEMENT, access, tag);
         this.sender = sender;
     }
 
+    /**
+     *
+     * @return
+     */
     public CacheController getSender() {
         return sender;
     }

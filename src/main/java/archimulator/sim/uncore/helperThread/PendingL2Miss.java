@@ -21,6 +21,10 @@ package archimulator.sim.uncore.helperThread;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.CacheMissType;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class PendingL2Miss {
     private MemoryHierarchyAccess access;
     private long beginCycle;
@@ -31,60 +35,118 @@ public class PendingL2Miss {
     private transient int numMlpSamples;
     private transient int mlpSum;
 
+    /**
+     *
+     * @param access
+     * @param beginCycle
+     * @param missType
+     */
     public PendingL2Miss(MemoryHierarchyAccess access, long beginCycle, CacheMissType missType) {
         this.access = access;
         this.beginCycle = beginCycle;
         this.missType = missType;
     }
 
+    /**
+     *
+     * @return
+     */
     public MemoryHierarchyAccess getAccess() {
         return access;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getBeginCycle() {
         return beginCycle;
     }
 
+    /**
+     *
+     * @return
+     */
     public CacheMissType getMissType() {
         return missType;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getEndCycle() {
         return endCycle;
     }
 
+    /**
+     *
+     * @param endCycle
+     */
     public void setEndCycle(long endCycle) {
         this.endCycle = endCycle;
     }
 
+    /**
+     *
+     * @return
+     */
     public double getMlpCost() {
         return mlpCost;
     }
 
+    /**
+     *
+     * @param mlpCost
+     */
     public void setMlpCost(double mlpCost) {
         this.mlpCost = mlpCost;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getNumMlpSamples() {
         return numMlpSamples;
     }
 
+    /**
+     *
+     * @param numMlpSamples
+     */
     public void setNumMlpSamples(int numMlpSamples) {
         this.numMlpSamples = numMlpSamples;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getMlpSum() {
         return mlpSum;
     }
 
+    /**
+     *
+     * @param mlpSum
+     */
     public void setMlpSum(int mlpSum) {
         this.mlpSum = mlpSum;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getNumCycles() {
         return (int) (this.endCycle - this.beginCycle);
     }
 
+    /**
+     *
+     * @return
+     */
     public double getAverageMlp() {
         return (double) mlpSum / (double) numMlpSamples;
     }

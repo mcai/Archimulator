@@ -21,10 +21,19 @@ package archimulator.sim.os.event;
 import archimulator.sim.isa.ArchitecturalRegisterFile;
 import archimulator.sim.os.Context;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class WaitEvent extends SystemEvent {
     private WaitProcessIdCriterion waitProcessIdCriterion;
     private SignalCriterion signalCriterion;
 
+    /**
+     *
+     * @param context
+     * @param pid
+     */
     public WaitEvent(Context context, int pid) {
         super(context, SystemEventType.WAIT);
 
@@ -32,11 +41,18 @@ public class WaitEvent extends SystemEvent {
         this.signalCriterion = new SignalCriterion();
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public boolean needProcess() {
         return this.waitProcessIdCriterion.needProcess(this.getContext()) || this.signalCriterion.needProcess(this.getContext());
     }
 
+    /**
+     *
+     */
     @Override
     public void process() {
         this.getContext().resume();
@@ -45,10 +61,18 @@ public class WaitEvent extends SystemEvent {
         this.getContext().getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_A3, 0);
     }
 
+    /**
+     *
+     * @return
+     */
     public WaitProcessIdCriterion getWaitProcessIdCriterion() {
         return waitProcessIdCriterion;
     }
 
+    /**
+     *
+     * @return
+     */
     public SignalCriterion getSignalCriterion() {
         return signalCriterion;
     }

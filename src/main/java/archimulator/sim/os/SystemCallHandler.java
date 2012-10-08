@@ -18,21 +18,42 @@
  ******************************************************************************/
 package archimulator.sim.os;
 
+/**
+ *
+ * @author Min Cai
+ */
 public abstract class SystemCallHandler {
     private int index;
     private String name;
 
+    /**
+     *
+     * @param index
+     * @param name
+     */
     public SystemCallHandler(int index, String name) {
         this.index = index;
         this.name = name;
     }
 
+    /**
+     *
+     * @param context
+     */
     public abstract void run(Context context);
 
+    /**
+     *
+     * @return
+     */
     public int getIndex() {
         return index;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getName() {
         return name;
     }

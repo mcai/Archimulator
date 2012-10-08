@@ -18,6 +18,25 @@
  ******************************************************************************/
 package archimulator.sim.core;
 
+/**
+ *
+ * @author Min Cai
+ */
 public enum PhysicalRegisterState {
-    AVAILABLE, RENAME_BUFFER_NOT_VALID, RENAME_BUFFER_VALID, ARCHITECTURAL_REGISTER
+    /**
+     *
+     */
+    AVAILABLE,
+    /**
+     *
+     */
+    RENAME_BUFFER_NOT_VALID,
+    /**
+     *
+     */
+    RENAME_BUFFER_VALID,
+    /**
+     *
+     */
+    ARCHITECTURAL_REGISTER
 }

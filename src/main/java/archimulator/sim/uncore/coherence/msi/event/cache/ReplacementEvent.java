@@ -25,6 +25,10 @@ import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import archimulator.sim.uncore.coherence.msi.state.CacheControllerState;
 import net.pickapack.action.Action;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class ReplacementEvent extends CacheControllerEvent {
     private CacheAccess<CacheControllerState> cacheAccess;
     private int set;
@@ -32,6 +36,18 @@ public class ReplacementEvent extends CacheControllerEvent {
     private Action onCompletedCallback;
     private Action onStalledCallback;
 
+    /**
+     *
+     * @param generator
+     * @param producerFlow
+     * @param tag
+     * @param cacheAccess
+     * @param set
+     * @param way
+     * @param onCompletedCallback
+     * @param onStalledCallback
+     * @param access
+     */
     public ReplacementEvent(CacheController generator, CacheCoherenceFlow producerFlow, int tag, CacheAccess<CacheControllerState> cacheAccess, int set, int way, Action onCompletedCallback, Action onStalledCallback, MemoryHierarchyAccess access) {
         super(generator, producerFlow, CacheControllerEventType.REPLACEMENT, access, tag);
         this.cacheAccess = cacheAccess;
@@ -41,22 +57,42 @@ public class ReplacementEvent extends CacheControllerEvent {
         this.onStalledCallback = onStalledCallback;
     }
 
+    /**
+     *
+     * @return
+     */
     public CacheAccess<CacheControllerState> getCacheAccess() {
         return cacheAccess;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getSet() {
         return set;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getWay() {
         return way;
     }
 
+    /**
+     *
+     * @return
+     */
     public Action getOnCompletedCallback() {
         return onCompletedCallback;
     }
 
+    /**
+     *
+     * @return
+     */
     public Action getOnStalledCallback() {
         return onStalledCallback;
     }

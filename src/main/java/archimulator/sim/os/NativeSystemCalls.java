@@ -21,32 +21,107 @@ package archimulator.sim.os;
 import com.sun.jna.Library;
 import com.sun.jna.Native;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class NativeSystemCalls {
+    /**
+     *
+     */
     public interface LibC extends Library {
+        /**
+         *
+         * @return
+         */
         long getuid();
 
+        /**
+         *
+         * @return
+         */
         long geteuid();
 
+        /**
+         *
+         * @return
+         */
         long getgid();
 
+        /**
+         *
+         * @return
+         */
         long getegid();
 
+        /**
+         *
+         * @param fd
+         * @param buf
+         * @param count
+         * @return
+         */
         int read(int fd, byte[] buf, int count);
 
+        /**
+         *
+         * @param fd
+         * @param buf
+         * @param count
+         * @return
+         */
         int write(int fd, byte[] buf, int count);
 
+        /**
+         *
+         * @param path
+         * @param flags
+         * @param mode
+         * @return
+         */
         int open(String path, int flags, int mode);
 
+        /**
+         *
+         * @param path
+         * @param flags
+         * @return
+         */
         int open(String path, int flags);
 
+        /**
+         *
+         * @param fd
+         * @return
+         */
         int close(int fd);
 
+        /**
+         *
+         * @param fd
+         * @param offset
+         * @param whence
+         * @return
+         */
         int lseek(int fd, int offset, int whence);
 
+        /**
+         *
+         * @param fd
+         * @param request
+         * @param buf
+         * @return
+         */
         int ioctl(int fd, int request, byte[] buf);
     }
 
+    /**
+     *
+     */
     public static final int CLOCKS_PER_SEC = 1000000;
+    /**
+     *
+     */
     public static final int CPU_FREQUENCY = 300000;
 
     private static final String LINUX = "linux";
@@ -57,8 +132,16 @@ public class NativeSystemCalls {
 
     private static final String LIBC_NAME = IS_LINUX ? "libc.so.6" : "c";
 
+    /**
+     *
+     */
     public static final LibC LIBC = (LibC) Native.loadLibrary(LIBC_NAME, LibC.class);
 
+    /**
+     *
+     * @param totalCycles
+     * @return
+     */
     public static long clock(long totalCycles) {
         return CLOCKS_PER_SEC * totalCycles / CPU_FREQUENCY;
     }

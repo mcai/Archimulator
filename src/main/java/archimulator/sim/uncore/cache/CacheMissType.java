@@ -18,8 +18,21 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache;
 
+/**
+ *
+ * @author Min Cai
+ */
 public enum CacheMissType {
+    /**
+     *
+     */
     COMPULSORY,
+    /**
+     *
+     */
     CAPACITY,
+    /**
+     *
+     */
     CONFLICT
 }

@@ -18,16 +18,48 @@
  ******************************************************************************/
 package archimulator.sim.uncore.coherence.msi.state;
 
+/**
+ *
+ * @author Min Cai
+ */
 public enum DirectoryControllerState {
+    /**
+     *
+     */
     I,
+    /**
+     *
+     */
     IS_D,
+    /**
+     *
+     */
     IM_D,
+    /**
+     *
+     */
     S,
+    /**
+     *
+     */
     M,
+    /**
+     *
+     */
     S_D,
+    /**
+     *
+     */
     MI_A,
+    /**
+     *
+     */
     SI_A;
 
+    /**
+     *
+     * @return
+     */
     public boolean isStable() {
         return this == I || this == S || this == M;
     }

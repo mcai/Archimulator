@@ -18,35 +18,91 @@
  ******************************************************************************/
 package archimulator.sim.common;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class Logger {
+    /**
+     *
+     * @param category
+     * @param format
+     * @param currentCycle
+     * @param args
+     */
     public static void infof(String category, String format, long currentCycle, Object... args) {
         info(category, String.format(format, args), currentCycle);
     }
 
+    /**
+     *
+     * @param category
+     * @param text
+     * @param currentCycle
+     */
     public static void info(String category, String text, long currentCycle) {
         info(getMessage(category + "|" + "info", text), currentCycle);
     }
 
+    /**
+     *
+     * @param category
+     * @param format
+     * @param currentCycle
+     * @param args
+     */
     public static void warnf(String category, String format, long currentCycle, Object... args) {
         warn(category, String.format(format, args), currentCycle);
     }
 
+    /**
+     *
+     * @param category
+     * @param text
+     * @param currentCycle
+     */
     public static void warn(String category, String text, long currentCycle) {
         warn(getMessage(category + "|" + "warn", text), currentCycle);
     }
 
+    /**
+     *
+     * @param category
+     * @param format
+     * @param currentCycle
+     * @param args
+     */
     public static void fatalf(String category, String format, long currentCycle, Object... args) {
         fatal(category, String.format(format, args), currentCycle);
     }
 
+    /**
+     *
+     * @param category
+     * @param text
+     * @param currentCycle
+     */
     public static void fatal(String category, String text, long currentCycle) {
         throw new RuntimeException("[" + currentCycle + "] " + getMessage(category + "|" + "fatal", text));
     }
 
+    /**
+     *
+     * @param category
+     * @param format
+     * @param currentCycle
+     * @param args
+     */
     public static void panicf(String category, String format, long currentCycle, Object... args) {
         panic(category, String.format(format, args), currentCycle);
     }
 
+    /**
+     *
+     * @param category
+     * @param text
+     * @param currentCycle
+     */
     public static void panic(String category, String text, long currentCycle) {
         throw new RuntimeException("[" + currentCycle + "] " + getMessage(category + "|" + "panic", text));
     }
@@ -63,27 +119,96 @@ public class Logger {
         return String.format("%s %s", caption.endsWith("info") ? "" : "[" + caption + "]", text);
     }
 
+    /**
+     *
+     */
     public static final String EVENT_QUEUE = "EVENT_QUEUE";
+    /**
+     *
+     */
     public static final String SIMULATOR = "SIMULATOR";
+    /**
+     *
+     */
     public static final String SIMULATION = "SIMULATION";
+    /**
+     *
+     */
     public static final String CORE = "CORE";
+    /**
+     *
+     */
     public static final String THREAD = "THREAD";
+    /**
+     *
+     */
     public static final String PROCESS = "PROCESS";
+    /**
+     *
+     */
     public static final String REGISTER = "REGISTER";
+    /**
+     *
+     */
     public static final String REQUEST = "REQUEST";
+    /**
+     *
+     */
     public static final String CACHE = "CACHE";
+    /**
+     *
+     */
     public static final String COHERENCE = "COHERENCE";
+    /**
+     *
+     */
     public static final String MEMORY = "MEMORY";
+    /**
+     *
+     */
     public static final String NET = "NET";
+    /**
+     *
+     */
     public static final String INSTRUCTION = "INSTRUCTION";
+    /**
+     *
+     */
     public static final String SYSTEM_CALL = "SYSTEM_CALL";
+    /**
+     *
+     */
     public static final String PSEUDO_CALL = "PSEUDO_CALL";
+    /**
+     *
+     */
     public static final String ROI = "ROI";
+    /**
+     *
+     */
     public static final String ELF = "ELF";
+    /**
+     *
+     */
     public static final String CONFIG = "CONFIG";
+    /**
+     *
+     */
     public static final String STAT = "STAT";
+    /**
+     *
+     */
     public static final String MISC = "MISC";
+    /**
+     *
+     */
     public static final String OOO = "OOO";
+    /**
+     *
+     */
     public static final String TEST = "TEST";
+    /**
+     *
+     */
     public static final String DEBUG = "DEBUG";
 }

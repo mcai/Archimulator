@@ -20,6 +20,10 @@ package archimulator.sim.os.elf;
 
 import java.io.IOException;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class ElfProgramHeader {
     private long p_type;
     private long p_offset;
@@ -30,6 +34,11 @@ public class ElfProgramHeader {
     private long p_flags;
     private long p_align;
 
+    /**
+     *
+     * @param elfFile
+     * @throws IOException
+     */
     public ElfProgramHeader(ElfFile elfFile) throws IOException {
         this.p_type = elfFile.readUnsignedWord();
         this.p_offset = elfFile.readUnsignedWord();
@@ -41,6 +50,12 @@ public class ElfProgramHeader {
         this.p_align = elfFile.readUnsignedWord();
     }
 
+    /**
+     *
+     * @param elfFile
+     * @return
+     * @throws IOException
+     */
     public byte[] readContent(ElfFile elfFile) throws IOException {
         long position = elfFile.getPosition();
 
@@ -54,34 +69,66 @@ public class ElfProgramHeader {
         return content;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getP_type() {
         return p_type;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getP_offset() {
         return p_offset;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getP_vaddr() {
         return p_vaddr;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getP_paddr() {
         return p_paddr;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getP_filesz() {
         return p_filesz;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getP_memsz() {
         return p_memsz;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getP_flags() {
         return p_flags;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getP_align() {
         return p_align;
     }

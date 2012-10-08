@@ -20,10 +20,20 @@ package archimulator.sim.uncore.net;
 
 import net.pickapack.action.Action;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class OutPort extends NetPort {
     private OutBuffer buffer;
     private int num;
 
+    /**
+     *
+     * @param node
+     * @param num
+     * @param bufferSize
+     */
     public OutPort(NetNode node, int num, int bufferSize) {
         super(node);
 
@@ -34,6 +44,10 @@ public class OutPort extends NetPort {
         }
     }
 
+    /**
+     *
+     * @param message
+     */
     public void toLink(final NetMessage message) {
         final NetLink link = this.getLink();
 
@@ -70,10 +84,18 @@ public class OutPort extends NetPort {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public OutBuffer getBuffer() {
         return buffer;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getNum() {
         return num;
     }

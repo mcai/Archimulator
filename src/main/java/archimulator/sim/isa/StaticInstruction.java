@@ -34,6 +34,10 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class StaticInstruction {
     private Mnemonic mnemonic;
     private int machineInstruction;
@@ -44,6 +48,11 @@ public class StaticInstruction {
 
     private Map<RegisterDependencyType, Integer> numFreePhysicalRegistersToAllocate = new EnumMap<RegisterDependencyType, Integer>(RegisterDependencyType.class);
 
+    /**
+     *
+     * @param mnemonic
+     * @param machineInstruction
+     */
     public StaticInstruction(Mnemonic mnemonic, int machineInstruction) {
         this.mnemonic = mnemonic;
         this.machineInstruction = machineInstruction;
@@ -67,26 +76,50 @@ public class StaticInstruction {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public Mnemonic getMnemonic() {
         return mnemonic;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getMachineInstruction() {
         return machineInstruction;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<Integer> getInputDependencies() {
         return inputDependencies;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<Integer> getOutputDependencies() {
         return outputDependencies;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getNonEffectiveAddressBaseDependency() {
         return nonEffectiveAddressBaseDependency;
     }
 
+    /**
+     *
+     * @return
+     */
     public Map<RegisterDependencyType, Integer> getNumFreePhysicalRegistersToAllocate() {
         return numFreePhysicalRegistersToAllocate;
     }
@@ -103,10 +136,59 @@ public class StaticInstruction {
     private static final int FMT3_LONG = 5;
     private static final int FMT3_PS = 6;
 
+    /**
+     *
+     */
     public static enum Dependency {
-        RS, RT, RD, FS, FT, FD, REGISTER_RA, REGISTER_V0, REGISTER_HI, REGISTER_LO, REGISTER_FCSR
+        /**
+         *
+         */
+        RS,
+        /**
+         *
+         */
+        RT,
+        /**
+         *
+         */
+        RD,
+        /**
+         *
+         */
+        FS,
+        /**
+         *
+         */
+        FT,
+        /**
+         *
+         */
+        FD,
+        /**
+         *
+         */
+        REGISTER_RA,
+        /**
+         *
+         */
+        REGISTER_V0,
+        /**
+         *
+         */
+        REGISTER_HI,
+        /**
+         *
+         */
+        REGISTER_LO,
+        /**
+         *
+         */
+        REGISTER_FCSR
     }
 
+    /**
+     *
+     */
     public static final List<Mnemonic> MNEMONICS;
 
     static {
@@ -1578,34 +1660,74 @@ public class StaticInstruction {
         context.getBlockingEventDispatcher().dispatch(new FunctionReturnEvent(context));
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean useStackPointerAsEffectiveAddressBase() {
         return useStackPointerAsEffectiveAddressBase(this.machineInstruction);
     }
 
+    /**
+     *
+     * @param context
+     * @return
+     */
     public int getEffectiveAddressBase(Context context) {
         return getEffectiveAddress(context, this.machineInstruction);
     }
 
+    /**
+     *
+     * @return
+     */
     public int getEffectiveAddressDisplacement() {
         return getEffectiveAddressDisplacement(this.machineInstruction);
     }
 
+    /**
+     *
+     * @param context
+     * @return
+     */
     public int getEffectiveAddress(Context context) {
         return getEffectiveAddress(context, this.machineInstruction);
     }
 
+    /**
+     *
+     * @param machineInstruction
+     * @return
+     */
     public static boolean useStackPointerAsEffectiveAddressBase(int machineInstruction) {
         return BitField.RS.valueOf(machineInstruction) == ArchitecturalRegisterFile.REGISTER_SP;
     }
 
+    /**
+     *
+     * @param context
+     * @param machineInstruction
+     * @return
+     */
     public static int getEffectiveAddressBase(Context context, int machineInstruction) {
         return context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction));
     }
 
+    /**
+     *
+     * @param machineInstruction
+     * @return
+     */
     public static int getEffectiveAddressDisplacement(int machineInstruction) {
         return MathHelper.signExtend(BitField.INTIMM.valueOf(machineInstruction));
     }
 
+    /**
+     *
+     * @param context
+     * @param machineInstruction
+     * @return
+     */
     public static int getEffectiveAddress(Context context, int machineInstruction) {
         return getEffectiveAddressBase(context, machineInstruction) + getEffectiveAddressDisplacement(machineInstruction);
     }
@@ -1635,6 +1757,13 @@ public class StaticInstruction {
         context.getRegisterFile().setNnpc(context.getRegisterFile().getNnpc() + 4);
     }
 
+    /**
+     *
+     * @param pc
+     * @param machineInstruction
+     * @param mnemonic
+     * @return
+     */
     public static int getTargetPcForControl(int pc, int machineInstruction, Mnemonic mnemonic) {
         switch (mnemonic) {
             case J:
@@ -1662,14 +1791,31 @@ public class StaticInstruction {
         return MathHelper.mbits(pc, 32, 28) | (BitField.TARGET.valueOf(machineInstruction) << 2);
     }
 
+    /**
+     *
+     * @param context
+     * @param machineInstruction
+     * @return
+     */
     public static int getTargetPcForJalr(Context context, int machineInstruction) {
         return context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction));
     }
 
+    /**
+     *
+     * @param context
+     * @param machineInstruction
+     * @return
+     */
     public static int getTargetPcForJr(Context context, int machineInstruction) {
         return context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction));
     }
 
+    /**
+     *
+     * @param staticInst
+     * @param context
+     */
     public static void execute(StaticInstruction staticInst, Context context) {
         int oldPc = context.getRegisterFile().getPc();
         try {
@@ -1682,5 +1828,8 @@ public class StaticInstruction {
         context.getBlockingEventDispatcher().dispatch(new InstructionFunctionallyExecutedEvent(context, oldPc, staticInst));
     }
 
+    /**
+     *
+     */
     public static final StaticInstruction NOP = new StaticInstruction(Mnemonic.NOP, 0x0);
 }

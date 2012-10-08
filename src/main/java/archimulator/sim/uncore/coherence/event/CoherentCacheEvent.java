@@ -21,14 +21,26 @@ package archimulator.sim.uncore.coherence.event;
 import archimulator.sim.common.SimulationEvent;
 import archimulator.sim.uncore.coherence.msi.controller.GeneralCacheController;
 
+/**
+ *
+ * @author Min Cai
+ */
 public abstract class CoherentCacheEvent extends SimulationEvent {
     private GeneralCacheController cacheController;
 
+    /**
+     *
+     * @param cacheController
+     */
     public CoherentCacheEvent(GeneralCacheController cacheController) {
         super(cacheController);
         this.cacheController = cacheController;
     }
 
+    /**
+     *
+     * @return
+     */
     public GeneralCacheController getCacheController() {
         return cacheController;
     }

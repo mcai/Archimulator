@@ -22,6 +22,10 @@ import net.pickapack.math.MathHelper;
 
 import java.lang.reflect.Field;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class BitField {
     private int hi;
     private int lo;
@@ -31,38 +35,111 @@ public class BitField {
         this.lo = lo;
     }
 
+    /**
+     *
+     * @param machineInstruction
+     * @return
+     */
     public int valueOf(int machineInstruction) {
         return MathHelper.bits(machineInstruction, this.hi, this.lo);
     }
 
+    /**
+     *
+     */
     public static final BitField OPCODE = new BitField(31, 26);
+    /**
+     *
+     */
     public static final BitField OPCODE_HI = new BitField(31, 29);
+    /**
+     *
+     */
     public static final BitField OPCODE_LO = new BitField(28, 26);
 
+    /**
+     *
+     */
     public static final BitField RS = new BitField(25, 21);
+    /**
+     *
+     */
     public static final BitField RT = new BitField(20, 16);
+    /**
+     *
+     */
     public static final BitField RD = new BitField(15, 11);
+    /**
+     *
+     */
     public static final BitField SHIFT = new BitField(10, 6);
 
+    /**
+     *
+     */
     public static final BitField FUNC = new BitField(5, 0);
+    /**
+     *
+     */
     public static final BitField FUNC_HI = new BitField(5, 3);
+    /**
+     *
+     */
     public static final BitField FUNC_LO = new BitField(2, 0);
 
+    /**
+     *
+     */
     public static final BitField COND = new BitField(3, 0);
 
+    /**
+     *
+     */
     public static final BitField INTIMM = new BitField(15, 0);
+    /**
+     *
+     */
     public static final BitField TARGET = new BitField(25, 0);
 
+    /**
+     *
+     */
     public static final BitField FMT = new BitField(25, 21);
+    /**
+     *
+     */
     public static final BitField FMT3 = new BitField(2, 0);
+    /**
+     *
+     */
     public static final BitField FT = new BitField(20, 16);
+    /**
+     *
+     */
     public static final BitField FR = new BitField(25, 21);
+    /**
+     *
+     */
     public static final BitField FS = new BitField(15, 11);
+    /**
+     *
+     */
     public static final BitField FD = new BitField(10, 6);
+    /**
+     *
+     */
     public static final BitField BRANCH_CC = new BitField(20, 18);
 
+    /**
+     *
+     */
     public static final BitField CC = new BitField(10, 8);
 
+    /**
+     *
+     * @param name
+     * @return
+     */
     public static BitField get(String name) {
         try {
             Field field = BitField.class.getField(name.toUpperCase());

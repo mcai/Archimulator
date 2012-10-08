@@ -28,9 +28,16 @@ import net.pickapack.service.AbstractService;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class BenchmarkServiceImpl extends AbstractService implements BenchmarkService {
     private Dao<Benchmark, Long> benchmarks;
 
+    /**
+     *
+     */
     @SuppressWarnings("unchecked")
     public BenchmarkServiceImpl() {
         super(ServiceManager.getDatabaseUrl(), Arrays.<Class<? extends ModelElement>>asList(Benchmark.class));
@@ -70,51 +77,95 @@ public class BenchmarkServiceImpl extends AbstractService implements BenchmarkSe
         }
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public List<Benchmark> getAllBenchmarks() {
         return this.getAllItems(this.benchmarks);
     }
 
+    /**
+     *
+     * @param first
+     * @param count
+     * @return
+     */
     @Override
     public List<Benchmark> getAllBenchmarks(long first, long count) {
         return this.getAllItems(this.benchmarks, first, count);
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public long getNumAllBenchmarks() {
         return this.getNumAllItems(this.benchmarks);
     }
 
+    /**
+     *
+     * @param id
+     * @return
+     */
     @Override
     public Benchmark getBenchmarkById(long id) {
         return this.getItemById(this.benchmarks, id);
     }
 
+    /**
+     *
+     * @param title
+     * @return
+     */
     @Override
     public Benchmark getBenchmarkByTitle(String title) {
         return this.getFirstItemByTitle(this.benchmarks, title);
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public Benchmark getFirstBenchmark() {
         return this.getFirstItem(this.benchmarks);
     }
 
+    /**
+     *
+     * @param benchmark
+     * @return
+     */
     @Override
     public long addBenchmark(Benchmark benchmark) {
         return this.addItem(this.benchmarks, Benchmark.class, benchmark);
     }
 
+    /**
+     *
+     * @param id
+     */
     @Override
     public void removeBenchmarkById(long id) {
         this.removeItemById(this.benchmarks, Benchmark.class, id);
     }
 
+    /**
+     *
+     */
     @Override
     public void clearBenchmarks() {
         this.clearItems(this.benchmarks, Benchmark.class);
     }
 
+    /**
+     *
+     * @param benchmark
+     */
     @Override
     public void updateBenchmark(Benchmark benchmark) {
         this.updateItem(this.benchmarks, Benchmark.class, benchmark);

@@ -25,24 +25,52 @@ import archimulator.sim.uncore.cache.EvictableCache;
 import java.io.Serializable;
 import java.util.Random;
 
+/**
+ *
+ * @author Min Cai
+ * @param <StateT>
+ */
 public class RandomPolicy<StateT extends Serializable> extends CacheReplacementPolicy<StateT> {
     private Random random;
 
+    /**
+     *
+     * @param cache
+     */
     public RandomPolicy(EvictableCache<StateT> cache) {
         super(cache);
 
         this.random = new Random(13);
     }
 
+    /**
+     *
+     * @param access
+     * @param set
+     * @param tag
+     * @return
+     */
     @Override
     public CacheAccess<StateT> handleReplacement(MemoryHierarchyAccess access, int set, int tag) {
         return new CacheAccess<StateT>(this.getCache(), access, set, this.random.nextInt(this.getCache().getAssociativity()), tag);
     }
 
+    /**
+     *
+     * @param access
+     * @param set
+     * @param way
+     */
     @Override
     public void handlePromotionOnHit(MemoryHierarchyAccess access, int set, int way) {
     }
 
+    /**
+     *
+     * @param access
+     * @param set
+     * @param way
+     */
     @Override
     public void handleInsertionOnMiss(MemoryHierarchyAccess access, int set, int way) {
     }

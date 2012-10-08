@@ -25,11 +25,23 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class BranchPredictorTraceTester extends TraceTester<BranchPredictorTraceRecord> {
+    /**
+     *
+     * @param fileName
+     */
     public BranchPredictorTraceTester(String fileName) {
         super(fileName);
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     protected BranchPredictorTraceRecord readNext() {
         byte[] data = new byte[9];

@@ -22,10 +22,19 @@ import archimulator.sim.os.Context;
 import archimulator.sim.os.ContextKilledEvent;
 import net.pickapack.action.Action1;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class WaitProcessIdCriterion implements SystemEventCriterion {
     private int processId;
     private boolean hasProcessIdKilled;
 
+    /**
+     *
+     * @param context
+     * @param processId
+     */
     public WaitProcessIdCriterion(Context context, int processId) {
         this.processId = processId;
 
@@ -40,10 +49,19 @@ public class WaitProcessIdCriterion implements SystemEventCriterion {
         }
     }
 
+    /**
+     *
+     * @param context
+     * @return
+     */
     public boolean needProcess(Context context) {
         return ((this.getProcessId() == -1) && this.hasProcessIdKilled) || ((this.getProcessId() > 0) && (context.getKernel().getContextFromProcessId(this.processId) == null));
     }
 
+    /**
+     *
+     * @return
+     */
     public int getProcessId() {
         return processId;
     }

@@ -31,6 +31,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class ElfFile {
     private RandomAccessFile file;
     private RandomAccessFileBuffer buffer;
@@ -52,6 +56,10 @@ public class ElfFile {
 
     private long position;
 
+    /**
+     *
+     * @param filename
+     */
     public ElfFile(String filename) {
         try {
             this.file = new RandomAccessFile(filename.replaceAll(ServiceManager.USER_HOME_TEMPLATE_ARG, System.getProperty("user.home")), "r");
@@ -139,6 +147,11 @@ public class ElfFile {
         }
     }
 
+    /**
+     *
+     * @param address
+     * @return
+     */
     public Symbol getSymbol(long address) {
         for (Symbol symbol : this.symbols.values()) {
             if (symbol.st_value == address) {
@@ -149,6 +162,9 @@ public class ElfFile {
         return null;
     }
 
+    /**
+     *
+     */
     public void loadLocalFunctions() {
         for (Symbol symbol : this.symbols.values()) {
             if (symbol.getSt_type() == Symbol.STT_FUNC) {
@@ -164,6 +180,9 @@ public class ElfFile {
         }
     }
 
+    /**
+     *
+     */
     public void loadLocalObjects() {
         for (Symbol symbol : this.symbols.values()) {
             if (symbol.getSt_type() == Symbol.STT_OBJECT) {
@@ -179,6 +198,9 @@ public class ElfFile {
         }
     }
 
+    /**
+     *
+     */
     public void loadCommonObjects() {
         for (Symbol symbol : this.symbols.values()) {
             if (symbol.getSt_bind() == Symbol.STB_GLOBAL && symbol.getSt_type() == Symbol.STT_OBJECT) {
@@ -189,6 +211,11 @@ public class ElfFile {
         }
     }
 
+    /**
+     *
+     * @param type
+     * @return
+     */
     public List<ElfSectionHeader> getSectionHeaders(int type) {
         List<ElfSectionHeader> sectionHeaders = new ArrayList<ElfSectionHeader>();
 
@@ -202,6 +229,10 @@ public class ElfFile {
         return sectionHeaders;
     }
 
+    /**
+     *
+     * @throws IOException
+     */
     public void close()
             throws IOException {
         this.file.close();
@@ -213,14 +244,26 @@ public class ElfFile {
         this.close();
     }
 
+    /**
+     *
+     * @return
+     */
     public long getPosition() {
         return this.position;
     }
 
+    /**
+     *
+     * @param position
+     */
     public void setPosition(long position) {
         this.position = position;
     }
 
+    /**
+     *
+     * @return
+     */
     public BufferAccessor getBufferAccessor() {
         if (this.littleEndian) {
             return new LittleEndianBufferAccessor();
@@ -229,6 +272,11 @@ public class ElfFile {
         }
     }
 
+    /**
+     *
+     * @param content
+     * @throws IOException
+     */
     public void read(byte[] content)
             throws IOException {
         this.file.seek(this.position);
@@ -237,12 +285,23 @@ public class ElfFile {
         this.position += content.length;
     }
 
+    /**
+     *
+     * @param offset
+     * @param content
+     * @throws IOException
+     */
     public void read(long offset, byte[] content)
             throws IOException {
         this.file.seek(offset);
         this.file.readFully(content);
     }
 
+    /**
+     *
+     * @return
+     * @throws IOException
+     */
     public int read()
             throws IOException {
         this.file.seek(this.position);
@@ -253,22 +312,44 @@ public class ElfFile {
         return data;
     }
 
+    /**
+     *
+     * @param offset
+     * @return
+     * @throws IOException
+     */
     public int read(long offset)
             throws IOException {
         this.file.seek(offset);
         return this.file.read();
     }
 
+    /**
+     *
+     * @return
+     * @throws IOException
+     */
     public long readUnsignedWord() throws IOException {
         long data = this.readUnsignedWord(this.position);
         this.position += 4;
         return data;
     }
 
+    /**
+     *
+     * @param offset
+     * @return
+     * @throws IOException
+     */
     public long readUnsignedWord(long offset) throws IOException {
         return this.getBufferAccessor().getU4(this.buffer, offset);
     }
 
+    /**
+     *
+     * @return
+     * @throws IOException
+     */
     public int readUnsignedHalfWord() throws IOException {
         int data = this.readUnsignedHalfWorld(this.position);
 
@@ -277,46 +358,92 @@ public class ElfFile {
         return data;
     }
 
+    /**
+     *
+     * @param offset
+     * @return
+     * @throws IOException
+     */
     public int readUnsignedHalfWorld(long offset) throws IOException {
         return this.getBufferAccessor().getU2(this.buffer, offset);
     }
 
+    /**
+     *
+     * @return
+     */
     public ElfIdentification getIdentification() {
         return this.identification;
     }
 
+    /**
+     *
+     * @return
+     */
     public ElfHeader getHeader() {
         return this.header;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<ElfSectionHeader> getSectionHeaders() {
         return this.sectionHeaders;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<ElfProgramHeader> getProgramHeaders() {
         return this.programHeaders;
     }
 
+    /**
+     *
+     * @return
+     */
     public ElfStringTable getStringTable() {
         return this.stringTable;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isLittleEndian() {
         return this.littleEndian;
     }
 
+    /**
+     *
+     * @return
+     */
     public Map<Integer, Symbol> getSymbols() {
         return symbols;
     }
 
+    /**
+     *
+     * @return
+     */
     public Map<Integer, Symbol> getLocalFunctionSymbols() {
         return localFunctionSymbols;
     }
 
+    /**
+     *
+     * @return
+     */
     public Map<Integer, Symbol> getLocalObjectSymbols() {
         return localObjectSymbols;
     }
 
+    /**
+     *
+     * @return
+     */
     public Map<Integer, Symbol> getCommonObjectSymbols() {
         return commonObjectSymbols;
     }

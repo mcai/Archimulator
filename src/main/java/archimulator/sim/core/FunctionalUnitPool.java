@@ -24,6 +24,10 @@ import net.pickapack.action.Action1;
 import java.util.EnumMap;
 import java.util.EnumSet;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class FunctionalUnitPool {
     private EnumMap<FunctionalUnitType, FunctionalUnitDescriptor> descriptors;
     private EnumMap<FunctionalUnitOperationType, FunctionalUnitType> functionalUnitOperationToFunctionalUnitMap;
@@ -80,6 +84,10 @@ public class FunctionalUnitPool {
         }
     }
 
+    /**
+     *
+     * @param core
+     */
     public FunctionalUnitPool(AbstractBasicCore core) {
         this.core = core;
 
@@ -127,6 +135,12 @@ public class FunctionalUnitPool {
         return desc;
     }
 
+    /**
+     *
+     * @param reorderBufferEntry
+     * @param onCompletedCallback
+     * @return
+     */
     public boolean acquire(final ReorderBufferEntry reorderBufferEntry, final Action1<ReorderBufferEntry> onCompletedCallback) {
         FunctionalUnitOperationType functionalUnitOperationType = reorderBufferEntry.getDynamicInstruction().getStaticInstruction().getMnemonic().getFunctionalUnitOperationType();
         FunctionalUnitType functionalUnitType = this.functionalUnitOperationToFunctionalUnitMap.get(functionalUnitOperationType);
@@ -161,12 +175,18 @@ public class FunctionalUnitPool {
         return true;
     }
 
+    /**
+     *
+     */
     public void releaseAll() {
         for (FunctionalUnitDescriptor fuDescriptor : this.descriptors.values()) {
             fuDescriptor.releaseAll();
         }
     }
 
+    /**
+     *
+     */
     public void updatePerCycleStats() {
         for (FunctionalUnitType fuType : FunctionalUnitPool.this.noFreeFunctionalUnit.keySet()) {
             if (this.descriptors.get(fuType).isFull()) {
@@ -175,10 +195,18 @@ public class FunctionalUnitPool {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public EnumMap<FunctionalUnitType, Long> getNoFreeFunctionalUnit() {
         return noFreeFunctionalUnit;
     }
 
+    /**
+     *
+     * @return
+     */
     public EnumMap<FunctionalUnitOperationType, Long> getAcquireFailedOnNoFreeFunctionalUnit() {
         return acquireFailedOnNoFreeFunctionalUnit;
     }

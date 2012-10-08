@@ -18,7 +18,16 @@
  ******************************************************************************/
 package archimulator.sim.uncore.net;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class EndPointNode extends NetNode {
+    /**
+     *
+     * @param net
+     * @param name
+     */
     public EndPointNode(Net net, String name) {
         super(net, name, 1, 0, 1, 0, 1);
     }

@@ -32,6 +32,10 @@ import org.apache.commons.lang.StringUtils;
 
 import java.util.*;
 
+/**
+ *
+ * @author Min Cai
+ */
 @DatabaseTable(tableName = "Experiment")
 public class Experiment implements ModelElement {
     @DatabaseField(generatedId = true)
@@ -66,12 +70,28 @@ public class Experiment implements ModelElement {
 
     private transient Architecture architecture;
 
+    /**
+     *
+     */
     public transient int currentMemoryPageId;
+    /**
+     *
+     */
     public transient int currentProcessId;
 
+    /**
+     *
+     */
     public Experiment() {
     }
 
+    /**
+     *
+     * @param type
+     * @param architecture
+     * @param numMaxInstructions
+     * @param contextMappings
+     */
     public Experiment(ExperimentType type, Architecture architecture, int numMaxInstructions, List<ContextMapping> contextMappings) {
         this.type = type;
         this.state = ExperimentState.PENDING;
@@ -82,6 +102,9 @@ public class Experiment implements ModelElement {
         this.createTime = DateHelper.toTick(new Date());
     }
 
+    /**
+     *
+     */
     public void updateTitle() {
         ContextMapping contextMapping = this.contextMappings.get(0);
         Benchmark benchmark = contextMapping.getBenchmark();
@@ -104,15 +127,27 @@ public class Experiment implements ModelElement {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public long getId() {
         return id;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public long getParentId() {
         return -1;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getTitle() {
         if(title == null) {
             updateTitle();
@@ -121,46 +156,90 @@ public class Experiment implements ModelElement {
         return title;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getCreateTime() {
         return createTime;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getCreateTimeAsString() {
         return DateHelper.toString(createTime);
     }
 
+    /**
+     *
+     * @return
+     */
     public ExperimentType getType() {
         return type;
     }
 
+    /**
+     *
+     * @return
+     */
     public ExperimentState getState() {
         return state;
     }
 
+    /**
+     *
+     * @param state
+     */
     public void setState(ExperimentState state) {
         this.state = state;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getFailedReason() {
         return failedReason;
     }
 
+    /**
+     *
+     * @param failedReason
+     */
     public void setFailedReason(String failedReason) {
         this.failedReason = failedReason;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getArchitectureId() {
         return architectureId;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getNumMaxInstructions() {
         return numMaxInstructions;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<ContextMapping> getContextMappings() {
         return contextMappings;
     }
 
+    /**
+     *
+     * @return
+     */
     public Map<String, String> getStats() {
         if(stats == null) {
             stats = new LinkedHashMap<String, String>();
@@ -169,10 +248,20 @@ public class Experiment implements ModelElement {
         return stats;
     }
 
+    /**
+     *
+     * @param key
+     * @return
+     */
     public String getStatValue(String key) {
         return getStats().containsKey(key) ? getStats().get(key).replaceAll(",", "") : null;
     }
 
+    /**
+     *
+     * @param keys
+     * @return
+     */
     public List<String> getStatValues(List<String> keys) {
         return CollectionHelper.transform(keys, new Function1<String, String>() {
             @Override
@@ -182,6 +271,10 @@ public class Experiment implements ModelElement {
         });
     }
 
+    /**
+     *
+     * @return
+     */
     public Architecture getArchitecture() {
         if (architecture == null) {
             architecture = ServiceManager.getArchitectureService().getArchitectureById(this.architectureId);
@@ -190,10 +283,18 @@ public class Experiment implements ModelElement {
         return architecture;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isStopped() {
         return this.state == ExperimentState.COMPLETED || this.state == ExperimentState.ABORTED;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getMeasurementTitlePrefix() {
         switch (type) {
             case TWO_PHASE:

@@ -42,12 +42,21 @@ import net.pickapack.action.Action2;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class DirectoryController extends GeneralCacheController {
     private CacheGeometry cacheGeometry;
     private EvictableCache<DirectoryControllerState> cache;
     private List<CacheController> cacheControllers;
     private DirectoryControllerFiniteStateMachineFactory fsmFactory;
 
+    /**
+     *
+     * @param cacheHierarchy
+     * @param name
+     */
     public DirectoryController(CacheHierarchy cacheHierarchy, final String name) {
         super(cacheHierarchy, name);
 
@@ -93,19 +102,36 @@ public class DirectoryController extends GeneralCacheController {
         });
     }
 
+    /**
+     *
+     * @param to
+     * @return
+     */
     @Override
     protected Net getNet(MemoryDevice to) {
         return to instanceof MemoryController ? this.getCacheHierarchy().getL2ToMemNetwork() : this.getCacheHierarchy().getL1sToL2Network();
     }
 
+    /**
+     *
+     * @param next
+     */
     public void setNext(MemoryController next) {
         super.setNext(next);
     }
 
+    /**
+     *
+     * @return
+     */
     public MemoryController getNext() {
         return (MemoryController) super.getNext();
     }
 
+    /**
+     *
+     * @param message
+     */
     @Override
     public void receive(CoherenceMessage message) {
         switch (message.getType()) {
@@ -256,29 +282,53 @@ public class DirectoryController extends GeneralCacheController {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public EvictableCache<DirectoryControllerState> getCache() {
         return cache;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<CacheController> getCacheControllers() {
         return cacheControllers;
     }
 
+    /**
+     *
+     * @return
+     */
     public DirectoryControllerFiniteStateMachineFactory getFsmFactory() {
         return fsmFactory;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public CacheGeometry getGeometry() {
         return cacheGeometry;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public int getHitLatency() {
         return getExperiment().getArchitecture().getL2HitLatency();
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public CacheReplacementPolicyType getReplacementPolicyType() {
         return getExperiment().getArchitecture().getL2ReplacementPolicyType();

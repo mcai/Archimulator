@@ -20,19 +20,46 @@ package archimulator.sim.os.elf;
 
 import java.io.IOException;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class ElfIdentification {
+    /**
+     *
+     */
     public static final int ElfClassNone = 0;
+    /**
+     *
+     */
     public static final int ElfClass32 = 1;
+    /**
+     *
+     */
     public static final int ElfClass64 = 2;
 
+    /**
+     *
+     */
     public static final int ElfDataNone = 0;
+    /**
+     *
+     */
     public static final int ElfData2Lsb = 1;
+    /**
+     *
+     */
     public static final int ElfData2Msb = 2;
 
     private int ei_class;
     private int ei_data;
     private int ei_version;
 
+    /**
+     *
+     * @param elfFile
+     * @throws IOException
+     */
     public void read(ElfFile elfFile) throws IOException {
         byte[] e_ident = new byte[16];
         elfFile.read(e_ident);
@@ -47,14 +74,26 @@ public class ElfIdentification {
         this.ei_version = e_ident[6];
     }
 
+    /**
+     *
+     * @return
+     */
     public int getEi_class() {
         return ei_class;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getEi_data() {
         return ei_data;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getEi_version() {
         return ei_version;
     }

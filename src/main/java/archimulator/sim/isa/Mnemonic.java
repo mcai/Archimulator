@@ -26,139 +26,520 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ *
+ * @author Min Cai
+ */
 public enum Mnemonic {
+    /**
+     *
+     */
     NOP,
+    /**
+     *
+     */
     BREAK,
 
+    /**
+     *
+     */
     SYSTEM_CALL,
 
+    /**
+     *
+     */
     ADD,
+    /**
+     *
+     */
     ADDI,
+    /**
+     *
+     */
     ADDIU,
+    /**
+     *
+     */
     ADDU,
+    /**
+     *
+     */
     SUB,
+    /**
+     *
+     */
     SUBU,
+    /**
+     *
+     */
     AND,
+    /**
+     *
+     */
     ANDI,
+    /**
+     *
+     */
     NOR,
+    /**
+     *
+     */
     OR,
+    /**
+     *
+     */
     ORI,
+    /**
+     *
+     */
     XOR,
+    /**
+     *
+     */
     XORI,
+    /**
+     *
+     */
     MULT,
+    /**
+     *
+     */
     MULTU,
+    /**
+     *
+     */
     DIV,
+    /**
+     *
+     */
     DIVU,
+    /**
+     *
+     */
     SLL,
+    /**
+     *
+     */
     SLLV,
+    /**
+     *
+     */
     SLT,
+    /**
+     *
+     */
     SLTI,
+    /**
+     *
+     */
     SLTIU,
+    /**
+     *
+     */
     SLTU,
+    /**
+     *
+     */
     SRA,
+    /**
+     *
+     */
     SRAV,
+    /**
+     *
+     */
     SRL,
+    /**
+     *
+     */
     SRLV,
+    /**
+     *
+     */
     MADD,
+    /**
+     *
+     */
     MSUB,
 
+    /**
+     *
+     */
     B,
+    /**
+     *
+     */
     BAL,
+    /**
+     *
+     */
     BEQ,
+    /**
+     *
+     */
     BEQL,
+    /**
+     *
+     */
     BGEZ,
+    /**
+     *
+     */
     BGEZL,
+    /**
+     *
+     */
     BGEZAL,
+    /**
+     *
+     */
     BGEZALL,
+    /**
+     *
+     */
     BGTZ,
+    /**
+     *
+     */
     BGTZL,
+    /**
+     *
+     */
     BLEZ,
+    /**
+     *
+     */
     BLEZL,
+    /**
+     *
+     */
     BLTZ,
+    /**
+     *
+     */
     BLTZL,
+    /**
+     *
+     */
     BLTZAL,
+    /**
+     *
+     */
     BLTZALL,
+    /**
+     *
+     */
     BNE,
+    /**
+     *
+     */
     BNEL,
 
+    /**
+     *
+     */
     J,
+    /**
+     *
+     */
     JAL,
+    /**
+     *
+     */
     JALR,
+    /**
+     *
+     */
     JR,
 
+    /**
+     *
+     */
     LB,
+    /**
+     *
+     */
     LBU,
+    /**
+     *
+     */
     LH,
+    /**
+     *
+     */
     LHU,
+    /**
+     *
+     */
     LUI,
+    /**
+     *
+     */
     LW,
+    /**
+     *
+     */
     LWL,
+    /**
+     *
+     */
     LWR,
 
+    /**
+     *
+     */
     SB,
+    /**
+     *
+     */
     SH,
+    /**
+     *
+     */
     SW,
+    /**
+     *
+     */
     SWL,
+    /**
+     *
+     */
     SWR,
 
+    /**
+     *
+     */
     LDC1,
+    /**
+     *
+     */
     LWC1,
 
+    /**
+     *
+     */
     SDC1,
+    /**
+     *
+     */
     SWC1,
 
+    /**
+     *
+     */
     MFHI,
+    /**
+     *
+     */
     MFLO,
+    /**
+     *
+     */
     MTHI,
+    /**
+     *
+     */
     MTLO,
 
+    /**
+     *
+     */
     CFC1,
+    /**
+     *
+     */
     CTC1,
+    /**
+     *
+     */
     MFC1,
+    /**
+     *
+     */
     MTC1,
 
+    /**
+     *
+     */
     LL,
+    /**
+     *
+     */
     SC,
 
+    /**
+     *
+     */
     NEG_D,
+    /**
+     *
+     */
     MOV_D,
+    /**
+     *
+     */
     SQRT_D,
+    /**
+     *
+     */
     ABS_D,
+    /**
+     *
+     */
     MUL_D,
+    /**
+     *
+     */
     DIV_D,
+    /**
+     *
+     */
     ADD_D,
+    /**
+     *
+     */
     SUB_D,
 
+    /**
+     *
+     */
     MUL_S,
+    /**
+     *
+     */
     DIV_S,
+    /**
+     *
+     */
     ADD_S,
+    /**
+     *
+     */
     SUB_S,
+    /**
+     *
+     */
     MOV_S,
+    /**
+     *
+     */
     NEG_S,
+    /**
+     *
+     */
     ABS_S,
+    /**
+     *
+     */
     SQRT_S,
 
+    /**
+     *
+     */
     C_COND_D,
+    /**
+     *
+     */
     C_COND_S,
 
+    /**
+     *
+     */
     CVT_D_L,
+    /**
+     *
+     */
     CVT_S_L,
+    /**
+     *
+     */
     CVT_D_W,
+    /**
+     *
+     */
     CVT_S_W,
+    /**
+     *
+     */
     CVT_L_D,
+    /**
+     *
+     */
     CVT_W_D,
+    /**
+     *
+     */
     CVT_S_D,
+    /**
+     *
+     */
     CVT_L_S,
+    /**
+     *
+     */
     CVT_W_S,
+    /**
+     *
+     */
     CVT_D_S,
 
+    /**
+     *
+     */
     BC1FL,
+    /**
+     *
+     */
     BC1TL,
+    /**
+     *
+     */
     BC1F,
+    /**
+     *
+     */
     BC1T,
 
-    MOVF, _MOVF, MOVN, _MOVN, _MOVT, MOVZ, _MOVZ, MUL, TRUNC_W,
+    /**
+     *
+     */
+    MOVF,
+    /**
+     *
+     */
+    _MOVF,
+    /**
+     *
+     */
+    MOVN,
+    /**
+     *
+     */
+    _MOVN,
+    /**
+     *
+     */
+    _MOVT,
+    /**
+     *
+     */
+    MOVZ,
+    /**
+     *
+     */
+    _MOVZ,
+    /**
+     *
+     */
+    MUL,
+    /**
+     *
+     */
+    TRUNC_W,
 
+    /**
+     *
+     */
     UNKNOWN;
 
     private Method method;
@@ -171,6 +552,11 @@ public enum Mnemonic {
     private StaticInstructionType type;
     private FunctionalUnitOperationType functionalUnitOperationType;
 
+    /**
+     *
+     * @param machineInstruction
+     * @return
+     */
     public List<Integer> getInputDependencies(final int machineInstruction) {
         return new ArrayList<Integer>() {{
             for (StaticInstruction.Dependency dependency : Mnemonic.this.getMethod().getAnnotation(InputDependencies.class).value()) {
@@ -179,6 +565,11 @@ public enum Mnemonic {
         }};
     }
 
+    /**
+     *
+     * @param machineInstruction
+     * @return
+     */
     public List<Integer> getOutputDependencies(final int machineInstruction) {
         return new ArrayList<Integer>() {{
             for (StaticInstruction.Dependency dependency : Mnemonic.this.getMethod().getAnnotation(OutputDependencies.class).value()) {
@@ -187,14 +578,27 @@ public enum Mnemonic {
         }};
     }
 
+    /**
+     *
+     * @param machineInstruction
+     * @return
+     */
     public int getNonEffectiveAddressBaseDep(int machineInstruction) {
         return toRegisterDependency(this.getMethod().getAnnotation(NonEffectiveAddressBaseDependency.class).value(), machineInstruction);
     }
 
+    /**
+     *
+     * @return
+     */
     public Method getMethod() {
         return this.method;
     }
 
+    /**
+     *
+     * @param method
+     */
     public void setMethod(Method method) {
         this.method = method;
 
@@ -249,30 +653,58 @@ public enum Mnemonic {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public int getMask() {
         return this.mask;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getBits() {
         return this.bits;
     }
 
+    /**
+     *
+     * @return
+     */
     public BitField getExtraBitField() {
         return this.extraBitField;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getExtraBitFieldValue() {
         return this.extraBitFieldValue;
     }
 
+    /**
+     *
+     * @return
+     */
     public StaticInstructionType getType() {
         return this.type;
     }
 
+    /**
+     *
+     * @return
+     */
     public FunctionalUnitOperationType getFunctionalUnitOperationType() {
         return this.functionalUnitOperationType;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isControl() {
         return this.getType() == StaticInstructionType.CONDITIONAL || this.getType() == StaticInstructionType.FUNCTION_CALL || this.getType() == StaticInstructionType.UNCONDITIONAL || this.getType() == StaticInstructionType.FUNCTION_RETURN;
     }

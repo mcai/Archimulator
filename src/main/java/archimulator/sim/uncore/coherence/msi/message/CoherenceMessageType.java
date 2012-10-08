@@ -18,19 +18,59 @@
  ******************************************************************************/
 package archimulator.sim.uncore.coherence.msi.message;
 
+/**
+ *
+ * @author Min Cai
+ */
 public enum CoherenceMessageType {
+    /**
+     *
+     */
     GETS,
+    /**
+     *
+     */
     GETM,
+    /**
+     *
+     */
     PUTS,
+    /**
+     *
+     */
     PUTM_AND_DATA,
 
+    /**
+     *
+     */
     FORWARD_GETS,
+    /**
+     *
+     */
     FORWARD_GETM,
+    /**
+     *
+     */
     INVALIDATION,
+    /**
+     *
+     */
     RECALL,
 
+    /**
+     *
+     */
     PUT_ACKNOWLEDGEMENT,
+    /**
+     *
+     */
     DATA,
+    /**
+     *
+     */
     INVALIDATION_ACKNOWLEDGEMENT,
+    /**
+     *
+     */
     RECALL_ACKNOWLEDGEMENT
 }

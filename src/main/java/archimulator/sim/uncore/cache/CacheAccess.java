@@ -22,6 +22,11 @@ import archimulator.sim.uncore.MemoryHierarchyAccess;
 
 import java.io.Serializable;
 
+/**
+ *
+ * @author Min Cai
+ * @param <StateT>
+ */
 public class CacheAccess<StateT extends Serializable> {
     private MemoryHierarchyAccess access;
     private int set;
@@ -32,6 +37,14 @@ public class CacheAccess<StateT extends Serializable> {
     private boolean hitInCache;
     private boolean replacement;
 
+    /**
+     *
+     * @param cache
+     * @param access
+     * @param set
+     * @param way
+     * @param tag
+     */
     public CacheAccess(EvictableCache<StateT> cache, MemoryHierarchyAccess access, int set, int way, int tag) {
         this.access = access;
         this.set = set;
@@ -47,26 +60,50 @@ public class CacheAccess<StateT extends Serializable> {
         this.replacement = this.line.isValid();
     }
 
+    /**
+     *
+     * @return
+     */
     public MemoryHierarchyAccess getAccess() {
         return access;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getSet() {
         return set;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getWay() {
         return way;
     }
 
+    /**
+     *
+     * @return
+     */
     public CacheLine<StateT> getLine() {
         return line;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isHitInCache() {
         return hitInCache;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isReplacement() {
         return replacement;
     }

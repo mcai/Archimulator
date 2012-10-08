@@ -18,8 +18,24 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache.prediction;
 
+/**
+ *
+ * @author Min Cai
+ * @param <PredictableT>
+ */
 public interface Predictor<PredictableT extends Comparable<PredictableT>> {
+    /**
+     *
+     * @param address
+     * @param observedValue
+     */
     void update(int address, PredictableT observedValue);
 
+    /**
+     *
+     * @param address
+     * @param defaultValue
+     * @return
+     */
     PredictableT predict(int address, PredictableT defaultValue);
 }

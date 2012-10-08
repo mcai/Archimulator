@@ -21,20 +21,35 @@ package archimulator.sim.os.event;
 import archimulator.sim.os.Context;
 import archimulator.sim.os.signal.SignalMask;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class SignalSuspendEvent extends SystemEvent {
     private SignalCriterion signalCriterion;
 
+    /**
+     *
+     * @param context
+     */
     public SignalSuspendEvent(Context context) {
         super(context, SystemEventType.SIGNAL_SUSPEND);
 
         this.signalCriterion = new SignalCriterion();
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public boolean needProcess() {
         return this.signalCriterion.needProcess(this.getContext());
     }
 
+    /**
+     *
+     */
     @Override
     public void process() {
         this.getContext().resume();
@@ -47,6 +62,10 @@ public class SignalSuspendEvent extends SystemEvent {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public SignalCriterion getSignalCriterion() {
         return signalCriterion;
     }

@@ -23,14 +23,30 @@ import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class DataFromOwnerEvent extends CacheControllerEvent {
     private Controller sender;
 
+    /**
+     *
+     * @param generator
+     * @param producerFlow
+     * @param sender
+     * @param tag
+     * @param access
+     */
     public DataFromOwnerEvent(CacheController generator, CacheCoherenceFlow producerFlow, Controller sender, int tag, MemoryHierarchyAccess access) {
         super(generator, producerFlow, CacheControllerEventType.DATA_FROM_OWNER, access, tag);
         this.sender = sender;
     }
 
+    /**
+     *
+     * @return
+     */
     public Controller getSender() {
         return sender;
     }

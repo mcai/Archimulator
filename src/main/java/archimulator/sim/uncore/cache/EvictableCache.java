@@ -28,15 +28,37 @@ import net.pickapack.util.ValueProviderFactory;
 
 import java.io.Serializable;
 
+/**
+ *
+ * @author Min Cai
+ * @param <StateT>
+ */
 public class EvictableCache<StateT extends Serializable> extends Cache<StateT> {
+    /**
+     *
+     */
     protected CacheReplacementPolicy<StateT> replacementPolicy;
 
+    /**
+     *
+     * @param parent
+     * @param name
+     * @param geometry
+     * @param replacementPolicyType
+     * @param cacheLineStateProviderFactory
+     */
     public EvictableCache(SimulationObject parent, String name, CacheGeometry geometry, CacheReplacementPolicyType replacementPolicyType, ValueProviderFactory<StateT, ValueProvider<StateT>> cacheLineStateProviderFactory) {
         super(parent, name, geometry, cacheLineStateProviderFactory);
 
         this.replacementPolicy = CacheReplacementPolicyFactory.createCacheReplacementPolicy(replacementPolicyType, this);
     }
 
+    /**
+     *
+     * @param access
+     * @param address
+     * @return
+     */
     public CacheAccess<StateT> newAccess(MemoryHierarchyAccess access, int address) {
         CacheLine<StateT> line = this.findLine(address);
 
@@ -66,6 +88,10 @@ public class EvictableCache<StateT extends Serializable> extends Cache<StateT> {
         return this.replacementPolicy.handleReplacement(access, set, tag);
     }
 
+    /**
+     *
+     * @return
+     */
     public CacheReplacementPolicy<StateT> getReplacementPolicy() {
         return replacementPolicy;
     }

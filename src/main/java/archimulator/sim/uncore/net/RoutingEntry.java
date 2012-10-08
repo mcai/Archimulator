@@ -18,37 +18,70 @@
  ******************************************************************************/
 package archimulator.sim.uncore.net;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class RoutingEntry {
     private NetNode sourceNode;
     private NetNode destinationNode;
     private int cost;
     private OutPort outPort;
 
+    /**
+     *
+     * @param sourceNode
+     * @param destinationNode
+     */
     public RoutingEntry(NetNode sourceNode, NetNode destinationNode) {
         this.sourceNode = sourceNode;
         this.destinationNode = destinationNode;
     }
 
+    /**
+     *
+     * @return
+     */
     public NetNode getSourceNode() {
         return sourceNode;
     }
 
+    /**
+     *
+     * @return
+     */
     public NetNode getDestinationNode() {
         return destinationNode;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getCost() {
         return cost;
     }
 
+    /**
+     *
+     * @param cost
+     */
     public void setCost(int cost) {
         this.cost = cost;
     }
 
+    /**
+     *
+     * @return
+     */
     public OutPort getOutPort() {
         return outPort;
     }
 
+    /**
+     *
+     * @param outPort
+     */
     public void setOutPort(OutPort outPort) {
         this.outPort = outPort;
     }

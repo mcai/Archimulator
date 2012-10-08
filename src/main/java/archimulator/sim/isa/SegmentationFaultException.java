@@ -18,14 +18,26 @@
  ******************************************************************************/
 package archimulator.sim.isa;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class SegmentationFaultException extends RuntimeException {
     private int address;
 
+    /**
+     *
+     * @param address
+     */
     public SegmentationFaultException(int address) {
         super(String.format("SegmentationFault @ 0x%08x", address));
         this.address = address;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getAddress() {
         return address;
     }

@@ -30,6 +30,10 @@ import archimulator.sim.os.signal.SignalMasks;
 import java.io.Serializable;
 import java.util.Stack;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class Context extends BasicSimulationObject implements SimulationObject, Serializable {
     private int id;
 
@@ -62,6 +66,13 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
 
     private ArchitecturalRegisterFile speculativeRegisterFile;
 
+    /**
+     *
+     * @param kernel
+     * @param simulationDirectory
+     * @param contextMapping
+     * @return
+     */
     public static Context load(Kernel kernel, String simulationDirectory, ContextMapping contextMapping) {
         Process process = new BasicProcess(kernel, simulationDirectory, contextMapping);
 
@@ -73,10 +84,24 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
         return new Context(kernel, process, null, regs, 0);
     }
 
+    /**
+     *
+     * @param parent
+     * @param registerFile
+     * @param signalFinish
+     */
     public Context(Context parent, ArchitecturalRegisterFile registerFile, int signalFinish) {
         this(parent.kernel, parent.process, parent, registerFile, signalFinish);
     }
 
+    /**
+     *
+     * @param kernel
+     * @param process
+     * @param parent
+     * @param registerFile
+     * @param signalFinish
+     */
     public Context(Kernel kernel, Process process, Context parent, ArchitecturalRegisterFile registerFile, int signalFinish) {
         super(kernel);
 
@@ -105,6 +130,9 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
         this.process = process;
     }
 
+    /**
+     *
+     */
     public void enterSpeculativeState() {
         try {
             this.process.getMemory().enterSpeculativeState();
@@ -115,12 +143,19 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
         }
     }
 
+    /**
+     *
+     */
     public void exitSpeculativeState() {
         this.process.getMemory().exitSpeculativeState();
         this.speculativeRegisterFile = null;
         this.speculative = false;
     }
 
+    /**
+     *
+     * @return
+     */
     public StaticInstruction decodeNextInstruction() {
         this.getRegisterFile().setPc(this.getRegisterFile().getNpc());
         this.getRegisterFile().setNpc(this.getRegisterFile().getNnpc());
@@ -132,10 +167,18 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
         return this.decode(this.getRegisterFile().getPc());
     }
 
+    /**
+     *
+     * @param mappedPc
+     * @return
+     */
     protected StaticInstruction decode(int mappedPc) {
         return this.process.getStaticInstruction(mappedPc);
     }
 
+    /**
+     *
+     */
     public void suspend() {
         if ((this.state == ContextState.BLOCKED)) {
             throw new IllegalArgumentException();
@@ -145,6 +188,9 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
 //        Logger.infof(Logger.THREAD, "%s: thread suspended\n", this.getThread().getName());
     }
 
+    /**
+     *
+     */
     public void resume() {
         if ((this.state != ContextState.BLOCKED)) {
             throw new IllegalArgumentException();
@@ -154,6 +200,9 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
 //        Logger.infof(Logger.THREAD, "%s: thread resumed\n", this.getThread().getName());
     }
 
+    /**
+     *
+     */
     public void finish() {
         if (this.state == ContextState.FINISHED) {
             throw new IllegalArgumentException();
@@ -174,46 +223,91 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
 //        Logger.infof(Logger.THREAD, "%s: thread finished\n", this.getThread().getName());
     }
 
+    /**
+     *
+     * @return
+     */
     public int getId() {
         return id;
     }
 
+    /**
+     *
+     * @return
+     */
     public ContextState getState() {
         return state;
     }
 
+    /**
+     *
+     * @param state
+     */
     public void setState(ContextState state) {
         this.state = state;
     }
 
+    /**
+     *
+     * @return
+     */
     public ArchitecturalRegisterFile getRegisterFile() {
         return !speculative ? registerFile : speculativeRegisterFile;
     }
 
+    /**
+     *
+     * @param registerFile
+     */
     public void setRegisterFile(ArchitecturalRegisterFile registerFile) {
         this.registerFile = registerFile;
     }
 
+    /**
+     *
+     * @return
+     */
     public SignalMasks getSignalMasks() {
         return signalMasks;
     }
 
+    /**
+     *
+     * @return
+     */
     public Context getParent() {
         return parent;
     }
 
+    /**
+     *
+     * @return
+     */
     public Kernel getKernel() {
         return kernel;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getThreadId() {
         return threadId;
     }
 
+    /**
+     *
+     * @param threadId
+     */
     public void setThreadId(int threadId) {
         this.threadId = threadId;
     }
 
+    /**
+     *
+     * @param processor
+     * @return
+     */
     public Thread getThread(Processor processor) {
         int coreNum = this.threadId / processor.getCores().size();
         int threadNum = this.threadId % processor.getCores().size();
@@ -221,50 +315,98 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
         return processor.getCores().get(coreNum).getThreads().get(threadNum);
     }
 
+    /**
+     *
+     * @return
+     */
     public Process getProcess() {
         return process;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getUserId() {
         return userId;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getEffectiveUserId() {
         return effectiveUserId;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getGroupId() {
         return groupId;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getEffectiveGroupId() {
         return effectiveGroupId;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getProcessId() {
         return processId;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getParentProcessId() {
         return parent == null ? 1 : parent.getProcessId();
     }
 
+    /**
+     *
+     * @return
+     */
     public Stack<FunctionCallContext> getFunctionCallContextStack() {
         return functionCallContextStack;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isSpeculative() {
         return speculative;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean useICache() {
         return true;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isPseudoCallEncounteredInLastInstructionExecution() {
         return pseudoCallEncounteredInLastInstructionExecution;
     }
 
+    /**
+     *
+     * @param pseudoCallEncounteredInLastInstructionExecution
+     */
     public void setPseudoCallEncounteredInLastInstructionExecution(boolean pseudoCallEncounteredInLastInstructionExecution) {
         this.pseudoCallEncounteredInLastInstructionExecution = pseudoCallEncounteredInLastInstructionExecution;
     }

@@ -21,11 +21,21 @@ package archimulator.sim.isa;
 import archimulator.sim.common.SimulationEvent;
 import archimulator.sim.os.Context;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class PseudoCallEncounteredEvent extends SimulationEvent {
     private Context context;
     private int rs;
     private int imm;
 
+    /**
+     *
+     * @param context
+     * @param rs
+     * @param imm
+     */
     public PseudoCallEncounteredEvent(Context context, int rs, int imm) {
         super(context);
         this.context = context;
@@ -33,14 +43,26 @@ public class PseudoCallEncounteredEvent extends SimulationEvent {
         this.imm = imm;
     }
 
+    /**
+     *
+     * @return
+     */
     public Context getContext() {
         return context;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getRs() {
         return rs;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getImm() {
         return imm;
     }

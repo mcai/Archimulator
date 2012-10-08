@@ -28,9 +28,16 @@ import net.pickapack.service.AbstractService;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class ExperimentMetricServiceImpl extends AbstractService implements ExperimentMetricService {
     private Dao<ExperimentGauge, Long> gauges;
 
+    /**
+     *
+     */
     @SuppressWarnings("unchecked")
     public ExperimentMetricServiceImpl() {
         super(ServiceManager.getDatabaseUrl(), Arrays.<Class<? extends ModelElement>>asList(ExperimentGauge.class));
@@ -42,36 +49,66 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
         }
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public List<ExperimentGauge> getAllGauges() {
         return this.getAllItems(this.gauges);
     }
 
+    /**
+     *
+     * @param id
+     * @return
+     */
     @Override
     public ExperimentGauge getGaugeById(long id) {
         return this.getItemById(this.gauges, id);
     }
 
+    /**
+     *
+     * @param title
+     * @return
+     */
     @Override
     public ExperimentGauge getGaugeByTitle(String title) {
         return this.getFirstItemByTitle(this.gauges, title);
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public ExperimentGauge getFirstGauge() {
         return this.getFirstItem(this.gauges);
     }
 
+    /**
+     *
+     * @param gauge
+     */
     @Override
     public void addGauge(ExperimentGauge gauge) {
         this.addItem(this.gauges, ExperimentGauge.class, gauge);
     }
 
+    /**
+     *
+     * @param id
+     */
     @Override
     public void removeGaugeById(long id) {
         this.removeItemById(this.gauges, ExperimentGauge.class, id);
     }
 
+    /**
+     *
+     * @param gauge
+     */
     @Override
     public void updateGauge(ExperimentGauge gauge) {
         this.updateItem(this.gauges, ExperimentGauge.class, gauge);

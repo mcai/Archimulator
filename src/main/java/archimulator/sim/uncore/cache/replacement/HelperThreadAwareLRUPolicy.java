@@ -27,14 +27,30 @@ import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestQuality;
 
 import java.io.Serializable;
 
+/**
+ *
+ * @author Min Cai
+ * @param <StateT>
+ */
 public class HelperThreadAwareLRUPolicy<StateT extends Serializable> extends LRUPolicy<StateT> {
     private boolean useBreakdown;
 
+    /**
+     *
+     * @param cache
+     * @param useBreakdown
+     */
     public HelperThreadAwareLRUPolicy(EvictableCache<StateT> cache, boolean useBreakdown) {
         super(cache);
         this.useBreakdown = useBreakdown;
     }
 
+    /**
+     *
+     * @param access
+     * @param set
+     * @param way
+     */
     @Override
     public void handlePromotionOnHit(MemoryHierarchyAccess access, int set, int way) {
         if (isAwarenessEnabled() && access.getType() == MemoryHierarchyAccessType.LOAD && requesterIsMainThread(access) && lineFoundIsHelperThread(set, way)) {
@@ -45,6 +61,12 @@ public class HelperThreadAwareLRUPolicy<StateT extends Serializable> extends LRU
         super.handlePromotionOnHit(access, set, way);
     }
 
+    /**
+     *
+     * @param access
+     * @param set
+     * @param way
+     */
     @Override
     public void handleInsertionOnMiss(MemoryHierarchyAccess access, int set, int way) {
         if (isAwarenessEnabled()) {
@@ -111,6 +133,10 @@ public class HelperThreadAwareLRUPolicy<StateT extends Serializable> extends LRU
         return BasicThread.isHelperThread(getCache().getSimulation().getHelperThreadL2CacheRequestProfilingHelper().getHelperThreadL2CacheRequestStates().get(set).get(way).getThreadId());
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isUseBreakdown() {
         return useBreakdown;
     }

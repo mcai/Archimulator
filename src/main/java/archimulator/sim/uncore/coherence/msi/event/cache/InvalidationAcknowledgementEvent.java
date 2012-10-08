@@ -22,14 +22,30 @@ import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class InvalidationAcknowledgementEvent extends CacheControllerEvent {
     private CacheController sender;
 
+    /**
+     *
+     * @param generator
+     * @param producerFlow
+     * @param sender
+     * @param tag
+     * @param access
+     */
     public InvalidationAcknowledgementEvent(CacheController generator, CacheCoherenceFlow producerFlow, CacheController sender, int tag, MemoryHierarchyAccess access) {
         super(generator, producerFlow, CacheControllerEventType.INVALIDATION_ACKNOWLEDGEMENT, access, tag);
         this.sender = sender;
     }
 
+    /**
+     *
+     * @return
+     */
     public CacheController getSender() {
         return sender;
     }

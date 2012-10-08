@@ -18,19 +18,36 @@
  ******************************************************************************/
 package archimulator.sim.analysis;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class ControlFlowGraphEdge {
     private BasicBlock from;
     private BasicBlock to;
 
+    /**
+     *
+     * @param from
+     * @param to
+     */
     public ControlFlowGraphEdge(BasicBlock from, BasicBlock to) {
         this.from = from;
         this.to = to;
     }
 
+    /**
+     *
+     * @return
+     */
     public BasicBlock getFrom() {
         return from;
     }
 
+    /**
+     *
+     * @return
+     */
     public BasicBlock getTo() {
         return to;
     }

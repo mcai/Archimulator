@@ -22,6 +22,10 @@ import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.coherence.msi.controller.GeneralCacheController;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class LastLevelCacheLineInsertEvent extends CoherentCacheEvent {
     private MemoryHierarchyAccess access;
     private int tag;
@@ -29,6 +33,15 @@ public class LastLevelCacheLineInsertEvent extends CoherentCacheEvent {
     private int way;
     private int victimTag;
 
+    /**
+     *
+     * @param cacheController
+     * @param access
+     * @param tag
+     * @param set
+     * @param way
+     * @param victimTag
+     */
     public LastLevelCacheLineInsertEvent(GeneralCacheController cacheController, MemoryHierarchyAccess access, int tag, int set, int way, int victimTag) {
         super(cacheController);
         this.tag = tag;
@@ -38,26 +51,50 @@ public class LastLevelCacheLineInsertEvent extends CoherentCacheEvent {
         this.victimTag = victimTag;
     }
 
+    /**
+     *
+     * @return
+     */
     public MemoryHierarchyAccess getAccess() {
         return access;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getTag() {
         return tag;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getSet() {
         return set;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getWay() {
         return way;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getVictimTag() {
         return victimTag;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isEviction() {
         return victimTag != CacheLine.INVALID_TAG;
     }

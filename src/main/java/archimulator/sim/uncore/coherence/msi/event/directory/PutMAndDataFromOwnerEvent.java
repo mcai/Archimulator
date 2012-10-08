@@ -23,14 +23,30 @@ import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class PutMAndDataFromOwnerEvent extends DirectoryControllerEvent {
     private CacheController requester;
 
+    /**
+     *
+     * @param generator
+     * @param producerFlow
+     * @param requester
+     * @param tag
+     * @param access
+     */
     public PutMAndDataFromOwnerEvent(DirectoryController generator, CacheCoherenceFlow producerFlow, CacheController requester, int tag, MemoryHierarchyAccess access) {
         super(generator, producerFlow, DirectoryControllerEventType.PUTM_AND_DATA_FROM_OWNER, access, tag);
         this.requester = requester;
     }
 
+    /**
+     *
+     * @return
+     */
     public CacheController getRequester() {
         return requester;
     }

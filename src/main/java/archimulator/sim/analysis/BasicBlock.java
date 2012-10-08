@@ -21,6 +21,10 @@ package archimulator.sim.analysis;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class BasicBlock {
     private Function function;
     private int num;
@@ -33,6 +37,11 @@ public class BasicBlock {
 
     private BasicBlockType type;
 
+    /**
+     *
+     * @param function
+     * @param num
+     */
     public BasicBlock(Function function, int num) {
         this.function = function;
         this.num = num;
@@ -43,42 +52,82 @@ public class BasicBlock {
         this.type = BasicBlockType.UNKNOWN;
     }
 
+    /**
+     *
+     * @return
+     */
     public Function getFunction() {
         return function;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getNum() {
         return num;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<Instruction> getInstructions() {
         return instructions;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<ControlFlowGraphEdge> getIncomingEdges() {
         return incomingEdges;
     }
 
+    /**
+     *
+     * @return
+     */
     public ControlFlowGraphEdge getOutgoingNotTakenEdge() {
         return OutgoingNotTakenEdge;
     }
 
+    /**
+     *
+     * @param outgoingNotTakenEdge
+     */
     public void setOutgoingNotTakenEdge(ControlFlowGraphEdge outgoingNotTakenEdge) {
         OutgoingNotTakenEdge = outgoingNotTakenEdge;
     }
 
+    /**
+     *
+     * @return
+     */
     public ControlFlowGraphEdge getOutgoingTakenEdge() {
         return OutgoingTakenEdge;
     }
 
+    /**
+     *
+     * @param outgoingTakenEdge
+     */
     public void setOutgoingTakenEdge(ControlFlowGraphEdge outgoingTakenEdge) {
         OutgoingTakenEdge = outgoingTakenEdge;
     }
 
+    /**
+     *
+     * @return
+     */
     public BasicBlockType getType() {
         return type;
     }
 
+    /**
+     *
+     * @param type
+     */
     public void setType(BasicBlockType type) {
         this.type = type;
     }

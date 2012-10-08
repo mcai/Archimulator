@@ -20,21 +20,44 @@ package archimulator.sim.core;
 
 import archimulator.sim.core.bpred.BranchPredictorUpdate;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class ReorderBufferEntry extends AbstractReorderBufferEntry {
     private boolean effectiveAddressComputation;
     private LoadStoreQueueEntry loadStoreQueueEntry;
 
     private boolean effectiveAddressComputationOperandReady;
 
+    /**
+     *
+     * @param thread
+     * @param dynamicInst
+     * @param npc
+     * @param nnpc
+     * @param predictedNnpc
+     * @param returnAddressStackRecoverIndex
+     * @param branchPredictorUpdate
+     * @param speculative
+     */
     public ReorderBufferEntry(Thread thread, DynamicInstruction dynamicInst, int npc, int nnpc, int predictedNnpc, int returnAddressStackRecoverIndex, BranchPredictorUpdate branchPredictorUpdate, boolean speculative) {
         super(thread, dynamicInst, npc, nnpc, predictedNnpc, returnAddressStackRecoverIndex, branchPredictorUpdate, speculative);
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     protected boolean isNeedWriteBack() {
         return !this.effectiveAddressComputation;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public boolean isAllOperandReady() {
         if (this.effectiveAddressComputation) {
@@ -44,26 +67,50 @@ public class ReorderBufferEntry extends AbstractReorderBufferEntry {
         return super.isAllOperandReady();
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isEffectiveAddressComputation() {
         return effectiveAddressComputation;
     }
 
+    /**
+     *
+     * @param effectiveAddressComputation
+     */
     public void setEffectiveAddressComputation(boolean effectiveAddressComputation) {
         this.effectiveAddressComputation = effectiveAddressComputation;
     }
 
+    /**
+     *
+     * @return
+     */
     public LoadStoreQueueEntry getLoadStoreQueueEntry() {
         return loadStoreQueueEntry;
     }
 
+    /**
+     *
+     * @param loadStoreQueueEntry
+     */
     public void setLoadStoreQueueEntry(LoadStoreQueueEntry loadStoreQueueEntry) {
         this.loadStoreQueueEntry = loadStoreQueueEntry;
     }
 
+    /**
+     *
+     * @param effectiveAddressComputationOperandReady
+     */
     public void setEffectiveAddressComputationOperandReady(boolean effectiveAddressComputationOperandReady) {
         this.effectiveAddressComputationOperandReady = effectiveAddressComputationOperandReady;
     }
 
+    /**
+     *
+     * @param numNotReadyOperands
+     */
     @Override
     public void setNumNotReadyOperands(int numNotReadyOperands) {
         super.setNumNotReadyOperands(numNotReadyOperands);

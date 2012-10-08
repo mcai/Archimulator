@@ -10,10 +10,20 @@ import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class PosixUtil {
     private static final EnhancedLinuxPOSIX POSIX = loadLinuxPOSIX(new POSIXHandlerImpl());
     private static final String LIBC = Platform.IS_LINUX ? "libc.so.6" : "c";
 
+    /**
+     *
+     * @param libraryName
+     * @param libCClass
+     * @return
+     */
     public static LibC loadLibC(String libraryName, Class<?> libCClass) {
         Map<Object, Object> defaultOptions = new HashMap<Object, Object>() {{
             put(Library.OPTION_TYPE_MAPPER, POSIXTypeMapper.INSTANCE);
@@ -22,10 +32,19 @@ public class PosixUtil {
         return (LibC) Native.loadLibrary(libraryName, libCClass, defaultOptions);
     }
 
+    /**
+     *
+     * @param handler
+     * @return
+     */
     public static EnhancedLinuxPOSIX loadLinuxPOSIX(POSIXHandler handler) {
         return new EnhancedLinuxPOSIX(LIBC, loadLibC(LIBC, LinuxLibC.class), handler);
     }
 
+    /**
+     *
+     * @return
+     */
     public static EnhancedLinuxPOSIX current() {
         return POSIX;
     }

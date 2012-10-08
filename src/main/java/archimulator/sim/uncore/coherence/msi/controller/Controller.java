@@ -23,28 +23,63 @@ import archimulator.sim.uncore.MemoryDevice;
 import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
 import archimulator.sim.uncore.coherence.msi.message.CoherenceMessage;
 
+/**
+ *
+ * @author Min Cai
+ */
 public abstract class Controller extends MemoryDevice {
     private MemoryDevice next;
 
+    /**
+     *
+     * @param cacheHierarchy
+     * @param name
+     */
     public Controller(CacheHierarchy cacheHierarchy, String name) {
         super(cacheHierarchy, name);
     }
 
+    /**
+     *
+     * @param message
+     */
     public abstract void receive(CoherenceMessage message);
 
+    /**
+     *
+     * @param to
+     * @param size
+     * @param message
+     */
     public void transfer(Controller to, int size, CoherenceMessage message) {
         this.getCacheHierarchy().transfer(this, to, size, message);
     }
 
+    /**
+     *
+     * @return
+     */
     public MemoryDevice getNext() {
         return next;
     }
 
+    /**
+     *
+     * @param next
+     */
     public void setNext(MemoryDevice next) {
         this.next = next;
     }
 
+    /**
+     *
+     * @return
+     */
     public abstract int getHitLatency();
 
+    /**
+     *
+     * @return
+     */
     public abstract CacheReplacementPolicyType getReplacementPolicyType();
 }

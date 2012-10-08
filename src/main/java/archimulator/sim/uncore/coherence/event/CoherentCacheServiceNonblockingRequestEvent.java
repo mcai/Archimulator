@@ -21,6 +21,10 @@ package archimulator.sim.uncore.coherence.event;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.msi.controller.GeneralCacheController;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class CoherentCacheServiceNonblockingRequestEvent extends CoherentCacheEvent {
     private MemoryHierarchyAccess access;
     private int tag;
@@ -28,6 +32,15 @@ public class CoherentCacheServiceNonblockingRequestEvent extends CoherentCacheEv
     private int way;
     private boolean hitInCache;
 
+    /**
+     *
+     * @param cacheController
+     * @param access
+     * @param tag
+     * @param set
+     * @param way
+     * @param hitInCache
+     */
     public CoherentCacheServiceNonblockingRequestEvent(GeneralCacheController cacheController, MemoryHierarchyAccess access, int tag, int set, int way, boolean hitInCache) {
         super(cacheController);
 
@@ -38,22 +51,42 @@ public class CoherentCacheServiceNonblockingRequestEvent extends CoherentCacheEv
         this.hitInCache = hitInCache;
     }
 
+    /**
+     *
+     * @return
+     */
     public MemoryHierarchyAccess getAccess() {
         return access;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getTag() {
         return tag;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getSet() {
         return set;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getWay() {
         return way;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isHitInCache() {
         return hitInCache;
     }

@@ -18,11 +18,33 @@
  ******************************************************************************/
 package archimulator.sim.analysis;
 
+/**
+ *
+ * @author Min Cai
+ */
 public enum BasicBlockType {
+    /**
+     *
+     */
     UNKNOWN,
+    /**
+     *
+     */
     SEQUENTIAL,
+    /**
+     *
+     */
     CONDITIONAL,
+    /**
+     *
+     */
     UNCONDITIONAL,
+    /**
+     *
+     */
     FUNCTION_CALL,
+    /**
+     *
+     */
     FUNCTION_RETURN
 }

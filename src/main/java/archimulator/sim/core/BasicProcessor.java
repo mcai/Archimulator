@@ -32,6 +32,10 @@ import net.pickapack.event.CycleAccurateEventQueue;
 
 import java.util.*;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class BasicProcessor extends BasicSimulationObject implements Processor {
     private List<Core> cores;
 
@@ -41,6 +45,15 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
 
     private Map<Context, Thread> contextToThreadMappings;
 
+    /**
+     *
+     * @param experiment
+     * @param simulation
+     * @param blockingEventDispatcher
+     * @param cycleAccurateEventQueue
+     * @param kernel
+     * @param cacheHierarchy
+     */
     public BasicProcessor(Experiment experiment, Simulation simulation, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, Kernel kernel, CacheHierarchy cacheHierarchy) {
         super(experiment, simulation, blockingEventDispatcher, cycleAccurateEventQueue);
 
@@ -73,6 +86,9 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
         this.updateContextToThreadAssignments();
     }
 
+    /**
+     *
+     */
     public void updateContextToThreadAssignments() {
         for (Iterator<Context> it = this.kernel.getContexts().iterator(); it.hasNext(); ) {
             Context context = it.next();
@@ -119,14 +135,26 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
         this.getBlockingEventDispatcher().dispatch(new ContextKilledEvent(context));
     }
 
+    /**
+     *
+     * @return
+     */
     public List<Core> getCores() {
         return cores;
     }
 
+    /**
+     *
+     * @return
+     */
     public Kernel getKernel() {
         return kernel;
     }
 
+    /**
+     *
+     * @return
+     */
     public CacheHierarchy getCacheHierarchy() {
         return cacheHierarchy;
     }

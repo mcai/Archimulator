@@ -24,19 +24,51 @@ import archimulator.sim.uncore.cache.EvictableCache;
 
 import java.io.Serializable;
 
+/**
+ *
+ * @author Min Cai
+ * @param <StateT>
+ */
 public abstract class CacheReplacementPolicy<StateT extends Serializable> {
     private EvictableCache<StateT> cache;
 
+    /**
+     *
+     * @param cache
+     */
     public CacheReplacementPolicy(EvictableCache<StateT> cache) {
         this.cache = cache;
     }
 
+    /**
+     *
+     * @param access
+     * @param set
+     * @param tag
+     * @return
+     */
     public abstract CacheAccess<StateT> handleReplacement(MemoryHierarchyAccess access, int set, int tag);
 
+    /**
+     *
+     * @param access
+     * @param set
+     * @param way
+     */
     public abstract void handlePromotionOnHit(MemoryHierarchyAccess access, int set, int way);
 
+    /**
+     *
+     * @param access
+     * @param set
+     * @param way
+     */
     public abstract void handleInsertionOnMiss(MemoryHierarchyAccess access, int set, int way);
 
+    /**
+     *
+     * @return
+     */
     public EvictableCache<StateT> getCache() {
         return cache;
     }

@@ -21,12 +21,24 @@ package archimulator.sim.uncore.coherence.event;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.msi.controller.GeneralCacheController;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class CoherentCacheLineReplacementEvent extends CoherentCacheEvent {
     private MemoryHierarchyAccess access;
     private int tag;
     private int set;
     private int way;
 
+    /**
+     *
+     * @param cacheController
+     * @param access
+     * @param tag
+     * @param set
+     * @param way
+     */
     public CoherentCacheLineReplacementEvent(GeneralCacheController cacheController, MemoryHierarchyAccess access, int tag, int set, int way) {
         super(cacheController);
 
@@ -36,18 +48,34 @@ public class CoherentCacheLineReplacementEvent extends CoherentCacheEvent {
         this.way = way;
     }
 
+    /**
+     *
+     * @return
+     */
     public MemoryHierarchyAccess getAccess() {
         return access;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getTag() {
         return tag;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getSet() {
         return set;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getWay() {
         return way;
     }

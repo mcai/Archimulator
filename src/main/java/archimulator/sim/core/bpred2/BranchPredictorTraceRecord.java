@@ -18,25 +18,47 @@
  ******************************************************************************/
 package archimulator.sim.core.bpred2;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class BranchPredictorTraceRecord {
     private boolean taken;
     private int target;
     private BranchInfo branchInfo;
 
+    /**
+     *
+     * @param taken
+     * @param target
+     * @param branchInfo
+     */
     public BranchPredictorTraceRecord(boolean taken, int target, BranchInfo branchInfo) {
         this.taken = taken;
         this.target = target;
         this.branchInfo = branchInfo;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isTaken() {
         return taken;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getTarget() {
         return target;
     }
 
+    /**
+     *
+     * @return
+     */
     public BranchInfo getBranchInfo() {
         return branchInfo;
     }

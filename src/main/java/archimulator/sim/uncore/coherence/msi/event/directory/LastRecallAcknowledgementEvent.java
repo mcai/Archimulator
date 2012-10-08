@@ -22,7 +22,18 @@ import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class LastRecallAcknowledgementEvent extends DirectoryControllerEvent {
+    /**
+     *
+     * @param generator
+     * @param producerFlow
+     * @param tag
+     * @param access
+     */
     public LastRecallAcknowledgementEvent(DirectoryController generator, CacheCoherenceFlow producerFlow, int tag, MemoryHierarchyAccess access) {
         super(generator, producerFlow, DirectoryControllerEventType.LAST_RECALL_ACKNOWLEDGEMENT, access, tag);
     }

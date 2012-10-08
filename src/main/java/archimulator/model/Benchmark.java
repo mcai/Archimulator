@@ -25,6 +25,10 @@ import net.pickapack.model.ModelElement;
 
 import java.util.Date;
 
+/**
+ *
+ * @author Min Cai
+ */
 @DatabaseTable(tableName = "Benchmark")
 public class Benchmark implements ModelElement {
     @DatabaseField(generatedId = true)
@@ -51,13 +55,32 @@ public class Benchmark implements ModelElement {
     @DatabaseField
     private boolean helperThreadEnabled;
 
+    /**
+     *
+     */
     public Benchmark() {
     }
 
+    /**
+     *
+     * @param title
+     * @param workingDirectory
+     * @param executable
+     * @param defaultArguments
+     */
     public Benchmark(String title, String workingDirectory, String executable, String defaultArguments) {
         this(title, workingDirectory, executable, defaultArguments, "", false);
     }
 
+    /**
+     *
+     * @param title
+     * @param workingDirectory
+     * @param executable
+     * @param defaultArguments
+     * @param standardIn
+     * @param helperThreadEnabled
+     */
     public Benchmark(String title, String workingDirectory, String executable, String defaultArguments, String standardIn, boolean helperThreadEnabled) {
         this.title = title;
         this.workingDirectory = workingDirectory;
@@ -70,35 +93,67 @@ public class Benchmark implements ModelElement {
         this.createTime = DateHelper.toTick(new Date());
     }
 
+    /**
+     *
+     * @return
+     */
     public long getId() {
         return id;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public long getParentId() {
         return -1;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getTitle() {
         return title;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getCreateTime() {
         return createTime;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getWorkingDirectory() {
         return workingDirectory;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getExecutable() {
         return executable;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getDefaultArguments() {
         return defaultArguments;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getStandardIn() {
         if(standardIn == null) {
             standardIn = "";
@@ -107,6 +162,10 @@ public class Benchmark implements ModelElement {
         return standardIn;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean getHelperThreadEnabled() {
         return helperThreadEnabled;
     }

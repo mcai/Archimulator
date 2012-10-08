@@ -18,15 +18,49 @@
  ******************************************************************************/
 package archimulator.sim.os;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class OpenFlags {
+    /**
+     *
+     */
     public static final int O_RDONLY = 0x00000000;
+    /**
+     *
+     */
     public static final int O_WRONLY = 0x00000001;
+    /**
+     *
+     */
     public static final int O_RDWR = 0x00000002;
+    /**
+     *
+     */
     public static final int O_CREAT = 0x00000040;
+    /**
+     *
+     */
     public static final int O_EXCL = 0x00000080;
+    /**
+     *
+     */
     public static final int O_NOCTTY = 0x00000100;
+    /**
+     *
+     */
     public static final int O_TRUNC = 0x00000200;
+    /**
+     *
+     */
     public static final int O_APPEND = 0x00000400;
+    /**
+     *
+     */
     public static final int O_NONBLOCK = 0x00000800;
+    /**
+     *
+     */
     public static final int O_SYNC = 0x00001000;
 }

@@ -20,7 +20,14 @@ package archimulator.sim.os.elf;
 
 import java.io.IOException;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class ElfHeader {
+    /**
+     *
+     */
     public static final short EM_MIPS = 8;
 
     private int e_type;
@@ -37,6 +44,11 @@ public class ElfHeader {
     private int e_shnum;
     private int e_shstrndx;
 
+    /**
+     *
+     * @param elfFile
+     * @throws IOException
+     */
     public ElfHeader(ElfFile elfFile) throws IOException {
         this.e_type = elfFile.readUnsignedHalfWord();
 
@@ -55,54 +67,106 @@ public class ElfHeader {
         this.e_shstrndx = elfFile.readUnsignedHalfWord();
     }
 
+    /**
+     *
+     * @return
+     */
     public int getE_type() {
         return e_type;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getE_machine() {
         return e_machine;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getE_version() {
         return e_version;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getE_entry() {
         return e_entry;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getE_phoff() {
         return e_phoff;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getE_shoff() {
         return e_shoff;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getE_flags() {
         return e_flags;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getE_ehsize() {
         return e_ehsize;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getE_phentsize() {
         return e_phentsize;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getE_phnum() {
         return e_phnum;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getE_shentsize() {
         return e_shentsize;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getE_shnum() {
         return e_shnum;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getE_shstrndx() {
         return e_shstrndx;
     }

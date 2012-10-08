@@ -28,9 +28,18 @@ import net.pickapack.util.ValueProviderFactory;
 
 import java.io.Serializable;
 
+/**
+ *
+ * @author Min Cai
+ * @param <StateT>
+ */
 public class LFUPolicy<StateT extends Serializable> extends CacheReplacementPolicy<StateT> {
     private Cache<Boolean> mirrorCache;
 
+    /**
+     *
+     * @param cache
+     */
     public LFUPolicy(EvictableCache<StateT> cache) {
         super(cache);
 
@@ -42,6 +51,13 @@ public class LFUPolicy<StateT extends Serializable> extends CacheReplacementPoli
         });
     }
 
+    /**
+     *
+     * @param access
+     * @param set
+     * @param tag
+     * @return
+     */
     @Override
     public CacheAccess<StateT> handleReplacement(MemoryHierarchyAccess access, int set, int tag) {
         int minFrequency = Integer.MAX_VALUE;
@@ -60,6 +76,12 @@ public class LFUPolicy<StateT extends Serializable> extends CacheReplacementPoli
         return new CacheAccess<StateT>(this.getCache(), access, set, victimWay, tag);
     }
 
+    /**
+     *
+     * @param access
+     * @param set
+     * @param way
+     */
     @Override
     public void handlePromotionOnHit(MemoryHierarchyAccess access, int set, int way) {
         CacheLine<Boolean> line = this.mirrorCache.getLine(set, way);
@@ -67,6 +89,12 @@ public class LFUPolicy<StateT extends Serializable> extends CacheReplacementPoli
         stateProvider.frequency++;
     }
 
+    /**
+     *
+     * @param access
+     * @param set
+     * @param way
+     */
     @Override
     public void handleInsertionOnMiss(MemoryHierarchyAccess access, int set, int way) {
         CacheLine<Boolean> line = this.mirrorCache.getLine(set, way);

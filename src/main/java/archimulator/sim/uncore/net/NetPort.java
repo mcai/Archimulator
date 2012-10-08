@@ -18,22 +18,42 @@
  ******************************************************************************/
 package archimulator.sim.uncore.net;
 
+/**
+ *
+ * @author Min Cai
+ */
 public abstract class NetPort {
     private NetNode node;
     private NetLink link;
 
+    /**
+     *
+     * @param node
+     */
     public NetPort(NetNode node) {
         this.node = node;
     }
 
+    /**
+     *
+     * @return
+     */
     public NetNode getNode() {
         return node;
     }
 
+    /**
+     *
+     * @return
+     */
     public NetLink getLink() {
         return link;
     }
 
+    /**
+     *
+     * @param link
+     */
     public void setLink(NetLink link) {
         this.link = link;
     }

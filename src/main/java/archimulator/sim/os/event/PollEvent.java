@@ -21,10 +21,18 @@ package archimulator.sim.os.event;
 import archimulator.sim.isa.ArchitecturalRegisterFile;
 import archimulator.sim.os.Context;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class PollEvent extends SystemEvent {
     private TimeCriterion timeCriterion;
     private WaitFileDescriptorCriterion waitFileDescriptorCriterion;
 
+    /**
+     *
+     * @param context
+     */
     public PollEvent(Context context) {
         super(context, SystemEventType.POLL);
 
@@ -32,11 +40,18 @@ public class PollEvent extends SystemEvent {
         this.waitFileDescriptorCriterion = new WaitFileDescriptorCriterion();
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public boolean needProcess() {
         return this.timeCriterion.needProcess(this.getContext()) || this.waitFileDescriptorCriterion.needProcess(this.getContext());
     }
 
+    /**
+     *
+     */
     @Override
     public void process() {
         if (!this.waitFileDescriptorCriterion.getBuffer().isEmpty()) {
@@ -50,10 +65,18 @@ public class PollEvent extends SystemEvent {
         this.getContext().resume();
     }
 
+    /**
+     *
+     * @return
+     */
     public TimeCriterion getTimeCriterion() {
         return timeCriterion;
     }
 
+    /**
+     *
+     * @return
+     */
     public WaitFileDescriptorCriterion getWaitFileDescriptorCriterion() {
         return waitFileDescriptorCriterion;
     }

@@ -41,6 +41,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class BasicCacheHierarchy extends BasicSimulationObject implements CacheHierarchy {
     private MemoryController memoryController;
     private DirectoryController l2CacheController;
@@ -55,6 +59,13 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
 
     private Map<Controller, Map<Controller, PointToPointReorderBuffer>> p2pReorderBuffers;
 
+    /**
+     *
+     * @param experiment
+     * @param simulation
+     * @param blockingEventDispatcher
+     * @param cycleAccurateEventQueue
+     */
     public BasicCacheHierarchy(Experiment experiment, Simulation simulation, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
         super(experiment, simulation, blockingEventDispatcher, cycleAccurateEventQueue);
 
@@ -103,6 +114,10 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
         this.p2pReorderBuffers = new HashMap<Controller, Map<Controller, PointToPointReorderBuffer>>();
     }
 
+    /**
+     *
+     * @param stats
+     */
     @Override
     public void dumpCacheControllerFsmStats(Map<String, String> stats) {
         for (CacheController l1ICacheController : this.l1ICacheControllers) {
@@ -115,6 +130,13 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
         this.l2CacheController.getFsmFactory().dump(this.l2CacheController.getName(), stats);
     }
 
+    /**
+     *
+     * @param from
+     * @param to
+     * @param size
+     * @param message
+     */
     @Override
     public void transfer(final Controller from, final Controller to, int size, final CoherenceMessage message) {
         if (!this.p2pReorderBuffers.containsKey(from)) {
@@ -135,22 +157,42 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
         });
     }
 
+    /**
+     *
+     * @return
+     */
     public MemoryController getMemoryController() {
         return memoryController;
     }
 
+    /**
+     *
+     * @return
+     */
     public DirectoryController getL2CacheController() {
         return l2CacheController;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<CacheController> getL1ICacheControllers() {
         return l1ICacheControllers;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<CacheController> getL1DCacheControllers() {
         return l1DCacheControllers;
     }
 
+    /**
+     *
+     * @return
+     */
     @SuppressWarnings("unchecked")
     public List<GeneralCacheController> getCacheControllers() {
         List<GeneralCacheController> cacheControllers = new ArrayList<GeneralCacheController>();
@@ -160,18 +202,34 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
         return cacheControllers;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<TranslationLookasideBuffer> getItlbs() {
         return itlbs;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<TranslationLookasideBuffer> getDtlbs() {
         return dtlbs;
     }
 
+    /**
+     *
+     * @return
+     */
     public Net getL1sToL2Network() {
         return l1sToL2Network;
     }
 
+    /**
+     *
+     * @return
+     */
     public L2ToMemNet getL2ToMemNetwork() {
         return l2ToMemNetwork;
     }

@@ -22,7 +22,18 @@ import archimulator.sim.uncore.cache.EvictableCache;
 
 import java.io.Serializable;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class CacheReplacementPolicyFactory {
+    /**
+     *
+     * @param <StateT>
+     * @param cacheReplacementPolicyType
+     * @param cache
+     * @return
+     */
     public static <StateT extends Serializable> CacheReplacementPolicy<StateT> createCacheReplacementPolicy(CacheReplacementPolicyType cacheReplacementPolicyType, EvictableCache<StateT> cache) {
         switch (cacheReplacementPolicyType) {
             case LRU:

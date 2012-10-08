@@ -22,6 +22,10 @@ import archimulator.service.ServiceManager;
 
 import java.io.Serializable;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class ContextMapping implements Serializable {
     private int threadId;
 
@@ -39,10 +43,23 @@ public class ContextMapping implements Serializable {
 
     private transient Benchmark benchmark;
 
+    /**
+     *
+     * @param threadId
+     * @param benchmark
+     * @param arguments
+     */
     public ContextMapping(int threadId, Benchmark benchmark, String arguments) {
         this(threadId, benchmark, arguments, getDefaultStandardOut(threadId));
     }
 
+    /**
+     *
+     * @param threadId
+     * @param benchmark
+     * @param arguments
+     * @param standardOut
+     */
     public ContextMapping(int threadId, Benchmark benchmark, String arguments, String standardOut) {
         this.threadId = threadId;
         this.benchmarkId = benchmark.getId();
@@ -50,23 +67,43 @@ public class ContextMapping implements Serializable {
         this.standardOut = standardOut;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getThreadId() {
         return threadId;
     }
 
+    /**
+     *
+     * @param threadId
+     */
     public void setThreadId(int threadId) {
         this.threadId = threadId;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getBenchmarkId() {
         return benchmarkId;
     }
 
+    /**
+     *
+     * @param benchmarkId
+     */
     public void setBenchmarkId(long benchmarkId) {
         this.benchmarkId = benchmarkId;
         this.benchmark = ServiceManager.getBenchmarkService().getBenchmarkById(benchmarkId);
     }
 
+    /**
+     *
+     * @return
+     */
     public String getArguments() {
         if(arguments == null) {
             arguments = "";
@@ -75,10 +112,18 @@ public class ContextMapping implements Serializable {
         return arguments;
     }
 
+    /**
+     *
+     * @param arguments
+     */
     public void setArguments(String arguments) {
         this.arguments = arguments;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getStandardOut() {
         if(standardOut == null) {
             standardOut = "";
@@ -87,34 +132,66 @@ public class ContextMapping implements Serializable {
         return standardOut;
     }
 
+    /**
+     *
+     * @param standardOut
+     */
     public void setStandardOut(String standardOut) {
         this.standardOut = standardOut;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getHelperThreadLookahead() {
         return helperThreadLookahead;
     }
 
+    /**
+     *
+     * @param helperThreadLookahead
+     */
     public void setHelperThreadLookahead(int helperThreadLookahead) {
         this.helperThreadLookahead = helperThreadLookahead;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getHelperThreadStride() {
         return helperThreadStride;
     }
 
+    /**
+     *
+     * @param helperThreadStride
+     */
     public void setHelperThreadStride(int helperThreadStride) {
         this.helperThreadStride = helperThreadStride;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean getDynamicHelperThreadParams() {
         return dynamicHelperThreadParams;
     }
 
+    /**
+     *
+     * @param dynamicHelperThreadParams
+     */
     public void setDynamicHelperThreadParams(boolean dynamicHelperThreadParams) {
         this.dynamicHelperThreadParams = dynamicHelperThreadParams;
     }
 
+    /**
+     *
+     * @return
+     */
     public Benchmark getBenchmark() {
         if (benchmark == null) {
             benchmark = ServiceManager.getBenchmarkService().getBenchmarkById(benchmarkId);
@@ -128,6 +205,11 @@ public class ContextMapping implements Serializable {
         return String.format("thread #%d->'%s'", threadId, getBenchmark().getTitle() + "_" + arguments + "-lookahead_" + helperThreadLookahead + "-stride_" + helperThreadStride);
     }
 
+    /**
+     *
+     * @param threadId
+     * @return
+     */
     public static String getDefaultStandardOut(int threadId) {
         return "ctx" + threadId + "_out.txt";
     }

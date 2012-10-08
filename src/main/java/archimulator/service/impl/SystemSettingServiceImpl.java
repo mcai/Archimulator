@@ -27,9 +27,16 @@ import net.pickapack.service.AbstractService;
 
 import java.util.Arrays;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class SystemSettingServiceImpl extends AbstractService implements SystemSettingService {
     private Dao<SystemSetting, Long> systemSettings;
 
+    /**
+     *
+     */
     @SuppressWarnings("unchecked")
     public SystemSettingServiceImpl() {
         super(ServiceManager.getDatabaseUrl(), Arrays.<Class<? extends ModelElement>>asList(SystemSetting.class));
@@ -37,6 +44,10 @@ public class SystemSettingServiceImpl extends AbstractService implements SystemS
         this.systemSettings = createDao(SystemSetting.class);
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public SystemSetting getSystemSettingSingleton() {
         if(getFirstItem(this.systemSettings) == null) {
@@ -49,6 +60,10 @@ public class SystemSettingServiceImpl extends AbstractService implements SystemS
         return getFirstItem(this.systemSettings);
     }
 
+    /**
+     *
+     * @param systemSetting
+     */
     @Override
     public void updateSystemSettingSingleton(SystemSetting systemSetting) {
         updateItem(this.systemSettings, SystemSetting.class, systemSetting);

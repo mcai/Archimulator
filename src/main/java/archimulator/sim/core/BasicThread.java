@@ -37,6 +37,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class BasicThread extends AbstractBasicThread {
     private int lineSizeOfICache;
 
@@ -53,6 +57,11 @@ public class BasicThread extends AbstractBasicThread {
 
     private DynamicInstruction nextInstructionInCacheWarmupPhase;
 
+    /**
+     *
+     * @param core
+     * @param num
+     */
     public BasicThread(Core core, int num) {
         super(core, num);
 
@@ -83,6 +92,11 @@ public class BasicThread extends AbstractBasicThread {
         });
     }
 
+    /**
+     *
+     * @param contextMapping
+     * @return
+     */
     protected int getHelperThreadLookahead(ContextMapping contextMapping) {
         if (contextMapping.getBenchmark().getHelperThreadEnabled()) {
             return contextMapping.getDynamicHelperThreadParams() ? 20 : contextMapping.getHelperThreadLookahead();
@@ -91,6 +105,11 @@ public class BasicThread extends AbstractBasicThread {
         throw new IllegalArgumentException();
     }
 
+    /**
+     *
+     * @param contextMapping
+     * @return
+     */
     protected int getHelperThreadStride(ContextMapping contextMapping) {
         if (contextMapping.getBenchmark().getHelperThreadEnabled()) {
             return contextMapping.getDynamicHelperThreadParams() ? 10 : contextMapping.getHelperThreadStride();
@@ -99,6 +118,9 @@ public class BasicThread extends AbstractBasicThread {
         throw new IllegalArgumentException();
     }
 
+    /**
+     *
+     */
     public void fastForwardOneCycle() {
         if (this.context != null && this.context.getState() == ContextState.RUNNING) {
             StaticInstruction staticInstruction;
@@ -115,6 +137,9 @@ public class BasicThread extends AbstractBasicThread {
         }
     }
 
+    /**
+     *
+     */
     public void warmupCacheOneCycle() {
         if (this.context != null && this.context.getState() == ContextState.RUNNING && !this.fetchStalled) {
             if (this.nextInstructionInCacheWarmupPhase == null) {
@@ -175,6 +200,9 @@ public class BasicThread extends AbstractBasicThread {
         }
     }
 
+    /**
+     *
+     */
     public void updateFetchNpcAndNnpcFromRegs() {
         this.fetchNpc = this.context.getRegisterFile().getNpc();
         this.fetchNnpc = this.context.getRegisterFile().getNnpc();
@@ -213,6 +241,9 @@ public class BasicThread extends AbstractBasicThread {
         }
     }
 
+    /**
+     *
+     */
     public void fetch() {
         if (!this.canFetch()) {
             return;
@@ -280,6 +311,10 @@ public class BasicThread extends AbstractBasicThread {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean registerRenameOne() {
         DecodeBufferEntry decodeBufferEntry = this.decodeBuffer.getEntries().get(0);
 
@@ -362,6 +397,10 @@ public class BasicThread extends AbstractBasicThread {
         return true;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean dispatchOne() {
         for (ReorderBufferEntry reorderBufferEntry : this.reorderBuffer.getEntries()) {
             if (!reorderBufferEntry.isDispatched()) {
@@ -394,6 +433,9 @@ public class BasicThread extends AbstractBasicThread {
         return false;
     }
 
+    /**
+     *
+     */
     public void refreshLoadStoreQueue() { //TODO: to be clarified
         List<Integer> stdUnknowns = new ArrayList<Integer>();
 
@@ -420,6 +462,9 @@ public class BasicThread extends AbstractBasicThread {
         }
     }
 
+    /**
+     *
+     */
     public void commit() {
         int COMMIT_TIMEOUT = 1000000;
 
@@ -509,6 +554,9 @@ public class BasicThread extends AbstractBasicThread {
         }
     }
 
+    /**
+     *
+     */
     public void squash() {
 //		Logger.infof(Logger.THREAD, "%s: squash", this.getName());
 
@@ -557,6 +605,10 @@ public class BasicThread extends AbstractBasicThread {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isLastDecodedDynamicInstructionCommitted() {
         return this.lastDecodedDynamicInstruction == null || lastDecodedDynamicInstructionCommitted;
     }
@@ -565,26 +617,54 @@ public class BasicThread extends AbstractBasicThread {
         return n & ~(alignment - 1);
     }
 
+    /**
+     *
+     * @param thread
+     * @return
+     */
     public static boolean isMainThread(MemoryHierarchyThread thread) {
         return isMainThread(thread.getId());
     }
 
+    /**
+     *
+     * @param threadId
+     * @return
+     */
     public static boolean isMainThread(int threadId) {
         return threadId == getMainThreadId();
     }
 
+    /**
+     *
+     * @return
+     */
     public static int getMainThreadId() {
         return 0; //TODO: main thread should not be hard coded.
     }
 
+    /**
+     *
+     * @param thread
+     * @return
+     */
     public static boolean isHelperThread(MemoryHierarchyThread thread) {
         return isHelperThread(thread.getId());
     }
 
+    /**
+     *
+     * @param threadId
+     * @return
+     */
     public static boolean isHelperThread(int threadId) {
         return threadId == getHelperThreadId();
     }
 
+    /**
+     *
+     * @return
+     */
     public static int getHelperThreadId() {
         return 2; //TODO: helper thread should not be hard coded.
     }

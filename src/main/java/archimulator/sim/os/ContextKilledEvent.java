@@ -20,14 +20,26 @@ package archimulator.sim.os;
 
 import archimulator.sim.common.SimulationEvent;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class ContextKilledEvent extends SimulationEvent {
     private Context context;
 
+    /**
+     *
+     * @param context
+     */
     public ContextKilledEvent(Context context) {
         super(context);
         this.context = context;
     }
 
+    /**
+     *
+     * @return
+     */
     public Context getContext() {
         return context;
     }

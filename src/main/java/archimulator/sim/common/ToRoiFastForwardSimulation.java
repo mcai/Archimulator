@@ -26,16 +26,37 @@ import net.pickapack.action.Action1;
 import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
 
+/**
+ *
+ * @author Min Cai
+ */
 public class ToRoiFastForwardSimulation extends Simulation {
     private int helperThreadPthreadSpawnIndex;
     private Reference<Kernel> kernelRef;
 
     private boolean pthreadHasSpawned;
 
+    /**
+     *
+     * @param title
+     * @param experiment
+     * @param blockingEventDispatcher
+     * @param cycleAccurateEventQueue
+     * @param kernelRef
+     */
     public ToRoiFastForwardSimulation(String title, Experiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, Reference<Kernel> kernelRef) {
         this(title, experiment, blockingEventDispatcher, cycleAccurateEventQueue, 3720, kernelRef);
     }
 
+    /**
+     *
+     * @param title
+     * @param experiment
+     * @param blockingEventDispatcher
+     * @param cycleAccurateEventQueue
+     * @param helperThreadPthreadSpawnIndex
+     * @param kernelRef
+     */
     public ToRoiFastForwardSimulation(String title, Experiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, int helperThreadPthreadSpawnIndex, Reference<Kernel> kernelRef) {
         super(title, SimulationType.FAST_FORWARD, experiment, blockingEventDispatcher, cycleAccurateEventQueue);
 
@@ -43,21 +64,36 @@ public class ToRoiFastForwardSimulation extends Simulation {
         this.kernelRef = kernelRef;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public boolean canDoFastForwardOneCycle() {
         return !pthreadHasSpawned;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public boolean canDoCacheWarmupOneCycle() {
         throw new IllegalArgumentException();
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public boolean canDoMeasurementOneCycle() {
         throw new IllegalArgumentException();
     }
 
+    /**
+     *
+     */
     @Override
     public void beginSimulation() {
         this.pthreadHasSpawned = false;
@@ -71,6 +107,9 @@ public class ToRoiFastForwardSimulation extends Simulation {
         });
     }
 
+    /**
+     *
+     */
     @Override
     public void endSimulation() {
         this.kernelRef.set(this.getProcessor().getKernel());

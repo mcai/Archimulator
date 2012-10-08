@@ -24,12 +24,31 @@ import archimulator.sim.uncore.CacheHierarchy;
 
 import java.util.List;
 
+/**
+ *
+ * @author Min Cai
+ */
 public interface Processor extends SimulationObject {
+    /**
+     *
+     * @return
+     */
     List<Core> getCores();
 
+    /**
+     *
+     * @return
+     */
     Kernel getKernel();
 
+    /**
+     *
+     */
     void updateContextToThreadAssignments();
 
+    /**
+     *
+     * @return
+     */
     CacheHierarchy getCacheHierarchy();
 }

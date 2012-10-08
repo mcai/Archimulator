@@ -5,6 +5,10 @@ import org.jruby.ext.posix.util.Platform;
 
 import java.io.FileDescriptor;
 
+/**
+ *
+ * @author Min Cai
+ */
 public final class EnhancedLinuxPOSIX extends BaseNativePOSIX {
     private final boolean hasFxstat;
     private final boolean hasLxstat;
@@ -14,6 +18,12 @@ public final class EnhancedLinuxPOSIX extends BaseNativePOSIX {
     private final boolean hasStat;
     private final int statVersion;
 
+    /**
+     *
+     * @param libraryName
+     * @param libc
+     * @param handler
+     */
     public EnhancedLinuxPOSIX(String libraryName, LibC libc, POSIXHandler handler) {
         super(libraryName, libc, handler);
 
@@ -36,6 +46,10 @@ public final class EnhancedLinuxPOSIX extends BaseNativePOSIX {
         hasStat = !hasXstat && hasMethod("stat64");
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public FileStat allocateStat() {
         if (Platform.IS_32_BIT) {
@@ -45,6 +59,11 @@ public final class EnhancedLinuxPOSIX extends BaseNativePOSIX {
         }
     }
 
+    /**
+     *
+     * @param fileDescriptor
+     * @return
+     */
     @Override
     public FileStat fstat(FileDescriptor fileDescriptor) {
         if (!hasFxstat) {
@@ -61,6 +80,11 @@ public final class EnhancedLinuxPOSIX extends BaseNativePOSIX {
         return stat;
     }
 
+    /**
+     *
+     * @param fd
+     * @return
+     */
     public FileStat fstat(int fd) {
         if (!hasFxstat) {
             throw new UnsupportedOperationException();
