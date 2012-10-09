@@ -119,6 +119,14 @@ public class ExperimentPack implements ModelElement {
      *
      * @return
      */
+    public String getCreateTimeAsString() {
+        return DateHelper.toString(createTime);
+    }
+
+    /**
+     *
+     * @return
+     */
     public ExperimentType getExperimentType() {
         return experimentType;
     }
