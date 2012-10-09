@@ -208,7 +208,6 @@ public abstract class Simulation implements SimulationObject {
         }
 
         for (ExperimentGauge gauge : ServiceManager.getExperimentMetricService().getGaugesByExperiment(experiment)) {
-            //TODO.. handle all cases: single node, multiple nodes, single value, multiple values.
             Object node = StringUtils.isEmpty(gauge.getType().getNodeExpression()) ? this : JaxenHelper.evaluate(this, gauge.getType().getNodeExpression());
 
             if (node instanceof Collection) {
