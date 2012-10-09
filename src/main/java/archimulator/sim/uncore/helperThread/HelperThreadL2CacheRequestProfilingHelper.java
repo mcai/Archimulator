@@ -116,9 +116,9 @@ public class HelperThreadL2CacheRequestProfilingHelper {
             }
         };
 
-        this.helperThreadL2CacheRequestVictimCache = new EvictableCache<HelperThreadL2CacheRequestVictimCacheLineState>(l2CacheController, l2CacheController.getName() + ".helperThreadL2CacheRequestVictimCache", l2CacheController.getCache().getGeometry(), CacheReplacementPolicyType.LRU, cacheLineStateProviderFactory);
+        this.helperThreadL2CacheRequestVictimCache = new EvictableCache<HelperThreadL2CacheRequestVictimCacheLineState>(l2CacheController, l2CacheController.getName() + "/helperThreadL2CacheRequestVictimCache", l2CacheController.getCache().getGeometry(), CacheReplacementPolicyType.LRU, cacheLineStateProviderFactory);
 
-        this.helperThreadL2CacheRequestQualityPredictor = new CacheBasedPredictor<HelperThreadL2CacheRequestQuality>(l2CacheController, l2CacheController.getName() + ".helperThreadL2CacheRequestQualityPredictor", new CacheGeometry(64, 1, 1), 4, 16); //TODO: parameters should not be hardcoded
+        this.helperThreadL2CacheRequestQualityPredictor = new CacheBasedPredictor<HelperThreadL2CacheRequestQuality>(l2CacheController, l2CacheController.getName() + "/helperThreadL2CacheRequestQualityPredictor", new CacheGeometry(64, 1, 1), 4, 16); //TODO: parameters should not be hardcoded
 
         this.pendingL2Misses = new LinkedHashMap<Integer, PendingL2Miss>();
 

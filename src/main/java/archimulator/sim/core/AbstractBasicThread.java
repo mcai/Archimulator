@@ -175,32 +175,32 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
 
         switch (getExperiment().getArchitecture().getBranchPredictorType()) {
             case PERFECT:
-                this.branchPredictor = new PerfectBranchPredictor(this, this.name + ".branchPredictor");
+                this.branchPredictor = new PerfectBranchPredictor(this, this.name + "/branchPredictor");
                 break;
             case TAKEN:
-                this.branchPredictor = new TakenBranchPredictor(this, this.name + ".branchPredictor");
+                this.branchPredictor = new TakenBranchPredictor(this, this.name + "/branchPredictor");
                 break;
             case NOT_TAKEN:
-                this.branchPredictor = new NotTakenBranchPredictor(this, this.name + ".branchPredictor");
+                this.branchPredictor = new NotTakenBranchPredictor(this, this.name + "/branchPredictor");
                 break;
             case TWO_BIT:
-                this.branchPredictor = new TwoBitBranchPredictor(this, this.name + ".branchPredictor");
+                this.branchPredictor = new TwoBitBranchPredictor(this, this.name + "/branchPredictor");
                 break;
             case TWO_LEVEL:
-                this.branchPredictor = new TwoLevelBranchPredictor(this, this.name + ".branchPredictor");
+                this.branchPredictor = new TwoLevelBranchPredictor(this, this.name + "/branchPredictor");
                 break;
             case COMBINED:
-                this.branchPredictor = new CombinedBranchPredictor(this, this.name + ".branchPredictor");
+                this.branchPredictor = new CombinedBranchPredictor(this, this.name + "/branchPredictor");
                 break;
             default:
                 throw new IllegalArgumentException();
         }
 
-        this.intPhysicalRegisterFile = new PhysicalRegisterFile(this.name + ".intPhysicalRegisterFile", getExperiment().getArchitecture().getPhysicalRegisterFileCapacity());
-        this.fpPhysicalRegisterFile = new PhysicalRegisterFile(this.name + ".fpPhysicalRegisterFile", getExperiment().getArchitecture().getPhysicalRegisterFileCapacity());
-        this.miscPhysicalRegisterFile = new PhysicalRegisterFile(this.name + ".miscPhysicalRegisterFile", getExperiment().getArchitecture().getPhysicalRegisterFileCapacity());
+        this.intPhysicalRegisterFile = new PhysicalRegisterFile(this.name + "/intPhysicalRegisterFile", getExperiment().getArchitecture().getPhysicalRegisterFileCapacity());
+        this.fpPhysicalRegisterFile = new PhysicalRegisterFile(this.name + "/fpPhysicalRegisterFile", getExperiment().getArchitecture().getPhysicalRegisterFileCapacity());
+        this.miscPhysicalRegisterFile = new PhysicalRegisterFile(this.name + "/miscPhysicalRegisterFile", getExperiment().getArchitecture().getPhysicalRegisterFileCapacity());
 
-        this.renameTable = new RegisterRenameTable(this.name + ".renameTable");
+        this.renameTable = new RegisterRenameTable(this.name + "/renameTable");
 
         for (int i = 0; i < ArchitecturalRegisterFile.NUM_INT_REGISTERS; i++) {
             int dep = RegisterDependencyType.toRegisterDependency(RegisterDependencyType.INTEGER, i);

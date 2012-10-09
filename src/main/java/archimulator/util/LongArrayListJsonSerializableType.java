@@ -16,38 +16,33 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.common;
+package archimulator.util;
 
-import archimulator.model.Experiment;
-import net.pickapack.event.BlockingEventDispatcher;
-import net.pickapack.event.CycleAccurateEventQueue;
+import archimulator.model.ContextMapping;
+import com.google.gson.reflect.TypeToken;
+
+import java.util.ArrayList;
 
 /**
  *
  * @author Min Cai
  */
-public interface SimulationObject extends Named {
+public class LongArrayListJsonSerializableType extends JsonSerializableType<ArrayList<ContextMapping>> {
+    private static final LongArrayListJsonSerializableType singleTon = new LongArrayListJsonSerializableType();
+
     /**
      *
-     * @return
      */
-    BlockingEventDispatcher<SimulationEvent> getBlockingEventDispatcher();
+    public LongArrayListJsonSerializableType() {
+        super(new TypeToken<ArrayList<Long>>() {
+        }.getType());
+    }
 
     /**
      *
      * @return
      */
-    CycleAccurateEventQueue getCycleAccurateEventQueue();
-
-    /**
-     *
-     * @return
-     */
-    Experiment getExperiment();
-
-    /**
-     *
-     * @return
-     */
-    Simulation getSimulation();
+    public static LongArrayListJsonSerializableType getSingleton() {
+        return singleTon;
+    }
 }

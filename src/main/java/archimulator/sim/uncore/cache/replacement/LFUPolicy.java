@@ -43,7 +43,7 @@ public class LFUPolicy<StateT extends Serializable> extends CacheReplacementPoli
     public LFUPolicy(EvictableCache<StateT> cache) {
         super(cache);
 
-        this.mirrorCache = new Cache<Boolean>(cache, cache.getName() + ".lfuPolicy.mirrorCache", cache.getGeometry(), new ValueProviderFactory<Boolean, ValueProvider<Boolean>>() {
+        this.mirrorCache = new Cache<Boolean>(cache, cache.getName() + "/lfuPolicy/mirrorCache", cache.getGeometry(), new ValueProviderFactory<Boolean, ValueProvider<Boolean>>() {
             @Override
             public ValueProvider<Boolean> createValueProvider(Object... args) {
                 return new BooleanValueProvider();

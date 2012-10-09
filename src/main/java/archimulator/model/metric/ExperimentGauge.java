@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.model.metric;
 
+import archimulator.service.ServiceManager;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import net.pickapack.model.metric.Gauge;
@@ -29,7 +30,7 @@ import net.pickapack.model.metric.Gauge;
 @DatabaseTable(tableName = "ExperimentGauge")
 public class ExperimentGauge extends Gauge {
     @DatabaseField
-    private ExperimentGaugeType type;
+    private long typeId;
 
     /**
      *
@@ -39,28 +40,34 @@ public class ExperimentGauge extends Gauge {
 
     /**
      *
+     * @param type
+     * @param valueExpression
+     *
+     */
+    public ExperimentGauge(ExperimentGaugeType type, String valueExpression) {
+        this(type, valueExpression, valueExpression);
+    }
+
+    /**
+     *
+     * @param type
      * @param title
-     * @param expression
-     * @param type
+     * @param valueExpression
      */
-    public ExperimentGauge(String title, String expression, ExperimentGaugeType type) {
-        super(title, expression);
-        this.type = type;
+    public ExperimentGauge(ExperimentGaugeType type, String title, String valueExpression) {
+        super(title, valueExpression);
+        this.typeId = type != null ? type.getId() : -1;
     }
 
-    /**
-     *
-     * @return
-     */
+    public long getTypeId() {
+        return typeId;
+    }
+
+    public void setTypeId(long typeId) {
+        this.typeId = typeId;
+    }
+
     public ExperimentGaugeType getType() {
-        return type;
-    }
-
-    /**
-     *
-     * @param type
-     */
-    public void setType(ExperimentGaugeType type) {
-        this.type = type;
+        return ServiceManager.getExperimentMetricService().getGaugeTypeById(typeId);
     }
 }

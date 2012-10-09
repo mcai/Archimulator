@@ -410,4 +410,9 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
     public void setPseudoCallEncounteredInLastInstructionExecution(boolean pseudoCallEncounteredInLastInstructionExecution) {
         this.pseudoCallEncounteredInLastInstructionExecution = pseudoCallEncounteredInLastInstructionExecution;
     }
+
+    @Override
+    public String getName() {
+        return "ctx" + threadId;
+    }
 }

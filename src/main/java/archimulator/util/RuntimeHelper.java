@@ -16,38 +16,38 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.common;
+package archimulator.util;
 
-import archimulator.model.Experiment;
-import net.pickapack.event.BlockingEventDispatcher;
-import net.pickapack.event.CycleAccurateEventQueue;
+import net.pickapack.StorageUnit;
+
+import java.text.MessageFormat;
 
 /**
  *
  * @author Min Cai
  */
-public interface SimulationObject extends Named {
+public class RuntimeHelper {
     /**
      *
-     * @return
+     * @return max memory
      */
-    BlockingEventDispatcher<SimulationEvent> getBlockingEventDispatcher();
+    public String getMaxMemory() {
+        return MessageFormat.format("{0}", StorageUnit.toString(Runtime.getRuntime().maxMemory()));
+    }
 
     /**
      *
-     * @return
+     * @return total memory
      */
-    CycleAccurateEventQueue getCycleAccurateEventQueue();
+    public String getTotalMemory() {
+        return MessageFormat.format("{0}", StorageUnit.toString(Runtime.getRuntime().totalMemory()));
+    }
 
     /**
      *
-     * @return
+     * @return used memory
      */
-    Experiment getExperiment();
-
-    /**
-     *
-     * @return
-     */
-    Simulation getSimulation();
+    public String getUsedMemory() {
+        return MessageFormat.format("{0}", StorageUnit.toString(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()));
+    }
 }

@@ -18,45 +18,170 @@
  ******************************************************************************/
 package archimulator.model.metric;
 
+import com.j256.ormlite.field.DatabaseField;
+import net.pickapack.dateTime.DateHelper;
+import net.pickapack.model.ModelElement;
+
+import java.util.Date;
+
 /**
  *
  * @author Min Cai
  */
-public enum ExperimentGaugeType {
+public class ExperimentGaugeType implements ModelElement {
+    @DatabaseField(generatedId = true)
+    private long id;
+
+    @DatabaseField
+    private String title;
+
+    @DatabaseField
+    private long createTime;
+
+    @DatabaseField
+    private String nodeExpression;
+
+    @DatabaseField
+    private String keyExpression;
+
+    @DatabaseField
+    private boolean multipleNodes;
+
     /**
      *
      */
-    RUNTIME,
+    public ExperimentGaugeType() {
+    }
+
+    /**
+     *
+     * @param title
+     * @param nodeExpression
+     * @param keyExpression
+     */
+    public ExperimentGaugeType(String title, String nodeExpression, String keyExpression) {
+        this.title = title;
+        this.nodeExpression = nodeExpression;
+        this.keyExpression = keyExpression;
+        this.createTime = DateHelper.toTick(new Date());
+    }
+
+    /**
+     *
+     * @return
+     */
+    public long getId() {
+        return id;
+    }
+
+    /**
+     *
+     * @return
+     */
+    @Override
+    public long getParentId() {
+        return -1;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public String getTitle() {
+        return title;
+    }
+
+    /**
+     *
+     * @return
+     */
+    @Override
+    public long getCreateTime() {
+        return createTime;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public String getNodeExpression() {
+        return nodeExpression;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public String getKeyExpression() {
+        return keyExpression;
+    }
+
+    /**
+     *
+     * @param keyExpression
+     */
+    public void setKeyExpression(String keyExpression) {
+        this.keyExpression = keyExpression;
+    }
+
+    /**
+     *
+     * @param nodeExpression
+     */
+    public void setNodeExpression(String nodeExpression) {
+        this.nodeExpression = nodeExpression;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean isMultipleNodes() {
+        return multipleNodes;
+    }
+
+    /**
+     *
+     * @param multipleNodes
+     */
+    public void setMultipleNodes(boolean multipleNodes) {
+        this.multipleNodes = multipleNodes;
+    }
+
     /**
      *
      */
-    SIMULATION,
+    public static String RUNTIME = "runtime";
     /**
      *
      */
-    MAIN_MEMORY,
+    public static String SIMULATION = "simulation";
     /**
      *
      */
-    CORE,
+    public static String MAIN_MEMORY = "mainMemory";
     /**
      *
      */
-    THREAD,
+    public static String CORE = "core";
     /**
      *
      */
-    TLB,
+    public static String THREAD = "thread";
     /**
      *
      */
-    CACHE_CONTROLLER,
+    public static String TLB = "tlb";
     /**
      *
      */
-    MEMORY_CONTROLLER,
+    public static String CACHE_CONTROLLER = "cacheController";
     /**
      *
      */
-    EXTENDED
+    public static String MEMORY_CONTROLLER = "memoryController";
+    /**
+     *
+     */
+    public static String HELPER_THREAD = "helperThread";
 }

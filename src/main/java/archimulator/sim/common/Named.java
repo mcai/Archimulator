@@ -18,36 +18,16 @@
  ******************************************************************************/
 package archimulator.sim.common;
 
-import archimulator.model.Experiment;
-import net.pickapack.event.BlockingEventDispatcher;
-import net.pickapack.event.CycleAccurateEventQueue;
+import java.io.Serializable;
 
 /**
  *
  * @author Min Cai
  */
-public interface SimulationObject extends Named {
+public interface Named extends Serializable {
     /**
      *
      * @return
      */
-    BlockingEventDispatcher<SimulationEvent> getBlockingEventDispatcher();
-
-    /**
-     *
-     * @return
-     */
-    CycleAccurateEventQueue getCycleAccurateEventQueue();
-
-    /**
-     *
-     * @return
-     */
-    Experiment getExperiment();
-
-    /**
-     *
-     * @return
-     */
-    Simulation getSimulation();
+    String getName();
 }

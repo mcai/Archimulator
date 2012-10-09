@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.core;
 
+import archimulator.sim.common.Named;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
 
@@ -28,7 +29,7 @@ import java.util.EnumSet;
  *
  * @author Min Cai
  */
-public class FunctionalUnitPool {
+public class FunctionalUnitPool implements Named {
     private EnumMap<FunctionalUnitType, FunctionalUnitDescriptor> descriptors;
     private EnumMap<FunctionalUnitOperationType, FunctionalUnitType> functionalUnitOperationToFunctionalUnitMap;
     private AbstractBasicCore core;
@@ -209,5 +210,10 @@ public class FunctionalUnitPool {
      */
     public EnumMap<FunctionalUnitOperationType, Long> getAcquireFailedOnNoFreeFunctionalUnit() {
         return acquireFailedOnNoFreeFunctionalUnit;
+    }
+
+    @Override
+    public String getName() {
+        return core.getName() + "/functionalUnitPool";
     }
 }

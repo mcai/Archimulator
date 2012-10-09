@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore.tlb;
 
+import archimulator.sim.common.Named;
 import archimulator.sim.common.SimulationObject;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.CacheAccess;
@@ -33,7 +34,7 @@ import net.pickapack.util.ValueProviderFactory;
  *
  * @author Min Cai
  */
-public class TranslationLookasideBuffer {
+public class TranslationLookasideBuffer implements Named {
     private String name;
 
     private EvictableCache<Boolean> cache;

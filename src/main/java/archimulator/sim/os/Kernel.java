@@ -50,6 +50,23 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
 
     /**
      *
+     */
+    public int currentPid = 1000;
+    /**
+     *
+     */
+    public int currentMemoryId = 0;
+    /**
+     *
+     */
+    public int currentContextId = 0;
+    /**
+     *
+     */
+    public int currentFd = 100;
+
+    /**
+     *
      * @param simulation
      */
     public Kernel(Simulation simulation) {
@@ -341,25 +358,13 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
         return systemCallEmulation;
     }
 
-    /**
-     *
-     */
-    public static final int MAX_SIGNAL = 64;
+    @Override
+    public String getName() {
+        return "kernel";
+    }
 
     /**
      *
      */
-    public int currentPid = 1000;
-    /**
-     *
-     */
-    public int currentMemoryId = 0;
-    /**
-     *
-     */
-    public int currentContextId = 0;
-    /**
-     *
-     */
-    public int currentFd = 100;
+    public static final int MAX_SIGNAL = 64;
 }

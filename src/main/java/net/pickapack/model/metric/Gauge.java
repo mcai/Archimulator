@@ -21,7 +21,7 @@ public abstract class Gauge implements ModelElement {
     private long createTime;
 
     @DatabaseField
-    private String expression;
+    private String valueExpression;
 
     @DatabaseField
     private String description;
@@ -35,11 +35,11 @@ public abstract class Gauge implements ModelElement {
     /**
      *
      * @param title
-     * @param expression
+     * @param valueExpression
      */
-    public Gauge(String title, String expression) {
+    public Gauge(String title, String valueExpression) {
         this.title = title;
-        this.expression = expression;
+        this.valueExpression = valueExpression;
         this.createTime = DateHelper.toTick(new Date());
     }
 
@@ -81,8 +81,16 @@ public abstract class Gauge implements ModelElement {
      *
      * @return
      */
-    public String getExpression() {
-        return expression;
+    public String getValueExpression() {
+        return valueExpression;
+    }
+
+    /**
+     *
+     * @param valueExpression
+     */
+    public void setValueExpression(String valueExpression) {
+        this.valueExpression = valueExpression;
     }
 
     /**

@@ -352,6 +352,11 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
         return contextMapping;
     }
 
+    @Override
+    public String getName() {
+        return "ctx" + getContextMapping().getThreadId() + "/process";
+    }
+
     /**
      *
      */

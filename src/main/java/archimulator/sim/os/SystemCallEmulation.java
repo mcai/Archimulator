@@ -874,6 +874,11 @@ public class SystemCallEmulation extends BasicSimulationObject implements Simula
         context.finish();
     }
 
+    @Override
+    public String getName() {
+        return "systemCallEmulation";
+    }
+
     /**
      *
      */

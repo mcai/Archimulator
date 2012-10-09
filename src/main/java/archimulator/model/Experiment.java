@@ -18,8 +18,10 @@
  ******************************************************************************/
 package archimulator.model;
 
+import archimulator.model.metric.ExperimentGauge;
 import archimulator.service.ServiceManager;
 import archimulator.util.ContextMappingArrayListJsonSerializableType;
+import archimulator.util.LongArrayListJsonSerializableType;
 import archimulator.util.StringStringLinkedHashMapJsonSerializableType;
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
@@ -65,6 +67,9 @@ public class Experiment implements ModelElement {
     @DatabaseField(persisterClass = ContextMappingArrayListJsonSerializableType.class)
     private ArrayList<ContextMapping> contextMappings;
 
+    @DatabaseField(persisterClass = LongArrayListJsonSerializableType.class)
+    private ArrayList<Long> gaugeIds;
+
     @DatabaseField(persisterClass = StringStringLinkedHashMapJsonSerializableType.class)
     private LinkedHashMap<String, String> stats;
 
@@ -74,6 +79,7 @@ public class Experiment implements ModelElement {
      *
      */
     public transient int currentMemoryPageId;
+
     /**
      *
      */
@@ -92,12 +98,18 @@ public class Experiment implements ModelElement {
      * @param numMaxInstructions
      * @param contextMappings
      */
-    public Experiment(ExperimentType type, Architecture architecture, int numMaxInstructions, List<ContextMapping> contextMappings) {
+    public Experiment(ExperimentType type, Architecture architecture, int numMaxInstructions, List<ContextMapping> contextMappings, List<ExperimentGauge> gauges) {
         this.type = type;
         this.state = ExperimentState.PENDING;
         this.failedReason = "";
         this.numMaxInstructions = numMaxInstructions;
         this.contextMappings = new ArrayList<ContextMapping>(contextMappings);
+        this.gaugeIds = new ArrayList<Long>(CollectionHelper.transform(gauges, new Function1<ExperimentGauge, Long>() {
+            @Override
+            public Long apply(ExperimentGauge gauge) {
+                return gauge.getId();
+            }
+        }));
         this.architectureId = architecture.getId();
         this.createTime = DateHelper.toTick(new Date());
     }
@@ -234,6 +246,10 @@ public class Experiment implements ModelElement {
      */
     public List<ContextMapping> getContextMappings() {
         return contextMappings;
+    }
+
+    public List<Long> getGaugeIds() {
+        return gaugeIds;
     }
 
     /**

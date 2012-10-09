@@ -20,21 +20,19 @@ package archimulator.sim.common;
 
 import archimulator.model.ContextMapping;
 import archimulator.model.Experiment;
+import archimulator.model.metric.ExperimentGauge;
 import archimulator.service.ServiceManager;
 import archimulator.sim.core.BasicProcessor;
 import archimulator.sim.core.Core;
 import archimulator.sim.core.Processor;
 import archimulator.sim.core.Thread;
-import archimulator.sim.isa.Memory;
 import archimulator.sim.os.Context;
 import archimulator.sim.os.Kernel;
 import archimulator.sim.uncore.BasicCacheHierarchy;
 import archimulator.sim.uncore.CacheHierarchy;
-import archimulator.sim.uncore.coherence.msi.controller.GeneralCacheController;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestProfilingHelper;
-import archimulator.sim.uncore.tlb.TranslationLookasideBuffer;
-import net.pickapack.StorageUnit;
+import archimulator.util.RuntimeHelper;
 import net.pickapack.action.Predicate;
 import net.pickapack.dateTime.DateHelper;
 import net.pickapack.event.BlockingEventDispatcher;
@@ -42,14 +40,13 @@ import net.pickapack.event.CycleAccurateEventQueue;
 import net.pickapack.io.file.FileHelper;
 import net.pickapack.tree.NodeHelper;
 import net.pickapack.util.JaxenHelper;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DurationFormatUtils;
 
 import java.io.File;
-import java.text.MessageFormat;
 import java.util.*;
 
 /**
- *
  * @author Min Cai
  */
 public abstract class Simulation implements SimulationObject {
@@ -70,6 +67,8 @@ public abstract class Simulation implements SimulationObject {
     private CycleAccurateEventQueue cycleAccurateEventQueue;
 
     private HelperThreadL2CacheRequestProfilingHelper helperThreadL2CacheRequestProfilingHelper;
+
+    private RuntimeHelper runtimeHelper;
 
     /**
      *
@@ -102,7 +101,6 @@ public abstract class Simulation implements SimulationObject {
     public List<CacheCoherenceFlow> pendingFlows = new ArrayList<CacheCoherenceFlow>();
 
     /**
-     *
      * @param title
      * @param type
      * @param experiment
@@ -136,7 +134,6 @@ public abstract class Simulation implements SimulationObject {
     }
 
     /**
-     *
      * @return
      */
     public Kernel createKernel() {
@@ -200,142 +197,79 @@ public abstract class Simulation implements SimulationObject {
     }
 
     private void collectStats(boolean endOfSimulation) {
+        //TODO: 'stats' is to be refactored out
         Map<String, String> stats = new LinkedHashMap<String, String>();
-
-        JaxenHelper.dumpValueFromXPath(stats, this, "title");
         stats.put("running", "" + !endOfSimulation);
-
-        JaxenHelper.dumpValueFromXPath(stats, this, "beginTimeAsString");
-        JaxenHelper.dumpValueFromXPath(stats, this, "endTimeAsString");
-        JaxenHelper.dumpValueFromXPath(stats, this, "duration");
-        JaxenHelper.dumpValueFromXPath(stats, this, "durationInSeconds");
-
-        stats.put("runtime/maxMemory", MessageFormat.format("{0}", StorageUnit.toString(Runtime.getRuntime().maxMemory())));
-        stats.put("runtime/totalMemory", MessageFormat.format("{0}", StorageUnit.toString(Runtime.getRuntime().totalMemory())));
-        stats.put("runtime/usedMemory", MessageFormat.format("{0}", StorageUnit.toString(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())));
-
-        JaxenHelper.dumpValueFromXPath(stats, this, "cycleAccurateEventQueue/currentCycle");
-        JaxenHelper.dumpValueFromXPath(stats, this, "totalInstructions");
-
-        JaxenHelper.dumpValueFromXPath(stats, this, "instructionsPerCycle");
-        JaxenHelper.dumpValueFromXPath(stats, this, "cyclesPerInstruction");
-        JaxenHelper.dumpValueFromXPath(stats, this, "cyclesPerSecond");
-        JaxenHelper.dumpValueFromXPath(stats, this, "instructionsPerSecond");
-
-        for (Memory memory : JaxenHelper.<Memory>selectNodes(this, "processor/kernel/processes/memory")) {
-            JaxenHelper.dumpValueFromXPath(stats, this, "processor/kernel/processes/memory[id='" + memory.getId() + "']/numPages");
-        }
-
-        for (Thread thread : JaxenHelper.<Thread>selectNodes(this, "processor/cores/threads[totalInstructions>0]")) {
-            JaxenHelper.dumpValueFromXPath(stats, this, "processor/cores/threads[name='" + thread.getName() + "']/totalInstructions");
-            JaxenHelper.dumpValuesFromXPath(stats, this, "processor/cores/threads[name='" + thread.getName() + "']/executedMnemonics");
-            JaxenHelper.dumpValuesFromXPath(stats, this, "processor/cores/threads[name='" + thread.getName() + "']/executedSystemCalls");
-        }
-
-        if (this.getType() == SimulationType.MEASUREMENT) {
-            for (Core core : JaxenHelper.<Core>selectNodes(this, "processor/cores[threads[totalInstructions>0]]")) {
-                JaxenHelper.dumpValueFromXPath(stats, this, "processor/cores[name='" + core.getName() + "']/functionalUnitPool/noFreeFunctionalUnit");
-                JaxenHelper.dumpValueFromXPath(stats, this, "processor/cores[name='" + core.getName() + "']/functionalUnitPool/acquireFailedOnNoFreeFunctionalUnit");
-            }
-        }
-
-        if (this.getType() == SimulationType.MEASUREMENT || this.getType() == SimulationType.CACHE_WARMUP) {
-            for (Thread thread : JaxenHelper.<Thread>selectNodes(this, "processor/cores/threads[totalInstructions>0]")) {
-                for (TranslationLookasideBuffer tlb : JaxenHelper.<TranslationLookasideBuffer>selectNodes(this, "processor/cores/threads[name='" + thread.getName() + "']/tlbs")) {
-                    JaxenHelper.dumpValueFromXPath(stats, this, "processor/cores/threads[name='" + thread.getName() + "']/tlbs[name='" + tlb.getName() + "']/hitRatio");
-                    JaxenHelper.dumpValueFromXPath(stats, this, "processor/cores/threads[name='" + thread.getName() + "']/tlbs[name='" + tlb.getName() + "']/numAccesses");
-                    JaxenHelper.dumpValueFromXPath(stats, this, "processor/cores/threads[name='" + thread.getName() + "']/tlbs[name='" + tlb.getName() + "']/numHits");
-                    JaxenHelper.dumpValueFromXPath(stats, this, "processor/cores/threads[name='" + thread.getName() + "']/tlbs[name='" + tlb.getName() + "']/numMisses");
-                    JaxenHelper.dumpValueFromXPath(stats, this, "processor/cores/threads[name='" + thread.getName() + "']/tlbs[name='" + tlb.getName() + "']/numEvictions");
-                }
-            }
-        }
-
-        if (this.getType() == SimulationType.MEASUREMENT) {
-            for (Thread thread : JaxenHelper.<Thread>selectNodes(this, "processor/cores/threads[totalInstructions>0]")) {
-                JaxenHelper.dumpValueFromXPath(stats, this, "processor/cores/threads[name='" + thread.getName() + "']/branchPredictor/type");
-                JaxenHelper.dumpValueFromXPath(stats, this, "processor/cores/threads[name='" + thread.getName() + "']/branchPredictor/hitRatio");
-                JaxenHelper.dumpValueFromXPath(stats, this, "processor/cores/threads[name='" + thread.getName() + "']/branchPredictor/numAccesses");
-                JaxenHelper.dumpValueFromXPath(stats, this, "processor/cores/threads[name='" + thread.getName() + "']/branchPredictor/numHits");
-                JaxenHelper.dumpValueFromXPath(stats, this, "processor/cores/threads[name='" + thread.getName() + "']/branchPredictor/numMisses");
-
-                JaxenHelper.dumpValueFromXPath(stats, this, "processor/cores/threads[name='" + thread.getName() + "']/decodeBufferFull");
-                JaxenHelper.dumpValueFromXPath(stats, this, "processor/cores/threads[name='" + thread.getName() + "']/reorderBufferFull");
-                JaxenHelper.dumpValueFromXPath(stats, this, "processor/cores/threads[name='" + thread.getName() + "']/loadStoreQueueFull");
-
-                JaxenHelper.dumpValueFromXPath(stats, this, "processor/cores/threads[name='" + thread.getName() + "']/intPhysicalRegisterFileFull");
-                JaxenHelper.dumpValueFromXPath(stats, this, "processor/cores/threads[name='" + thread.getName() + "']/fpPhysicalRegisterFileFull");
-                JaxenHelper.dumpValueFromXPath(stats, this, "processor/cores/threads[name='" + thread.getName() + "']/miscPhysicalRegisterFileFull");
-
-                JaxenHelper.dumpValueFromXPath(stats, this, "processor/cores/threads[name='" + thread.getName() + "']/fetchStallsOnDecodeBufferIsFull");
-
-                JaxenHelper.dumpValueFromXPath(stats, this, "processor/cores/threads[name='" + thread.getName() + "']/registerRenameStallsOnDecodeBufferIsEmpty");
-                JaxenHelper.dumpValueFromXPath(stats, this, "processor/cores/threads[name='" + thread.getName() + "']/registerRenameStallsOnReorderBufferIsFull");
-                JaxenHelper.dumpValueFromXPath(stats, this, "processor/cores/threads[name='" + thread.getName() + "']/registerRenameStallsOnLoadStoreQueueFull");
-
-                JaxenHelper.dumpValueFromXPath(stats, this, "processor/cores/threads[name='" + thread.getName() + "']/selectionStallOnCanNotLoad");
-                JaxenHelper.dumpValueFromXPath(stats, this, "processor/cores/threads[name='" + thread.getName() + "']/selectionStallOnCanNotStore");
-                JaxenHelper.dumpValueFromXPath(stats, this, "processor/cores/threads[name='" + thread.getName() + "']/selectionStallOnNoFreeFunctionalUnit");
-            }
-        }
-
-        if (this.getType() == SimulationType.MEASUREMENT || this.getType() == SimulationType.CACHE_WARMUP) {
-            for (GeneralCacheController cacheController : JaxenHelper.<GeneralCacheController>selectNodes(this, "processor/cacheHierarchy/cacheControllers[numDownwardAccesses>0]")) {
-                JaxenHelper.dumpValueFromXPath(stats, this, "processor/cacheHierarchy/cacheControllers[name='" + cacheController.getName() + "']/hitRatio");
-                JaxenHelper.dumpValueFromXPath(stats, this, "processor/cacheHierarchy/cacheControllers[name='" + cacheController.getName() + "']/numDownwardAccesses");
-                JaxenHelper.dumpValueFromXPath(stats, this, "processor/cacheHierarchy/cacheControllers[name='" + cacheController.getName() + "']/numDownwardHits");
-                JaxenHelper.dumpValueFromXPath(stats, this, "processor/cacheHierarchy/cacheControllers[name='" + cacheController.getName() + "']/numDownwardMisses");
-
-                JaxenHelper.dumpValueFromXPath(stats, this, "processor/cacheHierarchy/cacheControllers[name='" + cacheController.getName() + "']/numDownwardReadHits");
-                JaxenHelper.dumpValueFromXPath(stats, this, "processor/cacheHierarchy/cacheControllers[name='" + cacheController.getName() + "']/numDownwardReadMisses");
-                JaxenHelper.dumpValueFromXPath(stats, this, "processor/cacheHierarchy/cacheControllers[name='" + cacheController.getName() + "']/numDownwardWriteHits");
-                JaxenHelper.dumpValueFromXPath(stats, this, "processor/cacheHierarchy/cacheControllers[name='" + cacheController.getName() + "']/numDownwardWriteMisses");
-
-                JaxenHelper.dumpValueFromXPath(stats, this, "processor/cacheHierarchy/cacheControllers[name='" + cacheController.getName() + "']/numEvictions");
-
-                JaxenHelper.dumpValueFromXPath(stats, this, "processor/cacheHierarchy/cacheControllers[name='" + cacheController.getName() + "']/occupancyRatio");
-            }
-
-            JaxenHelper.dumpValueFromXPath(stats, this, "processor/cacheHierarchy/memoryController/numAccesses");
-            JaxenHelper.dumpValueFromXPath(stats, this, "processor/cacheHierarchy/memoryController/numReads");
-            JaxenHelper.dumpValueFromXPath(stats, this, "processor/cacheHierarchy/memoryController/numWrites");
-        }
 
         if (this.getExperiment().getArchitecture().getHelperThreadL2CacheRequestProfilingEnabled() && (this.getType() == SimulationType.MEASUREMENT || this.getType() == SimulationType.CACHE_WARMUP)) {
             if (endOfSimulation) {
                 this.getHelperThreadL2CacheRequestProfilingHelper().sumUpUnstableHelperThreadL2CacheRequests();
             }
-
-            JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/numMainThreadL2CacheHits");
-            JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/numMainThreadL2CacheMisses");
-
-            JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/numHelperThreadL2CacheHits");
-            JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/numHelperThreadL2CacheMisses");
-
-            JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/numTotalHelperThreadL2CacheRequests");
-
-            JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/numRedundantHitToTransientTagHelperThreadL2CacheRequests");
-            JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/numRedundantHitToCacheHelperThreadL2CacheRequests");
-
-            JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/numUsefulHelperThreadL2CacheRequests");
-
-            JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/numTimelyHelperThreadL2CacheRequests");
-            JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/numLateHelperThreadL2CacheRequests");
-
-            JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/numBadHelperThreadL2CacheRequests");
-            JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/numUglyHelperThreadL2CacheRequests");
-
-            JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/helperThreadL2CacheRequestCoverage");
-            JaxenHelper.dumpValueFromXPath(stats, this, "helperThreadL2CacheRequestProfilingHelper/helperThreadL2CacheRequestAccuracy");
         }
 
+        for (ExperimentGauge gauge : ServiceManager.getExperimentMetricService().getGaugesByExperiment(experiment)) {
+            //TODO.. handle all cases: single node, multiple nodes, single value, multiple values.
+            Object node = StringUtils.isEmpty(gauge.getType().getNodeExpression()) ? this : JaxenHelper.evaluate(this, gauge.getType().getNodeExpression());
+
+            if (node instanceof Collection) {
+                for (Object obj : (Collection) node) {
+                    collectStats(stats, gauge, obj);
+                }
+            } else {
+                collectStats(stats, gauge, node);
+            }
+        }
+
+        //TODO: the following is to be refactored out
         if (this.getType() == SimulationType.MEASUREMENT || this.getType() == SimulationType.CACHE_WARMUP) {
-            JaxenHelper.<CacheHierarchy>selectSingleNode(this, "processor/cacheHierarchy").dumpCacheControllerFsmStats(stats);
+            getProcessor().getCacheHierarchy().dumpCacheControllerFsmStats(stats);
         }
 
         stats = this.getStatsWithSimulationPrefix(stats);
 
         this.getExperiment().getStats().putAll(stats);
+    }
+
+    //TODO
+    private void collectStats(Map<String, String> stats, ExperimentGauge gauge, Object obj) {
+        Object keyObj = !StringUtils.isEmpty(gauge.getType().getKeyExpression()) ? JaxenHelper.evaluate(obj, gauge.getType().getKeyExpression()) : null;
+        Object valueObj;
+        valueObj = JaxenHelper.evaluate(obj, gauge.getValueExpression());
+
+        String expr = "";
+
+        if (obj instanceof Named) {
+            expr += ((Named) obj).getName() + "/";
+        } else {
+            expr += String.format("%s/", !StringUtils.isEmpty(gauge.getType().getNodeExpression()) ? gauge.getType().getNodeExpression() : "simulation");
+
+            if (!StringUtils.isEmpty(gauge.getType().getKeyExpression())) {
+                expr += keyObj + "/";
+            }
+        }
+
+        expr += gauge.getValueExpression();
+
+        if (valueObj != null) {
+            if (valueObj instanceof Map) {
+                Map resultMap = (Map) valueObj;
+
+                for (Object key : resultMap.keySet()) {
+                    stats.put(JaxenHelper.escape(expr) + "/" + key, JaxenHelper.toString(resultMap.get(key)));
+                }
+            } else if (valueObj instanceof List) {
+                List resultList = (List) valueObj;
+
+                for (int i = 0; i < resultList.size(); i++) {
+                    Object resultObj = resultList.get(i);
+                    stats.put(JaxenHelper.escape(expr) + "/" + i, JaxenHelper.toString(resultObj));
+                }
+            } else {
+                stats.put(JaxenHelper.escape(expr), JaxenHelper.toString(valueObj));
+            }
+        } else {
+            throw new IllegalArgumentException();
+        }
     }
 
     private Map<String, String> getStatsWithSimulationPrefix(Map<String, String> stats) {
@@ -351,19 +285,16 @@ public abstract class Simulation implements SimulationObject {
     }
 
     /**
-     *
      * @return
      */
     protected abstract boolean canDoFastForwardOneCycle();
 
     /**
-     *
      * @return
      */
     protected abstract boolean canDoCacheWarmupOneCycle();
 
     /**
-     *
      * @return
      */
     protected abstract boolean canDoMeasurementOneCycle();
@@ -443,7 +374,6 @@ public abstract class Simulation implements SimulationObject {
     }
 
     /**
-     *
      * @return
      */
     public Kernel prepareKernel() {
@@ -451,7 +381,6 @@ public abstract class Simulation implements SimulationObject {
     }
 
     /**
-     *
      * @return
      */
     public CacheHierarchy prepareCacheHierarchy() {
@@ -471,7 +400,6 @@ public abstract class Simulation implements SimulationObject {
     }
 
     /**
-     *
      * @return
      */
     public SimulationType getType() {
@@ -479,7 +407,6 @@ public abstract class Simulation implements SimulationObject {
     }
 
     /**
-     *
      * @return
      */
     public long getBeginTime() {
@@ -487,7 +414,6 @@ public abstract class Simulation implements SimulationObject {
     }
 
     /**
-     *
      * @return
      */
     public long getEndTime() {
@@ -495,7 +421,6 @@ public abstract class Simulation implements SimulationObject {
     }
 
     /**
-     *
      * @return
      */
     public String getBeginTimeAsString() {
@@ -503,7 +428,6 @@ public abstract class Simulation implements SimulationObject {
     }
 
     /**
-     *
      * @return
      */
     public String getEndTimeAsString() {
@@ -511,7 +435,6 @@ public abstract class Simulation implements SimulationObject {
     }
 
     /**
-     *
      * @return
      */
     public long getDurationInSeconds() {
@@ -519,7 +442,6 @@ public abstract class Simulation implements SimulationObject {
     }
 
     /**
-     *
      * @return
      */
     public String getDuration() {
@@ -527,7 +449,6 @@ public abstract class Simulation implements SimulationObject {
     }
 
     /**
-     *
      * @return
      */
     public long getTotalInstructions() {
@@ -543,7 +464,6 @@ public abstract class Simulation implements SimulationObject {
     }
 
     /**
-     *
      * @return
      */
     public double getInstructionsPerCycle() {
@@ -551,7 +471,6 @@ public abstract class Simulation implements SimulationObject {
     }
 
     /**
-     *
      * @return
      */
     public double getCyclesPerInstruction() {
@@ -559,7 +478,6 @@ public abstract class Simulation implements SimulationObject {
     }
 
     /**
-     *
      * @return
      */
     public double getCyclesPerSecond() {
@@ -567,7 +485,6 @@ public abstract class Simulation implements SimulationObject {
     }
 
     /**
-     *
      * @return
      */
     public double getInstructionsPerSecond() {
@@ -575,7 +492,6 @@ public abstract class Simulation implements SimulationObject {
     }
 
     /**
-     *
      * @return
      */
     public String getTitle() {
@@ -583,7 +499,6 @@ public abstract class Simulation implements SimulationObject {
     }
 
     /**
-     *
      * @return
      */
     public String getWorkingDirectory() {
@@ -591,7 +506,6 @@ public abstract class Simulation implements SimulationObject {
     }
 
     /**
-     *
      * @return
      */
     public Processor getProcessor() {
@@ -599,7 +513,6 @@ public abstract class Simulation implements SimulationObject {
     }
 
     /**
-     *
      * @return
      */
     public Experiment getExperiment() {
@@ -607,7 +520,6 @@ public abstract class Simulation implements SimulationObject {
     }
 
     /**
-     *
      * @return
      */
     @Override
@@ -616,7 +528,6 @@ public abstract class Simulation implements SimulationObject {
     }
 
     /**
-     *
      * @return
      */
     public CycleAccurateEventQueue getCycleAccurateEventQueue() {
@@ -624,7 +535,6 @@ public abstract class Simulation implements SimulationObject {
     }
 
     /**
-     *
      * @return
      */
     public BlockingEventDispatcher<SimulationEvent> getBlockingEventDispatcher() {
@@ -632,10 +542,25 @@ public abstract class Simulation implements SimulationObject {
     }
 
     /**
-     *
      * @return
      */
     public HelperThreadL2CacheRequestProfilingHelper getHelperThreadL2CacheRequestProfilingHelper() {
         return helperThreadL2CacheRequestProfilingHelper;
+    }
+
+    /**
+     * @return
+     */
+    public RuntimeHelper getRuntimeHelper() {
+        if (runtimeHelper == null) {
+            runtimeHelper = new RuntimeHelper();
+        }
+
+        return runtimeHelper;
+    }
+
+    @Override
+    public String getName() {
+        return "simulation";
     }
 }

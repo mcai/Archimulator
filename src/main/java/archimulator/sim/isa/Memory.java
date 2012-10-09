@@ -529,6 +529,11 @@ public class Memory extends BasicSimulationObject {
         return this.byteBuffers.get(pageId);
     }
 
+    @Override
+    public String getName() {
+        return getKernel().getProcessFromId(getProcessId()).getName() + "/mem";
+    }
+
     private class Page {
         private int id;
         private int physicalAddress;

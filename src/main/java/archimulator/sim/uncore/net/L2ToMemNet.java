@@ -56,4 +56,9 @@ public class L2ToMemNet extends Net {
         this.endPointNodes.put(cacheHierarchy.getMemoryController(), memoryControllerNode);
         this.createBidirectionalLink(memoryControllerNode, this.switchNode, 32);
     }
+
+    @Override
+    public String getName() {
+        return "l2ToMemNet";
+    }
 }

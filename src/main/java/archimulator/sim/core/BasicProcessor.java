@@ -158,4 +158,9 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
     public CacheHierarchy getCacheHierarchy() {
         return cacheHierarchy;
     }
+
+    @Override
+    public String getName() {
+        return "processor";
+    }
 }

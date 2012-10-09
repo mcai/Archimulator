@@ -34,18 +34,18 @@ public class ServiceManager {
 
     private static BenchmarkService benchmarkService;
     private static ArchitectureService architectureService;
+    private static ExperimentMetricService experimentMetricService;
     private static ExperimentService experimentService;
     private static UserService userService;
     private static SystemSettingService systemSettingService;
-    private static ExperimentMetricService experimentMetricService;
 
     static {
         benchmarkService = new BenchmarkServiceImpl();
         architectureService = new ArchitectureServiceImpl();
+        experimentMetricService = new ExperimentMetricServiceImpl();
         experimentService = new ExperimentServiceImpl();
         userService = new UserServiceImpl();
         systemSettingService = new SystemSettingServiceImpl();
-        experimentMetricService = new ExperimentMetricServiceImpl();
 
         System.out.println("Archimulator (version: " + PropertiesHelper.getVersion() + ") - CMP Architectural Simulator Written in Java.\n");
         System.out.println("Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).\n");
@@ -67,6 +67,15 @@ public class ServiceManager {
      */
     public static ArchitectureService getArchitectureService() {
         return architectureService;
+    }
+
+    /**
+     * Return the experiment metric service singleton.
+     *
+     * @return experiment metric service singleton
+     */
+    public static ExperimentMetricService getExperimentMetricService() {
+        return experimentMetricService;
     }
 
     /**
@@ -94,15 +103,6 @@ public class ServiceManager {
      */
     public static SystemSettingService getSystemSettingService() {
         return systemSettingService;
-    }
-
-    /**
-     * Return the experiment metric service singleton.
-     *
-     * @return experiment metric service singleton
-     */
-    public static ExperimentMetricService getExperimentMetricService() {
-        return experimentMetricService;
     }
 
     /**

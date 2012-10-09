@@ -91,19 +91,19 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
         this.dtlbs = new ArrayList<TranslationLookasideBuffer>();
 
         for (int i = 0; i < getExperiment().getArchitecture().getNumCores(); i++) {
-            CacheController l1ICacheController = new L1ICacheController(this, "c" + i + ".icache");
+            CacheController l1ICacheController = new L1ICacheController(this, "c" + i + "/icache");
             l1ICacheController.setNext(this.l2CacheController);
             this.l1ICacheControllers.add(l1ICacheController);
 
-            CacheController l1DCacheController = new L1DCacheController(this, "c" + i + ".dcache");
+            CacheController l1DCacheController = new L1DCacheController(this, "c" + i + "/dcache");
             l1DCacheController.setNext(this.l2CacheController);
             this.l1DCacheControllers.add(l1DCacheController);
 
             for (int j = 0; j < getExperiment().getArchitecture().getNumThreadsPerCore(); j++) {
-                TranslationLookasideBuffer itlb = new TranslationLookasideBuffer(this, "c" + i + "t" + j + ".itlb");
+                TranslationLookasideBuffer itlb = new TranslationLookasideBuffer(this, "c" + i + "t" + j + "/itlb");
                 this.itlbs.add(itlb);
 
-                TranslationLookasideBuffer dtlb = new TranslationLookasideBuffer(this, "c" + i + "t" + j + ".dtlb");
+                TranslationLookasideBuffer dtlb = new TranslationLookasideBuffer(this, "c" + i + "t" + j + "/dtlb");
                 this.dtlbs.add(dtlb);
             }
         }
@@ -232,5 +232,10 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
      */
     public L2ToMemNet getL2ToMemNetwork() {
         return l2ToMemNetwork;
+    }
+
+    @Override
+    public String getName() {
+        return "cacheHierarchy";
     }
 }

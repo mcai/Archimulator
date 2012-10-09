@@ -132,6 +132,6 @@ public class Instruction {
 
     @Override
     public String toString() {
-        return String.format("%s%s", this.basicBlock != null ? this.basicBlock.getFunction().getSymbol().getName() + ".bb" + this.basicBlock.getNum() + ": " : "", BasicProcess.getDisassemblyInstruction(process, this.pc));
+        return String.format("%s%s", this.basicBlock != null ? this.basicBlock.getFunction().getSymbol().getName() + "/bb" + this.basicBlock.getNum() + ": " : "", BasicProcess.getDisassemblyInstruction(process, this.pc));
     }
 }
