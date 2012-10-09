@@ -130,6 +130,14 @@ public class Benchmark implements ModelElement {
      *
      * @return
      */
+    public String getCreateTimeAsString() {
+        return DateHelper.toString(createTime);
+    }
+
+    /**
+     *
+     * @return
+     */
     public String getWorkingDirectory() {
         return workingDirectory;
     }
