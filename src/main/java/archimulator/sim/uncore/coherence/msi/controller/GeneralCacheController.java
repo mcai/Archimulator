@@ -21,6 +21,7 @@ package archimulator.sim.uncore.coherence.msi.controller;
 import archimulator.sim.uncore.CacheHierarchy;
 import archimulator.sim.uncore.cache.CacheGeometry;
 import archimulator.sim.uncore.cache.EvictableCache;
+import net.pickapack.fsm.FiniteStateMachineFactory;
 
 import java.io.Serializable;
 
@@ -29,7 +30,7 @@ import java.io.Serializable;
  * @author Min Cai
  * @param <StateT>
  */
-public abstract class GeneralCacheController<StateT extends Serializable> extends Controller {
+public abstract class GeneralCacheController<StateT extends Serializable, ConditionT> extends Controller {
     private long numDownwardReadHits;
     private long numDownwardReadMisses;
     private long numDownwardWriteHits;
@@ -166,4 +167,10 @@ public abstract class GeneralCacheController<StateT extends Serializable> extend
      * @return
      */
     public abstract CacheGeometry getGeometry();
+
+    /**
+     *
+     * @return
+     */
+    public abstract FiniteStateMachineFactory<StateT, ConditionT, ?> getFsmFactory();
 }

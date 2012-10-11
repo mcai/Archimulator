@@ -27,16 +27,38 @@ import net.pickapack.action.Action1;
 import net.pickapack.action.Action4;
 import net.pickapack.fsm.FiniteStateMachineFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author Min Cai
  */
 public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachineFactory<CacheControllerState, CacheControllerEventType, CacheControllerFiniteStateMachine> {
-    /**
-     *
-     * @param actionWhenStateChanged
-     */
-    public CacheControllerFiniteStateMachineFactory(Action1<CacheControllerFiniteStateMachine> actionWhenStateChanged) {
+    private CacheControllerFiniteStateMachineFactory() {
+        Action1<CacheControllerFiniteStateMachine> actionWhenStateChanged = new Action1<CacheControllerFiniteStateMachine>() {
+            @Override
+            public void apply(CacheControllerFiniteStateMachine fsm) {
+                if (fsm.getPreviousState() != fsm.getState()) {
+                    if (fsm.getState().isStable()) {
+                        Action onCompletedCallback = fsm.getOnCompletedCallback();
+                        if (onCompletedCallback != null) {
+                            fsm.setOnCompletedCallback(null);
+                            onCompletedCallback.apply();
+                        }
+                    }
+
+                    List<Action> stalledEventsToProcess = new ArrayList<Action>();
+                    stalledEventsToProcess.addAll(fsm.getStalledEvents());
+                    fsm.getStalledEvents().clear();
+
+                    for (Action stalledEvent : stalledEventsToProcess) {
+                        stalledEvent.apply();
+                    }
+                }
+            }
+        };
+
         this.inState(CacheControllerState.I)
                 .setOnCompletedCallback(actionWhenStateChanged)
                 .onCondition(CacheControllerEventType.LOAD, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, LoadEvent>() {
@@ -539,5 +561,19 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
                         fsm.getLine().setTag(CacheLine.INVALID_TAG);
                     }
                 }, CacheControllerState.I);
+    }
+
+    private static CacheControllerFiniteStateMachineFactory singleton;
+
+    /**
+     *
+     * @return
+     */
+    public static CacheControllerFiniteStateMachineFactory getSingleton() {
+        if(singleton == null) {
+            singleton = new CacheControllerFiniteStateMachineFactory();
+        }
+
+        return singleton;
     }
 }

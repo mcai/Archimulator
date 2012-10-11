@@ -26,6 +26,7 @@ import archimulator.sim.uncore.cache.CacheGeometry;
 import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
+import archimulator.sim.uncore.coherence.msi.event.directory.DirectoryControllerEventType;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import archimulator.sim.uncore.coherence.msi.fsm.DirectoryControllerFiniteStateMachine;
 import archimulator.sim.uncore.coherence.msi.fsm.DirectoryControllerFiniteStateMachineFactory;
@@ -33,11 +34,10 @@ import archimulator.sim.uncore.coherence.msi.message.*;
 import archimulator.sim.uncore.coherence.msi.state.DirectoryControllerState;
 import archimulator.sim.uncore.dram.MemoryController;
 import archimulator.sim.uncore.net.Net;
+import net.pickapack.action.Action;
+import net.pickapack.action.Action2;
 import net.pickapack.util.ValueProvider;
 import net.pickapack.util.ValueProviderFactory;
-import net.pickapack.action.Action;
-import net.pickapack.action.Action1;
-import net.pickapack.action.Action2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +46,7 @@ import java.util.List;
  *
  * @author Min Cai
  */
-public class DirectoryController extends GeneralCacheController {
+public class DirectoryController extends GeneralCacheController<DirectoryControllerState, DirectoryControllerEventType> {
     private CacheGeometry cacheGeometry;
     private EvictableCache<DirectoryControllerState> cache;
     private List<CacheController> cacheControllers;
@@ -75,31 +75,7 @@ public class DirectoryController extends GeneralCacheController {
         this.cache = new EvictableCache<DirectoryControllerState>(cacheHierarchy, name, getGeometry(), getReplacementPolicyType(), cacheLineStateProviderFactory);
         this.cacheControllers = new ArrayList<CacheController>();
 
-        this.fsmFactory = new DirectoryControllerFiniteStateMachineFactory(new Action1<DirectoryControllerFiniteStateMachine>() {
-            @Override
-            public void apply(DirectoryControllerFiniteStateMachine fsm) {
-                if (fsm.getPreviousState() != fsm.getState() && fsm.getState().isStable()) {
-                    Action onCompletedCallback = fsm.getOnCompletedCallback();
-                    if (onCompletedCallback != null) {
-                        fsm.setOnCompletedCallback(null);
-                        onCompletedCallback.apply();
-                    }
-                }
-
-                if (fsm.getPreviousState() != fsm.getState()) {
-                    List<Action> stalledEventsToProcess = new ArrayList<Action>();
-                    for (Action stalledEvent : fsm.getStalledEvents()) {
-                        stalledEventsToProcess.add(stalledEvent);
-                    }
-
-                    fsm.getStalledEvents().clear();
-
-                    for (Action stalledEvent : stalledEventsToProcess) {
-                        stalledEvent.apply();
-                    }
-                }
-            }
-        });
+        this.fsmFactory = DirectoryControllerFiniteStateMachineFactory.getSingleton();
     }
 
     /**

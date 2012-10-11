@@ -27,6 +27,9 @@ import net.pickapack.action.Action1;
 import net.pickapack.action.Action4;
 import net.pickapack.fsm.FiniteStateMachineFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static ch.lambdaj.Lambda.*;
 import static org.hamcrest.Matchers.not;
 
@@ -35,11 +38,33 @@ import static org.hamcrest.Matchers.not;
  * @author Min Cai
  */
 public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMachineFactory<DirectoryControllerState, DirectoryControllerEventType, DirectoryControllerFiniteStateMachine> {
-    /**
-     *
-     * @param actionWhenStateChanged
-     */
-    public DirectoryControllerFiniteStateMachineFactory(Action1<DirectoryControllerFiniteStateMachine> actionWhenStateChanged) {
+    private DirectoryControllerFiniteStateMachineFactory() {
+        Action1<DirectoryControllerFiniteStateMachine> actionWhenStateChanged = new Action1<DirectoryControllerFiniteStateMachine>() {
+            @Override
+            public void apply(DirectoryControllerFiniteStateMachine fsm) {
+                if (fsm.getPreviousState() != fsm.getState() && fsm.getState().isStable()) {
+                    Action onCompletedCallback = fsm.getOnCompletedCallback();
+                    if (onCompletedCallback != null) {
+                        fsm.setOnCompletedCallback(null);
+                        onCompletedCallback.apply();
+                    }
+                }
+
+                if (fsm.getPreviousState() != fsm.getState()) {
+                    List<Action> stalledEventsToProcess = new ArrayList<Action>();
+                    for (Action stalledEvent : fsm.getStalledEvents()) {
+                        stalledEventsToProcess.add(stalledEvent);
+                    }
+
+                    fsm.getStalledEvents().clear();
+
+                    for (Action stalledEvent : stalledEventsToProcess) {
+                        stalledEvent.apply();
+                    }
+                }
+            }
+        };
+
         this.inState(DirectoryControllerState.I)
                 .setOnCompletedCallback(actionWhenStateChanged)
                 .onCondition(DirectoryControllerEventType.GETS, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, GetSEvent>() {
@@ -469,5 +494,19 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                         fsm.sendPutAckToReq(event, event.getRequester(), event.getTag());
                     }
                 }, DirectoryControllerState.SI_A);
+    }
+
+    private static DirectoryControllerFiniteStateMachineFactory singleton;
+
+    /**
+     *
+     * @return
+     */
+    public static DirectoryControllerFiniteStateMachineFactory getSingleton() {
+        if(singleton == null) {
+            singleton = new DirectoryControllerFiniteStateMachineFactory();
+        }
+
+        return singleton;
     }
 }

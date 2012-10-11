@@ -24,6 +24,7 @@ import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
+import archimulator.sim.uncore.coherence.msi.event.cache.CacheControllerEventType;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import archimulator.sim.uncore.coherence.msi.flow.LoadFlow;
 import archimulator.sim.uncore.coherence.msi.flow.StoreFlow;
@@ -33,18 +34,19 @@ import archimulator.sim.uncore.coherence.msi.message.*;
 import archimulator.sim.uncore.coherence.msi.state.CacheControllerState;
 import archimulator.sim.uncore.net.Net;
 import net.pickapack.action.Action;
-import net.pickapack.action.Action1;
 import net.pickapack.action.Action2;
 import net.pickapack.util.ValueProvider;
 import net.pickapack.util.ValueProviderFactory;
 
-import java.util.*;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
  * @author Min Cai
  */
-public abstract class CacheController extends GeneralCacheController {
+public abstract class CacheController extends GeneralCacheController<CacheControllerState, CacheControllerEventType> {
     private EvictableCache<CacheControllerState> cache;
     private Map<Integer, MemoryHierarchyAccess> pendingAccesses;
     private EnumMap<MemoryHierarchyAccessType, Integer> pendingAccessesPerType;
@@ -77,28 +79,7 @@ public abstract class CacheController extends GeneralCacheController {
         this.pendingAccessesPerType.put(MemoryHierarchyAccessType.LOAD, 0);
         this.pendingAccessesPerType.put(MemoryHierarchyAccessType.STORE, 0);
 
-        this.fsmFactory = new CacheControllerFiniteStateMachineFactory(new Action1<CacheControllerFiniteStateMachine>() {
-            @Override
-            public void apply(CacheControllerFiniteStateMachine fsm) {
-                if (fsm.getPreviousState() != fsm.getState()) {
-                    if (fsm.getState().isStable()) {
-                        Action onCompletedCallback = fsm.getOnCompletedCallback();
-                        if (onCompletedCallback != null) {
-                            fsm.setOnCompletedCallback(null);
-                            onCompletedCallback.apply();
-                        }
-                    }
-
-                    List<Action> stalledEventsToProcess = new ArrayList<Action>();
-                    stalledEventsToProcess.addAll(fsm.getStalledEvents());
-                    fsm.getStalledEvents().clear();
-
-                    for (Action stalledEvent : stalledEventsToProcess) {
-                        stalledEvent.apply();
-                    }
-                }
-            }
-        });
+        this.fsmFactory = CacheControllerFiniteStateMachineFactory.getSingleton();
     }
 
     /**
@@ -426,6 +407,7 @@ public abstract class CacheController extends GeneralCacheController {
      *
      * @return
      */
+    @Override
     public CacheControllerFiniteStateMachineFactory getFsmFactory() {
         return fsmFactory;
     }

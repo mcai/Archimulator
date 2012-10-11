@@ -22,6 +22,7 @@ import archimulator.model.Experiment;
 import archimulator.sim.common.BasicSimulationObject;
 import archimulator.sim.common.Simulation;
 import archimulator.sim.common.SimulationEvent;
+import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.coherence.msi.controller.*;
 import archimulator.sim.uncore.coherence.msi.message.CoherenceMessage;
 import archimulator.sim.uncore.dram.BasicMemoryController;
@@ -35,7 +36,9 @@ import archimulator.sim.uncore.tlb.TranslationLookasideBuffer;
 import net.pickapack.action.Action;
 import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
+import net.pickapack.fsm.BasicFiniteStateMachine;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -121,13 +124,27 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
     @Override
     public void dumpCacheControllerFsmStats(Map<String, String> stats) {
         for (CacheController l1ICacheController : this.l1ICacheControllers) {
-            l1ICacheController.getFsmFactory().dump(l1ICacheController.getName(), stats);
+            dumpCacheControllerFsmStats(stats, l1ICacheController);
         }
 
         for (CacheController l1DCacheController : this.l1DCacheControllers) {
-            l1DCacheController.getFsmFactory().dump(l1DCacheController.getName(), stats);
+            dumpCacheControllerFsmStats(stats, l1DCacheController);
         }
-        this.l2CacheController.getFsmFactory().dump(this.l2CacheController.getName(), stats);
+        dumpCacheControllerFsmStats(stats, this.l2CacheController);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <StateT extends Serializable, ConditionT> void dumpCacheControllerFsmStats(Map<String, String> stats, GeneralCacheController<StateT, ConditionT> cacheController) {
+        List<BasicFiniteStateMachine<StateT, ConditionT>> fsms = new ArrayList<BasicFiniteStateMachine<StateT, ConditionT>>();
+
+        for(int set = 0; set < cacheController.getCache().getNumSets(); set++) {
+            for(CacheLine<StateT> line : cacheController.getCache().getLines(set)) {
+                BasicFiniteStateMachine<StateT, ConditionT> fsm = (BasicFiniteStateMachine<StateT, ConditionT>) line.getStateProvider();
+                fsms.add(fsm);
+            }
+        }
+
+        cacheController.getFsmFactory().dump(cacheController.getName(), fsms, stats);
     }
 
     /**
