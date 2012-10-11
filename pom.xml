@@ -146,6 +146,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>org.eobjects.metamodel</groupId>
+            <artifactId>MetaModel-full</artifactId>
+            <version>3.2</version>
+        </dependency>
     </dependencies>
 
     <build>

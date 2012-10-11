@@ -199,7 +199,6 @@ public abstract class Simulation implements SimulationObject {
     private void collectStats(boolean endOfSimulation) {
         //TODO: 'stats' is to be refactored out
         Map<String, String> stats = new LinkedHashMap<String, String>();
-        stats.put("running", "" + !endOfSimulation);
 
         if (this.getExperiment().getArchitecture().getHelperThreadL2CacheRequestProfilingEnabled() && (this.getType() == SimulationType.MEASUREMENT || this.getType() == SimulationType.CACHE_WARMUP)) {
             if (endOfSimulation) {
