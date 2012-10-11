@@ -16,18 +16,17 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.coherence.msi.message;
+package archimulator.sim.uncore.coherence.msi.event.cache;
 
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
-import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
 /**
  *
  * @author Min Cai
  */
-public class ForwardGetMMessage extends CoherenceMessage {
+public class FwdGetMEvent extends CacheControllerEvent {
     private CacheController requester;
 
     /**
@@ -38,8 +37,8 @@ public class ForwardGetMMessage extends CoherenceMessage {
      * @param tag
      * @param access
      */
-    public ForwardGetMMessage(Controller generator, CacheCoherenceFlow producerFlow, CacheController requester, int tag, MemoryHierarchyAccess access) {
-        super(generator, producerFlow, CoherenceMessageType.FORWARD_GETM, access, tag);
+    public FwdGetMEvent(CacheController generator, CacheCoherenceFlow producerFlow, CacheController requester, int tag, MemoryHierarchyAccess access) {
+        super(generator, producerFlow, CacheControllerEventType.FWD_GETM, access, tag);
         this.requester = requester;
     }
 
@@ -53,6 +52,6 @@ public class ForwardGetMMessage extends CoherenceMessage {
 
     @Override
     public String toString() {
-        return String.format("[%d] %s: ForwardGetMMessage{id=%d, requester=%s, tag=0x%08x}", getBeginCycle(), getGenerator(), getId(), requester, getTag());
+        return String.format("[%d] %s: FwdGetMEvent{id=%d, requester=%s, tag=0x%08x}", getBeginCycle(), getGenerator(), getId(), requester, getTag());
     }
 }

@@ -16,43 +16,43 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.coherence.msi.message;
+package archimulator.sim.uncore.coherence.msi.event.directory;
 
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
-import archimulator.sim.uncore.coherence.msi.controller.Controller;
+import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
 /**
  *
  * @author Min Cai
  */
-public class RecallAcknowledgementMessage extends CoherenceMessage {
-    private CacheController sender;
+public class DataFromMemEvent extends DirectoryControllerEvent {
+    private CacheController requester;
 
     /**
      *
      * @param generator
      * @param producerFlow
-     * @param sender
+     * @param requester
      * @param tag
      * @param access
      */
-    public RecallAcknowledgementMessage(Controller generator, CacheCoherenceFlow producerFlow, CacheController sender, int tag, MemoryHierarchyAccess access) {
-        super(generator, producerFlow, CoherenceMessageType.RECALL_ACKNOWLEDGEMENT, access, tag);
-        this.sender = sender;
+    public DataFromMemEvent(DirectoryController generator, CacheCoherenceFlow producerFlow, CacheController requester, int tag, MemoryHierarchyAccess access) {
+        super(generator, producerFlow, DirectoryControllerEventType.DATA_FROM_MEM, access, tag);
+        this.requester = requester;
     }
 
     /**
      *
      * @return
      */
-    public CacheController getSender() {
-        return sender;
+    public CacheController getRequester() {
+        return requester;
     }
 
     @Override
     public String toString() {
-        return String.format("[%d] %s: RecallAcknowledgementMessage{id=%d, sender=%s, tag=0x%08x}", getBeginCycle(), getGenerator(), getId(), sender, getTag());
+        return String.format("[%d] %s: DataFromMemEvent{id=%d, requester=%s, tag=0x%08x}", getBeginCycle(), getGenerator(), getId(), requester, getTag());
     }
 }

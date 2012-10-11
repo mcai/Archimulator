@@ -144,7 +144,7 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
             }
         }
 
-        cacheController.getFsmFactory().dump(cacheController.getName(), fsms, stats);
+        cacheController.getFsmFactory().dump(PREFIX_CC_FSM + cacheController.getName(), fsms, stats);
     }
 
     /**
@@ -255,4 +255,6 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
     public String getName() {
         return "cacheHierarchy";
     }
+
+    public static final String PREFIX_CC_FSM = "ccFsm/";
 }

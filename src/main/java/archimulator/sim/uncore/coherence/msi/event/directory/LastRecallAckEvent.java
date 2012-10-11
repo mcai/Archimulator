@@ -16,43 +16,30 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.coherence.msi.event.cache;
+package archimulator.sim.uncore.coherence.msi.event.directory;
 
 import archimulator.sim.uncore.MemoryHierarchyAccess;
-import archimulator.sim.uncore.coherence.msi.controller.CacheController;
-import archimulator.sim.uncore.coherence.msi.controller.Controller;
+import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
 /**
  *
  * @author Min Cai
  */
-public class DataFromDirectoryAcknowledgementsGreaterThan0Event extends CacheControllerEvent {
-    private Controller sender;
-
+public class LastRecallAckEvent extends DirectoryControllerEvent {
     /**
      *
      * @param generator
      * @param producerFlow
-     * @param sender
      * @param tag
      * @param access
      */
-    public DataFromDirectoryAcknowledgementsGreaterThan0Event(CacheController generator, CacheCoherenceFlow producerFlow, Controller sender, int tag, MemoryHierarchyAccess access) {
-        super(generator, producerFlow, CacheControllerEventType.DATA_FROM_DIRECTORY_ACKNOWLEDGEMENTS_GREATER_THAN_0, access, tag);
-        this.sender = sender;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public Controller getSender() {
-        return sender;
+    public LastRecallAckEvent(DirectoryController generator, CacheCoherenceFlow producerFlow, int tag, MemoryHierarchyAccess access) {
+        super(generator, producerFlow, DirectoryControllerEventType.LAST_RECALL_ACK, access, tag);
     }
 
     @Override
     public String toString() {
-        return String.format("[%d] %s: DataFromDirectoryAcknowledgementsGreaterThan0Event{id=%d, sender=%s, tag=0x%08x}", getBeginCycle(), getGenerator(), getId(), sender, getTag());
+        return String.format("[%d] %s: LastRecallAckEvent{id=%d, tag=0x%08x}", getBeginCycle(), getGenerator(), getId(), getTag());
     }
 }

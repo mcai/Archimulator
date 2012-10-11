@@ -28,7 +28,7 @@ import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
  */
 public class DataMessage extends CoherenceMessage {
     private Controller sender;
-    private int numInvalidationAcknowledgements;
+    private int numInvAcks;
 
     /**
      *
@@ -36,13 +36,13 @@ public class DataMessage extends CoherenceMessage {
      * @param producerFlow
      * @param sender
      * @param tag
-     * @param numInvalidationAcknowledgements
+     * @param numInvAcks
      * @param access
      */
-    public DataMessage(Controller generator, CacheCoherenceFlow producerFlow, Controller sender, int tag, int numInvalidationAcknowledgements, MemoryHierarchyAccess access) {
+    public DataMessage(Controller generator, CacheCoherenceFlow producerFlow, Controller sender, int tag, int numInvAcks, MemoryHierarchyAccess access) {
         super(generator, producerFlow, CoherenceMessageType.DATA, access, tag);
         this.sender = sender;
-        this.numInvalidationAcknowledgements = numInvalidationAcknowledgements;
+        this.numInvAcks = numInvAcks;
     }
 
     /**
@@ -57,12 +57,12 @@ public class DataMessage extends CoherenceMessage {
      *
      * @return
      */
-    public int getNumInvalidationAcknowledgements() {
-        return numInvalidationAcknowledgements;
+    public int getNumInvAcks() {
+        return numInvAcks;
     }
 
     @Override
     public String toString() {
-        return String.format("[%d] %s: DataMessage{%d, sender=%s, tag=0x%08x, numInvalidationAcknowledgements=%d}", getBeginCycle(), getGenerator(), getId(), sender, getTag(), numInvalidationAcknowledgements);
+        return String.format("[%d] %s: DataMessage{%d, sender=%s, tag=0x%08x, numInvAcks=%d}", getBeginCycle(), getGenerator(), getId(), sender, getTag(), numInvAcks);
     }
 }

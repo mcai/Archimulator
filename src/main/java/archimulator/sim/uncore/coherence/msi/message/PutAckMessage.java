@@ -16,42 +16,30 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.coherence.msi.event.cache;
+package archimulator.sim.uncore.coherence.msi.message;
 
 import archimulator.sim.uncore.MemoryHierarchyAccess;
-import archimulator.sim.uncore.coherence.msi.controller.CacheController;
+import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
 /**
  *
  * @author Min Cai
  */
-public class ForwardGetMEvent extends CacheControllerEvent {
-    private CacheController requester;
-
+public class PutAckMessage extends CoherenceMessage {
     /**
      *
      * @param generator
      * @param producerFlow
-     * @param requester
      * @param tag
      * @param access
      */
-    public ForwardGetMEvent(CacheController generator, CacheCoherenceFlow producerFlow, CacheController requester, int tag, MemoryHierarchyAccess access) {
-        super(generator, producerFlow, CacheControllerEventType.FORWARD_GETM, access, tag);
-        this.requester = requester;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public CacheController getRequester() {
-        return requester;
+    public PutAckMessage(Controller generator, CacheCoherenceFlow producerFlow, int tag, MemoryHierarchyAccess access) {
+        super(generator, producerFlow, CoherenceMessageType.PUT_ACK, access, tag);
     }
 
     @Override
     public String toString() {
-        return String.format("[%d] %s: ForwardGetMEvent{id=%d, requester=%s, tag=0x%08x}", getBeginCycle(), getGenerator(), getId(), requester, getTag());
+        return String.format("[%d] %s: PutAckMessage{id=%d, tag=0x%08x}", getBeginCycle(), getGenerator(), getId(), getTag());
     }
 }

@@ -20,14 +20,15 @@ package archimulator.sim.uncore.coherence.msi.event.cache;
 
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
+import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
 /**
  *
  * @author Min Cai
  */
-public class InvalidationAcknowledgementEvent extends CacheControllerEvent {
-    private CacheController sender;
+public class DataFromDirAcksEq0Event extends CacheControllerEvent {
+    private Controller sender;
 
     /**
      *
@@ -37,8 +38,8 @@ public class InvalidationAcknowledgementEvent extends CacheControllerEvent {
      * @param tag
      * @param access
      */
-    public InvalidationAcknowledgementEvent(CacheController generator, CacheCoherenceFlow producerFlow, CacheController sender, int tag, MemoryHierarchyAccess access) {
-        super(generator, producerFlow, CacheControllerEventType.INVALIDATION_ACKNOWLEDGEMENT, access, tag);
+    public DataFromDirAcksEq0Event(CacheController generator, CacheCoherenceFlow producerFlow, Controller sender, int tag, MemoryHierarchyAccess access) {
+        super(generator, producerFlow, CacheControllerEventType.DATA_FROM_DIR_ACKS_EQ_0, access, tag);
         this.sender = sender;
     }
 
@@ -46,12 +47,12 @@ public class InvalidationAcknowledgementEvent extends CacheControllerEvent {
      *
      * @return
      */
-    public CacheController getSender() {
+    public Controller getSender() {
         return sender;
     }
 
     @Override
     public String toString() {
-        return String.format("[%d] %s: InvalidationAcknowledgementEvent{id=%d, sender=%s, tag=0x%08x}", getBeginCycle(), getGenerator(), getId(), sender, getTag());
+        return String.format("[%d] %s: DataFromDirAcksEq0Event{id=%d, sender=%s, tag=0x%08x}", getBeginCycle(), getGenerator(), getId(), sender, getTag());
     }
 }

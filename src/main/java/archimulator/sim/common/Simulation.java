@@ -197,7 +197,7 @@ public abstract class Simulation implements SimulationObject {
     }
 
     private void collectStats(boolean endOfSimulation) {
-        //TODO: 'stats' is to be refactored out
+        //TODO: 'stats' should be refactored into a model class
         Map<String, String> stats = new LinkedHashMap<String, String>();
 
         if (this.getExperiment().getArchitecture().getHelperThreadL2CacheRequestProfilingEnabled() && (this.getType() == SimulationType.MEASUREMENT || this.getType() == SimulationType.CACHE_WARMUP)) {
@@ -218,7 +218,6 @@ public abstract class Simulation implements SimulationObject {
             }
         }
 
-        //TODO: the following is to be refactored out
         if (this.getType() == SimulationType.MEASUREMENT || this.getType() == SimulationType.CACHE_WARMUP) {
             getProcessor().getCacheHierarchy().dumpCacheControllerFsmStats(stats);
         }
@@ -228,7 +227,6 @@ public abstract class Simulation implements SimulationObject {
         this.getExperiment().getStats().putAll(stats);
     }
 
-    //TODO
     private void collectStats(Map<String, String> stats, ExperimentGauge gauge, Object obj) {
         Object keyObj = !StringUtils.isEmpty(gauge.getType().getKeyExpression()) ? JaxenHelper.evaluate(obj, gauge.getType().getKeyExpression()) : null;
         Object valueObj;

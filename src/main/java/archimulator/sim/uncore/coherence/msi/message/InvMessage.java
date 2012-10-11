@@ -16,30 +16,43 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.coherence.msi.event.directory;
+package archimulator.sim.uncore.coherence.msi.message;
 
 import archimulator.sim.uncore.MemoryHierarchyAccess;
-import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
+import archimulator.sim.uncore.coherence.msi.controller.CacheController;
+import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
 /**
  *
  * @author Min Cai
  */
-public class LastRecallAcknowledgementEvent extends DirectoryControllerEvent {
+public class InvMessage extends CoherenceMessage {
+    private CacheController requester;
+
     /**
      *
      * @param generator
      * @param producerFlow
+     * @param requester
      * @param tag
      * @param access
      */
-    public LastRecallAcknowledgementEvent(DirectoryController generator, CacheCoherenceFlow producerFlow, int tag, MemoryHierarchyAccess access) {
-        super(generator, producerFlow, DirectoryControllerEventType.LAST_RECALL_ACKNOWLEDGEMENT, access, tag);
+    public InvMessage(Controller generator, CacheCoherenceFlow producerFlow, CacheController requester, int tag, MemoryHierarchyAccess access) {
+        super(generator, producerFlow, CoherenceMessageType.INV, access, tag);
+        this.requester = requester;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public CacheController getRequester() {
+        return requester;
     }
 
     @Override
     public String toString() {
-        return String.format("[%d] %s: LastRecallAcknowledgementEvent{id=%d, tag=0x%08x}", getBeginCycle(), getGenerator(), getId(), getTag());
+        return String.format("[%d] %s: InvMessage{id=%d, requester=%s, tag=0x%08x}", getBeginCycle(), getGenerator(), getId(), requester, getTag());
     }
 }

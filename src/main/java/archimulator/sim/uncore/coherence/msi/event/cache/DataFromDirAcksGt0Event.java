@@ -27,7 +27,7 @@ import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
  *
  * @author Min Cai
  */
-public class DataFromDirectoryAcknowledgementsEqual0Event extends CacheControllerEvent {
+public class DataFromDirAcksGt0Event extends CacheControllerEvent {
     private Controller sender;
 
     /**
@@ -38,8 +38,8 @@ public class DataFromDirectoryAcknowledgementsEqual0Event extends CacheControlle
      * @param tag
      * @param access
      */
-    public DataFromDirectoryAcknowledgementsEqual0Event(CacheController generator, CacheCoherenceFlow producerFlow, Controller sender, int tag, MemoryHierarchyAccess access) {
-        super(generator, producerFlow, CacheControllerEventType.DATA_FROM_DIRECTORY_ACKNOWLEDGEMENTS_EQUAL_0, access, tag);
+    public DataFromDirAcksGt0Event(CacheController generator, CacheCoherenceFlow producerFlow, Controller sender, int tag, MemoryHierarchyAccess access) {
+        super(generator, producerFlow, CacheControllerEventType.DATA_FROM_DIR_ACKS_GT_0, access, tag);
         this.sender = sender;
     }
 
@@ -53,6 +53,6 @@ public class DataFromDirectoryAcknowledgementsEqual0Event extends CacheControlle
 
     @Override
     public String toString() {
-        return String.format("[%d] %s: DataFromDirectoryAcknowledgementsEqual0Event{id=%d, sender=%s, tag=0x%08x}", getBeginCycle(), getGenerator(), getId(), sender, getTag());
+        return String.format("[%d] %s: DataFromDirAcksGt0Event{id=%d, sender=%s, tag=0x%08x}", getBeginCycle(), getGenerator(), getId(), sender, getTag());
     }
 }

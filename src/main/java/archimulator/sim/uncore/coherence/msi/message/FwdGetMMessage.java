@@ -16,18 +16,18 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.coherence.msi.event.directory;
+package archimulator.sim.uncore.coherence.msi.message;
 
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
-import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
+import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
 /**
  *
  * @author Min Cai
  */
-public class DataFromMemoryEvent extends DirectoryControllerEvent {
+public class FwdGetMMessage extends CoherenceMessage {
     private CacheController requester;
 
     /**
@@ -38,8 +38,8 @@ public class DataFromMemoryEvent extends DirectoryControllerEvent {
      * @param tag
      * @param access
      */
-    public DataFromMemoryEvent(DirectoryController generator, CacheCoherenceFlow producerFlow, CacheController requester, int tag, MemoryHierarchyAccess access) {
-        super(generator, producerFlow, DirectoryControllerEventType.DATA_FROM_MEMORY, access, tag);
+    public FwdGetMMessage(Controller generator, CacheCoherenceFlow producerFlow, CacheController requester, int tag, MemoryHierarchyAccess access) {
+        super(generator, producerFlow, CoherenceMessageType.FWD_GETM, access, tag);
         this.requester = requester;
     }
 
@@ -53,6 +53,6 @@ public class DataFromMemoryEvent extends DirectoryControllerEvent {
 
     @Override
     public String toString() {
-        return String.format("[%d] %s: DataFromMemoryEvent{id=%d, requester=%s, tag=0x%08x}", getBeginCycle(), getGenerator(), getId(), requester, getTag());
+        return String.format("[%d] %s: FwdGetMMessage{id=%d, requester=%s, tag=0x%08x}", getBeginCycle(), getGenerator(), getId(), requester, getTag());
     }
 }

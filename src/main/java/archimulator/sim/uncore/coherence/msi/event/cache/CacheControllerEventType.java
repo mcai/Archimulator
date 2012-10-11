@@ -38,15 +38,15 @@ public enum CacheControllerEventType {
     /**
      *
      */
-    FORWARD_GETS,
+    FWD_GETS,
     /**
      *
      */
-    FORWARD_GETM,
+    FWD_GETM,
     /**
      *
      */
-    INVALIDATION,
+    INV,
     /**
      *
      */
@@ -54,15 +54,15 @@ public enum CacheControllerEventType {
     /**
      *
      */
-    PUT_ACKNOWLEDGEMENT,
+    PUT_ACK,
     /**
      *
      */
-    DATA_FROM_DIRECTORY_ACKNOWLEDGEMENTS_EQUAL_0,
+    DATA_FROM_DIR_ACKS_EQ_0,
     /**
      *
      */
-    DATA_FROM_DIRECTORY_ACKNOWLEDGEMENTS_GREATER_THAN_0,
+    DATA_FROM_DIR_ACKS_GT_0,
     /**
      *
      */
@@ -70,9 +70,9 @@ public enum CacheControllerEventType {
     /**
      *
      */
-    INVALIDATION_ACKNOWLEDGEMENT,
+    INV_ACK,
     /**
      *
      */
-    LAST_INVALIDATION_ACKNOWLEDGEMENT
+    LAST_INV_ACK
 }

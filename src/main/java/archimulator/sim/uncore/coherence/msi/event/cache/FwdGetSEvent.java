@@ -26,20 +26,32 @@ import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
  *
  * @author Min Cai
  */
-public class LastInvalidationAcknowledgementEvent extends CacheControllerEvent {
+public class FwdGetSEvent extends CacheControllerEvent {
+    private CacheController requester;
+
     /**
      *
      * @param generator
      * @param producerFlow
+     * @param requester
      * @param tag
      * @param access
      */
-    public LastInvalidationAcknowledgementEvent(CacheController generator, CacheCoherenceFlow producerFlow, int tag, MemoryHierarchyAccess access) {
-        super(generator, producerFlow, CacheControllerEventType.LAST_INVALIDATION_ACKNOWLEDGEMENT, access, tag);
+    public FwdGetSEvent(CacheController generator, CacheCoherenceFlow producerFlow, CacheController requester, int tag, MemoryHierarchyAccess access) {
+        super(generator, producerFlow, CacheControllerEventType.FWD_GETS, access, tag);
+        this.requester = requester;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public CacheController getRequester() {
+        return requester;
     }
 
     @Override
     public String toString() {
-        return String.format("[%d] %s: LastInvalidationAcknowledgementEvent{id=%d, tag=0x%08x}", getBeginCycle(), getGenerator(), getId(), getTag());
+        return String.format("[%d] %s: FwdGetSEvent{id=%d, requester=%s, tag=0x%08x}", getBeginCycle(), getGenerator(), getId(), requester, getTag());
     }
 }

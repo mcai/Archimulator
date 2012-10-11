@@ -117,8 +117,8 @@ public class DirectoryController extends GeneralCacheController<DirectoryControl
             case GETM:
                 onGetM((GetMMessage) message);
                 break;
-            case RECALL_ACKNOWLEDGEMENT:
-                onRecallAck((RecallAcknowledgementMessage) message);
+            case RECALL_ACK:
+                onRecallAck((RecallAckMessage) message);
                 break;
             case PUTS:
                 onPutS((PutSMessage) message);
@@ -170,7 +170,7 @@ public class DirectoryController extends GeneralCacheController<DirectoryControl
         }, onStalledCallback);
     }
 
-    private void onRecallAck(RecallAcknowledgementMessage message) {
+    private void onRecallAck(RecallAckMessage message) {
         CacheController sender = message.getSender();
         int tag = message.getTag();
 

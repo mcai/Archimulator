@@ -70,4 +70,9 @@ public class ExperimentGauge extends Gauge {
     public ExperimentGaugeType getType() {
         return ServiceManager.getExperimentMetricService().getGaugeTypeById(typeId);
     }
+
+    @Override
+    public String toString() {
+        return String.format("Gauge{id=%d, title='%s', createTime=%d, valueExpression='%s', typeId='%d'}", getId(), getTitle(), getCreateTime(), getValueExpression(), typeId);
+    }
 }

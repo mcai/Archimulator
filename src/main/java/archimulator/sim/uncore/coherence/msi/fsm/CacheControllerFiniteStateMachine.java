@@ -52,7 +52,7 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
     private int set;
     private int way;
 
-    private int numInvalidationAcknowledgements;
+    private int numInvAcks;
 
     private List<Action> stalledEvents = new ArrayList<Action>();
 
@@ -142,9 +142,9 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
      * @param requester
      * @param tag
      */
-    public void onEventForwardGetS(CacheCoherenceFlow producerFlow, CacheController requester, int tag) {
-        ForwardGetSEvent forwardGetSEvent = new ForwardGetSEvent(cacheController, producerFlow, requester, tag, producerFlow.getAccess());
-        this.fireTransition(requester + "." + String.format("0x%08x", tag), forwardGetSEvent);
+    public void onEventFwdGetS(CacheCoherenceFlow producerFlow, CacheController requester, int tag) {
+        FwdGetSEvent fwdGetSEvent = new FwdGetSEvent(cacheController, producerFlow, requester, tag, producerFlow.getAccess());
+        this.fireTransition(requester + "." + String.format("0x%08x", tag), fwdGetSEvent);
     }
 
     /**
@@ -153,9 +153,9 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
      * @param requester
      * @param tag
      */
-    public void onEventForwardGetM(CacheCoherenceFlow producerFlow, CacheController requester, int tag) {
-        ForwardGetMEvent forwardGetMEvent = new ForwardGetMEvent(cacheController, producerFlow, requester, tag, producerFlow.getAccess());
-        this.fireTransition(requester + "." + String.format("0x%08x", tag), forwardGetMEvent);
+    public void onEventFwdGetM(CacheCoherenceFlow producerFlow, CacheController requester, int tag) {
+        FwdGetMEvent fwdGetMEvent = new FwdGetMEvent(cacheController, producerFlow, requester, tag, producerFlow.getAccess());
+        this.fireTransition(requester + "." + String.format("0x%08x", tag), fwdGetMEvent);
     }
 
     /**
@@ -164,9 +164,9 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
      * @param requester
      * @param tag
      */
-    public void onEventInvalidation(CacheCoherenceFlow producerFlow, CacheController requester, int tag) {
-        InvalidationEvent invalidationEvent = new InvalidationEvent(cacheController, producerFlow, requester, tag, producerFlow.getAccess());
-        this.fireTransition(requester + "." + String.format("0x%08x", tag), invalidationEvent);
+    public void onEventInv(CacheCoherenceFlow producerFlow, CacheController requester, int tag) {
+        InvEvent invEvent = new InvEvent(cacheController, producerFlow, requester, tag, producerFlow.getAccess());
+        this.fireTransition(requester + "." + String.format("0x%08x", tag), invEvent);
     }
 
     /**
@@ -184,9 +184,9 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
      * @param producerFlow
      * @param tag
      */
-    public void onEventPutAcknowledgement(CacheCoherenceFlow producerFlow, int tag) {
-        PutAcknowledgementEvent putAcknowledgementEvent = new PutAcknowledgementEvent(cacheController, producerFlow, tag, producerFlow.getAccess());
-        this.fireTransition(cacheController.getDirectoryController() + "." + String.format("0x%08x", tag), putAcknowledgementEvent);
+    public void onEventPutAck(CacheCoherenceFlow producerFlow, int tag) {
+        PutAckEvent putAckEvent = new PutAckEvent(cacheController, producerFlow, tag, producerFlow.getAccess());
+        this.fireTransition(cacheController.getDirectoryController() + "." + String.format("0x%08x", tag), putAckEvent);
     }
 
     /**
@@ -197,18 +197,18 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
      * @param numInvalidationAcknowledgements
      */
     public void onEventData(CacheCoherenceFlow producerFlow, Controller sender, int tag, int numInvalidationAcknowledgements) {
-        this.numInvalidationAcknowledgements += numInvalidationAcknowledgements;
+        this.numInvAcks += numInvalidationAcknowledgements;
 
         if (sender instanceof DirectoryController) {
             if (numInvalidationAcknowledgements == 0) {
-                DataFromDirectoryAcknowledgementsEqual0Event dataFromDirectoryAcknowledgementsEqual0Event = new DataFromDirectoryAcknowledgementsEqual0Event(cacheController, producerFlow, sender, tag, producerFlow.getAccess());
-                this.fireTransition(sender + "." + String.format("0x%08x", tag), dataFromDirectoryAcknowledgementsEqual0Event);
+                DataFromDirAcksEq0Event dataFromDirAcksEq0Event = new DataFromDirAcksEq0Event(cacheController, producerFlow, sender, tag, producerFlow.getAccess());
+                this.fireTransition(sender + "." + String.format("0x%08x", tag), dataFromDirAcksEq0Event);
             } else {
-                DataFromDirectoryAcknowledgementsGreaterThan0Event dataFromDirectoryAcknowledgementsGreaterThan0Event = new DataFromDirectoryAcknowledgementsGreaterThan0Event(cacheController, producerFlow, sender, tag, producerFlow.getAccess());
-                this.fireTransition(sender + "." + String.format("0x%08x", tag), dataFromDirectoryAcknowledgementsGreaterThan0Event);
+                DataFromDirAcksGt0Event dataFromDirAcksGt0Event = new DataFromDirAcksGt0Event(cacheController, producerFlow, sender, tag, producerFlow.getAccess());
+                this.fireTransition(sender + "." + String.format("0x%08x", tag), dataFromDirAcksGt0Event);
 
-                if (this.numInvalidationAcknowledgements == 0) {
-                    onEventLastInvalidationAcknowledgement(producerFlow, tag);
+                if (this.numInvAcks == 0) {
+                    onEventLastInvAck(producerFlow, tag);
                 }
             }
         } else {
@@ -223,20 +223,20 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
      * @param sender
      * @param tag
      */
-    public void onEventInvalidationAcknowledgement(CacheCoherenceFlow producerFlow, CacheController sender, int tag) {
-        InvalidationAcknowledgementEvent invalidationAcknowledgementEvent = new InvalidationAcknowledgementEvent(cacheController, producerFlow, sender, tag, producerFlow.getAccess());
-        this.fireTransition(sender + "." + String.format("0x%08x", tag), invalidationAcknowledgementEvent);
+    public void onEventInvAck(CacheCoherenceFlow producerFlow, CacheController sender, int tag) {
+        InvAckEvent invAckEvent = new InvAckEvent(cacheController, producerFlow, sender, tag, producerFlow.getAccess());
+        this.fireTransition(sender + "." + String.format("0x%08x", tag), invAckEvent);
 
-        if (this.numInvalidationAcknowledgements == 0) {
-            onEventLastInvalidationAcknowledgement(producerFlow, tag);
+        if (this.numInvAcks == 0) {
+            onEventLastInvAck(producerFlow, tag);
         }
     }
 
-    private void onEventLastInvalidationAcknowledgement(CacheCoherenceFlow producerFlow, int tag) {
-        LastInvalidationAcknowledgementEvent lastInvalidationAcknowledgementEvent = new LastInvalidationAcknowledgementEvent(cacheController, producerFlow, tag, producerFlow.getAccess());
-        this.fireTransition("<N/A>" + "." + String.format("0x%08x", tag), lastInvalidationAcknowledgementEvent);
+    private void onEventLastInvAck(CacheCoherenceFlow producerFlow, int tag) {
+        LastInvAckEvent lastInvAckEvent = new LastInvAckEvent(cacheController, producerFlow, tag, producerFlow.getAccess());
+        this.fireTransition("<N/A>" + "." + String.format("0x%08x", tag), lastInvAckEvent);
 
-        this.numInvalidationAcknowledgements = 0;
+        this.numInvAcks = 0;
     }
 
     /**
@@ -254,7 +254,7 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
      * @param producerFlow
      * @param tag
      */
-    public void sendGetSToDirectory(CacheCoherenceFlow producerFlow, int tag) {
+    public void sendGetSToDir(CacheCoherenceFlow producerFlow, int tag) {
         cacheController.transfer(cacheController.getDirectoryController(), 8, new GetSMessage(cacheController, producerFlow, cacheController, tag, producerFlow.getAccess()));
     }
 
@@ -263,7 +263,7 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
      * @param producerFlow
      * @param tag
      */
-    public void sendGetMToDirectory(CacheCoherenceFlow producerFlow, int tag) {
+    public void sendGetMToDir(CacheCoherenceFlow producerFlow, int tag) {
         cacheController.transfer(cacheController.getDirectoryController(), 8, new GetMMessage(cacheController, producerFlow, cacheController, tag, producerFlow.getAccess()));
     }
 
@@ -272,7 +272,7 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
      * @param producerFlow
      * @param tag
      */
-    public void sendPutSToDirectory(CacheCoherenceFlow producerFlow, int tag) {
+    public void sendPutSToDir(CacheCoherenceFlow producerFlow, int tag) {
         cacheController.transfer(cacheController.getDirectoryController(), 8, new PutSMessage(cacheController, producerFlow, cacheController, tag, producerFlow.getAccess()));
     }
 
@@ -281,7 +281,7 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
      * @param producerFlow
      * @param tag
      */
-    public void sendPutMAndDataToDirectory(CacheCoherenceFlow producerFlow, int tag) {
+    public void sendPutMAndDataToDir(CacheCoherenceFlow producerFlow, int tag) {
         cacheController.transfer(cacheController.getDirectoryController(), cacheController.getCache().getLineSize() + 8, new PutMAndDataMessage(cacheController, producerFlow, cacheController, tag, producerFlow.getAccess()));
     }
 
@@ -291,7 +291,7 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
      * @param requester
      * @param tag
      */
-    public void sendDataToRequesterAndDirectory(CacheCoherenceFlow producerFlow, CacheController requester, int tag) {
+    public void sendDataToRequesterAndDir(CacheCoherenceFlow producerFlow, CacheController requester, int tag) {
         cacheController.transfer(requester, 10, new DataMessage(cacheController, producerFlow, cacheController, tag, 0, producerFlow.getAccess()));
         cacheController.transfer(cacheController.getDirectoryController(), cacheController.getCache().getLineSize() + 8, new DataMessage(cacheController, producerFlow, cacheController, tag, 0, producerFlow.getAccess()));
     }
@@ -312,8 +312,8 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
      * @param requester
      * @param tag
      */
-    public void sendInvalidationAcknowledgementToRequester(CacheCoherenceFlow producerFlow, CacheController requester, int tag) {
-        cacheController.transfer(requester, 8, new InvalidationAcknowledgementMessage(cacheController, producerFlow, cacheController, tag, producerFlow.getAccess()));
+    public void sendInvAckToRequester(CacheCoherenceFlow producerFlow, CacheController requester, int tag) {
+        cacheController.transfer(requester, 8, new InvAckMessage(cacheController, producerFlow, cacheController, tag, producerFlow.getAccess()));
     }
 
     /**
@@ -322,15 +322,15 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
      * @param tag
      * @param size
      */
-    public void sendRecallAcknowledgementToDirectory(CacheCoherenceFlow producerFlow, int tag, int size) {
-        cacheController.transfer(cacheController.getDirectoryController(), size, new RecallAcknowledgementMessage(cacheController, producerFlow, cacheController, tag, producerFlow.getAccess()));
+    public void sendRecallAckToDir(CacheCoherenceFlow producerFlow, int tag, int size) {
+        cacheController.transfer(cacheController.getDirectoryController(), size, new RecallAckMessage(cacheController, producerFlow, cacheController, tag, producerFlow.getAccess()));
     }
 
     /**
      *
      */
-    public void decrementInvalidationAcknowledgements() {
-        this.numInvalidationAcknowledgements--;
+    public void decInvAcks() {
+        this.numInvAcks--;
     }
 
     /**

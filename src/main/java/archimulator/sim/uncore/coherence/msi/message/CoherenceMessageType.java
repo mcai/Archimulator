@@ -43,15 +43,15 @@ public enum CoherenceMessageType {
     /**
      *
      */
-    FORWARD_GETS,
+    FWD_GETS,
     /**
      *
      */
-    FORWARD_GETM,
+    FWD_GETM,
     /**
      *
      */
-    INVALIDATION,
+    INV,
     /**
      *
      */
@@ -60,7 +60,7 @@ public enum CoherenceMessageType {
     /**
      *
      */
-    PUT_ACKNOWLEDGEMENT,
+    PUT_ACK,
     /**
      *
      */
@@ -68,9 +68,9 @@ public enum CoherenceMessageType {
     /**
      *
      */
-    INVALIDATION_ACKNOWLEDGEMENT,
+    INV_ACK,
     /**
      *
      */
-    RECALL_ACKNOWLEDGEMENT
+    RECALL_ACK
 }

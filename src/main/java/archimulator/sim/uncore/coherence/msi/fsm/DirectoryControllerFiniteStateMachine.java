@@ -49,7 +49,7 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
     private int set;
     private int way;
 
-    private int numRecallAcknowledgements;
+    private int numRecallAcks;
 
     private List<Action> stalledEvents;
 
@@ -145,12 +145,12 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
      * @param tag
      */
     public void onEventRecallAck(CacheCoherenceFlow producerFlow, CacheController sender, int tag) {
-        RecallAcknowledgementEvent recallAcknowledgementEvent = new RecallAcknowledgementEvent(this.directoryController, producerFlow, sender, tag, producerFlow.getAccess());
-        this.fireTransition(sender + "." + String.format("0x%08x", tag), recallAcknowledgementEvent);
+        RecallAckEvent recallAckEvent = new RecallAckEvent(this.directoryController, producerFlow, sender, tag, producerFlow.getAccess());
+        this.fireTransition(sender + "." + String.format("0x%08x", tag), recallAckEvent);
 
-        if (this.numRecallAcknowledgements == 0) {
-            LastRecallAcknowledgementEvent lastRecallAcknowledgementEvent = new LastRecallAcknowledgementEvent(this.directoryController, producerFlow, tag, producerFlow.getAccess());
-            this.fireTransition(sender + "." + String.format("0x%08x", tag), lastRecallAcknowledgementEvent);
+        if (this.numRecallAcks == 0) {
+            LastRecallAckEvent lastRecallAckEvent = new LastRecallAckEvent(this.directoryController, producerFlow, tag, producerFlow.getAccess());
+            this.fireTransition(sender + "." + String.format("0x%08x", tag), lastRecallAckEvent);
         }
     }
 
@@ -319,14 +319,14 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
      * @param tag
      */
     public static void sendPutAckToReq(CacheCoherenceFlow producerFlow, DirectoryController directoryController, CacheController requester, int tag) {
-        directoryController.transfer(requester, 8, new PutAcknowledgementMessage(directoryController, producerFlow, tag, producerFlow.getAccess()));
+        directoryController.transfer(requester, 8, new PutAckMessage(directoryController, producerFlow, tag, producerFlow.getAccess()));
     }
 
     /**
      *
      * @param tag
      */
-    public void copyDataToMemory(int tag) {
+    public void copyDataToMem(int tag) {
         this.directoryController.getNext().memWriteRequestReceive(this.directoryController, tag, new Action() {
             @Override
             public void apply() {
@@ -340,8 +340,8 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
      * @param requester
      * @param tag
      */
-    public void sendForwardGetSToOwner(CacheCoherenceFlow producerFlow, CacheController requester, int tag) {
-        this.directoryController.transfer(getDirectoryEntry().getOwner(), 8, new ForwardGetSMessage(this.directoryController, producerFlow, requester, tag, producerFlow.getAccess()));
+    public void sendFwdGetSToOwner(CacheCoherenceFlow producerFlow, CacheController requester, int tag) {
+        this.directoryController.transfer(getDirectoryEntry().getOwner(), 8, new FwdGetSMessage(this.directoryController, producerFlow, requester, tag, producerFlow.getAccess()));
     }
 
     /**
@@ -350,8 +350,8 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
      * @param requester
      * @param tag
      */
-    public void sendForwardGetMToOwner(CacheCoherenceFlow producerFlow, CacheController requester, int tag) {
-        this.directoryController.transfer(getDirectoryEntry().getOwner(), 8, new ForwardGetMMessage(this.directoryController, producerFlow, requester, tag, producerFlow.getAccess()));
+    public void sendFwdGetMToOwner(CacheCoherenceFlow producerFlow, CacheController requester, int tag) {
+        this.directoryController.transfer(getDirectoryEntry().getOwner(), 8, new FwdGetMMessage(this.directoryController, producerFlow, requester, tag, producerFlow.getAccess()));
     }
 
     /**
@@ -360,10 +360,10 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
      * @param requester
      * @param tag
      */
-    public void sendInvalidationToSharers(CacheCoherenceFlow producerFlow, CacheController requester, int tag) {
+    public void sendInvToSharers(CacheCoherenceFlow producerFlow, CacheController requester, int tag) {
         for (CacheController sharer : this.getDirectoryEntry().getSharers()) {
             if (requester != sharer) {
-                this.directoryController.transfer(sharer, 8, new InvalidationMessage(this.directoryController, producerFlow, requester, tag, producerFlow.getAccess()));
+                this.directoryController.transfer(sharer, 8, new InvMessage(this.directoryController, producerFlow, requester, tag, producerFlow.getAccess()));
             }
         }
     }
@@ -399,17 +399,17 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
 
     /**
      *
-     * @param numRecallAcknowledgements
+     * @param numRecallAcks
      */
-    public void setNumRecallAcknowledgements(int numRecallAcknowledgements) {
-        this.numRecallAcknowledgements = numRecallAcknowledgements;
+    public void setNumRecallAcks(int numRecallAcks) {
+        this.numRecallAcks = numRecallAcks;
     }
 
     /**
      *
      */
-    public void decrementRecallAcknowledgements() {
-        this.numRecallAcknowledgements--;
+    public void decRecallAcks() {
+        this.numRecallAcks--;
     }
 
     /**

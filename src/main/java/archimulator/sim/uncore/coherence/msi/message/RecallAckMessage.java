@@ -16,42 +16,43 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.coherence.msi.event.cache;
+package archimulator.sim.uncore.coherence.msi.message;
 
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
+import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
 /**
  *
  * @author Min Cai
  */
-public class InvalidationEvent extends CacheControllerEvent {
-    private CacheController requester;
+public class RecallAckMessage extends CoherenceMessage {
+    private CacheController sender;
 
     /**
      *
      * @param generator
      * @param producerFlow
-     * @param requester
+     * @param sender
      * @param tag
      * @param access
      */
-    public InvalidationEvent(CacheController generator, CacheCoherenceFlow producerFlow, CacheController requester, int tag, MemoryHierarchyAccess access) {
-        super(generator, producerFlow, CacheControllerEventType.INVALIDATION, access, tag);
-        this.requester = requester;
+    public RecallAckMessage(Controller generator, CacheCoherenceFlow producerFlow, CacheController sender, int tag, MemoryHierarchyAccess access) {
+        super(generator, producerFlow, CoherenceMessageType.RECALL_ACK, access, tag);
+        this.sender = sender;
     }
 
     /**
      *
      * @return
      */
-    public CacheController getRequester() {
-        return requester;
+    public CacheController getSender() {
+        return sender;
     }
 
     @Override
     public String toString() {
-        return String.format("[%d] %s: InvalidationEvent{id=%d, requester=%s, tag=0x%08x}", getBeginCycle(), getGenerator(), getId(), requester, getTag());
+        return String.format("[%d] %s: RecallAckMessage{id=%d, sender=%s, tag=0x%08x}", getBeginCycle(), getGenerator(), getId(), sender, getTag());
     }
 }

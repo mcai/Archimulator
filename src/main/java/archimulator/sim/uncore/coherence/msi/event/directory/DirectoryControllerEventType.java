@@ -38,11 +38,11 @@ public enum DirectoryControllerEventType {
     /**
      *
      */
-    RECALL_ACKNOWLEDGEMENT,
+    RECALL_ACK,
     /**
      *
      */
-    LAST_RECALL_ACKNOWLEDGEMENT,
+    LAST_RECALL_ACK,
     /**
      *
      */
@@ -66,5 +66,5 @@ public enum DirectoryControllerEventType {
     /**
      *
      */
-    DATA_FROM_MEMORY
+    DATA_FROM_MEM
 }

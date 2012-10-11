@@ -16,43 +16,42 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.coherence.msi.message;
+package archimulator.sim.uncore.coherence.msi.event.cache;
 
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
-import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
 /**
  *
  * @author Min Cai
  */
-public class InvalidationAcknowledgementMessage extends CoherenceMessage {
-    private CacheController sender;
+public class InvEvent extends CacheControllerEvent {
+    private CacheController requester;
 
     /**
      *
      * @param generator
      * @param producerFlow
-     * @param sender
+     * @param requester
      * @param tag
      * @param access
      */
-    public InvalidationAcknowledgementMessage(Controller generator, CacheCoherenceFlow producerFlow, CacheController sender, int tag, MemoryHierarchyAccess access) {
-        super(generator, producerFlow, CoherenceMessageType.INVALIDATION_ACKNOWLEDGEMENT, access, tag);
-        this.sender = sender;
+    public InvEvent(CacheController generator, CacheCoherenceFlow producerFlow, CacheController requester, int tag, MemoryHierarchyAccess access) {
+        super(generator, producerFlow, CacheControllerEventType.INV, access, tag);
+        this.requester = requester;
     }
 
     /**
      *
      * @return
      */
-    public CacheController getSender() {
-        return sender;
+    public CacheController getRequester() {
+        return requester;
     }
 
     @Override
     public String toString() {
-        return String.format("[%d] %s: InvalidationAcknowledgementMessage{id=%d, sender=%s, tag=0x%08x}", getBeginCycle(), getGenerator(), getId(), sender, getTag());
+        return String.format("[%d] %s: InvEvent{id=%d, requester=%s, tag=0x%08x}", getBeginCycle(), getGenerator(), getId(), requester, getTag());
     }
 }

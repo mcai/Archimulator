@@ -27,7 +27,7 @@ import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
  *
  * @author Min Cai
  */
-public class RecallAcknowledgementEvent extends DirectoryControllerEvent {
+public class RecallAckEvent extends DirectoryControllerEvent {
     private CacheController sender;
 
     /**
@@ -38,8 +38,8 @@ public class RecallAcknowledgementEvent extends DirectoryControllerEvent {
      * @param tag
      * @param access
      */
-    public RecallAcknowledgementEvent(DirectoryController generator, CacheCoherenceFlow producerFlow, CacheController sender, int tag, MemoryHierarchyAccess access) {
-        super(generator, producerFlow, DirectoryControllerEventType.RECALL_ACKNOWLEDGEMENT, access, tag);
+    public RecallAckEvent(DirectoryController generator, CacheCoherenceFlow producerFlow, CacheController sender, int tag, MemoryHierarchyAccess access) {
+        super(generator, producerFlow, DirectoryControllerEventType.RECALL_ACK, access, tag);
         this.sender = sender;
     }
 
@@ -53,6 +53,6 @@ public class RecallAcknowledgementEvent extends DirectoryControllerEvent {
 
     @Override
     public String toString() {
-        return String.format("[%d] %s: RecallAcknowledgementEvent{id=%d, sender=%s, tag=0x%08x}", getBeginCycle(), getGenerator(), getId(), sender, getTag());
+        return String.format("[%d] %s: RecallAckEvent{id=%d, sender=%s, tag=0x%08x}", getBeginCycle(), getGenerator(), getId(), sender, getTag());
     }
 }

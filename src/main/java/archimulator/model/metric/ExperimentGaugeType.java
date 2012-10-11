@@ -148,6 +148,11 @@ public class ExperimentGaugeType implements ModelElement {
         this.multipleNodes = multipleNodes;
     }
 
+    @Override
+    public String toString() {
+        return String.format("ExperimentGaugeType{id=%d, title='%s', createTime=%s, nodeExpression='%s', keyExpression='%s', multipleNodes=%s}", id, title, DateHelper.toString(createTime), nodeExpression, keyExpression, multipleNodes);
+    }
+
     /**
      *
      */

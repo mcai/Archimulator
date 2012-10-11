@@ -225,26 +225,26 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
     @Override
     public void receive(CoherenceMessage message) {
         switch (message.getType()) {
-            case FORWARD_GETS:
-                onFwdGetS((ForwardGetSMessage) message);
+            case FWD_GETS:
+                onFwdGetS((FwdGetSMessage) message);
                 break;
-            case FORWARD_GETM:
-                onFwdGetM((ForwardGetMMessage) message);
+            case FWD_GETM:
+                onFwdGetM((FwdGetMMessage) message);
                 break;
-            case INVALIDATION:
-                onInvalidation((InvalidationMessage) message);
+            case INV:
+                onInv((InvMessage) message);
                 break;
             case RECALL:
                 onRecall((RecallMessage) message);
                 break;
-            case PUT_ACKNOWLEDGEMENT:
-                onPutAck((PutAcknowledgementMessage) message);
+            case PUT_ACK:
+                onPutAck((PutAckMessage) message);
                 break;
             case DATA:
                 onData((DataMessage) message);
                 break;
-            case INVALIDATION_ACKNOWLEDGEMENT:
-                onInvalidationAcknowledgement((InvalidationAcknowledgementMessage) message);
+            case INV_ACK:
+                onInvAck((InvAckMessage) message);
                 break;
             default:
                 throw new IllegalArgumentException();
@@ -307,25 +307,25 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
         }, onStalledCallback);
     }
 
-    private void onFwdGetS(ForwardGetSMessage message) {
+    private void onFwdGetS(FwdGetSMessage message) {
         int way = this.cache.findWay(message.getTag());
         CacheLine<CacheControllerState> line = this.getCache().getLine(this.getCache().getSet(message.getTag()), way);
         CacheControllerFiniteStateMachine fsm = (CacheControllerFiniteStateMachine) line.getStateProvider();
-        fsm.onEventForwardGetS(message, message.getRequester(), message.getTag());
+        fsm.onEventFwdGetS(message, message.getRequester(), message.getTag());
     }
 
-    private void onFwdGetM(ForwardGetMMessage message) {
+    private void onFwdGetM(FwdGetMMessage message) {
         int way = this.cache.findWay(message.getTag());
         CacheLine<CacheControllerState> line = this.getCache().getLine(this.getCache().getSet(message.getTag()), way);
         CacheControllerFiniteStateMachine fsm = (CacheControllerFiniteStateMachine) line.getStateProvider();
-        fsm.onEventForwardGetM(message, message.getRequester(), message.getTag());
+        fsm.onEventFwdGetM(message, message.getRequester(), message.getTag());
     }
 
-    private void onInvalidation(InvalidationMessage message) {
+    private void onInv(InvMessage message) {
         int way = this.cache.findWay(message.getTag());
         CacheLine<CacheControllerState> line = this.getCache().getLine(this.getCache().getSet(message.getTag()), way);
         CacheControllerFiniteStateMachine fsm = (CacheControllerFiniteStateMachine) line.getStateProvider();
-        fsm.onEventInvalidation(message, message.getRequester(), message.getTag());
+        fsm.onEventInv(message, message.getRequester(), message.getTag());
     }
 
     private void onRecall(RecallMessage message) {
@@ -335,25 +335,25 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
         fsm.onEventRecall(message, message.getTag());
     }
 
-    private void onPutAck(PutAcknowledgementMessage message) {
+    private void onPutAck(PutAckMessage message) {
         int way = this.cache.findWay(message.getTag());
         CacheLine<CacheControllerState> line = this.getCache().getLine(this.getCache().getSet(message.getTag()), way);
         CacheControllerFiniteStateMachine fsm = (CacheControllerFiniteStateMachine) line.getStateProvider();
-        fsm.onEventPutAcknowledgement(message, message.getTag());
+        fsm.onEventPutAck(message, message.getTag());
     }
 
     private void onData(DataMessage message) {
         int way = this.cache.findWay(message.getTag());
         CacheLine<CacheControllerState> line = this.getCache().getLine(this.getCache().getSet(message.getTag()), way);
         CacheControllerFiniteStateMachine fsm = (CacheControllerFiniteStateMachine) line.getStateProvider();
-        fsm.onEventData(message, message.getSender(), message.getTag(), message.getNumInvalidationAcknowledgements());
+        fsm.onEventData(message, message.getSender(), message.getTag(), message.getNumInvAcks());
     }
 
-    private void onInvalidationAcknowledgement(InvalidationAcknowledgementMessage message) {
+    private void onInvAck(InvAckMessage message) {
         int way = this.cache.findWay(message.getTag());
         CacheLine<CacheControllerState> line = this.getCache().getLine(this.getCache().getSet(message.getTag()), way);
         CacheControllerFiniteStateMachine fsm = (CacheControllerFiniteStateMachine) line.getStateProvider();
-        fsm.onEventInvalidationAcknowledgement(message, message.getSender(), message.getTag());
+        fsm.onEventInvAck(message, message.getSender(), message.getTag());
     }
 
     /**

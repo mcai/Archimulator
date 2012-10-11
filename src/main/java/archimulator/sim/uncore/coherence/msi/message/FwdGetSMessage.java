@@ -27,7 +27,7 @@ import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
  *
  * @author Min Cai
  */
-public class InvalidationMessage extends CoherenceMessage {
+public class FwdGetSMessage extends CoherenceMessage {
     private CacheController requester;
 
     /**
@@ -38,8 +38,8 @@ public class InvalidationMessage extends CoherenceMessage {
      * @param tag
      * @param access
      */
-    public InvalidationMessage(Controller generator, CacheCoherenceFlow producerFlow, CacheController requester, int tag, MemoryHierarchyAccess access) {
-        super(generator, producerFlow, CoherenceMessageType.INVALIDATION, access, tag);
+    public FwdGetSMessage(Controller generator, CacheCoherenceFlow producerFlow, CacheController requester, int tag, MemoryHierarchyAccess access) {
+        super(generator, producerFlow, CoherenceMessageType.FWD_GETS, access, tag);
         this.requester = requester;
     }
 
@@ -53,6 +53,6 @@ public class InvalidationMessage extends CoherenceMessage {
 
     @Override
     public String toString() {
-        return String.format("[%d] %s: InvalidationMessage{id=%d, requester=%s, tag=0x%08x}", getBeginCycle(), getGenerator(), getId(), requester, getTag());
+        return String.format("[%d] %s: FwdGetSMessage{id=%d, requester=%s, tag=0x%08x}", getBeginCycle(), getGenerator(), getId(), requester, getTag());
     }
 }

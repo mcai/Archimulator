@@ -26,32 +26,32 @@ import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
  *
  * @author Min Cai
  */
-public class ForwardGetSEvent extends CacheControllerEvent {
-    private CacheController requester;
+public class InvAckEvent extends CacheControllerEvent {
+    private CacheController sender;
 
     /**
      *
      * @param generator
      * @param producerFlow
-     * @param requester
+     * @param sender
      * @param tag
      * @param access
      */
-    public ForwardGetSEvent(CacheController generator, CacheCoherenceFlow producerFlow, CacheController requester, int tag, MemoryHierarchyAccess access) {
-        super(generator, producerFlow, CacheControllerEventType.FORWARD_GETS, access, tag);
-        this.requester = requester;
+    public InvAckEvent(CacheController generator, CacheCoherenceFlow producerFlow, CacheController sender, int tag, MemoryHierarchyAccess access) {
+        super(generator, producerFlow, CacheControllerEventType.INV_ACK, access, tag);
+        this.sender = sender;
     }
 
     /**
      *
      * @return
      */
-    public CacheController getRequester() {
-        return requester;
+    public CacheController getSender() {
+        return sender;
     }
 
     @Override
     public String toString() {
-        return String.format("[%d] %s: ForwardGetSEvent{id=%d, requester=%s, tag=0x%08x}", getBeginCycle(), getGenerator(), getId(), requester, getTag());
+        return String.format("[%d] %s: InvAckEvent{id=%d, sender=%s, tag=0x%08x}", getBeginCycle(), getGenerator(), getId(), sender, getTag());
     }
 }
