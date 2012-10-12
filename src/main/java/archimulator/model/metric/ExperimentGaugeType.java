@@ -19,6 +19,7 @@
 package archimulator.model.metric;
 
 import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
 import net.pickapack.dateTime.DateHelper;
 import net.pickapack.model.ModelElement;
 
@@ -28,6 +29,7 @@ import java.util.Date;
  *
  * @author Min Cai
  */
+@DatabaseTable(tableName = "ExperimentGaugeType")
 public class ExperimentGaugeType implements ModelElement {
     @DatabaseField(generatedId = true)
     private long id;
