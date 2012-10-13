@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore;
 
+import archimulator.model.metric.ExperimentStat;
 import archimulator.sim.common.SimulationObject;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.controller.Controller;
@@ -29,7 +30,6 @@ import archimulator.sim.uncore.net.Net;
 import archimulator.sim.uncore.tlb.TranslationLookasideBuffer;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  *
@@ -97,5 +97,5 @@ public interface CacheHierarchy extends SimulationObject {
      *
      * @param stats
      */
-    void dumpCacheControllerFsmStats(Map<String, String> stats);
+    void dumpCacheControllerFsmStats(List<ExperimentStat> stats);
 }

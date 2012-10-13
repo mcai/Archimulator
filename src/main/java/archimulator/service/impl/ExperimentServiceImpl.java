@@ -20,6 +20,7 @@ package archimulator.service.impl;
 
 import archimulator.model.*;
 import archimulator.model.metric.ExperimentGauge;
+import archimulator.model.metric.ExperimentStat;
 import archimulator.service.ExperimentService;
 import archimulator.service.ServiceManager;
 import archimulator.sim.common.*;
@@ -156,7 +157,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
             updateBuilder.where().eq("state", ExperimentState.READY_TO_RUN).or().eq("state", ExperimentState.RUNNING);
             updateBuilder.updateColumnValue("state", ExperimentState.PENDING);
             updateBuilder.updateColumnValue("failedReason", "");
-            updateBuilder.updateColumnValue("stats", null);
 
             PreparedUpdate<Experiment> update = updateBuilder.prepare();
             this.experiments.update(update);
@@ -597,9 +597,9 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
         writer.incrementIndentation();
         writer.println("  stats:");
-        for (Map.Entry<String, String> entry : experiment.getStats().entrySet()) {
+        for (ExperimentStat stat : ServiceManager.getExperimentMetricService().getStatsByParent(experiment)) {
             writer.incrementIndentation();
-            writer.printf("%s: %s\n", entry.getKey(), entry.getValue());
+            writer.printf("%s: %s\n", stat.getTitle(), stat.getValue());
             writer.decrementIndentation();
         }
 
@@ -620,9 +620,9 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
                 Experiment experiment = experiments.queryForFirst(query);
 
                 if (experiment != null) {
-                    experiment.getStats().clear();
                     experiment.setState(ExperimentState.RUNNING);
                     ServiceManager.getExperimentService().updateExperiment(experiment);
+                    ServiceManager.getExperimentMetricService().clearStatsByParent(experiment);
                 }
 
                 return experiment;

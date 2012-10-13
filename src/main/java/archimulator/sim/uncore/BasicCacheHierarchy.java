@@ -19,6 +19,7 @@
 package archimulator.sim.uncore;
 
 import archimulator.model.Experiment;
+import archimulator.model.metric.ExperimentStat;
 import archimulator.sim.common.BasicSimulationObject;
 import archimulator.sim.common.Simulation;
 import archimulator.sim.common.SimulationEvent;
@@ -39,10 +40,7 @@ import net.pickapack.event.CycleAccurateEventQueue;
 import net.pickapack.fsm.BasicFiniteStateMachine;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  *
@@ -122,7 +120,7 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
      * @param stats
      */
     @Override
-    public void dumpCacheControllerFsmStats(Map<String, String> stats) {
+    public void dumpCacheControllerFsmStats(List<ExperimentStat> stats) {
         for (CacheController l1ICacheController : this.l1ICacheControllers) {
             dumpCacheControllerFsmStats(stats, l1ICacheController);
         }
@@ -134,7 +132,7 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
     }
 
     @SuppressWarnings("unchecked")
-    private <StateT extends Serializable, ConditionT> void dumpCacheControllerFsmStats(Map<String, String> stats, GeneralCacheController<StateT, ConditionT> cacheController) {
+    private <StateT extends Serializable, ConditionT> void dumpCacheControllerFsmStats(List<ExperimentStat> stats, GeneralCacheController<StateT, ConditionT> cacheController) {
         List<BasicFiniteStateMachine<StateT, ConditionT>> fsms = new ArrayList<BasicFiniteStateMachine<StateT, ConditionT>>();
 
         for(int set = 0; set < cacheController.getCache().getNumSets(); set++) {
@@ -144,7 +142,13 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
             }
         }
 
-        cacheController.getFsmFactory().dump(PREFIX_CC_FSM + cacheController.getName(), fsms, stats);
+        Map<String, String> statsMap = new LinkedHashMap<String, String>();
+
+        cacheController.getFsmFactory().dump(PREFIX_CC_FSM + cacheController.getName(), fsms, statsMap);
+
+        for(Map.Entry<String, String> entry : statsMap.entrySet()) {
+            stats.add(new ExperimentStat(getExperiment(), getSimulation().getPrefix(), entry.getKey(), entry.getValue()));
+        }
     }
 
     /**

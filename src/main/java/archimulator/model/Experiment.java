@@ -19,10 +19,10 @@
 package archimulator.model;
 
 import archimulator.model.metric.ExperimentGauge;
+import archimulator.model.metric.ExperimentStat;
 import archimulator.service.ServiceManager;
 import archimulator.util.ContextMappingArrayListJsonSerializableType;
 import archimulator.util.LongArrayListJsonSerializableType;
-import archimulator.util.StringStringLinkedHashMapJsonSerializableType;
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -32,7 +32,9 @@ import net.pickapack.model.ModelElement;
 import net.pickapack.util.CollectionHelper;
 import org.apache.commons.lang.StringUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -69,9 +71,6 @@ public class Experiment implements ModelElement {
 
     @DatabaseField(persisterClass = LongArrayListJsonSerializableType.class)
     private ArrayList<Long> gaugeIds;
-
-    @DatabaseField(persisterClass = StringStringLinkedHashMapJsonSerializableType.class)
-    private LinkedHashMap<String, String> stats;
 
     private transient Architecture architecture;
 
@@ -254,23 +253,12 @@ public class Experiment implements ModelElement {
 
     /**
      *
-     * @return
-     */
-    public Map<String, String> getStats() {
-        if(stats == null) {
-            stats = new LinkedHashMap<String, String>();
-        }
-
-        return stats;
-    }
-
-    /**
-     *
      * @param key
      * @return
      */
     public String getStatValue(String key) {
-        return getStats().containsKey(key) ? getStats().get(key).replaceAll(",", "") : null;
+        ExperimentStat stat = ServiceManager.getExperimentMetricService().getStatsByParentAndTitle(this, key);
+        return stat != null ? stat.getValue().replaceAll(",", "") : null;
     }
 
     /**

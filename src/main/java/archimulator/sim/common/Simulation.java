@@ -21,6 +21,7 @@ package archimulator.sim.common;
 import archimulator.model.ContextMapping;
 import archimulator.model.Experiment;
 import archimulator.model.metric.ExperimentGauge;
+import archimulator.model.metric.ExperimentStat;
 import archimulator.service.ServiceManager;
 import archimulator.sim.core.BasicProcessor;
 import archimulator.sim.core.Core;
@@ -197,8 +198,7 @@ public abstract class Simulation implements SimulationObject {
     }
 
     private void collectStats(boolean endOfSimulation) {
-        //TODO: 'stats' should be refactored into a model class
-        Map<String, String> stats = new LinkedHashMap<String, String>();
+        List<ExperimentStat> stats = new ArrayList<ExperimentStat>();
 
         if (this.getExperiment().getArchitecture().getHelperThreadL2CacheRequestProfilingEnabled() && (this.getType() == SimulationType.MEASUREMENT || this.getType() == SimulationType.CACHE_WARMUP)) {
             if (endOfSimulation) {
@@ -222,62 +222,67 @@ public abstract class Simulation implements SimulationObject {
             getProcessor().getCacheHierarchy().dumpCacheControllerFsmStats(stats);
         }
 
-        stats = this.getStatsWithSimulationPrefix(stats);
-
-        this.getExperiment().getStats().putAll(stats);
+        ServiceManager.getExperimentMetricService().addStats(stats);
     }
 
-    private void collectStats(Map<String, String> stats, ExperimentGauge gauge, Object obj) {
+    private void collectStats(List<ExperimentStat> stats, ExperimentGauge gauge, Object obj) {
         Object keyObj = !StringUtils.isEmpty(gauge.getType().getKeyExpression()) ? JaxenHelper.evaluate(obj, gauge.getType().getKeyExpression()) : null;
         Object valueObj;
         valueObj = JaxenHelper.evaluate(obj, gauge.getValueExpression());
 
-        String expr = "";
-
-        if (obj instanceof Named) {
-            expr += ((Named) obj).getName() + "/";
-        } else {
-            expr += String.format("%s/", !StringUtils.isEmpty(gauge.getType().getNodeExpression()) ? gauge.getType().getNodeExpression() : "simulation");
-
-            if (!StringUtils.isEmpty(gauge.getType().getKeyExpression())) {
-                expr += keyObj + "/";
-            }
-        }
-
-        expr += gauge.getValueExpression();
+        String initialNodeKey = getNodeKey(gauge, obj, keyObj);
 
         if (valueObj != null) {
             if (valueObj instanceof Map) {
                 Map resultMap = (Map) valueObj;
 
                 for (Object key : resultMap.keySet()) {
-                    stats.put(JaxenHelper.escape(expr) + "/" + key, JaxenHelper.toString(resultMap.get(key)));
+                    String nodeKey = JaxenHelper.escape(initialNodeKey) + "/" + key;
+                    String value = JaxenHelper.toString(resultMap.get(key));
+
+                    addStat(stats, gauge, nodeKey, value);
                 }
             } else if (valueObj instanceof List) {
                 List resultList = (List) valueObj;
 
                 for (int i = 0; i < resultList.size(); i++) {
-                    Object resultObj = resultList.get(i);
-                    stats.put(JaxenHelper.escape(expr) + "/" + i, JaxenHelper.toString(resultObj));
+                    String nodeKey = JaxenHelper.escape(initialNodeKey) + "/" + i;
+                    String value = JaxenHelper.toString(resultList.get(i));
+
+                    addStat(stats, gauge, nodeKey, value);
                 }
             } else {
-                stats.put(JaxenHelper.escape(expr), JaxenHelper.toString(valueObj));
+                String nodeKey = JaxenHelper.escape(initialNodeKey);
+                String value = JaxenHelper.toString(valueObj);
+
+                addStat(stats, gauge, nodeKey, value);
             }
         } else {
             throw new IllegalArgumentException();
         }
     }
 
-    private Map<String, String> getStatsWithSimulationPrefix(Map<String, String> stats) {
-        String title = this.getTitle();
-        String simulationPrefix = title.substring(title.indexOf("/") + 1);
+    private void addStat(List<ExperimentStat> stats, ExperimentGauge gauge, String nodeKey, String value) {
+        stats.add(new ExperimentStat(experiment, getPrefix(), gauge, nodeKey, value));
+    }
 
-        Map<String, String> result = new LinkedHashMap<String, String>();
-        for (String key : stats.keySet()) {
-            result.put(simulationPrefix + "/" + key, stats.get(key));
+    private String getNodeKey(ExperimentGauge gauge, Object obj, Object keyObj) {
+        String key = "";
+
+        if (obj instanceof Named) {
+            key = ((Named) obj).getName() + "/";
+        } else {
+            key = String.format("%s", !StringUtils.isEmpty(gauge.getType().getNodeExpression()) ? gauge.getType().getNodeExpression() : "simulation");
+
+            if (!StringUtils.isEmpty(gauge.getType().getKeyExpression())) {
+                key += "/" + keyObj;
+            }
         }
+        return key;
+    }
 
-        return result;
+    public String getPrefix() {
+        return this.getTitle().substring(this.getTitle().indexOf("/") + 1);
     }
 
     /**

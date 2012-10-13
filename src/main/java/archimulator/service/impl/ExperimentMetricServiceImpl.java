@@ -21,16 +21,19 @@ package archimulator.service.impl;
 import archimulator.model.Experiment;
 import archimulator.model.metric.ExperimentGauge;
 import archimulator.model.metric.ExperimentGaugeType;
+import archimulator.model.metric.ExperimentStat;
 import archimulator.service.ExperimentMetricService;
 import archimulator.service.ServiceManager;
 import com.j256.ormlite.dao.Dao;
-import com.j256.ormlite.stmt.PreparedQuery;
+import com.j256.ormlite.misc.TransactionManager;
+import com.j256.ormlite.stmt.*;
 import net.pickapack.model.ModelElement;
 import net.pickapack.service.AbstractService;
 
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 /**
  * @author Min Cai
@@ -38,16 +41,18 @@ import java.util.List;
 public class ExperimentMetricServiceImpl extends AbstractService implements ExperimentMetricService {
     private Dao<ExperimentGaugeType, Long> gaugeTypes;
     private Dao<ExperimentGauge, Long> gauges;
+    private Dao<ExperimentStat, Long> stats;
 
     /**
      *
      */
     @SuppressWarnings("unchecked")
     public ExperimentMetricServiceImpl() {
-        super(ServiceManager.getDatabaseUrl(), Arrays.<Class<? extends ModelElement>>asList(ExperimentGaugeType.class, ExperimentGauge.class));
+        super(ServiceManager.getDatabaseUrl(), Arrays.<Class<? extends ModelElement>>asList(ExperimentGaugeType.class, ExperimentGauge.class, ExperimentStat.class));
 
         this.gaugeTypes = createDao(ExperimentGaugeType.class);
         this.gauges = createDao(ExperimentGauge.class);
+        this.stats = createDao(ExperimentStat.class);
 
         if (this.getFirstGaugeType() == null) {
             this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.RUNTIME, "runtimeHelper", ""));
@@ -250,7 +255,7 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
     @Override
     public List<ExperimentGauge> getGaugesByType(ExperimentGaugeType type) {
         try {
-            PreparedQuery<ExperimentGauge> query = this.gauges.queryBuilder().where().eq("type", type).prepare();
+            PreparedQuery<ExperimentGauge> query = this.gauges.queryBuilder().where().eq("typeId", type.getId()).prepare();
             return this.gauges.query(query);
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -270,7 +275,7 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
     @Override
     public List<ExperimentGauge> getGaugesByExperimentAndType(Experiment experiment, ExperimentGaugeType type) {
         try {
-            PreparedQuery<ExperimentGauge> query = this.gauges.queryBuilder().where().in("id", experiment.getGaugeIds()).and().eq("type", type).prepare();
+            PreparedQuery<ExperimentGauge> query = this.gauges.queryBuilder().where().in("id", experiment.getGaugeIds()).and().eq("typeId", type.getId()).prepare();
             return this.gauges.query(query);
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -312,5 +317,81 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
     @Override
     public void updateGauge(ExperimentGauge gauge) {
         this.updateItem(this.gauges, ExperimentGauge.class, gauge);
+    }
+
+    @Override
+    public void addStats(final List<ExperimentStat> stats) {
+        try {
+            TransactionManager.callInTransaction(getConnectionSource(),
+                    new Callable<Void>() {
+                        public Void call() throws Exception {
+                            for(ExperimentStat stat : stats) {
+                                addStat(stat);
+                            }
+
+                            return null;
+                        }
+                    });
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void addStat(ExperimentStat stat) {
+        try {
+            PreparedQuery<ExperimentStat> query = this.stats.queryBuilder().where()
+                    .eq("parentId", stat.getParentId())
+                    .and()
+                    .eq("title", stat.getTitle())
+                    .prepare();
+
+            ExperimentStat oldStat = this.stats.queryForFirst(query);
+            if(oldStat != null) {
+                this.removeItemById(this.stats, ExperimentStat.class, oldStat.getId());
+            }
+
+            this.addItem(this.stats, ExperimentStat.class, stat);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void clearStatsByParent(Experiment parent) {
+        try {
+            DeleteBuilder<ExperimentStat, Long> deleteBuilder = this.stats.deleteBuilder();
+            deleteBuilder.where().eq("parentId", parent.getId());
+            PreparedDelete<ExperimentStat> delete = deleteBuilder.prepare();
+            this.stats.delete(delete);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<ExperimentStat> getStatsByParent(Experiment parent) {
+        try {
+            PreparedQuery<ExperimentStat> query = this.stats.queryBuilder().where()
+                    .eq("parentId", parent.getId())
+                    .prepare();
+            return this.stats.query(query);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public ExperimentStat getStatsByParentAndTitle(Experiment parent, String title) {
+        try {
+            PreparedQuery<ExperimentStat> query = this.stats.queryBuilder().where()
+                    .eq("parentId", parent.getId())
+                    .and()
+                    .eq("title", title)
+                    .prepare();
+            return this.stats.queryForFirst(query);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
