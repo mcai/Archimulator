@@ -434,7 +434,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
      */
     @Override
     public void addExperiment(Experiment experiment) {
-        this.addItem(this.experiments, Experiment.class, experiment);
+        this.addItem(this.experiments, experiment);
     }
 
     /**
@@ -443,7 +443,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
      */
     @Override
     public void removeExperimentById(long id) {
-        this.removeItemById(this.experiments, Experiment.class, id);
+        this.removeItemById(this.experiments, id);
     }
 
     /**
@@ -452,7 +452,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
      */
     @Override
     public void updateExperiment(Experiment experiment) {
-        this.updateItem(this.experiments, Experiment.class, experiment);
+        this.updateItem(this.experiments, experiment);
     }
 
     /**
@@ -715,7 +715,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
      */
     @Override
     public void addExperimentPack(ExperimentPack experimentPack) {
-        this.addItem(this.experimentPacks, ExperimentPack.class, experimentPack);
+        this.addItem(this.experimentPacks, experimentPack);
     }
 
     /**
@@ -724,7 +724,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
      */
     @Override
     public void removeExperimentPackById(long id) {
-        this.removeItemById(this.experimentPacks, ExperimentPack.class, id);
+        this.removeItemById(this.experimentPacks, id);
     }
 
     /**
@@ -733,7 +733,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
      */
     @Override
     public void updateExperimentPack(ExperimentPack experimentPack) {
-        this.updateItem(this.experimentPacks, ExperimentPack.class, experimentPack);
+        this.updateItem(this.experimentPacks, experimentPack);
     }
 
     /**
@@ -742,7 +742,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
      */
     @Override
     public void addExperimentSpec(ExperimentSpec experimentSpec) {
-        this.addItem(this.experimentSpecs, ExperimentSpec.class, experimentSpec);
+        this.addItem(this.experimentSpecs, experimentSpec);
     }
 
     /**
@@ -751,7 +751,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
      */
     @Override
     public void removeExperimentSpecById(long id) {
-        this.removeItemById(this.experimentSpecs, ExperimentSpec.class, id);
+        this.removeItemById(this.experimentSpecs, id);
     }
 
     /**

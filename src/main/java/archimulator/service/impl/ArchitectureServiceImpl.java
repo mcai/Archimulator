@@ -112,7 +112,7 @@ public class ArchitectureServiceImpl extends AbstractService implements Architec
      */
     @Override
     public void addArchitecture(Architecture architecture) {
-        this.addItem(this.architectures, Architecture.class, architecture);
+        this.addItem(this.architectures, architecture);
     }
 
     /**
@@ -121,7 +121,7 @@ public class ArchitectureServiceImpl extends AbstractService implements Architec
      */
     @Override
     public void removeArchitectureById(long id) {
-        this.removeItemById(this.architectures, Architecture.class, id);
+        this.removeItemById(this.architectures, id);
     }
 
     /**
@@ -129,7 +129,7 @@ public class ArchitectureServiceImpl extends AbstractService implements Architec
      */
     @Override
     public void clearArchitectures() {
-        this.clearItems(this.architectures, Architecture.class);
+        this.clearItems(this.architectures);
     }
 
     /**
@@ -138,7 +138,7 @@ public class ArchitectureServiceImpl extends AbstractService implements Architec
      */
     @Override
     public void updateArchitecture(Architecture architecture) {
-        this.updateItem(this.architectures, Architecture.class, architecture);
+        this.updateItem(this.architectures, architecture);
     }
 
     /**

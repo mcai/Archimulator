@@ -54,7 +54,7 @@ public class SystemSettingServiceImpl extends AbstractService implements SystemS
             SystemSetting systemSetting = new SystemSetting("");
             systemSetting.setRunningExperimentsEnabled(true);
 
-            addItem(this.systemSettings, SystemSetting.class, systemSetting);
+            addItem(this.systemSettings, systemSetting);
         }
 
         return getFirstItem(this.systemSettings);
@@ -66,6 +66,6 @@ public class SystemSettingServiceImpl extends AbstractService implements SystemS
      */
     @Override
     public void updateSystemSettingSingleton(SystemSetting systemSetting) {
-        updateItem(this.systemSettings, SystemSetting.class, systemSetting);
+        updateItem(this.systemSettings, systemSetting);
     }
 }

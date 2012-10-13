@@ -100,7 +100,7 @@ public class UserServiceImpl extends AbstractService implements UserService {
      */
     @Override
     public void addUser(User user) {
-        this.addItem(this.users, User.class, user);
+        this.addItem(this.users, user);
     }
 
     /**
@@ -109,7 +109,7 @@ public class UserServiceImpl extends AbstractService implements UserService {
      */
     @Override
     public void removeUserById(long id) {
-        this.removeItemById(this.users, User.class, id);
+        this.removeItemById(this.users, id);
     }
 
     /**
@@ -118,6 +118,6 @@ public class UserServiceImpl extends AbstractService implements UserService {
      */
     @Override
     public void updateUser(User user) {
-        this.updateItem(this.users, User.class, user);
+        this.updateItem(this.users, user);
     }
 }

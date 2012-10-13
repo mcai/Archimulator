@@ -25,15 +25,15 @@ import archimulator.model.metric.ExperimentStat;
 import archimulator.service.ExperimentMetricService;
 import archimulator.service.ServiceManager;
 import com.j256.ormlite.dao.Dao;
-import com.j256.ormlite.misc.TransactionManager;
-import com.j256.ormlite.stmt.*;
+import com.j256.ormlite.stmt.DeleteBuilder;
+import com.j256.ormlite.stmt.PreparedDelete;
+import com.j256.ormlite.stmt.PreparedQuery;
 import net.pickapack.model.ModelElement;
 import net.pickapack.service.AbstractService;
 
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 /**
  * @author Min Cai
@@ -209,17 +209,17 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
 
     @Override
     public void addGaugeType(ExperimentGaugeType gaugeType) {
-        this.addItem(this.gaugeTypes, ExperimentGaugeType.class, gaugeType);
+        this.addItem(this.gaugeTypes, gaugeType);
     }
 
     @Override
     public void removeGaugeTypeById(long id) {
-        this.removeItemById(this.gaugeTypes, ExperimentGaugeType.class, id);
+        this.removeItemById(this.gaugeTypes, id);
     }
 
     @Override
     public void updateGaugeType(ExperimentGaugeType gaugeType) {
-        this.updateItem(this.gaugeTypes, ExperimentGaugeType.class, gaugeType);
+        this.updateItem(this.gaugeTypes, gaugeType);
     }
 
     /**
@@ -300,7 +300,7 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
      */
     @Override
     public void addGauge(ExperimentGauge gauge) {
-        this.addItem(this.gauges, ExperimentGauge.class, gauge);
+        this.addItem(this.gauges, gauge);
     }
 
     /**
@@ -308,7 +308,7 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
      */
     @Override
     public void removeGaugeById(long id) {
-        this.removeItemById(this.gauges, ExperimentGauge.class, id);
+        this.removeItemById(this.gauges, id);
     }
 
     /**
@@ -316,44 +316,28 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
      */
     @Override
     public void updateGauge(ExperimentGauge gauge) {
-        this.updateItem(this.gauges, ExperimentGauge.class, gauge);
+        this.updateItem(this.gauges, gauge);
     }
 
     @Override
     public void addStats(final List<ExperimentStat> stats) {
-        try {
-            TransactionManager.callInTransaction(getConnectionSource(),
-                    new Callable<Void>() {
-                        public Void call() throws Exception {
-                            for(ExperimentStat stat : stats) {
-                                addStat(stat);
-                            }
+        if(stats.isEmpty()) {
+            throw new IllegalArgumentException();
+        }
 
-                            return null;
-                        }
-                    });
+        long parentId = stats.get(0).getParentId();
+        String prefix = stats.get(0).getPrefix();
+
+        try {
+            DeleteBuilder<ExperimentStat, Long> deleteBuilder = this.stats.deleteBuilder();
+            deleteBuilder.where().eq("parentId", parentId).and().eq("prefix", prefix);
+            PreparedDelete<ExperimentStat> delete = deleteBuilder.prepare();
+            this.stats.delete(delete);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-    }
 
-    private void addStat(ExperimentStat stat) {
-        try {
-            PreparedQuery<ExperimentStat> query = this.stats.queryBuilder().where()
-                    .eq("parentId", stat.getParentId())
-                    .and()
-                    .eq("title", stat.getTitle())
-                    .prepare();
-
-            ExperimentStat oldStat = this.stats.queryForFirst(query);
-            if(oldStat != null) {
-                this.removeItemById(this.stats, ExperimentStat.class, oldStat.getId());
-            }
-
-            this.addItem(this.stats, ExperimentStat.class, stat);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        addItems(ExperimentMetricServiceImpl.this.stats, stats);
     }
 
     @Override
@@ -382,7 +366,7 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
     }
 
     @Override
-    public ExperimentStat getStatsByParentAndTitle(Experiment parent, String title) {
+    public ExperimentStat getStatByParentAndTitle(Experiment parent, String title) {
         try {
             PreparedQuery<ExperimentStat> query = this.stats.queryBuilder().where()
                     .eq("parentId", parent.getId())

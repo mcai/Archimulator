@@ -176,5 +176,5 @@ public interface ExperimentMetricService extends Service {
      * @param title
      * @return
      */
-    ExperimentStat getStatsByParentAndTitle(Experiment parent, String title);
+    ExperimentStat getStatByParentAndTitle(Experiment parent, String title);
 }

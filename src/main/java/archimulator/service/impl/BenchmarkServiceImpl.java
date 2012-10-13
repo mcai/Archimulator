@@ -142,7 +142,7 @@ public class BenchmarkServiceImpl extends AbstractService implements BenchmarkSe
      */
     @Override
     public long addBenchmark(Benchmark benchmark) {
-        return this.addItem(this.benchmarks, Benchmark.class, benchmark);
+        return this.addItem(this.benchmarks, benchmark);
     }
 
     /**
@@ -151,7 +151,7 @@ public class BenchmarkServiceImpl extends AbstractService implements BenchmarkSe
      */
     @Override
     public void removeBenchmarkById(long id) {
-        this.removeItemById(this.benchmarks, Benchmark.class, id);
+        this.removeItemById(this.benchmarks, id);
     }
 
     /**
@@ -159,7 +159,7 @@ public class BenchmarkServiceImpl extends AbstractService implements BenchmarkSe
      */
     @Override
     public void clearBenchmarks() {
-        this.clearItems(this.benchmarks, Benchmark.class);
+        this.clearItems(this.benchmarks);
     }
 
     /**
@@ -168,6 +168,6 @@ public class BenchmarkServiceImpl extends AbstractService implements BenchmarkSe
      */
     @Override
     public void updateBenchmark(Benchmark benchmark) {
-        this.updateItem(this.benchmarks, Benchmark.class, benchmark);
+        this.updateItem(this.benchmarks, benchmark);
     }
 }
