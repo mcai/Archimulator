@@ -378,4 +378,18 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public List<ExperimentStat> getStatsByParentAndTitleLike(Experiment parent, String titleLike) {
+        try {
+            PreparedQuery<ExperimentStat> query = this.stats.queryBuilder().where()
+                    .eq("parentId", parent.getId())
+                    .and()
+                    .like("title", "%" + titleLike + "%")
+                    .prepare();
+            return this.stats.query(query);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

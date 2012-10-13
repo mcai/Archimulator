@@ -257,7 +257,15 @@ public class Experiment implements ModelElement {
      * @return
      */
     public String getStatValue(String key) {
-        ExperimentStat stat = ServiceManager.getExperimentMetricService().getStatByParentAndTitle(this, key);
+        return getStatValue(ServiceManager.getExperimentMetricService().getStatByParentAndTitle(this, key));
+    }
+
+    /**
+     *
+     * @param stat
+     * @return
+     */
+    public String getStatValue(ExperimentStat stat) {
         return stat != null ? stat.getValue().replaceAll(",", "") : null;
     }
 

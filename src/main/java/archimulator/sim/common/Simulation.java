@@ -270,7 +270,7 @@ public abstract class Simulation implements SimulationObject {
         String key = "";
 
         if (obj instanceof Named) {
-            key = ((Named) obj).getName() + "/";
+            key = ((Named) obj).getName();
         } else {
             key = String.format("%s", !StringUtils.isEmpty(gauge.getType().getNodeExpression()) ? gauge.getType().getNodeExpression() : "simulation");
 
