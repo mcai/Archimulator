@@ -222,7 +222,7 @@ public abstract class Simulation implements SimulationObject {
             getProcessor().getCacheHierarchy().dumpCacheControllerFsmStats(stats);
         }
 
-        ServiceManager.getExperimentMetricService().addStats(stats);
+        ServiceManager.getExperimentStatService().addStats(stats);
     }
 
     private void collectStats(List<ExperimentStat> stats, ExperimentGauge gauge, Object obj) {

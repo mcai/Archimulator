@@ -181,4 +181,9 @@ public class ExperimentStat implements ModelElement {
     public ExperimentGauge getGauge() {
         return ServiceManager.getExperimentMetricService().getGaugeById(gaugeId);
     }
+
+    @Override
+    public String toString() {
+        return String.format("ExperimentStat{id=%d, title='%s', createTime=%d, parentId=%d, prefix='%s', gaugeId=%d, nodeKey='%s', value='%s'}", id, title, createTime, parentId, prefix, gaugeId, nodeKey, value);
+    }
 }

@@ -36,6 +36,7 @@ public class ServiceManager {
     private static ArchitectureService architectureService;
     private static ExperimentMetricService experimentMetricService;
     private static ExperimentService experimentService;
+    private static ExperimentStatService experimentStatService;
     private static UserService userService;
     private static SystemSettingService systemSettingService;
 
@@ -44,6 +45,7 @@ public class ServiceManager {
         architectureService = new ArchitectureServiceImpl();
         experimentMetricService = new ExperimentMetricServiceImpl();
         experimentService = new ExperimentServiceImpl();
+        experimentStatService = new ExperimentStatServiceImpl();
         userService = new UserServiceImpl();
         systemSettingService = new SystemSettingServiceImpl();
 
@@ -85,6 +87,15 @@ public class ServiceManager {
      */
     public static ExperimentService getExperimentService() {
         return experimentService;
+    }
+
+    /**
+     * Return the experiment stat service singleton.
+     *
+     * @return experiment stat service singleton
+     */
+    public static ExperimentStatService getExperimentStatService() {
+        return experimentStatService;
     }
 
     /**

@@ -21,7 +21,6 @@ package archimulator.service;
 import archimulator.model.Experiment;
 import archimulator.model.metric.ExperimentGauge;
 import archimulator.model.metric.ExperimentGaugeType;
-import archimulator.model.metric.ExperimentStat;
 import net.pickapack.service.Service;
 
 import java.util.List;
@@ -150,41 +149,4 @@ public interface ExperimentMetricService extends Service {
      * @param gauge
      */
     void updateGauge(ExperimentGauge gauge);
-
-    /**
-     *
-     * @param stats
-     */
-    void addStats(List<ExperimentStat> stats);
-
-    /**
-     *
-     * @param parent
-     */
-    void clearStatsByParent(Experiment parent);
-
-    /**
-     *
-     * @param parent
-     * @return
-     */
-    List<ExperimentStat> getStatsByParent(Experiment parent);
-
-    /**
-     *
-     * @param parent
-     * @param title
-     * @return
-     */
-    ExperimentStat getStatByParentAndTitle(Experiment parent, String title);
-
-    /**
-     *
-     *
-     *
-     * @param parent
-     * @param titleLike
-     * @return
-     */
-    List<ExperimentStat> getStatsByParentAndTitleLike(Experiment parent, String titleLike);
 }

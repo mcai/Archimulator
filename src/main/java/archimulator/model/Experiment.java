@@ -257,7 +257,7 @@ public class Experiment implements ModelElement {
      * @return
      */
     public String getStatValue(String key) {
-        return getStatValue(ServiceManager.getExperimentMetricService().getStatByParentAndTitle(this, key));
+        return getStatValue(ServiceManager.getExperimentStatService().getStatByParentAndTitle(this, key));
     }
 
     /**

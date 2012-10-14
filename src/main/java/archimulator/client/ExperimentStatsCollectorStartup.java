@@ -58,11 +58,11 @@ public class ExperimentStatsCollectorStartup {
             for (String arg : args) {
                 ExperimentPack experimentPack = ServiceManager.getExperimentService().getExperimentPackByTitle(arg);
                 if (experimentPack != null) {
-                    ServiceManager.getExperimentService().dumpExperimentPack(experimentPack, true, true);
+                    ServiceManager.getExperimentStatService().dumpExperimentPack(experimentPack, true, true);
                 } else {
                     Experiment experiment = ServiceManager.getExperimentService().getFirstExperimentByTitle(arg);
                     if (experiment != null) {
-                        ServiceManager.getExperimentService().dumpExperiment(experiment);
+                        ServiceManager.getExperimentStatService().dumpExperiment(experiment);
                     } else {
                         System.err.println("Experiment pack or experiment \"" + arg + "\" do not exist");
                     }
@@ -70,7 +70,7 @@ public class ExperimentStatsCollectorStartup {
             }
         } else {
             for (ExperimentPack experimentPack : ServiceManager.getExperimentService().getAllExperimentPacks()) {
-                ServiceManager.getExperimentService().dumpExperimentPack(experimentPack, true, true);
+                ServiceManager.getExperimentStatService().dumpExperimentPack(experimentPack, true, true);
                 System.out.println();
             }
 
@@ -92,6 +92,6 @@ public class ExperimentStatsCollectorStartup {
             }
         });
 
-        ServiceManager.getExperimentService().tableSummary(titlePrefix, experiments.get(0), experiments);
+        ServiceManager.getExperimentStatService().tableSummary(titlePrefix, experiments.get(0), experiments);
     }
 }

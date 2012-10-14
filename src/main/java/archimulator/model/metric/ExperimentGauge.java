@@ -21,16 +21,34 @@ package archimulator.model.metric;
 import archimulator.service.ServiceManager;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
-import net.pickapack.model.metric.Gauge;
+import net.pickapack.dateTime.DateHelper;
+import net.pickapack.model.ModelElement;
+
+import java.util.Date;
 
 /**
  *
  * @author Min Cai
  */
 @DatabaseTable(tableName = "ExperimentGauge")
-public class ExperimentGauge extends Gauge {
+public class ExperimentGauge implements ModelElement {
+    @DatabaseField(generatedId = true)
+    private long id;
+
+    @DatabaseField
+    private String title;
+
+    @DatabaseField
+    private long createTime;
+
     @DatabaseField
     private long typeId;
+
+    @DatabaseField
+    private String valueExpression;
+
+    @DatabaseField
+    private String description;
 
     /**
      *
@@ -55,8 +73,76 @@ public class ExperimentGauge extends Gauge {
      * @param valueExpression
      */
     public ExperimentGauge(ExperimentGaugeType type, String title, String valueExpression) {
-        super(title, valueExpression);
+        this.title = title;
+        this.valueExpression = valueExpression;
         this.typeId = type != null ? type.getId() : -1;
+        this.createTime = DateHelper.toTick(new Date());
+    }
+
+    /**
+     *
+     * @return
+     */
+    public long getId() {
+        return id;
+    }
+
+    /**
+     *
+     * @return
+     */
+    @Override
+    public long getParentId() {
+        return -1;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public String getTitle() {
+        return title;
+    }
+
+    /**
+     *
+     * @return
+     */
+    @Override
+    public long getCreateTime() {
+        return createTime;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public String getValueExpression() {
+        return valueExpression;
+    }
+
+    /**
+     *
+     * @param valueExpression
+     */
+    public void setValueExpression(String valueExpression) {
+        this.valueExpression = valueExpression;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     *
+     * @param description
+     */
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public long getTypeId() {
@@ -73,6 +159,6 @@ public class ExperimentGauge extends Gauge {
 
     @Override
     public String toString() {
-        return String.format("Gauge{id=%d, title='%s', createTime=%d, valueExpression='%s', typeId='%d'}", getId(), getTitle(), getCreateTime(), getValueExpression(), typeId);
+        return String.format("ExperimentGauge{id=%d, title='%s', createTime=%d, valueExpression='%s', typeId='%d'}", getId(), getTitle(), getCreateTime(), getValueExpression(), typeId);
     }
 }
