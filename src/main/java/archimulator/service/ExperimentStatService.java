@@ -22,6 +22,7 @@ import archimulator.model.Experiment;
 import archimulator.model.ExperimentPack;
 import archimulator.model.metric.ExperimentGauge;
 import archimulator.model.metric.ExperimentStat;
+import archimulator.model.metric.Table;
 import net.pickapack.action.Function1;
 import net.pickapack.service.Service;
 import net.pickapack.util.IndentedPrintWriter;
@@ -77,7 +78,7 @@ public interface ExperimentStatService extends Service {
      * @param baselineExperiment
      * @param experiments
      */
-    void tableSummary(String title, Experiment baselineExperiment, List<Experiment> experiments);
+    Table tableSummary(String title, Experiment baselineExperiment, List<Experiment> experiments);
 
     /**
      * @param experiments

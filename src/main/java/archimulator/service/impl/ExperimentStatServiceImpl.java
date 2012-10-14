@@ -23,11 +23,13 @@ import archimulator.model.ExperimentPack;
 import archimulator.model.ExperimentType;
 import archimulator.model.metric.ExperimentGauge;
 import archimulator.model.metric.ExperimentStat;
+import archimulator.model.metric.Table;
 import archimulator.service.ExperimentStatService;
 import archimulator.service.ServiceManager;
-import com.Ostermiller.util.CSVPrinter;
 import com.j256.ormlite.dao.Dao;
-import com.j256.ormlite.stmt.*;
+import com.j256.ormlite.stmt.DeleteBuilder;
+import com.j256.ormlite.stmt.PreparedDelete;
+import com.j256.ormlite.stmt.PreparedQuery;
 import net.pickapack.JsonSerializationHelper;
 import net.pickapack.Pair;
 import net.pickapack.StorageUnit;
@@ -39,7 +41,6 @@ import net.pickapack.model.ModelElement;
 import net.pickapack.service.AbstractService;
 import net.pickapack.util.IndentedPrintWriter;
 import net.pickapack.util.JaxenHelper;
-import net.pickapack.util.TableHelper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -48,7 +49,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.math3.stat.StatUtils;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -168,7 +168,7 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
      * @param experiments
      */
     @Override
-    public void tableSummary(String title, Experiment baselineExperiment, List<Experiment> experiments) {
+    public Table tableSummary(String title, Experiment baselineExperiment, List<Experiment> experiments) {
         boolean helperThreadEnabled = baselineExperiment.getContextMappings().get(0).getBenchmark().getHelperThreadEnabled();
 
         List<String> columns = helperThreadEnabled ? Arrays.asList(
@@ -198,15 +198,15 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
                 row.add(experiment.getContextMappings().get(0).getHelperThreadStride() + "");
             }
 
-            row.add(experiment.getStatValue(experiment.getMeasurementTitlePrefix() + "cycleAccurateEventQueue/currentCycle"));
+            row.add(experiment.getStatValue(experiment.getMeasurementTitlePrefix() + "simulation/cycleAccurateEventQueue/currentCycle"));
 
             row.add(String.format("%.4f", getSpeedup(baselineExperiment, experiment)));
 
             row.add(String.format("%.4f", Double.parseDouble(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
-                    "instructionsPerCycle"))));
+                    "simulation/instructionsPerCycle"))));
 
             row.add(String.format("%.4f", Double.parseDouble(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
-                    "cyclesPerInstruction"))));
+                    "simulation/cyclesPerInstruction"))));
 
             row.add(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
                     "helperThreadL2CacheRequestProfilingHelper/numMainThreadL2CacheHits"));
@@ -214,11 +214,11 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
                     "helperThreadL2CacheRequestProfilingHelper/numMainThreadL2CacheMisses"));
 
             row.add(String.format("%.4f", Double.parseDouble(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
-                    "processor/cacheHierarchy/cacheControllers[name=l2]/hitRatio"))));
+                    "l2/hitRatio"))));
             row.add(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
-                    "processor/cacheHierarchy/cacheControllers[name=l2]/numEvictions"));
+                    "l2/numEvictions"));
             row.add(String.format("%.4f", Double.parseDouble(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
-                    "processor/cacheHierarchy/cacheControllers[name=l2]/occupancyRatio"))));
+                    "l2/occupancyRatio"))));
 
             if (helperThreadEnabled) {
                 row.add(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
@@ -248,7 +248,7 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
             rows.add(row);
         }
 
-        table(title, "summary", columns, rows);
+        return new Table(title, columns, rows);
     }
 
     /**
@@ -289,12 +289,12 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
      */
     @Override
     public List<Double> getSpeedups(Experiment baselineExperiment, List<Experiment> experiments) {
-        long baselineTotalCycles = Long.parseLong(baselineExperiment.getStatValue(baselineExperiment.getMeasurementTitlePrefix() + "cycleAccurateEventQueue/currentCycle"));
+        long baselineTotalCycles = Long.parseLong(baselineExperiment.getStatValue(baselineExperiment.getMeasurementTitlePrefix() + "simulation/cycleAccurateEventQueue/currentCycle"));
 
         List<Double> speedups = new ArrayList<Double>();
 
         for (Experiment experiment : experiments) {
-            long totalCycles = Long.parseLong(experiment.getStatValue(experiment.getMeasurementTitlePrefix() + "cycleAccurateEventQueue/currentCycle"));
+            long totalCycles = Long.parseLong(experiment.getStatValue(experiment.getMeasurementTitlePrefix() + "simulation/cycleAccurateEventQueue/currentCycle"));
             speedups.add((double) baselineTotalCycles / totalCycles);
         }
 
@@ -308,8 +308,8 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
      */
     @Override
     public double getSpeedup(Experiment baselineExperiment, Experiment experiment) {
-        long baselineTotalCycles = Long.parseLong(baselineExperiment.getStatValue(baselineExperiment.getMeasurementTitlePrefix() + "cycleAccurateEventQueue/currentCycle"));
-        long totalCycles = Long.parseLong(experiment.getStatValue(experiment.getMeasurementTitlePrefix() + "cycleAccurateEventQueue/currentCycle"));
+        long baselineTotalCycles = Long.parseLong(baselineExperiment.getStatValue(baselineExperiment.getMeasurementTitlePrefix() + "simulation/cycleAccurateEventQueue/currentCycle"));
+        long totalCycles = Long.parseLong(experiment.getStatValue(experiment.getMeasurementTitlePrefix() + "simulation/cycleAccurateEventQueue/currentCycle"));
         return (double) baselineTotalCycles / totalCycles;
     }
 
@@ -332,7 +332,7 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
         return transform(experiments, new Function1<Experiment, Double>() {
             @Override
             public Double apply(Experiment experiment) {
-                return Double.parseDouble(experiment.getStatValue(experiment.getMeasurementTitlePrefix() + "totalInstructions"));
+                return Double.parseDouble(experiment.getStatValue(experiment.getMeasurementTitlePrefix() + "simulation/totalInstructions"));
             }
         });
     }
@@ -373,7 +373,7 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
         return transform(experiments, new Function1<Experiment, Double>() {
             @Override
             public Double apply(Experiment experiment) {
-                return Double.parseDouble(experiment.getStatValue(experiment.getMeasurementTitlePrefix() + "cycleAccurateEventQueue/currentCycle"));
+                return Double.parseDouble(experiment.getStatValue(experiment.getMeasurementTitlePrefix() + "simulation/cycleAccurateEventQueue/currentCycle"));
             }
         });
     }
@@ -414,7 +414,7 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
         return transform(experiments, new Function1<Experiment, Double>() {
             @Override
             public Double apply(Experiment experiment) {
-                return Double.parseDouble(experiment.getStatValue(experiment.getMeasurementTitlePrefix() + "processor/cacheHierarchy/cacheControllers[name=l2]/numDownwardReadMisses"));
+                return Double.parseDouble(experiment.getStatValue(experiment.getMeasurementTitlePrefix() + "l2/numDownwardReadMisses"));
             }
         });
     }
@@ -713,8 +713,8 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
         return transform(experiments, new Function1<Experiment, Double>() {
             @Override
             public Double apply(Experiment experiment) {
-                long numL2DownwardReadMisses = Long.parseLong(experiment.getStatValue(experiment.getMeasurementTitlePrefix() + "processor/cacheHierarchy/cacheControllers[name=l2]/numDownwardReadMisses"));
-                long totalInstructions = Long.parseLong(experiment.getStatValue(experiment.getMeasurementTitlePrefix() + "totalInstructions"));
+                long numL2DownwardReadMisses = Long.parseLong(experiment.getStatValue(experiment.getMeasurementTitlePrefix() + "l2/numDownwardReadMisses"));
+                long totalInstructions = Long.parseLong(experiment.getStatValue(experiment.getMeasurementTitlePrefix() + "simulation/totalInstructions"));
                 return (double) numL2DownwardReadMisses / (totalInstructions / FileUtils.ONE_KB);
             }
         });
@@ -913,14 +913,14 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
             writer.println();
             writer.decrementIndentation();
 
-            tableSummary(experimentPack.getTitle(), experimentsByExperimentPack.get(0), experimentsByExperimentPack);
+            tableSummary(experimentPack.getTitle(), experimentsByExperimentPack.get(0), experimentsByExperimentPack); //TODO: to be refactored out
 
             writer.println("simulation times in seconds: ");
             writer.incrementIndentation();
             writer.println(JsonSerializationHelper.toJson(transform(experimentsByExperimentPack, new Function1<Experiment, Double>() {
                 @Override
                 public Double apply(Experiment experiment) {
-                    return Double.parseDouble(experiment.getStatValue(experiment.getMeasurementTitlePrefix() + "durationInSeconds"));
+                    return Double.parseDouble(experiment.getStatValue(experiment.getMeasurementTitlePrefix() + "simulation/durationInSeconds"));
                 }
             }), true));
             writer.println();
@@ -1192,25 +1192,6 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
 
         writer.println();
         writer.decrementIndentation();
-    }
-
-    private void table(String title, String tableFileNameSuffix, List<String> columns, List<List<String>> rows) {
-        String fileNamePrefix = "experiment_tables" + File.separator + title + "_" + tableFileNameSuffix;
-        new File(fileNamePrefix).getParentFile().mkdirs();
-
-        TableHelper.generateTable(fileNamePrefix + ".pdf", columns, rows);
-
-        try {
-            CSVPrinter csvPrinter = new CSVPrinter(new FileOutputStream(fileNamePrefix + ".csv"));
-
-            csvPrinter.writeln(columns.toArray(new String[columns.size()]));
-
-            for (List<String> row : rows) {
-                csvPrinter.writeln(row.toArray(new String[row.size()]));
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     private static Map<String, String> variablePropertyNameDescriptions;
