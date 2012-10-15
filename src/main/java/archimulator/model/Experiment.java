@@ -35,6 +35,7 @@ import org.apache.commons.lang.StringUtils;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -258,6 +259,16 @@ public class Experiment implements ModelElement {
      */
     public String getStatValue(String key) {
         return getStatValue(ServiceManager.getExperimentStatService().getStatByParentAndTitle(this, key));
+    }
+
+    /**
+     *
+     * @param statsMap
+     * @param key
+     * @return
+     */
+    public String getStatValue(Map<String, ExperimentStat> statsMap, String key) {
+        return getStatValue(statsMap.containsKey(key) ? statsMap.get(key) : null);
     }
 
     /**

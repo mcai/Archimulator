@@ -26,6 +26,9 @@ import net.pickapack.dateTime.DateHelper;
 import net.pickapack.model.ModelElement;
 
 import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -185,5 +188,13 @@ public class ExperimentStat implements ModelElement {
     @Override
     public String toString() {
         return String.format("ExperimentStat{id=%d, title='%s', createTime=%d, parentId=%d, prefix='%s', gaugeId=%d, nodeKey='%s', value='%s'}", id, title, createTime, parentId, prefix, gaugeId, nodeKey, value);
+    }
+
+    public static Map<String, ExperimentStat> toMap(List<ExperimentStat> stats) {
+        final Map<String, ExperimentStat> statsMap = new LinkedHashMap<String, ExperimentStat>();
+        for(ExperimentStat stat : stats) {
+            statsMap.put(stat.getTitle(), stat);
+        }
+        return statsMap;
     }
 }

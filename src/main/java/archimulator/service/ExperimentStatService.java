@@ -22,10 +22,10 @@ import archimulator.model.Experiment;
 import archimulator.model.ExperimentPack;
 import archimulator.model.metric.ExperimentGauge;
 import archimulator.model.metric.ExperimentStat;
+import archimulator.model.metric.MultiBarPlot;
 import archimulator.model.metric.Table;
 import net.pickapack.action.Function1;
 import net.pickapack.service.Service;
-import net.pickapack.util.IndentedPrintWriter;
 
 import java.util.List;
 import java.util.Map;
@@ -113,7 +113,7 @@ public interface ExperimentStatService extends Service {
      * @param baselineExperiment
      * @param experiments
      */
-    void plotSpeedups(ExperimentPack experimentPack, Experiment baselineExperiment, List<Experiment> experiments);
+    MultiBarPlot plotSpeedups(ExperimentPack experimentPack, Experiment baselineExperiment, List<Experiment> experiments);
 
     /**
      * @param experiments
@@ -125,7 +125,7 @@ public interface ExperimentStatService extends Service {
      * @param experimentPack
      * @param experiments
      */
-    void plotTotalInstructions(ExperimentPack experimentPack, List<Experiment> experiments);
+    MultiBarPlot plotTotalInstructions(ExperimentPack experimentPack, List<Experiment> experiments);
 
     /**
      * @param experiments
@@ -137,7 +137,7 @@ public interface ExperimentStatService extends Service {
      * @param experimentPack
      * @param experiments
      */
-    void plotNormalizedTotalInstructions(ExperimentPack experimentPack, List<Experiment> experiments);
+    MultiBarPlot plotNormalizedTotalInstructions(ExperimentPack experimentPack, List<Experiment> experiments);
 
     /**
      * @param experiments
@@ -149,7 +149,7 @@ public interface ExperimentStatService extends Service {
      * @param experimentPack
      * @param experiments
      */
-    void plotTotalCycles(ExperimentPack experimentPack, List<Experiment> experiments);
+    MultiBarPlot plotTotalCycles(ExperimentPack experimentPack, List<Experiment> experiments);
 
     /**
      * @param experiments
@@ -161,7 +161,7 @@ public interface ExperimentStatService extends Service {
      * @param experimentPack
      * @param experiments
      */
-    void plotNormalizedTotalCycles(ExperimentPack experimentPack, List<Experiment> experiments);
+    MultiBarPlot plotNormalizedTotalCycles(ExperimentPack experimentPack, List<Experiment> experiments);
 
     /**
      * @param experiments
@@ -173,7 +173,7 @@ public interface ExperimentStatService extends Service {
      * @param experimentPack
      * @param experiments
      */
-    void plotNumL2DownwardReadMisses(ExperimentPack experimentPack, List<Experiment> experiments);
+    MultiBarPlot plotNumL2DownwardReadMisses(ExperimentPack experimentPack, List<Experiment> experiments);
 
     /**
      * @param experiments
@@ -185,7 +185,7 @@ public interface ExperimentStatService extends Service {
      * @param experimentPack
      * @param experiments
      */
-    void plotNormalizedNumL2DownwardReadMisses(ExperimentPack experimentPack, List<Experiment> experiments);
+    MultiBarPlot plotNormalizedNumL2DownwardReadMisses(ExperimentPack experimentPack, List<Experiment> experiments);
 
     /**
      * @param experimentPack
@@ -247,49 +247,49 @@ public interface ExperimentStatService extends Service {
      * @param experimentPack
      * @param experiments
      */
-    void plotNumMainThreadL2CacheHits(ExperimentPack experimentPack, List<Experiment> experiments);
+    MultiBarPlot plotNumMainThreadL2CacheHits(ExperimentPack experimentPack, List<Experiment> experiments);
 
     /**
      * @param experimentPack
      * @param experiments
      */
-    void plotNumMainThreadL2CacheMisses(ExperimentPack experimentPack, List<Experiment> experiments);
+    MultiBarPlot plotNumMainThreadL2CacheMisses(ExperimentPack experimentPack, List<Experiment> experiments);
 
     /**
      * @param experimentPack
      * @param experiments
      */
-    void plotNumHelperThreadL2CacheHits(ExperimentPack experimentPack, List<Experiment> experiments);
+    MultiBarPlot plotNumHelperThreadL2CacheHits(ExperimentPack experimentPack, List<Experiment> experiments);
 
     /**
      * @param experimentPack
      * @param experiments
      */
-    void plotNumHelperThreadL2CacheMisses(ExperimentPack experimentPack, List<Experiment> experiments);
+    MultiBarPlot plotNumHelperThreadL2CacheMisses(ExperimentPack experimentPack, List<Experiment> experiments);
 
     /**
      * @param experimentPack
      * @param experiments
      */
-    void plotNormalizedNumMainThreadL2CacheHits(ExperimentPack experimentPack, List<Experiment> experiments);
+    MultiBarPlot plotNormalizedNumMainThreadL2CacheHits(ExperimentPack experimentPack, List<Experiment> experiments);
 
     /**
      * @param experimentPack
      * @param experiments
      */
-    void plotNormalizedNumMainThreadL2CacheMisses(ExperimentPack experimentPack, List<Experiment> experiments);
+    MultiBarPlot plotNormalizedNumMainThreadL2CacheMisses(ExperimentPack experimentPack, List<Experiment> experiments);
 
     /**
      * @param experimentPack
      * @param experiments
      */
-    void plotNormalizedNumHelperThreadL2CacheHits(ExperimentPack experimentPack, List<Experiment> experiments);
+    MultiBarPlot plotNormalizedNumHelperThreadL2CacheHits(ExperimentPack experimentPack, List<Experiment> experiments);
 
     /**
      * @param experimentPack
      * @param experiments
      */
-    void plotNormalizedNumHelperThreadL2CacheMisses(ExperimentPack experimentPack, List<Experiment> experiments);
+    MultiBarPlot plotNormalizedNumHelperThreadL2CacheMisses(ExperimentPack experimentPack, List<Experiment> experiments);
 
     /**
      * @param experimentPack
@@ -323,25 +323,25 @@ public interface ExperimentStatService extends Service {
      * @param experimentPack
      * @param experiments
      */
-    void plotHelperThreadL2CacheRequestCoverage(ExperimentPack experimentPack, List<Experiment> experiments);
+    MultiBarPlot plotHelperThreadL2CacheRequestCoverage(ExperimentPack experimentPack, List<Experiment> experiments);
 
     /**
      * @param experimentPack
      * @param experiments
      */
-    void plotHelperThreadL2CacheRequestAccuracy(ExperimentPack experimentPack, List<Experiment> experiments);
+    MultiBarPlot plotHelperThreadL2CacheRequestAccuracy(ExperimentPack experimentPack, List<Experiment> experiments);
 
     /**
      * @param experimentPack
      * @param experiments
      */
-    void plotNormalizedHelperThreadL2CacheRequestCoverage(ExperimentPack experimentPack, List<Experiment> experiments);
+    MultiBarPlot plotNormalizedHelperThreadL2CacheRequestCoverage(ExperimentPack experimentPack, List<Experiment> experiments);
 
     /**
      * @param experimentPack
      * @param experiments
      */
-    void plotNormalizedHelperThreadL2CacheRequestAccuracy(ExperimentPack experimentPack, List<Experiment> experiments);
+    MultiBarPlot plotNormalizedHelperThreadL2CacheRequestAccuracy(ExperimentPack experimentPack, List<Experiment> experiments);
 
     /**
      * @param experiments
@@ -353,7 +353,7 @@ public interface ExperimentStatService extends Service {
      * @param experimentPack
      * @param experiments
      */
-    void plotL2DownwardReadMPKIs(ExperimentPack experimentPack, List<Experiment> experiments);
+    MultiBarPlot plotL2DownwardReadMPKIs(ExperimentPack experimentPack, List<Experiment> experiments);
 
     /**
      * @param experiments
@@ -365,7 +365,7 @@ public interface ExperimentStatService extends Service {
      * @param experimentPack
      * @param experiments
      */
-    void plotNormalizedL2DownwardReadMPKIs(ExperimentPack experimentPack, List<Experiment> experiments);
+    MultiBarPlot plotNormalizedL2DownwardReadMPKIs(ExperimentPack experimentPack, List<Experiment> experiments);
 
     /**
      * @param experiments
@@ -377,7 +377,7 @@ public interface ExperimentStatService extends Service {
      * @param experimentPack
      * @param experiments
      */
-    void plotHelperThreadL2CacheRequestBreakdowns(ExperimentPack experimentPack, List<Experiment> experiments);
+    MultiBarPlot plotHelperThreadL2CacheRequestBreakdowns(ExperimentPack experimentPack, List<Experiment> experiments);
 
     /**
      * @param experiments
@@ -389,31 +389,5 @@ public interface ExperimentStatService extends Service {
      * @param experimentPack
      * @param experiments
      */
-    void plotL2CacheRequestBreakdowns(ExperimentPack experimentPack, List<Experiment> experiments);
-
-    /**
-     * @param experimentPack
-     * @param detailed
-     * @param stoppedExperimentsOnly
-     */
-    void dumpExperimentPack(ExperimentPack experimentPack, boolean detailed, boolean stoppedExperimentsOnly);
-
-    /**
-     * @param experimentPack
-     * @param detailed
-     * @param writer
-     * @param stoppedExperimentsOnly
-     */
-    void dumpExperimentPack(ExperimentPack experimentPack, boolean detailed, IndentedPrintWriter writer, boolean stoppedExperimentsOnly);
-
-    /**
-     * @param experiment
-     */
-    void dumpExperiment(Experiment experiment);
-
-    /**
-     * @param experiment
-     * @param writer
-     */
-    void dumpExperiment(Experiment experiment, IndentedPrintWriter writer);
+    MultiBarPlot plotL2CacheRequestBreakdowns(ExperimentPack experimentPack, List<Experiment> experiments);
 }

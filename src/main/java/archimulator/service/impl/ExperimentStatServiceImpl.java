@@ -20,9 +20,9 @@ package archimulator.service.impl;
 
 import archimulator.model.Experiment;
 import archimulator.model.ExperimentPack;
-import archimulator.model.ExperimentType;
 import archimulator.model.metric.ExperimentGauge;
 import archimulator.model.metric.ExperimentStat;
+import archimulator.model.metric.MultiBarPlot;
 import archimulator.model.metric.Table;
 import archimulator.service.ExperimentStatService;
 import archimulator.service.ServiceManager;
@@ -30,27 +30,16 @@ import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.PreparedDelete;
 import com.j256.ormlite.stmt.PreparedQuery;
-import net.pickapack.JsonSerializationHelper;
 import net.pickapack.Pair;
 import net.pickapack.StorageUnit;
 import net.pickapack.action.Function1;
 import net.pickapack.action.Function2;
-import net.pickapack.dateTime.DateHelper;
-import net.pickapack.io.cmd.CommandLineHelper;
 import net.pickapack.model.ModelElement;
 import net.pickapack.service.AbstractService;
-import net.pickapack.util.IndentedPrintWriter;
-import net.pickapack.util.JaxenHelper;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.math3.stat.StatUtils;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -172,12 +161,12 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
         boolean helperThreadEnabled = baselineExperiment.getContextMappings().get(0).getBenchmark().getHelperThreadEnabled();
 
         List<String> columns = helperThreadEnabled ? Arrays.asList(
-                "L2 Size", "L2 Assoc", "L2 Repl",
+                "Experiment", "L2 Size", "L2 Assoc", "L2 Repl",
                 "Lookahead", "Stride",
                 "Total Cycles", "Speedup", "IPC", "CPI",
                 "Main Thread Hit", "Main Thread Miss", "L2 Hit Ratio", "L2 Evictions", "L2 Occupancy Ratio", "Helper Thread Hit", "Helper Thread Miss", "Helper Thread Coverage", "Helper Thread Accuracy", "Redundant MSHR", "Redundant Cache", "Timely", "Late", "Bad", "Ugly"
         ) : Arrays.asList(
-                "L2 Size", "L2 Assoc", "L2 Repl",
+                "Experiment", "L2 Size", "L2 Assoc", "L2 Repl",
                 "Total Cycles", "Speedup", "IPC", "CPI",
                 "Main Thread Hit", "Main Thread Miss", "L2 Hit Ratio", "L2 Evictions", "L2 Occupancy Ratio"
         );
@@ -185,7 +174,11 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
         List<List<String>> rows = new ArrayList<List<String>>();
 
         for (Experiment experiment : experiments) {
+            Map<String, ExperimentStat> statsMap = ExperimentStat.toMap(ServiceManager.getExperimentStatService().getStatsByParent(experiment));
+
             List<String> row = new ArrayList<String>();
+
+            row.add("exp#" + experiment.getId());
 
             row.add(StorageUnit.toString(experiment.getArchitecture().getL2Size()));
 //            row.add(experiment.getArchitecture().getL2Size() + "");
@@ -198,50 +191,50 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
                 row.add(experiment.getContextMappings().get(0).getHelperThreadStride() + "");
             }
 
-            row.add(experiment.getStatValue(experiment.getMeasurementTitlePrefix() + "simulation/cycleAccurateEventQueue/currentCycle"));
+            row.add(experiment.getStatValue(statsMap, experiment.getMeasurementTitlePrefix() + "simulation/cycleAccurateEventQueue/currentCycle"));
 
             row.add(String.format("%.4f", getSpeedup(baselineExperiment, experiment)));
 
-            row.add(String.format("%.4f", Double.parseDouble(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
+            row.add(String.format("%.4f", Double.parseDouble(experiment.getStatValue(statsMap, experiment.getMeasurementTitlePrefix() +
                     "simulation/instructionsPerCycle"))));
 
-            row.add(String.format("%.4f", Double.parseDouble(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
+            row.add(String.format("%.4f", Double.parseDouble(experiment.getStatValue(statsMap, experiment.getMeasurementTitlePrefix() +
                     "simulation/cyclesPerInstruction"))));
 
-            row.add(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
+            row.add(experiment.getStatValue(statsMap, experiment.getMeasurementTitlePrefix() +
                     "helperThreadL2CacheRequestProfilingHelper/numMainThreadL2CacheHits"));
-            row.add(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
+            row.add(experiment.getStatValue(statsMap, experiment.getMeasurementTitlePrefix() +
                     "helperThreadL2CacheRequestProfilingHelper/numMainThreadL2CacheMisses"));
 
-            row.add(String.format("%.4f", Double.parseDouble(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
+            row.add(String.format("%.4f", Double.parseDouble(experiment.getStatValue(statsMap, experiment.getMeasurementTitlePrefix() +
                     "l2/hitRatio"))));
-            row.add(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
+            row.add(experiment.getStatValue(statsMap, experiment.getMeasurementTitlePrefix() +
                     "l2/numEvictions"));
-            row.add(String.format("%.4f", Double.parseDouble(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
+            row.add(String.format("%.4f", Double.parseDouble(experiment.getStatValue(statsMap, experiment.getMeasurementTitlePrefix() +
                     "l2/occupancyRatio"))));
 
             if (helperThreadEnabled) {
-                row.add(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
+                row.add(experiment.getStatValue(statsMap, experiment.getMeasurementTitlePrefix() +
                         "helperThreadL2CacheRequestProfilingHelper/numHelperThreadL2CacheHits"));
-                row.add(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
+                row.add(experiment.getStatValue(statsMap, experiment.getMeasurementTitlePrefix() +
                         "helperThreadL2CacheRequestProfilingHelper/numHelperThreadL2CacheMisses"));
 
-                row.add(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
+                row.add(experiment.getStatValue(statsMap, experiment.getMeasurementTitlePrefix() +
                         "helperThreadL2CacheRequestProfilingHelper/helperThreadL2CacheRequestCoverage"));
-                row.add(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
+                row.add(experiment.getStatValue(statsMap, experiment.getMeasurementTitlePrefix() +
                         "helperThreadL2CacheRequestProfilingHelper/helperThreadL2CacheRequestAccuracy"));
 
-                row.add(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
+                row.add(experiment.getStatValue(statsMap, experiment.getMeasurementTitlePrefix() +
                         "helperThreadL2CacheRequestProfilingHelper/numRedundantHitToTransientTagHelperThreadL2CacheRequests"));
-                row.add(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
+                row.add(experiment.getStatValue(statsMap, experiment.getMeasurementTitlePrefix() +
                         "helperThreadL2CacheRequestProfilingHelper/numRedundantHitToCacheHelperThreadL2CacheRequests"));
-                row.add(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
+                row.add(experiment.getStatValue(statsMap, experiment.getMeasurementTitlePrefix() +
                         "helperThreadL2CacheRequestProfilingHelper/numTimelyHelperThreadL2CacheRequests"));
-                row.add(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
+                row.add(experiment.getStatValue(statsMap, experiment.getMeasurementTitlePrefix() +
                         "helperThreadL2CacheRequestProfilingHelper/numLateHelperThreadL2CacheRequests"));
-                row.add(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
+                row.add(experiment.getStatValue(statsMap, experiment.getMeasurementTitlePrefix() +
                         "helperThreadL2CacheRequestProfilingHelper/numBadHelperThreadL2CacheRequests"));
-                row.add(experiment.getStatValue(experiment.getMeasurementTitlePrefix() +
+                row.add(experiment.getStatValue(statsMap, experiment.getMeasurementTitlePrefix() +
                         "helperThreadL2CacheRequestProfilingHelper/numUglyHelperThreadL2CacheRequests"));
             }
 
@@ -319,8 +312,8 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
      * @param experiments
      */
     @Override
-    public void plotSpeedups(ExperimentPack experimentPack, Experiment baselineExperiment, List<Experiment> experiments) {
-        plot(experimentPack, "speedups", "Speedups", getSpeedups(baselineExperiment, experiments));
+    public MultiBarPlot plotSpeedups(ExperimentPack experimentPack, Experiment baselineExperiment, List<Experiment> experiments) {
+        return singleBarPlot("Speedups", experiments, getSpeedups(baselineExperiment, experiments));
     }
 
     /**
@@ -342,8 +335,8 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
      * @param experiments
      */
     @Override
-    public void plotTotalInstructions(ExperimentPack experimentPack, List<Experiment> experiments) {
-        plot(experimentPack, "totalInstructions", "Total Instructions", getTotalCycles(experiments));
+    public MultiBarPlot plotTotalInstructions(ExperimentPack experimentPack, List<Experiment> experiments) {
+        return singleBarPlot("Total Instructions", experiments, getTotalCycles(experiments));
     }
 
     /**
@@ -360,8 +353,8 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
      * @param experiments
      */
     @Override
-    public void plotNormalizedTotalInstructions(ExperimentPack experimentPack, List<Experiment> experiments) {
-        plot(experimentPack, "totalInstructions_normalized", "Normalized Total Instructions", getNormalizedTotalCycles(experiments));
+    public MultiBarPlot plotNormalizedTotalInstructions(ExperimentPack experimentPack, List<Experiment> experiments) {
+        return singleBarPlot("Normalized Total Instructions", experiments, getNormalizedTotalCycles(experiments));
     }
 
     /**
@@ -383,8 +376,8 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
      * @param experiments
      */
     @Override
-    public void plotTotalCycles(ExperimentPack experimentPack, List<Experiment> experiments) {
-        plot(experimentPack, "totalCycles", "Total Cycles", getTotalCycles(experiments));
+    public MultiBarPlot plotTotalCycles(ExperimentPack experimentPack, List<Experiment> experiments) {
+        return singleBarPlot("Total Cycles", experiments, getTotalCycles(experiments));
     }
 
     /**
@@ -401,8 +394,8 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
      * @param experiments
      */
     @Override
-    public void plotNormalizedTotalCycles(ExperimentPack experimentPack, List<Experiment> experiments) {
-        plot(experimentPack, "totalCycles_normalized", "Normalized Total Cycles", getNormalizedTotalCycles(experiments));
+    public MultiBarPlot plotNormalizedTotalCycles(ExperimentPack experimentPack, List<Experiment> experiments) {
+        return singleBarPlot("Normalized Total Cycles", experiments, getNormalizedTotalCycles(experiments));
     }
 
     /**
@@ -424,8 +417,8 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
      * @param experiments
      */
     @Override
-    public void plotNumL2DownwardReadMisses(ExperimentPack experimentPack, List<Experiment> experiments) {
-        plot(experimentPack, "numL2DownwardReadMisses", "# L2 Downward Read Misses", getNumL2DownwardReadMisses(experiments));
+    public MultiBarPlot plotNumL2DownwardReadMisses(ExperimentPack experimentPack, List<Experiment> experiments) {
+        return singleBarPlot("# L2 Downward Read Misses", experiments, getNumL2DownwardReadMisses(experiments));
     }
 
     /**
@@ -442,8 +435,8 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
      * @param experiments
      */
     @Override
-    public void plotNormalizedNumL2DownwardReadMisses(ExperimentPack experimentPack, List<Experiment> experiments) {
-        plot(experimentPack, "numL2DownwardReadMisses_normalized", "# Normalized L2 Downward Read Misses", getNormalizedNumL2DownwardReadMisses(experiments));
+    public MultiBarPlot plotNormalizedNumL2DownwardReadMisses(ExperimentPack experimentPack, List<Experiment> experiments) {
+        return singleBarPlot("# Normalized L2 Downward Read Misses", experiments, getNormalizedNumL2DownwardReadMisses(experiments));
     }
 
     /**
@@ -551,8 +544,8 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
      * @param experiments
      */
     @Override
-    public void plotNumMainThreadL2CacheHits(ExperimentPack experimentPack, List<Experiment> experiments) {
-        plot(experimentPack, "numMainThreadL2CacheHits", "# Main Thread L2 Cache Hits", getNumMainThreadL2CacheHits(experimentPack, experiments));
+    public MultiBarPlot plotNumMainThreadL2CacheHits(ExperimentPack experimentPack, List<Experiment> experiments) {
+        return singleBarPlot("# Main Thread L2 Cache Hits", experiments, getNumMainThreadL2CacheHits(experimentPack, experiments));
     }
 
     /**
@@ -560,8 +553,8 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
      * @param experiments
      */
     @Override
-    public void plotNumMainThreadL2CacheMisses(ExperimentPack experimentPack, List<Experiment> experiments) {
-        plot(experimentPack, "numMainThreadL2CacheMisses", "# Main Thread L2 Cache Misses", getNumMainThreadL2CacheMisses(experimentPack, experiments));
+    public MultiBarPlot plotNumMainThreadL2CacheMisses(ExperimentPack experimentPack, List<Experiment> experiments) {
+        return singleBarPlot("# Main Thread L2 Cache Misses", experiments, getNumMainThreadL2CacheMisses(experimentPack, experiments));
     }
 
     /**
@@ -569,8 +562,8 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
      * @param experiments
      */
     @Override
-    public void plotNumHelperThreadL2CacheHits(ExperimentPack experimentPack, List<Experiment> experiments) {
-        plot(experimentPack, "numHelperThreadL2CacheHits", "# Helper Thread L2 Cache Hits", getNumHelperThreadL2CacheHits(experimentPack, experiments));
+    public MultiBarPlot plotNumHelperThreadL2CacheHits(ExperimentPack experimentPack, List<Experiment> experiments) {
+        return singleBarPlot("# Helper Thread L2 Cache Hits", experiments, getNumHelperThreadL2CacheHits(experimentPack, experiments));
     }
 
     /**
@@ -578,8 +571,8 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
      * @param experiments
      */
     @Override
-    public void plotNumHelperThreadL2CacheMisses(ExperimentPack experimentPack, List<Experiment> experiments) {
-        plot(experimentPack, "numHelperThreadL2CacheMisses", "# Helper Thread L2 Cache Misses", getNumHelperThreadL2CacheMisses(experimentPack, experiments));
+    public MultiBarPlot plotNumHelperThreadL2CacheMisses(ExperimentPack experimentPack, List<Experiment> experiments) {
+        return singleBarPlot("# Helper Thread L2 Cache Misses", experiments, getNumHelperThreadL2CacheMisses(experimentPack, experiments));
     }
 
     /**
@@ -587,8 +580,8 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
      * @param experiments
      */
     @Override
-    public void plotNormalizedNumMainThreadL2CacheHits(ExperimentPack experimentPack, List<Experiment> experiments) {
-        plot(experimentPack, "numMainThreadL2CacheHits_normalized", "# Normalized Main Thread L2 Cache Hits", getNormalizedNumMainThreadL2CacheHits(experimentPack, experiments));
+    public MultiBarPlot plotNormalizedNumMainThreadL2CacheHits(ExperimentPack experimentPack, List<Experiment> experiments) {
+        return singleBarPlot("# Normalized Main Thread L2 Cache Hits", experiments, getNormalizedNumMainThreadL2CacheHits(experimentPack, experiments));
     }
 
     /**
@@ -596,8 +589,8 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
      * @param experiments
      */
     @Override
-    public void plotNormalizedNumMainThreadL2CacheMisses(ExperimentPack experimentPack, List<Experiment> experiments) {
-        plot(experimentPack, "numMainThreadL2CacheMisses_normalized", "# Normalized Main Thread L2 Cache Misses", getNormalizedNumMainThreadL2CacheMisses(experimentPack, experiments));
+    public MultiBarPlot plotNormalizedNumMainThreadL2CacheMisses(ExperimentPack experimentPack, List<Experiment> experiments) {
+        return singleBarPlot("# Normalized Main Thread L2 Cache Misses", experiments, getNormalizedNumMainThreadL2CacheMisses(experimentPack, experiments));
     }
 
     /**
@@ -605,8 +598,8 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
      * @param experiments
      */
     @Override
-    public void plotNormalizedNumHelperThreadL2CacheHits(ExperimentPack experimentPack, List<Experiment> experiments) {
-        plot(experimentPack, "numHelperThreadL2CacheHits_normalized", "# Normalized Helper Thread L2 Cache Hits", getNormalizedNumHelperThreadL2CacheHits(experimentPack, experiments));
+    public MultiBarPlot plotNormalizedNumHelperThreadL2CacheHits(ExperimentPack experimentPack, List<Experiment> experiments) {
+        return singleBarPlot("# Normalized Helper Thread L2 Cache Hits", experiments, getNormalizedNumHelperThreadL2CacheHits(experimentPack, experiments));
     }
 
     /**
@@ -614,8 +607,8 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
      * @param experiments
      */
     @Override
-    public void plotNormalizedNumHelperThreadL2CacheMisses(ExperimentPack experimentPack, List<Experiment> experiments) {
-        plot(experimentPack, "numHelperThreadL2CacheMisses_normalized", "# Normalized Helper Thread L2 Cache Misses", getNormalizedNumHelperThreadL2CacheMisses(experimentPack, experiments));
+    public MultiBarPlot plotNormalizedNumHelperThreadL2CacheMisses(ExperimentPack experimentPack, List<Experiment> experiments) {
+        return singleBarPlot("# Normalized Helper Thread L2 Cache Misses", experiments, getNormalizedNumHelperThreadL2CacheMisses(experimentPack, experiments));
     }
 
     /**
@@ -673,8 +666,8 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
      * @param experiments
      */
     @Override
-    public void plotHelperThreadL2CacheRequestCoverage(ExperimentPack experimentPack, List<Experiment> experiments) {
-        plot(experimentPack, "helperThreadL2CacheRequestCoverage", "Helper Thread L2 Cache Request Coverage", getHelperThreadL2CacheRequestCoverage(experimentPack, experiments));
+    public MultiBarPlot plotHelperThreadL2CacheRequestCoverage(ExperimentPack experimentPack, List<Experiment> experiments) {
+        return singleBarPlot("Helper Thread L2 Cache Request Coverage", experiments, getHelperThreadL2CacheRequestCoverage(experimentPack, experiments));
     }
 
     /**
@@ -682,8 +675,8 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
      * @param experiments
      */
     @Override
-    public void plotHelperThreadL2CacheRequestAccuracy(ExperimentPack experimentPack, List<Experiment> experiments) {
-        plot(experimentPack, "helperThreadL2CacheRequestAccuracy", "HelperT hread L2 Cache Request Accuracy", getHelperThreadL2CacheRequestAccuracy(experimentPack, experiments));
+    public MultiBarPlot plotHelperThreadL2CacheRequestAccuracy(ExperimentPack experimentPack, List<Experiment> experiments) {
+        return singleBarPlot("Helper Thread L2 Cache Request Accuracy", experiments, getHelperThreadL2CacheRequestAccuracy(experimentPack, experiments));
     }
 
     /**
@@ -691,8 +684,8 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
      * @param experiments
      */
     @Override
-    public void plotNormalizedHelperThreadL2CacheRequestCoverage(ExperimentPack experimentPack, List<Experiment> experiments) {
-        plot(experimentPack, "helperThreadL2CacheRequestCoverage_normalized", "Normalized Helper Thread L2 Cache Request Coverage", getNormalizedHelperThreadL2CacheRequestCoverage(experimentPack, experiments));
+    public MultiBarPlot plotNormalizedHelperThreadL2CacheRequestCoverage(ExperimentPack experimentPack, List<Experiment> experiments) {
+        return singleBarPlot("Normalized Helper Thread L2 Cache Request Coverage", experiments, getNormalizedHelperThreadL2CacheRequestCoverage(experimentPack, experiments));
     }
 
     /**
@@ -700,8 +693,8 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
      * @param experiments
      */
     @Override
-    public void plotNormalizedHelperThreadL2CacheRequestAccuracy(ExperimentPack experimentPack, List<Experiment> experiments) {
-        plot(experimentPack, "helperThreadL2CacheRequestAccuracy_normalized", "Normalized Helper Thread L2 Cache Request Accuracy", getNormalizedHelperThreadL2CacheRequestAccuracy(experimentPack, experiments));
+    public MultiBarPlot plotNormalizedHelperThreadL2CacheRequestAccuracy(ExperimentPack experimentPack, List<Experiment> experiments) {
+        return singleBarPlot("Normalized Helper Thread L2 Cache Request Accuracy", experiments, getNormalizedHelperThreadL2CacheRequestAccuracy(experimentPack, experiments));
     }
 
     /**
@@ -725,8 +718,8 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
      * @param experiments
      */
     @Override
-    public void plotL2DownwardReadMPKIs(ExperimentPack experimentPack, List<Experiment> experiments) {
-        plot(experimentPack, "l2DownwardReadMPKIs", "# L2 Downward Read MPKIs", getL2DownwardReadMPKIs(experiments));
+    public MultiBarPlot plotL2DownwardReadMPKIs(ExperimentPack experimentPack, List<Experiment> experiments) {
+        return singleBarPlot("# L2 Downward Read MPKIs", experiments, getL2DownwardReadMPKIs(experiments));
     }
 
     /**
@@ -743,8 +736,8 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
      * @param experiments
      */
     @Override
-    public void plotNormalizedL2DownwardReadMPKIs(ExperimentPack experimentPack, List<Experiment> experiments) {
-        plot(experimentPack, "l2DownwardReadMPKIs_normalized", "# Normalized L2 Downward Read MPKIs", getNormalizedL2DownwardReadMPKIs(experiments));
+    public MultiBarPlot plotNormalizedL2DownwardReadMPKIs(ExperimentPack experimentPack, List<Experiment> experiments) {
+        return singleBarPlot("# Normalized L2 Downward Read MPKIs", experiments, getNormalizedL2DownwardReadMPKIs(experiments));
     }
 
     /**
@@ -777,9 +770,9 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
      * @param experiments
      */
     @Override
-    public void plotHelperThreadL2CacheRequestBreakdowns(ExperimentPack experimentPack, List<Experiment> experiments) {
+    public MultiBarPlot plotHelperThreadL2CacheRequestBreakdowns(ExperimentPack experimentPack, final List<Experiment> experiments) {
         List<Map<String, Double>> breakdowns = getHelperThreadL2CacheRequestBreakdowns(experiments);
-        List<Map<String, Double>> transformedBreakdowns = transform(breakdowns, new Function1<Map<String, Double>, Map<String, Double>>() {
+        final List<Map<String, Double>> transformedBreakdowns = transform(breakdowns, new Function1<Map<String, Double>, Map<String, Double>>() {
             @Override
             public Map<String, Double> apply(Map<String, Double> input) {
                 Map<String, Double> output = new LinkedHashMap<String, Double>();
@@ -813,7 +806,7 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
                 return output;
             }
         });
-        plot(experimentPack, "helperThreadL2CacheRequestBreakdowns", "# Helper Thread L2 Request Breakdowns", transformedBreakdowns);
+        return multiBarPlot("# Helper Thread L2 Request Breakdowns", experiments, transformedBreakdowns);
     }
 
     /**
@@ -842,7 +835,7 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
      * @param experiments
      */
     @Override
-    public void plotL2CacheRequestBreakdowns(ExperimentPack experimentPack, List<Experiment> experiments) {
+    public MultiBarPlot plotL2CacheRequestBreakdowns(ExperimentPack experimentPack, List<Experiment> experiments) {
         List<Map<String, Double>> breakdowns = getL2CacheRequestBreakdowns(experiments);
         List<Map<String, Double>> transformedBreakdowns = transform(breakdowns, new Function1<Map<String, Double>, Map<String, Double>>() {
             @Override
@@ -872,326 +865,7 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
                 return output;
             }
         });
-        plot(experimentPack, "l2CacheRequestBreakdowns", "# L2 Request Breakdowns", transformedBreakdowns);
-    }
-
-    /**
-     * @param experimentPack
-     * @param detailed
-     * @param stoppedExperimentsOnly
-     */
-    @Override
-    public void dumpExperimentPack(ExperimentPack experimentPack, boolean detailed, boolean stoppedExperimentsOnly) {
-        dumpExperimentPack(experimentPack, detailed, new IndentedPrintWriter(new PrintWriter(System.out), true), stoppedExperimentsOnly);
-    }
-
-    /**
-     * @param experimentPack
-     * @param detailed
-     * @param writer
-     * @param stoppedExperimentsOnly
-     */
-    @Override
-    public void dumpExperimentPack(ExperimentPack experimentPack, boolean detailed, IndentedPrintWriter writer, boolean stoppedExperimentsOnly) {
-        writer.printf("experiment pack %s\n", experimentPack.getTitle());
-        writer.println();
-
-        writer.incrementIndentation();
-
-        List<Experiment> experimentsByExperimentPack = stoppedExperimentsOnly ? ServiceManager.getExperimentService().getStoppedExperimentsByExperimentPack(experimentPack) : ServiceManager.getExperimentService().getExperimentsByExperimentPack(experimentPack);
-        Experiment firstExperimentByExperimentPack = stoppedExperimentsOnly ? ServiceManager.getExperimentService().getFirstStoppedExperimentByExperimentPack(experimentPack) : ServiceManager.getExperimentService().getExperimentsByExperimentPack(experimentPack).get(0);
-
-        if (firstExperimentByExperimentPack != null) {
-            writer.println("experiment titles: ");
-            writer.incrementIndentation();
-            writer.println(JsonSerializationHelper.toJson(transform(experimentsByExperimentPack, new Function1<Experiment, String>() {
-                @Override
-                public String apply(Experiment experiment) {
-                    return experiment.getTitle();
-                }
-            }), true));
-            writer.println();
-            writer.decrementIndentation();
-
-            tableSummary(experimentPack.getTitle(), experimentsByExperimentPack.get(0), experimentsByExperimentPack); //TODO: to be refactored out
-
-            writer.println("simulation times in seconds: ");
-            writer.incrementIndentation();
-            writer.println(JsonSerializationHelper.toJson(transform(experimentsByExperimentPack, new Function1<Experiment, Double>() {
-                @Override
-                public Double apply(Experiment experiment) {
-                    return Double.parseDouble(experiment.getStatValue(experiment.getMeasurementTitlePrefix() + "simulation/durationInSeconds"));
-                }
-            }), true));
-            writer.println();
-            writer.decrementIndentation();
-
-            writer.println("speedups: ");
-            writer.incrementIndentation();
-            writer.println(JsonSerializationHelper.toJson(getSpeedups(firstExperimentByExperimentPack, experimentsByExperimentPack), true));
-            writer.println();
-            writer.decrementIndentation();
-
-            plotSpeedups(experimentPack, firstExperimentByExperimentPack, experimentsByExperimentPack);
-
-            writer.println("total instructions: ");
-            writer.incrementIndentation();
-            writer.println(JsonSerializationHelper.toJson(getTotalInstructions(experimentsByExperimentPack), true));
-            writer.println();
-            writer.decrementIndentation();
-
-            plotTotalInstructions(experimentPack, experimentsByExperimentPack);
-
-            writer.println("normalized total instructions: ");
-            writer.incrementIndentation();
-            writer.println(JsonSerializationHelper.toJson(getNormalizedTotalInstructions(experimentsByExperimentPack), true));
-            writer.println();
-            writer.decrementIndentation();
-
-            plotNormalizedTotalInstructions(experimentPack, experimentsByExperimentPack);
-
-            writer.println("total cycles: ");
-            writer.incrementIndentation();
-            writer.println(JsonSerializationHelper.toJson(getTotalCycles(experimentsByExperimentPack), true));
-            writer.println();
-            writer.decrementIndentation();
-
-            plotTotalCycles(experimentPack, experimentsByExperimentPack);
-
-            writer.println("normalized total cycles: ");
-            writer.incrementIndentation();
-            writer.println(JsonSerializationHelper.toJson(getNormalizedTotalCycles(experimentsByExperimentPack), true));
-            writer.println();
-            writer.decrementIndentation();
-
-            plotNormalizedTotalCycles(experimentPack, experimentsByExperimentPack);
-
-            if (firstExperimentByExperimentPack.getType() != ExperimentType.FUNCTIONAL) {
-                writer.println("l2 request breakdowns: ");
-                writer.incrementIndentation();
-                writer.println(JsonSerializationHelper.toJson(getL2CacheRequestBreakdowns(experimentsByExperimentPack), true));
-                writer.println();
-                writer.decrementIndentation();
-
-                plotL2CacheRequestBreakdowns(experimentPack, experimentsByExperimentPack);
-
-                writer.println("# l2 downward read MPKIs: ");
-                writer.incrementIndentation();
-                writer.println(JsonSerializationHelper.toJson(getL2DownwardReadMPKIs(experimentsByExperimentPack), true));
-                writer.println();
-                writer.decrementIndentation();
-
-                plotL2DownwardReadMPKIs(experimentPack, experimentsByExperimentPack);
-
-                writer.println("# normalized l2 downward read MPKIs: ");
-                writer.incrementIndentation();
-                writer.println(JsonSerializationHelper.toJson(getNormalizedL2DownwardReadMPKIs(experimentsByExperimentPack), true));
-                writer.println();
-                writer.decrementIndentation();
-
-                plotNormalizedL2DownwardReadMPKIs(experimentPack, experimentsByExperimentPack);
-
-                writer.println("helper thread L2 request breakdowns: ");
-                writer.incrementIndentation();
-                writer.println(JsonSerializationHelper.toJson(getHelperThreadL2CacheRequestBreakdowns(experimentsByExperimentPack), true));
-                writer.println();
-                writer.decrementIndentation();
-
-                plotHelperThreadL2CacheRequestBreakdowns(experimentPack, experimentsByExperimentPack);
-
-                writer.println("helper thread L2 request coverage: ");
-                writer.incrementIndentation();
-                writer.println(JsonSerializationHelper.toJson(getHelperThreadL2CacheRequestCoverage(experimentPack, experimentsByExperimentPack), true));
-                writer.decrementIndentation();
-
-                plotHelperThreadL2CacheRequestCoverage(experimentPack, experimentsByExperimentPack);
-
-                writer.println("helper thread L2 request accuracy: ");
-                writer.incrementIndentation();
-                writer.println(JsonSerializationHelper.toJson(getHelperThreadL2CacheRequestAccuracy(experimentPack, experimentsByExperimentPack), true));
-                writer.println();
-                writer.decrementIndentation();
-
-                plotHelperThreadL2CacheRequestAccuracy(experimentPack, experimentsByExperimentPack);
-
-                writer.println("normalized helper thread L2 request coverage: ");
-                writer.incrementIndentation();
-                writer.println(JsonSerializationHelper.toJson(getNormalizedHelperThreadL2CacheRequestCoverage(experimentPack, experimentsByExperimentPack), true));
-                writer.decrementIndentation();
-
-                plotNormalizedHelperThreadL2CacheRequestCoverage(experimentPack, experimentsByExperimentPack);
-
-                writer.println("normalized helper thread L2 request accuracy: ");
-                writer.incrementIndentation();
-                writer.println(JsonSerializationHelper.toJson(getNormalizedHelperThreadL2CacheRequestAccuracy(experimentPack, experimentsByExperimentPack), true));
-                writer.println();
-                writer.decrementIndentation();
-
-                plotNormalizedHelperThreadL2CacheRequestAccuracy(experimentPack, experimentsByExperimentPack);
-
-                //TODO: dump and plot 3C misses/cache request/miss latencies and mlp based costs (and breakdowns)!!!
-            }
-        }
-
-        writer.decrementIndentation();
-
-        if (detailed) {
-            writer.incrementIndentation();
-            for (Experiment experiment : ServiceManager.getExperimentService().getExperimentsByExperimentPack(experimentPack)) {
-                dumpExperiment(experiment, writer);
-            }
-            writer.decrementIndentation();
-        }
-    }
-
-    /**
-     * @param experiment
-     */
-    @Override
-    public void dumpExperiment(Experiment experiment) {
-        dumpExperiment(experiment, new IndentedPrintWriter(new PrintWriter(System.out), true));
-    }
-
-    /**
-     * @param experiment
-     * @param writer
-     */
-    @Override
-    public void dumpExperiment(Experiment experiment, IndentedPrintWriter writer) {
-        writer.printf("[%s] experiment %s\n", DateHelper.toString(experiment.getCreateTime()), experiment);
-
-        Map<String, String> configs = new LinkedHashMap<String, String>();
-
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "title");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "createTimeAsString");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "type");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "state");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "numMaxInstructions");
-        JaxenHelper.dumpValuesFromXPath(configs, experiment, "contextMappings");
-
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/title");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/createTimeAsString");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/helperThreadPthreadSpawnIndex");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/helperThreadL2CacheRequestProfilingEnabled");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/numCores");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/numThreadsPerCore");
-
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/physicalRegisterFileCapacity");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/decodeWidth");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/issueWidth");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/commitWidth");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/decodeBufferCapacity");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/reorderBufferCapacity");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/loadStoreQueueCapacity");
-
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/branchPredictorType");
-        switch (experiment.getArchitecture().getBranchPredictorType()) {
-            case PERFECT:
-                break;
-            case TAKEN:
-                break;
-            case NOT_TAKEN:
-                break;
-            case TWO_BIT:
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/twoBitBranchPredictorBimodSize");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/twoBitBranchPredictorBranchTargetBufferNumSets");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/twoBitBranchPredictorBranchTargetBufferAssociativity");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/twoBitBranchPredictorReturnAddressStackSize");
-                break;
-            case TWO_LEVEL:
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/twoLevelBranchPredictorL1Size");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/twoLevelBranchPredictorL2Size");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/twoLevelBranchPredictorShiftWidth");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/twoLevelBranchPredictorXor");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/twoLevelBranchPredictorBranchTargetBufferNumSets");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/twoLevelBranchPredictorBranchTargetBufferAssociativity");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/twoLevelBranchPredictorReturnAddressStackSize");
-                break;
-            case COMBINED:
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/combinedBranchPredictorBimodSize");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/combinedBranchPredictorL1Size");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/combinedBranchPredictorL2Size");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/combinedBranchPredictorMetaSize");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/combinedBranchPredictorShiftWidth");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/combinedBranchPredictorXor");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/combinedBranchPredictorBranchTargetBufferNumSets");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/combinedBranchPredictorBranchTargetBufferAssociativity");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/combinedBranchPredictorReturnAddressStackSize");
-                break;
-        }
-
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/tlbSize");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/tlbAssociativity");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/tlbLineSize");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/tlbHitLatency");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/tlbMissLatency");
-
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/l1ISize");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/l1IAssociativity");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/l1ILineSize");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/l1IHitLatency");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/l1INumReadPorts");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/l1INumWritePorts");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/l1IReplacementPolicyType");
-
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/l1DSize");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/l1DAssociativity");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/l1DLineSize");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/l1DHitLatency");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/l1DNumReadPorts");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/l1DNumWritePorts");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/l1DReplacementPolicyType");
-
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/l2Size");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/l2Associativity");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/l2LineSize");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/l2HitLatency");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/l2ReplacementPolicyType");
-
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/memoryControllerType");
-        JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/memoryControllerLineSize");
-        switch (experiment.getArchitecture().getMemoryControllerType()) {
-            case FIXED_LATENCY:
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/fixedLatencyMemoryControllerLatency");
-                break;
-            case SIMPLE:
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/simpleMemoryControllerMemoryLatency");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/simpleMemoryControllerMemoryTrunkLatency");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/simpleMemoryControllerBusWidth");
-                break;
-            case BASIC:
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/basicMemoryControllerToDramLatency");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/basicMemoryControllerFromDramLatency");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/basicMemoryControllerPrechargeLatency");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/basicMemoryControllerClosedLatency");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/basicMemoryControllerConflictLatency");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/basicMemoryControllerBusWidth");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/basicMemoryControllerNumBanks");
-                JaxenHelper.dumpValueFromXPath(configs, experiment, "architecture/basicMemoryControllerRowSize");
-                break;
-        }
-
-        writer.incrementIndentation();
-        writer.println("  configs:");
-        for (Map.Entry<String, String> entry : configs.entrySet()) {
-            writer.incrementIndentation();
-            writer.printf("%s: %s\n", entry.getKey(), entry.getValue());
-            writer.decrementIndentation();
-        }
-
-        writer.println();
-        writer.decrementIndentation();
-
-        writer.incrementIndentation();
-        writer.println("  stats:");
-        for (ExperimentStat stat : ServiceManager.getExperimentStatService().getStatsByParent(experiment)) {
-            writer.incrementIndentation();
-            writer.printf("%s: %s\n", stat.getTitle(), stat.getValue());
-            writer.decrementIndentation();
-        }
-
-        writer.println();
-        writer.decrementIndentation();
+        return multiBarPlot("# L2 Request Breakdowns", experiments, transformedBreakdowns);
     }
 
     private static Map<String, String> variablePropertyNameDescriptions;
@@ -1222,59 +896,46 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
         return variablePropertyNameDescriptions.containsKey(variablePropertyName) ? variablePropertyNameDescriptions.get(variablePropertyName) : variablePropertyName;
     }
 
-    private void plot(final ExperimentPack experimentPack, String plotFileNameSuffix, String yLabel, List<?> rows) {
-        try {
-            String fileNamePdf = "experiment_plots" + File.separator + experimentPack.getTitle() + "_" + plotFileNameSuffix + ".pdf";
-            new File(fileNamePdf).getParentFile().mkdirs();
+    private MultiBarPlot multiBarPlot(String title, List<Experiment> experiments, final List<Map<String, Double>> transformedBreakdowns) {
+        final List<String> titles = new ArrayList<String>(transformedBreakdowns.get(0).keySet());
 
-            File fileInput = File.createTempFile("archimulator", "bargraph_input.txt");
+        List<MultiBarPlot.Bar> subCharts = new ArrayList<MultiBarPlot.Bar>();
 
-            PrintWriter pw = new PrintWriter(fileInput);
+        for (int k = 0; k < titles.size(); k++) {
+            List<MultiBarPlot.XY> values = new ArrayList<MultiBarPlot.XY>();
 
-            String variablePropertyDescription = CollectionUtils.isEmpty(experimentPack.getVariablePropertyNames()) ? "" : StringUtils.join(transform(experimentPack.getVariablePropertyNames(), new Function1<String, Object>() {
-                @Override
-                public Object apply(String variablePropertyName) {
-                    return getDescriptionOfVariablePropertyName(variablePropertyName);
-                }
-            }), "_");
+            for (int i = 0; i < experiments.size(); i++) {
+                values.add(new MultiBarPlot.XY("exp#" + experiments.get(i).getId(), new ArrayList<List<Double>>() {{
+                    for (String key : titles) {
+                        List<Double> rows = new ArrayList<Double>();
 
-            pw.println("yformat=%g");
-            pw.println("=nogridy");
-            pw.println("=norotate");
-//            pw.println("=patterns");
+                        for (Map<String, Double> transformedBreakdown : transformedBreakdowns) {
+                            rows.add(transformedBreakdown.get(key));
+                        }
 
-            pw.println("xscale=1.2");
-
-//            pw.println("legendx=right");
-//            pw.println("legendy=top");
-//            pw.println("=nolegoutline");
-//            pw.println("legendfill=");
-//            pw.println("legendfontsz=13");
-
-            if (rows.get(0) instanceof Map) {
-                pw.println("=stacked;" + StringUtils.join(((Map) (rows.get(0))).keySet(), ';'));
-                pw.println("=table");
+                        add(rows);
+                    }
+                }}.get(k).get(i)));
             }
 
-            pw.println("xlabel=" + variablePropertyDescription);
-            pw.println("ylabel=" + yLabel);
-
-            int i = 0;
-            for (Object row : rows) {
-                String title = CollectionUtils.isEmpty(experimentPack.getVariablePropertyValues()) ? "" : experimentPack.getVariablePropertyValues().get(i++);
-                pw.println(title.replaceAll(" ", "_") + "\t" + ((row instanceof Map) ? StringUtils.join(((Map) row).values(), '\t') : row));
-            }
-
-            pw.close();
-
-            System.err.println(StringUtils.join(CommandLineHelper.invokeShellCommandAndGetResult("tools/bargraph.pl" + " -pdf " + fileInput + " > " + fileNamePdf), IOUtils.LINE_SEPARATOR));
-
-            if (!fileInput.delete()) {
-                throw new IllegalArgumentException();
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            subCharts.add(new MultiBarPlot.Bar(titles.get(k), values.toArray(new MultiBarPlot.XY[values.size()])));
         }
+
+        return new MultiBarPlot(title, subCharts.toArray(new MultiBarPlot.Bar[subCharts.size()]));
+    }
+
+    private MultiBarPlot singleBarPlot(String title, List<Experiment> experiments, List<Double> rows) {
+        List<MultiBarPlot.Bar> subCharts = new ArrayList<MultiBarPlot.Bar>();
+
+        List<MultiBarPlot.XY> values = new ArrayList<MultiBarPlot.XY>();
+
+        for (int i = 0; i < experiments.size(); i++) {
+            values.add(new MultiBarPlot.XY("exp#" + experiments.get(i).getId(), rows.get(i)));
+        }
+
+        subCharts.add(new MultiBarPlot.Bar(title, values.toArray(new MultiBarPlot.XY[values.size()])));
+
+        return new MultiBarPlot(title, subCharts.toArray(new MultiBarPlot.Bar[subCharts.size()]));
     }
 
     private List<Double> normalize(List<Double> input) {
