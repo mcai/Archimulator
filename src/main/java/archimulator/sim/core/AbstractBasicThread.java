@@ -393,17 +393,6 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
      *
      * @return
      */
-    public List<TranslationLookasideBuffer> getTlbs() {
-        List<TranslationLookasideBuffer> tlbs = new ArrayList<TranslationLookasideBuffer>();
-        tlbs.add(getItlb());
-        tlbs.add(getDtlb());
-        return tlbs;
-    }
-
-    /**
-     *
-     * @return
-     */
     public Context getContext() {
         return context;
     }

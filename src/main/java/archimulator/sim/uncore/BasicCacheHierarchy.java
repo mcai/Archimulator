@@ -243,6 +243,17 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
      *
      * @return
      */
+    public List<TranslationLookasideBuffer> getTlbs() {
+        List<TranslationLookasideBuffer> tlbs = new ArrayList<TranslationLookasideBuffer>();
+        tlbs.addAll(getItlbs());
+        tlbs.addAll(getDtlbs());
+        return tlbs;
+    }
+
+    /**
+     *
+     * @return
+     */
     public Net getL1sToL2Network() {
         return l1sToL2Network;
     }

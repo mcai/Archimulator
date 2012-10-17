@@ -52,7 +52,7 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
         if (this.getFirstGaugeType() == null) {
             this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.RUNTIME, "runtimeHelper", ""));
             this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.SIMULATION, "", ""));
-            this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.MAIN_MEMORY, "processor/kernel/processes/memory", "id") {
+            this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.MAIN_MEMORY, "processor/kernel/memories", "id") {
                 {
                     setMultipleNodes(true);
                 }
@@ -62,12 +62,12 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
                     setMultipleNodes(true);
                 }
             });
-            this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.THREAD, "processor/cores/threads", "name") {
+            this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.THREAD, "processor/threads", "name") {
                 {
                     setMultipleNodes(true);
                 }
             });
-            this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.TLB, "processor/cores/threads/tlbs", "name") {
+            this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.TLB, "processor/cacheHierarchy/tlbs", "name") {
                 {
                     setMultipleNodes(true);
                 }

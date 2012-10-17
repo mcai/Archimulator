@@ -22,6 +22,7 @@ import archimulator.sim.common.BasicSimulationObject;
 import archimulator.sim.common.Simulation;
 import archimulator.sim.common.SimulationObject;
 import archimulator.sim.isa.ArchitecturalRegisterFile;
+import archimulator.sim.isa.Memory;
 import archimulator.sim.isa.StaticInstruction;
 import archimulator.sim.os.event.SystemEvent;
 import archimulator.sim.os.signal.SignalAction;
@@ -340,6 +341,20 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
      */
     public List<Process> getProcesses() {
         return processes;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public List<Memory> getMemories() {
+        List<Memory> memories = new ArrayList<Memory>();
+
+        for(Process process : processes) {
+            memories.add(process.getMemory());
+        }
+
+        return memories;
     }
 
     /**
