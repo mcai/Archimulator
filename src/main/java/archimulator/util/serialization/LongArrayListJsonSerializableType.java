@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.util;
+package archimulator.util.serialization;
 
 import archimulator.model.ContextMapping;
 import com.google.gson.reflect.TypeToken;

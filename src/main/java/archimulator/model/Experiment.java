@@ -21,8 +21,8 @@ package archimulator.model;
 import archimulator.model.metric.ExperimentGauge;
 import archimulator.model.metric.ExperimentStat;
 import archimulator.service.ServiceManager;
-import archimulator.util.ContextMappingArrayListJsonSerializableType;
-import archimulator.util.LongArrayListJsonSerializableType;
+import archimulator.util.serialization.ContextMappingArrayListJsonSerializableType;
+import archimulator.util.serialization.LongArrayListJsonSerializableType;
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -51,6 +51,9 @@ public class Experiment implements ModelElement {
 
     @DatabaseField
     private long createTime;
+
+    @DatabaseField
+    private long parentId;
 
     @DatabaseField
     private ExperimentType type;
@@ -98,7 +101,8 @@ public class Experiment implements ModelElement {
      * @param numMaxInstructions
      * @param contextMappings
      */
-    public Experiment(ExperimentType type, Architecture architecture, int numMaxInstructions, List<ContextMapping> contextMappings, List<ExperimentGauge> gauges) {
+    public Experiment(ExperimentPack parent, ExperimentType type, Architecture architecture, int numMaxInstructions, List<ContextMapping> contextMappings, List<ExperimentGauge> gauges) {
+        this.parentId = parent != null ? parent.getId() : -1;
         this.type = type;
         this.state = ExperimentState.PENDING;
         this.failedReason = "";
@@ -153,7 +157,7 @@ public class Experiment implements ModelElement {
      */
     @Override
     public long getParentId() {
-        return -1;
+        return parentId;
     }
 
     /**

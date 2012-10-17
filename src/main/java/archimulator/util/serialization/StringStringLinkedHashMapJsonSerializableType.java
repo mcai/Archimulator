@@ -16,25 +16,26 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.util;
+package archimulator.util.serialization;
 
 import archimulator.model.ContextMapping;
 import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 /**
  *
  * @author Min Cai
  */
-public class StringArrayListJsonSerializableType extends JsonSerializableType<ArrayList<ContextMapping>> {
-    private static final StringArrayListJsonSerializableType singleTon = new StringArrayListJsonSerializableType();
+public class StringStringLinkedHashMapJsonSerializableType extends JsonSerializableType<ArrayList<ContextMapping>> {
+    private static final StringStringLinkedHashMapJsonSerializableType singleTon = new StringStringLinkedHashMapJsonSerializableType();
 
     /**
      *
      */
-    public StringArrayListJsonSerializableType() {
-        super(new TypeToken<ArrayList<String>>() {
+    public StringStringLinkedHashMapJsonSerializableType() {
+        super(new TypeToken<LinkedHashMap<String, String>>() {
         }.getType());
     }
 
@@ -42,7 +43,7 @@ public class StringArrayListJsonSerializableType extends JsonSerializableType<Ar
      *
      * @return
      */
-    public static StringArrayListJsonSerializableType getSingleton() {
+    public static StringStringLinkedHashMapJsonSerializableType getSingleton() {
         return singleTon;
     }
 }

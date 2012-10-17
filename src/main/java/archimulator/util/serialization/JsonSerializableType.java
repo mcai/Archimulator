@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.util;
+package archimulator.util.serialization;
 
 import com.j256.ormlite.field.FieldType;
 import com.j256.ormlite.field.SqlType;

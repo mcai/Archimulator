@@ -72,14 +72,6 @@ public interface ExperimentService extends Service {
 
     /**
      *
-     * @param titlePrefix
-     * @param stoppedExperimentsOnly
-     * @return
-     */
-    List<Experiment> getExperimentsByTitlePrefix(String titlePrefix, boolean stoppedExperimentsOnly);
-
-    /**
-     *
      * @param title
      * @return
      */
@@ -108,19 +100,19 @@ public interface ExperimentService extends Service {
 
     /**
      *
-     * @param experimentPack
+     * @param parent
      * @return
      */
-    List<Experiment> getExperimentsByExperimentPack(ExperimentPack experimentPack);
+    List<Experiment> getExperimentsByParent(ExperimentPack parent);
 
     /**
      *
-     * @param experimentPack
+     * @param parent
      * @param first
      * @param count
      * @return
      */
-    List<Experiment> getExperimentsByExperimentPack(ExperimentPack experimentPack, long first, long count);
+    List<Experiment> getExperimentsByParent(ExperimentPack parent, long first, long count);
 
     /**
      *
@@ -148,17 +140,17 @@ public interface ExperimentService extends Service {
 
     /**
      *
-     * @param experimentPack
+     * @param parent
      * @return
      */
-    List<Experiment> getStoppedExperimentsByExperimentPack(ExperimentPack experimentPack);
+    List<Experiment> getStoppedExperimentsByParent(ExperimentPack parent);
 
     /**
      *
-     * @param experimentPack
+     * @param parent
      * @return
      */
-    Experiment getFirstStoppedExperimentByExperimentPack(ExperimentPack experimentPack);
+    Experiment getFirstStoppedExperimentByParent(ExperimentPack parent);
 
     /**
      *
@@ -227,18 +219,18 @@ public interface ExperimentService extends Service {
 
     /**
      *
-     * @param experimentPack
+     * @param parent
      * @return
      */
-    long getNumExperimentsByExperimentPack(ExperimentPack experimentPack);
+    long getNumExperimentsByParent(ExperimentPack parent);
 
     /**
      *
-     * @param experimentPack
+     * @param parent
      * @param experimentState
      * @return
      */
-    long getNumExperimentsByExperimentPackAndState(ExperimentPack experimentPack, ExperimentState experimentState);
+    long getNumExperimentsByParentAndState(ExperimentPack parent, ExperimentState experimentState);
 
     /**
      *
@@ -254,21 +246,21 @@ public interface ExperimentService extends Service {
 
     /**
      *
-     * @param experimentPack
+     * @param parent
      */
-    void resetCompletedExperimentsByExperimentPack(ExperimentPack experimentPack);
+    void resetCompletedExperimentsByParent(ExperimentPack parent);
 
     /**
      *
-     * @param experimentPack
+     * @param parent
      */
-    void resetAbortedExperimentsByExperimentPack(ExperimentPack experimentPack);
+    void resetAbortedExperimentsByParent(ExperimentPack parent);
 
     /**
      *
-     * @param experimentTitle
+     * @param experiment
      */
-    void runExperimentByTitle(String experimentTitle);
+    void startExperiment(Experiment experiment);
 
     /**
      *

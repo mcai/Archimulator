@@ -108,13 +108,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
                                             List<ExperimentGauge> gauges = ServiceManager.getExperimentMetricService().getAllGauges(); //TODO: should use basic gauges only.
 
-                                            Experiment experiment = new Experiment(experimentType, architecture, -1, contextMappings, gauges);
-
-                                            if (getLatestExperimentByTitle(experiment.getTitle()) == null) {
-                                                addExperiment(experiment);
-                                            }
-
-                                            experimentPack.getExperimentTitles().add(experiment.getTitle());
+                                            addExperiment(new Experiment(experimentPack, experimentType, architecture, -1, contextMappings, gauges));
                                         }
 
                                         updateExperimentPack(experimentPack);
@@ -299,25 +293,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
     /**
      *
-     * @param titlePrefix
-     * @param stoppedExperimentsOnly
-     * @return
-     */
-    @Override
-    public List<Experiment> getExperimentsByTitlePrefix(String titlePrefix, boolean stoppedExperimentsOnly) {
-        List<Experiment> result = new ArrayList<Experiment>();
-
-        for (Experiment experiment : this.getAllExperiments()) {
-            if (experiment.getTitle().startsWith(titlePrefix) && getLatestExperimentByTitle(experiment.getTitle()).getId() == experiment.getId() && (!stoppedExperimentsOnly || experiment.isStopped())) {
-                result.add(experiment);
-            }
-        }
-
-        return result;
-    }
-
-    /**
-     *
      * @param title
      * @return
      */
@@ -374,14 +349,14 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
     /**
      *
-     * @param experimentPack
+     * @param parent
      * @return
      */
     @Override
-    public List<Experiment> getExperimentsByExperimentPack(ExperimentPack experimentPack) {
+    public List<Experiment> getExperimentsByParent(ExperimentPack parent) {
         try {
             PreparedQuery<Experiment> query = this.experiments.queryBuilder().where()
-                    .in("title", experimentPack.getExperimentTitles())
+                    .eq("parentId", parent.getId())
                     .prepare();
             return this.experiments.query(query);
         } catch (SQLException e) {
@@ -391,17 +366,17 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
     /**
      *
-     * @param experimentPack
+     * @param parent
      * @param first
      * @param count
      * @return
      */
     @Override
-    public List<Experiment> getExperimentsByExperimentPack(ExperimentPack experimentPack, long first, long count) {
+    public List<Experiment> getExperimentsByParent(ExperimentPack parent, long first, long count) {
         try {
             QueryBuilder<Experiment, Long> queryBuilder = this.experiments.queryBuilder();
             queryBuilder.offset(first).limit(count);
-            queryBuilder.where().in("title", experimentPack.getExperimentTitles());
+            queryBuilder.where().eq("parentId", parent.getId());
             PreparedQuery<Experiment> query = queryBuilder.prepare();
             return this.experiments.query(query);
         } catch (SQLException e) {
@@ -465,18 +440,18 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
     /**
      *
-     * @param experimentPack
+     * @param parent
      * @return
      */
     @Override
     @SuppressWarnings("unchecked")
-    public List<Experiment> getStoppedExperimentsByExperimentPack(ExperimentPack experimentPack) {
+    public List<Experiment> getStoppedExperimentsByParent(ExperimentPack parent) {
         try {
             QueryBuilder<Experiment, Long> queryBuilder = this.experiments.queryBuilder();
 
             Where<Experiment, Long> where = queryBuilder.where();
             where.and(
-                    where.in("title", experimentPack.getExperimentTitles()),
+                    where.eq("parentId", parent.getId()),
                     where.eq("state", ExperimentState.COMPLETED).or().eq("state", ExperimentState.ABORTED)
             );
 
@@ -489,13 +464,25 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
     /**
      *
-     * @param experimentPack
+     * @param parent
      * @return
      */
     @Override
-    public Experiment getFirstStoppedExperimentByExperimentPack(ExperimentPack experimentPack) {
-        List<Experiment> stoppedExperimentsByExperimentPack = getStoppedExperimentsByExperimentPack(experimentPack);
-        return stoppedExperimentsByExperimentPack.isEmpty() ? null : stoppedExperimentsByExperimentPack.get(0);
+    public Experiment getFirstStoppedExperimentByParent(ExperimentPack parent) {
+        try {
+            QueryBuilder<Experiment, Long> queryBuilder = this.experiments.queryBuilder();
+
+            Where<Experiment, Long> where = queryBuilder.where();
+            where.and(
+                    where.eq("parentId", parent.getId()),
+                    where.eq("state", ExperimentState.COMPLETED).or().eq("state", ExperimentState.ABORTED)
+            );
+
+            PreparedQuery<Experiment> query = queryBuilder.prepare();
+            return this.experiments.queryForFirst(query);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -595,14 +582,14 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
     /**
      *
-     * @param experimentPack
+     * @param parent
      * @return
      */
     @Override
-    public long getNumExperimentsByExperimentPack(ExperimentPack experimentPack) {
+    public long getNumExperimentsByParent(ExperimentPack parent) {
         try {
             PreparedQuery<Experiment> query = this.experiments.queryBuilder().setCountOf(true).where()
-                    .in("title", experimentPack.getExperimentTitles())
+                    .eq("parentId", parent.getId())
                     .prepare();
             return this.experiments.countOf(query);
         } catch (SQLException e) {
@@ -612,15 +599,15 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
     /**
      *
-     * @param experimentPack
+     * @param parent
      * @param experimentState
      * @return
      */
     @Override
-    public long getNumExperimentsByExperimentPackAndState(ExperimentPack experimentPack, ExperimentState experimentState) {
+    public long getNumExperimentsByParentAndState(ExperimentPack parent, ExperimentState experimentState) {
         try {
             PreparedQuery<Experiment> query = this.experiments.queryBuilder().setCountOf(true).where()
-                    .in("title", experimentPack.getExperimentTitles())
+                    .eq("parentId", parent.getId())
                     .and()
                     .eq("state", experimentState)
                     .prepare();
@@ -638,7 +625,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     public void startExperimentPack(ExperimentPack experimentPack) {
         try {
             UpdateBuilder<Experiment, Long> updateBuilder = this.experiments.updateBuilder();
-            updateBuilder.where().in("title", experimentPack.getExperimentTitles()).and().eq("state", ExperimentState.PENDING);
+            updateBuilder.where().eq("parentId", experimentPack.getId()).and().eq("state", ExperimentState.PENDING);
             updateBuilder.updateColumnValue("state", ExperimentState.READY_TO_RUN);
             PreparedUpdate<Experiment> update = updateBuilder.prepare();
             this.experiments.update(update);
@@ -655,7 +642,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     public void stopExperimentPack(ExperimentPack experimentPack) {
         try {
             UpdateBuilder<Experiment, Long> updateBuilder = this.experiments.updateBuilder();
-            updateBuilder.where().in("title", experimentPack.getExperimentTitles()).and().eq("state", ExperimentState.READY_TO_RUN);
+            updateBuilder.where().eq("parentId", experimentPack.getId()).and().eq("state", ExperimentState.READY_TO_RUN);
             updateBuilder.updateColumnValue("state", ExperimentState.PENDING);
             PreparedUpdate<Experiment> update = updateBuilder.prepare();
             this.experiments.update(update);
@@ -666,17 +653,17 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
     /**
      *
-     * @param experimentPack
+     * @param parent
      */
     @Override
     @SuppressWarnings("unchecked")
-    public void resetCompletedExperimentsByExperimentPack(ExperimentPack experimentPack) {
+    public void resetCompletedExperimentsByParent(ExperimentPack parent) {
         try {
             UpdateBuilder<Experiment, Long> updateBuilder = this.experiments.updateBuilder();
 
             Where<Experiment, Long> where = updateBuilder.where();
             where.and(
-                    where.in("title", experimentPack.getExperimentTitles()),
+                    where.eq("parentId", parent.getId()),
                     where.eq("state", ExperimentState.COMPLETED)
             );
 
@@ -691,17 +678,17 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
     /**
      *
-     * @param experimentPack
+     * @param parent
      */
     @Override
     @SuppressWarnings("unchecked")
-    public void resetAbortedExperimentsByExperimentPack(ExperimentPack experimentPack) {
+    public void resetAbortedExperimentsByParent(ExperimentPack parent) {
         try {
             UpdateBuilder<Experiment, Long> updateBuilder = this.experiments.updateBuilder();
 
             Where<Experiment, Long> where = updateBuilder.where();
             where.and(
-                    where.in("title", experimentPack.getExperimentTitles()),
+                    where.eq("parentId", parent.getId()),
                     where.eq("state", ExperimentState.ABORTED)
             );
 
@@ -716,13 +703,13 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
     /**
      *
-     * @param experimentTitle
+     * @param experiment
      */
     @Override
-    public void runExperimentByTitle(String experimentTitle) {
+    public void startExperiment(Experiment experiment) {
         try {
             UpdateBuilder<Experiment, Long> updateBuilder = this.experiments.updateBuilder();
-            updateBuilder.where().eq("title", experimentTitle).and().eq("state", ExperimentState.PENDING);
+            updateBuilder.where().eq("id", experiment.getId()).and().eq("state", ExperimentState.PENDING);
             updateBuilder.updateColumnValue("state", ExperimentState.READY_TO_RUN);
             PreparedUpdate<Experiment> update = updateBuilder.prepare();
             this.experiments.update(update);

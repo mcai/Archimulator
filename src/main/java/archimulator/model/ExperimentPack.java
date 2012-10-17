@@ -19,8 +19,7 @@
 package archimulator.model;
 
 import archimulator.service.ServiceManager;
-import archimulator.util.ExperimentPackVariableArrayListJsonSerializableType;
-import archimulator.util.StringArrayListJsonSerializableType;
+import archimulator.util.serialization.ExperimentPackVariableArrayListJsonSerializableType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import net.pickapack.action.Function1;
@@ -58,9 +57,6 @@ public class ExperimentPack implements ModelElement {
     @DatabaseField(persisterClass = ExperimentPackVariableArrayListJsonSerializableType.class)
     private ArrayList<ExperimentPackVariable> variables;
 
-    @DatabaseField(persisterClass = StringArrayListJsonSerializableType.class)
-    private ArrayList<String> experimentTitles;
-
     private transient ExperimentSpec baselineExperimentSpec;
 
     /**
@@ -68,7 +64,6 @@ public class ExperimentPack implements ModelElement {
      */
     public ExperimentPack() {
         this.createTime = DateHelper.toTick(new Date());
-        this.experimentTitles = new ArrayList<String>();
     }
 
     /**
@@ -214,7 +209,7 @@ public class ExperimentPack implements ModelElement {
                     ExperimentSpec experimentSpec = (ExperimentSpec) BeanUtils.cloneBean(this.getBaselineExperimentSpec());
                     int i = 0;
                     for (String value : combination) {
-                        String name = this.getVariables().get(i++).getName();
+                        String name = this.variables.get(i++).getName();
                         BeanUtils.setProperty(experimentSpec, name, value);
                     }
                     experimentSpecs.add(experimentSpec);
@@ -242,13 +237,5 @@ public class ExperimentPack implements ModelElement {
                 return variable.getValues();
             }
         }));
-    }
-
-    /**
-     *
-     * @return
-     */
-    public List<String> getExperimentTitles() {
-        return experimentTitles;
     }
 }

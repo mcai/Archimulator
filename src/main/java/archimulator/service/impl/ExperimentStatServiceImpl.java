@@ -158,17 +158,17 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
      */
     @Override
     public Table tableSummary(String title, Experiment baselineExperiment, List<Experiment> experiments) {
-        boolean helperThreadEnabled = baselineExperiment.getContextMappings().get(0).getBenchmark().getHelperThreadEnabled();
+        boolean helperThreadEnabled = baselineExperiment != null && baselineExperiment.getContextMappings().get(0).getBenchmark().getHelperThreadEnabled();
 
         List<String> columns = helperThreadEnabled ? Arrays.asList(
                 "Experiment", "L2 Size", "L2 Assoc", "L2 Repl",
                 "Lookahead", "Stride",
                 "Total Cycles", "Speedup", "IPC", "CPI",
-                "Main Thread Hit", "Main Thread Miss", "L2 Hit Ratio", "L2 Evictions", "L2 Occupancy Ratio", "Helper Thread Hit", "Helper Thread Miss", "Helper Thread Coverage", "Helper Thread Accuracy", "Redundant MSHR", "Redundant Cache", "Timely", "Late", "Bad", "Ugly"
+                "L2 Downward Read MPKI", "Main Thread Hit", "Main Thread Miss", "L2 Hit Ratio", "L2 Evictions", "L2 Occupancy Ratio", "Helper Thread Hit", "Helper Thread Miss", "Helper Thread Coverage", "Helper Thread Accuracy", "Redundant MSHR", "Redundant Cache", "Timely", "Late", "Bad", "Ugly"
         ) : Arrays.asList(
                 "Experiment", "L2 Size", "L2 Assoc", "L2 Repl",
                 "Total Cycles", "Speedup", "IPC", "CPI",
-                "Main Thread Hit", "Main Thread Miss", "L2 Hit Ratio", "L2 Evictions", "L2 Occupancy Ratio"
+                "L2 Downward Read MPKI", "Main Thread Hit", "Main Thread Miss", "L2 Hit Ratio", "L2 Evictions", "L2 Occupancy Ratio"
         );
 
         List<List<String>> rows = new ArrayList<List<String>>();
@@ -200,6 +200,11 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
 
             row.add(String.format("%.4f", Double.parseDouble(experiment.getStatValue(statsMap, experiment.getMeasurementTitlePrefix() +
                     "simulation/cyclesPerInstruction"))));
+
+            long numL2DownwardReadMisses = Long.parseLong(experiment.getStatValue(statsMap, experiment.getMeasurementTitlePrefix() + "l2/numDownwardReadMisses"));
+            long totalInstructions = Long.parseLong(experiment.getStatValue(statsMap, experiment.getMeasurementTitlePrefix() + "simulation/totalInstructions"));
+
+            row.add(String.format("%.4f", (double) numL2DownwardReadMisses / (totalInstructions / FileUtils.ONE_KB)));
 
             row.add(experiment.getStatValue(statsMap, experiment.getMeasurementTitlePrefix() +
                     "helperThreadL2CacheRequestProfilingHelper/numMainThreadL2CacheHits"));
