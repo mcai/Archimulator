@@ -223,6 +223,12 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
                         fsm.stall(sender, event);
                     }
                 }, CacheControllerState.IM_A)
+                .onCondition(CacheControllerEventType.RECALL, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, FwdGetMEvent>() {
+                    @Override
+                    public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, FwdGetMEvent event) {
+                        fsm.stall(sender, event);
+                    }
+                }, CacheControllerState.IM_A)
                 .onCondition(CacheControllerEventType.INV_ACK, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, InvAckEvent>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, InvAckEvent event) {
