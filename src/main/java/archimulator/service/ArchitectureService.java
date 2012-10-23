@@ -32,81 +32,91 @@ import java.util.List;
  */
 public interface ArchitectureService extends Service {
     /**
+     * Get all architectures.
      *
-     * @return
+     * @return all architectures
      */
     List<Architecture> getAllArchitectures();
 
     /**
+     * Get all architectures by offset and count.
      *
-     * @param first
-     * @param count
-     * @return
+     * @param first offset
+     * @param count count
+     * @return all architectures by offset and count
      */
     List<Architecture> getAllArchitectures(long first, long count);
 
     /**
+     * Get the number of all architectures.
      *
-     * @return
+     * @return the number of all architectures
      */
     long getNumAllArchitectures();
 
     /**
+     * Get the architecture by id.
      *
-     * @param id
-     * @return
+     * @param id the architecture's id
+     * @return the architecture matching the id if any exists, otherwise null
      */
     Architecture getArchitectureById(long id);
 
     /**
+     * Get the architecture by title.
      *
-     * @param title
-     * @return
+     * @param title the architecture's title
+     * @return the architecture matching the title if any exists, otherwise null
      */
     Architecture getArchitectureByTitle(String title);
 
     /**
+     * Get the first architecture.
      *
-     * @return
+     * @return the first architecture if any exists, otherwise null
      */
     Architecture getFirstArchitecture();
 
     /**
+     * Add an architecture.
      *
-     * @param architecture
+     * @param architecture the architecture to be added
      */
     void addArchitecture(Architecture architecture);
 
     /**
+     * Remove the architecture by id.
      *
-     * @param id
+     * @param id the architecture's id
      */
     void removeArchitectureById(long id);
 
     /**
-     *
+     * Clear all architectures.
      */
     void clearArchitectures();
 
     /**
+     * Update the specified architecture.
      *
-     * @param architecture
+     * @param architecture the architecture to be updated
      */
     void updateArchitecture(Architecture architecture);
 
     /**
+     * Get or update an architecture matching the given parameters.
      *
-     * @param htLLCRequestProfilingEnabled
-     * @param numCores
-     * @param numThreadsPerCore
-     * @param l1ISize
-     * @param l1IAssoc
-     * @param l1DSize
-     * @param l1DAssoc
-     * @param l2Size
-     * @param l2Assoc
-     * @param l2ReplacementPolicyType
-     * @return
+     * @param htLLCRequestProfilingEnabled the value indicating whether helper thread LLC request profiling is enabled or not
+     * @param numCores the number of cores
+     * @param numThreadsPerCore number of threads per core
+     * @param l1ISize L1 instruction cache size
+     * @param l1IAssoc L1 instruction cache associativity
+     * @param l1DSize L1 data cache size
+     * @param l1DAssoc L1 data cache associativity
+     * @param l2Size L2 cache size
+     * @param l2Assoc L2 cache associativity
+     * @param l2ReplacementPolicyType L2 cache replacement policy type
+     * @return the existing or newly added architecture matching the given parameters
      */
     Architecture getOrAddArchitecture(boolean htLLCRequestProfilingEnabled, int numCores, int numThreadsPerCore, int l1ISize, int l1IAssoc, int l1DSize, int l1DAssoc, int l2Size, int l2Assoc, CacheReplacementPolicyType l2ReplacementPolicyType);
 }
