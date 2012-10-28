@@ -74,7 +74,7 @@ Quick Start
 ------------------
 
 0. For Debian based Linux distros (other distros can be similarly prepared):
-sudo apt-get install build-essential git-core mysql-server phpmyadmin
+sudo apt-get install build-essential ia32-libs git-core mysql-server phpmyadmin
 
 1. git clone git://github.com/mcai/Pickapack.Micro.git;
 cd Pickapack.Micro;
