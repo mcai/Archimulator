@@ -52,8 +52,8 @@ Key Features
 	- Support the software-controlled helper threaded data prefetching scheme: classification of good, bad and ugly HT requests.
 
 - Archimulator provides the following **common infrastructure**:
-	- Cycle-accurate event scheduling and dispatching framework for modeling asynchronous activities;
-	- XML-based I/O for configuring and reporting statistics of the simulated architectures, workloads and simulations;
+	- Scheduling and dispatching framework for modeling synchronous (cycle accurate) and asynchronous activities;
+	- Database/ORM supported configuration and statistics reporting of the simulated architectures, workloads and simulations;
 	- An easy-to-use logging mechanism.
 
 - Archimulator currently supports correct execution of all the **Olden benchmark suite** except incorrect output from "health".
@@ -73,7 +73,8 @@ For **developing and running Archimulator**, make sure that:
 Quick Start
 ------------------
 
-0. sudo apt-get install build-essential git-core mysql-server phpmyadmin
+0. For Debian based Linux distros (other distros can be similarly prepared):
+sudo apt-get install build-essential git-core mysql-server phpmyadmin
 
 1. git clone git://github.com/mcai/Pickapack.Micro.git;
 cd Pickapack.Micro;
@@ -92,8 +93,10 @@ mvn clean install war:war
 Customizing Archimulator for Your Needs
 ------------------
 
-Archimulator has shipped a few benchmark binaries under the directory: `benchmarks/` for your convenience.
+- Archimulator has shipped a few benchmark binaries under the directory: `benchmarks/` for your convenience.
 So if you use Archimulator for testing purposes only, there is no need to compile benchmarks for Archimulator by yourself.
+
+- As is always true for open source software, the existing Archimulator code are good examples for demonstrating its usage and power.
 
 Contact
 ------------------
