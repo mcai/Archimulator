@@ -154,7 +154,7 @@ void fill_from_fields(node_t *nodelist, int degree) {
 
   node_t *cur_node;
   cur_node = nodelist;
-  push_start(&cur_node,1);
+  push_start(&cur_node);
   for(cur_node = nodelist; cur_node; cur_node = cur_node->next) {
     int j;
     for (j=0; j<degree; j++) {

@@ -10,6 +10,6 @@
 
 void push_thread_func();
 
-void push_start(void*, int);
+void push_start(void*);
 
 #endif
