@@ -182,7 +182,7 @@ void fill_from_fields(node_t *nodelist, int degree) {
     }
   }
     
-  push_flag = -1;
+  push_flag = 0;
     
 #if defined(SIMICS)
     MAGIC(9002);

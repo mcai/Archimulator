@@ -2,13 +2,11 @@
 
 #include "push.h"
 
-int volatile i_sem = 0;
-
 node_t** volatile curr_pointer_addr;
 
 extern int d_nodes;
 
-int volatile push_flag = -1;
+int volatile push_flag = 0;
 
 inline void push_thread_func()
 {
@@ -38,39 +36,32 @@ inline void push_thread_func()
   //////////////////////////
 
   while (1) {
-    while (i_sem<=0);
-    i_sem--;
+    while(!push_flag);
 
-    if(push_flag == 1) {
-      to_curr_p = (node_t**)curr_pointer_addr;
-      curr_p = (node_t*)(*to_curr_p);
-      while (curr_p) {
-        for(j=0; j<lookahead && curr_p && push_flag; curr_p=curr_p->next);
+    to_curr_p = (node_t**)curr_pointer_addr;
+    curr_p = (node_t*)(*to_curr_p);
+    while (curr_p) {
+        for(i = 0; curr_p && i < lookahead; i++, curr_p = curr_p->next);
 
-        while (curr_p && i++<stride) {
-          for (j = 0;j<degree;j++) {
-            volatile int count,thecount;
-            void* volatile pushaddr;
-            node_t * volatile temp_other = curr_p->to_nodes[j];
-            double volatile **otherlist;
-            volatile double *value = curr_p->value;
-            if (temp_other) {
-              count = temp_other->from_length;
-              otherlist = temp_other->from_values;
+        for(i = 0; curr_p && i < stride; i++) {
+            for (j = 0;j < degree;j++) {
+                volatile int count, thecount;
+                void* volatile pushaddr;
+                node_t * volatile temp_other = curr_p->to_nodes[j];
+                double volatile **otherlist;
+                volatile double *value = curr_p->value;
+                if (temp_other) {
+                    count = temp_other->from_length;
+                    otherlist = temp_other->from_values;
+                }
+                pushaddr = &(otherlist[count]);
+                __builtin_prefetch(pushaddr);
             }
-            pushaddr = &(otherlist[count]);
-            __builtin_prefetch(pushaddr);
-          }
-          curr_p = curr_p->next;
+            curr_p = curr_p->next;
         }
-        i = 0;
         curr_p = (node_t*)(*to_curr_p);
         if (curr_p) curr_p = curr_p->next;
       }
-    }
-    else {
-        continue;
-    }
   }
 }
 
@@ -78,5 +69,4 @@ inline void push_start(void* curr_addr)
 {
   curr_pointer_addr  = (node_t**)curr_addr;
   push_flag = 1;
-  i_sem++;
 }
