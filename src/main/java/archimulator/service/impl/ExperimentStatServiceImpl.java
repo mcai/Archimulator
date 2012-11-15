@@ -150,12 +150,6 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
         }
     }
 
-
-    /**
-     * @param title
-     * @param baselineExperiment
-     * @param experiments
-     */
     @Override
     public Table tableSummary(String title, Experiment baselineExperiment, List<Experiment> experiments) {
         boolean helperThreadEnabled = baselineExperiment != null && baselineExperiment.getContextMappings().get(0).getBenchmark().getHelperThreadEnabled();
@@ -241,6 +235,96 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
                         "helperThreadL2CacheRequestProfilingHelper/numBadHelperThreadL2CacheRequests"));
                 row.add(experiment.getStatValue(statsMap, experiment.getMeasurementTitlePrefix() +
                         "helperThreadL2CacheRequestProfilingHelper/numUglyHelperThreadL2CacheRequests"));
+            }
+
+            rows.add(row);
+        }
+
+        return new Table(title, columns, rows);
+    }
+
+    @Override
+    public Table tableSummary2(String title, Experiment baselineExperiment, List<Experiment> experiments) {
+        final boolean helperThreadEnabled = baselineExperiment != null && baselineExperiment.getContextMappings().get(0).getBenchmark().getHelperThreadEnabled();
+
+        List<String> columns = new ArrayList<String>(){{
+            addAll(Arrays.asList("Experiment", "L2 Size In KB", "L2 Assoc", "L2 Repl"));
+
+            if(helperThreadEnabled) {
+                addAll(Arrays.asList("Lookahead", "Stride"));
+            }
+
+            addAll(Arrays.asList("Total Cycles", "Speedup"));
+
+            addAll(Arrays.asList("MT Hits", "MT Misses"));
+
+            if(helperThreadEnabled) {
+                addAll(Arrays.asList("HT Hits", "HT Misses"));
+            }
+
+            addAll(Arrays.asList("L2 Evictions"));
+
+            if(helperThreadEnabled) {
+                addAll(Arrays.asList("HT Coverage", "HT Accuracy", "Late", "Timely", "Bad", "Ugly", "Redundant MSHR", "Redundant Cache"));
+            }
+        }};
+
+        List<List<String>> rows = new ArrayList<List<String>>();
+
+        for (Experiment experiment : experiments) {
+            Map<String, ExperimentStat> statsMap = ExperimentStat.toMap(ServiceManager.getExperimentStatService().getStatsByParent(experiment));
+
+            List<String> row = new ArrayList<String>();
+
+            row.add("exp#" + experiment.getId());
+
+            row.add(StorageUnit.KILOBYTE.getValue(experiment.getArchitecture().getL2Size()) + "KB");
+
+            row.add(experiment.getArchitecture().getL2Associativity() + "way");
+            row.add(experiment.getArchitecture().getL2ReplacementPolicyType() + "");
+
+            if (helperThreadEnabled) {
+                row.add(experiment.getContextMappings().get(0).getHelperThreadLookahead() + "");
+                row.add(experiment.getContextMappings().get(0).getHelperThreadStride() + "");
+            }
+
+            row.add(experiment.getStatValue(statsMap, experiment.getMeasurementTitlePrefix() + "simulation/cycleAccurateEventQueue/currentCycle"));
+
+            row.add(String.format("%.4f", getSpeedup(baselineExperiment, experiment)));
+
+            row.add(experiment.getStatValue(statsMap, experiment.getMeasurementTitlePrefix() +
+                    "helperThreadL2CacheRequestProfilingHelper/numMainThreadL2CacheHits"));
+            row.add(experiment.getStatValue(statsMap, experiment.getMeasurementTitlePrefix() +
+                    "helperThreadL2CacheRequestProfilingHelper/numMainThreadL2CacheMisses"));
+
+            if (helperThreadEnabled) {
+                row.add(experiment.getStatValue(statsMap, experiment.getMeasurementTitlePrefix() +
+                        "helperThreadL2CacheRequestProfilingHelper/numHelperThreadL2CacheHits"));
+                row.add(experiment.getStatValue(statsMap, experiment.getMeasurementTitlePrefix() +
+                        "helperThreadL2CacheRequestProfilingHelper/numHelperThreadL2CacheMisses"));
+            }
+
+            row.add(experiment.getStatValue(statsMap, experiment.getMeasurementTitlePrefix() +
+                    "l2/numEvictions"));
+
+            if (helperThreadEnabled) {
+                row.add(experiment.getStatValue(statsMap, experiment.getMeasurementTitlePrefix() +
+                        "helperThreadL2CacheRequestProfilingHelper/helperThreadL2CacheRequestCoverage"));
+                row.add(experiment.getStatValue(statsMap, experiment.getMeasurementTitlePrefix() +
+                        "helperThreadL2CacheRequestProfilingHelper/helperThreadL2CacheRequestAccuracy"));
+
+                row.add(experiment.getStatValue(statsMap, experiment.getMeasurementTitlePrefix() +
+                        "helperThreadL2CacheRequestProfilingHelper/numLateHelperThreadL2CacheRequests"));
+                row.add(experiment.getStatValue(statsMap, experiment.getMeasurementTitlePrefix() +
+                        "helperThreadL2CacheRequestProfilingHelper/numTimelyHelperThreadL2CacheRequests"));
+                row.add(experiment.getStatValue(statsMap, experiment.getMeasurementTitlePrefix() +
+                        "helperThreadL2CacheRequestProfilingHelper/numBadHelperThreadL2CacheRequests"));
+                row.add(experiment.getStatValue(statsMap, experiment.getMeasurementTitlePrefix() +
+                        "helperThreadL2CacheRequestProfilingHelper/numUglyHelperThreadL2CacheRequests"));
+                row.add(experiment.getStatValue(statsMap, experiment.getMeasurementTitlePrefix() +
+                        "helperThreadL2CacheRequestProfilingHelper/numRedundantHitToTransientTagHelperThreadL2CacheRequests"));
+                row.add(experiment.getStatValue(statsMap, experiment.getMeasurementTitlePrefix() +
+                        "helperThreadL2CacheRequestProfilingHelper/numRedundantHitToCacheHelperThreadL2CacheRequests"));
             }
 
             rows.add(row);

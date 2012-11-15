@@ -81,6 +81,13 @@ public interface ExperimentStatService extends Service {
     Table tableSummary(String title, Experiment baselineExperiment, List<Experiment> experiments);
 
     /**
+     * @param title
+     * @param baselineExperiment
+     * @param experiments
+     */
+    Table tableSummary2(String title, Experiment baselineExperiment, List<Experiment> experiments);
+
+    /**
      * @param experiments
      * @param keysFunction
      * @return
