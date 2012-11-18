@@ -40,6 +40,10 @@
 #if defined(SPEC_CPU)
 #include "specrand.h"
 #endif /* SPEC_CPU */
+    
+#if defined(SIMICS)
+#include <simics/magic-instruction.h>
+#endif
 
 #include "push.h"
 
@@ -67,7 +71,7 @@ int main(int argc, char **argv) {
     }
 
     N = atoi(argv[1]);
-
+    
   if(N<15)
     {
         printf("Invalid number\n\n");
@@ -92,12 +96,12 @@ int main(int argc, char **argv) {
 #endif /* SPEC_CPU */
     }
 
-    printf("Random seed: %i\n", x);
+    printf("Random seed: %i\n", x);    
     
-    qr = quantum_new_qureg(0, width); 
+    qr = quantum_new_qureg(0, width);
 
     for (i = 0; i < width; i++)
-        quantum_hadamard(i, &qr);
+        quantum_hadamard(i, &qr);        
     
     quantum_addscratch(3* swidth + 2, &qr);
 
@@ -176,7 +180,7 @@ int main(int argc, char **argv) {
     else
         factor = b;
     
-    thread_destroy(push_thread_id);
+    //thread_destroy(push_thread_id);
     
     cur_reg = NULL;
     

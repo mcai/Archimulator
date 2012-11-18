@@ -76,13 +76,6 @@ long read_min( net )
 
     assert( net->max_new_m >= 3 );
 
-	printf("net->n: %d\n", net->n);
-	printf("net->max_m: %d\n", net->max_m);
-	printf("sizeof(node_t): %d\n", sizeof(node_t));
-	printf("sizeof(arc_t): %d\n", sizeof(arc_t));
-	printf("sizeof(arc_t): %d\n", sizeof(arc_t));
-	
-	printf("sum: %d\n", (net->n + 1) * sizeof(node_t) + net->n * sizeof(arc_t) + net->max_m * sizeof(arc_t));
     
     net->nodes      = (node_t *) calloc( net->n + 1, sizeof(node_t) );
     net->dummy_arcs = (arc_t *)  calloc( net->n,   sizeof(arc_t) );

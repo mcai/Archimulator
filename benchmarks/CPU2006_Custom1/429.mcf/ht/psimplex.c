@@ -27,6 +27,10 @@ Copyright (c) 2003-2005 Andreas Loebel.
 #include "push.h"
 
 #include <sys/syscall.h>
+    
+#if defined(SIMICS)
+#include <simics/magic-instruction.h>
+#endif
 
 #ifdef _PROTO_
 long primal_net_simplex( network_t *net )

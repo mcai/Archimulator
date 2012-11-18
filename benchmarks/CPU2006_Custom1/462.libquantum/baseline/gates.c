@@ -74,8 +74,6 @@ quantum_cnot(int control, int target, quantum_reg *reg)
     }
 }
 
-//~ int counter = 0;
-
 /* Apply a toffoli (or controlled-controlled-not) gate */
 
 void
@@ -113,10 +111,6 @@ quantum_toffoli(int control1, int control2, int target, quantum_reg *reg)
 
         quantum_decohere(reg);
     }
-    
-    //~ counter++;
-    
-    //~ printf("counter: %d\n", counter);
     
 #if defined(SIMICS)
     MAGIC(9002);

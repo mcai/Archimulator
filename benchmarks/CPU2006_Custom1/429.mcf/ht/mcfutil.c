@@ -21,6 +21,10 @@ Copyright (c) 2003-2005 Andreas Loebel.
 
 
 #include "mcfutil.h"
+    
+#if defined(SIMICS)
+#include <simics/magic-instruction.h>
+#endif
 
 #include "push.h"
 
@@ -78,7 +82,7 @@ long refresh_potential( net )
     node_t *node, *tmp;
     node_t *root = net->nodes;
     long checksum = 0;
-
+    
     g_root = root;
     inter_push_flag  = 2;
 

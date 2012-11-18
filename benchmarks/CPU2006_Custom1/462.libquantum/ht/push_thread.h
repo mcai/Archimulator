@@ -5,8 +5,6 @@
 
 #include <pthread.h>
 
-void cpu_set(int i);
-
 pthread_t thread_spawn(void* thread_func_p);
 
 void thread_destroy(pthread_t thread_id);

@@ -41,7 +41,7 @@ inline void push_thread_func()
         p_root = g_root;
         p_tmp = p_push = p_root->child;
         while ( p_push!=p_root) {
-          for (i=0; i<STEP && (p_push != p_root); i++) {
+          for (i=0; i<LOOKAHEAD && (p_push != p_root); i++) {
             while (p_push) {
               p_tmp = p_push;
               p_push = p_push->child;
@@ -57,7 +57,7 @@ inline void push_thread_func()
               }
             }
           }
-          for (i=0; i<BLOCKSIZE && (p_push != p_root); i++) {
+          for (i=0; i<STRIDE && (p_push != p_root); i++) {
             while (p_push) {
               PUSHDATA(&(p_push->basic_arc->cost));
               p_tmp = p_push;

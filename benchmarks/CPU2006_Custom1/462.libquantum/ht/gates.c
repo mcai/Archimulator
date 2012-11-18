@@ -42,6 +42,10 @@
 #define EPSILON 1.0e-9
 #endif /* SPEC_CPU */
 /* Apply a controlled-not gate */
+    
+#if defined(SIMICS)
+#include <simics/magic-instruction.h>
+#endif
 
 #include "push.h"
 
@@ -80,7 +84,7 @@ volatile int i_quantum_toffoli = 0;
 
 void
 quantum_toffoli(int control1, int control2, int target, quantum_reg *reg)
-{    
+{
 #if defined(SIMICS)
     MAGIC(9001);
 #endif
@@ -96,7 +100,8 @@ quantum_toffoli(int control1, int control2, int target, quantum_reg *reg)
     {
         if (quantum_objcode_put(TOFFOLI, control1, control2, target))
             return;
-                
+
+        //TODO: It is better that we use local variable and sync with the global one in the end?
         for(i_quantum_toffoli=0; i_quantum_toffoli<reg->size; i_quantum_toffoli++)
         {
             /* Flip the target bit of a basis state if both control bits are

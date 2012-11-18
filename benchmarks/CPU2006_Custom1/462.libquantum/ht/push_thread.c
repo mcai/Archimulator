@@ -2,7 +2,6 @@
 
 #define __USE_GNU
 
-#include <sched.h>
 #include <pthread.h>
     
 #if defined(SIMICS)
@@ -10,19 +9,6 @@
 #endif
 
 #include "push_thread.h"
-
-inline void cpu_set(int i)
-{
-    //TODO: the following code can not work under Simics, so commented.
-    //~ cpu_set_t mask;
-//~ 
-    //~ CPU_ZERO(&mask);
-    //~ CPU_SET(i, &mask);
-//~ 
-    //~ if (sched_setaffinity(0, sizeof(mask), &mask) == -1) {
-        //~ perror("CPU set error.\n");
-    //~ }
-}
 
 inline pthread_t thread_spawn(void* thread_func_p)
 {
