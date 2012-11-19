@@ -20,6 +20,7 @@ package archimulator.model.metric;
 
 import archimulator.model.Experiment;
 import archimulator.service.ServiceManager;
+import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import net.pickapack.dateTime.DateHelper;
@@ -39,7 +40,7 @@ public class ExperimentStat implements ModelElement {
     @DatabaseField(generatedId = true)
     private long id;
 
-    @DatabaseField
+    @DatabaseField(dataType = DataType.LONG_STRING)
     private String title;
 
     @DatabaseField
@@ -48,7 +49,7 @@ public class ExperimentStat implements ModelElement {
     @DatabaseField
     private long parentId;
 
-    @DatabaseField
+    @DatabaseField(dataType = DataType.LONG_STRING)
     private String prefix;
 
     @DatabaseField
