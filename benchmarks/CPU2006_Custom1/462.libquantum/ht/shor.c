@@ -23,6 +23,8 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <sys/syscall.h>
+
 #if !defined(SPEC_CPU_WINDOWS_ICL)
 #include <math.h>
 #else
@@ -115,6 +117,12 @@ int main(int argc, char **argv) {
     
 #if defined(SIMICS)
     MAGIC(9007);
+#endif
+          
+  //~ syscall(500, 0); // enter detailed simulation
+
+#ifdef MIPS_1
+  asm volatile ("addiu $0,$0,3720");
 #endif
 
     quantum_exp_mod_n(N, x, width, swidth, &qr);
