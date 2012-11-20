@@ -68,10 +68,17 @@ public interface ExperimentStatService extends Service {
 
     /**
      * @param parent
+     * @param prefix
      * @param gauge
      * @return
      */
-    List<ExperimentStat> getStatsByParentAndGauge(Experiment parent, ExperimentGauge gauge);
+    List<ExperimentStat> getStatsByParentAndPrefixAndGauge(Experiment parent, String prefix, ExperimentGauge gauge);
+
+    /**
+     * @param parent
+     * @return
+     */
+    List<String> getStatPrefixesByParent(Experiment parent);
 
     /**
      * @param title

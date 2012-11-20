@@ -30,12 +30,14 @@ import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.PreparedDelete;
 import com.j256.ormlite.stmt.PreparedQuery;
+import com.j256.ormlite.stmt.QueryBuilder;
 import net.pickapack.Pair;
 import net.pickapack.StorageUnit;
 import net.pickapack.action.Function1;
 import net.pickapack.action.Function2;
 import net.pickapack.model.ModelElement;
 import net.pickapack.service.AbstractService;
+import net.pickapack.util.CollectionHelper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.math3.stat.StatUtils;
@@ -137,14 +139,33 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
     }
 
     @Override
-    public List<ExperimentStat> getStatsByParentAndGauge(Experiment parent, ExperimentGauge gauge) {
+    public List<ExperimentStat> getStatsByParentAndPrefixAndGauge(Experiment parent, String prefix, ExperimentGauge gauge) {
         try {
             PreparedQuery<ExperimentStat> query = this.stats.queryBuilder().where()
                     .eq("parentId", parent.getId())
                     .and()
+                    .eq("prefix", prefix)
+                    .and()
                     .eq("gaugeId", gauge.getId())
                     .prepare();
             return this.stats.query(query);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<String> getStatPrefixesByParent(Experiment parent) {
+        try {
+            QueryBuilder<ExperimentStat,Long> queryBuilder = this.stats.queryBuilder();
+            queryBuilder.where().eq("parentId", parent.getId());
+            PreparedQuery<ExperimentStat> query = queryBuilder.distinct().selectColumns("prefix").prepare();
+            return CollectionHelper.transform(this.stats.query(query), new Function1<ExperimentStat, String>() {
+                @Override
+                public String apply(ExperimentStat stat) {
+                    return stat.getPrefix();
+                }
+            });
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
