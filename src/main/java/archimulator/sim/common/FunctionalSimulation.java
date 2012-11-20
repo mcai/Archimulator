@@ -38,7 +38,7 @@ public class FunctionalSimulation extends Simulation {
      * @param numMaxInstructions
      */
     public FunctionalSimulation(String title, Experiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, int numMaxInstructions) {
-        super(title, SimulationType.FAST_FORWARD, experiment, blockingEventDispatcher, cycleAccurateEventQueue);
+        super(title, SimulationType.FAST_FORWARD, experiment, blockingEventDispatcher, cycleAccurateEventQueue, null);
 
         this.numMaxInstructions = numMaxInstructions;
     }

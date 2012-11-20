@@ -30,7 +30,6 @@ import net.pickapack.event.CycleAccurateEventQueue;
  */
 public class FromRoiDetailedSimulation extends Simulation {
     private long numMaxInstructions;
-    private Reference<Kernel> kernelRef;
 
     /**
      *
@@ -42,10 +41,9 @@ public class FromRoiDetailedSimulation extends Simulation {
      * @param kernelRef
      */
     public FromRoiDetailedSimulation(String title, Experiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, long numMaxInstructions, Reference<Kernel> kernelRef) {
-        super(title, SimulationType.MEASUREMENT, experiment, blockingEventDispatcher, cycleAccurateEventQueue);
+        super(title, SimulationType.MEASUREMENT, experiment, blockingEventDispatcher, cycleAccurateEventQueue, kernelRef);
 
         this.numMaxInstructions = numMaxInstructions;
-        this.kernelRef = kernelRef;
     }
 
     /**
@@ -72,7 +70,7 @@ public class FromRoiDetailedSimulation extends Simulation {
      */
     @Override
     public boolean canDoMeasurementOneCycle() {
-        return this.getProcessor().getCores().get(0).getThreads().get(0).getTotalInstructions() < this.numMaxInstructions;
+        return numMaxInstructions == -1 || this.getProcessor().getCores().get(0).getThreads().get(0).getTotalInstructions() < this.numMaxInstructions;
     }
 
     /**

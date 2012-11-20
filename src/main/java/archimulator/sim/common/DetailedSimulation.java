@@ -38,7 +38,7 @@ public class DetailedSimulation extends Simulation {
      * @param numMaxInstructions
      */
     public DetailedSimulation(String title, Experiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, int numMaxInstructions) {
-        super(title, SimulationType.MEASUREMENT, experiment, blockingEventDispatcher, cycleAccurateEventQueue);
+        super(title, SimulationType.MEASUREMENT, experiment, blockingEventDispatcher, cycleAccurateEventQueue, null);
 
         this.numMaxInstructions = numMaxInstructions;
     }

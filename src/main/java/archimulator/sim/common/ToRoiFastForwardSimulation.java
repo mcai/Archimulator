@@ -32,7 +32,6 @@ import net.pickapack.event.CycleAccurateEventQueue;
  */
 public class ToRoiFastForwardSimulation extends Simulation {
     private int helperThreadPthreadSpawnIndex;
-    private Reference<Kernel> kernelRef;
 
     private boolean pthreadHasSpawned;
 
@@ -46,10 +45,8 @@ public class ToRoiFastForwardSimulation extends Simulation {
      * @param kernelRef
      */
     public ToRoiFastForwardSimulation(String title, Experiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, int helperThreadPthreadSpawnIndex, Reference<Kernel> kernelRef) {
-        super(title, SimulationType.FAST_FORWARD, experiment, blockingEventDispatcher, cycleAccurateEventQueue);
-
+        super(title, SimulationType.FAST_FORWARD, experiment, blockingEventDispatcher, cycleAccurateEventQueue, kernelRef);
         this.helperThreadPthreadSpawnIndex = helperThreadPthreadSpawnIndex;
-        this.kernelRef = kernelRef;
     }
 
     /**

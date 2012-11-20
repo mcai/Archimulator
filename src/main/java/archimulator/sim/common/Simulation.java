@@ -34,6 +34,7 @@ import archimulator.sim.uncore.CacheHierarchy;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestProfilingHelper;
 import archimulator.util.RuntimeHelper;
+import net.pickapack.Reference;
 import net.pickapack.action.Predicate;
 import net.pickapack.dateTime.DateHelper;
 import net.pickapack.event.BlockingEventDispatcher;
@@ -51,6 +52,8 @@ import java.util.*;
  * @author Min Cai
  */
 public abstract class Simulation implements SimulationObject {
+    protected Reference<Kernel> kernelRef;
+
     private String title;
 
     private long beginTime;
@@ -108,7 +111,7 @@ public abstract class Simulation implements SimulationObject {
      * @param blockingEventDispatcher
      * @param cycleAccurateEventQueue
      */
-    public Simulation(String title, SimulationType type, Experiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
+    public Simulation(String title, SimulationType type, Experiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, Reference<Kernel> kernelRef) {
         this.experiment = experiment;
         this.blockingEventDispatcher = blockingEventDispatcher;
         this.cycleAccurateEventQueue = cycleAccurateEventQueue;
@@ -121,6 +124,7 @@ public abstract class Simulation implements SimulationObject {
             throw new RuntimeException();
         }
 
+        this.kernelRef = kernelRef;
         Kernel kernel = this.prepareKernel();
 
         if (!this.blockingEventDispatcher.isEmpty()) {
