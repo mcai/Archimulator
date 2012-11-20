@@ -18,7 +18,11 @@
  ******************************************************************************/
 package archimulator.model.metric;
 
+import com.Ostermiller.util.CSVPrinter;
+
+import java.io.IOException;
 import java.io.Serializable;
+import java.io.StringWriter;
 import java.util.List;
 
 /**
@@ -46,5 +50,24 @@ public class Table implements Serializable {
 
     public List<List<String>> getRows() {
         return rows;
+    }
+
+    public String toCsv() {
+        try {
+            StringWriter sw = new StringWriter();
+            CSVPrinter csvPrinter = new CSVPrinter(sw);
+
+            csvPrinter.println(getColumns().toArray(new String[getColumns().size()]));
+
+            for(List<String> row : getRows()) {
+                csvPrinter.println(row.toArray(new String[row.size()]));
+            }
+
+            csvPrinter.close();
+
+            return sw.toString();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

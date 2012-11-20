@@ -203,6 +203,13 @@ public interface ExperimentService extends Service {
     ExperimentPack getExperimentPackByTitle(String title);
 
     /**
+     * Get first experiment pack.
+     *
+     * @return experiment pack
+     */
+    ExperimentPack getFirstExperimentPack();
+
+    /**
      * Add an experiment pack.
      *
      * @param experimentPack the experiment pack to be added
