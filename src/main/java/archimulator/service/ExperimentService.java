@@ -203,6 +203,14 @@ public interface ExperimentService extends Service {
     ExperimentPack getExperimentPackByTitle(String title);
 
     /**
+     * Get the experiment packs by benchmark.
+     *
+     * @param benchmark benchmark
+     * @return experiment packs
+     */
+    List<ExperimentPack> getExperimentPacksByBenchmark(Benchmark benchmark);
+
+    /**
      * Get first experiment pack.
      *
      * @return experiment pack

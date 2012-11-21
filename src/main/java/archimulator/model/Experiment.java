@@ -68,7 +68,7 @@ public class Experiment implements ModelElement {
     private long architectureId;
 
     @DatabaseField
-    private int numMaxInstructions;
+    private long numMaxInstructions;
 
     @DatabaseField(persisterClass = ContextMappingArrayListJsonSerializableType.class)
     private ArrayList<ContextMapping> contextMappings;
@@ -101,7 +101,7 @@ public class Experiment implements ModelElement {
      * @param numMaxInstructions
      * @param contextMappings
      */
-    public Experiment(ExperimentPack parent, ExperimentType type, Architecture architecture, int numMaxInstructions, List<ContextMapping> contextMappings, List<ExperimentGauge> gauges) {
+    public Experiment(ExperimentPack parent, ExperimentType type, Architecture architecture, long numMaxInstructions, List<ContextMapping> contextMappings, List<ExperimentGauge> gauges) {
         this.parentId = parent != null ? parent.getId() : -1;
         this.type = type;
         this.state = ExperimentState.PENDING;
@@ -240,7 +240,7 @@ public class Experiment implements ModelElement {
      *
      * @return
      */
-    public int getNumMaxInstructions() {
+    public long getNumMaxInstructions() {
         return numMaxInstructions;
     }
 

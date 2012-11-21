@@ -53,6 +53,9 @@ public class ExperimentSpec implements ModelElement {
     private String benchmarkArguments;
 
     @DatabaseField
+    private long numMaxInstructions;
+
+    @DatabaseField
     private int helperThreadLookahead;
 
     @DatabaseField
@@ -100,6 +103,7 @@ public class ExperimentSpec implements ModelElement {
      *
      * @param benchmarkTitle
      * @param benchmarkArguments
+     * @param numMaxInstructions
      * @param helperThreadLookahead
      * @param helperThreadStride
      * @param numCores
@@ -112,12 +116,13 @@ public class ExperimentSpec implements ModelElement {
      * @param l2Associativity
      * @param l2ReplacementPolicyType
      */
-    public ExperimentSpec(String benchmarkTitle, String benchmarkArguments, int helperThreadLookahead, int helperThreadStride, int numCores, int numThreadsPerCore, String l1ISize, int l1IAssociativity, String l1DSize, int l1DAssociativity, String l2Size, int l2Associativity, String l2ReplacementPolicyType) {
+    public ExperimentSpec(String benchmarkTitle, String benchmarkArguments, long numMaxInstructions, int helperThreadLookahead, int helperThreadStride, int numCores, int numThreadsPerCore, String l1ISize, int l1IAssociativity, String l1DSize, int l1DAssociativity, String l2Size, int l2Associativity, String l2ReplacementPolicyType) {
         this.title = "";
         this.createTime = DateHelper.toTick(new Date());
 
         this.benchmarkTitle = benchmarkTitle;
         this.benchmarkArguments = benchmarkArguments;
+        this.numMaxInstructions = numMaxInstructions;
 
         this.helperThreadLookahead = helperThreadLookahead;
         this.helperThreadStride = helperThreadStride;
@@ -194,6 +199,18 @@ public class ExperimentSpec implements ModelElement {
      */
     public String getBenchmarkArguments() {
         return benchmarkArguments;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public long getNumMaxInstructions() {
+        if(numMaxInstructions == 0L) {
+            numMaxInstructions = -1L;
+        }
+
+        return numMaxInstructions;
     }
 
     /**
@@ -322,6 +339,14 @@ public class ExperimentSpec implements ModelElement {
      */
     public void setBenchmarkArguments(String benchmarkArguments) {
         this.benchmarkArguments = benchmarkArguments;
+    }
+
+    /**
+     *
+     * @param numMaxInstructions
+     */
+    public void setNumMaxInstructions(long numMaxInstructions) {
+        this.numMaxInstructions = numMaxInstructions;
     }
 
     /**

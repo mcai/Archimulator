@@ -30,10 +30,12 @@ import com.j256.ormlite.stmt.*;
 import com.jayway.jsonpath.JsonPath;
 import net.pickapack.JsonSerializationHelper;
 import net.pickapack.Reference;
+import net.pickapack.action.Function1;
 import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
 import net.pickapack.model.ModelElement;
 import net.pickapack.service.AbstractService;
+import net.pickapack.util.CollectionHelper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 
@@ -108,7 +110,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
                                             List<ExperimentGauge> gauges = ServiceManager.getExperimentMetricService().getAllGauges(); //TODO: should use basic gauges only.
 
-                                            addExperiment(new Experiment(experimentPack, experimentType, architecture, -1, contextMappings, gauges));
+                                            addExperiment(new Experiment(experimentPack, experimentType, architecture, experimentSpec.getNumMaxInstructions(), contextMappings, gauges));
                                         }
 
                                         updateExperimentPack(experimentPack);
@@ -523,6 +525,28 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     @Override
     public ExperimentPack getExperimentPackByTitle(String title) {
         return this.getFirstItemByTitle(this.experimentPacks, title);
+    }
+
+    @Override
+    public List<ExperimentPack> getExperimentPacksByBenchmark(Benchmark benchmark) {
+        try {
+            QueryBuilder<ExperimentSpec, Long> queryBuilder = this.experimentSpecs.queryBuilder();
+            PreparedQuery<ExperimentSpec> query = queryBuilder.selectColumns("parentId").where().eq("benchmarkTitle", benchmark.getTitle()).prepare();
+            List<ExperimentSpec> experimentSpecs = this.experimentSpecs.query(query);
+            List<Long> parentIds = CollectionHelper.transform(experimentSpecs, new Function1<ExperimentSpec, Long>() {
+                @Override
+                public Long apply(ExperimentSpec experimentSpec) {
+                    return experimentSpec.getParentId();
+                }
+            });
+
+            QueryBuilder<ExperimentPack, Long> queryBuilder2 = this.experimentPacks.queryBuilder();
+            PreparedQuery<ExperimentPack> query2 = queryBuilder2.where().in("id", parentIds).prepare();
+            return this.experimentPacks.query(query2);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     @Override
