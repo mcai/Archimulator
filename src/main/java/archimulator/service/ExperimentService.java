@@ -211,6 +211,14 @@ public interface ExperimentService extends Service {
     List<ExperimentPack> getExperimentPacksByBenchmark(Benchmark benchmark);
 
     /**
+     * Get the first experiment pack by benchmark.
+     *
+     * @param benchmark benchmark
+     * @return experiment pack
+     */
+    ExperimentPack getFirstExperimentPackByBenchmark(Benchmark benchmark);
+
+    /**
      * Get first experiment pack.
      *
      * @return experiment pack

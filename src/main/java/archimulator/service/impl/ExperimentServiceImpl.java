@@ -546,7 +546,27 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
 
+    @Override
+    public ExperimentPack getFirstExperimentPackByBenchmark(Benchmark benchmark) {
+        try {
+            QueryBuilder<ExperimentSpec, Long> queryBuilder = this.experimentSpecs.queryBuilder();
+            PreparedQuery<ExperimentSpec> query = queryBuilder.selectColumns("parentId").where().eq("benchmarkTitle", benchmark.getTitle()).prepare();
+            List<ExperimentSpec> experimentSpecs = this.experimentSpecs.query(query);
+            List<Long> parentIds = CollectionHelper.transform(experimentSpecs, new Function1<ExperimentSpec, Long>() {
+                @Override
+                public Long apply(ExperimentSpec experimentSpec) {
+                    return experimentSpec.getParentId();
+                }
+            });
+
+            QueryBuilder<ExperimentPack, Long> queryBuilder2 = this.experimentPacks.queryBuilder();
+            PreparedQuery<ExperimentPack> query2 = queryBuilder2.where().in("id", parentIds).prepare();
+            return this.experimentPacks.queryForFirst(query2);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
