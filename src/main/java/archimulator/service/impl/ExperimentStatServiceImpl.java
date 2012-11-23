@@ -62,6 +62,26 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
         super(ServiceManager.getDatabaseUrl(), Arrays.<Class<? extends ModelElement>>asList(ExperimentStat.class));
 
         this.stats = createDao(ExperimentStat.class);
+
+        System.out.println("Cleaning up experiment stats..");
+
+        List<Long> experimentIds = CollectionHelper.transform(ServiceManager.getExperimentService().getAllExperiments(), new Function1<Experiment, Long>() {
+            @Override
+            public Long apply(Experiment experiment) {
+                return experiment.getId();
+            }
+        });
+
+        try {
+            DeleteBuilder<ExperimentStat, Long> deleteBuilder = this.stats.deleteBuilder();
+            deleteBuilder.where().notIn("parentId", experimentIds);
+            PreparedDelete<ExperimentStat> delete = deleteBuilder.prepare();
+            this.stats.delete(delete);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        System.out.println("Cleaned up experiment stats.");
     }
 
     @Override

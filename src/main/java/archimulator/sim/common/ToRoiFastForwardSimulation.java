@@ -31,22 +31,17 @@ import net.pickapack.event.CycleAccurateEventQueue;
  * @author Min Cai
  */
 public class ToRoiFastForwardSimulation extends Simulation {
-    private int helperThreadPthreadSpawnIndex;
-
     private boolean pthreadHasSpawned;
 
     /**
      *
-     * @param title
      * @param experiment
      * @param blockingEventDispatcher
      * @param cycleAccurateEventQueue
-     * @param helperThreadPthreadSpawnIndex
      * @param kernelRef
      */
-    public ToRoiFastForwardSimulation(String title, Experiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, int helperThreadPthreadSpawnIndex, Reference<Kernel> kernelRef) {
-        super(title, SimulationType.FAST_FORWARD, experiment, blockingEventDispatcher, cycleAccurateEventQueue, kernelRef);
-        this.helperThreadPthreadSpawnIndex = helperThreadPthreadSpawnIndex;
+    public ToRoiFastForwardSimulation(Experiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, Reference<Kernel> kernelRef) {
+        super(SimulationType.FAST_FORWARD, experiment, blockingEventDispatcher, cycleAccurateEventQueue, kernelRef);
     }
 
     /**
@@ -85,7 +80,7 @@ public class ToRoiFastForwardSimulation extends Simulation {
 
         this.getProcessor().getKernel().getBlockingEventDispatcher().addListener(PseudoCallEncounteredEvent.class, new Action1<PseudoCallEncounteredEvent>() {
             public void apply(PseudoCallEncounteredEvent event) {
-                if (event.getImm() == ToRoiFastForwardSimulation.this.helperThreadPthreadSpawnIndex) {
+                if (event.getImm() == getExperiment().getArchitecture().getHelperThreadPthreadSpawnIndex()) {
                     pthreadHasSpawned = true;
                 }
             }
@@ -98,5 +93,10 @@ public class ToRoiFastForwardSimulation extends Simulation {
     @Override
     public void endSimulation() {
         this.kernelRef.set(this.getProcessor().getKernel());
+    }
+
+    @Override
+    public String getPrefix() {
+        return "twoPhase/phase0";
     }
 }

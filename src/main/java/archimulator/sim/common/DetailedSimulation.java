@@ -27,20 +27,14 @@ import net.pickapack.event.CycleAccurateEventQueue;
  * @author Min Cai
  */
 public class DetailedSimulation extends Simulation {
-    private long numMaxInstructions;
-
     /**
      *
-     * @param title
      * @param experiment
      * @param blockingEventDispatcher
      * @param cycleAccurateEventQueue
-     * @param numMaxInstructions
      */
-    public DetailedSimulation(String title, Experiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, long numMaxInstructions) {
-        super(title, SimulationType.MEASUREMENT, experiment, blockingEventDispatcher, cycleAccurateEventQueue, null);
-
-        this.numMaxInstructions = numMaxInstructions;
+    public DetailedSimulation(Experiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
+        super(SimulationType.MEASUREMENT, experiment, blockingEventDispatcher, cycleAccurateEventQueue, null);
     }
 
     /**
@@ -67,7 +61,7 @@ public class DetailedSimulation extends Simulation {
      */
     @Override
     public boolean canDoMeasurementOneCycle() {
-        return numMaxInstructions == -1 || this.getProcessor().getCores().get(0).getThreads().get(0).getTotalInstructions() < this.numMaxInstructions;
+        return this.getExperiment().getNumMaxInstructions() == -1 || this.getProcessor().getCores().get(0).getThreads().get(0).getTotalInstructions() < this.getExperiment().getNumMaxInstructions();
     }
 
     /**
@@ -82,5 +76,10 @@ public class DetailedSimulation extends Simulation {
      */
     @Override
     public void endSimulation() {
+    }
+
+    @Override
+    public String getPrefix() {
+        return "detailed";
     }
 }

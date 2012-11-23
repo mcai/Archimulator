@@ -105,18 +105,17 @@ public abstract class Simulation implements SimulationObject {
     public List<CacheCoherenceFlow> pendingFlows = new ArrayList<CacheCoherenceFlow>();
 
     /**
-     * @param title
      * @param type
      * @param experiment
      * @param blockingEventDispatcher
      * @param cycleAccurateEventQueue
      */
-    public Simulation(String title, SimulationType type, Experiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, Reference<Kernel> kernelRef) {
+    public Simulation(SimulationType type, Experiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, Reference<Kernel> kernelRef) {
         this.experiment = experiment;
         this.blockingEventDispatcher = blockingEventDispatcher;
         this.cycleAccurateEventQueue = cycleAccurateEventQueue;
 
-        this.title = title;
+        this.title = experiment.getTitle() + "/" + getPrefix();
         this.type = type;
 
         File cwdFile = new File(this.getWorkingDirectory());
@@ -283,10 +282,6 @@ public abstract class Simulation implements SimulationObject {
             }
         }
         return key;
-    }
-
-    public String getPrefix() {
-        return this.getTitle().substring(this.getTitle().indexOf("/") + 1);
     }
 
     /**
@@ -568,4 +563,9 @@ public abstract class Simulation implements SimulationObject {
     public String getName() {
         return "simulation";
     }
+
+    /**
+     * @return
+     */
+    public abstract String getPrefix();
 }

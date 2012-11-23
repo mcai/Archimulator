@@ -129,6 +129,24 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     private void cleanUpExperiments() {
+        System.out.println("Cleaning up experiments..");
+
+        List<Long> experimentPackIds = CollectionHelper.transform(getAllExperimentPacks(), new Function1<ExperimentPack, Long>() {
+            @Override
+            public Long apply(ExperimentPack experimentPack) {
+                return experimentPack.getId();
+            }
+        });
+
+        try {
+            DeleteBuilder<Experiment, Long> deleteBuilder = this.experiments.deleteBuilder();
+            deleteBuilder.where().notIn("parentId", experimentPackIds);
+            PreparedDelete<Experiment> delete = deleteBuilder.prepare();
+            this.experiments.delete(delete);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
         try {
             UpdateBuilder<Experiment, Long> updateBuilder = this.experiments.updateBuilder();
             updateBuilder.where().eq("state", ExperimentState.READY_TO_RUN).or().eq("state", ExperimentState.RUNNING);
@@ -140,6 +158,8 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
+        System.out.println("Cleaned up experiments.");
     }
 
     private boolean running = false;
@@ -183,22 +203,22 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
             if (experiment.getType() == ExperimentType.FUNCTIONAL) {
                 BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher = new BlockingEventDispatcher<SimulationEvent>();
-                new FunctionalSimulation(experiment.getTitle() + "/functional", experiment, blockingEventDispatcher, cycleAccurateEventQueue, experiment.getNumMaxInstructions()).simulate();
+                new FunctionalSimulation(experiment, blockingEventDispatcher, cycleAccurateEventQueue).simulate();
             } else if (experiment.getType() == ExperimentType.DETAILED) {
                 BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher = new BlockingEventDispatcher<SimulationEvent>();
-                new DetailedSimulation(experiment.getTitle() + "/detailed", experiment, blockingEventDispatcher, cycleAccurateEventQueue, experiment.getNumMaxInstructions()).simulate();
+                new DetailedSimulation(experiment, blockingEventDispatcher, cycleAccurateEventQueue).simulate();
             } else if (experiment.getType() == ExperimentType.TWO_PHASE) {
                 Reference<Kernel> kernelRef = new Reference<Kernel>();
 
                 BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher = new BlockingEventDispatcher<SimulationEvent>();
 
-                new ToRoiFastForwardSimulation(experiment.getTitle() + "/twoPhase/phase0", experiment, blockingEventDispatcher, cycleAccurateEventQueue, experiment.getArchitecture().getHelperThreadPthreadSpawnIndex(), kernelRef).simulate();
+                new ToRoiFastForwardSimulation(experiment, blockingEventDispatcher, cycleAccurateEventQueue, kernelRef).simulate();
 
                 blockingEventDispatcher.clearListeners();
 
                 cycleAccurateEventQueue.resetCurrentCycle();
 
-                new FromRoiDetailedSimulation(experiment.getTitle() + "/twoPhase/phase1", experiment, blockingEventDispatcher, cycleAccurateEventQueue, experiment.getNumMaxInstructions(), kernelRef).simulate();
+                new FromRoiDetailedSimulation(experiment, blockingEventDispatcher, cycleAccurateEventQueue, kernelRef).simulate();
             }
 
             experiment.setState(ExperimentState.COMPLETED);
