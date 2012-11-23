@@ -262,7 +262,16 @@ public class Experiment implements ModelElement {
      * @return
      */
     public String getStatValue(String key) {
-        return getStatValue(ServiceManager.getExperimentStatService().getStatByParentAndTitle(this, key));
+        return getStatValue(key, null);
+    }
+
+    /**
+     *
+     * @param key
+     * @return
+     */
+    public String getStatValue(String key, String defaultValue) {
+        return getStatValue(ServiceManager.getExperimentStatService().getStatByParentAndTitle(this, key), defaultValue);
     }
 
     /**
@@ -277,11 +286,31 @@ public class Experiment implements ModelElement {
 
     /**
      *
+     * @param statsMap
+     * @param key
+     * @return
+     */
+    public String getStatValue(Map<String, ExperimentStat> statsMap, String key, String defaultValue) {
+        return getStatValue(statsMap.containsKey(key) ? statsMap.get(key) : null, defaultValue);
+    }
+
+    /**
+     *
      * @param stat
      * @return
      */
     public String getStatValue(ExperimentStat stat) {
-        return stat != null ? stat.getValue().replaceAll(",", "") : null;
+        return getStatValue(stat, null);
+    }
+
+    /**
+     *
+     * @param stat
+     * @param defaultValue
+     * @return
+     */
+    public String getStatValue(ExperimentStat stat, String defaultValue) {
+        return stat != null ? stat.getValue().replaceAll(",", "") : defaultValue;
     }
 
     /**

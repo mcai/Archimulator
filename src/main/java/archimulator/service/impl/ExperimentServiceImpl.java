@@ -323,6 +323,11 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         return this.getFirstItemByTitle(this.experiments, title);
     }
 
+    @Override
+    public Experiment getFirstExperimentByParent(ExperimentPack parent) {
+        return this.getFirstItemByParent(this.experiments, parent);
+    }
+
     /**
      *
      * @param title
