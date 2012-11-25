@@ -332,4 +332,6 @@ public interface ExperimentService extends Service {
      *  Start the experiment runner.
      */
     void start();
+
+    void initialize();
 }

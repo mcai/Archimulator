@@ -71,4 +71,6 @@ public interface UserService extends Service {
      * @param user
      */
     void updateUser(User user);
+
+    void initialize();
 }

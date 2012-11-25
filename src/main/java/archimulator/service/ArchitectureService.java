@@ -119,4 +119,6 @@ public interface ArchitectureService extends Service {
      * @return the existing or newly added architecture matching the given parameters
      */
     Architecture getOrAddArchitecture(boolean htLLCRequestProfilingEnabled, int numCores, int numThreadsPerCore, int l1ISize, int l1IAssoc, int l1DSize, int l1DAssoc, int l2Size, int l2Assoc, CacheReplacementPolicyType l2ReplacementPolicyType);
+
+    void initialize();
 }

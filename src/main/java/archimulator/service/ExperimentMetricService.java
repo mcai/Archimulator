@@ -149,4 +149,6 @@ public interface ExperimentMetricService extends Service {
      * @param gauge
      */
     void updateGauge(ExperimentGauge gauge);
+
+    void initialize();
 }

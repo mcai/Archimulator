@@ -20,6 +20,7 @@ package archimulator.service;
 
 import archimulator.model.Experiment;
 import archimulator.model.ExperimentPack;
+import archimulator.model.ExperimentSummary;
 import archimulator.model.metric.ExperimentGauge;
 import archimulator.model.metric.ExperimentStat;
 import archimulator.model.metric.MultiBarPlot;
@@ -37,9 +38,10 @@ import java.util.Map;
  */
 public interface ExperimentStatService extends Service {
     /**
+     * @param parent
      * @param stats
      */
-    void addStats(List<ExperimentStat> stats);
+    void addStatsByParent(Experiment parent, List<ExperimentStat> stats);
 
     /**
      * @param parent
@@ -81,6 +83,17 @@ public interface ExperimentStatService extends Service {
     List<String> getStatPrefixesByParent(Experiment parent);
 
     /**
+     * @param parent
+     * @return
+     */
+    ExperimentSummary getSummaryByParent(Experiment parent);
+
+    /**
+     * @param parent
+     */
+    void invalidateSummaryByParent(Experiment parent);
+
+    /**
      * @param title
      * @param baselineExperiment
      * @param experiments
@@ -88,11 +101,9 @@ public interface ExperimentStatService extends Service {
     Table tableSummary(String title, Experiment baselineExperiment, List<Experiment> experiments);
 
     /**
-     * @param title
-     * @param baselineExperiment
      * @param experiments
      */
-    Table tableSummary2(String title, Experiment baselineExperiment, List<Experiment> experiments);
+    Table tableSummary2(List<Experiment> experiments);
 
     /**
      * @param experiments
@@ -404,4 +415,6 @@ public interface ExperimentStatService extends Service {
      * @param experiments
      */
     MultiBarPlot plotL2CacheRequestBreakdowns(ExperimentPack experimentPack, List<Experiment> experiments);
+
+    void initialize();
 }

@@ -93,4 +93,6 @@ public interface BenchmarkService extends Service {
      * @param benchmark
      */
     void updateBenchmark(Benchmark benchmark);
+
+    void initialize();
 }

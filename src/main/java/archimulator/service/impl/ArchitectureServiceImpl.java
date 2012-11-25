@@ -44,7 +44,10 @@ public class ArchitectureServiceImpl extends AbstractService implements Architec
         super(ServiceManager.getDatabaseUrl(), Arrays.<Class<? extends ModelElement>>asList(Architecture.class));
 
         this.architectures = createDao(Architecture.class);
+    }
 
+    @Override
+    public void initialize() {
         this.getOrAddArchitecture(true, 2, 2, 32 * 1024, 8, 32 * 1024, 8, 4 * 1024 * 1024, 16, CacheReplacementPolicyType.LRU);
     }
 

@@ -48,7 +48,10 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
 
         this.gaugeTypes = createDao(ExperimentGaugeType.class);
         this.gauges = createDao(ExperimentGauge.class);
+    }
 
+    @Override
+    public void initialize() {
         if (this.getFirstGaugeType() == null) {
             this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.RUNTIME, "runtimeHelper", ""));
             this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.SIMULATION, "", ""));

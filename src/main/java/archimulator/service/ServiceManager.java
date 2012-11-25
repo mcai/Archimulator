@@ -49,6 +49,14 @@ public class ServiceManager {
         userService = new UserServiceImpl();
         systemSettingService = new SystemSettingServiceImpl();
 
+        benchmarkService.initialize();
+        architectureService.initialize();
+        experimentMetricService.initialize();
+        experimentService.initialize();
+        experimentStatService.initialize();
+        userService.initialize();
+        systemSettingService.initialize();
+
         System.out.println("Archimulator (version: " + PropertiesHelper.getVersion() + ") - CMP Architectural Simulator Written in Java.\n");
         System.out.println("Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).\n");
     }

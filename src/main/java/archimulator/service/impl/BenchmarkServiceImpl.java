@@ -42,7 +42,10 @@ public class BenchmarkServiceImpl extends AbstractService implements BenchmarkSe
         super(ServiceManager.getDatabaseUrl(), Arrays.<Class<? extends ModelElement>>asList(Benchmark.class));
 
         this.benchmarks = createDao(Benchmark.class);
+    }
 
+    @Override
+    public void initialize() {
         if (this.getBenchmarkByTitle("mst_baseline") == null) {
             this.addBenchmark(new Benchmark(
                     "mst_baseline", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/baseline",

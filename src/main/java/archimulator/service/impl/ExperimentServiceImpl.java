@@ -70,7 +70,10 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         this.experiments = createDao(Experiment.class);
         this.experimentPacks = createDao(ExperimentPack.class);
         this.experimentSpecs = createDao(ExperimentSpec.class);
+    }
 
+    @Override
+    public void initialize() {
         this.cleanUpExperiments();
 
         //TODO: to be exposed as import/upload experiment pack via web UI

@@ -37,4 +37,6 @@ public interface SystemSettingService extends Service {
      * @param systemSetting
      */
     void updateSystemSettingSingleton(SystemSetting systemSetting);
+
+    void initialize();
 }

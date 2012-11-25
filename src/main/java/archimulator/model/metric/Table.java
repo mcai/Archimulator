@@ -30,18 +30,12 @@ import java.util.List;
  * @author Min Cai
  */
 public class Table implements Serializable {
-    private String title;
     private List<String> columns;
     private List<List<String>> rows;
 
-    public Table(String title, List<String> columns, List<List<String>> rows) {
-        this.title = title;
+    public Table(List<String> columns, List<List<String>> rows) {
         this.columns = columns;
         this.rows = rows;
-    }
-
-    public String getTitle() {
-        return title;
     }
 
     public List<String> getColumns() {

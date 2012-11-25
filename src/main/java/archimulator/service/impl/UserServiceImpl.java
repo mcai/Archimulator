@@ -45,7 +45,10 @@ public class UserServiceImpl extends AbstractService implements UserService {
         super(ServiceManager.getDatabaseUrl(), Arrays.<Class<? extends ModelElement>>asList(User.class));
 
         this.users = createDao(User.class);
+    }
 
+    @Override
+    public void initialize() {
         if(this.getFirstUser() == null) {
             this.addUser(new User("test@archimulator.com", "archimulator")); //TODO: should not be hardcoded
         }

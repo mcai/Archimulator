@@ -44,6 +44,10 @@ public class SystemSettingServiceImpl extends AbstractService implements SystemS
         this.systemSettings = createDao(SystemSetting.class);
     }
 
+    @Override
+    public void initialize() {
+    }
+
     /**
      *
      * @return
