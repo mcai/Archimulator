@@ -28,6 +28,9 @@ import org.eobjects.metamodel.DataContextFactory;
 import org.eobjects.metamodel.csv.CsvConfiguration;
 import org.eobjects.metamodel.data.DataSet;
 import org.eobjects.metamodel.data.Row;
+import org.eobjects.metamodel.query.FilterItem;
+import org.eobjects.metamodel.query.LogicalOperator;
+import org.eobjects.metamodel.query.OperatorType;
 import org.eobjects.metamodel.query.SelectItem;
 import org.eobjects.metamodel.query.builder.SatisfiedSelectBuilder;
 
@@ -92,12 +95,19 @@ public class Table implements Serializable {
         try {
             DataContext dataContext = DataContextFactory.createCsvDataContext(IOUtils.toInputStream(toCsv(), "UTF-8"), CsvConfiguration.DEFAULT_SEPARATOR_CHAR, CsvConfiguration.DEFAULT_QUOTE_CHAR);
 
+            final org.eobjects.metamodel.schema.Table table = dataContext.getDefaultSchema().getTables()[0];
+
             SatisfiedSelectBuilder<?> select = dataContext.query()
-                    .from(dataContext.getDefaultSchema().getTables()[0])
+                    .from(table)
                     .select(criteria.getColumns().toArray(new String[criteria.getColumns().size()]));
 
-            for(Pair<String, String> condition : criteria.getConditions()) {
-                select.where(condition.getFirst()).eq(condition.getSecond());
+            for(final Pair<String, List<String>> condition : criteria.getConditions()) {
+                select.where(new FilterItem(LogicalOperator.OR, CollectionHelper.transform(condition.getSecond(), new Function1<String, FilterItem>() {
+                    @Override
+                    public FilterItem apply(String conditionLine) {
+                        return new FilterItem(new SelectItem(table.getColumnByName(condition.getFirst())), OperatorType.EQUALS_TO, conditionLine);
+                    }
+                })));
             }
 
             DataSet dataSet = select.execute();

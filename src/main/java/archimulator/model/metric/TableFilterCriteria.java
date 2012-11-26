@@ -8,7 +8,7 @@ import java.util.List;
 
 public class TableFilterCriteria {
     private List<String> columns;
-    private List<Pair<String, String>> conditions;
+    private List<Pair<String, List<String>>> conditions;
 
     public TableFilterCriteria(String... columns) {
         this(Arrays.asList(columns));
@@ -16,14 +16,14 @@ public class TableFilterCriteria {
 
     public TableFilterCriteria(List<String> columns) {
         this.columns = columns;
-        this.conditions = new ArrayList<Pair<String, String>>();
+        this.conditions = new ArrayList<Pair<String, List<String>>>();
     }
 
     public List<String> getColumns() {
         return columns;
     }
 
-    public List<Pair<String, String>> getConditions() {
+    public List<Pair<String, List<String>>> getConditions() {
         return conditions;
     }
 }
