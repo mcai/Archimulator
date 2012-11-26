@@ -19,10 +19,24 @@
 package archimulator.model.metric;
 
 import com.Ostermiller.util.CSVPrinter;
+import net.pickapack.Pair;
+import net.pickapack.action.Function1;
+import net.pickapack.util.CollectionHelper;
+import org.apache.commons.io.IOUtils;
+import org.eobjects.metamodel.DataContext;
+import org.eobjects.metamodel.DataContextFactory;
+import org.eobjects.metamodel.csv.CsvConfiguration;
+import org.eobjects.metamodel.data.DataSet;
+import org.eobjects.metamodel.data.Row;
+import org.eobjects.metamodel.query.SelectItem;
+import org.eobjects.metamodel.query.builder.SatisfiedSelectBuilder;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -46,10 +60,19 @@ public class Table implements Serializable {
         return rows;
     }
 
+    public static Table fromCsv(String csvFileName) {
+        DataContext dataContext = DataContextFactory.createCsvDataContext(new File(csvFileName), CsvConfiguration.DEFAULT_SEPARATOR_CHAR, CsvConfiguration.DEFAULT_QUOTE_CHAR);
+        org.eobjects.metamodel.schema.Table table = dataContext.getDefaultSchema().getTables()[0];
+        DataSet dataSet = dataContext.query()
+                .from(table)
+                .select(table.getColumnNames()).execute();
+        return fromDataSet(dataSet);
+    }
+
     public String toCsv() {
         try {
             StringWriter sw = new StringWriter();
-            CSVPrinter csvPrinter = new CSVPrinter(sw);
+            CSVPrinter csvPrinter = new CSVPrinter(sw, '#', CsvConfiguration.DEFAULT_QUOTE_CHAR, CsvConfiguration.DEFAULT_SEPARATOR_CHAR, true, true);
 
             csvPrinter.println(getColumns().toArray(new String[getColumns().size()]));
 
@@ -63,5 +86,45 @@ public class Table implements Serializable {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public Table filter(TableFilterCriteria criteria) {
+        try {
+            DataContext dataContext = DataContextFactory.createCsvDataContext(IOUtils.toInputStream(toCsv(), "UTF-8"), CsvConfiguration.DEFAULT_SEPARATOR_CHAR, CsvConfiguration.DEFAULT_QUOTE_CHAR);
+
+            SatisfiedSelectBuilder<?> select = dataContext.query()
+                    .from(dataContext.getDefaultSchema().getTables()[0])
+                    .select(criteria.getColumns().toArray(new String[criteria.getColumns().size()]));
+
+            for(Pair<String, String> condition : criteria.getConditions()) {
+                select.where(condition.getFirst()).eq(condition.getSecond());
+            }
+
+            DataSet dataSet = select.execute();
+            return fromDataSet(dataSet);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Table fromDataSet(DataSet dataSet) {
+        List<String> columns = new ArrayList<String>();
+
+        for(SelectItem selectedItem : dataSet.getSelectItems()) {
+            columns.add(selectedItem.getColumn().getName());
+        }
+
+        List<List<String>> rows = new ArrayList<List<String>>();
+
+        for(Row row : dataSet) {
+            rows.add(CollectionHelper.transform(Arrays.asList(row.getValues()), new Function1<Object, String>() {
+                @Override
+                public String apply(Object obj) {
+                    return obj + "";
+                }
+            }));
+        }
+
+        return new Table(columns, rows);
     }
 }

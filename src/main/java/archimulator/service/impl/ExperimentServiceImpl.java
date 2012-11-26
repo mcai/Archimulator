@@ -498,6 +498,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
      * @return
      */
     @Override
+    @SuppressWarnings("unchecked")
     public Experiment getFirstStoppedExperimentByParent(ExperimentPack parent) {
         try {
             QueryBuilder<Experiment, Long> queryBuilder = this.experiments.queryBuilder();
