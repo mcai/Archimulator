@@ -379,8 +379,8 @@ public class ExperimentSummary implements ModelElement {
         row.add(l2Associativity + "way");
         row.add(l2ReplacementPolicyType + "");
 
-        row.add(helperThreadEnabled ? helperThreadLookahead + "" : "-1");
-        row.add(helperThreadEnabled ? helperThreadStride + "" : "-1");
+        row.add(helperThreadEnabled ? "L=" + helperThreadLookahead + "" : "");
+        row.add(helperThreadEnabled ? "S=" + helperThreadStride + "" : "");
 
         row.add(totalInstructions + "");
         row.add(totalCycles + "");

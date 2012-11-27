@@ -496,12 +496,12 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
                 "HT Coverage",
                 "HT Accuracy",
 
-                "Late HT Requests",
-                "Timely HT Requests",
-                "Bad HT Requests",
-                "Ugly HT Requests",
-                "Redundant_MSHR HT Requests",
-                "Redundant_Cache HT Requests"
+                "Late",
+                "Timely",
+                "Bad",
+                "Ugly",
+                "Redundant MSHR",
+                "Redundant Cache"
         ), new ArrayList<List<String>>() {{
             for (Experiment experiment : experiments) {
                 add(getSummaryByParent(experiment).tableSummary2Row());

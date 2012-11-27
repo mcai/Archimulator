@@ -73,11 +73,17 @@ public class Table implements Serializable {
     }
 
     public String toCsv() {
+        return toCsv(true);
+    }
+
+    public String toCsv(boolean printColumnHeaders) {
         try {
             StringWriter sw = new StringWriter();
             CSVPrinter csvPrinter = new CSVPrinter(sw, '#', CsvConfiguration.DEFAULT_QUOTE_CHAR, CsvConfiguration.DEFAULT_SEPARATOR_CHAR, true, true);
 
-            csvPrinter.println(getColumns().toArray(new String[getColumns().size()]));
+            if(printColumnHeaders) {
+                csvPrinter.println(getColumns().toArray(new String[getColumns().size()]));
+            }
 
             for(List<String> row : getRows()) {
                 csvPrinter.println(row.toArray(new String[row.size()]));
