@@ -76,25 +76,28 @@ public class HelperThreadL2CacheRequestProfilingHelper {
 
     private Map<Integer, PendingL2Miss> pendingL2Misses;
 
-    private Map<CacheMissType, Long> numL2CacheMissesPerType;
-
     private DescriptiveStatistics statL2CacheMissNumCycles;
     private DescriptiveStatistics statL2CacheMissMlpCosts;
     private DescriptiveStatistics statL2CacheMissAverageMlps;
 
-    private boolean l2MissLatencyStatsEnabled;
+    private DescriptiveStatistics statL2CacheHitReuseDistances;
+    private DescriptiveStatistics statL2CacheMissReuseDistances;
+
+    private boolean l2RequestLatencyStatsEnabled;
 
     /**
+     * Constructs a helper thread L2 request profiling helper.
      *
-     * @param simulation
+     * @param simulation simulation
      */
     public HelperThreadL2CacheRequestProfilingHelper(Simulation simulation) {
         this(simulation.getProcessor().getCacheHierarchy().getL2CacheController());
     }
 
     /**
+     * Constructs a helper thread L2 request profiling helper.
      *
-     * @param l2CacheController
+     * @param l2CacheController L2 cache (directory) controller
      */
     public HelperThreadL2CacheRequestProfilingHelper(final DirectoryController l2CacheController) {
         this.l2CacheController = l2CacheController;
@@ -122,14 +125,12 @@ public class HelperThreadL2CacheRequestProfilingHelper {
 
         this.pendingL2Misses = new LinkedHashMap<Integer, PendingL2Miss>();
 
-        this.numL2CacheMissesPerType = new EnumMap<CacheMissType, Long>(CacheMissType.class);
-        this.numL2CacheMissesPerType.put(CacheMissType.COMPULSORY, 0L);
-        this.numL2CacheMissesPerType.put(CacheMissType.CAPACITY, 0L);
-        this.numL2CacheMissesPerType.put(CacheMissType.CONFLICT, 0L);
-
         this.statL2CacheMissNumCycles = new DescriptiveStatistics();
         this.statL2CacheMissMlpCosts = new DescriptiveStatistics();
         this.statL2CacheMissAverageMlps = new DescriptiveStatistics();
+
+        this.statL2CacheHitReuseDistances = new DescriptiveStatistics();
+        this.statL2CacheMissReuseDistances = new DescriptiveStatistics();
 
         l2CacheController.getBlockingEventDispatcher().addListener(CoherentCacheServiceNonblockingRequestEvent.class, new Action1<CoherentCacheServiceNonblockingRequestEvent>() {
             public void apply(CoherentCacheServiceNonblockingRequestEvent event) {
@@ -216,8 +217,36 @@ public class HelperThreadL2CacheRequestProfilingHelper {
         });
     }
 
+    private void profileReuseDistance(boolean hitInCache, MemoryHierarchyAccess access) {
+        int tag = access.getPhysicalTag();
+        int set = this.l2CacheController.getCache().getSet(tag);
+
+        Stack<Integer> lruStack = this.l2CacheController.getCache().get(set).getLruStack();
+
+        int position = lruStack.search(tag);
+
+        if(position == -1) {
+            lruStack.push(tag);
+            this.statL2CacheMissReuseDistances.addValue(position);
+        }
+        else {
+            lruStack.remove((Integer) tag);
+            lruStack.push(tag);
+
+            if(hitInCache) {
+                this.statL2CacheHitReuseDistances.addValue(position);
+            }
+            else {
+                this.statL2CacheMissReuseDistances.addValue(position);
+            }
+        }
+    }
+
+    /**
+     * To be invoked per cycle for updating MLP costs for in-flight L2 cache accesses.
+     */
     private void updateL2CacheMlpCostsPerCycle() {
-        if (!this.l2MissLatencyStatsEnabled) {
+        if (!this.l2RequestLatencyStatsEnabled) {
             return;
         }
 
@@ -229,43 +258,19 @@ public class HelperThreadL2CacheRequestProfilingHelper {
         }
     }
 
-    private void profileL2MissBeginServicing(MemoryHierarchyAccess access) {
-        if (!this.l2MissLatencyStatsEnabled) {
+    private void profileBeginServicingL2Request(MemoryHierarchyAccess access) {
+        if (!this.l2RequestLatencyStatsEnabled) {
             return;
         }
 
         int tag = access.getPhysicalTag();
-        int set = this.l2CacheController.getCache().getSet(tag);
 
-        List<Integer> tagsSeen = this.l2CacheController.getCache().get(set).getTagsSeen();
-        List<Integer> lruStack = this.l2CacheController.getCache().get(set).getLruStack();
-
-        CacheMissType missType;
-
-        if (!tagsSeen.contains(tag)) {
-            tagsSeen.add(tag);
-            missType = CacheMissType.COMPULSORY;
-        } else {
-            boolean inLruStack = lruStack.contains(tag);
-
-            missType = inLruStack ? CacheMissType.CONFLICT : CacheMissType.CAPACITY;
-
-            if (inLruStack) {
-                lruStack.remove((Integer) tag);
-            } else if (lruStack.size() >= this.l2CacheController.getCache().getAssociativity()) {
-                lruStack.remove(0);
-            }
-
-            lruStack.add(tag);
-        }
-
-
-        PendingL2Miss pendingL2Miss = new PendingL2Miss(access, l2CacheController.getCycleAccurateEventQueue().getCurrentCycle(), missType);
+        PendingL2Miss pendingL2Miss = new PendingL2Miss(access, l2CacheController.getCycleAccurateEventQueue().getCurrentCycle());
         this.pendingL2Misses.put(tag, pendingL2Miss);
     }
 
-    private void profileL2MissEndServicing(MemoryHierarchyAccess access) {
-        if (!this.l2MissLatencyStatsEnabled) {
+    private void profileEndServicingL2Request(MemoryHierarchyAccess access) {
+        if (!this.l2RequestLatencyStatsEnabled) {
             return;
         }
 
@@ -275,8 +280,6 @@ public class HelperThreadL2CacheRequestProfilingHelper {
         pendingL2Miss.setEndCycle(this.l2CacheController.getCycleAccurateEventQueue().getCurrentCycle());
 
         this.pendingL2Misses.remove(tag);
-
-        this.numL2CacheMissesPerType.put(pendingL2Miss.getMissType(), this.numL2CacheMissesPerType.get(pendingL2Miss.getMissType()) + 1);
 
         this.statL2CacheMissNumCycles.addValue(pendingL2Miss.getNumCycles());
         this.statL2CacheMissMlpCosts.addValue(pendingL2Miss.getMlpCost());
@@ -294,6 +297,13 @@ public class HelperThreadL2CacheRequestProfilingHelper {
                 this.sumUpUnstableHelperThreadL2CacheRequest(set, way);
             }
         }
+
+        //TODO: to be incorporated into statistics.
+        System.out.println("L2 Cache Hit Reuse Distances:");
+        System.out.println(this.statL2CacheHitReuseDistances);
+
+        System.out.println("L2 Cache Miss Reuse Distances:");
+        System.out.println(this.statL2CacheMissReuseDistances);
     }
 
     private void sumUpUnstableHelperThreadL2CacheRequest(int set, int way) {
@@ -317,7 +327,9 @@ public class HelperThreadL2CacheRequestProfilingHelper {
     }
 
     private void handleL2CacheRequest(CoherentCacheServiceNonblockingRequestEvent event, boolean requesterIsHelperThread, boolean lineFoundIsHelperThread) {
-        profileL2MissBeginServicing(event.getAccess());
+        profileReuseDistance(event.isHitInCache(), event.getAccess());
+
+        profileBeginServicingL2Request(event.getAccess());
 
         checkInvariants(event.getSet());
 
@@ -435,7 +447,7 @@ public class HelperThreadL2CacheRequestProfilingHelper {
     }
 
     private void handleL2CacheLineInsert(LastLevelCacheLineInsertEvent event, boolean requesterIsHelperThread, boolean lineFoundIsHelperThread) {
-        profileL2MissEndServicing(event.getAccess());
+        profileEndServicingL2Request(event.getAccess());
 
         checkInvariants(event.getSet());
 
@@ -830,14 +842,6 @@ public class HelperThreadL2CacheRequestProfilingHelper {
      *
      * @return
      */
-    public Map<CacheMissType, Long> getNumL2CacheMissesPerType() {
-        return numL2CacheMissesPerType;
-    }
-
-    /**
-     *
-     * @return
-     */
     public DescriptiveStatistics getStatL2CacheMissNumCycles() {
         return statL2CacheMissNumCycles;
     }
@@ -854,7 +858,7 @@ public class HelperThreadL2CacheRequestProfilingHelper {
      *
      * @return
      */
-    public DescriptiveStatistics getFrequencyL2CacheMissAverageMlps() {
+    public DescriptiveStatistics getStatL2CacheMissAverageMlps() {
         return statL2CacheMissAverageMlps;
     }
 
@@ -862,16 +866,32 @@ public class HelperThreadL2CacheRequestProfilingHelper {
      *
      * @return
      */
-    public boolean isL2MissLatencyStatsEnabled() {
-        return l2MissLatencyStatsEnabled;
+    public DescriptiveStatistics getStatL2CacheHitReuseDistances() {
+        return statL2CacheHitReuseDistances;
     }
 
     /**
      *
-     * @param l2MissLatencyStatsEnabled
+     * @return
      */
-    public void setL2MissLatencyStatsEnabled(boolean l2MissLatencyStatsEnabled) {
-        this.l2MissLatencyStatsEnabled = l2MissLatencyStatsEnabled;
+    public DescriptiveStatistics getStatL2CacheMissReuseDistances() {
+        return statL2CacheMissReuseDistances;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean isL2RequestLatencyStatsEnabled() {
+        return l2RequestLatencyStatsEnabled;
+    }
+
+    /**
+     *
+     * @param l2RequestLatencyStatsEnabled
+     */
+    public void setL2RequestLatencyStatsEnabled(boolean l2RequestLatencyStatsEnabled) {
+        this.l2RequestLatencyStatsEnabled = l2RequestLatencyStatsEnabled;
     }
 
     /**
@@ -879,15 +899,15 @@ public class HelperThreadL2CacheRequestProfilingHelper {
      */
     public static enum HelperThreadL2CacheRequestVictimCacheLineState {
         /**
-         *
+         * Invalid.
          */
         INVALID,
         /**
-         *
+         * NULL.
          */
         NULL,
         /**
-         *
+         * Data.
          */
         DATA
     }

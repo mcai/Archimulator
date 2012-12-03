@@ -24,6 +24,7 @@ import net.pickapack.util.ValueProviderFactory;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 /**
  *
@@ -34,8 +35,7 @@ public class CacheSet<StateT extends Serializable> {
     private Cache<StateT> cache;
     private List<CacheLine<StateT>> lines;
     private int num;
-    private List<Integer> tagsSeen;
-    private List<Integer> lruStack;
+    private Stack<Integer> lruStack;
 
     /**
      *
@@ -53,8 +53,7 @@ public class CacheSet<StateT extends Serializable> {
             this.lines.add(new CacheLine<StateT>(cache, this.num, i, cacheLineStateProviderFactory.createValueProvider(this.num, i)));
         }
 
-        this.tagsSeen = new ArrayList<Integer>();
-        this.lruStack = new ArrayList<Integer>();
+        this.lruStack = new Stack<Integer>();
     }
 
     /**
@@ -85,15 +84,7 @@ public class CacheSet<StateT extends Serializable> {
      *
      * @return
      */
-    public List<Integer> getTagsSeen() {
-        return tagsSeen;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public List<Integer> getLruStack() {
+    public Stack<Integer> getLruStack() {
         return lruStack;
     }
 }

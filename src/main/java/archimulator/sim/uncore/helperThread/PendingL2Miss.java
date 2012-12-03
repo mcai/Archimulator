@@ -19,7 +19,6 @@
 package archimulator.sim.uncore.helperThread;
 
 import archimulator.sim.uncore.MemoryHierarchyAccess;
-import archimulator.sim.uncore.cache.CacheMissType;
 
 /**
  *
@@ -29,7 +28,6 @@ public class PendingL2Miss {
     private MemoryHierarchyAccess access;
     private long beginCycle;
     private long endCycle;
-    private CacheMissType missType;
     private double mlpCost;
 
     private transient int numMlpSamples;
@@ -39,12 +37,10 @@ public class PendingL2Miss {
      *
      * @param access
      * @param beginCycle
-     * @param missType
      */
-    public PendingL2Miss(MemoryHierarchyAccess access, long beginCycle, CacheMissType missType) {
+    public PendingL2Miss(MemoryHierarchyAccess access, long beginCycle) {
         this.access = access;
         this.beginCycle = beginCycle;
-        this.missType = missType;
     }
 
     /**
@@ -61,14 +57,6 @@ public class PendingL2Miss {
      */
     public long getBeginCycle() {
         return beginCycle;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public CacheMissType getMissType() {
-        return missType;
     }
 
     /**
