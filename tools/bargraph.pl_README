@@ -1,5 +1,0 @@
-Install required packages:
-    sudo apt-get install gnuplot transfig
-
-Usage:
-    ./bargraph.pl -pdf fig.txt > fig.pdf
