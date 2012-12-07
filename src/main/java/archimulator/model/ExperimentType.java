@@ -19,20 +19,23 @@
 package archimulator.model;
 
 /**
+ * Experiment type.
  *
  * @author Min Cai
  */
 public enum ExperimentType {
     /**
-     *
+     * Functional experiment.
      */
     FUNCTIONAL,
+
     /**
-     *
+     * Detailed experiment.
      */
     DETAILED,
+
     /**
-     *
+     * Two-phase "fast forward and measurement" experiment.
      */
     TWO_PHASE
 }

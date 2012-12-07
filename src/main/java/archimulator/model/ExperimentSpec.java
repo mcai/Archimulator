@@ -29,6 +29,7 @@ import net.pickapack.util.StorageUnitHelper;
 import java.util.Date;
 
 /**
+ * Experiment specification.
  *
  * @author Min Cai
  */
@@ -94,27 +95,28 @@ public class ExperimentSpec implements ModelElement {
     private transient String arguments;
 
     /**
-     *
+     * Create an experiment specification. Reserved for ORM only.
      */
     public ExperimentSpec() {
     }
 
     /**
+     * Create an experiment specification.
      *
-     * @param benchmarkTitle
-     * @param benchmarkArguments
-     * @param numMaxInstructions
-     * @param helperThreadLookahead
-     * @param helperThreadStride
-     * @param numCores
-     * @param numThreadsPerCore
-     * @param l1ISize
-     * @param l1IAssociativity
-     * @param l1DSize
-     * @param l1DAssociativity
-     * @param l2Size
-     * @param l2Associativity
-     * @param l2ReplacementPolicyType
+     * @param benchmarkTitle          the benchmark title
+     * @param benchmarkArguments      the benchmark arguments
+     * @param numMaxInstructions      the upper limit of the number of instructions executed on the first hardware thread
+     * @param helperThreadLookahead   the helper thread lookahead
+     * @param helperThreadStride      the helper thread stride
+     * @param numCores                the number of cores
+     * @param numThreadsPerCore       the number of threads per core
+     * @param l1ISize                 the size of the L1I caches
+     * @param l1IAssociativity        the associativity of the L1I caches
+     * @param l1DSize                 the size of the L1D caches
+     * @param l1DAssociativity        the associativity of the L1D caches
+     * @param l2Size                  the size of the L2 cache
+     * @param l2Associativity         the associativity of the L2 cache
+     * @param l2ReplacementPolicyType the replacement policy type of the L2 cache
      */
     public ExperimentSpec(String benchmarkTitle, String benchmarkArguments, long numMaxInstructions, int helperThreadLookahead, int helperThreadStride, int numCores, int numThreadsPerCore, String l1ISize, int l1IAssociativity, String l1DSize, int l1DAssociativity, String l2Size, int l2Associativity, String l2ReplacementPolicyType) {
         this.title = "";
@@ -142,8 +144,9 @@ public class ExperimentSpec implements ModelElement {
     }
 
     /**
+     * Get the experiment specification's ID.
      *
-     * @return
+     * @return the experiment specification's ID
      */
     @Override
     public long getId() {
@@ -151,8 +154,9 @@ public class ExperimentSpec implements ModelElement {
     }
 
     /**
+     * Get the parent experiment pack's ID.
      *
-     * @return
+     * @return the parent experiment pack's ID
      */
     @Override
     public long getParentId() {
@@ -160,8 +164,9 @@ public class ExperimentSpec implements ModelElement {
     }
 
     /**
+     * Get the title.
      *
-     * @return
+     * @return the title
      */
     @Override
     public String getTitle() {
@@ -169,8 +174,9 @@ public class ExperimentSpec implements ModelElement {
     }
 
     /**
+     * Get the time in ticks when the experiment specification is created.
      *
-     * @return
+     * @return the time in ticks when the experiment specification is created
      */
     @Override
     public long getCreateTime() {
@@ -178,35 +184,39 @@ public class ExperimentSpec implements ModelElement {
     }
 
     /**
+     * Set the parent experiment pack.
      *
-     * @param parent
+     * @param parent the parent experiment pack
      */
     public void setParent(ExperimentPack parent) {
         this.parentId = parent != null ? parent.getId() : -1;
     }
 
     /**
+     * Get the benchmark title.
      *
-     * @return
+     * @return the benchmark title
      */
     public String getBenchmarkTitle() {
         return benchmarkTitle;
     }
 
     /**
+     * Get the benchmark arguments.
      *
-     * @return
+     * @return the benchmark arguments
      */
     public String getBenchmarkArguments() {
         return benchmarkArguments;
     }
 
     /**
+     * Get the upper limit of the number of instructions executed on the first hardware thread.
      *
-     * @return
+     * @return the upper limit of the number of instructions executed on the first hardware thread.
      */
     public long getNumMaxInstructions() {
-        if(numMaxInstructions == 0L) {
+        if (numMaxInstructions == 0L) {
             numMaxInstructions = -1L;
         }
 
@@ -214,235 +224,264 @@ public class ExperimentSpec implements ModelElement {
     }
 
     /**
+     * Get the helper thread lookahead.
      *
-     * @return
+     * @return the helper thread lookahead
      */
     public int getHelperThreadLookahead() {
         return helperThreadLookahead;
     }
 
     /**
+     * Get the helper thread stride.
      *
-     * @return
+     * @return the helper thread stride
      */
     public int getHelperThreadStride() {
         return helperThreadStride;
     }
 
     /**
+     * Get the number of cores.
      *
-     * @return
+     * @return the number of cores
      */
     public int getNumCores() {
         return numCores;
     }
 
     /**
+     * Get the number of threads per core.
      *
-     * @return
+     * @return the number of threads per core
      */
     public int getNumThreadsPerCore() {
         return numThreadsPerCore;
     }
 
     /**
+     * Get the size in bytes of the L1I cache.
      *
-     * @return
+     * @return the size in bytes of the L1I cache
      */
     public int getL1ISizeAsInt() {
         return l1ISize == null ? 0 : (int) StorageUnitHelper.displaySizeToByteCount(l1ISize);
     }
 
     /**
+     * Get the associativity of the L1I cache.
      *
-     * @return
+     * @return the associativity of the L1I cache
      */
     public int getL1IAssociativity() {
         return l1IAssociativity;
     }
 
     /**
+     * Get the size in bytes of the L1D cache.
      *
-     * @return
+     * @return the size in bytes of the L1D cache
      */
     public int getL1DSizeAsInt() {
         return l1DSize == null ? 0 : (int) StorageUnitHelper.displaySizeToByteCount(l1DSize);
     }
 
     /**
+     * Get the associativity of the L1D cache.
      *
-     * @return
+     * @return the associativity of the L1D cache
      */
     public int getL1DAssociativity() {
         return l1DAssociativity;
     }
 
     /**
+     * Get the size in bytes of the L2 cache.
      *
-     * @return
+     * @return the size in bytes of the L2 cache
      */
     public int getL2SizeAsInt() {
         return l2Size == null ? 0 : (int) StorageUnitHelper.displaySizeToByteCount(l2Size);
     }
 
     /**
+     * Get the associativity of the L2 cache.
      *
-     * @return
+     * @return the associativity of the L2 cache
      */
     public int getL2Associativity() {
         return l2Associativity;
     }
 
     /**
+     * Get the replacement policy type of the L2 cache.
      *
-     * @return
+     * @return the replacement policy type of the L2 cache
      */
     public String getL2ReplacementPolicyType() {
         return l2ReplacementPolicyType;
     }
 
     /**
+     * Get the size of the L1I cache.
      *
-     * @return
+     * @return the size of the L1I cache
      */
     public String getL1ISize() {
         return l1ISize;
     }
 
     /**
+     * Get the size of the L1D cache.
      *
-     * @return
+     * @return the size of the L1D cache
      */
     public String getL1DSize() {
         return l1DSize;
     }
 
     /**
+     * Get the size of the L2 cache.
      *
-     * @return
+     * @return the size of the L2 cache
      */
     public String getL2Size() {
         return l2Size;
     }
 
     /**
+     * Set the benchmark title.
      *
-     * @param benchmarkTitle
+     * @param benchmarkTitle the benchmark title
      */
     public void setBenchmarkTitle(String benchmarkTitle) {
         this.benchmarkTitle = benchmarkTitle;
     }
 
     /**
+     * Set the benchmark arguments.
      *
-     * @param benchmarkArguments
+     * @param benchmarkArguments the benchmark arguments
      */
     public void setBenchmarkArguments(String benchmarkArguments) {
         this.benchmarkArguments = benchmarkArguments;
     }
 
     /**
+     * Set the upper limit of the number of instructions executed on the first hardware thread.
      *
-     * @param numMaxInstructions
+     * @param numMaxInstructions the upper limit of the number of instructions executed on the first hardware thread.
      */
     public void setNumMaxInstructions(long numMaxInstructions) {
         this.numMaxInstructions = numMaxInstructions;
     }
 
     /**
+     * Set the helper thread lookahead.
      *
-     * @param helperThreadLookahead
+     * @param helperThreadLookahead the helper thread lookahead
      */
     public void setHelperThreadLookahead(int helperThreadLookahead) {
         this.helperThreadLookahead = helperThreadLookahead;
     }
 
     /**
+     * Set the helper thread stride.
      *
-     * @param helperThreadStride
+     * @param helperThreadStride the helper thread stride
      */
     public void setHelperThreadStride(int helperThreadStride) {
         this.helperThreadStride = helperThreadStride;
     }
 
     /**
+     * Set the number of cores.
      *
-     * @param numCores
+     * @param numCores the number of cores
      */
     public void setNumCores(int numCores) {
         this.numCores = numCores;
     }
 
     /**
+     * Set the number of threads per core.
      *
-     * @param numThreadsPerCore
+     * @param numThreadsPerCore the number of threads per core
      */
     public void setNumThreadsPerCore(int numThreadsPerCore) {
         this.numThreadsPerCore = numThreadsPerCore;
     }
 
     /**
+     * Set the size of the L1I caches.
      *
-     * @param l1ISize
+     * @param l1ISize the size of the L1I caches
      */
     public void setL1ISize(String l1ISize) {
         this.l1ISize = l1ISize;
     }
 
     /**
+     * Set the associativity of the L1I caches.
      *
-     * @param l1IAssociativity
+     * @param l1IAssociativity the associativity of the L1I caches
      */
     public void setL1IAssociativity(int l1IAssociativity) {
         this.l1IAssociativity = l1IAssociativity;
     }
 
     /**
+     * Set the size of the L1D caches.
      *
-     * @param l1DSize
+     * @param l1DSize the size of the L1D caches
      */
     public void setL1DSize(String l1DSize) {
         this.l1DSize = l1DSize;
     }
 
     /**
+     * Set the associativity of the L1D caches.
      *
-     * @param l1DAssociativity
+     * @param l1DAssociativity the associativity of the L1D caches
      */
     public void setL1DAssociativity(int l1DAssociativity) {
         this.l1DAssociativity = l1DAssociativity;
     }
 
     /**
+     * Set the size of the L2 cache.
      *
-     * @param l2Size
+     * @param l2Size the size of the L2 cache
      */
     public void setL2Size(String l2Size) {
         this.l2Size = l2Size;
     }
 
     /**
+     * Set the associativity of the L2 cache.
      *
-     * @param l2Associativity
+     * @param l2Associativity the associativity of the L2 cache
      */
     public void setL2Associativity(int l2Associativity) {
         this.l2Associativity = l2Associativity;
     }
 
     /**
+     * Set the replacement policy type of the L2 cache.
      *
-     * @param l2ReplacementPolicyType
+     * @param l2ReplacementPolicyType the replacement policy type of the L2 cache
      */
     public void setL2ReplacementPolicyType(String l2ReplacementPolicyType) {
         this.l2ReplacementPolicyType = l2ReplacementPolicyType;
     }
 
     /**
+     * Get the architecture object.
      *
-     * @return
+     * @return the architecture object
      */
     public Architecture getArchitecture() {
-        if(architecture == null) {
+        if (architecture == null) {
             architecture = ServiceManager.getArchitectureService().getOrAddArchitecture(true, getNumCores(), getNumThreadsPerCore(), getL1ISizeAsInt(), getL1IAssociativity(), getL1DSizeAsInt(), getL1DAssociativity(), getL2SizeAsInt(), getL2Associativity(), Enum.valueOf(CacheReplacementPolicyType.class, getL2ReplacementPolicyType()));
         }
 
@@ -450,11 +489,12 @@ public class ExperimentSpec implements ModelElement {
     }
 
     /**
+     * Get the benchmark.
      *
-     * @return
+     * @return the benchmark
      */
     public Benchmark getBenchmark() {
-        if(benchmark == null) {
+        if (benchmark == null) {
             benchmark = ServiceManager.getBenchmarkService().getBenchmarkByTitle(benchmarkTitle);
         }
 
@@ -462,11 +502,12 @@ public class ExperimentSpec implements ModelElement {
     }
 
     /**
+     * Get the arguments.
      *
-     * @return
+     * @return the arguments
      */
     public String getArguments() {
-        if(arguments == null) {
+        if (arguments == null) {
             String benchmarkArguments = getBenchmarkArguments();
             arguments = benchmarkArguments == null ? getBenchmark().getDefaultArguments() : benchmarkArguments;
         }

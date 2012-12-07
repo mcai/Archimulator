@@ -14,6 +14,7 @@
       <w>dtlb</w>
       <w>dtlbs</w>
       <w>endian</w>
+      <w>enqueued</w>
       <w>evictable</w>
       <w>evicter</w>
       <w>fcsr</w>

@@ -75,40 +75,48 @@ public abstract class Simulation implements SimulationObject {
     private RuntimeHelper runtimeHelper;
 
     /**
-     *
+     * Current (max) dynamic instruction ID.
      */
     public long currentDynamicInstructionId;
+
     /**
-     *
+     * Current (max) reorder buffer entry ID.
      */
     public long currentReorderBufferEntryId;
+
     /**
-     *
+     * Current (max) decode buffer entry ID.
      */
     public long currentDecodeBufferEntryId;
+
     /**
-     *
+     * Current (max) memory hierarchy access ID.
      */
     public long currentMemoryHierarchyAccessId;
+
     /**
-     *
+     * Current (max) net message ID.
      */
     public long currentNetMessageId;
+
     /**
-     *
+     * Current (max) cache coherence flow ID.
      */
     public long currentCacheCoherenceFlowId;
 
     /**
-     *
+     * Pending cache coherence flows.
      */
     public List<CacheCoherenceFlow> pendingFlows = new ArrayList<CacheCoherenceFlow>();
 
     /**
-     * @param type
-     * @param experiment
-     * @param blockingEventDispatcher
-     * @param cycleAccurateEventQueue
+     * Create a simulation.
+     *
+     * @param type                    the simulation type
+     * @param experiment              the experiment object
+     * @param blockingEventDispatcher the blocking event dispatcher
+     * @param cycleAccurateEventQueue the cycle accurate event queue
+     * @param kernelRef               the kernel reference
      */
     public Simulation(SimulationType type, Experiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, Reference<Kernel> kernelRef) {
         this.experiment = experiment;
@@ -138,7 +146,9 @@ public abstract class Simulation implements SimulationObject {
     }
 
     /**
-     * @return
+     * Create the kernel.
+     *
+     * @return the kernel that is created
      */
     public Kernel createKernel() {
         Kernel kernel = new Kernel(this);
@@ -161,7 +171,7 @@ public abstract class Simulation implements SimulationObject {
     }
 
     /**
-     *
+     * Perform the simulation.
      */
     public void simulate() {
         Logger.infof(Logger.SIMULATOR, "begin simulation: %s", this.cycleAccurateEventQueue.getCurrentCycle(), this.getTitle());
@@ -200,6 +210,11 @@ public abstract class Simulation implements SimulationObject {
         this.endSimulation();
     }
 
+    /**
+     * Collect the statistics.
+     *
+     * @param endOfSimulation a value indicating whether it is the end of simulation or not
+     */
     private void collectStats(boolean endOfSimulation) {
         List<ExperimentStat> stats = new ArrayList<ExperimentStat>();
 
@@ -228,6 +243,13 @@ public abstract class Simulation implements SimulationObject {
         ServiceManager.getExperimentStatService().addStatsByParent(this.getExperiment(), stats);
     }
 
+    /**
+     * Collect the statistics.
+     *
+     * @param stats the list of experiment statistics
+     * @param gauge the experiment gauge object
+     * @param obj the owning object
+     */
     private void collectStats(List<ExperimentStat> stats, ExperimentGauge gauge, Object obj) {
         Object keyObj = !StringUtils.isEmpty(gauge.getType().getKeyExpression()) ? JaxenHelper.evaluate(obj, gauge.getType().getKeyExpression()) : null;
         Object valueObj;
@@ -285,32 +307,38 @@ public abstract class Simulation implements SimulationObject {
     }
 
     /**
-     * @return
+     * Get a value indicating whether it can do fast forwarding one cycle or not.
+     *
+     * @return a value indicating whether it can fast forwarding one cycle or not
      */
     protected abstract boolean canDoFastForwardOneCycle();
 
     /**
-     * @return
+     * Get a value indicating whether it can do cache warmup one cycle or not.
+     *
+     * @return a value indicating whether it can do cache warmup one cycle or not
      */
     protected abstract boolean canDoCacheWarmupOneCycle();
 
     /**
-     * @return
+     * Get a value indicating whether it can do measurement one cycle or not.
+     *
+     * @return a value indicating whether it can do measurement one cycle or not
      */
     protected abstract boolean canDoMeasurementOneCycle();
 
     /**
-     *
+     * Begin the simulation.
      */
     protected abstract void beginSimulation();
 
     /**
-     *
+     * End the simulation.
      */
     protected abstract void endSimulation();
 
     /**
-     *
+     * Do fast forwarding.
      */
     public void doFastForward() {
         Logger.info(Logger.SIMULATION, "Switched to fast forward mode.", this.getCycleAccurateEventQueue().getCurrentCycle());
@@ -325,7 +353,7 @@ public abstract class Simulation implements SimulationObject {
     }
 
     /**
-     *
+     * Do cache warmup.
      */
     public void doCacheWarmup() {
         Logger.info(Logger.SIMULATION, "Switched to cache warmup mode.", this.getCycleAccurateEventQueue().getCurrentCycle());
@@ -340,7 +368,7 @@ public abstract class Simulation implements SimulationObject {
     }
 
     /**
-     *
+     * Do measurement.
      */
     public void doMeasurement() {
         Logger.info(Logger.SIMULATION, "Switched to measurement mode.", this.getCycleAccurateEventQueue().getCurrentCycle());
@@ -354,6 +382,9 @@ public abstract class Simulation implements SimulationObject {
         }
     }
 
+    /**
+     * Advance one cycle.
+     */
     private void advanceOneCycle() {
         this.doHouseKeeping();
         this.getCycleAccurateEventQueue().advanceOneCycle();
@@ -366,7 +397,7 @@ public abstract class Simulation implements SimulationObject {
     }
 
     /**
-     *
+     * Do housekeeping work.
      */
     public void doHouseKeeping() {
         this.getProcessor().getKernel().advanceOneCycle();
@@ -374,21 +405,25 @@ public abstract class Simulation implements SimulationObject {
     }
 
     /**
-     * @return
+     * Prepare the kernel.
+     *
+     * @return the kernel that is prepared
      */
     public Kernel prepareKernel() {
         return this.createKernel();
     }
 
     /**
-     * @return
+     * Prepare the cache hierarchy.
+     *
+     * @return the cache hierarchy that is prepared
      */
     public CacheHierarchy prepareCacheHierarchy() {
         return new BasicCacheHierarchy(this.getExperiment(), this, this.getBlockingEventDispatcher(), this.getCycleAccurateEventQueue());
     }
 
     /**
-     *
+     * Dump the tree of the pending cache coherence flows.
      */
     public void dumpPendingFlowTree() {
         for (CacheCoherenceFlow pendingFlow : pendingFlows) {
@@ -400,56 +435,72 @@ public abstract class Simulation implements SimulationObject {
     }
 
     /**
-     * @return
+     * Get the simulation type.
+     *
+     * @return the simulation type
      */
     public SimulationType getType() {
         return type;
     }
 
     /**
-     * @return
+     * Get the time in ticks when the simulation begins.
+     *
+     * @return the time in ticks when the simulation begins
      */
     public long getBeginTime() {
         return beginTime;
     }
 
     /**
-     * @return
+     * Get the time in ticks when the simulation ends.
+     *
+     * @return the time in ticks when the simulation ends
      */
     public long getEndTime() {
         return endTime;
     }
 
     /**
-     * @return
+     * Get the string representation of the time when the simulation begins.
+     *
+     * @return the string representation of the time when the simulation begins
      */
     public String getBeginTimeAsString() {
         return DateHelper.toString(beginTime);
     }
 
     /**
-     * @return
+     * Get the string representation of the time when the simulation ends.
+     *
+     * @return the string representation of the time when the simulation ends
      */
     public String getEndTimeAsString() {
         return DateHelper.toString(endTime);
     }
 
     /**
-     * @return
+     * Get the duration in seconds that the simulation lasts.
+     *
+     * @return the duration in seconds that the simulation lasts
      */
     public long getDurationInSeconds() {
         return (this.getEndTime() - this.getBeginTime()) / 1000;
     }
 
     /**
-     * @return
+     * Get the string representation of the duration that the simulation lasts.
+     *
+     * @return the string representation of the duration that the simulation lasts
      */
     public String getDuration() {
         return DurationFormatUtils.formatDurationHMS(this.getEndTime() - this.getBeginTime());
     }
 
     /**
-     * @return
+     * Get the total number of instructions that the simulation has executed till now.
+     *
+     * @return the total number of instructions that the simulation has executed till now.
      */
     public long getTotalInstructions() {
         long totalInstructions = 0;
@@ -464,92 +515,113 @@ public abstract class Simulation implements SimulationObject {
     }
 
     /**
-     * @return
+     * Get the IPC (instructions per cycle) value.
+     *
+     * @return the IPC (instructions per cycle) value
      */
     public double getInstructionsPerCycle() {
         return (double) this.getTotalInstructions() / this.getCycleAccurateEventQueue().getCurrentCycle();
     }
 
     /**
-     * @return
+     * Get the CPI (cycles per instruction) value.
+     *
+     * @return the CPI (cycles per instruction) value
      */
     public double getCyclesPerInstruction() {
         return (double) this.getCycleAccurateEventQueue().getCurrentCycle() / this.getTotalInstructions();
     }
 
     /**
-     * @return
+     * Get the simulation speed expressed as the CPS (cycles per second) value.
+     *
+     * @return the CPS (cycles per second) value
      */
     public double getCyclesPerSecond() {
         return (double) this.getCycleAccurateEventQueue().getCurrentCycle() / this.getDurationInSeconds();
     }
 
     /**
-     * @return
+     * Get the simulation speed expressed as the IPS (instructions per second) value.
+     *
+     * @return the IPS (instructions per second) value
      */
     public double getInstructionsPerSecond() {
         return (double) this.getTotalInstructions() / this.getDurationInSeconds();
     }
 
     /**
-     * @return
+     * Get the simulation title.
+     *
+     * @return the simulation title
      */
     public String getTitle() {
         return title;
     }
 
     /**
-     * @return
+     * Get the simulation's working directory.
+     *
+     * @return the simulation's working directory
      */
     public String getWorkingDirectory() {
         return "experiments" + File.separator + this.title;
     }
 
     /**
-     * @return
+     * Get the processor object.
+     *
+     * @return the processor object
      */
     public Processor getProcessor() {
         return this.processor;
     }
 
     /**
-     * @return
+     * Get the experiment object.
+     *
+     * @return the experiment object
      */
     public Experiment getExperiment() {
         return experiment;
     }
 
-    /**
-     * @return
-     */
     @Override
     public Simulation getSimulation() {
         return this;
     }
 
     /**
-     * @return
+     * Get the cycle accurate event queue.
+     *
+     * @return the cycle accurate event queue
      */
     public CycleAccurateEventQueue getCycleAccurateEventQueue() {
         return this.cycleAccurateEventQueue;
     }
 
     /**
-     * @return
+     * Get the blocking event dispatcher.
+     *
+     * @return the blocking event dispatcher
      */
     public BlockingEventDispatcher<SimulationEvent> getBlockingEventDispatcher() {
         return this.blockingEventDispatcher;
     }
 
     /**
-     * @return
+     * Get the helper thread L2 cache request profiling helper.
+     *
+     * @return the helper thread L2 cache request profiling helper
      */
     public HelperThreadL2CacheRequestProfilingHelper getHelperThreadL2CacheRequestProfilingHelper() {
         return helperThreadL2CacheRequestProfilingHelper;
     }
 
     /**
-     * @return
+     * Get the runtime helper.
+     *
+     * @return the runtime helper
      */
     public RuntimeHelper getRuntimeHelper() {
         if (runtimeHelper == null) {
@@ -565,7 +637,9 @@ public abstract class Simulation implements SimulationObject {
     }
 
     /**
-     * @return
+     * Get the simulation title prefix.
+     *
+     * @return the simulation title prefix
      */
     public abstract String getPrefix();
 }

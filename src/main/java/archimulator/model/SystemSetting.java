@@ -26,6 +26,7 @@ import net.pickapack.model.ModelElement;
 import java.util.Date;
 
 /**
+ * System setting.
  *
  * @author Min Cai
  */
@@ -44,14 +45,15 @@ public class SystemSetting implements ModelElement {
     private boolean runningExperimentsEnabled;
 
     /**
-     *
+     * Create a system setting. Reserved for ORM only.
      */
     public SystemSetting() {
     }
 
     /**
+     * Create a system setting.
      *
-     * @param title
+     * @param title the title
      */
     public SystemSetting(String title) {
         this.title = title;
@@ -59,49 +61,50 @@ public class SystemSetting implements ModelElement {
     }
 
     /**
+     * Get the system setting's ID.
      *
-     * @return
+     * @return the system setting's ID
      */
     public long getId() {
         return id;
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public long getParentId() {
         return -1;
     }
 
     /**
+     * Get the system setting's title.
      *
-     * @return
+     * @return the system setting's title
      */
     public String getTitle() {
         return title;
     }
 
     /**
+     * Get the time in ticks when the system setting is created.
      *
-     * @return
+     * @return the time in ticks when the system setting is created
      */
     public long getCreateTime() {
         return createTime;
     }
 
     /**
+     * Get a value indicating whether the running of experiments is enabled or not.
      *
-     * @return
+     * @return a value indicating whether the running of experiments is enabled or not
      */
     public boolean isRunningExperimentsEnabled() {
         return runningExperimentsEnabled;
     }
 
     /**
+     * Set a value indicating whether the running of experiments is enabled or not.
      *
-     * @param runningExperimentsEnabled
+     * @param runningExperimentsEnabled a value indicating whether the running of experiments is enabled or not
      */
     public void setRunningExperimentsEnabled(boolean runningExperimentsEnabled) {
         this.runningExperimentsEnabled = runningExperimentsEnabled;

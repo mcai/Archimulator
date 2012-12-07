@@ -22,6 +22,7 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
+ * Experiment pack variable.
  *
  * @author Min Cai
  */
@@ -30,32 +31,36 @@ public class ExperimentPackVariable implements Serializable {
     private List<String> values;
 
     /**
+     * Get the name.
      *
-     * @return
+     * @return the name
      */
     public String getName() {
         return name;
     }
 
     /**
+     * Set the name.
      *
-     * @param name
+     * @param name the name
      */
     public void setName(String name) {
         this.name = name;
     }
 
     /**
+     * Get the values.
      *
-     * @return
+     * @return the values
      */
     public List<String> getValues() {
         return values;
     }
 
     /**
+     * Set the values.
      *
-     * @param values
+     * @param values the values
      */
     public void setValues(List<String> values) {
         this.values = values;

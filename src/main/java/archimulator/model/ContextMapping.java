@@ -23,6 +23,7 @@ import archimulator.service.ServiceManager;
 import java.io.Serializable;
 
 /**
+ * Context mapping, or the assignment of software contexts to hardware threads.
  *
  * @author Min Cai
  */
@@ -44,21 +45,23 @@ public class ContextMapping implements Serializable {
     private transient Benchmark benchmark;
 
     /**
+     * Create a context mapping.
      *
-     * @param threadId
-     * @param benchmark
-     * @param arguments
+     * @param threadId the hardware thread ID.
+     * @param benchmark the benchmark.
+     * @param arguments the command line arguments used in running the software context
      */
     public ContextMapping(int threadId, Benchmark benchmark, String arguments) {
         this(threadId, benchmark, arguments, getDefaultStandardOut(threadId));
     }
 
     /**
+     * Create a context mapping.
      *
-     * @param threadId
-     * @param benchmark
-     * @param arguments
-     * @param standardOut
+     * @param threadId the hardware thread ID.
+     * @param benchmark the benchmark
+     * @param arguments the command line arguments used in running the software context
+     * @param standardOut the standard out
      */
     public ContextMapping(int threadId, Benchmark benchmark, String arguments, String standardOut) {
         this.threadId = threadId;
@@ -68,32 +71,36 @@ public class ContextMapping implements Serializable {
     }
 
     /**
+     * Get the hardware thread ID.
      *
-     * @return
+     * @return the hardware thread ID
      */
     public int getThreadId() {
         return threadId;
     }
 
     /**
+     * Set the hardware thread ID.
      *
-     * @param threadId
+     * @param threadId the hardware thread ID
      */
     public void setThreadId(int threadId) {
         this.threadId = threadId;
     }
 
     /**
+     * Get the benchmark ID.
      *
-     * @return
+     * @return the benchmark ID
      */
     public long getBenchmarkId() {
         return benchmarkId;
     }
 
     /**
+     * Set the benchmark ID.
      *
-     * @param benchmarkId
+     * @param benchmarkId the benchmark ID
      */
     public void setBenchmarkId(long benchmarkId) {
         this.benchmarkId = benchmarkId;
@@ -101,8 +108,9 @@ public class ContextMapping implements Serializable {
     }
 
     /**
+     * Get the command line arguments used in running the software context.
      *
-     * @return
+     * @return the command line arguments used in running the software context
      */
     public String getArguments() {
         if(arguments == null) {
@@ -113,16 +121,18 @@ public class ContextMapping implements Serializable {
     }
 
     /**
+     * Set the command line arguments used in running the software context
      *
-     * @param arguments
+     * @param arguments the command line arguments used in running the software context
      */
     public void setArguments(String arguments) {
         this.arguments = arguments;
     }
 
     /**
+     * Get the standard out.
      *
-     * @return
+     * @return the standard out
      */
     public String getStandardOut() {
         if(standardOut == null) {
@@ -133,64 +143,72 @@ public class ContextMapping implements Serializable {
     }
 
     /**
+     * Set the standard out.
      *
-     * @param standardOut
+     * @param standardOut the standard out
      */
     public void setStandardOut(String standardOut) {
         this.standardOut = standardOut;
     }
 
     /**
+     * Get the dynamic value of the helper thread lookahead.
      *
-     * @return
+     * @return the dynamic value of the helper thread lookahead
      */
     public int getHelperThreadLookahead() {
         return helperThreadLookahead;
     }
 
     /**
+     * Set the dynamic value of the helper thread lookahead.
      *
-     * @param helperThreadLookahead
+     * @param helperThreadLookahead the dynamic value of the helper thread lookahead
      */
     public void setHelperThreadLookahead(int helperThreadLookahead) {
         this.helperThreadLookahead = helperThreadLookahead;
     }
 
     /**
+     * Get the dynamic value of the helper thread stride.
      *
-     * @return
+     * @return the dynamic value of the helper thread stride
      */
     public int getHelperThreadStride() {
         return helperThreadStride;
     }
 
     /**
+     * Set the dynamic value of the helper thread stride.
      *
-     * @param helperThreadStride
+     * @param helperThreadStride the dynamic value of the helper thread stride
      */
     public void setHelperThreadStride(int helperThreadStride) {
         this.helperThreadStride = helperThreadStride;
     }
 
     /**
+     * Get a value indicating whether the dynamic getting/setting of the helper threading parameters is enabled or not.
      *
-     * @return
+     * @return a value indicating whether the dynamic getting/setting of the helper threading parameters is enabled or not.
      */
     public boolean getDynamicHelperThreadParams() {
         return dynamicHelperThreadParams;
     }
 
     /**
+     * Set a value indicating whether the dynamic getting/setting of the helper threading parameters is enabled or not.
      *
-     * @param dynamicHelperThreadParams
+     * @param dynamicHelperThreadParams a value indicating whether the dynamic getting/setting of the helper threading parameters is enabled or not
      */
     public void setDynamicHelperThreadParams(boolean dynamicHelperThreadParams) {
         this.dynamicHelperThreadParams = dynamicHelperThreadParams;
     }
 
     /**
+     * Get the benchmark.
      *
-     * @return
+     * @return the benchmark
      */
     public Benchmark getBenchmark() {
         if (benchmark == null) {
@@ -206,9 +224,10 @@ public class ContextMapping implements Serializable {
     }
 
     /**
+     * Get the default standard out by the hardware thread ID.
      *
-     * @param threadId
-     * @return
+     * @param threadId the hardware thread ID
+     * @return the default standard out by the hardware thread ID
      */
     public static String getDefaultStandardOut(int threadId) {
         return "ctx" + threadId + "_out.txt";

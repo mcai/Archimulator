@@ -26,6 +26,7 @@ import net.pickapack.model.ModelElement;
 import java.util.Date;
 
 /**
+ * Benchmark.
  *
  * @author Min Cai
  */
@@ -56,30 +57,32 @@ public class Benchmark implements ModelElement {
     private boolean helperThreadEnabled;
 
     /**
-     *
+     * Create a benchmark. Reserved for ORM only.
      */
     public Benchmark() {
     }
 
     /**
+     * Create a benchmark.
      *
-     * @param title
-     * @param workingDirectory
-     * @param executable
-     * @param defaultArguments
+     * @param title the title
+     * @param workingDirectory the working directory
+     * @param executable the executable
+     * @param defaultArguments the default arguments
      */
     public Benchmark(String title, String workingDirectory, String executable, String defaultArguments) {
         this(title, workingDirectory, executable, defaultArguments, "", false);
     }
 
     /**
+     * Create a benchmark.
      *
-     * @param title
-     * @param workingDirectory
-     * @param executable
-     * @param defaultArguments
-     * @param standardIn
-     * @param helperThreadEnabled
+     * @param title the title
+     * @param workingDirectory the working directory
+     * @param executable the executable
+     * @param defaultArguments the default arguments
+     * @param standardIn the standard in
+     * @param helperThreadEnabled a value indicating whether the helper threading is enabled or not
      */
     public Benchmark(String title, String workingDirectory, String executable, String defaultArguments, String standardIn, boolean helperThreadEnabled) {
         this.title = title;
@@ -94,16 +97,18 @@ public class Benchmark implements ModelElement {
     }
 
     /**
+     * Get the ID.
      *
-     * @return
+     * @return the ID
      */
     public long getId() {
         return id;
     }
 
     /**
+     * Get the parent ID.
      *
-     * @return
+     * @return the parent ID
      */
     @Override
     public long getParentId() {
@@ -111,56 +116,63 @@ public class Benchmark implements ModelElement {
     }
 
     /**
+     * Get the title.
      *
-     * @return
+     * @return the title
      */
     public String getTitle() {
         return title;
     }
 
     /**
+     * Get the time in ticks when the benchmark is created.
      *
-     * @return
+     * @return the time in ticks when the benchmark is created
      */
     public long getCreateTime() {
         return createTime;
     }
 
     /**
+     * Get the string representation of the time when the benchmark is created.
      *
-     * @return
+     * @return the string representation of the time when the benchmark is created
      */
     public String getCreateTimeAsString() {
         return DateHelper.toString(createTime);
     }
 
     /**
+     * Get the working directory.
      *
-     * @return
+     * @return the working directory
      */
     public String getWorkingDirectory() {
         return workingDirectory;
     }
 
     /**
+     * Get the executable.
      *
-     * @return
+     * @return the executable
      */
     public String getExecutable() {
         return executable;
     }
 
     /**
+     * Get the default arguments.
      *
-     * @return
+     * @return the default arguments
      */
     public String getDefaultArguments() {
         return defaultArguments;
     }
 
     /**
+     * Get the standard in.
      *
-     * @return
+     * @return  the standard in
      */
     public String getStandardIn() {
         if(standardIn == null) {
@@ -171,8 +183,9 @@ public class Benchmark implements ModelElement {
     }
 
     /**
+     * Get a value indicating whether the helper threading is enabled or not.
      *
-     * @return
+     * @return a value indicating whether the helper threading is enabled or not.
      */
     public boolean getHelperThreadEnabled() {
         return helperThreadEnabled;

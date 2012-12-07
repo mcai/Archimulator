@@ -265,16 +265,16 @@ public class Architecture implements ModelElement {
     /**
      * Create an architecture.
      *
-     * @param htLLCRequestProfilingEnabled whether the helper thread LLC request profiling is enabled or not
-     * @param numCores number of cores
-     * @param numThreadsPerCore number of threads per core
-     * @param l1ISize the size of the L1I caches in bytes
-     * @param l1IAssoc the associativity of the L1I caches
-     * @param l1DSize the size of the L1D caches in bytes
-     * @param l1DAssoc the associativity of the L1D caches
-     * @param l2Size the size of the L2 caches in bytes
-     * @param l2Assoc the associativity of the L2 cache
-     * @param l2ReplacementPolicyType the replacement policy type of the L2 cache
+     * @param htLLCRequestProfilingEnabled a value indicating whether the helper thread LLC request profiling is enabled or not
+     * @param numCores                     the number of cores
+     * @param numThreadsPerCore            the number of threads per core
+     * @param l1ISize                      the size of the L1I caches in bytes
+     * @param l1IAssoc                     the associativity of the L1I caches
+     * @param l1DSize                      the size of the L1D caches in bytes
+     * @param l1DAssoc                     the associativity of the L1D caches
+     * @param l2Size                       the size of the L2 caches in bytes
+     * @param l2Assoc                      the associativity of the L2 cache
+     * @param l2ReplacementPolicyType      the replacement policy type of the L2 cache
      */
     public Architecture(boolean htLLCRequestProfilingEnabled, int numCores, int numThreadsPerCore, int l1ISize, int l1IAssoc, int l1DSize, int l1DAssoc, int l2Size, int l2Assoc, CacheReplacementPolicyType l2ReplacementPolicyType) {
         this.createTime = DateHelper.toTick(new Date());
@@ -402,7 +402,7 @@ public class Architecture implements ModelElement {
      * @return title
      */
     public String getTitle() {
-        if(title == null) {
+        if (title == null) {
             updateTitle();
         }
 
@@ -1069,7 +1069,8 @@ public class Architecture implements ModelElement {
     /**
      * Set a value indicating whether the helper thread L2 cache request profiling is enabled or not.
      *
-     * @param helperThreadL2CacheRequestProfilingEnabled a new value indicating whether the helper thread L2 cache request profiling is enabled or not
+     * @param helperThreadL2CacheRequestProfilingEnabled
+     *         a new value indicating whether the helper thread L2 cache request profiling is enabled or not
      */
     public void setHelperThreadL2CacheRequestProfilingEnabled(boolean helperThreadL2CacheRequestProfilingEnabled) {
         this.helperThreadL2CacheRequestProfilingEnabled = helperThreadL2CacheRequestProfilingEnabled;
@@ -1177,7 +1178,8 @@ public class Architecture implements ModelElement {
     /**
      * Set the number of sets in the branch target buffer used in the two-bit branch predictor.
      *
-     * @param twoBitBranchPredictorBranchTargetBufferNumSets the number of sets in the branch target buffer used in the two-bit branch predictor
+     * @param twoBitBranchPredictorBranchTargetBufferNumSets
+     *         the number of sets in the branch target buffer used in the two-bit branch predictor
      */
     public void setTwoBitBranchPredictorBranchTargetBufferNumSets(int twoBitBranchPredictorBranchTargetBufferNumSets) {
         this.twoBitBranchPredictorBranchTargetBufferNumSets = twoBitBranchPredictorBranchTargetBufferNumSets;
@@ -1186,7 +1188,8 @@ public class Architecture implements ModelElement {
     /**
      * Set the associativity in the branch target buffer used in the two-bit branch predictor.
      *
-     * @param twoBitBranchPredictorBranchTargetBufferAssociativity the associativity in the branch target buffer used in the two-bit branch predictor
+     * @param twoBitBranchPredictorBranchTargetBufferAssociativity
+     *         the associativity in the branch target buffer used in the two-bit branch predictor
      */
     public void setTwoBitBranchPredictorBranchTargetBufferAssociativity(int twoBitBranchPredictorBranchTargetBufferAssociativity) {
         this.twoBitBranchPredictorBranchTargetBufferAssociativity = twoBitBranchPredictorBranchTargetBufferAssociativity;
@@ -1195,7 +1198,8 @@ public class Architecture implements ModelElement {
     /**
      * Set the size of the return address stack used in the two-bit branch predictor.
      *
-     * @param twoBitBranchPredictorReturnAddressStackSize the size of the return address stack used in the two-bit branch predictor
+     * @param twoBitBranchPredictorReturnAddressStackSize
+     *         the size of the return address stack used in the two-bit branch predictor
      */
     public void setTwoBitBranchPredictorReturnAddressStackSize(int twoBitBranchPredictorReturnAddressStackSize) {
         this.twoBitBranchPredictorReturnAddressStackSize = twoBitBranchPredictorReturnAddressStackSize;
@@ -1222,7 +1226,8 @@ public class Architecture implements ModelElement {
     /**
      * Set the shift width used in the two-level branch predictor.
      *
-     * @param twoLevelBranchPredictorShiftWidth the shift width used in the two-level branch predictor
+     * @param twoLevelBranchPredictorShiftWidth
+     *         the shift width used in the two-level branch predictor
      */
     public void setTwoLevelBranchPredictorShiftWidth(int twoLevelBranchPredictorShiftWidth) {
         this.twoLevelBranchPredictorShiftWidth = twoLevelBranchPredictorShiftWidth;
@@ -1240,7 +1245,8 @@ public class Architecture implements ModelElement {
     /**
      * Set the number of sets in the branch target buffer used in the two-level branch predictor.
      *
-     * @param twoLevelBranchPredictorBranchTargetBufferNumSets the number of sets in the branch target buffer used in the two-level branch predictor
+     * @param twoLevelBranchPredictorBranchTargetBufferNumSets
+     *         the number of sets in the branch target buffer used in the two-level branch predictor
      */
     public void setTwoLevelBranchPredictorBranchTargetBufferNumSets(int twoLevelBranchPredictorBranchTargetBufferNumSets) {
         this.twoLevelBranchPredictorBranchTargetBufferNumSets = twoLevelBranchPredictorBranchTargetBufferNumSets;
@@ -1249,7 +1255,8 @@ public class Architecture implements ModelElement {
     /**
      * Set the associativity of the branch target buffer used in the two-level branch predictor.
      *
-     * @param twoLevelBranchPredictorBranchTargetBufferAssociativity the associativity in the branch target buffer used in the two-level branch predictor
+     * @param twoLevelBranchPredictorBranchTargetBufferAssociativity
+     *         the associativity in the branch target buffer used in the two-level branch predictor
      */
     public void setTwoLevelBranchPredictorBranchTargetBufferAssociativity(int twoLevelBranchPredictorBranchTargetBufferAssociativity) {
         this.twoLevelBranchPredictorBranchTargetBufferAssociativity = twoLevelBranchPredictorBranchTargetBufferAssociativity;
@@ -1258,7 +1265,8 @@ public class Architecture implements ModelElement {
     /**
      * Set the size of the return address stack used in the two-level branch predictor.
      *
-     * @param twoLevelBranchPredictorReturnAddressStackSize the size of the return address stack used in the two-level branch predictor.
+     * @param twoLevelBranchPredictorReturnAddressStackSize
+     *         the size of the return address stack used in the two-level branch predictor.
      */
     public void setTwoLevelBranchPredictorReturnAddressStackSize(int twoLevelBranchPredictorReturnAddressStackSize) {
         this.twoLevelBranchPredictorReturnAddressStackSize = twoLevelBranchPredictorReturnAddressStackSize;
@@ -1267,7 +1275,8 @@ public class Architecture implements ModelElement {
     /**
      * Set the bimod size used in the combined branch predictor.
      *
-     * @param combinedBranchPredictorBimodSize the bimod size used in the combined branch predictor
+     * @param combinedBranchPredictorBimodSize
+     *         the bimod size used in the combined branch predictor
      */
     public void setCombinedBranchPredictorBimodSize(int combinedBranchPredictorBimodSize) {
         this.combinedBranchPredictorBimodSize = combinedBranchPredictorBimodSize;
@@ -1294,7 +1303,8 @@ public class Architecture implements ModelElement {
     /**
      * Set the meta size used in the combined branch predictor.
      *
-     * @param combinedBranchPredictorMetaSize the meta size used in the combined branch predictor
+     * @param combinedBranchPredictorMetaSize
+     *         the meta size used in the combined branch predictor
      */
     public void setCombinedBranchPredictorMetaSize(int combinedBranchPredictorMetaSize) {
         this.combinedBranchPredictorMetaSize = combinedBranchPredictorMetaSize;
@@ -1303,7 +1313,8 @@ public class Architecture implements ModelElement {
     /**
      * Set the shift width used in the combined branch predictor.
      *
-     * @param combinedBranchPredictorShiftWidth the shift width used in the combined branch predictor
+     * @param combinedBranchPredictorShiftWidth
+     *         the shift width used in the combined branch predictor
      */
     public void setCombinedBranchPredictorShiftWidth(int combinedBranchPredictorShiftWidth) {
         this.combinedBranchPredictorShiftWidth = combinedBranchPredictorShiftWidth;
@@ -1321,7 +1332,8 @@ public class Architecture implements ModelElement {
     /**
      * Set the number of sets in the branch target buffer used in the combined branch predictor.
      *
-     * @param combinedBranchPredictorBranchTargetBufferNumSets the number of sets in the branch target buffer used in the combined branch predictor
+     * @param combinedBranchPredictorBranchTargetBufferNumSets
+     *         the number of sets in the branch target buffer used in the combined branch predictor
      */
     public void setCombinedBranchPredictorBranchTargetBufferNumSets(int combinedBranchPredictorBranchTargetBufferNumSets) {
         this.combinedBranchPredictorBranchTargetBufferNumSets = combinedBranchPredictorBranchTargetBufferNumSets;
@@ -1330,7 +1342,8 @@ public class Architecture implements ModelElement {
     /**
      * Set the associativity of the branch target buffer used in the combined branch predictor.
      *
-     * @param combinedBranchPredictorBranchTargetBufferAssociativity the associativity of the branch target buffer used in the combined branch predictor
+     * @param combinedBranchPredictorBranchTargetBufferAssociativity
+     *         the associativity of the branch target buffer used in the combined branch predictor
      */
     public void setCombinedBranchPredictorBranchTargetBufferAssociativity(int combinedBranchPredictorBranchTargetBufferAssociativity) {
         this.combinedBranchPredictorBranchTargetBufferAssociativity = combinedBranchPredictorBranchTargetBufferAssociativity;
@@ -1339,7 +1352,8 @@ public class Architecture implements ModelElement {
     /**
      * Set the size of the return address stack used in the combined branch predictor.
      *
-     * @param combinedBranchPredictorReturnAddressStackSize the size of the return address stack used in the combined branch predictor
+     * @param combinedBranchPredictorReturnAddressStackSize
+     *         the size of the return address stack used in the combined branch predictor
      */
     public void setCombinedBranchPredictorReturnAddressStackSize(int combinedBranchPredictorReturnAddressStackSize) {
         this.combinedBranchPredictorReturnAddressStackSize = combinedBranchPredictorReturnAddressStackSize;
@@ -1582,7 +1596,8 @@ public class Architecture implements ModelElement {
     /**
      * Set the latency used in the fixed latency memory controller.
      *
-     * @param fixedLatencyMemoryControllerLatency the latency used in the fixed latency memory controller
+     * @param fixedLatencyMemoryControllerLatency
+     *         the latency used in the fixed latency memory controller
      */
     public void setFixedLatencyMemoryControllerLatency(int fixedLatencyMemoryControllerLatency) {
         this.fixedLatencyMemoryControllerLatency = fixedLatencyMemoryControllerLatency;
@@ -1591,7 +1606,8 @@ public class Architecture implements ModelElement {
     /**
      * Set the memory latency used in the simple memory controller.
      *
-     * @param simpleMemoryControllerMemoryLatency the memory latency used in the simple memory controller
+     * @param simpleMemoryControllerMemoryLatency
+     *         the memory latency used in the simple memory controller
      */
     public void setSimpleMemoryControllerMemoryLatency(int simpleMemoryControllerMemoryLatency) {
         this.simpleMemoryControllerMemoryLatency = simpleMemoryControllerMemoryLatency;
@@ -1600,7 +1616,8 @@ public class Architecture implements ModelElement {
     /**
      * Set the memory trunk latency used in the simple memory controller.
      *
-     * @param simpleMemoryControllerMemoryTrunkLatency the memory trunk latency used in the simple memory controller
+     * @param simpleMemoryControllerMemoryTrunkLatency
+     *         the memory trunk latency used in the simple memory controller
      */
     public void setSimpleMemoryControllerMemoryTrunkLatency(int simpleMemoryControllerMemoryTrunkLatency) {
         this.simpleMemoryControllerMemoryTrunkLatency = simpleMemoryControllerMemoryTrunkLatency;
@@ -1618,7 +1635,8 @@ public class Architecture implements ModelElement {
     /**
      * Set the "to DRAM" latency used in the basic memory controller.
      *
-     * @param basicMemoryControllerToDramLatency the "to DRAM" latency used in the basic memory controller
+     * @param basicMemoryControllerToDramLatency
+     *         the "to DRAM" latency used in the basic memory controller
      */
     public void setBasicMemoryControllerToDramLatency(int basicMemoryControllerToDramLatency) {
         this.basicMemoryControllerToDramLatency = basicMemoryControllerToDramLatency;
@@ -1627,7 +1645,8 @@ public class Architecture implements ModelElement {
     /**
      * Set the "from DRAM" latency used in the basic memory controller.
      *
-     * @param basicMemoryControllerFromDramLatency the "from DRAM" latency used in the basic memory controller
+     * @param basicMemoryControllerFromDramLatency
+     *         the "from DRAM" latency used in the basic memory controller
      */
     public void setBasicMemoryControllerFromDramLatency(int basicMemoryControllerFromDramLatency) {
         this.basicMemoryControllerFromDramLatency = basicMemoryControllerFromDramLatency;
@@ -1636,7 +1655,8 @@ public class Architecture implements ModelElement {
     /**
      * Set the precharge latency used in the basic memory controller.
      *
-     * @param basicMemoryControllerPrechargeLatency  the precharge latency used in the basic memory controller
+     * @param basicMemoryControllerPrechargeLatency
+     *         the precharge latency used in the basic memory controller
      */
     public void setBasicMemoryControllerPrechargeLatency(int basicMemoryControllerPrechargeLatency) {
         this.basicMemoryControllerPrechargeLatency = basicMemoryControllerPrechargeLatency;
@@ -1645,7 +1665,8 @@ public class Architecture implements ModelElement {
     /**
      * Set the "closed" latency used in the basic memory controller.
      *
-     * @param basicMemoryControllerClosedLatency the "closed" latency used in the basic memory controller
+     * @param basicMemoryControllerClosedLatency
+     *         the "closed" latency used in the basic memory controller
      */
     public void setBasicMemoryControllerClosedLatency(int basicMemoryControllerClosedLatency) {
         this.basicMemoryControllerClosedLatency = basicMemoryControllerClosedLatency;
@@ -1654,7 +1675,8 @@ public class Architecture implements ModelElement {
     /**
      * Set the conflict latency used in the basic memory controller.
      *
-     * @param basicMemoryControllerConflictLatency the conflict latency used in the basic memory controller
+     * @param basicMemoryControllerConflictLatency
+     *         the conflict latency used in the basic memory controller
      */
     public void setBasicMemoryControllerConflictLatency(int basicMemoryControllerConflictLatency) {
         this.basicMemoryControllerConflictLatency = basicMemoryControllerConflictLatency;

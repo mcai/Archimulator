@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Experiment.
  *
  * @author Min Cai
  */
@@ -79,27 +80,30 @@ public class Experiment implements ModelElement {
     private transient Architecture architecture;
 
     /**
-     *
+     * Current (max) memory page ID.
      */
     public transient int currentMemoryPageId;
 
     /**
-     *
+     * Current (max) process ID.
      */
     public transient int currentProcessId;
 
     /**
-     *
+     * Create an experiment. Reserved for ORM only.
      */
     public Experiment() {
     }
 
     /**
+     * Create an experiment.
      *
-     * @param type
-     * @param architecture
-     * @param numMaxInstructions
-     * @param contextMappings
+     * @param parent the parent experiment pack
+     * @param type the experiment type
+     * @param architecture the architecture
+     * @param numMaxInstructions the upper limit of the number of instructions executed on the first hardware thread
+     * @param contextMappings the context mappings
+     * @param gauges the experiment gauges
      */
     public Experiment(ExperimentPack parent, ExperimentType type, Architecture architecture, long numMaxInstructions, List<ContextMapping> contextMappings, List<ExperimentGauge> gauges) {
         this.parentId = parent != null ? parent.getId() : -1;
@@ -119,7 +123,7 @@ public class Experiment implements ModelElement {
     }
 
     /**
-     *
+     * Update the experiment title.
      */
     public void updateTitle() {
         ContextMapping contextMapping = this.contextMappings.get(0);
@@ -144,16 +148,18 @@ public class Experiment implements ModelElement {
     }
 
     /**
+     * Get the experiment ID.
      *
-     * @return
+     * @return the experiment ID
      */
     public long getId() {
         return id;
     }
 
     /**
+     * Get the parent experiment pack's ID.
      *
-     * @return
+     * @return the parent experiment pack's ID
      */
     @Override
     public long getParentId() {
@@ -161,8 +167,9 @@ public class Experiment implements ModelElement {
     }
 
     /**
+     * Get the experiment title.
      *
-     * @return
+     * @return the experiment title
      */
     public String getTitle() {
         if(title == null) {
@@ -173,150 +180,174 @@ public class Experiment implements ModelElement {
     }
 
     /**
+     * Get the time in ticks when the experiment is created.
      *
-     * @return
+     * @return the time in ticks when the experiment is created
      */
     public long getCreateTime() {
         return createTime;
     }
 
     /**
+     * Get the string representation of the time when the experiment is created.
      *
-     * @return
+     * @return the string representation of the time when the experiment is created
      */
     public String getCreateTimeAsString() {
         return DateHelper.toString(createTime);
     }
 
     /**
+     * Get the experiment type.
      *
-     * @return
+     * @return the experiment type
      */
     public ExperimentType getType() {
         return type;
     }
 
     /**
+     * Get the experiment state.
      *
-     * @return
+     * @return the experiment state
      */
     public ExperimentState getState() {
         return state;
     }
 
     /**
+     * Set the experiment state.
      *
-     * @param state
+     * @param state the experiment state
      */
     public void setState(ExperimentState state) {
         this.state = state;
     }
 
     /**
+     * Get the failed reason, being empty if the experiment is not failed at all.
      *
-     * @return
+     * @return the failed reason
      */
     public String getFailedReason() {
         return failedReason;
     }
 
     /**
+     * Set the failed reason, being empty if the experiment is not failed at all.
      *
-     * @param failedReason
+     * @param failedReason the failed reason
      */
     public void setFailedReason(String failedReason) {
         this.failedReason = failedReason;
     }
 
     /**
+     * Get the architecture ID.
      *
-     * @return
+     * @return the architecture ID
      */
     public long getArchitectureId() {
         return architectureId;
     }
 
     /**
+     * Get the upper limit of the number of instructions executed in the first hardware thread.
      *
-     * @return
+     * @return the upper limit of the number of instructions executed in the first hardware thread
      */
     public long getNumMaxInstructions() {
         return numMaxInstructions;
     }
 
     /**
+     * Get the context mappings.
      *
-     * @return
+     * @return the context mappings
      */
     public List<ContextMapping> getContextMappings() {
         return contextMappings;
     }
 
+    /**
+     * Get the gauge IDs.
+     *
+     * @return the gauge IDs
+     */
     public List<Long> getGaugeIds() {
         return gaugeIds;
     }
 
     /**
+     * Get a statistic value by key.
      *
-     * @param key
-     * @return
+     * @param key the key
+     * @return the statistic value
      */
     public String getStatValue(String key) {
         return getStatValue(key, null);
     }
 
     /**
+     * Get a statistic value by key and default value.
      *
-     * @param key
-     * @return
+     * @param key the key
+     * @param defaultValue the default value
+     * @return the statistic value
      */
     public String getStatValue(String key, String defaultValue) {
         return getStatValue(ServiceManager.getExperimentStatService().getStatByParentAndTitle(this, key), defaultValue);
     }
 
     /**
+     * Get a statistic value from the map and by key.
      *
-     * @param statsMap
-     * @param key
-     * @return
+     * @param statsMap the statistic map
+     * @param key the key
+     * @return the statistic value
      */
     public String getStatValue(Map<String, ExperimentStat> statsMap, String key) {
         return getStatValue(statsMap.containsKey(key) ? statsMap.get(key) : null);
     }
 
     /**
+     * Get a statistic value from the map and by key and default value.
      *
-     * @param statsMap
-     * @param key
-     * @return
+     * @param statsMap the statistics map
+     * @param key the key
+     * @param defaultValue the default value
+     * @return the statistic value
      */
     public String getStatValue(Map<String, ExperimentStat> statsMap, String key, String defaultValue) {
         return getStatValue(statsMap.containsKey(key) ? statsMap.get(key) : null, defaultValue);
     }
 
     /**
+     * Get the statistic value from the experiment stat object.
      *
-     * @param stat
-     * @return
+     * @param stat the experiment stat object
+     * @return the statistic value
      */
     public String getStatValue(ExperimentStat stat) {
         return getStatValue(stat, null);
     }
 
     /**
+     * Get the statistic value from the experiment stat object and the default value.
      *
-     * @param stat
-     * @param defaultValue
-     * @return
+     * @param stat the experiment stat object
+     * @param defaultValue the default value
+     * @return the statistic value
      */
     public String getStatValue(ExperimentStat stat, String defaultValue) {
         return stat != null ? stat.getValue().replaceAll(",", "") : defaultValue;
     }
 
     /**
+     * Get the statistic values from keys.
      *
-     * @param keys
-     * @return
+     * @param keys the keys
+     * @return the statistic values
      */
     public List<String> getStatValues(List<String> keys) {
         return CollectionHelper.transform(keys, new Function1<String, String>() {
@@ -328,8 +359,9 @@ public class Experiment implements ModelElement {
     }
 
     /**
+     * Get the architecture object.
      *
-     * @return
+     * @return the architecture object
      */
     public Architecture getArchitecture() {
         if (architecture == null) {
@@ -340,16 +372,18 @@ public class Experiment implements ModelElement {
     }
 
     /**
+     * Get a value indicating whether the experiment is stopped or not.
      *
-     * @return
+     * @return a value indicating whether the experiment is stopped or not
      */
     public boolean isStopped() {
         return this.state == ExperimentState.COMPLETED || this.state == ExperimentState.ABORTED;
     }
 
     /**
+     * Get the measurement simulation title prefix.
      *
-     * @return
+     * @return the measurement simulation title prefix
      */
     public String getMeasurementTitlePrefix() {
         switch (type) {

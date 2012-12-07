@@ -26,6 +26,7 @@ import net.pickapack.model.ModelElement;
 import java.util.Date;
 
 /**
+ * User.
  *
  * @author Min Cai
  */
@@ -44,15 +45,16 @@ public class User implements ModelElement {
     private String password;
 
     /**
-     *
+     * Create a user. Reserved for ORM only.
      */
     public User() {
     }
 
     /**
+     * Create a user.
      *
-     * @param email email
-     * @param password password
+     * @param email the email
+     * @param password the password
      */
     public User(String email, String password) {
         this.email = email;
@@ -61,43 +63,38 @@ public class User implements ModelElement {
     }
 
     /**
+     * Get the user's ID.
      *
-     * @return id
+     * @return the user's ID
      */
     @Override
     public long getId() {
         return id;
     }
 
-    /**
-     *
-     * @return parent id
-     */
     @Override
     public long getParentId() {
         return -1;
     }
 
-    /**
-     *
-     * @return title
-     */
     @Override
     public String getTitle() {
         return email;
     }
 
     /**
+     * Get the email.
      *
-     * @return
+     * @return the email
      */
     public String getEmail() {
         return email;
     }
 
     /**
+     * Get the time in ticks when the user is created.
      *
-     * @return
+     * @return the time in ticks when the user is created
      */
     @Override
     public long getCreateTime() {
@@ -105,16 +102,18 @@ public class User implements ModelElement {
     }
 
     /**
+     * Get the password.
      *
-     * @return
+     * @return the password
      */
     public String getPassword() {
         return password;
     }
 
     /**
+     * Set the password.
      *
-     * @param password
+     * @param password the password
      */
     public void setPassword(String password) {
         this.password = password;

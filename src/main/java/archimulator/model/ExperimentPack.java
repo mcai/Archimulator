@@ -37,6 +37,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * Experiment pack.
  *
  * @author Min Cai
  */
@@ -60,33 +61,31 @@ public class ExperimentPack implements ModelElement {
     private transient ExperimentSpec baselineExperimentSpec;
 
     /**
-     *
+     * Create an experiment pack.
      */
     public ExperimentPack() {
         this.createTime = DateHelper.toTick(new Date());
     }
 
     /**
+     * Get the experiment pack's ID.
      *
-     * @return
+     * @return the experiment pack's ID
      */
     @Override
     public long getId() {
         return id;
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public long getParentId() {
         return -1;
     }
 
     /**
+     * Get the experiment pack's title.
      *
-     * @return
+     * @return the experiment pack's title
      */
     @Override
     public String getTitle() {
@@ -94,16 +93,18 @@ public class ExperimentPack implements ModelElement {
     }
 
     /**
+     * Set the experiment pack's title.
      *
-     * @param title
+     * @param title the experiment pack's title
      */
     public void setTitle(String title) {
         this.title = title;
     }
 
     /**
+     * Get the time in ticks when the experiment pack is created.
      *
-     * @return
+     * @return the time in ticks when the experiment pack is created
      */
     @Override
     public long getCreateTime() {
@@ -111,32 +112,36 @@ public class ExperimentPack implements ModelElement {
     }
 
     /**
+     * Get the string representation of the time when the experiment pack is created.
      *
-     * @return
+     * @return the string representation of the time when the experiment pack is created
      */
     public String getCreateTimeAsString() {
         return DateHelper.toString(createTime);
     }
 
     /**
+     * Get the experiment type.
      *
-     * @return
+     * @return the experiment type
      */
     public ExperimentType getExperimentType() {
         return experimentType;
     }
 
     /**
+     * Set the experiment type.
      *
-     * @param experimentType
+     * @param experimentType the experiment type
      */
     public void setExperimentType(ExperimentType experimentType) {
         this.experimentType = experimentType;
     }
 
     /**
+     * Get the baseline experiment specification.
      *
-     * @return
+     * @return the baseline experiment specification
      */
     public ExperimentSpec getBaselineExperimentSpec() {
         if(baselineExperimentSpec == null) {
@@ -147,16 +152,18 @@ public class ExperimentPack implements ModelElement {
     }
 
     /**
+     * Set the baseline experiment specification.
      *
-     * @param baselineExperimentSpec
+     * @param baselineExperimentSpec the baseline experiment specification
      */
     public void setBaselineExperimentSpec(ExperimentSpec baselineExperimentSpec) {
         this.baselineExperimentSpec = baselineExperimentSpec;
     }
 
     /**
+     * Get the variable property names.
      *
-     * @return
+     * @return the variable property names
      */
     public List<String> getVariablePropertyNames() {
         return CollectionHelper.transform(this.variables, new Function1<ExperimentPackVariable, String>() {
@@ -168,8 +175,9 @@ public class ExperimentPack implements ModelElement {
     }
 
     /**
+     * Get the variable property values.
      *
-     * @return
+     * @return the variable property values.
      */
     public List<String> getVariablePropertyValues() {
         return CollectionHelper.transform(getCombinations(), new Function1<List<String>, String>() {
@@ -181,24 +189,27 @@ public class ExperimentPack implements ModelElement {
     }
 
     /**
+     * Get the variables.
      *
-     * @return
+     * @return the variables
      */
     public List<ExperimentPackVariable> getVariables() {
         return variables;
     }
 
     /**
+     * Set the variables.
      *
-     * @param variables
+     * @param variables the variables
      */
     public void setVariables(List<ExperimentPackVariable> variables) {
         this.variables = new ArrayList<ExperimentPackVariable>(variables);
     }
 
     /**
+     * Get the experiment specifications.
      *
-     * @return
+     * @return the experiment specifications
      */
     public List<ExperimentSpec> getExperimentSpecs() {
         try {
@@ -230,6 +241,11 @@ public class ExperimentPack implements ModelElement {
         }
     }
 
+    /**
+     * Get the combinations from the variables.
+     *
+     * @return the combinations
+     */
     private List<List<String>> getCombinations() {
         return CombinationHelper.getCombinations(CollectionHelper.transform(this.variables, new Function1<ExperimentPackVariable, List<String>>() {
             @Override

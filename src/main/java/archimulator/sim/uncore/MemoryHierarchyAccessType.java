@@ -24,33 +24,35 @@ package archimulator.sim.uncore;
  */
 public enum MemoryHierarchyAccessType {
     /**
-     *
+     * Instruction fetch.
      */
     IFETCH,
     /**
-     *
+     * Load.
      */
     LOAD,
     /**
-     *
+     * Store.
      */
     STORE,
     /**
-     *
+     * Unknown.
      */
     UNKNOWN;
 
     /**
+     * Get a value indicating whether it is a read or not.
      *
-     * @return
+     * @return a value indicating whether it is a read or not
      */
     public boolean isRead() {
         return this == IFETCH || this == LOAD;
     }
 
     /**
+     * Get a value indicating whether it is a write or not.
      *
-     * @return
+     * @return a value indicating whether it is a write or not
      */
     public boolean isWrite() {
         return this == STORE;
