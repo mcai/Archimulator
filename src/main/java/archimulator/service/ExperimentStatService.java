@@ -19,7 +19,6 @@
 package archimulator.service;
 
 import archimulator.model.Experiment;
-import archimulator.model.ExperimentPack;
 import archimulator.model.ExperimentSummary;
 import archimulator.model.metric.ExperimentGauge;
 import archimulator.model.metric.ExperimentStat;
@@ -38,383 +37,497 @@ import java.util.Map;
  */
 public interface ExperimentStatService extends Service {
     /**
-     * @param parent
-     * @param stats
+     * Add a list of statistics under the specified parent experiment object.
+     *
+     * @param parent the parent experiment object
+     * @param stats  a list of statistics to be added under the specified parent
      */
     void addStatsByParent(Experiment parent, List<ExperimentStat> stats);
 
     /**
-     * @param parent
+     * Clear the list of statistics under the specified parent experiment object.
+     *
+     * @param parent the parent experiment object
      */
     void clearStatsByParent(Experiment parent);
 
     /**
-     * @param parent
-     * @return
+     * Get the list of statistics under the specified parent experiment object.
+     *
+     * @param parent the parent experiment object
+     * @return a list of statistics under the specified parent if any exist; otherwise an empty list
      */
     List<ExperimentStat> getStatsByParent(Experiment parent);
 
     /**
-     * @param parent
-     * @param title
-     * @return
+     * Get the list of statistics under the specified parent experiment object and matching the specified title.
+     *
+     * @param parent the parent experiment object
+     * @param title  the title
+     * @return a list of statistics under the specified parent experiment object and matching the specified title if any exist; otherwise an empty list
      */
     ExperimentStat getStatByParentAndTitle(Experiment parent, String title);
 
     /**
-     * @param parent
-     * @param titleLike
-     * @return
+     * Get the list of statistics under the specified parent experiment object and matching the specified title pattern.
+     *
+     * @param parent    the parent experiment object
+     * @param titleLike the title pattern
+     * @return a list of statistics under the specified parent experiment object and matching the specified title pattern if any exist; otherwise an empty list
      */
     List<ExperimentStat> getStatsByParentAndTitleLike(Experiment parent, String titleLike);
 
     /**
-     * @param parent
-     * @param prefix
-     * @param gauge
-     * @return
+     * Get the list of statistics under the specified parent experiment object and matching the specified title prefix and gauge.
+     *
+     * @param parent the parent experiment object
+     * @param prefix the title prefix
+     * @param gauge  the gauge
+     * @return a list of statistics under the specified parent experiment object and matching the specified title prefix and gauge if any exist; otherwise an empty list
      */
     List<ExperimentStat> getStatsByParentAndPrefixAndGauge(Experiment parent, String prefix, ExperimentGauge gauge);
 
     /**
-     * @param parent
-     * @return
+     * Get the list of statistic prefixes under the specified parent experiment object.
+     *
+     * @param parent the parent experiment object
+     * @return a list of statistic prefixes under the specified parent experiment object
      */
     List<String> getStatPrefixesByParent(Experiment parent);
 
     /**
-     * @param parent
-     * @return
+     * Get the summary of the specified parent experiment object.
+     *
+     * @param parent the parent experiment object
+     * @return the summary of the specified parent experiment object
      */
     ExperimentSummary getSummaryByParent(Experiment parent);
 
     /**
-     * @param parent
+     * Invalidate the summary of the specified parent experiment object.
+     *
+     * @param parent the parent experiment object
      */
     void invalidateSummaryByParent(Experiment parent);
 
     /**
-     * @param title
-     * @param baselineExperiment
-     * @param experiments
+     * Generate a table of summaries for the specified title, baseline experiment and a list of experiments.
+     *
+     * @param title              the title
+     * @param baselineExperiment the baseline experiment
+     * @param experiments        a list of experiments
+     * @return a table of summaries for the specified title, baseline experiment and a list of experiments
      */
+    @Deprecated
     Table tableSummary(String title, Experiment baselineExperiment, List<Experiment> experiments);
 
     /**
-     * @param experiments
+     * Generate a table of summaries for the specified list of experiments.
+     *
+     * @param experiments a list of experiments
+     * @return a table of summaries for the specified list of experiments
      */
     Table tableSummary2(List<Experiment> experiments);
 
     /**
-     * @param experiments
-     * @param keysFunction
-     * @return
+     * Get the list of breakdowns for the specified list of experiments and the keys function.
+     *
+     * @param experiments  a list of experiments
+     * @param keysFunction the keys function
+     * @return a list of breakdowns for the specified list of experiments and the keys function
      */
     List<Map<String, Double>> getBreakdowns(List<Experiment> experiments, Function1<Experiment, List<String>> keysFunction);
 
     /**
-     * @param experiment
-     * @param keysFunction
-     * @return
+     * Get the breakdown for the specified experiment object and the keys function.
+     *
+     * @param experiment   the experiment object
+     * @param keysFunction the keys function
+     * @return the breakdown for the specified experiment object and the keys function
      */
     Map<String, Double> getBreakdown(Experiment experiment, Function1<Experiment, List<String>> keysFunction);
 
     /**
-     * @param baselineExperiment
-     * @param experiments
-     * @return
+     * Get the list of speedups for the specified baseline experiment and a list of experiments.
+     *
+     * @param baselineExperiment the baseline experiment
+     * @param experiments        a list of experiments
+     * @return the list of speedups for the specified baseline experiment and a list of experiments
      */
     List<Double> getSpeedups(Experiment baselineExperiment, List<Experiment> experiments);
 
     /**
-     * @param baselineExperiment
-     * @param experiment
-     * @return
+     * Get the speedup for the specified baseline experiment and the other experiment.
+     *
+     * @param baselineExperiment the baseline experiment
+     * @param experiment         the other experiment
+     * @return the speedup for the specified baseline experiment and the other experiment
      */
     double getSpeedup(Experiment baselineExperiment, Experiment experiment);
 
     /**
-     * @param experimentPack
-     * @param baselineExperiment
-     * @param experiments
+     * Generate a multi bar plot object for showing the speedups for the specified baseline experiment and a list of experiments.
+     *
+     * @param baselineExperiment the baseline experiment
+     * @param experiments        a list of experiments
+     * @return a multi bar plot object for showing the speedups for the specified baseline experiment and a list of experiments
      */
-    MultiBarPlot plotSpeedups(ExperimentPack experimentPack, Experiment baselineExperiment, List<Experiment> experiments);
+    MultiBarPlot plotSpeedups(Experiment baselineExperiment, List<Experiment> experiments);
 
     /**
-     * @param experiments
-     * @return
+     * Get the list of the number of total instructions for the specified list of experiments.
+     *
+     * @param experiments a list of experiments
+     * @return a list of the number of total instructions for the specified list of experiments
      */
     List<Double> getTotalInstructions(List<Experiment> experiments);
 
     /**
-     * @param experimentPack
-     * @param experiments
+     * Generate a multi bar plot object for showing the total instructions for the specified list of experiments.
+     *
+     * @param experiments    a list of experiments
+     * @return a multi bar plot object for showing the total instructions for the specified list of experiments
      */
-    MultiBarPlot plotTotalInstructions(ExperimentPack experimentPack, List<Experiment> experiments);
+    MultiBarPlot plotTotalInstructions(List<Experiment> experiments);
 
     /**
-     * @param experiments
-     * @return
+     * Get a list of normalized number of total instructions for the specified list of experiments.
+     *
+     * @param experiments a list of experiments
+     * @return a list of normalized number of total instructions for the specified list of experiments
      */
     List<Double> getNormalizedTotalInstructions(List<Experiment> experiments);
 
     /**
-     * @param experimentPack
-     * @param experiments
+     * Generate a multi bar plot object for showing the list of normalized number of total instructions for the specified list of experiments.
+     *
+     * @param experiments    a list of experiments
+     * @return a multi bar plot object for showing the list of normalized number of total instructions for the specified list of experiments
      */
-    MultiBarPlot plotNormalizedTotalInstructions(ExperimentPack experimentPack, List<Experiment> experiments);
+    MultiBarPlot plotNormalizedTotalInstructions(List<Experiment> experiments);
 
     /**
-     * @param experiments
-     * @return
+     * Get a list of the number of total cycles for the specified list of experiments.
+     *
+     * @param experiments a list of experiments
+     * @return a list of the number of total cycles for the specified list of experiments
      */
     List<Double> getTotalCycles(List<Experiment> experiments);
 
     /**
-     * @param experimentPack
-     * @param experiments
+     * Generate a multi bar plot object for showing the list of the number of total cycles for the specified list of experiments.
+     *
+     * @param experiments    a list of experiments
+     * @return a multi bar plot object for showing the list of the number of total cycles for the specified list of experiments
      */
-    MultiBarPlot plotTotalCycles(ExperimentPack experimentPack, List<Experiment> experiments);
+    MultiBarPlot plotTotalCycles(List<Experiment> experiments);
 
     /**
-     * @param experiments
-     * @return
+     * Get a list of the normalized number of total cycles for the specified list of experiments.
+     *
+     * @param experiments a list of experiments
+     * @return a list of the normalized number of total cycles for the specified list of experiments
      */
     List<Double> getNormalizedTotalCycles(List<Experiment> experiments);
 
     /**
-     * @param experimentPack
-     * @param experiments
+     * Generate a multi bar plot object for showing the list of the normalized number of total cycles for the specified list of experiments.
+     *
+     * @param experiments a list of experiments
+     * @return a multi bar plot object for showing the list of the normalized number of total cycles for the specified list of experiments
      */
-    MultiBarPlot plotNormalizedTotalCycles(ExperimentPack experimentPack, List<Experiment> experiments);
+    MultiBarPlot plotNormalizedTotalCycles(List<Experiment> experiments);
 
     /**
-     * @param experiments
-     * @return
+     * Get a list of the number of L2 downward read misses for the specified list of experiments.
+     *
+     * @param experiments a list of experiments
+     * @return a list of the number of L2 downward read misses for the specified list of experiments
      */
     List<Double> getNumL2DownwardReadMisses(List<Experiment> experiments);
 
     /**
-     * @param experimentPack
-     * @param experiments
+     * Generate a multi bar plot object for showing the list of the number of L2 downward read misses for the specified list of experiments.
+     *
+     * @param experiments a list of experiments
+     * @return a multi bar plot object for showing the list of the number of L2 downward read misses for the specified experiment list of experiments
      */
-    MultiBarPlot plotNumL2DownwardReadMisses(ExperimentPack experimentPack, List<Experiment> experiments);
+    MultiBarPlot plotNumL2DownwardReadMisses(List<Experiment> experiments);
 
     /**
-     * @param experiments
-     * @return
+     * Get a list of the normalized number of L2 downward read misses for the specified list of experiments.
+     *
+     * @param experiments a list of experiments
+     * @return a list of the normalized number of L2 downward read misses for the specified list of experiments
      */
     List<Double> getNormalizedNumL2DownwardReadMisses(List<Experiment> experiments);
 
     /**
-     * @param experimentPack
-     * @param experiments
+     * Generate a multi bar plot object for showing the list of the normalized number of L2 downward read misses for the specified list of experiments.
+     *
+     * @param experiments a list of experiments
+     * @return a multi bar plot object for showing the list of the normalized number of L2 downward read misses for the specified list of experiments
      */
-    MultiBarPlot plotNormalizedNumL2DownwardReadMisses(ExperimentPack experimentPack, List<Experiment> experiments);
+    MultiBarPlot plotNormalizedNumL2DownwardReadMisses(List<Experiment> experiments);
 
     /**
-     * @param experimentPack
-     * @param experiments
-     * @return
+     * Get a list of the number of main thread L2 cache hits for the specified list of experiments.
+     *
+     * @param experiments a list of experiments
+     * @return a list of the number of main thread L2 cache hits for the specified list of experiments
      */
-    List<Double> getNumMainThreadL2CacheHits(ExperimentPack experimentPack, List<Experiment> experiments);
+    List<Double> getNumMainThreadL2CacheHits(List<Experiment> experiments);
 
     /**
-     * @param experimentPack
-     * @param experiments
-     * @return
+     * Generate a multi bar plot object for showing the list of the number of main thread L2 cache hits for the specified list of experiments.
+     *
+     * @param experiments a list of experiments
+     * @return a multi bar plot object for showing the list of the number of main thread L2 cache hits for the specified list of experiments
      */
-    List<Double> getNumMainThreadL2CacheMisses(ExperimentPack experimentPack, List<Experiment> experiments);
+    MultiBarPlot plotNumMainThreadL2CacheHits(List<Experiment> experiments);
 
     /**
-     * @param experimentPack
-     * @param experiments
-     * @return
+     * Get a list of the number of main thread L2 cache misses for the specified list of experiments.
+     *
+     * @param experiments a list of experiments
+     * @return a list of the number of main thread L2 cache misses for the specified list of experiments
      */
-    List<Double> getNumHelperThreadL2CacheHits(ExperimentPack experimentPack, List<Experiment> experiments);
+    List<Double> getNumMainThreadL2CacheMisses(List<Experiment> experiments);
 
     /**
-     * @param experimentPack
-     * @param experiments
-     * @return
+     * Generate a multi bar plot object for showing the list of the number of main thread L2 cache misses for the specified list of experiments.
+     *
+     * @param experiments a list of experiments
+     * @return a multi bar plot object for showing the list of the number of main thread L2 cache misses for the specified list of experiments
      */
-    List<Double> getNumHelperThreadL2CacheMisses(ExperimentPack experimentPack, List<Experiment> experiments);
+    MultiBarPlot plotNumMainThreadL2CacheMisses(List<Experiment> experiments);
 
     /**
-     * @param experimentPack
-     * @param experiments
-     * @return
+     * Get a list of the number of helper thread L2 cache hits for the specified list of experiments.
+     *
+     * @param experiments a list of experiments
+     * @return a list of the number of helper thread L2 cache hits for the specified list of experiments
      */
-    List<Double> getNormalizedNumMainThreadL2CacheHits(ExperimentPack experimentPack, List<Experiment> experiments);
+    List<Double> getNumHelperThreadL2CacheHits(List<Experiment> experiments);
 
     /**
-     * @param experimentPack
-     * @param experiments
-     * @return
+     * Generate a multi bar plot object for showing the list of the number of helper thread L2 cache hits for the specified list of experiments.
+     *
+     * @param experiments a list of experiments
+     * @return a multi bar plot object for showing the list of the number of helper thread L2 cache hits for the specified list of experiments
      */
-    List<Double> getNormalizedNumMainThreadL2CacheMisses(ExperimentPack experimentPack, List<Experiment> experiments);
+    MultiBarPlot plotNumHelperThreadL2CacheHits(List<Experiment> experiments);
 
     /**
-     * @param experimentPack
-     * @param experiments
-     * @return
+     * Get a list of the number of helper thread L2 cache misses for the specified list of experiments.
+     *
+     * @param experiments a list of experiments
+     * @return a list of the number of helper thread L2 cache misses for the specified list of experiments
      */
-    List<Double> getNormalizedNumHelperThreadL2CacheHits(ExperimentPack experimentPack, List<Experiment> experiments);
+    List<Double> getNumHelperThreadL2CacheMisses(List<Experiment> experiments);
 
     /**
-     * @param experimentPack
-     * @param experiments
-     * @return
+     * Generate a multi bar plot object for showing the list of the number of helper thread L2 cache misses for the specified list of experiments.
+     *
+     * @param experiments a list of experiments
+     * @return a multi bar plot object for showing the list of the number of helper thread L2 cache misses for the specified list of experiments
      */
-    List<Double> getNormalizedNumHelperThreadL2CacheMisses(ExperimentPack experimentPack, List<Experiment> experiments);
+    MultiBarPlot plotNumHelperThreadL2CacheMisses(List<Experiment> experiments);
 
     /**
-     * @param experimentPack
-     * @param experiments
+     * Get a list of the normalized number of main thread L2 cache hits for the specified list of experiments.
+     *
+     * @param experiments a list of experiments
+     * @return a list of the normalized number of main thread L2 cache hits for the specified list of experiments
      */
-    MultiBarPlot plotNumMainThreadL2CacheHits(ExperimentPack experimentPack, List<Experiment> experiments);
+    List<Double> getNormalizedNumMainThreadL2CacheHits(List<Experiment> experiments);
 
     /**
-     * @param experimentPack
-     * @param experiments
+     * Generate a multi bar plot object for showing the list of the normalized number of main thread L2 cache hits for the specified list of experiments.
+     *
+     * @param experiments a list of experiments
+     * @return a multi bar plot object for showing the list of the normalized number of main thread L2 cache hits for the specified list of experiments
      */
-    MultiBarPlot plotNumMainThreadL2CacheMisses(ExperimentPack experimentPack, List<Experiment> experiments);
+    MultiBarPlot plotNormalizedNumMainThreadL2CacheHits(List<Experiment> experiments);
 
     /**
-     * @param experimentPack
-     * @param experiments
+     * Get a list of the normalized number of main thread L2 cache misses for the specified list of experiments.
+     *
+     * @param experiments a list of experiments
+     * @return a list of the normalized number of main thread L2 cache hits for the specified list of experiments
      */
-    MultiBarPlot plotNumHelperThreadL2CacheHits(ExperimentPack experimentPack, List<Experiment> experiments);
+    List<Double> getNormalizedNumMainThreadL2CacheMisses(List<Experiment> experiments);
 
     /**
-     * @param experimentPack
-     * @param experiments
+     * Generate a multi bar plot object for showing the list of the normalized number of main thread L2 cache misses for the specified list of experiments.
+     *
+     * @param experiments a list of experiments
+     * @return a multi bar plot object for showing the list of the normalized number of main thread L2 cache misses for the specified list of experiments
      */
-    MultiBarPlot plotNumHelperThreadL2CacheMisses(ExperimentPack experimentPack, List<Experiment> experiments);
+    MultiBarPlot plotNormalizedNumMainThreadL2CacheMisses(List<Experiment> experiments);
 
     /**
-     * @param experimentPack
-     * @param experiments
+     * Get a list of the normalized number of helper thread L2 cache hits for the specified list of experiments.
+     *
+     * @param experiments a list of experiments
+     * @return a list of the normalized number of helper thread L2 cache hits for the specified list of experiments
      */
-    MultiBarPlot plotNormalizedNumMainThreadL2CacheHits(ExperimentPack experimentPack, List<Experiment> experiments);
+    List<Double> getNormalizedNumHelperThreadL2CacheHits(List<Experiment> experiments);
 
     /**
-     * @param experimentPack
-     * @param experiments
+     * Generate multi bar plot object for showing the list of the normalized number of helper thread L2 cache hits for the specified list of experiments.
+     *
+     * @param experiments a list of experiments
+     * @return a multi bar plot object for showing the list of the normalized number of helper thread L2 cache hits for the specified list of experiments
      */
-    MultiBarPlot plotNormalizedNumMainThreadL2CacheMisses(ExperimentPack experimentPack, List<Experiment> experiments);
+    MultiBarPlot plotNormalizedNumHelperThreadL2CacheHits(List<Experiment> experiments);
 
     /**
-     * @param experimentPack
-     * @param experiments
+     * Get a list of the normalized number of helper thread L2 cache misses for the specified list of experiments.
+     *
+     * @param experiments a list of experiments
+     * @return a list of the normalized number of helper thread L2 cache misses for the specified list of experiments
      */
-    MultiBarPlot plotNormalizedNumHelperThreadL2CacheHits(ExperimentPack experimentPack, List<Experiment> experiments);
+    List<Double> getNormalizedNumHelperThreadL2CacheMisses(List<Experiment> experiments);
 
     /**
-     * @param experimentPack
-     * @param experiments
+     * Generate a multi bar plot object for showing the list of the normalized number of helper thread L2 cache misses for the specified list of experiments.
+     *
+     * @param experiments a list of experiments
+     * @return a multi bar plot object for showing the list of the normalized number of helper thread L2 cache misses for the specified list of experiments
      */
-    MultiBarPlot plotNormalizedNumHelperThreadL2CacheMisses(ExperimentPack experimentPack, List<Experiment> experiments);
+    MultiBarPlot plotNormalizedNumHelperThreadL2CacheMisses(List<Experiment> experiments);
 
     /**
-     * @param experimentPack
-     * @param experiments
-     * @return
+     * Get a list of the helper thread L2 cache request coverage for the specified list of experiments.
+     *
+     * @param experiments a list of experiments
+     * @return a list of the helper thread L2 cache request coverage for the specified list of experiments
      */
-    List<Double> getHelperThreadL2CacheRequestCoverage(ExperimentPack experimentPack, List<Experiment> experiments);
+    List<Double> getHelperThreadL2CacheRequestCoverage(List<Experiment> experiments);
 
     /**
-     * @param experimentPack
-     * @param experiments
-     * @return
+     * Generate a multi bar plot object for showing the list of the helper thread L2 cache request coverage for the specified list of experiments.
+     *
+     * @param experiments a list of experiments
+     * @return a multi bar plot object for showing the list of the helper thread L2 cache request coverage for the specified list of experiments
      */
-    List<Double> getHelperThreadL2CacheRequestAccuracy(ExperimentPack experimentPack, List<Experiment> experiments);
+    MultiBarPlot plotHelperThreadL2CacheRequestCoverage(List<Experiment> experiments);
 
     /**
-     * @param experimentPack
-     * @param experiments
-     * @return
+     * Get a list of the helper thread L2 cache request accuracy for the specified list of experiments.
+     *
+     * @param experiments a list of experiments
+     * @return a list of the helper thread L2 cache request accuracy for the specified list of experiments
      */
-    List<Double> getNormalizedHelperThreadL2CacheRequestCoverage(ExperimentPack experimentPack, List<Experiment> experiments);
+    List<Double> getHelperThreadL2CacheRequestAccuracy(List<Experiment> experiments);
 
     /**
-     * @param experimentPack
-     * @param experiments
-     * @return
+     * Generate a multi bar plot object for showing the list of the helper thread L2 cache request accuracy for the specified list of experiments.
+     *
+     * @param experiments a list of experiments
+     * @return a multi bar plot for showing the list of the helper thread L2 cache request accuracy for the specified list of experiments
      */
-    List<Double> getNormalizedHelperThreadL2CacheRequestAccuracy(ExperimentPack experimentPack, List<Experiment> experiments);
+    MultiBarPlot plotHelperThreadL2CacheRequestAccuracy(List<Experiment> experiments);
 
     /**
-     * @param experimentPack
-     * @param experiments
+     * Get a list of the normalized helper thread L2 cache request coverage for the specified list of experiments.
+     *
+     * @param experiments a list of experiments
+     * @return a list of the normalized helper thread L2 cache request coverage for the specified list of experiments
      */
-    MultiBarPlot plotHelperThreadL2CacheRequestCoverage(ExperimentPack experimentPack, List<Experiment> experiments);
+    List<Double> getNormalizedHelperThreadL2CacheRequestCoverage(List<Experiment> experiments);
 
     /**
-     * @param experimentPack
-     * @param experiments
+     * Generate a multi bar plot object for showing the list of the normalized helper thread L2 cache request coverage for the specified list of experiments.
+     *
+     * @param experiments a list of experiments
+     * @return a multi bar plot object for showing the list of the normalized helper thread L2 cache request coverage for the specified list of experiments
      */
-    MultiBarPlot plotHelperThreadL2CacheRequestAccuracy(ExperimentPack experimentPack, List<Experiment> experiments);
+    MultiBarPlot plotNormalizedHelperThreadL2CacheRequestCoverage(List<Experiment> experiments);
 
     /**
-     * @param experimentPack
-     * @param experiments
+     * Get a list of the normalized helper thread L2 cache request accuracy for the specified list of experiments.
+     *
+     * @param experiments a list of experiments
+     * @return a list of the normalized helper thread L2 cache request accuracy for the specified list of experiments
      */
-    MultiBarPlot plotNormalizedHelperThreadL2CacheRequestCoverage(ExperimentPack experimentPack, List<Experiment> experiments);
+    List<Double> getNormalizedHelperThreadL2CacheRequestAccuracy(List<Experiment> experiments);
 
     /**
-     * @param experimentPack
-     * @param experiments
+     * Generate a multi bar plot object for showing the list of the normalized helper thread L2 cache request accuracy for the specified list of experiments.
+     *
+     * @param experiments a list of experiments
+     * @return a multi bar plot object for showing the list of the normalized helper thread L2 cache request accuracy for the specified list of experiments
      */
-    MultiBarPlot plotNormalizedHelperThreadL2CacheRequestAccuracy(ExperimentPack experimentPack, List<Experiment> experiments);
+    MultiBarPlot plotNormalizedHelperThreadL2CacheRequestAccuracy(List<Experiment> experiments);
 
     /**
-     * @param experiments
-     * @return
+     * Get a list of the L2 cache downward read MPKI for the specified list of experiments.
+     *
+     * @param experiments a list of experiments
+     * @return a list of the L2 cache downward read MPKI for the specified list of experiments
      */
     List<Double> getL2DownwardReadMPKIs(List<Experiment> experiments);
 
     /**
-     * @param experimentPack
-     * @param experiments
+     * Generate a multi bar plot object for showing the list of the L2 cache downward read MPKI for the specified list of experiments.
+     *
+     * @param experiments a list of experiments
+     * @return a multi bar plot object for showing the list of the L2 cache downward read MPKI for the specified list of experiments
      */
-    MultiBarPlot plotL2DownwardReadMPKIs(ExperimentPack experimentPack, List<Experiment> experiments);
+    MultiBarPlot plotL2DownwardReadMPKIs(List<Experiment> experiments);
 
     /**
-     * @param experiments
-     * @return
+     * Get a list of the normalized L2 cache downward read MPKI for the specified list of experiments.
+     *
+     * @param experiments a list of experiments
+     * @return a list of the normalized L2 cache downward read MPKI for the specified list of experiments
      */
     List<Double> getNormalizedL2DownwardReadMPKIs(List<Experiment> experiments);
 
     /**
-     * @param experimentPack
-     * @param experiments
+     * Generate a multi bar plot object for showing the list of the normalized L2 cache downward read MPKI for the specified list of experiments.
+     *
+     * @param experiments a list of experiments
+     * @return a multi bar plot object for showing the list of the normalized L2 cache downward read MPKI for the specified list of experiments
      */
-    MultiBarPlot plotNormalizedL2DownwardReadMPKIs(ExperimentPack experimentPack, List<Experiment> experiments);
+    MultiBarPlot plotNormalizedL2DownwardReadMPKIs(List<Experiment> experiments);
 
     /**
-     * @param experiments
-     * @return
+     * Get a list of helper thread L2 cache request breakdown for the specified list of experiments.
+     *
+     * @param experiments a list of experiments
+     * @return a list of helper thread L2 cache request breakdown for the specified list of experiments
      */
     List<Map<String, Double>> getHelperThreadL2CacheRequestBreakdowns(List<Experiment> experiments);
 
     /**
-     * @param experimentPack
-     * @param experiments
+     * Generate multi bar plot object for showing the list of helper thread L2 cache request breakdown for the specified list of experiments.
+     *
+     * @param experiments a list of experiments
+     * @return a multi bar plot object for showing the list of helper thread L2 cache request breakdown for the specified list of experiments
      */
-    MultiBarPlot plotHelperThreadL2CacheRequestBreakdowns(ExperimentPack experimentPack, List<Experiment> experiments);
+    MultiBarPlot plotHelperThreadL2CacheRequestBreakdowns(List<Experiment> experiments);
 
     /**
-     * @param experiments
-     * @return
+     * Get a list of L2 cache request breakdown for the specified list of experiments.
+     *
+     * @param experiments a list of experiments
+     * @return a list of L2 cache request breakdown for the specified list of experiments
      */
     List<Map<String, Double>> getL2CacheRequestBreakdowns(List<Experiment> experiments);
 
     /**
-     * @param experimentPack
-     * @param experiments
+     * Generate a multi bar plot object for showing the list of L2 cache request breakdown for the specified list of experiments.
+     *
+     * @param experiments a list of experiments
+     * @return a multi bar plot object for showing the list of L2 cache request breakdown for the specified list of experiments
      */
-    MultiBarPlot plotL2CacheRequestBreakdowns(ExperimentPack experimentPack, List<Experiment> experiments);
+    MultiBarPlot plotL2CacheRequestBreakdowns(List<Experiment> experiments);
 
+    /**
+     * Initialize the service.
+     */
     void initialize();
 }

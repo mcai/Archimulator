@@ -148,6 +148,10 @@ void fill_from_fields(node_t *nodelist, int degree) {
     MAGIC(9001);
 #endif
 
+#ifdef MIPS_1
+  asm volatile ("addiu $0,$0,3721");
+#endif
+
   node_t *cur_node;
   for(cur_node = nodelist; cur_node; cur_node = cur_node->next) {
     int j;
@@ -178,6 +182,10 @@ void fill_from_fields(node_t *nodelist, int degree) {
     
 #if defined(SIMICS)
     MAGIC(9002);
+#endif
+
+#ifdef MIPS_1
+  asm volatile ("addiu $0,$0,3723");
 #endif
 }
 

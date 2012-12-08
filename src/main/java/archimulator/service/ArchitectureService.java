@@ -120,5 +120,8 @@ public interface ArchitectureService extends Service {
      */
     Architecture getOrAddArchitecture(boolean htLLCRequestProfilingEnabled, int numCores, int numThreadsPerCore, int l1ISize, int l1IAssoc, int l1DSize, int l1DAssoc, int l2Size, int l2Assoc, CacheReplacementPolicyType l2ReplacementPolicyType);
 
+    /**
+     * Initialize the service.
+     */
     void initialize();
 }

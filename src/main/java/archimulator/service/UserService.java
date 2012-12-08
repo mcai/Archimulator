@@ -24,53 +24,64 @@ import net.pickapack.service.Service;
 import java.util.List;
 
 /**
+ * Service for managing users.
  *
  * @author Min Cai
  */
 public interface UserService extends Service {
     /**
+     * Get all the users.
      *
-     * @return
+     * @return all the users
      */
     List<User> getAllUsers();
 
     /**
+     * Get a user by ID.
      *
-     * @param id
-     * @return
+     * @param id the user's ID
+     * @return the user matching the ID if any exists; otherwise null
      */
     User getUserById(long id);
 
     /**
+     * Get a user by email.
      *
-     * @param email
-     * @return
+     * @param email the user's email
+     * @return the user matching the email if any exists; otherwise null
      */
     User getUserByEmail(String email);
 
     /**
+     * Get the first user.
      *
-     * @return
+     * @return the first user if any exists; otherwise null
      */
     User getFirstUser();
 
     /**
+     * Add a user.
      *
-     * @param user
+     * @param user the user that is to be added
      */
     void addUser(User user);
 
     /**
+     * Remove a user by ID.
      *
-     * @param id
+     * @param id the ID of the user that is to be removed
      */
     void removeUserById(long id);
 
     /**
+     * Update a user.
      *
-     * @param user
+     * @param user the user that is to be updated
      */
     void updateUser(User user);
 
+    /**
+     * Initialize the service.
+     */
     void initialize();
 }

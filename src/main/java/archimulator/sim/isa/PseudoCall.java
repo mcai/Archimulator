@@ -16,46 +16,43 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.analysis;
-
-import java.util.SortedSet;
-import java.util.TreeSet;
+package archimulator.sim.isa;
 
 /**
+ * A pseudocall.
  *
  * @author Min Cai
  */
-public class Program {
-    private String fileName;
-    private SortedSet<Function> functions;
+public class PseudoCall {
+    private int rs;
+    private int imm;
 
     /**
+     * Create a pseudocall.
      *
-     * @param fileName
+     * @param rs the "rs" register value
+     * @param imm the immediate value
      */
-    public Program(String fileName) {
-        this.fileName = fileName;
-        this.functions = new TreeSet<Function>();
+    public PseudoCall(int rs, int imm) {
+        this.rs = rs;
+        this.imm = imm;
     }
 
     /**
+     * Get the "rs" register value.
      *
-     * @return
+     * @return the "rs" register value
      */
-    public String getFileName() {
-        return fileName;
+    public int getRs() {
+        return rs;
     }
 
     /**
+     * Get the immediate value.
      *
-     * @return
+     * @return the immediate value
      */
-    public SortedSet<Function> getFunctions() {
-        return functions;
-    }
-
-    @Override
-    public String toString() {
-        return String.format("Program{fileName='%s'}", fileName);
+    public int getImm() {
+        return imm;
     }
 }

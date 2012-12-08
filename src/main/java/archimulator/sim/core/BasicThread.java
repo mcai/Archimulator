@@ -38,7 +38,6 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
  * @author Min Cai
  */
 public class BasicThread extends AbstractBasicThread {
@@ -58,7 +57,6 @@ public class BasicThread extends AbstractBasicThread {
     private DynamicInstruction nextInstructionInCacheWarmupPhase;
 
     /**
-     *
      * @param core
      * @param num
      */
@@ -75,16 +73,16 @@ public class BasicThread extends AbstractBasicThread {
                     ContextMapping contextMapping = event.getContext().getProcess().getContextMapping();
 
                     if (contextMapping.getBenchmark().getHelperThreadEnabled()) {
-                        if (event.getImm() == 3820) {
-                            savedRegisterValue.set(event.getContext().getRegisterFile().getGpr(event.getRs()));
-                            event.getContext().getRegisterFile().setGpr(event.getRs(), getHelperThreadLookahead(contextMapping));
-                        } else if (event.getImm() == 3821) {
-                            event.getContext().getRegisterFile().setGpr(event.getRs(), savedRegisterValue.get());
-                        } else if (event.getImm() == 3822) {
-                            savedRegisterValue.set(event.getContext().getRegisterFile().getGpr(event.getRs()));
-                            event.getContext().getRegisterFile().setGpr(event.getRs(), getHelperThreadStride(contextMapping));
-                        } else if (event.getImm() == 3823) {
-                            event.getContext().getRegisterFile().setGpr(event.getRs(), savedRegisterValue.get());
+                        if (event.getPseudoCall().getImm() == 3820) {
+                            savedRegisterValue.set(event.getContext().getRegisterFile().getGpr(event.getPseudoCall().getRs()));
+                            event.getContext().getRegisterFile().setGpr(event.getPseudoCall().getRs(), getHelperThreadLookahead(contextMapping));
+                        } else if (event.getPseudoCall().getImm() == 3821) {
+                            event.getContext().getRegisterFile().setGpr(event.getPseudoCall().getRs(), savedRegisterValue.get());
+                        } else if (event.getPseudoCall().getImm() == 3822) {
+                            savedRegisterValue.set(event.getContext().getRegisterFile().getGpr(event.getPseudoCall().getRs()));
+                            event.getContext().getRegisterFile().setGpr(event.getPseudoCall().getRs(), getHelperThreadStride(contextMapping));
+                        } else if (event.getPseudoCall().getImm() == 3823) {
+                            event.getContext().getRegisterFile().setGpr(event.getPseudoCall().getRs(), savedRegisterValue.get());
                         }
                     }
                 }
@@ -93,7 +91,6 @@ public class BasicThread extends AbstractBasicThread {
     }
 
     /**
-     *
      * @param contextMapping
      * @return
      */
@@ -106,7 +103,6 @@ public class BasicThread extends AbstractBasicThread {
     }
 
     /**
-     *
      * @param contextMapping
      * @return
      */
@@ -312,7 +308,6 @@ public class BasicThread extends AbstractBasicThread {
     }
 
     /**
-     *
      * @return
      */
     public boolean registerRenameOne() {
@@ -398,7 +393,6 @@ public class BasicThread extends AbstractBasicThread {
     }
 
     /**
-     *
      * @return
      */
     public boolean dispatchOne() {
@@ -606,7 +600,6 @@ public class BasicThread extends AbstractBasicThread {
     }
 
     /**
-     *
      * @return
      */
     public boolean isLastDecodedDynamicInstructionCommitted() {
@@ -618,7 +611,6 @@ public class BasicThread extends AbstractBasicThread {
     }
 
     /**
-     *
      * @param thread
      * @return
      */
@@ -627,7 +619,6 @@ public class BasicThread extends AbstractBasicThread {
     }
 
     /**
-     *
      * @param threadId
      * @return
      */
@@ -636,7 +627,6 @@ public class BasicThread extends AbstractBasicThread {
     }
 
     /**
-     *
      * @return
      */
     public static int getMainThreadId() {
@@ -644,7 +634,6 @@ public class BasicThread extends AbstractBasicThread {
     }
 
     /**
-     *
      * @param thread
      * @return
      */
@@ -653,7 +642,6 @@ public class BasicThread extends AbstractBasicThread {
     }
 
     /**
-     *
      * @param threadId
      * @return
      */
@@ -662,7 +650,6 @@ public class BasicThread extends AbstractBasicThread {
     }
 
     /**
-     *
      * @return
      */
     public static int getHelperThreadId() {

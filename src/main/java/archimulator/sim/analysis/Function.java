@@ -99,4 +99,9 @@ public class Function implements Comparable<Function> {
     public int compareTo(Function o) {
         return new Long(this.symbol.st_value).compareTo(o.symbol.st_value);
     }
+
+    @Override
+    public String toString() {
+        return String.format("Function{program=%s, sectionName=%s, symbol=%s}", program, sectionName, symbol);
+    }
 }

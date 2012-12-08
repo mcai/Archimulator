@@ -31,68 +31,81 @@ import java.util.List;
  */
 public interface BenchmarkService extends Service {
     /**
+     * Get all the benchmarks.
      *
-     * @return
+     * @return the benchmarks
      */
     List<Benchmark> getAllBenchmarks();
 
     /**
+     * Get all the benchmarks by offset and count.
      *
-     * @param first
-     * @param count
-     * @return
+     * @param first offset
+     * @param count count
+     * @return the benchmarks
      */
     List<Benchmark> getAllBenchmarks(long first, long count);
 
     /**
+     * Get the number of the benchmarks.
      *
-     * @return
+     * @return the number of the benchmarks
      */
     long getNumAllBenchmarks();
 
     /**
+     * Get a benchmark by ID.
      *
-     * @param id
-     * @return
+     * @param id the benchmark's ID
+     * @return the benchmark matching the ID, if any exists; otherwise null
      */
     Benchmark getBenchmarkById(long id);
 
     /**
+     * Get a benchmark by title.
      *
-     * @param title
-     * @return
+     * @param title the benchmark's title
+     * @return the benchmark matching the title, if any exists; otherwise null
      */
     Benchmark getBenchmarkByTitle(String title);
 
     /**
+     * Get the first benchmark.
      *
-     * @return
+     * @return the first benchmark
      */
     Benchmark getFirstBenchmark();
 
     /**
+     * Add a benchmark.
      *
-     * @param benchmark
-     * @return
+     * @param benchmark the benchmark that is to be added
+     * @return the ID of the benchmark that is added
      */
     long addBenchmark(Benchmark benchmark);
 
     /**
+     * Remove a benchmark by ID.
      *
-     * @param id
+     * @param id the benchmark's ID
      */
     void removeBenchmarkById(long id);
 
     /**
+     * Clear (remove all) the benchmarks.
      *
      */
     void clearBenchmarks();
 
     /**
+     * Update the benchmark.
      *
-     * @param benchmark
+     * @param benchmark the benchmark that is to be updated
      */
     void updateBenchmark(Benchmark benchmark);
 
+    /**
+     * Initialize the service.
+     */
     void initialize();
 }

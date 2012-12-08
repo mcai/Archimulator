@@ -335,12 +335,16 @@ public class StaticInstruction {
     @InputDependencies(Dependency.RS)
     @OutputDependencies(Dependency.RT)
     private static void addiu(Context context, int machineInstruction) {
-        if (BitField.RT.valueOf(machineInstruction) == 0 && MathHelper.signExtend(BitField.INTIMM.valueOf(machineInstruction)) != 0 && !context.isSpeculative()) {
-            context.setPseudoCallEncounteredInLastInstructionExecution(true);
-            context.getBlockingEventDispatcher().dispatch(new PseudoCallEncounteredEvent(context, BitField.RS.valueOf(machineInstruction), MathHelper.signExtend(BitField.INTIMM.valueOf(machineInstruction))));
-        } else {
-            context.getRegisterFile().setGpr(BitField.RT.valueOf(machineInstruction), context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) + MathHelper.signExtend(BitField.INTIMM.valueOf(machineInstruction)));
+        if(!context.isSpeculative()) {
+            PseudoCall pseudoCall = getPseudoCall(machineInstruction);
+            if(pseudoCall != null) {
+                context.setPseudoCallEncounteredInLastInstructionExecution(true);
+                context.getBlockingEventDispatcher().dispatch(new PseudoCallEncounteredEvent(context, pseudoCall));
+                return;
+            }
         }
+
+        context.getRegisterFile().setGpr(BitField.RT.valueOf(machineInstruction), context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) + MathHelper.signExtend(BitField.INTIMM.valueOf(machineInstruction)));
     }
 
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.ADDU, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
@@ -1826,6 +1830,20 @@ public class StaticInstruction {
             throw new RuntimeException(e);
         }
         context.getBlockingEventDispatcher().dispatch(new InstructionFunctionallyExecutedEvent(context, oldPc, staticInst));
+    }
+
+    /**
+     * Get the pseudocall object if the specified machine instruction is a pseudocall.
+     *
+     * @param machineInstruction the machine instruction
+     * @return the pseudocall object if the machine instruction is a pseudocall; otherwise null.
+     */
+    public static PseudoCall getPseudoCall(int machineInstruction) {
+        if(BitField.RT.valueOf(machineInstruction) == 0 && MathHelper.signExtend(BitField.INTIMM.valueOf(machineInstruction)) != 0) {
+            return new PseudoCall(BitField.RS.valueOf(machineInstruction), MathHelper.signExtend(BitField.INTIMM.valueOf(machineInstruction)));
+        }
+
+        return null;
     }
 
     /**

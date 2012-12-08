@@ -22,25 +22,24 @@ import archimulator.sim.common.SimulationEvent;
 import archimulator.sim.os.Context;
 
 /**
+ * The event indicating a pseudocall is encountered during simulation.
  *
  * @author Min Cai
  */
 public class PseudoCallEncounteredEvent extends SimulationEvent {
     private Context context;
-    private int rs;
-    private int imm;
+    private PseudoCall pseudoCall;
 
     /**
+     * Create a pseudocall encountered event.
      *
-     * @param context
-     * @param rs
-     * @param imm
+     * @param context the context
+     * @param pseudoCall the pseudocall
      */
-    public PseudoCallEncounteredEvent(Context context, int rs, int imm) {
+    public PseudoCallEncounteredEvent(Context context, PseudoCall pseudoCall) {
         super(context);
         this.context = context;
-        this.rs = rs;
-        this.imm = imm;
+        this.pseudoCall = pseudoCall;
     }
 
     /**
@@ -52,18 +51,11 @@ public class PseudoCallEncounteredEvent extends SimulationEvent {
     }
 
     /**
+     * Get the pseudocall.
      *
-     * @return
+     * @return the pseudocall
      */
-    public int getRs() {
-        return rs;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public int getImm() {
-        return imm;
+    public PseudoCall getPseudoCall() {
+        return pseudoCall;
     }
 }

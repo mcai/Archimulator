@@ -21,6 +21,8 @@ Copyright (c) 2003-2005 Andreas Loebel.
 
 
 #include "mcfutil.h"
+
+#include <sys/syscall.h>
     
 #if defined(SIMICS)
 #include <simics/magic-instruction.h>
@@ -74,6 +76,10 @@ long refresh_potential( net )
     MAGIC(9001);
 #endif
 
+#ifdef MIPS_1
+  asm volatile ("addiu $0,$0,3721");
+#endif
+
     node_t *node, *tmp;
     node_t *root = net->nodes;
     long checksum = 0;
@@ -114,6 +120,10 @@ long refresh_potential( net )
     
 #if defined(SIMICS)
     MAGIC(9002);
+#endif
+
+#ifdef MIPS_1
+  asm volatile ("addiu $0,$0,3723");
 #endif
 
     return checksum;

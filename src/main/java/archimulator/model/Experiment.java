@@ -323,6 +323,42 @@ public class Experiment implements ModelElement {
     }
 
     /**
+     * Get a statistics value as long from the map and by key and default value.
+     *
+     * @param statsMap the statistics map
+     * @param key the key
+     * @param defaultValue the default value
+     * @return the statistics value
+     */
+    public long getStatValueAsLong(Map<String, ExperimentStat> statsMap, String key, long defaultValue) {
+        String val = getStatValue(statsMap.containsKey(key) ? statsMap.get(key) : null, defaultValue + "");
+        try {
+            return Long.parseLong(val);
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            return defaultValue;
+        }
+    }
+
+    /**
+     * Get a statistics value as double from the map and by key and default value.
+     *
+     * @param statsMap the statistics map
+     * @param key the key
+     * @param defaultValue the default value
+     * @return the statistics value
+     */
+    public double getStatValueAsDouble(Map<String, ExperimentStat> statsMap, String key, double defaultValue) {
+        String val = getStatValue(statsMap.containsKey(key) ? statsMap.get(key) : null, defaultValue + "");
+        try {
+            return Double.parseDouble(val);
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            return defaultValue;
+        }
+    }
+
+    /**
      * Get the statistic value from the experiment stat object.
      *
      * @param stat the experiment stat object
