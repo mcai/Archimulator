@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Basic block.
  *
  * @author Min Cai
  */
@@ -38,9 +39,10 @@ public class BasicBlock {
     private BasicBlockType type;
 
     /**
+     * Create a basic block.
      *
-     * @param function
-     * @param num
+     * @param function the function
+     * @param num the basic block's number
      */
     public BasicBlock(Function function, int num) {
         this.function = function;
@@ -53,80 +55,90 @@ public class BasicBlock {
     }
 
     /**
+     * Get the function.
      *
-     * @return
+     * @return the function
      */
     public Function getFunction() {
         return function;
     }
 
     /**
+     * Get the basic block's number.
      *
-     * @return
+     * @return the basic block's number
      */
     public int getNum() {
         return num;
     }
 
     /**
+     * Get the constituent list of instructions.
      *
-     * @return
+     * @return the constituent list of instructions
      */
     public List<Instruction> getInstructions() {
         return instructions;
     }
 
     /**
+     * Get the list of incoming edges.
      *
-     * @return
+     * @return the list of incoming edges
      */
     public List<ControlFlowGraphEdge> getIncomingEdges() {
         return incomingEdges;
     }
 
     /**
+     * Get the outgoing "not taken" edge.
      *
-     * @return
+     * @return the outgoing "not taken" edge
      */
     public ControlFlowGraphEdge getOutgoingNotTakenEdge() {
         return OutgoingNotTakenEdge;
     }
 
     /**
+     * Set the outgoing "not taken" edge.
      *
-     * @param outgoingNotTakenEdge
+     * @param outgoingNotTakenEdge the outgoing "not taken" edge
      */
     public void setOutgoingNotTakenEdge(ControlFlowGraphEdge outgoingNotTakenEdge) {
         OutgoingNotTakenEdge = outgoingNotTakenEdge;
     }
 
     /**
+     * Get the outgoing "taken" edge.
      *
-     * @return
+     * @return the outgoing "taken" edge
      */
     public ControlFlowGraphEdge getOutgoingTakenEdge() {
         return OutgoingTakenEdge;
     }
 
     /**
+     * Set the outgoing "taken" edge.
      *
-     * @param outgoingTakenEdge
+     * @param outgoingTakenEdge the outgoing "taken" edge
      */
     public void setOutgoingTakenEdge(ControlFlowGraphEdge outgoingTakenEdge) {
         OutgoingTakenEdge = outgoingTakenEdge;
     }
 
     /**
+     * Get the basic block's type.
      *
-     * @return
+     * @return the basic block's type
      */
     public BasicBlockType getType() {
         return type;
     }
 
     /**
+     * Set the basic block's type.
      *
-     * @param type
+     * @param type the basic block's type
      */
     public void setType(BasicBlockType type) {
         this.type = type;

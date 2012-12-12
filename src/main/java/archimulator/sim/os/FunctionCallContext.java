@@ -19,36 +19,64 @@
 package archimulator.sim.os;
 
 /**
+ * Function call context.
  *
  * @author Min Cai
  */
 public class FunctionCallContext {
+    private Context context;
     private int pc;
     private int targetPc;
 
     /**
+     * Create a function call context.
      *
-     * @param pc
-     * @param targetPc
+     * @param context the context.
+     * @param pc the PC (program counter)'s value
+     * @param targetPc the target PC (program counter)'s value
      */
-    public FunctionCallContext(int pc, int targetPc) {
+    public FunctionCallContext(Context context, int pc, int targetPc) {
+        this.context = context;
         this.pc = pc;
         this.targetPc = targetPc;
     }
 
     /**
+     * Get the context.
      *
-     * @return
+     * @return the context
+     */
+    public Context getContext() {
+        return context;
+    }
+
+    /**
+     * Get the PC (program counter)'s value.
+     *
+     * @return the PC (program counter)'s value
      */
     public int getPc() {
         return pc;
     }
 
     /**
+     * Get the target PC (program counter)'s value.
      *
-     * @return
+     * @return the target PC (program counter)'s value
      */
     public int getTargetPc() {
         return targetPc;
+    }
+
+    @Override
+    public String toString() {
+        return String.format(
+                "FunctionCallContext{context.name=%s, %s.pc=0x%08x, %s.targetPc=0x%08x}",
+                context.getName(),
+                context.getProcess().getFunctionNameFromPc(pc),
+                pc,
+                context.getProcess().getFunctionNameFromPc(targetPc),
+                targetPc
+        );
     }
 }

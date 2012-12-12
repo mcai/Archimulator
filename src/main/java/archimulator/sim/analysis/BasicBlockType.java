@@ -19,32 +19,38 @@
 package archimulator.sim.analysis;
 
 /**
+ * A basic block's type.
  *
  * @author Min Cai
  */
 public enum BasicBlockType {
     /**
-     *
+     * Unknown.
      */
     UNKNOWN,
+
     /**
-     *
+     * Sequential.
      */
     SEQUENTIAL,
+
     /**
-     *
+     * Conditional.
      */
     CONDITIONAL,
+
     /**
-     *
+     * Unconditional.
      */
     UNCONDITIONAL,
+
     /**
-     *
+     * Function call.
      */
     FUNCTION_CALL,
+
     /**
-     *
+     * Function return.
      */
     FUNCTION_RETURN
 }

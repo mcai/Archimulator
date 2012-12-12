@@ -55,4 +55,19 @@ public class PseudoCall {
     public int getImm() {
         return imm;
     }
+
+    /**
+     * The immediate value of a pseudocall instruction indicating the spawning of a helper thread.
+     */
+    public static final int PSEUDOCALL_HELPER_THREAD_SPAWN = 3720;
+
+    /**
+     * The immediate value of a pseudocall instruction indicating the beginning of a hotspot function.
+     */
+    public static final int PSEUDOCALL_HOTSPOT_FUNCTION_BEGIN = 3721;
+
+    /**
+     * The immediate value of a pseudocall instruction indicating the end of a hotspot function.
+     */
+    public static final int PSEUDOCALL_HOTSPOT_FUNCTION_END = 3723;
 }

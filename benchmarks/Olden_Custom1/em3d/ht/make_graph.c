@@ -147,7 +147,9 @@ void update_from_coeffs(node_t *nodelist) {
   }
 }
 
-void fill_from_fields(node_t *nodelist, int degree) {    
+void fill_from_fields(node_t *nodelist, int degree) __attribute__((noinline));
+
+void fill_from_fields(node_t *nodelist, int degree) {
 #if defined(SIMICS)
     MAGIC(9001);
 #endif

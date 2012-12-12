@@ -19,6 +19,7 @@
 package archimulator.sim.analysis;
 
 /**
+ * Control flow graph edge.
  *
  * @author Min Cai
  */
@@ -27,9 +28,10 @@ public class ControlFlowGraphEdge {
     private BasicBlock to;
 
     /**
+     * Create a control flow graph edge.
      *
-     * @param from
-     * @param to
+     * @param from the "from" basic block
+     * @param to the "to" basic block
      */
     public ControlFlowGraphEdge(BasicBlock from, BasicBlock to) {
         this.from = from;
@@ -37,16 +39,18 @@ public class ControlFlowGraphEdge {
     }
 
     /**
+     * Get the "from" basic block.
      *
-     * @return
+     * @return the "from" basic block
      */
     public BasicBlock getFrom() {
         return from;
     }
 
     /**
+     * Get the "to" basic block.
      *
-     * @return
+     * @return the "to" basic block
      */
     public BasicBlock getTo() {
         return to;

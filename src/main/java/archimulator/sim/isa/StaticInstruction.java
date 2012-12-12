@@ -1655,13 +1655,14 @@ public class StaticInstruction {
     private static void onFunctionCall(Context context, boolean jalr) {
         StaticInstruction staticInst = context.getProcess().getStaticInstruction(context.getRegisterFile().getPc());
         int targetPc = jalr ? getTargetPcForJalr(context, staticInst.getMachineInstruction()) : getTargetPcForJr(context, staticInst.getMachineInstruction());
-        context.getFunctionCallContextStack().push(new FunctionCallContext(context.getRegisterFile().getPc(), targetPc));
-        context.getBlockingEventDispatcher().dispatch(new FunctionalCallEvent(context));
+        FunctionCallContext functionCallContext = new FunctionCallContext(context, context.getRegisterFile().getPc(), targetPc);
+        context.getFunctionCallContextStack().push(functionCallContext);
+        context.getBlockingEventDispatcher().dispatch(new FunctionalCallEvent(functionCallContext));
     }
 
     private static void onFunctionReturn(Context context) {
-        context.getFunctionCallContextStack().pop();
-        context.getBlockingEventDispatcher().dispatch(new FunctionReturnEvent(context));
+        FunctionCallContext functionCallContext = context.getFunctionCallContextStack().pop();
+        context.getBlockingEventDispatcher().dispatch(new FunctionReturnEvent(functionCallContext));
     }
 
     /**

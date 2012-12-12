@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Function.
  *
  * @author Min Cai
  */
@@ -36,10 +37,11 @@ public class Function implements Comparable<Function> {
     private List<BasicBlock> basicBlocks;
 
     /**
+     * Create a function.
      *
-     * @param program
-     * @param sectionName
-     * @param symbol
+     * @param program the program
+     * @param sectionName the section name
+     * @param symbol the symbol
      */
     public Function(Program program, String sectionName, Symbol symbol) {
         this.program = program;
@@ -49,48 +51,54 @@ public class Function implements Comparable<Function> {
     }
 
     /**
+     * Get the program.
      *
-     * @return
+     * @return the program
      */
     public Program getProgram() {
         return program;
     }
 
     /**
+     * Get the section name.
      *
-     * @return
+     * @return the section name
      */
     public String getSectionName() {
         return sectionName;
     }
 
     /**
+     * Get the symbol.
      *
-     * @return
+     * @return the symbol
      */
     public Symbol getSymbol() {
         return symbol;
     }
 
     /**
+     * Get the number of instructions contained in this function.
      *
-     * @return
+     * @return the number of instructions contained in this function
      */
     public int getNumInstructions() {
         return numInstructions;
     }
 
     /**
+     * Set the number of instructions contained in this function.
      *
-     * @param numInstructions
+     * @param numInstructions the number of instructions contained in this function
      */
     public void setNumInstructions(int numInstructions) {
         this.numInstructions = numInstructions;
     }
 
     /**
+     * Get the list of basic blocks contained in this function.
      *
-     * @return
+     * @return the list of basic blocks contained in this function
      */
     public List<BasicBlock> getBasicBlocks() {
         return basicBlocks;

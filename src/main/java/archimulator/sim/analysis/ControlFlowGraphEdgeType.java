@@ -19,16 +19,18 @@
 package archimulator.sim.analysis;
 
 /**
+ * Control flow graph edge type.
  *
  * @author Min Cai
  */
 public enum ControlFlowGraphEdgeType {
     /**
-     *
+     * Not taken.
      */
     NOT_TAKEN,
+
     /**
-     *
+     * Taken.
      */
     TAKEN
 }

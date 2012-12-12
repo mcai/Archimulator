@@ -26,10 +26,11 @@ import archimulator.sim.common.Simulation;
 import archimulator.sim.core.BasicThread;
 import archimulator.sim.core.DynamicInstruction;
 import archimulator.sim.core.Processor;
+import archimulator.sim.isa.FunctionalCallEvent;
 import archimulator.sim.isa.PseudoCall;
-import archimulator.sim.isa.StaticInstruction;
+import archimulator.sim.isa.PseudoCallEncounteredEvent;
 import archimulator.sim.isa.StaticInstructionType;
-import archimulator.sim.os.BasicProcess;
+import archimulator.sim.os.Context;
 import archimulator.sim.uncore.coherence.event.CoherentCacheServiceNonblockingRequestEvent;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import net.pickapack.action.Action1;
@@ -45,6 +46,8 @@ import java.util.TreeMap;
 public class HotspotProfilingHelper {
     private DirectoryController l2CacheController;
     private Map<Integer, LoadInstructionEntry> loadsInHotspotFunction;
+    private Map<String, Map<String, Long>> numCallsPerFunctions;
+    private Context context;
 
     /**
      * Create a hotpot profiling helper.
@@ -64,57 +67,70 @@ public class HotspotProfilingHelper {
         this.l2CacheController = l2CacheController;
 
         this.loadsInHotspotFunction = new TreeMap<Integer, LoadInstructionEntry>();
+        this.numCallsPerFunctions = new TreeMap<String, Map<String, Long>>();
+
         Processor processor = this.l2CacheController.getSimulation().getProcessor();
 
-        BasicProcess process = (BasicProcess) processor.getCores().get(0).getThreads().get(0).getContext().getProcess();
+        this.context = processor.getCores().get(0).getThreads().get(0).getContext();
 
-        Function hotspotFunction = this.getHotspotFunction(process);
+        Function hotspotFunction = this.context.getProcess().getHotspotFunction();
         if (hotspotFunction != null) {
             this.scanLoadInstructionsInHotspotFunction(hotspotFunction);
         }
 
+        l2CacheController.getBlockingEventDispatcher().addListener(FunctionalCallEvent.class, new Action1<FunctionalCallEvent>() {
+            @Override
+            public void apply(FunctionalCallEvent event) {
+//                if (event.getContext() == context)
+                {
+                    String callerFunctionName = event.getContext().getProcess().getFunctionNameFromPc(event.getFunctionCallContext().getPc());
+                    String calleeFunctionName = event.getContext().getProcess().getFunctionNameFromPc(event.getFunctionCallContext().getTargetPc());
+                    if(callerFunctionName != null) {
+                        if(!numCallsPerFunctions.containsKey(callerFunctionName)) {
+                            numCallsPerFunctions.put(callerFunctionName, new TreeMap<String, Long>());
+                        }
+
+                        if(!numCallsPerFunctions.get(callerFunctionName).containsKey(calleeFunctionName)) {
+                            numCallsPerFunctions.get(callerFunctionName).put(calleeFunctionName, 0L);
+                        }
+
+                        numCallsPerFunctions.get(callerFunctionName).put(calleeFunctionName, numCallsPerFunctions.get(callerFunctionName).get(calleeFunctionName) + 1);
+                    }
+                }
+            }
+        });
+
+        l2CacheController.getBlockingEventDispatcher().addListener(PseudoCallEncounteredEvent.class, new Action1<PseudoCallEncounteredEvent>() {
+            @Override
+            public void apply(PseudoCallEncounteredEvent event) {
+                int imm = event.getPseudoCall().getImm();
+                if(imm == PseudoCall.PSEUDOCALL_HOTSPOT_FUNCTION_BEGIN || imm == PseudoCall.PSEUDOCALL_HOTSPOT_FUNCTION_END) {
+                    System.out.println(event.getContext().getFunctionCallContextStack());
+                }
+            }
+        });
+
         l2CacheController.getBlockingEventDispatcher().addListener(CoherentCacheServiceNonblockingRequestEvent.class, new Action1<CoherentCacheServiceNonblockingRequestEvent>() {
             public void apply(CoherentCacheServiceNonblockingRequestEvent event) {
-                if (event.getCacheController().equals(HotspotProfilingHelper.this.l2CacheController)) {
-                    DynamicInstruction dynamicInstruction = event.getAccess().getDynamicInstruction();
-
-                    if (dynamicInstruction != null && loadsInHotspotFunction.containsKey(dynamicInstruction.getPc()) && dynamicInstruction.getThread().getContext().getThreadId() == BasicThread.getMainThreadId()) {
-                        loadsInHotspotFunction.get(dynamicInstruction.getPc()).accesses++;
-                        if (event.isHitInCache()) {
-                            loadsInHotspotFunction.get(dynamicInstruction.getPc()).hits++;
+                DynamicInstruction dynamicInstruction = event.getAccess().getDynamicInstruction();
+                if (dynamicInstruction != null && dynamicInstruction.getThread().getContext().getThreadId() == BasicThread.getMainThreadId()) {
+                    if (loadsInHotspotFunction.containsKey(dynamicInstruction.getPc())) {
+                        LoadInstructionEntry loadInstructionEntry = loadsInHotspotFunction.get(dynamicInstruction.getPc());
+                        if (event.getCacheController().getName().equals("c0/dcache")) {
+                            loadInstructionEntry.l1DAccesses++;
+                            if (event.isHitInCache()) {
+                                loadInstructionEntry.l1DHits++;
+                            }
+                        } else if (event.getCacheController().equals(HotspotProfilingHelper.this.l2CacheController)) {
+                            loadInstructionEntry.l2Accesses++;
+                            if (event.isHitInCache()) {
+                                loadInstructionEntry.l2Hits++;
+                            }
                         }
                     }
                 }
             }
         });
-    }
-
-    /**
-     * Get the first hotspot function in the process.
-     *
-     * @param process the process
-     * @return the first hotspot function in the process if any exists; otherwise null
-     */
-    private Function getHotspotFunction(BasicProcess process) {
-        for (Function function : process.getElfAnalyzer().getProgram().getFunctions()) {
-            for (BasicBlock basicBlock : function.getBasicBlocks()) {
-                for (Instruction instruction : basicBlock.getInstructions()) {
-                    PseudoCall pseudoCall = StaticInstruction.getPseudoCall(instruction.getStaticInstruction().getMachineInstruction());
-                    if (pseudoCall != null && pseudoCall.getImm() == PSEUDOCALL_HOTSPOT_FUNCTION_BEGINNING) {
-                        Logger.infof(
-                                Logger.ROI,
-                                "{%s} a hotspot function is detected: %s",
-                                this.l2CacheController.getCycleAccurateEventQueue().getCurrentCycle(),
-                                this.l2CacheController.getSimulation().getExperiment().getTitle(),
-                                function
-                        );
-                        return function;
-                    }
-                }
-            }
-        }
-
-        return null;
     }
 
     /**
@@ -133,6 +149,9 @@ public class HotspotProfilingHelper {
     }
 
     //TODO: to be refactored out.
+    /**
+     * Dump the statistics.
+     */
     public void dumpStats() {
         Logger.infof(
                 Logger.ROI,
@@ -144,6 +163,25 @@ public class HotspotProfilingHelper {
         for (int pc : this.loadsInHotspotFunction.keySet()) {
             Logger.infof(Logger.ROI, "%s", this.l2CacheController.getCycleAccurateEventQueue().getCurrentCycle(), this.loadsInHotspotFunction.get(pc));
         }
+
+        Logger.infof(
+                Logger.ROI,
+                "{%s} number of dynamic instructions per function",
+                this.l2CacheController.getCycleAccurateEventQueue().getCurrentCycle(),
+                this.l2CacheController.getSimulation().getExperiment().getTitle()
+        );
+
+        for (String callerFunctionName : this.numCallsPerFunctions.keySet()) {
+            Map<String, Long> numCallsPerCallee = this.numCallsPerFunctions.get(callerFunctionName);
+
+            Logger.infof(Logger.ROI, "%s:", this.l2CacheController.getCycleAccurateEventQueue().getCurrentCycle(), callerFunctionName);
+
+            for(String calleeFunctionName : numCallsPerCallee.keySet()) {
+                Logger.infof(Logger.ROI, "\t=> %s: %d", this.l2CacheController.getCycleAccurateEventQueue().getCurrentCycle(), calleeFunctionName, numCallsPerCallee.get(calleeFunctionName));
+            }
+
+            Logger.info(Logger.ROI, "", this.l2CacheController.getCycleAccurateEventQueue().getCurrentCycle());
+        }
     }
 
     /**
@@ -151,8 +189,10 @@ public class HotspotProfilingHelper {
      */
     public class LoadInstructionEntry {
         private Instruction instruction;
-        private int accesses;
-        private int hits;
+        private int l1DAccesses;
+        private int l1DHits;
+        private int l2Accesses;
+        private int l2Hits;
 
         /**
          * Create a load instruction entry from the specified instruction object.
@@ -173,49 +213,87 @@ public class HotspotProfilingHelper {
         }
 
         /**
-         * Get the number of accesses.
+         * Get the number of L1D accesses.
          *
-         * @return the number of accesses
+         * @return the number of L1D accesses
          */
-        public int getAccesses() {
-            return accesses;
+        public int getL1DAccesses() {
+            return l1DAccesses;
         }
 
         /**
-         * Get the number of hits.
+         * Get the number of L1D hits.
          *
-         * @return the number of hits
+         * @return the number of L1D hits
          */
-        public int getHits() {
-            return hits;
+        public int getL1DHits() {
+            return l1DHits;
         }
 
         /**
-         * Get the number of misses.
+         * Get the number of L1D misses.
          *
-         * @return the number of misses
+         * @return the number of L1D misses
          */
-        public int getMisses() {
-            return accesses - hits;
+        public int getL1DMisses() {
+            return l1DAccesses - l1DHits;
         }
 
         /**
-         * Get the hit ratio.
+         * Get the L1D hit ratio.
          *
-         * @return the hit ratio
+         * @return the L1D hit ratio
          */
-        public double getHitRatio() {
-            return this.accesses > 0 ? (double) this.hits / this.accesses : 0.0;
+        public double getL1DHitRatio() {
+            return this.l1DAccesses > 0 ? (double) this.l1DHits / this.l1DAccesses : 0.0;
+        }
+
+        /**
+         * Get the number of L2 accesses.
+         *
+         * @return the number of L2 accesses
+         */
+        public int getL2Accesses() {
+            return l2Accesses;
+        }
+
+        /**
+         * Get the number of L2 hits.
+         *
+         * @return the number of L2 hits
+         */
+        public int getL2Hits() {
+            return l2Hits;
+        }
+
+        /**
+         * Get the number of L2 misses.
+         *
+         * @return the number of L2 misses
+         */
+        public int getL2Misses() {
+            return l2Accesses - l2Hits;
+        }
+
+        /**
+         * Get the L2 hit ratio.
+         *
+         * @return the L2 hit ratio
+         */
+        public double getL2HitRatio() {
+            return this.l2Accesses > 0 ? (double) this.l2Hits / this.l2Accesses : 0.0;
         }
 
         @Override
         public String toString() {
-            return String.format("LoadInstructionEntry{instruction=%s, accesses=%d, hits=%d, misses=%d, hitRatio=%.4f}", instruction, accesses, hits, getMisses(), getHitRatio());
+            return String.format(
+                    "LoadInstructionEntry{instruction=%s, " +
+                            "l1d.accesses=%d, l1d.hits=%d, l1d.misses=%d, l1d.hitRatio=%.4f, " +
+                            "l2.accesses=%d, l2.hits=%d, l2.misses=%d, l2.hitRatio=%.4f}",
+                    instruction,
+                    l1DAccesses, l1DHits, getL1DMisses(), getL1DHitRatio(),
+                    l2Accesses, l2Hits, getL2Misses(), getL2HitRatio()
+            );
         }
     }
-
-    /**
-     * The immediate value of a pseudocall instruction indicating the beginning of a hotspot function.
-     */
-    public static final int PSEUDOCALL_HOTSPOT_FUNCTION_BEGINNING = 3721;
 }

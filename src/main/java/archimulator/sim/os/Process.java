@@ -20,6 +20,8 @@ package archimulator.sim.os;
 
 import archimulator.model.ContextMapping;
 import archimulator.service.ServiceManager;
+import archimulator.sim.analysis.ElfAnalyzer;
+import archimulator.sim.analysis.Function;
 import archimulator.sim.common.BasicSimulationObject;
 import archimulator.sim.common.SimulationObject;
 import archimulator.sim.isa.BitField;
@@ -425,4 +427,21 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
             throw new RuntimeException(e);
         }
     }
+
+    public abstract ElfAnalyzer getElfAnalyzer();
+
+    /**
+     * Get the function name from the process by PC.
+     *
+     * @param pc the program counter (PC) value
+     * @return the function name from the process if any exists; otherwise null
+     */
+    public abstract String getFunctionNameFromPc(int pc);
+
+    /**
+     * Get the first hotspot function in the process.
+     *
+     * @return the first hotspot function in the process if any exists; otherwise null
+     */
+    public abstract Function getHotspotFunction();
 }

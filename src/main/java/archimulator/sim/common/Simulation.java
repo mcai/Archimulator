@@ -33,6 +33,7 @@ import archimulator.sim.uncore.BasicCacheHierarchy;
 import archimulator.sim.uncore.CacheHierarchy;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestProfilingHelper;
+import archimulator.sim.uncore.helperThread.HotspotProfilingHelper;
 import archimulator.util.RuntimeHelper;
 import net.pickapack.Reference;
 import net.pickapack.action.Predicate;
@@ -69,6 +70,8 @@ public abstract class Simulation implements SimulationObject {
     private BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher;
 
     private CycleAccurateEventQueue cycleAccurateEventQueue;
+
+    private HotspotProfilingHelper hotspotProfilingHelper;
 
     private HelperThreadL2CacheRequestProfilingHelper helperThreadL2CacheRequestProfilingHelper;
 
@@ -139,6 +142,8 @@ public abstract class Simulation implements SimulationObject {
         }
 
         this.processor = new BasicProcessor(this.experiment, this, this.blockingEventDispatcher, this.cycleAccurateEventQueue, kernel, this.prepareCacheHierarchy());
+
+        this.hotspotProfilingHelper = new HotspotProfilingHelper(this);
 
         if (getExperiment().getArchitecture().getHelperThreadL2CacheRequestProfilingEnabled()) {
             this.helperThreadL2CacheRequestProfilingHelper = new HelperThreadL2CacheRequestProfilingHelper(this);
@@ -217,6 +222,10 @@ public abstract class Simulation implements SimulationObject {
      */
     private void collectStats(boolean endOfSimulation) {
         List<ExperimentStat> stats = new ArrayList<ExperimentStat>();
+
+        if (endOfSimulation) {
+            this.getHotspotProfilingHelper().dumpStats();
+        }
 
         if (this.getExperiment().getArchitecture().getHelperThreadL2CacheRequestProfilingEnabled() && (this.getType() == SimulationType.MEASUREMENT || this.getType() == SimulationType.CACHE_WARMUP)) {
             if (endOfSimulation) {
@@ -607,6 +616,15 @@ public abstract class Simulation implements SimulationObject {
      */
     public BlockingEventDispatcher<SimulationEvent> getBlockingEventDispatcher() {
         return this.blockingEventDispatcher;
+    }
+
+    /**
+     * Get the hotspot profiling helper.
+     *
+     * @return the hotspot profiling helper
+     */
+    public HotspotProfilingHelper getHotspotProfilingHelper() {
+        return hotspotProfilingHelper;
     }
 
     /**

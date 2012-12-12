@@ -86,8 +86,6 @@ public class HelperThreadL2CacheRequestProfilingHelper {
 
     private boolean l2RequestLatencyStatsEnabled;
 
-    private HotspotProfilingHelper hotspotProfilingHelper;
-
     /**
      * Constructs a helper thread L2 request profiling helper.
      *
@@ -218,8 +216,6 @@ public class HelperThreadL2CacheRequestProfilingHelper {
                 updateL2CacheMlpCostsPerCycle();
             }
         });
-
-        this.hotspotProfilingHelper = new HotspotProfilingHelper(this.l2CacheController);
     }
 
     private void profileReuseDistance(boolean hitInCache, MemoryHierarchyAccess access) {
@@ -309,8 +305,6 @@ public class HelperThreadL2CacheRequestProfilingHelper {
 
         System.out.println("L2 Cache Miss Reuse Distances:");
         System.out.println(this.statL2CacheMissReuseDistances);
-
-        this.hotspotProfilingHelper.dumpStats();
     }
 
     private void sumUpUnstableHelperThreadL2CacheRequest(int set, int way) {

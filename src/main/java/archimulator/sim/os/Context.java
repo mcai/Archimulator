@@ -31,6 +31,7 @@ import java.io.Serializable;
 import java.util.Stack;
 
 /**
+ * Context.
  *
  * @author Min Cai
  */
@@ -67,11 +68,12 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
     private ArchitecturalRegisterFile speculativeRegisterFile;
 
     /**
+     * Create a context.
      *
-     * @param kernel
-     * @param simulationDirectory
-     * @param contextMapping
-     * @return
+     * @param kernel the kernel
+     * @param simulationDirectory the simulation's working directory
+     * @param contextMapping the context mapping
+     * @return the newly created context
      */
     public static Context load(Kernel kernel, String simulationDirectory, ContextMapping contextMapping) {
         Process process = new BasicProcess(kernel, simulationDirectory, contextMapping);
@@ -85,22 +87,24 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
     }
 
     /**
+     * Create a context.
      *
-     * @param parent
-     * @param registerFile
-     * @param signalFinish
+     * @param parent the parent context
+     * @param registerFile the architectural register file
+     * @param signalFinish the "finish" signal
      */
     public Context(Context parent, ArchitecturalRegisterFile registerFile, int signalFinish) {
         this(parent.kernel, parent.process, parent, registerFile, signalFinish);
     }
 
     /**
+     * Create a context.
      *
-     * @param kernel
-     * @param process
-     * @param parent
-     * @param registerFile
-     * @param signalFinish
+     * @param kernel the kernel
+     * @param process the process
+     * @param parent the parent context
+     * @param registerFile the architectural register file
+     * @param signalFinish the "finish" signal
      */
     public Context(Kernel kernel, Process process, Context parent, ArchitecturalRegisterFile registerFile, int signalFinish) {
         super(kernel);
@@ -131,7 +135,7 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
     }
 
     /**
-     *
+     * Enter the speculative state.
      */
     public void enterSpeculativeState() {
         try {
@@ -144,7 +148,7 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
     }
 
     /**
-     *
+     * Exit the speculative state.
      */
     public void exitSpeculativeState() {
         this.process.getMemory().exitSpeculativeState();
@@ -153,8 +157,9 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
     }
 
     /**
+     * Decode and return the next static instruction.
      *
-     * @return
+     * @return the next static instruction
      */
     public StaticInstruction decodeNextInstruction() {
         this.getRegisterFile().setPc(this.getRegisterFile().getNpc());
@@ -168,16 +173,17 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
     }
 
     /**
+     * Decode the static instruction at the specified mapped PC (program counter).
      *
-     * @param mappedPc
-     * @return
+     * @param mappedPc the mapped PC (program counter)
+     * @return the static instruction at the specified mapped PC (program counter)
      */
     protected StaticInstruction decode(int mappedPc) {
         return this.process.getStaticInstruction(mappedPc);
     }
 
     /**
-     *
+     * Suspend the running of the context.
      */
     public void suspend() {
         if ((this.state == ContextState.BLOCKED)) {
@@ -189,7 +195,7 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
     }
 
     /**
-     *
+     * Resume the running of the context.
      */
     public void resume() {
         if ((this.state != ContextState.BLOCKED)) {
@@ -201,7 +207,7 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
     }
 
     /**
-     *
+     * Finish the running of the context.
      */
     public void finish() {
         if (this.state == ContextState.FINISHED) {
@@ -224,30 +230,34 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
     }
 
     /**
+     * Get the context's ID.
      *
-     * @return
+     * @return the context's ID
      */
     public int getId() {
         return id;
     }
 
     /**
+     * Get the context's state.
      *
-     * @return
+     * @return the context's state
      */
     public ContextState getState() {
         return state;
     }
 
     /**
+     * Set the context's state.
      *
-     * @param state
+     * @param state the context's state
      */
     public void setState(ContextState state) {
         this.state = state;
     }
 
     /**
+     * Get the currently in-use architectural register file, depending whether the context is currently in the speculative mode or not.
      *
      * @return
      */
@@ -256,57 +266,64 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
     }
 
     /**
+     * Set the architectural register file.
      *
-     * @param registerFile
+     * @param registerFile the architectural register file
      */
     public void setRegisterFile(ArchitecturalRegisterFile registerFile) {
         this.registerFile = registerFile;
     }
 
     /**
+     * Get the signal masks.
      *
-     * @return
+     * @return the signal masks
      */
     public SignalMasks getSignalMasks() {
         return signalMasks;
     }
 
     /**
+     * Get the parent context.
      *
-     * @return
+     * @return the parent context if any exists; otherwise null
      */
     public Context getParent() {
         return parent;
     }
 
     /**
+     * Get the kernel creating the context.
      *
-     * @return
+     * @return the kernel creating the context
      */
     public Kernel getKernel() {
         return kernel;
     }
 
     /**
+     * Get the ID of the hardware thread that the context is mapped to.
      *
-     * @return
+     * @return the ID of the hardware thread that the context is mapped to
      */
     public int getThreadId() {
         return threadId;
     }
 
     /**
+     * Set the ID of the hardware thread that the context is mapped to.
      *
-     * @param threadId
+     * @param threadId the ID of the hardware thread that the context is mapped to
      */
     public void setThreadId(int threadId) {
         this.threadId = threadId;
     }
 
     /**
+     * Get the hardware thread that the context is mapped to.
      *
-     * @param processor
-     * @return
+     * @param processor the processor object
+     * @return the hardware thread that the context is mapped to
      */
     public Thread getThread(Processor processor) {
         int coreNum = this.threadId / processor.getCores().size();
@@ -316,96 +333,108 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
     }
 
     /**
+     * Get the process.
      *
-     * @return
+     * @return the process
      */
     public Process getProcess() {
         return process;
     }
 
     /**
+     * Get the user ID.
      *
-     * @return
+     * @return the user ID
      */
     public int getUserId() {
         return userId;
     }
 
     /**
+     * Get the effective user ID.
      *
-     * @return
+     * @return the effective user ID
      */
     public int getEffectiveUserId() {
         return effectiveUserId;
     }
 
     /**
+     * Get the group ID.
      *
-     * @return
+     * @return the group ID
      */
     public int getGroupId() {
         return groupId;
     }
 
     /**
+     * Get the effective group ID.
      *
-     * @return
+     * @return the effective group ID
      */
     public int getEffectiveGroupId() {
         return effectiveGroupId;
     }
 
     /**
+     * Get the process's ID.
      *
-     * @return
+     * @return the process's ID
      */
     public int getProcessId() {
         return processId;
     }
 
     /**
+     * Get the parent process's ID.
      *
-     * @return
+     * @return the parent process's ID
      */
     public int getParentProcessId() {
         return parent == null ? 1 : parent.getProcessId();
     }
 
     /**
+     * Get the stack of the function call contexts.
      *
-     * @return
+     * @return the stack of the function call contexts
      */
     public Stack<FunctionCallContext> getFunctionCallContextStack() {
         return functionCallContextStack;
     }
 
     /**
+     * Get a value indicating whether the context is currently in the speculative mode or not.
      *
-     * @return
+     * @return a value indicating whether the context is currently in the speculative mode or not
      */
     public boolean isSpeculative() {
         return speculative;
     }
 
     /**
+     * Get a value indicating whether the context is fetching instructions from the L1I cache or not (typically in the speculative execution scheme's hardware constructed context/thread).
      *
-     * @return
+     * @return a value indicating whether the context is fetching instructions from the L1I cache or not
      */
     public boolean useICache() {
         return true;
     }
 
     /**
+     * Get a value indicating whether a pseudocall is encountered in the execution of the last instruction or not.
      *
-     * @return
+     * @return a value indicating whether a pseudocall is encountered in the execution of the last instruction or not
      */
     public boolean isPseudoCallEncounteredInLastInstructionExecution() {
         return pseudoCallEncounteredInLastInstructionExecution;
     }
 
     /**
+     * Set a value indicating whether a pseudocall is encountered in the execution of the last instruction or not.
      *
-     * @param pseudoCallEncounteredInLastInstructionExecution
+     * @param pseudoCallEncounteredInLastInstructionExecution a value indicating whether a pseudocall is encountered in  the execution of the last instruction or not
      */
     public void setPseudoCallEncounteredInLastInstructionExecution(boolean pseudoCallEncounteredInLastInstructionExecution) {
         this.pseudoCallEncounteredInLastInstructionExecution = pseudoCallEncounteredInLastInstructionExecution;

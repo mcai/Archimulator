@@ -22,6 +22,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 /**
+ * Program.
  *
  * @author Min Cai
  */
@@ -30,8 +31,9 @@ public class Program {
     private SortedSet<Function> functions;
 
     /**
+     * Create a program.
      *
-     * @param fileName
+     * @param fileName the file name
      */
     public Program(String fileName) {
         this.fileName = fileName;
@@ -39,16 +41,18 @@ public class Program {
     }
 
     /**
+     * Get the file name.
      *
-     * @return
+     * @return the file name
      */
     public String getFileName() {
         return fileName;
     }
 
     /**
+     * Get the list of constituent functions.
      *
-     * @return
+     * @return the list of constituent functions
      */
     public SortedSet<Function> getFunctions() {
         return functions;

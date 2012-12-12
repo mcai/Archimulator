@@ -20,9 +20,12 @@ package archimulator.sim.os;
 
 import archimulator.model.ContextMapping;
 import archimulator.service.ServiceManager;
+import archimulator.sim.analysis.BasicBlock;
 import archimulator.sim.analysis.ElfAnalyzer;
+import archimulator.sim.analysis.Function;
 import archimulator.sim.analysis.Instruction;
 import archimulator.sim.isa.Memory;
+import archimulator.sim.isa.PseudoCall;
 import archimulator.sim.isa.StaticInstruction;
 import archimulator.sim.isa.dissembler.MipsDisassembler;
 import archimulator.sim.os.elf.ElfFile;
@@ -180,10 +183,41 @@ public class BasicProcess extends Process {
         return this.machineInstructionsToStaticInstructions.get(this.pcsToMachineInstructions.get(pc));
     }
 
+    @Override
+    public String getFunctionNameFromPc(int pc) {
+        for(Function function : this.elfAnalyzer.getProgram().getFunctions()) {
+            for (BasicBlock basicBlock : function.getBasicBlocks()) {
+                for (Instruction instruction : basicBlock.getInstructions()) {
+                    if (instruction.getPc() == pc) {
+                        return function.getSymbol().getName();
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public Function getHotspotFunction() {
+        for (Function function : this.elfAnalyzer.getProgram().getFunctions()) {
+            for (BasicBlock basicBlock : function.getBasicBlocks()) {
+                for (Instruction instruction : basicBlock.getInstructions()) {
+                    PseudoCall pseudoCall = StaticInstruction.getPseudoCall(instruction.getStaticInstruction().getMachineInstruction());
+                    if (pseudoCall != null && pseudoCall.getImm() == PseudoCall.PSEUDOCALL_HOTSPOT_FUNCTION_BEGIN) {
+                        return function;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
     /**
      *
      * @return
      */
+    @Override
     public ElfAnalyzer getElfAnalyzer() {
         return elfAnalyzer;
     }

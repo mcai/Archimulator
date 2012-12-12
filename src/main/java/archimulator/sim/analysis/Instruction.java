@@ -23,6 +23,7 @@ import archimulator.sim.os.BasicProcess;
 import archimulator.sim.os.Process;
 
 /**
+ * Instruction.
  *
  * @author Min Cai
  */
@@ -37,10 +38,11 @@ public class Instruction {
     private String sectionName;
 
     /**
+     * Create a instruction.
      *
-     * @param process
-     * @param pc
-     * @param staticInstruction
+     * @param process the process
+     * @param pc the program counter (PC) value
+     * @param staticInstruction the static instruction
      */
     public Instruction(Process process, int pc, StaticInstruction staticInstruction) {
         this.process = process;
@@ -49,49 +51,55 @@ public class Instruction {
     }
 
     /**
+     * Get the process.
      *
-     * @return
+     * @return the process
      */
     public Process getProcess() {
         return process;
     }
 
     /**
+     * Get the program counter (PC) value.
      *
-     * @return
+     * @return the program counter (PC) value
      */
     public int getPc() {
         return pc;
     }
 
     /**
+     * Get the static instruction.
      *
-     * @return
+     * @return the static instruction
      */
     public StaticInstruction getStaticInstruction() {
         return staticInstruction;
     }
 
     /**
+     * Get a value indicating whether the instruction is a leader or not.
      *
-     * @return
+     * @return a value indicating whether the instruction is a leader or not
      */
     public boolean isLeader() {
         return leader;
     }
 
     /**
+     * Get the leader type.
      *
-     * @return
+     * @return the leader type
      */
     public int getLeaderType() {
         return leaderType;
     }
 
     /**
+     * Set the leader information.
      *
-     * @param leader
-     * @param leaderType
+     * @param leader a value indicating whether the instruction is a leader or not
+     * @param leaderType the leader type
      */
     public void setLeader(boolean leader, int leaderType) {
         this.leader = leader;
@@ -99,32 +107,36 @@ public class Instruction {
     }
 
     /**
+     * Get the parent basic block.
      *
-     * @return
+     * @return the parent basic block
      */
     public BasicBlock getBasicBlock() {
         return basicBlock;
     }
 
     /**
+     * Set the parent basic block.
      *
-     * @param basicBlock
+     * @param basicBlock the parent basic block
      */
     public void setBasicBlock(BasicBlock basicBlock) {
         this.basicBlock = basicBlock;
     }
 
     /**
+     * Get the section name.
      *
-     * @return
+     * @return the section name
      */
     public String getSectionName() {
         return sectionName;
     }
 
     /**
+     * Set the section name.
      *
-     * @param sectionName
+     * @param sectionName the section name
      */
     public void setSectionName(String sectionName) {
         this.sectionName = sectionName;

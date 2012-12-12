@@ -20,28 +20,41 @@ package archimulator.sim.isa;
 
 import archimulator.sim.common.SimulationEvent;
 import archimulator.sim.os.Context;
+import archimulator.sim.os.FunctionCallContext;
 
 /**
+ * Function return event.
  *
  * @author Min Cai
  */
 public class FunctionReturnEvent extends SimulationEvent {
-    private Context context;
+    private FunctionCallContext functionCallContext;
 
     /**
+     * Create a function return event.
      *
-     * @param context
+     * @param functionCallContext the function call context
      */
-    public FunctionReturnEvent(Context context) {
-        super(context);
-        this.context = context;
+    public FunctionReturnEvent(FunctionCallContext functionCallContext) {
+        super(functionCallContext.getContext());
+        this.functionCallContext = functionCallContext;
     }
 
     /**
+     * Get the function call context.
      *
-     * @return
+     * @return the function call context
+     */
+    public FunctionCallContext getFunctionCallContext() {
+        return functionCallContext;
+    }
+
+    /**
+     * Get the context.
+     *
+     * @return the context
      */
     public Context getContext() {
-        return context;
+        return getFunctionCallContext().getContext();
     }
 }

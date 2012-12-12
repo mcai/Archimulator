@@ -31,6 +31,7 @@ import java.io.Writer;
 import java.util.*;
 
 /**
+ * ELF file analyzer.
  *
  * @author Min Cai
  */
@@ -41,11 +42,12 @@ public class ElfAnalyzer {
     private int programEntry;
 
     /**
+     * Create an ELF file analyzer.
      *
-     * @param fileName
-     * @param elfFile
-     * @param instructions
-     * @param programEntry
+     * @param fileName the file name
+     * @param elfFile the ELF file object
+     * @param instructions the map of constituent instructions sorted by section names
+     * @param programEntry the program entry's program counter (PC) value
      */
     public ElfAnalyzer(String fileName, ElfFile elfFile, Map<String, SortedMap<Integer, Instruction>> instructions, int programEntry) {
         this.elfFile = elfFile;
@@ -55,7 +57,7 @@ public class ElfAnalyzer {
     }
 
     /**
-     *
+     * Build the control flow graphs.
      */
     public void buildControlFlowGraphs() {
         for (String sectionName : this.instructions.keySet()) {
@@ -90,6 +92,11 @@ public class ElfAnalyzer {
         }
     }
 
+    /**
+     * Create the control flow graph for the specified function.
+     *
+     * @param function the function
+     */
     private void createControlFlowGraph(Function function) {
         this.scanBasicBlocks(function);
 
@@ -122,6 +129,11 @@ public class ElfAnalyzer {
         //TODO: ... identify loops
     }
 
+    /**
+     * Create the control flow graph edges for the specified function.
+     *
+     * @param function the function
+     */
     private void createControlFlowGraphEdges(Function function) {
         for (BasicBlock basicBlock : function.getBasicBlocks()) {
             if (basicBlock.getInstructions().size() >= 2) {
@@ -163,6 +175,13 @@ public class ElfAnalyzer {
         }
     }
 
+    /**
+     * Create a control flow graph edge.
+     *
+     * @param from the "from" basic block
+     * @param to the "to" basic block
+     * @param edgeType the edge type
+     */
     private void createControlFlowGraphEdge(BasicBlock from, BasicBlock to, ControlFlowGraphEdgeType edgeType) {
         ControlFlowGraphEdge edge = new ControlFlowGraphEdge(from, to);
 
@@ -175,6 +194,11 @@ public class ElfAnalyzer {
         to.getIncomingEdges().add(edge);
     }
 
+    /**
+     * Scan the list of basic blocks for the specified function.
+     *
+     * @param function the function
+     */
     private void scanBasicBlocks(Function function) {
         this.instructions.get(function.getSectionName()).get((int) function.getSymbol().getSt_value()).setLeader(true, 0);
 
@@ -209,18 +233,19 @@ public class ElfAnalyzer {
     }
 
     /**
+     * Dump the analysis result using the specified writer.
      *
-     * @param out
+     * @param writer the writer
      */
-    public void dumpAnalysisResult(Writer out) {
-        PrintWriter bw = new PrintWriter(out);
+    public void dumpAnalysisResult(Writer writer) {
+        PrintWriter pw = new PrintWriter(writer);
 
         for (Function function : this.program.getFunctions()) {
-            bw.println(String.format("0x%08x <%s>: ", function.getBasicBlocks().get(0).getInstructions().get(0).getPc(), function.getSymbol().getName()));
+            pw.println(String.format("0x%08x <%s>: ", function.getBasicBlocks().get(0).getInstructions().get(0).getPc(), function.getSymbol().getName()));
 
             for (BasicBlock basicBlock : function.getBasicBlocks()) {
-                bw.print("\tbb" + basicBlock.getNum() + ": \t; type = " + basicBlock.getType() + "; ");
-                bw.print("  preds = ");
+                pw.print("\tbb" + basicBlock.getNum() + ": \t; type = " + basicBlock.getType() + "; ");
+                pw.print("  preds = ");
 
                 List<String> preds = new ArrayList<String>();
 
@@ -228,58 +253,69 @@ public class ElfAnalyzer {
                     preds.add("bb" + incomingEdge.getFrom().getNum());
                 }
 
-                bw.println(StringUtils.join(preds, ", "));
+                pw.println(StringUtils.join(preds, ", "));
 
                 for (Instruction instruction : basicBlock.getInstructions()) {
-                    bw.println("\t\t" + instruction + (instruction.isLeader() ? " <leader:" + instruction.getLeaderType() + ">" : ""));
+                    pw.println("\t\t" + instruction + (instruction.isLeader() ? " <leader:" + instruction.getLeaderType() + ">" : ""));
                 }
 
-                bw.println();
+                pw.println();
             }
         }
 
-        bw.close();
+        pw.close();
         try {
-            out.close();
+            writer.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
+    /**
+     * Get the target instruction for the specified function and instruction.
+     *
+     * @param function the function
+     * @param instruction the instruction
+     * @return the target instruction
+     */
     private Instruction getTargetInstruction(Function function, Instruction instruction) {
         int targetPc = StaticInstruction.getTargetPcForControl(instruction.getPc() + 4, instruction.getStaticInstruction().getMachineInstruction(), instruction.getStaticInstruction().getMnemonic());
         return this.instructions.get(function.getSectionName()).get(targetPc);
     }
 
     /**
+     * Get the program.
      *
-     * @return
+     * @return the program
      */
     public Program getProgram() {
-        return this.program;
+        return program;
     }
 
     /**
+     * Get the ELF file.
      *
-     * @return
+     * @return the ELF file
      */
     public ElfFile getElfFile() {
-        return this.elfFile;
+        return elfFile;
     }
 
     /**
+     * Get the map of constituent instructions sorted by section names.
      *
-     * @return
+     * @return the map of constituent instructions sorted by section names
      */
     public Map<String, SortedMap<Integer, Instruction>> getInstructions() {
-        return this.instructions;
+        return instructions;
     }
 
     /**
+     * Get the program entry's program counter (PC) value,
      *
-     * @return
+     * @return the program entry's program counter (PC) value
      */
     public int getProgramEntry() {
-        return this.programEntry;
+        return programEntry;
     }
 }
