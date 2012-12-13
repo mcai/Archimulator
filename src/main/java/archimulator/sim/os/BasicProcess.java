@@ -45,6 +45,8 @@ public class BasicProcess extends Process {
     private Map<String, SortedMap<Integer, Instruction>> instructions;
     private ElfAnalyzer elfAnalyzer;
 
+    private Map<Integer, String> pcToFunctionNameMappingCache;
+
     /**
      *
      * @param kernel
@@ -148,6 +150,8 @@ public class BasicProcess extends Process {
 
         this.elfAnalyzer = new ElfAnalyzer(elfFileName, elfFile, this.instructions, this.getProgramEntry());
         this.elfAnalyzer.buildControlFlowGraphs();
+
+        this.pcToFunctionNameMappingCache = new TreeMap<Integer, String>();
     }
 
     private void predecode(String sectionName, Memory memory, int pc) {
@@ -185,11 +189,17 @@ public class BasicProcess extends Process {
 
     @Override
     public String getFunctionNameFromPc(int pc) {
+        if(this.pcToFunctionNameMappingCache.containsKey(pc)) {
+            return this.pcToFunctionNameMappingCache.get(pc);
+        }
+
         for(Function function : this.elfAnalyzer.getProgram().getFunctions()) {
             for (BasicBlock basicBlock : function.getBasicBlocks()) {
                 for (Instruction instruction : basicBlock.getInstructions()) {
                     if (instruction.getPc() == pc) {
-                        return function.getSymbol().getName();
+                        String functionName = function.getSymbol().getName();
+                        this.pcToFunctionNameMappingCache.put(pc, functionName);
+                        return functionName;
                     }
                 }
             }
