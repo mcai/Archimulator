@@ -141,13 +141,15 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
             }
         });
 
-        try {
-            DeleteBuilder<Experiment, Long> deleteBuilder = this.experiments.deleteBuilder();
-            deleteBuilder.where().notIn("parentId", experimentPackIds);
-            PreparedDelete<Experiment> delete = deleteBuilder.prepare();
-            this.experiments.delete(delete);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        if(!experimentPackIds.isEmpty()) {
+            try {
+                DeleteBuilder<Experiment, Long> deleteBuilder = this.experiments.deleteBuilder();
+                deleteBuilder.where().notIn("parentId", experimentPackIds);
+                PreparedDelete<Experiment> delete = deleteBuilder.prepare();
+                this.experiments.delete(delete);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         try {

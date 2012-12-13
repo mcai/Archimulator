@@ -143,7 +143,9 @@ public abstract class Simulation implements SimulationObject {
 
         this.processor = new BasicProcessor(this.experiment, this, this.blockingEventDispatcher, this.cycleAccurateEventQueue, kernel, this.prepareCacheHierarchy());
 
-        this.hotspotProfilingHelper = new HotspotProfilingHelper(this);
+        if (getExperiment().getArchitecture().getHotspotProfilingEnabled()) {
+            this.hotspotProfilingHelper = new HotspotProfilingHelper(this);
+        }
 
         if (getExperiment().getArchitecture().getHelperThreadL2CacheRequestProfilingEnabled()) {
             this.helperThreadL2CacheRequestProfilingHelper = new HelperThreadL2CacheRequestProfilingHelper(this);
@@ -223,14 +225,8 @@ public abstract class Simulation implements SimulationObject {
     private void collectStats(boolean endOfSimulation) {
         List<ExperimentStat> stats = new ArrayList<ExperimentStat>();
 
-        if (endOfSimulation) {
-            this.getHotspotProfilingHelper().dumpStats();
-        }
-
-        if (this.getExperiment().getArchitecture().getHelperThreadL2CacheRequestProfilingEnabled() && (this.getType() == SimulationType.MEASUREMENT || this.getType() == SimulationType.CACHE_WARMUP)) {
-            if (endOfSimulation) {
-                this.getHelperThreadL2CacheRequestProfilingHelper().sumUpUnstableHelperThreadL2CacheRequests();
-            }
+        if (endOfSimulation && this.getExperiment().getArchitecture().getHelperThreadL2CacheRequestProfilingEnabled() && (this.getType() == SimulationType.MEASUREMENT || this.getType() == SimulationType.CACHE_WARMUP)) {
+            this.getHelperThreadL2CacheRequestProfilingHelper().sumUpUnstableHelperThreadL2CacheRequests();
         }
 
         for (ExperimentGauge gauge : ServiceManager.getExperimentMetricService().getGaugesByExperiment(experiment)) {
@@ -276,12 +272,13 @@ public abstract class Simulation implements SimulationObject {
 
                     addStat(stats, gauge, nodeKey, value);
                 }
-            } else if (valueObj instanceof List) {
-                List resultList = (List) valueObj;
+            } else if (valueObj instanceof Collection) {
+                Collection resultCollection = (Collection) valueObj;
 
-                for (int i = 0; i < resultList.size(); i++) {
-                    String nodeKey = JaxenHelper.escape(initialNodeKey) + "/" + i;
-                    String value = JaxenHelper.toString(resultList.get(i));
+                int i = 0;
+                for(Object obj1 : resultCollection) {
+                    String nodeKey = JaxenHelper.escape(initialNodeKey) + "/" + (i++);
+                    String value = JaxenHelper.toString(obj1);
 
                     addStat(stats, gauge, nodeKey, value);
                 }

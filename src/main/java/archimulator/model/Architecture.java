@@ -47,6 +47,9 @@ public class Architecture implements ModelElement {
     private long createTime;
 
     @DatabaseField
+    private boolean hotspotProfilingEnabled;
+
+    @DatabaseField
     private int helperThreadPthreadSpawnIndex;
 
     @DatabaseField
@@ -265,7 +268,8 @@ public class Architecture implements ModelElement {
     /**
      * Create an architecture.
      *
-     * @param htLLCRequestProfilingEnabled a value indicating whether the helper thread LLC request profiling is enabled or not
+     * @param hotspotProfilingEnabled      a value indicating whether the hotspot profiling is enabled or not
+     * @param helperThreadL2CacheRequestProfilingEnabled a value indicating whether the helper thread L2 request profiling is enabled or not
      * @param numCores                     the number of cores
      * @param numThreadsPerCore            the number of threads per core
      * @param l1ISize                      the size of the L1I caches in bytes
@@ -276,11 +280,13 @@ public class Architecture implements ModelElement {
      * @param l2Assoc                      the associativity of the L2 cache
      * @param l2ReplacementPolicyType      the replacement policy type of the L2 cache
      */
-    public Architecture(boolean htLLCRequestProfilingEnabled, int numCores, int numThreadsPerCore, int l1ISize, int l1IAssoc, int l1DSize, int l1DAssoc, int l2Size, int l2Assoc, CacheReplacementPolicyType l2ReplacementPolicyType) {
+    public Architecture(boolean hotspotProfilingEnabled, boolean helperThreadL2CacheRequestProfilingEnabled, int numCores, int numThreadsPerCore, int l1ISize, int l1IAssoc, int l1DSize, int l1DAssoc, int l2Size, int l2Assoc, CacheReplacementPolicyType l2ReplacementPolicyType) {
         this.createTime = DateHelper.toTick(new Date());
 
+        this.hotspotProfilingEnabled = hotspotProfilingEnabled;
+
         this.helperThreadPthreadSpawnIndex = 3720;
-        this.helperThreadL2CacheRequestProfilingEnabled = htLLCRequestProfilingEnabled;
+        this.helperThreadL2CacheRequestProfilingEnabled = helperThreadL2CacheRequestProfilingEnabled;
 
         this.numCores = numCores;
         this.numThreadsPerCore = numThreadsPerCore;
@@ -425,6 +431,15 @@ public class Architecture implements ModelElement {
      */
     public String getCreateTimeAsString() {
         return DateHelper.toString(createTime);
+    }
+
+    /**
+     * Get a value indicating whether the hotspot profiling is enabled or not.
+     *
+     * @return a value indicating whether the hotspot profiling is enabled or not
+     */
+    public boolean getHotspotProfilingEnabled() {
+        return hotspotProfilingEnabled;
     }
 
     /**
@@ -1055,6 +1070,15 @@ public class Architecture implements ModelElement {
      */
     public int getBasicMemoryControllerRowSize() {
         return basicMemoryControllerRowSize;
+    }
+
+    /**
+     * Set a value indicating whether the hotspot profiling is enabled or not.
+     *
+     * @param hotspotProfilingEnabled a value indicating whether the hotspot profiling is enabled or not
+     */
+    public void setHotspotProfilingEnabled(boolean hotspotProfilingEnabled) {
+        this.hotspotProfilingEnabled = hotspotProfilingEnabled;
     }
 
     /**

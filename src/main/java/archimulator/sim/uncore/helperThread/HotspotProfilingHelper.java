@@ -21,18 +21,13 @@ package archimulator.sim.uncore.helperThread;
 import archimulator.sim.analysis.BasicBlock;
 import archimulator.sim.analysis.Function;
 import archimulator.sim.analysis.Instruction;
-import archimulator.sim.common.Logger;
 import archimulator.sim.common.Simulation;
 import archimulator.sim.core.BasicThread;
 import archimulator.sim.core.DynamicInstruction;
-import archimulator.sim.core.Processor;
 import archimulator.sim.isa.FunctionalCallEvent;
-import archimulator.sim.isa.PseudoCall;
-import archimulator.sim.isa.PseudoCallEncounteredEvent;
 import archimulator.sim.isa.StaticInstructionType;
-import archimulator.sim.os.Context;
+import archimulator.sim.os.Process;
 import archimulator.sim.uncore.coherence.event.CoherentCacheServiceNonblockingRequestEvent;
-import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import net.pickapack.action.Action1;
 
 import java.util.Map;
@@ -44,10 +39,9 @@ import java.util.TreeMap;
  * @author Min Cai
  */
 public class HotspotProfilingHelper {
-    private DirectoryController l2CacheController;
-    private Map<Integer, LoadInstructionEntry> loadsInHotspotFunction;
+    private Simulation simulation;
     private Map<String, Map<String, Long>> numCallsPerFunctions;
-    private Context context;
+    private Map<Integer, LoadInstructionEntry> loadsInHotspotFunction;
 
     /**
      * Create a hotpot profiling helper.
@@ -55,62 +49,33 @@ public class HotspotProfilingHelper {
      * @param simulation the simulation object
      */
     public HotspotProfilingHelper(Simulation simulation) {
-        this(simulation.getProcessor().getCacheHierarchy().getL2CacheController());
-    }
+        this.simulation = simulation;
 
-    /**
-     * Create a hotspot profiling helper.
-     *
-     * @param l2CacheController the L2 cache controller
-     */
-    public HotspotProfilingHelper(final DirectoryController l2CacheController) {
-        this.l2CacheController = l2CacheController;
-
-        this.loadsInHotspotFunction = new TreeMap<Integer, LoadInstructionEntry>();
         this.numCallsPerFunctions = new TreeMap<String, Map<String, Long>>();
+        this.loadsInHotspotFunction = new TreeMap<Integer, LoadInstructionEntry>();
 
-        Processor processor = this.l2CacheController.getSimulation().getProcessor();
+        this.scanLoadInstructionsInHotspotFunction(this.simulation.getProcessor().getCores().get(0).getThreads().get(0).getContext().getProcess());
 
-        this.context = processor.getCores().get(0).getThreads().get(0).getContext();
-
-        Function hotspotFunction = this.context.getProcess().getHotspotFunction();
-        if (hotspotFunction != null) {
-            this.scanLoadInstructionsInHotspotFunction(hotspotFunction);
-        }
-
-        l2CacheController.getBlockingEventDispatcher().addListener(FunctionalCallEvent.class, new Action1<FunctionalCallEvent>() {
+        this.simulation.getBlockingEventDispatcher().addListener(FunctionalCallEvent.class, new Action1<FunctionalCallEvent>() {
             @Override
             public void apply(FunctionalCallEvent event) {
-//                if (event.getContext() == context)
-                {
-                    String callerFunctionName = event.getContext().getProcess().getFunctionNameFromPc(event.getFunctionCallContext().getPc());
-                    String calleeFunctionName = event.getContext().getProcess().getFunctionNameFromPc(event.getFunctionCallContext().getTargetPc());
-                    if(callerFunctionName != null) {
-                        if(!numCallsPerFunctions.containsKey(callerFunctionName)) {
-                            numCallsPerFunctions.put(callerFunctionName, new TreeMap<String, Long>());
-                        }
-
-                        if(!numCallsPerFunctions.get(callerFunctionName).containsKey(calleeFunctionName)) {
-                            numCallsPerFunctions.get(callerFunctionName).put(calleeFunctionName, 0L);
-                        }
-
-                        numCallsPerFunctions.get(callerFunctionName).put(calleeFunctionName, numCallsPerFunctions.get(callerFunctionName).get(calleeFunctionName) + 1);
+                String callerFunctionName = event.getContext().getProcess().getFunctionNameFromPc(event.getFunctionCallContext().getPc());
+                String calleeFunctionName = event.getContext().getProcess().getFunctionNameFromPc(event.getFunctionCallContext().getTargetPc());
+                if(callerFunctionName != null) {
+                    if(!numCallsPerFunctions.containsKey(callerFunctionName)) {
+                        numCallsPerFunctions.put(callerFunctionName, new TreeMap<String, Long>());
                     }
+
+                    if(!numCallsPerFunctions.get(callerFunctionName).containsKey(calleeFunctionName)) {
+                        numCallsPerFunctions.get(callerFunctionName).put(calleeFunctionName, 0L);
+                    }
+
+                    numCallsPerFunctions.get(callerFunctionName).put(calleeFunctionName, numCallsPerFunctions.get(callerFunctionName).get(calleeFunctionName) + 1);
                 }
             }
         });
 
-        l2CacheController.getBlockingEventDispatcher().addListener(PseudoCallEncounteredEvent.class, new Action1<PseudoCallEncounteredEvent>() {
-            @Override
-            public void apply(PseudoCallEncounteredEvent event) {
-                int imm = event.getPseudoCall().getImm();
-                if(imm == PseudoCall.PSEUDOCALL_HOTSPOT_FUNCTION_BEGIN || imm == PseudoCall.PSEUDOCALL_HOTSPOT_FUNCTION_END) {
-                    System.out.println(event.getContext().getFunctionCallContextStack());
-                }
-            }
-        });
-
-        l2CacheController.getBlockingEventDispatcher().addListener(CoherentCacheServiceNonblockingRequestEvent.class, new Action1<CoherentCacheServiceNonblockingRequestEvent>() {
+        this.simulation.getBlockingEventDispatcher().addListener(CoherentCacheServiceNonblockingRequestEvent.class, new Action1<CoherentCacheServiceNonblockingRequestEvent>() {
             public void apply(CoherentCacheServiceNonblockingRequestEvent event) {
                 DynamicInstruction dynamicInstruction = event.getAccess().getDynamicInstruction();
                 if (dynamicInstruction != null && dynamicInstruction.getThread().getContext().getThreadId() == BasicThread.getMainThreadId()) {
@@ -121,7 +86,7 @@ public class HotspotProfilingHelper {
                             if (event.isHitInCache()) {
                                 loadInstructionEntry.l1DHits++;
                             }
-                        } else if (event.getCacheController().equals(HotspotProfilingHelper.this.l2CacheController)) {
+                        } else if (event.getCacheController().getName().equals("l2")) {
                             loadInstructionEntry.l2Accesses++;
                             if (event.isHitInCache()) {
                                 loadInstructionEntry.l2Hits++;
@@ -134,54 +99,40 @@ public class HotspotProfilingHelper {
     }
 
     /**
-     * Scan the load instructions included in the specified function object.
+     * Scan the load instructions in the first identified hotspot function in the specified process.
      *
-     * @param function the function object
+     * @param process the process
      */
-    private void scanLoadInstructionsInHotspotFunction(Function function) {
-        for (BasicBlock basicBlock : function.getBasicBlocks()) {
-            for (Instruction instruction : basicBlock.getInstructions()) {
-                if (instruction.getStaticInstruction().getMnemonic().getType() == StaticInstructionType.LOAD) {
-                    this.loadsInHotspotFunction.put(instruction.getPc(), new LoadInstructionEntry(instruction));
+    private void scanLoadInstructionsInHotspotFunction(Process process) {
+        Function hotspotFunction = process.getHotspotFunction();
+
+        if(hotspotFunction != null) {
+            for (BasicBlock basicBlock : hotspotFunction.getBasicBlocks()) {
+                for (Instruction instruction : basicBlock.getInstructions()) {
+                    if (instruction.getStaticInstruction().getMnemonic().getType() == StaticInstructionType.LOAD) {
+                        this.loadsInHotspotFunction.put(instruction.getPc(), new LoadInstructionEntry(instruction));
+                    }
                 }
             }
         }
     }
 
-    //TODO: to be refactored out.
     /**
-     * Dump the statistics.
+     * Get the number of calls per functions.
+     *
+     * @return the number of calls per functions
      */
-    public void dumpStats() {
-        Logger.infof(
-                Logger.ROI,
-                "{%s} profiling of load instructions in the first hotspot function",
-                this.l2CacheController.getCycleAccurateEventQueue().getCurrentCycle(),
-                this.l2CacheController.getSimulation().getExperiment().getTitle()
-        );
+    public Map<String, Map<String, Long>> getNumCallsPerFunctions() {
+        return numCallsPerFunctions;
+    }
 
-        for (int pc : this.loadsInHotspotFunction.keySet()) {
-            Logger.infof(Logger.ROI, "%s", this.l2CacheController.getCycleAccurateEventQueue().getCurrentCycle(), this.loadsInHotspotFunction.get(pc));
-        }
-
-        Logger.infof(
-                Logger.ROI,
-                "{%s} number of dynamic instructions per function",
-                this.l2CacheController.getCycleAccurateEventQueue().getCurrentCycle(),
-                this.l2CacheController.getSimulation().getExperiment().getTitle()
-        );
-
-        for (String callerFunctionName : this.numCallsPerFunctions.keySet()) {
-            Map<String, Long> numCallsPerCallee = this.numCallsPerFunctions.get(callerFunctionName);
-
-            Logger.infof(Logger.ROI, "%s:", this.l2CacheController.getCycleAccurateEventQueue().getCurrentCycle(), callerFunctionName);
-
-            for(String calleeFunctionName : numCallsPerCallee.keySet()) {
-                Logger.infof(Logger.ROI, "\t=> %s: %d", this.l2CacheController.getCycleAccurateEventQueue().getCurrentCycle(), calleeFunctionName, numCallsPerCallee.get(calleeFunctionName));
-            }
-
-            Logger.info(Logger.ROI, "", this.l2CacheController.getCycleAccurateEventQueue().getCurrentCycle());
-        }
+    /**
+     * Get the loads in the first identified hotspot function in the first context/process.
+     *
+     * @return the loads in the first identified hotspot function in the first context/process
+     */
+    public Map<Integer, LoadInstructionEntry> getLoadsInHotspotFunction() {
+        return loadsInHotspotFunction;
     }
 
     /**

@@ -190,5 +190,9 @@ public class ExperimentGaugeType implements ModelElement {
     /**
      *
      */
+    public static String HOTSPOT = "hotspot";
+    /**
+     *
+     */
     public static String HELPER_THREAD = "helperThread";
 }

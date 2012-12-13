@@ -48,7 +48,7 @@ public class ArchitectureServiceImpl extends AbstractService implements Architec
 
     @Override
     public void initialize() {
-        this.getOrAddArchitecture(true, 2, 2, 32 * 1024, 8, 32 * 1024, 8, 4 * 1024 * 1024, 16, CacheReplacementPolicyType.LRU);
+        this.getOrAddArchitecture(true, true, 2, 2, 32 * 1024, 8, 32 * 1024, 8, 4 * 1024 * 1024, 16, CacheReplacementPolicyType.LRU);
     }
 
     /**
@@ -146,7 +146,8 @@ public class ArchitectureServiceImpl extends AbstractService implements Architec
 
     /**
      *
-     * @param htLLCRequestProfilingEnabled
+     * @param hotspotProfilingEnabled
+     * @param helperThreadL2CacheRequestProfilingEnabled
      * @param numCores
      * @param numThreadsPerCore
      * @param l1ISize
@@ -159,8 +160,8 @@ public class ArchitectureServiceImpl extends AbstractService implements Architec
      * @return
      */
     @Override
-    public Architecture getOrAddArchitecture(boolean htLLCRequestProfilingEnabled, int numCores, int numThreadsPerCore, int l1ISize, int l1IAssociativity, int l1DSize, int l1DAssociativity, int l2Size, int l2Associativity, CacheReplacementPolicyType l2ReplacementPolicyType) {
-        Architecture architecture = new Architecture(htLLCRequestProfilingEnabled, numCores, numThreadsPerCore, l1ISize, l1IAssociativity, l1DSize, l1DAssociativity, l2Size, l2Associativity, l2ReplacementPolicyType);
+    public Architecture getOrAddArchitecture(boolean hotspotProfilingEnabled, boolean helperThreadL2CacheRequestProfilingEnabled, int numCores, int numThreadsPerCore, int l1ISize, int l1IAssociativity, int l1DSize, int l1DAssociativity, int l2Size, int l2Associativity, CacheReplacementPolicyType l2ReplacementPolicyType) {
+        Architecture architecture = new Architecture(hotspotProfilingEnabled, helperThreadL2CacheRequestProfilingEnabled, numCores, numThreadsPerCore, l1ISize, l1IAssociativity, l1DSize, l1DAssociativity, l2Size, l2Associativity, l2ReplacementPolicyType);
 
         Architecture architectureWithSameTitle = getArchitectureByTitle(architecture.getTitle());
         if(architectureWithSameTitle == null) {
