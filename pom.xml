@@ -20,11 +20,6 @@
     <dependencies>
         <dependency>
             <groupId>net.pickapack</groupId>
-            <artifactId>pickapack.micro</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>net.pickapack</groupId>
             <artifactId>pickapack</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
@@ -56,7 +51,7 @@
         <dependency>
             <groupId>commons-configuration</groupId>
             <artifactId>commons-configuration</artifactId>
-            <version>1.8</version>
+            <version>1.9</version>
         </dependency>
         <dependency>
             <groupId>commons-beanutils</groupId>
@@ -92,23 +87,23 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.21</version>
+            <version>5.1.22</version>
         </dependency>
         <dependency>
             <groupId>com.jcraft</groupId>
             <artifactId>jsch</artifactId>
-            <version>0.1.48</version>
+            <version>0.1.49</version>
         </dependency>
         <dependency>
             <groupId>com.itextpdf</groupId>
             <artifactId>itextpdf</artifactId>
-            <version>5.3.2</version>
+            <version>5.3.4</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>com.itextpdf.tool</groupId>
             <artifactId>xmlworker</artifactId>
-            <version>1.1.6</version>
+            <version>1.2.1</version>
             <type>jar</type>
         </dependency>
         <dependency>
@@ -149,7 +144,7 @@
         <dependency>
             <groupId>org.eobjects.metamodel</groupId>
             <artifactId>MetaModel-full</artifactId>
-            <version>3.2</version>
+            <version>3.2.4</version>
         </dependency>
     </dependencies>
 
