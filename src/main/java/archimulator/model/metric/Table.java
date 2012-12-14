@@ -43,6 +43,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ * CSV-mappable table object.
  *
  * @author Min Cai
  */
@@ -50,19 +51,41 @@ public class Table implements Serializable {
     private List<String> columns;
     private List<List<String>> rows;
 
+    /**
+     * Create a table object.
+     *
+     * @param columns a list of columns
+     * @param rows a two-dimensional list of rows
+     */
     public Table(List<String> columns, List<List<String>> rows) {
         this.columns = columns;
         this.rows = rows;
     }
 
+    /**
+     * Get the list of columns.
+     *
+     * @return the list of columns
+     */
     public List<String> getColumns() {
         return columns;
     }
 
+    /**
+     * Get the two-dimensional list of rows.
+     *
+     * @return the two-dimensional list of rows
+     */
     public List<List<String>> getRows() {
         return rows;
     }
 
+    /**
+     * Create a table object from the specified CSV file.
+     *
+     * @param csvFileName the CSV file name
+     * @return a table object created from the specified CSV file
+     */
     public static Table fromCsv(String csvFileName) {
         DataContext dataContext = DataContextFactory.createCsvDataContext(new File(csvFileName), CsvConfiguration.DEFAULT_SEPARATOR_CHAR, CsvConfiguration.DEFAULT_QUOTE_CHAR);
         org.eobjects.metamodel.schema.Table table = dataContext.getDefaultSchema().getTables()[0];
@@ -72,10 +95,21 @@ public class Table implements Serializable {
         return fromDataSet(dataSet);
     }
 
+    /**
+     * Get the converted CSV file content.
+     *
+     * @return the converted CSV file content
+     */
     public String toCsv() {
         return toCsv(true);
     }
 
+    /**
+     * Get the converted CSV file content.
+     *
+     * @param printColumnHeaders a value indicating whether the column headers should be included or not
+     * @return the converted CSV file content
+     */
     public String toCsv(boolean printColumnHeaders) {
         try {
             StringWriter sw = new StringWriter();
@@ -97,6 +131,12 @@ public class Table implements Serializable {
         }
     }
 
+    /**
+     * Filter the table based on the specified criteria.
+     *
+     * @param criteria the filter criteria
+     * @return a new table created based on the specified criteria from the original table
+     */
     public Table filter(TableFilterCriteria criteria) {
         try {
             DataContext dataContext = DataContextFactory.createCsvDataContext(IOUtils.toInputStream(toCsv(), "UTF-8"), CsvConfiguration.DEFAULT_SEPARATOR_CHAR, CsvConfiguration.DEFAULT_QUOTE_CHAR);
@@ -123,6 +163,12 @@ public class Table implements Serializable {
         }
     }
 
+    /**
+     * Create a table object from the specified data set object.
+     *
+     * @param dataSet the data set object
+     * @return a table object created from the specified data set object
+     */
     public static Table fromDataSet(DataSet dataSet) {
         List<String> columns = new ArrayList<String>();
 

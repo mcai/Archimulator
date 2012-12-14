@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Experiment statistic.
  *
  * @author Min Cai
  */
@@ -62,18 +63,19 @@ public class ExperimentStat implements ModelElement {
     private String value;
 
     /**
-     *
+     * Create an experiment statistic. Reserved for ORM only.
      */
     public ExperimentStat() {
     }
 
     /**
+     * Create an experiment statistic.
      *
-     * @param parent
-     * @param prefix
-     * @param gauge
-     * @param nodeKey
-     * @param value
+     * @param parent the parent experiment object
+     * @param prefix the prefix
+     * @param gauge the gauge
+     * @param nodeKey the node key
+     * @param value the value
      */
     public ExperimentStat(Experiment parent, String prefix, ExperimentGauge gauge, String nodeKey, String value) {
         this.title = prefix + "/" + nodeKey + "/" + gauge.getValueExpression();
@@ -86,11 +88,12 @@ public class ExperimentStat implements ModelElement {
     }
 
     /**
+     * Create an experiment statistic.
      *
-     * @param parent
-     * @param prefix
-     * @param key
-     * @param value
+     * @param parent the parent experiment object
+     * @param prefix the prefix
+     * @param key the key
+     * @param value the value
      */
     public ExperimentStat(Experiment parent, String prefix, String key, String value) {
         this.title = prefix + "/" + key;
@@ -103,8 +106,9 @@ public class ExperimentStat implements ModelElement {
     }
 
     /**
+     * Get the experiment statistic's ID.
      *
-     * @return
+     * @return the experiment statistic's ID
      */
     @Override
     public long getId() {
@@ -112,8 +116,9 @@ public class ExperimentStat implements ModelElement {
     }
 
     /**
+     * Get the parent experiment object's ID.
      *
-     * @return
+     * @return the parent experiment object's ID
      */
     @Override
     public long getParentId() {
@@ -121,8 +126,9 @@ public class ExperimentStat implements ModelElement {
     }
 
     /**
+     * Get the experiment statistic's title.
      *
-     * @return
+     * @return the experiment statistic's title
      */
     @Override
     public String getTitle() {
@@ -130,8 +136,9 @@ public class ExperimentStat implements ModelElement {
     }
 
     /**
+     * Get the time in ticks when the experiment statistic is created.
      *
-     * @return
+     * @return the time in ticks when the experiment statistic is created
      */
     @Override
     public long getCreateTime() {
@@ -139,48 +146,54 @@ public class ExperimentStat implements ModelElement {
     }
 
     /**
+     * Get the prefix.
      *
-     * @return
+     * @return the prefix
      */
     public String getPrefix() {
         return prefix;
     }
 
     /**
+     * Get the gauge ID.
      *
-     * @return
+     * @return the gauge ID
      */
     public long getGaugeId() {
         return gaugeId;
     }
 
     /**
+     * Get the node key.
      *
-     * @return
+     * @return the node key
      */
     public String getNodeKey() {
         return nodeKey;
     }
 
     /**
+     * Get the value.
      *
-     * @return
+     * @return the value
      */
     public String getValue() {
         return value;
     }
 
     /**
+     * Get the parent experiment object.
      *
-     * @return
+     * @return the parent experiment object
      */
     public Experiment getParent() {
         return ServiceManager.getExperimentService().getExperimentById(parentId);
     }
 
     /**
+     * Get the gauge object.
      *
-     * @return
+     * @return the gauge object
      */
     public ExperimentGauge getGauge() {
         return ServiceManager.getExperimentMetricService().getGaugeById(gaugeId);
@@ -191,6 +204,12 @@ public class ExperimentStat implements ModelElement {
         return String.format("ExperimentStat{id=%d, title='%s', createTime=%d, parentId=%d, prefix='%s', gaugeId=%d, nodeKey='%s', value='%s'}", id, title, createTime, parentId, prefix, gaugeId, nodeKey, value);
     }
 
+    /**
+     * Convert a list of experiment statistics into a map of experiment statistics.
+     *
+     * @param stats a list of experiment statistics
+     * @return a map of experiment statistics
+     */
     public static Map<String, ExperimentStat> toMap(List<ExperimentStat> stats) {
         final Map<String, ExperimentStat> statsMap = new LinkedHashMap<String, ExperimentStat>();
         for(ExperimentStat stat : stats) {

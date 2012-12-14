@@ -27,6 +27,7 @@ import net.pickapack.model.ModelElement;
 import java.util.Date;
 
 /**
+ * Experiment gauge.
  *
  * @author Min Cai
  */
@@ -51,15 +52,16 @@ public class ExperimentGauge implements ModelElement {
     private String description;
 
     /**
-     *
+     * Create an experiment gauge. Reserved for ORM only.
      */
     public ExperimentGauge() {
     }
 
     /**
+     * Create an experiment gauge.
      *
-     * @param type
-     * @param valueExpression
+     * @param type the type of the gauge
+     * @param valueExpression the value expression
      *
      */
     public ExperimentGauge(ExperimentGaugeType type, String valueExpression) {
@@ -67,10 +69,11 @@ public class ExperimentGauge implements ModelElement {
     }
 
     /**
+     * Create an experiment gauge.
      *
-     * @param type
-     * @param title
-     * @param valueExpression
+     * @param type the type of the gauge
+     * @param title the title of the gauge
+     * @param valueExpression the value expression
      */
     public ExperimentGauge(ExperimentGaugeType type, String title, String valueExpression) {
         this.title = title;
@@ -80,33 +83,32 @@ public class ExperimentGauge implements ModelElement {
     }
 
     /**
+     * Get the gauge's ID.
      *
-     * @return
+     * @return the gauge's ID
      */
     public long getId() {
         return id;
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public long getParentId() {
         return -1;
     }
 
     /**
+     * Get the title of the gauge.
      *
-     * @return
+     * @return the title of the gauge.
      */
     public String getTitle() {
         return title;
     }
 
     /**
+     * Get the time in ticks when the gauge is created.
      *
-     * @return
+     * @return the time in ticks when the gauge is created
      */
     @Override
     public long getCreateTime() {
@@ -114,45 +116,64 @@ public class ExperimentGauge implements ModelElement {
     }
 
     /**
+     * Get the value expression.
      *
-     * @return
+     * @return the value expression
      */
     public String getValueExpression() {
         return valueExpression;
     }
 
     /**
+     * Set the value expression.
      *
-     * @param valueExpression
+     * @param valueExpression the value expression
      */
     public void setValueExpression(String valueExpression) {
         this.valueExpression = valueExpression;
     }
 
     /**
+     * Get the description.
      *
-     * @return
+     * @return the description
      */
     public String getDescription() {
         return description;
     }
 
     /**
+     * Set the description.
      *
-     * @param description
+     * @param description the description
      */
     public void setDescription(String description) {
         this.description = description;
     }
 
+    /**
+     * Get the type ID.
+     *
+     * @return the type ID
+     */
     public long getTypeId() {
         return typeId;
     }
 
+    /**
+     * Set the type ID.
+     *
+     * @param typeId the type ID
+     */
     public void setTypeId(long typeId) {
         this.typeId = typeId;
     }
 
+    /**
+     * Get the type of the gauge.
+     *
+     * @return  the type of the gauge
+     */
     public ExperimentGaugeType getType() {
         return ServiceManager.getExperimentMetricService().getGaugeTypeById(typeId);
     }
