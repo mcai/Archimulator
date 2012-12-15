@@ -25,9 +25,10 @@ import net.pickapack.util.ValueProvider;
 import java.io.Serializable;
 
 /**
+ * Cache line.
  *
  * @author Min Cai
- * @param <StateT>
+ * @param <StateT> state
  */
 public class CacheLine<StateT extends Serializable> extends Params {
     private Cache<StateT> cache;
@@ -39,11 +40,12 @@ public class CacheLine<StateT extends Serializable> extends Params {
     private ValueProvider<StateT> stateProvider;
 
     /**
+     * Create a cache line.
      *
-     * @param cache
-     * @param set
-     * @param way
-     * @param stateProvider
+     * @param cache the parent cache
+     * @param set the set index
+     * @param way the way
+     * @param stateProvider the state provider
      */
     public CacheLine(Cache<StateT> cache, int set, int way, ValueProvider<StateT> stateProvider) {
         this.cache = cache;
@@ -55,56 +57,63 @@ public class CacheLine<StateT extends Serializable> extends Params {
     }
 
     /**
+     * Get the parent cache.
      *
-     * @return
+     * @return the parent cache
      */
     public Cache<StateT> getCache() {
         return cache;
     }
 
     /**
+     * Get the set index.
      *
-     * @return
+     * @return the set index
      */
     public int getSet() {
         return set;
     }
 
     /**
+     * Get the way.
      *
-     * @return
+     * @return the way
      */
     public int getWay() {
         return way;
     }
 
     /**
+     * Get the state provider.
      *
-     * @return
+     * @return the state provider
      */
     public ValueProvider<StateT> getStateProvider() {
         return stateProvider;
     }
 
     /**
+     * Get the initial state.
      *
-     * @return
+     * @return the initial state
      */
     public StateT getInitialState() {
         return getStateProvider().getInitialValue();
     }
 
     /**
+     * Get the tag.
      *
-     * @return
+     * @return the tag
      */
     public int getTag() {
         return tag;
     }
 
     /**
+     * Set the tag.
      *
-     * @param tag
+     * @param tag the tag
      */
     public void setTag(int tag) {
         if (tag != INVALID_TAG) {
@@ -125,32 +134,36 @@ public class CacheLine<StateT extends Serializable> extends Params {
     }
 
     /**
+     * Get the associated memory hierarchy access.
      *
-     * @return
+     * @return the associated memory hierarchy access if any exist; otherwise null
      */
     public MemoryHierarchyAccess getAccess() {
         return access;
     }
 
     /**
+     * Set the associated memory hierarchy access.
      *
-     * @param access
+     * @param access the associated memory hierarchy access
      */
     public void setAccess(MemoryHierarchyAccess access) {
         this.access = access;
     }
 
     /**
+     * Get the state.
      *
-     * @return
+     * @return the state
      */
     public StateT getState() {
         return getStateProvider().get();
     }
 
     /**
+     * Get a value indicating whether the cache line is valid or not.
      *
-     * @return
+     * @return a value indicating whether the cache line is valid or not
      */
     public boolean isValid() {
         return this.getState() != this.getInitialState();
@@ -162,7 +175,7 @@ public class CacheLine<StateT extends Serializable> extends Params {
     }
 
     /**
-     *
+     * Invalid tag constant.
      */
     public static final int INVALID_TAG = -1;
 }

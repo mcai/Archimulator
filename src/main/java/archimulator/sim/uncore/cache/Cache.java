@@ -28,9 +28,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Cache.
  *
- * @author Min Cai
- * @param <StateT>
+ * @author  Min Cai
+ * @param <StateT> state
  */
 public class Cache<StateT extends Serializable> extends BasicSimulationObject implements Serializable {
     private String name;
@@ -39,11 +40,12 @@ public class Cache<StateT extends Serializable> extends BasicSimulationObject im
     private int numTagsInUse;
 
     /**
+     * Create a cache.
      *
-     * @param parent
-     * @param name
-     * @param geometry
-     * @param cacheLineStateProviderFactory
+     * @param parent the parent simulation object
+     * @param name the name
+     * @param geometry the geometry
+     * @param cacheLineStateProviderFactory the cache line state provider factory
      */
     public Cache(SimulationObject parent, String name, CacheGeometry geometry, ValueProviderFactory<StateT, ValueProvider<StateT>> cacheLineStateProviderFactory) {
         super(parent);
@@ -58,9 +60,10 @@ public class Cache<StateT extends Serializable> extends BasicSimulationObject im
     }
 
     /**
+     * Get lines in the specified set.
      *
-     * @param set
-     * @return
+     * @param set the set index
+     * @return the lines in the specified set
      */
     public List<CacheLine<StateT>> getLines(int set) {
         if (set < 0 || set >= this.getNumSets()) {
@@ -71,10 +74,11 @@ public class Cache<StateT extends Serializable> extends BasicSimulationObject im
     }
 
     /**
+     * Get the line at the specified set and way.
      *
-     * @param set
-     * @param way
-     * @return
+     * @param set the set index
+     * @param way the way
+     * @return the line at the specified set and way
      */
     public CacheLine<StateT> getLine(int set, int way) {
         if (way < 0 || way >= this.getAssociativity()) {
@@ -87,9 +91,10 @@ public class Cache<StateT extends Serializable> extends BasicSimulationObject im
     }
 
     /**
+     * Get the set at the specified index.
      *
-     * @param set
-     * @return
+     * @param set the set index
+     * @return the set at the specified index
      */
     public CacheSet<StateT> get(int set) {
         if (set < 0 || set >= this.getNumSets()) {
@@ -100,9 +105,10 @@ public class Cache<StateT extends Serializable> extends BasicSimulationObject im
     }
 
     /**
+     * Find the way of the line that matches the specified address.
      *
-     * @param address
-     * @return
+     * @param address the address
+     * @return the way of the line that matches the specified address if any exists; otherwise -1
      */
     public int findWay(int address) {
         int tag = this.getTag(address);
@@ -118,9 +124,10 @@ public class Cache<StateT extends Serializable> extends BasicSimulationObject im
     }
 
     /**
+     * Find the line that matches the specified address.
      *
-     * @param address
-     * @return
+     * @param address the address
+     * @return the line that matches the specified address if any exists; otherwise null
      */
     public CacheLine<StateT> findLine(int address) {
         int set = this.getSet(address);
@@ -129,18 +136,20 @@ public class Cache<StateT extends Serializable> extends BasicSimulationObject im
     }
 
     /**
+     * Get the tag of the specified address.
      *
-     * @param address
-     * @return
+     * @param address the address
+     * @return the tag of the specified address
      */
     public int getTag(int address) {
         return CacheGeometry.getTag(address, this.geometry);
     }
 
     /**
+     * Get the set index of the specified address.
      *
-     * @param address
-     * @return
+     * @param address the address
+     * @return the set index of the specified address
      */
     public int getSet(int address) {
         int set = CacheGeometry.getSet(address, this.geometry);
@@ -153,73 +162,82 @@ public class Cache<StateT extends Serializable> extends BasicSimulationObject im
     }
 
     /**
+     * Get the line ID of the specified address.
      *
-     * @param address
-     * @return
+     * @param address the address
+     * @return the line ID of the specified address
      */
     public int getLineId(int address) {
         return CacheGeometry.getLineId(address, this.geometry);
     }
 
     /**
+     * Get the number of sets.
      *
-     * @return
+     * @return the number of sets
      */
     public int getNumSets() {
         return this.geometry.getNumSets();
     }
 
     /**
+     * Get the associativity.
      *
-     * @return
+     * @return the associativity
      */
     public int getAssociativity() {
         return this.geometry.getAssociativity();
     }
 
     /**
+     * Get the line size.
      *
-     * @return
+     * @return the line size
      */
     public int getLineSize() {
         return this.geometry.getLineSize();
     }
 
     /**
+     * Get the name.
      *
-     * @return
+     * @return the name
      */
     public String getName() {
         return name;
     }
 
     /**
+     * Get the geometry.
      *
-     * @return
+     * @return the geometry
      */
     public CacheGeometry getGeometry() {
         return geometry;
     }
 
     /**
+     * Get the number of tags in use.
      *
-     * @return
+     * @return the number of tags in use
      */
     public int getNumTagsInUse() {
         return numTagsInUse;
     }
 
     /**
+     * Set the number of tags in use.
      *
-     * @param numTagsInUse
+     * @param numTagsInUse the number of tags in use
      */
     public void setNumTagsInUse(int numTagsInUse) {
         this.numTagsInUse = numTagsInUse;
     }
 
     /**
+     * Get the occupancy ratio.
      *
-     * @return
+     * @return the occupancy ratio
      */
     public double getOccupancyRatio() {
         return (double) numTagsInUse / this.getGeometry().getNumLines();

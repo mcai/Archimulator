@@ -23,9 +23,10 @@ import archimulator.sim.uncore.MemoryHierarchyAccess;
 import java.io.Serializable;
 
 /**
+ * Cache access.
  *
  * @author Min Cai
- * @param <StateT>
+ * @param <StateT> state
  */
 public class CacheAccess<StateT extends Serializable> {
     private MemoryHierarchyAccess access;
@@ -38,12 +39,13 @@ public class CacheAccess<StateT extends Serializable> {
     private boolean replacement;
 
     /**
+     * Create a cache access.
      *
-     * @param cache
-     * @param access
-     * @param set
-     * @param way
-     * @param tag
+     * @param cache the access
+     * @param access the memory hierarchy access
+     * @param set the set index
+     * @param way the way
+     * @param tag the tag
      */
     public CacheAccess(EvictableCache<StateT> cache, MemoryHierarchyAccess access, int set, int way, int tag) {
         this.access = access;
@@ -61,48 +63,54 @@ public class CacheAccess<StateT extends Serializable> {
     }
 
     /**
+     * Get the memory hierarchy access.
      *
-     * @return
+     * @return the memory hierarchy access
      */
     public MemoryHierarchyAccess getAccess() {
         return access;
     }
 
     /**
+     * Get the set index.
      *
-     * @return
+     * @return the set index
      */
     public int getSet() {
         return set;
     }
 
     /**
+     * Get the way.
      *
-     * @return
+     * @return the way
      */
     public int getWay() {
         return way;
     }
 
     /**
+     * Get the cache line.
      *
-     * @return
+     * @return the cache line
      */
     public CacheLine<StateT> getLine() {
         return line;
     }
 
     /**
+     * Get a value indicating whether the cache access is hit in cache or not.
      *
-     * @return
+     * @return a value indicating whether the cache access is hit in cache or not.
      */
     public boolean isHitInCache() {
         return hitInCache;
     }
 
     /**
+     * Get a value indicating whether the cache access needs a replacement or not.
      *
-     * @return
+     * @return a value indicating whether the cache access needs a replacement or not.
      */
     public boolean isReplacement() {
         return replacement;

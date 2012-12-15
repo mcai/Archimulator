@@ -27,9 +27,10 @@ import java.util.List;
 import java.util.Stack;
 
 /**
+ * Cache set.
  *
  * @author Min Cai
- * @param <StateT>
+ * @param <StateT> state
  */
 public class CacheSet<StateT extends Serializable> {
     private Cache<StateT> cache;
@@ -38,11 +39,12 @@ public class CacheSet<StateT extends Serializable> {
     private Stack<Integer> lruStack;
 
     /**
+     * Create a cache set.
      *
-     * @param cache
-     * @param associativity
-     * @param num
-     * @param cacheLineStateProviderFactory
+     * @param cache the parent cache
+     * @param associativity the associativity
+     * @param num the cache set number
+     * @param cacheLineStateProviderFactory the cache line state provider factory
      */
     public CacheSet(Cache<StateT> cache, int associativity, int num, ValueProviderFactory<StateT, ValueProvider<StateT>> cacheLineStateProviderFactory) {
         this.cache = cache;
@@ -57,32 +59,36 @@ public class CacheSet<StateT extends Serializable> {
     }
 
     /**
+     * Get the parent cache.
      *
-     * @return
+     * @return the parent cache
      */
     public Cache<StateT> getCache() {
         return cache;
     }
 
     /**
+     * Get the constituent list of lines.
      *
-     * @return
+     * @return the constituent list of lines
      */
     public List<CacheLine<StateT>> getLines() {
         return lines;
     }
 
     /**
+     * Get the cache set number.
      *
-     * @return
+     * @return the cache set number
      */
     public int getNum() {
         return num;
     }
 
     /**
+     * Get the LRU stack.
      *
-     * @return
+     * @return the LRU stack
      */
     public Stack<Integer> getLruStack() {
         return lruStack;
