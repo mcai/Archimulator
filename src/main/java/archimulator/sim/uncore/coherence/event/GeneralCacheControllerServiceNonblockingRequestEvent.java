@@ -18,14 +18,17 @@
  ******************************************************************************/
 package archimulator.sim.uncore.coherence.event;
 
+import archimulator.sim.common.SimulationEvent;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.msi.controller.GeneralCacheController;
 
 /**
+ * The event when a general cache controller begins servicing a non-blocking request.
  *
  * @author Min Cai
  */
-public class CoherentCacheServiceNonblockingRequestEvent extends CoherentCacheEvent {
+public class GeneralCacheControllerServiceNonblockingRequestEvent extends SimulationEvent {
+    private GeneralCacheController cacheController;
     private MemoryHierarchyAccess access;
     private int tag;
     private int set;
@@ -33,17 +36,19 @@ public class CoherentCacheServiceNonblockingRequestEvent extends CoherentCacheEv
     private boolean hitInCache;
 
     /**
+     * Create an event when a general cache controller begins servicing a non-blocking request
      *
-     * @param cacheController
-     * @param access
-     * @param tag
-     * @param set
-     * @param way
-     * @param hitInCache
+     * @param cacheController the cache controller
+     * @param access          the access
+     * @param tag             the tag
+     * @param set             the set index
+     * @param way             the way
+     * @param hitInCache      a value indicating whether the request hits in the cache or not
      */
-    public CoherentCacheServiceNonblockingRequestEvent(GeneralCacheController cacheController, MemoryHierarchyAccess access, int tag, int set, int way, boolean hitInCache) {
+    public GeneralCacheControllerServiceNonblockingRequestEvent(GeneralCacheController cacheController, MemoryHierarchyAccess access, int tag, int set, int way, boolean hitInCache) {
         super(cacheController);
 
+        this.cacheController = cacheController;
         this.access = access;
         this.tag = tag;
         this.set = set;
@@ -52,40 +57,54 @@ public class CoherentCacheServiceNonblockingRequestEvent extends CoherentCacheEv
     }
 
     /**
+     * Get the cache controller.
      *
-     * @return
+     * @return the cache controller
+     */
+    public GeneralCacheController getCacheController() {
+        return cacheController;
+    }
+
+    /**
+     * Get the memory hierarchy access.
+     *
+     * @return the memory hierarchy access
      */
     public MemoryHierarchyAccess getAccess() {
         return access;
     }
 
     /**
+     * Get the tag.
      *
-     * @return
+     * @return the tag
      */
     public int getTag() {
         return tag;
     }
 
     /**
+     * Get the set index.
      *
-     * @return
+     * @return the set index
      */
     public int getSet() {
         return set;
     }
 
     /**
+     * Get the way.
      *
-     * @return
+     * @return the way
      */
     public int getWay() {
         return way;
     }
 
     /**
+     * Get a value indicating whether the request hits in the cache or not.
      *
-     * @return
+     * @return a value indicating whether the request hits in the cache or not
      */
     public boolean isHitInCache() {
         return hitInCache;
@@ -93,6 +112,6 @@ public class CoherentCacheServiceNonblockingRequestEvent extends CoherentCacheEv
 
     @Override
     public String toString() {
-        return String.format("CoherentCacheServiceNonblockingRequestEvent{tag=0x%08x, access=%s, set=%d, way=%d, hitInCache=%s, accessType=%s}", tag, access, set, way, hitInCache, access.getType());
+        return String.format("GeneralCacheControllerServiceNonblockingRequestEvent{access=%s, tag=0x%08x, set=%d, way=%d, hitInCache=%s, accessType=%s}", access, tag, set, way, hitInCache, access.getType());
     }
 }

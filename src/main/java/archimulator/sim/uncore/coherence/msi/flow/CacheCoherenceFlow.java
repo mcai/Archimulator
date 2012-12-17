@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Cache coherence flow.
  *
  * @author Min Cai
  */
@@ -44,11 +45,12 @@ public abstract class CacheCoherenceFlow extends Params implements Node {
     private int tag;
 
     /**
+     * Create a cache coherence flow.
      *
-     * @param generator
-     * @param producerFlow
-     * @param access
-     * @param tag
+     * @param generator    the generator controller
+     * @param producerFlow the producer cache coherence flow
+     * @param access       the memory hierarchy access
+     * @param tag          the tag
      */
     public CacheCoherenceFlow(Controller generator, CacheCoherenceFlow producerFlow, MemoryHierarchyAccess access, int tag) {
         this.id = generator.getSimulation().currentCacheCoherenceFlowId++;
@@ -56,17 +58,17 @@ public abstract class CacheCoherenceFlow extends Params implements Node {
         this.producerFlow = producerFlow;
         this.ancestorFlow = producerFlow == null ? this : producerFlow.ancestorFlow;
         this.childFlows = new ArrayList<CacheCoherenceFlow>();
-        this.onCreate(this.generator.getCycleAccurateEventQueue().getCurrentCycle());
         this.access = access;
         this.tag = tag;
+
+        this.onCreate();
     }
 
     /**
-     *
-     * @param beginCycle
+     * Act on when the cache coherence flow begins.
      */
-    public void onCreate(long beginCycle) {
-        this.beginCycle = beginCycle;
+    private void onCreate() {
+        this.beginCycle = this.generator.getCycleAccurateEventQueue().getCurrentCycle();
         if (this.producerFlow == null) {
             this.generator.getSimulation().pendingFlows.add(this);
         } else {
@@ -76,7 +78,7 @@ public abstract class CacheCoherenceFlow extends Params implements Node {
     }
 
     /**
-     *
+     * Act on when the cache coherence flow is completed.
      */
     public void onCompleted() {
         this.completed = true;
@@ -89,80 +91,90 @@ public abstract class CacheCoherenceFlow extends Params implements Node {
     }
 
     /**
+     * Get the ID of the cache coherence flow.
      *
-     * @return
+     * @return the ID of the cache coherence flow
      */
     public long getId() {
         return id;
     }
 
     /**
+     * Get the ancestor cache coherence flow.
      *
-     * @return
+     * @return the ancestor cache coherence flow
      */
     public CacheCoherenceFlow getAncestorFlow() {
         return ancestorFlow;
     }
 
     /**
+     * Get the producer cache coherence flow.
      *
-     * @return
+     * @return the producer cache coherence flow
      */
     public CacheCoherenceFlow getProducerFlow() {
         return producerFlow;
     }
 
     /**
+     * Get the list of child flows.
      *
-     * @return
+     * @return the list of child flows
      */
     public List<CacheCoherenceFlow> getChildFlows() {
         return childFlows;
     }
 
     /**
+     * Get the cycle when the cache coherence flow begins.
      *
-     * @return
+     * @return the cycle when the cache coherence flow begins
      */
     public long getBeginCycle() {
         return beginCycle;
     }
 
     /**
+     * Get the cycle when the cache coherence flow is completed (ended).
      *
-     * @return
+     * @return the cycle when the cache coherence flow is completed (ended)
      */
     public long getEndCycle() {
         return endCycle;
     }
 
     /**
+     * Get the generator controller.
      *
-     * @return
+     * @return the generator controller
      */
-    public Object getGenerator() {
+    public Controller getGenerator() {
         return generator;
     }
 
     /**
+     * Get a value indicating whether the cache coherence flow is completed or not.
      *
-     * @return
+     * @return a value indicating whether the cache coherence flow is completed or not
      */
     public boolean isCompleted() {
         return completed;
     }
 
     /**
+     * Get the memory hierarchy access.
      *
-     * @return
+     * @return the memory hierarchy access
      */
     public MemoryHierarchyAccess getAccess() {
         return access;
     }
 
     /**
+     * Get the node value.
      *
-     * @return
+     * @return the node value
      */
     @Override
     public Object getValue() {
@@ -170,8 +182,9 @@ public abstract class CacheCoherenceFlow extends Params implements Node {
     }
 
     /**
+     * Get the list of child flows.
      *
-     * @return
+     * @return the list of child flows
      */
     @Override
     public List<CacheCoherenceFlow> getChildren() {
@@ -179,8 +192,9 @@ public abstract class CacheCoherenceFlow extends Params implements Node {
     }
 
     /**
+     * Get the tag.
      *
-     * @return
+     * @return the tag
      */
     public int getTag() {
         return tag;

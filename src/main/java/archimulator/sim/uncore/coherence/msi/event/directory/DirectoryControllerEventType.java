@@ -19,52 +19,63 @@
 package archimulator.sim.uncore.coherence.msi.event.directory;
 
 /**
+ * Directory controller event type.
  *
  * @author Min Cai
  */
 public enum DirectoryControllerEventType {
     /**
-     *
+     * GetS.
      */
     GETS,
+
     /**
-     *
+     * GetM.
      */
     GETM,
+
     /**
-     *
+     * Replacement.
      */
     REPLACEMENT,
+
     /**
-     *
+     * Recall acknowledgement.
      */
     RECALL_ACK,
+
     /**
-     *
+     * Last recall acknowledgement.
      */
     LAST_RECALL_ACK,
+
     /**
-     *
+     * PutS (not last).
      */
     PUTS_NOT_LAST,
+
     /**
-     *
+     * PutS (last).
      */
     PUTS_LAST,
+
     /**
-     *
+     * PutM and data (from the owner).
      */
     PUTM_AND_DATA_FROM_OWNER,
+
     /**
-     *
+     * PutM and data (not from the owner).
      */
     PUTM_AND_DATA_FROM_NONOWNER,
+
     /**
-     *
+     * Data from an L1 cache controller.
      */
     DATA,
+
     /**
-     *
+     * Data from the memory controller
      */
     DATA_FROM_MEM
 }

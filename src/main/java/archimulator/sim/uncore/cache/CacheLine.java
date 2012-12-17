@@ -27,8 +27,8 @@ import java.io.Serializable;
 /**
  * Cache line.
  *
- * @author Min Cai
  * @param <StateT> state
+ * @author Min Cai
  */
 public class CacheLine<StateT extends Serializable> extends Params {
     private Cache<StateT> cache;
@@ -42,9 +42,9 @@ public class CacheLine<StateT extends Serializable> extends Params {
     /**
      * Create a cache line.
      *
-     * @param cache the parent cache
-     * @param set the set index
-     * @param way the way
+     * @param cache         the parent cache
+     * @param set           the set index
+     * @param way           the way
      * @param stateProvider the state provider
      */
     public CacheLine(Cache<StateT> cache, int set, int way, ValueProvider<StateT> stateProvider) {

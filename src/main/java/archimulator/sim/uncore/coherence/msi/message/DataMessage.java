@@ -23,6 +23,7 @@ import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
 /**
+ * "Data" message.
  *
  * @author Min Cai
  */
@@ -31,13 +32,14 @@ public class DataMessage extends CoherenceMessage {
     private int numInvAcks;
 
     /**
+     * Create a "data" message.
      *
-     * @param generator
-     * @param producerFlow
-     * @param sender
-     * @param tag
-     * @param numInvAcks
-     * @param access
+     * @param generator    the generator controller
+     * @param producerFlow the producer cache coherence flow
+     * @param sender       the sender controller
+     * @param tag          the tag
+     * @param numInvAcks   the number of pending invalidation acknowledgements expected
+     * @param access       the memory hierarchy access
      */
     public DataMessage(Controller generator, CacheCoherenceFlow producerFlow, Controller sender, int tag, int numInvAcks, MemoryHierarchyAccess access) {
         super(generator, producerFlow, CoherenceMessageType.DATA, access, tag);
@@ -46,6 +48,7 @@ public class DataMessage extends CoherenceMessage {
     }
 
     /**
+     * Get the sender controller.
      *
      * @return
      */
@@ -54,8 +57,9 @@ public class DataMessage extends CoherenceMessage {
     }
 
     /**
+     * Get the number of pending invalidation acknowledgements expected.
      *
-     * @return
+     * @return the number of pending invalidation acknowledgements expected
      */
     public int getNumInvAcks() {
         return numInvAcks;

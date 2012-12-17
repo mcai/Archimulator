@@ -25,8 +25,8 @@ import java.io.Serializable;
 /**
  * Cache access.
  *
- * @author Min Cai
  * @param <StateT> state
+ * @author Min Cai
  */
 public class CacheAccess<StateT extends Serializable> {
     private MemoryHierarchyAccess access;
@@ -41,11 +41,11 @@ public class CacheAccess<StateT extends Serializable> {
     /**
      * Create a cache access.
      *
-     * @param cache the access
+     * @param cache  the access
      * @param access the memory hierarchy access
-     * @param set the set index
-     * @param way the way
-     * @param tag the tag
+     * @param set    the set index
+     * @param way    the way
+     * @param tag    the tag
      */
     public CacheAccess(EvictableCache<StateT> cache, MemoryHierarchyAccess access, int set, int way, int tag) {
         this.access = access;

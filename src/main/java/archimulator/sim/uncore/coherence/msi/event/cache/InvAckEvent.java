@@ -23,6 +23,7 @@ import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
 /**
+ * The event when an L1 cache controller receives an "invalidation acknowledgement" message.
  *
  * @author Min Cai
  */
@@ -30,12 +31,13 @@ public class InvAckEvent extends CacheControllerEvent {
     private CacheController sender;
 
     /**
+     * Create an event when an L1 cache controller receives an "invalidation acknowledgement" message.
      *
-     * @param generator
-     * @param producerFlow
-     * @param sender
-     * @param tag
-     * @param access
+     * @param generator    the generator L1 cache controller
+     * @param producerFlow the producer cache coherence flow
+     * @param sender       the sender cache controller
+     * @param tag          the tag
+     * @param access       the memory hierarchy access
      */
     public InvAckEvent(CacheController generator, CacheCoherenceFlow producerFlow, CacheController sender, int tag, MemoryHierarchyAccess access) {
         super(generator, producerFlow, CacheControllerEventType.INV_ACK, access, tag);
@@ -43,8 +45,9 @@ public class InvAckEvent extends CacheControllerEvent {
     }
 
     /**
+     * Get the sender L1 cache controller.
      *
-     * @return
+     * @return the sender L1 cache controller
      */
     public CacheController getSender() {
         return sender;

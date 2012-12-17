@@ -34,10 +34,14 @@ import static ch.lambdaj.Lambda.*;
 import static org.hamcrest.Matchers.not;
 
 /**
+ * Directory controller finite state machine factory.
  *
  * @author Min Cai
  */
 public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMachineFactory<DirectoryControllerState, DirectoryControllerEventType, DirectoryControllerFiniteStateMachine> {
+    /**
+     * Create a directory controller finite state machine factory.
+     */
     private DirectoryControllerFiniteStateMachineFactory() {
         Action1<DirectoryControllerFiniteStateMachine> actionWhenStateChanged = new Action1<DirectoryControllerFiniteStateMachine>() {
             @Override
@@ -413,7 +417,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                 .onCondition(DirectoryControllerEventType.RECALL_ACK, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, RecallAckEvent>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, RecallAckEvent event) {
-                        fsm.decRecallAcks();
+                        fsm.decrementRecallAcks();
                     }
                 }, DirectoryControllerState.MI_A)
                 .onCondition(DirectoryControllerEventType.LAST_RECALL_ACK, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, LastRecallAckEvent>() {
@@ -466,7 +470,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                 .onCondition(DirectoryControllerEventType.RECALL_ACK, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, RecallAckEvent>() {
                     @Override
                     public void apply(DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, RecallAckEvent event) {
-                        fsm.decRecallAcks();
+                        fsm.decrementRecallAcks();
                     }
                 }, DirectoryControllerState.SI_A)
                 .onCondition(DirectoryControllerEventType.LAST_RECALL_ACK, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, LastRecallAckEvent>() {
@@ -499,11 +503,12 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
     private static DirectoryControllerFiniteStateMachineFactory singleton;
 
     /**
+     * Get the directory controller finite state machine factory singleton.
      *
-     * @return
+     * @return the directory controller finite state machine factory singleton
      */
     public static DirectoryControllerFiniteStateMachineFactory getSingleton() {
-        if(singleton == null) {
+        if (singleton == null) {
             singleton = new DirectoryControllerFiniteStateMachineFactory();
         }
 

@@ -24,6 +24,7 @@ import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
 /**
+ * The event when an L1 cache controller receives a "data from the directory controller where there is no pending acknowledgement expected" message.
  *
  * @author Min Cai
  */
@@ -31,12 +32,13 @@ public class DataFromDirAcksEq0Event extends CacheControllerEvent {
     private Controller sender;
 
     /**
+     * Create an event when a L1 cache controller receives a "data from the directory controller where there is no pending acknowledgement expected" message.
      *
-     * @param generator
-     * @param producerFlow
-     * @param sender
-     * @param tag
-     * @param access
+     * @param generator    the generator L1 cache controller
+     * @param producerFlow the producer cache coherence flow
+     * @param sender       the sender controller
+     * @param tag          the tag
+     * @param access       the memory hierarchy access
      */
     public DataFromDirAcksEq0Event(CacheController generator, CacheCoherenceFlow producerFlow, Controller sender, int tag, MemoryHierarchyAccess access) {
         super(generator, producerFlow, CacheControllerEventType.DATA_FROM_DIR_ACKS_EQ_0, access, tag);
@@ -44,8 +46,9 @@ public class DataFromDirAcksEq0Event extends CacheControllerEvent {
     }
 
     /**
+     * Get the sender controller.
      *
-     * @return
+     * @return the sender controller
      */
     public Controller getSender() {
         return sender;

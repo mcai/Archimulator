@@ -19,60 +19,73 @@
 package archimulator.sim.uncore.coherence.msi.event.cache;
 
 /**
+ * L1 Cache controller event type.
  *
  * @author Min Cai
  */
 public enum CacheControllerEventType {
     /**
-     *
+     * Load.
      */
     LOAD,
+
     /**
-     *
+     * Store.
      */
     STORE,
+
     /**
-     *
+     * Replacement.
      */
     REPLACEMENT,
+
     /**
-     *
+     * Forwarded GetS.
      */
     FWD_GETS,
+
     /**
-     *
+     * Forwarded GetM.
      */
     FWD_GETM,
+
     /**
-     *
+     * Invalidation.
      */
     INV,
+
     /**
-     *
+     * Recall.
      */
     RECALL,
+
     /**
-     *
+     * Put acknowledgement.
      */
     PUT_ACK,
+
     /**
-     *
+     * Data from the directory controller where there is no pending acknowledgement expected.
      */
     DATA_FROM_DIR_ACKS_EQ_0,
+
     /**
-     *
+     * Data from the directory controller where there are pending acknowledgements expected.
      */
     DATA_FROM_DIR_ACKS_GT_0,
+
     /**
-     *
+     * Data from the owner L1 cache controller
      */
     DATA_FROM_OWNER,
+
     /**
-     *
+     * Invalidation acknowledgement.
      */
     INV_ACK,
+
     /**
-     *
+     * Last invalidation acknowledgement.
      */
     LAST_INV_ACK
 }

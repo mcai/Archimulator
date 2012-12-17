@@ -38,9 +38,9 @@ public class CacheGeometry {
     /**
      * Create a cache geometry.
      *
-     * @param size the size.
+     * @param size          the size.
      * @param associativity the associativity
-     * @param lineSize the line size
+     * @param lineSize      the line size
      */
     public CacheGeometry(int size, int associativity, int lineSize) {
         this.size = size;
@@ -118,7 +118,7 @@ public class CacheGeometry {
     /**
      * Get the displacement for the specified address and geometry.
      *
-     * @param address the address
+     * @param address       the address
      * @param cacheGeometry the geometry
      * @return the displacement for the specified address and geometry
      */
@@ -129,7 +129,7 @@ public class CacheGeometry {
     /**
      * Get the tag for the specified address and geometry.
      *
-     * @param address the address
+     * @param address       the address
      * @param cacheGeometry the geometry
      * @return the tag for the specified address and geometry
      */
@@ -140,7 +140,7 @@ public class CacheGeometry {
     /**
      * Get the set index for the specified address and geometry.
      *
-     * @param address the address
+     * @param address       the address
      * @param cacheGeometry the geometry
      * @return the set index for the specified address and geometry
      */
@@ -151,7 +151,7 @@ public class CacheGeometry {
     /**
      * Get the line ID for the specified address and geometry.
      *
-     * @param address the address
+     * @param address       the address
      * @param cacheGeometry the geometry
      * @return the line ID for the specified address and geometry
      */
@@ -162,7 +162,7 @@ public class CacheGeometry {
     /**
      * Get a value indicating whether the specified address is aligned or not based on the specified geometry.
      *
-     * @param address the address
+     * @param address       the address
      * @param cacheGeometry the geometry
      * @return a value indicating whether the specified address is aligned or not based on the specified geometry
      */

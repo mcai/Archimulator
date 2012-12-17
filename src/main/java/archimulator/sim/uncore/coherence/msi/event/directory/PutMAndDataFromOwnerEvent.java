@@ -24,6 +24,7 @@ import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
 /**
+ * The event when the directory controller receives a "PutM and data (from the owner)" message.
  *
  * @author Min Cai
  */
@@ -31,12 +32,13 @@ public class PutMAndDataFromOwnerEvent extends DirectoryControllerEvent {
     private CacheController requester;
 
     /**
+     * Create an event when the directory controller receives a "PutM and data (from the owner)" message.
      *
-     * @param generator
-     * @param producerFlow
-     * @param requester
-     * @param tag
-     * @param access
+     * @param generator    the generator directory controller
+     * @param producerFlow the producer cache coherence flow
+     * @param requester    the requester L1 cache controller
+     * @param tag          the tag
+     * @param access       the memory hierarchy access
      */
     public PutMAndDataFromOwnerEvent(DirectoryController generator, CacheCoherenceFlow producerFlow, CacheController requester, int tag, MemoryHierarchyAccess access) {
         super(generator, producerFlow, DirectoryControllerEventType.PUTM_AND_DATA_FROM_OWNER, access, tag);
@@ -44,8 +46,9 @@ public class PutMAndDataFromOwnerEvent extends DirectoryControllerEvent {
     }
 
     /**
+     * Get the requester L1 cache controller.
      *
-     * @return
+     * @return the requester L1 cache controller
      */
     public CacheController getRequester() {
         return requester;

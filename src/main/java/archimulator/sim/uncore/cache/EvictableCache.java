@@ -31,8 +31,8 @@ import java.io.Serializable;
 /**
  * Cache which supports eviction (replacement).
  *
- * @author Min Cai
  * @param <StateT> state
+ * @author Min Cai
  */
 public class EvictableCache<StateT extends Serializable> extends Cache<StateT> {
     /**
@@ -43,10 +43,10 @@ public class EvictableCache<StateT extends Serializable> extends Cache<StateT> {
     /**
      * Create an evictable cache.
      *
-     * @param parent the parent simulation object.
-     * @param name the name
-     * @param geometry the geometry
-     * @param replacementPolicyType the replacement policy type
+     * @param parent                        the parent simulation object.
+     * @param name                          the name
+     * @param geometry                      the geometry
+     * @param replacementPolicyType         the replacement policy type
      * @param cacheLineStateProviderFactory the cache line state provider factory
      */
     public EvictableCache(SimulationObject parent, String name, CacheGeometry geometry, CacheReplacementPolicyType replacementPolicyType, ValueProviderFactory<StateT, ValueProvider<StateT>> cacheLineStateProviderFactory) {
@@ -58,7 +58,7 @@ public class EvictableCache<StateT extends Serializable> extends Cache<StateT> {
     /**
      * Create a new cache access.
      *
-     * @param access the memory hierarchy access
+     * @param access  the memory hierarchy access
      * @param address the address
      * @return the newly created cache access
      */
@@ -77,10 +77,10 @@ public class EvictableCache<StateT extends Serializable> extends Cache<StateT> {
     /**
      * Create a new cache hit.
      *
-     * @param access the memory hierarchy access
-     * @param set the set index
+     * @param access  the memory hierarchy access
+     * @param set     the set index
      * @param address the address
-     * @param way the way
+     * @param way     the way
      * @return the newly created cache hit object
      */
     private CacheAccess<StateT> newHit(MemoryHierarchyAccess access, int set, int address, int way) {
@@ -90,8 +90,8 @@ public class EvictableCache<StateT extends Serializable> extends Cache<StateT> {
     /**
      * Create a new cache miss.
      *
-     * @param access the memory hierarchy access
-     * @param set the set index
+     * @param access  the memory hierarchy access
+     * @param set     the set index
      * @param address the address
      * @return the newly created cache miss object
      */

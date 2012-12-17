@@ -24,6 +24,7 @@ import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
 import archimulator.sim.uncore.coherence.msi.message.CoherenceMessage;
 
 /**
+ * Controller.
  *
  * @author Min Cai
  */
@@ -31,55 +32,62 @@ public abstract class Controller extends MemoryDevice {
     private MemoryDevice next;
 
     /**
+     * Create a controller.
      *
-     * @param cacheHierarchy
-     * @param name
+     * @param cacheHierarchy the parent cache hierarchy
+     * @param name           the name
      */
     public Controller(CacheHierarchy cacheHierarchy, String name) {
         super(cacheHierarchy, name);
     }
 
     /**
+     * Receive a coherence message.
      *
-     * @param message
+     * @param message the coherence message
      */
     public abstract void receive(CoherenceMessage message);
 
     /**
+     * Transfer the specified message to the destination controller.
      *
-     * @param to
-     * @param size
-     * @param message
+     * @param to      the destination controller
+     * @param size    the size of the message
+     * @param message the message
      */
     public void transfer(Controller to, int size, CoherenceMessage message) {
         this.getCacheHierarchy().transfer(this, to, size, message);
     }
 
     /**
+     * Get the next level memory device.
      *
-     * @return
+     * @return the next level memory device
      */
     public MemoryDevice getNext() {
         return next;
     }
 
     /**
+     * Set the next level memory device.
      *
-     * @param next
+     * @param next the next level memory device
      */
     public void setNext(MemoryDevice next) {
         this.next = next;
     }
 
     /**
+     * Get the hit latency in cycles.
      *
-     * @return
+     * @return the hit latency in cycles
      */
     public abstract int getHitLatency();
 
     /**
+     * Get the cache replacement policy type.
      *
-     * @return
+     * @return the  cache replacement policy type
      */
     public abstract CacheReplacementPolicyType getReplacementPolicyType();
 }

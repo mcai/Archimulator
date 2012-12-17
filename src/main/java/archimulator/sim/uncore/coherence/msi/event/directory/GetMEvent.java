@@ -25,6 +25,7 @@ import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import net.pickapack.action.Action;
 
 /**
+ * The event when the directory controller receives a "GetM" message.
  *
  * @author Min Cai
  */
@@ -35,15 +36,16 @@ public class GetMEvent extends DirectoryControllerEvent {
     private Action onStalledCallback;
 
     /**
+     * Create an event when the directory controller receives a "GetM" message.
      *
-     * @param generator
-     * @param producerFlow
-     * @param requester
-     * @param tag
-     * @param set
-     * @param way
-     * @param onStalledCallback
-     * @param access
+     * @param generator         the generator directory controller
+     * @param producerFlow      the producer cache coherence flow
+     * @param requester         the requester L1 cache controller
+     * @param tag               the tag
+     * @param set               the set index
+     * @param way               the way
+     * @param onStalledCallback the callback action performed when the access is stalled
+     * @param access            the memory hierarchy access
      */
     public GetMEvent(DirectoryController generator, CacheCoherenceFlow producerFlow, CacheController requester, int tag, int set, int way, Action onStalledCallback, MemoryHierarchyAccess access) {
         super(generator, producerFlow, DirectoryControllerEventType.GETM, access, tag);
@@ -54,32 +56,36 @@ public class GetMEvent extends DirectoryControllerEvent {
     }
 
     /**
+     * Get the requester L1 cache controller.
      *
-     * @return
+     * @return the requester L1 cache controller
      */
     public CacheController getRequester() {
         return requester;
     }
 
     /**
+     * Get the set index.
      *
-     * @return
+     * @return the set index
      */
     public int getSet() {
         return set;
     }
 
     /**
+     * Get the way.
      *
-     * @return
+     * @return the way
      */
     public int getWay() {
         return way;
     }
 
     /**
+     * Get the callback action performed when the access is stalled.
      *
-     * @return
+     * @return the callback action performed when the access is stalled
      */
     public Action getOnStalledCallback() {
         return onStalledCallback;

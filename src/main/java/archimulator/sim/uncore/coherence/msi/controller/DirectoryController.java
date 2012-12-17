@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Directory controller.
  *
  * @author Min Cai
  */
@@ -53,9 +54,10 @@ public class DirectoryController extends GeneralCacheController<DirectoryControl
     private DirectoryControllerFiniteStateMachineFactory fsmFactory;
 
     /**
+     * Create a directory controller.
      *
-     * @param cacheHierarchy
-     * @param name
+     * @param cacheHierarchy the cache hierarchy
+     * @param name           the name
      */
     public DirectoryController(CacheHierarchy cacheHierarchy, final String name) {
         super(cacheHierarchy, name);
@@ -78,36 +80,23 @@ public class DirectoryController extends GeneralCacheController<DirectoryControl
         this.fsmFactory = DirectoryControllerFiniteStateMachineFactory.getSingleton();
     }
 
-    /**
-     *
-     * @param to
-     * @return
-     */
     @Override
     protected Net getNet(MemoryDevice to) {
         return to instanceof MemoryController ? this.getCacheHierarchy().getL2ToMemNetwork() : this.getCacheHierarchy().getL1sToL2Network();
     }
 
-    /**
-     *
-     * @param next
-     */
-    public void setNext(MemoryController next) {
-        super.setNext(next);
-    }
-
-    /**
-     *
-     * @return
-     */
     public MemoryController getNext() {
         return (MemoryController) super.getNext();
     }
 
-    /**
-     *
-     * @param message
-     */
+    public void setNext(MemoryDevice next) {
+        if (!(next instanceof MemoryController)) {
+            throw new IllegalArgumentException();
+        }
+
+        super.setNext(next);
+    }
+
     @Override
     public void receive(CoherenceMessage message) {
         switch (message.getType()) {
@@ -134,6 +123,11 @@ public class DirectoryController extends GeneralCacheController<DirectoryControl
         }
     }
 
+    /**
+     * Act on a "GetS" message.
+     *
+     * @param message the "GetS" message
+     */
     private void onGetS(final GetSMessage message) {
         final Action onStalledCallback = new Action() {
             @Override
@@ -152,6 +146,11 @@ public class DirectoryController extends GeneralCacheController<DirectoryControl
         }, onStalledCallback);
     }
 
+    /**
+     * Act on a "GetM" message.
+     *
+     * @param message the "GetM" message
+     */
     private void onGetM(final GetMMessage message) {
         final Action onStalledCallback = new Action() {
             @Override
@@ -170,6 +169,11 @@ public class DirectoryController extends GeneralCacheController<DirectoryControl
         }, onStalledCallback);
     }
 
+    /**
+     * Act on a "recall acknowledgement" message.
+     *
+     * @param message the "recall acknowledgement" message
+     */
     private void onRecallAck(RecallAckMessage message) {
         CacheController sender = message.getSender();
         int tag = message.getTag();
@@ -180,6 +184,11 @@ public class DirectoryController extends GeneralCacheController<DirectoryControl
         fsm.onEventRecallAck(message, sender, tag);
     }
 
+    /**
+     * Act on a "PutS" message.
+     *
+     * @param message the "PutS" message
+     */
     private void onPutS(PutSMessage message) {
         CacheController req = message.getRequester();
         int tag = message.getTag();
@@ -195,6 +204,11 @@ public class DirectoryController extends GeneralCacheController<DirectoryControl
         }
     }
 
+    /**
+     * Act on a "PutM and data" message.
+     *
+     * @param message the "PutM and data" message
+     */
     private void onPutMAndData(PutMAndDataMessage message) {
         CacheController req = message.getRequester();
         int tag = message.getTag();
@@ -210,6 +224,11 @@ public class DirectoryController extends GeneralCacheController<DirectoryControl
         }
     }
 
+    /**
+     * Act on a "data" message.
+     *
+     * @param message the "data" message
+     */
     private void onData(DataMessage message) {
         CacheController sender = (CacheController) message.getSender();
         int tag = message.getTag();
@@ -220,6 +239,16 @@ public class DirectoryController extends GeneralCacheController<DirectoryControl
         fsm.onEventData(message, sender, tag);
     }
 
+    /**
+     * Perform the memory hierarchy access.
+     *
+     * @param producerFlow                   the producer flow
+     * @param access                         the access
+     * @param req                            the requester controller
+     * @param tag                            the tag
+     * @param onReplacementCompletedCallback the callback action performed when the replacement is completed
+     * @param onReplacementStalledCallback   the callback action performed when the replacement is stalled
+     */
     private void access(CacheCoherenceFlow producerFlow, MemoryHierarchyAccess access, CacheController req, final int tag, final Action2<Integer, Integer> onReplacementCompletedCallback, final Action onReplacementStalledCallback) {
         final int set = this.cache.getSet(tag);
 
@@ -258,33 +287,25 @@ public class DirectoryController extends GeneralCacheController<DirectoryControl
         }
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public EvictableCache<DirectoryControllerState> getCache() {
         return cache;
     }
 
     /**
+     * Get the list of upper level L1 cache controllers.
      *
-     * @return
+     * @return the list of upper level L1 cache controllers
      */
     public List<CacheController> getCacheControllers() {
         return cacheControllers;
     }
 
-    /**
-     *
-     * @return
-     */
     public DirectoryControllerFiniteStateMachineFactory getFsmFactory() {
         return fsmFactory;
     }
 
     /**
-     *
      * @return
      */
     @Override
@@ -292,19 +313,11 @@ public class DirectoryController extends GeneralCacheController<DirectoryControl
         return cacheGeometry;
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public int getHitLatency() {
         return getExperiment().getArchitecture().getL2HitLatency();
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public CacheReplacementPolicyType getReplacementPolicyType() {
         return getExperiment().getArchitecture().getL2ReplacementPolicyType();

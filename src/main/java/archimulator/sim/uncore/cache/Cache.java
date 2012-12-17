@@ -30,8 +30,8 @@ import java.util.List;
 /**
  * Cache.
  *
- * @author  Min Cai
  * @param <StateT> state
+ * @author Min Cai
  */
 public class Cache<StateT extends Serializable> extends BasicSimulationObject implements Serializable {
     private String name;
@@ -42,9 +42,9 @@ public class Cache<StateT extends Serializable> extends BasicSimulationObject im
     /**
      * Create a cache.
      *
-     * @param parent the parent simulation object
-     * @param name the name
-     * @param geometry the geometry
+     * @param parent                        the parent simulation object
+     * @param name                          the name
+     * @param geometry                      the geometry
      * @param cacheLineStateProviderFactory the cache line state provider factory
      */
     public Cache(SimulationObject parent, String name, CacheGeometry geometry, ValueProviderFactory<StateT, ValueProvider<StateT>> cacheLineStateProviderFactory) {

@@ -18,30 +18,35 @@
  ******************************************************************************/
 package archimulator.sim.uncore.coherence.event;
 
+import archimulator.sim.common.SimulationEvent;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.msi.controller.GeneralCacheController;
 
 /**
+ * The event when a general cache controller sees a non-blocking request hit to a transient tag.
  *
  * @author Min Cai
  */
-public class CoherentCacheNonblockingRequestHitToTransientTagEvent extends CoherentCacheEvent {
+public class GeneralCacheControllerNonblockingRequestHitToTransientTagEvent extends SimulationEvent {
+    private GeneralCacheController cacheController;
     private MemoryHierarchyAccess access;
     private int tag;
     private int set;
     private int way;
 
     /**
+     * Create an event when a general cache controller sees a non-blocking request hit to a transient tag.
      *
-     * @param cacheController
-     * @param access
-     * @param tag
-     * @param set
-     * @param way
+     * @param cacheController the cache controller
+     * @param access          the memory hierarchy access
+     * @param tag             the tag
+     * @param set             the set index
+     * @param way             the way
      */
-    public CoherentCacheNonblockingRequestHitToTransientTagEvent(GeneralCacheController cacheController, MemoryHierarchyAccess access, int tag, int set, int way) {
+    public GeneralCacheControllerNonblockingRequestHitToTransientTagEvent(GeneralCacheController cacheController, MemoryHierarchyAccess access, int tag, int set, int way) {
         super(cacheController);
 
+        this.cacheController = cacheController;
         this.access = access;
         this.tag = tag;
         this.set = set;
@@ -49,34 +54,52 @@ public class CoherentCacheNonblockingRequestHitToTransientTagEvent extends Coher
     }
 
     /**
+     * Get the cache controller.
      *
-     * @return
+     * @return the cache controller
+     */
+    public GeneralCacheController getCacheController() {
+        return cacheController;
+    }
+
+    /**
+     * Get the memory hierarchy access.
+     *
+     * @return the memory hierarchy access
      */
     public MemoryHierarchyAccess getAccess() {
         return access;
     }
 
     /**
+     * Get the tag.
      *
-     * @return
+     * @return the tag
      */
     public int getTag() {
         return tag;
     }
 
     /**
+     * Get the set index.
      *
-     * @return
+     * @return the set index
      */
     public int getSet() {
         return set;
     }
 
     /**
+     * Get the way.
      *
-     * @return
+     * @return the way
      */
     public int getWay() {
         return way;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("GeneralCacheControllerNonblockingRequestHitToTransientTagEvent{access=%s, tag=%d, set=%d, way=%d, accessType=%s}", access, tag, set, way, access.getType());
     }
 }

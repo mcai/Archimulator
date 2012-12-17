@@ -24,6 +24,7 @@ import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
 /**
+ * A "PutM and data" message.
  *
  * @author Min Cai
  */
@@ -31,12 +32,13 @@ public class PutMAndDataMessage extends CoherenceMessage {
     private CacheController requester;
 
     /**
+     * Create a "PutM and data" message.
      *
-     * @param generator
-     * @param producerFlow
-     * @param requester
-     * @param tag
-     * @param access
+     * @param generator    the generator controller
+     * @param producerFlow the producer cache coherence flow
+     * @param requester    the requester L1 cache controller
+     * @param tag          the tag
+     * @param access       the memory hierarchy access
      */
     public PutMAndDataMessage(Controller generator, CacheCoherenceFlow producerFlow, CacheController requester, int tag, MemoryHierarchyAccess access) {
         super(generator, producerFlow, CoherenceMessageType.PUTM_AND_DATA, access, tag);
@@ -44,8 +46,9 @@ public class PutMAndDataMessage extends CoherenceMessage {
     }
 
     /**
+     * Get the requester L1 cache controller.
      *
-     * @return
+     * @return the requester L1 cache controller
      */
     public CacheController getRequester() {
         return requester;

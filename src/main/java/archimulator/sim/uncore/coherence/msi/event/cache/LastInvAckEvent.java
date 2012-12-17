@@ -23,16 +23,18 @@ import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
 /**
+ * The event when an L1 cache controller receives a "last invalidation acknowledgement" message.
  *
  * @author Min Cai
  */
 public class LastInvAckEvent extends CacheControllerEvent {
     /**
+     * Create an event when an L1 cache controller receives a "last invalidation acknowledgement" message.
      *
-     * @param generator
-     * @param producerFlow
-     * @param tag
-     * @param access
+     * @param generator    the generator L1 cache controller
+     * @param producerFlow the producer cache coherence flow
+     * @param tag          the tag
+     * @param access       the memory hierarchy access
      */
     public LastInvAckEvent(CacheController generator, CacheCoherenceFlow producerFlow, int tag, MemoryHierarchyAccess access) {
         super(generator, producerFlow, CacheControllerEventType.LAST_INV_ACK, access, tag);

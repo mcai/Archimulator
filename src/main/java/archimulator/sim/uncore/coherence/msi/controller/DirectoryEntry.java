@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Directory entry.
  *
  * @author Min Cai
  */
@@ -30,31 +31,34 @@ public class DirectoryEntry {
     private List<CacheController> sharers;
 
     /**
-     *
+     * Create a directory entry.
      */
     public DirectoryEntry() {
         this.sharers = new ArrayList<CacheController>();
     }
 
     /**
+     * Get the owner L1 cache controller.
      *
-     * @return
+     * @return the owner L1 cache controller
      */
     public CacheController getOwner() {
         return owner;
     }
 
     /**
+     * Set the owner L1 cache controller.
      *
-     * @param owner
+     * @param owner the owner L1 cache controller
      */
     public void setOwner(CacheController owner) {
         this.owner = owner;
     }
 
     /**
+     * Get the sharer list of L1 cache controllers.
      *
-     * @return
+     * @return the sharer list of L1 cache controllers
      */
     public List<CacheController> getSharers() {
         return sharers;

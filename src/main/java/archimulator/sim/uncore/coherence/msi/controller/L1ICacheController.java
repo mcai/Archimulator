@@ -23,59 +23,41 @@ import archimulator.sim.uncore.cache.CacheGeometry;
 import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
 
 /**
+ * L1I cache controller.
  *
  * @author Min Cai
  */
 public class L1ICacheController extends CacheController {
     /**
+     * Create an L1I cache controller.
      *
-     * @param cacheHierarchy
-     * @param name
+     * @param cacheHierarchy the parent cache hierarchy
+     * @param name           the name
      */
     public L1ICacheController(CacheHierarchy cacheHierarchy, String name) {
         super(cacheHierarchy, name);
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public int getNumReadPorts() {
         return getExperiment().getArchitecture().getL1INumReadPorts();
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public int getNumWritePorts() {
         return getExperiment().getArchitecture().getL1INumWritePorts();
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public CacheGeometry getGeometry() {
         return new CacheGeometry(getExperiment().getArchitecture().getL1ISize(), getExperiment().getArchitecture().getL1IAssociativity(), getExperiment().getArchitecture().getL1ILineSize());
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public int getHitLatency() {
         return getExperiment().getArchitecture().getL1IHitLatency();
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public CacheReplacementPolicyType getReplacementPolicyType() {
         return getExperiment().getArchitecture().getL1IReplacementPolicyType();

@@ -26,9 +26,10 @@ import net.pickapack.fsm.FiniteStateMachineFactory;
 import java.io.Serializable;
 
 /**
+ * General cache controller.
  *
+ * @param <StateT> state
  * @author Min Cai
- * @param <StateT>
  */
 public abstract class GeneralCacheController<StateT extends Serializable, ConditionT> extends Controller {
     private long numDownwardReadHits;
@@ -39,25 +40,28 @@ public abstract class GeneralCacheController<StateT extends Serializable, Condit
     private long numEvictions;
 
     /**
+     * Create a general cache controller.
      *
-     * @param cacheHierarchy
-     * @param name
+     * @param cacheHierarchy the cache hierarchy
+     * @param name           the name
      */
     public GeneralCacheController(CacheHierarchy cacheHierarchy, String name) {
         super(cacheHierarchy, name);
     }
 
     /**
+     * Get the owned evictable cache.
      *
-     * @return
+     * @return the owned evictable cache
      */
     public abstract EvictableCache<StateT> getCache();
 
     /**
+     * Update statistics.
      *
-     * @param cache
-     * @param read
-     * @param hitInCache
+     * @param cache      the cache
+     * @param read       a value indicating whether the access involved is a read or not
+     * @param hitInCache a value indicating whether the access involved hits in the cache or not
      */
     public void updateStats(EvictableCache<?> cache, boolean read, boolean hitInCache) {
         if (read) {
@@ -76,101 +80,113 @@ public abstract class GeneralCacheController<StateT extends Serializable, Condit
     }
 
     /**
-     *
+     * Increment the number of evictions.
      */
     public void incrementNumEvictions() {
         this.numEvictions++;
     }
 
     /**
+     * Get the hit ratio.
      *
-     * @return
+     * @return the hit ratio
      */
     public double getHitRatio() {
         return getNumDownwardAccesses() > 0 ? (double) getNumDownwardHits() / (getNumDownwardAccesses()) : 0.0;
     }
 
     /**
+     * Get the number of downward hits.
      *
-     * @return
+     * @return the number of downward hits
      */
     public long getNumDownwardHits() {
         return numDownwardReadHits + numDownwardWriteHits;
     }
 
     /**
+     * Get the number of downward misses.
      *
-     * @return
+     * @return the number of downward misses
      */
     public long getNumDownwardMisses() {
         return numDownwardReadMisses + numDownwardWriteMisses;
     }
 
     /**
+     * Get the number of downward accesses.
      *
-     * @return
+     * @return the number of downward accesses
      */
     public long getNumDownwardAccesses() {
         return getNumDownwardHits() + getNumDownwardMisses();
     }
 
     /**
+     * Get the number of downward read hits.
      *
-     * @return
+     * @return the number of downward read hits
      */
     public long getNumDownwardReadHits() {
         return numDownwardReadHits;
     }
 
     /**
+     * Get the number of downward read misses.
      *
-     * @return
+     * @return the number of downward read misses
      */
     public long getNumDownwardReadMisses() {
         return numDownwardReadMisses;
     }
 
     /**
+     * Get the number of downward write hits.
      *
-     * @return
+     * @return the number of downward write hits
      */
     public long getNumDownwardWriteHits() {
         return numDownwardWriteHits;
     }
 
     /**
+     * Get the number of write misses.
      *
-     * @return
+     * @return the number of write misses
      */
     public long getNumDownwardWriteMisses() {
         return numDownwardWriteMisses;
     }
 
     /**
+     * Get the number of evictions.
      *
-     * @return
+     * @return the number of evictions
      */
     public long getNumEvictions() {
         return numEvictions;
     }
 
     /**
+     * Get the occupancy ratio.
      *
-     * @return
+     * @return the occupancy ratio
      */
     public double getOccupancyRatio() {
         return getCache().getOccupancyRatio();
     }
 
     /**
+     * Get the geometry of the owned evictable cache.
      *
-     * @return
+     * @return the geometry of the owned evictable cache
      */
     public abstract CacheGeometry getGeometry();
 
     /**
+     * Get the finite state machine factory.
      *
-     * @return
+     * @return the finite state machine factory
      */
     public abstract FiniteStateMachineFactory<StateT, ConditionT, ?> getFsmFactory();
 }

@@ -18,30 +18,35 @@
  ******************************************************************************/
 package archimulator.sim.uncore.coherence.event;
 
+import archimulator.sim.common.SimulationEvent;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.msi.controller.GeneralCacheController;
 
 /**
+ * The event when a general cache controller receives a "last PutS" or "PutM and data from the owner" message.
  *
  * @author Min Cai
  */
-public class CoherentCacheLastPutSOrPutMAndDataFromOwnerEvent extends CoherentCacheEvent {
+public class GeneralCacheControllerLastPutSOrPutMAndDataFromOwnerEvent extends SimulationEvent {
+    private GeneralCacheController cacheController;
     private MemoryHierarchyAccess access;
     private int tag;
     private int set;
     private int way;
 
     /**
+     * Create an event when a general cache controller receives a "last PutS" or "PutM and data from the owner" message.
      *
-     * @param cacheController
-     * @param access
-     * @param tag
-     * @param set
-     * @param way
+     * @param cacheController the cache controller
+     * @param access          the memory hierarchy access
+     * @param tag             the tag
+     * @param set             the set index
+     * @param way             the way
      */
-    public CoherentCacheLastPutSOrPutMAndDataFromOwnerEvent(GeneralCacheController cacheController, MemoryHierarchyAccess access, int tag, int set, int way) {
+    public GeneralCacheControllerLastPutSOrPutMAndDataFromOwnerEvent(GeneralCacheController cacheController, MemoryHierarchyAccess access, int tag, int set, int way) {
         super(cacheController);
 
+        this.cacheController = cacheController;
         this.access = access;
         this.tag = tag;
         this.set = set;
@@ -49,32 +54,45 @@ public class CoherentCacheLastPutSOrPutMAndDataFromOwnerEvent extends CoherentCa
     }
 
     /**
+     * Get the cache controller.
      *
-     * @return
+     * @return the cache controller
+     */
+    public GeneralCacheController getCacheController() {
+        return cacheController;
+    }
+
+    /**
+     * Get the memory hierarchy access.
+     *
+     * @return the memory hierarchy access
      */
     public MemoryHierarchyAccess getAccess() {
         return access;
     }
 
     /**
+     * Get the tag.
      *
-     * @return
+     * @return the tag
      */
     public int getTag() {
         return tag;
     }
 
     /**
+     * Get the set index.
      *
-     * @return
+     * @return the set index
      */
     public int getSet() {
         return set;
     }
 
     /**
+     * Get the way.
      *
-     * @return
+     * @return the way
      */
     public int getWay() {
         return way;
@@ -82,6 +100,6 @@ public class CoherentCacheLastPutSOrPutMAndDataFromOwnerEvent extends CoherentCa
 
     @Override
     public String toString() {
-        return String.format("CoherentCacheLastPutSOrPutMAndDataFromOwnerEvent{access=%s, tag=0x%08x, set=%d, way=%d}", access, tag, set, way);
+        return String.format("GeneralCacheControllerLastPutSOrPutMAndDataFromOwnerEvent{access=%s, tag=0x%08x, set=%d, way=%d}", access, tag, set, way);
     }
 }

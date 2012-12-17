@@ -18,15 +18,18 @@
  ******************************************************************************/
 package archimulator.sim.uncore.coherence.event;
 
+import archimulator.sim.common.SimulationEvent;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.coherence.msi.controller.GeneralCacheController;
 
 /**
+ * The event when the last level cache (LLC) controller has a line inserted.
  *
  * @author Min Cai
  */
-public class LastLevelCacheLineInsertEvent extends CoherentCacheEvent {
+public class LastLevelCacheControllerLineInsertEvent extends SimulationEvent {
+    private GeneralCacheController cacheController;
     private MemoryHierarchyAccess access;
     private int tag;
     private int set;
@@ -34,16 +37,19 @@ public class LastLevelCacheLineInsertEvent extends CoherentCacheEvent {
     private int victimTag;
 
     /**
+     * Create an event when the last level cache (LLC) controller has a line inserted.
      *
-     * @param cacheController
-     * @param access
-     * @param tag
-     * @param set
-     * @param way
-     * @param victimTag
+     * @param cacheController the cache controller
+     * @param access          the access
+     * @param tag             the tag
+     * @param set             the set index
+     * @param way             the way
+     * @param victimTag       the victim tag
      */
-    public LastLevelCacheLineInsertEvent(GeneralCacheController cacheController, MemoryHierarchyAccess access, int tag, int set, int way, int victimTag) {
+    public LastLevelCacheControllerLineInsertEvent(GeneralCacheController cacheController, MemoryHierarchyAccess access, int tag, int set, int way, int victimTag) {
         super(cacheController);
+
+        this.cacheController = cacheController;
         this.tag = tag;
         this.set = set;
         this.way = way;
@@ -52,48 +58,63 @@ public class LastLevelCacheLineInsertEvent extends CoherentCacheEvent {
     }
 
     /**
+     * Get the cache controller.
      *
-     * @return
+     * @return the cache controller
+     */
+    public GeneralCacheController getCacheController() {
+        return cacheController;
+    }
+
+    /**
+     * Get the memory hierarchy access.
+     *
+     * @return the memory hierarchy access
      */
     public MemoryHierarchyAccess getAccess() {
         return access;
     }
 
     /**
+     * Get the tag.
      *
-     * @return
+     * @return the tag
      */
     public int getTag() {
         return tag;
     }
 
     /**
+     * Get the set index.
      *
-     * @return
+     * @return the set index
      */
     public int getSet() {
         return set;
     }
 
     /**
+     * Get the way.
      *
-     * @return
+     * @return the way
      */
     public int getWay() {
         return way;
     }
 
     /**
+     * Get the victim tag.
      *
-     * @return
+     * @return the victim tag
      */
     public int getVictimTag() {
         return victimTag;
     }
 
     /**
+     * Get a value indicating whether an eviction is needed or not.
      *
-     * @return
+     * @return a value indicating whether an eviction is needed or not
      */
     public boolean isEviction() {
         return victimTag != CacheLine.INVALID_TAG;
@@ -101,6 +122,6 @@ public class LastLevelCacheLineInsertEvent extends CoherentCacheEvent {
 
     @Override
     public String toString() {
-        return String.format("LastLevelCacheLineInsertEvent{access=%s, tag=0x%08x, set=%d, way=%d, cache.name=%s}", access, tag, set, way, getCacheController().getCache().getName());
+        return String.format("LastLevelCacheControllerLineInsertEvent{access=%s, tag=0x%08x, set=%d, way=%d, accessType=%s}", access, tag, set, way, access.getType());
     }
 }

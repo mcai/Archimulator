@@ -23,16 +23,18 @@ import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
 /**
+ * "Put acknowledgement" message.
  *
  * @author Min Cai
  */
 public class PutAckMessage extends CoherenceMessage {
     /**
+     * Create a "put acknowledgement" message.
      *
-     * @param generator
-     * @param producerFlow
-     * @param tag
-     * @param access
+     * @param generator    the generator controller
+     * @param producerFlow the producer cache coherence flow
+     * @param tag          the tag
+     * @param access       the memory hierarchy access
      */
     public PutAckMessage(Controller generator, CacheCoherenceFlow producerFlow, int tag, MemoryHierarchyAccess access) {
         super(generator, producerFlow, CoherenceMessageType.PUT_ACK, access, tag);

@@ -29,8 +29,8 @@ import java.util.Stack;
 /**
  * Cache set.
  *
- * @author Min Cai
  * @param <StateT> state
+ * @author Min Cai
  */
 public class CacheSet<StateT extends Serializable> {
     private Cache<StateT> cache;
@@ -41,9 +41,9 @@ public class CacheSet<StateT extends Serializable> {
     /**
      * Create a cache set.
      *
-     * @param cache the parent cache
-     * @param associativity the associativity
-     * @param num the cache set number
+     * @param cache                         the parent cache
+     * @param associativity                 the associativity
+     * @param num                           the cache set number
      * @param cacheLineStateProviderFactory the cache line state provider factory
      */
     public CacheSet(Cache<StateT> cache, int associativity, int num, ValueProviderFactory<StateT, ValueProvider<StateT>> cacheLineStateProviderFactory) {

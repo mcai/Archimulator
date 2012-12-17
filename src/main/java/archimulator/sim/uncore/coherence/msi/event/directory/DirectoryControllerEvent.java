@@ -24,6 +24,7 @@ import archimulator.sim.uncore.coherence.msi.event.ControllerEvent;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
 /**
+ * Directory controller event.
  *
  * @author Min Cai
  */
@@ -31,12 +32,13 @@ public abstract class DirectoryControllerEvent extends ControllerEvent {
     private DirectoryControllerEventType type;
 
     /**
+     * Create a directory controller event.
      *
-     * @param generator
-     * @param producerFlow
-     * @param type
-     * @param access
-     * @param tag
+     * @param generator    the generator directory controller
+     * @param producerFlow the producer cache coherence flow
+     * @param type         the type of the directory controller event
+     * @param access       the memory hierarchy access
+     * @param tag          the tag
      */
     public DirectoryControllerEvent(DirectoryController generator, CacheCoherenceFlow producerFlow, DirectoryControllerEventType type, MemoryHierarchyAccess access, int tag) {
         super(generator, producerFlow, access, tag);
@@ -44,8 +46,9 @@ public abstract class DirectoryControllerEvent extends ControllerEvent {
     }
 
     /**
+     * Get the type of the directory controller event.
      *
-     * @return
+     * @return the type of the directory controller event
      */
     public DirectoryControllerEventType getType() {
         return type;

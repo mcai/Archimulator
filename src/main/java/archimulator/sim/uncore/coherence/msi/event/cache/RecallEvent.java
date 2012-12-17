@@ -23,16 +23,18 @@ import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
 /**
+ * The event when an L1 cache controller receives a "recall" message.
  *
  * @author Min Cai
  */
 public class RecallEvent extends CacheControllerEvent {
     /**
+     * Create an event when an L1 cache controller receives a "recall" message.
      *
-     * @param generator
-     * @param producerFlow
-     * @param tag
-     * @param access
+     * @param generator    the generator L1 cache controller
+     * @param producerFlow the producer cache coherence flow
+     * @param tag          the tag
+     * @param access       the memory hierarchy access
      */
     public RecallEvent(CacheController generator, CacheCoherenceFlow producerFlow, int tag, MemoryHierarchyAccess access) {
         super(generator, producerFlow, CacheControllerEventType.RECALL, access, tag);

@@ -23,6 +23,7 @@ import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
 /**
+ * Cache coherence message.
  *
  * @author Min Cai
  */
@@ -31,12 +32,13 @@ public abstract class CoherenceMessage extends CacheCoherenceFlow {
     private boolean destinationArrived;
 
     /**
+     * Create a cache coherence message.
      *
-     * @param generator
-     * @param producerFlow
-     * @param type
-     * @param access
-     * @param tag
+     * @param generator    the generator controller
+     * @param producerFlow the producer cache coherence flow
+     * @param type         the type of the cache coherence message
+     * @param access       the memory hierarchy access
+     * @param tag          the tag
      */
     public CoherenceMessage(Controller generator, CacheCoherenceFlow producerFlow, CoherenceMessageType type, MemoryHierarchyAccess access, int tag) {
         super(generator, producerFlow, access, tag);
@@ -44,23 +46,25 @@ public abstract class CoherenceMessage extends CacheCoherenceFlow {
     }
 
     /**
-     *
+     * Act on when the cache coherence message has arrived at the destination.
      */
     public void onDestinationArrived() {
         this.destinationArrived = true;
     }
 
     /**
+     * Get the type of the cache coherence message.
      *
-     * @return
+     * @return the type of the cache coherence message
      */
     public CoherenceMessageType getType() {
         return type;
     }
 
     /**
+     * Get a value indicating whether the message has arrived at the destination.
      *
-     * @return
+     * @return a value indicating whether the message has arrived at the destination
      */
     public boolean isDestinationArrived() {
         return destinationArrived;

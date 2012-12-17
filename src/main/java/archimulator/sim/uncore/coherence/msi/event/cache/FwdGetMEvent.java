@@ -23,6 +23,7 @@ import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
 /**
+ * The event when an L1 cache controller receives a "forwarded GetM" message.
  *
  * @author Min Cai
  */
@@ -30,12 +31,13 @@ public class FwdGetMEvent extends CacheControllerEvent {
     private CacheController requester;
 
     /**
+     * Create an event when an L1 cache controller receives a "forwarded GetM" message.
      *
-     * @param generator
-     * @param producerFlow
-     * @param requester
-     * @param tag
-     * @param access
+     * @param generator    the generator L1 cache controller
+     * @param producerFlow the producer cache coherence flow
+     * @param requester    the requester L1 cache controller
+     * @param tag          the tag
+     * @param access       the memory hierarchy access
      */
     public FwdGetMEvent(CacheController generator, CacheCoherenceFlow producerFlow, CacheController requester, int tag, MemoryHierarchyAccess access) {
         super(generator, producerFlow, CacheControllerEventType.FWD_GETM, access, tag);
@@ -43,8 +45,9 @@ public class FwdGetMEvent extends CacheControllerEvent {
     }
 
     /**
+     * Get the requester L1 cache controller.
      *
-     * @return
+     * @return the requester L1 cache controller
      */
     public CacheController getRequester() {
         return requester;

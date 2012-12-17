@@ -27,7 +27,7 @@ import archimulator.sim.core.DynamicInstruction;
 import archimulator.sim.isa.FunctionalCallEvent;
 import archimulator.sim.isa.StaticInstructionType;
 import archimulator.sim.os.Process;
-import archimulator.sim.uncore.coherence.event.CoherentCacheServiceNonblockingRequestEvent;
+import archimulator.sim.uncore.coherence.event.GeneralCacheControllerServiceNonblockingRequestEvent;
 import net.pickapack.action.Action1;
 
 import java.util.Map;
@@ -75,8 +75,8 @@ public class HotspotProfilingHelper {
             }
         });
 
-        this.simulation.getBlockingEventDispatcher().addListener(CoherentCacheServiceNonblockingRequestEvent.class, new Action1<CoherentCacheServiceNonblockingRequestEvent>() {
-            public void apply(CoherentCacheServiceNonblockingRequestEvent event) {
+        this.simulation.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, new Action1<GeneralCacheControllerServiceNonblockingRequestEvent>() {
+            public void apply(GeneralCacheControllerServiceNonblockingRequestEvent event) {
                 DynamicInstruction dynamicInstruction = event.getAccess().getDynamicInstruction();
                 if (dynamicInstruction != null && dynamicInstruction.getThread().getContext().getThreadId() == BasicThread.getMainThreadId()) {
                     if (loadsInHotspotFunction.containsKey(dynamicInstruction.getPc())) {

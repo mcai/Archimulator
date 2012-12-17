@@ -23,16 +23,18 @@ import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
 /**
+ * The event when the directory controller receives a "last recall acknowledgement" message.
  *
  * @author Min Cai
  */
 public class LastRecallAckEvent extends DirectoryControllerEvent {
     /**
+     * Create an event when the directory controller receives a "last recall acknowledgement" message.
      *
-     * @param generator
-     * @param producerFlow
-     * @param tag
-     * @param access
+     * @param generator    the generator directory controller
+     * @param producerFlow the producer cache coherence flow
+     * @param tag          the tag
+     * @param access       the memory hierarchy access
      */
     public LastRecallAckEvent(DirectoryController generator, CacheCoherenceFlow producerFlow, int tag, MemoryHierarchyAccess access) {
         super(generator, producerFlow, DirectoryControllerEventType.LAST_RECALL_ACK, access, tag);

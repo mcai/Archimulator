@@ -31,10 +31,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * L1 cache controller finite state machine factory.
  *
  * @author Min Cai
  */
 public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachineFactory<CacheControllerState, CacheControllerEventType, CacheControllerFiniteStateMachine> {
+    /**
+     * Create an L1 cache controller finite state machine factory.
+     */
     private CacheControllerFiniteStateMachineFactory() {
         Action1<CacheControllerFiniteStateMachine> actionWhenStateChanged = new Action1<CacheControllerFiniteStateMachine>() {
             @Override
@@ -185,7 +189,7 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
                 .onCondition(CacheControllerEventType.INV_ACK, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, InvAckEvent>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, InvAckEvent event) {
-                        fsm.decInvAcks();
+                        fsm.decrementInvAcks();
                     }
                 }, CacheControllerState.IM_AD);
 
@@ -232,7 +236,7 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
                 .onCondition(CacheControllerEventType.INV_ACK, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, InvAckEvent>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, InvAckEvent event) {
-                        fsm.decInvAcks();
+                        fsm.decrementInvAcks();
                     }
                 }, CacheControllerState.IM_A)
                 .onCondition(CacheControllerEventType.LAST_INV_ACK, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, LastInvAckEvent>() {
@@ -349,7 +353,7 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
                 .onCondition(CacheControllerEventType.INV_ACK, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, InvAckEvent>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, InvAckEvent event) {
-                        fsm.decInvAcks();
+                        fsm.decrementInvAcks();
                     }
                 }, CacheControllerState.SM_AD);
 
@@ -389,7 +393,7 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
                 .onCondition(CacheControllerEventType.INV_ACK, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, InvAckEvent>() {
                     @Override
                     public void apply(CacheControllerFiniteStateMachine fsm, Object sender, CacheControllerEventType eventType, InvAckEvent event) {
-                        fsm.decInvAcks();
+                        fsm.decrementInvAcks();
                     }
                 }, CacheControllerState.SM_A)
                 .onCondition(CacheControllerEventType.LAST_INV_ACK, new Action4<CacheControllerFiniteStateMachine, Object, CacheControllerEventType, LastInvAckEvent>() {
@@ -571,11 +575,12 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
     private static CacheControllerFiniteStateMachineFactory singleton;
 
     /**
+     * Get the L1 cache controller finite state machine factory singleton.
      *
-     * @return
+     * @return the L1 cache controller finite state machine factory singleton
      */
     public static CacheControllerFiniteStateMachineFactory getSingleton() {
-        if(singleton == null) {
+        if (singleton == null) {
             singleton = new CacheControllerFiniteStateMachineFactory();
         }
 

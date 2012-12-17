@@ -24,6 +24,7 @@ import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import net.pickapack.action.Action;
 
 /**
+ * The event when an L1 cache controller receives a "load" memory hierarchy access.
  *
  * @author Min Cai
  */
@@ -34,15 +35,16 @@ public class LoadEvent extends CacheControllerEvent {
     private Action onStalledCallback;
 
     /**
+     * Create an event when an L1 cache controller receives a "load" memory hierarchy access.
      *
-     * @param generator
-     * @param producerFlow
-     * @param tag
-     * @param set
-     * @param way
-     * @param onCompletedCallback
-     * @param onStalledCallback
-     * @param access
+     * @param generator           the generator L1 cache controller
+     * @param producerFlow        the producer cache coherence flow
+     * @param tag                 the tag
+     * @param set                 the set index
+     * @param way                 the way
+     * @param onCompletedCallback the callback action performed when the access is completed
+     * @param onStalledCallback   the callback action performed when the access is stalled
+     * @param access              the memory hierarchy access
      */
     public LoadEvent(CacheController generator, CacheCoherenceFlow producerFlow, int tag, int set, int way, Action onCompletedCallback, Action onStalledCallback, MemoryHierarchyAccess access) {
         super(generator, producerFlow, CacheControllerEventType.LOAD, access, tag);
@@ -54,32 +56,36 @@ public class LoadEvent extends CacheControllerEvent {
     }
 
     /**
+     * Get the set index.
      *
-     * @return
+     * @return the set index
      */
     public int getSet() {
         return set;
     }
 
     /**
+     * Get the way.
      *
-     * @return
+     * @return the way
      */
     public int getWay() {
         return way;
     }
 
     /**
+     * Get the callback action performed when the access is completed.
      *
-     * @return
+     * @return the callback action performed when the access is completed
      */
     public Action getOnCompletedCallback() {
         return onCompletedCallback;
     }
 
     /**
+     * Get the callback action performed when the access is stalled.
      *
-     * @return
+     * @return the callback action performed when the access is stalled
      */
     public Action getOnStalledCallback() {
         return onStalledCallback;

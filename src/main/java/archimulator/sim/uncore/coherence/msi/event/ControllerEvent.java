@@ -23,16 +23,18 @@ import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
 /**
+ * Controller event.
  *
  * @author Min Cai
  */
 public abstract class ControllerEvent extends CacheCoherenceFlow {
     /**
+     * Create a controller event.
      *
-     * @param generator
-     * @param producerFlow
-     * @param access
-     * @param tag
+     * @param generator    the generator controller
+     * @param producerFlow the producer flow
+     * @param access       the memory hierarchy access
+     * @param tag          the tag
      */
     public ControllerEvent(Controller generator, CacheCoherenceFlow producerFlow, MemoryHierarchyAccess access, int tag) {
         super(generator, producerFlow, access, tag);

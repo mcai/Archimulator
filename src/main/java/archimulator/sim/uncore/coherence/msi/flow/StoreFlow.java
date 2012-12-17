@@ -23,25 +23,25 @@ import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import net.pickapack.action.Action;
 
 /**
+ * Store flow.
  *
  * @author Min Cai
  */
 public class StoreFlow extends CacheCoherenceFlow {
     private Action onCompletedCallback;
-    private Action onCompletedCallback2;
 
     /**
+     * Create a store flow.
      *
-     * @param generator
-     * @param tag
-     * @param onCompletedCallback
-     * @param access
+     * @param generator           the generator L1 cache controller
+     * @param tag                 the tag
+     * @param onCompletedCallback the callback action performed when the store flow is completed
+     * @param access              the memory hierarchy access
      */
     public StoreFlow(final CacheController generator, int tag, final Action onCompletedCallback, MemoryHierarchyAccess access) {
         super(generator, null, access, tag);
-        this.onCompletedCallback = onCompletedCallback;
 
-        this.onCompletedCallback2 = new Action() {
+        this.onCompletedCallback = new Action() {
             @Override
             public void apply() {
                 onCompletedCallback.apply();
@@ -51,19 +51,12 @@ public class StoreFlow extends CacheCoherenceFlow {
     }
 
     /**
+     * Get the callback action performed when the store flow is completed.
      *
-     * @return
+     * @return the callback action performed when the store flow is completed
      */
     public Action getOnCompletedCallback() {
         return onCompletedCallback;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public Action getOnCompletedCallback2() {
-        return onCompletedCallback2;
     }
 
     @Override

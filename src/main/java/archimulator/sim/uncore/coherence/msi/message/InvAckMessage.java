@@ -24,6 +24,7 @@ import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
 /**
+ * "Invalidation acknowledgement" message.
  *
  * @author Min Cai
  */
@@ -31,12 +32,13 @@ public class InvAckMessage extends CoherenceMessage {
     private CacheController sender;
 
     /**
+     * Create an "invalidation acknowledgement" message.
      *
-     * @param generator
-     * @param producerFlow
-     * @param sender
-     * @param tag
-     * @param access
+     * @param generator    the generator controller
+     * @param producerFlow the producer cache coherence flow
+     * @param sender       the sender L1 cache controller
+     * @param tag          the tag
+     * @param access       the memory hierarchy access
      */
     public InvAckMessage(Controller generator, CacheCoherenceFlow producerFlow, CacheController sender, int tag, MemoryHierarchyAccess access) {
         super(generator, producerFlow, CoherenceMessageType.INV_ACK, access, tag);
@@ -44,8 +46,9 @@ public class InvAckMessage extends CoherenceMessage {
     }
 
     /**
+     * Get the sender L1 cache controller.
      *
-     * @return
+     * @return the sender L1 cache controller
      */
     public CacheController getSender() {
         return sender;

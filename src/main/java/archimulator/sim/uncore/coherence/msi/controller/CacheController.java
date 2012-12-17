@@ -43,6 +43,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Cache controller.
  *
  * @author Min Cai
  */
@@ -53,9 +54,10 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
     private CacheControllerFiniteStateMachineFactory fsmFactory;
 
     /**
+     * Create a cache controller.
      *
-     * @param cacheHierarchy
-     * @param name
+     * @param cacheHierarchy the cache hierarchy
+     * @param name           the name
      */
     public CacheController(CacheHierarchy cacheHierarchy, final String name) {
         super(cacheHierarchy, name);
@@ -83,10 +85,11 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
     }
 
     /**
+     * Get a value indicating whether the specified memory hierarchy access can be performed now.
      *
-     * @param type
-     * @param physicalTag
-     * @return
+     * @param type        the type of the memory hierarchy access
+     * @param physicalTag the physical tag
+     * @return a value indicating whether the specified memory hierarchy access can be performed now
      */
     public boolean canAccess(MemoryHierarchyAccessType type, int physicalTag) {
         MemoryHierarchyAccess access = this.findAccess(physicalTag);
@@ -96,24 +99,26 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
     }
 
     /**
+     * Find the pending memory hierarchy access matching the specified physical tag.
      *
-     * @param physicalTag
-     * @return
+     * @param physicalTag the physical tag
+     * @return the pending memory hierarchy access matching the specified physical tag if any exists; otherwise null
      */
     public MemoryHierarchyAccess findAccess(int physicalTag) {
         return this.pendingAccesses.containsKey(physicalTag) ? this.pendingAccesses.get(physicalTag) : null;
     }
 
     /**
+     * Begin a memory hierarchy access.
      *
-     * @param dynamicInstruction
-     * @param thread
-     * @param type
-     * @param virtualPc
-     * @param physicalAddress
-     * @param physicalTag
-     * @param onCompletedCallback
-     * @return
+     * @param dynamicInstruction  the dynamic instruction
+     * @param thread              the thread
+     * @param type                the type of the memory hierarchy access
+     * @param virtualPc           the virtual address of the program counter (PC)'s value
+     * @param physicalAddress     the physical address
+     * @param physicalTag         the physical tag
+     * @param onCompletedCallback the callback action performed when the memory hierarchy access is completed
+     * @return the newly created memory hierarchy access
      */
     public MemoryHierarchyAccess beginAccess(DynamicInstruction dynamicInstruction, MemoryHierarchyThread thread, MemoryHierarchyAccessType type, int virtualPc, int physicalAddress, int physicalTag, Action onCompletedCallback) {
         MemoryHierarchyAccess newAccess = new MemoryHierarchyAccess(dynamicInstruction, thread, type, virtualPc, physicalAddress, physicalTag, onCompletedCallback, this.getCycleAccurateEventQueue().getCurrentCycle());
@@ -131,8 +136,9 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
     }
 
     /**
+     * End the memory hierarchy access matching the specified physical tag.
      *
-     * @param physicalTag
+     * @param physicalTag the physical tag
      */
     public void endAccess(int physicalTag) {
         MemoryHierarchyAccess access = this.findAccess(physicalTag);
@@ -150,9 +156,10 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
     }
 
     /**
+     * Get the net for the specified destination device.
      *
-     * @param to
-     * @return
+     * @param to the destination device
+     * @return the net for the specified destination device
      */
     @Override
     protected Net getNet(MemoryDevice to) {
@@ -160,9 +167,10 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
     }
 
     /**
+     * Receive an "instruction fetch" memory hierarchy access.
      *
-     * @param access
-     * @param onCompletedCallback
+     * @param access              the memory hierarchy access
+     * @param onCompletedCallback the callback action performed when the access is completed
      */
     public void receiveIfetch(final MemoryHierarchyAccess access, final Action onCompletedCallback) {
         this.getCycleAccurateEventQueue().schedule(this, new Action() {
@@ -174,9 +182,10 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
     }
 
     /**
+     * Receive a "load" memory hierarchy access.
      *
-     * @param access
-     * @param onCompletedCallback
+     * @param access              the memory hierarchy access
+     * @param onCompletedCallback the callback action performed when the access is completed
      */
     public void receiveLoad(final MemoryHierarchyAccess access, final Action onCompletedCallback) {
         this.getCycleAccurateEventQueue().schedule(this, new Action() {
@@ -188,9 +197,10 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
     }
 
     /**
+     * Receive a "store" memory hierarchy access.
      *
-     * @param access
-     * @param onCompletedCallback
+     * @param access              the memory hierarchy access
+     * @param onCompletedCallback the callback action performed when the access is completed
      */
     public void receiveStore(final MemoryHierarchyAccess access, final Action onCompletedCallback) {
         this.getCycleAccurateEventQueue().schedule(this, new Action() {
@@ -202,26 +212,28 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
     }
 
     /**
+     * Get the next level directory controller.
      *
-     * @param next
-     */
-    public void setNext(DirectoryController next) {
-        next.getCacheControllers().add(this);
-        super.setNext(next);
-    }
-
-    /**
-     *
-     * @return
+     * @return the next level directory controller
      */
     public DirectoryController getNext() {
         return (DirectoryController) super.getNext();
     }
 
     /**
+     * Set the next level directory controller.
      *
-     * @param message
+     * @param next the next level directory controller
      */
+    public void setNext(MemoryDevice next) {
+        if (!(next instanceof DirectoryController)) {
+            throw new IllegalArgumentException();
+        }
+
+        ((DirectoryController) next).getCacheControllers().add(this);
+        super.setNext(next);
+    }
+
     @Override
     public void receive(CoherenceMessage message) {
         switch (message.getType()) {
@@ -252,15 +264,23 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
     }
 
     /**
+     * Act on a "load" memory hierarchy access.
      *
-     * @param access
-     * @param tag
-     * @param onCompletedCallback
+     * @param access              the memory hierarchy access
+     * @param tag                 the tag
+     * @param onCompletedCallback the callback action performed when the access is completed
      */
     public void onLoad(MemoryHierarchyAccess access, int tag, Action onCompletedCallback) {
         onLoad(access, tag, new LoadFlow(this, tag, onCompletedCallback, access));
     }
 
+    /**
+     * Act on a "load" memory hierarchy access.
+     *
+     * @param access   the memory hierarchy access
+     * @param tag      the tag
+     * @param loadFlow the load flow
+     */
     private void onLoad(final MemoryHierarchyAccess access, final int tag, final LoadFlow loadFlow) {
         final Action onStalledCallback = new Action() {
             @Override
@@ -274,21 +294,29 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
             public void apply(Integer set, Integer way) {
                 CacheLine<CacheControllerState> line = getCache().getLine(set, way);
                 CacheControllerFiniteStateMachine fsm = (CacheControllerFiniteStateMachine) line.getStateProvider();
-                fsm.onEventLoad(loadFlow, tag, loadFlow.getOnCompletedCallback2(), onStalledCallback);
+                fsm.onEventLoad(loadFlow, tag, loadFlow.getOnCompletedCallback(), onStalledCallback);
             }
         }, onStalledCallback);
     }
 
     /**
+     * Act on a "store" memory hierarchy access.
      *
-     * @param access
-     * @param tag
-     * @param onCompletedCallback
+     * @param access              the memory hierarchy access
+     * @param tag                 the tag
+     * @param onCompletedCallback the callback action performed when the access is completed
      */
     public void onStore(MemoryHierarchyAccess access, int tag, Action onCompletedCallback) {
         onStore(access, tag, new StoreFlow(this, tag, onCompletedCallback, access));
     }
 
+    /**
+     * Act on a "store" memory hierarchy access.
+     *
+     * @param access    the memory hierarchy access
+     * @param tag       the tag
+     * @param storeFlow the associated store flow
+     */
     private void onStore(final MemoryHierarchyAccess access, final int tag, final StoreFlow storeFlow) {
         final Action onStalledCallback = new Action() {
             @Override
@@ -302,11 +330,16 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
             public void apply(Integer set, Integer way) {
                 CacheLine<CacheControllerState> line = getCache().getLine(set, way);
                 CacheControllerFiniteStateMachine fsm = (CacheControllerFiniteStateMachine) line.getStateProvider();
-                fsm.onEventStore(storeFlow, tag, storeFlow.getOnCompletedCallback2(), onStalledCallback);
+                fsm.onEventStore(storeFlow, tag, storeFlow.getOnCompletedCallback(), onStalledCallback);
             }
         }, onStalledCallback);
     }
 
+    /**
+     * Act on a "forwarded GetS" message.
+     *
+     * @param message the "forwarded GetS" message
+     */
     private void onFwdGetS(FwdGetSMessage message) {
         int way = this.cache.findWay(message.getTag());
         CacheLine<CacheControllerState> line = this.getCache().getLine(this.getCache().getSet(message.getTag()), way);
@@ -314,6 +347,11 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
         fsm.onEventFwdGetS(message, message.getRequester(), message.getTag());
     }
 
+    /**
+     * Act on a "forwarded GetM" message.
+     *
+     * @param message the "forwarded GetM" message
+     */
     private void onFwdGetM(FwdGetMMessage message) {
         int way = this.cache.findWay(message.getTag());
         CacheLine<CacheControllerState> line = this.getCache().getLine(this.getCache().getSet(message.getTag()), way);
@@ -321,6 +359,11 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
         fsm.onEventFwdGetM(message, message.getRequester(), message.getTag());
     }
 
+    /**
+     * Act on an "invalidation" message.
+     *
+     * @param message the "invalidation" message
+     */
     private void onInv(InvMessage message) {
         int way = this.cache.findWay(message.getTag());
         CacheLine<CacheControllerState> line = this.getCache().getLine(this.getCache().getSet(message.getTag()), way);
@@ -328,6 +371,11 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
         fsm.onEventInv(message, message.getRequester(), message.getTag());
     }
 
+    /**
+     * Act on a "recall" message.
+     *
+     * @param message the "recall" message
+     */
     private void onRecall(RecallMessage message) {
         int way = this.cache.findWay(message.getTag());
         CacheLine<CacheControllerState> line = this.getCache().getLine(this.getCache().getSet(message.getTag()), way);
@@ -335,6 +383,11 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
         fsm.onEventRecall(message, message.getTag());
     }
 
+    /**
+     * Act on a "Put Acknowledgement" message.
+     *
+     * @param message the "Put Acknowledgement" message
+     */
     private void onPutAck(PutAckMessage message) {
         int way = this.cache.findWay(message.getTag());
         CacheLine<CacheControllerState> line = this.getCache().getLine(this.getCache().getSet(message.getTag()), way);
@@ -342,6 +395,11 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
         fsm.onEventPutAck(message, message.getTag());
     }
 
+    /**
+     * Act on a "data" message.
+     *
+     * @param message the "data" message
+     */
     private void onData(DataMessage message) {
         int way = this.cache.findWay(message.getTag());
         CacheLine<CacheControllerState> line = this.getCache().getLine(this.getCache().getSet(message.getTag()), way);
@@ -349,6 +407,11 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
         fsm.onEventData(message, message.getSender(), message.getTag(), message.getNumInvAcks());
     }
 
+    /**
+     * Act on an "invalidation acknowledgement" message.
+     *
+     * @param message the "invalidation acknowledgement" message
+     */
     private void onInvAck(InvAckMessage message) {
         int way = this.cache.findWay(message.getTag());
         CacheLine<CacheControllerState> line = this.getCache().getLine(this.getCache().getSet(message.getTag()), way);
@@ -357,14 +420,14 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
     }
 
     /**
+     * Perform the memory hierarchy access.
      *
-     * @return
+     * @param producerFlow                   the producer cache coherence flow
+     * @param access                         the memory hierarchy access
+     * @param tag                            the tag
+     * @param onReplacementCompletedCallback the callback action performed when the line replacement is completed
+     * @param onReplacementStalledCallback   the callback action performed when the line replacement is stalled
      */
-    @Override
-    public EvictableCache<CacheControllerState> getCache() {
-        return cache;
-    }
-
     private void access(CacheCoherenceFlow producerFlow, MemoryHierarchyAccess access, int tag, final Action2<Integer, Integer> onReplacementCompletedCallback, final Action onReplacementStalledCallback) {
         final int set = this.cache.getSet(tag);
 
@@ -395,46 +458,42 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
         }
     }
 
+    @Override
+    public EvictableCache<CacheControllerState> getCache() {
+        return cache;
+    }
+
     /**
+     * Get the lower level directory controller.
      *
-     * @return
+     * @return the lower level directory controller
      */
     public DirectoryController getDirectoryController() {
         return this.getNext();
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public CacheControllerFiniteStateMachineFactory getFsmFactory() {
         return fsmFactory;
     }
 
     /**
+     * Get the number of read ports.
      *
-     * @return
+     * @return the number of read ports
      */
     public abstract int getNumReadPorts();
 
     /**
+     * Get the number of write ports.
      *
-     * @return
+     * @return the number of write ports
      */
     public abstract int getNumWritePorts();
 
-    /**
-     *
-     * @return
-     */
     @Override
     public abstract int getHitLatency();
 
-    /**
-     *
-     * @return
-     */
     @Override
     public abstract CacheReplacementPolicyType getReplacementPolicyType();
 

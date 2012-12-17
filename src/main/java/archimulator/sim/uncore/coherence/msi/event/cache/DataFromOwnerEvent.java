@@ -24,6 +24,7 @@ import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
 /**
+ * The event when an L1 cache controller receives a "data" message from the owner controller.
  *
  * @author Min Cai
  */
@@ -31,12 +32,13 @@ public class DataFromOwnerEvent extends CacheControllerEvent {
     private Controller sender;
 
     /**
+     * Create an event when an L1 cache controller receives a "data" message from the owner controller.
      *
-     * @param generator
-     * @param producerFlow
-     * @param sender
-     * @param tag
-     * @param access
+     * @param generator    the generator L1 cache controller
+     * @param producerFlow the producer cache coherence flow
+     * @param sender       the sender controller
+     * @param tag          the tag
+     * @param access       the memory hierarchy access
      */
     public DataFromOwnerEvent(CacheController generator, CacheCoherenceFlow producerFlow, Controller sender, int tag, MemoryHierarchyAccess access) {
         super(generator, producerFlow, CacheControllerEventType.DATA_FROM_OWNER, access, tag);
@@ -44,8 +46,9 @@ public class DataFromOwnerEvent extends CacheControllerEvent {
     }
 
     /**
+     * Get the sender controller.
      *
-     * @return
+     * @return the sender controller
      */
     public Controller getSender() {
         return sender;

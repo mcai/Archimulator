@@ -19,48 +19,66 @@
 package archimulator.sim.uncore.coherence.msi.state;
 
 /**
+ * Directory controller state.
  *
  * @author Min Cai
  */
 public enum DirectoryControllerState {
     /**
-     *
+     * I.
      */
     I,
+
     /**
-     *
+     * IS_D.
      */
     IS_D,
+
     /**
-     *
+     * IM_D.
      */
     IM_D,
+
     /**
-     *
+     * S.
      */
     S,
+
     /**
-     *
+     * M.
      */
     M,
+
     /**
-     *
+     * S_D.
      */
     S_D,
+
     /**
-     *
+     * MI_A.
      */
     MI_A,
+
     /**
-     *
+     * SI_A.
      */
     SI_A;
 
     /**
+     * Get a value indicating whether the state is stable or not.
      *
-     * @return
+     * @return a value indicating whether the state is stable or not
      */
     public boolean isStable() {
         return this == I || this == S || this == M;
+    }
+
+    /**
+     * Get a value indicating whether the state is transient or not.
+     *
+     * @return a value indicating whether the state is transient or not
+     */
+    public boolean isTransient() {
+        return !isStable();
     }
 }

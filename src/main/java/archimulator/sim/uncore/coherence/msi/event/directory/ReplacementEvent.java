@@ -26,6 +26,7 @@ import archimulator.sim.uncore.coherence.msi.state.DirectoryControllerState;
 import net.pickapack.action.Action;
 
 /**
+ * The event when the directory controller performs a line replacement.
  *
  * @author Min Cai
  */
@@ -37,16 +38,17 @@ public class ReplacementEvent extends DirectoryControllerEvent {
     private Action onStalledCallback;
 
     /**
+     * Create an event when the directory controller performs a line replacement.
      *
-     * @param generator
-     * @param producerFlow
-     * @param tag
-     * @param cacheAccess
-     * @param set
-     * @param way
-     * @param onCompletedCallback
-     * @param onStalledCallback
-     * @param access
+     * @param generator           the generator directory controller
+     * @param producerFlow        the producer cache coherence flow
+     * @param tag                 the tag
+     * @param cacheAccess         the cache access
+     * @param set                 the set index
+     * @param way                 the way
+     * @param onCompletedCallback the callback action performed when the line replacement is completed
+     * @param onStalledCallback   the callback action performed when the line replacement is stalled
+     * @param access              the memory hierarchy access
      */
     public ReplacementEvent(DirectoryController generator, CacheCoherenceFlow producerFlow, int tag, CacheAccess<DirectoryControllerState> cacheAccess, int set, int way, Action onCompletedCallback, Action onStalledCallback, MemoryHierarchyAccess access) {
         super(generator, producerFlow, DirectoryControllerEventType.REPLACEMENT, access, tag);
@@ -58,40 +60,45 @@ public class ReplacementEvent extends DirectoryControllerEvent {
     }
 
     /**
+     * Get the cache access.
      *
-     * @return
+     * @return the cache access
      */
     public CacheAccess<DirectoryControllerState> getCacheAccess() {
         return cacheAccess;
     }
 
     /**
+     * Get the set index.
      *
-     * @return
+     * @return the set index
      */
     public int getSet() {
         return set;
     }
 
     /**
+     * Get the way.
      *
-     * @return
+     * @return the way
      */
     public int getWay() {
         return way;
     }
 
     /**
+     * Get the callback action performed when the line replacement is completed.
      *
-     * @return
+     * @return the callback action performed when the line replacement is completed
      */
     public Action getOnCompletedCallback() {
         return onCompletedCallback;
     }
 
     /**
+     * Get the callback action performed when the line replacement is stalled.
      *
-     * @return
+     * @return the callback action performed when the line replacement is stalled
      */
     public Action getOnStalledCallback() {
         return onStalledCallback;
