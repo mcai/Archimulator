@@ -59,7 +59,7 @@ public class ExperimentStat implements ModelElement {
     @DatabaseField
     private String nodeKey;
 
-    @DatabaseField
+    @DatabaseField(dataType = DataType.LONG_STRING)
     private String value;
 
     /**
