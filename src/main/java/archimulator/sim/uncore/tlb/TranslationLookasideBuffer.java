@@ -31,6 +31,7 @@ import net.pickapack.util.ValueProvider;
 import net.pickapack.util.ValueProviderFactory;
 
 /**
+ * Translation lookaside buffer (TLB).
  *
  * @author Min Cai
  */
@@ -45,9 +46,10 @@ public class TranslationLookasideBuffer implements Named {
     private long numEvictions;
 
     /**
+     * Create a translation lookaside buffer (TLB).
      *
-     * @param parent
-     * @param name
+     * @param parent the parent simulation object
+     * @param name the name
      */
     public TranslationLookasideBuffer(SimulationObject parent, String name) {
         this.name = name;
@@ -63,9 +65,10 @@ public class TranslationLookasideBuffer implements Named {
     }
 
     /**
+     * Act on a TLB access.
      *
-     * @param access
-     * @param onCompletedCallback
+     * @param access the memory hierarchy access
+     * @param onCompletedCallback the callback action performed when the access is completed
      */
     public void access(MemoryHierarchyAccess access, Action onCompletedCallback) {
         int set = this.cache.getSet(access.getPhysicalAddress());
@@ -94,97 +97,124 @@ public class TranslationLookasideBuffer implements Named {
     }
 
     /**
+     * Get the name of the translation lookaside buffer (TLB).
      *
-     * @return
+     * @return the name of the translation lookaside buffer (TLB)
      */
     public String getName() {
         return name;
     }
 
     /**
+     * Get the number of misses.
      *
-     * @return
+     * @return the number of misses
      */
     public long getNumMisses() {
         return this.numMisses;
     }
 
     /**
+     * Get the number of hits.
      *
-     * @return
-     */
-    public double getHitRatio() {
-        return this.getNumAccesses() > 0 ? (double) this.numHits / this.getNumAccesses() : 0.0;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public long getNumAccesses() {
-        return numHits + numMisses;
-    }
-
-    /**
-     *
-     * @return
+     * @return the number of hits
      */
     public long getNumHits() {
         return numHits;
     }
 
     /**
+     * Get the number of accesses.
      *
-     * @return
+     * @return the number of accesses
+     */
+    public long getNumAccesses() {
+        return numHits + numMisses;
+    }
+
+    /**
+     * Get the hit ratio.
+     *
+     * @return the hit ratio
+     */
+    public double getHitRatio() {
+        return this.getNumAccesses() > 0 ? (double) this.numHits / this.getNumAccesses() : 0.0;
+    }
+
+    /**
+     * Get the number of evictions.
+     *
+     * @return the number of evictions
      */
     public long getNumEvictions() {
         return numEvictions;
     }
 
     /**
+     * Get the occupancy ratio.
      *
-     * @return
+     * @return the occupancy ratio
      */
     public double getOccupancyRatio() {
         return getCache().getOccupancyRatio();
     }
 
     /**
+     * Get the hit latency.
      *
-     * @return
-     */
-    public EvictableCache<Boolean> getCache() {
-        return cache;
-    }
-
-    /**
-     *
-     * @return
+     * @return the hit latency
      */
     public int getHitLatency() {
         return getCache().getExperiment().getArchitecture().getTlbHitLatency();
     }
 
     /**
+     * Get the miss latency.
      *
-     * @return
+     * @return the miss latency
      */
     public int getMissLatency() {
         return getCache().getExperiment().getArchitecture().getTlbMissLatency();
     }
 
+    /**
+     * Get the owned evictable cache.
+     *
+     * @return the owned evictable cache
+     */
+    public EvictableCache<Boolean> getCache() {
+        return cache;
+    }
+
+    /**
+     * Boolean value provider.
+     *
+     */
     private class BooleanValueProvider implements ValueProvider<Boolean> {
         protected boolean state;
 
+        /**
+         * Create a boolean value provider.
+         */
         public BooleanValueProvider() {
             this.state = false;
         }
 
+        /**
+         * Get the state.
+         *
+         * @return the state
+         */
         @Override
         public Boolean get() {
             return state;
         }
 
+        /**
+         * Get the initial state.
+         *
+         * @return the initial state
+         */
         @Override
         public Boolean getInitialValue() {
             return false;
