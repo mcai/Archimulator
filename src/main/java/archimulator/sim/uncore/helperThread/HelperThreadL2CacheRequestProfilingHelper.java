@@ -81,13 +81,10 @@ public class HelperThreadL2CacheRequestProfilingHelper {
     private DescriptiveStatistics statL2CacheMissMlpCosts;
     private DescriptiveStatistics statL2CacheMissAverageMlps;
 
-    private DescriptiveStatistics statL2CacheHitReuseDistances;
-    private DescriptiveStatistics statL2CacheMissReuseDistances;
-
     private boolean l2RequestLatencyStatsEnabled;
 
     /**
-     * Constructs a helper thread L2 request profiling helper.
+     * Create a helper thread L2 request profiling helper.
      *
      * @param simulation simulation
      */
@@ -96,7 +93,7 @@ public class HelperThreadL2CacheRequestProfilingHelper {
     }
 
     /**
-     * Constructs a helper thread L2 request profiling helper.
+     * Create a helper thread L2 request profiling helper.
      *
      * @param l2CacheController L2 cache (directory) controller
      */
@@ -129,9 +126,6 @@ public class HelperThreadL2CacheRequestProfilingHelper {
         this.statL2CacheMissNumCycles = new DescriptiveStatistics();
         this.statL2CacheMissMlpCosts = new DescriptiveStatistics();
         this.statL2CacheMissAverageMlps = new DescriptiveStatistics();
-
-        this.statL2CacheHitReuseDistances = new DescriptiveStatistics();
-        this.statL2CacheMissReuseDistances = new DescriptiveStatistics();
 
         l2CacheController.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, new Action1<GeneralCacheControllerServiceNonblockingRequestEvent>() {
             public void apply(GeneralCacheControllerServiceNonblockingRequestEvent event) {
@@ -218,31 +212,6 @@ public class HelperThreadL2CacheRequestProfilingHelper {
         });
     }
 
-    private void profileReuseDistance(boolean hitInCache, MemoryHierarchyAccess access) {
-        int tag = access.getPhysicalTag();
-        int set = this.l2CacheController.getCache().getSet(tag);
-
-        Stack<Integer> lruStack = this.l2CacheController.getCache().get(set).getLruStack();
-
-        int position = lruStack.search(tag);
-
-        if(position == -1) {
-            lruStack.push(tag);
-            this.statL2CacheMissReuseDistances.addValue(position);
-        }
-        else {
-            lruStack.remove((Integer) tag);
-            lruStack.push(tag);
-
-            if(hitInCache) {
-                this.statL2CacheHitReuseDistances.addValue(position);
-            }
-            else {
-                this.statL2CacheMissReuseDistances.addValue(position);
-            }
-        }
-    }
-
     /**
      * To be invoked per cycle for updating MLP costs for in-flight L2 cache accesses.
      */
@@ -259,6 +228,11 @@ public class HelperThreadL2CacheRequestProfilingHelper {
         }
     }
 
+    /**
+     * Profile the beginning of servicing an L2 cache request.
+     *
+     * @param access the memory hierarchy access
+     */
     private void profileBeginServicingL2Request(MemoryHierarchyAccess access) {
         if (!this.l2RequestLatencyStatsEnabled) {
             return;
@@ -270,6 +244,11 @@ public class HelperThreadL2CacheRequestProfilingHelper {
         this.pendingL2Misses.put(tag, pendingL2Miss);
     }
 
+    /**
+     * Profile the end of servicing an L2 cache request.
+     *
+     * @param access the memory hierarchy access
+     */
     private void profileEndServicingL2Request(MemoryHierarchyAccess access) {
         if (!this.l2RequestLatencyStatsEnabled) {
             return;
@@ -290,7 +269,7 @@ public class HelperThreadL2CacheRequestProfilingHelper {
     }
 
     /**
-     *
+     * Sum up the unstable helper thread L2 cache requests.
      */
     public void sumUpUnstableHelperThreadL2CacheRequests() {
         for (int set = 0; set < l2CacheController.getCache().getNumSets(); set++) {
@@ -298,13 +277,6 @@ public class HelperThreadL2CacheRequestProfilingHelper {
                 this.sumUpUnstableHelperThreadL2CacheRequest(set, way);
             }
         }
-
-        //TODO: to be incorporated into statistics.
-        System.out.println("L2 Cache Hit Reuse Distances:");
-        System.out.println(this.statL2CacheHitReuseDistances);
-
-        System.out.println("L2 Cache Miss Reuse Distances:");
-        System.out.println(this.statL2CacheMissReuseDistances);
     }
 
     private void sumUpUnstableHelperThreadL2CacheRequest(int set, int way) {
@@ -328,8 +300,6 @@ public class HelperThreadL2CacheRequestProfilingHelper {
     }
 
     private void handleL2CacheRequest(GeneralCacheControllerServiceNonblockingRequestEvent event, boolean requesterIsHelperThread, boolean lineFoundIsHelperThread) {
-        profileReuseDistance(event.isHitInCache(), event.getAccess());
-
         profileBeginServicingL2Request(event.getAccess());
 
         checkInvariants(event.getSet());
@@ -861,22 +831,6 @@ public class HelperThreadL2CacheRequestProfilingHelper {
      */
     public DescriptiveStatistics getStatL2CacheMissAverageMlps() {
         return statL2CacheMissAverageMlps;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public DescriptiveStatistics getStatL2CacheHitReuseDistances() {
-        return statL2CacheHitReuseDistances;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public DescriptiveStatistics getStatL2CacheMissReuseDistances() {
-        return statL2CacheMissReuseDistances;
     }
 
     /**

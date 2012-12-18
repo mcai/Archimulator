@@ -83,7 +83,6 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
             this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.MEMORY_CONTROLLER, "processor/cacheHierarchy/memoryController", ""));
             this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.HOTSPOT, "hotspotProfilingHelper", ""));
             this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.HELPER_THREAD, "helperThreadL2CacheRequestProfilingHelper", ""));
-            //TODO...
         }
 
         if (this.getFirstGauge() == null) {
@@ -162,6 +161,9 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
 
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HOTSPOT), "numCallsPerFunctions"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HOTSPOT), "loadsInHotspotFunction"));
+
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HOTSPOT), "statL2CacheHitReuseDistances"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HOTSPOT), "statL2CacheMissReuseDistances"));
 
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HELPER_THREAD), "numMainThreadL2CacheHits"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HELPER_THREAD), "numMainThreadL2CacheMisses"));

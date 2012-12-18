@@ -126,7 +126,7 @@ public abstract class Simulation implements SimulationObject {
         this.blockingEventDispatcher = blockingEventDispatcher;
         this.cycleAccurateEventQueue = cycleAccurateEventQueue;
 
-        this.title = experiment.getTitle() + "/" + getPrefix();
+        this.title = experiment.getId() + "/" + getPrefix();
         this.type = type;
 
         File cwdFile = new File(this.getWorkingDirectory());
