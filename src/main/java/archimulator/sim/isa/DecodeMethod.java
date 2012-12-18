@@ -24,6 +24,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Decode method.
  *
  * @author Min Cai
  */
@@ -31,14 +32,16 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface DecodeMethod {
     /**
+     * Get the bits.
      *
-     * @return
+     * @return the bits
      */
     int bits();
 
     /**
+     * Get the mask.
      *
-     * @return
+     * @return the mask
      */
     int mask();
 }

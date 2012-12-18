@@ -27,6 +27,7 @@ import java.nio.ByteOrder;
 import java.util.*;
 
 /**
+ * Memory.
  *
  * @author Min Cai
  */
@@ -47,10 +48,11 @@ public class Memory extends BasicSimulationObject {
     private Map<Integer, List<SpeculativeMemoryBlock>> speculativeMemoryBlocks;
 
     /**
+     * Create a "memory".
      *
-     * @param kernel
-     * @param littleEndian
-     * @param processId
+     * @param kernel       the kernel
+     * @param littleEndian a value indicating whether the memory is little endian or not
+     * @param processId    the ID of the process
      */
     public Memory(Kernel kernel, boolean littleEndian, int processId) {
         super(kernel);
@@ -70,9 +72,10 @@ public class Memory extends BasicSimulationObject {
     }
 
     /**
+     * Read a byte at the specified address.
      *
-     * @param address
-     * @return
+     * @param address the address
+     * @return a byte at the specified address
      */
     public byte readByte(int address) {
         byte[] buffer = new byte[1];
@@ -81,9 +84,10 @@ public class Memory extends BasicSimulationObject {
     }
 
     /**
+     * Read a half word at the specified address.
      *
-     * @param address
-     * @return
+     * @param address the address
+     * @return a half word at the specified address
      */
     public short readHalfWord(int address) {
         byte[] buffer = new byte[2];
@@ -92,9 +96,10 @@ public class Memory extends BasicSimulationObject {
     }
 
     /**
+     * Read a word at the specified address.
      *
-     * @param address
-     * @return
+     * @param address the address
+     * @return a word at the specified address
      */
     public int readWord(int address) {
         byte[] buffer = new byte[4];
@@ -103,9 +108,10 @@ public class Memory extends BasicSimulationObject {
     }
 
     /**
+     * Read a double word at the specified address.
      *
-     * @param address
-     * @return
+     * @param address the address
+     * @return a double word at the specified address
      */
     public long readDoubleWord(int address) {
         byte[] buffer = new byte[8];
@@ -114,10 +120,11 @@ public class Memory extends BasicSimulationObject {
     }
 
     /**
+     * Read a block of bytes at the specified address.
      *
-     * @param address
-     * @param size
-     * @return
+     * @param address the address
+     * @param size    the size in bytes of the block
+     * @return a block of bytes at the specified address
      */
     public byte[] readBlock(int address, int size) {
         byte[] buffer = new byte[size];
@@ -126,10 +133,11 @@ public class Memory extends BasicSimulationObject {
     }
 
     /**
+     * Read a string of the specified size at the specified address.
      *
-     * @param address
-     * @param size
-     * @return
+     * @param address the address
+     * @param size    the size of the string to be read
+     * @return a string of the specified size at the specified address
      */
     public String readString(int address, int size) {
         byte[] data = this.readBlock(address, size);
@@ -143,9 +151,10 @@ public class Memory extends BasicSimulationObject {
     }
 
     /**
+     * Write a byte at the specified address.
      *
-     * @param address
-     * @param data
+     * @param address the address
+     * @param data    one byte of data to be written
      */
     public void writeByte(int address, byte data) {
         byte[] buffer = new byte[]{data};
@@ -153,9 +162,10 @@ public class Memory extends BasicSimulationObject {
     }
 
     /**
+     * Write a half word at the specified address.
      *
-     * @param address
-     * @param data
+     * @param address the address
+     * @param data    one half word of data to be written
      */
     public void writeHalfWord(int address, short data) {
         byte[] buffer = new byte[2];
@@ -164,9 +174,10 @@ public class Memory extends BasicSimulationObject {
     }
 
     /**
+     * Write a word at the specified address.
      *
-     * @param address
-     * @param data
+     * @param address the address
+     * @param data    one word of data to be written
      */
     public void writeWord(int address, int data) {
         byte[] buffer = new byte[4];
@@ -175,9 +186,10 @@ public class Memory extends BasicSimulationObject {
     }
 
     /**
+     * Write a double word at the specified address.
      *
-     * @param address
-     * @param data
+     * @param address the address
+     * @param data    one double word of data to be written
      */
     public void writeDoubleWord(int address, long data) {
         byte[] buffer = new byte[8];
@@ -186,10 +198,11 @@ public class Memory extends BasicSimulationObject {
     }
 
     /**
+     * Write a string at the specified address.
      *
-     * @param address
-     * @param data
-     * @return
+     * @param address the address
+     * @param data    the string to be written
+     * @return the length of the string that is written
      */
     public int writeString(int address, String data) {
         byte[] buffer = (data + "\0").getBytes();
@@ -199,31 +212,34 @@ public class Memory extends BasicSimulationObject {
     }
 
     /**
+     * Write a block of data of the specified size at the specified address.
      *
-     * @param address
-     * @param size
-     * @param data
+     * @param address the address
+     * @param size    the size of the block to be written
+     * @param data    the block of data to be written
      */
     public void writeBlock(int address, int size, byte[] data) {
         this.access(address, size, data, true, true);
     }
 
     /**
+     * Fill zeros of the specified size at the specified address.
      *
-     * @param address
-     * @param size
+     * @param address the address
+     * @param size    the size of zeros to be filled
      */
     public void zero(int address, int size) {
         this.writeBlock(address, size, new byte[size]);
     }
 
     /**
+     * Perform a read or write operation on the specified range of addresses.
      *
-     * @param address
-     * @param size
-     * @param buffer
-     * @param write
-     * @param createNewPageIfNecessary
+     * @param address                  the starting address
+     * @param size                     the size
+     * @param buffer                   the buffer
+     * @param write                    a value indicating whether the access is a read or write
+     * @param createNewPageIfNecessary a value indicating whether creating a new page if necessary
      */
     public void access(int address, int size, byte[] buffer, boolean write, boolean createNewPageIfNecessary) {
         if (this.speculative) {
@@ -233,6 +249,14 @@ public class Memory extends BasicSimulationObject {
         }
     }
 
+    /**
+     * Perform a speculative read or write operation on the specified range of addresses.
+     *
+     * @param address the starting address
+     * @param size    the size
+     * @param buffer  the buffer
+     * @param write   a value indicating whether the access is a read or write
+     */
     private void doSpeculativeAccess(int address, int size, byte[] buffer, boolean write) {
         int tag = address >> SpeculativeMemoryBlock.BLOCK_LOGSIZE;
         int index = tag % SpeculativeMemoryBlock.COUNT;
@@ -274,20 +298,29 @@ public class Memory extends BasicSimulationObject {
     }
 
     /**
-     *
+     * Enter the speculative state.
      */
     public void enterSpeculativeState() {
         this.speculative = true;
     }
 
     /**
-     *
+     * Exit the speculative state.
      */
     public void exitSpeculativeState() {
         this.speculativeMemoryBlocks.clear();
         this.speculative = false;
     }
 
+    /**
+     * Perform a non-speculative access operation on the specified range of addresses.
+     *
+     * @param address                  the starting address
+     * @param size                     the size
+     * @param buffer                   the buffer
+     * @param write                    a value indicating whether the access is a read or write
+     * @param createNewPageIfNecessary a value indicating whether creating a new page if necessary
+     */
     private void doNonSpeculativeAccess(int address, int size, byte[] buffer, boolean write, boolean createNewPageIfNecessary) {
         int offset = 0;
 
@@ -304,10 +337,11 @@ public class Memory extends BasicSimulationObject {
     }
 
     /**
+     * Create pages for the specified range of addresses if necessary.
      *
-     * @param address
-     * @param size
-     * @return
+     * @param address the starting address
+     * @param size    the size
+     * @return the starting tag
      */
     public int map(int address, int size) {
         int tagStart, tagEnd;
@@ -357,9 +391,10 @@ public class Memory extends BasicSimulationObject {
 //    }
 
     /**
+     * Remove pages for the specified range of addresses.
      *
-     * @param address
-     * @param size
+     * @param address the starting address
+     * @param size    the size
      */
     public void unmap(int address, int size) {
         int tagStart = getTag(address);
@@ -373,11 +408,12 @@ public class Memory extends BasicSimulationObject {
     }
 
     /**
+     * Remap the specified range of addresses.
      *
-     * @param oldAddr
-     * @param oldSize
-     * @param newSize
-     * @return
+     * @param oldAddr the old starting address
+     * @param oldSize the old size
+     * @param newSize the new size
+     * @return the new starting address
      */
     public int remap(int oldAddr, int oldSize, int newSize) {
         int start = this.map(0, newSize);
@@ -398,20 +434,33 @@ public class Memory extends BasicSimulationObject {
     }
 
     /**
+     * Get the physical address of the specified virtual address.
      *
-     * @param virtualAddress
-     * @return
+     * @param virtualAddress the virtual address
+     * @return the translated physical address of the specified virtual address
      */
     public int getPhysicalAddress(int virtualAddress) {
         return this.getPage(virtualAddress).physicalAddress + getDisplacement(virtualAddress);
     }
 
+    /**
+     * Get the page containing the specified address.
+     *
+     * @param address the address
+     * @return the page containing the specified address if any exists; otherwise null
+     */
     private Page getPage(int address) {
         int index = getIndex(address);
 
         return this.pages.containsKey(index) ? this.pages.get(index) : null;
     }
 
+    /**
+     * Add a page containing the specified address.
+     *
+     * @param address the address
+     * @return a newly created page containing the specified address
+     */
     private Page addPage(int address) {
         int index = getIndex(address);
 
@@ -423,12 +472,26 @@ public class Memory extends BasicSimulationObject {
         return page;
     }
 
+    /**
+     * Remove a page containing the specified address.
+     *
+     * @param address the address
+     */
     private void removePage(int address) {
         int index = getIndex(address);
 
         this.pages.remove(index);
     }
 
+    /**
+     * Perform a non-speculative access operation on the specified range of addresses at the page boundary.
+     *
+     * @param address                  the starting address
+     * @param size                     the size
+     * @param buffer                   the buffer
+     * @param write                    a value indicating whether the access is a read or write
+     * @param createNewPageIfNecessary a value indicating whether creating a new page if necessary
+     */
     private void accessPageBoundary(int address, int size, byte[] buffer, int offset, boolean write, boolean createNewPageIfNecessary) {
         Page page = this.getPage(address);
 
@@ -442,21 +505,23 @@ public class Memory extends BasicSimulationObject {
     }
 
     /**
+     * Act on when a page is created.
      *
-     * @param id
+     * @param id the ID of the newly created page
      */
     protected void onPageCreated(int id) {
         this.byteBuffers.put(id, ByteBuffer.allocate(Memory.getPageSize()).order(isLittleEndian() ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN));
     }
 
     /**
+     * Act on when a page is accessed.
      *
-     * @param pageId
-     * @param displacement
-     * @param buffer
-     * @param offset
-     * @param size
-     * @param write
+     * @param pageId       the ID of the page
+     * @param displacement the displacement within the page
+     * @param buffer       the buffer
+     * @param offset       the offset within the buffer
+     * @param size         the size of data to be accessed within the buffer
+     * @param write        whether the access is a read or write
      */
     protected void doPageAccess(int pageId, int displacement, byte[] buffer, int offset, int size, boolean write) {
         ByteBuffer bb = getByteBuffer(pageId);
@@ -470,74 +535,100 @@ public class Memory extends BasicSimulationObject {
     }
 
     /**
+     * Get the ID of the memory.
      *
-     * @return
+     * @return the ID of the memory
      */
     public int getId() {
         return id;
     }
 
     /**
+     * Get a value indicating whether the memory is little endian or not.
      *
-     * @return
+     * @return a value indicating whether the memory is little endian or not
      */
     public boolean isLittleEndian() {
         return littleEndian;
     }
 
     /**
+     * Get the kernel.
      *
-     * @return
+     * @return the kernel
      */
     public Kernel getKernel() {
         return kernel;
     }
 
     /**
+     * Get the ID of the process.
      *
-     * @return
+     * @return the ID of the process
      */
     public int getProcessId() {
         return processId;
     }
 
     /**
+     * Get a value indicating whether the memory is currently in the speculative mode or not.
      *
-     * @return
+     * @return a value indicating whether the memory is currently in the speculative mode or not
      */
     public boolean isSpeculative() {
         return speculative;
     }
 
     /**
+     * Get the geometry of the memory.
      *
-     * @return
+     * @return the geometry of the memory
      */
     public static CacheGeometry getGeometry() {
         return geometry;
     }
 
     /**
+     * Get the number of pages contained in the memory.
      *
-     * @return
+     * @return the number of pages contained in the memory
      */
     public int getNumPages() {
         return numPages;
     }
 
+    /**
+     * Get the byte buffer for the specified page ID.
+     *
+     * @param pageId the ID of the page
+     * @return the byte buffer for the specified page ID.
+     */
     private ByteBuffer getByteBuffer(int pageId) {
-        return this.byteBuffers.get(pageId);
+        return this.byteBuffers.containsKey(pageId) ? this.byteBuffers.get(pageId) : null;
     }
 
+    /**
+     * Get the name of the memory.
+     *
+     * @return the name of the memory
+     */
     @Override
     public String getName() {
         return getKernel().getProcessFromId(getProcessId()).getName() + "/mem";
     }
 
+    /**
+     * Page.
+     */
     private class Page {
         private int id;
         private int physicalAddress;
 
+        /**
+         * Create a page.
+         *
+         * @param id the ID of the page that is to be created
+         */
         private Page(int id) {
             this.id = id;
             this.physicalAddress = this.id << Memory.getPageSizeInLog2();
@@ -545,15 +636,32 @@ public class Memory extends BasicSimulationObject {
             onPageCreated(id);
         }
 
+        /**
+         * Perform an access for the specified range of addresses.
+         *
+         * @param address the starting address
+         * @param buffer  the buffer
+         * @param offset  the offset within the buffer
+         * @param size    the size of data to be accessed within the buffer
+         * @param write   a value indicating whether the access is a read or write
+         */
         private void doAccess(int address, byte[] buffer, int offset, int size, boolean write) {
             doPageAccess(id, getDisplacement(address), buffer, offset, size, write);
         }
     }
 
+    /**
+     * Speculative memory block. Used for representing a range of addresses involved in a speculative access.
+     */
     private class SpeculativeMemoryBlock {
         private int tag;
         private byte[] data;
 
+        /**
+         * Create a speculative memory block.
+         *
+         * @param tag the tag
+         */
         private SpeculativeMemoryBlock(int tag) {
             this.tag = tag;
             this.data = new byte[BLOCK_SIZE];
@@ -567,33 +675,48 @@ public class Memory extends BasicSimulationObject {
     private static final CacheGeometry geometry = new CacheGeometry(-1, 1, 1 << 12);
 
     /**
+     * Get the displacement for the specified address.
      *
-     * @param address
-     * @return
+     * @param address the address
+     * @return the displacement for the specified address
      */
     public static int getDisplacement(int address) {
         return CacheGeometry.getDisplacement(address, geometry);
     }
 
+    /**
+     * Get the tag for the specified address.
+     *
+     * @param address the address
+     * @return the tag for the specified address
+     */
     private static int getTag(int address) {
         return CacheGeometry.getTag(address, geometry);
     }
 
+    /**
+     * Get the index for the specified address.
+     *
+     * @param address the address
+     * @return the index for the specified address
+     */
     private static int getIndex(int address) {
         return CacheGeometry.getLineId(address, geometry);
     }
 
     /**
+     * Get the memory's page size in bytes in Log2.
      *
-     * @return
+     * @return the memory's page size in in bytes in Log2
      */
     public static int getPageSizeInLog2() {
         return geometry.getLineSizeInLog2();
     }
 
     /**
+     * Get the memory's page size in bytes.
      *
-     * @return
+     * @return the memory's page size in bytes
      */
     public static int getPageSize() {
         return geometry.getLineSize();

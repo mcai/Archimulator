@@ -27,518 +27,624 @@ import java.util.Collection;
 import java.util.List;
 
 /**
+ * Mnemonic.
  *
  * @author Min Cai
  */
 public enum Mnemonic {
     /**
-     *
+     * No operation (NOP).
      */
     NOP,
+
     /**
-     *
+     * Break.
      */
     BREAK,
 
     /**
-     *
+     * System call.
      */
     SYSTEM_CALL,
 
     /**
-     *
+     * Add.
      */
     ADD,
+
     /**
-     *
+     * Addi.
      */
     ADDI,
+
     /**
-     *
+     * Addiu.
      */
     ADDIU,
+
     /**
-     *
+     * Addu.
      */
     ADDU,
+
     /**
-     *
+     * Sub.
      */
     SUB,
+
     /**
-     *
+     * Subu.
      */
     SUBU,
+
     /**
-     *
+     * And.
      */
     AND,
+
     /**
-     *
+     * Andi.
      */
     ANDI,
+
     /**
-     *
+     * Nor.
      */
     NOR,
+
     /**
-     *
+     * Or.
      */
     OR,
+
     /**
-     *
+     * Ori.
      */
     ORI,
+
     /**
-     *
+     * Xor.
      */
     XOR,
+
     /**
-     *
+     * Xori.
      */
     XORI,
+
     /**
-     *
+     * Mult.
      */
     MULT,
+
     /**
-     *
+     * Multu.
      */
     MULTU,
+
     /**
-     *
+     * Div.
      */
     DIV,
+
     /**
-     *
+     * Divu.
      */
     DIVU,
+
     /**
-     *
+     * Sll.
      */
     SLL,
+
     /**
-     *
+     * Sllv.
      */
     SLLV,
+
     /**
-     *
+     * Slt.
      */
     SLT,
+
     /**
-     *
+     * Slti.
      */
     SLTI,
+
     /**
-     *
+     * Sltiu.
      */
     SLTIU,
+
     /**
-     *
+     * Sltu.
      */
     SLTU,
+
     /**
-     *
+     * Sra.
      */
     SRA,
+
     /**
-     *
+     * Srav.
      */
     SRAV,
+
     /**
-     *
+     * Srl.
      */
     SRL,
+
     /**
-     *
+     * Srlv.
      */
     SRLV,
+
     /**
-     *
+     * Madd.
      */
     MADD,
+
     /**
-     *
+     * Msub.
      */
     MSUB,
 
     /**
-     *
+     * B.
      */
     B,
+
     /**
-     *
+     * Bal.
      */
     BAL,
+
     /**
-     *
+     * Beq.
      */
     BEQ,
+
     /**
-     *
+     * Beql.
      */
     BEQL,
+
     /**
-     *
+     * Bgez.
      */
     BGEZ,
+
     /**
-     *
+     * Bgezl.
      */
     BGEZL,
+
     /**
-     *
+     * Bgezal.
      */
     BGEZAL,
+
     /**
-     *
+     * Bgezall.
      */
     BGEZALL,
+
     /**
-     *
+     * Bgtz.
      */
     BGTZ,
+
     /**
-     *
+     * Bgtzl.
      */
     BGTZL,
+
     /**
-     *
+     * Blez.
      */
     BLEZ,
+
     /**
-     *
+     * Blezl.
      */
     BLEZL,
+
     /**
-     *
+     * Bltz.
      */
     BLTZ,
+
     /**
-     *
+     * Bltzl.
      */
     BLTZL,
+
     /**
-     *
+     * Bltzal.
      */
     BLTZAL,
+
     /**
-     *
+     * Bltzall.
      */
     BLTZALL,
+
     /**
-     *
+     * Bne.
      */
     BNE,
+
     /**
-     *
+     * Bnel.
      */
     BNEL,
 
+
     /**
-     *
+     * J.
      */
     J,
+
     /**
-     *
+     * Jal.
      */
     JAL,
+
     /**
-     *
+     * Jalr.
      */
     JALR,
+
     /**
-     *
+     * Jr.
      */
     JR,
 
     /**
-     *
+     * Lb.
      */
     LB,
+
     /**
-     *
+     * Lbu.
      */
     LBU,
+
     /**
-     *
+     * Lh.
      */
     LH,
+
     /**
-     *
+     * Lhu.
      */
     LHU,
+
     /**
-     *
+     * Lui.
      */
     LUI,
+
     /**
-     *
+     * Lw.
      */
     LW,
+
     /**
-     *
+     * Lwl.
      */
     LWL,
+
     /**
-     *
+     * Lwr.
      */
     LWR,
 
     /**
-     *
+     * Sb.
      */
     SB,
+
     /**
-     *
+     * Sh.
      */
     SH,
+
     /**
-     *
+     * Sw.
      */
     SW,
+
     /**
-     *
+     * Swl.
      */
     SWL,
+
     /**
-     *
+     * Swr.
      */
     SWR,
 
     /**
-     *
+     * Ldc1.
      */
     LDC1,
+
     /**
-     *
+     * Lwc1.
      */
     LWC1,
 
     /**
-     *
+     * Sdc1.
      */
     SDC1,
+
     /**
-     *
+     * Swc1.
      */
     SWC1,
 
     /**
-     *
+     * Mfhi.
      */
     MFHI,
+
     /**
-     *
+     * Mflo.
      */
     MFLO,
+
     /**
-     *
+     * Mthi.
      */
     MTHI,
+
     /**
-     *
+     * Mtlo.
      */
     MTLO,
 
     /**
-     *
+     * Cfc1.
      */
     CFC1,
+
     /**
-     *
+     * Ctc1.
      */
     CTC1,
+
     /**
-     *
+     * Mfc1.
      */
     MFC1,
+
     /**
-     *
+     * Mtc1.
      */
     MTC1,
 
     /**
-     *
+     * Ll.
      */
     LL,
+
     /**
-     *
+     * Sc.
      */
     SC,
 
     /**
-     *
+     * Neg_d.
      */
     NEG_D,
+
     /**
-     *
+     * Mov_d.
      */
     MOV_D,
+
     /**
-     *
+     * Sqrt_d.
      */
     SQRT_D,
+
     /**
-     *
+     * Abs_d.
      */
     ABS_D,
+
     /**
-     *
+     * Mul_d.
      */
     MUL_D,
+
     /**
-     *
+     * Div_d.
      */
     DIV_D,
+
     /**
-     *
+     * Add_d.
      */
     ADD_D,
+
     /**
-     *
+     * Sub_d.
      */
     SUB_D,
 
     /**
-     *
+     * Mul_s.
      */
     MUL_S,
+
     /**
-     *
+     * Div_s.
      */
     DIV_S,
+
     /**
-     *
+     * Add_s.
      */
     ADD_S,
+
     /**
-     *
+     * Sub_s.
      */
     SUB_S,
+
     /**
-     *
+     * Mov_s.
      */
     MOV_S,
+
     /**
-     *
+     * Neg_s.
      */
     NEG_S,
+
     /**
-     *
+     * Abs_s.
      */
     ABS_S,
+
     /**
-     *
+     * Sqrt_s.
      */
     SQRT_S,
 
     /**
-     *
+     * C_cond_d.
      */
     C_COND_D,
+
     /**
-     *
+     * C_cond_s.
      */
     C_COND_S,
 
     /**
-     *
+     * Cvt_d_l.
      */
     CVT_D_L,
+
     /**
-     *
+     * Cvt_s_l.
      */
     CVT_S_L,
+
     /**
-     *
+     * Cvt_d_w.
      */
     CVT_D_W,
+
     /**
-     *
+     * Cvt_s_w.
      */
     CVT_S_W,
+
     /**
-     *
+     * Cvt_l_d.
      */
     CVT_L_D,
+
     /**
-     *
+     * Cvt_w_d.
      */
     CVT_W_D,
+
     /**
-     *
+     * Cvt_s_d.
      */
     CVT_S_D,
+
     /**
-     *
+     * Cvt_l_s.
      */
     CVT_L_S,
+
     /**
-     *
+     * Cvt_w_s.
      */
     CVT_W_S,
+
     /**
-     *
+     * Cvt_d_s.
      */
     CVT_D_S,
 
     /**
-     *
+     * Bc1fl.
      */
     BC1FL,
+
     /**
-     *
+     * Bc1tl.
      */
     BC1TL,
+
     /**
-     *
+     * Bc1f.
      */
     BC1F,
+
     /**
-     *
+     * Bc1t.
      */
     BC1T,
 
     /**
-     *
+     * Movf.
      */
     MOVF,
+
     /**
-     *
+     * _movf.
      */
     _MOVF,
+
     /**
-     *
+     * Movn.
      */
     MOVN,
+
     /**
-     *
+     * _movn.
      */
     _MOVN,
+
     /**
-     *
+     * _movt.
      */
     _MOVT,
+
     /**
-     *
+     * Movz.
      */
     MOVZ,
+
     /**
-     *
+     * _movz.
      */
     _MOVZ,
+
     /**
-     *
+     * Mul.
      */
     MUL,
+
     /**
-     *
+     * Trunc_w.
      */
     TRUNC_W,
 
     /**
-     *
+     * Unknown.
      */
     UNKNOWN;
 
@@ -553,9 +659,10 @@ public enum Mnemonic {
     private FunctionalUnitOperationType functionalUnitOperationType;
 
     /**
+     * Get the list of input dependencies for the specified machine instruction.
      *
-     * @param machineInstruction
-     * @return
+     * @param machineInstruction the machine instruction
+     * @return the list of input dependencies for the specified machine instruction
      */
     public List<Integer> getInputDependencies(final int machineInstruction) {
         return new ArrayList<Integer>() {{
@@ -566,9 +673,10 @@ public enum Mnemonic {
     }
 
     /**
+     * Get the list of output dependencies for the specified machine instruction.
      *
-     * @param machineInstruction
-     * @return
+     * @param machineInstruction the machine instruction
+     * @return the list of output dependencies for the specified machine instruction
      */
     public List<Integer> getOutputDependencies(final int machineInstruction) {
         return new ArrayList<Integer>() {{
@@ -579,25 +687,28 @@ public enum Mnemonic {
     }
 
     /**
+     * Get the non effective address base dependency for the specified machine instruction.
      *
-     * @param machineInstruction
-     * @return
+     * @param machineInstruction the machine instruction
+     * @return the non effective address base dependency for the specified machine instruction
      */
     public int getNonEffectiveAddressBaseDep(int machineInstruction) {
         return toRegisterDependency(this.getMethod().getAnnotation(NonEffectiveAddressBaseDependency.class).value(), machineInstruction);
     }
 
     /**
+     * Get the method.
      *
-     * @return
+     * @return the method
      */
     public Method getMethod() {
         return this.method;
     }
 
     /**
+     * Set the method.
      *
-     * @param method
+     * @param method the method
      */
     public void setMethod(Method method) {
         this.method = method;
@@ -623,6 +734,11 @@ public enum Mnemonic {
 
     }
 
+    /**
+     * Determine the instruction type for the specified collection of tags.
+     *
+     * @param flags the collection of tags
+     */
     private void determineInstructionType(Collection<StaticInstructionFlag> flags) {
         if (flags.contains(StaticInstructionFlag.INTEGER_COMPUTATION)) {
             this.type = StaticInstructionType.INTEGER_COMPUTATION;
@@ -654,61 +770,75 @@ public enum Mnemonic {
     }
 
     /**
+     * Get the mask.
      *
-     * @return
+     * @return the mask
      */
     public int getMask() {
         return this.mask;
     }
 
     /**
+     * Get the bits.
      *
-     * @return
+     * @return the bits
      */
     public int getBits() {
         return this.bits;
     }
 
     /**
+     * Get the extra bit field.
      *
-     * @return
+     * @return the extra bit field
      */
     public BitField getExtraBitField() {
         return this.extraBitField;
     }
 
     /**
+     * Get the value of the extra bit field.
      *
-     * @return
+     * @return the value of the extra bit field
      */
     public int getExtraBitFieldValue() {
         return this.extraBitFieldValue;
     }
 
     /**
+     * Get the static instruction type.
      *
-     * @return
+     * @return the static instruction type
      */
     public StaticInstructionType getType() {
         return this.type;
     }
 
     /**
+     * Get the functional unit operation type.
      *
-     * @return
+     * @return the functional unit operation type
      */
     public FunctionalUnitOperationType getFunctionalUnitOperationType() {
         return this.functionalUnitOperationType;
     }
 
     /**
+     * Get a value indicating whether the mnemonic is control or not.
      *
-     * @return
+     * @return a value indicating whether the mnemonic is control or not
      */
     public boolean isControl() {
         return this.getType() == StaticInstructionType.CONDITIONAL || this.getType() == StaticInstructionType.FUNCTION_CALL || this.getType() == StaticInstructionType.UNCONDITIONAL || this.getType() == StaticInstructionType.FUNCTION_RETURN;
     }
 
+    /**
+     * Get the register dependency from the annotated machine instruction.
+     *
+     * @param dependencyA        the dependency annotation
+     * @param machineInstruction the machine instruction
+     * @return the register dependency from the annotated machine instruction
+     */
     private static int toRegisterDependency(StaticInstruction.Dependency dependencyA, int machineInstruction) {
         switch (dependencyA) {
             case RS:

@@ -20,6 +20,10 @@ package archimulator.sim.isa;
 
 import archimulator.sim.common.Logger;
 import archimulator.sim.core.FunctionalUnitOperationType;
+import archimulator.sim.isa.event.FunctionReturnEvent;
+import archimulator.sim.isa.event.FunctionalCallEvent;
+import archimulator.sim.isa.event.InstructionFunctionallyExecutedEvent;
+import archimulator.sim.isa.event.PseudoCallEncounteredEvent;
 import archimulator.sim.os.Context;
 import archimulator.sim.os.FunctionCallContext;
 import net.pickapack.Reference;
@@ -35,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Static instruction.
  *
  * @author Min Cai
  */
@@ -49,9 +54,10 @@ public class StaticInstruction {
     private Map<RegisterDependencyType, Integer> numFreePhysicalRegistersToAllocate = new EnumMap<RegisterDependencyType, Integer>(RegisterDependencyType.class);
 
     /**
+     * Create a static instruction.
      *
-     * @param mnemonic
-     * @param machineInstruction
+     * @param mnemonic           the mnemonic
+     * @param machineInstruction the machine instruction
      */
     public StaticInstruction(Mnemonic mnemonic, int machineInstruction) {
         this.mnemonic = mnemonic;
@@ -77,48 +83,54 @@ public class StaticInstruction {
     }
 
     /**
+     * Get the mnemonic.
      *
-     * @return
+     * @return the mnemonic
      */
     public Mnemonic getMnemonic() {
         return mnemonic;
     }
 
     /**
+     * Get the machine instruction.
      *
-     * @return
+     * @return the machine instruction
      */
     public int getMachineInstruction() {
         return machineInstruction;
     }
 
     /**
+     * Get the list of input dependencies.
      *
-     * @return
+     * @return the list of input dependencies
      */
     public List<Integer> getInputDependencies() {
         return inputDependencies;
     }
 
     /**
+     * Get the list of output dependencies.
      *
-     * @return
+     * @return the list of output dependencies
      */
     public List<Integer> getOutputDependencies() {
         return outputDependencies;
     }
 
     /**
+     * Get the non effective address base dependency.
      *
-     * @return
+     * @return the non effective address base dependency
      */
     public int getNonEffectiveAddressBaseDependency() {
         return nonEffectiveAddressBaseDependency;
     }
 
     /**
+     * Get the number of free physical registers to be allocated.
      *
-     * @return
+     * @return the number of free physical registers to be allocated
      */
     public Map<RegisterDependencyType, Integer> getNumFreePhysicalRegistersToAllocate() {
         return numFreePhysicalRegistersToAllocate;
@@ -137,60 +149,73 @@ public class StaticInstruction {
     private static final int FMT3_PS = 6;
 
     /**
-     *
+     * Dependency.
      */
     public static enum Dependency {
         /**
-         *
+         * RS.
          */
         RS,
+
         /**
-         *
+         * RT.
          */
         RT,
+
         /**
-         *
+         * RD.
          */
         RD,
+
         /**
-         *
+         * FS.
          */
         FS,
+
         /**
-         *
+         * FT.
          */
         FT,
+
         /**
-         *
+         * FD.
          */
         FD,
+
         /**
-         *
+         * Register RA.
          */
         REGISTER_RA,
+
         /**
-         *
+         * Register V0.
          */
         REGISTER_V0,
+
         /**
-         *
+         * Register HI.
          */
         REGISTER_HI,
+
         /**
-         *
+         * Register LO.
          */
         REGISTER_LO,
+
         /**
-         *
+         * Register FCSR.
          */
         REGISTER_FCSR
     }
 
     /**
-     *
+     * The list of mnemonics.
      */
     public static final List<Mnemonic> MNEMONICS;
 
+    /**
+     * Static constructor.
+     */
     static {
         Method[] declaredMethods = StaticInstruction.class.getDeclaredMethods();
         for (Method declaredMethod : declaredMethods) {
@@ -311,6 +336,12 @@ public class StaticInstruction {
         }};
     }
 
+    /**
+     * "Add" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.ADD, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags(StaticInstructionFlag.INTEGER_COMPUTATION)
     @DecodeMethod(bits = 0x00000020, mask = 0xfc0007ff)
@@ -320,6 +351,12 @@ public class StaticInstruction {
         context.getRegisterFile().setGpr(BitField.RD.valueOf(machineInstruction), context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) + context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)));
     }
 
+    /**
+     * "Addi" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.ADDI, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags({StaticInstructionFlag.INTEGER_COMPUTATION, StaticInstructionFlag.IMMEDIATE})
     @DecodeMethod(bits = 0x20000000, mask = 0xfc000000)
@@ -329,15 +366,21 @@ public class StaticInstruction {
         context.getRegisterFile().setGpr(BitField.RT.valueOf(machineInstruction), context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) + MathHelper.signExtend(BitField.INTIMM.valueOf(machineInstruction)));
     }
 
+    /**
+     * "Addiu" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.ADDIU, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags({StaticInstructionFlag.INTEGER_COMPUTATION, StaticInstructionFlag.IMMEDIATE})
     @DecodeMethod(bits = 0x24000000, mask = 0xfc000000)
     @InputDependencies(Dependency.RS)
     @OutputDependencies(Dependency.RT)
     private static void addiu(Context context, int machineInstruction) {
-        if(!context.isSpeculative()) {
+        if (!context.isSpeculative()) {
             PseudoCall pseudoCall = getPseudoCall(machineInstruction);
-            if(pseudoCall != null) {
+            if (pseudoCall != null) {
                 context.setPseudoCallEncounteredInLastInstructionExecution(true);
                 context.getBlockingEventDispatcher().dispatch(new PseudoCallEncounteredEvent(context, pseudoCall));
                 return;
@@ -347,6 +390,12 @@ public class StaticInstruction {
         context.getRegisterFile().setGpr(BitField.RT.valueOf(machineInstruction), context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) + MathHelper.signExtend(BitField.INTIMM.valueOf(machineInstruction)));
     }
 
+    /**
+     * "Addu" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.ADDU, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags(StaticInstructionFlag.INTEGER_COMPUTATION)
     @DecodeMethod(bits = 0x00000021, mask = 0xfc0007ff)
@@ -356,6 +405,12 @@ public class StaticInstruction {
         context.getRegisterFile().setGpr(BitField.RD.valueOf(machineInstruction), context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) + context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)));
     }
 
+    /**
+     * "And" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.AND, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags(StaticInstructionFlag.INTEGER_COMPUTATION)
     @DecodeMethod(bits = 0x00000024, mask = 0xfc0007ff)
@@ -365,6 +420,12 @@ public class StaticInstruction {
         context.getRegisterFile().setGpr(BitField.RD.valueOf(machineInstruction), context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) & context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)));
     }
 
+    /**
+     * "Andi" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.ANDI, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags({StaticInstructionFlag.INTEGER_COMPUTATION, StaticInstructionFlag.IMMEDIATE})
     @DecodeMethod(bits = 0x30000000, mask = 0xfc000000)
@@ -374,6 +435,12 @@ public class StaticInstruction {
         context.getRegisterFile().setGpr(BitField.RT.valueOf(machineInstruction), context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) & MathHelper.zeroExtend(BitField.INTIMM.valueOf(machineInstruction)));
     }
 
+    /**
+     * "Div" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.DIV, functionalUnitOperationType = FunctionalUnitOperationType.INT_DIVIDE)
     @StaticInstructionFlags(StaticInstructionFlag.INTEGER_COMPUTATION)
     @DecodeMethod(bits = 0x0000001a, mask = 0xfc00ffff)
@@ -387,6 +454,12 @@ public class StaticInstruction {
         context.getRegisterFile().setLo(rt != 0 ? rs / rt : 0);
     }
 
+    /**
+     * "Divu" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.DIVU, functionalUnitOperationType = FunctionalUnitOperationType.INT_DIVIDE)
     @StaticInstructionFlags(StaticInstructionFlag.INTEGER_COMPUTATION)
     @DecodeMethod(bits = 0x0000001b, mask = 0xfc00003f)
@@ -400,6 +473,12 @@ public class StaticInstruction {
         context.getRegisterFile().setLo(rt != 0 ? (int) (((rs / rt) << 32) >> 32) : 0);
     }
 
+    /**
+     * "Lui" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.LUI, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags(StaticInstructionFlag.INTEGER_COMPUTATION)
     @DecodeMethod(bits = 0x3c000000, mask = 0xffe00000)
@@ -409,6 +488,12 @@ public class StaticInstruction {
         context.getRegisterFile().setGpr(BitField.RT.valueOf(machineInstruction), BitField.INTIMM.valueOf(machineInstruction) << 16);
     }
 
+    /**
+     * "Madd" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.MADD, functionalUnitOperationType = FunctionalUnitOperationType.INT_MULTIPLY)
     @StaticInstructionFlags(StaticInstructionFlag.INTEGER_COMPUTATION)
     @DecodeMethod(bits = 0x70000000, mask = 0xfc00ffff)
@@ -421,6 +506,12 @@ public class StaticInstruction {
         context.getRegisterFile().setLo((int) ((temp << 32) >> 32));
     }
 
+    /**
+     * "Mfhi" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.MFHI, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags(StaticInstructionFlag.INTEGER_COMPUTATION)
     @DecodeMethod(bits = 0x00000010, mask = 0xffff07ff)
@@ -430,6 +521,12 @@ public class StaticInstruction {
         context.getRegisterFile().setGpr(BitField.RD.valueOf(machineInstruction), context.getRegisterFile().getHi());
     }
 
+    /**
+     * "Mflo" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.MFLO, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags(StaticInstructionFlag.INTEGER_COMPUTATION)
     @DecodeMethod(bits = 0x00000012, mask = 0xffff07ff)
@@ -439,6 +536,12 @@ public class StaticInstruction {
         context.getRegisterFile().setGpr(BitField.RD.valueOf(machineInstruction), context.getRegisterFile().getLo());
     }
 
+    /**
+     * "Msub" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.MSUB, functionalUnitOperationType = FunctionalUnitOperationType.INT_MULTIPLY)
     @StaticInstructionFlags(StaticInstructionFlag.INTEGER_COMPUTATION)
     @DecodeMethod(bits = 0x70000004, mask = 0xfc00ffff)
@@ -451,6 +554,12 @@ public class StaticInstruction {
         context.getRegisterFile().setLo((int) ((temp << 32) >> 32));
     }
 
+    /**
+     * "Mthi" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.MTHI, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags(StaticInstructionFlag.INTEGER_COMPUTATION)
     @DecodeMethod(bits = 0x0, mask = 0x0) //TODO: missing decoding information
@@ -460,6 +569,12 @@ public class StaticInstruction {
         context.getRegisterFile().setHi(context.getRegisterFile().getGpr(BitField.RD.valueOf(machineInstruction)));
     }
 
+    /**
+     * "Mtlo" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.MTLO, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags(StaticInstructionFlag.INTEGER_COMPUTATION)
     @DecodeMethod(bits = 0x00000013, mask = 0xfc1fffff)
@@ -469,6 +584,12 @@ public class StaticInstruction {
         context.getRegisterFile().setLo(context.getRegisterFile().getGpr(BitField.RD.valueOf(machineInstruction)));
     }
 
+    /**
+     * "Mult" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.MULT, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags(StaticInstructionFlag.INTEGER_COMPUTATION)
     @DecodeMethod(bits = 0x00000018, mask = 0xfc00003f)
@@ -481,6 +602,12 @@ public class StaticInstruction {
         context.getRegisterFile().setLo((int) ((product << 32) >> 32));
     }
 
+    /**
+     * "Multu" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.MULTU, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags(StaticInstructionFlag.INTEGER_COMPUTATION)
     @DecodeMethod(bits = 0x00000019, mask = 0xfc00003f)
@@ -493,6 +620,12 @@ public class StaticInstruction {
         context.getRegisterFile().setLo((int) ((product << 32) >> 32));
     }
 
+    /**
+     * "Nor" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.NOR, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags(StaticInstructionFlag.INTEGER_COMPUTATION)
     @DecodeMethod(bits = 0x00000027, mask = 0xfc00003f)
@@ -502,6 +635,12 @@ public class StaticInstruction {
         context.getRegisterFile().setGpr(BitField.RD.valueOf(machineInstruction), ~(context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) | context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction))));
     }
 
+    /**
+     * "Or" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.OR, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags(StaticInstructionFlag.INTEGER_COMPUTATION)
     @DecodeMethod(bits = 0x00000025, mask = 0xfc0007ff)
@@ -511,6 +650,12 @@ public class StaticInstruction {
         context.getRegisterFile().setGpr(BitField.RD.valueOf(machineInstruction), context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) | context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)));
     }
 
+    /**
+     * "Ori" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.ORI, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags({StaticInstructionFlag.INTEGER_COMPUTATION, StaticInstructionFlag.IMMEDIATE})
     @DecodeMethod(bits = 0x34000000, mask = 0xfc000000)
@@ -520,6 +665,12 @@ public class StaticInstruction {
         context.getRegisterFile().setGpr(BitField.RT.valueOf(machineInstruction), context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) | MathHelper.zeroExtend(BitField.INTIMM.valueOf(machineInstruction)));
     }
 
+    /**
+     * "Sll" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SLL, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags(StaticInstructionFlag.INTEGER_COMPUTATION)
     @DecodeMethod(bits = 0x00000000, mask = 0xffe0003f)
@@ -529,6 +680,12 @@ public class StaticInstruction {
         context.getRegisterFile().setGpr(BitField.RD.valueOf(machineInstruction), context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)) << BitField.SHIFT.valueOf(machineInstruction));
     }
 
+    /**
+     * "Sllv" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SLLV, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags(StaticInstructionFlag.INTEGER_COMPUTATION)
     @DecodeMethod(bits = 0x00000004, mask = 0xfc0007ff)
@@ -538,6 +695,12 @@ public class StaticInstruction {
         context.getRegisterFile().setGpr(BitField.RD.valueOf(machineInstruction), context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)) << MathHelper.bits(context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)), 4, 0));
     }
 
+    /**
+     * "Slt" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SLT, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags(StaticInstructionFlag.INTEGER_COMPUTATION)
     @DecodeMethod(bits = 0x0000002a, mask = 0xfc00003f)
@@ -547,6 +710,12 @@ public class StaticInstruction {
         context.getRegisterFile().setGpr(BitField.RD.valueOf(machineInstruction), (context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) < context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction))) ? 1 : 0);
     }
 
+    /**
+     * "Slti" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SLTI, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags({StaticInstructionFlag.INTEGER_COMPUTATION, StaticInstructionFlag.IMMEDIATE})
     @DecodeMethod(bits = 0x28000000, mask = 0xfc000000)
@@ -556,6 +725,12 @@ public class StaticInstruction {
         context.getRegisterFile().setGpr(BitField.RT.valueOf(machineInstruction), (context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) < MathHelper.signExtend(BitField.INTIMM.valueOf(machineInstruction))) ? 1 : 0);
     }
 
+    /**
+     * "Sltiu" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SLTIU, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags({StaticInstructionFlag.INTEGER_COMPUTATION, StaticInstructionFlag.IMMEDIATE})
     @DecodeMethod(bits = 0x2c000000, mask = 0xfc000000)
@@ -572,6 +747,12 @@ public class StaticInstruction {
         }
     }
 
+    /**
+     * "Sltu" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SLTU, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags({StaticInstructionFlag.INTEGER_COMPUTATION})
     @DecodeMethod(bits = 0x0000002b, mask = 0xfc0007ff)
@@ -588,6 +769,12 @@ public class StaticInstruction {
         }
     }
 
+    /**
+     * "Sra" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SRA, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags(StaticInstructionFlag.INTEGER_COMPUTATION)
     @DecodeMethod(bits = 0x00000003, mask = 0xffe0003f)
@@ -597,6 +784,12 @@ public class StaticInstruction {
         context.getRegisterFile().setGpr(BitField.RD.valueOf(machineInstruction), context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)) >> BitField.SHIFT.valueOf(machineInstruction));
     }
 
+    /**
+     * "Srav" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SRAV, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags(StaticInstructionFlag.INTEGER_COMPUTATION)
     @DecodeMethod(bits = 0x00000007, mask = 0xfc0007ff)
@@ -606,6 +799,12 @@ public class StaticInstruction {
         context.getRegisterFile().setGpr(BitField.RD.valueOf(machineInstruction), context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)) >> MathHelper.bits(context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)), 4, 0));
     }
 
+    /**
+     * "Srl" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SRL, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags(StaticInstructionFlag.INTEGER_COMPUTATION)
     @DecodeMethod(bits = 0x00000002, mask = 0xffe0003f)
@@ -615,6 +814,12 @@ public class StaticInstruction {
         context.getRegisterFile().setGpr(BitField.RD.valueOf(machineInstruction), context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)) >>> BitField.SHIFT.valueOf(machineInstruction));
     }
 
+    /**
+     * "Srlv" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SRLV, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags(StaticInstructionFlag.INTEGER_COMPUTATION)
     @DecodeMethod(bits = 0x00000006, mask = 0xfc0007ff)
@@ -624,6 +829,12 @@ public class StaticInstruction {
         context.getRegisterFile().setGpr(BitField.RD.valueOf(machineInstruction), context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)) >>> MathHelper.bits(context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)), 4, 0));
     }
 
+    /**
+     * "Sub" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SUB, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags(StaticInstructionFlag.INTEGER_COMPUTATION)
     @DecodeMethod(bits = 0x0, mask = 0x0) // TODO: missing decoding information
@@ -633,6 +844,12 @@ public class StaticInstruction {
         context.getRegisterFile().setGpr(BitField.RD.valueOf(machineInstruction), context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) - context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)));
     }
 
+    /**
+     * "Subu" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SUBU, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags(StaticInstructionFlag.INTEGER_COMPUTATION)
     @DecodeMethod(bits = 0x00000023, mask = 0xfc0007ff)
@@ -642,6 +859,12 @@ public class StaticInstruction {
         context.getRegisterFile().setGpr(BitField.RD.valueOf(machineInstruction), context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) - context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)));
     }
 
+    /**
+     * "Xor" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.XOR, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags(StaticInstructionFlag.INTEGER_COMPUTATION)
     @DecodeMethod(bits = 0x00000026, mask = 0xfc0007ff)
@@ -651,6 +874,12 @@ public class StaticInstruction {
         context.getRegisterFile().setGpr(BitField.RD.valueOf(machineInstruction), context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) ^ context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)));
     }
 
+    /**
+     * "Xori" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.XORI, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags({StaticInstructionFlag.INTEGER_COMPUTATION, StaticInstructionFlag.IMMEDIATE})
     @DecodeMethod(bits = 0x38000000, mask = 0xfc000000)
@@ -660,6 +889,12 @@ public class StaticInstruction {
         context.getRegisterFile().setGpr(BitField.RT.valueOf(machineInstruction), context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) ^ MathHelper.zeroExtend(BitField.INTIMM.valueOf(machineInstruction)));
     }
 
+    /**
+     * "Abs_d" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.ABS_D, functionalUnitOperationType = FunctionalUnitOperationType.FLOAT_COMPARE)
     @StaticInstructionFlags(StaticInstructionFlag.FLOAT_COMPUTATION)
     @DecodeMethod(bits = 0x44000005, mask = 0xfc1f003f)
@@ -667,9 +902,15 @@ public class StaticInstruction {
     @InputDependencies(Dependency.FS)
     @OutputDependencies(Dependency.FD)
     private static void abs_d(Context context, int machineInstruction) {
-        context.getRegisterFile().getFpr().setDouble(BitField.FD.valueOf(machineInstruction), Math.abs(context.getRegisterFile().getFpr().getDouble(BitField.FS.valueOf(machineInstruction))));
+        context.getRegisterFile().getFprs().setDouble(BitField.FD.valueOf(machineInstruction), Math.abs(context.getRegisterFile().getFprs().getDouble(BitField.FS.valueOf(machineInstruction))));
     }
 
+    /**
+     * "Abs_s" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.ABS_S, functionalUnitOperationType = FunctionalUnitOperationType.FLOAT_COMPARE)
     @StaticInstructionFlags(StaticInstructionFlag.FLOAT_COMPUTATION)
     @DecodeMethod(bits = 0x44000005, mask = 0xfc1f003f)
@@ -677,9 +918,15 @@ public class StaticInstruction {
     @InputDependencies(Dependency.FS)
     @OutputDependencies(Dependency.FD)
     private static void abs_s(Context context, int machineInstruction) {
-        context.getRegisterFile().getFpr().setFloat(BitField.FD.valueOf(machineInstruction), Math.abs(context.getRegisterFile().getFpr().getFloat(BitField.FS.valueOf(machineInstruction))));
+        context.getRegisterFile().getFprs().setFloat(BitField.FD.valueOf(machineInstruction), Math.abs(context.getRegisterFile().getFprs().getFloat(BitField.FS.valueOf(machineInstruction))));
     }
 
+    /**
+     * "Add_d" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.ADD_D, functionalUnitOperationType = FunctionalUnitOperationType.FLOAT_ADD)
     @StaticInstructionFlags(StaticInstructionFlag.FLOAT_COMPUTATION)
     @DecodeMethod(bits = 0x44000000, mask = 0xfc00003f)
@@ -687,9 +934,15 @@ public class StaticInstruction {
     @InputDependencies({Dependency.FS, Dependency.FT})
     @OutputDependencies(Dependency.FD)
     private static void add_d(Context context, int machineInstruction) {
-        context.getRegisterFile().getFpr().setDouble(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFpr().getDouble(BitField.FS.valueOf(machineInstruction)) + context.getRegisterFile().getFpr().getDouble(BitField.FT.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setDouble(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFprs().getDouble(BitField.FS.valueOf(machineInstruction)) + context.getRegisterFile().getFprs().getDouble(BitField.FT.valueOf(machineInstruction)));
     }
 
+    /**
+     * "Add_s" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.ADD_S, functionalUnitOperationType = FunctionalUnitOperationType.FLOAT_ADD)
     @StaticInstructionFlags(StaticInstructionFlag.FLOAT_COMPUTATION)
     @DecodeMethod(bits = 0x44000000, mask = 0xfc00003f)
@@ -697,9 +950,15 @@ public class StaticInstruction {
     @InputDependencies({Dependency.FS, Dependency.FT})
     @OutputDependencies(Dependency.FD)
     private static void add_s(Context context, int machineInstruction) {
-        context.getRegisterFile().getFpr().setFloat(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFpr().getFloat(BitField.FS.valueOf(machineInstruction)) + context.getRegisterFile().getFpr().getFloat(BitField.FT.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setFloat(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFprs().getFloat(BitField.FS.valueOf(machineInstruction)) + context.getRegisterFile().getFprs().getFloat(BitField.FT.valueOf(machineInstruction)));
     }
 
+    /**
+     * "C_cond_d" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.C_COND_D, functionalUnitOperationType = FunctionalUnitOperationType.FLOAT_COMPARE)
     @StaticInstructionFlags(StaticInstructionFlag.FLOAT_COMPUTATION)
     @DecodeMethod(bits = 0x44000030, mask = 0xfc0000f0)
@@ -707,14 +966,20 @@ public class StaticInstruction {
     @InputDependencies({Dependency.FS, Dependency.FT, Dependency.REGISTER_FCSR})
     @OutputDependencies(Dependency.REGISTER_FCSR)
     private static void c_cond_d(Context context, int machineInstruction) {
-        double fs = context.getRegisterFile().getFpr().getDouble(BitField.FS.valueOf(machineInstruction));
-        double ft = context.getRegisterFile().getFpr().getDouble(BitField.FT.valueOf(machineInstruction));
+        double fs = context.getRegisterFile().getFprs().getDouble(BitField.FS.valueOf(machineInstruction));
+        double ft = context.getRegisterFile().getFprs().getDouble(BitField.FT.valueOf(machineInstruction));
 
         boolean unordered = Double.isNaN(fs) || Double.isNaN(ft);
 
         c_cond(context, machineInstruction, unordered, !unordered && fs < ft, !unordered && fs == ft);
     }
 
+    /**
+     * "C_cond_s" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.C_COND_S, functionalUnitOperationType = FunctionalUnitOperationType.FLOAT_COMPARE)
     @StaticInstructionFlags(StaticInstructionFlag.FLOAT_COMPUTATION)
     @DecodeMethod(bits = 0x44000030, mask = 0xfc0000f0)
@@ -722,14 +987,23 @@ public class StaticInstruction {
     @InputDependencies({Dependency.FS, Dependency.FT, Dependency.REGISTER_FCSR})
     @OutputDependencies(Dependency.REGISTER_FCSR)
     private static void c_cond_s(Context context, int machineInstruction) {
-        float fs = context.getRegisterFile().getFpr().getFloat(BitField.FS.valueOf(machineInstruction));
-        float ft = context.getRegisterFile().getFpr().getFloat(BitField.FT.valueOf(machineInstruction));
+        float fs = context.getRegisterFile().getFprs().getFloat(BitField.FS.valueOf(machineInstruction));
+        float ft = context.getRegisterFile().getFprs().getFloat(BitField.FT.valueOf(machineInstruction));
 
         boolean unordered = Float.isNaN(fs) || Float.isNaN(ft);
 
         c_cond(context, machineInstruction, unordered, !unordered && fs < ft, !unordered && fs == ft);
     }
 
+    /**
+     * "C_cond" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     * @param unordered          a value indicating whether the instruction is unordered or not
+     * @param less               a value indicating whether the condition is less or not.
+     * @param equal              a value indicating whether the condition is equal or not.
+     */
     private static void c_cond(Context context, int machineInstruction, boolean unordered, boolean less, boolean equal) {
         int cond = BitField.COND.valueOf(machineInstruction);
 
@@ -744,6 +1018,12 @@ public class StaticInstruction {
         context.getRegisterFile().setFcsr(fcsrRef.get());
     }
 
+    /**
+     * "Cvt_d_l" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.CVT_D_L, functionalUnitOperationType = FunctionalUnitOperationType.FLOAT_CONVERT)
     @StaticInstructionFlags(StaticInstructionFlag.FLOAT_COMPUTATION)
     @DecodeMethod(bits = 0x44000021, mask = 0xfc1f003f)
@@ -751,9 +1031,15 @@ public class StaticInstruction {
     @InputDependencies(Dependency.FS)
     @OutputDependencies(Dependency.FD)
     private static void cvt_d_l(Context context, int machineInstruction) {
-        context.getRegisterFile().getFpr().setDouble(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFpr().getLong(BitField.FS.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setDouble(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFprs().getLong(BitField.FS.valueOf(machineInstruction)));
     }
 
+    /**
+     * "Cvt_d_s" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.CVT_D_S, functionalUnitOperationType = FunctionalUnitOperationType.FLOAT_CONVERT)
     @StaticInstructionFlags(StaticInstructionFlag.FLOAT_COMPUTATION)
     @DecodeMethod(bits = 0x44000021, mask = 0xfc1f003f)
@@ -761,9 +1047,15 @@ public class StaticInstruction {
     @InputDependencies(Dependency.FS)
     @OutputDependencies(Dependency.FD)
     private static void cvt_d_s(Context context, int machineInstruction) {
-        context.getRegisterFile().getFpr().setDouble(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFpr().getFloat(BitField.FS.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setDouble(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFprs().getFloat(BitField.FS.valueOf(machineInstruction)));
     }
 
+    /**
+     * "Cvt_d_w" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.CVT_D_W, functionalUnitOperationType = FunctionalUnitOperationType.FLOAT_CONVERT)
     @StaticInstructionFlags(StaticInstructionFlag.FLOAT_COMPUTATION)
     @DecodeMethod(bits = 0x44000021, mask = 0xfc1f003f)
@@ -771,27 +1063,45 @@ public class StaticInstruction {
     @InputDependencies(Dependency.FS)
     @OutputDependencies(Dependency.FD)
     private static void cvt_d_w(Context context, int machineInstruction) {
-        context.getRegisterFile().getFpr().setDouble(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFpr().getInt(BitField.FS.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setDouble(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFprs().getInt(BitField.FS.valueOf(machineInstruction)));
     }
 
+    /**
+     * "Cvt_l_d" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.CVT_L_D, functionalUnitOperationType = FunctionalUnitOperationType.FLOAT_CONVERT)
     @StaticInstructionFlags(StaticInstructionFlag.FLOAT_COMPUTATION)
     @DecodeMethod(bits = 0x0, mask = 0x0) //TODO: missing decoding information
     @InputDependencies(Dependency.FS)
     @OutputDependencies(Dependency.FD)
     private static void cvt_l_d(Context context, int machineInstruction) {
-        context.getRegisterFile().getFpr().setLong(BitField.FD.valueOf(machineInstruction), (long) context.getRegisterFile().getFpr().getDouble(BitField.FS.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setLong(BitField.FD.valueOf(machineInstruction), (long) context.getRegisterFile().getFprs().getDouble(BitField.FS.valueOf(machineInstruction)));
     }
 
+    /**
+     * "Cvt_l_s" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.CVT_L_S, functionalUnitOperationType = FunctionalUnitOperationType.FLOAT_CONVERT)
     @StaticInstructionFlags(StaticInstructionFlag.FLOAT_COMPUTATION)
     @DecodeMethod(bits = 0x0, mask = 0x0) //TODO: missing decoding information
     @InputDependencies(Dependency.FS)
     @OutputDependencies(Dependency.FD)
     private static void cvt_l_s(Context context, int machineInstruction) {
-        context.getRegisterFile().getFpr().setLong(BitField.FD.valueOf(machineInstruction), (long) context.getRegisterFile().getFpr().getFloat(BitField.FS.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setLong(BitField.FD.valueOf(machineInstruction), (long) context.getRegisterFile().getFprs().getFloat(BitField.FS.valueOf(machineInstruction)));
     }
 
+    /**
+     * "Cvt_s_d" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.CVT_S_D, functionalUnitOperationType = FunctionalUnitOperationType.FLOAT_CONVERT)
     @StaticInstructionFlags(StaticInstructionFlag.FLOAT_COMPUTATION)
     @DecodeMethod(bits = 0x44000020, mask = 0xfc1f003f)
@@ -799,9 +1109,15 @@ public class StaticInstruction {
     @InputDependencies(Dependency.FS)
     @OutputDependencies(Dependency.FD)
     private static void cvt_s_d(Context context, int machineInstruction) {
-        context.getRegisterFile().getFpr().setFloat(BitField.FD.valueOf(machineInstruction), (float) context.getRegisterFile().getFpr().getDouble(BitField.FS.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setFloat(BitField.FD.valueOf(machineInstruction), (float) context.getRegisterFile().getFprs().getDouble(BitField.FS.valueOf(machineInstruction)));
     }
 
+    /**
+     * "Cvt_s_l" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.CVT_S_L, functionalUnitOperationType = FunctionalUnitOperationType.FLOAT_CONVERT)
     @StaticInstructionFlags(StaticInstructionFlag.FLOAT_COMPUTATION)
     @DecodeMethod(bits = 0x44000020, mask = 0xfc1f003f)
@@ -809,9 +1125,15 @@ public class StaticInstruction {
     @InputDependencies(Dependency.FS)
     @OutputDependencies(Dependency.FD)
     private static void cvt_s_l(Context context, int machineInstruction) {
-        context.getRegisterFile().getFpr().setFloat(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFpr().getLong(BitField.FS.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setFloat(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFprs().getLong(BitField.FS.valueOf(machineInstruction)));
     }
 
+    /**
+     * "Cvt_s_w" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.CVT_S_W, functionalUnitOperationType = FunctionalUnitOperationType.FLOAT_CONVERT)
     @StaticInstructionFlags(StaticInstructionFlag.FLOAT_COMPUTATION)
     @DecodeMethod(bits = 0x44000020, mask = 0xfc1f003f)
@@ -819,9 +1141,15 @@ public class StaticInstruction {
     @InputDependencies(Dependency.FS)
     @OutputDependencies(Dependency.FD)
     private static void cvt_s_w(Context context, int machineInstruction) {
-        context.getRegisterFile().getFpr().setFloat(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFpr().getInt(BitField.FS.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setFloat(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFprs().getInt(BitField.FS.valueOf(machineInstruction)));
     }
 
+    /**
+     * "Cvt_w_d" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.CVT_W_D, functionalUnitOperationType = FunctionalUnitOperationType.FLOAT_CONVERT)
     @StaticInstructionFlags(StaticInstructionFlag.FLOAT_COMPUTATION)
     @DecodeMethod(bits = 0x44000024, mask = 0xfc1f003f)
@@ -829,9 +1157,15 @@ public class StaticInstruction {
     @InputDependencies(Dependency.FS)
     @OutputDependencies(Dependency.FD)
     private static void cvt_w_d(Context context, int machineInstruction) {
-        context.getRegisterFile().getFpr().setInt(BitField.FD.valueOf(machineInstruction), (int) context.getRegisterFile().getFpr().getDouble(BitField.FS.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setInt(BitField.FD.valueOf(machineInstruction), (int) context.getRegisterFile().getFprs().getDouble(BitField.FS.valueOf(machineInstruction)));
     }
 
+    /**
+     * "Cvt_w_s" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.CVT_W_S, functionalUnitOperationType = FunctionalUnitOperationType.FLOAT_CONVERT)
     @StaticInstructionFlags(StaticInstructionFlag.FLOAT_COMPUTATION)
     @DecodeMethod(bits = 0x44000024, mask = 0xfc1f003f)
@@ -839,9 +1173,15 @@ public class StaticInstruction {
     @InputDependencies(Dependency.FS)
     @OutputDependencies(Dependency.FD)
     private static void cvt_w_s(Context context, int machineInstruction) {
-        context.getRegisterFile().getFpr().setInt(BitField.FD.valueOf(machineInstruction), (int) context.getRegisterFile().getFpr().getFloat(BitField.FS.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setInt(BitField.FD.valueOf(machineInstruction), (int) context.getRegisterFile().getFprs().getFloat(BitField.FS.valueOf(machineInstruction)));
     }
 
+    /**
+     * "Div_d" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.DIV_D, functionalUnitOperationType = FunctionalUnitOperationType.FLOAT_DIVIDE)
     @StaticInstructionFlags(StaticInstructionFlag.FLOAT_COMPUTATION)
     @DecodeMethod(bits = 0x44000003, mask = 0xfc00003f)
@@ -849,9 +1189,15 @@ public class StaticInstruction {
     @InputDependencies({Dependency.FS, Dependency.FT})
     @OutputDependencies(Dependency.FD)
     private static void div_d(Context context, int machineInstruction) {
-        context.getRegisterFile().getFpr().setDouble(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFpr().getDouble(BitField.FS.valueOf(machineInstruction)) / context.getRegisterFile().getFpr().getDouble(BitField.FT.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setDouble(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFprs().getDouble(BitField.FS.valueOf(machineInstruction)) / context.getRegisterFile().getFprs().getDouble(BitField.FT.valueOf(machineInstruction)));
     }
 
+    /**
+     * "Div_s" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.DIV_S, functionalUnitOperationType = FunctionalUnitOperationType.FLOAT_DIVIDE)
     @StaticInstructionFlags(StaticInstructionFlag.FLOAT_COMPUTATION)
     @DecodeMethod(bits = 0x44000003, mask = 0xfc00003f)
@@ -859,9 +1205,15 @@ public class StaticInstruction {
     @InputDependencies({Dependency.FS, Dependency.FT})
     @OutputDependencies(Dependency.FD)
     private static void div_s(Context context, int machineInstruction) {
-        context.getRegisterFile().getFpr().setFloat(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFpr().getFloat(BitField.FS.valueOf(machineInstruction)) / context.getRegisterFile().getFpr().getFloat(BitField.FT.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setFloat(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFprs().getFloat(BitField.FS.valueOf(machineInstruction)) / context.getRegisterFile().getFprs().getFloat(BitField.FT.valueOf(machineInstruction)));
     }
 
+    /**
+     * "Mov_d" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.MOV_D, functionalUnitOperationType = FunctionalUnitOperationType.NONE)
     @StaticInstructionFlags({StaticInstructionFlag.FLOAT_COMPUTATION})
     @DecodeMethod(bits = 0x44000006, mask = 0xfc1f003f)
@@ -869,9 +1221,15 @@ public class StaticInstruction {
     @InputDependencies(Dependency.FS)
     @OutputDependencies(Dependency.FD)
     private static void mov_d(Context context, int machineInstruction) {
-        context.getRegisterFile().getFpr().setDouble(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFpr().getDouble(BitField.FS.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setDouble(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFprs().getDouble(BitField.FS.valueOf(machineInstruction)));
     }
 
+    /**
+     * "Mov_s" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.MOV_S, functionalUnitOperationType = FunctionalUnitOperationType.NONE)
     @StaticInstructionFlags({StaticInstructionFlag.FLOAT_COMPUTATION})
     @DecodeMethod(bits = 0x44000006, mask = 0xfc1f003f)
@@ -879,9 +1237,15 @@ public class StaticInstruction {
     @InputDependencies(Dependency.FS)
     @OutputDependencies(Dependency.FD)
     private static void mov_s(Context context, int machineInstruction) {
-        context.getRegisterFile().getFpr().setFloat(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFpr().getFloat(BitField.FS.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setFloat(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFprs().getFloat(BitField.FS.valueOf(machineInstruction)));
     }
 
+    /**
+     * "Movf" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.MOVF, functionalUnitOperationType = FunctionalUnitOperationType.NONE)
     @StaticInstructionFlags({StaticInstructionFlag.UNIMPLEMENTED})
     @DecodeMethod(bits = 0x00000001, mask = 0xfc0307ff)
@@ -889,6 +1253,12 @@ public class StaticInstruction {
         throw new UnsupportedOperationException(); //TODO: movf
     }
 
+    /**
+     * "_movf" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic._MOVF, functionalUnitOperationType = FunctionalUnitOperationType.NONE)
     @StaticInstructionFlags({StaticInstructionFlag.UNIMPLEMENTED})
     @DecodeMethod(bits = 0x44000011, mask = 0xfc03003f)
@@ -896,6 +1266,12 @@ public class StaticInstruction {
         throw new UnsupportedOperationException(); //TODO: _movf
     }
 
+    /**
+     * "Movn" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.MOVN, functionalUnitOperationType = FunctionalUnitOperationType.NONE)
     @StaticInstructionFlags({StaticInstructionFlag.UNIMPLEMENTED})
     @DecodeMethod(bits = 0x0000000b, mask = 0xfc0007ff)
@@ -903,6 +1279,12 @@ public class StaticInstruction {
         throw new UnsupportedOperationException(); //TODO: movn
     }
 
+    /**
+     * "_movn" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic._MOVN, functionalUnitOperationType = FunctionalUnitOperationType.NONE)
     @StaticInstructionFlags({StaticInstructionFlag.UNIMPLEMENTED})
     @DecodeMethod(bits = 0x44000013, mask = 0xfc00003f)
@@ -910,6 +1292,12 @@ public class StaticInstruction {
         throw new UnsupportedOperationException(); //TODO: _movn
     }
 
+    /**
+     * "_movt" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic._MOVT, functionalUnitOperationType = FunctionalUnitOperationType.NONE)
     @StaticInstructionFlags({StaticInstructionFlag.UNIMPLEMENTED})
     @DecodeMethod(bits = 0x44010011, mask = 0xfc03003f)
@@ -917,6 +1305,12 @@ public class StaticInstruction {
         throw new UnsupportedOperationException(); //TODO: _movt
     }
 
+    /**
+     * "Movz" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.MOVZ, functionalUnitOperationType = FunctionalUnitOperationType.NONE)
     @StaticInstructionFlags({StaticInstructionFlag.UNIMPLEMENTED})
     @DecodeMethod(bits = 0x0000000a, mask = 0xfc0007ff)
@@ -924,6 +1318,12 @@ public class StaticInstruction {
         throw new UnsupportedOperationException(); //TODO: movz
     }
 
+    /**
+     * "_movz" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic._MOVZ, functionalUnitOperationType = FunctionalUnitOperationType.NONE)
     @StaticInstructionFlags({StaticInstructionFlag.UNIMPLEMENTED})
     @DecodeMethod(bits = 0x44000012, mask = 0xfc00003f)
@@ -931,6 +1331,12 @@ public class StaticInstruction {
         throw new UnsupportedOperationException(); //TODO: _movz
     }
 
+    /**
+     * "Mul" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.MUL, functionalUnitOperationType = FunctionalUnitOperationType.NONE)
     @StaticInstructionFlags({StaticInstructionFlag.UNIMPLEMENTED})
     @DecodeMethod(bits = 0x70000002, mask = 0xfc0007ff)
@@ -938,6 +1344,12 @@ public class StaticInstruction {
         throw new UnsupportedOperationException(); //TODO: mul
     }
 
+    /**
+     * "Trunc_w" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.TRUNC_W, functionalUnitOperationType = FunctionalUnitOperationType.NONE)
     @StaticInstructionFlags({StaticInstructionFlag.UNIMPLEMENTED})
     @DecodeMethod(bits = 0x4400000d, mask = 0xfc1f003f)
@@ -945,6 +1357,12 @@ public class StaticInstruction {
         throw new UnsupportedOperationException(); //TODO: trunc_w
     }
 
+    /**
+     * "Mul_d" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.MUL_D, functionalUnitOperationType = FunctionalUnitOperationType.FLOAT_MULTIPLY)
     @StaticInstructionFlags(StaticInstructionFlag.FLOAT_COMPUTATION)
     @DecodeMethod(bits = 0x44000002, mask = 0xfc00003f)
@@ -952,9 +1370,15 @@ public class StaticInstruction {
     @InputDependencies({Dependency.FS, Dependency.FT})
     @OutputDependencies(Dependency.FD)
     private static void mul_d(Context context, int machineInstruction) {
-        context.getRegisterFile().getFpr().setDouble(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFpr().getDouble(BitField.FS.valueOf(machineInstruction)) * context.getRegisterFile().getFpr().getDouble(BitField.FT.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setDouble(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFprs().getDouble(BitField.FS.valueOf(machineInstruction)) * context.getRegisterFile().getFprs().getDouble(BitField.FT.valueOf(machineInstruction)));
     }
 
+    /**
+     * "Mul_s" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.MUL_S, functionalUnitOperationType = FunctionalUnitOperationType.FLOAT_MULTIPLY)
     @StaticInstructionFlags(StaticInstructionFlag.FLOAT_COMPUTATION)
     @DecodeMethod(bits = 0x44000002, mask = 0xfc00003f)
@@ -962,9 +1386,15 @@ public class StaticInstruction {
     @InputDependencies({Dependency.FS, Dependency.FT})
     @OutputDependencies(Dependency.FD)
     private static void mul_s(Context context, int machineInstruction) {
-        context.getRegisterFile().getFpr().setFloat(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFpr().getFloat(BitField.FS.valueOf(machineInstruction)) * context.getRegisterFile().getFpr().getFloat(BitField.FT.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setFloat(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFprs().getFloat(BitField.FS.valueOf(machineInstruction)) * context.getRegisterFile().getFprs().getFloat(BitField.FT.valueOf(machineInstruction)));
     }
 
+    /**
+     * "Neg_d" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.NEG_D, functionalUnitOperationType = FunctionalUnitOperationType.FLOAT_COMPARE)
     @StaticInstructionFlags(StaticInstructionFlag.FLOAT_COMPUTATION)
     @DecodeMethod(bits = 0x44000007, mask = 0xfc1f003f)
@@ -972,9 +1402,15 @@ public class StaticInstruction {
     @InputDependencies(Dependency.FS)
     @OutputDependencies(Dependency.FD)
     private static void neg_d(Context context, int machineInstruction) {
-        context.getRegisterFile().getFpr().setDouble(BitField.FD.valueOf(machineInstruction), -context.getRegisterFile().getFpr().getDouble(BitField.FS.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setDouble(BitField.FD.valueOf(machineInstruction), -context.getRegisterFile().getFprs().getDouble(BitField.FS.valueOf(machineInstruction)));
     }
 
+    /**
+     * "Neg_s" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.NEG_S, functionalUnitOperationType = FunctionalUnitOperationType.FLOAT_COMPARE)
     @StaticInstructionFlags(StaticInstructionFlag.FLOAT_COMPUTATION)
     @DecodeMethod(bits = 0x44000007, mask = 0xfc1f003f)
@@ -982,9 +1418,15 @@ public class StaticInstruction {
     @InputDependencies(Dependency.FS)
     @OutputDependencies(Dependency.FD)
     private static void neg_s(Context context, int machineInstruction) {
-        context.getRegisterFile().getFpr().setFloat(BitField.FD.valueOf(machineInstruction), -context.getRegisterFile().getFpr().getFloat(BitField.FS.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setFloat(BitField.FD.valueOf(machineInstruction), -context.getRegisterFile().getFprs().getFloat(BitField.FS.valueOf(machineInstruction)));
     }
 
+    /**
+     * "Sqrt_d" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SQRT_D, functionalUnitOperationType = FunctionalUnitOperationType.FLOAT_SQRT)
     @StaticInstructionFlags(StaticInstructionFlag.FLOAT_COMPUTATION)
     @DecodeMethod(bits = 0x44000004, mask = 0xfc1f003f)
@@ -992,9 +1434,15 @@ public class StaticInstruction {
     @InputDependencies(Dependency.FS)
     @OutputDependencies(Dependency.FD)
     private static void sqrt_d(Context context, int machineInstruction) {
-        context.getRegisterFile().getFpr().setDouble(BitField.FD.valueOf(machineInstruction), Math.sqrt(context.getRegisterFile().getFpr().getDouble(BitField.FS.valueOf(machineInstruction))));
+        context.getRegisterFile().getFprs().setDouble(BitField.FD.valueOf(machineInstruction), Math.sqrt(context.getRegisterFile().getFprs().getDouble(BitField.FS.valueOf(machineInstruction))));
     }
 
+    /**
+     * "Sqrt_s" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SQRT_S, functionalUnitOperationType = FunctionalUnitOperationType.FLOAT_SQRT)
     @StaticInstructionFlags(StaticInstructionFlag.FLOAT_COMPUTATION)
     @DecodeMethod(bits = 0x44000004, mask = 0xfc1f003f)
@@ -1002,9 +1450,15 @@ public class StaticInstruction {
     @InputDependencies(Dependency.FS)
     @OutputDependencies(Dependency.FD)
     private static void sqrt_s(Context context, int machineInstruction) {
-        context.getRegisterFile().getFpr().setFloat(BitField.FD.valueOf(machineInstruction), (float) Math.sqrt(context.getRegisterFile().getFpr().getFloat(BitField.FS.valueOf(machineInstruction))));
+        context.getRegisterFile().getFprs().setFloat(BitField.FD.valueOf(machineInstruction), (float) Math.sqrt(context.getRegisterFile().getFprs().getFloat(BitField.FS.valueOf(machineInstruction))));
     }
 
+    /**
+     * "Sub_d" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SUB_D, functionalUnitOperationType = FunctionalUnitOperationType.FLOAT_ADD)
     @StaticInstructionFlags(StaticInstructionFlag.FLOAT_COMPUTATION)
     @DecodeMethod(bits = 0x44000001, mask = 0xfc00003f)
@@ -1012,9 +1466,15 @@ public class StaticInstruction {
     @InputDependencies({Dependency.FS, Dependency.FT})
     @OutputDependencies(Dependency.FD)
     private static void sub_d(Context context, int machineInstruction) {
-        context.getRegisterFile().getFpr().setDouble(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFpr().getDouble(BitField.FS.valueOf(machineInstruction)) - context.getRegisterFile().getFpr().getDouble(BitField.FT.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setDouble(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFprs().getDouble(BitField.FS.valueOf(machineInstruction)) - context.getRegisterFile().getFprs().getDouble(BitField.FT.valueOf(machineInstruction)));
     }
 
+    /**
+     * "Sub_s" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SUB_S, functionalUnitOperationType = FunctionalUnitOperationType.FLOAT_ADD)
     @StaticInstructionFlags(StaticInstructionFlag.FLOAT_COMPUTATION)
     @DecodeMethod(bits = 0x44000001, mask = 0xfc00003f)
@@ -1022,9 +1482,15 @@ public class StaticInstruction {
     @InputDependencies({Dependency.FS, Dependency.FT})
     @OutputDependencies(Dependency.FD)
     private static void sub_s(Context context, int machineInstruction) {
-        context.getRegisterFile().getFpr().setFloat(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFpr().getFloat(BitField.FS.valueOf(machineInstruction)) - context.getRegisterFile().getFpr().getFloat(BitField.FT.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setFloat(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFprs().getFloat(BitField.FS.valueOf(machineInstruction)) - context.getRegisterFile().getFprs().getFloat(BitField.FT.valueOf(machineInstruction)));
     }
 
+    /**
+     * "J" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.J, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags({StaticInstructionFlag.UNCONDITIONAL, StaticInstructionFlag.DIRECT_JUMP})
     @DecodeMethod(bits = 0x08000000, mask = 0xfc000000)
@@ -1034,6 +1500,12 @@ public class StaticInstruction {
         doJump(context, getTargetPcForJ(context.getRegisterFile().getNpc(), machineInstruction));
     }
 
+    /**
+     * "Jal" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.JAL, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags({StaticInstructionFlag.UNCONDITIONAL, StaticInstructionFlag.FUNCTION_CALL, StaticInstructionFlag.DIRECT_JUMP})
     @DecodeMethod(bits = 0x0c000000, mask = 0xfc000000)
@@ -1048,6 +1520,12 @@ public class StaticInstruction {
         }
     }
 
+    /**
+     * "Jalr" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.JALR, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags({StaticInstructionFlag.UNCONDITIONAL, StaticInstructionFlag.FUNCTION_CALL, StaticInstructionFlag.INDIRECT_JUMP})
     @DecodeMethod(bits = 0x00000009, mask = 0xfc00003f)
@@ -1062,6 +1540,12 @@ public class StaticInstruction {
         }
     }
 
+    /**
+     * "Jr" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.JR, functionalUnitOperationType = FunctionalUnitOperationType.NONE)
     @StaticInstructionFlags({StaticInstructionFlag.UNCONDITIONAL, StaticInstructionFlag.FUNCTION_RETURN, StaticInstructionFlag.INDIRECT_JUMP})
     @DecodeMethod(bits = 0x00000008, mask = 0xfc00003f)
@@ -1075,6 +1559,12 @@ public class StaticInstruction {
         }
     }
 
+    /**
+     * "B" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.B, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags({StaticInstructionFlag.UNCONDITIONAL, StaticInstructionFlag.DIRECT_JUMP})
     @DecodeMethod(bits = 0x10000000, mask = 0xffff0000)
@@ -1084,6 +1574,12 @@ public class StaticInstruction {
         doBranch(context, machineInstruction);
     }
 
+    /**
+     * "Bal" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BAL, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags({StaticInstructionFlag.UNCONDITIONAL, StaticInstructionFlag.DIRECT_JUMP})
     @DecodeMethod(bits = 0x04110000, mask = 0xffff0000)
@@ -1094,6 +1590,12 @@ public class StaticInstruction {
         doBranch(context, machineInstruction);
     }
 
+    /**
+     * "Bc1f" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BC1F, functionalUnitOperationType = FunctionalUnitOperationType.NONE)
     @StaticInstructionFlags({StaticInstructionFlag.CONDITIONAL})
     @DecodeMethod(bits = 0x45000000, mask = 0xffe30000)
@@ -1105,6 +1607,12 @@ public class StaticInstruction {
         }
     }
 
+    /**
+     * "Bc1fl" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BC1FL, functionalUnitOperationType = FunctionalUnitOperationType.NONE)
     @StaticInstructionFlags({StaticInstructionFlag.CONDITIONAL})
     @DecodeMethod(bits = 0x0, mask = 0x0) //TODO: missing decoding information
@@ -1118,6 +1626,12 @@ public class StaticInstruction {
         }
     }
 
+    /**
+     * "Bc1t" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BC1T, functionalUnitOperationType = FunctionalUnitOperationType.NONE)
     @StaticInstructionFlags({StaticInstructionFlag.CONDITIONAL})
     @DecodeMethod(bits = 0x45010000, mask = 0xffe30000)
@@ -1129,6 +1643,12 @@ public class StaticInstruction {
         }
     }
 
+    /**
+     * "Bc1tl" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BC1TL, functionalUnitOperationType = FunctionalUnitOperationType.NONE)
     @StaticInstructionFlags({StaticInstructionFlag.CONDITIONAL})
     @DecodeMethod(bits = 0x0, mask = 0x0) //TODO: missing decoding information
@@ -1142,6 +1662,12 @@ public class StaticInstruction {
         }
     }
 
+    /**
+     * "Beq" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BEQ, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags({StaticInstructionFlag.CONDITIONAL, StaticInstructionFlag.DIRECT_JUMP})
     @DecodeMethod(bits = 0x10000000, mask = 0xfc000000)
@@ -1153,6 +1679,12 @@ public class StaticInstruction {
         }
     }
 
+    /**
+     * "Beql" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BEQL, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags({StaticInstructionFlag.CONDITIONAL, StaticInstructionFlag.DIRECT_JUMP})
     @DecodeMethod(bits = 0x0, mask = 0x0) //TODO: missing decoding information
@@ -1166,6 +1698,12 @@ public class StaticInstruction {
         }
     }
 
+    /**
+     * "Bgez" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BGEZ, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags({StaticInstructionFlag.CONDITIONAL, StaticInstructionFlag.DIRECT_JUMP})
     @DecodeMethod(bits = 0x04010000, mask = 0xfc1f0000)
@@ -1177,6 +1715,12 @@ public class StaticInstruction {
         }
     }
 
+    /**
+     * "Bgezal" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BGEZAL, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags({StaticInstructionFlag.CONDITIONAL, StaticInstructionFlag.FUNCTION_CALL, StaticInstructionFlag.DIRECT_JUMP})
     @DecodeMethod(bits = 0x04110000, mask = 0xfc1f0000)
@@ -1190,6 +1734,12 @@ public class StaticInstruction {
         }
     }
 
+    /**
+     * "Bgezall" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BGEZALL, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags({StaticInstructionFlag.CONDITIONAL, StaticInstructionFlag.FUNCTION_CALL, StaticInstructionFlag.DIRECT_JUMP})
     @DecodeMethod(bits = 0x0, mask = 0x0) //TODO: missing decoding information
@@ -1205,6 +1755,12 @@ public class StaticInstruction {
         }
     }
 
+    /**
+     * "Bgezl" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BGEZL, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags({StaticInstructionFlag.CONDITIONAL, StaticInstructionFlag.DIRECT_JUMP})
     @DecodeMethod(bits = 0x0, mask = 0x0) //TODO: missing decoding information
@@ -1218,6 +1774,12 @@ public class StaticInstruction {
         }
     }
 
+    /**
+     * "Bgtz" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BGTZ, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags({StaticInstructionFlag.CONDITIONAL, StaticInstructionFlag.DIRECT_JUMP})
     @DecodeMethod(bits = 0x1c000000, mask = 0xfc1f0000)
@@ -1229,6 +1791,12 @@ public class StaticInstruction {
         }
     }
 
+    /**
+     * "Bgtzl" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BGTZL, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags({StaticInstructionFlag.CONDITIONAL, StaticInstructionFlag.DIRECT_JUMP})
     @DecodeMethod(bits = 0x0, mask = 0x0) //TODO: missing decoding information
@@ -1242,6 +1810,12 @@ public class StaticInstruction {
         }
     }
 
+    /**
+     * "Blez" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BLEZ, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags({StaticInstructionFlag.CONDITIONAL, StaticInstructionFlag.DIRECT_JUMP})
     @DecodeMethod(bits = 0x18000000, mask = 0xfc1f0000)
@@ -1253,6 +1827,12 @@ public class StaticInstruction {
         }
     }
 
+    /**
+     * "Blezl" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BLEZL, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags({StaticInstructionFlag.CONDITIONAL, StaticInstructionFlag.DIRECT_JUMP})
     @DecodeMethod(bits = 0x0, mask = 0x0) //TODO: missing decoding information
@@ -1266,6 +1846,12 @@ public class StaticInstruction {
         }
     }
 
+    /**
+     * "Bltz" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BLTZ, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags({StaticInstructionFlag.CONDITIONAL, StaticInstructionFlag.DIRECT_JUMP})
     @DecodeMethod(bits = 0x04000000, mask = 0xfc1f0000)
@@ -1277,6 +1863,12 @@ public class StaticInstruction {
         }
     }
 
+    /**
+     * "Bltzal" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BLTZAL, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags({StaticInstructionFlag.CONDITIONAL, StaticInstructionFlag.FUNCTION_CALL, StaticInstructionFlag.DIRECT_JUMP})
     @DecodeMethod(bits = 0x0, mask = 0x0) //TODO: missing decoding information
@@ -1290,6 +1882,12 @@ public class StaticInstruction {
         }
     }
 
+    /**
+     * "Bltzall" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BLTZALL, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags({StaticInstructionFlag.CONDITIONAL, StaticInstructionFlag.FUNCTION_CALL, StaticInstructionFlag.DIRECT_JUMP})
     @DecodeMethod(bits = 0x0, mask = 0x0) //TODO: missing decoding information
@@ -1305,6 +1903,12 @@ public class StaticInstruction {
         }
     }
 
+    /**
+     * "Bltzl" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BLTZL, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags({StaticInstructionFlag.CONDITIONAL, StaticInstructionFlag.DIRECT_JUMP})
     @DecodeMethod(bits = 0x0, mask = 0x0) //TODO: missing decoding information
@@ -1316,6 +1920,12 @@ public class StaticInstruction {
         }
     }
 
+    /**
+     * "Bne" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BNE, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags({StaticInstructionFlag.CONDITIONAL, StaticInstructionFlag.DIRECT_JUMP})
     @DecodeMethod(bits = 0x14000000, mask = 0xfc000000)
@@ -1327,6 +1937,12 @@ public class StaticInstruction {
         }
     }
 
+    /**
+     * "Bnel" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BNEL, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags({StaticInstructionFlag.CONDITIONAL, StaticInstructionFlag.DIRECT_JUMP})
     @DecodeMethod(bits = 0x0, mask = 0x0) //TODO: missing decoding information
@@ -1340,6 +1956,12 @@ public class StaticInstruction {
         }
     }
 
+    /**
+     * "Lb" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.LB, functionalUnitOperationType = FunctionalUnitOperationType.READ_PORT)
     @StaticInstructionFlags({StaticInstructionFlag.LOAD, StaticInstructionFlag.DISPLACED_ADDRESSING})
     @DecodeMethod(bits = 0x80000000, mask = 0xfc000000)
@@ -1350,6 +1972,12 @@ public class StaticInstruction {
         context.getRegisterFile().setGpr(BitField.RT.valueOf(machineInstruction), context.getProcess().getMemory().readByte(getEffectiveAddress(context, machineInstruction)));
     }
 
+    /**
+     * "Lbu" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.LBU, functionalUnitOperationType = FunctionalUnitOperationType.READ_PORT)
     @StaticInstructionFlags({StaticInstructionFlag.LOAD, StaticInstructionFlag.DISPLACED_ADDRESSING})
     @DecodeMethod(bits = 0x90000000, mask = 0xfc000000)
@@ -1360,6 +1988,12 @@ public class StaticInstruction {
         context.getRegisterFile().setGpr(BitField.RT.valueOf(machineInstruction), context.getProcess().getMemory().readByte(getEffectiveAddress(context, machineInstruction)) & 0xff);
     }
 
+    /**
+     * "Ldc1" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.LDC1, functionalUnitOperationType = FunctionalUnitOperationType.READ_PORT)
     @StaticInstructionFlags({StaticInstructionFlag.LOAD, StaticInstructionFlag.DISPLACED_ADDRESSING})
     @DecodeMethod(bits = 0xd4000000, mask = 0xfc000000)
@@ -1367,9 +2001,15 @@ public class StaticInstruction {
     @OutputDependencies(Dependency.FT)
     @NonEffectiveAddressBaseDependency(Dependency.FT)
     private static void ldc1(Context context, int machineInstruction) {
-        context.getRegisterFile().getFpr().setLong(BitField.FT.valueOf(machineInstruction), context.getProcess().getMemory().readDoubleWord(getEffectiveAddress(context, machineInstruction)));
+        context.getRegisterFile().getFprs().setLong(BitField.FT.valueOf(machineInstruction), context.getProcess().getMemory().readDoubleWord(getEffectiveAddress(context, machineInstruction)));
     }
 
+    /**
+     * "Lh" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.LH, functionalUnitOperationType = FunctionalUnitOperationType.READ_PORT)
     @StaticInstructionFlags({StaticInstructionFlag.LOAD, StaticInstructionFlag.DISPLACED_ADDRESSING})
     @DecodeMethod(bits = 0x84000000, mask = 0xfc000000)
@@ -1380,6 +2020,12 @@ public class StaticInstruction {
         context.getRegisterFile().setGpr(BitField.RT.valueOf(machineInstruction), context.getProcess().getMemory().readHalfWord(getEffectiveAddress(context, machineInstruction)));
     }
 
+    /**
+     * "Lhu" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.LHU, functionalUnitOperationType = FunctionalUnitOperationType.READ_PORT)
     @StaticInstructionFlags({StaticInstructionFlag.LOAD, StaticInstructionFlag.DISPLACED_ADDRESSING})
     @DecodeMethod(bits = 0x94000000, mask = 0xfc000000)
@@ -1390,6 +2036,12 @@ public class StaticInstruction {
         context.getRegisterFile().setGpr(BitField.RT.valueOf(machineInstruction), context.getProcess().getMemory().readHalfWord(getEffectiveAddress(context, machineInstruction)) & 0xffff);
     }
 
+    /**
+     * "Ll" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.LL, functionalUnitOperationType = FunctionalUnitOperationType.READ_PORT)
     @StaticInstructionFlags({StaticInstructionFlag.LOAD, StaticInstructionFlag.DISPLACED_ADDRESSING})
     @DecodeMethod(bits = 0xc0000000, mask = 0xfc000000)
@@ -1400,6 +2052,12 @@ public class StaticInstruction {
         context.getRegisterFile().setGpr(BitField.RT.valueOf(machineInstruction), context.getProcess().getMemory().readWord(getEffectiveAddress(context, machineInstruction)));
     }
 
+    /**
+     * "Lw" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.LW, functionalUnitOperationType = FunctionalUnitOperationType.READ_PORT)
     @StaticInstructionFlags({StaticInstructionFlag.LOAD, StaticInstructionFlag.DISPLACED_ADDRESSING})
     @DecodeMethod(bits = 0x8c000000, mask = 0xfc000000)
@@ -1410,6 +2068,12 @@ public class StaticInstruction {
         context.getRegisterFile().setGpr(BitField.RT.valueOf(machineInstruction), context.getProcess().getMemory().readWord(getEffectiveAddress(context, machineInstruction)));
     }
 
+    /**
+     * "Lwc1" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.LWC1, functionalUnitOperationType = FunctionalUnitOperationType.READ_PORT)
     @StaticInstructionFlags({StaticInstructionFlag.LOAD, StaticInstructionFlag.DISPLACED_ADDRESSING})
     @DecodeMethod(bits = 0xc4000000, mask = 0xfc000000)
@@ -1417,9 +2081,15 @@ public class StaticInstruction {
     @OutputDependencies(Dependency.FT)
     @NonEffectiveAddressBaseDependency(Dependency.FT)
     private static void lwc1(Context context, int machineInstruction) {
-        context.getRegisterFile().getFpr().setInt(BitField.FT.valueOf(machineInstruction), context.getProcess().getMemory().readWord(getEffectiveAddress(context, machineInstruction)));
+        context.getRegisterFile().getFprs().setInt(BitField.FT.valueOf(machineInstruction), context.getProcess().getMemory().readWord(getEffectiveAddress(context, machineInstruction)));
     }
 
+    /**
+     * "Lwl" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.LWL, functionalUnitOperationType = FunctionalUnitOperationType.READ_PORT)
     @StaticInstructionFlags({StaticInstructionFlag.LOAD, StaticInstructionFlag.DISPLACED_ADDRESSING})
     @DecodeMethod(bits = 0x88000000, mask = 0xfc000000)
@@ -1444,6 +2114,12 @@ public class StaticInstruction {
         context.getRegisterFile().setGpr(BitField.RT.valueOf(machineInstruction), rt);
     }
 
+    /**
+     * "Lwr" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.LWR, functionalUnitOperationType = FunctionalUnitOperationType.READ_PORT)
     @StaticInstructionFlags({StaticInstructionFlag.LOAD, StaticInstructionFlag.DISPLACED_ADDRESSING})
     @DecodeMethod(bits = 0x98000000, mask = 0xfc000000)
@@ -1468,6 +2144,12 @@ public class StaticInstruction {
         context.getRegisterFile().setGpr(BitField.RT.valueOf(machineInstruction), rt);
     }
 
+    /**
+     * "Sb" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SB, functionalUnitOperationType = FunctionalUnitOperationType.WRITE_PORT)
     @StaticInstructionFlags({StaticInstructionFlag.STORE, StaticInstructionFlag.DISPLACED_ADDRESSING})
     @DecodeMethod(bits = 0xa0000000, mask = 0xfc000000)
@@ -1478,6 +2160,12 @@ public class StaticInstruction {
         context.getProcess().getMemory().writeByte(getEffectiveAddress(context, machineInstruction), (byte) MathHelper.bits(context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)), 7, 0));
     }
 
+    /**
+     * "Sc" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SC, functionalUnitOperationType = FunctionalUnitOperationType.WRITE_PORT)
     @StaticInstructionFlags({StaticInstructionFlag.STORE, StaticInstructionFlag.DISPLACED_ADDRESSING})
     @DecodeMethod(bits = 0xe0000000, mask = 0xfc000000)
@@ -1489,6 +2177,12 @@ public class StaticInstruction {
         context.getRegisterFile().setGpr(BitField.RT.valueOf(machineInstruction), 1);
     }
 
+    /**
+     * "Sdc1" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SDC1, functionalUnitOperationType = FunctionalUnitOperationType.WRITE_PORT)
     @StaticInstructionFlags({StaticInstructionFlag.STORE, StaticInstructionFlag.DISPLACED_ADDRESSING})
     @DecodeMethod(bits = 0xf4000000, mask = 0xfc000000)
@@ -1496,9 +2190,15 @@ public class StaticInstruction {
     @OutputDependencies({})
     @NonEffectiveAddressBaseDependency(Dependency.FT)
     private static void sdc1(Context context, int machineInstruction) {
-        context.getProcess().getMemory().writeDoubleWord(getEffectiveAddress(context, machineInstruction), context.getRegisterFile().getFpr().getLong(BitField.FT.valueOf(machineInstruction)));
+        context.getProcess().getMemory().writeDoubleWord(getEffectiveAddress(context, machineInstruction), context.getRegisterFile().getFprs().getLong(BitField.FT.valueOf(machineInstruction)));
     }
 
+    /**
+     * "Sh" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SH, functionalUnitOperationType = FunctionalUnitOperationType.WRITE_PORT)
     @StaticInstructionFlags({StaticInstructionFlag.STORE, StaticInstructionFlag.DISPLACED_ADDRESSING})
     @DecodeMethod(bits = 0xa4000000, mask = 0xfc000000)
@@ -1509,6 +2209,12 @@ public class StaticInstruction {
         context.getProcess().getMemory().writeHalfWord(getEffectiveAddress(context, machineInstruction), (short) MathHelper.bits(context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)), 15, 0));
     }
 
+    /**
+     * "Sw" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SW, functionalUnitOperationType = FunctionalUnitOperationType.WRITE_PORT)
     @StaticInstructionFlags({StaticInstructionFlag.STORE, StaticInstructionFlag.DISPLACED_ADDRESSING})
     @DecodeMethod(bits = 0xac000000, mask = 0xfc000000)
@@ -1519,6 +2225,12 @@ public class StaticInstruction {
         context.getProcess().getMemory().writeWord(getEffectiveAddress(context, machineInstruction), context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)));
     }
 
+    /**
+     * "Swc1" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SWC1, functionalUnitOperationType = FunctionalUnitOperationType.WRITE_PORT)
     @StaticInstructionFlags({StaticInstructionFlag.STORE, StaticInstructionFlag.DISPLACED_ADDRESSING})
     @DecodeMethod(bits = 0xe4000000, mask = 0xfc000000)
@@ -1526,9 +2238,15 @@ public class StaticInstruction {
     @OutputDependencies({})
     @NonEffectiveAddressBaseDependency(Dependency.FT)
     private static void swc1(Context context, int machineInstruction) {
-        context.getProcess().getMemory().writeWord(getEffectiveAddress(context, machineInstruction), context.getRegisterFile().getFpr().getInt(BitField.FT.valueOf(machineInstruction)));
+        context.getProcess().getMemory().writeWord(getEffectiveAddress(context, machineInstruction), context.getRegisterFile().getFprs().getInt(BitField.FT.valueOf(machineInstruction)));
     }
 
+    /**
+     * "Swl" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SWL, functionalUnitOperationType = FunctionalUnitOperationType.WRITE_PORT)
     @StaticInstructionFlags({StaticInstructionFlag.STORE, StaticInstructionFlag.DISPLACED_ADDRESSING})
     @DecodeMethod(bits = 0xa8000000, mask = 0xfc000000)
@@ -1550,6 +2268,12 @@ public class StaticInstruction {
         context.getProcess().getMemory().writeBlock(addr, size, dst);
     }
 
+    /**
+     * "Swr" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SWR, functionalUnitOperationType = FunctionalUnitOperationType.WRITE_PORT)
     @StaticInstructionFlags({StaticInstructionFlag.STORE, StaticInstructionFlag.DISPLACED_ADDRESSING})
     @DecodeMethod(bits = 0xb8000000, mask = 0xfc000000)
@@ -1571,6 +2295,12 @@ public class StaticInstruction {
         context.getProcess().getMemory().writeBlock(addr - size + 1, size, dst);
     }
 
+    /**
+     * "Cfc1" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.CFC1, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags({StaticInstructionFlag.INTEGER_COMPUTATION})
     @DecodeMethod(bits = 0x44400000, mask = 0xffe007ff)
@@ -1582,6 +2312,12 @@ public class StaticInstruction {
         }
     }
 
+    /**
+     * "Ctc1" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.CTC1, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags({StaticInstructionFlag.INTEGER_COMPUTATION})
     @DecodeMethod(bits = 0x44c00000, mask = 0xffe007ff)
@@ -1593,24 +2329,42 @@ public class StaticInstruction {
         }
     }
 
+    /**
+     * "Mfc1" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.MFC1, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags({StaticInstructionFlag.INTEGER_COMPUTATION})
     @DecodeMethod(bits = 0x44000000, mask = 0xffe007ff)
     @InputDependencies(Dependency.FS)
     @OutputDependencies(Dependency.RT)
     private static void mfc1(Context context, int machineInstruction) {
-        context.getRegisterFile().setGpr(BitField.RT.valueOf(machineInstruction), context.getRegisterFile().getFpr().getInt(BitField.FS.valueOf(machineInstruction)));
+        context.getRegisterFile().setGpr(BitField.RT.valueOf(machineInstruction), context.getRegisterFile().getFprs().getInt(BitField.FS.valueOf(machineInstruction)));
     }
 
+    /**
+     * "Mtc1" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.MTC1, functionalUnitOperationType = FunctionalUnitOperationType.INT_ALU)
     @StaticInstructionFlags({StaticInstructionFlag.INTEGER_COMPUTATION})
     @DecodeMethod(bits = 0x44800000, mask = 0xffe007ff)
     @InputDependencies(Dependency.RT)
     @OutputDependencies(Dependency.FS)
     private static void mtc1(Context context, int machineInstruction) {
-        context.getRegisterFile().getFpr().setInt(BitField.FS.valueOf(machineInstruction), context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setInt(BitField.FS.valueOf(machineInstruction), context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)));
     }
 
+    /**
+     * "_break" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.BREAK, functionalUnitOperationType = FunctionalUnitOperationType.NONE)
     @StaticInstructionFlags({StaticInstructionFlag.TRAP})
     @DecodeMethod(bits = 0x0000000d, mask = 0xfc00003f)
@@ -1622,6 +2376,12 @@ public class StaticInstruction {
         }
     }
 
+    /**
+     * "System call" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.SYSTEM_CALL, functionalUnitOperationType = FunctionalUnitOperationType.NONE)
     @StaticInstructionFlags({StaticInstructionFlag.TRAP})
     @DecodeMethod(bits = 0x0000000c, mask = 0xfc00003f)
@@ -1633,6 +2393,12 @@ public class StaticInstruction {
         }
     }
 
+    /**
+     * "No operation (NOP)" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.NOP, functionalUnitOperationType = FunctionalUnitOperationType.NONE)
     @StaticInstructionFlags({StaticInstructionFlag.NOP})
     @DecodeMethod(bits = 0x00000000, mask = 0xffffffff)
@@ -1641,6 +2407,12 @@ public class StaticInstruction {
     private static void nop(Context context, int machineInstruction) {
     }
 
+    /**
+     * "Unknown" instruction.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     @StaticInstructionIntrinsic(mnemonic = Mnemonic.UNKNOWN, functionalUnitOperationType = FunctionalUnitOperationType.NONE)
     @StaticInstructionFlags({StaticInstructionFlag.UNKNOWN})
     @DecodeMethod(bits = 0x0, mask = 0x0) //TODO: special support for unknown instruction
@@ -1652,6 +2424,12 @@ public class StaticInstruction {
         }
     }
 
+    /**
+     * Act on a function call.
+     *
+     * @param context the context
+     * @param jalr    a value indicating whether the instruction is jalr or not.
+     */
     private static void onFunctionCall(Context context, boolean jalr) {
         StaticInstruction staticInst = context.getProcess().getStaticInstruction(context.getRegisterFile().getPc());
         int targetPc = jalr ? getTargetPcForJalr(context, staticInst.getMachineInstruction()) : getTargetPcForJr(context, staticInst.getMachineInstruction());
@@ -1660,114 +2438,164 @@ public class StaticInstruction {
         context.getBlockingEventDispatcher().dispatch(new FunctionalCallEvent(functionCallContext));
     }
 
+    /**
+     * Act on a function return.
+     *
+     * @param context the context
+     */
     private static void onFunctionReturn(Context context) {
         FunctionCallContext functionCallContext = context.getFunctionCallContextStack().pop();
         context.getBlockingEventDispatcher().dispatch(new FunctionReturnEvent(functionCallContext));
     }
 
     /**
+     * Get a value indicating whether using the stack pointer as the effective address base.
      *
-     * @return
+     * @return a value indicating whether using the stack pointer as the effective address base
      */
     public boolean useStackPointerAsEffectiveAddressBase() {
         return useStackPointerAsEffectiveAddressBase(this.machineInstruction);
     }
 
     /**
+     * Get the effective address base for the instruction in the specified context.
      *
-     * @param context
-     * @return
+     * @param context the context
+     * @return the effective address base for the instruction in the specified context
      */
     public int getEffectiveAddressBase(Context context) {
         return getEffectiveAddress(context, this.machineInstruction);
     }
 
     /**
+     * Get the effective address displacement.
      *
-     * @return
+     * @return the effective address displacement
      */
     public int getEffectiveAddressDisplacement() {
         return getEffectiveAddressDisplacement(this.machineInstruction);
     }
 
     /**
+     * Get the effective address for the instruction in the specified context.
      *
-     * @param context
-     * @return
+     * @param context the context the context
+     * @return the effective address for the instruction in the specified context
      */
     public int getEffectiveAddress(Context context) {
         return getEffectiveAddress(context, this.machineInstruction);
     }
 
     /**
+     * Get a value indicating whether using the stack pointer as the effective address base for the specified machine instruction.
      *
-     * @param machineInstruction
-     * @return
+     * @param machineInstruction the machine instruction
+     * @return a value indicating whether using the stack pointer as the effective address base for the specified machine instruction
      */
     public static boolean useStackPointerAsEffectiveAddressBase(int machineInstruction) {
         return BitField.RS.valueOf(machineInstruction) == ArchitecturalRegisterFile.REGISTER_SP;
     }
 
     /**
+     * Get the effective address base for the specified machine instruction in the specified context.
      *
-     * @param context
-     * @param machineInstruction
-     * @return
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     * @return the effective address base for the specified machine instruction in the specifid context
      */
     public static int getEffectiveAddressBase(Context context, int machineInstruction) {
         return context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction));
     }
 
     /**
+     * Get the effective address displacement for the specified machine instruction.
      *
-     * @param machineInstruction
-     * @return
+     * @param machineInstruction the machine instruction
+     * @return the effective address displacement for the specified machine instruction
      */
     public static int getEffectiveAddressDisplacement(int machineInstruction) {
         return MathHelper.signExtend(BitField.INTIMM.valueOf(machineInstruction));
     }
 
     /**
+     * Get the effective address for the specified machine instruction in the specified context.
      *
-     * @param context
-     * @param machineInstruction
-     * @return
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     * @return the effective address for the specified machine instruction in the specified context
      */
     public static int getEffectiveAddress(Context context, int machineInstruction) {
         return getEffectiveAddressBase(context, machineInstruction) + getEffectiveAddressDisplacement(machineInstruction);
     }
 
+    /**
+     * Get the FCC value in the FCSR register.
+     *
+     * @param fcsr  the FCSR register
+     * @param ccIdx the CC index
+     * @return the computed FCC value
+     */
     private static boolean getFCC(int fcsr, int ccIdx) {
         return ((fcsr >> ((ccIdx == 0) ? 23 : ccIdx + 24)) & 0x00000001) != 0;
     }
 
+    /**
+     * Set the FCC value in the FCSR register.
+     *
+     * @param fcsr the FCSR register
+     * @param cc   the CC value
+     */
     private static void setFCC(Reference<Integer> fcsr, int cc) {
         fcsr.set(fcsr.get() | (cc == 0 ? 0x800000 : 0x1000000 << cc));
     }
 
+    /**
+     * Clear the FCC value in the FCSR register.
+     *
+     * @param fcsr the FCSR register
+     * @param cc   the CC value
+     */
     private static void clearFCC(Reference<Integer> fcsr, int cc) {
         fcsr.set(fcsr.get() & (cc == 0 ? 0xFF7FFFFF : 0xFEFFFFFF << cc));
     }
 
+    /**
+     * Act on a jump.
+     *
+     * @param context  the context
+     * @param targetPc the target program counter (PC)
+     */
     private static void doJump(Context context, int targetPc) {
         context.getRegisterFile().setNnpc(targetPc);
     }
 
+    /**
+     * Act on a branch.
+     *
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     */
     private static void doBranch(Context context, int machineInstruction) {
         context.getRegisterFile().setNnpc(getTargetPcForBranch(context.getRegisterFile().getNpc(), machineInstruction));
     }
 
+    /**
+     * Skip delay slot.
+     *
+     * @param context the context
+     */
     private static void skipDelaySlot(Context context) {
         context.getRegisterFile().setNpc(context.getRegisterFile().getNnpc());
         context.getRegisterFile().setNnpc(context.getRegisterFile().getNnpc() + 4);
     }
 
     /**
+     * Get the target PC for the specified control instruction.
      *
-     * @param pc
-     * @param machineInstruction
-     * @param mnemonic
-     * @return
+     * @param pc                 the current program counter (PC) value
+     * @param machineInstruction the machine instruction
+     * @param mnemonic           the mnemonic
+     * @return the target PC for the specified control instruction
      */
     public static int getTargetPcForControl(int pc, int machineInstruction, Mnemonic mnemonic) {
         switch (mnemonic) {
@@ -1784,10 +2612,24 @@ public class StaticInstruction {
         }
     }
 
+    /**
+     * Get the target PC for the specified branch instruction.
+     *
+     * @param pc                 the current program counter (PC) value
+     * @param machineInstruction the machine instruction
+     * @return the target PC for the specified branch instruction
+     */
     private static int getTargetPcForBranch(int pc, int machineInstruction) {
         return pc + MathHelper.signExtend(BitField.INTIMM.valueOf(machineInstruction) << 2);
     }
 
+    /**
+     * Get the target PC for the specified J instruction.
+     *
+     * @param pc                 the current program counter (PC) value
+     * @param machineInstruction the machine instruction
+     * @return the target PC for the specified J instruction
+     */
     private static int getTargetPcForJ(int pc, int machineInstruction) {
         return MathHelper.mbits(pc, 32, 28) | (BitField.TARGET.valueOf(machineInstruction) << 2);
     }
@@ -1797,40 +2639,43 @@ public class StaticInstruction {
     }
 
     /**
+     * Get the target PC for the specified jalr instruction.
      *
-     * @param context
-     * @param machineInstruction
-     * @return
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     * @return the target PC for the specified jalr instruction
      */
     public static int getTargetPcForJalr(Context context, int machineInstruction) {
         return context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction));
     }
 
     /**
+     * Get the target PC for the specified jr instruction.
      *
-     * @param context
-     * @param machineInstruction
-     * @return
+     * @param context            the context
+     * @param machineInstruction the machine instruction
+     * @return the target PC for the specified jr instruction
      */
     public static int getTargetPcForJr(Context context, int machineInstruction) {
         return context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction));
     }
 
     /**
+     * Execute the specified static instruction under the specified context.
      *
-     * @param staticInst
-     * @param context
+     * @param staticInstruction the static instruction
+     * @param context           the context
      */
-    public static void execute(StaticInstruction staticInst, Context context) {
+    public static void execute(StaticInstruction staticInstruction, Context context) {
         int oldPc = context.getRegisterFile().getPc();
         try {
-            staticInst.mnemonic.getMethod().invoke(null, context, staticInst.machineInstruction);
+            staticInstruction.mnemonic.getMethod().invoke(null, context, staticInstruction.machineInstruction);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (InvocationTargetException e) {
             throw new RuntimeException(e);
         }
-        context.getBlockingEventDispatcher().dispatch(new InstructionFunctionallyExecutedEvent(context, oldPc, staticInst));
+        context.getBlockingEventDispatcher().dispatch(new InstructionFunctionallyExecutedEvent(context, oldPc, staticInstruction));
     }
 
     /**
@@ -1840,7 +2685,7 @@ public class StaticInstruction {
      * @return the pseudocall object if the machine instruction is a pseudocall; otherwise null.
      */
     public static PseudoCall getPseudoCall(int machineInstruction) {
-        if(BitField.RT.valueOf(machineInstruction) == 0 && MathHelper.signExtend(BitField.INTIMM.valueOf(machineInstruction)) != 0) {
+        if (BitField.RT.valueOf(machineInstruction) == 0 && MathHelper.signExtend(BitField.INTIMM.valueOf(machineInstruction)) != 0) {
             return new PseudoCall(BitField.RS.valueOf(machineInstruction), MathHelper.signExtend(BitField.INTIMM.valueOf(machineInstruction)));
         }
 
@@ -1848,7 +2693,7 @@ public class StaticInstruction {
     }
 
     /**
-     *
+     * The constant "no operation" (NOP) instruction.
      */
     public static final StaticInstruction NOP = new StaticInstruction(Mnemonic.NOP, 0x0);
 }

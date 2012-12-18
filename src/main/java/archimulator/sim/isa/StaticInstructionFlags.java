@@ -24,6 +24,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Static instruction flags.
  *
  * @author Min Cai
  */
@@ -31,8 +32,9 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface StaticInstructionFlags {
     /**
+     * Get the array of values.
      *
-     * @return
+     * @return the array of values
      */
     StaticInstructionFlag[] value();
 }

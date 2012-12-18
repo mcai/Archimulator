@@ -23,6 +23,7 @@ import archimulator.sim.isa.StaticInstruction;
 import net.pickapack.math.MathHelper;
 
 /**
+ * MIPS disassembler.
  *
  * @author Min Cai
  */
@@ -31,9 +32,10 @@ public class MipsDisassembler {
             "k0", "k1", "gp", "sp", "s8", "ra"};
 
     /**
+     * Get the type of the specified machine instruction.
      *
-     * @param machineInstruction
-     * @return
+     * @param machineInstruction the machine instruction
+     * @return the type of the specified machine instruction
      */
     public static MachineInstructionType getMachineInstructionType(int machineInstruction) {
         int opcode = BitField.OPCODE.valueOf(machineInstruction);
@@ -52,9 +54,10 @@ public class MipsDisassembler {
     }
 
     /**
+     * Get a value indicating whether the specified machine instruction is RMT or not.
      *
-     * @param machineInstruction
-     * @return
+     * @param machineInstruction the machine instruction
+     * @return a value indicating whether the specified machine instruction is RMT or not
      */
     public static boolean isRMt(int machineInstruction) {
         int func = BitField.FUNC.valueOf(machineInstruction);
@@ -62,9 +65,10 @@ public class MipsDisassembler {
     }
 
     /**
+     * Get a value indicating whether the specified machine instruction is RMF or not.
      *
-     * @param machineInstruction
-     * @return
+     * @param machineInstruction the machine instruction
+     * @return a value indicating whether the specified machine instruction is RMF or not
      */
     public static boolean isRMf(int machineInstruction) {
         int func = BitField.FUNC.valueOf(machineInstruction);
@@ -72,9 +76,10 @@ public class MipsDisassembler {
     }
 
     /**
+     * Get a value indicating whether the specified machine instruction is ROneOp or not.
      *
-     * @param machineInstruction
-     * @return
+     * @param machineInstruction the machine instruction
+     * @return a value indicating whether the specified machine instruction is ROneOp or not
      */
     public static boolean isROneOp(int machineInstruction) {
         int func = BitField.FUNC.valueOf(machineInstruction);
@@ -82,9 +87,10 @@ public class MipsDisassembler {
     }
 
     /**
+     * Get a value indicating whether the specified machine instruction is RTwoOp or not.
      *
-     * @param machineInstruction
-     * @return
+     * @param machineInstruction the machine instruction
+     * @return a value indicating whether the specified machine instruction is RTwoOp or not
      */
     public static boolean isRTwoOp(int machineInstruction) {
         int func = BitField.FUNC.valueOf(machineInstruction);
@@ -92,9 +98,10 @@ public class MipsDisassembler {
     }
 
     /**
+     * Get a value indicating whether the specified machine instruction is a load/store or not.
      *
-     * @param machineInstruction
-     * @return
+     * @param machineInstruction the machine instruction
+     * @return a value indicating whether the specified machine instruction is a load/store or not
      */
     public static boolean isLoadStore(int machineInstruction) {
         int opcode = BitField.OPCODE.valueOf(machineInstruction);
@@ -102,9 +109,10 @@ public class MipsDisassembler {
     }
 
     /**
+     * Get a value indicating whether the specified machine instruction is a floating point load/store or not.
      *
-     * @param machineInstruction
-     * @return
+     * @param machineInstruction the machine instruction
+     * @return a value indicating whether the specified machine instruction is a floating point load/store or not
      */
     public static boolean isFPLoadStore(int machineInstruction) {
         int opcode = BitField.OPCODE.valueOf(machineInstruction);
@@ -112,9 +120,10 @@ public class MipsDisassembler {
     }
 
     /**
+     * Get a value indicating whether the specified machine instruction is a one operand branch or not.
      *
-     * @param machineInstruction
-     * @return
+     * @param machineInstruction the machine instruction
+     * @return a value indicating whether the specified machine instruction is a one operand branch or not
      */
     public static boolean isOneOpBranch(int machineInstruction) {
         int opcode = BitField.OPCODE.valueOf(machineInstruction);
@@ -122,9 +131,10 @@ public class MipsDisassembler {
     }
 
     /**
+     * Get a value indicating whether the specified machine instruction is a shift operation or not.
      *
-     * @param machineInstruction
-     * @return
+     * @param machineInstruction the machine instruction
+     * @return a value indicating whether the specified machine instruction is a shift operation or not
      */
     public static boolean isShift(int machineInstruction) {
         int func = BitField.FUNC.valueOf(machineInstruction);
@@ -132,9 +142,10 @@ public class MipsDisassembler {
     }
 
     /**
+     * Get a value indicating whether the specified machine instruction is a convert operation or not.
      *
-     * @param machineInstruction
-     * @return
+     * @param machineInstruction the machine instruction
+     * @return a value indicating whether the specified machine instruction is a convert operation or not
      */
     public static boolean isCVT(int machineInstruction) {
         int func = BitField.FUNC.valueOf(machineInstruction);
@@ -142,9 +153,10 @@ public class MipsDisassembler {
     }
 
     /**
+     * Get a value indicating whether the specified machine instruction is a compare operation or not.
      *
-     * @param machineInstruction
-     * @return
+     * @param machineInstruction the machine instruction
+     * @return a value indicating whether the specified machine instruction is a compare operation or not
      */
     public static boolean isCompare(int machineInstruction) {
         int func = BitField.FUNC.valueOf(machineInstruction);
@@ -152,9 +164,10 @@ public class MipsDisassembler {
     }
 
     /**
+     * Get a value indicating whether the specified machine instruction is a move operation from a GPR to a floating point register or not.
      *
-     * @param machineInstruction
-     * @return
+     * @param machineInstruction the machine instruction
+     * @return a value indicating whether the specified machine instruction is a move operation from a GPR to a floating point register or not
      */
     public static boolean isGprFpMove(int machineInstruction) {
         int rs = BitField.RS.valueOf(machineInstruction);
@@ -162,9 +175,10 @@ public class MipsDisassembler {
     }
 
     /**
+     * Get a value indicating whether the specified machine instruction is a move operation from a GPR to a floating point register or not.
      *
-     * @param machineInstruction
-     * @return
+     * @param machineInstruction the machine instruction
+     * @return a value indicating whether the specified machine instruction is a move operation from a GPR to the FCR or not
      */
     public static boolean isGprFcrMove(int machineInstruction) {
         int rs = BitField.RS.valueOf(machineInstruction);
@@ -172,9 +186,10 @@ public class MipsDisassembler {
     }
 
     /**
+     * Get a value indicating whether the specified machine instruction is a floating point branch operation or not.
      *
-     * @param machineInstruction
-     * @return
+     * @param machineInstruction the machine instruction
+     * @return a value indicating whether the specified machine instruction is a floating point branch operation or not
      */
     public static boolean isFpBranch(int machineInstruction) {
         int rs = BitField.RS.valueOf(machineInstruction);
@@ -182,97 +197,98 @@ public class MipsDisassembler {
     }
 
     /**
+     * Get a value indicating whether the specified machine instruction is a system call or not.
      *
-     * @param machineInstruction
-     * @return
+     * @param machineInstruction the machine instruction
+     * @return a value indicating whether the specified machine instruction is a system call or not
      */
     public static boolean isSystemCall(int machineInstruction) {
         return (BitField.OPCODE_LO.valueOf(machineInstruction) == 0x0 && BitField.FUNC_HI.valueOf(machineInstruction) == 0x1 && BitField.FUNC_LO.valueOf(machineInstruction) == 0x4);
     }
 
     /**
+     * Disassemble the specified static instruction at the specified program counter (PC).
      *
-     * @param pc
-     * @param staticInstruction
-     * @return
+     * @param pc                the program counter (PC) value
+     * @param staticInstruction the static instruction
+     * @return the text representation of the disassembled instruction
      */
     public static String disassemble(int pc, StaticInstruction staticInstruction) {
-        StringBuilder buf = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
 
-        int machInst = staticInstruction.getMachineInstruction();
-        buf.append(String.format("0x%08x: 0x%08x %s ", pc, machInst, staticInstruction.getMnemonic().toString().toLowerCase()));
-//        buf.append(String.format("0x%08x: %s ", pc, staticInstruction.getMnemonic().toString().toLowerCase()));
+        int machineInstruction = staticInstruction.getMachineInstruction();
+        sb.append(String.format("0x%08x: 0x%08x %s ", pc, machineInstruction, staticInstruction.getMnemonic().toString().toLowerCase()));
 
-        if (machInst == 0x00000000) {
-            return buf.toString().trim();
+        if (machineInstruction == 0x00000000) {
+            return sb.toString().trim();
         }
 
-        MachineInstructionType machineInstructionType = getMachineInstructionType(machInst);
+        MachineInstructionType machineInstructionType = getMachineInstructionType(machineInstruction);
 
-        int imm = MathHelper.signExtend(BitField.INTIMM.valueOf(machInst));
+        int imm = MathHelper.signExtend(BitField.INTIMM.valueOf(machineInstruction));
 
-        int rs = BitField.RS.valueOf(machInst);
-        int rt = BitField.RT.valueOf(machInst);
-        int rd = BitField.RD.valueOf(machInst);
+        int rs = BitField.RS.valueOf(machineInstruction);
+        int rt = BitField.RT.valueOf(machineInstruction);
+        int rd = BitField.RD.valueOf(machineInstruction);
 
-        int fs = BitField.FS.valueOf(machInst);
-        int ft = BitField.FT.valueOf(machInst);
-        int fd = BitField.FD.valueOf(machInst);
+        int fs = BitField.FS.valueOf(machineInstruction);
+        int ft = BitField.FT.valueOf(machineInstruction);
+        int fd = BitField.FD.valueOf(machineInstruction);
 
-        int shift = BitField.SHIFT.valueOf(machInst);
+        int shift = BitField.SHIFT.valueOf(machineInstruction);
 
-        int target = BitField.TARGET.valueOf(machInst);
+        int target = BitField.TARGET.valueOf(machineInstruction);
 
         switch (machineInstructionType) {
             case J:
-                buf.append(String.format("%x", target));
+                sb.append(String.format("%x", target));
                 break;
             case I:
-                if (isOneOpBranch(machInst)) {
-                    buf.append(String.format("$%s, %d", MIPS_GPR_NAMES[rs], imm));
-                } else if (isLoadStore(machInst)) {
-                    buf.append(String.format("$%s, %d($%s)", MIPS_GPR_NAMES[rt], imm, MIPS_GPR_NAMES[rs]));
-                } else if (isFPLoadStore(machInst)) {
-                    buf.append(String.format("$f%d, %d($%s)", ft, imm, MIPS_GPR_NAMES[rs]));
+                if (isOneOpBranch(machineInstruction)) {
+                    sb.append(String.format("$%s, %d", MIPS_GPR_NAMES[rs], imm));
+                } else if (isLoadStore(machineInstruction)) {
+                    sb.append(String.format("$%s, %d($%s)", MIPS_GPR_NAMES[rt], imm, MIPS_GPR_NAMES[rs]));
+                } else if (isFPLoadStore(machineInstruction)) {
+                    sb.append(String.format("$f%d, %d($%s)", ft, imm, MIPS_GPR_NAMES[rs]));
                 } else {
-                    buf.append(String.format("$%s, $%s, %d", MIPS_GPR_NAMES[rt], MIPS_GPR_NAMES[rs], imm));
+                    sb.append(String.format("$%s, $%s, %d", MIPS_GPR_NAMES[rt], MIPS_GPR_NAMES[rs], imm));
                 }
                 break;
             case F:
-                if (isCVT(machInst)) {
-                    buf.append(String.format("$f%d, $f%d", fd, fs));
-                } else if (isCompare(machInst)) {
-                    buf.append(String.format("%d, $f%d, $f%d", fd >> 2, fs, ft));
-                } else if (isFpBranch(machInst)) {
-                    buf.append(String.format("%d, %d", fd >> 2, imm));
-                } else if (isGprFpMove(machInst)) {
-                    buf.append(String.format("$%s, $f%d", MIPS_GPR_NAMES[rt], fs));
-                } else if (isGprFcrMove(machInst)) {
-                    buf.append(String.format("$%s, $%d", MIPS_GPR_NAMES[rt], fs));
+                if (isCVT(machineInstruction)) {
+                    sb.append(String.format("$f%d, $f%d", fd, fs));
+                } else if (isCompare(machineInstruction)) {
+                    sb.append(String.format("%d, $f%d, $f%d", fd >> 2, fs, ft));
+                } else if (isFpBranch(machineInstruction)) {
+                    sb.append(String.format("%d, %d", fd >> 2, imm));
+                } else if (isGprFpMove(machineInstruction)) {
+                    sb.append(String.format("$%s, $f%d", MIPS_GPR_NAMES[rt], fs));
+                } else if (isGprFcrMove(machineInstruction)) {
+                    sb.append(String.format("$%s, $%d", MIPS_GPR_NAMES[rt], fs));
                 } else {
-                    buf.append(String.format("$f%d, $f%d, $f%d", fd, fs, ft));
+                    sb.append(String.format("$f%d, $f%d, $f%d", fd, fs, ft));
                 }
                 break;
             case R:
-                if (isSystemCall(machInst)) {
-                } else if (isShift(machInst)) {
-                    buf.append(String.format("$%s, $%s, %d", MIPS_GPR_NAMES[rd], MIPS_GPR_NAMES[rt], shift));
-                } else if (isROneOp(machInst)) {
-                    buf.append(String.format("$%s", MIPS_GPR_NAMES[rs]));
-                } else if (isRTwoOp(machInst)) {
-                    buf.append(String.format("$%s, $%s", MIPS_GPR_NAMES[rs], MIPS_GPR_NAMES[rt]));
-                } else if (isRMt(machInst)) {
-                    buf.append(String.format("$%s", MIPS_GPR_NAMES[rs]));
-                } else if (isRMf(machInst)) {
-                    buf.append(String.format("$%s", MIPS_GPR_NAMES[rd]));
+                if (isSystemCall(machineInstruction)) {
+                } else if (isShift(machineInstruction)) {
+                    sb.append(String.format("$%s, $%s, %d", MIPS_GPR_NAMES[rd], MIPS_GPR_NAMES[rt], shift));
+                } else if (isROneOp(machineInstruction)) {
+                    sb.append(String.format("$%s", MIPS_GPR_NAMES[rs]));
+                } else if (isRTwoOp(machineInstruction)) {
+                    sb.append(String.format("$%s, $%s", MIPS_GPR_NAMES[rs], MIPS_GPR_NAMES[rt]));
+                } else if (isRMt(machineInstruction)) {
+                    sb.append(String.format("$%s", MIPS_GPR_NAMES[rs]));
+                } else if (isRMf(machineInstruction)) {
+                    sb.append(String.format("$%s", MIPS_GPR_NAMES[rd]));
                 } else {
-                    buf.append(String.format("$%s, $%s, $%s", MIPS_GPR_NAMES[rd], MIPS_GPR_NAMES[rs], MIPS_GPR_NAMES[rt]));
+                    sb.append(String.format("$%s, $%s, $%s", MIPS_GPR_NAMES[rd], MIPS_GPR_NAMES[rs], MIPS_GPR_NAMES[rt]));
                 }
                 break;
             default:
                 throw new IllegalArgumentException();
         }
 
-        return buf.toString().trim();
+        return sb.toString().trim();
     }
 }

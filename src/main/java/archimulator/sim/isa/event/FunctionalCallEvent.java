@@ -16,43 +16,45 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.isa;
+package archimulator.sim.isa.event;
 
 import archimulator.sim.common.SimulationEvent;
 import archimulator.sim.os.Context;
+import archimulator.sim.os.FunctionCallContext;
 
 /**
+ * Function call event.
  *
  * @author Min Cai
  */
-public class SystemCallExecutedEvent extends SimulationEvent {
-    private Context context;
-    private String systemCallName;
+public class FunctionalCallEvent extends SimulationEvent {
+    private FunctionCallContext functionCallContext;
 
     /**
+     * Create a function call event.
      *
-     * @param context
-     * @param systemCallName
+     * @param functionCallContext the function call context
      */
-    public SystemCallExecutedEvent(Context context, String systemCallName) {
-        super(context);
-        this.systemCallName = systemCallName;
-        this.context = context;
+    public FunctionalCallEvent(FunctionCallContext functionCallContext) {
+        super(functionCallContext.getContext());
+        this.functionCallContext = functionCallContext;
     }
 
     /**
+     * Get the function call context.
      *
-     * @return
+     * @return the function call context
+     */
+    public FunctionCallContext getFunctionCallContext() {
+        return functionCallContext;
+    }
+
+    /**
+     * Get the context.
+     *
+     * @return the context
      */
     public Context getContext() {
-        return context;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public String getSystemCallName() {
-        return systemCallName;
+        return getFunctionCallContext().getContext();
     }
 }

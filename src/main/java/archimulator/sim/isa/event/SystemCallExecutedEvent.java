@@ -16,37 +16,30 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.isa;
+package archimulator.sim.isa.event;
 
 import archimulator.sim.common.SimulationEvent;
 import archimulator.sim.os.Context;
-import archimulator.sim.os.FunctionCallContext;
 
 /**
- * Function call event.
+ * "System call executed" event.
  *
  * @author Min Cai
  */
-public class FunctionalCallEvent extends SimulationEvent {
-    private FunctionCallContext functionCallContext;
+public class SystemCallExecutedEvent extends SimulationEvent {
+    private Context context;
+    private String systemCallName;
 
     /**
-     * Create a function call event.
+     * Create a "system call executed" event.
      *
-     * @param functionCallContext the function call context
+     * @param context        the context
+     * @param systemCallName the name of the system call
      */
-    public FunctionalCallEvent(FunctionCallContext functionCallContext) {
-        super(functionCallContext.getContext());
-        this.functionCallContext = functionCallContext;
-    }
-
-    /**
-     * Get the function call context.
-     *
-     * @return the function call context
-     */
-    public FunctionCallContext getFunctionCallContext() {
-        return functionCallContext;
+    public SystemCallExecutedEvent(Context context, String systemCallName) {
+        super(context);
+        this.systemCallName = systemCallName;
+        this.context = context;
     }
 
     /**
@@ -55,6 +48,15 @@ public class FunctionalCallEvent extends SimulationEvent {
      * @return the context
      */
     public Context getContext() {
-        return getFunctionCallContext().getContext();
+        return context;
+    }
+
+    /**
+     * Get the name of the system call.
+     *
+     * @return the name of the system call
+     */
+    public String getSystemCallName() {
+        return systemCallName;
     }
 }

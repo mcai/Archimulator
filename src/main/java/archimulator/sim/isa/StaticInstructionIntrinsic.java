@@ -26,6 +26,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Static instruction intrinsic.
  *
  * @author Min Cai
  */
@@ -33,14 +34,16 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface StaticInstructionIntrinsic {
     /**
+     * Get the mnemonic.
      *
-     * @return
+     * @return the mnemonic
      */
     Mnemonic mnemonic();
 
     /**
+     * Get the functional unit operation type.
      *
-     * @return
+     * @return the functional unit operation type
      */
     FunctionalUnitOperationType functionalUnitOperationType();
 }

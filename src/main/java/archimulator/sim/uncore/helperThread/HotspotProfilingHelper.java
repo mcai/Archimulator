@@ -24,7 +24,7 @@ import archimulator.sim.analysis.Instruction;
 import archimulator.sim.common.Simulation;
 import archimulator.sim.core.BasicThread;
 import archimulator.sim.core.DynamicInstruction;
-import archimulator.sim.isa.FunctionalCallEvent;
+import archimulator.sim.isa.event.FunctionalCallEvent;
 import archimulator.sim.isa.StaticInstructionType;
 import archimulator.sim.os.Process;
 import archimulator.sim.uncore.coherence.event.GeneralCacheControllerServiceNonblockingRequestEvent;

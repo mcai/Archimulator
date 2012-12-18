@@ -24,6 +24,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Decode condition.
  *
  * @author Min Cai
  */
@@ -31,14 +32,16 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface DecodeCondition {
     /**
+     * Get the bit field.
      *
-     * @return
+     * @return the bit field
      */
     String bitField();
 
     /**
+     * Get the value.
      *
-     * @return
+     * @return the value
      */
     int value();
 }

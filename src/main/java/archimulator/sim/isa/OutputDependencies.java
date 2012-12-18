@@ -24,6 +24,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Output dependencies.
  *
  * @author Min Cai
  */
@@ -31,8 +32,9 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface OutputDependencies {
     /**
+     * Get the array of values.
      *
-     * @return
+     * @return the array of values
      */
     StaticInstruction.Dependency[] value();
 }

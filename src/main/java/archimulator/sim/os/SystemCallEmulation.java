@@ -22,7 +22,7 @@ import archimulator.sim.common.BasicSimulationObject;
 import archimulator.sim.common.Logger;
 import archimulator.sim.common.SimulationObject;
 import archimulator.sim.isa.ArchitecturalRegisterFile;
-import archimulator.sim.isa.SystemCallExecutedEvent;
+import archimulator.sim.isa.event.SystemCallExecutedEvent;
 import archimulator.sim.os.event.*;
 import archimulator.sim.os.signal.SignalMask;
 import net.pickapack.action.Predicate;

@@ -23,7 +23,7 @@ import archimulator.sim.core.bpred.BranchPredictorUpdate;
 import archimulator.sim.core.bpred.DynamicBranchPredictor;
 import archimulator.sim.core.event.InstructionCommittedEvent;
 import archimulator.sim.core.event.InstructionDecodedEvent;
-import archimulator.sim.isa.PseudoCallEncounteredEvent;
+import archimulator.sim.isa.event.PseudoCallEncounteredEvent;
 import archimulator.sim.isa.RegisterDependencyType;
 import archimulator.sim.isa.StaticInstruction;
 import archimulator.sim.isa.StaticInstructionType;

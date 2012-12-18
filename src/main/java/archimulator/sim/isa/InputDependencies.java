@@ -24,6 +24,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Input dependencies.
  *
  * @author Min Cai
  */
@@ -31,8 +32,9 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface InputDependencies {
     /**
+     * Get the array of dependencies.
      *
-     * @return
+     * @return the array of dependencies
      */
     StaticInstruction.Dependency[] value();
 }

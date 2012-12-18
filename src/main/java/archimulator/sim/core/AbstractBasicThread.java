@@ -21,6 +21,8 @@ package archimulator.sim.core;
 import archimulator.sim.common.BasicSimulationObject;
 import archimulator.sim.core.bpred.*;
 import archimulator.sim.isa.*;
+import archimulator.sim.isa.event.InstructionFunctionallyExecutedEvent;
+import archimulator.sim.isa.event.SystemCallExecutedEvent;
 import archimulator.sim.os.Context;
 import archimulator.sim.uncore.tlb.TranslationLookasideBuffer;
 import net.pickapack.action.Action1;

@@ -16,9 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.isa;
+package archimulator.sim.isa.event;
 
 import archimulator.sim.common.SimulationEvent;
+import archimulator.sim.isa.PseudoCall;
 import archimulator.sim.os.Context;
 
 /**
@@ -33,7 +34,7 @@ public class PseudoCallEncounteredEvent extends SimulationEvent {
     /**
      * Create a pseudocall encountered event.
      *
-     * @param context the context
+     * @param context    the context
      * @param pseudoCall the pseudocall
      */
     public PseudoCallEncounteredEvent(Context context, PseudoCall pseudoCall) {
@@ -43,8 +44,9 @@ public class PseudoCallEncounteredEvent extends SimulationEvent {
     }
 
     /**
+     * Get the context.
      *
-     * @return
+     * @return the context
      */
     public Context getContext() {
         return context;

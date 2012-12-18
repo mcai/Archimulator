@@ -24,6 +24,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Non effective address base dependency.
  *
  * @author Min Cai
  */
@@ -31,8 +32,9 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface NonEffectiveAddressBaseDependency {
     /**
+     * Get the value.
      *
-     * @return
+     * @return the value
      */
     StaticInstruction.Dependency value();
 }

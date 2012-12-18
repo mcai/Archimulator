@@ -21,28 +21,32 @@ package archimulator.sim.isa;
 import net.pickapack.Pair;
 
 /**
+ * Register dependency type.
  *
  * @author Min Cai
  */
 public enum RegisterDependencyType {
     /**
-     *
+     * Integer.
      */
     INTEGER,
+
     /**
-     *
+     * Floating point.
      */
     FLOAT,
+
     /**
-     *
+     * Miscellaneous.
      */
     MISC;
 
     /**
+     * Get the register dependency for the specified type and number.
      *
-     * @param type
-     * @param num
-     * @return
+     * @param type the type of the register dependency
+     * @param num  the number of the register dependency
+     * @return the register dependency for the specified type and number
      */
     public static int toRegisterDependency(RegisterDependencyType type, int num) {
         switch (type) {
@@ -58,9 +62,10 @@ public enum RegisterDependencyType {
     }
 
     /**
+     * Parse the total ordered dependency into a pair of dependency type and number.
      *
-     * @param dependency
-     * @return
+     * @param dependency the total ordered dependency
+     * @return a pair of dependency type and number for the specified total ordered dependency
      */
     public static Pair<RegisterDependencyType, Integer> parse(int dependency) {
         if (dependency < ArchitecturalRegisterFile.NUM_INT_REGISTERS) {
@@ -73,18 +78,20 @@ public enum RegisterDependencyType {
     }
 
     /**
+     * Get the dependency type for the specified total ordered dependency.
      *
-     * @param dependency
-     * @return
+     * @param dependency the total ordered dependency
+     * @return the dependency type for the specified total ordered dependency
      */
     public static RegisterDependencyType getType(int dependency) {
         return parse(dependency).getFirst();
     }
 
     /**
+     * Get the dependency number for the specified total ordered dependency.
      *
-     * @param dependency
-     * @return
+     * @param dependency the total ordered dependency
+     * @return the dependency number for the specified total ordered dependency
      */
     public static int getNum(int dependency) {
         return parse(dependency).getSecond();

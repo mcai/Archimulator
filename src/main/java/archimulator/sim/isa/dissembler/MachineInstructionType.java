@@ -19,24 +19,28 @@
 package archimulator.sim.isa.dissembler;
 
 /**
+ * Machine instruction type.
  *
  * @author Min Cai
  */
 public enum MachineInstructionType {
     /**
-     *
+     * Register.
      */
     R,
+
     /**
-     *
+     * Indirect jump.
      */
     I,
+
     /**
-     *
+     * Jump.
      */
     J,
+
     /**
-     *
+     * Floating point.
      */
     F
 }

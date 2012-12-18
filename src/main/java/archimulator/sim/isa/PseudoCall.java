@@ -30,7 +30,7 @@ public class PseudoCall {
     /**
      * Create a pseudocall.
      *
-     * @param rs the "rs" register value
+     * @param rs  the "rs" register value
      * @param imm the immediate value
      */
     public PseudoCall(int rs, int imm) {

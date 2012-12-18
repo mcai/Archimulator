@@ -19,56 +19,68 @@
 package archimulator.sim.isa;
 
 /**
+ * Static instruction type.
  *
  * @author Min Cai
  */
 public enum StaticInstructionType {
     /**
-     *
+     * Integer computation.
      */
     INTEGER_COMPUTATION,
+
     /**
-     *
+     * Floating point computation.
      */
     FLOAT_COMPUTATION,
+
     /**
-     *
+     * Conditional.
      */
     CONDITIONAL,
+
     /**
-     *
+     * Unconditional.
      */
     UNCONDITIONAL,
+
     /**
-     *
+     * Load.
      */
     LOAD,
+
     /**
-     *
+     * Store.
      */
     STORE,
+
     /**
-     *
+     * Function call.
      */
     FUNCTION_CALL,
+
     /**
-     *
+     * Function return.
      */
     FUNCTION_RETURN,
+
     /**
-     *
+     * Trap.
      */
     TRAP,
+
     /**
-     *
+     * No operation (NOP).
      */
     NOP,
+
     /**
-     *
+     * Unimplemented instruction.
      */
     UNIMPLEMENTED,
+
     /**
-     *
+     * Unknown instruction.
      */
     UNKNOWN
 }

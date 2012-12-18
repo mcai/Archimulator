@@ -16,12 +16,14 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.isa;
+package archimulator.sim.isa.event;
 
 import archimulator.sim.common.SimulationEvent;
+import archimulator.sim.isa.StaticInstruction;
 import archimulator.sim.os.Context;
 
 /**
+ * "Instruction functionally executed" event.
  *
  * @author Min Cai
  */
@@ -31,10 +33,11 @@ public class InstructionFunctionallyExecutedEvent extends SimulationEvent {
     private StaticInstruction staticInstruction;
 
     /**
+     * Create an "instruction functionally executed" event.
      *
-     * @param context
-     * @param pc
-     * @param staticInstruction
+     * @param context           the context
+     * @param pc                the value of the program counter (PC)
+     * @param staticInstruction the static instruction
      */
     public InstructionFunctionallyExecutedEvent(Context context, int pc, StaticInstruction staticInstruction) {
         super(context);
@@ -44,24 +47,27 @@ public class InstructionFunctionallyExecutedEvent extends SimulationEvent {
     }
 
     /**
+     * Get the context.
      *
-     * @return
+     * @return the context
      */
     public Context getContext() {
         return context;
     }
 
     /**
+     * Get the value of the program counter (PC).
      *
-     * @return
+     * @return the value of the program counter (PC)
      */
     public int getPc() {
         return pc;
     }
 
     /**
+     * Get the static instruction.
      *
-     * @return
+     * @return the static instruction
      */
     public StaticInstruction getStaticInstruction() {
         return staticInstruction;
