@@ -19,42 +19,50 @@
 package archimulator.sim.uncore.helperThread;
 
 /**
+ * Helper thread L2 cache request quality.
  *
  * @author Min Cai
  */
 public enum HelperThreadL2CacheRequestQuality {
     /**
-     *
+     * Redundant hit to transient tag.
      */
     REDUNDANT_HIT_TO_TRANSIENT_TAG,
+
     /**
-     *
+     * Redundant hit to cache.
      */
     REDUNDANT_HIT_TO_CACHE,
+
     /**
-     *
+     * Timely.
      */
     TIMELY,
+
     /**
-     *
+     * Late.
      */
     LATE,
+
     /**
-     *
+     * Bad.
      */
     BAD,
+
     /**
-     *
+     * Ugly.
      */
     UGLY,
+
     /**
-     *
+     * Invalid.
      */
     INVALID;
 
     /**
+     * Get a value indicating whether the current state of the quality is modifiable or not.
      *
-     * @return
+     * @return a value indicating whether the current state of the quality is modifiable or not
      */
     public boolean isModifiable() {
         return this == UGLY;

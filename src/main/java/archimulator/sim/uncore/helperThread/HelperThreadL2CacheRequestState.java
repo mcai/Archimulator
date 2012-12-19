@@ -19,6 +19,7 @@
 package archimulator.sim.uncore.helperThread;
 
 /**
+ * Helper thread L2 cache request state.
  *
  * @author Min Cai
  */
@@ -30,7 +31,7 @@ public class HelperThreadL2CacheRequestState {
     private boolean hitToTransientTag;
 
     /**
-     *
+     * Create a helper thread L2 cache request state.
      */
     public HelperThreadL2CacheRequestState() {
         this.inFlightThreadId = -1;
@@ -40,56 +41,63 @@ public class HelperThreadL2CacheRequestState {
     }
 
     /**
+     * Get the in-flight thread ID.
      *
-     * @return
+     * @return the in-flight thread ID
      */
     public int getInFlightThreadId() {
         return inFlightThreadId;
     }
 
     /**
+     * Set the in-flight thread ID.
      *
-     * @param inFlightThreadId
+     * @param inFlightThreadId the in-flight thread ID
      */
     public void setInFlightThreadId(int inFlightThreadId) {
         this.inFlightThreadId = inFlightThreadId;
     }
 
     /**
+     * Get the thread ID.
      *
-     * @return
+     * @return the thread ID
      */
     public int getThreadId() {
         return threadId;
     }
 
     /**
+     * Set the thread ID.
      *
-     * @param threadId
+     * @param threadId the thread ID
      */
     public void setThreadId(int threadId) {
         this.threadId = threadId;
     }
 
     /**
+     * Get the virtual address of the program counter (PC).
      *
-     * @return
+     * @return the virtual address of the program counter (PC)
      */
     public int getPc() {
         return pc;
     }
 
     /**
+     * Set the virtual address of the program counter (PC).
      *
-     * @param pc
+     * @param pc the virtual address of the program counter (PC)
      */
     public void setPc(int pc) {
         this.pc = pc;
     }
 
     /**
+     * Set the quality of the helper thread L2 cache request.
      *
-     * @param quality
+     * @param quality the quality of the helper thread L2 cache request
      */
     public void setQuality(HelperThreadL2CacheRequestQuality quality) {
         if (this.quality != HelperThreadL2CacheRequestQuality.INVALID && quality != HelperThreadL2CacheRequestQuality.INVALID && !this.quality.isModifiable()) {
@@ -100,24 +108,27 @@ public class HelperThreadL2CacheRequestState {
     }
 
     /**
+     * Get the quality of the helper thread L2 cache request.
      *
-     * @return
+     * @return the quality of the helper thread L2 cache request
      */
     public HelperThreadL2CacheRequestQuality getQuality() {
         return quality;
     }
 
     /**
+     * Set a value indicating whether there is a hit to the transient tag.
      *
-     * @param hitToTransientTag
+     * @param hitToTransientTag a value indicating whether there is a hit to the transient tag
      */
     public void setHitToTransientTag(boolean hitToTransientTag) {
         this.hitToTransientTag = hitToTransientTag;
     }
 
     /**
+     * Get a value indicating whether there is a hit to the transient tag.
      *
-     * @return
+     * @return a value indicating whether there is a hit to the transient tag
      */
     public boolean isHitToTransientTag() {
         return hitToTransientTag;

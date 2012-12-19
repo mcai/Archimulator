@@ -279,6 +279,12 @@ public class HelperThreadL2CacheRequestProfilingHelper {
         }
     }
 
+    /**
+     * Sum up unstable helper thread L2 cache request for the specified set index and way.
+     *
+     * @param set the set index
+     * @param way the way
+     */
     private void sumUpUnstableHelperThreadL2CacheRequest(int set, int way) {
         HelperThreadL2CacheRequestState helperThreadL2CacheRequestState = helperThreadL2CacheRequestStates.get(set).get(way);
 
@@ -299,6 +305,13 @@ public class HelperThreadL2CacheRequestProfilingHelper {
         }
     }
 
+    /**
+     * Handle an L2 cache request.
+     *
+     * @param event the event
+     * @param requesterIsHelperThread a value indicating whether the requester is the main thread or not
+     * @param lineFoundIsHelperThread a value indicating whether the line found is brought by the helper thread or not
+     */
     private void handleL2CacheRequest(GeneralCacheControllerServiceNonblockingRequestEvent event, boolean requesterIsHelperThread, boolean lineFoundIsHelperThread) {
         profileBeginServicingL2Request(event.getAccess());
 
@@ -361,6 +374,12 @@ public class HelperThreadL2CacheRequestProfilingHelper {
         }
     }
 
+    /**
+     * Handle a cache request in the case 1.
+     *
+     * @param event the event
+     * @param victimLine the victim cache line
+     */
     private void handleRequestCase1(GeneralCacheControllerServiceNonblockingRequestEvent event, CacheLine<HelperThreadL2CacheRequestVictimCacheLineState> victimLine) {
         this.helperThreadL2CacheRequestStates.get(event.getSet()).get(event.getWay()).setQuality(HelperThreadL2CacheRequestQuality.BAD);
 
@@ -369,6 +388,11 @@ public class HelperThreadL2CacheRequestProfilingHelper {
         checkInvariants(event.getSet());
     }
 
+    /**
+     * Handle a cache request in the case 2.
+     *
+     * @param event the event
+     */
     private void handleRequestCase2(GeneralCacheControllerServiceNonblockingRequestEvent event) {
         HelperThreadL2CacheRequestState helperThreadL2CacheRequestState = this.helperThreadL2CacheRequestStates.get(event.getSet()).get(event.getWay());
 
@@ -396,6 +420,11 @@ public class HelperThreadL2CacheRequestProfilingHelper {
         checkInvariants(event.getSet());
     }
 
+    /**
+     * Handle a cache request in the case 3.
+     *
+     * @param event the event
+     */
     private void handleRequestCase3(GeneralCacheControllerServiceNonblockingRequestEvent event) {
         this.markMainThread(event.getSet(), event.getWay(), event.getAccess().getVirtualPc());
         this.helperThreadL2CacheRequestStates.get(event.getSet()).get(event.getWay()).setQuality(HelperThreadL2CacheRequestQuality.INVALID);
@@ -411,12 +440,25 @@ public class HelperThreadL2CacheRequestProfilingHelper {
         checkInvariants(event.getSet());
     }
 
+    /**
+     * Handle a cache request in the case 4.
+     *
+     * @param event the event
+     * @param victimLine the victim cache line
+     */
     private void handleRequestCase4(GeneralCacheControllerServiceNonblockingRequestEvent event, CacheLine<HelperThreadL2CacheRequestVictimCacheLineState> victimLine) {
         clearVictimInVictimCacheLine(event.getSet(), victimLine.getWay());
 
         checkInvariants(event.getSet());
     }
 
+    /**
+     * Handle an L2 cache line insertion.
+     *
+     * @param event the event
+     * @param requesterIsHelperThread a value indicating whether the requester is the helper thread or not
+     * @param lineFoundIsHelperThread a value indicating whether the line found is brought by the helper thread or not
+     */
     private void handleL2CacheLineInsert(LastLevelCacheControllerLineInsertEvent event, boolean requesterIsHelperThread, boolean lineFoundIsHelperThread) {
         profileEndServicingL2Request(event.getAccess());
 
@@ -450,15 +492,15 @@ public class HelperThreadL2CacheRequestProfilingHelper {
         }
 
         if (requesterIsHelperThread && !event.isEviction()) {
-            handleLineInsert1(event);
+            handleLineInsertCase1(event);
         } else if (requesterIsHelperThread && event.isEviction() && !lineFoundIsHelperThread) {
-            handleLineInsert2(event);
+            handleLineInsertCase2(event);
         } else if (requesterIsHelperThread && event.isEviction() && lineFoundIsHelperThread) {
-            handleLineInsert3(event);
+            handleLineInsertCase3(event);
         } else if (!requesterIsHelperThread && event.isEviction() && lineFoundIsHelperThread) {
-            handleLineInsert4(event);
+            handleLineInsertCase4(event);
         } else if (!requesterIsHelperThread && event.isEviction() && !lineFoundIsHelperThread) {
-            handleLineInsert5(event);
+            handleLineInsertCase5(event);
         } else {
             checkInvariants(event.getSet());
         }
@@ -468,19 +510,34 @@ public class HelperThreadL2CacheRequestProfilingHelper {
         }
     }
 
-    private void handleLineInsert1(LastLevelCacheControllerLineInsertEvent event) {
+    /**
+     * Handle a cache line insertion in the case 1.
+     *
+     * @param event the event
+     */
+    private void handleLineInsertCase1(LastLevelCacheControllerLineInsertEvent event) {
         this.insertNullEntry(event.getAccess(), event.getSet(), event.getTag());
 
         checkInvariants(event.getSet());
     }
 
-    private void handleLineInsert2(LastLevelCacheControllerLineInsertEvent event) {
+    /**
+     * Handle a cache line insertion in the case 2.
+     *
+     * @param event the event
+     */
+    private void handleLineInsertCase2(LastLevelCacheControllerLineInsertEvent event) {
         this.insertDataEntry(event.getAccess(), event.getSet(), event.getVictimTag(), event.getTag());
 
         checkInvariants(event.getSet());
     }
 
-    private void handleLineInsert3(LastLevelCacheControllerLineInsertEvent event) {
+    /**
+     * Handle a cache line insertion in the case 3.
+     *
+     * @param event th event
+     */
+    private void handleLineInsertCase3(LastLevelCacheControllerLineInsertEvent event) {
         int wayOfVictimCacheLine = this.findWayOfVictimCacheLineByHelperThreadL2CacheRequestTag(event.getSet(), event.getVictimTag());
 
         CacheLine<HelperThreadL2CacheRequestVictimCacheLineState> line = this.helperThreadL2CacheRequestVictimCache.getLine(event.getSet(), wayOfVictimCacheLine);
@@ -490,7 +547,12 @@ public class HelperThreadL2CacheRequestProfilingHelper {
         checkInvariants(event.getSet());
     }
 
-    private void handleLineInsert4(LastLevelCacheControllerLineInsertEvent event) {
+    /**
+     * Handle a cache line insertion in the case 4.
+     *
+     * @param event the event
+     */
+    private void handleLineInsertCase4(LastLevelCacheControllerLineInsertEvent event) {
         int wayOfVictimCacheLine = this.findWayOfVictimCacheLineByHelperThreadL2CacheRequestTag(event.getSet(), event.getVictimTag());
 
         if (wayOfVictimCacheLine == -1) {
@@ -502,7 +564,12 @@ public class HelperThreadL2CacheRequestProfilingHelper {
         checkInvariants(event.getSet());
     }
 
-    private void handleLineInsert5(LastLevelCacheControllerLineInsertEvent event) {
+    /**
+     * Handle a cache line insertion in the case 5.
+     *
+     * @param event the event
+     */
+    private void handleLineInsertCase5(LastLevelCacheControllerLineInsertEvent event) {
 //        for (int way = 0; way < this.helperThreadL2CacheRequestVictimCache.getAssociativity(); way++) {
 //            if (this.helperThreadL2CacheRequestVictimCache.getLine(event.getSet(), way).getState() != HelperThreadL2CacheRequestVictimCacheLineState.INVALID) {
 //                this.removeLRU(event.getSet());
@@ -517,6 +584,11 @@ public class HelperThreadL2CacheRequestProfilingHelper {
     //    private boolean checkInvariantsEnabled = true;
     private boolean checkInvariantsEnabled = false;
 
+    /**
+     * Check for invariants for the specified set index.
+     *
+     * @param set the set index
+     */
     private void checkInvariants(int set) {
         if (checkInvariantsEnabled) {
             int numHelperThreadLinesInL2 = select(this.helperThreadL2CacheRequestStates.get(set).values(), having(on(HelperThreadL2CacheRequestState.class).getThreadId(), equalTo(BasicThread.getHelperThreadId()))).size();
@@ -540,16 +612,35 @@ public class HelperThreadL2CacheRequestProfilingHelper {
         }
     }
 
+    /**
+     * Increment the number of ugly helper thread L2 cache requests.
+     *
+     * @param threadId the thread ID
+     * @param pc the virtual address of the program counter (PC)
+     */
     private void incrementUglyHelperThreadL2CacheRequests(int threadId, int pc) {
         this.numUglyHelperThreadL2CacheRequests++;
         updateHelperThreadL2CacheRequestQualityPredictor(threadId, pc, HelperThreadL2CacheRequestQuality.UGLY);
     }
 
+    /**
+     * Increment the number of bad helper thread L2 cache requests.
+     *
+     * @param threadId the thread ID
+     * @param pc the virtual address of the program counter (PC)
+     */
     private void incrementBadHelperThreadL2CacheRequests(int threadId, int pc) {
         this.numBadHelperThreadL2CacheRequests++;
         updateHelperThreadL2CacheRequestQualityPredictor(threadId, pc, HelperThreadL2CacheRequestQuality.BAD);
     }
 
+    /**
+     * Update the helper thread L2 cache request quality predictor.
+     *
+     * @param threadId the thread ID
+     * @param pc the virtual address of the program counter (PC)
+     * @param helperThreadL2CacheRequestQuality the quality of the helper thread L2 cache request
+     */
     private void updateHelperThreadL2CacheRequestQualityPredictor(int threadId, int pc, HelperThreadL2CacheRequestQuality helperThreadL2CacheRequestQuality) {
         if (threadId != BasicThread.getHelperThreadId()) {
             throw new IllegalArgumentException(String.format("ctx: %d: pc: 0x%08x, quality: %s", threadId, pc, helperThreadL2CacheRequestQuality));
@@ -558,22 +649,59 @@ public class HelperThreadL2CacheRequestProfilingHelper {
         this.helperThreadL2CacheRequestQualityPredictor.update(pc, helperThreadL2CacheRequestQuality);
     }
 
+    /**
+     * Mark as invalid for the specified set index and way.
+     *
+     * @param set the set index
+     * @param way the way
+     */
     private void markInvalid(int set, int way) {
         this.sumUpUnstableHelperThreadL2CacheRequest(set, way);
     }
 
+    /**
+     * Mark the broughter as the helper thread for the specified set index and way.
+     *
+     * @param set the set index
+     * @param way the way
+     * @param pc the virtual address of the program counter (PC)
+     */
     private void markHelperThread(int set, int way, int pc) {
         this.setL2CacheLineBroughterThreadId(set, way, BasicThread.getHelperThreadId(), pc, false);
     }
 
+    /**
+     * Mark the broughter as the main thread for the specified set index and way.
+     *
+     * @param set the set index
+     * @param way the way
+     * @param pc the virtual address of the program counter (PC)
+     */
     private void markMainThread(int set, int way, int pc) {
         this.setL2CacheLineBroughterThreadId(set, way, BasicThread.getMainThreadId(), pc, false);
     }
 
+    /**
+     * Mark the transient thread ID for the specified set index and way.
+     *
+     * @param set the set index
+     * @param way the way
+     * @param threadId the thread ID
+     * @param pc the virtual address of the program counter (PC)
+     */
     private void markTransientThreadId(int set, int way, int threadId, int pc) {
         this.setL2CacheLineBroughterThreadId(set, way, threadId, pc, true);
     }
 
+    /**
+     * Set the L2 cache line's broughter thread ID.
+     *
+     * @param set the set index
+     * @param way the way
+     * @param l2CacheLineBroughterThreadId the L2 cache line's broughter thread ID
+     * @param pc the virtual address of the program counter (PC)
+     * @param inFlight a value indicating whether it is in-flight or not
+     */
     private void setL2CacheLineBroughterThreadId(int set, int way, int l2CacheLineBroughterThreadId, int pc, boolean inFlight) {
         HelperThreadL2CacheRequestState helperThreadL2CacheRequestState = this.helperThreadL2CacheRequestStates.get(set).get(way);
 
@@ -591,11 +719,26 @@ public class HelperThreadL2CacheRequestProfilingHelper {
         }
     }
 
+    /**
+     * Mark as late for the specified set index and way.
+     *
+     * @param set the set index
+     * @param way the way
+     * @param late whether its is late or not
+     */
     private void markLate(int set, int way, boolean late) {
         HelperThreadL2CacheRequestState helperThreadL2CacheRequestState = this.helperThreadL2CacheRequestStates.get(set).get(way);
         helperThreadL2CacheRequestState.setHitToTransientTag(late);
     }
 
+    /**
+     * Insert a data entry in the victim cache.
+     *
+     * @param access the memory hierarchy access
+     * @param set the set index
+     * @param tag the tag
+     * @param helperThreadRequestTag the helper thread request tag
+     */
     private void insertDataEntry(MemoryHierarchyAccess access, int set, int tag, int helperThreadRequestTag) {
         if (tag == CacheLine.INVALID_TAG) {
             throw new IllegalArgumentException();
@@ -610,6 +753,13 @@ public class HelperThreadL2CacheRequestProfilingHelper {
         helperThreadL2CacheRequestVictimCache.getReplacementPolicy().handleInsertionOnMiss(access, set, newMiss.getWay());
     }
 
+    /**
+     * Insert a null entry in the victim cache.
+     *
+     * @param access the memory hierarchy access
+     * @param set the set index
+     * @param helperThreadRequestTag the helper thread request tag
+     */
     private void insertNullEntry(MemoryHierarchyAccess access, int set, int helperThreadRequestTag) {
         CacheAccess<HelperThreadL2CacheRequestVictimCacheLineState> newMiss = this.newMiss(0, set);
         CacheLine<HelperThreadL2CacheRequestVictimCacheLineState> line = newMiss.getLine();
@@ -620,6 +770,13 @@ public class HelperThreadL2CacheRequestProfilingHelper {
         helperThreadL2CacheRequestVictimCache.getReplacementPolicy().handleInsertionOnMiss(access, set, newMiss.getWay());
     }
 
+    /**
+     * Find the way of the victim cache line matching the specified helper thread L2 cache request tag.
+     *
+     * @param set the set index
+     * @param helperThreadRequestTag the helper thread request tag
+     * @return the way of the victim cache line matching the specified helper thread L2 cache request tag
+     */
     private int findWayOfVictimCacheLineByHelperThreadL2CacheRequestTag(int set, int helperThreadRequestTag) {
         for (int way = 0; way < this.l2CacheController.getCache().getAssociativity(); way++) {
             CacheLine<HelperThreadL2CacheRequestVictimCacheLineState> line = this.helperThreadL2CacheRequestVictimCache.getLine(set, way);
@@ -632,6 +789,12 @@ public class HelperThreadL2CacheRequestProfilingHelper {
         return -1;
     }
 
+    /**
+     * Invalidate the victim cache line for the specified set index and way.
+     *
+     * @param set the set index
+     * @param way the way
+     */
     private void invalidateVictimCacheLine(int set, int way) {
         CacheLine<HelperThreadL2CacheRequestVictimCacheLineState> line = this.helperThreadL2CacheRequestVictimCache.getLine(set, way);
         HelperThreadL2CacheRequestVictimCacheLineStateValueProvider stateProvider = (HelperThreadL2CacheRequestVictimCacheLineStateValueProvider) line.getStateProvider();
@@ -640,6 +803,12 @@ public class HelperThreadL2CacheRequestProfilingHelper {
         line.setTag(CacheLine.INVALID_TAG);
     }
 
+    /**
+     * Clear the victim tag and set the state to NULL in the victim cache line for the specified set index and way.
+     *
+     * @param set the set index
+     * @param way the way
+     */
     private void clearVictimInVictimCacheLine(int set, int way) {
         CacheLine<HelperThreadL2CacheRequestVictimCacheLineState> line = this.helperThreadL2CacheRequestVictimCache.getLine(set, way);
         HelperThreadL2CacheRequestVictimCacheLineStateValueProvider stateProvider = (HelperThreadL2CacheRequestVictimCacheLineStateValueProvider) line.getStateProvider();
@@ -647,10 +816,22 @@ public class HelperThreadL2CacheRequestProfilingHelper {
         line.setTag(CacheLine.INVALID_TAG);
     }
 
+    /**
+     * Get the LRU policy in the victim cache.
+     *
+     * @return the LRU policy in the victim cache
+     */
     private LRUPolicy<HelperThreadL2CacheRequestVictimCacheLineState> getLruPolicyForHelperThreadL2RequestVictimCache() {
         return (LRUPolicy<HelperThreadL2CacheRequestVictimCacheLineState>) this.helperThreadL2CacheRequestVictimCache.getReplacementPolicy();
     }
 
+    /**
+     * Create a new cache miss in the victim cache for the specified address.
+     *
+     * @param address the address
+     * @param set the set index
+     * @return the newly created cache miss in the victim cache for the specified address
+     */
     private CacheAccess<HelperThreadL2CacheRequestVictimCacheLineState> newMiss(int address, int set) {
         int tag = this.helperThreadL2CacheRequestVictimCache.getTag(address);
 
@@ -666,221 +847,264 @@ public class HelperThreadL2CacheRequestProfilingHelper {
     }
 
     /**
+     * Get the helper thread L2 cache request coverage.
      *
-     * @return
+     * @return the helper thread L2 cache request coverage
      */
     public double getHelperThreadL2CacheRequestCoverage() {
         return (this.numMainThreadL2CacheMisses + this.numUsefulHelperThreadL2CacheRequests) == 0 ? 0 : (double) this.numUsefulHelperThreadL2CacheRequests / (this.numMainThreadL2CacheMisses + this.numUsefulHelperThreadL2CacheRequests);
     }
 
     /**
+     * Get the helper thread L2 cache request accuracy.
      *
-     * @return
+     * @return the helper thread L2 cache request accuracy
      */
     public double getHelperThreadL2CacheRequestAccuracy() {
         return this.getNumTotalHelperThreadL2CacheRequests() == 0 ? 0 : (double) this.numUsefulHelperThreadL2CacheRequests / this.getNumTotalHelperThreadL2CacheRequests();
     }
 
     /**
+     * Get the helper thread L2 cache request states.
      *
-     * @return
+     * @return the helper thread L2 cache request states
      */
     public Map<Integer, Map<Integer, HelperThreadL2CacheRequestState>> getHelperThreadL2CacheRequestStates() {
         return helperThreadL2CacheRequestStates;
     }
 
     /**
+     * Get the helper thread L2 cache request  victim cache.
      *
-     * @return
+     * @return victim cache
      */
     public EvictableCache<HelperThreadL2CacheRequestVictimCacheLineState> getHelperThreadL2CacheRequestVictimCache() {
         return helperThreadL2CacheRequestVictimCache;
     }
 
     /**
+     * Get the helper thread L2 cache request quality predictor.
      *
-     * @return
+     * @return the helper thread L2 cache request quality predictor
      */
     public Predictor<HelperThreadL2CacheRequestQuality> getHelperThreadL2CacheRequestQualityPredictor() {
         return helperThreadL2CacheRequestQualityPredictor;
     }
 
     /**
+     * Get the number of main thread L2 cache hits.
      *
-     * @return
+     * @return the number of main thread L2 cache hits
      */
     public long getNumMainThreadL2CacheHits() {
         return numMainThreadL2CacheHits;
     }
 
     /**
+     * Get the number of main thread L2 cache misses.
      *
-     * @return
+     * @return the number of main thread L2 cache misses
      */
     public long getNumMainThreadL2CacheMisses() {
         return numMainThreadL2CacheMisses;
     }
 
     /**
+     * Get the number of helper thread L2 cache hits.
      *
-     * @return
+     * @return the number of helper thread L2 cache hits
      */
     public long getNumHelperThreadL2CacheHits() {
         return numHelperThreadL2CacheHits;
     }
 
     /**
+     * Get the number of helper thread L2 cache misses.
      *
-     * @return
+     * @return the number of helper thread L2 cache misses
      */
     public long getNumHelperThreadL2CacheMisses() {
         return numHelperThreadL2CacheMisses;
     }
 
     /**
+     * Get the number of total helper thread L2 cache requests.
      *
-     * @return
+     * @return the number of total helper thread L2 cache requests
      */
     public long getNumTotalHelperThreadL2CacheRequests() {
         return numHelperThreadL2CacheHits + numHelperThreadL2CacheMisses;
     }
 
     /**
+     * Get the number of redundant "hit to transient tag" helper thread L2 cache requests.
      *
-     * @return
+     * @return the number of redundant "hit to transient tag" helper thread L2 cache requests
      */
     public long getNumRedundantHitToTransientTagHelperThreadL2CacheRequests() {
         return numRedundantHitToTransientTagHelperThreadL2CacheRequests;
     }
 
     /**
+     * Get the number of redundant "hit to cache" helper thread L2 cache requests.
      *
-     * @return
+     * @return the number of redundant "hit to cache" helper thread L2 cache requests
      */
     public long getNumRedundantHitToCacheHelperThreadL2CacheRequests() {
         return numRedundantHitToCacheHelperThreadL2CacheRequests;
     }
 
     /**
+     * Get the number of useful helper thread L2 cache requests.
      *
-     * @return
+     * @return the number of useful helper thread L2 cache requests
      */
     public long getNumUsefulHelperThreadL2CacheRequests() {
         return numUsefulHelperThreadL2CacheRequests;
     }
 
     /**
+     * Get the number of timely helper thread L2 cache requests.
      *
-     * @return
+     * @return the number of timely helper thread L2 cache requests
      */
     public long getNumTimelyHelperThreadL2CacheRequests() {
         return numTimelyHelperThreadL2CacheRequests;
     }
 
     /**
+     * Get the number of late helper thread L2 cache requests.
      *
-     * @return
+     * @return the number of late helper thread L2 cache requests
      */
     public long getNumLateHelperThreadL2CacheRequests() {
         return numLateHelperThreadL2CacheRequests;
     }
 
     /**
+     * Get the number of bad helper thread L2 cache requests.
      *
-     * @return
+     * @return the number of late helper thread L2 cache requests
      */
     public long getNumBadHelperThreadL2CacheRequests() {
         return numBadHelperThreadL2CacheRequests;
     }
 
     /**
+     * Get the number of ugly helper thread L2 cache requests.
      *
-     * @return
+     * @return the number of ugly helper thread L2 cache requests
      */
     public long getNumUglyHelperThreadL2CacheRequests() {
         return numUglyHelperThreadL2CacheRequests;
     }
 
     /**
+     * Get a value indicating whether the checking of invariants is enabled or not.
      *
-     * @return
+     * @return a value indicating whether the checking of invariants is enabled or not
      */
     public boolean isCheckInvariantsEnabled() {
         return checkInvariantsEnabled;
     }
 
     /**
+     * Get the descriptive statistics of the number of cycles for the L2 cache misses.
      *
-     * @return
+     * @return the descriptive statistics of the number of cycles for the L2 cache misses
      */
     public DescriptiveStatistics getStatL2CacheMissNumCycles() {
         return statL2CacheMissNumCycles;
     }
 
     /**
+     * Get the descriptive statistics of the MLP costs for the L2 cache misses.
      *
-     * @return
+     * @return the descriptive statistics of the MLP costs for the L2 cache misses
      */
     public DescriptiveStatistics getStatL2CacheMissMlpCosts() {
         return statL2CacheMissMlpCosts;
     }
 
     /**
+     * Get the descriptive statistics of the average MLPs for the L2 cache misses.
      *
-     * @return
+     * @return the descriptive statistics of the average MLPs for the L2 cache misses
      */
     public DescriptiveStatistics getStatL2CacheMissAverageMlps() {
         return statL2CacheMissAverageMlps;
     }
 
     /**
+     * Get a value indicating whether the statistics of L2 cache request latencies is enabled or not.
      *
-     * @return
+     * @return a value indicating whether the statistics of L2 cache request latencies
      */
     public boolean isL2RequestLatencyStatsEnabled() {
         return l2RequestLatencyStatsEnabled;
     }
 
     /**
+     * Set a value indicating whether the statistics of L2 cache request latencies is enabled or not.
      *
-     * @param l2RequestLatencyStatsEnabled
+     * @param l2RequestLatencyStatsEnabled a value indicating whether the statistics of L2 cache request latencies is enabled or not
      */
     public void setL2RequestLatencyStatsEnabled(boolean l2RequestLatencyStatsEnabled) {
         this.l2RequestLatencyStatsEnabled = l2RequestLatencyStatsEnabled;
     }
 
     /**
-     *
+     * Helper thread L2 cache request victim cache line state.
      */
     public static enum HelperThreadL2CacheRequestVictimCacheLineState {
         /**
          * Invalid.
          */
         INVALID,
+
         /**
-         * NULL.
+         * Null.
          */
         NULL,
+
         /**
          * Data.
          */
         DATA
     }
 
+    /**
+     * Helper thread L2 cache request victim cache line state value provider.
+     *
+     */
     private static class HelperThreadL2CacheRequestVictimCacheLineStateValueProvider implements ValueProvider<HelperThreadL2CacheRequestVictimCacheLineState> {
         private HelperThreadL2CacheRequestVictimCacheLineState state;
         private int helperThreadRequestTag;
 
+        /**
+         * Create a helper thread L2 cache request victim cache line state value provider.
+         *
+         */
         public HelperThreadL2CacheRequestVictimCacheLineStateValueProvider() {
             this.state = HelperThreadL2CacheRequestVictimCacheLineState.INVALID;
             this.helperThreadRequestTag = CacheLine.INVALID_TAG;
         }
 
+        /**
+         * Get the value.
+         *
+         * @return the value
+         */
         @Override
         public HelperThreadL2CacheRequestVictimCacheLineState get() {
             return state;
         }
 
+        /**
+         * Get the initial value.
+         *
+         * @return the initial value
+         */
         @Override
         public HelperThreadL2CacheRequestVictimCacheLineState getInitialValue() {
             return HelperThreadL2CacheRequestVictimCacheLineState.INVALID;

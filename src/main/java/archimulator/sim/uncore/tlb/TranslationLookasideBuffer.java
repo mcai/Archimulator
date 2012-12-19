@@ -201,9 +201,9 @@ public class TranslationLookasideBuffer implements Named {
         }
 
         /**
-         * Get the state.
+         * Get the value.
          *
-         * @return the state
+         * @return the value
          */
         @Override
         public Boolean get() {
@@ -211,9 +211,9 @@ public class TranslationLookasideBuffer implements Named {
         }
 
         /**
-         * Get the initial state.
+         * Get the initial value.
          *
-         * @return the initial state
+         * @return the initial value
          */
         @Override
         public Boolean getInitialValue() {

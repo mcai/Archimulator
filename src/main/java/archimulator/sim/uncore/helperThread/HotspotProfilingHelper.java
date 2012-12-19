@@ -231,52 +231,52 @@ public class HotspotProfilingHelper {
         }
 
         /**
-         * Get the number of L1D accesses.
+         * Get the number of L1D cache accesses.
          *
-         * @return the number of L1D accesses
+         * @return the number of L1D cache accesses
          */
         public int getL1DAccesses() {
             return l1DAccesses;
         }
 
         /**
-         * Get the number of L1D hits.
+         * Get the number of L1D cache hits.
          *
-         * @return the number of L1D hits
+         * @return the number of L1D cache hits
          */
         public int getL1DHits() {
             return l1DHits;
         }
 
         /**
-         * Get the number of L1D misses.
+         * Get the number of L1D cache misses.
          *
-         * @return the number of L1D misses
+         * @return the number of L1D cache misses
          */
         public int getL1DMisses() {
             return l1DAccesses - l1DHits;
         }
 
         /**
-         * Get the L1D hit ratio.
+         * Get the L1D cache hit ratio.
          *
-         * @return the L1D hit ratio
+         * @return the L1D cache hit ratio
          */
         public double getL1DHitRatio() {
             return this.l1DAccesses > 0 ? (double) this.l1DHits / this.l1DAccesses : 0.0;
         }
 
         /**
-         * Get the number of L2 accesses.
+         * Get the number of L2 cache accesses.
          *
-         * @return the number of L2 accesses
+         * @return the number of L2 cache accesses
          */
         public int getL2Accesses() {
             return l2Accesses;
         }
 
         /**
-         * Get the number of L2 hits.
+         * Get the number of L2 cache hits.
          *
          * @return the number of L2 hits
          */
@@ -285,18 +285,18 @@ public class HotspotProfilingHelper {
         }
 
         /**
-         * Get the number of L2 misses.
+         * Get the number of L2 cache misses.
          *
-         * @return the number of L2 misses
+         * @return the number of L2 cache misses
          */
         public int getL2Misses() {
             return l2Accesses - l2Hits;
         }
 
         /**
-         * Get the L2 hit ratio.
+         * Get the L2 cache hit ratio.
          *
-         * @return the L2 hit ratio
+         * @return the L2 cache hit ratio
          */
         public double getL2HitRatio() {
             return this.l2Accesses > 0 ? (double) this.l2Hits / this.l2Accesses : 0.0;

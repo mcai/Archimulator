@@ -21,6 +21,7 @@ package archimulator.sim.uncore.helperThread;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 
 /**
+ * Pending L2 cache miss.
  *
  * @author Min Cai
  */
@@ -34,9 +35,10 @@ public class PendingL2Miss {
     private transient int mlpSum;
 
     /**
+     * Create a pending L2 cache miss.
      *
-     * @param access
-     * @param beginCycle
+     * @param access the memory hierarchy access
+     * @param beginCycle the time in cycles when the access begins
      */
     public PendingL2Miss(MemoryHierarchyAccess access, long beginCycle) {
         this.access = access;
@@ -44,96 +46,108 @@ public class PendingL2Miss {
     }
 
     /**
+     * Get the memory hierarchy access.
      *
-     * @return
+     * @return the memory hierarchy access
      */
     public MemoryHierarchyAccess getAccess() {
         return access;
     }
 
     /**
+     * Get the time in cycles when the access begins.
      *
-     * @return
+     * @return the time in cycles when the access begins
      */
     public long getBeginCycle() {
         return beginCycle;
     }
 
     /**
+     * Get the time in cycles when the access ends.
      *
-     * @return
+     * @return the time in cycles when the access ends
      */
     public long getEndCycle() {
         return endCycle;
     }
 
     /**
+     * Set the time in cycles when the access ends.
      *
-     * @param endCycle
+     * @param endCycle the time in cycles when the access ends
      */
     public void setEndCycle(long endCycle) {
         this.endCycle = endCycle;
     }
 
     /**
+     * Get the aggregated MLP cost.
      *
-     * @return
+     * @return the aggregated MLP cost
      */
     public double getMlpCost() {
         return mlpCost;
     }
 
     /**
+     * Set the aggregated MLP cost.
      *
-     * @param mlpCost
+     * @param mlpCost the aggregated MLP cost
      */
     public void setMlpCost(double mlpCost) {
         this.mlpCost = mlpCost;
     }
 
     /**
+     * Get the number of MLP samples.
      *
-     * @return
+     * @return the number of MLP samples
      */
     public int getNumMlpSamples() {
         return numMlpSamples;
     }
 
     /**
+     * Set the number of MLP samples.
      *
-     * @param numMlpSamples
+     * @param numMlpSamples the number of MLP samples
      */
     public void setNumMlpSamples(int numMlpSamples) {
         this.numMlpSamples = numMlpSamples;
     }
 
     /**
+     * Get the MLP sum.
      *
-     * @return
+     * @return the MLP sum
      */
     public int getMlpSum() {
         return mlpSum;
     }
 
     /**
+     * Set the MLP sum.
      *
-     * @param mlpSum
+     * @param mlpSum the MLP sum
      */
     public void setMlpSum(int mlpSum) {
         this.mlpSum = mlpSum;
     }
 
     /**
+     * Get the time in cycles spent servicing the access.
      *
-     * @return
+     * @return the time in cycles spent servicing the access
      */
     public int getNumCycles() {
         return (int) (this.endCycle - this.beginCycle);
     }
 
     /**
+     * Get the average MLP.
      *
-     * @return
+     * @return the average MLP
      */
     public double getAverageMlp() {
         return (double) mlpSum / (double) numMlpSamples;

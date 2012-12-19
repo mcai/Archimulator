@@ -26,33 +26,36 @@ import net.pickapack.util.ValueProvider;
 import net.pickapack.util.ValueProviderFactory;
 
 /**
+ * Cache based predictor.
  *
  * @author Min Cai
- * @param <PredictableT>
+ * @param <PredictableT> predictable type
  */
 public class CacheBasedPredictor<PredictableT extends Comparable<PredictableT>> implements Predictor<PredictableT> {
     private EvictableCache<Boolean> cache;
 
     /**
+     * Create a cache based predictor.
      *
-     * @param parent
-     * @param name
-     * @param geometry
-     * @param counterThreshold
-     * @param counterMaxValue
+     * @param parent the parent simulation object
+     * @param name the name of the cache based predictor
+     * @param geometry the geometry of the cache based predictor
+     * @param counterThreshold the threshold value of the counter
+     * @param counterMaxValue the maximum value of the counter
      */
     public CacheBasedPredictor(SimulationObject parent, String name, CacheGeometry geometry, final int counterThreshold, final int counterMaxValue) {
         this(parent, name, geometry, CacheReplacementPolicyType.LRU, counterThreshold, counterMaxValue);
     }
 
     /**
+     * Create a cache based predictor.
      *
-     * @param parent
-     * @param name
-     * @param geometry
-     * @param cacheReplacementPolicyType
-     * @param counterThreshold
-     * @param counterMaxValue
+     * @param parent the parent simulation object
+     * @param name the name of the cache based predictor
+     * @param geometry the geometry of the cache based predictor
+     * @param cacheReplacementPolicyType the type of the cache replacement policy
+     * @param counterThreshold the threshold value of the predictor
+     * @param counterMaxValue the maximum value of the predictor
      */
     public CacheBasedPredictor(SimulationObject parent, String name, CacheGeometry geometry, CacheReplacementPolicyType cacheReplacementPolicyType, final int counterThreshold, final int counterMaxValue) {
         ValueProviderFactory<Boolean, ValueProvider<Boolean>> cacheLineStateProviderFactory = new ValueProviderFactory<Boolean, ValueProvider<Boolean>>() {
@@ -65,11 +68,6 @@ public class CacheBasedPredictor<PredictableT extends Comparable<PredictableT>> 
         this.cache = new EvictableCache<Boolean>(parent, name, geometry, cacheReplacementPolicyType, cacheLineStateProviderFactory);
     }
 
-    /**
-     *
-     * @param address
-     * @param observedValue
-     */
     public void update(int address, PredictableT observedValue) {
         int set = this.cache.getSet(address);
         int tag = this.cache.getTag(address);
@@ -102,23 +100,26 @@ public class CacheBasedPredictor<PredictableT extends Comparable<PredictableT>> 
         }
     }
 
-    /**
-     *
-     * @param address
-     * @param defaultValue
-     * @return
-     */
     public PredictableT predict(int address, PredictableT defaultValue) {
         CacheLine<Boolean> lineFound = this.cache.findLine(address);
         BooleanValueProvider stateProvider = lineFound != null ? (BooleanValueProvider) lineFound.getStateProvider() : null;
         return lineFound != null && stateProvider.confidence.isTaken() ? stateProvider.predictedValue : defaultValue;
     }
 
+    /**
+     * Boolean value predictor.
+     */
     private class BooleanValueProvider implements ValueProvider<Boolean> {
         protected boolean state;
         private PredictableT predictedValue;
         private SaturatingCounter confidence;
 
+        /**
+         * Create a boolean value predictor.
+         *
+         * @param counterThreshold the threshold value of the counter
+         * @param counterMaxValue the maximum value of the counter
+         */
         public BooleanValueProvider(int counterThreshold, int counterMaxValue) {
             this.state = false;
 
@@ -126,11 +127,21 @@ public class CacheBasedPredictor<PredictableT extends Comparable<PredictableT>> 
             this.confidence = new SaturatingCounter(0, counterThreshold, counterMaxValue, 0);
         }
 
+        /**
+         * Get the value.
+         *
+         * @return the value
+         */
         @Override
         public Boolean get() {
             return state;
         }
 
+        /**
+         * Get the initial value.
+         *
+         * @return the initial value
+         */
         @Override
         public Boolean getInitialValue() {
             return false;
