@@ -19,6 +19,7 @@
 package archimulator.sim.uncore.net;
 
 /**
+ * Out buffer.
  *
  * @author Min Cai
  */
@@ -26,9 +27,10 @@ public class OutBuffer extends NetBuffer {
     private OutPort port;
 
     /**
+     * Create an out buffer.
      *
-     * @param port
-     * @param size
+     * @param port the out port
+     * @param size the size of the buffer
      */
     public OutBuffer(OutPort port, int size) {
         super(size);
@@ -36,8 +38,9 @@ public class OutBuffer extends NetBuffer {
     }
 
     /**
+     * End the writing of the specified message.
      *
-     * @param message
+     * @param message the message
      */
     public void endWrite(NetMessage message) {
         super.endWrite(message);
@@ -45,8 +48,9 @@ public class OutBuffer extends NetBuffer {
     }
 
     /**
+     * Get the out port.
      *
-     * @return
+     * @return the out port
      */
     @Override
     public OutPort getPort() {

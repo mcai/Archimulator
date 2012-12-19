@@ -29,22 +29,25 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Net.
  *
  * @author Min Cai
  */
 public abstract class Net extends BasicSimulationObject {
     /**
-     *
+     * The map of the destination devices to the End point nodes.
      */
     protected Map<MemoryDevice, EndPointNode> endPointNodes;
+
     /**
-     *
+     * The switch node.
      */
     protected SwitchNode switchNode;
 
     /**
+     * Create a net.
      *
-     * @param cacheHierarchy
+     * @param cacheHierarchy the parent cache hierarchy
      */
     public Net(CacheHierarchy cacheHierarchy) {
         super(cacheHierarchy);
@@ -56,11 +59,15 @@ public abstract class Net extends BasicSimulationObject {
     }
 
     /**
+     * Setup the net.
      *
-     * @param cacheHierarchy
+     * @param cacheHierarchy the parent cache hierarchy
      */
     protected abstract void setup(CacheHierarchy cacheHierarchy);
 
+    /**
+     * Calculate the routes.
+     */
     private void calculateRoutes() {
         Map<RoutingEntry, NetNode> routes = new HashMap<RoutingEntry, NetNode>();
 
@@ -132,10 +139,11 @@ public abstract class Net extends BasicSimulationObject {
     }
 
     /**
+     * Create a bi-directional link between the specified two nodes.
      *
-     * @param node1
-     * @param node2
-     * @param bandwidth
+     * @param node1 the first node
+     * @param node2 the second node
+     * @param bandwidth the bandwidth of the bi-directional link
      */
     protected void createBidirectionalLink(NetNode node1, NetNode node2, int bandwidth) {
         new NetLink(node1, node2, bandwidth);
@@ -143,16 +151,17 @@ public abstract class Net extends BasicSimulationObject {
     }
 
     /**
+     * Transfer a message of the specified size from the source device to the destination device.
      *
-     * @param sourceDevice
-     * @param destinationDevice
-     * @param size
-     * @param onCompletedCallback
+     * @param sourceDevice the source device
+     * @param destinationDevice the destination device
+     * @param size the size
+     * @param onCompletedCallback the callback action performed when the transfer is completed
      */
     public void transfer(MemoryDevice sourceDevice, MemoryDevice destinationDevice, int size, Action onCompletedCallback) {
         EndPointNode sourceNode = this.endPointNodes.get(sourceDevice);
         EndPointNode destinationNode = this.endPointNodes.get(destinationDevice);
         OutPort port = sourceNode.getPort(destinationNode);
-        port.toLink(new NetMessage(this, sourceNode, destinationNode, size, onCompletedCallback, this.getCycleAccurateEventQueue().getCurrentCycle()));
+        port.toLink(new NetMessage(this, sourceNode, destinationNode, size, onCompletedCallback));
     }
 }

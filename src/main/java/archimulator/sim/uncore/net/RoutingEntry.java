@@ -19,6 +19,7 @@
 package archimulator.sim.uncore.net;
 
 /**
+ * Routing entry.
  *
  * @author Min Cai
  */
@@ -29,9 +30,10 @@ public class RoutingEntry {
     private OutPort outPort;
 
     /**
+     * Create a routing entry from the source node to the destination node.
      *
-     * @param sourceNode
-     * @param destinationNode
+     * @param sourceNode the source node
+     * @param destinationNode the destination node
      */
     public RoutingEntry(NetNode sourceNode, NetNode destinationNode) {
         this.sourceNode = sourceNode;
@@ -39,48 +41,54 @@ public class RoutingEntry {
     }
 
     /**
+     * Get the source node.
      *
-     * @return
+     * @return the source node
      */
     public NetNode getSourceNode() {
         return sourceNode;
     }
 
     /**
+     * Get the destination node.
      *
-     * @return
+     * @return the destination node
      */
     public NetNode getDestinationNode() {
         return destinationNode;
     }
 
     /**
+     * Get the cost.
      *
-     * @return
+     * @return the cost
      */
     public int getCost() {
         return cost;
     }
 
     /**
+     * Set the cost.
      *
-     * @param cost
+     * @param cost the cost
      */
     public void setCost(int cost) {
         this.cost = cost;
     }
 
     /**
+     * Get the out port.
      *
-     * @return
+     * @return the out port
      */
     public OutPort getOutPort() {
         return outPort;
     }
 
     /**
+     * Set the out port.
      *
-     * @param outPort
+     * @param outPort the out port
      */
     public void setOutPort(OutPort outPort) {
         this.outPort = outPort;

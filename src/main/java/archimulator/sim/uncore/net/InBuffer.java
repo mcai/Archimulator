@@ -19,6 +19,7 @@
 package archimulator.sim.uncore.net;
 
 /**
+ * In buffer.
  *
  * @author Min Cai
  */
@@ -26,9 +27,10 @@ public class InBuffer extends NetBuffer {
     private InPort port;
 
     /**
+     * Create an in buffer.
      *
-     * @param port
-     * @param size
+     * @param port the in port
+     * @param size the size of the buffer
      */
     public InBuffer(InPort port, int size) {
         super(size);
@@ -36,8 +38,9 @@ public class InBuffer extends NetBuffer {
     }
 
     /**
+     * End the writing of the specified message.
      *
-     * @param message
+     * @param message the message
      */
     public void endWrite(NetMessage message) {
         super.endWrite(message);
@@ -45,8 +48,9 @@ public class InBuffer extends NetBuffer {
     }
 
     /**
+     * Get the in port.
      *
-     * @return
+     * @return the in port
      */
     @Override
     public InPort getPort() {

@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Net link.
  *
  * @author Min Cai
  */
@@ -35,10 +36,11 @@ public class NetLink {
     private List<Action> pendingActions;
 
     /**
+     * Create a net link from the source node to the destination node.
      *
-     * @param sourceNode
-     * @param destinationNode
-     * @param bandwidth
+     * @param sourceNode the source node
+     * @param destinationNode the destination node
+     * @param bandwidth the bandwidth of the link
      */
     public NetLink(NetNode sourceNode, NetNode destinationNode, int bandwidth) {
         this.sourcePort = sourceNode.findFreeOutPort();
@@ -53,8 +55,9 @@ public class NetLink {
     }
 
     /**
+     * Transfer the specified message to the in buffer.
      *
-     * @param message
+     * @param message the message
      */
     public void toInBuffer(final NetMessage message) {
         if (this.destinationPort.getBuffer() != null) {
@@ -86,20 +89,21 @@ public class NetLink {
                 }
             }
         } else {
-            message.complete(sourcePort.getNode().getNet().getCycleAccurateEventQueue().getCurrentCycle());
+            message.complete();
         }
     }
 
     /**
-     *
+     * Begin the transfer.
      */
     public void beginTransfer() {
         this.busy = true;
     }
 
     /**
+     * End the transfer of the specified message.
      *
-     * @param message
+     * @param message the message to end transferring
      */
     public void endTransfer(NetMessage message) {
         this.busy = false;
@@ -109,13 +113,17 @@ public class NetLink {
     }
 
     /**
+     * Add the specified action to the pending action list.
      *
-     * @param action
+     * @param action the action
      */
     public void addPendingAction(Action action) {
         this.pendingActions.add(action);
     }
 
+    /**
+     * Do pending actions.
+     */
     private void doPendingActions() {
         if (!this.pendingActions.isEmpty()) {
             Action action = this.pendingActions.get(0);
@@ -125,32 +133,36 @@ public class NetLink {
     }
 
     /**
+     * Get the source port.
      *
-     * @return
+     * @return the source port
      */
     public NetPort getSourcePort() {
         return sourcePort;
     }
 
     /**
+     * Get the destination port.
      *
-     * @return
+     * @return the destination port
      */
     public NetPort getDestinationPort() {
         return destinationPort;
     }
 
     /**
+     * Get the bandwidth of the link.
      *
-     * @return
+     * @return the bandwidth of the link
      */
     public int getBandwidth() {
         return bandwidth;
     }
 
     /**
+     * Get a value indicating whether the link is busy or not.
      *
-     * @return
+     * @return a value indicating whether the link is busy or not
      */
     public boolean isBusy() {
         return busy;

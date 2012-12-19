@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Net buffer.
  *
  * @author Min Cai
  */
@@ -32,11 +33,12 @@ public abstract class NetBuffer {
     private int count;
 
     /**
-     *
+     * A value indicating whether the net buffer is busy reading or not.
      */
     protected boolean readBusy;
+
     /**
-     *
+     * A value indicating whether the net buffer is busy writing or not.
      */
     protected boolean writeBusy;
 
@@ -45,8 +47,9 @@ public abstract class NetBuffer {
     private List<Action> pendingFullActions;
 
     /**
+     * Create a net buffer of the specified size.
      *
-     * @param size
+     * @param size the size of the net buffer
      */
     public NetBuffer(int size) {
         this.size = size;
@@ -57,15 +60,16 @@ public abstract class NetBuffer {
     }
 
     /**
-     *
+     * Begin the reading.
      */
     public void beginRead() {
         this.readBusy = true;
     }
 
     /**
+     * End the reading of the specified message.
      *
-     * @param message
+     * @param message the message
      */
     public void endRead(NetMessage message) {
         this.readBusy = false;
@@ -75,15 +79,16 @@ public abstract class NetBuffer {
     }
 
     /**
-     *
+     * Begin the writing.
      */
     public void beginWrite() {
         this.writeBusy = true;
     }
 
     /**
+     * End the writing of the specified message.
      *
-     * @param message
+     * @param message the message
      */
     public void endWrite(NetMessage message) {
         this.writeBusy = false;
@@ -92,29 +97,35 @@ public abstract class NetBuffer {
     }
 
     /**
+     * Add the specified action to the pending read action list.
      *
-     * @param action
+     * @param action the action
      */
     public void addPendingReadAction(Action action) {
         this.pendingReadActions.add(action);
     }
 
     /**
+     * Add the specified action to the pending write action list.
      *
-     * @param action
+     * @param action the action
      */
     public void addPendingWriteAction(Action action) {
         this.pendingWriteActions.add(action);
     }
 
     /**
+     * Add the specified action to the pending full action list.
      *
-     * @param action
+     * @param action the action
      */
     public void addPendingFullAction(Action action) {
         this.pendingFullActions.add(action);
     }
 
+    /**
+     * Do pending read actions.
+     */
     private void doPendingReadActions() {
         if (!this.pendingReadActions.isEmpty()) {
             Action action = this.pendingReadActions.get(0);
@@ -123,6 +134,9 @@ public abstract class NetBuffer {
         }
     }
 
+    /**
+     * Do pending write actions.
+     */
     private void doPendingWriteActions() {
         if (!this.pendingWriteActions.isEmpty()) {
             Action action = this.pendingWriteActions.get(0);
@@ -131,6 +145,9 @@ public abstract class NetBuffer {
         }
     }
 
+    /**
+     * Do pending full actions.
+     */
     private void doPendingFullActions() {
         if (!this.pendingFullActions.isEmpty()) {
             Action action = this.pendingFullActions.get(0);
@@ -140,38 +157,43 @@ public abstract class NetBuffer {
     }
 
     /**
+     * Get the port.
      *
-     * @return
+     * @return the port
      */
     public abstract NetPort getPort();
 
     /**
+     * Get the size of the buffer.
      *
-     * @return
+     * @return the size of the buffer
      */
     public int getSize() {
         return size;
     }
 
     /**
+     * Get the count of messages in the buffer.
      *
-     * @return
+     * @return the count of messages in the buffer
      */
     public int getCount() {
         return count;
     }
 
     /**
+     * Get a value indicating whether the buffer is busy reading or not.
      *
-     * @return
+     * @return a value indicating whether the buffer is busy reading or not
      */
     public boolean isReadBusy() {
         return readBusy;
     }
 
     /**
+     * Get a value indicating whether the buffer is busy writing or not.
      *
-     * @return
+     * @return a value indicating whether the buffer is busy writing or not
      */
     public boolean isWriteBusy() {
         return writeBusy;

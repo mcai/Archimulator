@@ -21,6 +21,7 @@ package archimulator.sim.uncore.net;
 import net.pickapack.action.Action;
 
 /**
+ * Net message.
  *
  * @author Min Cai
  */
@@ -34,15 +35,15 @@ public class NetMessage {
     private long beginCycle;
 
     /**
+     * Create a net message.
      *
-     * @param net
-     * @param sourceNode
-     * @param destinationNode
-     * @param size
-     * @param onCompletedCallback
-     * @param beginCycle
+     * @param net the parent net
+     * @param sourceNode the source node
+     * @param destinationNode the destination node
+     * @param size the size of the message
+     * @param onCompletedCallback the callback action performed when the transfer of the message is completed
      */
-    public NetMessage(Net net, NetNode sourceNode, NetNode destinationNode, int size, Action onCompletedCallback, long beginCycle) {
+    public NetMessage(Net net, NetNode sourceNode, NetNode destinationNode, int size, Action onCompletedCallback) {
         this.id = net.getSimulation().currentNetMessageId++;
 
         this.sourceNode = sourceNode;
@@ -50,54 +51,56 @@ public class NetMessage {
         this.size = size;
         this.onCompletedCallback = onCompletedCallback;
 
-        this.beginCycle = beginCycle;
+        this.beginCycle = net.getCycleAccurateEventQueue().getCurrentCycle();
     }
 
     /**
-     *
-     * @param endCycle
+     * Complete the transferring of the message.
      */
-    public void complete(long endCycle) {
+    public void complete() {
         this.onCompletedCallback.apply();
-
-//        System.out.printf("%s -> %s: size: %d, latency: %d%n", sourceNode.getName(), destinationNode.getName(), size, (endCycle - beginCycle));
     }
 
     /**
+     * Get the ID of the message.
      *
-     * @return
+     * @return the ID of the message
      */
     public long getId() {
         return id;
     }
 
     /**
+     * Get the source node.
      *
-     * @return
+     * @return the source node
      */
     public NetNode getSourceNode() {
         return sourceNode;
     }
 
     /**
+     * Get the destination node.
      *
-     * @return
+     * @return the destination node
      */
     public NetNode getDestinationNode() {
         return destinationNode;
     }
 
     /**
+     * Get the size of the message.
      *
-     * @return
+     * @return the size of the message
      */
     public int getSize() {
         return size;
     }
 
     /**
+     * Get the time in cycles when the message begins transferring.
      *
-     * @return
+     * @return the time in cycles when the message begins transferring
      */
     public long getBeginCycle() {
         return beginCycle;

@@ -21,21 +21,24 @@ package archimulator.sim.uncore.net;
 import archimulator.sim.uncore.CacheHierarchy;
 
 /**
+ * The net for connecting the L2 cache controller to the memory controller.
  *
  * @author Min Cai
  */
 public class L2ToMemNet extends Net {
     /**
+     * Create a net for connecting the L2 cache controller to the memory controller.
      *
-     * @param cacheHierarchy
+     * @param cacheHierarchy the cache hierarchy
      */
     public L2ToMemNet(CacheHierarchy cacheHierarchy) {
         super(cacheHierarchy);
     }
 
     /**
+     * Setup the net.
      *
-     * @param cacheHierarchy
+     * @param cacheHierarchy the parent cache hierarchy
      */
     @Override
     protected void setup(CacheHierarchy cacheHierarchy) {
@@ -57,6 +60,11 @@ public class L2ToMemNet extends Net {
         this.createBidirectionalLink(memoryControllerNode, this.switchNode, 32);
     }
 
+    /**
+     * Get the name of the net.
+     *
+     * @return the name of the net
+     */
     @Override
     public String getName() {
         return "l2ToMemNet";

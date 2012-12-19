@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Cross bar.
  *
  * @author Min Cai
  */
@@ -34,9 +35,10 @@ public class Crossbar {
     private List<Action> pendingActions;
 
     /**
+     * Create a cross bar.
      *
-     * @param node
-     * @param bandwidth
+     * @param node the node
+     * @param bandwidth the bandwidth
      */
     public Crossbar(NetNode node, int bandwidth) {
         this.node = node;
@@ -45,8 +47,9 @@ public class Crossbar {
     }
 
     /**
+     * Transfer a message to the out buffer.
      *
-     * @param message
+     * @param message the message to be transferred to the out buffer
      */
     public void toOutBuffer(final NetMessage message) {
         final OutPort destinationPort = this.node.getPort(message.getDestinationNode());
@@ -82,15 +85,16 @@ public class Crossbar {
     }
 
     /**
-     *
+     * Begin the transfer.
      */
     public void beginTransfer() {
         this.busy = true;
     }
 
     /**
+     * End the transfer.
      *
-     * @param message
+     * @param message the message to end transfer
      */
     public void endTransfer(NetMessage message) {
         this.busy = false;
@@ -99,13 +103,17 @@ public class Crossbar {
     }
 
     /**
+     * Add the specified action to the pending action list.
      *
-     * @param action
+     * @param action the action
      */
     public void addPendingAction(Action action) {
         this.pendingActions.add(action);
     }
 
+    /**
+     * Do pending actions.
+     */
     private void doPendingActions() {
         if (!this.pendingActions.isEmpty()) {
             Action action = this.pendingActions.get(0);
@@ -115,24 +123,27 @@ public class Crossbar {
     }
 
     /**
+     * Get the node.
      *
-     * @return
+     * @return the node
      */
     public NetNode getNode() {
         return node;
     }
 
     /**
+     * Get the bandwidth.
      *
-     * @return
+     * @return the bandwidth
      */
     public int getBandwidth() {
         return bandwidth;
     }
 
     /**
+     * Get a value indicating whether the cross bar is busy or not.
      *
-     * @return
+     * @return a value indicating whether the cross bar is busy or not
      */
     public boolean isBusy() {
         return busy;

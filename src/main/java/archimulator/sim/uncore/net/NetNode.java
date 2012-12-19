@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Net node.
  *
  * @author Min Cai
  */
@@ -38,14 +39,15 @@ public abstract class NetNode {
     private Map<NetNode, RoutingEntry> routingEntries;
 
     /**
+     * Create a net node.
      *
-     * @param net
-     * @param name
-     * @param numInPorts
-     * @param inBufferSize
-     * @param numOutPorts
-     * @param outBufferSize
-     * @param bandwidth
+     * @param net the parent net
+     * @param name the name of the net node
+     * @param numInPorts the number of in ports
+     * @param inBufferSize the size of the in buffer
+     * @param numOutPorts the number of out ports
+     * @param outBufferSize the size of the out buffer
+     * @param bandwidth the bandwidth of the net node
      */
     public NetNode(Net net, String name, int numInPorts, int inBufferSize, int numOutPorts, int outBufferSize, int bandwidth) {
         this.net = net;
@@ -67,26 +69,29 @@ public abstract class NetNode {
     }
 
     /**
+     * Find a free in port.
      *
-     * @return
+     * @return a free in port if any exists; otherwise null
      */
     public InPort findFreeInPort() {
         return this.findFreePort(this.inPorts);
     }
 
     /**
+     * Find a free out port.
      *
-     * @return
+     * @return a free out port if any exists; otherwise null
      */
     public OutPort findFreeOutPort() {
         return this.findFreePort(this.outPorts);
     }
 
     /**
+     * Find a free port among the specified list of ports.
      *
-     * @param <NetPortT>
-     * @param ports
-     * @return
+     * @param <NetPortT> port type
+     * @param ports the list of ports to be searched
+     * @return a free port found among the specified list of ports if any exists; otherwise null
      */
     protected <NetPortT extends NetPort> NetPortT findFreePort(List<NetPortT> ports) {
         for (NetPortT port : ports) {
@@ -99,57 +104,64 @@ public abstract class NetNode {
     }
 
     /**
+     * Get the out port for the specified destination node.
      *
-     * @param destinationNode
-     * @return
+     * @param destinationNode the destination node
+     * @return the out port for the specified destination node
      */
     public OutPort getPort(NetNode destinationNode) {
         return this.routingEntries.get(destinationNode).getOutPort();
     }
 
     /**
+     * Get the parent net.
      *
-     * @return
+     * @return the parent net
      */
     public Net getNet() {
         return net;
     }
 
     /**
+     * Get the name of the net node.
      *
-     * @return
+     * @return the name of the net node
      */
     public String getName() {
         return name;
     }
 
     /**
+     * Get the list of the out ports.
      *
-     * @return
+     * @return the list of the out ports
      */
     public List<OutPort> getOutPorts() {
         return outPorts;
     }
 
     /**
+     * Get the list of the in ports.
      *
-     * @return
+     * @return the list of the in ports
      */
     public List<InPort> getInPorts() {
         return inPorts;
     }
 
     /**
+     * Get the cross bar.
      *
-     * @return
+     * @return the cross bar
      */
     public Crossbar getCrossbar() {
         return crossbar;
     }
 
     /**
+     * Get the map of the destination nodes to the routing entries.
      *
-     * @return
+     * @return the map of the destination nodes to the routing entries
      */
     public Map<NetNode, RoutingEntry> getRoutingEntries() {
         return routingEntries;
