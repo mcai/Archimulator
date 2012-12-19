@@ -19,6 +19,7 @@
 package archimulator.sim.uncore;
 
 /**
+ * Memory hierarchy access type.
  *
  * @author Min Cai
  */
@@ -27,14 +28,17 @@ public enum MemoryHierarchyAccessType {
      * Instruction fetch.
      */
     IFETCH,
+
     /**
      * Load.
      */
     LOAD,
+
     /**
      * Store.
      */
     STORE,
+
     /**
      * Unknown.
      */

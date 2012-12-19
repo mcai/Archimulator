@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Point to point reorder buffer.
  *
  * @author Min Cai
  */
@@ -36,9 +37,10 @@ public class PointToPointReorderBuffer {
     private long lastCompletedMessageId = -1;
 
     /**
+     * Create a point to point reorder buffer from the source controller to the destination controller.
      *
-     * @param from
-     * @param to
+     * @param from the source controller
+     * @param to   the destination controller
      */
     public PointToPointReorderBuffer(Controller from, Controller to) {
         this.from = from;
@@ -47,16 +49,18 @@ public class PointToPointReorderBuffer {
     }
 
     /**
+     * Transfer the specified message.
      *
-     * @param message
+     * @param message the message
      */
     public void transfer(CoherenceMessage message) {
         this.messages.add(message);
     }
 
     /**
+     * Act on when a message arrives at the destination.
      *
-     * @param message
+     * @param message the message
      */
     public void onDestinationArrived(CoherenceMessage message) {
         message.onDestinationArrived();
@@ -64,7 +68,7 @@ public class PointToPointReorderBuffer {
     }
 
     /**
-     *
+     * Commit. Remove and notify the completion of the completed messages from the list of messages.
      */
     public void commit() {
         while (!this.messages.isEmpty()) {
@@ -90,24 +94,27 @@ public class PointToPointReorderBuffer {
     }
 
     /**
+     * Get the list of messages.
      *
-     * @return
+     * @return the list of messages
      */
     public List<CoherenceMessage> getMessages() {
         return messages;
     }
 
     /**
+     * Get the source controller.
      *
-     * @return
+     * @return the source controller
      */
     public Controller getFrom() {
         return from;
     }
 
     /**
+     * Get the destination controller.
      *
-     * @return
+     * @return the destination controller
      */
     public Controller getTo() {
         return to;

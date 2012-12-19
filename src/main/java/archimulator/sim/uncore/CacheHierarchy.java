@@ -32,70 +32,81 @@ import archimulator.sim.uncore.tlb.TranslationLookasideBuffer;
 import java.util.List;
 
 /**
+ * Cache hierarchy.
  *
  * @author Min Cai
  */
 public interface CacheHierarchy extends SimulationObject {
     /**
+     * Transfer a message of the specified size from the source controller to the destination controller.
      *
-     * @param from
-     * @param to
-     * @param size
-     * @param message
+     * @param from    the source controller
+     * @param to      the destination controller
+     * @param size    the size of the message to be transferred
+     * @param message the message to be transferred
      */
     void transfer(Controller from, Controller to, int size, CoherenceMessage message);
 
     /**
+     * Get the memory controller.
      *
-     * @return
+     * @return the memory controller
      */
     MemoryController getMemoryController();
 
     /**
+     * Get the L2 cache controller.
      *
-     * @return
+     * @return the L2 cache controller
      */
     DirectoryController getL2CacheController();
 
     /**
+     * Get the L1I cache controller.
      *
-     * @return
+     * @return the L1I cache controller
      */
     List<CacheController> getL1ICacheControllers();
 
     /**
+     * Get the L1D cache controller.
      *
-     * @return
+     * @return the L1D cache controller
      */
     List<CacheController> getL1DCacheControllers();
 
     /**
+     * Get the list of instruction translation lookaside buffers (iTLBs).
      *
-     * @return
+     * @return the list of instruction translation lookaside buffers (iTLBs)
      */
     List<TranslationLookasideBuffer> getItlbs();
 
     /**
+     * Get the list of data translation lookaside buffers (dTLBs).
      *
-     * @return
+     * @return the list of data translation lookaside buffers (dTLBs)
      */
     List<TranslationLookasideBuffer> getDtlbs();
 
     /**
+     * Get the net for the L1 cache controllers to the L2 cache controller.
      *
-     * @return
+     * @return the net for the L1 cache controllers to the L2 cache controller
      */
-    Net getL1sToL2Network();
+    Net getL1sToL2Net();
 
     /**
+     * Get the net for the L2 cache controller to the memory controller.
      *
-     * @return
+     * @return the net for the L2 cache controller to the memory controller
      */
-    L2ToMemNet getL2ToMemNetwork();
+    L2ToMemNet getL2ToMemNet();
 
     /**
+     * Dump the cache controller finite state machine statistics.
      *
-     * @param stats
+     * @param stats the list of statistics to be manipulated
      */
     void dumpCacheControllerFsmStats(List<ExperimentStat> stats);
 }

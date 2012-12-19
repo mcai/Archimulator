@@ -22,55 +22,64 @@ import archimulator.sim.common.SimulationObject;
 import archimulator.sim.uncore.tlb.TranslationLookasideBuffer;
 
 /**
+ * Memory hierarchy thread.
  *
  * @author Min Cai
  */
 public interface MemoryHierarchyThread extends SimulationObject {
     /**
+     * Get the number of the memory hierarchy thread.
      *
-     * @return
+     * @return the number of the memory hierarchy thread
      */
     int getNum();
 
     /**
+     * Get the ID of the memory hierarchy thread.
      *
-     * @return
+     * @return the ID of the memory hierarchy thread
      */
     int getId();
 
     /**
+     * Get the name of the memory hierarchy thread.
      *
-     * @return
+     * @return the name of the memory hierarchy thread
      */
     String getName();
 
     /**
+     * Get the instruction translation lookaside buffer (iTLB).
      *
-     * @return
+     * @return the instruction translation lookaside buffer (iTLB)
      */
     TranslationLookasideBuffer getItlb();
 
     /**
+     * Set the instruction translation lookaside buffer (iTLB).
      *
-     * @param itlb
+     * @param itlb the instruction translation lookaside buffer (iTLB)
      */
     void setItlb(TranslationLookasideBuffer itlb);
 
     /**
+     * Get the data translation lookaside buffer (dTLB).
      *
-     * @return
+     * @return the data translation lookaside buffer (dTLB)
      */
     TranslationLookasideBuffer getDtlb();
 
     /**
+     * Set the data translation lookaside buffer (dTLB).
      *
-     * @param dtlb
+     * @param dtlb the data translation lookaside buffer (dTLB)
      */
     void setDtlb(TranslationLookasideBuffer dtlb);
 
     /**
+     * Get the parent core.
      *
-     * @return
+     * @return the parent core.
      */
     MemoryHierarchyCore getCore();
 }

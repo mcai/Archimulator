@@ -26,6 +26,7 @@ import net.pickapack.action.Action;
 import java.io.Serializable;
 
 /**
+ * Memory device.
  *
  * @author Min Cai
  */
@@ -34,9 +35,10 @@ public abstract class MemoryDevice extends BasicSimulationObject implements Simu
     private String name;
 
     /**
+     * Create a memory device.
      *
-     * @param cacheHierarchy
-     * @param name
+     * @param cacheHierarchy the parent cache hierarchy
+     * @param name           the name of the memory device
      */
     public MemoryDevice(CacheHierarchy cacheHierarchy, String name) {
         super(cacheHierarchy);
@@ -46,33 +48,37 @@ public abstract class MemoryDevice extends BasicSimulationObject implements Simu
     }
 
     /**
+     * Transfer a message of the specified size from the device itself to the destination.
      *
-     * @param to
-     * @param size
-     * @param action
+     * @param to     the destination device
+     * @param size   the size of the message to be transferred
+     * @param action the callback action performed when the message arrives at the destination
      */
     public void transfer(MemoryDevice to, int size, Action action) {
         this.getNet(to).transfer(this, to, size, action);
     }
 
     /**
+     * Get the net for the specified destination device
      *
-     * @param to
-     * @return
+     * @param to the destination device
+     * @return the net for the specified destination device
      */
     protected abstract Net getNet(MemoryDevice to);
 
     /**
+     * Get the parent cache hierarchy.
      *
-     * @return
+     * @return the parent cache hierarchy
      */
     public CacheHierarchy getCacheHierarchy() {
         return cacheHierarchy;
     }
 
     /**
+     * Get the name of the memory device.
      *
-     * @return
+     * @return the name of the memory device
      */
     public String getName() {
         return name;

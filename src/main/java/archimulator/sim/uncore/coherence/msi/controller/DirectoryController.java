@@ -82,7 +82,7 @@ public class DirectoryController extends GeneralCacheController<DirectoryControl
 
     @Override
     protected Net getNet(MemoryDevice to) {
-        return to instanceof MemoryController ? this.getCacheHierarchy().getL2ToMemNetwork() : this.getCacheHierarchy().getL1sToL2Network();
+        return to instanceof MemoryController ? this.getCacheHierarchy().getL2ToMemNet() : this.getCacheHierarchy().getL1sToL2Net();
     }
 
     public MemoryController getNext() {

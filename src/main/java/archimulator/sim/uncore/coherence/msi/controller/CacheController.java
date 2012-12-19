@@ -121,7 +121,7 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
      * @return the newly created memory hierarchy access
      */
     public MemoryHierarchyAccess beginAccess(DynamicInstruction dynamicInstruction, MemoryHierarchyThread thread, MemoryHierarchyAccessType type, int virtualPc, int physicalAddress, int physicalTag, Action onCompletedCallback) {
-        MemoryHierarchyAccess newAccess = new MemoryHierarchyAccess(dynamicInstruction, thread, type, virtualPc, physicalAddress, physicalTag, onCompletedCallback, this.getCycleAccurateEventQueue().getCurrentCycle());
+        MemoryHierarchyAccess newAccess = new MemoryHierarchyAccess(dynamicInstruction, thread, type, virtualPc, physicalAddress, physicalTag, onCompletedCallback);
 
         MemoryHierarchyAccess access = this.findAccess(physicalTag);
 
@@ -143,10 +143,10 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
     public void endAccess(int physicalTag) {
         MemoryHierarchyAccess access = this.findAccess(physicalTag);
 
-        access.complete(this.getCycleAccurateEventQueue().getCurrentCycle());
+        access.complete();
 
         for (MemoryHierarchyAccess alias : access.getAliases()) {
-            alias.complete(this.getCycleAccurateEventQueue().getCurrentCycle());
+            alias.complete();
         }
 
         MemoryHierarchyAccessType type = access.getType();
@@ -163,7 +163,7 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
      */
     @Override
     protected Net getNet(MemoryDevice to) {
-        return this.getCacheHierarchy().getL1sToL2Network();
+        return this.getCacheHierarchy().getL1sToL2Net();
     }
 
     /**

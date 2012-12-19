@@ -22,6 +22,7 @@ import archimulator.sim.common.SimulationEvent;
 import archimulator.sim.core.Thread;
 
 /**
+ * The event when a memory access is initiated.
  *
  * @author Min Cai
  */
@@ -33,12 +34,13 @@ public class MemoryAccessInitiatedEvent extends SimulationEvent {
     private MemoryHierarchyAccessType type;
 
     /**
+     * Create an event when a memory access is initiated.
      *
-     * @param thread
-     * @param virtualPc
-     * @param physicalAddress
-     * @param physicalTag
-     * @param type
+     * @param thread          the thread
+     * @param virtualPc       the virtual address of the program counter (PC)
+     * @param physicalAddress the physical address of the data under access
+     * @param physicalTag     the physical tag of the data under access
+     * @param type            the memory hierarchy access type
      */
     public MemoryAccessInitiatedEvent(Thread thread, int virtualPc, int physicalAddress, int physicalTag, MemoryHierarchyAccessType type) {
         super(thread);
@@ -50,40 +52,45 @@ public class MemoryAccessInitiatedEvent extends SimulationEvent {
     }
 
     /**
+     * Get the ID of the thread.
      *
-     * @return
+     * @return the ID of the thread
      */
     public int getThreadId() {
         return threadId;
     }
 
     /**
+     * Get the virtual address of the program counter (PC).
      *
-     * @return
+     * @return the virtual address of the program counter (PC)
      */
     public int getVirtualPc() {
         return virtualPc;
     }
 
     /**
+     * Get the physical address of the data under access.
      *
-     * @return
+     * @return the physical address of the data under access
      */
     public int getPhysicalAddress() {
         return physicalAddress;
     }
 
     /**
+     * Get the physical tag of the data under access.
      *
-     * @return
+     * @return the physical tag of the data under access
      */
     public int getPhysicalTag() {
         return physicalTag;
     }
 
     /**
+     * Get the memory hierarchy access type.
      *
-     * @return
+     * @return the memory hierarchy access type
      */
     public MemoryHierarchyAccessType getType() {
         return type;

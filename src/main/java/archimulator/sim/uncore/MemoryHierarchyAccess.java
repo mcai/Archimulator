@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Memory hierarchy access.
  *
  * @author Min Cai
  */
@@ -45,17 +46,17 @@ public class MemoryHierarchyAccess {
     private long endCycle;
 
     /**
+     * Create a memory hierarchy access.
      *
-     * @param dynamicInstruction
-     * @param thread
-     * @param type
-     * @param virtualPc
-     * @param physicalAddress
-     * @param physicalTag
-     * @param onCompletedCallback
-     * @param beginCycle
+     * @param dynamicInstruction  the dynamic instruction
+     * @param thread              the thread
+     * @param type                the type of the memory hierarchy access
+     * @param virtualPc           the virtual address of the program counter (PC)
+     * @param physicalAddress     the physical address of the data under access
+     * @param physicalTag         the physical tag of the data under access
+     * @param onCompletedCallback the callback action performed when the access is completed
      */
-    public MemoryHierarchyAccess(DynamicInstruction dynamicInstruction, MemoryHierarchyThread thread, MemoryHierarchyAccessType type, int virtualPc, int physicalAddress, int physicalTag, Action onCompletedCallback, long beginCycle) {
+    public MemoryHierarchyAccess(DynamicInstruction dynamicInstruction, MemoryHierarchyThread thread, MemoryHierarchyAccessType type, int virtualPc, int physicalAddress, int physicalTag, Action onCompletedCallback) {
         this.id = thread.getSimulation().currentMemoryHierarchyAccessId++;
 
         this.dynamicInstruction = dynamicInstruction;
@@ -70,102 +71,112 @@ public class MemoryHierarchyAccess {
 
         this.aliases = new ArrayList<MemoryHierarchyAccess>();
 
-        this.beginCycle = beginCycle;
+        this.beginCycle = thread.getCycleAccurateEventQueue().getCurrentCycle();
     }
 
     /**
-     *
-     * @param currentCycle
+     * Act on when the access is completed.
      */
-    public void complete(long currentCycle) {
-        this.endCycle = currentCycle;
+    public void complete() {
+        this.endCycle = this.thread.getCycleAccurateEventQueue().getCurrentCycle();
         this.onCompletedCallback.apply();
         this.onCompletedCallback = null;
     }
 
     /**
+     * Get the ID of the memory hierarchy access.
      *
-     * @return
+     * @return the ID of the memory hierarchy access
      */
     public long getId() {
         return id;
     }
 
     /**
+     * Get the dynamic instruction.
      *
-     * @return
+     * @return the dynamic instruction
      */
     public DynamicInstruction getDynamicInstruction() {
         return dynamicInstruction;
     }
 
     /**
+     * Get the thread.
      *
-     * @return
+     * @return the thread
      */
     public MemoryHierarchyThread getThread() {
         return thread;
     }
 
     /**
+     * Get the memory hierarchy access type.
      *
-     * @return
+     * @return the memory hierarchy access type
      */
     public MemoryHierarchyAccessType getType() {
         return type;
     }
 
     /**
+     * Get the virtual address of the program counter (PC).
      *
-     * @return
+     * @return the virtual address of the program counter (PC)
      */
     public int getVirtualPc() {
         return virtualPc;
     }
 
     /**
+     * Get the physical address of the data under access.
      *
-     * @return
+     * @return the physical address of the data under access
      */
     public int getPhysicalAddress() {
         return physicalAddress;
     }
 
     /**
+     * Get the physical tag of the data under access.
      *
-     * @return
+     * @return the physical tag of the data under access
      */
     public int getPhysicalTag() {
         return physicalTag;
     }
 
     /**
+     * Get the list of aliases.
      *
-     * @return
+     * @return the list of aliases
      */
     public List<MemoryHierarchyAccess> getAliases() {
         return aliases;
     }
 
     /**
+     * Get the time in cycles when the access begins.
      *
-     * @return
+     * @return the time in cycles when the access begins
      */
     public long getBeginCycle() {
         return beginCycle;
     }
 
     /**
+     * Get the time in cycles when the access ends.
      *
-     * @return
+     * @return the time in cycles when the access ends
      */
     public long getEndCycle() {
         return endCycle;
     }
 
     /**
+     * Get the time in cycles spent servicing the access.
      *
-     * @return
+     * @return the time in cycles spent servicing the access
      */
     public int getCycles() {
         return (int) (endCycle - beginCycle);

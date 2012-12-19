@@ -43,6 +43,7 @@ import java.io.Serializable;
 import java.util.*;
 
 /**
+ * Basic cache hierarchy.
  *
  * @author Min Cai
  */
@@ -55,17 +56,18 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
     private List<TranslationLookasideBuffer> itlbs;
     private List<TranslationLookasideBuffer> dtlbs;
 
-    private L1sToL2Net l1sToL2Network;
-    private L2ToMemNet l2ToMemNetwork;
+    private L1sToL2Net l1sToL2Net;
+    private L2ToMemNet l2ToMemNet;
 
     private Map<Controller, Map<Controller, PointToPointReorderBuffer>> p2pReorderBuffers;
 
     /**
+     * Create a basic cache hierarchy.
      *
-     * @param experiment
-     * @param simulation
-     * @param blockingEventDispatcher
-     * @param cycleAccurateEventQueue
+     * @param experiment              the experiment
+     * @param simulation              the simulation
+     * @param blockingEventDispatcher the blocking event dispatcher
+     * @param cycleAccurateEventQueue the cycle accurate event queue
      */
     public BasicCacheHierarchy(Experiment experiment, Simulation simulation, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
         super(experiment, simulation, blockingEventDispatcher, cycleAccurateEventQueue);
@@ -109,15 +111,16 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
             }
         }
 
-        this.l1sToL2Network = new L1sToL2Net(this);
-        this.l2ToMemNetwork = new L2ToMemNet(this);
+        this.l1sToL2Net = new L1sToL2Net(this);
+        this.l2ToMemNet = new L2ToMemNet(this);
 
         this.p2pReorderBuffers = new HashMap<Controller, Map<Controller, PointToPointReorderBuffer>>();
     }
 
     /**
+     * Dump the cache controller finite state machine statistics.
      *
-     * @param stats
+     * @param stats the list of statistics to be manipulated
      */
     @Override
     public void dumpCacheControllerFsmStats(List<ExperimentStat> stats) {
@@ -131,12 +134,20 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
         dumpCacheControllerFsmStats(stats, this.l2CacheController);
     }
 
+    /**
+     * Dump the statistics for the specified general cache controller.
+     *
+     * @param stats           the list of statistics to be manipulated
+     * @param cacheController the general cache controller
+     * @param <StateT>        state
+     * @param <ConditionT>    transition
+     */
     @SuppressWarnings("unchecked")
     private <StateT extends Serializable, ConditionT> void dumpCacheControllerFsmStats(List<ExperimentStat> stats, GeneralCacheController<StateT, ConditionT> cacheController) {
         List<BasicFiniteStateMachine<StateT, ConditionT>> fsms = new ArrayList<BasicFiniteStateMachine<StateT, ConditionT>>();
 
-        for(int set = 0; set < cacheController.getCache().getNumSets(); set++) {
-            for(CacheLine<StateT> line : cacheController.getCache().getLines(set)) {
+        for (int set = 0; set < cacheController.getCache().getNumSets(); set++) {
+            for (CacheLine<StateT> line : cacheController.getCache().getLines(set)) {
                 BasicFiniteStateMachine<StateT, ConditionT> fsm = (BasicFiniteStateMachine<StateT, ConditionT>) line.getStateProvider();
                 fsms.add(fsm);
             }
@@ -146,17 +157,18 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
 
         cacheController.getFsmFactory().dump(PREFIX_CC_FSM + cacheController.getName(), fsms, statsMap);
 
-        for(Map.Entry<String, String> entry : statsMap.entrySet()) {
+        for (Map.Entry<String, String> entry : statsMap.entrySet()) {
             stats.add(new ExperimentStat(getExperiment(), getSimulation().getPrefix(), entry.getKey(), entry.getValue()));
         }
     }
 
     /**
+     * Transfer a message of the specified size from the source device to the destination device.
      *
-     * @param from
-     * @param to
-     * @param size
-     * @param message
+     * @param from    the source device
+     * @param to      the destination device
+     * @param size    the size of the message to be transferred
+     * @param message the message to be transferred
      */
     @Override
     public void transfer(final Controller from, final Controller to, int size, final CoherenceMessage message) {
@@ -179,40 +191,45 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
     }
 
     /**
+     * Get the memory controller.
      *
-     * @return
+     * @return the memory controller
      */
     public MemoryController getMemoryController() {
         return memoryController;
     }
 
     /**
+     * Get the L2 cache controller.
      *
-     * @return
+     * @return the L2 cache controller
      */
     public DirectoryController getL2CacheController() {
         return l2CacheController;
     }
 
     /**
+     * Get the list of L1I cache controllers.
      *
-     * @return
+     * @return the list of L1I cache controllers
      */
     public List<CacheController> getL1ICacheControllers() {
         return l1ICacheControllers;
     }
 
     /**
+     * Get the list of L1D cache controllers.
      *
-     * @return
+     * @return the list of L1D cache controllers
      */
     public List<CacheController> getL1DCacheControllers() {
         return l1DCacheControllers;
     }
 
     /**
+     * Get the the list of L1 cache controllers.
      *
-     * @return
+     * @return the list of L1 cache controllers
      */
     @SuppressWarnings("unchecked")
     public List<GeneralCacheController> getCacheControllers() {
@@ -224,24 +241,27 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
     }
 
     /**
+     * Get the list of instruction translation lookaside buffers (iTLBs).
      *
-     * @return
+     * @return the list of instruction translation lookaside buffers (iTLBs)
      */
     public List<TranslationLookasideBuffer> getItlbs() {
         return itlbs;
     }
 
     /**
+     * Get the list of data translation lookaside buffers (dTLBs).
      *
-     * @return
+     * @return the list of data translation lookaside buffers (dTLBs)
      */
     public List<TranslationLookasideBuffer> getDtlbs() {
         return dtlbs;
     }
 
     /**
+     * Get the list of translation lookaside buffers (TLBs).
      *
-     * @return
+     * @return the list of translation lookaside buffers (TLBs)
      */
     public List<TranslationLookasideBuffer> getTlbs() {
         List<TranslationLookasideBuffer> tlbs = new ArrayList<TranslationLookasideBuffer>();
@@ -251,25 +271,35 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
     }
 
     /**
+     * Get the net for the L1 cache controllers to the L2 cache controller.
      *
-     * @return
+     * @return the net for the L1 cache controllers to the L2 cache controller.
      */
-    public Net getL1sToL2Network() {
-        return l1sToL2Network;
+    public Net getL1sToL2Net() {
+        return l1sToL2Net;
     }
 
     /**
+     * Get the net for the L2 cache controller to the memory controller.
      *
-     * @return
+     * @return the net for the L2 cache controller to the memory controller.
      */
-    public L2ToMemNet getL2ToMemNetwork() {
-        return l2ToMemNetwork;
+    public L2ToMemNet getL2ToMemNet() {
+        return l2ToMemNet;
     }
 
+    /**
+     * Get the name of the cache hierarchy.
+     *
+     * @return the name of the cache hierarchy
+     */
     @Override
     public String getName() {
         return "cacheHierarchy";
     }
 
+    /**
+     * Statistics prefix for cache coherence finite state machine stuff.
+     */
     public static final String PREFIX_CC_FSM = "ccFsm/";
 }

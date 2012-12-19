@@ -21,13 +21,15 @@ package archimulator.sim.uncore;
 import archimulator.sim.common.SimulationObject;
 
 /**
+ * Memory hierarchy core.
  *
  * @author Min Cai
  */
 public interface MemoryHierarchyCore extends SimulationObject {
     /**
+     * Get the number of the memory hierarchy core.
      *
-     * @return
+     * @return the number of the memory hierarchy core
      */
     int getNum();
 }

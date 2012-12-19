@@ -47,7 +47,7 @@ public abstract class MemoryController extends MemoryDevice {
      */
     @Override
     protected Net getNet(MemoryDevice to) {
-        return this.getCacheHierarchy().getL2ToMemNetwork();
+        return this.getCacheHierarchy().getL2ToMemNet();
     }
 
     /**
