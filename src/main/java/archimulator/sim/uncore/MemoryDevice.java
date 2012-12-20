@@ -31,19 +31,19 @@ import java.io.Serializable;
  * @author Min Cai
  */
 public abstract class MemoryDevice extends BasicSimulationObject implements SimulationObject, Serializable {
-    private CacheHierarchy cacheHierarchy;
+    private MemoryHierarchy memoryHierarchy;
     private String name;
 
     /**
      * Create a memory device.
      *
-     * @param cacheHierarchy the parent cache hierarchy
+     * @param memoryHierarchy the parent memory hierarchy
      * @param name           the name of the memory device
      */
-    public MemoryDevice(CacheHierarchy cacheHierarchy, String name) {
-        super(cacheHierarchy);
+    public MemoryDevice(MemoryHierarchy memoryHierarchy, String name) {
+        super(memoryHierarchy);
 
-        this.cacheHierarchy = cacheHierarchy;
+        this.memoryHierarchy = memoryHierarchy;
         this.name = name;
     }
 
@@ -67,12 +67,12 @@ public abstract class MemoryDevice extends BasicSimulationObject implements Simu
     protected abstract Net getNet(MemoryDevice to);
 
     /**
-     * Get the parent cache hierarchy.
+     * Get the parent memory hierarchy.
      *
-     * @return the parent cache hierarchy
+     * @return the parent memory hierarchy
      */
-    public CacheHierarchy getCacheHierarchy() {
-        return cacheHierarchy;
+    public MemoryHierarchy getMemoryHierarchy() {
+        return memoryHierarchy;
     }
 
     /**

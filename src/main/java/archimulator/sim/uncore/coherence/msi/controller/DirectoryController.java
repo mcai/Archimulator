@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore.coherence.msi.controller;
 
-import archimulator.sim.uncore.CacheHierarchy;
+import archimulator.sim.uncore.MemoryHierarchy;
 import archimulator.sim.uncore.MemoryDevice;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.CacheAccess;
@@ -56,11 +56,11 @@ public class DirectoryController extends GeneralCacheController<DirectoryControl
     /**
      * Create a directory controller.
      *
-     * @param cacheHierarchy the cache hierarchy
+     * @param memoryHierarchy the memory hierarchy
      * @param name           the name
      */
-    public DirectoryController(CacheHierarchy cacheHierarchy, final String name) {
-        super(cacheHierarchy, name);
+    public DirectoryController(MemoryHierarchy memoryHierarchy, final String name) {
+        super(memoryHierarchy, name);
 
         this.cacheGeometry = new CacheGeometry(getExperiment().getArchitecture().getL2Size(), getExperiment().getArchitecture().getL2Associativity(), getExperiment().getArchitecture().getL2LineSize());
 
@@ -74,7 +74,7 @@ public class DirectoryController extends GeneralCacheController<DirectoryControl
             }
         };
 
-        this.cache = new EvictableCache<DirectoryControllerState>(cacheHierarchy, name, getGeometry(), getReplacementPolicyType(), cacheLineStateProviderFactory);
+        this.cache = new EvictableCache<DirectoryControllerState>(memoryHierarchy, name, getGeometry(), getReplacementPolicyType(), cacheLineStateProviderFactory);
         this.cacheControllers = new ArrayList<CacheController>();
 
         this.fsmFactory = DirectoryControllerFiniteStateMachineFactory.getSingleton();
@@ -82,7 +82,7 @@ public class DirectoryController extends GeneralCacheController<DirectoryControl
 
     @Override
     protected Net getNet(MemoryDevice to) {
-        return to instanceof MemoryController ? this.getCacheHierarchy().getL2ToMemNet() : this.getCacheHierarchy().getL1sToL2Net();
+        return to instanceof MemoryController ? this.getMemoryHierarchy().getL2ToMemNet() : this.getMemoryHierarchy().getL1sToL2Net();
     }
 
     public MemoryController getNext() {

@@ -44,7 +44,7 @@ Key Features
 	- Various kinds of static and dynamic branch predictors, checkpointing-based pipeline recovery on branch misprediction.
 
 - Archimulator supports the following **unclassified simulation features**:
-	- Support measurement of instructions, pipeline structures and the cache hierarchy;
+	- Support measurement of instructions, pipeline structures and the memory hierarchy;
 	- Support generation of instruction traces;
 	- Support both execution-driven and trace-driven memory subsystem simulation;
 	- Support complex simulation strategies, e.g., cycle count based, instruction count based, and hotspot oriented simulation;

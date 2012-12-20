@@ -19,7 +19,7 @@
 package archimulator.sim.uncore.net;
 
 import archimulator.sim.common.BasicSimulationObject;
-import archimulator.sim.uncore.CacheHierarchy;
+import archimulator.sim.uncore.MemoryHierarchy;
 import archimulator.sim.uncore.MemoryDevice;
 import net.pickapack.action.Action;
 
@@ -47,23 +47,23 @@ public abstract class Net extends BasicSimulationObject {
     /**
      * Create a net.
      *
-     * @param cacheHierarchy the parent cache hierarchy
+     * @param memoryHierarchy the parent memory hierarchy
      */
-    public Net(CacheHierarchy cacheHierarchy) {
-        super(cacheHierarchy);
+    public Net(MemoryHierarchy memoryHierarchy) {
+        super(memoryHierarchy);
 
         this.endPointNodes = new HashMap<MemoryDevice, EndPointNode>();
 
-        this.setup(cacheHierarchy);
+        this.setup(memoryHierarchy);
         this.calculateRoutes();
     }
 
     /**
      * Setup the net.
      *
-     * @param cacheHierarchy the parent cache hierarchy
+     * @param memoryHierarchy the parent memory hierarchy
      */
-    protected abstract void setup(CacheHierarchy cacheHierarchy);
+    protected abstract void setup(MemoryHierarchy memoryHierarchy);
 
     /**
      * Calculate the routes.

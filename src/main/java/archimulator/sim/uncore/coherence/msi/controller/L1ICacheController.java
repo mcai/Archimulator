@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore.coherence.msi.controller;
 
-import archimulator.sim.uncore.CacheHierarchy;
+import archimulator.sim.uncore.MemoryHierarchy;
 import archimulator.sim.uncore.cache.CacheGeometry;
 import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
 
@@ -31,11 +31,11 @@ public class L1ICacheController extends CacheController {
     /**
      * Create an L1I cache controller.
      *
-     * @param cacheHierarchy the parent cache hierarchy
+     * @param memoryHierarchy the parent memory hierarchy
      * @param name           the name
      */
-    public L1ICacheController(CacheHierarchy cacheHierarchy, String name) {
-        super(cacheHierarchy, name);
+    public L1ICacheController(MemoryHierarchy memoryHierarchy, String name) {
+        super(memoryHierarchy, name);
     }
 
     @Override

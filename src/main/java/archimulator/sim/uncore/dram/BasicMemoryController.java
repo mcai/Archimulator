@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore.dram;
 
-import archimulator.sim.uncore.CacheHierarchy;
+import archimulator.sim.uncore.MemoryHierarchy;
 import net.pickapack.action.Action;
 import net.pickapack.math.Counter;
 
@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Basic memory controller.
  *
  * @author Min Cai
  */
@@ -35,11 +36,12 @@ public class BasicMemoryController extends MemoryController {
     private int previousBank = 0;
 
     /**
+     * Create a basic memory controller.
      *
-     * @param cacheHierarchy
+     * @param memoryHierarchy the parent memory hierarchy
      */
-    public BasicMemoryController(CacheHierarchy cacheHierarchy) {
-        super(cacheHierarchy);
+    public BasicMemoryController(MemoryHierarchy memoryHierarchy) {
+        super(memoryHierarchy);
 
         this.banks = new ArrayList<Bank>();
 
@@ -58,9 +60,10 @@ public class BasicMemoryController extends MemoryController {
     }
 
     /**
+     * Act on an access of the specified address.
      *
-     * @param address
-     * @param onCompletedCallback
+     * @param address the address
+     * @param onCompletedCallback the callback action performed when the access is completed
      */
     @Override
     protected void access(int address, final Action onCompletedCallback) {
@@ -96,13 +99,19 @@ public class BasicMemoryController extends MemoryController {
         }
     }
 
-    private void accessDram(int addr, final Action onCompletedCallback) {
-        final int targetRow = (addr >> this.rowBits) / this.getNumBanks();
-        final int targetBank = (addr >> this.rowBits) % this.getNumBanks();
+    /**
+     * Access the specified address of the DRAM.
+     *
+     * @param address the address
+     * @param onCompletedCallback the callback action performed when the access is completed
+     */
+    private void accessDram(int address, final Action onCompletedCallback) {
+        final int targetRow = (address >> this.rowBits) / this.getNumBanks();
+        final int targetBank = (address >> this.rowBits) % this.getNumBanks();
 
         final boolean contiguous = (targetBank == previousBank);
 
-        this.banks.get(targetBank).startAccess(targetRow, contiguous, new Action() {
+        this.banks.get(targetBank).beginAccess(targetRow, contiguous, new Action() {
             @Override
             public void apply() {
                 getCycleAccurateEventQueue().schedule(this, onCompletedCallback, getFromDramLatency());
@@ -113,86 +122,120 @@ public class BasicMemoryController extends MemoryController {
     }
 
     /**
+     * Get the "to DRAM" latency.
      *
-     * @return
+     * @return the "to DRAM" latency
      */
     public int getToDramLatency() {
         return getExperiment().getArchitecture().getBasicMemoryControllerToDramLatency();
     }
 
     /**
+     * Get the "from DRAM" latency.
      *
-     * @return
+     * @return the "from DRAM" latency
      */
     public int getFromDramLatency() {
         return getExperiment().getArchitecture().getBasicMemoryControllerFromDramLatency();
     }
 
     /**
+     * Get the precharge latency.
      *
-     * @return
+     * @return the precharge latency
      */
     public int getPrechargeLatency() {
         return getExperiment().getArchitecture().getBasicMemoryControllerPrechargeLatency();
     }
 
     /**
+     * Get the closed latency.
      *
-     * @return
+     * @return the closed latency
      */
     public int getClosedLatency() {
         return getExperiment().getArchitecture().getBasicMemoryControllerClosedLatency();
     }
 
     /**
+     * Get the conflict latency.
      *
-     * @return
+     * @return the conflict latency
      */
     public int getConflictLatency() {
         return getExperiment().getArchitecture().getBasicMemoryControllerConflictLatency();
     }
 
     /**
+     * Get the bus width.
      *
-     * @return
+     * @return the bus width
      */
     public int getBusWidth() {
         return getExperiment().getArchitecture().getBasicMemoryControllerBusWidth();
     }
 
     /**
+     * Get the number of banks.
      *
-     * @return
+     * @return the number of banks
      */
     public int getNumBanks() {
         return getExperiment().getArchitecture().getBasicMemoryControllerNumBanks();
     }
 
     /**
+     * Get the size of a row.
      *
-     * @return
+     * @return the size of a row
      */
     public int getRowSize() {
         return getExperiment().getArchitecture().getBasicMemoryControllerRowSize();
     }
 
+    /**
+     * Bank status.
+     */
     private enum BankStatus {
+        /**
+         * Closed.
+         */
         CLOSED,
+
+        /**
+         * Precharged.
+         */
         PRECHARGED
     }
 
+    /**
+     * Bank.
+     */
     private class Bank {
+        /**
+         * Pending access.
+         */
         private class PendingAccess {
             private int row;
             private boolean contiguous;
             private Action onCompletedCallback;
 
+            /**
+             * Create a pending access on the specified row of the bank.
+             *
+             * @param row the row
+             * @param contiguous a value indicating whether access is contiguous or not
+             * @param onCompletedCallback the callback action performed when the access is completed
+             */
             private PendingAccess(int row, boolean contiguous, Action onCompletedCallback) {
                 this.row = row;
                 this.contiguous = contiguous;
                 this.onCompletedCallback = onCompletedCallback;
             }
 
+            /**
+             * Complete the pending access.
+             */
             private void complete() {
                 this.onCompletedCallback.apply();
             }
@@ -202,12 +245,20 @@ public class BasicMemoryController extends MemoryController {
         private int currentRow;
         private List<PendingAccess> pendingAccesses;
 
+        /**
+         * Create a bank.
+         */
         private Bank() {
             this.status = BankStatus.CLOSED;
             this.currentRow = -1;
             this.pendingAccesses = new ArrayList<PendingAccess>();
         }
 
+        /**
+         * Act on a precharge.
+         *
+         * @param onCompletedCallback the callback action performed when the precharge is completed
+         */
         private void precharge(final Action onCompletedCallback) {
             getCycleAccurateEventQueue().schedule(this, new Action() {
                 @Override
@@ -218,6 +269,9 @@ public class BasicMemoryController extends MemoryController {
             }, getClosedLatency());
         }
 
+        /**
+         * Refresh the bank.
+         */
         private void refresh() {
             if (this.pendingAccesses.size() > 0) {
                 final PendingAccess pendingAccess = this.pendingAccesses.get(0);
@@ -234,7 +288,14 @@ public class BasicMemoryController extends MemoryController {
             }
         }
 
-        private void startAccess(int row, boolean contiguous, Action onCompletedCallback) {
+        /**
+         * Begin the access on the specified row of the bank.
+         *
+         * @param row the row
+         * @param contiguous a value indicating whether the access is contiguous or not
+         * @param onCompletedCallback the callback action performed when the access is completed
+         */
+        private void beginAccess(int row, boolean contiguous, Action onCompletedCallback) {
             final PendingAccess pendingAccess = new PendingAccess(row, contiguous, onCompletedCallback);
             this.pendingAccesses.add(pendingAccess);
 
@@ -243,6 +304,13 @@ public class BasicMemoryController extends MemoryController {
             }
         }
 
+        /**
+         * Access the specified row of the bank.
+         *
+         * @param row the row
+         * @param contiguous a value indicating whether the access is contiguous or not
+         * @param onCompletedCallback the callback action performed when the access is completed
+         */
         private void access(final int row, final boolean contiguous, final Action onCompletedCallback) {
             if (this.status == BankStatus.CLOSED) {
                 this.precharge(new Action() {

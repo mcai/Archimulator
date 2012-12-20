@@ -43,11 +43,11 @@ import java.io.Serializable;
 import java.util.*;
 
 /**
- * Basic cache hierarchy.
+ * Basic memory hierarchy.
  *
  * @author Min Cai
  */
-public class BasicCacheHierarchy extends BasicSimulationObject implements CacheHierarchy {
+public class BasicMemoryHierarchy extends BasicSimulationObject implements MemoryHierarchy {
     private MemoryController memoryController;
     private DirectoryController l2CacheController;
     private List<CacheController> l1ICacheControllers;
@@ -62,14 +62,14 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
     private Map<Controller, Map<Controller, PointToPointReorderBuffer>> p2pReorderBuffers;
 
     /**
-     * Create a basic cache hierarchy.
+     * Create a basic memory hierarchy.
      *
      * @param experiment              the experiment
      * @param simulation              the simulation
      * @param blockingEventDispatcher the blocking event dispatcher
      * @param cycleAccurateEventQueue the cycle accurate event queue
      */
-    public BasicCacheHierarchy(Experiment experiment, Simulation simulation, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
+    public BasicMemoryHierarchy(Experiment experiment, Simulation simulation, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
         super(experiment, simulation, blockingEventDispatcher, cycleAccurateEventQueue);
 
         switch (getExperiment().getArchitecture().getMemoryControllerType()) {
@@ -289,13 +289,13 @@ public class BasicCacheHierarchy extends BasicSimulationObject implements CacheH
     }
 
     /**
-     * Get the name of the cache hierarchy.
+     * Get the name of the memory hierarchy.
      *
-     * @return the name of the cache hierarchy
+     * @return the name of the memory hierarchy
      */
     @Override
     public String getName() {
-        return "cacheHierarchy";
+        return "memoryHierarchy";
     }
 
     /**

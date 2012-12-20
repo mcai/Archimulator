@@ -70,17 +70,17 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
                     setMultipleNodes(true);
                 }
             });
-            this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.TLB, "processor/cacheHierarchy/tlbs", "name") {
+            this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.TLB, "processor/memoryHierarchy/tlbs", "name") {
                 {
                     setMultipleNodes(true);
                 }
             });
-            this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.CACHE_CONTROLLER, "processor/cacheHierarchy/cacheControllers", "name") {
+            this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.CACHE_CONTROLLER, "processor/memoryHierarchy/cacheControllers", "name") {
                 {
                     setMultipleNodes(true);
                 }
             });
-            this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.MEMORY_CONTROLLER, "processor/cacheHierarchy/memoryController", ""));
+            this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.MEMORY_CONTROLLER, "processor/memoryHierarchy/memoryController", ""));
             this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.HOTSPOT, "hotspotProfilingHelper", ""));
             this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.HELPER_THREAD, "helperThreadL2CacheRequestProfilingHelper", ""));
         }

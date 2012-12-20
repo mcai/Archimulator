@@ -26,7 +26,7 @@ import archimulator.sim.os.Context;
 import archimulator.sim.os.ContextKilledEvent;
 import archimulator.sim.os.ContextState;
 import archimulator.sim.os.Kernel;
-import archimulator.sim.uncore.CacheHierarchy;
+import archimulator.sim.uncore.MemoryHierarchy;
 import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
 
@@ -41,7 +41,7 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
 
     private Kernel kernel;
 
-    private CacheHierarchy cacheHierarchy;
+    private MemoryHierarchy memoryHierarchy;
 
     private Map<Context, Thread> contextToThreadMappings;
 
@@ -52,30 +52,30 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
      * @param blockingEventDispatcher
      * @param cycleAccurateEventQueue
      * @param kernel
-     * @param cacheHierarchy
+     * @param memoryHierarchy
      */
-    public BasicProcessor(Experiment experiment, Simulation simulation, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, Kernel kernel, CacheHierarchy cacheHierarchy) {
+    public BasicProcessor(Experiment experiment, Simulation simulation, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, Kernel kernel, MemoryHierarchy memoryHierarchy) {
         super(experiment, simulation, blockingEventDispatcher, cycleAccurateEventQueue);
 
         this.kernel = kernel;
 
-        this.cacheHierarchy = cacheHierarchy;
+        this.memoryHierarchy = memoryHierarchy;
 
         this.cores = new ArrayList<Core>();
 
         for (int i = 0; i < getExperiment().getArchitecture().getNumCores(); i++) {
             Core core = new BasicCore(this, i);
 
-            core.setL1ICacheController(cacheHierarchy.getL1ICacheControllers().get(i));
-            core.setL1DCacheController(cacheHierarchy.getL1DCacheControllers().get(i));
+            core.setL1ICacheController(memoryHierarchy.getL1ICacheControllers().get(i));
+            core.setL1DCacheController(memoryHierarchy.getL1DCacheControllers().get(i));
 
             for (int j = 0; j < getExperiment().getArchitecture().getNumThreadsPerCore(); j++) {
                 BasicThread thread = new BasicThread(core, j);
                 core.getThreads().add(thread);
 
-                thread.setItlb(cacheHierarchy.getItlbs().get(thread.getId()));
+                thread.setItlb(memoryHierarchy.getItlbs().get(thread.getId()));
 
-                thread.setDtlb(cacheHierarchy.getDtlbs().get(thread.getId()));
+                thread.setDtlb(memoryHierarchy.getDtlbs().get(thread.getId()));
             }
 
             this.cores.add(core);
@@ -169,8 +169,8 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
      *
      * @return
      */
-    public CacheHierarchy getCacheHierarchy() {
-        return cacheHierarchy;
+    public MemoryHierarchy getMemoryHierarchy() {
+        return memoryHierarchy;
     }
 
     @Override

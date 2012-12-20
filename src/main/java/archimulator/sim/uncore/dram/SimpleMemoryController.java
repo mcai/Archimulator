@@ -18,62 +18,54 @@
  ******************************************************************************/
 package archimulator.sim.uncore.dram;
 
-import archimulator.sim.uncore.CacheHierarchy;
+import archimulator.sim.uncore.MemoryHierarchy;
 import net.pickapack.action.Action;
 
 /**
+ * Simple memory controller.
  *
  * @author Min Cai
  */
 public class SimpleMemoryController extends MemoryController {
+    private int latency;
+
     /**
+     * Create a simple memory controller.
      *
-     * @param cacheHierarchy
+     * @param memoryHierarchy the parent memory hierarchy
      */
-    public SimpleMemoryController(CacheHierarchy cacheHierarchy) {
-        super(cacheHierarchy);
+    public SimpleMemoryController(MemoryHierarchy memoryHierarchy) {
+        super(memoryHierarchy);
+
+        int busWidth = getExperiment().getArchitecture().getSimpleMemoryControllerBusWidth();
+        int memoryLatency = getExperiment().getArchitecture().getSimpleMemoryControllerMemoryLatency();
+        int memoryTrunkLatency = getExperiment().getArchitecture().getSimpleMemoryControllerMemoryTrunkLatency();
+
+        int numChunks = (this.getLineSize() - (busWidth - 1)) / busWidth;
+        if ((numChunks <= 0)) {
+            throw new IllegalArgumentException();
+        }
+
+        this.latency = memoryLatency + (memoryTrunkLatency * (numChunks - 1));
     }
 
     /**
+     * Access the specified address.
      *
-     * @param address
-     * @param onCompletedCallback
+     * @param address the address
+     * @param onCompletedCallback the callback action performed when the access is completed
      */
     @Override
     protected void access(int address, Action onCompletedCallback) {
         this.getCycleAccurateEventQueue().schedule(this, onCompletedCallback, this.getLatency());
     }
 
+    /**
+     * Get the latency.
+     *
+     * @return the latency
+     */
     private int getLatency() {
-        int numChunks = (this.getLineSize() - (this.getBusWidth() - 1)) / this.getBusWidth();
-        if ((numChunks <= 0)) {
-            throw new IllegalArgumentException();
-        }
-
-        return this.getMemoryLatency() + (this.getMemoryTrunkLatency() * (numChunks - 1));
-    }
-
-    /**
-     *
-     * @return
-     */
-    public int getMemoryLatency() {
-        return getExperiment().getArchitecture().getSimpleMemoryControllerMemoryLatency();
-    }
-
-    /**
-     *
-     * @return
-     */
-    public int getMemoryTrunkLatency() {
-        return getExperiment().getArchitecture().getSimpleMemoryControllerMemoryTrunkLatency();
-    }
-
-    /**
-     *
-     * @return
-     */
-    public int getBusWidth() {
-        return getExperiment().getArchitecture().getSimpleMemoryControllerBusWidth();
+        return latency;
     }
 }

@@ -18,13 +18,14 @@
  ******************************************************************************/
 package archimulator.sim.uncore.dram;
 
-import archimulator.sim.uncore.CacheHierarchy;
+import archimulator.sim.uncore.MemoryHierarchy;
 import archimulator.sim.uncore.MemoryDevice;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.net.Net;
 import net.pickapack.action.Action;
 
 /**
+ * Memory controller.
  *
  * @author Min Cai
  */
@@ -33,91 +34,100 @@ public abstract class MemoryController extends MemoryDevice {
     private long numWrites;
 
     /**
+     * Create a memory controller.
      *
-     * @param cacheHierarchy
+     * @param memoryHierarchy the parent memory hierarchy
      */
-    public MemoryController(CacheHierarchy cacheHierarchy) {
-        super(cacheHierarchy, "memoryController");
+    public MemoryController(MemoryHierarchy memoryHierarchy) {
+        super(memoryHierarchy, "memoryController");
     }
 
     /**
+     * Get the net for the destination memory device.
      *
-     * @param to
-     * @return
+     * @param to the destination memory device
+     * @return the net for the destination memory device
      */
     @Override
     protected Net getNet(MemoryDevice to) {
-        return this.getCacheHierarchy().getL2ToMemNet();
+        return this.getMemoryHierarchy().getL2ToMemNet();
     }
 
     /**
+     * Act on receiving a read request.
      *
-     * @param source
-     * @param tag
-     * @param onSuccessCallback
+     * @param source the source memory device
+     * @param tag the tag
+     * @param onCompletedCallback the callback action performed when the request is completed
      */
-    public void memReadRequestReceive(final MemoryDevice source, int tag, final Action onSuccessCallback) {
+    public void memReadRequestReceive(final MemoryDevice source, int tag, final Action onCompletedCallback) {
         this.numReads++;
 
         this.access(tag, new Action() {
             @Override
             public void apply() {
-                transfer(source, ((DirectoryController) source).getCache().getLineSize() + 8, onSuccessCallback);
+                transfer(source, ((DirectoryController) source).getCache().getLineSize() + 8, onCompletedCallback);
             }
         });
     }
 
     /**
+     * Act on receiving a write request.
      *
-     * @param source
-     * @param tag
-     * @param onSuccessCallback
+     * @param source the source memory device
+     * @param tag the tag
+     * @param onCompletedCallback the callback action performed when the request is completed
      */
-    public void memWriteRequestReceive(final MemoryDevice source, int tag, final Action onSuccessCallback) {
+    public void memWriteRequestReceive(final MemoryDevice source, int tag, final Action onCompletedCallback) {
         this.numWrites++;
 
         this.access(tag, new Action() {
             @Override
             public void apply() {
-                transfer(source, 8, onSuccessCallback);
+                transfer(source, 8, onCompletedCallback);
             }
         });
     }
 
     /**
+     * Access the specified address.
      *
-     * @param address
-     * @param onCompletedCallback
+     * @param address the address
+     * @param onCompletedCallback the callback action performed when the access is completed
      */
     protected abstract void access(int address, Action onCompletedCallback);
 
     /**
+     * Get the number of accesses.
      *
-     * @return
+     * @return the number of accesses
      */
     public long getNumAccesses() {
         return this.numReads + this.numWrites;
     }
 
     /**
+     * Get the number of reads.
      *
-     * @return
+     * @return the number of reads
      */
     public long getNumReads() {
         return numReads;
     }
 
     /**
+     * Get the number of writes.
      *
-     * @return
+     * @return the number of writes
      */
     public long getNumWrites() {
         return numWrites;
     }
 
     /**
+     * Get the line size.
      *
-     * @return
+     * @return the line size
      */
     public int getLineSize() {
         return getExperiment().getArchitecture().getMemoryControllerLineSize();

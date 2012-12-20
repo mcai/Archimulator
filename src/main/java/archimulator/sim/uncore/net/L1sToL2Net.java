@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore.net;
 
-import archimulator.sim.uncore.CacheHierarchy;
+import archimulator.sim.uncore.MemoryHierarchy;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 
 /**
@@ -30,42 +30,42 @@ public class L1sToL2Net extends Net {
     /**
      * Create a net for connecting the L1 cache controllers to the L2 cache controller.
      *
-     * @param cacheHierarchy the cache hierarchy
+     * @param memoryHierarchy the memory hierarchy
      */
-    public L1sToL2Net(CacheHierarchy cacheHierarchy) {
-        super(cacheHierarchy);
+    public L1sToL2Net(MemoryHierarchy memoryHierarchy) {
+        super(memoryHierarchy);
     }
 
     /**
      * Setup the net.
      *
-     * @param cacheHierarchy the parent cache hierarchy
+     * @param memoryHierarchy the parent memory hierarchy
      */
     @Override
-    protected void setup(CacheHierarchy cacheHierarchy) {
+    protected void setup(MemoryHierarchy memoryHierarchy) {
         int l2CacheLineSize = 64;
 
         this.switchNode = new SwitchNode(this,
                 "l1sToL2Switch",
-                cacheHierarchy.getL1ICacheControllers().size() + cacheHierarchy.getL1DCacheControllers().size() + 1,
+                memoryHierarchy.getL1ICacheControllers().size() + memoryHierarchy.getL1DCacheControllers().size() + 1,
                 (l2CacheLineSize + 8) * 2,
-                cacheHierarchy.getL1ICacheControllers().size() + cacheHierarchy.getL1DCacheControllers().size() + 1,
+                memoryHierarchy.getL1ICacheControllers().size() + memoryHierarchy.getL1DCacheControllers().size() + 1,
                 (l2CacheLineSize + 8) * 2, 8);
 
-        for (CacheController l1ICacheController : cacheHierarchy.getL1ICacheControllers()) {
+        for (CacheController l1ICacheController : memoryHierarchy.getL1ICacheControllers()) {
             EndPointNode l1ICacheControllerNode = new EndPointNode(this, l1ICacheController.getName());
             this.endPointNodes.put(l1ICacheController, l1ICacheControllerNode);
             this.createBidirectionalLink(l1ICacheControllerNode, this.switchNode, 32);
         }
 
-        for (CacheController l1DCacheController : cacheHierarchy.getL1DCacheControllers()) {
+        for (CacheController l1DCacheController : memoryHierarchy.getL1DCacheControllers()) {
             EndPointNode l1DCacheControllerNode = new EndPointNode(this, l1DCacheController.getName());
             this.endPointNodes.put(l1DCacheController, l1DCacheControllerNode);
             this.createBidirectionalLink(l1DCacheControllerNode, this.switchNode, 32);
         }
 
-        EndPointNode l2CacheControllerNode = new EndPointNode(this, cacheHierarchy.getL2CacheController().getName());
-        this.endPointNodes.put(cacheHierarchy.getL2CacheController(), l2CacheControllerNode);
+        EndPointNode l2CacheControllerNode = new EndPointNode(this, memoryHierarchy.getL2CacheController().getName());
+        this.endPointNodes.put(memoryHierarchy.getL2CacheController(), l2CacheControllerNode);
         this.createBidirectionalLink(l2CacheControllerNode, this.switchNode, 32);
     }
 

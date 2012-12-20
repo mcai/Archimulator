@@ -89,7 +89,7 @@ public class HelperThreadL2CacheRequestProfilingHelper {
      * @param simulation simulation
      */
     public HelperThreadL2CacheRequestProfilingHelper(Simulation simulation) {
-        this(simulation.getProcessor().getCacheHierarchy().getL2CacheController());
+        this(simulation.getProcessor().getMemoryHierarchy().getL2CacheController());
     }
 
     /**

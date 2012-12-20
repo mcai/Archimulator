@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore.net;
 
-import archimulator.sim.uncore.CacheHierarchy;
+import archimulator.sim.uncore.MemoryHierarchy;
 
 /**
  * The net for connecting the L2 cache controller to the memory controller.
@@ -29,19 +29,19 @@ public class L2ToMemNet extends Net {
     /**
      * Create a net for connecting the L2 cache controller to the memory controller.
      *
-     * @param cacheHierarchy the cache hierarchy
+     * @param memoryHierarchy the memory hierarchy
      */
-    public L2ToMemNet(CacheHierarchy cacheHierarchy) {
-        super(cacheHierarchy);
+    public L2ToMemNet(MemoryHierarchy memoryHierarchy) {
+        super(memoryHierarchy);
     }
 
     /**
      * Setup the net.
      *
-     * @param cacheHierarchy the parent cache hierarchy
+     * @param memoryHierarchy the parent memory hierarchy
      */
     @Override
-    protected void setup(CacheHierarchy cacheHierarchy) {
+    protected void setup(MemoryHierarchy memoryHierarchy) {
         int memBlockSize = 64;
 
         this.switchNode = new SwitchNode(this,
@@ -51,12 +51,12 @@ public class L2ToMemNet extends Net {
                 2,
                 (memBlockSize + 8) * 2, 8);
 
-        EndPointNode l2CacheControllerNode = new EndPointNode(this, cacheHierarchy.getL2CacheController().getName());
-        this.endPointNodes.put(cacheHierarchy.getL2CacheController(), l2CacheControllerNode);
+        EndPointNode l2CacheControllerNode = new EndPointNode(this, memoryHierarchy.getL2CacheController().getName());
+        this.endPointNodes.put(memoryHierarchy.getL2CacheController(), l2CacheControllerNode);
         this.createBidirectionalLink(l2CacheControllerNode, this.switchNode, 32);
 
-        EndPointNode memoryControllerNode = new EndPointNode(this, cacheHierarchy.getMemoryController().getName());
-        this.endPointNodes.put(cacheHierarchy.getMemoryController(), memoryControllerNode);
+        EndPointNode memoryControllerNode = new EndPointNode(this, memoryHierarchy.getMemoryController().getName());
+        this.endPointNodes.put(memoryHierarchy.getMemoryController(), memoryControllerNode);
         this.createBidirectionalLink(memoryControllerNode, this.switchNode, 32);
     }
 

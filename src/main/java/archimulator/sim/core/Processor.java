@@ -20,7 +20,7 @@ package archimulator.sim.core;
 
 import archimulator.sim.common.SimulationObject;
 import archimulator.sim.os.Kernel;
-import archimulator.sim.uncore.CacheHierarchy;
+import archimulator.sim.uncore.MemoryHierarchy;
 
 import java.util.List;
 
@@ -50,5 +50,5 @@ public interface Processor extends SimulationObject {
      *
      * @return
      */
-    CacheHierarchy getCacheHierarchy();
+    MemoryHierarchy getMemoryHierarchy();
 }

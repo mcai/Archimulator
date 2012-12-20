@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore.coherence.msi.controller;
 
-import archimulator.sim.uncore.CacheHierarchy;
+import archimulator.sim.uncore.MemoryHierarchy;
 import archimulator.sim.uncore.cache.CacheGeometry;
 import archimulator.sim.uncore.cache.EvictableCache;
 import net.pickapack.fsm.FiniteStateMachineFactory;
@@ -42,11 +42,11 @@ public abstract class GeneralCacheController<StateT extends Serializable, Condit
     /**
      * Create a general cache controller.
      *
-     * @param cacheHierarchy the cache hierarchy
+     * @param memoryHierarchy the memory hierarchy
      * @param name           the name
      */
-    public GeneralCacheController(CacheHierarchy cacheHierarchy, String name) {
-        super(cacheHierarchy, name);
+    public GeneralCacheController(MemoryHierarchy memoryHierarchy, String name) {
+        super(memoryHierarchy, name);
     }
 
     /**

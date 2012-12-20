@@ -29,8 +29,8 @@ import archimulator.sim.core.Processor;
 import archimulator.sim.core.Thread;
 import archimulator.sim.os.Context;
 import archimulator.sim.os.Kernel;
-import archimulator.sim.uncore.BasicCacheHierarchy;
-import archimulator.sim.uncore.CacheHierarchy;
+import archimulator.sim.uncore.BasicMemoryHierarchy;
+import archimulator.sim.uncore.MemoryHierarchy;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestProfilingHelper;
 import archimulator.sim.uncore.helperThread.HotspotProfilingHelper;
@@ -143,7 +143,7 @@ public abstract class Simulation implements SimulationObject {
             throw new IllegalArgumentException();
         }
 
-        this.processor = new BasicProcessor(this.experiment, this, this.blockingEventDispatcher, this.cycleAccurateEventQueue, kernel, this.prepareCacheHierarchy());
+        this.processor = new BasicProcessor(this.experiment, this, this.blockingEventDispatcher, this.cycleAccurateEventQueue, kernel, this.prepareMemoryHierarchy());
 
         if (getExperiment().getArchitecture().getHotspotProfilingEnabled()) {
             this.hotspotProfilingHelper = new HotspotProfilingHelper(this);
@@ -244,7 +244,7 @@ public abstract class Simulation implements SimulationObject {
         }
 
         if (this.getType() == SimulationType.MEASUREMENT || this.getType() == SimulationType.CACHE_WARMUP) {
-            getProcessor().getCacheHierarchy().dumpCacheControllerFsmStats(stats);
+            getProcessor().getMemoryHierarchy().dumpCacheControllerFsmStats(stats);
         }
 
         ServiceManager.getExperimentStatService().addStatsByParent(this.getExperiment(), stats);
@@ -422,12 +422,12 @@ public abstract class Simulation implements SimulationObject {
     }
 
     /**
-     * Prepare the cache hierarchy.
+     * Prepare the memory hierarchy.
      *
-     * @return the cache hierarchy that is prepared
+     * @return the memory hierarchy that is prepared
      */
-    public CacheHierarchy prepareCacheHierarchy() {
-        return new BasicCacheHierarchy(this.getExperiment(), this, this.getBlockingEventDispatcher(), this.getCycleAccurateEventQueue());
+    public MemoryHierarchy prepareMemoryHierarchy() {
+        return new BasicMemoryHierarchy(this.getExperiment(), this, this.getBlockingEventDispatcher(), this.getCycleAccurateEventQueue());
     }
 
     /**

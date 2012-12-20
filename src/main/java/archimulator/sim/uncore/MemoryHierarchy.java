@@ -32,11 +32,11 @@ import archimulator.sim.uncore.tlb.TranslationLookasideBuffer;
 import java.util.List;
 
 /**
- * Cache hierarchy.
+ * Memory hierarchy.
  *
  * @author Min Cai
  */
-public interface CacheHierarchy extends SimulationObject {
+public interface MemoryHierarchy extends SimulationObject {
     /**
      * Transfer a message of the specified size from the source controller to the destination controller.
      *

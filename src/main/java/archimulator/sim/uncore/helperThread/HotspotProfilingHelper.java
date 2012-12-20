@@ -59,7 +59,7 @@ public class HotspotProfilingHelper {
      */
     public HotspotProfilingHelper(Simulation simulation) {
         this.simulation = simulation;
-        this.l2CacheController = simulation.getProcessor().getCacheHierarchy().getL2CacheController();
+        this.l2CacheController = simulation.getProcessor().getMemoryHierarchy().getL2CacheController();
 
         this.numCallsPerFunctions = new TreeMap<String, Map<String, Long>>();
         this.loadsInHotspotFunction = new TreeMap<Integer, LoadInstructionEntry>();

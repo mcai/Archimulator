@@ -18,26 +18,29 @@
  ******************************************************************************/
 package archimulator.sim.uncore.dram;
 
-import archimulator.sim.uncore.CacheHierarchy;
+import archimulator.sim.uncore.MemoryHierarchy;
 import net.pickapack.action.Action;
 
 /**
+ * Fixed latency memory controller.
  *
  * @author Min Cai
  */
 public class FixedLatencyMemoryController extends MemoryController {
     /**
+     * Create a fixed latency memory controller.
      *
-     * @param cacheHierarchy
+     * @param memoryHierarchy the parent memory hierarchy
      */
-    public FixedLatencyMemoryController(CacheHierarchy cacheHierarchy) {
-        super(cacheHierarchy);
+    public FixedLatencyMemoryController(MemoryHierarchy memoryHierarchy) {
+        super(memoryHierarchy);
     }
 
     /**
+     * Access the specified address.
      *
-     * @param address
-     * @param onCompletedCallback
+     * @param address the address
+     * @param onCompletedCallback the callback action performed when the access is completed
      */
     @Override
     protected void access(int address, Action onCompletedCallback) {
@@ -45,8 +48,9 @@ public class FixedLatencyMemoryController extends MemoryController {
     }
 
     /**
+     * Get the fixed latency.
      *
-     * @return
+     * @return the fixed latency
      */
     public int getLatency() {
         return getExperiment().getArchitecture().getFixedLatencyMemoryControllerLatency();

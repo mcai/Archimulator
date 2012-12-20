@@ -56,11 +56,11 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
     /**
      * Create a cache controller.
      *
-     * @param cacheHierarchy the cache hierarchy
+     * @param memoryHierarchy the memory hierarchy
      * @param name           the name
      */
-    public CacheController(CacheHierarchy cacheHierarchy, final String name) {
-        super(cacheHierarchy, name);
+    public CacheController(MemoryHierarchy memoryHierarchy, final String name) {
+        super(memoryHierarchy, name);
 
         ValueProviderFactory<CacheControllerState, ValueProvider<CacheControllerState>> cacheLineStateProviderFactory = new ValueProviderFactory<CacheControllerState, ValueProvider<CacheControllerState>>() {
             @Override
@@ -72,7 +72,7 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
             }
         };
 
-        this.cache = new EvictableCache<CacheControllerState>(cacheHierarchy, name, getGeometry(), getReplacementPolicyType(), cacheLineStateProviderFactory);
+        this.cache = new EvictableCache<CacheControllerState>(memoryHierarchy, name, getGeometry(), getReplacementPolicyType(), cacheLineStateProviderFactory);
 
         this.pendingAccesses = new HashMap<Integer, MemoryHierarchyAccess>();
 
@@ -163,7 +163,7 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
      */
     @Override
     protected Net getNet(MemoryDevice to) {
-        return this.getCacheHierarchy().getL1sToL2Net();
+        return this.getMemoryHierarchy().getL1sToL2Net();
     }
 
     /**
