@@ -23,31 +23,36 @@ import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
 
 /**
+ * Simulation object.
  *
  * @author Min Cai
  */
 public interface SimulationObject extends Named {
     /**
+     * Get the blocking event dispatcher.
      *
-     * @return
+     * @return the blocking event dispatcher
      */
     BlockingEventDispatcher<SimulationEvent> getBlockingEventDispatcher();
 
     /**
+     * Get the cycle accurate event queue.
      *
-     * @return
+     * @return the cycle accurate event queue
      */
     CycleAccurateEventQueue getCycleAccurateEventQueue();
 
     /**
+     * Get the parent experiment.
      *
-     * @return
+     * @return the parent experiment
      */
     Experiment getExperiment();
 
     /**
+     * Get the parent simulation.
      *
-     * @return
+     * @return the parent simulation
      */
     Simulation getSimulation();
 }

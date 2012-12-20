@@ -19,20 +19,23 @@
 package archimulator.sim.common;
 
 /**
+ * Simulation type.
  *
  * @author Min Cai
  */
 public enum SimulationType {
     /**
-     *
+     * Fast forward.
      */
     FAST_FORWARD,
+
     /**
-     *
+     * Cache warmup.
      */
     CACHE_WARMUP,
+
     /**
-     *
+     * Measurement.
      */
     MEASUREMENT
 }

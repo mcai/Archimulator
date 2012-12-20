@@ -50,6 +50,8 @@ import java.io.File;
 import java.util.*;
 
 /**
+ * Simulation.
+ *
  * @author Min Cai
  */
 public abstract class Simulation implements SimulationObject {
@@ -253,7 +255,7 @@ public abstract class Simulation implements SimulationObject {
      *
      * @param stats the list of experiment statistics
      * @param gauge the experiment gauge object
-     * @param obj the owning object
+     * @param obj   the owning object
      */
     private void collectStats(List<ExperimentStat> stats, ExperimentGauge gauge, Object obj) {
         Object keyObj = !StringUtils.isEmpty(gauge.getType().getKeyExpression()) ? JaxenHelper.evaluate(obj, gauge.getType().getKeyExpression()) : null;
@@ -276,7 +278,7 @@ public abstract class Simulation implements SimulationObject {
                 Collection resultCollection = (Collection) valueObj;
 
                 int i = 0;
-                for(Object obj1 : resultCollection) {
+                for (Object obj1 : resultCollection) {
                     String nodeKey = JaxenHelper.escape(initialNodeKey) + "/" + (i++);
                     String value = JaxenHelper.toString(obj1);
 

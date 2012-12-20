@@ -23,23 +23,26 @@ import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
 
 /**
+ * Detailed simulation.
  *
  * @author Min Cai
  */
 public class DetailedSimulation extends Simulation {
     /**
+     * Create a detailed simulation.
      *
-     * @param experiment
-     * @param blockingEventDispatcher
-     * @param cycleAccurateEventQueue
+     * @param experiment              the parent experiment
+     * @param blockingEventDispatcher the blocking event dispatcher
+     * @param cycleAccurateEventQueue the cycle accurate event queue
      */
     public DetailedSimulation(Experiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
         super(SimulationType.MEASUREMENT, experiment, blockingEventDispatcher, cycleAccurateEventQueue, null);
     }
 
     /**
+     * Get a value indicating whether it can do fast forward for one cycle or not.
      *
-     * @return
+     * @return a value indicating whether it can do fast forward for one cycle or not
      */
     @Override
     public boolean canDoFastForwardOneCycle() {
@@ -47,8 +50,9 @@ public class DetailedSimulation extends Simulation {
     }
 
     /**
+     * Get a value indicating whether it can do cache warmup for one cycle or not.
      *
-     * @return
+     * @return a value indicating whether it can do cache warmup for one cycle or not
      */
     @Override
     public boolean canDoCacheWarmupOneCycle() {
@@ -56,8 +60,9 @@ public class DetailedSimulation extends Simulation {
     }
 
     /**
+     * Get a value indicating whether it can do measurement for one cycle or not.
      *
-     * @return
+     * @return a value indicating whether it can do measurement for one cycle or not
      */
     @Override
     public boolean canDoMeasurementOneCycle() {
@@ -65,19 +70,24 @@ public class DetailedSimulation extends Simulation {
     }
 
     /**
-     *
+     * Begin the simulation.
      */
     @Override
     public void beginSimulation() {
     }
 
     /**
-     *
+     * End the simulation.
      */
     @Override
     public void endSimulation() {
     }
 
+    /**
+     * Get the title prefix.
+     *
+     * @return the title prefix
+     */
     @Override
     public String getPrefix() {
         return "detailed";

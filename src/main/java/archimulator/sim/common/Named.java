@@ -21,13 +21,15 @@ package archimulator.sim.common;
 import java.io.Serializable;
 
 /**
+ * Named.
  *
  * @author Min Cai
  */
 public interface Named extends Serializable {
     /**
+     * Get the name.
      *
-     * @return
+     * @return the name
      */
     String getName();
 }

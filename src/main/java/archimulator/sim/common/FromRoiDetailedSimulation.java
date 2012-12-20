@@ -25,24 +25,27 @@ import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
 
 /**
+ * "From ROI" detailed simulation.
  *
  * @author Min Cai
  */
 public class FromRoiDetailedSimulation extends Simulation {
     /**
+     * Create a "from ROI" detailed simulation.
      *
-     * @param experiment
-     * @param blockingEventDispatcher
-     * @param cycleAccurateEventQueue
-     * @param kernelRef
+     * @param experiment              the parent experiment
+     * @param blockingEventDispatcher the blocking event dispatcher
+     * @param cycleAccurateEventQueue the cycle accurate event queue
+     * @param kernelRef               the kernel reference
      */
     public FromRoiDetailedSimulation(Experiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, Reference<Kernel> kernelRef) {
         super(SimulationType.MEASUREMENT, experiment, blockingEventDispatcher, cycleAccurateEventQueue, kernelRef);
     }
 
     /**
+     * Get a value indicating whether it can do fast forward for one cycle or not.
      *
-     * @return
+     * @return a value indicating whether it can do fast forward for one cycle or not
      */
     @Override
     public boolean canDoFastForwardOneCycle() {
@@ -50,8 +53,9 @@ public class FromRoiDetailedSimulation extends Simulation {
     }
 
     /**
+     * Get a value indicating whether it can do cache warmup for one cycle or not.
      *
-     * @return
+     * @return a value indicating whether it can do cache warmup for one cycle or not
      */
     @Override
     public boolean canDoCacheWarmupOneCycle() {
@@ -59,8 +63,9 @@ public class FromRoiDetailedSimulation extends Simulation {
     }
 
     /**
+     * Get a value indicating whether it can do measurement for one cycle or not.
      *
-     * @return
+     * @return a value indicating whether it can do measurement for one cycle or not
      */
     @Override
     public boolean canDoMeasurementOneCycle() {
@@ -68,28 +73,34 @@ public class FromRoiDetailedSimulation extends Simulation {
     }
 
     /**
-     *
+     * Begin the simulation.
      */
     @Override
     public void beginSimulation() {
     }
 
     /**
-     *
+     * End the simulation.
      */
     @Override
     public void endSimulation() {
     }
 
     /**
+     * Prepare the kernel.
      *
-     * @return
+     * @return the prepared kernel
      */
     @Override
     public Kernel prepareKernel() {
         return this.kernelRef.get();
     }
 
+    /**
+     * Get the title prefix
+     *
+     * @return the title prefix
+     */
     @Override
     public String getPrefix() {
         return "twoPhase/phase1";

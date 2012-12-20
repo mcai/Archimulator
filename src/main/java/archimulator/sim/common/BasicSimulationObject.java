@@ -23,6 +23,7 @@ import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
 
 /**
+ * Basic simulation object.
  *
  * @author Min Cai
  */
@@ -33,11 +34,12 @@ public abstract class BasicSimulationObject implements SimulationObject {
     private Simulation simulation;
 
     /**
+     * Create a basic simulation object.
      *
-     * @param experiment
-     * @param simulation
-     * @param blockingEventDispatcher
-     * @param cycleAccurateEventQueue
+     * @param experiment              the parent experiment
+     * @param simulation              the parent simulation
+     * @param blockingEventDispatcher the blocking event dispatcher
+     * @param cycleAccurateEventQueue the cycle accurate event queue
      */
     public BasicSimulationObject(Experiment experiment, Simulation simulation, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
         this.experiment = experiment;
@@ -47,40 +49,45 @@ public abstract class BasicSimulationObject implements SimulationObject {
     }
 
     /**
+     * Create a basic simulation object.
      *
-     * @param parent
+     * @param parent the parent simulation object
      */
     public BasicSimulationObject(SimulationObject parent) {
         this(parent.getExperiment(), parent.getSimulation(), parent.getBlockingEventDispatcher(), parent.getCycleAccurateEventQueue());
     }
 
     /**
+     * Get the blocking event dispatcher.
      *
-     * @return
+     * @return the blocking event dispatcher
      */
     public BlockingEventDispatcher<SimulationEvent> getBlockingEventDispatcher() {
         return blockingEventDispatcher;
     }
 
     /**
+     * Get the cycle accurate queue.
      *
-     * @return
+     * @return the cycle accurate queue
      */
     public CycleAccurateEventQueue getCycleAccurateEventQueue() {
         return cycleAccurateEventQueue;
     }
 
     /**
+     * Get the parent experiment.
      *
-     * @return
+     * @return the parent experiment
      */
     public Experiment getExperiment() {
         return experiment;
     }
 
     /**
+     * Get the parent simulation.
      *
-     * @return
+     * @return the parent simulation
      */
     public Simulation getSimulation() {
         return simulation;

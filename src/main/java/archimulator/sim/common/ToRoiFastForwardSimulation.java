@@ -27,6 +27,7 @@ import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
 
 /**
+ * "To ROI" fast forward simulation.
  *
  * @author Min Cai
  */
@@ -34,19 +35,21 @@ public class ToRoiFastForwardSimulation extends Simulation {
     private boolean pthreadHasSpawned;
 
     /**
+     * Create a "to ROI" fast forward simulation.
      *
-     * @param experiment
-     * @param blockingEventDispatcher
-     * @param cycleAccurateEventQueue
-     * @param kernelRef
+     * @param experiment              the parent experiment
+     * @param blockingEventDispatcher the blocking event dispatcher
+     * @param cycleAccurateEventQueue the cycle accurate event queue
+     * @param kernelRef               the kernel reference
      */
     public ToRoiFastForwardSimulation(Experiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, Reference<Kernel> kernelRef) {
         super(SimulationType.FAST_FORWARD, experiment, blockingEventDispatcher, cycleAccurateEventQueue, kernelRef);
     }
 
     /**
+     * Get a value indicating whether it can do fast forward for one cycle or not.
      *
-     * @return
+     * @return a value indicating whether it can do fast forward for one cycle or not
      */
     @Override
     public boolean canDoFastForwardOneCycle() {
@@ -54,8 +57,9 @@ public class ToRoiFastForwardSimulation extends Simulation {
     }
 
     /**
+     * Get a value indicating whether it can do cache warmup for one cycle or not.
      *
-     * @return
+     * @return a value indicating whether it can do cache warmup for one cycle or not
      */
     @Override
     public boolean canDoCacheWarmupOneCycle() {
@@ -63,8 +67,9 @@ public class ToRoiFastForwardSimulation extends Simulation {
     }
 
     /**
+     * Get a value indicating whether it can do measurement for one cycle or not.
      *
-     * @return
+     * @return a value indicating whether it can do measurement for one cycle or not
      */
     @Override
     public boolean canDoMeasurementOneCycle() {
@@ -72,7 +77,7 @@ public class ToRoiFastForwardSimulation extends Simulation {
     }
 
     /**
-     *
+     * Begin the simulation.
      */
     @Override
     public void beginSimulation() {
@@ -88,13 +93,18 @@ public class ToRoiFastForwardSimulation extends Simulation {
     }
 
     /**
-     *
+     * End the simulation.
      */
     @Override
     public void endSimulation() {
         this.kernelRef.set(this.getProcessor().getKernel());
     }
 
+    /**
+     * Get the title prefix.
+     *
+     * @return the title prefix
+     */
     @Override
     public String getPrefix() {
         return "twoPhase/phase0";

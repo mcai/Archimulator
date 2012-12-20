@@ -23,23 +23,26 @@ import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
 
 /**
+ * Functional simulation.
  *
  * @author Min Cai
  */
 public class FunctionalSimulation extends Simulation {
     /**
+     * Create a functional simulation.
      *
-     * @param experiment
-     * @param blockingEventDispatcher
-     * @param cycleAccurateEventQueue
+     * @param experiment              the parent experiment
+     * @param blockingEventDispatcher the blocking event dispatcher
+     * @param cycleAccurateEventQueue the cycle accurate event queue
      */
     public FunctionalSimulation(Experiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
         super(SimulationType.FAST_FORWARD, experiment, blockingEventDispatcher, cycleAccurateEventQueue, null);
     }
 
     /**
+     * Get a value indicating whether it can do fast forward for one cycle or not.
      *
-     * @return
+     * @return a value indicating whether it can do fast forward for one cycle or not
      */
     @Override
     public boolean canDoFastForwardOneCycle() {
@@ -47,8 +50,9 @@ public class FunctionalSimulation extends Simulation {
     }
 
     /**
+     * Get a value indicating whether it can do cache warmup for one cycle or not.
      *
-     * @return
+     * @return a value indicating whether it can do cache warmup for one cycle or not
      */
     @Override
     public boolean canDoCacheWarmupOneCycle() {
@@ -56,8 +60,9 @@ public class FunctionalSimulation extends Simulation {
     }
 
     /**
+     * Get a value indicating whether it can do measurement for one cycle or not.
      *
-     * @return
+     * @return a value indicating whether it can do measurement for one cycle or not
      */
     @Override
     public boolean canDoMeasurementOneCycle() {
@@ -65,19 +70,24 @@ public class FunctionalSimulation extends Simulation {
     }
 
     /**
-     *
+     * Begin the simulation.
      */
     @Override
     public void beginSimulation() {
     }
 
     /**
-     *
+     * End the simulation.
      */
     @Override
     public void endSimulation() {
     }
 
+    /**
+     * Get the title prefix.
+     *
+     * @return the title prefix
+     */
     @Override
     public String getPrefix() {
         return "functional";
