@@ -26,16 +26,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Stack based cache replacement policy.
  *
  * @author Min Cai
- * @param <StateT>
+ * @param <StateT> the state type of the parent evictable cache
  */
 public abstract class StackBasedCacheReplacementPolicy<StateT extends Serializable> extends CacheReplacementPolicy<StateT> {
     private List<List<Integer>> stackEntries;
 
     /**
+     * Create a stack based replacement policy for the specified evictable cache.
      *
-     * @param cache
+     * @param cache the parent evictable cache
      */
     public StackBasedCacheReplacementPolicy(EvictableCache<StateT> cache) {
         super(cache);
@@ -52,66 +54,73 @@ public abstract class StackBasedCacheReplacementPolicy<StateT extends Serializab
     }
 
     /**
+     * Get the way in the MRU position in the specified set.
      *
-     * @param set
-     * @return
+     * @param set the set index
+     * @return the way in the MRU position in the specified set
      */
     public int getMRU(int set) {
         return this.getCacheLineInStackPosition(set, 0).getWay();
     }
 
     /**
+     * Get the way in the LRU position in the specified set.
      *
-     * @param set
-     * @return
+     * @param set the set index
+     * @return the way in the LRU position in the specified set
      */
     public int getLRU(int set) {
         return this.getCacheLineInStackPosition(set, this.getCache().getAssociativity() - 1).getWay();
     }
 
     /**
+     * Set the specified way in the MRU position in the specified set.
      *
-     * @param set
-     * @param way
+     * @param set the set index
+     * @param way the way
      */
     public void setMRU(int set, int way) {
         this.setStackPosition(set, way, 0);
     }
 
     /**
+     * Set the specified way in the LRU position in the specified set.
      *
-     * @param set
-     * @param way
+     * @param set the set index
+     * @param way the way
      */
     public void setLRU(int set, int way) {
         this.setStackPosition(set, way, this.getCache().getAssociativity() - 1);
     }
 
     /**
+     * Get the way in the specified stack position in the specified set.
      *
-     * @param set
-     * @param stackPosition
-     * @return
+     * @param set the set index
+     * @param stackPosition the stack position
+     * @return the way in the specified stack position in the specified set
      */
     public int getWayInStackPosition(int set, int stackPosition) {
         return this.getCacheLineInStackPosition(set, stackPosition).getWay();
     }
 
     /**
+     * Get the cache line in the specified stack position in the specified set.
      *
-     * @param set
-     * @param stackPosition
-     * @return
+     * @param set the set index
+     * @param stackPosition the stack position
+     * @return the cache line in the specified stack position in the specified set
      */
     public CacheLine<StateT> getCacheLineInStackPosition(int set, int stackPosition) {
         return this.getCache().getLine(set, this.stackEntries.get(set).get(stackPosition));
     }
 
     /**
+     * Get the stack position for the specified way in the specified set.
      *
-     * @param set
-     * @param way
-     * @return
+     * @param set the set index
+     * @param way the way
+     * @return the stack position for the specified way in the specified set
      */
     public int getStackPosition(int set, int way) {
         Integer stackEntryFound = this.getStackEntry(set, way);
@@ -119,10 +128,11 @@ public abstract class StackBasedCacheReplacementPolicy<StateT extends Serializab
     }
 
     /**
+     * Set the stack position for the specified way in the specified set.
      *
-     * @param set
-     * @param way
-     * @param newStackPosition
+     * @param set the set index
+     * @param way the way
+     * @param newStackPosition the new stack position
      */
     public void setStackPosition(int set, int way, int newStackPosition) {
         Integer stackEntryFound = this.getStackEntry(set, way);
@@ -130,6 +140,13 @@ public abstract class StackBasedCacheReplacementPolicy<StateT extends Serializab
         this.stackEntries.get(set).add(newStackPosition, stackEntryFound);
     }
 
+    /**
+     * Get the stack entry at the specified set and way.
+     *
+     * @param set the set index
+     * @param way the way
+     * @return the stack entry at the specified set and way
+     */
     private Integer getStackEntry(int set, int way) {
         List<Integer> stackEntriesPerSet = this.stackEntries.get(set);
 

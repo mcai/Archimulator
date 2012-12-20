@@ -26,16 +26,18 @@ import java.io.Serializable;
 import java.util.Random;
 
 /**
+ * Random policy.
  *
  * @author Min Cai
- * @param <StateT>
+ * @param <StateT> the state type of the parent evictable cache
  */
 public class RandomPolicy<StateT extends Serializable> extends CacheReplacementPolicy<StateT> {
     private Random random;
 
     /**
+     * Create a random policy for the specified evictable cache.
      *
-     * @param cache
+     * @param cache the parent evictable cache
      */
     public RandomPolicy(EvictableCache<StateT> cache) {
         super(cache);
@@ -44,11 +46,12 @@ public class RandomPolicy<StateT extends Serializable> extends CacheReplacementP
     }
 
     /**
+     * Handle a cache replacement.
      *
-     * @param access
-     * @param set
-     * @param tag
-     * @return
+     * @param access the memory hierarchy access
+     * @param set the set index
+     * @param tag the tag
+     * @return the newly created cache access object
      */
     @Override
     public CacheAccess<StateT> handleReplacement(MemoryHierarchyAccess access, int set, int tag) {
@@ -56,20 +59,22 @@ public class RandomPolicy<StateT extends Serializable> extends CacheReplacementP
     }
 
     /**
+     * Handle promotion on a cache hit.
      *
-     * @param access
-     * @param set
-     * @param way
+     * @param access the memory hierarchy access
+     * @param set the set index
+     * @param way the way
      */
     @Override
     public void handlePromotionOnHit(MemoryHierarchyAccess access, int set, int way) {
     }
 
     /**
+     * Handle insertion on a cache miss.
      *
-     * @param access
-     * @param set
-     * @param way
+     * @param access the memory hierarchy access
+     * @param set the set index
+     * @param way the way
      */
     @Override
     public void handleInsertionOnMiss(MemoryHierarchyAccess access, int set, int way) {

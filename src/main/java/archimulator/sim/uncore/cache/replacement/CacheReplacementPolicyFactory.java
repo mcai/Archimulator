@@ -23,16 +23,18 @@ import archimulator.sim.uncore.cache.EvictableCache;
 import java.io.Serializable;
 
 /**
+ * Cache replacement policy factory.
  *
  * @author Min Cai
  */
 public class CacheReplacementPolicyFactory {
     /**
+     * Create a cache replacement policy for the specified evictable cache and based on the specified type.
      *
-     * @param <StateT>
-     * @param cacheReplacementPolicyType
-     * @param cache
-     * @return
+     * @param <StateT> the state type of the evictable cache
+     * @param cacheReplacementPolicyType the cache replacement policy type
+     * @param cache the evictable cache
+     * @return the newly created cache replacement policy for the specified evictable cache and based on the specified type
      */
     public static <StateT extends Serializable> CacheReplacementPolicy<StateT> createCacheReplacementPolicy(CacheReplacementPolicyType cacheReplacementPolicyType, EvictableCache<StateT> cache) {
         switch (cacheReplacementPolicyType) {

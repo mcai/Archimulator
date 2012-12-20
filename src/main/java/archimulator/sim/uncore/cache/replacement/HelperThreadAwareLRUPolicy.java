@@ -28,17 +28,19 @@ import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestQuality;
 import java.io.Serializable;
 
 /**
+ * Helper thread aware least recently used (LRU) policy.
  *
  * @author Min Cai
- * @param <StateT>
+ * @param <StateT> the state type of the parent evictable cache
  */
 public class HelperThreadAwareLRUPolicy<StateT extends Serializable> extends LRUPolicy<StateT> {
     private boolean useBreakdown;
 
     /**
+     * Create a helper thread aware least recently used (LRU) policy for the specified evictable cache.
      *
-     * @param cache
-     * @param useBreakdown
+     * @param cache the parent evictable cache
+     * @param useBreakdown a value indicating whether using the helper thread L2 cache request breakdown based enhancement or not
      */
     public HelperThreadAwareLRUPolicy(EvictableCache<StateT> cache, boolean useBreakdown) {
         super(cache);
@@ -46,10 +48,11 @@ public class HelperThreadAwareLRUPolicy<StateT extends Serializable> extends LRU
     }
 
     /**
+     * Handle promotion on a cache hit.
      *
-     * @param access
-     * @param set
-     * @param way
+     * @param access the memory hierarchy access
+     * @param set the set index
+     * @param way the way
      */
     @Override
     public void handlePromotionOnHit(MemoryHierarchyAccess access, int set, int way) {
@@ -62,10 +65,11 @@ public class HelperThreadAwareLRUPolicy<StateT extends Serializable> extends LRU
     }
 
     /**
+     * Handle insertion on a cache miss.
      *
-     * @param access
-     * @param set
-     * @param way
+     * @param access the memory hierarchy access
+     * @param set the set
+     * @param way the way
      */
     @Override
     public void handleInsertionOnMiss(MemoryHierarchyAccess access, int set, int way) {
@@ -117,25 +121,50 @@ public class HelperThreadAwareLRUPolicy<StateT extends Serializable> extends LRU
         super.handleInsertionOnMiss(access, set, way);
     }
 
+    /**
+     * Get a value indicating whether the helper thread L2 cache request profiling is enabled or not.
+     *
+     * @return a value indicating whether the helper thread L2 cache request profiling is enabled or not
+     */
     private boolean isAwarenessEnabled() {
         return getCache().getExperiment().getArchitecture().getHelperThreadL2CacheRequestProfilingEnabled();
     }
 
+    /**
+     * Get a value indicating whether the requester of the specified memory hierarchy access is the main thread or not.
+     *
+     * @param access the memory hierarchy access
+     * @return a value indicating whether the requester of the specified memory hierarchy access is the main thread or not
+     */
     private boolean requesterIsMainThread(MemoryHierarchyAccess access) {
         return BasicThread.isMainThread(access.getThread());
     }
 
+    /**
+     * Get a value indicating whether the requester of the specified memory hierarchy access is the helper thread or not.
+     *
+     * @param access the memory hierarchy access
+     * @return a value indicating whether the requester of the specified memory hierarchy access is the helper thread or not
+     */
     private boolean requesterIsHelperThread(MemoryHierarchyAccess access) {
         return BasicThread.isHelperThread(access.getThread());
     }
 
+    /**
+     * Get a value indicating whether the line found in the specified set index and way is brought by the helper thread or not.
+     *
+     * @param set the set index
+     * @param way the way
+     * @return a value indicating whether the line found in the specified set index and way is brought by the helper thread or not
+     */
     private boolean lineFoundIsHelperThread(int set, int way) {
         return BasicThread.isHelperThread(getCache().getSimulation().getHelperThreadL2CacheRequestProfilingHelper().getHelperThreadL2CacheRequestStates().get(set).get(way).getThreadId());
     }
 
     /**
+     * Get a value indicating whether the helper thread L2 cache request breakdown based enhancement is used or not.
      *
-     * @return
+     * @return a value indicating whether the helper thread L2 cache request breakdown based enhancement is used or not
      */
     public boolean isUseBreakdown() {
         return useBreakdown;

@@ -19,28 +19,33 @@
 package archimulator.sim.uncore.cache.replacement;
 
 /**
+ * Cache replacement policy type.
  *
  * @author Min Cai
  */
 public enum CacheReplacementPolicyType {
     /**
-     *
+     * Least recently used (LRU).
      */
     LRU,
+
     /**
-     *
+     * Least frequently used (LFU).
      */
     LFU,
+
     /**
-     *
+     * Random.
      */
     RANDOM,
+
     /**
-     *
+     * Helper thread aware least recently used (LRU).
      */
     HELPER_THREAD_AWARE_LRU,
+
     /**
-     *
+     * Helper thread request breakdown enhanced least recently used (LRU).
      */
     HELPER_THREAD_AWARE_BREAKDOWN_LRU
 }

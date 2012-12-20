@@ -29,16 +29,18 @@ import net.pickapack.util.ValueProviderFactory;
 import java.io.Serializable;
 
 /**
+ * Least frequently used (LFU) policy.
  *
  * @author Min Cai
- * @param <StateT>
+ * @param <StateT> the state type of the parent evictable cache
  */
 public class LFUPolicy<StateT extends Serializable> extends CacheReplacementPolicy<StateT> {
     private Cache<Boolean> mirrorCache;
 
     /**
+     * Create a least frequently used (LFU) policy for the evictable cache.
      *
-     * @param cache
+     * @param cache the parent evictable cache
      */
     public LFUPolicy(EvictableCache<StateT> cache) {
         super(cache);
@@ -52,11 +54,12 @@ public class LFUPolicy<StateT extends Serializable> extends CacheReplacementPoli
     }
 
     /**
+     * Handle a cache replacement.
      *
-     * @param access
-     * @param set
-     * @param tag
-     * @return
+     * @param access the memory hierarchy access
+     * @param set the set
+     * @param tag the tag
+     * @return the newly created cache access object
      */
     @Override
     public CacheAccess<StateT> handleReplacement(MemoryHierarchyAccess access, int set, int tag) {
@@ -77,10 +80,11 @@ public class LFUPolicy<StateT extends Serializable> extends CacheReplacementPoli
     }
 
     /**
+     * Handle promotion on a cache hit.
      *
-     * @param access
-     * @param set
-     * @param way
+     * @param access the memory hierarchy access
+     * @param set the set index
+     * @param way the way
      */
     @Override
     public void handlePromotionOnHit(MemoryHierarchyAccess access, int set, int way) {
@@ -90,10 +94,11 @@ public class LFUPolicy<StateT extends Serializable> extends CacheReplacementPoli
     }
 
     /**
+     * Handle insertion on a cache miss.
      *
-     * @param access
-     * @param set
-     * @param way
+     * @param access the memory hierarchy access
+     * @param set the set index
+     * @param way the way
      */
     @Override
     public void handleInsertionOnMiss(MemoryHierarchyAccess access, int set, int way) {
@@ -102,19 +107,35 @@ public class LFUPolicy<StateT extends Serializable> extends CacheReplacementPoli
         stateProvider.frequency = 0;
     }
 
+    /**
+     * Boolean value provider.
+     */
     private static class BooleanValueProvider implements ValueProvider<Boolean> {
         private boolean state;
         private int frequency;
 
+        /**
+         * Create a boolean value provider.
+         */
         private BooleanValueProvider() {
             this.state = true;
         }
 
+        /**
+         * Get the value.
+         *
+         * @return the value
+         */
         @Override
         public Boolean get() {
             return state;
         }
 
+        /**
+         * Get the initial value.
+         *
+         * @return the initial value
+         */
         @Override
         public Boolean getInitialValue() {
             return false;
