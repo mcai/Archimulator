@@ -25,7 +25,10 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import net.pickapack.StorageUnit;
 import net.pickapack.dateTime.DateHelper;
-import net.pickapack.model.ModelElement;
+import net.pickapack.model.WithCreateTime;
+import net.pickapack.model.WithId;
+import net.pickapack.model.WithParentId;
+import net.pickapack.model.WithTitle;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -37,7 +40,7 @@ import java.util.List;
  * @author Min Cai
  */
 @DatabaseTable(tableName = "ExperimentSummary")
-public class ExperimentSummary implements ModelElement {
+public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithCreateTime {
     @DatabaseField(generatedId = true)
     private long id;
 

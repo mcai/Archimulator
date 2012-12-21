@@ -36,7 +36,6 @@ public class CacheSet<StateT extends Serializable> {
     private Cache<StateT> cache;
     private List<CacheLine<StateT>> lines;
     private int num;
-    private Stack<Integer> lruStack;
 
     /**
      * Create a cache set.
@@ -49,13 +48,11 @@ public class CacheSet<StateT extends Serializable> {
     public CacheSet(Cache<StateT> cache, int associativity, int num, ValueProviderFactory<StateT, ValueProvider<StateT>> cacheLineStateProviderFactory) {
         this.cache = cache;
         this.num = num;
-
         this.lines = new ArrayList<CacheLine<StateT>>();
         for (int i = 0; i < associativity; i++) {
             this.lines.add(new CacheLine<StateT>(cache, this.num, i, cacheLineStateProviderFactory.createValueProvider(this.num, i)));
         }
 
-        this.lruStack = new Stack<Integer>();
     }
 
     /**
@@ -83,14 +80,5 @@ public class CacheSet<StateT extends Serializable> {
      */
     public int getNum() {
         return num;
-    }
-
-    /**
-     * Get the LRU stack.
-     *
-     * @return the LRU stack
-     */
-    public Stack<Integer> getLruStack() {
-        return lruStack;
     }
 }

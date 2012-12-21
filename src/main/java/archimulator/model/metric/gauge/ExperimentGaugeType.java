@@ -16,12 +16,14 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.model.metric;
+package archimulator.model.metric.gauge;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import net.pickapack.dateTime.DateHelper;
-import net.pickapack.model.ModelElement;
+import net.pickapack.model.WithCreateTime;
+import net.pickapack.model.WithId;
+import net.pickapack.model.WithTitle;
 
 import java.util.Date;
 
@@ -31,7 +33,7 @@ import java.util.Date;
  * @author Min Cai
  */
 @DatabaseTable(tableName = "ExperimentGaugeType")
-public class ExperimentGaugeType implements ModelElement {
+public class ExperimentGaugeType implements WithId, WithTitle, WithCreateTime {
     @DatabaseField(generatedId = true)
     private long id;
 
@@ -75,13 +77,9 @@ public class ExperimentGaugeType implements ModelElement {
      *
      * @return the experiment gauge type's ID
      */
+    @Override
     public long getId() {
         return id;
-    }
-
-    @Override
-    public long getParentId() {
-        return -1;
     }
 
     /**
@@ -89,6 +87,7 @@ public class ExperimentGaugeType implements ModelElement {
      *
      * @return the experiment gauge type's title
      */
+    @Override
     public String getTitle() {
         return title;
     }

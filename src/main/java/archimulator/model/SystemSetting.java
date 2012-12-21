@@ -21,7 +21,8 @@ package archimulator.model;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import net.pickapack.dateTime.DateHelper;
-import net.pickapack.model.ModelElement;
+import net.pickapack.model.WithCreateTime;
+import net.pickapack.model.WithId;
 
 import java.util.Date;
 
@@ -31,12 +32,9 @@ import java.util.Date;
  * @author Min Cai
  */
 @DatabaseTable(tableName = "SystemSetting")
-public class SystemSetting implements ModelElement {
+public class SystemSetting implements WithId, WithCreateTime {
     @DatabaseField(generatedId = true)
     private long id;
-
-    @DatabaseField
-    private String title;
 
     @DatabaseField
     private long createTime;
@@ -45,18 +43,9 @@ public class SystemSetting implements ModelElement {
     private boolean runningExperimentsEnabled;
 
     /**
-     * Create a system setting. Reserved for ORM only.
+     * Create a system setting.
      */
     public SystemSetting() {
-    }
-
-    /**
-     * Create a system setting.
-     *
-     * @param title the title
-     */
-    public SystemSetting(String title) {
-        this.title = title;
         this.createTime = DateHelper.toTick(new Date());
     }
 
@@ -65,22 +54,9 @@ public class SystemSetting implements ModelElement {
      *
      * @return the system setting's ID
      */
+    @Override
     public long getId() {
         return id;
-    }
-
-    @Override
-    public long getParentId() {
-        return -1;
-    }
-
-    /**
-     * Get the system setting's title.
-     *
-     * @return the system setting's title
-     */
-    public String getTitle() {
-        return title;
     }
 
     /**
@@ -88,6 +64,7 @@ public class SystemSetting implements ModelElement {
      *
      * @return the time in ticks when the system setting is created
      */
+    @Override
     public long getCreateTime() {
         return createTime;
     }

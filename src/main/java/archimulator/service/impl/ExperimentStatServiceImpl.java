@@ -20,10 +20,10 @@ package archimulator.service.impl;
 
 import archimulator.model.Experiment;
 import archimulator.model.ExperimentSummary;
-import archimulator.model.metric.ExperimentGauge;
+import archimulator.model.metric.gauge.ExperimentGauge;
 import archimulator.model.metric.ExperimentStat;
-import archimulator.model.metric.MultiBarPlot;
-import archimulator.model.metric.Table;
+import archimulator.util.plot.MultiBarPlot;
+import archimulator.util.plot.Table;
 import archimulator.service.ExperimentStatService;
 import archimulator.service.ServiceManager;
 import com.j256.ormlite.dao.Dao;
@@ -35,7 +35,7 @@ import net.pickapack.Pair;
 import net.pickapack.StorageUnit;
 import net.pickapack.action.Function1;
 import net.pickapack.action.Function2;
-import net.pickapack.model.ModelElement;
+import net.pickapack.model.WithId;
 import net.pickapack.service.AbstractService;
 import net.pickapack.util.CollectionHelper;
 import org.apache.commons.io.FileUtils;
@@ -80,7 +80,7 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
      */
     @SuppressWarnings("unchecked")
     public ExperimentStatServiceImpl() {
-        super(ServiceManager.getDatabaseUrl(), Arrays.<Class<? extends ModelElement>>asList(ExperimentStat.class, ExperimentSummary.class));
+        super(ServiceManager.getDatabaseUrl(), Arrays.<Class<? extends WithId>>asList(ExperimentStat.class, ExperimentSummary.class));
 
         this.stats = createDao(ExperimentStat.class);
         this.summaries = createDao(ExperimentSummary.class);

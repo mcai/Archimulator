@@ -20,10 +20,10 @@ package archimulator.service;
 
 import archimulator.model.Experiment;
 import archimulator.model.ExperimentSummary;
-import archimulator.model.metric.ExperimentGauge;
+import archimulator.model.metric.gauge.ExperimentGauge;
 import archimulator.model.metric.ExperimentStat;
-import archimulator.model.metric.MultiBarPlot;
-import archimulator.model.metric.Table;
+import archimulator.util.plot.MultiBarPlot;
+import archimulator.util.plot.Table;
 import net.pickapack.action.Function1;
 import net.pickapack.service.Service;
 

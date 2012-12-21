@@ -20,7 +20,7 @@ package archimulator.sim.common;
 
 import archimulator.model.ContextMapping;
 import archimulator.model.Experiment;
-import archimulator.model.metric.ExperimentGauge;
+import archimulator.model.metric.gauge.ExperimentGauge;
 import archimulator.model.metric.ExperimentStat;
 import archimulator.service.ServiceManager;
 import archimulator.sim.core.BasicProcessor;

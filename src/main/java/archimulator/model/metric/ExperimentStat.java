@@ -19,12 +19,16 @@
 package archimulator.model.metric;
 
 import archimulator.model.Experiment;
+import archimulator.model.metric.gauge.ExperimentGauge;
 import archimulator.service.ServiceManager;
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import net.pickapack.dateTime.DateHelper;
-import net.pickapack.model.ModelElement;
+import net.pickapack.model.WithCreateTime;
+import net.pickapack.model.WithId;
+import net.pickapack.model.WithParentId;
+import net.pickapack.model.WithTitle;
 
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -37,7 +41,7 @@ import java.util.Map;
  * @author Min Cai
  */
 @DatabaseTable(tableName = "ExperimentStat")
-public class ExperimentStat implements ModelElement {
+public class ExperimentStat implements WithId, WithParentId, WithTitle, WithCreateTime {
     @DatabaseField(generatedId = true)
     private long id;
 

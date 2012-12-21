@@ -19,8 +19,8 @@
 package archimulator.service;
 
 import archimulator.model.Experiment;
-import archimulator.model.metric.ExperimentGauge;
-import archimulator.model.metric.ExperimentGaugeType;
+import archimulator.model.metric.gauge.ExperimentGauge;
+import archimulator.model.metric.gauge.ExperimentGaugeType;
 import net.pickapack.service.Service;
 
 import java.util.List;

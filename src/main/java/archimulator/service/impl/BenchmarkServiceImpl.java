@@ -22,7 +22,7 @@ import archimulator.model.Benchmark;
 import archimulator.service.BenchmarkService;
 import archimulator.service.ServiceManager;
 import com.j256.ormlite.dao.Dao;
-import net.pickapack.model.ModelElement;
+import net.pickapack.model.WithId;
 import net.pickapack.service.AbstractService;
 
 import java.util.Arrays;
@@ -39,7 +39,7 @@ public class BenchmarkServiceImpl extends AbstractService implements BenchmarkSe
      */
     @SuppressWarnings("unchecked")
     public BenchmarkServiceImpl() {
-        super(ServiceManager.getDatabaseUrl(), Arrays.<Class<? extends ModelElement>>asList(Benchmark.class));
+        super(ServiceManager.getDatabaseUrl(), Arrays.<Class<? extends WithId>>asList(Benchmark.class));
 
         this.benchmarks = createDao(Benchmark.class);
     }
@@ -108,7 +108,7 @@ public class BenchmarkServiceImpl extends AbstractService implements BenchmarkSe
      */
     @Override
     public List<Benchmark> getAllBenchmarks() {
-        return this.getAllItems(this.benchmarks);
+        return this.getItems(this.benchmarks);
     }
 
     /**
@@ -118,7 +118,7 @@ public class BenchmarkServiceImpl extends AbstractService implements BenchmarkSe
      */
     @Override
     public List<Benchmark> getAllBenchmarks(long first, long count) {
-        return this.getAllItems(this.benchmarks, first, count);
+        return this.getItems(this.benchmarks, first, count);
     }
 
     /**
@@ -126,7 +126,7 @@ public class BenchmarkServiceImpl extends AbstractService implements BenchmarkSe
      */
     @Override
     public long getNumAllBenchmarks() {
-        return this.getNumAllItems(this.benchmarks);
+        return this.getNumItems(this.benchmarks);
     }
 
     /**

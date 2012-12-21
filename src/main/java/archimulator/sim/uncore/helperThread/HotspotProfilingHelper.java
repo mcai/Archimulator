@@ -43,7 +43,6 @@ import java.util.TreeMap;
  * @author Min Cai
  */
 public class HotspotProfilingHelper {
-    private Simulation simulation;
     private DirectoryController l2CacheController;
 
     private Map<String, Map<String, Long>> numCallsPerFunctions;
@@ -52,13 +51,14 @@ public class HotspotProfilingHelper {
     private DescriptiveStatistics statL2CacheHitReuseDistances;
     private DescriptiveStatistics statL2CacheMissReuseDistances;
 
+    private Map<Integer, Stack<Integer>> l2CacheLruStacks;
+
     /**
      * Create a hotpot profiling helper.
      *
      * @param simulation the simulation object
      */
     public HotspotProfilingHelper(Simulation simulation) {
-        this.simulation = simulation;
         this.l2CacheController = simulation.getProcessor().getMemoryHierarchy().getL2CacheController();
 
         this.numCallsPerFunctions = new TreeMap<String, Map<String, Long>>();
@@ -67,9 +67,11 @@ public class HotspotProfilingHelper {
         this.statL2CacheHitReuseDistances = new DescriptiveStatistics();
         this.statL2CacheMissReuseDistances = new DescriptiveStatistics();
 
-        this.scanLoadInstructionsInHotspotFunction(this.simulation.getProcessor().getCores().get(0).getThreads().get(0).getContext().getProcess());
+        this.l2CacheLruStacks = new TreeMap<Integer, Stack<Integer>>();
 
-        this.simulation.getBlockingEventDispatcher().addListener(FunctionalCallEvent.class, new Action1<FunctionalCallEvent>() {
+        this.scanLoadInstructionsInHotspotFunction(simulation.getProcessor().getCores().get(0).getThreads().get(0).getContext().getProcess());
+
+        simulation.getBlockingEventDispatcher().addListener(FunctionalCallEvent.class, new Action1<FunctionalCallEvent>() {
             @Override
             public void apply(FunctionalCallEvent event) {
                 String callerFunctionName = event.getContext().getProcess().getFunctionNameFromPc(event.getFunctionCallContext().getPc());
@@ -88,7 +90,7 @@ public class HotspotProfilingHelper {
             }
         });
 
-        this.simulation.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, new Action1<GeneralCacheControllerServiceNonblockingRequestEvent>() {
+        simulation.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, new Action1<GeneralCacheControllerServiceNonblockingRequestEvent>() {
             public void apply(GeneralCacheControllerServiceNonblockingRequestEvent event) {
                 DynamicInstruction dynamicInstruction = event.getAccess().getDynamicInstruction();
 
@@ -110,7 +112,7 @@ public class HotspotProfilingHelper {
                 }
 
                 if (event.getCacheController() == l2CacheController) {
-                    profileReuseDistance(event.isHitInCache(), event.getAccess());
+                    profileReuseDistance(event.isHitInCache(), event.getWay(), event.getAccess());
                 }
             }
         });
@@ -139,13 +141,14 @@ public class HotspotProfilingHelper {
      * Profile the reuse distance for an access.
      *
      * @param hitInCache a value indicating whether the access hits in the cache or not
+     * @param way
      * @param access the memory hierarchy access
      */
-    private void profileReuseDistance(boolean hitInCache, MemoryHierarchyAccess access) {
+    private void profileReuseDistance(boolean hitInCache, int way, MemoryHierarchyAccess access) {
         int tag = access.getPhysicalTag();
         int set = this.l2CacheController.getCache().getSet(tag);
 
-        Stack<Integer> lruStack = this.l2CacheController.getCache().get(set).getLruStack();
+        Stack<Integer> lruStack = getLruStackForL2Cache(set);
 
         int position = lruStack.search(tag);
 
@@ -154,6 +157,19 @@ public class HotspotProfilingHelper {
             this.statL2CacheMissReuseDistances.addValue(position);
         }
         else {
+            if(hitInCache && BasicThread.isMainThread(access.getThread())) {
+                HelperThreadL2CacheRequestProfilingHelper helperThreadL2CacheRequestProfilingHelper = this.l2CacheController.getSimulation().getHelperThreadL2CacheRequestProfilingHelper();
+
+                if(helperThreadL2CacheRequestProfilingHelper != null) {
+                    HelperThreadL2CacheRequestState helperThreadL2CacheRequestState =
+                            helperThreadL2CacheRequestProfilingHelper.getHelperThreadL2CacheRequestStates().get(set).get(way);
+
+                    if(BasicThread.isHelperThread(helperThreadL2CacheRequestState.getThreadId())) {
+                        System.out.println(); //TODO
+                    }
+                }
+            }
+
             lruStack.remove((Integer) tag);
             lruStack.push(tag);
 
@@ -164,6 +180,20 @@ public class HotspotProfilingHelper {
                 this.statL2CacheMissReuseDistances.addValue(position);
             }
         }
+    }
+
+    /**
+     * Get the LRU stack for the specified set in the L2 cache.
+     *
+     * @param set the set index
+     * @return the LRU stack for the specified set in the L2 cache
+     */
+    private Stack<Integer> getLruStackForL2Cache(int set) {
+        if(!this.l2CacheLruStacks.containsKey(set)) {
+            this.l2CacheLruStacks.put(set, new Stack<Integer>());
+        }
+
+        return this.l2CacheLruStacks.get(set);
     }
 
     /**

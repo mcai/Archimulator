@@ -21,7 +21,9 @@ package archimulator.model;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import net.pickapack.dateTime.DateHelper;
-import net.pickapack.model.ModelElement;
+import net.pickapack.model.WithCreateTime;
+import net.pickapack.model.WithId;
+import net.pickapack.model.WithTitle;
 
 import java.util.Date;
 
@@ -31,7 +33,7 @@ import java.util.Date;
  * @author Min Cai
  */
 @DatabaseTable(tableName = "Benchmark")
-public class Benchmark implements ModelElement {
+public class Benchmark implements WithId, WithTitle, WithCreateTime {
     @DatabaseField(generatedId = true)
     private long id;
 
@@ -101,18 +103,9 @@ public class Benchmark implements ModelElement {
      *
      * @return the ID
      */
+    @Override
     public long getId() {
         return id;
-    }
-
-    /**
-     * Get the parent ID.
-     *
-     * @return the parent ID
-     */
-    @Override
-    public long getParentId() {
-        return -1;
     }
 
     /**

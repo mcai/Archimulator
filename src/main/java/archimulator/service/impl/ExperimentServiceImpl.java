@@ -19,7 +19,7 @@
 package archimulator.service.impl;
 
 import archimulator.model.*;
-import archimulator.model.metric.ExperimentGauge;
+import archimulator.model.metric.gauge.ExperimentGauge;
 import archimulator.service.ExperimentService;
 import archimulator.service.ServiceManager;
 import archimulator.sim.common.*;
@@ -33,7 +33,7 @@ import net.pickapack.Reference;
 import net.pickapack.action.Function1;
 import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
-import net.pickapack.model.ModelElement;
+import net.pickapack.model.WithId;
 import net.pickapack.service.AbstractService;
 import net.pickapack.util.CollectionHelper;
 import org.apache.commons.io.FileUtils;
@@ -65,7 +65,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
      */
     @SuppressWarnings("unchecked")
     public ExperimentServiceImpl() {
-        super(ServiceManager.getDatabaseUrl(), Arrays.<Class<? extends ModelElement>>asList(Experiment.class, ExperimentPack.class, ExperimentSpec.class));
+        super(ServiceManager.getDatabaseUrl(), Arrays.<Class<? extends WithId>>asList(Experiment.class, ExperimentPack.class, ExperimentSpec.class));
 
         this.experiments = createDao(Experiment.class);
         this.experimentPacks = createDao(ExperimentPack.class);
@@ -258,7 +258,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
      */
     @Override
     public List<Experiment> getAllExperiments() {
-        return this.getAllItems(this.experiments);
+        return this.getItems(this.experiments);
     }
 
     /**
@@ -269,7 +269,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
      */
     @Override
     public List<Experiment> getAllExperiments(long first, long count) {
-        return this.getAllItems(this.experiments, first, count);
+        return this.getItems(this.experiments, first, count);
     }
 
     /**
@@ -278,7 +278,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
      */
     @Override
     public long getNumAllExperiments() {
-        return this.getNumAllItems(this.experiments);
+        return this.getNumItems(this.experiments);
     }
 
     /**
@@ -524,7 +524,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
      */
     @Override
     public List<ExperimentPack> getAllExperimentPacks() {
-        return this.getAllItems(this.experimentPacks);
+        return this.getItems(this.experimentPacks);
     }
 
     /**
@@ -535,7 +535,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
      */
     @Override
     public List<ExperimentPack> getAllExperimentPacks(long first, long count) {
-        return this.getAllItems(this.experimentPacks, first, count);
+        return this.getItems(this.experimentPacks, first, count);
     }
 
     /**

@@ -23,7 +23,7 @@ import archimulator.service.ArchitectureService;
 import archimulator.service.ServiceManager;
 import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
 import com.j256.ormlite.dao.Dao;
-import net.pickapack.model.ModelElement;
+import net.pickapack.model.WithId;
 import net.pickapack.service.AbstractService;
 
 import java.util.Arrays;
@@ -41,7 +41,7 @@ public class ArchitectureServiceImpl extends AbstractService implements Architec
      */
     @SuppressWarnings("unchecked")
     public ArchitectureServiceImpl() {
-        super(ServiceManager.getDatabaseUrl(), Arrays.<Class<? extends ModelElement>>asList(Architecture.class));
+        super(ServiceManager.getDatabaseUrl(), Arrays.<Class<? extends WithId>>asList(Architecture.class));
 
         this.architectures = createDao(Architecture.class);
     }
@@ -57,7 +57,7 @@ public class ArchitectureServiceImpl extends AbstractService implements Architec
      */
     @Override
     public List<Architecture> getAllArchitectures() {
-        return this.getAllItems(this.architectures);
+        return this.getItems(this.architectures);
     }
 
     /**
@@ -68,7 +68,7 @@ public class ArchitectureServiceImpl extends AbstractService implements Architec
      */
     @Override
     public List<Architecture> getAllArchitectures(long first, long count) {
-        return this.getAllItems(this.architectures, first, count);
+        return this.getItems(this.architectures, first, count);
     }
 
     /**
@@ -77,7 +77,7 @@ public class ArchitectureServiceImpl extends AbstractService implements Architec
      */
     @Override
     public long getNumAllArchitectures() {
-        return this.getNumAllItems(this.architectures);
+        return this.getNumItems(this.architectures);
     }
 
     /**

@@ -19,13 +19,13 @@
 package archimulator.service.impl;
 
 import archimulator.model.Experiment;
-import archimulator.model.metric.ExperimentGauge;
-import archimulator.model.metric.ExperimentGaugeType;
+import archimulator.model.metric.gauge.ExperimentGauge;
+import archimulator.model.metric.gauge.ExperimentGaugeType;
 import archimulator.service.ExperimentMetricService;
 import archimulator.service.ServiceManager;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.PreparedQuery;
-import net.pickapack.model.ModelElement;
+import net.pickapack.model.WithId;
 import net.pickapack.service.AbstractService;
 
 import java.sql.SQLException;
@@ -44,7 +44,7 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
      */
     @SuppressWarnings("unchecked")
     public ExperimentMetricServiceImpl() {
-        super(ServiceManager.getDatabaseUrl(), Arrays.<Class<? extends ModelElement>>asList(ExperimentGaugeType.class, ExperimentGauge.class));
+        super(ServiceManager.getDatabaseUrl(), Arrays.<Class<? extends WithId>>asList(ExperimentGaugeType.class, ExperimentGauge.class));
 
         this.gaugeTypes = createDao(ExperimentGaugeType.class);
         this.gauges = createDao(ExperimentGauge.class);
@@ -193,7 +193,7 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
 
     @Override
     public List<ExperimentGaugeType> getAllGaugeTypes() {
-        return this.getAllItems(this.gaugeTypes);
+        return this.getItems(this.gaugeTypes);
     }
 
     @Override
@@ -231,7 +231,7 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
      */
     @Override
     public List<ExperimentGauge> getAllGauges() {
-        return this.getAllItems(this.gauges);
+        return this.getItems(this.gauges);
     }
 
     /**

@@ -25,7 +25,9 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import net.pickapack.StorageUnit;
 import net.pickapack.dateTime.DateHelper;
-import net.pickapack.model.ModelElement;
+import net.pickapack.model.WithCreateTime;
+import net.pickapack.model.WithId;
+import net.pickapack.model.WithTitle;
 import net.pickapack.util.StorageUnitHelper;
 
 import java.util.Date;
@@ -36,7 +38,7 @@ import java.util.Date;
  * @author Min Cai
  */
 @DatabaseTable(tableName = "Architecture")
-public class Architecture implements ModelElement {
+public class Architecture implements WithId, WithTitle, WithCreateTime {
     @DatabaseField(generatedId = true)
     private long id;
 
@@ -393,20 +395,11 @@ public class Architecture implements ModelElement {
     }
 
     /**
-     * Get the parent ID.
-     *
-     * @return parent ID
-     */
-    @Override
-    public long getParentId() {
-        return -1;
-    }
-
-    /**
      * Get the title.
      *
      * @return title
      */
+    @Override
     public String getTitle() {
         if (title == null) {
             updateTitle();
@@ -420,6 +413,7 @@ public class Architecture implements ModelElement {
      *
      * @return the time in ticks
      */
+    @Override
     public long getCreateTime() {
         return createTime;
     }

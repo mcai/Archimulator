@@ -23,7 +23,7 @@ import archimulator.service.ServiceManager;
 import archimulator.service.UserService;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.PreparedQuery;
-import net.pickapack.model.ModelElement;
+import net.pickapack.model.WithId;
 import net.pickapack.service.AbstractService;
 
 import java.sql.SQLException;
@@ -42,7 +42,7 @@ public class UserServiceImpl extends AbstractService implements UserService {
      */
     @SuppressWarnings("unchecked")
     public UserServiceImpl() {
-        super(ServiceManager.getDatabaseUrl(), Arrays.<Class<? extends ModelElement>>asList(User.class));
+        super(ServiceManager.getDatabaseUrl(), Arrays.<Class<? extends WithId>>asList(User.class));
 
         this.users = createDao(User.class);
     }
@@ -60,7 +60,7 @@ public class UserServiceImpl extends AbstractService implements UserService {
      */
     @Override
     public List<User> getAllUsers() {
-        return this.getAllItems(this.users);
+        return this.getItems(this.users);
     }
 
     /**

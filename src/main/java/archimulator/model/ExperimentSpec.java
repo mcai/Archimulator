@@ -23,7 +23,10 @@ import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import net.pickapack.dateTime.DateHelper;
-import net.pickapack.model.ModelElement;
+import net.pickapack.model.WithCreateTime;
+import net.pickapack.model.WithId;
+import net.pickapack.model.WithParentId;
+import net.pickapack.model.WithTitle;
 import net.pickapack.util.StorageUnitHelper;
 
 import java.util.Date;
@@ -34,7 +37,7 @@ import java.util.Date;
  * @author Min Cai
  */
 @DatabaseTable(tableName = "ExperimentSpec")
-public class ExperimentSpec implements ModelElement {
+public class ExperimentSpec implements WithId, WithParentId, WithTitle, WithCreateTime {
     @DatabaseField(generatedId = true)
     private long id;
 

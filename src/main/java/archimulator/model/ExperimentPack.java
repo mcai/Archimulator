@@ -24,7 +24,9 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import net.pickapack.action.Function1;
 import net.pickapack.dateTime.DateHelper;
-import net.pickapack.model.ModelElement;
+import net.pickapack.model.WithCreateTime;
+import net.pickapack.model.WithId;
+import net.pickapack.model.WithTitle;
 import net.pickapack.util.CollectionHelper;
 import net.pickapack.util.CombinationHelper;
 import org.apache.commons.beanutils.BeanUtils;
@@ -42,7 +44,7 @@ import java.util.List;
  * @author Min Cai
  */
 @DatabaseTable(tableName = "ExperimentPack")
-public class ExperimentPack implements ModelElement {
+public class ExperimentPack implements WithId, WithTitle, WithCreateTime {
     @DatabaseField(generatedId = true)
     private long id;
 
@@ -75,11 +77,6 @@ public class ExperimentPack implements ModelElement {
     @Override
     public long getId() {
         return id;
-    }
-
-    @Override
-    public long getParentId() {
-        return -1;
     }
 
     /**

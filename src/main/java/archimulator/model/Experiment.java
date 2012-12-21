@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.model;
 
-import archimulator.model.metric.ExperimentGauge;
+import archimulator.model.metric.gauge.ExperimentGauge;
 import archimulator.model.metric.ExperimentStat;
 import archimulator.service.ServiceManager;
 import archimulator.util.serialization.ContextMappingArrayListJsonSerializableType;
@@ -28,7 +28,10 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import net.pickapack.action.Function1;
 import net.pickapack.dateTime.DateHelper;
-import net.pickapack.model.ModelElement;
+import net.pickapack.model.WithCreateTime;
+import net.pickapack.model.WithId;
+import net.pickapack.model.WithParentId;
+import net.pickapack.model.WithTitle;
 import net.pickapack.util.CollectionHelper;
 import org.apache.commons.lang.StringUtils;
 
@@ -43,7 +46,7 @@ import java.util.Map;
  * @author Min Cai
  */
 @DatabaseTable(tableName = "Experiment")
-public class Experiment implements ModelElement {
+public class Experiment implements WithId, WithParentId, WithTitle, WithCreateTime {
     @DatabaseField(generatedId = true)
     private long id;
 
@@ -152,6 +155,7 @@ public class Experiment implements ModelElement {
      *
      * @return the experiment ID
      */
+    @Override
     public long getId() {
         return id;
     }
@@ -171,6 +175,7 @@ public class Experiment implements ModelElement {
      *
      * @return the experiment title
      */
+    @Override
     public String getTitle() {
         if(title == null) {
             updateTitle();
@@ -184,6 +189,7 @@ public class Experiment implements ModelElement {
      *
      * @return the time in ticks when the experiment is created
      */
+    @Override
     public long getCreateTime() {
         return createTime;
     }

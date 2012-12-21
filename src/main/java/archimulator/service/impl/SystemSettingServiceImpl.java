@@ -22,7 +22,7 @@ import archimulator.model.SystemSetting;
 import archimulator.service.ServiceManager;
 import archimulator.service.SystemSettingService;
 import com.j256.ormlite.dao.Dao;
-import net.pickapack.model.ModelElement;
+import net.pickapack.model.WithId;
 import net.pickapack.service.AbstractService;
 
 import java.util.Arrays;
@@ -39,7 +39,7 @@ public class SystemSettingServiceImpl extends AbstractService implements SystemS
      */
     @SuppressWarnings("unchecked")
     public SystemSettingServiceImpl() {
-        super(ServiceManager.getDatabaseUrl(), Arrays.<Class<? extends ModelElement>>asList(SystemSetting.class));
+        super(ServiceManager.getDatabaseUrl(), Arrays.<Class<? extends WithId>>asList(SystemSetting.class));
 
         this.systemSettings = createDao(SystemSetting.class);
     }
@@ -55,10 +55,9 @@ public class SystemSettingServiceImpl extends AbstractService implements SystemS
     @Override
     public SystemSetting getSystemSettingSingleton() {
         if(getFirstItem(this.systemSettings) == null) {
-            SystemSetting systemSetting = new SystemSetting("");
-            systemSetting.setRunningExperimentsEnabled(true);
-
-            addItem(this.systemSettings, systemSetting);
+            addItem(this.systemSettings, new SystemSetting() {{
+                setRunningExperimentsEnabled(true);
+            }});
         }
 
         return getFirstItem(this.systemSettings);
