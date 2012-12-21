@@ -164,6 +164,7 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
 
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HOTSPOT), "statL2CacheHitReuseDistances"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HOTSPOT), "statL2CacheMissReuseDistances"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HOTSPOT), "statL2CacheHitHotspotInterThreadReuseDistances"));
 
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HELPER_THREAD), "numMainThreadL2CacheHits"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HELPER_THREAD), "numMainThreadL2CacheMisses"));

@@ -133,4 +133,9 @@ public class HelperThreadL2CacheRequestState {
     public boolean isHitToTransientTag() {
         return hitToTransientTag;
     }
+
+    @Override
+    public String toString() {
+        return String.format("HelperThreadL2CacheRequestState{inFlightThreadId=%d, threadId=%d, pc=0x%08x, quality=%s, hitToTransientTag=%s}", inFlightThreadId, threadId, pc, quality, hitToTransientTag);
+    }
 }

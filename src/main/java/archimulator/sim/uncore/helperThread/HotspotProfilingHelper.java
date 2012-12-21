@@ -22,6 +22,8 @@ import archimulator.sim.analysis.BasicBlock;
 import archimulator.sim.analysis.Function;
 import archimulator.sim.analysis.Instruction;
 import archimulator.sim.common.Simulation;
+import archimulator.sim.common.SimulationObject;
+import archimulator.sim.common.meter.SimulationMeterEvent;
 import archimulator.sim.core.BasicThread;
 import archimulator.sim.core.DynamicInstruction;
 import archimulator.sim.isa.event.FunctionalCallEvent;
@@ -30,9 +32,11 @@ import archimulator.sim.os.Process;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.event.GeneralCacheControllerServiceNonblockingRequestEvent;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
+import archimulator.sim.core.Thread;
 import net.pickapack.action.Action1;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
@@ -51,6 +55,8 @@ public class HotspotProfilingHelper {
     private DescriptiveStatistics statL2CacheHitReuseDistances;
     private DescriptiveStatistics statL2CacheMissReuseDistances;
 
+    private DescriptiveStatistics statL2CacheHitHotspotInterThreadReuseDistances;
+
     private Map<Integer, Stack<Integer>> l2CacheLruStacks;
 
     /**
@@ -66,6 +72,8 @@ public class HotspotProfilingHelper {
 
         this.statL2CacheHitReuseDistances = new DescriptiveStatistics();
         this.statL2CacheMissReuseDistances = new DescriptiveStatistics();
+
+        this.statL2CacheHitHotspotInterThreadReuseDistances = new DescriptiveStatistics();
 
         this.l2CacheLruStacks = new TreeMap<Integer, Stack<Integer>>();
 
@@ -116,6 +124,13 @@ public class HotspotProfilingHelper {
                 }
             }
         });
+
+        simulation.getBlockingEventDispatcher().addListener(HotspotInterThreadReuseDistanceMeterEvent.class, new Action1<HotspotInterThreadReuseDistanceMeterEvent>() {
+            @Override
+            public void apply(HotspotInterThreadReuseDistanceMeterEvent event) {
+                statL2CacheHitHotspotInterThreadReuseDistances.addValue(event.getValue().getReuseDistance());
+            }
+        });
     }
 
     /**
@@ -141,7 +156,7 @@ public class HotspotProfilingHelper {
      * Profile the reuse distance for an access.
      *
      * @param hitInCache a value indicating whether the access hits in the cache or not
-     * @param way
+     * @param way the way
      * @param access the memory hierarchy access
      */
     private void profileReuseDistance(boolean hitInCache, int way, MemoryHierarchyAccess access) {
@@ -165,7 +180,14 @@ public class HotspotProfilingHelper {
                             helperThreadL2CacheRequestProfilingHelper.getHelperThreadL2CacheRequestStates().get(set).get(way);
 
                     if(BasicThread.isHelperThread(helperThreadL2CacheRequestState.getThreadId())) {
-                        System.out.println(); //TODO
+                        this.l2CacheController.getBlockingEventDispatcher().dispatch(new HotspotInterThreadReuseDistanceMeterEvent(
+                                this.l2CacheController,
+                                access.getVirtualPc(),
+                                access.getPhysicalAddress(),
+                                access.getThread().getId(),
+                                ((Thread) access.getThread()).getContext().getProcess().getFunctionNameFromPc(access.getVirtualPc()),
+                                new HotspotInterThreadReuseDistanceMeterEventValue(helperThreadL2CacheRequestState, position)
+                        ));
                     }
                 }
             }
@@ -230,6 +252,66 @@ public class HotspotProfilingHelper {
      */
     public DescriptiveStatistics getStatL2CacheMissReuseDistances() {
         return statL2CacheMissReuseDistances;
+    }
+
+    /**
+     * Get the descriptive statistics on the L2 cache hit hotspot inter-thread reuse distances.
+     *
+     * @return the descriptive statistics on the L2 cache hit hotspot inter-thread reuse distances
+     */
+    public DescriptiveStatistics getStatL2CacheHitHotspotInterThreadReuseDistances() {
+        return statL2CacheHitHotspotInterThreadReuseDistances;
+    }
+
+    /**
+     * Hotspot inter-thread reuse distance meter event.
+     */
+    public class HotspotInterThreadReuseDistanceMeterEvent extends SimulationMeterEvent<HotspotInterThreadReuseDistanceMeterEventValue> {
+        /**
+         * Create an hotspot inter-thread reuse distance meter event.
+         *
+         * @param sender       the sender simulation object
+         * @param pc           the value of the program counter (PC)
+         * @param address      the data access address
+         * @param threadId     the thread ID
+         * @param functionName the function symbol name
+         * @param value        the value
+         */
+        public HotspotInterThreadReuseDistanceMeterEvent(SimulationObject sender, int pc, int address, int threadId, String functionName, HotspotInterThreadReuseDistanceMeterEventValue value) {
+            super(sender, "HotspotInterThreadReuseDistanceMeterEvent", pc, address, threadId, functionName, value);
+        }
+    }
+
+    /**
+     * Hotspot inter-thread reuse distance meter event value.
+     */
+    public class HotspotInterThreadReuseDistanceMeterEventValue implements Serializable {
+        private HelperThreadL2CacheRequestState helperThreadL2CacheRequestState;
+        private long reuseDistance;
+
+        /**
+         * Create a hotspot inter-thread reuse distance meter event value.
+         *
+         * @param helperThreadL2CacheRequestState the helper thread L2 cache request state
+         * @param reuseDistance the reuse distance
+         */
+        public HotspotInterThreadReuseDistanceMeterEventValue(HelperThreadL2CacheRequestState helperThreadL2CacheRequestState, long reuseDistance) {
+            this.helperThreadL2CacheRequestState = helperThreadL2CacheRequestState;
+            this.reuseDistance = reuseDistance;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("{htRequestState=%s, reuseDistance=%d}", helperThreadL2CacheRequestState, reuseDistance);
+        }
+
+        public HelperThreadL2CacheRequestState getHelperThreadL2CacheRequestState() {
+            return helperThreadL2CacheRequestState;
+        }
+
+        public long getReuseDistance() {
+            return reuseDistance;
+        }
     }
 
     /**
@@ -308,7 +390,7 @@ public class HotspotProfilingHelper {
         /**
          * Get the number of L2 cache hits.
          *
-         * @return the number of L2 hits
+         * @return the number of L2 cache hits
          */
         public int getL2Hits() {
             return l2Hits;
