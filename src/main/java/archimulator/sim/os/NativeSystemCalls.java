@@ -139,10 +139,10 @@ public class NativeSystemCalls {
 
     /**
      *
-     * @param totalCycles
+     * @param numCycles
      * @return
      */
-    public static long clock(long totalCycles) {
-        return CLOCKS_PER_SEC * totalCycles / CPU_FREQUENCY;
+    public static long clock(long numCycles) {
+        return CLOCKS_PER_SEC * numCycles / CPU_FREQUENCY;
     }
 }

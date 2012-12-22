@@ -18,236 +18,313 @@
  ******************************************************************************/
 package archimulator.sim.core;
 
+import archimulator.sim.common.SimulationObject;
 import archimulator.sim.core.bpred.BranchPredictor;
 import archimulator.sim.isa.Mnemonic;
 import archimulator.sim.os.Context;
-import archimulator.sim.uncore.MemoryHierarchyThread;
+import archimulator.sim.uncore.tlb.TranslationLookasideBuffer;
 
-import java.util.List;
+import java.util.Map;
 
 /**
+ * Thread.
  *
  * @author Min Cai
  */
-public interface Thread extends MemoryHierarchyThread {
+public interface Thread extends SimulationObject {
     /**
-     *
+     * Fast forward for one cycle.
      */
     void fastForwardOneCycle();
 
     /**
-     *
+     * Warmup cache for one cycle.
      */
     void warmupCacheOneCycle();
 
     /**
-     *
+     * Update the fetch NPC and the fetch NNPC from the architectural register file.
      */
     void updateFetchNpcAndNnpcFromRegs();
 
     /**
-     *
+     * Fetch.
      */
     void fetch();
 
     /**
+     * Register rename one entry.
      *
-     * @return
+     * @return whether there is an entry is register renamed or not
      */
     boolean registerRenameOne();
 
     /**
+     * Dispatch one entry.
      *
-     * @return
+     * @return whether there is an entry is dispatched or not
      */
     boolean dispatchOne();
 
     /**
-     *
+     * Refresh the load/store queue.
      */
     void refreshLoadStoreQueue();
 
     /**
-     *
+     * Commit.
      */
     void commit();
 
     /**
-     *
+     * Squash the pipeline.
      */
     void squash();
 
     /**
-     *
-     * @return
-     */
-    Core getCore();
-
-    /**
-     *
-     * @return
-     */
-    BranchPredictor getBranchPredictor();
-
-    /**
-     *
-     * @return
-     */
-    PipelineBuffer<DecodeBufferEntry> getDecodeBuffer();
-
-    /**
-     *
-     * @return
-     */
-    PipelineBuffer<ReorderBufferEntry> getReorderBuffer();
-
-    /**
-     *
-     * @return
-     */
-    PipelineBuffer<LoadStoreQueueEntry> getLoadStoreQueue();
-
-    /**
-     *
-     * @return
-     */
-    long getTotalInstructions();
-
-    /**
-     *
-     * @return
-     */
-    Context getContext();
-
-    /**
-     *
-     * @param context
-     */
-    void setContext(Context context);
-
-    /**
-     *
-     * @return
-     */
-    boolean isLastDecodedDynamicInstructionCommitted();
-
-    /**
-     *
+     * Update statistics per cycle.
      */
     void updatePerCycleStats();
 
     /**
+     * Get the number of the thread.
      *
+     * @return the number of the thread
      */
-    void incrementRegisterRenameStallsOnDecodeBufferIsEmpty();
+    int getNum();
 
     /**
+     * Get the ID of the thread.
      *
+     * @return the ID of the thread
      */
-    void incrementRegisterRenameStallsOnReorderBufferIsFull();
+    int getId();
 
     /**
+     * Get the name of the thread.
      *
+     * @return the name of the thread
      */
-    void incrementSelectionStallOnCanNotLoad();
+    String getName();
 
     /**
+     * Get the instruction translation lookaside buffer (iTLB).
      *
+     * @return the instruction translation lookaside buffer (iTLB)
      */
-    void incrementSelectionStallOnCanNotStore();
+    TranslationLookasideBuffer getItlb();
 
     /**
+     * Set the instruction translation lookaside buffer (iTLB).
      *
+     * @param itlb the instruction translation lookaside buffer (iTLB)
      */
-    void incrementSelectionStallOnNoFreeFunctionalUnit();
+    void setItlb(TranslationLookasideBuffer itlb);
 
     /**
+     * Get the data translation lookaside buffer (dTLB).
      *
-     * @return
+     * @return the data translation lookaside buffer (dTLB)
      */
-    long getDecodeBufferFull();
+    TranslationLookasideBuffer getDtlb();
 
     /**
+     * Set the data translation lookaside buffer (dTLB).
      *
-     * @return
+     * @param dtlb the data translation lookaside buffer (dTLB)
      */
-    long getReorderBufferFull();
+    void setDtlb(TranslationLookasideBuffer dtlb);
 
     /**
+     * Get the parent core.
      *
-     * @return
+     * @return the parent core
      */
-    long getLoadStoreQueueFull();
+    Core getCore();
 
     /**
+     * Get the branch predictor.
      *
-     * @return
+     * @return the branch predictor
      */
-    long getIntPhysicalRegisterFileFull();
+    BranchPredictor getBranchPredictor();
 
     /**
+     * Get the decode buffer.
      *
-     * @return
+     * @return the decode buffer
      */
-    long getFpPhysicalRegisterFileFull();
+    PipelineBuffer<DecodeBufferEntry> getDecodeBuffer();
 
     /**
+     * Get the reorder buffer.
      *
-     * @return
+     * @return the reorder buffer
      */
-    long getMiscPhysicalRegisterFileFull();
+    PipelineBuffer<ReorderBufferEntry> getReorderBuffer();
 
     /**
+     * Get the load/store queue.
      *
-     * @return
+     * @return the load/store queue
      */
-    long getFetchStallsOnDecodeBufferIsFull();
+    PipelineBuffer<LoadStoreQueueEntry> getLoadStoreQueue();
 
     /**
+     * Get the number of instructions.
      *
-     * @return
+     * @return the number of instructions
      */
-    long getRegisterRenameStallsOnDecodeBufferIsEmpty();
+    long getNumInstructions();
 
     /**
+     * Get the context.
      *
-     * @return
+     * @return the context
      */
-    long getRegisterRenameStallsOnReorderBufferIsFull();
+    Context getContext();
 
     /**
+     * Set the context.
      *
-     * @return
+     * @param context the context
      */
-    long getRegisterRenameStallsOnLoadStoreQueueFull();
+    void setContext(Context context);
 
     /**
+     * Get a value indicating whether the last decoded dynamic instruction has been committed or not.
      *
-     * @return
+     * @return a value indicating whether the last decoded dynamic instruction has been committed or not
      */
-    long getSelectionStallOnCanNotLoad();
+    boolean isLastDecodedDynamicInstructionCommitted();
 
     /**
-     *
-     * @return
+     * Increment the number of register rename stalls when the decode buffer is empty.
      */
-    long getSelectionStallOnCanNotStore();
+    void incrementNumRegisterRenameStallsOnDecodeBufferIsEmpty();
 
     /**
-     *
-     * @return
+     * Increment the number of register rename stalls when the reorder buffer is full.
      */
-    long getSelectionStallOnNoFreeFunctionalUnit();
+    void incrementNumRegisterRenameStallsOnReorderBufferIsFull();
 
     /**
-     *
-     * @return
+     * Increment the number of selection stalls when loads can not be issued.
      */
-    List<Mnemonic> getExecutedMnemonics();
+    void incrementNumSelectionStallsOnCanNotLoad();
 
     /**
-     *
-     * @return
+     * Increment the number of selection stalls when stores can not be issued.
      */
-    List<String> getExecutedSystemCalls();
+    void incrementNumSelectionStallsOnCanNotStore();
+
+    /**
+     * Increment the number of selection stalls when there is no free functional unit of the a specific type.
+     */
+    void incrementNumSelectionStallsOnNoFreeFunctionalUnit();
+
+    /**
+     * Get the number of stalls on the decode buffer is full.
+     *
+     * @return the number of stalls on the decode buffer is full
+     */
+    long getNumDecodeBufferFullStalls();
+
+    /**
+     * Get the number of stalls on the reorder buffer is full.
+     *
+     * @return the number of stalls on the reorder buffer is full
+     */
+    long getNumReorderBufferFullStalls();
+
+    /**
+     * Get the number of stalls on the load/store queue is full.
+     *
+     * @return the number of stalls on the load/store queue is full
+     */
+    long getNumLoadStoreQueueFullStalls();
+
+    /**
+     * Get the number of stalls on the integer physical register file is full.
+     *
+     * @return the number of stalls on the integer physical register file is full
+     */
+    long getNumIntPhysicalRegisterFileFullStalls();
+
+    /**
+     * Get the number of stalls on the floating point physical register file is full.
+     *
+     * @return the number of stalls on the floating point physical register file is full
+     */
+    long getNumFpPhysicalRegisterFileFullStalls();
+
+    /**
+     * Get the number of stalls on the miscellaneous physical register file is full.
+     *
+     * @return the number of stalls on the miscellaneous physical register file is full
+     */
+    long getNumMiscPhysicalRegisterFileFullStalls();
+
+    /**
+     * Get the number of fetch stalls on the decode buffer is full.
+     *
+     * @return the number of fetch stalls on the decode buffer is full
+     */
+    long getNumFetchStallsOnDecodeBufferIsFull();
+
+    /**
+     * Get the number of register rename stalls on the decode buffer is empty.
+     *
+     * @return the number of register rename stalls on the decode buffer is empty
+     */
+    long getNumRegisterRenameStallsOnDecodeBufferIsEmpty();
+
+    /**
+     * Get the number of register rename stalls on the reorder buffer is full.
+     *
+     * @return the number of register rename stalls on the reorder buffer is full
+     */
+    long getNumRegisterRenameStallsOnReorderBufferIsFull();
+
+    /**
+     * Get the number of register rename stalls on the load/store queue is full.
+     *
+     * @return the number of register rename stalls on the load/store queue is full
+     */
+    long getNumRegisterRenameStallsOnLoadStoreQueueFull();
+
+    /**
+     * Get the number of selection stalls on loads can not be issued.
+     *
+     * @return the number of selection stalls on loads can not be issued
+     */
+    long getNumSelectionStallsOnCanNotLoad();
+
+    /**
+     * Get the number of selection stalls on stores can not be issued.
+     *
+     * @return the number of selection stalls on stores can not be issued
+     */
+    long getNumSelectionStallsOnCanNotStore();
+
+    /**
+     * Get the number of selection stalls on there is no free functional unit of a specific type.
+     *
+     * @return the number of selection stalls on there is no free functional unit of a specific type
+     */
+    long getNumSelectionStallsOnNoFreeFunctionalUnit();
+
+    /**
+     * Get the executed mnemonics.
+     *
+     * @return the executed mnemonics
+     */
+    Map<Mnemonic, Long> getExecutedMnemonics();
+
+    /**
+     * get the executed system call names.
+     *
+     * @return the executed system call names
+     */
+    Map<String, Long> getExecutedSystemCalls();
 }

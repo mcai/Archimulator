@@ -271,9 +271,9 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
             summary.setHelperThreadLookahead(helperThreadEnabled ? parent.getContextMappings().get(0).getHelperThreadLookahead() : -1);
             summary.setHelperThreadStride(helperThreadEnabled ? parent.getContextMappings().get(0).getHelperThreadStride() : -1);
 
-            summary.setTotalInstructions(parent.getStatValueAsLong(statsMap, parent.getMeasurementTitlePrefix() + "simulation/totalInstructions", 0));
+            summary.setNumInstructions(parent.getStatValueAsLong(statsMap, parent.getMeasurementTitlePrefix() + "simulation/numInstructions", 0));
 
-            summary.setTotalCycles(
+            summary.setNumCycles(
                     parent.getStatValueAsLong(statsMap, parent.getMeasurementTitlePrefix() + "simulation/cycleAccurateEventQueue/currentCycle", 0)
             );
 
@@ -374,11 +374,11 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
         List<String> columns = helperThreadEnabled ? Arrays.asList(
                 "Experiment", "L2 Size", "L2 Assoc", "L2 Repl",
                 "Lookahead", "Stride",
-                "Total Cycles", "Speedup", "IPC", "CPI",
+                "Num Cycles", "Speedup", "IPC", "CPI",
                 "L2 Downward Read MPKI", "Main Thread Hit", "Main Thread Miss", "L2 Hit Ratio", "L2 Evictions", "L2 Occupancy Ratio", "Helper Thread Hit", "Helper Thread Miss", "Helper Thread Coverage", "Helper Thread Accuracy", "Redundant MSHR", "Redundant Cache", "Timely", "Late", "Bad", "Ugly"
         ) : Arrays.asList(
                 "Experiment", "L2 Size", "L2 Assoc", "L2 Repl",
-                "Total Cycles", "Speedup", "IPC", "CPI",
+                "Num Cycles", "Speedup", "IPC", "CPI",
                 "L2 Downward Read MPKI", "Main Thread Hit", "Main Thread Miss", "L2 Hit Ratio", "L2 Evictions", "L2 Occupancy Ratio"
         );
 
@@ -413,9 +413,9 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
                     "simulation/cyclesPerInstruction"))));
 
             long numL2DownwardReadMisses = Long.parseLong(experiment.getStatValue(statsMap, experiment.getMeasurementTitlePrefix() + "l2/numDownwardReadMisses"));
-            long totalInstructions = Long.parseLong(experiment.getStatValue(statsMap, experiment.getMeasurementTitlePrefix() + "simulation/totalInstructions"));
+            long numInstructions = Long.parseLong(experiment.getStatValue(statsMap, experiment.getMeasurementTitlePrefix() + "simulation/numInstructions"));
 
-            row.add(String.format("%.4f", (double) numL2DownwardReadMisses / (totalInstructions / FileUtils.ONE_KB)));
+            row.add(String.format("%.4f", (double) numL2DownwardReadMisses / (numInstructions / FileUtils.ONE_KB)));
 
             row.add(experiment.getStatValue(statsMap, experiment.getMeasurementTitlePrefix() +
                     "helperThreadL2CacheRequestProfilingHelper/numMainThreadL2CacheHits"));
@@ -475,8 +475,8 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
                 "Lookahead",
                 "Stride",
 
-                "Total Instructions",
-                "Total Cycles",
+                "Num Instructions",
+                "Num Cycles",
 
                 "IPC",
                 "CPI",
@@ -545,13 +545,13 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
      */
     @Override
     public List<Double> getSpeedups(Experiment baselineExperiment, List<Experiment> experiments) {
-        long baselineTotalCycles = Long.parseLong(baselineExperiment.getStatValue(baselineExperiment.getMeasurementTitlePrefix() + "simulation/cycleAccurateEventQueue/currentCycle"));
+        long baselineNumCycles = Long.parseLong(baselineExperiment.getStatValue(baselineExperiment.getMeasurementTitlePrefix() + "simulation/cycleAccurateEventQueue/currentCycle"));
 
         List<Double> speedups = new ArrayList<Double>();
 
         for (Experiment experiment : experiments) {
-            long totalCycles = Long.parseLong(experiment.getStatValue(experiment.getMeasurementTitlePrefix() + "simulation/cycleAccurateEventQueue/currentCycle"));
-            speedups.add((double) baselineTotalCycles / totalCycles);
+            long numCycles = Long.parseLong(experiment.getStatValue(experiment.getMeasurementTitlePrefix() + "simulation/cycleAccurateEventQueue/currentCycle"));
+            speedups.add((double) baselineNumCycles / numCycles);
         }
 
         return speedups;
@@ -564,9 +564,9 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
      */
     @Override
     public double getSpeedup(Experiment baselineExperiment, Experiment experiment) {
-        long baselineTotalCycles = Long.parseLong(baselineExperiment.getStatValue(baselineExperiment.getMeasurementTitlePrefix() + "simulation/cycleAccurateEventQueue/currentCycle", "0"));
-        long totalCycles = Long.parseLong(experiment.getStatValue(experiment.getMeasurementTitlePrefix() + "simulation/cycleAccurateEventQueue/currentCycle", "0"));
-        return totalCycles == 0L ? 0.0f : (double) baselineTotalCycles / totalCycles;
+        long baselineNumCycles = Long.parseLong(baselineExperiment.getStatValue(baselineExperiment.getMeasurementTitlePrefix() + "simulation/cycleAccurateEventQueue/currentCycle", "0"));
+        long numCycles = Long.parseLong(experiment.getStatValue(experiment.getMeasurementTitlePrefix() + "simulation/cycleAccurateEventQueue/currentCycle", "0"));
+        return numCycles == 0L ? 0.0f : (double) baselineNumCycles / numCycles;
     }
 
     /**
@@ -583,11 +583,11 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
      * @return
      */
     @Override
-    public List<Double> getTotalInstructions(List<Experiment> experiments) {
+    public List<Double> getNumInstructions(List<Experiment> experiments) {
         return transform(experiments, new Function1<Experiment, Double>() {
             @Override
             public Double apply(Experiment experiment) {
-                return Double.parseDouble(experiment.getStatValue(experiment.getMeasurementTitlePrefix() + "simulation/totalInstructions"));
+                return Double.parseDouble(experiment.getStatValue(experiment.getMeasurementTitlePrefix() + "simulation/numInstructions"));
             }
         });
     }
@@ -596,8 +596,8 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
      * @param experiments
      */
     @Override
-    public MultiBarPlot plotTotalInstructions(List<Experiment> experiments) {
-        return singleBarPlot("Total Instructions", experiments, getTotalCycles(experiments));
+    public MultiBarPlot plotNumInstructions(List<Experiment> experiments) {
+        return singleBarPlot("Number of Instructions", experiments, getNumberCycles(experiments));
     }
 
     /**
@@ -605,16 +605,16 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
      * @return
      */
     @Override
-    public List<Double> getNormalizedTotalInstructions(List<Experiment> experiments) {
-        return normalize(getTotalInstructions(experiments));
+    public List<Double> getNormalizedNumInstructions(List<Experiment> experiments) {
+        return normalize(getNumInstructions(experiments));
     }
 
     /**
      * @param experiments
      */
     @Override
-    public MultiBarPlot plotNormalizedTotalInstructions(List<Experiment> experiments) {
-        return singleBarPlot("Normalized Total Instructions", experiments, getNormalizedTotalCycles(experiments));
+    public MultiBarPlot plotNormalizedNumInstructions(List<Experiment> experiments) {
+        return singleBarPlot("Normalized Number of Instructions", experiments, getNormalizedNumCycles(experiments));
     }
 
     /**
@@ -622,7 +622,7 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
      * @return
      */
     @Override
-    public List<Double> getTotalCycles(List<Experiment> experiments) {
+    public List<Double> getNumberCycles(List<Experiment> experiments) {
         return transform(experiments, new Function1<Experiment, Double>() {
             @Override
             public Double apply(Experiment experiment) {
@@ -635,8 +635,8 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
      * @param experiments
      */
     @Override
-    public MultiBarPlot plotTotalCycles(List<Experiment> experiments) {
-        return singleBarPlot("Total Cycles", experiments, getTotalCycles(experiments));
+    public MultiBarPlot plotNumCycles(List<Experiment> experiments) {
+        return singleBarPlot("Number of Cycles", experiments, getNumberCycles(experiments));
     }
 
     /**
@@ -644,16 +644,16 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
      * @return
      */
     @Override
-    public List<Double> getNormalizedTotalCycles(List<Experiment> experiments) {
-        return normalize(getTotalCycles(experiments));
+    public List<Double> getNormalizedNumCycles(List<Experiment> experiments) {
+        return normalize(getNumberCycles(experiments));
     }
 
     /**
      * @param experiments
      */
     @Override
-    public MultiBarPlot plotNormalizedTotalCycles(List<Experiment> experiments) {
-        return singleBarPlot("Normalized Total Cycles", experiments, getNormalizedTotalCycles(experiments));
+    public MultiBarPlot plotNormalizedNumCycles(List<Experiment> experiments) {
+        return singleBarPlot("Normalized Number of Cycles", experiments, getNormalizedNumCycles(experiments));
     }
 
     /**
@@ -947,8 +947,8 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
             @Override
             public Double apply(Experiment experiment) {
                 long numL2DownwardReadMisses = Long.parseLong(experiment.getStatValue(experiment.getMeasurementTitlePrefix() + "l2/numDownwardReadMisses"));
-                long totalInstructions = Long.parseLong(experiment.getStatValue(experiment.getMeasurementTitlePrefix() + "simulation/totalInstructions"));
-                return (double) numL2DownwardReadMisses / (totalInstructions / FileUtils.ONE_KB);
+                long numInstructions = Long.parseLong(experiment.getStatValue(experiment.getMeasurementTitlePrefix() + "simulation/numInstructions"));
+                return (double) numL2DownwardReadMisses / (numInstructions / FileUtils.ONE_KB);
             }
         });
     }

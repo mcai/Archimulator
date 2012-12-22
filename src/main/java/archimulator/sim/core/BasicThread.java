@@ -28,7 +28,6 @@ import archimulator.sim.isa.RegisterDependencyType;
 import archimulator.sim.isa.StaticInstruction;
 import archimulator.sim.isa.StaticInstructionType;
 import archimulator.sim.os.ContextState;
-import archimulator.sim.uncore.MemoryHierarchyThread;
 import net.pickapack.Reference;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
@@ -125,7 +124,7 @@ public class BasicThread extends AbstractBasicThread {
                 StaticInstruction.execute(staticInstruction, this.context);
 
                 if (!this.context.isPseudoCallEncounteredInLastInstructionExecution() && staticInstruction.getMnemonic().getType() != StaticInstructionType.NOP) {
-                    this.totalInstructions++;
+                    this.numInstructions++;
                 }
 
             }
@@ -146,7 +145,7 @@ public class BasicThread extends AbstractBasicThread {
                     StaticInstruction.execute(staticInstruction, this.context);
 
                     if (!this.context.isPseudoCallEncounteredInLastInstructionExecution() && staticInstruction.getMnemonic().getType() != StaticInstructionType.NOP) {
-                        this.totalInstructions++;
+                        this.numInstructions++;
                     }
                 }
                 while (this.context != null && this.context.getState() == ContextState.RUNNING && !this.fetchStalled && (this.context.isPseudoCallEncounteredInLastInstructionExecution() || staticInstruction.getMnemonic().getType() == StaticInstructionType.NOP));
@@ -253,7 +252,7 @@ public class BasicThread extends AbstractBasicThread {
             }
 
             if (this.decodeBuffer.isFull()) {
-                this.fetchStallsOnDecodeBufferIsFull++;
+                this.numFetchStallsOnDecodeBufferIsFull++;
                 break;
             }
 
@@ -322,7 +321,7 @@ public class BasicThread extends AbstractBasicThread {
         }
 
         if ((dynamicInstruction.getStaticInstruction().getMnemonic().getType() == StaticInstructionType.LOAD || dynamicInstruction.getStaticInstruction().getMnemonic().getType() == StaticInstructionType.STORE) && this.getLoadStoreQueue().isFull()) {
-            this.registerRenameStallsOnLoadStoreQueueFull++;
+            this.numRegisterRenameStallsOnLoadStoreQueueFull++;
             return false;
         }
 
@@ -466,7 +465,7 @@ public class BasicThread extends AbstractBasicThread {
             if (noInstructionCommittedCounterThreshold > 5) {
                 getSimulation().dumpPendingFlowTree();
 
-//                Logger.fatalf(Logger.THREAD, "%s: No instruction committed for %d cycles, %d committed.", this.getCycleAccurateEventQueue().getCurrentCycle(), this.getName(), COMMIT_TIMEOUT, this.totalInstructions);
+//                Logger.fatalf(Logger.THREAD, "%s: No instruction committed for %d cycles, %d committed.", this.getCycleAccurateEventQueue().getCurrentCycle(), this.getName(), COMMIT_TIMEOUT, this.numInstructions);
             } else {
                 this.lastCommitCycle = this.getCycleAccurateEventQueue().getCurrentCycle();
                 this.noInstructionCommittedCounterThreshold++;
@@ -538,7 +537,7 @@ public class BasicThread extends AbstractBasicThread {
 
             this.reorderBuffer.getEntries().remove(0);
 
-            this.totalInstructions++;
+            this.numInstructions++;
 
             this.lastCommitCycle = this.getCycleAccurateEventQueue().getCurrentCycle();
 
@@ -614,7 +613,7 @@ public class BasicThread extends AbstractBasicThread {
      * @param thread
      * @return
      */
-    public static boolean isMainThread(MemoryHierarchyThread thread) {
+    public static boolean isMainThread(Thread thread) {
         return isMainThread(thread.getId());
     }
 
@@ -637,7 +636,7 @@ public class BasicThread extends AbstractBasicThread {
      * @param thread
      * @return
      */
-    public static boolean isHelperThread(MemoryHierarchyThread thread) {
+    public static boolean isHelperThread(Thread thread) {
         return isHelperThread(thread.getId());
     }
 

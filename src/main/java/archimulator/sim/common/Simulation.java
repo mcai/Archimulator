@@ -33,7 +33,7 @@ import archimulator.sim.uncore.BasicMemoryHierarchy;
 import archimulator.sim.uncore.MemoryHierarchy;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestProfilingHelper;
-import archimulator.sim.uncore.helperThread.HotspotProfilingHelper;
+import archimulator.sim.uncore.helperThread.hotspot.HotspotProfilingHelper;
 import archimulator.util.RuntimeHelper;
 import net.pickapack.Reference;
 import net.pickapack.action.Predicate;
@@ -506,20 +506,20 @@ public abstract class Simulation implements SimulationObject {
     }
 
     /**
-     * Get the total number of instructions that the simulation has executed till now.
+     * Get the number of instructions that the simulation has executed till now.
      *
-     * @return the total number of instructions that the simulation has executed till now.
+     * @return the number of instructions that the simulation has executed till now.
      */
-    public long getTotalInstructions() {
-        long totalInstructions = 0;
+    public long getNumInstructions() {
+        long numInstructions = 0;
 
         for (Core core : this.processor.getCores()) {
             for (Thread thread : core.getThreads()) {
-                totalInstructions += thread.getTotalInstructions();
+                numInstructions += thread.getNumInstructions();
             }
         }
 
-        return totalInstructions;
+        return numInstructions;
     }
 
     /**
@@ -528,7 +528,7 @@ public abstract class Simulation implements SimulationObject {
      * @return the IPC (instructions per cycle) value
      */
     public double getInstructionsPerCycle() {
-        return (double) this.getTotalInstructions() / this.getCycleAccurateEventQueue().getCurrentCycle();
+        return (double) this.getNumInstructions() / this.getCycleAccurateEventQueue().getCurrentCycle();
     }
 
     /**
@@ -537,7 +537,7 @@ public abstract class Simulation implements SimulationObject {
      * @return the CPI (cycles per instruction) value
      */
     public double getCyclesPerInstruction() {
-        return (double) this.getCycleAccurateEventQueue().getCurrentCycle() / this.getTotalInstructions();
+        return (double) this.getCycleAccurateEventQueue().getCurrentCycle() / this.getNumInstructions();
     }
 
     /**
@@ -555,7 +555,7 @@ public abstract class Simulation implements SimulationObject {
      * @return the IPS (instructions per second) value
      */
     public double getInstructionsPerSecond() {
-        return (double) this.getTotalInstructions() / this.getDurationInSeconds();
+        return (double) this.getNumInstructions() / this.getDurationInSeconds();
     }
 
     /**

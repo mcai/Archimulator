@@ -36,7 +36,7 @@ import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
 import net.pickapack.util.ValueProvider;
 import net.pickapack.util.ValueProviderFactory;
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
 import java.util.*;
 
@@ -77,9 +77,9 @@ public class HelperThreadL2CacheRequestProfilingHelper {
 
     private Map<Integer, PendingL2Miss> pendingL2Misses;
 
-    private DescriptiveStatistics statL2CacheMissNumCycles;
-    private DescriptiveStatistics statL2CacheMissMlpCosts;
-    private DescriptiveStatistics statL2CacheMissAverageMlps;
+    private SummaryStatistics statL2CacheMissNumCycles;
+    private SummaryStatistics statL2CacheMissMlpCosts;
+    private SummaryStatistics statL2CacheMissAverageMlps;
 
     private boolean l2RequestLatencyStatsEnabled;
 
@@ -123,9 +123,9 @@ public class HelperThreadL2CacheRequestProfilingHelper {
 
         this.pendingL2Misses = new LinkedHashMap<Integer, PendingL2Miss>();
 
-        this.statL2CacheMissNumCycles = new DescriptiveStatistics();
-        this.statL2CacheMissMlpCosts = new DescriptiveStatistics();
-        this.statL2CacheMissAverageMlps = new DescriptiveStatistics();
+        this.statL2CacheMissNumCycles = new SummaryStatistics();
+        this.statL2CacheMissMlpCosts = new SummaryStatistics();
+        this.statL2CacheMissAverageMlps = new SummaryStatistics();
 
         l2CacheController.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, new Action1<GeneralCacheControllerServiceNonblockingRequestEvent>() {
             public void apply(GeneralCacheControllerServiceNonblockingRequestEvent event) {
@@ -1009,29 +1009,29 @@ public class HelperThreadL2CacheRequestProfilingHelper {
     }
 
     /**
-     * Get the descriptive statistics of the number of cycles for the L2 cache misses.
+     * Get the summary statistics of the number of cycles for the L2 cache misses.
      *
-     * @return the descriptive statistics of the number of cycles for the L2 cache misses
+     * @return the summary statistics of the number of cycles for the L2 cache misses
      */
-    public DescriptiveStatistics getStatL2CacheMissNumCycles() {
+    public SummaryStatistics getStatL2CacheMissNumCycles() {
         return statL2CacheMissNumCycles;
     }
 
     /**
-     * Get the descriptive statistics of the MLP costs for the L2 cache misses.
+     * Get the summary statistics of the MLP costs for the L2 cache misses.
      *
-     * @return the descriptive statistics of the MLP costs for the L2 cache misses
+     * @return the summary statistics of the MLP costs for the L2 cache misses
      */
-    public DescriptiveStatistics getStatL2CacheMissMlpCosts() {
+    public SummaryStatistics getStatL2CacheMissMlpCosts() {
         return statL2CacheMissMlpCosts;
     }
 
     /**
-     * Get the descriptive statistics of the average MLPs for the L2 cache misses.
+     * Get the summary statistics of the average MLPs for the L2 cache misses.
      *
-     * @return the descriptive statistics of the average MLPs for the L2 cache misses
+     * @return the summary statistics of the average MLPs for the L2 cache misses
      */
-    public DescriptiveStatistics getStatL2CacheMissAverageMlps() {
+    public SummaryStatistics getStatL2CacheMissAverageMlps() {
         return statL2CacheMissAverageMlps;
     }
 

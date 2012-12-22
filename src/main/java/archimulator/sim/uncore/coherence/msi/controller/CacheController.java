@@ -33,6 +33,7 @@ import archimulator.sim.uncore.coherence.msi.fsm.CacheControllerFiniteStateMachi
 import archimulator.sim.uncore.coherence.msi.message.*;
 import archimulator.sim.uncore.coherence.msi.state.CacheControllerState;
 import archimulator.sim.uncore.net.Net;
+import archimulator.sim.core.Thread;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action2;
 import net.pickapack.util.ValueProvider;
@@ -120,7 +121,7 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
      * @param onCompletedCallback the callback action performed when the memory hierarchy access is completed
      * @return the newly created memory hierarchy access
      */
-    public MemoryHierarchyAccess beginAccess(DynamicInstruction dynamicInstruction, MemoryHierarchyThread thread, MemoryHierarchyAccessType type, int virtualPc, int physicalAddress, int physicalTag, Action onCompletedCallback) {
+    public MemoryHierarchyAccess beginAccess(DynamicInstruction dynamicInstruction, Thread thread, MemoryHierarchyAccessType type, int virtualPc, int physicalAddress, int physicalTag, Action onCompletedCallback) {
         MemoryHierarchyAccess newAccess = new MemoryHierarchyAccess(dynamicInstruction, thread, type, virtualPc, physicalAddress, physicalTag, onCompletedCallback);
 
         MemoryHierarchyAccess access = this.findAccess(physicalTag);

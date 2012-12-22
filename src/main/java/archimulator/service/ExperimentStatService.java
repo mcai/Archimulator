@@ -175,68 +175,68 @@ public interface ExperimentStatService extends Service {
     MultiBarPlot plotSpeedups(Experiment baselineExperiment, List<Experiment> experiments);
 
     /**
-     * Get the list of the number of total instructions for the specified list of experiments.
+     * Get the list of the number of instructions for the specified list of experiments.
      *
      * @param experiments a list of experiments
-     * @return a list of the number of total instructions for the specified list of experiments
+     * @return a list of the number of instructions for the specified list of experiments
      */
-    List<Double> getTotalInstructions(List<Experiment> experiments);
+    List<Double> getNumInstructions(List<Experiment> experiments);
 
     /**
-     * Generate a multi bar plot object for showing the total instructions for the specified list of experiments.
+     * Generate a multi bar plot object for showing the number of instructions for the specified list of experiments.
      *
      * @param experiments    a list of experiments
-     * @return a multi bar plot object for showing the total instructions for the specified list of experiments
+     * @return a multi bar plot object for showing the number of instructions for the specified list of experiments
      */
-    MultiBarPlot plotTotalInstructions(List<Experiment> experiments);
+    MultiBarPlot plotNumInstructions(List<Experiment> experiments);
 
     /**
-     * Get a list of normalized number of total instructions for the specified list of experiments.
+     * Get a list of normalized number of instructions for the specified list of experiments.
      *
      * @param experiments a list of experiments
-     * @return a list of normalized number of total instructions for the specified list of experiments
+     * @return a list of normalized number of instructions for the specified list of experiments
      */
-    List<Double> getNormalizedTotalInstructions(List<Experiment> experiments);
+    List<Double> getNormalizedNumInstructions(List<Experiment> experiments);
 
     /**
-     * Generate a multi bar plot object for showing the list of normalized number of total instructions for the specified list of experiments.
+     * Generate a multi bar plot object for showing the list of normalized number of instructions for the specified list of experiments.
      *
      * @param experiments    a list of experiments
-     * @return a multi bar plot object for showing the list of normalized number of total instructions for the specified list of experiments
+     * @return a multi bar plot object for showing the list of normalized number of instructions for the specified list of experiments
      */
-    MultiBarPlot plotNormalizedTotalInstructions(List<Experiment> experiments);
+    MultiBarPlot plotNormalizedNumInstructions(List<Experiment> experiments);
 
     /**
-     * Get a list of the number of total cycles for the specified list of experiments.
+     * Get a list of the number of cycles for the specified list of experiments.
      *
      * @param experiments a list of experiments
-     * @return a list of the number of total cycles for the specified list of experiments
+     * @return a list of the number of cycles for the specified list of experiments
      */
-    List<Double> getTotalCycles(List<Experiment> experiments);
+    List<Double> getNumberCycles(List<Experiment> experiments);
 
     /**
-     * Generate a multi bar plot object for showing the list of the number of total cycles for the specified list of experiments.
+     * Generate a multi bar plot object for showing the list of the number of cycles for the specified list of experiments.
      *
      * @param experiments    a list of experiments
-     * @return a multi bar plot object for showing the list of the number of total cycles for the specified list of experiments
+     * @return a multi bar plot object for showing the list of the number of cycles for the specified list of experiments
      */
-    MultiBarPlot plotTotalCycles(List<Experiment> experiments);
+    MultiBarPlot plotNumCycles(List<Experiment> experiments);
 
     /**
-     * Get a list of the normalized number of total cycles for the specified list of experiments.
+     * Get a list of the normalized number of cycles for the specified list of experiments.
      *
      * @param experiments a list of experiments
-     * @return a list of the normalized number of total cycles for the specified list of experiments
+     * @return a list of the normalized number of cycles for the specified list of experiments
      */
-    List<Double> getNormalizedTotalCycles(List<Experiment> experiments);
+    List<Double> getNormalizedNumCycles(List<Experiment> experiments);
 
     /**
-     * Generate a multi bar plot object for showing the list of the normalized number of total cycles for the specified list of experiments.
+     * Generate a multi bar plot object for showing the list of the normalized number of cycles for the specified list of experiments.
      *
      * @param experiments a list of experiments
-     * @return a multi bar plot object for showing the list of the normalized number of total cycles for the specified list of experiments
+     * @return a multi bar plot object for showing the list of the normalized number of cycles for the specified list of experiments
      */
-    MultiBarPlot plotNormalizedTotalCycles(List<Experiment> experiments);
+    MultiBarPlot plotNormalizedNumCycles(List<Experiment> experiments);
 
     /**
      * Get a list of the number of L2 downward read misses for the specified list of experiments.

@@ -96,7 +96,7 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.RUNTIME), "usedMemory"));
 
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.SIMULATION), "cycleAccurateEventQueue/currentCycle"));
-            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.SIMULATION), "totalInstructions"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.SIMULATION), "numInstructions"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.SIMULATION), "instructionsPerCycle"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.SIMULATION), "cyclesPerInstruction"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.SIMULATION), "cyclesPerSecond"));
@@ -104,7 +104,7 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
 
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.MAIN_MEMORY), "numPages"));
 
-            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.THREAD), "totalInstructions"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.THREAD), "numInstructions"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.THREAD), "executedMnemonics"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.THREAD), "executedSystemCalls"));
 
@@ -123,23 +123,23 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.THREAD), "branchPredictor/numHits"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.THREAD), "branchPredictor/numMisses"));
 
-            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.THREAD), "decodeBufferFull"));
-            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.THREAD), "reorderBufferFull"));
-            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.THREAD), "loadStoreQueueFull"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.THREAD), "numDecodeBufferFullStalls"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.THREAD), "numReorderBufferFullStalls"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.THREAD), "numLoadStoreQueueFullStalls"));
 
-            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.THREAD), "intPhysicalRegisterFileFull"));
-            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.THREAD), "fpPhysicalRegisterFileFull"));
-            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.THREAD), "miscPhysicalRegisterFileFull"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.THREAD), "numIntPhysicalRegisterFileFullStalls"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.THREAD), "numFpPhysicalRegisterFileFullStalls"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.THREAD), "numMiscPhysicalRegisterFileFullStalls"));
 
-            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.THREAD), "fetchStallsOnDecodeBufferIsFull"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.THREAD), "numFetchStallsOnDecodeBufferIsFull"));
 
-            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.THREAD), "registerRenameStallsOnDecodeBufferIsEmpty"));
-            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.THREAD), "registerRenameStallsOnReorderBufferIsFull"));
-            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.THREAD), "registerRenameStallsOnLoadStoreQueueFull"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.THREAD), "numRegisterRenameStallsOnDecodeBufferIsEmpty"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.THREAD), "numRegisterRenameStallsOnReorderBufferIsFull"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.THREAD), "numRegisterRenameStallsOnLoadStoreQueueFull"));
 
-            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.THREAD), "selectionStallOnCanNotLoad"));
-            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.THREAD), "selectionStallOnCanNotStore"));
-            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.THREAD), "selectionStallOnNoFreeFunctionalUnit"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.THREAD), "numSelectionStallsOnCanNotLoad"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.THREAD), "numSelectionStallsOnCanNotStore"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.THREAD), "numSelectionStallsOnNoFreeFunctionalUnit"));
 
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.CACHE_CONTROLLER), "hitRatio"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.CACHE_CONTROLLER), "numDownwardAccesses"));
@@ -165,6 +165,7 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HOTSPOT), "statL2CacheHitReuseDistances"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HOTSPOT), "statL2CacheMissReuseDistances"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HOTSPOT), "statL2CacheHitHotspotInterThreadReuseDistances"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HOTSPOT), "statL2CacheMissHotspotReuseDistances"));
 
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HELPER_THREAD), "numMainThreadL2CacheHits"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HELPER_THREAD), "numMainThreadL2CacheMisses"));

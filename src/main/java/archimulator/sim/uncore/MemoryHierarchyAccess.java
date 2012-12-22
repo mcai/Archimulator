@@ -19,6 +19,7 @@
 package archimulator.sim.uncore;
 
 import archimulator.sim.core.DynamicInstruction;
+import archimulator.sim.core.Thread;
 import net.pickapack.action.Action;
 
 import java.util.ArrayList;
@@ -32,7 +33,7 @@ import java.util.List;
 public class MemoryHierarchyAccess {
     private long id;
     private DynamicInstruction dynamicInstruction;
-    private MemoryHierarchyThread thread;
+    private Thread thread;
     private MemoryHierarchyAccessType type;
 
     private int virtualPc;
@@ -56,7 +57,7 @@ public class MemoryHierarchyAccess {
      * @param physicalTag         the physical tag of the data under access
      * @param onCompletedCallback the callback action performed when the access is completed
      */
-    public MemoryHierarchyAccess(DynamicInstruction dynamicInstruction, MemoryHierarchyThread thread, MemoryHierarchyAccessType type, int virtualPc, int physicalAddress, int physicalTag, Action onCompletedCallback) {
+    public MemoryHierarchyAccess(DynamicInstruction dynamicInstruction, Thread thread, MemoryHierarchyAccessType type, int virtualPc, int physicalAddress, int physicalTag, Action onCompletedCallback) {
         this.id = thread.getSimulation().currentMemoryHierarchyAccessId++;
 
         this.dynamicInstruction = dynamicInstruction;
@@ -106,7 +107,7 @@ public class MemoryHierarchyAccess {
      *
      * @return the thread
      */
-    public MemoryHierarchyThread getThread() {
+    public Thread getThread() {
         return thread;
     }
 

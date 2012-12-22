@@ -281,13 +281,13 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
 
     /**
      *
-     * @param dynamicInst
+     * @param dynamicInstruction
      * @param virtualAddress
      * @param virtualPc
      * @param onCompletedCallback
      */
-    public void load(DynamicInstruction dynamicInst, int virtualAddress, int virtualPc, final Action onCompletedCallback) {
-        final int physicalAddress = dynamicInst.getThread().getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress);
+    public void load(DynamicInstruction dynamicInstruction, int virtualAddress, int virtualPc, final Action onCompletedCallback) {
+        final int physicalAddress = dynamicInstruction.getThread().getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress);
         final int physicalTag = this.l1DCacheController.getCache().getTag(physicalAddress);
 
         final Counter counterPending = new Counter(0);
@@ -295,7 +295,7 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
         counterPending.inc();
 
         MemoryHierarchyAccess alias = this.l1DCacheController.findAccess(physicalTag);
-        MemoryHierarchyAccess access = this.l1DCacheController.beginAccess(dynamicInst, dynamicInst.getThread(), MemoryHierarchyAccessType.LOAD, virtualPc, physicalAddress, physicalTag, new Action() {
+        MemoryHierarchyAccess access = this.l1DCacheController.beginAccess(dynamicInstruction, dynamicInstruction.getThread(), MemoryHierarchyAccessType.LOAD, virtualPc, physicalAddress, physicalTag, new Action() {
             public void apply() {
                 counterPending.dec();
 
@@ -308,7 +308,7 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
         if (alias == null) {
             counterPending.inc();
 
-            dynamicInst.getThread().getDtlb().access(access, new Action() {
+            dynamicInstruction.getThread().getDtlb().access(access, new Action() {
                 public void apply() {
                     counterPending.dec();
 
@@ -330,18 +330,18 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
             });
         }
 
-        this.getBlockingEventDispatcher().dispatch(new MemoryAccessInitiatedEvent(dynamicInst.getThread(), virtualPc, physicalAddress, physicalTag, MemoryHierarchyAccessType.LOAD));
+        this.getBlockingEventDispatcher().dispatch(new MemoryAccessInitiatedEvent(dynamicInstruction.getThread(), virtualPc, physicalAddress, physicalTag, MemoryHierarchyAccessType.LOAD));
     }
 
     /**
      *
-     * @param dynamicInst
+     * @param dynamicInstruction
      * @param virtualAddress
      * @param virtualPc
      * @param onCompletedCallback
      */
-    public void store(DynamicInstruction dynamicInst, int virtualAddress, int virtualPc, final Action onCompletedCallback) {
-        final int physicalAddress = dynamicInst.getThread().getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress);
+    public void store(DynamicInstruction dynamicInstruction, int virtualAddress, int virtualPc, final Action onCompletedCallback) {
+        final int physicalAddress = dynamicInstruction.getThread().getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress);
         final int physicalTag = this.l1DCacheController.getCache().getTag(physicalAddress);
 
         final Counter counterPending = new Counter(0);
@@ -349,7 +349,7 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
         counterPending.inc();
 
         MemoryHierarchyAccess alias = this.l1DCacheController.findAccess(physicalTag);
-        MemoryHierarchyAccess access = this.l1DCacheController.beginAccess(dynamicInst, dynamicInst.getThread(), MemoryHierarchyAccessType.STORE, virtualPc, physicalAddress, physicalTag, new Action() {
+        MemoryHierarchyAccess access = this.l1DCacheController.beginAccess(dynamicInstruction, dynamicInstruction.getThread(), MemoryHierarchyAccessType.STORE, virtualPc, physicalAddress, physicalTag, new Action() {
             public void apply() {
                 counterPending.dec();
 
@@ -362,7 +362,7 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
         if (alias == null) {
             counterPending.inc();
 
-            dynamicInst.getThread().getDtlb().access(access, new Action() {
+            dynamicInstruction.getThread().getDtlb().access(access, new Action() {
                 public void apply() {
                     counterPending.dec();
 
@@ -379,7 +379,7 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
             });
         }
 
-        this.getBlockingEventDispatcher().dispatch(new MemoryAccessInitiatedEvent(dynamicInst.getThread(), virtualPc, physicalAddress, physicalTag, MemoryHierarchyAccessType.STORE));
+        this.getBlockingEventDispatcher().dispatch(new MemoryAccessInitiatedEvent(dynamicInstruction.getThread(), virtualPc, physicalAddress, physicalTag, MemoryHierarchyAccessType.STORE));
     }
 
     /**

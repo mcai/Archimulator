@@ -46,7 +46,7 @@ public class FunctionalSimulation extends Simulation {
      */
     @Override
     public boolean canDoFastForwardOneCycle() {
-        return this.getExperiment().getNumMaxInstructions() == -1 || this.getProcessor().getCores().get(0).getThreads().get(0).getTotalInstructions() < this.getExperiment().getNumMaxInstructions();
+        return this.getExperiment().getNumMaxInstructions() == -1 || this.getProcessor().getCores().get(0).getThreads().get(0).getNumInstructions() < this.getExperiment().getNumMaxInstructions();
     }
 
     /**

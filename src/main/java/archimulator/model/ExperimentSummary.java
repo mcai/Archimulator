@@ -75,10 +75,10 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
     private int helperThreadStride;
 
     @DatabaseField
-    private long totalInstructions;
+    private long numInstructions;
 
     @DatabaseField
-    private long totalCycles;
+    private long numCycles;
 
     @DatabaseField
     private double ipc;
@@ -315,39 +315,39 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
     }
 
     /**
-     * Get the total number of instructions executed on all the hardware threads.
+     * Get the number of instructions executed on all the hardware threads.
      *
-     * @return the total number of instructions executed on all the hardware threads
+     * @return the number of instructions executed on all the hardware threads
      */
-    public long getTotalInstructions() {
-        return totalInstructions;
+    public long getNumInstructions() {
+        return numInstructions;
     }
 
     /**
-     * Set the total number of instructions executed on all the hardware threads.
+     * Set the number of instructions executed on all the hardware threads.
      *
-     * @param totalInstructions the total number of instructions executed on all the hardware threads
+     * @param numInstructions the number of instructions executed on all the hardware threads
      */
-    public void setTotalInstructions(long totalInstructions) {
-        this.totalInstructions = totalInstructions;
+    public void setNumInstructions(long numInstructions) {
+        this.numInstructions = numInstructions;
     }
 
     /**
-     * Get the total number of cycles elapsed.
+     * Get the number of cycles elapsed.
      *
-     * @return the total number of cycles elapsed
+     * @return the number of cycles elapsed
      */
-    public long getTotalCycles() {
-        return totalCycles;
+    public long getNumCycles() {
+        return numCycles;
     }
 
     /**
-     * Set the total number of cycles elapsed.
+     * Set the number of cycles elapsed.
      *
-     * @param totalCycles the total number of cycles elapsed
+     * @param numCycles the number of cycles elapsed
      */
-    public void setTotalCycles(long totalCycles) {
-        this.totalCycles = totalCycles;
+    public void setNumCycles(long numCycles) {
+        this.numCycles = numCycles;
     }
 
     /**
@@ -686,8 +686,8 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
             add(helperThreadEnabled ? "L=" + helperThreadLookahead + "" : "");
             add(helperThreadEnabled ? "S=" + helperThreadStride + "" : "");
 
-            add(totalInstructions + "");
-            add(totalCycles + "");
+            add(numInstructions + "");
+            add(numCycles + "");
 
             add(ipc + "");
             add(cpi + "");

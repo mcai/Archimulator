@@ -51,10 +51,10 @@ public class BasicCore extends AbstractBasicCore {
                 if (thread.getContext() == null) {
                     return false;
                 } else if (thread.getDecodeBuffer().isEmpty()) {
-                    thread.incrementRegisterRenameStallsOnDecodeBufferIsEmpty();
+                    thread.incrementNumRegisterRenameStallsOnDecodeBufferIsEmpty();
                     return false;
                 } else if (thread.getReorderBuffer().isFull()) {
-                    thread.incrementRegisterRenameStallsOnReorderBufferIsFull();
+                    thread.incrementNumRegisterRenameStallsOnReorderBufferIsFull();
                     return false;
                 } else {
                     return true;
@@ -151,7 +151,7 @@ public class BasicCore extends AbstractBasicCore {
                 })) {
                     reorderBufferEntry.setIssued();
                 } else {
-                    reorderBufferEntry.getThread().incrementSelectionStallOnNoFreeFunctionalUnit();
+                    reorderBufferEntry.getThread().incrementNumSelectionStallsOnNoFreeFunctionalUnit();
                     continue;
                 }
             } else {
@@ -184,7 +184,7 @@ public class BasicCore extends AbstractBasicCore {
                 loadStoreQueueEntry.signalCompleted();
             } else {
                 if (!this.canLoad(loadStoreQueueEntry.getThread(), loadStoreQueueEntry.getEffectiveAddress())) {
-                    loadStoreQueueEntry.getThread().incrementSelectionStallOnCanNotLoad();
+                    loadStoreQueueEntry.getThread().incrementNumSelectionStallsOnCanNotLoad();
                     break;
                 }
 
@@ -207,7 +207,7 @@ public class BasicCore extends AbstractBasicCore {
             final LoadStoreQueueEntry loadStoreQueueEntry = (LoadStoreQueueEntry) it.next();
 
             if (!this.canStore(loadStoreQueueEntry.getThread(), loadStoreQueueEntry.getEffectiveAddress())) {
-                loadStoreQueueEntry.getThread().incrementSelectionStallOnCanNotStore();
+                loadStoreQueueEntry.getThread().incrementNumSelectionStallsOnCanNotStore();
                 break;
             }
 

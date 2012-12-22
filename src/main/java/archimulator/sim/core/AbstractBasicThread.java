@@ -27,8 +27,8 @@ import archimulator.sim.os.Context;
 import archimulator.sim.uncore.tlb.TranslationLookasideBuffer;
 import net.pickapack.action.Action1;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  *
@@ -98,67 +98,67 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
     /**
      *
      */
-    protected long totalInstructions;
+    protected long numInstructions;
 
     /**
      *
      */
-    protected long decodeBufferFull;
+    protected long numDecodeBufferFullStalls;
     /**
      *
      */
-    protected long reorderBufferFull;
+    protected long numReorderBufferFullStalls;
     /**
      *
      */
-    protected long loadStoreQueueFull;
+    protected long numLoadStoreQueueFullStalls;
 
     /**
      *
      */
-    protected long intPhysicalRegisterFileFull;
+    protected long numIntPhysicalRegisterFileFullStalls;
     /**
      *
      */
-    protected long fpPhysicalRegisterFileFull;
+    protected long numFpPhysicalRegisterFileFullStalls;
     /**
      *
      */
-    protected long miscPhysicalRegisterFileFull;
+    protected long numMiscPhysicalRegisterFileFullStalls;
 
     /**
      *
      */
-    protected long fetchStallsOnDecodeBufferIsFull;
+    protected long numFetchStallsOnDecodeBufferIsFull;
 
     /**
      *
      */
-    protected long registerRenameStallsOnDecodeBufferIsEmpty;
+    protected long numRegisterRenameStallsOnDecodeBufferIsEmpty;
     /**
      *
      */
-    protected long registerRenameStallsOnReorderBufferIsFull;
+    protected long numRegisterRenameStallsOnReorderBufferIsFull;
     /**
      *
      */
-    protected long registerRenameStallsOnLoadStoreQueueFull;
+    protected long numRegisterRenameStallsOnLoadStoreQueueFull;
 
     /**
      *
      */
-    protected long selectionStallOnCanNotLoad;
+    protected long numSelectionStallsOnCanNotLoad;
     /**
      *
      */
-    protected long selectionStallOnCanNotStore;
+    protected long numSelectionStallsOnCanNotStore;
     /**
      *
      */
-    protected long selectionStallOnNoFreeFunctionalUnit;
+    protected long numSelectionStallsOnNoFreeFunctionalUnit;
 
-    private List<Mnemonic> executedMnemonics;
-    private List<String> executedSystemCalls;
+    private Map<Mnemonic, Long> executedMnemonics;
+    private Map<String, Long> executedSystemCalls;
 
     /**
      *
@@ -229,17 +229,18 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
         this.reorderBuffer = new PipelineBuffer<ReorderBufferEntry>(getExperiment().getArchitecture().getReorderBufferCapacity());
         this.loadStoreQueue = new PipelineBuffer<LoadStoreQueueEntry>(getExperiment().getArchitecture().getLoadStoreQueueCapacity());
 
-        this.executedMnemonics = new ArrayList<Mnemonic>();
-        this.executedSystemCalls = new ArrayList<String>();
+        this.executedMnemonics = new TreeMap<Mnemonic, Long>();
+        this.executedSystemCalls = new TreeMap<String, Long>();
 
         this.getBlockingEventDispatcher().addListener(InstructionFunctionallyExecutedEvent.class, new Action1<InstructionFunctionallyExecutedEvent>() {
             @Override
             public void apply(InstructionFunctionallyExecutedEvent event) {
                 if (event.getContext() == context) {
                     Mnemonic mnemonic = event.getStaticInstruction().getMnemonic();
-                    if (!executedMnemonics.contains(mnemonic)) {
-                        executedMnemonics.add(mnemonic);
+                    if (!executedMnemonics.containsKey(mnemonic)) {
+                        executedMnemonics.put(mnemonic, 0L);
                     }
+                    executedMnemonics.put(mnemonic, executedMnemonics.get(mnemonic) + 1);
                 }
             }
         });
@@ -249,9 +250,10 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
             public void apply(SystemCallExecutedEvent event) {
                 if (event.getContext() == context) {
                     String systemCallName = event.getSystemCallName();
-                    if (!executedSystemCalls.contains(systemCallName)) {
-                        executedSystemCalls.add(systemCallName);
+                    if (!executedSystemCalls.containsKey(systemCallName)) {
+                        executedSystemCalls.put(systemCallName, 0L);
                     }
+                    executedSystemCalls.put(systemCallName, executedSystemCalls.get(systemCallName) + 1);
                 }
             }
         });
@@ -262,27 +264,27 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
      */
     public void updatePerCycleStats() {
         if (this.decodeBuffer.isFull()) {
-            this.decodeBufferFull++;
+            this.numDecodeBufferFullStalls++;
         }
 
         if (this.reorderBuffer.isFull()) {
-            this.reorderBufferFull++;
+            this.numReorderBufferFullStalls++;
         }
 
         if (this.loadStoreQueue.isFull()) {
-            this.loadStoreQueueFull++;
+            this.numLoadStoreQueueFullStalls++;
         }
 
         if (this.intPhysicalRegisterFile.isFull()) {
-            this.intPhysicalRegisterFileFull++;
+            this.numIntPhysicalRegisterFileFullStalls++;
         }
 
         if (this.fpPhysicalRegisterFile.isFull()) {
-            this.fpPhysicalRegisterFileFull++;
+            this.numFpPhysicalRegisterFileFullStalls++;
         }
 
         if (this.miscPhysicalRegisterFile.isFull()) {
-            this.miscPhysicalRegisterFileFull++;
+            this.numMiscPhysicalRegisterFileFullStalls++;
         }
     }
 
@@ -355,8 +357,8 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
      *
      * @return
      */
-    public long getTotalInstructions() {
-        return totalInstructions;
+    public long getNumInstructions() {
+        return numInstructions;
     }
 
     /**
@@ -410,45 +412,36 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
     /**
      *
      */
-    public void incrementRegisterRenameStallsOnDecodeBufferIsEmpty() {
-        this.registerRenameStallsOnDecodeBufferIsEmpty++;
+    public void incrementNumRegisterRenameStallsOnDecodeBufferIsEmpty() {
+        this.numRegisterRenameStallsOnDecodeBufferIsEmpty++;
     }
 
     /**
      *
      */
-    public void incrementRegisterRenameStallsOnReorderBufferIsFull() {
-        this.registerRenameStallsOnReorderBufferIsFull++;
+    public void incrementNumRegisterRenameStallsOnReorderBufferIsFull() {
+        this.numRegisterRenameStallsOnReorderBufferIsFull++;
     }
 
     /**
      *
      */
-    public void incrementSelectionStallOnCanNotLoad() {
-        this.selectionStallOnCanNotLoad++;
+    public void incrementNumSelectionStallsOnCanNotLoad() {
+        this.numSelectionStallsOnCanNotLoad++;
     }
 
     /**
      *
      */
-    public void incrementSelectionStallOnCanNotStore() {
-        this.selectionStallOnCanNotStore++;
+    public void incrementNumSelectionStallsOnCanNotStore() {
+        this.numSelectionStallsOnCanNotStore++;
     }
 
     /**
      *
      */
-    public void incrementSelectionStallOnNoFreeFunctionalUnit() {
-        this.selectionStallOnNoFreeFunctionalUnit++;
-    }
-
-    /**
-     *
-     * @return
-     */
-    @Override
-    public long getDecodeBufferFull() {
-        return decodeBufferFull;
+    public void incrementNumSelectionStallsOnNoFreeFunctionalUnit() {
+        this.numSelectionStallsOnNoFreeFunctionalUnit++;
     }
 
     /**
@@ -456,8 +449,8 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
      * @return
      */
     @Override
-    public long getReorderBufferFull() {
-        return reorderBufferFull;
+    public long getNumDecodeBufferFullStalls() {
+        return numDecodeBufferFullStalls;
     }
 
     /**
@@ -465,8 +458,8 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
      * @return
      */
     @Override
-    public long getLoadStoreQueueFull() {
-        return loadStoreQueueFull;
+    public long getNumReorderBufferFullStalls() {
+        return numReorderBufferFullStalls;
     }
 
     /**
@@ -474,8 +467,8 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
      * @return
      */
     @Override
-    public long getIntPhysicalRegisterFileFull() {
-        return intPhysicalRegisterFileFull;
+    public long getNumLoadStoreQueueFullStalls() {
+        return numLoadStoreQueueFullStalls;
     }
 
     /**
@@ -483,8 +476,8 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
      * @return
      */
     @Override
-    public long getFpPhysicalRegisterFileFull() {
-        return fpPhysicalRegisterFileFull;
+    public long getNumIntPhysicalRegisterFileFullStalls() {
+        return numIntPhysicalRegisterFileFullStalls;
     }
 
     /**
@@ -492,8 +485,8 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
      * @return
      */
     @Override
-    public long getMiscPhysicalRegisterFileFull() {
-        return miscPhysicalRegisterFileFull;
+    public long getNumFpPhysicalRegisterFileFullStalls() {
+        return numFpPhysicalRegisterFileFullStalls;
     }
 
     /**
@@ -501,8 +494,8 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
      * @return
      */
     @Override
-    public long getFetchStallsOnDecodeBufferIsFull() {
-        return fetchStallsOnDecodeBufferIsFull;
+    public long getNumMiscPhysicalRegisterFileFullStalls() {
+        return numMiscPhysicalRegisterFileFullStalls;
     }
 
     /**
@@ -510,8 +503,8 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
      * @return
      */
     @Override
-    public long getRegisterRenameStallsOnDecodeBufferIsEmpty() {
-        return registerRenameStallsOnDecodeBufferIsEmpty;
+    public long getNumFetchStallsOnDecodeBufferIsFull() {
+        return numFetchStallsOnDecodeBufferIsFull;
     }
 
     /**
@@ -519,8 +512,8 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
      * @return
      */
     @Override
-    public long getRegisterRenameStallsOnReorderBufferIsFull() {
-        return registerRenameStallsOnReorderBufferIsFull;
+    public long getNumRegisterRenameStallsOnDecodeBufferIsEmpty() {
+        return numRegisterRenameStallsOnDecodeBufferIsEmpty;
     }
 
     /**
@@ -528,8 +521,8 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
      * @return
      */
     @Override
-    public long getRegisterRenameStallsOnLoadStoreQueueFull() {
-        return registerRenameStallsOnLoadStoreQueueFull;
+    public long getNumRegisterRenameStallsOnReorderBufferIsFull() {
+        return numRegisterRenameStallsOnReorderBufferIsFull;
     }
 
     /**
@@ -537,8 +530,8 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
      * @return
      */
     @Override
-    public long getSelectionStallOnCanNotLoad() {
-        return selectionStallOnCanNotLoad;
+    public long getNumRegisterRenameStallsOnLoadStoreQueueFull() {
+        return numRegisterRenameStallsOnLoadStoreQueueFull;
     }
 
     /**
@@ -546,8 +539,8 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
      * @return
      */
     @Override
-    public long getSelectionStallOnCanNotStore() {
-        return selectionStallOnCanNotStore;
+    public long getNumSelectionStallsOnCanNotLoad() {
+        return numSelectionStallsOnCanNotLoad;
     }
 
     /**
@@ -555,8 +548,8 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
      * @return
      */
     @Override
-    public long getSelectionStallOnNoFreeFunctionalUnit() {
-        return selectionStallOnNoFreeFunctionalUnit;
+    public long getNumSelectionStallsOnCanNotStore() {
+        return numSelectionStallsOnCanNotStore;
     }
 
     /**
@@ -564,7 +557,16 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
      * @return
      */
     @Override
-    public List<Mnemonic> getExecutedMnemonics() {
+    public long getNumSelectionStallsOnNoFreeFunctionalUnit() {
+        return numSelectionStallsOnNoFreeFunctionalUnit;
+    }
+
+    /**
+     *
+     * @return
+     */
+    @Override
+    public Map<Mnemonic, Long> getExecutedMnemonics() {
         return executedMnemonics;
     }
 
@@ -573,7 +575,7 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
      * @return
      */
     @Override
-    public List<String> getExecutedSystemCalls() {
+    public Map<String, Long> getExecutedSystemCalls() {
         return executedSystemCalls;
     }
 }
