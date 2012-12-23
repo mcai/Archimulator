@@ -131,6 +131,13 @@ public class HotspotProfilingHelper {
                 statL2CacheHitHotspotInterThreadReuseDistances.addValue(event.getValue().getReuseDistance());
             }
         });
+
+        simulation.getBlockingEventDispatcher().addListener(L2CacheMissHotspotReuseDistanceMeterEvent.class, new Action1<L2CacheMissHotspotReuseDistanceMeterEvent>() {
+            @Override
+            public void apply(L2CacheMissHotspotReuseDistanceMeterEvent event) {
+                statL2CacheMissHotspotReuseDistances.addValue(event.getValue().getReuseDistance());
+            }
+        });
     }
 
     /**
