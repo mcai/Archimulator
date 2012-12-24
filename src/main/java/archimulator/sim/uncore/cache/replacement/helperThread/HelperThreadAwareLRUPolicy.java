@@ -16,13 +16,14 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.cache.replacement;
+package archimulator.sim.uncore.cache.replacement.helperThread;
 
 import archimulator.sim.core.BasicThread;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.MemoryHierarchyAccessType;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.prediction.Predictor;
+import archimulator.sim.uncore.cache.replacement.LRUPolicy;
 import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestQuality;
 
 import java.io.Serializable;

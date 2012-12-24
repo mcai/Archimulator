@@ -8,6 +8,7 @@
       <w>bookmarkable</w>
       <w>bpred</w>
       <w>broughter</w>
+      <w>call's</w>
       <w>debian</w>
       <w>disassembly</w>
       <w>dropdown</w>
@@ -51,6 +52,7 @@
       <w>pageable</w>
       <w>precharge</w>
       <w>precharged</w>
+      <w>precomputation</w>
       <w>predecode</w>
       <w>prefetches</w>
       <w>prefetching</w>
@@ -59,8 +61,10 @@
       <w>pthread</w>
       <w>putm</w>
       <w>quant</w>
+      <w>quantizer</w>
       <w>rereference</w>
       <w>runnables</w>
+      <w>spawnings</w>
       <w>sqlite</w>
       <w>sqrt</w>
       <w>strided</w>
@@ -70,6 +74,7 @@
       <w>tuple</w>
       <w>ubuntu</w>
       <w>unmap</w>
+      <w>unmark</w>
       <w>unpartitioned</w>
       <w>viewport</w>
       <w>warmup</w>

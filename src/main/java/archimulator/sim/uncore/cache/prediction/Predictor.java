@@ -22,7 +22,7 @@ package archimulator.sim.uncore.cache.prediction;
  * Predictor.
  *
  * @author Min Cai
- * @param <PredictableT>
+ * @param <PredictableT> the predictable type
  */
 public interface Predictor<PredictableT extends Comparable<PredictableT>> {
     /**

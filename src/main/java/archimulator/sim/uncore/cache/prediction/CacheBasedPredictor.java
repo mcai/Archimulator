@@ -29,7 +29,7 @@ import net.pickapack.util.ValueProviderFactory;
  * Cache based predictor.
  *
  * @author Min Cai
- * @param <PredictableT> predictable type
+ * @param <PredictableT> the predictable type
  */
 public class CacheBasedPredictor<PredictableT extends Comparable<PredictableT>> implements Predictor<PredictableT> {
     private EvictableCache<Boolean> cache;

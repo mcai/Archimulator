@@ -23,6 +23,7 @@ import archimulator.sim.isa.StaticInstructionType;
 import org.apache.commons.lang.StringUtils;
 
 /**
+ * Dynamic instruction.
  *
  * @author Min Cai
  */
@@ -39,13 +40,14 @@ public class DynamicInstruction {
     private boolean useStackPointerAsEffectiveAddressBase;
 
     private boolean missedInL2Cache;
-    private int cyclesSpentAtHeadOfReorderBuffer;
+    private int numCyclesSpentAtHeadOfReorderBuffer;
 
     /**
+     * Create a dynamic instruction.
      *
-     * @param thread
-     * @param pc
-     * @param staticInstruction
+     * @param thread the thread
+     * @param pc the value of the program counter (PC)
+     * @param staticInstruction the static instruction
      */
     public DynamicInstruction(Thread thread, int pc, StaticInstruction staticInstruction) {
         this.id = thread.getSimulation().currentDynamicInstructionId++;
@@ -62,104 +64,115 @@ public class DynamicInstruction {
         }
 
         this.missedInL2Cache = false;
-        this.cyclesSpentAtHeadOfReorderBuffer = 0;
+        this.numCyclesSpentAtHeadOfReorderBuffer = 0;
     }
 
     /**
+     * Get the ID of the dynamic instruction.
      *
-     * @return
+     * @return the ID of the dynamic instruction
      */
     public long getId() {
         return id;
     }
 
     /**
+     * Get the thread.
      *
-     * @return
+     * @return the thread
      */
     public Thread getThread() {
         return thread;
     }
 
     /**
+     * Get the value of the program counter (PC).
      *
-     * @return
+     * @return the value of the program counter (PC)
      */
     public int getPc() {
         return pc;
     }
 
     /**
+     * Get the static instruction.
      *
-     * @return
+     * @return the static instruction
      */
     public StaticInstruction getStaticInstruction() {
         return staticInstruction;
     }
 
     /**
+     * Get the effective address.
      *
-     * @return
+     * @return the effective address
      */
     public int getEffectiveAddress() {
         return effectiveAddress;
     }
 
     /**
+     * Get the effective address base.
      *
-     * @return
+     * @return the effective address base
      */
     public int getEffectiveAddressBase() {
         return effectiveAddressBase;
     }
 
     /**
+     * Get the effective address displacement.
      *
-     * @return
+     * @return the effective address displacement
      */
     public int getEffectiveAddressDisplacement() {
         return effectiveAddressDisplacement;
     }
 
     /**
+     * Get a value indicating whether using the stack pointer as the effective address base or not.
      *
-     * @return
+     * @return a value indicating whether using the stack pointer as the effective address base or not
      */
     public boolean isUseStackPointerAsEffectiveAddressBase() {
         return useStackPointerAsEffectiveAddressBase;
     }
 
     /**
+     * Get a value indicating whether the dynamic instruction has caused an L2 cache miss or not.
      *
-     * @return
+     * @return a value indicating whether the dynamic instruction has caused an L2 cache miss or not
      */
     public boolean isMissedInL2Cache() {
         return missedInL2Cache;
     }
 
-    //TODO: set value
     /**
+     * Set a value indicating whether the dynamic instruction has caused an L2 cache miss or not.
      *
-     * @param missedInL2Cache
+     * @param missedInL2Cache a value indicating whether the dynamic instruction has caused an L2 cache miss or not
      */
     public void setMissedInL2Cache(boolean missedInL2Cache) {
         this.missedInL2Cache = missedInL2Cache;
     }
 
     /**
+     * Get the number of cycles the dynamic instruction has spent at the head of the reorder buffer.
      *
-     * @return
+     * @return the number of cycles the dynamic instruction has spent at the head of the reorder buffer
      */
-    public int getCyclesSpentAtHeadOfReorderBuffer() {
-        return cyclesSpentAtHeadOfReorderBuffer;
+    public int getNumCyclesSpentAtHeadOfReorderBuffer() {
+        return numCyclesSpentAtHeadOfReorderBuffer;
     }
 
     /**
+     * Set the number of cycles the dynamic instruction has spent at the head of the reorder buffer.
      *
-     * @param cyclesSpentAtHeadOfReorderBuffer
+     * @param numCyclesSpentAtHeadOfReorderBuffer the number of cycles the dynamic instruction has spent at the head of the reorder buffer
      */
-    public void setCyclesSpentAtHeadOfReorderBuffer(int cyclesSpentAtHeadOfReorderBuffer) {
-        this.cyclesSpentAtHeadOfReorderBuffer = cyclesSpentAtHeadOfReorderBuffer;
+    public void setNumCyclesSpentAtHeadOfReorderBuffer(int numCyclesSpentAtHeadOfReorderBuffer) {
+        this.numCyclesSpentAtHeadOfReorderBuffer = numCyclesSpentAtHeadOfReorderBuffer;
     }
 
     @Override

@@ -478,7 +478,7 @@ public class BasicThread extends AbstractBasicThread {
             ReorderBufferEntry reorderBufferEntry = this.reorderBuffer.getEntries().get(0);
 
             if (!reorderBufferEntry.isCompleted()) {
-                reorderBufferEntry.getDynamicInstruction().setCyclesSpentAtHeadOfReorderBuffer(reorderBufferEntry.getDynamicInstruction().getCyclesSpentAtHeadOfReorderBuffer() + 1);
+                reorderBufferEntry.getDynamicInstruction().setNumCyclesSpentAtHeadOfReorderBuffer(reorderBufferEntry.getDynamicInstruction().getNumCyclesSpentAtHeadOfReorderBuffer() + 1);
                 break;
             }
 

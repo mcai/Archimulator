@@ -19,9 +19,13 @@
 package archimulator.sim.uncore.helperThread;
 
 import archimulator.sim.common.Simulation;
+import archimulator.sim.common.SimulationEvent;
 import archimulator.sim.core.BasicThread;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
-import archimulator.sim.uncore.cache.*;
+import archimulator.sim.uncore.cache.CacheAccess;
+import archimulator.sim.uncore.cache.CacheGeometry;
+import archimulator.sim.uncore.cache.CacheLine;
+import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.prediction.CacheBasedPredictor;
 import archimulator.sim.uncore.cache.prediction.Predictor;
 import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
@@ -38,7 +42,9 @@ import net.pickapack.util.ValueProvider;
 import net.pickapack.util.ValueProviderFactory;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import static ch.lambdaj.Lambda.*;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -344,9 +350,11 @@ public class HelperThreadL2CacheRequestProfilingHelper {
             if (event.isHitInCache() && !lineFoundIsHelperThread) {
                 if (this.helperThreadL2CacheRequestStates.get(event.getSet()).get(event.getWay()).isHitToTransientTag()) {
                     this.numRedundantHitToTransientTagHelperThreadL2CacheRequests++;
+                    this.l2CacheController.getBlockingEventDispatcher().dispatch(new RedundantHitToTransientTagHelperThreadL2CacheRequestEvent());
                     this.updateHelperThreadL2CacheRequestQualityPredictor(event.getAccess().getThread().getId(), event.getAccess().getVirtualPc(), HelperThreadL2CacheRequestQuality.REDUNDANT_HIT_TO_TRANSIENT_TAG);
                 } else {
                     this.numRedundantHitToCacheHelperThreadL2CacheRequests++;
+                    this.l2CacheController.getBlockingEventDispatcher().dispatch(new RedundantHitToCacheHelperThreadL2CacheRequestEvent());
                     this.updateHelperThreadL2CacheRequestQualityPredictor(event.getAccess().getThread().getId(), event.getAccess().getVirtualPc(), HelperThreadL2CacheRequestQuality.REDUNDANT_HIT_TO_CACHE);
                 }
             }
@@ -399,10 +407,12 @@ public class HelperThreadL2CacheRequestProfilingHelper {
         if (helperThreadL2CacheRequestState.isHitToTransientTag()) {
             helperThreadL2CacheRequestState.setQuality(HelperThreadL2CacheRequestQuality.LATE);
             this.numLateHelperThreadL2CacheRequests++;
+            this.l2CacheController.getBlockingEventDispatcher().dispatch(new LateHelperThreadL2CacheRequestEvent());
             this.updateHelperThreadL2CacheRequestQualityPredictor(helperThreadL2CacheRequestState.getThreadId(), helperThreadL2CacheRequestState.getPc(), HelperThreadL2CacheRequestQuality.LATE);
         } else {
             helperThreadL2CacheRequestState.setQuality(HelperThreadL2CacheRequestQuality.TIMELY);
             this.numTimelyHelperThreadL2CacheRequests++;
+            this.l2CacheController.getBlockingEventDispatcher().dispatch(new TimelyHelperThreadL2CacheRequestEvent());
             this.updateHelperThreadL2CacheRequestQualityPredictor(helperThreadL2CacheRequestState.getThreadId(), helperThreadL2CacheRequestState.getPc(), HelperThreadL2CacheRequestQuality.TIMELY);
         }
 
@@ -620,6 +630,7 @@ public class HelperThreadL2CacheRequestProfilingHelper {
      */
     private void incrementUglyHelperThreadL2CacheRequests(int threadId, int pc) {
         this.numUglyHelperThreadL2CacheRequests++;
+        this.l2CacheController.getBlockingEventDispatcher().dispatch(new UglyHelperThreadL2CacheRequestEvent());
         updateHelperThreadL2CacheRequestQualityPredictor(threadId, pc, HelperThreadL2CacheRequestQuality.UGLY);
     }
 
@@ -631,6 +642,7 @@ public class HelperThreadL2CacheRequestProfilingHelper {
      */
     private void incrementBadHelperThreadL2CacheRequests(int threadId, int pc) {
         this.numBadHelperThreadL2CacheRequests++;
+        this.l2CacheController.getBlockingEventDispatcher().dispatch(new BadHelperThreadL2CacheRequestEvent());
         updateHelperThreadL2CacheRequestQualityPredictor(threadId, pc, HelperThreadL2CacheRequestQuality.BAD);
     }
 
@@ -1109,5 +1121,53 @@ public class HelperThreadL2CacheRequestProfilingHelper {
         public HelperThreadL2CacheRequestVictimCacheLineState getInitialValue() {
             return HelperThreadL2CacheRequestVictimCacheLineState.INVALID;
         }
+    }
+
+    /**
+     * Stable helper thread L2 cache request event.
+     */
+    public abstract class StableHelperThreadL2CacheRequestEvent extends SimulationEvent {
+        /**
+         * Create a stable helper thread L2 cache request event.
+         */
+        public StableHelperThreadL2CacheRequestEvent() {
+            super(l2CacheController);
+        }
+    }
+
+    /**
+     * Redundant "hit to transient tag" helper thread L2 cache request event.
+     */
+    public class RedundantHitToTransientTagHelperThreadL2CacheRequestEvent extends StableHelperThreadL2CacheRequestEvent {
+    }
+
+    /**
+     * Redundant "hit to cache" helper thread L2 cache request event.
+     */
+    public class RedundantHitToCacheHelperThreadL2CacheRequestEvent extends StableHelperThreadL2CacheRequestEvent {
+    }
+
+    /**
+     * Timely helper thread L2 cache request event.
+     */
+    public class TimelyHelperThreadL2CacheRequestEvent extends StableHelperThreadL2CacheRequestEvent {
+    }
+
+    /**
+     * Late helper thread L2 cache request event.
+     */
+    public class LateHelperThreadL2CacheRequestEvent extends StableHelperThreadL2CacheRequestEvent {
+    }
+
+    /**
+     * Bad helper thread L2 cache request event.
+     */
+    public class BadHelperThreadL2CacheRequestEvent extends StableHelperThreadL2CacheRequestEvent {
+    }
+
+    /**
+     * Ugly helper thread L2 cache request event.
+     */
+    public class UglyHelperThreadL2CacheRequestEvent extends StableHelperThreadL2CacheRequestEvent {
     }
 }

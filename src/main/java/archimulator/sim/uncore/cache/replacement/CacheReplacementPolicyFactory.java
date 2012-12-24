@@ -19,6 +19,10 @@
 package archimulator.sim.uncore.cache.replacement;
 
 import archimulator.sim.uncore.cache.EvictableCache;
+import archimulator.sim.uncore.cache.replacement.helperThread.HelperThreadAwareLRUPolicy;
+import archimulator.sim.uncore.cache.replacement.helperThread.HelperThreadIntervalAwareLRUPolicy;
+import archimulator.sim.uncore.cache.replacement.reuseDistance.RereferenceIntervalPredictionPolicy;
+import archimulator.sim.uncore.cache.replacement.reuseDistance.ReuseDistancePredictionPolicy;
 
 import java.io.Serializable;
 
@@ -46,8 +50,14 @@ public class CacheReplacementPolicyFactory {
                 return new RandomPolicy<StateT>(cache);
             case HELPER_THREAD_AWARE_LRU:
                 return new HelperThreadAwareLRUPolicy<StateT>(cache, false);
+            case HELPER_THREAD_INTERVAL_AWARE_LRU:
+                return new HelperThreadIntervalAwareLRUPolicy<StateT>(cache);
             case HELPER_THREAD_AWARE_BREAKDOWN_LRU:
                 return new HelperThreadAwareLRUPolicy<StateT>(cache, true);
+            case REUSE_DISTANCE_PREDICTION:
+                return new ReuseDistancePredictionPolicy<StateT>(cache);
+            case REREFERENCE_INTERVAL_PREDICTION:
+                return new RereferenceIntervalPredictionPolicy<StateT>(cache);
             default:
                 throw new IllegalArgumentException();
         }

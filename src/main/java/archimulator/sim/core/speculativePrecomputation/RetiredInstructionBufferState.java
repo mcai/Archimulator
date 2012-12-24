@@ -16,51 +16,24 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.cache.replacement;
+package archimulator.sim.core.speculativePrecomputation;
 
 /**
- * Cache replacement policy type.
- *
- * @author Min Cai
+ * Retired instruction buffer state.
  */
-public enum CacheReplacementPolicyType {
+public enum RetiredInstructionBufferState {
     /**
-     * Least recently used (LRU).
+     * Idle.
      */
-    LRU,
+    IDLE,
 
     /**
-     * Least frequently used (LFU).
+     * Instruction gathering.
      */
-    LFU,
+    INSTRUCTION_GATHERING,
 
     /**
-     * Random.
+     * Slice building.
      */
-    RANDOM,
-
-    /**
-     * Helper thread aware least recently used (LRU).
-     */
-    HELPER_THREAD_AWARE_LRU,
-
-    /**
-     * Helper thread interval aware least recently used (LRU).
-     */
-    HELPER_THREAD_INTERVAL_AWARE_LRU,
-
-    /**
-     * Helper thread request breakdown enhanced least recently used (LRU).
-     */
-    HELPER_THREAD_AWARE_BREAKDOWN_LRU,
-
-    /**
-     * Reuse distance prediction.
-     */
-    REUSE_DISTANCE_PREDICTION,
-
-    /**
-     * Rereference interval prediction.
-     */
-    REREFERENCE_INTERVAL_PREDICTION
+    SLICE_BUILDING
 }

@@ -16,51 +16,27 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.cache.replacement;
+package archimulator.sim.uncore.cache.replacement.reuseDistance;
+
+import archimulator.sim.uncore.MemoryHierarchyAccess;
+import archimulator.sim.uncore.cache.CacheAccess;
+import archimulator.sim.uncore.cache.EvictableCache;
+
+import java.io.Serializable;
 
 /**
- * Cache replacement policy type.
+ * Reuse distance prediction policy.
  *
  * @author Min Cai
+ * @param <StateT> the state type of the parent evictable cache
  */
-public enum CacheReplacementPolicyType {
-    /**
-     * Least recently used (LRU).
-     */
-    LRU,
+public class ReuseDistancePredictionPolicy<StateT extends Serializable> extends AbstractReuseDistancePredictionPolicy<StateT> {
+    public ReuseDistancePredictionPolicy(EvictableCache<StateT> cache) {
+        super(cache);
+    }
 
-    /**
-     * Least frequently used (LFU).
-     */
-    LFU,
-
-    /**
-     * Random.
-     */
-    RANDOM,
-
-    /**
-     * Helper thread aware least recently used (LRU).
-     */
-    HELPER_THREAD_AWARE_LRU,
-
-    /**
-     * Helper thread interval aware least recently used (LRU).
-     */
-    HELPER_THREAD_INTERVAL_AWARE_LRU,
-
-    /**
-     * Helper thread request breakdown enhanced least recently used (LRU).
-     */
-    HELPER_THREAD_AWARE_BREAKDOWN_LRU,
-
-    /**
-     * Reuse distance prediction.
-     */
-    REUSE_DISTANCE_PREDICTION,
-
-    /**
-     * Rereference interval prediction.
-     */
-    REREFERENCE_INTERVAL_PREDICTION
+    @Override
+    public CacheAccess<StateT> handleReplacement(MemoryHierarchyAccess access, int set, int tag) {
+        return handleReplacementBasedOnReuseDistancePrediction(access, set, tag);
+    }
 }

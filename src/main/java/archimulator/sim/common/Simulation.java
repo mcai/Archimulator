@@ -27,11 +27,13 @@ import archimulator.sim.core.BasicProcessor;
 import archimulator.sim.core.Core;
 import archimulator.sim.core.Processor;
 import archimulator.sim.core.Thread;
+import archimulator.sim.core.speculativePrecomputation.DynamicSpeculativePrecomputationHelper;
 import archimulator.sim.os.Context;
 import archimulator.sim.os.Kernel;
 import archimulator.sim.uncore.BasicMemoryHierarchy;
 import archimulator.sim.uncore.MemoryHierarchy;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
+import archimulator.sim.uncore.delinquentLoad.DelinquentLoadIdentificationHelper;
 import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestProfilingHelper;
 import archimulator.sim.uncore.helperThread.hotspot.HotspotProfilingHelper;
 import archimulator.util.RuntimeHelper;
@@ -76,6 +78,10 @@ public abstract class Simulation implements SimulationObject {
     private HotspotProfilingHelper hotspotProfilingHelper;
 
     private HelperThreadL2CacheRequestProfilingHelper helperThreadL2CacheRequestProfilingHelper;
+
+    private DelinquentLoadIdentificationHelper delinquentLoadIdentificationHelper;
+
+    private DynamicSpeculativePrecomputationHelper dynamicSpeculativePrecomputationHelper;
 
     private RuntimeHelper runtimeHelper;
 
@@ -152,6 +158,12 @@ public abstract class Simulation implements SimulationObject {
         if (getExperiment().getArchitecture().getHelperThreadL2CacheRequestProfilingEnabled()) {
             this.helperThreadL2CacheRequestProfilingHelper = new HelperThreadL2CacheRequestProfilingHelper(this);
         }
+
+        //TODO: add enabling property
+        this.delinquentLoadIdentificationHelper = new DelinquentLoadIdentificationHelper(this);
+
+        //TODO: add enabling property
+        this.dynamicSpeculativePrecomputationHelper = new DynamicSpeculativePrecomputationHelper(this);
     }
 
     /**
@@ -633,6 +645,24 @@ public abstract class Simulation implements SimulationObject {
      */
     public HelperThreadL2CacheRequestProfilingHelper getHelperThreadL2CacheRequestProfilingHelper() {
         return helperThreadL2CacheRequestProfilingHelper;
+    }
+
+    /**
+     * Get the delinquent load identification helper.
+     *
+     * @return the delinquent load identification helper
+     */
+    public DelinquentLoadIdentificationHelper getDelinquentLoadIdentificationHelper() {
+        return delinquentLoadIdentificationHelper;
+    }
+
+    /**
+     * Get the dynamic speculative precomputation helper.
+     *
+     * @return the dynamic speculative precomputation helper
+     */
+    public DynamicSpeculativePrecomputationHelper getDynamicSpeculativePrecomputationHelper() {
+        return dynamicSpeculativePrecomputationHelper;
     }
 
     /**
