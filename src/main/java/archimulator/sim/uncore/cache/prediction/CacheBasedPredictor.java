@@ -33,6 +33,9 @@ import net.pickapack.util.ValueProviderFactory;
  */
 public class CacheBasedPredictor<PredictableT extends Comparable<PredictableT>> implements Predictor<PredictableT> {
     private EvictableCache<Boolean> cache;
+    private PredictableT defaultValue;
+    private long numHits;
+    private long numMisses;
 
     /**
      * Create a cache based predictor.
@@ -42,9 +45,10 @@ public class CacheBasedPredictor<PredictableT extends Comparable<PredictableT>> 
      * @param geometry the geometry of the cache based predictor
      * @param counterThreshold the threshold value of the counter
      * @param counterMaxValue the maximum value of the counter
+     * @param defaultValue the default value
      */
-    public CacheBasedPredictor(SimulationObject parent, String name, CacheGeometry geometry, final int counterThreshold, final int counterMaxValue) {
-        this(parent, name, geometry, CacheReplacementPolicyType.LRU, counterThreshold, counterMaxValue);
+    public CacheBasedPredictor(SimulationObject parent, String name, CacheGeometry geometry, final int counterThreshold, final int counterMaxValue, PredictableT defaultValue) {
+        this(parent, name, geometry, CacheReplacementPolicyType.LRU, counterThreshold, counterMaxValue, defaultValue);
     }
 
     /**
@@ -56,8 +60,9 @@ public class CacheBasedPredictor<PredictableT extends Comparable<PredictableT>> 
      * @param cacheReplacementPolicyType the type of the cache replacement policy
      * @param counterThreshold the threshold value of the predictor
      * @param counterMaxValue the maximum value of the predictor
+     * @param defaultValue the default value
      */
-    public CacheBasedPredictor(SimulationObject parent, String name, CacheGeometry geometry, CacheReplacementPolicyType cacheReplacementPolicyType, final int counterThreshold, final int counterMaxValue) {
+    public CacheBasedPredictor(SimulationObject parent, String name, CacheGeometry geometry, CacheReplacementPolicyType cacheReplacementPolicyType, final int counterThreshold, final int counterMaxValue, PredictableT defaultValue) {
         ValueProviderFactory<Boolean, ValueProvider<Boolean>> cacheLineStateProviderFactory = new ValueProviderFactory<Boolean, ValueProvider<Boolean>>() {
             @Override
             public ValueProvider<Boolean> createValueProvider(Object... args) {
@@ -66,9 +71,23 @@ public class CacheBasedPredictor<PredictableT extends Comparable<PredictableT>> 
         };
 
         this.cache = new EvictableCache<Boolean>(parent, name, geometry, cacheReplacementPolicyType, cacheLineStateProviderFactory);
+        this.defaultValue = defaultValue;
+    }
+
+    public PredictableT predict(int address) {
+        CacheLine<Boolean> lineFound = this.cache.findLine(address);
+        BooleanValueProvider stateProvider = lineFound != null ? (BooleanValueProvider) lineFound.getStateProvider() : null;
+        return lineFound != null && stateProvider.confidence.isTaken() ? stateProvider.predictedValue : getDefaultValue();
     }
 
     public void update(int address, PredictableT observedValue) {
+        if(this.predict(address).equals(observedValue)) {
+            this.numHits++;
+        }
+        else {
+            this.numMisses++;
+        }
+
         int set = this.cache.getSet(address);
         int tag = this.cache.getTag(address);
 
@@ -100,10 +119,51 @@ public class CacheBasedPredictor<PredictableT extends Comparable<PredictableT>> 
         }
     }
 
-    public PredictableT predict(int address, PredictableT defaultValue) {
-        CacheLine<Boolean> lineFound = this.cache.findLine(address);
-        BooleanValueProvider stateProvider = lineFound != null ? (BooleanValueProvider) lineFound.getStateProvider() : null;
-        return lineFound != null && stateProvider.confidence.isTaken() ? stateProvider.predictedValue : defaultValue;
+    /**
+     * Get the default value.
+     *
+     * @return the default value
+     */
+    public PredictableT getDefaultValue() {
+        return defaultValue;
+    }
+
+    /**
+     * Get the number of hits.
+     *
+     * @return the number of hits
+     */
+    @Override
+    public long getNumHits() {
+        return numHits;
+    }
+
+    /**
+     * Get the number of misses.
+     *
+     * @return the number of misses
+     */
+    @Override
+    public long getNumMisses() {
+        return numMisses;
+    }
+
+    /**
+     * Get the number of accesses.
+     *
+     * @return the number of accesses
+     */
+    public long getNumAccesses() {
+        return numHits + numMisses;
+    }
+
+    /**
+     * Get the hit ratio.
+     *
+     * @return the hit ratio
+     */
+    public double getHitRatio() {
+        return this.getNumAccesses() > 0 ? (double) this.numHits / this.getNumAccesses() : 0.0;
     }
 
     /**

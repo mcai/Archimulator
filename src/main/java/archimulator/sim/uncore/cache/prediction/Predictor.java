@@ -26,6 +26,15 @@ package archimulator.sim.uncore.cache.prediction;
  */
 public interface Predictor<PredictableT extends Comparable<PredictableT>> {
     /**
+     * Predict the value for the specified address.
+     *
+     *
+     * @param address the address
+     * @return the predicted value for the specified address
+     */
+    PredictableT predict(int address);
+
+    /**
      * Update the observed value for the specified address.
      *
      * @param address the address
@@ -34,11 +43,23 @@ public interface Predictor<PredictableT extends Comparable<PredictableT>> {
     void update(int address, PredictableT observedValue);
 
     /**
-     * Predict the value for the specified address.
+     * Get the default value.
      *
-     * @param address the address
-     * @param defaultValue the default value
-     * @return the predicted value for the specified address
+     * @return the default value
      */
-    PredictableT predict(int address, PredictableT defaultValue);
+    PredictableT getDefaultValue();
+
+    /**
+     * Get the number of misses.
+     *
+     * @return the number of misses
+     */
+    long getNumHits();
+
+    /**
+     * Get the number of misses.
+     *
+     * @return the number of misses
+     */
+    long getNumMisses();
 }

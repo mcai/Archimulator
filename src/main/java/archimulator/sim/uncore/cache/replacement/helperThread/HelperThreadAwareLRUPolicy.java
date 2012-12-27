@@ -22,7 +22,6 @@ import archimulator.sim.core.BasicThread;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.MemoryHierarchyAccessType;
 import archimulator.sim.uncore.cache.EvictableCache;
-import archimulator.sim.uncore.cache.prediction.Predictor;
 import archimulator.sim.uncore.cache.replacement.LRUPolicy;
 import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestQuality;
 
@@ -86,8 +85,7 @@ public class HelperThreadAwareLRUPolicy<StateT extends Serializable> extends LRU
                     return;
                 }
 
-                Predictor<HelperThreadL2CacheRequestQuality> predictor = getCache().getSimulation().getHelperThreadL2CacheRequestProfilingHelper().getHelperThreadL2CacheRequestQualityPredictor();
-                HelperThreadL2CacheRequestQuality predictedQuality = predictor.predict(access.getVirtualPc(), HelperThreadL2CacheRequestQuality.UGLY);
+                HelperThreadL2CacheRequestQuality predictedQuality = getCache().getSimulation().getHelperThreadL2CacheRequestProfilingHelper().getHelperThreadL2CacheRequestQualityPredictor().predict(access.getVirtualPc());
 
                 switch (predictedQuality) {
                     case REDUNDANT_HIT_TO_TRANSIENT_TAG:

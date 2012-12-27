@@ -189,6 +189,10 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HELPER_THREAD), "helperThreadL2CacheRequestCoverage"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HELPER_THREAD), "helperThreadL2CacheRequestAccuracy"));
 
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HELPER_THREAD), "helperThreadL2CacheRequestQualityPredictor/numHits"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HELPER_THREAD), "helperThreadL2CacheRequestQualityPredictor/numMisses"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HELPER_THREAD), "helperThreadL2CacheRequestQualityPredictor/hitRatio"));
+
             //TODO: integrate the above gauges into Simulation and expose their management and usages in experiments via web UI.
         }
     }

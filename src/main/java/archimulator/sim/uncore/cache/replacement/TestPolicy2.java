@@ -23,7 +23,6 @@ import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.*;
 import archimulator.sim.uncore.cache.prediction.CacheBasedPredictor;
 import archimulator.sim.uncore.cache.prediction.Predictor;
-import archimulator.sim.uncore.cache.replacement.LRUPolicy;
 import net.pickapack.util.ValueProvider;
 import net.pickapack.util.ValueProviderFactory;
 
@@ -56,7 +55,7 @@ public class TestPolicy2<StateT extends Serializable> extends LRUPolicy<StateT> 
             }
         });
 
-        this.replacementOwnershipPredictor = new CacheBasedPredictor<Boolean>(cache, cache.getName() + ".replacementOwnershipPredictor", new CacheGeometry(16 * 16 * getCache().getLineSize(), 16, getCache().getLineSize()), 1, 3);
+        this.replacementOwnershipPredictor = new CacheBasedPredictor<Boolean>(cache, cache.getName() + ".replacementOwnershipPredictor", new CacheGeometry(16 * 16 * getCache().getLineSize(), 16, getCache().getLineSize()), 1, 3, false);
     }
 
     @Override
@@ -114,7 +113,7 @@ public class TestPolicy2<StateT extends Serializable> extends LRUPolicy<StateT> 
             this.replacementOwnershipPredictor.update(pc, true);
         }
 
-        stateProvider.ownedByMainThread = this.replacementOwnershipPredictor.predict(pc, false);
+        stateProvider.ownedByMainThread = this.replacementOwnershipPredictor.predict(pc);
     }
 
     /**

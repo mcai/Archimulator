@@ -37,7 +37,7 @@ public class ReuseDistanceMonitor {
     private ReuseDistanceSampler sampler;
 
     public ReuseDistanceMonitor(Cache<?> cache, Quantizer quantizerRd) {
-        this.predictor = new CacheBasedPredictor<Integer>(cache, cache.getName() + ".rdPredictor", new CacheGeometry(16 * 16 * cache.getGeometry().getLineSize(), 16, cache.getGeometry().getLineSize()), 0, 3);
+        this.predictor = new CacheBasedPredictor<Integer>(cache, cache.getName() + ".rdPredictor", new CacheGeometry(16 * 16 * cache.getGeometry().getLineSize(), 16, cache.getGeometry().getLineSize()), 0, 3, 0);
         this.sampler = new ReuseDistanceSampler(4096, (quantizerRd.getMaxValue() + 1) * quantizerRd.getQuantum(), quantizerRd);
     }
 
@@ -46,7 +46,7 @@ public class ReuseDistanceMonitor {
     }
 
     public int lookup(int pc) {
-        return this.predictor.predict(pc, 0);
+        return this.predictor.predict(pc);
     }
 
     private class ReuseDistanceSampler {
