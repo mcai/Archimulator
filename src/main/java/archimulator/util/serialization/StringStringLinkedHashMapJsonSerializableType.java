@@ -18,17 +18,15 @@
  ******************************************************************************/
 package archimulator.util.serialization;
 
-import archimulator.model.ContextMapping;
 import com.google.gson.reflect.TypeToken;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 /**
  *
  * @author Min Cai
  */
-public class StringStringLinkedHashMapJsonSerializableType extends JsonSerializableType<ArrayList<ContextMapping>> {
+public class StringStringLinkedHashMapJsonSerializableType extends JsonSerializableType {
     private static final StringStringLinkedHashMapJsonSerializableType singleTon = new StringStringLinkedHashMapJsonSerializableType();
 
     /**

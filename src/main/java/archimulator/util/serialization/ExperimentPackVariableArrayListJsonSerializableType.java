@@ -18,7 +18,6 @@
  ******************************************************************************/
 package archimulator.util.serialization;
 
-import archimulator.model.ContextMapping;
 import archimulator.model.ExperimentPackVariable;
 import com.google.gson.reflect.TypeToken;
 
@@ -28,7 +27,7 @@ import java.util.ArrayList;
  *
  * @author Min Cai
  */
-public class ExperimentPackVariableArrayListJsonSerializableType extends JsonSerializableType<ArrayList<ContextMapping>> {
+public class ExperimentPackVariableArrayListJsonSerializableType extends JsonSerializableType {
     private static final ExperimentPackVariableArrayListJsonSerializableType singleTon = new ExperimentPackVariableArrayListJsonSerializableType();
 
     /**

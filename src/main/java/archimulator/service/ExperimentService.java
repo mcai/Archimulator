@@ -211,22 +211,6 @@ public interface ExperimentService extends Service {
     ExperimentPack getExperimentPackByTitle(String title);
 
     /**
-     * Get the experiment packs by benchmark.
-     *
-     * @param benchmark benchmark
-     * @return experiment packs
-     */
-    List<ExperimentPack> getExperimentPacksByBenchmark(Benchmark benchmark);
-
-    /**
-     * Get the first experiment pack by benchmark.
-     *
-     * @param benchmark benchmark
-     * @return experiment pack
-     */
-    ExperimentPack getFirstExperimentPackByBenchmark(Benchmark benchmark);
-
-    /**
      * Get first experiment pack.
      *
      * @return experiment pack
@@ -253,28 +237,6 @@ public interface ExperimentService extends Service {
      * @param experimentPack the experiment pack
      */
     void updateExperimentPack(ExperimentPack experimentPack);
-
-    /**
-     * Add an experiment specification.
-     *
-     * @param experimentSpec the experiment specification to be added
-     */
-    void addExperimentSpec(ExperimentSpec experimentSpec);
-
-    /**
-     * Remove the experiment specification by id.
-     *
-     * @param id the experiment specification's id
-     */
-    void removeExperimentSpecById(long id);
-
-    /**
-     * Get the experiment specification by parent experiment pack.
-     *
-     * @param parent the parent experiment pack
-     * @return the experiment specification owned by the specified parent experiment pack
-     */
-    ExperimentSpec getExperimentSpecByParent(ExperimentPack parent);
 
     /**
      * Get the number of experiments by the parent experiment pack.

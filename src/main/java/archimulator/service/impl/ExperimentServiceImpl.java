@@ -27,7 +27,6 @@ import archimulator.sim.os.Kernel;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.misc.TransactionManager;
 import com.j256.ormlite.stmt.*;
-import com.jayway.jsonpath.JsonPath;
 import net.pickapack.JsonSerializationHelper;
 import net.pickapack.Reference;
 import net.pickapack.action.Function1;
@@ -50,18 +49,18 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
+ * Experiment service implementation.
  *
  * @author Min Cai
  */
 public class ExperimentServiceImpl extends AbstractService implements ExperimentService {
     private Dao<Experiment, Long> experiments;
     private Dao<ExperimentPack, Long> experimentPacks;
-    private Dao<ExperimentSpec, Long> experimentSpecs;
 
     private Lock lockGetFirstExperimentToRun = new ReentrantLock();
 
     /**
-     *
+     * Create an experiment service implementation.
      */
     @SuppressWarnings("unchecked")
     public ExperimentServiceImpl() {
@@ -69,7 +68,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
         this.experiments = createDao(Experiment.class);
         this.experimentPacks = createDao(ExperimentPack.class);
-        this.experimentSpecs = createDao(ExperimentSpec.class);
     }
 
     @Override
@@ -89,19 +87,13 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
                                     ExperimentPack experimentPack = JsonSerializationHelper.deserialize(ExperimentPack.class, text);
 
                                     if (experimentPack != null && getExperimentPackByTitle(experimentPack.getTitle()) == null) {
-                                        Object read = JsonPath.read(text, "$.baselineExperimentSpec");
-                                        experimentPack.setBaselineExperimentSpec(JsonSerializationHelper.deserialize(ExperimentSpec.class, read.toString()));
                                         addExperimentPack(experimentPack);
-
-                                        ExperimentSpec baselineExperimentSpec = experimentPack.getBaselineExperimentSpec();
-                                        baselineExperimentSpec.setParent(experimentPack);
-                                        addExperimentSpec(baselineExperimentSpec);
 
                                         for (ExperimentSpec experimentSpec : experimentPack.getExperimentSpecs()) {
                                             ExperimentType experimentType = experimentPack.getExperimentType();
                                             Benchmark benchmark = experimentSpec.getBenchmark();
                                             Architecture architecture = experimentSpec.getArchitecture();
-                                            String arguments = experimentSpec.getArguments();
+                                            String arguments = experimentSpec.getBenchmark().getDefaultArguments();
 
                                             List<ContextMapping> contextMappings = new ArrayList<ContextMapping>();
 
@@ -119,14 +111,22 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
                                         updateExperimentPack(experimentPack);
                                     }
                                 }
+
+                                return null;
                             } catch (IOException e) {
+                                e.printStackTrace();
+                                throw new RuntimeException(e);
+                            } catch (Exception e) {
+                                e.printStackTrace();
                                 throw new RuntimeException(e);
                             }
-
-                            return null;
                         }
                     });
         } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
@@ -141,7 +141,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
             }
         });
 
-        if(!experimentPackIds.isEmpty()) {
+        if (!experimentPackIds.isEmpty()) {
             try {
                 DeleteBuilder<Experiment, Long> deleteBuilder = this.experiments.deleteBuilder();
                 deleteBuilder.where().notIn("parentId", experimentPackIds);
@@ -180,7 +180,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
             Thread thread = new Thread() {
                 public void run() {
                     try {
-                        for (;running; ) {
+                        for (; running; ) {
                             Experiment experiment;
                             while ((experiment = getFirstExperimentToRun()) == null) {
                                 synchronized (this) {
@@ -253,7 +253,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     /**
-     *
      * @return
      */
     @Override
@@ -262,7 +261,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     /**
-     *
      * @param first
      * @param count
      * @return
@@ -273,7 +271,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     /**
-     *
      * @return
      */
     @Override
@@ -282,7 +279,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     /**
-     *
      * @param experimentState
      * @return
      */
@@ -299,7 +295,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     /**
-     *
      * @param id
      * @return
      */
@@ -309,7 +304,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     /**
-     *
      * @param title
      * @return
      */
@@ -319,7 +313,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     /**
-     *
      * @param title
      * @return
      */
@@ -334,7 +327,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     /**
-     *
      * @param title
      * @return
      */
@@ -344,7 +336,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     /**
-     *
      * @param benchmark
      * @return
      */
@@ -365,7 +356,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     /**
-     *
      * @param architecture
      * @return
      */
@@ -380,7 +370,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     /**
-     *
      * @param parent
      * @return
      */
@@ -397,7 +386,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     /**
-     *
      * @param parent
      * @param first
      * @param count
@@ -417,7 +405,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     /**
-     *
      * @param experiment
      */
     @Override
@@ -426,7 +413,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     /**
-     *
      * @param id
      */
     @Override
@@ -435,7 +421,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     /**
-     *
      * @param experiment
      */
     @Override
@@ -444,7 +429,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     /**
-     *
      * @return
      */
     @Override
@@ -471,7 +455,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     /**
-     *
      * @param parent
      * @return
      */
@@ -495,7 +478,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     /**
-     *
      * @param parent
      * @return
      */
@@ -519,7 +501,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     /**
-     *
      * @return
      */
     @Override
@@ -528,7 +509,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     /**
-     *
      * @param first
      * @param count
      * @return
@@ -539,7 +519,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     /**
-     *
      * @param id
      * @return
      */
@@ -549,7 +528,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     /**
-     *
      * @param title
      * @return
      */
@@ -559,54 +537,11 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     @Override
-    public List<ExperimentPack> getExperimentPacksByBenchmark(Benchmark benchmark) {
-        try {
-            QueryBuilder<ExperimentSpec, Long> queryBuilder = this.experimentSpecs.queryBuilder();
-            PreparedQuery<ExperimentSpec> query = queryBuilder.selectColumns("parentId").where().eq("benchmarkTitle", benchmark.getTitle()).prepare();
-            List<ExperimentSpec> experimentSpecs = this.experimentSpecs.query(query);
-            List<Long> parentIds = CollectionHelper.transform(experimentSpecs, new Function1<ExperimentSpec, Long>() {
-                @Override
-                public Long apply(ExperimentSpec experimentSpec) {
-                    return experimentSpec.getParentId();
-                }
-            });
-
-            QueryBuilder<ExperimentPack, Long> queryBuilder2 = this.experimentPacks.queryBuilder();
-            PreparedQuery<ExperimentPack> query2 = queryBuilder2.where().in("id", parentIds).prepare();
-            return this.experimentPacks.query(query2);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public ExperimentPack getFirstExperimentPackByBenchmark(Benchmark benchmark) {
-        try {
-            QueryBuilder<ExperimentSpec, Long> queryBuilder = this.experimentSpecs.queryBuilder();
-            PreparedQuery<ExperimentSpec> query = queryBuilder.selectColumns("parentId").where().eq("benchmarkTitle", benchmark.getTitle()).prepare();
-            List<ExperimentSpec> experimentSpecs = this.experimentSpecs.query(query);
-            List<Long> parentIds = CollectionHelper.transform(experimentSpecs, new Function1<ExperimentSpec, Long>() {
-                @Override
-                public Long apply(ExperimentSpec experimentSpec) {
-                    return experimentSpec.getParentId();
-                }
-            });
-
-            QueryBuilder<ExperimentPack, Long> queryBuilder2 = this.experimentPacks.queryBuilder();
-            PreparedQuery<ExperimentPack> query2 = queryBuilder2.where().in("id", parentIds).prepare();
-            return this.experimentPacks.queryForFirst(query2);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
     public ExperimentPack getFirstExperimentPack() {
         return this.getFirstItem(this.experimentPacks);
     }
 
     /**
-     *
      * @param experimentPack
      */
     @Override
@@ -615,7 +550,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     /**
-     *
      * @param id
      */
     @Override
@@ -624,7 +558,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     /**
-     *
      * @param experimentPack
      */
     @Override
@@ -633,35 +566,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     /**
-     *
-     * @param experimentSpec
-     */
-    @Override
-    public void addExperimentSpec(ExperimentSpec experimentSpec) {
-        this.addItem(this.experimentSpecs, experimentSpec);
-    }
-
-    /**
-     *
-     * @param id
-     */
-    @Override
-    public void removeExperimentSpecById(long id) {
-        this.removeItemById(this.experimentSpecs, id);
-    }
-
-    /**
-     *
-     * @param parent
-     * @return
-     */
-    @Override
-    public ExperimentSpec getExperimentSpecByParent(ExperimentPack parent) {
-        return this.getFirstItemByParent(this.experimentSpecs, parent);
-    }
-
-    /**
-     *
      * @param parent
      * @return
      */
@@ -678,7 +582,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     /**
-     *
      * @param parent
      * @param experimentState
      * @return
@@ -698,7 +601,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     /**
-     *
      * @param experimentPack
      */
     @Override
@@ -715,7 +617,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     /**
-     *
      * @param experimentPack
      */
     @Override
@@ -732,7 +633,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     /**
-     *
      * @param parent
      */
     @Override
@@ -757,7 +657,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     /**
-     *
      * @param parent
      */
     @Override
@@ -782,7 +681,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     /**
-     *
      * @param experiment
      */
     @Override

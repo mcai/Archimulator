@@ -18,7 +18,6 @@
  ******************************************************************************/
 package archimulator.util.serialization;
 
-import archimulator.model.ContextMapping;
 import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
@@ -27,7 +26,7 @@ import java.util.ArrayList;
  *
  * @author Min Cai
  */
-public class LongArrayListJsonSerializableType extends JsonSerializableType<ArrayList<ContextMapping>> {
+public class LongArrayListJsonSerializableType extends JsonSerializableType {
     private static final LongArrayListJsonSerializableType singleTon = new LongArrayListJsonSerializableType();
 
     /**

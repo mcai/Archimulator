@@ -37,7 +37,7 @@ import java.util.Date;
  * @author Min Cai
  */
 @DatabaseTable(tableName = "ExperimentSpec")
-public class ExperimentSpec implements WithId, WithParentId, WithTitle, WithCreateTime {
+public class ExperimentSpec implements WithId, WithParentId, WithCreateTime {
     @DatabaseField(generatedId = true)
     private long id;
 
@@ -45,16 +45,10 @@ public class ExperimentSpec implements WithId, WithParentId, WithTitle, WithCrea
     private long parentId;
 
     @DatabaseField
-    private String title;
-
-    @DatabaseField
     private long createTime;
 
     @DatabaseField
     private String benchmarkTitle;
-
-    @DatabaseField
-    private String benchmarkArguments;
 
     @DatabaseField
     private long numMaxInstructions;
@@ -107,7 +101,6 @@ public class ExperimentSpec implements WithId, WithParentId, WithTitle, WithCrea
      * Create an experiment specification.
      *
      * @param benchmarkTitle          the benchmark title
-     * @param benchmarkArguments      the benchmark arguments
      * @param numMaxInstructions      the upper limit of the number of instructions executed on the first hardware thread
      * @param helperThreadLookahead   the helper thread lookahead
      * @param helperThreadStride      the helper thread stride
@@ -121,12 +114,10 @@ public class ExperimentSpec implements WithId, WithParentId, WithTitle, WithCrea
      * @param l2Associativity         the associativity of the L2 cache
      * @param l2ReplacementPolicyType the replacement policy type of the L2 cache
      */
-    public ExperimentSpec(String benchmarkTitle, String benchmarkArguments, long numMaxInstructions, int helperThreadLookahead, int helperThreadStride, int numCores, int numThreadsPerCore, String l1ISize, int l1IAssociativity, String l1DSize, int l1DAssociativity, String l2Size, int l2Associativity, String l2ReplacementPolicyType) {
-        this.title = "";
+    public ExperimentSpec(String benchmarkTitle, long numMaxInstructions, int helperThreadLookahead, int helperThreadStride, int numCores, int numThreadsPerCore, String l1ISize, int l1IAssociativity, String l1DSize, int l1DAssociativity, String l2Size, int l2Associativity, String l2ReplacementPolicyType) {
         this.createTime = DateHelper.toTick(new Date());
 
         this.benchmarkTitle = benchmarkTitle;
-        this.benchmarkArguments = benchmarkArguments;
         this.numMaxInstructions = numMaxInstructions;
 
         this.helperThreadLookahead = helperThreadLookahead;
@@ -167,16 +158,6 @@ public class ExperimentSpec implements WithId, WithParentId, WithTitle, WithCrea
     }
 
     /**
-     * Get the title.
-     *
-     * @return the title
-     */
-    @Override
-    public String getTitle() {
-        return title;
-    }
-
-    /**
      * Get the time in ticks when the experiment specification is created.
      *
      * @return the time in ticks when the experiment specification is created
@@ -202,15 +183,6 @@ public class ExperimentSpec implements WithId, WithParentId, WithTitle, WithCrea
      */
     public String getBenchmarkTitle() {
         return benchmarkTitle;
-    }
-
-    /**
-     * Get the benchmark arguments.
-     *
-     * @return the benchmark arguments
-     */
-    public String getBenchmarkArguments() {
-        return benchmarkArguments;
     }
 
     /**
@@ -362,15 +334,6 @@ public class ExperimentSpec implements WithId, WithParentId, WithTitle, WithCrea
     }
 
     /**
-     * Set the benchmark arguments.
-     *
-     * @param benchmarkArguments the benchmark arguments
-     */
-    public void setBenchmarkArguments(String benchmarkArguments) {
-        this.benchmarkArguments = benchmarkArguments;
-    }
-
-    /**
      * Set the upper limit of the number of instructions executed on the first hardware thread.
      *
      * @param numMaxInstructions the upper limit of the number of instructions executed on the first hardware thread.
@@ -502,19 +465,5 @@ public class ExperimentSpec implements WithId, WithParentId, WithTitle, WithCrea
         }
 
         return benchmark;
-    }
-
-    /**
-     * Get the arguments.
-     *
-     * @return the arguments
-     */
-    public String getArguments() {
-        if (arguments == null) {
-            String benchmarkArguments = getBenchmarkArguments();
-            arguments = benchmarkArguments == null ? getBenchmark().getDefaultArguments() : benchmarkArguments;
-        }
-
-        return arguments;
     }
 }

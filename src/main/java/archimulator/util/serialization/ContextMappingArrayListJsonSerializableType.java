@@ -27,7 +27,7 @@ import java.util.ArrayList;
  *
  * @author Min Cai
  */
-public class ContextMappingArrayListJsonSerializableType extends JsonSerializableType<ArrayList<ContextMapping>> {
+public class ContextMappingArrayListJsonSerializableType extends JsonSerializableType {
     private static final ContextMappingArrayListJsonSerializableType singleTon = new ContextMappingArrayListJsonSerializableType();
 
     /**

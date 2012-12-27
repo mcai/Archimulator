@@ -104,10 +104,10 @@ public class HelperThreadAwareLRUPolicy<StateT extends Serializable> extends LRU
                         this.setLRU(set, way);
                         break;
                     case UGLY:
-                        this.setMRU(set, way); //TODO: it is evicted too early? setMRU : setLRU
+                        this.setStackPosition(set, way, 6); // TODO: 3/4
                         break;
                     case INVALID:
-                        this.setLRU(set, way); //TODO: set to middle stack position
+                        this.setLRU(set, 4); //TODO: set to middle stack position
                         break;
                     default:
                         throw new IllegalArgumentException();

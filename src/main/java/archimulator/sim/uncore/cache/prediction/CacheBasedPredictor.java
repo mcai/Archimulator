@@ -119,6 +119,15 @@ public class CacheBasedPredictor<PredictableT extends Comparable<PredictableT>> 
         }
     }
 
+    public void dumpState() {
+        for(int i = 0; i < this.cache.getNumSets(); i++) {
+            for (CacheLine<Boolean> line : this.cache.getLines(i)) {
+                BooleanValueProvider stateProvider = (BooleanValueProvider) line.getStateProvider();
+                System.out.printf("%s: %s\n", line, stateProvider);
+            }
+        }
+    }
+
     /**
      * Get the default value.
      *
@@ -205,6 +214,11 @@ public class CacheBasedPredictor<PredictableT extends Comparable<PredictableT>> 
         @Override
         public Boolean getInitialValue() {
             return false;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("{predictedValue=%s, confidence=%s}", predictedValue, confidence);
         }
     }
 }

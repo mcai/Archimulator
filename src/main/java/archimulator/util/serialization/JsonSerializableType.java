@@ -32,9 +32,8 @@ import java.sql.SQLException;
 /**
  *
  * @author Min Cai
- * @param <T>
  */
-public abstract class JsonSerializableType<T> extends BaseDataType {
+public abstract class JsonSerializableType extends BaseDataType {
     private Type clz;
 
 	/**
