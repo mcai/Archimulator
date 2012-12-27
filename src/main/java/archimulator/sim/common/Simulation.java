@@ -159,11 +159,13 @@ public abstract class Simulation implements SimulationObject {
             this.helperThreadL2CacheRequestProfilingHelper = new HelperThreadL2CacheRequestProfilingHelper(this);
         }
 
-        //TODO: add enabling property
-        this.delinquentLoadIdentificationHelper = new DelinquentLoadIdentificationHelper(this);
+        if (getExperiment().getArchitecture().getDelinquentLoadIdentificationEnabled()) {
+            this.delinquentLoadIdentificationHelper = new DelinquentLoadIdentificationHelper(this);
+        }
 
-        //TODO: add enabling property
-        this.dynamicSpeculativePrecomputationHelper = new DynamicSpeculativePrecomputationHelper(this);
+        if (getExperiment().getArchitecture().getDynamicSpeculativePrecomputationEnabled()) {
+            this.dynamicSpeculativePrecomputationHelper = new DynamicSpeculativePrecomputationHelper(this);
+        }
     }
 
     /**

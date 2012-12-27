@@ -58,6 +58,12 @@ public class Architecture implements WithId, WithTitle, WithCreateTime {
     private boolean helperThreadL2CacheRequestProfilingEnabled;
 
     @DatabaseField
+    private boolean delinquentLoadIdentificationEnabled;
+
+    @DatabaseField
+    private boolean dynamicSpeculativePrecomputationEnabled;
+
+    @DatabaseField
     private int numCores;
 
     @DatabaseField
@@ -290,6 +296,9 @@ public class Architecture implements WithId, WithTitle, WithCreateTime {
         this.helperThreadPthreadSpawnIndex = 3720;
         this.helperThreadL2CacheRequestProfilingEnabled = helperThreadL2CacheRequestProfilingEnabled;
 
+        this.delinquentLoadIdentificationEnabled = false;
+        this.dynamicSpeculativePrecomputationEnabled = false;
+
         this.numCores = numCores;
         this.numThreadsPerCore = numThreadsPerCore;
 
@@ -437,7 +446,7 @@ public class Architecture implements WithId, WithTitle, WithCreateTime {
     }
 
     /**
-     * Get the helper thread Pthread spawning index of pseudocalls.
+     * Get the helper thread Pthread spawning index of pseudo calls.
      *
      * @return the helper thread Pthread spawning index.
      */
@@ -446,12 +455,30 @@ public class Architecture implements WithId, WithTitle, WithCreateTime {
     }
 
     /**
-     * Get a value indicating whether the helper thread L2 cache request profiling is enabled or not.
+     * Get a value indicating whether helper thread L2 cache request profiling is enabled or not.
      *
-     * @return a value indicating whether the helper thread L2 cache request profiling is enabled or not.
+     * @return a value indicating whether helper thread L2 cache request profiling is enabled or not.
      */
     public boolean getHelperThreadL2CacheRequestProfilingEnabled() {
         return helperThreadL2CacheRequestProfilingEnabled;
+    }
+
+    /**
+     * Get a value indicating whether delinquent load identification is enabled or not.
+     *
+     * @return a value indicating whether delinquent load identification is enabled or not
+     */
+    public boolean getDelinquentLoadIdentificationEnabled() {
+        return delinquentLoadIdentificationEnabled;
+    }
+
+    /**
+     * Get a value indicating whether dynamic speculative precomputation is enabled or not.
+     *
+     * @return a value indicating whether dynamic speculative precomputation is enabled or not
+     */
+    public boolean getDynamicSpeculativePrecomputationEnabled() {
+        return dynamicSpeculativePrecomputationEnabled;
     }
 
     /**
@@ -1085,13 +1112,31 @@ public class Architecture implements WithId, WithTitle, WithCreateTime {
     }
 
     /**
-     * Set a value indicating whether the helper thread L2 cache request profiling is enabled or not.
+     * Set a value indicating whether helper thread L2 cache request profiling is enabled or not.
      *
      * @param helperThreadL2CacheRequestProfilingEnabled
-     *         a new value indicating whether the helper thread L2 cache request profiling is enabled or not
+     *         a new value indicating whether helper thread L2 cache request profiling is enabled or not
      */
     public void setHelperThreadL2CacheRequestProfilingEnabled(boolean helperThreadL2CacheRequestProfilingEnabled) {
         this.helperThreadL2CacheRequestProfilingEnabled = helperThreadL2CacheRequestProfilingEnabled;
+    }
+
+    /**
+     * Set a value indicating whether delinquent load identification is enabled or not.
+     *
+     * @param delinquentLoadIdentificationEnabled a value indicating whether delinquent load identification is enabled or not
+     */
+    public void setDelinquentLoadIdentificationEnabled(boolean delinquentLoadIdentificationEnabled) {
+        this.delinquentLoadIdentificationEnabled = delinquentLoadIdentificationEnabled;
+    }
+
+    /**
+     * Set a value indicating dynamic speculative precomputation is enabled or not.
+     *
+     * @param dynamicSpeculativePrecomputationEnabled a value indicating whether dynamic speculative precomputation is enabled or not
+     */
+    public void setDynamicSpeculativePrecomputationEnabled(boolean dynamicSpeculativePrecomputationEnabled) {
+        this.dynamicSpeculativePrecomputationEnabled = dynamicSpeculativePrecomputationEnabled;
     }
 
     /**
