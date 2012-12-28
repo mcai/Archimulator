@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).
+ * Copyright (c) 2010-2013 by Min Cai (min.cai.china@gmail.com).
  *
  * This file is part of the Archimulator multicore architectural simulator.
  *
@@ -33,6 +33,8 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ * Experiment metric service implementation.
+ *
  * @author Min Cai
  */
 public class ExperimentMetricServiceImpl extends AbstractService implements ExperimentMetricService {
@@ -40,7 +42,7 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
     private Dao<ExperimentGauge, Long> gauges;
 
     /**
-     *
+     * Create an experiment metric service implementation.
      */
     @SuppressWarnings("unchecked")
     public ExperimentMetricServiceImpl() {
@@ -232,36 +234,21 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
         this.updateItem(this.gaugeTypes, gaugeType);
     }
 
-    /**
-     * @return
-     */
     @Override
     public List<ExperimentGauge> getAllGauges() {
         return this.getItems(this.gauges);
     }
 
-    /**
-     * @param id
-     * @return
-     */
     @Override
     public ExperimentGauge getGaugeById(long id) {
         return this.getItemById(this.gauges, id);
     }
 
-    /**
-     * @param title
-     * @return
-     */
     @Override
     public ExperimentGauge getGaugeByTitle(String title) {
         return this.getFirstItemByTitle(this.gauges, title);
     }
 
-    /**
-     * @param type
-     * @return
-     */
     @Override
     public List<ExperimentGauge> getGaugesByType(ExperimentGaugeType type) {
         try {
@@ -297,33 +284,21 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
         return getGaugesByExperimentAndType(experiment, getGaugeTypeByTitle(typeTitle));
     }
 
-    /**
-     * @return
-     */
     @Override
     public ExperimentGauge getFirstGauge() {
         return this.getFirstItem(this.gauges);
     }
 
-    /**
-     * @param gauge
-     */
     @Override
     public void addGauge(ExperimentGauge gauge) {
         this.addItem(this.gauges, gauge);
     }
 
-    /**
-     * @param id
-     */
     @Override
     public void removeGaugeById(long id) {
         this.removeItemById(this.gauges, id);
     }
 
-    /**
-     * @param gauge
-     */
     @Override
     public void updateGauge(ExperimentGauge gauge) {
         this.updateItem(this.gauges, gauge);

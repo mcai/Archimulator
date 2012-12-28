@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).
+ * Copyright (c) 2010-2013 by Min Cai (min.cai.china@gmail.com).
  *
  * This file is part of the Archimulator multicore architectural simulator.
  *
@@ -56,6 +56,8 @@ import java.util.concurrent.locks.ReentrantLock;
 public class ExperimentServiceImpl extends AbstractService implements ExperimentService {
     private Dao<Experiment, Long> experiments;
     private Dao<ExperimentPack, Long> experimentPacks;
+
+    private boolean running = false;
 
     private Lock lockGetFirstExperimentToRun = new ReentrantLock();
 
@@ -131,6 +133,9 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         }
     }
 
+    /**
+     * Clean up experiments.
+     */
     private void cleanUpExperiments() {
         System.out.println("Cleaning up experiments..");
 
@@ -167,11 +172,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         System.out.println("Cleaned up experiments.");
     }
 
-    private boolean running = false;
-
-    /**
-     *
-     */
     @Override
     public void start() {
         running = true;
@@ -202,6 +202,11 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         }
     }
 
+    /**
+     * Run the specified experiment.
+     *
+     * @param experiment the experiment to run
+     */
     private void runExperiment(Experiment experiment) {
         try {
             CycleAccurateEventQueue cycleAccurateEventQueue = new CycleAccurateEventQueue();
@@ -236,9 +241,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         }
     }
 
-    /**
-     *
-     */
     @Override
     public void stop() {
         running = false;
@@ -252,36 +254,21 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         super.stop();
     }
 
-    /**
-     * @return
-     */
     @Override
     public List<Experiment> getAllExperiments() {
         return this.getItems(this.experiments);
     }
 
-    /**
-     * @param first
-     * @param count
-     * @return
-     */
     @Override
     public List<Experiment> getAllExperiments(long first, long count) {
         return this.getItems(this.experiments, first, count);
     }
 
-    /**
-     * @return
-     */
     @Override
     public long getNumAllExperiments() {
         return this.getNumItems(this.experiments);
     }
 
-    /**
-     * @param experimentState
-     * @return
-     */
     @Override
     public long getNumAllExperimentsByState(ExperimentState experimentState) {
         try {
@@ -294,28 +281,16 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         }
     }
 
-    /**
-     * @param id
-     * @return
-     */
     @Override
     public Experiment getExperimentById(long id) {
         return this.getItemById(this.experiments, id);
     }
 
-    /**
-     * @param title
-     * @return
-     */
     @Override
     public List<Experiment> getExperimentsByTitle(String title) {
         return this.getItemsByTitle(this.experiments, title);
     }
 
-    /**
-     * @param title
-     * @return
-     */
     @Override
     public Experiment getFirstExperimentByTitle(String title) {
         return this.getFirstItemByTitle(this.experiments, title);
@@ -326,19 +301,11 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         return this.getFirstItemByParent(this.experiments, parent);
     }
 
-    /**
-     * @param title
-     * @return
-     */
     @Override
     public Experiment getLatestExperimentByTitle(String title) {
         return this.getLatestItemByTitle(this.experiments, title);
     }
 
-    /**
-     * @param benchmark
-     * @return
-     */
     @Override
     public List<Experiment> getExperimentsByBenchmark(Benchmark benchmark) { //TODO: to be optimized
         List<Experiment> result = new ArrayList<Experiment>();
@@ -355,10 +322,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         return result;
     }
 
-    /**
-     * @param architecture
-     * @return
-     */
     @Override
     public List<Experiment> getExperimentsByArchitecture(Architecture architecture) {
         try {
@@ -369,10 +332,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         }
     }
 
-    /**
-     * @param parent
-     * @return
-     */
     @Override
     public List<Experiment> getExperimentsByParent(ExperimentPack parent) {
         try {
@@ -385,12 +344,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         }
     }
 
-    /**
-     * @param parent
-     * @param first
-     * @param count
-     * @return
-     */
     @Override
     public List<Experiment> getExperimentsByParent(ExperimentPack parent, long first, long count) {
         try {
@@ -404,33 +357,21 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         }
     }
 
-    /**
-     * @param experiment
-     */
     @Override
     public void addExperiment(Experiment experiment) {
         this.addItem(this.experiments, experiment);
     }
 
-    /**
-     * @param id
-     */
     @Override
     public void removeExperimentById(long id) {
         this.removeItemById(this.experiments, id);
     }
 
-    /**
-     * @param experiment
-     */
     @Override
     public void updateExperiment(Experiment experiment) {
         this.updateItem(this.experiments, experiment);
     }
 
-    /**
-     * @return
-     */
     @Override
     public Experiment getFirstExperimentToRun() {
         lockGetFirstExperimentToRun.lock();
@@ -454,10 +395,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         }
     }
 
-    /**
-     * @param parent
-     * @return
-     */
     @Override
     @SuppressWarnings("unchecked")
     public List<Experiment> getStoppedExperimentsByParent(ExperimentPack parent) {
@@ -477,10 +414,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         }
     }
 
-    /**
-     * @param parent
-     * @return
-     */
     @Override
     @SuppressWarnings("unchecked")
     public Experiment getFirstStoppedExperimentByParent(ExperimentPack parent) {
@@ -500,37 +433,21 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         }
     }
 
-    /**
-     * @return
-     */
     @Override
     public List<ExperimentPack> getAllExperimentPacks() {
         return this.getItems(this.experimentPacks);
     }
 
-    /**
-     * @param first
-     * @param count
-     * @return
-     */
     @Override
     public List<ExperimentPack> getAllExperimentPacks(long first, long count) {
         return this.getItems(this.experimentPacks, first, count);
     }
 
-    /**
-     * @param id
-     * @return
-     */
     @Override
     public ExperimentPack getExperimentPackById(long id) {
         return this.getItemById(this.experimentPacks, id);
     }
 
-    /**
-     * @param title
-     * @return
-     */
     @Override
     public ExperimentPack getExperimentPackByTitle(String title) {
         return this.getFirstItemByTitle(this.experimentPacks, title);
@@ -541,34 +458,21 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         return this.getFirstItem(this.experimentPacks);
     }
 
-    /**
-     * @param experimentPack
-     */
     @Override
     public void addExperimentPack(ExperimentPack experimentPack) {
         this.addItem(this.experimentPacks, experimentPack);
     }
 
-    /**
-     * @param id
-     */
     @Override
     public void removeExperimentPackById(long id) {
         this.removeItemById(this.experimentPacks, id);
     }
 
-    /**
-     * @param experimentPack
-     */
     @Override
     public void updateExperimentPack(ExperimentPack experimentPack) {
         this.updateItem(this.experimentPacks, experimentPack);
     }
 
-    /**
-     * @param parent
-     * @return
-     */
     @Override
     public long getNumExperimentsByParent(ExperimentPack parent) {
         try {
@@ -581,11 +485,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         }
     }
 
-    /**
-     * @param parent
-     * @param experimentState
-     * @return
-     */
     @Override
     public long getNumExperimentsByParentAndState(ExperimentPack parent, ExperimentState experimentState) {
         try {
@@ -600,9 +499,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         }
     }
 
-    /**
-     * @param experimentPack
-     */
     @Override
     public void startExperimentPack(ExperimentPack experimentPack) {
         try {
@@ -616,9 +512,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         }
     }
 
-    /**
-     * @param experimentPack
-     */
     @Override
     public void stopExperimentPack(ExperimentPack experimentPack) {
         try {
@@ -632,9 +525,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         }
     }
 
-    /**
-     * @param parent
-     */
     @Override
     @SuppressWarnings("unchecked")
     public void resetCompletedExperimentsByParent(ExperimentPack parent) {
@@ -656,9 +546,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         }
     }
 
-    /**
-     * @param parent
-     */
     @Override
     @SuppressWarnings("unchecked")
     public void resetAbortedExperimentsByParent(ExperimentPack parent) {
@@ -680,9 +567,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         }
     }
 
-    /**
-     * @param experiment
-     */
     @Override
     public void startExperiment(Experiment experiment) {
         try {

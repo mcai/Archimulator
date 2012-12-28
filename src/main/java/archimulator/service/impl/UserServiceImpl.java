@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).
+ * Copyright (c) 2010-2013 by Min Cai (min.cai.china@gmail.com).
  *
  * This file is part of the Archimulator multicore architectural simulator.
  *
@@ -31,6 +31,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ * User service implementation.
  *
  * @author Min Cai
  */
@@ -38,7 +39,7 @@ public class UserServiceImpl extends AbstractService implements UserService {
     private Dao<User, Long> users;
 
     /**
-     *
+     * Create a user service implementation.
      */
     @SuppressWarnings("unchecked")
     public UserServiceImpl() {
@@ -54,30 +55,16 @@ public class UserServiceImpl extends AbstractService implements UserService {
         }
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public List<User> getAllUsers() {
         return this.getItems(this.users);
     }
 
-    /**
-     *
-     * @param id
-     * @return
-     */
     @Override
     public User getUserById(long id) {
         return this.getItemById(this.users, id);
     }
 
-    /**
-     *
-     * @param email
-     * @return
-     */
     @Override
     public User getUserByEmail(String email) {
         try {
@@ -88,37 +75,21 @@ public class UserServiceImpl extends AbstractService implements UserService {
         }
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public User getFirstUser() {
         return this.getFirstItem(this.users);
     }
 
-    /**
-     *
-     * @param user
-     */
     @Override
     public void addUser(User user) {
         this.addItem(this.users, user);
     }
 
-    /**
-     *
-     * @param id
-     */
     @Override
     public void removeUserById(long id) {
         this.removeItemById(this.users, id);
     }
 
-    /**
-     *
-     * @param user
-     */
     @Override
     public void updateUser(User user) {
         this.updateItem(this.users, user);

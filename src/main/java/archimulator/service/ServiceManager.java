@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).
+ * Copyright (c) 2010-2013 by Min Cai (min.cai.china@gmail.com).
  *
  * This file is part of the Archimulator multicore architectural simulator.
  *
@@ -58,7 +58,7 @@ public class ServiceManager {
         systemSettingService.initialize();
 
         System.out.println("Archimulator (version: " + PropertiesHelper.getVersion() + ") - CMP Architectural Simulator Written in Java.\n");
-        System.out.println("Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).\n");
+        System.out.println("Copyright (c) 2010-2013 by Min Cai (min.cai.china@gmail.com).\n");
     }
 
     /**

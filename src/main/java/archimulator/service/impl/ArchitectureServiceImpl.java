@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).
+ * Copyright (c) 2010-2013 by Min Cai (min.cai.china@gmail.com).
  *
  * This file is part of the Archimulator multicore architectural simulator.
  *
@@ -30,6 +30,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ * Architecture service implementation.
  *
  * @author Min Cai
  */
@@ -37,7 +38,7 @@ public class ArchitectureServiceImpl extends AbstractService implements Architec
     private Dao<Architecture, Long> architectures;
 
     /**
-     *
+     * Create an architecture service implementation.
      */
     @SuppressWarnings("unchecked")
     public ArchitectureServiceImpl() {
@@ -51,114 +52,56 @@ public class ArchitectureServiceImpl extends AbstractService implements Architec
         this.getOrAddArchitecture(true, true, 2, 2, 32 * 1024, 8, 32 * 1024, 8, 4 * 1024 * 1024, 16, CacheReplacementPolicyType.LRU);
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public List<Architecture> getAllArchitectures() {
         return this.getItems(this.architectures);
     }
 
-    /**
-     *
-     * @param first
-     * @param count
-     * @return
-     */
     @Override
     public List<Architecture> getAllArchitectures(long first, long count) {
         return this.getItems(this.architectures, first, count);
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public long getNumAllArchitectures() {
         return this.getNumItems(this.architectures);
     }
 
-    /**
-     *
-     * @param id
-     * @return
-     */
     @Override
     public Architecture getArchitectureById(long id) {
         return this.getItemById(this.architectures, id);
     }
 
-    /**
-     *
-     * @param title
-     * @return
-     */
     @Override
     public Architecture getArchitectureByTitle(String title) {
         return this.getFirstItemByTitle(this.architectures, title);
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public Architecture getFirstArchitecture() {
         return this.getFirstItem(this.architectures);
     }
 
-    /**
-     *
-     * @param architecture
-     */
     @Override
     public void addArchitecture(Architecture architecture) {
         this.addItem(this.architectures, architecture);
     }
 
-    /**
-     *
-     * @param id
-     */
     @Override
     public void removeArchitectureById(long id) {
         this.removeItemById(this.architectures, id);
     }
 
-    /**
-     *
-     */
     @Override
     public void clearArchitectures() {
         this.clearItems(this.architectures);
     }
 
-    /**
-     *
-     * @param architecture
-     */
     @Override
     public void updateArchitecture(Architecture architecture) {
         this.updateItem(this.architectures, architecture);
     }
 
-    /**
-     *
-     * @param hotspotProfilingEnabled
-     * @param helperThreadL2CacheRequestProfilingEnabled
-     * @param numCores
-     * @param numThreadsPerCore
-     * @param l1ISize
-     * @param l1IAssociativity
-     * @param l1DSize
-     * @param l1DAssociativity
-     * @param l2Size
-     * @param l2Associativity
-     * @param l2ReplacementPolicyType
-     * @return
-     */
     @Override
     public Architecture getOrAddArchitecture(boolean hotspotProfilingEnabled, boolean helperThreadL2CacheRequestProfilingEnabled, int numCores, int numThreadsPerCore, int l1ISize, int l1IAssociativity, int l1DSize, int l1DAssociativity, int l2Size, int l2Associativity, CacheReplacementPolicyType l2ReplacementPolicyType) {
         Architecture architecture = new Architecture(hotspotProfilingEnabled, helperThreadL2CacheRequestProfilingEnabled, numCores, numThreadsPerCore, l1ISize, l1IAssociativity, l1DSize, l1DAssociativity, l2Size, l2Associativity, l2ReplacementPolicyType);

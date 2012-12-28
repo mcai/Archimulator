@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).
+ * Copyright (c) 2010-2013 by Min Cai (min.cai.china@gmail.com).
  *
  * This file is part of the Archimulator multicore architectural simulator.
  *
@@ -28,6 +28,7 @@ import net.pickapack.service.AbstractService;
 import java.util.Arrays;
 
 /**
+ * System setting service implementation.
  *
  * @author Min Cai
  */
@@ -35,7 +36,7 @@ public class SystemSettingServiceImpl extends AbstractService implements SystemS
     private Dao<SystemSetting, Long> systemSettings;
 
     /**
-     *
+     * Create a system setting service implementation.
      */
     @SuppressWarnings("unchecked")
     public SystemSettingServiceImpl() {
@@ -48,10 +49,6 @@ public class SystemSettingServiceImpl extends AbstractService implements SystemS
     public void initialize() {
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public SystemSetting getSystemSettingSingleton() {
         if(getFirstItem(this.systemSettings) == null) {
@@ -63,10 +60,6 @@ public class SystemSettingServiceImpl extends AbstractService implements SystemS
         return getFirstItem(this.systemSettings);
     }
 
-    /**
-     *
-     * @param systemSetting
-     */
     @Override
     public void updateSystemSettingSingleton(SystemSetting systemSetting) {
         updateItem(this.systemSettings, systemSetting);

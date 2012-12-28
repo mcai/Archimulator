@@ -6,7 +6,7 @@ This README briefly describes what Archimulator is and how to setup & run Archim
 Credits and License Information
 ------------------
 
-Copyright (c) 2010-2012 by Min Cai (<min.cai.china@gmail.com>)
+Copyright (c) 2010-2013 by Min Cai (<min.cai.china@gmail.com>)
 
 This program is free software, licensed under the GPL3.
 Please, read the license file "COPYING" for further information.
@@ -76,19 +76,15 @@ Quick Start
 0. For Debian based Linux distros (other distros can be similarly prepared):
 sudo apt-get install build-essential ia32-libs git-core mysql-server phpmyadmin
 
-1. git clone git://github.com/mcai/Pickapack.Micro.git;
-cd Pickapack.Micro;
-mvn clean install
-
-2. cd ..;git clone git://github.com/mcai/Pickapack.git;
+1. git clone git://github.com/mcai/Pickapack.git;
 cd Pickapack;
 mvn clean install
 
-3. cd ..;git clone git://github.com/mcai/Archimulator.git;
+2. cd ..;git clone git://github.com/mcai/Archimulator.git;
 cd Archimulator;
-mvn clean install war:war
+mvn clean install
 
-4. chmod +x ./run.sh;./run.sh
+3. chmod +x ./run.sh;./run.sh
 
 Customizing Archimulator for Your Needs
 ------------------

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).
+ * Copyright (c) 2010-2013 by Min Cai (min.cai.china@gmail.com).
  *
  * This file is part of the Archimulator multicore architectural simulator.
  *
@@ -29,13 +29,15 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ * Benchmark service implementation.
+ *
  * @author Min Cai
  */
 public class BenchmarkServiceImpl extends AbstractService implements BenchmarkService {
     private Dao<Benchmark, Long> benchmarks;
 
     /**
-     *
+     * Create a benchmark service implementation.
      */
     @SuppressWarnings("unchecked")
     public BenchmarkServiceImpl() {
@@ -160,86 +162,51 @@ public class BenchmarkServiceImpl extends AbstractService implements BenchmarkSe
         }
     }
 
-    /**
-     * @return
-     */
     @Override
     public List<Benchmark> getAllBenchmarks() {
         return this.getItems(this.benchmarks);
     }
 
-    /**
-     * @param first
-     * @param count
-     * @return
-     */
     @Override
     public List<Benchmark> getAllBenchmarks(long first, long count) {
         return this.getItems(this.benchmarks, first, count);
     }
 
-    /**
-     * @return
-     */
     @Override
     public long getNumAllBenchmarks() {
         return this.getNumItems(this.benchmarks);
     }
 
-    /**
-     * @param id
-     * @return
-     */
     @Override
     public Benchmark getBenchmarkById(long id) {
         return this.getItemById(this.benchmarks, id);
     }
 
-    /**
-     * @param title
-     * @return
-     */
     @Override
     public Benchmark getBenchmarkByTitle(String title) {
         return this.getFirstItemByTitle(this.benchmarks, title);
     }
 
-    /**
-     * @return
-     */
     @Override
     public Benchmark getFirstBenchmark() {
         return this.getFirstItem(this.benchmarks);
     }
 
-    /**
-     * @param benchmark
-     * @return
-     */
     @Override
     public long addBenchmark(Benchmark benchmark) {
         return this.addItem(this.benchmarks, benchmark);
     }
 
-    /**
-     * @param id
-     */
     @Override
     public void removeBenchmarkById(long id) {
         this.removeItemById(this.benchmarks, id);
     }
 
-    /**
-     *
-     */
     @Override
     public void clearBenchmarks() {
         this.clearItems(this.benchmarks);
     }
 
-    /**
-     * @param benchmark
-     */
     @Override
     public void updateBenchmark(Benchmark benchmark) {
         this.updateItem(this.benchmarks, benchmark);

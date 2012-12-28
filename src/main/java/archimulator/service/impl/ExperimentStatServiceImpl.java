@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).
+ * Copyright (c) 2010-2013 by Min Cai (min.cai.china@gmail.com).
  *
  * This file is part of the Archimulator multicore architectural simulator.
  *
@@ -49,34 +49,16 @@ import static net.pickapack.util.CollectionHelper.toMap;
 import static net.pickapack.util.CollectionHelper.transform;
 
 /**
+ * Experiment stat service implementation.
+ *
  * @author Min Cai
  */
 public class ExperimentStatServiceImpl extends AbstractService implements ExperimentStatService {
-    private static Map<String, String> variablePropertyNameDescriptions;
-
-    static {
-        variablePropertyNameDescriptions = new LinkedHashMap<String, String>();
-
-        variablePropertyNameDescriptions.put("benchmarkTitle", "Benchmark Title");
-        variablePropertyNameDescriptions.put("benchmarkArguments", "Benchmark Arguments");
-        variablePropertyNameDescriptions.put("helperThreadLookahead", "Helper Thread Lookahead");
-        variablePropertyNameDescriptions.put("helperThreadStride", "Helper Thread Stride");
-        variablePropertyNameDescriptions.put("numCores", "Number of Cores");
-        variablePropertyNameDescriptions.put("numThreadsPerCore", "Number of Threads per Core");
-        variablePropertyNameDescriptions.put("l1ISize", "L1I Size");
-        variablePropertyNameDescriptions.put("l1IAssociativity", "L1I Associativity");
-        variablePropertyNameDescriptions.put("l1DSize", "L1D Size");
-        variablePropertyNameDescriptions.put("l1DAssociativity", "L1D Associativity");
-        variablePropertyNameDescriptions.put("l2Size", "L2 Size");
-        variablePropertyNameDescriptions.put("l2Associativity", "L2 Associativity");
-        variablePropertyNameDescriptions.put("l2ReplacementPolicyType", "L2 Replacement Policy Type");
-    }
-
     private Dao<ExperimentStat, Long> stats;
     private Dao<ExperimentSummary, Long> summaries;
 
     /**
-     *
+     * Create an experiment stat service implementation.
      */
     @SuppressWarnings("unchecked")
     public ExperimentStatServiceImpl() {
@@ -124,14 +106,6 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
         }
 
         System.out.println("Cleaned up experiment stats and summaries.");
-    }
-
-    /**
-     * @param variablePropertyName
-     * @return
-     */
-    public static String getDescriptionOfVariablePropertyName(String variablePropertyName) {
-        return variablePropertyNameDescriptions.containsKey(variablePropertyName) ? variablePropertyNameDescriptions.get(variablePropertyName) : variablePropertyName;
     }
 
     @Override
@@ -251,6 +225,11 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
         return this.getFirstItemByParent(this.summaries, parent);
     }
 
+    /**
+     * Create the summary for the specified experiment if necessary.
+     *
+     * @param parent the parent experiment
+     */
     private void CreateSummaryIfNotExistsByParent(Experiment parent) {
         if(this.getFirstItemByParent(this.summaries, parent) == null) {
             System.out.println("Creating summary for experiment #" + parent.getId() + "..");
@@ -507,11 +486,6 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
         }});
     }
 
-    /**
-     * @param experiments
-     * @param keysFunction
-     * @return
-     */
     @Override
     public List<Map<String, Double>> getBreakdowns(List<Experiment> experiments, final Function1<Experiment, List<String>> keysFunction) {
         return transform(experiments, new Function1<Experiment, Map<String, Double>>() {
@@ -522,11 +496,6 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
         });
     }
 
-    /**
-     * @param experiment
-     * @param keysFunction
-     * @return
-     */
     @Override
     public Map<String, Double> getBreakdown(Experiment experiment, Function1<Experiment, List<String>> keysFunction) {
         final List<String> keys = keysFunction.apply(experiment);
@@ -538,11 +507,6 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
         }));
     }
 
-    /**
-     * @param baselineExperiment
-     * @param experiments
-     * @return
-     */
     @Override
     public List<Double> getSpeedups(Experiment baselineExperiment, List<Experiment> experiments) {
         long baselineNumCycles = Long.parseLong(baselineExperiment.getStatValue(baselineExperiment.getMeasurementTitlePrefix() + "simulation/cycleAccurateEventQueue/currentCycle"));
@@ -557,11 +521,6 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
         return speedups;
     }
 
-    /**
-     * @param baselineExperiment
-     * @param experiment
-     * @return
-     */
     @Override
     public double getSpeedup(Experiment baselineExperiment, Experiment experiment) {
         long baselineNumCycles = Long.parseLong(baselineExperiment.getStatValue(baselineExperiment.getMeasurementTitlePrefix() + "simulation/cycleAccurateEventQueue/currentCycle", "0"));
@@ -569,19 +528,11 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
         return numCycles == 0L ? 0.0f : (double) baselineNumCycles / numCycles;
     }
 
-    /**
-     * @param baselineExperiment
-     * @param experiments
-     */
     @Override
     public MultiBarPlot plotSpeedups(Experiment baselineExperiment, List<Experiment> experiments) {
         return singleBarPlot("Speedups", experiments, getSpeedups(baselineExperiment, experiments));
     }
 
-    /**
-     * @param experiments
-     * @return
-     */
     @Override
     public List<Double> getNumInstructions(List<Experiment> experiments) {
         return transform(experiments, new Function1<Experiment, Double>() {
@@ -592,35 +543,21 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
         });
     }
 
-    /**
-     * @param experiments
-     */
     @Override
     public MultiBarPlot plotNumInstructions(List<Experiment> experiments) {
         return singleBarPlot("Number of Instructions", experiments, getNumberCycles(experiments));
     }
 
-    /**
-     * @param experiments
-     * @return
-     */
     @Override
     public List<Double> getNormalizedNumInstructions(List<Experiment> experiments) {
         return normalize(getNumInstructions(experiments));
     }
 
-    /**
-     * @param experiments
-     */
     @Override
     public MultiBarPlot plotNormalizedNumInstructions(List<Experiment> experiments) {
         return singleBarPlot("Normalized Number of Instructions", experiments, getNormalizedNumCycles(experiments));
     }
 
-    /**
-     * @param experiments
-     * @return
-     */
     @Override
     public List<Double> getNumberCycles(List<Experiment> experiments) {
         return transform(experiments, new Function1<Experiment, Double>() {
@@ -631,35 +568,21 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
         });
     }
 
-    /**
-     * @param experiments
-     */
     @Override
     public MultiBarPlot plotNumCycles(List<Experiment> experiments) {
         return singleBarPlot("Number of Cycles", experiments, getNumberCycles(experiments));
     }
 
-    /**
-     * @param experiments
-     * @return
-     */
     @Override
     public List<Double> getNormalizedNumCycles(List<Experiment> experiments) {
         return normalize(getNumberCycles(experiments));
     }
 
-    /**
-     * @param experiments
-     */
     @Override
     public MultiBarPlot plotNormalizedNumCycles(List<Experiment> experiments) {
         return singleBarPlot("Normalized Number of Cycles", experiments, getNormalizedNumCycles(experiments));
     }
 
-    /**
-     * @param experiments
-     * @return
-     */
     @Override
     public List<Double> getNumL2DownwardReadMisses(List<Experiment> experiments) {
         return transform(experiments, new Function1<Experiment, Double>() {
@@ -670,36 +593,21 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
         });
     }
 
-    /**
-     * @param experiments
-     */
     @Override
     public MultiBarPlot plotNumL2DownwardReadMisses(List<Experiment> experiments) {
         return singleBarPlot("# L2 Downward Read Misses", experiments, getNumL2DownwardReadMisses(experiments));
     }
 
-    /**
-     * @param experiments
-     * @return
-     */
     @Override
     public List<Double> getNormalizedNumL2DownwardReadMisses(List<Experiment> experiments) {
         return normalize(getNumL2DownwardReadMisses(experiments));
     }
 
-    /**
-     * @param experiments
-     */
     @Override
     public MultiBarPlot plotNormalizedNumL2DownwardReadMisses(List<Experiment> experiments) {
         return singleBarPlot("# Normalized L2 Downward Read Misses", experiments, getNormalizedNumL2DownwardReadMisses(experiments));
     }
 
-    /**
-     *
-     * @param experiments
-     * @return
-     */
     @Override
     public List<Double> getNumMainThreadL2CacheHits(List<Experiment> experiments) {
         return transform(experiments, new Function1<Experiment, Double>() {
@@ -710,11 +618,6 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
         });
     }
 
-    /**
-     *
-     * @param experiments
-     * @return
-     */
     @Override
     public List<Double> getNumMainThreadL2CacheMisses(List<Experiment> experiments) {
         return transform(experiments, new Function1<Experiment, Double>() {
@@ -725,11 +628,6 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
         });
     }
 
-    /**
-     *
-     * @param experiments
-     * @return
-     */
     @Override
     public List<Double> getNumHelperThreadL2CacheHits(List<Experiment> experiments) {
         return transform(experiments, new Function1<Experiment, Double>() {
@@ -740,11 +638,6 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
         });
     }
 
-    /**
-     *
-     * @param experiments
-     * @return
-     */
     @Override
     public List<Double> getNumHelperThreadL2CacheMisses(List<Experiment> experiments) {
         return transform(experiments, new Function1<Experiment, Double>() {
@@ -755,114 +648,66 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
         });
     }
 
-    /**
-     *
-     * @param experiments
-     * @return
-     */
     @Override
     public List<Double> getNormalizedNumMainThreadL2CacheHits(List<Experiment> experiments) {
         return normalize(getNumMainThreadL2CacheHits(experiments));
     }
 
-    /**
-     *
-     * @param experiments
-     * @return
-     */
     @Override
     public List<Double> getNormalizedNumMainThreadL2CacheMisses(List<Experiment> experiments) {
         return normalize(getNumMainThreadL2CacheMisses(experiments));
     }
 
-    /**
-     *
-     * @param experiments
-     * @return
-     */
     @Override
     public List<Double> getNormalizedNumHelperThreadL2CacheHits(List<Experiment> experiments) {
         return normalize(getNumHelperThreadL2CacheHits(experiments));
     }
 
-    /**
-     *
-     * @param experiments
-     * @return
-     */
     @Override
     public List<Double> getNormalizedNumHelperThreadL2CacheMisses(List<Experiment> experiments) {
         return normalize(getNumHelperThreadL2CacheMisses(experiments));
     }
 
-    /**
-     * @param experiments
-     */
     @Override
     public MultiBarPlot plotNumMainThreadL2CacheHits(List<Experiment> experiments) {
         return singleBarPlot("# Main Thread L2 Cache Hits", experiments, getNumMainThreadL2CacheHits(experiments));
     }
 
-    /**
-     * @param experiments
-     */
     @Override
     public MultiBarPlot plotNumMainThreadL2CacheMisses(List<Experiment> experiments) {
         return singleBarPlot("# Main Thread L2 Cache Misses", experiments, getNumMainThreadL2CacheMisses(experiments));
     }
 
-    /**
-     * @param experiments
-     */
     @Override
     public MultiBarPlot plotNumHelperThreadL2CacheHits(List<Experiment> experiments) {
         return singleBarPlot("# Helper Thread L2 Cache Hits", experiments, getNumHelperThreadL2CacheHits(experiments));
     }
 
-    /**
-     * @param experiments
-     */
     @Override
     public MultiBarPlot plotNumHelperThreadL2CacheMisses(List<Experiment> experiments) {
         return singleBarPlot("# Helper Thread L2 Cache Misses", experiments, getNumHelperThreadL2CacheMisses(experiments));
     }
 
-    /**
-     * @param experiments
-     */
     @Override
     public MultiBarPlot plotNormalizedNumMainThreadL2CacheHits(List<Experiment> experiments) {
         return singleBarPlot("# Normalized Main Thread L2 Cache Hits", experiments, getNormalizedNumMainThreadL2CacheHits(experiments));
     }
 
-    /**
-     * @param experiments
-     */
     @Override
     public MultiBarPlot plotNormalizedNumMainThreadL2CacheMisses(List<Experiment> experiments) {
         return singleBarPlot("# Normalized Main Thread L2 Cache Misses", experiments, getNormalizedNumMainThreadL2CacheMisses(experiments));
     }
 
-    /**
-     * @param experiments
-     */
     @Override
     public MultiBarPlot plotNormalizedNumHelperThreadL2CacheHits(List<Experiment> experiments) {
         return singleBarPlot("# Normalized Helper Thread L2 Cache Hits", experiments, getNormalizedNumHelperThreadL2CacheHits(experiments));
     }
 
-    /**
-     * @param experiments
-     */
     @Override
     public MultiBarPlot plotNormalizedNumHelperThreadL2CacheMisses(List<Experiment> experiments) {
         return singleBarPlot("# Normalized Helper Thread L2 Cache Misses", experiments, getNormalizedNumHelperThreadL2CacheMisses(experiments));
     }
 
-    /**
-     * @param experiments
-     * @return
-     */
     @Override
     public List<Double> getHelperThreadL2CacheRequestCoverage(List<Experiment> experiments) {
         return transform(experiments, new Function1<Experiment, Double>() {
@@ -873,10 +718,6 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
         });
     }
 
-    /**
-     * @param experiments
-     * @return
-     */
     @Override
     public List<Double> getHelperThreadL2CacheRequestAccuracy(List<Experiment> experiments) {
         return transform(experiments, new Function1<Experiment, Double>() {
@@ -887,60 +728,36 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
         });
     }
 
-    /**
-     * @param experiments
-     * @return
-     */
     @Override
     public List<Double> getNormalizedHelperThreadL2CacheRequestCoverage(List<Experiment> experiments) {
         return normalize(getHelperThreadL2CacheRequestCoverage(experiments));
     }
 
-    /**
-     * @param experiments
-     * @return
-     */
     @Override
     public List<Double> getNormalizedHelperThreadL2CacheRequestAccuracy(List<Experiment> experiments) {
         return normalize(getHelperThreadL2CacheRequestAccuracy(experiments));
     }
 
-    /**
-     * @param experiments
-     */
     @Override
     public MultiBarPlot plotHelperThreadL2CacheRequestCoverage(List<Experiment> experiments) {
         return singleBarPlot("Helper Thread L2 Cache Request Coverage", experiments, getHelperThreadL2CacheRequestCoverage(experiments));
     }
 
-    /**
-     * @param experiments
-     */
     @Override
     public MultiBarPlot plotHelperThreadL2CacheRequestAccuracy(List<Experiment> experiments) {
         return singleBarPlot("Helper Thread L2 Cache Request Accuracy", experiments, getHelperThreadL2CacheRequestAccuracy(experiments));
     }
 
-    /**
-     * @param experiments
-     */
     @Override
     public MultiBarPlot plotNormalizedHelperThreadL2CacheRequestCoverage(List<Experiment> experiments) {
         return singleBarPlot("Normalized Helper Thread L2 Cache Request Coverage", experiments, getNormalizedHelperThreadL2CacheRequestCoverage(experiments));
     }
 
-    /**
-     * @param experiments
-     */
     @Override
     public MultiBarPlot plotNormalizedHelperThreadL2CacheRequestAccuracy(List<Experiment> experiments) {
         return singleBarPlot("Normalized Helper Thread L2 Cache Request Accuracy", experiments, getNormalizedHelperThreadL2CacheRequestAccuracy(experiments));
     }
 
-    /**
-     * @param experiments
-     * @return
-     */
     @Override
     public List<Double> getL2DownwardReadMPKIs(List<Experiment> experiments) {
         return transform(experiments, new Function1<Experiment, Double>() {
@@ -953,35 +770,21 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
         });
     }
 
-    /**
-     * @param experiments
-     */
     @Override
     public MultiBarPlot plotL2DownwardReadMPKIs(List<Experiment> experiments) {
         return singleBarPlot("# L2 Downward Read MPKIs", experiments, getL2DownwardReadMPKIs(experiments));
     }
 
-    /**
-     * @param experiments
-     * @return
-     */
     @Override
     public List<Double> getNormalizedL2DownwardReadMPKIs(List<Experiment> experiments) {
         return normalize(getL2DownwardReadMPKIs(experiments));
     }
 
-    /**
-     * @param experiments
-     */
     @Override
     public MultiBarPlot plotNormalizedL2DownwardReadMPKIs(List<Experiment> experiments) {
         return singleBarPlot("# Normalized L2 Downward Read MPKIs", experiments, getNormalizedL2DownwardReadMPKIs(experiments));
     }
 
-    /**
-     * @param experiments
-     * @return
-     */
     @Override
     public List<Map<String, Double>> getHelperThreadL2CacheRequestBreakdowns(List<Experiment> experiments) {
         return getBreakdowns(experiments, new Function1<Experiment, List<String>>() {
@@ -1003,9 +806,6 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
         });
     }
 
-    /**
-     * @param experiments
-     */
     @Override
     public MultiBarPlot plotHelperThreadL2CacheRequestBreakdowns(final List<Experiment> experiments) {
         List<Map<String, Double>> breakdowns = getHelperThreadL2CacheRequestBreakdowns(experiments);
@@ -1046,10 +846,6 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
         return multiBarPlot("# Helper Thread L2 Request Breakdowns", experiments, transformedBreakdowns);
     }
 
-    /**
-     * @param experiments
-     * @return
-     */
     @Override
     public List<Map<String, Double>> getL2CacheRequestBreakdowns(List<Experiment> experiments) {
         return getBreakdowns(experiments, new Function1<Experiment, List<String>>() {
@@ -1067,9 +863,6 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
         });
     }
 
-    /**
-     * @param experiments
-     */
     @Override
     public MultiBarPlot plotL2CacheRequestBreakdowns(List<Experiment> experiments) {
         List<Map<String, Double>> breakdowns = getL2CacheRequestBreakdowns(experiments);
@@ -1104,6 +897,14 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
         return multiBarPlot("# L2 Request Breakdowns", experiments, transformedBreakdowns);
     }
 
+    /**
+     * Create a multi bar plot.
+     *
+     * @param title the title
+     * @param experiments the list of experiments
+     * @param transformedBreakdowns the list of transformed breakdowns
+     * @return a multi bar plot
+     */
     private MultiBarPlot multiBarPlot(String title, List<Experiment> experiments, final List<Map<String, Double>> transformedBreakdowns) {
         final List<String> titles = new ArrayList<String>(transformedBreakdowns.get(0).keySet());
 
