@@ -91,18 +91,37 @@ public class DynamicSpeculativePrecomputationHelper {
         });
     }
 
+    /**
+     * Get the slice cache.
+     *
+     * @return the slice cache
+     */
     public EvictableCache<Boolean> getSliceCache() {
         return sliceCache;
     }
 
+    /**
+     * Get the map of delinquent load identification tables.
+     *
+     * @return the map of delinquent load identification tables
+     */
     public Map<Thread, DelinquentLoadIdentificationTable> getDelinquentLoadIdentificationTables() {
         return delinquentLoadIdentificationTables;
     }
 
+    /**
+     * Get the map of retired instruction buffers.
+     * @return the map of retired instruction buffers
+     */
     public Map<Thread, RetiredInstructionBuffer> getRetiredInstructionBuffers() {
         return retiredInstructionBuffers;
     }
 
+    /**
+     * Get the map of slice information tables.
+     *
+     * @return the map of slice information tables
+     */
     public Map<Thread, SliceInformationTable> getSliceInformationTables() {
         return sliceInformationTables;
     }
@@ -269,7 +288,9 @@ public class DynamicSpeculativePrecomputationHelper {
                 this.unmark(stackAddressTableEntry.retiredInstruction);
             }
 
-            assert (lastAnalyzedRetiredInstruction != null);
+            if (lastAnalyzedRetiredInstruction == null) {
+                throw new IllegalArgumentException();
+            }
 
             slice.setTriggerPc(lastAnalyzedRetiredInstruction.pc);
 

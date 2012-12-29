@@ -64,70 +64,155 @@ public class Slice {
         this.setIneffective(false);
     }
 
+    /**
+     * Get the delinquent load.
+     *
+     * @return the delinquent load
+     */
     public DelinquentLoad getDelinquentLoad() {
         return delinquentLoad;
     }
 
+    /**
+     * Get the trigger PC.
+     *
+     * @return the trigger PC
+     */
     public int getTriggerPc() {
         return triggerPc;
     }
 
+    /**
+     * Set the trigger PC.
+     *
+     * @param triggerPc the trigger PC
+     */
     public void setTriggerPc(int triggerPc) {
         this.triggerPc = triggerPc;
     }
 
+    /**
+     * Get the set of live ins.
+     *
+     * @return the set of live ins
+     */
     public Set<Integer> getLiveIns() {
         return liveIns;
     }
 
+    /**
+     * Set the set of live ins.
+     *
+     * @param liveIns the set of live ins
+     */
     public void setLiveIns(Set<Integer> liveIns) {
         this.liveIns = liveIns;
     }
 
+    /**
+     * Get the list of PCs.
+     *
+     * @return the list of PCs
+     */
     public List<Integer> getPcs() {
         return pcs;
     }
 
+    /**
+     * Set the list of PCs.
+     *
+     * @param pcs the list of PCs
+     */
     public void setPcs(List<Integer> pcs) {
         this.pcs = pcs;
     }
 
+    /**
+     * Get the number of spawnings.
+     *
+     * @return the number of spawnings
+     */
     public int getNumSpawnings() {
         return numSpawnings;
     }
 
+    /**
+     * Set the number of spawnings.
+     *
+     * @param numSpawnings the number of spawnings
+     */
     public void setNumSpawnings(int numSpawnings) {
         this.numSpawnings = numSpawnings;
     }
 
+    /**
+     * Get the spawned thread context.
+     *
+     * @return the spawned thread context
+     */
     public Context getSpawnedThreadContext() {
         return spawnedThreadContext;
     }
 
+    /**
+     * Set the spawned thread context.
+     *
+     * @param spawnedThreadContext the spawned thread context
+     */
     public void setSpawnedThreadContext(Context spawnedThreadContext) {
         this.spawnedThreadContext = spawnedThreadContext;
     }
 
+    /**
+     * Get the number of decoded instructions.
+     *
+     * @return the number of decoded instructions
+     */
     public int getNumDecodedInstructions() {
         return numDecodedInstructions;
     }
 
+    /**
+     * Set the number of decoded instructions.
+     *
+     * @param numDecodedInstructions the number of decoded instructions
+     */
     public void setNumDecodedInstructions(int numDecodedInstructions) {
         this.numDecodedInstructions = numDecodedInstructions;
     }
 
+    /**
+     * Get the number of saved L2 cache misses.
+     *
+     * @return the number of saved L2 cache misses
+     */
     public int getNumSavedL2Misses() {
         return numSavedL2Misses;
     }
 
+    /**
+     * Set the number of saved L2 cache misses.
+     *
+     * @param numSavedL2Misses the number of saved L2 cache misses
+     */
     public void setNumSavedL2Misses(int numSavedL2Misses) {
         this.numSavedL2Misses = numSavedL2Misses;
     }
 
+    /**
+     * Get a value indicating whether it is ineffective or not.
+     *
+     * @return a value indicating whether it is ineffective or not
+     */
     public boolean isIneffective() {
         return ineffective;
     }
 
+    /**
+     * Set a value indicating whether it is ineffective or not.
+     *
+     * @param ineffective a value indicating whether it is ineffective or not
+     */
     public void setIneffective(boolean ineffective) {
         this.ineffective = ineffective;
     }

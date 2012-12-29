@@ -66,7 +66,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
      */
     @SuppressWarnings("unchecked")
     public ExperimentServiceImpl() {
-        super(ServiceManager.getDatabaseUrl(), Arrays.<Class<? extends WithId>>asList(Experiment.class, ExperimentPack.class, ExperimentSpec.class));
+        super(ServiceManager.getDatabaseUrl(), Arrays.<Class<? extends WithId>>asList(Experiment.class, ExperimentPack.class));
 
         this.experiments = createDao(Experiment.class);
         this.experimentPacks = createDao(ExperimentPack.class);

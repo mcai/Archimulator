@@ -20,160 +20,52 @@ package archimulator.model;
 
 import archimulator.service.ServiceManager;
 import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
-import com.j256.ormlite.field.DatabaseField;
-import com.j256.ormlite.table.DatabaseTable;
-import net.pickapack.dateTime.DateHelper;
-import net.pickapack.model.WithCreateTime;
-import net.pickapack.model.WithId;
-import net.pickapack.model.WithParentId;
-import net.pickapack.model.WithTitle;
 import net.pickapack.util.StorageUnitHelper;
 
-import java.util.Date;
+import java.io.Serializable;
 
 /**
  * Experiment specification.
  *
  * @author Min Cai
  */
-@DatabaseTable(tableName = "ExperimentSpec")
-public class ExperimentSpec implements WithId, WithParentId, WithCreateTime {
-    @DatabaseField(generatedId = true)
-    private long id;
-
-    @DatabaseField
-    private long parentId;
-
-    @DatabaseField
-    private long createTime;
-
-    @DatabaseField
+public class ExperimentSpec implements Serializable {
     private String benchmarkTitle;
 
-    @DatabaseField
     private long numMaxInstructions;
 
-    @DatabaseField
     private int helperThreadLookahead;
 
-    @DatabaseField
     private int helperThreadStride;
 
-    @DatabaseField
     private int numCores;
 
-    @DatabaseField
     private int numThreadsPerCore;
 
-    @DatabaseField
     private String l1ISize;
 
-    @DatabaseField
     private int l1IAssociativity;
 
     private String l1DSize;
 
-    @DatabaseField
     private int l1DAssociativity;
 
-    @DatabaseField
     private String l2Size;
 
-    @DatabaseField
     private int l2Associativity;
 
-    @DatabaseField
     private String l2ReplacementPolicyType;
+
+    private boolean dynamicSpeculativePrecomputationEnabled;
 
     private transient Architecture architecture;
 
     private transient Benchmark benchmark;
 
-    private transient String arguments;
-
-    /**
-     * Create an experiment specification. Reserved for ORM only.
-     */
-    public ExperimentSpec() {
-    }
-
     /**
      * Create an experiment specification.
-     *
-     * @param benchmarkTitle          the benchmark title
-     * @param numMaxInstructions      the upper limit of the number of instructions executed on the first hardware thread
-     * @param helperThreadLookahead   the helper thread lookahead
-     * @param helperThreadStride      the helper thread stride
-     * @param numCores                the number of cores
-     * @param numThreadsPerCore       the number of threads per core
-     * @param l1ISize                 the size of the L1I caches
-     * @param l1IAssociativity        the associativity of the L1I caches
-     * @param l1DSize                 the size of the L1D caches
-     * @param l1DAssociativity        the associativity of the L1D caches
-     * @param l2Size                  the size of the L2 cache
-     * @param l2Associativity         the associativity of the L2 cache
-     * @param l2ReplacementPolicyType the replacement policy type of the L2 cache
      */
-    public ExperimentSpec(String benchmarkTitle, long numMaxInstructions, int helperThreadLookahead, int helperThreadStride, int numCores, int numThreadsPerCore, String l1ISize, int l1IAssociativity, String l1DSize, int l1DAssociativity, String l2Size, int l2Associativity, String l2ReplacementPolicyType) {
-        this.createTime = DateHelper.toTick(new Date());
-
-        this.benchmarkTitle = benchmarkTitle;
-        this.numMaxInstructions = numMaxInstructions;
-
-        this.helperThreadLookahead = helperThreadLookahead;
-        this.helperThreadStride = helperThreadStride;
-
-        this.numCores = numCores;
-        this.numThreadsPerCore = numThreadsPerCore;
-
-        this.l1ISize = l1ISize;
-        this.l1IAssociativity = l1IAssociativity;
-
-        this.l1DSize = l1DSize;
-        this.l1DAssociativity = l1DAssociativity;
-
-        this.l2Size = l2Size;
-        this.l2Associativity = l2Associativity;
-        this.l2ReplacementPolicyType = l2ReplacementPolicyType;
-    }
-
-    /**
-     * Get the experiment specification's ID.
-     *
-     * @return the experiment specification's ID
-     */
-    @Override
-    public long getId() {
-        return id;
-    }
-
-    /**
-     * Get the parent experiment pack's ID.
-     *
-     * @return the parent experiment pack's ID
-     */
-    @Override
-    public long getParentId() {
-        return parentId;
-    }
-
-    /**
-     * Get the time in ticks when the experiment specification is created.
-     *
-     * @return the time in ticks when the experiment specification is created
-     */
-    @Override
-    public long getCreateTime() {
-        return createTime;
-    }
-
-    /**
-     * Set the parent experiment pack.
-     *
-     * @param parent the parent experiment pack
-     */
-    public void setParent(ExperimentPack parent) {
-        this.parentId = parent != null ? parent.getId() : -1;
+    public ExperimentSpec() {
     }
 
     /**
@@ -325,6 +217,15 @@ public class ExperimentSpec implements WithId, WithParentId, WithCreateTime {
     }
 
     /**
+     * Get a value indicating whether dynamic speculative precomputation is enabled or not.
+     *
+     * @return a value indicating whether dynamic speculative precomputation is enabled or not
+     */
+    public boolean isDynamicSpeculativePrecomputationEnabled() {
+        return dynamicSpeculativePrecomputationEnabled;
+    }
+
+    /**
      * Set the benchmark title.
      *
      * @param benchmarkTitle the benchmark title
@@ -442,13 +343,22 @@ public class ExperimentSpec implements WithId, WithParentId, WithCreateTime {
     }
 
     /**
+     * Set a value indicating whether dynamic speculative precomputation is enabled or not.
+     *
+     * @param dynamicSpeculativePrecomputationEnabled a value indicating whether dynamic speculative precomputation is enabled or not
+     */
+    public void setDynamicSpeculativePrecomputationEnabled(boolean dynamicSpeculativePrecomputationEnabled) {
+        this.dynamicSpeculativePrecomputationEnabled = dynamicSpeculativePrecomputationEnabled;
+    }
+
+    /**
      * Get the architecture object.
      *
      * @return the architecture object
      */
     public Architecture getArchitecture() {
         if (architecture == null) {
-            architecture = ServiceManager.getArchitectureService().getOrAddArchitecture(true, true, getNumCores(), getNumThreadsPerCore(), getL1ISizeAsInt(), getL1IAssociativity(), getL1DSizeAsInt(), getL1DAssociativity(), getL2SizeAsInt(), getL2Associativity(), Enum.valueOf(CacheReplacementPolicyType.class, getL2ReplacementPolicyType()));
+            architecture = ServiceManager.getArchitectureService().getOrAddArchitecture(true, true, dynamicSpeculativePrecomputationEnabled, numCores, numThreadsPerCore, getL1ISizeAsInt(), l1IAssociativity, getL1DSizeAsInt(), l1DAssociativity, getL2SizeAsInt(), l2Associativity, Enum.valueOf(CacheReplacementPolicyType.class, getL2ReplacementPolicyType()));
         }
 
         return architecture;

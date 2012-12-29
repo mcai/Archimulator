@@ -90,6 +90,10 @@ public class ExperimentPack implements WithId, WithTitle, WithCreateTime {
     @DatabaseField(persisterClass = StringArrayListJsonSerializableType.class)
     private ArrayList<String> l2ReplacementPolicyType;
 
+    @PropertyArray
+    @DatabaseField(persisterClass = StringArrayListJsonSerializableType.class)
+    private ArrayList<String> dynamicSpeculativePrecomputationEnabled;
+
     private transient List<ExperimentPackVariable> variables;
 
     /**
@@ -267,6 +271,14 @@ public class ExperimentPack implements WithId, WithTitle, WithCreateTime {
 
     public void setL2ReplacementPolicyType(ArrayList<String> l2ReplacementPolicyType) {
         this.l2ReplacementPolicyType = l2ReplacementPolicyType;
+    }
+
+    public ArrayList<String> getDynamicSpeculativePrecomputationEnabled() {
+        return dynamicSpeculativePrecomputationEnabled;
+    }
+
+    public void setDynamicSpeculativePrecomputationEnabled(ArrayList<String> dynamicSpeculativePrecomputationEnabled) {
+        this.dynamicSpeculativePrecomputationEnabled = dynamicSpeculativePrecomputationEnabled;
     }
 
     /**

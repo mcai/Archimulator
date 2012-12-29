@@ -278,6 +278,7 @@ public class Architecture implements WithId, WithTitle, WithCreateTime {
      *
      * @param hotspotProfilingEnabled      a value indicating whether the hotspot profiling is enabled or not
      * @param helperThreadL2CacheRequestProfilingEnabled a value indicating whether the helper thread L2 request profiling is enabled or not
+     * @param dynamicSpeculativePrecomputationEnabled a value indicating whether the dynamic speculative precomputation is enabled or not
      * @param numCores                     the number of cores
      * @param numThreadsPerCore            the number of threads per core
      * @param l1ISize                      the size of the L1I caches in bytes
@@ -288,7 +289,7 @@ public class Architecture implements WithId, WithTitle, WithCreateTime {
      * @param l2Assoc                      the associativity of the L2 cache
      * @param l2ReplacementPolicyType      the replacement policy type of the L2 cache
      */
-    public Architecture(boolean hotspotProfilingEnabled, boolean helperThreadL2CacheRequestProfilingEnabled, int numCores, int numThreadsPerCore, int l1ISize, int l1IAssoc, int l1DSize, int l1DAssoc, int l2Size, int l2Assoc, CacheReplacementPolicyType l2ReplacementPolicyType) {
+    public Architecture(boolean hotspotProfilingEnabled, boolean helperThreadL2CacheRequestProfilingEnabled, boolean dynamicSpeculativePrecomputationEnabled, int numCores, int numThreadsPerCore, int l1ISize, int l1IAssoc, int l1DSize, int l1DAssoc, int l2Size, int l2Assoc, CacheReplacementPolicyType l2ReplacementPolicyType) {
         this.createTime = DateHelper.toTick(new Date());
 
         this.hotspotProfilingEnabled = hotspotProfilingEnabled;
@@ -297,7 +298,7 @@ public class Architecture implements WithId, WithTitle, WithCreateTime {
         this.helperThreadL2CacheRequestProfilingEnabled = helperThreadL2CacheRequestProfilingEnabled;
 
         this.delinquentLoadIdentificationEnabled = false;
-        this.dynamicSpeculativePrecomputationEnabled = false;
+        this.dynamicSpeculativePrecomputationEnabled = dynamicSpeculativePrecomputationEnabled;
 
         this.numCores = numCores;
         this.numThreadsPerCore = numThreadsPerCore;
