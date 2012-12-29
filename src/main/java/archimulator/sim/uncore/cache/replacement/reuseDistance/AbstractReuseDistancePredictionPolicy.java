@@ -50,7 +50,7 @@ public abstract class AbstractReuseDistancePredictionPolicy<StateT extends Seria
     public AbstractReuseDistancePredictionPolicy(EvictableCache<StateT> cache) {
         super(cache);
 
-        this.mirrorCache = new Cache<Boolean>(cache, cache.getName() + ".rdPredictionEvictionPolicy.mirrorCache", cache.getGeometry(), new ValueProviderFactory<Boolean, ValueProvider<Boolean>>() {
+        this.mirrorCache = new Cache<Boolean>(cache, cache.getName() + ".reuseDistancePredictionPolicy.mirrorCache", cache.getGeometry(), new ValueProviderFactory<Boolean, ValueProvider<Boolean>>() {
             @Override
             public ValueProvider<Boolean> createValueProvider(Object... args) {
                 return new BooleanValueProvider();
