@@ -18,11 +18,11 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache.replacement.helperThread;
 
-import archimulator.sim.core.BasicThread;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.replacement.LRUPolicy;
 import archimulator.sim.uncore.coherence.event.GeneralCacheControllerLineReplacementEvent;
+import archimulator.sim.uncore.helperThread.HelperThreadingHelper;
 import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestProfilingHelper;
 import net.pickapack.action.Action1;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
@@ -121,7 +121,7 @@ public class HelperThreadIntervalAwareLRUPolicy<StateT extends Serializable> ext
 
     @Override
     public void handleInsertionOnMiss(MemoryHierarchyAccess access, int set, int way) {
-        if (BasicThread.isHelperThread(access.getThread().getId())) {
+        if (HelperThreadingHelper.isHelperThread(access.getThread().getId())) {
             int newStackPosition;
 
             switch (this.helperThreadL2CacheRequestPollution) {

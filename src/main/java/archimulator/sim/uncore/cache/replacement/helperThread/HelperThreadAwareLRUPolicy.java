@@ -18,11 +18,11 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache.replacement.helperThread;
 
-import archimulator.sim.core.BasicThread;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.MemoryHierarchyAccessType;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.replacement.LRUPolicy;
+import archimulator.sim.uncore.helperThread.HelperThreadingHelper;
 import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestQuality;
 
 import java.io.Serializable;
@@ -136,7 +136,7 @@ public class HelperThreadAwareLRUPolicy<StateT extends Serializable> extends LRU
      * @return a value indicating whether the requester of the specified memory hierarchy access is the main thread or not
      */
     private boolean requesterIsMainThread(MemoryHierarchyAccess access) {
-        return BasicThread.isMainThread(access.getThread());
+        return HelperThreadingHelper.isMainThread(access.getThread());
     }
 
     /**
@@ -146,7 +146,7 @@ public class HelperThreadAwareLRUPolicy<StateT extends Serializable> extends LRU
      * @return a value indicating whether the requester of the specified memory hierarchy access is the helper thread or not
      */
     private boolean requesterIsHelperThread(MemoryHierarchyAccess access) {
-        return BasicThread.isHelperThread(access.getThread());
+        return HelperThreadingHelper.isHelperThread(access.getThread());
     }
 
     /**
@@ -157,7 +157,7 @@ public class HelperThreadAwareLRUPolicy<StateT extends Serializable> extends LRU
      * @return a value indicating whether the line found in the specified set index and way is brought by the helper thread or not
      */
     private boolean lineFoundIsHelperThread(int set, int way) {
-        return BasicThread.isHelperThread(getCache().getSimulation().getHelperThreadL2CacheRequestProfilingHelper().getHelperThreadL2CacheRequestStates().get(set).get(way).getThreadId());
+        return HelperThreadingHelper.isHelperThread(getCache().getSimulation().getHelperThreadL2CacheRequestProfilingHelper().getHelperThreadL2CacheRequestStates().get(set).get(way).getThreadId());
     }
 
     /**

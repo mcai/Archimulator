@@ -18,13 +18,13 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache.replacement.helperThread;
 
-import archimulator.sim.core.BasicThread;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.Cache;
 import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.replacement.LRUPolicy;
+import archimulator.sim.uncore.helperThread.HelperThreadingHelper;
 import net.pickapack.IntegerIntegerPair;
 import net.pickapack.util.ValueProvider;
 import net.pickapack.util.ValueProviderFactory;
@@ -62,7 +62,7 @@ public class ThrashingSensitiveHelperThreadAwareLRUPolicy<StateT extends Seriali
 
     @Override
     public CacheAccess<StateT> handleReplacement(MemoryHierarchyAccess access, int set, int tag) {
-        if (access.getType().isRead() && this.isDelinquentPc(access.getThread().getId(), access.getVirtualPc()) && BasicThread.isMainThread(access.getThread())) {
+        if (access.getType().isRead() && this.isDelinquentPc(access.getThread().getId(), access.getVirtualPc()) && HelperThreadingHelper.isMainThread(access.getThread())) {
             return new CacheAccess<StateT>(this.getCache(), access, set, -1, tag); //bypass
         }
 
@@ -74,7 +74,7 @@ public class ThrashingSensitiveHelperThreadAwareLRUPolicy<StateT extends Seriali
         CacheLine<Boolean> mirrorLine = this.mirrorCache.getLine(set, way);
         BooleanValueProvider stateProvider = (BooleanValueProvider) mirrorLine.getStateProvider();
 
-        if (access.getType().isRead() && stateProvider.helperThread && BasicThread.isMainThread(access.getThread())) {
+        if (access.getType().isRead() && stateProvider.helperThread && HelperThreadingHelper.isMainThread(access.getThread())) {
             this.setLRU(set, way);  //HT-MT inter-thread hit: Demote to LRU position; turn off HT bit
             stateProvider.helperThread = false;
         } else {
@@ -91,9 +91,9 @@ public class ThrashingSensitiveHelperThreadAwareLRUPolicy<StateT extends Seriali
         stateProvider.helperThread = false;
 
         if (access.getType().isRead() && this.isDelinquentPc(access.getThread().getId(), access.getVirtualPc())) {
-            if (BasicThread.isMainThread(access.getThread())) {
+            if (HelperThreadingHelper.isMainThread(access.getThread())) {
                 this.setLRU(set, way); // MT miss: insert in LRU position
-            } else if (BasicThread.isHelperThread(access.getThread())) {
+            } else if (HelperThreadingHelper.isHelperThread(access.getThread())) {
                 this.setMRU(set, way);  //HT miss: insert in MRU position; turn on HT bit
                 stateProvider.helperThread = true;
             } else {

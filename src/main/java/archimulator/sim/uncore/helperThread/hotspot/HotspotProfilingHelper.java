@@ -22,7 +22,6 @@ import archimulator.sim.analysis.BasicBlock;
 import archimulator.sim.analysis.Function;
 import archimulator.sim.analysis.Instruction;
 import archimulator.sim.common.Simulation;
-import archimulator.sim.core.BasicThread;
 import archimulator.sim.core.DynamicInstruction;
 import archimulator.sim.isa.event.FunctionalCallEvent;
 import archimulator.sim.isa.StaticInstructionType;
@@ -30,6 +29,7 @@ import archimulator.sim.os.Process;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.event.GeneralCacheControllerServiceNonblockingRequestEvent;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
+import archimulator.sim.uncore.helperThread.HelperThreadingHelper;
 import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestProfilingHelper;
 import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestState;
 import net.pickapack.action.Action1;
@@ -102,7 +102,7 @@ public class HotspotProfilingHelper {
             public void apply(GeneralCacheControllerServiceNonblockingRequestEvent event) {
                 DynamicInstruction dynamicInstruction = event.getAccess().getDynamicInstruction();
 
-                if (dynamicInstruction != null && dynamicInstruction.getThread().getContext().getThreadId() == BasicThread.getMainThreadId()) {
+                if (dynamicInstruction != null && dynamicInstruction.getThread().getContext().getThreadId() == HelperThreadingHelper.getMainThreadId()) {
                     if (loadsInHotspotFunction.containsKey(dynamicInstruction.getPc())) {
                         LoadInstructionEntry loadInstructionEntry = loadsInHotspotFunction.get(dynamicInstruction.getPc());
                         if (event.getCacheController().getName().equals("c0/dcache")) {
@@ -179,14 +179,14 @@ public class HotspotProfilingHelper {
         }
         lruStack.push(tag);
 
-        if(hitInCache && BasicThread.isMainThread(access.getThread())) {
+        if(hitInCache && HelperThreadingHelper.isMainThread(access.getThread())) {
             HelperThreadL2CacheRequestProfilingHelper helperThreadL2CacheRequestProfilingHelper = this.l2CacheController.getSimulation().getHelperThreadL2CacheRequestProfilingHelper();
 
             if(helperThreadL2CacheRequestProfilingHelper != null) {
                 HelperThreadL2CacheRequestState helperThreadL2CacheRequestState =
                         helperThreadL2CacheRequestProfilingHelper.getHelperThreadL2CacheRequestStates().get(set).get(way);
 
-                if(BasicThread.isHelperThread(helperThreadL2CacheRequestState.getThreadId())) {
+                if(HelperThreadingHelper.isHelperThread(helperThreadL2CacheRequestState.getThreadId())) {
                     this.l2CacheController.getBlockingEventDispatcher().dispatch(new L2CacheHitHotspotInterThreadReuseDistanceMeterEvent(
                             this.l2CacheController,
                             access.getVirtualPc(),
@@ -199,7 +199,7 @@ public class HotspotProfilingHelper {
             }
         }
 
-        if(!hitInCache && BasicThread.isMainThread(access.getThread())) {
+        if(!hitInCache && HelperThreadingHelper.isMainThread(access.getThread())) {
             this.l2CacheController.getBlockingEventDispatcher().dispatch(new L2CacheMissHotspotReuseDistanceMeterEvent(
                     this.l2CacheController,
                     access.getVirtualPc(),

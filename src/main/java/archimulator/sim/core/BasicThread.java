@@ -37,6 +37,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Basic thread.
+ *
  * @author Min Cai
  */
 public class BasicThread extends AbstractBasicThread {
@@ -56,8 +58,10 @@ public class BasicThread extends AbstractBasicThread {
     private DynamicInstruction nextInstructionInCacheWarmupPhase;
 
     /**
-     * @param core
-     * @param num
+     * Create a basic thread.
+     *
+     * @param core the core
+     * @param num the num of the thread
      */
     public BasicThread(Core core, int num) {
         super(core, num);
@@ -90,8 +94,10 @@ public class BasicThread extends AbstractBasicThread {
     }
 
     /**
-     * @param contextMapping
-     * @return
+     * Get the helper thread lookahead for the specified context mapping.
+     *
+     * @param contextMapping the context mapping
+     * @return the helper thread lookahead for the specified context mapping
      */
     protected int getHelperThreadLookahead(ContextMapping contextMapping) {
         if (contextMapping.getBenchmark().getHelperThreadEnabled()) {
@@ -102,8 +108,10 @@ public class BasicThread extends AbstractBasicThread {
     }
 
     /**
-     * @param contextMapping
-     * @return
+     * Get the helper thread stride for the specified context mapping.
+     *
+     * @param contextMapping the context mapping
+     * @return the helper thread stride for the specified context mapping
      */
     protected int getHelperThreadStride(ContextMapping contextMapping) {
         if (contextMapping.getBenchmark().getHelperThreadEnabled()) {
@@ -113,9 +121,6 @@ public class BasicThread extends AbstractBasicThread {
         throw new IllegalArgumentException();
     }
 
-    /**
-     *
-     */
     public void fastForwardOneCycle() {
         if (this.context != null && this.context.getState() == ContextState.RUNNING) {
             StaticInstruction staticInstruction;
@@ -132,9 +137,6 @@ public class BasicThread extends AbstractBasicThread {
         }
     }
 
-    /**
-     *
-     */
     public void warmupCacheOneCycle() {
         if (this.context != null && this.context.getState() == ContextState.RUNNING && !this.fetchStalled) {
             if (this.nextInstructionInCacheWarmupPhase == null) {
@@ -195,9 +197,6 @@ public class BasicThread extends AbstractBasicThread {
         }
     }
 
-    /**
-     *
-     */
     public void updateFetchNpcAndNnpcFromRegs() {
         this.fetchNpc = this.context.getRegisterFile().getNpc();
         this.fetchNnpc = this.context.getRegisterFile().getNnpc();
@@ -236,9 +235,6 @@ public class BasicThread extends AbstractBasicThread {
         }
     }
 
-    /**
-     *
-     */
     public void fetch() {
         if (!this.canFetch()) {
             return;
@@ -306,9 +302,6 @@ public class BasicThread extends AbstractBasicThread {
         }
     }
 
-    /**
-     * @return
-     */
     public boolean registerRenameOne() {
         DecodeBufferEntry decodeBufferEntry = this.decodeBuffer.getEntries().get(0);
 
@@ -391,9 +384,6 @@ public class BasicThread extends AbstractBasicThread {
         return true;
     }
 
-    /**
-     * @return
-     */
     public boolean dispatchOne() {
         for (ReorderBufferEntry reorderBufferEntry : this.reorderBuffer.getEntries()) {
             if (!reorderBufferEntry.isDispatched()) {
@@ -426,9 +416,6 @@ public class BasicThread extends AbstractBasicThread {
         return false;
     }
 
-    /**
-     *
-     */
     public void refreshLoadStoreQueue() { //TODO: to be clarified
         List<Integer> stdUnknowns = new ArrayList<Integer>();
 
@@ -455,9 +442,6 @@ public class BasicThread extends AbstractBasicThread {
         }
     }
 
-    /**
-     *
-     */
     public void commit() {
         int COMMIT_TIMEOUT = 1000000;
 
@@ -547,9 +531,6 @@ public class BasicThread extends AbstractBasicThread {
         }
     }
 
-    /**
-     *
-     */
     public void squash() {
 //		Logger.infof(Logger.THREAD, "%s: squash", this.getName());
 
@@ -587,6 +568,17 @@ public class BasicThread extends AbstractBasicThread {
         this.decodeBuffer.getEntries().clear();
     }
 
+    @Override
+    public boolean isLastDecodedDynamicInstructionCommitted() {
+        return this.lastDecodedDynamicInstruction == null || lastDecodedDynamicInstructionCommitted;
+    }
+
+    /**
+     * Get the physical register file based on the specified register dependency type.
+     *
+     * @param type the register dependency type
+     * @return the physical register file based on the specified register dependency type
+     */
     private PhysicalRegisterFile getPhysicalRegisterFile(RegisterDependencyType type) {
         switch (type) {
             case INTEGER:
@@ -599,59 +591,13 @@ public class BasicThread extends AbstractBasicThread {
     }
 
     /**
-     * @return
+     * Get the aligned value for the specified number and alignment.
+     *
+     * @param n the number
+     * @param alignment the alignment
+     * @return the aligned value for the specified number and alignment
      */
-    public boolean isLastDecodedDynamicInstructionCommitted() {
-        return this.lastDecodedDynamicInstruction == null || lastDecodedDynamicInstructionCommitted;
-    }
-
     private static int aligned(int n, int alignment) {
         return n & ~(alignment - 1);
-    }
-
-    /**
-     * @param thread
-     * @return
-     */
-    public static boolean isMainThread(Thread thread) {
-        return isMainThread(thread.getId());
-    }
-
-    /**
-     * @param threadId
-     * @return
-     */
-    public static boolean isMainThread(int threadId) {
-        return threadId == getMainThreadId();
-    }
-
-    /**
-     * @return
-     */
-    public static int getMainThreadId() {
-        return 0; //TODO: main thread should not be hard coded.
-    }
-
-    /**
-     * @param thread
-     * @return
-     */
-    public static boolean isHelperThread(Thread thread) {
-        return isHelperThread(thread.getId());
-    }
-
-    /**
-     * @param threadId
-     * @return
-     */
-    public static boolean isHelperThread(int threadId) {
-        return threadId == getHelperThreadId();
-    }
-
-    /**
-     * @return
-     */
-    public static int getHelperThreadId() {
-        return 2; //TODO: helper thread should not be hard coded.
     }
 }

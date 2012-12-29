@@ -168,17 +168,18 @@ public class DynamicSpeculativePrecomputationHelper {
     /**
      * Find an invalid line and create a new miss for the specified address.
      *
+     * @param thread the thread
      * @param address the address
      * @param set the set index
      * @return an invalid line and the newly created miss for the specified address
      */
-    private CacheAccess<Boolean> findInvalidLineAndNewMiss(int address, int set) {
+    private CacheAccess<Boolean> findInvalidLineAndNewMiss(Thread thread, int address, int set) {
         int tag = this.getSliceCache().getTag(address);
 
         for (int way = 0; way < this.getSliceCache().getAssociativity(); way++) {
             CacheLine<Boolean> line = this.getSliceCache().getLine(set, way);
             if (line.getState() == line.getInitialState()) {
-                return new CacheAccess<Boolean>(this.getSliceCache(), new MemoryHierarchyAccess(null, null, MemoryHierarchyAccessType.UNKNOWN, -1, address, tag, null), set, way, tag);
+                return new CacheAccess<Boolean>(this.getSliceCache(), new MemoryHierarchyAccess(null, thread, MemoryHierarchyAccessType.UNKNOWN, -1, address, tag, null), set, way, tag);
             }
         }
 
@@ -516,7 +517,7 @@ public class DynamicSpeculativePrecomputationHelper {
 
             int set = dynamicSpeculativePrecomputationHelper.getSliceCache().getSet(slice.getTriggerPc());
 
-            CacheAccess<Boolean> cacheAccess = dynamicSpeculativePrecomputationHelper.findInvalidLineAndNewMiss(slice.getTriggerPc(), set);
+            CacheAccess<Boolean> cacheAccess = dynamicSpeculativePrecomputationHelper.findInvalidLineAndNewMiss(thread, slice.getTriggerPc(), set);
 
             if (cacheAccess != null) {
                 CacheLine<Boolean> line = cacheAccess.getLine();

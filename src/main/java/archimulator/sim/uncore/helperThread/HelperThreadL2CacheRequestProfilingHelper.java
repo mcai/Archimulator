@@ -20,7 +20,6 @@ package archimulator.sim.uncore.helperThread;
 
 import archimulator.sim.common.Simulation;
 import archimulator.sim.common.SimulationEvent;
-import archimulator.sim.core.BasicThread;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.cache.CacheGeometry;
@@ -137,8 +136,8 @@ public class HelperThreadL2CacheRequestProfilingHelper {
             public void apply(GeneralCacheControllerServiceNonblockingRequestEvent event) {
                 if (event.getCacheController().equals(HelperThreadL2CacheRequestProfilingHelper.this.l2CacheController)) {
                     int set = event.getSet();
-                    boolean requesterIsHelperThread = BasicThread.isHelperThread(event.getAccess().getThread());
-                    boolean lineFoundIsHelperThread = helperThreadL2CacheRequestStates.get(set).get(event.getWay()).getThreadId() == BasicThread.getHelperThreadId();
+                    boolean requesterIsHelperThread = HelperThreadingHelper.isHelperThread(event.getAccess().getThread());
+                    boolean lineFoundIsHelperThread = helperThreadL2CacheRequestStates.get(set).get(event.getWay()).getThreadId() == HelperThreadingHelper.getHelperThreadId();
 
                     handleL2CacheRequest(event, requesterIsHelperThread, lineFoundIsHelperThread);
                 }
@@ -150,8 +149,8 @@ public class HelperThreadL2CacheRequestProfilingHelper {
             public void apply(LastLevelCacheControllerLineInsertEvent event) {
                 if (event.getCacheController().equals(HelperThreadL2CacheRequestProfilingHelper.this.l2CacheController)) {
                     int set = event.getSet();
-                    boolean requesterIsHelperThread = BasicThread.isHelperThread(event.getAccess().getThread());
-                    boolean lineFoundIsHelperThread = helperThreadL2CacheRequestStates.get(set).get(event.getWay()).getThreadId() == BasicThread.getHelperThreadId();
+                    boolean requesterIsHelperThread = HelperThreadingHelper.isHelperThread(event.getAccess().getThread());
+                    boolean lineFoundIsHelperThread = helperThreadL2CacheRequestStates.get(set).get(event.getWay()).getThreadId() == HelperThreadingHelper.getHelperThreadId();
 
                     handleL2CacheLineInsert(event, requesterIsHelperThread, lineFoundIsHelperThread);
                 }
@@ -166,7 +165,7 @@ public class HelperThreadL2CacheRequestProfilingHelper {
 
                     checkInvariants(set);
 
-                    boolean lineFoundIsHelperThread = helperThreadL2CacheRequestStates.get(set).get(event.getWay()).getThreadId() == BasicThread.getHelperThreadId();
+                    boolean lineFoundIsHelperThread = helperThreadL2CacheRequestStates.get(set).get(event.getWay()).getThreadId() == HelperThreadingHelper.getHelperThreadId();
 
                     markInvalid(set, event.getWay());
 
@@ -198,8 +197,8 @@ public class HelperThreadL2CacheRequestProfilingHelper {
                         throw new IllegalArgumentException();
                     }
 
-                    boolean requesterIsHelperThread = BasicThread.isHelperThread(requesterThreadId);
-                    boolean lineFoundIsHelperThread = BasicThread.isHelperThread(lineFoundThreadId);
+                    boolean requesterIsHelperThread = HelperThreadingHelper.isHelperThread(requesterThreadId);
+                    boolean lineFoundIsHelperThread = HelperThreadingHelper.isHelperThread(lineFoundThreadId);
 
                     if (!requesterIsHelperThread && lineFoundIsHelperThread) {
                         markLate(set, event.getWay(), true);
@@ -601,8 +600,8 @@ public class HelperThreadL2CacheRequestProfilingHelper {
      */
     private void checkInvariants(int set) {
         if (checkInvariantsEnabled) {
-            int numHelperThreadLinesInL2 = select(this.helperThreadL2CacheRequestStates.get(set).values(), having(on(HelperThreadL2CacheRequestState.class).getThreadId(), equalTo(BasicThread.getHelperThreadId()))).size();
-            int numMainThreadLinesInL2 = select(this.helperThreadL2CacheRequestStates.get(set).values(), having(on(HelperThreadL2CacheRequestState.class).getThreadId(), not(BasicThread.getHelperThreadId()))).size();
+            int numHelperThreadLinesInL2 = select(this.helperThreadL2CacheRequestStates.get(set).values(), having(on(HelperThreadL2CacheRequestState.class).getThreadId(), equalTo(HelperThreadingHelper.getHelperThreadId()))).size();
+            int numMainThreadLinesInL2 = select(this.helperThreadL2CacheRequestStates.get(set).values(), having(on(HelperThreadL2CacheRequestState.class).getThreadId(), not(HelperThreadingHelper.getHelperThreadId()))).size();
             int numVictimEntriesInVictimCache = select(this.helperThreadL2CacheRequestVictimCache.getLines(set), having(on(CacheLine.class).getState(), not(HelperThreadL2CacheRequestVictimCacheLineState.INVALID))).size();
 
             if (numHelperThreadLinesInL2 != numVictimEntriesInVictimCache || numVictimEntriesInVictimCache + numMainThreadLinesInL2 > this.l2CacheController.getCache().getAssociativity()) {
@@ -611,7 +610,7 @@ public class HelperThreadL2CacheRequestProfilingHelper {
 
             for (int i = 0; i < this.l2CacheController.getCache().getAssociativity(); i++) {
                 CacheLine<DirectoryControllerState> line = this.l2CacheController.getCache().getLine(set, i);
-                if (line.getState().isStable() && line.isValid() && this.helperThreadL2CacheRequestStates.get(set).get(i).getThreadId() == BasicThread.getHelperThreadId()) {
+                if (line.getState().isStable() && line.isValid() && this.helperThreadL2CacheRequestStates.get(set).get(i).getThreadId() == HelperThreadingHelper.getHelperThreadId()) {
                     int wayOfVictimCacheLine = this.findWayOfVictimCacheLineByHelperThreadL2CacheRequestTag(set, line.getTag());
 
                     if (wayOfVictimCacheLine == -1) {
@@ -654,7 +653,7 @@ public class HelperThreadL2CacheRequestProfilingHelper {
      * @param helperThreadL2CacheRequestQuality the quality of the helper thread L2 cache request
      */
     private void updateHelperThreadL2CacheRequestQualityPredictor(int threadId, int pc, HelperThreadL2CacheRequestQuality helperThreadL2CacheRequestQuality) {
-        if (threadId != BasicThread.getHelperThreadId()) {
+        if (threadId != HelperThreadingHelper.getHelperThreadId()) {
             throw new IllegalArgumentException(String.format("ctx: %d: pc: 0x%08x, quality: %s", threadId, pc, helperThreadL2CacheRequestQuality));
         }
 
@@ -679,7 +678,7 @@ public class HelperThreadL2CacheRequestProfilingHelper {
      * @param pc the virtual address of the program counter (PC)
      */
     private void markHelperThread(int set, int way, int pc) {
-        this.setL2CacheLineBroughterThreadId(set, way, BasicThread.getHelperThreadId(), pc, false);
+        this.setL2CacheLineBroughterThreadId(set, way, HelperThreadingHelper.getHelperThreadId(), pc, false);
     }
 
     /**
@@ -690,7 +689,7 @@ public class HelperThreadL2CacheRequestProfilingHelper {
      * @param pc the virtual address of the program counter (PC)
      */
     private void markMainThread(int set, int way, int pc) {
-        this.setL2CacheLineBroughterThreadId(set, way, BasicThread.getMainThreadId(), pc, false);
+        this.setL2CacheLineBroughterThreadId(set, way, HelperThreadingHelper.getMainThreadId(), pc, false);
     }
 
     /**

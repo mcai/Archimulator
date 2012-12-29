@@ -133,4 +133,9 @@ public class DelinquentLoad {
     public void setSteady(boolean steady) {
         this.steady = steady;
     }
+
+    @Override
+    public String toString() {
+        return String.format("DelinquentLoad{pc=0x%08x, functionCallPc=0x%08x, numExecutions=%d, numInstructions=%d, numCyclesSpentAtHeadOfReorderBuffer=%d, steady=%s}", pc, functionCallPc, numExecutions, numInstructions, numCyclesSpentAtHeadOfReorderBuffer, steady);
+    }
 }
