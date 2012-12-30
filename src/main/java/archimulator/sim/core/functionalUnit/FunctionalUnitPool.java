@@ -16,9 +16,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.core;
+package archimulator.sim.core.functionalUnit;
 
 import archimulator.sim.common.Named;
+import archimulator.sim.core.AbstractBasicCore;
+import archimulator.sim.core.ReorderBufferEntry;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
 
@@ -26,6 +28,7 @@ import java.util.EnumMap;
 import java.util.EnumSet;
 
 /**
+ * Functional unit pool.
  *
  * @author Min Cai
  */
@@ -34,60 +37,13 @@ public class FunctionalUnitPool implements Named {
     private EnumMap<FunctionalUnitOperationType, FunctionalUnitType> functionalUnitOperationToFunctionalUnitMap;
     private AbstractBasicCore core;
 
-    private EnumMap<FunctionalUnitType, Long> noFreeFunctionalUnit;
-    private EnumMap<FunctionalUnitOperationType, Long> acquireFailedOnNoFreeFunctionalUnit;
-
-    private enum FunctionalUnitType {
-        INTEGER_ALU,
-        INTEGER_MULT_DIV,
-        FP_ADDER,
-        FP_MULT_DIV,
-        MEMORY_PORT
-    }
-
-    private class FunctionalUnitDescriptor {
-        private FunctionalUnitType type;
-        private int quantity;
-        private int numFree;
-
-        private EnumMap<FunctionalUnitOperationType, FunctionalUnitOperation> operations;
-
-        private FunctionalUnitDescriptor(FunctionalUnitType type, int quantity) {
-            this.type = type;
-            this.quantity = quantity;
-            this.numFree = this.quantity;
-
-            this.operations = new EnumMap<FunctionalUnitOperationType, FunctionalUnitOperation>(FunctionalUnitOperationType.class);
-        }
-
-        private FunctionalUnitDescriptor addFunctionalUnitOperation(FunctionalUnitOperationType fuOperationType, int operationLatency, int issueLatency) {
-            this.operations.put(fuOperationType, new FunctionalUnitOperation(operationLatency, issueLatency));
-            functionalUnitOperationToFunctionalUnitMap.put(fuOperationType, this.type);
-            return this;
-        }
-
-        private void releaseAll() {
-            this.numFree = this.quantity;
-        }
-
-        private boolean isFull() {
-            return this.numFree == 0;
-        }
-    }
-
-    private class FunctionalUnitOperation {
-        private int operationLatency;
-        private int issueLatency;
-
-        private FunctionalUnitOperation(int operationLatency, int issueLatency) {
-            this.operationLatency = operationLatency;
-            this.issueLatency = issueLatency;
-        }
-    }
+    private EnumMap<FunctionalUnitType, Long> numStallsOnNoFreeFunctionalUnit;
+    private EnumMap<FunctionalUnitOperationType, Long> numStallsOnAcquireFailedOnNoFreeFunctionalUnit;
 
     /**
+     * Create a functional unit pool.
      *
-     * @param core
+     * @param core the core
      */
     public FunctionalUnitPool(AbstractBasicCore core) {
         this.core = core;
@@ -99,16 +55,16 @@ public class FunctionalUnitPool implements Named {
         this.addFunctionalUnitDescriptor(FunctionalUnitType.INTEGER_ALU, 8)
                 .addFunctionalUnitOperation(FunctionalUnitOperationType.INT_ALU, 2, 1);
 
-        this.addFunctionalUnitDescriptor(FunctionalUnitType.INTEGER_MULT_DIV, 2)
+        this.addFunctionalUnitDescriptor(FunctionalUnitType.INTEGER_MULTIPLY_DIVIDE, 2)
                 .addFunctionalUnitOperation(FunctionalUnitOperationType.INT_MULTIPLY, 3, 1)
                 .addFunctionalUnitOperation(FunctionalUnitOperationType.INT_DIVIDE, 20, 19);
 
-        this.addFunctionalUnitDescriptor(FunctionalUnitType.FP_ADDER, 8)
+        this.addFunctionalUnitDescriptor(FunctionalUnitType.FLOAT_ADD, 8)
                 .addFunctionalUnitOperation(FunctionalUnitOperationType.FLOAT_ADD, 4, 1)
                 .addFunctionalUnitOperation(FunctionalUnitOperationType.FLOAT_COMPARE, 4, 1)
                 .addFunctionalUnitOperation(FunctionalUnitOperationType.FLOAT_CONVERT, 4, 1);
 
-        this.addFunctionalUnitDescriptor(FunctionalUnitType.FP_MULT_DIV, 2)
+        this.addFunctionalUnitDescriptor(FunctionalUnitType.FLOAT_MULTIPLY_DIVIDE, 2)
                 .addFunctionalUnitOperation(FunctionalUnitOperationType.FLOAT_MULTIPLY, 8, 1)
                 .addFunctionalUnitOperation(FunctionalUnitOperationType.FLOAT_DIVIDE, 40, 20)
                 .addFunctionalUnitOperation(FunctionalUnitOperationType.FLOAT_SQRT, 80, 40);
@@ -117,40 +73,48 @@ public class FunctionalUnitPool implements Named {
                 .addFunctionalUnitOperation(FunctionalUnitOperationType.READ_PORT, 1, 1)
                 .addFunctionalUnitOperation(FunctionalUnitOperationType.WRITE_PORT, 1, 1);
 
-        this.noFreeFunctionalUnit = new EnumMap<FunctionalUnitType, Long>(FunctionalUnitType.class);
+        this.numStallsOnNoFreeFunctionalUnit = new EnumMap<FunctionalUnitType, Long>(FunctionalUnitType.class);
         EnumSet<FunctionalUnitType> fuTypes = EnumSet.allOf(FunctionalUnitType.class);
         for (FunctionalUnitType fuTye : fuTypes) {
-            this.noFreeFunctionalUnit.put(fuTye, 0L);
+            this.numStallsOnNoFreeFunctionalUnit.put(fuTye, 0L);
         }
 
-        this.acquireFailedOnNoFreeFunctionalUnit = new EnumMap<FunctionalUnitOperationType, Long>(FunctionalUnitOperationType.class);
+        this.numStallsOnAcquireFailedOnNoFreeFunctionalUnit = new EnumMap<FunctionalUnitOperationType, Long>(FunctionalUnitOperationType.class);
         EnumSet<FunctionalUnitOperationType> fuOperationTypes = EnumSet.allOf(FunctionalUnitOperationType.class);
         for (FunctionalUnitOperationType fuOperationType : fuOperationTypes) {
-            this.acquireFailedOnNoFreeFunctionalUnit.put(fuOperationType, 0L);
+            this.numStallsOnAcquireFailedOnNoFreeFunctionalUnit.put(fuOperationType, 0L);
         }
     }
 
+    /**
+     * Add a functional unit descriptor.
+     *
+     * @param type the functional unit type
+     * @param quantity the quantity
+     * @return the newly added functional unit descriptor
+     */
     private FunctionalUnitDescriptor addFunctionalUnitDescriptor(FunctionalUnitType type, int quantity) {
-        FunctionalUnitDescriptor desc = new FunctionalUnitDescriptor(type, quantity);
+        FunctionalUnitDescriptor desc = new FunctionalUnitDescriptor(this, type, quantity);
         this.descriptors.put(type, desc);
         return desc;
     }
 
     /**
+     * Acquire.
      *
-     * @param reorderBufferEntry
-     * @param onCompletedCallback
-     * @return
+     * @param reorderBufferEntry the reorder buffer entry
+     * @param onCompletedCallback the callback action performed when the operation is completed
+     * @return a value indicating whether the acquiring succeeds or not
      */
     public boolean acquire(final ReorderBufferEntry reorderBufferEntry, final Action1<ReorderBufferEntry> onCompletedCallback) {
         FunctionalUnitOperationType functionalUnitOperationType = reorderBufferEntry.getDynamicInstruction().getStaticInstruction().getMnemonic().getFunctionalUnitOperationType();
         FunctionalUnitType functionalUnitType = this.functionalUnitOperationToFunctionalUnitMap.get(functionalUnitOperationType);
-        FunctionalUnitOperation functionalUnitOperation = this.descriptors.get(functionalUnitType).operations.get(functionalUnitOperationType);
+        FunctionalUnitOperation functionalUnitOperation = this.descriptors.get(functionalUnitType).getOperations().get(functionalUnitOperationType);
 
         final FunctionalUnitDescriptor functionalUnitDescriptor = this.descriptors.get(functionalUnitType);
 
         if (functionalUnitDescriptor.isFull()) {
-            this.acquireFailedOnNoFreeFunctionalUnit.put(functionalUnitOperationType, this.acquireFailedOnNoFreeFunctionalUnit.get(functionalUnitOperationType) + 1);
+            this.numStallsOnAcquireFailedOnNoFreeFunctionalUnit.put(functionalUnitOperationType, this.numStallsOnAcquireFailedOnNoFreeFunctionalUnit.get(functionalUnitOperationType) + 1);
 
             return false;
         }
@@ -159,9 +123,9 @@ public class FunctionalUnitPool implements Named {
                 .schedule(this, new Action() {
                     @Override
                     public void apply() {
-                        functionalUnitDescriptor.numFree++;
+                        functionalUnitDescriptor.setNumFree(functionalUnitDescriptor.getNumFree() + 1);
                     }
-                }, functionalUnitOperation.issueLatency)
+                }, functionalUnitOperation.getIssueLatency())
                 .schedule(this, new Action() {
                     @Override
                     public void apply() {
@@ -169,15 +133,15 @@ public class FunctionalUnitPool implements Named {
                             onCompletedCallback.apply(reorderBufferEntry);
                         }
                     }
-                }, functionalUnitOperation.operationLatency);
+                }, functionalUnitOperation.getOperationLatency());
 
-        functionalUnitDescriptor.numFree--;
+        functionalUnitDescriptor.setNumFree(functionalUnitDescriptor.getNumFree() - 1);
 
         return true;
     }
 
     /**
-     *
+     * Release all functional unit descriptors.
      */
     public void releaseAll() {
         for (FunctionalUnitDescriptor fuDescriptor : this.descriptors.values()) {
@@ -186,30 +150,50 @@ public class FunctionalUnitPool implements Named {
     }
 
     /**
-     *
+     * Update statistics per cycle.
      */
     public void updatePerCycleStats() {
-        for (FunctionalUnitType fuType : FunctionalUnitPool.this.noFreeFunctionalUnit.keySet()) {
+        for (FunctionalUnitType fuType : FunctionalUnitPool.this.numStallsOnNoFreeFunctionalUnit.keySet()) {
             if (this.descriptors.get(fuType).isFull()) {
-                this.noFreeFunctionalUnit.put(fuType, this.noFreeFunctionalUnit.get(fuType) + 1);
+                this.numStallsOnNoFreeFunctionalUnit.put(fuType, this.numStallsOnNoFreeFunctionalUnit.get(fuType) + 1);
             }
         }
     }
 
     /**
+     * Get the map of descriptors.
      *
-     * @return
+     * @return the map of descriptors
      */
-    public EnumMap<FunctionalUnitType, Long> getNoFreeFunctionalUnit() {
-        return noFreeFunctionalUnit;
+    public EnumMap<FunctionalUnitType, FunctionalUnitDescriptor> getDescriptors() {
+        return descriptors;
     }
 
     /**
+     * Get the map of functional unit operation types to functional unit types.
      *
-     * @return
+     * @return the map of functional unit operation types to functional unit types
      */
-    public EnumMap<FunctionalUnitOperationType, Long> getAcquireFailedOnNoFreeFunctionalUnit() {
-        return acquireFailedOnNoFreeFunctionalUnit;
+    public EnumMap<FunctionalUnitOperationType, FunctionalUnitType> getFunctionalUnitOperationToFunctionalUnitMap() {
+        return functionalUnitOperationToFunctionalUnitMap;
+    }
+
+    /**
+     * Get the map of the numbers of stalls when there is no free functional unit for a specific functional unit type.
+     *
+     * @return the map of the numbers of stalls when there is no free functional unit for a specific functional unit type
+     */
+    public EnumMap<FunctionalUnitType, Long> getNumStallsOnNoFreeFunctionalUnit() {
+        return numStallsOnNoFreeFunctionalUnit;
+    }
+
+    /**
+     * Get the map of the numbers of stalls on acquiring failed when there is no free functional unit for a specific functional unit type.
+     *
+     * @return the map of the numbers of stalls on acquiring failed when there is no free functional unit for a specific functional unit type
+     */
+    public EnumMap<FunctionalUnitOperationType, Long> getNumStallsOnAcquireFailedOnNoFreeFunctionalUnit() {
+        return numStallsOnAcquireFailedOnNoFreeFunctionalUnit;
     }
 
     @Override

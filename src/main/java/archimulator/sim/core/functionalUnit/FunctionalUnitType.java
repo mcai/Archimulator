@@ -16,31 +16,36 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.core;
+package archimulator.sim.core.functionalUnit;
 
 /**
- * Physical register file state.
+ * Functional unit type.
  *
  * @author Min Cai
  */
-public enum PhysicalRegisterState {
+public enum FunctionalUnitType {
     /**
-     * Available.
+     * Integer arithmetic/logic.
      */
-    AVAILABLE,
+    INTEGER_ALU,
 
     /**
-     * Rename buffer is not valid.
+     * Integer multiply/divide.
      */
-    RENAME_BUFFER_NOT_VALID,
+    INTEGER_MULTIPLY_DIVIDE,
 
     /**
-     * Rename buffer is valid.
+     * Floating add.
      */
-    RENAME_BUFFER_VALID,
+    FLOAT_ADD,
 
     /**
-     * Architectural register.
+     * Floating multiply/divide.
      */
-    ARCHITECTURAL_REGISTER
+    FLOAT_MULTIPLY_DIVIDE,
+
+    /**
+     * Memory port.
+     */
+    MEMORY_PORT
 }

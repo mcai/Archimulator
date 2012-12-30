@@ -31,51 +31,58 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
+ * Abstract basic core.
  *
  * @author Min Cai
  */
 public abstract class AbstractBasicThread extends BasicSimulationObject implements Thread {
     /**
-     *
+     * The number of the thread.
      */
     protected int num;
+
     /**
-     *
+     * The context.
      */
     protected Context context;
+
     /**
-     *
+     * The ID of the thread.
      */
     protected int id;
+
     /**
-     *
+     * The name of the thread.
      */
     protected String name;
+
     /**
-     *
+     * The parent core.
      */
     protected Core core;
 
     /**
-     *
+     * The branch predictor.
      */
     protected BranchPredictor branchPredictor;
 
     /**
-     *
+     * The rename table.
      */
     protected RegisterRenameTable renameTable;
 
     /**
-     *
+     * The decode buffer.
      */
     protected PipelineBuffer<DecodeBufferEntry> decodeBuffer;
+
     /**
-     *
+     * The reorder buffer.
      */
     protected PipelineBuffer<ReorderBufferEntry> reorderBuffer;
+
     /**
-     *
+     * The load/store queue.
      */
     protected PipelineBuffer<LoadStoreQueueEntry> loadStoreQueue;
 
@@ -83,77 +90,87 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
     private TranslationLookasideBuffer dtlb;
 
     /**
-     *
+     * The integer physical register file.
      */
     protected PhysicalRegisterFile intPhysicalRegisterFile;
+
     /**
-     *
+     * The floating point physical register file.
      */
     protected PhysicalRegisterFile fpPhysicalRegisterFile;
+
     /**
-     *
+     * The miscellaneous physical register file.
      */
     protected PhysicalRegisterFile miscPhysicalRegisterFile;
 
     /**
-     *
+     * The number of instructions.
      */
     protected long numInstructions;
 
     /**
-     *
+     * The number of decode buffer full stalls.
      */
     protected long numDecodeBufferFullStalls;
+
     /**
-     *
+     * The number of reorder buffer full stalls.
      */
     protected long numReorderBufferFullStalls;
+
     /**
-     *
+     * The number of load/store queue full stalls.
      */
     protected long numLoadStoreQueueFullStalls;
 
     /**
-     *
+     * The number of integer physical register file full stalls.
      */
     protected long numIntPhysicalRegisterFileFullStalls;
+
     /**
-     *
+     * The number of floating point physical register file full stalls.
      */
     protected long numFpPhysicalRegisterFileFullStalls;
+
     /**
-     *
+     * The number of miscellaneous physical register file full stalls.
      */
     protected long numMiscPhysicalRegisterFileFullStalls;
 
     /**
-     *
+     * The number of fetch stalls when the decode buffer is full.
      */
     protected long numFetchStallsOnDecodeBufferIsFull;
 
     /**
-     *
+     * The number of register rename stalls when the decode buffer is empty.
      */
     protected long numRegisterRenameStallsOnDecodeBufferIsEmpty;
+
     /**
-     *
+     * The number of register rename stalls when the reorder buffer is full.
      */
     protected long numRegisterRenameStallsOnReorderBufferIsFull;
+
     /**
-     *
+     * The number of register rename stalls when the load/store queue is full.
      */
     protected long numRegisterRenameStallsOnLoadStoreQueueFull;
 
     /**
-     *
+     * The number of selection stalls when loads can not be issued.
      */
     protected long numSelectionStallsOnCanNotLoad;
+
     /**
-     *
+     * The number of selection stalls when stores can not be issued.
      */
     protected long numSelectionStallsOnCanNotStore;
+
     /**
-     *
+     * The number of selection stalls when there is no free functional unit for a specific functional unit type.
      */
     protected long numSelectionStallsOnNoFreeFunctionalUnit;
 
@@ -161,9 +178,10 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
     private Map<String, Long> executedSystemCalls;
 
     /**
+     * Create an abstract basic thread.
      *
-     * @param core
-     * @param num
+     * @param core the parent core
+     * @param num the number of the thread
      */
     public AbstractBasicThread(Core core, int num) {
         super(core);
@@ -206,21 +224,21 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
 
         for (int i = 0; i < ArchitecturalRegisterFile.NUM_INT_REGISTERS; i++) {
             int dep = RegisterDependencyType.toRegisterDependency(RegisterDependencyType.INTEGER, i);
-            PhysicalRegisterFile.PhysicalRegister physReg = this.intPhysicalRegisterFile.getRegisters().get(i);
+            PhysicalRegister physReg = this.intPhysicalRegisterFile.getRegisters().get(i);
             physReg.reserve(dep);
             this.renameTable.put(dep, physReg);
         }
 
         for (int i = 0; i < ArchitecturalRegisterFile.NUM_FLOAT_REGISTERS; i++) {
             int dep = RegisterDependencyType.toRegisterDependency(RegisterDependencyType.FLOAT, i);
-            PhysicalRegisterFile.PhysicalRegister physReg = this.fpPhysicalRegisterFile.getRegisters().get(i);
+            PhysicalRegister physReg = this.fpPhysicalRegisterFile.getRegisters().get(i);
             physReg.reserve(dep);
             this.renameTable.put(dep, physReg);
         }
 
         for (int i = 0; i < ArchitecturalRegisterFile.NUM_MISC_REGISTERS; i++) {
             int dep = RegisterDependencyType.toRegisterDependency(RegisterDependencyType.MISC, i);
-            PhysicalRegisterFile.PhysicalRegister physReg = this.miscPhysicalRegisterFile.getRegisters().get(i);
+            PhysicalRegister physReg = this.miscPhysicalRegisterFile.getRegisters().get(i);
             physReg.reserve(dep);
             this.renameTable.put(dep, physReg);
         }
@@ -259,9 +277,7 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
         });
     }
 
-    /**
-     *
-     */
+    @Override
     public void updatePerCycleStats() {
         if (this.decodeBuffer.isFull()) {
             this.numDecodeBufferFullStalls++;
@@ -288,292 +304,176 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
         }
     }
 
-    /**
-     *
-     * @return
-     */
+    @Override
     public int getNum() {
         return num;
     }
 
-    /**
-     *
-     * @return
-     */
+    @Override
     public int getId() {
         return id;
     }
 
-    /**
-     *
-     * @return
-     */
+    @Override
     public String getName() {
         return name;
     }
 
-    /**
-     *
-     * @return
-     */
+    @Override
     public Core getCore() {
         return core;
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public BranchPredictor getBranchPredictor() {
         return branchPredictor;
     }
 
-    /**
-     *
-     * @return
-     */
+    @Override
     public PipelineBuffer<DecodeBufferEntry> getDecodeBuffer() {
         return decodeBuffer;
     }
 
-    /**
-     *
-     * @return
-     */
+    @Override
     public PipelineBuffer<ReorderBufferEntry> getReorderBuffer() {
         return reorderBuffer;
     }
 
-    /**
-     *
-     * @return
-     */
+    @Override
     public PipelineBuffer<LoadStoreQueueEntry> getLoadStoreQueue() {
         return loadStoreQueue;
     }
 
-    /**
-     *
-     * @return
-     */
+    @Override
     public long getNumInstructions() {
         return numInstructions;
     }
 
-    /**
-     *
-     * @return
-     */
+    @Override
     public TranslationLookasideBuffer getItlb() {
         return itlb;
     }
 
-    /**
-     *
-     * @param itlb
-     */
+    @Override
     public void setItlb(TranslationLookasideBuffer itlb) {
         this.itlb = itlb;
     }
 
-    /**
-     *
-     * @return
-     */
+    @Override
     public TranslationLookasideBuffer getDtlb() {
         return dtlb;
     }
 
-    /**
-     *
-     * @param dtlb
-     */
+    @Override
     public void setDtlb(TranslationLookasideBuffer dtlb) {
         this.dtlb = dtlb;
     }
 
-    /**
-     *
-     * @return
-     */
+    @Override
     public Context getContext() {
         return context;
     }
 
-    /**
-     *
-     * @param context
-     */
+    @Override
     public void setContext(Context context) {
         this.context = context;
     }
 
-    /**
-     *
-     */
+    @Override
     public void incrementNumRegisterRenameStallsOnDecodeBufferIsEmpty() {
         this.numRegisterRenameStallsOnDecodeBufferIsEmpty++;
     }
 
-    /**
-     *
-     */
+    @Override
     public void incrementNumRegisterRenameStallsOnReorderBufferIsFull() {
         this.numRegisterRenameStallsOnReorderBufferIsFull++;
     }
 
-    /**
-     *
-     */
+    @Override
     public void incrementNumSelectionStallsOnCanNotLoad() {
         this.numSelectionStallsOnCanNotLoad++;
     }
 
-    /**
-     *
-     */
+    @Override
     public void incrementNumSelectionStallsOnCanNotStore() {
         this.numSelectionStallsOnCanNotStore++;
     }
 
-    /**
-     *
-     */
+    @Override
     public void incrementNumSelectionStallsOnNoFreeFunctionalUnit() {
         this.numSelectionStallsOnNoFreeFunctionalUnit++;
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public long getNumDecodeBufferFullStalls() {
         return numDecodeBufferFullStalls;
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public long getNumReorderBufferFullStalls() {
         return numReorderBufferFullStalls;
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public long getNumLoadStoreQueueFullStalls() {
         return numLoadStoreQueueFullStalls;
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public long getNumIntPhysicalRegisterFileFullStalls() {
         return numIntPhysicalRegisterFileFullStalls;
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public long getNumFpPhysicalRegisterFileFullStalls() {
         return numFpPhysicalRegisterFileFullStalls;
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public long getNumMiscPhysicalRegisterFileFullStalls() {
         return numMiscPhysicalRegisterFileFullStalls;
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public long getNumFetchStallsOnDecodeBufferIsFull() {
         return numFetchStallsOnDecodeBufferIsFull;
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public long getNumRegisterRenameStallsOnDecodeBufferIsEmpty() {
         return numRegisterRenameStallsOnDecodeBufferIsEmpty;
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public long getNumRegisterRenameStallsOnReorderBufferIsFull() {
         return numRegisterRenameStallsOnReorderBufferIsFull;
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public long getNumRegisterRenameStallsOnLoadStoreQueueFull() {
         return numRegisterRenameStallsOnLoadStoreQueueFull;
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public long getNumSelectionStallsOnCanNotLoad() {
         return numSelectionStallsOnCanNotLoad;
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public long getNumSelectionStallsOnCanNotStore() {
         return numSelectionStallsOnCanNotStore;
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public long getNumSelectionStallsOnNoFreeFunctionalUnit() {
         return numSelectionStallsOnNoFreeFunctionalUnit;
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public Map<Mnemonic, Long> getExecutedMnemonics() {
         return executedMnemonics;
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public Map<String, Long> getExecutedSystemCalls() {
         return executedSystemCalls;

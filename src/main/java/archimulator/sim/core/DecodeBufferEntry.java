@@ -21,6 +21,7 @@ package archimulator.sim.core;
 import archimulator.sim.core.bpred.BranchPredictorUpdate;
 
 /**
+ * Decode buffer entry.
  *
  * @author Min Cai
  */
@@ -35,14 +36,15 @@ public class DecodeBufferEntry {
     private boolean speculative;
 
     /**
+     * Create a decode buffer entry.
      *
-     * @param dynamicInstruction
-     * @param npc
-     * @param nnpc
-     * @param predictedNnpc
-     * @param returnAddressStackRecoverIndex
-     * @param branchPredictorUpdate
-     * @param speculative
+     * @param dynamicInstruction the dynamic instruction
+     * @param npc the value of the next program counter (NPC)
+     * @param nnpc the value of the next next program counter (NNPC)
+     * @param predictedNnpc the predicted value of the next next program counter (predicted NNPC)
+     * @param returnAddressStackRecoverIndex the return address stack recover index
+     * @param branchPredictorUpdate the branch predictor update
+     * @param speculative a value indicating whether the decode buffer entry is speculative or not
      */
     public DecodeBufferEntry(DynamicInstruction dynamicInstruction, int npc, int nnpc, int predictedNnpc, int returnAddressStackRecoverIndex, BranchPredictorUpdate branchPredictorUpdate, boolean speculative) {
         this.id = dynamicInstruction.getThread().getSimulation().currentDecodeBufferEntryId++;
@@ -56,64 +58,72 @@ public class DecodeBufferEntry {
     }
 
     /**
+     * Get the ID of the decode buffer entry.
      *
-     * @return
+     * @return the ID of the decode buffer entry
      */
     public long getId() {
         return id;
     }
 
     /**
+     * Get the dynamic instruction.
      *
-     * @return
+     * @return the dynamic instruction
      */
     public DynamicInstruction getDynamicInstruction() {
         return dynamicInstruction;
     }
 
     /**
+     * Get the value of the next program counter (NPC).
      *
-     * @return
+     * @return the value of the next program counter (NPC)
      */
     public int getNpc() {
         return npc;
     }
 
     /**
+     * Get the value of the next next program counter (NNPC).
      *
-     * @return
+     * @return the value of the next next program counter (NNPC)
      */
     public int getNnpc() {
         return nnpc;
     }
 
     /**
+     * Get the predicted value of the next next program counter (predicted NNPC).
      *
-     * @return
+     * @return the predicted value of the next next program counter (predicted NNPC)
      */
     public int getPredictedNnpc() {
         return predictedNnpc;
     }
 
     /**
+     * Get the return address stack recover index.
      *
-     * @return
+     * @return the return address stack recover index
      */
     public int getReturnAddressStackRecoverIndex() {
         return returnAddressStackRecoverIndex;
     }
 
     /**
+     * Get the branch predictor update.
      *
-     * @return
+     * @return the branch predictor update
      */
     public BranchPredictorUpdate getBranchPredictorUpdate() {
         return branchPredictorUpdate;
     }
 
     /**
+     * Get a value indicating whether the decode buffer entry is speculative or not.
      *
-     * @return
+     * @return a value indicating whether the decode buffer entry is speculative or not
      */
     public boolean isSpeculative() {
         return speculative;

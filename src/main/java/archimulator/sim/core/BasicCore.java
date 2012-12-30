@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.core;
 
+import archimulator.sim.core.functionalUnit.FunctionalUnitOperationType;
 import archimulator.sim.isa.StaticInstructionType;
 import archimulator.sim.os.ContextState;
 import net.pickapack.Reference;
@@ -31,6 +32,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ * The basic core.
  *
  * @author Min Cai
  */
@@ -39,9 +41,10 @@ public class BasicCore extends AbstractBasicCore {
     private RoundRobinScheduler<Thread> dispatchScheduler;
 
     /**
+     * Create a basic core.
      *
-     * @param processor
-     * @param num
+     * @param processor the parent processor
+     * @param num the number of the core
      */
     public BasicCore(Processor processor, int num) {
         super(processor, num);
@@ -79,9 +82,6 @@ public class BasicCore extends AbstractBasicCore {
         );
     }
 
-    /**
-     *
-     */
     @Override
     protected void fetch() {
         for (Thread thread : this.threads) {
@@ -91,31 +91,28 @@ public class BasicCore extends AbstractBasicCore {
         }
     }
 
-    /**
-     *
-     */
     @Override
     protected void registerRename() {
         this.registerRenameScheduler.consumeNext();
     }
 
-    /**
-     *
-     */
     @Override
     protected void dispatch() {
         this.dispatchScheduler.consumeNext();
     }
 
-    /**
-     *
-     */
     @Override
     protected void wakeUp() {
         this.wakeUp(this.waitingInstructionQueue, this.readyInstructionQueue);
         this.wakeUp(this.waitingStoreQueue, this.readyStoreQueue);
     }
 
+    /**
+     * Wake up.
+     *
+     * @param waitingQueue the waiting queue
+     * @param readyQueue the ready queue
+     */
     private void wakeUp(List<AbstractReorderBufferEntry> waitingQueue, List<AbstractReorderBufferEntry> readyQueue) {
         for (Iterator<AbstractReorderBufferEntry> it = waitingQueue.iterator(); it.hasNext(); ) {
             AbstractReorderBufferEntry waitingQueueEntry = it.next();
@@ -127,9 +124,6 @@ public class BasicCore extends AbstractBasicCore {
         }
     }
 
-    /**
-     *
-     */
     @Override
     protected void issue() {
         Reference<Integer> quant = new Reference<Integer>(getExperiment().getArchitecture().getIssueWidth());
@@ -139,6 +133,11 @@ public class BasicCore extends AbstractBasicCore {
         this.issueStoreQueue(quant);
     }
 
+    /**
+     * Issue the instruction queue.
+     *
+     * @param quant the quant
+     */
     private void issueInstructionQueue(Reference<Integer> quant) {
         for (Iterator<AbstractReorderBufferEntry> it = this.readyInstructionQueue.iterator(); quant.get() > 0 && it.hasNext(); ) {
             final ReorderBufferEntry reorderBufferEntry = (ReorderBufferEntry) it.next();
@@ -166,6 +165,11 @@ public class BasicCore extends AbstractBasicCore {
         }
     }
 
+    /**
+     * Issue the load queue.
+     *
+     * @param quant the quant
+     */
     private void issueLoadQueue(Reference<Integer> quant) {
         for (Iterator<AbstractReorderBufferEntry> it = this.readyLoadQueue.iterator(); quant.get() > 0 && it.hasNext(); ) {
             final LoadStoreQueueEntry loadStoreQueueEntry = (LoadStoreQueueEntry) it.next();
@@ -202,6 +206,11 @@ public class BasicCore extends AbstractBasicCore {
         }
     }
 
+    /**
+     * Issue the store queue.
+     *
+     * @param quant the store queue
+     */
     private void issueStoreQueue(Reference<Integer> quant) {
         for (Iterator<AbstractReorderBufferEntry> it = this.readyStoreQueue.iterator(); quant.get() > 0 && it.hasNext(); ) {
             final LoadStoreQueueEntry loadStoreQueueEntry = (LoadStoreQueueEntry) it.next();
@@ -225,9 +234,6 @@ public class BasicCore extends AbstractBasicCore {
         }
     }
 
-    /**
-     *
-     */
     @Override
     protected void writeBack() {
         for (AbstractReorderBufferEntry reorderBufferEntry : this.oooEventQueue) {
@@ -238,9 +244,6 @@ public class BasicCore extends AbstractBasicCore {
         this.oooEventQueue.clear();
     }
 
-    /**
-     *
-     */
     @Override
     protected void refreshLoadStoreQueue() {
         for (Thread thread : this.threads) {
@@ -250,9 +253,6 @@ public class BasicCore extends AbstractBasicCore {
         }
     }
 
-    /**
-     *
-     */
     @Override
     protected void commit() {
         for (Thread thread : this.threads) {

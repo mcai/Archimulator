@@ -16,31 +16,43 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.core;
+package archimulator.sim.core.functionalUnit;
 
 /**
- * Physical register file state.
+ * Functional unit operation.
  *
  * @author Min Cai
  */
-public enum PhysicalRegisterState {
-    /**
-     * Available.
-     */
-    AVAILABLE,
+public class FunctionalUnitOperation {
+    private int operationLatency;
+    private int issueLatency;
 
     /**
-     * Rename buffer is not valid.
+     * Create a functional unit operation.
+     *
+     * @param operationLatency the operation latency in cycles
+     * @param issueLatency the issue latency in cycles
      */
-    RENAME_BUFFER_NOT_VALID,
+    public FunctionalUnitOperation(int operationLatency, int issueLatency) {
+        this.operationLatency = operationLatency;
+        this.issueLatency = issueLatency;
+    }
 
     /**
-     * Rename buffer is valid.
+     * Get the operation latency in cycles.
+     *
+     * @return the operation latency in cycles
      */
-    RENAME_BUFFER_VALID,
+    public int getOperationLatency() {
+        return operationLatency;
+    }
 
     /**
-     * Architectural register.
+     * Get the issue latency in cycles.
+     *
+     * @return the issue latency in cycles
      */
-    ARCHITECTURAL_REGISTER
+    public int getIssueLatency() {
+        return issueLatency;
+    }
 }

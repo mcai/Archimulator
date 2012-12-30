@@ -22,6 +22,7 @@ import archimulator.sim.common.SimulationEvent;
 import archimulator.sim.core.DynamicInstruction;
 
 /**
+ * The event when an instruction is decoded.
  *
  * @author Min Cai
  */
@@ -29,8 +30,9 @@ public class InstructionDecodedEvent extends SimulationEvent {
     private DynamicInstruction dynamicInstruction;
 
     /**
+     * Create an event when a instruction is decoded.
      *
-     * @param dynamicInstruction
+     * @param dynamicInstruction the dynamic instruction
      */
     public InstructionDecodedEvent(DynamicInstruction dynamicInstruction) {
         super(dynamicInstruction.getThread());
@@ -38,8 +40,9 @@ public class InstructionDecodedEvent extends SimulationEvent {
     }
 
     /**
+     * Get the dynamic instruction.
      *
-     * @return
+     * @return the dynamic instruction
      */
     public DynamicInstruction getDynamicInstruction() {
         return dynamicInstruction;

@@ -22,43 +22,48 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
+ * Register rename table.
  *
  * @author Min Cai
  */
 public class RegisterRenameTable {
     private String name;
-    private Map<Integer, PhysicalRegisterFile.PhysicalRegister> entries;
+    private Map<Integer, PhysicalRegister> entries;
 
     /**
+     * Create a register rename table.
      *
-     * @param name
+     * @param name the name of the register rename table
      */
     public RegisterRenameTable(String name) {
         this.name = name;
-        this.entries = new TreeMap<Integer, PhysicalRegisterFile.PhysicalRegister>();
+        this.entries = new TreeMap<Integer, PhysicalRegister>();
     }
 
     /**
+     * Get the corresponding physical register for the specified dependency.
      *
-     * @param dependency
-     * @return
+     * @param dependency the dependency
+     * @return the corresponding physical register for the specified dependency
      */
-    public PhysicalRegisterFile.PhysicalRegister get(int dependency) {
+    public PhysicalRegister get(int dependency) {
         return this.entries.get(dependency);
     }
 
     /**
+     * Set the corresponding physical register for the specified dependency.
      *
-     * @param dependency
-     * @param physicalRegister
+     * @param dependency the dependency
+     * @param physicalRegister the physical register
      */
-    public void put(int dependency, PhysicalRegisterFile.PhysicalRegister physicalRegister) {
+    public void put(int dependency, PhysicalRegister physicalRegister) {
         this.entries.put(dependency, physicalRegister);
     }
 
     /**
+     * Get the name of the register rename table.
      *
-     * @return
+     * @return the name of the register rename table
      */
     public String getName() {
         return name;

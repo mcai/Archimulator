@@ -21,67 +21,66 @@ package archimulator.sim.core;
 import archimulator.sim.core.bpred.BranchPredictorUpdate;
 
 /**
+ * Load/store queue entry.
  *
  * @author Min Cai
  */
 public class LoadStoreQueueEntry extends AbstractReorderBufferEntry {
-    /**
-     *
-     */
-    protected int effectiveAddress;
+    private int effectiveAddress;
     private boolean storeAddressReady;
 
     /**
+     * Create a load/store queue entry.
      *
-     * @param thread
-     * @param dynamicInstruction
-     * @param npc
-     * @param nnpc
-     * @param predictedNnpc
-     * @param returnAddressStackRecoverIndex
-     * @param branchPredictorUpdate
-     * @param speculative
+     * @param thread the thread
+     * @param dynamicInstruction the dynamic instruction
+     * @param npc the value of the next program counter (NPC)
+     * @param nnpc the value of the next next program counter (NNPC)
+     * @param predictedNnpc the predicted value of the next next program counter (predicted NNPC)
+     * @param returnAddressStackRecoverIndex the return address stack recover index
+     * @param branchPredictorUpdate the branch predictor update
+     * @param speculative a value indicating whether the load/store queue entry is speculative or not
      */
     public LoadStoreQueueEntry(Thread thread, DynamicInstruction dynamicInstruction, int npc, int nnpc, int predictedNnpc, int returnAddressStackRecoverIndex, BranchPredictorUpdate branchPredictorUpdate, boolean speculative) {
         super(thread, dynamicInstruction, npc, nnpc, predictedNnpc, returnAddressStackRecoverIndex, branchPredictorUpdate, speculative);
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     protected boolean isNeedWriteBack() {
         return true;
     }
 
     /**
+     * Get a value indicating whether the store address is ready or not.
      *
-     * @return
+     * @return a value indicating whether the store address is ready or not
      */
     public boolean isStoreAddressReady() {
         return this.storeAddressReady;
     }
 
     /**
+     * Set a value indicating whether the store address is ready or not.
      *
-     * @param storeAddressReady
+     * @param storeAddressReady a value indicating whether the store address is ready or not
      */
     public void setStoreAddressReady(boolean storeAddressReady) {
         this.storeAddressReady = storeAddressReady;
     }
 
     /**
+     * Get the effective address.
      *
-     * @return
+     * @return the effective address
      */
     public int getEffectiveAddress() {
         return effectiveAddress;
     }
 
     /**
+     * Set the effective address.
      *
-     * @param effectiveAddress
+     * @param effectiveAddress the effective address
      */
     public void setEffectiveAddress(int effectiveAddress) {
         this.effectiveAddress = effectiveAddress;

@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.isa;
 
-import archimulator.sim.core.FunctionalUnitOperationType;
+import archimulator.sim.core.functionalUnit.FunctionalUnitOperationType;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

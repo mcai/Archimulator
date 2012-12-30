@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Physical register file.
  *
  * @author Min Cai
  */
@@ -32,25 +33,27 @@ public class PhysicalRegisterFile {
     private int numFreePhysicalRegisters;
 
     /**
+     * Create a physical register file.
      *
-     * @param name
-     * @param capacity
+     * @param name the name of the physical register file
+     * @param capacity the capacity
      */
     public PhysicalRegisterFile(String name, int capacity) {
         this.name = name;
 
         this.registers = new ArrayList<PhysicalRegister>();
         for (int i = 0; i < capacity; i++) {
-            this.registers.add(new PhysicalRegister());
+            this.registers.add(new PhysicalRegister(this));
         }
 
-        this.numFreePhysicalRegisters = capacity;
+        this.setNumFreePhysicalRegisters(capacity);
     }
 
     /**
+     * Allocate a physical register for the specified dependency.
      *
-     * @param dependency
-     * @return
+     * @param dependency the dependency
+     * @return the newly allocated physical register for the specified dependency
      */
     public PhysicalRegister allocate(int dependency) {
         for (PhysicalRegister physReg : this.registers) {
@@ -64,199 +67,47 @@ public class PhysicalRegisterFile {
     }
 
     /**
+     * Get a value indicating whether the physical register file is full or not.
      *
-     * @return
+     * @return a value indicating whether the physical register file is full or not
      */
     public boolean isFull() {
         return this.numFreePhysicalRegisters == 0;
     }
 
     /**
+     * Get the name of the physical register file.
      *
-     * @return
+     * @return the name of the physical register file
      */
     public String getName() {
         return name;
     }
 
     /**
+     * Get the list of physical registers.
      *
-     * @return
+     * @return the list of physical registers
      */
     public List<PhysicalRegister> getRegisters() {
         return registers;
     }
 
     /**
+     * Get the number of free physical registers.
      *
-     * @return
+     * @return the number of free physical registers
      */
     public int getNumFreePhysicalRegisters() {
         return numFreePhysicalRegisters;
     }
 
     /**
+     * Set the number of free physical registers.
      *
+     * @param numFreePhysicalRegisters the number of free physical registers
      */
-    public class PhysicalRegister {
-        private PhysicalRegisterState state;
-
-        private int dependency;
-
-        private List<ReorderBufferEntry> effectiveAddressComputationOperandDependents;
-        private List<LoadStoreQueueEntry> storeAddressDependents;
-        private List<AbstractReorderBufferEntry> dependents;
-
-        private PhysicalRegister() {
-            this.state = PhysicalRegisterState.AVAILABLE;
-
-            this.effectiveAddressComputationOperandDependents = new ArrayList<ReorderBufferEntry>();
-            this.storeAddressDependents = new ArrayList<LoadStoreQueueEntry>();
-            this.dependents = new ArrayList<AbstractReorderBufferEntry>();
-        }
-
-        /**
-         *
-         * @param dependency
-         */
-        public void reserve(int dependency) {
-            if (this.state != PhysicalRegisterState.AVAILABLE) {
-                throw new IllegalArgumentException();
-            }
-
-            this.dependency = dependency;
-            this.state = PhysicalRegisterState.ARCHITECTURAL_REGISTER;
-
-            numFreePhysicalRegisters--;
-        }
-
-        /**
-         *
-         * @param dependency
-         */
-        public void allocate(int dependency) {
-            if (this.state != PhysicalRegisterState.AVAILABLE) {
-                throw new IllegalArgumentException();
-            }
-
-            this.dependency = dependency;
-            this.state = PhysicalRegisterState.RENAME_BUFFER_NOT_VALID;
-
-            numFreePhysicalRegisters--;
-        }
-
-        /**
-         *
-         */
-        public void writeback() {
-            if (this.state != PhysicalRegisterState.RENAME_BUFFER_NOT_VALID) {
-                throw new IllegalArgumentException();
-            }
-
-            this.state = PhysicalRegisterState.RENAME_BUFFER_VALID;
-
-            for (ReorderBufferEntry effectiveAddressComputationOperandDependent : this.effectiveAddressComputationOperandDependents) {
-                effectiveAddressComputationOperandDependent.setEffectiveAddressComputationOperandReady(true);
-            }
-
-            for (LoadStoreQueueEntry storeAddressDependent : this.storeAddressDependents) {
-                storeAddressDependent.setStoreAddressReady(true);
-            }
-
-            for (AbstractReorderBufferEntry dependent : this.dependents) {
-                dependent.setNumNotReadyOperands(dependent.getNumNotReadyOperands() - 1);
-            }
-
-            this.effectiveAddressComputationOperandDependents.clear();
-            this.storeAddressDependents.clear();
-            this.dependents.clear();
-        }
-
-        /**
-         *
-         */
-        public void commit() {
-            if (this.state != PhysicalRegisterState.RENAME_BUFFER_VALID) {
-                throw new IllegalArgumentException();
-            }
-
-            this.state = PhysicalRegisterState.ARCHITECTURAL_REGISTER;
-        }
-
-        /**
-         *
-         */
-        public void recover() {
-            if (this.state != PhysicalRegisterState.RENAME_BUFFER_NOT_VALID && this.state != PhysicalRegisterState.RENAME_BUFFER_VALID) {
-                throw new IllegalArgumentException();
-            }
-
-            this.dependency = -1;
-            this.state = PhysicalRegisterState.AVAILABLE;
-
-            numFreePhysicalRegisters++;
-        }
-
-        /**
-         *
-         */
-        public void reclaim() {
-            if (this.state != PhysicalRegisterState.ARCHITECTURAL_REGISTER) {
-                throw new IllegalArgumentException();
-            }
-
-            this.dependency = -1;
-            this.state = PhysicalRegisterState.AVAILABLE;
-
-            numFreePhysicalRegisters++;
-        }
-
-        /**
-         *
-         * @return
-         */
-        public boolean isReady() {
-            return this.state == PhysicalRegisterState.RENAME_BUFFER_VALID || this.state == PhysicalRegisterState.ARCHITECTURAL_REGISTER;
-        }
-
-        /**
-         *
-         * @return
-         */
-        public int getDependency() {
-            return dependency;
-        }
-
-        /**
-         *
-         * @return
-         */
-        public PhysicalRegisterState getState() {
-            return state;
-        }
-
-        /**
-         *
-         * @return
-         */
-        public List<AbstractReorderBufferEntry> getDependents() {
-            return dependents;
-        }
-
-        /**
-         *
-         * @return
-         */
-        public List<LoadStoreQueueEntry> getStoreAddressDependents() {
-            return storeAddressDependents;
-        }
-
-        /**
-         *
-         * @return
-         */
-        public List<ReorderBufferEntry> getEffectiveAddressComputationOperandDependents() {
-            return effectiveAddressComputationOperandDependents;
-        }
+    public void setNumFreePhysicalRegisters(int numFreePhysicalRegisters) {
+        this.numFreePhysicalRegisters = numFreePhysicalRegisters;
     }
 }

@@ -19,7 +19,7 @@
 package archimulator.sim.isa;
 
 import archimulator.sim.common.Logger;
-import archimulator.sim.core.FunctionalUnitOperationType;
+import archimulator.sim.core.functionalUnit.FunctionalUnitOperationType;
 import archimulator.sim.isa.event.FunctionReturnEvent;
 import archimulator.sim.isa.event.FunctionalCallEvent;
 import archimulator.sim.isa.event.InstructionFunctionallyExecutedEvent;

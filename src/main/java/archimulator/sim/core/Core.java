@@ -19,6 +19,7 @@
 package archimulator.sim.core;
 
 import archimulator.sim.common.SimulationObject;
+import archimulator.sim.core.functionalUnit.FunctionalUnitPool;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import net.pickapack.action.Action;
 

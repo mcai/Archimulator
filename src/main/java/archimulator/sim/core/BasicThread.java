@@ -94,6 +94,7 @@ public class BasicThread extends AbstractBasicThread {
         });
     }
 
+    @Override
     public void fastForwardOneCycle() {
         if (this.context != null && this.context.getState() == ContextState.RUNNING) {
             StaticInstruction staticInstruction;
@@ -110,6 +111,7 @@ public class BasicThread extends AbstractBasicThread {
         }
     }
 
+    @Override
     public void warmupCacheOneCycle() {
         if (this.context != null && this.context.getState() == ContextState.RUNNING && !this.fetchStalled) {
             if (this.nextInstructionInCacheWarmupPhase == null) {
@@ -170,6 +172,7 @@ public class BasicThread extends AbstractBasicThread {
         }
     }
 
+    @Override
     public void updateFetchNpcAndNnpcFromRegs() {
         this.fetchNpc = this.context.getRegisterFile().getNpc();
         this.fetchNnpc = this.context.getRegisterFile().getNnpc();
@@ -213,6 +216,7 @@ public class BasicThread extends AbstractBasicThread {
         }
     }
 
+    @Override
     public void fetch() {
         if (!this.canFetch()) {
             return;
@@ -280,6 +284,7 @@ public class BasicThread extends AbstractBasicThread {
         }
     }
 
+    @Override
     public boolean registerRenameOne() {
         DecodeBufferEntry decodeBufferEntry = this.decodeBuffer.getEntries().get(0);
 
@@ -306,13 +311,13 @@ public class BasicThread extends AbstractBasicThread {
         for (int outputDependency : reorderBufferEntry.getDynamicInstruction().getStaticInstruction().getOutputDependencies()) {
             if (outputDependency != 0) {
                 reorderBufferEntry.getOldPhysicalRegisters().put(outputDependency, this.renameTable.get(outputDependency));
-                PhysicalRegisterFile.PhysicalRegister physReg = this.getPhysicalRegisterFile(RegisterDependencyType.getType(outputDependency)).allocate(outputDependency);
+                PhysicalRegister physReg = this.getPhysicalRegisterFile(RegisterDependencyType.getType(outputDependency)).allocate(outputDependency);
                 this.renameTable.put(outputDependency, physReg);
                 reorderBufferEntry.getTargetPhysicalRegisters().put(outputDependency, physReg);
             }
         }
 
-        for (PhysicalRegisterFile.PhysicalRegister physicalRegister : reorderBufferEntry.getSourcePhysicalRegisters().values()) {
+        for (PhysicalRegister physicalRegister : reorderBufferEntry.getSourcePhysicalRegisters().values()) {
             if (!physicalRegister.isReady()) {
                 reorderBufferEntry.setNumNotReadyOperands(reorderBufferEntry.getNumNotReadyOperands() + 1);
                 physicalRegister.getDependents().add(reorderBufferEntry);
@@ -320,7 +325,7 @@ public class BasicThread extends AbstractBasicThread {
         }
 
         if (reorderBufferEntry.isEffectiveAddressComputation()) {
-            PhysicalRegisterFile.PhysicalRegister physicalRegister = reorderBufferEntry.getSourcePhysicalRegisters().get(reorderBufferEntry.getDynamicInstruction().getStaticInstruction().getInputDependencies().get(0));
+            PhysicalRegister physicalRegister = reorderBufferEntry.getSourcePhysicalRegisters().get(reorderBufferEntry.getDynamicInstruction().getStaticInstruction().getInputDependencies().get(0));
             if (!physicalRegister.isReady()) {
                 physicalRegister.getEffectiveAddressComputationOperandDependents().add(reorderBufferEntry);
             } else {
@@ -335,7 +340,7 @@ public class BasicThread extends AbstractBasicThread {
             loadStoreQueueEntry.setSourcePhysicalRegisters(reorderBufferEntry.getSourcePhysicalRegisters());
             loadStoreQueueEntry.setTargetPhysicalRegisters(reorderBufferEntry.getTargetPhysicalRegisters());
 
-            for (PhysicalRegisterFile.PhysicalRegister physicalRegister : loadStoreQueueEntry.getSourcePhysicalRegisters().values()) {
+            for (PhysicalRegister physicalRegister : loadStoreQueueEntry.getSourcePhysicalRegisters().values()) {
                 if (!physicalRegister.isReady()) {
                     physicalRegister.getDependents().add(loadStoreQueueEntry);
                 }
@@ -343,7 +348,7 @@ public class BasicThread extends AbstractBasicThread {
 
             loadStoreQueueEntry.setNumNotReadyOperands(reorderBufferEntry.getNumNotReadyOperands());
 
-            PhysicalRegisterFile.PhysicalRegister storeAddressPhysicalRegister = loadStoreQueueEntry.getSourcePhysicalRegisters().get(loadStoreQueueEntry.getDynamicInstruction().getStaticInstruction().getInputDependencies().get(0));
+            PhysicalRegister storeAddressPhysicalRegister = loadStoreQueueEntry.getSourcePhysicalRegisters().get(loadStoreQueueEntry.getDynamicInstruction().getStaticInstruction().getInputDependencies().get(0));
             if (!storeAddressPhysicalRegister.isReady()) {
                 storeAddressPhysicalRegister.getStoreAddressDependents().add(loadStoreQueueEntry);
             } else {
@@ -362,6 +367,7 @@ public class BasicThread extends AbstractBasicThread {
         return true;
     }
 
+    @Override
     public boolean dispatchOne() {
         for (ReorderBufferEntry reorderBufferEntry : this.reorderBuffer.getEntries()) {
             if (!reorderBufferEntry.isDispatched()) {
@@ -394,6 +400,7 @@ public class BasicThread extends AbstractBasicThread {
         return false;
     }
 
+    @Override
     public void refreshLoadStoreQueue() { //TODO: to be clarified
         List<Integer> stdUnknowns = new ArrayList<Integer>();
 
@@ -420,6 +427,7 @@ public class BasicThread extends AbstractBasicThread {
         }
     }
 
+    @Override
     public void commit() {
         int COMMIT_TIMEOUT = 1000000;
 
@@ -509,6 +517,7 @@ public class BasicThread extends AbstractBasicThread {
         }
     }
 
+    @Override
     public void squash() {
 //		Logger.infof(Logger.THREAD, "%s: squash", this.getName());
 

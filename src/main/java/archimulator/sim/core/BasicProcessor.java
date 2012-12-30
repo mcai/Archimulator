@@ -33,6 +33,7 @@ import net.pickapack.event.CycleAccurateEventQueue;
 import java.util.*;
 
 /**
+ * Basic processor.
  *
  * @author Min Cai
  */
@@ -46,13 +47,14 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
     private Map<Context, Thread> contextToThreadMappings;
 
     /**
+     * Create a basic processor.
      *
-     * @param experiment
-     * @param simulation
-     * @param blockingEventDispatcher
-     * @param cycleAccurateEventQueue
-     * @param kernel
-     * @param memoryHierarchy
+     * @param experiment the experiment
+     * @param simulation the simulation
+     * @param blockingEventDispatcher the blocking event dispatcher
+     * @param cycleAccurateEventQueue the cycle accurate event queue
+     * @param kernel the kernel
+     * @param memoryHierarchy the memory hierarchy
      */
     public BasicProcessor(Experiment experiment, Simulation simulation, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, Kernel kernel, MemoryHierarchy memoryHierarchy) {
         super(experiment, simulation, blockingEventDispatcher, cycleAccurateEventQueue);
@@ -86,9 +88,7 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
         this.updateContextToThreadAssignments();
     }
 
-    /**
-     *
-     */
+    @Override
     public void updateContextToThreadAssignments() {
         for (Iterator<Context> it = this.kernel.getContexts().iterator(); it.hasNext(); ) {
             Context context = it.next();
@@ -115,8 +115,15 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
         }
     }
 
+    /**
+     * Kill the specified context.
+     *
+     * @param context the context to be killed
+     */
     private void kill(Context context) {
-        assert (context.getState() == ContextState.FINISHED);
+        if (context.getState() != ContextState.FINISHED) {
+            throw new IllegalArgumentException();
+        }
 
         for (Context childContext : this.kernel.getContexts()) {
             if (childContext.getParent() == context) {
@@ -135,17 +142,15 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
         this.getBlockingEventDispatcher().dispatch(new ContextKilledEvent(context));
     }
 
-    /**
-     *
-     * @return
-     */
+    @Override
     public List<Core> getCores() {
         return cores;
     }
 
     /**
+     * Get the list of threads.
      *
-     * @return
+     * @return the list of threads
      */
     public List<Thread> getThreads() {
         List<Thread> threads = new ArrayList<Thread>();
@@ -157,18 +162,12 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
         return threads;
     }
 
-    /**
-     *
-     * @return
-     */
+    @Override
     public Kernel getKernel() {
         return kernel;
     }
 
-    /**
-     *
-     * @return
-     */
+    @Override
     public MemoryHierarchy getMemoryHierarchy() {
         return memoryHierarchy;
     }

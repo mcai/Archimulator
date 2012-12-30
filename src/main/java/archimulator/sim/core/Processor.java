@@ -25,30 +25,34 @@ import archimulator.sim.uncore.MemoryHierarchy;
 import java.util.List;
 
 /**
+ * Processor.
  *
  * @author Min Cai
  */
 public interface Processor extends SimulationObject {
     /**
+     * Get the list of cores.
      *
-     * @return
+     * @return the list of cores
      */
     List<Core> getCores();
 
     /**
+     * Get the kernel.
      *
-     * @return
+     * @return the kernel
      */
     Kernel getKernel();
 
     /**
-     *
+     * Update the assignments of contexts to threads.
      */
     void updateContextToThreadAssignments();
 
     /**
+     * Get the memory hierarchy.
      *
-     * @return
+     * @return the memory hierarchy
      */
     MemoryHierarchy getMemoryHierarchy();
 }

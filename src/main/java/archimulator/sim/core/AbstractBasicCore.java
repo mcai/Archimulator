@@ -19,6 +19,7 @@
 package archimulator.sim.core;
 
 import archimulator.sim.common.BasicSimulationObject;
+import archimulator.sim.core.functionalUnit.FunctionalUnitPool;
 import archimulator.sim.uncore.MemoryAccessInitiatedEvent;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.MemoryHierarchyAccessType;
@@ -30,75 +31,81 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Abstract basic core.
  *
  * @author Min Cai
  */
 public abstract class AbstractBasicCore extends BasicSimulationObject implements Core {
     /**
-     *
+     * The number of the core.
      */
     protected int num;
+
     /**
-     *
+     * The name of the core.
      */
     protected String name;
 
     /**
-     *
+     * The processor.
      */
     protected Processor processor;
 
     /**
-     *
+     * The list of threads.
      */
     protected List<Thread> threads;
 
     /**
-     *
+     * The L1I cache controller.
      */
     protected CacheController l1ICacheController;
+
     /**
-     *
+     * The L1D cache controller.
      */
     protected CacheController l1DCacheController;
 
     /**
-     *
+     * The functional unit pool.
      */
     protected FunctionalUnitPool functionalUnitPool;
 
     /**
-     *
+     * The waiting instruction queue.
      */
     protected List<AbstractReorderBufferEntry> waitingInstructionQueue;
+
     /**
-     *
+     * The ready instruction queue.
      */
     protected List<AbstractReorderBufferEntry> readyInstructionQueue;
 
     /**
-     *
+     * The ready load queue.
      */
     protected List<AbstractReorderBufferEntry> readyLoadQueue;
 
     /**
-     *
+     * The waiting store queue.
      */
     protected List<AbstractReorderBufferEntry> waitingStoreQueue;
+
     /**
-     *
+     * The ready store queue.
      */
     protected List<AbstractReorderBufferEntry> readyStoreQueue;
 
     /**
-     *
+     * The out-of-order event queue.
      */
     protected List<AbstractReorderBufferEntry> oooEventQueue;
 
     /**
+     * Create an abstract basic core.
      *
-     * @param processor
-     * @param num
+     * @param processor the parent processor
+     * @param num the number of the core
      */
     public AbstractBasicCore(Processor processor, int num) {
         super(processor);
@@ -123,27 +130,21 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
         this.oooEventQueue = new ArrayList<AbstractReorderBufferEntry>();
     }
 
-    /**
-     *
-     */
+    @Override
     public void doFastForwardOneCycle() {
         for (Thread thread : this.threads) {
             thread.fastForwardOneCycle();
         }
     }
 
-    /**
-     *
-     */
+    @Override
     public void doCacheWarmupOneCycle() {
         for (Thread thread : this.threads) {
             thread.warmupCacheOneCycle();
         }
     }
 
-    /**
-     *
-     */
+    @Override
     public void doMeasurementOneCycle() {
         this.commit();
         this.writeBack();
@@ -158,85 +159,64 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
     }
 
     /**
-     *
+     * Fetch.
      */
     protected abstract void fetch();
 
     /**
-     *
+     * Do register renaming.
      */
     protected abstract void registerRename(); //TODO: to be merged with dispatch()
 
     /**
-     *
+     * Dispatch.
      */
     protected abstract void dispatch();
 
     /**
-     *
+     * Wake up.
      */
     protected abstract void wakeUp(); //TODO: to be removed
 
     /**
-     *
+     * Issue.
      */
     protected abstract void issue();
 
     /**
-     *
+     * Write back.
      */
     protected abstract void writeBack();
 
     /**
-     *
+     * Refresh the load/store queue.
      */
     protected abstract void refreshLoadStoreQueue();
 
     /**
-     *
+     * Commit.
      */
     protected abstract void commit();
 
-    /**
-     *
-     * @param thread
-     * @param virtualAddress
-     * @return
-     */
+    @Override
     public boolean canIfetch(Thread thread, int virtualAddress) {
         int physicalTag = this.l1ICacheController.getCache().getTag(thread.getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress));
         return this.l1ICacheController.canAccess(MemoryHierarchyAccessType.IFETCH, physicalTag);
     }
 
-    /**
-     *
-     * @param thread
-     * @param virtualAddress
-     * @return
-     */
+    @Override
     public boolean canLoad(Thread thread, int virtualAddress) {
         int physicalTag = this.l1DCacheController.getCache().getTag(thread.getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress));
         return this.l1DCacheController.canAccess(MemoryHierarchyAccessType.LOAD, physicalTag);
     }
 
-    /**
-     *
-     * @param thread
-     * @param virtualAddress
-     * @return
-     */
+    @Override
     public boolean canStore(Thread thread, int virtualAddress) {
         int physicalTag = this.l1DCacheController.getCache().getTag(thread.getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress));
         return this.l1DCacheController.canAccess(MemoryHierarchyAccessType.STORE, physicalTag);
     }
 
-    /**
-     *
-     * @param thread
-     * @param virtualAddress
-     * @param virtualPc
-     * @param onCompletedCallback
-     */
+    @Override
     public void ifetch(Thread thread, int virtualAddress, int virtualPc, final Action onCompletedCallback) {
         final int physicalAddress = thread.getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress);
         final int physicalTag = this.l1ICacheController.getCache().getTag(physicalAddress);
@@ -279,13 +259,7 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
         this.getBlockingEventDispatcher().dispatch(new MemoryAccessInitiatedEvent(thread, virtualPc, physicalAddress, physicalTag, MemoryHierarchyAccessType.IFETCH));
     }
 
-    /**
-     *
-     * @param dynamicInstruction
-     * @param virtualAddress
-     * @param virtualPc
-     * @param onCompletedCallback
-     */
+    @Override
     public void load(DynamicInstruction dynamicInstruction, int virtualAddress, int virtualPc, final Action onCompletedCallback) {
         final int physicalAddress = dynamicInstruction.getThread().getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress);
         final int physicalTag = this.l1DCacheController.getCache().getTag(physicalAddress);
@@ -333,13 +307,7 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
         this.getBlockingEventDispatcher().dispatch(new MemoryAccessInitiatedEvent(dynamicInstruction.getThread(), virtualPc, physicalAddress, physicalTag, MemoryHierarchyAccessType.LOAD));
     }
 
-    /**
-     *
-     * @param dynamicInstruction
-     * @param virtualAddress
-     * @param virtualPc
-     * @param onCompletedCallback
-     */
+    @Override
     public void store(DynamicInstruction dynamicInstruction, int virtualAddress, int virtualPc, final Action onCompletedCallback) {
         final int physicalAddress = dynamicInstruction.getThread().getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress);
         final int physicalTag = this.l1DCacheController.getCache().getTag(physicalAddress);
@@ -382,10 +350,7 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
         this.getBlockingEventDispatcher().dispatch(new MemoryAccessInitiatedEvent(dynamicInstruction.getThread(), virtualPc, physicalAddress, physicalTag, MemoryHierarchyAccessType.STORE));
     }
 
-    /**
-     *
-     * @param reorderBufferEntry
-     */
+    @Override
     public void removeFromQueues(AbstractReorderBufferEntry reorderBufferEntry) {
         this.oooEventQueue.remove(reorderBufferEntry);
 
@@ -400,9 +365,7 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
         reorderBufferEntry.setSquashed();
     }
 
-    /**
-     *
-     */
+    @Override
     public void updatePerCycleStats() {
         for (Thread thread : this.getThreads()) {
             thread.updatePerCycleStats();
@@ -411,122 +374,77 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
         this.functionalUnitPool.updatePerCycleStats();
     }
 
-    /**
-     *
-     * @return
-     */
+    @Override
     public String getName() {
         return name;
     }
 
-    /**
-     *
-     * @return
-     */
+    @Override
     public int getNum() {
         return num;
     }
 
-    /**
-     *
-     * @return
-     */
+    @Override
     public Processor getProcessor() {
         return processor;
     }
 
-    /**
-     *
-     * @return
-     */
+    @Override
     public List<Thread> getThreads() {
         return threads;
     }
 
-    /**
-     *
-     * @return
-     */
+    @Override
     public FunctionalUnitPool getFunctionalUnitPool() {
         return functionalUnitPool;
     }
 
-    /**
-     *
-     * @return
-     */
+    @Override
     public List<AbstractReorderBufferEntry> getWaitingInstructionQueue() {
         return waitingInstructionQueue;
     }
 
-    /**
-     *
-     * @return
-     */
+    @Override
     public List<AbstractReorderBufferEntry> getReadyInstructionQueue() {
         return readyInstructionQueue;
     }
 
-    /**
-     *
-     * @return
-     */
+    @Override
     public List<AbstractReorderBufferEntry> getReadyLoadQueue() {
         return readyLoadQueue;
     }
 
-    /**
-     *
-     * @return
-     */
+    @Override
     public List<AbstractReorderBufferEntry> getWaitingStoreQueue() {
         return waitingStoreQueue;
     }
 
-    /**
-     *
-     * @return
-     */
+    @Override
     public List<AbstractReorderBufferEntry> getReadyStoreQueue() {
         return readyStoreQueue;
     }
 
-    /**
-     *
-     * @return
-     */
+    @Override
     public List<AbstractReorderBufferEntry> getOooEventQueue() {
         return oooEventQueue;
     }
 
-    /**
-     *
-     * @return
-     */
+    @Override
     public CacheController getL1ICacheController() {
         return l1ICacheController;
     }
 
-    /**
-     *
-     * @param l1ICacheController
-     */
+    @Override
     public void setL1ICacheController(CacheController l1ICacheController) {
         this.l1ICacheController = l1ICacheController;
     }
 
-    /**
-     *
-     * @return
-     */
+    @Override
     public CacheController getL1DCacheController() {
         return l1DCacheController;
     }
 
-    /**
-     *
-     * @param l1DCacheController
-     */
+    @Override
     public void setL1DCacheController(CacheController l1DCacheController) {
         this.l1DCacheController = l1DCacheController;
     }

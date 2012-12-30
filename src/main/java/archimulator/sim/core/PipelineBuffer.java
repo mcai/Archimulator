@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Pipeline buffer.
  *
  * @author Min Cai
  * @param <EntryT>
@@ -31,8 +32,9 @@ public class PipelineBuffer<EntryT> {
     private List<EntryT> entries;
 
     /**
+     * Create a pipeline buffer.
      *
-     * @param capacity
+     * @param capacity the capacity of the pipeline buffer
      */
     public PipelineBuffer(int capacity) {
         this.capacity = capacity;
@@ -40,32 +42,36 @@ public class PipelineBuffer<EntryT> {
     }
 
     /**
+     * Get a value indicating whether the pipeline buffer is full or not.
      *
-     * @return
+     * @return a value indicating whether the pipeline buffer is full or not
      */
     public boolean isFull() {
         return this.entries.size() >= this.capacity;
     }
 
     /**
+     * Get a value indicating whether the pipeline buffer is empty or not.
      *
-     * @return
+     * @return a value indicating whether the pipeline buffer is empty or not
      */
     public boolean isEmpty() {
         return this.entries.isEmpty();
     }
 
     /**
+     * Get the capacity of the pipeline buffer.
      *
-     * @return
+     * @return the capacity of the pipeline buffer
      */
     public int getCapacity() {
         return capacity;
     }
 
     /**
+     * Get the list of entries.
      *
-     * @return
+     * @return the list of entries
      */
     public List<EntryT> getEntries() {
         return entries;

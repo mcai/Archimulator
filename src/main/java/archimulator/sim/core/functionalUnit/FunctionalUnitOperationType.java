@@ -16,59 +16,71 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.core;
+package archimulator.sim.core.functionalUnit;
 
 /**
+ * Functional unit operation type.
  *
  * @author Min Cai
  */
 public enum FunctionalUnitOperationType {
     /**
-     *
+     * None.
      */
     NONE,
+
     /**
-     *
+     * Integer arithmetic/logic.
      */
     INT_ALU,
+
     /**
-     *
+     * Integer multiply.
      */
     INT_MULTIPLY,
+
     /**
-     *
+     * Integer divide.
      */
     INT_DIVIDE,
+
     /**
-     *
+     * Floating add.
      */
     FLOAT_ADD,
+
     /**
-     *
+     * Floating compare.
      */
     FLOAT_COMPARE,
+
     /**
-     *
+     * Floating convert.
      */
     FLOAT_CONVERT,
+
     /**
-     *
+     * Floating multiply.
      */
     FLOAT_MULTIPLY,
+
     /**
-     *
+     * Floating divide.
      */
     FLOAT_DIVIDE,
+
     /**
-     *
+     * Floating square root.
      */
     FLOAT_SQRT,
+
     /**
-     *
+     * Read port.
      */
     READ_PORT,
+
     /**
-     *
+     * Write port.
      */
     WRITE_PORT
 }
