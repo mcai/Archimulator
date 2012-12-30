@@ -1,4 +1,4 @@
-package archimulator.model;
+package archimulator.util;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;

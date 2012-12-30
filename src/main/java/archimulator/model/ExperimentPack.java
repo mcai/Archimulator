@@ -1,5 +1,6 @@
 package archimulator.model;
 
+import archimulator.util.PropertyArray;
 import archimulator.util.serialization.StringArrayListJsonSerializableType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
