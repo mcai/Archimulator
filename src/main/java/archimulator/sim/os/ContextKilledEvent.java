@@ -21,6 +21,7 @@ package archimulator.sim.os;
 import archimulator.sim.common.SimulationEvent;
 
 /**
+ * The event when a context is killed.
  *
  * @author Min Cai
  */
@@ -28,8 +29,9 @@ public class ContextKilledEvent extends SimulationEvent {
     private Context context;
 
     /**
+     * Create an event when the specified context is killed.
      *
-     * @param context
+     * @param context the context
      */
     public ContextKilledEvent(Context context) {
         super(context);
@@ -37,8 +39,9 @@ public class ContextKilledEvent extends SimulationEvent {
     }
 
     /**
+     * Get the context.
      *
-     * @return
+     * @return the context
      */
     public Context getContext() {
         return context;

@@ -23,14 +23,15 @@ import archimulator.sim.os.Context;
 import java.io.Serializable;
 
 /**
+ * System event criterion.
  *
  * @author Min Cai
  */
 public interface SystemEventCriterion extends Serializable {
     /**
+     * Get a value indicating whether the criterion need be checked immediately or not.
      *
-     * @param context
-     * @return
+     * @return a value indicating whether the criterion need be checked immediately or not
      */
     boolean needProcess(Context context);
 }

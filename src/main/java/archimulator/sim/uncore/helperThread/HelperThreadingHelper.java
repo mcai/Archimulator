@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore.helperThread;
 
-import archimulator.sim.core.*;
+import archimulator.model.ContextMapping;
 import archimulator.sim.core.Thread;
 
 /**
@@ -83,5 +83,33 @@ public class HelperThreadingHelper {
      */
     public static int getHelperThreadId() {
         return 2; //TODO: helper thread should not be hard coded.
+    }
+
+    /**
+     * Get the helper thread lookahead for the specified context mapping.
+     *
+     * @param contextMapping the context mapping
+     * @return the helper thread lookahead for the specified context mapping
+     */
+    public static int getHelperThreadLookahead(ContextMapping contextMapping) {
+        if (contextMapping.getBenchmark().getHelperThreadEnabled()) {
+            return contextMapping.getDynamicHelperThreadParams() ? 20 : contextMapping.getHelperThreadLookahead();
+        }
+
+        throw new IllegalArgumentException();
+    }
+
+    /**
+     * Get the helper thread stride for the specified context mapping.
+     *
+     * @param contextMapping the context mapping
+     * @return the helper thread stride for the specified context mapping
+     */
+    public static int getHelperThreadStride(ContextMapping contextMapping) {
+        if (contextMapping.getBenchmark().getHelperThreadEnabled()) {
+            return contextMapping.getDynamicHelperThreadParams() ? 10 : contextMapping.getHelperThreadStride();
+        }
+
+        throw new IllegalArgumentException();
     }
 }

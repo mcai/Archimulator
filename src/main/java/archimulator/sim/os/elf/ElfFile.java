@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * ELF file.
  *
  * @author Min Cai
  */
@@ -57,8 +58,9 @@ public class ElfFile {
     private long position;
 
     /**
+     * ELF file.
      *
-     * @param filename
+     * @param filename the file name
      */
     public ElfFile(String filename) {
         try {
@@ -71,30 +73,30 @@ public class ElfFile {
             this.identification = new ElfIdentification();
             this.identification.read(this);
 
-            if (this.identification.getEi_class() != ElfIdentification.ElfClass32) {
+            if (this.identification.getClz() != ElfIdentification.ElfClass32) {
                 throw new IllegalArgumentException();
             }
 
-            this.littleEndian = (this.identification.getEi_data() == ElfIdentification.ElfData2Lsb);
+            this.littleEndian = (this.identification.getData() == ElfIdentification.ElfData2Lsb);
 
             this.header = new ElfHeader(this);
 
-            if (this.header.getE_machine() != ElfHeader.EM_MIPS) {
+            if (this.header.getMachine() != ElfHeader.EM_MIPS) {
                 throw new IllegalArgumentException();
             }
 
-            this.setPosition(this.header.getE_shoff());
+            this.setPosition(this.header.getSectionHeaderTableOffset());
 
-            for (int i = 0; i < this.header.getE_shnum(); i++) {
-                this.setPosition(this.header.getE_shoff() + (i * this.header.getE_shentsize()));
+            for (int i = 0; i < this.header.getSectionHeaderTableEntryCount(); i++) {
+                this.setPosition(this.header.getSectionHeaderTableOffset() + (i * this.header.getSectionHeaderTableEntrySize()));
                 this.sectionHeaders.add(new ElfSectionHeader(this));
             }
 
-            this.stringTable = new ElfStringTable(this, this.sectionHeaders.get(this.header.getE_shstrndx()));
+            this.stringTable = new ElfStringTable(this, this.sectionHeaders.get(this.header.getSectionHeaderStringTableIndex()));
 
-            this.setPosition(this.header.getE_phoff());
+            this.setPosition(this.header.getProgramHeaderTableOffset());
 
-            for (int i = 0; i < this.header.getE_phnum(); i++) {
+            for (int i = 0; i < this.header.getProgramHeaderTableEntryCount(); i++) {
                 this.programHeaders.add(new ElfProgramHeader(this));
             }
 
@@ -109,6 +111,9 @@ public class ElfFile {
         }
     }
 
+    /**
+     * Load symbols.
+     */
     private void loadSymbols() {
         List<ElfSectionHeader> sections = this.getSectionHeaders(ElfSectionHeader.SHT_SYMTAB);
         if (!sections.isEmpty()) {
@@ -120,27 +125,32 @@ public class ElfFile {
         this.loadCommonObjects();
     }
 
+    /**
+     * Load symbols by the specified section.
+     *
+     * @param sectionHeader the section header
+     */
     private void loadSymbolsBySection(ElfSectionHeader sectionHeader) {
         try {
             int numSymbols = 1;
 
-            if (sectionHeader.getSh_entsize() != 0) {
-                numSymbols = (int) sectionHeader.getSh_size() / (int) sectionHeader.getSh_entsize();
+            if (sectionHeader.getEntrySize() != 0) {
+                numSymbols = (int) sectionHeader.getSize() / (int) sectionHeader.getEntrySize();
             }
 
-            long offset = sectionHeader.getSh_offset();
-            for (int c = 0; c < numSymbols; offset += sectionHeader.getSh_entsize(), c++) {
+            long offset = sectionHeader.getOffset();
+            for (int c = 0; c < numSymbols; offset += sectionHeader.getEntrySize(), c++) {
                 this.setPosition(offset);
 
                 Symbol symbol = new Symbol(this, sectionHeader);
-                symbol.st_name = this.readUnsignedWord();
-                symbol.st_value = this.readUnsignedWord();
-                symbol.st_size = this.readUnsignedWord();
-                symbol.st_info = this.read();
-                symbol.st_other = this.read();
-                symbol.st_shndx = this.readUnsignedHalfWord();
+                symbol.setNameIndex(this.readUnsignedWord());
+                symbol.setValue(this.readUnsignedWord());
+                symbol.setSize(this.readUnsignedWord());
+                symbol.setInfo(this.read());
+                symbol.setOther(this.read());
+                symbol.setSectionHeaderTableIndex(this.readUnsignedHalfWord());
 
-                this.symbols.put((int) symbol.st_value, symbol);
+                this.symbols.put((int) symbol.getValue(), symbol);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -148,13 +158,14 @@ public class ElfFile {
     }
 
     /**
+     * Get the symbol at the specified address.
      *
-     * @param address
-     * @return
+     * @param address the address
+     * @return the symbol at the specified address
      */
     public Symbol getSymbol(long address) {
         for (Symbol symbol : this.symbols.values()) {
-            if (symbol.st_value == address) {
+            if (symbol.getValue() == address) {
                 return symbol;
             }
         }
@@ -163,64 +174,65 @@ public class ElfFile {
     }
 
     /**
-     *
+     * Load local functions.
      */
     public void loadLocalFunctions() {
         for (Symbol symbol : this.symbols.values()) {
-            if (symbol.getSt_type() == Symbol.STT_FUNC) {
-                int idx = symbol.st_shndx;
+            if (symbol.getType() == Symbol.STT_FUNC) {
+                int idx = symbol.getSectionHeaderTableIndex();
                 if (idx > Symbol.SHN_LOPROC && idx < Symbol.SHN_HIPROC) {
                     if (symbol.getName().length() > 0) {
-                        this.localFunctionSymbols.put((int) symbol.st_value, symbol);
+                        this.localFunctionSymbols.put((int) symbol.getValue(), symbol);
                     }
-                } else if (idx >= 0 && this.getSectionHeaders().get(idx).getSh_type() != ElfSectionHeader.SHT_NULL) {
-                    this.localFunctionSymbols.put((int) symbol.st_value, symbol);
+                } else if (idx >= 0 && this.getSectionHeaders().get(idx).getType() != ElfSectionHeader.SHT_NULL) {
+                    this.localFunctionSymbols.put((int) symbol.getValue(), symbol);
                 }
             }
         }
     }
 
     /**
-     *
+     * Load local objects.
      */
     public void loadLocalObjects() {
         for (Symbol symbol : this.symbols.values()) {
-            if (symbol.getSt_type() == Symbol.STT_OBJECT) {
-                int idx = symbol.st_shndx;
+            if (symbol.getType() == Symbol.STT_OBJECT) {
+                int idx = symbol.getSectionHeaderTableIndex();
                 if (idx > Symbol.SHN_LOPROC && idx < Symbol.SHN_HIPROC) {
                     if (symbol.getName().length() > 0) {
-                        this.localObjectSymbols.put((int) symbol.st_value, symbol);
+                        this.localObjectSymbols.put((int) symbol.getValue(), symbol);
                     }
-                } else if (idx >= 0 && this.getSectionHeaders().get(idx).getSh_type() != ElfSectionHeader.SHT_NULL) {
-                    this.localObjectSymbols.put((int) symbol.st_value, symbol);
+                } else if (idx >= 0 && this.getSectionHeaders().get(idx).getType() != ElfSectionHeader.SHT_NULL) {
+                    this.localObjectSymbols.put((int) symbol.getValue(), symbol);
                 }
             }
         }
     }
 
     /**
-     *
+     * Load common objects.
      */
     public void loadCommonObjects() {
         for (Symbol symbol : this.symbols.values()) {
-            if (symbol.getSt_bind() == Symbol.STB_GLOBAL && symbol.getSt_type() == Symbol.STT_OBJECT) {
-                if (symbol.st_shndx == Symbol.SHN_COMMON) {
-                    this.commonObjectSymbols.put((int) symbol.st_value, symbol);
+            if (symbol.getBind() == Symbol.STB_GLOBAL && symbol.getType() == Symbol.STT_OBJECT) {
+                if (symbol.getSectionHeaderTableIndex() == Symbol.SHN_COMMON) {
+                    this.commonObjectSymbols.put((int) symbol.getValue(), symbol);
                 }
             }
         }
     }
 
     /**
+     * Get the list of section headers matching the specified type.
      *
-     * @param type
-     * @return
+     * @param type the section header type to be matched
+     * @return the list of section headers matching the specified type
      */
     public List<ElfSectionHeader> getSectionHeaders(int type) {
         List<ElfSectionHeader> sectionHeaders = new ArrayList<ElfSectionHeader>();
 
         for (ElfSectionHeader sectionHeader : this.getSectionHeaders()) {
-            if (sectionHeader.getSh_type() == type) {
+            if (sectionHeader.getType() == type) {
                 sectionHeaders.add(sectionHeader);
 
             }
@@ -230,6 +242,7 @@ public class ElfFile {
     }
 
     /**
+     * Close the ELF file.
      *
      * @throws IOException
      */
@@ -245,24 +258,27 @@ public class ElfFile {
     }
 
     /**
+     * Get the current cursor position.
      *
-     * @return
+     * @return the current cursor position
      */
     public long getPosition() {
         return this.position;
     }
 
     /**
+     * Set the current cursor position.
      *
-     * @param position
+     * @param position the current cursor position
      */
     public void setPosition(long position) {
         this.position = position;
     }
 
     /**
+     * Get the buffer accessor.
      *
-     * @return
+     * @return the buffer accessor
      */
     public BufferAccessor getBufferAccessor() {
         if (this.littleEndian) {
@@ -273,8 +289,9 @@ public class ElfFile {
     }
 
     /**
+     * Read the content from the current position in the ELF file.
      *
-     * @param content
+     * @param content the content buffer
      * @throws IOException
      */
     public void read(byte[] content)
@@ -286,9 +303,10 @@ public class ElfFile {
     }
 
     /**
+     * Read the content from the specified offset in the ELF file.
      *
-     * @param offset
-     * @param content
+     * @param offset the offset
+     * @param content the content buffer
      * @throws IOException
      */
     public void read(long offset, byte[] content)
@@ -298,8 +316,9 @@ public class ElfFile {
     }
 
     /**
+     * Read a byte of data from the current position in the ELF file.
      *
-     * @return
+     * @return a byte of data read from the current position in the ELF file
      * @throws IOException
      */
     public int read()
@@ -313,9 +332,10 @@ public class ElfFile {
     }
 
     /**
+     * Read a byte of data from the specified offset in the ELF file.
      *
-     * @param offset
-     * @return
+     * @param offset the offset
+     * @return a byte of data read from the specified offset in the ELF file
      * @throws IOException
      */
     public int read(long offset)
@@ -325,8 +345,9 @@ public class ElfFile {
     }
 
     /**
+     * Read an unsigned word of data from the current position in the ELF file.
      *
-     * @return
+     * @return an unsigned word of data from the current position in the ELF file
      * @throws IOException
      */
     public long readUnsignedWord() throws IOException {
@@ -336,9 +357,10 @@ public class ElfFile {
     }
 
     /**
+     * Read an unsigned word of data from the specified offset in the ELF file.
      *
-     * @param offset
-     * @return
+     * @param offset the offset
+     * @return an unsigned word of data from the specified offset in the ELF file
      * @throws IOException
      */
     public long readUnsignedWord(long offset) throws IOException {
@@ -346,12 +368,13 @@ public class ElfFile {
     }
 
     /**
+     * Read an unsigned half word of data from the current position in the ELF file.
      *
-     * @return
+     * @return an unsigned half word of data from the current position in the ELF file
      * @throws IOException
      */
     public int readUnsignedHalfWord() throws IOException {
-        int data = this.readUnsignedHalfWorld(this.position);
+        int data = this.readUnsignedHalfWord(this.position);
 
         this.position += 2;
 
@@ -359,90 +382,101 @@ public class ElfFile {
     }
 
     /**
+     * Read an unsigned half word of data from the specified offset in the ELF file.
      *
-     * @param offset
-     * @return
+     * @param offset the offset
+     * @return an unsigned half word of data from the specified offset in the ELF file
      * @throws IOException
      */
-    public int readUnsignedHalfWorld(long offset) throws IOException {
+    public int readUnsignedHalfWord(long offset) throws IOException {
         return this.getBufferAccessor().getU2(this.buffer, offset);
     }
 
     /**
+     * Get the identification.
      *
-     * @return
+     * @return the identification
      */
     public ElfIdentification getIdentification() {
         return this.identification;
     }
 
     /**
+     * Get the header.
      *
-     * @return
+     * @return the header
      */
     public ElfHeader getHeader() {
         return this.header;
     }
 
     /**
+     * Get the list of section headers.
      *
-     * @return
+     * @return the list of section headers
      */
     public List<ElfSectionHeader> getSectionHeaders() {
         return this.sectionHeaders;
     }
 
     /**
+     * Get the list of program headers.
      *
-     * @return
+     * @return the list of program headers
      */
     public List<ElfProgramHeader> getProgramHeaders() {
         return this.programHeaders;
     }
 
     /**
+     * Get the string table.
      *
-     * @return
+     * @return the string table
      */
     public ElfStringTable getStringTable() {
         return this.stringTable;
     }
 
     /**
+     * Get a value indicating whether the ELF file is little endian or not.
      *
-     * @return
+     * @return a value indicating whether the ELF file is little endian or not
      */
     public boolean isLittleEndian() {
         return this.littleEndian;
     }
 
     /**
+     * Get the map of symbols.
      *
-     * @return
+     * @return the map of symbols
      */
     public Map<Integer, Symbol> getSymbols() {
         return symbols;
     }
 
     /**
+     * Get the map of local function symbols.
      *
-     * @return
+     * @return the map of local function symbols
      */
     public Map<Integer, Symbol> getLocalFunctionSymbols() {
         return localFunctionSymbols;
     }
 
     /**
+     * Get the map of local object symbols.
      *
-     * @return
+     * @return the map of local object symbols
      */
     public Map<Integer, Symbol> getLocalObjectSymbols() {
         return localObjectSymbols;
     }
 
     /**
+     * Get the map of common object symbols.
      *
-     * @return
+     * @return the map of common object symbols
      */
     public Map<Integer, Symbol> getCommonObjectSymbols() {
         return commonObjectSymbols;

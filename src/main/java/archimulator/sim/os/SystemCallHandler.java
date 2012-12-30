@@ -19,6 +19,7 @@
 package archimulator.sim.os;
 
 /**
+ * System call handler.
  *
  * @author Min Cai
  */
@@ -27,9 +28,10 @@ public abstract class SystemCallHandler {
     private String name;
 
     /**
+     * Create a system call handler.
      *
-     * @param index
-     * @param name
+     * @param index the index of the system call to be handled
+     * @param name the name of the system call to be handled
      */
     public SystemCallHandler(int index, String name) {
         this.index = index;
@@ -37,22 +39,25 @@ public abstract class SystemCallHandler {
     }
 
     /**
+     * Process the system call.
      *
-     * @param context
+     * @param context the context
      */
     public abstract void run(Context context);
 
     /**
+     * Get the index of the system call to be handled.
      *
-     * @return
+     * @return the index of the system call to be handled
      */
     public int getIndex() {
         return index;
     }
 
     /**
+     * Get the name of the system call to be handled.
      *
-     * @return
+     * @return the name of the system call to be handled
      */
     public String getName() {
         return name;

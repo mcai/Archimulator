@@ -19,28 +19,33 @@
 package archimulator.sim.os.event;
 
 /**
+ * System event type.
  *
  * @author Min Cai
  */
 public enum SystemEventType {
     /**
-     *
+     * Read.
      */
     READ,
+
     /**
-     *
+     * Resume.
      */
     RESUME,
+
     /**
-     *
+     * Wait.
      */
     WAIT,
+
     /**
-     *
+     * Poll.
      */
     POLL,
+
     /**
-     *
+     * Signal suspend.
      */
     SIGNAL_SUSPEND
 }

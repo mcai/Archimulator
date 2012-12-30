@@ -33,9 +33,11 @@
       <w>itlbs</w>
       <w>javadocs</w>
       <w>jaxen</w>
+      <w>libc</w>
       <w>libquantum</w>
       <w>lookahead</w>
       <w>lookaside</w>
+      <w>makefile</w>
       <w>microarchitecture</w>
       <w>mlp</w>
       <w>mlps</w>

@@ -19,6 +19,7 @@
 package archimulator.sim.os;
 
 /**
+ * Open flag mapping.
  *
  * @author Min Cai
  */
@@ -27,9 +28,10 @@ public class OpenFlagMapping {
     private int hostFlag;
 
     /**
+     * Create an open flag mapping.
      *
-     * @param targetFlag
-     * @param hostFlag
+     * @param targetFlag the target flag
+     * @param hostFlag the host flag
      */
     public OpenFlagMapping(int targetFlag, int hostFlag) {
         this.targetFlag = targetFlag;
@@ -37,16 +39,18 @@ public class OpenFlagMapping {
     }
 
     /**
+     * Get the target flag.
      *
-     * @return
+     * @return the target flag
      */
     public int getTargetFlag() {
         return targetFlag;
     }
 
     /**
+     * Get the host flag.
      *
-     * @return
+     * @return the host flag
      */
     public int getHostFlag() {
         return hostFlag;

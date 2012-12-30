@@ -22,15 +22,11 @@ import archimulator.sim.os.Context;
 import archimulator.sim.os.Kernel;
 
 /**
+ * Signal criterion.
  *
  * @author Min Cai
  */
 public class SignalCriterion implements SystemEventCriterion {
-    /**
-     *
-     * @param context
-     * @return
-     */
     public boolean needProcess(Context context) {
         for (int signal = 1; signal <= Kernel.MAX_SIGNAL; signal++) {
             if (context.getKernel().mustProcessSignal(context, signal)) {

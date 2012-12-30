@@ -19,6 +19,7 @@
 package archimulator.sim.os.signal;
 
 /**
+ * A set of signal masks.
  *
  * @author Min Cai
  */
@@ -28,7 +29,7 @@ public class SignalMasks {
     private SignalMask backup;
 
     /**
-     *
+     * Create a set of signal masks.
      */
     public SignalMasks() {
         this.pending = new SignalMask();
@@ -37,48 +38,54 @@ public class SignalMasks {
     }
 
     /**
+     * Get the pending signal mask.
      *
-     * @return
+     * @return the pending signal mask
      */
     public SignalMask getPending() {
         return pending;
     }
 
     /**
+     * Set the pending signal mask.
      *
-     * @param pending
+     * @param pending the pending signal mask
      */
     public void setPending(SignalMask pending) {
         this.pending = pending;
     }
 
     /**
+     * Get the blocked signal mask.
      *
-     * @return
+     * @return the blocked signal mask
      */
     public SignalMask getBlocked() {
         return blocked;
     }
 
     /**
+     * Set the blocked signal mask.
      *
-     * @param blocked
+     * @param blocked the blocked signal mask
      */
     public void setBlocked(SignalMask blocked) {
         this.blocked = blocked;
     }
 
     /**
+     * Get the backup signal mask.
      *
-     * @return
+     * @return the backup signal mask
      */
     public SignalMask getBackup() {
         return backup;
     }
 
     /**
+     * Set the backup signal mask.
      *
-     * @param backup
+     * @param backup the backup signal mask
      */
     public void setBackup(SignalMask backup) {
         this.backup = backup;

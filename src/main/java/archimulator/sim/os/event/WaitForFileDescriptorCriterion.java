@@ -22,84 +22,88 @@ import archimulator.sim.os.Context;
 import net.pickapack.io.buffer.CircularByteBuffer;
 
 /**
+ * Wait for file descriptor criterion.
  *
  * @author Min Cai
  */
-public class WaitFileDescriptorCriterion implements SystemEventCriterion {
+public class WaitForFileDescriptorCriterion implements SystemEventCriterion {
     private CircularByteBuffer buffer;
 
     private int address;
     private int size;
     private int pufds;
 
-    /**
-     *
-     * @param context
-     * @return
-     */
     public boolean needProcess(Context context) {
         return !this.getBuffer().isEmpty();
     }
 
     /**
+     * Get the buffer.
      *
-     * @return
+     * @return the buffer
      */
     public CircularByteBuffer getBuffer() {
         return buffer;
     }
 
     /**
+     * Set the buffer.
      *
-     * @param buffer
+     * @param buffer the buffer
      */
     public void setBuffer(CircularByteBuffer buffer) {
         this.buffer = buffer;
     }
 
     /**
+     * Get the address.
      *
-     * @return
+     * @return the address
      */
     public int getAddress() {
         return address;
     }
 
     /**
+     * Set the address.
      *
-     * @param address
+     * @param address the address
      */
     public void setAddress(int address) {
         this.address = address;
     }
 
     /**
+     * Get the size of the buffer.
      *
-     * @return
+     * @return the size of the buffer
      */
     public int getSize() {
         return size;
     }
 
     /**
+     * Set the size of the buffer.
      *
-     * @param size
+     * @param size the size of the buffer
      */
     public void setSize(int size) {
         this.size = size;
     }
 
     /**
+     * Get the pufds.
      *
-     * @return
+     * @return the pufds
      */
     public int getPufds() {
         return pufds;
     }
 
     /**
+     * Set the pufds.
      *
-     * @param pufds
+     * @param pufds the pufds
      */
     public void setPufds(int pufds) {
         this.pufds = pufds;

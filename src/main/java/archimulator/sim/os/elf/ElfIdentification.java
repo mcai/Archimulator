@@ -21,43 +21,48 @@ package archimulator.sim.os.elf;
 import java.io.IOException;
 
 /**
+ * ELF identification.
  *
  * @author Min Cai
  */
 public class ElfIdentification {
     /**
-     *
+     * Invalid class.
      */
     public static final int ElfClassNone = 0;
+
     /**
-     *
+     * 32-bit objects.
      */
     public static final int ElfClass32 = 1;
+
     /**
-     *
+     * 64-bit objects.
      */
     public static final int ElfClass64 = 2;
 
     /**
-     *
+     * Invalid data encoding.
      */
     public static final int ElfDataNone = 0;
+
     /**
-     *
+     * Specifies 2's complement values, with the least significant byte occupying the lowest address.
      */
     public static final int ElfData2Lsb = 1;
     /**
-     *
+     * Specifies 2's complement values, with the most significant byte occupying the lowest address.
      */
     public static final int ElfData2Msb = 2;
 
-    private int ei_class;
-    private int ei_data;
-    private int ei_version;
+    private int clz;
+    private int data;
+    private int version;
 
     /**
+     * Read the ELF identification structure from the ELF file.
      *
-     * @param elfFile
+     * @param elfFile the ELF file
      * @throws IOException
      */
     public void read(ElfFile elfFile) throws IOException {
@@ -68,33 +73,36 @@ public class ElfIdentification {
             throw new RuntimeException("Not elf file");
         }
 
-        this.ei_class = e_ident[4] == 1 ? ElfClass32 : e_ident[4] == 2 ? ElfClass64 : ElfClassNone;
-        this.ei_data = e_ident[5] == 1 ? ElfData2Lsb : e_ident[5] == 2 ? ElfData2Msb : ElfDataNone;
+        this.clz = e_ident[4] == 1 ? ElfClass32 : e_ident[4] == 2 ? ElfClass64 : ElfClassNone;
+        this.data = e_ident[5] == 1 ? ElfData2Lsb : e_ident[5] == 2 ? ElfData2Msb : ElfDataNone;
 
-        this.ei_version = e_ident[6];
+        this.version = e_ident[6];
     }
 
     /**
+     * Get the ELF file's class.
      *
-     * @return
+     * @return the ELF file's class
      */
-    public int getEi_class() {
-        return ei_class;
+    public int getClz() {
+        return clz;
     }
 
     /**
+     * Get the data.
      *
-     * @return
+     * @return the data
      */
-    public int getEi_data() {
-        return ei_data;
+    public int getData() {
+        return data;
     }
 
     /**
+     * Get the version.
      *
-     * @return
+     * @return the version
      */
-    public int getEi_version() {
-        return ei_version;
+    public int getVersion() {
+        return version;
     }
 }

@@ -28,6 +28,7 @@ import archimulator.sim.isa.RegisterDependencyType;
 import archimulator.sim.isa.StaticInstruction;
 import archimulator.sim.isa.StaticInstructionType;
 import archimulator.sim.os.ContextState;
+import archimulator.sim.uncore.helperThread.HelperThreadingHelper;
 import net.pickapack.Reference;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
@@ -78,12 +79,12 @@ public class BasicThread extends AbstractBasicThread {
                     if (contextMapping.getBenchmark().getHelperThreadEnabled()) {
                         if (event.getPseudoCall().getImm() == 3820) {
                             savedRegisterValue.set(event.getContext().getRegisterFile().getGpr(event.getPseudoCall().getRs()));
-                            event.getContext().getRegisterFile().setGpr(event.getPseudoCall().getRs(), getHelperThreadLookahead(contextMapping));
+                            event.getContext().getRegisterFile().setGpr(event.getPseudoCall().getRs(), HelperThreadingHelper.getHelperThreadLookahead(contextMapping));
                         } else if (event.getPseudoCall().getImm() == 3821) {
                             event.getContext().getRegisterFile().setGpr(event.getPseudoCall().getRs(), savedRegisterValue.get());
                         } else if (event.getPseudoCall().getImm() == 3822) {
                             savedRegisterValue.set(event.getContext().getRegisterFile().getGpr(event.getPseudoCall().getRs()));
-                            event.getContext().getRegisterFile().setGpr(event.getPseudoCall().getRs(), getHelperThreadStride(contextMapping));
+                            event.getContext().getRegisterFile().setGpr(event.getPseudoCall().getRs(), HelperThreadingHelper.getHelperThreadStride(contextMapping));
                         } else if (event.getPseudoCall().getImm() == 3823) {
                             event.getContext().getRegisterFile().setGpr(event.getPseudoCall().getRs(), savedRegisterValue.get());
                         }
@@ -91,34 +92,6 @@ public class BasicThread extends AbstractBasicThread {
                 }
             }
         });
-    }
-
-    /**
-     * Get the helper thread lookahead for the specified context mapping.
-     *
-     * @param contextMapping the context mapping
-     * @return the helper thread lookahead for the specified context mapping
-     */
-    protected int getHelperThreadLookahead(ContextMapping contextMapping) {
-        if (contextMapping.getBenchmark().getHelperThreadEnabled()) {
-            return contextMapping.getDynamicHelperThreadParams() ? 20 : contextMapping.getHelperThreadLookahead();
-        }
-
-        throw new IllegalArgumentException();
-    }
-
-    /**
-     * Get the helper thread stride for the specified context mapping.
-     *
-     * @param contextMapping the context mapping
-     * @return the helper thread stride for the specified context mapping
-     */
-    protected int getHelperThreadStride(ContextMapping contextMapping) {
-        if (contextMapping.getBenchmark().getHelperThreadEnabled()) {
-            return contextMapping.getDynamicHelperThreadParams() ? 10 : contextMapping.getHelperThreadStride();
-        }
-
-        throw new IllegalArgumentException();
     }
 
     public void fastForwardOneCycle() {
@@ -204,6 +177,11 @@ public class BasicThread extends AbstractBasicThread {
         this.lastCommitCycle = this.getCycleAccurateEventQueue().getCurrentCycle();
     }
 
+    /**
+     * Get a value indicating whether the thread can fetch instructions at the moment or not.
+     *
+     * @return a value indicating whether the thread can fetch instructions at the moment or not
+     */
     private boolean canFetch() {
         if (!this.context.useICache()) {
             this.lastFetchedCacheLine = aligned(this.fetchNpc, this.lineSizeOfICache);

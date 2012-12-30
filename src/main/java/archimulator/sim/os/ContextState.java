@@ -19,24 +19,28 @@
 package archimulator.sim.os;
 
 /**
+ * Context state.
  *
  * @author Min Cai
  */
 public enum ContextState {
     /**
-     *
+     * Idle.
      */
     IDLE,
+
     /**
-     *
+     * Blocked.
      */
     BLOCKED,
+
     /**
-     *
+     * Running.
      */
     RUNNING,
+
     /**
-     *
+     * Finished.
      */
     FINISHED
 }

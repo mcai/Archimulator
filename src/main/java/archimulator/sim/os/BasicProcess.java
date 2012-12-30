@@ -35,6 +35,7 @@ import java.io.File;
 import java.util.*;
 
 /**
+ * Basic process.
  *
  * @author Min Cai
  */
@@ -48,20 +49,22 @@ public class BasicProcess extends Process {
     private Map<Integer, String> pcToFunctionNameMappingCache;
 
     /**
+     * Create a basic process.
      *
-     * @param kernel
-     * @param simulationDirectory
-     * @param contextMapping
+     * @param kernel the kernel
+     * @param simulationDirectory the simulation directory
+     * @param contextMapping the context mapping
      */
     public BasicProcess(Kernel kernel, String simulationDirectory, ContextMapping contextMapping) {
         super(kernel, simulationDirectory, contextMapping);
     }
 
     /**
+     * Load the program.
      *
-     * @param kernel
-     * @param simulationDirectory
-     * @param contextMapping
+     * @param kernel the kernel
+     * @param simulationDirectory the simulation directory
+     * @param contextMapping the context mapping
      */
     @Override
     protected void loadProgram(Kernel kernel, String simulationDirectory, ContextMapping contextMapping) {
@@ -81,37 +84,37 @@ public class BasicProcess extends Process {
                 throw new IllegalArgumentException("dynamic linking is not supported");
             }
 
-            if (sectionHeader.getSh_type() == ElfSectionHeader.SHT_PROGBITS || sectionHeader.getSh_type() == ElfSectionHeader.SHT_NOBITS) {
-                if (sectionHeader.getSh_size() > 0 && (sectionHeader.getSh_flags() & ElfSectionHeader.SHF_ALLOC) != 0) {
-//                        this.memory.map((int) sectionHeader.getSh_addr(), (int) sectionHeader.getSh_size()));
+            if (sectionHeader.getType() == ElfSectionHeader.SHT_PROGBITS || sectionHeader.getType() == ElfSectionHeader.SHT_NOBITS) {
+                if (sectionHeader.getSize() > 0 && (sectionHeader.getFlags() & ElfSectionHeader.SHF_ALLOC) != 0) {
+//                        this.memory.map((int) sectionHeader.getAddress(), (int) sectionHeader.getSize()));
 
-                    if (sectionHeader.getSh_type() == ElfSectionHeader.SHT_NOBITS) {
-                        this.getMemory().zero((int) sectionHeader.getSh_addr(), (int) sectionHeader.getSh_size());
+                    if (sectionHeader.getType() == ElfSectionHeader.SHT_NOBITS) {
+                        this.getMemory().zero((int) sectionHeader.getAddress(), (int) sectionHeader.getSize());
                     } else {
-                        this.getMemory().writeBlock((int) sectionHeader.getSh_addr(), (int) sectionHeader.getSh_size(), sectionHeader.readContent(elfFile));
+                        this.getMemory().writeBlock((int) sectionHeader.getAddress(), (int) sectionHeader.getSize(), sectionHeader.readContent(elfFile));
 
-                        if ((sectionHeader.getSh_flags() & ElfSectionHeader.SHF_EXECINSTR) != 0) {
+                        if ((sectionHeader.getFlags() & ElfSectionHeader.SHF_EXECINSTR) != 0) {
                             this.instructions.put(sectionHeader.getName(), new TreeMap<Integer, Instruction>());
 
-                            for (int i = 0; i < (int) sectionHeader.getSh_size(); i += 4) {
-                                int pc = (int) sectionHeader.getSh_addr() + i;
+                            for (int i = 0; i < (int) sectionHeader.getSize(); i += 4) {
+                                int pc = (int) sectionHeader.getAddress() + i;
                                 this.predecode(sectionHeader.getName(), this.getMemory(), pc);
                             }
                         }
                     }
 
-                    if (sectionHeader.getSh_addr() >= DATA_BASE) {
-                        this.setDataTop((int) Math.max(this.getDataTop(), sectionHeader.getSh_addr() + sectionHeader.getSh_size() - 1));
+                    if (sectionHeader.getAddress() >= DATA_BASE) {
+                        this.setDataTop((int) Math.max(this.getDataTop(), sectionHeader.getAddress() + sectionHeader.getSize() - 1));
                     }
                 }
             }
 
             if (sectionHeader.getName().equals(".text")) {
-                this.setTextSize((int) (sectionHeader.getSh_addr() + sectionHeader.getSh_size() - TEXT_BASE));
+                this.setTextSize((int) (sectionHeader.getAddress() + sectionHeader.getSize() - TEXT_BASE));
             }
         }
 
-        this.setProgramEntry((int) elfFile.getHeader().getE_entry());
+        this.setProgramEntry((int) elfFile.getHeader().getEntry());
         this.setHeapTop(roundUp(this.getDataTop(), Memory.getPageSize()));
 
         this.setStackBase(STACK_BASE);
@@ -154,6 +157,13 @@ public class BasicProcess extends Process {
         this.pcToFunctionNameMappingCache = new TreeMap<Integer, String>();
     }
 
+    /**
+     * Predecode the instruction at the specified program counter (PC).
+     *
+     * @param sectionName the section name
+     * @param memory the memory
+     * @param pc the program counter (PC)
+     */
     private void predecode(String sectionName, Memory memory, int pc) {
         int machineInstruction = memory.readWord(pc);
 
@@ -168,20 +178,16 @@ public class BasicProcess extends Process {
     }
 
     /**
+     * Get the disassembly instruction at the specified program counter (PC) for the specified process.
      *
-     * @param process
-     * @param pc
-     * @return
+     * @param process the process
+     * @param pc the program counter (PC)
+     * @return the disassembly instruction at the specified program counter (PC) for the specified progress
      */
     public static String getDisassemblyInstruction(Process process, int pc) {
         return MipsDisassembler.disassemble(pc, process.getStaticInstruction(pc));
     }
 
-    /**
-     *
-     * @param pc
-     * @return
-     */
     @Override
     public StaticInstruction getStaticInstruction(int pc) {
         return this.machineInstructionsToStaticInstructions.get(this.pcsToMachineInstructions.get(pc));
@@ -223,10 +229,6 @@ public class BasicProcess extends Process {
         return null;
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public ElfAnalyzer getElfAnalyzer() {
         return elfAnalyzer;

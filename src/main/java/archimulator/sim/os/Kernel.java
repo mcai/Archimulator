@@ -34,6 +34,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ * Kernel.
  *
  * @author Min Cai
  */
@@ -50,25 +51,29 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
     private long currentCycle;
 
     /**
-     *
+     * Current/maximum process ID.
      */
     public int currentPid = 1000;
+
     /**
-     *
+     * Current/maximum memory ID.
      */
     public int currentMemoryId = 0;
+
     /**
-     *
+     * Current/maximum context ID.
      */
     public int currentContextId = 0;
+
     /**
-     *
+     * Current/maximum file descriptor ID.
      */
     public int currentFd = 100;
 
     /**
+     * Create a kernel.
      *
-     * @param simulation
+     * @param simulation the simulation object
      */
     public Kernel(Simulation simulation) {
         super(simulation);
@@ -88,9 +93,10 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
     }
 
     /**
+     * Get the process object from the specified process ID.
      *
-     * @param id
-     * @return
+     * @param id the process ID
+     * @return the process object matching the specified process ID
      */
     public Process getProcessFromId(int id) {
         for (Process process : this.processes) {
@@ -103,9 +109,10 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
     }
 
     /**
+     * Get the context object from the specified context ID.
      *
-     * @param id
-     * @return
+     * @param id the context ID
+     * @return the context object matching the specified context ID
      */
     public Context getContextFromId(int id) {
         for (Context context : this.contexts) {
@@ -118,9 +125,10 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
     }
 
     /**
+     * Get the context object from the specified process ID.
      *
-     * @param processId
-     * @return
+     * @param processId the process ID
+     * @return the context object matching the specified process ID
      */
     public Context getContextFromProcessId(int processId) {
         for (Context context : this.contexts) {
@@ -133,10 +141,11 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
     }
 
     /**
+     * Map the specified context to an idle thread.
      *
-     * @param contextToMap
-     * @param predicate
-     * @return
+     * @param contextToMap the context to be mapped
+     * @param predicate the predicate
+     * @return a value indicating whether the mapping succeeds or not
      */
     public boolean map(Context contextToMap, Predicate<Integer> predicate) {
         if (contextToMap.getThreadId() != -1) {
@@ -167,15 +176,16 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
     }
 
     /**
+     * Schedule the specified system event.
      *
-     * @param event
+     * @param event the system event to be scheduled
      */
     public void scheduleSystemEvent(SystemEvent event) {
         this.systemEvents.add(event);
     }
 
     /**
-     *
+     * Process the pending list of system events.
      */
     public void processSystemEvents() {
         for (Iterator<SystemEvent> it = this.systemEvents.iterator(); it.hasNext(); ) {
@@ -189,7 +199,7 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
     }
 
     /**
-     *
+     * Process the pending list of signals.
      */
     public void processSignals() {
         for (Context context : this.contexts) {
@@ -204,8 +214,9 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
     }
 
     /**
+     * Create a pipe for the specified array of two file descriptor numbers.
      *
-     * @param fileDescriptors
+     * @param fileDescriptors the array of two descriptor numbers
      */
     public void createPipe(int[] fileDescriptors) {
         fileDescriptors[0] = currentFd++;
@@ -214,8 +225,9 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
     }
 
     /**
+     * Close the pipes containing the specified file descriptor number.
      *
-     * @param fileDescriptor
+     * @param fileDescriptor the file descriptor number
      */
     public void closePipe(int fileDescriptor) {
         for (Iterator<Pipe> it = this.pipes.iterator(); it.hasNext(); ) {
@@ -235,23 +247,32 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
     }
 
     /**
+     * Get the read buffer for the specified file descriptor number.
      *
-     * @param fileDescriptor
-     * @return
+     * @param fileDescriptor the file descriptor number
+     * @return the read buffer for the specified file descriptor number
      */
     public CircularByteBuffer getReadBuffer(int fileDescriptor) {
         return this.getBuffer(fileDescriptor, 0);
     }
 
     /**
+     * Get the write buffer for the specified file descriptor number.
      *
-     * @param fileDescriptor
-     * @return
+     * @param fileDescriptor the file descriptor number
+     * @return the write buffer for the specified file descriptor number
      */
     public CircularByteBuffer getWriteBuffer(int fileDescriptor) {
         return this.getBuffer(fileDescriptor, 1);
     }
 
+    /**
+     * Get the circular buffer for the specified file descriptor number and index.
+     *
+     * @param fileDescriptor the file descriptor
+     * @param index the index
+     * @return the circular buffer matching the specified file descriptor number and index
+     */
     private CircularByteBuffer getBuffer(int fileDescriptor, int index) {
         for (Pipe pipe : this.pipes) {
             if (pipe.getFileDescriptors()[index] == fileDescriptor) {
@@ -263,9 +284,10 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
     }
 
     /**
+     * Run the signal handler for the specified context and signal.
      *
-     * @param context
-     * @param signal
+     * @param context the context
+     * @param signal the signal
      */
     public void runSignalHandler(Context context, int signal) {
         try {
@@ -298,17 +320,18 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
     }
 
     /**
+     * Get a value indicating whether the specified signal must be processed for the specified context or not.
      *
-     * @param context
-     * @param signal
-     * @return
+     * @param context the context
+     * @param signal the signal
+     * @return a value indicating whether the specified signal must be processed for the specified context or not
      */
     public boolean mustProcessSignal(Context context, int signal) {
         return context.getSignalMasks().getPending().contains(signal) && !context.getSignalMasks().getBlocked().contains(signal);
     }
 
     /**
-     *
+     * Advance one cycle.
      */
     public void advanceOneCycle() {
         if (this.currentCycle % 1000 == 0) {
@@ -320,32 +343,36 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
     }
 
     /**
+     * Get the list of signal actions.
      *
-     * @return
+     * @return the list of signal actions
      */
     public List<SignalAction> getSignalActions() {
         return signalActions;
     }
 
     /**
+     * Get the list of contexts.
      *
-     * @return
+     * @return the list of contexts
      */
     public List<Context> getContexts() {
         return contexts;
     }
 
     /**
+     * Get the list of processes.
      *
-     * @return
+     * @return the list of processes
      */
     public List<Process> getProcesses() {
         return processes;
     }
 
     /**
+     * Get the list of memories.
      *
-     * @return
+     * @return the list of memories
      */
     public List<Memory> getMemories() {
         List<Memory> memories = new ArrayList<Memory>();
@@ -358,28 +385,35 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
     }
 
     /**
+     * Get the current cycle.
      *
-     * @return
+     * @return the current cycle
      */
     public long getCurrentCycle() {
         return currentCycle;
     }
 
     /**
+     * Get the system call emulation object.
      *
-     * @return
+     * @return the system call emulation object
      */
     public SystemCallEmulation getSystemCallEmulation() {
         return systemCallEmulation;
     }
 
+    /**
+     * Get the name of the kernel.
+     *
+     * @return the name of the kernel
+     */
     @Override
     public String getName() {
         return "kernel";
     }
 
     /**
-     *
+     * Maximum signal.
      */
     public static final int MAX_SIGNAL = 64;
 }

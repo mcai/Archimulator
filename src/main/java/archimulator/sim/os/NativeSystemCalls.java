@@ -22,105 +22,118 @@ import com.sun.jna.Library;
 import com.sun.jna.Native;
 
 /**
+ * Native system calls implementation.
  *
  * @author Min Cai
  */
 public class NativeSystemCalls {
     /**
-     *
+     * C library.
      */
     public interface LibC extends Library {
         /**
+         * getuid.
          *
-         * @return
+         * @return the result
          */
         long getuid();
 
         /**
+         * geteuid.
          *
-         * @return
+         * @return the result
          */
         long geteuid();
 
         /**
+         * getgid.
          *
-         * @return
+         * @return the result
          */
         long getgid();
 
         /**
+         * getegid.
          *
-         * @return
+         * @return the result
          */
         long getegid();
 
         /**
+         * read.
          *
-         * @param fd
-         * @param buf
-         * @param count
-         * @return
+         * @param fd the file descriptor
+         * @param buf the buffer
+         * @param count the count
+         * @return the number of bytes read
          */
         int read(int fd, byte[] buf, int count);
 
         /**
+         * write.
          *
-         * @param fd
-         * @param buf
-         * @param count
-         * @return
+         * @param fd the file descriptor
+         * @param buf the buffer
+         * @param count the count
+         * @return the number of bytes written
          */
         int write(int fd, byte[] buf, int count);
 
         /**
+         * Open a file.
          *
-         * @param path
-         * @param flags
-         * @param mode
-         * @return
+         * @param path the file path
+         * @param flags the flags
+         * @param mode the open mode
+         * @return the file descriptor for the opened file
          */
         int open(String path, int flags, int mode);
 
         /**
+         * Open a file.
          *
-         * @param path
-         * @param flags
-         * @return
+         * @param path the file path
+         * @param flags the flags
+         * @return the file descriptor for the opened file
          */
         int open(String path, int flags);
 
         /**
+         * Close a file.
          *
-         * @param fd
-         * @return
+         * @param fd the file descriptor
+         * @return the result
          */
         int close(int fd);
 
         /**
+         * lseek.
          *
-         * @param fd
-         * @param offset
-         * @param whence
-         * @return
+         * @param fd the file descriptor
+         * @param offset the offset
+         * @param whence the whence
+         * @return the result
          */
         int lseek(int fd, int offset, int whence);
 
         /**
+         * ioctrl.
          *
-         * @param fd
-         * @param request
-         * @param buf
-         * @return
+         * @param fd the file descriptor
+         * @param request the request
+         * @param buf the buffer
+         * @return the result
          */
         int ioctl(int fd, int request, byte[] buf);
     }
 
     /**
-     *
+     * Clocks per second.
      */
     public static final int CLOCKS_PER_SEC = 1000000;
+
     /**
-     *
+     * CPU frequency.
      */
     public static final int CPU_FREQUENCY = 300000;
 
@@ -133,14 +146,15 @@ public class NativeSystemCalls {
     private static final String LIBC_NAME = IS_LINUX ? "libc.so.6" : "c";
 
     /**
-     *
+     * Libc singleton.
      */
     public static final LibC LIBC = (LibC) Native.loadLibrary(LIBC_NAME, LibC.class);
 
     /**
+     * Get the clocks for the specified number of cycles.
      *
-     * @param numCycles
-     * @return
+     * @param numCycles the number of cycles
+     * @return the clocks for the specified number of cycles
      */
     public static long clock(long numCycles) {
         return CLOCKS_PER_SEC * numCycles / CPU_FREQUENCY;

@@ -22,40 +22,35 @@ import archimulator.sim.isa.ArchitecturalRegisterFile;
 import archimulator.sim.os.Context;
 
 /**
+ * Poll event.
  *
  * @author Min Cai
  */
 public class PollEvent extends SystemEvent {
     private TimeCriterion timeCriterion;
-    private WaitFileDescriptorCriterion waitFileDescriptorCriterion;
+    private WaitForFileDescriptorCriterion waitForFileDescriptorCriterion;
 
     /**
+     * Create a poll event for the specified context.
      *
-     * @param context
+     * @param context the context
      */
     public PollEvent(Context context) {
         super(context, SystemEventType.POLL);
 
         this.timeCriterion = new TimeCriterion();
-        this.waitFileDescriptorCriterion = new WaitFileDescriptorCriterion();
+        this.waitForFileDescriptorCriterion = new WaitForFileDescriptorCriterion();
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public boolean needProcess() {
-        return this.timeCriterion.needProcess(this.getContext()) || this.waitFileDescriptorCriterion.needProcess(this.getContext());
+        return this.timeCriterion.needProcess(this.getContext()) || this.waitForFileDescriptorCriterion.needProcess(this.getContext());
     }
 
-    /**
-     *
-     */
     @Override
     public void process() {
-        if (!this.waitFileDescriptorCriterion.getBuffer().isEmpty()) {
-            this.getContext().getProcess().getMemory().writeHalfWord(this.waitFileDescriptorCriterion.getPufds() + 6, (short) 1);
+        if (!this.waitForFileDescriptorCriterion.getBuffer().isEmpty()) {
+            this.getContext().getProcess().getMemory().writeHalfWord(this.waitForFileDescriptorCriterion.getPufds() + 6, (short) 1);
             this.getContext().getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_V0, 1);
         } else {
             this.getContext().getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_V0, 0);
@@ -66,18 +61,20 @@ public class PollEvent extends SystemEvent {
     }
 
     /**
+     * Get the time criterion.
      *
-     * @return
+     * @return the time criterion
      */
     public TimeCriterion getTimeCriterion() {
         return timeCriterion;
     }
 
     /**
+     * Get the wait for file descriptor criterion.
      *
-     * @return
+     * @return the wait for file descriptor criterion
      */
-    public WaitFileDescriptorCriterion getWaitFileDescriptorCriterion() {
-        return waitFileDescriptorCriterion;
+    public WaitForFileDescriptorCriterion getWaitForFileDescriptorCriterion() {
+        return waitForFileDescriptorCriterion;
     }
 }

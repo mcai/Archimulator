@@ -40,10 +40,14 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
+ * System call emulation.
  *
  * @author Min Cai
  */
 public class SystemCallEmulation extends BasicSimulationObject implements SimulationObject {
+    /**
+     * System control arguments.
+     */
     private class SysctrlArgs {
         private int name;
         private int nlen;
@@ -63,8 +67,9 @@ public class SystemCallEmulation extends BasicSimulationObject implements Simula
     private List<OpenFlagMapping> openFlagMappings;
 
     /**
+     * Create a system call emulation object.
      *
-     * @param kernel
+     * @param kernel the kernel
      */
     public SystemCallEmulation(Kernel kernel) {
         super(kernel);
@@ -282,9 +287,10 @@ public class SystemCallEmulation extends BasicSimulationObject implements Simula
     }
 
     /**
+     * Do the specified system call.
      *
-     * @param callNum
-     * @param context
+     * @param callNum the number of the system call
+     * @param context the context
      */
     public void doSystemCall(int callNum, Context context) {
         int systemCallIndex = callNum - 4000;
@@ -294,6 +300,12 @@ public class SystemCallEmulation extends BasicSimulationObject implements Simula
         }
     }
 
+    /**
+     * Check if there is any system call error for the specified context.
+     *
+     * @param context the context
+     * @return a value indicating whether there is any system call error for the specified context
+     */
     private boolean checkSystemCallError(Context context) {
         if (context.getRegisterFile().getGpr(ArchitecturalRegisterFile.REGISTER_V0) != -1) {
             context.getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_A3, 0);
@@ -305,6 +317,13 @@ public class SystemCallEmulation extends BasicSimulationObject implements Simula
         }
     }
 
+    /**
+     * Find and call the system call handler for the specified system call index and context.
+     *
+     * @param systemCallIndex the system call index
+     * @param context         the context
+     * @return a value indicating whether there is a registered system call handler matching the specified system call index
+     */
     private boolean findAndCallSystemCallHandler(int systemCallIndex, Context context) {
         if (handlers.containsKey(systemCallIndex)) {
             SystemCallHandler systemCallHandler = handlers.get(systemCallIndex);
@@ -330,19 +349,29 @@ public class SystemCallEmulation extends BasicSimulationObject implements Simula
         return false;
     }
 
+    /**
+     * Register the specified system call handler.
+     *
+     * @param handler the system call handler to be registered
+     */
     private void registerHandler(SystemCallHandler handler) {
         handlers.put(handler.getIndex(), handler);
     }
 
-
+    /**
+     * exit_group implementation.
+     *
+     * @param context the context
+     */
     private void exit_group_impl(Context context) {
         context.finish();
     }
 
     /**
+     * Get the file descriptor by the specified file descriptor number.
      *
-     * @param fd
-     * @return
+     * @param fd the file descriptor number
+     * @return the file descriptor
      */
     public static FileDescriptor getFD(int fd) {
         try {
@@ -352,6 +381,11 @@ public class SystemCallEmulation extends BasicSimulationObject implements Simula
         }
     }
 
+    /**
+     * fstat64 implementation.
+     *
+     * @param context the context
+     */
     private void fstat64_impl(Context context) {
         int fd = context.getProcess().translateFileDescriptor(context.getRegisterFile().getGpr(ArchitecturalRegisterFile.REGISTER_A0));
         int bufAddr = context.getRegisterFile().getGpr(ArchitecturalRegisterFile.REGISTER_A1);
@@ -386,6 +420,11 @@ public class SystemCallEmulation extends BasicSimulationObject implements Simula
         }
     }
 
+    /**
+     * rt_sigsuspend implementation.
+     *
+     * @param context the context
+     */
     private void rt_sigsuspend_impl(Context context) {
         int pmask = context.getRegisterFile().getGpr(ArchitecturalRegisterFile.REGISTER_A0);
 
@@ -408,6 +447,11 @@ public class SystemCallEmulation extends BasicSimulationObject implements Simula
         context.getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_V0, 0);
     }
 
+    /**
+     * rt_sigprocmask implementation.
+     *
+     * @param context the context
+     */
     private void rt_sigprocmask_impl(Context context) {
         int how = context.getRegisterFile().getGpr(ArchitecturalRegisterFile.REGISTER_A0);
         int pset = context.getRegisterFile().getGpr(ArchitecturalRegisterFile.REGISTER_A1);
@@ -446,6 +490,11 @@ public class SystemCallEmulation extends BasicSimulationObject implements Simula
         context.getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_V0, 0);
     }
 
+    /**
+     * rt_sigaction implementation.
+     *
+     * @param context the context
+     */
     private void rt_sigaction_impl(Context context) {
         int signum = context.getRegisterFile().getGpr(ArchitecturalRegisterFile.REGISTER_A0);
         int pact = context.getRegisterFile().getGpr(ArchitecturalRegisterFile.REGISTER_A1);
@@ -462,6 +511,11 @@ public class SystemCallEmulation extends BasicSimulationObject implements Simula
         context.getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_V0, 0);
     }
 
+    /**
+     * poll implementation.
+     *
+     * @param context the context
+     */
     private void poll_impl(Context context) {
         int pufds = context.getRegisterFile().getGpr(ArchitecturalRegisterFile.REGISTER_A0);
         int nfds = context.getRegisterFile().getGpr(ArchitecturalRegisterFile.REGISTER_A1);
@@ -479,16 +533,21 @@ public class SystemCallEmulation extends BasicSimulationObject implements Simula
 
             PollEvent e = new PollEvent(context);
             e.getTimeCriterion().setWhen(NativeSystemCalls.clock(context.getKernel().getCurrentCycle()) + timeout * NativeSystemCalls.CLOCKS_PER_SEC / 1000);
-            e.getWaitFileDescriptorCriterion().setBuffer(context.getKernel().getReadBuffer(fd));
-            if (e.getWaitFileDescriptorCriterion().getBuffer() == null) {
+            e.getWaitForFileDescriptorCriterion().setBuffer(context.getKernel().getReadBuffer(fd));
+            if (e.getWaitForFileDescriptorCriterion().getBuffer() == null) {
                 throw new IllegalArgumentException("system call poll: fd does not belong to a pipe read buffer");
             }
-            e.getWaitFileDescriptorCriterion().setPufds(pufds);
+            e.getWaitForFileDescriptorCriterion().setPufds(pufds);
             context.getKernel().scheduleSystemEvent(e);
         }
         context.suspend();
     }
 
+    /**
+     * nanosleep implementation.
+     *
+     * @param context the context
+     */
     private void nanosleep_impl(Context context) {
         int preq = context.getRegisterFile().getGpr(ArchitecturalRegisterFile.REGISTER_A0);
         int sec = context.getProcess().getMemory().readWord(preq);
@@ -502,6 +561,11 @@ public class SystemCallEmulation extends BasicSimulationObject implements Simula
         context.suspend();
     }
 
+    /**
+     * mremap implmentation.
+     *
+     * @param context the context
+     */
     private void mremap_impl(Context context) {
         int oldAddr = context.getRegisterFile().getGpr(ArchitecturalRegisterFile.REGISTER_A0);
         int oldSize = context.getRegisterFile().getGpr(ArchitecturalRegisterFile.REGISTER_A1);
@@ -514,6 +578,11 @@ public class SystemCallEmulation extends BasicSimulationObject implements Simula
         error = checkSystemCallError(context);
     }
 
+    /**
+     * _sysctl implementation.
+     *
+     * @param context the context
+     */
     private void _sysctl_impl(Context context) {
         byte[] buf = context.getProcess().getMemory().readBlock(context.getRegisterFile().getGpr(4), 4 * 6);
         ByteBuffer bb = ByteBuffer.wrap(buf).order(context.getProcess().isLittleEndian() ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
@@ -543,6 +612,11 @@ public class SystemCallEmulation extends BasicSimulationObject implements Simula
         }
     }
 
+    /**
+     * _llseek implementation.
+     *
+     * @param context the context
+     */
     private void _llseek_impl(Context context) {
         int fd = context.getProcess().translateFileDescriptor(context.getRegisterFile().getGpr(ArchitecturalRegisterFile.REGISTER_A0));
         int offset = context.getRegisterFile().getGpr(ArchitecturalRegisterFile.REGISTER_A1);
@@ -555,11 +629,21 @@ public class SystemCallEmulation extends BasicSimulationObject implements Simula
         error = checkSystemCallError(context);
     }
 
+    /**
+     * mprotect implementation.
+     *
+     * @param context the context
+     */
     private void mprotect_impl(Context context) {
         context.getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_A3, 0);
         context.getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_V0, 0);
     }
 
+    /**
+     * uname implementation.
+     *
+     * @param context the context
+     */
     private void uname_impl(Context context) {
         Utsname un = new Utsname();
         un.sysname = "Linux";
@@ -575,6 +659,11 @@ public class SystemCallEmulation extends BasicSimulationObject implements Simula
         context.getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_V0, 0);
     }
 
+    /**
+     * clone implementation.
+     *
+     * @param context the context
+     */
     private void clone_impl(Context context) {
         int cloneFlags = context.getRegisterFile().getGpr(ArchitecturalRegisterFile.REGISTER_A0);
         int newsp = context.getRegisterFile().getGpr(ArchitecturalRegisterFile.REGISTER_A1);
@@ -604,6 +693,11 @@ public class SystemCallEmulation extends BasicSimulationObject implements Simula
         context.getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_V0, newContext.getProcessId());
     }
 
+    /**
+     * munmap implementation.
+     *
+     * @param context the context
+     */
     private void munmap_impl(Context context) {
         int start = context.getRegisterFile().getGpr(ArchitecturalRegisterFile.REGISTER_A0);
         int length = context.getRegisterFile().getGpr(ArchitecturalRegisterFile.REGISTER_A1);
@@ -614,6 +708,11 @@ public class SystemCallEmulation extends BasicSimulationObject implements Simula
         context.getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_V0, 0);
     }
 
+    /**
+     * mmap implementation.
+     *
+     * @param context the context
+     */
     private void mmap_impl(Context context) {
         int start = context.getRegisterFile().getGpr(ArchitecturalRegisterFile.REGISTER_A0);
         int length = context.getRegisterFile().getGpr(ArchitecturalRegisterFile.REGISTER_A1);
@@ -633,6 +732,11 @@ public class SystemCallEmulation extends BasicSimulationObject implements Simula
         context.getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_V0, start);
     }
 
+    /**
+     * getrlimit implementation.
+     *
+     * @param context the context
+     */
     private void getrlimit_impl(Context context) {
         int prlimit = context.getRegisterFile().getGpr(ArchitecturalRegisterFile.REGISTER_A1);
 
@@ -647,6 +751,11 @@ public class SystemCallEmulation extends BasicSimulationObject implements Simula
         context.getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_V0, 0);
     }
 
+    /**
+     * setrlimit implementation.
+     *
+     * @param context the context
+     */
     private void setrlimit_impl(Context context) {
         if (context.getRegisterFile().getGpr(ArchitecturalRegisterFile.REGISTER_A0) != 3) {
             throw new RuntimeException();
@@ -658,11 +767,21 @@ public class SystemCallEmulation extends BasicSimulationObject implements Simula
         context.getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_V0, 0);
     }
 
+    /**
+     * getppid implementation.
+     *
+     * @param context the context
+     */
     private void getppid_impl(Context context) {
         context.getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_V0, context.getParentProcessId());
         error = checkSystemCallError(context);
     }
 
+    /**
+     * ioctl implementation.
+     *
+     * @param context the context
+     */
     private void ioctl_impl(Context context) {
         byte[] buf = new byte[128];
 
@@ -683,26 +802,51 @@ public class SystemCallEmulation extends BasicSimulationObject implements Simula
         }
     }
 
+    /**
+     * getegid implementation.
+     *
+     * @param context the context
+     */
     private void getegid_impl(Context context) {
         context.getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_V0, context.getEffectiveGroupId());
         error = checkSystemCallError(context);
     }
 
+    /**
+     * geteuid implementation.
+     *
+     * @param context the context
+     */
     private void geteuid_impl(Context context) {
         context.getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_V0, context.getEffectiveUserId());
         error = checkSystemCallError(context);
     }
 
+    /**
+     * getgid implementation.
+     *
+     * @param context the context
+     */
     private void getgid_impl(Context context) {
         context.getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_V0, context.getGroupId());
         error = checkSystemCallError(context);
     }
 
+    /**
+     * brk implementation.
+     *
+     * @param context the context
+     */
     private void brk_impl(Context context) {
         context.getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_A3, 0);
         context.getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_V0, 0);
     }
 
+    /**
+     * pipe implementation.
+     *
+     * @param context the context
+     */
     private void pipe_impl(Context context) {
         int[] fileDescriptors = new int[2];
         context.getKernel().createPipe(fileDescriptors);
@@ -714,6 +858,11 @@ public class SystemCallEmulation extends BasicSimulationObject implements Simula
         //            System.out.printf("\tpipe created with fd={%d, %d}\n", fd[0], fd[1]);
     }
 
+    /**
+     * kill implementation.
+     *
+     * @param context the context
+     */
     private void kill_impl(Context context) {
         int pid = context.getRegisterFile().getGpr(ArchitecturalRegisterFile.REGISTER_A0);
         int sig = context.getRegisterFile().getGpr(ArchitecturalRegisterFile.REGISTER_A1);
@@ -735,16 +884,31 @@ public class SystemCallEmulation extends BasicSimulationObject implements Simula
         //            System.out.printf("\t%s: sending signal %d to %s (pid=%d)\n", context.getThread().getName(), sig, destContext.getThread().getName(), pid);
     }
 
+    /**
+     * getuid implementation.
+     *
+     * @param context the context
+     */
     private void getuid_impl(Context context) {
         context.getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_V0, context.getUserId());
         error = checkSystemCallError(context);
     }
 
+    /**
+     * getpid implementation.
+     * <p/>
+     * -@param context the context
+     */
     private void getpid_impl(Context context) {
         context.getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_V0, context.getProcessId());
         error = checkSystemCallError(context);
     }
 
+    /**
+     * waitpid implementation.
+     *
+     * @param context the context
+     */
     private void waitpid_impl(Context context) {
         int pid = context.getRegisterFile().getGpr(ArchitecturalRegisterFile.REGISTER_A0);
         int pstatus = context.getRegisterFile().getGpr(ArchitecturalRegisterFile.REGISTER_A1);
@@ -767,6 +931,11 @@ public class SystemCallEmulation extends BasicSimulationObject implements Simula
         }
     }
 
+    /**
+     * close implementation.
+     *
+     * @param context the context
+     */
     private void close_impl(Context context) {
         int fd = context.getRegisterFile().getGpr(ArchitecturalRegisterFile.REGISTER_A0);
 
@@ -781,6 +950,11 @@ public class SystemCallEmulation extends BasicSimulationObject implements Simula
         error = checkSystemCallError(context);
     }
 
+    /**
+     * open implementation.
+     *
+     * @param context the context
+     */
     private void open_impl(Context context) {
         int addr = context.getRegisterFile().getGpr(ArchitecturalRegisterFile.REGISTER_A0);
         int tgtFlags = context.getRegisterFile().getGpr(ArchitecturalRegisterFile.REGISTER_A1);
@@ -806,6 +980,11 @@ public class SystemCallEmulation extends BasicSimulationObject implements Simula
         error = checkSystemCallError(context);
     }
 
+    /**
+     * write implementation.
+     *
+     * @param context the context
+     */
     private void write_impl(Context context) {
         int fd = context.getProcess().translateFileDescriptor(context.getRegisterFile().getGpr(ArchitecturalRegisterFile.REGISTER_A0));
         int bufAddr = context.getRegisterFile().getGpr(ArchitecturalRegisterFile.REGISTER_A1);
@@ -829,6 +1008,11 @@ public class SystemCallEmulation extends BasicSimulationObject implements Simula
         //            System.out.printf("\tsystem call write: %d bytes written to fd=%d\n", ret, fd);
     }
 
+    /**
+     * read implementation.
+     *
+     * @param context the context
+     */
     private void read_impl(Context context) {
         int readMaxSize = 1 << 25;
 
@@ -843,9 +1027,9 @@ public class SystemCallEmulation extends BasicSimulationObject implements Simula
         if (buffer != null) {
             if (buffer.isEmpty()) {
                 ReadEvent e = new ReadEvent(context);
-                e.getWaitFileDescriptorCriterion().setBuffer(buffer);
-                e.getWaitFileDescriptorCriterion().setAddress(bufAddr);
-                e.getWaitFileDescriptorCriterion().setSize(count);
+                e.getWaitForFileDescriptorCriterion().setBuffer(buffer);
+                e.getWaitForFileDescriptorCriterion().setAddress(bufAddr);
+                e.getWaitForFileDescriptorCriterion().setSize(count);
                 context.getKernel().scheduleSystemEvent(e);
                 context.suspend();
                 return;
@@ -870,151 +1054,197 @@ public class SystemCallEmulation extends BasicSimulationObject implements Simula
         //            System.out.printf("\tsystem call read: %d bytes read from fd=%d\n", ret, fd);
     }
 
+    /**
+     * exit implementation.
+     *
+     * @param context the context
+     */
     private void exit_impl(Context context) {
         context.finish();
     }
 
+    /**
+     * Get the name of the system call emulation object.
+     *
+     * @return the name of the system call emulation object
+     */
     @Override
     public String getName() {
         return "systemCallEmulation";
     }
 
     /**
-     *
+     * EPERM.
      */
     public static final int EPERM = 1;
+
     /**
-     *
+     * ENOENT.
      */
     public static final int ENOENT = 2;
+
     /**
-     *
+     * ESRCH.
      */
     public static final int ESRCH = 3;
+
     /**
-     *
+     * EINTR.
      */
     public static final int EINTR = 4;
+
     /**
-     *
+     * EIO.
      */
     public static final int EIO = 5;
+
     /**
-     *
+     * ENXIO.
      */
     public static final int ENXIO = 6;
+
     /**
-     *
+     * E2BIG.
      */
     public static final int E2BIG = 7;
+
     /**
-     *
+     * ENOEXEC.
      */
     public static final int ENOEXEC = 8;
+
     /**
-     *
+     * EBADF.
      */
     public static final int EBADF = 9;
+
     /**
-     *
+     * ECHILD.
      */
     public static final int ECHILD = 10;
+
     /**
-     *
+     * EAGAIN.
      */
     public static final int EAGAIN = 11;
+
     /**
-     *
+     * ENOMEM.
      */
     public static final int ENOMEM = 12;
+
     /**
-     *
+     * EACCES.
      */
     public static final int EACCES = 13;
+
     /**
-     *
+     * EFAULT.
      */
     public static final int EFAULT = 14;
+
     /**
-     *
+     * ENOTBLK.
      */
     public static final int ENOTBLK = 15;
+
     /**
-     *
+     * EBUSY.
      */
     public static final int EBUSY = 16;
+
     /**
-     *
+     * EEXIST.
      */
     public static final int EEXIST = 17;
+
     /**
-     *
+     * EXDEV.
      */
     public static final int EXDEV = 18;
+
     /**
-     *
+     * ENODEV.
      */
     public static final int ENODEV = 19;
+
     /**
-     *
+     * ENOTDIR.
      */
     public static final int ENOTDIR = 20;
+
     /**
-     *
+     * EISDIR.
      */
     public static final int EISDIR = 21;
+
     /**
-     *
+     * EINVAL.
      */
     public static final int EINVAL = 22;
+
     /**
-     *
+     * ENFILE.
      */
     public static final int ENFILE = 23;
+
     /**
-     *
+     * EMFILE.
      */
     public static final int EMFILE = 24;
+
     /**
-     *
+     * ENOTTY.
      */
     public static final int ENOTTY = 25;
+
     /**
-     *
+     * ETXTBSY.
      */
     public static final int ETXTBSY = 26;
+
     /**
-     *
+     * EFBIG.
      */
     public static final int EFBIG = 27;
+
     /**
-     *
+     * ENOSPC.
      */
     public static final int ENOSPC = 28;
+
     /**
-     *
+     * ESPIPE.
      */
     public static final int ESPIPE = 29;
+
     /**
-     *
+     * EROFS.
      */
     public static final int EROFS = 30;
+
     /**
-     *
+     * EMLINK.
      */
     public static final int EMLINK = 31;
+
     /**
-     *
+     * EPIPE.
      */
     public static final int EPIPE = 32;
+
     /**
-     *
+     * EDOM.
      */
     public static final int EDOM = 33;
+
     /**
-     *
+     * ERANGE.
      */
     public static final int ERANGE = 34;
 
+    /**
+     * Maximum buffer size.
+     */
     private static final int MAX_BUFFER_SIZE = 1024;
 }

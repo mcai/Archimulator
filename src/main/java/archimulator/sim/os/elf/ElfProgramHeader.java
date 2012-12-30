@@ -21,47 +21,50 @@ package archimulator.sim.os.elf;
 import java.io.IOException;
 
 /**
+ * ELF program header.
  *
  * @author Min Cai
  */
 public class ElfProgramHeader {
-    private long p_type;
-    private long p_offset;
-    private long p_vaddr;
-    private long p_paddr;
-    private long p_filesz;
-    private long p_memsz;
-    private long p_flags;
-    private long p_align;
+    private long type;
+    private long offset;
+    private long virtualAddress;
+    private long physicalAddress;
+    private long sizeInFile;
+    private long sizeInMemory;
+    private long flags;
+    private long alignment;
 
     /**
+     * Create an ELF program header.
      *
-     * @param elfFile
+     * @param elfFile the ELF file
      * @throws IOException
      */
     public ElfProgramHeader(ElfFile elfFile) throws IOException {
-        this.p_type = elfFile.readUnsignedWord();
-        this.p_offset = elfFile.readUnsignedWord();
-        this.p_vaddr = elfFile.readUnsignedWord();
-        this.p_paddr = elfFile.readUnsignedWord();
-        this.p_filesz = elfFile.readUnsignedWord();
-        this.p_memsz = elfFile.readUnsignedWord();
-        this.p_flags = elfFile.readUnsignedWord();
-        this.p_align = elfFile.readUnsignedWord();
+        this.type = elfFile.readUnsignedWord();
+        this.offset = elfFile.readUnsignedWord();
+        this.virtualAddress = elfFile.readUnsignedWord();
+        this.physicalAddress = elfFile.readUnsignedWord();
+        this.sizeInFile = elfFile.readUnsignedWord();
+        this.sizeInMemory = elfFile.readUnsignedWord();
+        this.flags = elfFile.readUnsignedWord();
+        this.alignment = elfFile.readUnsignedWord();
     }
 
     /**
+     * Read the ELF program header as a byte array from the ELF file.
      *
-     * @param elfFile
-     * @return
+     * @param elfFile the ELF file
+     * @return the ELF program header as a byte array
      * @throws IOException
      */
     public byte[] readContent(ElfFile elfFile) throws IOException {
         long position = elfFile.getPosition();
 
-        elfFile.setPosition(this.p_offset);
+        elfFile.setPosition(this.offset);
 
-        byte[] content = new byte[(int) this.p_filesz];
+        byte[] content = new byte[(int) this.sizeInFile];
         elfFile.read(content);
 
         elfFile.setPosition(position);
@@ -70,66 +73,74 @@ public class ElfProgramHeader {
     }
 
     /**
+     * Get the type.
      *
-     * @return
+     * @return the type
      */
-    public long getP_type() {
-        return p_type;
+    public long getType() {
+        return type;
     }
 
     /**
+     * Get the offset.
      *
-     * @return
+     * @return the offset
      */
-    public long getP_offset() {
-        return p_offset;
+    public long getOffset() {
+        return offset;
     }
 
     /**
+     * Get the virtual address.
      *
-     * @return
+     * @return the virtual address
      */
-    public long getP_vaddr() {
-        return p_vaddr;
+    public long getVirtualAddress() {
+        return virtualAddress;
     }
 
     /**
+     * Get the physical address.
      *
-     * @return
+     * @return physical address
      */
-    public long getP_paddr() {
-        return p_paddr;
+    public long getPhysicalAddress() {
+        return physicalAddress;
     }
 
     /**
+     * Get the size of the ELF program header in the ELF file.
      *
-     * @return
+     * @return the size of the ELF program header in the ELF file
      */
-    public long getP_filesz() {
-        return p_filesz;
+    public long getSizeInFile() {
+        return sizeInFile;
     }
 
     /**
+     * Get the size of the ELF program header in memory.
      *
-     * @return
+     * @return the size of the ELF program header in memory
      */
-    public long getP_memsz() {
-        return p_memsz;
+    public long getSizeInMemory() {
+        return sizeInMemory;
     }
 
     /**
+     * Get the flags.
      *
-     * @return
+     * @return the flags
      */
-    public long getP_flags() {
-        return p_flags;
+    public long getFlags() {
+        return flags;
     }
 
     /**
+     * Get the alignment.
      *
-     * @return
+     * @return the alignment
      */
-    public long getP_align() {
-        return p_align;
+    public long getAlignment() {
+        return alignment;
     }
 }

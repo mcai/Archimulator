@@ -19,6 +19,7 @@
 package archimulator.sim.os.elf;
 
 /**
+ * ELF string table.
  *
  * @author Min Cai
  */
@@ -26,12 +27,13 @@ public class ElfStringTable {
     private byte[] data;
 
     /**
+     * Create an ELF string table.
      *
-     * @param elfFile
-     * @param sectionHeader
+     * @param elfFile the ELF file
+     * @param sectionHeader the section header that containing the string table
      */
     public ElfStringTable(ElfFile elfFile, ElfSectionHeader sectionHeader) {
-        if (sectionHeader.getSh_type() != ElfSectionHeader.SHT_STRTAB) {
+        if (sectionHeader.getType() != ElfSectionHeader.SHT_STRTAB) {
             throw new IllegalArgumentException("Section is not a string table");
         }
 
@@ -39,9 +41,10 @@ public class ElfStringTable {
     }
 
     /**
+     * Get the string by the specified index.
      *
-     * @param index
-     * @return
+     * @param index the index
+     * @return the string by the specified index
      */
     public String getString(int index) {
         StringBuilder sb = new StringBuilder();

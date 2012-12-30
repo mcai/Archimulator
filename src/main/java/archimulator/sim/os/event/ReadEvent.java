@@ -22,53 +22,49 @@ import archimulator.sim.isa.ArchitecturalRegisterFile;
 import archimulator.sim.os.Context;
 
 /**
+ * Read event.
  *
  * @author Min Cai
  */
 public class ReadEvent extends SystemEvent {
-    private WaitFileDescriptorCriterion waitFileDescriptorCriterion;
+    private WaitForFileDescriptorCriterion waitForFileDescriptorCriterion;
 
     /**
+     * Create a read event for the specified context.
      *
-     * @param context
+     * @param context the context
      */
     public ReadEvent(Context context) {
         super(context, SystemEventType.READ);
 
-        this.waitFileDescriptorCriterion = new WaitFileDescriptorCriterion();
+        this.waitForFileDescriptorCriterion = new WaitForFileDescriptorCriterion();
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public boolean needProcess() {
-        return this.waitFileDescriptorCriterion.needProcess(this.getContext());
+        return this.waitForFileDescriptorCriterion.needProcess(this.getContext());
     }
 
-    /**
-     *
-     */
     @Override
     public void process() {
         this.getContext().resume();
 
-        byte[] buf = new byte[this.waitFileDescriptorCriterion.getSize()];
+        byte[] buf = new byte[this.waitForFileDescriptorCriterion.getSize()];
 
-        int numRead = this.waitFileDescriptorCriterion.getBuffer().read(buf, 0, buf.length);
+        int numRead = this.waitForFileDescriptorCriterion.getBuffer().read(buf, 0, buf.length);
 
         this.getContext().getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_V0, numRead);
         this.getContext().getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_A3, 0);
 
-        this.getContext().getProcess().getMemory().writeBlock(this.waitFileDescriptorCriterion.getAddress(), numRead, buf);
+        this.getContext().getProcess().getMemory().writeBlock(this.waitForFileDescriptorCriterion.getAddress(), numRead, buf);
     }
 
     /**
+     * Get the wait for file descriptor criterion.
      *
-     * @return
+     * @return the wait for file descriptor criterion
      */
-    public WaitFileDescriptorCriterion getWaitFileDescriptorCriterion() {
-        return waitFileDescriptorCriterion;
+    public WaitForFileDescriptorCriterion getWaitForFileDescriptorCriterion() {
+        return waitForFileDescriptorCriterion;
     }
 }

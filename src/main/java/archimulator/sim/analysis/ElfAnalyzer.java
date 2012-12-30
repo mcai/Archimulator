@@ -103,7 +103,7 @@ public class ElfAnalyzer {
         BasicBlock newBasicBlock = null;
 
         for (int i = 0; i < function.getNumInstructions(); i++) {
-            int pc = (int) function.getSymbol().getSt_value() + i * 4;
+            int pc = (int) function.getSymbol().getValue() + i * 4;
 
             Instruction instruction = this.instructions.get(function.getSectionName()).get(pc);
             if (instruction.isLeader()) {
@@ -200,10 +200,10 @@ public class ElfAnalyzer {
      * @param function the function
      */
     private void scanBasicBlocks(Function function) {
-        this.instructions.get(function.getSectionName()).get((int) function.getSymbol().getSt_value()).setLeader(true, 0);
+        this.instructions.get(function.getSectionName()).get((int) function.getSymbol().getValue()).setLeader(true, 0);
 
         for (int i = 0; i < function.getNumInstructions(); i++) {
-            int pc = (int) function.getSymbol().getSt_value() + i * 4;
+            int pc = (int) function.getSymbol().getValue() + i * 4;
 
             Instruction instruction = this.instructions.get(function.getSectionName()).get(pc);
             Instruction nextNextInstruction = this.instructions.get(function.getSectionName()).get(pc + 8);

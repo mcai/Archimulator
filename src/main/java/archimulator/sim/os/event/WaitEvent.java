@@ -22,56 +22,53 @@ import archimulator.sim.isa.ArchitecturalRegisterFile;
 import archimulator.sim.os.Context;
 
 /**
+ * Wait event.
  *
  * @author Min Cai
  */
 public class WaitEvent extends SystemEvent {
-    private WaitProcessIdCriterion waitProcessIdCriterion;
+    private WaitForProcessIdCriterion waitForProcessIdCriterion;
     private SignalCriterion signalCriterion;
 
     /**
+     * Create a wait event.
      *
-     * @param context
-     * @param pid
+     * @param context the context
+     * @param pid the process ID
      */
     public WaitEvent(Context context, int pid) {
         super(context, SystemEventType.WAIT);
 
-        this.waitProcessIdCriterion = new WaitProcessIdCriterion(context, pid);
+        this.waitForProcessIdCriterion = new WaitForProcessIdCriterion(context, pid);
         this.signalCriterion = new SignalCriterion();
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public boolean needProcess() {
-        return this.waitProcessIdCriterion.needProcess(this.getContext()) || this.signalCriterion.needProcess(this.getContext());
+        return this.waitForProcessIdCriterion.needProcess(this.getContext()) || this.signalCriterion.needProcess(this.getContext());
     }
 
-    /**
-     *
-     */
     @Override
     public void process() {
         this.getContext().resume();
 
-        this.getContext().getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_V0, this.waitProcessIdCriterion.getProcessId());
+        this.getContext().getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_V0, this.waitForProcessIdCriterion.getProcessId());
         this.getContext().getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_A3, 0);
     }
 
     /**
+     * Get the wait for process ID criterion.
      *
-     * @return
+     * @return the wait for process ID criterion
      */
-    public WaitProcessIdCriterion getWaitProcessIdCriterion() {
-        return waitProcessIdCriterion;
+    public WaitForProcessIdCriterion getWaitForProcessIdCriterion() {
+        return waitForProcessIdCriterion;
     }
 
     /**
+     * Get the signal criterion.
      *
-     * @return
+     * @return the signal criterion
      */
     public SignalCriterion getSignalCriterion() {
         return signalCriterion;

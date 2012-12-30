@@ -105,7 +105,7 @@ public class Function implements Comparable<Function> {
     }
 
     public int compareTo(Function o) {
-        return new Long(this.symbol.st_value).compareTo(o.symbol.st_value);
+        return new Long(this.symbol.getValue()).compareTo(o.symbol.getValue());
     }
 
     @Override

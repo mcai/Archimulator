@@ -23,19 +23,21 @@ import archimulator.sim.os.ContextKilledEvent;
 import net.pickapack.action.Action1;
 
 /**
+ * Wait for process ID criterion.
  *
  * @author Min Cai
  */
-public class WaitProcessIdCriterion implements SystemEventCriterion {
+public class WaitForProcessIdCriterion implements SystemEventCriterion {
     private int processId;
     private boolean hasProcessIdKilled;
 
     /**
+     * Create a wait for process ID criterion.
      *
-     * @param context
-     * @param processId
+     * @param context the context
+     * @param processId the process ID
      */
-    public WaitProcessIdCriterion(Context context, int processId) {
+    public WaitForProcessIdCriterion(Context context, int processId) {
         this.processId = processId;
 
         this.hasProcessIdKilled = false;
@@ -49,18 +51,14 @@ public class WaitProcessIdCriterion implements SystemEventCriterion {
         }
     }
 
-    /**
-     *
-     * @param context
-     * @return
-     */
     public boolean needProcess(Context context) {
         return ((this.getProcessId() == -1) && this.hasProcessIdKilled) || ((this.getProcessId() > 0) && (context.getKernel().getContextFromProcessId(this.processId) == null));
     }
 
     /**
+     * Get the process ID.
      *
-     * @return
+     * @return the process ID
      */
     public int getProcessId() {
         return processId;

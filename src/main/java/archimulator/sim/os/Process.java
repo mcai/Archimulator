@@ -74,10 +74,11 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
     private ContextMapping contextMapping;
 
     /**
+     * Create a process.
      *
-     * @param kernel
-     * @param simulationDirectory
-     * @param contextMapping
+     * @param kernel the kernel
+     * @param simulationDirectory the simulation directory
+     * @param contextMapping the context mapping
      */
     public Process(Kernel kernel, String simulationDirectory, ContextMapping contextMapping) {
         super(kernel);
@@ -129,17 +130,19 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
     }
 
     /**
+     * Load the program.
      *
-     * @param kernel
-     * @param simulationDirectory
-     * @param contextMapping
+     * @param kernel the kernel
+     * @param simulationDirectory the simulation directory
+     * @param contextMapping the context mapping
      */
     protected abstract void loadProgram(Kernel kernel, String simulationDirectory, ContextMapping contextMapping);
 
     /**
+     * Translate the specified file descriptor number.
      *
-     * @param fileDescriptor
-     * @return
+     * @param fileDescriptor the file descriptor number
+     * @return the translated file descriptor number
      */
     public int translateFileDescriptor(int fileDescriptor) {
         if (fileDescriptor == 1 || fileDescriptor == 2) {
@@ -152,7 +155,7 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
     }
 
     /**
-     *
+     * Close the program.
      */
     public void closeProgram() {
         if (this.standardInFileDescriptor != 0) {
@@ -164,9 +167,10 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
     }
 
     /**
+     * Decode the specified machine instruction.
      *
-     * @param machineInstruction
-     * @return
+     * @param machineInstruction the machine instruction
+     * @return the decoded static instruction
      */
     protected StaticInstruction decode(int machineInstruction) {
         for (Mnemonic mnemonic : StaticInstruction.MNEMONICS) {
@@ -180,216 +184,256 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
     }
 
     /**
+     * Get the static instruction at the specified program counter (PC).
      *
-     * @param pc
-     * @return
+     * @param pc the program counter (PC)
+     * @return the static instruction at the specified program counter (PC)
      */
     public abstract StaticInstruction getStaticInstruction(int pc);
 
     /**
+     * Get the ID of the process.
      *
-     * @return
+     * @return the ID of the process
      */
     public int getId() {
         return id;
     }
 
     /**
+     * Get the standard in file descriptor.
      *
-     * @return
+     * @return the standard in file descriptor
      */
     public int getStandardInFileDescriptor() {
         return standardInFileDescriptor;
     }
 
     /**
+     * Get the standard out file descriptor.
      *
-     * @return
+     * @return the standard out file descriptor
      */
     public int getStandardOutFileDescriptor() {
         return standardOutFileDescriptor;
     }
 
     /**
+     * Get the list of environment variables.
      *
-     * @return
+     * @return the list of environment variables
      */
     public List<String> getEnvironments() {
         return environments;
     }
 
     /**
+     * Get the stack base.
      *
-     * @return
+     * @return the stack base
      */
     public int getStackBase() {
         return stackBase;
     }
 
     /**
+     * Set the stack base.
      *
-     * @param stackBase
+     * @param stackBase the stack base
      */
     public void setStackBase(int stackBase) {
         this.stackBase = stackBase;
     }
 
     /**
+     * Get the stack size.
      *
-     * @return
+     * @return the stack size
      */
     public int getStackSize() {
         return stackSize;
     }
 
     /**
+     * Set the stack size.
      *
-     * @param stackSize
+     * @param stackSize the stack size
      */
     public void setStackSize(int stackSize) {
         this.stackSize = stackSize;
     }
 
     /**
+     * Get the text size.
      *
-     * @return
+     * @return the text size
      */
     public int getTextSize() {
         return textSize;
     }
 
     /**
+     * Set the text size.
      *
-     * @param textSize
+     * @param textSize the text size
      */
     public void setTextSize(int textSize) {
         this.textSize = textSize;
     }
 
     /**
+     * Get the environment base.
      *
-     * @return
+     * @return the environment base
      */
     public int getEnvironmentBase() {
         return environmentBase;
     }
 
     /**
+     * Set the environment base.
      *
-     * @param environmentBase
+     * @param environmentBase the environment base
      */
     public void setEnvironmentBase(int environmentBase) {
         this.environmentBase = environmentBase;
     }
 
     /**
+     * Get the heap top.
      *
-     * @return
+     * @return the heap top
      */
     public int getHeapTop() {
         return heapTop;
     }
 
     /**
+     * Set the heap top.
      *
-     * @param heapTop
+     * @param heapTop the heap top
      */
     public void setHeapTop(int heapTop) {
         this.heapTop = heapTop;
     }
 
     /**
+     * Get the data top.
      *
-     * @return
+     * @return the data top
      */
     public int getDataTop() {
         return dataTop;
     }
 
     /**
+     * Set the data top.
      *
-     * @param dataTop
+     * @param dataTop the data top
      */
     public void setDataTop(int dataTop) {
         this.dataTop = dataTop;
     }
 
     /**
+     * Get the program entry.
      *
-     * @return
+     * @return the program entry
      */
     public int getProgramEntry() {
         return programEntry;
     }
 
     /**
+     * Set the program entry.
      *
-     * @param programEntry
+     * @param programEntry the program entry
      */
     public void setProgramEntry(int programEntry) {
         this.programEntry = programEntry;
     }
 
     /**
+     * Get a value indicating whether the process is little endian or not.
      *
-     * @return
+     * @return a value indicating whether the process is little endian or not
      */
     public boolean isLittleEndian() {
         return littleEndian;
     }
 
     /**
+     * Get the memory.
      *
-     * @return
+     * @return the memory
      */
     public Memory getMemory() {
         return memory;
     }
 
     /**
+     * Get the context mapping.
      *
-     * @return
+     * @return the context mapping
      */
     public ContextMapping getContextMapping() {
         return contextMapping;
     }
 
+    /**
+     * Get the name of the process.
+     *
+     * @return the name of the process
+     */
     @Override
     public String getName() {
         return "ctx" + getContextMapping().getThreadId() + "/process";
     }
 
     /**
-     *
+     * Text base.
      */
     public static final int TEXT_BASE = 0x00400000;
+
     /**
-     *
+     * Data base.
      */
     public static final int DATA_BASE = 0x10000000;
+
     /**
-     *
+     * Stack base.
      */
     public static final int STACK_BASE = 0x7fffc000;
+
     /**
-     *
+     * Stack size.
      */
     public static final int STACK_SIZE = 1024 * 1024;
+
     /**
-     *
+     * Maximum environment.
      */
     public static final int MAX_ENVIRON = 16 * 1024;
 
     /**
+     * Round up.
      *
-     * @param n
-     * @param alignment
-     * @return
+     * @param n the number
+     * @param alignment th alignment
+     * @return the result
      */
     protected static int roundUp(int n, int alignment) {
         return (n + alignment - 1) & ~(alignment - 1);
     }
 
+    /**
+     * Build the benchmark.
+     *
+     * @param workingDirectory the working directory
+     * @param helperThreadEnabled a value indicating whether the helper threading is enabled or not
+     * @param helperThreadLookahead the helper thread lookahead
+     * @param helperThreadStride the helper thread stride
+     */
     private static void buildBenchmark(String workingDirectory, boolean helperThreadEnabled, int helperThreadLookahead, int helperThreadStride) {
         if (helperThreadEnabled) {
             pushMacroDefineArg(workingDirectory, "push_params.h", "LOOKAHEAD", helperThreadLookahead + "");
@@ -398,6 +442,14 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
         buildWithMakeFile(workingDirectory);
     }
 
+    /**
+     * Push the macro #define argument.
+     *
+     * @param workingDirectory the working directory
+     * @param fileName the file name
+     * @param key the key
+     * @param value the value
+     */
     private static void pushMacroDefineArg(String workingDirectory, String fileName, String key, String value) {
         fileName = getTransformedBenchmarkWorkingDirectory(workingDirectory) + "/" + fileName;
         System.err.printf("[%s] Pushing Macro Define Arg in %s: %s, %s\n", DateHelper.toString(new Date()), fileName, key, value);
@@ -407,6 +459,11 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
         }
     }
 
+    /**
+     * Build the benchmark using a Makefile.
+     *
+     * @param workingDirectory the working directory
+     */
     private static void buildWithMakeFile(String workingDirectory) {
         System.err.printf("[%s] Building with Makefile\n", DateHelper.toString(new Date()));
         List<String> result = CommandLineHelper.invokeShellCommandAndGetResult("sh -c 'cd " + getTransformedBenchmarkWorkingDirectory(workingDirectory) +
@@ -416,10 +473,21 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
         }
     }
 
+    /**
+     * Get the transformed benchmark's working directory with parameters filled in.
+     *
+     * @param workingDirectory the working directory
+     * @return the transformed benchmark's working directory with parameters filled in
+     */
     private static String getTransformedBenchmarkWorkingDirectory(String workingDirectory) {
         return workingDirectory.replaceAll(ServiceManager.USER_HOME_TEMPLATE_ARG, FileUtils.getUserDirectoryPath());
     }
 
+    /**
+     * Get the current directory.
+     *
+     * @return the current directory
+     */
     private static String getCurrentDirectory() {
         try {
             return new File(".").getCanonicalPath();
@@ -428,6 +496,11 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
         }
     }
 
+    /**
+     * Get the ELF file analyzer.
+     *
+     * @return the ELF file analyzer
+     */
     public abstract ElfAnalyzer getElfAnalyzer();
 
     /**

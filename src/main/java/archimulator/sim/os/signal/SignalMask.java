@@ -23,6 +23,7 @@ import archimulator.sim.os.Kernel;
 import net.pickapack.math.MathHelper;
 
 /**
+ * Signal mask.
  *
  * @author Min Cai
  */
@@ -30,7 +31,7 @@ public class SignalMask implements Cloneable {
     private int[] signals = new int[Kernel.MAX_SIGNAL / 32];
 
     /**
-     *
+     * Create a signal mask.
      */
     public SignalMask() {
     }
@@ -43,8 +44,9 @@ public class SignalMask implements Cloneable {
     }
 
     /**
+     * Set the specified signal.
      *
-     * @param signal
+     * @param signal the signal to be set
      */
     public void set(int signal) {
         if (signal < 1 || signal > Kernel.MAX_SIGNAL) {
@@ -57,8 +59,9 @@ public class SignalMask implements Cloneable {
     }
 
     /**
+     * Clear the specified signal.
      *
-     * @param signal
+     * @param signal the signal to be cleared
      */
     public void clear(int signal) {
         if (signal < 1 || signal > Kernel.MAX_SIGNAL) {
@@ -71,9 +74,10 @@ public class SignalMask implements Cloneable {
     }
 
     /**
+     * Get a value indicating whether the signal mask contains the specified signal or not.
      *
-     * @param signal
-     * @return
+     * @param signal the signal
+     * @return a value indicating whether the signal mask contains the specified signal or not
      */
     public boolean contains(int signal) {
         if (signal < 1 || signal > Kernel.MAX_SIGNAL) {
@@ -86,9 +90,10 @@ public class SignalMask implements Cloneable {
     }
 
     /**
+     * Load the signal mask from the specified address in the specified memory.
      *
-     * @param memory
-     * @param address
+     * @param memory the memory
+     * @param address the address
      */
     public void loadFrom(Memory memory, int address) {
         for (int i = 0; i < Kernel.MAX_SIGNAL / 32; i++) {
@@ -97,9 +102,10 @@ public class SignalMask implements Cloneable {
     }
 
     /**
+     * Store the signal mask to the specified address in the specified memory.
      *
-     * @param memory
-     * @param address
+     * @param memory the memory
+     * @param address the address
      */
     public void saveTo(Memory memory, int address) {
         for (int i = 0; i < Kernel.MAX_SIGNAL / 32; i++) {

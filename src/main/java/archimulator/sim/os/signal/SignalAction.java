@@ -21,6 +21,7 @@ package archimulator.sim.os.signal;
 import archimulator.sim.isa.Memory;
 
 /**
+ * Signal action.
  *
  * @author Min Cai
  */
@@ -31,16 +32,17 @@ public class SignalAction {
     private SignalMask mask;
 
     /**
-     *
+     * Create a signal action.
      */
     public SignalAction() {
         this.mask = new SignalMask();
     }
 
     /**
+     * Load the signal action from the specified address in the specified memory.
      *
-     * @param memory
-     * @param address
+     * @param memory the memory
+     * @param address the address
      */
     public void loadFrom(Memory memory, int address) {
         this.flags = memory.readWord(address);
@@ -51,9 +53,10 @@ public class SignalAction {
     }
 
     /**
+     * Save the signal action to the specified address in the specified memory.
      *
-     * @param memory
-     * @param address
+     * @param memory the memory
+     * @param address the address
      */
     public void saveTo(Memory memory, int address) {
         memory.writeWord(address, this.flags);
@@ -64,32 +67,36 @@ public class SignalAction {
     }
 
     /**
+     * Get the flags.
      *
-     * @return
+     * @return the flags
      */
     public int getFlags() {
         return flags;
     }
 
     /**
+     * Get the address of the handler procedure.
      *
-     * @return
+     * @return the address of the handler procedure
      */
     public int getHandler() {
         return handler;
     }
 
     /**
+     * Get the address of the restorer procedure.
      *
-     * @return
+     * @return the address of the restore procedure
      */
     public int getRestorer() {
         return restorer;
     }
 
     /**
+     * Get the mask.
      *
-     * @return
+     * @return the mask
      */
     public SignalMask getMask() {
         return mask;

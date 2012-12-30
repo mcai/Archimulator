@@ -22,32 +22,30 @@ import archimulator.sim.os.Context;
 import archimulator.sim.os.NativeSystemCalls;
 
 /**
+ * Time criterion.
  *
  * @author Min Cai
  */
 public class TimeCriterion implements SystemEventCriterion {
     private long when;
 
-    /**
-     *
-     * @param context
-     * @return
-     */
     public boolean needProcess(Context context) {
         return this.getWhen() <= NativeSystemCalls.clock(context.getKernel().getCurrentCycle());
     }
 
     /**
+     * Get the time when the criterion is time out.
      *
-     * @return
+     * @return the time when the criterion is time out
      */
     public long getWhen() {
         return when;
     }
 
     /**
+     * Set the time when the criterion is time out.
      *
-     * @param when
+     * @param when the time when the criterion is time out
      */
     public void setWhen(long when) {
         this.when = when;

@@ -21,6 +21,7 @@ package archimulator.sim.os.event;
 import archimulator.sim.os.Context;
 
 /**
+ * System event.
  *
  * @author Min Cai
  */
@@ -29,9 +30,10 @@ public abstract class SystemEvent {
     private SystemEventType type;
 
     /**
+     * Create a system event of the specified type for the specified context.
      *
-     * @param context
-     * @param type
+     * @param context the context
+     * @param type the type
      */
     public SystemEvent(Context context, SystemEventType type) {
         this.context = context;
@@ -39,27 +41,30 @@ public abstract class SystemEvent {
     }
 
     /**
+     * Get a value indicating whether the event need be processed immediately or not.
      *
-     * @return
+     * @return a value indicating whether the event need be processed immediately or not
      */
     public abstract boolean needProcess();
 
     /**
-     *
+     * Process the event.
      */
     public abstract void process();
 
     /**
+     * Get the context.
      *
-     * @return
+     * @return the context
      */
     public Context getContext() {
         return context;
     }
 
     /**
+     * Get the event type.
      *
-     * @return
+     * @return the event type
      */
     public SystemEventType getType() {
         return type;

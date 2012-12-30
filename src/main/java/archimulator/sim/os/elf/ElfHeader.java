@@ -21,153 +21,180 @@ package archimulator.sim.os.elf;
 import java.io.IOException;
 
 /**
+ * ELF header.
  *
  * @author Min Cai
  */
 public class ElfHeader {
     /**
-     *
+     * Indicating this is a MIPS ELF header.
      */
     public static final short EM_MIPS = 8;
 
-    private int e_type;
-    private int e_machine;
-    private long e_version;
-    private long e_entry;
-    private long e_phoff;
-    private long e_shoff;
-    private long e_flags;
-    private int e_ehsize;
-    private int e_phentsize;
-    private int e_phnum;
-    private int e_shentsize;
-    private int e_shnum;
-    private int e_shstrndx;
+    private int type;
+
+    private int machine;
+
+    private long version;
+
+    private long entry;
+
+    private long programHeaderTableOffset;
+
+    private long sectionHeaderTableOffset;
+
+    private long flags;
+
+    private int elfHeaderSize;
+
+    private int programHeaderTableEntrySize;
+
+    private int programHeaderTableEntryCount;
+
+    private int sectionHeaderTableEntrySize;
+
+    private int sectionHeaderTableEntryCount;
+
+    private int sectionHeaderStringTableIndex;
 
     /**
+     * Create an ELF header.
      *
-     * @param elfFile
+     * @param elfFile the ELF file
      * @throws IOException
      */
     public ElfHeader(ElfFile elfFile) throws IOException {
-        this.e_type = elfFile.readUnsignedHalfWord();
+        this.type = elfFile.readUnsignedHalfWord();
 
-        this.e_machine = elfFile.readUnsignedHalfWord();
-        this.e_version = elfFile.readUnsignedWord();
-        this.e_entry = elfFile.readUnsignedWord();
-        this.e_phoff = elfFile.readUnsignedWord();
-        this.e_shoff = elfFile.readUnsignedWord();
-        this.e_flags = elfFile.readUnsignedWord();
+        this.machine = elfFile.readUnsignedHalfWord();
+        this.version = elfFile.readUnsignedWord();
+        this.entry = elfFile.readUnsignedWord();
+        this.programHeaderTableOffset = elfFile.readUnsignedWord();
+        this.sectionHeaderTableOffset = elfFile.readUnsignedWord();
+        this.flags = elfFile.readUnsignedWord();
 
-        this.e_ehsize = elfFile.readUnsignedHalfWord();
-        this.e_phentsize = elfFile.readUnsignedHalfWord();
-        this.e_phnum = elfFile.readUnsignedHalfWord();
-        this.e_shentsize = elfFile.readUnsignedHalfWord();
-        this.e_shnum = elfFile.readUnsignedHalfWord();
-        this.e_shstrndx = elfFile.readUnsignedHalfWord();
+        this.elfHeaderSize = elfFile.readUnsignedHalfWord();
+        this.programHeaderTableEntrySize = elfFile.readUnsignedHalfWord();
+        this.programHeaderTableEntryCount = elfFile.readUnsignedHalfWord();
+        this.sectionHeaderTableEntrySize = elfFile.readUnsignedHalfWord();
+        this.sectionHeaderTableEntryCount = elfFile.readUnsignedHalfWord();
+        this.sectionHeaderStringTableIndex = elfFile.readUnsignedHalfWord();
     }
 
     /**
+     * Get the object file type.
      *
-     * @return
+     * @return the object file type
      */
-    public int getE_type() {
-        return e_type;
+    public int getType() {
+        return type;
     }
 
     /**
+     * Get the machine architecture.
      *
-     * @return
+     * @return the machine architecture
      */
-    public int getE_machine() {
-        return e_machine;
+    public int getMachine() {
+        return machine;
     }
 
     /**
+     * Get the object file version.
      *
-     * @return
+     * @return the object file version
      */
-    public long getE_version() {
-        return e_version;
+    public long getVersion() {
+        return version;
     }
 
     /**
+     * Get the entry point virtual address.
      *
-     * @return
+     * @return the entry point virtual address
      */
-    public long getE_entry() {
-        return e_entry;
+    public long getEntry() {
+        return entry;
     }
 
     /**
+     * Get the program header table offset.
      *
-     * @return
+     * @return the program header table offset
      */
-    public long getE_phoff() {
-        return e_phoff;
+    public long getProgramHeaderTableOffset() {
+        return programHeaderTableOffset;
     }
 
     /**
+     * Get the section header table offset.
      *
-     * @return
+     * @return the section header table offset
      */
-    public long getE_shoff() {
-        return e_shoff;
+    public long getSectionHeaderTableOffset() {
+        return sectionHeaderTableOffset;
     }
 
     /**
+     * Get the processor-specific flags.
      *
-     * @return
+     * @return the processor-specific flags
      */
-    public long getE_flags() {
-        return e_flags;
+    public long getFlags() {
+        return flags;
     }
 
     /**
+     * Get the ELF header size in bytes.
      *
-     * @return
+     * @return the ELF header size in bytes
      */
-    public int getE_ehsize() {
-        return e_ehsize;
+    public int getElfHeaderSize() {
+        return elfHeaderSize;
     }
 
     /**
+     * Get the program header table entry size.
      *
-     * @return
+     * @return the program header table entry size
      */
-    public int getE_phentsize() {
-        return e_phentsize;
+    public int getProgramHeaderTableEntrySize() {
+        return programHeaderTableEntrySize;
     }
 
     /**
+     * Get the program header table entry count.
      *
-     * @return
+     * @return the program header table entry count
      */
-    public int getE_phnum() {
-        return e_phnum;
+    public int getProgramHeaderTableEntryCount() {
+        return programHeaderTableEntryCount;
     }
 
     /**
+     * Get the section header table entry size.
      *
-     * @return
+     * @return the section header table entry size
      */
-    public int getE_shentsize() {
-        return e_shentsize;
+    public int getSectionHeaderTableEntrySize() {
+        return sectionHeaderTableEntrySize;
     }
 
     /**
+     * Get the section header table entry count.
      *
-     * @return
+     * @return the section header table entry count
      */
-    public int getE_shnum() {
-        return e_shnum;
+    public int getSectionHeaderTableEntryCount() {
+        return sectionHeaderTableEntryCount;
     }
 
     /**
+     * Get the section header string table index.
      *
-     * @return
+     * @return the section header string table index
      */
-    public int getE_shstrndx() {
-        return e_shstrndx;
+    public int getSectionHeaderStringTableIndex() {
+        return sectionHeaderStringTableIndex;
     }
 }

@@ -23,6 +23,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /**
+ * Utsname.
  *
  * @author Min Cai
  */
@@ -31,34 +32,40 @@ public class Utsname {
     private static final int SIZE_OF = _SYSNAME_SIZE * 6;
 
     /**
-     *
+     * sysname.
      */
     public String sysname;
+
     /**
-     *
+     * nodename.
      */
     public String nodename;
+
     /**
-     *
+     * release.
      */
     public String release;
+
     /**
-     *
+     * version.
      */
     public String version;
+
     /**
-     *
+     * machine.
      */
     public String machine;
+
     /**
-     *
+     * domainname.
      */
     public String domainname;
 
     /**
+     * Get the bytes array representation of the utsname.
      *
-     * @param littleEndian
-     * @return
+     * @param littleEndian whether it is little endian or not
+     * @return the byte array representation of the utsname
      */
     public byte[] getBytes(boolean littleEndian) {
         try {
