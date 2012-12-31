@@ -19,32 +19,38 @@
 package archimulator.sim.core.bpred;
 
 /**
+ * Branch predictor type.
  *
  * @author Min Cai
  */
 public enum BranchPredictorType {
     /**
-     *
+     * Perfect.
      */
     PERFECT,
+
     /**
-     *
+     * Always taken.
      */
     TAKEN,
+
     /**
-     *
+     * Always not taken.
      */
     NOT_TAKEN,
+
     /**
-     *
+     * Two bit.
      */
     TWO_BIT,
+
     /**
-     *
+     * Two level.
      */
     TWO_LEVEL,
+
     /**
-     *
+     * Combined.
      */
     COMBINED
 }

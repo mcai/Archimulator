@@ -23,37 +23,26 @@ import archimulator.sim.isa.Mnemonic;
 import net.pickapack.Reference;
 
 /**
+ * The "always taken" branch predictor.
  *
  * @author Min Cai
  */
 public class TakenBranchPredictor extends BranchPredictor {
     /**
+     * Create an "always taken" branch predictor.
      *
-     * @param thread
-     * @param name
+     * @param thread the thread
+     * @param name the name of the branch predictor
      */
     public TakenBranchPredictor(Thread thread, String name) {
         super(thread, name, BranchPredictorType.TAKEN);
     }
 
-    /**
-     *
-     * @param branchAddress
-     * @param branchTarget
-     * @param mnemonic
-     * @param branchPredictorUpdate
-     * @param returnAddressStackRecoverIndex
-     * @return
-     */
     @Override
     public int predict(int branchAddress, int branchTarget, Mnemonic mnemonic, BranchPredictorUpdate branchPredictorUpdate, Reference<Integer> returnAddressStackRecoverIndex) {
         return branchTarget;
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public boolean isDynamic() {
         return false;

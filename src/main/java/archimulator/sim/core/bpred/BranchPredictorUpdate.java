@@ -21,6 +21,7 @@ package archimulator.sim.core.bpred;
 import net.pickapack.math.SaturatingCounter;
 
 /**
+ * Branch predictor update.
  *
  * @author Min Cai
  */
@@ -35,7 +36,7 @@ public class BranchPredictorUpdate {
     private boolean meta;
 
     /**
-     *
+     * Create a branch predictor update.
      */
     public BranchPredictorUpdate() {
     }

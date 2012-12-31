@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Branch target buffer.
  *
  * @author Min Cai
  */
@@ -29,9 +30,10 @@ public class BranchTargetBuffer {
     private List<List<BranchTargetBufferEntry>> entries;
 
     /**
+     * Create a branch target buffer.
      *
-     * @param numSets
-     * @param associativity
+     * @param numSets the number of sets
+     * @param associativity associativity
      */
     public BranchTargetBuffer(int numSets, int associativity) {
         this.entries = new ArrayList<List<BranchTargetBufferEntry>>();
@@ -48,16 +50,17 @@ public class BranchTargetBuffer {
     }
 
     /**
+     * Lookup the branch target buffer entry for the specified branch address.
      *
-     * @param branchAddress
-     * @return
+     * @param branchAddress the branch address
+     * @return the branch target buffer entry matching the specified branch address
      */
     public BranchTargetBufferEntry lookup(int branchAddress) {
         int set = this.getSet(branchAddress);
 
-        for (BranchTargetBufferEntry btbEntry : this.entries.get(set)) {
-            if (btbEntry.getSource() == branchAddress) {
-                return btbEntry;
+        for (BranchTargetBufferEntry branchTargetBufferEntry : this.entries.get(set)) {
+            if (branchTargetBufferEntry.getSource() == branchAddress) {
+                return branchTargetBufferEntry;
             }
         }
 
@@ -65,11 +68,12 @@ public class BranchTargetBuffer {
     }
 
     /**
+     * Update.
      *
-     * @param branchAddress
-     * @param branchTarget
-     * @param taken
-     * @return
+     * @param branchAddress the branch address
+     * @param branchTarget the branch target
+     * @param taken a value indicating whether the branch is taken or not
+     * @return the branch target buffer entry matching the specified branch address
      */
     public BranchTargetBufferEntry update(int branchAddress, int branchTarget, boolean taken) {
         if (!taken) {
@@ -104,6 +108,12 @@ public class BranchTargetBuffer {
         return entryFound;
     }
 
+    /**
+     * Get the set index for the specified branch address
+     *
+     * @param branchAddress the branch address
+     * @return the set index for the specified branch address
+     */
     private int getSet(int branchAddress) {
         return (branchAddress >> BranchPredictor.BRANCH_SHIFT) & (this.entries.size() - 1);
     }

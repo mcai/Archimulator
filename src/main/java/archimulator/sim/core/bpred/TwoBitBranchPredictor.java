@@ -25,6 +25,7 @@ import net.pickapack.Reference;
 import net.pickapack.math.SaturatingCounter;
 
 /**
+ * Two bit branch predictor.
  *
  * @author Min Cai
  */

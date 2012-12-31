@@ -21,6 +21,7 @@ package archimulator.sim.core.bpred;
 import archimulator.sim.core.Thread;
 
 /**
+ * Dynamic branch predictor.
  *
  * @author Min Cai
  */
@@ -29,13 +30,14 @@ public abstract class DynamicBranchPredictor extends BranchPredictor {
     private ReturnAddressStack returnAddressStack;
 
     /**
+     * Create a dynamic branch predictor.
      *
-     * @param thread
-     * @param name
-     * @param type
-     * @param branchTargetBufferNumSets
-     * @param branchTargetBufferAssociativity
-     * @param returnAddressStackSize
+     * @param thread the thread
+     * @param name the name of the dynamic branch predictor
+     * @param type the type of the dynamic branch predictor
+     * @param branchTargetBufferNumSets the number of sets in the branch target buffer
+     * @param branchTargetBufferAssociativity the associativity in the branch target buffer
+     * @param returnAddressStackSize the return address stack size
      */
     public DynamicBranchPredictor(Thread thread, String name, BranchPredictorType type, int branchTargetBufferNumSets, int branchTargetBufferAssociativity, int returnAddressStackSize) {
         super(thread, name, type);
@@ -44,26 +46,24 @@ public abstract class DynamicBranchPredictor extends BranchPredictor {
         this.returnAddressStack = new ReturnAddressStack(returnAddressStackSize);
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public boolean isDynamic() {
         return true;
     }
 
     /**
+     * Get the branch target buffer.
      *
-     * @return
+     * @return the branch target buffer
      */
     public BranchTargetBuffer getBranchTargetBuffer() {
         return branchTargetBuffer;
     }
 
     /**
+     * Get the return address stack.
      *
-     * @return
+     * @return the return address stack
      */
     public ReturnAddressStack getReturnAddressStack() {
         return returnAddressStack;

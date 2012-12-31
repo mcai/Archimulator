@@ -23,6 +23,7 @@ import archimulator.sim.isa.Mnemonic;
 import net.pickapack.Reference;
 
 /**
+ * Branch predictor.
  *
  * @author Min Cai
  */
@@ -31,21 +32,23 @@ public abstract class BranchPredictor {
     private BranchPredictorType type;
 
     /**
-     *
+     * The number of hits.
      */
     protected long numHits;
+
     /**
-     *
+     * The number of misses.
      */
     protected long numMisses;
 
     private Thread thread;
 
     /**
+     * Create a branch predictor.
      *
-     * @param thread
-     * @param name
-     * @param type
+     * @param thread the thread
+     * @param name the name of the branch predictor
+     * @param type the type of the branch predictor
      */
     public BranchPredictor(Thread thread, String name, BranchPredictorType type) {
         this.thread = thread;
@@ -54,25 +57,27 @@ public abstract class BranchPredictor {
     }
 
     /**
+     * Predict.
      *
-     * @param branchAddress
-     * @param branchTarget
-     * @param mnemonic
-     * @param dirUpdate
-     * @param returnAddressStackRecoverIndex
-     * @return
+     * @param branchAddress the branch address
+     * @param branchTarget the branch target
+     * @param mnemonic the mnemonic
+     * @param branchPredictorUpdate the branch predictor update
+     * @param returnAddressStackRecoverIndex the return address stack recover index
+     * @return the predicted target address
      */
-    public abstract int predict(int branchAddress, int branchTarget, Mnemonic mnemonic, BranchPredictorUpdate dirUpdate, Reference<Integer> returnAddressStackRecoverIndex);
+    public abstract int predict(int branchAddress, int branchTarget, Mnemonic mnemonic, BranchPredictorUpdate branchPredictorUpdate, Reference<Integer> returnAddressStackRecoverIndex);
 
     /**
+     * Update.
      *
-     * @param branchAddress
-     * @param branchTarget
-     * @param taken
-     * @param predictedTaken
-     * @param correct
-     * @param mnemonic
-     * @param branchPredictorUpdate
+     * @param branchAddress the branch address
+     * @param branchTarget the branch target
+     * @param taken a value indicating whether the branch is taken or not
+     * @param predictedTaken a value indicating whether the branch is predicted as taken or not
+     * @param correct a value indicating whether the prediction is correct or not
+     * @param mnemonic the mnemonic
+     * @param branchPredictorUpdate the branch predictor update
      */
     public void update(int branchAddress, int branchTarget, boolean taken, boolean predictedTaken, boolean correct, Mnemonic mnemonic, BranchPredictorUpdate branchPredictorUpdate) {
         if (correct) {
@@ -83,69 +88,77 @@ public abstract class BranchPredictor {
     }
 
     /**
+     * Get a value indicating whether the branch predictor is dynamic or not.
      *
-     * @return
+     * @return a value indicating whether the branch predictor is dynamic or not
      */
     public abstract boolean isDynamic();
 
     /**
+     * Get the name of the branch predictor.
      *
-     * @return
+     * @return the name of the branch predictor
      */
     public String getName() {
         return name;
     }
 
     /**
+     * Get the type of the branch predictor.
      *
-     * @return
+     * @return the type of the branch predictor
      */
     public BranchPredictorType getType() {
         return type;
     }
 
     /**
+     * Get the number of accesses.
      *
-     * @return
+     * @return the number of accesses
      */
     public long getNumAccesses() {
         return numHits + numMisses;
     }
 
     /**
+     * Get the number of hits.
      *
-     * @return
+     * @return the number of hits
      */
     public long getNumHits() {
         return numHits;
     }
 
     /**
+     * Get the number of misses.
      *
-     * @return
+     * @return the number of misses
      */
     public long getNumMisses() {
         return numMisses;
     }
 
     /**
+     * Get the hit ratio.
      *
-     * @return
+     * @return the hit ratio
      */
     public double getHitRatio() {
         return this.getNumAccesses() > 0 ? (double) this.numHits / this.getNumAccesses() : 0.0;
     }
 
     /**
+     * Get the thread.
      *
-     * @return
+     * @return the thread
      */
     public Thread getThread() {
         return thread;
     }
 
     /**
-     *
+     * Branch shift.
      */
     public static final int BRANCH_SHIFT = 2;
 }

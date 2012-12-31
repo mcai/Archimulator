@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Return address stack.
  *
  * @author Min Cai
  */
@@ -31,8 +32,9 @@ public class ReturnAddressStack {
     private List<BranchTargetBufferEntry> entries;
 
     /**
+     * Create a return address stack.
      *
-     * @param size
+     * @param size the size of the return address stack
      */
     public ReturnAddressStack(int size) {
         this.size = size;
@@ -46,16 +48,18 @@ public class ReturnAddressStack {
     }
 
     /**
+     * Recover.
      *
-     * @param returnAddressStackRecoverIndex
+     * @param returnAddressStackRecoverIndex the return address stack recover index
      */
     public void recover(int returnAddressStackRecoverIndex) {
         this.topOfStack = returnAddressStackRecoverIndex;
     }
 
     /**
+     * Push.
      *
-     * @param branchAddress
+     * @param branchAddress the branch address
      */
     public void push(int branchAddress) {
         this.topOfStack = (this.topOfStack + 1) % this.size;
@@ -63,8 +67,9 @@ public class ReturnAddressStack {
     }
 
     /**
+     * Pop.
      *
-     * @return
+     * @return the branch target address at the top of the stack
      */
     public int pop() {
         int target = this.entries.get(this.topOfStack).getTarget();
@@ -73,16 +78,18 @@ public class ReturnAddressStack {
     }
 
     /**
+     * Get the size of the return address stack.
      *
-     * @return
+     * @return the size of the return address stack
      */
     public int getSize() {
         return size;
     }
 
     /**
+     * Get the top of the stack.
      *
-     * @return
+     * @return the top of the stack
      */
     public int getTopOfStack() {
         return this.size > 0 ? this.topOfStack : 0;

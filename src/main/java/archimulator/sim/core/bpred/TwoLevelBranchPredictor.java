@@ -25,6 +25,7 @@ import net.pickapack.Reference;
 import net.pickapack.math.SaturatingCounter;
 
 /**
+ * Two level branch predictor.
  *
  * @author Min Cai
  */
@@ -75,15 +76,6 @@ public class TwoLevelBranchPredictor extends DynamicBranchPredictor {
         this(thread, name, thread.getExperiment().getArchitecture().getTwoLevelBranchPredictorL1Size(), thread.getExperiment().getArchitecture().getTwoLevelBranchPredictorL2Size(), thread.getExperiment().getArchitecture().getTwoLevelBranchPredictorShiftWidth(), thread.getExperiment().getArchitecture().getTwoLevelBranchPredictorXor(), thread.getExperiment().getArchitecture().getTwoLevelBranchPredictorBranchTargetBufferNumSets(), thread.getExperiment().getArchitecture().getTwoLevelBranchPredictorBranchTargetBufferAssociativity(), thread.getExperiment().getArchitecture().getTwoLevelBranchPredictorReturnAddressStackSize());
     }
 
-    /**
-     *
-     * @param branchAddress
-     * @param branchTarget
-     * @param mnemonic
-     * @param branchPredictorUpdate
-     * @param returnAddressStackRecoverIndex
-     * @return
-     */
     @Override
     public int predict(int branchAddress, int branchTarget, Mnemonic mnemonic, BranchPredictorUpdate branchPredictorUpdate, Reference<Integer> returnAddressStackRecoverIndex) {
         if (mnemonic.getType() == StaticInstructionType.CONDITIONAL) {
@@ -114,16 +106,6 @@ public class TwoLevelBranchPredictor extends DynamicBranchPredictor {
         return branchTargetBufferEntry != null ? branchTargetBufferEntry.getTarget() : 1;
     }
 
-    /**
-     *
-     * @param branchAddress
-     * @param branchTarget
-     * @param taken
-     * @param predictedTaken
-     * @param correct
-     * @param mnemonic
-     * @param branchPredictorUpdate
-     */
     @Override
     public void update(int branchAddress, int branchTarget, boolean taken, boolean predictedTaken, boolean correct, Mnemonic mnemonic, BranchPredictorUpdate branchPredictorUpdate) {
         super.update(branchAddress, branchTarget, taken, predictedTaken, correct, mnemonic, branchPredictorUpdate);
