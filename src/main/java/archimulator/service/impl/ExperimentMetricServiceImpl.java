@@ -110,8 +110,8 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.THREAD), "executedMnemonics"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.THREAD), "executedSystemCalls"));
 
-            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.CORE), "functionalUnitPool/noFreeFunctionalUnit"));
-            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.CORE), "functionalUnitPool/acquireFailedOnNoFreeFunctionalUnit"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.CORE), "functionalUnitPool/numStallsOnNoFreeFunctionalUnit"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.CORE), "functionalUnitPool/numStallsOnAcquireFailedOnNoFreeFunctionalUnit"));
 
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.TLB), "hitRatio"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.TLB), "numAccesses"));
