@@ -53,14 +53,14 @@ public class BenchmarkServiceImpl extends AbstractService implements BenchmarkSe
             this.addBenchmark(new Benchmark(
                     "mst_baseline", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/baseline",
                     "mst.mips",
-                    "4000"));
+                    "10000"));
         }
 
         if (this.getBenchmarkByTitle("mst_ht") == null) {
             this.addBenchmark(new Benchmark(
                     "mst_ht", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/ht",
                     "mst.mips",
-                    "4000", "", true));
+                    "10000", "", true));
         }
 
         if (this.getBenchmarkByTitle("em3d_baseline") == null) {
@@ -109,14 +109,14 @@ public class BenchmarkServiceImpl extends AbstractService implements BenchmarkSe
             this.addBenchmark(new Benchmark(
                     "mst_baseline_sim", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/baseline",
                     "mst.mips",
-                    "4000"));
+                    "10000"));
         }
 
         if (this.getBenchmarkByTitle("mst_ht_sim") == null) {
             this.addBenchmark(new Benchmark(
                     "mst_ht_sim", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/ht",
                     "mst.mips",
-                    "4000", "", true));
+                    "10000", "", true));
         }
 
         if (this.getBenchmarkByTitle("em3d_baseline_sim") == null) {
