@@ -23,6 +23,7 @@ import com.google.gson.reflect.TypeToken;
 import java.util.LinkedHashMap;
 
 /**
+ * The "LinkedHashMap of <String,String>" JSON serializable type.
  *
  * @author Min Cai
  */
@@ -30,7 +31,7 @@ public class StringStringLinkedHashMapJsonSerializableType extends JsonSerializa
     private static final StringStringLinkedHashMapJsonSerializableType singleTon = new StringStringLinkedHashMapJsonSerializableType();
 
     /**
-     *
+     * Create a "LinkedHashMap of <String,String>" JSON serializable type.
      */
     public StringStringLinkedHashMapJsonSerializableType() {
         super(new TypeToken<LinkedHashMap<String, String>>() {
@@ -38,8 +39,9 @@ public class StringStringLinkedHashMapJsonSerializableType extends JsonSerializa
     }
 
     /**
+     * Get the singleton.
      *
-     * @return
+     * @return the singleton
      */
     public static StringStringLinkedHashMapJsonSerializableType getSingleton() {
         return singleTon;

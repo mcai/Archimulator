@@ -30,6 +30,7 @@ import java.lang.reflect.Type;
 import java.sql.SQLException;
 
 /**
+ * JSON serializable type.
  *
  * @author Min Cai
  */
@@ -37,8 +38,9 @@ public abstract class JsonSerializableType extends BaseDataType {
     private Type clz;
 
 	/**
+     * Create a JSON serializable type.
      *
-     * @param type
+     * @param type the type
      */
     protected JsonSerializableType(Type type) {
 		super(SqlType.LONG_STRING, new Class<?>[0]);

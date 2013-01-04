@@ -24,6 +24,7 @@ import com.google.gson.reflect.TypeToken;
 import java.util.ArrayList;
 
 /**
+ * The "ArrayList of ExperimentPackVariable" JSON serializable type.
  *
  * @author Min Cai
  */
@@ -31,7 +32,7 @@ public class ExperimentPackVariableArrayListJsonSerializableType extends JsonSer
     private static final ExperimentPackVariableArrayListJsonSerializableType singleTon = new ExperimentPackVariableArrayListJsonSerializableType();
 
     /**
-     *
+     * Create an "ArrayList of ExperimentPackVariable" JSON serializable type.
      */
     public ExperimentPackVariableArrayListJsonSerializableType() {
         super(new TypeToken<ArrayList<ExperimentPackVariable>>() {
@@ -39,8 +40,9 @@ public class ExperimentPackVariableArrayListJsonSerializableType extends JsonSer
     }
 
     /**
+     * Get the singleton.
      *
-     * @return
+     * @return the singleton
      */
     public static ExperimentPackVariableArrayListJsonSerializableType getSingleton() {
         return singleTon;

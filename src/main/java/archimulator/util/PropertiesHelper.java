@@ -22,12 +22,16 @@ import java.io.IOException;
 import java.util.Properties;
 
 /**
+ * Properties helper.
  *
  * @author Min Cai
  */
 public class PropertiesHelper {
     private static Properties properties;
 
+    /**
+     * Static constructor.
+     */
     static {
         properties = new Properties();
         try {
@@ -38,16 +42,18 @@ public class PropertiesHelper {
     }
 
     /**
+     * Get the properties singleton.
      *
-     * @return
+     * @return the properties singleton
      */
     public static Properties getProperties() {
         return properties;
     }
 
     /**
+     * Get the project's version.
      *
-     * @return
+     * @return the project's version
      */
     public static String getVersion() {
         return getProperties().getProperty("project.version");

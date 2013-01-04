@@ -24,6 +24,7 @@ import com.google.gson.reflect.TypeToken;
 import java.util.ArrayList;
 
 /**
+ * The "ArrayList of ContextMapping" JSON serializable type.
  *
  * @author Min Cai
  */
@@ -31,7 +32,7 @@ public class ContextMappingArrayListJsonSerializableType extends JsonSerializabl
     private static final ContextMappingArrayListJsonSerializableType singleTon = new ContextMappingArrayListJsonSerializableType();
 
     /**
-     *
+     * Create an "ArrayList of ContextMapping" JSON serializable type.
      */
     public ContextMappingArrayListJsonSerializableType() {
         super(new TypeToken<ArrayList<ContextMapping>>() {
@@ -39,8 +40,9 @@ public class ContextMappingArrayListJsonSerializableType extends JsonSerializabl
     }
 
     /**
+     * Get the singleton.
      *
-     * @return
+     * @return the singleton
      */
     public static ContextMappingArrayListJsonSerializableType getSingleton() {
         return singleTon;

@@ -23,6 +23,7 @@ import com.google.gson.reflect.TypeToken;
 import java.util.ArrayList;
 
 /**
+ * The "ArrayList of String" JSON serializable type.
  *
  * @author Min Cai
  */
@@ -30,7 +31,7 @@ public class StringArrayListJsonSerializableType extends JsonSerializableType {
     private static final StringArrayListJsonSerializableType singleTon = new StringArrayListJsonSerializableType();
 
     /**
-     *
+     * Create an "ArrayList of String" JSON serializable type.
      */
     public StringArrayListJsonSerializableType() {
         super(new TypeToken<ArrayList<String>>() {
@@ -38,8 +39,9 @@ public class StringArrayListJsonSerializableType extends JsonSerializableType {
     }
 
     /**
+     * Get the singleton.
      *
-     * @return
+     * @return the singleton
      */
     public static StringArrayListJsonSerializableType getSingleton() {
         return singleTon;

@@ -23,6 +23,7 @@ import com.google.gson.reflect.TypeToken;
 import java.util.ArrayList;
 
 /**
+ * The "ArrayList of Long" JSON serializable type.
  *
  * @author Min Cai
  */
@@ -30,7 +31,7 @@ public class LongArrayListJsonSerializableType extends JsonSerializableType {
     private static final LongArrayListJsonSerializableType singleTon = new LongArrayListJsonSerializableType();
 
     /**
-     *
+     * Create an "ArrayList of Long" JSON serializable type.
      */
     public LongArrayListJsonSerializableType() {
         super(new TypeToken<ArrayList<Long>>() {
@@ -38,8 +39,9 @@ public class LongArrayListJsonSerializableType extends JsonSerializableType {
     }
 
     /**
+     * Get the singleton.
      *
-     * @return
+     * @return the singleton
      */
     public static LongArrayListJsonSerializableType getSingleton() {
         return singleTon;

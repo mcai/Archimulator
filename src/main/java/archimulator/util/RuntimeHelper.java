@@ -23,29 +23,33 @@ import net.pickapack.StorageUnit;
 import java.text.MessageFormat;
 
 /**
+ * Runtime helper.
  *
  * @author Min Cai
  */
 public class RuntimeHelper {
     /**
+     * Get the maximum memory.
      *
-     * @return max memory
+     * @return the maximum memory
      */
     public String getMaxMemory() {
         return MessageFormat.format("{0}", StorageUnit.toString(Runtime.getRuntime().maxMemory()));
     }
 
     /**
+     * Get the total memory.
      *
-     * @return total memory
+     * @return the total memory
      */
     public String getTotalMemory() {
         return MessageFormat.format("{0}", StorageUnit.toString(Runtime.getRuntime().totalMemory()));
     }
 
     /**
+     * Get the used memory.
      *
-     * @return used memory
+     * @return the used memory
      */
     public String getUsedMemory() {
         return MessageFormat.format("{0}", StorageUnit.toString(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()));
