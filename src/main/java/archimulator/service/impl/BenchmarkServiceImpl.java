@@ -160,6 +160,20 @@ public class BenchmarkServiceImpl extends AbstractService implements BenchmarkSe
                     "462.libquantum.mips",
                     "1397 8", "", true));
         }
+
+        if (this.getBenchmarkByTitle("mst_baseline_micro") == null) {
+            this.addBenchmark(new Benchmark(
+                    "mst_baseline_micro", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/baseline",
+                    "mst.mips",
+                    "1000"));
+        }
+
+        if (this.getBenchmarkByTitle("mst_ht_micro") == null) {
+            this.addBenchmark(new Benchmark(
+                    "mst_ht_micro", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/ht",
+                    "mst.mips",
+                    "1000", "", true));
+        }
     }
 
     @Override

@@ -28,7 +28,6 @@ public interface Predictor<PredictableT extends Comparable<PredictableT>> {
     /**
      * Predict the value for the specified address.
      *
-     *
      * @param address the address
      * @return the predicted value for the specified address
      */

@@ -43,9 +43,9 @@ public class HelperThreadIntervalAwareLRUPolicy<StateT extends Serializable> ext
 
     private HelperThreadL2CacheRequestPollution helperThreadL2CacheRequestPollution;
 
-    private IntervalStat totalHelperThreadL2CacheRequests;
-    private IntervalStat badHelperThreadL2CacheRequests;
-    private IntervalStat lateHelperThreadL2CacheRequests;
+    private IntervalStat numTotalHelperThreadL2CacheRequestsStat;
+    private IntervalStat numBadHelperThreadL2CacheRequestsStat;
+    private IntervalStat numLateHelperThreadL2CacheRequestsStat;
 
     public HelperThreadIntervalAwareLRUPolicy(EvictableCache<StateT> cache) {
         super(cache);
@@ -54,51 +54,51 @@ public class HelperThreadIntervalAwareLRUPolicy<StateT extends Serializable> ext
 
         this.helperThreadL2CacheRequestPollution = HelperThreadL2CacheRequestPollution.MEDIUM;
 
-        this.totalHelperThreadL2CacheRequests = new IntervalStat();
-        this.badHelperThreadL2CacheRequests = new IntervalStat();
-        this.lateHelperThreadL2CacheRequests = new IntervalStat();
+        this.numTotalHelperThreadL2CacheRequestsStat = new IntervalStat();
+        this.numBadHelperThreadL2CacheRequestsStat = new IntervalStat();
+        this.numLateHelperThreadL2CacheRequestsStat = new IntervalStat();
 
         cache.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.RedundantHitToTransientTagHelperThreadL2CacheRequestEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.RedundantHitToTransientTagHelperThreadL2CacheRequestEvent>() {
             @Override
             public void apply(HelperThreadL2CacheRequestProfilingHelper.RedundantHitToTransientTagHelperThreadL2CacheRequestEvent param) {
-                totalHelperThreadL2CacheRequests.inc();
+                numTotalHelperThreadL2CacheRequestsStat.inc();
             }
         });
 
         cache.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.RedundantHitToCacheHelperThreadL2CacheRequestEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.RedundantHitToCacheHelperThreadL2CacheRequestEvent>() {
             @Override
             public void apply(HelperThreadL2CacheRequestProfilingHelper.RedundantHitToCacheHelperThreadL2CacheRequestEvent param) {
-                totalHelperThreadL2CacheRequests.inc();
+                numTotalHelperThreadL2CacheRequestsStat.inc();
             }
         });
 
         cache.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.TimelyHelperThreadL2CacheRequestEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.TimelyHelperThreadL2CacheRequestEvent>() {
             @Override
             public void apply(HelperThreadL2CacheRequestProfilingHelper.TimelyHelperThreadL2CacheRequestEvent param) {
-                totalHelperThreadL2CacheRequests.inc();
+                numTotalHelperThreadL2CacheRequestsStat.inc();
             }
         });
 
         cache.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.LateHelperThreadL2CacheRequestEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.LateHelperThreadL2CacheRequestEvent>() {
             @Override
             public void apply(HelperThreadL2CacheRequestProfilingHelper.LateHelperThreadL2CacheRequestEvent param) {
-                lateHelperThreadL2CacheRequests.inc();
-                totalHelperThreadL2CacheRequests.inc();
+                numLateHelperThreadL2CacheRequestsStat.inc();
+                numTotalHelperThreadL2CacheRequestsStat.inc();
             }
         });
 
         cache.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.BadHelperThreadL2CacheRequestEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.BadHelperThreadL2CacheRequestEvent>() {
             @Override
             public void apply(HelperThreadL2CacheRequestProfilingHelper.BadHelperThreadL2CacheRequestEvent event) {
-                badHelperThreadL2CacheRequests.inc();
-                totalHelperThreadL2CacheRequests.inc();
+                numBadHelperThreadL2CacheRequestsStat.inc();
+                numTotalHelperThreadL2CacheRequestsStat.inc();
             }
         });
 
         cache.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.UglyHelperThreadL2CacheRequestEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.UglyHelperThreadL2CacheRequestEvent>() {
             @Override
             public void apply(HelperThreadL2CacheRequestProfilingHelper.UglyHelperThreadL2CacheRequestEvent param) {
-                totalHelperThreadL2CacheRequests.inc();
+                numTotalHelperThreadL2CacheRequestsStat.inc();
             }
         });
 
@@ -147,17 +147,17 @@ public class HelperThreadIntervalAwareLRUPolicy<StateT extends Serializable> ext
     private SummaryStatistics stat = new SummaryStatistics();
 
     private void newInterval() {
-        long numTotalHtRequests = this.totalHelperThreadL2CacheRequests.newInterval();
-        long numBadHtRequests = this.badHelperThreadL2CacheRequests.newInterval();
-        long numLateHtRequests = this.lateHelperThreadL2CacheRequests.newInterval();
+        long numTotalHelperThreadL2CacheRequests = this.numTotalHelperThreadL2CacheRequestsStat.newInterval();
+        long numBadHelperThreadL2CacheRequests = this.numBadHelperThreadL2CacheRequestsStat.newInterval();
+        long numLateHelperThreadL2CacheRequests = this.numLateHelperThreadL2CacheRequestsStat.newInterval();
 
-        double pollution = this.getHtRequestPollution(numBadHtRequests, numTotalHtRequests);
-        double lateness = this.getHtRequestLateness(numLateHtRequests, numTotalHtRequests);
+        double pollution = this.getHelperThreadRequestPollution(numBadHelperThreadL2CacheRequests, numTotalHelperThreadL2CacheRequests);
+        double lateness = this.getHelperThreadRequestLateness(numLateHelperThreadL2CacheRequests, numTotalHelperThreadL2CacheRequests);
 
 //        stat.addValue(pollution);
-//        stat.addValue(numTotalHtRequests);
-        stat.addValue(numBadHtRequests);
-//        stat.addValue(numLateHtRequests);
+//        stat.addValue(numTotalHelperThreadL2CacheRequests);
+        stat.addValue(numBadHelperThreadL2CacheRequests);
+//        stat.addValue(numLateHelperThreadL2CacheRequests);
 
         if (pollution > htRequestCachePollutionDegreeHighThreshold) {
             this.helperThreadL2CacheRequestPollution = HelperThreadL2CacheRequestPollution.HIGH;
@@ -168,12 +168,12 @@ public class HelperThreadIntervalAwareLRUPolicy<StateT extends Serializable> ext
         }
     }
 
-    private double getHtRequestPollution(long numBadHtRequests, long numTotalHtRequests) {
-        return (double) numBadHtRequests / numTotalHtRequests;
+    private double getHelperThreadRequestPollution(long numBadHelperThreadL2CacheRequests, long numTotalHelperThreadL2CacheRequests) {
+        return (double) numBadHelperThreadL2CacheRequests / numTotalHelperThreadL2CacheRequests;
     }
 
-    private double getHtRequestLateness(long numLateHtRequests, long numTotalHtRequests) {
-        return (double) numLateHtRequests / numTotalHtRequests;
+    private double getHelperThreadRequestLateness(long numLateHelperThreadL2CacheRequests, long numTotalHelperThreadL2CacheRequests) {
+        return (double) numLateHelperThreadL2CacheRequests / numTotalHelperThreadL2CacheRequests;
     }
 
     public int getEvictedL2CacheLinesPerInterval() {
@@ -184,16 +184,16 @@ public class HelperThreadIntervalAwareLRUPolicy<StateT extends Serializable> ext
         return intervals;
     }
 
-    public IntervalStat getTotalHelperThreadL2CacheRequests() {
-        return totalHelperThreadL2CacheRequests;
+    public IntervalStat getNumTotalHelperThreadL2CacheRequestsStat() {
+        return numTotalHelperThreadL2CacheRequestsStat;
     }
 
-    public IntervalStat getBadHelperThreadL2CacheRequests() {
-        return badHelperThreadL2CacheRequests;
+    public IntervalStat getNumBadHelperThreadL2CacheRequestsStat() {
+        return numBadHelperThreadL2CacheRequestsStat;
     }
 
-    public IntervalStat getLateHelperThreadL2CacheRequests() {
-        return lateHelperThreadL2CacheRequests;
+    public IntervalStat getNumLateHelperThreadL2CacheRequestsStat() {
+        return numLateHelperThreadL2CacheRequestsStat;
     }
 
     public SummaryStatistics getStat() {

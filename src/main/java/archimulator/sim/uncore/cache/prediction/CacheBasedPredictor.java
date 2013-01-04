@@ -119,11 +119,18 @@ public class CacheBasedPredictor<PredictableT extends Comparable<PredictableT>> 
         }
     }
 
+    /**
+     * Dump the state of the predictor.
+     */
     public void dumpState() {
+        System.out.printf("exp#%s: CacheBasedPredictor %s content:%n", cache.getExperiment().getId(), cache.getName());
+
         for(int i = 0; i < this.cache.getNumSets(); i++) {
             for (CacheLine<Boolean> line : this.cache.getLines(i)) {
-                BooleanValueProvider stateProvider = (BooleanValueProvider) line.getStateProvider();
-                System.out.printf("%s: %s\n", line, stateProvider);
+                if(line.isValid()) {
+                    BooleanValueProvider stateProvider = (BooleanValueProvider) line.getStateProvider();
+                    System.out.printf("%s: %s\n", line, stateProvider);
+                }
             }
         }
     }

@@ -20,8 +20,8 @@ package archimulator.sim.common;
 
 import archimulator.model.ContextMapping;
 import archimulator.model.Experiment;
-import archimulator.model.metric.gauge.ExperimentGauge;
 import archimulator.model.metric.ExperimentStat;
+import archimulator.model.metric.gauge.ExperimentGauge;
 import archimulator.service.ServiceManager;
 import archimulator.sim.core.BasicProcessor;
 import archimulator.sim.core.Core;
@@ -32,9 +32,11 @@ import archimulator.sim.os.Context;
 import archimulator.sim.os.Kernel;
 import archimulator.sim.uncore.BasicMemoryHierarchy;
 import archimulator.sim.uncore.MemoryHierarchy;
+import archimulator.sim.uncore.cache.prediction.CacheBasedPredictor;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import archimulator.sim.uncore.delinquentLoad.DelinquentLoadIdentificationHelper;
 import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestProfilingHelper;
+import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestQuality;
 import archimulator.sim.uncore.helperThread.hotspot.HotspotProfilingHelper;
 import archimulator.util.RuntimeHelper;
 import net.pickapack.Reference;
@@ -259,6 +261,12 @@ public abstract class Simulation implements SimulationObject {
 
         if (this.getType() == SimulationType.MEASUREMENT || this.getType() == SimulationType.CACHE_WARMUP) {
             getProcessor().getMemoryHierarchy().dumpCacheControllerFsmStats(stats);
+        }
+
+        if(endOfSimulation && this.getExperiment().getArchitecture().getHelperThreadL2CacheRequestProfilingEnabled() && (this.getType() == SimulationType.MEASUREMENT || this.getType() == SimulationType.CACHE_WARMUP)) {
+            CacheBasedPredictor<HelperThreadL2CacheRequestQuality> helperThreadL2CacheRequestQualityPredictor = (CacheBasedPredictor<HelperThreadL2CacheRequestQuality>) this.getHelperThreadL2CacheRequestProfilingHelper().getHelperThreadL2CacheRequestQualityPredictor();
+            helperThreadL2CacheRequestQualityPredictor.dumpState();
+
         }
 
         ServiceManager.getExperimentStatService().addStatsByParent(this.getExperiment(), stats);
