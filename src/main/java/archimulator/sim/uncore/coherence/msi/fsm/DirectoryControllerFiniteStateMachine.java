@@ -29,11 +29,11 @@ import archimulator.sim.uncore.coherence.msi.event.directory.*;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import archimulator.sim.uncore.coherence.msi.message.*;
 import archimulator.sim.uncore.coherence.msi.state.DirectoryControllerState;
-import net.pickapack.util.ValueProvider;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
 import net.pickapack.fsm.BasicFiniteStateMachine;
 import net.pickapack.fsm.event.ExitStateEvent;
+import net.pickapack.util.ValueProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,9 +63,9 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
     /**
      * Create a directory controller finite state machine.
      *
-     * @param name the name
-     * @param set the set index
-     * @param way the way
+     * @param name                the name
+     * @param set                 the set index
+     * @param way                 the way
      * @param directoryController the directory controller
      */
     public DirectoryControllerFiniteStateMachine(String name, int set, int way, final DirectoryController directoryController) {
@@ -89,9 +89,9 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
     /**
      * Act on a "GetS" event.
      *
-     * @param producerFlow the producer cache coherence flow
-     * @param requester the requester L1 cache controller
-     * @param tag the tag
+     * @param producerFlow      the producer cache coherence flow
+     * @param requester         the requester L1 cache controller
+     * @param tag               the tag
      * @param onStalledCallback the callback action performed when the event is stalled
      */
     public void onEventGetS(CacheCoherenceFlow producerFlow, CacheController requester, int tag, Action onStalledCallback) {
@@ -102,9 +102,9 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
     /**
      * Act on a "GetM" event.
      *
-     * @param producerFlow the producer cache coherence flow
-     * @param requester the requester L1 cache controller
-     * @param tag the tag
+     * @param producerFlow      the producer cache coherence flow
+     * @param requester         the requester L1 cache controller
+     * @param tag               the tag
      * @param onStalledCallback the callback action performed when the event is stalled
      */
     public void onEventGetM(CacheCoherenceFlow producerFlow, CacheController requester, int tag, Action onStalledCallback) {
@@ -115,12 +115,12 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
     /**
      * Act on a "replacement" event.
      *
-     * @param producerFlow the producer cache coherence flow
-     * @param requester the requester L1 cache controller
-     * @param tag the tag
-     * @param cacheAccess the cache access
+     * @param producerFlow        the producer cache coherence flow
+     * @param requester           the requester L1 cache controller
+     * @param tag                 the tag
+     * @param cacheAccess         the cache access
      * @param onCompletedCallback the callback action performed when the replacement is completed
-     * @param onStalledCallback the callback action performed when the replacement is stalled
+     * @param onStalledCallback   the callback action performed when the replacement is stalled
      */
     public void onEventReplacement(CacheCoherenceFlow producerFlow, CacheController requester, int tag, CacheAccess<DirectoryControllerState> cacheAccess, Action onCompletedCallback, Action onStalledCallback) {
         ReplacementEvent replacementEvent = new ReplacementEvent(this.directoryController, producerFlow, tag, cacheAccess, set, way, onCompletedCallback, onStalledCallback, producerFlow.getAccess());
@@ -131,8 +131,8 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
      * Act on a "recall acknowledgement" event.
      *
      * @param producerFlow the producer cache coherence flow
-     * @param sender the sender L1 cache controller
-     * @param tag the tag
+     * @param sender       the sender L1 cache controller
+     * @param tag          the tag
      */
     public void onEventRecallAck(CacheCoherenceFlow producerFlow, CacheController sender, int tag) {
         RecallAckEvent recallAckEvent = new RecallAckEvent(this.directoryController, producerFlow, sender, tag, producerFlow.getAccess());
@@ -148,8 +148,8 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
      * Act on a "PutS" event.
      *
      * @param producerFlow the producer cache coherence flow
-     * @param requester the requester L1 cache controller
-     * @param tag the tag
+     * @param requester    the requester L1 cache controller
+     * @param tag          the tag
      */
     public void onEventPutS(CacheCoherenceFlow producerFlow, CacheController requester, int tag) {
         if (this.getDirectoryEntry().getSharers().size() > 1) {
@@ -165,8 +165,8 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
      * Act on a "PutM and data" event.
      *
      * @param producerFlow the producer cache coherence flow
-     * @param requester the requester L1 cache controller
-     * @param tag the tag
+     * @param requester    the requester L1 cache controller
+     * @param tag          the tag
      */
     public void onEventPutMAndData(CacheCoherenceFlow producerFlow, CacheController requester, int tag) {
         if (requester == this.getDirectoryEntry().getOwner()) {
@@ -182,8 +182,8 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
      * Act on a "data" event.
      *
      * @param producerFlow the producer cache coherence flow
-     * @param sender the sender L1 cache controller
-     * @param tag the tag
+     * @param sender       the sender L1 cache controller
+     * @param tag          the tag
      */
     public void onEventData(CacheCoherenceFlow producerFlow, CacheController sender, int tag) {
         DataEvent dataEvent = new DataEvent(this.directoryController, producerFlow, sender, tag, producerFlow.getAccess());
@@ -194,7 +194,7 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
      * Fire the predefined action based on the specified directory controller event.
      *
      * @param sender the sender object
-     * @param event the directory controller event
+     * @param event  the directory controller event
      */
     public void fireTransition(Object sender, DirectoryControllerEvent event) {
         event.onCompleted();
@@ -205,9 +205,9 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
      * Act on a cache hit.
      *
      * @param access the memory hierarchy access
-     * @param tag the tag
-     * @param set the set
-     * @param way the way
+     * @param tag    the tag
+     * @param set    the set
+     * @param way    the way
      */
     public void hit(MemoryHierarchyAccess access, int tag, int set, int way) {
         this.directoryController.getCache().getReplacementPolicy().handlePromotionOnHit(access, set, way);
@@ -218,7 +218,7 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
      * Act on a stall.
      *
      * @param sender the sender object
-     * @param event the directory controller event
+     * @param event  the directory controller event
      */
     public void stall(final Object sender, final DirectoryControllerEvent event) {
         Action action = new Action() {
@@ -242,8 +242,8 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
     /**
      * Fire a "service non-blocking request" event.
      *
-     * @param access the memory hierarchy access
-     * @param tag the tag
+     * @param access     the memory hierarchy access
+     * @param tag        the tag
      * @param hitInCache a value indicating whether the access hits in the cache or not
      */
     public void fireServiceNonblockingRequestEvent(MemoryHierarchyAccess access, int tag, boolean hitInCache) {
@@ -254,8 +254,8 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
     /**
      * Fire a "cache line inserted" event.
      *
-     * @param access the memory hierarchy access
-     * @param tag the tag
+     * @param access    the memory hierarchy access
+     * @param tag       the tag
      * @param victimTag the victim tag
      */
     public void fireCacheLineInsertEvent(MemoryHierarchyAccess access, int tag, int victimTag) {
@@ -266,7 +266,7 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
      * Fire a "replacement" event.
      *
      * @param access the memory hierarchy access
-     * @param tag the tag
+     * @param tag    the tag
      */
     public void fireReplacementEvent(MemoryHierarchyAccess access, int tag) {
         this.getDirectoryController().getBlockingEventDispatcher().dispatch(new GeneralCacheControllerLineReplacementEvent(this.getDirectoryController(), access, tag, getSet(), getWay()));
@@ -276,7 +276,7 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
      * Fire a "PutS or PutM and data from the owner" event.
      *
      * @param access the memory hierarchy access
-     * @param tag the tag
+     * @param tag    the tag
      */
     public void firePutSOrPutMAndDataFromOwnerEvent(MemoryHierarchyAccess access, int tag) {
         this.getDirectoryController().getBlockingEventDispatcher().dispatch(new GeneralCacheControllerLastPutSOrPutMAndDataFromOwnerEvent(this.getDirectoryController(), access, tag, getSet(), getWay()));
@@ -286,7 +286,7 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
      * Fire a "non-blocking request hit to transient tag" event.
      *
      * @param access the memory hierarchy access
-     * @param tag the tag
+     * @param tag    the tag
      */
     public void fireNonblockingRequestHitToTransientTagEvent(MemoryHierarchyAccess access, int tag) {
         this.getDirectoryController().getBlockingEventDispatcher().dispatch(new GeneralCacheControllerNonblockingRequestHitToTransientTagEvent(this.getDirectoryController(), access, tag, getSet(), getWay()));
@@ -296,10 +296,10 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
      * Send a "data" message to the requester L1 cache controller.
      *
      * @param producerFlow the producer cache coherence flow
-     * @param requester the requester L1 cache controller
-     * @param tag the tag
-     * @param numInvalidationAcknowledgements the number of pending invalidation acknowledgements expected
-     *
+     * @param requester    the requester L1 cache controller
+     * @param tag          the tag
+     * @param numInvalidationAcknowledgements
+     *                     the number of pending invalidation acknowledgements expected
      */
     public void sendDataToRequester(CacheCoherenceFlow producerFlow, CacheController requester, int tag, int numInvalidationAcknowledgements) {
         this.directoryController.transfer(requester, this.directoryController.getCache().getLineSize() + 8, new DataMessage(this.directoryController, producerFlow, this.directoryController, tag, numInvalidationAcknowledgements, producerFlow.getAccess()));
@@ -309,8 +309,8 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
      * Send a "Put acknowledgement" message to the requester L1 cache controller.
      *
      * @param producerFlow the producer cache coherence flow
-     * @param requester the requester L1 cache controller
-     * @param tag the tag
+     * @param requester    the requester L1 cache controller
+     * @param tag          the tag
      */
     public void sendPutAckToReq(CacheCoherenceFlow producerFlow, CacheController requester, int tag) {
         sendPutAckToReq(producerFlow, this.directoryController, requester, tag);
@@ -319,10 +319,10 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
     /**
      * Send a "Put acknowledgement" message to the requester L1 cache controller.
      *
-     * @param producerFlow the producer cache coherence flow
+     * @param producerFlow        the producer cache coherence flow
      * @param directoryController the directory controller
-     * @param requester the requester L1 cache controller
-     * @param tag the tag
+     * @param requester           the requester L1 cache controller
+     * @param tag                 the tag
      */
     public static void sendPutAckToReq(CacheCoherenceFlow producerFlow, DirectoryController directoryController, CacheController requester, int tag) {
         directoryController.transfer(requester, 8, new PutAckMessage(directoryController, producerFlow, tag, producerFlow.getAccess()));
@@ -345,8 +345,8 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
      * Send a "forwarded GetS" message to the owner L1 cache controller.
      *
      * @param producerFlow the producer cache coherence flow
-     * @param requester the requester L1 cache controller
-     * @param tag the tag
+     * @param requester    the requester L1 cache controller
+     * @param tag          the tag
      */
     public void sendFwdGetSToOwner(CacheCoherenceFlow producerFlow, CacheController requester, int tag) {
         this.directoryController.transfer(getDirectoryEntry().getOwner(), 8, new FwdGetSMessage(this.directoryController, producerFlow, requester, tag, producerFlow.getAccess()));
@@ -356,8 +356,8 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
      * Send a "forwarded GetM" message to the owner L1 cache controller.
      *
      * @param producerFlow the producer cache coherence flow
-     * @param requester the requester L1 cache controller
-     * @param tag the tag
+     * @param requester    the requester L1 cache controller
+     * @param tag          the tag
      */
     public void sendFwdGetMToOwner(CacheCoherenceFlow producerFlow, CacheController requester, int tag) {
         this.directoryController.transfer(getDirectoryEntry().getOwner(), 8, new FwdGetMMessage(this.directoryController, producerFlow, requester, tag, producerFlow.getAccess()));
@@ -367,8 +367,8 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
      * Send "invalidation" messages to the L1 sharers.
      *
      * @param producerFlow the producer cache coherence flow
-     * @param requester the requester L1 cache controller
-     * @param tag the tag
+     * @param requester    the requester L1 cache controller
+     * @param tag          the tag
      */
     public void sendInvToSharers(CacheCoherenceFlow producerFlow, CacheController requester, int tag) {
         for (CacheController sharer : this.getDirectoryEntry().getSharers()) {
@@ -382,7 +382,7 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
      * Send a "recall" message to the owner L1 cache controller.
      *
      * @param producerFlow the producer cache coherence flow
-     * @param tag the tag
+     * @param tag          the tag
      */
     public void sendRecallToOwner(CacheCoherenceFlow producerFlow, int tag) {
         CacheController owner = getDirectoryEntry().getOwner();
@@ -397,7 +397,7 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
      * Send "recall" messages to the L1 sharers.
      *
      * @param producerFlow the producer cache coherence flow
-     * @param tag the tag
+     * @param tag          the tag
      */
     public void sendRecallToSharers(CacheCoherenceFlow producerFlow, int tag) {
         for (CacheController sharer : this.getDirectoryEntry().getSharers()) {

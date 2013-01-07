@@ -105,7 +105,7 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
      * Create an abstract basic core.
      *
      * @param processor the parent processor
-     * @param num the number of the core
+     * @param num       the number of the core
      */
     public AbstractBasicCore(Processor processor, int num) {
         super(processor);

@@ -32,7 +32,7 @@ public class BranchTargetBuffer {
     /**
      * Create a branch target buffer.
      *
-     * @param numSets the number of sets
+     * @param numSets       the number of sets
      * @param associativity associativity
      */
     public BranchTargetBuffer(int numSets, int associativity) {
@@ -71,8 +71,8 @@ public class BranchTargetBuffer {
      * Update.
      *
      * @param branchAddress the branch address
-     * @param branchTarget the branch target
-     * @param taken a value indicating whether the branch is taken or not
+     * @param branchTarget  the branch target
+     * @param taken         a value indicating whether the branch is taken or not
      * @return the branch target buffer entry matching the specified branch address
      */
     public BranchTargetBufferEntry update(int branchAddress, int branchTarget, boolean taken) {

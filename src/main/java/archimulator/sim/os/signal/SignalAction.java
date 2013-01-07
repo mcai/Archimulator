@@ -41,7 +41,7 @@ public class SignalAction {
     /**
      * Load the signal action from the specified address in the specified memory.
      *
-     * @param memory the memory
+     * @param memory  the memory
      * @param address the address
      */
     public void loadFrom(Memory memory, int address) {
@@ -55,7 +55,7 @@ public class SignalAction {
     /**
      * Save the signal action to the specified address in the specified memory.
      *
-     * @param memory the memory
+     * @param memory  the memory
      * @param address the address
      */
     public void saveTo(Memory memory, int address) {

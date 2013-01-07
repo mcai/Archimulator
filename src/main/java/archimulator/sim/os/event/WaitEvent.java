@@ -34,7 +34,7 @@ public class WaitEvent extends SystemEvent {
      * Create a wait event.
      *
      * @param context the context
-     * @param pid the process ID
+     * @param pid     the process ID
      */
     public WaitEvent(Context context, int pid) {
         super(context, SystemEventType.WAIT);

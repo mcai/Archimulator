@@ -20,7 +20,9 @@ package archimulator.sim.core;
 
 import archimulator.sim.common.BasicSimulationObject;
 import archimulator.sim.core.bpred.*;
-import archimulator.sim.isa.*;
+import archimulator.sim.isa.ArchitecturalRegisterFile;
+import archimulator.sim.isa.Mnemonic;
+import archimulator.sim.isa.RegisterDependencyType;
 import archimulator.sim.isa.event.InstructionFunctionallyExecutedEvent;
 import archimulator.sim.isa.event.SystemCallExecutedEvent;
 import archimulator.sim.os.Context;
@@ -181,7 +183,7 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
      * Create an abstract basic thread.
      *
      * @param core the parent core
-     * @param num the number of the thread
+     * @param num  the number of the thread
      */
     public AbstractBasicThread(Core core, int num) {
         super(core);

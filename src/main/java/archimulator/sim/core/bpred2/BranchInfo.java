@@ -19,7 +19,6 @@
 package archimulator.sim.core.bpred2;
 
 /**
- *
  * @author Min Cai
  */
 public class BranchInfo {
@@ -28,7 +27,6 @@ public class BranchInfo {
     private int branchFlags;
 
     /**
-     *
      * @param address
      * @param opcode
      * @param branchFlags
@@ -40,7 +38,6 @@ public class BranchInfo {
     }
 
     /**
-     *
      * @return
      */
     public int getAddress() {
@@ -48,7 +45,6 @@ public class BranchInfo {
     }
 
     /**
-     *
      * @return
      */
     public int getOpcode() {
@@ -56,7 +52,6 @@ public class BranchInfo {
     }
 
     /**
-     *
      * @return
      */
     public int getBranchFlags() {

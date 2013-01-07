@@ -44,8 +44,8 @@ public class ElfAnalyzer {
     /**
      * Create an ELF file analyzer.
      *
-     * @param fileName the file name
-     * @param elfFile the ELF file object
+     * @param fileName     the file name
+     * @param elfFile      the ELF file object
      * @param instructions the map of constituent instructions sorted by section names
      * @param programEntry the program entry's program counter (PC) value
      */
@@ -178,8 +178,8 @@ public class ElfAnalyzer {
     /**
      * Create a control flow graph edge.
      *
-     * @param from the "from" basic block
-     * @param to the "to" basic block
+     * @param from     the "from" basic block
+     * @param to       the "to" basic block
      * @param edgeType the edge type
      */
     private void createControlFlowGraphEdge(BasicBlock from, BasicBlock to, ControlFlowGraphEdgeType edgeType) {
@@ -274,7 +274,7 @@ public class ElfAnalyzer {
     /**
      * Get the target instruction for the specified function and instruction.
      *
-     * @param function the function
+     * @param function    the function
      * @param instruction the instruction
      * @return the target instruction
      */

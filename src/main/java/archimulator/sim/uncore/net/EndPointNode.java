@@ -27,7 +27,7 @@ public class EndPointNode extends NetNode {
     /**
      * Create an end point node.
      *
-     * @param net the parent net
+     * @param net  the parent net
      * @param name the name of the end point node
      */
     public EndPointNode(Net net, String name) {

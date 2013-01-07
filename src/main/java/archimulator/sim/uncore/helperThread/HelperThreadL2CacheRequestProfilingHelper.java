@@ -313,7 +313,7 @@ public class HelperThreadL2CacheRequestProfilingHelper {
     /**
      * Handle an L2 cache request.
      *
-     * @param event the event
+     * @param event                   the event
      * @param requesterIsHelperThread a value indicating whether the requester is the main thread or not
      * @param lineFoundIsHelperThread a value indicating whether the line found is brought by the helper thread or not
      */
@@ -384,7 +384,7 @@ public class HelperThreadL2CacheRequestProfilingHelper {
     /**
      * Handle a cache request in the case 1.
      *
-     * @param event the event
+     * @param event      the event
      * @param victimLine the victim cache line
      */
     private void handleRequestCase1(GeneralCacheControllerServiceNonblockingRequestEvent event, CacheLine<HelperThreadL2CacheRequestVictimCacheLineState> victimLine) {
@@ -452,7 +452,7 @@ public class HelperThreadL2CacheRequestProfilingHelper {
     /**
      * Handle a cache request in the case 4.
      *
-     * @param event the event
+     * @param event      the event
      * @param victimLine the victim cache line
      */
     private void handleRequestCase4(GeneralCacheControllerServiceNonblockingRequestEvent event, CacheLine<HelperThreadL2CacheRequestVictimCacheLineState> victimLine) {
@@ -464,7 +464,7 @@ public class HelperThreadL2CacheRequestProfilingHelper {
     /**
      * Handle an L2 cache line insertion.
      *
-     * @param event the event
+     * @param event                   the event
      * @param requesterIsHelperThread a value indicating whether the requester is the helper thread or not
      * @param lineFoundIsHelperThread a value indicating whether the line found is brought by the helper thread or not
      */
@@ -625,7 +625,7 @@ public class HelperThreadL2CacheRequestProfilingHelper {
      * Increment the number of ugly helper thread L2 cache requests.
      *
      * @param threadId the thread ID
-     * @param pc the virtual address of the program counter (PC)
+     * @param pc       the virtual address of the program counter (PC)
      */
     private void incrementUglyHelperThreadL2CacheRequests(int threadId, int pc) {
         this.numUglyHelperThreadL2CacheRequests++;
@@ -637,7 +637,7 @@ public class HelperThreadL2CacheRequestProfilingHelper {
      * Increment the number of bad helper thread L2 cache requests.
      *
      * @param threadId the thread ID
-     * @param pc the virtual address of the program counter (PC)
+     * @param pc       the virtual address of the program counter (PC)
      */
     private void incrementBadHelperThreadL2CacheRequests(int threadId, int pc) {
         this.numBadHelperThreadL2CacheRequests++;
@@ -649,8 +649,9 @@ public class HelperThreadL2CacheRequestProfilingHelper {
      * Update the helper thread L2 cache request quality predictor.
      *
      * @param threadId the thread ID
-     * @param pc the virtual address of the program counter (PC)
-     * @param helperThreadL2CacheRequestQuality the quality of the helper thread L2 cache request
+     * @param pc       the virtual address of the program counter (PC)
+     * @param helperThreadL2CacheRequestQuality
+     *                 the quality of the helper thread L2 cache request
      */
     private void updateHelperThreadL2CacheRequestQualityPredictor(int threadId, int pc, HelperThreadL2CacheRequestQuality helperThreadL2CacheRequestQuality) {
         if (threadId != HelperThreadingHelper.getHelperThreadId()) {
@@ -675,7 +676,7 @@ public class HelperThreadL2CacheRequestProfilingHelper {
      *
      * @param set the set index
      * @param way the way
-     * @param pc the virtual address of the program counter (PC)
+     * @param pc  the virtual address of the program counter (PC)
      */
     private void markHelperThread(int set, int way, int pc) {
         this.setL2CacheLineBroughterThreadId(set, way, HelperThreadingHelper.getHelperThreadId(), pc, false);
@@ -686,7 +687,7 @@ public class HelperThreadL2CacheRequestProfilingHelper {
      *
      * @param set the set index
      * @param way the way
-     * @param pc the virtual address of the program counter (PC)
+     * @param pc  the virtual address of the program counter (PC)
      */
     private void markMainThread(int set, int way, int pc) {
         this.setL2CacheLineBroughterThreadId(set, way, HelperThreadingHelper.getMainThreadId(), pc, false);
@@ -695,10 +696,10 @@ public class HelperThreadL2CacheRequestProfilingHelper {
     /**
      * Mark the transient thread ID for the specified set index and way.
      *
-     * @param set the set index
-     * @param way the way
+     * @param set      the set index
+     * @param way      the way
      * @param threadId the thread ID
-     * @param pc the virtual address of the program counter (PC)
+     * @param pc       the virtual address of the program counter (PC)
      */
     private void markTransientThreadId(int set, int way, int threadId, int pc) {
         this.setL2CacheLineBroughterThreadId(set, way, threadId, pc, true);
@@ -707,11 +708,11 @@ public class HelperThreadL2CacheRequestProfilingHelper {
     /**
      * Set the L2 cache line's broughter thread ID.
      *
-     * @param set the set index
-     * @param way the way
+     * @param set                          the set index
+     * @param way                          the way
      * @param l2CacheLineBroughterThreadId the L2 cache line's broughter thread ID
-     * @param pc the virtual address of the program counter (PC)
-     * @param inFlight a value indicating whether it is in-flight or not
+     * @param pc                           the virtual address of the program counter (PC)
+     * @param inFlight                     a value indicating whether it is in-flight or not
      */
     private void setL2CacheLineBroughterThreadId(int set, int way, int l2CacheLineBroughterThreadId, int pc, boolean inFlight) {
         HelperThreadL2CacheRequestState helperThreadL2CacheRequestState = this.helperThreadL2CacheRequestStates.get(set).get(way);
@@ -733,8 +734,8 @@ public class HelperThreadL2CacheRequestProfilingHelper {
     /**
      * Mark as late for the specified set index and way.
      *
-     * @param set the set index
-     * @param way the way
+     * @param set  the set index
+     * @param way  the way
      * @param late whether its is late or not
      */
     private void markLate(int set, int way, boolean late) {
@@ -745,9 +746,9 @@ public class HelperThreadL2CacheRequestProfilingHelper {
     /**
      * Insert a data entry in the victim cache.
      *
-     * @param access the memory hierarchy access
-     * @param set the set index
-     * @param tag the tag
+     * @param access                 the memory hierarchy access
+     * @param set                    the set index
+     * @param tag                    the tag
      * @param helperThreadRequestTag the helper thread request tag
      */
     private void insertDataEntry(MemoryHierarchyAccess access, int set, int tag, int helperThreadRequestTag) {
@@ -767,8 +768,8 @@ public class HelperThreadL2CacheRequestProfilingHelper {
     /**
      * Insert a null entry in the victim cache.
      *
-     * @param access the memory hierarchy access
-     * @param set the set index
+     * @param access                 the memory hierarchy access
+     * @param set                    the set index
      * @param helperThreadRequestTag the helper thread request tag
      */
     private void insertNullEntry(MemoryHierarchyAccess access, int set, int helperThreadRequestTag) {
@@ -784,7 +785,7 @@ public class HelperThreadL2CacheRequestProfilingHelper {
     /**
      * Find the way of the victim cache line matching the specified helper thread L2 cache request tag.
      *
-     * @param set the set index
+     * @param set                    the set index
      * @param helperThreadRequestTag the helper thread request tag
      * @return the way of the victim cache line matching the specified helper thread L2 cache request tag
      */
@@ -840,7 +841,7 @@ public class HelperThreadL2CacheRequestProfilingHelper {
      * Create a new cache miss in the victim cache for the specified address.
      *
      * @param address the address
-     * @param set the set index
+     * @param set     the set index
      * @return the newly created cache miss in the victim cache for the specified address
      */
     private CacheAccess<HelperThreadL2CacheRequestVictimCacheLineState> newMiss(int address, int set) {
@@ -1086,7 +1087,6 @@ public class HelperThreadL2CacheRequestProfilingHelper {
 
     /**
      * Helper thread L2 cache request victim cache line state value provider.
-     *
      */
     private static class HelperThreadL2CacheRequestVictimCacheLineStateValueProvider implements ValueProvider<HelperThreadL2CacheRequestVictimCacheLineState> {
         private HelperThreadL2CacheRequestVictimCacheLineState state;
@@ -1094,7 +1094,6 @@ public class HelperThreadL2CacheRequestProfilingHelper {
 
         /**
          * Create a helper thread L2 cache request victim cache line state value provider.
-         *
          */
         public HelperThreadL2CacheRequestVictimCacheLineStateValueProvider() {
             this.state = HelperThreadL2CacheRequestVictimCacheLineState.INVALID;

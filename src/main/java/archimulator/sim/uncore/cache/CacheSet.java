@@ -24,7 +24,6 @@ import net.pickapack.util.ValueProviderFactory;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 
 /**
  * Cache set.

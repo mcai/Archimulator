@@ -107,7 +107,7 @@ public class ArchitectureServiceImpl extends AbstractService implements Architec
         Architecture architecture = new Architecture(hotspotProfilingEnabled, helperThreadL2CacheRequestProfilingEnabled, dynamicSpeculativePrecomputationEnabled, numCores, numThreadsPerCore, l1ISize, l1IAssociativity, l1DSize, l1DAssociativity, l2Size, l2Associativity, l2ReplacementPolicyType);
 
         Architecture architectureWithSameTitle = getArchitectureByTitle(architecture.getTitle());
-        if(architectureWithSameTitle == null) {
+        if (architectureWithSameTitle == null) {
             addArchitecture(architecture);
             return architecture;
         }

@@ -34,14 +34,14 @@ public class ReorderBufferEntry extends AbstractReorderBufferEntry {
     /**
      * Create a reorder buffer entry.
      *
-     * @param thread the thread
-     * @param dynamicInstruction the dynamic instruction
-     * @param npc the value of the next program counter (NPC)
-     * @param nnpc the value of the next next program counter (NNPC)
-     * @param predictedNnpc the predicted value of the next net program counter (predicted NNPC)
+     * @param thread                         the thread
+     * @param dynamicInstruction             the dynamic instruction
+     * @param npc                            the value of the next program counter (NPC)
+     * @param nnpc                           the value of the next next program counter (NNPC)
+     * @param predictedNnpc                  the predicted value of the next net program counter (predicted NNPC)
      * @param returnAddressStackRecoverIndex the return address stack recover index
-     * @param branchPredictorUpdate the branch predictor update
-     * @param speculative a value indicating whether the reorder buffer entry is speculative or not
+     * @param branchPredictorUpdate          the branch predictor update
+     * @param speculative                    a value indicating whether the reorder buffer entry is speculative or not
      */
     public ReorderBufferEntry(Thread thread, DynamicInstruction dynamicInstruction, int npc, int nnpc, int predictedNnpc, int returnAddressStackRecoverIndex, BranchPredictorUpdate branchPredictorUpdate, boolean speculative) {
         super(thread, dynamicInstruction, npc, nnpc, predictedNnpc, returnAddressStackRecoverIndex, branchPredictorUpdate, speculative);
@@ -89,7 +89,6 @@ public class ReorderBufferEntry extends AbstractReorderBufferEntry {
     }
 
     /**
-     *
      * Set the associated load/store queue entry.
      *
      * @param loadStoreQueueEntry the associated load/store queue entry
@@ -101,7 +100,8 @@ public class ReorderBufferEntry extends AbstractReorderBufferEntry {
     /**
      * Set a value indicating whether the effective address computation operand is ready or not.
      *
-     * @param effectiveAddressComputationOperandReady a value indicating whether the effective address computation operand is ready or not
+     * @param effectiveAddressComputationOperandReady
+     *         a value indicating whether the effective address computation operand is ready or not
      */
     public void setEffectiveAddressComputationOperandReady(boolean effectiveAddressComputationOperandReady) {
         this.effectiveAddressComputationOperandReady = effectiveAddressComputationOperandReady;

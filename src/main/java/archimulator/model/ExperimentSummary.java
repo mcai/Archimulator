@@ -524,7 +524,8 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
     /**
      * Set the coverage of the helper thread L2 cache requests.
      *
-     * @param helperThreadL2CacheRequestCoverage the coverage of the helper thread L2 cache requests
+     * @param helperThreadL2CacheRequestCoverage
+     *         the coverage of the helper thread L2 cache requests
      */
     public void setHelperThreadL2CacheRequestCoverage(double helperThreadL2CacheRequestCoverage) {
         this.helperThreadL2CacheRequestCoverage = helperThreadL2CacheRequestCoverage;
@@ -542,7 +543,8 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
     /**
      * Set the accuracy of the helper thread L2 cache requests.
      *
-     * @param helperThreadL2CacheRequestAccuracy the accuracy of the helper thread L2 cache requests
+     * @param helperThreadL2CacheRequestAccuracy
+     *         the accuracy of the helper thread L2 cache requests
      */
     public void setHelperThreadL2CacheRequestAccuracy(double helperThreadL2CacheRequestAccuracy) {
         this.helperThreadL2CacheRequestAccuracy = helperThreadL2CacheRequestAccuracy;
@@ -560,7 +562,8 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
     /**
      * Set the number of the late helper thread L2 cache requests.
      *
-     * @param numLateHelperThreadL2CacheRequests the number of the late helper thread L2 cache requests
+     * @param numLateHelperThreadL2CacheRequests
+     *         the number of the late helper thread L2 cache requests
      */
     public void setNumLateHelperThreadL2CacheRequests(long numLateHelperThreadL2CacheRequests) {
         this.numLateHelperThreadL2CacheRequests = numLateHelperThreadL2CacheRequests;
@@ -578,7 +581,8 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
     /**
      * Set the number of the timely helper thread L2 cache requests.
      *
-     * @param numTimelyHelperThreadL2CacheRequests the number of the timely helper thread L2 cache requests
+     * @param numTimelyHelperThreadL2CacheRequests
+     *         the number of the timely helper thread L2 cache requests
      */
     public void setNumTimelyHelperThreadL2CacheRequests(long numTimelyHelperThreadL2CacheRequests) {
         this.numTimelyHelperThreadL2CacheRequests = numTimelyHelperThreadL2CacheRequests;
@@ -596,7 +600,8 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
     /**
      * Set the number of the bad helper thread L2 cache requests.
      *
-     * @param numBadHelperThreadL2CacheRequests the number of the bad helper thread L2 cache requests
+     * @param numBadHelperThreadL2CacheRequests
+     *         the number of the bad helper thread L2 cache requests
      */
     public void setNumBadHelperThreadL2CacheRequests(long numBadHelperThreadL2CacheRequests) {
         this.numBadHelperThreadL2CacheRequests = numBadHelperThreadL2CacheRequests;
@@ -614,7 +619,8 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
     /**
      * Set the number of the ugly helper thread L2 cache requests.
      *
-     * @param numUglyHelperThreadL2CacheRequests the number of the ugly helper thread L2 cache requests
+     * @param numUglyHelperThreadL2CacheRequests
+     *         the number of the ugly helper thread L2 cache requests
      */
     public void setNumUglyHelperThreadL2CacheRequests(long numUglyHelperThreadL2CacheRequests) {
         this.numUglyHelperThreadL2CacheRequests = numUglyHelperThreadL2CacheRequests;
@@ -632,7 +638,8 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
     /**
      * Set the number of the redundant "hit to transient tag" helper thread L2 cache requests.
      *
-     * @param numRedundantHitToTransientTagHelperThreadL2CacheRequests the number of the redundant "hit to transient tag" helper thread L2 cache requests
+     * @param numRedundantHitToTransientTagHelperThreadL2CacheRequests
+     *         the number of the redundant "hit to transient tag" helper thread L2 cache requests
      */
     public void setNumRedundantHitToTransientTagHelperThreadL2CacheRequests(long numRedundantHitToTransientTagHelperThreadL2CacheRequests) {
         this.numRedundantHitToTransientTagHelperThreadL2CacheRequests = numRedundantHitToTransientTagHelperThreadL2CacheRequests;
@@ -650,7 +657,8 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
     /**
      * Set the number of the redundant "hit to cache" helper thread L2 cache requests.
      *
-     * @param numRedundantHitToCacheHelperThreadL2CacheRequests the number of the redundant "hit to cache" helper thread L2 cache requests
+     * @param numRedundantHitToCacheHelperThreadL2CacheRequests
+     *         the number of the redundant "hit to cache" helper thread L2 cache requests
      */
     public void setNumRedundantHitToCacheHelperThreadL2CacheRequests(long numRedundantHitToCacheHelperThreadL2CacheRequests) {
         this.numRedundantHitToCacheHelperThreadL2CacheRequests = numRedundantHitToCacheHelperThreadL2CacheRequests;

@@ -263,7 +263,7 @@ public abstract class Simulation implements SimulationObject {
             getProcessor().getMemoryHierarchy().dumpCacheControllerFsmStats(stats);
         }
 
-        if(endOfSimulation && this.getExperiment().getArchitecture().getHelperThreadL2CacheRequestProfilingEnabled() && (this.getType() == SimulationType.MEASUREMENT || this.getType() == SimulationType.CACHE_WARMUP)) {
+        if (endOfSimulation && this.getExperiment().getArchitecture().getHelperThreadL2CacheRequestProfilingEnabled() && (this.getType() == SimulationType.MEASUREMENT || this.getType() == SimulationType.CACHE_WARMUP)) {
             CacheBasedPredictor<HelperThreadL2CacheRequestQuality> helperThreadL2CacheRequestQualityPredictor = (CacheBasedPredictor<HelperThreadL2CacheRequestQuality>) this.getHelperThreadL2CacheRequestProfilingHelper().getHelperThreadL2CacheRequestQualityPredictor();
             helperThreadL2CacheRequestQualityPredictor.dumpState();
 

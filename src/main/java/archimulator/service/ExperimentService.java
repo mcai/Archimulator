@@ -128,8 +128,8 @@ public interface ExperimentService extends Service {
      * Get the list of experiments by parent experiment pack, offset and count.
      *
      * @param parent the parent experiment pack
-     * @param first offset
-     * @param count count
+     * @param first  offset
+     * @param count  count
      * @return the list of experiments under the parent experiment pack with the specified offset and count
      */
     List<Experiment> getExperimentsByParent(ExperimentPack parent, long first, long count);
@@ -249,7 +249,7 @@ public interface ExperimentService extends Service {
     /**
      * Get the number of experiments by the parent experiment pack and state.
      *
-     * @param parent the parent experiment pack
+     * @param parent          the parent experiment pack
      * @param experimentState the experiment's state
      * @return the number of experiments in the specified state and owned by the specified parent experiment pack
      */
@@ -291,7 +291,7 @@ public interface ExperimentService extends Service {
     void startExperiment(Experiment experiment);
 
     /**
-     *  Start the experiment runner.
+     * Start the experiment runner.
      */
     void start();
 

@@ -36,7 +36,7 @@ public class DelinquentLoad {
     /**
      * Create a delinquent load.
      *
-     * @param pc the value of the program counter (PC)
+     * @param pc             the value of the program counter (PC)
      * @param functionCallPc the value of the function call's program counter (PC)
      */
     public DelinquentLoad(int pc, int functionCallPc) {
@@ -110,7 +110,8 @@ public class DelinquentLoad {
     /**
      * Set the number of cycles spent at the head of the reorder buffer.
      *
-     * @param numCyclesSpentAtHeadOfReorderBuffer the number of cycles spent at the head of the reorder buffer
+     * @param numCyclesSpentAtHeadOfReorderBuffer
+     *         the number of cycles spent at the head of the reorder buffer
      */
     public void setNumCyclesSpentAtHeadOfReorderBuffer(int numCyclesSpentAtHeadOfReorderBuffer) {
         this.numCyclesSpentAtHeadOfReorderBuffer = numCyclesSpentAtHeadOfReorderBuffer;

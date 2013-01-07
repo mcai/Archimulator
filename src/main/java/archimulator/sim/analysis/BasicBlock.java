@@ -42,7 +42,7 @@ public class BasicBlock {
      * Create a basic block.
      *
      * @param function the function
-     * @param num the basic block's number
+     * @param num      the basic block's number
      */
     public BasicBlock(Function function, int num) {
         this.function = function;

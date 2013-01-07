@@ -28,7 +28,7 @@ import archimulator.util.PropertiesHelper;
  */
 public class ServiceManager {
     /**
-     *  To be used in benchmark arguments injection.
+     * To be used in benchmark arguments injection.
      */
     public static final String USER_HOME_TEMPLATE_ARG = "<user.home>";
 

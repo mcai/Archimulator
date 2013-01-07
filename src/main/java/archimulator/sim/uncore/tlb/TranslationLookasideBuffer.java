@@ -49,7 +49,7 @@ public class TranslationLookasideBuffer implements Named {
      * Create a translation lookaside buffer (TLB).
      *
      * @param parent the parent simulation object
-     * @param name the name
+     * @param name   the name
      */
     public TranslationLookasideBuffer(SimulationObject parent, String name) {
         this.name = name;
@@ -67,7 +67,7 @@ public class TranslationLookasideBuffer implements Named {
     /**
      * Act on a TLB access.
      *
-     * @param access the memory hierarchy access
+     * @param access              the memory hierarchy access
      * @param onCompletedCallback the callback action performed when the access is completed
      */
     public void access(MemoryHierarchyAccess access, Action onCompletedCallback) {
@@ -188,7 +188,6 @@ public class TranslationLookasideBuffer implements Named {
 
     /**
      * Boolean value provider.
-     *
      */
     private class BooleanValueProvider implements ValueProvider<Boolean> {
         protected boolean state;

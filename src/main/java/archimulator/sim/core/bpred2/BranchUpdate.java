@@ -19,7 +19,6 @@
 package archimulator.sim.core.bpred2;
 
 /**
- *
  * @author Min Cai
  */
 public class BranchUpdate {
@@ -35,7 +34,6 @@ public class BranchUpdate {
     }
 
     /**
-     *
      * @return
      */
     public boolean isPredictedDirection() {
@@ -43,7 +41,6 @@ public class BranchUpdate {
     }
 
     /**
-     *
      * @param predictedDirection
      */
     public void setPredictedDirection(boolean predictedDirection) {
@@ -51,7 +48,6 @@ public class BranchUpdate {
     }
 
     /**
-     *
      * @return
      */
     public int getPredictedTarget() {
@@ -59,7 +55,6 @@ public class BranchUpdate {
     }
 
     /**
-     *
      * @param predictedTarget
      */
     public void setPredictedTarget(int predictedTarget) {

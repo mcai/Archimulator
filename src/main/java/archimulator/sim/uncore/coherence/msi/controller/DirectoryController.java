@@ -18,8 +18,8 @@
  ******************************************************************************/
 package archimulator.sim.uncore.coherence.msi.controller;
 
-import archimulator.sim.uncore.MemoryHierarchy;
 import archimulator.sim.uncore.MemoryDevice;
+import archimulator.sim.uncore.MemoryHierarchy;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.cache.CacheGeometry;
@@ -57,7 +57,7 @@ public class DirectoryController extends GeneralCacheController<DirectoryControl
      * Create a directory controller.
      *
      * @param memoryHierarchy the memory hierarchy
-     * @param name           the name
+     * @param name            the name
      */
     public DirectoryController(MemoryHierarchy memoryHierarchy, final String name) {
         super(memoryHierarchy, name);

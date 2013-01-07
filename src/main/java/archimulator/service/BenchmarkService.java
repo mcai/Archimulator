@@ -24,7 +24,6 @@ import net.pickapack.service.Service;
 import java.util.List;
 
 /**
- *
  * Service for managing benchmarks.
  *
  * @author Min Cai
@@ -93,7 +92,6 @@ public interface BenchmarkService extends Service {
 
     /**
      * Clear (remove all) the benchmarks.
-     *
      */
     void clearBenchmarks();
 

@@ -37,7 +37,7 @@ public class Crossbar {
     /**
      * Create a cross bar.
      *
-     * @param node the node
+     * @param node      the node
      * @param bandwidth the bandwidth
      */
     public Crossbar(NetNode node, int bandwidth) {

@@ -55,7 +55,7 @@ public class Table implements Serializable {
      * Create a table object.
      *
      * @param columns a list of columns
-     * @param rows a two-dimensional list of rows
+     * @param rows    a two-dimensional list of rows
      */
     public Table(List<String> columns, List<List<String>> rows) {
         this.columns = columns;
@@ -115,11 +115,11 @@ public class Table implements Serializable {
             StringWriter sw = new StringWriter();
             CSVPrinter csvPrinter = new CSVPrinter(sw, '#', CsvConfiguration.DEFAULT_QUOTE_CHAR, CsvConfiguration.DEFAULT_SEPARATOR_CHAR, true, true);
 
-            if(printColumnHeaders) {
+            if (printColumnHeaders) {
                 csvPrinter.println(getColumns().toArray(new String[getColumns().size()]));
             }
 
-            for(List<String> row : getRows()) {
+            for (List<String> row : getRows()) {
                 csvPrinter.println(row.toArray(new String[row.size()]));
             }
 
@@ -147,7 +147,7 @@ public class Table implements Serializable {
                     .from(table)
                     .select(criteria.getColumns().toArray(new String[criteria.getColumns().size()]));
 
-            for(final Pair<String, List<String>> condition : criteria.getConditions()) {
+            for (final Pair<String, List<String>> condition : criteria.getConditions()) {
                 select.where(new FilterItem(LogicalOperator.OR, CollectionHelper.transform(condition.getSecond(), new Function1<String, FilterItem>() {
                     @Override
                     public FilterItem apply(String conditionLine) {
@@ -172,13 +172,13 @@ public class Table implements Serializable {
     public static Table fromDataSet(DataSet dataSet) {
         List<String> columns = new ArrayList<String>();
 
-        for(SelectItem selectedItem : dataSet.getSelectItems()) {
+        for (SelectItem selectedItem : dataSet.getSelectItems()) {
             columns.add(selectedItem.getColumn().getName());
         }
 
         List<List<String>> rows = new ArrayList<List<String>>();
 
-        for(Row row : dataSet) {
+        for (Row row : dataSet) {
             rows.add(CollectionHelper.transform(Arrays.asList(row.getValues()), new Function1<Object, String>() {
                 @Override
                 public String apply(Object obj) {

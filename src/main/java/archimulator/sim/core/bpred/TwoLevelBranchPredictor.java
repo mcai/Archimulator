@@ -38,6 +38,7 @@ public class TwoLevelBranchPredictor extends DynamicBranchPredictor {
     private SaturatingCounter[] l2Table;
 
     /**
+     * Create a two level branch predictor.
      *
      * @param thread
      * @param name
@@ -68,6 +69,7 @@ public class TwoLevelBranchPredictor extends DynamicBranchPredictor {
     }
 
     /**
+     * Create a two level branch predictor.
      *
      * @param thread
      * @param name
@@ -141,7 +143,6 @@ public class TwoLevelBranchPredictor extends DynamicBranchPredictor {
     }
 
     /**
-     *
      * @param branchAddress
      * @return
      */
@@ -150,7 +151,6 @@ public class TwoLevelBranchPredictor extends DynamicBranchPredictor {
     }
 
     /**
-     *
      * @param branchAddress
      * @param taken
      */

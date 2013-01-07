@@ -144,7 +144,7 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
      * Map the specified context to an idle thread.
      *
      * @param contextToMap the context to be mapped
-     * @param predicate the predicate
+     * @param predicate    the predicate
      * @return a value indicating whether the mapping succeeds or not
      */
     public boolean map(Context contextToMap, Predicate<Integer> predicate) {
@@ -270,7 +270,7 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
      * Get the circular buffer for the specified file descriptor number and index.
      *
      * @param fileDescriptor the file descriptor
-     * @param index the index
+     * @param index          the index
      * @return the circular buffer matching the specified file descriptor number and index
      */
     private CircularByteBuffer getBuffer(int fileDescriptor, int index) {
@@ -287,7 +287,7 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
      * Run the signal handler for the specified context and signal.
      *
      * @param context the context
-     * @param signal the signal
+     * @param signal  the signal
      */
     public void runSignalHandler(Context context, int signal) {
         try {
@@ -323,7 +323,7 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
      * Get a value indicating whether the specified signal must be processed for the specified context or not.
      *
      * @param context the context
-     * @param signal the signal
+     * @param signal  the signal
      * @return a value indicating whether the specified signal must be processed for the specified context or not
      */
     public boolean mustProcessSignal(Context context, int signal) {
@@ -377,7 +377,7 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
     public List<Memory> getMemories() {
         List<Memory> memories = new ArrayList<Memory>();
 
-        for(Process process : processes) {
+        for (Process process : processes) {
             memories.add(process.getMemory());
         }
 

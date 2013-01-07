@@ -19,7 +19,8 @@
 package archimulator.sim.uncore.cache.replacement.reuseDistance;
 
 import archimulator.sim.uncore.MemoryHierarchyAccess;
-import archimulator.sim.uncore.cache.*;
+import archimulator.sim.uncore.cache.CacheAccess;
+import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicy;
 
 import java.io.Serializable;
@@ -27,8 +28,8 @@ import java.io.Serializable;
 /**
  * Reuse distance based evaluator policy.
  *
- * @author Min Cai
  * @param <StateT> the state type of the parent evictable cache
+ * @author Min Cai
  */
 public class ReuseDistanceBasedEvaluatorPolicy<StateT extends Serializable> extends AbstractReuseDistancePredictionPolicy<StateT> {
     private CacheReplacementPolicy<StateT> evictionPolicy;

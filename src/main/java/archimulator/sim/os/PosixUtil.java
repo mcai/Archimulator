@@ -41,7 +41,7 @@ public class PosixUtil {
      * Load the C library.
      *
      * @param libraryName the library name
-     * @param libCClass the libc class
+     * @param libCClass   the libc class
      * @return the loaded libc instance
      */
     public static LibC loadLibC(String libraryName, Class<?> libCClass) {

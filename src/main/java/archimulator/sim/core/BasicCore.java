@@ -44,7 +44,7 @@ public class BasicCore extends AbstractBasicCore {
      * Create a basic core.
      *
      * @param processor the parent processor
-     * @param num the number of the core
+     * @param num       the number of the core
      */
     public BasicCore(Processor processor, int num) {
         super(processor, num);
@@ -111,7 +111,7 @@ public class BasicCore extends AbstractBasicCore {
      * Wake up.
      *
      * @param waitingQueue the waiting queue
-     * @param readyQueue the ready queue
+     * @param readyQueue   the ready queue
      */
     private void wakeUp(List<AbstractReorderBufferEntry> waitingQueue, List<AbstractReorderBufferEntry> readyQueue) {
         for (Iterator<AbstractReorderBufferEntry> it = waitingQueue.iterator(); it.hasNext(); ) {

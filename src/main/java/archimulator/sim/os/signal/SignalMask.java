@@ -92,7 +92,7 @@ public class SignalMask implements Cloneable {
     /**
      * Load the signal mask from the specified address in the specified memory.
      *
-     * @param memory the memory
+     * @param memory  the memory
      * @param address the address
      */
     public void loadFrom(Memory memory, int address) {
@@ -104,7 +104,7 @@ public class SignalMask implements Cloneable {
     /**
      * Store the signal mask to the specified address in the specified memory.
      *
-     * @param memory the memory
+     * @param memory  the memory
      * @param address the address
      */
     public void saveTo(Memory memory, int address) {

@@ -27,8 +27,8 @@ import java.io.Serializable;
 /**
  * Reuse distance prediction policy.
  *
- * @author Min Cai
  * @param <StateT> the state type of the parent evictable cache
+ * @author Min Cai
  */
 public class ReuseDistancePredictionPolicy<StateT extends Serializable> extends AbstractReuseDistancePredictionPolicy<StateT> {
     public ReuseDistancePredictionPolicy(EvictableCache<StateT> cache) {

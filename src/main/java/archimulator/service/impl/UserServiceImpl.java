@@ -50,7 +50,7 @@ public class UserServiceImpl extends AbstractService implements UserService {
 
     @Override
     public void initialize() {
-        if(this.getFirstUser() == null) {
+        if (this.getFirstUser() == null) {
             this.addUser(new User("test@archimulator.com", "archimulator")); //TODO: should not be hardcoded
         }
     }

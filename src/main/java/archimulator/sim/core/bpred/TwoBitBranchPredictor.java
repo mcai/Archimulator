@@ -34,12 +34,12 @@ public class TwoBitBranchPredictor extends DynamicBranchPredictor {
     private SaturatingCounter[] table;
 
     /**
-     *
      * @param thread
      * @param name
      * @param bimodSize
      * @param branchTargetBufferNumSets
      * @param branchTargetBufferAssociativity
+     *
      * @param returnAddressStackSize
      */
     public TwoBitBranchPredictor(Thread thread, String name, int bimodSize, int branchTargetBufferNumSets, int branchTargetBufferAssociativity, int returnAddressStackSize) {
@@ -57,7 +57,6 @@ public class TwoBitBranchPredictor extends DynamicBranchPredictor {
     }
 
     /**
-     *
      * @param thread
      * @param name
      */
@@ -66,7 +65,6 @@ public class TwoBitBranchPredictor extends DynamicBranchPredictor {
     }
 
     /**
-     *
      * @param branchAddress
      * @param branchTarget
      * @param mnemonic
@@ -100,7 +98,6 @@ public class TwoBitBranchPredictor extends DynamicBranchPredictor {
     }
 
     /**
-     *
      * @param branchAddress
      * @param branchTarget
      * @param taken
@@ -127,7 +124,6 @@ public class TwoBitBranchPredictor extends DynamicBranchPredictor {
     }
 
     /**
-     *
      * @param branchAddress
      * @return
      */

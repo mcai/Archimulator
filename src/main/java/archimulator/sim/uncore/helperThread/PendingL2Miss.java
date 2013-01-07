@@ -37,7 +37,7 @@ public class PendingL2Miss {
     /**
      * Create a pending L2 cache miss.
      *
-     * @param access the memory hierarchy access
+     * @param access     the memory hierarchy access
      * @param beginCycle the time in cycles when the access begins
      */
     public PendingL2Miss(MemoryHierarchyAccess access, long beginCycle) {

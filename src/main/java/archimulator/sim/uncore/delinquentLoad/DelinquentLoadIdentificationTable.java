@@ -99,8 +99,8 @@ public class DelinquentLoadIdentificationTable {
         thread.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, new Action1<GeneralCacheControllerServiceNonblockingRequestEvent>() {
             @Override
             public void apply(GeneralCacheControllerServiceNonblockingRequestEvent event) {
-                if(!event.isHitInCache() && event.getAccess().getThread() == DelinquentLoadIdentificationTable.this.thread && event.getCacheController() instanceof DirectoryController && event.getAccess().getType().isRead()) {
-                    if(event.getAccess().getDynamicInstruction() != null) {
+                if (!event.isHitInCache() && event.getAccess().getThread() == DelinquentLoadIdentificationTable.this.thread && event.getCacheController() instanceof DirectoryController && event.getAccess().getType().isRead()) {
+                    if (event.getAccess().getDynamicInstruction() != null) {
                         event.getAccess().getDynamicInstruction().setMissedInL2Cache(true);
                     }
                 }
@@ -169,7 +169,7 @@ public class DelinquentLoadIdentificationTable {
         /**
          * Create a delinquent load identified event.
          *
-         * @param thread the thread
+         * @param thread         the thread
          * @param delinquentLoad the delinquent load
          */
         public DelinquentLoadIdentifiedEvent(Thread thread, DelinquentLoad delinquentLoad) {

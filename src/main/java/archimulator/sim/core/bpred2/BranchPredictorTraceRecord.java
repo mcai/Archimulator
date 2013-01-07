@@ -19,7 +19,6 @@
 package archimulator.sim.core.bpred2;
 
 /**
- *
  * @author Min Cai
  */
 public class BranchPredictorTraceRecord {
@@ -28,7 +27,6 @@ public class BranchPredictorTraceRecord {
     private BranchInfo branchInfo;
 
     /**
-     *
      * @param taken
      * @param target
      * @param branchInfo
@@ -40,7 +38,6 @@ public class BranchPredictorTraceRecord {
     }
 
     /**
-     *
      * @return
      */
     public boolean isTaken() {
@@ -48,7 +45,6 @@ public class BranchPredictorTraceRecord {
     }
 
     /**
-     *
      * @return
      */
     public int getTarget() {
@@ -56,7 +52,6 @@ public class BranchPredictorTraceRecord {
     }
 
     /**
-     *
      * @return
      */
     public BranchInfo getBranchInfo() {

@@ -35,7 +35,7 @@ public class PhysicalRegisterFile {
     /**
      * Create a physical register file.
      *
-     * @param name the name of the physical register file
+     * @param name     the name of the physical register file
      * @param capacity the capacity
      */
     public PhysicalRegisterFile(String name, int capacity) {

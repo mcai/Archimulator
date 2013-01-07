@@ -41,7 +41,7 @@ public class Symbol {
     /**
      * Create an ELF symbol.
      *
-     * @param elfFile the ELF file
+     * @param elfFile             the ELF file
      * @param symbolSectionHeader the symbol section header
      */
     public Symbol(ElfFile elfFile, ElfSectionHeader symbolSectionHeader) {
@@ -199,6 +199,7 @@ public class Symbol {
     }
 
     //TODO
+
     /**
      * Set a value indicating whether the symbol is inline or not.
      *

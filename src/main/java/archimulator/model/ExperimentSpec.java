@@ -345,7 +345,8 @@ public class ExperimentSpec implements Serializable {
     /**
      * Set a value indicating whether dynamic speculative precomputation is enabled or not.
      *
-     * @param dynamicSpeculativePrecomputationEnabled a value indicating whether dynamic speculative precomputation is enabled or not
+     * @param dynamicSpeculativePrecomputationEnabled
+     *         a value indicating whether dynamic speculative precomputation is enabled or not
      */
     public void setDynamicSpeculativePrecomputationEnabled(boolean dynamicSpeculativePrecomputationEnabled) {
         this.dynamicSpeculativePrecomputationEnabled = dynamicSpeculativePrecomputationEnabled;

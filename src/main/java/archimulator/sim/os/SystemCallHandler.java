@@ -31,7 +31,7 @@ public abstract class SystemCallHandler {
      * Create a system call handler.
      *
      * @param index the index of the system call to be handled
-     * @param name the name of the system call to be handled
+     * @param name  the name of the system call to be handled
      */
     public SystemCallHandler(int index, String name) {
         this.index = index;

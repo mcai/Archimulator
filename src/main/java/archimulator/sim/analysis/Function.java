@@ -39,9 +39,9 @@ public class Function implements Comparable<Function> {
     /**
      * Create a function.
      *
-     * @param program the program
+     * @param program     the program
      * @param sectionName the section name
-     * @param symbol the symbol
+     * @param symbol      the symbol
      */
     public Function(Program program, String sectionName, Symbol symbol) {
         this.program = program;

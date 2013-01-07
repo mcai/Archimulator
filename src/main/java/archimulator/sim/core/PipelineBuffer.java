@@ -24,8 +24,8 @@ import java.util.List;
 /**
  * Pipeline buffer.
  *
- * @author Min Cai
  * @param <EntryT>
+ * @author Min Cai
  */
 public class PipelineBuffer<EntryT> {
     private int capacity;

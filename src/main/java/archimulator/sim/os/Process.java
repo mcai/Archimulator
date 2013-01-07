@@ -46,7 +46,6 @@ import java.util.Date;
 import java.util.List;
 
 /**
- *
  * @author Min Cai
  */
 public abstract class Process extends BasicSimulationObject implements SimulationObject, Serializable {
@@ -76,9 +75,9 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
     /**
      * Create a process.
      *
-     * @param kernel the kernel
+     * @param kernel              the kernel
      * @param simulationDirectory the simulation directory
-     * @param contextMapping the context mapping
+     * @param contextMapping      the context mapping
      */
     public Process(Kernel kernel, String simulationDirectory, ContextMapping contextMapping) {
         super(kernel);
@@ -132,9 +131,9 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
     /**
      * Load the program.
      *
-     * @param kernel the kernel
+     * @param kernel              the kernel
      * @param simulationDirectory the simulation directory
-     * @param contextMapping the context mapping
+     * @param contextMapping      the context mapping
      */
     protected abstract void loadProgram(Kernel kernel, String simulationDirectory, ContextMapping contextMapping);
 
@@ -418,7 +417,7 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
     /**
      * Round up.
      *
-     * @param n the number
+     * @param n         the number
      * @param alignment th alignment
      * @return the result
      */
@@ -429,10 +428,10 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
     /**
      * Build the benchmark.
      *
-     * @param workingDirectory the working directory
-     * @param helperThreadEnabled a value indicating whether the helper threading is enabled or not
+     * @param workingDirectory      the working directory
+     * @param helperThreadEnabled   a value indicating whether the helper threading is enabled or not
      * @param helperThreadLookahead the helper thread lookahead
-     * @param helperThreadStride the helper thread stride
+     * @param helperThreadStride    the helper thread stride
      */
     private static void buildBenchmark(String workingDirectory, boolean helperThreadEnabled, int helperThreadLookahead, int helperThreadStride) {
         if (helperThreadEnabled) {
@@ -446,9 +445,9 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
      * Push the macro #define argument.
      *
      * @param workingDirectory the working directory
-     * @param fileName the file name
-     * @param key the key
-     * @param value the value
+     * @param fileName         the file name
+     * @param key              the key
+     * @param value            the value
      */
     private static void pushMacroDefineArg(String workingDirectory, String fileName, String key, String value) {
         fileName = getTransformedBenchmarkWorkingDirectory(workingDirectory) + "/" + fileName;

@@ -33,7 +33,7 @@ public class NotTakenBranchPredictor extends BranchPredictor {
      * Create an "always not taken" branch predictor.
      *
      * @param thread the thread
-     * @param name the name of the branch predictor
+     * @param name   the name of the branch predictor
      */
     public NotTakenBranchPredictor(Thread thread, String name) {
         super(thread, name, BranchPredictorType.NOT_TAKEN);

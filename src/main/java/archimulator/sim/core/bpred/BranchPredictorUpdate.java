@@ -42,7 +42,6 @@ public class BranchPredictorUpdate {
     }
 
     /**
-     *
      * @return
      */
     public SaturatingCounter getCounterDir1() {
@@ -50,7 +49,6 @@ public class BranchPredictorUpdate {
     }
 
     /**
-     *
      * @param counterDir1
      */
     public void setCounterDir1(SaturatingCounter counterDir1) {
@@ -58,7 +56,6 @@ public class BranchPredictorUpdate {
     }
 
     /**
-     *
      * @return
      */
     public SaturatingCounter getCounterDir2() {
@@ -66,7 +63,6 @@ public class BranchPredictorUpdate {
     }
 
     /**
-     *
      * @param counterDir2
      */
     public void setCounterDir2(SaturatingCounter counterDir2) {
@@ -74,7 +70,6 @@ public class BranchPredictorUpdate {
     }
 
     /**
-     *
      * @return
      */
     public SaturatingCounter getCounterMeta() {
@@ -82,7 +77,6 @@ public class BranchPredictorUpdate {
     }
 
     /**
-     *
      * @param counterMeta
      */
     public void setCounterMeta(SaturatingCounter counterMeta) {
@@ -90,7 +84,6 @@ public class BranchPredictorUpdate {
     }
 
     /**
-     *
      * @return
      */
     public boolean isRas() {
@@ -98,7 +91,6 @@ public class BranchPredictorUpdate {
     }
 
     /**
-     *
      * @param ras
      */
     public void setRas(boolean ras) {
@@ -106,7 +98,6 @@ public class BranchPredictorUpdate {
     }
 
     /**
-     *
      * @return
      */
     public boolean isBimod() {
@@ -114,7 +105,6 @@ public class BranchPredictorUpdate {
     }
 
     /**
-     *
      * @param bimod
      */
     public void setBimod(boolean bimod) {
@@ -122,7 +112,6 @@ public class BranchPredictorUpdate {
     }
 
     /**
-     *
      * @return
      */
     public boolean isTwoLevel() {
@@ -130,7 +119,6 @@ public class BranchPredictorUpdate {
     }
 
     /**
-     *
      * @param twoLevel
      */
     public void setTwoLevel(boolean twoLevel) {
@@ -138,7 +126,6 @@ public class BranchPredictorUpdate {
     }
 
     /**
-     *
      * @return
      */
     public boolean isMeta() {
@@ -146,7 +133,6 @@ public class BranchPredictorUpdate {
     }
 
     /**
-     *
      * @param meta
      */
     public void setMeta(boolean meta) {

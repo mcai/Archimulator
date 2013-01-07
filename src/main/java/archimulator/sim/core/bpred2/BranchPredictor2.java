@@ -19,19 +19,16 @@
 package archimulator.sim.core.bpred2;
 
 /**
- *
  * @author Min Cai
  */
 public interface BranchPredictor2 {
     /**
-     *
      * @param branchInfo
      * @return
      */
     BranchUpdate predict(BranchInfo branchInfo);
 
     /**
-     *
      * @param branchInfo
      * @param branchUpdate
      * @param taken

@@ -83,7 +83,9 @@ public class DynamicInsertionPolicy {
         /* Number of SDMs per thread */
         int totalSdmCount = 2;
 
-        assert (this.cache.getNumSets() >= totalSdmSize * totalSdmCount);
+        if (this.cache.getNumSets() < totalSdmSize * totalSdmCount) {
+            throw new IllegalArgumentException();
+        }
 
         /* When using multiple cache banks, seeding is to ensure that all banks use the same sampled sets */
         for (int p = 0; p < totalSdmCount; p++) {
@@ -124,7 +126,9 @@ public class DynamicInsertionPolicy {
 
                 if (((index >> 5) & 1) != 0 && index >= 0 && (MathHelper.bits(index, 11, 6) == MathHelper.bits(index, 5, 0))) {
                     /* Check to make sure this set isn't already assigned */
-                    assert (setDuelingMonitor.type == SetDuelingMonitorType.FOLLOWERS);
+                    if (setDuelingMonitor.type != SetDuelingMonitorType.FOLLOWERS) {
+                        throw new IllegalArgumentException();
+                    }
 
                     setDuelingMonitor.type = SetDuelingMonitorType.LRU;
                     setDuelingMonitor.ownerThreadId = threadId;
@@ -134,7 +138,9 @@ public class DynamicInsertionPolicy {
 
                 if (((index >> 5) & 1) == 0 && index <= 2047 && (MathHelper.bits(index, 11, 6) == MathHelper.bits(index, 5, 0))) {
                     // Check to make sure this set isn't already assigned
-                    assert (setDuelingMonitor.type == SetDuelingMonitorType.FOLLOWERS);
+                    if (setDuelingMonitor.type != SetDuelingMonitorType.FOLLOWERS) {
+                        throw new IllegalArgumentException();
+                    }
 
                     setDuelingMonitor.type = SetDuelingMonitorType.BIP;
                     setDuelingMonitor.ownerThreadId = threadId;

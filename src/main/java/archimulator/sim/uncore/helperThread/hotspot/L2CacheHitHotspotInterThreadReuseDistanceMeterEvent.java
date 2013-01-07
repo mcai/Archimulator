@@ -54,7 +54,8 @@ public class L2CacheHitHotspotInterThreadReuseDistanceMeterEvent extends Simulat
         /**
          * Create an L2 cache hit hotspot inter-thread reuse distance meter event value.
          *
-         * @param helperThreadL2CacheRequestState the helper thread L2 cache request state
+         * @param helperThreadL2CacheRequestState
+         *                      the helper thread L2 cache request state
          * @param reuseDistance the reuse distance
          */
         public L2CacheHitHotspotInterThreadReuseDistanceMeterEventValue(HelperThreadL2CacheRequestState helperThreadL2CacheRequestState, long reuseDistance) {

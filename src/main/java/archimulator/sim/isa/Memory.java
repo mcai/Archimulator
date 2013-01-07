@@ -369,7 +369,9 @@ public class Memory extends BasicSimulationObject {
         }
 
         for (int tag = tagStart; tag <= tagEnd; tag += pageSize) {
-            assert (this.getPage(tag) == null);
+            if (this.getPage(tag) != null) {
+                throw new IllegalArgumentException();
+            }
             this.addPage(tag);
         }
 

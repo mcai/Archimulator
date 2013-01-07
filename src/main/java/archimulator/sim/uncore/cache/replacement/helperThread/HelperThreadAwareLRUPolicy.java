@@ -22,16 +22,16 @@ import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.MemoryHierarchyAccessType;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.replacement.LRUPolicy;
-import archimulator.sim.uncore.helperThread.HelperThreadingHelper;
 import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestQuality;
+import archimulator.sim.uncore.helperThread.HelperThreadingHelper;
 
 import java.io.Serializable;
 
 /**
  * Helper thread aware least recently used (LRU) policy.
  *
- * @author Min Cai
  * @param <StateT> the state type of the parent evictable cache
+ * @author Min Cai
  */
 public class HelperThreadAwareLRUPolicy<StateT extends Serializable> extends LRUPolicy<StateT> {
     private boolean useBreakdown;
@@ -39,7 +39,7 @@ public class HelperThreadAwareLRUPolicy<StateT extends Serializable> extends LRU
     /**
      * Create a helper thread aware least recently used (LRU) policy for the specified evictable cache.
      *
-     * @param cache the parent evictable cache
+     * @param cache        the parent evictable cache
      * @param useBreakdown a value indicating whether using the helper thread L2 cache request breakdown based enhancement or not
      */
     public HelperThreadAwareLRUPolicy(EvictableCache<StateT> cache, boolean useBreakdown) {
@@ -51,8 +51,8 @@ public class HelperThreadAwareLRUPolicy<StateT extends Serializable> extends LRU
      * Handle promotion on a cache hit.
      *
      * @param access the memory hierarchy access
-     * @param set the set index
-     * @param way the way
+     * @param set    the set index
+     * @param way    the way
      */
     @Override
     public void handlePromotionOnHit(MemoryHierarchyAccess access, int set, int way) {
@@ -68,8 +68,8 @@ public class HelperThreadAwareLRUPolicy<StateT extends Serializable> extends LRU
      * Handle insertion on a cache miss.
      *
      * @param access the memory hierarchy access
-     * @param set the set
-     * @param way the way
+     * @param set    the set
+     * @param way    the way
      */
     @Override
     public void handleInsertionOnMiss(MemoryHierarchyAccess access, int set, int way) {
@@ -78,9 +78,8 @@ public class HelperThreadAwareLRUPolicy<StateT extends Serializable> extends LRU
                 //TODO: setLRU(..) only when the access is from delinquent PC only
                 this.setLRU(set, way); // MT miss, prevented from thrashing: low locality => insert in LRU position
                 return;
-            }
-            else if (access.getType() == MemoryHierarchyAccessType.LOAD && requesterIsHelperThread(access)) {
-                if(!this.useBreakdown) {
+            } else if (access.getType() == MemoryHierarchyAccessType.LOAD && requesterIsHelperThread(access)) {
+                if (!this.useBreakdown) {
                     setMRU(set, way); // HT miss: expected high HT-MT inter-thread reuse in most cases => insert in MRU position
                     return;
                 }

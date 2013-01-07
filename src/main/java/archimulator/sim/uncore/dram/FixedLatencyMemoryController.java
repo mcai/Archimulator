@@ -39,7 +39,7 @@ public class FixedLatencyMemoryController extends MemoryController {
     /**
      * Access the specified address.
      *
-     * @param address the address
+     * @param address             the address
      * @param onCompletedCallback the callback action performed when the access is completed
      */
     @Override

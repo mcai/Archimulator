@@ -33,7 +33,7 @@ public abstract class SystemEvent {
      * Create a system event of the specified type for the specified context.
      *
      * @param context the context
-     * @param type the type
+     * @param type    the type
      */
     public SystemEvent(Context context, SystemEventType type) {
         this.context = context;

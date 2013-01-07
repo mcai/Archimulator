@@ -33,11 +33,11 @@ import archimulator.sim.uncore.coherence.msi.flow.LoadFlow;
 import archimulator.sim.uncore.coherence.msi.flow.StoreFlow;
 import archimulator.sim.uncore.coherence.msi.message.*;
 import archimulator.sim.uncore.coherence.msi.state.CacheControllerState;
-import net.pickapack.util.ValueProvider;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
 import net.pickapack.fsm.BasicFiniteStateMachine;
 import net.pickapack.fsm.event.ExitStateEvent;
+import net.pickapack.util.ValueProvider;
 
 import java.util.ArrayList;
 import java.util.List;

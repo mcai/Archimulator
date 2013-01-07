@@ -32,7 +32,7 @@ public class RoutingEntry {
     /**
      * Create a routing entry from the source node to the destination node.
      *
-     * @param sourceNode the source node
+     * @param sourceNode      the source node
      * @param destinationNode the destination node
      */
     public RoutingEntry(NetNode sourceNode, NetNode destinationNode) {

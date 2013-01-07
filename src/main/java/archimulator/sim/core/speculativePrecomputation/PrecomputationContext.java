@@ -34,9 +34,10 @@ public class PrecomputationContext extends Context {
     /**
      * Create a precomputation context.
      *
-     * @param dynamicSpeculativePrecomputationHelper the dynamic speculative precomputation helper
-     * @param parent the parent context
-     * @param regs the architectural register file
+     * @param dynamicSpeculativePrecomputationHelper
+     *                  the dynamic speculative precomputation helper
+     * @param parent    the parent context
+     * @param regs      the architectural register file
      * @param triggerPc the value of the trigger program counter (PC)
      */
     PrecomputationContext(DynamicSpeculativePrecomputationHelper dynamicSpeculativePrecomputationHelper, Context parent, ArchitecturalRegisterFile regs, int triggerPc) {

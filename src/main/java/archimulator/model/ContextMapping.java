@@ -47,7 +47,7 @@ public class ContextMapping implements Serializable {
     /**
      * Create a context mapping.
      *
-     * @param threadId the hardware thread ID.
+     * @param threadId  the hardware thread ID.
      * @param benchmark the benchmark.
      * @param arguments the command line arguments used in running the software context
      */
@@ -58,9 +58,9 @@ public class ContextMapping implements Serializable {
     /**
      * Create a context mapping.
      *
-     * @param threadId the hardware thread ID.
-     * @param benchmark the benchmark
-     * @param arguments the command line arguments used in running the software context
+     * @param threadId    the hardware thread ID.
+     * @param benchmark   the benchmark
+     * @param arguments   the command line arguments used in running the software context
      * @param standardOut the standard out
      */
     public ContextMapping(int threadId, Benchmark benchmark, String arguments, String standardOut) {
@@ -113,7 +113,7 @@ public class ContextMapping implements Serializable {
      * @return the command line arguments used in running the software context
      */
     public String getArguments() {
-        if(arguments == null) {
+        if (arguments == null) {
             arguments = "";
         }
 
@@ -135,7 +135,7 @@ public class ContextMapping implements Serializable {
      * @return the standard out
      */
     public String getStandardOut() {
-        if(standardOut == null) {
+        if (standardOut == null) {
             standardOut = "";
         }
 

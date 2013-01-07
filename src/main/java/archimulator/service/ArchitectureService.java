@@ -25,7 +25,6 @@ import net.pickapack.service.Service;
 import java.util.List;
 
 /**
- *
  * Service for managing architectures.
  *
  * @author Min Cai
@@ -107,16 +106,18 @@ public interface ArchitectureService extends Service {
      * Get or update an architecture matching the given parameters.
      *
      * @param hotspotProfilingEnabled a value indicating whether the hotspot profiling is enabled or not
-     * @param helperThreadL2CacheRequestProfilingEnabled a value indicating whether helper thread LLC request profiling is enabled or not
-     * @param dynamicSpeculativePrecomputationEnabled a value indicating whether dynamic speculative precomputation is enabled or not
-     * @param numCores the number of cores
-     * @param numThreadsPerCore number of threads per core
-     * @param l1ISize L1 instruction cache size
-     * @param l1IAssoc L1 instruction cache associativity
-     * @param l1DSize L1 data cache size
-     * @param l1DAssoc L1 data cache associativity
-     * @param l2Size L2 cache size
-     * @param l2Assoc L2 cache associativity
+     * @param helperThreadL2CacheRequestProfilingEnabled
+     *                                a value indicating whether helper thread LLC request profiling is enabled or not
+     * @param dynamicSpeculativePrecomputationEnabled
+     *                                a value indicating whether dynamic speculative precomputation is enabled or not
+     * @param numCores                the number of cores
+     * @param numThreadsPerCore       number of threads per core
+     * @param l1ISize                 L1 instruction cache size
+     * @param l1IAssoc                L1 instruction cache associativity
+     * @param l1DSize                 L1 data cache size
+     * @param l1DAssoc                L1 data cache associativity
+     * @param l2Size                  L2 cache size
+     * @param l2Assoc                 L2 cache associativity
      * @param l2ReplacementPolicyType L2 cache replacement policy type
      * @return the existing or newly added architecture matching the given parameters
      */

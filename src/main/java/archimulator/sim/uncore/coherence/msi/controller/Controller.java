@@ -18,8 +18,8 @@
  ******************************************************************************/
 package archimulator.sim.uncore.coherence.msi.controller;
 
-import archimulator.sim.uncore.MemoryHierarchy;
 import archimulator.sim.uncore.MemoryDevice;
+import archimulator.sim.uncore.MemoryHierarchy;
 import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
 import archimulator.sim.uncore.coherence.msi.message.CoherenceMessage;
 
@@ -35,7 +35,7 @@ public abstract class Controller extends MemoryDevice {
      * Create a controller.
      *
      * @param memoryHierarchy the parent memory hierarchy
-     * @param name           the name
+     * @param name            the name
      */
     public Controller(MemoryHierarchy memoryHierarchy, String name) {
         super(memoryHierarchy, name);

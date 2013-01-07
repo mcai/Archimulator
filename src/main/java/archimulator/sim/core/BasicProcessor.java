@@ -49,12 +49,12 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
     /**
      * Create a basic processor.
      *
-     * @param experiment the experiment
-     * @param simulation the simulation
+     * @param experiment              the experiment
+     * @param simulation              the simulation
      * @param blockingEventDispatcher the blocking event dispatcher
      * @param cycleAccurateEventQueue the cycle accurate event queue
-     * @param kernel the kernel
-     * @param memoryHierarchy the memory hierarchy
+     * @param kernel                  the kernel
+     * @param memoryHierarchy         the memory hierarchy
      */
     public BasicProcessor(Experiment experiment, Simulation simulation, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, Kernel kernel, MemoryHierarchy memoryHierarchy) {
         super(experiment, simulation, blockingEventDispatcher, cycleAccurateEventQueue);
@@ -155,7 +155,7 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
     public List<Thread> getThreads() {
         List<Thread> threads = new ArrayList<Thread>();
 
-        for(Core core : cores) {
+        for (Core core : cores) {
             threads.addAll(core.getThreads());
         }
 

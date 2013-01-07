@@ -27,13 +27,13 @@ public class SwitchNode extends NetNode {
     /**
      * Create a switch node.
      *
-     * @param net the parent net
-     * @param name the name of the switch node
-     * @param numInPorts the number of the in ports
-     * @param inBufferSize the size of the in buffer
-     * @param numOutPorts the number of the out ports
+     * @param net           the parent net
+     * @param name          the name of the switch node
+     * @param numInPorts    the number of the in ports
+     * @param inBufferSize  the size of the in buffer
+     * @param numOutPorts   the number of the out ports
      * @param outBufferSize the size of the out buffer
-     * @param bandwidth the bandwidth of the switch node
+     * @param bandwidth     the bandwidth of the switch node
      */
     public SwitchNode(Net net, String name, int numInPorts, int inBufferSize, int numOutPorts, int outBufferSize, int bandwidth) {
         super(net, name, numInPorts, inBufferSize, numOutPorts, outBufferSize, bandwidth);

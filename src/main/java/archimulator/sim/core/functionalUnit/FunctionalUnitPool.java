@@ -89,7 +89,7 @@ public class FunctionalUnitPool implements Named {
     /**
      * Add a functional unit descriptor.
      *
-     * @param type the functional unit type
+     * @param type     the functional unit type
      * @param quantity the quantity
      * @return the newly added functional unit descriptor
      */
@@ -102,7 +102,7 @@ public class FunctionalUnitPool implements Named {
     /**
      * Acquire.
      *
-     * @param reorderBufferEntry the reorder buffer entry
+     * @param reorderBufferEntry  the reorder buffer entry
      * @param onCompletedCallback the callback action performed when the operation is completed
      * @return a value indicating whether the acquiring succeeds or not
      */

@@ -53,7 +53,7 @@ public class RegisterRenameTable {
     /**
      * Set the corresponding physical register for the specified dependency.
      *
-     * @param dependency the dependency
+     * @param dependency       the dependency
      * @param physicalRegister the physical register
      */
     public void put(int dependency, PhysicalRegister physicalRegister) {

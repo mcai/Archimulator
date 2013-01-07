@@ -10,7 +10,7 @@ public class HistogramHelper {
         EmpiricalDistribution distribution = new EmpiricalDistribution(5);
         distribution.load(data);
         for (SummaryStatistics stats : distribution.getBinStats()) {
-            if(stats.getN() > 0) {
+            if (stats.getN() > 0) {
                 System.out.println("[" + stats.getMin() + "-" + stats.getMax() + "] = " + stats.getN());
             }
         }

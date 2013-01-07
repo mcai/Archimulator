@@ -32,7 +32,7 @@ public class PerfectBranchPredictor extends BranchPredictor {
      * Create a perfect branch predictor.
      *
      * @param thread the thread
-     * @param name the name of the branch predictor
+     * @param name   the name of the branch predictor
      */
     public PerfectBranchPredictor(Thread thread, String name) {
         super(thread, name, BranchPredictorType.PERFECT);

@@ -18,8 +18,8 @@
  ******************************************************************************/
 package archimulator.model;
 
-import archimulator.model.metric.gauge.ExperimentGauge;
 import archimulator.model.metric.ExperimentStat;
+import archimulator.model.metric.gauge.ExperimentGauge;
 import archimulator.service.ServiceManager;
 import archimulator.util.serialization.ContextMappingArrayListJsonSerializableType;
 import archimulator.util.serialization.LongArrayListJsonSerializableType;
@@ -101,12 +101,12 @@ public class Experiment implements WithId, WithParentId, WithTitle, WithCreateTi
     /**
      * Create an experiment.
      *
-     * @param parent the parent experiment pack
-     * @param type the experiment type
-     * @param architecture the architecture
+     * @param parent             the parent experiment pack
+     * @param type               the experiment type
+     * @param architecture       the architecture
      * @param numMaxInstructions the upper limit of the number of instructions executed on the first hardware thread
-     * @param contextMappings the context mappings
-     * @param gauges the experiment gauges
+     * @param contextMappings    the context mappings
+     * @param gauges             the experiment gauges
      */
     public Experiment(ExperimentPack parent, ExperimentType type, Architecture architecture, long numMaxInstructions, List<ContextMapping> contextMappings, List<ExperimentGauge> gauges) {
         this.parentId = parent != null ? parent.getId() : -1;
@@ -136,13 +136,12 @@ public class Experiment implements WithId, WithParentId, WithTitle, WithCreateTi
 
         if (this.type == ExperimentType.FUNCTIONAL) {
             this.title += "-functional";
-        }
-        else {
-            if(this.type == ExperimentType.TWO_PHASE) {
+        } else {
+            if (this.type == ExperimentType.TWO_PHASE) {
                 this.title += "-two_phase";
             }
 
-            if(contextMapping.getBenchmark().getHelperThreadEnabled()) {
+            if (contextMapping.getBenchmark().getHelperThreadEnabled()) {
                 this.title += "-lookahead_" + contextMapping.getHelperThreadLookahead() + "-stride_" + contextMapping.getHelperThreadStride();
             }
 
@@ -177,7 +176,7 @@ public class Experiment implements WithId, WithParentId, WithTitle, WithCreateTi
      */
     @Override
     public String getTitle() {
-        if(title == null) {
+        if (title == null) {
             updateTitle();
         }
 
@@ -297,7 +296,7 @@ public class Experiment implements WithId, WithParentId, WithTitle, WithCreateTi
     /**
      * Get a statistic value by key and default value.
      *
-     * @param key the key
+     * @param key          the key
      * @param defaultValue the default value
      * @return the statistic value
      */
@@ -309,7 +308,7 @@ public class Experiment implements WithId, WithParentId, WithTitle, WithCreateTi
      * Get a statistic value from the map and by key.
      *
      * @param statsMap the statistic map
-     * @param key the key
+     * @param key      the key
      * @return the statistic value
      */
     public String getStatValue(Map<String, ExperimentStat> statsMap, String key) {
@@ -319,8 +318,8 @@ public class Experiment implements WithId, WithParentId, WithTitle, WithCreateTi
     /**
      * Get a statistic value from the map and by key and default value.
      *
-     * @param statsMap the statistics map
-     * @param key the key
+     * @param statsMap     the statistics map
+     * @param key          the key
      * @param defaultValue the default value
      * @return the statistic value
      */
@@ -331,8 +330,8 @@ public class Experiment implements WithId, WithParentId, WithTitle, WithCreateTi
     /**
      * Get a statistics value as long from the map and by key and default value.
      *
-     * @param statsMap the statistics map
-     * @param key the key
+     * @param statsMap     the statistics map
+     * @param key          the key
      * @param defaultValue the default value
      * @return the statistics value
      */
@@ -349,8 +348,8 @@ public class Experiment implements WithId, WithParentId, WithTitle, WithCreateTi
     /**
      * Get a statistics value as double from the map and by key and default value.
      *
-     * @param statsMap the statistics map
-     * @param key the key
+     * @param statsMap     the statistics map
+     * @param key          the key
      * @param defaultValue the default value
      * @return the statistics value
      */
@@ -377,7 +376,7 @@ public class Experiment implements WithId, WithParentId, WithTitle, WithCreateTi
     /**
      * Get the statistic value from the experiment stat object and the default value.
      *
-     * @param stat the experiment stat object
+     * @param stat         the experiment stat object
      * @param defaultValue the default value
      * @return the statistic value
      */

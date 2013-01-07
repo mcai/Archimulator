@@ -45,8 +45,8 @@ public class DynamicInstruction {
     /**
      * Create a dynamic instruction.
      *
-     * @param thread the thread
-     * @param pc the value of the program counter (PC)
+     * @param thread            the thread
+     * @param pc                the value of the program counter (PC)
      * @param staticInstruction the static instruction
      */
     public DynamicInstruction(Thread thread, int pc, StaticInstruction staticInstruction) {
@@ -169,7 +169,8 @@ public class DynamicInstruction {
     /**
      * Set the number of cycles the dynamic instruction has spent at the head of the reorder buffer.
      *
-     * @param numCyclesSpentAtHeadOfReorderBuffer the number of cycles the dynamic instruction has spent at the head of the reorder buffer
+     * @param numCyclesSpentAtHeadOfReorderBuffer
+     *         the number of cycles the dynamic instruction has spent at the head of the reorder buffer
      */
     public void setNumCyclesSpentAtHeadOfReorderBuffer(int numCyclesSpentAtHeadOfReorderBuffer) {
         this.numCyclesSpentAtHeadOfReorderBuffer = numCyclesSpentAtHeadOfReorderBuffer;

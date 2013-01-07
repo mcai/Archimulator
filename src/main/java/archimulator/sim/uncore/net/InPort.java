@@ -32,8 +32,8 @@ public class InPort extends NetPort {
     /**
      * Create an in port.
      *
-     * @param node the node
-     * @param num the number of the in port
+     * @param node       the node
+     * @param num        the number of the in port
      * @param bufferSize the size of the buffer
      */
     public InPort(NetNode node, int num, int bufferSize) {

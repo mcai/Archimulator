@@ -20,12 +20,12 @@ package archimulator.service.impl;
 
 import archimulator.model.Experiment;
 import archimulator.model.ExperimentSummary;
-import archimulator.model.metric.gauge.ExperimentGauge;
 import archimulator.model.metric.ExperimentStat;
-import archimulator.util.plot.MultiBarPlot;
-import archimulator.util.plot.Table;
+import archimulator.model.metric.gauge.ExperimentGauge;
 import archimulator.service.ExperimentStatService;
 import archimulator.service.ServiceManager;
+import archimulator.util.plot.MultiBarPlot;
+import archimulator.util.plot.Table;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.PreparedDelete;
@@ -101,7 +101,7 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
 
         System.out.println("There are " + experiments.size() + " experiments.");
 
-        for(Experiment experiment : experiments) {
+        for (Experiment experiment : experiments) {
             this.CreateSummaryIfNotExistsByParent(experiment);
         }
 
@@ -231,7 +231,7 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
      * @param parent the parent experiment
      */
     private void CreateSummaryIfNotExistsByParent(Experiment parent) {
-        if(this.getFirstItemByParent(this.summaries, parent) == null) {
+        if (this.getFirstItemByParent(this.summaries, parent) == null) {
             System.out.println("Creating summary for experiment #" + parent.getId() + "..");
 
             Map<String, ExperimentStat> statsMap = ExperimentStat.toMap(ServiceManager.getExperimentStatService().getStatsByParent(parent));
@@ -900,8 +900,8 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
     /**
      * Create a multi bar plot.
      *
-     * @param title the title
-     * @param experiments the list of experiments
+     * @param title                 the title
+     * @param experiments           the list of experiments
      * @param transformedBreakdowns the list of transformed breakdowns
      * @return a multi bar plot
      */

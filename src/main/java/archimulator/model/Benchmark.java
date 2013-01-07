@@ -67,9 +67,9 @@ public class Benchmark implements WithId, WithTitle, WithCreateTime {
     /**
      * Create a benchmark.
      *
-     * @param title the title
+     * @param title            the title
      * @param workingDirectory the working directory
-     * @param executable the executable
+     * @param executable       the executable
      * @param defaultArguments the default arguments
      */
     public Benchmark(String title, String workingDirectory, String executable, String defaultArguments) {
@@ -79,11 +79,11 @@ public class Benchmark implements WithId, WithTitle, WithCreateTime {
     /**
      * Create a benchmark.
      *
-     * @param title the title
-     * @param workingDirectory the working directory
-     * @param executable the executable
-     * @param defaultArguments the default arguments
-     * @param standardIn the standard in
+     * @param title               the title
+     * @param workingDirectory    the working directory
+     * @param executable          the executable
+     * @param defaultArguments    the default arguments
+     * @param standardIn          the standard in
      * @param helperThreadEnabled a value indicating whether the helper threading is enabled or not
      */
     public Benchmark(String title, String workingDirectory, String executable, String defaultArguments, String standardIn, boolean helperThreadEnabled) {
@@ -165,10 +165,10 @@ public class Benchmark implements WithId, WithTitle, WithCreateTime {
     /**
      * Get the standard in.
      *
-     * @return  the standard in
+     * @return the standard in
      */
     public String getStandardIn() {
-        if(standardIn == null) {
+        if (standardIn == null) {
             standardIn = "";
         }
 

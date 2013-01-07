@@ -47,8 +47,8 @@ public abstract class BranchPredictor {
      * Create a branch predictor.
      *
      * @param thread the thread
-     * @param name the name of the branch predictor
-     * @param type the type of the branch predictor
+     * @param name   the name of the branch predictor
+     * @param type   the type of the branch predictor
      */
     public BranchPredictor(Thread thread, String name, BranchPredictorType type) {
         this.thread = thread;
@@ -59,10 +59,10 @@ public abstract class BranchPredictor {
     /**
      * Predict.
      *
-     * @param branchAddress the branch address
-     * @param branchTarget the branch target
-     * @param mnemonic the mnemonic
-     * @param branchPredictorUpdate the branch predictor update
+     * @param branchAddress                  the branch address
+     * @param branchTarget                   the branch target
+     * @param mnemonic                       the mnemonic
+     * @param branchPredictorUpdate          the branch predictor update
      * @param returnAddressStackRecoverIndex the return address stack recover index
      * @return the predicted target address
      */
@@ -71,12 +71,12 @@ public abstract class BranchPredictor {
     /**
      * Update.
      *
-     * @param branchAddress the branch address
-     * @param branchTarget the branch target
-     * @param taken a value indicating whether the branch is taken or not
-     * @param predictedTaken a value indicating whether the branch is predicted as taken or not
-     * @param correct a value indicating whether the prediction is correct or not
-     * @param mnemonic the mnemonic
+     * @param branchAddress         the branch address
+     * @param branchTarget          the branch target
+     * @param taken                 a value indicating whether the branch is taken or not
+     * @param predictedTaken        a value indicating whether the branch is predicted as taken or not
+     * @param correct               a value indicating whether the prediction is correct or not
+     * @param mnemonic              the mnemonic
      * @param branchPredictorUpdate the branch predictor update
      */
     public void update(int branchAddress, int branchTarget, boolean taken, boolean predictedTaken, boolean correct, Mnemonic mnemonic, BranchPredictorUpdate branchPredictorUpdate) {

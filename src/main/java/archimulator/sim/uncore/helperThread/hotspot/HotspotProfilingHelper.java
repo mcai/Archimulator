@@ -23,15 +23,15 @@ import archimulator.sim.analysis.Function;
 import archimulator.sim.analysis.Instruction;
 import archimulator.sim.common.Simulation;
 import archimulator.sim.core.DynamicInstruction;
-import archimulator.sim.isa.event.FunctionalCallEvent;
 import archimulator.sim.isa.StaticInstructionType;
+import archimulator.sim.isa.event.FunctionalCallEvent;
 import archimulator.sim.os.Process;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.event.GeneralCacheControllerServiceNonblockingRequestEvent;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
-import archimulator.sim.uncore.helperThread.HelperThreadingHelper;
 import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestProfilingHelper;
 import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestState;
+import archimulator.sim.uncore.helperThread.HelperThreadingHelper;
 import net.pickapack.action.Action1;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
@@ -84,12 +84,12 @@ public class HotspotProfilingHelper {
             public void apply(FunctionalCallEvent event) {
                 String callerFunctionName = event.getContext().getProcess().getFunctionNameFromPc(event.getFunctionCallContext().getPc());
                 String calleeFunctionName = event.getContext().getProcess().getFunctionNameFromPc(event.getFunctionCallContext().getTargetPc());
-                if(callerFunctionName != null) {
-                    if(!numCallsPerFunctions.containsKey(callerFunctionName)) {
+                if (callerFunctionName != null) {
+                    if (!numCallsPerFunctions.containsKey(callerFunctionName)) {
                         numCallsPerFunctions.put(callerFunctionName, new TreeMap<String, Long>());
                     }
 
-                    if(!numCallsPerFunctions.get(callerFunctionName).containsKey(calleeFunctionName)) {
+                    if (!numCallsPerFunctions.get(callerFunctionName).containsKey(calleeFunctionName)) {
                         numCallsPerFunctions.get(callerFunctionName).put(calleeFunctionName, 0L);
                     }
 
@@ -148,7 +148,7 @@ public class HotspotProfilingHelper {
     private void scanLoadInstructionsInHotspotFunction(Process process) {
         Function hotspotFunction = process.getHotspotFunction();
 
-        if(hotspotFunction != null) {
+        if (hotspotFunction != null) {
             for (BasicBlock basicBlock : hotspotFunction.getBasicBlocks()) {
                 for (Instruction instruction : basicBlock.getInstructions()) {
                     if (instruction.getStaticInstruction().getMnemonic().getType() == StaticInstructionType.LOAD) {
@@ -163,8 +163,8 @@ public class HotspotProfilingHelper {
      * Profile the reuse distance for an access.
      *
      * @param hitInCache a value indicating whether the access hits in the cache or not
-     * @param way the way
-     * @param access the memory hierarchy access
+     * @param way        the way
+     * @param access     the memory hierarchy access
      */
     private void profileReuseDistance(boolean hitInCache, int way, MemoryHierarchyAccess access) {
         int tag = access.getPhysicalTag();
@@ -179,14 +179,14 @@ public class HotspotProfilingHelper {
         }
         lruStack.push(tag);
 
-        if(hitInCache && HelperThreadingHelper.isMainThread(access.getThread())) {
+        if (hitInCache && HelperThreadingHelper.isMainThread(access.getThread())) {
             HelperThreadL2CacheRequestProfilingHelper helperThreadL2CacheRequestProfilingHelper = this.l2CacheController.getSimulation().getHelperThreadL2CacheRequestProfilingHelper();
 
-            if(helperThreadL2CacheRequestProfilingHelper != null) {
+            if (helperThreadL2CacheRequestProfilingHelper != null) {
                 HelperThreadL2CacheRequestState helperThreadL2CacheRequestState =
                         helperThreadL2CacheRequestProfilingHelper.getHelperThreadL2CacheRequestStates().get(set).get(way);
 
-                if(HelperThreadingHelper.isHelperThread(helperThreadL2CacheRequestState.getThreadId())) {
+                if (HelperThreadingHelper.isHelperThread(helperThreadL2CacheRequestState.getThreadId())) {
                     this.l2CacheController.getBlockingEventDispatcher().dispatch(new L2CacheHitHotspotInterThreadReuseDistanceMeterEvent(
                             this.l2CacheController,
                             access.getVirtualPc(),
@@ -199,7 +199,7 @@ public class HotspotProfilingHelper {
             }
         }
 
-        if(!hitInCache && HelperThreadingHelper.isMainThread(access.getThread())) {
+        if (!hitInCache && HelperThreadingHelper.isMainThread(access.getThread())) {
             this.l2CacheController.getBlockingEventDispatcher().dispatch(new L2CacheMissHotspotReuseDistanceMeterEvent(
                     this.l2CacheController,
                     access.getVirtualPc(),
@@ -210,10 +210,9 @@ public class HotspotProfilingHelper {
             ));
         }
 
-        if(hitInCache) {
+        if (hitInCache) {
             this.statL2CacheHitReuseDistances.addValue(position);
-        }
-        else {
+        } else {
             this.statL2CacheMissReuseDistances.addValue(position);
         }
     }
@@ -225,7 +224,7 @@ public class HotspotProfilingHelper {
      * @return the LRU stack for the specified set in the L2 cache
      */
     private Stack<Integer> getLruStackForL2Cache(int set) {
-        if(!this.l2CacheLruStacks.containsKey(set)) {
+        if (!this.l2CacheLruStacks.containsKey(set)) {
             this.l2CacheLruStacks.put(set, new Stack<Integer>());
         }
 

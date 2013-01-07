@@ -32,7 +32,10 @@ import archimulator.sim.os.Context;
 import archimulator.sim.os.ContextKilledEvent;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.MemoryHierarchyAccessType;
-import archimulator.sim.uncore.cache.*;
+import archimulator.sim.uncore.cache.CacheAccess;
+import archimulator.sim.uncore.cache.CacheGeometry;
+import archimulator.sim.uncore.cache.CacheLine;
+import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
 import archimulator.sim.uncore.coherence.event.GeneralCacheControllerServiceNonblockingRequestEvent;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
@@ -111,6 +114,7 @@ public class DynamicSpeculativePrecomputationHelper {
 
     /**
      * Get the map of retired instruction buffers.
+     *
      * @return the map of retired instruction buffers
      */
     public Map<Thread, RetiredInstructionBuffer> getRetiredInstructionBuffers() {
@@ -168,9 +172,9 @@ public class DynamicSpeculativePrecomputationHelper {
     /**
      * Find an invalid line and create a new miss for the specified address.
      *
-     * @param thread the thread
+     * @param thread  the thread
      * @param address the address
-     * @param set the set index
+     * @param set     the set index
      * @return an invalid line and the newly created miss for the specified address
      */
     private CacheAccess<Boolean> findInvalidLineAndNewMiss(Thread thread, int address, int set) {
@@ -203,7 +207,8 @@ public class DynamicSpeculativePrecomputationHelper {
         /**
          * Create a retired instruction buffer.
          *
-         * @param dynamicSpeculativePrecomputationHelper the dynamic speculative precomputation helper
+         * @param dynamicSpeculativePrecomputationHelper
+         *               the dynamic speculative precomputation helper
          * @param thread the thread
          */
         private RetiredInstructionBuffer(DynamicSpeculativePrecomputationHelper dynamicSpeculativePrecomputationHelper, Thread thread) {
@@ -369,8 +374,9 @@ public class DynamicSpeculativePrecomputationHelper {
              * Create a stack address table entry.
              *
              * @param retiredInstruction the retired instruction
-             * @param displacement the displacement
-             * @param nonEffectiveAddressBaseDependency the non-effective address base dependency
+             * @param displacement       the displacement
+             * @param nonEffectiveAddressBaseDependency
+             *                           the non-effective address base dependency
              */
             private StackAddressTableEntry(RetiredInstruction retiredInstruction, int displacement, int nonEffectiveAddressBaseDependency) {
                 this.retiredInstruction = retiredInstruction;
@@ -393,10 +399,11 @@ public class DynamicSpeculativePrecomputationHelper {
             /**
              * Create a retired instruction.
              *
-             * @param pc the value of the program counter (PC)
-             * @param useStackPointerAsEffectiveAddressBase a value indicating whether using the stack pointer as the effective address base or not
+             * @param pc                           the value of the program counter (PC)
+             * @param useStackPointerAsEffectiveAddressBase
+             *                                     a value indicating whether using the stack pointer as the effective address base or not
              * @param effectiveAddressDisplacement the effective address displacement
-             * @param staticInstruction the static instruction
+             * @param staticInstruction            the static instruction
              */
             private RetiredInstruction(int pc, boolean useStackPointerAsEffectiveAddressBase, int effectiveAddressDisplacement, StaticInstruction staticInstruction) {
                 this.marked = false;
@@ -427,7 +434,8 @@ public class DynamicSpeculativePrecomputationHelper {
         /**
          * Create a slice information table for the specified thread.
          *
-         * @param dynamicSpeculativePrecomputationHelper the dynamic speculative precomputation helper
+         * @param dynamicSpeculativePrecomputationHelper
+         *               the dynamic speculative precomputation helper
          * @param thread the thread
          */
         private SliceInformationTable(DynamicSpeculativePrecomputationHelper dynamicSpeculativePrecomputationHelper, Thread thread) {
@@ -490,7 +498,7 @@ public class DynamicSpeculativePrecomputationHelper {
             this.thread.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, new Action1<GeneralCacheControllerServiceNonblockingRequestEvent>() {
                 @Override
                 public void apply(GeneralCacheControllerServiceNonblockingRequestEvent event) {
-                    if(!event.isHitInCache() && event.getCacheController() instanceof DirectoryController && event.getAccess().getType().isRead()) {
+                    if (!event.isHitInCache() && event.getCacheController() instanceof DirectoryController && event.getAccess().getType().isRead()) {
                         for (Slice slice : slices) {
                             if (slice.getSpawnedThreadContext() != null) {
                                 if (event.getAccess().getThread().getContext() == slice.getSpawnedThreadContext()) {
@@ -546,7 +554,7 @@ public class DynamicSpeculativePrecomputationHelper {
         /**
          * Spawn a precomputation thread for the specified slice and context.
          *
-         * @param slice the slice
+         * @param slice   the slice
          * @param context the context
          */
         private void spawnPrecomputationThread(Slice slice, Context context) {

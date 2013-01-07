@@ -31,7 +31,7 @@ public class OpenFlagMapping {
      * Create an open flag mapping.
      *
      * @param targetFlag the target flag
-     * @param hostFlag the host flag
+     * @param hostFlag   the host flag
      */
     public OpenFlagMapping(int targetFlag, int hostFlag) {
         this.targetFlag = targetFlag;

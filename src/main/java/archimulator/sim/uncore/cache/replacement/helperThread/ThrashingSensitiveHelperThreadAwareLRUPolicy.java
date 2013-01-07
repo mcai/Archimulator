@@ -34,11 +34,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 //TODO: to be refactored out
+
 /**
  * Thrashing sensitive helper thread aware least recently used (LRU) policy.
  *
- * @author Min Cai
  * @param <StateT> the state type of the parent evictable cache
+ * @author Min Cai
  */
 public class ThrashingSensitiveHelperThreadAwareLRUPolicy<StateT extends Serializable> extends LRUPolicy<StateT> {
     private Cache<Boolean> mirrorCache;

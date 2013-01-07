@@ -19,8 +19,8 @@
 package archimulator.sim.uncore.net;
 
 import archimulator.sim.common.BasicSimulationObject;
-import archimulator.sim.uncore.MemoryHierarchy;
 import archimulator.sim.uncore.MemoryDevice;
+import archimulator.sim.uncore.MemoryHierarchy;
 import net.pickapack.action.Action;
 
 import java.util.ArrayList;
@@ -141,8 +141,8 @@ public abstract class Net extends BasicSimulationObject {
     /**
      * Create a bi-directional link between the specified two nodes.
      *
-     * @param node1 the first node
-     * @param node2 the second node
+     * @param node1     the first node
+     * @param node2     the second node
      * @param bandwidth the bandwidth of the bi-directional link
      */
     protected void createBidirectionalLink(NetNode node1, NetNode node2, int bandwidth) {
@@ -153,9 +153,9 @@ public abstract class Net extends BasicSimulationObject {
     /**
      * Transfer a message of the specified size from the source device to the destination device.
      *
-     * @param sourceDevice the source device
-     * @param destinationDevice the destination device
-     * @param size the size
+     * @param sourceDevice        the source device
+     * @param destinationDevice   the destination device
+     * @param size                the size
      * @param onCompletedCallback the callback action performed when the transfer is completed
      */
     public void transfer(MemoryDevice sourceDevice, MemoryDevice destinationDevice, int size, Action onCompletedCallback) {

@@ -34,7 +34,7 @@ public class WaitForProcessIdCriterion implements SystemEventCriterion {
     /**
      * Create a wait for process ID criterion.
      *
-     * @param context the context
+     * @param context   the context
      * @param processId the process ID
      */
     public WaitForProcessIdCriterion(Context context, int processId) {

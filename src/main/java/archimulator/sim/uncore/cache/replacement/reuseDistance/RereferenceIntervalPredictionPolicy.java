@@ -19,7 +19,10 @@
 package archimulator.sim.uncore.cache.replacement.reuseDistance;
 
 import archimulator.sim.uncore.MemoryHierarchyAccess;
-import archimulator.sim.uncore.cache.*;
+import archimulator.sim.uncore.cache.Cache;
+import archimulator.sim.uncore.cache.CacheAccess;
+import archimulator.sim.uncore.cache.CacheLine;
+import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicy;
 import net.pickapack.util.ValueProvider;
 import net.pickapack.util.ValueProviderFactory;
@@ -29,8 +32,8 @@ import java.io.Serializable;
 /**
  * Rereference interval prediction policy.
  *
- * @author Min Cai
  * @param <StateT> the state type of the parent evictable cache
+ * @author Min Cai
  */
 public class RereferenceIntervalPredictionPolicy<StateT extends Serializable> extends CacheReplacementPolicy<StateT> {
     private int predictedRereferenceIntervalMaxValue;

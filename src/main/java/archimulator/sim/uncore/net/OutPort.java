@@ -32,8 +32,8 @@ public class OutPort extends NetPort {
     /**
      * Create an out port.
      *
-     * @param node the node.
-     * @param num the number of the port
+     * @param node       the node.
+     * @param num        the number of the port
      * @param bufferSize the size of the buffer
      */
     public OutPort(NetNode node, int num, int bufferSize) {

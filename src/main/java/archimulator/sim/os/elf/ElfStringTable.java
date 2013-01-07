@@ -29,7 +29,7 @@ public class ElfStringTable {
     /**
      * Create an ELF string table.
      *
-     * @param elfFile the ELF file
+     * @param elfFile       the ELF file
      * @param sectionHeader the section header that containing the string table
      */
     public ElfStringTable(ElfFile elfFile, ElfSectionHeader sectionHeader) {

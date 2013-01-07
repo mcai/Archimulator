@@ -43,7 +43,7 @@ public abstract class GeneralCacheController<StateT extends Serializable, Condit
      * Create a general cache controller.
      *
      * @param memoryHierarchy the memory hierarchy
-     * @param name           the name
+     * @param name            the name
      */
     public GeneralCacheController(MemoryHierarchy memoryHierarchy, String name) {
         super(memoryHierarchy, name);

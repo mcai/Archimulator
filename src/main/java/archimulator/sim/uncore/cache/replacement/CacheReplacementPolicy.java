@@ -27,8 +27,8 @@ import java.io.Serializable;
 /**
  * Cache replacement policy.
  *
- * @author Min Cai
  * @param <StateT>
+ * @author Min Cai
  */
 public abstract class CacheReplacementPolicy<StateT extends Serializable> {
     private EvictableCache<StateT> cache;
@@ -46,8 +46,8 @@ public abstract class CacheReplacementPolicy<StateT extends Serializable> {
      * Handle a cache replacement.
      *
      * @param access the memory hierarchy access
-     * @param set the set index
-     * @param tag the tag
+     * @param set    the set index
+     * @param tag    the tag
      * @return the newly created cache access object
      */
     public abstract CacheAccess<StateT> handleReplacement(MemoryHierarchyAccess access, int set, int tag);
@@ -56,8 +56,8 @@ public abstract class CacheReplacementPolicy<StateT extends Serializable> {
      * Handle promotion on a cache hit.
      *
      * @param access the memory hierarchy access
-     * @param set the set index
-     * @param way the way
+     * @param set    the set index
+     * @param way    the way
      */
     public abstract void handlePromotionOnHit(MemoryHierarchyAccess access, int set, int way);
 
@@ -65,8 +65,8 @@ public abstract class CacheReplacementPolicy<StateT extends Serializable> {
      * Handle insertion on a cache miss.
      *
      * @param access the memory hierarchy access
-     * @param set the set index
-     * @param way the way
+     * @param set    the set index
+     * @param way    the way
      */
     public abstract void handleInsertionOnMiss(MemoryHierarchyAccess access, int set, int way);
 

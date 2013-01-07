@@ -33,8 +33,8 @@ import java.io.Serializable;
 /**
  * Abstract reuse distance prediction policy.
  *
- * @author Min Cai
  * @param <StateT> the state type of the parent evictable cache
+ * @author Min Cai
  */
 public abstract class AbstractReuseDistancePredictionPolicy<StateT extends Serializable> extends CacheReplacementPolicy<StateT> {
     protected Cache<Boolean> mirrorCache;

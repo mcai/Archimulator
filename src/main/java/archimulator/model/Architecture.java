@@ -276,18 +276,20 @@ public class Architecture implements WithId, WithTitle, WithCreateTime {
     /**
      * Create an architecture.
      *
-     * @param hotspotProfilingEnabled      a value indicating whether the hotspot profiling is enabled or not
-     * @param helperThreadL2CacheRequestProfilingEnabled a value indicating whether the helper thread L2 request profiling is enabled or not
-     * @param dynamicSpeculativePrecomputationEnabled a value indicating whether the dynamic speculative precomputation is enabled or not
-     * @param numCores                     the number of cores
-     * @param numThreadsPerCore            the number of threads per core
-     * @param l1ISize                      the size of the L1I caches in bytes
-     * @param l1IAssoc                     the associativity of the L1I caches
-     * @param l1DSize                      the size of the L1D caches in bytes
-     * @param l1DAssoc                     the associativity of the L1D caches
-     * @param l2Size                       the size of the L2 caches in bytes
-     * @param l2Assoc                      the associativity of the L2 cache
-     * @param l2ReplacementPolicyType      the replacement policy type of the L2 cache
+     * @param hotspotProfilingEnabled a value indicating whether the hotspot profiling is enabled or not
+     * @param helperThreadL2CacheRequestProfilingEnabled
+     *                                a value indicating whether the helper thread L2 request profiling is enabled or not
+     * @param dynamicSpeculativePrecomputationEnabled
+     *                                a value indicating whether the dynamic speculative precomputation is enabled or not
+     * @param numCores                the number of cores
+     * @param numThreadsPerCore       the number of threads per core
+     * @param l1ISize                 the size of the L1I caches in bytes
+     * @param l1IAssoc                the associativity of the L1I caches
+     * @param l1DSize                 the size of the L1D caches in bytes
+     * @param l1DAssoc                the associativity of the L1D caches
+     * @param l2Size                  the size of the L2 caches in bytes
+     * @param l2Assoc                 the associativity of the L2 cache
+     * @param l2ReplacementPolicyType the replacement policy type of the L2 cache
      */
     public Architecture(boolean hotspotProfilingEnabled, boolean helperThreadL2CacheRequestProfilingEnabled, boolean dynamicSpeculativePrecomputationEnabled, int numCores, int numThreadsPerCore, int l1ISize, int l1IAssoc, int l1DSize, int l1DAssoc, int l2Size, int l2Assoc, CacheReplacementPolicyType l2ReplacementPolicyType) {
         this.createTime = DateHelper.toTick(new Date());
@@ -1125,7 +1127,8 @@ public class Architecture implements WithId, WithTitle, WithCreateTime {
     /**
      * Set a value indicating whether delinquent load identification is enabled or not.
      *
-     * @param delinquentLoadIdentificationEnabled a value indicating whether delinquent load identification is enabled or not
+     * @param delinquentLoadIdentificationEnabled
+     *         a value indicating whether delinquent load identification is enabled or not
      */
     public void setDelinquentLoadIdentificationEnabled(boolean delinquentLoadIdentificationEnabled) {
         this.delinquentLoadIdentificationEnabled = delinquentLoadIdentificationEnabled;
@@ -1134,7 +1137,8 @@ public class Architecture implements WithId, WithTitle, WithCreateTime {
     /**
      * Set a value indicating dynamic speculative precomputation is enabled or not.
      *
-     * @param dynamicSpeculativePrecomputationEnabled a value indicating whether dynamic speculative precomputation is enabled or not
+     * @param dynamicSpeculativePrecomputationEnabled
+     *         a value indicating whether dynamic speculative precomputation is enabled or not
      */
     public void setDynamicSpeculativePrecomputationEnabled(boolean dynamicSpeculativePrecomputationEnabled) {
         this.dynamicSpeculativePrecomputationEnabled = dynamicSpeculativePrecomputationEnabled;

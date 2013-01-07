@@ -32,7 +32,7 @@ public class L1ICacheController extends CacheController {
      * Create an L1I cache controller.
      *
      * @param memoryHierarchy the parent memory hierarchy
-     * @param name           the name
+     * @param name            the name
      */
     public L1ICacheController(MemoryHierarchy memoryHierarchy, String name) {
         super(memoryHierarchy, name);

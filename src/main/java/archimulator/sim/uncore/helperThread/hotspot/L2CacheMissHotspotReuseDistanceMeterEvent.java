@@ -20,7 +20,6 @@ package archimulator.sim.uncore.helperThread.hotspot;
 
 import archimulator.sim.common.SimulationObject;
 import archimulator.sim.common.meter.SimulationMeterEvent;
-import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestState;
 
 import java.io.Serializable;
 

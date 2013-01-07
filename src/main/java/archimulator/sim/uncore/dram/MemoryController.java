@@ -18,8 +18,8 @@
  ******************************************************************************/
 package archimulator.sim.uncore.dram;
 
-import archimulator.sim.uncore.MemoryHierarchy;
 import archimulator.sim.uncore.MemoryDevice;
+import archimulator.sim.uncore.MemoryHierarchy;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.net.Net;
 import net.pickapack.action.Action;
@@ -56,8 +56,8 @@ public abstract class MemoryController extends MemoryDevice {
     /**
      * Act on receiving a read request.
      *
-     * @param source the source memory device
-     * @param tag the tag
+     * @param source              the source memory device
+     * @param tag                 the tag
      * @param onCompletedCallback the callback action performed when the request is completed
      */
     public void memReadRequestReceive(final MemoryDevice source, int tag, final Action onCompletedCallback) {
@@ -74,8 +74,8 @@ public abstract class MemoryController extends MemoryDevice {
     /**
      * Act on receiving a write request.
      *
-     * @param source the source memory device
-     * @param tag the tag
+     * @param source              the source memory device
+     * @param tag                 the tag
      * @param onCompletedCallback the callback action performed when the request is completed
      */
     public void memWriteRequestReceive(final MemoryDevice source, int tag, final Action onCompletedCallback) {
@@ -92,7 +92,7 @@ public abstract class MemoryController extends MemoryDevice {
     /**
      * Access the specified address.
      *
-     * @param address the address
+     * @param address             the address
      * @param onCompletedCallback the callback action performed when the access is completed
      */
     protected abstract void access(int address, Action onCompletedCallback);

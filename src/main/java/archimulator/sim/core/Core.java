@@ -41,7 +41,7 @@ public interface Core extends SimulationObject {
     /**
      * Get a value indicating whether the specified thread can fetch the instruction at the specified address.
      *
-     * @param thread the thread
+     * @param thread         the thread
      * @param virtualAddress the virtual address
      * @return a value indicating whether the specified thread can fetch the instruction at the specified address
      */
@@ -50,7 +50,7 @@ public interface Core extends SimulationObject {
     /**
      * Get a value indicating whether the specified thread can perform a load at the specified address.
      *
-     * @param thread the thread
+     * @param thread         the thread
      * @param virtualAddress the virtual address
      * @return a value indicating whether the specified thread can perform a load at the specified address
      */
@@ -59,7 +59,7 @@ public interface Core extends SimulationObject {
     /**
      * Get a value indicating whether the specified thread can perform a store at the specified address.
      *
-     * @param thread the thread
+     * @param thread         the thread
      * @param virtualAddress the virtual address
      * @return a value indicating whether the specified thread can perform a store at the specified address
      */
@@ -68,9 +68,9 @@ public interface Core extends SimulationObject {
     /**
      * Act on when the specified thread fetch the instruction at the specified address.
      *
-     * @param thread the thread
-     * @param virtualAddress the virtual address
-     * @param virtualPc the virtual address of the program counter (PC)
+     * @param thread              the thread
+     * @param virtualAddress      the virtual address
+     * @param virtualPc           the virtual address of the program counter (PC)
      * @param onCompletedCallback the callback action performed when the instruction fetch is completed
      */
     void ifetch(Thread thread, int virtualAddress, int virtualPc, Action onCompletedCallback);
@@ -78,9 +78,9 @@ public interface Core extends SimulationObject {
     /**
      * Act on when the specified thread perform a load at the specified address.
      *
-     * @param dynamicInstruction the dynamic instruction
-     * @param virtualAddress the virtual address
-     * @param virtualPc the virtual address of the program counter (PC)
+     * @param dynamicInstruction  the dynamic instruction
+     * @param virtualAddress      the virtual address
+     * @param virtualPc           the virtual address of the program counter (PC)
      * @param onCompletedCallback the callback action performed when the load is completed
      */
     void load(DynamicInstruction dynamicInstruction, int virtualAddress, int virtualPc, Action onCompletedCallback);
@@ -88,9 +88,9 @@ public interface Core extends SimulationObject {
     /**
      * Act on when the specified thread perform a store at the specified address.
      *
-     * @param dynamicInstruction the dynamic instruction
-     * @param virtualAddress the virtual address
-     * @param virtualPc the virtual address of the program counter (PC)
+     * @param dynamicInstruction  the dynamic instruction
+     * @param virtualAddress      the virtual address
+     * @param virtualPc           the virtual address of the program counter (PC)
      * @param onCompletedCallback the callback action performed when the store is completed
      */
     void store(DynamicInstruction dynamicInstruction, int virtualAddress, int virtualPc, Action onCompletedCallback);

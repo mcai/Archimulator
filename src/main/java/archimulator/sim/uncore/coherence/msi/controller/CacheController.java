@@ -19,7 +19,11 @@
 package archimulator.sim.uncore.coherence.msi.controller;
 
 import archimulator.sim.core.DynamicInstruction;
-import archimulator.sim.uncore.*;
+import archimulator.sim.core.Thread;
+import archimulator.sim.uncore.MemoryDevice;
+import archimulator.sim.uncore.MemoryHierarchy;
+import archimulator.sim.uncore.MemoryHierarchyAccess;
+import archimulator.sim.uncore.MemoryHierarchyAccessType;
 import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.cache.EvictableCache;
@@ -33,7 +37,6 @@ import archimulator.sim.uncore.coherence.msi.fsm.CacheControllerFiniteStateMachi
 import archimulator.sim.uncore.coherence.msi.message.*;
 import archimulator.sim.uncore.coherence.msi.state.CacheControllerState;
 import archimulator.sim.uncore.net.Net;
-import archimulator.sim.core.Thread;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action2;
 import net.pickapack.util.ValueProvider;
@@ -58,7 +61,7 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
      * Create a cache controller.
      *
      * @param memoryHierarchy the memory hierarchy
-     * @param name           the name
+     * @param name            the name
      */
     public CacheController(MemoryHierarchy memoryHierarchy, final String name) {
         super(memoryHierarchy, name);

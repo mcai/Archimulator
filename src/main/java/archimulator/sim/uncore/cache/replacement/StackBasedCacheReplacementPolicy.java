@@ -28,8 +28,8 @@ import java.util.List;
 /**
  * Stack based cache replacement policy.
  *
- * @author Min Cai
  * @param <StateT> the state type of the parent evictable cache
+ * @author Min Cai
  */
 public abstract class StackBasedCacheReplacementPolicy<StateT extends Serializable> extends CacheReplacementPolicy<StateT> {
     private List<List<Integer>> stackEntries;
@@ -96,7 +96,7 @@ public abstract class StackBasedCacheReplacementPolicy<StateT extends Serializab
     /**
      * Get the way in the specified stack position in the specified set.
      *
-     * @param set the set index
+     * @param set           the set index
      * @param stackPosition the stack position
      * @return the way in the specified stack position in the specified set
      */
@@ -107,7 +107,7 @@ public abstract class StackBasedCacheReplacementPolicy<StateT extends Serializab
     /**
      * Get the cache line in the specified stack position in the specified set.
      *
-     * @param set the set index
+     * @param set           the set index
      * @param stackPosition the stack position
      * @return the cache line in the specified stack position in the specified set
      */
@@ -130,8 +130,8 @@ public abstract class StackBasedCacheReplacementPolicy<StateT extends Serializab
     /**
      * Set the stack position for the specified way in the specified set.
      *
-     * @param set the set index
-     * @param way the way
+     * @param set              the set index
+     * @param way              the way
      * @param newStackPosition the new stack position
      */
     public void setStackPosition(int set, int way, int newStackPosition) {

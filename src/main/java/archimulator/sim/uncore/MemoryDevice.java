@@ -38,7 +38,7 @@ public abstract class MemoryDevice extends BasicSimulationObject implements Simu
      * Create a memory device.
      *
      * @param memoryHierarchy the parent memory hierarchy
-     * @param name           the name of the memory device
+     * @param name            the name of the memory device
      */
     public MemoryDevice(MemoryHierarchy memoryHierarchy, String name) {
         super(memoryHierarchy);

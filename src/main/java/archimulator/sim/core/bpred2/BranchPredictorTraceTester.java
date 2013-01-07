@@ -26,12 +26,10 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /**
- *
  * @author Min Cai
  */
 public class BranchPredictorTraceTester extends TraceTester<BranchPredictorTraceRecord> {
     /**
-     *
      * @param fileName
      */
     public BranchPredictorTraceTester(String fileName) {
@@ -39,7 +37,6 @@ public class BranchPredictorTraceTester extends TraceTester<BranchPredictorTrace
     }
 
     /**
-     *
      * @return
      */
     @Override

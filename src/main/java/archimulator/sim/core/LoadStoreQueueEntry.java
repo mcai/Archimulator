@@ -32,14 +32,14 @@ public class LoadStoreQueueEntry extends AbstractReorderBufferEntry {
     /**
      * Create a load/store queue entry.
      *
-     * @param thread the thread
-     * @param dynamicInstruction the dynamic instruction
-     * @param npc the value of the next program counter (NPC)
-     * @param nnpc the value of the next next program counter (NNPC)
-     * @param predictedNnpc the predicted value of the next next program counter (predicted NNPC)
+     * @param thread                         the thread
+     * @param dynamicInstruction             the dynamic instruction
+     * @param npc                            the value of the next program counter (NPC)
+     * @param nnpc                           the value of the next next program counter (NNPC)
+     * @param predictedNnpc                  the predicted value of the next next program counter (predicted NNPC)
      * @param returnAddressStackRecoverIndex the return address stack recover index
-     * @param branchPredictorUpdate the branch predictor update
-     * @param speculative a value indicating whether the load/store queue entry is speculative or not
+     * @param branchPredictorUpdate          the branch predictor update
+     * @param speculative                    a value indicating whether the load/store queue entry is speculative or not
      */
     public LoadStoreQueueEntry(Thread thread, DynamicInstruction dynamicInstruction, int npc, int nnpc, int predictedNnpc, int returnAddressStackRecoverIndex, BranchPredictorUpdate branchPredictorUpdate, boolean speculative) {
         super(thread, dynamicInstruction, npc, nnpc, predictedNnpc, returnAddressStackRecoverIndex, branchPredictorUpdate, speculative);

@@ -20,8 +20,8 @@ package archimulator.service;
 
 import archimulator.model.Experiment;
 import archimulator.model.ExperimentSummary;
-import archimulator.model.metric.gauge.ExperimentGauge;
 import archimulator.model.metric.ExperimentStat;
+import archimulator.model.metric.gauge.ExperimentGauge;
 import archimulator.util.plot.MultiBarPlot;
 import archimulator.util.plot.Table;
 import net.pickapack.action.Function1;
@@ -185,7 +185,7 @@ public interface ExperimentStatService extends Service {
     /**
      * Generate a multi bar plot object for showing the number of instructions for the specified list of experiments.
      *
-     * @param experiments    a list of experiments
+     * @param experiments a list of experiments
      * @return a multi bar plot object for showing the number of instructions for the specified list of experiments
      */
     MultiBarPlot plotNumInstructions(List<Experiment> experiments);
@@ -201,7 +201,7 @@ public interface ExperimentStatService extends Service {
     /**
      * Generate a multi bar plot object for showing the list of normalized number of instructions for the specified list of experiments.
      *
-     * @param experiments    a list of experiments
+     * @param experiments a list of experiments
      * @return a multi bar plot object for showing the list of normalized number of instructions for the specified list of experiments
      */
     MultiBarPlot plotNormalizedNumInstructions(List<Experiment> experiments);
@@ -217,7 +217,7 @@ public interface ExperimentStatService extends Service {
     /**
      * Generate a multi bar plot object for showing the list of the number of cycles for the specified list of experiments.
      *
-     * @param experiments    a list of experiments
+     * @param experiments a list of experiments
      * @return a multi bar plot object for showing the list of the number of cycles for the specified list of experiments
      */
     MultiBarPlot plotNumCycles(List<Experiment> experiments);

@@ -31,8 +31,8 @@ import java.io.Serializable;
 /**
  * Least frequently used (LFU) policy.
  *
- * @author Min Cai
  * @param <StateT> the state type of the parent evictable cache
+ * @author Min Cai
  */
 public class LFUPolicy<StateT extends Serializable> extends CacheReplacementPolicy<StateT> {
     private Cache<Boolean> mirrorCache;
@@ -57,8 +57,8 @@ public class LFUPolicy<StateT extends Serializable> extends CacheReplacementPoli
      * Handle a cache replacement.
      *
      * @param access the memory hierarchy access
-     * @param set the set
-     * @param tag the tag
+     * @param set    the set
+     * @param tag    the tag
      * @return the newly created cache access object
      */
     @Override
@@ -83,8 +83,8 @@ public class LFUPolicy<StateT extends Serializable> extends CacheReplacementPoli
      * Handle promotion on a cache hit.
      *
      * @param access the memory hierarchy access
-     * @param set the set index
-     * @param way the way
+     * @param set    the set index
+     * @param way    the way
      */
     @Override
     public void handlePromotionOnHit(MemoryHierarchyAccess access, int set, int way) {
@@ -97,8 +97,8 @@ public class LFUPolicy<StateT extends Serializable> extends CacheReplacementPoli
      * Handle insertion on a cache miss.
      *
      * @param access the memory hierarchy access
-     * @param set the set index
-     * @param way the way
+     * @param set    the set index
+     * @param way    the way
      */
     @Override
     public void handleInsertionOnMiss(MemoryHierarchyAccess access, int set, int way) {

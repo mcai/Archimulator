@@ -31,7 +31,7 @@ public class FunctionalUnitOperation {
      * Create a functional unit operation.
      *
      * @param operationLatency the operation latency in cycles
-     * @param issueLatency the issue latency in cycles
+     * @param issueLatency     the issue latency in cycles
      */
     public FunctionalUnitOperation(int operationLatency, int issueLatency) {
         this.operationLatency = operationLatency;

@@ -305,7 +305,7 @@ public class ElfFile {
     /**
      * Read the content from the specified offset in the ELF file.
      *
-     * @param offset the offset
+     * @param offset  the offset
      * @param content the content buffer
      * @throws IOException
      */

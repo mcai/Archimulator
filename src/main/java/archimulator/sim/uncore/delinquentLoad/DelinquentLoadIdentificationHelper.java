@@ -79,7 +79,7 @@ public class DelinquentLoadIdentificationHelper {
      * Get a value indicating whether the specified program counter (PC) is delinquent or not for the specified thread.
      *
      * @param threadId the ID of the thread
-     * @param pc the value of the program counter (PC)
+     * @param pc       the value of the program counter (PC)
      * @return a value indicating whether the specified program counter (PC) is delinquent or not for the specified thread
      */
     public boolean isDelinquentPc(int threadId, int pc) {

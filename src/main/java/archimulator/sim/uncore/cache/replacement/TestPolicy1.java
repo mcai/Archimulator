@@ -20,7 +20,6 @@ package archimulator.sim.uncore.cache.replacement;
 
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.EvictableCache;
-import archimulator.sim.uncore.cache.replacement.LRUPolicy;
 import net.pickapack.IntegerIntegerPair;
 
 import java.io.Serializable;
@@ -32,8 +31,8 @@ import java.util.List;
 /**
  * Test policy #1.
  *
- * @author Min Cai
  * @param <StateT> the state type of the parent evictable cache
+ * @author Min Cai
  */
 public class TestPolicy1<StateT extends Serializable> extends LRUPolicy<StateT> {
     private List<IntegerIntegerPair> predefinedDelinquentPcs;
@@ -83,7 +82,7 @@ public class TestPolicy1<StateT extends Serializable> extends LRUPolicy<StateT> 
      * Get a value indicating whether the specified program counter (PC) is delinquent or not for the specified thread.
      *
      * @param threadId the ID of the thread
-     * @param pc the value of the program counter (PC)
+     * @param pc       the value of the program counter (PC)
      * @return a value indicating whether the specified program counter (PC) is delinquent or not for the specified thread
      */
     private boolean isDelinquentPc(int threadId, int pc) {

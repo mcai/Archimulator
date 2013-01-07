@@ -54,7 +54,7 @@ public class User implements WithId, WithCreateTime {
     /**
      * Create a user.
      *
-     * @param email the email
+     * @param email    the email
      * @param password the password
      */
     public User(String email, String password) {

@@ -236,6 +236,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         } catch (Exception e) {
             experiment.setState(ExperimentState.ABORTED);
             experiment.setFailedReason(ExceptionUtils.getStackTrace(e));
+            e.printStackTrace();
         } finally {
             ServiceManager.getExperimentService().updateExperiment(experiment);
         }

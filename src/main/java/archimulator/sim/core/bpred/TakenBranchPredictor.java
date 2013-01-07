@@ -32,7 +32,7 @@ public class TakenBranchPredictor extends BranchPredictor {
      * Create an "always taken" branch predictor.
      *
      * @param thread the thread
-     * @param name the name of the branch predictor
+     * @param name   the name of the branch predictor
      */
     public TakenBranchPredictor(Thread thread, String name) {
         super(thread, name, BranchPredictorType.TAKEN);

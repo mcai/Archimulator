@@ -75,11 +75,11 @@ public class ExperimentStat implements WithId, WithParentId, WithTitle, WithCrea
     /**
      * Create an experiment statistic.
      *
-     * @param parent the parent experiment object
-     * @param prefix the prefix
-     * @param gauge the gauge
+     * @param parent  the parent experiment object
+     * @param prefix  the prefix
+     * @param gauge   the gauge
      * @param nodeKey the node key
-     * @param value the value
+     * @param value   the value
      */
     public ExperimentStat(Experiment parent, String prefix, ExperimentGauge gauge, String nodeKey, String value) {
         this.title = prefix + "/" + nodeKey + "/" + gauge.getValueExpression();
@@ -96,8 +96,8 @@ public class ExperimentStat implements WithId, WithParentId, WithTitle, WithCrea
      *
      * @param parent the parent experiment object
      * @param prefix the prefix
-     * @param key the key
-     * @param value the value
+     * @param key    the key
+     * @param value  the value
      */
     public ExperimentStat(Experiment parent, String prefix, String key, String value) {
         this.title = prefix + "/" + key;
@@ -216,7 +216,7 @@ public class ExperimentStat implements WithId, WithParentId, WithTitle, WithCrea
      */
     public static Map<String, ExperimentStat> toMap(List<ExperimentStat> stats) {
         final Map<String, ExperimentStat> statsMap = new LinkedHashMap<String, ExperimentStat>();
-        for(ExperimentStat stat : stats) {
+        for (ExperimentStat stat : stats) {
             statsMap.put(stat.getTitle(), stat);
         }
         return statsMap;

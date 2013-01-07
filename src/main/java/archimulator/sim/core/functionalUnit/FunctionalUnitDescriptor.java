@@ -37,8 +37,8 @@ public class FunctionalUnitDescriptor {
      * Create a functional unit descriptor.
      *
      * @param functionalUnitPool the functional unit pool
-     * @param type the functional unit type
-     * @param quantity the quantity
+     * @param type               the functional unit type
+     * @param quantity           the quantity
      */
     public FunctionalUnitDescriptor(FunctionalUnitPool functionalUnitPool, FunctionalUnitType type, int quantity) {
         this.functionalUnitPool = functionalUnitPool;
@@ -53,8 +53,8 @@ public class FunctionalUnitDescriptor {
      * Add a functional unit operation definition.
      *
      * @param functionalUnitOperationType the functional unit operation type
-     * @param operationLatency the operation latency in cycles
-     * @param issueLatency the operation latency in cycles
+     * @param operationLatency            the operation latency in cycles
+     * @param issueLatency                the operation latency in cycles
      * @return the functional unit descriptor itself
      */
     public FunctionalUnitDescriptor addFunctionalUnitOperation(FunctionalUnitOperationType functionalUnitOperationType, int operationLatency, int issueLatency) {

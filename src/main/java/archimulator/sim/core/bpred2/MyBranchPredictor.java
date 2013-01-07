@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
  * @author Min Cai
  */
 public class MyBranchPredictor implements BranchPredictor2 {
@@ -47,7 +46,6 @@ public class MyBranchPredictor implements BranchPredictor2 {
     }
 
     /**
-     *
      * @param branchInfo
      * @return
      */
@@ -65,14 +63,15 @@ public class MyBranchPredictor implements BranchPredictor2 {
     }
 
     /**
-     *
      * @param branchInfo
      * @param branchUpdate
      * @param taken
      * @param target
      */
     public void update(BranchInfo branchInfo, BranchUpdate branchUpdate, boolean taken, int target) {
-        assert (branchUpdate instanceof MyBranchUpdate);
+        if (!(branchUpdate instanceof MyBranchUpdate)) {
+            throw new IllegalArgumentException();
+        }
 
         if ((branchInfo.getBranchFlags() & BranchInfo.BR_CONDITIONAL) != 0) {
             SaturatingCounter counter = this.tab.get(((MyBranchUpdate) branchUpdate).getIndex());

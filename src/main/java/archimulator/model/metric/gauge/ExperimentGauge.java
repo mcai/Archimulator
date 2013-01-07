@@ -62,9 +62,8 @@ public class ExperimentGauge implements WithId, WithTitle, WithCreateTime {
     /**
      * Create an experiment gauge.
      *
-     * @param type the type of the gauge
+     * @param type            the type of the gauge
      * @param valueExpression the value expression
-     *
      */
     public ExperimentGauge(ExperimentGaugeType type, String valueExpression) {
         this(type, valueExpression, valueExpression);
@@ -73,8 +72,8 @@ public class ExperimentGauge implements WithId, WithTitle, WithCreateTime {
     /**
      * Create an experiment gauge.
      *
-     * @param type the type of the gauge
-     * @param title the title of the gauge
+     * @param type            the type of the gauge
+     * @param title           the title of the gauge
      * @param valueExpression the value expression
      */
     public ExperimentGauge(ExperimentGaugeType type, String title, String valueExpression) {
@@ -171,7 +170,7 @@ public class ExperimentGauge implements WithId, WithTitle, WithCreateTime {
     /**
      * Get the type of the gauge.
      *
-     * @return  the type of the gauge
+     * @return the type of the gauge
      */
     public ExperimentGaugeType getType() {
         return ServiceManager.getExperimentMetricService().getGaugeTypeById(typeId);

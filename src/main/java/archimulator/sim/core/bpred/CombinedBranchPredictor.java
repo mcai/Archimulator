@@ -38,7 +38,7 @@ public class CombinedBranchPredictor extends DynamicBranchPredictor {
      * Create a combined branch predictor.
      *
      * @param thread the thread
-     * @param name the name of the combined branch predictor
+     * @param name   the name of the combined branch predictor
      */
     public CombinedBranchPredictor(Thread thread, String name) {
         super(thread, name, BranchPredictorType.COMBINED, thread.getExperiment().getArchitecture().getCombinedBranchPredictorBranchTargetBufferNumSets(), thread.getExperiment().getArchitecture().getCombinedBranchPredictorBranchTargetBufferAssociativity(), thread.getExperiment().getArchitecture().getCombinedBranchPredictorReturnAddressStackSize());
@@ -118,7 +118,6 @@ public class CombinedBranchPredictor extends DynamicBranchPredictor {
     }
 
     /**
-     *
      * @return
      */
     public TwoBitBranchPredictor getBimod() {
@@ -126,7 +125,6 @@ public class CombinedBranchPredictor extends DynamicBranchPredictor {
     }
 
     /**
-     *
      * @return
      */
     public TwoBitBranchPredictor getMeta() {
@@ -134,7 +132,6 @@ public class CombinedBranchPredictor extends DynamicBranchPredictor {
     }
 
     /**
-     *
      * @return
      */
     public TwoLevelBranchPredictor getTwoLevel() {

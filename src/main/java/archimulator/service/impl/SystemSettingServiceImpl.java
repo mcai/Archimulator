@@ -51,7 +51,7 @@ public class SystemSettingServiceImpl extends AbstractService implements SystemS
 
     @Override
     public SystemSetting getSystemSettingSingleton() {
-        if(getFirstItem(this.systemSettings) == null) {
+        if (getFirstItem(this.systemSettings) == null) {
             addItem(this.systemSettings, new SystemSetting() {{
                 setRunningExperimentsEnabled(true);
             }});

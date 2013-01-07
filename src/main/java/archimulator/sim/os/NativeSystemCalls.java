@@ -62,8 +62,8 @@ public class NativeSystemCalls {
         /**
          * read.
          *
-         * @param fd the file descriptor
-         * @param buf the buffer
+         * @param fd    the file descriptor
+         * @param buf   the buffer
          * @param count the count
          * @return the number of bytes read
          */
@@ -72,8 +72,8 @@ public class NativeSystemCalls {
         /**
          * write.
          *
-         * @param fd the file descriptor
-         * @param buf the buffer
+         * @param fd    the file descriptor
+         * @param buf   the buffer
          * @param count the count
          * @return the number of bytes written
          */
@@ -82,9 +82,9 @@ public class NativeSystemCalls {
         /**
          * Open a file.
          *
-         * @param path the file path
+         * @param path  the file path
          * @param flags the flags
-         * @param mode the open mode
+         * @param mode  the open mode
          * @return the file descriptor for the opened file
          */
         int open(String path, int flags, int mode);
@@ -92,7 +92,7 @@ public class NativeSystemCalls {
         /**
          * Open a file.
          *
-         * @param path the file path
+         * @param path  the file path
          * @param flags the flags
          * @return the file descriptor for the opened file
          */
@@ -109,7 +109,7 @@ public class NativeSystemCalls {
         /**
          * lseek.
          *
-         * @param fd the file descriptor
+         * @param fd     the file descriptor
          * @param offset the offset
          * @param whence the whence
          * @return the result
@@ -119,9 +119,9 @@ public class NativeSystemCalls {
         /**
          * ioctrl.
          *
-         * @param fd the file descriptor
+         * @param fd      the file descriptor
          * @param request the request
-         * @param buf the buffer
+         * @param buf     the buffer
          * @return the result
          */
         int ioctl(int fd, int request, byte[] buf);

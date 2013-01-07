@@ -40,8 +40,8 @@ public class Instruction {
     /**
      * Create a instruction.
      *
-     * @param process the process
-     * @param pc the program counter (PC) value
+     * @param process           the process
+     * @param pc                the program counter (PC) value
      * @param staticInstruction the static instruction
      */
     public Instruction(Process process, int pc, StaticInstruction staticInstruction) {
@@ -98,7 +98,7 @@ public class Instruction {
     /**
      * Set the leader information.
      *
-     * @param leader a value indicating whether the instruction is a leader or not
+     * @param leader     a value indicating whether the instruction is a leader or not
      * @param leaderType the leader type
      */
     public void setLeader(boolean leader, int leaderType) {

@@ -33,8 +33,8 @@ import java.io.Serializable;
 /**
  * Test policy #2.
  *
- * @author Min Cai
  * @param <StateT> the state type of the parent evictable cache
+ * @author Min Cai
  */
 public class TestPolicy2<StateT extends Serializable> extends LRUPolicy<StateT> {
     private Cache<Boolean> mirrorCache;
@@ -97,8 +97,8 @@ public class TestPolicy2<StateT extends Serializable> extends LRUPolicy<StateT> 
     /**
      * Handle line reference.
      *
-     * @param set the set index
-     * @param way the way
+     * @param set      the set index
+     * @param way      the way
      * @param threadId the ID of the thread
      */
     private void handleLineReference(int set, int way, int threadId) {

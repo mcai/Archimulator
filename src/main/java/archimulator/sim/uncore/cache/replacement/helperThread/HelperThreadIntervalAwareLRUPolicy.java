@@ -22,8 +22,8 @@ import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.replacement.LRUPolicy;
 import archimulator.sim.uncore.coherence.event.GeneralCacheControllerLineReplacementEvent;
-import archimulator.sim.uncore.helperThread.HelperThreadingHelper;
 import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestProfilingHelper;
+import archimulator.sim.uncore.helperThread.HelperThreadingHelper;
 import net.pickapack.action.Action1;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
@@ -32,8 +32,8 @@ import java.io.Serializable;
 /**
  * Helper thread interval aware least recently used (LRU) policy.
  *
- * @author Min Cai
  * @param <StateT> the state type of the parent evictable cache
+ * @author Min Cai
  */
 public class HelperThreadIntervalAwareLRUPolicy<StateT extends Serializable> extends LRUPolicy<StateT> {
     private int evictedL2CacheLinesPerInterval;
@@ -105,7 +105,7 @@ public class HelperThreadIntervalAwareLRUPolicy<StateT extends Serializable> ext
         cache.getBlockingEventDispatcher().addListener(GeneralCacheControllerLineReplacementEvent.class, new Action1<GeneralCacheControllerLineReplacementEvent>() {
             @Override
             public void apply(GeneralCacheControllerLineReplacementEvent event) {
-                if(event.getCacheController().getCache() == getCache()) {
+                if (event.getCacheController().getCache() == getCache()) {
                     evictedL2CacheLines++;
 
                     if (evictedL2CacheLines == evictedL2CacheLinesPerInterval) {

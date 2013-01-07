@@ -23,10 +23,10 @@ import archimulator.sim.core.bpred.BranchPredictorUpdate;
 import archimulator.sim.core.bpred.DynamicBranchPredictor;
 import archimulator.sim.core.event.InstructionCommittedEvent;
 import archimulator.sim.core.event.InstructionDecodedEvent;
-import archimulator.sim.isa.event.PseudoCallEncounteredEvent;
 import archimulator.sim.isa.RegisterDependencyType;
 import archimulator.sim.isa.StaticInstruction;
 import archimulator.sim.isa.StaticInstructionType;
+import archimulator.sim.isa.event.PseudoCallEncounteredEvent;
 import archimulator.sim.os.ContextState;
 import archimulator.sim.uncore.helperThread.HelperThreadingHelper;
 import net.pickapack.Reference;
@@ -62,7 +62,7 @@ public class BasicThread extends AbstractBasicThread {
      * Create a basic thread.
      *
      * @param core the core
-     * @param num the num of the thread
+     * @param num  the num of the thread
      */
     public BasicThread(Core core, int num) {
         super(core, num);
@@ -580,7 +580,7 @@ public class BasicThread extends AbstractBasicThread {
     /**
      * Get the aligned value for the specified number and alignment.
      *
-     * @param n the number
+     * @param n         the number
      * @param alignment the alignment
      * @return the aligned value for the specified number and alignment
      */

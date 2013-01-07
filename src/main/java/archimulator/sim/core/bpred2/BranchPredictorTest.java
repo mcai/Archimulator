@@ -22,12 +22,10 @@ import net.pickapack.action.Action1;
 import net.pickapack.math.Counter;
 
 /**
- *
  * @author Min Cai
  */
 public class BranchPredictorTest {
     /**
-     *
      * @param args
      */
     public static void main(String[] args) {

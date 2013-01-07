@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- *
  * @author Min Cai
  */
 public abstract class AbstractReorderBufferEntry {
@@ -95,14 +94,14 @@ public abstract class AbstractReorderBufferEntry {
     /**
      * Create an abstract reorder buffer entry.
      *
-     * @param thread the thread
-     * @param dynamicInstruction the dynamic instruction
-     * @param npc the value of the next program counter (NPC)
-     * @param nnpc the value of the next next program counter (NNPC)
-     * @param predictedNnpc the predicted value of the next next program counter (predicted NNPC)
+     * @param thread                         the thread
+     * @param dynamicInstruction             the dynamic instruction
+     * @param npc                            the value of the next program counter (NPC)
+     * @param nnpc                           the value of the next next program counter (NNPC)
+     * @param predictedNnpc                  the predicted value of the next next program counter (predicted NNPC)
      * @param returnAddressStackRecoverIndex the return address stack recover index
-     * @param branchPredictorUpdate the branch predictor update
-     * @param speculative a value indicating whether the reorder buffer entry is speculative or not
+     * @param branchPredictorUpdate          the branch predictor update
+     * @param speculative                    a value indicating whether the reorder buffer entry is speculative or not
      */
     public AbstractReorderBufferEntry(Thread thread, DynamicInstruction dynamicInstruction, int npc, int nnpc, int predictedNnpc, int returnAddressStackRecoverIndex, BranchPredictorUpdate branchPredictorUpdate, boolean speculative) {
         this.id = thread.getSimulation().currentReorderBufferEntryId++;

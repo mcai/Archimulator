@@ -61,9 +61,9 @@ public class ExperimentGaugeType implements WithId, WithTitle, WithCreateTime {
     /**
      * Create an experiment gauge type.
      *
-     * @param title the title of the gauge type
+     * @param title          the title of the gauge type
      * @param nodeExpression the node expression
-     * @param keyExpression the key expression
+     * @param keyExpression  the key expression
      */
     public ExperimentGaugeType(String title, String nodeExpression, String keyExpression) {
         this.title = title;

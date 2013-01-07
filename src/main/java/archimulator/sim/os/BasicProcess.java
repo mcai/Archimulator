@@ -51,9 +51,9 @@ public class BasicProcess extends Process {
     /**
      * Create a basic process.
      *
-     * @param kernel the kernel
+     * @param kernel              the kernel
      * @param simulationDirectory the simulation directory
-     * @param contextMapping the context mapping
+     * @param contextMapping      the context mapping
      */
     public BasicProcess(Kernel kernel, String simulationDirectory, ContextMapping contextMapping) {
         super(kernel, simulationDirectory, contextMapping);
@@ -62,9 +62,9 @@ public class BasicProcess extends Process {
     /**
      * Load the program.
      *
-     * @param kernel the kernel
+     * @param kernel              the kernel
      * @param simulationDirectory the simulation directory
-     * @param contextMapping the context mapping
+     * @param contextMapping      the context mapping
      */
     @Override
     protected void loadProgram(Kernel kernel, String simulationDirectory, ContextMapping contextMapping) {
@@ -161,8 +161,8 @@ public class BasicProcess extends Process {
      * Predecode the instruction at the specified program counter (PC).
      *
      * @param sectionName the section name
-     * @param memory the memory
-     * @param pc the program counter (PC)
+     * @param memory      the memory
+     * @param pc          the program counter (PC)
      */
     private void predecode(String sectionName, Memory memory, int pc) {
         int machineInstruction = memory.readWord(pc);
@@ -181,7 +181,7 @@ public class BasicProcess extends Process {
      * Get the disassembly instruction at the specified program counter (PC) for the specified process.
      *
      * @param process the process
-     * @param pc the program counter (PC)
+     * @param pc      the program counter (PC)
      * @return the disassembly instruction at the specified program counter (PC) for the specified progress
      */
     public static String getDisassemblyInstruction(Process process, int pc) {
@@ -195,11 +195,11 @@ public class BasicProcess extends Process {
 
     @Override
     public String getFunctionNameFromPc(int pc) {
-        if(this.pcToFunctionNameMappingCache.containsKey(pc)) {
+        if (this.pcToFunctionNameMappingCache.containsKey(pc)) {
             return this.pcToFunctionNameMappingCache.get(pc);
         }
 
-        for(Function function : this.elfAnalyzer.getProgram().getFunctions()) {
+        for (Function function : this.elfAnalyzer.getProgram().getFunctions()) {
             for (BasicBlock basicBlock : function.getBasicBlocks()) {
                 for (Instruction instruction : basicBlock.getInstructions()) {
                     if (instruction.getPc() == pc) {

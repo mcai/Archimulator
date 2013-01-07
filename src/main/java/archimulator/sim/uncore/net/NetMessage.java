@@ -37,10 +37,10 @@ public class NetMessage {
     /**
      * Create a net message.
      *
-     * @param net the parent net
-     * @param sourceNode the source node
-     * @param destinationNode the destination node
-     * @param size the size of the message
+     * @param net                 the parent net
+     * @param sourceNode          the source node
+     * @param destinationNode     the destination node
+     * @param size                the size of the message
      * @param onCompletedCallback the callback action performed when the transfer of the message is completed
      */
     public NetMessage(Net net, NetNode sourceNode, NetNode destinationNode, int size, Action onCompletedCallback) {

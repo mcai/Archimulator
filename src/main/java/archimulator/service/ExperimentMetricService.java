@@ -26,7 +26,6 @@ import net.pickapack.service.Service;
 import java.util.List;
 
 /**
- *
  * Service for managing experiment metrics.
  *
  * @author Min Cai
@@ -126,7 +125,7 @@ public interface ExperimentMetricService extends Service {
      * Get the gauges by experiment and type.
      *
      * @param experiment the experiment to be searched
-     * @param type the gauge type to be searched
+     * @param type       the gauge type to be searched
      * @return the gauges under the experiment matching the type if any exist; otherwise an empty list
      */
     List<ExperimentGauge> getGaugesByExperimentAndType(Experiment experiment, ExperimentGaugeType type);
@@ -135,7 +134,7 @@ public interface ExperimentMetricService extends Service {
      * Get the gauges by experiment and type title.
      *
      * @param experiment the experiment to be searched
-     * @param typeTitle the title of the gauge type to be searched
+     * @param typeTitle  the title of the gauge type to be searched
      * @return the gauges under the experiment matching the type if any exist; otherwise an empty list
      */
     List<ExperimentGauge> getGaugesByExperimentAndType(Experiment experiment, String typeTitle);

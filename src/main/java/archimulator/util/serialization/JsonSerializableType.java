@@ -37,63 +37,63 @@ import java.sql.SQLException;
 public abstract class JsonSerializableType extends BaseDataType {
     private Type clz;
 
-	/**
+    /**
      * Create a JSON serializable type.
      *
      * @param type the type
      */
     protected JsonSerializableType(Type type) {
-		super(SqlType.LONG_STRING, new Class<?>[0]);
+        super(SqlType.LONG_STRING, new Class<?>[0]);
         this.clz = type;
     }
 
-	@Override
-	public Object parseDefaultString(FieldType fieldType, String defaultStr) throws SQLException {
-		throw new SQLException("Default values for serializable types are not supported");
-	}
+    @Override
+    public Object parseDefaultString(FieldType fieldType, String defaultStr) throws SQLException {
+        throw new SQLException("Default values for serializable types are not supported");
+    }
 
-	@Override
-	public Object resultToSqlArg(FieldType fieldType, DatabaseResults results, int columnPos) throws SQLException {
-		return results.getString(columnPos);
-	}
+    @Override
+    public Object resultToSqlArg(FieldType fieldType, DatabaseResults results, int columnPos) throws SQLException {
+        return results.getString(columnPos);
+    }
 
-	@Override
-	public Object sqlArgToJava(FieldType fieldType, Object sqlArg, int columnPos) throws SQLException {
+    @Override
+    public Object sqlArgToJava(FieldType fieldType, Object sqlArg, int columnPos) throws SQLException {
         return JsonSerializationHelper.deserialize(clz, (String) sqlArg);
-	}
+    }
 
-	@Override
-	public Object javaToSqlArg(FieldType fieldType, Object obj) throws SQLException {
+    @Override
+    public Object javaToSqlArg(FieldType fieldType, Object obj) throws SQLException {
         return JsonSerializationHelper.serialize(obj, clz);
-	}
+    }
 
-	@Override
-	public boolean isValidForField(Field field) {
-		return Serializable.class.isAssignableFrom(field.getType());
-	}
+    @Override
+    public boolean isValidForField(Field field) {
+        return Serializable.class.isAssignableFrom(field.getType());
+    }
 
-	@Override
-	public boolean isStreamType() {
-		return true;
-	}
+    @Override
+    public boolean isStreamType() {
+        return true;
+    }
 
-	@Override
-	public boolean isComparable() {
-		return false;
-	}
+    @Override
+    public boolean isComparable() {
+        return false;
+    }
 
-	@Override
-	public boolean isAppropriateId() {
-		return false;
-	}
+    @Override
+    public boolean isAppropriateId() {
+        return false;
+    }
 
-	@Override
-	public boolean isArgumentHolderRequired() {
-		return true;
-	}
+    @Override
+    public boolean isArgumentHolderRequired() {
+        return true;
+    }
 
-	@Override
-	public Object resultStringToJava(FieldType fieldType, String stringValue, int columnPos) throws SQLException {
-		throw new SQLException("Serializable type cannot be converted from json to Java");
-	}
+    @Override
+    public Object resultStringToJava(FieldType fieldType, String stringValue, int columnPos) throws SQLException {
+        throw new SQLException("Serializable type cannot be converted from json to Java");
+    }
 }

@@ -31,7 +31,7 @@ public class ControlFlowGraphEdge {
      * Create a control flow graph edge.
      *
      * @param from the "from" basic block
-     * @param to the "to" basic block
+     * @param to   the "to" basic block
      */
     public ControlFlowGraphEdge(BasicBlock from, BasicBlock to) {
         this.from = from;

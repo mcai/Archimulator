@@ -62,7 +62,7 @@ public class BasicMemoryController extends MemoryController {
     /**
      * Act on an access of the specified address.
      *
-     * @param address the address
+     * @param address             the address
      * @param onCompletedCallback the callback action performed when the access is completed
      */
     @Override
@@ -102,7 +102,7 @@ public class BasicMemoryController extends MemoryController {
     /**
      * Access the specified address of the DRAM.
      *
-     * @param address the address
+     * @param address             the address
      * @param onCompletedCallback the callback action performed when the access is completed
      */
     private void accessDram(int address, final Action onCompletedCallback) {
@@ -223,8 +223,8 @@ public class BasicMemoryController extends MemoryController {
             /**
              * Create a pending access on the specified row of the bank.
              *
-             * @param row the row
-             * @param contiguous a value indicating whether access is contiguous or not
+             * @param row                 the row
+             * @param contiguous          a value indicating whether access is contiguous or not
              * @param onCompletedCallback the callback action performed when the access is completed
              */
             private PendingAccess(int row, boolean contiguous, Action onCompletedCallback) {
@@ -291,8 +291,8 @@ public class BasicMemoryController extends MemoryController {
         /**
          * Begin the access on the specified row of the bank.
          *
-         * @param row the row
-         * @param contiguous a value indicating whether the access is contiguous or not
+         * @param row                 the row
+         * @param contiguous          a value indicating whether the access is contiguous or not
          * @param onCompletedCallback the callback action performed when the access is completed
          */
         private void beginAccess(int row, boolean contiguous, Action onCompletedCallback) {
@@ -307,8 +307,8 @@ public class BasicMemoryController extends MemoryController {
         /**
          * Access the specified row of the bank.
          *
-         * @param row the row
-         * @param contiguous a value indicating whether the access is contiguous or not
+         * @param row                 the row
+         * @param contiguous          a value indicating whether the access is contiguous or not
          * @param onCompletedCallback the callback action performed when the access is completed
          */
         private void access(final int row, final boolean contiguous, final Action onCompletedCallback) {

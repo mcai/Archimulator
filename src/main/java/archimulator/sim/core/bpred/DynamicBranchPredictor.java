@@ -32,12 +32,13 @@ public abstract class DynamicBranchPredictor extends BranchPredictor {
     /**
      * Create a dynamic branch predictor.
      *
-     * @param thread the thread
-     * @param name the name of the dynamic branch predictor
-     * @param type the type of the dynamic branch predictor
+     * @param thread                    the thread
+     * @param name                      the name of the dynamic branch predictor
+     * @param type                      the type of the dynamic branch predictor
      * @param branchTargetBufferNumSets the number of sets in the branch target buffer
-     * @param branchTargetBufferAssociativity the associativity in the branch target buffer
-     * @param returnAddressStackSize the return address stack size
+     * @param branchTargetBufferAssociativity
+     *                                  the associativity in the branch target buffer
+     * @param returnAddressStackSize    the return address stack size
      */
     public DynamicBranchPredictor(Thread thread, String name, BranchPredictorType type, int branchTargetBufferNumSets, int branchTargetBufferAssociativity, int returnAddressStackSize) {
         super(thread, name, type);

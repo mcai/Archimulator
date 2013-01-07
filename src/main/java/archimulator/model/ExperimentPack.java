@@ -317,15 +317,15 @@ public class ExperimentPack implements WithId, WithTitle, WithCreateTime {
      * @return the variables
      */
     public List<ExperimentPackVariable> getVariables() {
-        if(this.variables == null) {
+        if (this.variables == null) {
             this.variables = new ArrayList<ExperimentPackVariable>();
         }
 
-        if(this.variables.isEmpty()) {
+        if (this.variables.isEmpty()) {
             try {
-                for(final Field field : this.getClass().getDeclaredFields()) {
+                for (final Field field : this.getClass().getDeclaredFields()) {
                     PropertyArray propertyAnnotation = field.getAnnotation(PropertyArray.class);
-                    if(propertyAnnotation != null) {
+                    if (propertyAnnotation != null) {
                         variables.add(new ExperimentPackVariable() {{
                             setName(field.getName());
                             setValues(Arrays.asList(BeanUtils.getArrayProperty(ExperimentPack.this, field.getName())));

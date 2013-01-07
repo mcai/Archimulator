@@ -70,9 +70,9 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
     /**
      * Create a context.
      *
-     * @param kernel the kernel
+     * @param kernel              the kernel
      * @param simulationDirectory the simulation's working directory
-     * @param contextMapping the context mapping
+     * @param contextMapping      the context mapping
      * @return the newly created context
      */
     public static Context load(Kernel kernel, String simulationDirectory, ContextMapping contextMapping) {
@@ -89,7 +89,7 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
     /**
      * Create a context.
      *
-     * @param parent the parent context
+     * @param parent       the parent context
      * @param registerFile the architectural register file
      * @param signalFinish the "finish" signal
      */
@@ -100,9 +100,9 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
     /**
      * Create a context.
      *
-     * @param kernel the kernel
-     * @param process the process
-     * @param parent the parent context
+     * @param kernel       the kernel
+     * @param process      the process
+     * @param parent       the parent context
      * @param registerFile the architectural register file
      * @param signalFinish the "finish" signal
      */
@@ -434,7 +434,8 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
     /**
      * Set a value indicating whether a pseudocall is encountered in the execution of the last instruction or not.
      *
-     * @param pseudoCallEncounteredInLastInstructionExecution a value indicating whether a pseudocall is encountered in  the execution of the last instruction or not
+     * @param pseudoCallEncounteredInLastInstructionExecution
+     *         a value indicating whether a pseudocall is encountered in  the execution of the last instruction or not
      */
     public void setPseudoCallEncounteredInLastInstructionExecution(boolean pseudoCallEncounteredInLastInstructionExecution) {
         this.pseudoCallEncounteredInLastInstructionExecution = pseudoCallEncounteredInLastInstructionExecution;

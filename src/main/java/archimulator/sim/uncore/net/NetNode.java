@@ -41,13 +41,13 @@ public abstract class NetNode {
     /**
      * Create a net node.
      *
-     * @param net the parent net
-     * @param name the name of the net node
-     * @param numInPorts the number of in ports
-     * @param inBufferSize the size of the in buffer
-     * @param numOutPorts the number of out ports
+     * @param net           the parent net
+     * @param name          the name of the net node
+     * @param numInPorts    the number of in ports
+     * @param inBufferSize  the size of the in buffer
+     * @param numOutPorts   the number of out ports
      * @param outBufferSize the size of the out buffer
-     * @param bandwidth the bandwidth of the net node
+     * @param bandwidth     the bandwidth of the net node
      */
     public NetNode(Net net, String name, int numInPorts, int inBufferSize, int numOutPorts, int outBufferSize, int bandwidth) {
         this.net = net;
@@ -90,7 +90,7 @@ public abstract class NetNode {
      * Find a free port among the specified list of ports.
      *
      * @param <NetPortT> port type
-     * @param ports the list of ports to be searched
+     * @param ports      the list of ports to be searched
      * @return a free port found among the specified list of ports if any exists; otherwise null
      */
     protected <NetPortT extends NetPort> NetPortT findFreePort(List<NetPortT> ports) {

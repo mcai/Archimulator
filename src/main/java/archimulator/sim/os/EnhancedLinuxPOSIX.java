@@ -41,8 +41,8 @@ public final class EnhancedLinuxPOSIX extends BaseNativePOSIX {
      * Create an enhanced Linux POSIX implementation.
      *
      * @param libraryName the library name
-     * @param libc the libc
-     * @param handler the POSIX handler
+     * @param libc        the libc
+     * @param handler     the POSIX handler
      */
     public EnhancedLinuxPOSIX(String libraryName, LibC libc, POSIXHandler handler) {
         super(libraryName, libc, handler);

@@ -38,9 +38,9 @@ public class NetLink {
     /**
      * Create a net link from the source node to the destination node.
      *
-     * @param sourceNode the source node
+     * @param sourceNode      the source node
      * @param destinationNode the destination node
-     * @param bandwidth the bandwidth of the link
+     * @param bandwidth       the bandwidth of the link
      */
     public NetLink(NetNode sourceNode, NetNode destinationNode, int bandwidth) {
         this.sourcePort = sourceNode.findFreeOutPort();

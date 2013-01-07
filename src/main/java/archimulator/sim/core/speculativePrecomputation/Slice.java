@@ -18,8 +18,8 @@
  ******************************************************************************/
 package archimulator.sim.core.speculativePrecomputation;
 
-import archimulator.sim.uncore.delinquentLoad.DelinquentLoad;
 import archimulator.sim.os.Context;
+import archimulator.sim.uncore.delinquentLoad.DelinquentLoad;
 
 import java.util.ArrayList;
 import java.util.HashSet;

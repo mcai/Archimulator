@@ -69,7 +69,6 @@ public class MultiBarPlot {
 
     /**
      * Bar.
-     *
      */
     public static class Bar implements SubChart {
         private String key;
@@ -78,7 +77,7 @@ public class MultiBarPlot {
         /**
          * Create a bar.
          *
-         * @param key the key
+         * @param key    the key
          * @param values the values
          */
         public Bar(String key, XY[] values) {
@@ -112,7 +111,7 @@ public class MultiBarPlot {
     /**
      * Create a multi bar plot object.
      *
-     * @param title the title
+     * @param title     the title
      * @param subCharts an array of constituent sub charts.
      */
     public MultiBarPlot(String title, SubChart[] subCharts) {
