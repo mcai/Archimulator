@@ -52,7 +52,7 @@ public class RereferenceIntervalPredictionPolicy<StateT extends Serializable> ex
             }
         });
 
-        this.insertionPolicy = new archimulator.sim.uncore.cache.replacement.reuseDistance.DynamicInsertionPolicy(cache, 4, ((1 << 10) - 1), 8); //TODO: parameter passing
+        this.insertionPolicy = new DynamicInsertionPolicy(cache, 4, ((1 << 10) - 1), 6); //TODO: parameter passing
     }
 
     @Override
