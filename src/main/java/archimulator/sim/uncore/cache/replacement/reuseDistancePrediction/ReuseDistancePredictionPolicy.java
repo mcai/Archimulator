@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.cache.replacement.reuseDistance;
+package archimulator.sim.uncore.cache.replacement.reuseDistancePrediction;
 
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.CacheAccess;
@@ -31,6 +31,11 @@ import java.io.Serializable;
  * @author Min Cai
  */
 public class ReuseDistancePredictionPolicy<StateT extends Serializable> extends AbstractReuseDistancePredictionPolicy<StateT> {
+    /**
+     * Create a reuse distance prediction policy.
+     *
+     * @param cache the parent cache
+     */
     public ReuseDistancePredictionPolicy(EvictableCache<StateT> cache) {
         super(cache);
     }

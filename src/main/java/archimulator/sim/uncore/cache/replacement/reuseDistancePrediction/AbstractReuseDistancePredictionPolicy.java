@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.cache.replacement.reuseDistance;
+package archimulator.sim.uncore.cache.replacement.reuseDistancePrediction;
 
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.Cache;
@@ -47,6 +47,11 @@ public abstract class AbstractReuseDistancePredictionPolicy<StateT extends Seria
     protected int accessesCounterLow;
     protected int accessesCounterHigh;
 
+    /**
+     * Create an abstract reuse distance prediction policy.
+     *
+     * @param cache the parent cache
+     */
     public AbstractReuseDistancePredictionPolicy(EvictableCache<StateT> cache) {
         super(cache);
 
@@ -66,6 +71,14 @@ public abstract class AbstractReuseDistancePredictionPolicy<StateT extends Seria
         this.accessesCounterHigh = 1;
     }
 
+    /**
+     * Handle replacement based on reuse distance prediction.
+     *
+     * @param access the memory hierarchy access
+     * @param set the set index
+     * @param tag the tag
+     * @return the newly created cache access object
+     */
     protected CacheAccess<StateT> handleReplacementBasedOnReuseDistancePrediction(MemoryHierarchyAccess access, int set, int tag) {
         int victimTime = 0;
         int victimWay = 0;
@@ -97,8 +110,14 @@ public abstract class AbstractReuseDistancePredictionPolicy<StateT extends Seria
         return new CacheAccess<StateT>(this.getCache(), access, set, victimWay, tag);
     }
 
+    /**
+     * Get a value indicating whether the specified cache access's decision is polluting or not.
+     *
+     * @param cacheAccess the cache access
+     * @return a value indicating whether the specified cache access's decision is polluting or not
+     */
     protected boolean isPolluting(CacheAccess<StateT> cacheAccess) {
-        int predictedRequesterReuseDistance = this.reuseDistanceMonitor.lookup(cacheAccess.getAccess().getVirtualPc()); //TODO: thread awareness: threadId-pc pair??!!
+        int predictedRequesterReuseDistance = this.reuseDistanceMonitor.getPredictor().predict(cacheAccess.getAccess().getVirtualPc()); //TODO: thread awareness: threadId-pc pair??!!
 
         CacheLine<Boolean> mirrorLine = this.mirrorCache.getLine(cacheAccess.getSet(), cacheAccess.getWay());
         BooleanValueProvider stateProvider = (BooleanValueProvider) mirrorLine.getStateProvider();
@@ -118,15 +137,28 @@ public abstract class AbstractReuseDistancePredictionPolicy<StateT extends Seria
         this.handleLineReference(set, way, access.getVirtualPc());
     }
 
+    /**
+     * Handle a line reference.
+     *
+     * @param set the set index
+     * @param way the way
+     * @param pc the value of the program counter (PC)
+     */
     private void handleLineReference(int set, int way, int pc) {
         this.updateOnEveryAccess(pc, this.getCache().getLine(set, way).getTag());
 
         CacheLine<Boolean> mirrorLine = this.mirrorCache.getLine(set, way);
         BooleanValueProvider stateProvider = (BooleanValueProvider) mirrorLine.getStateProvider();
         stateProvider.timeStamp = this.accessesCounterHigh;
-        stateProvider.predictedReuseDistance = this.reuseDistanceMonitor.lookup(pc);
+        stateProvider.predictedReuseDistance = this.reuseDistanceMonitor.getPredictor().predict(pc);
     }
 
+    /**
+     * Update values on every access.
+     *
+     * @param pc the value of the program counter (PC)
+     * @param address the address
+     */
     protected void updateOnEveryAccess(int pc, int address) {
         this.accessesCounterLow++;
         if (this.accessesCounterLow == this.quantizerTimestamp.getQuantum()) {
@@ -136,19 +168,39 @@ public abstract class AbstractReuseDistancePredictionPolicy<StateT extends Seria
                 this.accessesCounterHigh = 0;
             }
         }
-        this.reuseDistanceMonitor.update(pc, address);
+        this.reuseDistanceMonitor.getSampler().update(pc, address);
     }
 
+    /**
+     * Boolean value provider.
+     */
     private static class BooleanValueProvider implements ValueProvider<Boolean> {
         private boolean state;
         protected int timeStamp;
         protected int predictedReuseDistance;
 
+        /**
+         * Create a boolean value provider.
+         */
+        private BooleanValueProvider() {
+            this.state = true;
+        }
+
+        /**
+         * Get the state.
+         *
+         * @return the state
+         */
         @Override
         public Boolean get() {
             return state;
         }
 
+        /**
+         * Get the initial state.
+         *
+         * @return the initial state
+         */
         @Override
         public Boolean getInitialValue() {
             return true;

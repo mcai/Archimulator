@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.cache.replacement.reuseDistance;
+package archimulator.sim.uncore.cache.replacement.rereferenceIntervalPrediction;
 
 import archimulator.sim.uncore.cache.Cache;
 import net.pickapack.math.MathHelper;
@@ -47,6 +47,14 @@ public class DynamicInsertionPolicy {
 
     private Random random;
 
+    /**
+     * Create a dynamic insertion policy.
+     *
+     * @param cache the parent cache
+     * @param numThreads the number of threads
+     * @param policySelectionCounterMaxValue the maximum value of the policy selection counter
+     * @param setDuelingMonitorSize the set dueling monitor size
+     */
     public DynamicInsertionPolicy(Cache<?> cache, int numThreads, int policySelectionCounterMaxValue, int setDuelingMonitorSize) {
         this.cache = cache;
 
@@ -76,7 +84,9 @@ public class DynamicInsertionPolicy {
 //        this.initSetDuelingMonitorsBasedOnSetIndexBits();
     }
 
-    /* Randomly assign sets to SDMs */
+    /**
+     * Randomly assign sets to SDMs.
+     */
     private void initSetDuelingMonitorsRandomly() {
         /* total SDM size of cache */
         int totalSdmSize = this.setDuelingMonitorSize * this.numThreads;
@@ -116,7 +126,9 @@ public class DynamicInsertionPolicy {
         }
     }
 
-    /* Choose Leader Sets Based on bits 0-5 and 6-10 of the set index */
+    /**
+     * Choose Leader Sets Based on bits 0-5 and 6-10 of the set index.
+     */
     private void initSetDuelingMonitorsBasedOnSetIndexBits() {
         for (int set = 0; set < this.cache.getNumSets(); set++) {
             /* Dedicate Per Thread SDMs. Can determine if it is my dedicated set or not */
@@ -149,6 +161,13 @@ public class DynamicInsertionPolicy {
         }
     }
 
+    /**
+     * Get a value indicating whether it should do normal fill or not.
+     *
+     * @param threadId the thread ID
+     * @param set the set
+     * @return a value indicating whether it should do normal fill or not
+     */
     public boolean shouldDoNormalFill(int threadId, int set) {
         if (this.setDuelingMonitors.get(set).type == SetDuelingMonitorType.LRU && this.setDuelingMonitors.get(set).ownerThreadId == threadId) {
             /* Is it an SDM that does normal fill (NF) policy and is dedicated to this thread? */
@@ -162,6 +181,11 @@ public class DynamicInsertionPolicy {
         }
     }
 
+    /**
+     * Record a miss.
+     *
+     * @param set the set index
+     */
     public void recordMiss(int set) {
         SetDuelingMonitorType sdmType = this.setDuelingMonitors.get(set).type;
 
@@ -174,20 +198,46 @@ public class DynamicInsertionPolicy {
         }
     }
 
+    /**
+     * Get the bimodal suggestion.
+     *
+     * @param throttle the throttle
+     * @return the bimodal suggestion
+     */
     private boolean bimodalSuggestion(int throttle) {
         return this.random.nextInt(100) <= throttle;
     }
 
+    /**
+     * Set dueling monitor type.
+     */
     private enum SetDuelingMonitorType {
+        /**
+         * Followers.
+         */
         FOLLOWERS,
+
+        /**
+         * Least recently used (LRU).
+         */
         LRU,
+
+        /**
+         * Bimodal insertion policy (BIP).
+         */
         BIP
     }
 
+    /**
+     * Set dueling monitor.
+     */
     private class SetDuelingMonitor {
         private SetDuelingMonitorType type;
         private int ownerThreadId;
 
+        /**
+         * Create a set dueling monitor.
+         */
         private SetDuelingMonitor() {
             this.type = SetDuelingMonitorType.FOLLOWERS;
         }

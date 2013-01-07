@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.cache.replacement.reuseDistance;
+package archimulator.sim.uncore.cache.replacement.rereferenceIntervalPrediction;
 
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.Cache;
@@ -40,6 +40,11 @@ public class RereferenceIntervalPredictionPolicy<StateT extends Serializable> ex
     private DynamicInsertionPolicy insertionPolicy;
     private Cache<Boolean> mirrorCache;
 
+    /**
+     * Create a rereference interval prediction policy.
+     *
+     * @param cache the parent cache
+     */
     public RereferenceIntervalPredictionPolicy(EvictableCache<StateT> cache) {
         super(cache);
 
@@ -95,20 +100,36 @@ public class RereferenceIntervalPredictionPolicy<StateT extends Serializable> ex
         }
     }
 
+    /**
+     * Boolean value provider.
+     */
     private class BooleanValueProvider implements ValueProvider<Boolean> {
         private boolean state;
         private int predictedRereferenceInterval;
 
+        /**
+         * Create a boolean value provider.
+         */
         public BooleanValueProvider() {
             this.state = true;
             this.predictedRereferenceInterval = predictedRereferenceIntervalMaxValue;
         }
 
+        /**
+         * Get the state.
+         *
+         * @return the state
+         */
         @Override
         public Boolean get() {
             return state;
         }
 
+        /**
+         * Get the initial state.
+         *
+         * @return the initial state
+         */
         @Override
         public Boolean getInitialValue() {
             return true;

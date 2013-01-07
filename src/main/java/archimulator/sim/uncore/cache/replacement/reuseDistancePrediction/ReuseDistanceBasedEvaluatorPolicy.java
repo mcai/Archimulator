@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.cache.replacement.reuseDistance;
+package archimulator.sim.uncore.cache.replacement.reuseDistancePrediction;
 
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.CacheAccess;
@@ -32,40 +32,26 @@ import java.io.Serializable;
  * @author Min Cai
  */
 public class ReuseDistanceBasedEvaluatorPolicy<StateT extends Serializable> extends AbstractReuseDistancePredictionPolicy<StateT> {
-    private CacheReplacementPolicy<StateT> evictionPolicy;
+    private CacheReplacementPolicy<StateT> replacementPolicy;
 
     private long totalReplacements;
     private long pollutingReplacements;
     private long nonOptimalReplacements;
 
-    public ReuseDistanceBasedEvaluatorPolicy(EvictableCache<StateT> cache, CacheReplacementPolicy<StateT> evictionPolicy) {
+    /**
+     * Create a reuse distance based evaluator policy.
+     *
+     * @param cache the parent cache
+     * @param replacementPolicy the replacement policy to be evaluated
+     */
+    public ReuseDistanceBasedEvaluatorPolicy(EvictableCache<StateT> cache, CacheReplacementPolicy<StateT> replacementPolicy) {
         super(cache);
-        this.evictionPolicy = evictionPolicy;
-    }
-
-    public long getTotalReplacements() {
-        return totalReplacements;
-    }
-
-    public long getPollutingReplacements() {
-        return pollutingReplacements;
-    }
-
-    public long getNonOptimalReplacements() {
-        return nonOptimalReplacements;
-    }
-
-    public double getPollution() {
-        return (double) this.pollutingReplacements / this.totalReplacements;
-    }
-
-    public double getNonOptimality() {
-        return (double) this.nonOptimalReplacements / this.totalReplacements;
+        this.replacementPolicy = replacementPolicy;
     }
 
     @Override
     public CacheAccess<StateT> handleReplacement(MemoryHierarchyAccess access, int set, int tag) {
-        CacheAccess<StateT> miss = this.evictionPolicy.handleReplacement(access, set, tag);
+        CacheAccess<StateT> miss = this.replacementPolicy.handleReplacement(access, set, tag);
 
         CacheAccess<StateT> reuseDistancePredictionBasedMiss = this.handleReplacementBasedOnReuseDistancePrediction(access, set, tag);
 
@@ -84,15 +70,60 @@ public class ReuseDistanceBasedEvaluatorPolicy<StateT extends Serializable> exte
 
     @Override
     public void handlePromotionOnHit(MemoryHierarchyAccess access, int set, int way) {
-        this.evictionPolicy.handlePromotionOnHit(access, set, way);
+        this.replacementPolicy.handlePromotionOnHit(access, set, way);
 
         super.handlePromotionOnHit(access, set, way);
     }
 
     @Override
     public void handleInsertionOnMiss(MemoryHierarchyAccess access, int set, int way) {
-        this.evictionPolicy.handleInsertionOnMiss(access, set, way);
+        this.replacementPolicy.handleInsertionOnMiss(access, set, way);
 
         super.handleInsertionOnMiss(access, set, way);
+    }
+
+    /**
+     * Get the total number of replacements.
+     *
+     * @return the total number of replacements
+     */
+    public long getTotalReplacements() {
+        return totalReplacements;
+    }
+
+    /**
+     * Get the number of polluting replacements.
+     *
+     * @return the number of polluting replacements
+     */
+    public long getPollutingReplacements() {
+        return pollutingReplacements;
+    }
+
+    /**
+     * Get the number of non-optimal replacements.
+     *
+     * @return the number of non-optimal replacements
+     */
+    public long getNonOptimalReplacements() {
+        return nonOptimalReplacements;
+    }
+
+    /**
+     * Get the degree of observed pollution.
+     *
+     * @return the degree of observed pollution
+     */
+    public double getPollution() {
+        return (double) this.pollutingReplacements / this.totalReplacements;
+    }
+
+    /**
+     * Get the degree of observed non-optimality.
+     *
+     * @return the degree of observed non-optimality
+     */
+    public double getNonOptimality() {
+        return (double) this.nonOptimalReplacements / this.totalReplacements;
     }
 }

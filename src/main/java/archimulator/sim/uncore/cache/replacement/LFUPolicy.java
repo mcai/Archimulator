@@ -138,7 +138,7 @@ public class LFUPolicy<StateT extends Serializable> extends CacheReplacementPoli
          */
         @Override
         public Boolean getInitialValue() {
-            return false;
+            return true;
         }
     }
 }

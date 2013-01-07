@@ -21,8 +21,8 @@ package archimulator.sim.uncore.cache.replacement;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.replacement.helperThread.HelperThreadAwareLRUPolicy;
 import archimulator.sim.uncore.cache.replacement.helperThread.HelperThreadIntervalAwareLRUPolicy;
-import archimulator.sim.uncore.cache.replacement.reuseDistance.RereferenceIntervalPredictionPolicy;
-import archimulator.sim.uncore.cache.replacement.reuseDistance.ReuseDistancePredictionPolicy;
+import archimulator.sim.uncore.cache.replacement.rereferenceIntervalPrediction.RereferenceIntervalPredictionPolicy;
+import archimulator.sim.uncore.cache.replacement.reuseDistancePrediction.ReuseDistancePredictionPolicy;
 
 import java.io.Serializable;
 
