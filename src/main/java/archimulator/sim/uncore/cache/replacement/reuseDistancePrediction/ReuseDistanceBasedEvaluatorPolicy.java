@@ -34,9 +34,9 @@ import java.io.Serializable;
 public class ReuseDistanceBasedEvaluatorPolicy<StateT extends Serializable> extends AbstractReuseDistancePredictionPolicy<StateT> {
     private CacheReplacementPolicy<StateT> replacementPolicy;
 
-    private long totalReplacements;
-    private long pollutingReplacements;
-    private long nonOptimalReplacements;
+    private long numTotalReplacements;
+    private long numPollutingReplacements;
+    private long numNonOptimalReplacements;
 
     /**
      * Create a reuse distance based evaluator policy.
@@ -55,14 +55,14 @@ public class ReuseDistanceBasedEvaluatorPolicy<StateT extends Serializable> exte
 
         CacheAccess<StateT> reuseDistancePredictionBasedMiss = this.handleReplacementBasedOnReuseDistancePrediction(access, set, tag);
 
-        this.totalReplacements++;
+        this.numTotalReplacements++;
 
         if (this.isPolluting(miss)) {
-            this.pollutingReplacements++;
+            this.numPollutingReplacements++;
         }
 
         if (miss.getWay() != reuseDistancePredictionBasedMiss.getWay()) {
-            this.nonOptimalReplacements++;
+            this.numNonOptimalReplacements++;
         }
 
         return miss;
@@ -87,8 +87,8 @@ public class ReuseDistanceBasedEvaluatorPolicy<StateT extends Serializable> exte
      *
      * @return the total number of replacements
      */
-    public long getTotalReplacements() {
-        return totalReplacements;
+    public long getNumTotalReplacements() {
+        return numTotalReplacements;
     }
 
     /**
@@ -96,8 +96,8 @@ public class ReuseDistanceBasedEvaluatorPolicy<StateT extends Serializable> exte
      *
      * @return the number of polluting replacements
      */
-    public long getPollutingReplacements() {
-        return pollutingReplacements;
+    public long getNumPollutingReplacements() {
+        return numPollutingReplacements;
     }
 
     /**
@@ -105,25 +105,25 @@ public class ReuseDistanceBasedEvaluatorPolicy<StateT extends Serializable> exte
      *
      * @return the number of non-optimal replacements
      */
-    public long getNonOptimalReplacements() {
-        return nonOptimalReplacements;
+    public long getNumNonOptimalReplacements() {
+        return numNonOptimalReplacements;
     }
 
     /**
-     * Get the degree of observed pollution.
+     * Get the ratio of observed pollution.
      *
-     * @return the degree of observed pollution
+     * @return the ratio of observed pollution
      */
-    public double getPollution() {
-        return (double) this.pollutingReplacements / this.totalReplacements;
+    public double getPollutionRatio() {
+        return (double) this.numPollutingReplacements / this.numTotalReplacements;
     }
 
     /**
-     * Get the degree of observed non-optimality.
+     * Get the ratio of observed non-optimality.
      *
-     * @return the degree of observed non-optimality
+     * @return the ratio of observed non-optimality
      */
-    public double getNonOptimality() {
-        return (double) this.nonOptimalReplacements / this.totalReplacements;
+    public double getNonOptimalityRatio() {
+        return (double) this.numNonOptimalReplacements / this.numTotalReplacements;
     }
 }

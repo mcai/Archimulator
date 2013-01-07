@@ -39,13 +39,13 @@ import java.io.Serializable;
 public abstract class AbstractReuseDistancePredictionPolicy<StateT extends Serializable> extends CacheReplacementPolicy<StateT> {
     protected Cache<Boolean> mirrorCache;
 
-    protected Quantizer quantizerReuseDistance;
-    protected Quantizer quantizerTimestamp;
+    protected Quantizer reuseDistanceQuantizer;
+    protected Quantizer timestampQuantizer;
 
     protected ReuseDistanceMonitor reuseDistanceMonitor;
 
-    protected int accessesCounterLow;
-    protected int accessesCounterHigh;
+    protected int lowAccessesCounter;
+    protected int highAccessesCounter;
 
     /**
      * Create an abstract reuse distance prediction policy.
@@ -62,13 +62,13 @@ public abstract class AbstractReuseDistancePredictionPolicy<StateT extends Seria
             }
         });
 
-        this.quantizerTimestamp = new Quantizer(7, 16384);
-        this.quantizerReuseDistance = new Quantizer(15, 8192);
+        this.timestampQuantizer = new Quantizer(7, 16384);
+        this.reuseDistanceQuantizer = new Quantizer(15, 8192);
 
-        this.reuseDistanceMonitor = new ReuseDistanceMonitor(this.getCache(), this.quantizerReuseDistance);
+        this.reuseDistanceMonitor = new ReuseDistanceMonitor(this.getCache(), this.reuseDistanceQuantizer);
 
-        this.accessesCounterLow = 0;
-        this.accessesCounterHigh = 1;
+        this.lowAccessesCounter = 0;
+        this.highAccessesCounter = 1;
     }
 
     /**
@@ -88,10 +88,10 @@ public abstract class AbstractReuseDistancePredictionPolicy<StateT extends Seria
 
             int way = mirrorLine.getWay();
 
-            int now = this.quantizerTimestamp.unQuantize(this.accessesCounterHigh + (stateProvider.timeStamp > this.accessesCounterHigh ? this.quantizerTimestamp.getMaxValue() + 1 : 0));
+            int now = this.timestampQuantizer.unQuantize(this.highAccessesCounter + (stateProvider.timeStamp > this.highAccessesCounter ? this.timestampQuantizer.getMaxValue() + 1 : 0));
 
-            int rawTimestamp = this.quantizerTimestamp.unQuantize(stateProvider.timeStamp);
-            int rawPredictedReuseDistance = this.quantizerReuseDistance.unQuantize(stateProvider.predictedReuseDistance);
+            int rawTimestamp = this.timestampQuantizer.unQuantize(stateProvider.timeStamp);
+            int rawPredictedReuseDistance = this.reuseDistanceQuantizer.unQuantize(stateProvider.predictedReuseDistance);
 
             int timeLeft = rawTimestamp + rawPredictedReuseDistance > now ? rawTimestamp + rawPredictedReuseDistance - now : 0;
             if (timeLeft > victimTime) {
@@ -149,7 +149,7 @@ public abstract class AbstractReuseDistancePredictionPolicy<StateT extends Seria
 
         CacheLine<Boolean> mirrorLine = this.mirrorCache.getLine(set, way);
         BooleanValueProvider stateProvider = (BooleanValueProvider) mirrorLine.getStateProvider();
-        stateProvider.timeStamp = this.accessesCounterHigh;
+        stateProvider.timeStamp = this.highAccessesCounter;
         stateProvider.predictedReuseDistance = this.reuseDistanceMonitor.getPredictor().predict(pc);
     }
 
@@ -160,12 +160,12 @@ public abstract class AbstractReuseDistancePredictionPolicy<StateT extends Seria
      * @param address the address
      */
     protected void updateOnEveryAccess(int pc, int address) {
-        this.accessesCounterLow++;
-        if (this.accessesCounterLow == this.quantizerTimestamp.getQuantum()) {
-            this.accessesCounterLow = 0;
-            this.accessesCounterHigh++;
-            if (this.accessesCounterHigh > this.quantizerTimestamp.getMaxValue()) {
-                this.accessesCounterHigh = 0;
+        this.lowAccessesCounter++;
+        if (this.lowAccessesCounter == this.timestampQuantizer.getQuantum()) {
+            this.lowAccessesCounter = 0;
+            this.highAccessesCounter++;
+            if (this.highAccessesCounter > this.timestampQuantizer.getMaxValue()) {
+                this.highAccessesCounter = 0;
             }
         }
         this.reuseDistanceMonitor.getSampler().update(pc, address);
@@ -176,7 +176,15 @@ public abstract class AbstractReuseDistancePredictionPolicy<StateT extends Seria
      */
     private static class BooleanValueProvider implements ValueProvider<Boolean> {
         private boolean state;
+
+        /**
+         * The timestamp.
+         */
         protected int timeStamp;
+
+        /**
+         * The predicted value of the reuse distance.
+         */
         protected int predictedReuseDistance;
 
         /**
