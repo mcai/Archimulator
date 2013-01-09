@@ -18,6 +18,9 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache.replacement.reuseDistancePrediction;
 
+import archimulator.sim.common.BasicSimulationObject;
+import archimulator.sim.common.SimulationEvent;
+import archimulator.sim.common.SimulationObject;
 import net.pickapack.math.Quantizer;
 
 import java.util.ArrayList;
@@ -28,8 +31,8 @@ import java.util.List;
  *
  * @author Min Cai
  */
-public class ReuseDistanceSampler {
-    private ReuseDistanceMonitor reuseDistanceMonitor;
+public class ReuseDistanceSampler extends BasicSimulationObject {
+    private String name;
 
     private List<ReuseDistanceSamplerEntry> entries;
 
@@ -41,13 +44,15 @@ public class ReuseDistanceSampler {
     /**
      * Create a reuse distance sampler.
      *
-     * @param reuseDistanceMonitor the parent reuse distance monitor
-     * @param samplingPeriod the sampling period
-     * @param maxReuseDistance the maximum reuse distance
+     * @param parent                 the parent simulation object
+     * @param samplingPeriod         the sampling period
+     * @param maxReuseDistance       the maximum reuse distance
      * @param reuseDistanceQuantizer the reuse distance quantizer
      */
-    public ReuseDistanceSampler(ReuseDistanceMonitor reuseDistanceMonitor, int samplingPeriod, int maxReuseDistance, Quantizer reuseDistanceQuantizer) {
-        this.reuseDistanceMonitor = reuseDistanceMonitor;
+    public ReuseDistanceSampler(SimulationObject parent, String name, int samplingPeriod, int maxReuseDistance, Quantizer reuseDistanceQuantizer) {
+        super(parent);
+
+        this.name = name;
         this.samplingPeriod = samplingPeriod;
         this.reuseDistanceQuantizer = reuseDistanceQuantizer;
 
@@ -62,7 +67,7 @@ public class ReuseDistanceSampler {
     /**
      * Update.
      *
-     * @param pc the value of the program counter (PC)
+     * @param pc      the value of the program counter (PC)
      * @param address the address
      */
     public void update(int pc, int address) {
@@ -70,8 +75,7 @@ public class ReuseDistanceSampler {
             ReuseDistanceSamplerEntry entry = this.entries.get(i);
             if (entry.isValid() && entry.getAddress() == address) {
                 entry.setValid(false);
-                int reuseDistance = (i + 8) * this.samplingPeriod;
-                reuseDistanceMonitor.getPredictor().update(entry.getPc(), this.reuseDistanceQuantizer.quantize(reuseDistance));
+                this.getBlockingEventDispatcher().dispatch(new ReuseDistanceSampledEvent(this, entry.getPc(), this.reuseDistanceQuantizer.quantize(i * this.samplingPeriod)));
                 break;
             }
         }
@@ -79,7 +83,7 @@ public class ReuseDistanceSampler {
         if (this.samplingCounter == 0) {
             ReuseDistanceSamplerEntry victimEntry = this.entries.get(this.entries.size() - 1);
             if (victimEntry.isValid()) {
-                reuseDistanceMonitor.getPredictor().update(victimEntry.getPc(), this.reuseDistanceQuantizer.getMaxValue());
+                this.getBlockingEventDispatcher().dispatch(new ReuseDistanceSampledEvent(this, victimEntry.getPc(), this.reuseDistanceQuantizer.getMaxValue()));
             }
 
             this.entries.remove(victimEntry);
@@ -95,13 +99,9 @@ public class ReuseDistanceSampler {
         }
     }
 
-    /**
-     * Get the parent reuse distance monitor.
-     *
-     * @return the parent reuse distance monitor
-     */
-    public ReuseDistanceMonitor getReuseDistanceMonitor() {
-        return reuseDistanceMonitor;
+    @Override
+    public String getName() {
+        return name;
     }
 
     /**
@@ -138,5 +138,44 @@ public class ReuseDistanceSampler {
      */
     public Quantizer getReuseDistanceQuantizer() {
         return reuseDistanceQuantizer;
+    }
+
+    /**
+     * The event when a reuse distance is sampled.
+     */
+    public class ReuseDistanceSampledEvent extends SimulationEvent {
+        private int pc;
+        private int reuseDistance;
+
+        /**
+         * Create a event when a reuse distance is sampled.
+         *
+         * @param sender        the sender simulation object
+         * @param pc            the value of the program counter (PC)
+         * @param reuseDistance the reuse distance
+         */
+        public ReuseDistanceSampledEvent(SimulationObject sender, int pc, int reuseDistance) {
+            super(sender);
+            this.pc = pc;
+            this.reuseDistance = reuseDistance;
+        }
+
+        /**
+         * Get the value of the program counter (PC).
+         *
+         * @return the value of the program counter (PC)
+         */
+        public int getPc() {
+            return pc;
+        }
+
+        /**
+         * Get the reuse distance.
+         *
+         * @return the reuse distance
+         */
+        public int getReuseDistance() {
+            return reuseDistance;
+        }
     }
 }

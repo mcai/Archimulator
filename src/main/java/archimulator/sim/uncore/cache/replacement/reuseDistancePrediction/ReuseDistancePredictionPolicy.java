@@ -19,8 +19,15 @@
 package archimulator.sim.uncore.cache.replacement.reuseDistancePrediction;
 
 import archimulator.sim.uncore.MemoryHierarchyAccess;
-import archimulator.sim.uncore.cache.CacheAccess;
-import archimulator.sim.uncore.cache.EvictableCache;
+import archimulator.sim.uncore.cache.*;
+import archimulator.sim.uncore.cache.prediction.CacheBasedPredictor;
+import archimulator.sim.uncore.cache.prediction.Predictor;
+import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicy;
+import archimulator.util.HighLowCounter;
+import net.pickapack.action.Action1;
+import net.pickapack.math.Quantizer;
+import net.pickapack.util.ValueProvider;
+import net.pickapack.util.ValueProviderFactory;
 
 import java.io.Serializable;
 
@@ -30,7 +37,17 @@ import java.io.Serializable;
  * @param <StateT> the state type of the parent evictable cache
  * @author Min Cai
  */
-public class ReuseDistancePredictionPolicy<StateT extends Serializable> extends AbstractReuseDistancePredictionPolicy<StateT> {
+public class ReuseDistancePredictionPolicy<StateT extends Serializable> extends CacheReplacementPolicy<StateT> {
+    private Cache<Boolean> mirrorCache;
+
+    private Quantizer reuseDistanceQuantizer;
+
+    private Predictor<Integer> reuseDistancePredictor;
+
+    private ReuseDistanceSampler reuseDistanceSampler;
+
+    private HighLowCounter highLowCounter;
+
     /**
      * Create a reuse distance prediction policy.
      *
@@ -38,10 +55,148 @@ public class ReuseDistancePredictionPolicy<StateT extends Serializable> extends 
      */
     public ReuseDistancePredictionPolicy(EvictableCache<StateT> cache) {
         super(cache);
+
+        this.mirrorCache = new Cache<Boolean>(cache, cache.getName() + ".reuseDistancePredictionPolicy.mirrorCache", cache.getGeometry(), new ValueProviderFactory<Boolean, ValueProvider<Boolean>>() {
+            @Override
+            public ValueProvider<Boolean> createValueProvider(Object... args) {
+                return new BooleanValueProvider();
+            }
+        });
+
+        this.reuseDistanceQuantizer = new Quantizer(15, 8192);
+
+        this.reuseDistancePredictor = new CacheBasedPredictor<Integer>(cache, cache.getName() + ".reuseDistancePredictor", new CacheGeometry(16 * 16 * cache.getGeometry().getLineSize(), 16, cache.getGeometry().getLineSize()), 0, 3, 0);
+        this.reuseDistanceSampler = new ReuseDistanceSampler(cache, cache.getName() + ".reuseDistanceSampler", 4096, (reuseDistanceQuantizer.getMaxValue() + 1) * reuseDistanceQuantizer.getQuantum(), reuseDistanceQuantizer);
+
+        this.highLowCounter = new HighLowCounter(7, 16384);
+
+        cache.getBlockingEventDispatcher().addListener(ReuseDistanceSampler.ReuseDistanceSampledEvent.class, new Action1<ReuseDistanceSampler.ReuseDistanceSampledEvent>() {
+            @Override
+            public void apply(ReuseDistanceSampler.ReuseDistanceSampledEvent event) {
+                if (event.getSender() == reuseDistanceSampler) {
+                    reuseDistancePredictor.update(event.getPc(), event.getReuseDistance());
+                }
+            }
+        });
     }
 
     @Override
     public CacheAccess<StateT> handleReplacement(MemoryHierarchyAccess access, int set, int tag) {
-        return handleReplacementBasedOnReuseDistancePrediction(access, set, tag);
+        int victimTime = 0;
+        int victimWay = 0;
+
+        for (CacheLine<Boolean> mirrorLine : this.mirrorCache.getLines(set)) {
+            BooleanValueProvider stateProvider = (BooleanValueProvider) mirrorLine.getStateProvider();
+
+            int way = mirrorLine.getWay();
+
+            int now = this.highLowCounter.getTimestampQuantizer().unQuantize(this.highLowCounter.getHighCounter() + (stateProvider.timeStamp > this.highLowCounter.getHighCounter() ? this.highLowCounter.getTimestampQuantizer().getMaxValue() + 1 : 0));
+
+            int rawTimestamp = this.highLowCounter.getTimestampQuantizer().unQuantize(stateProvider.timeStamp);
+            int rawPredictedReuseDistance = this.reuseDistanceQuantizer.unQuantize(stateProvider.predictedReuseDistance);
+
+            int timeLeft = Math.max(rawTimestamp + rawPredictedReuseDistance - now, 0);
+            if (timeLeft > victimTime) {
+                victimTime = timeLeft;
+                victimWay = way;
+            }
+
+            int timeIdle = now - rawTimestamp;
+            if (timeIdle > victimTime) {
+                victimTime = timeIdle;
+                victimWay = way;
+            }
+        }
+
+        return new CacheAccess<StateT>(this.getCache(), access, set, victimWay, tag);
+    }
+
+    @Override
+    public void handlePromotionOnHit(MemoryHierarchyAccess access, int set, int way) {
+        this.handleLineReference(set, way, access.getVirtualPc());
+    }
+
+    @Override
+    public void handleInsertionOnMiss(MemoryHierarchyAccess access, int set, int way) {
+        this.handleLineReference(set, way, access.getVirtualPc());
+    }
+
+    /**
+     * Handle a line reference.
+     *
+     * @param set the set index
+     * @param way the way
+     * @param pc  the value of the program counter (PC)
+     */
+    private void handleLineReference(int set, int way, int pc) {
+        this.highLowCounter.inc();
+        this.reuseDistanceSampler.update(pc, this.getCache().getLine(set, way).getTag());
+
+        CacheLine<Boolean> mirrorLine = this.mirrorCache.getLine(set, way);
+        BooleanValueProvider stateProvider = (BooleanValueProvider) mirrorLine.getStateProvider();
+        stateProvider.timeStamp = this.highLowCounter.getHighCounter();
+        stateProvider.predictedReuseDistance = this.reuseDistancePredictor.predict(pc);
+    }
+
+    /**
+     * Get the reuse distance predictor.
+     *
+     * @return the reuse distance predictor
+     */
+    public Predictor<Integer> getReuseDistancePredictor() {
+        return reuseDistancePredictor;
+    }
+
+    /**
+     * Get the reuse distance sampler.
+     *
+     * @return the reuse distance sampler
+     */
+    public ReuseDistanceSampler getReuseDistanceSampler() {
+        return reuseDistanceSampler;
+    }
+
+    /**
+     * Boolean value provider.
+     */
+    private class BooleanValueProvider implements ValueProvider<Boolean> {
+        private boolean state;
+
+        /**
+         * The timestamp.
+         */
+        protected int timeStamp;
+
+        /**
+         * The predicted value of the reuse distance.
+         */
+        protected int predictedReuseDistance;
+
+        /**
+         * Create a boolean value provider.
+         */
+        private BooleanValueProvider() {
+            this.state = true;
+        }
+
+        /**
+         * Get the state.
+         *
+         * @return the state
+         */
+        @Override
+        public Boolean get() {
+            return state;
+        }
+
+        /**
+         * Get the initial state.
+         *
+         * @return the initial state
+         */
+        @Override
+        public Boolean getInitialValue() {
+            return true;
+        }
     }
 }
