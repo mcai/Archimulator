@@ -113,24 +113,25 @@ public class ReuseDistancePredictionPolicy<StateT extends Serializable> extends 
 
     @Override
     public void handlePromotionOnHit(MemoryHierarchyAccess access, int set, int way) {
-        this.handleLineReference(set, way, access.getVirtualPc());
+        this.handleLineReference(set, way, access.getThread().getId(), access.getVirtualPc());
     }
 
     @Override
     public void handleInsertionOnMiss(MemoryHierarchyAccess access, int set, int way) {
-        this.handleLineReference(set, way, access.getVirtualPc());
+        this.handleLineReference(set, way, access.getThread().getId(), access.getVirtualPc());
     }
 
     /**
      * Handle a line reference.
      *
-     * @param set the set index
-     * @param way the way
-     * @param pc  the value of the program counter (PC)
+     * @param set      the set index
+     * @param way      the way
+     * @param threadId the thread ID
+     * @param pc       the value of the program counter (PC)
      */
-    private void handleLineReference(int set, int way, int pc) {
+    private void handleLineReference(int set, int way, int threadId, int pc) {
         this.highLowCounter.inc();
-        this.reuseDistanceSampler.update(pc, this.getCache().getLine(set, way).getTag());
+        this.reuseDistanceSampler.update(threadId, pc, this.getCache().getLine(set, way).getTag());
 
         CacheLine<Boolean> mirrorLine = this.mirrorCache.getLine(set, way);
         BooleanValueProvider stateProvider = (BooleanValueProvider) mirrorLine.getStateProvider();

@@ -60,7 +60,7 @@ public enum CacheReplacementPolicyType {
     REUSE_DISTANCE_PREDICTION,
 
     /**
-     * Rereference interval prediction.
+     * Rereference interval prediction (RRIP).
      */
     REREFERENCE_INTERVAL_PREDICTION
 }

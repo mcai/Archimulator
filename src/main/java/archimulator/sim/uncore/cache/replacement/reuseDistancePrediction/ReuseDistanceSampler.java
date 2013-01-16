@@ -67,15 +67,20 @@ public class ReuseDistanceSampler extends BasicSimulationObject {
     /**
      * Update.
      *
-     * @param pc      the value of the program counter (PC)
-     * @param address the address
+     * @param threadId the thread ID
+     * @param pc       the value of the program counter (PC)
+     * @param address  the address
      */
-    public void update(int pc, int address) {
+    public void update(int threadId, int pc, int address) {
+        if(!needUpdate(threadId, pc, address)) {
+            return;
+        }
+
         for (int i = 0; i < this.entries.size(); i++) {
             ReuseDistanceSamplerEntry entry = this.entries.get(i);
             if (entry.isValid() && entry.getAddress() == address) {
                 entry.setValid(false);
-                this.getBlockingEventDispatcher().dispatch(new ReuseDistanceSampledEvent(this, entry.getPc(), this.reuseDistanceQuantizer.quantize(i * this.samplingPeriod)));
+                this.getBlockingEventDispatcher().dispatch(new ReuseDistanceSampledEvent(this, entry.getThreadId(), threadId , entry.getPc(), this.reuseDistanceQuantizer.quantize(i * this.samplingPeriod)));
                 break;
             }
         }
@@ -83,13 +88,14 @@ public class ReuseDistanceSampler extends BasicSimulationObject {
         if (this.samplingCounter == 0) {
             ReuseDistanceSamplerEntry victimEntry = this.entries.get(this.entries.size() - 1);
             if (victimEntry.isValid()) {
-                this.getBlockingEventDispatcher().dispatch(new ReuseDistanceSampledEvent(this, victimEntry.getPc(), this.reuseDistanceQuantizer.getMaxValue()));
+                this.getBlockingEventDispatcher().dispatch(new ReuseDistanceSampledEvent(this, victimEntry.getThreadId(), -1, victimEntry.getPc(), this.reuseDistanceQuantizer.getMaxValue()));
             }
 
             this.entries.remove(victimEntry);
             this.entries.add(0, victimEntry);
 
             victimEntry.setValid(true);
+            victimEntry.setThreadId(threadId);
             victimEntry.setPc(pc);
             victimEntry.setAddress(address);
 
@@ -97,6 +103,18 @@ public class ReuseDistanceSampler extends BasicSimulationObject {
         } else {
             samplingCounter--;
         }
+    }
+
+    /**
+     * Get a value indicating whether update is needed or not.
+     *
+     * @param threadId the thread ID
+     * @param pc the PC
+     * @param address the address
+     * @return a value indicating whether update is needed or not
+     */
+    public boolean needUpdate(int threadId, int pc, int address) {
+        return true;
     }
 
     @Override
@@ -144,20 +162,44 @@ public class ReuseDistanceSampler extends BasicSimulationObject {
      * The event when a reuse distance is sampled.
      */
     public class ReuseDistanceSampledEvent extends SimulationEvent {
+        private int leaderThreadId;
+        private int followerThreadId;
         private int pc;
         private int reuseDistance;
 
         /**
          * Create a event when a reuse distance is sampled.
          *
-         * @param sender        the sender simulation object
-         * @param pc            the value of the program counter (PC)
-         * @param reuseDistance the reuse distance
+         * @param sender           the sender simulation object
+         * @param leaderThreadId   the leader thread ID
+         * @param followerThreadId the follower thread ID
+         * @param pc               the value of the program counter (PC)
+         * @param reuseDistance    the reuse distance
          */
-        public ReuseDistanceSampledEvent(SimulationObject sender, int pc, int reuseDistance) {
+        public ReuseDistanceSampledEvent(SimulationObject sender, int leaderThreadId, int followerThreadId, int pc, int reuseDistance) {
             super(sender);
+            this.leaderThreadId = leaderThreadId;
+            this.followerThreadId = followerThreadId;
             this.pc = pc;
             this.reuseDistance = reuseDistance;
+        }
+
+        /**
+         * Get the leader thread ID.
+         *
+         * @return the leader thread ID
+         */
+        public int getLeaderThreadId() {
+            return leaderThreadId;
+        }
+
+        /**
+         * Get the follower thread ID.
+         *
+         * @return the follower thread ID
+         */
+        public int getFollowerThreadId() {
+            return followerThreadId;
         }
 
         /**

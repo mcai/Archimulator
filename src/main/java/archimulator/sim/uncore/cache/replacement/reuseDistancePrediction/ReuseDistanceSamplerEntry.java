@@ -25,8 +25,19 @@ package archimulator.sim.uncore.cache.replacement.reuseDistancePrediction;
  */
 public class ReuseDistanceSamplerEntry {
     private boolean valid;
+    private int threadId;
     private int pc;
     private int address;
+
+    /**
+     * Create a reuse distance sampler entry.
+     */
+    public ReuseDistanceSamplerEntry() {
+        this.valid = false;
+        this.threadId = -1;
+        this.pc = -1;
+        this.address = -1;
+    }
 
     /**
      * Get a value indicating whether the entry is valid or not.
@@ -44,6 +55,24 @@ public class ReuseDistanceSamplerEntry {
      */
     public void setValid(boolean valid) {
         this.valid = valid;
+    }
+
+    /**
+     * Get the thread ID.
+     *
+     * @return the thread ID
+     */
+    public int getThreadId() {
+        return threadId;
+    }
+
+    /**
+     * Set the thread ID.
+     *
+     * @param threadId the thread ID
+     */
+    public void setThreadId(int threadId) {
+        this.threadId = threadId;
     }
 
     /**
