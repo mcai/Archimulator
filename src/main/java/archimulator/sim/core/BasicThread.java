@@ -28,7 +28,6 @@ import archimulator.sim.isa.StaticInstruction;
 import archimulator.sim.isa.StaticInstructionType;
 import archimulator.sim.isa.event.PseudoCallEncounteredEvent;
 import archimulator.sim.os.ContextState;
-import archimulator.sim.uncore.helperThread.HelperThreadingHelper;
 import net.pickapack.Reference;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
@@ -79,12 +78,12 @@ public class BasicThread extends AbstractBasicThread {
                     if (contextMapping.getBenchmark().getHelperThreadEnabled()) {
                         if (event.getPseudoCall().getImm() == 3820) {
                             savedRegisterValue.set(event.getContext().getRegisterFile().getGpr(event.getPseudoCall().getRs()));
-                            event.getContext().getRegisterFile().setGpr(event.getPseudoCall().getRs(), HelperThreadingHelper.getHelperThreadLookahead(contextMapping));
+                            event.getContext().getRegisterFile().setGpr(event.getPseudoCall().getRs(), contextMapping.getHelperThreadLookahead());
                         } else if (event.getPseudoCall().getImm() == 3821) {
                             event.getContext().getRegisterFile().setGpr(event.getPseudoCall().getRs(), savedRegisterValue.get());
                         } else if (event.getPseudoCall().getImm() == 3822) {
                             savedRegisterValue.set(event.getContext().getRegisterFile().getGpr(event.getPseudoCall().getRs()));
-                            event.getContext().getRegisterFile().setGpr(event.getPseudoCall().getRs(), HelperThreadingHelper.getHelperThreadStride(contextMapping));
+                            event.getContext().getRegisterFile().setGpr(event.getPseudoCall().getRs(), contextMapping.getHelperThreadStride());
                         } else if (event.getPseudoCall().getImm() == 3823) {
                             event.getContext().getRegisterFile().setGpr(event.getPseudoCall().getRs(), savedRegisterValue.get());
                         }

@@ -40,8 +40,6 @@ public class ContextMapping implements Serializable {
 
     private int helperThreadStride;
 
-    private boolean dynamicHelperThreadParams;
-
     private transient Benchmark benchmark;
 
     /**
@@ -185,24 +183,6 @@ public class ContextMapping implements Serializable {
      */
     public void setHelperThreadStride(int helperThreadStride) {
         this.helperThreadStride = helperThreadStride;
-    }
-
-    /**
-     * Get a value indicating whether the dynamic getting/setting of the helper threading parameters is enabled or not.
-     *
-     * @return a value indicating whether the dynamic getting/setting of the helper threading parameters is enabled or not.
-     */
-    public boolean getDynamicHelperThreadParams() {
-        return dynamicHelperThreadParams;
-    }
-
-    /**
-     * Set a value indicating whether the dynamic getting/setting of the helper threading parameters is enabled or not.
-     *
-     * @param dynamicHelperThreadParams a value indicating whether the dynamic getting/setting of the helper threading parameters is enabled or not
-     */
-    public void setDynamicHelperThreadParams(boolean dynamicHelperThreadParams) {
-        this.dynamicHelperThreadParams = dynamicHelperThreadParams;
     }
 
     /**

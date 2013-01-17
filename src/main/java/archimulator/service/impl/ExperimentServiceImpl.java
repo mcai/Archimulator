@@ -102,7 +102,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
                                             ContextMapping contextMapping = new ContextMapping(0, benchmark, arguments);
                                             contextMapping.setHelperThreadLookahead(experimentSpec.getHelperThreadLookahead());
                                             contextMapping.setHelperThreadStride(experimentSpec.getHelperThreadStride());
-                                            contextMapping.setDynamicHelperThreadParams(false);
                                             contextMappings.add(contextMapping);
 
                                             List<ExperimentGauge> gauges = ServiceManager.getExperimentMetricService().getAllGauges(); //TODO: should use basic gauges only.
