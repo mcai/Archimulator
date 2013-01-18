@@ -35,6 +35,7 @@ import archimulator.sim.uncore.MemoryHierarchy;
 import archimulator.sim.uncore.cache.prediction.CacheBasedPredictor;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import archimulator.sim.uncore.delinquentLoad.DelinquentLoadIdentificationHelper;
+import archimulator.sim.uncore.helperThread.FeedbackDirectedHelperThreadingHelper;
 import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestProfilingHelper;
 import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestQuality;
 import archimulator.sim.uncore.helperThread.hotspot.HotspotProfilingHelper;
@@ -80,6 +81,8 @@ public abstract class Simulation implements SimulationObject {
     private HotspotProfilingHelper hotspotProfilingHelper;
 
     private HelperThreadL2CacheRequestProfilingHelper helperThreadL2CacheRequestProfilingHelper;
+
+    private FeedbackDirectedHelperThreadingHelper feedbackDirectedHelperThreadingHelper;
 
     private DelinquentLoadIdentificationHelper delinquentLoadIdentificationHelper;
 
@@ -160,6 +163,9 @@ public abstract class Simulation implements SimulationObject {
         if (getExperiment().getArchitecture().getHelperThreadL2CacheRequestProfilingEnabled()) {
             this.helperThreadL2CacheRequestProfilingHelper = new HelperThreadL2CacheRequestProfilingHelper(this);
         }
+
+        //TODO: handle configuration support of conditional attribute
+        this.feedbackDirectedHelperThreadingHelper = new FeedbackDirectedHelperThreadingHelper(this);
 
         if (getExperiment().getArchitecture().getDelinquentLoadIdentificationEnabled()) {
             this.delinquentLoadIdentificationHelper = new DelinquentLoadIdentificationHelper(this);
@@ -655,6 +661,15 @@ public abstract class Simulation implements SimulationObject {
      */
     public HelperThreadL2CacheRequestProfilingHelper getHelperThreadL2CacheRequestProfilingHelper() {
         return helperThreadL2CacheRequestProfilingHelper;
+    }
+
+    /**
+     * Get the feedback directed helper threading helper.
+     *
+     * @return the feedback directed helper threading helper
+     */
+    public FeedbackDirectedHelperThreadingHelper getFeedbackDirectedHelperThreadingHelper() {
+        return feedbackDirectedHelperThreadingHelper;
     }
 
     /**
