@@ -210,4 +210,9 @@ public class ExperimentGaugeType implements WithId, WithTitle, WithCreateTime {
      * Helper thread.
      */
     public static String HELPER_THREAD = "helperThread";
+
+    /**
+     * Feedback directed helper threading.
+     */
+    public static String FEEDBACK_DIRECTED_HELPER_THREADING = "feedbackDirectedHelperThreading";
 }

@@ -85,6 +85,7 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
             this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.MEMORY_CONTROLLER, "processor/memoryHierarchy/memoryController", ""));
             this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.HOTSPOT, "hotspotProfilingHelper", ""));
             this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.HELPER_THREAD, "helperThreadL2CacheRequestProfilingHelper", ""));
+            this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.FEEDBACK_DIRECTED_HELPER_THREADING, "feedbackDirectedHelperThreadingHelper", ""));
         }
 
         if (this.getFirstGauge() == null) {
@@ -194,6 +195,25 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HELPER_THREAD), "helperThreadL2CacheRequestQualityPredictor/numHits"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HELPER_THREAD), "helperThreadL2CacheRequestQualityPredictor/numMisses"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HELPER_THREAD), "helperThreadL2CacheRequestQualityPredictor/hitRatio"));
+
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.FEEDBACK_DIRECTED_HELPER_THREADING), "numEvictedL2CacheLinesPerInterval"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.FEEDBACK_DIRECTED_HELPER_THREADING), "numIntervals"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.FEEDBACK_DIRECTED_HELPER_THREADING), "numTotalHelperThreadL2CacheRequestsStat"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.FEEDBACK_DIRECTED_HELPER_THREADING), "numRedundantHitToTransientTagHelperThreadL2CacheRequestsStat"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.FEEDBACK_DIRECTED_HELPER_THREADING), "numRedundantHitToCacheHelperThreadL2CacheRequestsStat"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.FEEDBACK_DIRECTED_HELPER_THREADING), "numTimelyHelperThreadL2CacheRequestsStat"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.FEEDBACK_DIRECTED_HELPER_THREADING), "numLateHelperThreadL2CacheRequestsStat"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.FEEDBACK_DIRECTED_HELPER_THREADING), "numBadHelperThreadL2CacheRequestsStat"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.FEEDBACK_DIRECTED_HELPER_THREADING), "numUglyHelperThreadL2CacheRequestsStat"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.FEEDBACK_DIRECTED_HELPER_THREADING), "pollutionForInsertionPolicy"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.FEEDBACK_DIRECTED_HELPER_THREADING), "statAccuracy"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.FEEDBACK_DIRECTED_HELPER_THREADING), "statLateness"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.FEEDBACK_DIRECTED_HELPER_THREADING), "statPollution"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.FEEDBACK_DIRECTED_HELPER_THREADING), "accuracyDistribution"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.FEEDBACK_DIRECTED_HELPER_THREADING), "latenessDistribution"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.FEEDBACK_DIRECTED_HELPER_THREADING), "pollutionDistribution"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.FEEDBACK_DIRECTED_HELPER_THREADING), "aggressivenessDistribution"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.FEEDBACK_DIRECTED_HELPER_THREADING), "pollutionForInsertionPolicyDistribution"));
 
             //TODO: integrate the above gauges into Simulation and expose their management and usages in experiments via web UI.
         }

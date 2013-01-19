@@ -21,6 +21,7 @@ package archimulator.sim.uncore.helperThread;
 import archimulator.model.ContextMapping;
 import archimulator.sim.common.Simulation;
 import archimulator.sim.uncore.cache.EvictableCache;
+import archimulator.sim.uncore.cache.replacement.helperThread.HelperThreadIntervalAwareLRUPolicy;
 import archimulator.sim.uncore.coherence.event.GeneralCacheControllerLineReplacementEvent;
 import archimulator.sim.uncore.coherence.msi.state.DirectoryControllerState;
 import archimulator.util.IntervalStat;
@@ -101,6 +102,11 @@ public class FeedbackDirectedHelperThreadingHelper {
         this.pollutionDistribution = new TreeMap<HelperThreadL2CacheRequestPollution, Long>();
         this.aggressivenessDistribution = new TreeMap<HelperThreadAggressiveness, Long>();
         this.pollutionForInsertionPolicyDistribution = new TreeMap<HelperThreadL2CacheRequestPollutionForInsertionPolicy, Long>();
+
+        //TODO: should not be hardcoded!!!
+        if(!(cache.getReplacementPolicy() instanceof HelperThreadIntervalAwareLRUPolicy)) {
+            return;
+        }
 
         cache.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.RedundantHitToTransientTagHelperThreadL2CacheRequestEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.RedundantHitToTransientTagHelperThreadL2CacheRequestEvent>() {
             @Override
@@ -238,8 +244,6 @@ public class FeedbackDirectedHelperThreadingHelper {
         this.pollutionDistribution.put(pollution, this.pollutionDistribution.get(pollution) + 1);
         this.aggressivenessDistribution.put(aggressiveness, this.aggressivenessDistribution.get(aggressiveness) + 1);
         this.pollutionForInsertionPolicyDistribution.put(pollutionForInsertionPolicy, this.pollutionForInsertionPolicyDistribution.get(pollutionForInsertionPolicy) + 1);
-
-        //TODO: add summary statistics and reporting support for the above summary statistics and distributions
     }
 
     /**
