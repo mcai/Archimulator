@@ -895,6 +895,15 @@ public class HelperThreadL2CacheRequestProfilingHelper {
     }
 
     /**
+     * Get the redundancy of the helper thread L2 cache requests.
+     *
+     * @return the redundancy of the helper thread L2 cache requests
+     */
+    public double getHelperThreadL2CacheRequestRedundancy() {
+        return this.getNumTotalHelperThreadL2CacheRequests() == 0 ? 0 : (double) (this.numRedundantHitToTransientTagHelperThreadL2CacheRequests + numRedundantHitToCacheHelperThreadL2CacheRequests) / this.getNumTotalHelperThreadL2CacheRequests();
+    }
+
+    /**
      * Get the helper thread L2 cache request states.
      *
      * @return the helper thread L2 cache request states

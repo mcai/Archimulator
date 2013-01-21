@@ -120,6 +120,9 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
     private double helperThreadL2CacheRequestPollution;
 
     @DatabaseField
+    private double helperThreadL2CacheRequestRedundancy;
+
+    @DatabaseField
     private long numLateHelperThreadL2CacheRequests;
 
     @DatabaseField
@@ -593,6 +596,24 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
     }
 
     /**
+     * Get the redundancy of the helper thread L2 cache requests.
+     *
+     * @return the redundancy of the helper thread L2 cache requests
+     */
+    public double getHelperThreadL2CacheRequestRedundancy() {
+        return helperThreadL2CacheRequestRedundancy;
+    }
+
+    /**
+     * Set the redundancy of the helper thread L2 cache requests.
+     *
+     * @param helperThreadL2CacheRequestRedundancy the redundancy of the helper thread L2 cache requests
+     */
+    public void setHelperThreadL2CacheRequestRedundancy(double helperThreadL2CacheRequestRedundancy) {
+        this.helperThreadL2CacheRequestRedundancy = helperThreadL2CacheRequestRedundancy;
+    }
+
+    /**
      * Get the number of the late helper thread L2 cache requests.
      *
      * @return the number of the late helper thread L2 cache requests
@@ -756,6 +777,7 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
             add(helperThreadL2CacheRequestAccuracy + "");
             add(helperThreadL2CacheRequestLateness + "");
             add(helperThreadL2CacheRequestPollution + "");
+            add(helperThreadL2CacheRequestRedundancy + "");
 
             add(numLateHelperThreadL2CacheRequests + "");
             add(numTimelyHelperThreadL2CacheRequests + "");
