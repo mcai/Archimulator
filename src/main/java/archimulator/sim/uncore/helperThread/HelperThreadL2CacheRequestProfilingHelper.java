@@ -859,21 +859,39 @@ public class HelperThreadL2CacheRequestProfilingHelper {
     }
 
     /**
-     * Get the helper thread L2 cache request coverage.
+     * Get the coverage of the helper thread L2 cache requests.
      *
-     * @return the helper thread L2 cache request coverage
+     * @return the coverage of the helper thread L2 cache requests
      */
     public double getHelperThreadL2CacheRequestCoverage() {
         return (this.numMainThreadL2CacheMisses + this.numUsefulHelperThreadL2CacheRequests) == 0 ? 0 : (double) this.numUsefulHelperThreadL2CacheRequests / (this.numMainThreadL2CacheMisses + this.numUsefulHelperThreadL2CacheRequests);
     }
 
     /**
-     * Get the helper thread L2 cache request accuracy.
+     * Get the accuracy of the helper thread L2 cache requests.
      *
-     * @return the helper thread L2 cache request accuracy
+     * @return the accuracy of the helper thread L2 cache requests
      */
     public double getHelperThreadL2CacheRequestAccuracy() {
         return this.getNumTotalHelperThreadL2CacheRequests() == 0 ? 0 : (double) this.numUsefulHelperThreadL2CacheRequests / this.getNumTotalHelperThreadL2CacheRequests();
+    }
+
+    /**
+     * Get the lateness of the helper thread L2 cache requests.
+     *
+     * @return the lateness of the helper thread L2 cache requests
+     */
+    public double getHelperThreadL2CacheRequestLateness() {
+        return this.getNumTotalHelperThreadL2CacheRequests() == 0 ? 0 : (double) this.numLateHelperThreadL2CacheRequests / this.getNumTotalHelperThreadL2CacheRequests();
+    }
+
+    /**
+     * Get the pollution of the helper thread L2 cache requests.
+     *
+     * @return the pollution of the helper thread L2 cache requests
+     */
+    public double getHelperThreadL2CacheRequestPollution() {
+        return this.getNumTotalHelperThreadL2CacheRequests() == 0 ? 0 : (double) this.numBadHelperThreadL2CacheRequests / this.getNumTotalHelperThreadL2CacheRequests();
     }
 
     /**

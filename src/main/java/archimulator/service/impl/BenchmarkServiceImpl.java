@@ -109,14 +109,14 @@ public class BenchmarkServiceImpl extends AbstractService implements BenchmarkSe
             this.addBenchmark(new Benchmark(
                     "mst_baseline_sim", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/baseline",
                     "mst.mips",
-                    "2000"));
+                    "1000"));
         }
 
         if (this.getBenchmarkByTitle("mst_ht_sim") == null) {
             this.addBenchmark(new Benchmark(
                     "mst_ht_sim", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/ht",
                     "mst.mips",
-                    "2000", "", true));
+                    "1000", "", true));
         }
 
         if (this.getBenchmarkByTitle("em3d_baseline_sim") == null) {

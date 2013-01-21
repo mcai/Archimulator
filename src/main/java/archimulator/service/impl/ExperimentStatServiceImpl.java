@@ -300,6 +300,16 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
                             "helperThreadL2CacheRequestProfilingHelper/helperThreadL2CacheRequestAccuracy", 0.0f) : 0.0f
             );
 
+            summary.setHelperThreadL2CacheRequestLateness(
+                    helperThreadEnabled ? parent.getStatValueAsDouble(statsMap, parent.getMeasurementTitlePrefix() +
+                            "helperThreadL2CacheRequestProfilingHelper/helperThreadL2CacheRequestLateness", 0.0f) : 0.0f
+            );
+
+            summary.setHelperThreadL2CacheRequestPollution(
+                    helperThreadEnabled ? parent.getStatValueAsDouble(statsMap, parent.getMeasurementTitlePrefix() +
+                            "helperThreadL2CacheRequestProfilingHelper/helperThreadL2CacheRequestPollution", 0.0f) : 0.0f
+            );
+
             summary.setNumLateHelperThreadL2CacheRequests(
                     helperThreadEnabled ? parent.getStatValueAsLong(statsMap, parent.getMeasurementTitlePrefix() +
                             "helperThreadL2CacheRequestProfilingHelper/numLateHelperThreadL2CacheRequests", 0) : 0
@@ -472,6 +482,8 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
 
                 "HT Coverage",
                 "HT Accuracy",
+                "HT Lateness",
+                "HT Pollution",
 
                 "Late",
                 "Timely",

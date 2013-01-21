@@ -114,6 +114,12 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
     private double helperThreadL2CacheRequestAccuracy;
 
     @DatabaseField
+    private double helperThreadL2CacheRequestLateness;
+
+    @DatabaseField
+    private double helperThreadL2CacheRequestPollution;
+
+    @DatabaseField
     private long numLateHelperThreadL2CacheRequests;
 
     @DatabaseField
@@ -551,6 +557,42 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
     }
 
     /**
+     * Get the lateness of the helper thread L2 cache requests.
+     *
+     * @return the lateness of the helper thread L2 cache requests
+     */
+    public double getHelperThreadL2CacheRequestLateness() {
+        return helperThreadL2CacheRequestLateness;
+    }
+
+    /**
+     * Set the lateness of the helper thread L2 cache requests.
+     *
+     * @param helperThreadL2CacheRequestLateness the lateness of the helper thread L2 cache requests
+     */
+    public void setHelperThreadL2CacheRequestLateness(double helperThreadL2CacheRequestLateness) {
+        this.helperThreadL2CacheRequestLateness = helperThreadL2CacheRequestLateness;
+    }
+
+    /**
+     * Get the pollution of the helper thread L2 cache requests.
+     *
+     * @return the pollution of the helper thread L2 cache requests
+     */
+    public double getHelperThreadL2CacheRequestPollution() {
+        return helperThreadL2CacheRequestPollution;
+    }
+
+    /**
+     * Set the pollution of the helper thread L2 cache requests.
+     *
+     * @param helperThreadL2CacheRequestPollution the pollution of the helper thread L2  cache requests
+     */
+    public void setHelperThreadL2CacheRequestPollution(double helperThreadL2CacheRequestPollution) {
+        this.helperThreadL2CacheRequestPollution = helperThreadL2CacheRequestPollution;
+    }
+
+    /**
      * Get the number of the late helper thread L2 cache requests.
      *
      * @return the number of the late helper thread L2 cache requests
@@ -712,6 +754,8 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
 
             add(helperThreadL2CacheRequestCoverage + "");
             add(helperThreadL2CacheRequestAccuracy + "");
+            add(helperThreadL2CacheRequestLateness + "");
+            add(helperThreadL2CacheRequestPollution + "");
 
             add(numLateHelperThreadL2CacheRequests + "");
             add(numTimelyHelperThreadL2CacheRequests + "");
