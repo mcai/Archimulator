@@ -100,7 +100,11 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
 
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.SIMULATION), "cycleAccurateEventQueue/currentCycle"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.SIMULATION), "numInstructions"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.SIMULATION), "c0t0NumInstructions"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.SIMULATION), "c1t0NumInstructions"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.SIMULATION), "instructionsPerCycle"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.SIMULATION), "c0t0InstructionsPerCycle"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.SIMULATION), "c1t0InstructionsPerCycle"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.SIMULATION), "cyclesPerInstruction"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.SIMULATION), "cyclesPerSecond"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.SIMULATION), "instructionsPerSecond"));
@@ -212,6 +216,7 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.FEEDBACK_DIRECTED_HELPER_THREADING), "statAccuracy"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.FEEDBACK_DIRECTED_HELPER_THREADING), "statLateness"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.FEEDBACK_DIRECTED_HELPER_THREADING), "statPollution"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.FEEDBACK_DIRECTED_HELPER_THREADING), "statMemoryBandwidthContention"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.FEEDBACK_DIRECTED_HELPER_THREADING), "accuracyDistribution"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.FEEDBACK_DIRECTED_HELPER_THREADING), "latenessDistribution"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.FEEDBACK_DIRECTED_HELPER_THREADING), "pollutionDistribution"));

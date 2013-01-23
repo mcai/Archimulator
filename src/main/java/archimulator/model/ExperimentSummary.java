@@ -78,10 +78,22 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
     private long numInstructions;
 
     @DatabaseField
+    private long c0t0NumInstructions;
+
+    @DatabaseField
+    private long c1t0NumInstructions;
+
+    @DatabaseField
     private long numCycles;
 
     @DatabaseField
     private double ipc;
+
+    @DatabaseField
+    private double c0t0Ipc;
+
+    @DatabaseField
+    private double c1t0Ipc;
 
     @DatabaseField
     private double cpi;
@@ -342,6 +354,42 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
     }
 
     /**
+     * Get the number of instructions executed on the thread C0T0.
+     *
+     * @return the number of instructions executed on the thread C0T0
+     */
+    public long getC0t0NumInstructions() {
+        return c0t0NumInstructions;
+    }
+
+    /**
+     * Set the number of instructions executed on the thread C0T0.
+     *
+     * @param c0t0NumInstructions the number of instructions executed on the thread C0T0
+     */
+    public void setC0t0NumInstructions(long c0t0NumInstructions) {
+        this.c0t0NumInstructions = c0t0NumInstructions;
+    }
+
+    /**
+     * Get the number of instructions executed on the thread C1T0.
+     *
+     * @return the number of instructions executed on the thread C1T0
+     */
+    public long getC1t0NumInstructions() {
+        return c1t0NumInstructions;
+    }
+
+    /**
+     * Set the number of instructions executed on the thread C1T0.
+     *
+     * @param c1t0NumInstructions the number of instructions executed on the thread C1T0
+     */
+    public void setC1t0NumInstructions(long c1t0NumInstructions) {
+        this.c1t0NumInstructions = c1t0NumInstructions;
+    }
+
+    /**
      * Get the number of cycles elapsed.
      *
      * @return the number of cycles elapsed
@@ -375,6 +423,42 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
      */
     public void setIpc(double ipc) {
         this.ipc = ipc;
+    }
+
+    /**
+     * Get the IPC value for the thread C0T0.
+     *
+     * @return the IPC value for the thread C0T0
+     */
+    public double getC0t0Ipc() {
+        return c0t0Ipc;
+    }
+
+    /**
+     * Set the IPC value for the thread C0T0.
+     *
+     * @param c0t0Ipc the IPC value for the thread C0T0
+     */
+    public void setC0t0Ipc(double c0t0Ipc) {
+        this.c0t0Ipc = c0t0Ipc;
+    }
+
+    /**
+     * Get the IPC value for the thread C1T0.
+     *
+     * @return the IPC value for the thread C1T0
+     */
+    public double getC1t0Ipc() {
+        return c1t0Ipc;
+    }
+
+    /**
+     * Set the IPC value for the thread C1T0.
+     *
+     * @param c1t0Ipc the IPC value for the thread C1T0
+     */
+    public void setC1t0Ipc(double c1t0Ipc) {
+        this.c1t0Ipc = c1t0Ipc;
     }
 
     /**
@@ -758,9 +842,13 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
             add(helperThreadEnabled ? "S=" + helperThreadStride + "" : "");
 
             add(numInstructions + "");
+            add(c0t0NumInstructions + "");
+            add(c1t0NumInstructions + "");
             add(numCycles + "");
 
             add(ipc + "");
+            add(c0t0Ipc + "");
+            add(c1t0Ipc + "");
             add(cpi + "");
 
             add(numMainThreadL2CacheHits + "");

@@ -25,6 +25,7 @@ import archimulator.sim.uncore.cache.replacement.helperThread.HelperThreadInterv
 import archimulator.sim.uncore.coherence.event.GeneralCacheControllerLineReplacementEvent;
 import archimulator.sim.uncore.coherence.msi.state.DirectoryControllerState;
 import archimulator.util.IntervalStat;
+import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
 import net.pickapack.math.SaturatingCounter;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
@@ -61,6 +62,7 @@ public class FeedbackDirectedHelperThreadingHelper {
     private SummaryStatistics statAccuracy;
     private SummaryStatistics statLateness;
     private SummaryStatistics statPollution;
+    private SummaryStatistics statMemoryBandwidthContention;
 
     private Map<HelperThreadL2CacheRequestAccuracy, Long> accuracyDistribution;
     private Map<HelperThreadL2CacheRequestLateness, Long> latenessDistribution;
@@ -96,6 +98,7 @@ public class FeedbackDirectedHelperThreadingHelper {
         this.statAccuracy = new SummaryStatistics();
         this.statLateness = new SummaryStatistics();
         this.statPollution = new SummaryStatistics();
+        this.statMemoryBandwidthContention = new SummaryStatistics();
 
         this.accuracyDistribution = new TreeMap<HelperThreadL2CacheRequestAccuracy, Long>();
         this.latenessDistribution = new TreeMap<HelperThreadL2CacheRequestLateness, Long>();
@@ -103,8 +106,18 @@ public class FeedbackDirectedHelperThreadingHelper {
         this.aggressivenessDistribution = new TreeMap<HelperThreadAggressiveness, Long>();
         this.pollutionForInsertionPolicyDistribution = new TreeMap<HelperThreadL2CacheRequestPollutionForInsertionPolicy, Long>();
 
+        cache.getCycleAccurateEventQueue().getPerCycleEvents().add(new Action() {
+            @Override
+            public void apply() {
+                int numPendingMemoryAccesses = FeedbackDirectedHelperThreadingHelper.this.simulation.getProcessor().getMemoryHierarchy().getL2CacheController().getNumPendingMemoryAccesses();
+                if (numPendingMemoryAccesses > 0) {
+                    statMemoryBandwidthContention.addValue(numPendingMemoryAccesses);
+                }
+            }
+        });
+
         //TODO: should not be hardcoded!!!
-        if(!(cache.getReplacementPolicy() instanceof HelperThreadIntervalAwareLRUPolicy)) {
+        if (!(cache.getReplacementPolicy() instanceof HelperThreadIntervalAwareLRUPolicy)) {
             return;
         }
 
@@ -503,6 +516,15 @@ public class FeedbackDirectedHelperThreadingHelper {
      */
     public SummaryStatistics getStatPollution() {
         return statPollution;
+    }
+
+    /**
+     * Get the summary statistics of memory bandwidth contention.
+     *
+     * @return the summary statistics of memory bandwidth contention
+     */
+    public SummaryStatistics getStatMemoryBandwidthContention() {
+        return statMemoryBandwidthContention;
     }
 
     /**

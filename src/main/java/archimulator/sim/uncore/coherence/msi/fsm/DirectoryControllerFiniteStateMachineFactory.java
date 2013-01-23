@@ -74,6 +74,8 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                 .onCondition(DirectoryControllerEventType.GETS, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, GetSEvent>() {
                     @Override
                     public void apply(final DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, final GetSEvent event) {
+                        fsm.getDirectoryController().incrementNumPendingMemoryAccesses();
+
                         fsm.getDirectoryController().transfer(fsm.getDirectoryController().getNext(), 8, new Action() {
                             @Override
                             public void apply() {
@@ -83,6 +85,8 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                                         fsm.getDirectoryController().getCycleAccurateEventQueue().schedule(fsm.getDirectoryController(), new Action() {
                                             @Override
                                             public void apply() {
+                                                fsm.getDirectoryController().decrementNumPendingMemoryAccesses();
+
                                                 DataFromMemEvent dataFromMemEvent = new DataFromMemEvent(fsm.getDirectoryController(), event, event.getRequester(), event.getTag(), event.getAccess());
                                                 fsm.fireTransition(fsm.getDirectoryController().getNext() + "." + String.format("0x%08x", event.getTag()), dataFromMemEvent);
                                             }
@@ -99,6 +103,8 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                 .onCondition(DirectoryControllerEventType.GETM, new Action4<DirectoryControllerFiniteStateMachine, Object, DirectoryControllerEventType, GetMEvent>() {
                     @Override
                     public void apply(final DirectoryControllerFiniteStateMachine fsm, Object sender, DirectoryControllerEventType eventType, final GetMEvent event) {
+                        fsm.getDirectoryController().incrementNumPendingMemoryAccesses();
+
                         fsm.getDirectoryController().transfer(fsm.getDirectoryController().getNext(), 8, new Action() {
                             @Override
                             public void apply() {
@@ -108,6 +114,8 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                                         fsm.getDirectoryController().getCycleAccurateEventQueue().schedule(fsm.getDirectoryController(), new Action() {
                                             @Override
                                             public void apply() {
+                                                fsm.getDirectoryController().decrementNumPendingMemoryAccesses();
+
                                                 DataFromMemEvent dataFromMemEvent = new DataFromMemEvent(fsm.getDirectoryController(), event, event.getRequester(), event.getTag(), event.getAccess());
                                                 fsm.fireTransition(fsm.getDirectoryController().getNext() + "." + String.format("0x%08x", event.getTag()), dataFromMemEvent);
                                             }

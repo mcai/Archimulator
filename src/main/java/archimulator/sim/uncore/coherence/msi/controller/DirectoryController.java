@@ -53,6 +53,8 @@ public class DirectoryController extends GeneralCacheController<DirectoryControl
     private List<CacheController> cacheControllers;
     private DirectoryControllerFiniteStateMachineFactory fsmFactory;
 
+    private int numPendingMemoryAccesses;
+
     /**
      * Create a directory controller.
      *
@@ -305,9 +307,6 @@ public class DirectoryController extends GeneralCacheController<DirectoryControl
         return fsmFactory;
     }
 
-    /**
-     * @return
-     */
     @Override
     public CacheGeometry getGeometry() {
         return cacheGeometry;
@@ -326,5 +325,28 @@ public class DirectoryController extends GeneralCacheController<DirectoryControl
     @Override
     public String toString() {
         return this.getCache().getName();
+    }
+
+    /**
+     * Increment the number of pending memory accesses.
+     */
+    public void incrementNumPendingMemoryAccesses() {
+        this.numPendingMemoryAccesses++;
+    }
+
+    /**
+     * Decrement the number of pending memory accesses.
+     */
+    public void decrementNumPendingMemoryAccesses() {
+        this.numPendingMemoryAccesses--;
+    }
+
+    /**
+     * Get the number of pending memory accesses.
+     *
+     * @return the number of pending memory accesses
+     */
+    public int getNumPendingMemoryAccesses() {
+        return numPendingMemoryAccesses;
     }
 }

@@ -534,9 +534,9 @@ public abstract class Simulation implements SimulationObject {
     }
 
     /**
-     * Get the number of instructions that the simulation has executed till now.
+     * Get the number of instructions executed on all the threads.
      *
-     * @return the number of instructions that the simulation has executed till now.
+     * @return the number of instructions executed on all the threads.
      */
     public long getNumInstructions() {
         long numInstructions = 0;
@@ -551,12 +551,56 @@ public abstract class Simulation implements SimulationObject {
     }
 
     /**
+     * Get the number of instructions executed on the thread C0T0.
+     *
+     * @return the number of instructions executed on the thread C0T0
+     */
+    public long getC0t0NumInstructions() {
+        return this.processor.getCores().get(0).getThreads().get(0).getNumInstructions();
+    }
+
+    /**
+     * Get the number of instructions executed on the thread C1T0.
+     *
+     * @return the number of instructions executed on the thread C1T0
+     */
+    public long getC1t0NumInstructions() {
+        if(this.processor.getCores().size() < 2) {
+            return 0;
+        }
+
+        return this.processor.getCores().get(1).getThreads().get(0).getNumInstructions();
+    }
+
+    /**
      * Get the IPC (instructions per cycle) value.
      *
      * @return the IPC (instructions per cycle) value
      */
     public double getInstructionsPerCycle() {
         return (double) this.getNumInstructions() / this.getCycleAccurateEventQueue().getCurrentCycle();
+    }
+
+    /**
+     * Get the IPC (instructions per cycle) value for the thread C0T0.
+     *
+     * @return the IPC (instructions per cycle) value for the thread C0T0
+     */
+    public double getC0t0InstructionsPerCycle() {
+        return (double) this.processor.getCores().get(0).getThreads().get(0).getNumInstructions() / this.getCycleAccurateEventQueue().getCurrentCycle();
+    }
+
+    /**
+     * Get the IPC (instructions per cycle) value for the thread C1T0.
+     *
+     * @return the IPC (instructions per cycle) value for the thread C1T0
+     */
+    public double getC1t0InstructionsPerCycle() {
+        if(this.processor.getCores().size() < 2) {
+            return 0;
+        }
+
+        return (double) this.processor.getCores().get(1).getThreads().get(0).getNumInstructions() / this.getCycleAccurateEventQueue().getCurrentCycle();
     }
 
     /**

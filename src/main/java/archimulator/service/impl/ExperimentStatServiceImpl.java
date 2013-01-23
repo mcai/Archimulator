@@ -251,6 +251,8 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
             summary.setHelperThreadStride(helperThreadEnabled ? parent.getContextMappings().get(0).getHelperThreadStride() : -1);
 
             summary.setNumInstructions(parent.getStatValueAsLong(statsMap, parent.getMeasurementTitlePrefix() + "simulation/numInstructions", 0));
+            summary.setC0t0NumInstructions(parent.getStatValueAsLong(statsMap, parent.getMeasurementTitlePrefix() + "simulation/c0t0NumInstructions", 0));
+            summary.setC1t0NumInstructions(parent.getStatValueAsLong(statsMap, parent.getMeasurementTitlePrefix() + "simulation/c1t0NumInstructions", 0));
 
             summary.setNumCycles(
                     parent.getStatValueAsLong(statsMap, parent.getMeasurementTitlePrefix() + "simulation/cycleAccurateEventQueue/currentCycle", 0)
@@ -258,6 +260,14 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
 
             summary.setIpc(
                     parent.getStatValueAsDouble(statsMap, parent.getMeasurementTitlePrefix() + "simulation/instructionsPerCycle", 0)
+            );
+
+            summary.setC0t0Ipc(
+                    parent.getStatValueAsDouble(statsMap, parent.getMeasurementTitlePrefix() + "simulation/c0t0InstructionsPerCycle", 0)
+            );
+
+            summary.setC1t0Ipc(
+                    parent.getStatValueAsDouble(statsMap, parent.getMeasurementTitlePrefix() + "simulation/c1t0InstructionsPerCycle", 0)
             );
 
             summary.setCpi(
@@ -462,41 +472,45 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
                 "Type",
                 "State",
 
-                "L2 Size",
-                "L2 Associativity",
-                "L2 Replacement",
+                "L2_Size",
+                "L2_Associativity",
+                "L2_Replacement",
 
                 "Lookahead",
                 "Stride",
 
-                "Num Instructions",
-                "Num Cycles",
+                "Num_Instructions",
+                "C0T0.Num_Instructions",
+                "C1T0.Num_Instructions",
+                "Num_Cycles",
 
                 "IPC",
+                "C0T0.IPC",
+                "C1T0.IPC",
                 "CPI",
 
-                "MT Hits",
-                "MT Misses",
+                "MT.Hits",
+                "MT.Misses",
 
-                "HT Hits",
-                "HT Misses",
+                "HT.Hits",
+                "HT.Misses",
 
-                "L2 Evictions",
-                "L2 Hit Ratio",
-                "L2 Occupancy Ratio",
+                "L2.Evictions",
+                "L2.Hit_Ratio",
+                "L2.Occupancy_Ratio",
 
-                "HT Coverage",
-                "HT Accuracy",
-                "HT Lateness",
-                "HT Pollution",
-                "HT Redundancy",
+                "HT.Coverage",
+                "HT.Accuracy",
+                "HT.Lateness",
+                "HT.Pollution",
+                "HT.Redundancy",
 
                 "Late",
                 "Timely",
                 "Bad",
                 "Ugly",
-                "Redundant MSHR",
-                "Redundant Cache"
+                "Redundant_MSHR",
+                "Redundant_Cache"
         ), new ArrayList<List<String>>() {{
             for (Experiment experiment : experiments) {
                 add(getSummaryByParent(experiment).tableSummary2Row());
