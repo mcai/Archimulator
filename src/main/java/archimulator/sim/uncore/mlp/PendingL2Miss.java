@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.helperThread;
+package archimulator.sim.uncore.mlp;
 
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 
@@ -91,9 +91,9 @@ public class PendingL2Miss {
     }
 
     /**
-     * Set the aggregated MLP cost.
+     * Set the aggregated MLP-cost.
      *
-     * @param mlpCost the aggregated MLP cost
+     * @param mlpCost the aggregated MLP-cost
      */
     public void setMlpCost(double mlpCost) {
         this.mlpCost = mlpCost;

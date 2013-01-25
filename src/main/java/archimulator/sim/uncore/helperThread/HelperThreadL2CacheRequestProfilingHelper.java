@@ -35,14 +35,11 @@ import archimulator.sim.uncore.coherence.event.GeneralCacheControllerServiceNonb
 import archimulator.sim.uncore.coherence.event.LastLevelCacheControllerLineInsertEvent;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.coherence.msi.state.DirectoryControllerState;
-import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
 import net.pickapack.util.ValueProvider;
 import net.pickapack.util.ValueProviderFactory;
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static ch.lambdaj.Lambda.*;
@@ -79,14 +76,6 @@ public class HelperThreadL2CacheRequestProfilingHelper {
     private long numUglyHelperThreadL2CacheRequests;
 
     private Predictor<HelperThreadL2CacheRequestQuality> helperThreadL2CacheRequestQualityPredictor;
-
-    private Map<Integer, PendingL2Miss> pendingL2Misses;
-
-    private SummaryStatistics statL2CacheMissNumCycles;
-    private SummaryStatistics statL2CacheMissMlpCosts;
-    private SummaryStatistics statL2CacheMissAverageMlps;
-
-    private boolean l2RequestLatencyStatsEnabled;
 
     /**
      * Create a helper thread L2 request profiling helper.
@@ -125,12 +114,6 @@ public class HelperThreadL2CacheRequestProfilingHelper {
         this.helperThreadL2CacheRequestVictimCache = new EvictableCache<HelperThreadL2CacheRequestVictimCacheLineState>(l2CacheController, l2CacheController.getName() + "/helperThreadL2CacheRequestVictimCache", l2CacheController.getCache().getGeometry(), CacheReplacementPolicyType.LRU, cacheLineStateProviderFactory);
 
         this.helperThreadL2CacheRequestQualityPredictor = new CacheBasedPredictor<HelperThreadL2CacheRequestQuality>(l2CacheController, l2CacheController.getName() + "/helperThreadL2CacheRequestQualityPredictor", new CacheGeometry(64, 1, 1), 4, 16, HelperThreadL2CacheRequestQuality.UGLY); //TODO: parameters should not be hardcoded
-
-        this.pendingL2Misses = new LinkedHashMap<Integer, PendingL2Miss>();
-
-        this.statL2CacheMissNumCycles = new SummaryStatistics();
-        this.statL2CacheMissMlpCosts = new SummaryStatistics();
-        this.statL2CacheMissAverageMlps = new SummaryStatistics();
 
         l2CacheController.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, new Action1<GeneralCacheControllerServiceNonblockingRequestEvent>() {
             public void apply(GeneralCacheControllerServiceNonblockingRequestEvent event) {
@@ -208,69 +191,6 @@ public class HelperThreadL2CacheRequestProfilingHelper {
                 }
             }
         });
-
-        l2CacheController.getCycleAccurateEventQueue().getPerCycleEvents().add(new Action() {
-            @Override
-            public void apply() {
-                updateL2CacheMlpCostsPerCycle();
-            }
-        });
-    }
-
-    /**
-     * To be invoked per cycle for updating MLP costs for in-flight L2 cache accesses.
-     */
-    private void updateL2CacheMlpCostsPerCycle() {
-        if (!this.l2RequestLatencyStatsEnabled) {
-            return;
-        }
-
-        for (Integer tag : this.pendingL2Misses.keySet()) {
-            PendingL2Miss pendingL2Miss = this.pendingL2Misses.get(tag);
-            pendingL2Miss.setMlpCost(pendingL2Miss.getMlpCost() + 1 / (double) this.pendingL2Misses.size());
-            pendingL2Miss.setNumMlpSamples(pendingL2Miss.getNumMlpSamples() + 1);
-            pendingL2Miss.setMlpSum(pendingL2Miss.getMlpSum() + this.pendingL2Misses.size());
-        }
-    }
-
-    /**
-     * Profile the beginning of servicing an L2 cache request.
-     *
-     * @param access the memory hierarchy access
-     */
-    private void profileBeginServicingL2Request(MemoryHierarchyAccess access) {
-        if (!this.l2RequestLatencyStatsEnabled) {
-            return;
-        }
-
-        int tag = access.getPhysicalTag();
-
-        PendingL2Miss pendingL2Miss = new PendingL2Miss(access, l2CacheController.getCycleAccurateEventQueue().getCurrentCycle());
-        this.pendingL2Misses.put(tag, pendingL2Miss);
-    }
-
-    /**
-     * Profile the end of servicing an L2 cache request.
-     *
-     * @param access the memory hierarchy access
-     */
-    private void profileEndServicingL2Request(MemoryHierarchyAccess access) {
-        if (!this.l2RequestLatencyStatsEnabled) {
-            return;
-        }
-
-        int tag = access.getPhysicalTag();
-
-        PendingL2Miss pendingL2Miss = this.pendingL2Misses.get(tag);
-        pendingL2Miss.setEndCycle(this.l2CacheController.getCycleAccurateEventQueue().getCurrentCycle());
-
-        this.pendingL2Misses.remove(tag);
-
-        this.statL2CacheMissNumCycles.addValue(pendingL2Miss.getNumCycles());
-        this.statL2CacheMissMlpCosts.addValue(pendingL2Miss.getMlpCost());
-        this.statL2CacheMissAverageMlps.addValue(pendingL2Miss.getAverageMlp());
-
-        //TODO: error, tracking pending accesses precisely from directory controller/fsm/fsmFactory!!!
     }
 
     /**
@@ -318,8 +238,6 @@ public class HelperThreadL2CacheRequestProfilingHelper {
      * @param lineFoundIsHelperThread a value indicating whether the line found is brought by the helper thread or not
      */
     private void handleL2CacheRequest(GeneralCacheControllerServiceNonblockingRequestEvent event, boolean requesterIsHelperThread, boolean lineFoundIsHelperThread) {
-        profileBeginServicingL2Request(event.getAccess());
-
         checkInvariants(event.getSet());
 
         boolean mainThreadHit = event.isHitInCache() && !requesterIsHelperThread && !lineFoundIsHelperThread;
@@ -469,8 +387,6 @@ public class HelperThreadL2CacheRequestProfilingHelper {
      * @param lineFoundIsHelperThread a value indicating whether the line found is brought by the helper thread or not
      */
     private void handleL2CacheLineInsert(LastLevelCacheControllerLineInsertEvent event, boolean requesterIsHelperThread, boolean lineFoundIsHelperThread) {
-        profileEndServicingL2Request(event.getAccess());
-
         checkInvariants(event.getSet());
 
         CacheLine<HelperThreadL2CacheRequestVictimCacheLineState> victimLine = this.helperThreadL2CacheRequestVictimCache.findLine(event.getTag());
@@ -1045,51 +961,6 @@ public class HelperThreadL2CacheRequestProfilingHelper {
      */
     public boolean isCheckInvariantsEnabled() {
         return checkInvariantsEnabled;
-    }
-
-    /**
-     * Get the summary statistics of the number of cycles for the L2 cache misses.
-     *
-     * @return the summary statistics of the number of cycles for the L2 cache misses
-     */
-    public SummaryStatistics getStatL2CacheMissNumCycles() {
-        return statL2CacheMissNumCycles;
-    }
-
-    /**
-     * Get the summary statistics of the MLP costs for the L2 cache misses.
-     *
-     * @return the summary statistics of the MLP costs for the L2 cache misses
-     */
-    public SummaryStatistics getStatL2CacheMissMlpCosts() {
-        return statL2CacheMissMlpCosts;
-    }
-
-    /**
-     * Get the summary statistics of the average MLPs for the L2 cache misses.
-     *
-     * @return the summary statistics of the average MLPs for the L2 cache misses
-     */
-    public SummaryStatistics getStatL2CacheMissAverageMlps() {
-        return statL2CacheMissAverageMlps;
-    }
-
-    /**
-     * Get a value indicating whether the statistics of L2 cache request latencies is enabled or not.
-     *
-     * @return a value indicating whether the statistics of L2 cache request latencies
-     */
-    public boolean isL2RequestLatencyStatsEnabled() {
-        return l2RequestLatencyStatsEnabled;
-    }
-
-    /**
-     * Set a value indicating whether the statistics of L2 cache request latencies is enabled or not.
-     *
-     * @param l2RequestLatencyStatsEnabled a value indicating whether the statistics of L2 cache request latencies is enabled or not
-     */
-    public void setL2RequestLatencyStatsEnabled(boolean l2RequestLatencyStatsEnabled) {
-        this.l2RequestLatencyStatsEnabled = l2RequestLatencyStatsEnabled;
     }
 
     /**
