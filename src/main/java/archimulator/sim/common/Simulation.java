@@ -39,6 +39,8 @@ import archimulator.sim.uncore.helperThread.FeedbackDirectedHelperThreadingHelpe
 import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestProfilingHelper;
 import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestQuality;
 import archimulator.sim.uncore.helperThread.hotspot.HotspotProfilingHelper;
+import archimulator.sim.uncore.mlp.MLPProfilingHelper;
+import archimulator.sim.uncore.stackDistanceProfile.StackDistanceProfilingHelper;
 import archimulator.util.RuntimeHelper;
 import net.pickapack.Reference;
 import net.pickapack.action.Predicate;
@@ -78,6 +80,8 @@ public abstract class Simulation implements SimulationObject {
 
     private CycleAccurateEventQueue cycleAccurateEventQueue;
 
+    private StackDistanceProfilingHelper stackDistanceProfilingHelper;
+
     private HotspotProfilingHelper hotspotProfilingHelper;
 
     private HelperThreadL2CacheRequestProfilingHelper helperThreadL2CacheRequestProfilingHelper;
@@ -87,6 +91,8 @@ public abstract class Simulation implements SimulationObject {
     private DelinquentLoadIdentificationHelper delinquentLoadIdentificationHelper;
 
     private DynamicSpeculativePrecomputationHelper dynamicSpeculativePrecomputationHelper;
+
+    private MLPProfilingHelper mlpProfilingHelper;
 
     private RuntimeHelper runtimeHelper;
 
@@ -156,6 +162,8 @@ public abstract class Simulation implements SimulationObject {
 
         this.processor = new BasicProcessor(this.experiment, this, this.blockingEventDispatcher, this.cycleAccurateEventQueue, kernel, this.prepareMemoryHierarchy());
 
+        this.stackDistanceProfilingHelper = new StackDistanceProfilingHelper(this);
+
         if (getExperiment().getArchitecture().getHotspotProfilingEnabled()) {
             this.hotspotProfilingHelper = new HotspotProfilingHelper(this);
         }
@@ -174,6 +182,8 @@ public abstract class Simulation implements SimulationObject {
         if (getExperiment().getArchitecture().getDynamicSpeculativePrecomputationEnabled()) {
             this.dynamicSpeculativePrecomputationHelper = new DynamicSpeculativePrecomputationHelper(this);
         }
+
+        this.mlpProfilingHelper = new MLPProfilingHelper(this);
     }
 
     /**
@@ -690,6 +700,15 @@ public abstract class Simulation implements SimulationObject {
     }
 
     /**
+     * Get the stack distance profiling helper.
+     *
+     * @return the stack distance profiling helper
+     */
+    public StackDistanceProfilingHelper getStackDistanceProfilingHelper() {
+        return stackDistanceProfilingHelper;
+    }
+
+    /**
      * Get the hotspot profiling helper.
      *
      * @return the hotspot profiling helper
@@ -732,6 +751,15 @@ public abstract class Simulation implements SimulationObject {
      */
     public DynamicSpeculativePrecomputationHelper getDynamicSpeculativePrecomputationHelper() {
         return dynamicSpeculativePrecomputationHelper;
+    }
+
+    /**
+     * Get the MLP profiling helper.
+     *
+     * @return the MLP profiling helper
+     */
+    public MLPProfilingHelper getMlpProfilingHelper() {
+        return mlpProfilingHelper;
     }
 
     /**

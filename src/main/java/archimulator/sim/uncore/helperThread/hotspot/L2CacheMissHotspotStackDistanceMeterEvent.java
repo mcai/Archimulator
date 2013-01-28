@@ -24,13 +24,13 @@ import archimulator.sim.common.meter.SimulationMeterEvent;
 import java.io.Serializable;
 
 /**
- * L2 cache miss Hotspot reuse distance meter event.
+ * L2 cache miss Hotspot stack distance meter event.
  *
  * @author Min Cai
  */
-public class L2CacheMissHotspotReuseDistanceMeterEvent extends SimulationMeterEvent<L2CacheMissHotspotReuseDistanceMeterEvent.L2CacheMissHotspotReuseDistanceMeterEventValue> {
+public class L2CacheMissHotspotStackDistanceMeterEvent extends SimulationMeterEvent<L2CacheMissHotspotStackDistanceMeterEvent.L2CacheMissHotspotStackDistanceMeterEventValue> {
     /**
-     * Create an L2 cache miss hotspot reuse distance meter event.
+     * Create an L2 cache miss hotspot stack distance meter event.
      *
      * @param sender       the sender simulation object
      * @param pc           the value of the program counter (PC)
@@ -39,37 +39,37 @@ public class L2CacheMissHotspotReuseDistanceMeterEvent extends SimulationMeterEv
      * @param functionName the function symbol name
      * @param value        the value
      */
-    public L2CacheMissHotspotReuseDistanceMeterEvent(SimulationObject sender, int pc, int address, int threadId, String functionName, L2CacheMissHotspotReuseDistanceMeterEventValue value) {
-        super(sender, "L2CacheMissHotspotReuseDistanceMeterEvent", pc, address, threadId, functionName, value);
+    public L2CacheMissHotspotStackDistanceMeterEvent(SimulationObject sender, int pc, int address, int threadId, String functionName, L2CacheMissHotspotStackDistanceMeterEventValue value) {
+        super(sender, "L2CacheMissHotspotStackDistanceMeterEvent", pc, address, threadId, functionName, value);
     }
 
     /**
-     * L2 cache miss Hotspot reuse distance meter event value.
+     * L2 cache miss Hotspot stack distance meter event value.
      */
-    public static class L2CacheMissHotspotReuseDistanceMeterEventValue implements Serializable {
-        private long reuseDistance;
+    public static class L2CacheMissHotspotStackDistanceMeterEventValue implements Serializable {
+        private long stackDistance;
 
         /**
-         * Create an L2 cache miss hotspot reuse distance meter event value.
+         * Create an L2 cache miss hotspot stack distance meter event value.
          *
-         * @param reuseDistance the reuse distance
+         * @param stackDistance the stack distance
          */
-        public L2CacheMissHotspotReuseDistanceMeterEventValue(long reuseDistance) {
-            this.reuseDistance = reuseDistance;
+        public L2CacheMissHotspotStackDistanceMeterEventValue(long stackDistance) {
+            this.stackDistance = stackDistance;
         }
 
         /**
-         * Get the reuse distance.
+         * Get the stack distance.
          *
-         * @return the reuse distance
+         * @return the stack distance
          */
-        public long getReuseDistance() {
-            return reuseDistance;
+        public long getStackDistance() {
+            return stackDistance;
         }
 
         @Override
         public String toString() {
-            return String.format("{reuseDistance=%d}", reuseDistance);
+            return String.format("{stackDistance=%d}", stackDistance);
         }
     }
 }

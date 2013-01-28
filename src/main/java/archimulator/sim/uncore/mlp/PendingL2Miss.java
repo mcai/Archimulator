@@ -29,7 +29,6 @@ public class PendingL2Miss {
     private MemoryHierarchyAccess access;
     private long beginCycle;
     private long endCycle;
-    private double mlpCost;
 
     private transient int numMlpSamples;
     private transient int mlpSum;
@@ -79,24 +78,6 @@ public class PendingL2Miss {
      */
     public void setEndCycle(long endCycle) {
         this.endCycle = endCycle;
-    }
-
-    /**
-     * Get the aggregated MLP cost.
-     *
-     * @return the aggregated MLP cost
-     */
-    public double getMlpCost() {
-        return mlpCost;
-    }
-
-    /**
-     * Set the aggregated MLP-cost.
-     *
-     * @param mlpCost the aggregated MLP-cost
-     */
-    public void setMlpCost(double mlpCost) {
-        this.mlpCost = mlpCost;
     }
 
     /**
@@ -151,5 +132,14 @@ public class PendingL2Miss {
      */
     public double getAverageMlp() {
         return (double) mlpSum / (double) numMlpSamples;
+    }
+
+    /**
+     * Get the aggregated MLP cost.
+     *
+     * @return the aggregated MLP cost
+     */
+    public double getMlpCost() {
+        return (double) mlpSum / numMlpSamples;
     }
 }

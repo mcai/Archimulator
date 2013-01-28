@@ -20,10 +20,9 @@ package archimulator.sim.uncore.helperThread;
 
 import archimulator.model.ContextMapping;
 import archimulator.sim.common.Simulation;
-import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.replacement.helperThread.HelperThreadIntervalAwareLRUPolicy;
 import archimulator.sim.uncore.coherence.event.GeneralCacheControllerLineReplacementEvent;
-import archimulator.sim.uncore.coherence.msi.state.DirectoryControllerState;
+import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.util.IntervalStat;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
@@ -78,9 +77,9 @@ public class FeedbackDirectedHelperThreadingHelper {
     public FeedbackDirectedHelperThreadingHelper(Simulation simulation) {
         this.simulation = simulation;
 
-        final EvictableCache<DirectoryControllerState> cache = simulation.getProcessor().getMemoryHierarchy().getL2CacheController().getCache();
+        final DirectoryController l2CacheController = simulation.getProcessor().getMemoryHierarchy().getL2CacheController();
 
-        this.numEvictedL2CacheLinesPerInterval = cache.getNumSets() * cache.getAssociativity() / 2;
+        this.numEvictedL2CacheLinesPerInterval = l2CacheController.getCache().getNumSets() * l2CacheController.getCache().getAssociativity() / 2;
 
         this.pollutionForInsertionPolicy = HelperThreadL2CacheRequestPollutionForInsertionPolicy.MEDIUM;
 
@@ -106,10 +105,10 @@ public class FeedbackDirectedHelperThreadingHelper {
         this.aggressivenessDistribution = new TreeMap<HelperThreadAggressiveness, Long>();
         this.pollutionForInsertionPolicyDistribution = new TreeMap<HelperThreadL2CacheRequestPollutionForInsertionPolicy, Long>();
 
-        cache.getCycleAccurateEventQueue().getPerCycleEvents().add(new Action() {
+        l2CacheController.getCycleAccurateEventQueue().getPerCycleEvents().add(new Action() {
             @Override
             public void apply() {
-                int numPendingMemoryAccesses = FeedbackDirectedHelperThreadingHelper.this.simulation.getProcessor().getMemoryHierarchy().getL2CacheController().getNumPendingMemoryAccesses();
+                int numPendingMemoryAccesses = l2CacheController.getNumPendingMemoryAccesses();
                 if (numPendingMemoryAccesses > 0) {
                     statMemoryBandwidthContention.addValue(numPendingMemoryAccesses);
                 }
@@ -117,11 +116,11 @@ public class FeedbackDirectedHelperThreadingHelper {
         });
 
         //TODO: should not be hardcoded!!!
-        if (!(cache.getReplacementPolicy() instanceof HelperThreadIntervalAwareLRUPolicy)) {
+        if (!(l2CacheController.getCache().getReplacementPolicy() instanceof HelperThreadIntervalAwareLRUPolicy)) {
             return;
         }
 
-        cache.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.RedundantHitToTransientTagHelperThreadL2CacheRequestEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.RedundantHitToTransientTagHelperThreadL2CacheRequestEvent>() {
+        l2CacheController.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.RedundantHitToTransientTagHelperThreadL2CacheRequestEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.RedundantHitToTransientTagHelperThreadL2CacheRequestEvent>() {
             @Override
             public void apply(HelperThreadL2CacheRequestProfilingHelper.RedundantHitToTransientTagHelperThreadL2CacheRequestEvent param) {
                 numRedundantHitToTransientTagHelperThreadL2CacheRequestsStat.inc();
@@ -129,7 +128,7 @@ public class FeedbackDirectedHelperThreadingHelper {
             }
         });
 
-        cache.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.RedundantHitToCacheHelperThreadL2CacheRequestEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.RedundantHitToCacheHelperThreadL2CacheRequestEvent>() {
+        l2CacheController.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.RedundantHitToCacheHelperThreadL2CacheRequestEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.RedundantHitToCacheHelperThreadL2CacheRequestEvent>() {
             @Override
             public void apply(HelperThreadL2CacheRequestProfilingHelper.RedundantHitToCacheHelperThreadL2CacheRequestEvent param) {
                 numRedundantHitToCacheHelperThreadL2CacheRequestsStat.inc();
@@ -137,7 +136,7 @@ public class FeedbackDirectedHelperThreadingHelper {
             }
         });
 
-        cache.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.TimelyHelperThreadL2CacheRequestEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.TimelyHelperThreadL2CacheRequestEvent>() {
+        l2CacheController.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.TimelyHelperThreadL2CacheRequestEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.TimelyHelperThreadL2CacheRequestEvent>() {
             @Override
             public void apply(HelperThreadL2CacheRequestProfilingHelper.TimelyHelperThreadL2CacheRequestEvent param) {
                 numTimelyHelperThreadL2CacheRequestsStat.inc();
@@ -145,7 +144,7 @@ public class FeedbackDirectedHelperThreadingHelper {
             }
         });
 
-        cache.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.LateHelperThreadL2CacheRequestEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.LateHelperThreadL2CacheRequestEvent>() {
+        l2CacheController.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.LateHelperThreadL2CacheRequestEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.LateHelperThreadL2CacheRequestEvent>() {
             @Override
             public void apply(HelperThreadL2CacheRequestProfilingHelper.LateHelperThreadL2CacheRequestEvent param) {
                 numLateHelperThreadL2CacheRequestsStat.inc();
@@ -153,7 +152,7 @@ public class FeedbackDirectedHelperThreadingHelper {
             }
         });
 
-        cache.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.BadHelperThreadL2CacheRequestEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.BadHelperThreadL2CacheRequestEvent>() {
+        l2CacheController.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.BadHelperThreadL2CacheRequestEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.BadHelperThreadL2CacheRequestEvent>() {
             @Override
             public void apply(HelperThreadL2CacheRequestProfilingHelper.BadHelperThreadL2CacheRequestEvent event) {
                 numBadHelperThreadL2CacheRequestsStat.inc();
@@ -161,7 +160,7 @@ public class FeedbackDirectedHelperThreadingHelper {
             }
         });
 
-        cache.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.UglyHelperThreadL2CacheRequestEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.UglyHelperThreadL2CacheRequestEvent>() {
+        l2CacheController.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.UglyHelperThreadL2CacheRequestEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.UglyHelperThreadL2CacheRequestEvent>() {
             @Override
             public void apply(HelperThreadL2CacheRequestProfilingHelper.UglyHelperThreadL2CacheRequestEvent param) {
                 numUglyHelperThreadL2CacheRequestsStat.inc();
@@ -169,10 +168,10 @@ public class FeedbackDirectedHelperThreadingHelper {
             }
         });
 
-        cache.getBlockingEventDispatcher().addListener(GeneralCacheControllerLineReplacementEvent.class, new Action1<GeneralCacheControllerLineReplacementEvent>() {
+        l2CacheController.getBlockingEventDispatcher().addListener(GeneralCacheControllerLineReplacementEvent.class, new Action1<GeneralCacheControllerLineReplacementEvent>() {
             @Override
             public void apply(GeneralCacheControllerLineReplacementEvent event) {
-                if (event.getCacheController().getCache() == cache) {
+                if (event.getCacheController() == l2CacheController) {
                     numEvictedL2CacheLines++;
 
                     if (numEvictedL2CacheLines == numEvictedL2CacheLinesPerInterval) {

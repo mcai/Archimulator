@@ -202,6 +202,11 @@ public class ExperimentGaugeType implements WithId, WithTitle, WithCreateTime {
     public static String MEMORY_CONTROLLER = "memoryController";
 
     /**
+     * Stack distance.
+     */
+    public static String STACK_DISTANCE = "stackDistance";
+
+    /**
      * Hotspot function.
      */
     public static String HOTSPOT = "hotspot";

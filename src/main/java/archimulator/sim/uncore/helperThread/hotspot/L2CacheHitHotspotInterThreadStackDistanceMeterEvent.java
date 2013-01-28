@@ -25,13 +25,13 @@ import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestState;
 import java.io.Serializable;
 
 /**
- * L2 cache hit Hotspot inter-thread reuse distance meter event.
+ * L2 cache hit Hotspot inter-thread stack distance meter event.
  *
  * @author Min Cai
  */
-public class L2CacheHitHotspotInterThreadReuseDistanceMeterEvent extends SimulationMeterEvent<L2CacheHitHotspotInterThreadReuseDistanceMeterEvent.L2CacheHitHotspotInterThreadReuseDistanceMeterEventValue> {
+public class L2CacheHitHotspotInterThreadStackDistanceMeterEvent extends SimulationMeterEvent<L2CacheHitHotspotInterThreadStackDistanceMeterEvent.L2CacheHitHotspotInterThreadStackDistanceMeterEventValue> {
     /**
-     * Create an L2 cache hit hotspot inter-thread reuse distance meter event.
+     * Create an L2 cache hit hotspot inter-thread stack distance meter event.
      *
      * @param sender       the sender simulation object
      * @param pc           the value of the program counter (PC)
@@ -40,27 +40,27 @@ public class L2CacheHitHotspotInterThreadReuseDistanceMeterEvent extends Simulat
      * @param functionName the function symbol name
      * @param value        the value
      */
-    public L2CacheHitHotspotInterThreadReuseDistanceMeterEvent(SimulationObject sender, int pc, int address, int threadId, String functionName, L2CacheHitHotspotInterThreadReuseDistanceMeterEventValue value) {
-        super(sender, "L2CacheHitHotspotInterThreadReuseDistanceMeterEvent", pc, address, threadId, functionName, value);
+    public L2CacheHitHotspotInterThreadStackDistanceMeterEvent(SimulationObject sender, int pc, int address, int threadId, String functionName, L2CacheHitHotspotInterThreadStackDistanceMeterEventValue value) {
+        super(sender, "L2CacheHitHotspotInterThreadStackDistanceMeterEvent", pc, address, threadId, functionName, value);
     }
 
     /**
-     * L2 cache hit Hotspot inter-thread reuse distance meter event value.
+     * L2 cache hit Hotspot inter-thread stack distance meter event value.
      */
-    public static class L2CacheHitHotspotInterThreadReuseDistanceMeterEventValue implements Serializable {
+    public static class L2CacheHitHotspotInterThreadStackDistanceMeterEventValue implements Serializable {
         private HelperThreadL2CacheRequestState helperThreadL2CacheRequestState;
-        private long reuseDistance;
+        private long stackDistance;
 
         /**
-         * Create an L2 cache hit hotspot inter-thread reuse distance meter event value.
+         * Create an L2 cache hit hotspot inter-thread stack distance meter event value.
          *
          * @param helperThreadL2CacheRequestState
          *                      the helper thread L2 cache request state
-         * @param reuseDistance the reuse distance
+         * @param stackDistance the stack distance
          */
-        public L2CacheHitHotspotInterThreadReuseDistanceMeterEventValue(HelperThreadL2CacheRequestState helperThreadL2CacheRequestState, long reuseDistance) {
+        public L2CacheHitHotspotInterThreadStackDistanceMeterEventValue(HelperThreadL2CacheRequestState helperThreadL2CacheRequestState, long stackDistance) {
             this.helperThreadL2CacheRequestState = helperThreadL2CacheRequestState;
-            this.reuseDistance = reuseDistance;
+            this.stackDistance = stackDistance;
         }
 
         /**
@@ -73,17 +73,17 @@ public class L2CacheHitHotspotInterThreadReuseDistanceMeterEvent extends Simulat
         }
 
         /**
-         * Get the reuse distance.
+         * Get the stack distance.
          *
-         * @return the reuse distance
+         * @return the stack distance
          */
-        public long getReuseDistance() {
-            return reuseDistance;
+        public long getStackDistance() {
+            return stackDistance;
         }
 
         @Override
         public String toString() {
-            return String.format("{htRequestState=%s, reuseDistance=%d}", helperThreadL2CacheRequestState, reuseDistance);
+            return String.format("{htRequestState=%s, stackDistance=%d}", helperThreadL2CacheRequestState, stackDistance);
         }
     }
 }

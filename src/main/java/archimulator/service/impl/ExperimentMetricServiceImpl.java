@@ -83,6 +83,7 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
                 }
             });
             this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.MEMORY_CONTROLLER, "processor/memoryHierarchy/memoryController", ""));
+            this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.STACK_DISTANCE, "stackDistanceProfilingHelper", ""));
             this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.HOTSPOT, "hotspotProfilingHelper", ""));
             this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.HELPER_THREAD, "helperThreadL2CacheRequestProfilingHelper", ""));
             this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.FEEDBACK_DIRECTED_HELPER_THREADING, "feedbackDirectedHelperThreadingHelper", ""));
@@ -166,13 +167,16 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.MEMORY_CONTROLLER), "numReads"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.MEMORY_CONTROLLER), "numWrites"));
 
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.STACK_DISTANCE), "l2CacheStackDistanceProfile/hitCounters"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.STACK_DISTANCE), "l2CacheStackDistanceProfile/missCounter"));
+
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HOTSPOT), "numCallsPerFunctions"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HOTSPOT), "loadsInHotspotFunction"));
 
-            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HOTSPOT), "statL2CacheHitReuseDistances"));
-            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HOTSPOT), "statL2CacheMissReuseDistances"));
-            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HOTSPOT), "statL2CacheHitHotspotInterThreadReuseDistances"));
-            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HOTSPOT), "statL2CacheMissHotspotReuseDistances"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HOTSPOT), "statL2CacheHitStackDistances"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HOTSPOT), "statL2CacheMissStackDistances"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HOTSPOT), "statL2CacheHitHotspotInterThreadStackDistances"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HOTSPOT), "statL2CacheMissHotspotStackDistances"));
 
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HELPER_THREAD), "numMainThreadL2CacheHits"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HELPER_THREAD), "numMainThreadL2CacheMisses"));

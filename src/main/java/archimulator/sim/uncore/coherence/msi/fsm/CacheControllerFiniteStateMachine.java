@@ -350,8 +350,8 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
      * @param way    the way
      */
     public void hit(MemoryHierarchyAccess access, int tag, int set, int way) {
-        this.cacheController.getCache().getReplacementPolicy().handlePromotionOnHit(access, set, way);
         this.fireServiceNonblockingRequestEvent(access, tag, true);
+        this.cacheController.getCache().getReplacementPolicy().handlePromotionOnHit(access, set, way);
     }
 
     /**

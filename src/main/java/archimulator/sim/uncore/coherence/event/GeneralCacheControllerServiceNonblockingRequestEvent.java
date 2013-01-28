@@ -28,7 +28,7 @@ import archimulator.sim.uncore.coherence.msi.controller.GeneralCacheController;
  * @author Min Cai
  */
 public class GeneralCacheControllerServiceNonblockingRequestEvent extends SimulationEvent {
-    private GeneralCacheController cacheController;
+    private GeneralCacheController<?, ?> cacheController;
     private MemoryHierarchyAccess access;
     private int tag;
     private int set;
@@ -45,7 +45,7 @@ public class GeneralCacheControllerServiceNonblockingRequestEvent extends Simula
      * @param way             the way
      * @param hitInCache      a value indicating whether the request hits in the cache or not
      */
-    public GeneralCacheControllerServiceNonblockingRequestEvent(GeneralCacheController cacheController, MemoryHierarchyAccess access, int tag, int set, int way, boolean hitInCache) {
+    public GeneralCacheControllerServiceNonblockingRequestEvent(GeneralCacheController<?, ?> cacheController, MemoryHierarchyAccess access, int tag, int set, int way, boolean hitInCache) {
         super(cacheController);
 
         this.cacheController = cacheController;
@@ -61,7 +61,7 @@ public class GeneralCacheControllerServiceNonblockingRequestEvent extends Simula
      *
      * @return the cache controller
      */
-    public GeneralCacheController getCacheController() {
+    public GeneralCacheController<?, ?> getCacheController() {
         return cacheController;
     }
 
