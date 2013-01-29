@@ -29,6 +29,9 @@ import archimulator.sim.uncore.coherence.msi.controller.GeneralCacheController;
 import archimulator.sim.uncore.coherence.msi.state.DirectoryControllerState;
 import net.pickapack.action.Action1;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Stack distance profiling helper.
  *
@@ -84,6 +87,43 @@ public class StackDistanceProfilingHelper {
         } else {
             this.l2CacheStackDistanceProfile.incMissCounter();
         }
+    }
+
+    /**
+     * Get the number of misses for the assumed associativity.
+     *
+     * @param associativity the assumed associativity
+     * @return the number of misses for the assumed associativity
+     */
+    public int getAssumedNumMisses(int associativity) {
+        if(associativity > this.l2CacheController.getCache().getAssociativity()) {
+            throw new IllegalArgumentException();
+        }
+
+        int numMisses = 0;
+
+        for(int i = associativity; i < this.l2CacheController.getCache().getAssociativity(); i++) {
+            numMisses += this.l2CacheStackDistanceProfile.getHitCounters().get(i);
+        }
+
+        numMisses += this.l2CacheStackDistanceProfile.getMissCounter();
+
+        return numMisses;
+    }
+
+    /**
+     * Get the distribution of the number of misses for the assumed associativities.
+     *
+     * @return the distribution of the number of misses for the assumed associativities
+     */
+    public Map<Integer, Integer> getAssumedNumMissesDistribution() {
+        Map<Integer, Integer> result = new LinkedHashMap<Integer, Integer>();
+
+        for(int associativity = 1; associativity <= this.l2CacheController.getCache().getAssociativity(); associativity++) {
+            result.put(associativity, this.getAssumedNumMisses(associativity));
+        }
+
+        return result;
     }
 
     /**

@@ -169,6 +169,7 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
 
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.STACK_DISTANCE), "l2CacheStackDistanceProfile/hitCounters"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.STACK_DISTANCE), "l2CacheStackDistanceProfile/missCounter"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.STACK_DISTANCE), "assumedNumMissesDistribution"));
 
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HOTSPOT), "numCallsPerFunctions"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HOTSPOT), "loadsInHotspotFunction"));
