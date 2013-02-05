@@ -21,16 +21,15 @@ package archimulator.sim.uncore.stackDistanceProfile;
 import archimulator.sim.common.Simulation;
 import archimulator.sim.common.SimulationEvent;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
-import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicy;
-import archimulator.sim.uncore.cache.replacement.StackBasedCacheReplacementPolicy;
 import archimulator.sim.uncore.coherence.event.GeneralCacheControllerServiceNonblockingRequestEvent;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.coherence.msi.controller.GeneralCacheController;
-import archimulator.sim.uncore.coherence.msi.state.DirectoryControllerState;
 import net.pickapack.action.Action1;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Stack;
+import java.util.TreeMap;
 
 /**
  * Stack distance profiling helper.
@@ -39,8 +38,8 @@ import java.util.Map;
  */
 public class StackDistanceProfilingHelper {
     private DirectoryController l2CacheController;
+    private Map<Integer, Stack<Integer>> l2CacheLruStacks;
     private StackDistanceProfile l2CacheStackDistanceProfile;
-    private StackBasedCacheReplacementPolicy<DirectoryControllerState> l2CacheReplacementPolicy;
 
     /**
      * Create a stack distance profiling helper.
@@ -49,14 +48,8 @@ public class StackDistanceProfilingHelper {
      */
     public StackDistanceProfilingHelper(Simulation simulation) {
         this.l2CacheController = simulation.getProcessor().getMemoryHierarchy().getL2CacheController();
+        this.l2CacheLruStacks = new TreeMap<Integer, Stack<Integer>>();
         this.l2CacheStackDistanceProfile = new StackDistanceProfile(this.l2CacheController.getCache().getAssociativity());
-
-        CacheReplacementPolicy<DirectoryControllerState> replacementPolicy = this.l2CacheController.getCache().getReplacementPolicy();
-        if(!(replacementPolicy instanceof StackBasedCacheReplacementPolicy)) {
-            return;
-        }
-
-        this.l2CacheReplacementPolicy = (StackBasedCacheReplacementPolicy<DirectoryControllerState>) replacementPolicy;
 
         simulation.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, new Action1<GeneralCacheControllerServiceNonblockingRequestEvent>() {
             public void apply(GeneralCacheControllerServiceNonblockingRequestEvent event) {
@@ -78,15 +71,36 @@ public class StackDistanceProfilingHelper {
         int tag = access.getPhysicalTag();
         int set = this.l2CacheController.getCache().getSet(tag);
 
-        int stackPosition = hitInCache ? l2CacheReplacementPolicy.getStackPosition(set, way) : -1;
+        Stack<Integer> lruStack = getLruStack(set);
 
-        this.l2CacheController.getBlockingEventDispatcher().dispatch(new StackDistanceProfiledEvent(this.l2CacheController, access, hitInCache, set, way, stackPosition));
+        int stackDistance = lruStack.search(tag);
+
+        if (stackDistance != -1) {
+            lruStack.remove((Integer) tag);
+        }
+        lruStack.push(tag);
+
+        this.l2CacheController.getBlockingEventDispatcher().dispatch(new StackDistanceProfiledEvent(this.l2CacheController, access, hitInCache, set, way, stackDistance));
 
         if (hitInCache) {
-            this.l2CacheStackDistanceProfile.incHitCounter(stackPosition);
+            this.l2CacheStackDistanceProfile.incHitCounter(stackDistance);
         } else {
             this.l2CacheStackDistanceProfile.incMissCounter();
         }
+    }
+
+    /**
+     * Get the LRU stack for the specified set in the L2 cache.
+     *
+     * @param set the set index
+     * @return the LRU stack for the specified set in the L2 cache
+     */
+    private Stack<Integer> getLruStack(int set) {
+        if (!this.l2CacheLruStacks.containsKey(set)) {
+            this.l2CacheLruStacks.put(set, new Stack<Integer>());
+        }
+
+        return this.l2CacheLruStacks.get(set);
     }
 
     /**
@@ -102,7 +116,7 @@ public class StackDistanceProfilingHelper {
 
         int numMisses = 0;
 
-        for(int i = associativity; i < this.l2CacheController.getCache().getAssociativity(); i++) {
+        for(int i = associativity - 1; i < this.l2CacheController.getCache().getAssociativity(); i++) {
             numMisses += this.l2CacheStackDistanceProfile.getHitCounters().get(i);
         }
 

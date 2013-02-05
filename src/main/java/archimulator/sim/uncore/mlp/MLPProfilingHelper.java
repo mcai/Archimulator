@@ -47,7 +47,6 @@ public class MLPProfilingHelper {
 
     private SummaryStatistics statL2CacheMissNumCycles;
     private SummaryStatistics statL2CacheMissMlpCosts;
-    private SummaryStatistics statL2CacheMissAverageMlps;
 
     /**
      * Create an MLP profiling helper.
@@ -69,32 +68,25 @@ public class MLPProfilingHelper {
         this.mlpCostQuantizer = new Function1<Integer, Integer>() {
             @Override
             public Integer apply(Integer rawValue) {
-                if(rawValue < 0) {
+                if (rawValue < 0) {
                     throw new IllegalArgumentException();
                 }
 
-                if(rawValue <= 42) {
+                if (rawValue <= 42) {
                     return 0;
-                }
-                else if(rawValue <= 85) {
+                } else if (rawValue <= 85) {
                     return 1;
-                }
-                else if(rawValue <= 128) {
+                } else if (rawValue <= 128) {
                     return 2;
-                }
-                else if (rawValue <= 170) {
+                } else if (rawValue <= 170) {
                     return 3;
-                }
-                else if(rawValue <= 213) {
+                } else if (rawValue <= 213) {
                     return 4;
-                }
-                else if(rawValue <= 246) {
+                } else if (rawValue <= 246) {
                     return 5;
-                }
-                else if(rawValue <= 300) {
+                } else if (rawValue <= 300) {
                     return 6;
-                }
-                else {
+                } else {
                     return 7;
                 }
             }
@@ -104,7 +96,6 @@ public class MLPProfilingHelper {
 
         this.statL2CacheMissNumCycles = new SummaryStatistics();
         this.statL2CacheMissMlpCosts = new SummaryStatistics();
-        this.statL2CacheMissAverageMlps = new SummaryStatistics();
 
         l2CacheController.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, new Action1<GeneralCacheControllerServiceNonblockingRequestEvent>() {
             public void apply(GeneralCacheControllerServiceNonblockingRequestEvent event) {
@@ -135,9 +126,8 @@ public class MLPProfilingHelper {
      * To be invoked per cycle for updating MLP-costs for in-flight L2 cache accesses.
      */
     private void updateL2CacheMlpCostsPerCycle() {
-        for(PendingL2Miss pendingL2Miss : this.pendingL2Misses.values()) {
-            pendingL2Miss.setNumMlpSamples(pendingL2Miss.getNumMlpSamples() + 1);
-            pendingL2Miss.setMlpSum(pendingL2Miss.getMlpSum() + this.pendingL2Misses.size());
+        for (PendingL2Miss pendingL2Miss : this.pendingL2Misses.values()) {
+            pendingL2Miss.setMlpCost(pendingL2Miss.getMlpCost() + (double) 1 / this.pendingL2Misses.size());
         }
     }
 
@@ -168,7 +158,6 @@ public class MLPProfilingHelper {
 
         this.statL2CacheMissNumCycles.addValue(pendingL2Miss.getNumCycles());
         this.statL2CacheMissMlpCosts.addValue(pendingL2Miss.getMlpCost());
-        this.statL2CacheMissAverageMlps.addValue(pendingL2Miss.getAverageMlp());
     }
 
     /**
@@ -196,14 +185,5 @@ public class MLPProfilingHelper {
      */
     public SummaryStatistics getStatL2CacheMissMlpCosts() {
         return statL2CacheMissMlpCosts;
-    }
-
-    /**
-     * Get the summary statistics of the average MLPs for the L2 cache misses.
-     *
-     * @return the summary statistics of the average MLPs for the L2 cache misses
-     */
-    public SummaryStatistics getStatL2CacheMissAverageMlps() {
-        return statL2CacheMissAverageMlps;
     }
 }

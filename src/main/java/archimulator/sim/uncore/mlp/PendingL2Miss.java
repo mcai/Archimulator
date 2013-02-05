@@ -29,9 +29,8 @@ public class PendingL2Miss {
     private MemoryHierarchyAccess access;
     private long beginCycle;
     private long endCycle;
-
-    private transient int numMlpSamples;
-    private transient int mlpSum;
+    private double mlpCost;
+    private int stackDistance;
 
     /**
      * Create a pending L2 cache miss.
@@ -81,39 +80,21 @@ public class PendingL2Miss {
     }
 
     /**
-     * Get the number of MLP samples.
+     * Get the stack distance.
      *
-     * @return the number of MLP samples
+     * @return the stack distance
      */
-    public int getNumMlpSamples() {
-        return numMlpSamples;
+    public int getStackDistance() {
+        return stackDistance;
     }
 
     /**
-     * Set the number of MLP samples.
+     * Set the stack distance.
      *
-     * @param numMlpSamples the number of MLP samples
+     * @param stackDistance the stack distance
      */
-    public void setNumMlpSamples(int numMlpSamples) {
-        this.numMlpSamples = numMlpSamples;
-    }
-
-    /**
-     * Get the MLP sum.
-     *
-     * @return the MLP sum
-     */
-    public int getMlpSum() {
-        return mlpSum;
-    }
-
-    /**
-     * Set the MLP sum.
-     *
-     * @param mlpSum the MLP sum
-     */
-    public void setMlpSum(int mlpSum) {
-        this.mlpSum = mlpSum;
+    public void setStackDistance(int stackDistance) {
+        this.stackDistance = stackDistance;
     }
 
     /**
@@ -126,20 +107,20 @@ public class PendingL2Miss {
     }
 
     /**
-     * Get the average MLP.
+     * Get the MLP-cost.
      *
-     * @return the average MLP
+     * @return the MLP-cost
      */
-    public double getAverageMlp() {
-        return (double) mlpSum / (double) numMlpSamples;
+    public double getMlpCost() {
+        return mlpCost;
     }
 
     /**
-     * Get the aggregated MLP cost.
+     * Set the MLP-cost.
      *
-     * @return the aggregated MLP cost
+     * @param mlpCost the MLP-cost
      */
-    public double getMlpCost() {
-        return (double) mlpSum / numMlpSamples;
+    public void setMlpCost(double mlpCost) {
+        this.mlpCost = mlpCost;
     }
 }
