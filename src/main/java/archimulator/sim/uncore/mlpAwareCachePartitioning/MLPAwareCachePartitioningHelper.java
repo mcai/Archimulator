@@ -41,7 +41,6 @@ public class MLPAwareCachePartitioningHelper {
     private DirectoryController l2CacheController;
     private Map<Integer, PendingL2Miss> pendingL2Misses;
     private L2CacheMissMLPCostProfile l2CacheMissMLPCostProfile;
-    private StackBasedCacheReplacementPolicy<DirectoryControllerState> l2CacheReplacementPolicy;
     private Map<Integer, Stack<Integer>> l2CacheLruStacks;
 
     /**
@@ -64,13 +63,6 @@ public class MLPAwareCachePartitioningHelper {
         this.pendingL2Misses = new LinkedHashMap<Integer, PendingL2Miss>();
 
         this.l2CacheMissMLPCostProfile = new L2CacheMissMLPCostProfile(this.l2CacheController.getCache().getAssociativity());
-
-        CacheReplacementPolicy<DirectoryControllerState> replacementPolicy = this.l2CacheController.getCache().getReplacementPolicy();
-        if (!(replacementPolicy instanceof StackBasedCacheReplacementPolicy)) {
-            return;
-        }
-
-        this.l2CacheReplacementPolicy = (StackBasedCacheReplacementPolicy<DirectoryControllerState>) replacementPolicy;
 
         this.l2CacheLruStacks = new TreeMap<Integer, Stack<Integer>>();
 
