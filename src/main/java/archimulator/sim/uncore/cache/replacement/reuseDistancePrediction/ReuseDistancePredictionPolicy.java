@@ -130,7 +130,7 @@ public class ReuseDistancePredictionPolicy<StateT extends Serializable> extends 
      * @param pc       the value of the program counter (PC)
      */
     private void handleLineReference(int set, int way, int threadId, int pc) {
-        this.highLowCounter.inc();
+        this.highLowCounter.increment();
         this.reuseDistanceSampler.update(threadId, pc, this.getCache().getLine(set, way).getTag());
 
         CacheLine<Boolean> mirrorLine = this.mirrorCache.getLine(set, way);

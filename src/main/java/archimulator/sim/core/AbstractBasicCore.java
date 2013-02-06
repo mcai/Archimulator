@@ -223,12 +223,12 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
 
         final Counter counterPending = new Counter(0);
 
-        counterPending.inc();
+        counterPending.increment();
 
         MemoryHierarchyAccess alias = this.l1ICacheController.findAccess(physicalTag);
         MemoryHierarchyAccess access = this.l1ICacheController.beginAccess(null, thread, MemoryHierarchyAccessType.IFETCH, virtualPc, physicalAddress, physicalTag, new Action() {
             public void apply() {
-                counterPending.dec();
+                counterPending.decrement();
 
                 if (counterPending.getValue() == 0) {
                     onCompletedCallback.apply();
@@ -237,11 +237,11 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
         });
 
         if (alias == null) {
-            counterPending.inc();
+            counterPending.increment();
 
             thread.getItlb().access(access, new Action() {
                 public void apply() {
-                    counterPending.dec();
+                    counterPending.decrement();
 
                     if (counterPending.getValue() == 0) {
                         onCompletedCallback.apply();
@@ -266,12 +266,12 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
 
         final Counter counterPending = new Counter(0);
 
-        counterPending.inc();
+        counterPending.increment();
 
         MemoryHierarchyAccess alias = this.l1DCacheController.findAccess(physicalTag);
         MemoryHierarchyAccess access = this.l1DCacheController.beginAccess(dynamicInstruction, dynamicInstruction.getThread(), MemoryHierarchyAccessType.LOAD, virtualPc, physicalAddress, physicalTag, new Action() {
             public void apply() {
-                counterPending.dec();
+                counterPending.decrement();
 
                 if (counterPending.getValue() == 0) {
                     onCompletedCallback.apply();
@@ -280,11 +280,11 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
         });
 
         if (alias == null) {
-            counterPending.inc();
+            counterPending.increment();
 
             dynamicInstruction.getThread().getDtlb().access(access, new Action() {
                 public void apply() {
-                    counterPending.dec();
+                    counterPending.decrement();
 
                     if (counterPending.getValue() == 0) {
                         onCompletedCallback.apply();
@@ -314,12 +314,12 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
 
         final Counter counterPending = new Counter(0);
 
-        counterPending.inc();
+        counterPending.increment();
 
         MemoryHierarchyAccess alias = this.l1DCacheController.findAccess(physicalTag);
         MemoryHierarchyAccess access = this.l1DCacheController.beginAccess(dynamicInstruction, dynamicInstruction.getThread(), MemoryHierarchyAccessType.STORE, virtualPc, physicalAddress, physicalTag, new Action() {
             public void apply() {
-                counterPending.dec();
+                counterPending.decrement();
 
                 if (counterPending.getValue() == 0) {
                     onCompletedCallback.apply();
@@ -328,11 +328,11 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
         });
 
         if (alias == null) {
-            counterPending.inc();
+            counterPending.increment();
 
             dynamicInstruction.getThread().getDtlb().access(access, new Action() {
                 public void apply() {
-                    counterPending.dec();
+                    counterPending.decrement();
 
                     if (counterPending.getValue() == 0) {
                         onCompletedCallback.apply();

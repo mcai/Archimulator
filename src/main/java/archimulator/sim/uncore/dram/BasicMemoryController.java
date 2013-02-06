@@ -83,7 +83,7 @@ public class BasicMemoryController extends MemoryController {
                     accessDram(currentAddress, new Action() {
                         @Override
                         public void apply() {
-                            counterPending.dec();
+                            counterPending.decrement();
 
                             if (counterPending.getValue() == 0) {
                                 onCompletedCallback.apply();
@@ -93,7 +93,7 @@ public class BasicMemoryController extends MemoryController {
                 }
             }, this.getToDramLatency());
 
-            counterPending.inc();
+            counterPending.increment();
 
             offset += this.getBusWidth();
         }

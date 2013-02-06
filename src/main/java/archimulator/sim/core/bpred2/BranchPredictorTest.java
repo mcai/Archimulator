@@ -44,11 +44,11 @@ public class BranchPredictorTest {
 
                 if ((traceRecord.getBranchInfo().getBranchFlags() & BranchInfo.BR_CONDITIONAL) != 0) {
                     if (branchUpdate.isPredictedDirection() != traceRecord.isTaken()) {
-                        counterDirectionMispredictions.inc();
+                        counterDirectionMispredictions.increment();
                     }
 
                     if (branchUpdate.getPredictedTarget() != traceRecord.getTarget()) {
-                        counterTargetMispredictions.inc();
+                        counterTargetMispredictions.increment();
                     }
 
                     branchPredictor.update(traceRecord.getBranchInfo(), branchUpdate, traceRecord.isTaken(), traceRecord.getTarget());

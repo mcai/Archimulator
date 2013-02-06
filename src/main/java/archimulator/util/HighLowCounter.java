@@ -27,7 +27,7 @@ public class HighLowCounter {
     /**
      * Increment.
      */
-    public void inc() {
+    public void increment() {
         this.lowCounter++;
         if (this.lowCounter == this.timestampQuantizer.getQuantum()) {
             this.lowCounter = 0;

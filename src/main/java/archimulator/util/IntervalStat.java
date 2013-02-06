@@ -30,7 +30,7 @@ public class IntervalStat {
     /**
      * Increment.
      */
-    public void inc() {
+    public void increment() {
         this.value++;
     }
 

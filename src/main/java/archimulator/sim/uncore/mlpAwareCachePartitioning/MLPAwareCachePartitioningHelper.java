@@ -20,12 +20,9 @@ package archimulator.sim.uncore.mlpAwareCachePartitioning;
 
 import archimulator.sim.common.Simulation;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
-import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicy;
-import archimulator.sim.uncore.cache.replacement.StackBasedCacheReplacementPolicy;
 import archimulator.sim.uncore.coherence.event.GeneralCacheControllerServiceNonblockingRequestEvent;
 import archimulator.sim.uncore.coherence.event.LastLevelCacheControllerLineInsertEvent;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
-import archimulator.sim.uncore.coherence.msi.state.DirectoryControllerState;
 import archimulator.sim.uncore.mlp.PendingL2Miss;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
@@ -96,8 +93,7 @@ public class MLPAwareCachePartitioningHelper {
      */
     private void updateL2CacheMlpCostsPerCycle() {
         for (PendingL2Miss pendingL2Miss : this.pendingL2Misses.values()) {
-            int stackDistance = 1; //TODO
-            pendingL2Miss.setMlpCost(pendingL2Miss.getMlpCost() + (double) 1 / this.l2CacheMissMLPCostProfile.getN(stackDistance));
+            pendingL2Miss.setMlpCost(pendingL2Miss.getMlpCost() + (double) 1 / this.l2CacheMissMLPCostProfile.getN(pendingL2Miss.getStackDistance()));
         }
     }
 
@@ -126,7 +122,7 @@ public class MLPAwareCachePartitioningHelper {
         };
         this.pendingL2Misses.put(tag, pendingL2Miss);
 
-        this.l2CacheMissMLPCostProfile.incCounter(stackDistance);
+        this.l2CacheMissMLPCostProfile.incrementCounter(stackDistance);
     }
 
     /**
@@ -140,7 +136,7 @@ public class MLPAwareCachePartitioningHelper {
         PendingL2Miss pendingL2Miss = this.pendingL2Misses.get(tag);
         pendingL2Miss.setEndCycle(this.l2CacheController.getCycleAccurateEventQueue().getCurrentCycle());
 
-        this.l2CacheMissMLPCostProfile.decCounter(pendingL2Miss.getStackDistance());
+        this.l2CacheMissMLPCostProfile.decrementCounter(pendingL2Miss.getStackDistance());
 
         this.pendingL2Misses.remove(tag);
     }
@@ -183,7 +179,7 @@ public class MLPAwareCachePartitioningHelper {
          *
          * @param stackDistance the stack distance
          */
-        public void incCounter(int stackDistance) {
+        public void incrementCounter(int stackDistance) {
             this.getCounters().set(stackDistance, this.getCounters().get(stackDistance) + 1);
         }
 
@@ -192,7 +188,7 @@ public class MLPAwareCachePartitioningHelper {
          *
          * @param stackDistance the stack distance
          */
-        public void decCounter(int stackDistance) {
+        public void decrementCounter(int stackDistance) {
             this.getCounters().set(stackDistance, this.getCounters().get(stackDistance) - 1);
         }
 
@@ -220,5 +216,10 @@ public class MLPAwareCachePartitioningHelper {
         public List<Integer> getCounters() {
             return counters;
         }
+    }
+
+    public class CachePartition {
+        private int threadId;
+        private int numWays;
     }
 }

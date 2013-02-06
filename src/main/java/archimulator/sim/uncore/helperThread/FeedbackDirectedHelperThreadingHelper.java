@@ -123,48 +123,48 @@ public class FeedbackDirectedHelperThreadingHelper {
         l2CacheController.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.RedundantHitToTransientTagHelperThreadL2CacheRequestEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.RedundantHitToTransientTagHelperThreadL2CacheRequestEvent>() {
             @Override
             public void apply(HelperThreadL2CacheRequestProfilingHelper.RedundantHitToTransientTagHelperThreadL2CacheRequestEvent param) {
-                numRedundantHitToTransientTagHelperThreadL2CacheRequestsStat.inc();
-                numTotalHelperThreadL2CacheRequestsStat.inc();
+                numRedundantHitToTransientTagHelperThreadL2CacheRequestsStat.increment();
+                numTotalHelperThreadL2CacheRequestsStat.increment();
             }
         });
 
         l2CacheController.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.RedundantHitToCacheHelperThreadL2CacheRequestEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.RedundantHitToCacheHelperThreadL2CacheRequestEvent>() {
             @Override
             public void apply(HelperThreadL2CacheRequestProfilingHelper.RedundantHitToCacheHelperThreadL2CacheRequestEvent param) {
-                numRedundantHitToCacheHelperThreadL2CacheRequestsStat.inc();
-                numTotalHelperThreadL2CacheRequestsStat.inc();
+                numRedundantHitToCacheHelperThreadL2CacheRequestsStat.increment();
+                numTotalHelperThreadL2CacheRequestsStat.increment();
             }
         });
 
         l2CacheController.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.TimelyHelperThreadL2CacheRequestEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.TimelyHelperThreadL2CacheRequestEvent>() {
             @Override
             public void apply(HelperThreadL2CacheRequestProfilingHelper.TimelyHelperThreadL2CacheRequestEvent param) {
-                numTimelyHelperThreadL2CacheRequestsStat.inc();
-                numTotalHelperThreadL2CacheRequestsStat.inc();
+                numTimelyHelperThreadL2CacheRequestsStat.increment();
+                numTotalHelperThreadL2CacheRequestsStat.increment();
             }
         });
 
         l2CacheController.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.LateHelperThreadL2CacheRequestEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.LateHelperThreadL2CacheRequestEvent>() {
             @Override
             public void apply(HelperThreadL2CacheRequestProfilingHelper.LateHelperThreadL2CacheRequestEvent param) {
-                numLateHelperThreadL2CacheRequestsStat.inc();
-                numTotalHelperThreadL2CacheRequestsStat.inc();
+                numLateHelperThreadL2CacheRequestsStat.increment();
+                numTotalHelperThreadL2CacheRequestsStat.increment();
             }
         });
 
         l2CacheController.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.BadHelperThreadL2CacheRequestEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.BadHelperThreadL2CacheRequestEvent>() {
             @Override
             public void apply(HelperThreadL2CacheRequestProfilingHelper.BadHelperThreadL2CacheRequestEvent event) {
-                numBadHelperThreadL2CacheRequestsStat.inc();
-                numTotalHelperThreadL2CacheRequestsStat.inc();
+                numBadHelperThreadL2CacheRequestsStat.increment();
+                numTotalHelperThreadL2CacheRequestsStat.increment();
             }
         });
 
         l2CacheController.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.UglyHelperThreadL2CacheRequestEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.UglyHelperThreadL2CacheRequestEvent>() {
             @Override
             public void apply(HelperThreadL2CacheRequestProfilingHelper.UglyHelperThreadL2CacheRequestEvent param) {
-                numUglyHelperThreadL2CacheRequestsStat.inc();
-                numTotalHelperThreadL2CacheRequestsStat.inc();
+                numUglyHelperThreadL2CacheRequestsStat.increment();
+                numTotalHelperThreadL2CacheRequestsStat.increment();
             }
         });
 

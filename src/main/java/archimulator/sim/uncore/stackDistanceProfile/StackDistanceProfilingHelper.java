@@ -83,9 +83,9 @@ public class StackDistanceProfilingHelper {
         this.l2CacheController.getBlockingEventDispatcher().dispatch(new StackDistanceProfiledEvent(this.l2CacheController, access, hitInCache, set, way, stackDistance));
 
         if (hitInCache) {
-            this.l2CacheStackDistanceProfile.incHitCounter(stackDistance);
+            this.l2CacheStackDistanceProfile.incrementHitCounter(stackDistance);
         } else {
-            this.l2CacheStackDistanceProfile.incMissCounter();
+            this.l2CacheStackDistanceProfile.incrementMissCounter();
         }
     }
 

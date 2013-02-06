@@ -48,14 +48,14 @@ public class StackDistanceProfile {
      *
      * @param stackDistance the stack distance
      */
-    public void incHitCounter(int stackDistance) {
+    public void incrementHitCounter(int stackDistance) {
         this.getHitCounters().set(stackDistance, this.getHitCounters().get(stackDistance) + 1);
     }
 
     /**
      * Increment the miss counter.
      */
-    public void incMissCounter() {
+    public void incrementMissCounter() {
         this.missCounter++;
     }
 
