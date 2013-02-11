@@ -29,6 +29,7 @@ import archimulator.sim.uncore.mlp.PendingL2Miss;
 import net.pickapack.Pair;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
+import net.pickapack.action.Function1;
 import org.paukov.combinatorics.Factory;
 import org.paukov.combinatorics.Generator;
 import org.paukov.combinatorics.ICombinatoricsVector;
@@ -61,6 +62,8 @@ public class MLPAwareCachePartitioningHelper {
     private int numThreads;
 
     private Map<Integer, Map<Integer, LRUStack>> lruStacks;
+
+    private Function1<Double, Integer> mlpCostQuantizer;
 
     /**
      * Create an MLP aware cache partitioning helper.
@@ -95,6 +98,33 @@ public class MLPAwareCachePartitioningHelper {
         this.mlpAwareStackDistanceProfiles = new LinkedHashMap<Integer, MLPAwareStackDistanceProfile>();
 
         this.lruStacks = new LinkedHashMap<Integer, Map<Integer, LRUStack>>();
+
+        this.mlpCostQuantizer = new Function1<Double, Integer>() {
+            @Override
+            public Integer apply(Double rawValue) {
+                if (rawValue < 0) {
+                    throw new IllegalArgumentException();
+                }
+
+                if (rawValue <= 42) {
+                    return 0;
+                } else if (rawValue <= 85) {
+                    return 1;
+                } else if (rawValue <= 128) {
+                    return 2;
+                } else if (rawValue <= 170) {
+                    return 3;
+                } else if (rawValue <= 213) {
+                    return 4;
+                } else if (rawValue <= 246) {
+                    return 5;
+                } else if (rawValue <= 300) {
+                    return 6;
+                } else {
+                    return 7;
+                }
+            }
+        };
 
         if (l2Associativity < this.numThreads) {
             throw new IllegalArgumentException();
@@ -176,7 +206,7 @@ public class MLPAwareCachePartitioningHelper {
 
         for(Map<Integer, PendingL2Hit> pendingL2HitsPerThread : this.pendingL2Hits.values()) {
             for(PendingL2Hit pendingL2Hit : pendingL2HitsPerThread.values()) {
-                pendingL2Hit.setMlpCost(pendingL2Hit.getMlpCost() + (double) 1 / this.l2CacheAccessMLPCostProfile.getN(pendingL2Hit.getStackDistance())); //TODO: is it correct?
+                pendingL2Hit.setMlpCost(pendingL2Hit.getMlpCost() + (double) 1 / this.l2CacheAccessMLPCostProfile.getN(pendingL2Hit.getStackDistance()));
             }
         }
     }
@@ -251,6 +281,15 @@ public class MLPAwareCachePartitioningHelper {
         this.pendingL2Misses.remove(tag);
 
         this.memoryLatencyMeter.newSample(pendingL2Miss.getNumCycles());
+
+        MLPAwareStackDistanceProfile mlpAwareStackDistanceProfile = this.getMlpAwareStackDistanceProfile(access.getThread().getId());
+
+        if(pendingL2Miss.getStackDistance() == -1) {
+            mlpAwareStackDistanceProfile.incrementMissCounter(this.mlpCostQuantizer.apply(pendingL2Miss.getMlpCost()));
+        }
+        else {
+            mlpAwareStackDistanceProfile.incrementHitCounter(pendingL2Miss.getStackDistance(), this.mlpCostQuantizer.apply(pendingL2Miss.getMlpCost()));
+        }
     }
 
     /**
@@ -295,6 +334,15 @@ public class MLPAwareCachePartitioningHelper {
         this.l2CacheAccessMLPCostProfile.decrementCounter(pendingL2Hit.getStackDistance());
 
         this.pendingL2Hits.get(access.getThread().getId()).remove(tag);
+
+        MLPAwareStackDistanceProfile mlpAwareStackDistanceProfile = this.getMlpAwareStackDistanceProfile(access.getThread().getId());
+
+        if(pendingL2Hit.getStackDistance() == -1) {
+            mlpAwareStackDistanceProfile.incrementMissCounter(this.mlpCostQuantizer.apply(pendingL2Hit.getMlpCost()));
+        }
+        else {
+            mlpAwareStackDistanceProfile.incrementHitCounter(pendingL2Hit.getStackDistance(), this.mlpCostQuantizer.apply(pendingL2Hit.getMlpCost()));
+        }
     }
 
     /**
@@ -490,16 +538,18 @@ public class MLPAwareCachePartitioningHelper {
          * Increment the hit counter for the specified stack distance.
          *
          * @param stackDistance the stack distance
+         * @param quantizedMlpCost the quantized MLP-cost
          */
-        public void incrementHitCounter(int stackDistance) {
-            this.getHitCounters().set(stackDistance, this.getHitCounters().get(stackDistance) + 1);
+        public void incrementHitCounter(int stackDistance, int quantizedMlpCost) {
+            this.getHitCounters().set(stackDistance, this.getHitCounters().get(stackDistance) + quantizedMlpCost);
         }
 
         /**
          * Increment the miss counter.
+         * @param quantizedMlpCost the quantized MLP-cost
          */
-        public void incrementMissCounter() {
-            this.missCounter++;
+        public void incrementMissCounter(int quantizedMlpCost) {
+            this.missCounter+= quantizedMlpCost;
         }
 
         /**

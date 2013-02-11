@@ -82,12 +82,16 @@ public class StackDistanceProfilingHelper {
 
         lruStack.push(tag);
 
+        if(lruStack.size() > this.l2CacheController.getCache().getAssociativity()) {
+            lruStack.remove(lruStack.size() - 1);
+        }
+
         this.l2CacheController.getBlockingEventDispatcher().dispatch(new StackDistanceProfiledEvent(this.l2CacheController, access, hitInCache, set, way, stackDistance));
 
-        if (hitInCache) {
-            this.l2CacheStackDistanceProfile.incrementHitCounter(stackDistance);
-        } else {
+        if (stackDistance == -1) {
             this.l2CacheStackDistanceProfile.incrementMissCounter();
+        } else {
+            this.l2CacheStackDistanceProfile.incrementHitCounter(stackDistance);
         }
     }
 
