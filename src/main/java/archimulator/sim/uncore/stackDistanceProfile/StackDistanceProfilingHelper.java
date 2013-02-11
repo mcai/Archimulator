@@ -77,7 +77,9 @@ public class StackDistanceProfilingHelper {
 
         if (stackDistance != -1) {
             lruStack.remove((Integer) tag);
+            stackDistance--;
         }
+
         lruStack.push(tag);
 
         this.l2CacheController.getBlockingEventDispatcher().dispatch(new StackDistanceProfiledEvent(this.l2CacheController, access, hitInCache, set, way, stackDistance));

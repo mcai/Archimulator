@@ -141,6 +141,7 @@
     <orderEntry type="library" name="Maven: org.eobjects.metamodel:MetaModel-openoffice:3.2.4" level="project" />
     <orderEntry type="library" name="Maven: hsqldb:hsqldb:1.8.0.10" level="project" />
     <orderEntry type="library" name="Maven: org.eobjects.metamodel:MetaModel-xml:3.2.4" level="project" />
+    <orderEntry type="library" name="Maven: com.googlecode.combinatoricslib:combinatoricslib:2.0" level="project" />
   </component>
 </module>
 

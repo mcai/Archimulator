@@ -40,6 +40,7 @@ import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestProfilingH
 import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestQuality;
 import archimulator.sim.uncore.helperThread.hotspot.HotspotProfilingHelper;
 import archimulator.sim.uncore.mlp.MLPProfilingHelper;
+import archimulator.sim.uncore.mlpAwareCachePartitioning.MLPAwareCachePartitioningHelper;
 import archimulator.sim.uncore.stackDistanceProfile.StackDistanceProfilingHelper;
 import archimulator.util.RuntimeHelper;
 import net.pickapack.Reference;
@@ -93,6 +94,8 @@ public abstract class Simulation implements SimulationObject {
     private DynamicSpeculativePrecomputationHelper dynamicSpeculativePrecomputationHelper;
 
     private MLPProfilingHelper mlpProfilingHelper;
+
+    private MLPAwareCachePartitioningHelper mlpAwareCachePartitioningHelper;
 
     private RuntimeHelper runtimeHelper;
 
@@ -184,6 +187,8 @@ public abstract class Simulation implements SimulationObject {
         }
 
         this.mlpProfilingHelper = new MLPProfilingHelper(this);
+
+        this.mlpAwareCachePartitioningHelper = new MLPAwareCachePartitioningHelper(this);
     }
 
     /**
@@ -760,6 +765,15 @@ public abstract class Simulation implements SimulationObject {
      */
     public MLPProfilingHelper getMlpProfilingHelper() {
         return mlpProfilingHelper;
+    }
+
+    /**
+     * Get the MLP-aware cache partitioning helper.
+     *
+     * @return the MLP-aware cache partitioning helper
+     */
+    public MLPAwareCachePartitioningHelper getMlpAwareCachePartitioningHelper() {
+        return mlpAwareCachePartitioningHelper;
     }
 
     /**

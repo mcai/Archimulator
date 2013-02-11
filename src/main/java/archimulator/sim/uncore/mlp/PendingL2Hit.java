@@ -21,24 +21,26 @@ package archimulator.sim.uncore.mlp;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 
 /**
- * Pending L2 cache miss.
+ * Pending L2 cache hit.
  *
  * @author Min Cai
  */
-public class PendingL2Miss {
+public class PendingL2Hit {
     private MemoryHierarchyAccess access;
     private long beginCycle;
     private long endCycle;
     private double mlpCost;
     private int stackDistance;
+    private int numCommittedInstructionsSinceAccess;
+    private int numCyclesElapsedSinceAccess;
 
     /**
-     * Create a pending L2 cache miss.
+     * Create a pending L2 cache hit.
      *
-     * @param access     the memory hierarchy access
+     * @param access the memory hierarchy access
      * @param beginCycle the time in cycles when the access begins
      */
-    public PendingL2Miss(MemoryHierarchyAccess access, long beginCycle) {
+    public PendingL2Hit(MemoryHierarchyAccess access, long beginCycle) {
         this.access = access;
         this.beginCycle = beginCycle;
     }
@@ -124,8 +126,40 @@ public class PendingL2Miss {
         this.mlpCost = mlpCost;
     }
 
+    /**
+     * Get the number of committed dynamic instructions since the access.
+     *
+     * @return the number of committed dynamic instructions since the access
+     */
+    public int getNumCommittedInstructionsSinceAccess() {
+        return numCommittedInstructionsSinceAccess;
+    }
+
+    /**
+     * Increment the number of committed dynamic instructions since the access.
+     */
+    public void incrementNumCommittedInstructionsSinceAccess() {
+        this.numCommittedInstructionsSinceAccess++;
+    }
+
+    /**
+     * Get the number of cycles since the access.
+     *
+     * @return the number of cycles since the access
+     */
+    public int getNumCyclesElapsedSinceAccess() {
+        return numCyclesElapsedSinceAccess;
+    }
+
+    /**
+     * Increment the number of cycles elapsed since the access.
+     */
+    public void incrementNumCyclesElapsedSinceAccess() {
+        this.numCyclesElapsedSinceAccess++;
+    }
+
     @Override
     public String toString() {
-        return String.format("PendingL2Miss{access=%s, beginCycle=%d, endCycle=%d, mlpCost=%s, stackDistance=%d}", access, beginCycle, endCycle, mlpCost, stackDistance);
+        return String.format("PendingL2Hit{access=%s, beginCycle=%d, endCycle=%d, mlpCost=%s, stackDistance=%d, numCommittedInstructionsSinceAccess=%d, numCyclesElapsedSinceAccess=%d}", access, beginCycle, endCycle, mlpCost, stackDistance, numCommittedInstructionsSinceAccess, numCyclesElapsedSinceAccess);
     }
 }
