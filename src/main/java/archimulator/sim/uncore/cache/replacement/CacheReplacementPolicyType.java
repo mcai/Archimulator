@@ -62,5 +62,10 @@ public enum CacheReplacementPolicyType {
     /**
      * Rereference interval prediction (RRIP).
      */
-    REREFERENCE_INTERVAL_PREDICTION
+    REREFERENCE_INTERVAL_PREDICTION,
+
+    /**
+     * MLP-aware cache partitioning based least recently used (LRU).
+     */
+    MLP_AWARE_CACHE_PARTITIONING_LRU
 }

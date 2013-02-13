@@ -64,6 +64,7 @@ public class MLPAwareCachePartitioningHelper {
     private Map<Integer, Map<Integer, LRUStack>> lruStacks;
 
     private Function1<Double, Integer> mlpCostQuantizer;
+    private List<List<Integer>> partitions;
 
     /**
      * Create an MLP aware cache partitioning helper.
@@ -681,7 +682,9 @@ public class MLPAwareCachePartitioningHelper {
      * @return the minimal sum of MLP-cost and its associated optimal partition
      */
     private Pair<Integer, List<Integer>> getOptimalMlpCostSumAndPartition() {
-        List<List<Integer>> partitions = partition(this.l2CacheController.getCache().getAssociativity(), this.numThreads);
+        if(partitions == null) {
+            partitions = partition(this.l2CacheController.getCache().getAssociativity(), this.numThreads);
+        }
 
         int minMlpCostSum = Integer.MAX_VALUE;
         List<Integer> minPartition = null;
@@ -724,6 +727,6 @@ public class MLPAwareCachePartitioningHelper {
     }
 
     public static void main(String[] args) {
-        System.out.println(partition(8, 4).size());
+        System.out.println(partition(16, 4).size());
     }
 }
