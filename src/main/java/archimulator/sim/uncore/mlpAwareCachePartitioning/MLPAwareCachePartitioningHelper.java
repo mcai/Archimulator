@@ -142,8 +142,7 @@ public class MLPAwareCachePartitioningHelper {
                 if (event.getCacheController().equals(MLPAwareCachePartitioningHelper.this.l2CacheController)) {
                     if (!event.isHitInCache()) {
                         profileBeginServicingL2CacheMiss(event.getAccess());
-                    }
-                    else {
+                    } else {
                         profileBeginServicingL2CacheHit(event.getAccess());
                     }
                 }
@@ -168,7 +167,7 @@ public class MLPAwareCachePartitioningHelper {
 
                 numCyclesElapsed++;
 
-                if(numCyclesElapsed == numCyclesElapsedPerInterval) {
+                if (numCyclesElapsed == numCyclesElapsedPerInterval) {
                     newInterval();
 
                     numCyclesElapsed = 0;
@@ -181,7 +180,7 @@ public class MLPAwareCachePartitioningHelper {
         l2CacheController.getBlockingEventDispatcher().addListener(InstructionCommittedEvent.class, new Action1<InstructionCommittedEvent>() {
             @Override
             public void apply(InstructionCommittedEvent event) {
-                if(pendingL2Hits.containsKey(event.getDynamicInstruction().getThread().getId())) {
+                if (pendingL2Hits.containsKey(event.getDynamicInstruction().getThread().getId())) {
                     for (PendingL2Hit pendingL2Hit : pendingL2Hits.get(event.getDynamicInstruction().getThread().getId()).values()) {
                         pendingL2Hit.incrementNumCommittedInstructionsSinceAccess();
                     }
@@ -205,8 +204,8 @@ public class MLPAwareCachePartitioningHelper {
             pendingL2Miss.setMlpCost(pendingL2Miss.getMlpCost() + (double) 1 / this.l2CacheAccessMLPCostProfile.getN(pendingL2Miss.getStackDistance()));
         }
 
-        for(Map<Integer, PendingL2Hit> pendingL2HitsPerThread : this.pendingL2Hits.values()) {
-            for(PendingL2Hit pendingL2Hit : pendingL2HitsPerThread.values()) {
+        for (Map<Integer, PendingL2Hit> pendingL2HitsPerThread : this.pendingL2Hits.values()) {
+            for (PendingL2Hit pendingL2Hit : pendingL2HitsPerThread.values()) {
                 pendingL2Hit.setMlpCost(pendingL2Hit.getMlpCost() + (double) 1 / this.l2CacheAccessMLPCostProfile.getN(pendingL2Hit.getStackDistance()));
             }
         }
@@ -216,8 +215,8 @@ public class MLPAwareCachePartitioningHelper {
      * To be invoked per cycle for updating elapsed cycles for in-flight L2 cache hits.
      */
     private void updateL2CacheHitElapsedCyclesPerCycle() {
-        for(Map<Integer, PendingL2Hit> pendingL2HitsPerThread : this.pendingL2Hits.values()) {
-            for(PendingL2Hit pendingL2Hit : pendingL2HitsPerThread.values()) {
+        for (Map<Integer, PendingL2Hit> pendingL2HitsPerThread : this.pendingL2Hits.values()) {
+            for (PendingL2Hit pendingL2Hit : pendingL2HitsPerThread.values()) {
                 pendingL2Hit.incrementNumCyclesElapsedSinceAccess();
             }
         }
@@ -227,17 +226,17 @@ public class MLPAwareCachePartitioningHelper {
      * To be invoked per cycle for freeing invalid in-flight L2 cache hits.
      */
     private void freeInvalidL2CacheHitsPerCycle() {
-        for(Map<Integer, PendingL2Hit> pendingL2HitsPerThread : this.pendingL2Hits.values()) {
+        for (Map<Integer, PendingL2Hit> pendingL2HitsPerThread : this.pendingL2Hits.values()) {
             List<Integer> tagsToFree = new ArrayList<Integer>();
 
-            for(PendingL2Hit pendingL2Hit : pendingL2HitsPerThread.values()) {
-                if(pendingL2Hit.getNumCommittedInstructionsSinceAccess() >= this.l2CacheController.getExperiment().getArchitecture().getReorderBufferCapacity()
+            for (PendingL2Hit pendingL2Hit : pendingL2HitsPerThread.values()) {
+                if (pendingL2Hit.getNumCommittedInstructionsSinceAccess() >= this.l2CacheController.getExperiment().getArchitecture().getReorderBufferCapacity()
                         || pendingL2Hit.getNumCyclesElapsedSinceAccess() >= memoryLatencyMeter.getAverageLatency()) {
                     tagsToFree.add(pendingL2Hit.getAccess().getPhysicalTag());
                 }
             }
 
-            for(int tag : tagsToFree) {
+            for (int tag : tagsToFree) {
                 profileEndServicingL2CacheHit(pendingL2HitsPerThread.get(tag).getAccess());
             }
         }
@@ -285,10 +284,9 @@ public class MLPAwareCachePartitioningHelper {
 
         MLPAwareStackDistanceProfile mlpAwareStackDistanceProfile = this.getMlpAwareStackDistanceProfile(access.getThread().getId());
 
-        if(pendingL2Miss.getStackDistance() == -1) {
+        if (pendingL2Miss.getStackDistance() == -1) {
             mlpAwareStackDistanceProfile.incrementMissCounter(this.mlpCostQuantizer.apply(pendingL2Miss.getMlpCost()));
-        }
-        else {
+        } else {
             mlpAwareStackDistanceProfile.incrementHitCounter(pendingL2Miss.getStackDistance(), this.mlpCostQuantizer.apply(pendingL2Miss.getMlpCost()));
         }
     }
@@ -312,7 +310,7 @@ public class MLPAwareCachePartitioningHelper {
             }
         };
 
-        if(!this.pendingL2Hits.containsKey(access.getThread().getId())) {
+        if (!this.pendingL2Hits.containsKey(access.getThread().getId())) {
             this.pendingL2Hits.put(access.getThread().getId(), new LinkedHashMap<Integer, PendingL2Hit>());
         }
 
@@ -338,10 +336,9 @@ public class MLPAwareCachePartitioningHelper {
 
         MLPAwareStackDistanceProfile mlpAwareStackDistanceProfile = this.getMlpAwareStackDistanceProfile(access.getThread().getId());
 
-        if(pendingL2Hit.getStackDistance() == -1) {
+        if (pendingL2Hit.getStackDistance() == -1) {
             mlpAwareStackDistanceProfile.incrementMissCounter(this.mlpCostQuantizer.apply(pendingL2Hit.getMlpCost()));
-        }
-        else {
+        } else {
             mlpAwareStackDistanceProfile.incrementHitCounter(pendingL2Hit.getStackDistance(), this.mlpCostQuantizer.apply(pendingL2Hit.getMlpCost()));
         }
     }
@@ -350,7 +347,7 @@ public class MLPAwareCachePartitioningHelper {
      * Get the LRU stack for the specified thread ID and set index in the L2 cache.
      *
      * @param threadId the thread ID
-     * @param set the set index
+     * @param set      the set index
      * @return the LRU stack for the specified thread ID and set index in the L2 cache
      */
     private LRUStack getLruStack(int threadId, int set) {
@@ -358,7 +355,7 @@ public class MLPAwareCachePartitioningHelper {
             this.lruStacks.put(threadId, new LinkedHashMap<Integer, LRUStack>());
         }
 
-        if(!this.lruStacks.get(threadId).containsKey(set)) {
+        if (!this.lruStacks.get(threadId).containsKey(set)) {
             this.lruStacks.get(threadId).put(set, new LRUStack(threadId, set, this.l2CacheController.getCache().getAssociativity()));
         }
 
@@ -418,10 +415,9 @@ public class MLPAwareCachePartitioningHelper {
          * @param stackDistance the stack distance
          */
         public void incrementCounter(int stackDistance) {
-            if(stackDistance == -1) {
+            if (stackDistance == -1) {
                 missCounter++;
-            }
-            else {
+            } else {
                 this.getHitCounters().set(stackDistance, this.getHitCounters().get(stackDistance) + 1);
             }
         }
@@ -432,10 +428,9 @@ public class MLPAwareCachePartitioningHelper {
          * @param stackDistance the stack distance
          */
         public void decrementCounter(int stackDistance) {
-            if(stackDistance == -1) {
+            if (stackDistance == -1) {
                 missCounter--;
-            }
-            else {
+            } else {
                 this.getHitCounters().set(stackDistance, this.getHitCounters().get(stackDistance) - 1);
             }
         }
@@ -447,7 +442,7 @@ public class MLPAwareCachePartitioningHelper {
          * @return the value of N, which is the number of L2 accesses with stack distance greater than or equal to the specified stack distance
          */
         public int getN(int stackDistance) {
-            if(stackDistance == -1) {
+            if (stackDistance == -1) {
                 return missCounter;
             }
 
@@ -538,7 +533,7 @@ public class MLPAwareCachePartitioningHelper {
         /**
          * Increment the hit counter for the specified stack distance.
          *
-         * @param stackDistance the stack distance
+         * @param stackDistance    the stack distance
          * @param quantizedMlpCost the quantized MLP-cost
          */
         public void incrementHitCounter(int stackDistance, int quantizedMlpCost) {
@@ -547,10 +542,11 @@ public class MLPAwareCachePartitioningHelper {
 
         /**
          * Increment the miss counter.
+         *
          * @param quantizedMlpCost the quantized MLP-cost
          */
         public void incrementMissCounter(int quantizedMlpCost) {
-            this.missCounter+= quantizedMlpCost;
+            this.missCounter += quantizedMlpCost;
         }
 
         /**
@@ -584,8 +580,8 @@ public class MLPAwareCachePartitioningHelper {
         /**
          * Create a per-thread, per-set LRU stack.
          *
-         * @param threadId the thread ID
-         * @param set the set index
+         * @param threadId      the thread ID
+         * @param set           the set index
          * @param associativity the associativity
          */
         public LRUStack(int threadId, int set, int associativity) {
@@ -611,7 +607,7 @@ public class MLPAwareCachePartitioningHelper {
 
             this.tags.push(tag);
 
-            if(this.tags.size() > this.associativity) {
+            if (this.tags.size() > this.associativity) {
                 this.tags.remove(this.tags.size() - 1);
             }
 
@@ -640,12 +636,12 @@ public class MLPAwareCachePartitioningHelper {
     /**
      * Get the total MLP-cost for the specified thread ID and associativity.
      *
-     * @param threadId the thread ID
+     * @param threadId      the thread ID
      * @param associativity the associativity
      * @return the total MLP-cost for the specified thread ID and associativity
      */
     public int getTotalMlpCost(int threadId, int associativity) {
-        if(associativity > this.l2CacheController.getCache().getAssociativity()) {
+        if (associativity > this.l2CacheController.getCache().getAssociativity()) {
             throw new IllegalArgumentException();
         }
 
@@ -653,7 +649,7 @@ public class MLPAwareCachePartitioningHelper {
 
         int totalMlpCost = 0;
 
-        for(int i = associativity - 1; i < this.l2CacheController.getCache().getAssociativity(); i++) {
+        for (int i = associativity - 1; i < this.l2CacheController.getCache().getAssociativity(); i++) {
             totalMlpCost += mlpAwareStackDistanceProfile.getHitCounters().get(i);
         }
 
@@ -669,7 +665,7 @@ public class MLPAwareCachePartitioningHelper {
      * @return the MLP-aware stack distance profile for the specified thread ID
      */
     private MLPAwareStackDistanceProfile getMlpAwareStackDistanceProfile(int threadId) {
-        if(!this.mlpAwareStackDistanceProfiles.containsKey(threadId)) {
+        if (!this.mlpAwareStackDistanceProfiles.containsKey(threadId)) {
             this.mlpAwareStackDistanceProfiles.put(threadId, new MLPAwareStackDistanceProfile(this.l2CacheController.getCache().getAssociativity()));
         }
 
@@ -682,21 +678,21 @@ public class MLPAwareCachePartitioningHelper {
      * @return the minimal sum of MLP-cost and its associated optimal partition
      */
     private Pair<Integer, List<Integer>> getOptimalMlpCostSumAndPartition() {
-        if(partitions == null) {
+        if (partitions == null) {
             partitions = partition(this.l2CacheController.getCache().getAssociativity(), this.numThreads);
         }
 
         int minMlpCostSum = Integer.MAX_VALUE;
         List<Integer> minPartition = null;
 
-        for(List<Integer> partition : partitions) {
+        for (List<Integer> partition : partitions) {
             int sum = 0;
 
-            for(int i = 0; i < partition.size(); i++) {
+            for (int i = 0; i < partition.size(); i++) {
                 sum += getTotalMlpCost(i, partition.get(i));
             }
 
-            if(sum < minMlpCostSum) {
+            if (sum < minMlpCostSum) {
                 minMlpCostSum = sum;
                 minPartition = partition;
             }
@@ -718,7 +714,7 @@ public class MLPAwareCachePartitioningHelper {
         Generator<Integer> generator = Factory.createCompositionGenerator(n);
 
         for (ICombinatoricsVector<Integer> vector : generator) {
-            if(vector.getSize() == k) {
+            if (vector.getSize() == k) {
                 result.add(vector.getVector());
             }
         }

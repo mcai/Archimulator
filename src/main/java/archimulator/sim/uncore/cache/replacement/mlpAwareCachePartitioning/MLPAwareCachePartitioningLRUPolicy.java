@@ -54,27 +54,26 @@ public class MLPAwareCachePartitioningLRUPolicy<StateT extends Serializable> ext
     public CacheAccess<StateT> handleReplacement(MemoryHierarchyAccess access, int set, int tag) {
         int numUsedWays = 0;
 
-        for(int way = 0; way < this.getCache().getAssociativity(); way++) {
+        for (int way = 0; way < this.getCache().getAssociativity(); way++) {
             CacheLine<StateT> line = this.getCache().getLine(set, way);
-            if(line.getAccess() != null && line.getAccess().getThread().getId() == access.getThread().getId()) {
+            if (line.getAccess() != null && line.getAccess().getThread().getId() == access.getThread().getId()) {
                 numUsedWays++;
             }
         }
 
-        if(numUsedWays < getCache().getSimulation().getMlpAwareCachePartitioningHelper().getPartition().get(access.getThread().getId())) {
-            for(int stackPosition = this.getCache().getAssociativity() - 1; stackPosition >= 0; stackPosition++) {
+        if (numUsedWays < getCache().getSimulation().getMlpAwareCachePartitioningHelper().getPartition().get(access.getThread().getId())) {
+            for (int stackPosition = this.getCache().getAssociativity() - 1; stackPosition >= 0; stackPosition--) {
                 int way = this.getWayInStackPosition(set, stackPosition);
                 CacheLine<StateT> line = this.getCache().getLine(set, way);
-                if(line.getAccess() != null && line.getAccess().getThread().getId() != access.getThread().getId()) {
+                if (line.getAccess() != null && line.getAccess().getThread().getId() != access.getThread().getId()) {
                     return new CacheAccess<StateT>(this.getCache(), access, set, way, tag);
                 }
             }
-        }
-        else {
-            for(int stackPosition = this.getCache().getAssociativity() - 1; stackPosition >= 0; stackPosition++) {
+        } else {
+            for (int stackPosition = this.getCache().getAssociativity() - 1; stackPosition >= 0; stackPosition--) {
                 int way = this.getWayInStackPosition(set, stackPosition);
                 CacheLine<StateT> line = this.getCache().getLine(set, way);
-                if(line.getAccess() != null && line.getAccess().getThread().getId() == access.getThread().getId()) {
+                if (line.getAccess() != null && line.getAccess().getThread().getId() == access.getThread().getId()) {
                     return new CacheAccess<StateT>(this.getCache(), access, set, way, tag);
                 }
             }
