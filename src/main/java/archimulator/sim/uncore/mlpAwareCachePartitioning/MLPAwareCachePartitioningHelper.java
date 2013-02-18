@@ -363,277 +363,6 @@ public class MLPAwareCachePartitioningHelper {
     }
 
     /**
-     * Get the partition.
-     *
-     * @return the partition
-     */
-    public List<Integer> getPartition() {
-        return partition;
-    }
-
-    /**
-     * Get the measuring interval in cycles.
-     *
-     * @return the measuring interval in cycles
-     */
-    public int getNumCyclesElapsedPerInterval() {
-        return numCyclesElapsedPerInterval;
-    }
-
-    /**
-     * Get the number of intervals.
-     *
-     * @return the number of intervals
-     */
-    public long getNumIntervals() {
-        return numIntervals;
-    }
-
-    /**
-     * L2 cache access MLP-cost profile.
-     */
-    public class L2CacheAccessMLPCostProfile {
-        private List<Integer> hitCounters;
-        private int missCounter;
-
-        /**
-         * Create an L2 cache access MLP-cost profile.
-         *
-         * @param associativity the associativity
-         */
-        public L2CacheAccessMLPCostProfile(int associativity) {
-            this.hitCounters = new ArrayList<Integer>();
-
-            for (int i = 0; i < associativity; i++) {
-                this.hitCounters.add(0);
-            }
-        }
-
-        /**
-         * Increment the hit counter for the specified stack distance.
-         *
-         * @param stackDistance the stack distance
-         */
-        public void incrementCounter(int stackDistance) {
-            if (stackDistance == -1) {
-                missCounter++;
-            } else {
-                this.getHitCounters().set(stackDistance, this.getHitCounters().get(stackDistance) + 1);
-            }
-        }
-
-        /**
-         * Decrement the hit counter for the specified stack distance.
-         *
-         * @param stackDistance the stack distance
-         */
-        public void decrementCounter(int stackDistance) {
-            if (stackDistance == -1) {
-                missCounter--;
-            } else {
-                this.getHitCounters().set(stackDistance, this.getHitCounters().get(stackDistance) - 1);
-            }
-        }
-
-        /**
-         * Get the value of N, which is the number of L2 accesses with stack distance greater than or equal to the specified stack distance.
-         *
-         * @param stackDistance the stack distance
-         * @return the value of N, which is the number of L2 accesses with stack distance greater than or equal to the specified stack distance
-         */
-        public int getN(int stackDistance) {
-            if (stackDistance == -1) {
-                return missCounter;
-            }
-
-            int n = 0;
-
-            for (int i = stackDistance; i < this.hitCounters.size(); i++) {
-                n += this.hitCounters.get(i);
-            }
-
-            return n;
-        }
-
-        /**
-         * Get the list of hit hitCounters.
-         *
-         * @return the list of hit hitCounters
-         */
-        public List<Integer> getHitCounters() {
-            return hitCounters;
-        }
-    }
-
-    /**
-     * Memory latency meter.
-     */
-    public class MemoryLatencyMeter {
-        private long numSamples;
-        private long totalCycles;
-
-        /**
-         * Record new sample.
-         *
-         * @param latency the memory latency in cycles
-         */
-        public void newSample(int latency) {
-            this.numSamples++;
-            this.totalCycles += latency;
-        }
-
-        /**
-         * Get the number of samples recorded.
-         *
-         * @return the number of samples recorded
-         */
-        public long getNumSamples() {
-            return numSamples;
-        }
-
-        /**
-         * Get the accumulated total number of cycles recorded.
-         *
-         * @return the accumulated total number of cycles recorded
-         */
-        public long getTotalCycles() {
-            return totalCycles;
-        }
-
-        /**
-         * Get the average memory latency in cycles.
-         *
-         * @return the average memory latency in cycles
-         */
-        public int getAverageLatency() {
-            return (int) (totalCycles / numSamples);
-        }
-    }
-
-    /**
-     * MLP-aware stack distance profile.
-     */
-    public class MLPAwareStackDistanceProfile {
-        private List<Integer> hitCounters;
-        private int missCounter;
-
-        /**
-         * Create an MLP-aware stack distance profile.
-         *
-         * @param associativity the associativity
-         */
-        public MLPAwareStackDistanceProfile(int associativity) {
-            this.hitCounters = new ArrayList<Integer>();
-
-            for (int i = 0; i < associativity; i++) {
-                this.hitCounters.add(0);
-            }
-        }
-
-        /**
-         * Increment the hit counter for the specified stack distance.
-         *
-         * @param stackDistance    the stack distance
-         * @param quantizedMlpCost the quantized MLP-cost
-         */
-        public void incrementHitCounter(int stackDistance, int quantizedMlpCost) {
-            this.getHitCounters().set(stackDistance, this.getHitCounters().get(stackDistance) + quantizedMlpCost);
-        }
-
-        /**
-         * Increment the miss counter.
-         *
-         * @param quantizedMlpCost the quantized MLP-cost
-         */
-        public void incrementMissCounter(int quantizedMlpCost) {
-            this.missCounter += quantizedMlpCost;
-        }
-
-        /**
-         * Get the list of hit hitCounters.
-         *
-         * @return the list of hit hitCounters
-         */
-        public List<Integer> getHitCounters() {
-            return hitCounters;
-        }
-
-        /**
-         * Get the miss counter.
-         *
-         * @return the miss counter
-         */
-        public int getMissCounter() {
-            return missCounter;
-        }
-    }
-
-    /**
-     * Per-thread, per-set LRU stack.
-     */
-    public class LRUStack {
-        private int threadId;
-        private int set;
-        private int associativity;
-        private Stack<Integer> tags;
-
-        /**
-         * Create a per-thread, per-set LRU stack.
-         *
-         * @param threadId      the thread ID
-         * @param set           the set index
-         * @param associativity the associativity
-         */
-        public LRUStack(int threadId, int set, int associativity) {
-            this.threadId = threadId;
-            this.set = set;
-            this.associativity = associativity;
-            this.tags = new Stack<Integer>();
-        }
-
-        /**
-         * Access the specified tag.
-         *
-         * @param tag the tag
-         * @return the stack distance of the access
-         */
-        public int access(int tag) {
-            int stackDistance = this.tags.search(tag);
-
-            if (stackDistance != -1) {
-                this.tags.remove((Integer) tag);
-                stackDistance--;
-            }
-
-            this.tags.push(tag);
-
-            if (this.tags.size() > this.associativity) {
-                this.tags.remove(this.tags.size() - 1);
-            }
-
-            return stackDistance;
-        }
-
-        /**
-         * Get the thread ID.
-         *
-         * @return the thread ID
-         */
-        public int getThreadId() {
-            return threadId;
-        }
-
-        /**
-         * Get the set index.
-         *
-         * @return the set index
-         */
-        public int getSet() {
-            return set;
-        }
-    }
-
-    /**
      * Get the total MLP-cost for the specified thread ID and associativity.
      *
      * @param threadId      the thread ID
@@ -702,6 +431,69 @@ public class MLPAwareCachePartitioningHelper {
     }
 
     /**
+     * Get the partition.
+     *
+     * @return the partition
+     */
+    public List<Integer> getPartition() {
+        return partition;
+    }
+
+    /**
+     * Get the measuring interval in cycles.
+     *
+     * @return the measuring interval in cycles
+     */
+    public int getNumCyclesElapsedPerInterval() {
+        return numCyclesElapsedPerInterval;
+    }
+
+    /**
+     * Get the number of intervals.
+     *
+     * @return the number of intervals
+     */
+    public long getNumIntervals() {
+        return numIntervals;
+    }
+
+    /**
+     * Get the L2 cache access MLP-cost profile.
+     *
+     * @return the L2 cache access MLP-cost profile
+     */
+    public L2CacheAccessMLPCostProfile getL2CacheAccessMLPCostProfile() {
+        return l2CacheAccessMLPCostProfile;
+    }
+
+    /**
+     * Get the memory latency meter.
+     *
+     * @return the memory latency meter
+     */
+    public MemoryLatencyMeter getMemoryLatencyMeter() {
+        return memoryLatencyMeter;
+    }
+
+    /**
+     * Get the map of MLP aware stack distance profiles.
+     *
+     * @return the map of MLP aware stack distance profiles
+     */
+    public Map<Integer, MLPAwareStackDistanceProfile> getMlpAwareStackDistanceProfiles() {
+        return mlpAwareStackDistanceProfiles;
+    }
+
+    /**
+     * Get the map of LRU stacks.
+     *
+     * @return the map of LRU stacks
+     */
+    public Map<Integer, Map<Integer, LRUStack>> getLruStacks() {
+        return lruStacks;
+    }
+
+    /**
      * Divide the integer n into k partitions.
      *
      * @param n the integer n to be partitioned
@@ -720,9 +512,5 @@ public class MLPAwareCachePartitioningHelper {
         }
 
         return result;
-    }
-
-    public static void main(String[] args) {
-        System.out.println(partition(16, 4).size());
     }
 }

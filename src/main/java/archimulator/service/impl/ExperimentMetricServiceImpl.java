@@ -87,6 +87,7 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
             this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.HOTSPOT, "hotspotProfilingHelper", ""));
             this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.HELPER_THREAD, "helperThreadL2CacheRequestProfilingHelper", ""));
             this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.FEEDBACK_DIRECTED_HELPER_THREADING, "feedbackDirectedHelperThreadingHelper", ""));
+            this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.MLP_AWARE_CACHE_PARTITIONING, "mlpAwareCachePartitioningHelper", ""));
         }
 
         if (this.getFirstGauge() == null) {
@@ -227,6 +228,12 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.FEEDBACK_DIRECTED_HELPER_THREADING), "pollutionDistribution"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.FEEDBACK_DIRECTED_HELPER_THREADING), "aggressivenessDistribution"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.FEEDBACK_DIRECTED_HELPER_THREADING), "pollutionForInsertionPolicyDistribution"));
+
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.MLP_AWARE_CACHE_PARTITIONING), "partition"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.MLP_AWARE_CACHE_PARTITIONING), "numIntervals"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.MLP_AWARE_CACHE_PARTITIONING), "l2CacheAccessMLPCostProfile/hitCounters"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.MLP_AWARE_CACHE_PARTITIONING), "l2CacheAccessMLPCostProfile/missCounter"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.MLP_AWARE_CACHE_PARTITIONING), "memoryLatencyMeter/averageLatency"));
 
             //TODO: integrate the above gauges into Simulation and expose their management and usages in experiments via web UI.
         }

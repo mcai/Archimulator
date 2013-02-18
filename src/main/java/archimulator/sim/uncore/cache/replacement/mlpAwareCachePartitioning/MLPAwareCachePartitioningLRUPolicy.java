@@ -107,6 +107,6 @@ public class MLPAwareCachePartitioningLRUPolicy<StateT extends Serializable> ext
             throw new IllegalArgumentException();
         }
 
-        return threadIds.get(threadIdA) == threadIds.get(threadIdB);
+        return threadIds.get(threadIdA).equals(threadIds.get(threadIdB));
     }
 }

@@ -220,4 +220,9 @@ public class ExperimentGaugeType implements WithId, WithTitle, WithCreateTime {
      * Feedback directed helper threading.
      */
     public static String FEEDBACK_DIRECTED_HELPER_THREADING = "feedbackDirectedHelperThreading";
+
+    /**
+     * MLP aware cache partitioning.
+     */
+    public static String MLP_AWARE_CACHE_PARTITIONING = "mlpAwareCachePartitioning";
 }
