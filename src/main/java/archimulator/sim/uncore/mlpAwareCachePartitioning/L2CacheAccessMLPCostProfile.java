@@ -50,9 +50,9 @@ public class L2CacheAccessMLPCostProfile {
      */
     public void incrementCounter(int stackDistance) {
         if (stackDistance == -1) {
-            missCounter++;
+            this.missCounter++;
         } else {
-            this.getHitCounters().set(stackDistance, this.getHitCounters().get(stackDistance) + 1);
+            this.hitCounters.set(stackDistance, this.hitCounters.get(stackDistance) + 1);
         }
     }
 
@@ -63,9 +63,9 @@ public class L2CacheAccessMLPCostProfile {
      */
     public void decrementCounter(int stackDistance) {
         if (stackDistance == -1) {
-            missCounter--;
+            this.missCounter--;
         } else {
-            this.getHitCounters().set(stackDistance, this.getHitCounters().get(stackDistance) - 1);
+            this.hitCounters.set(stackDistance, this.hitCounters.get(stackDistance) - 1);
         }
     }
 
@@ -77,7 +77,7 @@ public class L2CacheAccessMLPCostProfile {
      */
     public int getN(int stackDistance) {
         if (stackDistance == -1) {
-            return missCounter;
+            return this.missCounter;
         }
 
         int n = 0;

@@ -25,8 +25,8 @@ import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.replacement.LRUPolicy;
 
 import java.io.Serializable;
-import java.util.Map;
-import java.util.TreeMap;
+
+import static archimulator.sim.uncore.mlpAwareCachePartitioning.MLPAwareCachePartitioningHelper.getThreadIdentifier;
 
 /**
  * MLP-aware cache partitioning based least recently used (LRU) policy.
@@ -58,16 +58,16 @@ public class MLPAwareCachePartitioningLRUPolicy<StateT extends Serializable> ext
 
         for (int way = 0; way < this.getCache().getAssociativity(); way++) {
             CacheLine<StateT> line = this.getCache().getLine(set, way);
-            if (line.getAccess() != null && isSamePartition(line.getAccess().getThread().getId(), access.getThread().getId())) {
+            if (line.getAccess() != null && getThreadIdentifier(line.getAccess().getThread()) == getThreadIdentifier(access.getThread())) {
                 numUsedWays++;
             }
         }
 
-        if (numUsedWays < getCache().getSimulation().getMlpAwareCachePartitioningHelper().getPartition().get(access.getThread().getId())) {
+        if (numUsedWays < getCache().getSimulation().getMlpAwareCachePartitioningHelper().getPartition().get(getThreadIdentifier(access.getThread()))) {
             for (int stackPosition = this.getCache().getAssociativity() - 1; stackPosition >= 0; stackPosition--) {
                 int way = this.getWayInStackPosition(set, stackPosition);
                 CacheLine<StateT> line = this.getCache().getLine(set, way);
-                if (line.getAccess() != null && !isSamePartition(line.getAccess().getThread().getId(), access.getThread().getId())) {
+                if (line.getAccess() != null && getThreadIdentifier(line.getAccess().getThread()) != getThreadIdentifier(access.getThread())) {
                     return new CacheAccess<StateT>(this.getCache(), access, set, way, tag);
                 }
             }
@@ -75,38 +75,12 @@ public class MLPAwareCachePartitioningLRUPolicy<StateT extends Serializable> ext
             for (int stackPosition = this.getCache().getAssociativity() - 1; stackPosition >= 0; stackPosition--) {
                 int way = this.getWayInStackPosition(set, stackPosition);
                 CacheLine<StateT> line = this.getCache().getLine(set, way);
-                if (line.getAccess() != null && isSamePartition(line.getAccess().getThread().getId(), access.getThread().getId())) {
+                if (line.getAccess() != null && getThreadIdentifier(line.getAccess().getThread()) == getThreadIdentifier(access.getThread())) {
                     return new CacheAccess<StateT>(this.getCache(), access, set, way, tag);
                 }
             }
         }
 
         throw new IllegalArgumentException();
-    }
-
-    private static Map<Integer,Integer> threadIds; //TODO: should not be hardcoded!!!
-
-    //TODO: should not be hardcoded!!!
-    static {
-        threadIds = new TreeMap<Integer, Integer>();
-        threadIds.put(0, 0);
-        threadIds.put(1, 0);
-        threadIds.put(2, 1);
-        threadIds.put(3, 1);
-    }
-
-    /**
-     * Get a value indicating whether the given two thread IDs are within the same partition or not.
-     *
-     * @param threadIdA the first thread ID
-     * @param threadIdB the second thread ID
-     * @return a value indicating whether the given two thread IDs are within the same partition or not
-     */
-    private static boolean isSamePartition(int threadIdA, int threadIdB) {
-        if(!threadIds.containsKey(threadIdA) || !threadIds.containsKey(threadIdB)) {
-            throw new IllegalArgumentException();
-        }
-
-        return threadIds.get(threadIdA).equals(threadIds.get(threadIdB));
     }
 }

@@ -34,9 +34,9 @@ public class LRUStack {
     /**
      * Create a per-thread, per-set LRU stack.
      *
-     * @param threadId      the thread ID
-     * @param set           the set index
-     * @param associativity the associativity
+     * @param threadId the thread ID
+     * @param set                the set index
+     * @param associativity      the associativity
      */
     public LRUStack(int threadId, int set, int associativity) {
         this.threadId = threadId;

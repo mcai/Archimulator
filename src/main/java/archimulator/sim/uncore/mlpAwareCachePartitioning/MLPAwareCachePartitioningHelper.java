@@ -26,6 +26,7 @@ import archimulator.sim.uncore.coherence.event.LastLevelCacheControllerLineInser
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.mlp.PendingL2Hit;
 import archimulator.sim.uncore.mlp.PendingL2Miss;
+import archimulator.sim.core.Thread;
 import net.pickapack.Pair;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
@@ -34,7 +35,10 @@ import org.paukov.combinatorics.Factory;
 import org.paukov.combinatorics.Generator;
 import org.paukov.combinatorics.ICombinatoricsVector;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Memory level parallelism (MLP) aware cache partitioning helper.
@@ -90,7 +94,8 @@ public class MLPAwareCachePartitioningHelper {
 
         this.l2CacheAccessMLPCostProfile = new L2CacheAccessMLPCostProfile(l2Associativity);
 
-        this.numThreads = this.l2CacheController.getExperiment().getArchitecture().getNumThreadsPerCore() * this.l2CacheController.getExperiment().getArchitecture().getNumCores();
+//        this.numThreads = this.l2CacheController.getExperiment().getArchitecture().getNumThreadsPerCore() * this.l2CacheController.getExperiment().getArchitecture().getNumCores();
+        this.numThreads = this.l2CacheController.getExperiment().getArchitecture().getNumCores();
 
         this.partition = new ArrayList<Integer>();
 
@@ -180,8 +185,8 @@ public class MLPAwareCachePartitioningHelper {
         l2CacheController.getBlockingEventDispatcher().addListener(InstructionCommittedEvent.class, new Action1<InstructionCommittedEvent>() {
             @Override
             public void apply(InstructionCommittedEvent event) {
-                if (pendingL2Hits.containsKey(event.getDynamicInstruction().getThread().getId())) {
-                    for (PendingL2Hit pendingL2Hit : pendingL2Hits.get(event.getDynamicInstruction().getThread().getId()).values()) {
+                if (pendingL2Hits.containsKey(getThreadIdentifier(event.getDynamicInstruction().getThread()))) {
+                    for (PendingL2Hit pendingL2Hit : pendingL2Hits.get(getThreadIdentifier(event.getDynamicInstruction().getThread())).values()) {
                         pendingL2Hit.incrementNumCommittedInstructionsSinceAccess();
                     }
                 }
@@ -251,7 +256,7 @@ public class MLPAwareCachePartitioningHelper {
         int tag = access.getPhysicalTag();
         int set = this.l2CacheController.getCache().getSet(tag);
 
-        LRUStack lruStack = getLruStack(access.getThread().getId(), set);
+        LRUStack lruStack = getLruStack(getThreadIdentifier(access.getThread()), set);
 
         final int stackDistance = lruStack.access(tag);
 
@@ -282,7 +287,7 @@ public class MLPAwareCachePartitioningHelper {
 
         this.memoryLatencyMeter.newSample(pendingL2Miss.getNumCycles());
 
-        MLPAwareStackDistanceProfile mlpAwareStackDistanceProfile = this.getMlpAwareStackDistanceProfile(access.getThread().getId());
+        MLPAwareStackDistanceProfile mlpAwareStackDistanceProfile = this.getMlpAwareStackDistanceProfile(getThreadIdentifier(access.getThread()));
 
         if (pendingL2Miss.getStackDistance() == -1) {
             mlpAwareStackDistanceProfile.incrementMissCounter(this.mlpCostQuantizer.apply(pendingL2Miss.getMlpCost()));
@@ -300,7 +305,7 @@ public class MLPAwareCachePartitioningHelper {
         int tag = access.getPhysicalTag();
         int set = this.l2CacheController.getCache().getSet(tag);
 
-        LRUStack lruStack = getLruStack(access.getThread().getId(), set);
+        LRUStack lruStack = getLruStack(getThreadIdentifier(access.getThread()), set);
 
         final int stackDistance = lruStack.access(tag);
 
@@ -310,11 +315,11 @@ public class MLPAwareCachePartitioningHelper {
             }
         };
 
-        if (!this.pendingL2Hits.containsKey(access.getThread().getId())) {
-            this.pendingL2Hits.put(access.getThread().getId(), new LinkedHashMap<Integer, PendingL2Hit>());
+        if (!this.pendingL2Hits.containsKey(getThreadIdentifier(access.getThread()))) {
+            this.pendingL2Hits.put(getThreadIdentifier(access.getThread()), new LinkedHashMap<Integer, PendingL2Hit>());
         }
 
-        this.pendingL2Hits.get(access.getThread().getId()).put(tag, pendingL2Hit);
+        this.pendingL2Hits.get(getThreadIdentifier(access.getThread())).put(tag, pendingL2Hit);
 
         this.l2CacheAccessMLPCostProfile.incrementCounter(stackDistance);
     }
@@ -327,14 +332,14 @@ public class MLPAwareCachePartitioningHelper {
     private void profileEndServicingL2CacheHit(MemoryHierarchyAccess access) {
         int tag = access.getPhysicalTag();
 
-        PendingL2Hit pendingL2Hit = this.pendingL2Hits.get(access.getThread().getId()).get(tag);
+        PendingL2Hit pendingL2Hit = this.pendingL2Hits.get(getThreadIdentifier(access.getThread())).get(tag);
         pendingL2Hit.setEndCycle(this.l2CacheController.getCycleAccurateEventQueue().getCurrentCycle());
 
         this.l2CacheAccessMLPCostProfile.decrementCounter(pendingL2Hit.getStackDistance());
 
-        this.pendingL2Hits.get(access.getThread().getId()).remove(tag);
+        this.pendingL2Hits.get(getThreadIdentifier(access.getThread())).remove(tag);
 
-        MLPAwareStackDistanceProfile mlpAwareStackDistanceProfile = this.getMlpAwareStackDistanceProfile(access.getThread().getId());
+        MLPAwareStackDistanceProfile mlpAwareStackDistanceProfile = this.getMlpAwareStackDistanceProfile(getThreadIdentifier(access.getThread()));
 
         if (pendingL2Hit.getStackDistance() == -1) {
             mlpAwareStackDistanceProfile.incrementMissCounter(this.mlpCostQuantizer.apply(pendingL2Hit.getMlpCost()));
@@ -512,5 +517,15 @@ public class MLPAwareCachePartitioningHelper {
         }
 
         return result;
+    }
+
+    /**
+     * Get the identifier for the specified thread.
+     *
+     * @param thread the thread
+     * @return the identifier for the specified thread
+     */
+    public static int getThreadIdentifier(Thread thread) {
+        return thread.getCore().getNum();
     }
 }
