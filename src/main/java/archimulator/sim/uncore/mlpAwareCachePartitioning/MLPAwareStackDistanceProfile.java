@@ -63,6 +63,17 @@ public class MLPAwareStackDistanceProfile {
     }
 
     /**
+     * Begins new interval.
+     */
+    public void newInterval() {
+        for(int i = 0; i < this.hitCounters.size(); i++) {
+            this.hitCounters.set(i, (int) (this.hitCounters.get(i) * RHO));
+        }
+
+        this.missCounter *= RHO;
+    }
+
+    /**
      * Get the list of hit counters.
      *
      * @return the list of hit counters
@@ -79,4 +90,6 @@ public class MLPAwareStackDistanceProfile {
     public int getMissCounter() {
         return missCounter;
     }
+
+    private static final double RHO = 0.5f;
 }

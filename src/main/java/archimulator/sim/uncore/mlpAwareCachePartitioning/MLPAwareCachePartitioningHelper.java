@@ -198,7 +198,11 @@ public class MLPAwareCachePartitioningHelper {
      * New interval.
      */
     private void newInterval() {
-        this.partition = getOptimalMlpCostSumAndPartition().getSecond();
+        this.partition = this.getOptimalMlpCostSumAndPartition().getSecond();
+
+        for(MLPAwareStackDistanceProfile mlpAwareStackDistanceProfile : this.mlpAwareStackDistanceProfiles.values()) {
+            mlpAwareStackDistanceProfile.newInterval();
+        }
     }
 
     /**
@@ -379,7 +383,7 @@ public class MLPAwareCachePartitioningHelper {
             throw new IllegalArgumentException();
         }
 
-        MLPAwareStackDistanceProfile mlpAwareStackDistanceProfile = getMlpAwareStackDistanceProfile(threadId);
+        MLPAwareStackDistanceProfile mlpAwareStackDistanceProfile = this.getMlpAwareStackDistanceProfile(threadId);
 
         int totalMlpCost = 0;
 
@@ -412,18 +416,18 @@ public class MLPAwareCachePartitioningHelper {
      * @return the minimal sum of MLP-cost and its associated optimal partition
      */
     private Pair<Integer, List<Integer>> getOptimalMlpCostSumAndPartition() {
-        if (partitions == null) {
-            partitions = partition(this.l2CacheController.getCache().getAssociativity(), this.numThreads);
+        if (this.partitions == null) {
+            this.partitions = partition(this.l2CacheController.getCache().getAssociativity(), this.numThreads);
         }
 
         int minMlpCostSum = Integer.MAX_VALUE;
         List<Integer> minPartition = null;
 
-        for (List<Integer> partition : partitions) {
+        for (List<Integer> partition : this.partitions) {
             int sum = 0;
 
             for (int i = 0; i < partition.size(); i++) {
-                sum += getTotalMlpCost(i, partition.get(i));
+                sum += this.getTotalMlpCost(i, partition.get(i));
             }
 
             if (sum < minMlpCostSum) {
