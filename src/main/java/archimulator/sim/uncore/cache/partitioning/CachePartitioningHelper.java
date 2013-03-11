@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache.partitioning;
 
+import archimulator.sim.common.Simulation;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import net.pickapack.action.Action;
 
@@ -41,6 +42,20 @@ public abstract class CachePartitioningHelper {
 
     private List<Integer> partition;
 
+    /**
+     * Create a cache partitioning helper.
+     *
+     * @param simulation the simulation
+     */
+    public CachePartitioningHelper(Simulation simulation) {
+        this(simulation.getProcessor().getMemoryHierarchy().getL2CacheController());
+    }
+
+    /**
+     * Create a cache partitioning helper.
+     *
+     * @param l2CacheController the L2 cache controller
+     */
     public CachePartitioningHelper(DirectoryController l2CacheController) {
         this.l2CacheController = l2CacheController;
 
