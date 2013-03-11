@@ -33,7 +33,7 @@ public class BranchPredictorTest {
      * @param args the arguments
      */
     public static void main(String[] args) {
-        final BranchPredictor2 branchPredictor = new MyBranchPredictor();
+        final BranchPredictor2 branchPredictor = new BranchPredictor2Impl();
 
         final Counter counterDirectionMispredictions = new Counter(0);
         final Counter counterTargetMispredictions = new Counter(0);

@@ -19,6 +19,8 @@
 package archimulator.sim.core.bpred2;
 
 /**
+ * Branch update object.
+ *
  * @author Min Cai
  */
 public class BranchUpdate {
@@ -26,7 +28,7 @@ public class BranchUpdate {
     private int predictedTarget;
 
     /**
-     *
+     * Create a branch update object.
      */
     public BranchUpdate() {
         this.predictedDirection = false;
@@ -34,28 +36,36 @@ public class BranchUpdate {
     }
 
     /**
-     * @return
+     * Get a value indicating whether the actual direction is the same as the predicted one or not.
+     *
+     * @return a value indicating whether the actual direction is the same as the predicted one or not
      */
     public boolean isPredictedDirection() {
         return predictedDirection;
     }
 
     /**
-     * @param predictedDirection
+     * Set a value indicating whether the actual direction is the same as the predicted one or not.
+     *
+     * @param predictedDirection a value indicating whether the actual direction is the same as the predicted one or not
      */
     public void setPredictedDirection(boolean predictedDirection) {
         this.predictedDirection = predictedDirection;
     }
 
     /**
-     * @return
+     * Get the predicted target address.
+     *
+     * @return the predicted target address
      */
     public int getPredictedTarget() {
         return predictedTarget;
     }
 
     /**
-     * @param predictedTarget
+     * Set the predicted target address.
+     *
+     * @param predictedTarget the predicted target address
      */
     public void setPredictedTarget(int predictedTarget) {
         this.predictedTarget = predictedTarget;

@@ -26,18 +26,24 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /**
+ * Branch predictor trace tester.
+ *
  * @author Min Cai
  */
 public class BranchPredictorTraceTester extends TraceTester<BranchPredictorTraceRecord> {
     /**
-     * @param fileName
+     * Create a branch predictor trace tester.
+     *
+     * @param fileName the file name
      */
     public BranchPredictorTraceTester(String fileName) {
         super(fileName);
     }
 
     /**
-     * @return
+     * Read the next record from the trace file.
+     *
+     * @return the next record
      */
     @Override
     protected BranchPredictorTraceRecord readNext() {

@@ -24,9 +24,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * A branch predictor test implementation.
+ *
  * @author Min Cai
  */
-public class MyBranchPredictor implements BranchPredictor2 {
+public class BranchPredictor2Impl implements BranchPredictor2 {
     private static final int HISTORY_LENGTH = 15;
     private static final int TABLE_BITS = 15;
 
@@ -34,9 +36,9 @@ public class MyBranchPredictor implements BranchPredictor2 {
     private List<SaturatingCounter> tab;
 
     /**
-     *
+     * Create a branch predictor test implementation.
      */
-    public MyBranchPredictor() {
+    public BranchPredictor2Impl() {
         this.history = 0;
 
         this.tab = new ArrayList<SaturatingCounter>();
@@ -46,8 +48,10 @@ public class MyBranchPredictor implements BranchPredictor2 {
     }
 
     /**
-     * @param branchInfo
-     * @return
+     * Predict.
+     *
+     * @param branchInfo the branch information object
+     * @return the result branch update object
      */
     public BranchUpdate predict(BranchInfo branchInfo) {
         MyBranchUpdate branchUpdate = new MyBranchUpdate();
@@ -63,10 +67,12 @@ public class MyBranchPredictor implements BranchPredictor2 {
     }
 
     /**
-     * @param branchInfo
-     * @param branchUpdate
-     * @param taken
-     * @param target
+     * Update.
+     *
+     * @param branchInfo   the branch information object
+     * @param branchUpdate the branch update object
+     * @param taken        a value indicating whether the branch is taken or not
+     * @param target       the branch target address
      */
     public void update(BranchInfo branchInfo, BranchUpdate branchUpdate, boolean taken, int target) {
         if (!(branchUpdate instanceof MyBranchUpdate)) {
@@ -82,16 +88,32 @@ public class MyBranchPredictor implements BranchPredictor2 {
         }
     }
 
+    /**
+     * A custom branch update object.
+     */
     private static class MyBranchUpdate extends BranchUpdate {
         private int index;
 
+        /**
+         * Create a custom branch update object.
+         */
         private MyBranchUpdate() {
         }
 
+        /**
+         * Get the index.
+         *
+         * @return the index
+         */
         public int getIndex() {
             return index;
         }
 
+        /**
+         * Set the index.
+         *
+         * @param index the index
+         */
         public void setIndex(int index) {
             this.index = index;
         }

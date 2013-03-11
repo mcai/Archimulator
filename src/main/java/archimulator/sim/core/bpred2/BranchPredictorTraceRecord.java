@@ -19,6 +19,8 @@
 package archimulator.sim.core.bpred2;
 
 /**
+ * Branch predictor trace record.
+ *
  * @author Min Cai
  */
 public class BranchPredictorTraceRecord {
@@ -27,9 +29,11 @@ public class BranchPredictorTraceRecord {
     private BranchInfo branchInfo;
 
     /**
-     * @param taken
-     * @param target
-     * @param branchInfo
+     * Create a branch predictor trace record.
+     *
+     * @param taken      a value indicating whether the branch is taken or not
+     * @param target     the target address
+     * @param branchInfo the branch information object
      */
     public BranchPredictorTraceRecord(boolean taken, int target, BranchInfo branchInfo) {
         this.taken = taken;
@@ -38,21 +42,27 @@ public class BranchPredictorTraceRecord {
     }
 
     /**
-     * @return
+     * Get a value indicating whether the branch is taken or not.
+     *
+     * @return a value indicating whether the branch is taken or not
      */
     public boolean isTaken() {
         return taken;
     }
 
     /**
-     * @return
+     * Get the target address.
+     *
+     * @return the target address
      */
     public int getTarget() {
         return target;
     }
 
     /**
-     * @return
+     * Get the branch information object.
+     *
+     * @return the branch information object
      */
     public BranchInfo getBranchInfo() {
         return branchInfo;
