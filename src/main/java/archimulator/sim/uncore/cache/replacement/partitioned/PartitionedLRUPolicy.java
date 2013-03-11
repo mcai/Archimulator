@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.cache.replacement.mlpAwareCachePartitioning;
+package archimulator.sim.uncore.cache.replacement.partitioned;
 
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.CacheAccess;
@@ -25,22 +25,23 @@ import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.replacement.LRUPolicy;
 
 import java.io.Serializable;
+import java.util.List;
 
-import static archimulator.sim.uncore.mlpAwareCachePartitioning.MLPAwareCachePartitioningHelper.getThreadIdentifier;
+import static archimulator.sim.uncore.cache.partitioning.mlpAware.MLPAwareCachePartitioningHelper.getThreadIdentifier;
 
 /**
- * MLP-aware cache partitioning based least recently used (LRU) policy.
+ * Partitioned least recently used (LRU) policy.
  *
  * @param <StateT> the state type of the parent evictable cache
  * @author Min Cai
  */
-public class MLPAwareCachePartitioningLRUPolicy<StateT extends Serializable> extends LRUPolicy<StateT> {
+public abstract class PartitionedLRUPolicy<StateT extends Serializable> extends LRUPolicy<StateT> {
     /**
-     * Create a MLP-aware cache partitioning based least recently used (LRU) policy for the specified evictable cache.
+     * Create a partitioned least recently used (LRU) policy for the specified evictable cache.
      *
      * @param cache the parent evictable cache
      */
-    public MLPAwareCachePartitioningLRUPolicy(EvictableCache<StateT> cache) {
+    public PartitionedLRUPolicy(EvictableCache<StateT> cache) {
         super(cache);
     }
 
@@ -63,7 +64,7 @@ public class MLPAwareCachePartitioningLRUPolicy<StateT extends Serializable> ext
             }
         }
 
-        if (numUsedWays < getCache().getSimulation().getMlpAwareCachePartitioningHelper().getPartition().get(getThreadIdentifier(access.getThread()))) {
+        if (numUsedWays < getPartition().get(getThreadIdentifier(access.getThread()))) {
             for (int stackPosition = this.getCache().getAssociativity() - 1; stackPosition >= 0; stackPosition--) {
                 int way = this.getWayInStackPosition(set, stackPosition);
                 CacheLine<StateT> line = this.getCache().getLine(set, way);
@@ -83,4 +84,11 @@ public class MLPAwareCachePartitioningLRUPolicy<StateT extends Serializable> ext
 
         throw new IllegalArgumentException();
     }
+
+    /**
+     * Get the partition.
+     *
+     * @return the partition
+     */
+    protected abstract List<Integer> getPartition();
 }

@@ -21,7 +21,7 @@ package archimulator.sim.uncore.cache.replacement;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.replacement.helperThread.HelperThreadAwareLRUPolicy;
 import archimulator.sim.uncore.cache.replacement.helperThread.HelperThreadIntervalAwareLRUPolicy;
-import archimulator.sim.uncore.cache.replacement.mlpAwareCachePartitioning.MLPAwareCachePartitioningLRUPolicy;
+import archimulator.sim.uncore.cache.replacement.partitioned.mlpAware.MLPAwarePartitionedLRUPolicy;
 import archimulator.sim.uncore.cache.replacement.rereferenceIntervalPrediction.RereferenceIntervalPredictionPolicy;
 import archimulator.sim.uncore.cache.replacement.reuseDistancePrediction.ReuseDistancePredictionPolicy;
 
@@ -60,7 +60,7 @@ public class CacheReplacementPolicyFactory {
             case REREFERENCE_INTERVAL_PREDICTION:
                 return new RereferenceIntervalPredictionPolicy<StateT>(cache);
             case MLP_AWARE_CACHE_PARTITIONING_LRU:
-                return new MLPAwareCachePartitioningLRUPolicy<StateT>(cache);
+                return new MLPAwarePartitionedLRUPolicy<StateT>(cache);
             default:
                 throw new IllegalArgumentException();
         }

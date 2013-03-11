@@ -16,26 +16,26 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.mlpAwareCachePartitioning;
+package archimulator.sim.uncore.cache.partitioning.mlpAware;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * L2 cache access MLP-cost profile.
+ * MLP-aware stack distance profile.
  *
  * @author Min Cai
  */
-public class L2CacheAccessMLPCostProfile {
+public class MLPAwareStackDistanceProfile {
     private List<Integer> hitCounters;
     private int missCounter;
 
     /**
-     * Create an L2 cache access MLP-cost profile.
+     * Create an MLP-aware stack distance profile.
      *
      * @param associativity the associativity
      */
-    public L2CacheAccessMLPCostProfile(int associativity) {
+    public MLPAwareStackDistanceProfile(int associativity) {
         this.hitCounters = new ArrayList<Integer>();
 
         for (int i = 0; i < associativity; i++) {
@@ -46,47 +46,31 @@ public class L2CacheAccessMLPCostProfile {
     /**
      * Increment the hit counter for the specified stack distance.
      *
-     * @param stackDistance the stack distance
+     * @param stackDistance    the stack distance
+     * @param quantizedMlpCost the quantized MLP-cost
      */
-    public void incrementCounter(int stackDistance) {
-        if (stackDistance == -1) {
-            this.missCounter++;
-        } else {
-            this.hitCounters.set(stackDistance, this.hitCounters.get(stackDistance) + 1);
-        }
+    public void incrementHitCounter(int stackDistance, int quantizedMlpCost) {
+        this.getHitCounters().set(stackDistance, this.getHitCounters().get(stackDistance) + quantizedMlpCost);
     }
 
     /**
-     * Decrement the hit counter for the specified stack distance.
+     * Increment the miss counter.
      *
-     * @param stackDistance the stack distance
+     * @param quantizedMlpCost the quantized MLP-cost
      */
-    public void decrementCounter(int stackDistance) {
-        if (stackDistance == -1) {
-            this.missCounter--;
-        } else {
-            this.hitCounters.set(stackDistance, this.hitCounters.get(stackDistance) - 1);
-        }
+    public void incrementMissCounter(int quantizedMlpCost) {
+        this.missCounter += quantizedMlpCost;
     }
 
     /**
-     * Get the value of N, which is the number of L2 accesses with stack distance greater than or equal to the specified stack distance.
-     *
-     * @param stackDistance the stack distance
-     * @return the value of N, which is the number of L2 accesses with stack distance greater than or equal to the specified stack distance
+     * Begins new interval.
      */
-    public int getN(int stackDistance) {
-        if (stackDistance == -1) {
-            return this.missCounter;
+    public void newInterval() {
+        for(int i = 0; i < this.hitCounters.size(); i++) {
+            this.hitCounters.set(i, (int) (this.hitCounters.get(i) * RHO));
         }
 
-        int n = 0;
-
-        for (int i = stackDistance; i < this.hitCounters.size(); i++) {
-            n += this.hitCounters.get(i);
-        }
-
-        return n;
+        this.missCounter *= RHO;
     }
 
     /**
@@ -106,4 +90,6 @@ public class L2CacheAccessMLPCostProfile {
     public int getMissCounter() {
         return missCounter;
     }
+
+    private static final double RHO = 0.5f;
 }

@@ -16,11 +16,14 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.mlpAwareCachePartitioning;
+package archimulator.sim.uncore.cache.partitioning.mlpAware;
 
 import archimulator.sim.common.Simulation;
 import archimulator.sim.core.event.InstructionCommittedEvent;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
+import archimulator.sim.uncore.cache.partitioning.CachePartitioningHelper;
+import archimulator.sim.uncore.cache.partitioning.LRUStack;
+import archimulator.sim.uncore.cache.partitioning.MemoryLatencyMeter;
 import archimulator.sim.uncore.coherence.event.GeneralCacheControllerServiceNonblockingRequestEvent;
 import archimulator.sim.uncore.coherence.event.LastLevelCacheControllerLineInsertEvent;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
@@ -45,25 +48,15 @@ import java.util.Map;
  *
  * @author Min Cai
  */
-public class MLPAwareCachePartitioningHelper {
-    private DirectoryController l2CacheController;
-
+public class MLPAwareCachePartitioningHelper extends CachePartitioningHelper {
     private Map<Integer, PendingL2Miss> pendingL2Misses;
     private Map<Integer, Map<Integer, PendingL2Hit>> pendingL2Hits;
 
     private L2CacheAccessMLPCostProfile l2CacheAccessMLPCostProfile;
 
-    private int numCyclesElapsedPerInterval;
-
-    private long numIntervals;
-    private int numCyclesElapsed;
-
-    private List<Integer> partition;
-
     private MemoryLatencyMeter memoryLatencyMeter;
 
     private Map<Integer, MLPAwareStackDistanceProfile> mlpAwareStackDistanceProfiles;
-    private int numThreads;
 
     private Map<Integer, Map<Integer, LRUStack>> lruStacks;
 
@@ -85,19 +78,12 @@ public class MLPAwareCachePartitioningHelper {
      * @param l2CacheController the L2 cache controller
      */
     public MLPAwareCachePartitioningHelper(final DirectoryController l2CacheController) {
-        this.l2CacheController = l2CacheController;
+        super(l2CacheController);
 
         this.pendingL2Misses = new LinkedHashMap<Integer, PendingL2Miss>();
         this.pendingL2Hits = new LinkedHashMap<Integer, Map<Integer, PendingL2Hit>>();
 
-        int l2Associativity = this.l2CacheController.getCache().getAssociativity();
-
-        this.l2CacheAccessMLPCostProfile = new L2CacheAccessMLPCostProfile(l2Associativity);
-
-//        this.numThreads = this.l2CacheController.getExperiment().getArchitecture().getNumThreadsPerCore() * this.l2CacheController.getExperiment().getArchitecture().getNumCores();
-        this.numThreads = this.l2CacheController.getExperiment().getArchitecture().getNumCores();
-
-        this.partition = new ArrayList<Integer>();
+        this.l2CacheAccessMLPCostProfile = new L2CacheAccessMLPCostProfile(this.getL2CacheController().getCache().getAssociativity());
 
         this.memoryLatencyMeter = new MemoryLatencyMeter();
 
@@ -132,19 +118,9 @@ public class MLPAwareCachePartitioningHelper {
             }
         };
 
-        if (l2Associativity < this.numThreads) {
-            throw new IllegalArgumentException();
-        }
-
-        for (int i = 0; i < this.numThreads; i++) {
-            this.partition.add(l2Associativity / this.numThreads);
-        }
-
-        this.numCyclesElapsedPerInterval = 5000000;
-
         l2CacheController.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, new Action1<GeneralCacheControllerServiceNonblockingRequestEvent>() {
             public void apply(GeneralCacheControllerServiceNonblockingRequestEvent event) {
-                if (event.getCacheController().equals(MLPAwareCachePartitioningHelper.this.l2CacheController)) {
+                if (event.getCacheController().equals(getL2CacheController())) {
                     if (!event.isHitInCache()) {
                         profileBeginServicingL2CacheMiss(event.getAccess());
                     } else {
@@ -157,7 +133,7 @@ public class MLPAwareCachePartitioningHelper {
         l2CacheController.getBlockingEventDispatcher().addListener(LastLevelCacheControllerLineInsertEvent.class, new Action1<LastLevelCacheControllerLineInsertEvent>() {
             @Override
             public void apply(LastLevelCacheControllerLineInsertEvent event) {
-                if (event.getCacheController().equals(MLPAwareCachePartitioningHelper.this.l2CacheController)) {
+                if (event.getCacheController().equals(getL2CacheController())) {
                     profileEndServicingL2CacheMiss(event.getAccess());
                 }
             }
@@ -169,15 +145,6 @@ public class MLPAwareCachePartitioningHelper {
                 updateL2CacheAccessMlpCostsPerCycle();
                 updateL2CacheHitElapsedCyclesPerCycle();
                 freeInvalidL2CacheHitsPerCycle();
-
-                numCyclesElapsed++;
-
-                if (numCyclesElapsed == numCyclesElapsedPerInterval) {
-                    newInterval();
-
-                    numCyclesElapsed = 0;
-                    numIntervals++;
-                }
 
             }
         });
@@ -197,8 +164,9 @@ public class MLPAwareCachePartitioningHelper {
     /**
      * New interval.
      */
-    private void newInterval() {
-        this.partition = this.getOptimalMlpCostSumAndPartition().getSecond();
+    @Override
+    protected void newInterval() {
+        this.setPartition(this.getOptimalMlpCostSumAndPartition().getSecond());
 
         for(MLPAwareStackDistanceProfile mlpAwareStackDistanceProfile : this.mlpAwareStackDistanceProfiles.values()) {
             mlpAwareStackDistanceProfile.newInterval();
@@ -239,7 +207,7 @@ public class MLPAwareCachePartitioningHelper {
             List<Integer> tagsToFree = new ArrayList<Integer>();
 
             for (PendingL2Hit pendingL2Hit : pendingL2HitsPerThread.values()) {
-                if (pendingL2Hit.getNumCommittedInstructionsSinceAccess() >= this.l2CacheController.getExperiment().getArchitecture().getReorderBufferCapacity()
+                if (pendingL2Hit.getNumCommittedInstructionsSinceAccess() >= this.getL2CacheController().getExperiment().getArchitecture().getReorderBufferCapacity()
                         || pendingL2Hit.getNumCyclesElapsedSinceAccess() >= memoryLatencyMeter.getAverageLatency()) {
                     tagsToFree.add(pendingL2Hit.getAccess().getPhysicalTag());
                 }
@@ -258,13 +226,13 @@ public class MLPAwareCachePartitioningHelper {
      */
     private void profileBeginServicingL2CacheMiss(MemoryHierarchyAccess access) {
         int tag = access.getPhysicalTag();
-        int set = this.l2CacheController.getCache().getSet(tag);
+        int set = this.getL2CacheController().getCache().getSet(tag);
 
         LRUStack lruStack = getLruStack(getThreadIdentifier(access.getThread()), set);
 
         final int stackDistance = lruStack.access(tag);
 
-        PendingL2Miss pendingL2Miss = new PendingL2Miss(access, l2CacheController.getCycleAccurateEventQueue().getCurrentCycle()) {
+        PendingL2Miss pendingL2Miss = new PendingL2Miss(access, getL2CacheController().getCycleAccurateEventQueue().getCurrentCycle()) {
             {
                 setStackDistance(stackDistance);
             }
@@ -283,7 +251,7 @@ public class MLPAwareCachePartitioningHelper {
         int tag = access.getPhysicalTag();
 
         PendingL2Miss pendingL2Miss = this.pendingL2Misses.get(tag);
-        pendingL2Miss.setEndCycle(this.l2CacheController.getCycleAccurateEventQueue().getCurrentCycle());
+        pendingL2Miss.setEndCycle(this.getL2CacheController().getCycleAccurateEventQueue().getCurrentCycle());
 
         this.l2CacheAccessMLPCostProfile.decrementCounter(pendingL2Miss.getStackDistance());
 
@@ -307,13 +275,13 @@ public class MLPAwareCachePartitioningHelper {
      */
     private void profileBeginServicingL2CacheHit(MemoryHierarchyAccess access) {
         int tag = access.getPhysicalTag();
-        int set = this.l2CacheController.getCache().getSet(tag);
+        int set = this.getL2CacheController().getCache().getSet(tag);
 
         LRUStack lruStack = getLruStack(getThreadIdentifier(access.getThread()), set);
 
         final int stackDistance = lruStack.access(tag);
 
-        PendingL2Hit pendingL2Hit = new PendingL2Hit(access, l2CacheController.getCycleAccurateEventQueue().getCurrentCycle()) {
+        PendingL2Hit pendingL2Hit = new PendingL2Hit(access, getL2CacheController().getCycleAccurateEventQueue().getCurrentCycle()) {
             {
                 setStackDistance(stackDistance);
             }
@@ -337,7 +305,7 @@ public class MLPAwareCachePartitioningHelper {
         int tag = access.getPhysicalTag();
 
         PendingL2Hit pendingL2Hit = this.pendingL2Hits.get(getThreadIdentifier(access.getThread())).get(tag);
-        pendingL2Hit.setEndCycle(this.l2CacheController.getCycleAccurateEventQueue().getCurrentCycle());
+        pendingL2Hit.setEndCycle(this.getL2CacheController().getCycleAccurateEventQueue().getCurrentCycle());
 
         this.l2CacheAccessMLPCostProfile.decrementCounter(pendingL2Hit.getStackDistance());
 
@@ -365,7 +333,7 @@ public class MLPAwareCachePartitioningHelper {
         }
 
         if (!this.lruStacks.get(threadId).containsKey(set)) {
-            this.lruStacks.get(threadId).put(set, new LRUStack(threadId, set, this.l2CacheController.getCache().getAssociativity()));
+            this.lruStacks.get(threadId).put(set, new LRUStack(threadId, set, this.getL2CacheController().getCache().getAssociativity()));
         }
 
         return this.lruStacks.get(threadId).get(set);
@@ -379,7 +347,7 @@ public class MLPAwareCachePartitioningHelper {
      * @return the total MLP-cost for the specified thread ID and associativity
      */
     public int getTotalMlpCost(int threadId, int associativity) {
-        if (associativity > this.l2CacheController.getCache().getAssociativity()) {
+        if (associativity > this.getL2CacheController().getCache().getAssociativity()) {
             throw new IllegalArgumentException();
         }
 
@@ -387,7 +355,7 @@ public class MLPAwareCachePartitioningHelper {
 
         int totalMlpCost = 0;
 
-        for (int i = associativity - 1; i < this.l2CacheController.getCache().getAssociativity(); i++) {
+        for (int i = associativity - 1; i < this.getL2CacheController().getCache().getAssociativity(); i++) {
             totalMlpCost += mlpAwareStackDistanceProfile.getHitCounters().get(i);
         }
 
@@ -404,7 +372,7 @@ public class MLPAwareCachePartitioningHelper {
      */
     private MLPAwareStackDistanceProfile getMlpAwareStackDistanceProfile(int threadId) {
         if (!this.mlpAwareStackDistanceProfiles.containsKey(threadId)) {
-            this.mlpAwareStackDistanceProfiles.put(threadId, new MLPAwareStackDistanceProfile(this.l2CacheController.getCache().getAssociativity()));
+            this.mlpAwareStackDistanceProfiles.put(threadId, new MLPAwareStackDistanceProfile(this.getL2CacheController().getCache().getAssociativity()));
         }
 
         return this.mlpAwareStackDistanceProfiles.get(threadId);
@@ -417,7 +385,7 @@ public class MLPAwareCachePartitioningHelper {
      */
     private Pair<Integer, List<Integer>> getOptimalMlpCostSumAndPartition() {
         if (this.partitions == null) {
-            this.partitions = partition(this.l2CacheController.getCache().getAssociativity(), this.numThreads);
+            this.partitions = partition(this.getL2CacheController().getCache().getAssociativity(), this.getNumThreads());
         }
 
         int minMlpCostSum = Integer.MAX_VALUE;
@@ -437,33 +405,6 @@ public class MLPAwareCachePartitioningHelper {
         }
 
         return new Pair<Integer, List<Integer>>(minMlpCostSum, minPartition);
-    }
-
-    /**
-     * Get the partition.
-     *
-     * @return the partition
-     */
-    public List<Integer> getPartition() {
-        return partition;
-    }
-
-    /**
-     * Get the measuring interval in cycles.
-     *
-     * @return the measuring interval in cycles
-     */
-    public int getNumCyclesElapsedPerInterval() {
-        return numCyclesElapsedPerInterval;
-    }
-
-    /**
-     * Get the number of intervals.
-     *
-     * @return the number of intervals
-     */
-    public long getNumIntervals() {
-        return numIntervals;
     }
 
     /**

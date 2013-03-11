@@ -32,7 +32,7 @@ import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestProfilingHelper;
 import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestState;
 import archimulator.sim.uncore.helperThread.HelperThreadingHelper;
-import archimulator.sim.uncore.stackDistanceProfile.StackDistanceProfilingHelper;
+import archimulator.sim.uncore.cache.stackDistanceProfile.StackDistanceProfilingHelper;
 import net.pickapack.action.Action1;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 

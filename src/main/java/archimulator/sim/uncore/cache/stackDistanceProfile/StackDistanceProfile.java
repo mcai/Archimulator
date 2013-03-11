@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.stackDistanceProfile;
+package archimulator.sim.uncore.cache.stackDistanceProfile;
 
 import java.util.ArrayList;
 import java.util.List;

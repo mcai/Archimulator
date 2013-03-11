@@ -40,8 +40,8 @@ import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestProfilingH
 import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestQuality;
 import archimulator.sim.uncore.helperThread.hotspot.HotspotProfilingHelper;
 import archimulator.sim.uncore.mlp.MLPProfilingHelper;
-import archimulator.sim.uncore.mlpAwareCachePartitioning.MLPAwareCachePartitioningHelper;
-import archimulator.sim.uncore.stackDistanceProfile.StackDistanceProfilingHelper;
+import archimulator.sim.uncore.cache.partitioning.mlpAware.MLPAwareCachePartitioningHelper;
+import archimulator.sim.uncore.cache.stackDistanceProfile.StackDistanceProfilingHelper;
 import archimulator.util.RuntimeHelper;
 import net.pickapack.Reference;
 import net.pickapack.action.Predicate;
