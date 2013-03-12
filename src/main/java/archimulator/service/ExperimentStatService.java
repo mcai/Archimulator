@@ -111,23 +111,12 @@ public interface ExperimentStatService extends Service {
     void invalidateSummaryByParent(Experiment parent);
 
     /**
-     * Generate a table of summaries for the specified title, baseline experiment and a list of experiments.
-     *
-     * @param title              the title
-     * @param baselineExperiment the baseline experiment
-     * @param experiments        a list of experiments
-     * @return a table of summaries for the specified title, baseline experiment and a list of experiments
-     */
-    @Deprecated
-    Table tableSummary(String title, Experiment baselineExperiment, List<Experiment> experiments);
-
-    /**
      * Generate a table of summaries for the specified list of experiments.
      *
      * @param experiments a list of experiments
      * @return a table of summaries for the specified list of experiments
      */
-    Table tableSummary2(List<Experiment> experiments);
+    Table tableSummary(List<Experiment> experiments);
 
     /**
      * Get the list of breakdowns for the specified list of experiments and the keys function.

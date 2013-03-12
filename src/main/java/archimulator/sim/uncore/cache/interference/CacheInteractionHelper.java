@@ -128,11 +128,11 @@ public class CacheInteractionHelper {
     }
 
     /**
-     * Get the ratio of constructive L2 cache inter-thread interactions.
+     * Get the ratio of L2 cache inter-thread constructive interactions.
      *
-     * @return the ratio of constructive L2 cache inter-thread interactions
+     * @return the ratio of L2 cache inter-thread constructive interactions
      */
-    public double getConstructiveL2CacheInterThreadInteractionRatio() {
+    public double getL2CacheInterThreadConstructiveInteractionRatio() {
         return this.getNumL2CacheInterThreadInteractions() == 0 ? 0 : (double) (this.numL2CacheInterThreadConstructiveInteractions) / this.getNumL2CacheInterThreadInteractions();
     }
 }
