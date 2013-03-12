@@ -32,6 +32,7 @@ import archimulator.sim.os.Context;
 import archimulator.sim.os.Kernel;
 import archimulator.sim.uncore.BasicMemoryHierarchy;
 import archimulator.sim.uncore.MemoryHierarchy;
+import archimulator.sim.uncore.cache.interference.CacheInteractionHelper;
 import archimulator.sim.uncore.cache.prediction.CacheBasedPredictor;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import archimulator.sim.uncore.delinquentLoad.DelinquentLoadIdentificationHelper;
@@ -86,6 +87,8 @@ public abstract class Simulation implements SimulationObject {
     private HotspotProfilingHelper hotspotProfilingHelper;
 
     private HelperThreadL2CacheRequestProfilingHelper helperThreadL2CacheRequestProfilingHelper;
+
+    private CacheInteractionHelper cacheInteractionHelper;
 
     private FeedbackDirectedHelperThreadingHelper feedbackDirectedHelperThreadingHelper;
 
@@ -173,6 +176,7 @@ public abstract class Simulation implements SimulationObject {
 
         if (getExperiment().getArchitecture().getHelperThreadL2CacheRequestProfilingEnabled()) {
             this.helperThreadL2CacheRequestProfilingHelper = new HelperThreadL2CacheRequestProfilingHelper(this);
+            this.cacheInteractionHelper = new CacheInteractionHelper(this);
         }
 
         //TODO: handle configuration support of conditional attribute
@@ -729,6 +733,15 @@ public abstract class Simulation implements SimulationObject {
      */
     public HelperThreadL2CacheRequestProfilingHelper getHelperThreadL2CacheRequestProfilingHelper() {
         return helperThreadL2CacheRequestProfilingHelper;
+    }
+
+    /**
+     * Get the cache interaction helper.
+     *
+     * @return the cache interaction helper
+     */
+    public CacheInteractionHelper getCacheInteractionHelper() {
+        return cacheInteractionHelper;
     }
 
     /**

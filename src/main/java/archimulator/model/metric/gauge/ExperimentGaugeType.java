@@ -217,6 +217,11 @@ public class ExperimentGaugeType implements WithId, WithTitle, WithCreateTime {
     public static String HELPER_THREAD = "helperThread";
 
     /**
+     * Cache interaction.
+     */
+    public static String CACHE_INTERACTION = "cacheInteraction";
+
+    /**
      * Feedback directed helper threading.
      */
     public static String FEEDBACK_DIRECTED_HELPER_THREADING = "feedbackDirectedHelperThreading";

@@ -86,6 +86,7 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
             this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.STACK_DISTANCE, "stackDistanceProfilingHelper", ""));
             this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.HOTSPOT, "hotspotProfilingHelper", ""));
             this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.HELPER_THREAD, "helperThreadL2CacheRequestProfilingHelper", ""));
+            this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.CACHE_INTERACTION, "cacheInteractionHelper", ""));
             this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.FEEDBACK_DIRECTED_HELPER_THREADING, "feedbackDirectedHelperThreadingHelper", ""));
             this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.MLP_AWARE_CACHE_PARTITIONING, "mlpAwareCachePartitioningHelper", ""));
         }
@@ -208,6 +209,11 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HELPER_THREAD), "helperThreadL2CacheRequestQualityPredictor/numHits"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HELPER_THREAD), "helperThreadL2CacheRequestQualityPredictor/numMisses"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HELPER_THREAD), "helperThreadL2CacheRequestQualityPredictor/hitRatio"));
+
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.CACHE_INTERACTION), "numL2CacheInterThreadInteractions"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.CACHE_INTERACTION), "numL2CacheInterThreadConstructiveInteractions"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.CACHE_INTERACTION), "numL2CacheInterThreadEvictions"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.CACHE_INTERACTION), "constructiveL2CacheInterThreadInteractionRatio"));
 
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.FEEDBACK_DIRECTED_HELPER_THREADING), "numEvictedL2CacheLinesPerInterval"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.FEEDBACK_DIRECTED_HELPER_THREADING), "numIntervals"));

@@ -18,7 +18,6 @@
  ******************************************************************************/
 package archimulator.sim.uncore.helperThread;
 
-import archimulator.model.ContextMapping;
 import archimulator.sim.core.Thread;
 
 /**
@@ -33,7 +32,7 @@ public class HelperThreadingHelper {
      * @param thread the thread
      * @return a value indicating whether the specified thread is the main thread if the helper threading scheme
      */
-    public static boolean isMainThread(archimulator.sim.core.Thread thread) {
+    public static boolean isMainThread(Thread thread) {
         return isMainThread(thread.getId());
     }
 
