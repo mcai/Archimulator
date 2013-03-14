@@ -354,26 +354,6 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
                             "helperThreadL2CacheRequestProfilingHelper/numRedundantHitToCacheHelperThreadL2CacheRequests", 0) : 0
             );
 
-            summary.setNumL2CacheInterThreadInteractions(
-                    helperThreadEnabled ? parent.getStatValueAsLong(statsMap, parent.getMeasurementTitlePrefix() +
-                            "cacheInteractionHelper/numL2CacheInterThreadInteractions", 0) : 0
-            );
-
-            summary.setNumL2CacheInterThreadConstructiveInteractions(
-                    helperThreadEnabled ? parent.getStatValueAsLong(statsMap, parent.getMeasurementTitlePrefix() +
-                            "cacheInteractionHelper/numL2CacheInterThreadConstructiveInteractions", 0) : 0
-            );
-
-            summary.setNumL2CacheInterThreadEvictions(
-                    helperThreadEnabled ? parent.getStatValueAsLong(statsMap, parent.getMeasurementTitlePrefix() +
-                            "cacheInteractionHelper/numL2CacheInterThreadEvictions", 0) : 0
-            );
-
-            summary.setL2CacheInterThreadConstructiveInteractionRatio(
-                    helperThreadEnabled ? parent.getStatValueAsDouble(statsMap, parent.getMeasurementTitlePrefix() +
-                            "cacheInteractionHelper/l2CacheInterThreadConstructiveInteractionRatio", 0.0f) : 0.0f
-            );
-
             this.addItem(this.summaries, summary);
         }
     }
@@ -435,12 +415,7 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
                 "Bad",
                 "Ugly",
                 "Redundant_MSHR",
-                "Redundant_Cache",
-
-                "L2.InterThreadInteractions",
-                "L2.InterThreadConstructiveInteractions",
-                "L2.InterThreadEvictions",
-                "L2.InterThreadConstructiveInteraction_Ratio"
+                "Redundant_Cache"
         ), new ArrayList<List<String>>() {{
             for (Experiment experiment : experiments) {
                 add(getSummaryByParent(experiment).tableSummary2Row());
