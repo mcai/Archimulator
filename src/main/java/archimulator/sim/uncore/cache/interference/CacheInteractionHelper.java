@@ -24,6 +24,9 @@ import archimulator.sim.uncore.coherence.event.GeneralCacheControllerServiceNonb
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import net.pickapack.action.Action1;
 
+import java.util.Map;
+import java.util.TreeMap;
+
 /**
  * Cache interaction helper.
  *
@@ -32,8 +35,8 @@ import net.pickapack.action.Action1;
 public class CacheInteractionHelper {
     private DirectoryController l2CacheController;
 
-    private long numL2CacheInterThreadConstructiveInteractions;
-    private long numL2CacheInterThreadEvictions;
+    private Map<Integer, Map<Integer, Long>> numL2CacheInterThreadConstructiveInteractions;
+    private Map<Integer, Map<Integer, Long>> numL2CacheInterThreadEvictions;
 
     /**
      * Create a cache interaction helper.
@@ -52,6 +55,9 @@ public class CacheInteractionHelper {
     public CacheInteractionHelper(final DirectoryController l2CacheController) {
         this.l2CacheController = l2CacheController;
 
+        this.numL2CacheInterThreadConstructiveInteractions = new TreeMap<Integer, Map<Integer, Long>>();
+        this.numL2CacheInterThreadEvictions = new TreeMap<Integer, Map<Integer, Long>>();
+
         l2CacheController.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, new Action1<GeneralCacheControllerServiceNonblockingRequestEvent>() {
             public void apply(GeneralCacheControllerServiceNonblockingRequestEvent event) {
                 if (event.getCacheController().equals(CacheInteractionHelper.this.l2CacheController) && event.isHitInCache()) {
@@ -69,7 +75,15 @@ public class CacheInteractionHelper {
                     }
 
                     if(broughterThreadId != requesterThreadId) {
-                        numL2CacheInterThreadConstructiveInteractions++;
+                        if(!numL2CacheInterThreadConstructiveInteractions.containsKey(broughterThreadId)) {
+                            numL2CacheInterThreadConstructiveInteractions.put(broughterThreadId, new TreeMap<Integer, Long>());
+                        }
+
+                        if(!numL2CacheInterThreadConstructiveInteractions.get(broughterThreadId).containsKey(requesterThreadId)) {
+                            numL2CacheInterThreadConstructiveInteractions.get(broughterThreadId).put(requesterThreadId, 0L);
+                        }
+
+                        numL2CacheInterThreadConstructiveInteractions.get(broughterThreadId).put(requesterThreadId, numL2CacheInterThreadConstructiveInteractions.get(broughterThreadId).get(requesterThreadId) + 1);
                     }
                 }
             }
@@ -93,7 +107,15 @@ public class CacheInteractionHelper {
                     }
 
                     if(broughterThreadId != requesterThreadId) {
-                        numL2CacheInterThreadEvictions++;
+                        if(!numL2CacheInterThreadEvictions.containsKey(broughterThreadId)) {
+                            numL2CacheInterThreadEvictions.put(broughterThreadId, new TreeMap<Integer, Long>());
+                        }
+
+                        if(!numL2CacheInterThreadEvictions.get(broughterThreadId).containsKey(requesterThreadId)) {
+                            numL2CacheInterThreadEvictions.get(broughterThreadId).put(requesterThreadId, 0L);
+                        }
+
+                        numL2CacheInterThreadEvictions.get(broughterThreadId).put(requesterThreadId, numL2CacheInterThreadEvictions.get(broughterThreadId).get(requesterThreadId) + 1);
                     }
                 }
             }
@@ -101,20 +123,11 @@ public class CacheInteractionHelper {
     }
 
     /**
-     * Get the number of L2 cache inter-thread interactions.
-     *
-     * @return the number of L2 cache inter-thread interactions
-     */
-    public long getNumL2CacheInterThreadInteractions() {
-        return this.numL2CacheInterThreadConstructiveInteractions + this.numL2CacheInterThreadEvictions;
-    }
-
-    /**
      * Get the number of L2 cache inter-thread constructive interactions.
      *
      * @return the number of L2 cache inter-thread constructive interactions
      */
-    public long getNumL2CacheInterThreadConstructiveInteractions() {
+    public Map<Integer, Map<Integer, Long>> getNumL2CacheInterThreadConstructiveInteractions() {
         return numL2CacheInterThreadConstructiveInteractions;
     }
 
@@ -123,16 +136,7 @@ public class CacheInteractionHelper {
      *
      * @return the number of L2 cache inter-thread evictions
      */
-    public long getNumL2CacheInterThreadEvictions() {
+    public Map<Integer, Map<Integer, Long>> getNumL2CacheInterThreadEvictions() {
         return numL2CacheInterThreadEvictions;
-    }
-
-    /**
-     * Get the ratio of L2 cache inter-thread constructive interactions.
-     *
-     * @return the ratio of L2 cache inter-thread constructive interactions
-     */
-    public double getL2CacheInterThreadConstructiveInteractionRatio() {
-        return this.getNumL2CacheInterThreadInteractions() == 0 ? 0 : (double) (this.numL2CacheInterThreadConstructiveInteractions) / this.getNumL2CacheInterThreadInteractions();
     }
 }

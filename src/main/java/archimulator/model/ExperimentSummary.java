@@ -152,18 +152,6 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
     @DatabaseField
     private long numRedundantHitToCacheHelperThreadL2CacheRequests;
 
-    @DatabaseField
-    private long numL2CacheInterThreadInteractions;
-
-    @DatabaseField
-    private long numL2CacheInterThreadConstructiveInteractions;
-
-    @DatabaseField
-    private long numL2CacheInterThreadEvictions;
-
-    @DatabaseField
-    private double l2CacheInterThreadConstructiveInteractionRatio;
-
     /**
      * Create an experiment summary. Reserved for ORM only.
      */
@@ -824,78 +812,6 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
     }
 
     /**
-     * Get the number of L2 cache inter-thread interactions.
-     *
-     * @return the number of L2 cache inter-thread interactions
-     */
-    public long getNumL2CacheInterThreadInteractions() {
-        return numL2CacheInterThreadInteractions;
-    }
-
-    /**
-     * Set the number of L2 cache inter-thread interactions.
-     *
-     * @param numL2CacheInterThreadInteractions the number of L2 cache inter-thread interactions
-     */
-    public void setNumL2CacheInterThreadInteractions(long numL2CacheInterThreadInteractions) {
-        this.numL2CacheInterThreadInteractions = numL2CacheInterThreadInteractions;
-    }
-
-    /**
-     * Get the number of L2 cache inter-thread constructive interactions.
-     *
-     * @return the number of L2 cache inter-thread constructive interactions
-     */
-    public long getNumL2CacheInterThreadConstructiveInteractions() {
-        return numL2CacheInterThreadConstructiveInteractions;
-    }
-
-    /**
-     * Set the number of L2 cache inter-thread constructive interactions.
-     *
-     * @param numL2CacheInterThreadConstructiveInteractions the number of L2 cache inter-thread constructive interactions
-     */
-    public void setNumL2CacheInterThreadConstructiveInteractions(long numL2CacheInterThreadConstructiveInteractions) {
-        this.numL2CacheInterThreadConstructiveInteractions = numL2CacheInterThreadConstructiveInteractions;
-    }
-
-    /**
-     * Get the number of L2 cache inter-thread evictions.
-     *
-     * @return the number of L2 cache inter-thread evictions
-     */
-    public long getNumL2CacheInterThreadEvictions() {
-        return numL2CacheInterThreadEvictions;
-    }
-
-    /**
-     * Set the number of L2 cache inter-thread evictions.
-     *
-     * @param numL2CacheInterThreadEvictions the number of L2 cache inter-thread evictions
-     */
-    public void setNumL2CacheInterThreadEvictions(long numL2CacheInterThreadEvictions) {
-        this.numL2CacheInterThreadEvictions = numL2CacheInterThreadEvictions;
-    }
-
-    /**
-     * Get the ratio of constructive L2 cache inter-thread interactions.
-     *
-     * @return the ratio of constructive L2 cache inter-thread interactions
-     */
-    public double getL2CacheInterThreadConstructiveInteractionRatio() {
-        return l2CacheInterThreadConstructiveInteractionRatio;
-    }
-
-    /**
-     * Set the ratio of L2 cache inter-thread constructive interactions.
-     *
-     * @param l2CacheInterThreadConstructiveInteractionRatio the ratio of L2 cache inter-thread constructive interactions
-     */
-    public void setL2CacheInterThreadConstructiveInteractionRatio(double l2CacheInterThreadConstructiveInteractionRatio) {
-        this.l2CacheInterThreadConstructiveInteractionRatio = l2CacheInterThreadConstructiveInteractionRatio;
-    }
-
-    /**
      * Get the parent experiment object.
      *
      * @return the parent experiment object
@@ -957,11 +873,6 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
             add(numUglyHelperThreadL2CacheRequests + "");
             add(numRedundantHitToTransientTagHelperThreadL2CacheRequests + "");
             add(numRedundantHitToCacheHelperThreadL2CacheRequests + "");
-
-            add(numL2CacheInterThreadInteractions + "");
-            add(numL2CacheInterThreadConstructiveInteractions + "");
-            add(numL2CacheInterThreadEvictions + "");
-            add(l2CacheInterThreadConstructiveInteractionRatio + "");
         }};
     }
 }

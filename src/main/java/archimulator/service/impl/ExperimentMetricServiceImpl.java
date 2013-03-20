@@ -210,10 +210,8 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HELPER_THREAD), "helperThreadL2CacheRequestQualityPredictor/numMisses"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.HELPER_THREAD), "helperThreadL2CacheRequestQualityPredictor/hitRatio"));
 
-            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.CACHE_INTERACTION), "numL2CacheInterThreadInteractions"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.CACHE_INTERACTION), "numL2CacheInterThreadConstructiveInteractions"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.CACHE_INTERACTION), "numL2CacheInterThreadEvictions"));
-            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.CACHE_INTERACTION), "l2CacheInterThreadConstructiveInteractionRatio"));
 
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.FEEDBACK_DIRECTED_HELPER_THREADING), "numEvictedL2CacheLinesPerInterval"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.FEEDBACK_DIRECTED_HELPER_THREADING), "numIntervals"));
