@@ -31,12 +31,12 @@ import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.PreparedDelete;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
-import net.pickapack.Pair;
+import net.pickapack.util.Pair;
 import net.pickapack.action.Function1;
 import net.pickapack.action.Function2;
 import net.pickapack.model.WithId;
 import net.pickapack.service.AbstractService;
-import net.pickapack.util.CollectionHelper;
+import net.pickapack.collection.CollectionHelper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.math3.stat.StatUtils;
@@ -44,8 +44,8 @@ import org.apache.commons.math3.stat.StatUtils;
 import java.sql.SQLException;
 import java.util.*;
 
-import static net.pickapack.util.CollectionHelper.toMap;
-import static net.pickapack.util.CollectionHelper.transform;
+import static net.pickapack.collection.CollectionHelper.toMap;
+import static net.pickapack.collection.CollectionHelper.transform;
 
 /**
  * Experiment stat service implementation.

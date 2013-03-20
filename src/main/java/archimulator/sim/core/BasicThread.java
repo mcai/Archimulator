@@ -28,7 +28,7 @@ import archimulator.sim.isa.StaticInstruction;
 import archimulator.sim.isa.StaticInstructionType;
 import archimulator.sim.isa.event.PseudoCallEncounteredEvent;
 import archimulator.sim.os.ContextState;
-import net.pickapack.Reference;
+import net.pickapack.util.Reference;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
 

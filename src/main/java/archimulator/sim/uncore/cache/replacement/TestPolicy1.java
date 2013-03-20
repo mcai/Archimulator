@@ -20,7 +20,7 @@ package archimulator.sim.uncore.cache.replacement;
 
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.EvictableCache;
-import net.pickapack.IntegerIntegerPair;
+import net.pickapack.util.IntegerIntegerPair;
 
 import java.io.Serializable;
 import java.util.ArrayList;

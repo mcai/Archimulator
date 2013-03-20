@@ -27,14 +27,14 @@ import archimulator.sim.os.Kernel;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.misc.TransactionManager;
 import com.j256.ormlite.stmt.*;
-import net.pickapack.JsonSerializationHelper;
-import net.pickapack.Reference;
+import net.pickapack.io.serialization.JsonSerializationHelper;
+import net.pickapack.util.Reference;
 import net.pickapack.action.Function1;
 import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
 import net.pickapack.model.WithId;
 import net.pickapack.service.AbstractService;
-import net.pickapack.util.CollectionHelper;
+import net.pickapack.collection.CollectionHelper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 

@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.util;
 
-import net.pickapack.StorageUnit;
+import net.pickapack.util.StorageUnit;
 
 import java.text.MessageFormat;
 

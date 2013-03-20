@@ -23,7 +23,7 @@ import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
-import net.pickapack.StorageUnit;
+import net.pickapack.util.StorageUnit;
 import net.pickapack.dateTime.DateHelper;
 import net.pickapack.model.WithCreateTime;
 import net.pickapack.model.WithId;

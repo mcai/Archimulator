@@ -32,7 +32,7 @@ import net.pickapack.model.WithCreateTime;
 import net.pickapack.model.WithId;
 import net.pickapack.model.WithParentId;
 import net.pickapack.model.WithTitle;
-import net.pickapack.util.CollectionHelper;
+import net.pickapack.collection.CollectionHelper;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;

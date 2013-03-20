@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.isa;
 
-import net.pickapack.Pair;
+import net.pickapack.util.Pair;
 
 /**
  * Register dependency type.

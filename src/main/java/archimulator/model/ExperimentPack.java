@@ -9,8 +9,8 @@ import net.pickapack.dateTime.DateHelper;
 import net.pickapack.model.WithCreateTime;
 import net.pickapack.model.WithId;
 import net.pickapack.model.WithTitle;
-import net.pickapack.util.CollectionHelper;
-import net.pickapack.util.CombinationHelper;
+import net.pickapack.collection.CollectionHelper;
+import net.pickapack.collection.CombinationHelper;
 import org.apache.commons.beanutils.BeanUtils;
 
 import java.lang.reflect.Field;

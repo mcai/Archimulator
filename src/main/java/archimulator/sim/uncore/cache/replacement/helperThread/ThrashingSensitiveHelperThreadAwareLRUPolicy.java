@@ -25,7 +25,7 @@ import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.replacement.LRUPolicy;
 import archimulator.sim.uncore.helperThread.HelperThreadingHelper;
-import net.pickapack.IntegerIntegerPair;
+import net.pickapack.util.IntegerIntegerPair;
 import net.pickapack.util.ValueProvider;
 import net.pickapack.util.ValueProviderFactory;
 

@@ -19,9 +19,9 @@
 package archimulator.util.plot;
 
 import com.Ostermiller.util.CSVPrinter;
-import net.pickapack.Pair;
+import net.pickapack.util.Pair;
 import net.pickapack.action.Function1;
-import net.pickapack.util.CollectionHelper;
+import net.pickapack.collection.CollectionHelper;
 import org.apache.commons.io.IOUtils;
 import org.eobjects.metamodel.DataContext;
 import org.eobjects.metamodel.DataContextFactory;

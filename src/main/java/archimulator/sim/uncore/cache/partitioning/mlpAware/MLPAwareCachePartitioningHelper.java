@@ -30,7 +30,7 @@ import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.mlp.PendingL2Hit;
 import archimulator.sim.uncore.mlp.PendingL2Miss;
 import archimulator.sim.core.Thread;
-import net.pickapack.Pair;
+import net.pickapack.util.Pair;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
 import net.pickapack.action.Function1;

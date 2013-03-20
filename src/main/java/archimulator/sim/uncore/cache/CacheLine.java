@@ -19,7 +19,7 @@
 package archimulator.sim.uncore.cache;
 
 import archimulator.sim.uncore.MemoryHierarchyAccess;
-import net.pickapack.Params;
+import net.pickapack.util.Params;
 import net.pickapack.util.ValueProvider;
 
 import java.io.Serializable;

@@ -20,7 +20,7 @@ package archimulator.sim.common;
 
 import archimulator.model.Experiment;
 import archimulator.sim.os.Kernel;
-import net.pickapack.Reference;
+import net.pickapack.util.Reference;
 import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
 

@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.util.plot;
 
-import net.pickapack.Pair;
+import net.pickapack.util.Pair;
 
 import java.util.ArrayList;
 import java.util.Arrays;

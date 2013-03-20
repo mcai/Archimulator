@@ -22,7 +22,7 @@ import com.j256.ormlite.field.FieldType;
 import com.j256.ormlite.field.SqlType;
 import com.j256.ormlite.field.types.BaseDataType;
 import com.j256.ormlite.support.DatabaseResults;
-import net.pickapack.JsonSerializationHelper;
+import net.pickapack.io.serialization.JsonSerializationHelper;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;

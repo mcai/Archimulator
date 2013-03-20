@@ -26,7 +26,7 @@ import archimulator.sim.isa.event.InstructionFunctionallyExecutedEvent;
 import archimulator.sim.isa.event.PseudoCallEncounteredEvent;
 import archimulator.sim.os.Context;
 import archimulator.sim.os.FunctionCallContext;
-import net.pickapack.Reference;
+import net.pickapack.util.Reference;
 import net.pickapack.math.MathHelper;
 
 import java.lang.reflect.InvocationTargetException;

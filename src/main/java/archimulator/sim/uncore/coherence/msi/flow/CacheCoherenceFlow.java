@@ -20,8 +20,8 @@ package archimulator.sim.uncore.coherence.msi.flow;
 
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.msi.controller.Controller;
-import net.pickapack.Params;
-import net.pickapack.tree.Node;
+import net.pickapack.util.Params;
+import net.pickapack.collection.tree.Node;
 
 import java.util.ArrayList;
 import java.util.List;

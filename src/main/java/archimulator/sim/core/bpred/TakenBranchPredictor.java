@@ -20,7 +20,7 @@ package archimulator.sim.core.bpred;
 
 import archimulator.sim.core.Thread;
 import archimulator.sim.isa.Mnemonic;
-import net.pickapack.Reference;
+import net.pickapack.util.Reference;
 
 /**
  * The "always taken" branch predictor.
