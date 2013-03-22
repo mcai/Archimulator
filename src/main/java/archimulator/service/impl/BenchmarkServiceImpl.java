@@ -116,7 +116,7 @@ public class BenchmarkServiceImpl extends AbstractService implements BenchmarkSe
             this.addBenchmark(new Benchmark(
                     "mst_ht_sim", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/ht",
                     "mst.mips",
-                    "1000", "", true));
+                    "1000", "", true)); //TODO: 1200 nodes as in [Changhee Jung, IPDPS'06]
         }
 
         if (this.getBenchmarkByTitle("em3d_baseline_sim") == null) {
@@ -130,7 +130,7 @@ public class BenchmarkServiceImpl extends AbstractService implements BenchmarkSe
             this.addBenchmark(new Benchmark(
                     "em3d_ht_sim", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/em3d/ht",
                     "em3d.mips",
-                    "1000 128 75 1", "", true));
+                    "1000 128 75 1", "", true)); //TODO: 200,000 as in [Changhee Jung, IPDPS'06]
         }
 
         if (this.getBenchmarkByTitle("429_mcf_baseline_sim") == null) {
