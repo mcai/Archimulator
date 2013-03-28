@@ -23,11 +23,11 @@ import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
 import archimulator.sim.uncore.dram.MemoryControllerType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
-import net.pickapack.util.StorageUnit;
 import net.pickapack.dateTime.DateHelper;
 import net.pickapack.model.WithCreateTime;
 import net.pickapack.model.WithId;
 import net.pickapack.model.WithTitle;
+import net.pickapack.util.StorageUnit;
 import net.pickapack.util.StorageUnitHelper;
 
 import java.util.Date;
@@ -62,6 +62,9 @@ public class Architecture implements WithId, WithTitle, WithCreateTime {
 
     @DatabaseField
     private boolean dynamicSpeculativePrecomputationEnabled;
+
+    @DatabaseField
+    private int numMainThreadWaysInStaticPartitionedLRUPolicy;
 
     @DatabaseField
     private int numCores;
@@ -281,6 +284,8 @@ public class Architecture implements WithId, WithTitle, WithCreateTime {
      *                                a value indicating whether the helper thread L2 request profiling is enabled or not
      * @param dynamicSpeculativePrecomputationEnabled
      *                                a value indicating whether the dynamic speculative precomputation is enabled or not
+     * @param numMainThreadWaysInStaticPartitionedLRUPolicy
+     *                                the number of main thread ways used in the static partitioned LRU policy for the shared L2 cache
      * @param numCores                the number of cores
      * @param numThreadsPerCore       the number of threads per core
      * @param l1ISize                 the size of the L1I caches in bytes
@@ -291,7 +296,7 @@ public class Architecture implements WithId, WithTitle, WithCreateTime {
      * @param l2Assoc                 the associativity of the L2 cache
      * @param l2ReplacementPolicyType the replacement policy type of the L2 cache
      */
-    public Architecture(boolean hotspotProfilingEnabled, boolean helperThreadL2CacheRequestProfilingEnabled, boolean dynamicSpeculativePrecomputationEnabled, int numCores, int numThreadsPerCore, int l1ISize, int l1IAssoc, int l1DSize, int l1DAssoc, int l2Size, int l2Assoc, CacheReplacementPolicyType l2ReplacementPolicyType) {
+    public Architecture(boolean hotspotProfilingEnabled, boolean helperThreadL2CacheRequestProfilingEnabled, boolean dynamicSpeculativePrecomputationEnabled, int numMainThreadWaysInStaticPartitionedLRUPolicy, int numCores, int numThreadsPerCore, int l1ISize, int l1IAssoc, int l1DSize, int l1DAssoc, int l2Size, int l2Assoc, CacheReplacementPolicyType l2ReplacementPolicyType) {
         this.createTime = DateHelper.toTick(new Date());
 
         this.hotspotProfilingEnabled = hotspotProfilingEnabled;
@@ -301,6 +306,8 @@ public class Architecture implements WithId, WithTitle, WithCreateTime {
 
         this.delinquentLoadIdentificationEnabled = false;
         this.dynamicSpeculativePrecomputationEnabled = dynamicSpeculativePrecomputationEnabled;
+
+        this.numMainThreadWaysInStaticPartitionedLRUPolicy = numMainThreadWaysInStaticPartitionedLRUPolicy;
 
         this.numCores = numCores;
         this.numThreadsPerCore = numThreadsPerCore;
@@ -393,7 +400,7 @@ public class Architecture implements WithId, WithTitle, WithCreateTime {
                 + "-" + "L1I_" + StorageUnit.toString(this.l1ISize).replaceAll(" ", "") + "_" + "Assoc" + this.l1IAssociativity
                 + "-" + "l1D_" + StorageUnit.toString(this.l1DSize).replaceAll(" ", "") + "_" + "Assoc" + this.l1DAssociativity
                 + "-" + "L2_" + StorageUnit.toString(this.l2Size).replaceAll(" ", "") + "_" + "Assoc" + this.l2Associativity
-                + "_" + this.l2ReplacementPolicyType;
+                + "_" + this.l2ReplacementPolicyType+ "_MTPart" + this.numMainThreadWaysInStaticPartitionedLRUPolicy;
     }
 
     /**
@@ -482,6 +489,15 @@ public class Architecture implements WithId, WithTitle, WithCreateTime {
      */
     public boolean getDynamicSpeculativePrecomputationEnabled() {
         return dynamicSpeculativePrecomputationEnabled;
+    }
+
+    /**
+     * Get the number of main thread ways used in the static partitioned LRU policy for the shared L2 cache.
+     *
+     * @return the number of main thread ways used in the static partitioned LRU policy for the shared L2 cache
+     */
+    public int getNumMainThreadWaysInStaticPartitionedLRUPolicy() {
+        return numMainThreadWaysInStaticPartitionedLRUPolicy;
     }
 
     /**
@@ -1142,6 +1158,16 @@ public class Architecture implements WithId, WithTitle, WithCreateTime {
      */
     public void setDynamicSpeculativePrecomputationEnabled(boolean dynamicSpeculativePrecomputationEnabled) {
         this.dynamicSpeculativePrecomputationEnabled = dynamicSpeculativePrecomputationEnabled;
+    }
+
+    /**
+     * Set the number of main thread ways used in the static partitioned LRU policy for the shared L2 cache.
+     *
+     * @param numMainThreadWaysInStaticPartitionedLRUPolicy
+     *         the number of main thread ways used in the static partitioned LRU policy for the shared L2 cache
+     */
+    public void setNumMainThreadWaysInStaticPartitionedLRUPolicy(int numMainThreadWaysInStaticPartitionedLRUPolicy) {
+        this.numMainThreadWaysInStaticPartitionedLRUPolicy = numMainThreadWaysInStaticPartitionedLRUPolicy;
     }
 
     /**

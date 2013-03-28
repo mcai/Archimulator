@@ -49,7 +49,7 @@ public class ArchitectureServiceImpl extends AbstractService implements Architec
 
     @Override
     public void initialize() {
-        this.getOrAddArchitecture(true, true, false, 2, 2, 32 * 1024, 8, 32 * 1024, 8, 4 * 1024 * 1024, 16, CacheReplacementPolicyType.LRU);
+        this.getOrAddArchitecture(true, true, false, -1, 2, 2, 32 * 1024, 8, 32 * 1024, 8, 4 * 1024 * 1024, 16, CacheReplacementPolicyType.LRU);
     }
 
     @Override
@@ -103,8 +103,8 @@ public class ArchitectureServiceImpl extends AbstractService implements Architec
     }
 
     @Override
-    public Architecture getOrAddArchitecture(boolean hotspotProfilingEnabled, boolean helperThreadL2CacheRequestProfilingEnabled, boolean dynamicSpeculativePrecomputationEnabled, int numCores, int numThreadsPerCore, int l1ISize, int l1IAssociativity, int l1DSize, int l1DAssociativity, int l2Size, int l2Associativity, CacheReplacementPolicyType l2ReplacementPolicyType) {
-        Architecture architecture = new Architecture(hotspotProfilingEnabled, helperThreadL2CacheRequestProfilingEnabled, dynamicSpeculativePrecomputationEnabled, numCores, numThreadsPerCore, l1ISize, l1IAssociativity, l1DSize, l1DAssociativity, l2Size, l2Associativity, l2ReplacementPolicyType);
+    public Architecture getOrAddArchitecture(boolean hotspotProfilingEnabled, boolean helperThreadL2CacheRequestProfilingEnabled, boolean dynamicSpeculativePrecomputationEnabled, int numMainThreadWaysInStaticPartitionedLRUPolicy, int numCores, int numThreadsPerCore, int l1ISize, int l1IAssociativity, int l1DSize, int l1DAssociativity, int l2Size, int l2Associativity, CacheReplacementPolicyType l2ReplacementPolicyType) {
+        Architecture architecture = new Architecture(hotspotProfilingEnabled, helperThreadL2CacheRequestProfilingEnabled, dynamicSpeculativePrecomputationEnabled, numMainThreadWaysInStaticPartitionedLRUPolicy, numCores, numThreadsPerCore, l1ISize, l1IAssociativity, l1DSize, l1DAssociativity, l2Size, l2Associativity, l2ReplacementPolicyType);
 
         Architecture architectureWithSameTitle = getArchitectureByTitle(architecture.getTitle());
         if (architectureWithSameTitle == null) {

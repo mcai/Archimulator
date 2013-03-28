@@ -65,6 +65,11 @@ public enum CacheReplacementPolicyType {
     REREFERENCE_INTERVAL_PREDICTION,
 
     /**
+     * Static cache partitioning based least recently used (LRU).
+     */
+    STATIC_CACHE_PARTITIONING_LRU,
+
+    /**
      * MLP-aware cache partitioning based least recently used (LRU).
      */
     MLP_AWARE_CACHE_PARTITIONING_LRU

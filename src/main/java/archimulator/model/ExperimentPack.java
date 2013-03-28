@@ -57,6 +57,10 @@ public class ExperimentPack implements WithId, WithTitle, WithCreateTime {
 
     @PropertyArray
     @DatabaseField(persisterClass = StringArrayListJsonSerializableType.class)
+    private ArrayList<String> numMainThreadWaysInStaticPartitionedLRUPolicy;
+
+    @PropertyArray
+    @DatabaseField(persisterClass = StringArrayListJsonSerializableType.class)
     private ArrayList<String> numCores;
 
     @PropertyArray
@@ -200,6 +204,14 @@ public class ExperimentPack implements WithId, WithTitle, WithCreateTime {
 
     public void setHelperThreadStride(List<String> helperThreadStride) {
         this.helperThreadStride = new ArrayList<String>(helperThreadStride);
+    }
+
+    public ArrayList<String> getNumMainThreadWaysInStaticPartitionedLRUPolicy() {
+        return numMainThreadWaysInStaticPartitionedLRUPolicy;
+    }
+
+    public void setNumMainThreadWaysInStaticPartitionedLRUPolicy(List<String> numMainThreadWaysInStaticPartitionedLRUPolicy) {
+        this.numMainThreadWaysInStaticPartitionedLRUPolicy = new ArrayList<String>(numMainThreadWaysInStaticPartitionedLRUPolicy);
     }
 
     public List<String> getNumCores() {
