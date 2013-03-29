@@ -249,6 +249,8 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
             summary.setHelperThreadLookahead(helperThreadEnabled ? parent.getContextMappings().get(0).getHelperThreadLookahead() : -1);
             summary.setHelperThreadStride(helperThreadEnabled ? parent.getContextMappings().get(0).getHelperThreadStride() : -1);
 
+            summary.setNumMainThreadWaysInStaticPartitionedLRUPolicy(parent.getArchitecture().getNumMainThreadWaysInStaticPartitionedLRUPolicy());
+
             summary.setNumInstructions(parent.getStatValueAsLong(statsMap, parent.getMeasurementTitlePrefix() + "simulation/numInstructions", 0));
             summary.setC0t0NumInstructions(parent.getStatValueAsLong(statsMap, parent.getMeasurementTitlePrefix() + "simulation/c0t0NumInstructions", 0));
             summary.setC1t0NumInstructions(parent.getStatValueAsLong(statsMap, parent.getMeasurementTitlePrefix() + "simulation/c1t0NumInstructions", 0));
@@ -383,6 +385,8 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
 
                 "Lookahead",
                 "Stride",
+
+                "MT_Ways_In_Partitioned_L2",
 
                 "Num_Instructions",
                 "C0T0.Num_Instructions",

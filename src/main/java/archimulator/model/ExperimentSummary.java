@@ -23,12 +23,12 @@ import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
-import net.pickapack.util.StorageUnit;
 import net.pickapack.dateTime.DateHelper;
 import net.pickapack.model.WithCreateTime;
 import net.pickapack.model.WithId;
 import net.pickapack.model.WithParentId;
 import net.pickapack.model.WithTitle;
+import net.pickapack.util.StorageUnit;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -73,6 +73,9 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
 
     @DatabaseField
     private int helperThreadStride;
+
+    @DatabaseField
+    private int numMainThreadWaysInStaticPartitionedLRUPolicy;
 
     @DatabaseField
     private long numInstructions;
@@ -333,6 +336,25 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
      */
     public void setHelperThreadStride(int helperThreadStride) {
         this.helperThreadStride = helperThreadStride;
+    }
+
+    /**
+     * Get the number of main thread ways used in the static partitioned LRU policy for the shared L2 cache.
+     *
+     * @return the number of main thread ways used in the static partitioned LRU policy for the shared L2 cache
+     */
+    public int getNumMainThreadWaysInStaticPartitionedLRUPolicy() {
+        return numMainThreadWaysInStaticPartitionedLRUPolicy;
+    }
+
+    /**
+     * Set the number of main thread ways used in the static partitioned LRU policy for the shared L2 cache.
+     *
+     * @param numMainThreadWaysInStaticPartitionedLRUPolicy
+     *         the number of main thread ways used in the static partitioned LRU policy for the shared L2 cache
+     */
+    public void setNumMainThreadWaysInStaticPartitionedLRUPolicy(int numMainThreadWaysInStaticPartitionedLRUPolicy) {
+        this.numMainThreadWaysInStaticPartitionedLRUPolicy = numMainThreadWaysInStaticPartitionedLRUPolicy;
     }
 
     /**
@@ -655,7 +677,8 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
     /**
      * Set the lateness of the helper thread L2 cache requests.
      *
-     * @param helperThreadL2CacheRequestLateness the lateness of the helper thread L2 cache requests
+     * @param helperThreadL2CacheRequestLateness
+     *         the lateness of the helper thread L2 cache requests
      */
     public void setHelperThreadL2CacheRequestLateness(double helperThreadL2CacheRequestLateness) {
         this.helperThreadL2CacheRequestLateness = helperThreadL2CacheRequestLateness;
@@ -673,7 +696,8 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
     /**
      * Set the pollution of the helper thread L2 cache requests.
      *
-     * @param helperThreadL2CacheRequestPollution the pollution of the helper thread L2  cache requests
+     * @param helperThreadL2CacheRequestPollution
+     *         the pollution of the helper thread L2  cache requests
      */
     public void setHelperThreadL2CacheRequestPollution(double helperThreadL2CacheRequestPollution) {
         this.helperThreadL2CacheRequestPollution = helperThreadL2CacheRequestPollution;
@@ -691,7 +715,8 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
     /**
      * Set the redundancy of the helper thread L2 cache requests.
      *
-     * @param helperThreadL2CacheRequestRedundancy the redundancy of the helper thread L2 cache requests
+     * @param helperThreadL2CacheRequestRedundancy
+     *         the redundancy of the helper thread L2 cache requests
      */
     public void setHelperThreadL2CacheRequestRedundancy(double helperThreadL2CacheRequestRedundancy) {
         this.helperThreadL2CacheRequestRedundancy = helperThreadL2CacheRequestRedundancy;
@@ -840,6 +865,8 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
 
             add(helperThreadEnabled ? "L=" + helperThreadLookahead + "" : "");
             add(helperThreadEnabled ? "S=" + helperThreadStride + "" : "");
+
+            add("P=" + numMainThreadWaysInStaticPartitionedLRUPolicy + "");
 
             add(numInstructions + "");
             add(c0t0NumInstructions + "");
