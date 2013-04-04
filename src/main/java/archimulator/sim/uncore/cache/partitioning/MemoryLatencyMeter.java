@@ -43,7 +43,7 @@ public class MemoryLatencyMeter {
      * @return the average memory latency in cycles
      */
     public int getAverageLatency() {
-        return (int) (totalCycles / numSamples);
+        return numSamples == 0 ? 0 : (int) (totalCycles / numSamples);
     }
 
     /**
