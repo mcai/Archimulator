@@ -29,7 +29,6 @@ import archimulator.sim.uncore.coherence.event.LastLevelCacheControllerLineInser
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.mlp.PendingL2Hit;
 import archimulator.sim.uncore.mlp.PendingL2Miss;
-import archimulator.sim.core.Thread;
 import net.pickapack.util.Pair;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
@@ -462,15 +461,5 @@ public class MLPAwareCachePartitioningHelper extends CachePartitioningHelper {
         }
 
         return result;
-    }
-
-    /**
-     * Get the identifier for the specified thread.
-     *
-     * @param thread the thread
-     * @return the identifier for the specified thread
-     */
-    public static int getThreadIdentifier(Thread thread) {
-        return thread.getCore().getNum();
     }
 }

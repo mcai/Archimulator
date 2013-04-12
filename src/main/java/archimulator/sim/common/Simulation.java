@@ -33,6 +33,7 @@ import archimulator.sim.os.Kernel;
 import archimulator.sim.uncore.BasicMemoryHierarchy;
 import archimulator.sim.uncore.MemoryHierarchy;
 import archimulator.sim.uncore.cache.interference.CacheInteractionHelper;
+import archimulator.sim.uncore.cache.partitioning.CPIBasedCachePartitioningHelper;
 import archimulator.sim.uncore.cache.prediction.CacheBasedPredictor;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import archimulator.sim.uncore.delinquentLoad.DelinquentLoadIdentificationHelper;
@@ -95,6 +96,8 @@ public abstract class Simulation implements SimulationObject {
     private DelinquentLoadIdentificationHelper delinquentLoadIdentificationHelper;
 
     private DynamicSpeculativePrecomputationHelper dynamicSpeculativePrecomputationHelper;
+
+    private CPIBasedCachePartitioningHelper cpiBasedCachePartitioningHelper;
 
     private MLPProfilingHelper mlpProfilingHelper;
 
@@ -189,6 +192,8 @@ public abstract class Simulation implements SimulationObject {
         if (getExperiment().getArchitecture().getDynamicSpeculativePrecomputationEnabled()) {
             this.dynamicSpeculativePrecomputationHelper = new DynamicSpeculativePrecomputationHelper(this);
         }
+
+        this.cpiBasedCachePartitioningHelper = new CPIBasedCachePartitioningHelper(this);
 
         this.mlpProfilingHelper = new MLPProfilingHelper(this);
 
@@ -769,6 +774,15 @@ public abstract class Simulation implements SimulationObject {
      */
     public DynamicSpeculativePrecomputationHelper getDynamicSpeculativePrecomputationHelper() {
         return dynamicSpeculativePrecomputationHelper;
+    }
+
+    /**
+     * Get the CPI based cache partitioning helper.
+     *
+     * @return the CPI based cache partitioning helper
+     */
+    public CPIBasedCachePartitioningHelper getCpiBasedCachePartitioningHelper() {
+        return cpiBasedCachePartitioningHelper;
     }
 
     /**

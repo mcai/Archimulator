@@ -70,6 +70,11 @@ public enum CacheReplacementPolicyType {
     STATIC_CACHE_PARTITIONING_LRU,
 
     /**
+     * CPI based cache partitioning based least recently used (LRU).
+     */
+    CPI_BASED_CACHE_PARTITIONING_LRU,
+
+    /**
      * MLP-aware cache partitioning based least recently used (LRU).
      */
     MLP_AWARE_CACHE_PARTITIONING_LRU

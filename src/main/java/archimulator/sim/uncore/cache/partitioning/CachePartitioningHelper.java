@@ -19,6 +19,7 @@
 package archimulator.sim.uncore.cache.partitioning;
 
 import archimulator.sim.common.Simulation;
+import archimulator.sim.core.Thread;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import net.pickapack.action.Action;
 
@@ -87,7 +88,6 @@ public abstract class CachePartitioningHelper {
                     numCyclesElapsed = 0;
                     numIntervals++;
                 }
-
             }
         });
     }
@@ -158,5 +158,15 @@ public abstract class CachePartitioningHelper {
      */
     public void setPartition(List<Integer> partition) {
         this.partition = partition;
+    }
+
+    /**
+     * Get the identifier for the specified thread.
+     *
+     * @param thread the thread
+     * @return the identifier for the specified thread
+     */
+    public static int getThreadIdentifier(Thread thread) {
+        return thread.getCore().getNum();
     }
 }
