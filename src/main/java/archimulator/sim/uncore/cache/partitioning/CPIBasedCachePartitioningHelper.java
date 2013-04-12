@@ -48,6 +48,10 @@ public class CPIBasedCachePartitioningHelper extends CachePartitioningHelper {
         List<Double> cyclePerInstructions = new ArrayList<Double>();
 
         for(int threadId = 0; threadId < this.getNumThreads(); threadId++) {
+            if (!committedInstructions.containsKey(threadId)) {
+                committedInstructions.put(threadId, 0L);
+            }
+
             long numCommittedInstructions = this.committedInstructions.get(threadId);
             cyclePerInstructions.add((double) this.getNumCyclesElapsedPerInterval() / numCommittedInstructions);
         }
