@@ -88,6 +88,7 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
             this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.HELPER_THREAD, "helperThreadL2CacheRequestProfilingHelper", ""));
             this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.CACHE_INTERACTION, "cacheInteractionHelper", ""));
             this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.FEEDBACK_DIRECTED_HELPER_THREADING, "feedbackDirectedHelperThreadingHelper", ""));
+            this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.CPI_BASED_CACHE_PARTITIONING, "cpiBasedCachePartitioningHelper", ""));
             this.addGaugeType(new ExperimentGaugeType(ExperimentGaugeType.MLP_AWARE_CACHE_PARTITIONING, "mlpAwareCachePartitioningHelper", ""));
         }
 
@@ -232,6 +233,9 @@ public class ExperimentMetricServiceImpl extends AbstractService implements Expe
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.FEEDBACK_DIRECTED_HELPER_THREADING), "pollutionDistribution"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.FEEDBACK_DIRECTED_HELPER_THREADING), "aggressivenessDistribution"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.FEEDBACK_DIRECTED_HELPER_THREADING), "pollutionForInsertionPolicyDistribution"));
+
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.CPI_BASED_CACHE_PARTITIONING), "partition"));
+            this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.CPI_BASED_CACHE_PARTITIONING), "numIntervals"));
 
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.MLP_AWARE_CACHE_PARTITIONING), "partition"));
             this.addGauge(new ExperimentGauge(getGaugeTypeByTitle(ExperimentGaugeType.MLP_AWARE_CACHE_PARTITIONING), "numIntervals"));

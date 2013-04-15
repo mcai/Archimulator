@@ -227,6 +227,11 @@ public class ExperimentGaugeType implements WithId, WithTitle, WithCreateTime {
     public static String FEEDBACK_DIRECTED_HELPER_THREADING = "feedbackDirectedHelperThreading";
 
     /**
+     * CPI based cache partitioning.
+     */
+    public static String CPI_BASED_CACHE_PARTITIONING = "cpiBasedCachePartitioning";
+
+    /**
      * MLP aware cache partitioning.
      */
     public static String MLP_AWARE_CACHE_PARTITIONING = "mlpAwareCachePartitioning";
