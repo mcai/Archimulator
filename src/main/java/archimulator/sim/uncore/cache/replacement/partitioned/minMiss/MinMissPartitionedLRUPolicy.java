@@ -32,7 +32,7 @@ import java.util.List;
  */
 public class MinMissPartitionedLRUPolicy<StateT extends Serializable> extends PartitionedLRUPolicy<StateT> {
     /**
-     * Create a Min-miss partitioned least recently used (LRU) policy for the specified evictable cache.
+     * Create a min-miss partitioned least recently used (LRU) policy for the specified evictable cache.
      *
      * @param cache the parent evictable cache
      */
