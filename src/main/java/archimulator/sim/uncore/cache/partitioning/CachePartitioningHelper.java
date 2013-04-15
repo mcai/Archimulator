@@ -22,6 +22,9 @@ import archimulator.sim.common.Simulation;
 import archimulator.sim.core.Thread;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import net.pickapack.action.Action;
+import org.paukov.combinatorics.Factory;
+import org.paukov.combinatorics.Generator;
+import org.paukov.combinatorics.ICombinatoricsVector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -168,5 +171,26 @@ public abstract class CachePartitioningHelper {
      */
     public static int getThreadIdentifier(Thread thread) {
         return thread.getCore().getNum();
+    }
+
+    /**
+     * Divide the integer n into k partitions.
+     *
+     * @param n the integer n to be partitioned
+     * @param k the number of partitions
+     * @return the partition list of the specified integer n
+     */
+    public static List<List<Integer>> partition(int n, int k) {
+        List<List<Integer>> result = new ArrayList<List<Integer>>();
+
+        Generator<Integer> generator = Factory.createCompositionGenerator(n);
+
+        for (ICombinatoricsVector<Integer> vector : generator) {
+            if (vector.getSize() == k) {
+                result.add(vector.getVector());
+            }
+        }
+
+        return result;
     }
 }

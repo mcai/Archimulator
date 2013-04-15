@@ -53,6 +53,17 @@ public class StackDistanceProfile {
     }
 
     /**
+     * Begins new interval.
+     */
+    public void newInterval() {
+        for(int i = 0; i < this.hitCounters.size(); i++) {
+            this.hitCounters.set(i, (int) (this.hitCounters.get(i) * RHO));
+        }
+
+        this.missCounter *= RHO;
+    }
+
+    /**
      * Increment the miss counter.
      */
     public void incrementMissCounter() {
@@ -76,4 +87,6 @@ public class StackDistanceProfile {
     public int getMissCounter() {
         return missCounter;
     }
+
+    private static final double RHO = 0.5f;
 }

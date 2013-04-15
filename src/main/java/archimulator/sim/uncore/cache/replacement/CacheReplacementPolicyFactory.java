@@ -23,6 +23,7 @@ import archimulator.sim.uncore.cache.replacement.helperThread.HelperThreadAwareL
 import archimulator.sim.uncore.cache.replacement.helperThread.HelperThreadIntervalAwareLRUPolicy;
 import archimulator.sim.uncore.cache.replacement.partitioned.StaticPartitionedLRUPolicy;
 import archimulator.sim.uncore.cache.replacement.partitioned.cpiBased.CPIBasedPartitionedLRUPolicy;
+import archimulator.sim.uncore.cache.replacement.partitioned.minMiss.MinMissPartitionedLRUPolicy;
 import archimulator.sim.uncore.cache.replacement.partitioned.mlpAware.MLPAwarePartitionedLRUPolicy;
 import archimulator.sim.uncore.cache.replacement.rereferenceIntervalPrediction.RereferenceIntervalPredictionPolicy;
 import archimulator.sim.uncore.cache.replacement.reuseDistancePrediction.ReuseDistancePredictionPolicy;
@@ -65,6 +66,8 @@ public class CacheReplacementPolicyFactory {
                 return new StaticPartitionedLRUPolicy<StateT>(cache);
             case CPI_BASED_CACHE_PARTITIONING_LRU:
                 return new CPIBasedPartitionedLRUPolicy<StateT>(cache);
+            case MIN_MISS_CACHE_PARTITIONING_LRU:
+                return new MinMissPartitionedLRUPolicy<StateT>(cache);
             case MLP_AWARE_CACHE_PARTITIONING_LRU:
                 return new MLPAwarePartitionedLRUPolicy<StateT>(cache);
             default:

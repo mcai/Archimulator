@@ -34,6 +34,7 @@ import archimulator.sim.uncore.BasicMemoryHierarchy;
 import archimulator.sim.uncore.MemoryHierarchy;
 import archimulator.sim.uncore.cache.interference.CacheInteractionHelper;
 import archimulator.sim.uncore.cache.partitioning.CPIBasedCachePartitioningHelper;
+import archimulator.sim.uncore.cache.partitioning.minMiss.MinMissCachePartitioningHelper;
 import archimulator.sim.uncore.cache.prediction.CacheBasedPredictor;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import archimulator.sim.uncore.delinquentLoad.DelinquentLoadIdentificationHelper;
@@ -98,6 +99,8 @@ public abstract class Simulation implements SimulationObject {
     private DynamicSpeculativePrecomputationHelper dynamicSpeculativePrecomputationHelper;
 
     private CPIBasedCachePartitioningHelper cpiBasedCachePartitioningHelper;
+
+    private MinMissCachePartitioningHelper minMissCachePartitioningHelper;
 
     private MLPProfilingHelper mlpProfilingHelper;
 
@@ -194,6 +197,8 @@ public abstract class Simulation implements SimulationObject {
         }
 
         this.cpiBasedCachePartitioningHelper = new CPIBasedCachePartitioningHelper(this);
+
+        this.minMissCachePartitioningHelper = new MinMissCachePartitioningHelper(this);
 
         this.mlpProfilingHelper = new MLPProfilingHelper(this);
 
@@ -783,6 +788,15 @@ public abstract class Simulation implements SimulationObject {
      */
     public CPIBasedCachePartitioningHelper getCpiBasedCachePartitioningHelper() {
         return cpiBasedCachePartitioningHelper;
+    }
+
+    /**
+     * get the min-miss cache partitioning helper.
+     *
+     * @return the min-miss cache partitioning helper
+     */
+    public MinMissCachePartitioningHelper getMinMissCachePartitioningHelper() {
+        return minMissCachePartitioningHelper;
     }
 
     /**

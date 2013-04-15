@@ -232,6 +232,11 @@ public class ExperimentGaugeType implements WithId, WithTitle, WithCreateTime {
     public static String CPI_BASED_CACHE_PARTITIONING = "cpiBasedCachePartitioning";
 
     /**
+     * Min-miss cache partitioning.
+     */
+    public static String MIN_MISS_CACHE_PARTITIONING = "minMissCachePartitioning";
+
+    /**
      * MLP aware cache partitioning.
      */
     public static String MLP_AWARE_CACHE_PARTITIONING = "mlpAwareCachePartitioning";
