@@ -62,7 +62,7 @@ public class CPIBasedCachePartitioningHelper extends CachePartitioningHelper {
         }
 
         for(int threadId = 0; threadId < this.getNumThreads(); threadId++) {
-            partition.add((int) (cyclePerInstructions.get(threadId) / cyclePerInstructionSum * this.getL2CacheController().getCache().getAssociativity()));
+            partition.add((int) (cyclePerInstructions.get(threadId) / cyclePerInstructionSum * (this.getL2CacheController().getCache().getAssociativity() - this.getNumThreads())) + 1);
         }
 
         this.setPartition(partition);
