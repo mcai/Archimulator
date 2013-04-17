@@ -460,7 +460,7 @@ public class HelperThreadL2CacheRequestProfilingHelper {
     /**
      * Handle a cache line insertion in the case 3.
      *
-     * @param event th event
+     * @param event the event
      */
     private void handleLineInsertCase3(LastLevelCacheControllerLineInsertEvent event) {
         int wayOfVictimCacheLine = this.findWayOfVictimCacheLineByHelperThreadL2CacheRequestTag(event.getSet(), event.getVictimTag());
