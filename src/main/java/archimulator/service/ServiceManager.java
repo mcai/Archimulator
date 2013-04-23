@@ -20,6 +20,7 @@ package archimulator.service;
 
 import archimulator.service.impl.*;
 import archimulator.util.PropertiesHelper;
+import archimulator.util.plugin.PluginHelper;
 
 /**
  * Helper class for retrieving services.
@@ -40,7 +41,14 @@ public class ServiceManager {
     private static UserService userService;
     private static SystemSettingService systemSettingService;
 
+    private static PluginHelper pluginHelper;
+
     static {
+        System.out.println("Archimulator (version: " + PropertiesHelper.getVersion() + ") - CMP Architectural Simulator Written in Java.\n");
+        System.out.println("Copyright (c) 2010-2013 by Min Cai (min.cai.china@gmail.com).\n");
+
+        pluginHelper = new PluginHelper();
+
         benchmarkService = new BenchmarkServiceImpl();
         architectureService = new ArchitectureServiceImpl();
         experimentMetricService = new ExperimentMetricServiceImpl();
@@ -57,8 +65,7 @@ public class ServiceManager {
         userService.initialize();
         systemSettingService.initialize();
 
-        System.out.println("Archimulator (version: " + PropertiesHelper.getVersion() + ") - CMP Architectural Simulator Written in Java.\n");
-        System.out.println("Copyright (c) 2010-2013 by Min Cai (min.cai.china@gmail.com).\n");
+        System.out.println("Archimulator initialized successfully.\n");
     }
 
     /**
@@ -122,6 +129,15 @@ public class ServiceManager {
      */
     public static SystemSettingService getSystemSettingService() {
         return systemSettingService;
+    }
+
+    /**
+     * Return the plugin helper.
+     *
+     * @return the plugin helper
+     */
+    public static PluginHelper getPluginHelper() {
+        return pluginHelper;
     }
 
     /**

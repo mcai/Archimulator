@@ -35,7 +35,9 @@ import archimulator.sim.uncore.MemoryHierarchy;
 import archimulator.sim.uncore.cache.interference.CacheInteractionHelper;
 import archimulator.sim.uncore.cache.partitioning.CPIBasedCachePartitioningHelper;
 import archimulator.sim.uncore.cache.partitioning.minMiss.MinMissCachePartitioningHelper;
+import archimulator.sim.uncore.cache.partitioning.mlpAware.MLPAwareCachePartitioningHelper;
 import archimulator.sim.uncore.cache.prediction.CacheBasedPredictor;
+import archimulator.sim.uncore.cache.stackDistanceProfile.StackDistanceProfilingHelper;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import archimulator.sim.uncore.delinquentLoad.DelinquentLoadIdentificationHelper;
 import archimulator.sim.uncore.helperThread.FeedbackDirectedHelperThreadingHelper;
@@ -43,17 +45,16 @@ import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestProfilingH
 import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestQuality;
 import archimulator.sim.uncore.helperThread.hotspot.HotspotProfilingHelper;
 import archimulator.sim.uncore.mlp.MLPProfilingHelper;
-import archimulator.sim.uncore.cache.partitioning.mlpAware.MLPAwareCachePartitioningHelper;
-import archimulator.sim.uncore.cache.stackDistanceProfile.StackDistanceProfilingHelper;
 import archimulator.util.RuntimeHelper;
-import net.pickapack.util.Reference;
+import archimulator.util.plugin.SimulationExtensionPoint;
 import net.pickapack.action.Predicate;
+import net.pickapack.collection.tree.NodeHelper;
 import net.pickapack.dateTime.DateHelper;
 import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
 import net.pickapack.io.file.FileHelper;
-import net.pickapack.collection.tree.NodeHelper;
 import net.pickapack.util.JaxenHelper;
+import net.pickapack.util.Reference;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DurationFormatUtils;
 
@@ -174,6 +175,11 @@ public abstract class Simulation implements SimulationObject {
 
         this.processor = new BasicProcessor(this.experiment, this, this.blockingEventDispatcher, this.cycleAccurateEventQueue, kernel, this.prepareMemoryHierarchy());
 
+        List<SimulationExtensionPoint> simulationExtensionPoints = ServiceManager.getPluginHelper().getPluginManager().getExtensions(SimulationExtensionPoint.class);
+        for (SimulationExtensionPoint simulationExtensionPoint : simulationExtensionPoints) {
+            simulationExtensionPoint.onInitialized(this);
+        }
+
         this.stackDistanceProfilingHelper = new StackDistanceProfilingHelper(this);
 
         if (getExperiment().getArchitecture().getHotspotProfilingEnabled()) {
@@ -244,6 +250,11 @@ public abstract class Simulation implements SimulationObject {
 
         this.beginTime = DateHelper.toTick(new Date());
 
+        List<SimulationExtensionPoint> simulationExtensionPoints = ServiceManager.getPluginHelper().getPluginManager().getExtensions(SimulationExtensionPoint.class);
+        for (SimulationExtensionPoint simulationExtensionPoint : simulationExtensionPoints) {
+            simulationExtensionPoint.onStarted(this);
+        }
+
         this.beginSimulation();
 
         try {
@@ -261,11 +272,19 @@ public abstract class Simulation implements SimulationObject {
 
             this.endSimulation();
 
+            for (SimulationExtensionPoint simulationExtensionPoint : simulationExtensionPoints) {
+                simulationExtensionPoint.onAborted(this);
+            }
+
             throw new RuntimeException(e);
         }
 
         this.endTime = DateHelper.toTick(new Date());
         this.collectStats(true);
+
+        for (SimulationExtensionPoint simulationExtensionPoint : simulationExtensionPoints) {
+            simulationExtensionPoint.onStopped(this);
+        }
 
         this.endSimulation();
     }

@@ -83,33 +83,37 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
                     new Callable<Void>() {
                         public Void call() throws Exception {
                             try {
-                                for (File file : FileUtils.listFiles(new File("experiment_inputs"), null, true)) {
-                                    String text = FileUtils.readFileToString(file);
+                                File fileExperimentInputs = new File("experiment_inputs");
 
-                                    ExperimentPack experimentPack = JsonSerializationHelper.deserialize(ExperimentPack.class, text);
+                                if(fileExperimentInputs.exists()) {
+                                    for (File file : FileUtils.listFiles(fileExperimentInputs, null, true)) {
+                                        String text = FileUtils.readFileToString(file);
 
-                                    if (experimentPack != null && getExperimentPackByTitle(experimentPack.getTitle()) == null) {
-                                        addExperimentPack(experimentPack);
+                                        ExperimentPack experimentPack = JsonSerializationHelper.deserialize(ExperimentPack.class, text);
 
-                                        for (ExperimentSpec experimentSpec : experimentPack.getExperimentSpecs()) {
-                                            ExperimentType experimentType = experimentPack.getExperimentType();
-                                            Benchmark benchmark = experimentSpec.getBenchmark();
-                                            Architecture architecture = experimentSpec.getArchitecture();
-                                            String arguments = experimentSpec.getBenchmark().getDefaultArguments();
+                                        if (experimentPack != null && getExperimentPackByTitle(experimentPack.getTitle()) == null) {
+                                            addExperimentPack(experimentPack);
 
-                                            List<ContextMapping> contextMappings = new ArrayList<ContextMapping>();
+                                            for (ExperimentSpec experimentSpec : experimentPack.getExperimentSpecs()) {
+                                                ExperimentType experimentType = experimentPack.getExperimentType();
+                                                Benchmark benchmark = experimentSpec.getBenchmark();
+                                                Architecture architecture = experimentSpec.getArchitecture();
+                                                String arguments = experimentSpec.getBenchmark().getDefaultArguments();
 
-                                            ContextMapping contextMapping = new ContextMapping(0, benchmark, arguments);
-                                            contextMapping.setHelperThreadLookahead(experimentSpec.getHelperThreadLookahead());
-                                            contextMapping.setHelperThreadStride(experimentSpec.getHelperThreadStride());
-                                            contextMappings.add(contextMapping);
+                                                List<ContextMapping> contextMappings = new ArrayList<ContextMapping>();
 
-                                            List<ExperimentGauge> gauges = ServiceManager.getExperimentMetricService().getAllGauges(); //TODO: should use basic gauges only.
+                                                ContextMapping contextMapping = new ContextMapping(0, benchmark, arguments);
+                                                contextMapping.setHelperThreadLookahead(experimentSpec.getHelperThreadLookahead());
+                                                contextMapping.setHelperThreadStride(experimentSpec.getHelperThreadStride());
+                                                contextMappings.add(contextMapping);
 
-                                            addExperiment(new Experiment(experimentPack, experimentType, architecture, experimentSpec.getNumMaxInstructions(), contextMappings, gauges));
+                                                List<ExperimentGauge> gauges = ServiceManager.getExperimentMetricService().getAllGauges(); //TODO: should use basic gauges only.
+
+                                                addExperiment(new Experiment(experimentPack, experimentType, architecture, experimentSpec.getNumMaxInstructions(), contextMappings, gauges));
+                                            }
+
+                                            updateExperimentPack(experimentPack);
                                         }
-
-                                        updateExperimentPack(experimentPack);
                                     }
                                 }
 
