@@ -156,6 +156,11 @@
             <artifactId>pf4j</artifactId>
             <version>0.4</version>
         </dependency>
+        <dependency>
+            <groupId>org.simpleframework</groupId>
+            <artifactId>simple-xml</artifactId>
+            <version>2.7</version>
+        </dependency>
     </dependencies>
 
     <build>

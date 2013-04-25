@@ -24,17 +24,17 @@ import archimulator.service.ExperimentService;
 import archimulator.service.ServiceManager;
 import archimulator.sim.common.*;
 import archimulator.sim.os.Kernel;
+import archimulator.util.serialization.XMLSerializationHelper;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.misc.TransactionManager;
 import com.j256.ormlite.stmt.*;
-import net.pickapack.io.serialization.JsonSerializationHelper;
-import net.pickapack.util.Reference;
 import net.pickapack.action.Function1;
+import net.pickapack.collection.CollectionHelper;
 import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
 import net.pickapack.model.WithId;
 import net.pickapack.service.AbstractService;
-import net.pickapack.collection.CollectionHelper;
+import net.pickapack.util.Reference;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 
@@ -86,10 +86,10 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
                                 File fileExperimentInputs = new File("experiment_inputs");
 
                                 if(fileExperimentInputs.exists()) {
-                                    for (File file : FileUtils.listFiles(fileExperimentInputs, null, true)) {
+                                    for (File file : FileUtils.listFiles(fileExperimentInputs, new String[]{"xml"}, true)) {
                                         String text = FileUtils.readFileToString(file);
 
-                                        ExperimentPack experimentPack = JsonSerializationHelper.deserialize(ExperimentPack.class, text);
+                                        ExperimentPack experimentPack = XMLSerializationHelper.deserialize(ExperimentPack.class, text);
 
                                         if (experimentPack != null && getExperimentPackByTitle(experimentPack.getTitle()) == null) {
                                             addExperimentPack(experimentPack);

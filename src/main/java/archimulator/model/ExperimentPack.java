@@ -5,13 +5,16 @@ import archimulator.util.serialization.StringArrayListJsonSerializableType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import net.pickapack.action.Function1;
+import net.pickapack.collection.CollectionHelper;
+import net.pickapack.collection.CombinationHelper;
 import net.pickapack.dateTime.DateHelper;
 import net.pickapack.model.WithCreateTime;
 import net.pickapack.model.WithId;
 import net.pickapack.model.WithTitle;
-import net.pickapack.collection.CollectionHelper;
-import net.pickapack.collection.CombinationHelper;
 import org.apache.commons.beanutils.BeanUtils;
+import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.ElementList;
+import org.simpleframework.xml.Root;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -25,76 +28,94 @@ import java.util.List;
  *
  * @author Min Cai
  */
+@Root
 @DatabaseTable(tableName = "ExperimentPack")
 public class ExperimentPack implements WithId, WithTitle, WithCreateTime {
     @DatabaseField(generatedId = true)
     private long id;
 
+    @Attribute
     @DatabaseField
     private String title;
 
     @DatabaseField
     private long createTime;
 
+    @Attribute
     @DatabaseField
     private ExperimentType experimentType;
 
+    @ElementList
     @PropertyArray
     @DatabaseField(persisterClass = StringArrayListJsonSerializableType.class)
     private ArrayList<String> benchmarkTitle;
 
+    @ElementList
     @PropertyArray
     @DatabaseField(persisterClass = StringArrayListJsonSerializableType.class)
     private ArrayList<String> numMaxInstructions;
 
+    @ElementList
     @PropertyArray
     @DatabaseField(persisterClass = StringArrayListJsonSerializableType.class)
     private ArrayList<String> helperThreadLookahead;
 
+    @ElementList
     @PropertyArray
     @DatabaseField(persisterClass = StringArrayListJsonSerializableType.class)
     private ArrayList<String> helperThreadStride;
 
+    @ElementList
     @PropertyArray
     @DatabaseField(persisterClass = StringArrayListJsonSerializableType.class)
     private ArrayList<String> numMainThreadWaysInStaticPartitionedLRUPolicy;
 
+    @ElementList
     @PropertyArray
     @DatabaseField(persisterClass = StringArrayListJsonSerializableType.class)
     private ArrayList<String> numCores;
 
+    @ElementList
     @PropertyArray
     @DatabaseField(persisterClass = StringArrayListJsonSerializableType.class)
     private ArrayList<String> numThreadsPerCore;
 
+    @ElementList
     @PropertyArray
     @DatabaseField(persisterClass = StringArrayListJsonSerializableType.class)
     private ArrayList<String> l1ISize;
 
+    @ElementList
     @PropertyArray
     @DatabaseField(persisterClass = StringArrayListJsonSerializableType.class)
     private ArrayList<String> l1IAssociativity;
 
+    @ElementList
     @PropertyArray
     @DatabaseField(persisterClass = StringArrayListJsonSerializableType.class)
     private ArrayList<String> l1DSize;
 
+    @ElementList
     @PropertyArray
     @DatabaseField(persisterClass = StringArrayListJsonSerializableType.class)
     private ArrayList<String> l1DAssociativity;
 
+    @ElementList
     @PropertyArray
     @DatabaseField(persisterClass = StringArrayListJsonSerializableType.class)
     private ArrayList<String> l2Size;
 
+    @ElementList
     @PropertyArray
     @DatabaseField(persisterClass = StringArrayListJsonSerializableType.class)
     private ArrayList<String> l2Associativity;
 
+    @ElementList
     @PropertyArray
     @DatabaseField(persisterClass = StringArrayListJsonSerializableType.class)
     private ArrayList<String> l2ReplacementPolicyType;
 
+    @ElementList
     @PropertyArray
     @DatabaseField(persisterClass = StringArrayListJsonSerializableType.class)
     private ArrayList<String> dynamicSpeculativePrecomputationEnabled;
