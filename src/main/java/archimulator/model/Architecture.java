@@ -746,7 +746,7 @@ public class Architecture implements WithId, WithTitle, WithCreateTime {
     /**
      * Get the number of sets in the branch target buffer used in the combined branch predictor.
      *
-     * @return
+     * @return the number of sets in the branch target buffer used in the combined branch predictor
      */
     public int getCombinedBranchPredictorBranchTargetBufferNumSets() {
         return combinedBranchPredictorBranchTargetBufferNumSets;
