@@ -29,7 +29,7 @@ import archimulator.util.plugin.PluginHelper;
  */
 public class ServiceManager {
     /**
-     * To be used in benchmark arguments injection.
+     * User home template argument. To be used in benchmark arguments injection.
      */
     public static final String USER_HOME_TEMPLATE_ARG = "<user.home>";
 
