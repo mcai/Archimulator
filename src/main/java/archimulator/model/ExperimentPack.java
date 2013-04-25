@@ -46,6 +46,10 @@ public class ExperimentPack implements WithId, WithTitle, WithCreateTime {
     private ExperimentType experimentType;
 
     @ElementList
+    @DatabaseField(persisterClass = StringArrayListJsonSerializableType.class)
+    private ArrayList<String> tags;
+
+    @ElementList
     @PropertyArray
     @DatabaseField(persisterClass = StringArrayListJsonSerializableType.class)
     private ArrayList<String> benchmarkTitle;
@@ -195,124 +199,291 @@ public class ExperimentPack implements WithId, WithTitle, WithCreateTime {
         this.experimentType = experimentType;
     }
 
+    /**
+     * Get the list of tags.
+     *
+     * @return the list of tags
+     */
+    public List<String> getTags() {
+        return tags;
+    }
+
+    /**
+     * Set the list of tags.
+     *
+     * @param tags the list of tags
+     */
+    public void setTags(List<String> tags) {
+        this.tags = new ArrayList<String>(tags);
+    }
+
+    /**
+     * Get the list of benchmark titles.
+     *
+     * @return the list of benchmark titles
+     */
     public List<String> getBenchmarkTitle() {
         return benchmarkTitle;
     }
 
+    /**
+     * Set the list of benchmark titles.
+     *
+     * @param benchmarkTitle the list of benchmark titles
+     */
     public void setBenchmarkTitle(List<String> benchmarkTitle) {
         this.benchmarkTitle = new ArrayList<String>(benchmarkTitle);
     }
 
+    /**
+     * Get the list of maximum number of instructions.
+     *
+     * @return the list of maximum number of instructions
+     */
     public List<String> getNumMaxInstructions() {
         return numMaxInstructions;
     }
 
+    /**
+     * Set the list of maximum number of instructions.
+     *
+     * @param numMaxInstructions the list of maximum number of instructions
+     */
     public void setNumMaxInstructions(List<String> numMaxInstructions) {
         this.numMaxInstructions = new ArrayList<String>(numMaxInstructions);
     }
 
+    /**
+     * Get the list of helper thread lookahead values.
+     *
+     * @return the list of helper thread lookahead values
+     */
     public List<String> getHelperThreadLookahead() {
         return helperThreadLookahead;
     }
 
+    /**
+     * Set the list of helper thread lookahead values.
+     *
+     * @param helperThreadLookahead the list of helper thread lookahead values
+     */
     public void setHelperThreadLookahead(List<String> helperThreadLookahead) {
         this.helperThreadLookahead = new ArrayList<String>(helperThreadLookahead);
     }
 
+    /**
+     * Get the list of helper thread stride values.
+     *
+     * @return the list of helper thread stride values
+     */
     public List<String> getHelperThreadStride() {
         return helperThreadStride;
     }
 
+    /**
+     * Set the list of helper thread stride values.
+     *
+     * @param helperThreadStride the list of helper thread stride values
+     */
     public void setHelperThreadStride(List<String> helperThreadStride) {
         this.helperThreadStride = new ArrayList<String>(helperThreadStride);
     }
 
-    public ArrayList<String> getNumMainThreadWaysInStaticPartitionedLRUPolicy() {
+    /**
+     * Get the list of number of main thread ways used in the static partitioned LRU policy.
+     *
+     * @return the list of number of main thread ways used in the static partitioned LRU policy
+     */
+    public List<String> getNumMainThreadWaysInStaticPartitionedLRUPolicy() {
         return numMainThreadWaysInStaticPartitionedLRUPolicy;
     }
 
+    /**
+     * Set the list of number of main thread ways used in the static partitioned LRU policy.
+     *
+     * @param numMainThreadWaysInStaticPartitionedLRUPolicy the list of number of main thread ways used in the static partitioned LRU policy
+     */
     public void setNumMainThreadWaysInStaticPartitionedLRUPolicy(List<String> numMainThreadWaysInStaticPartitionedLRUPolicy) {
         this.numMainThreadWaysInStaticPartitionedLRUPolicy = new ArrayList<String>(numMainThreadWaysInStaticPartitionedLRUPolicy);
     }
 
+    /**
+     * Get the list of number of cores.
+     *
+     * @return the list of number of cores
+     */
     public List<String> getNumCores() {
         return numCores;
     }
 
+    /**
+     * Set the list of number of cores.
+     *
+     * @param numCores the list of number of cores
+     */
     public void setNumCores(List<String> numCores) {
         this.numCores = new ArrayList<String>(numCores);
     }
 
+    /**
+     * Get the list of number of threads per core.
+     *
+     * @return the list of number of threads per core
+     */
     public List<String> getNumThreadsPerCore() {
         return numThreadsPerCore;
     }
 
+    /**
+     * Set the list of number of threads per core.
+     *
+     * @param numThreadsPerCore the list of number of threads per core
+     */
     public void setNumThreadsPerCore(List<String> numThreadsPerCore) {
         this.numThreadsPerCore = new ArrayList<String>(numThreadsPerCore);
     }
 
+    /**
+     * Get the list of L1I cache size values.
+     *
+     * @return the list of L1I cache size values
+     */
     public List<String> getL1ISize() {
         return l1ISize;
     }
 
+    /**
+     * Set the list of L1I cache size values.
+     *
+     * @param l1ISize the list of L1I cache size values
+     */
     public void setL1ISize(List<String> l1ISize) {
         this.l1ISize = new ArrayList<String>(l1ISize);
     }
 
+    /**
+     * Get the list of L1I cache associativity values.
+     *
+     * @return the list of L1I cache associativity values
+     */
     public List<String> getL1IAssociativity() {
         return l1IAssociativity;
     }
 
+    /**
+     * Set the list of L1I cache associativity values.
+     *
+     * @param l1IAssociativity the list of L1I cache associativity values
+     */
     public void setL1IAssociativity(List<String> l1IAssociativity) {
         this.l1IAssociativity = new ArrayList<String>(l1IAssociativity);
     }
 
+    /**
+     * Get the list of L1D cache size values.
+     *
+     * @return the list of L1D cache size values
+     */
     public List<String> getL1DSize() {
         return l1DSize;
     }
 
+    /**
+     * Set the list of L1D cache size values.
+     *
+     * @param l1DSize the list of L1D cache size values
+     */
     public void setL1DSize(List<String> l1DSize) {
         this.l1DSize = new ArrayList<String>(l1DSize);
     }
 
+    /**
+     * Get the list of L1D cache associativity values.
+     *
+     * @return the list of L1D cache associativity values
+     */
     public List<String> getL1DAssociativity() {
         return l1DAssociativity;
     }
 
+    /**
+     * Set the list of L1D cache associativity values.
+     *
+     * @param l1DAssociativity the list of L1D cache associativity values
+     */
     public void setL1DAssociativity(List<String> l1DAssociativity) {
         this.l1DAssociativity = new ArrayList<String>(l1DAssociativity);
     }
 
+    /**
+     * Get the list of L2 cache size values.
+     *
+     * @return the list of L2 cache size values
+     */
     public List<String> getL2Size() {
         return l2Size;
     }
 
+    /**
+     * Set the list of L2 cache size values.
+     *
+     * @param l2Size the list of L2 cache size values
+     */
     public void setL2Size(List<String> l2Size) {
         this.l2Size = new ArrayList<String>(l2Size);
     }
 
+    /**
+     * Get the list of L2 cache associativity values.
+     *
+     * @return the list of L2 cache associativity values
+     */
     public List<String> getL2Associativity() {
         return l2Associativity;
     }
 
+    /**
+     * Set the list of L2 cache associativity values.
+     *
+     * @param l2Associativity the list of L2 cache associativity values
+     */
     public void setL2Associativity(List<String> l2Associativity) {
         this.l2Associativity = new ArrayList<String>(l2Associativity);
     }
 
-    public ArrayList<String> getL2ReplacementPolicyType() {
+    /**
+     * Get the list of L2 cache replacement policy type values.
+     *
+     * @return the list of L2 cache replacement policy type values
+     */
+    public List<String> getL2ReplacementPolicyType() {
         return l2ReplacementPolicyType;
     }
 
-    public void setL2ReplacementPolicyType(ArrayList<String> l2ReplacementPolicyType) {
-        this.l2ReplacementPolicyType = l2ReplacementPolicyType;
+    /**
+     * Set the list of L2 cache replacement policy type values.
+     *
+     * @param l2ReplacementPolicyType the list of L2 cache replacement policy type values
+     */
+    public void setL2ReplacementPolicyType(List<String> l2ReplacementPolicyType) {
+        this.l2ReplacementPolicyType = new ArrayList<String>(l2ReplacementPolicyType);
     }
 
-    public ArrayList<String> getDynamicSpeculativePrecomputationEnabled() {
+    /**
+     * Get the list of boolean values indicating whether the dynamic speculative precomputation is enabled or not.
+     * @return the list of boolean values indicating whether the dynamic speculative precomputation is enabled or not
+     */
+    public List<String> getDynamicSpeculativePrecomputationEnabled() {
         return dynamicSpeculativePrecomputationEnabled;
     }
 
-    public void setDynamicSpeculativePrecomputationEnabled(ArrayList<String> dynamicSpeculativePrecomputationEnabled) {
-        this.dynamicSpeculativePrecomputationEnabled = dynamicSpeculativePrecomputationEnabled;
+    /**
+     * Set the list of boolean values indicating whether the dynamic speculative precomputation is enabled or not.
+     *
+     * @param dynamicSpeculativePrecomputationEnabled the list of boolean values indicating whether the dynamic speculative precomputation is enabled or not
+     */
+    public void setDynamicSpeculativePrecomputationEnabled(List<String> dynamicSpeculativePrecomputationEnabled) {
+        this.dynamicSpeculativePrecomputationEnabled = new ArrayList<String>(dynamicSpeculativePrecomputationEnabled);
     }
 
     /**

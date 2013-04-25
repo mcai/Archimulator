@@ -211,6 +211,14 @@ public interface ExperimentService extends Service {
     ExperimentPack getExperimentPackByTitle(String title);
 
     /**
+     * Get the list of experiment packs matching the specified tag.
+     *
+     * @param tag the tag
+     * @return the list of experiment packs matching the specified tag
+     */
+    List<ExperimentPack> getExperimentPacksByTag(String tag);
+
+    /**
      * Get first experiment pack.
      *
      * @return experiment pack

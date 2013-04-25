@@ -458,6 +458,19 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     @Override
+    public List<ExperimentPack> getExperimentPacksByTag(String tag) {
+        List<ExperimentPack> result = new ArrayList<ExperimentPack>();
+
+        for(ExperimentPack experimentPack : this.getAllExperimentPacks()) {
+            if(experimentPack.getTags().contains(tag)) {
+                result.add(experimentPack);
+            }
+        }
+
+        return result;
+    }
+
+    @Override
     public ExperimentPack getFirstExperimentPack() {
         return this.getFirstItem(this.experimentPacks);
     }
