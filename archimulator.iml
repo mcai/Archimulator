@@ -14,6 +14,9 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Maven: net.pickapack:pickapack.micro:1.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.2.2" level="project" />
+    <orderEntry type="library" name="Maven: com.j256.ormlite:ormlite-core:4.42" level="project" />
     <orderEntry type="library" name="Maven: net.pickapack:pickapack:1.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: javax.mail:mail:1.4.5" level="project" />
     <orderEntry type="library" name="Maven: javax.activation:activation:1.1" level="project" />
@@ -38,7 +41,6 @@
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-util:8.1.7.v20120910" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-io:8.1.7.v20120910" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-http:8.1.7.v20120910" level="project" />
-    <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.2.2" level="project" />
     <orderEntry type="library" name="Maven: commons-lang:commons-lang:2.6" level="project" />
     <orderEntry type="library" name="Maven: commons-net:commons-net:3.2" level="project" />
     <orderEntry type="library" name="Maven: commons-math:commons-math:1.2" level="project" />
@@ -48,7 +50,6 @@
     <orderEntry type="library" name="Maven: net.java.dev.jna:jna:platform:3.3.0" level="project" />
     <orderEntry type="library" name="Maven: net.java.dev.jna:jna:3.3.0" level="project" />
     <orderEntry type="library" name="Maven: com.j256.ormlite:ormlite-jdbc:4.42" level="project" />
-    <orderEntry type="library" name="Maven: com.j256.ormlite:ormlite-core:4.42" level="project" />
     <orderEntry type="library" name="Maven: mysql:mysql-connector-java:5.1.22" level="project" />
     <orderEntry type="library" name="Maven: org.subethamail:subethasmtp:3.1.7" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.6.4" level="project" />
