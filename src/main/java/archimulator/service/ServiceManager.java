@@ -146,6 +146,13 @@ public class ServiceManager {
      * @return database url
      */
     public static String getDatabaseUrl() {
-        return "jdbc:h2:./experiment_results/database";
+        return "jdbc:mysql://" +
+                PropertiesHelper.getProperties().getProperty("archimulator.database.host") +
+                "/" +
+                PropertiesHelper.getProperties().getProperty("archimulator.database.name") +
+                "?user=" +
+                PropertiesHelper.getProperties().getProperty("archimulator.database.user") +
+                "&password=" +
+                PropertiesHelper.getProperties().getProperty("archimulator.database.password");
     }
 }
