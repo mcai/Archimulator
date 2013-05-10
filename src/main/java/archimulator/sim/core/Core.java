@@ -19,6 +19,7 @@
 package archimulator.sim.core;
 
 import archimulator.sim.common.SimulationObject;
+import archimulator.sim.common.report.Reportable;
 import archimulator.sim.core.functionalUnit.FunctionalUnitPool;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import net.pickapack.action.Action;
@@ -30,7 +31,7 @@ import java.util.List;
  *
  * @author Min Cai
  */
-public interface Core extends SimulationObject {
+public interface Core extends SimulationObject, Reportable {
     /**
      * Remove the entry from the queues.
      *

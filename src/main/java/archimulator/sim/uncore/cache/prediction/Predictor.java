@@ -61,4 +61,18 @@ public interface Predictor<PredictableT extends Comparable<PredictableT>> {
      * @return the number of misses
      */
     long getNumMisses();
+
+    /**
+     * Get the number of accesses.
+     *
+     * @return the number of accesses
+     */
+    long getNumAccesses();
+
+    /**
+     * Get the hit ratio.
+     *
+     * @return the hit ratio
+     */
+    double getHitRatio();
 }

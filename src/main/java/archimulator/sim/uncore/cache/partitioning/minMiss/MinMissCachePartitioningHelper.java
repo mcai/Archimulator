@@ -19,6 +19,8 @@
 package archimulator.sim.uncore.cache.partitioning.minMiss;
 
 import archimulator.sim.common.Simulation;
+import archimulator.sim.common.report.ReportNode;
+import archimulator.sim.common.report.Reportable;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.partitioning.CachePartitioningHelper;
 import archimulator.sim.uncore.cache.partitioning.LRUStack;
@@ -37,7 +39,7 @@ import java.util.Map;
  *
  * @author Min Cai
  */
-public class MinMissCachePartitioningHelper extends CachePartitioningHelper {
+public class MinMissCachePartitioningHelper extends CachePartitioningHelper implements Reportable {
     private Map<Integer, StackDistanceProfile> stackDistanceProfiles;
 
     private Map<Integer, Map<Integer, LRUStack>> lruStacks;
@@ -192,5 +194,13 @@ public class MinMissCachePartitioningHelper extends CachePartitioningHelper {
         }
 
         return new Pair<Integer, List<Integer>>(minMissSum, minPartition);
+    }
+
+    @Override
+    public void dumpStats(ReportNode reportNode) {
+        reportNode.getChildren().add(new ReportNode(reportNode, "minMissCachePartitioningHelper") {{
+            getChildren().add(new ReportNode(this, "partition", getPartition() + ""));
+            getChildren().add(new ReportNode(this, "numIntervals", getNumIntervals() + ""));
+        }});
     }
 }

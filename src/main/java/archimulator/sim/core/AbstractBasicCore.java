@@ -19,6 +19,7 @@
 package archimulator.sim.core;
 
 import archimulator.sim.common.BasicSimulationObject;
+import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.core.functionalUnit.FunctionalUnitPool;
 import archimulator.sim.uncore.MemoryAccessInitiatedEvent;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
@@ -372,6 +373,14 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
         }
 
         this.functionalUnitPool.updatePerCycleStats();
+    }
+
+    @Override
+    public void dumpStats(ReportNode reportNode) {
+        reportNode.getChildren().add(new ReportNode(reportNode, getName()) {{
+            getChildren().add(new ReportNode(this, "functionalUnitPool/numStallsOnNoFreeFunctionalUnit", getFunctionalUnitPool().getNumStallsOnNoFreeFunctionalUnit() + ""));
+            getChildren().add(new ReportNode(this, "functionalUnitPool/numStallsOnAcquireFailedOnNoFreeFunctionalUnit", getFunctionalUnitPool().getNumStallsOnAcquireFailedOnNoFreeFunctionalUnit() + ""));
+        }});
     }
 
     @Override

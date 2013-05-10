@@ -19,6 +19,8 @@
 package archimulator.sim.isa;
 
 import archimulator.sim.common.BasicSimulationObject;
+import archimulator.sim.common.report.ReportNode;
+import archimulator.sim.common.report.Reportable;
 import archimulator.sim.os.Kernel;
 import archimulator.sim.uncore.cache.CacheGeometry;
 
@@ -31,7 +33,7 @@ import java.util.*;
  *
  * @author Min Cai
  */
-public class Memory extends BasicSimulationObject {
+public class Memory extends BasicSimulationObject implements Reportable {
     private int id;
     private boolean littleEndian;
 
@@ -534,6 +536,13 @@ public class Memory extends BasicSimulationObject {
         } else {
             bb.get(buffer, offset, size);
         }
+    }
+
+    @Override
+    public void dumpStats(ReportNode reportNode) {
+        reportNode.getChildren().add(new ReportNode(reportNode, "mem-" + getId()) {{
+            getChildren().add(new ReportNode(this, "numPages", getNumPages() + ""));
+        }});
     }
 
     /**

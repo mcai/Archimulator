@@ -23,6 +23,7 @@ import archimulator.sim.common.SimulationObject;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
+import archimulator.sim.uncore.coherence.msi.controller.GeneralCacheController;
 import archimulator.sim.uncore.coherence.msi.message.CoherenceMessage;
 import archimulator.sim.uncore.dram.MemoryController;
 import archimulator.sim.uncore.net.L2ToMemNet;
@@ -76,6 +77,13 @@ public interface MemoryHierarchy extends SimulationObject {
     List<CacheController> getL1DCacheControllers();
 
     /**
+     * Get the the list of L1 cache controllers.
+     *
+     * @return the list of L1 cache controllers
+     */
+    List<GeneralCacheController> getCacheControllers();
+
+    /**
      * Get the list of instruction translation lookaside buffers (iTLBs).
      *
      * @return the list of instruction translation lookaside buffers (iTLBs)
@@ -88,6 +96,13 @@ public interface MemoryHierarchy extends SimulationObject {
      * @return the list of data translation lookaside buffers (dTLBs)
      */
     List<TranslationLookasideBuffer> getDtlbs();
+
+    /**
+     * Get the list of translation lookaside buffers (TLBs).
+     *
+     * @return the list of translation lookaside buffers (TLBs)
+     */
+    List<TranslationLookasideBuffer> getTlbs();
 
     /**
      * Get the net for the L1 cache controllers to the L2 cache controller.

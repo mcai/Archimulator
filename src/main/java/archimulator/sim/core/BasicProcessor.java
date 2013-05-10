@@ -147,11 +147,7 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
         return cores;
     }
 
-    /**
-     * Get the list of threads.
-     *
-     * @return the list of threads
-     */
+    @Override
     public List<Thread> getThreads() {
         List<Thread> threads = new ArrayList<Thread>();
 

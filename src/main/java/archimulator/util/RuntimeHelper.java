@@ -18,6 +18,8 @@
  ******************************************************************************/
 package archimulator.util;
 
+import archimulator.sim.common.report.ReportNode;
+import archimulator.sim.common.report.Reportable;
 import net.pickapack.util.StorageUnit;
 
 import java.text.MessageFormat;
@@ -27,7 +29,7 @@ import java.text.MessageFormat;
  *
  * @author Min Cai
  */
-public class RuntimeHelper {
+public class RuntimeHelper implements Reportable {
     /**
      * Get the maximum memory.
      *
@@ -53,5 +55,14 @@ public class RuntimeHelper {
      */
     public String getUsedMemory() {
         return MessageFormat.format("{0}", StorageUnit.toString(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()));
+    }
+
+    @Override
+    public void dumpStats(ReportNode reportNode) {
+        reportNode.getChildren().add(new ReportNode(reportNode, "runTimeHelper") {{
+            getChildren().add(new ReportNode(this, "maxMemory", getMaxMemory() + ""));
+            getChildren().add(new ReportNode(this, "totalMemory", getTotalMemory() + ""));
+            getChildren().add(new ReportNode(this, "usedMemory", getUsedMemory() + ""));
+        }});
     }
 }

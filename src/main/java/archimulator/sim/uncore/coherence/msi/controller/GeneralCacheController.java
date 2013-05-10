@@ -18,6 +18,8 @@
  ******************************************************************************/
 package archimulator.sim.uncore.coherence.msi.controller;
 
+import archimulator.sim.common.report.ReportNode;
+import archimulator.sim.common.report.Reportable;
 import archimulator.sim.uncore.MemoryHierarchy;
 import archimulator.sim.uncore.cache.CacheGeometry;
 import archimulator.sim.uncore.cache.EvictableCache;
@@ -31,7 +33,7 @@ import java.io.Serializable;
  * @param <StateT> state
  * @author Min Cai
  */
-public abstract class GeneralCacheController<StateT extends Serializable, ConditionT> extends Controller {
+public abstract class GeneralCacheController<StateT extends Serializable, ConditionT> extends Controller implements Reportable {
     private long numDownwardReadHits;
     private long numDownwardReadMisses;
     private long numDownwardWriteHits;
@@ -77,6 +79,25 @@ public abstract class GeneralCacheController<StateT extends Serializable, Condit
                 numDownwardWriteMisses++;
             }
         }
+    }
+
+    @Override
+    public void dumpStats(ReportNode reportNode) {
+        reportNode.getChildren().add(new ReportNode(reportNode, getName()) {{
+            getChildren().add(new ReportNode(this, "hitRatio", getHitRatio() + ""));
+            getChildren().add(new ReportNode(this, "numDownwardAccesses", getNumDownwardAccesses() + ""));
+            getChildren().add(new ReportNode(this, "numDownwardHits", getNumDownwardHits() + ""));
+            getChildren().add(new ReportNode(this, "numDownwardMisses", getNumDownwardMisses() + ""));
+
+            getChildren().add(new ReportNode(this, "numDownwardReadHits", getNumDownwardReadHits() + ""));
+            getChildren().add(new ReportNode(this, "numDownwardReadMisses", getNumDownwardReadMisses() + ""));
+            getChildren().add(new ReportNode(this, "numDownwardWriteHits", getNumDownwardWriteHits() + ""));
+            getChildren().add(new ReportNode(this, "numDownwardWriteMisses", getNumDownwardWriteMisses() + ""));
+
+            getChildren().add(new ReportNode(this, "numEvictions", getNumEvictions() + ""));
+
+            getChildren().add(new ReportNode(this, "occupancyRatio", getOccupancyRatio() + ""));
+        }});
     }
 
     /**

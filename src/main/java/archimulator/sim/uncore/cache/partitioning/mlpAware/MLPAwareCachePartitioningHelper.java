@@ -19,6 +19,8 @@
 package archimulator.sim.uncore.cache.partitioning.mlpAware;
 
 import archimulator.sim.common.Simulation;
+import archimulator.sim.common.report.ReportNode;
+import archimulator.sim.common.report.Reportable;
 import archimulator.sim.core.event.InstructionCommittedEvent;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.partitioning.CachePartitioningHelper;
@@ -44,7 +46,7 @@ import java.util.Map;
  *
  * @author Min Cai
  */
-public class MLPAwareCachePartitioningHelper extends CachePartitioningHelper {
+public class MLPAwareCachePartitioningHelper extends CachePartitioningHelper implements Reportable {
     private Map<Integer, PendingL2Miss> pendingL2Misses;
     private Map<Integer, Map<Integer, PendingL2Hit>> pendingL2Hits;
 
@@ -401,6 +403,17 @@ public class MLPAwareCachePartitioningHelper extends CachePartitioningHelper {
         }
 
         return new Pair<Integer, List<Integer>>(minMlpCostSum, minPartition);
+    }
+
+    @Override
+    public void dumpStats(ReportNode reportNode) {
+        reportNode.getChildren().add(new ReportNode(reportNode, "mlpAwareCachePartitioningHelper") {{
+            getChildren().add(new ReportNode(this, "partition", getPartition() + ""));
+            getChildren().add(new ReportNode(this, "numIntervals", getNumIntervals() + ""));
+            getChildren().add(new ReportNode(this, "l2CacheAccessMLPCostProfile/hitCounters", getL2CacheAccessMLPCostProfile().getHitCounters() + ""));
+            getChildren().add(new ReportNode(this, "l2CacheAccessMLPCostProfile/missCounter", getL2CacheAccessMLPCostProfile().getMissCounter() + ""));
+            getChildren().add(new ReportNode(this, "memoryLatencyMeter/averageLatency", getMemoryLatencyMeter().getAverageLatency() + ""));
+        }});
     }
 
     /**

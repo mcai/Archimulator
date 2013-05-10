@@ -20,6 +20,8 @@ package archimulator.sim.uncore.tlb;
 
 import archimulator.sim.common.Named;
 import archimulator.sim.common.SimulationObject;
+import archimulator.sim.common.report.ReportNode;
+import archimulator.sim.common.report.Reportable;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.cache.CacheGeometry;
@@ -35,7 +37,7 @@ import net.pickapack.util.ValueProviderFactory;
  *
  * @author Min Cai
  */
-public class TranslationLookasideBuffer implements Named {
+public class TranslationLookasideBuffer implements Named, Reportable {
     private String name;
 
     private EvictableCache<Boolean> cache;
@@ -94,6 +96,17 @@ public class TranslationLookasideBuffer implements Named {
         }
 
         access.getThread().getCycleAccurateEventQueue().schedule(this, onCompletedCallback, cacheAccess.isHitInCache() ? this.getHitLatency() : this.getMissLatency());
+    }
+
+    @Override
+    public void dumpStats(ReportNode reportNode) {
+        reportNode.getChildren().add(new ReportNode(reportNode, getName()) {{
+            getChildren().add(new ReportNode(this, "hitRatio", getHitRatio() + ""));
+            getChildren().add(new ReportNode(this, "numAccesses", getNumAccesses() + ""));
+            getChildren().add(new ReportNode(this, "numHits", getNumHits() + ""));
+            getChildren().add(new ReportNode(this, "numMisses", getNumMisses() + ""));
+            getChildren().add(new ReportNode(this, "numEvictions", getNumEvictions() + ""));
+        }});
     }
 
     /**

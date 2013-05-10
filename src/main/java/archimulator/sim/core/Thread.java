@@ -19,6 +19,7 @@
 package archimulator.sim.core;
 
 import archimulator.sim.common.SimulationObject;
+import archimulator.sim.common.report.Reportable;
 import archimulator.sim.core.bpred.BranchPredictor;
 import archimulator.sim.isa.Mnemonic;
 import archimulator.sim.os.Context;
@@ -31,7 +32,7 @@ import java.util.Map;
  *
  * @author Min Cai
  */
-public interface Thread extends SimulationObject {
+public interface Thread extends SimulationObject, Reportable {
     /**
      * Fast forward for one cycle.
      */

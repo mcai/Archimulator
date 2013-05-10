@@ -20,6 +20,8 @@ package archimulator.sim.uncore.cache.stackDistanceProfile;
 
 import archimulator.sim.common.Simulation;
 import archimulator.sim.common.SimulationEvent;
+import archimulator.sim.common.report.ReportNode;
+import archimulator.sim.common.report.Reportable;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.event.GeneralCacheControllerServiceNonblockingRequestEvent;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
@@ -36,7 +38,7 @@ import java.util.TreeMap;
  *
  * @author Min Cai
  */
-public class StackDistanceProfilingHelper {
+public class StackDistanceProfilingHelper implements Reportable {
     private DirectoryController l2CacheController;
     private Map<Integer, Stack<Integer>> l2CacheLruStacks;
     private StackDistanceProfile l2CacheStackDistanceProfile;
@@ -82,7 +84,7 @@ public class StackDistanceProfilingHelper {
 
         lruStack.push(tag);
 
-        if(lruStack.size() > this.l2CacheController.getCache().getAssociativity()) {
+        if (lruStack.size() > this.l2CacheController.getCache().getAssociativity()) {
             lruStack.remove(lruStack.size() - 1);
         }
 
@@ -93,6 +95,17 @@ public class StackDistanceProfilingHelper {
         } else {
             this.l2CacheStackDistanceProfile.incrementHitCounter(stackDistance);
         }
+    }
+
+    @Override
+    public void dumpStats(ReportNode reportNode) {
+        reportNode.getChildren().add(new ReportNode(reportNode, "stackDistanceProfilingHelper") {
+            {
+                getChildren().add(new ReportNode(this, "l2CacheStackDistanceProfile/hitCounters", getL2CacheStackDistanceProfile().getHitCounters() + ""));
+                getChildren().add(new ReportNode(this, "l2CacheStackDistanceProfile/missCounter", getL2CacheStackDistanceProfile().getMissCounter() + ""));
+                getChildren().add(new ReportNode(this, "assumedNumMissesDistribution", getAssumedNumMissesDistribution() + ""));
+            }
+        });
     }
 
     /**
@@ -116,13 +129,13 @@ public class StackDistanceProfilingHelper {
      * @return the number of misses for the assumed associativity
      */
     public int getAssumedNumMisses(int associativity) {
-        if(associativity > this.l2CacheController.getCache().getAssociativity()) {
+        if (associativity > this.l2CacheController.getCache().getAssociativity()) {
             throw new IllegalArgumentException();
         }
 
         int numMisses = 0;
 
-        for(int i = associativity - 1; i < this.l2CacheController.getCache().getAssociativity(); i++) {
+        for (int i = associativity - 1; i < this.l2CacheController.getCache().getAssociativity(); i++) {
             numMisses += this.l2CacheStackDistanceProfile.getHitCounters().get(i);
         }
 
@@ -139,7 +152,7 @@ public class StackDistanceProfilingHelper {
     public Map<Integer, Integer> getAssumedNumMissesDistribution() {
         Map<Integer, Integer> result = new LinkedHashMap<Integer, Integer>();
 
-        for(int associativity = 1; associativity <= this.l2CacheController.getCache().getAssociativity(); associativity++) {
+        for (int associativity = 1; associativity <= this.l2CacheController.getCache().getAssociativity(); associativity++) {
             result.put(associativity, this.getAssumedNumMisses(associativity));
         }
 

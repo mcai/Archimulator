@@ -16,50 +16,18 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.core;
-
-import archimulator.sim.common.SimulationObject;
-import archimulator.sim.os.Kernel;
-import archimulator.sim.uncore.MemoryHierarchy;
-
-import java.util.List;
+package archimulator.sim.common.report;
 
 /**
- * Processor.
+ * Reportable object.
  *
  * @author Min Cai
  */
-public interface Processor extends SimulationObject {
+public interface Reportable {
     /**
-     * Get the list of cores.
+     * Dump the statistics into the specified report node.
      *
-     * @return the list of cores
+     * @param reportNode the report node
      */
-    List<Core> getCores();
-
-    /**
-     * Get the list of threads.
-     *
-     * @return the list of threads
-     */
-    List<Thread> getThreads();
-
-    /**
-     * Get the kernel.
-     *
-     * @return the kernel
-     */
-    Kernel getKernel();
-
-    /**
-     * Update the assignments of contexts to threads.
-     */
-    void updateContextToThreadAssignments();
-
-    /**
-     * Get the memory hierarchy.
-     *
-     * @return the memory hierarchy
-     */
-    MemoryHierarchy getMemoryHierarchy();
+    void dumpStats(ReportNode reportNode);
 }

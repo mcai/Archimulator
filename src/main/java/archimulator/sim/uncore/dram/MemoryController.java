@@ -18,6 +18,8 @@
  ******************************************************************************/
 package archimulator.sim.uncore.dram;
 
+import archimulator.sim.common.report.ReportNode;
+import archimulator.sim.common.report.Reportable;
 import archimulator.sim.uncore.MemoryDevice;
 import archimulator.sim.uncore.MemoryHierarchy;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
@@ -29,7 +31,7 @@ import net.pickapack.action.Action;
  *
  * @author Min Cai
  */
-public abstract class MemoryController extends MemoryDevice {
+public abstract class MemoryController extends MemoryDevice implements Reportable {
     private long numReads;
     private long numWrites;
 
@@ -96,6 +98,15 @@ public abstract class MemoryController extends MemoryDevice {
      * @param onCompletedCallback the callback action performed when the access is completed
      */
     protected abstract void access(int address, Action onCompletedCallback);
+
+    @Override
+    public void dumpStats(ReportNode reportNode) {
+        reportNode.getChildren().add(new ReportNode(reportNode, getName()) {{
+            getChildren().add(new ReportNode(this, "numAccesses", getNumAccesses() + ""));
+            getChildren().add(new ReportNode(this, "numReads", getNumReads() + ""));
+            getChildren().add(new ReportNode(this, "numWrites", getNumWrites() + ""));
+        }});
+    }
 
     /**
      * Get the number of accesses.

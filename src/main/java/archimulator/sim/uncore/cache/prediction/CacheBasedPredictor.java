@@ -137,49 +137,26 @@ public class CacheBasedPredictor<PredictableT extends Comparable<PredictableT>> 
         }
     }
 
-    /**
-     * Get the default value.
-     *
-     * @return the default value
-     */
     public PredictableT getDefaultValue() {
         return defaultValue;
     }
 
-    /**
-     * Get the number of hits.
-     *
-     * @return the number of hits
-     */
     @Override
     public long getNumHits() {
         return numHits;
     }
 
-    /**
-     * Get the number of misses.
-     *
-     * @return the number of misses
-     */
     @Override
     public long getNumMisses() {
         return numMisses;
     }
 
-    /**
-     * Get the number of accesses.
-     *
-     * @return the number of accesses
-     */
+    @Override
     public long getNumAccesses() {
         return numHits + numMisses;
     }
 
-    /**
-     * Get the hit ratio.
-     *
-     * @return the hit ratio
-     */
+    @Override
     public double getHitRatio() {
         return this.getNumAccesses() > 0 ? (double) this.numHits / this.getNumAccesses() : 0.0;
     }

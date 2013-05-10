@@ -226,11 +226,7 @@ public class BasicMemoryHierarchy extends BasicSimulationObject implements Memor
         return l1DCacheControllers;
     }
 
-    /**
-     * Get the the list of L1 cache controllers.
-     *
-     * @return the list of L1 cache controllers
-     */
+    @Override
     @SuppressWarnings("unchecked")
     public List<GeneralCacheController> getCacheControllers() {
         List<GeneralCacheController> cacheControllers = new ArrayList<GeneralCacheController>();
@@ -258,11 +254,7 @@ public class BasicMemoryHierarchy extends BasicSimulationObject implements Memor
         return dtlbs;
     }
 
-    /**
-     * Get the list of translation lookaside buffers (TLBs).
-     *
-     * @return the list of translation lookaside buffers (TLBs)
-     */
+    @Override
     public List<TranslationLookasideBuffer> getTlbs() {
         List<TranslationLookasideBuffer> tlbs = new ArrayList<TranslationLookasideBuffer>();
         tlbs.addAll(getItlbs());

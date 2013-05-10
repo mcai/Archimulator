@@ -20,6 +20,8 @@ package archimulator.sim.uncore.helperThread;
 
 import archimulator.sim.common.Simulation;
 import archimulator.sim.common.SimulationEvent;
+import archimulator.sim.common.report.ReportNode;
+import archimulator.sim.common.report.Reportable;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.cache.CacheGeometry;
@@ -51,7 +53,7 @@ import static org.hamcrest.CoreMatchers.not;
  *
  * @author Min Cai
  */
-public class HelperThreadL2CacheRequestProfilingHelper {
+public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
     private DirectoryController l2CacheController;
 
     private Map<Integer, Map<Integer, HelperThreadL2CacheRequestState>> helperThreadL2CacheRequestStates;
@@ -772,6 +774,40 @@ public class HelperThreadL2CacheRequestProfilingHelper {
         }
 
         throw new IllegalArgumentException();
+    }
+
+    @Override
+    public void dumpStats(ReportNode reportNode) {
+        reportNode.getChildren().add(new ReportNode(reportNode, "helperThreadL2CacheRequestProfilingHelper") {{
+            getChildren().add(new ReportNode(this, "numMainThreadL2CacheHits", getNumMainThreadL2CacheHits() + ""));
+            getChildren().add(new ReportNode(this, "numMainThreadL2CacheMisses", getNumMainThreadL2CacheMisses() + ""));
+
+            getChildren().add(new ReportNode(this, "numHelperThreadL2CacheHits", getNumHelperThreadL2CacheHits() + ""));
+            getChildren().add(new ReportNode(this, "numHelperThreadL2CacheMisses", getNumMainThreadL2CacheMisses() + ""));
+
+            getChildren().add(new ReportNode(this, "numTotalHelperThreadL2CacheRequests", getNumTotalHelperThreadL2CacheRequests() + ""));
+
+            getChildren().add(new ReportNode(this, "numRedundantHitToTransientTagHelperThreadL2CacheRequests", getNumRedundantHitToTransientTagHelperThreadL2CacheRequests() + ""));
+            getChildren().add(new ReportNode(this, "numRedundantHitToCacheHelperThreadL2CacheRequests", getNumRedundantHitToCacheHelperThreadL2CacheRequests() + ""));
+
+            getChildren().add(new ReportNode(this, "numUsefulHelperThreadL2CacheRequests", getNumUsefulHelperThreadL2CacheRequests() + ""));
+
+            getChildren().add(new ReportNode(this, "numTimelyHelperThreadL2CacheRequests", getNumTimelyHelperThreadL2CacheRequests() + ""));
+            getChildren().add(new ReportNode(this, "numLateHelperThreadL2CacheRequests", getNumLateHelperThreadL2CacheRequests() + ""));
+
+            getChildren().add(new ReportNode(this, "numBadHelperThreadL2CacheRequests", getNumBadHelperThreadL2CacheRequests() + ""));
+            getChildren().add(new ReportNode(this, "numUglyHelperThreadL2CacheRequests", getNumUglyHelperThreadL2CacheRequests() + ""));
+
+            getChildren().add(new ReportNode(this, "helperThreadL2CacheRequestCoverage", getHelperThreadL2CacheRequestCoverage() + ""));
+            getChildren().add(new ReportNode(this, "helperThreadL2CacheRequestAccuracy", getHelperThreadL2CacheRequestAccuracy() + ""));
+            getChildren().add(new ReportNode(this, "helperThreadL2CacheRequestLateness", getHelperThreadL2CacheRequestLateness() + ""));
+            getChildren().add(new ReportNode(this, "helperThreadL2CacheRequestPollution", getHelperThreadL2CacheRequestPollution() + ""));
+            getChildren().add(new ReportNode(this, "helperThreadL2CacheRequestRedundancy", getHelperThreadL2CacheRequestRedundancy() + ""));
+
+            getChildren().add(new ReportNode(this, "helperThreadL2CacheRequestQualityPredictor/numHits", getHelperThreadL2CacheRequestQualityPredictor().getNumHits() + ""));
+            getChildren().add(new ReportNode(this, "helperThreadL2CacheRequestQualityPredictor/numMisses", getHelperThreadL2CacheRequestQualityPredictor().getNumMisses() + ""));
+            getChildren().add(new ReportNode(this, "helperThreadL2CacheRequestQualityPredictor/hitRatio", getHelperThreadL2CacheRequestQualityPredictor().getHitRatio() + ""));
+        }});
     }
 
     /**

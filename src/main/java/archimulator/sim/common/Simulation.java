@@ -23,11 +23,14 @@ import archimulator.model.Experiment;
 import archimulator.model.metric.ExperimentStat;
 import archimulator.model.metric.gauge.ExperimentGauge;
 import archimulator.service.ServiceManager;
+import archimulator.sim.common.report.ReportNode;
+import archimulator.sim.common.report.Reportable;
 import archimulator.sim.core.BasicProcessor;
 import archimulator.sim.core.Core;
 import archimulator.sim.core.Processor;
 import archimulator.sim.core.Thread;
 import archimulator.sim.core.speculativePrecomputation.DynamicSpeculativePrecomputationHelper;
+import archimulator.sim.isa.Memory;
 import archimulator.sim.os.Context;
 import archimulator.sim.os.Kernel;
 import archimulator.sim.uncore.BasicMemoryHierarchy;
@@ -38,6 +41,7 @@ import archimulator.sim.uncore.cache.partitioning.minMiss.MinMissCachePartitioni
 import archimulator.sim.uncore.cache.partitioning.mlpAware.MLPAwareCachePartitioningHelper;
 import archimulator.sim.uncore.cache.prediction.CacheBasedPredictor;
 import archimulator.sim.uncore.cache.stackDistanceProfile.StackDistanceProfilingHelper;
+import archimulator.sim.uncore.coherence.msi.controller.GeneralCacheController;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import archimulator.sim.uncore.delinquentLoad.DelinquentLoadIdentificationHelper;
 import archimulator.sim.uncore.helperThread.FeedbackDirectedHelperThreadingHelper;
@@ -45,6 +49,7 @@ import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestProfilingH
 import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestQuality;
 import archimulator.sim.uncore.helperThread.hotspot.HotspotProfilingHelper;
 import archimulator.sim.uncore.mlp.MLPProfilingHelper;
+import archimulator.sim.uncore.tlb.TranslationLookasideBuffer;
 import archimulator.util.RuntimeHelper;
 import archimulator.util.plugin.SimulationExtensionPoint;
 import net.pickapack.action.Predicate;
@@ -66,7 +71,7 @@ import java.util.*;
  *
  * @author Min Cai
  */
-public abstract class Simulation implements SimulationObject {
+public abstract class Simulation implements SimulationObject, Reportable {
     protected Reference<Kernel> kernelRef;
 
     private String title;
@@ -84,6 +89,8 @@ public abstract class Simulation implements SimulationObject {
     private BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher;
 
     private CycleAccurateEventQueue cycleAccurateEventQueue;
+
+    //TODO: the following stuffs are to be refactored out!!!
 
     private StackDistanceProfilingHelper stackDistanceProfilingHelper;
 
@@ -301,6 +308,52 @@ public abstract class Simulation implements SimulationObject {
             this.getHelperThreadL2CacheRequestProfilingHelper().sumUpUnstableHelperThreadL2CacheRequests();
         }
 
+        ReportNode rootReportNode = new ReportNode(null, "experiment");
+
+        this.getRuntimeHelper().dumpStats(rootReportNode);
+
+        this.dumpStats(rootReportNode);
+
+        for(Memory memory : this.getProcessor().getKernel().getMemories()) {
+            memory.dumpStats(rootReportNode);
+        }
+
+        for(Core core : this.getProcessor().getCores()) {
+            core.dumpStats(rootReportNode);
+        }
+
+        for(Thread thread : this.getProcessor().getThreads()) {
+            thread.dumpStats(rootReportNode);
+        }
+
+        for(TranslationLookasideBuffer tlb : this.getProcessor().getMemoryHierarchy().getTlbs()) {
+            tlb.dumpStats(rootReportNode);
+        }
+
+        for(GeneralCacheController cacheController : this.getProcessor().getMemoryHierarchy().getCacheControllers()) {
+            cacheController.dumpStats(rootReportNode);
+        }
+
+        this.getProcessor().getMemoryHierarchy().getMemoryController().dumpStats(rootReportNode);
+
+        this.getStackDistanceProfilingHelper().dumpStats(rootReportNode);
+        this.getHotspotProfilingHelper().dumpStats(rootReportNode);
+        this.getHelperThreadL2CacheRequestProfilingHelper().dumpStats(rootReportNode);
+        this.getCacheInteractionHelper().dumpStats(rootReportNode);
+        this.getFeedbackDirectedHelperThreadingHelper().dumpStats(rootReportNode);
+        this.getCpiBasedCachePartitioningHelper().dumpStats(rootReportNode);
+        this.getMinMissCachePartitioningHelper().dumpStats(rootReportNode);
+        this.getMlpAwareCachePartitioningHelper().dumpStats(rootReportNode);
+
+        System.out.println(DateHelper.toString(new Date()));
+
+        rootReportNode.traverse();
+
+        ServiceManager.getExperimentReportService().setReportNodeByParent(getExperiment(), rootReportNode);
+
+        System.out.println();
+
+        // TODO: to be refactored out!!!
         for (ExperimentGauge gauge : ServiceManager.getExperimentMetricService().getGaugesByExperiment(experiment)) {
             Object node = StringUtils.isEmpty(gauge.getType().getNodeExpression()) ? this : JaxenHelper.evaluate(this, gauge.getType().getNodeExpression());
 
@@ -516,6 +569,27 @@ public abstract class Simulation implements SimulationObject {
         }
 
         System.out.println();
+    }
+
+    @Override
+    public void dumpStats(ReportNode reportNode) {
+        reportNode.getChildren().add(new ReportNode(reportNode, "simulation") {{
+            getChildren().add(new ReportNode(this, "beginTimeAsString", getBeginTimeAsString()));
+            getChildren().add(new ReportNode(this, "endTimeAsString", getEndTimeAsString()));
+            getChildren().add(new ReportNode(this, "duration", getDuration()));
+            getChildren().add(new ReportNode(this, "durationInSeconds", getDurationInSeconds() + ""));
+
+            getChildren().add(new ReportNode(this, "cycleAccurateEventQueue/currentCycle", getCycleAccurateEventQueue().getCurrentCycle() + ""));
+            getChildren().add(new ReportNode(this, "numInstructions", getNumInstructions() + ""));
+            getChildren().add(new ReportNode(this, "c0t0NumInstructions", getC0t0NumInstructions() + ""));
+            getChildren().add(new ReportNode(this, "c1t0NumInstructions", getC1t0NumInstructions() + ""));
+            getChildren().add(new ReportNode(this, "instructionsPerCycle", getInstructionsPerCycle() + ""));
+            getChildren().add(new ReportNode(this, "c0t0InstructionsPerCycle", getC0t0InstructionsPerCycle() + ""));
+            getChildren().add(new ReportNode(this, "c1t0InstructionsPerCycle", getC1t0InstructionsPerCycle() + ""));
+            getChildren().add(new ReportNode(this, "cyclesPerInstruction", getCyclesPerInstruction() + ""));
+            getChildren().add(new ReportNode(this, "cyclesPerSecond", getCyclesPerSecond() + ""));
+            getChildren().add(new ReportNode(this, "instructionsPerSecond", getInstructionsPerSecond() + ""));
+        }});
     }
 
     /**

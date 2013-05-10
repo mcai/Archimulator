@@ -19,6 +19,8 @@
 package archimulator.sim.uncore.cache.interference;
 
 import archimulator.sim.common.Simulation;
+import archimulator.sim.common.report.ReportNode;
+import archimulator.sim.common.report.Reportable;
 import archimulator.sim.uncore.coherence.event.GeneralCacheControllerLineReplacementEvent;
 import archimulator.sim.uncore.coherence.event.GeneralCacheControllerServiceNonblockingRequestEvent;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
@@ -32,7 +34,7 @@ import java.util.TreeMap;
  *
  * @author Min Cai
  */
-public class CacheInteractionHelper {
+public class CacheInteractionHelper implements Reportable {
     private DirectoryController l2CacheController;
 
     private Map<Integer, Map<Integer, Long>> numL2CacheInterThreadConstructiveInteractions;
@@ -120,6 +122,14 @@ public class CacheInteractionHelper {
                 }
             }
         });
+    }
+
+    @Override
+    public void dumpStats(ReportNode reportNode) {
+        reportNode.getChildren().add(new ReportNode(reportNode, "cacheInteractionHelper") {{
+            getChildren().add(new ReportNode(this, "numL2CacheInterThreadConstructiveInteractions", getNumL2CacheInterThreadConstructiveInteractions() + ""));
+            getChildren().add(new ReportNode(this, "numL2CacheInterThreadEvictions", getNumL2CacheInterThreadEvictions() + ""));
+        }});
     }
 
     /**

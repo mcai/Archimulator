@@ -1,6 +1,8 @@
 package archimulator.sim.uncore.cache.partitioning;
 
 import archimulator.sim.common.Simulation;
+import archimulator.sim.common.report.ReportNode;
+import archimulator.sim.common.report.Reportable;
 import archimulator.sim.core.Thread;
 import archimulator.sim.core.event.InstructionCommittedEvent;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
@@ -17,7 +19,7 @@ import java.util.TreeMap;
  *
  * @author Min Cai
  */
-public class CPIBasedCachePartitioningHelper extends CachePartitioningHelper {
+public class CPIBasedCachePartitioningHelper extends CachePartitioningHelper implements Reportable {
     private Map<Integer, Long> committedInstructions;
 
     public CPIBasedCachePartitioningHelper(Simulation simulation) {
@@ -68,5 +70,13 @@ public class CPIBasedCachePartitioningHelper extends CachePartitioningHelper {
 
         this.setPartition(partition);
         this.committedInstructions.clear();
+    }
+
+    @Override
+    public void dumpStats(ReportNode reportNode) {
+        reportNode.getChildren().add(new ReportNode(reportNode, "cpiBasedCachePartitioningHelper") {{
+            getChildren().add(new ReportNode(this, "partition", getPartition() + ""));
+            getChildren().add(new ReportNode(this, "numIntervals", getNumIntervals() + ""));
+        }});
     }
 }

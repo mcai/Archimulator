@@ -22,6 +22,8 @@ import archimulator.sim.analysis.BasicBlock;
 import archimulator.sim.analysis.Function;
 import archimulator.sim.analysis.Instruction;
 import archimulator.sim.common.Simulation;
+import archimulator.sim.common.report.ReportNode;
+import archimulator.sim.common.report.Reportable;
 import archimulator.sim.core.DynamicInstruction;
 import archimulator.sim.isa.StaticInstructionType;
 import archimulator.sim.isa.event.FunctionalCallEvent;
@@ -44,7 +46,7 @@ import java.util.TreeMap;
  *
  * @author Min Cai
  */
-public class HotspotProfilingHelper {
+public class HotspotProfilingHelper implements Reportable {
     private DirectoryController l2CacheController;
 
     private Map<String, Map<String, Long>> numCallsPerFunctions;
@@ -195,6 +197,19 @@ public class HotspotProfilingHelper {
                 }
             }
         }
+    }
+
+    @Override
+    public void dumpStats(ReportNode reportNode) {
+        reportNode.getChildren().add(new ReportNode(reportNode, "hotspot") {{
+            getChildren().add(new ReportNode(this, "numCallsPerFunctions", getNumCallsPerFunctions() + "")); //TODO
+            getChildren().add(new ReportNode(this, "loadsInHotspotFunction", getLoadsInHotspotFunction() + "")); //TODO
+
+            getChildren().add(new ReportNode(this, "statL2CacheHitStackDistances", getStatL2CacheHitStackDistances() + "")); //TODO
+            getChildren().add(new ReportNode(this, "statL2CacheMissStackDistances", getStatL2CacheMissStackDistances() + "")); //TODO
+            getChildren().add(new ReportNode(this, "statL2CacheHitHotspotInterThreadStackDistances", getStatL2CacheHitHotspotInterThreadStackDistances() + "")); //TODO
+            getChildren().add(new ReportNode(this, "statL2CacheMissHotspotStackDistances", getStatL2CacheMissStackDistances() + "")); //TODO
+        }});
     }
 
     /**

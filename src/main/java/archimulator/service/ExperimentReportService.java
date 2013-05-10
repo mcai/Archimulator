@@ -16,50 +16,45 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.core;
+package archimulator.service;
 
-import archimulator.sim.common.SimulationObject;
-import archimulator.sim.os.Kernel;
-import archimulator.sim.uncore.MemoryHierarchy;
-
-import java.util.List;
+import archimulator.model.Experiment;
+import archimulator.sim.common.report.ReportNode;
+import net.pickapack.service.Service;
 
 /**
- * Processor.
+ * Service for managing experiment reports.
  *
  * @author Min Cai
  */
-public interface Processor extends SimulationObject {
+public interface ExperimentReportService extends Service {
     /**
-     * Get the list of cores.
-     *
-     * @return the list of cores
+     * Initialize.
      */
-    List<Core> getCores();
+    void initialize();
 
     /**
-     * Get the list of threads.
+     * Set the report node for the specified parent experiment.
      *
-     * @return the list of threads
+     * @param parent the parent experiment
+     * @param reportNode the report node
      */
-    List<Thread> getThreads();
+    void setReportNodeByParent(Experiment parent, ReportNode reportNode);
 
     /**
-     * Get the kernel.
+     * Get the report node for the specified parent experiment.
      *
-     * @return the kernel
+     * @param parent the parent experiment
+     * @return the report node for the specified parent experiment
      */
-    Kernel getKernel();
+    ReportNode getReportNodeByParent(Experiment parent);
 
     /**
-     * Update the assignments of contexts to threads.
-     */
-    void updateContextToThreadAssignments();
-
-    /**
-     * Get the memory hierarchy.
+     * Get the report node for the specified parent experiment and path.
      *
-     * @return the memory hierarchy
+     * @param parent the parent experiment
+     * @param path the path
+     * @return the report node for the specified parent experiment and path
      */
-    MemoryHierarchy getMemoryHierarchy();
+    ReportNode getReportNodeByParent(Experiment parent, String... path);
 }
