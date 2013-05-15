@@ -20,8 +20,7 @@ package archimulator.sim.common;
 
 import archimulator.model.ContextMapping;
 import archimulator.model.Experiment;
-import archimulator.model.metric.ExperimentStat;
-import archimulator.model.metric.gauge.ExperimentGauge;
+import archimulator.model.ExperimentStat;
 import archimulator.service.ServiceManager;
 import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.common.report.Reportable;
@@ -52,19 +51,20 @@ import archimulator.sim.uncore.mlp.MLPProfilingHelper;
 import archimulator.sim.uncore.tlb.TranslationLookasideBuffer;
 import archimulator.util.RuntimeHelper;
 import archimulator.util.plugin.SimulationExtensionPoint;
+import net.pickapack.action.Action1;
 import net.pickapack.action.Predicate;
 import net.pickapack.collection.tree.NodeHelper;
 import net.pickapack.dateTime.DateHelper;
 import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
 import net.pickapack.io.file.FileHelper;
-import net.pickapack.util.JaxenHelper;
 import net.pickapack.util.Reference;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DurationFormatUtils;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Simulation.
@@ -302,13 +302,13 @@ public abstract class Simulation implements SimulationObject, Reportable {
      * @param endOfSimulation a value indicating whether it is the end of simulation or not
      */
     private void collectStats(boolean endOfSimulation) {
-        List<ExperimentStat> stats = new ArrayList<ExperimentStat>();
+        final List<ExperimentStat> stats = new ArrayList<ExperimentStat>();
 
         if (endOfSimulation && this.getExperiment().getArchitecture().getHelperThreadL2CacheRequestProfilingEnabled() && (this.getType() == SimulationType.MEASUREMENT || this.getType() == SimulationType.CACHE_WARMUP)) {
             this.getHelperThreadL2CacheRequestProfilingHelper().sumUpUnstableHelperThreadL2CacheRequests();
         }
 
-        ReportNode rootReportNode = new ReportNode(null, "experiment");
+        ReportNode rootReportNode = new ReportNode(null, "");
 
         this.getRuntimeHelper().dumpStats(rootReportNode);
 
@@ -345,26 +345,12 @@ public abstract class Simulation implements SimulationObject, Reportable {
         this.getMinMissCachePartitioningHelper().dumpStats(rootReportNode);
         this.getMlpAwareCachePartitioningHelper().dumpStats(rootReportNode);
 
-        System.out.println(DateHelper.toString(new Date()));
-
-        rootReportNode.traverse();
-
-        ServiceManager.getExperimentReportService().setReportNodeByParent(getExperiment(), rootReportNode);
-
-        System.out.println();
-
-        // TODO: to be refactored out!!!
-        for (ExperimentGauge gauge : ServiceManager.getExperimentMetricService().getGaugesByExperiment(experiment)) {
-            Object node = StringUtils.isEmpty(gauge.getType().getNodeExpression()) ? this : JaxenHelper.evaluate(this, gauge.getType().getNodeExpression());
-
-            if (node instanceof Collection) {
-                for (Object obj : (Collection) node) {
-                    collectStats(stats, gauge, obj);
-                }
-            } else {
-                collectStats(stats, gauge, node);
+        rootReportNode.traverse(new Action1<ReportNode>() {
+            @Override
+            public void apply(ReportNode node) {
+                stats.add(new ExperimentStat(experiment, getPrefix(), node.getPath(), node.getValue()));
             }
-        }
+        });
 
         if (this.getType() == SimulationType.MEASUREMENT || this.getType() == SimulationType.CACHE_WARMUP) {
             getProcessor().getMemoryHierarchy().dumpCacheControllerFsmStats(stats);
@@ -377,70 +363,6 @@ public abstract class Simulation implements SimulationObject, Reportable {
         }
 
         ServiceManager.getExperimentStatService().addStatsByParent(this.getExperiment(), stats);
-    }
-
-    /**
-     * Collect the statistics.
-     *
-     * @param stats the list of experiment statistics
-     * @param gauge the experiment gauge object
-     * @param obj   the owning object
-     */
-    private void collectStats(List<ExperimentStat> stats, ExperimentGauge gauge, Object obj) {
-        Object keyObj = !StringUtils.isEmpty(gauge.getType().getKeyExpression()) ? JaxenHelper.evaluate(obj, gauge.getType().getKeyExpression()) : null;
-        Object valueObj;
-        valueObj = JaxenHelper.evaluate(obj, gauge.getValueExpression());
-
-        String initialNodeKey = getNodeKey(gauge, obj, keyObj);
-
-        if (valueObj != null) {
-            if (valueObj instanceof Map) {
-                Map resultMap = (Map) valueObj;
-
-                for (Object key : resultMap.keySet()) {
-                    String nodeKey = JaxenHelper.escape(initialNodeKey) + "/" + key;
-                    String value = JaxenHelper.toString(resultMap.get(key));
-
-                    addStat(stats, gauge, nodeKey, value);
-                }
-            } else if (valueObj instanceof Collection) {
-                Collection resultCollection = (Collection) valueObj;
-
-                int i = 0;
-                for (Object obj1 : resultCollection) {
-                    String nodeKey = JaxenHelper.escape(initialNodeKey) + "/" + (i++);
-                    String value = JaxenHelper.toString(obj1);
-
-                    addStat(stats, gauge, nodeKey, value);
-                }
-            } else {
-                String nodeKey = JaxenHelper.escape(initialNodeKey);
-                String value = JaxenHelper.toString(valueObj);
-
-                addStat(stats, gauge, nodeKey, value);
-            }
-        } else {
-            throw new IllegalArgumentException();
-        }
-    }
-
-    private void addStat(List<ExperimentStat> stats, ExperimentGauge gauge, String nodeKey, String value) {
-        stats.add(new ExperimentStat(experiment, getPrefix(), gauge, nodeKey, value));
-    }
-
-    private String getNodeKey(ExperimentGauge gauge, Object obj, Object keyObj) {
-        String key = "";
-
-        if (obj instanceof Named) {
-            key = ((Named) obj).getName();
-        } else {
-            key = String.format("%s", !StringUtils.isEmpty(gauge.getType().getNodeExpression()) ? gauge.getType().getNodeExpression() : "simulation");
-
-            if (!StringUtils.isEmpty(gauge.getType().getKeyExpression())) {
-                key += "/" + keyObj;
-            }
-        }
-        return key;
     }
 
     /**

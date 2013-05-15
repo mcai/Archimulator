@@ -19,7 +19,7 @@
 package archimulator.sim.uncore;
 
 import archimulator.model.Experiment;
-import archimulator.model.metric.ExperimentStat;
+import archimulator.model.ExperimentStat;
 import archimulator.sim.common.BasicSimulationObject;
 import archimulator.sim.common.Simulation;
 import archimulator.sim.common.SimulationEvent;

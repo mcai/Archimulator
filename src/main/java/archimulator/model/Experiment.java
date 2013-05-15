@@ -18,21 +18,18 @@
  ******************************************************************************/
 package archimulator.model;
 
-import archimulator.model.metric.ExperimentStat;
-import archimulator.model.metric.gauge.ExperimentGauge;
 import archimulator.service.ServiceManager;
 import archimulator.util.serialization.ContextMappingArrayListJsonSerializableType;
-import archimulator.util.serialization.LongArrayListJsonSerializableType;
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import net.pickapack.action.Function1;
+import net.pickapack.collection.CollectionHelper;
 import net.pickapack.dateTime.DateHelper;
 import net.pickapack.model.WithCreateTime;
 import net.pickapack.model.WithId;
 import net.pickapack.model.WithParentId;
 import net.pickapack.model.WithTitle;
-import net.pickapack.collection.CollectionHelper;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
@@ -77,8 +74,9 @@ public class Experiment implements WithId, WithParentId, WithTitle, WithCreateTi
     @DatabaseField(persisterClass = ContextMappingArrayListJsonSerializableType.class)
     private ArrayList<ContextMapping> contextMappings;
 
-    @DatabaseField(persisterClass = LongArrayListJsonSerializableType.class)
-    private ArrayList<Long> gaugeIds;
+    private transient List<ExperimentStat> stats;
+
+    private transient ExperimentSummary summary;
 
     private transient Architecture architecture;
 
@@ -106,21 +104,14 @@ public class Experiment implements WithId, WithParentId, WithTitle, WithCreateTi
      * @param architecture       the architecture
      * @param numMaxInstructions the upper limit of the number of instructions executed on the first hardware thread
      * @param contextMappings    the context mappings
-     * @param gauges             the experiment gauges
      */
-    public Experiment(ExperimentPack parent, ExperimentType type, Architecture architecture, long numMaxInstructions, List<ContextMapping> contextMappings, List<ExperimentGauge> gauges) {
+    public Experiment(ExperimentPack parent, ExperimentType type, Architecture architecture, long numMaxInstructions, List<ContextMapping> contextMappings) {
         this.parentId = parent != null ? parent.getId() : -1;
         this.type = type;
         this.state = ExperimentState.PENDING;
         this.failedReason = "";
         this.numMaxInstructions = numMaxInstructions;
         this.contextMappings = new ArrayList<ContextMapping>(contextMappings);
-        this.gaugeIds = new ArrayList<Long>(CollectionHelper.transform(gauges, new Function1<ExperimentGauge, Long>() {
-            @Override
-            public Long apply(ExperimentGauge gauge) {
-                return gauge.getId();
-            }
-        }));
         this.architectureId = architecture.getId();
         this.createTime = DateHelper.toTick(new Date());
     }
@@ -275,15 +266,6 @@ public class Experiment implements WithId, WithParentId, WithTitle, WithCreateTi
     }
 
     /**
-     * Get the gauge IDs.
-     *
-     * @return the gauge IDs
-     */
-    public List<Long> getGaugeIds() {
-        return gaugeIds;
-    }
-
-    /**
      * Get a statistic value by key.
      *
      * @param key the key
@@ -410,6 +392,42 @@ public class Experiment implements WithId, WithParentId, WithTitle, WithCreateTi
         }
 
         return architecture;
+    }
+
+    /**
+     * Get the in-memory list of statistics.
+     *
+     * @return the in-memory list of statistics
+     */
+    public List<ExperimentStat> getStats() {
+        return stats;
+    }
+
+    /**
+     * Set the in-memory list of statistics.
+     *
+     * @param stats the in-memory list of statistics
+     */
+    public void setStats(List<ExperimentStat> stats) {
+        this.stats = stats;
+    }
+
+    /**
+     * Get the in-memory summary.
+     *
+     * @return the in-memory summary
+     */
+    public ExperimentSummary getSummary() {
+        return summary;
+    }
+
+    /**
+     * Set the in-memory summary.
+     *
+     * @param summary the in-memory summary
+     */
+    public void setSummary(ExperimentSummary summary) {
+        this.summary = summary;
     }
 
     /**

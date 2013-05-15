@@ -18,13 +18,16 @@
  ******************************************************************************/
 package archimulator.sim.common.report;
 
+import net.pickapack.action.Action1;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Report node.
  */
-public class ReportNode {
+public class ReportNode implements Serializable {
     private ReportNode parent;
     private String key;
     private String value;
@@ -105,19 +108,31 @@ public class ReportNode {
      * @return the path of the node
      */
     public String getPath() {
-        return (getParent() != null ? getParent().getPath() + "/" : "") + getKey();
+        return (getParent() != null && !getParent().getKey().isEmpty() ? getParent().getPath() + "/" : "") + getKey();
     }
 
     /**
-     * Traverse the node and its child nodes.
+     * Print recursively the node and its child nodes.
      */
-    public void traverse() {
+    public void print() {
+        traverse(new Action1<ReportNode>() {
+            @Override
+            public void apply(ReportNode node) {
+                System.out.println(node);
+            }
+        });
+    }
+
+    /**
+     * Traverse the node and its child nodes using the specified callback action.
+     */
+    public void traverse(Action1<ReportNode> callback) {
         if(this.value != null) {
-            System.out.println(this);
+            callback.apply(this);
         }
 
         for(ReportNode child : getChildren()) {
-            child.traverse();
+            child.traverse(callback);
         }
     }
 

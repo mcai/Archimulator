@@ -16,10 +16,8 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.model.metric;
+package archimulator.model;
 
-import archimulator.model.Experiment;
-import archimulator.model.metric.gauge.ExperimentGauge;
 import archimulator.service.ServiceManager;
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
@@ -57,11 +55,8 @@ public class ExperimentStat implements WithId, WithParentId, WithTitle, WithCrea
     @DatabaseField(dataType = DataType.LONG_STRING)
     private String prefix;
 
-    @DatabaseField
-    private long gaugeId;
-
-    @DatabaseField
-    private String nodeKey;
+    @DatabaseField(dataType = DataType.LONG_STRING)
+    private String key;
 
     @DatabaseField(dataType = DataType.LONG_STRING)
     private String value;
@@ -77,34 +72,14 @@ public class ExperimentStat implements WithId, WithParentId, WithTitle, WithCrea
      *
      * @param parent  the parent experiment object
      * @param prefix  the prefix
-     * @param gauge   the gauge
-     * @param nodeKey the node key
+     * @param key     the key
      * @param value   the value
-     */
-    public ExperimentStat(Experiment parent, String prefix, ExperimentGauge gauge, String nodeKey, String value) {
-        this.title = prefix + "/" + nodeKey + "/" + gauge.getValueExpression();
-        this.parentId = parent.getId();
-        this.prefix = prefix;
-        this.gaugeId = gauge.getId();
-        this.nodeKey = nodeKey;
-        this.value = value;
-        this.createTime = DateHelper.toTick(new Date());
-    }
-
-    /**
-     * Create an experiment statistic.
-     *
-     * @param parent the parent experiment object
-     * @param prefix the prefix
-     * @param key    the key
-     * @param value  the value
      */
     public ExperimentStat(Experiment parent, String prefix, String key, String value) {
         this.title = prefix + "/" + key;
         this.parentId = parent.getId();
         this.prefix = prefix;
-        this.gaugeId = -1;
-        this.nodeKey = null;
+        this.key = key;
         this.value = value;
         this.createTime = DateHelper.toTick(new Date());
     }
@@ -159,21 +134,12 @@ public class ExperimentStat implements WithId, WithParentId, WithTitle, WithCrea
     }
 
     /**
-     * Get the gauge ID.
+     * Get the key.
      *
-     * @return the gauge ID
+     * @return the key
      */
-    public long getGaugeId() {
-        return gaugeId;
-    }
-
-    /**
-     * Get the node key.
-     *
-     * @return the node key
-     */
-    public String getNodeKey() {
-        return nodeKey;
+    public String getKey() {
+        return key;
     }
 
     /**
@@ -194,18 +160,9 @@ public class ExperimentStat implements WithId, WithParentId, WithTitle, WithCrea
         return ServiceManager.getExperimentService().getExperimentById(parentId);
     }
 
-    /**
-     * Get the gauge object.
-     *
-     * @return the gauge object
-     */
-    public ExperimentGauge getGauge() {
-        return ServiceManager.getExperimentMetricService().getGaugeById(gaugeId);
-    }
-
     @Override
     public String toString() {
-        return String.format("ExperimentStat{id=%d, title='%s', createTime=%d, parentId=%d, prefix='%s', gaugeId=%d, nodeKey='%s', value='%s'}", id, title, createTime, parentId, prefix, gaugeId, nodeKey, value);
+        return String.format("ExperimentStat{id=%d, title='%s', createTime=%d, parentId=%d, prefix='%s', key='%s', value='%s'}", id, title, createTime, parentId, prefix, key, value);
     }
 
     /**

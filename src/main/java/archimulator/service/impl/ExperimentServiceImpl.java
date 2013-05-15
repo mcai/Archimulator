@@ -19,7 +19,6 @@
 package archimulator.service.impl;
 
 import archimulator.model.*;
-import archimulator.model.metric.gauge.ExperimentGauge;
 import archimulator.service.ExperimentService;
 import archimulator.service.ServiceManager;
 import archimulator.sim.common.*;
@@ -107,9 +106,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
                                                 contextMapping.setHelperThreadStride(experimentSpec.getHelperThreadStride());
                                                 contextMappings.add(contextMapping);
 
-                                                List<ExperimentGauge> gauges = ServiceManager.getExperimentMetricService().getAllGauges(); //TODO: should use basic gauges only.
-
-                                                addExperiment(new Experiment(experimentPack, experimentType, architecture, experimentSpec.getNumMaxInstructions(), contextMappings, gauges));
+                                                addExperiment(new Experiment(experimentPack, experimentType, architecture, experimentSpec.getNumMaxInstructions(), contextMappings));
                                             }
 
                                             updateExperimentPack(experimentPack);

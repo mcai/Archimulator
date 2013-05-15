@@ -35,10 +35,8 @@ public class ServiceManager {
 
     private static BenchmarkService benchmarkService;
     private static ArchitectureService architectureService;
-    private static ExperimentMetricService experimentMetricService;
     private static ExperimentService experimentService;
     private static ExperimentStatService experimentStatService;
-    private static ExperimentReportService experimentReportService;
     private static UserService userService;
     private static SystemSettingService systemSettingService;
 
@@ -52,19 +50,15 @@ public class ServiceManager {
 
         benchmarkService = new BenchmarkServiceImpl();
         architectureService = new ArchitectureServiceImpl();
-        experimentMetricService = new ExperimentMetricServiceImpl();
         experimentService = new ExperimentServiceImpl();
         experimentStatService = new ExperimentStatServiceImpl();
-        experimentReportService = new ExperimentReportServiceImpl();
         userService = new UserServiceImpl();
         systemSettingService = new SystemSettingServiceImpl();
 
         benchmarkService.initialize();
         architectureService.initialize();
-        experimentMetricService.initialize();
         experimentService.initialize();
         experimentStatService.initialize();
-        experimentReportService.initialize();
         userService.initialize();
         systemSettingService.initialize();
 
@@ -90,15 +84,6 @@ public class ServiceManager {
     }
 
     /**
-     * Get the experiment metric service singleton.
-     *
-     * @return experiment metric service singleton
-     */
-    public static ExperimentMetricService getExperimentMetricService() {
-        return experimentMetricService;
-    }
-
-    /**
      * Get the experiment service singleton.
      *
      * @return experiment service singleton
@@ -114,15 +99,6 @@ public class ServiceManager {
      */
     public static ExperimentStatService getExperimentStatService() {
         return experimentStatService;
-    }
-
-    /**
-     * Get the experiment report service singleton.
-     *
-     * @return the experiment report service singleton
-     */
-    public static ExperimentReportService getExperimentReportService() {
-        return experimentReportService;
     }
 
     /**

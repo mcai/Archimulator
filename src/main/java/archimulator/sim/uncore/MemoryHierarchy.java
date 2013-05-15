@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore;
 
-import archimulator.model.metric.ExperimentStat;
+import archimulator.model.ExperimentStat;
 import archimulator.sim.common.SimulationObject;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.controller.Controller;

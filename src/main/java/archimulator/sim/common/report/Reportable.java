@@ -18,12 +18,14 @@
  ******************************************************************************/
 package archimulator.sim.common.report;
 
+import java.io.Serializable;
+
 /**
  * Reportable object.
  *
  * @author Min Cai
  */
-public interface Reportable {
+public interface Reportable extends Serializable {
     /**
      * Dump the statistics into the specified report node.
      *
