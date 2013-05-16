@@ -25,7 +25,7 @@ import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import net.pickapack.action.Action;
 
 /**
- * The event when the directory controller receives a "GetM" message.
+ * The event fired when the directory controller receives a "GetM" message.
  *
  * @author Min Cai
  */

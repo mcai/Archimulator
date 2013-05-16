@@ -24,7 +24,7 @@ import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
 /**
- * The event when an L1 cache controller receives a "data from the directory controller where there are pending acknowledgements expected" message.
+ * The event fired when an L1 cache controller receives a "data from the directory controller where there are pending acknowledgements expected" message.
  *
  * @author Min Cai
  */

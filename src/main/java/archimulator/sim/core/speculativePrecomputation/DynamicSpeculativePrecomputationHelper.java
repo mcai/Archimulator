@@ -51,6 +51,8 @@ import java.util.*;
 
 /**
  * Dynamic speculative precomputation helper.
+ *
+ * @author Min Cai
  */
 public class DynamicSpeculativePrecomputationHelper {
     private EvictableCache<Boolean> sliceCache;

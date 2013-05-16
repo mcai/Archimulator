@@ -22,7 +22,7 @@ import archimulator.sim.common.SimulationEvent;
 import archimulator.sim.core.DynamicInstruction;
 
 /**
- * The event when a dynamic instruction is committed.
+ * The event fired when a dynamic instruction is committed.
  *
  * @author Min Cai
  */

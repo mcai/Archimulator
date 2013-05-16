@@ -23,7 +23,7 @@ import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.msi.controller.GeneralCacheController;
 
 /**
- * The event when a general cache controller has a line replacement.
+ * The event fired when a general cache controller has a line replacement.
  *
  * @author Min Cai
  */

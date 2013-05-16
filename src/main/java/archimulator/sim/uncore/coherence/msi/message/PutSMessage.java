@@ -24,7 +24,7 @@ import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
 /**
- * A "PutS" message.
+ * "PutS" message.
  *
  * @author Min Cai
  */

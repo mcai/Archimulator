@@ -24,7 +24,7 @@ import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
 /**
- * The event when the directory controller receives a "data" message from an L1 cache controller.
+ * The event fired when the directory controller receives a "data" message from an L1 cache controller.
  *
  * @author Min Cai
  */

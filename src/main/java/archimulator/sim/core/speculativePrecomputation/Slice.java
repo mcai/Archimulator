@@ -28,6 +28,8 @@ import java.util.Set;
 
 /**
  * Slice.
+ *
+ * @author Min Cai
  */
 public class Slice {
     private DelinquentLoad delinquentLoad;

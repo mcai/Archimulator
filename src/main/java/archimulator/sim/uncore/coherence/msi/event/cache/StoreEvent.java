@@ -24,7 +24,7 @@ import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import net.pickapack.action.Action;
 
 /**
- * The event when an L1 cache controller receives a "store" memory hierarchy access.
+ * The event fired when an L1 cache controller receives a "store" memory hierarchy access.
  *
  * @author Min Cai
  */

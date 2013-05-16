@@ -46,6 +46,8 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * Process.
+ *
  * @author Min Cai
  */
 public abstract class Process extends BasicSimulationObject implements SimulationObject, Serializable {

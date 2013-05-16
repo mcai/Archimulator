@@ -32,7 +32,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * The basic core.
+ * Basic core.
  *
  * @author Min Cai
  */

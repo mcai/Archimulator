@@ -159,7 +159,7 @@ public class ReuseDistanceSampler extends BasicSimulationObject {
     }
 
     /**
-     * The event when a reuse distance is sampled.
+     * The event fired when a reuse distance is sampled.
      */
     public class ReuseDistanceSampledEvent extends SimulationEvent {
         private int leaderThreadId;

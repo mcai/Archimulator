@@ -26,7 +26,7 @@ import archimulator.sim.uncore.coherence.msi.state.CacheControllerState;
 import net.pickapack.action.Action;
 
 /**
- * The event when an L1 cache controller performs a line replacement.
+ * The event fired when an L1 cache controller performs a line replacement.
  *
  * @author Min Cai
  */

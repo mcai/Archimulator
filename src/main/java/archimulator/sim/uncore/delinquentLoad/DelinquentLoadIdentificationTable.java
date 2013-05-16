@@ -160,7 +160,7 @@ public class DelinquentLoadIdentificationTable {
     }
 
     /**
-     * The event when a delinquent load is identified.
+     * The event fired when a delinquent load is identified.
      */
     public class DelinquentLoadIdentifiedEvent extends SimulationEvent {
         private Thread thread;

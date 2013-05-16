@@ -22,7 +22,7 @@ import archimulator.sim.common.SimulationEvent;
 import archimulator.sim.core.Thread;
 
 /**
- * The event when a memory access is initiated.
+ * The event fired when a memory access is initiated.
  *
  * @author Min Cai
  */

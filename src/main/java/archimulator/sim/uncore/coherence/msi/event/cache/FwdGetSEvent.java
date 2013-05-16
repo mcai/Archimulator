@@ -23,7 +23,7 @@ import archimulator.sim.uncore.coherence.msi.controller.CacheController;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
 /**
- * The event when an L1 cache controller receives a "forwarded GetS" message.
+ * The event fired when an L1 cache controller receives a "forwarded GetS" message.
  *
  * @author Min Cai
  */

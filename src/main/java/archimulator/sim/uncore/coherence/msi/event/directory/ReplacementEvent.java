@@ -26,7 +26,7 @@ import archimulator.sim.uncore.coherence.msi.state.DirectoryControllerState;
 import net.pickapack.action.Action;
 
 /**
- * The event when the directory controller performs a line replacement.
+ * The event fired when the directory controller performs a line replacement.
  *
  * @author Min Cai
  */

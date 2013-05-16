@@ -21,7 +21,7 @@ package archimulator.sim.os;
 import archimulator.sim.common.SimulationEvent;
 
 /**
- * The event when a context is killed.
+ * The event fired when a context is killed.
  *
  * @author Min Cai
  */

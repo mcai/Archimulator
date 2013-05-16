@@ -24,7 +24,7 @@ import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
 /**
- * The event when the directory controller receives a "PutM and data (not from the owner)" message.
+ * The event fired when the directory controller receives a "PutM and data (not from the owner)" message.
  *
  * @author Min Cai
  */

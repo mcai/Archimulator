@@ -24,7 +24,7 @@ import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
 /**
- * The event when the directory controller receives a "PutS (last)" message.
+ * The event fired when the directory controller receives a "PutS (last)" message.
  *
  * @author Min Cai
  */

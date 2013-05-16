@@ -24,7 +24,7 @@ import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.coherence.msi.controller.GeneralCacheController;
 
 /**
- * The event when the last level cache (LLC) controller has a line inserted.
+ * The event fired when the last level cache (LLC) controller has a line inserted.
  *
  * @author Min Cai
  */

@@ -26,6 +26,8 @@ import archimulator.sim.uncore.cache.CacheLine;
 
 /**
  * Precomputation context.
+ *
+ * @author Min Cai
  */
 public class PrecomputationContext extends Context {
     private DynamicSpeculativePrecomputationHelper dynamicSpeculativePrecomputationHelper;

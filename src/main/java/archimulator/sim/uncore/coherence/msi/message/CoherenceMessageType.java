@@ -19,6 +19,8 @@
 package archimulator.sim.uncore.coherence.msi.message;
 
 /**
+ * Coherence message type.
+ *
  * @author Min Cai
  */
 public enum CoherenceMessageType {

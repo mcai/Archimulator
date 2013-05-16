@@ -20,6 +20,8 @@ package archimulator.sim.core.speculativePrecomputation;
 
 /**
  * Retired instruction buffer state.
+ *
+ * @author Min Cai
  */
 public enum RetiredInstructionBufferState {
     /**

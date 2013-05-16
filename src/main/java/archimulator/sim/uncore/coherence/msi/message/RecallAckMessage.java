@@ -24,7 +24,7 @@ import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 
 /**
- * A "recall acknowledgement" message.
+ * "Recall acknowledgement" message.
  *
  * @author Min Cai
  */

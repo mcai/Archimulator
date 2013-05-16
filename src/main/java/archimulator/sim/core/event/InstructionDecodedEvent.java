@@ -22,7 +22,7 @@ import archimulator.sim.common.SimulationEvent;
 import archimulator.sim.core.DynamicInstruction;
 
 /**
- * The event when an instruction is decoded.
+ * The event fired when an instruction is decoded.
  *
  * @author Min Cai
  */
