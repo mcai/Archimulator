@@ -35,7 +35,7 @@ import java.util.List;
  * @author Min Cai
  */
 public abstract class CachePartitioningHelper {
-    private DirectoryController l2CacheController;
+    private Simulation simulation;
 
     private int numCyclesElapsedPerInterval;
 
@@ -52,23 +52,14 @@ public abstract class CachePartitioningHelper {
      * @param simulation the simulation
      */
     public CachePartitioningHelper(Simulation simulation) {
-        this(simulation.getProcessor().getMemoryHierarchy().getL2CacheController());
-    }
+        this.simulation = simulation;
 
-    /**
-     * Create a cache partitioning helper.
-     *
-     * @param l2CacheController the L2 cache controller
-     */
-    public CachePartitioningHelper(DirectoryController l2CacheController) {
-        this.l2CacheController = l2CacheController;
-
-//        this.numThreads = this.l2CacheController.getExperiment().getArchitecture().getNumThreadsPerCore() * this.l2CacheController.getExperiment().getArchitecture().getNumCores();
-        this.numThreads = this.l2CacheController.getExperiment().getArchitecture().getNumCores();
+//        this.numThreads = simulation.getExperiment().getArchitecture().getNumThreadsPerCore() * this.l2CacheController.getExperiment().getArchitecture().getNumCores();
+        this.numThreads = simulation.getExperiment().getArchitecture().getNumCores();
 
         this.partition = new ArrayList<Integer>();
 
-        int l2Associativity = this.l2CacheController.getCache().getAssociativity();
+        int l2Associativity = simulation.getExperiment().getArchitecture().getL2Associativity();
 
         if (l2Associativity < this.numThreads) {
             throw new IllegalArgumentException();
@@ -80,7 +71,7 @@ public abstract class CachePartitioningHelper {
 
         this.numCyclesElapsedPerInterval = 5000000;
 
-        this.l2CacheController.getCycleAccurateEventQueue().getPerCycleEvents().add(new Action() {
+        simulation.getCycleAccurateEventQueue().getPerCycleEvents().add(new Action() {
             @Override
             public void apply() {
                 numCyclesElapsed++;
@@ -101,12 +92,21 @@ public abstract class CachePartitioningHelper {
     protected abstract void newInterval();
 
     /**
+     * Get the simulation.
+     *
+     * @return the simulation
+     */
+    public Simulation getSimulation() {
+        return simulation;
+    }
+
+    /**
      * Get the L2 cache controller.
      *
      * @return the L2 cache controller
      */
     public DirectoryController getL2CacheController() {
-        return l2CacheController;
+        return getSimulation().getProcessor().getMemoryHierarchy().getL2CacheController();
     }
 
     /**

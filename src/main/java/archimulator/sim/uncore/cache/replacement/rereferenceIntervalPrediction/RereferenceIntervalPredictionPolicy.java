@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache.replacement.rereferenceIntervalPrediction;
 
+import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.Cache;
 import archimulator.sim.uncore.cache.CacheAccess;
@@ -98,6 +99,10 @@ public class RereferenceIntervalPredictionPolicy<StateT extends Serializable> ex
             BooleanValueProvider stateProvider = (BooleanValueProvider) mirrorLine.getStateProvider();
             stateProvider.predictedRereferenceInterval = this.predictedRereferenceIntervalMaxValue - 1;
         }
+    }
+
+    @Override
+    public void dumpStats(ReportNode reportNode) {
     }
 
     /**

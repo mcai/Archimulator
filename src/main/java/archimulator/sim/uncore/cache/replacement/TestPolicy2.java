@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache.replacement;
 
+import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.*;
 import archimulator.sim.uncore.cache.prediction.CacheBasedPredictor;
@@ -92,6 +93,10 @@ public class TestPolicy2<StateT extends Serializable> extends LRUPolicy<StateT> 
         stateProvider.pc = access.getVirtualPc();
 
         this.handleLineReference(set, way, access.getThread().getId());
+    }
+
+    @Override
+    public void dumpStats(ReportNode reportNode) {
     }
 
     /**

@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache.replacement;
 
+import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.Cache;
 import archimulator.sim.uncore.cache.CacheAccess;
@@ -105,6 +106,10 @@ public class LFUPolicy<StateT extends Serializable> extends CacheReplacementPoli
         CacheLine<Boolean> line = this.mirrorCache.getLine(set, way);
         BooleanValueProvider stateProvider = (BooleanValueProvider) line.getStateProvider();
         stateProvider.frequency = 0;
+    }
+
+    @Override
+    public void dumpStats(ReportNode reportNode) {
     }
 
     /**

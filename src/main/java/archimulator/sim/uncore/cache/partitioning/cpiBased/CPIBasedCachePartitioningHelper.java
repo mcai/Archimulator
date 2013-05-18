@@ -1,11 +1,11 @@
-package archimulator.sim.uncore.cache.partitioning;
+package archimulator.sim.uncore.cache.partitioning.cpiBased;
 
 import archimulator.sim.common.Simulation;
 import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.common.report.Reportable;
 import archimulator.sim.core.Thread;
 import archimulator.sim.core.event.InstructionCommittedEvent;
-import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
+import archimulator.sim.uncore.cache.partitioning.CachePartitioningHelper;
 import net.pickapack.action.Action1;
 import org.apache.commons.math3.util.Precision;
 
@@ -22,16 +22,17 @@ import java.util.TreeMap;
 public class CPIBasedCachePartitioningHelper extends CachePartitioningHelper implements Reportable {
     private Map<Integer, Long> committedInstructions;
 
+    /**
+     * Create a CPI based cache partitioning helper.
+     *
+     * @param simulation the simulation
+     */
     public CPIBasedCachePartitioningHelper(Simulation simulation) {
-        this(simulation.getProcessor().getMemoryHierarchy().getL2CacheController());
-    }
-
-    public CPIBasedCachePartitioningHelper(DirectoryController l2CacheController) {
-        super(l2CacheController);
+        super(simulation);
 
         this.committedInstructions = new TreeMap<Integer, Long>();
 
-        l2CacheController.getBlockingEventDispatcher().addListener(InstructionCommittedEvent.class, new Action1<InstructionCommittedEvent>() {
+        simulation.getBlockingEventDispatcher().addListener(InstructionCommittedEvent.class, new Action1<InstructionCommittedEvent>() {
             public void apply(InstructionCommittedEvent event) {
                 Thread thread = event.getDynamicInstruction().getThread();
 

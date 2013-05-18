@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache.replacement;
 
+import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.EvictableCache;
 import net.pickapack.util.IntegerIntegerPair;
@@ -76,6 +77,10 @@ public class TestPolicy1<StateT extends Serializable> extends LRUPolicy<StateT> 
 //            this.setLRU(set, way);
             this.setStackPosition(set, way, 4);
         }
+    }
+
+    @Override
+    public void dumpStats(ReportNode reportNode) {
     }
 
     /**

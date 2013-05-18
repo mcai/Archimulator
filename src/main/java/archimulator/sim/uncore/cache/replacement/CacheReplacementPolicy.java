@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache.replacement;
 
+import archimulator.sim.common.report.Reportable;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.cache.EvictableCache;
@@ -30,7 +31,7 @@ import java.io.Serializable;
  * @param <StateT>
  * @author Min Cai
  */
-public abstract class CacheReplacementPolicy<StateT extends Serializable> {
+public abstract class CacheReplacementPolicy<StateT extends Serializable> implements Reportable {
     private EvictableCache<StateT> cache;
 
     /**

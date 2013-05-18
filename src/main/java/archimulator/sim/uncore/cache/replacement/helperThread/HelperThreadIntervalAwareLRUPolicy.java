@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache.replacement.helperThread;
 
+import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.replacement.LRUPolicy;
@@ -64,5 +65,9 @@ public class HelperThreadIntervalAwareLRUPolicy<StateT extends Serializable> ext
         } else {
             super.handleInsertionOnMiss(access, set, way);
         }
+    }
+
+    @Override
+    public void dumpStats(ReportNode reportNode) {
     }
 }

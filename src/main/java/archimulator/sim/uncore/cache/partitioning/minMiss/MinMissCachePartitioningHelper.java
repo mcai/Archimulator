@@ -26,7 +26,6 @@ import archimulator.sim.uncore.cache.partitioning.CachePartitioningHelper;
 import archimulator.sim.uncore.cache.partitioning.LRUStack;
 import archimulator.sim.uncore.cache.stackDistanceProfile.StackDistanceProfile;
 import archimulator.sim.uncore.coherence.event.GeneralCacheControllerServiceNonblockingRequestEvent;
-import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import net.pickapack.action.Action1;
 import net.pickapack.util.Pair;
 
@@ -52,24 +51,15 @@ public class MinMissCachePartitioningHelper extends CachePartitioningHelper impl
      * @param simulation the simulation
      */
     public MinMissCachePartitioningHelper(Simulation simulation) {
-        this(simulation.getProcessor().getMemoryHierarchy().getL2CacheController());
-    }
-
-    /**
-     * Create a min-miss cache partitioning helper.
-     *
-     * @param l2CacheController the L2 cache controller
-     */
-    public MinMissCachePartitioningHelper(final DirectoryController l2CacheController) {
-        super(l2CacheController);
+        super(simulation);
 
         this.stackDistanceProfiles = new LinkedHashMap<Integer, StackDistanceProfile>();
 
         this.lruStacks = new LinkedHashMap<Integer, Map<Integer, LRUStack>>();
 
-        l2CacheController.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, new Action1<GeneralCacheControllerServiceNonblockingRequestEvent>() {
+        simulation.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, new Action1<GeneralCacheControllerServiceNonblockingRequestEvent>() {
             public void apply(GeneralCacheControllerServiceNonblockingRequestEvent event) {
-                if (event.getCacheController() == l2CacheController) {
+                if (event.getCacheController() == getL2CacheController()) {
                     profileStackDistance(event.getAccess());
                 }
             }

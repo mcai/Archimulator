@@ -19,6 +19,8 @@
 package archimulator.sim.uncore.delinquentLoad;
 
 import archimulator.sim.common.Simulation;
+import archimulator.sim.common.report.ReportNode;
+import archimulator.sim.common.report.Reportable;
 import archimulator.sim.core.Core;
 import archimulator.sim.core.Processor;
 import archimulator.sim.core.Thread;
@@ -32,7 +34,7 @@ import java.util.Map;
  *
  * @author Min Cai
  */
-public class DelinquentLoadIdentificationHelper {
+public class DelinquentLoadIdentificationHelper implements Reportable {
     private Map<Integer, DelinquentLoadIdentificationTable> delinquentLoadIdentificationTables;
     private Processor processor;
 
@@ -54,28 +56,6 @@ public class DelinquentLoadIdentificationHelper {
     }
 
     /**
-     * Dump the statistics.
-     *
-     * @param stats the map of statistics
-     */
-    //TODO: to be converted into getters
-    private void dumpStats(Map<String, Object> stats) {
-        for (Core core : this.processor.getCores()) {
-            for (Thread thread : core.getThreads()) {
-                final List<DelinquentLoad> steadyDelinquentLoads = this.delinquentLoadIdentificationTables.get(thread.getId()).getSteadyDelinquentLoads();
-
-                stats.put("DelinquentLoadIdentificationHelper." + thread.getName() + ".steadyDelinquentLoads.size", steadyDelinquentLoads.size());
-
-                for (int i = 0, steadyDelinquentLoadsSize = steadyDelinquentLoads.size(); i < steadyDelinquentLoadsSize; i++) {
-                    DelinquentLoad delinquentLoad = steadyDelinquentLoads.get(i);
-                    stats.put("DelinquentLoadIdentificationHelper." + thread.getName() + ".steadyDelinquentLoad_" + i,
-                            String.format("PC: 0x%08x, functionCallPC: 0x%08x", delinquentLoad.getPc(), delinquentLoad.getFunctionCallPc()));
-                }
-            }
-        }
-    }
-
-    /**
      * Get a value indicating whether the specified program counter (PC) is delinquent or not for the specified thread.
      *
      * @param threadId the ID of the thread
@@ -84,5 +64,24 @@ public class DelinquentLoadIdentificationHelper {
      */
     public boolean isDelinquentPc(int threadId, int pc) {
         return this.delinquentLoadIdentificationTables.get(threadId).isDelinquentPc(pc);
+    }
+
+    @Override
+    public void dumpStats(ReportNode reportNode) {
+        reportNode.getChildren().add(new ReportNode(reportNode, "delinquentLoadIdentificationHelper") {{
+            for (Core core : processor.getCores()) {
+                for (Thread thread : core.getThreads()) {
+                    final List<DelinquentLoad> steadyDelinquentLoads = delinquentLoadIdentificationTables.get(thread.getId()).getSteadyDelinquentLoads();
+
+                    getChildren().add(new ReportNode(this, thread.getName() + ".steadyDelinquentLoads.size", steadyDelinquentLoads.size() + ""));
+
+                    for (int i = 0, steadyDelinquentLoadsSize = steadyDelinquentLoads.size(); i < steadyDelinquentLoadsSize; i++) {
+                        DelinquentLoad delinquentLoad = steadyDelinquentLoads.get(i);
+                        getChildren().add(new ReportNode(this, thread.getName() + ".steadyDelinquentLoad_" + i,
+                                String.format("PC: 0x%08x, functionCallPC: 0x%08x", delinquentLoad.getPc(), delinquentLoad.getFunctionCallPc())));
+                    }
+                }
+            }
+        }});
     }
 }

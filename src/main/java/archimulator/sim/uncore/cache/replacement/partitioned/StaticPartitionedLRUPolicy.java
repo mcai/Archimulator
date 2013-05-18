@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache.replacement.partitioned;
 
+import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.uncore.cache.EvictableCache;
 
 import java.io.Serializable;
@@ -53,5 +54,9 @@ public class StaticPartitionedLRUPolicy<StateT extends Serializable> extends Par
             add(numMainThreadWays);
             add(getCache().getAssociativity() - numMainThreadWays);
         }};
+    }
+
+    @Override
+    public void dumpStats(ReportNode reportNode) {
     }
 }

@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache.replacement;
 
+import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.cache.EvictableCache;
@@ -75,5 +76,9 @@ public class LRUPolicy<StateT extends Serializable> extends StackBasedCacheRepla
     @Override
     public void handleInsertionOnMiss(MemoryHierarchyAccess access, int set, int way) {
         this.setMRU(set, way);
+    }
+
+    @Override
+    public void dumpStats(ReportNode reportNode) {
     }
 }

@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache.replacement.helperThread;
 
+import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.Cache;
 import archimulator.sim.uncore.cache.CacheAccess;
@@ -103,6 +104,10 @@ public class ThrashingSensitiveHelperThreadAwareLRUPolicy<StateT extends Seriali
         } else {
             super.handleInsertionOnMiss(access, set, way); //insert in MRU position
         }
+    }
+
+    @Override
+    public void dumpStats(ReportNode reportNode) {
     }
 
     private boolean isDelinquentPc(int threadId, int pc) {

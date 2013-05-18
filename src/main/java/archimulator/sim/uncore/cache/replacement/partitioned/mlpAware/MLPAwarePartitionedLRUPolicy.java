@@ -18,7 +18,9 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache.replacement.partitioned.mlpAware;
 
+import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.uncore.cache.EvictableCache;
+import archimulator.sim.uncore.cache.partitioning.mlpAware.MLPAwareCachePartitioningHelper;
 import archimulator.sim.uncore.cache.replacement.partitioned.PartitionedLRUPolicy;
 
 import java.io.Serializable;
@@ -31,6 +33,8 @@ import java.util.List;
  * @author Min Cai
  */
 public class MLPAwarePartitionedLRUPolicy<StateT extends Serializable> extends PartitionedLRUPolicy<StateT> {
+    private MLPAwareCachePartitioningHelper mlpAwareCachePartitioningHelper;
+
     /**
      * Create a MLP-aware partitioned least recently used (LRU) policy for the specified evictable cache.
      *
@@ -38,6 +42,7 @@ public class MLPAwarePartitionedLRUPolicy<StateT extends Serializable> extends P
      */
     public MLPAwarePartitionedLRUPolicy(EvictableCache<StateT> cache) {
         super(cache);
+        this.mlpAwareCachePartitioningHelper = new MLPAwareCachePartitioningHelper(cache.getSimulation());
     }
 
     /**
@@ -47,6 +52,20 @@ public class MLPAwarePartitionedLRUPolicy<StateT extends Serializable> extends P
      */
     @Override
     protected List<Integer> getPartition() {
-        return getCache().getSimulation().getMlpAwareCachePartitioningHelper().getPartition();
+        return getMlpAwareCachePartitioningHelper().getPartition();
+    }
+
+    @Override
+    public void dumpStats(ReportNode reportNode) {
+        getMlpAwareCachePartitioningHelper().dumpStats(reportNode);
+    }
+
+    /**
+     * Get the MLP-aware cache partitioning helper.
+     *
+     * @return the MLP-aware cache partitioning helper
+     */
+    public MLPAwareCachePartitioningHelper getMlpAwareCachePartitioningHelper() {
+        return mlpAwareCachePartitioningHelper;
     }
 }

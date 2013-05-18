@@ -18,7 +18,9 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache.replacement.partitioned.minMiss;
 
+import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.uncore.cache.EvictableCache;
+import archimulator.sim.uncore.cache.partitioning.minMiss.MinMissCachePartitioningHelper;
 import archimulator.sim.uncore.cache.replacement.partitioned.PartitionedLRUPolicy;
 
 import java.io.Serializable;
@@ -31,6 +33,8 @@ import java.util.List;
  * @author Min Cai
  */
 public class MinMissPartitionedLRUPolicy<StateT extends Serializable> extends PartitionedLRUPolicy<StateT> {
+    private MinMissCachePartitioningHelper minMissCachePartitioningHelper;
+
     /**
      * Create a min-miss partitioned least recently used (LRU) policy for the specified evictable cache.
      *
@@ -38,6 +42,7 @@ public class MinMissPartitionedLRUPolicy<StateT extends Serializable> extends Pa
      */
     public MinMissPartitionedLRUPolicy(EvictableCache<StateT> cache) {
         super(cache);
+        this.minMissCachePartitioningHelper = new MinMissCachePartitioningHelper(cache.getSimulation());
     }
 
     /**
@@ -47,6 +52,20 @@ public class MinMissPartitionedLRUPolicy<StateT extends Serializable> extends Pa
      */
     @Override
     protected List<Integer> getPartition() {
-        return getCache().getSimulation().getMinMissCachePartitioningHelper().getPartition();
+        return getMinMissCachePartitioningHelper().getPartition();
+    }
+
+    @Override
+    public void dumpStats(ReportNode reportNode) {
+        getMinMissCachePartitioningHelper().dumpStats(reportNode);
+    }
+
+    /**
+     * get the min-miss cache partitioning helper.
+     *
+     * @return the min-miss cache partitioning helper
+     */
+    public MinMissCachePartitioningHelper getMinMissCachePartitioningHelper() {
+        return minMissCachePartitioningHelper;
     }
 }

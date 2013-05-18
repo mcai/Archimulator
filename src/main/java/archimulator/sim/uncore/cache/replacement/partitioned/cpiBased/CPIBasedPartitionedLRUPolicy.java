@@ -18,7 +18,9 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache.replacement.partitioned.cpiBased;
 
+import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.uncore.cache.EvictableCache;
+import archimulator.sim.uncore.cache.partitioning.cpiBased.CPIBasedCachePartitioningHelper;
 import archimulator.sim.uncore.cache.replacement.partitioned.PartitionedLRUPolicy;
 
 import java.io.Serializable;
@@ -31,6 +33,8 @@ import java.util.List;
  * @author Min Cai
  */
 public class CPIBasedPartitionedLRUPolicy<StateT extends Serializable> extends PartitionedLRUPolicy<StateT> {
+    private CPIBasedCachePartitioningHelper cpiBasedCachePartitioningHelper;
+
     /**
      * Create a CPI based partitioned least recently used (LRU) policy for the specified evictable cache.
      *
@@ -38,6 +42,7 @@ public class CPIBasedPartitionedLRUPolicy<StateT extends Serializable> extends P
      */
     public CPIBasedPartitionedLRUPolicy(EvictableCache<StateT> cache) {
         super(cache);
+        this.cpiBasedCachePartitioningHelper = new CPIBasedCachePartitioningHelper(cache.getSimulation());
     }
 
     /**
@@ -47,6 +52,20 @@ public class CPIBasedPartitionedLRUPolicy<StateT extends Serializable> extends P
      */
     @Override
     protected List<Integer> getPartition() {
-        return getCache().getSimulation().getCpiBasedCachePartitioningHelper().getPartition();
+        return getCpiBasedCachePartitioningHelper().getPartition();
+    }
+
+    @Override
+    public void dumpStats(ReportNode reportNode) {
+        getCpiBasedCachePartitioningHelper().dumpStats(reportNode);
+    }
+
+    /**
+     * Get the CPI based cache partitioning helper.
+     *
+     * @return the CPI based cache partitioning helper
+     */
+    public CPIBasedCachePartitioningHelper getCpiBasedCachePartitioningHelper() {
+        return cpiBasedCachePartitioningHelper;
     }
 }

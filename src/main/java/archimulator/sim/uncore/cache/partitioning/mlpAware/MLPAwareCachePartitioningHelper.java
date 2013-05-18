@@ -28,7 +28,6 @@ import archimulator.sim.uncore.cache.partitioning.LRUStack;
 import archimulator.sim.uncore.cache.partitioning.MemoryLatencyMeter;
 import archimulator.sim.uncore.coherence.event.GeneralCacheControllerServiceNonblockingRequestEvent;
 import archimulator.sim.uncore.coherence.event.LastLevelCacheControllerLineInsertEvent;
-import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.mlp.PendingL2Hit;
 import archimulator.sim.uncore.mlp.PendingL2Miss;
 import net.pickapack.action.Action;
@@ -67,21 +66,12 @@ public class MLPAwareCachePartitioningHelper extends CachePartitioningHelper imp
      * @param simulation the simulation
      */
     public MLPAwareCachePartitioningHelper(Simulation simulation) {
-        this(simulation.getProcessor().getMemoryHierarchy().getL2CacheController());
-    }
-
-    /**
-     * Create an MLP aware cache partitioning helper.
-     *
-     * @param l2CacheController the L2 cache controller
-     */
-    public MLPAwareCachePartitioningHelper(final DirectoryController l2CacheController) {
-        super(l2CacheController);
+        super(simulation);
 
         this.pendingL2Misses = new LinkedHashMap<Integer, PendingL2Miss>();
         this.pendingL2Hits = new LinkedHashMap<Integer, Map<Integer, PendingL2Hit>>();
 
-        this.l2CacheAccessMLPCostProfile = new L2CacheAccessMLPCostProfile(this.getL2CacheController().getCache().getAssociativity());
+        this.l2CacheAccessMLPCostProfile = new L2CacheAccessMLPCostProfile(simulation.getExperiment().getArchitecture().getL2Associativity());
 
         this.memoryLatencyMeter = new MemoryLatencyMeter();
 
@@ -116,7 +106,7 @@ public class MLPAwareCachePartitioningHelper extends CachePartitioningHelper imp
             }
         };
 
-        l2CacheController.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, new Action1<GeneralCacheControllerServiceNonblockingRequestEvent>() {
+        simulation.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, new Action1<GeneralCacheControllerServiceNonblockingRequestEvent>() {
             public void apply(GeneralCacheControllerServiceNonblockingRequestEvent event) {
                 if (event.getCacheController().equals(getL2CacheController())) {
                     if (!event.isHitInCache()) {
@@ -128,7 +118,7 @@ public class MLPAwareCachePartitioningHelper extends CachePartitioningHelper imp
             }
         });
 
-        l2CacheController.getBlockingEventDispatcher().addListener(LastLevelCacheControllerLineInsertEvent.class, new Action1<LastLevelCacheControllerLineInsertEvent>() {
+        simulation.getBlockingEventDispatcher().addListener(LastLevelCacheControllerLineInsertEvent.class, new Action1<LastLevelCacheControllerLineInsertEvent>() {
             @Override
             public void apply(LastLevelCacheControllerLineInsertEvent event) {
                 if (event.getCacheController().equals(getL2CacheController())) {
@@ -137,7 +127,7 @@ public class MLPAwareCachePartitioningHelper extends CachePartitioningHelper imp
             }
         });
 
-        l2CacheController.getCycleAccurateEventQueue().getPerCycleEvents().add(new Action() {
+        simulation.getCycleAccurateEventQueue().getPerCycleEvents().add(new Action() {
             @Override
             public void apply() {
                 updateL2CacheAccessMlpCostsPerCycle();
@@ -147,7 +137,7 @@ public class MLPAwareCachePartitioningHelper extends CachePartitioningHelper imp
             }
         });
 
-        l2CacheController.getBlockingEventDispatcher().addListener(InstructionCommittedEvent.class, new Action1<InstructionCommittedEvent>() {
+        simulation.getBlockingEventDispatcher().addListener(InstructionCommittedEvent.class, new Action1<InstructionCommittedEvent>() {
             @Override
             public void apply(InstructionCommittedEvent event) {
                 if (pendingL2Hits.containsKey(getThreadIdentifier(event.getDynamicInstruction().getThread()))) {

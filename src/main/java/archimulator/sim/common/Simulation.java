@@ -35,9 +35,6 @@ import archimulator.sim.os.Kernel;
 import archimulator.sim.uncore.BasicMemoryHierarchy;
 import archimulator.sim.uncore.MemoryHierarchy;
 import archimulator.sim.uncore.cache.interference.CacheInteractionHelper;
-import archimulator.sim.uncore.cache.partitioning.CPIBasedCachePartitioningHelper;
-import archimulator.sim.uncore.cache.partitioning.minMiss.MinMissCachePartitioningHelper;
-import archimulator.sim.uncore.cache.partitioning.mlpAware.MLPAwareCachePartitioningHelper;
 import archimulator.sim.uncore.cache.prediction.CacheBasedPredictor;
 import archimulator.sim.uncore.cache.stackDistanceProfile.StackDistanceProfilingHelper;
 import archimulator.sim.uncore.coherence.msi.controller.GeneralCacheController;
@@ -106,13 +103,7 @@ public abstract class Simulation implements SimulationObject, Reportable {
 
     private DynamicSpeculativePrecomputationHelper dynamicSpeculativePrecomputationHelper;
 
-    private CPIBasedCachePartitioningHelper cpiBasedCachePartitioningHelper;
-
-    private MinMissCachePartitioningHelper minMissCachePartitioningHelper;
-
     private MLPProfilingHelper mlpProfilingHelper;
-
-    private MLPAwareCachePartitioningHelper mlpAwareCachePartitioningHelper;
 
     private RuntimeHelper runtimeHelper;
 
@@ -209,13 +200,7 @@ public abstract class Simulation implements SimulationObject, Reportable {
             this.dynamicSpeculativePrecomputationHelper = new DynamicSpeculativePrecomputationHelper(this);
         }
 
-        this.cpiBasedCachePartitioningHelper = new CPIBasedCachePartitioningHelper(this);
-
-        this.minMissCachePartitioningHelper = new MinMissCachePartitioningHelper(this);
-
         this.mlpProfilingHelper = new MLPProfilingHelper(this);
-
-        this.mlpAwareCachePartitioningHelper = new MLPAwareCachePartitioningHelper(this);
     }
 
     /**
@@ -341,9 +326,8 @@ public abstract class Simulation implements SimulationObject, Reportable {
         this.getHelperThreadL2CacheRequestProfilingHelper().dumpStats(rootReportNode);
         this.getCacheInteractionHelper().dumpStats(rootReportNode);
         this.getFeedbackDirectedHelperThreadingHelper().dumpStats(rootReportNode);
-        this.getCpiBasedCachePartitioningHelper().dumpStats(rootReportNode);
-        this.getMinMissCachePartitioningHelper().dumpStats(rootReportNode);
-        this.getMlpAwareCachePartitioningHelper().dumpStats(rootReportNode);
+
+        this.getProcessor().getMemoryHierarchy().getL2CacheController().getCache().getReplacementPolicy().dumpStats(rootReportNode);
 
         rootReportNode.traverse(new Action1<ReportNode>() {
             @Override
@@ -359,7 +343,6 @@ public abstract class Simulation implements SimulationObject, Reportable {
         if (endOfSimulation && this.getExperiment().getArchitecture().getHelperThreadL2CacheRequestProfilingEnabled() && (this.getType() == SimulationType.MEASUREMENT || this.getType() == SimulationType.CACHE_WARMUP)) {
             CacheBasedPredictor<HelperThreadL2CacheRequestQuality> helperThreadL2CacheRequestQualityPredictor = (CacheBasedPredictor<HelperThreadL2CacheRequestQuality>) this.getHelperThreadL2CacheRequestProfilingHelper().getHelperThreadL2CacheRequestQualityPredictor();
             helperThreadL2CacheRequestQualityPredictor.dumpState();
-
         }
 
         ServiceManager.getExperimentStatService().addStatsByParent(this.getExperiment(), stats);
@@ -797,39 +780,12 @@ public abstract class Simulation implements SimulationObject, Reportable {
     }
 
     /**
-     * Get the CPI based cache partitioning helper.
-     *
-     * @return the CPI based cache partitioning helper
-     */
-    public CPIBasedCachePartitioningHelper getCpiBasedCachePartitioningHelper() {
-        return cpiBasedCachePartitioningHelper;
-    }
-
-    /**
-     * get the min-miss cache partitioning helper.
-     *
-     * @return the min-miss cache partitioning helper
-     */
-    public MinMissCachePartitioningHelper getMinMissCachePartitioningHelper() {
-        return minMissCachePartitioningHelper;
-    }
-
-    /**
      * Get the MLP profiling helper.
      *
      * @return the MLP profiling helper
      */
     public MLPProfilingHelper getMlpProfilingHelper() {
         return mlpProfilingHelper;
-    }
-
-    /**
-     * Get the MLP-aware cache partitioning helper.
-     *
-     * @return the MLP-aware cache partitioning helper
-     */
-    public MLPAwareCachePartitioningHelper getMlpAwareCachePartitioningHelper() {
-        return mlpAwareCachePartitioningHelper;
     }
 
     /**
