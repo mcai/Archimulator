@@ -60,6 +60,18 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
     private ExperimentState state;
 
     @DatabaseField
+    private String beginTimeAsString;
+
+    @DatabaseField
+    private String endTimeAsString;
+
+    @DatabaseField
+    private String duration;
+
+    @DatabaseField
+    private long durationInSeconds;
+
+    @DatabaseField
     private int l2Size;
 
     @DatabaseField
@@ -246,6 +258,78 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
      */
     public void setState(ExperimentState state) {
         this.state = state;
+    }
+
+    /**
+     * Get the string representation of the begin time.
+     *
+     * @return the string representation of the begin time
+     */
+    public String getBeginTimeAsString() {
+        return beginTimeAsString;
+    }
+
+    /**
+     * Set the string representation of the begin time.
+     *
+     * @param beginTimeAsString the string representation of the begin time
+     */
+    public void setBeginTimeAsString(String beginTimeAsString) {
+        this.beginTimeAsString = beginTimeAsString;
+    }
+
+    /**
+     * Get the string representation of the end time.
+     *
+     * @return the string representation of the end time
+     */
+    public String getEndTimeAsString() {
+        return endTimeAsString;
+    }
+
+    /**
+     * Set the string representation of the end time.
+     *
+     * @param endTimeAsString the string representation of the end time
+     */
+    public void setEndTimeAsString(String endTimeAsString) {
+        this.endTimeAsString = endTimeAsString;
+    }
+
+    /**
+     * Get the duration.
+     *
+     * @return the duration
+     */
+    public String getDuration() {
+        return duration;
+    }
+
+    /**
+     * Set the duration.
+     *
+     * @param duration the duration
+     */
+    public void setDuration(String duration) {
+        this.duration = duration;
+    }
+
+    /**
+     * Get the duration in seconds.
+     *
+     * @return the duration in seconds
+     */
+    public long getDurationInSeconds() {
+        return durationInSeconds;
+    }
+
+    /**
+     * Set the duration in seconds.
+     *
+     * @param durationInSeconds the duration in seconds
+     */
+    public void setDurationInSeconds(long durationInSeconds) {
+        this.durationInSeconds = durationInSeconds;
     }
 
     /**
@@ -858,6 +942,11 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
 
             add(type + "");
             add(state + "");
+
+            add(beginTimeAsString);
+            add(endTimeAsString);
+            add(duration);
+            add(durationInSeconds + "");
 
             add(StorageUnit.KILOBYTE.getValue(l2Size) + "KB");
             add(l2Associativity + "way");

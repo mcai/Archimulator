@@ -233,6 +233,11 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
             summary.setType(parent.getType());
             summary.setState(parent.getState());
 
+            summary.setBeginTimeAsString(parent.getStatValue(statsMap, parent.getMeasurementTitlePrefix() + "simulation/beginTimeAsString"));
+            summary.setEndTimeAsString(parent.getStatValue(statsMap, parent.getMeasurementTitlePrefix() + "simulation/endTimeAsString"));
+            summary.setDuration(parent.getStatValue(statsMap, parent.getMeasurementTitlePrefix() + "simulation/duration"));
+            summary.setDurationInSeconds(parent.getStatValueAsLong(statsMap, parent.getMeasurementTitlePrefix() + "simulation/durationInSeconds", 0));
+
             summary.setL2Size(parent.getArchitecture().getL2Size());
             summary.setL2Associativity(parent.getArchitecture().getL2Associativity());
             summary.setL2ReplacementPolicyType(parent.getArchitecture().getL2ReplacementPolicyType());
@@ -369,6 +374,11 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
 
                 "Type",
                 "State",
+
+                "Begin Time",
+                "End Time",
+                "Duration",
+                "Duration in Seconds",
 
                 "L2_Size",
                 "L2_Associativity",
