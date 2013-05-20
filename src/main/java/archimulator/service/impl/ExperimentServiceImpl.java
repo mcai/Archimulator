@@ -40,9 +40,7 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -85,7 +83,16 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
                                 File fileExperimentInputs = new File("experiment_inputs");
 
                                 if(fileExperimentInputs.exists()) {
-                                    for (File file : FileUtils.listFiles(fileExperimentInputs, new String[]{"xml"}, true)) {
+                                    List<File> files = new ArrayList<File>(FileUtils.listFiles(fileExperimentInputs, new String[]{"xml"}, true));
+
+                                    Collections.sort(files, new Comparator<File>() {
+                                        @Override
+                                        public int compare(File o1, File o2) {
+                                            return o1.getAbsolutePath().compareTo(o2.getAbsolutePath());
+                                        }
+                                    });
+
+                                    for (File file : files) {
                                         String text = FileUtils.readFileToString(file);
 
                                         ExperimentPack experimentPack = XMLSerializationHelper.deserialize(ExperimentPack.class, text);
