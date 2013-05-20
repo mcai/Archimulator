@@ -783,7 +783,7 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
             getChildren().add(new ReportNode(this, "numMainThreadL2CacheMisses", getNumMainThreadL2CacheMisses() + ""));
 
             getChildren().add(new ReportNode(this, "numHelperThreadL2CacheHits", getNumHelperThreadL2CacheHits() + ""));
-            getChildren().add(new ReportNode(this, "numHelperThreadL2CacheMisses", getNumMainThreadL2CacheMisses() + ""));
+            getChildren().add(new ReportNode(this, "numHelperThreadL2CacheMisses", getNumHelperThreadL2CacheMisses() + ""));
 
             getChildren().add(new ReportNode(this, "numTotalHelperThreadL2CacheRequests", getNumTotalHelperThreadL2CacheRequests() + ""));
 
