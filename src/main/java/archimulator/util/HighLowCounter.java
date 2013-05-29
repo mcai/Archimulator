@@ -22,6 +22,8 @@ import net.pickapack.math.Quantizer;
 
 /**
  * High/low counter.
+ *
+ * @author Min Cai
  */
 public class HighLowCounter {
     private Quantizer timestampQuantizer;
