@@ -65,4 +65,9 @@ public class ExperimentPackVariable implements Serializable {
     public void setValues(List<String> values) {
         this.values = values;
     }
+
+    @Override
+    public String toString() {
+        return String.format("ExperimentPackVariable{name='%s', values=%s}", name, values);
+    }
 }

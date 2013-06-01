@@ -569,6 +569,22 @@ public class ExperimentPack implements WithId, WithTitle, WithCreateTime {
     }
 
     /**
+     * Get the variable by name.
+     *
+     * @param name the name
+     * @return the variable matching the specified name
+     */
+    public ExperimentPackVariable getVariable(String name) {
+        for(ExperimentPackVariable variable : this.getVariables()) {
+            if(variable.getName().equals(name)) {
+                return variable;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Get the combinations from the variables.
      *
      * @return the combinations
