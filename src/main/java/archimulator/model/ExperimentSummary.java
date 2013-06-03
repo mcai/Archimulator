@@ -948,7 +948,7 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
             add(duration);
             add(durationInSeconds + "");
 
-            add(StorageUnit.KILOBYTE.getValue(l2Size) + "KB");
+            add(StorageUnit.toString(l2Size).replaceAll(" ", ""));
             add(l2Associativity + "way");
             add(l2ReplacementPolicyType + "");
 
