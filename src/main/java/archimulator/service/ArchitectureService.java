@@ -110,7 +110,7 @@ public interface ArchitectureService extends Service {
      *                                a value indicating whether helper thread LLC request profiling is enabled or not
      * @param dynamicSpeculativePrecomputationEnabled
      *                                a value indicating whether dynamic speculative precomputation is enabled or not
-     * @param numMainThreadWaysInStaticPartitionedLRUPolicy
+     * @param numMainThreadWaysInStaticPartitionedLRUPolicy the number of main thread ways used in the static partitioned LRU policy
      * @param numCores                the number of cores
      * @param numThreadsPerCore       number of threads per core
      * @param l1ISize                 L1 instruction cache size
