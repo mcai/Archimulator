@@ -72,7 +72,49 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     @Override
     public void initialize() {
         this.cleanUpExperiments();
+    }
 
+    /**
+     * Clean up experiments.
+     */
+    private void cleanUpExperiments() {
+        System.out.println("Cleaning up experiments..");
+
+        List<Long> experimentPackIds = CollectionHelper.transform(getAllExperimentPacks(), new Function1<ExperimentPack, Long>() {
+            @Override
+            public Long apply(ExperimentPack experimentPack) {
+                return experimentPack.getId();
+            }
+        });
+
+        if (!experimentPackIds.isEmpty()) {
+            try {
+                DeleteBuilder<Experiment, Long> deleteBuilder = this.experiments.deleteBuilder();
+                deleteBuilder.where().notIn("parentId", experimentPackIds);
+                PreparedDelete<Experiment> delete = deleteBuilder.prepare();
+                this.experiments.delete(delete);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        try {
+            UpdateBuilder<Experiment, Long> updateBuilder = this.experiments.updateBuilder();
+            updateBuilder.where().eq("state", ExperimentState.READY_TO_RUN).or().eq("state", ExperimentState.RUNNING);
+            updateBuilder.updateColumnValue("state", ExperimentState.PENDING);
+            updateBuilder.updateColumnValue("failedReason", "");
+
+            PreparedUpdate<Experiment> update = updateBuilder.prepare();
+            this.experiments.update(update);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        System.out.println("Cleaned up experiments.");
+    }
+
+    @Override
+    public void start() {
         //TODO: to be exposed as import/upload experiment pack via web UI
 
         try {
@@ -138,49 +180,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
             e.printStackTrace();
             throw new RuntimeException(e);
         }
-    }
 
-    /**
-     * Clean up experiments.
-     */
-    private void cleanUpExperiments() {
-        System.out.println("Cleaning up experiments..");
-
-        List<Long> experimentPackIds = CollectionHelper.transform(getAllExperimentPacks(), new Function1<ExperimentPack, Long>() {
-            @Override
-            public Long apply(ExperimentPack experimentPack) {
-                return experimentPack.getId();
-            }
-        });
-
-        if (!experimentPackIds.isEmpty()) {
-            try {
-                DeleteBuilder<Experiment, Long> deleteBuilder = this.experiments.deleteBuilder();
-                deleteBuilder.where().notIn("parentId", experimentPackIds);
-                PreparedDelete<Experiment> delete = deleteBuilder.prepare();
-                this.experiments.delete(delete);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        try {
-            UpdateBuilder<Experiment, Long> updateBuilder = this.experiments.updateBuilder();
-            updateBuilder.where().eq("state", ExperimentState.READY_TO_RUN).or().eq("state", ExperimentState.RUNNING);
-            updateBuilder.updateColumnValue("state", ExperimentState.PENDING);
-            updateBuilder.updateColumnValue("failedReason", "");
-
-            PreparedUpdate<Experiment> update = updateBuilder.prepare();
-            this.experiments.update(update);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
-        System.out.println("Cleaned up experiments.");
-    }
-
-    @Override
-    public void start() {
         running = true;
 
         for (int i = 0; i < Runtime.getRuntime().availableProcessors(); i++) {
