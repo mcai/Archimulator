@@ -38,9 +38,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * CSV-mappable table object.
@@ -185,6 +183,63 @@ public class Table implements Serializable {
                     return obj + "";
                 }
             }));
+        }
+
+        return new Table(columns, rows);
+    }
+
+    /**
+     * Get the value at the specified row and column in the specified table.
+     *
+     * @param table  the table
+     * @param row    the row
+     * @param column the column
+     * @return the value at the specified row and column in the specified table
+     */
+    public static String getValue(Table table, List<String> row, String column) {
+        return row.get(table.getColumns().indexOf(column));
+    }
+
+    /**
+     * Sort the specified table by specified list of columns.
+     *
+     * @param table   the table
+     * @param columns the list of columns
+     */
+    public static void sort(final Table table, final String... columns) {
+        List<String> columnList = Arrays.asList(columns);
+        Collections.reverse(columnList);
+
+        for (final String column : columnList) {
+            Collections.sort(table.getRows(), new Comparator<List<String>>() {
+                @Override
+                public int compare(List<String> row1, List<String> row2) {
+                    String val1 = getValue(table, row1, column);
+                    String val2 = getValue(table, row2, column);
+
+                    return val1.compareTo(val2);
+                }
+            });
+        }
+    }
+
+    /**
+     * Merge the specified list of tables into a bigger one.
+     *
+     * @param tables the list of tables to merge
+     * @return the resultant table from the merging of the specified list of tables
+     */
+    public static Table merge(Table... tables) {
+        if (tables.length == 0) {
+            throw new IllegalArgumentException();
+        }
+
+        List<String> columns = tables[0].getColumns();
+
+        List<List<String>> rows = new ArrayList<List<String>>();
+
+        for (Table table : tables) {
+            rows.addAll(table.getRows());
         }
 
         return new Table(columns, rows);
