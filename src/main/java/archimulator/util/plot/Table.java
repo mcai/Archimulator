@@ -162,6 +162,25 @@ public class Table implements Serializable {
     }
 
     /**
+     * Get the list of identical cells in the specified column of the table.
+     *
+     * @param column the column name
+     * @return the list of identical cells in the specified column of the table
+     */
+    public List<String> getIdenticalCells(String column) {
+        List<String> result = new ArrayList<String>();
+
+        for(List<String> row : getRows()) {
+            String cell = getValue(this, row, column);
+            if(!result.contains(cell)) {
+                result.add(cell);
+            }
+        }
+
+        return result;
+    }
+
+    /**
      * Create a table object from the specified data set object.
      *
      * @param dataSet the data set object
@@ -198,6 +217,46 @@ public class Table implements Serializable {
      */
     public static String getValue(Table table, List<String> row, String column) {
         return row.get(table.getColumns().indexOf(column));
+    }
+
+    /**
+     * Find the list of rows matching the specified conditions in the specified table.
+     *
+     * @param table the table
+     * @param conditions the list of conditions
+     * @return the list of rows matching the specified conditions in the specified table
+     */
+    public static List<List<String>> findRows(Table table, List<Pair<String, String>> conditions) {
+        List<List<String>> result = new ArrayList<List<String>>();
+
+        for(List<String> row : table.getRows()) {
+            boolean valid = true;
+
+            for(Pair<String, String> condition : conditions) {
+                if(!getValue(table, row, condition.getFirst()).equals(condition.getSecond())) {
+                    valid = false;
+                    break;
+                }
+            }
+
+            if(valid) {
+                result.add(row);
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Find the first row matching the specified conditions in the specified table.
+     *
+     * @param table the table
+     * @param conditions the conditions
+     * @return the first row matching the specified conditions in the specified table if found; otherwise null
+     */
+    public static List<String> findRow(Table table, List<Pair<String, String>> conditions) {
+        List<List<String>> result = findRows(table, conditions);
+        return result.isEmpty() ? null : result.get(0);
     }
 
     /**
