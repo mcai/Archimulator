@@ -33,6 +33,8 @@ public class TableFilterCriteria {
     private List<String> columns;
     private List<Pair<String, List<String>>> conditions;
 
+    private boolean preserveColumns;
+
     /**
      * Create a table filter criteria.
      *
@@ -68,5 +70,23 @@ public class TableFilterCriteria {
      */
     public List<Pair<String, List<String>>> getConditions() {
         return conditions;
+    }
+
+    /**
+     * Get a value indicating whether the columns of the original table should be preserved.
+     *
+     * @return a value indicating whether the columns of the original table should be preserved
+     */
+    public boolean isPreserveColumns() {
+        return preserveColumns;
+    }
+
+    /**
+     * Set a value indicating whether the columns of the original table should be preserved.
+     *
+     * @param preserveColumns a value indicating whether the columns of the original table should be preserved
+     */
+    public void setPreserveColumns(boolean preserveColumns) {
+        this.preserveColumns = preserveColumns;
     }
 }

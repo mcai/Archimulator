@@ -141,9 +141,11 @@ public class Table implements Serializable {
 
             final org.eobjects.metamodel.schema.Table table = dataContext.getDefaultSchema().getTables()[0];
 
+            List<String> columns = criteria.isPreserveColumns() ? getColumns() : criteria.getColumns();
+
             SatisfiedSelectBuilder<?> select = dataContext.query()
                     .from(table)
-                    .select(criteria.getColumns().toArray(new String[criteria.getColumns().size()]));
+                    .select(columns.toArray(new String[columns.size()]));
 
             for (final Pair<String, List<String>> condition : criteria.getConditions()) {
                 select.where(new FilterItem(LogicalOperator.OR, CollectionHelper.transform(condition.getSecond(), new Function1<String, FilterItem>() {
