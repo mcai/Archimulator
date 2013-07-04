@@ -99,6 +99,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
                                         if (experimentPack != null && getExperimentPackByTitle(experimentPack.getTitle()) == null) {
                                             addExperimentPack(experimentPack);
+                                            System.out.println("Experiment pack " + experimentPack.getTitle() + " added.");
 
                                             for (ExperimentSpec experimentSpec : experimentPack.getExperimentSpecs()) {
                                                 ExperimentType experimentType = experimentPack.getExperimentType();
@@ -113,7 +114,10 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
                                                 contextMapping.setHelperThreadStride(experimentSpec.getHelperThreadStride());
                                                 contextMappings.add(contextMapping);
 
-                                                addExperiment(new Experiment(experimentPack, experimentType, architecture, experimentSpec.getNumMaxInstructions(), contextMappings));
+                                                Experiment experiment = new Experiment(experimentPack, experimentType, architecture, experimentSpec.getNumMaxInstructions(), contextMappings);
+                                                addExperiment(experiment);
+
+                                                System.out.println("Experiment " + experiment.getTitle() + " added.");
                                             }
 
                                             updateExperimentPack(experimentPack);
