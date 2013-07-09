@@ -164,11 +164,11 @@ public class DynamicInsertionPolicy {
     /**
      * Get a value indicating whether it should do normal fill or not.
      *
-     * @param threadId the thread ID
      * @param set the set
+     * @param threadId the thread ID
      * @return a value indicating whether it should do normal fill or not
      */
-    public boolean shouldDoNormalFill(int threadId, int set) {
+    public boolean shouldDoNormalFill(int set, int threadId) {
         if (this.setDuelingMonitors.get(set).type == SetDuelingMonitorType.LRU && this.setDuelingMonitors.get(set).ownerThreadId == threadId) {
             /* Is it an SDM that does normal fill (NF) policy and is dedicated to this thread? */
             return true;

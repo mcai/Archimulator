@@ -42,17 +42,12 @@ public class MLPAwarePartitionedLRUPolicy<StateT extends Serializable> extends P
      */
     public MLPAwarePartitionedLRUPolicy(EvictableCache<StateT> cache) {
         super(cache);
-        this.mlpAwareCachePartitioningHelper = new MLPAwareCachePartitioningHelper(cache.getSimulation());
+        this.mlpAwareCachePartitioningHelper = new MLPAwareCachePartitioningHelper(cache);
     }
 
-    /**
-     * Get the partition.
-     *
-     * @return the partition
-     */
     @Override
-    protected List<Integer> getPartition() {
-        return getMlpAwareCachePartitioningHelper().getPartition();
+    protected List<Integer> getPartition(int set) {
+        return getMlpAwareCachePartitioningHelper().getPartition(set);
     }
 
     @Override

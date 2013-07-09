@@ -42,17 +42,12 @@ public class CPIBasedPartitionedLRUPolicy<StateT extends Serializable> extends P
      */
     public CPIBasedPartitionedLRUPolicy(EvictableCache<StateT> cache) {
         super(cache);
-        this.cpiBasedCachePartitioningHelper = new CPIBasedCachePartitioningHelper(cache.getSimulation());
+        this.cpiBasedCachePartitioningHelper = new CPIBasedCachePartitioningHelper(cache);
     }
 
-    /**
-     * Get the partition.
-     *
-     * @return the partition
-     */
     @Override
-    protected List<Integer> getPartition() {
-        return getCpiBasedCachePartitioningHelper().getPartition();
+    protected List<Integer> getPartition(int set) {
+        return getCpiBasedCachePartitioningHelper().getPartition(set);
     }
 
     @Override

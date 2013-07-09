@@ -94,7 +94,7 @@ public class RereferenceIntervalPredictionPolicy<StateT extends Serializable> ex
     public void handleInsertionOnMiss(MemoryHierarchyAccess access, int set, int way) {
         this.insertionPolicy.recordMiss(set);
 
-        if (this.insertionPolicy.shouldDoNormalFill(access.getThread().getId(), set)) {
+        if (this.insertionPolicy.shouldDoNormalFill(set, access.getThread().getId())) {
             CacheLine<Boolean> mirrorLine = this.mirrorCache.getLine(set, way);
             BooleanValueProvider stateProvider = (BooleanValueProvider) mirrorLine.getStateProvider();
             stateProvider.predictedRereferenceInterval = this.predictedRereferenceIntervalMaxValue - 1;

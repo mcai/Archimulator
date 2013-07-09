@@ -64,7 +64,7 @@ public abstract class PartitionedLRUPolicy<StateT extends Serializable> extends 
             }
         }
 
-        if (numUsedWays < getPartition().get(getThreadIdentifier(access.getThread()))) {
+        if (numUsedWays < getPartition(set).get(getThreadIdentifier(access.getThread()))) {
             for (int stackPosition = this.getCache().getAssociativity() - 1; stackPosition >= 0; stackPosition--) {
                 int way = this.getWayInStackPosition(set, stackPosition);
                 CacheLine<StateT> line = this.getCache().getLine(set, way);
@@ -86,9 +86,10 @@ public abstract class PartitionedLRUPolicy<StateT extends Serializable> extends 
     }
 
     /**
-     * Get the partition.
+     * Get the partition for the specified set.
      *
-     * @return the partition
+     * @param set the set
+     * @return the partition for the specified set
      */
-    protected abstract List<Integer> getPartition();
+    protected abstract List<Integer> getPartition(int set);
 }

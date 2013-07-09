@@ -42,17 +42,12 @@ public class MinMissPartitionedLRUPolicy<StateT extends Serializable> extends Pa
      */
     public MinMissPartitionedLRUPolicy(EvictableCache<StateT> cache) {
         super(cache);
-        this.minMissCachePartitioningHelper = new MinMissCachePartitioningHelper(cache.getSimulation());
+        this.minMissCachePartitioningHelper = new MinMissCachePartitioningHelper(cache);
     }
 
-    /**
-     * Get the partition.
-     *
-     * @return the partition
-     */
     @Override
-    protected List<Integer> getPartition() {
-        return getMinMissCachePartitioningHelper().getPartition();
+    protected List<Integer> getPartition(int set) {
+        return getMinMissCachePartitioningHelper().getPartition(set);
     }
 
     @Override

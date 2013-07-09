@@ -1,10 +1,10 @@
 package archimulator.sim.uncore.cache.partitioning.cpiBased;
 
-import archimulator.sim.common.Simulation;
 import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.common.report.Reportable;
 import archimulator.sim.core.Thread;
 import archimulator.sim.core.event.InstructionCommittedEvent;
+import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.partitioning.CachePartitioningHelper;
 import net.pickapack.action.Action1;
 import org.apache.commons.math3.util.Precision;
@@ -25,14 +25,14 @@ public class CPIBasedCachePartitioningHelper extends CachePartitioningHelper imp
     /**
      * Create a CPI based cache partitioning helper.
      *
-     * @param simulation the simulation
+     * @param cache the cache
      */
-    public CPIBasedCachePartitioningHelper(Simulation simulation) {
-        super(simulation);
+    public CPIBasedCachePartitioningHelper(EvictableCache<?> cache) {
+        super(cache);
 
         this.committedInstructions = new TreeMap<Integer, Long>();
 
-        simulation.getBlockingEventDispatcher().addListener(InstructionCommittedEvent.class, new Action1<InstructionCommittedEvent>() {
+        cache.getBlockingEventDispatcher().addListener(InstructionCommittedEvent.class, new Action1<InstructionCommittedEvent>() {
             public void apply(InstructionCommittedEvent event) {
                 Thread thread = event.getDynamicInstruction().getThread();
 
@@ -69,14 +69,17 @@ public class CPIBasedCachePartitioningHelper extends CachePartitioningHelper imp
             partition.add((int) Precision.round(cyclePerInstructions.get(threadId) * (this.getL2CacheController().getCache().getAssociativity() - this.getNumThreads()) / cyclePerInstructionSum, 0) + 1);
         }
 
-        this.setPartition(partition);
+        for(int i = 0; i < this.getL2CacheController().getCache().getNumSets(); i++) {
+            this.setPartition(i, partition);
+        }
+
         this.committedInstructions.clear();
     }
 
     @Override
     public void dumpStats(ReportNode reportNode) {
         reportNode.getChildren().add(new ReportNode(reportNode, "cpiBasedCachePartitioningHelper") {{
-            getChildren().add(new ReportNode(this, "partition", getPartition() + ""));
+            getChildren().add(new ReportNode(this, "partition", getPartition(0) + ""));
             getChildren().add(new ReportNode(this, "numIntervals", getNumIntervals() + ""));
         }});
     }

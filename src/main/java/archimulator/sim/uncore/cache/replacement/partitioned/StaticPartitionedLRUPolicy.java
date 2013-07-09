@@ -26,14 +26,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * MLP-aware partitioned least recently used (LRU) policy.
+ * Static partitioned least recently used (LRU) policy.
  *
  * @param <StateT> the state type of the parent evictable cache
  * @author Min Cai
  */
 public class StaticPartitionedLRUPolicy<StateT extends Serializable> extends PartitionedLRUPolicy<StateT> {
     /**
-     * Create a MLP-aware partitioned least recently used (LRU) policy for the specified evictable cache.
+     * Create a static partitioned least recently used (LRU) policy for the specified evictable cache.
      *
      * @param cache the parent evictable cache
      */
@@ -41,13 +41,8 @@ public class StaticPartitionedLRUPolicy<StateT extends Serializable> extends Par
         super(cache);
     }
 
-    /**
-     * Get the partition.
-     *
-     * @return the partition
-     */
     @Override
-    protected List<Integer> getPartition() {
+    protected List<Integer> getPartition(int set) {
         final int numMainThreadWays = getCache().getExperiment().getArchitecture().getNumMainThreadWaysInStaticPartitionedLRUPolicy();
 
         return new ArrayList<Integer>(){{

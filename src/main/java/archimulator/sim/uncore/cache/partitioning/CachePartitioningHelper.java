@@ -18,8 +18,8 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache.partitioning;
 
-import archimulator.sim.common.Simulation;
 import archimulator.sim.core.Thread;
+import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import net.pickapack.action.Action;
 import org.paukov.combinatorics.Factory;
@@ -28,6 +28,8 @@ import org.paukov.combinatorics.ICombinatoricsVector;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Cache partitioning helper.
@@ -35,7 +37,7 @@ import java.util.List;
  * @author Min Cai
  */
 public abstract class CachePartitioningHelper {
-    private Simulation simulation;
+    private EvictableCache<?> cache;
 
     private int numCyclesElapsedPerInterval;
 
@@ -44,34 +46,39 @@ public abstract class CachePartitioningHelper {
 
     private int numThreads;
 
-    private List<Integer> partition;
+    private Map<Integer, List<Integer>> partitionsPerSet;
 
     /**
      * Create a cache partitioning helper.
      *
-     * @param simulation the simulation
+     * @param cache the cache
      */
-    public CachePartitioningHelper(Simulation simulation) {
-        this.simulation = simulation;
+    public CachePartitioningHelper(EvictableCache<?> cache) {
+        this.cache = cache;
 
-//        this.numThreads = simulation.getExperiment().getArchitecture().getNumThreadsPerCore() * this.l2CacheController.getExperiment().getArchitecture().getNumCores();
-        this.numThreads = simulation.getExperiment().getArchitecture().getNumCores();
+//        this.numThreads = cache.getExperiment().getArchitecture().getNumThreadsPerCore() * this.l2CacheController.getExperiment().getArchitecture().getNumCores();
+        this.numThreads = this.cache.getExperiment().getArchitecture().getNumCores();
 
-        this.partition = new ArrayList<Integer>();
+        this.partitionsPerSet = new TreeMap<Integer, List<Integer>>();
 
-        int l2Associativity = simulation.getExperiment().getArchitecture().getL2Associativity();
+        int l2Associativity = this.cache.getAssociativity();
 
         if (l2Associativity < this.numThreads) {
             throw new IllegalArgumentException();
         }
 
-        for (int i = 0; i < this.numThreads; i++) {
-            this.partition.add(l2Associativity / this.numThreads);
+        for(int i = 0; i < this.cache.getNumSets(); i++) {
+            ArrayList<Integer> partition1 = new ArrayList<Integer>();
+            this.partitionsPerSet.put(i, partition1);
+
+            for (int j = 0; j < this.numThreads; j++) {
+                partition1.add(l2Associativity / this.numThreads);
+            }
         }
 
         this.numCyclesElapsedPerInterval = 5000000;
 
-        simulation.getCycleAccurateEventQueue().getPerCycleEvents().add(new Action() {
+        this.cache.getCycleAccurateEventQueue().getPerCycleEvents().add(new Action() {
             @Override
             public void apply() {
                 numCyclesElapsed++;
@@ -92,12 +99,12 @@ public abstract class CachePartitioningHelper {
     protected abstract void newInterval();
 
     /**
-     * Get the simulation.
+     * Get the cache.
      *
-     * @return the simulation
+     * @return the cache
      */
-    public Simulation getSimulation() {
-        return simulation;
+    public EvictableCache<?> getCache() {
+        return cache;
     }
 
     /**
@@ -106,7 +113,7 @@ public abstract class CachePartitioningHelper {
      * @return the L2 cache controller
      */
     public DirectoryController getL2CacheController() {
-        return getSimulation().getProcessor().getMemoryHierarchy().getL2CacheController();
+        return getCache().getSimulation().getProcessor().getMemoryHierarchy().getL2CacheController();
     }
 
     /**
@@ -146,21 +153,27 @@ public abstract class CachePartitioningHelper {
     }
 
     /**
-     * Get the partition.
+     * Get the partition for the specified set.
      *
-     * @return the partition
+     * @param set the set
+     * @return the partition for the specified set
      */
-    public List<Integer> getPartition() {
-        return partition;
+    public List<Integer> getPartition(int set) {
+        if(!partitionsPerSet.containsKey(set)) {
+            throw new IllegalArgumentException();
+        }
+
+        return partitionsPerSet.get(set);
     }
 
     /**
-     * Set the partition.
+     * Set the partition for the specified set.
      *
+     * @param set the set
      * @param partition the partition
      */
-    public void setPartition(List<Integer> partition) {
-        this.partition = partition;
+    public void setPartition(int set, List<Integer> partition) {
+        this.partitionsPerSet.put(set, partition);
     }
 
     /**
