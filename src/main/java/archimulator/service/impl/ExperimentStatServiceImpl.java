@@ -91,12 +91,6 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
             throw new RuntimeException(e);
         }
 
-        System.out.println("There are " + experiments.size() + " experiments.");
-
-        for (Experiment experiment : experiments) {
-            this.CreateSummaryIfNotExistsByParent(experiment);
-        }
-
         System.out.println("Cleaned up experiment stats and summaries.");
     }
 
