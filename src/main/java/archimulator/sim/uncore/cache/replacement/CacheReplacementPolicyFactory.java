@@ -19,6 +19,9 @@
 package archimulator.sim.uncore.cache.replacement;
 
 import archimulator.sim.uncore.cache.EvictableCache;
+import archimulator.sim.uncore.cache.partitioning.cpiBased.CPIBasedCachePartitioningHelper;
+import archimulator.sim.uncore.cache.partitioning.minMiss.MinMissCachePartitioningHelper;
+import archimulator.sim.uncore.cache.partitioning.mlpAware.MLPAwareCachePartitioningHelper;
 import archimulator.sim.uncore.cache.replacement.helperThread.HelperThreadAwareLRUPolicy;
 import archimulator.sim.uncore.cache.replacement.helperThread.HelperThreadIntervalAwareLRUPolicy;
 import archimulator.sim.uncore.cache.replacement.partitioned.StaticPartitionedLRUPolicy;
@@ -71,8 +74,12 @@ public class CacheReplacementPolicyFactory {
                 return new MinMissPartitionedLRUPolicy<StateT>(cache);
             case MLP_AWARE_CACHE_PARTITIONING_LRU:
                 return new MLPAwarePartitionedLRUPolicy<StateT>(cache);
-            case SET_DUELING_CACHE_PARTITIONING_LRU:
-                return new SetDuelingPartitionedLRUPolicy<StateT>(cache);
+            case CPI_BASED_AND_MIN_MISS_SET_DUELING_CACHE_PARTITIONING_LRU:
+                return new SetDuelingPartitionedLRUPolicy<StateT>(cache, new CPIBasedCachePartitioningHelper(cache), new MinMissCachePartitioningHelper(cache));
+            case CPI_BASED_AND_MLP_AWARE_SET_DUELING_CACHE_PARTITIONING_LRU:
+                return new SetDuelingPartitionedLRUPolicy<StateT>(cache, new CPIBasedCachePartitioningHelper(cache), new MLPAwareCachePartitioningHelper(cache));
+            case MIN_MISS_AND_MLP_AWARE_SET_DUELING_CACHE_PARTITIONING_LRU:
+                return new SetDuelingPartitionedLRUPolicy<StateT>(cache, new MinMissCachePartitioningHelper(cache), new MLPAwareCachePartitioningHelper(cache));
             default:
                 throw new IllegalArgumentException();
         }

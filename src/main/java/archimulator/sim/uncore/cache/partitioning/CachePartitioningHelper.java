@@ -18,6 +18,8 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache.partitioning;
 
+import archimulator.sim.common.SimulationType;
+import archimulator.sim.common.report.Reportable;
 import archimulator.sim.core.Thread;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
@@ -36,7 +38,7 @@ import java.util.TreeMap;
  *
  * @author Min Cai
  */
-public abstract class CachePartitioningHelper {
+public abstract class CachePartitioningHelper implements Reportable {
     private EvictableCache<?> cache;
 
     private int numCyclesElapsedPerInterval;
@@ -53,7 +55,7 @@ public abstract class CachePartitioningHelper {
      *
      * @param cache the cache
      */
-    public CachePartitioningHelper(EvictableCache<?> cache) {
+    public CachePartitioningHelper(final EvictableCache<?> cache) {
         this.cache = cache;
 
 //        this.numThreads = cache.getExperiment().getArchitecture().getNumThreadsPerCore() * this.l2CacheController.getExperiment().getArchitecture().getNumCores();
@@ -67,12 +69,12 @@ public abstract class CachePartitioningHelper {
             throw new IllegalArgumentException();
         }
 
-        for(int i = 0; i < this.cache.getNumSets(); i++) {
-            ArrayList<Integer> partition1 = new ArrayList<Integer>();
-            this.partitionsPerSet.put(i, partition1);
+        for (int i = 0; i < this.cache.getNumSets(); i++) {
+            List<Integer> partition = new ArrayList<Integer>();
+            this.partitionsPerSet.put(i, partition);
 
             for (int j = 0; j < this.numThreads; j++) {
-                partition1.add(l2Associativity / this.numThreads);
+                partition.add(l2Associativity / this.numThreads);
             }
         }
 
@@ -81,13 +83,15 @@ public abstract class CachePartitioningHelper {
         this.cache.getCycleAccurateEventQueue().getPerCycleEvents().add(new Action() {
             @Override
             public void apply() {
-                numCyclesElapsed++;
+                if (cache.getSimulation().getType() != SimulationType.FAST_FORWARD) {
+                    numCyclesElapsed++;
 
-                if (numCyclesElapsed == numCyclesElapsedPerInterval) {
-                    newInterval();
+                    if (numCyclesElapsed == numCyclesElapsedPerInterval) {
+                        newInterval();
 
-                    numCyclesElapsed = 0;
-                    numIntervals++;
+                        numCyclesElapsed = 0;
+                        numIntervals++;
+                    }
                 }
             }
         });
@@ -159,7 +163,7 @@ public abstract class CachePartitioningHelper {
      * @return the partition for the specified set
      */
     public List<Integer> getPartition(int set) {
-        if(!partitionsPerSet.containsKey(set)) {
+        if (!partitionsPerSet.containsKey(set)) {
             throw new IllegalArgumentException();
         }
 
@@ -169,7 +173,7 @@ public abstract class CachePartitioningHelper {
     /**
      * Set the partition for the specified set.
      *
-     * @param set the set
+     * @param set       the set
      * @param partition the partition
      */
     public void setPartition(int set, List<Integer> partition) {

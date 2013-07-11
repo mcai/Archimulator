@@ -21,10 +21,8 @@ package archimulator.sim.uncore.cache.replacement.partitioned.setDueling;
 import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.partitioning.CachePartitioningHelper;
-import archimulator.sim.uncore.cache.partitioning.minMiss.MinMissCachePartitioningHelper;
-import archimulator.sim.uncore.cache.partitioning.mlpAware.MLPAwareCachePartitioningHelper;
 import archimulator.sim.uncore.cache.replacement.partitioned.PartitionedLRUPolicy;
-import archimulator.sim.uncore.coherence.event.GeneralCacheControllerServiceNonblockingRequestEvent;
+import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestProfilingHelper;
 import net.pickapack.action.Action1;
 
 import java.io.Serializable;
@@ -33,43 +31,53 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * Set dueling partitioned least recently used (LRU) policy.
+ * Set dueling partitioned least recently used (LRU) policy based on helper thread L2 request breakdown.
  *
  * @param <StateT> the state type of the parent evictable cache
  * @author Min Cai
  */
 public class SetDuelingPartitionedLRUPolicy<StateT extends Serializable> extends PartitionedLRUPolicy<StateT> {
-    private MinMissCachePartitioningHelper minMissCachePartitioningHelper;
-    private MLPAwareCachePartitioningHelper mlpAwareCachePartitioningHelper;
+    private CachePartitioningHelper cachePartitioningHelper1;
+    private CachePartitioningHelper cachePartitioningHelper2;
     private SetDuelingUnit setDuelingUnit;
 
-    private long numMinMissUsed;
-    private long minMlpAwareUsed;
+    private long numCachePartitioningHelper1Used;
+    private long numCachePartitioningHelper2Used;
     private Map<Integer, Long> numPartitionsPerWay;
 
     /**
      * Create a set dueling partitioned least recently used (LRU) policy for the specified evictable cache.
      *
-     * @param cache the parent evictable cache
+     * @param cache                    the parent evictable cache
+     * @param cachePartitioningHelper1 the first cache partitioning helper
+     * @param cachePartitioningHelper2 the second cache partitioning helper
      */
-    public SetDuelingPartitionedLRUPolicy(final EvictableCache<StateT> cache) {
+    public SetDuelingPartitionedLRUPolicy(
+            final EvictableCache<StateT> cache,
+            CachePartitioningHelper cachePartitioningHelper1,
+            CachePartitioningHelper cachePartitioningHelper2
+    ) {
         super(cache);
-        this.minMissCachePartitioningHelper = new MinMissCachePartitioningHelper(cache);
-        this.mlpAwareCachePartitioningHelper = new MLPAwareCachePartitioningHelper(cache);
+        this.cachePartitioningHelper1 = cachePartitioningHelper1;
+        this.cachePartitioningHelper2 = cachePartitioningHelper2;
         this.setDuelingUnit = new SetDuelingUnit(cache, ((1 << 10) - 1), 6);
 
         this.numPartitionsPerWay = new TreeMap<Integer, Long>();
-        for(int i = 0; i < cache.getAssociativity(); i++) {
+        for (int i = 0; i < cache.getAssociativity(); i++) {
             this.numPartitionsPerWay.put(i, 0L);
         }
 
-        cache.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, new Action1<GeneralCacheControllerServiceNonblockingRequestEvent>() {
-            public void apply(GeneralCacheControllerServiceNonblockingRequestEvent event) {
-                if (event.getCacheController() == cache.getSimulation().getProcessor().getMemoryHierarchy().getL2CacheController() && !event.isHitInCache()) {
-                    if (event.getAccess().getThread().getNum() == 0) { // TODO: To be refactored; if it is from the main thread for helper threaded prefetching.
-                        setDuelingUnit.recordMiss(event.getSet());
-                    }
-                }
+        cache.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.TimelyHelperThreadL2CacheRequestEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.TimelyHelperThreadL2CacheRequestEvent>() {
+            @Override
+            public void apply(HelperThreadL2CacheRequestProfilingHelper.TimelyHelperThreadL2CacheRequestEvent event) {
+                setDuelingUnit.recordUsefulHelperThreadL2Request(event.getSet());
+            }
+        });
+
+        cache.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.LateHelperThreadL2CacheRequestEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.LateHelperThreadL2CacheRequestEvent>() {
+            @Override
+            public void apply(HelperThreadL2CacheRequestProfilingHelper.LateHelperThreadL2CacheRequestEvent event) {
+                setDuelingUnit.recordUsefulHelperThreadL2Request(event.getSet());
             }
         });
     }
@@ -79,13 +87,13 @@ public class SetDuelingPartitionedLRUPolicy<StateT extends Serializable> extends
         CachePartitioningHelper partitioningHelper =
                 setDuelingUnit.getPartitioningPolicyType(set) ==
                         SetDuelingUnit.SetDuelingMonitorType.POLICY1 ?
-                        getMinMissCachePartitioningHelper() :
-                        getMlpAwareCachePartitioningHelper();
+                        getCachePartitioningHelper1() :
+                        getCachePartitioningHelper2();
 
-        if (partitioningHelper == minMissCachePartitioningHelper) {
-            numMinMissUsed++;
+        if (partitioningHelper == cachePartitioningHelper1) {
+            numCachePartitioningHelper1Used++;
         } else {
-            minMlpAwareUsed++;
+            numCachePartitioningHelper2Used++;
         }
 
         List<Integer> partition = partitioningHelper.getPartition(set);
@@ -97,33 +105,33 @@ public class SetDuelingPartitionedLRUPolicy<StateT extends Serializable> extends
     @Override
     public void dumpStats(final ReportNode reportNode) {
         reportNode.getChildren().add(new ReportNode(reportNode, "setDuelingPartitionedLRUPolicy") {{
-            getChildren().add(new ReportNode(this, "numMinMissUsed", numMinMissUsed + ""));
-            getChildren().add(new ReportNode(this, "minMlpAwareUsed", minMlpAwareUsed + ""));
+            getChildren().add(new ReportNode(this, "numCachePartitioningHelper1Used", numCachePartitioningHelper1Used + ""));
+            getChildren().add(new ReportNode(this, "numCachePartitioningHelper2Used", numCachePartitioningHelper2Used + ""));
 
-            for(int way : numPartitionsPerWay.keySet()) {
+            for (int way : numPartitionsPerWay.keySet()) {
                 getChildren().add(new ReportNode(this, "numPartitionsPerWay[" + way + "]", numPartitionsPerWay.get(way) + ""));
             }
 
-            getMinMissCachePartitioningHelper().dumpStats(reportNode);
-            getMlpAwareCachePartitioningHelper().dumpStats(reportNode);
+            getCachePartitioningHelper1().dumpStats(reportNode);
+            getCachePartitioningHelper2().dumpStats(reportNode);
         }});
     }
 
     /**
-     * get the min-miss cache partitioning helper.
+     * get the first cache partitioning helper.
      *
-     * @return the min-miss cache partitioning helper
+     * @return the first cache partitioning helper
      */
-    public MinMissCachePartitioningHelper getMinMissCachePartitioningHelper() {
-        return minMissCachePartitioningHelper;
+    public CachePartitioningHelper getCachePartitioningHelper1() {
+        return cachePartitioningHelper1;
     }
 
     /**
-     * Get the MLP-aware cache partitioning helper.
+     * Get the second cache partitioning helper.
      *
-     * @return the MLP-aware cache partitioning helper
+     * @return the second cache partitioning helper
      */
-    public MLPAwareCachePartitioningHelper getMlpAwareCachePartitioningHelper() {
-        return mlpAwareCachePartitioningHelper;
+    public CachePartitioningHelper getCachePartitioningHelper2() {
+        return cachePartitioningHelper2;
     }
 }

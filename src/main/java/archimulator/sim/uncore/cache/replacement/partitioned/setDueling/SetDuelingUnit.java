@@ -104,16 +104,16 @@ public class SetDuelingUnit {
         } else if (this.setDuelingMonitors.get(set).type == SetDuelingMonitorType.POLICY2) {
             return SetDuelingMonitorType.POLICY2;
         } else {
-            return !this.policySelectionCounter.isTaken() ? SetDuelingMonitorType.POLICY1 : SetDuelingMonitorType.POLICY2;
+            return this.policySelectionCounter.isTaken() ? SetDuelingMonitorType.POLICY1 : SetDuelingMonitorType.POLICY2;
         }
     }
 
     /**
-     * Record a miss.
+     * Record a useful helper thread L2 request.
      *
      * @param set the set index
      */
-    public void recordMiss(int set) {
+    public void recordUsefulHelperThreadL2Request(int set) {
         SetDuelingMonitorType sdmType = this.setDuelingMonitors.get(set).type;
 
         if (sdmType != SetDuelingMonitorType.FOLLOWERS) {

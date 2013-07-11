@@ -1,7 +1,6 @@
 package archimulator.sim.uncore.cache.partitioning.cpiBased;
 
 import archimulator.sim.common.report.ReportNode;
-import archimulator.sim.common.report.Reportable;
 import archimulator.sim.core.Thread;
 import archimulator.sim.core.event.InstructionCommittedEvent;
 import archimulator.sim.uncore.cache.EvictableCache;
@@ -19,7 +18,7 @@ import java.util.TreeMap;
  *
  * @author Min Cai
  */
-public class CPIBasedCachePartitioningHelper extends CachePartitioningHelper implements Reportable {
+public class CPIBasedCachePartitioningHelper extends CachePartitioningHelper {
     private Map<Integer, Long> committedInstructions;
 
     /**

@@ -19,7 +19,6 @@
 package archimulator.sim.uncore.cache.partitioning.mlpAware;
 
 import archimulator.sim.common.report.ReportNode;
-import archimulator.sim.common.report.Reportable;
 import archimulator.sim.core.event.InstructionCommittedEvent;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.EvictableCache;
@@ -42,7 +41,7 @@ import java.util.*;
  *
  * @author Min Cai
  */
-public class MLPAwareCachePartitioningHelper extends CachePartitioningHelper implements Reportable {
+public class MLPAwareCachePartitioningHelper extends CachePartitioningHelper {
     private class PerSetDataEntry {
         private int set;
         private Map<Integer, MLPAwareStackDistanceProfile> mlpAwareStackDistanceProfiles;

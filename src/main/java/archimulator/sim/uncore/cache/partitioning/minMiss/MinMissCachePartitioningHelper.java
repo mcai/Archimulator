@@ -19,7 +19,6 @@
 package archimulator.sim.uncore.cache.partitioning.minMiss;
 
 import archimulator.sim.common.report.ReportNode;
-import archimulator.sim.common.report.Reportable;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.partitioning.CachePartitioningHelper;
@@ -39,7 +38,7 @@ import java.util.TreeMap;
  *
  * @author Min Cai
  */
-public class MinMissCachePartitioningHelper extends CachePartitioningHelper implements Reportable {
+public class MinMissCachePartitioningHelper extends CachePartitioningHelper {
     private class PerSetDataEntry {
         private Map<Integer, StackDistanceProfile> stackDistanceProfiles;
         private Map<Integer, Map<Integer, LRUStack>> lruStacks;

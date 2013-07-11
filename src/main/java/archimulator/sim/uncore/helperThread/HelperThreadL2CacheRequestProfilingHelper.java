@@ -217,9 +217,9 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
 
         if (helperThreadL2CacheRequestState.getQuality() != HelperThreadL2CacheRequestQuality.INVALID) {
             if (helperThreadL2CacheRequestState.getQuality() == HelperThreadL2CacheRequestQuality.BAD) {
-                this.incrementBadHelperThreadL2CacheRequests(helperThreadL2CacheRequestState.getThreadId(), helperThreadL2CacheRequestState.getPc());
+                this.incrementBadHelperThreadL2CacheRequests(set, helperThreadL2CacheRequestState.getThreadId(), helperThreadL2CacheRequestState.getPc());
             } else if (helperThreadL2CacheRequestState.getQuality() == HelperThreadL2CacheRequestQuality.UGLY) {
-                this.incrementUglyHelperThreadL2CacheRequests(helperThreadL2CacheRequestState.getThreadId(), helperThreadL2CacheRequestState.getPc());
+                this.incrementUglyHelperThreadL2CacheRequests(set, helperThreadL2CacheRequestState.getThreadId(), helperThreadL2CacheRequestState.getPc());
             } else {
                 throw new IllegalArgumentException(helperThreadL2CacheRequestState.getQuality() + "");
             }
@@ -269,11 +269,11 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
             if (event.isHitInCache() && !lineFoundIsHelperThread) {
                 if (this.helperThreadL2CacheRequestStates.get(event.getSet()).get(event.getWay()).isHitToTransientTag()) {
                     this.numRedundantHitToTransientTagHelperThreadL2CacheRequests++;
-                    this.l2CacheController.getBlockingEventDispatcher().dispatch(new RedundantHitToTransientTagHelperThreadL2CacheRequestEvent());
+                    this.l2CacheController.getBlockingEventDispatcher().dispatch(new RedundantHitToTransientTagHelperThreadL2CacheRequestEvent(event.getSet()));
                     this.updateHelperThreadL2CacheRequestQualityPredictor(event.getAccess().getThread().getId(), event.getAccess().getVirtualPc(), HelperThreadL2CacheRequestQuality.REDUNDANT_HIT_TO_TRANSIENT_TAG);
                 } else {
                     this.numRedundantHitToCacheHelperThreadL2CacheRequests++;
-                    this.l2CacheController.getBlockingEventDispatcher().dispatch(new RedundantHitToCacheHelperThreadL2CacheRequestEvent());
+                    this.l2CacheController.getBlockingEventDispatcher().dispatch(new RedundantHitToCacheHelperThreadL2CacheRequestEvent(event.getSet()));
                     this.updateHelperThreadL2CacheRequestQualityPredictor(event.getAccess().getThread().getId(), event.getAccess().getVirtualPc(), HelperThreadL2CacheRequestQuality.REDUNDANT_HIT_TO_CACHE);
                 }
             }
@@ -326,12 +326,12 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
         if (helperThreadL2CacheRequestState.isHitToTransientTag()) {
             helperThreadL2CacheRequestState.setQuality(HelperThreadL2CacheRequestQuality.LATE);
             this.numLateHelperThreadL2CacheRequests++;
-            this.l2CacheController.getBlockingEventDispatcher().dispatch(new LateHelperThreadL2CacheRequestEvent());
+            this.l2CacheController.getBlockingEventDispatcher().dispatch(new LateHelperThreadL2CacheRequestEvent(event.getSet()));
             this.updateHelperThreadL2CacheRequestQualityPredictor(helperThreadL2CacheRequestState.getThreadId(), helperThreadL2CacheRequestState.getPc(), HelperThreadL2CacheRequestQuality.LATE);
         } else {
             helperThreadL2CacheRequestState.setQuality(HelperThreadL2CacheRequestQuality.TIMELY);
             this.numTimelyHelperThreadL2CacheRequests++;
-            this.l2CacheController.getBlockingEventDispatcher().dispatch(new TimelyHelperThreadL2CacheRequestEvent());
+            this.l2CacheController.getBlockingEventDispatcher().dispatch(new TimelyHelperThreadL2CacheRequestEvent(event.getSet()));
             this.updateHelperThreadL2CacheRequestQualityPredictor(helperThreadL2CacheRequestState.getThreadId(), helperThreadL2CacheRequestState.getPc(), HelperThreadL2CacheRequestQuality.TIMELY);
         }
 
@@ -402,9 +402,9 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
             HelperThreadL2CacheRequestQuality quality = helperThreadL2CacheRequestState.getQuality();
 
             if (quality == HelperThreadL2CacheRequestQuality.BAD) {
-                this.incrementBadHelperThreadL2CacheRequests(helperThreadL2CacheRequestState.getThreadId(), helperThreadL2CacheRequestState.getPc());
+                this.incrementBadHelperThreadL2CacheRequests(event.getSet(), helperThreadL2CacheRequestState.getThreadId(), helperThreadL2CacheRequestState.getPc());
             } else if (quality == HelperThreadL2CacheRequestQuality.UGLY) {
-                this.incrementUglyHelperThreadL2CacheRequests(helperThreadL2CacheRequestState.getThreadId(), helperThreadL2CacheRequestState.getPc());
+                this.incrementUglyHelperThreadL2CacheRequests(event.getSet(), helperThreadL2CacheRequestState.getThreadId(), helperThreadL2CacheRequestState.getPc());
             } else {
                 throw new IllegalArgumentException();
             }
@@ -542,24 +542,26 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
     /**
      * Increment the number of ugly helper thread L2 cache requests.
      *
+     * @param set      the set
      * @param threadId the thread ID
      * @param pc       the virtual address of the program counter (PC)
      */
-    private void incrementUglyHelperThreadL2CacheRequests(int threadId, int pc) {
+    private void incrementUglyHelperThreadL2CacheRequests(int set, int threadId, int pc) {
         this.numUglyHelperThreadL2CacheRequests++;
-        this.l2CacheController.getBlockingEventDispatcher().dispatch(new UglyHelperThreadL2CacheRequestEvent());
+        this.l2CacheController.getBlockingEventDispatcher().dispatch(new UglyHelperThreadL2CacheRequestEvent(set));
         updateHelperThreadL2CacheRequestQualityPredictor(threadId, pc, HelperThreadL2CacheRequestQuality.UGLY);
     }
 
     /**
      * Increment the number of bad helper thread L2 cache requests.
      *
+     * @param set      the set
      * @param threadId the thread ID
      * @param pc       the virtual address of the program counter (PC)
      */
-    private void incrementBadHelperThreadL2CacheRequests(int threadId, int pc) {
+    private void incrementBadHelperThreadL2CacheRequests(int set, int threadId, int pc) {
         this.numBadHelperThreadL2CacheRequests++;
-        this.l2CacheController.getBlockingEventDispatcher().dispatch(new BadHelperThreadL2CacheRequestEvent());
+        this.l2CacheController.getBlockingEventDispatcher().dispatch(new BadHelperThreadL2CacheRequestEvent(set));
         updateHelperThreadL2CacheRequestQualityPredictor(threadId, pc, HelperThreadL2CacheRequestQuality.BAD);
     }
 
@@ -1059,11 +1061,23 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
      * Stable helper thread L2 cache request event.
      */
     public abstract class StableHelperThreadL2CacheRequestEvent extends SimulationEvent {
+        private int set;
+
         /**
          * Create a stable helper thread L2 cache request event.
          */
-        public StableHelperThreadL2CacheRequestEvent() {
+        public StableHelperThreadL2CacheRequestEvent(int set) {
             super(l2CacheController);
+            this.set = set;
+        }
+
+        /**
+         * Get the set.
+         *
+         * @return the set
+         */
+        public int getSet() {
+            return set;
         }
     }
 
@@ -1071,35 +1085,53 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
      * Redundant "hit to transient tag" helper thread L2 cache request event.
      */
     public class RedundantHitToTransientTagHelperThreadL2CacheRequestEvent extends StableHelperThreadL2CacheRequestEvent {
+        public RedundantHitToTransientTagHelperThreadL2CacheRequestEvent(int set) {
+            super(set);
+        }
     }
 
     /**
      * Redundant "hit to cache" helper thread L2 cache request event.
      */
     public class RedundantHitToCacheHelperThreadL2CacheRequestEvent extends StableHelperThreadL2CacheRequestEvent {
+        public RedundantHitToCacheHelperThreadL2CacheRequestEvent(int set) {
+            super(set);
+        }
     }
 
     /**
      * Timely helper thread L2 cache request event.
      */
     public class TimelyHelperThreadL2CacheRequestEvent extends StableHelperThreadL2CacheRequestEvent {
+        public TimelyHelperThreadL2CacheRequestEvent(int set) {
+            super(set);
+        }
     }
 
     /**
      * Late helper thread L2 cache request event.
      */
     public class LateHelperThreadL2CacheRequestEvent extends StableHelperThreadL2CacheRequestEvent {
+        public LateHelperThreadL2CacheRequestEvent(int set) {
+            super(set);
+        }
     }
 
     /**
      * Bad helper thread L2 cache request event.
      */
     public class BadHelperThreadL2CacheRequestEvent extends StableHelperThreadL2CacheRequestEvent {
+        public BadHelperThreadL2CacheRequestEvent(int set) {
+            super(set);
+        }
     }
 
     /**
      * Ugly helper thread L2 cache request event.
      */
     public class UglyHelperThreadL2CacheRequestEvent extends StableHelperThreadL2CacheRequestEvent {
+        public UglyHelperThreadL2CacheRequestEvent(int set) {
+            super(set);
+        }
     }
 }
