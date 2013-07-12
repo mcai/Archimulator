@@ -68,17 +68,16 @@ public class SetDuelingUnit {
     }
 
     /**
-     * Randomly assign sets to SDMs.
+     * Randomly assign sets to set dueling monitors.
      */
     private void initSetDuelingMonitorsRandomly() {
-        int totalSdmCount = 2;
+        int numTotalSetDuelingMonitors = 2;
 
-        if (this.cache.getNumSets() < this.setDuelingMonitorSize * totalSdmCount) {
+        if (this.cache.getNumSets() < this.setDuelingMonitorSize * numTotalSetDuelingMonitors) {
             throw new IllegalArgumentException();
         }
 
-        /* When using multiple cache banks, seeding is to ensure that all banks use the same sampled sets */
-        for (int p = 0; p < totalSdmCount; p++) {
+        for (int p = 0; p < numTotalSetDuelingMonitors; p++) {
             for (int ldr = 0; ldr < this.setDuelingMonitorSize; ldr++) {
                 int set;
                 do {
@@ -86,7 +85,6 @@ public class SetDuelingUnit {
                 }
                 while (this.setDuelingMonitors.get(set).type != SetDuelingMonitorType.FOLLOWERS);
 
-                /* Set the Leader Set Type (NF or BF) */
                 this.setDuelingMonitors.get(set).type = p == 0 ? SetDuelingMonitorType.POLICY1 : SetDuelingMonitorType.POLICY2;
             }
         }

@@ -103,7 +103,7 @@ public class BenchmarkServiceImpl extends AbstractService implements BenchmarkSe
         this.addBenchmarkIfNotExists(new Benchmark(
                 "mst_baseline_micro", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/baseline",
                 "mst.mips",
-                "1000")); //TODO: 1200 nodes as in [Changhee Jung, IPDPS'06]
+                "1024")); //TODO: 1200 nodes as in [Changhee Jung, IPDPS'06]
 
         this.addBenchmarkIfNotExists(new Benchmark(
                 "em3d_baseline_micro", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/em3d/baseline",
@@ -125,7 +125,7 @@ public class BenchmarkServiceImpl extends AbstractService implements BenchmarkSe
         this.addBenchmarkIfNotExists(new Benchmark(
                 "mst_ht_micro", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/ht",
                 "mst.mips",
-                "1000", "", true));
+                "1024", "", true));
 
         this.addBenchmarkIfNotExists(new Benchmark(
                 "em3d_ht_micro", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/em3d/ht",

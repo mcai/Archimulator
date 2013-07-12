@@ -60,7 +60,7 @@ public class SetDuelingPartitionedLRUPolicy<StateT extends Serializable> extends
         super(cache);
         this.cachePartitioningHelper1 = cachePartitioningHelper1;
         this.cachePartitioningHelper2 = cachePartitioningHelper2;
-        this.setDuelingUnit = new SetDuelingUnit(cache, ((1 << 10) - 1), 6);
+        this.setDuelingUnit = new SetDuelingUnit(cache, (1 << 10) - 1, 6);
 
         this.numPartitionsPerWay = new TreeMap<Integer, Long>();
         for (int i = 0; i < cache.getAssociativity(); i++) {
