@@ -31,7 +31,6 @@ import net.pickapack.util.Pair;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Min-miss cache partitioning helper.
@@ -39,88 +38,11 @@ import java.util.TreeMap;
  * @author Min Cai
  */
 public class MinMissCachePartitioningHelper extends CachePartitioningHelper {
-    private class PerSetDataEntry {
-        private Map<Integer, StackDistanceProfile> stackDistanceProfiles;
-        private Map<Integer, Map<Integer, LRUStack>> lruStacks;
-        private int set;
+    private Map<Integer, StackDistanceProfile> stackDistanceProfiles;
 
-        public PerSetDataEntry(int set) {
-            this.set = set;
-            this.stackDistanceProfiles = new LinkedHashMap<Integer, StackDistanceProfile>();
-            this.lruStacks = new LinkedHashMap<Integer, Map<Integer, LRUStack>>();
-        }
-
-        /**
-         * Get the total number of misses for the specified thread ID and associativity.
-         *
-         * @param threadId      the thread ID
-         * @param associativity the associativity
-         * @return the total number of misses for the specified thread ID and associativity
-         */
-        public int getTotalMisses(int threadId, int associativity) {
-            if (associativity > getL2CacheController().getCache().getAssociativity()) {
-                throw new IllegalArgumentException();
-            }
-
-            StackDistanceProfile stackDistanceProfile = this.getStackDistanceProfile(threadId);
-
-            int totalMisses = 0;
-
-            for (int i = associativity - 1; i < getL2CacheController().getCache().getAssociativity(); i++) {
-                totalMisses += stackDistanceProfile.getHitCounters().get(i);
-            }
-
-            totalMisses += stackDistanceProfile.getMissCounter();
-
-            return totalMisses;
-        }
-
-        /**
-         * Get the stack distance profile for the specified thread ID.
-         *
-         * @param threadId the thread ID
-         * @return the stack distance profile for the specified thread ID
-         */
-        private StackDistanceProfile getStackDistanceProfile(int threadId) {
-            if (!this.stackDistanceProfiles.containsKey(threadId)) {
-                this.stackDistanceProfiles.put(threadId, new StackDistanceProfile(getL2CacheController().getCache().getAssociativity()));
-            }
-
-            return this.stackDistanceProfiles.get(threadId);
-        }
-
-        /**
-         * Get the minimal sum of misses and its associated optimal partition.
-         *
-         * @return the minimal sum of misses and its associated optimal partition
-         */
-        private Pair<Integer, List<Integer>> getMinMissSumAndPartition() {
-            if (partitions == null) {
-                partitions = partition(getL2CacheController().getCache().getAssociativity(), getNumThreads());
-            }
-
-            int minMissSum = Integer.MAX_VALUE;
-            List<Integer> minPartition = null;
-
-            for (List<Integer> partition : partitions) {
-                int sum = 0;
-
-                for (int i = 0; i < partition.size(); i++) {
-                    sum += this.getTotalMisses(i, partition.get(i));
-                }
-
-                if (sum < minMissSum) {
-                    minMissSum = sum;
-                    minPartition = partition;
-                }
-            }
-
-            return new Pair<Integer, List<Integer>>(minMissSum, minPartition);
-        }
-    }
+    private Map<Integer, Map<Integer, LRUStack>> lruStacks;
 
     private List<List<Integer>> partitions;
-    private Map<Integer, PerSetDataEntry> entries;
 
     /**
      * Create a min-miss cache partitioning helper.
@@ -130,14 +52,13 @@ public class MinMissCachePartitioningHelper extends CachePartitioningHelper {
     public MinMissCachePartitioningHelper(EvictableCache<?> cache) {
         super(cache);
 
-        this.entries = new TreeMap<Integer, PerSetDataEntry>();
-        for(int i = 0; i < cache.getNumSets(); i++) {
-            this.entries.put(i, new PerSetDataEntry(i));
-        }
+        this.stackDistanceProfiles = new LinkedHashMap<Integer, StackDistanceProfile>();
+
+        this.lruStacks = new LinkedHashMap<Integer, Map<Integer, LRUStack>>();
 
         cache.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, new Action1<GeneralCacheControllerServiceNonblockingRequestEvent>() {
             public void apply(GeneralCacheControllerServiceNonblockingRequestEvent event) {
-                if (event.getCacheController() == getL2CacheController()) {
+                if (event.getCacheController() == getL2CacheController() && shouldInclude(event.getSet())) {
                     profileStackDistance(event.getAccess());
                 }
             }
@@ -149,12 +70,10 @@ public class MinMissCachePartitioningHelper extends CachePartitioningHelper {
      */
     @Override
     protected void newInterval() {
-        for(int i = 0; i < this.getL2CacheController().getCache().getNumSets(); i++) {
-            this.setPartition(i, this.entries.get(i).getMinMissSumAndPartition().getSecond());
+        this.setPartition(this.getMinMissSumAndPartition().getSecond());
 
-            for (StackDistanceProfile stackDistanceProfile : this.entries.get(i).stackDistanceProfiles.values()) {
-                stackDistanceProfile.newInterval();
-            }
+        for (StackDistanceProfile stackDistanceProfile : this.stackDistanceProfiles.values()) {
+            stackDistanceProfile.newInterval();
         }
     }
 
@@ -173,9 +92,9 @@ public class MinMissCachePartitioningHelper extends CachePartitioningHelper {
         int stackDistance = lruStack.access(tag);
 
         if (stackDistance == -1) {
-            this.entries.get(set).getStackDistanceProfile(threadId).incrementMissCounter();
+            this.getStackDistanceProfile(threadId).incrementMissCounter();
         } else {
-            this.entries.get(set).getStackDistanceProfile(threadId).incrementHitCounter(stackDistance);
+            this.getStackDistanceProfile(threadId).incrementHitCounter(stackDistance);
         }
     }
 
@@ -187,21 +106,89 @@ public class MinMissCachePartitioningHelper extends CachePartitioningHelper {
      * @return the LRU stack for the specified thread ID and set index in the L2 cache
      */
     private LRUStack getLruStack(int threadId, int set) {
-        if (!this.entries.get(set).lruStacks.containsKey(threadId)) {
-            this.entries.get(set).lruStacks.put(threadId, new LinkedHashMap<Integer, LRUStack>());
+        if (!this.lruStacks.containsKey(threadId)) {
+            this.lruStacks.put(threadId, new LinkedHashMap<Integer, LRUStack>());
         }
 
-        if (!this.entries.get(set).lruStacks.get(threadId).containsKey(set)) {
-            this.entries.get(set).lruStacks.get(threadId).put(set, new LRUStack(threadId, set, this.getL2CacheController().getCache().getAssociativity()));
+        if (!this.lruStacks.get(threadId).containsKey(set)) {
+            this.lruStacks.get(threadId).put(set, new LRUStack(threadId, set, this.getL2CacheController().getCache().getAssociativity()));
         }
 
-        return this.entries.get(set).lruStacks.get(threadId).get(set);
+        return this.lruStacks.get(threadId).get(set);
+    }
+
+    /**
+     * Get the total number of misses for the specified thread ID and associativity.
+     *
+     * @param threadId      the thread ID
+     * @param associativity the associativity
+     * @return the total number of misses for the specified thread ID and associativity
+     */
+    public int getTotalMisses(int threadId, int associativity) {
+        if (associativity > getL2CacheController().getCache().getAssociativity()) {
+            throw new IllegalArgumentException();
+        }
+
+        StackDistanceProfile stackDistanceProfile = this.getStackDistanceProfile(threadId);
+
+        int totalMisses = 0;
+
+        for (int i = associativity - 1; i < getL2CacheController().getCache().getAssociativity(); i++) {
+            totalMisses += stackDistanceProfile.getHitCounters().get(i);
+        }
+
+        totalMisses += stackDistanceProfile.getMissCounter();
+
+        return totalMisses;
+    }
+
+    /**
+     * Get the stack distance profile for the specified thread ID.
+     *
+     * @param threadId the thread ID
+     * @return the stack distance profile for the specified thread ID
+     */
+    private StackDistanceProfile getStackDistanceProfile(int threadId) {
+        if (!this.stackDistanceProfiles.containsKey(threadId)) {
+            this.stackDistanceProfiles.put(threadId, new StackDistanceProfile(getL2CacheController().getCache().getAssociativity()));
+        }
+
+        return this.stackDistanceProfiles.get(threadId);
+    }
+
+    /**
+     * Get the minimal sum of misses and its associated optimal partition.
+     *
+     * @return the minimal sum of misses and its associated optimal partition
+     */
+    private Pair<Integer, List<Integer>> getMinMissSumAndPartition() {
+        if (partitions == null) {
+            partitions = partition(getL2CacheController().getCache().getAssociativity(), getNumThreads());
+        }
+
+        int minMissSum = Integer.MAX_VALUE;
+        List<Integer> minPartition = null;
+
+        for (List<Integer> partition : partitions) {
+            int sum = 0;
+
+            for (int i = 0; i < partition.size(); i++) {
+                sum += this.getTotalMisses(i, partition.get(i));
+            }
+
+            if (sum < minMissSum) {
+                minMissSum = sum;
+                minPartition = partition;
+            }
+        }
+
+        return new Pair<Integer, List<Integer>>(minMissSum, minPartition);
     }
 
     @Override
     public void dumpStats(ReportNode reportNode) {
         reportNode.getChildren().add(new ReportNode(reportNode, "minMissCachePartitioningHelper") {{
-            getChildren().add(new ReportNode(this, "partition", getPartition(0) + ""));
+            getChildren().add(new ReportNode(this, "partition", getPartition() + ""));
             getChildren().add(new ReportNode(this, "numIntervals", getNumIntervals() + ""));
         }});
     }

@@ -24,14 +24,13 @@ import archimulator.sim.core.Thread;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import net.pickapack.action.Action;
+import net.pickapack.action.Predicate;
 import org.paukov.combinatorics.Factory;
 import org.paukov.combinatorics.Generator;
 import org.paukov.combinatorics.ICombinatoricsVector;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Cache partitioning helper.
@@ -40,6 +39,7 @@ import java.util.TreeMap;
  */
 public abstract class CachePartitioningHelper implements Reportable {
     private EvictableCache<?> cache;
+    private Predicate<Integer> shouldIncludePredicate;
 
     private int numCyclesElapsedPerInterval;
 
@@ -48,7 +48,7 @@ public abstract class CachePartitioningHelper implements Reportable {
 
     private int numThreads;
 
-    private Map<Integer, List<Integer>> partitionsPerSet;
+    private List<Integer> partition;
 
     /**
      * Create a cache partitioning helper.
@@ -61,7 +61,7 @@ public abstract class CachePartitioningHelper implements Reportable {
 //        this.numThreads = cache.getExperiment().getArchitecture().getNumThreadsPerCore() * this.l2CacheController.getExperiment().getArchitecture().getNumCores();
         this.numThreads = this.cache.getExperiment().getArchitecture().getNumCores();
 
-        this.partitionsPerSet = new TreeMap<Integer, List<Integer>>();
+        this.partition = new ArrayList<Integer>();
 
         int l2Associativity = this.cache.getAssociativity();
 
@@ -69,13 +69,8 @@ public abstract class CachePartitioningHelper implements Reportable {
             throw new IllegalArgumentException();
         }
 
-        for (int i = 0; i < this.cache.getNumSets(); i++) {
-            List<Integer> partition = new ArrayList<Integer>();
-            this.partitionsPerSet.put(i, partition);
-
-            for (int j = 0; j < this.numThreads; j++) {
-                partition.add(l2Associativity / this.numThreads);
-            }
+        for (int i = 0; i < this.numThreads; i++) {
+            partition.add(l2Associativity / this.numThreads);
         }
 
         this.numCyclesElapsedPerInterval = 5000000;
@@ -159,25 +154,38 @@ public abstract class CachePartitioningHelper implements Reportable {
     /**
      * Get the partition for the specified set.
      *
-     * @param set the set
      * @return the partition for the specified set
      */
-    public List<Integer> getPartition(int set) {
-        if (!partitionsPerSet.containsKey(set)) {
-            throw new IllegalArgumentException();
-        }
-
-        return partitionsPerSet.get(set);
+    public List<Integer> getPartition() {
+        return partition;
     }
 
     /**
      * Set the partition for the specified set.
      *
-     * @param set       the set
      * @param partition the partition
      */
-    public void setPartition(int set, List<Integer> partition) {
-        this.partitionsPerSet.put(set, partition);
+    public void setPartition(List<Integer> partition) {
+        this.partition = partition;
+    }
+
+    /**
+     * Set a predicate indicating whether should include the set in this cache partitioning helper.
+     *
+     * @param shouldIncludePredicate a predicate indicating whether should include the set in this cache partitioning helper
+     */
+    public void setShouldIncludePredicate(Predicate<Integer> shouldIncludePredicate) {
+        this.shouldIncludePredicate = shouldIncludePredicate;
+    }
+
+    /**
+     * Get a value indicating whether should include the specified set in this cache partitioning helper.
+     *
+     * @param set the set
+     * @return value indicating whether should include the specified set in this cache partitioning helper
+     */
+    protected boolean shouldInclude(int set) {
+        return shouldIncludePredicate.apply(set);
     }
 
     /**

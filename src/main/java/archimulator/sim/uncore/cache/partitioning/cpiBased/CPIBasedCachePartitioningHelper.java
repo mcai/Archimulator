@@ -68,9 +68,7 @@ public class CPIBasedCachePartitioningHelper extends CachePartitioningHelper {
             partition.add((int) Precision.round(cyclePerInstructions.get(threadId) * (this.getL2CacheController().getCache().getAssociativity() - this.getNumThreads()) / cyclePerInstructionSum, 0) + 1);
         }
 
-        for(int i = 0; i < this.getL2CacheController().getCache().getNumSets(); i++) {
-            this.setPartition(i, partition);
-        }
+        this.setPartition(partition);
 
         this.committedInstructions.clear();
     }
@@ -78,7 +76,7 @@ public class CPIBasedCachePartitioningHelper extends CachePartitioningHelper {
     @Override
     public void dumpStats(ReportNode reportNode) {
         reportNode.getChildren().add(new ReportNode(reportNode, "cpiBasedCachePartitioningHelper") {{
-            getChildren().add(new ReportNode(this, "partition", getPartition(0) + ""));
+            getChildren().add(new ReportNode(this, "partition", getPartition() + ""));
             getChildren().add(new ReportNode(this, "numIntervals", getNumIntervals() + ""));
         }});
     }
