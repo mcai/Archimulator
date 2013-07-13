@@ -22,6 +22,7 @@ import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.partitioning.cpiBased.CPIBasedCachePartitioningHelper;
 import archimulator.sim.uncore.cache.replacement.partitioned.PartitionedLRUPolicy;
+import net.pickapack.action.Predicate;
 
 import java.io.Serializable;
 import java.util.List;
@@ -42,16 +43,26 @@ public class CPIBasedPartitionedLRUPolicy<StateT extends Serializable> extends P
      */
     public CPIBasedPartitionedLRUPolicy(EvictableCache<StateT> cache) {
         super(cache);
+
         this.cpiBasedCachePartitioningHelper = new CPIBasedCachePartitioningHelper(cache);
+        this.cpiBasedCachePartitioningHelper.setShouldIncludePredicate(new Predicate<Integer>() {
+            @Override
+            public boolean apply(Integer set) {
+                return true;
+            }
+        });
     }
 
     @Override
     protected List<Integer> getPartition(int set) {
-        return getCpiBasedCachePartitioningHelper().getPartition(set);
+        return getCpiBasedCachePartitioningHelper().getPartition();
     }
 
     @Override
     public void dumpStats(ReportNode reportNode) {
+        for (int way : getNumPartitionsPerWay().keySet()) {
+            reportNode.getChildren().add(new ReportNode(reportNode, "numPartitionsPerWay[" + way + "]", getNumPartitionsPerWay().get(way) + ""));
+        }
         getCpiBasedCachePartitioningHelper().dumpStats(reportNode);
     }
 

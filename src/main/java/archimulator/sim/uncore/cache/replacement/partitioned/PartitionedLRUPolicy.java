@@ -26,6 +26,8 @@ import archimulator.sim.uncore.cache.replacement.LRUPolicy;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import static archimulator.sim.uncore.cache.partitioning.mlpAware.MLPAwareCachePartitioningHelper.getThreadIdentifier;
 
@@ -36,6 +38,8 @@ import static archimulator.sim.uncore.cache.partitioning.mlpAware.MLPAwareCacheP
  * @author Min Cai
  */
 public abstract class PartitionedLRUPolicy<StateT extends Serializable> extends LRUPolicy<StateT> {
+    private Map<Integer, Long> numPartitionsPerWay;
+
     /**
      * Create a partitioned least recently used (LRU) policy for the specified evictable cache.
      *
@@ -43,6 +47,11 @@ public abstract class PartitionedLRUPolicy<StateT extends Serializable> extends 
      */
     public PartitionedLRUPolicy(EvictableCache<StateT> cache) {
         super(cache);
+
+        this.numPartitionsPerWay = new TreeMap<Integer, Long>();
+        for (int i = 0; i < cache.getAssociativity(); i++) {
+            this.numPartitionsPerWay.put(i, 0L);
+        }
     }
 
     /**
@@ -64,7 +73,7 @@ public abstract class PartitionedLRUPolicy<StateT extends Serializable> extends 
             }
         }
 
-        if (numUsedWays < getPartition(set).get(getThreadIdentifier(access.getThread()))) {
+        if (numUsedWays < doGetPartition(set).get(getThreadIdentifier(access.getThread()))) {
             for (int stackPosition = this.getCache().getAssociativity() - 1; stackPosition >= 0; stackPosition--) {
                 int way = this.getWayInStackPosition(set, stackPosition);
                 CacheLine<StateT> line = this.getCache().getLine(set, way);
@@ -85,6 +94,12 @@ public abstract class PartitionedLRUPolicy<StateT extends Serializable> extends 
         throw new IllegalArgumentException();
     }
 
+    private List<Integer> doGetPartition(int set) {
+        List<Integer> partition = getPartition(set);
+        numPartitionsPerWay.put(partition.get(0), numPartitionsPerWay.get(partition.get(0)) + 1);
+        return partition;
+    }
+
     /**
      * Get the partition for the specified set.
      *
@@ -92,4 +107,13 @@ public abstract class PartitionedLRUPolicy<StateT extends Serializable> extends 
      * @return the partition for the specified set
      */
     protected abstract List<Integer> getPartition(int set);
+
+    /**
+     * Get the number of partitions with the specified main thread way.
+     *
+     * @return the number of partitions with the specified main thread way
+     */
+    public Map<Integer, Long> getNumPartitionsPerWay() {
+        return numPartitionsPerWay;
+    }
 }

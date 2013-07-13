@@ -22,6 +22,7 @@ import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.partitioning.minMiss.MinMissCachePartitioningHelper;
 import archimulator.sim.uncore.cache.replacement.partitioned.PartitionedLRUPolicy;
+import net.pickapack.action.Predicate;
 
 import java.io.Serializable;
 import java.util.List;
@@ -42,16 +43,26 @@ public class MinMissPartitionedLRUPolicy<StateT extends Serializable> extends Pa
      */
     public MinMissPartitionedLRUPolicy(EvictableCache<StateT> cache) {
         super(cache);
+
         this.minMissCachePartitioningHelper = new MinMissCachePartitioningHelper(cache);
+        this.minMissCachePartitioningHelper.setShouldIncludePredicate(new Predicate<Integer>() {
+            @Override
+            public boolean apply(Integer set) {
+                return true;
+            }
+        });
     }
 
     @Override
     protected List<Integer> getPartition(int set) {
-        return getMinMissCachePartitioningHelper().getPartition(set);
+        return getMinMissCachePartitioningHelper().getPartition();
     }
 
     @Override
     public void dumpStats(ReportNode reportNode) {
+        for (int way : getNumPartitionsPerWay().keySet()) {
+            reportNode.getChildren().add(new ReportNode(reportNode, "numPartitionsPerWay[" + way + "]", getNumPartitionsPerWay().get(way) + ""));
+        }
         getMinMissCachePartitioningHelper().dumpStats(reportNode);
     }
 
