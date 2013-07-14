@@ -74,12 +74,8 @@ public class CacheReplacementPolicyFactory {
                 return new MinMissPartitionedLRUPolicy<StateT>(cache);
             case MLP_AWARE_CACHE_PARTITIONING_LRU:
                 return new MLPAwarePartitionedLRUPolicy<StateT>(cache);
-            case CPI_BASED_AND_MIN_MISS_SET_DUELING_CACHE_PARTITIONING_LRU:
-                return new SetDuelingPartitionedLRUPolicy<StateT>(cache, new CPIBasedCachePartitioningHelper(cache), new MinMissCachePartitioningHelper(cache));
-            case CPI_BASED_AND_MLP_AWARE_SET_DUELING_CACHE_PARTITIONING_LRU:
-                return new SetDuelingPartitionedLRUPolicy<StateT>(cache, new CPIBasedCachePartitioningHelper(cache), new MLPAwareCachePartitioningHelper(cache));
-            case MIN_MISS_AND_MLP_AWARE_SET_DUELING_CACHE_PARTITIONING_LRU:
-                return new SetDuelingPartitionedLRUPolicy<StateT>(cache, new MinMissCachePartitioningHelper(cache), new MLPAwareCachePartitioningHelper(cache));
+            case SET_DUELING_CACHE_PARTITIONING_LRU:
+                return new SetDuelingPartitionedLRUPolicy<StateT>(cache, new CPIBasedCachePartitioningHelper(cache), new MinMissCachePartitioningHelper(cache), new MLPAwareCachePartitioningHelper(cache));
             default:
                 throw new IllegalArgumentException();
         }

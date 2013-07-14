@@ -18,12 +18,11 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache.replacement.partitioned.setDueling;
 
+import archimulator.sim.common.SimulationType;
 import archimulator.sim.uncore.cache.Cache;
-import net.pickapack.math.SaturatingCounter;
+import net.pickapack.action.Action;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Set dueling unit for set dueling partitioned least recently used (LRU) policy.
@@ -31,94 +30,6 @@ import java.util.Random;
  * @author Min Cai
  */
 public class SetDuelingUnit {
-    private Cache<?> cache;
-    private SaturatingCounter policySelectionCounter;
-
-    private List<SetDuelingMonitor> setDuelingMonitors;
-
-    private int setDuelingMonitorSize;
-
-    private Random random;
-
-    /**
-     * Create a set dueling unit for set dueling partitioned least recently used (LRU) policy.
-     *
-     * @param cache the parent cache
-     * @param policySelectionCounterMaxValue the maximum value of the policy selection counter
-     * @param setDuelingMonitorSize the set dueling monitor size
-     */
-    public SetDuelingUnit(Cache<?> cache, int policySelectionCounterMaxValue, int setDuelingMonitorSize) {
-        this.cache = cache;
-
-        this.setDuelingMonitorSize = setDuelingMonitorSize;
-
-        this.random = new Random(13);
-
-        int policySelectionCounterThreshold = (int) ((float) policySelectionCounterMaxValue * 0.5);
-
-        this.policySelectionCounter = new SaturatingCounter(0, policySelectionCounterThreshold, policySelectionCounterThreshold, 0);
-
-        this.setDuelingMonitors = new ArrayList<SetDuelingMonitor>();
-
-        for (int i = 0; i < this.cache.getNumSets(); i++) {
-            this.setDuelingMonitors.add(new SetDuelingMonitor());
-        }
-
-        this.initSetDuelingMonitorsRandomly();
-    }
-
-    /**
-     * Randomly assign sets to set dueling monitors.
-     */
-    private void initSetDuelingMonitorsRandomly() {
-        int numTotalSetDuelingMonitors = 2;
-
-        if (this.cache.getNumSets() < this.setDuelingMonitorSize * numTotalSetDuelingMonitors) {
-            throw new IllegalArgumentException();
-        }
-
-        for (int p = 0; p < numTotalSetDuelingMonitors; p++) {
-            for (int ldr = 0; ldr < this.setDuelingMonitorSize; ldr++) {
-                int set;
-                do {
-                    set = this.random.nextInt(this.cache.getNumSets());
-                }
-                while (this.setDuelingMonitors.get(set).type != SetDuelingMonitorType.FOLLOWERS);
-
-                this.setDuelingMonitors.get(set).type = p == 0 ? SetDuelingMonitorType.POLICY1 : SetDuelingMonitorType.POLICY2;
-            }
-        }
-    }
-
-    /**
-     * Get the partitioning policy type for the specified set.
-     *
-     * @param set the set
-     * @return the partitioning policy type for the specified set
-     */
-    public SetDuelingMonitorType getPartitioningPolicyType(int set) {
-        if (this.setDuelingMonitors.get(set).type == SetDuelingMonitorType.POLICY1) {
-            return SetDuelingMonitorType.POLICY1;
-        } else if (this.setDuelingMonitors.get(set).type == SetDuelingMonitorType.POLICY2) {
-            return SetDuelingMonitorType.POLICY2;
-        } else {
-            return this.policySelectionCounter.isTaken() ? SetDuelingMonitorType.POLICY1 : SetDuelingMonitorType.POLICY2;
-        }
-    }
-
-    /**
-     * Record a useful helper thread L2 request.
-     *
-     * @param set the set index
-     */
-    public void recordUsefulHelperThreadL2Request(int set) {
-        SetDuelingMonitorType sdmType = this.setDuelingMonitors.get(set).type;
-
-        if (sdmType != SetDuelingMonitorType.FOLLOWERS) {
-            this.policySelectionCounter.update(sdmType == SetDuelingMonitorType.POLICY1);
-        }
-    }
-
     /**
      * Set dueling monitor type.
      */
@@ -136,7 +47,12 @@ public class SetDuelingUnit {
         /**
          * Policy 2.
          */
-        POLICY2
+        POLICY2,
+
+        /**
+         * Policy 3.
+         */
+        POLICY3
     }
 
     /**
@@ -150,6 +66,140 @@ public class SetDuelingUnit {
          */
         private SetDuelingMonitor() {
             this.type = SetDuelingMonitorType.FOLLOWERS;
+        }
+    }
+
+    private Cache<?> cache;
+    private Map<SetDuelingMonitorType, Long> policySelectionCounter;
+
+    private List<SetDuelingMonitor> setDuelingMonitors;
+
+    private int setDuelingMonitorSize;
+
+    private Random random;
+
+    private int numCyclesElapsedPerInterval;
+
+    private long numIntervals;
+    private int numCyclesElapsed;
+
+    /**
+     * Create a set dueling unit for set dueling partitioned least recently used (LRU) policy.
+     *
+     * @param cache the parent cache
+     * @param setDuelingMonitorSize the set dueling monitor size
+     */
+    public SetDuelingUnit(final Cache<?> cache, int setDuelingMonitorSize) {
+        this.cache = cache;
+
+        this.setDuelingMonitorSize = setDuelingMonitorSize;
+
+        this.random = new Random(13);
+
+        this.policySelectionCounter = new TreeMap<SetDuelingMonitorType, Long>();
+        this.policySelectionCounter.put(SetDuelingMonitorType.POLICY1, 0L);
+        this.policySelectionCounter.put(SetDuelingMonitorType.POLICY2, 0L);
+        this.policySelectionCounter.put(SetDuelingMonitorType.POLICY3, 0L);
+
+        this.setDuelingMonitors = new ArrayList<SetDuelingMonitor>();
+
+        for (int i = 0; i < this.cache.getNumSets(); i++) {
+            this.setDuelingMonitors.add(new SetDuelingMonitor());
+        }
+
+        this.initSetDuelingMonitorsRandomly();
+
+        this.numCyclesElapsedPerInterval = 5000000;
+
+        this.cache.getCycleAccurateEventQueue().getPerCycleEvents().add(new Action() {
+            @Override
+            public void apply() {
+                if (cache.getSimulation().getType() != SimulationType.FAST_FORWARD) {
+                    numCyclesElapsed++;
+
+                    if (numCyclesElapsed == numCyclesElapsedPerInterval) {
+                        policySelectionCounter.put(SetDuelingMonitorType.POLICY1, 0L);
+                        policySelectionCounter.put(SetDuelingMonitorType.POLICY2, 0L);
+                        policySelectionCounter.put(SetDuelingMonitorType.POLICY3, 0L);
+
+                        numCyclesElapsed = 0;
+                        numIntervals++;
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * Randomly assign sets to set dueling monitors.
+     */
+    private void initSetDuelingMonitorsRandomly() {
+        int numTotalSetDuelingMonitors = 3;
+
+        if (this.cache.getNumSets() < this.setDuelingMonitorSize * numTotalSetDuelingMonitors) {
+            throw new IllegalArgumentException();
+        }
+
+        for (int p = 0; p < numTotalSetDuelingMonitors; p++) {
+            for (int ldr = 0; ldr < this.setDuelingMonitorSize; ldr++) {
+                int set;
+                do {
+                    set = this.random.nextInt(this.cache.getNumSets());
+                }
+                while (this.setDuelingMonitors.get(set).type != SetDuelingMonitorType.FOLLOWERS);
+
+                switch (p) {
+                    case 0:
+                        this.setDuelingMonitors.get(set).type = SetDuelingMonitorType.POLICY1;
+                        break;
+                    case 1:
+                        this.setDuelingMonitors.get(set).type = SetDuelingMonitorType.POLICY2;
+                        break;
+                    case 2:
+                        this.setDuelingMonitors.get(set).type = SetDuelingMonitorType.POLICY3;
+                        break;
+                    default:
+                        throw new IllegalArgumentException();
+                }
+            }
+        }
+    }
+
+    /**
+     * Get the partitioning policy type for the specified set.
+     *
+     * @param set the set
+     * @return the partitioning policy type for the specified set
+     */
+    public SetDuelingMonitorType getPartitioningPolicyType(int set) {
+        if (this.setDuelingMonitors.get(set).type == SetDuelingMonitorType.POLICY1) {
+            return SetDuelingMonitorType.POLICY1;
+        } else if (this.setDuelingMonitors.get(set).type == SetDuelingMonitorType.POLICY2) {
+            return SetDuelingMonitorType.POLICY2;
+        } else if (this.setDuelingMonitors.get(set).type == SetDuelingMonitorType.POLICY3) {
+            return SetDuelingMonitorType.POLICY3;
+        } else {
+            return Collections.min(this.policySelectionCounter.keySet(), new Comparator<SetDuelingMonitorType>() {
+                @Override
+                public int compare(SetDuelingMonitorType o1, SetDuelingMonitorType o2) {
+                    Long value1 = policySelectionCounter.get(o1);
+                    Long value2 = policySelectionCounter.get(o2);
+                    return value1.compareTo(value2);
+                }
+            });
+        }
+    }
+
+    /**
+     * Record a useful helper thread L2 request.
+     *
+     * @param set the set index
+     */
+    public void recordUsefulHelperThreadL2Request(int set) {
+        SetDuelingMonitorType sdmType = this.setDuelingMonitors.get(set).type;
+
+        if (sdmType != SetDuelingMonitorType.FOLLOWERS) {
+            this.policySelectionCounter.put(sdmType, this.policySelectionCounter.get(sdmType) + 1);
         }
     }
 }
