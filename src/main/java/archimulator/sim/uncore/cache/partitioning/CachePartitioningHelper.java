@@ -19,7 +19,6 @@
 package archimulator.sim.uncore.cache.partitioning;
 
 import archimulator.sim.common.SimulationType;
-import archimulator.sim.common.report.Reportable;
 import archimulator.sim.core.Thread;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
@@ -37,7 +36,7 @@ import java.util.List;
  *
  * @author Min Cai
  */
-public abstract class CachePartitioningHelper implements Reportable {
+public abstract class CachePartitioningHelper implements Partitioner {
     private EvictableCache<?> cache;
     private Predicate<Integer> shouldIncludePredicate;
 
@@ -169,11 +168,7 @@ public abstract class CachePartitioningHelper implements Reportable {
         this.partition = partition;
     }
 
-    /**
-     * Set a predicate indicating whether should include the set in this cache partitioning helper.
-     *
-     * @param shouldIncludePredicate a predicate indicating whether should include the set in this cache partitioning helper
-     */
+    @Override
     public void setShouldIncludePredicate(Predicate<Integer> shouldIncludePredicate) {
         this.shouldIncludePredicate = shouldIncludePredicate;
     }

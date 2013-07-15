@@ -55,6 +55,8 @@
       <w>nonowner</w>
       <w>opcode</w>
       <w>pageable</w>
+      <w>partitioner</w>
+      <w>partitioners</w>
       <w>precharge</w>
       <w>precharged</w>
       <w>precomputation</w>

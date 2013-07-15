@@ -19,6 +19,7 @@
 package archimulator.sim.uncore.cache.replacement;
 
 import archimulator.sim.uncore.cache.EvictableCache;
+import archimulator.sim.uncore.cache.partitioning.Partitioner;
 import archimulator.sim.uncore.cache.partitioning.cpiBased.CPIBasedCachePartitioningHelper;
 import archimulator.sim.uncore.cache.partitioning.minMiss.MinMissCachePartitioningHelper;
 import archimulator.sim.uncore.cache.partitioning.mlpAware.MLPAwareCachePartitioningHelper;
@@ -33,6 +34,7 @@ import archimulator.sim.uncore.cache.replacement.rereferenceIntervalPrediction.R
 import archimulator.sim.uncore.cache.replacement.reuseDistancePrediction.ReuseDistancePredictionPolicy;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 /**
  * Cache replacement policy factory.
@@ -48,7 +50,7 @@ public class CacheReplacementPolicyFactory {
      * @param cache                      the evictable cache
      * @return the newly created cache replacement policy for the specified evictable cache and based on the specified type
      */
-    public static <StateT extends Serializable> CacheReplacementPolicy<StateT> createCacheReplacementPolicy(CacheReplacementPolicyType cacheReplacementPolicyType, EvictableCache<StateT> cache) {
+    public static <StateT extends Serializable> CacheReplacementPolicy<StateT> createCacheReplacementPolicy(CacheReplacementPolicyType cacheReplacementPolicyType, final EvictableCache<StateT> cache) {
         switch (cacheReplacementPolicyType) {
             case LRU:
                 return new LRUPolicy<StateT>(cache);
@@ -75,7 +77,18 @@ public class CacheReplacementPolicyFactory {
             case MLP_AWARE_CACHE_PARTITIONING_LRU:
                 return new MLPAwarePartitionedLRUPolicy<StateT>(cache);
             case SET_DUELING_CACHE_PARTITIONING_LRU:
-                return new SetDuelingPartitionedLRUPolicy<StateT>(cache, new CPIBasedCachePartitioningHelper(cache), new MinMissCachePartitioningHelper(cache), new MLPAwareCachePartitioningHelper(cache));
+                return new SetDuelingPartitionedLRUPolicy<StateT>(
+                        cache,
+                        new CPIBasedCachePartitioningHelper(cache),
+                        new MinMissCachePartitioningHelper(cache),
+                        new MLPAwareCachePartitioningHelper(cache)
+                );
+            case SET_DUELING_STATIC_CACHE_PARTITIONING_LRU:
+                return new SetDuelingPartitionedLRUPolicy<StateT>(cache, new ArrayList<Partitioner>() {{
+                    for(int i = 1; i < cache.getAssociativity() - 1; i++) {
+                        add(new StaticPartitionedLRUPolicy<StateT>(cache, i));
+                    }
+                }});
             default:
                 throw new IllegalArgumentException();
         }

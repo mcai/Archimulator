@@ -20,6 +20,8 @@ package archimulator.sim.uncore.cache.replacement.partitioned;
 
 import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.uncore.cache.EvictableCache;
+import archimulator.sim.uncore.cache.partitioning.Partitioner;
+import net.pickapack.action.Predicate;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -31,21 +33,32 @@ import java.util.List;
  * @param <StateT> the state type of the parent evictable cache
  * @author Min Cai
  */
-public class StaticPartitionedLRUPolicy<StateT extends Serializable> extends PartitionedLRUPolicy<StateT> {
+public class StaticPartitionedLRUPolicy<StateT extends Serializable> extends PartitionedLRUPolicy<StateT> implements Partitioner {
+    private int numMainThreadWays;
+
     /**
      * Create a static partitioned least recently used (LRU) policy for the specified evictable cache.
      *
      * @param cache the parent evictable cache
      */
     public StaticPartitionedLRUPolicy(EvictableCache<StateT> cache) {
+        this(cache, cache.getExperiment().getArchitecture().getNumMainThreadWaysInStaticPartitionedLRUPolicy());
+    }
+
+    /**
+     * Create a static partitioned least recently used (LRU) policy for the specified evictable cache.
+     *
+     * @param cache             the parent evictable cache
+     * @param numMainThreadWays the number of main thread ways
+     */
+    public StaticPartitionedLRUPolicy(EvictableCache<StateT> cache, int numMainThreadWays) {
         super(cache);
+        this.numMainThreadWays = numMainThreadWays;
     }
 
     @Override
     protected List<Integer> getPartition(int set) {
-        final int numMainThreadWays = getCache().getExperiment().getArchitecture().getNumMainThreadWaysInStaticPartitionedLRUPolicy();
-
-        return new ArrayList<Integer>(){{
+        return new ArrayList<Integer>() {{
             add(numMainThreadWays);
             add(getCache().getAssociativity() - numMainThreadWays);
         }};
@@ -53,5 +66,14 @@ public class StaticPartitionedLRUPolicy<StateT extends Serializable> extends Par
 
     @Override
     public void dumpStats(ReportNode reportNode) {
+    }
+
+    @Override
+    public List<Integer> getPartition() {
+        return getPartition(0);
+    }
+
+    @Override
+    public void setShouldIncludePredicate(Predicate<Integer> shouldIncludePredicate) {
     }
 }

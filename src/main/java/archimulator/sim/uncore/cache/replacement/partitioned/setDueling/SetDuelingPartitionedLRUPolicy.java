@@ -20,7 +20,7 @@ package archimulator.sim.uncore.cache.replacement.partitioned.setDueling;
 
 import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.uncore.cache.EvictableCache;
-import archimulator.sim.uncore.cache.partitioning.CachePartitioningHelper;
+import archimulator.sim.uncore.cache.partitioning.Partitioner;
 import archimulator.sim.uncore.cache.replacement.partitioned.PartitionedLRUPolicy;
 import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestProfilingHelper;
 import net.pickapack.action.Action1;
@@ -38,7 +38,7 @@ import java.util.List;
  * @author Min Cai
  */
 public class SetDuelingPartitionedLRUPolicy<StateT extends Serializable> extends PartitionedLRUPolicy<StateT> {
-    private List<CachePartitioningHelper> cachePartitioningHelpers;
+    private List<Partitioner> partitioners;
     private SetDuelingUnit setDuelingUnit;
 
     private List<Long> numCachePartitioningHelpersUsed;
@@ -46,23 +46,36 @@ public class SetDuelingPartitionedLRUPolicy<StateT extends Serializable> extends
     /**
      * Create a set dueling partitioned least recently used (LRU) policy for the specified evictable cache.
      *
-     * @param cache                    the parent evictable cache
-     * @param cachePartitioningHelpers the array of cache partitioning helpers
+     * @param cache        the parent evictable cache
+     * @param partitioners the array of partitioners
      */
     public SetDuelingPartitionedLRUPolicy(
             final EvictableCache<StateT> cache,
-            CachePartitioningHelper... cachePartitioningHelpers
+            Partitioner... partitioners
+    ) {
+        this(cache, Arrays.asList(partitioners));
+    }
+
+    /**
+     * Create a set dueling partitioned least recently used (LRU) policy for the specified evictable cache.
+     *
+     * @param cache        the parent evictable cache
+     * @param partitioners the list of partitioners
+     */
+    public SetDuelingPartitionedLRUPolicy(
+            final EvictableCache<StateT> cache,
+            List<Partitioner> partitioners
     ) {
         super(cache);
 
         this.numCachePartitioningHelpersUsed = new ArrayList<Long>();
 
-        this.cachePartitioningHelpers = Arrays.asList(cachePartitioningHelpers);
+        this.partitioners = partitioners;
 
-        for(int i = 0; i < this.cachePartitioningHelpers.size(); i++) {
+        for (int i = 0; i < this.partitioners.size(); i++) {
             this.numCachePartitioningHelpersUsed.add(0L);
 
-            CachePartitioningHelper cachePartitioningHelper = this.cachePartitioningHelpers.get(i);
+            Partitioner cachePartitioningHelper = this.partitioners.get(i);
 
             final int tempI = i;
             cachePartitioningHelper.setShouldIncludePredicate(new Predicate<Integer>() {
@@ -73,7 +86,7 @@ public class SetDuelingPartitionedLRUPolicy<StateT extends Serializable> extends
             });
         }
 
-        this.setDuelingUnit = new SetDuelingUnit(cache, 6, this.cachePartitioningHelpers.size());
+        this.setDuelingUnit = new SetDuelingUnit(cache, 6, this.partitioners.size());
 
         cache.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.TimelyHelperThreadL2CacheRequestEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.TimelyHelperThreadL2CacheRequestEvent>() {
             @Override
@@ -94,7 +107,7 @@ public class SetDuelingPartitionedLRUPolicy<StateT extends Serializable> extends
     protected List<Integer> getPartition(int set) {
         int setDuelingMonitorType = setDuelingUnit.getPartitioningPolicyType(set);
 
-        CachePartitioningHelper partitioningHelper = this.cachePartitioningHelpers.get(setDuelingMonitorType);
+        Partitioner partitioningHelper = this.partitioners.get(setDuelingMonitorType);
         this.numCachePartitioningHelpersUsed.set(setDuelingMonitorType, this.numCachePartitioningHelpersUsed.get(setDuelingMonitorType) + 1);
 
         return partitioningHelper.getPartition();
@@ -103,7 +116,7 @@ public class SetDuelingPartitionedLRUPolicy<StateT extends Serializable> extends
     @Override
     public void dumpStats(final ReportNode reportNode) {
         reportNode.getChildren().add(new ReportNode(reportNode, "setDuelingPartitionedLRUPolicy") {{
-            for (int i = 0; i < cachePartitioningHelpers.size(); i++) {
+            for (int i = 0; i < partitioners.size(); i++) {
                 getChildren().add(new ReportNode(this, "numCachePartitioningHelperUsed[" + i + "]", numCachePartitioningHelpersUsed.get(i) + ""));
             }
 
@@ -111,18 +124,18 @@ public class SetDuelingPartitionedLRUPolicy<StateT extends Serializable> extends
                 getChildren().add(new ReportNode(this, "numPartitionsPerWay[" + way + "]", getNumPartitionsPerWay().get(way) + ""));
             }
 
-            for (CachePartitioningHelper cachePartitioningHelper : cachePartitioningHelpers) {
+            for (Partitioner cachePartitioningHelper : partitioners) {
                 cachePartitioningHelper.dumpStats(reportNode);
             }
         }});
     }
 
     /**
-     * get the list of cache partitioning helpers.
+     * get the list of partitioners.
      *
-     * @return the list of cache partitioning helpers
+     * @return the list of partitioners
      */
-    public List<CachePartitioningHelper> getCachePartitioningHelpers() {
-        return cachePartitioningHelpers;
+    public List<Partitioner> getPartitioners() {
+        return partitioners;
     }
 }

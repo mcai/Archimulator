@@ -87,5 +87,10 @@ public enum CacheReplacementPolicyType {
     /**
      * Set dueling cache partitioning based least recently used (LRU).
      */
-    SET_DUELING_CACHE_PARTITIONING_LRU
+    SET_DUELING_CACHE_PARTITIONING_LRU,
+
+    /**
+     * Set dueling static cache partitioning based least recently used (LRU).
+     */
+    SET_DUELING_STATIC_CACHE_PARTITIONING_LRU
 }
