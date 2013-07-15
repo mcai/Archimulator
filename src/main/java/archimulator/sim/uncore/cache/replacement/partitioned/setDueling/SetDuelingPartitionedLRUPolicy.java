@@ -27,6 +27,8 @@ import net.pickapack.action.Action1;
 import net.pickapack.action.Predicate;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -36,60 +38,42 @@ import java.util.List;
  * @author Min Cai
  */
 public class SetDuelingPartitionedLRUPolicy<StateT extends Serializable> extends PartitionedLRUPolicy<StateT> {
-    private CachePartitioningHelper cachePartitioningHelper1;
-    private CachePartitioningHelper cachePartitioningHelper2;
-    private CachePartitioningHelper cachePartitioningHelper3;
+    private List<CachePartitioningHelper> cachePartitioningHelpers;
     private SetDuelingUnit setDuelingUnit;
 
-    private long numCachePartitioningHelper1Used;
-    private long numCachePartitioningHelper2Used;
-    private long numCachePartitioningHelper3Used;
+    private List<Long> numCachePartitioningHelpersUsed;
 
     /**
      * Create a set dueling partitioned least recently used (LRU) policy for the specified evictable cache.
      *
      * @param cache                    the parent evictable cache
-     * @param cachePartitioningHelper1 the first cache partitioning helper
-     * @param cachePartitioningHelper2 the second cache partitioning helper
-     * @param cachePartitioningHelper3 the third cache partitioning helper
+     * @param cachePartitioningHelpers the array of cache partitioning helpers
      */
     public SetDuelingPartitionedLRUPolicy(
             final EvictableCache<StateT> cache,
-            CachePartitioningHelper cachePartitioningHelper1,
-            CachePartitioningHelper cachePartitioningHelper2,
-            CachePartitioningHelper cachePartitioningHelper3
+            CachePartitioningHelper... cachePartitioningHelpers
     ) {
         super(cache);
 
-        this.cachePartitioningHelper1 = cachePartitioningHelper1;
-        this.cachePartitioningHelper2 = cachePartitioningHelper2;
-        this.cachePartitioningHelper3 = cachePartitioningHelper3;
+        this.numCachePartitioningHelpersUsed = new ArrayList<Long>();
 
-        this.cachePartitioningHelper1.setShouldIncludePredicate(new Predicate<Integer>() {
-            @Override
-            public boolean apply(Integer set) {
-                return setDuelingUnit.getPartitioningPolicyType(set) ==
-                        SetDuelingUnit.SetDuelingMonitorType.POLICY1;
-            }
-        });
+        this.cachePartitioningHelpers = Arrays.asList(cachePartitioningHelpers);
 
-        this.cachePartitioningHelper2.setShouldIncludePredicate(new Predicate<Integer>() {
-            @Override
-            public boolean apply(Integer set) {
-                return setDuelingUnit.getPartitioningPolicyType(set) ==
-                        SetDuelingUnit.SetDuelingMonitorType.POLICY2;
-            }
-        });
+        for(int i = 0; i < this.cachePartitioningHelpers.size(); i++) {
+            this.numCachePartitioningHelpersUsed.add(0L);
 
-        this.cachePartitioningHelper3.setShouldIncludePredicate(new Predicate<Integer>() {
-            @Override
-            public boolean apply(Integer set) {
-                return setDuelingUnit.getPartitioningPolicyType(set) ==
-                        SetDuelingUnit.SetDuelingMonitorType.POLICY3;
-            }
-        });
+            CachePartitioningHelper cachePartitioningHelper = this.cachePartitioningHelpers.get(i);
 
-        this.setDuelingUnit = new SetDuelingUnit(cache, 6);
+            final int tempI = i;
+            cachePartitioningHelper.setShouldIncludePredicate(new Predicate<Integer>() {
+                @Override
+                public boolean apply(Integer set) {
+                    return setDuelingUnit.getPartitioningPolicyType(set) == tempI;
+                }
+            });
+        }
+
+        this.setDuelingUnit = new SetDuelingUnit(cache, 6, this.cachePartitioningHelpers.size());
 
         cache.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.TimelyHelperThreadL2CacheRequestEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.TimelyHelperThreadL2CacheRequestEvent>() {
             @Override
@@ -108,26 +92,10 @@ public class SetDuelingPartitionedLRUPolicy<StateT extends Serializable> extends
 
     @Override
     protected List<Integer> getPartition(int set) {
-        SetDuelingUnit.SetDuelingMonitorType setDuelingMonitorType = setDuelingUnit.getPartitioningPolicyType(set);
+        int setDuelingMonitorType = setDuelingUnit.getPartitioningPolicyType(set);
 
-        CachePartitioningHelper partitioningHelper;
-
-        switch (setDuelingMonitorType) {
-            case POLICY1:
-                partitioningHelper = getCachePartitioningHelper1();
-                numCachePartitioningHelper1Used++;
-                break;
-            case POLICY2:
-                partitioningHelper = getCachePartitioningHelper2();
-                numCachePartitioningHelper2Used++;
-                break;
-            case POLICY3:
-                partitioningHelper = getCachePartitioningHelper3();
-                numCachePartitioningHelper3Used++;
-                break;
-            default:
-                throw new IllegalArgumentException();
-        }
+        CachePartitioningHelper partitioningHelper = this.cachePartitioningHelpers.get(setDuelingMonitorType);
+        this.numCachePartitioningHelpersUsed.set(setDuelingMonitorType, this.numCachePartitioningHelpersUsed.get(setDuelingMonitorType) + 1);
 
         return partitioningHelper.getPartition();
     }
@@ -135,44 +103,26 @@ public class SetDuelingPartitionedLRUPolicy<StateT extends Serializable> extends
     @Override
     public void dumpStats(final ReportNode reportNode) {
         reportNode.getChildren().add(new ReportNode(reportNode, "setDuelingPartitionedLRUPolicy") {{
-            getChildren().add(new ReportNode(this, "numCachePartitioningHelper1Used", numCachePartitioningHelper1Used + ""));
-            getChildren().add(new ReportNode(this, "numCachePartitioningHelper2Used", numCachePartitioningHelper2Used + ""));
-            getChildren().add(new ReportNode(this, "numCachePartitioningHelper3Used", numCachePartitioningHelper3Used + ""));
+            for (int i = 0; i < cachePartitioningHelpers.size(); i++) {
+                getChildren().add(new ReportNode(this, "numCachePartitioningHelperUsed[" + i + "]", numCachePartitioningHelpersUsed.get(i) + ""));
+            }
 
             for (int way : getNumPartitionsPerWay().keySet()) {
                 getChildren().add(new ReportNode(this, "numPartitionsPerWay[" + way + "]", getNumPartitionsPerWay().get(way) + ""));
             }
 
-            getCachePartitioningHelper1().dumpStats(reportNode);
-            getCachePartitioningHelper2().dumpStats(reportNode);
-            getCachePartitioningHelper3().dumpStats(reportNode);
+            for (CachePartitioningHelper cachePartitioningHelper : cachePartitioningHelpers) {
+                cachePartitioningHelper.dumpStats(reportNode);
+            }
         }});
     }
 
     /**
-     * get the first cache partitioning helper.
+     * get the list of cache partitioning helpers.
      *
-     * @return the first cache partitioning helper
+     * @return the list of cache partitioning helpers
      */
-    public CachePartitioningHelper getCachePartitioningHelper1() {
-        return cachePartitioningHelper1;
-    }
-
-    /**
-     * Get the second cache partitioning helper.
-     *
-     * @return the second cache partitioning helper
-     */
-    public CachePartitioningHelper getCachePartitioningHelper2() {
-        return cachePartitioningHelper2;
-    }
-
-    /**
-     * Get the third cache partitioning helper.
-     *
-     * @return the third cache partitioning helper
-     */
-    public CachePartitioningHelper getCachePartitioningHelper3() {
-        return cachePartitioningHelper3;
+    public List<CachePartitioningHelper> getCachePartitioningHelpers() {
+        return cachePartitioningHelpers;
     }
 }
