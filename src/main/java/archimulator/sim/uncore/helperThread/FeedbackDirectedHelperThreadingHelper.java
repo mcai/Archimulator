@@ -25,7 +25,7 @@ import archimulator.sim.common.report.Reportable;
 import archimulator.sim.uncore.cache.replacement.helperThread.HelperThreadIntervalAwareLRUPolicy;
 import archimulator.sim.uncore.coherence.event.GeneralCacheControllerLineReplacementEvent;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
-import archimulator.util.IntervalStat;
+import archimulator.util.IntervalCounter;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
 import net.pickapack.math.SaturatingCounter;
@@ -47,14 +47,14 @@ public class FeedbackDirectedHelperThreadingHelper implements Reportable {
     private long numIntervals;
     private int numEvictedL2CacheLines;
 
-    private IntervalStat numTotalHelperThreadL2CacheRequestsStat;
+    private IntervalCounter numTotalHelperThreadL2CacheRequestsStat;
 
-    private IntervalStat numRedundantHitToTransientTagHelperThreadL2CacheRequestsStat;
-    private IntervalStat numRedundantHitToCacheHelperThreadL2CacheRequestsStat;
-    private IntervalStat numTimelyHelperThreadL2CacheRequestsStat;
-    private IntervalStat numLateHelperThreadL2CacheRequestsStat;
-    private IntervalStat numBadHelperThreadL2CacheRequestsStat;
-    private IntervalStat numUglyHelperThreadL2CacheRequestsStat;
+    private IntervalCounter numRedundantHitToTransientTagHelperThreadL2CacheRequestsStat;
+    private IntervalCounter numRedundantHitToCacheHelperThreadL2CacheRequestsStat;
+    private IntervalCounter numTimelyHelperThreadL2CacheRequestsStat;
+    private IntervalCounter numLateHelperThreadL2CacheRequestsStat;
+    private IntervalCounter numBadHelperThreadL2CacheRequestsStat;
+    private IntervalCounter numUglyHelperThreadL2CacheRequestsStat;
 
     private HelperThreadL2CacheRequestPollutionForInsertionPolicy pollutionForInsertionPolicy;
 
@@ -85,14 +85,14 @@ public class FeedbackDirectedHelperThreadingHelper implements Reportable {
 
         this.pollutionForInsertionPolicy = HelperThreadL2CacheRequestPollutionForInsertionPolicy.MEDIUM;
 
-        this.numTotalHelperThreadL2CacheRequestsStat = new IntervalStat();
+        this.numTotalHelperThreadL2CacheRequestsStat = new IntervalCounter();
 
-        this.numRedundantHitToTransientTagHelperThreadL2CacheRequestsStat = new IntervalStat();
-        this.numRedundantHitToCacheHelperThreadL2CacheRequestsStat = new IntervalStat();
-        this.numTimelyHelperThreadL2CacheRequestsStat = new IntervalStat();
-        this.numLateHelperThreadL2CacheRequestsStat = new IntervalStat();
-        this.numBadHelperThreadL2CacheRequestsStat = new IntervalStat();
-        this.numUglyHelperThreadL2CacheRequestsStat = new IntervalStat();
+        this.numRedundantHitToTransientTagHelperThreadL2CacheRequestsStat = new IntervalCounter();
+        this.numRedundantHitToCacheHelperThreadL2CacheRequestsStat = new IntervalCounter();
+        this.numTimelyHelperThreadL2CacheRequestsStat = new IntervalCounter();
+        this.numLateHelperThreadL2CacheRequestsStat = new IntervalCounter();
+        this.numBadHelperThreadL2CacheRequestsStat = new IntervalCounter();
+        this.numUglyHelperThreadL2CacheRequestsStat = new IntervalCounter();
 
         this.helperThreadingAggressivenessCounter = new SaturatingCounter(1, 1, 5, 1);
 
@@ -450,7 +450,7 @@ public class FeedbackDirectedHelperThreadingHelper implements Reportable {
      *
      * @return the interval stat of the total number of helper thread L2 cache requests
      */
-    public IntervalStat getNumTotalHelperThreadL2CacheRequestsStat() {
+    public IntervalCounter getNumTotalHelperThreadL2CacheRequestsStat() {
         return numTotalHelperThreadL2CacheRequestsStat;
     }
 
@@ -459,7 +459,7 @@ public class FeedbackDirectedHelperThreadingHelper implements Reportable {
      *
      * @return the interval stat of the number of redundant "hit to transient tag" helper thread L2 cache requests
      */
-    public IntervalStat getNumRedundantHitToTransientTagHelperThreadL2CacheRequestsStat() {
+    public IntervalCounter getNumRedundantHitToTransientTagHelperThreadL2CacheRequestsStat() {
         return numRedundantHitToTransientTagHelperThreadL2CacheRequestsStat;
     }
 
@@ -468,7 +468,7 @@ public class FeedbackDirectedHelperThreadingHelper implements Reportable {
      *
      * @return the interval stat of the number of redundant "hit to cache" helper thread L2 cache requests
      */
-    public IntervalStat getNumRedundantHitToCacheHelperThreadL2CacheRequestsStat() {
+    public IntervalCounter getNumRedundantHitToCacheHelperThreadL2CacheRequestsStat() {
         return numRedundantHitToCacheHelperThreadL2CacheRequestsStat;
     }
 
@@ -477,7 +477,7 @@ public class FeedbackDirectedHelperThreadingHelper implements Reportable {
      *
      * @return the interval stat of the number of timely helper thread L2 cache requests
      */
-    public IntervalStat getNumTimelyHelperThreadL2CacheRequestsStat() {
+    public IntervalCounter getNumTimelyHelperThreadL2CacheRequestsStat() {
         return numTimelyHelperThreadL2CacheRequestsStat;
     }
 
@@ -486,7 +486,7 @@ public class FeedbackDirectedHelperThreadingHelper implements Reportable {
      *
      * @return the interval stat of the number of late helper thread L2 cache requests
      */
-    public IntervalStat getNumLateHelperThreadL2CacheRequestsStat() {
+    public IntervalCounter getNumLateHelperThreadL2CacheRequestsStat() {
         return numLateHelperThreadL2CacheRequestsStat;
     }
 
@@ -495,7 +495,7 @@ public class FeedbackDirectedHelperThreadingHelper implements Reportable {
      *
      * @return the interval stat of the number of bad helper thread L2 cache requests
      */
-    public IntervalStat getNumBadHelperThreadL2CacheRequestsStat() {
+    public IntervalCounter getNumBadHelperThreadL2CacheRequestsStat() {
         return numBadHelperThreadL2CacheRequestsStat;
     }
 
@@ -504,7 +504,7 @@ public class FeedbackDirectedHelperThreadingHelper implements Reportable {
      *
      * @return the interval stat of the number of ugly helper thread L2 cache requests
      */
-    public IntervalStat getNumUglyHelperThreadL2CacheRequestsStat() {
+    public IntervalCounter getNumUglyHelperThreadL2CacheRequestsStat() {
         return numUglyHelperThreadL2CacheRequestsStat;
     }
 

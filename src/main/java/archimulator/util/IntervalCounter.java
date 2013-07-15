@@ -19,11 +19,11 @@
 package archimulator.util;
 
 /**
- * Interval stat.
+ * Interval counter.
  *
  * @author Min Cai
  */
-public class IntervalStat {
+public class IntervalCounter {
     private long valueInPreviousInterval;
     private long value;
 
@@ -50,6 +50,15 @@ public class IntervalStat {
         this.valueInPreviousInterval = (this.valueInPreviousInterval + this.value) / 2;
         this.value = 0;
         return this.valueInPreviousInterval;
+    }
+
+    /**
+     * Get the value.
+     *
+     * @return the value
+     */
+    public long getValue() {
+        return value;
     }
 
     @Override
