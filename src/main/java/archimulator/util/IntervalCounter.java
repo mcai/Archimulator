@@ -24,21 +24,21 @@ package archimulator.util;
  * @author Min Cai
  */
 public class IntervalCounter {
-    private long valueInPreviousInterval;
     private long value;
+    private long valueInTheCurrentInterval;
 
     /**
      * Increment.
      */
     public void increment() {
-        this.value++;
+        this.valueInTheCurrentInterval++;
     }
 
     /**
      * Reset.
      */
     public void reset() {
-        this.value = this.valueInPreviousInterval = 0;
+        this.valueInTheCurrentInterval = this.value = 0;
     }
 
     /**
@@ -47,9 +47,9 @@ public class IntervalCounter {
      * @return the initial value for the next interval
      */
     public long newInterval() {
-        this.valueInPreviousInterval = (this.valueInPreviousInterval + this.value) / 2;
-        this.value = 0;
-        return this.valueInPreviousInterval;
+        this.value = (this.value + this.valueInTheCurrentInterval) / 2;
+        this.valueInTheCurrentInterval = 0;
+        return this.value;
     }
 
     /**
@@ -63,6 +63,6 @@ public class IntervalCounter {
 
     @Override
     public String toString() {
-        return Long.toString(this.value);
+        return String.format("IntervalCounter{value=%d, valueInTheCurrentInterval=%d}", value, valueInTheCurrentInterval);
     }
 }
