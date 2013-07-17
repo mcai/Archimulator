@@ -61,6 +61,15 @@ public class IntervalCounter {
         return value;
     }
 
+    /**
+     * Get the value in the current interval.
+     *
+     * @return the value in the current interval
+     */
+    public long getValueInTheCurrentInterval() {
+        return valueInTheCurrentInterval;
+    }
+
     @Override
     public String toString() {
         return String.format("IntervalCounter{value=%d, valueInTheCurrentInterval=%d}", value, valueInTheCurrentInterval);

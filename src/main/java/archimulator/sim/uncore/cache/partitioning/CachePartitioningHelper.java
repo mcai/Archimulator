@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache.partitioning;
 
+import archimulator.sim.common.SimulationObject;
 import archimulator.sim.common.SimulationType;
 import archimulator.sim.core.Thread;
 import archimulator.sim.uncore.cache.EvictableCache;
@@ -77,7 +78,7 @@ public abstract class CachePartitioningHelper implements Partitioner {
         this.cache.getCycleAccurateEventQueue().getPerCycleEvents().add(new Action() {
             @Override
             public void apply() {
-                if (cache.getSimulation().getType() != SimulationType.FAST_FORWARD) {
+                if (cache.getSimulation().getType() != SimulationType.FAST_FORWARD && canPartition(cache)) { //TODO: should not be hardcoded!!!
                     numCyclesElapsed++;
 
                     if (numCyclesElapsed == numCyclesElapsedPerInterval) {
@@ -89,6 +90,19 @@ public abstract class CachePartitioningHelper implements Partitioner {
                 }
             }
         });
+    }
+
+    //TODO: to be refactored out!!!
+    /**
+     * Get a value indicating whether cache partitioning is needed or not.
+     *
+     * @param simulationObject the simulation object
+     * @return a value indicating whether cache partitioning is needed or not
+     */
+    public static boolean canPartition(SimulationObject simulationObject) {
+        return simulationObject.getExperiment().getArchitecture().getNumCores() == 2
+                && simulationObject.getExperiment().getArchitecture().getNumThreadsPerCore() == 2
+                && simulationObject.getSimulation().getProcessor().getCores().get(1).getThreads().get(0).getContext() != null;
     }
 
     /**

@@ -85,7 +85,7 @@ public class CacheReplacementPolicyFactory {
                 );
             case SET_DUELING_STATIC_CACHE_PARTITIONING_LRU:
                 return new SetDuelingPartitionedLRUPolicy<StateT>(cache, new ArrayList<Partitioner>() {{
-                    for(int i = 1; i < cache.getAssociativity() - 1; i++) {
+                    for(int i = 1; i < cache.getAssociativity(); i++) {
                         add(new StaticPartitionedLRUPolicy<StateT>(cache, i));
                     }
                 }});

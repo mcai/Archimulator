@@ -132,6 +132,8 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
         this.functionCallContextStack = new Stack<FunctionCallContext>();
 
         this.process = process;
+
+        this.getBlockingEventDispatcher().dispatch(new ContextCreatedEvent(this));
     }
 
     /**

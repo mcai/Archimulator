@@ -103,9 +103,23 @@ public class SetDuelingUnit {
                     numCyclesElapsed++;
 
                     if (numCyclesElapsed == numCyclesElapsedPerInterval) {
+                        int bestPolicy = getBestPolicy();
+
                         for (int i = 0; i < numTotalSetDuelingMonitors; i++) {
-                            numUsefulHelperThreadL2CacheRequestsPerPolicy.get(i).newInterval();
+                            IntervalCounter intervalCounter = numUsefulHelperThreadL2CacheRequestsPerPolicy.get(i);
+
+                            System.out.printf(
+                                    "numUsefulHelperThreadL2CacheRequestsPerPolicy[interval: %d, %d]=%s%s\n",
+                                    numIntervals,
+                                    i,
+                                    intervalCounter,
+                                    (intervalCounter.getValue() > 0 && i == bestPolicy) ? "*" : ""
+                            );
+
+                            intervalCounter.newInterval();
                         }
+
+                        System.out.println();
 
                         numCyclesElapsed = 0;
                         numIntervals++;
@@ -145,15 +159,23 @@ public class SetDuelingUnit {
      */
     public int getPartitioningPolicyType(int set) {
         int policy = this.setDuelingMonitors.get(set).policy;
+        return policy == FOLLOWERS ? getBestPolicy() : policy;
+    }
 
-        return policy == FOLLOWERS ? Collections.min(this.numUsefulHelperThreadL2CacheRequestsPerPolicy.keySet(), new Comparator<Integer>() {
+    /**
+     * Get the best policy.
+     *
+     * @return the best policy
+     */
+    private Integer getBestPolicy() {
+        return Collections.max(this.numUsefulHelperThreadL2CacheRequestsPerPolicy.keySet(), new Comparator<Integer>() {
             @Override
             public int compare(Integer policy1, Integer policy2) {
                 Long value1 = numUsefulHelperThreadL2CacheRequestsPerPolicy.get(policy1).getValue();
                 Long value2 = numUsefulHelperThreadL2CacheRequestsPerPolicy.get(policy2).getValue();
                 return value1.compareTo(value2);
             }
-        }) : policy;
+        });
     }
 
     /**
