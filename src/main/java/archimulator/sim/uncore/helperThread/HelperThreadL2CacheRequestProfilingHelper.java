@@ -85,16 +85,7 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
      * @param simulation simulation
      */
     public HelperThreadL2CacheRequestProfilingHelper(Simulation simulation) {
-        this(simulation.getProcessor().getMemoryHierarchy().getL2CacheController());
-    }
-
-    /**
-     * Create a helper thread L2 request profiling helper.
-     *
-     * @param l2CacheController L2 cache (directory) controller
-     */
-    public HelperThreadL2CacheRequestProfilingHelper(final DirectoryController l2CacheController) {
-        this.l2CacheController = l2CacheController;
+        this.l2CacheController = simulation.getProcessor().getMemoryHierarchy().getL2CacheController();
 
         this.helperThreadL2CacheRequestStates = new HashMap<Integer, Map<Integer, HelperThreadL2CacheRequestState>>();
         for (int set = 0; set < this.l2CacheController.getCache().getNumSets(); set++) {
@@ -252,8 +243,10 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
         if (!requesterIsHelperThread) {
             if (!event.isHitInCache()) {
                 this.numMainThreadL2CacheMisses++;
+                this.l2CacheController.getBlockingEventDispatcher().dispatch(new MainThreadL2CacheMissEvent(event.getSet()));
             } else {
                 this.numMainThreadL2CacheHits++;
+                this.l2CacheController.getBlockingEventDispatcher().dispatch(new MainThreadL2CacheHitEvent(event.getSet()));
 
                 if (lineFoundIsHelperThread) {
                     this.numUsefulHelperThreadL2CacheRequests++;
@@ -262,8 +255,10 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
         } else {
             if (!event.isHitInCache()) {
                 this.numHelperThreadL2CacheMisses++;
+                this.l2CacheController.getBlockingEventDispatcher().dispatch(new HelperThreadL2CacheMissEvent(event.getSet()));
             } else {
                 this.numHelperThreadL2CacheHits++;
+                this.l2CacheController.getBlockingEventDispatcher().dispatch(new HelperThreadL2CacheHitEvent(event.getSet()));
             }
 
             if (event.isHitInCache() && !lineFoundIsHelperThread) {
@@ -1058,15 +1053,17 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
     }
 
     /**
-     * Stable helper thread L2 cache request event.
+     * Helper thread L2 cache event.
      */
-    public abstract class StableHelperThreadL2CacheRequestEvent extends SimulationEvent {
+    public abstract class HelperThreadL2CacheEvent extends SimulationEvent {
         private int set;
 
         /**
-         * Create a stable helper thread L2 cache request event.
+         * Create a helper thread L2 cache event.
+         *
+         * @param set the set
          */
-        public StableHelperThreadL2CacheRequestEvent(int set) {
+        public HelperThreadL2CacheEvent(int set) {
             super(l2CacheController);
             this.set = set;
         }
@@ -1082,19 +1079,57 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
     }
 
     /**
-     * Redundant "hit to transient tag" helper thread L2 cache request event.
+     * Main thread L2 cache hit event.
      */
-    public class RedundantHitToTransientTagHelperThreadL2CacheRequestEvent extends StableHelperThreadL2CacheRequestEvent {
-        public RedundantHitToTransientTagHelperThreadL2CacheRequestEvent(int set) {
+    public class MainThreadL2CacheHitEvent extends HelperThreadL2CacheEvent {
+        /**
+         * Create a main thread L2 cache hit event.
+         *
+         * @param set the set
+         */
+        public MainThreadL2CacheHitEvent(int set) {
             super(set);
         }
     }
 
     /**
-     * Redundant "hit to cache" helper thread L2 cache request event.
+     * Main thread L2 cache miss event.
      */
-    public class RedundantHitToCacheHelperThreadL2CacheRequestEvent extends StableHelperThreadL2CacheRequestEvent {
-        public RedundantHitToCacheHelperThreadL2CacheRequestEvent(int set) {
+    public class MainThreadL2CacheMissEvent extends HelperThreadL2CacheEvent {
+        /**
+         * Create a main thread L2 cache miss event.
+         *
+         * @param set the set
+         */
+        public MainThreadL2CacheMissEvent(int set) {
+            super(set);
+        }
+    }
+
+    /**
+     * Helper thread L2 cache hit event.
+     */
+    public class HelperThreadL2CacheHitEvent extends HelperThreadL2CacheEvent {
+        /**
+         * Create a helper thread L2 cache hit event.
+         *
+         * @param set the set
+         */
+        public HelperThreadL2CacheHitEvent(int set) {
+            super(set);
+        }
+    }
+
+    /**
+     * Main thread L2 cache miss event.
+     */
+    public class HelperThreadL2CacheMissEvent extends HelperThreadL2CacheEvent {
+        /**
+         * Create a main thread L2 cache miss event.
+         *
+         * @param set the set
+         */
+        public HelperThreadL2CacheMissEvent(int set) {
             super(set);
         }
     }
@@ -1102,7 +1137,12 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
     /**
      * Timely helper thread L2 cache request event.
      */
-    public class TimelyHelperThreadL2CacheRequestEvent extends StableHelperThreadL2CacheRequestEvent {
+    public class TimelyHelperThreadL2CacheRequestEvent extends HelperThreadL2CacheEvent {
+        /**
+         * Create a timely helper thread L2 cache request event.
+         *
+         * @param set the set
+         */
         public TimelyHelperThreadL2CacheRequestEvent(int set) {
             super(set);
         }
@@ -1111,7 +1151,12 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
     /**
      * Late helper thread L2 cache request event.
      */
-    public class LateHelperThreadL2CacheRequestEvent extends StableHelperThreadL2CacheRequestEvent {
+    public class LateHelperThreadL2CacheRequestEvent extends HelperThreadL2CacheEvent {
+        /**
+         * Create a late helper thread L2 cache request event.
+         *
+         * @param set the set
+         */
         public LateHelperThreadL2CacheRequestEvent(int set) {
             super(set);
         }
@@ -1120,7 +1165,12 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
     /**
      * Bad helper thread L2 cache request event.
      */
-    public class BadHelperThreadL2CacheRequestEvent extends StableHelperThreadL2CacheRequestEvent {
+    public class BadHelperThreadL2CacheRequestEvent extends HelperThreadL2CacheEvent {
+        /**
+         * Create a bad helper thread L2 cache request event.
+         *
+         * @param set the set
+         */
         public BadHelperThreadL2CacheRequestEvent(int set) {
             super(set);
         }
@@ -1129,8 +1179,41 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
     /**
      * Ugly helper thread L2 cache request event.
      */
-    public class UglyHelperThreadL2CacheRequestEvent extends StableHelperThreadL2CacheRequestEvent {
+    public class UglyHelperThreadL2CacheRequestEvent extends HelperThreadL2CacheEvent {
+        /**
+         * Create a ugly helper thread L2 cache request event.
+         *
+         * @param set the set
+         */
         public UglyHelperThreadL2CacheRequestEvent(int set) {
+            super(set);
+        }
+    }
+
+    /**
+     * Redundant "hit to transient tag" helper thread L2 cache request event.
+     */
+    public class RedundantHitToTransientTagHelperThreadL2CacheRequestEvent extends HelperThreadL2CacheEvent {
+        /**
+         * Create a redundant "hit to transient tag" helper thread L2 cache request event.
+         *
+         * @param set the set
+         */
+        public RedundantHitToTransientTagHelperThreadL2CacheRequestEvent(int set) {
+            super(set);
+        }
+    }
+
+    /**
+     * Redundant "hit to cache" helper thread L2 cache request event.
+     */
+    public class RedundantHitToCacheHelperThreadL2CacheRequestEvent extends HelperThreadL2CacheEvent {
+        /**
+         * Create a redundant "hit to cache" helper thread L2 cache request event.
+         *
+         * @param set the set
+         */
+        public RedundantHitToCacheHelperThreadL2CacheRequestEvent(int set) {
             super(set);
         }
     }

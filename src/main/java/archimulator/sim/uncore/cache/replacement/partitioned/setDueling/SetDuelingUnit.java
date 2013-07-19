@@ -92,7 +92,7 @@ public class SetDuelingUnit {
             this.setDuelingMonitors.add(new SetDuelingMonitor());
         }
 
-        this.initSetDuelingMonitorsRandomly();
+        this.initializeSetDuelingMonitorsRandomly();
 
         this.numCyclesElapsedPerInterval = 5000000;
 
@@ -108,18 +108,8 @@ public class SetDuelingUnit {
                         for (int i = 0; i < numTotalSetDuelingMonitors; i++) {
                             IntervalCounter intervalCounter = numUsefulHelperThreadL2CacheRequestsPerPolicy.get(i);
 
-                            System.out.printf(
-                                    "numUsefulHelperThreadL2CacheRequestsPerPolicy[interval: %d, %d]=%s%s\n",
-                                    numIntervals,
-                                    i,
-                                    intervalCounter,
-                                    (intervalCounter.getValue() > 0 && i == bestPolicy) ? "*" : ""
-                            );
-
                             intervalCounter.newInterval();
                         }
-
-                        System.out.println();
 
                         numCyclesElapsed = 0;
                         numIntervals++;
@@ -132,7 +122,7 @@ public class SetDuelingUnit {
     /**
      * Randomly assign sets to set dueling monitors.
      */
-    private void initSetDuelingMonitorsRandomly() {
+    private void initializeSetDuelingMonitorsRandomly() {
         if (this.cache.getNumSets() < this.setDuelingMonitorSize * numTotalSetDuelingMonitors) {
             throw new IllegalArgumentException();
         }

@@ -34,6 +34,7 @@ import archimulator.sim.os.Context;
 import archimulator.sim.os.Kernel;
 import archimulator.sim.uncore.BasicMemoryHierarchy;
 import archimulator.sim.uncore.MemoryHierarchy;
+import archimulator.sim.uncore.cache.Interval.IntervalHelper;
 import archimulator.sim.uncore.cache.interference.CacheInteractionHelper;
 import archimulator.sim.uncore.cache.prediction.CacheBasedPredictor;
 import archimulator.sim.uncore.cache.stackDistanceProfile.StackDistanceProfilingHelper;
@@ -104,6 +105,8 @@ public abstract class Simulation implements SimulationObject, Reportable {
     private DynamicSpeculativePrecomputationHelper dynamicSpeculativePrecomputationHelper;
 
     private MLPProfilingHelper mlpProfilingHelper;
+
+    private IntervalHelper intervalHelper;
 
     private RuntimeHelper runtimeHelper;
 
@@ -201,6 +204,8 @@ public abstract class Simulation implements SimulationObject, Reportable {
         }
 
         this.mlpProfilingHelper = new MLPProfilingHelper(this);
+
+        this.intervalHelper = new IntervalHelper(this);
     }
 
     /**
@@ -326,6 +331,7 @@ public abstract class Simulation implements SimulationObject, Reportable {
         this.getHelperThreadL2CacheRequestProfilingHelper().dumpStats(rootReportNode);
         this.getCacheInteractionHelper().dumpStats(rootReportNode);
         this.getFeedbackDirectedHelperThreadingHelper().dumpStats(rootReportNode);
+        this.getIntervalHelper().dumpStats(rootReportNode);
 
         this.getProcessor().getMemoryHierarchy().getL2CacheController().getCache().getReplacementPolicy().dumpStats(rootReportNode);
 
@@ -786,6 +792,15 @@ public abstract class Simulation implements SimulationObject, Reportable {
      */
     public MLPProfilingHelper getMlpProfilingHelper() {
         return mlpProfilingHelper;
+    }
+
+    /**
+     * Get the interval helper.
+     *
+     * @return the interval helper
+     */
+    public IntervalHelper getIntervalHelper() {
+        return intervalHelper;
     }
 
     /**

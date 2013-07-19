@@ -445,6 +445,21 @@ public class Experiment implements WithId, WithParentId, WithTitle, WithCreateTi
      * @return the measurement simulation title prefix
      */
     public String getMeasurementTitlePrefix() {
+        return getMeasurementTitlePrefix(type);
+    }
+
+    @Override
+    public String toString() {
+        return title;
+    }
+
+    /**
+     * Get the measurement simulation title prefix from the specified experiment type.
+     *
+     * @param type the experiment type
+     * @return the measurement simulation title prefix from the specified experiment type
+     */
+    public static String getMeasurementTitlePrefix(ExperimentType type) {
         switch (type) {
             case TWO_PHASE:
                 return "twoPhase/phase1/";
@@ -455,10 +470,5 @@ public class Experiment implements WithId, WithParentId, WithTitle, WithCreateTi
             default:
                 throw new IllegalArgumentException();
         }
-    }
-
-    @Override
-    public String toString() {
-        return title;
     }
 }
