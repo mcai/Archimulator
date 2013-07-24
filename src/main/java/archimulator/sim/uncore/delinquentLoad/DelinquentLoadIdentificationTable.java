@@ -143,6 +143,15 @@ public class DelinquentLoadIdentificationTable {
     }
 
     /**
+     * Get the list of delinquent loads.
+     *
+     * @return the list of delinquent loads
+     */
+    public List<DelinquentLoad> getDelinquentLoads() {
+        return delinquentLoads;
+    }
+
+    /**
      * Get the list of steady delinquent loads.
      *
      * @return the list of steady delinquent loads

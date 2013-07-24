@@ -22,12 +22,11 @@ import archimulator.sim.common.Simulation;
 import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.common.report.Reportable;
 import archimulator.sim.core.Core;
-import archimulator.sim.core.Processor;
 import archimulator.sim.core.Thread;
+import net.pickapack.action.Action1;
+import net.pickapack.util.Pair;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Delinquent load identification helper.
@@ -36,7 +35,8 @@ import java.util.Map;
  */
 public class DelinquentLoadIdentificationHelper implements Reportable {
     private Map<Integer, DelinquentLoadIdentificationTable> delinquentLoadIdentificationTables;
-    private Processor processor;
+
+    private List<Pair<Integer, Integer>> identifiedDelinquentLoads;
 
     /**
      * Create a delinquent load identification helper.
@@ -44,15 +44,42 @@ public class DelinquentLoadIdentificationHelper implements Reportable {
      * @param simulation the simulation
      */
     public DelinquentLoadIdentificationHelper(Simulation simulation) {
-        this.processor = simulation.getProcessor();
-
         this.delinquentLoadIdentificationTables = new HashMap<Integer, DelinquentLoadIdentificationTable>();
 
-        for (Core core : processor.getCores()) {
+        for (Core core : simulation.getProcessor().getCores()) {
             for (Thread thread : core.getThreads()) {
                 this.delinquentLoadIdentificationTables.put(thread.getId(), new DelinquentLoadIdentificationTable(thread));
             }
         }
+
+        this.identifiedDelinquentLoads = new ArrayList<Pair<Integer, Integer>>();
+
+        simulation.getBlockingEventDispatcher().addListener(DelinquentLoadIdentificationTable.DelinquentLoadIdentifiedEvent.class, new Action1<DelinquentLoadIdentificationTable.DelinquentLoadIdentifiedEvent>() {
+            @Override
+            public void apply(DelinquentLoadIdentificationTable.DelinquentLoadIdentifiedEvent event) {
+                for(Pair<Integer, Integer> recordedDelinquentLoad : identifiedDelinquentLoads) {
+                    if(recordedDelinquentLoad.getFirst() == event.getThread().getId() && recordedDelinquentLoad.getSecond() == event.getDelinquentLoad().getPc()) {
+                        return;
+                    }
+                }
+
+                identifiedDelinquentLoads.add(new Pair<Integer, Integer>(event.getThread().getId(), event.getDelinquentLoad().getPc()));
+
+                Collections.sort(identifiedDelinquentLoads, new Comparator<Pair<Integer, Integer>>() {
+                    @Override
+                    public int compare(Pair<Integer, Integer> o1, Pair<Integer, Integer> o2) {
+                        return o1.getFirst().compareTo(o2.getFirst());
+                    }
+                });
+
+                Collections.sort(identifiedDelinquentLoads, new Comparator<Pair<Integer, Integer>>() {
+                    @Override
+                    public int compare(Pair<Integer, Integer> o1, Pair<Integer, Integer> o2) {
+                        return o1.getSecond().compareTo(o2.getSecond());
+                    }
+                });
+            }
+        });
     }
 
     /**
@@ -63,24 +90,22 @@ public class DelinquentLoadIdentificationHelper implements Reportable {
      * @return a value indicating whether the specified program counter (PC) is delinquent or not for the specified thread
      */
     public boolean isDelinquentPc(int threadId, int pc) {
-        return this.delinquentLoadIdentificationTables.get(threadId).isDelinquentPc(pc);
+        for(Pair<Integer, Integer> recordedDelinquentLoad : identifiedDelinquentLoads) {
+            if(recordedDelinquentLoad.getFirst() == threadId && recordedDelinquentLoad.getSecond() == pc) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
     public void dumpStats(ReportNode reportNode) {
         reportNode.getChildren().add(new ReportNode(reportNode, "delinquentLoadIdentificationHelper") {{
-            for (Core core : processor.getCores()) {
-                for (Thread thread : core.getThreads()) {
-                    final List<DelinquentLoad> steadyDelinquentLoads = delinquentLoadIdentificationTables.get(thread.getId()).getSteadyDelinquentLoads();
+            getChildren().add(new ReportNode(this, "identifiedDelinquentLoads.size", identifiedDelinquentLoads.size() + ""));
 
-                    getChildren().add(new ReportNode(this, thread.getName() + ".steadyDelinquentLoads.size", steadyDelinquentLoads.size() + ""));
-
-                    for (int i = 0, steadyDelinquentLoadsSize = steadyDelinquentLoads.size(); i < steadyDelinquentLoadsSize; i++) {
-                        DelinquentLoad delinquentLoad = steadyDelinquentLoads.get(i);
-                        getChildren().add(new ReportNode(this, thread.getName() + ".steadyDelinquentLoad_" + i,
-                                String.format("PC: 0x%08x, functionCallPC: 0x%08x", delinquentLoad.getPc(), delinquentLoad.getFunctionCallPc())));
-                    }
-                }
+            for (int i = 0; i < identifiedDelinquentLoads.size(); i++) {
+                Pair<Integer, Integer> delinquentLoad = identifiedDelinquentLoads.get(i);
+                getChildren().add(new ReportNode(this, "identifiedDelinquentLoad_" + i, String.format("threadId: %d, pc: 0x%08x", delinquentLoad.getFirst(), delinquentLoad.getSecond())));
             }
         }});
     }

@@ -54,6 +54,26 @@ public class IntervalHelper implements Reportable {
         private long numBadHelperThreadL2CacheRequests;
 
         private long numUglyHelperThreadL2CacheRequests;
+
+        private double helperThreadL2CacheRequestAccuracy;
+        private double helperThreadL2CacheRequestRedundancy;
+        private double helperThreadL2CacheRequestEarliness;
+        private double helperThreadL2CacheRequestLateness;
+        private double helperThreadL2CacheRequestPollution;
+
+        /**
+         * Handle when this interval is completed.
+         */
+        public void onCompleted() {
+            long numTotalHelperThreadL2CacheRequests = numHelperThreadL2CacheHits + numHelperThreadL2CacheMisses;
+            long numUsefulHelperThreadL2CacheRequests = numTimelyHelperThreadL2CacheRequests + numLateHelperThreadL2CacheRequests;
+
+            helperThreadL2CacheRequestAccuracy = (double) numUsefulHelperThreadL2CacheRequests / numTotalHelperThreadL2CacheRequests;
+            helperThreadL2CacheRequestRedundancy = (double) (numRedundantHitToTransientTagHelperThreadL2CacheRequests + numRedundantHitToCacheHelperThreadL2CacheRequests) / numUsefulHelperThreadL2CacheRequests;
+            helperThreadL2CacheRequestEarliness = (double) numUglyHelperThreadL2CacheRequests / numUsefulHelperThreadL2CacheRequests;
+            helperThreadL2CacheRequestLateness = (double) numLateHelperThreadL2CacheRequests / numUsefulHelperThreadL2CacheRequests;
+            helperThreadL2CacheRequestPollution = (double) numBadHelperThreadL2CacheRequests / numUsefulHelperThreadL2CacheRequests;
+        }
     }
 
     private int numCyclesElapsedPerInterval;
@@ -83,10 +103,10 @@ public class IntervalHelper implements Reportable {
                     numCyclesElapsed++;
 
                     if (numCyclesElapsed == numCyclesElapsedPerInterval) {
-                        numCyclesElapsed = 0;
-
+                        currentInterval.onCompleted();
                         intervals.add(currentInterval);
 
+                        numCyclesElapsed = 0;
                         currentInterval = new Interval();
                     }
                 }
@@ -184,6 +204,12 @@ public class IntervalHelper implements Reportable {
                 getChildren().add(new ReportNode(this, "numBadHelperThreadL2CacheRequests[" + i + "]", interval.numBadHelperThreadL2CacheRequests + ""));
 
                 getChildren().add(new ReportNode(this, "numUglyHelperThreadL2CacheRequests[" + i + "]", interval.numUglyHelperThreadL2CacheRequests + ""));
+
+                getChildren().add(new ReportNode(this, "helperThreadL2CacheRequestAccuracy[" + i + "]", interval.helperThreadL2CacheRequestAccuracy + ""));
+                getChildren().add(new ReportNode(this, "helperThreadL2CacheRequestRedundancy[" + i + "]", interval.helperThreadL2CacheRequestRedundancy + ""));
+                getChildren().add(new ReportNode(this, "helperThreadL2CacheRequestEarliness[" + i + "]", interval.helperThreadL2CacheRequestEarliness + ""));
+                getChildren().add(new ReportNode(this, "helperThreadL2CacheRequestLateness[" + i + "]", interval.helperThreadL2CacheRequestLateness + ""));
+                getChildren().add(new ReportNode(this, "helperThreadL2CacheRequestPollution[" + i + "]", interval.helperThreadL2CacheRequestPollution + ""));
             }
         }});
     }

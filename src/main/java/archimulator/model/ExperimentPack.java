@@ -137,7 +137,7 @@ public class ExperimentPack implements WithId, WithTitle, WithCreateTime {
     @DatabaseField(persisterClass = StringArrayListJsonSerializableType.class)
     private ArrayList<String> l2ReplacementPolicyType;
 
-    @ElementList
+    @ElementList(required = false)
     @PropertyArray
     @DatabaseField(persisterClass = StringArrayListJsonSerializableType.class)
     private ArrayList<String> dynamicSpeculativePrecomputationEnabled;
@@ -489,6 +489,7 @@ public class ExperimentPack implements WithId, WithTitle, WithCreateTime {
 
     /**
      * Get the list of boolean values indicating whether the dynamic speculative precomputation is enabled or not.
+     *
      * @return the list of boolean values indicating whether the dynamic speculative precomputation is enabled or not
      */
     public List<String> getDynamicSpeculativePrecomputationEnabled() {

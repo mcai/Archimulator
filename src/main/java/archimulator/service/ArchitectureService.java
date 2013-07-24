@@ -105,9 +105,6 @@ public interface ArchitectureService extends Service {
     /**
      * Get or update an architecture matching the given parameters.
      *
-     * @param hotspotProfilingEnabled a value indicating whether the hotspot profiling is enabled or not
-     * @param helperThreadL2CacheRequestProfilingEnabled
-     *                                a value indicating whether helper thread LLC request profiling is enabled or not
      * @param dynamicSpeculativePrecomputationEnabled
      *                                a value indicating whether dynamic speculative precomputation is enabled or not
      * @param numMainThreadWaysInStaticPartitionedLRUPolicy the number of main thread ways used in the static partitioned LRU policy
@@ -122,7 +119,7 @@ public interface ArchitectureService extends Service {
      * @param l2ReplacementPolicyType L2 cache replacement policy type
      * @return the existing or newly added architecture matching the given parameters
      */
-    Architecture getOrAddArchitecture(boolean hotspotProfilingEnabled, boolean helperThreadL2CacheRequestProfilingEnabled, boolean dynamicSpeculativePrecomputationEnabled, int numMainThreadWaysInStaticPartitionedLRUPolicy, int numCores, int numThreadsPerCore, int l1ISize, int l1IAssoc, int l1DSize, int l1DAssoc, int l2Size, int l2Assoc, CacheReplacementPolicyType l2ReplacementPolicyType);
+    Architecture getOrAddArchitecture(boolean dynamicSpeculativePrecomputationEnabled, int numMainThreadWaysInStaticPartitionedLRUPolicy, int numCores, int numThreadsPerCore, int l1ISize, int l1IAssoc, int l1DSize, int l1DAssoc, int l2Size, int l2Assoc, CacheReplacementPolicyType l2ReplacementPolicyType);
 
     /**
      * Initialize the service.

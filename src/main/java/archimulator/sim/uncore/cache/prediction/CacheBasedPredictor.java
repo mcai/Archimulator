@@ -19,6 +19,7 @@
 package archimulator.sim.uncore.cache.prediction;
 
 import archimulator.sim.common.SimulationObject;
+import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.cache.CacheGeometry;
 import archimulator.sim.uncore.cache.CacheLine;
@@ -121,20 +122,18 @@ public class CacheBasedPredictor<PredictableT extends Comparable<PredictableT>> 
         }
     }
 
-    /**
-     * Dump the state of the predictor.
-     */
-    public void dumpState() {
-        System.out.printf("exp#%s: CacheBasedPredictor %s content:%n", cache.getExperiment().getId(), cache.getName());
-
-        for (int i = 0; i < this.cache.getNumSets(); i++) {
-            for (CacheLine<Boolean> line : this.cache.getLines(i)) {
-                if (line.isValid()) {
-                    BooleanValueProvider stateProvider = (BooleanValueProvider) line.getStateProvider();
-                    System.out.printf("%s: %s\n", line, stateProvider);
+    @Override
+    public void dumpStats(ReportNode reportNode) {
+        reportNode.getChildren().add(new ReportNode(reportNode, cache.getName()) {{
+            for (int i = 0; i < cache.getNumSets(); i++) {
+                for (CacheLine<Boolean> line : cache.getLines(i)) {
+                    if (line.isValid()) {
+                        BooleanValueProvider stateProvider = (BooleanValueProvider) line.getStateProvider();
+                        getChildren().add(new ReportNode(this, line + "", stateProvider + ""));
+                    }
                 }
             }
-        }
+        }});
     }
 
     public PredictableT getDefaultValue() {

@@ -18,13 +18,15 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache.prediction;
 
+import archimulator.sim.common.report.Reportable;
+
 /**
  * Predictor.
  *
  * @param <PredictableT> the predictable type
  * @author Min Cai
  */
-public interface Predictor<PredictableT extends Comparable<PredictableT>> {
+public interface Predictor<PredictableT extends Comparable<PredictableT>> extends Reportable {
     /**
      * Predict the value for the specified address.
      *

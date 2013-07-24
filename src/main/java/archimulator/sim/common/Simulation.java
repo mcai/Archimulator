@@ -36,14 +36,13 @@ import archimulator.sim.uncore.BasicMemoryHierarchy;
 import archimulator.sim.uncore.MemoryHierarchy;
 import archimulator.sim.uncore.cache.Interval.IntervalHelper;
 import archimulator.sim.uncore.cache.interference.CacheInteractionHelper;
-import archimulator.sim.uncore.cache.prediction.CacheBasedPredictor;
+import archimulator.sim.uncore.cache.replacement.reuseDistancePrediction.ReuseDistancePredictionHelper;
 import archimulator.sim.uncore.cache.stackDistanceProfile.StackDistanceProfilingHelper;
 import archimulator.sim.uncore.coherence.msi.controller.GeneralCacheController;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import archimulator.sim.uncore.delinquentLoad.DelinquentLoadIdentificationHelper;
 import archimulator.sim.uncore.helperThread.FeedbackDirectedHelperThreadingHelper;
 import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestProfilingHelper;
-import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestQuality;
 import archimulator.sim.uncore.helperThread.hotspot.HotspotProfilingHelper;
 import archimulator.sim.uncore.mlp.MLPProfilingHelper;
 import archimulator.sim.uncore.tlb.TranslationLookasideBuffer;
@@ -91,6 +90,8 @@ public abstract class Simulation implements SimulationObject, Reportable {
     //TODO: the following stuffs are to be refactored out!!!
 
     private StackDistanceProfilingHelper stackDistanceProfilingHelper;
+
+    private ReuseDistancePredictionHelper reuseDistancePredictionHelper;
 
     private HotspotProfilingHelper hotspotProfilingHelper;
 
@@ -183,21 +184,17 @@ public abstract class Simulation implements SimulationObject, Reportable {
 
         this.stackDistanceProfilingHelper = new StackDistanceProfilingHelper(this);
 
-        if (getExperiment().getArchitecture().getHotspotProfilingEnabled()) {
-            this.hotspotProfilingHelper = new HotspotProfilingHelper(this);
-        }
+        this.reuseDistancePredictionHelper = new ReuseDistancePredictionHelper(this);
 
-        if (getExperiment().getArchitecture().getHelperThreadL2CacheRequestProfilingEnabled()) {
-            this.helperThreadL2CacheRequestProfilingHelper = new HelperThreadL2CacheRequestProfilingHelper(this);
-            this.cacheInteractionHelper = new CacheInteractionHelper(this);
-        }
+        this.hotspotProfilingHelper = new HotspotProfilingHelper(this);
 
-        //TODO: handle configuration support of conditional attribute
+        this.helperThreadL2CacheRequestProfilingHelper = new HelperThreadL2CacheRequestProfilingHelper(this);
+
+        this.cacheInteractionHelper = new CacheInteractionHelper(this);
+
         this.feedbackDirectedHelperThreadingHelper = new FeedbackDirectedHelperThreadingHelper(this);
 
-        if (getExperiment().getArchitecture().getDelinquentLoadIdentificationEnabled()) {
-            this.delinquentLoadIdentificationHelper = new DelinquentLoadIdentificationHelper(this);
-        }
+        this.delinquentLoadIdentificationHelper = new DelinquentLoadIdentificationHelper(this);
 
         if (getExperiment().getArchitecture().getDynamicSpeculativePrecomputationEnabled()) {
             this.dynamicSpeculativePrecomputationHelper = new DynamicSpeculativePrecomputationHelper(this);
@@ -294,7 +291,7 @@ public abstract class Simulation implements SimulationObject, Reportable {
     private void collectStats(boolean endOfSimulation) {
         final List<ExperimentStat> stats = new ArrayList<ExperimentStat>();
 
-        if (endOfSimulation && this.getExperiment().getArchitecture().getHelperThreadL2CacheRequestProfilingEnabled() && (this.getType() == SimulationType.MEASUREMENT || this.getType() == SimulationType.CACHE_WARMUP)) {
+        if (endOfSimulation && (this.getType() == SimulationType.MEASUREMENT || this.getType() == SimulationType.CACHE_WARMUP)) {
             this.getHelperThreadL2CacheRequestProfilingHelper().sumUpUnstableHelperThreadL2CacheRequests();
         }
 
@@ -327,10 +324,12 @@ public abstract class Simulation implements SimulationObject, Reportable {
         this.getProcessor().getMemoryHierarchy().getMemoryController().dumpStats(rootReportNode);
 
         this.getStackDistanceProfilingHelper().dumpStats(rootReportNode);
+        this.getReuseDistancePredictionHelper().dumpStats(rootReportNode);
         this.getHotspotProfilingHelper().dumpStats(rootReportNode);
         this.getHelperThreadL2CacheRequestProfilingHelper().dumpStats(rootReportNode);
         this.getCacheInteractionHelper().dumpStats(rootReportNode);
         this.getFeedbackDirectedHelperThreadingHelper().dumpStats(rootReportNode);
+        this.getDelinquentLoadIdentificationHelper().dumpStats(rootReportNode);
         this.getIntervalHelper().dumpStats(rootReportNode);
 
         this.getProcessor().getMemoryHierarchy().getL2CacheController().getCache().getReplacementPolicy().dumpStats(rootReportNode);
@@ -344,11 +343,6 @@ public abstract class Simulation implements SimulationObject, Reportable {
 
         if (this.getType() == SimulationType.MEASUREMENT || this.getType() == SimulationType.CACHE_WARMUP) {
             getProcessor().getMemoryHierarchy().dumpCacheControllerFsmStats(stats);
-        }
-
-        if (endOfSimulation && this.getExperiment().getArchitecture().getHelperThreadL2CacheRequestProfilingEnabled() && (this.getType() == SimulationType.MEASUREMENT || this.getType() == SimulationType.CACHE_WARMUP)) {
-            CacheBasedPredictor<HelperThreadL2CacheRequestQuality> helperThreadL2CacheRequestQualityPredictor = (CacheBasedPredictor<HelperThreadL2CacheRequestQuality>) this.getHelperThreadL2CacheRequestProfilingHelper().getHelperThreadL2CacheRequestQualityPredictor();
-            helperThreadL2CacheRequestQualityPredictor.dumpState();
         }
 
         ServiceManager.getExperimentStatService().addStatsByParent(this.getExperiment(), stats);
@@ -729,6 +723,15 @@ public abstract class Simulation implements SimulationObject, Reportable {
      */
     public StackDistanceProfilingHelper getStackDistanceProfilingHelper() {
         return stackDistanceProfilingHelper;
+    }
+
+    /**
+     * Get the reuse distance prediction helper.
+     *
+     * @return the reuse distance prediction helper
+     */
+    public ReuseDistancePredictionHelper getReuseDistancePredictionHelper() {
+        return reuseDistancePredictionHelper;
     }
 
     /**

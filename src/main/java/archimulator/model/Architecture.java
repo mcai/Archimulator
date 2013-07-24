@@ -49,16 +49,7 @@ public class Architecture implements WithId, WithTitle, WithCreateTime {
     private long createTime;
 
     @DatabaseField
-    private boolean hotspotProfilingEnabled;
-
-    @DatabaseField
     private int helperThreadPthreadSpawnIndex;
-
-    @DatabaseField
-    private boolean helperThreadL2CacheRequestProfilingEnabled;
-
-    @DatabaseField
-    private boolean delinquentLoadIdentificationEnabled;
 
     @DatabaseField
     private boolean dynamicSpeculativePrecomputationEnabled;
@@ -279,13 +270,10 @@ public class Architecture implements WithId, WithTitle, WithCreateTime {
     /**
      * Create an architecture.
      *
-     * @param hotspotProfilingEnabled a value indicating whether the hotspot profiling is enabled or not
-     * @param helperThreadL2CacheRequestProfilingEnabled
-     *                                a value indicating whether the helper thread L2 request profiling is enabled or not
      * @param dynamicSpeculativePrecomputationEnabled
-     *                                a value indicating whether the dynamic speculative precomputation is enabled or not
+*                                a value indicating whether the dynamic speculative precomputation is enabled or not
      * @param numMainThreadWaysInStaticPartitionedLRUPolicy
-     *                                the number of main thread ways used in the static partitioned LRU policy for the shared L2 cache
+*                                the number of main thread ways used in the static partitioned LRU policy for the shared L2 cache
      * @param numCores                the number of cores
      * @param numThreadsPerCore       the number of threads per core
      * @param l1ISize                 the size of the L1I caches in bytes
@@ -296,15 +284,11 @@ public class Architecture implements WithId, WithTitle, WithCreateTime {
      * @param l2Assoc                 the associativity of the L2 cache
      * @param l2ReplacementPolicyType the replacement policy type of the L2 cache
      */
-    public Architecture(boolean hotspotProfilingEnabled, boolean helperThreadL2CacheRequestProfilingEnabled, boolean dynamicSpeculativePrecomputationEnabled, int numMainThreadWaysInStaticPartitionedLRUPolicy, int numCores, int numThreadsPerCore, int l1ISize, int l1IAssoc, int l1DSize, int l1DAssoc, int l2Size, int l2Assoc, CacheReplacementPolicyType l2ReplacementPolicyType) {
+    public Architecture(boolean dynamicSpeculativePrecomputationEnabled, int numMainThreadWaysInStaticPartitionedLRUPolicy, int numCores, int numThreadsPerCore, int l1ISize, int l1IAssoc, int l1DSize, int l1DAssoc, int l2Size, int l2Assoc, CacheReplacementPolicyType l2ReplacementPolicyType) {
         this.createTime = DateHelper.toTick(new Date());
 
-        this.hotspotProfilingEnabled = hotspotProfilingEnabled;
-
         this.helperThreadPthreadSpawnIndex = 3720;
-        this.helperThreadL2CacheRequestProfilingEnabled = helperThreadL2CacheRequestProfilingEnabled;
 
-        this.delinquentLoadIdentificationEnabled = false;
         this.dynamicSpeculativePrecomputationEnabled = dynamicSpeculativePrecomputationEnabled;
 
         this.numMainThreadWaysInStaticPartitionedLRUPolicy = numMainThreadWaysInStaticPartitionedLRUPolicy;
@@ -447,39 +431,12 @@ public class Architecture implements WithId, WithTitle, WithCreateTime {
     }
 
     /**
-     * Get a value indicating whether the hotspot profiling is enabled or not.
-     *
-     * @return a value indicating whether the hotspot profiling is enabled or not
-     */
-    public boolean getHotspotProfilingEnabled() {
-        return hotspotProfilingEnabled;
-    }
-
-    /**
      * Get the helper thread Pthread spawning index of pseudo calls.
      *
      * @return the helper thread Pthread spawning index.
      */
     public int getHelperThreadPthreadSpawnIndex() {
         return helperThreadPthreadSpawnIndex;
-    }
-
-    /**
-     * Get a value indicating whether helper thread L2 cache request profiling is enabled or not.
-     *
-     * @return a value indicating whether helper thread L2 cache request profiling is enabled or not.
-     */
-    public boolean getHelperThreadL2CacheRequestProfilingEnabled() {
-        return helperThreadL2CacheRequestProfilingEnabled;
-    }
-
-    /**
-     * Get a value indicating whether delinquent load identification is enabled or not.
-     *
-     * @return a value indicating whether delinquent load identification is enabled or not
-     */
-    public boolean getDelinquentLoadIdentificationEnabled() {
-        return delinquentLoadIdentificationEnabled;
     }
 
     /**
@@ -1113,41 +1070,12 @@ public class Architecture implements WithId, WithTitle, WithCreateTime {
     }
 
     /**
-     * Set a value indicating whether the hotspot profiling is enabled or not.
-     *
-     * @param hotspotProfilingEnabled a value indicating whether the hotspot profiling is enabled or not
-     */
-    public void setHotspotProfilingEnabled(boolean hotspotProfilingEnabled) {
-        this.hotspotProfilingEnabled = hotspotProfilingEnabled;
-    }
-
-    /**
      * Set the helper thread Pthread spawning index.
      *
      * @param helperThreadPthreadSpawnIndex the new helper thread Pthread spawning index
      */
     public void setHelperThreadPthreadSpawnIndex(int helperThreadPthreadSpawnIndex) {
         this.helperThreadPthreadSpawnIndex = helperThreadPthreadSpawnIndex;
-    }
-
-    /**
-     * Set a value indicating whether helper thread L2 cache request profiling is enabled or not.
-     *
-     * @param helperThreadL2CacheRequestProfilingEnabled
-     *         a new value indicating whether helper thread L2 cache request profiling is enabled or not
-     */
-    public void setHelperThreadL2CacheRequestProfilingEnabled(boolean helperThreadL2CacheRequestProfilingEnabled) {
-        this.helperThreadL2CacheRequestProfilingEnabled = helperThreadL2CacheRequestProfilingEnabled;
-    }
-
-    /**
-     * Set a value indicating whether delinquent load identification is enabled or not.
-     *
-     * @param delinquentLoadIdentificationEnabled
-     *         a value indicating whether delinquent load identification is enabled or not
-     */
-    public void setDelinquentLoadIdentificationEnabled(boolean delinquentLoadIdentificationEnabled) {
-        this.delinquentLoadIdentificationEnabled = delinquentLoadIdentificationEnabled;
     }
 
     /**

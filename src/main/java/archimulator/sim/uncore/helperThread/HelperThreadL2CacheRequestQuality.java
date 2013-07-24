@@ -67,4 +67,13 @@ public enum HelperThreadL2CacheRequestQuality {
     public boolean isModifiable() {
         return this == UGLY;
     }
+
+    /**
+     * Get a value indicating whether the current state of the quality is useful or not.
+     *
+     * @return a value indicating whether the current state of the quality is useful or not
+     */
+    public boolean isUseful() {
+        return this == TIMELY || this == LATE;
+    }
 }

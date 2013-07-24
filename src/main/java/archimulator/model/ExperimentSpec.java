@@ -380,7 +380,7 @@ public class ExperimentSpec implements Serializable {
      */
     public Architecture getArchitecture() {
         if (architecture == null) {
-            architecture = ServiceManager.getArchitectureService().getOrAddArchitecture(true, true, dynamicSpeculativePrecomputationEnabled, numMainThreadWaysInStaticPartitionedLRUPolicy, numCores, numThreadsPerCore, getL1ISizeAsInt(), l1IAssociativity, getL1DSizeAsInt(), l1DAssociativity, getL2SizeAsInt(), l2Associativity, Enum.valueOf(CacheReplacementPolicyType.class, getL2ReplacementPolicyType()));
+            architecture = ServiceManager.getArchitectureService().getOrAddArchitecture(dynamicSpeculativePrecomputationEnabled, numMainThreadWaysInStaticPartitionedLRUPolicy, numCores, numThreadsPerCore, getL1ISizeAsInt(), l1IAssociativity, getL1DSizeAsInt(), l1DAssociativity, getL2SizeAsInt(), l2Associativity, Enum.valueOf(CacheReplacementPolicyType.class, getL2ReplacementPolicyType()));
         }
 
         return architecture;

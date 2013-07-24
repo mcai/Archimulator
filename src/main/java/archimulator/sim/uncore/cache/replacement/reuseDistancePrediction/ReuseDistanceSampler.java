@@ -34,12 +34,12 @@ import java.util.List;
 public class ReuseDistanceSampler extends BasicSimulationObject {
     private String name;
 
-    private List<ReuseDistanceSamplerEntry> entries;
+    protected List<ReuseDistanceSamplerEntry> entries;
 
-    private int samplingPeriod;
-    private int samplingCounter;
+    protected int samplingPeriod;
+    protected int samplingCounter;
 
-    private Quantizer reuseDistanceQuantizer;
+    protected Quantizer reuseDistanceQuantizer;
 
     /**
      * Create a reuse distance sampler.
@@ -72,10 +72,6 @@ public class ReuseDistanceSampler extends BasicSimulationObject {
      * @param address  the address
      */
     public void update(int threadId, int pc, int address) {
-        if(!needUpdate(threadId, pc, address)) {
-            return;
-        }
-
         for (int i = 0; i < this.entries.size(); i++) {
             ReuseDistanceSamplerEntry entry = this.entries.get(i);
             if (entry.isValid() && entry.getAddress() == address) {
@@ -103,18 +99,6 @@ public class ReuseDistanceSampler extends BasicSimulationObject {
         } else {
             samplingCounter--;
         }
-    }
-
-    /**
-     * Get a value indicating whether update is needed or not.
-     *
-     * @param threadId the thread ID
-     * @param pc the PC
-     * @param address the address
-     * @return a value indicating whether update is needed or not
-     */
-    public boolean needUpdate(int threadId, int pc, int address) {
-        return true;
     }
 
     @Override
