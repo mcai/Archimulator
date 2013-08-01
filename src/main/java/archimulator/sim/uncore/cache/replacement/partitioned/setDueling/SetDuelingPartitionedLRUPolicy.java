@@ -88,17 +88,12 @@ public class SetDuelingPartitionedLRUPolicy<StateT extends Serializable> extends
 
         this.setDuelingUnit = new SetDuelingUnit(cache, 6, this.partitioners.size());
 
-        cache.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.TimelyHelperThreadL2CacheRequestEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.TimelyHelperThreadL2CacheRequestEvent>() {
+        cache.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.HelperThreadL2CacheRequestEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.HelperThreadL2CacheRequestEvent>() {
             @Override
-            public void apply(HelperThreadL2CacheRequestProfilingHelper.TimelyHelperThreadL2CacheRequestEvent event) {
-                setDuelingUnit.recordUsefulHelperThreadL2Request(event.getSet());
-            }
-        });
-
-        cache.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.LateHelperThreadL2CacheRequestEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.LateHelperThreadL2CacheRequestEvent>() {
-            @Override
-            public void apply(HelperThreadL2CacheRequestProfilingHelper.LateHelperThreadL2CacheRequestEvent event) {
-                setDuelingUnit.recordUsefulHelperThreadL2Request(event.getSet());
+            public void apply(HelperThreadL2CacheRequestProfilingHelper.HelperThreadL2CacheRequestEvent event) {
+                if(event.getQuality().isUseful()) {
+                    setDuelingUnit.recordUsefulHelperThreadL2Request(event.getSet());
+                }
             }
         });
     }

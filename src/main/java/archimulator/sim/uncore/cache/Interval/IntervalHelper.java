@@ -53,6 +53,8 @@ public class IntervalHelper implements Reportable {
 
         private long numBadHelperThreadL2CacheRequests;
 
+        private long numEarlyHelperThreadL2CacheRequests;
+
         private long numUglyHelperThreadL2CacheRequests;
 
         private double helperThreadL2CacheRequestAccuracy;
@@ -141,45 +143,34 @@ public class IntervalHelper implements Reportable {
             }
         });
 
-        simulation.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.RedundantHitToTransientTagHelperThreadL2CacheRequestEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.RedundantHitToTransientTagHelperThreadL2CacheRequestEvent>() {
+        simulation.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.HelperThreadL2CacheRequestEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.HelperThreadL2CacheRequestEvent>() {
             @Override
-            public void apply(HelperThreadL2CacheRequestProfilingHelper.RedundantHitToTransientTagHelperThreadL2CacheRequestEvent event) {
-                currentInterval.numRedundantHitToTransientTagHelperThreadL2CacheRequests++;
-            }
-        });
-
-        simulation.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.RedundantHitToCacheHelperThreadL2CacheRequestEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.RedundantHitToCacheHelperThreadL2CacheRequestEvent>() {
-            @Override
-            public void apply(HelperThreadL2CacheRequestProfilingHelper.RedundantHitToCacheHelperThreadL2CacheRequestEvent event) {
-                currentInterval.numRedundantHitToCacheHelperThreadL2CacheRequests++;
-            }
-        });
-
-        simulation.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.TimelyHelperThreadL2CacheRequestEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.TimelyHelperThreadL2CacheRequestEvent>() {
-            @Override
-            public void apply(HelperThreadL2CacheRequestProfilingHelper.TimelyHelperThreadL2CacheRequestEvent event) {
-                currentInterval.numTimelyHelperThreadL2CacheRequests++;
-            }
-        });
-
-        simulation.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.LateHelperThreadL2CacheRequestEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.LateHelperThreadL2CacheRequestEvent>() {
-            @Override
-            public void apply(HelperThreadL2CacheRequestProfilingHelper.LateHelperThreadL2CacheRequestEvent event) {
-                currentInterval.numLateHelperThreadL2CacheRequests++;
-            }
-        });
-
-        simulation.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.UglyHelperThreadL2CacheRequestEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.UglyHelperThreadL2CacheRequestEvent>() {
-            @Override
-            public void apply(HelperThreadL2CacheRequestProfilingHelper.UglyHelperThreadL2CacheRequestEvent event) {
-                currentInterval.numUglyHelperThreadL2CacheRequests++;
-            }
-        });
-
-        simulation.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.BadHelperThreadL2CacheRequestEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.BadHelperThreadL2CacheRequestEvent>() {
-            @Override
-            public void apply(HelperThreadL2CacheRequestProfilingHelper.BadHelperThreadL2CacheRequestEvent event) {
-                currentInterval.numBadHelperThreadL2CacheRequests++;
+            public void apply(HelperThreadL2CacheRequestProfilingHelper.HelperThreadL2CacheRequestEvent event) {
+                switch (event.getQuality()) {
+                    case REDUNDANT_HIT_TO_TRANSIENT_TAG:
+                        currentInterval.numRedundantHitToTransientTagHelperThreadL2CacheRequests++;
+                        break;
+                    case REDUNDANT_HIT_TO_CACHE:
+                        currentInterval.numRedundantHitToCacheHelperThreadL2CacheRequests++;
+                        break;
+                    case TIMELY:
+                        currentInterval.numTimelyHelperThreadL2CacheRequests++;
+                        break;
+                    case LATE:
+                        currentInterval.numLateHelperThreadL2CacheRequests++;
+                        break;
+                    case BAD:
+                        currentInterval.numBadHelperThreadL2CacheRequests++;
+                        break;
+                    case EARLY:
+                        currentInterval.numEarlyHelperThreadL2CacheRequests++;
+                        break;
+                    case UGLY:
+                        currentInterval.numUglyHelperThreadL2CacheRequests++;
+                        break;
+                    default:
+                        throw new IllegalArgumentException();
+                }
             }
         });
     }
@@ -202,6 +193,8 @@ public class IntervalHelper implements Reportable {
                 getChildren().add(new ReportNode(this, "numLateHelperThreadL2CacheRequests[" + i + "]", interval.numLateHelperThreadL2CacheRequests + ""));
 
                 getChildren().add(new ReportNode(this, "numBadHelperThreadL2CacheRequests[" + i + "]", interval.numBadHelperThreadL2CacheRequests + ""));
+
+                getChildren().add(new ReportNode(this, "numEarlyHelperThreadL2CacheRequests[" + i + "]", interval.numEarlyHelperThreadL2CacheRequests + ""));
 
                 getChildren().add(new ReportNode(this, "numUglyHelperThreadL2CacheRequests[" + i + "]", interval.numUglyHelperThreadL2CacheRequests + ""));
 

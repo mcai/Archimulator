@@ -19,6 +19,7 @@
       <w>endian</w>
       <w>enqueued</w>
       <w>evictable</w>
+      <w>evictee</w>
       <w>evicter</w>
       <w>fcsr</w>
       <w>fprs</w>

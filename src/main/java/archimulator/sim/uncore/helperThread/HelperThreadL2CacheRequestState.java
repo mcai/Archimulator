@@ -18,6 +18,8 @@
  ******************************************************************************/
 package archimulator.sim.uncore.helperThread;
 
+import archimulator.sim.uncore.cache.CacheLine;
+
 /**
  * Helper thread L2 cache request state.
  *
@@ -30,6 +32,10 @@ public class HelperThreadL2CacheRequestState {
     private HelperThreadL2CacheRequestQuality quality;
     private boolean hitToTransientTag;
 
+    private int victimThreadId;
+    private int victimPc;
+    private int victimTag;
+
     /**
      * Create a helper thread L2 cache request state.
      */
@@ -38,6 +44,10 @@ public class HelperThreadL2CacheRequestState {
         this.threadId = -1;
         this.pc = -1;
         this.quality = HelperThreadL2CacheRequestQuality.INVALID;
+
+        this.victimThreadId = -1;
+        this.victimPc = -1;
+        this.victimTag = CacheLine.INVALID_TAG;
     }
 
     /**
@@ -134,8 +144,62 @@ public class HelperThreadL2CacheRequestState {
         return hitToTransientTag;
     }
 
+    /**
+     * Get the victim's thread ID.
+     *
+     * @return the victim's thread ID
+     */
+    public int getVictimThreadId() {
+        return victimThreadId;
+    }
+
+    /**
+     * Set the victim's thread ID.
+     *
+     * @param victimThreadId the victim thread ID
+     */
+    public void setVictimThreadId(int victimThreadId) {
+        this.victimThreadId = victimThreadId;
+    }
+
+    /**
+     * Get the victim PC.
+     *
+     * @return the victim PC
+     */
+    public int getVictimPc() {
+        return victimPc;
+    }
+
+    /**
+     * Set the victim PC.
+     *
+     * @param victimPc the victim PC
+     */
+    public void setVictimPc(int victimPc) {
+        this.victimPc = victimPc;
+    }
+
+    /**
+     * Get the victim tag.
+     *
+     * @return the victim tag
+     */
+    public int getVictimTag() {
+        return victimTag;
+    }
+
+    /**
+     * Set the victim tag.
+     *
+     * @param victimTag the victim tag
+     */
+    public void setVictimTag(int victimTag) {
+        this.victimTag = victimTag;
+    }
+
     @Override
     public String toString() {
-        return String.format("HelperThreadL2CacheRequestState{inFlightThreadId=%d, threadId=%d, pc=0x%08x, quality=%s, hitToTransientTag=%s}", inFlightThreadId, threadId, pc, quality, hitToTransientTag);
+        return String.format("HelperThreadL2CacheRequestState{inFlightThreadId=%d, threadId=%d, pc=0x%08x, quality=%s, hitToTransientTag=%s, victimThreadId=%d, victimPc=0x%08x, victimTag=0x%08x}", inFlightThreadId, threadId, pc, quality, hitToTransientTag, victimThreadId, victimPc, victimTag);
     }
 }
