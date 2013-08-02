@@ -29,7 +29,7 @@ public class HelperThreadL2CacheRequestState {
     private int inFlightThreadId;
     private int threadId;
     private int pc;
-    private HelperThreadL2CacheRequestQuality quality;
+    private boolean bad;
     private boolean hitToTransientTag;
 
     private int victimThreadId;
@@ -43,7 +43,7 @@ public class HelperThreadL2CacheRequestState {
         this.inFlightThreadId = -1;
         this.threadId = -1;
         this.pc = -1;
-        this.quality = HelperThreadL2CacheRequestQuality.INVALID;
+        this.bad = false;
 
         this.victimThreadId = -1;
         this.victimPc = -1;
@@ -105,25 +105,25 @@ public class HelperThreadL2CacheRequestState {
     }
 
     /**
-     * Set the quality of the helper thread L2 cache request.
+     * Get a value indicating whether it is bad or not.
      *
-     * @param quality the quality of the helper thread L2 cache request
+     * @return a value indicating whether it is bad or not
      */
-    public void setQuality(HelperThreadL2CacheRequestQuality quality) {
-        if (this.quality != HelperThreadL2CacheRequestQuality.INVALID && quality != HelperThreadL2CacheRequestQuality.INVALID && !this.quality.isModifiable()) {
-            throw new IllegalArgumentException();
-        }
-
-        this.quality = quality;
+    public boolean isBad() {
+        return bad;
     }
 
     /**
-     * Get the quality of the helper thread L2 cache request.
+     * Set a value indicating whether it is bad or not.
      *
-     * @return the quality of the helper thread L2 cache request
+     * @param bad a value indicating whether it is bad or not
      */
-    public HelperThreadL2CacheRequestQuality getQuality() {
-        return quality;
+    public void setBad(boolean bad) {
+        if(!HelperThreadingHelper.isHelperThread(threadId) && bad) {
+            throw new IllegalArgumentException();
+        }
+
+        this.bad = bad;
     }
 
     /**
@@ -200,6 +200,6 @@ public class HelperThreadL2CacheRequestState {
 
     @Override
     public String toString() {
-        return String.format("HelperThreadL2CacheRequestState{inFlightThreadId=%d, threadId=%d, pc=0x%08x, quality=%s, hitToTransientTag=%s, victimThreadId=%d, victimPc=0x%08x, victimTag=0x%08x}", inFlightThreadId, threadId, pc, quality, hitToTransientTag, victimThreadId, victimPc, victimTag);
+        return String.format("HelperThreadL2CacheRequestState{inFlightThreadId=%d, threadId=%d, pc=0x%08x, bad=%s, hitToTransientTag=%s, victimThreadId=%d, victimPc=0x%08x, victimTag=0x%08x}", inFlightThreadId, threadId, pc, bad, hitToTransientTag, victimThreadId, victimPc, victimTag);
     }
 }
