@@ -18,9 +18,19 @@
  ******************************************************************************/
 package archimulator.service;
 
+import archimulator.model.*;
 import archimulator.service.impl.*;
 import archimulator.util.PropertiesHelper;
 import archimulator.util.plugin.PluginHelper;
+import archimulator.util.serialization.XMLSerializationHelper;
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * Helper class for retrieving services.
@@ -42,6 +52,9 @@ public class ServiceManager {
 
     private static PluginHelper pluginHelper;
 
+    /**
+     * Static constructor.
+     */
     static {
         System.out.println("Archimulator (version: " + PropertiesHelper.getVersion() + ") - CMP Architectural Simulator Written in Java.\n");
         System.out.println("Copyright (c) 2010-2013 by Min Cai (min.cai.china@gmail.com).\n");
@@ -62,7 +75,63 @@ public class ServiceManager {
         userService.initialize();
         systemSettingService.initialize();
 
+        startTasks();
+
         System.out.println("Archimulator initialized successfully.\n");
+    }
+
+    /**
+     * Start tasks.
+     */
+    private static void startTasks() {
+        try {
+            File fileTaskInputs = new File("experiment_tasks");
+
+            if(fileTaskInputs.exists()) {
+                List<File> files = new ArrayList<File>(FileUtils.listFiles(fileTaskInputs, new String[]{"xml"}, true));
+
+                Collections.sort(files, new Comparator<File>() {
+                    @Override
+                    public int compare(File o1, File o2) {
+                        return o1.getAbsolutePath().compareTo(o2.getAbsolutePath());
+                    }
+                });
+
+                for (File file : files) {
+                    String text = FileUtils.readFileToString(file);
+
+                    Task task = XMLSerializationHelper.deserialize(Task.class, text);
+
+                    if (task != null && task.isActive()) {
+                        for(String tag : task.getTags()) {
+                            List<ExperimentPack> experimentPacks = experimentService.getExperimentPacksByTag(tag);
+                            for(ExperimentPack experimentPack : experimentPacks) {
+                                if(task.isReset()) {
+                                    experimentService.resetAbortedExperimentsByParent(experimentPack);
+                                    experimentService.resetCompletedExperimentsByParent(experimentPack);
+                                }
+                                experimentService.startExperimentPack(experimentPack);
+                            }
+                        }
+
+                        for(String experimentPackTitle : task.getExperimentPackTitles()) {
+                            ExperimentPack experimentPack = experimentService.getExperimentPackByTitle(experimentPackTitle);
+                            if(task.isReset()) {
+                                experimentService.resetAbortedExperimentsByParent(experimentPack);
+                                experimentService.resetCompletedExperimentsByParent(experimentPack);
+                            }
+                            experimentService.startExperimentPack(experimentPack);
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
     }
 
     /**
