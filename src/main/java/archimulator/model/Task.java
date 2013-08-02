@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Experiment pack.
+ * Task.
  *
  * @author Min Cai
  */
