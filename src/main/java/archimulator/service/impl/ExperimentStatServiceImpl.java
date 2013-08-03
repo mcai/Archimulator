@@ -331,6 +331,11 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
                             "helperThreadL2CacheRequestProfilingHelper/numBadHelperThreadL2CacheRequests", 0) : 0
             );
 
+            summary.setNumEarlyHelperThreadL2CacheRequests(
+                    helperThreadEnabled ? parent.getStatValueAsLong(statsMap, parent.getMeasurementTitlePrefix() +
+                            "helperThreadL2CacheRequestProfilingHelper/numEarlyHelperThreadL2CacheRequests", 0) : 0
+            );
+
             summary.setNumUglyHelperThreadL2CacheRequests(
                     helperThreadEnabled ? parent.getStatValueAsLong(statsMap, parent.getMeasurementTitlePrefix() +
                             "helperThreadL2CacheRequestProfilingHelper/numUglyHelperThreadL2CacheRequests", 0) : 0
@@ -412,6 +417,7 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
                 "Late",
                 "Timely",
                 "Bad",
+                "Early",
                 "Ugly",
                 "Redundant_MSHR",
                 "Redundant_Cache"

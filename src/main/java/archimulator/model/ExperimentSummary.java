@@ -159,6 +159,9 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
     private long numBadHelperThreadL2CacheRequests;
 
     @DatabaseField
+    private long numEarlyHelperThreadL2CacheRequests;
+
+    @DatabaseField
     private long numUglyHelperThreadL2CacheRequests;
 
     @DatabaseField
@@ -864,6 +867,25 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
     }
 
     /**
+     * Get the number of the early helper thread L2 cache requests.
+     *
+     * @return the number of the early helper thread L2 cache requests
+     */
+    public long getNumEarlyHelperThreadL2CacheRequests() {
+        return numEarlyHelperThreadL2CacheRequests;
+    }
+
+    /**
+     * Set the number of the early helper thread L2 cache requests.
+     *
+     * @param numEarlyHelperThreadL2CacheRequests
+     *         the number of the early helper thread L2 cache requests
+     */
+    public void setNumEarlyHelperThreadL2CacheRequests(long numEarlyHelperThreadL2CacheRequests) {
+        this.numEarlyHelperThreadL2CacheRequests = numEarlyHelperThreadL2CacheRequests;
+    }
+
+    /**
      * Get the number of the ugly helper thread L2 cache requests.
      *
      * @return the number of the ugly helper thread L2 cache requests
@@ -986,6 +1008,7 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
             add(numLateHelperThreadL2CacheRequests + "");
             add(numTimelyHelperThreadL2CacheRequests + "");
             add(numBadHelperThreadL2CacheRequests + "");
+            add(numEarlyHelperThreadL2CacheRequests + "");
             add(numUglyHelperThreadL2CacheRequests + "");
             add(numRedundantHitToTransientTagHelperThreadL2CacheRequests + "");
             add(numRedundantHitToCacheHelperThreadL2CacheRequests + "");
