@@ -123,9 +123,6 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
                                                 updateExperimentPack(experimentPack);
                                             }
-                                            else {
-                                                throw new IllegalArgumentException("Duplicate experiment pack " + experimentPack.getTitle() + " found.");
-                                            }
                                         }
                                     }
                                 }
