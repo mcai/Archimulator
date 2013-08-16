@@ -23,14 +23,14 @@ import archimulator.service.impl.*;
 import archimulator.util.PropertiesHelper;
 import archimulator.util.plugin.PluginHelper;
 import archimulator.util.serialization.XMLSerializationHelper;
+import net.pickapack.action.Action1;
+import net.pickapack.event.BlockingEvent;
+import net.pickapack.event.BlockingEventDispatcher;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Helper class for retrieving services.
@@ -43,6 +43,10 @@ public class ServiceManager {
      */
     public static final String USER_HOME_TEMPLATE_ARG = "<user.home>";
 
+    private static PluginHelper pluginHelper;
+
+    private static BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher;
+
     private static BenchmarkService benchmarkService;
     private static ArchitectureService architectureService;
     private static ExperimentService experimentService;
@@ -50,7 +54,7 @@ public class ServiceManager {
     private static UserService userService;
     private static SystemSettingService systemSettingService;
 
-    private static PluginHelper pluginHelper;
+    private static Map<Long, Task> experimentPacksToTasksMap;
 
     /**
      * Static constructor.
@@ -60,6 +64,8 @@ public class ServiceManager {
         System.out.println("Copyright (c) 2010-2013 by Min Cai (min.cai.china@gmail.com).\n");
 
         pluginHelper = new PluginHelper();
+
+        blockingEventDispatcher = new BlockingEventDispatcher<BlockingEvent>();
 
         benchmarkService = new BenchmarkServiceImpl();
         architectureService = new ArchitectureServiceImpl();
@@ -74,6 +80,8 @@ public class ServiceManager {
         experimentStatService.initialize();
         userService.initialize();
         systemSettingService.initialize();
+
+        experimentPacksToTasksMap = new LinkedHashMap<Long, Task>();
 
         startTasks();
 
@@ -103,27 +111,35 @@ public class ServiceManager {
                     Task task = XMLSerializationHelper.deserialize(Task.class, text);
 
                     if (task != null && task.isActive()) {
+                        System.out.printf("Running task %s\n\n", task.getTitle());
+
                         for(String tag : task.getTags()) {
                             List<ExperimentPack> experimentPacks = experimentService.getExperimentPacksByTag(tag);
                             for(ExperimentPack experimentPack : experimentPacks) {
-                                if(task.isReset()) {
-                                    experimentService.resetAbortedExperimentsByParent(experimentPack);
-                                    experimentService.resetCompletedExperimentsByParent(experimentPack);
-                                }
-                                experimentService.startExperimentPack(experimentPack);
+                                processExperimentPack(task, experimentPack);
                             }
                         }
 
                         for(String experimentPackTitle : task.getExperimentPackTitles()) {
                             ExperimentPack experimentPack = experimentService.getExperimentPackByTitle(experimentPackTitle);
-                            if(task.isReset()) {
-                                experimentService.resetAbortedExperimentsByParent(experimentPack);
-                                experimentService.resetCompletedExperimentsByParent(experimentPack);
-                            }
-                            experimentService.startExperimentPack(experimentPack);
+                            processExperimentPack(task, experimentPack);
                         }
                     }
                 }
+
+                getBlockingEventDispatcher().addListener(ExperimentStartedEvent.class, new Action1<ExperimentStartedEvent>() {
+                    @Override
+                    public void apply(ExperimentStartedEvent event) {
+                        printStats(event.getSender().getParent());
+                    }
+                });
+
+                getBlockingEventDispatcher().addListener(ExperimentStoppedEvent.class, new Action1<ExperimentStoppedEvent>() {
+                    @Override
+                    public void apply(ExperimentStoppedEvent event) {
+                        printStats(event.getSender().getParent());
+                    }
+                });
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -132,6 +148,88 @@ public class ServiceManager {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Process the specified experiment pack.
+     *
+     * @param experimentPack the experiment pack
+     */
+    private static void processExperimentPack(Task task, ExperimentPack experimentPack) {
+        experimentPacksToTasksMap.put(experimentPack.getId(), task);
+
+        printStats(experimentPack);
+
+        if(task.isReset()) {
+            experimentService.resetAbortedExperimentsByParent(experimentPack);
+            experimentService.resetCompletedExperimentsByParent(experimentPack);
+        }
+        experimentService.startExperimentPack(experimentPack);
+    }
+
+    /**
+     * Print the statistics for the specified experiment pack.
+     *
+     * @param experimentPack the experiment pack
+     */
+    private static void printStats(ExperimentPack experimentPack) {
+        System.out.println(experimentPack.getTitle());
+
+        for(ExperimentState experimentState : ExperimentState.values()) {
+            System.out.printf("  %s: %d\n", experimentState, experimentService.getNumExperimentsByParentAndState(experimentPack, experimentState));
+        }
+
+        System.out.printf("  %% completion: %.4f\n", (double) experimentService.getNumExperimentsByParentAndState(experimentPack, ExperimentState.COMPLETED) / experimentService.getNumExperimentsByParent(experimentPack));
+
+        if(experimentPacksToTasksMap.containsKey(experimentPack.getId())) {
+            printStats(experimentPacksToTasksMap.get(experimentPack.getId()));
+        }
+
+        System.out.println();
+    }
+
+    /**
+     * Print the statistics for the specified task.
+     *
+     * @param task the task
+     */
+    private static void printStats(Task task) {
+        long numCompleted = 0;
+        long numTotal = 0;
+
+        for(String tag : task.getTags()) {
+            List<ExperimentPack> experimentPacks = experimentService.getExperimentPacksByTag(tag);
+            for(ExperimentPack experimentPack : experimentPacks) {
+                numCompleted += experimentService.getNumExperimentsByParentAndState(experimentPack, ExperimentState.COMPLETED);
+                numTotal += experimentService.getNumExperimentsByParent(experimentPack);
+            }
+        }
+
+        for(String experimentPackTitle : task.getExperimentPackTitles()) {
+            ExperimentPack experimentPack = experimentService.getExperimentPackByTitle(experimentPackTitle);
+            numCompleted += experimentService.getNumExperimentsByParentAndState(experimentPack, ExperimentState.COMPLETED);
+            numTotal += experimentService.getNumExperimentsByParent(experimentPack);
+        }
+
+        System.out.printf("  %% completion of task %s: %.4f\n\n", task.getTitle(), (double) numCompleted / numTotal);
+    }
+
+    /**
+     * Get the plugin helper.
+     *
+     * @return the plugin helper
+     */
+    public static PluginHelper getPluginHelper() {
+        return pluginHelper;
+    }
+
+    /**
+     * Get the blocking event dispatcher.
+     *
+     * @return the blocking event dispatcher
+     */
+    public static BlockingEventDispatcher<BlockingEvent> getBlockingEventDispatcher() {
+        return blockingEventDispatcher;
     }
 
     /**
@@ -189,18 +287,9 @@ public class ServiceManager {
     }
 
     /**
-     * Get the plugin helper.
+     * Get the database URL to be used among archimulator services.
      *
-     * @return the plugin helper
-     */
-    public static PluginHelper getPluginHelper() {
-        return pluginHelper;
-    }
-
-    /**
-     * Get the database url to be used among archimulator services.
-     *
-     * @return database url
+     * @return database URL
      */
     public static String getDatabaseUrl() {
         return "jdbc:mysql://" +

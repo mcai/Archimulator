@@ -21,21 +21,15 @@ package archimulator.service.impl;
 import archimulator.model.*;
 import archimulator.service.ExperimentService;
 import archimulator.service.ServiceManager;
-import archimulator.sim.common.*;
-import archimulator.sim.os.Kernel;
 import archimulator.util.serialization.XMLSerializationHelper;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.misc.TransactionManager;
 import com.j256.ormlite.stmt.*;
 import net.pickapack.action.Function1;
 import net.pickapack.collection.CollectionHelper;
-import net.pickapack.event.BlockingEventDispatcher;
-import net.pickapack.event.CycleAccurateEventQueue;
 import net.pickapack.model.WithId;
 import net.pickapack.service.AbstractService;
-import net.pickapack.util.Reference;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -221,38 +215,8 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
      * @param experiment the experiment to run
      */
     private void runExperiment(Experiment experiment) {
-        try {
-            CycleAccurateEventQueue cycleAccurateEventQueue = new CycleAccurateEventQueue();
-
-            if (experiment.getType() == ExperimentType.FUNCTIONAL) {
-                BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher = new BlockingEventDispatcher<SimulationEvent>();
-                new FunctionalSimulation(experiment, blockingEventDispatcher, cycleAccurateEventQueue).simulate();
-            } else if (experiment.getType() == ExperimentType.DETAILED) {
-                BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher = new BlockingEventDispatcher<SimulationEvent>();
-                new DetailedSimulation(experiment, blockingEventDispatcher, cycleAccurateEventQueue).simulate();
-            } else if (experiment.getType() == ExperimentType.TWO_PHASE) {
-                Reference<Kernel> kernelRef = new Reference<Kernel>();
-
-                BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher = new BlockingEventDispatcher<SimulationEvent>();
-
-                new ToRoiFastForwardSimulation(experiment, blockingEventDispatcher, cycleAccurateEventQueue, kernelRef).simulate();
-
-                blockingEventDispatcher.clearListeners();
-
-                cycleAccurateEventQueue.resetCurrentCycle();
-
-                new FromRoiDetailedSimulation(experiment, blockingEventDispatcher, cycleAccurateEventQueue, kernelRef).simulate();
-            }
-
-            experiment.setState(ExperimentState.COMPLETED);
-            experiment.setFailedReason("");
-        } catch (Exception e) {
-            experiment.setState(ExperimentState.ABORTED);
-            experiment.setFailedReason(ExceptionUtils.getStackTrace(e));
-            e.printStackTrace();
-        } finally {
-            ServiceManager.getExperimentService().updateExperiment(experiment);
-        }
+        experiment.run();
+        ServiceManager.getExperimentService().updateExperiment(experiment);
     }
 
     @Override
@@ -308,6 +272,11 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     @Override
     public Experiment getFirstExperimentByTitle(String title) {
         return this.getFirstItemByTitle(this.experiments, title);
+    }
+
+    @Override
+    public ExperimentPack getParent(Experiment experiment) {
+        return this.getExperimentPackById(experiment.getParentId());
     }
 
     @Override

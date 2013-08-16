@@ -19,6 +19,8 @@
 package archimulator.model;
 
 import archimulator.service.ServiceManager;
+import archimulator.sim.common.*;
+import archimulator.sim.os.Kernel;
 import archimulator.util.serialization.ContextMappingArrayListJsonSerializableType;
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
@@ -26,11 +28,15 @@ import com.j256.ormlite.table.DatabaseTable;
 import net.pickapack.action.Function1;
 import net.pickapack.collection.CollectionHelper;
 import net.pickapack.dateTime.DateHelper;
+import net.pickapack.event.BlockingEventDispatcher;
+import net.pickapack.event.CycleAccurateEventQueue;
 import net.pickapack.model.WithCreateTime;
 import net.pickapack.model.WithId;
 import net.pickapack.model.WithParentId;
 import net.pickapack.model.WithTitle;
+import net.pickapack.util.Reference;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -138,6 +144,46 @@ public class Experiment implements WithId, WithParentId, WithTitle, WithCreateTi
 
             this.title += "-" + this.getArchitecture().getTitle();
         }
+    }
+
+    /**
+     * Run.
+     */
+    public void run() {
+        ServiceManager.getBlockingEventDispatcher().dispatch(new ExperimentStartedEvent(this));
+
+        try {
+            CycleAccurateEventQueue cycleAccurateEventQueue = new CycleAccurateEventQueue();
+
+            if (getType() == ExperimentType.FUNCTIONAL) {
+                BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher = new BlockingEventDispatcher<SimulationEvent>();
+                new FunctionalSimulation(this, blockingEventDispatcher, cycleAccurateEventQueue).simulate();
+            } else if (getType() == ExperimentType.DETAILED) {
+                BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher = new BlockingEventDispatcher<SimulationEvent>();
+                new DetailedSimulation(this, blockingEventDispatcher, cycleAccurateEventQueue).simulate();
+            } else if (getType() == ExperimentType.TWO_PHASE) {
+                Reference<Kernel> kernelRef = new Reference<Kernel>();
+
+                BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher = new BlockingEventDispatcher<SimulationEvent>();
+
+                new ToRoiFastForwardSimulation(this, blockingEventDispatcher, cycleAccurateEventQueue, kernelRef).simulate();
+
+                blockingEventDispatcher.clearListeners();
+
+                cycleAccurateEventQueue.resetCurrentCycle();
+
+                new FromRoiDetailedSimulation(this, blockingEventDispatcher, cycleAccurateEventQueue, kernelRef).simulate();
+            }
+
+            this.setState(ExperimentState.COMPLETED);
+            this.setFailedReason("");
+        } catch (Exception e) {
+            this.setState(ExperimentState.ABORTED);
+            this.setFailedReason(ExceptionUtils.getStackTrace(e));
+            e.printStackTrace();
+        }
+
+        ServiceManager.getBlockingEventDispatcher().dispatch(new ExperimentStoppedEvent(this));
     }
 
     /**
@@ -446,6 +492,15 @@ public class Experiment implements WithId, WithParentId, WithTitle, WithCreateTi
      */
     public String getMeasurementTitlePrefix() {
         return getMeasurementTitlePrefix(type);
+    }
+
+    /**
+     * Get the parent experiment pack.
+     *
+     * @return the parent experiment pack
+     */
+    public ExperimentPack getParent() {
+        return ServiceManager.getExperimentService().getParent(this);
     }
 
     @Override

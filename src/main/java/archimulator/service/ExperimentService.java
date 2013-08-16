@@ -85,6 +85,14 @@ public interface ExperimentService extends Service {
     Experiment getFirstExperimentByTitle(String title);
 
     /**
+     * Get the parent for the specified experiment.
+     *
+     * @param experiment the experiment
+     * @return the parent for the specified experiment
+     */
+    ExperimentPack getParent(Experiment experiment);
+
+    /**
      * Get the first experiment under the specified parent experiment pack.
      *
      * @param parent parent experiment pack
