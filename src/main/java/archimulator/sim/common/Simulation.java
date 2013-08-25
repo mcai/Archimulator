@@ -44,6 +44,7 @@ import archimulator.sim.uncore.delinquentLoad.DelinquentLoadIdentificationHelper
 import archimulator.sim.uncore.helperThread.FeedbackDirectedHelperThreadingHelper;
 import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestProfilingHelper;
 import archimulator.sim.uncore.helperThread.hotspot.HotspotProfilingHelper;
+import archimulator.sim.uncore.mlp.BLPProfilingHelper;
 import archimulator.sim.uncore.mlp.MLPProfilingHelper;
 import archimulator.sim.uncore.tlb.TranslationLookasideBuffer;
 import archimulator.util.RuntimeHelper;
@@ -106,6 +107,8 @@ public abstract class Simulation implements SimulationObject, Reportable {
     private DynamicSpeculativePrecomputationHelper dynamicSpeculativePrecomputationHelper;
 
     private MLPProfilingHelper mlpProfilingHelper;
+
+    private BLPProfilingHelper blpProfilingHelper;
 
     private IntervalHelper intervalHelper;
 
@@ -201,6 +204,8 @@ public abstract class Simulation implements SimulationObject, Reportable {
         }
 
         this.mlpProfilingHelper = new MLPProfilingHelper(this);
+
+        this.blpProfilingHelper = new BLPProfilingHelper(this);
 
         this.intervalHelper = new IntervalHelper(this);
     }
@@ -795,6 +800,15 @@ public abstract class Simulation implements SimulationObject, Reportable {
      */
     public MLPProfilingHelper getMlpProfilingHelper() {
         return mlpProfilingHelper;
+    }
+
+    /**
+     * Get the BLP profiling helper.
+     *
+     * @return the BLP profiling helper
+     */
+    public BLPProfilingHelper getBlpProfilingHelper() {
+        return blpProfilingHelper;
     }
 
     /**

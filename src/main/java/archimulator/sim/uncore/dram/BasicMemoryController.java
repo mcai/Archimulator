@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore.dram;
 
+import archimulator.sim.common.SimulationEvent;
 import archimulator.sim.uncore.MemoryHierarchy;
 import net.pickapack.action.Action;
 import net.pickapack.math.Counter;
@@ -105,21 +106,93 @@ public class BasicMemoryController extends MemoryController {
      * @param address             the address
      * @param onCompletedCallback the callback action performed when the access is completed
      */
-    private void accessDram(int address, final Action onCompletedCallback) {
+    private void accessDram(final int address, final Action onCompletedCallback) {
         final int targetRow = (address >> this.rowBits) / this.getNumBanks();
         final int targetBank = (address >> this.rowBits) % this.getNumBanks();
 
         final boolean contiguous = (targetBank == previousBank);
 
+        getBlockingEventDispatcher().dispatch(new BeginAccessEvent(address, targetBank));
+
         this.banks.get(targetBank).beginAccess(targetRow, contiguous, new Action() {
             @Override
             public void apply() {
+                getBlockingEventDispatcher().dispatch(new EndAccessEvent(address, targetBank));
                 getCycleAccurateEventQueue().schedule(this, onCompletedCallback, getFromDramLatency());
             }
         });
 
         previousBank = targetBank;
     }
+
+    /**
+     * Access event.
+     */
+    protected abstract class AccessEvent extends SimulationEvent {
+        private int address;
+        private int bank;
+
+        /**
+         * Create an access event.
+         *
+         * @param address the address
+         * @param bank the bank
+         */
+        public AccessEvent(int address, int bank) {
+            super(BasicMemoryController.this);
+            this.address = address;
+            this.bank = bank;
+        }
+
+        /**
+         * Get the address.
+         *
+         * @return the address
+         */
+        public int getAddress() {
+            return address;
+        }
+
+        /**
+         * Get the bank.
+         *
+         * @return the bank
+         */
+        public int getBank() {
+            return bank;
+        }
+    }
+
+    /**
+     * Begin access event.
+     */
+    public class BeginAccessEvent extends AccessEvent {
+        /**
+         * Create a begin access event.
+         *
+         * @param address the address
+         * @param bank    the bank
+         */
+        public BeginAccessEvent(int address, int bank) {
+            super(address, bank);
+        }
+    }
+
+    /**
+     * End access event.
+     */
+    public class EndAccessEvent extends AccessEvent {
+        /**
+         * Create an end access event.
+         *
+         * @param address the address
+         * @param bank    the bank
+         */
+        public EndAccessEvent(int address, int bank) {
+            super(address, bank);
+        }
+    }
+
 
     /**
      * Get the "to DRAM" latency.

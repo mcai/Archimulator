@@ -19,6 +19,7 @@
 package archimulator.sim.uncore.mlp;
 
 import archimulator.sim.common.Simulation;
+import archimulator.sim.common.SimulationEvent;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.event.GeneralCacheControllerServiceNonblockingRequestEvent;
 import archimulator.sim.uncore.coherence.event.LastLevelCacheControllerLineInsertEvent;
@@ -39,6 +40,41 @@ import java.util.Map;
  * @author Min Cai
  */
 public class MLPProfilingHelper {
+    /**
+     * L2 miss MLP profiled event.
+     */
+    public class L2MissMLPProfiledEvent extends SimulationEvent {
+        private PendingL2Miss pendingL2Miss;
+
+        /**
+         * Create an L2 miss MLP profiled event.
+         *
+         * @param pendingL2Miss the pending L2 miss
+         */
+        public L2MissMLPProfiledEvent(PendingL2Miss pendingL2Miss) {
+            super(l2CacheController);
+            this.pendingL2Miss = pendingL2Miss;
+        }
+
+        /**
+         * Get the pending L2 miss.
+         *
+         * @return the pending L2 miss
+         */
+        public PendingL2Miss getPendingL2Miss() {
+            return pendingL2Miss;
+        }
+
+        /**
+         * Get the L2 cache controller.
+         *
+         * @return the L2 cache controller
+         */
+        public DirectoryController getL2CacheController() {
+            return l2CacheController;
+        }
+    }
+
     private DirectoryController l2CacheController;
 
     private Function1<Integer, Integer> mlpCostQuantizer;
@@ -54,16 +90,7 @@ public class MLPProfilingHelper {
      * @param simulation the simulation
      */
     public MLPProfilingHelper(Simulation simulation) {
-        this(simulation.getProcessor().getMemoryHierarchy().getL2CacheController());
-    }
-
-    /**
-     * Create an MLP profiling helper.
-     *
-     * @param l2CacheController the L2 cache controller
-     */
-    public MLPProfilingHelper(final DirectoryController l2CacheController) {
-        this.l2CacheController = l2CacheController;
+        this.l2CacheController = simulation.getProcessor().getMemoryHierarchy().getL2CacheController();
 
         this.mlpCostQuantizer = new Function1<Integer, Integer>() {
             @Override
@@ -139,7 +166,7 @@ public class MLPProfilingHelper {
     private void profileBeginServicingL2CacheMiss(MemoryHierarchyAccess access) {
         int tag = access.getPhysicalTag();
 
-        PendingL2Miss pendingL2Miss = new PendingL2Miss(access, l2CacheController.getCycleAccurateEventQueue().getCurrentCycle());
+        PendingL2Miss pendingL2Miss = new PendingL2Miss(access, this.l2CacheController.getCycleAccurateEventQueue().getCurrentCycle());
         this.pendingL2Misses.put(tag, pendingL2Miss);
     }
 
@@ -158,6 +185,8 @@ public class MLPProfilingHelper {
 
         this.statL2CacheMissNumCycles.addValue(pendingL2Miss.getNumCycles());
         this.statL2CacheMissMlpCosts.addValue(pendingL2Miss.getMlpCost());
+
+        this.l2CacheController.getBlockingEventDispatcher().dispatch(new L2MissMLPProfiledEvent(pendingL2Miss));
     }
 
     /**

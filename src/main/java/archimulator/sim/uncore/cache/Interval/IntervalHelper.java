@@ -23,6 +23,8 @@ import archimulator.sim.common.SimulationType;
 import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.common.report.Reportable;
 import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestProfilingHelper;
+import archimulator.sim.uncore.mlp.BLPProfilingHelper;
+import archimulator.sim.uncore.mlp.MLPProfilingHelper;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
 
@@ -62,6 +64,12 @@ public class IntervalHelper implements Reportable {
         private double helperThreadL2CacheRequestEarliness;
         private double helperThreadL2CacheRequestLateness;
         private double helperThreadL2CacheRequestPollution;
+
+        private double l2MissMlpCosts;
+        private double numL2MissMlpSamples;
+
+        private double dramBankAccessBlpCosts;
+        private double numDramBankAccessBlpSamples;
 
         /**
          * Handle when this interval is completed.
@@ -173,6 +181,22 @@ public class IntervalHelper implements Reportable {
                 }
             }
         });
+
+        simulation.getBlockingEventDispatcher().addListener(MLPProfilingHelper.L2MissMLPProfiledEvent.class, new Action1<MLPProfilingHelper.L2MissMLPProfiledEvent>() {
+            @Override
+            public void apply(MLPProfilingHelper.L2MissMLPProfiledEvent event) {
+                currentInterval.l2MissMlpCosts += event.getPendingL2Miss().getMlpCost();
+                currentInterval.numL2MissMlpSamples++;
+            }
+        });
+
+        simulation.getBlockingEventDispatcher().addListener(BLPProfilingHelper.BankAccessBLPProfiledEvent.class, new Action1<BLPProfilingHelper.BankAccessBLPProfiledEvent>() {
+            @Override
+            public void apply(BLPProfilingHelper.BankAccessBLPProfiledEvent event) {
+                currentInterval.dramBankAccessBlpCosts += event.getPendingDramBankAccess().getBlpCost();
+                currentInterval.numDramBankAccessBlpSamples++;
+            }
+        });
     }
 
     @Override
@@ -203,6 +227,12 @@ public class IntervalHelper implements Reportable {
                 getChildren().add(new ReportNode(this, "helperThreadL2CacheRequestEarliness[" + i + "]", interval.helperThreadL2CacheRequestEarliness + ""));
                 getChildren().add(new ReportNode(this, "helperThreadL2CacheRequestLateness[" + i + "]", interval.helperThreadL2CacheRequestLateness + ""));
                 getChildren().add(new ReportNode(this, "helperThreadL2CacheRequestPollution[" + i + "]", interval.helperThreadL2CacheRequestPollution + ""));
+
+                getChildren().add(new ReportNode(this, "averageL2MissMlpCost[" + i + "]", (interval.numL2MissMlpSamples == 0 ? 0 : interval.l2MissMlpCosts / interval.numL2MissMlpSamples) + ""));
+                getChildren().add(new ReportNode(this, "numL2MissMlpSamples[" + i + "]", interval.numL2MissMlpSamples + ""));
+
+                getChildren().add(new ReportNode(this, "averageDramBankAccessBlpCost[" + i + "]", (interval.numDramBankAccessBlpSamples == 0 ? 0 : interval.dramBankAccessBlpCosts / interval.numDramBankAccessBlpSamples) + ""));
+                getChildren().add(new ReportNode(this, "numDramBankAccessBlpSamples[" + i + "]", interval.numDramBankAccessBlpSamples + ""));
             }
         }});
     }
