@@ -22,6 +22,7 @@ import archimulator.model.Architecture;
 import archimulator.service.ArchitectureService;
 import archimulator.service.ServiceManager;
 import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
+import archimulator.sim.uncore.dram.MemoryControllerType;
 import com.j256.ormlite.dao.Dao;
 import net.pickapack.model.WithId;
 import net.pickapack.service.AbstractService;
@@ -49,7 +50,7 @@ public class ArchitectureServiceImpl extends AbstractService implements Architec
 
     @Override
     public void initialize() {
-        this.getOrAddArchitecture(false, -1, 2, 2, 32 * 1024, 8, 32 * 1024, 8, 4 * 1024 * 1024, 16, CacheReplacementPolicyType.LRU);
+        this.getOrAddArchitecture(false, -1, 2, 2, 32 * 1024, 8, 32 * 1024, 8, 4 * 1024 * 1024, 16, CacheReplacementPolicyType.LRU, MemoryControllerType.FIXED_LATENCY);
     }
 
     @Override
@@ -103,8 +104,8 @@ public class ArchitectureServiceImpl extends AbstractService implements Architec
     }
 
     @Override
-    public Architecture getOrAddArchitecture(boolean dynamicSpeculativePrecomputationEnabled, int numMainThreadWaysInStaticPartitionedLRUPolicy, int numCores, int numThreadsPerCore, int l1ISize, int l1IAssociativity, int l1DSize, int l1DAssociativity, int l2Size, int l2Associativity, CacheReplacementPolicyType l2ReplacementPolicyType) {
-        Architecture architecture = new Architecture(dynamicSpeculativePrecomputationEnabled, numMainThreadWaysInStaticPartitionedLRUPolicy, numCores, numThreadsPerCore, l1ISize, l1IAssociativity, l1DSize, l1DAssociativity, l2Size, l2Associativity, l2ReplacementPolicyType);
+    public Architecture getOrAddArchitecture(boolean dynamicSpeculativePrecomputationEnabled, int numMainThreadWaysInStaticPartitionedLRUPolicy, int numCores, int numThreadsPerCore, int l1ISize, int l1IAssociativity, int l1DSize, int l1DAssociativity, int l2Size, int l2Associativity, CacheReplacementPolicyType l2ReplacementPolicyType, MemoryControllerType memoryControllerType) {
+        Architecture architecture = new Architecture(dynamicSpeculativePrecomputationEnabled, numMainThreadWaysInStaticPartitionedLRUPolicy, numCores, numThreadsPerCore, l1ISize, l1IAssociativity, l1DSize, l1DAssociativity, l2Size, l2Associativity, l2ReplacementPolicyType, memoryControllerType);
 
         Architecture architectureWithSameTitle = getArchitectureByTitle(architecture.getTitle());
         if (architectureWithSameTitle == null) {

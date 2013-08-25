@@ -20,6 +20,7 @@ package archimulator.model;
 
 import archimulator.service.ServiceManager;
 import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
+import archimulator.sim.uncore.dram.MemoryControllerType;
 import net.pickapack.util.StorageUnitHelper;
 
 import java.io.Serializable;
@@ -59,6 +60,8 @@ public class ExperimentSpec implements Serializable {
     private String l2ReplacementPolicyType;
 
     private boolean dynamicSpeculativePrecomputationEnabled;
+
+    private String memoryControllerType;
 
     private transient Architecture architecture;
 
@@ -237,6 +240,15 @@ public class ExperimentSpec implements Serializable {
     }
 
     /**
+     * Get the memory controller type.
+     *
+     * @return the memory controller type
+     */
+    public String getMemoryControllerType() {
+        return memoryControllerType;
+    }
+
+    /**
      * Set the benchmark title.
      *
      * @param benchmarkTitle the benchmark title
@@ -374,13 +386,22 @@ public class ExperimentSpec implements Serializable {
     }
 
     /**
+     * Set the memory controller type.
+     *
+     * @param memoryControllerType the memory controller type
+     */
+    public void setMemoryControllerType(String memoryControllerType) {
+        this.memoryControllerType = memoryControllerType;
+    }
+
+    /**
      * Get the architecture object.
      *
      * @return the architecture object
      */
     public Architecture getArchitecture() {
         if (architecture == null) {
-            architecture = ServiceManager.getArchitectureService().getOrAddArchitecture(dynamicSpeculativePrecomputationEnabled, numMainThreadWaysInStaticPartitionedLRUPolicy, numCores, numThreadsPerCore, getL1ISizeAsInt(), l1IAssociativity, getL1DSizeAsInt(), l1DAssociativity, getL2SizeAsInt(), l2Associativity, Enum.valueOf(CacheReplacementPolicyType.class, getL2ReplacementPolicyType()));
+            architecture = ServiceManager.getArchitectureService().getOrAddArchitecture(dynamicSpeculativePrecomputationEnabled, numMainThreadWaysInStaticPartitionedLRUPolicy, numCores, numThreadsPerCore, getL1ISizeAsInt(), l1IAssociativity, getL1DSizeAsInt(), l1DAssociativity, getL2SizeAsInt(), l2Associativity, Enum.valueOf(CacheReplacementPolicyType.class, l2ReplacementPolicyType), Enum.valueOf(MemoryControllerType.class, memoryControllerType));
         }
 
         return architecture;

@@ -283,8 +283,9 @@ public class Architecture implements WithId, WithTitle, WithCreateTime {
      * @param l2Size                  the size of the L2 caches in bytes
      * @param l2Assoc                 the associativity of the L2 cache
      * @param l2ReplacementPolicyType the replacement policy type of the L2 cache
+     * @param memoryControllerType    the memory controller type
      */
-    public Architecture(boolean dynamicSpeculativePrecomputationEnabled, int numMainThreadWaysInStaticPartitionedLRUPolicy, int numCores, int numThreadsPerCore, int l1ISize, int l1IAssoc, int l1DSize, int l1DAssoc, int l2Size, int l2Assoc, CacheReplacementPolicyType l2ReplacementPolicyType) {
+    public Architecture(boolean dynamicSpeculativePrecomputationEnabled, int numMainThreadWaysInStaticPartitionedLRUPolicy, int numCores, int numThreadsPerCore, int l1ISize, int l1IAssoc, int l1DSize, int l1DAssoc, int l2Size, int l2Assoc, CacheReplacementPolicyType l2ReplacementPolicyType, MemoryControllerType memoryControllerType) {
         this.createTime = DateHelper.toTick(new Date());
 
         this.helperThreadPthreadSpawnIndex = 3720;
@@ -357,7 +358,7 @@ public class Architecture implements WithId, WithTitle, WithCreateTime {
         this.l2HitLatency = 10;
         this.l2ReplacementPolicyType = l2ReplacementPolicyType;
 
-        this.memoryControllerType = MemoryControllerType.FIXED_LATENCY;
+        this.memoryControllerType = memoryControllerType;
         this.memoryControllerLineSize = 64;
 
         this.fixedLatencyMemoryControllerLatency = 200;
@@ -384,7 +385,8 @@ public class Architecture implements WithId, WithTitle, WithCreateTime {
                 + "-" + "L1I_" + StorageUnit.toString(this.l1ISize).replaceAll(" ", "") + "_" + "Assoc" + this.l1IAssociativity
                 + "-" + "l1D_" + StorageUnit.toString(this.l1DSize).replaceAll(" ", "") + "_" + "Assoc" + this.l1DAssociativity
                 + "-" + "L2_" + StorageUnit.toString(this.l2Size).replaceAll(" ", "") + "_" + "Assoc" + this.l2Associativity
-                + "_" + this.l2ReplacementPolicyType+ "_MTPart" + this.numMainThreadWaysInStaticPartitionedLRUPolicy;
+                + "_" + this.l2ReplacementPolicyType+ "_MTPart" + this.numMainThreadWaysInStaticPartitionedLRUPolicy
+                + "_" + this.memoryControllerType;
     }
 
     /**

@@ -20,6 +20,7 @@ package archimulator.service;
 
 import archimulator.model.Architecture;
 import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
+import archimulator.sim.uncore.dram.MemoryControllerType;
 import net.pickapack.service.Service;
 
 import java.util.List;
@@ -117,9 +118,10 @@ public interface ArchitectureService extends Service {
      * @param l2Size                  L2 cache size
      * @param l2Assoc                 L2 cache associativity
      * @param l2ReplacementPolicyType L2 cache replacement policy type
+     * @param memoryControllerType    the memory controller type
      * @return the existing or newly added architecture matching the given parameters
      */
-    Architecture getOrAddArchitecture(boolean dynamicSpeculativePrecomputationEnabled, int numMainThreadWaysInStaticPartitionedLRUPolicy, int numCores, int numThreadsPerCore, int l1ISize, int l1IAssoc, int l1DSize, int l1DAssoc, int l2Size, int l2Assoc, CacheReplacementPolicyType l2ReplacementPolicyType);
+    Architecture getOrAddArchitecture(boolean dynamicSpeculativePrecomputationEnabled, int numMainThreadWaysInStaticPartitionedLRUPolicy, int numCores, int numThreadsPerCore, int l1ISize, int l1IAssoc, int l1DSize, int l1DAssoc, int l2Size, int l2Assoc, CacheReplacementPolicyType l2ReplacementPolicyType, MemoryControllerType memoryControllerType);
 
     /**
      * Initialize the service.

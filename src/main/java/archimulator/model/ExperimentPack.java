@@ -137,6 +137,11 @@ public class ExperimentPack implements WithId, WithTitle, WithCreateTime {
     @DatabaseField(persisterClass = StringArrayListJsonSerializableType.class)
     private ArrayList<String> l2ReplacementPolicyType;
 
+    @ElementList
+    @PropertyArray
+    @DatabaseField(persisterClass = StringArrayListJsonSerializableType.class)
+    private ArrayList<String> memoryControllerType;
+
     @ElementList(required = false)
     @PropertyArray
     @DatabaseField(persisterClass = StringArrayListJsonSerializableType.class)
@@ -485,6 +490,24 @@ public class ExperimentPack implements WithId, WithTitle, WithCreateTime {
      */
     public void setL2ReplacementPolicyType(List<String> l2ReplacementPolicyType) {
         this.l2ReplacementPolicyType = new ArrayList<String>(l2ReplacementPolicyType);
+    }
+
+    /**
+     * Get the list of memory controller types.
+     *
+     * @return the list of memory controller types
+     */
+    public List<String> getMemoryControllerType() {
+        return memoryControllerType;
+    }
+
+    /**
+     * Set the list of memory controller types.
+     *
+     * @param memoryControllerType the list of memory controller types
+     */
+    public void setMemoryControllerType(List<String> memoryControllerType) {
+        this.memoryControllerType = new ArrayList<String>(memoryControllerType);
     }
 
     /**
