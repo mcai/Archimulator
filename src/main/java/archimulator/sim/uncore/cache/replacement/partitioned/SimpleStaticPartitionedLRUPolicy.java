@@ -71,10 +71,10 @@ public class SimpleStaticPartitionedLRUPolicy<StateT extends Serializable> exten
         int currentWay = 0;
 
         for (Integer partition : this.partitions) {
-            previousWay = currentWay + 1;
+            previousWay = currentWay;
             currentWay += partition;
 
-            this.partitionBoundaries.add(new Pair<Integer, Integer>(previousWay, currentWay));
+            this.partitionBoundaries.add(new Pair<Integer, Integer>(previousWay, currentWay - 1));
         }
     }
 
