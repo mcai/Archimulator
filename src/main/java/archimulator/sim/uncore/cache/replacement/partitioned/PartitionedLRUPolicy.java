@@ -55,14 +55,6 @@ public abstract class PartitionedLRUPolicy<StateT extends Serializable> extends 
         }
     }
 
-    /**
-     * Handle a cache replacement.
-     *
-     * @param access the memory hierarchy access
-     * @param set    the set index
-     * @param tag    the tag
-     * @return the newly created cache access object
-     */
     @Override
     public CacheAccess<StateT> handleReplacement(MemoryHierarchyAccess access, int set, int tag) {
         if (CachePartitioningHelper.canPartition(getCache())) {

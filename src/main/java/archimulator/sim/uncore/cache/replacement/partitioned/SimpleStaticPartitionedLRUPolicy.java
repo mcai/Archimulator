@@ -30,8 +30,6 @@ import net.pickapack.util.Pair;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import static archimulator.sim.uncore.cache.partitioning.mlpAware.MLPAwareCachePartitioningHelper.getThreadIdentifier;
 
@@ -42,7 +40,6 @@ import static archimulator.sim.uncore.cache.partitioning.mlpAware.MLPAwareCacheP
  * @author Min Cai
  */
 public class SimpleStaticPartitionedLRUPolicy<StateT extends Serializable> extends LRUPolicy<StateT> implements Partitioner {
-    private Map<Integer, Long> numPartitionsPerWay;
     private List<Integer> partitions;
     private List<Pair<Integer,Integer>> partitionBoundaries;
 
@@ -63,11 +60,6 @@ public class SimpleStaticPartitionedLRUPolicy<StateT extends Serializable> exten
     public SimpleStaticPartitionedLRUPolicy(EvictableCache<StateT> cache, final int numMainThreadWays) {
         super(cache);
 
-        this.numPartitionsPerWay = new TreeMap<Integer, Long>();
-        for (int i = 0; i < cache.getAssociativity(); i++) {
-            this.numPartitionsPerWay.put(i, 0L);
-        }
-
         this.partitions = new ArrayList<Integer>() {{
             add(numMainThreadWays);
             add(getCache().getAssociativity() - numMainThreadWays);
@@ -86,6 +78,21 @@ public class SimpleStaticPartitionedLRUPolicy<StateT extends Serializable> exten
         }
     }
 
+    @Override
+    public CacheAccess<StateT> newMiss(MemoryHierarchyAccess access, int set, int address) {
+        int tag = this.getCache().getTag(address);
+        Pair<Integer, Integer> partitionBoundary = doGetPartitionBoundary(getThreadIdentifier(access.getThread()));
+
+        for(int way = partitionBoundary.getFirst(); way <= partitionBoundary.getSecond(); way++) {
+            CacheLine<StateT> line = this.getCache().getLine(set, way);
+            if (line.getState() == line.getInitialState()) {
+                return new CacheAccess<StateT>(this.getCache(), access, set, way, tag);
+            }
+        }
+
+        return this.handleReplacement(access, set, tag);
+    }
+
     /**
      * Handle a cache replacement.
      *
@@ -102,7 +109,6 @@ public class SimpleStaticPartitionedLRUPolicy<StateT extends Serializable> exten
             int way = this.getWayInStackPosition(set, stackPosition);
 
             if(way >= partitionBoundary.getFirst() && way <= partitionBoundary.getSecond()) {
-                CacheLine<StateT> line = this.getCache().getLine(set, way);
                 return new CacheAccess<StateT>(this.getCache(), access, set, way, tag);
             }
         }
@@ -111,9 +117,7 @@ public class SimpleStaticPartitionedLRUPolicy<StateT extends Serializable> exten
     }
 
     private Pair<Integer, Integer> doGetPartitionBoundary(int set) {
-        Pair<Integer, Integer> partitionBoundary = partitionBoundaries.get(set);
-        numPartitionsPerWay.put(partitions.get(0), numPartitionsPerWay.get(partitions.get(0)) + 1);
-        return partitionBoundary;
+        return partitionBoundaries.get(set);
     }
 
     @Override
@@ -123,14 +127,5 @@ public class SimpleStaticPartitionedLRUPolicy<StateT extends Serializable> exten
 
     @Override
     public void setShouldIncludePredicate(Predicate<Integer> shouldIncludePredicate) {
-    }
-
-    /**
-     * Get the number of partitions with the specified main thread way.
-     *
-     * @return the number of partitions with the specified main thread way
-     */
-    public Map<Integer, Long> getNumPartitionsPerWay() {
-        return numPartitionsPerWay;
     }
 }

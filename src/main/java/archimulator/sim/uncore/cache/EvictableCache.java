@@ -96,16 +96,7 @@ public class EvictableCache<StateT extends Serializable> extends Cache<StateT> {
      * @return the newly created cache miss object
      */
     private CacheAccess<StateT> newMiss(MemoryHierarchyAccess access, int set, int address) {
-        int tag = this.getTag(address);
-
-        for (int way = 0; way < this.getAssociativity(); way++) {
-            CacheLine<StateT> line = this.getLine(set, way);
-            if (line.getState() == line.getInitialState()) {
-                return new CacheAccess<StateT>(this, access, set, way, tag);
-            }
-        }
-
-        return this.replacementPolicy.handleReplacement(access, set, tag);
+        return this.replacementPolicy.newMiss(access, set, address);
     }
 
     /**

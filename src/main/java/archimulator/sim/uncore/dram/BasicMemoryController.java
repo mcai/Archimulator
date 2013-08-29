@@ -32,240 +32,6 @@ import java.util.List;
  * @author Min Cai
  */
 public class BasicMemoryController extends MemoryController {
-    private int rowBits;
-    private List<Bank> banks;
-    private int previousBank = 0;
-
-    /**
-     * Create a basic memory controller.
-     *
-     * @param memoryHierarchy the parent memory hierarchy
-     */
-    public BasicMemoryController(MemoryHierarchy memoryHierarchy) {
-        super(memoryHierarchy);
-
-        this.banks = new ArrayList<Bank>();
-
-        for (int i = 0; i < this.getNumBanks(); i++) {
-            this.banks.add(new Bank());
-        }
-
-        int rowSize = this.getRowSize();
-
-        this.rowBits = 0;
-
-        while (rowSize > 0) {
-            this.rowBits++;
-            rowSize >>= 1;
-        }
-    }
-
-    /**
-     * Act on an access of the specified address.
-     *
-     * @param address             the address
-     * @param onCompletedCallback the callback action performed when the access is completed
-     */
-    @Override
-    protected void access(int address, final Action onCompletedCallback) {
-        final Counter counterPending = new Counter(0);
-
-        int offset = 0;
-
-        int size = this.getLineSize();
-
-        while (size > 0) {
-            size -= this.getBusWidth();
-
-            final int currentAddress = address + offset;
-            this.getCycleAccurateEventQueue().schedule(this, new Action() {
-                @Override
-                public void apply() {
-                    accessDram(currentAddress, new Action() {
-                        @Override
-                        public void apply() {
-                            counterPending.decrement();
-
-                            if (counterPending.getValue() == 0) {
-                                onCompletedCallback.apply();
-                            }
-                        }
-                    });
-                }
-            }, this.getToDramLatency());
-
-            counterPending.increment();
-
-            offset += this.getBusWidth();
-        }
-    }
-
-    /**
-     * Access the specified address of the DRAM.
-     *
-     * @param address             the address
-     * @param onCompletedCallback the callback action performed when the access is completed
-     */
-    private void accessDram(final int address, final Action onCompletedCallback) {
-        final int targetRow = (address >> this.rowBits) / this.getNumBanks();
-        final int targetBank = (address >> this.rowBits) % this.getNumBanks();
-
-        final boolean contiguous = (targetBank == previousBank);
-
-        getBlockingEventDispatcher().dispatch(new BeginAccessEvent(address, targetBank));
-
-        this.banks.get(targetBank).beginAccess(targetRow, contiguous, new Action() {
-            @Override
-            public void apply() {
-                getBlockingEventDispatcher().dispatch(new EndAccessEvent(address, targetBank));
-                getCycleAccurateEventQueue().schedule(this, onCompletedCallback, getFromDramLatency());
-            }
-        });
-
-        previousBank = targetBank;
-    }
-
-    /**
-     * Access event.
-     */
-    protected abstract class AccessEvent extends SimulationEvent {
-        private int address;
-        private int bank;
-
-        /**
-         * Create an access event.
-         *
-         * @param address the address
-         * @param bank the bank
-         */
-        public AccessEvent(int address, int bank) {
-            super(BasicMemoryController.this);
-            this.address = address;
-            this.bank = bank;
-        }
-
-        /**
-         * Get the address.
-         *
-         * @return the address
-         */
-        public int getAddress() {
-            return address;
-        }
-
-        /**
-         * Get the bank.
-         *
-         * @return the bank
-         */
-        public int getBank() {
-            return bank;
-        }
-    }
-
-    /**
-     * Begin access event.
-     */
-    public class BeginAccessEvent extends AccessEvent {
-        /**
-         * Create a begin access event.
-         *
-         * @param address the address
-         * @param bank    the bank
-         */
-        public BeginAccessEvent(int address, int bank) {
-            super(address, bank);
-        }
-    }
-
-    /**
-     * End access event.
-     */
-    public class EndAccessEvent extends AccessEvent {
-        /**
-         * Create an end access event.
-         *
-         * @param address the address
-         * @param bank    the bank
-         */
-        public EndAccessEvent(int address, int bank) {
-            super(address, bank);
-        }
-    }
-
-
-    /**
-     * Get the "to DRAM" latency.
-     *
-     * @return the "to DRAM" latency
-     */
-    public int getToDramLatency() {
-        return getExperiment().getArchitecture().getBasicMemoryControllerToDramLatency();
-    }
-
-    /**
-     * Get the "from DRAM" latency.
-     *
-     * @return the "from DRAM" latency
-     */
-    public int getFromDramLatency() {
-        return getExperiment().getArchitecture().getBasicMemoryControllerFromDramLatency();
-    }
-
-    /**
-     * Get the precharge latency.
-     *
-     * @return the precharge latency
-     */
-    public int getPrechargeLatency() {
-        return getExperiment().getArchitecture().getBasicMemoryControllerPrechargeLatency();
-    }
-
-    /**
-     * Get the closed latency.
-     *
-     * @return the closed latency
-     */
-    public int getClosedLatency() {
-        return getExperiment().getArchitecture().getBasicMemoryControllerClosedLatency();
-    }
-
-    /**
-     * Get the conflict latency.
-     *
-     * @return the conflict latency
-     */
-    public int getConflictLatency() {
-        return getExperiment().getArchitecture().getBasicMemoryControllerConflictLatency();
-    }
-
-    /**
-     * Get the bus width.
-     *
-     * @return the bus width
-     */
-    public int getBusWidth() {
-        return getExperiment().getArchitecture().getBasicMemoryControllerBusWidth();
-    }
-
-    /**
-     * Get the number of banks.
-     *
-     * @return the number of banks
-     */
-    public int getNumBanks() {
-        return getExperiment().getArchitecture().getBasicMemoryControllerNumBanks();
-    }
-
-    /**
-     * Get the size of a row.
-     *
-     * @return the size of a row
-     */
-    public int getRowSize() {
-        return getExperiment().getArchitecture().getBasicMemoryControllerRowSize();
-    }
-
     /**
      * Bank status.
      */
@@ -415,5 +181,248 @@ public class BasicMemoryController extends MemoryController {
                 }
             }
         }
+    }
+
+    /**
+     * Access event.
+     */
+    protected abstract class AccessEvent extends SimulationEvent {
+        private int address;
+        private int bank;
+
+        /**
+         * Create an access event.
+         *
+         * @param address the address
+         * @param bank the bank
+         */
+        public AccessEvent(int address, int bank) {
+            super(BasicMemoryController.this);
+            this.address = address;
+            this.bank = bank;
+        }
+
+        /**
+         * Get the address.
+         *
+         * @return the address
+         */
+        public int getAddress() {
+            return address;
+        }
+
+        /**
+         * Get the bank.
+         *
+         * @return the bank
+         */
+        public int getBank() {
+            return bank;
+        }
+    }
+
+    /**
+     * Begin access event.
+     */
+    public class BeginAccessEvent extends AccessEvent {
+        /**
+         * Create a begin access event.
+         *
+         * @param address the address
+         * @param bank    the bank
+         */
+        public BeginAccessEvent(int address, int bank) {
+            super(address, bank);
+        }
+
+        @Override
+        public String toString() {
+            return String.format("BeginAccessEvent{address=0x%08x, bank=%d}", getAddress(), getBank());
+        }
+    }
+
+    /**
+     * End access event.
+     */
+    public class EndAccessEvent extends AccessEvent {
+        /**
+         * Create an end access event.
+         *
+         * @param address the address
+         * @param bank    the bank
+         */
+        public EndAccessEvent(int address, int bank) {
+            super(address, bank);
+        }
+
+        @Override
+        public String toString() {
+            return String.format("EndAccessEvent{address=0x%08x, bank=%d}", getAddress(), getBank());
+        }
+    }
+
+    private int rowBits;
+    private List<Bank> banks;
+    private int previousBank = 0;
+
+    /**
+     * Create a basic memory controller.
+     *
+     * @param memoryHierarchy the parent memory hierarchy
+     */
+    public BasicMemoryController(MemoryHierarchy memoryHierarchy) {
+        super(memoryHierarchy);
+
+        this.banks = new ArrayList<Bank>();
+
+        for (int i = 0; i < this.getNumBanks(); i++) {
+            this.banks.add(new Bank());
+        }
+
+        int rowSize = this.getRowSize();
+
+        this.rowBits = 0;
+
+        while (rowSize > 0) {
+            this.rowBits++;
+            rowSize >>= 1;
+        }
+    }
+
+    /**
+     * Act on an access of the specified address.
+     *
+     * @param address             the address
+     * @param onCompletedCallback the callback action performed when the access is completed
+     */
+    @Override
+    protected void access(int address, final Action onCompletedCallback) {
+        final Counter counterPending = new Counter(0);
+
+        int offset = 0;
+
+        int size = this.getLineSize();
+
+        while (size > 0) {
+            size -= this.getBusWidth();
+
+            final int currentAddress = address + offset;
+            this.getCycleAccurateEventQueue().schedule(this, new Action() {
+                @Override
+                public void apply() {
+                    accessDram(currentAddress, new Action() {
+                        @Override
+                        public void apply() {
+                            counterPending.decrement();
+
+                            if (counterPending.getValue() == 0) {
+                                onCompletedCallback.apply();
+                            }
+                        }
+                    });
+                }
+            }, this.getToDramLatency());
+
+            counterPending.increment();
+
+            offset += this.getBusWidth();
+        }
+    }
+
+    /**
+     * Access the specified address of the DRAM.
+     *
+     * @param address             the address
+     * @param onCompletedCallback the callback action performed when the access is completed
+     */
+    private void accessDram(final int address, final Action onCompletedCallback) {
+        final int targetRow = (address >> this.rowBits) / this.getNumBanks();
+        final int targetBank = (address >> this.rowBits) % this.getNumBanks();
+
+        final boolean contiguous = (targetBank == previousBank);
+
+        getBlockingEventDispatcher().dispatch(new BeginAccessEvent(address, targetBank));
+
+        this.banks.get(targetBank).beginAccess(targetRow, contiguous, new Action() {
+            @Override
+            public void apply() {
+                getBlockingEventDispatcher().dispatch(new EndAccessEvent(address, targetBank));
+                getCycleAccurateEventQueue().schedule(this, onCompletedCallback, getFromDramLatency());
+            }
+        });
+
+        previousBank = targetBank;
+    }
+
+    /**
+     * Get the "to DRAM" latency.
+     *
+     * @return the "to DRAM" latency
+     */
+    public int getToDramLatency() {
+        return getExperiment().getArchitecture().getBasicMemoryControllerToDramLatency();
+    }
+
+    /**
+     * Get the "from DRAM" latency.
+     *
+     * @return the "from DRAM" latency
+     */
+    public int getFromDramLatency() {
+        return getExperiment().getArchitecture().getBasicMemoryControllerFromDramLatency();
+    }
+
+    /**
+     * Get the precharge latency.
+     *
+     * @return the precharge latency
+     */
+    public int getPrechargeLatency() {
+        return getExperiment().getArchitecture().getBasicMemoryControllerPrechargeLatency();
+    }
+
+    /**
+     * Get the closed latency.
+     *
+     * @return the closed latency
+     */
+    public int getClosedLatency() {
+        return getExperiment().getArchitecture().getBasicMemoryControllerClosedLatency();
+    }
+
+    /**
+     * Get the conflict latency.
+     *
+     * @return the conflict latency
+     */
+    public int getConflictLatency() {
+        return getExperiment().getArchitecture().getBasicMemoryControllerConflictLatency();
+    }
+
+    /**
+     * Get the bus width.
+     *
+     * @return the bus width
+     */
+    public int getBusWidth() {
+        return getExperiment().getArchitecture().getBasicMemoryControllerBusWidth();
+    }
+
+    /**
+     * Get the number of banks.
+     *
+     * @return the number of banks
+     */
+    public int getNumBanks() {
+        return getExperiment().getArchitecture().getBasicMemoryControllerNumBanks();
+    }
+
+    /**
+     * Get the size of a row.
+     *
+     * @return the size of a row
+     */
+    public int getRowSize() {
+        return getExperiment().getArchitecture().getBasicMemoryControllerRowSize();
     }
 }

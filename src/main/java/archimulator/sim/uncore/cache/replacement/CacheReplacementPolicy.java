@@ -21,6 +21,7 @@ package archimulator.sim.uncore.cache.replacement;
 import archimulator.sim.common.report.Reportable;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.CacheAccess;
+import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.cache.EvictableCache;
 
 import java.io.Serializable;
@@ -41,6 +42,27 @@ public abstract class CacheReplacementPolicy<StateT extends Serializable> implem
      */
     public CacheReplacementPolicy(EvictableCache<StateT> cache) {
         this.cache = cache;
+    }
+
+    /**
+     * Create a new cache miss.
+     *
+     * @param access  the memory hierarchy access
+     * @param set     the set index
+     * @param address the address
+     * @return the newly created cache miss object
+     */
+    public CacheAccess<StateT> newMiss(MemoryHierarchyAccess access, int set, int address) {
+        int tag = this.cache.getTag(address);
+
+        for (int way = 0; way < this.cache.getAssociativity(); way++) {
+            CacheLine<StateT> line = this.cache.getLine(set, way);
+            if (line.getState() == line.getInitialState()) {
+                return new CacheAccess<StateT>(this.cache, access, set, way, tag);
+            }
+        }
+
+        return this.handleReplacement(access, set, tag);
     }
 
     /**

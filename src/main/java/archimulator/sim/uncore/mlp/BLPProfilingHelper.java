@@ -159,6 +159,11 @@ public class BLPProfilingHelper {
      */
     private void profileBeginServicingL2CacheMiss(BasicMemoryController.BeginAccessEvent event) {
         PendingDramBankAccess pendingDramBankAccess = new PendingDramBankAccess(event.getAddress(), event.getBank(), memoryController.getCycleAccurateEventQueue().getCurrentCycle());
+
+        if(this.pendingDRAMBankAccesses.containsKey(event.getAddress())) {
+            throw new IllegalArgumentException(event + "");
+        }
+
         this.pendingDRAMBankAccesses.put(event.getAddress(), pendingDramBankAccess);
     }
 
