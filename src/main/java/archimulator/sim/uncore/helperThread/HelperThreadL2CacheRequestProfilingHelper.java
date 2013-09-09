@@ -40,6 +40,12 @@ import java.util.Map;
 /**
  * Helper thread L2 cache request profiling helper.
  *
+ *  Redundant: HT->HT (USED=true), REDUNDANT++
+ *  Good: HT->MT, GOOD++
+ *  Bad: HT->HT (victim->INVALID, USED=true), BAD++
+ *  Early: MT->MT (victim->INVALID), EARLY++,UGLY--
+ *  Ugly: HT->INVALID, UGLY++
+ *
  * @author Min Cai
  */
 public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
@@ -83,7 +89,7 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
             this.helperThreadL2CacheRequestStates.put(set, helperThreadL2CacheRequestStatesPerSet);
 
             for (int way = 0; way < this.l2CacheController.getCache().getAssociativity(); way++) {
-                helperThreadL2CacheRequestStatesPerSet.put(way, new HelperThreadL2CacheRequestState(this));
+                helperThreadL2CacheRequestStatesPerSet.put(way, new HelperThreadL2CacheRequestState());
             }
         }
 
@@ -106,7 +112,10 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
             @Override
             public void apply(LastLevelCacheControllerLineInsertEvent event) {
                 if (event.getCacheController().equals(HelperThreadL2CacheRequestProfilingHelper.this.l2CacheController)) {
-                    handleL2CacheLineInsert(event);
+                    int set = event.getSet();
+                    boolean lineFoundIsHelperThread = helperThreadL2CacheRequestStates.get(set).get(event.getWay()).getThreadId() == HelperThreadingHelper.getHelperThreadId();
+
+                    handleL2CacheLineInsert(event, lineFoundIsHelperThread);
                 }
             }
         });
@@ -116,6 +125,7 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
             public void apply(GeneralCacheControllerLastPutSOrPutMAndDataFromOwnerEvent event) {
                 if (event.getCacheController().equals(HelperThreadL2CacheRequestProfilingHelper.this.l2CacheController)) {
                     int set = event.getSet();
+
                     markInvalid(set, event.getWay());
                 }
             }
@@ -172,7 +182,7 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
         HelperThreadL2CacheRequestState llcLineState = this.helperThreadL2CacheRequestStates.get(event.getSet()).get(event.getWay());
 
         boolean mainThreadHit = event.isHitInCache() && !requesterIsHelperThread && !lineFoundIsHelperThread;
-        boolean helperThreadHit = event.isHitInCache() && !requesterIsHelperThread && lineFoundIsHelperThread && llcLineState.getQuality().isModifiable();
+        boolean helperThreadHit = event.isHitInCache() && !requesterIsHelperThread && lineFoundIsHelperThread && !llcLineState.isUsed();
 
         if (!requesterIsHelperThread) {
             if (event.isHitInCache()) {
@@ -184,7 +194,7 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
                         event.getTag()
                 ));
 
-                if (lineFoundIsHelperThread && llcLineState.getQuality().isModifiable()) {
+                if (lineFoundIsHelperThread && !llcLineState.isUsed()) {
                     this.numUsefulHelperThreadL2CacheRequests++;
                 }
             } else {
@@ -218,10 +228,25 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
             if (event.isHitInCache() && !lineFoundIsHelperThread) {
                 //Redundant.
                 if (llcLineState.isHitToTransientTag()) {
-                    this.helperThreadL2CacheRequestStates.get(event.getSet()).get(event.getWay()).setQuality(HelperThreadL2CacheRequestQuality.REDUNDANT_HIT_TO_TRANSIENT_TAG);
+                    this.numRedundantHitToTransientTagHelperThreadL2CacheRequests++;
+                    this.l2CacheController.getBlockingEventDispatcher().dispatch(new HelperThreadL2CacheRequestEvent(
+                            HelperThreadL2CacheRequestQuality.REDUNDANT_HIT_TO_TRANSIENT_TAG,
+                            event.getSet(),
+                            event.getAccess().getThread().getId(),
+                            event.getAccess().getVirtualPc(),
+                            event.getTag()
+                    ));
                 } else {
-                    this.helperThreadL2CacheRequestStates.get(event.getSet()).get(event.getWay()).setQuality(HelperThreadL2CacheRequestQuality.REDUNDANT_HIT_TO_CACHE);
+                    this.numRedundantHitToCacheHelperThreadL2CacheRequests++;
+                    this.l2CacheController.getBlockingEventDispatcher().dispatch(new HelperThreadL2CacheRequestEvent(
+                            HelperThreadL2CacheRequestQuality.REDUNDANT_HIT_TO_CACHE,
+                            event.getSet(),
+                            event.getAccess().getThread().getId(),
+                            event.getAccess().getVirtualPc(),
+                            event.getTag()
+                    ));
                 }
+                llcLineState.setUsed(true);
             }
         }
 
@@ -236,25 +261,25 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
                 } else if (victimEvicterMainThreadHit && victimMainThreadHit) {
                     //No action.
                 } else if (victimEvicterHelperThreadHit && victimMainThreadHit) {
-                    bad(victimLineState);
+                    bad(event, victimLine, victimLineState);
                 } else if (victimEvicterMainThreadHit && victimHelperThreadHit) {
-                    early(victimLineState);
+                    early(event, victimLineState);
                 } else if (victimEvicterHelperThreadHit && victimHelperThreadHit) {
                     //Ugly.
                 }
             } else if (helperThreadHit) {
                 if (!victimHit) {
-                    good(llcLineState);
+                    good(event, llcLine, llcLineState);
                 } else if (victimEvicterMainThreadHit && victimMainThreadHit) {
-                    good(llcLineState);
+                    good(event, llcLine, llcLineState);
                 } else if (victimEvicterHelperThreadHit && victimMainThreadHit) {
-                    good(llcLineState);
-                    bad(victimLineState);
+                    good(event, llcLine, llcLineState);
+                    bad(event, victimLine, victimLineState);
                 } else if (victimEvicterMainThreadHit && victimHelperThreadHit) {
-                    good(llcLineState);
-                    early(victimLineState);
+                    good(event, llcLine, llcLineState);
+                    early(event, victimLineState);
                 } else if (victimEvicterHelperThreadHit && victimHelperThreadHit) {
-                    good(llcLineState);
+                    good(event, llcLine, llcLineState);
                 }
             } else {
                 if (!victimHit) {
@@ -272,116 +297,126 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
         }
 
         if (event.isHitInCache()) {
-            this.setL2CacheLineBroughterThreadId(event.getSet(), event.getWay(), event.getAccess().getThread().getId(), event.getAccess().getVirtualPc(), false);
-
             llcLineState.setVictimThreadId(llcLineState.getThreadId());
             llcLineState.setVictimPc(llcLineState.getPc());
             llcLineState.setVictimTag(llcLine.getTag());
-
-            llcLineState.invalidate();
-
-            if (HelperThreadingHelper.isHelperThread(event.getAccess().getThread())) {
-                llcLineState.setQuality(HelperThreadL2CacheRequestQuality.UGLY);
-            }
+            llcLineState.setUsed(false);
+            this.setL2CacheLineBroughterThreadId(event.getSet(), event.getWay(), event.getAccess().getThread().getId(), event.getAccess().getVirtualPc(), false);
         }
 
         if (victimHit) {
             victimLineState.setVictimThreadId(-1);
             victimLineState.setVictimPc(-1);
             victimLineState.setVictimTag(CacheLine.INVALID_TAG);
-
-            victimLineState.invalidate();
-        }
-
-        if(!HelperThreadingHelper.isHelperThread(llcLineState.getThreadId()) && llcLineState.getQuality() != HelperThreadL2CacheRequestQuality.INVALID) {
-            throw new IllegalArgumentException();
-        }
-
-        if(victimHit && !HelperThreadingHelper.isHelperThread(victimLineState.getThreadId()) && victimLineState.getQuality() != HelperThreadL2CacheRequestQuality.INVALID) {
-            throw new IllegalArgumentException();
+            victimLineState.setUsed(false);
         }
     }
 
     /**
      * A good helper thread L2 request has been identified.
      *
+     * @param event        the event
+     * @param llcLine      the LLC line
      * @param llcLineState the LLC line state
      */
-    private void good(HelperThreadL2CacheRequestState llcLineState) {
+    private void good(GeneralCacheControllerServiceNonblockingRequestEvent event, CacheLine<DirectoryControllerState> llcLine, HelperThreadL2CacheRequestState llcLineState) {
         //Good.
-        if (llcLineState.getQuality().isModifiable()) {
-            if (llcLineState.isHitToTransientTag()) {
-                llcLineState.setQuality(HelperThreadL2CacheRequestQuality.LATE);
-            } else {
-                llcLineState.setQuality(HelperThreadL2CacheRequestQuality.TIMELY);
-            }
-        }
-    }
-
-    /**
-     * A bad helper thread L2 request has been identified.
-     *
-     * @param victimLineState the victim line state
-     */
-    private void bad(HelperThreadL2CacheRequestState victimLineState) {
-        //Bad.
-        if (victimLineState.getQuality().isModifiable()) {
-            victimLineState.setQuality(HelperThreadL2CacheRequestQuality.BAD);
-        }
-    }
-
-    /**
-     * An early helper thread L2 request has been identified.
-     *
-     * @param victimLineState the victim line state
-     */
-    private void early(HelperThreadL2CacheRequestState victimLineState) {
-        //Early.
-        if (victimLineState.getQuality().isModifiable()) {
-//            victimLineState.setQuality(HelperThreadL2CacheRequestQuality.EARLY);
-        }
-    }
-
-    /**
-     * Handle an L2 cache line insertion.
-     *
-     * @param event the event
-     */
-    private void handleL2CacheLineInsert(LastLevelCacheControllerLineInsertEvent event) {
-        CacheLine<DirectoryControllerState> llcLine = this.l2CacheController.getCache().getLine(event.getSet(), event.getWay());
-        HelperThreadL2CacheRequestState llcLineState = this.helperThreadL2CacheRequestStates.get(event.getSet()).get(event.getWay());
-
-        if (llcLineState.getQuality() != HelperThreadL2CacheRequestQuality.INVALID) {
+        if (llcLineState.isHitToTransientTag()) {
+            this.numLateHelperThreadL2CacheRequests++;
             this.l2CacheController.getBlockingEventDispatcher().dispatch(new HelperThreadL2CacheRequestEvent(
-                    llcLineState.getQuality(),
+                    HelperThreadL2CacheRequestQuality.LATE,
+                    event.getSet(),
+                    llcLineState.getInFlightThreadId(),
+                    llcLineState.getPc(),
+                    llcLine.getTag()
+            ));
+        } else {
+            this.numTimelyHelperThreadL2CacheRequests++;
+            this.l2CacheController.getBlockingEventDispatcher().dispatch(new HelperThreadL2CacheRequestEvent(
+                    HelperThreadL2CacheRequestQuality.TIMELY,
                     event.getSet(),
                     llcLineState.getThreadId(),
                     llcLineState.getPc(),
                     llcLine.getTag()
             ));
         }
+    }
 
-        this.setL2CacheLineBroughterThreadId(event.getSet(), event.getWay(), event.getAccess().getThread().getId(), event.getAccess().getVirtualPc(), false);
+    /**
+     * A bad helper thread L2 request has been identified.
+     *
+     * @param event           the event
+     * @param victimLine      the victim line
+     * @param victimLineState the victim line state
+     */
+    private void bad(GeneralCacheControllerServiceNonblockingRequestEvent event, CacheLine<DirectoryControllerState> victimLine, HelperThreadL2CacheRequestState victimLineState) {
+        //Bad.
+        this.numBadHelperThreadL2CacheRequests++;
+        this.l2CacheController.getBlockingEventDispatcher().dispatch(new HelperThreadL2CacheRequestEvent(
+                HelperThreadL2CacheRequestQuality.BAD,
+                event.getSet(),
+                victimLineState.getThreadId(),
+                victimLineState.getPc(),
+                victimLine.getTag()
+        ));
+        victimLineState.setUsed(true);
+    }
+
+    /**
+     * An early helper thread L2 request has been identified.
+     *
+     * @param event           the event
+     * @param victimLineState the victim line state
+     */
+    private void early(GeneralCacheControllerServiceNonblockingRequestEvent event, HelperThreadL2CacheRequestState victimLineState) {
+        //Early.
+        this.numEarlyHelperThreadL2CacheRequests++;
+        this.numUglyHelperThreadL2CacheRequests--;
+        this.l2CacheController.getBlockingEventDispatcher().dispatch(new HelperThreadL2CacheRequestEvent(
+                HelperThreadL2CacheRequestQuality.EARLY,
+                event.getSet(),
+                victimLineState.getVictimThreadId(),
+                victimLineState.getVictimPc(),
+                victimLineState.getVictimTag()
+        ));
+    }
+
+    /**
+     * Handle an L2 cache line insertion.
+     *
+     * @param event                   the event
+     * @param lineFoundIsHelperThread a value indicating whether the LLC line is brought by the helper thread or not
+     */
+    private void handleL2CacheLineInsert(LastLevelCacheControllerLineInsertEvent event, boolean lineFoundIsHelperThread) {
+        CacheLine<DirectoryControllerState> llcLine = this.l2CacheController.getCache().getLine(event.getSet(), event.getWay());
+        HelperThreadL2CacheRequestState llcLineState = this.helperThreadL2CacheRequestStates.get(event.getSet()).get(event.getWay());
+
+        if (lineFoundIsHelperThread) {
+            if(!llcLineState.isUsed()) {
+                //Ugly.
+                this.numUglyHelperThreadL2CacheRequests++;
+                this.l2CacheController.getBlockingEventDispatcher().dispatch(new HelperThreadL2CacheRequestEvent(
+                        HelperThreadL2CacheRequestQuality.UGLY,
+                        event.getSet(),
+                        llcLineState.getThreadId(),
+                        llcLineState.getPc(),
+                        llcLine.getTag()
+                ));
+            }
+        }
 
         if (!event.isEviction()) {
             llcLineState.setVictimThreadId(-1);
             llcLineState.setVictimPc(-1);
             llcLineState.setVictimTag(CacheLine.INVALID_TAG);
-
         } else {
             llcLineState.setVictimThreadId(llcLineState.getThreadId());
             llcLineState.setVictimPc(llcLineState.getPc());
             llcLineState.setVictimTag(event.getVictimTag());
-            llcLineState.invalidate();
         }
 
-        if (HelperThreadingHelper.isHelperThread(event.getAccess().getThread())) {
-            llcLineState.setQuality(HelperThreadL2CacheRequestQuality.UGLY);
-        }
-
-        if(!HelperThreadingHelper.isHelperThread(llcLineState.getThreadId()) && llcLineState.getQuality() != HelperThreadL2CacheRequestQuality.INVALID) {
-            throw new IllegalArgumentException();
-        }
+        llcLineState.setUsed(false);
+        this.setL2CacheLineBroughterThreadId(event.getSet(), event.getWay(), event.getAccess().getThread().getId(), event.getAccess().getVirtualPc(), false);
     }
 
     /**
@@ -390,42 +425,38 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
     public void sumUpUnstableHelperThreadL2CacheRequests() {
         for (int set = 0; set < this.l2CacheController.getCache().getNumSets(); set++) {
             for (int way = 0; way < this.l2CacheController.getCache().getAssociativity(); way++) {
-                this.markInvalid(set, way);
+                this.sumUpUnstableHelperThreadL2CacheRequest(set, way);
             }
         }
     }
 
     /**
-     * Update statistics.
+     * Sum up unstable helper thread L2 cache request for the specified set index and way.
      *
-     * @param llcLineStateQuality the LLC line state's quality
+     * @param set the set index
+     * @param way the way
      */
-    public void updateStats(HelperThreadL2CacheRequestQuality llcLineStateQuality) {
-        switch (llcLineStateQuality) {
-            case REDUNDANT_HIT_TO_TRANSIENT_TAG:
-                this.numRedundantHitToTransientTagHelperThreadL2CacheRequests++;
-                break;
-            case REDUNDANT_HIT_TO_CACHE:
-                this.numRedundantHitToCacheHelperThreadL2CacheRequests++;
-                break;
-            case TIMELY:
-                this.numTimelyHelperThreadL2CacheRequests++;
-                break;
-            case LATE:
-                this.numLateHelperThreadL2CacheRequests++;
-                break;
-            case BAD:
-                this.numBadHelperThreadL2CacheRequests++;
-                break;
-            case EARLY:
-                this.numEarlyHelperThreadL2CacheRequests++;
-                break;
-            case UGLY:
+    private void sumUpUnstableHelperThreadL2CacheRequest(int set, int way) {
+        CacheLine<DirectoryControllerState> llcLine = this.l2CacheController.getCache().getLine(set, way);
+        HelperThreadL2CacheRequestState llcLineState = this.helperThreadL2CacheRequestStates.get(set).get(way);
+
+        boolean lineFoundIsHelperThread = HelperThreadingHelper.isHelperThread(this.helperThreadL2CacheRequestStates.get(set).get(way).getThreadId());
+
+        if (lineFoundIsHelperThread) {
+            if (!llcLineState.isUsed()) {
+                //Ugly.
                 this.numUglyHelperThreadL2CacheRequests++;
-                break;
-            case INVALID:
-                break;
+                this.l2CacheController.getBlockingEventDispatcher().dispatch(new HelperThreadL2CacheRequestEvent(
+                        HelperThreadL2CacheRequestQuality.UGLY,
+                        set,
+                        llcLineState.getThreadId(),
+                        llcLineState.getPc(),
+                        llcLine.getTag()
+                ));
+            }
         }
+
+        this.markInvalid(set, way);
     }
 
     /**
@@ -457,18 +488,11 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
 
         this.setL2CacheLineBroughterThreadId(set, way, -1, -1, false);
         llcLineState.setPc(-1);
-
         llcLineState.setVictimThreadId(-1);
         llcLineState.setVictimPc(-1);
         llcLineState.setVictimTag(CacheLine.INVALID_TAG);
-
-        llcLineState.invalidate();
-
+        llcLineState.setUsed(false);
         this.markLate(set, way, false);
-
-        if(!HelperThreadingHelper.isHelperThread(llcLineState.getThreadId()) && llcLineState.getQuality() != HelperThreadL2CacheRequestQuality.INVALID) {
-            throw new IllegalArgumentException();
-        }
     }
 
     /**

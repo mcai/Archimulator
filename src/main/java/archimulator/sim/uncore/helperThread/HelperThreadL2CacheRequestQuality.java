@@ -70,7 +70,7 @@ public enum HelperThreadL2CacheRequestQuality {
      * @return a value indicating whether the current state of the quality is modifiable or not
      */
     public boolean isModifiable() {
-        return this == UGLY;
+        return this == UGLY || this == BAD;
     }
 
     /**
