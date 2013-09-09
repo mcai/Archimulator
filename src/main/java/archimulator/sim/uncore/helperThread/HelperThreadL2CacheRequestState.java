@@ -26,28 +26,36 @@ import archimulator.sim.uncore.cache.CacheLine;
  * @author Min Cai
  */
 public class HelperThreadL2CacheRequestState {
+    private HelperThreadL2CacheRequestProfilingHelper helperThreadL2CacheRequestProfilingHelper;
+
     private int inFlightThreadId;
     private int threadId;
     private int pc;
-    private boolean bad;
     private boolean hitToTransientTag;
 
     private int victimThreadId;
     private int victimPc;
     private int victimTag;
 
+    private HelperThreadL2CacheRequestQuality quality;
+
     /**
      * Create a helper thread L2 cache request state.
+     *
+     * @param helperThreadL2CacheRequestProfilingHelper the helper thread L2 cache request profiling helper
      */
-    public HelperThreadL2CacheRequestState() {
+    public HelperThreadL2CacheRequestState(HelperThreadL2CacheRequestProfilingHelper helperThreadL2CacheRequestProfilingHelper) {
+        this.helperThreadL2CacheRequestProfilingHelper = helperThreadL2CacheRequestProfilingHelper;
+
         this.inFlightThreadId = -1;
         this.threadId = -1;
         this.pc = -1;
-        this.bad = false;
 
         this.victimThreadId = -1;
         this.victimPc = -1;
         this.victimTag = CacheLine.INVALID_TAG;
+
+        this.quality = HelperThreadL2CacheRequestQuality.INVALID;
     }
 
     /**
@@ -102,28 +110,6 @@ public class HelperThreadL2CacheRequestState {
      */
     public void setPc(int pc) {
         this.pc = pc;
-    }
-
-    /**
-     * Get a value indicating whether it is bad or not.
-     *
-     * @return a value indicating whether it is bad or not
-     */
-    public boolean isBad() {
-        return bad;
-    }
-
-    /**
-     * Set a value indicating whether it is bad or not.
-     *
-     * @param bad a value indicating whether it is bad or not
-     */
-    public void setBad(boolean bad) {
-        if(!HelperThreadingHelper.isHelperThread(threadId) && bad) {
-            throw new IllegalArgumentException();
-        }
-
-        this.bad = bad;
     }
 
     /**
@@ -198,8 +184,48 @@ public class HelperThreadL2CacheRequestState {
         this.victimTag = victimTag;
     }
 
+    /**
+     * Get the quality.
+     *
+     * @return the quality
+     */
+    public HelperThreadL2CacheRequestQuality getQuality() {
+        return quality;
+    }
+
+    /**
+     * Set the quality.
+     *
+     * @param quality the quality
+     */
+    public void setQuality(HelperThreadL2CacheRequestQuality quality) {
+        if(quality == HelperThreadL2CacheRequestQuality.INVALID) {
+            throw new IllegalArgumentException();
+        }
+
+        if(this.quality != HelperThreadL2CacheRequestQuality.INVALID && !this.quality.isModifiable()) {
+            throw new IllegalArgumentException(this.quality + "->" + quality);
+        }
+
+        this.quality = quality;
+    }
+
+    /**
+     * Invalidate.
+     */
+    public void invalidate() {
+        if(this.quality != HelperThreadL2CacheRequestQuality.INVALID) {
+            if(!HelperThreadingHelper.isHelperThread(this.threadId)) {
+                throw new IllegalArgumentException(this.threadId + ":" + quality);
+            }
+
+            this.helperThreadL2CacheRequestProfilingHelper.updateStats(this.getQuality());
+            this.quality = HelperThreadL2CacheRequestQuality.INVALID;
+        }
+    }
+
     @Override
     public String toString() {
-        return String.format("HelperThreadL2CacheRequestState{inFlightThreadId=%d, threadId=%d, pc=0x%08x, bad=%s, hitToTransientTag=%s, victimThreadId=%d, victimPc=0x%08x, victimTag=0x%08x}", inFlightThreadId, threadId, pc, bad, hitToTransientTag, victimThreadId, victimPc, victimTag);
+        return String.format("HelperThreadL2CacheRequestState{inFlightThreadId=%d, threadId=%d, pc=0x%08x, hitToTransientTag=%s, victimThreadId=%d, victimPc=0x%08x, victimTag=0x%08x, quality=%s}", inFlightThreadId, threadId, pc, hitToTransientTag, victimThreadId, victimPc, victimTag, quality);
     }
 }
