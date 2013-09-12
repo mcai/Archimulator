@@ -40,11 +40,11 @@ import java.util.Map;
 /**
  * Helper thread L2 cache request profiling helper.
  *
- *  Redundant: HT->HT (USED=true), REDUNDANT++
- *  Good: HT->MT, GOOD++
- *  Bad: HT->HT (victim->INVALID, USED=true), BAD++
- *  Early: MT->MT (victim->INVALID), EARLY++,UGLY--
- *  Ugly: HT->INVALID, UGLY++
+ * Redundant: HT->HT (USED=true), REDUNDANT++
+ * Good: HT->MT, GOOD++
+ * Bad: HT->HT (victim->INVALID, USED=true), BAD++
+ * Early: MT->MT (victim->INVALID), EARLY++,UGLY--
+ * Ugly: HT->INVALID, UGLY++
  *
  * @author Min Cai
  */
@@ -173,16 +173,16 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
         HelperThreadL2CacheRequestState victimLineState = victimWay != -1 ? this.helperThreadL2CacheRequestStates.get(event.getSet()).get(victimWay) : null;
 
         boolean victimHit = victimLine != null;
-        boolean victimEvicterMainThreadHit = victimLine != null && this.helperThreadL2CacheRequestStates.get(event.getSet()).get(victimWay).getThreadId() == HelperThreadingHelper.getMainThreadId();
-        boolean victimEvicterHelperThreadHit = victimLine != null && this.helperThreadL2CacheRequestStates.get(event.getSet()).get(victimWay).getThreadId() == HelperThreadingHelper.getHelperThreadId();
-        boolean victimMainThreadHit = victimLine != null && this.helperThreadL2CacheRequestStates.get(event.getSet()).get(victimWay).getVictimThreadId() == HelperThreadingHelper.getMainThreadId();
-        boolean victimHelperThreadHit = victimLine != null && this.helperThreadL2CacheRequestStates.get(event.getSet()).get(victimWay).getVictimThreadId() == HelperThreadingHelper.getHelperThreadId();
+        boolean victimEvicterMainThreadHit = victimHit && this.helperThreadL2CacheRequestStates.get(event.getSet()).get(victimWay).getThreadId() == HelperThreadingHelper.getMainThreadId();
+        boolean victimEvicterHelperThreadHit = victimHit && !victimLineState.isUsed() && this.helperThreadL2CacheRequestStates.get(event.getSet()).get(victimWay).getThreadId() == HelperThreadingHelper.getHelperThreadId();
+        boolean victimMainThreadHit = victimHit && this.helperThreadL2CacheRequestStates.get(event.getSet()).get(victimWay).getVictimThreadId() == HelperThreadingHelper.getMainThreadId();
+        boolean victimHelperThreadHit = victimHit && this.helperThreadL2CacheRequestStates.get(event.getSet()).get(victimWay).getVictimThreadId() == HelperThreadingHelper.getHelperThreadId();
 
         CacheLine<DirectoryControllerState> llcLine = this.l2CacheController.getCache().getLine(event.getSet(), event.getWay());
         HelperThreadL2CacheRequestState llcLineState = this.helperThreadL2CacheRequestStates.get(event.getSet()).get(event.getWay());
 
         boolean mainThreadHit = event.isHitInCache() && !requesterIsHelperThread && !lineFoundIsHelperThread;
-        boolean helperThreadHit = event.isHitInCache() && !requesterIsHelperThread && lineFoundIsHelperThread && !llcLineState.isUsed();
+        boolean helperThreadHit = event.isHitInCache() && !llcLineState.isUsed() && !requesterIsHelperThread && lineFoundIsHelperThread;
 
         if (!requesterIsHelperThread) {
             if (event.isHitInCache()) {
@@ -226,32 +226,12 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
             }
 
             if (event.isHitInCache() && !lineFoundIsHelperThread) {
-                //Redundant.
-                if (llcLineState.isHitToTransientTag()) {
-                    this.numRedundantHitToTransientTagHelperThreadL2CacheRequests++;
-                    this.l2CacheController.getBlockingEventDispatcher().dispatch(new HelperThreadL2CacheRequestEvent(
-                            HelperThreadL2CacheRequestQuality.REDUNDANT_HIT_TO_TRANSIENT_TAG,
-                            event.getSet(),
-                            event.getAccess().getThread().getId(),
-                            event.getAccess().getVirtualPc(),
-                            event.getTag()
-                    ));
-                } else {
-                    this.numRedundantHitToCacheHelperThreadL2CacheRequests++;
-                    this.l2CacheController.getBlockingEventDispatcher().dispatch(new HelperThreadL2CacheRequestEvent(
-                            HelperThreadL2CacheRequestQuality.REDUNDANT_HIT_TO_CACHE,
-                            event.getSet(),
-                            event.getAccess().getThread().getId(),
-                            event.getAccess().getVirtualPc(),
-                            event.getTag()
-                    ));
-                }
-                llcLineState.setUsed(true);
+                redundant(event, llcLineState);
             }
         }
 
         if (!event.isHitInCache()) {
-            this.markTransientThreadId(event.getSet(), event.getWay(), event.getAccess().getThread().getId(), event.getAccess().getVirtualPc());
+            this.setL2CacheLineBroughterThreadId(event.getSet(), event.getWay(), event.getAccess().getThread().getId(), event.getAccess().getVirtualPc(), true);
         }
 
         if (!requesterIsHelperThread) {
@@ -300,15 +280,62 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
             llcLineState.setVictimThreadId(llcLineState.getThreadId());
             llcLineState.setVictimPc(llcLineState.getPc());
             llcLineState.setVictimTag(llcLine.getTag());
-            llcLineState.setUsed(false);
             this.setL2CacheLineBroughterThreadId(event.getSet(), event.getWay(), event.getAccess().getThread().getId(), event.getAccess().getVirtualPc(), false);
+
+            if(requesterIsHelperThread && lineFoundIsHelperThread && !llcLineState.isUsed()) {
+                //Ugly.
+                this.numUglyHelperThreadL2CacheRequests++;
+                this.l2CacheController.getBlockingEventDispatcher().dispatch(new HelperThreadL2CacheRequestEvent(
+                        HelperThreadL2CacheRequestQuality.UGLY,
+                        event.getSet(),
+                        llcLineState.getThreadId(),
+                        llcLineState.getPc(),
+                        llcLine.getTag()
+                ));
+            }
+
+            if(requesterIsHelperThread && !lineFoundIsHelperThread) {
+                llcLineState.setUsed(true);
+            }
+            else
+            {
+                llcLineState.setUsed(false);
+            }
         }
 
         if (victimHit) {
             victimLineState.setVictimThreadId(-1);
             victimLineState.setVictimPc(-1);
             victimLineState.setVictimTag(CacheLine.INVALID_TAG);
-            victimLineState.setUsed(false);
+        }
+    }
+
+    /**
+     * A redundant helper thread L2 request has been identified.
+     *
+     * @param event        the event
+     * @param llcLineState the LLC line state
+     */
+    private void redundant(GeneralCacheControllerServiceNonblockingRequestEvent event, HelperThreadL2CacheRequestState llcLineState) {
+        //Redundant.
+        if (llcLineState.isHitToTransientTag()) {
+            this.numRedundantHitToTransientTagHelperThreadL2CacheRequests++;
+            this.l2CacheController.getBlockingEventDispatcher().dispatch(new HelperThreadL2CacheRequestEvent(
+                    HelperThreadL2CacheRequestQuality.REDUNDANT_HIT_TO_TRANSIENT_TAG,
+                    event.getSet(),
+                    event.getAccess().getThread().getId(),
+                    event.getAccess().getVirtualPc(),
+                    event.getTag()
+            ));
+        } else {
+            this.numRedundantHitToCacheHelperThreadL2CacheRequests++;
+            this.l2CacheController.getBlockingEventDispatcher().dispatch(new HelperThreadL2CacheRequestEvent(
+                    HelperThreadL2CacheRequestQuality.REDUNDANT_HIT_TO_CACHE,
+                    event.getSet(),
+                    event.getAccess().getThread().getId(),
+                    event.getAccess().getVirtualPc(),
+                    event.getTag()
+            ));
         }
     }
 
@@ -391,8 +418,12 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
         CacheLine<DirectoryControllerState> llcLine = this.l2CacheController.getCache().getLine(event.getSet(), event.getWay());
         HelperThreadL2CacheRequestState llcLineState = this.helperThreadL2CacheRequestStates.get(event.getSet()).get(event.getWay());
 
+        if(!lineFoundIsHelperThread && llcLineState.isUsed()) {
+            throw new IllegalArgumentException();
+        }
+
         if (lineFoundIsHelperThread) {
-            if(!llcLineState.isUsed()) {
+            if (!llcLineState.isUsed()) {
                 //Ugly.
                 this.numUglyHelperThreadL2CacheRequests++;
                 this.l2CacheController.getBlockingEventDispatcher().dispatch(new HelperThreadL2CacheRequestEvent(
@@ -415,8 +446,8 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
             llcLineState.setVictimTag(event.getVictimTag());
         }
 
-        llcLineState.setUsed(false);
         this.setL2CacheLineBroughterThreadId(event.getSet(), event.getWay(), event.getAccess().getThread().getId(), event.getAccess().getVirtualPc(), false);
+        llcLineState.setUsed(false);
     }
 
     /**
@@ -441,6 +472,10 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
         HelperThreadL2CacheRequestState llcLineState = this.helperThreadL2CacheRequestStates.get(set).get(way);
 
         boolean lineFoundIsHelperThread = HelperThreadingHelper.isHelperThread(this.helperThreadL2CacheRequestStates.get(set).get(way).getThreadId());
+
+        if(!lineFoundIsHelperThread && llcLineState.isUsed()) {
+            throw new IllegalArgumentException();
+        }
 
         if (lineFoundIsHelperThread) {
             if (!llcLineState.isUsed()) {
@@ -493,18 +528,6 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
         llcLineState.setVictimTag(CacheLine.INVALID_TAG);
         llcLineState.setUsed(false);
         this.markLate(set, way, false);
-    }
-
-    /**
-     * Mark the transient thread ID for the specified set index and way.
-     *
-     * @param set      the set index
-     * @param way      the way
-     * @param threadId the thread ID
-     * @param pc       the virtual address of the program counter (PC)
-     */
-    private void markTransientThreadId(int set, int way, int threadId, int pc) {
-        this.setL2CacheLineBroughterThreadId(set, way, threadId, pc, true);
     }
 
     /**

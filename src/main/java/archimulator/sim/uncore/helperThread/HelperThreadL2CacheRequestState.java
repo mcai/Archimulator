@@ -119,10 +119,6 @@ public class HelperThreadL2CacheRequestState {
      * @param used a value indicating whether it is used or not
      */
     public void setUsed(boolean used) {
-        if(!HelperThreadingHelper.isHelperThread(threadId) && used) {
-            throw new IllegalArgumentException();
-        }
-
         this.used = used;
     }
 
