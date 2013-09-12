@@ -267,7 +267,7 @@ public abstract class Simulation implements SimulationObject, Reportable {
         } catch (Exception e) {
             e.printStackTrace();
             this.endTime = DateHelper.toTick(new Date());
-            this.collectStats(true);
+            this.collectStats();
 
             this.endSimulation();
 
@@ -279,7 +279,7 @@ public abstract class Simulation implements SimulationObject, Reportable {
         }
 
         this.endTime = DateHelper.toTick(new Date());
-        this.collectStats(true);
+        this.collectStats();
 
         for (SimulationExtensionPoint simulationExtensionPoint : simulationExtensionPoints) {
             simulationExtensionPoint.onStopped(this);
@@ -290,15 +290,9 @@ public abstract class Simulation implements SimulationObject, Reportable {
 
     /**
      * Collect the statistics.
-     *
-     * @param endOfSimulation a value indicating whether it is the end of simulation or not
      */
-    private void collectStats(boolean endOfSimulation) {
+    private void collectStats() {
         final List<ExperimentStat> stats = new ArrayList<ExperimentStat>();
-
-        if (endOfSimulation && (this.getType() == SimulationType.MEASUREMENT || this.getType() == SimulationType.CACHE_WARMUP)) {
-            this.getHelperThreadL2CacheRequestProfilingHelper().sumUpUnstableHelperThreadL2CacheRequests();
-        }
 
         ReportNode rootReportNode = new ReportNode(null, "");
 
@@ -438,7 +432,7 @@ public abstract class Simulation implements SimulationObject, Reportable {
 
         if (this.getCycleAccurateEventQueue().getCurrentCycle() % (this.type == SimulationType.FAST_FORWARD ? 100000000 : 10000000) == 0) {
             this.endTime = DateHelper.toTick(new Date());
-            this.collectStats(false);
+            this.collectStats();
             ServiceManager.getExperimentService().updateExperiment(this.experiment);
         }
     }

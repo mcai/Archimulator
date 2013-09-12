@@ -39,12 +39,10 @@ import java.util.Map;
 
 /**
  * Helper thread L2 cache request profiling helper.
- *
  * Redundant: HT->HT (USED=true), REDUNDANT++
  * Good: HT->MT, GOOD++
  * Bad: HT->HT (victim->INVALID, USED=true), BAD++
  * Early: MT->MT (victim->INVALID), EARLY++,UGLY--
- * Ugly: HT->INVALID, UGLY++
  *
  * @author Min Cai
  */
@@ -70,8 +68,6 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
     private long numBadHelperThreadL2CacheRequests;
 
     private long numEarlyHelperThreadL2CacheRequests;
-
-    private long numUglyHelperThreadL2CacheRequests;
 
     private Predictor<Boolean> helperThreadL2CacheRequestQualityPredictor;
 
@@ -282,23 +278,9 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
             llcLineState.setVictimTag(llcLine.getTag());
             this.setL2CacheLineBroughterThreadId(event.getSet(), event.getWay(), event.getAccess().getThread().getId(), event.getAccess().getVirtualPc(), false);
 
-            if(requesterIsHelperThread && lineFoundIsHelperThread && !llcLineState.isUsed()) {
-                //Ugly.
-                this.numUglyHelperThreadL2CacheRequests++;
-                this.l2CacheController.getBlockingEventDispatcher().dispatch(new HelperThreadL2CacheRequestEvent(
-                        HelperThreadL2CacheRequestQuality.UGLY,
-                        event.getSet(),
-                        llcLineState.getThreadId(),
-                        llcLineState.getPc(),
-                        llcLine.getTag()
-                ));
-            }
-
-            if(requesterIsHelperThread && !lineFoundIsHelperThread) {
+            if (requesterIsHelperThread && !lineFoundIsHelperThread) {
                 llcLineState.setUsed(true);
-            }
-            else
-            {
+            } else {
                 llcLineState.setUsed(false);
             }
         }
@@ -398,7 +380,6 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
     private void early(GeneralCacheControllerServiceNonblockingRequestEvent event, HelperThreadL2CacheRequestState victimLineState) {
         //Early.
         this.numEarlyHelperThreadL2CacheRequests++;
-        this.numUglyHelperThreadL2CacheRequests--;
         this.l2CacheController.getBlockingEventDispatcher().dispatch(new HelperThreadL2CacheRequestEvent(
                 HelperThreadL2CacheRequestQuality.EARLY,
                 event.getSet(),
@@ -415,25 +396,10 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
      * @param lineFoundIsHelperThread a value indicating whether the LLC line is brought by the helper thread or not
      */
     private void handleL2CacheLineInsert(LastLevelCacheControllerLineInsertEvent event, boolean lineFoundIsHelperThread) {
-        CacheLine<DirectoryControllerState> llcLine = this.l2CacheController.getCache().getLine(event.getSet(), event.getWay());
         HelperThreadL2CacheRequestState llcLineState = this.helperThreadL2CacheRequestStates.get(event.getSet()).get(event.getWay());
 
-        if(!lineFoundIsHelperThread && llcLineState.isUsed()) {
+        if (!lineFoundIsHelperThread && llcLineState.isUsed()) {
             throw new IllegalArgumentException();
-        }
-
-        if (lineFoundIsHelperThread) {
-            if (!llcLineState.isUsed()) {
-                //Ugly.
-                this.numUglyHelperThreadL2CacheRequests++;
-                this.l2CacheController.getBlockingEventDispatcher().dispatch(new HelperThreadL2CacheRequestEvent(
-                        HelperThreadL2CacheRequestQuality.UGLY,
-                        event.getSet(),
-                        llcLineState.getThreadId(),
-                        llcLineState.getPc(),
-                        llcLine.getTag()
-                ));
-            }
         }
 
         if (!event.isEviction()) {
@@ -448,50 +414,6 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
 
         this.setL2CacheLineBroughterThreadId(event.getSet(), event.getWay(), event.getAccess().getThread().getId(), event.getAccess().getVirtualPc(), false);
         llcLineState.setUsed(false);
-    }
-
-    /**
-     * Sum up the unstable helper thread L2 cache requests.
-     */
-    public void sumUpUnstableHelperThreadL2CacheRequests() {
-        for (int set = 0; set < this.l2CacheController.getCache().getNumSets(); set++) {
-            for (int way = 0; way < this.l2CacheController.getCache().getAssociativity(); way++) {
-                this.sumUpUnstableHelperThreadL2CacheRequest(set, way);
-            }
-        }
-    }
-
-    /**
-     * Sum up unstable helper thread L2 cache request for the specified set index and way.
-     *
-     * @param set the set index
-     * @param way the way
-     */
-    private void sumUpUnstableHelperThreadL2CacheRequest(int set, int way) {
-        CacheLine<DirectoryControllerState> llcLine = this.l2CacheController.getCache().getLine(set, way);
-        HelperThreadL2CacheRequestState llcLineState = this.helperThreadL2CacheRequestStates.get(set).get(way);
-
-        boolean lineFoundIsHelperThread = HelperThreadingHelper.isHelperThread(this.helperThreadL2CacheRequestStates.get(set).get(way).getThreadId());
-
-        if(!lineFoundIsHelperThread && llcLineState.isUsed()) {
-            throw new IllegalArgumentException();
-        }
-
-        if (lineFoundIsHelperThread) {
-            if (!llcLineState.isUsed()) {
-                //Ugly.
-                this.numUglyHelperThreadL2CacheRequests++;
-                this.l2CacheController.getBlockingEventDispatcher().dispatch(new HelperThreadL2CacheRequestEvent(
-                        HelperThreadL2CacheRequestQuality.UGLY,
-                        set,
-                        llcLineState.getThreadId(),
-                        llcLineState.getPc(),
-                        llcLine.getTag()
-                ));
-            }
-        }
-
-        this.markInvalid(set, way);
     }
 
     /**
@@ -584,7 +506,16 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
 
             getChildren().add(new ReportNode(this, "numBadHelperThreadL2CacheRequests", getNumBadHelperThreadL2CacheRequests() + ""));
             getChildren().add(new ReportNode(this, "numEarlyHelperThreadL2CacheRequests", getNumEarlyHelperThreadL2CacheRequests() + ""));
-            getChildren().add(new ReportNode(this, "numUglyHelperThreadL2CacheRequests", getNumUglyHelperThreadL2CacheRequests() + ""));
+            getChildren().add(new ReportNode(this, "numUglyHelperThreadL2CacheRequests",
+                    (getNumTotalHelperThreadL2CacheRequests()
+                            - getNumRedundantHitToCacheHelperThreadL2CacheRequests()
+                            - getNumRedundantHitToTransientTagHelperThreadL2CacheRequests()
+                            - getNumTimelyHelperThreadL2CacheRequests()
+                            - getNumLateHelperThreadL2CacheRequests()
+                            - getNumBadHelperThreadL2CacheRequests()
+                            - getNumEarlyHelperThreadL2CacheRequests()
+                    ) +
+                            ""));
 
             getChildren().add(new ReportNode(this, "helperThreadL2CacheRequestCoverage", getHelperThreadL2CacheRequestCoverage() + ""));
             getChildren().add(new ReportNode(this, "helperThreadL2CacheRequestAccuracy", getHelperThreadL2CacheRequestAccuracy() + ""));
@@ -765,15 +696,6 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
      */
     public long getNumEarlyHelperThreadL2CacheRequests() {
         return numEarlyHelperThreadL2CacheRequests;
-    }
-
-    /**
-     * Get the number of ugly helper thread L2 cache requests.
-     *
-     * @return the number of ugly helper thread L2 cache requests
-     */
-    public long getNumUglyHelperThreadL2CacheRequests() {
-        return numUglyHelperThreadL2CacheRequests;
     }
 
     /**
