@@ -49,7 +49,8 @@
 
 #include "push.h"
 
-volatile int mt_status = 0;
+volatile int __attribute__((aligned(64))) push_flag = 0;
+volatile int __attribute__((aligned(64))) global_i = 0;
 
 void
 quantum_cnot(int control, int target, quantum_reg *reg)
@@ -65,20 +66,19 @@ quantum_cnot(int control, int target, quantum_reg *reg)
     {
         if (quantum_objcode_put(CNOT, control, target))
             return;
-
+       push_flag=1;
       for(i=0; i<reg->size; i++)
         {
             /* Flip the target bit of a basis state if the control bit is set */
-
+	    global_i=i;
             if ((reg->node[i].state & ((MAX_UNSIGNED) 1 << control)))
                 reg->node[i].state ^= ((MAX_UNSIGNED) 1 << target);
         }
-
+      push_flag=0;
         quantum_decohere(reg);
     }
 }
 
-volatile int i_quantum_toffoli = 0;
 
 /* Apply a toffoli (or controlled-controlled-not) gate */
 
@@ -88,35 +88,39 @@ quantum_toffoli(int control1, int control2, int target, quantum_reg *reg)
 #if defined(SIMICS)
     MAGIC(9001);
 #endif
+    int i;
     int qec;
 
     quantum_qec_get_status(&qec, NULL);
-
-    mt_status = 1;
+    
 
     if (qec)
+    {
         quantum_toffoli_ft(control1, control2, target, reg);
+    }
     else
     {
         if (quantum_objcode_put(TOFFOLI, control1, control2, target))
             return;
 
-        //TODO: It is better that we use local variable and sync with the global one in the end?
-        for(i_quantum_toffoli=0; i_quantum_toffoli<reg->size; i_quantum_toffoli++)
+        push_flag = 1;
+
+        for(i=0; i<reg->size; i++)
         {
+          global_i = i;
+
             /* Flip the target bit of a basis state if both control bits are
              set */
-        
-          if(reg->node[i_quantum_toffoli].state & ((MAX_UNSIGNED) 1 << control1))
+          if(reg->node[i].state & ((MAX_UNSIGNED) 1 << control1))
             {
-              if(reg->node[i_quantum_toffoli].state & ((MAX_UNSIGNED) 1 << control2))
-                {
-                  reg->node[i_quantum_toffoli].state ^= ((MAX_UNSIGNED) 1 << target);
+              if(reg->node[i].state & ((MAX_UNSIGNED) 1 << control2))
+               {
+                 reg->node[i].state ^= ((MAX_UNSIGNED) 1 << target);
                 }
             }
         }
-        
-        mt_status = 2;
+		
+        push_flag = 0;
 
         quantum_decohere(reg);
     }
@@ -178,6 +182,10 @@ quantum_unbounded_toffoli(int controlling, quantum_reg *reg, ...)
 void
 quantum_sigma_x(int target, quantum_reg *reg)
 {
+#if defined(SIMICS)
+    MAGIC(9001);
+#endif
+
     int i;
     int qec;
 
@@ -189,16 +197,24 @@ quantum_sigma_x(int target, quantum_reg *reg)
     {
         if (quantum_objcode_put(SIGMA_X, target))
             return;
-
+	
+		push_flag = 1;
+        
         for(i=0; i<reg->size; i++)
         {
             /* Flip the target bit of each basis state */
-
+	    global_i = i;
             reg->node[i].state ^= ((MAX_UNSIGNED) 1 << target);
         }
 
+		push_flag = 0;
+
         quantum_decohere(reg);
     }
+    
+#if defined(SIMICS)
+    MAGIC(9002);
+#endif
 }
 
 /* Apply a sigma_y gate */
@@ -206,13 +222,21 @@ quantum_sigma_x(int target, quantum_reg *reg)
 void
 quantum_sigma_y(int target, quantum_reg *reg)
 {
+#if defined(SIMICS)
+    MAGIC(9001);
+#endif
+
     int i;
 
     if (quantum_objcode_put(SIGMA_Y, target))
         return;
 
+  push_flag = 1;
+
   for(i=0; i<reg->size;i++)
     {
+		global_i = i;
+
         /* Flip the target bit of each basis state and multiply with
          +/- i */
 
@@ -224,7 +248,13 @@ quantum_sigma_y(int target, quantum_reg *reg)
             reg->node[i].amplitude *= -IMAGINARY;
     }
 
+    push_flag = 0;
+
     quantum_decohere(reg);
+    
+#if defined(SIMICS)
+    MAGIC(9002);
+#endif
 }
 
 /* Apply a sigma_y gate */
@@ -232,19 +262,33 @@ quantum_sigma_y(int target, quantum_reg *reg)
 void
 quantum_sigma_z(int target, quantum_reg *reg)
 {
+#if defined(SIMICS)
+    MAGIC(9001);
+#endif
+
     int i;
 
     if (quantum_objcode_put(SIGMA_Z, target))
         return;
 
+  	push_flag = 1;
+
   for(i=0; i<reg->size; i++)
     {
-        /* Multiply with -1 if the target bit is set */
+	global_i = i;
 
+        /* Multiply with -1 if the target bit is set */
         if (reg->node[i].state & ((MAX_UNSIGNED) 1 << target))
             reg->node[i].amplitude *= -1;
     }
+
+   push_flag = 0;
+
     quantum_decohere(reg);
+    
+#if defined(SIMICS)
+    MAGIC(9002);
+#endif
 }
 
 /* Swap the first WIDTH bits of the quantum register. This is done
@@ -319,6 +363,10 @@ quantum_swaptheleads_omuln_controlled(int control, int width, quantum_reg *reg)
 void 
 quantum_gate1(int target, quantum_matrix m, quantum_reg *reg)
 {
+#if defined(SIMICS)
+    MAGIC(9001);
+#endif
+
     int i, j, k, iset;
     int addsize = 0, decsize = 0;
     COMPLEX_FLOAT t, tnot = 0;
@@ -339,10 +387,13 @@ quantum_gate1(int target, quantum_matrix m, quantum_reg *reg)
     for (i = 0; i < reg->size; i++)
         quantum_add_hash(reg->node[i].state, i, reg);
 
-    /* calculate the number of basis states to be added */
+  push_flag = 1;
 
+    /* calculate the number of basis states to be added */
   for(i=0; i<reg->size; i++)
     {
+      global_i = i;
+
       j = quantum_get_state(reg->node[i].state ^ ((MAX_UNSIGNED) 1 << target),
                 *reg);
       if(j == -1)
@@ -364,6 +415,8 @@ quantum_gate1(int target, quantum_matrix m, quantum_reg *reg)
 #endif /* SPEC_CPU */
         }
     }
+
+   push_flag = 0;
 
     /* allocate memory for the new basis states */
 
@@ -496,6 +549,10 @@ quantum_gate1(int target, quantum_matrix m, quantum_reg *reg)
     }
 
     quantum_decohere(reg);
+    
+#if defined(SIMICS)
+    MAGIC(9002);
+#endif
 }
 
 /* Apply the 4x4 matrix M to the target bit, controlled by CONTROL. M

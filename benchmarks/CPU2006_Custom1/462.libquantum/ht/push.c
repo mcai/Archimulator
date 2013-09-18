@@ -4,44 +4,41 @@
 
 #include "push.h"
 
-extern volatile int mt_status;
+extern volatile int push_flag;
 
-extern volatile quantum_reg* cur_reg;
+extern  quantum_reg *volatile cur_reg;
 
-extern volatile int i_quantum_toffoli;
+extern volatile int global_i;
 
 inline void push_thread_func()
 {
-    const int cur_reg_size = cur_reg->size;
     volatile long tmp_state;
     
+    int i=0;
     int j = 0;
 
     while(1)
     {
-        while(mt_status != 1);
+        while(!push_flag);
+                
+        i = global_i;
 
-        int step = STEP;
-
-        while(step < cur_reg->size)
-        {
+        while(push_flag && i < cur_reg->size)
+		{
         #if defined(SIMICS)
             MAGIC(9017);
         #endif
-    
-            for (j = step; j < cur_reg->size && j <= step + BLOCKSIZE; j += STRIDE)
-            {
-                 tmp_state = cur_reg->node[j].state;
-            }
 
-            for(;j > i_quantum_toffoli && j < cur_reg->size;j+=STRIDE)
-            {
-                 tmp_state = cur_reg->node[j].state;
-            }
-
-            step = i_quantum_toffoli + STEP;
+	 		if(i + LOOKAHEAD < cur_reg->size)
+	        	i += LOOKAHEAD;
+	    	j=0;
+	    	while(push_flag && i < cur_reg->size && j < STRIDE)
+	    	{
+				j++;       
+	            tmp_state = cur_reg->node[i].state;
+				i+=1;
+	     	}
+	   		i = global_i;
         }
-        
-        mt_status = 0;
     }
 }

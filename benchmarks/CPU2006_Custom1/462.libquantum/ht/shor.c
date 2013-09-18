@@ -49,7 +49,7 @@
 
 #include "push.h"
 
-volatile quantum_reg *cur_reg;
+quantum_reg *volatile cur_reg;
 
 int main(int argc, char **argv) {
 
