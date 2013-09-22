@@ -73,22 +73,24 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
             }
         });
 
-        try {
-            DeleteBuilder<ExperimentStat, Long> deleteBuilder = this.stats.deleteBuilder();
-            deleteBuilder.where().notIn("parentId", experimentIds);
-            PreparedDelete<ExperimentStat> delete = deleteBuilder.prepare();
-            this.stats.delete(delete);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        if(!experimentIds.isEmpty()) {
+            try {
+                DeleteBuilder<ExperimentStat, Long> deleteBuilder = this.stats.deleteBuilder();
+                deleteBuilder.where().notIn("parentId", experimentIds);
+                PreparedDelete<ExperimentStat> delete = deleteBuilder.prepare();
+                this.stats.delete(delete);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
 
-        try {
-            DeleteBuilder<ExperimentSummary, Long> deleteBuilder2 = this.summaries.deleteBuilder();
-            deleteBuilder2.where().notIn("parentId", experimentIds);
-            PreparedDelete<ExperimentSummary> delete = deleteBuilder2.prepare();
-            this.summaries.delete(delete);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+            try {
+                DeleteBuilder<ExperimentSummary, Long> deleteBuilder2 = this.summaries.deleteBuilder();
+                deleteBuilder2.where().notIn("parentId", experimentIds);
+                PreparedDelete<ExperimentSummary> delete = deleteBuilder2.prepare();
+                this.summaries.delete(delete);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         System.out.println("Cleaned up experiment stats and summaries.");
