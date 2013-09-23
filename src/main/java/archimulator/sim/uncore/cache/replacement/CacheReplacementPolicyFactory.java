@@ -25,6 +25,7 @@ import archimulator.sim.uncore.cache.partitioning.minMiss.MinMissCachePartitioni
 import archimulator.sim.uncore.cache.partitioning.mlpAware.MLPAwareCachePartitioningHelper;
 import archimulator.sim.uncore.cache.replacement.helperThread.HelperThreadAwareLRUPolicy;
 import archimulator.sim.uncore.cache.replacement.helperThread.HelperThreadIntervalAwareLRUPolicy;
+import archimulator.sim.uncore.cache.replacement.mlpAware.LinearMLPAwareLRUPolicy;
 import archimulator.sim.uncore.cache.replacement.partitioned.HelperThreadAndMLPAwarePartitionedLRUPolicy;
 import archimulator.sim.uncore.cache.replacement.partitioned.SimpleStaticPartitionedLRUPolicy;
 import archimulator.sim.uncore.cache.replacement.partitioned.StaticPartitionedLRUPolicy;
@@ -89,12 +90,14 @@ public class CacheReplacementPolicyFactory {
                 );
             case SET_DUELING_STATIC_CACHE_PARTITIONING_LRU:
                 return new SetDuelingPartitionedLRUPolicy<StateT>(cache, new ArrayList<Partitioner>() {{
-                    for(int i = 1; i < cache.getAssociativity(); i++) {
+                    for (int i = 1; i < cache.getAssociativity(); i++) {
                         add(new StaticPartitionedLRUPolicy<StateT>(cache, i));
                     }
                 }});
             case HELPER_THREAD_AND_MLP_AWARE_CACHE_PARTITIONING_LRU:
                 return new HelperThreadAndMLPAwarePartitionedLRUPolicy<StateT>(cache);
+            case LINEAR_MLP_AWARE_LRU:
+                return new LinearMLPAwareLRUPolicy<StateT>(cache);
             default:
                 throw new IllegalArgumentException();
         }

@@ -32,8 +32,6 @@ import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-//TODO: integration into Simulation and statistics reporting
-//TODO: MLP quantizer, MLP-cost predictor and MLP-cost based LLC replacement policy
 /**
  * Memory level parallelism (MLP) profiling helper.
  *
@@ -44,25 +42,22 @@ public class MLPProfilingHelper {
      * L2 miss MLP profiled event.
      */
     public class L2MissMLPProfiledEvent extends SimulationEvent {
+        private int set;
+        private int way;
         private PendingL2Miss pendingL2Miss;
 
         /**
          * Create an L2 miss MLP profiled event.
          *
+         * @param set the set
+         * @param way the way
          * @param pendingL2Miss the pending L2 miss
          */
-        public L2MissMLPProfiledEvent(PendingL2Miss pendingL2Miss) {
+        public L2MissMLPProfiledEvent(int set, int way, PendingL2Miss pendingL2Miss) {
             super(l2CacheController);
+            this.set = set;
+            this.way = way;
             this.pendingL2Miss = pendingL2Miss;
-        }
-
-        /**
-         * Get the pending L2 miss.
-         *
-         * @return the pending L2 miss
-         */
-        public PendingL2Miss getPendingL2Miss() {
-            return pendingL2Miss;
         }
 
         /**
@@ -72,6 +67,33 @@ public class MLPProfilingHelper {
          */
         public DirectoryController getL2CacheController() {
             return l2CacheController;
+        }
+
+        /**
+         * Get the set.
+         *
+         * @return the set
+         */
+        public int getSet() {
+            return set;
+        }
+
+        /**
+         * Get the way.
+         *
+         * @return the way
+         */
+        public int getWay() {
+            return way;
+        }
+
+        /**
+         * Get the pending L2 miss.
+         *
+         * @return the pending L2 miss
+         */
+        public PendingL2Miss getPendingL2Miss() {
+            return pendingL2Miss;
         }
     }
 
@@ -136,7 +158,7 @@ public class MLPProfilingHelper {
             @Override
             public void apply(LastLevelCacheControllerLineInsertEvent event) {
                 if (event.getCacheController().equals(MLPProfilingHelper.this.l2CacheController)) {
-                    profileEndServicingL2CacheMiss(event.getAccess());
+                    profileEndServicingL2CacheMiss(event.getSet(), event.getWay(), event.getAccess());
                 }
             }
         });
@@ -173,9 +195,11 @@ public class MLPProfilingHelper {
     /**
      * Profile the end of servicing an L2 cache request.
      *
+     * @param set the set
+     * @param way the way
      * @param access the memory hierarchy access
      */
-    private void profileEndServicingL2CacheMiss(MemoryHierarchyAccess access) {
+    private void profileEndServicingL2CacheMiss(int set, int way, MemoryHierarchyAccess access) {
         int tag = access.getPhysicalTag();
 
         PendingL2Miss pendingL2Miss = this.pendingL2Misses.get(tag);
@@ -186,7 +210,7 @@ public class MLPProfilingHelper {
         this.statL2CacheMissNumCycles.addValue(pendingL2Miss.getNumCycles());
         this.statL2CacheMissMlpCosts.addValue(pendingL2Miss.getMlpCost());
 
-        this.l2CacheController.getBlockingEventDispatcher().dispatch(new L2MissMLPProfiledEvent(pendingL2Miss));
+        this.l2CacheController.getBlockingEventDispatcher().dispatch(new L2MissMLPProfiledEvent(set, way, pendingL2Miss));
     }
 
     /**

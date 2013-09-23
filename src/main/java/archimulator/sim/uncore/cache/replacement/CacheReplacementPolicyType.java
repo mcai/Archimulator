@@ -102,5 +102,10 @@ public enum CacheReplacementPolicyType {
     /**
      * Helper thread and MLP-aware cache partitioning based least recently used (LRU).
      */
-    HELPER_THREAD_AND_MLP_AWARE_CACHE_PARTITIONING_LRU
+    HELPER_THREAD_AND_MLP_AWARE_CACHE_PARTITIONING_LRU,
+
+    /**
+     * Linear MLP-aware least recently used (LRU).
+     */
+    LINEAR_MLP_AWARE_LRU
 }
