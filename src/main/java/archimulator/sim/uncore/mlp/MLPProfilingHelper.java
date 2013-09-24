@@ -26,7 +26,7 @@ import archimulator.sim.uncore.coherence.event.LastLevelCacheControllerLineInser
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
-import net.pickapack.action.Function1;
+import net.pickapack.math.Quantizer;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
 import java.util.LinkedHashMap;
@@ -99,7 +99,7 @@ public class MLPProfilingHelper {
 
     private DirectoryController l2CacheController;
 
-    private Function1<Integer, Integer> mlpCostQuantizer;
+    private Quantizer mlpCostQuantizer;
 
     private Map<Integer, PendingL2Miss> pendingL2Misses;
 
@@ -114,32 +114,7 @@ public class MLPProfilingHelper {
     public MLPProfilingHelper(Simulation simulation) {
         this.l2CacheController = simulation.getProcessor().getMemoryHierarchy().getL2CacheController();
 
-        this.mlpCostQuantizer = new Function1<Integer, Integer>() {
-            @Override
-            public Integer apply(Integer rawValue) {
-                if (rawValue < 0) {
-                    throw new IllegalArgumentException();
-                }
-
-                if (rawValue <= 42) {
-                    return 0;
-                } else if (rawValue <= 85) {
-                    return 1;
-                } else if (rawValue <= 128) {
-                    return 2;
-                } else if (rawValue <= 170) {
-                    return 3;
-                } else if (rawValue <= 213) {
-                    return 4;
-                } else if (rawValue <= 246) {
-                    return 5;
-                } else if (rawValue <= 300) {
-                    return 6;
-                } else {
-                    return 7;
-                }
-            }
-        };
+        this.mlpCostQuantizer = new Quantizer(7, 60);
 
         this.pendingL2Misses = new LinkedHashMap<Integer, PendingL2Miss>();
 
@@ -218,7 +193,7 @@ public class MLPProfilingHelper {
      *
      * @return the MLP-cost quantizer
      */
-    public Function1<Integer, Integer> getMlpCostQuantizer() {
+    public Quantizer getMlpCostQuantizer() {
         return mlpCostQuantizer;
     }
 
