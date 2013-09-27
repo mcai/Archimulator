@@ -44,14 +44,17 @@ import java.util.TreeMap;
 public class LinearMLPAwareLRUPolicy<StateT extends Serializable> extends LRUPolicy<StateT> {
     private Cache<Boolean> mirrorCache;
 
+    private int lambda;
+
     private Map<Integer, Long> numL2MissesPerMlpCostQuantum;
 
     /**
      * Create a linear-MLP aware least recently used (LRU) policy for the specified evictable cache.
      *
      * @param cache the parent evictable cache
+     * @param lambda the lambda
      */
-    public LinearMLPAwareLRUPolicy(EvictableCache<StateT> cache) {
+    public LinearMLPAwareLRUPolicy(EvictableCache<StateT> cache, int lambda) {
         super(cache);
 
         this.mirrorCache = new Cache<Boolean>(cache, cache.getName() + ".reuseDistancePredictionPolicy.mirrorCache", cache.getGeometry(), new ValueProviderFactory<Boolean, ValueProvider<Boolean>>() {
@@ -60,6 +63,8 @@ public class LinearMLPAwareLRUPolicy<StateT extends Serializable> extends LRUPol
                 return new BooleanValueProvider();
             }
         });
+
+        this.lambda = lambda;
 
         this.numL2MissesPerMlpCostQuantum = new TreeMap<Integer, Long>();
 
@@ -157,6 +162,4 @@ public class LinearMLPAwareLRUPolicy<StateT extends Serializable> extends LRUPol
             return true;
         }
     }
-
-    private static final int lambda = 4;
 }

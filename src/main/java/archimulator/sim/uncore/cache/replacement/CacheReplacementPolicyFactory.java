@@ -96,8 +96,20 @@ public class CacheReplacementPolicyFactory {
                 }});
             case HELPER_THREAD_AND_MLP_AWARE_CACHE_PARTITIONING_LRU:
                 return new HelperThreadAndMLPAwarePartitionedLRUPolicy<StateT>(cache);
-            case LINEAR_MLP_AWARE_LRU:
-                return new LinearMLPAwareLRUPolicy<StateT>(cache);
+            case LINEAR_MLP_AWARE_LRU_LAMBDA_1:
+                return new LinearMLPAwareLRUPolicy<StateT>(cache, 1);
+            case LINEAR_MLP_AWARE_LRU_LAMBDA_2:
+                return new LinearMLPAwareLRUPolicy<StateT>(cache, 2);
+            case LINEAR_MLP_AWARE_LRU_LAMBDA_3:
+                return new LinearMLPAwareLRUPolicy<StateT>(cache, 3);
+            case LINEAR_MLP_AWARE_LRU_LAMBDA_4:
+                return new LinearMLPAwareLRUPolicy<StateT>(cache, 4);
+            case LINEAR_MLP_AWARE_LRU_LAMBDA_5:
+                return new LinearMLPAwareLRUPolicy<StateT>(cache, 5);
+            case LINEAR_MLP_AWARE_LRU_LAMBDA_6:
+                return new LinearMLPAwareLRUPolicy<StateT>(cache, 6);
+            case LINEAR_MLP_AWARE_LRU_LAMBDA_7:
+                return new LinearMLPAwareLRUPolicy<StateT>(cache, 7);
             default:
                 throw new IllegalArgumentException();
         }

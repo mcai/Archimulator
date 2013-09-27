@@ -105,7 +105,37 @@ public enum CacheReplacementPolicyType {
     HELPER_THREAD_AND_MLP_AWARE_CACHE_PARTITIONING_LRU,
 
     /**
-     * Linear MLP-aware least recently used (LRU).
+     * Linear MLP-aware least recently used (LRU), with lambda being 1.
      */
-    LINEAR_MLP_AWARE_LRU
+    LINEAR_MLP_AWARE_LRU_LAMBDA_1,
+
+    /**
+     * Linear MLP-aware least recently used (LRU), with lambda being 2.
+     */
+    LINEAR_MLP_AWARE_LRU_LAMBDA_2,
+
+    /**
+     * Linear MLP-aware least recently used (LRU), with lambda being 3.
+     */
+    LINEAR_MLP_AWARE_LRU_LAMBDA_3,
+
+    /**
+     * Linear MLP-aware least recently used (LRU), with lambda being 4.
+     */
+    LINEAR_MLP_AWARE_LRU_LAMBDA_4,
+
+    /**
+     * Linear MLP-aware least recently used (LRU), with lambda being 5.
+     */
+    LINEAR_MLP_AWARE_LRU_LAMBDA_5,
+
+    /**
+     * Linear MLP-aware least recently used (LRU), with lambda being 6.
+     */
+    LINEAR_MLP_AWARE_LRU_LAMBDA_6,
+
+    /**
+     * Linear MLP-aware least recently used (LRU), with lambda being 7.
+     */
+    LINEAR_MLP_AWARE_LRU_LAMBDA_7
 }
