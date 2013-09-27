@@ -114,7 +114,7 @@ public class MLPProfilingHelper {
     public MLPProfilingHelper(Simulation simulation) {
         this.l2CacheController = simulation.getProcessor().getMemoryHierarchy().getL2CacheController();
 
-        this.mlpCostQuantizer = new Quantizer(7, 60);
+        this.mlpCostQuantizer = new Quantizer(7, 40);
 
         this.pendingL2Misses = new LinkedHashMap<Integer, PendingL2Miss>();
 

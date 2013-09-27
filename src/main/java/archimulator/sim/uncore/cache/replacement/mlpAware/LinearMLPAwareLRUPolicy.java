@@ -119,10 +119,14 @@ public class LinearMLPAwareLRUPolicy<StateT extends Serializable> extends LRUPol
     }
 
     @Override
-    public void dumpStats(ReportNode reportNode) {
-        Quantizer mlpCostQuantizer = getCache().getSimulation().getMlpProfilingHelper().getMlpCostQuantizer();
-        reportNode.getChildren().add(new ReportNode(reportNode, "mlpCostQuantizer.maxValue", mlpCostQuantizer.getMaxValue() + ""));
-        reportNode.getChildren().add(new ReportNode(reportNode, "mlpCostQuantizer.quantum", mlpCostQuantizer.getQuantum() + ""));
+    public void dumpStats(final ReportNode reportNode) {
+        final Quantizer mlpCostQuantizer = getCache().getSimulation().getMlpProfilingHelper().getMlpCostQuantizer();
+
+        reportNode.getChildren().add(new ReportNode(reportNode, "mlpCostQuantizer") {{
+            getChildren().add(new ReportNode(this, "maxValue", mlpCostQuantizer.getMaxValue() + ""));
+            getChildren().add(new ReportNode(this, "quantum", mlpCostQuantizer.getQuantum() + ""));
+        }});
+
         for(int i = 0; i < mlpCostQuantizer.getMaxValue(); i++) {
             reportNode.getChildren().add(new ReportNode(reportNode, "numL2MissesPerMlpCostQuantum[" + i + "]", numL2MissesPerMlpCostQuantum.get(i) + ""));
         }

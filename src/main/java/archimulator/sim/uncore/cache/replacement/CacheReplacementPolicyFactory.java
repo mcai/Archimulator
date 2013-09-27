@@ -96,6 +96,8 @@ public class CacheReplacementPolicyFactory {
                 }});
             case HELPER_THREAD_AND_MLP_AWARE_CACHE_PARTITIONING_LRU:
                 return new HelperThreadAndMLPAwarePartitionedLRUPolicy<StateT>(cache);
+            case LINEAR_MLP_AWARE_LRU_LAMBDA_0:
+                return new LinearMLPAwareLRUPolicy<StateT>(cache, 0);
             case LINEAR_MLP_AWARE_LRU_LAMBDA_1:
                 return new LinearMLPAwareLRUPolicy<StateT>(cache, 1);
             case LINEAR_MLP_AWARE_LRU_LAMBDA_2:
