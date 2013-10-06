@@ -121,7 +121,7 @@ public class MLPProfilingHelper {
         this.statL2CacheMissNumCycles = new SummaryStatistics();
         this.statL2CacheMissMlpCosts = new SummaryStatistics();
 
-        l2CacheController.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, new Action1<GeneralCacheControllerServiceNonblockingRequestEvent>() {
+        this.l2CacheController.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, new Action1<GeneralCacheControllerServiceNonblockingRequestEvent>() {
             public void apply(GeneralCacheControllerServiceNonblockingRequestEvent event) {
                 if (event.getCacheController().equals(MLPProfilingHelper.this.l2CacheController) && !event.isHitInCache()) {
                     profileBeginServicingL2CacheMiss(event.getAccess());
@@ -129,7 +129,7 @@ public class MLPProfilingHelper {
             }
         });
 
-        l2CacheController.getBlockingEventDispatcher().addListener(LastLevelCacheControllerLineInsertEvent.class, new Action1<LastLevelCacheControllerLineInsertEvent>() {
+        this.l2CacheController.getBlockingEventDispatcher().addListener(LastLevelCacheControllerLineInsertEvent.class, new Action1<LastLevelCacheControllerLineInsertEvent>() {
             @Override
             public void apply(LastLevelCacheControllerLineInsertEvent event) {
                 if (event.getCacheController().equals(MLPProfilingHelper.this.l2CacheController)) {
@@ -138,7 +138,7 @@ public class MLPProfilingHelper {
             }
         });
 
-        l2CacheController.getCycleAccurateEventQueue().getPerCycleEvents().add(new Action() {
+        this.l2CacheController.getCycleAccurateEventQueue().getPerCycleEvents().add(new Action() {
             @Override
             public void apply() {
                 updateL2CacheMlpCostsPerCycle();
