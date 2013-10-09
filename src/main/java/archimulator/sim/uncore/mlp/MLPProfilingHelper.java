@@ -20,6 +20,8 @@ package archimulator.sim.uncore.mlp;
 
 import archimulator.sim.common.Simulation;
 import archimulator.sim.common.SimulationEvent;
+import archimulator.sim.common.report.ReportNode;
+import archimulator.sim.common.report.Reportable;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.event.GeneralCacheControllerServiceNonblockingRequestEvent;
 import archimulator.sim.uncore.coherence.event.LastLevelCacheControllerLineInsertEvent;
@@ -27,17 +29,17 @@ import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
 import net.pickapack.math.Quantizer;
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Memory level parallelism (MLP) profiling helper.
  *
  * @author Min Cai
  */
-public class MLPProfilingHelper {
+public class MLPProfilingHelper implements Reportable {
     /**
      * L2 miss MLP profiled event.
      */
@@ -103,8 +105,7 @@ public class MLPProfilingHelper {
 
     private Map<Integer, PendingL2Miss> pendingL2Misses;
 
-    private SummaryStatistics statL2CacheMissNumCycles;
-    private SummaryStatistics statL2CacheMissMlpCosts;
+    private Map<Integer, Long> numL2MissesPerMlpCostQuantum;
 
     /**
      * Create an MLP profiling helper.
@@ -118,8 +119,7 @@ public class MLPProfilingHelper {
 
         this.pendingL2Misses = new LinkedHashMap<Integer, PendingL2Miss>();
 
-        this.statL2CacheMissNumCycles = new SummaryStatistics();
-        this.statL2CacheMissMlpCosts = new SummaryStatistics();
+        this.numL2MissesPerMlpCostQuantum = new TreeMap<Integer, Long>();
 
         this.l2CacheController.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, new Action1<GeneralCacheControllerServiceNonblockingRequestEvent>() {
             public void apply(GeneralCacheControllerServiceNonblockingRequestEvent event) {
@@ -142,6 +142,20 @@ public class MLPProfilingHelper {
             @Override
             public void apply() {
                 updateL2CacheMlpCostsPerCycle();
+            }
+        });
+
+        this.l2CacheController.getBlockingEventDispatcher().addListener(MLPProfilingHelper.L2MissMLPProfiledEvent.class, new Action1<MLPProfilingHelper.L2MissMLPProfiledEvent>() {
+            @Override
+            public void apply(MLPProfilingHelper.L2MissMLPProfiledEvent event) {
+                double mlpCost = event.getPendingL2Miss().getMlpCost();
+
+                int quantizedMlpCost = getMlpCostQuantizer().quantize((int) mlpCost);
+                if (!numL2MissesPerMlpCostQuantum.containsKey(quantizedMlpCost)) {
+                    numL2MissesPerMlpCostQuantum.put(quantizedMlpCost, 0L);
+                }
+
+                numL2MissesPerMlpCostQuantum.put(quantizedMlpCost, numL2MissesPerMlpCostQuantum.get(quantizedMlpCost) + 1);
             }
         });
     }
@@ -182,10 +196,19 @@ public class MLPProfilingHelper {
 
         this.pendingL2Misses.remove(tag);
 
-        this.statL2CacheMissNumCycles.addValue(pendingL2Miss.getNumCycles());
-        this.statL2CacheMissMlpCosts.addValue(pendingL2Miss.getMlpCost());
-
         this.l2CacheController.getBlockingEventDispatcher().dispatch(new L2MissMLPProfiledEvent(set, way, pendingL2Miss));
+    }
+
+    @Override
+    public void dumpStats(final ReportNode reportNode) {
+        reportNode.getChildren().add(new ReportNode(reportNode, "mlpCostQuantizer") {{
+            getChildren().add(new ReportNode(this, "maxValue", mlpCostQuantizer.getMaxValue() + ""));
+            getChildren().add(new ReportNode(this, "quantum", mlpCostQuantizer.getQuantum() + ""));
+        }});
+
+        for(int i = 0; i < mlpCostQuantizer.getMaxValue(); i++) {
+            reportNode.getChildren().add(new ReportNode(reportNode, "numL2MissesPerMlpCostQuantum[" + i + "]", numL2MissesPerMlpCostQuantum.get(i) + ""));
+        }
     }
 
     /**
@@ -195,23 +218,5 @@ public class MLPProfilingHelper {
      */
     public Quantizer getMlpCostQuantizer() {
         return mlpCostQuantizer;
-    }
-
-    /**
-     * Get the summary statistics of the number of cycles for the L2 cache misses.
-     *
-     * @return the summary statistics of the number of cycles for the L2 cache misses
-     */
-    public SummaryStatistics getStatL2CacheMissNumCycles() {
-        return statL2CacheMissNumCycles;
-    }
-
-    /**
-     * Get the summary statistics of the MLP-costs for the L2 cache misses.
-     *
-     * @return the summary statistics of the MLP-costs for the L2 cache misses
-     */
-    public SummaryStatistics getStatL2CacheMissMlpCosts() {
-        return statL2CacheMissMlpCosts;
     }
 }

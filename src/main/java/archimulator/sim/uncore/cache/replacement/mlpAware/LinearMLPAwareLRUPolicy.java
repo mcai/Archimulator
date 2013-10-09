@@ -18,7 +18,6 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache.replacement.mlpAware;
 
-import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.Cache;
 import archimulator.sim.uncore.cache.CacheAccess;
@@ -27,13 +26,10 @@ import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.replacement.LRUPolicy;
 import archimulator.sim.uncore.mlp.MLPProfilingHelper;
 import net.pickapack.action.Action1;
-import net.pickapack.math.Quantizer;
 import net.pickapack.util.ValueProvider;
 import net.pickapack.util.ValueProviderFactory;
 
 import java.io.Serializable;
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Linear MLP-aware least recently used (LRU) policy.
@@ -45,8 +41,6 @@ public class LinearMLPAwareLRUPolicy<StateT extends Serializable> extends LRUPol
     private Cache<Boolean> mirrorCache;
 
     private int lambda;
-
-    private Map<Integer, Long> numL2MissesPerMlpCostQuantum;
 
     /**
      * Create a linear-MLP aware least recently used (LRU) policy for the specified evictable cache.
@@ -66,22 +60,12 @@ public class LinearMLPAwareLRUPolicy<StateT extends Serializable> extends LRUPol
 
         this.lambda = lambda;
 
-        this.numL2MissesPerMlpCostQuantum = new TreeMap<Integer, Long>();
-
         cache.getBlockingEventDispatcher().addListener(MLPProfilingHelper.L2MissMLPProfiledEvent.class, new Action1<MLPProfilingHelper.L2MissMLPProfiledEvent>() {
             @Override
             public void apply(MLPProfilingHelper.L2MissMLPProfiledEvent event) {
                 CacheLine<Boolean> mirrorLine = mirrorCache.getLine(event.getSet(), event.getWay());
                 BooleanValueProvider stateProvider = (BooleanValueProvider) mirrorLine.getStateProvider();
-                double mlpCost = event.getPendingL2Miss().getMlpCost();
-                stateProvider.mlpCost = mlpCost;
-
-                int quantizedMlpCost = getCache().getSimulation().getMlpProfilingHelper().getMlpCostQuantizer().quantize((int) mlpCost);
-                if(!numL2MissesPerMlpCostQuantum.containsKey(quantizedMlpCost)) {
-                    numL2MissesPerMlpCostQuantum.put(quantizedMlpCost, 0L);
-                }
-
-                numL2MissesPerMlpCostQuantum.put(quantizedMlpCost, numL2MissesPerMlpCostQuantum.get(quantizedMlpCost) + 1);
+                stateProvider.mlpCost = event.getPendingL2Miss().getMlpCost();
             }
         });
     }
@@ -116,20 +100,6 @@ public class LinearMLPAwareLRUPolicy<StateT extends Serializable> extends LRUPol
         }
 
         return new CacheAccess<StateT>(this.getCache(), access, set, victimWay, tag);
-    }
-
-    @Override
-    public void dumpStats(final ReportNode reportNode) {
-        final Quantizer mlpCostQuantizer = getCache().getSimulation().getMlpProfilingHelper().getMlpCostQuantizer();
-
-        reportNode.getChildren().add(new ReportNode(reportNode, "mlpCostQuantizer") {{
-            getChildren().add(new ReportNode(this, "maxValue", mlpCostQuantizer.getMaxValue() + ""));
-            getChildren().add(new ReportNode(this, "quantum", mlpCostQuantizer.getQuantum() + ""));
-        }});
-
-        for(int i = 0; i < mlpCostQuantizer.getMaxValue(); i++) {
-            reportNode.getChildren().add(new ReportNode(reportNode, "numL2MissesPerMlpCostQuantum[" + i + "]", numL2MissesPerMlpCostQuantum.get(i) + ""));
-        }
     }
 
     /**

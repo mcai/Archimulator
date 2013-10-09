@@ -329,6 +329,7 @@ public abstract class Simulation implements SimulationObject, Reportable {
         this.getCacheInteractionHelper().dumpStats(rootReportNode);
         this.getFeedbackDirectedHelperThreadingHelper().dumpStats(rootReportNode);
         this.getDelinquentLoadIdentificationHelper().dumpStats(rootReportNode);
+        this.getMlpProfilingHelper().dumpStats(rootReportNode);
         this.getIntervalHelper().dumpStats(rootReportNode);
 
         this.getProcessor().getMemoryHierarchy().getL2CacheController().getCache().getReplacementPolicy().dumpStats(rootReportNode);
