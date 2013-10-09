@@ -36,6 +36,7 @@
       <w>itlbs</w>
       <w>javadocs</w>
       <w>jaxen</w>
+      <w>jedis</w>
       <w>libc</w>
       <w>libquantum</w>
       <w>lookahead</w>
