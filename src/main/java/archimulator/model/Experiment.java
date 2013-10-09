@@ -314,22 +314,24 @@ public class Experiment implements WithId, WithParentId, WithTitle, WithCreateTi
     /**
      * Get a statistic value by key.
      *
-     * @param key the key
+     * @param prefix the prefix
+     * @param key    the key
      * @return the statistic value
      */
-    public String getStatValue(String key) {
-        return getStatValue(key, null);
+    public String getStatValue(String prefix, String key) {
+        return getStatValue(prefix, key, null);
     }
 
     /**
      * Get a statistic value by key and default value.
      *
+     * @param prefix       the prefix
      * @param key          the key
      * @param defaultValue the default value
      * @return the statistic value
      */
-    public String getStatValue(String key, String defaultValue) {
-        return getStatValue(ServiceManager.getExperimentStatService().getStatByParentAndTitle(this, key), defaultValue);
+    public String getStatValue(String prefix, String key, String defaultValue) {
+        return getStatValue(ServiceManager.getExperimentStatService().getStatByParentAndPrefixAndKey(this, prefix, key), defaultValue);
     }
 
     /**
@@ -415,14 +417,15 @@ public class Experiment implements WithId, WithParentId, WithTitle, WithCreateTi
     /**
      * Get the statistic values from keys.
      *
-     * @param keys the keys
+     * @param keys   the keys
+     * @param prefix the prefix
      * @return the statistic values
      */
-    public List<String> getStatValues(List<String> keys) {
+    public List<String> getStatValues(final String prefix, List<String> keys) {
         return CollectionHelper.transform(keys, new Function1<String, String>() {
             @Override
             public String apply(String key) {
-                return getStatValue(key);
+                return getStatValue(prefix, key);
             }
         });
     }
@@ -517,11 +520,11 @@ public class Experiment implements WithId, WithParentId, WithTitle, WithCreateTi
     public static String getMeasurementTitlePrefix(ExperimentType type) {
         switch (type) {
             case TWO_PHASE:
-                return "twoPhase/phase1/";
+                return "twoPhase/phase1";
             case FUNCTIONAL:
-                return "functional/";
+                return "functional";
             case DETAILED:
-                return "detailed/";
+                return "detailed";
             default:
                 throw new IllegalArgumentException();
         }

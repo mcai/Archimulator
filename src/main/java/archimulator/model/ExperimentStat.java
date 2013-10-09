@@ -19,16 +19,8 @@
 package archimulator.model;
 
 import archimulator.service.ServiceManager;
-import com.j256.ormlite.field.DataType;
-import com.j256.ormlite.field.DatabaseField;
-import com.j256.ormlite.table.DatabaseTable;
-import net.pickapack.dateTime.DateHelper;
-import net.pickapack.model.WithCreateTime;
-import net.pickapack.model.WithId;
-import net.pickapack.model.WithParentId;
-import net.pickapack.model.WithTitle;
 
-import java.util.Date;
+import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,27 +30,15 @@ import java.util.Map;
  *
  * @author Min Cai
  */
-@DatabaseTable(tableName = "ExperimentStat")
-public class ExperimentStat implements WithId, WithParentId, WithTitle, WithCreateTime {
-    @DatabaseField(generatedId = true)
-    private long id;
-
-    @DatabaseField(dataType = DataType.LONG_STRING)
+public class ExperimentStat implements Serializable {
     private String title;
 
-    @DatabaseField
-    private long createTime;
-
-    @DatabaseField
     private long parentId;
 
-    @DatabaseField(dataType = DataType.LONG_STRING)
     private String prefix;
 
-    @DatabaseField(dataType = DataType.LONG_STRING)
     private String key;
 
-    @DatabaseField(dataType = DataType.LONG_STRING)
     private String value;
 
     /**
@@ -70,28 +50,17 @@ public class ExperimentStat implements WithId, WithParentId, WithTitle, WithCrea
     /**
      * Create an experiment statistic.
      *
-     * @param parent  the parent experiment object
+     * @param parentId  the parent experiment ID
      * @param prefix  the prefix
      * @param key     the key
      * @param value   the value
      */
-    public ExperimentStat(Experiment parent, String prefix, String key, String value) {
+    public ExperimentStat(long parentId, String prefix, String key, String value) {
         this.title = prefix + "/" + key;
-        this.parentId = parent.getId();
+        this.parentId = parentId;
         this.prefix = prefix;
         this.key = key;
         this.value = value;
-        this.createTime = DateHelper.toTick(new Date());
-    }
-
-    /**
-     * Get the experiment statistic's ID.
-     *
-     * @return the experiment statistic's ID
-     */
-    @Override
-    public long getId() {
-        return id;
     }
 
     /**
@@ -99,7 +68,6 @@ public class ExperimentStat implements WithId, WithParentId, WithTitle, WithCrea
      *
      * @return the parent experiment object's ID
      */
-    @Override
     public long getParentId() {
         return parentId;
     }
@@ -109,19 +77,8 @@ public class ExperimentStat implements WithId, WithParentId, WithTitle, WithCrea
      *
      * @return the experiment statistic's title
      */
-    @Override
     public String getTitle() {
         return title;
-    }
-
-    /**
-     * Get the time in ticks when the experiment statistic is created.
-     *
-     * @return the time in ticks when the experiment statistic is created
-     */
-    @Override
-    public long getCreateTime() {
-        return createTime;
     }
 
     /**
@@ -162,7 +119,7 @@ public class ExperimentStat implements WithId, WithParentId, WithTitle, WithCrea
 
     @Override
     public String toString() {
-        return String.format("ExperimentStat{id=%d, title='%s', createTime=%d, parentId=%d, prefix='%s', key='%s', value='%s'}", id, title, createTime, parentId, prefix, key, value);
+        return String.format("ExperimentStat{title='%s', parentId=%d, prefix='%s', key='%s', value='%s'}", title, parentId, prefix, key, value);
     }
 
     /**

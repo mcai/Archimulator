@@ -19,8 +19,8 @@
 package archimulator.service;
 
 import archimulator.model.Experiment;
-import archimulator.model.ExperimentSummary;
 import archimulator.model.ExperimentStat;
+import archimulator.model.ExperimentSummary;
 import archimulator.util.plot.Table;
 import net.pickapack.service.Service;
 
@@ -56,22 +56,24 @@ public interface ExperimentStatService extends Service {
     List<ExperimentStat> getStatsByParent(Experiment parent);
 
     /**
-     * Get the list of statistics under the specified parent experiment object and matching the specified title.
+     * Get the statistics under the specified parent experiment object and matching the specified prefix and key.
      *
      * @param parent the parent experiment object
-     * @param title  the title
-     * @return a list of statistics under the specified parent experiment object and matching the specified title if any exist; otherwise an empty list
+     * @param prefix the prefix
+     * @param key    the key
+     * @return the statistics under the specified parent experiment object and matching the specified prefix and key if any exist; otherwise an empty list
      */
-    ExperimentStat getStatByParentAndTitle(Experiment parent, String title);
+    ExperimentStat getStatByParentAndPrefixAndKey(Experiment parent, String prefix, String key);
 
     /**
-     * Get the list of statistics under the specified parent experiment object and matching the specified title pattern.
+     * Get the list of statistics under the specified parent experiment object and matching the specified prefix and key pattern.
      *
      * @param parent    the parent experiment object
-     * @param titleLike the title pattern
-     * @return a list of statistics under the specified parent experiment object and matching the specified title pattern if any exist; otherwise an empty list
+     * @param prefix the prefix
+     * @param keyLike the key pattern
+     * @return a list of statistics under the specified parent experiment object and matching the specified prefix and key pattern if any exist; otherwise an empty list
      */
-    List<ExperimentStat> getStatsByParentAndTitleLike(Experiment parent, String titleLike);
+    List<ExperimentStat> getStatsByParentAndPrefixAndKeyLike(Experiment parent, String prefix, String keyLike);
 
     /**
      * Get the list of statistics under the specified parent experiment object and matching the specified title prefix.

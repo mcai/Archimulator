@@ -158,7 +158,7 @@ public class BasicMemoryHierarchy extends BasicSimulationObject implements Memor
         cacheController.getFsmFactory().dump(PREFIX_CC_FSM + cacheController.getName(), fsms, statsMap);
 
         for (Map.Entry<String, String> entry : statsMap.entrySet()) {
-            stats.add(new ExperimentStat(getExperiment(), getSimulation().getPrefix(), entry.getKey(), entry.getValue()));
+            stats.add(new ExperimentStat(getExperiment().getId(), getSimulation().getPrefix(), entry.getKey(), entry.getValue()));
         }
     }
 

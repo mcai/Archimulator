@@ -207,7 +207,7 @@ public class MLPProfilingHelper implements Reportable {
         }});
 
         for(int i = 0; i < mlpCostQuantizer.getMaxValue(); i++) {
-            reportNode.getChildren().add(new ReportNode(reportNode, "numL2MissesPerMlpCostQuantum[" + i + "]", numL2MissesPerMlpCostQuantum.get(i) + ""));
+            reportNode.getChildren().add(new ReportNode(reportNode, "numL2MissesPerMlpCostQuantum[" + i + "]", (numL2MissesPerMlpCostQuantum.containsKey(i) ? numL2MissesPerMlpCostQuantum.get(i) : 0) + ""));
         }
     }
 

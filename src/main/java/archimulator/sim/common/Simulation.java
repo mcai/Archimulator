@@ -337,7 +337,7 @@ public abstract class Simulation implements SimulationObject, Reportable {
         rootReportNode.traverse(new Action1<ReportNode>() {
             @Override
             public void apply(ReportNode node) {
-                stats.add(new ExperimentStat(experiment, getPrefix(), node.getPath(), node.getValue()));
+                stats.add(new ExperimentStat(experiment.getId(), getPrefix(), node.getPath(), node.getValue()));
             }
         });
 

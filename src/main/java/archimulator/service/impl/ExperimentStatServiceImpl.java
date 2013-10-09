@@ -19,16 +19,15 @@
 package archimulator.service.impl;
 
 import archimulator.model.Experiment;
-import archimulator.model.ExperimentSummary;
 import archimulator.model.ExperimentStat;
+import archimulator.model.ExperimentSummary;
 import archimulator.service.ExperimentStatService;
 import archimulator.service.ServiceManager;
+import archimulator.util.JedisHelper;
 import archimulator.util.plot.Table;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.PreparedDelete;
-import com.j256.ormlite.stmt.PreparedQuery;
-import com.j256.ormlite.stmt.QueryBuilder;
 import net.pickapack.action.Function1;
 import net.pickapack.collection.CollectionHelper;
 import net.pickapack.model.WithId;
@@ -46,7 +45,6 @@ import java.util.Map;
  * @author Min Cai
  */
 public class ExperimentStatServiceImpl extends AbstractService implements ExperimentStatService {
-    private Dao<ExperimentStat, Long> stats;
     private Dao<ExperimentSummary, Long> summaries;
 
     /**
@@ -54,9 +52,8 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
      */
     @SuppressWarnings("unchecked")
     public ExperimentStatServiceImpl() {
-        super(ServiceManager.getDatabaseUrl(), Arrays.<Class<? extends WithId>>asList(ExperimentStat.class, ExperimentSummary.class));
+        super(ServiceManager.getDatabaseUrl(), Arrays.<Class<? extends WithId>>asList(ExperimentSummary.class));
 
-        this.stats = createDao(ExperimentStat.class);
         this.summaries = createDao(ExperimentSummary.class);
     }
 
@@ -74,13 +71,8 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
         });
 
         if(!experimentIds.isEmpty()) {
-            try {
-                DeleteBuilder<ExperimentStat, Long> deleteBuilder = this.stats.deleteBuilder();
-                deleteBuilder.where().notIn("parentId", experimentIds);
-                PreparedDelete<ExperimentStat> delete = deleteBuilder.prepare();
-                this.stats.delete(delete);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
+            for(long experimentId : experimentIds) {
+                JedisHelper.clearStatsByParent(experimentId);
             }
 
             try {
@@ -102,19 +94,7 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
             throw new IllegalArgumentException();
         }
 
-        long parentId = stats.get(0).getParentId();
-        String prefix = stats.get(0).getPrefix();
-
-        try {
-            DeleteBuilder<ExperimentStat, Long> deleteBuilder = this.stats.deleteBuilder();
-            deleteBuilder.where().eq("parentId", parentId).and().eq("prefix", prefix);
-            PreparedDelete<ExperimentStat> delete = deleteBuilder.prepare();
-            this.stats.delete(delete);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
-        addItems(this.stats, stats);
+        JedisHelper.addStatsByParent(parent.getId(), stats);
 
         invalidateSummaryByParent(parent);
     }
@@ -122,92 +102,39 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
     @Override
     @SuppressWarnings("unchecked")
     public void clearStatsByParent(Experiment parent) {
-        try {
-            DeleteBuilder<ExperimentStat, Long> deleteBuilder = this.stats.deleteBuilder();
-            deleteBuilder.where().eq("parentId", parent.getId());
-            PreparedDelete<ExperimentStat> delete = deleteBuilder.prepare();
-            this.stats.delete(delete);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        JedisHelper.clearStatsByParent(parent.getId());
 
         invalidateSummaryByParent(parent);
     }
 
     @Override
     public List<ExperimentStat> getStatsByParent(Experiment parent) {
-        try {
-            PreparedQuery<ExperimentStat> query = this.stats.queryBuilder().where()
-                    .eq("parentId", parent.getId())
-                    .prepare();
-            return this.stats.query(query);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        return JedisHelper.getStatsByParent(parent.getId());
     }
 
     @Override
-    public ExperimentStat getStatByParentAndTitle(Experiment parent, String title) {
-        try {
-            PreparedQuery<ExperimentStat> query = this.stats.queryBuilder().where()
-                    .eq("parentId", parent.getId())
-                    .and()
-                    .eq("title", title)
-                    .prepare();
-            return this.stats.queryForFirst(query);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+    public ExperimentStat getStatByParentAndPrefixAndKey(Experiment parent, String prefix, String key) {
+        return JedisHelper.getStatByParentAndPrefixAndKey(parent.getId(), prefix, key);
     }
 
     @Override
-    public List<ExperimentStat> getStatsByParentAndTitleLike(Experiment parent, String titleLike) {
-        try {
-            PreparedQuery<ExperimentStat> query = this.stats.queryBuilder().where()
-                    .eq("parentId", parent.getId())
-                    .and()
-                    .like("title", "%" + titleLike + "%")
-                    .prepare();
-            return this.stats.query(query);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+    public List<ExperimentStat> getStatsByParentAndPrefixAndKeyLike(Experiment parent, String prefix, String keyLike) {
+        return JedisHelper.getStatsByParentAndPrefixAndKeyLike(parent.getId(), prefix, keyLike);
     }
 
     @Override
     public List<ExperimentStat> getStatsByParentAndPrefix(Experiment parent, String prefix) {
-        try {
-            PreparedQuery<ExperimentStat> query = this.stats.queryBuilder().where()
-                    .eq("parentId", parent.getId())
-                    .and()
-                    .eq("prefix", prefix)
-                    .prepare();
-            return this.stats.query(query);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        return JedisHelper.getStatsByParentAndPrefix(parent.getId(), prefix);
     }
 
     @Override
     public List<String> getStatPrefixesByParent(Experiment parent) {
-        try {
-            QueryBuilder<ExperimentStat, Long> queryBuilder = this.stats.queryBuilder();
-            queryBuilder.where().eq("parentId", parent.getId());
-            PreparedQuery<ExperimentStat> query = queryBuilder.distinct().selectColumns("prefix").prepare();
-            return CollectionHelper.transform(this.stats.query(query), new Function1<ExperimentStat, String>() {
-                @Override
-                public String apply(ExperimentStat stat) {
-                    return stat.getPrefix();
-                }
-            });
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        return JedisHelper.getStatPrefixesByParent(parent.getId());
     }
 
     @Override
     public ExperimentSummary getSummaryByParent(Experiment parent) {
-        this.CreateSummaryIfNotExistsByParent(parent);
+        this.createSummaryIfNotExistsByParent(parent);
         return this.getFirstItemByParent(this.summaries, parent);
     }
 
@@ -216,11 +143,11 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
      *
      * @param parent the parent experiment
      */
-    private void CreateSummaryIfNotExistsByParent(Experiment parent) {
+    private void createSummaryIfNotExistsByParent(Experiment parent) {
         if (this.getFirstItemByParent(this.summaries, parent) == null) {
             System.out.println("Creating summary for experiment #" + parent.getId() + "..");
 
-            Map<String, ExperimentStat> statsMap = ExperimentStat.toMap(ServiceManager.getExperimentStatService().getStatsByParent(parent));
+            Map<String, ExperimentStat> statsMap = ExperimentStat.toMap(ServiceManager.getExperimentStatService().getStatsByParentAndPrefix(parent, parent.getMeasurementTitlePrefix()));
 
             boolean helperThreadEnabled = parent.getContextMappings().get(0).getBenchmark().getHelperThreadEnabled();
 
@@ -229,10 +156,10 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
             summary.setType(parent.getType());
             summary.setState(parent.getState());
 
-            summary.setBeginTimeAsString(parent.getStatValue(statsMap, parent.getMeasurementTitlePrefix() + "simulation/beginTimeAsString"));
-            summary.setEndTimeAsString(parent.getStatValue(statsMap, parent.getMeasurementTitlePrefix() + "simulation/endTimeAsString"));
-            summary.setDuration(parent.getStatValue(statsMap, parent.getMeasurementTitlePrefix() + "simulation/duration"));
-            summary.setDurationInSeconds(parent.getStatValueAsLong(statsMap, parent.getMeasurementTitlePrefix() + "simulation/durationInSeconds", 0));
+            summary.setBeginTimeAsString(parent.getStatValue(statsMap, "simulation/beginTimeAsString"));
+            summary.setEndTimeAsString(parent.getStatValue(statsMap, "simulation/endTimeAsString"));
+            summary.setDuration(parent.getStatValue(statsMap, "simulation/duration"));
+            summary.setDurationInSeconds(parent.getStatValueAsLong(statsMap, "simulation/durationInSeconds", 0));
 
             summary.setL2Size(parent.getArchitecture().getL2Size());
             summary.setL2Associativity(parent.getArchitecture().getL2Associativity());
@@ -243,113 +170,113 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
 
             summary.setNumMainThreadWaysInStaticPartitionedLRUPolicy(parent.getArchitecture().getNumMainThreadWaysInStaticPartitionedLRUPolicy());
 
-            summary.setNumInstructions(parent.getStatValueAsLong(statsMap, parent.getMeasurementTitlePrefix() + "simulation/numInstructions", 0));
-            summary.setC0t0NumInstructions(parent.getStatValueAsLong(statsMap, parent.getMeasurementTitlePrefix() + "simulation/c0t0NumInstructions", 0));
-            summary.setC1t0NumInstructions(parent.getStatValueAsLong(statsMap, parent.getMeasurementTitlePrefix() + "simulation/c1t0NumInstructions", 0));
+            summary.setNumInstructions(parent.getStatValueAsLong(statsMap, "simulation/numInstructions", 0));
+            summary.setC0t0NumInstructions(parent.getStatValueAsLong(statsMap, "simulation/c0t0NumInstructions", 0));
+            summary.setC1t0NumInstructions(parent.getStatValueAsLong(statsMap, "simulation/c1t0NumInstructions", 0));
 
             summary.setNumCycles(
-                    parent.getStatValueAsLong(statsMap, parent.getMeasurementTitlePrefix() + "simulation/cycleAccurateEventQueue/currentCycle", 0)
+                    parent.getStatValueAsLong(statsMap, "simulation/cycleAccurateEventQueue/currentCycle", 0)
             );
 
             summary.setIpc(
-                    parent.getStatValueAsDouble(statsMap, parent.getMeasurementTitlePrefix() + "simulation/instructionsPerCycle", 0)
+                    parent.getStatValueAsDouble(statsMap, "simulation/instructionsPerCycle", 0)
             );
 
             summary.setC0t0Ipc(
-                    parent.getStatValueAsDouble(statsMap, parent.getMeasurementTitlePrefix() + "simulation/c0t0InstructionsPerCycle", 0)
+                    parent.getStatValueAsDouble(statsMap, "simulation/c0t0InstructionsPerCycle", 0)
             );
 
             summary.setC1t0Ipc(
-                    parent.getStatValueAsDouble(statsMap, parent.getMeasurementTitlePrefix() + "simulation/c1t0InstructionsPerCycle", 0)
+                    parent.getStatValueAsDouble(statsMap, "simulation/c1t0InstructionsPerCycle", 0)
             );
 
             summary.setCpi(
-                    parent.getStatValueAsDouble(statsMap, parent.getMeasurementTitlePrefix() + "simulation/cyclesPerInstruction", 0)
+                    parent.getStatValueAsDouble(statsMap, "simulation/cyclesPerInstruction", 0)
             );
 
             summary.setNumMainThreadL2CacheHits(
-                    parent.getStatValueAsLong(statsMap, parent.getMeasurementTitlePrefix() + "helperThreadL2CacheRequestProfilingHelper/numMainThreadL2CacheHits", 0)
+                    parent.getStatValueAsLong(statsMap, "helperThreadL2CacheRequestProfilingHelper/numMainThreadL2CacheHits", 0)
             );
             summary.setNumMainThreadL2CacheMisses(
-                    parent.getStatValueAsLong(statsMap, parent.getMeasurementTitlePrefix() + "helperThreadL2CacheRequestProfilingHelper/numMainThreadL2CacheMisses", 0)
+                    parent.getStatValueAsLong(statsMap, "helperThreadL2CacheRequestProfilingHelper/numMainThreadL2CacheMisses", 0)
             );
 
             summary.setNumHelperThreadL2CacheHits(
-                    parent.getStatValueAsLong(statsMap, parent.getMeasurementTitlePrefix() + "helperThreadL2CacheRequestProfilingHelper/numHelperThreadL2CacheHits", 0)
+                    parent.getStatValueAsLong(statsMap, "helperThreadL2CacheRequestProfilingHelper/numHelperThreadL2CacheHits", 0)
             );
             summary.setNumHelperThreadL2CacheMisses(
-                    parent.getStatValueAsLong(statsMap, parent.getMeasurementTitlePrefix() + "helperThreadL2CacheRequestProfilingHelper/numHelperThreadL2CacheMisses", 0)
+                    parent.getStatValueAsLong(statsMap, "helperThreadL2CacheRequestProfilingHelper/numHelperThreadL2CacheMisses", 0)
             );
 
             summary.setNumL2CacheEvictions(
-                    parent.getStatValueAsLong(statsMap, parent.getMeasurementTitlePrefix() + "l2/numEvictions", 0)
+                    parent.getStatValueAsLong(statsMap, "l2/numEvictions", 0)
             );
 
             summary.setL2CacheHitRatio(
-                    parent.getStatValueAsDouble(statsMap, parent.getMeasurementTitlePrefix() + "l2/hitRatio", 0)
+                    parent.getStatValueAsDouble(statsMap, "l2/hitRatio", 0)
             );
 
             summary.setL2CacheOccupancyRatio(
-                    parent.getStatValueAsDouble(statsMap, parent.getMeasurementTitlePrefix() + "l2/occupancyRatio", 0)
+                    parent.getStatValueAsDouble(statsMap, "l2/occupancyRatio", 0)
             );
 
             summary.setHelperThreadL2CacheRequestCoverage(
-                    helperThreadEnabled ? parent.getStatValueAsDouble(statsMap, parent.getMeasurementTitlePrefix() +
+                    helperThreadEnabled ? parent.getStatValueAsDouble(statsMap,
                             "helperThreadL2CacheRequestProfilingHelper/helperThreadL2CacheRequestCoverage", 0.0f) : 0.0f
             );
 
             summary.setHelperThreadL2CacheRequestAccuracy(
-                    helperThreadEnabled ? parent.getStatValueAsDouble(statsMap, parent.getMeasurementTitlePrefix() +
+                    helperThreadEnabled ? parent.getStatValueAsDouble(statsMap,
                             "helperThreadL2CacheRequestProfilingHelper/helperThreadL2CacheRequestAccuracy", 0.0f) : 0.0f
             );
 
             summary.setHelperThreadL2CacheRequestLateness(
-                    helperThreadEnabled ? parent.getStatValueAsDouble(statsMap, parent.getMeasurementTitlePrefix() +
+                    helperThreadEnabled ? parent.getStatValueAsDouble(statsMap,
                             "helperThreadL2CacheRequestProfilingHelper/helperThreadL2CacheRequestLateness", 0.0f) : 0.0f
             );
 
             summary.setHelperThreadL2CacheRequestPollution(
-                    helperThreadEnabled ? parent.getStatValueAsDouble(statsMap, parent.getMeasurementTitlePrefix() +
+                    helperThreadEnabled ? parent.getStatValueAsDouble(statsMap,
                             "helperThreadL2CacheRequestProfilingHelper/helperThreadL2CacheRequestPollution", 0.0f) : 0.0f
             );
 
             summary.setHelperThreadL2CacheRequestRedundancy(
-                    helperThreadEnabled ? parent.getStatValueAsDouble(statsMap, parent.getMeasurementTitlePrefix() +
+                    helperThreadEnabled ? parent.getStatValueAsDouble(statsMap,
                             "helperThreadL2CacheRequestProfilingHelper/helperThreadL2CacheRequestRedundancy", 0.0f) : 0.0f
             );
 
             summary.setNumLateHelperThreadL2CacheRequests(
-                    helperThreadEnabled ? parent.getStatValueAsLong(statsMap, parent.getMeasurementTitlePrefix() +
+                    helperThreadEnabled ? parent.getStatValueAsLong(statsMap,
                             "helperThreadL2CacheRequestProfilingHelper/numLateHelperThreadL2CacheRequests", 0) : 0
             );
 
             summary.setNumTimelyHelperThreadL2CacheRequests(
-                    helperThreadEnabled ? parent.getStatValueAsLong(statsMap, parent.getMeasurementTitlePrefix() +
+                    helperThreadEnabled ? parent.getStatValueAsLong(statsMap,
                             "helperThreadL2CacheRequestProfilingHelper/numTimelyHelperThreadL2CacheRequests", 0) : 0
             );
 
             summary.setNumBadHelperThreadL2CacheRequests(
-                    helperThreadEnabled ? parent.getStatValueAsLong(statsMap, parent.getMeasurementTitlePrefix() +
+                    helperThreadEnabled ? parent.getStatValueAsLong(statsMap,
                             "helperThreadL2CacheRequestProfilingHelper/numBadHelperThreadL2CacheRequests", 0) : 0
             );
 
             summary.setNumEarlyHelperThreadL2CacheRequests(
-                    helperThreadEnabled ? parent.getStatValueAsLong(statsMap, parent.getMeasurementTitlePrefix() +
+                    helperThreadEnabled ? parent.getStatValueAsLong(statsMap,
                             "helperThreadL2CacheRequestProfilingHelper/numEarlyHelperThreadL2CacheRequests", 0) : 0
             );
 
             summary.setNumUglyHelperThreadL2CacheRequests(
-                    helperThreadEnabled ? parent.getStatValueAsLong(statsMap, parent.getMeasurementTitlePrefix() +
+                    helperThreadEnabled ? parent.getStatValueAsLong(statsMap,
                             "helperThreadL2CacheRequestProfilingHelper/numUglyHelperThreadL2CacheRequests", 0) : 0
             );
 
             summary.setNumRedundantHitToTransientTagHelperThreadL2CacheRequests(
-                    helperThreadEnabled ? parent.getStatValueAsLong(statsMap, parent.getMeasurementTitlePrefix() +
+                    helperThreadEnabled ? parent.getStatValueAsLong(statsMap,
                             "helperThreadL2CacheRequestProfilingHelper/numRedundantHitToTransientTagHelperThreadL2CacheRequests", 0) : 0
             );
 
             summary.setNumRedundantHitToCacheHelperThreadL2CacheRequests(
-                    helperThreadEnabled ? parent.getStatValueAsLong(statsMap, parent.getMeasurementTitlePrefix() +
+                    helperThreadEnabled ? parent.getStatValueAsLong(statsMap,
                             "helperThreadL2CacheRequestProfilingHelper/numRedundantHitToCacheHelperThreadL2CacheRequests", 0) : 0
             );
 
