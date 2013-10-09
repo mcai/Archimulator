@@ -42,6 +42,12 @@ public class JedisHelper {
         jedis = new Jedis("localhost");
     }
 
+    /**
+     * Add a list of statistics under the specified parent experiment object.
+     *
+     * @param parentId the ID of the parent experiment object
+     * @param stats    a list of statistics to be added under the specified parent
+     */
     public static void addStatsByParent(long parentId, final List<ExperimentStat> stats) {
         String prefix = stats.get(0).getPrefix();
         String experimentKey = getKeyByParentAndPrefix(parentId, prefix);
@@ -53,32 +59,52 @@ public class JedisHelper {
         }});
     }
 
+    /**
+     * Clear the list of statistics under the specified parent experiment object and the specified prefix.
+     *
+     * @param parentId the ID of the parent experiment object
+     * @param prefix   the prefix
+     */
     public static void clearStatsByParentAndPrefix(long parentId, String prefix) {
         jedis.del(getKeyByParentAndPrefix(parentId, prefix));
     }
 
+    /**
+     * Clear the list of statistics under the specified parent experiment object.
+     *
+     * @param parentId the ID of the parent experiment object
+     */
     public static void clearStatsByParent(long parentId) {
         List<String> experimentKeys = getKeysByParent(parentId);
 
-        if(!experimentKeys.isEmpty()) {
+        if (!experimentKeys.isEmpty()) {
             jedis.del(experimentKeys.toArray(new String[experimentKeys.size()]));
         }
     }
 
+    /**
+     * Clear all the statistics stored in the Redis database.
+     */
     public static void clearAllStats() {
         Set<String> experimentKeys = jedis.keys(KEY_PREFIX_EXPERIMENT_STATS + "*");
 
-        if(!experimentKeys.isEmpty()) {
+        if (!experimentKeys.isEmpty()) {
             jedis.del(experimentKeys.toArray(new String[experimentKeys.size()]));
         }
     }
 
+    /**
+     * Get the list of statistics under the specified parent experiment object.
+     *
+     * @param parentId the ID of the parent experiment object
+     * @return a list of statistics under the specified parent if any exist; otherwise an empty list
+     */
     public static List<ExperimentStat> getStatsByParent(long parentId) {
         List<String> prefixes = getStatPrefixesByParent(parentId);
 
         List<ExperimentStat> stats = new ArrayList<ExperimentStat>();
 
-        for(String prefix : prefixes) {
+        for (String prefix : prefixes) {
             List<ExperimentStat> result = getStatsByParentAndPrefix(parentId, prefix);
             stats.addAll(result);
         }
@@ -86,14 +112,21 @@ public class JedisHelper {
         return stats;
     }
 
+    /**
+     * Get the list of statistics under the specified parent experiment object and matching the specified title prefix.
+     *
+     * @param parentId the ID of the parent experiment object
+     * @param prefix the title prefix
+     * @return a list of statistics under the specified parent experiment object and matching the specified title prefix if any exist; otherwise an empty list
+     */
     public static List<ExperimentStat> getStatsByParentAndPrefix(long parentId, String prefix) {
         String experimentKey = getKeyByParentAndPrefix(parentId, prefix);
-        if(jedis.exists(experimentKey)) {
+        if (jedis.exists(experimentKey)) {
             List<ExperimentStat> stats = new ArrayList<ExperimentStat>();
 
-            Map<String,String> result = jedis.hgetAll(experimentKey);
+            Map<String, String> result = jedis.hgetAll(experimentKey);
 
-            for(String resultKey : result.keySet()) {
+            for (String resultKey : result.keySet()) {
                 ExperimentStat stat = new ExperimentStat(parentId, prefix, resultKey, result.get(resultKey));
                 stats.add(stat);
             }
@@ -104,25 +137,41 @@ public class JedisHelper {
         return new ArrayList<ExperimentStat>();
     }
 
+    /**
+     * Get the statistics under the specified parent experiment object and matching the specified prefix and key.
+     *
+     * @param parentId the ID of the parent experiment object
+     * @param prefix the prefix
+     * @param key    the key
+     * @return the statistics under the specified parent experiment object and matching the specified prefix and key if any exist; otherwise an empty list
+     */
     public static ExperimentStat getStatByParentAndPrefixAndKey(long parentId, String prefix, String key) {
         String experimentKey = getKeyByParentAndPrefix(parentId, prefix);
-        if(jedis.exists(experimentKey)) {
+        if (jedis.exists(experimentKey)) {
             return new ExperimentStat(parentId, prefix, experimentKey, jedis.hget(experimentKey, key));
         }
 
         return null;
     }
 
+    /**
+     * Get the list of statistics under the specified parent experiment object and matching the specified prefix and key pattern.
+     *
+     * @param parentId the ID of the parent experiment object
+     * @param prefix the prefix
+     * @param keyLike the key pattern
+     * @return a list of statistics under the specified parent experiment object and matching the specified prefix and key pattern if any exist; otherwise an empty list
+     */
     public static List<ExperimentStat> getStatsByParentAndPrefixAndKeyLike(long parentId, String prefix, String keyLike) {
         String experimentKey = getKeyByParentAndPrefix(parentId, prefix);
 
         List<ExperimentStat> stats = new ArrayList<ExperimentStat>();
 
-        if(jedis.exists(experimentKey)) {
+        if (jedis.exists(experimentKey)) {
             Set<String> keys = jedis.hkeys(experimentKey);
 
-            for(String key : keys) {
-                if(key.contains(keyLike)) {
+            for (String key : keys) {
+                if (key.contains(keyLike)) {
                     stats.add(new ExperimentStat(parentId, prefix, key, jedis.hget(experimentKey, key)));
                 }
             }
@@ -131,6 +180,12 @@ public class JedisHelper {
         return stats;
     }
 
+    /**
+     * Get the list of statistic prefixes under the specified parent experiment object.
+     *
+     * @param parentId the ID of the parent experiment object
+     * @return a list of statistic prefixes under the specified parent experiment object
+     */
     public static List<String> getStatPrefixesByParent(long parentId) {
         List<String> experimentKeys = getKeysByParent(parentId);
         return CollectionHelper.transform(experimentKeys, new Function1<String, String>() {
@@ -141,7 +196,7 @@ public class JedisHelper {
         });
     }
 
-    public static List<Integer> getExperimentIds() {
+    private static List<Integer> getExperimentIds() {
         List<String> experimentKeys = new ArrayList<String>(jedis.keys(KEY_PREFIX_EXPERIMENT_STATS + "*"));
         return CollectionHelper.transform(experimentKeys, new Function1<String, Integer>() {
             @Override
@@ -151,11 +206,11 @@ public class JedisHelper {
         });
     }
 
-    public static List<String> getKeysByParent(long parentId) {
+    private static List<String> getKeysByParent(long parentId) {
         return new ArrayList<String>(jedis.keys(KEY_PREFIX_EXPERIMENT_STATS + parentId + "*"));
     }
 
-    public static String getKeyByParentAndPrefix(long parentId, String prefix) {
+    private static String getKeyByParentAndPrefix(long parentId, String prefix) {
         return KEY_PREFIX_EXPERIMENT_STATS + parentId + "/" + prefix;
     }
 }
