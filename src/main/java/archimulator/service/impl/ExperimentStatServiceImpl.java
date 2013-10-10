@@ -111,11 +111,6 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
     }
 
     @Override
-    public List<ExperimentStat> getStatsByParent(Experiment parent) {
-        return JedisHelper.getStatsByParent(parent.getId());
-    }
-
-    @Override
     public ExperimentStat getStatByParentAndPrefixAndKey(Experiment parent, String prefix, String key) {
         return JedisHelper.getStatByParentAndPrefixAndKey(parent.getId(), prefix, key);
     }

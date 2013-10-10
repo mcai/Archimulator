@@ -48,14 +48,6 @@ public interface ExperimentStatService extends Service {
     void clearStatsByParent(Experiment parent);
 
     /**
-     * Get the list of statistics under the specified parent experiment object.
-     *
-     * @param parent the parent experiment object
-     * @return a list of statistics under the specified parent if any exist; otherwise an empty list
-     */
-    List<ExperimentStat> getStatsByParent(Experiment parent);
-
-    /**
      * Get the statistics under the specified parent experiment object and matching the specified prefix and key.
      *
      * @param parent the parent experiment object

@@ -21,6 +21,8 @@ package archimulator.util;
 import archimulator.model.ExperimentStat;
 import net.pickapack.action.Function1;
 import net.pickapack.collection.CollectionHelper;
+import net.pickapack.io.serialization.JsonSerializationHelper;
+import net.pickapack.util.Pair;
 import redis.clients.jedis.Jedis;
 
 import java.util.*;
@@ -33,7 +35,11 @@ import java.util.*;
 public class JedisHelper {
     public static final String KEY_PREFIX_EXPERIMENT_STATS = "archimulator.experimentStatService.stats.";
 
+    private static final long MAX_TICK = 1000000000L;
+
     private static Jedis jedis;
+
+    private static long currentTick;
 
     /**
      * Static constructor.
@@ -54,9 +60,17 @@ public class JedisHelper {
 
         jedis.hmset(experimentKey, new LinkedHashMap<String, String>() {{
             for (ExperimentStat stat : stats) {
-                put(stat.getKey(), stat.getValue());
+                put(stat.getKey(), JsonSerializationHelper.serialize(new Pair<String, String>(stat.getValue(), "" + currentTick++)));
             }
         }});
+
+        checkForResetCurrentTick();
+    }
+
+    private static void checkForResetCurrentTick() {
+        if(currentTick > MAX_TICK) {
+            currentTick = 0;
+        }
     }
 
     /**
@@ -94,44 +108,42 @@ public class JedisHelper {
     }
 
     /**
-     * Get the list of statistics under the specified parent experiment object.
-     *
-     * @param parentId the ID of the parent experiment object
-     * @return a list of statistics under the specified parent if any exist; otherwise an empty list
-     */
-    public static List<ExperimentStat> getStatsByParent(long parentId) {
-        List<String> prefixes = getStatPrefixesByParent(parentId);
-
-        List<ExperimentStat> stats = new ArrayList<ExperimentStat>();
-
-        for (String prefix : prefixes) {
-            List<ExperimentStat> result = getStatsByParentAndPrefix(parentId, prefix);
-            stats.addAll(result);
-        }
-
-        return stats;
-    }
-
-    /**
      * Get the list of statistics under the specified parent experiment object and matching the specified title prefix.
      *
      * @param parentId the ID of the parent experiment object
      * @param prefix the title prefix
      * @return a list of statistics under the specified parent experiment object and matching the specified title prefix if any exist; otherwise an empty list
      */
+    @SuppressWarnings("unchecked")
     public static List<ExperimentStat> getStatsByParentAndPrefix(long parentId, String prefix) {
         String experimentKey = getKeyByParentAndPrefix(parentId, prefix);
         if (jedis.exists(experimentKey)) {
-            List<ExperimentStat> stats = new ArrayList<ExperimentStat>();
+            List<Pair<ExperimentStat, String>> stats = new ArrayList<Pair<ExperimentStat, String>>();
 
             Map<String, String> result = jedis.hgetAll(experimentKey);
 
             for (String resultKey : result.keySet()) {
-                ExperimentStat stat = new ExperimentStat(parentId, prefix, resultKey, result.get(resultKey));
-                stats.add(stat);
+                Pair<String, String> value = JsonSerializationHelper.deserialize(Pair.class, result.get(resultKey));
+
+                ExperimentStat stat = new ExperimentStat(parentId, prefix, resultKey, value.getFirst());
+                stats.add(new Pair<ExperimentStat, String>(stat, value.getSecond()));
             }
 
-            return stats;
+            Collections.sort(stats, new Comparator<Pair<ExperimentStat, String>>() {
+                @Override
+                public int compare(Pair<ExperimentStat, String> o1, Pair<ExperimentStat, String> o2) {
+                    Double first = Double.parseDouble(o1.getSecond());
+                    Double second = Double.parseDouble(o2.getSecond());
+                    return first.compareTo(second);
+                }
+            });
+
+            return CollectionHelper.transform(stats, new Function1<Pair<ExperimentStat, String>, ExperimentStat>() {
+                @Override
+                public ExperimentStat apply(Pair<ExperimentStat, String> pair) {
+                    return pair.getFirst();
+                }
+            });
         }
 
         return new ArrayList<ExperimentStat>();
@@ -145,10 +157,12 @@ public class JedisHelper {
      * @param key    the key
      * @return the statistics under the specified parent experiment object and matching the specified prefix and key if any exist; otherwise an empty list
      */
+    @SuppressWarnings("unchecked")
     public static ExperimentStat getStatByParentAndPrefixAndKey(long parentId, String prefix, String key) {
         String experimentKey = getKeyByParentAndPrefix(parentId, prefix);
         if (jedis.exists(experimentKey)) {
-            return new ExperimentStat(parentId, prefix, experimentKey, jedis.hget(experimentKey, key));
+            Pair<String, String> value = JsonSerializationHelper.deserialize(Pair.class, jedis.hget(experimentKey, key));
+            return new ExperimentStat(parentId, prefix, experimentKey, value.getFirst());
         }
 
         return null;
@@ -162,22 +176,40 @@ public class JedisHelper {
      * @param keyLike the key pattern
      * @return a list of statistics under the specified parent experiment object and matching the specified prefix and key pattern if any exist; otherwise an empty list
      */
+    @SuppressWarnings("unchecked")
     public static List<ExperimentStat> getStatsByParentAndPrefixAndKeyLike(long parentId, String prefix, String keyLike) {
         String experimentKey = getKeyByParentAndPrefix(parentId, prefix);
 
-        List<ExperimentStat> stats = new ArrayList<ExperimentStat>();
+        List<Pair<ExperimentStat, String>> stats = new ArrayList<Pair<ExperimentStat, String>>();
 
         if (jedis.exists(experimentKey)) {
             Set<String> keys = jedis.hkeys(experimentKey);
 
             for (String key : keys) {
                 if (key.contains(keyLike)) {
-                    stats.add(new ExperimentStat(parentId, prefix, key, jedis.hget(experimentKey, key)));
+                    Pair<String, String> value = JsonSerializationHelper.deserialize(Pair.class, jedis.hget(experimentKey, key));
+
+                    ExperimentStat stat = new ExperimentStat(parentId, prefix, key, value.getFirst());
+                    stats.add(new Pair<ExperimentStat, String>(stat, value.getSecond()));
                 }
             }
         }
 
-        return stats;
+        Collections.sort(stats, new Comparator<Pair<ExperimentStat, String>>() {
+            @Override
+            public int compare(Pair<ExperimentStat, String> o1, Pair<ExperimentStat, String> o2) {
+                Double first = Double.parseDouble(o1.getSecond());
+                Double second = Double.parseDouble(o2.getSecond());
+                return first.compareTo(second);
+            }
+        });
+
+        return CollectionHelper.transform(stats, new Function1<Pair<ExperimentStat, String>, ExperimentStat>() {
+            @Override
+            public ExperimentStat apply(Pair<ExperimentStat, String> pair) {
+                return pair.getFirst();
+            }
+        });
     }
 
     /**

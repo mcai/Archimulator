@@ -343,7 +343,7 @@ public class Experiment implements WithId, WithParentId, WithTitle, WithCreateTi
      * @return the statistic value as long
      */
     public long getStatValueAsLong(String prefix, String key, long defaultValue) {
-        String val = getStatValue(ServiceManager.getExperimentStatService().getStatByParentAndPrefixAndKey(this, prefix, key));
+        String val = getStatValue(ServiceManager.getExperimentStatService().getStatByParentAndPrefixAndKey(this, prefix, key), defaultValue + "");
 
         try {
             return Long.parseLong(val);
@@ -362,7 +362,7 @@ public class Experiment implements WithId, WithParentId, WithTitle, WithCreateTi
      * @return the statistic value as double
      */
     public double getStatValueAsDouble(String prefix, String key, double defaultValue) {
-        String val = getStatValue(ServiceManager.getExperimentStatService().getStatByParentAndPrefixAndKey(this, prefix, key));
+        String val = getStatValue(ServiceManager.getExperimentStatService().getStatByParentAndPrefixAndKey(this, prefix, key), defaultValue + "");
 
         try {
             return Double.parseDouble(val);
