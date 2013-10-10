@@ -335,6 +335,44 @@ public class Experiment implements WithId, WithParentId, WithTitle, WithCreateTi
     }
 
     /**
+     * Get a statistic value as long by key and default value.
+     *
+     * @param prefix       the prefix
+     * @param key          the key
+     * @param defaultValue the default value
+     * @return the statistic value as long
+     */
+    public long getStatValueAsLong(String prefix, String key, long defaultValue) {
+        String val = getStatValue(ServiceManager.getExperimentStatService().getStatByParentAndPrefixAndKey(this, prefix, key));
+
+        try {
+            return Long.parseLong(val);
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            return defaultValue;
+        }
+    }
+
+    /**
+     * Get a statistic value as double by key and default value.
+     *
+     * @param prefix       the prefix
+     * @param key          the key
+     * @param defaultValue the default value
+     * @return the statistic value as double
+     */
+    public double getStatValueAsDouble(String prefix, String key, double defaultValue) {
+        String val = getStatValue(ServiceManager.getExperimentStatService().getStatByParentAndPrefixAndKey(this, prefix, key));
+
+        try {
+            return Double.parseDouble(val);
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            return defaultValue;
+        }
+    }
+
+    /**
      * Get a statistic value from the map and by key.
      *
      * @param statsMap the statistic map

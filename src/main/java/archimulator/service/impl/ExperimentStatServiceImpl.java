@@ -37,7 +37,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Experiment stat service implementation.
@@ -147,8 +146,6 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
         if (this.getFirstItemByParent(this.summaries, parent) == null) {
             System.out.println("Creating summary for experiment #" + parent.getId() + "..");
 
-            Map<String, ExperimentStat> statsMap = ExperimentStat.toMap(ServiceManager.getExperimentStatService().getStatsByParentAndPrefix(parent, parent.getMeasurementTitlePrefix()));
-
             boolean helperThreadEnabled = parent.getContextMappings().get(0).getBenchmark().getHelperThreadEnabled();
 
             ExperimentSummary summary = new ExperimentSummary(parent);
@@ -156,10 +153,10 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
             summary.setType(parent.getType());
             summary.setState(parent.getState());
 
-            summary.setBeginTimeAsString(parent.getStatValue(statsMap, "simulation/beginTimeAsString"));
-            summary.setEndTimeAsString(parent.getStatValue(statsMap, "simulation/endTimeAsString"));
-            summary.setDuration(parent.getStatValue(statsMap, "simulation/duration"));
-            summary.setDurationInSeconds(parent.getStatValueAsLong(statsMap, "simulation/durationInSeconds", 0));
+            summary.setBeginTimeAsString(parent.getStatValue(parent.getMeasurementTitlePrefix(), "simulation/beginTimeAsString"));
+            summary.setEndTimeAsString(parent.getStatValue(parent.getMeasurementTitlePrefix(), "simulation/endTimeAsString"));
+            summary.setDuration(parent.getStatValue(parent.getMeasurementTitlePrefix(), "simulation/duration"));
+            summary.setDurationInSeconds(parent.getStatValueAsLong(parent.getMeasurementTitlePrefix(), "simulation/durationInSeconds", 0));
 
             summary.setL2Size(parent.getArchitecture().getL2Size());
             summary.setL2Associativity(parent.getArchitecture().getL2Associativity());
@@ -170,113 +167,113 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
 
             summary.setNumMainThreadWaysInStaticPartitionedLRUPolicy(parent.getArchitecture().getNumMainThreadWaysInStaticPartitionedLRUPolicy());
 
-            summary.setNumInstructions(parent.getStatValueAsLong(statsMap, "simulation/numInstructions", 0));
-            summary.setC0t0NumInstructions(parent.getStatValueAsLong(statsMap, "simulation/c0t0NumInstructions", 0));
-            summary.setC1t0NumInstructions(parent.getStatValueAsLong(statsMap, "simulation/c1t0NumInstructions", 0));
+            summary.setNumInstructions(parent.getStatValueAsLong(parent.getMeasurementTitlePrefix(), "simulation/numInstructions", 0));
+            summary.setC0t0NumInstructions(parent.getStatValueAsLong(parent.getMeasurementTitlePrefix(), "simulation/c0t0NumInstructions", 0));
+            summary.setC1t0NumInstructions(parent.getStatValueAsLong(parent.getMeasurementTitlePrefix(), "simulation/c1t0NumInstructions", 0));
 
             summary.setNumCycles(
-                    parent.getStatValueAsLong(statsMap, "simulation/cycleAccurateEventQueue/currentCycle", 0)
+                    parent.getStatValueAsLong(parent.getMeasurementTitlePrefix(), "simulation/cycleAccurateEventQueue/currentCycle", 0)
             );
 
             summary.setIpc(
-                    parent.getStatValueAsDouble(statsMap, "simulation/instructionsPerCycle", 0)
+                    parent.getStatValueAsDouble(parent.getMeasurementTitlePrefix(), "simulation/instructionsPerCycle", 0)
             );
 
             summary.setC0t0Ipc(
-                    parent.getStatValueAsDouble(statsMap, "simulation/c0t0InstructionsPerCycle", 0)
+                    parent.getStatValueAsDouble(parent.getMeasurementTitlePrefix(), "simulation/c0t0InstructionsPerCycle", 0)
             );
 
             summary.setC1t0Ipc(
-                    parent.getStatValueAsDouble(statsMap, "simulation/c1t0InstructionsPerCycle", 0)
+                    parent.getStatValueAsDouble(parent.getMeasurementTitlePrefix(), "simulation/c1t0InstructionsPerCycle", 0)
             );
 
             summary.setCpi(
-                    parent.getStatValueAsDouble(statsMap, "simulation/cyclesPerInstruction", 0)
+                    parent.getStatValueAsDouble(parent.getMeasurementTitlePrefix(), "simulation/cyclesPerInstruction", 0)
             );
 
             summary.setNumMainThreadL2CacheHits(
-                    parent.getStatValueAsLong(statsMap, "helperThreadL2CacheRequestProfilingHelper/numMainThreadL2CacheHits", 0)
+                    parent.getStatValueAsLong(parent.getMeasurementTitlePrefix(), "helperThreadL2CacheRequestProfilingHelper/numMainThreadL2CacheHits", 0)
             );
             summary.setNumMainThreadL2CacheMisses(
-                    parent.getStatValueAsLong(statsMap, "helperThreadL2CacheRequestProfilingHelper/numMainThreadL2CacheMisses", 0)
+                    parent.getStatValueAsLong(parent.getMeasurementTitlePrefix(), "helperThreadL2CacheRequestProfilingHelper/numMainThreadL2CacheMisses", 0)
             );
 
             summary.setNumHelperThreadL2CacheHits(
-                    parent.getStatValueAsLong(statsMap, "helperThreadL2CacheRequestProfilingHelper/numHelperThreadL2CacheHits", 0)
+                    parent.getStatValueAsLong(parent.getMeasurementTitlePrefix(), "helperThreadL2CacheRequestProfilingHelper/numHelperThreadL2CacheHits", 0)
             );
             summary.setNumHelperThreadL2CacheMisses(
-                    parent.getStatValueAsLong(statsMap, "helperThreadL2CacheRequestProfilingHelper/numHelperThreadL2CacheMisses", 0)
+                    parent.getStatValueAsLong(parent.getMeasurementTitlePrefix(), "helperThreadL2CacheRequestProfilingHelper/numHelperThreadL2CacheMisses", 0)
             );
 
             summary.setNumL2CacheEvictions(
-                    parent.getStatValueAsLong(statsMap, "l2/numEvictions", 0)
+                    parent.getStatValueAsLong(parent.getMeasurementTitlePrefix(), "l2/numEvictions", 0)
             );
 
             summary.setL2CacheHitRatio(
-                    parent.getStatValueAsDouble(statsMap, "l2/hitRatio", 0)
+                    parent.getStatValueAsDouble(parent.getMeasurementTitlePrefix(), "l2/hitRatio", 0)
             );
 
             summary.setL2CacheOccupancyRatio(
-                    parent.getStatValueAsDouble(statsMap, "l2/occupancyRatio", 0)
+                    parent.getStatValueAsDouble(parent.getMeasurementTitlePrefix(), "l2/occupancyRatio", 0)
             );
 
             summary.setHelperThreadL2CacheRequestCoverage(
-                    helperThreadEnabled ? parent.getStatValueAsDouble(statsMap,
+                    helperThreadEnabled ? parent.getStatValueAsDouble(parent.getMeasurementTitlePrefix(),
                             "helperThreadL2CacheRequestProfilingHelper/helperThreadL2CacheRequestCoverage", 0.0f) : 0.0f
             );
 
             summary.setHelperThreadL2CacheRequestAccuracy(
-                    helperThreadEnabled ? parent.getStatValueAsDouble(statsMap,
+                    helperThreadEnabled ? parent.getStatValueAsDouble(parent.getMeasurementTitlePrefix(),
                             "helperThreadL2CacheRequestProfilingHelper/helperThreadL2CacheRequestAccuracy", 0.0f) : 0.0f
             );
 
             summary.setHelperThreadL2CacheRequestLateness(
-                    helperThreadEnabled ? parent.getStatValueAsDouble(statsMap,
+                    helperThreadEnabled ? parent.getStatValueAsDouble(parent.getMeasurementTitlePrefix(),
                             "helperThreadL2CacheRequestProfilingHelper/helperThreadL2CacheRequestLateness", 0.0f) : 0.0f
             );
 
             summary.setHelperThreadL2CacheRequestPollution(
-                    helperThreadEnabled ? parent.getStatValueAsDouble(statsMap,
+                    helperThreadEnabled ? parent.getStatValueAsDouble(parent.getMeasurementTitlePrefix(),
                             "helperThreadL2CacheRequestProfilingHelper/helperThreadL2CacheRequestPollution", 0.0f) : 0.0f
             );
 
             summary.setHelperThreadL2CacheRequestRedundancy(
-                    helperThreadEnabled ? parent.getStatValueAsDouble(statsMap,
+                    helperThreadEnabled ? parent.getStatValueAsDouble(parent.getMeasurementTitlePrefix(),
                             "helperThreadL2CacheRequestProfilingHelper/helperThreadL2CacheRequestRedundancy", 0.0f) : 0.0f
             );
 
             summary.setNumLateHelperThreadL2CacheRequests(
-                    helperThreadEnabled ? parent.getStatValueAsLong(statsMap,
+                    helperThreadEnabled ? parent.getStatValueAsLong(parent.getMeasurementTitlePrefix(),
                             "helperThreadL2CacheRequestProfilingHelper/numLateHelperThreadL2CacheRequests", 0) : 0
             );
 
             summary.setNumTimelyHelperThreadL2CacheRequests(
-                    helperThreadEnabled ? parent.getStatValueAsLong(statsMap,
+                    helperThreadEnabled ? parent.getStatValueAsLong(parent.getMeasurementTitlePrefix(),
                             "helperThreadL2CacheRequestProfilingHelper/numTimelyHelperThreadL2CacheRequests", 0) : 0
             );
 
             summary.setNumBadHelperThreadL2CacheRequests(
-                    helperThreadEnabled ? parent.getStatValueAsLong(statsMap,
+                    helperThreadEnabled ? parent.getStatValueAsLong(parent.getMeasurementTitlePrefix(),
                             "helperThreadL2CacheRequestProfilingHelper/numBadHelperThreadL2CacheRequests", 0) : 0
             );
 
             summary.setNumEarlyHelperThreadL2CacheRequests(
-                    helperThreadEnabled ? parent.getStatValueAsLong(statsMap,
+                    helperThreadEnabled ? parent.getStatValueAsLong(parent.getMeasurementTitlePrefix(),
                             "helperThreadL2CacheRequestProfilingHelper/numEarlyHelperThreadL2CacheRequests", 0) : 0
             );
 
             summary.setNumUglyHelperThreadL2CacheRequests(
-                    helperThreadEnabled ? parent.getStatValueAsLong(statsMap,
+                    helperThreadEnabled ? parent.getStatValueAsLong(parent.getMeasurementTitlePrefix(),
                             "helperThreadL2CacheRequestProfilingHelper/numUglyHelperThreadL2CacheRequests", 0) : 0
             );
 
             summary.setNumRedundantHitToTransientTagHelperThreadL2CacheRequests(
-                    helperThreadEnabled ? parent.getStatValueAsLong(statsMap,
+                    helperThreadEnabled ? parent.getStatValueAsLong(parent.getMeasurementTitlePrefix(),
                             "helperThreadL2CacheRequestProfilingHelper/numRedundantHitToTransientTagHelperThreadL2CacheRequests", 0) : 0
             );
 
             summary.setNumRedundantHitToCacheHelperThreadL2CacheRequests(
-                    helperThreadEnabled ? parent.getStatValueAsLong(statsMap,
+                    helperThreadEnabled ? parent.getStatValueAsLong(parent.getMeasurementTitlePrefix(),
                             "helperThreadL2CacheRequestProfilingHelper/numRedundantHitToCacheHelperThreadL2CacheRequests", 0) : 0
             );
 
