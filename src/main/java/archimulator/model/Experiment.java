@@ -449,7 +449,15 @@ public class Experiment implements WithId, WithParentId, WithTitle, WithCreateTi
      * @return the statistic value
      */
     public String getStatValue(ExperimentStat stat, String defaultValue) {
-        return stat != null ? stat.getValue().replaceAll(",", "") : defaultValue;
+        if (stat != null) {
+            if (stat.getValue() != null) {
+                return stat.getValue().replaceAll(",", "");
+            }
+            else return null;
+        }
+        else {
+            return defaultValue;
+        }
     }
 
     /**

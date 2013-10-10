@@ -75,7 +75,7 @@ public class JedisHelper {
      * @param parentId the ID of the parent experiment object
      */
     public static void clearStatsByParent(long parentId) {
-        List<String> experimentKeys = getKeysByParent(parentId);
+        Set<String> experimentKeys = getKeysByParent(parentId);
 
         if (!experimentKeys.isEmpty()) {
             jedis.del(experimentKeys.toArray(new String[experimentKeys.size()]));
@@ -187,7 +187,7 @@ public class JedisHelper {
      * @return a list of statistic prefixes under the specified parent experiment object
      */
     public static List<String> getStatPrefixesByParent(long parentId) {
-        List<String> experimentKeys = getKeysByParent(parentId);
+        List<String> experimentKeys = new ArrayList<String>(getKeysByParent(parentId));
         return CollectionHelper.transform(experimentKeys, new Function1<String, String>() {
             @Override
             public String apply(String key) {
@@ -196,18 +196,23 @@ public class JedisHelper {
         });
     }
 
-    private static List<Integer> getExperimentIds() {
+    /**
+     * Get the list of experiment IDs stored in the Redis database.
+     *
+     * @return the list of experiment IDs stored in the Redis database
+     */
+    public static List<Long> getExperimentIds() {
         List<String> experimentKeys = new ArrayList<String>(jedis.keys(KEY_PREFIX_EXPERIMENT_STATS + "*"));
-        return CollectionHelper.transform(experimentKeys, new Function1<String, Integer>() {
+        return CollectionHelper.transform(experimentKeys, new Function1<String, Long>() {
             @Override
-            public Integer apply(String key) {
-                return Integer.parseInt(key.substring(key.lastIndexOf(".") + 1, key.indexOf("/")));
+            public Long apply(String key) {
+                return Long.parseLong(key.substring(key.lastIndexOf(".") + 1, key.indexOf("/")));
             }
         });
     }
 
-    private static List<String> getKeysByParent(long parentId) {
-        return new ArrayList<String>(jedis.keys(KEY_PREFIX_EXPERIMENT_STATS + parentId + "*"));
+    private static Set<String> getKeysByParent(long parentId) {
+        return jedis.keys(KEY_PREFIX_EXPERIMENT_STATS + parentId + "*");
     }
 
     private static String getKeyByParentAndPrefix(long parentId, String prefix) {

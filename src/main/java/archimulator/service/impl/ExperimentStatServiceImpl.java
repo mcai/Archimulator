@@ -70,8 +70,12 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
         });
 
         if(!experimentIds.isEmpty()) {
-            for(long experimentId : experimentIds) {
-                JedisHelper.clearStatsByParent(experimentId);
+            List<Long> storedExperimentIdWithStats = JedisHelper.getExperimentIds();
+
+            for(long storedExperimentId : storedExperimentIdWithStats) {
+                if(!experimentIds.contains(storedExperimentId)) {
+                    JedisHelper.clearStatsByParent(storedExperimentId);
+                }
             }
 
             try {
