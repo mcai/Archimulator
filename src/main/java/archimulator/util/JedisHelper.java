@@ -24,6 +24,7 @@ import net.pickapack.collection.CollectionHelper;
 import net.pickapack.io.serialization.JsonSerializationHelper;
 import net.pickapack.util.Pair;
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.Protocol;
 
 import java.util.*;
 
@@ -45,7 +46,7 @@ public class JedisHelper {
      * Static constructor.
      */
     static {
-        jedis = new Jedis("localhost");
+        jedis = new Jedis("localhost", Protocol.DEFAULT_PORT, 180000);
     }
 
     /**
