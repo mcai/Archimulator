@@ -48,7 +48,6 @@ import archimulator.sim.uncore.mlp.BLPProfilingHelper;
 import archimulator.sim.uncore.mlp.MLPProfilingHelper;
 import archimulator.sim.uncore.tlb.TranslationLookasideBuffer;
 import archimulator.util.RuntimeHelper;
-import archimulator.util.plugin.SimulationExtensionPoint;
 import net.pickapack.action.Action1;
 import net.pickapack.action.Predicate;
 import net.pickapack.collection.tree.NodeHelper;
@@ -180,11 +179,6 @@ public abstract class Simulation implements SimulationObject, Reportable {
 
         this.processor = new BasicProcessor(this.experiment, this, this.blockingEventDispatcher, this.cycleAccurateEventQueue, kernel, this.prepareMemoryHierarchy());
 
-        List<SimulationExtensionPoint> simulationExtensionPoints = ServiceManager.getPluginHelper().getPluginManager().getExtensions(SimulationExtensionPoint.class);
-        for (SimulationExtensionPoint simulationExtensionPoint : simulationExtensionPoints) {
-            simulationExtensionPoint.onInitialized(this);
-        }
-
         this.stackDistanceProfilingHelper = new StackDistanceProfilingHelper(this);
 
         this.reuseDistancePredictionHelper = new ReuseDistancePredictionHelper(this);
@@ -249,11 +243,6 @@ public abstract class Simulation implements SimulationObject, Reportable {
 
         this.beginTime = DateHelper.toTick(new Date());
 
-        List<SimulationExtensionPoint> simulationExtensionPoints = ServiceManager.getPluginHelper().getPluginManager().getExtensions(SimulationExtensionPoint.class);
-        for (SimulationExtensionPoint simulationExtensionPoint : simulationExtensionPoints) {
-            simulationExtensionPoint.onStarted(this);
-        }
-
         this.beginSimulation();
 
         try {
@@ -271,19 +260,11 @@ public abstract class Simulation implements SimulationObject, Reportable {
 
             this.endSimulation();
 
-            for (SimulationExtensionPoint simulationExtensionPoint : simulationExtensionPoints) {
-                simulationExtensionPoint.onAborted(this);
-            }
-
             throw new RuntimeException(e);
         }
 
         this.endTime = DateHelper.toTick(new Date());
         this.collectStats();
-
-        for (SimulationExtensionPoint simulationExtensionPoint : simulationExtensionPoints) {
-            simulationExtensionPoint.onStopped(this);
-        }
 
         this.endSimulation();
     }

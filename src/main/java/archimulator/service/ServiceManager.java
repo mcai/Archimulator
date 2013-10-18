@@ -21,7 +21,6 @@ package archimulator.service;
 import archimulator.model.*;
 import archimulator.service.impl.*;
 import archimulator.util.PropertiesHelper;
-import archimulator.util.plugin.PluginHelper;
 import archimulator.util.serialization.XMLSerializationHelper;
 import net.pickapack.action.Action1;
 import net.pickapack.event.BlockingEvent;
@@ -43,8 +42,6 @@ public class ServiceManager {
      */
     public static final String USER_HOME_TEMPLATE_ARG = "<user.home>";
 
-    private static PluginHelper pluginHelper;
-
     private static BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher;
 
     private static BenchmarkService benchmarkService;
@@ -62,8 +59,6 @@ public class ServiceManager {
     static {
         System.out.println("Archimulator (version: " + PropertiesHelper.getVersion() + ") - CMP Architectural Simulator Written in Java.\n");
         System.out.println("Copyright (c) 2010-2013 by Min Cai (min.cai.china@gmail.com).\n");
-
-        pluginHelper = new PluginHelper();
 
         blockingEventDispatcher = new BlockingEventDispatcher<BlockingEvent>();
 
@@ -212,15 +207,6 @@ public class ServiceManager {
         }
 
         System.out.printf("  %% completion of task %s: %.4f\n\n", task.getTitle(), (double) numCompleted / numTotal);
-    }
-
-    /**
-     * Get the plugin helper.
-     *
-     * @return the plugin helper
-     */
-    public static PluginHelper getPluginHelper() {
-        return pluginHelper;
     }
 
     /**
