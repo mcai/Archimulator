@@ -1,7 +1,7 @@
 #ifndef PUSH_PARAMS_H_
 #define PUSH_PARAMS_H_
     
-#define LOOKAHEAD 160
-#define STRIDE 50
+#define LOOKAHEAD 10
+#define STRIDE 10
 
 #endif

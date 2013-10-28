@@ -16,9 +16,8 @@ inline void push_thread_func()
 
 	while(1)
 	{
-		while(!push_flag)
-		{asm("pause");}
-		asm("pause");
+		while(!push_flag);
+
 		switch(push_flag)
 		{
 			case 1:

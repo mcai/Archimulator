@@ -67,6 +67,16 @@ public class BenchmarkServiceImpl extends AbstractService implements BenchmarkSe
                 "40000 128 75 1")); //TODO: 200,000 as in [Changhee Jung, IPDPS'06]
 
         this.addBenchmarkIfNotExists(new Benchmark(
+                "health_baseline", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/health/baseline",
+                "health.mips",
+                ""));
+
+        this.addBenchmarkIfNotExists(new Benchmark(
+                "tsp_baseline", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/tsp/baseline",
+                "tsp.mips",
+                ""));
+
+        this.addBenchmarkIfNotExists(new Benchmark(
                 "429_mcf_baseline", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline",
                 "429.mcf.mips",
                 ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline/data/ref/input/inp.in"));
@@ -87,6 +97,16 @@ public class BenchmarkServiceImpl extends AbstractService implements BenchmarkSe
                 "em3d_ht", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/em3d/ht",
                 "em3d.mips",
                 "40000 128 75 1", "", true));
+
+        this.addBenchmarkIfNotExists(new Benchmark(
+                "health_ht", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/health/ht",
+                "health.mips",
+                "", "", true));
+
+        this.addBenchmarkIfNotExists(new Benchmark(
+                "tsp_ht", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/tsp/ht",
+                "tsp.mips",
+                "", "", true));
 
         this.addBenchmarkIfNotExists(new Benchmark(
                 "429_mcf_ht", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht",
@@ -111,6 +131,16 @@ public class BenchmarkServiceImpl extends AbstractService implements BenchmarkSe
                 "4000 128 75 1")); //TODO: 200,000 as in [Changhee Jung, IPDPS'06]
 
         this.addBenchmarkIfNotExists(new Benchmark(
+                "health_baseline_micro", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/health/baseline",
+                "health.mips",
+                ""));
+
+        this.addBenchmarkIfNotExists(new Benchmark(
+                "tsp_baseline_micro", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/tsp/baseline",
+                "tsp.mips",
+                ""));
+
+        this.addBenchmarkIfNotExists(new Benchmark(
                 "429_mcf_baseline_micro", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline",
                 "429.mcf.mips",
                 ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline/data/ref/input/inp.in"));
@@ -131,6 +161,16 @@ public class BenchmarkServiceImpl extends AbstractService implements BenchmarkSe
                 "em3d_ht_micro", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/em3d/ht",
                 "em3d.mips",
                 "4000 128 75 1", "", true));
+
+        this.addBenchmarkIfNotExists(new Benchmark(
+                "health_ht_micro", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/health/ht",
+                "health.mips",
+                "", "", true));
+
+        this.addBenchmarkIfNotExists(new Benchmark(
+                "tsp_ht_micro", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/tsp/ht",
+                "tsp.mips",
+                "", "", true));
 
         this.addBenchmarkIfNotExists(new Benchmark(
                 "429_mcf_ht_micro", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht",

@@ -28,8 +28,7 @@ inline void push_thread_func()
 	struct List volatile *curr_list;
 	struct List volatile **to_curr_list;
   while(1){	
-	while(!push_flag)
-	 {asm("pause");}
+	while(!push_flag);
 
 	curr_list=g_list;
      	curr_t=g_valiage;
