@@ -3,10 +3,6 @@
 #include "health.h"
 #include "push.h"
 
-#define PUSHDATA(addr) asm volatile ("prefetcht1 (%0)"::"r"(addr))
-
-pthread_t push_thread_id;
-
 int volatile tmp_cur_addr;
 int volatile tmp_curr_addr;
 volatile int __attribute__((aligned(64))) push_flag=0;

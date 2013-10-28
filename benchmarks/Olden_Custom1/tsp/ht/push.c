@@ -4,8 +4,6 @@
 
 #include "push.h"
 
-#define PUSHDATA(ADDR) asm volatile  ("prefetcht1 (%0)"::"r"(ADDR))
-
 Tree volatile tmp_a,case2_t;
 Tree volatile __attribute__((aligned(64))) g_curr_pointer;
 volatile int __attribute__((aligned(64))) push_flag=0;
@@ -32,12 +30,12 @@ inline void push_thread_func()
 			    {	
 					for(i=0; push_flag && i< LOOKAHEAD && p_push != p_stop;i++)
 					{	p_push=p_push->next;
-						PUSHDATA(p_push->next);
+						__builtin_prefetch(p_push->next);
 					}
 
 					for(i=0 ; push_flag && i< STRIDE && p_push != p_stop; i++)
 					{
-						PUSHDATA(&(p_push->x));
+						__builtin_prefetch(&(p_push->x));
 						p_push=p_push->next;
 					}
 
