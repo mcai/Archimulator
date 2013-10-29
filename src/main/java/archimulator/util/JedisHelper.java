@@ -244,10 +244,25 @@ public class JedisHelper {
         });
     }
 
+    /**
+     * Get the set of keys by the specified parent.
+     *
+     * @param parentId the ID of the parent
+     *
+     * @return the set of keys matched by the specified parent
+     */
     private static Set<String> getKeysByParent(long parentId) {
         return jedis.keys(KEY_PREFIX_EXPERIMENT_STATS + parentId + "*");
     }
 
+    /**
+     * Get the key matching the specified parent and prefix.
+     *
+     * @param parentId the ID of the parent
+     * @param prefix the prefix
+     *
+     * @return the key matching the specified parent and prefix
+     */
     private static String getKeyByParentAndPrefix(long parentId, String prefix) {
         return KEY_PREFIX_EXPERIMENT_STATS + parentId + "/" + prefix;
     }
