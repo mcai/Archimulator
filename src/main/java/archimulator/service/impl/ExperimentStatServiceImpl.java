@@ -54,6 +54,8 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
 
     private Dao<ExperimentSummary, Long> summaries;
 
+    private transient List<ExperimentStat> lastExperimentStats;
+
     /**
      * Create an experiment stat service implementation.
      */
@@ -62,6 +64,8 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
         super(ServiceManager.getDatabaseUrl(), Arrays.<Class<? extends WithId>>asList(ExperimentSummary.class));
 
         this.summaries = createDao(ExperimentSummary.class);
+
+        this.lastExperimentStats = null;
     }
 
     @Override
@@ -205,12 +209,18 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
 
     @SuppressWarnings("unchecked")
     private List<ExperimentStat> getStatsByParent(Experiment parent) {
+        if(lastExperimentStats != null && !lastExperimentStats.isEmpty() && lastExperimentStats.get(0).getParentId() == parent.getId()) {
+            return this.lastExperimentStats;
+        }
+
         File file = new File(FILE_NAME_EXPERIMENT_STATS + "/" + parent.getId() + ".json");
 
         if (file.exists()) {
             try {
                 String json = FileUtils.readFileToString(file);
-                return JsonSerializationHelper.deserialize(ExperimentStat.ExperimentStatListContainer.class, json).getStats();
+                List<ExperimentStat> stats = JsonSerializationHelper.deserialize(ExperimentStat.ExperimentStatListContainer.class, json).getStats();
+                lastExperimentStats = stats;
+                return stats;
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
