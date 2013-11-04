@@ -21,6 +21,7 @@ package archimulator.model;
 import archimulator.service.ServiceManager;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Experiment statistic.
@@ -28,6 +29,37 @@ import java.io.Serializable;
  * @author Min Cai
  */
 public class ExperimentStat implements Serializable {
+    /**
+     * Experiment statistic list container.
+     */
+    public static class ExperimentStatListContainer {
+        private List<ExperimentStat> stats;
+
+        /**
+         * Create an experiment statistic list container.
+         */
+        public ExperimentStatListContainer() {
+        }
+
+        /**
+         * Create an experiment statistic list container.
+         *
+         * @param stats the list of experiment statistics.
+         */
+        public ExperimentStatListContainer(List<ExperimentStat> stats) {
+            this.stats = stats;
+        }
+
+        /**
+         * Get the list of experiment statistics.
+         *
+         * @return the list of experiment statistics
+         */
+        public List<ExperimentStat> getStats() {
+            return stats;
+        }
+    }
+
     private long parentId;
 
     private String prefix;

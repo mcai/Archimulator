@@ -23,19 +23,25 @@ import archimulator.model.ExperimentStat;
 import archimulator.model.ExperimentSummary;
 import archimulator.service.ExperimentStatService;
 import archimulator.service.ServiceManager;
-import archimulator.util.JedisHelper;
+import archimulator.util.ExperimentStatHelper;
 import archimulator.util.plot.Table;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.PreparedDelete;
 import net.pickapack.action.Function1;
 import net.pickapack.collection.CollectionHelper;
+import net.pickapack.io.serialization.JsonSerializationHelper;
 import net.pickapack.model.WithId;
 import net.pickapack.service.AbstractService;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -44,6 +50,8 @@ import java.util.List;
  * @author Min Cai
  */
 public class ExperimentStatServiceImpl extends AbstractService implements ExperimentStatService {
+    public static final String FILE_NAME_EXPERIMENT_STATS = "experiment_stats";
+
     private Dao<ExperimentSummary, Long> summaries;
 
     /**
@@ -60,6 +68,8 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
     public void initialize() {
         System.out.println("Cleaning up experiment stats and summaries..");
 
+        ExperimentStatHelper.main(null);
+
         List<Experiment> experiments = ServiceManager.getExperimentService().getAllExperiments();
 
         List<Long> experimentIds = CollectionHelper.transform(experiments, new Function1<Experiment, Long>() {
@@ -70,11 +80,14 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
         });
 
         if(!experimentIds.isEmpty()) {
-            List<Long> storedExperimentIdWithStats = JedisHelper.getExperimentIds();
+            Collection<File> files = FileUtils.listFiles(new File(FILE_NAME_EXPERIMENT_STATS), new String[]{"json"}, true);
 
-            for(long storedExperimentId : storedExperimentIdWithStats) {
+            for(File file : files) {
+                String baseName = FilenameUtils.getBaseName(file.getAbsolutePath());
+                long storedExperimentId = Long.parseLong(baseName);
+
                 if(!experimentIds.contains(storedExperimentId)) {
-                    JedisHelper.clearStatsByParent(storedExperimentId);
+                    clearStatsByParentId(storedExperimentId);
                 }
             }
 
@@ -97,7 +110,21 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
             throw new IllegalArgumentException();
         }
 
-        JedisHelper.addStatsByParent(parent.getId(), stats);
+        String json = JsonSerializationHelper.serialize(stats);
+
+        File file = new File(FILE_NAME_EXPERIMENT_STATS + "/" + parent.getId() + ".json");
+
+        if (!file.getParentFile().exists()) {
+            if (!file.getParentFile().mkdirs()) {
+                throw new RuntimeException();
+            }
+        }
+
+        try {
+            FileUtils.writeStringToFile(file, json);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         invalidateSummaryByParent(parent);
     }
@@ -105,29 +132,91 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
     @Override
     @SuppressWarnings("unchecked")
     public void clearStatsByParent(Experiment parent) {
-        JedisHelper.clearStatsByParent(parent.getId());
+        clearStatsByParentId(parent.getId());
 
         invalidateSummaryByParent(parent);
     }
 
+    private void clearStatsByParentId(Long parentId) {
+        File file = new File(FILE_NAME_EXPERIMENT_STATS + "/" + parentId + ".json");
+
+        if(file.exists()) {
+            file.delete();
+        }
+    }
+
     @Override
     public ExperimentStat getStatByParentAndPrefixAndKey(Experiment parent, String prefix, String key) {
-        return JedisHelper.getStatByParentAndPrefixAndKey(parent.getId(), prefix, key);
+        List<ExperimentStat> stats = getStatsByParent(parent);
+
+        for(ExperimentStat stat : stats) {
+            if(stat.getPrefix().equals(prefix) && stat.getKey().equals(key)) {
+                return stat;
+            }
+        }
+
+        return null;
     }
 
     @Override
     public List<ExperimentStat> getStatsByParentAndPrefixAndKeyLike(Experiment parent, String prefix, String keyLike) {
-        return JedisHelper.getStatsByParentAndPrefixAndKeyLike(parent.getId(), prefix, keyLike);
+        List<ExperimentStat> stats = getStatsByParent(parent);
+
+        List<ExperimentStat> result = new ArrayList<ExperimentStat>();
+
+        for(ExperimentStat stat : stats) {
+            if(stat.getPrefix().equals(prefix) && stat.getKey().contains(keyLike)) {
+                result.add(stat);
+            }
+        }
+
+        return result;
     }
 
     @Override
     public List<ExperimentStat> getStatsByParentAndPrefix(Experiment parent, String prefix) {
-        return JedisHelper.getStatsByParentAndPrefix(parent.getId(), prefix);
+        List<ExperimentStat> stats = getStatsByParent(parent);
+
+        List<ExperimentStat> result = new ArrayList<ExperimentStat>();
+
+        for(ExperimentStat stat : stats) {
+            if(stat.getPrefix().equals(prefix)) {
+                result.add(stat);
+            }
+        }
+
+        return result;
     }
 
     @Override
     public List<String> getStatPrefixesByParent(Experiment parent) {
-        return JedisHelper.getStatPrefixesByParent(parent.getId());
+        List<ExperimentStat> stats = getStatsByParent(parent);
+
+        List<String> prefixes = new ArrayList<String>();
+
+        for(ExperimentStat stat : stats) {
+            if(!prefixes.contains(stat.getPrefix())) {
+                prefixes.add(stat.getPrefix());
+            }
+        }
+
+        return prefixes;
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<ExperimentStat> getStatsByParent(Experiment parent) {
+        File file = new File(FILE_NAME_EXPERIMENT_STATS + "/" + parent.getId() + ".json");
+
+        if (file.exists()) {
+            try {
+                String json = FileUtils.readFileToString(file);
+                return JsonSerializationHelper.deserialize(ExperimentStat.ExperimentStatListContainer.class, json).getStats();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return new ArrayList<ExperimentStat>();
     }
 
     @Override

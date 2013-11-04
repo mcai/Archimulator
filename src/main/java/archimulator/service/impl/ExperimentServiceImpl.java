@@ -167,7 +167,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
         try {
             UpdateBuilder<Experiment, Long> updateBuilder = this.experiments.updateBuilder();
             updateBuilder.where().eq("state", ExperimentState.READY_TO_RUN).or().eq("state", ExperimentState.RUNNING);
-            updateBuilder.updateColumnValue("state", ExperimentState.PENDING);
+            updateBuilder.updateColumnValue("state", ExperimentState.READY_TO_RUN);
             updateBuilder.updateColumnValue("failedReason", "");
 
             PreparedUpdate<Experiment> update = updateBuilder.prepare();
