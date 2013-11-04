@@ -45,7 +45,7 @@ public class ExperimentStatHelper {
         List<Experiment> experiments = ServiceManager.getExperimentService().getAllExperiments();
 
         for (Experiment experiment : experiments) {
-            if(experiment.getState() == ExperimentState.COMPLETED) {
+            if (experiment.getState() == ExperimentState.COMPLETED) {
                 List<ExperimentStat> stats = new ArrayList<ExperimentStat>();
 
                 List<String> statPrefixes = JedisHelper.getStatPrefixesByParent(experiment.getId());
@@ -54,7 +54,11 @@ public class ExperimentStatHelper {
                     stats.addAll(JedisHelper.getStatsByParentAndPrefix(experiment.getId(), statPrefix));
                 }
 
-                String json = JsonSerializationHelper.serialize(new ExperimentStat.ExperimentStatListContainer(stats));
+                String json = JsonSerializationHelper.serialize(
+                        new ExperimentStat.ExperimentStatListContainer(
+                                experiment.getParent().getTitle(), experiment.getTitle(), stats
+                        )
+                );
 
                 String path = "experiment_stats/" + experiment.getId() + ".json";
                 File file = new File(path);

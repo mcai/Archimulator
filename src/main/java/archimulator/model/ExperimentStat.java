@@ -33,6 +33,9 @@ public class ExperimentStat implements Serializable {
      * Experiment statistic list container.
      */
     public static class ExperimentStatListContainer {
+        private String experimentPackTitle;
+        private String experimentTitle;
+
         private List<ExperimentStat> stats;
 
         /**
@@ -44,10 +47,33 @@ public class ExperimentStat implements Serializable {
         /**
          * Create an experiment statistic list container.
          *
-         * @param stats the list of experiment statistics.
+         * @param experimentPackTitle the experiment pack title
+         * @param experimentTitle     the experiment title
+         * @param stats               the list of experiment statistics.
          */
-        public ExperimentStatListContainer(List<ExperimentStat> stats) {
+        public ExperimentStatListContainer(String experimentPackTitle, String experimentTitle, List<ExperimentStat> stats) {
+            this.experimentPackTitle = experimentPackTitle;
+            this.experimentTitle = experimentTitle;
+
             this.stats = stats;
+        }
+
+        /**
+         * Get the experiment pack title.
+         *
+         * @return the experiment pack title
+         */
+        public String getExperimentPackTitle() {
+            return experimentPackTitle;
+        }
+
+        /**
+         * Get the experiment title.
+         *
+         * @return the experiment title
+         */
+        public String getExperimentTitle() {
+            return experimentTitle;
         }
 
         /**
@@ -77,10 +103,10 @@ public class ExperimentStat implements Serializable {
     /**
      * Create an experiment statistic.
      *
-     * @param parentId  the parent experiment ID
-     * @param prefix  the prefix
-     * @param key     the key
-     * @param value   the value
+     * @param parentId the parent experiment ID
+     * @param prefix   the prefix
+     * @param key      the key
+     * @param value    the value
      */
     public ExperimentStat(long parentId, String prefix, String key, String value) {
         this.parentId = parentId;
