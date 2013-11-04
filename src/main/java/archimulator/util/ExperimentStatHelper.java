@@ -46,36 +46,38 @@ public class ExperimentStatHelper {
 
         for (Experiment experiment : experiments) {
             if (experiment.getState() == ExperimentState.COMPLETED) {
-                List<ExperimentStat> stats = new ArrayList<ExperimentStat>();
-
-                List<String> statPrefixes = JedisHelper.getStatPrefixesByParent(experiment.getId());
-
-                for (String statPrefix : statPrefixes) {
-                    stats.addAll(JedisHelper.getStatsByParentAndPrefix(experiment.getId(), statPrefix));
-                }
-
-                String json = JsonSerializationHelper.serialize(
-                        new ExperimentStat.ExperimentStatListContainer(
-                                experiment.getParent().getTitle(), experiment.getTitle(), stats
-                        )
-                );
-
                 String path = "experiment_stats/" + experiment.getId() + ".json";
                 File file = new File(path);
 
-                if (!file.getParentFile().exists()) {
-                    if (!file.getParentFile().mkdirs()) {
-                        throw new RuntimeException();
+                if(!file.exists()) {
+                    List<ExperimentStat> stats = new ArrayList<ExperimentStat>();
+
+                    List<String> statPrefixes = JedisHelper.getStatPrefixesByParent(experiment.getId());
+
+                    for (String statPrefix : statPrefixes) {
+                        stats.addAll(JedisHelper.getStatsByParentAndPrefix(experiment.getId(), statPrefix));
                     }
-                }
 
-                try {
-                    FileUtils.writeStringToFile(file, json);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                    String json = JsonSerializationHelper.serialize(
+                            new ExperimentStat.ExperimentStatListContainer(
+                                    experiment.getParent().getTitle(), experiment.getTitle(), stats
+                            )
+                    );
 
-                System.out.println("Experiment #" + experiment.getId() + "'s statistics has been written to " + path);
+                    if (!file.getParentFile().exists()) {
+                        if (!file.getParentFile().mkdirs()) {
+                            throw new RuntimeException();
+                        }
+                    }
+
+                    try {
+                        FileUtils.writeStringToFile(file, json);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    System.out.println("Experiment #" + experiment.getId() + "'s statistics has been written to " + path);
+                }
             }
         }
     }
