@@ -411,6 +411,10 @@ public abstract class Simulation implements SimulationObject, Reportable {
     private void advanceOneCycle() {
         this.doHouseKeeping();
         this.getCycleAccurateEventQueue().advanceOneCycle();
+
+        if (this.getCycleAccurateEventQueue().getCurrentCycle() % (this.type == SimulationType.FAST_FORWARD ? 100000000 : 10000000) == 0) {
+            ServiceManager.getExperimentService().updateExperiment(this.experiment);
+        }
     }
 
     /**

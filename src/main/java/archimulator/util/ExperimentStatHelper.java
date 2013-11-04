@@ -36,6 +36,11 @@ import java.util.List;
  * @author Min Cai
  */
 public class ExperimentStatHelper {
+    /**
+     * Entry point.
+     *
+     * @param args the arguments
+     */
     public static void main(String[] args) {
         List<Experiment> experiments = ServiceManager.getExperimentService().getAllExperiments();
 
