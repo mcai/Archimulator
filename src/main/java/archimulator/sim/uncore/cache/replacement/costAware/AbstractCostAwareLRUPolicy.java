@@ -16,35 +16,34 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.cache.replacement;
+package archimulator.sim.uncore.cache.replacement.costAware;
 
-import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.Cache;
-import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.cache.EvictableCache;
+import archimulator.sim.uncore.cache.replacement.LRUPolicy;
 import net.pickapack.util.ValueProvider;
 import net.pickapack.util.ValueProviderFactory;
 
 import java.io.Serializable;
 
 /**
- * Cost based least recently used (LRU) policy.
+ * Abstract cost aware least recently used (LRU) policy.
  *
  * @param <StateT> the state type of the parent evictable cache
  * @author Min Cai
  */
-public abstract class CostBasedLRUPolicy<StateT extends Serializable> extends LRUPolicy<StateT> {
+public abstract class AbstractCostAwareLRUPolicy<StateT extends Serializable> extends LRUPolicy<StateT> {
     protected Cache<Boolean> mirrorCache;
     protected int lambda;
 
     /**
-     * Create a cost based least recently used (LRU) policy.
+     * Create an abstract cost aware least recently used (LRU) policy.
      *
      * @param cache the parent evictable cache
      * @param lambda the lambda value
      */
-    public CostBasedLRUPolicy(EvictableCache<StateT> cache, int lambda) {
+    public AbstractCostAwareLRUPolicy(EvictableCache<StateT> cache, int lambda) {
         super(cache);
         this.lambda = lambda;
         this.mirrorCache = new Cache<Boolean>(cache, cache.getName() + ".costBasedLRUPolicy.mirrorCache", cache.getGeometry(), new ValueProviderFactory<Boolean, ValueProvider<Boolean>>() {
@@ -53,34 +52,6 @@ public abstract class CostBasedLRUPolicy<StateT extends Serializable> extends LR
                 return new BooleanValueProvider();
             }
         });
-    }
-
-    /**
-     * Handle a cache replacement.
-     *
-     * @param access the memory hierarchy access
-     * @param set    the set index
-     * @param tag    the tag
-     * @return the newly created cache access object
-     */
-    @Override
-    public CacheAccess<StateT> handleReplacement(MemoryHierarchyAccess access, int set, int tag) {
-        int victimLinearSum = Integer.MAX_VALUE;
-        int victimWay = 0;
-
-        for(int way = 0; way < this.getCache().getAssociativity(); way++) {
-            int recency = this.getCache().getAssociativity() - getStackPosition(set, way);
-            int quantizedCost = this.getQuantizedCost(this.getCost(set, way));
-
-            int linearSum = recency + lambda * quantizedCost;
-
-            if (linearSum < victimLinearSum) {
-                victimLinearSum = linearSum;
-                victimWay = way;
-            }
-        }
-
-        return new CacheAccess<StateT>(this.getCache(), access, set, victimWay, tag);
     }
 
     /**

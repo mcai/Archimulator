@@ -25,7 +25,7 @@ import archimulator.sim.uncore.cache.partitioning.minMiss.MinMissCachePartitioni
 import archimulator.sim.uncore.cache.partitioning.mlpAware.MLPAwareCachePartitioningHelper;
 import archimulator.sim.uncore.cache.replacement.helperThread.HelperThreadAwareLRUPolicy;
 import archimulator.sim.uncore.cache.replacement.helperThread.HelperThreadIntervalAwareLRUPolicy;
-import archimulator.sim.uncore.cache.replacement.mlpAware.LinearMLPAwareLRUPolicy;
+import archimulator.sim.uncore.cache.replacement.costAware.mlp.LinearMLPAwareLRUPolicy;
 import archimulator.sim.uncore.cache.replacement.partitioned.HelperThreadAndMLPAwarePartitionedLRUPolicy;
 import archimulator.sim.uncore.cache.replacement.partitioned.SimpleStaticPartitionedLRUPolicy;
 import archimulator.sim.uncore.cache.replacement.partitioned.StaticPartitionedLRUPolicy;

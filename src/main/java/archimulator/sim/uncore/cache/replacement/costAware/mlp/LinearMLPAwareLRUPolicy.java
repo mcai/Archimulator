@@ -16,10 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.cache.replacement.mlpAware;
+package archimulator.sim.uncore.cache.replacement.costAware.mlp;
 
 import archimulator.sim.uncore.cache.EvictableCache;
-import archimulator.sim.uncore.cache.replacement.CostBasedLRUPolicy;
+import archimulator.sim.uncore.cache.replacement.costAware.CostBasedLRUPolicy;
 import archimulator.sim.uncore.mlp.MLPProfilingHelper;
 import net.pickapack.action.Action1;
 
