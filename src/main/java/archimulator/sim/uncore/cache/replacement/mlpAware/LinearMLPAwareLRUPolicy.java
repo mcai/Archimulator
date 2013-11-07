@@ -18,16 +18,10 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache.replacement.mlpAware;
 
-import archimulator.sim.uncore.MemoryHierarchyAccess;
-import archimulator.sim.uncore.cache.Cache;
-import archimulator.sim.uncore.cache.CacheAccess;
-import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.cache.EvictableCache;
-import archimulator.sim.uncore.cache.replacement.LRUPolicy;
+import archimulator.sim.uncore.cache.replacement.CostBasedLRUPolicy;
 import archimulator.sim.uncore.mlp.MLPProfilingHelper;
 import net.pickapack.action.Action1;
-import net.pickapack.util.ValueProvider;
-import net.pickapack.util.ValueProviderFactory;
 
 import java.io.Serializable;
 
@@ -37,103 +31,26 @@ import java.io.Serializable;
  * @param <StateT> the state type of the parent evictable cache
  * @author Min Cai
  */
-public class LinearMLPAwareLRUPolicy<StateT extends Serializable> extends LRUPolicy<StateT> {
-    private Cache<Boolean> mirrorCache;
-
-    private int lambda;
-
+public class LinearMLPAwareLRUPolicy<StateT extends Serializable> extends CostBasedLRUPolicy<StateT> {
     /**
      * Create a linear-MLP aware least recently used (LRU) policy for the specified evictable cache.
      *
      * @param cache the parent evictable cache
-     * @param lambda the lambda
+     * @param lambda the lambda value
      */
     public LinearMLPAwareLRUPolicy(EvictableCache<StateT> cache, int lambda) {
-        super(cache);
-
-        this.mirrorCache = new Cache<Boolean>(cache, cache.getName() + ".reuseDistancePredictionPolicy.mirrorCache", cache.getGeometry(), new ValueProviderFactory<Boolean, ValueProvider<Boolean>>() {
-            @Override
-            public ValueProvider<Boolean> createValueProvider(Object... args) {
-                return new BooleanValueProvider();
-            }
-        });
-
-        this.lambda = lambda;
+        super(cache, lambda);
 
         cache.getBlockingEventDispatcher().addListener(MLPProfilingHelper.L2MissMLPProfiledEvent.class, new Action1<MLPProfilingHelper.L2MissMLPProfiledEvent>() {
             @Override
             public void apply(MLPProfilingHelper.L2MissMLPProfiledEvent event) {
-                CacheLine<Boolean> mirrorLine = mirrorCache.getLine(event.getSet(), event.getWay());
-                BooleanValueProvider stateProvider = (BooleanValueProvider) mirrorLine.getStateProvider();
-                stateProvider.mlpCost = event.getPendingL2Miss().getMlpCost();
+                setCost(event.getSet(), event.getWay(), event.getPendingL2Miss().getMlpCost());
             }
         });
     }
 
-    /**
-     * Handle a cache replacement.
-     *
-     * @param access the memory hierarchy access
-     * @param set    the set index
-     * @param tag    the tag
-     * @return the newly created cache access object
-     */
     @Override
-    public CacheAccess<StateT> handleReplacement(MemoryHierarchyAccess access, int set, int tag) {
-        int victimLinearSum = Integer.MAX_VALUE;
-        int victimWay = 0;
-
-        for (CacheLine<Boolean> mirrorLine : this.mirrorCache.getLines(set)) {
-            BooleanValueProvider stateProvider = (BooleanValueProvider) mirrorLine.getStateProvider();
-
-            int way = mirrorLine.getWay();
-
-            int recency = getCache().getAssociativity() - getStackPosition(set, way);
-            int quantizedMlpCost = getCache().getSimulation().getMlpProfilingHelper().getMlpCostQuantizer().quantize((int) stateProvider.mlpCost);
-
-            int linearSum = recency + lambda * quantizedMlpCost;
-
-            if(linearSum < victimLinearSum) {
-                victimLinearSum = linearSum;
-                victimWay = way;
-            }
-        }
-
-        return new CacheAccess<StateT>(this.getCache(), access, set, victimWay, tag);
-    }
-
-    /**
-     * Boolean value provider.
-     */
-    private class BooleanValueProvider implements ValueProvider<Boolean> {
-        private boolean state;
-        private double mlpCost;
-
-        /**
-         * Create a boolean value provider.
-         */
-        private BooleanValueProvider() {
-            this.state = true;
-        }
-
-        /**
-         * Get the state.
-         *
-         * @return the state
-         */
-        @Override
-        public Boolean get() {
-            return state;
-        }
-
-        /**
-         * Get the initial state.
-         *
-         * @return the initial state
-         */
-        @Override
-        public Boolean getInitialValue() {
-            return true;
-        }
+    protected int getQuantizedCost(double cost) {
+        return getCache().getSimulation().getMlpProfilingHelper().getMlpCostQuantizer().quantize((int) cost);
     }
 }
