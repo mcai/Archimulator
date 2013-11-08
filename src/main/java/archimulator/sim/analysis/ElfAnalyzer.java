@@ -247,7 +247,7 @@ public class ElfAnalyzer {
                 pw.print("\tbb" + basicBlock.getNum() + ": \t; type = " + basicBlock.getType() + "; ");
                 pw.print("  preds = ");
 
-                List<String> preds = new ArrayList<String>();
+                List<String> preds = new ArrayList<>();
 
                 for (ControlFlowGraphEdge incomingEdge : basicBlock.getIncomingEdges()) {
                     preds.add("bb" + incomingEdge.getFrom().getNum());

@@ -26,6 +26,8 @@ import java.util.List;
 
 /**
  * Report node.
+ *
+ * @author Min Cai
  */
 public class ReportNode implements Serializable {
     private ReportNode parent;
@@ -54,7 +56,7 @@ public class ReportNode implements Serializable {
         this.parent = parent;
         this.key = key;
         this.value = value;
-        this.children = new ArrayList<ReportNode>();
+        this.children = new ArrayList<>();
     }
 
     /**

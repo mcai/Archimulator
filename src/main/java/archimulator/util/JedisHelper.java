@@ -67,6 +67,9 @@ public class JedisHelper {
         checkForResetCurrentTick();
     }
 
+    /**
+     * Check for resetting the current tick.
+     */
     private static void checkForResetCurrentTick() {
         if(currentTick > MAX_TICK) {
             currentTick = 0;
@@ -138,7 +141,7 @@ public class JedisHelper {
             return stats.stream().map(Pair::getFirst).collect(Collectors.toList());
         }
 
-        return new ArrayList<ExperimentStat>();
+        return new ArrayList<>();
     }
 
     /**
