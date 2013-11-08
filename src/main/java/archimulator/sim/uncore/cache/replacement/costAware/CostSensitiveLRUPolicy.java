@@ -32,9 +32,6 @@ import java.io.Serializable;
  * @author Min Cai
  */
 public abstract class CostSensitiveLRUPolicy<StateT extends Serializable> extends AbstractCostAwareLRUPolicy<StateT> {
-    protected Cache<Boolean> mirrorCache;
-    protected int lambda;
-
     /**
      * Create a cost sensitive least recently used (LRU) policy.
      *
