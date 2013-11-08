@@ -51,7 +51,7 @@ public class LRUPolicy<StateT extends Serializable> extends StackBasedCacheRepla
      */
     @Override
     public CacheAccess<StateT> handleReplacement(MemoryHierarchyAccess access, int set, int tag) {
-        return new CacheAccess<StateT>(this.getCache(), access, set, this.getLRU(set), tag);
+        return new CacheAccess<>(this.getCache(), access, set, this.getLRU(set), tag);
     }
 
     /**

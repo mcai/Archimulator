@@ -39,7 +39,7 @@ public class ReturnAddressStack {
     public ReturnAddressStack(int size) {
         this.size = size;
 
-        this.entries = new ArrayList<BranchTargetBufferEntry>();
+        this.entries = new ArrayList<>();
         for (int i = 0; i < this.size; i++) {
             this.entries.add(new BranchTargetBufferEntry());
         }

@@ -69,11 +69,11 @@ public enum RegisterDependencyType {
      */
     public static Pair<RegisterDependencyType, Integer> parse(int dependency) {
         if (dependency < ArchitecturalRegisterFile.NUM_INT_REGISTERS) {
-            return new Pair<RegisterDependencyType, Integer>(RegisterDependencyType.INTEGER, dependency);
+            return new Pair<>(RegisterDependencyType.INTEGER, dependency);
         } else if (dependency < ArchitecturalRegisterFile.NUM_INT_REGISTERS + ArchitecturalRegisterFile.NUM_FLOAT_REGISTERS) {
-            return new Pair<RegisterDependencyType, Integer>(RegisterDependencyType.FLOAT, dependency - ArchitecturalRegisterFile.NUM_INT_REGISTERS);
+            return new Pair<>(RegisterDependencyType.FLOAT, dependency - ArchitecturalRegisterFile.NUM_INT_REGISTERS);
         } else {
-            return new Pair<RegisterDependencyType, Integer>(RegisterDependencyType.MISC, dependency - ArchitecturalRegisterFile.NUM_INT_REGISTERS - ArchitecturalRegisterFile.NUM_FLOAT_REGISTERS);
+            return new Pair<>(RegisterDependencyType.MISC, dependency - ArchitecturalRegisterFile.NUM_INT_REGISTERS - ArchitecturalRegisterFile.NUM_FLOAT_REGISTERS);
         }
     }
 

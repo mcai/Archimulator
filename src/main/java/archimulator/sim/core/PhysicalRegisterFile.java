@@ -41,7 +41,7 @@ public class PhysicalRegisterFile {
     public PhysicalRegisterFile(String name, int capacity) {
         this.name = name;
 
-        this.registers = new ArrayList<PhysicalRegister>();
+        this.registers = new ArrayList<>();
         for (int i = 0; i < capacity; i++) {
             this.registers.add(new PhysicalRegister(this));
         }

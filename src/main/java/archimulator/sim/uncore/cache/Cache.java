@@ -53,9 +53,9 @@ public class Cache<StateT extends Serializable> extends BasicSimulationObject im
         this.name = name;
         this.geometry = geometry;
 
-        this.sets = new ArrayList<CacheSet<StateT>>();
+        this.sets = new ArrayList<>();
         for (int i = 0; i < this.getNumSets(); i++) {
-            this.sets.add(new CacheSet<StateT>(this, this.getAssociativity(), i, cacheLineStateProviderFactory));
+            this.sets.add(new CacheSet<>(this, this.getAssociativity(), i, cacheLineStateProviderFactory));
         }
     }
 

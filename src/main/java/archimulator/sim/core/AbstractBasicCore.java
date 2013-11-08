@@ -116,19 +116,19 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
 
         this.processor = processor;
 
-        this.threads = new ArrayList<Thread>();
+        this.threads = new ArrayList<>();
 
         this.functionalUnitPool = new FunctionalUnitPool(this);
 
-        this.waitingInstructionQueue = new ArrayList<AbstractReorderBufferEntry>();
-        this.readyInstructionQueue = new ArrayList<AbstractReorderBufferEntry>();
+        this.waitingInstructionQueue = new ArrayList<>();
+        this.readyInstructionQueue = new ArrayList<>();
 
-        this.readyLoadQueue = new ArrayList<AbstractReorderBufferEntry>();
+        this.readyLoadQueue = new ArrayList<>();
 
-        this.waitingStoreQueue = new ArrayList<AbstractReorderBufferEntry>();
-        this.readyStoreQueue = new ArrayList<AbstractReorderBufferEntry>();
+        this.waitingStoreQueue = new ArrayList<>();
+        this.readyStoreQueue = new ArrayList<>();
 
-        this.oooEventQueue = new ArrayList<AbstractReorderBufferEntry>();
+        this.oooEventQueue = new ArrayList<>();
     }
 
     @Override
@@ -227,33 +227,27 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
         counterPending.increment();
 
         MemoryHierarchyAccess alias = this.l1ICacheController.findAccess(physicalTag);
-        MemoryHierarchyAccess access = this.l1ICacheController.beginAccess(null, thread, MemoryHierarchyAccessType.IFETCH, virtualPc, physicalAddress, physicalTag, new Action() {
-            public void apply() {
-                counterPending.decrement();
+        MemoryHierarchyAccess access = this.l1ICacheController.beginAccess(null, thread, MemoryHierarchyAccessType.IFETCH, virtualPc, physicalAddress, physicalTag, () -> {
+            counterPending.decrement();
 
-                if (counterPending.getValue() == 0) {
-                    onCompletedCallback.apply();
-                }
+            if (counterPending.getValue() == 0) {
+                onCompletedCallback.apply();
             }
         });
 
         if (alias == null) {
             counterPending.increment();
 
-            thread.getItlb().access(access, new Action() {
-                public void apply() {
-                    counterPending.decrement();
+            thread.getItlb().access(access, () -> {
+                counterPending.decrement();
 
-                    if (counterPending.getValue() == 0) {
-                        onCompletedCallback.apply();
-                    }
+                if (counterPending.getValue() == 0) {
+                    onCompletedCallback.apply();
                 }
             });
 
-            this.l1ICacheController.receiveIfetch(access, new Action() {
-                public void apply() {
-                    l1ICacheController.endAccess(physicalTag);
-                }
+            this.l1ICacheController.receiveIfetch(access, () -> {
+                l1ICacheController.endAccess(physicalTag);
             });
         }
 
@@ -283,25 +277,16 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
         if (alias == null) {
             counterPending.increment();
 
-            dynamicInstruction.getThread().getDtlb().access(access, new Action() {
-                public void apply() {
-                    counterPending.decrement();
+            dynamicInstruction.getThread().getDtlb().access(access, () -> {
+                counterPending.decrement();
 
-                    if (counterPending.getValue() == 0) {
-                        onCompletedCallback.apply();
-                    }
+                if (counterPending.getValue() == 0) {
+                    onCompletedCallback.apply();
                 }
             });
 
-            this.l1DCacheController.receiveLoad(access, new Action() {
-                public void apply() {
-                    l1DCacheController.endAccess(physicalTag);
-                }
-
-                @Override
-                public String toString() {
-                    return "load";
-                }
+            this.l1DCacheController.receiveLoad(access, () -> {
+                l1DCacheController.endAccess(physicalTag);
             });
         }
 
@@ -331,20 +316,16 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
         if (alias == null) {
             counterPending.increment();
 
-            dynamicInstruction.getThread().getDtlb().access(access, new Action() {
-                public void apply() {
-                    counterPending.decrement();
+            dynamicInstruction.getThread().getDtlb().access(access, () -> {
+                counterPending.decrement();
 
-                    if (counterPending.getValue() == 0) {
-                        onCompletedCallback.apply();
-                    }
+                if (counterPending.getValue() == 0) {
+                    onCompletedCallback.apply();
                 }
             });
 
-            this.l1DCacheController.receiveStore(access, new Action() {
-                public void apply() {
-                    l1DCacheController.endAccess(physicalTag);
-                }
+            this.l1DCacheController.receiveStore(access, () -> {
+                l1DCacheController.endAccess(physicalTag);
             });
         }
 

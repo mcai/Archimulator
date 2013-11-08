@@ -29,8 +29,6 @@ import archimulator.sim.isa.StaticInstructionType;
 import archimulator.sim.isa.event.PseudoCallEncounteredEvent;
 import archimulator.sim.os.ContextState;
 import net.pickapack.util.Reference;
-import net.pickapack.action.Action;
-import net.pickapack.action.Action1;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,23 +68,21 @@ public class BasicThread extends AbstractBasicThread {
 
         final Reference<Integer> savedRegisterValue = new Reference<Integer>(-1);
 
-        this.getBlockingEventDispatcher().addListener(PseudoCallEncounteredEvent.class, new Action1<PseudoCallEncounteredEvent>() {
-            public void apply(PseudoCallEncounteredEvent event) {
-                if (event.getContext() == getContext()) {
-                    ContextMapping contextMapping = event.getContext().getProcess().getContextMapping();
+        this.getBlockingEventDispatcher().addListener(PseudoCallEncounteredEvent.class, event -> {
+            if (event.getContext() == getContext()) {
+                ContextMapping contextMapping = event.getContext().getProcess().getContextMapping();
 
-                    if (contextMapping.getBenchmark().getHelperThreadEnabled()) {
-                        if (event.getPseudoCall().getImm() == 3820) {
-                            savedRegisterValue.set(event.getContext().getRegisterFile().getGpr(event.getPseudoCall().getRs()));
-                            event.getContext().getRegisterFile().setGpr(event.getPseudoCall().getRs(), contextMapping.getHelperThreadLookahead());
-                        } else if (event.getPseudoCall().getImm() == 3821) {
-                            event.getContext().getRegisterFile().setGpr(event.getPseudoCall().getRs(), savedRegisterValue.get());
-                        } else if (event.getPseudoCall().getImm() == 3822) {
-                            savedRegisterValue.set(event.getContext().getRegisterFile().getGpr(event.getPseudoCall().getRs()));
-                            event.getContext().getRegisterFile().setGpr(event.getPseudoCall().getRs(), contextMapping.getHelperThreadStride());
-                        } else if (event.getPseudoCall().getImm() == 3823) {
-                            event.getContext().getRegisterFile().setGpr(event.getPseudoCall().getRs(), savedRegisterValue.get());
-                        }
+                if (contextMapping.getBenchmark().getHelperThreadEnabled()) {
+                    if (event.getPseudoCall().getImm() == 3820) {
+                        savedRegisterValue.set(event.getContext().getRegisterFile().getGpr(event.getPseudoCall().getRs()));
+                        event.getContext().getRegisterFile().setGpr(event.getPseudoCall().getRs(), contextMapping.getHelperThreadLookahead());
+                    } else if (event.getPseudoCall().getImm() == 3821) {
+                        event.getContext().getRegisterFile().setGpr(event.getPseudoCall().getRs(), savedRegisterValue.get());
+                    } else if (event.getPseudoCall().getImm() == 3822) {
+                        savedRegisterValue.set(event.getContext().getRegisterFile().getGpr(event.getPseudoCall().getRs()));
+                        event.getContext().getRegisterFile().setGpr(event.getPseudoCall().getRs(), contextMapping.getHelperThreadStride());
+                    } else if (event.getPseudoCall().getImm() == 3823) {
+                        event.getContext().getRegisterFile().setGpr(event.getPseudoCall().getRs(), savedRegisterValue.get());
                     }
                 }
             }
@@ -132,10 +128,8 @@ public class BasicThread extends AbstractBasicThread {
             int cacheLineToFetch = aligned(pc, this.lineSizeOfICache);
             if (cacheLineToFetch != this.lastFetchedCacheLine) {
                 if (this.core.canIfetch(this, pc)) {
-                    this.core.ifetch(this, pc, pc, new Action() {
-                        public void apply() {
-                            fetchStalled = false;
-                        }
+                    this.core.ifetch(this, pc, pc, () -> {
+                        fetchStalled = false;
                     });
 
                     this.fetchStalled = true;
@@ -149,19 +143,13 @@ public class BasicThread extends AbstractBasicThread {
 
             if (this.nextInstructionInCacheWarmupPhase.getStaticInstruction().getMnemonic().getType() == StaticInstructionType.LOAD) {
                 if (this.core.canLoad(this, effectiveAddress)) {
-                    this.core.load(this.nextInstructionInCacheWarmupPhase, effectiveAddress, pc, new Action() {
-                        public void apply() {
-                        }
-                    });
+                    this.core.load(this.nextInstructionInCacheWarmupPhase, effectiveAddress, pc, () -> {});
 
                     this.nextInstructionInCacheWarmupPhase = null;
                 }
             } else if (this.nextInstructionInCacheWarmupPhase.getStaticInstruction().getMnemonic().getType() == StaticInstructionType.STORE) {
                 if (this.core.canStore(this, effectiveAddress)) {
-                    this.core.store(this.nextInstructionInCacheWarmupPhase, effectiveAddress, pc, new Action() {
-                        public void apply() {
-                        }
-                    });
+                    this.core.store(this.nextInstructionInCacheWarmupPhase, effectiveAddress, pc, () -> {});
 
                     this.nextInstructionInCacheWarmupPhase = null;
                 }
@@ -198,10 +186,8 @@ public class BasicThread extends AbstractBasicThread {
                 if (!this.core.canIfetch(this, this.fetchNpc)) {
                     return false;
                 } else {
-                    this.core.ifetch(this, this.fetchNpc, this.fetchNpc, new Action() {
-                        public void apply() {
-                            fetchStalled = false;
-                        }
+                    this.core.ifetch(this, this.fetchNpc, this.fetchNpc, () -> {
+                        fetchStalled = false;
                     });
 
                     this.fetchStalled = true;
@@ -270,7 +256,7 @@ public class BasicThread extends AbstractBasicThread {
 
             BranchPredictorUpdate branchPredictorUpdate = new BranchPredictorUpdate();
 
-            Reference<Integer> returnAddressStackRecoverIndexRef = new Reference<Integer>(0);
+            Reference<Integer> returnAddressStackRecoverIndexRef = new Reference<>(0);
             int destination = dynamicInstruction.getStaticInstruction().getMnemonic().isControl() ? this.branchPredictor.predict(this.fetchNpc, 0, dynamicInstruction.getStaticInstruction().getMnemonic(), branchPredictorUpdate, returnAddressStackRecoverIndexRef) : this.fetchNpc + 4;
 
             this.fetchNnpc = destination <= 1 ? this.fetchNpc + 4 : destination;
@@ -401,7 +387,7 @@ public class BasicThread extends AbstractBasicThread {
 
     @Override
     public void refreshLoadStoreQueue() { //TODO: to be clarified
-        List<Integer> stdUnknowns = new ArrayList<Integer>();
+        List<Integer> stdUnknowns = new ArrayList<>();
 
         for (LoadStoreQueueEntry loadStoreQueueEntry : this.loadStoreQueue.getEntries()) {
             if (loadStoreQueueEntry.getDynamicInstruction().getStaticInstruction().getMnemonic().getType() == StaticInstructionType.STORE) {

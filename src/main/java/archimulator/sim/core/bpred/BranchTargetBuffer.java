@@ -36,7 +36,7 @@ public class BranchTargetBuffer {
      * @param associativity associativity
      */
     public BranchTargetBuffer(int numSets, int associativity) {
-        this.entries = new ArrayList<List<BranchTargetBufferEntry>>();
+        this.entries = new ArrayList<>();
 
         for (int i = 0; i < numSets; i++) {
             List<BranchTargetBufferEntry> entriesPerSet = new ArrayList<BranchTargetBufferEntry>();
@@ -115,6 +115,6 @@ public class BranchTargetBuffer {
      * @return the set index for the specified branch address
      */
     private int getSet(int branchAddress) {
-        return (branchAddress >> BranchPredictor.BRANCH_SHIFT) & (this.entries.size() - 1);
+        return branchAddress >> BranchPredictor.BRANCH_SHIFT & (this.entries.size() - 1);
     }
 }

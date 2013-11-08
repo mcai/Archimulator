@@ -57,7 +57,7 @@ public class SystemCallEmulation extends BasicSimulationObject implements Simula
         private int newlen;
     }
 
-    private Map<Integer, SystemCallHandler> handlers = new TreeMap<Integer, SystemCallHandler>();
+    private Map<Integer, SystemCallHandler> handlers = new TreeMap<>();
     private int errno;
 
     private int stackLimit = 0x800000;
@@ -74,7 +74,7 @@ public class SystemCallEmulation extends BasicSimulationObject implements Simula
     public SystemCallEmulation(Kernel kernel) {
         super(kernel);
 
-        this.openFlagMappings = new ArrayList<OpenFlagMapping>();
+        this.openFlagMappings = new ArrayList<>();
         this.openFlagMappings.add(new OpenFlagMapping(TargetOpenFlags.O_RDONLY, OpenFlags.O_RDONLY));
         this.openFlagMappings.add(new OpenFlagMapping(TargetOpenFlags.O_WRONLY, OpenFlags.O_WRONLY));
         this.openFlagMappings.add(new OpenFlagMapping(TargetOpenFlags.O_RDWR, OpenFlags.O_RDWR));
@@ -562,7 +562,7 @@ public class SystemCallEmulation extends BasicSimulationObject implements Simula
     }
 
     /**
-     * mremap implmentation.
+     * mremap implementation.
      *
      * @param context the context
      */
@@ -896,8 +896,8 @@ public class SystemCallEmulation extends BasicSimulationObject implements Simula
 
     /**
      * getpid implementation.
-     * <p/>
-     * -@param context the context
+     *
+     * @param context the context
      */
     private void getpid_impl(Context context) {
         context.getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_V0, context.getProcessId());

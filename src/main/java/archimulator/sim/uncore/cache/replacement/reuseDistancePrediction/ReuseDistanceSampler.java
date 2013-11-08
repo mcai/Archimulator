@@ -58,7 +58,7 @@ public class ReuseDistanceSampler extends BasicSimulationObject {
 
         this.samplingCounter = 0;
 
-        this.entries = new ArrayList<ReuseDistanceSamplerEntry>();
+        this.entries = new ArrayList<>();
         for (int i = 0; i < maxReuseDistance / this.samplingPeriod; i++) {
             this.entries.add(new ReuseDistanceSamplerEntry());
         }

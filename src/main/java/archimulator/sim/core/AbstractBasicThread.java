@@ -28,7 +28,6 @@ import archimulator.sim.isa.event.InstructionFunctionallyExecutedEvent;
 import archimulator.sim.isa.event.SystemCallExecutedEvent;
 import archimulator.sim.os.Context;
 import archimulator.sim.uncore.tlb.TranslationLookasideBuffer;
-import net.pickapack.action.Action1;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -246,36 +245,30 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
             this.renameTable.put(dep, physReg);
         }
 
-        this.decodeBuffer = new PipelineBuffer<DecodeBufferEntry>(getExperiment().getArchitecture().getDecodeBufferCapacity());
-        this.reorderBuffer = new PipelineBuffer<ReorderBufferEntry>(getExperiment().getArchitecture().getReorderBufferCapacity());
-        this.loadStoreQueue = new PipelineBuffer<LoadStoreQueueEntry>(getExperiment().getArchitecture().getLoadStoreQueueCapacity());
+        this.decodeBuffer = new PipelineBuffer<>(getExperiment().getArchitecture().getDecodeBufferCapacity());
+        this.reorderBuffer = new PipelineBuffer<>(getExperiment().getArchitecture().getReorderBufferCapacity());
+        this.loadStoreQueue = new PipelineBuffer<>(getExperiment().getArchitecture().getLoadStoreQueueCapacity());
 
-        this.executedMnemonics = new TreeMap<Mnemonic, Long>();
-        this.executedSystemCalls = new TreeMap<String, Long>();
+        this.executedMnemonics = new TreeMap<>();
+        this.executedSystemCalls = new TreeMap<>();
 
-        this.getBlockingEventDispatcher().addListener(InstructionFunctionallyExecutedEvent.class, new Action1<InstructionFunctionallyExecutedEvent>() {
-            @Override
-            public void apply(InstructionFunctionallyExecutedEvent event) {
-                if (event.getContext() == context) {
-                    Mnemonic mnemonic = event.getStaticInstruction().getMnemonic();
-                    if (!executedMnemonics.containsKey(mnemonic)) {
-                        executedMnemonics.put(mnemonic, 0L);
-                    }
-                    executedMnemonics.put(mnemonic, executedMnemonics.get(mnemonic) + 1);
+        this.getBlockingEventDispatcher().addListener(InstructionFunctionallyExecutedEvent.class, event -> {
+            if (event.getContext() == context) {
+                Mnemonic mnemonic = event.getStaticInstruction().getMnemonic();
+                if (!executedMnemonics.containsKey(mnemonic)) {
+                    executedMnemonics.put(mnemonic, 0L);
                 }
+                executedMnemonics.put(mnemonic, executedMnemonics.get(mnemonic) + 1);
             }
         });
 
-        this.getBlockingEventDispatcher().addListener(SystemCallExecutedEvent.class, new Action1<SystemCallExecutedEvent>() {
-            @Override
-            public void apply(SystemCallExecutedEvent event) {
-                if (event.getContext() == context) {
-                    String systemCallName = event.getSystemCallName();
-                    if (!executedSystemCalls.containsKey(systemCallName)) {
-                        executedSystemCalls.put(systemCallName, 0L);
-                    }
-                    executedSystemCalls.put(systemCallName, executedSystemCalls.get(systemCallName) + 1);
+        this.getBlockingEventDispatcher().addListener(SystemCallExecutedEvent.class, event -> {
+            if (event.getContext() == context) {
+                String systemCallName = event.getSystemCallName();
+                if (!executedSystemCalls.containsKey(systemCallName)) {
+                    executedSystemCalls.put(systemCallName, 0L);
                 }
+                executedSystemCalls.put(systemCallName, executedSystemCalls.get(systemCallName) + 1);
             }
         });
     }

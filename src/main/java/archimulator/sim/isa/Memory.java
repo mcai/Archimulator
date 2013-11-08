@@ -65,12 +65,12 @@ public class Memory extends BasicSimulationObject implements Reportable {
 
         this.id = this.kernel.currentMemoryId++;
 
-        this.pages = new TreeMap<Integer, Page>();
+        this.pages = new TreeMap<>();
 
-        this.byteBuffers = new HashMap<Integer, ByteBuffer>();
+        this.byteBuffers = new HashMap<>();
 
         this.speculative = false;
-        this.speculativeMemoryBlocks = new TreeMap<Integer, List<SpeculativeMemoryBlock>>();
+        this.speculativeMemoryBlocks = new TreeMap<>();
     }
 
     /**

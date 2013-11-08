@@ -78,16 +78,16 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
     public Kernel(Simulation simulation) {
         super(simulation);
 
-        this.pipes = new ArrayList<Pipe>();
-        this.systemEvents = new ArrayList<SystemEvent>();
+        this.pipes = new ArrayList<>();
+        this.systemEvents = new ArrayList<>();
 
-        this.signalActions = new ArrayList<SignalAction>();
+        this.signalActions = new ArrayList<>();
         for (int i = 0; i < Kernel.MAX_SIGNAL; i++) {
             this.signalActions.add(new SignalAction());
         }
 
-        this.contexts = new ArrayList<Context>();
-        this.processes = new ArrayList<Process>();
+        this.contexts = new ArrayList<>();
+        this.processes = new ArrayList<>();
 
         this.systemCallEmulation = new SystemCallEmulation(this);
     }
@@ -375,7 +375,7 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
      * @return the list of memories
      */
     public List<Memory> getMemories() {
-        List<Memory> memories = new ArrayList<Memory>();
+        List<Memory> memories = new ArrayList<>();
 
         for (Process process : processes) {
             memories.add(process.getMemory());

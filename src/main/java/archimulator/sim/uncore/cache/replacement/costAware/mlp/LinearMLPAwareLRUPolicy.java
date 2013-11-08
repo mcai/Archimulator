@@ -21,7 +21,6 @@ package archimulator.sim.uncore.cache.replacement.costAware.mlp;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.replacement.costAware.CostBasedLRUPolicy;
 import archimulator.sim.uncore.mlp.MLPProfilingHelper;
-import net.pickapack.action.Action1;
 
 import java.io.Serializable;
 
@@ -41,11 +40,8 @@ public class LinearMLPAwareLRUPolicy<StateT extends Serializable> extends CostBa
     public LinearMLPAwareLRUPolicy(EvictableCache<StateT> cache, int lambda) {
         super(cache, lambda);
 
-        cache.getBlockingEventDispatcher().addListener(MLPProfilingHelper.L2MissMLPProfiledEvent.class, new Action1<MLPProfilingHelper.L2MissMLPProfiledEvent>() {
-            @Override
-            public void apply(MLPProfilingHelper.L2MissMLPProfiledEvent event) {
-                setCost(event.getSet(), event.getWay(), event.getPendingL2Miss().getMlpCost());
-            }
+        cache.getBlockingEventDispatcher().addListener(MLPProfilingHelper.L2MissMLPProfiledEvent.class, event -> {
+            setCost(event.getSet(), event.getWay(), event.getPendingL2Miss().getMlpCost());
         });
     }
 

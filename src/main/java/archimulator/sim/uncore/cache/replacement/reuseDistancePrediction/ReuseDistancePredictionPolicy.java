@@ -27,7 +27,6 @@ import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicy;
 import archimulator.util.HighLowCounter;
 import net.pickapack.util.ValueProvider;
-import net.pickapack.util.ValueProviderFactory;
 
 import java.io.Serializable;
 
@@ -50,12 +49,7 @@ public class ReuseDistancePredictionPolicy<StateT extends Serializable> extends 
     public ReuseDistancePredictionPolicy(EvictableCache<StateT> cache) {
         super(cache);
 
-        this.mirrorCache = new Cache<Boolean>(cache, cache.getName() + ".reuseDistancePredictionPolicy.mirrorCache", cache.getGeometry(), new ValueProviderFactory<Boolean, ValueProvider<Boolean>>() {
-            @Override
-            public ValueProvider<Boolean> createValueProvider(Object... args) {
-                return new BooleanValueProvider();
-            }
-        });
+        this.mirrorCache = new Cache<>(cache, cache.getName() + ".reuseDistancePredictionPolicy.mirrorCache", cache.getGeometry(), args -> new BooleanValueProvider());
 
         this.highLowCounter = new HighLowCounter(7, 16384);
     }
@@ -88,7 +82,7 @@ public class ReuseDistancePredictionPolicy<StateT extends Serializable> extends 
             }
         }
 
-        return new CacheAccess<StateT>(this.getCache(), access, set, victimWay, tag);
+        return new CacheAccess<>(this.getCache(), access, set, victimWay, tag);
     }
 
     @Override

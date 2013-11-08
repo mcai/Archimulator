@@ -41,12 +41,9 @@ public class StoreFlow extends CacheCoherenceFlow {
     public StoreFlow(final CacheController generator, int tag, final Action onCompletedCallback, MemoryHierarchyAccess access) {
         super(generator, null, access, tag);
 
-        this.onCompletedCallback = new Action() {
-            @Override
-            public void apply() {
-                onCompletedCallback.apply();
-                onCompleted();
-            }
+        this.onCompletedCallback = () -> {
+            onCompletedCallback.apply();
+            onCompleted();
         };
     }
 

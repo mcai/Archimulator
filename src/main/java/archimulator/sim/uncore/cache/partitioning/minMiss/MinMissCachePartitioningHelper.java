@@ -25,7 +25,6 @@ import archimulator.sim.uncore.cache.partitioning.CachePartitioningHelper;
 import archimulator.sim.uncore.cache.partitioning.LRUStack;
 import archimulator.sim.uncore.cache.stackDistanceProfile.StackDistanceProfile;
 import archimulator.sim.uncore.coherence.event.GeneralCacheControllerServiceNonblockingRequestEvent;
-import net.pickapack.action.Action1;
 import net.pickapack.util.Pair;
 
 import java.util.LinkedHashMap;
@@ -52,15 +51,13 @@ public class MinMissCachePartitioningHelper extends CachePartitioningHelper {
     public MinMissCachePartitioningHelper(EvictableCache<?> cache) {
         super(cache);
 
-        this.stackDistanceProfiles = new LinkedHashMap<Integer, StackDistanceProfile>();
+        this.stackDistanceProfiles = new LinkedHashMap<>();
 
-        this.lruStacks = new LinkedHashMap<Integer, Map<Integer, LRUStack>>();
+        this.lruStacks = new LinkedHashMap<>();
 
-        cache.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, new Action1<GeneralCacheControllerServiceNonblockingRequestEvent>() {
-            public void apply(GeneralCacheControllerServiceNonblockingRequestEvent event) {
-                if (event.getCacheController() == getL2CacheController() && shouldInclude(event.getSet())) {
-                    profileStackDistance(event.getAccess());
-                }
+        cache.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, event -> {
+            if (event.getCacheController() == getL2CacheController() && shouldInclude(event.getSet())) {
+                profileStackDistance(event.getAccess());
             }
         });
     }
@@ -182,7 +179,7 @@ public class MinMissCachePartitioningHelper extends CachePartitioningHelper {
             }
         }
 
-        return new Pair<Integer, List<Integer>>(minMissSum, minPartition);
+        return new Pair<>(minMissSum, minPartition);
     }
 
     @Override

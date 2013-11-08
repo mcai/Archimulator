@@ -25,8 +25,6 @@ import archimulator.sim.common.report.Reportable;
 import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestProfilingHelper;
 import archimulator.sim.uncore.mlp.BLPProfilingHelper;
 import archimulator.sim.uncore.mlp.MLPProfilingHelper;
-import net.pickapack.action.Action;
-import net.pickapack.action.Action1;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -102,100 +100,76 @@ public class IntervalHelper implements Reportable {
     public IntervalHelper(final Simulation simulation) {
         this.numCyclesElapsedPerInterval = 5000000;
 
-        this.intervals = new ArrayList<Interval>();
+        this.intervals = new ArrayList<>();
 
         this.currentInterval = new Interval();
 
-        simulation.getCycleAccurateEventQueue().getPerCycleEvents().add(new Action() {
-            @Override
-            public void apply() {
-                if (simulation.getType() != SimulationType.FAST_FORWARD) {
-                    numCyclesElapsed++;
+        simulation.getCycleAccurateEventQueue().getPerCycleEvents().add(() -> {
+            if (simulation.getType() != SimulationType.FAST_FORWARD) {
+                numCyclesElapsed++;
 
-                    if (numCyclesElapsed == numCyclesElapsedPerInterval) {
-                        currentInterval.onCompleted();
-                        intervals.add(currentInterval);
+                if (numCyclesElapsed == numCyclesElapsedPerInterval) {
+                    currentInterval.onCompleted();
+                    intervals.add(currentInterval);
 
-                        numCyclesElapsed = 0;
-                        currentInterval = new Interval();
-                    }
+                    numCyclesElapsed = 0;
+                    currentInterval = new Interval();
                 }
             }
         });
 
-        simulation.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.MainThreadL2CacheHitEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.MainThreadL2CacheHitEvent>() {
-            @Override
-            public void apply(HelperThreadL2CacheRequestProfilingHelper.MainThreadL2CacheHitEvent event) {
-                currentInterval.numMainThreadL2CacheHits++;
+        simulation.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.MainThreadL2CacheHitEvent.class, event -> {
+            currentInterval.numMainThreadL2CacheHits++;
+        });
+
+        simulation.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.MainThreadL2CacheMissEvent.class, event -> {
+            currentInterval.numMainThreadL2CacheMisses++;
+        });
+
+        simulation.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.HelperThreadL2CacheHitEvent.class, event -> {
+            currentInterval.numHelperThreadL2CacheHits++;
+        });
+
+        simulation.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.HelperThreadL2CacheMissEvent.class, event -> {
+            currentInterval.numHelperThreadL2CacheMisses++;
+        });
+
+        simulation.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.HelperThreadL2CacheRequestEvent.class, event -> {
+            switch (event.getQuality()) {
+                case REDUNDANT_HIT_TO_TRANSIENT_TAG:
+                    currentInterval.numRedundantHitToTransientTagHelperThreadL2CacheRequests++;
+                    break;
+                case REDUNDANT_HIT_TO_CACHE:
+                    currentInterval.numRedundantHitToCacheHelperThreadL2CacheRequests++;
+                    break;
+                case TIMELY:
+                    currentInterval.numTimelyHelperThreadL2CacheRequests++;
+                    break;
+                case LATE:
+                    currentInterval.numLateHelperThreadL2CacheRequests++;
+                    break;
+                case BAD:
+                    currentInterval.numBadHelperThreadL2CacheRequests++;
+                    break;
+                case EARLY:
+                    currentInterval.numEarlyHelperThreadL2CacheRequests++;
+                    break;
+                case UGLY:
+                    currentInterval.numUglyHelperThreadL2CacheRequests++;
+                    break;
+                default:
+                    throw new IllegalArgumentException();
             }
         });
 
-        simulation.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.MainThreadL2CacheMissEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.MainThreadL2CacheMissEvent>() {
-            @Override
-            public void apply(HelperThreadL2CacheRequestProfilingHelper.MainThreadL2CacheMissEvent event) {
-                currentInterval.numMainThreadL2CacheMisses++;
-            }
+        simulation.getBlockingEventDispatcher().addListener(MLPProfilingHelper.L2MissMLPProfiledEvent.class, event -> {
+            currentInterval.l2MissMlpCosts += event.getPendingL2Miss().getMlpCost();
+            currentInterval.numL2MissMlpSamples++;
         });
 
-        simulation.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.HelperThreadL2CacheHitEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.HelperThreadL2CacheHitEvent>() {
-            @Override
-            public void apply(HelperThreadL2CacheRequestProfilingHelper.HelperThreadL2CacheHitEvent event) {
-                currentInterval.numHelperThreadL2CacheHits++;
-            }
-        });
-
-        simulation.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.HelperThreadL2CacheMissEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.HelperThreadL2CacheMissEvent>() {
-            @Override
-            public void apply(HelperThreadL2CacheRequestProfilingHelper.HelperThreadL2CacheMissEvent event) {
-                currentInterval.numHelperThreadL2CacheMisses++;
-            }
-        });
-
-        simulation.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.HelperThreadL2CacheRequestEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.HelperThreadL2CacheRequestEvent>() {
-            @Override
-            public void apply(HelperThreadL2CacheRequestProfilingHelper.HelperThreadL2CacheRequestEvent event) {
-                switch (event.getQuality()) {
-                    case REDUNDANT_HIT_TO_TRANSIENT_TAG:
-                        currentInterval.numRedundantHitToTransientTagHelperThreadL2CacheRequests++;
-                        break;
-                    case REDUNDANT_HIT_TO_CACHE:
-                        currentInterval.numRedundantHitToCacheHelperThreadL2CacheRequests++;
-                        break;
-                    case TIMELY:
-                        currentInterval.numTimelyHelperThreadL2CacheRequests++;
-                        break;
-                    case LATE:
-                        currentInterval.numLateHelperThreadL2CacheRequests++;
-                        break;
-                    case BAD:
-                        currentInterval.numBadHelperThreadL2CacheRequests++;
-                        break;
-                    case EARLY:
-                        currentInterval.numEarlyHelperThreadL2CacheRequests++;
-                        break;
-                    case UGLY:
-                        currentInterval.numUglyHelperThreadL2CacheRequests++;
-                        break;
-                    default:
-                        throw new IllegalArgumentException();
-                }
-            }
-        });
-
-        simulation.getBlockingEventDispatcher().addListener(MLPProfilingHelper.L2MissMLPProfiledEvent.class, new Action1<MLPProfilingHelper.L2MissMLPProfiledEvent>() {
-            @Override
-            public void apply(MLPProfilingHelper.L2MissMLPProfiledEvent event) {
-                currentInterval.l2MissMlpCosts += event.getPendingL2Miss().getMlpCost();
-                currentInterval.numL2MissMlpSamples++;
-            }
-        });
-
-        simulation.getBlockingEventDispatcher().addListener(BLPProfilingHelper.BankAccessBLPProfiledEvent.class, new Action1<BLPProfilingHelper.BankAccessBLPProfiledEvent>() {
-            @Override
-            public void apply(BLPProfilingHelper.BankAccessBLPProfiledEvent event) {
-                currentInterval.dramBankAccessBlpCosts += event.getPendingDramBankAccess().getBlpCost();
-                currentInterval.numDramBankAccessBlpSamples++;
-            }
+        simulation.getBlockingEventDispatcher().addListener(BLPProfilingHelper.BankAccessBLPProfiledEvent.class, event -> {
+            currentInterval.dramBankAccessBlpCosts += event.getPendingDramBankAccess().getBlpCost();
+            currentInterval.numDramBankAccessBlpSamples++;
         });
     }
 

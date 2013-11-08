@@ -27,7 +27,6 @@ import archimulator.sim.uncore.cache.prediction.CacheBasedPredictor;
 import archimulator.sim.uncore.cache.prediction.Predictor;
 import archimulator.sim.uncore.coherence.event.GeneralCacheControllerServiceNonblockingRequestEvent;
 import archimulator.sim.uncore.coherence.msi.state.DirectoryControllerState;
-import net.pickapack.action.Action1;
 import net.pickapack.math.Quantizer;
 
 /**
@@ -53,36 +52,27 @@ public class ReuseDistancePredictionHelper implements Reportable {
 
         this.reuseDistanceQuantizer = new Quantizer(15, 8192);
 
-        this.reuseDistancePredictor = new CacheBasedPredictor<Integer>(cache, cache.getName() + ".reuseDistancePredictor", new CacheGeometry(16 * 16 * cache.getGeometry().getLineSize(), 16, cache.getGeometry().getLineSize()), 0, 3, 0);
+        this.reuseDistancePredictor = new CacheBasedPredictor<>(cache, cache.getName() + ".reuseDistancePredictor", new CacheGeometry(16 * 16 * cache.getGeometry().getLineSize(), 16, cache.getGeometry().getLineSize()), 0, 3, 0);
 
-        this.helperThreadL2RequestReuseDistancePredictor = new CacheBasedPredictor<Integer>(cache, cache.getName() + ".helperThreadL2RequestReuseDistancePredictor", new CacheGeometry(16 * 16 * cache.getGeometry().getLineSize(), 16, cache.getGeometry().getLineSize()), 0, 3, 0);
+        this.helperThreadL2RequestReuseDistancePredictor = new CacheBasedPredictor<>(cache, cache.getName() + ".helperThreadL2RequestReuseDistancePredictor", new CacheGeometry(16 * 16 * cache.getGeometry().getLineSize(), 16, cache.getGeometry().getLineSize()), 0, 3, 0);
 
         this.reuseDistanceSampler = new HelperThreadAwareReuseDistanceSampler(cache, cache.getName() + ".reuseDistanceSampler", 4096, (reuseDistanceQuantizer.getMaxValue() + 1) * reuseDistanceQuantizer.getQuantum(), reuseDistanceQuantizer);
 
-        cache.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, new Action1<GeneralCacheControllerServiceNonblockingRequestEvent>() {
-            @Override
-            public void apply(GeneralCacheControllerServiceNonblockingRequestEvent event) {
-                if(event.getCacheController().getCache() == cache) {
-                    reuseDistanceSampler.update(event.getAccess().getThread().getId(), event.getAccess().getVirtualPc(), event.getTag());
-                }
+        cache.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, event -> {
+            if(event.getCacheController().getCache() == cache) {
+                reuseDistanceSampler.update(event.getAccess().getThread().getId(), event.getAccess().getVirtualPc(), event.getTag());
             }
         });
 
-        cache.getBlockingEventDispatcher().addListener(ReuseDistanceSampler.ReuseDistanceSampledEvent.class, new Action1<ReuseDistanceSampler.ReuseDistanceSampledEvent>() {
-            @Override
-            public void apply(ReuseDistanceSampler.ReuseDistanceSampledEvent event) {
-                if (event.getSender() == reuseDistanceSampler) {
-                    reuseDistancePredictor.update(event.getPc(), event.getReuseDistance());
-                }
+        cache.getBlockingEventDispatcher().addListener(ReuseDistanceSampler.ReuseDistanceSampledEvent.class, event -> {
+            if (event.getSender() == reuseDistanceSampler) {
+                reuseDistancePredictor.update(event.getPc(), event.getReuseDistance());
             }
         });
 
-        cache.getBlockingEventDispatcher().addListener(HelperThreadAwareReuseDistanceSampler.HelperThreadL2RequestReuseDistanceSampledEvent.class, new Action1<HelperThreadAwareReuseDistanceSampler.HelperThreadL2RequestReuseDistanceSampledEvent>() {
-            @Override
-            public void apply(HelperThreadAwareReuseDistanceSampler.HelperThreadL2RequestReuseDistanceSampledEvent event) {
-                if (event.getSender() == reuseDistanceSampler) {
-                    helperThreadL2RequestReuseDistancePredictor.update(event.getPc(), event.getReuseDistance());
-                }
+        cache.getBlockingEventDispatcher().addListener(HelperThreadAwareReuseDistanceSampler.HelperThreadL2RequestReuseDistanceSampledEvent.class, event -> {
+            if (event.getSender() == reuseDistanceSampler) {
+                helperThreadL2RequestReuseDistancePredictor.update(event.getPc(), event.getReuseDistance());
             }
         });
     }

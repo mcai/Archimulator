@@ -153,9 +153,7 @@ public class BitField {
         try {
             Field field = BitField.class.getField(name.toUpperCase());
             return (BitField) field.get(null);
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
+        } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }

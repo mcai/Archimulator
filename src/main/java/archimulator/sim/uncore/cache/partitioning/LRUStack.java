@@ -42,7 +42,7 @@ public class LRUStack {
         this.threadId = threadId;
         this.set = set;
         this.associativity = associativity;
-        this.tags = new Stack<Integer>();
+        this.tags = new Stack<>();
     }
 
     /**

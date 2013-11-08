@@ -23,8 +23,6 @@ import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.partitioning.Partitioner;
 import archimulator.sim.uncore.cache.replacement.partitioned.PartitionedLRUPolicy;
 import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestProfilingHelper;
-import net.pickapack.action.Action1;
-import net.pickapack.action.Predicate;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -68,7 +66,7 @@ public class SetDuelingPartitionedLRUPolicy<StateT extends Serializable> extends
     ) {
         super(cache);
 
-        this.numCachePartitioningHelpersUsed = new ArrayList<Long>();
+        this.numCachePartitioningHelpersUsed = new ArrayList<>();
 
         this.partitioners = partitioners;
 
@@ -78,22 +76,14 @@ public class SetDuelingPartitionedLRUPolicy<StateT extends Serializable> extends
             Partitioner cachePartitioningHelper = this.partitioners.get(i);
 
             final int tempI = i;
-            cachePartitioningHelper.setShouldIncludePredicate(new Predicate<Integer>() {
-                @Override
-                public boolean apply(Integer set) {
-                    return setDuelingUnit.getPartitioningPolicyType(set) == tempI;
-                }
-            });
+            cachePartitioningHelper.setShouldIncludePredicate(set -> setDuelingUnit.getPartitioningPolicyType(set) == tempI);
         }
 
         this.setDuelingUnit = new SetDuelingUnit(cache, 6, this.partitioners.size());
 
-        cache.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.HelperThreadL2CacheRequestEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.HelperThreadL2CacheRequestEvent>() {
-            @Override
-            public void apply(HelperThreadL2CacheRequestProfilingHelper.HelperThreadL2CacheRequestEvent event) {
-                if(event.getQuality().isUseful()) {
-                    setDuelingUnit.recordUsefulHelperThreadL2Request(event.getSet());
-                }
+        cache.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.HelperThreadL2CacheRequestEvent.class, event -> {
+            if(event.getQuality().isUseful()) {
+                setDuelingUnit.recordUsefulHelperThreadL2Request(event.getSet());
             }
         });
     }

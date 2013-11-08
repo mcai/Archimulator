@@ -42,98 +42,126 @@ public class BranchPredictorUpdate {
     }
 
     /**
-     * @return
+     * Get the counter dir 1.
+     *
+     * @return the counter dir 1
      */
     public SaturatingCounter getCounterDir1() {
         return counterDir1;
     }
 
     /**
-     * @param counterDir1
+     * Set the counter dir 1.
+     *
+     * @param counterDir1 the counter dir 1
      */
     public void setCounterDir1(SaturatingCounter counterDir1) {
         this.counterDir1 = counterDir1;
     }
 
     /**
-     * @return
+     * Get the counter dir 2.
+     *
+     * @return the counter dir 2
      */
     public SaturatingCounter getCounterDir2() {
         return counterDir2;
     }
 
     /**
-     * @param counterDir2
+     * Set the counter dir 2.
+     *
+     * @param counterDir2 the counter dir 2
      */
     public void setCounterDir2(SaturatingCounter counterDir2) {
         this.counterDir2 = counterDir2;
     }
 
     /**
-     * @return
+     * Get the counter meta.
+     *
+     * @return the counter meta
      */
     public SaturatingCounter getCounterMeta() {
         return counterMeta;
     }
 
     /**
-     * @param counterMeta
+     * Set the counter meta.
+     *
+     * @param counterMeta the counter meta
      */
     public void setCounterMeta(SaturatingCounter counterMeta) {
         this.counterMeta = counterMeta;
     }
 
     /**
-     * @return
+     * Get a value indicating whether it is RAS or not.
+     *
+     * @return a value indicating whether it is RAS or not
      */
     public boolean isRas() {
         return ras;
     }
 
     /**
-     * @param ras
+     * Set a value indicating whether it is RAS or not.
+     *
+     * @param ras a value indicating whether it is RAS or not
      */
     public void setRas(boolean ras) {
         this.ras = ras;
     }
 
     /**
-     * @return
+     * Get a value indicating whether it is bimod or not.
+     *
+     * @return a value indicating whether it is bimod or not
      */
     public boolean isBimod() {
         return bimod;
     }
 
     /**
-     * @param bimod
+     * Set a value indicating whether it is bimod or not.
+     *
+     * @param bimod a value indicating whether it is bimod or not
      */
     public void setBimod(boolean bimod) {
         this.bimod = bimod;
     }
 
     /**
-     * @return
+     * Get a value indicating whether it is two level or not.
+     *
+     * @return a value indicating whether it is two level or not
      */
     public boolean isTwoLevel() {
         return twoLevel;
     }
 
     /**
-     * @param twoLevel
+     * Set a value indicating whether it is two level or not.
+     *
+     * @param twoLevel a value indicating whether it is two level or not
      */
     public void setTwoLevel(boolean twoLevel) {
         this.twoLevel = twoLevel;
     }
 
     /**
-     * @return
+     * Get a value indicating whether it is meta or not.
+     *
+     * @return a value indicating whether it is meta or not
      */
     public boolean isMeta() {
         return meta;
     }
 
     /**
-     * @param meta
+     * Set a value indicating whether it is meta or not.
+     *
+     * @param meta a value indicating whether it is meta or not
      */
     public void setMeta(boolean meta) {
         this.meta = meta;

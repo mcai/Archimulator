@@ -21,12 +21,10 @@ package archimulator.sim.core;
 import archimulator.sim.core.functionalUnit.FunctionalUnitOperationType;
 import archimulator.sim.isa.StaticInstructionType;
 import archimulator.sim.os.ContextState;
+import net.pickapack.action.Action;
+import net.pickapack.action.Function1;
 import net.pickapack.util.Reference;
 import net.pickapack.util.RoundRobinScheduler;
-import net.pickapack.action.Action;
-import net.pickapack.action.Action1;
-import net.pickapack.action.Function1;
-import net.pickapack.action.Predicate;
 
 import java.util.Iterator;
 import java.util.List;
@@ -49,36 +47,29 @@ public class BasicCore extends AbstractBasicCore {
     public BasicCore(Processor processor, int num) {
         super(processor, num);
 
-        this.registerRenameScheduler = new RoundRobinScheduler<Thread>(this.threads, new Predicate<Thread>() {
-            public boolean apply(Thread thread) {
-                if (thread.getContext() == null) {
-                    return false;
-                } else if (thread.getDecodeBuffer().isEmpty()) {
-                    thread.incrementNumRegisterRenameStallsOnDecodeBufferIsEmpty();
-                    return false;
-                } else if (thread.getReorderBuffer().isFull()) {
-                    thread.incrementNumRegisterRenameStallsOnReorderBufferIsFull();
-                    return false;
-                } else {
-                    return true;
-                }
-            }
-        }, new Function1<Thread, Boolean>() {
-            public Boolean apply(Thread thread) {
-                return thread.registerRenameOne();
-            }
-        }, getExperiment().getArchitecture().getDecodeWidth()
+        this.registerRenameScheduler = new RoundRobinScheduler<>(
+                this.threads,
+                thread -> {
+                    if (thread.getContext() == null) {
+                        return false;
+                    } else if (thread.getDecodeBuffer().isEmpty()) {
+                        thread.incrementNumRegisterRenameStallsOnDecodeBufferIsEmpty();
+                        return false;
+                    } else if (thread.getReorderBuffer().isFull()) {
+                        thread.incrementNumRegisterRenameStallsOnReorderBufferIsFull();
+                        return false;
+                    } else {
+                        return true;
+                    }
+                },
+                Thread::registerRenameOne, getExperiment().getArchitecture().getDecodeWidth()
         );
 
-        this.dispatchScheduler = new RoundRobinScheduler<Thread>(this.threads, new Predicate<Thread>() {
-            public boolean apply(Thread thread) {
-                return thread.getContext() != null;
-            }
-        }, new Function1<Thread, Boolean>() {
-            public Boolean apply(Thread thread) {
-                return thread.dispatchOne();
-            }
-        }, getExperiment().getArchitecture().getDecodeWidth()
+        this.dispatchScheduler = new RoundRobinScheduler<>(
+                this.threads,
+                thread -> thread.getContext() != null,
+                (Function1<Thread, Boolean>) Thread::dispatchOne,
+                getExperiment().getArchitecture().getDecodeWidth()
         );
     }
 
@@ -143,10 +134,8 @@ public class BasicCore extends AbstractBasicCore {
             final ReorderBufferEntry reorderBufferEntry = (ReorderBufferEntry) it.next();
 
             if (reorderBufferEntry.getDynamicInstruction().getStaticInstruction().getMnemonic().getFunctionalUnitOperationType() != FunctionalUnitOperationType.NONE) {
-                if (this.functionalUnitPool.acquire(reorderBufferEntry, new Action1<ReorderBufferEntry>() {
-                    public void apply(ReorderBufferEntry readyQueueEntry1) {
-                        reorderBufferEntry.signalCompleted();
-                    }
+                if (this.functionalUnitPool.acquire(reorderBufferEntry, readyQueueEntry1 -> {
+                    reorderBufferEntry.signalCompleted();
                 })) {
                     reorderBufferEntry.setIssued();
                 } else {

@@ -248,7 +248,7 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
      */
     public void fireServiceNonblockingRequestEvent(MemoryHierarchyAccess access, int tag, boolean hitInCache) {
         this.getDirectoryController().getBlockingEventDispatcher().dispatch(new GeneralCacheControllerServiceNonblockingRequestEvent(this.getDirectoryController(), access, tag, getSet(), getWay(), hitInCache));
-        this.getDirectoryController().updateStats(this.getDirectoryController().getCache(), access.getType().isRead(), hitInCache);
+        this.getDirectoryController().updateStats(access.getType().isRead(), hitInCache);
     }
 
     /**

@@ -79,12 +79,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
                                 if(fileExperimentInputs.exists()) {
                                     List<File> files = new ArrayList<File>(FileUtils.listFiles(fileExperimentInputs, new String[]{"xml"}, true));
 
-                                    Collections.sort(files, new Comparator<File>() {
-                                        @Override
-                                        public int compare(File o1, File o2) {
-                                            return o1.getAbsolutePath().compareTo(o2.getAbsolutePath());
-                                        }
-                                    });
+                                    Collections.sort(files, (o1, o2) -> o1.getAbsolutePath().compareTo(o2.getAbsolutePath()));
 
                                     for (File file : files) {
                                         String text = FileUtils.readFileToString(file);
@@ -291,7 +286,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
     @Override
     public List<Experiment> getExperimentsByBenchmark(Benchmark benchmark) { //TODO: to be optimized
-        List<Experiment> result = new ArrayList<Experiment>();
+        List<Experiment> result = new ArrayList<>();
 
         for (Experiment experiment : getAllExperiments()) {
             for (ContextMapping contextMapping : experiment.getContextMappings()) {

@@ -21,7 +21,6 @@ package archimulator.sim.uncore.cache.replacement.partitioned.setDueling;
 import archimulator.sim.common.SimulationType;
 import archimulator.sim.uncore.cache.Cache;
 import archimulator.util.IntervalCounter;
-import net.pickapack.action.Action;
 
 import java.util.*;
 
@@ -81,12 +80,12 @@ public class SetDuelingUnit {
 
         this.random = new Random(13);
 
-        this.numUsefulHelperThreadL2CacheRequestsPerPolicy = new TreeMap<Integer, IntervalCounter>();
+        this.numUsefulHelperThreadL2CacheRequestsPerPolicy = new TreeMap<>();
         for (int i = 0; i < this.numTotalSetDuelingMonitors; i++) {
             this.numUsefulHelperThreadL2CacheRequestsPerPolicy.put(i, new IntervalCounter());
         }
 
-        this.setDuelingMonitors = new ArrayList<SetDuelingMonitor>();
+        this.setDuelingMonitors = new ArrayList<>();
 
         for (int i = 0; i < this.cache.getNumSets(); i++) {
             this.setDuelingMonitors.add(new SetDuelingMonitor());
@@ -96,24 +95,21 @@ public class SetDuelingUnit {
 
         this.numCyclesElapsedPerInterval = 5000000;
 
-        this.cache.getCycleAccurateEventQueue().getPerCycleEvents().add(new Action() {
-            @Override
-            public void apply() {
-                if (cache.getSimulation().getType() != SimulationType.FAST_FORWARD) {
-                    numCyclesElapsed++;
+        this.cache.getCycleAccurateEventQueue().getPerCycleEvents().add(() -> {
+            if (cache.getSimulation().getType() != SimulationType.FAST_FORWARD) {
+                numCyclesElapsed++;
 
-                    if (numCyclesElapsed == numCyclesElapsedPerInterval) {
-                        int bestPolicy = getBestPolicy();
+                if (numCyclesElapsed == numCyclesElapsedPerInterval) {
+                    int bestPolicy = getBestPolicy();
 
-                        for (int i = 0; i < numTotalSetDuelingMonitors; i++) {
-                            IntervalCounter intervalCounter = numUsefulHelperThreadL2CacheRequestsPerPolicy.get(i);
+                    for (int i = 0; i < numTotalSetDuelingMonitors; i++) {
+                        IntervalCounter intervalCounter = numUsefulHelperThreadL2CacheRequestsPerPolicy.get(i);
 
-                            intervalCounter.newInterval();
-                        }
-
-                        numCyclesElapsed = 0;
-                        numIntervals++;
+                        intervalCounter.newInterval();
                     }
+
+                    numCyclesElapsed = 0;
+                    numIntervals++;
                 }
             }
         });
@@ -158,13 +154,10 @@ public class SetDuelingUnit {
      * @return the best policy
      */
     private Integer getBestPolicy() {
-        return Collections.max(this.numUsefulHelperThreadL2CacheRequestsPerPolicy.keySet(), new Comparator<Integer>() {
-            @Override
-            public int compare(Integer policy1, Integer policy2) {
-                Long value1 = numUsefulHelperThreadL2CacheRequestsPerPolicy.get(policy1).getValue();
-                Long value2 = numUsefulHelperThreadL2CacheRequestsPerPolicy.get(policy2).getValue();
-                return value1.compareTo(value2);
-            }
+        return Collections.max(this.numUsefulHelperThreadL2CacheRequestsPerPolicy.keySet(), (policy1, policy2) -> {
+            Long value1 = numUsefulHelperThreadL2CacheRequestsPerPolicy.get(policy1).getValue();
+            Long value2 = numUsefulHelperThreadL2CacheRequestsPerPolicy.get(policy2).getValue();
+            return value1.compareTo(value2);
         });
     }
 

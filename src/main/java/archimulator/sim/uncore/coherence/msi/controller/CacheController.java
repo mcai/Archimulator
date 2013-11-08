@@ -39,8 +39,6 @@ import archimulator.sim.uncore.coherence.msi.state.CacheControllerState;
 import archimulator.sim.uncore.net.Net;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action2;
-import net.pickapack.util.ValueProvider;
-import net.pickapack.util.ValueProviderFactory;
 
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -66,21 +64,16 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
     public CacheController(MemoryHierarchy memoryHierarchy, final String name) {
         super(memoryHierarchy, name);
 
-        ValueProviderFactory<CacheControllerState, ValueProvider<CacheControllerState>> cacheLineStateProviderFactory = new ValueProviderFactory<CacheControllerState, ValueProvider<CacheControllerState>>() {
-            @Override
-            public ValueProvider<CacheControllerState> createValueProvider(Object... args) {
-                int set = (Integer) args[0];
-                int way = (Integer) args[1];
+        this.cache = new EvictableCache<>(memoryHierarchy, name, getGeometry(), getReplacementPolicyType(), args -> {
+            int set = (Integer) args[0];
+            int way = (Integer) args[1];
 
-                return new CacheControllerFiniteStateMachine(name, set, way, CacheController.this);
-            }
-        };
+            return new CacheControllerFiniteStateMachine(name, set, way, this);
+        });
 
-        this.cache = new EvictableCache<CacheControllerState>(memoryHierarchy, name, getGeometry(), getReplacementPolicyType(), cacheLineStateProviderFactory);
+        this.pendingAccesses = new HashMap<>();
 
-        this.pendingAccesses = new HashMap<Integer, MemoryHierarchyAccess>();
-
-        this.pendingAccessesPerType = new EnumMap<MemoryHierarchyAccessType, Integer>(MemoryHierarchyAccessType.class);
+        this.pendingAccessesPerType = new EnumMap<>(MemoryHierarchyAccessType.class);
         this.pendingAccessesPerType.put(MemoryHierarchyAccessType.IFETCH, 0);
         this.pendingAccessesPerType.put(MemoryHierarchyAccessType.LOAD, 0);
         this.pendingAccessesPerType.put(MemoryHierarchyAccessType.STORE, 0);
@@ -177,11 +170,8 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
      * @param onCompletedCallback the callback action performed when the access is completed
      */
     public void receiveIfetch(final MemoryHierarchyAccess access, final Action onCompletedCallback) {
-        this.getCycleAccurateEventQueue().schedule(this, new Action() {
-            @Override
-            public void apply() {
-                onLoad(access, access.getPhysicalTag(), onCompletedCallback);
-            }
+        this.getCycleAccurateEventQueue().schedule(this, () -> {
+            onLoad(access, access.getPhysicalTag(), onCompletedCallback);
         }, this.getHitLatency());
     }
 
@@ -192,11 +182,8 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
      * @param onCompletedCallback the callback action performed when the access is completed
      */
     public void receiveLoad(final MemoryHierarchyAccess access, final Action onCompletedCallback) {
-        this.getCycleAccurateEventQueue().schedule(this, new Action() {
-            @Override
-            public void apply() {
-                onLoad(access, access.getPhysicalTag(), onCompletedCallback);
-            }
+        this.getCycleAccurateEventQueue().schedule(this, () -> {
+            onLoad(access, access.getPhysicalTag(), onCompletedCallback);
         }, this.getHitLatency());
     }
 
@@ -207,11 +194,8 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
      * @param onCompletedCallback the callback action performed when the access is completed
      */
     public void receiveStore(final MemoryHierarchyAccess access, final Action onCompletedCallback) {
-        this.getCycleAccurateEventQueue().schedule(this, new Action() {
-            @Override
-            public void apply() {
-                onStore(access, access.getPhysicalTag(), onCompletedCallback);
-            }
+        this.getCycleAccurateEventQueue().schedule(this, () -> {
+            onStore(access, access.getPhysicalTag(), onCompletedCallback);
         }, this.getHitLatency());
     }
 
@@ -286,20 +270,14 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
      * @param loadFlow the load flow
      */
     private void onLoad(final MemoryHierarchyAccess access, final int tag, final LoadFlow loadFlow) {
-        final Action onStalledCallback = new Action() {
-            @Override
-            public void apply() {
-                onLoad(access, tag, loadFlow);
-            }
+        final Action onStalledCallback = () -> {
+            onLoad(access, tag, loadFlow);
         };
 
-        this.access(loadFlow, access, tag, new Action2<Integer, Integer>() {
-            @Override
-            public void apply(Integer set, Integer way) {
-                CacheLine<CacheControllerState> line = getCache().getLine(set, way);
-                CacheControllerFiniteStateMachine fsm = (CacheControllerFiniteStateMachine) line.getStateProvider();
-                fsm.onEventLoad(loadFlow, tag, loadFlow.getOnCompletedCallback(), onStalledCallback);
-            }
+        this.access(loadFlow, access, tag, (set, way) -> {
+            CacheLine<CacheControllerState> line = getCache().getLine(set, way);
+            CacheControllerFiniteStateMachine fsm = (CacheControllerFiniteStateMachine) line.getStateProvider();
+            fsm.onEventLoad(loadFlow, tag, loadFlow.getOnCompletedCallback(), onStalledCallback);
         }, onStalledCallback);
     }
 
@@ -322,20 +300,14 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
      * @param storeFlow the associated store flow
      */
     private void onStore(final MemoryHierarchyAccess access, final int tag, final StoreFlow storeFlow) {
-        final Action onStalledCallback = new Action() {
-            @Override
-            public void apply() {
-                onStore(access, tag, storeFlow);
-            }
+        final Action onStalledCallback = () -> {
+            onStore(access, tag, storeFlow);
         };
 
-        this.access(storeFlow, access, tag, new Action2<Integer, Integer>() {
-            @Override
-            public void apply(Integer set, Integer way) {
-                CacheLine<CacheControllerState> line = getCache().getLine(set, way);
-                CacheControllerFiniteStateMachine fsm = (CacheControllerFiniteStateMachine) line.getStateProvider();
-                fsm.onEventStore(storeFlow, tag, storeFlow.getOnCompletedCallback(), onStalledCallback);
-            }
+        this.access(storeFlow, access, tag, (set, way) -> {
+            CacheLine<CacheControllerState> line = getCache().getLine(set, way);
+            CacheControllerFiniteStateMachine fsm = (CacheControllerFiniteStateMachine) line.getStateProvider();
+            fsm.onEventStore(storeFlow, tag, storeFlow.getOnCompletedCallback(), onStalledCallback);
         }, onStalledCallback);
     }
 
@@ -443,17 +415,11 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
                 CacheLine<CacheControllerState> line = this.getCache().getLine(set, cacheAccess.getWay());
                 CacheControllerFiniteStateMachine fsm = (CacheControllerFiniteStateMachine) line.getStateProvider();
                 fsm.onEventReplacement(producerFlow, tag, cacheAccess,
-                        new Action() {
-                            @Override
-                            public void apply() {
-                                onReplacementCompletedCallback.apply(set, cacheAccess.getWay());
-                            }
+                        () -> {
+                            onReplacementCompletedCallback.apply(set, cacheAccess.getWay());
                         },
-                        new Action() {
-                            @Override
-                            public void apply() {
-                                getCycleAccurateEventQueue().schedule(CacheController.this, onReplacementStalledCallback, 1);
-                            }
+                        () -> {
+                            getCycleAccurateEventQueue().schedule(CacheController.this, onReplacementStalledCallback, 1);
                         }
                 );
             } else {

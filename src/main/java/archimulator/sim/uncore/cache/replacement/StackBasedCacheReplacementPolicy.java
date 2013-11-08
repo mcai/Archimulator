@@ -42,7 +42,7 @@ public abstract class StackBasedCacheReplacementPolicy<StateT extends Serializab
     public StackBasedCacheReplacementPolicy(EvictableCache<StateT> cache) {
         super(cache);
 
-        this.stackEntries = new ArrayList<List<Integer>>();
+        this.stackEntries = new ArrayList<>();
 
         for (int set = 0; set < this.getCache().getNumSets(); set++) {
             this.stackEntries.add(new ArrayList<Integer>());

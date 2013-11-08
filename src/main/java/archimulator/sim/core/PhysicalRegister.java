@@ -42,9 +42,9 @@ public class PhysicalRegister {
     public PhysicalRegister(PhysicalRegisterFile physicalRegisterFile) {
         this.physicalRegisterFile = physicalRegisterFile;
         this.state = PhysicalRegisterState.AVAILABLE;
-        this.effectiveAddressComputationOperandDependents = new ArrayList<ReorderBufferEntry>();
-        this.storeAddressDependents = new ArrayList<LoadStoreQueueEntry>();
-        this.dependents = new ArrayList<AbstractReorderBufferEntry>();
+        this.effectiveAddressComputationOperandDependents = new ArrayList<>();
+        this.storeAddressDependents = new ArrayList<>();
+        this.dependents = new ArrayList<>();
     }
 
     /**

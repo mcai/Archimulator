@@ -58,7 +58,7 @@ public abstract class CacheReplacementPolicy<StateT extends Serializable> implem
         for (int way = 0; way < this.cache.getAssociativity(); way++) {
             CacheLine<StateT> line = this.cache.getLine(set, way);
             if (line.getState() == line.getInitialState()) {
-                return new CacheAccess<StateT>(this.cache, access, set, way, tag);
+                return new CacheAccess<>(this.cache, access, set, way, tag);
             }
         }
 

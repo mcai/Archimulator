@@ -63,7 +63,7 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
 
         this.memoryHierarchy = memoryHierarchy;
 
-        this.cores = new ArrayList<Core>();
+        this.cores = new ArrayList<>();
 
         for (int i = 0; i < getExperiment().getArchitecture().getNumCores(); i++) {
             Core core = new BasicCore(this, i);
@@ -83,7 +83,7 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
             this.cores.add(core);
         }
 
-        this.contextToThreadMappings = new HashMap<Context, Thread>();
+        this.contextToThreadMappings = new HashMap<>();
 
         this.updateContextToThreadAssignments();
     }
@@ -149,7 +149,7 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
 
     @Override
     public List<Thread> getThreads() {
-        List<Thread> threads = new ArrayList<Thread>();
+        List<Thread> threads = new ArrayList<>();
 
         for (Core core : cores) {
             threads.addAll(core.getThreads());

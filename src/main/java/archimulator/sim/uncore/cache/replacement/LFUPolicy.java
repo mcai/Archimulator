@@ -25,7 +25,6 @@ import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.cache.EvictableCache;
 import net.pickapack.util.ValueProvider;
-import net.pickapack.util.ValueProviderFactory;
 
 import java.io.Serializable;
 
@@ -46,12 +45,7 @@ public class LFUPolicy<StateT extends Serializable> extends CacheReplacementPoli
     public LFUPolicy(EvictableCache<StateT> cache) {
         super(cache);
 
-        this.mirrorCache = new Cache<Boolean>(cache, cache.getName() + "/lfuPolicy/mirrorCache", cache.getGeometry(), new ValueProviderFactory<Boolean, ValueProvider<Boolean>>() {
-            @Override
-            public ValueProvider<Boolean> createValueProvider(Object... args) {
-                return new BooleanValueProvider();
-            }
-        });
+        this.mirrorCache = new Cache<>(cache, cache.getName() + "/lfuPolicy/mirrorCache", cache.getGeometry(), args -> new BooleanValueProvider());
     }
 
     /**
@@ -77,7 +71,7 @@ public class LFUPolicy<StateT extends Serializable> extends CacheReplacementPoli
             }
         }
 
-        return new CacheAccess<StateT>(this.getCache(), access, set, victimWay, tag);
+        return new CacheAccess<>(this.getCache(), access, set, victimWay, tag);
     }
 
     /**

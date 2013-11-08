@@ -92,7 +92,7 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
         this.standardInFileDescriptor = contextMapping.getBenchmark().getStandardIn().length() > 0 ? NativeSystemCalls.LIBC.open(simulationDirectory + File.separator + contextMapping.getBenchmark().getStandardIn(), OpenFlags.O_RDONLY) : 0;
         this.standardOutFileDescriptor = contextMapping.getStandardOut().length() > 0 ? NativeSystemCalls.LIBC.open(simulationDirectory + File.separator + contextMapping.getStandardOut(), OpenFlags.O_CREAT | OpenFlags.O_APPEND | OpenFlags.O_TRUNC | OpenFlags.O_WRONLY, 0660) : 1;
 
-        this.environments = new ArrayList<String>();
+        this.environments = new ArrayList<>();
 
         this.littleEndian = false;
 

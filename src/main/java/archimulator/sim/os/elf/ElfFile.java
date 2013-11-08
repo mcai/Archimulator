@@ -67,8 +67,8 @@ public class ElfFile {
             this.file = new RandomAccessFile(filename.replaceAll(ServiceManager.USER_HOME_TEMPLATE_ARG, System.getProperty("user.home")), "r");
             this.buffer = new RandomAccessFileBuffer(this.file);
 
-            this.sectionHeaders = new ArrayList<ElfSectionHeader>();
-            this.programHeaders = new ArrayList<ElfProgramHeader>();
+            this.sectionHeaders = new ArrayList<>();
+            this.programHeaders = new ArrayList<>();
 
             this.identification = new ElfIdentification();
             this.identification.read(this);
@@ -100,10 +100,10 @@ public class ElfFile {
                 this.programHeaders.add(new ElfProgramHeader(this));
             }
 
-            this.symbols = new HashMap<Integer, Symbol>();
-            this.localFunctionSymbols = new HashMap<Integer, Symbol>();
-            this.localObjectSymbols = new HashMap<Integer, Symbol>();
-            this.commonObjectSymbols = new HashMap<Integer, Symbol>();
+            this.symbols = new HashMap<>();
+            this.localFunctionSymbols = new HashMap<>();
+            this.localObjectSymbols = new HashMap<>();
+            this.commonObjectSymbols = new HashMap<>();
 
             this.loadSymbols();
         } catch (IOException e) {
@@ -229,7 +229,7 @@ public class ElfFile {
      * @return the list of section headers matching the specified type
      */
     public List<ElfSectionHeader> getSectionHeaders(int type) {
-        List<ElfSectionHeader> sectionHeaders = new ArrayList<ElfSectionHeader>();
+        List<ElfSectionHeader> sectionHeaders = new ArrayList<>();
 
         for (ElfSectionHeader sectionHeader : this.getSectionHeaders()) {
             if (sectionHeader.getType() == type) {

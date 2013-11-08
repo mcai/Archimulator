@@ -51,7 +51,7 @@ public class StaticInstruction {
 
     private int nonEffectiveAddressBaseDependency;
 
-    private Map<RegisterDependencyType, Integer> numFreePhysicalRegistersToAllocate = new EnumMap<RegisterDependencyType, Integer>(RegisterDependencyType.class);
+    private Map<RegisterDependencyType, Integer> numFreePhysicalRegistersToAllocate = new EnumMap<>(RegisterDependencyType.class);
 
     /**
      * Create a static instruction.
@@ -2670,9 +2670,7 @@ public class StaticInstruction {
         int oldPc = context.getRegisterFile().getPc();
         try {
             staticInstruction.mnemonic.getMethod().invoke(null, context, staticInstruction.machineInstruction);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
         context.getBlockingEventDispatcher().dispatch(new InstructionFunctionallyExecutedEvent(context, oldPc, staticInstruction));

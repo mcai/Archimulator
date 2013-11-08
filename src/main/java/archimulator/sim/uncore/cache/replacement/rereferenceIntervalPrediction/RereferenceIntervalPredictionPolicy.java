@@ -26,7 +26,6 @@ import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicy;
 import net.pickapack.util.ValueProvider;
-import net.pickapack.util.ValueProviderFactory;
 
 import java.io.Serializable;
 
@@ -51,12 +50,7 @@ public class RereferenceIntervalPredictionPolicy<StateT extends Serializable> ex
 
         this.predictedRereferenceIntervalMaxValue = 3;
 
-        this.mirrorCache = new Cache<Boolean>(cache, getCache().getName() + ".rereferenceIntervalPredictionEvictionPolicy.mirrorCache", cache.getGeometry(), new ValueProviderFactory<Boolean, ValueProvider<Boolean>>() {
-            @Override
-            public ValueProvider<Boolean> createValueProvider(Object... args) {
-                return new BooleanValueProvider();
-            }
-        });
+        this.mirrorCache = new Cache<>(cache, getCache().getName() + ".rereferenceIntervalPredictionEvictionPolicy.mirrorCache", cache.getGeometry(), args -> new BooleanValueProvider());
 
         this.insertionPolicy = new DynamicInsertionPolicy(cache, 4, ((1 << 10) - 1), 6); //TODO: parameter passing
     }

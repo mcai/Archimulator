@@ -41,10 +41,7 @@ import archimulator.sim.uncore.coherence.event.GeneralCacheControllerServiceNonb
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.delinquentLoad.DelinquentLoad;
 import archimulator.sim.uncore.delinquentLoad.DelinquentLoadIdentificationTable;
-import net.pickapack.action.Action1;
-import net.pickapack.action.Predicate;
 import net.pickapack.util.ValueProvider;
-import net.pickapack.util.ValueProviderFactory;
 import org.apache.commons.collections.iterators.ReverseListIterator;
 
 import java.util.*;
@@ -69,16 +66,11 @@ public class DynamicSpeculativePrecomputationHelper {
     public DynamicSpeculativePrecomputationHelper(Simulation simulation) {
         Processor processor = simulation.getProcessor();
 
-        this.sliceCache = new EvictableCache<Boolean>(processor, "sliceCache", new CacheGeometry(SLICE_CACHE_CAPACITY, SLICE_CACHE_CAPACITY, 1), CacheReplacementPolicyType.LRU, new ValueProviderFactory<Boolean, ValueProvider<Boolean>>() {
-            @Override
-            public ValueProvider<Boolean> createValueProvider(Object... args) {
-                return new BooleanValueProvider();
-            }
-        });
+        this.sliceCache = new EvictableCache<>(processor, "sliceCache", new CacheGeometry(SLICE_CACHE_CAPACITY, SLICE_CACHE_CAPACITY, 1), CacheReplacementPolicyType.LRU, args -> new BooleanValueProvider());
 
-        this.delinquentLoadIdentificationTables = new HashMap<Thread, DelinquentLoadIdentificationTable>();
-        this.retiredInstructionBuffers = new HashMap<Thread, RetiredInstructionBuffer>();
-        this.sliceInformationTables = new HashMap<Thread, SliceInformationTable>();
+        this.delinquentLoadIdentificationTables = new HashMap<>();
+        this.retiredInstructionBuffers = new HashMap<>();
+        this.sliceInformationTables = new HashMap<>();
 
         for (Core core : processor.getCores()) {
             for (Thread thread : core.getThreads()) {
@@ -88,11 +80,8 @@ public class DynamicSpeculativePrecomputationHelper {
             }
         }
 
-        processor.getBlockingEventDispatcher().addListener(DelinquentLoadIdentificationTable.DelinquentLoadIdentifiedEvent.class, new Action1<DelinquentLoadIdentificationTable.DelinquentLoadIdentifiedEvent>() {
-            @Override
-            public void apply(DelinquentLoadIdentificationTable.DelinquentLoadIdentifiedEvent event) {
-                getRetiredInstructionBuffers().get(event.getThread()).gatherInstructionsFor(event.getDelinquentLoad());
-            }
+        processor.getBlockingEventDispatcher().addListener(DelinquentLoadIdentificationTable.DelinquentLoadIdentifiedEvent.class, event -> {
+            getRetiredInstructionBuffers().get(event.getThread()).gatherInstructionsFor(event.getDelinquentLoad());
         });
     }
 
@@ -185,7 +174,7 @@ public class DynamicSpeculativePrecomputationHelper {
         for (int way = 0; way < this.getSliceCache().getAssociativity(); way++) {
             CacheLine<Boolean> line = this.getSliceCache().getLine(set, way);
             if (line.getState() == line.getInitialState()) {
-                return new CacheAccess<Boolean>(this.getSliceCache(), new MemoryHierarchyAccess(null, thread, MemoryHierarchyAccessType.UNKNOWN, -1, address, tag, null), set, way, tag);
+                return new CacheAccess<>(this.getSliceCache(), new MemoryHierarchyAccess(null, thread, MemoryHierarchyAccessType.UNKNOWN, -1, address, tag, null), set, way, tag);
             }
         }
 
@@ -217,28 +206,26 @@ public class DynamicSpeculativePrecomputationHelper {
             this.dynamicSpeculativePrecomputationHelper = dynamicSpeculativePrecomputationHelper;
             this.thread = thread;
 
-            this.retiredInstructions = new Stack<RetiredInstruction>();
+            this.retiredInstructions = new Stack<>();
 
-            this.stackAddressTable = new ArrayList<StackAddressTableEntry>();
+            this.stackAddressTable = new ArrayList<>();
 
             this.state = RetiredInstructionBufferState.IDLE;
 
-            this.thread.getBlockingEventDispatcher().addListener(InstructionCommittedEvent.class, new Action1<InstructionCommittedEvent>() {
-                public void apply(InstructionCommittedEvent event) {
-                    if (event.getDynamicInstruction().getThread() == RetiredInstructionBuffer.this.thread) {
-                        if (state == RetiredInstructionBufferState.IDLE && delinquentLoad != null && event.getDynamicInstruction().getPc() == delinquentLoad.getPc() && !event.getDynamicInstruction().getThread().getContext().getFunctionCallContextStack().isEmpty() && event.getDynamicInstruction().getThread().getContext().getFunctionCallContextStack().peek().getPc() == delinquentLoad.getFunctionCallPc()) {
-                            state = RetiredInstructionBufferState.INSTRUCTION_GATHERING;
+            this.thread.getBlockingEventDispatcher().addListener(InstructionCommittedEvent.class, event -> {
+                if (event.getDynamicInstruction().getThread() == RetiredInstructionBuffer.this.thread) {
+                    if (state == RetiredInstructionBufferState.IDLE && delinquentLoad != null && event.getDynamicInstruction().getPc() == delinquentLoad.getPc() && !event.getDynamicInstruction().getThread().getContext().getFunctionCallContextStack().isEmpty() && event.getDynamicInstruction().getThread().getContext().getFunctionCallContextStack().peek().getPc() == delinquentLoad.getFunctionCallPc()) {
+                        state = RetiredInstructionBufferState.INSTRUCTION_GATHERING;
 
-                            retiredInstructions.add(new RetiredInstruction(event.getDynamicInstruction().getPc(), event.getDynamicInstruction().isUseStackPointerAsEffectiveAddressBase(), event.getDynamicInstruction().getEffectiveAddressDisplacement(), event.getDynamicInstruction().getStaticInstruction()));
-                        } else if (state == RetiredInstructionBufferState.INSTRUCTION_GATHERING) {
-                            if (retiredInstructions.size() >= CAPACITY) {
-                                retiredInstructions.remove(retiredInstructions.firstElement());
-                            }
-                            retiredInstructions.add(new RetiredInstruction(event.getDynamicInstruction().getPc(), event.getDynamicInstruction().isUseStackPointerAsEffectiveAddressBase(), event.getDynamicInstruction().getEffectiveAddressDisplacement(), event.getDynamicInstruction().getStaticInstruction()));
+                        retiredInstructions.add(new RetiredInstruction(event.getDynamicInstruction().getPc(), event.getDynamicInstruction().isUseStackPointerAsEffectiveAddressBase(), event.getDynamicInstruction().getEffectiveAddressDisplacement(), event.getDynamicInstruction().getStaticInstruction()));
+                    } else if (state == RetiredInstructionBufferState.INSTRUCTION_GATHERING) {
+                        if (retiredInstructions.size() >= CAPACITY) {
+                            retiredInstructions.remove(retiredInstructions.firstElement());
+                        }
+                        retiredInstructions.add(new RetiredInstruction(event.getDynamicInstruction().getPc(), event.getDynamicInstruction().isUseStackPointerAsEffectiveAddressBase(), event.getDynamicInstruction().getEffectiveAddressDisplacement(), event.getDynamicInstruction().getStaticInstruction()));
 
-                            if (event.getDynamicInstruction().getPc() == delinquentLoad.getPc() && !event.getDynamicInstruction().getThread().getContext().getFunctionCallContextStack().isEmpty() && event.getDynamicInstruction().getThread().getContext().getFunctionCallContextStack().peek().getPc() == delinquentLoad.getFunctionCallPc()) {
-                                buildSlice();
-                            }
+                        if (event.getDynamicInstruction().getPc() == delinquentLoad.getPc() && !event.getDynamicInstruction().getThread().getContext().getFunctionCallContextStack().isEmpty() && event.getDynamicInstruction().getThread().getContext().getFunctionCallContextStack().peek().getPc() == delinquentLoad.getFunctionCallPc()) {
+                            buildSlice();
                         }
                     }
                 }
@@ -444,69 +431,60 @@ public class DynamicSpeculativePrecomputationHelper {
             this.dynamicSpeculativePrecomputationHelper = dynamicSpeculativePrecomputationHelper;
             this.thread = thread;
 
-            this.slices = new ArrayList<Slice>();
+            this.slices = new ArrayList<>();
 
-            this.thread.getBlockingEventDispatcher().addListener(InstructionDecodedEvent.class, new Action1<InstructionDecodedEvent>() {
-                public void apply(InstructionDecodedEvent event) {
-                    for (Slice slice : slices) {
-                        if (event.getDynamicInstruction().getPc() == slice.getTriggerPc() && slice.getSpawnedThreadContext() == null) {
-                            spawnPrecomputationThread(slice, event.getDynamicInstruction().getThread().getContext());
-                            break;
-                        }
+            this.thread.getBlockingEventDispatcher().addListener(InstructionDecodedEvent.class, event -> {
+                for (Slice slice : slices) {
+                    if (event.getDynamicInstruction().getPc() == slice.getTriggerPc() && slice.getSpawnedThreadContext() == null) {
+                        spawnPrecomputationThread(slice, event.getDynamicInstruction().getThread().getContext());
+                        break;
                     }
+                }
 
-                    for (Slice slice : slices) {
-                        if (slice.getSpawnedThreadContext() != null && event.getDynamicInstruction().getThread().getContext() == slice.getSpawnedThreadContext()) {
-                            slice.setNumDecodedInstructions(slice.getNumDecodedInstructions() + 1);
-                            break;
-                        }
+                for (Slice slice : slices) {
+                    if (slice.getSpawnedThreadContext() != null && event.getDynamicInstruction().getThread().getContext() == slice.getSpawnedThreadContext()) {
+                        slice.setNumDecodedInstructions(slice.getNumDecodedInstructions() + 1);
+                        break;
                     }
                 }
             });
 
-            this.thread.getBlockingEventDispatcher().addListener(InstructionCommittedEvent.class, new Action1<InstructionCommittedEvent>() {
-                public void apply(InstructionCommittedEvent event) {
-                    if (SliceInformationTable.this.thread.getNumInstructions() % INSTRUCTIONS_PER_PHASE == 0) {
-                        for (Iterator<Slice> it = slices.iterator(); it.hasNext(); ) {
-                            Slice slice = it.next();
-                            if (slice.getNumSpawnings() > 0) {
-                                if (!evaluateEffectiveness(slice)) {
-                                    it.remove();
-                                }
+            this.thread.getBlockingEventDispatcher().addListener(InstructionCommittedEvent.class, event -> {
+                if (SliceInformationTable.this.thread.getNumInstructions() % INSTRUCTIONS_PER_PHASE == 0) {
+                    for (Iterator<Slice> it = slices.iterator(); it.hasNext(); ) {
+                        Slice slice = it.next();
+                        if (slice.getNumSpawnings() > 0) {
+                            if (!evaluateEffectiveness(slice)) {
+                                it.remove();
                             }
                         }
                     }
                 }
             });
 
-            this.thread.getBlockingEventDispatcher().addListener(ContextKilledEvent.class, new Action1<ContextKilledEvent>() {
-                public void apply(ContextKilledEvent event) {
-                    for (Iterator<Slice> iterator = slices.iterator(); iterator.hasNext(); ) {
-                        Slice slice = iterator.next();
-                        if (event.getContext() == slice.getSpawnedThreadContext()) {
-                            slice.setSpawnedThreadContext(null);
+            this.thread.getBlockingEventDispatcher().addListener(ContextKilledEvent.class, event -> {
+                for (Iterator<Slice> iterator = slices.iterator(); iterator.hasNext(); ) {
+                    Slice slice = iterator.next();
+                    if (event.getContext() == slice.getSpawnedThreadContext()) {
+                        slice.setSpawnedThreadContext(null);
 
-                            if (slice.isIneffective()) {
-                                prepareRemoveSlice(slice);
-                                iterator.remove();
-                            }
-
-                            break;
+                        if (slice.isIneffective()) {
+                            prepareRemoveSlice(slice);
+                            iterator.remove();
                         }
+
+                        break;
                     }
                 }
             });
 
-            this.thread.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, new Action1<GeneralCacheControllerServiceNonblockingRequestEvent>() {
-                @Override
-                public void apply(GeneralCacheControllerServiceNonblockingRequestEvent event) {
-                    if (!event.isHitInCache() && event.getCacheController() instanceof DirectoryController && event.getAccess().getType().isRead()) {
-                        for (Slice slice : slices) {
-                            if (slice.getSpawnedThreadContext() != null) {
-                                if (event.getAccess().getThread().getContext() == slice.getSpawnedThreadContext()) {
-                                    slice.setNumSavedL2Misses(slice.getNumSavedL2Misses() + 1);
-                                    break;
-                                }
+            this.thread.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, event -> {
+                if (!event.isHitInCache() && event.getCacheController() instanceof DirectoryController && event.getAccess().getType().isRead()) {
+                    for (Slice slice : slices) {
+                        if (slice.getSpawnedThreadContext() != null) {
+                            if (event.getAccess().getThread().getContext() == slice.getSpawnedThreadContext()) {
+                                slice.setNumSavedL2Misses(slice.getNumSavedL2Misses() + 1);
+                                break;
                             }
                         }
                     }
@@ -536,7 +514,7 @@ public class DynamicSpeculativePrecomputationHelper {
                 line.setTag(slice.getTriggerPc());
                 dynamicSpeculativePrecomputationHelper.getSliceCache().getReplacementPolicy().handleInsertionOnMiss(null, set, cacheAccess.getWay());
 
-                Map<Integer, Integer> machInsts = new TreeMap<Integer, Integer>();
+                Map<Integer, Integer> machInsts = new TreeMap<>();
 
                 int i = FIRST_INSTRUCTION_PC;
 
@@ -568,12 +546,10 @@ public class DynamicSpeculativePrecomputationHelper {
 
             final PrecomputationContext newContext = new PrecomputationContext(dynamicSpeculativePrecomputationHelper, context, newRegs, slice.getTriggerPc());
 
-            if (this.thread.getCore().getProcessor().getKernel().map(newContext, new Predicate<Integer>() {
-                public boolean apply(Integer candidateThreadId) {
-                    int candidateCoreNum = candidateThreadId / thread.getCore().getProcessor().getExperiment().getArchitecture().getNumThreadsPerCore();
-                    int parentCoreNum = newContext.getParent().getThreadId() / thread.getCore().getProcessor().getExperiment().getArchitecture().getNumThreadsPerCore();
-                    return candidateCoreNum != parentCoreNum;
-                }
+            if (this.thread.getCore().getProcessor().getKernel().map(newContext, candidateThreadId -> {
+                int candidateCoreNum = candidateThreadId / thread.getCore().getProcessor().getExperiment().getArchitecture().getNumThreadsPerCore();
+                int parentCoreNum = newContext.getParent().getThreadId() / thread.getCore().getProcessor().getExperiment().getArchitecture().getNumThreadsPerCore();
+                return candidateCoreNum != parentCoreNum;
             })) {
                 context.getKernel().getContexts().add(newContext);
 

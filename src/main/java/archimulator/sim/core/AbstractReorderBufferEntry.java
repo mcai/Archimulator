@@ -137,9 +137,9 @@ public abstract class AbstractReorderBufferEntry {
         this.branchPredictorUpdate = branchPredictorUpdate;
         this.speculative = speculative;
 
-        this.oldPhysicalRegisters = new TreeMap<Integer, PhysicalRegister>();
-        this.targetPhysicalRegisters = new TreeMap<Integer, PhysicalRegister>();
-        this.sourcePhysicalRegisters = new TreeMap<Integer, PhysicalRegister>();
+        this.oldPhysicalRegisters = new TreeMap<>();
+        this.targetPhysicalRegisters = new TreeMap<>();
+        this.sourcePhysicalRegisters = new TreeMap<>();
     }
 
     /**

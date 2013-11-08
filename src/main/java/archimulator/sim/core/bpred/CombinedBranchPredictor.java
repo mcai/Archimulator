@@ -118,21 +118,27 @@ public class CombinedBranchPredictor extends DynamicBranchPredictor {
     }
 
     /**
-     * @return
+     * Get the bimod branch predictor.
+     *
+     * @return the bimod branch predictor
      */
     public TwoBitBranchPredictor getBimod() {
         return bimod;
     }
 
     /**
-     * @return
+     * Get the meta branch predictor.
+     *
+     * @return the meta branch predictor
      */
     public TwoBitBranchPredictor getMeta() {
         return meta;
     }
 
     /**
-     * @return
+     * Get the two level branch predictor.
+     *
+     * @return the two level branch predictor
      */
     public TwoLevelBranchPredictor getTwoLevel() {
         return twoLevel;

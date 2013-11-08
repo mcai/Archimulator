@@ -57,7 +57,7 @@ public abstract class CacheCoherenceFlow extends Params implements Node {
         this.generator = generator;
         this.producerFlow = producerFlow;
         this.ancestorFlow = producerFlow == null ? this : producerFlow.ancestorFlow;
-        this.childFlows = new ArrayList<CacheCoherenceFlow>();
+        this.childFlows = new ArrayList<>();
         this.access = access;
         this.tag = tag;
 

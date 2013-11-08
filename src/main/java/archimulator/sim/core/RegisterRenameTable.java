@@ -37,7 +37,7 @@ public class RegisterRenameTable {
      */
     public RegisterRenameTable(String name) {
         this.name = name;
-        this.entries = new TreeMap<Integer, PhysicalRegister>();
+        this.entries = new TreeMap<>();
     }
 
     /**

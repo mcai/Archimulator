@@ -24,7 +24,6 @@ import archimulator.sim.common.report.Reportable;
 import archimulator.sim.uncore.coherence.event.GeneralCacheControllerLineReplacementEvent;
 import archimulator.sim.uncore.coherence.event.GeneralCacheControllerServiceNonblockingRequestEvent;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
-import net.pickapack.action.Action1;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -57,68 +56,63 @@ public class CacheInteractionHelper implements Reportable {
     public CacheInteractionHelper(final DirectoryController l2CacheController) {
         this.l2CacheController = l2CacheController;
 
-        this.numL2CacheInterThreadConstructiveInteractions = new TreeMap<Integer, Map<Integer, Long>>();
-        this.numL2CacheInterThreadEvictions = new TreeMap<Integer, Map<Integer, Long>>();
+        this.numL2CacheInterThreadConstructiveInteractions = new TreeMap<>();
+        this.numL2CacheInterThreadEvictions = new TreeMap<>();
 
-        l2CacheController.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, new Action1<GeneralCacheControllerServiceNonblockingRequestEvent>() {
-            public void apply(GeneralCacheControllerServiceNonblockingRequestEvent event) {
-                if (event.getCacheController().equals(CacheInteractionHelper.this.l2CacheController) && event.isHitInCache()) {
-                    int set = event.getSet();
-                    int way = event.getWay();
-                    int broughterThreadId = CacheInteractionHelper.this.l2CacheController.getSimulation().getHelperThreadL2CacheRequestProfilingHelper().getHelperThreadL2CacheRequestStates().get(set).get(way).getThreadId();
-                    int requesterThreadId = event.getAccess().getThread().getId();
+        l2CacheController.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, event -> {
+            if (event.getCacheController().equals(CacheInteractionHelper.this.l2CacheController) && event.isHitInCache()) {
+                int set = event.getSet();
+                int way = event.getWay();
+                int broughterThreadId = CacheInteractionHelper.this.l2CacheController.getSimulation().getHelperThreadL2CacheRequestProfilingHelper().getHelperThreadL2CacheRequestStates().get(set).get(way).getThreadId();
+                int requesterThreadId = event.getAccess().getThread().getId();
 
-                    if(broughterThreadId == -1) {
-                        throw new IllegalArgumentException();
+                if(broughterThreadId == -1) {
+                    throw new IllegalArgumentException();
+                }
+
+                if(requesterThreadId == -1) {
+                    throw new IllegalArgumentException();
+                }
+
+                if(broughterThreadId != requesterThreadId) {
+                    if(!numL2CacheInterThreadConstructiveInteractions.containsKey(broughterThreadId)) {
+                        numL2CacheInterThreadConstructiveInteractions.put(broughterThreadId, new TreeMap<Integer, Long>());
                     }
 
-                    if(requesterThreadId == -1) {
-                        throw new IllegalArgumentException();
+                    if(!numL2CacheInterThreadConstructiveInteractions.get(broughterThreadId).containsKey(requesterThreadId)) {
+                        numL2CacheInterThreadConstructiveInteractions.get(broughterThreadId).put(requesterThreadId, 0L);
                     }
 
-                    if(broughterThreadId != requesterThreadId) {
-                        if(!numL2CacheInterThreadConstructiveInteractions.containsKey(broughterThreadId)) {
-                            numL2CacheInterThreadConstructiveInteractions.put(broughterThreadId, new TreeMap<Integer, Long>());
-                        }
-
-                        if(!numL2CacheInterThreadConstructiveInteractions.get(broughterThreadId).containsKey(requesterThreadId)) {
-                            numL2CacheInterThreadConstructiveInteractions.get(broughterThreadId).put(requesterThreadId, 0L);
-                        }
-
-                        numL2CacheInterThreadConstructiveInteractions.get(broughterThreadId).put(requesterThreadId, numL2CacheInterThreadConstructiveInteractions.get(broughterThreadId).get(requesterThreadId) + 1);
-                    }
+                    numL2CacheInterThreadConstructiveInteractions.get(broughterThreadId).put(requesterThreadId, numL2CacheInterThreadConstructiveInteractions.get(broughterThreadId).get(requesterThreadId) + 1);
                 }
             }
         });
 
-        l2CacheController.getBlockingEventDispatcher().addListener(GeneralCacheControllerLineReplacementEvent.class, new Action1<GeneralCacheControllerLineReplacementEvent>() {
-            @Override
-            public void apply(GeneralCacheControllerLineReplacementEvent event) {
-                if (event.getCacheController() == CacheInteractionHelper.this.l2CacheController) {
-                    int set = event.getSet();
-                    int way = event.getWay();
-                    int broughterThreadId = CacheInteractionHelper.this.l2CacheController.getSimulation().getHelperThreadL2CacheRequestProfilingHelper().getHelperThreadL2CacheRequestStates().get(set).get(way).getThreadId();
-                    int requesterThreadId = event.getAccess().getThread().getId();
+        l2CacheController.getBlockingEventDispatcher().addListener(GeneralCacheControllerLineReplacementEvent.class, event -> {
+            if (event.getCacheController() == CacheInteractionHelper.this.l2CacheController) {
+                int set = event.getSet();
+                int way = event.getWay();
+                int broughterThreadId = CacheInteractionHelper.this.l2CacheController.getSimulation().getHelperThreadL2CacheRequestProfilingHelper().getHelperThreadL2CacheRequestStates().get(set).get(way).getThreadId();
+                int requesterThreadId = event.getAccess().getThread().getId();
 
-                    if(broughterThreadId == -1) {
-                        throw new IllegalArgumentException();
+                if(broughterThreadId == -1) {
+                    throw new IllegalArgumentException();
+                }
+
+                if(requesterThreadId == -1) {
+                    throw new IllegalArgumentException();
+                }
+
+                if(broughterThreadId != requesterThreadId) {
+                    if(!numL2CacheInterThreadEvictions.containsKey(broughterThreadId)) {
+                        numL2CacheInterThreadEvictions.put(broughterThreadId, new TreeMap<Integer, Long>());
                     }
 
-                    if(requesterThreadId == -1) {
-                        throw new IllegalArgumentException();
+                    if(!numL2CacheInterThreadEvictions.get(broughterThreadId).containsKey(requesterThreadId)) {
+                        numL2CacheInterThreadEvictions.get(broughterThreadId).put(requesterThreadId, 0L);
                     }
 
-                    if(broughterThreadId != requesterThreadId) {
-                        if(!numL2CacheInterThreadEvictions.containsKey(broughterThreadId)) {
-                            numL2CacheInterThreadEvictions.put(broughterThreadId, new TreeMap<Integer, Long>());
-                        }
-
-                        if(!numL2CacheInterThreadEvictions.get(broughterThreadId).containsKey(requesterThreadId)) {
-                            numL2CacheInterThreadEvictions.get(broughterThreadId).put(requesterThreadId, 0L);
-                        }
-
-                        numL2CacheInterThreadEvictions.get(broughterThreadId).put(requesterThreadId, numL2CacheInterThreadEvictions.get(broughterThreadId).get(requesterThreadId) + 1);
-                    }
+                    numL2CacheInterThreadEvictions.get(broughterThreadId).put(requesterThreadId, numL2CacheInterThreadEvictions.get(broughterThreadId).get(requesterThreadId) + 1);
                 }
             }
         });

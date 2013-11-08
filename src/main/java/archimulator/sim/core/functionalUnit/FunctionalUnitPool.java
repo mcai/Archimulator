@@ -21,7 +21,6 @@ package archimulator.sim.core.functionalUnit;
 import archimulator.sim.common.Named;
 import archimulator.sim.core.AbstractBasicCore;
 import archimulator.sim.core.ReorderBufferEntry;
-import net.pickapack.action.Action;
 import net.pickapack.action.Action1;
 
 import java.util.EnumMap;
@@ -48,9 +47,9 @@ public class FunctionalUnitPool implements Named {
     public FunctionalUnitPool(AbstractBasicCore core) {
         this.core = core;
 
-        this.descriptors = new EnumMap<FunctionalUnitType, FunctionalUnitDescriptor>(FunctionalUnitType.class);
+        this.descriptors = new EnumMap<>(FunctionalUnitType.class);
 
-        this.functionalUnitOperationToFunctionalUnitMap = new EnumMap<FunctionalUnitOperationType, FunctionalUnitType>(FunctionalUnitOperationType.class);
+        this.functionalUnitOperationToFunctionalUnitMap = new EnumMap<>(FunctionalUnitOperationType.class);
 
         this.addFunctionalUnitDescriptor(FunctionalUnitType.INTEGER_ALU, 8)
                 .addFunctionalUnitOperation(FunctionalUnitOperationType.INT_ALU, 2, 1);
@@ -73,13 +72,13 @@ public class FunctionalUnitPool implements Named {
                 .addFunctionalUnitOperation(FunctionalUnitOperationType.READ_PORT, 1, 1)
                 .addFunctionalUnitOperation(FunctionalUnitOperationType.WRITE_PORT, 1, 1);
 
-        this.numStallsOnNoFreeFunctionalUnit = new EnumMap<FunctionalUnitType, Long>(FunctionalUnitType.class);
+        this.numStallsOnNoFreeFunctionalUnit = new EnumMap<>(FunctionalUnitType.class);
         EnumSet<FunctionalUnitType> fuTypes = EnumSet.allOf(FunctionalUnitType.class);
         for (FunctionalUnitType fuTye : fuTypes) {
             this.numStallsOnNoFreeFunctionalUnit.put(fuTye, 0L);
         }
 
-        this.numStallsOnAcquireFailedOnNoFreeFunctionalUnit = new EnumMap<FunctionalUnitOperationType, Long>(FunctionalUnitOperationType.class);
+        this.numStallsOnAcquireFailedOnNoFreeFunctionalUnit = new EnumMap<>(FunctionalUnitOperationType.class);
         EnumSet<FunctionalUnitOperationType> fuOperationTypes = EnumSet.allOf(FunctionalUnitOperationType.class);
         for (FunctionalUnitOperationType fuOperationType : fuOperationTypes) {
             this.numStallsOnAcquireFailedOnNoFreeFunctionalUnit.put(fuOperationType, 0L);
@@ -120,18 +119,12 @@ public class FunctionalUnitPool implements Named {
         }
 
         this.core.getCycleAccurateEventQueue()
-                .schedule(this, new Action() {
-                    @Override
-                    public void apply() {
-                        functionalUnitDescriptor.setNumFree(functionalUnitDescriptor.getNumFree() + 1);
-                    }
+                .schedule(this, () -> {
+                    functionalUnitDescriptor.setNumFree(functionalUnitDescriptor.getNumFree() + 1);
                 }, functionalUnitOperation.getIssueLatency())
-                .schedule(this, new Action() {
-                    @Override
-                    public void apply() {
-                        if (!reorderBufferEntry.isSquashed()) {
-                            onCompletedCallback.apply(reorderBufferEntry);
-                        }
+                .schedule(this, () -> {
+                    if (!reorderBufferEntry.isSquashed()) {
+                        onCompletedCallback.apply(reorderBufferEntry);
                     }
                 }, functionalUnitOperation.getOperationLatency());
 

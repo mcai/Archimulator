@@ -68,13 +68,13 @@ public class DynamicInsertionPolicy {
 
         int policySelectionCounterThreshold = (int) ((float) policySelectionCounterMaxValue * 0.5);
 
-        this.policySelectionCounter = new ArrayList<SaturatingCounter>();
+        this.policySelectionCounter = new ArrayList<>();
 
         for (int i1 = 0; i1 < this.numThreads; i1++) {
             this.policySelectionCounter.add(new SaturatingCounter(0, policySelectionCounterThreshold, policySelectionCounterThreshold, 0));
         }
 
-        this.setDuelingMonitors = new ArrayList<SetDuelingMonitor>();
+        this.setDuelingMonitors = new ArrayList<>();
 
         for (int i = 0; i < this.cache.getNumSets(); i++) {
             this.setDuelingMonitors.add(new SetDuelingMonitor());

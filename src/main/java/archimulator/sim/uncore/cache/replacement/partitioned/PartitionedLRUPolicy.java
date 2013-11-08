@@ -49,7 +49,7 @@ public abstract class PartitionedLRUPolicy<StateT extends Serializable> extends 
     public PartitionedLRUPolicy(EvictableCache<StateT> cache) {
         super(cache);
 
-        this.numPartitionsPerWay = new TreeMap<Integer, Long>();
+        this.numPartitionsPerWay = new TreeMap<>();
         for (int i = 0; i < cache.getAssociativity(); i++) {
             this.numPartitionsPerWay.put(i, 0L);
         }

@@ -23,7 +23,6 @@ import archimulator.sim.common.SimulationType;
 import archimulator.sim.core.Thread;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
-import net.pickapack.action.Action;
 import net.pickapack.action.Predicate;
 import org.paukov.combinatorics.Factory;
 import org.paukov.combinatorics.Generator;
@@ -61,7 +60,7 @@ public abstract class CachePartitioningHelper implements Partitioner {
 //        this.numThreads = cache.getExperiment().getArchitecture().getNumThreadsPerCore() * this.l2CacheController.getExperiment().getArchitecture().getNumCores();
         this.numThreads = this.cache.getExperiment().getArchitecture().getNumCores();
 
-        this.partition = new ArrayList<Integer>();
+        this.partition = new ArrayList<>();
 
         int l2Associativity = this.cache.getAssociativity();
 
@@ -75,18 +74,15 @@ public abstract class CachePartitioningHelper implements Partitioner {
 
         this.numCyclesElapsedPerInterval = 5000000;
 
-        this.cache.getCycleAccurateEventQueue().getPerCycleEvents().add(new Action() {
-            @Override
-            public void apply() {
-                if (cache.getSimulation().getType() != SimulationType.FAST_FORWARD && canPartition(cache)) { //TODO: should not be hardcoded!!!
-                    numCyclesElapsed++;
+        this.cache.getCycleAccurateEventQueue().getPerCycleEvents().add(() -> {
+            if (cache.getSimulation().getType() != SimulationType.FAST_FORWARD && canPartition(cache)) { //TODO: should not be hardcoded!!!
+                numCyclesElapsed++;
 
-                    if (numCyclesElapsed == numCyclesElapsedPerInterval) {
-                        newInterval();
+                if (numCyclesElapsed == numCyclesElapsedPerInterval) {
+                    newInterval();
 
-                        numCyclesElapsed = 0;
-                        numIntervals++;
-                    }
+                    numCyclesElapsed = 0;
+                    numIntervals++;
                 }
             }
         });
@@ -215,7 +211,7 @@ public abstract class CachePartitioningHelper implements Partitioner {
      * @return the partition list of the specified integer n
      */
     public static List<List<Integer>> partition(int n, int k) {
-        List<List<Integer>> result = new ArrayList<List<Integer>>();
+        List<List<Integer>> result = new ArrayList<>();
 
         Generator<Integer> generator = Factory.createCompositionGenerator(n);
 

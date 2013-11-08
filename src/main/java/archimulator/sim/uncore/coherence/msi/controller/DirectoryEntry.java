@@ -34,7 +34,7 @@ public class DirectoryEntry {
      * Create a directory entry.
      */
     public DirectoryEntry() {
-        this.sharers = new ArrayList<CacheController>();
+        this.sharers = new ArrayList<>();
     }
 
     /**

@@ -46,7 +46,7 @@ public class TestPolicy1<StateT extends Serializable> extends LRUPolicy<StateT> 
     public TestPolicy1(EvictableCache<StateT> cache) {
         super(cache);
 
-        this.predefinedDelinquentPcs = new ArrayList<IntegerIntegerPair>();
+        this.predefinedDelinquentPcs = new ArrayList<>();
         this.predefinedDelinquentPcs.add(new IntegerIntegerPair(2, 0x004014d8));
         this.predefinedDelinquentPcs.add(new IntegerIntegerPair(0, 0x00400a34));
     }

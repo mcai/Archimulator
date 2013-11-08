@@ -40,15 +40,15 @@ public class TwoLevelBranchPredictor extends DynamicBranchPredictor {
     /**
      * Create a two level branch predictor.
      *
-     * @param thread
-     * @param name
-     * @param l1Size
-     * @param l2Size
-     * @param shiftWidth
-     * @param xor
-     * @param branchTargetBufferNumSets
-     * @param branchTargetBufferAssociativity
-     * @param returnAddressStackSize
+     * @param thread the thread
+     * @param name the name
+     * @param l1Size the L1 cache size
+     * @param l2Size the L2 cache size
+     * @param shiftWidth the shift width
+     * @param xor the xor
+     * @param branchTargetBufferNumSets the number of sets in the branch target buffer
+     * @param branchTargetBufferAssociativity the associativity of the branch target buffer
+     * @param returnAddressStackSize the size of the return address stack
      */
     public TwoLevelBranchPredictor(Thread thread, String name, int l1Size, int l2Size, int shiftWidth, boolean xor, int branchTargetBufferNumSets, int branchTargetBufferAssociativity, int returnAddressStackSize) {
         super(thread, name, BranchPredictorType.TWO_LEVEL, branchTargetBufferNumSets, branchTargetBufferAssociativity, returnAddressStackSize);
@@ -71,8 +71,8 @@ public class TwoLevelBranchPredictor extends DynamicBranchPredictor {
     /**
      * Create a two level branch predictor.
      *
-     * @param thread
-     * @param name
+     * @param thread the thread
+     * @param name the name
      */
     public TwoLevelBranchPredictor(Thread thread, String name) {
         this(thread, name, thread.getExperiment().getArchitecture().getTwoLevelBranchPredictorL1Size(), thread.getExperiment().getArchitecture().getTwoLevelBranchPredictorL2Size(), thread.getExperiment().getArchitecture().getTwoLevelBranchPredictorShiftWidth(), thread.getExperiment().getArchitecture().getTwoLevelBranchPredictorXor(), thread.getExperiment().getArchitecture().getTwoLevelBranchPredictorBranchTargetBufferNumSets(), thread.getExperiment().getArchitecture().getTwoLevelBranchPredictorBranchTargetBufferAssociativity(), thread.getExperiment().getArchitecture().getTwoLevelBranchPredictorReturnAddressStackSize());
@@ -143,16 +143,20 @@ public class TwoLevelBranchPredictor extends DynamicBranchPredictor {
     }
 
     /**
-     * @param branchAddress
-     * @return
+     * Get the index for the specified branch address.
+     *
+     * @param branchAddress the branch address
+     * @return the index for the specified branch address
      */
     public SaturatingCounter getIndex(int branchAddress) {
         return this.l2Table[this.hash(branchAddress)];
     }
 
     /**
-     * @param branchAddress
-     * @param taken
+     * Update the table.
+     *
+     * @param branchAddress the branch address
+     * @param taken a value indicating whether it is taken or not
      */
     public void updateTable(int branchAddress, boolean taken) {
         int l1Index = (branchAddress >> BranchPredictor.BRANCH_SHIFT) & (this.l1Size - 1);

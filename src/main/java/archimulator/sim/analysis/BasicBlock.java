@@ -47,9 +47,9 @@ public class BasicBlock {
     public BasicBlock(Function function, int num) {
         this.function = function;
         this.num = num;
-        this.instructions = new ArrayList<Instruction>();
+        this.instructions = new ArrayList<>();
 
-        this.incomingEdges = new ArrayList<ControlFlowGraphEdge>();
+        this.incomingEdges = new ArrayList<>();
 
         this.type = BasicBlockType.UNKNOWN;
     }

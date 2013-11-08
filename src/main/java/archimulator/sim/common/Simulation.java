@@ -48,8 +48,6 @@ import archimulator.sim.uncore.mlp.BLPProfilingHelper;
 import archimulator.sim.uncore.mlp.MLPProfilingHelper;
 import archimulator.sim.uncore.tlb.TranslationLookasideBuffer;
 import archimulator.util.RuntimeHelper;
-import net.pickapack.action.Action1;
-import net.pickapack.action.Predicate;
 import net.pickapack.collection.tree.NodeHelper;
 import net.pickapack.dateTime.DateHelper;
 import net.pickapack.event.BlockingEventDispatcher;
@@ -215,12 +213,7 @@ public abstract class Simulation implements SimulationObject, Reportable {
         for (final ContextMapping contextMapping : this.getExperiment().getContextMappings()) {
             final Context context = Context.load(kernel, this.getWorkingDirectory(), contextMapping);
 
-            if (!kernel.map(context, new Predicate<Integer>() {
-                @Override
-                public boolean apply(Integer candidateThreadId) {
-                    return candidateThreadId == contextMapping.getThreadId();
-                }
-            })) {
+            if (!kernel.map(context, candidateThreadId -> candidateThreadId == contextMapping.getThreadId())) {
                 throw new RuntimeException();
             }
 
@@ -273,7 +266,7 @@ public abstract class Simulation implements SimulationObject, Reportable {
      * Collect the statistics.
      */
     private void collectStats() {
-        final List<ExperimentStat> stats = new ArrayList<ExperimentStat>();
+        final List<ExperimentStat> stats = new ArrayList<>();
 
         ReportNode rootReportNode = new ReportNode(null, "");
 
@@ -315,11 +308,8 @@ public abstract class Simulation implements SimulationObject, Reportable {
 
         this.getProcessor().getMemoryHierarchy().getL2CacheController().getCache().getReplacementPolicy().dumpStats(rootReportNode);
 
-        rootReportNode.traverse(new Action1<ReportNode>() {
-            @Override
-            public void apply(ReportNode node) {
-                stats.add(new ExperimentStat(experiment.getId(), getPrefix(), node.getPath(), node.getValue()));
-            }
+        rootReportNode.traverse(node -> {
+            stats.add(new ExperimentStat(experiment.getId(), getPrefix(), node.getPath(), node.getValue()));
         });
 
         if (this.getType() == SimulationType.MEASUREMENT || this.getType() == SimulationType.CACHE_WARMUP) {

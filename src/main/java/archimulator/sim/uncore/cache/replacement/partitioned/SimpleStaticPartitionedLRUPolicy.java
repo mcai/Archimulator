@@ -65,16 +65,16 @@ public class SimpleStaticPartitionedLRUPolicy<StateT extends Serializable> exten
             add(getCache().getAssociativity() - numMainThreadWays);
         }};
 
-        this.partitionBoundaries = new ArrayList<Pair<Integer, Integer>>();
+        this.partitionBoundaries = new ArrayList<>();
 
-        int previousWay = 0;
+        int previousWay;
         int currentWay = 0;
 
         for (Integer partition : this.partitions) {
             previousWay = currentWay;
             currentWay += partition;
 
-            this.partitionBoundaries.add(new Pair<Integer, Integer>(previousWay, currentWay - 1));
+            this.partitionBoundaries.add(new Pair<>(previousWay, currentWay - 1));
         }
     }
 
@@ -86,7 +86,7 @@ public class SimpleStaticPartitionedLRUPolicy<StateT extends Serializable> exten
         for(int way = partitionBoundary.getFirst(); way <= partitionBoundary.getSecond(); way++) {
             CacheLine<StateT> line = this.getCache().getLine(set, way);
             if (line.getState() == line.getInitialState()) {
-                return new CacheAccess<StateT>(this.getCache(), access, set, way, tag);
+                return new CacheAccess<>(this.getCache(), access, set, way, tag);
             }
         }
 
@@ -109,7 +109,7 @@ public class SimpleStaticPartitionedLRUPolicy<StateT extends Serializable> exten
             int way = this.getWayInStackPosition(set, stackPosition);
 
             if(way >= partitionBoundary.getFirst() && way <= partitionBoundary.getSecond()) {
-                return new CacheAccess<StateT>(this.getCache(), access, set, way, tag);
+                return new CacheAccess<>(this.getCache(), access, set, way, tag);
             }
         }
 

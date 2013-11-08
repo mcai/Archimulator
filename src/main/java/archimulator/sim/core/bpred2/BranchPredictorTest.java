@@ -18,7 +18,6 @@
  ******************************************************************************/
 package archimulator.sim.core.bpred2;
 
-import net.pickapack.action.Action1;
 import net.pickapack.math.Counter;
 
 /**
@@ -40,23 +39,21 @@ public class BranchPredictorTest {
 
         BranchPredictorTraceTester traceReader = new BranchPredictorTraceTester("/home/itecgo/Tools/cbp2-infrastructure-v2/src/compress/gzip.trace");
 
-        traceReader.run(new Action1<BranchPredictorTraceRecord>() {
-            public void apply(BranchPredictorTraceRecord traceRecord) {
+        traceReader.run(traceRecord -> {
 //            System.out.printf("taken: %s, target: 0x%08x, address: 0x%08x, opcode: %d, brFlags: %d\n", traceRecord.isTaken(), traceRecord.getTarget(), traceRecord.getBranchInfo().getAddress(), traceRecord.getBranchInfo().getOpcode(), traceRecord.getBranchInfo().getBranchFlags());
 
-                BranchUpdate branchUpdate = branchPredictor.predict(traceRecord.getBranchInfo());
+            BranchUpdate branchUpdate = branchPredictor.predict(traceRecord.getBranchInfo());
 
-                if ((traceRecord.getBranchInfo().getBranchFlags() & BranchInfo.BR_CONDITIONAL) != 0) {
-                    if (branchUpdate.isPredictedDirection() != traceRecord.isTaken()) {
-                        counterDirectionMispredictions.increment();
-                    }
-
-                    if (branchUpdate.getPredictedTarget() != traceRecord.getTarget()) {
-                        counterTargetMispredictions.increment();
-                    }
-
-                    branchPredictor.update(traceRecord.getBranchInfo(), branchUpdate, traceRecord.isTaken(), traceRecord.getTarget());
+            if ((traceRecord.getBranchInfo().getBranchFlags() & BranchInfo.BR_CONDITIONAL) != 0) {
+                if (branchUpdate.isPredictedDirection() != traceRecord.isTaken()) {
+                    counterDirectionMispredictions.increment();
                 }
+
+                if (branchUpdate.getPredictedTarget() != traceRecord.getTarget()) {
+                    counterTargetMispredictions.increment();
+                }
+
+                branchPredictor.update(traceRecord.getBranchInfo(), branchUpdate, traceRecord.isTaken(), traceRecord.getTarget());
             }
         });
 

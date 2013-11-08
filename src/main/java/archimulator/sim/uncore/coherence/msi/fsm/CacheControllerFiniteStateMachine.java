@@ -34,7 +34,6 @@ import archimulator.sim.uncore.coherence.msi.flow.StoreFlow;
 import archimulator.sim.uncore.coherence.msi.message.*;
 import archimulator.sim.uncore.coherence.msi.state.CacheControllerState;
 import net.pickapack.action.Action;
-import net.pickapack.action.Action1;
 import net.pickapack.fsm.BasicFiniteStateMachine;
 import net.pickapack.fsm.event.ExitStateEvent;
 import net.pickapack.util.ValueProvider;
@@ -55,7 +54,7 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
 
     private int numInvAcks;
 
-    private List<Action> stalledEvents = new ArrayList<Action>();
+    private List<Action> stalledEvents = new ArrayList<>();
 
     private Action onCompletedCallback;
 
@@ -73,11 +72,8 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
         this.way = way;
         this.cacheController = cacheController;
 
-        this.addListener(ExitStateEvent.class, new Action1<ExitStateEvent>() {
-            @Override
-            public void apply(ExitStateEvent exitStateEvent) {
-                previousState = getState();
-            }
+        this.addListener(ExitStateEvent.class, exitStateEvent -> {
+            previousState = getState();
         });
     }
 
@@ -361,13 +357,9 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
      * @param event  the L1 cache controller event
      */
     public void stall(final Object sender, final CacheControllerEvent event) {
-        Action action = new Action() {
-            @Override
-            public void apply() {
-                fireTransition(sender, event);
-            }
-        };
-        stall(action);
+        stall((Action) () -> {
+            fireTransition(sender, event);
+        });
     }
 
     /**
@@ -388,7 +380,7 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
      */
     public void fireServiceNonblockingRequestEvent(MemoryHierarchyAccess access, int tag, boolean hitInCache) {
         this.getCacheController().getBlockingEventDispatcher().dispatch(new GeneralCacheControllerServiceNonblockingRequestEvent(this.getCacheController(), access, tag, getSet(), getWay(), hitInCache));
-        this.getCacheController().updateStats(this.getCacheController().getCache(), access.getType().isRead(), hitInCache);
+        this.getCacheController().updateStats(access.getType().isRead(), hitInCache);
     }
 
     /**

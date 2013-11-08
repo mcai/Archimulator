@@ -36,8 +36,6 @@ import archimulator.sim.uncore.dram.MemoryController;
 import archimulator.sim.uncore.net.Net;
 import net.pickapack.action.Action;
 import net.pickapack.action.Action2;
-import net.pickapack.util.ValueProvider;
-import net.pickapack.util.ValueProviderFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,18 +64,13 @@ public class DirectoryController extends GeneralCacheController<DirectoryControl
 
         this.cacheGeometry = new CacheGeometry(getExperiment().getArchitecture().getL2Size(), getExperiment().getArchitecture().getL2Associativity(), getExperiment().getArchitecture().getL2LineSize());
 
-        ValueProviderFactory<DirectoryControllerState, ValueProvider<DirectoryControllerState>> cacheLineStateProviderFactory = new ValueProviderFactory<DirectoryControllerState, ValueProvider<DirectoryControllerState>>() {
-            @Override
-            public ValueProvider<DirectoryControllerState> createValueProvider(Object... args) {
-                int set = (Integer) args[0];
-                int way = (Integer) args[1];
+        this.cache = new EvictableCache<>(memoryHierarchy, name, getGeometry(), getReplacementPolicyType(), args -> {
+            int set = (Integer) args[0];
+            int way = (Integer) args[1];
 
-                return new DirectoryControllerFiniteStateMachine(name, set, way, DirectoryController.this);
-            }
-        };
-
-        this.cache = new EvictableCache<DirectoryControllerState>(memoryHierarchy, name, getGeometry(), getReplacementPolicyType(), cacheLineStateProviderFactory);
-        this.cacheControllers = new ArrayList<CacheController>();
+            return new DirectoryControllerFiniteStateMachine(name, set, way, this);
+        });
+        this.cacheControllers = new ArrayList<>();
 
         this.fsmFactory = DirectoryControllerFiniteStateMachineFactory.getSingleton();
     }
@@ -131,20 +124,14 @@ public class DirectoryController extends GeneralCacheController<DirectoryControl
      * @param message the "GetS" message
      */
     private void onGetS(final GetSMessage message) {
-        final Action onStalledCallback = new Action() {
-            @Override
-            public void apply() {
-                onGetS(message);
-            }
+        final Action onStalledCallback = () -> {
+            onGetS(message);
         };
 
-        this.access(message, message.getAccess(), message.getRequester(), message.getTag(), new Action2<Integer, Integer>() {
-            @Override
-            public void apply(Integer set, Integer way) {
-                CacheLine<DirectoryControllerState> line = getCache().getLine(set, way);
-                DirectoryControllerFiniteStateMachine fsm = (DirectoryControllerFiniteStateMachine) line.getStateProvider();
-                fsm.onEventGetS(message, message.getRequester(), message.getTag(), onStalledCallback);
-            }
+        this.access(message, message.getAccess(), message.getRequester(), message.getTag(), (set, way) -> {
+            CacheLine<DirectoryControllerState> line = getCache().getLine(set, way);
+            DirectoryControllerFiniteStateMachine fsm = (DirectoryControllerFiniteStateMachine) line.getStateProvider();
+            fsm.onEventGetS(message, message.getRequester(), message.getTag(), onStalledCallback);
         }, onStalledCallback);
     }
 
@@ -154,20 +141,14 @@ public class DirectoryController extends GeneralCacheController<DirectoryControl
      * @param message the "GetM" message
      */
     private void onGetM(final GetMMessage message) {
-        final Action onStalledCallback = new Action() {
-            @Override
-            public void apply() {
-                onGetM(message);
-            }
+        final Action onStalledCallback = () -> {
+            onGetM(message);
         };
 
-        this.access(message, message.getAccess(), message.getRequester(), message.getTag(), new Action2<Integer, Integer>() {
-            @Override
-            public void apply(Integer set, Integer way) {
-                CacheLine<DirectoryControllerState> line = getCache().getLine(set, way);
-                DirectoryControllerFiniteStateMachine fsm = (DirectoryControllerFiniteStateMachine) line.getStateProvider();
-                fsm.onEventGetM(message, message.getRequester(), message.getTag(), onStalledCallback);
-            }
+        this.access(message, message.getAccess(), message.getRequester(), message.getTag(), (set, way) -> {
+            CacheLine<DirectoryControllerState> line = getCache().getLine(set, way);
+            DirectoryControllerFiniteStateMachine fsm = (DirectoryControllerFiniteStateMachine) line.getStateProvider();
+            fsm.onEventGetM(message, message.getRequester(), message.getTag(), onStalledCallback);
         }, onStalledCallback);
     }
 
@@ -270,17 +251,11 @@ public class DirectoryController extends GeneralCacheController<DirectoryControl
                 CacheLine<DirectoryControllerState> line = this.getCache().getLine(set, cacheAccess.getWay());
                 DirectoryControllerFiniteStateMachine fsm = (DirectoryControllerFiniteStateMachine) line.getStateProvider();
                 fsm.onEventReplacement(producerFlow, req, tag, cacheAccess,
-                        new Action() {
-                            @Override
-                            public void apply() {
-                                onReplacementCompletedCallback.apply(set, cacheAccess.getWay());
-                            }
+                        () -> {
+                            onReplacementCompletedCallback.apply(set, cacheAccess.getWay());
                         },
-                        new Action() {
-                            @Override
-                            public void apply() {
-                                getCycleAccurateEventQueue().schedule(DirectoryController.this, onReplacementStalledCallback, 1);
-                            }
+                        () -> {
+                            getCycleAccurateEventQueue().schedule(DirectoryController.this, onReplacementStalledCallback, 1);
                         }
                 );
             } else {

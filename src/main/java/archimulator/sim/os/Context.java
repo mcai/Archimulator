@@ -129,7 +129,7 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
 
         this.state = ContextState.IDLE;
 
-        this.functionCallContextStack = new Stack<FunctionCallContext>();
+        this.functionCallContextStack = new Stack<>();
 
         this.process = process;
 
@@ -259,9 +259,9 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
     }
 
     /**
-     * Get the currently in-use architectural register file, depending whether the context is currently in the speculative mode or not.
+     * Get the currently in-use architectural register file, depending on whether the context is currently in the speculative mode or not.
      *
-     * @return
+     * @return the currently in-use architectural register file, depending on whether the context is currently in the speculative mode or not
      */
     public ArchitecturalRegisterFile getRegisterFile() {
         return !speculative ? registerFile : speculativeRegisterFile;
@@ -436,8 +436,7 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
     /**
      * Set a value indicating whether a pseudocall is encountered in the execution of the last instruction or not.
      *
-     * @param pseudoCallEncounteredInLastInstructionExecution
-     *         a value indicating whether a pseudocall is encountered in  the execution of the last instruction or not
+     * @param pseudoCallEncounteredInLastInstructionExecution a value indicating whether a pseudocall is encountered in  the execution of the last instruction or not
      */
     public void setPseudoCallEncounteredInLastInstructionExecution(boolean pseudoCallEncounteredInLastInstructionExecution) {
         this.pseudoCallEncounteredInLastInstructionExecution = pseudoCallEncounteredInLastInstructionExecution;

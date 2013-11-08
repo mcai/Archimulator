@@ -270,19 +270,20 @@ public class MipsDisassembler {
                 }
                 break;
             case R:
-                if (isSystemCall(machineInstruction)) {
-                } else if (isShift(machineInstruction)) {
-                    sb.append(String.format("$%s, $%s, %d", MIPS_GPR_NAMES[rd], MIPS_GPR_NAMES[rt], shift));
-                } else if (isROneOp(machineInstruction)) {
-                    sb.append(String.format("$%s", MIPS_GPR_NAMES[rs]));
-                } else if (isRTwoOp(machineInstruction)) {
-                    sb.append(String.format("$%s, $%s", MIPS_GPR_NAMES[rs], MIPS_GPR_NAMES[rt]));
-                } else if (isRMt(machineInstruction)) {
-                    sb.append(String.format("$%s", MIPS_GPR_NAMES[rs]));
-                } else if (isRMf(machineInstruction)) {
-                    sb.append(String.format("$%s", MIPS_GPR_NAMES[rd]));
-                } else {
-                    sb.append(String.format("$%s, $%s, $%s", MIPS_GPR_NAMES[rd], MIPS_GPR_NAMES[rs], MIPS_GPR_NAMES[rt]));
+                if (!isSystemCall(machineInstruction)) {
+                    if (isShift(machineInstruction)) {
+                        sb.append(String.format("$%s, $%s, %d", MIPS_GPR_NAMES[rd], MIPS_GPR_NAMES[rt], shift));
+                    } else if (isROneOp(machineInstruction)) {
+                        sb.append(String.format("$%s", MIPS_GPR_NAMES[rs]));
+                    } else if (isRTwoOp(machineInstruction)) {
+                        sb.append(String.format("$%s, $%s", MIPS_GPR_NAMES[rs], MIPS_GPR_NAMES[rt]));
+                    } else if (isRMt(machineInstruction)) {
+                        sb.append(String.format("$%s", MIPS_GPR_NAMES[rs]));
+                    } else if (isRMf(machineInstruction)) {
+                        sb.append(String.format("$%s", MIPS_GPR_NAMES[rd]));
+                    } else {
+                        sb.append(String.format("$%s, $%s, $%s", MIPS_GPR_NAMES[rd], MIPS_GPR_NAMES[rs], MIPS_GPR_NAMES[rt]));
+                    }
                 }
                 break;
             default:

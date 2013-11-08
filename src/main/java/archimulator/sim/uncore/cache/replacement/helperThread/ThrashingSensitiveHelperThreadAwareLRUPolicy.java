@@ -28,7 +28,6 @@ import archimulator.sim.uncore.cache.replacement.LRUPolicy;
 import archimulator.sim.uncore.helperThread.HelperThreadingHelper;
 import net.pickapack.util.IntegerIntegerPair;
 import net.pickapack.util.ValueProvider;
-import net.pickapack.util.ValueProviderFactory;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -50,14 +49,9 @@ public class ThrashingSensitiveHelperThreadAwareLRUPolicy<StateT extends Seriali
     public ThrashingSensitiveHelperThreadAwareLRUPolicy(EvictableCache<StateT> cache) {
         super(cache);
 
-        this.mirrorCache = new Cache<Boolean>(cache, getCache().getName() + ".thrashingSensitiveHelperThreadAwareLRUPolicy.mirrorCache", cache.getGeometry(), new ValueProviderFactory<Boolean, ValueProvider<Boolean>>() {
-            @Override
-            public ValueProvider<Boolean> createValueProvider(Object... args) {
-                return new BooleanValueProvider();
-            }
-        });
+        this.mirrorCache = new Cache<>(cache, getCache().getName() + ".thrashingSensitiveHelperThreadAwareLRUPolicy.mirrorCache", cache.getGeometry(), args -> new BooleanValueProvider());
 
-        this.predefinedDelinquentPcs = new ArrayList<IntegerIntegerPair>();
+        this.predefinedDelinquentPcs = new ArrayList<>();
         this.predefinedDelinquentPcs.add(new IntegerIntegerPair(2, 0x004014d8));
         this.predefinedDelinquentPcs.add(new IntegerIntegerPair(0, 0x00400a34));
     }

@@ -41,7 +41,7 @@ public class BranchPredictor2Impl implements BranchPredictor2 {
     public BranchPredictor2Impl() {
         this.history = 0;
 
-        this.tab = new ArrayList<SaturatingCounter>();
+        this.tab = new ArrayList<>();
         for (int i = 0; i < 1 << TABLE_BITS; i++) {
             this.tab.add(new SaturatingCounter(0, 2, 3, 0));
         }

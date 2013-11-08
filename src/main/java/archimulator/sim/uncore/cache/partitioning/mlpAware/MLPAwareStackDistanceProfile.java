@@ -36,7 +36,7 @@ public class MLPAwareStackDistanceProfile {
      * @param associativity the associativity
      */
     public MLPAwareStackDistanceProfile(int associativity) {
-        this.hitCounters = new ArrayList<Integer>();
+        this.hitCounters = new ArrayList<>();
 
         for (int i = 0; i < associativity; i++) {
             this.hitCounters.add(0);

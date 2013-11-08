@@ -5,7 +5,6 @@ import archimulator.sim.core.Thread;
 import archimulator.sim.core.event.InstructionCommittedEvent;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.partitioning.CachePartitioningHelper;
-import net.pickapack.action.Action1;
 import org.apache.commons.math3.util.Precision;
 
 import java.util.ArrayList;
@@ -29,26 +28,24 @@ public class CPIBasedCachePartitioningHelper extends CachePartitioningHelper {
     public CPIBasedCachePartitioningHelper(EvictableCache<?> cache) {
         super(cache);
 
-        this.committedInstructions = new TreeMap<Integer, Long>();
+        this.committedInstructions = new TreeMap<>();
 
-        cache.getBlockingEventDispatcher().addListener(InstructionCommittedEvent.class, new Action1<InstructionCommittedEvent>() {
-            public void apply(InstructionCommittedEvent event) {
-                Thread thread = event.getDynamicInstruction().getThread();
+        cache.getBlockingEventDispatcher().addListener(InstructionCommittedEvent.class, event -> {
+            Thread thread = event.getDynamicInstruction().getThread();
 
-                if (!committedInstructions.containsKey(getThreadIdentifier(thread))) {
-                    committedInstructions.put(getThreadIdentifier(thread), 0L);
-                }
-
-                committedInstructions.put(getThreadIdentifier(thread), committedInstructions.get(getThreadIdentifier(thread)) + 1);
+            if (!committedInstructions.containsKey(getThreadIdentifier(thread))) {
+                committedInstructions.put(getThreadIdentifier(thread), 0L);
             }
+
+            committedInstructions.put(getThreadIdentifier(thread), committedInstructions.get(getThreadIdentifier(thread)) + 1);
         });
     }
 
     @Override
     protected void newInterval() {
-        List<Integer> partition = new ArrayList<Integer>();
+        List<Integer> partition = new ArrayList<>();
 
-        List<Double> cyclePerInstructions = new ArrayList<Double>();
+        List<Double> cyclePerInstructions = new ArrayList<>();
 
         for(int threadId = 0; threadId < this.getNumThreads(); threadId++) {
             if (!committedInstructions.containsKey(threadId)) {

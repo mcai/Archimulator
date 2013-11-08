@@ -29,12 +29,13 @@ import archimulator.sim.uncore.coherence.event.GeneralCacheControllerServiceNonb
 import archimulator.sim.uncore.coherence.event.LastLevelCacheControllerLineInsertEvent;
 import archimulator.sim.uncore.mlp.PendingL2Hit;
 import archimulator.sim.uncore.mlp.PendingL2Miss;
-import net.pickapack.action.Action;
-import net.pickapack.action.Action1;
 import net.pickapack.action.Function1;
 import net.pickapack.util.Pair;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Memory level parallelism (MLP) aware cache partitioning helper.
@@ -64,82 +65,68 @@ public class MLPAwareCachePartitioningHelper extends CachePartitioningHelper {
     public MLPAwareCachePartitioningHelper(EvictableCache<?> cache) {
         super(cache);
 
-        this.pendingL2Misses = new LinkedHashMap<Integer, PendingL2Miss>();
-        this.pendingL2Hits = new LinkedHashMap<Integer, Map<Integer, PendingL2Hit>>();
+        this.pendingL2Misses = new LinkedHashMap<>();
+        this.pendingL2Hits = new LinkedHashMap<>();
 
         this.l2CacheAccessMLPCostProfile = new L2CacheAccessMLPCostProfile(cache.getAssociativity());
 
         this.memoryLatencyMeter = new MemoryLatencyMeter();
 
-        this.mlpAwareStackDistanceProfiles = new LinkedHashMap<Integer, MLPAwareStackDistanceProfile>();
+        this.mlpAwareStackDistanceProfiles = new LinkedHashMap<>();
 
-        this.lruStacks = new LinkedHashMap<Integer, Map<Integer, LRUStack>>();
+        this.lruStacks = new LinkedHashMap<>();
 
-        this.mlpCostQuantizer = new Function1<Double, Integer>() {
-            @Override
-            public Integer apply(Double rawValue) {
-                if (rawValue < 0) {
-                    throw new IllegalArgumentException();
-                }
+        this.mlpCostQuantizer = rawValue -> {
+            if (rawValue < 0) {
+                throw new IllegalArgumentException();
+            }
 
-                if (rawValue <= 42) {
-                    return 0;
-                } else if (rawValue <= 85) {
-                    return 1;
-                } else if (rawValue <= 128) {
-                    return 2;
-                } else if (rawValue <= 170) {
-                    return 3;
-                } else if (rawValue <= 213) {
-                    return 4;
-                } else if (rawValue <= 246) {
-                    return 5;
-                } else if (rawValue <= 300) {
-                    return 6;
-                } else {
-                    return 7;
-                }
+            if (rawValue <= 42) {
+                return 0;
+            } else if (rawValue <= 85) {
+                return 1;
+            } else if (rawValue <= 128) {
+                return 2;
+            } else if (rawValue <= 170) {
+                return 3;
+            } else if (rawValue <= 213) {
+                return 4;
+            } else if (rawValue <= 246) {
+                return 5;
+            } else if (rawValue <= 300) {
+                return 6;
+            } else {
+                return 7;
             }
         };
 
-        cache.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, new Action1<GeneralCacheControllerServiceNonblockingRequestEvent>() {
-            public void apply(GeneralCacheControllerServiceNonblockingRequestEvent event) {
-                if (event.getCacheController().equals(getL2CacheController()) && shouldInclude(event.getSet())) {
-                    if (!event.isHitInCache()) {
-                        profileBeginServicingL2CacheMiss(event.getAccess());
-                    } else {
-                        profileBeginServicingL2CacheHit(event.getAccess());
-                    }
+        cache.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, event -> {
+            if (event.getCacheController().equals(getL2CacheController()) && shouldInclude(event.getSet())) {
+                if (!event.isHitInCache()) {
+                    profileBeginServicingL2CacheMiss(event.getAccess());
+                } else {
+                    profileBeginServicingL2CacheHit(event.getAccess());
                 }
             }
         });
 
-        cache.getBlockingEventDispatcher().addListener(LastLevelCacheControllerLineInsertEvent.class, new Action1<LastLevelCacheControllerLineInsertEvent>() {
-            @Override
-            public void apply(LastLevelCacheControllerLineInsertEvent event) {
-                if (event.getCacheController().equals(getL2CacheController()) && pendingL2Misses.containsKey(event.getAccess().getPhysicalTag())) {
-                    profileEndServicingL2CacheMiss(event.getAccess());
-                }
+        cache.getBlockingEventDispatcher().addListener(LastLevelCacheControllerLineInsertEvent.class, event -> {
+            if (event.getCacheController().equals(getL2CacheController()) && pendingL2Misses.containsKey(event.getAccess().getPhysicalTag())) {
+                profileEndServicingL2CacheMiss(event.getAccess());
             }
         });
 
-        cache.getCycleAccurateEventQueue().getPerCycleEvents().add(new Action() {
-            @Override
-            public void apply() {
-                updateL2CacheAccessMlpCostsPerCycle();
-                updateL2CacheHitElapsedCyclesPerCycle();
-                freeInvalidL2CacheHitsPerCycle();
+        cache.getCycleAccurateEventQueue().getPerCycleEvents().add(() -> {
+            updateL2CacheAccessMlpCostsPerCycle();
+            updateL2CacheHitElapsedCyclesPerCycle();
+            freeInvalidL2CacheHitsPerCycle();
 
-            }
         });
 
-        cache.getBlockingEventDispatcher().addListener(InstructionCommittedEvent.class, new Action1<InstructionCommittedEvent>() {
-            @Override
-            public void apply(InstructionCommittedEvent event) {
-                if (pendingL2Hits.containsKey(getThreadIdentifier(event.getDynamicInstruction().getThread()))) {
-                    for (PendingL2Hit pendingL2Hit : pendingL2Hits.get(getThreadIdentifier(event.getDynamicInstruction().getThread())).values()) {
-                        pendingL2Hit.incrementNumCommittedInstructionsSinceAccess();
-                    }
+        cache.getBlockingEventDispatcher().addListener(InstructionCommittedEvent.class, event -> {
+            if (pendingL2Hits.containsKey(getThreadIdentifier(event.getDynamicInstruction().getThread()))) {
+                for (PendingL2Hit pendingL2Hit : pendingL2Hits.get(getThreadIdentifier(event.getDynamicInstruction().getThread())).values()) {
+                    pendingL2Hit.incrementNumCommittedInstructionsSinceAccess();
                 }
             }
         });

@@ -47,7 +47,7 @@ public class Function implements Comparable<Function> {
         this.program = program;
         this.sectionName = sectionName;
         this.symbol = symbol;
-        this.basicBlocks = new ArrayList<BasicBlock>();
+        this.basicBlocks = new ArrayList<>();
     }
 
     /**

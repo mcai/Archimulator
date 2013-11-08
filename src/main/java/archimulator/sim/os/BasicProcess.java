@@ -68,10 +68,10 @@ public class BasicProcess extends Process {
      */
     @Override
     protected void loadProgram(Kernel kernel, String simulationDirectory, ContextMapping contextMapping) {
-        this.pcsToMachineInstructions = new TreeMap<Integer, Integer>();
-        this.machineInstructionsToStaticInstructions = new TreeMap<Integer, StaticInstruction>();
+        this.pcsToMachineInstructions = new TreeMap<>();
+        this.machineInstructionsToStaticInstructions = new TreeMap<>();
 
-        this.instructions = new HashMap<String, SortedMap<Integer, Instruction>>();
+        this.instructions = new HashMap<>();
 
         List<String> commandLineArgumentList = Arrays.asList((contextMapping.getBenchmark().getWorkingDirectory() + File.separator + contextMapping.getBenchmark().getExecutable() + " " + contextMapping.getArguments()).replaceAll(ServiceManager.USER_HOME_TEMPLATE_ARG, System.getProperty("user.home")).split(" "));
 
@@ -154,7 +154,7 @@ public class BasicProcess extends Process {
         this.elfAnalyzer = new ElfAnalyzer(elfFileName, elfFile, this.instructions, this.getProgramEntry());
         this.elfAnalyzer.buildControlFlowGraphs();
 
-        this.pcToFunctionNameMappingCache = new TreeMap<Integer, String>();
+        this.pcToFunctionNameMappingCache = new TreeMap<>();
     }
 
     /**

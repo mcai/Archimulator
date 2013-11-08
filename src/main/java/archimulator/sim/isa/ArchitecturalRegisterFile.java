@@ -336,7 +336,7 @@ public final class ArchitecturalRegisterFile implements Cloneable {
     /**
      * Get a value indicating whether the architectural register file is little endian or not.
      *
-     * @return
+     * @return a value indicating whether the architectural register file is little endian or not
      */
     public boolean isLittleEndian() {
         return littleEndian;

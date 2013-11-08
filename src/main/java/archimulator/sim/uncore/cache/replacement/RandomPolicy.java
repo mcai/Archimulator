@@ -56,7 +56,7 @@ public class RandomPolicy<StateT extends Serializable> extends CacheReplacementP
      */
     @Override
     public CacheAccess<StateT> handleReplacement(MemoryHierarchyAccess access, int set, int tag) {
-        return new CacheAccess<StateT>(this.getCache(), access, set, this.random.nextInt(this.getCache().getAssociativity()), tag);
+        return new CacheAccess<>(this.getCache(), access, set, this.random.nextInt(this.getCache().getAssociativity()), tag);
     }
 
     /**

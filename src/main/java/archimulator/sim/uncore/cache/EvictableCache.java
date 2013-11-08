@@ -84,7 +84,7 @@ public class EvictableCache<StateT extends Serializable> extends Cache<StateT> {
      * @return the newly created cache hit object
      */
     private CacheAccess<StateT> newHit(MemoryHierarchyAccess access, int set, int address, int way) {
-        return new CacheAccess<StateT>(this, access, set, way, this.getTag(address));
+        return new CacheAccess<>(this, access, set, way, this.getTag(address));
     }
 
     /**

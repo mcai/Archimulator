@@ -115,12 +115,7 @@ public class ReportNode implements Serializable {
      * Print recursively the node and its child nodes.
      */
     public void print() {
-        traverse(new Action1<ReportNode>() {
-            @Override
-            public void apply(ReportNode node) {
-                System.out.println(node);
-            }
-        });
+        traverse(System.out::println);
     }
 
     /**

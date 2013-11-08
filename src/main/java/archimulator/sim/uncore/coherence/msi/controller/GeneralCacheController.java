@@ -61,11 +61,10 @@ public abstract class GeneralCacheController<StateT extends Serializable, Condit
     /**
      * Update statistics.
      *
-     * @param cache      the cache
      * @param read       a value indicating whether the access involved is a read or not
      * @param hitInCache a value indicating whether the access involved hits in the cache or not
      */
-    public void updateStats(EvictableCache<?> cache, boolean read, boolean hitInCache) {
+    public void updateStats(boolean read, boolean hitInCache) {
         if (read) {
             if (hitInCache) {
                 numDownwardReadHits++;

@@ -47,9 +47,9 @@ public class CacheSet<StateT extends Serializable> {
     public CacheSet(Cache<StateT> cache, int associativity, int num, ValueProviderFactory<StateT, ValueProvider<StateT>> cacheLineStateProviderFactory) {
         this.cache = cache;
         this.num = num;
-        this.lines = new ArrayList<CacheLine<StateT>>();
+        this.lines = new ArrayList<>();
         for (int i = 0; i < associativity; i++) {
-            this.lines.add(new CacheLine<StateT>(cache, this.num, i, cacheLineStateProviderFactory.createValueProvider(this.num, i)));
+            this.lines.add(new CacheLine<>(cache, this.num, i, cacheLineStateProviderFactory.createValueProvider(this.num, i)));
         }
 
     }

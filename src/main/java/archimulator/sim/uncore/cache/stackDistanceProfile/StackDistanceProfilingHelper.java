@@ -26,7 +26,6 @@ import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.event.GeneralCacheControllerServiceNonblockingRequestEvent;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.coherence.msi.controller.GeneralCacheController;
-import net.pickapack.action.Action1;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -50,14 +49,12 @@ public class StackDistanceProfilingHelper implements Reportable {
      */
     public StackDistanceProfilingHelper(Simulation simulation) {
         this.l2CacheController = simulation.getProcessor().getMemoryHierarchy().getL2CacheController();
-        this.l2CacheLruStacks = new TreeMap<Integer, Stack<Integer>>();
+        this.l2CacheLruStacks = new TreeMap<>();
         this.l2CacheStackDistanceProfile = new StackDistanceProfile(this.l2CacheController.getCache().getAssociativity());
 
-        simulation.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, new Action1<GeneralCacheControllerServiceNonblockingRequestEvent>() {
-            public void apply(GeneralCacheControllerServiceNonblockingRequestEvent event) {
-                if (event.getCacheController() == l2CacheController) {
-                    profileStackDistance(event.isHitInCache(), event.getWay(), event.getAccess());
-                }
+        simulation.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, event -> {
+            if (event.getCacheController() == l2CacheController) {
+                profileStackDistance(event.isHitInCache(), event.getWay(), event.getAccess());
             }
         });
     }

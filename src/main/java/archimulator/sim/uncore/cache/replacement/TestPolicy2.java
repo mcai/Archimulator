@@ -25,7 +25,6 @@ import archimulator.sim.uncore.cache.prediction.CacheBasedPredictor;
 import archimulator.sim.uncore.cache.prediction.Predictor;
 import archimulator.sim.uncore.helperThread.HelperThreadingHelper;
 import net.pickapack.util.ValueProvider;
-import net.pickapack.util.ValueProviderFactory;
 
 import java.io.Serializable;
 
@@ -49,14 +48,9 @@ public class TestPolicy2<StateT extends Serializable> extends LRUPolicy<StateT> 
     public TestPolicy2(EvictableCache<StateT> cache) {
         super(cache);
 
-        this.mirrorCache = new Cache<Boolean>(cache, getCache().getName() + ".testEvictionPolicy2.mirrorCache", cache.getGeometry(), new ValueProviderFactory<Boolean, ValueProvider<Boolean>>() {
-            @Override
-            public ValueProvider<Boolean> createValueProvider(Object... args) {
-                return new BooleanValueProvider();
-            }
-        });
+        this.mirrorCache = new Cache<>(cache, getCache().getName() + ".testEvictionPolicy2.mirrorCache", cache.getGeometry(), args -> new BooleanValueProvider());
 
-        this.replacementOwnershipPredictor = new CacheBasedPredictor<Boolean>(cache, cache.getName() + ".replacementOwnershipPredictor", new CacheGeometry(16 * 16 * getCache().getLineSize(), 16, getCache().getLineSize()), 1, 3, false);
+        this.replacementOwnershipPredictor = new CacheBasedPredictor<>(cache, cache.getName() + ".replacementOwnershipPredictor", new CacheGeometry(16 * 16 * getCache().getLineSize(), 16, getCache().getLineSize()), 1, 3, false);
     }
 
     @Override
@@ -69,11 +63,11 @@ public class TestPolicy2<StateT extends Serializable> extends LRUPolicy<StateT> 
                 CacheLine<Boolean> mirrorLine = this.mirrorCache.getLine(set, way);
                 BooleanValueProvider stateProvider = (BooleanValueProvider) mirrorLine.getStateProvider();
                 if (!stateProvider.ownedByMainThread) {
-                    return new CacheAccess<StateT>(this.getCache(), access, set, way, tag);
+                    return new CacheAccess<>(this.getCache(), access, set, way, tag);
                 }
             }
 
-            return new CacheAccess<StateT>(this.getCache(), access, set, getCache().getAssociativity() - 1, tag); //TODO: or just bypass? i'm not sure the performance impact!
+            return new CacheAccess<>(this.getCache(), access, set, getCache().getAssociativity() - 1, tag); //TODO: or just bypass? i'm not sure the performance impact!
         }
     }
 

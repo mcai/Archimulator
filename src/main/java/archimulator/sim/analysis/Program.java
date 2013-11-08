@@ -37,7 +37,7 @@ public class Program {
      */
     public Program(String fileName) {
         this.fileName = fileName;
-        this.functions = new TreeSet<Function>();
+        this.functions = new TreeSet<>();
     }
 
     /**

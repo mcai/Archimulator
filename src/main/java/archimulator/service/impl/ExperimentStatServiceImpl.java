@@ -169,7 +169,7 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
     public List<ExperimentStat> getStatsByParentAndPrefixAndKeyLike(Experiment parent, String prefix, String keyLike) {
         List<ExperimentStat> stats = getStatsByParent(parent);
 
-        List<ExperimentStat> result = new ArrayList<ExperimentStat>();
+        List<ExperimentStat> result = new ArrayList<>();
 
         for(ExperimentStat stat : stats) {
             if(stat.getPrefix().equals(prefix) && stat.getKey().contains(keyLike)) {
@@ -184,7 +184,7 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
     public List<ExperimentStat> getStatsByParentAndPrefix(Experiment parent, String prefix) {
         List<ExperimentStat> stats = getStatsByParent(parent);
 
-        List<ExperimentStat> result = new ArrayList<ExperimentStat>();
+        List<ExperimentStat> result = new ArrayList<>();
 
         for(ExperimentStat stat : stats) {
             if(stat.getPrefix().equals(prefix)) {
@@ -199,7 +199,7 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
     public List<String> getStatPrefixesByParent(Experiment parent) {
         List<ExperimentStat> stats = getStatsByParent(parent);
 
-        List<String> prefixes = new ArrayList<String>();
+        List<String> prefixes = new ArrayList<>();
 
         for(ExperimentStat stat : stats) {
             if(!prefixes.contains(stat.getPrefix())) {

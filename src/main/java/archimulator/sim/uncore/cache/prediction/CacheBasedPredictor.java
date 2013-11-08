@@ -67,14 +67,9 @@ public class CacheBasedPredictor<PredictableT extends Comparable<PredictableT>> 
      * @param defaultValue               the default value
      */
     public CacheBasedPredictor(SimulationObject parent, String name, CacheGeometry geometry, CacheReplacementPolicyType cacheReplacementPolicyType, final int counterThreshold, final int counterMaxValue, PredictableT defaultValue) {
-        ValueProviderFactory<Boolean, ValueProvider<Boolean>> cacheLineStateProviderFactory = new ValueProviderFactory<Boolean, ValueProvider<Boolean>>() {
-            @Override
-            public ValueProvider<Boolean> createValueProvider(Object... args) {
-                return new BooleanValueProvider(counterThreshold, counterMaxValue);
-            }
-        };
+        ValueProviderFactory<Boolean, ValueProvider<Boolean>> cacheLineStateProviderFactory = args -> new BooleanValueProvider(counterThreshold, counterMaxValue);
 
-        this.cache = new EvictableCache<Boolean>(parent, name, geometry, cacheReplacementPolicyType, cacheLineStateProviderFactory);
+        this.cache = new EvictableCache<>(parent, name, geometry, cacheReplacementPolicyType, cacheLineStateProviderFactory);
         this.defaultValue = defaultValue;
     }
 

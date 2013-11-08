@@ -38,7 +38,7 @@ public class PipelineBuffer<EntryT> {
      */
     public PipelineBuffer(int capacity) {
         this.capacity = capacity;
-        this.entries = new ArrayList<EntryT>();
+        this.entries = new ArrayList<>();
     }
 
     /**

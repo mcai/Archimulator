@@ -56,62 +56,62 @@ public class CacheReplacementPolicyFactory {
     public static <StateT extends Serializable> CacheReplacementPolicy<StateT> createCacheReplacementPolicy(CacheReplacementPolicyType cacheReplacementPolicyType, final EvictableCache<StateT> cache) {
         switch (cacheReplacementPolicyType) {
             case LRU:
-                return new LRUPolicy<StateT>(cache);
+                return new LRUPolicy<>(cache);
             case LFU:
-                return new LFUPolicy<StateT>(cache);
+                return new LFUPolicy<>(cache);
             case RANDOM:
-                return new RandomPolicy<StateT>(cache);
+                return new RandomPolicy<>(cache);
             case HELPER_THREAD_AWARE_LRU:
-                return new HelperThreadAwareLRUPolicy<StateT>(cache, false);
+                return new HelperThreadAwareLRUPolicy<>(cache, false);
             case HELPER_THREAD_INTERVAL_AWARE_LRU:
-                return new HelperThreadIntervalAwareLRUPolicy<StateT>(cache);
+                return new HelperThreadIntervalAwareLRUPolicy<>(cache);
             case HELPER_THREAD_AWARE_BREAKDOWN_LRU:
-                return new HelperThreadAwareLRUPolicy<StateT>(cache, true);
+                return new HelperThreadAwareLRUPolicy<>(cache, true);
             case REUSE_DISTANCE_PREDICTION:
-                return new ReuseDistancePredictionPolicy<StateT>(cache);
+                return new ReuseDistancePredictionPolicy<>(cache);
             case REREFERENCE_INTERVAL_PREDICTION:
-                return new RereferenceIntervalPredictionPolicy<StateT>(cache);
+                return new RereferenceIntervalPredictionPolicy<>(cache);
             case STATIC_CACHE_PARTITIONING_LRU:
-                return new StaticPartitionedLRUPolicy<StateT>(cache);
+                return new StaticPartitionedLRUPolicy<>(cache);
             case SIMPLE_STATIC_CACHE_PARTITIONING_LRU:
-                return new SimpleStaticPartitionedLRUPolicy<StateT>(cache);
+                return new SimpleStaticPartitionedLRUPolicy<>(cache);
             case CPI_BASED_CACHE_PARTITIONING_LRU:
-                return new CPIBasedPartitionedLRUPolicy<StateT>(cache);
+                return new CPIBasedPartitionedLRUPolicy<>(cache);
             case MIN_MISS_CACHE_PARTITIONING_LRU:
-                return new MinMissPartitionedLRUPolicy<StateT>(cache);
+                return new MinMissPartitionedLRUPolicy<>(cache);
             case MLP_AWARE_CACHE_PARTITIONING_LRU:
-                return new MLPAwarePartitionedLRUPolicy<StateT>(cache);
+                return new MLPAwarePartitionedLRUPolicy<>(cache);
             case SET_DUELING_CACHE_PARTITIONING_LRU:
-                return new SetDuelingPartitionedLRUPolicy<StateT>(
+                return new SetDuelingPartitionedLRUPolicy<>(
                         cache,
                         new CPIBasedCachePartitioningHelper(cache),
                         new MinMissCachePartitioningHelper(cache),
                         new MLPAwareCachePartitioningHelper(cache)
                 );
             case SET_DUELING_STATIC_CACHE_PARTITIONING_LRU:
-                return new SetDuelingPartitionedLRUPolicy<StateT>(cache, new ArrayList<Partitioner>() {{
+                return new SetDuelingPartitionedLRUPolicy<>(cache, new ArrayList<Partitioner>() {{
                     for (int i = 1; i < cache.getAssociativity(); i++) {
-                        add(new StaticPartitionedLRUPolicy<StateT>(cache, i));
+                        add(new StaticPartitionedLRUPolicy<>(cache, i));
                     }
                 }});
             case HELPER_THREAD_AND_MLP_AWARE_CACHE_PARTITIONING_LRU:
-                return new HelperThreadAndMLPAwarePartitionedLRUPolicy<StateT>(cache);
+                return new HelperThreadAndMLPAwarePartitionedLRUPolicy<>(cache);
             case LINEAR_MLP_AWARE_LRU_LAMBDA_0:
-                return new LinearMLPAwareLRUPolicy<StateT>(cache, 0);
+                return new LinearMLPAwareLRUPolicy<>(cache, 0);
             case LINEAR_MLP_AWARE_LRU_LAMBDA_1:
-                return new LinearMLPAwareLRUPolicy<StateT>(cache, 1);
+                return new LinearMLPAwareLRUPolicy<>(cache, 1);
             case LINEAR_MLP_AWARE_LRU_LAMBDA_2:
-                return new LinearMLPAwareLRUPolicy<StateT>(cache, 2);
+                return new LinearMLPAwareLRUPolicy<>(cache, 2);
             case LINEAR_MLP_AWARE_LRU_LAMBDA_3:
-                return new LinearMLPAwareLRUPolicy<StateT>(cache, 3);
+                return new LinearMLPAwareLRUPolicy<>(cache, 3);
             case LINEAR_MLP_AWARE_LRU_LAMBDA_4:
-                return new LinearMLPAwareLRUPolicy<StateT>(cache, 4);
+                return new LinearMLPAwareLRUPolicy<>(cache, 4);
             case LINEAR_MLP_AWARE_LRU_LAMBDA_5:
-                return new LinearMLPAwareLRUPolicy<StateT>(cache, 5);
+                return new LinearMLPAwareLRUPolicy<>(cache, 5);
             case LINEAR_MLP_AWARE_LRU_LAMBDA_6:
-                return new LinearMLPAwareLRUPolicy<StateT>(cache, 6);
+                return new LinearMLPAwareLRUPolicy<>(cache, 6);
             case LINEAR_MLP_AWARE_LRU_LAMBDA_7:
-                return new LinearMLPAwareLRUPolicy<StateT>(cache, 7);
+                return new LinearMLPAwareLRUPolicy<>(cache, 7);
             default:
                 throw new IllegalArgumentException();
         }

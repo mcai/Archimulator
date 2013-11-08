@@ -198,8 +198,6 @@ public class Symbol {
         return inline;
     }
 
-    //TODO
-
     /**
      * Set a value indicating whether the symbol is inline or not.
      *
