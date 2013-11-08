@@ -23,7 +23,6 @@ import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.replacement.LRUPolicy;
 import net.pickapack.util.ValueProvider;
-import net.pickapack.util.ValueProviderFactory;
 
 import java.io.Serializable;
 
@@ -46,12 +45,7 @@ public abstract class AbstractCostAwareLRUPolicy<StateT extends Serializable> ex
     public AbstractCostAwareLRUPolicy(EvictableCache<StateT> cache, int lambda) {
         super(cache);
         this.lambda = lambda;
-        this.mirrorCache = new Cache<Boolean>(cache, cache.getName() + ".costBasedLRUPolicy.mirrorCache", cache.getGeometry(), new ValueProviderFactory<Boolean, ValueProvider<Boolean>>() {
-            @Override
-            public ValueProvider<Boolean> createValueProvider(Object... args) {
-                return new BooleanValueProvider();
-            }
-        });
+        this.mirrorCache = new Cache<>(cache, cache.getName() + ".costBasedLRUPolicy.mirrorCache", cache.getGeometry(), args -> new BooleanValueProvider());
     }
 
     /**
