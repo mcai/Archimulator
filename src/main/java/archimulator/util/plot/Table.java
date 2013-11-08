@@ -19,14 +19,12 @@
 package archimulator.util.plot;
 
 import com.Ostermiller.util.CSVPrinter;
-import net.pickapack.collection.CollectionHelper;
 import net.pickapack.util.Pair;
 import org.apache.commons.io.IOUtils;
 import org.eobjects.metamodel.DataContext;
 import org.eobjects.metamodel.DataContextFactory;
 import org.eobjects.metamodel.csv.CsvConfiguration;
 import org.eobjects.metamodel.data.DataSet;
-import org.eobjects.metamodel.data.Row;
 import org.eobjects.metamodel.query.FilterItem;
 import org.eobjects.metamodel.query.LogicalOperator;
 import org.eobjects.metamodel.query.OperatorType;
@@ -37,7 +35,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringWriter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * CSV-mappable table object.
@@ -147,7 +149,8 @@ public class Table implements Serializable {
                     .select(columns.toArray(new String[columns.size()]));
 
             for (final Pair<String, List<String>> condition : criteria.getConditions()) {
-                select.where(new FilterItem(LogicalOperator.OR, CollectionHelper.transform(condition.getSecond(), conditionLine -> new FilterItem(new SelectItem(table.getColumnByName(condition.getFirst())), OperatorType.EQUALS_TO, conditionLine))));
+                List<FilterItem> items = condition.getSecond().stream().map(conditionLine -> new FilterItem(new SelectItem(table.getColumnByName(condition.getFirst())), OperatorType.EQUALS_TO, conditionLine)).collect(Collectors.toList());
+                select.where(new FilterItem(LogicalOperator.OR, items));
             }
 
             DataSet dataSet = select.execute();
@@ -191,9 +194,9 @@ public class Table implements Serializable {
 
         List<List<String>> rows = new ArrayList<>();
 
-        for (Row row : dataSet) {
-            rows.add(CollectionHelper.transform(Arrays.asList(row.getValues()), obj -> obj + ""));
-        }
+        dataSet.forEach(row -> {
+            rows.add(Arrays.asList(row.getValues()).stream().map(obj -> obj + "").collect(Collectors.toList()));
+        });
 
         return new Table(columns, rows);
     }

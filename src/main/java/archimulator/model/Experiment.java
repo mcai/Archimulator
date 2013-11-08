@@ -25,8 +25,6 @@ import archimulator.util.serialization.ContextMappingArrayListJsonSerializableTy
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
-import net.pickapack.action.Function1;
-import net.pickapack.collection.CollectionHelper;
 import net.pickapack.dateTime.DateHelper;
 import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
@@ -42,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Experiment.
@@ -117,7 +116,7 @@ public class Experiment implements WithId, WithParentId, WithTitle, WithCreateTi
         this.state = ExperimentState.PENDING;
         this.failedReason = "";
         this.numMaxInstructions = numMaxInstructions;
-        this.contextMappings = new ArrayList<ContextMapping>(contextMappings);
+        this.contextMappings = new ArrayList<>(contextMappings);
         this.architectureId = architecture.getId();
         this.createTime = DateHelper.toTick(new Date());
     }
@@ -156,15 +155,15 @@ public class Experiment implements WithId, WithParentId, WithTitle, WithCreateTi
             CycleAccurateEventQueue cycleAccurateEventQueue = new CycleAccurateEventQueue();
 
             if (getType() == ExperimentType.FUNCTIONAL) {
-                BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher = new BlockingEventDispatcher<SimulationEvent>();
+                BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher = new BlockingEventDispatcher<>();
                 new FunctionalSimulation(this, blockingEventDispatcher, cycleAccurateEventQueue).simulate();
             } else if (getType() == ExperimentType.DETAILED) {
-                BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher = new BlockingEventDispatcher<SimulationEvent>();
+                BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher = new BlockingEventDispatcher<>();
                 new DetailedSimulation(this, blockingEventDispatcher, cycleAccurateEventQueue).simulate();
             } else if (getType() == ExperimentType.TWO_PHASE) {
-                Reference<Kernel> kernelRef = new Reference<Kernel>();
+                Reference<Kernel> kernelRef = new Reference<>();
 
-                BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher = new BlockingEventDispatcher<SimulationEvent>();
+                BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher = new BlockingEventDispatcher<>();
 
                 new ToRoiFastForwardSimulation(this, blockingEventDispatcher, cycleAccurateEventQueue, kernelRef).simulate();
 
@@ -468,12 +467,7 @@ public class Experiment implements WithId, WithParentId, WithTitle, WithCreateTi
      * @return the statistic values
      */
     public List<String> getStatValues(final String prefix, List<String> keys) {
-        return CollectionHelper.transform(keys, new Function1<String, String>() {
-            @Override
-            public String apply(String key) {
-                return getStatValue(prefix, key);
-            }
-        });
+        return keys.stream().map(key -> getStatValue(prefix, key)).collect(Collectors.toList());
     }
 
     /**

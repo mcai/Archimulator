@@ -19,13 +19,13 @@
 package archimulator.util;
 
 import archimulator.model.ExperimentStat;
-import net.pickapack.collection.CollectionHelper;
 import net.pickapack.io.serialization.JsonSerializationHelper;
 import net.pickapack.util.Pair;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Protocol;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Jedis helper.
@@ -135,7 +135,7 @@ public class JedisHelper {
                 return first.compareTo(second);
             });
 
-            return CollectionHelper.transform(stats, pair -> pair.getFirst());
+            return stats.stream().map(Pair::getFirst).collect(Collectors.toList());
         }
 
         return new ArrayList<ExperimentStat>();
@@ -193,7 +193,7 @@ public class JedisHelper {
             return first.compareTo(second);
         });
 
-        return CollectionHelper.transform(stats, pair -> pair.getFirst());
+        return stats.stream().map(Pair::getFirst).collect(Collectors.toList());
     }
 
     /**
@@ -204,7 +204,7 @@ public class JedisHelper {
      */
     public static List<String> getStatPrefixesByParent(long parentId) {
         List<String> experimentKeys = new ArrayList<>(getKeysByParent(parentId));
-        return CollectionHelper.transform(experimentKeys, key -> key.substring(key.indexOf("/") + 1));
+        return experimentKeys.stream().map(key -> key.substring(key.indexOf("/") + 1)).collect(Collectors.toList());
     }
 
     /**
@@ -214,7 +214,7 @@ public class JedisHelper {
      */
     public static List<Long> getExperimentIds() {
         List<String> experimentKeys = new ArrayList<>(jedis.keys(KEY_PREFIX_EXPERIMENT_STATS + "*"));
-        return CollectionHelper.transform(experimentKeys, key -> Long.parseLong(key.substring(key.lastIndexOf(".") + 1, key.indexOf("/"))));
+        return experimentKeys.stream().map(key -> Long.parseLong(key.substring(key.lastIndexOf(".") + 1, key.indexOf("/")))).collect(Collectors.toList());
     }
 
     /**

@@ -22,8 +22,6 @@ import archimulator.util.PropertyArray;
 import archimulator.util.serialization.StringArrayListJsonSerializableType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
-import net.pickapack.action.Function1;
-import net.pickapack.collection.CollectionHelper;
 import net.pickapack.collection.CombinationHelper;
 import net.pickapack.dateTime.DateHelper;
 import net.pickapack.model.WithCreateTime;
@@ -40,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Experiment pack.
@@ -578,13 +577,7 @@ public class ExperimentPack implements WithId, WithTitle, WithCreateTime {
                         }});
                     }
                 }
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            } catch (InvocationTargetException e) {
-                throw new RuntimeException(e);
-            } catch (NoSuchMethodException e) {
-                throw new RuntimeException(e);
-            } catch (Exception e) {
+            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -614,11 +607,6 @@ public class ExperimentPack implements WithId, WithTitle, WithCreateTime {
      * @return the combinations
      */
     private List<List<String>> getCombinations() {
-        return CombinationHelper.getCombinations(CollectionHelper.transform(this.getVariables(), new Function1<ExperimentPackVariable, List<String>>() {
-            @Override
-            public List<String> apply(ExperimentPackVariable variable) {
-                return variable.getValues();
-            }
-        }));
+        return CombinationHelper.getCombinations(this.getVariables().stream().map(ExperimentPackVariable::getValues).collect(Collectors.toList()));
     }
 }

@@ -25,8 +25,6 @@ import archimulator.util.serialization.XMLSerializationHelper;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.misc.TransactionManager;
 import com.j256.ormlite.stmt.*;
-import net.pickapack.action.Function1;
-import net.pickapack.collection.CollectionHelper;
 import net.pickapack.model.WithId;
 import net.pickapack.service.AbstractService;
 import org.apache.commons.io.FileUtils;
@@ -34,10 +32,14 @@ import org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 
 /**
  * Experiment service implementation.
@@ -141,12 +143,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     private void cleanUpExperiments() {
         System.out.println("Cleaning up experiments..");
 
-        List<Long> experimentPackIds = CollectionHelper.transform(getAllExperimentPacks(), new Function1<ExperimentPack, Long>() {
-            @Override
-            public Long apply(ExperimentPack experimentPack) {
-                return experimentPack.getId();
-            }
-        });
+        List<Long> experimentPackIds = getAllExperimentPacks().stream().map(ExperimentPack::getId).collect(Collectors.toList());
 
         if (!experimentPackIds.isEmpty()) {
             try {

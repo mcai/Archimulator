@@ -28,7 +28,6 @@ import archimulator.util.plot.Table;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.PreparedDelete;
-import net.pickapack.collection.CollectionHelper;
 import net.pickapack.io.serialization.JsonSerializationHelper;
 import net.pickapack.model.WithId;
 import net.pickapack.service.AbstractService;
@@ -42,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Experiment stat service implementation.
@@ -75,7 +75,7 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
 
         List<Experiment> experiments = ServiceManager.getExperimentService().getAllExperiments();
 
-        List<Long> experimentIds = CollectionHelper.transform(experiments, Experiment::getId);
+        List<Long> experimentIds = experiments.stream().map(Experiment::getId).collect(Collectors.toList());
 
         if(!experimentIds.isEmpty()) {
             File directoryExperimentStats = new File(FILE_NAME_EXPERIMENT_STATS);
