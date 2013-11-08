@@ -43,7 +43,7 @@ public class Crossbar {
     public Crossbar(NetNode node, int bandwidth) {
         this.node = node;
         this.bandwidth = bandwidth;
-        this.pendingActions = new ArrayList<Action>();
+        this.pendingActions = new ArrayList<>();
     }
 
     /**
@@ -56,17 +56,9 @@ public class Crossbar {
 
         if (destinationPort.getBuffer() != null) {
             if (destinationPort.getBuffer().isWriteBusy()) {
-                destinationPort.getBuffer().addPendingWriteAction(new Action() {
-                    public void apply() {
-                        toOutBuffer(message);
-                    }
-                });
+                destinationPort.getBuffer().addPendingWriteAction(() -> toOutBuffer(message));
             } else if (destinationPort.getBuffer().getCount() + message.getSize() > destinationPort.getBuffer().getSize()) {
-                destinationPort.getBuffer().addPendingFullAction(new Action() {
-                    public void apply() {
-                        toOutBuffer(message);
-                    }
-                });
+                destinationPort.getBuffer().addPendingFullAction(() -> toOutBuffer(message));
             } else {
                 if (destinationPort.getBuffer() != null) {
                     if (destinationPort.getBuffer().getCount() + message.getSize() > destinationPort.getBuffer().getSize()) {
@@ -74,11 +66,7 @@ public class Crossbar {
                     }
 
                     destinationPort.getBuffer().beginWrite();
-                    this.node.getNet().getCycleAccurateEventQueue().schedule(this, new Action() {
-                        public void apply() {
-                            destinationPort.getBuffer().endWrite(message);
-                        }
-                    }, 1); //TODO: latency
+                    this.node.getNet().getCycleAccurateEventQueue().schedule(this, () -> destinationPort.getBuffer().endWrite(message), 1); //TODO: latency
                 }
             }
         }

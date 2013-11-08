@@ -19,9 +19,8 @@
 package archimulator.util.plot;
 
 import com.Ostermiller.util.CSVPrinter;
-import net.pickapack.util.Pair;
-import net.pickapack.action.Function1;
 import net.pickapack.collection.CollectionHelper;
+import net.pickapack.util.Pair;
 import org.apache.commons.io.IOUtils;
 import org.eobjects.metamodel.DataContext;
 import org.eobjects.metamodel.DataContextFactory;
@@ -148,12 +147,7 @@ public class Table implements Serializable {
                     .select(columns.toArray(new String[columns.size()]));
 
             for (final Pair<String, List<String>> condition : criteria.getConditions()) {
-                select.where(new FilterItem(LogicalOperator.OR, CollectionHelper.transform(condition.getSecond(), new Function1<String, FilterItem>() {
-                    @Override
-                    public FilterItem apply(String conditionLine) {
-                        return new FilterItem(new SelectItem(table.getColumnByName(condition.getFirst())), OperatorType.EQUALS_TO, conditionLine);
-                    }
-                })));
+                select.where(new FilterItem(LogicalOperator.OR, CollectionHelper.transform(condition.getSecond(), conditionLine -> new FilterItem(new SelectItem(table.getColumnByName(condition.getFirst())), OperatorType.EQUALS_TO, conditionLine))));
             }
 
             DataSet dataSet = select.execute();
@@ -189,21 +183,16 @@ public class Table implements Serializable {
      * @return a table object created from the specified data set object
      */
     public static Table fromDataSet(DataSet dataSet) {
-        List<String> columns = new ArrayList<String>();
+        List<String> columns = new ArrayList<>();
 
         for (SelectItem selectedItem : dataSet.getSelectItems()) {
             columns.add(selectedItem.getColumn().getName());
         }
 
-        List<List<String>> rows = new ArrayList<List<String>>();
+        List<List<String>> rows = new ArrayList<>();
 
         for (Row row : dataSet) {
-            rows.add(CollectionHelper.transform(Arrays.asList(row.getValues()), new Function1<Object, String>() {
-                @Override
-                public String apply(Object obj) {
-                    return obj + "";
-                }
-            }));
+            rows.add(CollectionHelper.transform(Arrays.asList(row.getValues()), obj -> obj + ""));
         }
 
         return new Table(columns, rows);
@@ -229,7 +218,7 @@ public class Table implements Serializable {
      * @return the list of rows matching the specified conditions in the specified table
      */
     public static List<List<String>> findRows(Table table, List<Pair<String, String>> conditions) {
-        List<List<String>> result = new ArrayList<List<String>>();
+        List<List<String>> result = new ArrayList<>();
 
         for(List<String> row : table.getRows()) {
             boolean valid = true;
@@ -272,14 +261,11 @@ public class Table implements Serializable {
         Collections.reverse(columnList);
 
         for (final String column : columnList) {
-            Collections.sort(table.getRows(), new Comparator<List<String>>() {
-                @Override
-                public int compare(List<String> row1, List<String> row2) {
-                    String val1 = getValue(table, row1, column);
-                    String val2 = getValue(table, row2, column);
+            Collections.sort(table.getRows(), (row1, row2) -> {
+                String val1 = getValue(table, row1, column);
+                String val2 = getValue(table, row2, column);
 
-                    return val1.compareTo(val2);
-                }
+                return val1.compareTo(val2);
             });
         }
     }
@@ -297,7 +283,7 @@ public class Table implements Serializable {
 
         List<String> columns = tables[0].getColumns();
 
-        List<List<String>> rows = new ArrayList<List<String>>();
+        List<List<String>> rows = new ArrayList<>();
 
         for (Table table : tables) {
             rows.addAll(table.getRows());

@@ -26,8 +26,6 @@ import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.event.GeneralCacheControllerServiceNonblockingRequestEvent;
 import archimulator.sim.uncore.coherence.event.LastLevelCacheControllerLineInsertEvent;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
-import net.pickapack.action.Action;
-import net.pickapack.action.Action1;
 import net.pickapack.math.Quantizer;
 
 import java.util.LinkedHashMap;
@@ -117,46 +115,33 @@ public class MLPProfilingHelper implements Reportable {
 
         this.mlpCostQuantizer = new Quantizer(7, 40);
 
-        this.pendingL2Misses = new LinkedHashMap<Integer, PendingL2Miss>();
+        this.pendingL2Misses = new LinkedHashMap<>();
 
-        this.numL2MissesPerMlpCostQuantum = new TreeMap<Integer, Long>();
+        this.numL2MissesPerMlpCostQuantum = new TreeMap<>();
 
-        this.l2CacheController.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, new Action1<GeneralCacheControllerServiceNonblockingRequestEvent>() {
-            public void apply(GeneralCacheControllerServiceNonblockingRequestEvent event) {
-                if (event.getCacheController().equals(MLPProfilingHelper.this.l2CacheController) && !event.isHitInCache()) {
-                    profileBeginServicingL2CacheMiss(event.getAccess());
-                }
+        this.l2CacheController.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, event -> {
+            if (event.getCacheController().equals(MLPProfilingHelper.this.l2CacheController) && !event.isHitInCache()) {
+                profileBeginServicingL2CacheMiss(event.getAccess());
             }
         });
 
-        this.l2CacheController.getBlockingEventDispatcher().addListener(LastLevelCacheControllerLineInsertEvent.class, new Action1<LastLevelCacheControllerLineInsertEvent>() {
-            @Override
-            public void apply(LastLevelCacheControllerLineInsertEvent event) {
-                if (event.getCacheController().equals(MLPProfilingHelper.this.l2CacheController)) {
-                    profileEndServicingL2CacheMiss(event.getSet(), event.getWay(), event.getAccess());
-                }
+        this.l2CacheController.getBlockingEventDispatcher().addListener(LastLevelCacheControllerLineInsertEvent.class, event -> {
+            if (event.getCacheController().equals(MLPProfilingHelper.this.l2CacheController)) {
+                profileEndServicingL2CacheMiss(event.getSet(), event.getWay(), event.getAccess());
             }
         });
 
-        this.l2CacheController.getCycleAccurateEventQueue().getPerCycleEvents().add(new Action() {
-            @Override
-            public void apply() {
-                updateL2CacheMlpCostsPerCycle();
+        this.l2CacheController.getCycleAccurateEventQueue().getPerCycleEvents().add(this::updateL2CacheMlpCostsPerCycle);
+
+        this.l2CacheController.getBlockingEventDispatcher().addListener(MLPProfilingHelper.L2MissMLPProfiledEvent.class, event -> {
+            double mlpCost = event.getPendingL2Miss().getMlpCost();
+
+            int quantizedMlpCost = getMlpCostQuantizer().quantize((int) mlpCost);
+            if (!numL2MissesPerMlpCostQuantum.containsKey(quantizedMlpCost)) {
+                numL2MissesPerMlpCostQuantum.put(quantizedMlpCost, 0L);
             }
-        });
 
-        this.l2CacheController.getBlockingEventDispatcher().addListener(MLPProfilingHelper.L2MissMLPProfiledEvent.class, new Action1<MLPProfilingHelper.L2MissMLPProfiledEvent>() {
-            @Override
-            public void apply(MLPProfilingHelper.L2MissMLPProfiledEvent event) {
-                double mlpCost = event.getPendingL2Miss().getMlpCost();
-
-                int quantizedMlpCost = getMlpCostQuantizer().quantize((int) mlpCost);
-                if (!numL2MissesPerMlpCostQuantum.containsKey(quantizedMlpCost)) {
-                    numL2MissesPerMlpCostQuantum.put(quantizedMlpCost, 0L);
-                }
-
-                numL2MissesPerMlpCostQuantum.put(quantizedMlpCost, numL2MissesPerMlpCostQuantum.get(quantizedMlpCost) + 1);
-            }
+            numL2MissesPerMlpCostQuantum.put(quantizedMlpCost, numL2MissesPerMlpCostQuantum.get(quantizedMlpCost) + 1);
         });
     }
 

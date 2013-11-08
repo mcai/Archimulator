@@ -29,13 +29,12 @@ import archimulator.sim.isa.StaticInstructionType;
 import archimulator.sim.isa.event.FunctionalCallEvent;
 import archimulator.sim.os.Process;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
+import archimulator.sim.uncore.cache.stackDistanceProfile.StackDistanceProfilingHelper;
 import archimulator.sim.uncore.coherence.event.GeneralCacheControllerServiceNonblockingRequestEvent;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestProfilingHelper;
 import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestState;
 import archimulator.sim.uncore.helperThread.HelperThreadingHelper;
-import archimulator.sim.uncore.cache.stackDistanceProfile.StackDistanceProfilingHelper;
-import net.pickapack.action.Action1;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
 import java.util.Map;
@@ -66,8 +65,8 @@ public class HotspotProfilingHelper implements Reportable {
     public HotspotProfilingHelper(Simulation simulation) {
         this.l2CacheController = simulation.getProcessor().getMemoryHierarchy().getL2CacheController();
 
-        this.numCallsPerFunctions = new TreeMap<String, Map<String, Long>>();
-        this.loadsInHotspotFunction = new TreeMap<Integer, LoadInstructionEntry>();
+        this.numCallsPerFunctions = new TreeMap<>();
+        this.loadsInHotspotFunction = new TreeMap<>();
 
         this.statL2CacheHitStackDistances = new SummaryStatistics();
         this.statL2CacheMissStackDistances = new SummaryStatistics();
@@ -77,106 +76,92 @@ public class HotspotProfilingHelper implements Reportable {
 
         this.scanLoadInstructionsInHotspotFunction(simulation.getProcessor().getCores().get(0).getThreads().get(0).getContext().getProcess());
 
-        simulation.getBlockingEventDispatcher().addListener(FunctionalCallEvent.class, new Action1<FunctionalCallEvent>() {
-            @Override
-            public void apply(FunctionalCallEvent event) {
-                String callerFunctionName = event.getContext().getProcess().getFunctionNameFromPc(event.getFunctionCallContext().getPc());
-                String calleeFunctionName = event.getContext().getProcess().getFunctionNameFromPc(event.getFunctionCallContext().getTargetPc());
-                if (callerFunctionName != null) {
-                    if (!numCallsPerFunctions.containsKey(callerFunctionName)) {
-                        numCallsPerFunctions.put(callerFunctionName, new TreeMap<String, Long>());
-                    }
-
-                    if (!numCallsPerFunctions.get(callerFunctionName).containsKey(calleeFunctionName)) {
-                        numCallsPerFunctions.get(callerFunctionName).put(calleeFunctionName, 0L);
-                    }
-
-                    numCallsPerFunctions.get(callerFunctionName).put(calleeFunctionName, numCallsPerFunctions.get(callerFunctionName).get(calleeFunctionName) + 1);
+        simulation.getBlockingEventDispatcher().addListener(FunctionalCallEvent.class, event -> {
+            String callerFunctionName = event.getContext().getProcess().getFunctionNameFromPc(event.getFunctionCallContext().getPc());
+            String calleeFunctionName = event.getContext().getProcess().getFunctionNameFromPc(event.getFunctionCallContext().getTargetPc());
+            if (callerFunctionName != null) {
+                if (!numCallsPerFunctions.containsKey(callerFunctionName)) {
+                    numCallsPerFunctions.put(callerFunctionName, new TreeMap<String, Long>());
                 }
+
+                if (!numCallsPerFunctions.get(callerFunctionName).containsKey(calleeFunctionName)) {
+                    numCallsPerFunctions.get(callerFunctionName).put(calleeFunctionName, 0L);
+                }
+
+                numCallsPerFunctions.get(callerFunctionName).put(calleeFunctionName, numCallsPerFunctions.get(callerFunctionName).get(calleeFunctionName) + 1);
             }
         });
 
-        simulation.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, new Action1<GeneralCacheControllerServiceNonblockingRequestEvent>() {
-            public void apply(GeneralCacheControllerServiceNonblockingRequestEvent event) {
-                DynamicInstruction dynamicInstruction = event.getAccess().getDynamicInstruction();
+        simulation.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, event -> {
+            DynamicInstruction dynamicInstruction = event.getAccess().getDynamicInstruction();
 
-                if (dynamicInstruction != null && dynamicInstruction.getThread().getContext().getThreadId() == HelperThreadingHelper.getMainThreadId()) {
-                    if (loadsInHotspotFunction.containsKey(dynamicInstruction.getPc())) {
-                        LoadInstructionEntry loadInstructionEntry = loadsInHotspotFunction.get(dynamicInstruction.getPc());
-                        if (event.getCacheController().getName().equals("c0/dcache")) {
-                            loadInstructionEntry.setL1DAccesses(loadInstructionEntry.getL1DAccesses() + 1);
-                            if (event.isHitInCache()) {
-                                loadInstructionEntry.setL1DHits(loadInstructionEntry.getL1DHits() + 1);
-                            }
-                        } else if (event.getCacheController() == l2CacheController) {
-                            loadInstructionEntry.setL2Accesses(loadInstructionEntry.getL2Accesses() + 1);
-                            if (event.isHitInCache()) {
-                                loadInstructionEntry.setL2Hits(loadInstructionEntry.getL2Hits() + 1);
-                            }
+            if (dynamicInstruction != null && dynamicInstruction.getThread().getContext().getThreadId() == HelperThreadingHelper.getMainThreadId()) {
+                if (loadsInHotspotFunction.containsKey(dynamicInstruction.getPc())) {
+                    LoadInstructionEntry loadInstructionEntry = loadsInHotspotFunction.get(dynamicInstruction.getPc());
+                    if (event.getCacheController().getName().equals("c0/dcache")) {
+                        loadInstructionEntry.setL1DAccesses(loadInstructionEntry.getL1DAccesses() + 1);
+                        if (event.isHitInCache()) {
+                            loadInstructionEntry.setL1DHits(loadInstructionEntry.getL1DHits() + 1);
+                        }
+                    } else if (event.getCacheController() == l2CacheController) {
+                        loadInstructionEntry.setL2Accesses(loadInstructionEntry.getL2Accesses() + 1);
+                        if (event.isHitInCache()) {
+                            loadInstructionEntry.setL2Hits(loadInstructionEntry.getL2Hits() + 1);
                         }
                     }
                 }
             }
         });
 
-        simulation.getBlockingEventDispatcher().addListener(StackDistanceProfilingHelper.StackDistanceProfiledEvent.class, new Action1<StackDistanceProfilingHelper.StackDistanceProfiledEvent>() {
-            @Override
-            public void apply(StackDistanceProfilingHelper.StackDistanceProfiledEvent event) {
-                if(event.getCacheController() == l2CacheController) {
-                    MemoryHierarchyAccess access = event.getAccess();
+        simulation.getBlockingEventDispatcher().addListener(StackDistanceProfilingHelper.StackDistanceProfiledEvent.class, event -> {
+            if(event.getCacheController() == l2CacheController) {
+                MemoryHierarchyAccess access = event.getAccess();
 
-                    if (event.isHitInCache() && HelperThreadingHelper.isMainThread(access.getThread())) {
-                        HelperThreadL2CacheRequestProfilingHelper helperThreadL2CacheRequestProfilingHelper = l2CacheController.getSimulation().getHelperThreadL2CacheRequestProfilingHelper();
+                if (event.isHitInCache() && HelperThreadingHelper.isMainThread(access.getThread())) {
+                    HelperThreadL2CacheRequestProfilingHelper helperThreadL2CacheRequestProfilingHelper = l2CacheController.getSimulation().getHelperThreadL2CacheRequestProfilingHelper();
 
-                        if (helperThreadL2CacheRequestProfilingHelper != null) {
-                            HelperThreadL2CacheRequestState helperThreadL2CacheRequestState =
-                                    helperThreadL2CacheRequestProfilingHelper.getHelperThreadL2CacheRequestStates().get(event.getSet()).get(event.getWay());
+                    if (helperThreadL2CacheRequestProfilingHelper != null) {
+                        HelperThreadL2CacheRequestState helperThreadL2CacheRequestState =
+                                helperThreadL2CacheRequestProfilingHelper.getHelperThreadL2CacheRequestStates().get(event.getSet()).get(event.getWay());
 
-                            if (HelperThreadingHelper.isHelperThread(helperThreadL2CacheRequestState.getThreadId())) {
-                                l2CacheController.getBlockingEventDispatcher().dispatch(new L2CacheHitHotspotInterThreadStackDistanceMeterEvent(
-                                        l2CacheController,
-                                        access.getVirtualPc(),
-                                        access.getPhysicalAddress(),
-                                        access.getThread().getId(),
-                                        access.getThread().getContext().getProcess().getFunctionNameFromPc(access.getVirtualPc()),
-                                        new L2CacheHitHotspotInterThreadStackDistanceMeterEvent.L2CacheHitHotspotInterThreadStackDistanceMeterEventValue(helperThreadL2CacheRequestState, event.getStackDistance())
-                                ));
-                            }
+                        if (HelperThreadingHelper.isHelperThread(helperThreadL2CacheRequestState.getThreadId())) {
+                            l2CacheController.getBlockingEventDispatcher().dispatch(new L2CacheHitHotspotInterThreadStackDistanceMeterEvent(
+                                    l2CacheController,
+                                    access.getVirtualPc(),
+                                    access.getPhysicalAddress(),
+                                    access.getThread().getId(),
+                                    access.getThread().getContext().getProcess().getFunctionNameFromPc(access.getVirtualPc()),
+                                    new L2CacheHitHotspotInterThreadStackDistanceMeterEvent.L2CacheHitHotspotInterThreadStackDistanceMeterEventValue(helperThreadL2CacheRequestState, event.getStackDistance())
+                            ));
                         }
                     }
+                }
 
-                    if (!event.isHitInCache() && HelperThreadingHelper.isMainThread(access.getThread())) {
-                        l2CacheController.getBlockingEventDispatcher().dispatch(new L2CacheMissHotspotStackDistanceMeterEvent(
-                                l2CacheController,
-                                access.getVirtualPc(),
-                                access.getPhysicalAddress(),
-                                access.getThread().getId(),
-                                access.getThread().getContext().getProcess().getFunctionNameFromPc(access.getVirtualPc()),
-                                new L2CacheMissHotspotStackDistanceMeterEvent.L2CacheMissHotspotStackDistanceMeterEventValue(event.getStackDistance())
-                        ));
-                    }
+                if (!event.isHitInCache() && HelperThreadingHelper.isMainThread(access.getThread())) {
+                    l2CacheController.getBlockingEventDispatcher().dispatch(new L2CacheMissHotspotStackDistanceMeterEvent(
+                            l2CacheController,
+                            access.getVirtualPc(),
+                            access.getPhysicalAddress(),
+                            access.getThread().getId(),
+                            access.getThread().getContext().getProcess().getFunctionNameFromPc(access.getVirtualPc()),
+                            new L2CacheMissHotspotStackDistanceMeterEvent.L2CacheMissHotspotStackDistanceMeterEventValue(event.getStackDistance())
+                    ));
+                }
 
-                    if (event.isHitInCache()) {
-                        statL2CacheHitStackDistances.addValue(event.getStackDistance());
-                    } else {
-                        statL2CacheMissStackDistances.addValue(event.getStackDistance());
-                    }
+                if (event.isHitInCache()) {
+                    statL2CacheHitStackDistances.addValue(event.getStackDistance());
+                } else {
+                    statL2CacheMissStackDistances.addValue(event.getStackDistance());
                 }
             }
         });
 
-        simulation.getBlockingEventDispatcher().addListener(L2CacheHitHotspotInterThreadStackDistanceMeterEvent.class, new Action1<L2CacheHitHotspotInterThreadStackDistanceMeterEvent>() {
-            @Override
-            public void apply(L2CacheHitHotspotInterThreadStackDistanceMeterEvent event) {
-                statL2CacheHitHotspotInterThreadStackDistances.addValue(event.getValue().getStackDistance());
-            }
+        simulation.getBlockingEventDispatcher().addListener(L2CacheHitHotspotInterThreadStackDistanceMeterEvent.class, event -> {
+            statL2CacheHitHotspotInterThreadStackDistances.addValue(event.getValue().getStackDistance());
         });
 
-        simulation.getBlockingEventDispatcher().addListener(L2CacheMissHotspotStackDistanceMeterEvent.class, new Action1<L2CacheMissHotspotStackDistanceMeterEvent>() {
-            @Override
-            public void apply(L2CacheMissHotspotStackDistanceMeterEvent event) {
-                statL2CacheMissHotspotStackDistances.addValue(event.getValue().getStackDistance());
-            }
+        simulation.getBlockingEventDispatcher().addListener(L2CacheMissHotspotStackDistanceMeterEvent.class, event -> {
+            statL2CacheMissHotspotStackDistances.addValue(event.getValue().getStackDistance());
         });
     }
 

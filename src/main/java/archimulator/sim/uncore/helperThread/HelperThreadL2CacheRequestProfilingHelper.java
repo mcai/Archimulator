@@ -32,7 +32,6 @@ import archimulator.sim.uncore.coherence.event.GeneralCacheControllerServiceNonb
 import archimulator.sim.uncore.coherence.event.LastLevelCacheControllerLineInsertEvent;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.sim.uncore.coherence.msi.state.DirectoryControllerState;
-import net.pickapack.action.Action1;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -79,9 +78,9 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
     public HelperThreadL2CacheRequestProfilingHelper(Simulation simulation) {
         this.l2CacheController = simulation.getProcessor().getMemoryHierarchy().getL2CacheController();
 
-        this.helperThreadL2CacheRequestStates = new HashMap<Integer, Map<Integer, HelperThreadL2CacheRequestState>>();
+        this.helperThreadL2CacheRequestStates = new HashMap<>();
         for (int set = 0; set < this.l2CacheController.getCache().getNumSets(); set++) {
-            HashMap<Integer, HelperThreadL2CacheRequestState> helperThreadL2CacheRequestStatesPerSet = new HashMap<Integer, HelperThreadL2CacheRequestState>();
+            HashMap<Integer, HelperThreadL2CacheRequestState> helperThreadL2CacheRequestStatesPerSet = new HashMap<>();
             this.helperThreadL2CacheRequestStates.put(set, helperThreadL2CacheRequestStatesPerSet);
 
             for (int way = 0; way < this.l2CacheController.getCache().getAssociativity(); way++) {
@@ -89,70 +88,55 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
             }
         }
 
-        this.helperThreadL2CacheRequestQualityPredictor = new CacheBasedPredictor<Boolean>(l2CacheController, l2CacheController.getName() + "/helperThreadL2CacheRequestQualityPredictor", new CacheGeometry(64, 1, 1), 4, 16, false); //TODO: parameters should not be hardcoded
+        this.helperThreadL2CacheRequestQualityPredictor = new CacheBasedPredictor<>(l2CacheController, l2CacheController.getName() + "/helperThreadL2CacheRequestQualityPredictor", new CacheGeometry(64, 1, 1), 4, 16, false); //TODO: parameters should not be hardcoded
 
-        this.l2CacheController.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, new Action1<GeneralCacheControllerServiceNonblockingRequestEvent>() {
-            @Override
-            public void apply(GeneralCacheControllerServiceNonblockingRequestEvent event) {
-                if (event.getCacheController().equals(HelperThreadL2CacheRequestProfilingHelper.this.l2CacheController)) {
-                    int set = event.getSet();
-                    boolean requesterIsHelperThread = HelperThreadingHelper.isHelperThread(event.getAccess().getThread());
-                    boolean lineFoundIsHelperThread = helperThreadL2CacheRequestStates.get(set).get(event.getWay()).getThreadId() == HelperThreadingHelper.getHelperThreadId();
+        this.l2CacheController.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, event -> {
+            if (event.getCacheController().equals(HelperThreadL2CacheRequestProfilingHelper.this.l2CacheController)) {
+                int set = event.getSet();
+                boolean requesterIsHelperThread = HelperThreadingHelper.isHelperThread(event.getAccess().getThread());
+                boolean lineFoundIsHelperThread = helperThreadL2CacheRequestStates.get(set).get(event.getWay()).getThreadId() == HelperThreadingHelper.getHelperThreadId();
 
-                    handleL2CacheRequest(event, requesterIsHelperThread, lineFoundIsHelperThread);
+                handleL2CacheRequest(event, requesterIsHelperThread, lineFoundIsHelperThread);
+            }
+        });
+
+        this.l2CacheController.getBlockingEventDispatcher().addListener(LastLevelCacheControllerLineInsertEvent.class, event -> {
+            if (event.getCacheController().equals(HelperThreadL2CacheRequestProfilingHelper.this.l2CacheController)) {
+                int set = event.getSet();
+                boolean lineFoundIsHelperThread = helperThreadL2CacheRequestStates.get(set).get(event.getWay()).getThreadId() == HelperThreadingHelper.getHelperThreadId();
+
+                handleL2CacheLineInsert(event, lineFoundIsHelperThread);
+            }
+        });
+
+        this.l2CacheController.getBlockingEventDispatcher().addListener(GeneralCacheControllerLastPutSOrPutMAndDataFromOwnerEvent.class, event -> {
+            if (event.getCacheController().equals(HelperThreadL2CacheRequestProfilingHelper.this.l2CacheController)) {
+                int set = event.getSet();
+
+                markInvalid(set, event.getWay());
+            }
+        });
+
+        this.l2CacheController.getBlockingEventDispatcher().addListener(GeneralCacheControllerNonblockingRequestHitToTransientTagEvent.class, event -> {
+            if (event.getCacheController().equals(HelperThreadL2CacheRequestProfilingHelper.this.l2CacheController)) {
+                int set = event.getSet();
+
+                int requesterThreadId = event.getAccess().getThread().getId();
+                int lineFoundThreadId = helperThreadL2CacheRequestStates.get(set).get(event.getWay()).getInFlightThreadId();
+
+                boolean requesterIsHelperThread = HelperThreadingHelper.isHelperThread(requesterThreadId);
+                boolean lineFoundIsHelperThread = HelperThreadingHelper.isHelperThread(lineFoundThreadId);
+
+                if (!requesterIsHelperThread && lineFoundIsHelperThread) {
+                    markLate(set, event.getWay(), true);
+                } else if (requesterIsHelperThread && !lineFoundIsHelperThread) {
+                    markLate(set, event.getWay(), true);
                 }
             }
         });
 
-        this.l2CacheController.getBlockingEventDispatcher().addListener(LastLevelCacheControllerLineInsertEvent.class, new Action1<LastLevelCacheControllerLineInsertEvent>() {
-            @Override
-            public void apply(LastLevelCacheControllerLineInsertEvent event) {
-                if (event.getCacheController().equals(HelperThreadL2CacheRequestProfilingHelper.this.l2CacheController)) {
-                    int set = event.getSet();
-                    boolean lineFoundIsHelperThread = helperThreadL2CacheRequestStates.get(set).get(event.getWay()).getThreadId() == HelperThreadingHelper.getHelperThreadId();
-
-                    handleL2CacheLineInsert(event, lineFoundIsHelperThread);
-                }
-            }
-        });
-
-        this.l2CacheController.getBlockingEventDispatcher().addListener(GeneralCacheControllerLastPutSOrPutMAndDataFromOwnerEvent.class, new Action1<GeneralCacheControllerLastPutSOrPutMAndDataFromOwnerEvent>() {
-            @Override
-            public void apply(GeneralCacheControllerLastPutSOrPutMAndDataFromOwnerEvent event) {
-                if (event.getCacheController().equals(HelperThreadL2CacheRequestProfilingHelper.this.l2CacheController)) {
-                    int set = event.getSet();
-
-                    markInvalid(set, event.getWay());
-                }
-            }
-        });
-
-        this.l2CacheController.getBlockingEventDispatcher().addListener(GeneralCacheControllerNonblockingRequestHitToTransientTagEvent.class, new Action1<GeneralCacheControllerNonblockingRequestHitToTransientTagEvent>() {
-            @Override
-            public void apply(GeneralCacheControllerNonblockingRequestHitToTransientTagEvent event) {
-                if (event.getCacheController().equals(HelperThreadL2CacheRequestProfilingHelper.this.l2CacheController)) {
-                    int set = event.getSet();
-
-                    int requesterThreadId = event.getAccess().getThread().getId();
-                    int lineFoundThreadId = helperThreadL2CacheRequestStates.get(set).get(event.getWay()).getInFlightThreadId();
-
-                    boolean requesterIsHelperThread = HelperThreadingHelper.isHelperThread(requesterThreadId);
-                    boolean lineFoundIsHelperThread = HelperThreadingHelper.isHelperThread(lineFoundThreadId);
-
-                    if (!requesterIsHelperThread && lineFoundIsHelperThread) {
-                        markLate(set, event.getWay(), true);
-                    } else if (requesterIsHelperThread && !lineFoundIsHelperThread) {
-                        markLate(set, event.getWay(), true);
-                    }
-                }
-            }
-        });
-
-        this.l2CacheController.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestEvent.class, new Action1<HelperThreadL2CacheRequestEvent>() {
-            @Override
-            public void apply(HelperThreadL2CacheRequestEvent event) {
-                helperThreadL2CacheRequestQualityPredictor.update(event.getPc(), event.getQuality().isUseful());
-            }
+        this.l2CacheController.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestEvent.class, event -> {
+            helperThreadL2CacheRequestQualityPredictor.update(event.getPc(), event.getQuality().isUseful());
         });
     }
 

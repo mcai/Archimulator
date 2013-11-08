@@ -50,7 +50,7 @@ public class ExperimentStatHelper {
                 File file = new File(path);
 
                 if(!file.exists()) {
-                    List<ExperimentStat> stats = new ArrayList<ExperimentStat>();
+                    List<ExperimentStat> stats = new ArrayList<>();
 
                     List<String> statPrefixes = JedisHelper.getStatPrefixesByParent(experiment.getId());
 

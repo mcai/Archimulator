@@ -50,7 +50,7 @@ public class DataMessage extends CoherenceMessage {
     /**
      * Get the sender controller.
      *
-     * @return
+     * @return the sender controller
      */
     public Controller getSender() {
         return sender;

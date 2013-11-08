@@ -30,7 +30,6 @@ import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import archimulator.sim.uncore.coherence.msi.message.*;
 import archimulator.sim.uncore.coherence.msi.state.DirectoryControllerState;
 import net.pickapack.action.Action;
-import net.pickapack.action.Action1;
 import net.pickapack.fsm.BasicFiniteStateMachine;
 import net.pickapack.fsm.event.ExitStateEvent;
 import net.pickapack.util.ValueProvider;
@@ -74,15 +73,12 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
         this.way = way;
         this.directoryController = directoryController;
         this.directoryEntry = new DirectoryEntry();
-        this.stalledEvents = new ArrayList<Action>();
+        this.stalledEvents = new ArrayList<>();
         this.evicterTag = CacheLine.INVALID_TAG;
         this.victimTag = CacheLine.INVALID_TAG;
 
-        this.addListener(ExitStateEvent.class, new Action1<ExitStateEvent>() {
-            @Override
-            public void apply(ExitStateEvent exitStateEvent) {
-                previousState = getState();
-            }
+        this.addListener(ExitStateEvent.class, exitStateEvent -> {
+            previousState = getState();
         });
     }
 
@@ -221,13 +217,7 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
      * @param event  the directory controller event
      */
     public void stall(final Object sender, final DirectoryControllerEvent event) {
-        Action action = new Action() {
-            @Override
-            public void apply() {
-                fireTransition(sender, event);
-            }
-        };
-        stall(action);
+        stall(() -> fireTransition(sender, event));
     }
 
     /**
@@ -334,11 +324,7 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
      * @param tag the tag
      */
     public void copyDataToMem(int tag) {
-        this.directoryController.getNext().memWriteRequestReceive(this.directoryController, tag, new Action() {
-            @Override
-            public void apply() {
-            }
-        });
+        this.directoryController.getNext().memWriteRequestReceive(this.directoryController, tag, () -> {});
     }
 
     /**

@@ -20,7 +20,6 @@ package archimulator.sim.uncore;
 
 import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import archimulator.sim.uncore.coherence.msi.message.CoherenceMessage;
-import net.pickapack.action.Action;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +44,7 @@ public class PointToPointReorderBuffer {
     public PointToPointReorderBuffer(Controller from, Controller to) {
         this.from = from;
         this.to = to;
-        this.messages = new ArrayList<CoherenceMessage>();
+        this.messages = new ArrayList<>();
     }
 
     /**
@@ -79,16 +78,13 @@ public class PointToPointReorderBuffer {
 
             this.messages.remove(message);
 
-            to.getCycleAccurateEventQueue().schedule(this, new Action() {
-                @Override
-                public void apply() {
-                    message.onCompleted();
-                    if (message.getId() < lastCompletedMessageId) {
-                        throw new IllegalArgumentException(String.format("p2pReorderBuffer[%s->%s] messageId: %d, lastCompletedMessageId: %d", from.getName(), to.getName(), message.getId(), lastCompletedMessageId));
-                    }
-                    lastCompletedMessageId = message.getId();
-                    to.receive(message);
+            to.getCycleAccurateEventQueue().schedule(this, () -> {
+                message.onCompleted();
+                if (message.getId() < lastCompletedMessageId) {
+                    throw new IllegalArgumentException(String.format("p2pReorderBuffer[%s->%s] messageId: %d, lastCompletedMessageId: %d", from.getName(), to.getName(), message.getId(), lastCompletedMessageId));
                 }
+                lastCompletedMessageId = message.getId();
+                to.receive(message);
             }, to.getHitLatency());
         }
     }

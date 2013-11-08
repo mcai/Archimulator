@@ -22,8 +22,6 @@ import archimulator.sim.common.Simulation;
 import archimulator.sim.common.SimulationEvent;
 import archimulator.sim.uncore.dram.BasicMemoryController;
 import archimulator.sim.uncore.dram.MemoryController;
-import net.pickapack.action.Action;
-import net.pickapack.action.Action1;
 import net.pickapack.action.Function1;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
@@ -88,58 +86,40 @@ public class BLPProfilingHelper {
     public BLPProfilingHelper(Simulation simulation) {
         this.memoryController = simulation.getProcessor().getMemoryHierarchy().getMemoryController();
 
-        this.blpCostQuantizer = new Function1<Integer, Integer>() {
-            @Override
-            public Integer apply(Integer rawValue) {
-                if (rawValue < 0) {
-                    throw new IllegalArgumentException();
-                }
+        this.blpCostQuantizer = rawValue -> {
+            if (rawValue < 0) {
+                throw new IllegalArgumentException();
+            }
 
-                if (rawValue <= 42) {
-                    return 0;
-                } else if (rawValue <= 85) {
-                    return 1;
-                } else if (rawValue <= 128) {
-                    return 2;
-                } else if (rawValue <= 170) {
-                    return 3;
-                } else if (rawValue <= 213) {
-                    return 4;
-                } else if (rawValue <= 246) {
-                    return 5;
-                } else if (rawValue <= 300) {
-                    return 6;
-                } else {
-                    return 7;
-                }
+            if (rawValue <= 42) {
+                return 0;
+            } else if (rawValue <= 85) {
+                return 1;
+            } else if (rawValue <= 128) {
+                return 2;
+            } else if (rawValue <= 170) {
+                return 3;
+            } else if (rawValue <= 213) {
+                return 4;
+            } else if (rawValue <= 246) {
+                return 5;
+            } else if (rawValue <= 300) {
+                return 6;
+            } else {
+                return 7;
             }
         };
 
-        this.pendingDRAMBankAccesses = new LinkedHashMap<Integer, PendingDramBankAccess>();
+        this.pendingDRAMBankAccesses = new LinkedHashMap<>();
 
         this.statDramBankAccessNumCycles = new SummaryStatistics();
         this.statDramBankAccessBlpCosts = new SummaryStatistics();
 
-        memoryController.getBlockingEventDispatcher().addListener(BasicMemoryController.BeginAccessEvent.class, new Action1<BasicMemoryController.BeginAccessEvent>() {
-            @Override
-            public void apply(BasicMemoryController.BeginAccessEvent event) {
-                profileBeginServicingL2CacheMiss(event);
-            }
-        });
+        memoryController.getBlockingEventDispatcher().addListener(BasicMemoryController.BeginAccessEvent.class, this::profileBeginServicingL2CacheMiss);
 
-        memoryController.getBlockingEventDispatcher().addListener(BasicMemoryController.EndAccessEvent.class, new Action1<BasicMemoryController.EndAccessEvent>() {
-            @Override
-            public void apply(BasicMemoryController.EndAccessEvent event) {
-                profileEndServicingL2CacheMiss(event);
-            }
-        });
+        memoryController.getBlockingEventDispatcher().addListener(BasicMemoryController.EndAccessEvent.class, this::profileEndServicingL2CacheMiss);
 
-        memoryController.getCycleAccurateEventQueue().getPerCycleEvents().add(new Action() {
-            @Override
-            public void apply() {
-                updateBlpCostsPerCycle();
-            }
-        });
+        memoryController.getCycleAccurateEventQueue().getPerCycleEvents().add(this::updateBlpCostsPerCycle);
     }
 
 

@@ -54,9 +54,9 @@ public abstract class NetBuffer {
     public NetBuffer(int size) {
         this.size = size;
 
-        this.pendingReadActions = new ArrayList<Action>();
-        this.pendingWriteActions = new ArrayList<Action>();
-        this.pendingFullActions = new ArrayList<Action>();
+        this.pendingReadActions = new ArrayList<>();
+        this.pendingWriteActions = new ArrayList<>();
+        this.pendingFullActions = new ArrayList<>();
     }
 
     /**

@@ -19,7 +19,6 @@
 package archimulator.util;
 
 import archimulator.model.ExperimentStat;
-import net.pickapack.action.Function1;
 import net.pickapack.collection.CollectionHelper;
 import net.pickapack.io.serialization.JsonSerializationHelper;
 import net.pickapack.util.Pair;
@@ -61,7 +60,7 @@ public class JedisHelper {
 
         jedis.hmset(experimentKey, new LinkedHashMap<String, String>() {{
             for (ExperimentStat stat : stats) {
-                put(stat.getKey(), JsonSerializationHelper.serialize(new Pair<String, String>(stat.getValue(), "" + currentTick++)));
+                put(stat.getKey(), JsonSerializationHelper.serialize(new Pair<>(stat.getValue(), "" + currentTick++)));
             }
         }});
 
@@ -119,7 +118,7 @@ public class JedisHelper {
     public static List<ExperimentStat> getStatsByParentAndPrefix(long parentId, String prefix) {
         String experimentKey = getKeyByParentAndPrefix(parentId, prefix);
         if (jedis.exists(experimentKey)) {
-            List<Pair<ExperimentStat, String>> stats = new ArrayList<Pair<ExperimentStat, String>>();
+            List<Pair<ExperimentStat, String>> stats = new ArrayList<>();
 
             Map<String, String> result = jedis.hgetAll(experimentKey);
 
@@ -127,24 +126,16 @@ public class JedisHelper {
                 Pair<String, String> value = JsonSerializationHelper.deserialize(Pair.class, result.get(resultKey));
 
                 ExperimentStat stat = new ExperimentStat(parentId, prefix, resultKey, value.getFirst());
-                stats.add(new Pair<ExperimentStat, String>(stat, value.getSecond()));
+                stats.add(new Pair<>(stat, value.getSecond()));
             }
 
-            Collections.sort(stats, new Comparator<Pair<ExperimentStat, String>>() {
-                @Override
-                public int compare(Pair<ExperimentStat, String> o1, Pair<ExperimentStat, String> o2) {
-                    Double first = Double.parseDouble(o1.getSecond());
-                    Double second = Double.parseDouble(o2.getSecond());
-                    return first.compareTo(second);
-                }
+            Collections.sort(stats, (o1, o2) -> {
+                Double first = Double.parseDouble(o1.getSecond());
+                Double second = Double.parseDouble(o2.getSecond());
+                return first.compareTo(second);
             });
 
-            return CollectionHelper.transform(stats, new Function1<Pair<ExperimentStat, String>, ExperimentStat>() {
-                @Override
-                public ExperimentStat apply(Pair<ExperimentStat, String> pair) {
-                    return pair.getFirst();
-                }
-            });
+            return CollectionHelper.transform(stats, pair -> pair.getFirst());
         }
 
         return new ArrayList<ExperimentStat>();
@@ -181,7 +172,7 @@ public class JedisHelper {
     public static List<ExperimentStat> getStatsByParentAndPrefixAndKeyLike(long parentId, String prefix, String keyLike) {
         String experimentKey = getKeyByParentAndPrefix(parentId, prefix);
 
-        List<Pair<ExperimentStat, String>> stats = new ArrayList<Pair<ExperimentStat, String>>();
+        List<Pair<ExperimentStat, String>> stats = new ArrayList<>();
 
         if (jedis.exists(experimentKey)) {
             Set<String> keys = jedis.hkeys(experimentKey);
@@ -191,26 +182,18 @@ public class JedisHelper {
                     Pair<String, String> value = JsonSerializationHelper.deserialize(Pair.class, jedis.hget(experimentKey, key));
 
                     ExperimentStat stat = new ExperimentStat(parentId, prefix, key, value.getFirst());
-                    stats.add(new Pair<ExperimentStat, String>(stat, value.getSecond()));
+                    stats.add(new Pair<>(stat, value.getSecond()));
                 }
             }
         }
 
-        Collections.sort(stats, new Comparator<Pair<ExperimentStat, String>>() {
-            @Override
-            public int compare(Pair<ExperimentStat, String> o1, Pair<ExperimentStat, String> o2) {
-                Double first = Double.parseDouble(o1.getSecond());
-                Double second = Double.parseDouble(o2.getSecond());
-                return first.compareTo(second);
-            }
+        Collections.sort(stats, (o1, o2) -> {
+            Double first = Double.parseDouble(o1.getSecond());
+            Double second = Double.parseDouble(o2.getSecond());
+            return first.compareTo(second);
         });
 
-        return CollectionHelper.transform(stats, new Function1<Pair<ExperimentStat, String>, ExperimentStat>() {
-            @Override
-            public ExperimentStat apply(Pair<ExperimentStat, String> pair) {
-                return pair.getFirst();
-            }
-        });
+        return CollectionHelper.transform(stats, pair -> pair.getFirst());
     }
 
     /**
@@ -220,13 +203,8 @@ public class JedisHelper {
      * @return a list of statistic prefixes under the specified parent experiment object
      */
     public static List<String> getStatPrefixesByParent(long parentId) {
-        List<String> experimentKeys = new ArrayList<String>(getKeysByParent(parentId));
-        return CollectionHelper.transform(experimentKeys, new Function1<String, String>() {
-            @Override
-            public String apply(String key) {
-                return key.substring(key.indexOf("/") + 1);
-            }
-        });
+        List<String> experimentKeys = new ArrayList<>(getKeysByParent(parentId));
+        return CollectionHelper.transform(experimentKeys, key -> key.substring(key.indexOf("/") + 1));
     }
 
     /**
@@ -235,13 +213,8 @@ public class JedisHelper {
      * @return the list of experiment IDs stored in the Redis database
      */
     public static List<Long> getExperimentIds() {
-        List<String> experimentKeys = new ArrayList<String>(jedis.keys(KEY_PREFIX_EXPERIMENT_STATS + "*"));
-        return CollectionHelper.transform(experimentKeys, new Function1<String, Long>() {
-            @Override
-            public Long apply(String key) {
-                return Long.parseLong(key.substring(key.lastIndexOf(".") + 1, key.indexOf("/")));
-            }
-        });
+        List<String> experimentKeys = new ArrayList<>(jedis.keys(KEY_PREFIX_EXPERIMENT_STATS + "*"));
+        return CollectionHelper.transform(experimentKeys, key -> Long.parseLong(key.substring(key.lastIndexOf(".") + 1, key.indexOf("/"))));
     }
 
     /**

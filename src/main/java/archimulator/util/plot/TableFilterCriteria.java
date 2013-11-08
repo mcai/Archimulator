@@ -51,7 +51,7 @@ public class TableFilterCriteria {
      */
     public TableFilterCriteria(List<String> columns) {
         this.columns = columns;
-        this.conditions = new ArrayList<Pair<String, List<String>>>();
+        this.conditions = new ArrayList<>();
     }
 
     /**

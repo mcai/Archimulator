@@ -65,12 +65,7 @@ public abstract class MemoryController extends MemoryDevice implements Reportabl
     public void memReadRequestReceive(final MemoryDevice source, int tag, final Action onCompletedCallback) {
         this.numReads++;
 
-        this.access(tag, new Action() {
-            @Override
-            public void apply() {
-                transfer(source, ((DirectoryController) source).getCache().getLineSize() + 8, onCompletedCallback);
-            }
-        });
+        this.access(tag, () -> transfer(source, ((DirectoryController) source).getCache().getLineSize() + 8, onCompletedCallback));
     }
 
     /**
@@ -83,12 +78,7 @@ public abstract class MemoryController extends MemoryDevice implements Reportabl
     public void memWriteRequestReceive(final MemoryDevice source, int tag, final Action onCompletedCallback) {
         this.numWrites++;
 
-        this.access(tag, new Action() {
-            @Override
-            public void apply() {
-                transfer(source, 8, onCompletedCallback);
-            }
-        });
+        this.access(tag, () -> transfer(source, 8, onCompletedCallback));
     }
 
     /**

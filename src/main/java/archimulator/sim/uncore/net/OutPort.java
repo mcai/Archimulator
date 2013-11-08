@@ -18,8 +18,6 @@
  ******************************************************************************/
 package archimulator.sim.uncore.net;
 
-import net.pickapack.action.Action;
-
 /**
  * Out port.
  *
@@ -55,34 +53,18 @@ public class OutPort extends NetPort {
         final NetLink link = this.getLink();
 
         if (this.buffer != null && this.buffer.isReadBusy()) {
-            this.buffer.addPendingReadAction(new Action() {
-                public void apply() {
-                    toLink(message);
-                }
-            });
+            this.buffer.addPendingReadAction(() -> toLink(message));
         } else if (this.getLink().isBusy()) {
-            this.getLink().addPendingAction(new Action() {
-                public void apply() {
-                    toLink(message);
-                }
-            });
+            this.getLink().addPendingAction(() -> toLink(message));
         } else {
             int latency = (message.getSize() + this.getLink().getBandwidth()) / this.getLink().getBandwidth();
 
             link.beginTransfer();
-            this.getNode().getNet().getCycleAccurateEventQueue().schedule(this, new Action() {
-                public void apply() {
-                    link.endTransfer(message);
-                }
-            }, latency);
+            this.getNode().getNet().getCycleAccurateEventQueue().schedule(this, () -> link.endTransfer(message), latency);
 
             if (this.buffer != null) {
                 this.buffer.beginRead();
-                this.getNode().getNet().getCycleAccurateEventQueue().schedule(this, new Action() {
-                    public void apply() {
-                        buffer.endRead(message);
-                    }
-                }, latency);
+                this.getNode().getNet().getCycleAccurateEventQueue().schedule(this, () -> buffer.endRead(message), latency);
             }
         }
     }

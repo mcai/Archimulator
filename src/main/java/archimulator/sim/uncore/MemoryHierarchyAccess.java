@@ -70,7 +70,7 @@ public class MemoryHierarchyAccess {
 
         this.onCompletedCallback = onCompletedCallback;
 
-        this.aliases = new ArrayList<MemoryHierarchyAccess>();
+        this.aliases = new ArrayList<>();
 
         this.beginCycle = thread.getCycleAccurateEventQueue().getCurrentCycle();
     }

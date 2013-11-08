@@ -23,7 +23,6 @@ import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.common.report.Reportable;
 import archimulator.sim.core.Core;
 import archimulator.sim.core.Thread;
-import net.pickapack.action.Action1;
 import net.pickapack.util.Pair;
 
 import java.util.*;
@@ -44,7 +43,7 @@ public class DelinquentLoadIdentificationHelper implements Reportable {
      * @param simulation the simulation
      */
     public DelinquentLoadIdentificationHelper(Simulation simulation) {
-        this.delinquentLoadIdentificationTables = new HashMap<Integer, DelinquentLoadIdentificationTable>();
+        this.delinquentLoadIdentificationTables = new HashMap<>();
 
         for (Core core : simulation.getProcessor().getCores()) {
             for (Thread thread : core.getThreads()) {
@@ -52,33 +51,20 @@ public class DelinquentLoadIdentificationHelper implements Reportable {
             }
         }
 
-        this.identifiedDelinquentLoads = new ArrayList<Pair<Integer, Integer>>();
+        this.identifiedDelinquentLoads = new ArrayList<>();
 
-        simulation.getBlockingEventDispatcher().addListener(DelinquentLoadIdentificationTable.DelinquentLoadIdentifiedEvent.class, new Action1<DelinquentLoadIdentificationTable.DelinquentLoadIdentifiedEvent>() {
-            @Override
-            public void apply(DelinquentLoadIdentificationTable.DelinquentLoadIdentifiedEvent event) {
-                for(Pair<Integer, Integer> recordedDelinquentLoad : identifiedDelinquentLoads) {
-                    if(recordedDelinquentLoad.getFirst() == event.getThread().getId() && recordedDelinquentLoad.getSecond() == event.getDelinquentLoad().getPc()) {
-                        return;
-                    }
+        simulation.getBlockingEventDispatcher().addListener(DelinquentLoadIdentificationTable.DelinquentLoadIdentifiedEvent.class, event -> {
+            for(Pair<Integer, Integer> recordedDelinquentLoad : identifiedDelinquentLoads) {
+                if(recordedDelinquentLoad.getFirst() == event.getThread().getId() && recordedDelinquentLoad.getSecond() == event.getDelinquentLoad().getPc()) {
+                    return;
                 }
-
-                identifiedDelinquentLoads.add(new Pair<Integer, Integer>(event.getThread().getId(), event.getDelinquentLoad().getPc()));
-
-                Collections.sort(identifiedDelinquentLoads, new Comparator<Pair<Integer, Integer>>() {
-                    @Override
-                    public int compare(Pair<Integer, Integer> o1, Pair<Integer, Integer> o2) {
-                        return o1.getFirst().compareTo(o2.getFirst());
-                    }
-                });
-
-                Collections.sort(identifiedDelinquentLoads, new Comparator<Pair<Integer, Integer>>() {
-                    @Override
-                    public int compare(Pair<Integer, Integer> o1, Pair<Integer, Integer> o2) {
-                        return o1.getSecond().compareTo(o2.getSecond());
-                    }
-                });
             }
+
+            identifiedDelinquentLoads.add(new Pair<>(event.getThread().getId(), event.getDelinquentLoad().getPc()));
+
+            Collections.sort(identifiedDelinquentLoads, (o1, o2) -> o1.getFirst().compareTo(o2.getFirst()));
+
+            Collections.sort(identifiedDelinquentLoads, (o1, o2) -> o1.getSecond().compareTo(o2.getSecond()));
         });
     }
 

@@ -34,7 +34,6 @@ import archimulator.sim.uncore.net.L1sToL2Net;
 import archimulator.sim.uncore.net.L2ToMemNet;
 import archimulator.sim.uncore.net.Net;
 import archimulator.sim.uncore.tlb.TranslationLookasideBuffer;
-import net.pickapack.action.Action;
 import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
 import net.pickapack.fsm.BasicFiniteStateMachine;
@@ -87,11 +86,11 @@ public class BasicMemoryHierarchy extends BasicSimulationObject implements Memor
         this.l2CacheController = new DirectoryController(this, "l2");
         this.l2CacheController.setNext(this.memoryController);
 
-        this.l1ICacheControllers = new ArrayList<CacheController>();
-        this.l1DCacheControllers = new ArrayList<CacheController>();
+        this.l1ICacheControllers = new ArrayList<>();
+        this.l1DCacheControllers = new ArrayList<>();
 
-        this.itlbs = new ArrayList<TranslationLookasideBuffer>();
-        this.dtlbs = new ArrayList<TranslationLookasideBuffer>();
+        this.itlbs = new ArrayList<>();
+        this.dtlbs = new ArrayList<>();
 
         for (int i = 0; i < getExperiment().getArchitecture().getNumCores(); i++) {
             CacheController l1ICacheController = new L1ICacheController(this, "c" + i + "/icache");
@@ -114,7 +113,7 @@ public class BasicMemoryHierarchy extends BasicSimulationObject implements Memor
         this.l1sToL2Net = new L1sToL2Net(this);
         this.l2ToMemNet = new L2ToMemNet(this);
 
-        this.p2pReorderBuffers = new HashMap<Controller, Map<Controller, PointToPointReorderBuffer>>();
+        this.p2pReorderBuffers = new HashMap<>();
     }
 
     /**
@@ -144,18 +143,18 @@ public class BasicMemoryHierarchy extends BasicSimulationObject implements Memor
      */
     @SuppressWarnings("unchecked")
     private <StateT extends Serializable, ConditionT> void dumpCacheControllerFsmStats(List<ExperimentStat> stats, GeneralCacheController<StateT, ConditionT> cacheController) {
-        List<BasicFiniteStateMachine<StateT, ConditionT>> fsms = new ArrayList<BasicFiniteStateMachine<StateT, ConditionT>>();
+        List<BasicFiniteStateMachine<StateT, ConditionT>> finiteStateMachines = new ArrayList<>();
 
         for (int set = 0; set < cacheController.getCache().getNumSets(); set++) {
             for (CacheLine<StateT> line : cacheController.getCache().getLines(set)) {
                 BasicFiniteStateMachine<StateT, ConditionT> fsm = (BasicFiniteStateMachine<StateT, ConditionT>) line.getStateProvider();
-                fsms.add(fsm);
+                finiteStateMachines.add(fsm);
             }
         }
 
-        Map<String, String> statsMap = new LinkedHashMap<String, String>();
+        Map<String, String> statsMap = new LinkedHashMap<>();
 
-        cacheController.getFsmFactory().dump(PREFIX_CC_FSM + cacheController.getName(), fsms, statsMap);
+        cacheController.getFsmFactory().dump(PREFIX_CC_FSM + cacheController.getName(), finiteStateMachines, statsMap);
 
         for (Map.Entry<String, String> entry : statsMap.entrySet()) {
             stats.add(new ExperimentStat(getExperiment().getId(), getSimulation().getPrefix(), entry.getKey(), entry.getValue()));
@@ -173,7 +172,7 @@ public class BasicMemoryHierarchy extends BasicSimulationObject implements Memor
     @Override
     public void transfer(final Controller from, final Controller to, int size, final CoherenceMessage message) {
         if (!this.p2pReorderBuffers.containsKey(from)) {
-            this.p2pReorderBuffers.put(from, new HashMap<Controller, PointToPointReorderBuffer>());
+            this.p2pReorderBuffers.put(from, new HashMap<>());
         }
 
         if (!this.p2pReorderBuffers.get(from).containsKey(to)) {
@@ -182,12 +181,7 @@ public class BasicMemoryHierarchy extends BasicSimulationObject implements Memor
 
         this.p2pReorderBuffers.get(from).get(to).transfer(message);
 
-        from.getNet(to).transfer(from, to, size, new Action() {
-            @Override
-            public void apply() {
-                p2pReorderBuffers.get(from).get(to).onDestinationArrived(message);
-            }
-        });
+        from.getNet(to).transfer(from, to, size, () -> p2pReorderBuffers.get(from).get(to).onDestinationArrived(message));
     }
 
     /**
@@ -229,7 +223,7 @@ public class BasicMemoryHierarchy extends BasicSimulationObject implements Memor
     @Override
     @SuppressWarnings("unchecked")
     public List<GeneralCacheController> getCacheControllers() {
-        List<GeneralCacheController> cacheControllers = new ArrayList<GeneralCacheController>();
+        List<GeneralCacheController> cacheControllers = new ArrayList<>();
         cacheControllers.add(l2CacheController);
         cacheControllers.addAll(getL1ICacheControllers());
         cacheControllers.addAll(getL1DCacheControllers());

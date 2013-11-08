@@ -26,8 +26,6 @@ import archimulator.sim.uncore.cache.replacement.helperThread.HelperThreadInterv
 import archimulator.sim.uncore.coherence.event.GeneralCacheControllerLineReplacementEvent;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.util.IntervalCounter;
-import net.pickapack.action.Action;
-import net.pickapack.action.Action1;
 import net.pickapack.math.SaturatingCounter;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
@@ -103,19 +101,16 @@ public class FeedbackDirectedHelperThreadingHelper implements Reportable {
         this.statPollution = new SummaryStatistics();
         this.statMemoryBandwidthContention = new SummaryStatistics();
 
-        this.accuracyDistribution = new TreeMap<HelperThreadL2CacheRequestAccuracy, Long>();
-        this.latenessDistribution = new TreeMap<HelperThreadL2CacheRequestLateness, Long>();
-        this.pollutionDistribution = new TreeMap<HelperThreadL2CacheRequestPollution, Long>();
-        this.aggressivenessDistribution = new TreeMap<HelperThreadAggressiveness, Long>();
-        this.pollutionForInsertionPolicyDistribution = new TreeMap<HelperThreadL2CacheRequestPollutionForInsertionPolicy, Long>();
+        this.accuracyDistribution = new TreeMap<>();
+        this.latenessDistribution = new TreeMap<>();
+        this.pollutionDistribution = new TreeMap<>();
+        this.aggressivenessDistribution = new TreeMap<>();
+        this.pollutionForInsertionPolicyDistribution = new TreeMap<>();
 
-        l2CacheController.getCycleAccurateEventQueue().getPerCycleEvents().add(new Action() {
-            @Override
-            public void apply() {
-                int numPendingMemoryAccesses = l2CacheController.getNumPendingMemoryAccesses();
-                if (numPendingMemoryAccesses > 0) {
-                    statMemoryBandwidthContention.addValue(numPendingMemoryAccesses);
-                }
+        l2CacheController.getCycleAccurateEventQueue().getPerCycleEvents().add(() -> {
+            int numPendingMemoryAccesses = l2CacheController.getNumPendingMemoryAccesses();
+            if (numPendingMemoryAccesses > 0) {
+                statMemoryBandwidthContention.addValue(numPendingMemoryAccesses);
             }
         });
 
@@ -124,56 +119,50 @@ public class FeedbackDirectedHelperThreadingHelper implements Reportable {
             return;
         }
 
-        l2CacheController.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.HelperThreadL2CacheRequestEvent.class, new Action1<HelperThreadL2CacheRequestProfilingHelper.HelperThreadL2CacheRequestEvent>() {
-            @Override
-            public void apply(HelperThreadL2CacheRequestProfilingHelper.HelperThreadL2CacheRequestEvent event) {
-                switch (event.getQuality()) {
-                    case REDUNDANT_HIT_TO_TRANSIENT_TAG:
-                        numRedundantHitToTransientTagHelperThreadL2CacheRequestsStat.increment();
-                        numTotalHelperThreadL2CacheRequestsStat.increment();
-                        break;
-                    case REDUNDANT_HIT_TO_CACHE:
-                        numRedundantHitToCacheHelperThreadL2CacheRequestsStat.increment();
-                        numTotalHelperThreadL2CacheRequestsStat.increment();
-                        break;
-                    case TIMELY:
-                        numTimelyHelperThreadL2CacheRequestsStat.increment();
-                        numTotalHelperThreadL2CacheRequestsStat.increment();
-                        break;
-                    case LATE:
-                        numLateHelperThreadL2CacheRequestsStat.increment();
-                        numTotalHelperThreadL2CacheRequestsStat.increment();
-                        break;
-                    case BAD:
-                        numBadHelperThreadL2CacheRequestsStat.increment();
-                        numTotalHelperThreadL2CacheRequestsStat.increment();
-                        break;
-                    case EARLY:
-                        numEarlyHelperThreadL2CacheRequestsStat.increment();
-                        numTotalHelperThreadL2CacheRequestsStat.increment();
-                        break;
-                    case UGLY:
-                        numUglyHelperThreadL2CacheRequestsStat.increment();
-                        numTotalHelperThreadL2CacheRequestsStat.increment();
-                        break;
-                    default:
-                        throw new IllegalArgumentException();
-                }
+        l2CacheController.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.HelperThreadL2CacheRequestEvent.class, event -> {
+            switch (event.getQuality()) {
+                case REDUNDANT_HIT_TO_TRANSIENT_TAG:
+                    numRedundantHitToTransientTagHelperThreadL2CacheRequestsStat.increment();
+                    numTotalHelperThreadL2CacheRequestsStat.increment();
+                    break;
+                case REDUNDANT_HIT_TO_CACHE:
+                    numRedundantHitToCacheHelperThreadL2CacheRequestsStat.increment();
+                    numTotalHelperThreadL2CacheRequestsStat.increment();
+                    break;
+                case TIMELY:
+                    numTimelyHelperThreadL2CacheRequestsStat.increment();
+                    numTotalHelperThreadL2CacheRequestsStat.increment();
+                    break;
+                case LATE:
+                    numLateHelperThreadL2CacheRequestsStat.increment();
+                    numTotalHelperThreadL2CacheRequestsStat.increment();
+                    break;
+                case BAD:
+                    numBadHelperThreadL2CacheRequestsStat.increment();
+                    numTotalHelperThreadL2CacheRequestsStat.increment();
+                    break;
+                case EARLY:
+                    numEarlyHelperThreadL2CacheRequestsStat.increment();
+                    numTotalHelperThreadL2CacheRequestsStat.increment();
+                    break;
+                case UGLY:
+                    numUglyHelperThreadL2CacheRequestsStat.increment();
+                    numTotalHelperThreadL2CacheRequestsStat.increment();
+                    break;
+                default:
+                    throw new IllegalArgumentException();
             }
         });
 
-        l2CacheController.getBlockingEventDispatcher().addListener(GeneralCacheControllerLineReplacementEvent.class, new Action1<GeneralCacheControllerLineReplacementEvent>() {
-            @Override
-            public void apply(GeneralCacheControllerLineReplacementEvent event) {
-                if (event.getCacheController() == l2CacheController) {
-                    numEvictedL2CacheLines++;
+        l2CacheController.getBlockingEventDispatcher().addListener(GeneralCacheControllerLineReplacementEvent.class, event -> {
+            if (event.getCacheController() == l2CacheController) {
+                numEvictedL2CacheLines++;
 
-                    if (numEvictedL2CacheLines == numEvictedL2CacheLinesPerInterval) {
-                        newInterval();
+                if (numEvictedL2CacheLines == numEvictedL2CacheLinesPerInterval) {
+                    newInterval();
 
-                        numEvictedL2CacheLines = 0;
-                        numIntervals++;
-                    }
+                    numEvictedL2CacheLines = 0;
+                    numIntervals++;
                 }
             }
         });

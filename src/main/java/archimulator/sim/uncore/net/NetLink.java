@@ -51,7 +51,7 @@ public class NetLink {
         this.sourcePort.setLink(this);
         this.destinationPort.setLink(this);
 
-        this.pendingActions = new ArrayList<Action>();
+        this.pendingActions = new ArrayList<>();
     }
 
     /**
@@ -62,17 +62,9 @@ public class NetLink {
     public void toInBuffer(final NetMessage message) {
         if (this.destinationPort.getBuffer() != null) {
             if (this.destinationPort.getBuffer().isWriteBusy()) {
-                this.destinationPort.getBuffer().addPendingWriteAction(new Action() {
-                    public void apply() {
-                        toInBuffer(message);
-                    }
-                });
+                this.destinationPort.getBuffer().addPendingWriteAction(() -> toInBuffer(message));
             } else if (this.destinationPort.getBuffer().getCount() + message.getSize() > this.destinationPort.getBuffer().getSize()) {
-                this.destinationPort.getBuffer().addPendingFullAction(new Action() {
-                    public void apply() {
-                        toInBuffer(message);
-                    }
-                });
+                this.destinationPort.getBuffer().addPendingFullAction(() -> toInBuffer(message));
             } else {
                 if (this.destinationPort.getBuffer() != null) {
                     if (destinationPort.getBuffer().getCount() + message.getSize() > destinationPort.getBuffer().getSize()) {
@@ -80,12 +72,7 @@ public class NetLink {
                     }
 
                     this.destinationPort.getBuffer().beginWrite();
-                    this.sourcePort.getNode().getNet().getCycleAccurateEventQueue().schedule(this, new Action() {
-                        @Override
-                        public void apply() {
-                            destinationPort.getBuffer().endWrite(message);
-                        }
-                    }, 1); //TODO: latency
+                    this.sourcePort.getNode().getNet().getCycleAccurateEventQueue().schedule(this, () -> destinationPort.getBuffer().endWrite(message), 1); //TODO: latency
                 }
             }
         } else {

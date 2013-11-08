@@ -28,7 +28,6 @@ import archimulator.util.plot.Table;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.PreparedDelete;
-import net.pickapack.action.Function1;
 import net.pickapack.collection.CollectionHelper;
 import net.pickapack.io.serialization.JsonSerializationHelper;
 import net.pickapack.model.WithId;
@@ -76,22 +75,21 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
 
         List<Experiment> experiments = ServiceManager.getExperimentService().getAllExperiments();
 
-        List<Long> experimentIds = CollectionHelper.transform(experiments, new Function1<Experiment, Long>() {
-            @Override
-            public Long apply(Experiment experiment) {
-                return experiment.getId();
-            }
-        });
+        List<Long> experimentIds = CollectionHelper.transform(experiments, Experiment::getId);
 
         if(!experimentIds.isEmpty()) {
-            Collection<File> files = FileUtils.listFiles(new File(FILE_NAME_EXPERIMENT_STATS), new String[]{"json"}, true);
+            File directoryExperimentStats = new File(FILE_NAME_EXPERIMENT_STATS);
 
-            for(File file : files) {
-                String baseName = FilenameUtils.getBaseName(file.getAbsolutePath());
-                long storedExperimentId = Long.parseLong(baseName);
+            if(directoryExperimentStats.exists()) {
+                Collection<File> files = FileUtils.listFiles(directoryExperimentStats, new String[]{"json"}, true);
 
-                if(!experimentIds.contains(storedExperimentId)) {
-                    clearStatsByParentId(storedExperimentId);
+                for(File file : files) {
+                    String baseName = FilenameUtils.getBaseName(file.getAbsolutePath());
+                    long storedExperimentId = Long.parseLong(baseName);
+
+                    if(!experimentIds.contains(storedExperimentId)) {
+                        clearStatsByParentId(storedExperimentId);
+                    }
                 }
             }
 

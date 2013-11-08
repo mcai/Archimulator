@@ -30,7 +30,6 @@ import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
 import net.pickapack.action.Action;
 import net.pickapack.util.ValueProvider;
-import net.pickapack.util.ValueProviderFactory;
 
 /**
  * Translation lookaside buffer (TLB).
@@ -56,14 +55,7 @@ public class TranslationLookasideBuffer implements Named, Reportable {
     public TranslationLookasideBuffer(SimulationObject parent, String name) {
         this.name = name;
 
-        ValueProviderFactory<Boolean, ValueProvider<Boolean>> cacheLineStateProviderFactory = new ValueProviderFactory<Boolean, ValueProvider<Boolean>>() {
-            @Override
-            public ValueProvider<Boolean> createValueProvider(Object... args) {
-                return new BooleanValueProvider();
-            }
-        };
-
-        this.cache = new EvictableCache<Boolean>(parent, name, new CacheGeometry(parent.getExperiment().getArchitecture().getTlbSize(), parent.getExperiment().getArchitecture().getTlbAssociativity(), parent.getExperiment().getArchitecture().getTlbLineSize()), CacheReplacementPolicyType.LRU, cacheLineStateProviderFactory);
+        this.cache = new EvictableCache<>(parent, name, new CacheGeometry(parent.getExperiment().getArchitecture().getTlbSize(), parent.getExperiment().getArchitecture().getTlbAssociativity(), parent.getExperiment().getArchitecture().getTlbLineSize()), CacheReplacementPolicyType.LRU, args -> new BooleanValueProvider());
     }
 
     /**

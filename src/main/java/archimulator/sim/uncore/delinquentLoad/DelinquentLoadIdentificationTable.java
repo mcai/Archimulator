@@ -24,7 +24,6 @@ import archimulator.sim.core.event.InstructionCommittedEvent;
 import archimulator.sim.os.FunctionCallContext;
 import archimulator.sim.uncore.coherence.event.GeneralCacheControllerServiceNonblockingRequestEvent;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
-import net.pickapack.action.Action1;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -47,62 +46,57 @@ public class DelinquentLoadIdentificationTable {
      */
     public DelinquentLoadIdentificationTable(final Thread thread) {
         this.thread = thread;
-        this.delinquentLoads = new ArrayList<DelinquentLoad>();
+        this.delinquentLoads = new ArrayList<>();
 
-        thread.getBlockingEventDispatcher().addListener(InstructionCommittedEvent.class, new Action1<InstructionCommittedEvent>() {
-            public void apply(InstructionCommittedEvent event) {
-                if (event.getDynamicInstruction().getThread() == DelinquentLoadIdentificationTable.this.thread) {
-                    Stack<FunctionCallContext> functionCallContextStack = event.getDynamicInstruction().getThread().getContext().getFunctionCallContextStack();
+        thread.getBlockingEventDispatcher().addListener(InstructionCommittedEvent.class, event -> {
+            if (event.getDynamicInstruction().getThread() == DelinquentLoadIdentificationTable.this.thread) {
+                Stack<FunctionCallContext> functionCallContextStack = event.getDynamicInstruction().getThread().getContext().getFunctionCallContextStack();
 
-                    if (functionCallContextStack.size() > 0) {
-                        boolean delinquentLoadFound = false;
+                if (functionCallContextStack.size() > 0) {
+                    boolean delinquentLoadFound = false;
 
-                        for (DelinquentLoad delinquentLoad : delinquentLoads) {
-                            if (delinquentLoad.getPc() == event.getDynamicInstruction().getPc() && delinquentLoad.getFunctionCallPc() == functionCallContextStack.peek().getPc()) {
-                                delinquentLoad.setNumExecutions(delinquentLoad.getNumExecutions() + 1);
-                                delinquentLoad.setNumCyclesSpentAtHeadOfReorderBuffer(delinquentLoad.getNumCyclesSpentAtHeadOfReorderBuffer() + event.getDynamicInstruction().getNumCyclesSpentAtHeadOfReorderBuffer());
-                                delinquentLoadFound = true;
-                                break;
-                            }
-                        }
-
-                        if (!delinquentLoadFound && event.getDynamicInstruction().isMissedInL2Cache() && delinquentLoads.size() < CAPACITY) {
-                            DelinquentLoad delinquentLoad = new DelinquentLoad(event.getDynamicInstruction().getPc(), functionCallContextStack.peek().getPc());
-                            delinquentLoad.setNumExecutions(1);
-                            delinquentLoad.setNumCyclesSpentAtHeadOfReorderBuffer(event.getDynamicInstruction().getNumCyclesSpentAtHeadOfReorderBuffer());
-                            delinquentLoads.add(delinquentLoad);
+                    for (DelinquentLoad delinquentLoad : delinquentLoads) {
+                        if (delinquentLoad.getPc() == event.getDynamicInstruction().getPc() && delinquentLoad.getFunctionCallPc() == functionCallContextStack.peek().getPc()) {
+                            delinquentLoad.setNumExecutions(delinquentLoad.getNumExecutions() + 1);
+                            delinquentLoad.setNumCyclesSpentAtHeadOfReorderBuffer(delinquentLoad.getNumCyclesSpentAtHeadOfReorderBuffer() + event.getDynamicInstruction().getNumCyclesSpentAtHeadOfReorderBuffer());
+                            delinquentLoadFound = true;
+                            break;
                         }
                     }
 
-                    for (Iterator<DelinquentLoad> iterator = delinquentLoads.iterator(); iterator.hasNext(); ) {
-                        DelinquentLoad delinquentLoad = iterator.next();
-                        delinquentLoad.setNumInstructions(delinquentLoad.getNumInstructions() + 1);
+                    if (!delinquentLoadFound && event.getDynamicInstruction().isMissedInL2Cache() && delinquentLoads.size() < CAPACITY) {
+                        DelinquentLoad delinquentLoad = new DelinquentLoad(event.getDynamicInstruction().getPc(), functionCallContextStack.peek().getPc());
+                        delinquentLoad.setNumExecutions(1);
+                        delinquentLoad.setNumCyclesSpentAtHeadOfReorderBuffer(event.getDynamicInstruction().getNumCyclesSpentAtHeadOfReorderBuffer());
+                        delinquentLoads.add(delinquentLoad);
+                    }
+                }
 
-                        if (delinquentLoad.getNumInstructions() >= INSTRUCTIONS_PER_PHASE) {
-                            if (delinquentLoad.getNumExecutions() >= EXECUTION_COUNT_THRESHOLD && delinquentLoad.getNumCyclesSpentAtHeadOfReorderBuffer() / EXECUTION_COUNT_THRESHOLD >= 4) {
-                                thread.getBlockingEventDispatcher().dispatch(new DelinquentLoadIdentifiedEvent(thread, delinquentLoad));
+                for (Iterator<DelinquentLoad> iterator = delinquentLoads.iterator(); iterator.hasNext(); ) {
+                    DelinquentLoad delinquentLoad = iterator.next();
+                    delinquentLoad.setNumInstructions(delinquentLoad.getNumInstructions() + 1);
 
-                                delinquentLoad.setSteady(true);
+                    if (delinquentLoad.getNumInstructions() >= INSTRUCTIONS_PER_PHASE) {
+                        if (delinquentLoad.getNumExecutions() >= EXECUTION_COUNT_THRESHOLD && delinquentLoad.getNumCyclesSpentAtHeadOfReorderBuffer() / EXECUTION_COUNT_THRESHOLD >= 4) {
+                            thread.getBlockingEventDispatcher().dispatch(new DelinquentLoadIdentifiedEvent(thread, delinquentLoad));
 
-                                delinquentLoad.setNumInstructions(0);
-                                delinquentLoad.setNumExecutions(0);
-                                delinquentLoad.setNumCyclesSpentAtHeadOfReorderBuffer(0);
-                            } else {
-                                iterator.remove();
-                            }
+                            delinquentLoad.setSteady(true);
+
+                            delinquentLoad.setNumInstructions(0);
+                            delinquentLoad.setNumExecutions(0);
+                            delinquentLoad.setNumCyclesSpentAtHeadOfReorderBuffer(0);
+                        } else {
+                            iterator.remove();
                         }
                     }
                 }
             }
         });
 
-        thread.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, new Action1<GeneralCacheControllerServiceNonblockingRequestEvent>() {
-            @Override
-            public void apply(GeneralCacheControllerServiceNonblockingRequestEvent event) {
-                if (!event.isHitInCache() && event.getAccess().getThread() == DelinquentLoadIdentificationTable.this.thread && event.getCacheController() instanceof DirectoryController && event.getAccess().getType().isRead()) {
-                    if (event.getAccess().getDynamicInstruction() != null) {
-                        event.getAccess().getDynamicInstruction().setMissedInL2Cache(true);
-                    }
+        thread.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, event -> {
+            if (!event.isHitInCache() && event.getAccess().getThread() == DelinquentLoadIdentificationTable.this.thread && event.getCacheController() instanceof DirectoryController && event.getAccess().getType().isRead()) {
+                if (event.getAccess().getDynamicInstruction() != null) {
+                    event.getAccess().getDynamicInstruction().setMissedInL2Cache(true);
                 }
             }
         });
@@ -157,7 +151,7 @@ public class DelinquentLoadIdentificationTable {
      * @return the list of steady delinquent loads
      */
     public List<DelinquentLoad> getSteadyDelinquentLoads() {
-        List<DelinquentLoad> steadyDelinquentLoads = new ArrayList<DelinquentLoad>();
+        List<DelinquentLoad> steadyDelinquentLoads = new ArrayList<>();
 
         for (DelinquentLoad delinquentLoad : this.delinquentLoads) {
             if (delinquentLoad.isSteady()) {

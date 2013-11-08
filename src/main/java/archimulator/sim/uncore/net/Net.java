@@ -52,7 +52,7 @@ public abstract class Net extends BasicSimulationObject {
     public Net(MemoryHierarchy memoryHierarchy) {
         super(memoryHierarchy);
 
-        this.endPointNodes = new HashMap<MemoryDevice, EndPointNode>();
+        this.endPointNodes = new HashMap<>();
 
         this.setup(memoryHierarchy);
         this.calculateRoutes();
@@ -69,9 +69,9 @@ public abstract class Net extends BasicSimulationObject {
      * Calculate the routes.
      */
     private void calculateRoutes() {
-        Map<RoutingEntry, NetNode> routes = new HashMap<RoutingEntry, NetNode>();
+        Map<RoutingEntry, NetNode> routes = new HashMap<>();
 
-        List<NetNode> nodes = new ArrayList<NetNode>();
+        List<NetNode> nodes = new ArrayList<>();
         nodes.add(this.switchNode);
         nodes.addAll(this.endPointNodes.values());
 

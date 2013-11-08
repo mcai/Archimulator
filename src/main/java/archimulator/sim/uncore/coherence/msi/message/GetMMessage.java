@@ -48,7 +48,7 @@ public class GetMMessage extends CoherenceMessage {
     /**
      * Get the requester L1 cache controller.
      *
-     * @return
+     * @return the requester L1 cache controller
      */
     public CacheController getRequester() {
         return requester;

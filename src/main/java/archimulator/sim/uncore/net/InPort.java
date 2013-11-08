@@ -18,8 +18,6 @@
  ******************************************************************************/
 package archimulator.sim.uncore.net;
 
-import net.pickapack.action.Action;
-
 /**
  * In port.
  *
@@ -53,35 +51,19 @@ public class InPort extends NetPort {
      */
     public void toCrossbar(final NetMessage message) {
         if (this.buffer != null && this.buffer.isReadBusy()) {
-            this.buffer.addPendingReadAction(new Action() {
-                public void apply() {
-                    toCrossbar(message);
-                }
-            });
+            this.buffer.addPendingReadAction(() -> toCrossbar(message));
         } else if (this.getNode().getCrossbar() != null && this.getNode().getCrossbar().isBusy()) {
-            this.getNode().getCrossbar().addPendingAction(new Action() {
-                public void apply() {
-                    toCrossbar(message);
-                }
-            });
+            this.getNode().getCrossbar().addPendingAction(() -> toCrossbar(message));
         } else {
             if (this.getNode().getCrossbar() != null) {
                 int latency = (message.getSize() + this.getNode().getCrossbar().getBandwidth()) / this.getNode().getCrossbar().getBandwidth();
 
                 this.getNode().getCrossbar().beginTransfer();
-                this.getNode().getNet().getCycleAccurateEventQueue().schedule(this, new Action() {
-                    public void apply() {
-                        getNode().getCrossbar().endTransfer(message);
-                    }
-                }, latency);
+                this.getNode().getNet().getCycleAccurateEventQueue().schedule(this, () -> getNode().getCrossbar().endTransfer(message), latency);
 
                 if (this.buffer != null) {
                     this.buffer.beginRead();
-                    this.getNode().getNet().getCycleAccurateEventQueue().schedule(this, new Action() {
-                        public void apply() {
-                            buffer.endRead(message);
-                        }
-                    }, latency);
+                    this.getNode().getNet().getCycleAccurateEventQueue().schedule(this, () -> buffer.endRead(message), latency);
                 }
             }
         }

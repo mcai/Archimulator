@@ -53,19 +53,19 @@ public abstract class NetNode {
         this.net = net;
         this.name = name;
 
-        this.inPorts = new ArrayList<InPort>();
+        this.inPorts = new ArrayList<>();
         for (int i = 0; i < numInPorts; i++) {
             this.inPorts.add(new InPort(this, i, inBufferSize));
         }
 
-        this.outPorts = new ArrayList<OutPort>();
+        this.outPorts = new ArrayList<>();
         for (int i = 0; i < numOutPorts; i++) {
             this.outPorts.add(new OutPort(this, i, outBufferSize));
         }
 
         this.crossbar = new Crossbar(this, bandwidth);
 
-        this.routingEntries = new HashMap<NetNode, RoutingEntry>();
+        this.routingEntries = new HashMap<>();
     }
 
     /**
