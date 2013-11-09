@@ -246,9 +246,7 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
                 }
             });
 
-            this.l1ICacheController.receiveIfetch(access, () -> {
-                l1ICacheController.endAccess(physicalTag);
-            });
+            this.l1ICacheController.receiveIfetch(access, () -> l1ICacheController.endAccess(physicalTag));
         }
 
         this.getBlockingEventDispatcher().dispatch(new MemoryAccessInitiatedEvent(thread, virtualPc, physicalAddress, physicalTag, MemoryHierarchyAccessType.IFETCH));
@@ -285,9 +283,7 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
                 }
             });
 
-            this.l1DCacheController.receiveLoad(access, () -> {
-                l1DCacheController.endAccess(physicalTag);
-            });
+            this.l1DCacheController.receiveLoad(access, () -> l1DCacheController.endAccess(physicalTag));
         }
 
         this.getBlockingEventDispatcher().dispatch(new MemoryAccessInitiatedEvent(dynamicInstruction.getThread(), virtualPc, physicalAddress, physicalTag, MemoryHierarchyAccessType.LOAD));
@@ -324,9 +320,7 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
                 }
             });
 
-            this.l1DCacheController.receiveStore(access, () -> {
-                l1DCacheController.endAccess(physicalTag);
-            });
+            this.l1DCacheController.receiveStore(access, () -> l1DCacheController.endAccess(physicalTag));
         }
 
         this.getBlockingEventDispatcher().dispatch(new MemoryAccessInitiatedEvent(dynamicInstruction.getThread(), virtualPc, physicalAddress, physicalTag, MemoryHierarchyAccessType.STORE));

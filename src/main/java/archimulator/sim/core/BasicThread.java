@@ -66,7 +66,7 @@ public class BasicThread extends AbstractBasicThread {
 
         this.lineSizeOfICache = this.core.getL1ICacheController().getCache().getGeometry().getLineSize();
 
-        final Reference<Integer> savedRegisterValue = new Reference<Integer>(-1);
+        final Reference<Integer> savedRegisterValue = new Reference<>(-1);
 
         this.getBlockingEventDispatcher().addListener(PseudoCallEncounteredEvent.class, event -> {
             if (event.getContext() == getContext()) {
@@ -143,13 +143,15 @@ public class BasicThread extends AbstractBasicThread {
 
             if (this.nextInstructionInCacheWarmupPhase.getStaticInstruction().getMnemonic().getType() == StaticInstructionType.LOAD) {
                 if (this.core.canLoad(this, effectiveAddress)) {
-                    this.core.load(this.nextInstructionInCacheWarmupPhase, effectiveAddress, pc, () -> {});
+                    this.core.load(this.nextInstructionInCacheWarmupPhase, effectiveAddress, pc, () -> {
+                    });
 
                     this.nextInstructionInCacheWarmupPhase = null;
                 }
             } else if (this.nextInstructionInCacheWarmupPhase.getStaticInstruction().getMnemonic().getType() == StaticInstructionType.STORE) {
                 if (this.core.canStore(this, effectiveAddress)) {
-                    this.core.store(this.nextInstructionInCacheWarmupPhase, effectiveAddress, pc, () -> {});
+                    this.core.store(this.nextInstructionInCacheWarmupPhase, effectiveAddress, pc, () -> {
+                    });
 
                     this.nextInstructionInCacheWarmupPhase = null;
                 }

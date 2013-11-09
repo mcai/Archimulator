@@ -46,7 +46,15 @@ public class DecodeBufferEntry {
      * @param branchPredictorUpdate          the branch predictor update
      * @param speculative                    a value indicating whether the decode buffer entry is speculative or not
      */
-    public DecodeBufferEntry(DynamicInstruction dynamicInstruction, int npc, int nnpc, int predictedNnpc, int returnAddressStackRecoverIndex, BranchPredictorUpdate branchPredictorUpdate, boolean speculative) {
+    public DecodeBufferEntry(
+            DynamicInstruction dynamicInstruction,
+            int npc,
+            int nnpc,
+            int predictedNnpc,
+            int returnAddressStackRecoverIndex,
+            BranchPredictorUpdate branchPredictorUpdate,
+            boolean speculative
+    ) {
         this.id = dynamicInstruction.getThread().getSimulation().currentDecodeBufferEntryId++;
         this.dynamicInstruction = dynamicInstruction;
         this.npc = npc;

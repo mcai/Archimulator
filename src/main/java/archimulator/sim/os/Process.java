@@ -118,7 +118,11 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
                 Thread.sleep(RandomUtils.nextInt(10) * 1000);
             }
 
-            buildBenchmark(contextMapping.getBenchmark().getWorkingDirectory(), contextMapping.getBenchmark().getHelperThreadEnabled(), contextMapping.getHelperThreadLookahead(), contextMapping.getHelperThreadStride());
+            buildBenchmark(
+                    contextMapping.getBenchmark().getWorkingDirectory(),
+                    contextMapping.getBenchmark().getHelperThreadEnabled(),
+                    contextMapping.getHelperThreadLookahead(), contextMapping.getHelperThreadStride()
+            );
             this.loadProgram(kernel, simulationDirectory, contextMapping);
 
             lock.release();

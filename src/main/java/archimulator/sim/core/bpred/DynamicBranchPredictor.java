@@ -40,7 +40,14 @@ public abstract class DynamicBranchPredictor extends BranchPredictor {
      *                                  the associativity in the branch target buffer
      * @param returnAddressStackSize    the return address stack size
      */
-    public DynamicBranchPredictor(Thread thread, String name, BranchPredictorType type, int branchTargetBufferNumSets, int branchTargetBufferAssociativity, int returnAddressStackSize) {
+    public DynamicBranchPredictor(
+            Thread thread,
+            String name,
+            BranchPredictorType type,
+            int branchTargetBufferNumSets,
+            int branchTargetBufferAssociativity,
+            int returnAddressStackSize
+    ) {
         super(thread, name, type);
 
         this.branchTargetBuffer = new BranchTargetBuffer(branchTargetBufferNumSets, branchTargetBufferAssociativity);

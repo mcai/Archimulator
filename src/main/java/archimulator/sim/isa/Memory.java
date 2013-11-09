@@ -278,7 +278,7 @@ public class Memory extends BasicSimulationObject implements Reportable {
             blockFound = new SpeculativeMemoryBlock(tag);
 
             if (!this.speculativeMemoryBlocks.containsKey(index)) {
-                this.speculativeMemoryBlocks.put(index, new ArrayList<SpeculativeMemoryBlock>());
+                this.speculativeMemoryBlocks.put(index, new ArrayList<>());
             }
 
             this.speculativeMemoryBlocks.get(index).add(0, blockFound);

@@ -348,7 +348,10 @@ public class StaticInstruction {
     @InputDependencies({Dependency.RS, Dependency.RT})
     @OutputDependencies(Dependency.RD)
     private static void add(Context context, int machineInstruction) {
-        context.getRegisterFile().setGpr(BitField.RD.valueOf(machineInstruction), context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) + context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)));
+        context.getRegisterFile().setGpr(
+                BitField.RD.valueOf(machineInstruction),
+                context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) + context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction))
+        );
     }
 
     /**
@@ -363,7 +366,10 @@ public class StaticInstruction {
     @InputDependencies(Dependency.RS)
     @OutputDependencies(Dependency.RT)
     private static void addi(Context context, int machineInstruction) {
-        context.getRegisterFile().setGpr(BitField.RT.valueOf(machineInstruction), context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) + MathHelper.signExtend(BitField.INTIMM.valueOf(machineInstruction)));
+        context.getRegisterFile().setGpr(
+                BitField.RT.valueOf(machineInstruction),
+                context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) + MathHelper.signExtend(BitField.INTIMM.valueOf(machineInstruction))
+        );
     }
 
     /**
@@ -387,7 +393,10 @@ public class StaticInstruction {
             }
         }
 
-        context.getRegisterFile().setGpr(BitField.RT.valueOf(machineInstruction), context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) + MathHelper.signExtend(BitField.INTIMM.valueOf(machineInstruction)));
+        context.getRegisterFile().setGpr(
+                BitField.RT.valueOf(machineInstruction),
+                context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) + MathHelper.signExtend(BitField.INTIMM.valueOf(machineInstruction))
+        );
     }
 
     /**
@@ -402,7 +411,10 @@ public class StaticInstruction {
     @InputDependencies({Dependency.RS, Dependency.RT})
     @OutputDependencies(Dependency.RD)
     private static void addu(Context context, int machineInstruction) {
-        context.getRegisterFile().setGpr(BitField.RD.valueOf(machineInstruction), context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) + context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)));
+        context.getRegisterFile().setGpr(
+                BitField.RD.valueOf(machineInstruction),
+                context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) + context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction))
+        );
     }
 
     /**
@@ -417,7 +429,10 @@ public class StaticInstruction {
     @InputDependencies({Dependency.RS, Dependency.RT})
     @OutputDependencies(Dependency.RD)
     private static void and(Context context, int machineInstruction) {
-        context.getRegisterFile().setGpr(BitField.RD.valueOf(machineInstruction), context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) & context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)));
+        context.getRegisterFile().setGpr(
+                BitField.RD.valueOf(machineInstruction),
+                context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) & context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction))
+        );
     }
 
     /**
@@ -432,7 +447,10 @@ public class StaticInstruction {
     @InputDependencies(Dependency.RS)
     @OutputDependencies(Dependency.RT)
     private static void andi(Context context, int machineInstruction) {
-        context.getRegisterFile().setGpr(BitField.RT.valueOf(machineInstruction), context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) & MathHelper.zeroExtend(BitField.INTIMM.valueOf(machineInstruction)));
+        context.getRegisterFile().setGpr(
+                BitField.RT.valueOf(machineInstruction),
+                context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) & MathHelper.zeroExtend(BitField.INTIMM.valueOf(machineInstruction))
+        );
     }
 
     /**
@@ -632,7 +650,10 @@ public class StaticInstruction {
     @InputDependencies({Dependency.RS, Dependency.RT})
     @OutputDependencies(Dependency.RD)
     private static void nor(Context context, int machineInstruction) {
-        context.getRegisterFile().setGpr(BitField.RD.valueOf(machineInstruction), ~(context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) | context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction))));
+        context.getRegisterFile().setGpr(
+                BitField.RD.valueOf(machineInstruction),
+                ~(context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) | context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)))
+        );
     }
 
     /**
@@ -647,7 +668,10 @@ public class StaticInstruction {
     @InputDependencies({Dependency.RS, Dependency.RT})
     @OutputDependencies(Dependency.RD)
     private static void or(Context context, int machineInstruction) {
-        context.getRegisterFile().setGpr(BitField.RD.valueOf(machineInstruction), context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) | context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)));
+        context.getRegisterFile().setGpr(
+                BitField.RD.valueOf(machineInstruction),
+                context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) | context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction))
+        );
     }
 
     /**
@@ -662,7 +686,10 @@ public class StaticInstruction {
     @InputDependencies(Dependency.RS)
     @OutputDependencies(Dependency.RT)
     private static void ori(Context context, int machineInstruction) {
-        context.getRegisterFile().setGpr(BitField.RT.valueOf(machineInstruction), context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) | MathHelper.zeroExtend(BitField.INTIMM.valueOf(machineInstruction)));
+        context.getRegisterFile().setGpr(
+                BitField.RT.valueOf(machineInstruction),
+                context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) | MathHelper.zeroExtend(BitField.INTIMM.valueOf(machineInstruction))
+        );
     }
 
     /**
@@ -677,7 +704,10 @@ public class StaticInstruction {
     @InputDependencies(Dependency.RT)
     @OutputDependencies(Dependency.RD)
     private static void sll(Context context, int machineInstruction) {
-        context.getRegisterFile().setGpr(BitField.RD.valueOf(machineInstruction), context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)) << BitField.SHIFT.valueOf(machineInstruction));
+        context.getRegisterFile().setGpr(
+                BitField.RD.valueOf(machineInstruction),
+                context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)) << BitField.SHIFT.valueOf(machineInstruction)
+        );
     }
 
     /**
@@ -692,7 +722,10 @@ public class StaticInstruction {
     @InputDependencies({Dependency.RS, Dependency.RT})
     @OutputDependencies(Dependency.RD)
     private static void sllv(Context context, int machineInstruction) {
-        context.getRegisterFile().setGpr(BitField.RD.valueOf(machineInstruction), context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)) << MathHelper.bits(context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)), 4, 0));
+        context.getRegisterFile().setGpr(
+                BitField.RD.valueOf(machineInstruction),
+                context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)) << MathHelper.bits(context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)), 4, 0)
+        );
     }
 
     /**
@@ -707,7 +740,10 @@ public class StaticInstruction {
     @InputDependencies({Dependency.RS, Dependency.RT})
     @OutputDependencies(Dependency.RD)
     private static void slt(Context context, int machineInstruction) {
-        context.getRegisterFile().setGpr(BitField.RD.valueOf(machineInstruction), (context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) < context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction))) ? 1 : 0);
+        context.getRegisterFile().setGpr(
+                BitField.RD.valueOf(machineInstruction),
+                (context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) < context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction))) ? 1 : 0
+        );
     }
 
     /**
@@ -722,7 +758,10 @@ public class StaticInstruction {
     @InputDependencies(Dependency.RS)
     @OutputDependencies(Dependency.RT)
     private static void slti(Context context, int machineInstruction) {
-        context.getRegisterFile().setGpr(BitField.RT.valueOf(machineInstruction), (context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) < MathHelper.signExtend(BitField.INTIMM.valueOf(machineInstruction))) ? 1 : 0);
+        context.getRegisterFile().setGpr(
+                BitField.RT.valueOf(machineInstruction),
+                (context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) < MathHelper.signExtend(BitField.INTIMM.valueOf(machineInstruction))) ? 1 : 0
+        );
     }
 
     /**
@@ -781,7 +820,10 @@ public class StaticInstruction {
     @InputDependencies(Dependency.RT)
     @OutputDependencies(Dependency.RD)
     private static void sra(Context context, int machineInstruction) {
-        context.getRegisterFile().setGpr(BitField.RD.valueOf(machineInstruction), context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)) >> BitField.SHIFT.valueOf(machineInstruction));
+        context.getRegisterFile().setGpr(
+                BitField.RD.valueOf(machineInstruction),
+                context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)) >> BitField.SHIFT.valueOf(machineInstruction)
+        );
     }
 
     /**
@@ -796,7 +838,10 @@ public class StaticInstruction {
     @InputDependencies({Dependency.RS, Dependency.RT})
     @OutputDependencies(Dependency.RD)
     private static void srav(Context context, int machineInstruction) {
-        context.getRegisterFile().setGpr(BitField.RD.valueOf(machineInstruction), context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)) >> MathHelper.bits(context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)), 4, 0));
+        context.getRegisterFile().setGpr(
+                BitField.RD.valueOf(machineInstruction),
+                context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)) >> MathHelper.bits(context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)), 4, 0)
+        );
     }
 
     /**
@@ -811,7 +856,10 @@ public class StaticInstruction {
     @InputDependencies(Dependency.RT)
     @OutputDependencies(Dependency.RD)
     private static void srl(Context context, int machineInstruction) {
-        context.getRegisterFile().setGpr(BitField.RD.valueOf(machineInstruction), context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)) >>> BitField.SHIFT.valueOf(machineInstruction));
+        context.getRegisterFile().setGpr(
+                BitField.RD.valueOf(machineInstruction),
+                context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)) >>> BitField.SHIFT.valueOf(machineInstruction)
+        );
     }
 
     /**
@@ -826,7 +874,10 @@ public class StaticInstruction {
     @InputDependencies({Dependency.RS, Dependency.RT})
     @OutputDependencies(Dependency.RD)
     private static void srlv(Context context, int machineInstruction) {
-        context.getRegisterFile().setGpr(BitField.RD.valueOf(machineInstruction), context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)) >>> MathHelper.bits(context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)), 4, 0));
+        context.getRegisterFile().setGpr(
+                BitField.RD.valueOf(machineInstruction),
+                context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)) >>> MathHelper.bits(context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)), 4, 0)
+        );
     }
 
     /**
@@ -841,7 +892,10 @@ public class StaticInstruction {
     @InputDependencies({Dependency.RS, Dependency.RT})
     @OutputDependencies(Dependency.RD)
     private static void sub(Context context, int machineInstruction) {
-        context.getRegisterFile().setGpr(BitField.RD.valueOf(machineInstruction), context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) - context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)));
+        context.getRegisterFile().setGpr(
+                BitField.RD.valueOf(machineInstruction),
+                context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) - context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction))
+        );
     }
 
     /**
@@ -856,7 +910,10 @@ public class StaticInstruction {
     @InputDependencies({Dependency.RS, Dependency.RT})
     @OutputDependencies(Dependency.RD)
     private static void subu(Context context, int machineInstruction) {
-        context.getRegisterFile().setGpr(BitField.RD.valueOf(machineInstruction), context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) - context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)));
+        context.getRegisterFile().setGpr(
+                BitField.RD.valueOf(machineInstruction),
+                context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) - context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction))
+        );
     }
 
     /**
@@ -871,7 +928,10 @@ public class StaticInstruction {
     @InputDependencies({Dependency.RS, Dependency.RT})
     @OutputDependencies(Dependency.RD)
     private static void xor(Context context, int machineInstruction) {
-        context.getRegisterFile().setGpr(BitField.RD.valueOf(machineInstruction), context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) ^ context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)));
+        context.getRegisterFile().setGpr(
+                BitField.RD.valueOf(machineInstruction),
+                context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) ^ context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction))
+        );
     }
 
     /**
@@ -886,7 +946,10 @@ public class StaticInstruction {
     @InputDependencies(Dependency.RS)
     @OutputDependencies(Dependency.RT)
     private static void xori(Context context, int machineInstruction) {
-        context.getRegisterFile().setGpr(BitField.RT.valueOf(machineInstruction), context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) ^ MathHelper.zeroExtend(BitField.INTIMM.valueOf(machineInstruction)));
+        context.getRegisterFile().setGpr(
+                BitField.RT.valueOf(machineInstruction),
+                context.getRegisterFile().getGpr(BitField.RS.valueOf(machineInstruction)) ^ MathHelper.zeroExtend(BitField.INTIMM.valueOf(machineInstruction))
+        );
     }
 
     /**
@@ -902,7 +965,10 @@ public class StaticInstruction {
     @InputDependencies(Dependency.FS)
     @OutputDependencies(Dependency.FD)
     private static void abs_d(Context context, int machineInstruction) {
-        context.getRegisterFile().getFprs().setDouble(BitField.FD.valueOf(machineInstruction), Math.abs(context.getRegisterFile().getFprs().getDouble(BitField.FS.valueOf(machineInstruction))));
+        context.getRegisterFile().getFprs().setDouble(
+                BitField.FD.valueOf(machineInstruction),
+                Math.abs(context.getRegisterFile().getFprs().getDouble(BitField.FS.valueOf(machineInstruction)))
+        );
     }
 
     /**
@@ -918,7 +984,10 @@ public class StaticInstruction {
     @InputDependencies(Dependency.FS)
     @OutputDependencies(Dependency.FD)
     private static void abs_s(Context context, int machineInstruction) {
-        context.getRegisterFile().getFprs().setFloat(BitField.FD.valueOf(machineInstruction), Math.abs(context.getRegisterFile().getFprs().getFloat(BitField.FS.valueOf(machineInstruction))));
+        context.getRegisterFile().getFprs().setFloat(
+                BitField.FD.valueOf(machineInstruction),
+                Math.abs(context.getRegisterFile().getFprs().getFloat(BitField.FS.valueOf(machineInstruction)))
+        );
     }
 
     /**
@@ -934,7 +1003,10 @@ public class StaticInstruction {
     @InputDependencies({Dependency.FS, Dependency.FT})
     @OutputDependencies(Dependency.FD)
     private static void add_d(Context context, int machineInstruction) {
-        context.getRegisterFile().getFprs().setDouble(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFprs().getDouble(BitField.FS.valueOf(machineInstruction)) + context.getRegisterFile().getFprs().getDouble(BitField.FT.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setDouble(
+                BitField.FD.valueOf(machineInstruction),
+                context.getRegisterFile().getFprs().getDouble(BitField.FS.valueOf(machineInstruction)) + context.getRegisterFile().getFprs().getDouble(BitField.FT.valueOf(machineInstruction))
+        );
     }
 
     /**
@@ -950,7 +1022,10 @@ public class StaticInstruction {
     @InputDependencies({Dependency.FS, Dependency.FT})
     @OutputDependencies(Dependency.FD)
     private static void add_s(Context context, int machineInstruction) {
-        context.getRegisterFile().getFprs().setFloat(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFprs().getFloat(BitField.FS.valueOf(machineInstruction)) + context.getRegisterFile().getFprs().getFloat(BitField.FT.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setFloat(
+                BitField.FD.valueOf(machineInstruction),
+                context.getRegisterFile().getFprs().getFloat(BitField.FS.valueOf(machineInstruction)) + context.getRegisterFile().getFprs().getFloat(BitField.FT.valueOf(machineInstruction))
+        );
     }
 
     /**
@@ -1007,7 +1082,7 @@ public class StaticInstruction {
     private static void c_cond(Context context, int machineInstruction, boolean unordered, boolean less, boolean equal) {
         int cond = BitField.COND.valueOf(machineInstruction);
 
-        Reference<Integer> fcsrRef = new Reference<Integer>(context.getRegisterFile().getFcsr());
+        Reference<Integer> fcsrRef = new Reference<>(context.getRegisterFile().getFcsr());
 
         if ((((cond & 0x4) != 0) && less) || (((cond & 0x2) != 0) && equal) || (((cond & 0x1) != 0) && unordered)) {
             setFCC(fcsrRef, BitField.CC.valueOf(machineInstruction));
@@ -1031,7 +1106,10 @@ public class StaticInstruction {
     @InputDependencies(Dependency.FS)
     @OutputDependencies(Dependency.FD)
     private static void cvt_d_l(Context context, int machineInstruction) {
-        context.getRegisterFile().getFprs().setDouble(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFprs().getLong(BitField.FS.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setDouble(
+                BitField.FD.valueOf(machineInstruction),
+                context.getRegisterFile().getFprs().getLong(BitField.FS.valueOf(machineInstruction))
+        );
     }
 
     /**
@@ -1047,7 +1125,10 @@ public class StaticInstruction {
     @InputDependencies(Dependency.FS)
     @OutputDependencies(Dependency.FD)
     private static void cvt_d_s(Context context, int machineInstruction) {
-        context.getRegisterFile().getFprs().setDouble(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFprs().getFloat(BitField.FS.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setDouble(
+                BitField.FD.valueOf(machineInstruction),
+                context.getRegisterFile().getFprs().getFloat(BitField.FS.valueOf(machineInstruction))
+        );
     }
 
     /**
@@ -1063,7 +1144,10 @@ public class StaticInstruction {
     @InputDependencies(Dependency.FS)
     @OutputDependencies(Dependency.FD)
     private static void cvt_d_w(Context context, int machineInstruction) {
-        context.getRegisterFile().getFprs().setDouble(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFprs().getInt(BitField.FS.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setDouble(
+                BitField.FD.valueOf(machineInstruction),
+                context.getRegisterFile().getFprs().getInt(BitField.FS.valueOf(machineInstruction))
+        );
     }
 
     /**
@@ -1078,7 +1162,10 @@ public class StaticInstruction {
     @InputDependencies(Dependency.FS)
     @OutputDependencies(Dependency.FD)
     private static void cvt_l_d(Context context, int machineInstruction) {
-        context.getRegisterFile().getFprs().setLong(BitField.FD.valueOf(machineInstruction), (long) context.getRegisterFile().getFprs().getDouble(BitField.FS.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setLong(
+                BitField.FD.valueOf(machineInstruction),
+                (long) context.getRegisterFile().getFprs().getDouble(BitField.FS.valueOf(machineInstruction))
+        );
     }
 
     /**
@@ -1093,7 +1180,10 @@ public class StaticInstruction {
     @InputDependencies(Dependency.FS)
     @OutputDependencies(Dependency.FD)
     private static void cvt_l_s(Context context, int machineInstruction) {
-        context.getRegisterFile().getFprs().setLong(BitField.FD.valueOf(machineInstruction), (long) context.getRegisterFile().getFprs().getFloat(BitField.FS.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setLong(
+                BitField.FD.valueOf(machineInstruction),
+                (long) context.getRegisterFile().getFprs().getFloat(BitField.FS.valueOf(machineInstruction))
+        );
     }
 
     /**
@@ -1109,7 +1199,10 @@ public class StaticInstruction {
     @InputDependencies(Dependency.FS)
     @OutputDependencies(Dependency.FD)
     private static void cvt_s_d(Context context, int machineInstruction) {
-        context.getRegisterFile().getFprs().setFloat(BitField.FD.valueOf(machineInstruction), (float) context.getRegisterFile().getFprs().getDouble(BitField.FS.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setFloat(
+                BitField.FD.valueOf(machineInstruction),
+                (float) context.getRegisterFile().getFprs().getDouble(BitField.FS.valueOf(machineInstruction))
+        );
     }
 
     /**
@@ -1125,7 +1218,10 @@ public class StaticInstruction {
     @InputDependencies(Dependency.FS)
     @OutputDependencies(Dependency.FD)
     private static void cvt_s_l(Context context, int machineInstruction) {
-        context.getRegisterFile().getFprs().setFloat(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFprs().getLong(BitField.FS.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setFloat(
+                BitField.FD.valueOf(machineInstruction),
+                context.getRegisterFile().getFprs().getLong(BitField.FS.valueOf(machineInstruction))
+        );
     }
 
     /**
@@ -1141,7 +1237,10 @@ public class StaticInstruction {
     @InputDependencies(Dependency.FS)
     @OutputDependencies(Dependency.FD)
     private static void cvt_s_w(Context context, int machineInstruction) {
-        context.getRegisterFile().getFprs().setFloat(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFprs().getInt(BitField.FS.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setFloat(
+                BitField.FD.valueOf(machineInstruction),
+                context.getRegisterFile().getFprs().getInt(BitField.FS.valueOf(machineInstruction))
+        );
     }
 
     /**
@@ -1157,7 +1256,10 @@ public class StaticInstruction {
     @InputDependencies(Dependency.FS)
     @OutputDependencies(Dependency.FD)
     private static void cvt_w_d(Context context, int machineInstruction) {
-        context.getRegisterFile().getFprs().setInt(BitField.FD.valueOf(machineInstruction), (int) context.getRegisterFile().getFprs().getDouble(BitField.FS.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setInt(
+                BitField.FD.valueOf(machineInstruction),
+                (int) context.getRegisterFile().getFprs().getDouble(BitField.FS.valueOf(machineInstruction))
+        );
     }
 
     /**
@@ -1173,7 +1275,10 @@ public class StaticInstruction {
     @InputDependencies(Dependency.FS)
     @OutputDependencies(Dependency.FD)
     private static void cvt_w_s(Context context, int machineInstruction) {
-        context.getRegisterFile().getFprs().setInt(BitField.FD.valueOf(machineInstruction), (int) context.getRegisterFile().getFprs().getFloat(BitField.FS.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setInt(
+                BitField.FD.valueOf(machineInstruction),
+                (int) context.getRegisterFile().getFprs().getFloat(BitField.FS.valueOf(machineInstruction))
+        );
     }
 
     /**
@@ -1189,7 +1294,10 @@ public class StaticInstruction {
     @InputDependencies({Dependency.FS, Dependency.FT})
     @OutputDependencies(Dependency.FD)
     private static void div_d(Context context, int machineInstruction) {
-        context.getRegisterFile().getFprs().setDouble(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFprs().getDouble(BitField.FS.valueOf(machineInstruction)) / context.getRegisterFile().getFprs().getDouble(BitField.FT.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setDouble(
+                BitField.FD.valueOf(machineInstruction),
+                context.getRegisterFile().getFprs().getDouble(BitField.FS.valueOf(machineInstruction)) / context.getRegisterFile().getFprs().getDouble(BitField.FT.valueOf(machineInstruction))
+        );
     }
 
     /**
@@ -1205,7 +1313,10 @@ public class StaticInstruction {
     @InputDependencies({Dependency.FS, Dependency.FT})
     @OutputDependencies(Dependency.FD)
     private static void div_s(Context context, int machineInstruction) {
-        context.getRegisterFile().getFprs().setFloat(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFprs().getFloat(BitField.FS.valueOf(machineInstruction)) / context.getRegisterFile().getFprs().getFloat(BitField.FT.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setFloat(
+                BitField.FD.valueOf(machineInstruction),
+                context.getRegisterFile().getFprs().getFloat(BitField.FS.valueOf(machineInstruction)) / context.getRegisterFile().getFprs().getFloat(BitField.FT.valueOf(machineInstruction))
+        );
     }
 
     /**
@@ -1221,7 +1332,10 @@ public class StaticInstruction {
     @InputDependencies(Dependency.FS)
     @OutputDependencies(Dependency.FD)
     private static void mov_d(Context context, int machineInstruction) {
-        context.getRegisterFile().getFprs().setDouble(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFprs().getDouble(BitField.FS.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setDouble(
+                BitField.FD.valueOf(machineInstruction),
+                context.getRegisterFile().getFprs().getDouble(BitField.FS.valueOf(machineInstruction))
+        );
     }
 
     /**
@@ -1237,7 +1351,10 @@ public class StaticInstruction {
     @InputDependencies(Dependency.FS)
     @OutputDependencies(Dependency.FD)
     private static void mov_s(Context context, int machineInstruction) {
-        context.getRegisterFile().getFprs().setFloat(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFprs().getFloat(BitField.FS.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setFloat(
+                BitField.FD.valueOf(machineInstruction),
+                context.getRegisterFile().getFprs().getFloat(BitField.FS.valueOf(machineInstruction))
+        );
     }
 
     /**
@@ -1370,7 +1487,10 @@ public class StaticInstruction {
     @InputDependencies({Dependency.FS, Dependency.FT})
     @OutputDependencies(Dependency.FD)
     private static void mul_d(Context context, int machineInstruction) {
-        context.getRegisterFile().getFprs().setDouble(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFprs().getDouble(BitField.FS.valueOf(machineInstruction)) * context.getRegisterFile().getFprs().getDouble(BitField.FT.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setDouble(
+                BitField.FD.valueOf(machineInstruction),
+                context.getRegisterFile().getFprs().getDouble(BitField.FS.valueOf(machineInstruction)) * context.getRegisterFile().getFprs().getDouble(BitField.FT.valueOf(machineInstruction))
+        );
     }
 
     /**
@@ -1386,7 +1506,10 @@ public class StaticInstruction {
     @InputDependencies({Dependency.FS, Dependency.FT})
     @OutputDependencies(Dependency.FD)
     private static void mul_s(Context context, int machineInstruction) {
-        context.getRegisterFile().getFprs().setFloat(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFprs().getFloat(BitField.FS.valueOf(machineInstruction)) * context.getRegisterFile().getFprs().getFloat(BitField.FT.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setFloat(
+                BitField.FD.valueOf(machineInstruction),
+                context.getRegisterFile().getFprs().getFloat(BitField.FS.valueOf(machineInstruction)) * context.getRegisterFile().getFprs().getFloat(BitField.FT.valueOf(machineInstruction))
+        );
     }
 
     /**
@@ -1402,7 +1525,10 @@ public class StaticInstruction {
     @InputDependencies(Dependency.FS)
     @OutputDependencies(Dependency.FD)
     private static void neg_d(Context context, int machineInstruction) {
-        context.getRegisterFile().getFprs().setDouble(BitField.FD.valueOf(machineInstruction), -context.getRegisterFile().getFprs().getDouble(BitField.FS.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setDouble(
+                BitField.FD.valueOf(machineInstruction),
+                -context.getRegisterFile().getFprs().getDouble(BitField.FS.valueOf(machineInstruction))
+        );
     }
 
     /**
@@ -1418,7 +1544,10 @@ public class StaticInstruction {
     @InputDependencies(Dependency.FS)
     @OutputDependencies(Dependency.FD)
     private static void neg_s(Context context, int machineInstruction) {
-        context.getRegisterFile().getFprs().setFloat(BitField.FD.valueOf(machineInstruction), -context.getRegisterFile().getFprs().getFloat(BitField.FS.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setFloat(
+                BitField.FD.valueOf(machineInstruction),
+                -context.getRegisterFile().getFprs().getFloat(BitField.FS.valueOf(machineInstruction))
+        );
     }
 
     /**
@@ -1434,7 +1563,10 @@ public class StaticInstruction {
     @InputDependencies(Dependency.FS)
     @OutputDependencies(Dependency.FD)
     private static void sqrt_d(Context context, int machineInstruction) {
-        context.getRegisterFile().getFprs().setDouble(BitField.FD.valueOf(machineInstruction), Math.sqrt(context.getRegisterFile().getFprs().getDouble(BitField.FS.valueOf(machineInstruction))));
+        context.getRegisterFile().getFprs().setDouble(
+                BitField.FD.valueOf(machineInstruction),
+                Math.sqrt(context.getRegisterFile().getFprs().getDouble(BitField.FS.valueOf(machineInstruction)))
+        );
     }
 
     /**
@@ -1450,7 +1582,10 @@ public class StaticInstruction {
     @InputDependencies(Dependency.FS)
     @OutputDependencies(Dependency.FD)
     private static void sqrt_s(Context context, int machineInstruction) {
-        context.getRegisterFile().getFprs().setFloat(BitField.FD.valueOf(machineInstruction), (float) Math.sqrt(context.getRegisterFile().getFprs().getFloat(BitField.FS.valueOf(machineInstruction))));
+        context.getRegisterFile().getFprs().setFloat(
+                BitField.FD.valueOf(machineInstruction),
+                (float) Math.sqrt(context.getRegisterFile().getFprs().getFloat(BitField.FS.valueOf(machineInstruction)))
+        );
     }
 
     /**
@@ -1466,7 +1601,10 @@ public class StaticInstruction {
     @InputDependencies({Dependency.FS, Dependency.FT})
     @OutputDependencies(Dependency.FD)
     private static void sub_d(Context context, int machineInstruction) {
-        context.getRegisterFile().getFprs().setDouble(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFprs().getDouble(BitField.FS.valueOf(machineInstruction)) - context.getRegisterFile().getFprs().getDouble(BitField.FT.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setDouble(
+                BitField.FD.valueOf(machineInstruction),
+                context.getRegisterFile().getFprs().getDouble(BitField.FS.valueOf(machineInstruction)) - context.getRegisterFile().getFprs().getDouble(BitField.FT.valueOf(machineInstruction))
+        );
     }
 
     /**
@@ -1482,7 +1620,10 @@ public class StaticInstruction {
     @InputDependencies({Dependency.FS, Dependency.FT})
     @OutputDependencies(Dependency.FD)
     private static void sub_s(Context context, int machineInstruction) {
-        context.getRegisterFile().getFprs().setFloat(BitField.FD.valueOf(machineInstruction), context.getRegisterFile().getFprs().getFloat(BitField.FS.valueOf(machineInstruction)) - context.getRegisterFile().getFprs().getFloat(BitField.FT.valueOf(machineInstruction)));
+        context.getRegisterFile().getFprs().setFloat(
+                BitField.FD.valueOf(machineInstruction),
+                context.getRegisterFile().getFprs().getFloat(BitField.FS.valueOf(machineInstruction)) - context.getRegisterFile().getFprs().getFloat(BitField.FT.valueOf(machineInstruction))
+        );
     }
 
     /**
@@ -1969,7 +2110,10 @@ public class StaticInstruction {
     @OutputDependencies(Dependency.RT)
     @NonEffectiveAddressBaseDependency(Dependency.RT)
     private static void lb(Context context, int machineInstruction) {
-        context.getRegisterFile().setGpr(BitField.RT.valueOf(machineInstruction), context.getProcess().getMemory().readByte(getEffectiveAddress(context, machineInstruction)));
+        context.getRegisterFile().setGpr(
+                BitField.RT.valueOf(machineInstruction),
+                context.getProcess().getMemory().readByte(getEffectiveAddress(context, machineInstruction))
+        );
     }
 
     /**
@@ -1985,7 +2129,10 @@ public class StaticInstruction {
     @OutputDependencies(Dependency.RT)
     @NonEffectiveAddressBaseDependency(Dependency.RT)
     private static void lbu(Context context, int machineInstruction) {
-        context.getRegisterFile().setGpr(BitField.RT.valueOf(machineInstruction), context.getProcess().getMemory().readByte(getEffectiveAddress(context, machineInstruction)) & 0xff);
+        context.getRegisterFile().setGpr(
+                BitField.RT.valueOf(machineInstruction),
+                context.getProcess().getMemory().readByte(getEffectiveAddress(context, machineInstruction)) & 0xff
+        );
     }
 
     /**
@@ -2001,7 +2148,10 @@ public class StaticInstruction {
     @OutputDependencies(Dependency.FT)
     @NonEffectiveAddressBaseDependency(Dependency.FT)
     private static void ldc1(Context context, int machineInstruction) {
-        context.getRegisterFile().getFprs().setLong(BitField.FT.valueOf(machineInstruction), context.getProcess().getMemory().readDoubleWord(getEffectiveAddress(context, machineInstruction)));
+        context.getRegisterFile().getFprs().setLong(
+                BitField.FT.valueOf(machineInstruction),
+                context.getProcess().getMemory().readDoubleWord(getEffectiveAddress(context, machineInstruction))
+        );
     }
 
     /**
@@ -2017,7 +2167,10 @@ public class StaticInstruction {
     @OutputDependencies(Dependency.RT)
     @NonEffectiveAddressBaseDependency(Dependency.RT)
     private static void lh(Context context, int machineInstruction) {
-        context.getRegisterFile().setGpr(BitField.RT.valueOf(machineInstruction), context.getProcess().getMemory().readHalfWord(getEffectiveAddress(context, machineInstruction)));
+        context.getRegisterFile().setGpr(
+                BitField.RT.valueOf(machineInstruction),
+                context.getProcess().getMemory().readHalfWord(getEffectiveAddress(context, machineInstruction))
+        );
     }
 
     /**
@@ -2033,7 +2186,10 @@ public class StaticInstruction {
     @OutputDependencies(Dependency.RT)
     @NonEffectiveAddressBaseDependency(Dependency.RT)
     private static void lhu(Context context, int machineInstruction) {
-        context.getRegisterFile().setGpr(BitField.RT.valueOf(machineInstruction), context.getProcess().getMemory().readHalfWord(getEffectiveAddress(context, machineInstruction)) & 0xffff);
+        context.getRegisterFile().setGpr(
+                BitField.RT.valueOf(machineInstruction),
+                context.getProcess().getMemory().readHalfWord(getEffectiveAddress(context, machineInstruction)) & 0xffff
+        );
     }
 
     /**
@@ -2049,7 +2205,10 @@ public class StaticInstruction {
     @OutputDependencies(Dependency.RT)
     @NonEffectiveAddressBaseDependency(Dependency.RT)
     private static void ll(Context context, int machineInstruction) {
-        context.getRegisterFile().setGpr(BitField.RT.valueOf(machineInstruction), context.getProcess().getMemory().readWord(getEffectiveAddress(context, machineInstruction)));
+        context.getRegisterFile().setGpr(
+                BitField.RT.valueOf(machineInstruction),
+                context.getProcess().getMemory().readWord(getEffectiveAddress(context, machineInstruction))
+        );
     }
 
     /**
@@ -2065,7 +2224,10 @@ public class StaticInstruction {
     @OutputDependencies(Dependency.RT)
     @NonEffectiveAddressBaseDependency(Dependency.RT)
     private static void lw(Context context, int machineInstruction) {
-        context.getRegisterFile().setGpr(BitField.RT.valueOf(machineInstruction), context.getProcess().getMemory().readWord(getEffectiveAddress(context, machineInstruction)));
+        context.getRegisterFile().setGpr(
+                BitField.RT.valueOf(machineInstruction),
+                context.getProcess().getMemory().readWord(getEffectiveAddress(context, machineInstruction))
+        );
     }
 
     /**
@@ -2081,7 +2243,10 @@ public class StaticInstruction {
     @OutputDependencies(Dependency.FT)
     @NonEffectiveAddressBaseDependency(Dependency.FT)
     private static void lwc1(Context context, int machineInstruction) {
-        context.getRegisterFile().getFprs().setInt(BitField.FT.valueOf(machineInstruction), context.getProcess().getMemory().readWord(getEffectiveAddress(context, machineInstruction)));
+        context.getRegisterFile().getFprs().setInt(
+                BitField.FT.valueOf(machineInstruction),
+                context.getProcess().getMemory().readWord(getEffectiveAddress(context, machineInstruction))
+        );
     }
 
     /**
@@ -2157,7 +2322,10 @@ public class StaticInstruction {
     @OutputDependencies({})
     @NonEffectiveAddressBaseDependency(Dependency.RT)
     private static void sb(Context context, int machineInstruction) {
-        context.getProcess().getMemory().writeByte(getEffectiveAddress(context, machineInstruction), (byte) MathHelper.bits(context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)), 7, 0));
+        context.getProcess().getMemory().writeByte(
+                getEffectiveAddress(context, machineInstruction),
+                (byte) MathHelper.bits(context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)), 7, 0)
+        );
     }
 
     /**
@@ -2173,7 +2341,10 @@ public class StaticInstruction {
     @OutputDependencies(Dependency.RT)
     @NonEffectiveAddressBaseDependency(Dependency.RT)
     private static void sc(Context context, int machineInstruction) {
-        context.getProcess().getMemory().writeWord(getEffectiveAddress(context, machineInstruction), context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)));
+        context.getProcess().getMemory().writeWord(
+                getEffectiveAddress(context, machineInstruction),
+                context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction))
+        );
         context.getRegisterFile().setGpr(BitField.RT.valueOf(machineInstruction), 1);
     }
 
@@ -2190,7 +2361,10 @@ public class StaticInstruction {
     @OutputDependencies({})
     @NonEffectiveAddressBaseDependency(Dependency.FT)
     private static void sdc1(Context context, int machineInstruction) {
-        context.getProcess().getMemory().writeDoubleWord(getEffectiveAddress(context, machineInstruction), context.getRegisterFile().getFprs().getLong(BitField.FT.valueOf(machineInstruction)));
+        context.getProcess().getMemory().writeDoubleWord(
+                getEffectiveAddress(context, machineInstruction),
+                context.getRegisterFile().getFprs().getLong(BitField.FT.valueOf(machineInstruction))
+        );
     }
 
     /**
@@ -2206,7 +2380,10 @@ public class StaticInstruction {
     @OutputDependencies({})
     @NonEffectiveAddressBaseDependency(Dependency.RT)
     private static void sh(Context context, int machineInstruction) {
-        context.getProcess().getMemory().writeHalfWord(getEffectiveAddress(context, machineInstruction), (short) MathHelper.bits(context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)), 15, 0));
+        context.getProcess().getMemory().writeHalfWord(
+                getEffectiveAddress(context, machineInstruction),
+                (short) MathHelper.bits(context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)), 15, 0)
+        );
     }
 
     /**
@@ -2222,7 +2399,10 @@ public class StaticInstruction {
     @OutputDependencies({})
     @NonEffectiveAddressBaseDependency(Dependency.RT)
     private static void sw(Context context, int machineInstruction) {
-        context.getProcess().getMemory().writeWord(getEffectiveAddress(context, machineInstruction), context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction)));
+        context.getProcess().getMemory().writeWord(
+                getEffectiveAddress(context, machineInstruction),
+                context.getRegisterFile().getGpr(BitField.RT.valueOf(machineInstruction))
+        );
     }
 
     /**
@@ -2238,7 +2418,10 @@ public class StaticInstruction {
     @OutputDependencies({})
     @NonEffectiveAddressBaseDependency(Dependency.FT)
     private static void swc1(Context context, int machineInstruction) {
-        context.getProcess().getMemory().writeWord(getEffectiveAddress(context, machineInstruction), context.getRegisterFile().getFprs().getInt(BitField.FT.valueOf(machineInstruction)));
+        context.getProcess().getMemory().writeWord(
+                getEffectiveAddress(context, machineInstruction),
+                context.getRegisterFile().getFprs().getInt(BitField.FT.valueOf(machineInstruction))
+        );
     }
 
     /**

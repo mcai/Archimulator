@@ -46,7 +46,7 @@ public class FunctionalUnitDescriptor {
         this.quantity = quantity;
         this.numFree = this.quantity;
 
-        this.operations = new EnumMap<FunctionalUnitOperationType, FunctionalUnitOperation>(FunctionalUnitOperationType.class);
+        this.operations = new EnumMap<>(FunctionalUnitOperationType.class);
     }
 
     /**

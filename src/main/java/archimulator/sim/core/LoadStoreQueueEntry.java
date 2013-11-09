@@ -41,7 +41,16 @@ public class LoadStoreQueueEntry extends AbstractReorderBufferEntry {
      * @param branchPredictorUpdate          the branch predictor update
      * @param speculative                    a value indicating whether the load/store queue entry is speculative or not
      */
-    public LoadStoreQueueEntry(Thread thread, DynamicInstruction dynamicInstruction, int npc, int nnpc, int predictedNnpc, int returnAddressStackRecoverIndex, BranchPredictorUpdate branchPredictorUpdate, boolean speculative) {
+    public LoadStoreQueueEntry(
+            Thread thread,
+            DynamicInstruction dynamicInstruction,
+            int npc,
+            int nnpc,
+            int predictedNnpc,
+            int returnAddressStackRecoverIndex,
+            BranchPredictorUpdate branchPredictorUpdate,
+            boolean speculative
+    ) {
         super(thread, dynamicInstruction, npc, nnpc, predictedNnpc, returnAddressStackRecoverIndex, branchPredictorUpdate, speculative);
     }
 

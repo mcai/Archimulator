@@ -66,7 +66,13 @@ public class DynamicSpeculativePrecomputationHelper {
     public DynamicSpeculativePrecomputationHelper(Simulation simulation) {
         Processor processor = simulation.getProcessor();
 
-        this.sliceCache = new EvictableCache<>(processor, "sliceCache", new CacheGeometry(SLICE_CACHE_CAPACITY, SLICE_CACHE_CAPACITY, 1), CacheReplacementPolicyType.LRU, args -> new BooleanValueProvider());
+        this.sliceCache = new EvictableCache<>(
+                processor,
+                "sliceCache",
+                new CacheGeometry(SLICE_CACHE_CAPACITY, SLICE_CACHE_CAPACITY, 1),
+                CacheReplacementPolicyType.LRU,
+                args -> new BooleanValueProvider()
+        );
 
         this.delinquentLoadIdentificationTables = new HashMap<>();
         this.retiredInstructionBuffers = new HashMap<>();
@@ -80,9 +86,10 @@ public class DynamicSpeculativePrecomputationHelper {
             }
         }
 
-        processor.getBlockingEventDispatcher().addListener(DelinquentLoadIdentificationTable.DelinquentLoadIdentifiedEvent.class, event -> {
-            getRetiredInstructionBuffers().get(event.getThread()).gatherInstructionsFor(event.getDelinquentLoad());
-        });
+        processor.getBlockingEventDispatcher().addListener(
+                DelinquentLoadIdentificationTable.DelinquentLoadIdentifiedEvent.class,
+                event -> getRetiredInstructionBuffers().get(event.getThread()).gatherInstructionsFor(event.getDelinquentLoad())
+        );
     }
 
     /**

@@ -41,11 +41,42 @@ public class CombinedBranchPredictor extends DynamicBranchPredictor {
      * @param name   the name of the combined branch predictor
      */
     public CombinedBranchPredictor(Thread thread, String name) {
-        super(thread, name, BranchPredictorType.COMBINED, thread.getExperiment().getArchitecture().getCombinedBranchPredictorBranchTargetBufferNumSets(), thread.getExperiment().getArchitecture().getCombinedBranchPredictorBranchTargetBufferAssociativity(), thread.getExperiment().getArchitecture().getCombinedBranchPredictorReturnAddressStackSize());
+        super(
+                thread,
+                name,
+                BranchPredictorType.COMBINED,
+                thread.getExperiment().getArchitecture().getCombinedBranchPredictorBranchTargetBufferNumSets(),
+                thread.getExperiment().getArchitecture().getCombinedBranchPredictorBranchTargetBufferAssociativity(),
+                thread.getExperiment().getArchitecture().getCombinedBranchPredictorReturnAddressStackSize()
+        );
 
-        this.bimod = new TwoBitBranchPredictor(thread, name + "/bimod", thread.getExperiment().getArchitecture().getCombinedBranchPredictorBimodSize(), 0, 0, 0);
-        this.meta = new TwoBitBranchPredictor(thread, name + "/meta", thread.getExperiment().getArchitecture().getCombinedBranchPredictorMetaSize(), 0, 0, 0);
-        this.twoLevel = new TwoLevelBranchPredictor(thread, name + "/twoLevel", thread.getExperiment().getArchitecture().getCombinedBranchPredictorL1Size(), thread.getExperiment().getArchitecture().getCombinedBranchPredictorL2Size(), thread.getExperiment().getArchitecture().getCombinedBranchPredictorShiftWidth(), thread.getExperiment().getArchitecture().getCombinedBranchPredictorXor(), 0, 0, 0);
+        this.bimod = new TwoBitBranchPredictor(
+                thread,
+                name + "/bimod",
+                thread.getExperiment().getArchitecture().getCombinedBranchPredictorBimodSize(),
+                0,
+                0,
+                0
+        );
+        this.meta = new TwoBitBranchPredictor(
+                thread,
+                name + "/meta",
+                thread.getExperiment().getArchitecture().getCombinedBranchPredictorMetaSize(),
+                0,
+                0,
+                0
+        );
+        this.twoLevel = new TwoLevelBranchPredictor(
+                thread,
+                name + "/twoLevel",
+                thread.getExperiment().getArchitecture().getCombinedBranchPredictorL1Size(),
+                thread.getExperiment().getArchitecture().getCombinedBranchPredictorL2Size(),
+                thread.getExperiment().getArchitecture().getCombinedBranchPredictorShiftWidth(),
+                thread.getExperiment().getArchitecture().getCombinedBranchPredictorXor(),
+                0,
+                0,
+                0
+        );
     }
 
     @Override

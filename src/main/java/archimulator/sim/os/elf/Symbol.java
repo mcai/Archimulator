@@ -209,7 +209,18 @@ public class Symbol {
 
     @Override
     public String toString() {
-        return String.format("Symbol{name='%s\', st_type=0x%08x, st_bind=0x%08x, nameIndex=0x%08x, value=0x%08x, size=%d, info=%d, other=%d, sectionHeaderTableIndex=%d}", this.getName(), this.getType(), this.getBind(), this.getNameIndex(), this.getValue(), this.getSize(), this.getInfo(), this.getOther(), this.getSectionHeaderTableIndex());
+        return String.format(
+                "Symbol{name='%s\', st_type=0x%08x, st_bind=0x%08x, nameIndex=0x%08x, value=0x%08x, size=%d, info=%d, other=%d, sectionHeaderTableIndex=%d}",
+                this.getName(),
+                this.getType(),
+                this.getBind(),
+                this.getNameIndex(),
+                this.getValue(),
+                this.getSize(),
+                this.getInfo(),
+                this.getOther(),
+                this.getSectionHeaderTableIndex()
+        );
     }
 
     /**

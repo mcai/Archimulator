@@ -21,7 +21,7 @@ package archimulator.sim.core.functionalUnit;
 import archimulator.sim.common.Named;
 import archimulator.sim.core.AbstractBasicCore;
 import archimulator.sim.core.ReorderBufferEntry;
-import net.pickapack.action.Action1;
+import net.pickapack.action.Action;
 
 import java.util.EnumMap;
 import java.util.EnumSet;
@@ -105,7 +105,7 @@ public class FunctionalUnitPool implements Named {
      * @param onCompletedCallback the callback action performed when the operation is completed
      * @return a value indicating whether the acquiring succeeds or not
      */
-    public boolean acquire(final ReorderBufferEntry reorderBufferEntry, final Action1<ReorderBufferEntry> onCompletedCallback) {
+    public boolean acquire(final ReorderBufferEntry reorderBufferEntry, final Action onCompletedCallback) {
         FunctionalUnitOperationType functionalUnitOperationType = reorderBufferEntry.getDynamicInstruction().getStaticInstruction().getMnemonic().getFunctionalUnitOperationType();
         FunctionalUnitType functionalUnitType = this.functionalUnitOperationToFunctionalUnitMap.get(functionalUnitOperationType);
         FunctionalUnitOperation functionalUnitOperation = this.descriptors.get(functionalUnitType).getOperations().get(functionalUnitOperationType);
@@ -113,18 +113,19 @@ public class FunctionalUnitPool implements Named {
         final FunctionalUnitDescriptor functionalUnitDescriptor = this.descriptors.get(functionalUnitType);
 
         if (functionalUnitDescriptor.isFull()) {
-            this.numStallsOnAcquireFailedOnNoFreeFunctionalUnit.put(functionalUnitOperationType, this.numStallsOnAcquireFailedOnNoFreeFunctionalUnit.get(functionalUnitOperationType) + 1);
+            this.numStallsOnAcquireFailedOnNoFreeFunctionalUnit.put(
+                    functionalUnitOperationType,
+                    this.numStallsOnAcquireFailedOnNoFreeFunctionalUnit.get(functionalUnitOperationType) + 1
+            );
 
             return false;
         }
 
         this.core.getCycleAccurateEventQueue()
-                .schedule(this, () -> {
-                    functionalUnitDescriptor.setNumFree(functionalUnitDescriptor.getNumFree() + 1);
-                }, functionalUnitOperation.getIssueLatency())
+                .schedule(this, () -> functionalUnitDescriptor.setNumFree(functionalUnitDescriptor.getNumFree() + 1), functionalUnitOperation.getIssueLatency())
                 .schedule(this, () -> {
                     if (!reorderBufferEntry.isSquashed()) {
-                        onCompletedCallback.apply(reorderBufferEntry);
+                        onCompletedCallback.apply();
                     }
                 }, functionalUnitOperation.getOperationLatency());
 

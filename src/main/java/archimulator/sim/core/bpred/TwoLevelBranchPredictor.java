@@ -75,7 +75,17 @@ public class TwoLevelBranchPredictor extends DynamicBranchPredictor {
      * @param name the name
      */
     public TwoLevelBranchPredictor(Thread thread, String name) {
-        this(thread, name, thread.getExperiment().getArchitecture().getTwoLevelBranchPredictorL1Size(), thread.getExperiment().getArchitecture().getTwoLevelBranchPredictorL2Size(), thread.getExperiment().getArchitecture().getTwoLevelBranchPredictorShiftWidth(), thread.getExperiment().getArchitecture().getTwoLevelBranchPredictorXor(), thread.getExperiment().getArchitecture().getTwoLevelBranchPredictorBranchTargetBufferNumSets(), thread.getExperiment().getArchitecture().getTwoLevelBranchPredictorBranchTargetBufferAssociativity(), thread.getExperiment().getArchitecture().getTwoLevelBranchPredictorReturnAddressStackSize());
+        this(
+                thread,
+                name,
+                thread.getExperiment().getArchitecture().getTwoLevelBranchPredictorL1Size(),
+                thread.getExperiment().getArchitecture().getTwoLevelBranchPredictorL2Size(),
+                thread.getExperiment().getArchitecture().getTwoLevelBranchPredictorShiftWidth(),
+                thread.getExperiment().getArchitecture().getTwoLevelBranchPredictorXor(),
+                thread.getExperiment().getArchitecture().getTwoLevelBranchPredictorBranchTargetBufferNumSets(),
+                thread.getExperiment().getArchitecture().getTwoLevelBranchPredictorBranchTargetBufferAssociativity(),
+                thread.getExperiment().getArchitecture().getTwoLevelBranchPredictorReturnAddressStackSize()
+        );
     }
 
     @Override

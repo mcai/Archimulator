@@ -21,7 +21,6 @@ package archimulator.sim.core;
 import archimulator.sim.core.functionalUnit.FunctionalUnitOperationType;
 import archimulator.sim.isa.StaticInstructionType;
 import archimulator.sim.os.ContextState;
-import net.pickapack.action.Action;
 import net.pickapack.action.Function1;
 import net.pickapack.util.Reference;
 import net.pickapack.util.RoundRobinScheduler;
@@ -117,7 +116,7 @@ public class BasicCore extends AbstractBasicCore {
 
     @Override
     protected void issue() {
-        Reference<Integer> quant = new Reference<Integer>(getExperiment().getArchitecture().getIssueWidth());
+        Reference<Integer> quant = new Reference<>(getExperiment().getArchitecture().getIssueWidth());
 
         this.issueInstructionQueue(quant);
         this.issueLoadQueue(quant);
@@ -134,9 +133,7 @@ public class BasicCore extends AbstractBasicCore {
             final ReorderBufferEntry reorderBufferEntry = (ReorderBufferEntry) it.next();
 
             if (reorderBufferEntry.getDynamicInstruction().getStaticInstruction().getMnemonic().getFunctionalUnitOperationType() != FunctionalUnitOperationType.NONE) {
-                if (this.functionalUnitPool.acquire(reorderBufferEntry, readyQueueEntry1 -> {
-                    reorderBufferEntry.signalCompleted();
-                })) {
+                if (this.functionalUnitPool.acquire(reorderBufferEntry, reorderBufferEntry::signalCompleted)) {
                     reorderBufferEntry.setIssued();
                 } else {
                     reorderBufferEntry.getThread().incrementNumSelectionStallsOnNoFreeFunctionalUnit();
@@ -165,8 +162,8 @@ public class BasicCore extends AbstractBasicCore {
 
             boolean hitInLoadStoreQueue = false;
 
-            for (LoadStoreQueueEntry loadStoreQueueEntry1 : loadStoreQueueEntry.getThread().getLoadStoreQueue().getEntries()) {
-                if (loadStoreQueueEntry1.getDynamicInstruction().getStaticInstruction().getMnemonic().getType() == StaticInstructionType.STORE && loadStoreQueueEntry1.getEffectiveAddress() == loadStoreQueueEntry.getEffectiveAddress()) {
+            for (LoadStoreQueueEntry loadStoreQueueEntryFound : loadStoreQueueEntry.getThread().getLoadStoreQueue().getEntries()) {
+                if (loadStoreQueueEntryFound.getDynamicInstruction().getStaticInstruction().getMnemonic().getType() == StaticInstructionType.STORE && loadStoreQueueEntryFound.getEffectiveAddress() == loadStoreQueueEntry.getEffectiveAddress()) {
                     hitInLoadStoreQueue = true;
                     break;
                 }
@@ -181,11 +178,12 @@ public class BasicCore extends AbstractBasicCore {
                     break;
                 }
 
-                this.load(loadStoreQueueEntry.getDynamicInstruction(), loadStoreQueueEntry.getEffectiveAddress(), loadStoreQueueEntry.getDynamicInstruction().getPc(), new Action() {
-                    public void apply() {
-                        loadStoreQueueEntry.signalCompleted();
-                    }
-                });
+                this.load(
+                        loadStoreQueueEntry.getDynamicInstruction(),
+                        loadStoreQueueEntry.getEffectiveAddress(),
+                        loadStoreQueueEntry.getDynamicInstruction().getPc(),
+                        loadStoreQueueEntry::signalCompleted
+                );
                 loadStoreQueueEntry.setIssued();
             }
 
@@ -209,10 +207,8 @@ public class BasicCore extends AbstractBasicCore {
                 break;
             }
 
-            this.store(loadStoreQueueEntry.getDynamicInstruction(), loadStoreQueueEntry.getEffectiveAddress(), loadStoreQueueEntry.getDynamicInstruction().getPc(), new Action() {
-                public void apply() {
+            this.store(loadStoreQueueEntry.getDynamicInstruction(), loadStoreQueueEntry.getEffectiveAddress(), loadStoreQueueEntry.getDynamicInstruction().getPc(), () -> {
 //                    loadStoreQueueEntry.signalCompleted(); //TODO: should we need to wait for store to complete?
-                }
             });
             loadStoreQueueEntry.setIssued();
             loadStoreQueueEntry.signalCompleted(); //TODO: should we need to wait for store to complete?

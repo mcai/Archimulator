@@ -56,7 +56,14 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
      * @param kernel                  the kernel
      * @param memoryHierarchy         the memory hierarchy
      */
-    public BasicProcessor(Experiment experiment, Simulation simulation, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, Kernel kernel, MemoryHierarchy memoryHierarchy) {
+    public BasicProcessor(
+            Experiment experiment,
+            Simulation simulation,
+            BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher,
+            CycleAccurateEventQueue cycleAccurateEventQueue,
+            Kernel kernel,
+            MemoryHierarchy memoryHierarchy
+    ) {
         super(experiment, simulation, blockingEventDispatcher, cycleAccurateEventQueue);
 
         this.kernel = kernel;

@@ -39,7 +39,7 @@ public class BranchTargetBuffer {
         this.entries = new ArrayList<>();
 
         for (int i = 0; i < numSets; i++) {
-            List<BranchTargetBufferEntry> entriesPerSet = new ArrayList<BranchTargetBufferEntry>();
+            List<BranchTargetBufferEntry> entriesPerSet = new ArrayList<>();
 
             for (int j = 0; j < associativity; j++) {
                 entriesPerSet.add(new BranchTargetBufferEntry());

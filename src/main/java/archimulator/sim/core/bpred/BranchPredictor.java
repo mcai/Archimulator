@@ -66,7 +66,13 @@ public abstract class BranchPredictor {
      * @param returnAddressStackRecoverIndex the return address stack recover index
      * @return the predicted target address
      */
-    public abstract int predict(int branchAddress, int branchTarget, Mnemonic mnemonic, BranchPredictorUpdate branchPredictorUpdate, Reference<Integer> returnAddressStackRecoverIndex);
+    public abstract int predict(
+            int branchAddress,
+            int branchTarget,
+            Mnemonic mnemonic,
+            BranchPredictorUpdate branchPredictorUpdate,
+            Reference<Integer> returnAddressStackRecoverIndex
+    );
 
     /**
      * Update.
@@ -79,7 +85,15 @@ public abstract class BranchPredictor {
      * @param mnemonic              the mnemonic
      * @param branchPredictorUpdate the branch predictor update
      */
-    public void update(int branchAddress, int branchTarget, boolean taken, boolean predictedTaken, boolean correct, Mnemonic mnemonic, BranchPredictorUpdate branchPredictorUpdate) {
+    public void update(
+            int branchAddress,
+            int branchTarget,
+            boolean taken,
+            boolean predictedTaken,
+            boolean correct,
+            Mnemonic mnemonic,
+            BranchPredictorUpdate branchPredictorUpdate
+    ) {
         if (correct) {
             this.numHits++;
         } else {

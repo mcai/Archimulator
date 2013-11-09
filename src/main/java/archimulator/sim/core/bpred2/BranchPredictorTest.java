@@ -57,6 +57,10 @@ public class BranchPredictorTest {
             }
         });
 
-        System.out.printf("targetMispredictions: %f MPKI, directionMispredictions: %f MPKI\n", 1000.0 * (counterTargetMispredictions.getValue() / 1e8), 1000.0 * (counterDirectionMispredictions.getValue() / 1e8));
+        System.out.printf(
+                "targetMispredictions: %f MPKI, directionMispredictions: %f MPKI\n",
+                1000.0 * (counterTargetMispredictions.getValue() / 1e8),
+                1000.0 * (counterDirectionMispredictions.getValue() / 1e8)
+        );
     }
 }
