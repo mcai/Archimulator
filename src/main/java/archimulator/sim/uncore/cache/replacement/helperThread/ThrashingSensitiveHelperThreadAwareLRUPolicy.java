@@ -64,10 +64,10 @@ public class ThrashingSensitiveHelperThreadAwareLRUPolicy<StateT extends Seriali
     @Override
     public CacheAccess<StateT> handleReplacement(MemoryHierarchyAccess access, int set, int tag) {
         if (access.getType().isRead() && this.isDelinquentPc(access.getThread().getId(), access.getVirtualPc()) && HelperThreadingHelper.isMainThread(access.getThread())) {
-            return new CacheAccess<StateT>(this.getCache(), access, set, -1, tag); //bypass
+            return new CacheAccess<>(this.getCache(), access, set, -1, tag); //bypass
         }
 
-        return new CacheAccess<StateT>(this.getCache(), access, set, this.getLRU(set), tag);  //LRU victim selection
+        return new CacheAccess<>(this.getCache(), access, set, this.getLRU(set), tag);  //LRU victim selection
     }
 
     @Override

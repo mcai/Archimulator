@@ -66,6 +66,6 @@ public abstract class CostBasedLRUPolicy<StateT extends Serializable> extends Ab
             }
         }
 
-        return new CacheAccess<StateT>(this.getCache(), access, set, victimWay, tag);
+        return new CacheAccess<>(this.getCache(), access, set, victimWay, tag);
     }
 }
