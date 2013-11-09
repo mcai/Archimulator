@@ -49,7 +49,12 @@ public class ThrashingSensitiveHelperThreadAwareLRUPolicy<StateT extends Seriali
     public ThrashingSensitiveHelperThreadAwareLRUPolicy(EvictableCache<StateT> cache) {
         super(cache);
 
-        this.mirrorCache = new Cache<>(cache, getCache().getName() + ".thrashingSensitiveHelperThreadAwareLRUPolicy.mirrorCache", cache.getGeometry(), args -> new BooleanValueProvider());
+        this.mirrorCache = new Cache<>(
+                cache,
+                getCache().getName() + ".thrashingSensitiveHelperThreadAwareLRUPolicy.mirrorCache",
+                cache.getGeometry(),
+                args -> new BooleanValueProvider()
+        );
 
         this.predefinedDelinquentPcs = new ArrayList<>();
         this.predefinedDelinquentPcs.add(new IntegerIntegerPair(2, 0x004014d8));
@@ -104,15 +109,28 @@ public class ThrashingSensitiveHelperThreadAwareLRUPolicy<StateT extends Seriali
     public void dumpStats(ReportNode reportNode) {
     }
 
+    /**
+     * Get a value indicating whether the specified PC address in the specified thread is delinquent or not.
+     *
+     * @param threadId the ID of the thread
+     * @param pc the PC address
+     * @return a value indicating whether the specified PC address in the specified thread is delinquent or not
+     */
     private boolean isDelinquentPc(int threadId, int pc) {
         return this.predefinedDelinquentPcs.contains(new IntegerIntegerPair(threadId, pc));
 //        return this.processor.getCapability(DelinquentLoadIdentificationHelper.class).isDelinquentPc(threadId, pc);
     }
 
+    /**
+     * Boolean value provider.
+     */
     private static class BooleanValueProvider implements ValueProvider<Boolean> {
         private boolean state;
         private boolean helperThread;
 
+        /**
+         * Create a boolean value provider.
+         */
         private BooleanValueProvider() {
             state = true;
         }

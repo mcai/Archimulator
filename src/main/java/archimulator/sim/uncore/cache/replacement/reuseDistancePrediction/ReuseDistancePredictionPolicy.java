@@ -49,7 +49,12 @@ public class ReuseDistancePredictionPolicy<StateT extends Serializable> extends 
     public ReuseDistancePredictionPolicy(EvictableCache<StateT> cache) {
         super(cache);
 
-        this.mirrorCache = new Cache<>(cache, cache.getName() + ".reuseDistancePredictionPolicy.mirrorCache", cache.getGeometry(), args -> new BooleanValueProvider());
+        this.mirrorCache = new Cache<>(
+                cache,
+                cache.getName() + ".reuseDistancePredictionPolicy.mirrorCache",
+                cache.getGeometry(),
+                args -> new BooleanValueProvider()
+        );
 
         this.highLowCounter = new HighLowCounter(7, 16384);
     }

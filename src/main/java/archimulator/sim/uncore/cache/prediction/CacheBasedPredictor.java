@@ -27,7 +27,6 @@ import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
 import net.pickapack.math.SaturatingCounter;
 import net.pickapack.util.ValueProvider;
-import net.pickapack.util.ValueProviderFactory;
 
 /**
  * Cache based predictor.
@@ -67,9 +66,14 @@ public class CacheBasedPredictor<PredictableT extends Comparable<PredictableT>> 
      * @param defaultValue               the default value
      */
     public CacheBasedPredictor(SimulationObject parent, String name, CacheGeometry geometry, CacheReplacementPolicyType cacheReplacementPolicyType, final int counterThreshold, final int counterMaxValue, PredictableT defaultValue) {
-        ValueProviderFactory<Boolean, ValueProvider<Boolean>> cacheLineStateProviderFactory = args -> new BooleanValueProvider(counterThreshold, counterMaxValue);
+        this.cache = new EvictableCache<>(
+                parent,
+                name,
+                geometry,
+                cacheReplacementPolicyType,
+                args -> new BooleanValueProvider(counterThreshold, counterMaxValue)
+        );
 
-        this.cache = new EvictableCache<>(parent, name, geometry, cacheReplacementPolicyType, cacheLineStateProviderFactory);
         this.defaultValue = defaultValue;
     }
 

@@ -170,9 +170,10 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
      * @param onCompletedCallback the callback action performed when the access is completed
      */
     public void receiveIfetch(final MemoryHierarchyAccess access, final Action onCompletedCallback) {
-        this.getCycleAccurateEventQueue().schedule(this, () -> {
-            onLoad(access, access.getPhysicalTag(), onCompletedCallback);
-        }, this.getHitLatency());
+        this.getCycleAccurateEventQueue().schedule(
+                this,
+                () -> onLoad(access, access.getPhysicalTag(), onCompletedCallback), this.getHitLatency()
+        );
     }
 
     /**
@@ -182,9 +183,10 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
      * @param onCompletedCallback the callback action performed when the access is completed
      */
     public void receiveLoad(final MemoryHierarchyAccess access, final Action onCompletedCallback) {
-        this.getCycleAccurateEventQueue().schedule(this, () -> {
-            onLoad(access, access.getPhysicalTag(), onCompletedCallback);
-        }, this.getHitLatency());
+        this.getCycleAccurateEventQueue().schedule(
+                this,
+                () -> onLoad(access, access.getPhysicalTag(), onCompletedCallback), this.getHitLatency()
+        );
     }
 
     /**
@@ -194,9 +196,10 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
      * @param onCompletedCallback the callback action performed when the access is completed
      */
     public void receiveStore(final MemoryHierarchyAccess access, final Action onCompletedCallback) {
-        this.getCycleAccurateEventQueue().schedule(this, () -> {
-            onStore(access, access.getPhysicalTag(), onCompletedCallback);
-        }, this.getHitLatency());
+        this.getCycleAccurateEventQueue().schedule(
+                this,
+                () -> onStore(access, access.getPhysicalTag(), onCompletedCallback), this.getHitLatency()
+        );
     }
 
     /**
@@ -270,9 +273,7 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
      * @param loadFlow the load flow
      */
     private void onLoad(final MemoryHierarchyAccess access, final int tag, final LoadFlow loadFlow) {
-        final Action onStalledCallback = () -> {
-            onLoad(access, tag, loadFlow);
-        };
+        final Action onStalledCallback = () -> onLoad(access, tag, loadFlow);
 
         this.access(loadFlow, access, tag, (set, way) -> {
             CacheLine<CacheControllerState> line = getCache().getLine(set, way);
@@ -300,9 +301,7 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
      * @param storeFlow the associated store flow
      */
     private void onStore(final MemoryHierarchyAccess access, final int tag, final StoreFlow storeFlow) {
-        final Action onStalledCallback = () -> {
-            onStore(access, tag, storeFlow);
-        };
+        final Action onStalledCallback = () -> onStore(access, tag, storeFlow);
 
         this.access(storeFlow, access, tag, (set, way) -> {
             CacheLine<CacheControllerState> line = getCache().getLine(set, way);

@@ -48,9 +48,21 @@ public class TestPolicy2<StateT extends Serializable> extends LRUPolicy<StateT> 
     public TestPolicy2(EvictableCache<StateT> cache) {
         super(cache);
 
-        this.mirrorCache = new Cache<>(cache, getCache().getName() + ".testEvictionPolicy2.mirrorCache", cache.getGeometry(), args -> new BooleanValueProvider());
+        this.mirrorCache = new Cache<>(
+                cache,
+                getCache().getName() + ".testEvictionPolicy2.mirrorCache",
+                cache.getGeometry(),
+                args -> new BooleanValueProvider()
+        );
 
-        this.replacementOwnershipPredictor = new CacheBasedPredictor<>(cache, cache.getName() + ".replacementOwnershipPredictor", new CacheGeometry(16 * 16 * getCache().getLineSize(), 16, getCache().getLineSize()), 1, 3, false);
+        this.replacementOwnershipPredictor = new CacheBasedPredictor<>(
+                cache,
+                cache.getName() + ".replacementOwnershipPredictor",
+                new CacheGeometry(16 * 16 * getCache().getLineSize(), 16, getCache().getLineSize()),
+                1,
+                3,
+                false
+        );
     }
 
     @Override

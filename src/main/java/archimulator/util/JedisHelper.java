@@ -132,11 +132,7 @@ public class JedisHelper {
                 stats.add(new Pair<>(stat, value.getSecond()));
             }
 
-            Collections.sort(stats, (o1, o2) -> {
-                Double first = Double.parseDouble(o1.getSecond());
-                Double second = Double.parseDouble(o2.getSecond());
-                return first.compareTo(second);
-            });
+            stats.sort(Comparator.comparing(o -> o.getSecond()));
 
             return stats.stream().map(Pair::getFirst).collect(Collectors.toList());
         }
@@ -190,11 +186,7 @@ public class JedisHelper {
             }
         }
 
-        Collections.sort(stats, (o1, o2) -> {
-            Double first = Double.parseDouble(o1.getSecond());
-            Double second = Double.parseDouble(o2.getSecond());
-            return first.compareTo(second);
-        });
+        stats.sort(Comparator.comparing(o -> o.getSecond()));
 
         return stats.stream().map(Pair::getFirst).collect(Collectors.toList());
     }

@@ -50,7 +50,12 @@ public class RereferenceIntervalPredictionPolicy<StateT extends Serializable> ex
 
         this.predictedRereferenceIntervalMaxValue = 3;
 
-        this.mirrorCache = new Cache<>(cache, getCache().getName() + ".rereferenceIntervalPredictionEvictionPolicy.mirrorCache", cache.getGeometry(), args -> new BooleanValueProvider());
+        this.mirrorCache = new Cache<>(
+                cache,
+                getCache().getName() + ".rereferenceIntervalPredictionEvictionPolicy.mirrorCache",
+                cache.getGeometry(),
+                args -> new BooleanValueProvider()
+        );
 
         this.insertionPolicy = new DynamicInsertionPolicy(cache, 4, ((1 << 10) - 1), 6); //TODO: parameter passing
     }
@@ -63,7 +68,7 @@ public class RereferenceIntervalPredictionPolicy<StateT extends Serializable> ex
                 CacheLine<Boolean> mirrorLine = this.mirrorCache.getLine(set, way);
                 BooleanValueProvider stateProvider = (BooleanValueProvider) mirrorLine.getStateProvider();
                 if (stateProvider.predictedRereferenceInterval == this.predictedRereferenceIntervalMaxValue) {
-                    return new CacheAccess<StateT>(this.getCache(), access, set, way, tag);
+                    return new CacheAccess<>(this.getCache(), access, set, way, tag);
                 }
             }
 

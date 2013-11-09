@@ -45,7 +45,7 @@ public abstract class StackBasedCacheReplacementPolicy<StateT extends Serializab
         this.stackEntries = new ArrayList<>();
 
         for (int set = 0; set < this.getCache().getNumSets(); set++) {
-            this.stackEntries.add(new ArrayList<Integer>());
+            this.stackEntries.add(new ArrayList<>());
 
             for (int way = 0; way < this.getCache().getAssociativity(); way++) {
                 this.stackEntries.get(set).add(way);

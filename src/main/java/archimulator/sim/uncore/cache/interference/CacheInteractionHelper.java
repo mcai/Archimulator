@@ -76,7 +76,7 @@ public class CacheInteractionHelper implements Reportable {
 
                 if(broughterThreadId != requesterThreadId) {
                     if(!numL2CacheInterThreadConstructiveInteractions.containsKey(broughterThreadId)) {
-                        numL2CacheInterThreadConstructiveInteractions.put(broughterThreadId, new TreeMap<Integer, Long>());
+                        numL2CacheInterThreadConstructiveInteractions.put(broughterThreadId, new TreeMap<>());
                     }
 
                     if(!numL2CacheInterThreadConstructiveInteractions.get(broughterThreadId).containsKey(requesterThreadId)) {
@@ -105,7 +105,7 @@ public class CacheInteractionHelper implements Reportable {
 
                 if(broughterThreadId != requesterThreadId) {
                     if(!numL2CacheInterThreadEvictions.containsKey(broughterThreadId)) {
-                        numL2CacheInterThreadEvictions.put(broughterThreadId, new TreeMap<Integer, Long>());
+                        numL2CacheInterThreadEvictions.put(broughterThreadId, new TreeMap<>());
                     }
 
                     if(!numL2CacheInterThreadEvictions.get(broughterThreadId).containsKey(requesterThreadId)) {

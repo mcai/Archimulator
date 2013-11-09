@@ -72,7 +72,7 @@ public abstract class PartitionedLRUPolicy<StateT extends Serializable> extends 
                     int way = this.getWayInStackPosition(set, stackPosition);
                     CacheLine<StateT> line = this.getCache().getLine(set, way);
                     if (line.getAccess() != null && getThreadIdentifier(line.getAccess().getThread()) != getThreadIdentifier(access.getThread())) {
-                        return new CacheAccess<StateT>(this.getCache(), access, set, way, tag);
+                        return new CacheAccess<>(this.getCache(), access, set, way, tag);
                     }
                 }
             } else {
@@ -80,14 +80,14 @@ public abstract class PartitionedLRUPolicy<StateT extends Serializable> extends 
                     int way = this.getWayInStackPosition(set, stackPosition);
                     CacheLine<StateT> line = this.getCache().getLine(set, way);
                     if (line.getAccess() != null && getThreadIdentifier(line.getAccess().getThread()) == getThreadIdentifier(access.getThread())) {
-                        return new CacheAccess<StateT>(this.getCache(), access, set, way, tag);
+                        return new CacheAccess<>(this.getCache(), access, set, way, tag);
                     }
                 }
             }
 
             throw new IllegalArgumentException();
         } else {
-            return new CacheAccess<StateT>(this.getCache(), access, set, this.getLRU(set), tag);
+            return new CacheAccess<>(this.getCache(), access, set, this.getLRU(set), tag);
         }
     }
 

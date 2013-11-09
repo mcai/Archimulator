@@ -62,14 +62,25 @@ public class DirectoryController extends GeneralCacheController<DirectoryControl
     public DirectoryController(MemoryHierarchy memoryHierarchy, final String name) {
         super(memoryHierarchy, name);
 
-        this.cacheGeometry = new CacheGeometry(getExperiment().getArchitecture().getL2Size(), getExperiment().getArchitecture().getL2Associativity(), getExperiment().getArchitecture().getL2LineSize());
+        this.cacheGeometry = new CacheGeometry(
+                getExperiment().getArchitecture().getL2Size(),
+                getExperiment().getArchitecture().getL2Associativity(),
+                getExperiment().getArchitecture().getL2LineSize()
+        );
 
-        this.cache = new EvictableCache<>(memoryHierarchy, name, getGeometry(), getReplacementPolicyType(), args -> {
-            int set = (Integer) args[0];
-            int way = (Integer) args[1];
+        this.cache = new EvictableCache<>(
+                memoryHierarchy,
+                name,
+                getGeometry(),
+                getReplacementPolicyType(),
+                args -> {
+                    int set = (Integer) args[0];
+                    int way = (Integer) args[1];
 
-            return new DirectoryControllerFiniteStateMachine(name, set, way, this);
-        });
+                    return new DirectoryControllerFiniteStateMachine(name, set, way, this);
+                }
+        );
+
         this.cacheControllers = new ArrayList<>();
 
         this.fsmFactory = DirectoryControllerFiniteStateMachineFactory.getSingleton();
@@ -124,9 +135,7 @@ public class DirectoryController extends GeneralCacheController<DirectoryControl
      * @param message the "GetS" message
      */
     private void onGetS(final GetSMessage message) {
-        final Action onStalledCallback = () -> {
-            onGetS(message);
-        };
+        final Action onStalledCallback = () -> onGetS(message);
 
         this.access(message, message.getAccess(), message.getRequester(), message.getTag(), (set, way) -> {
             CacheLine<DirectoryControllerState> line = getCache().getLine(set, way);
@@ -141,9 +150,7 @@ public class DirectoryController extends GeneralCacheController<DirectoryControl
      * @param message the "GetM" message
      */
     private void onGetM(final GetMMessage message) {
-        final Action onStalledCallback = () -> {
-            onGetM(message);
-        };
+        final Action onStalledCallback = () -> onGetM(message);
 
         this.access(message, message.getAccess(), message.getRequester(), message.getTag(), (set, way) -> {
             CacheLine<DirectoryControllerState> line = getCache().getLine(set, way);
@@ -250,13 +257,13 @@ public class DirectoryController extends GeneralCacheController<DirectoryControl
             if (cacheAccess.isReplacement()) {
                 CacheLine<DirectoryControllerState> line = this.getCache().getLine(set, cacheAccess.getWay());
                 DirectoryControllerFiniteStateMachine fsm = (DirectoryControllerFiniteStateMachine) line.getStateProvider();
-                fsm.onEventReplacement(producerFlow, req, tag, cacheAccess,
-                        () -> {
-                            onReplacementCompletedCallback.apply(set, cacheAccess.getWay());
-                        },
-                        () -> {
-                            getCycleAccurateEventQueue().schedule(DirectoryController.this, onReplacementStalledCallback, 1);
-                        }
+                fsm.onEventReplacement(
+                        producerFlow,
+                        req,
+                        tag,
+                        cacheAccess,
+                        () -> onReplacementCompletedCallback.apply(set, cacheAccess.getWay()),
+                        () -> getCycleAccurateEventQueue().schedule(DirectoryController.this, onReplacementStalledCallback, 1)
                 );
             } else {
                 onReplacementCompletedCallback.apply(set, cacheAccess.getWay());

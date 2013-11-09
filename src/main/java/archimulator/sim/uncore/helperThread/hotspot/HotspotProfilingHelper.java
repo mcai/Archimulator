@@ -81,7 +81,7 @@ public class HotspotProfilingHelper implements Reportable {
             String calleeFunctionName = event.getContext().getProcess().getFunctionNameFromPc(event.getFunctionCallContext().getTargetPc());
             if (callerFunctionName != null) {
                 if (!numCallsPerFunctions.containsKey(callerFunctionName)) {
-                    numCallsPerFunctions.put(callerFunctionName, new TreeMap<String, Long>());
+                    numCallsPerFunctions.put(callerFunctionName, new TreeMap<>());
                 }
 
                 if (!numCallsPerFunctions.get(callerFunctionName).containsKey(calleeFunctionName)) {
@@ -156,13 +156,15 @@ public class HotspotProfilingHelper implements Reportable {
             }
         });
 
-        simulation.getBlockingEventDispatcher().addListener(L2CacheHitHotspotInterThreadStackDistanceMeterEvent.class, event -> {
-            statL2CacheHitHotspotInterThreadStackDistances.addValue(event.getValue().getStackDistance());
-        });
+        simulation.getBlockingEventDispatcher().addListener(
+                L2CacheHitHotspotInterThreadStackDistanceMeterEvent.class,
+                event -> statL2CacheHitHotspotInterThreadStackDistances.addValue(event.getValue().getStackDistance())
+        );
 
-        simulation.getBlockingEventDispatcher().addListener(L2CacheMissHotspotStackDistanceMeterEvent.class, event -> {
-            statL2CacheMissHotspotStackDistances.addValue(event.getValue().getStackDistance());
-        });
+        simulation.getBlockingEventDispatcher().addListener(
+                L2CacheMissHotspotStackDistanceMeterEvent.class,
+                event -> statL2CacheMissHotspotStackDistances.addValue(event.getValue().getStackDistance())
+        );
     }
 
     /**

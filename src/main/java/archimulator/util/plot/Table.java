@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.util.plot;
 
+import archimulator.util.SortHelper;
 import com.Ostermiller.util.CSVPrinter;
 import net.pickapack.util.Pair;
 import org.apache.commons.io.IOUtils;
@@ -35,10 +36,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -167,7 +166,7 @@ public class Table implements Serializable {
      * @return the list of identical cells in the specified column of the table
      */
     public List<String> getIdenticalCells(String column) {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
 
         for(List<String> row : getRows()) {
             String cell = getValue(this, row, column);
@@ -260,17 +259,11 @@ public class Table implements Serializable {
      * @param columns the list of columns
      */
     public static void sort(final Table table, final String... columns) {
-        List<String> columnList = Arrays.asList(columns);
-        Collections.reverse(columnList);
-
-        for (final String column : columnList) {
-            Collections.sort(table.getRows(), (row1, row2) -> {
-                String val1 = getValue(table, row1, column);
-                String val2 = getValue(table, row2, column);
-
-                return val1.compareTo(val2);
-            });
-        }
+        SortHelper.sort(table.getRows(), new ArrayList<Function<List<String>, Comparable>>(){{
+            for (final String column : columns) {
+                add(row -> getValue(table, row, column));
+            }
+        }});
     }
 
     /**

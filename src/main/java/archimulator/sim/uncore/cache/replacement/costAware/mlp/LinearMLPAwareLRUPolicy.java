@@ -40,9 +40,10 @@ public class LinearMLPAwareLRUPolicy<StateT extends Serializable> extends CostBa
     public LinearMLPAwareLRUPolicy(EvictableCache<StateT> cache, int lambda) {
         super(cache, lambda);
 
-        cache.getBlockingEventDispatcher().addListener(MLPProfilingHelper.L2MissMLPProfiledEvent.class, event -> {
-            setCost(event.getSet(), event.getWay(), event.getPendingL2Miss().getMlpCost());
-        });
+        cache.getBlockingEventDispatcher().addListener(
+                MLPProfilingHelper.L2MissMLPProfiledEvent.class,
+                event -> setCost(event.getSet(), event.getWay(), event.getPendingL2Miss().getMlpCost())
+        );
     }
 
     @Override

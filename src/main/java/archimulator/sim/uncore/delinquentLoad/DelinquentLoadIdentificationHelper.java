@@ -62,9 +62,7 @@ public class DelinquentLoadIdentificationHelper implements Reportable {
 
             identifiedDelinquentLoads.add(new Pair<>(event.getThread().getId(), event.getDelinquentLoad().getPc()));
 
-            Collections.sort(identifiedDelinquentLoads, (o1, o2) -> o1.getFirst().compareTo(o2.getFirst()));
-
-            Collections.sort(identifiedDelinquentLoads, (o1, o2) -> o1.getSecond().compareTo(o2.getSecond()));
+            identifiedDelinquentLoads.sort(Comparator.<Pair<Integer, Integer>, Comparable>comparing(Pair::getFirst).thenComparing(Pair::getSecond));
         });
     }
 

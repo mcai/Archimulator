@@ -147,7 +147,7 @@ public class StackDistanceProfilingHelper implements Reportable {
      * @return the distribution of the number of misses for the assumed associativities
      */
     public Map<Integer, Integer> getAssumedNumMissesDistribution() {
-        Map<Integer, Integer> result = new LinkedHashMap<Integer, Integer>();
+        Map<Integer, Integer> result = new LinkedHashMap<>();
 
         for (int associativity = 1; associativity <= this.l2CacheController.getCache().getAssociativity(); associativity++) {
             result.put(associativity, this.getAssumedNumMisses(associativity));

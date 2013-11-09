@@ -45,21 +45,42 @@ public class ReuseDistancePredictionHelper implements Reportable {
 
     /**
      * Create a reuse distance prediction helper.
-     * @param simulation  the simulation
+     *
+     * @param simulation the simulation
      */
     public ReuseDistancePredictionHelper(Simulation simulation) {
         final EvictableCache<DirectoryControllerState> cache = simulation.getProcessor().getMemoryHierarchy().getL2CacheController().getCache();
 
         this.reuseDistanceQuantizer = new Quantizer(15, 8192);
 
-        this.reuseDistancePredictor = new CacheBasedPredictor<>(cache, cache.getName() + ".reuseDistancePredictor", new CacheGeometry(16 * 16 * cache.getGeometry().getLineSize(), 16, cache.getGeometry().getLineSize()), 0, 3, 0);
+        this.reuseDistancePredictor = new CacheBasedPredictor<>(
+                cache,
+                cache.getName() + ".reuseDistancePredictor",
+                new CacheGeometry(16 * 16 * cache.getGeometry().getLineSize(), 16, cache.getGeometry().getLineSize()),
+                0,
+                3,
+                0
+        );
 
-        this.helperThreadL2RequestReuseDistancePredictor = new CacheBasedPredictor<>(cache, cache.getName() + ".helperThreadL2RequestReuseDistancePredictor", new CacheGeometry(16 * 16 * cache.getGeometry().getLineSize(), 16, cache.getGeometry().getLineSize()), 0, 3, 0);
+        this.helperThreadL2RequestReuseDistancePredictor = new CacheBasedPredictor<>(
+                cache,
+                cache.getName() + ".helperThreadL2RequestReuseDistancePredictor",
+                new CacheGeometry(16 * 16 * cache.getGeometry().getLineSize(), 16, cache.getGeometry().getLineSize()),
+                0,
+                3,
+                0
+        );
 
-        this.reuseDistanceSampler = new HelperThreadAwareReuseDistanceSampler(cache, cache.getName() + ".reuseDistanceSampler", 4096, (reuseDistanceQuantizer.getMaxValue() + 1) * reuseDistanceQuantizer.getQuantum(), reuseDistanceQuantizer);
+        this.reuseDistanceSampler = new HelperThreadAwareReuseDistanceSampler(
+                cache,
+                cache.getName() + ".reuseDistanceSampler",
+                4096,
+                (reuseDistanceQuantizer.getMaxValue() + 1) * reuseDistanceQuantizer.getQuantum(),
+                reuseDistanceQuantizer
+        );
 
         cache.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, event -> {
-            if(event.getCacheController().getCache() == cache) {
+            if (event.getCacheController().getCache() == cache) {
                 reuseDistanceSampler.update(event.getAccess().getThread().getId(), event.getAccess().getVirtualPc(), event.getTag());
             }
         });

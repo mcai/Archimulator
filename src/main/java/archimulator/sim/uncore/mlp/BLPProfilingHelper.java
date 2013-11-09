@@ -89,9 +89,7 @@ public class BLPProfilingHelper {
         this.blpCostQuantizer = rawValue -> {
             if (rawValue < 0) {
                 throw new IllegalArgumentException();
-            }
-
-            if (rawValue <= 42) {
+            } else if (rawValue <= 42) {
                 return 0;
             } else if (rawValue <= 85) {
                 return 1;
@@ -140,7 +138,7 @@ public class BLPProfilingHelper {
     private void profileBeginServicingL2CacheMiss(BasicMemoryController.BeginAccessEvent event) {
         PendingDramBankAccess pendingDramBankAccess = new PendingDramBankAccess(event.getAddress(), event.getBank(), memoryController.getCycleAccurateEventQueue().getCurrentCycle());
 
-        if(this.pendingDRAMBankAccesses.containsKey(event.getAddress())) {
+        if (this.pendingDRAMBankAccesses.containsKey(event.getAddress())) {
             throw new IllegalArgumentException(event + "");
         }
 

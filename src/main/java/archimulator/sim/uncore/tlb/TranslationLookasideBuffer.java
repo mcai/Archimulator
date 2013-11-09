@@ -55,7 +55,17 @@ public class TranslationLookasideBuffer implements Named, Reportable {
     public TranslationLookasideBuffer(SimulationObject parent, String name) {
         this.name = name;
 
-        this.cache = new EvictableCache<>(parent, name, new CacheGeometry(parent.getExperiment().getArchitecture().getTlbSize(), parent.getExperiment().getArchitecture().getTlbAssociativity(), parent.getExperiment().getArchitecture().getTlbLineSize()), CacheReplacementPolicyType.LRU, args -> new BooleanValueProvider());
+        this.cache = new EvictableCache<>(
+                parent,
+                name,
+                new CacheGeometry(
+                        parent.getExperiment().getArchitecture().getTlbSize(),
+                        parent.getExperiment().getArchitecture().getTlbAssociativity(),
+                        parent.getExperiment().getArchitecture().getTlbLineSize()
+                ),
+                CacheReplacementPolicyType.LRU,
+                args -> new BooleanValueProvider()
+        );
     }
 
     /**

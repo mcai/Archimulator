@@ -22,7 +22,6 @@ import archimulator.model.*;
 import archimulator.service.impl.*;
 import archimulator.util.PropertiesHelper;
 import archimulator.util.serialization.XMLSerializationHelper;
-import net.pickapack.action.Action1;
 import net.pickapack.event.BlockingEvent;
 import net.pickapack.event.BlockingEventDispatcher;
 import org.apache.commons.io.FileUtils;
@@ -76,7 +75,7 @@ public class ServiceManager {
         userService.initialize();
         systemSettingService.initialize();
 
-        experimentPacksToTasksMap = new LinkedHashMap<Long, Task>();
+        experimentPacksToTasksMap = new LinkedHashMap<>();
 
         startTasks();
 
@@ -91,14 +90,9 @@ public class ServiceManager {
             File fileTaskInputs = new File("experiment_tasks");
 
             if(fileTaskInputs.exists()) {
-                List<File> files = new ArrayList<File>(FileUtils.listFiles(fileTaskInputs, new String[]{"xml"}, true));
+                List<File> files = new ArrayList<>(FileUtils.listFiles(fileTaskInputs, new String[]{"xml"}, true));
 
-                Collections.sort(files, new Comparator<File>() {
-                    @Override
-                    public int compare(File o1, File o2) {
-                        return o1.getAbsolutePath().compareTo(o2.getAbsolutePath());
-                    }
-                });
+                files.sort(Comparator.comparing(File::getAbsolutePath));
 
                 for (File file : files) {
                     String text = FileUtils.readFileToString(file);
@@ -122,19 +116,8 @@ public class ServiceManager {
                     }
                 }
 
-                getBlockingEventDispatcher().addListener(ExperimentStartedEvent.class, new Action1<ExperimentStartedEvent>() {
-                    @Override
-                    public void apply(ExperimentStartedEvent event) {
-                        printStats(event.getSender().getParent());
-                    }
-                });
-
-                getBlockingEventDispatcher().addListener(ExperimentStoppedEvent.class, new Action1<ExperimentStoppedEvent>() {
-                    @Override
-                    public void apply(ExperimentStoppedEvent event) {
-                        printStats(event.getSender().getParent());
-                    }
-                });
+                getBlockingEventDispatcher().addListener(ExperimentStartedEvent.class, event -> printStats(event.getSender().getParent()));
+                getBlockingEventDispatcher().addListener(ExperimentStoppedEvent.class, event -> printStats(event.getSender().getParent()));
             }
         } catch (IOException e) {
             e.printStackTrace();

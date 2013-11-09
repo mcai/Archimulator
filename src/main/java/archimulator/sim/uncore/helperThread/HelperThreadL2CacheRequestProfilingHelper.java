@@ -92,28 +92,22 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
 
         this.l2CacheController.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, event -> {
             if (event.getCacheController().equals(HelperThreadL2CacheRequestProfilingHelper.this.l2CacheController)) {
-                int set = event.getSet();
                 boolean requesterIsHelperThread = HelperThreadingHelper.isHelperThread(event.getAccess().getThread());
-                boolean lineFoundIsHelperThread = helperThreadL2CacheRequestStates.get(set).get(event.getWay()).getThreadId() == HelperThreadingHelper.getHelperThreadId();
-
+                boolean lineFoundIsHelperThread = helperThreadL2CacheRequestStates.get(event.getSet()).get(event.getWay()).getThreadId() == HelperThreadingHelper.getHelperThreadId();
                 handleL2CacheRequest(event, requesterIsHelperThread, lineFoundIsHelperThread);
             }
         });
 
         this.l2CacheController.getBlockingEventDispatcher().addListener(LastLevelCacheControllerLineInsertEvent.class, event -> {
             if (event.getCacheController().equals(HelperThreadL2CacheRequestProfilingHelper.this.l2CacheController)) {
-                int set = event.getSet();
-                boolean lineFoundIsHelperThread = helperThreadL2CacheRequestStates.get(set).get(event.getWay()).getThreadId() == HelperThreadingHelper.getHelperThreadId();
-
+                boolean lineFoundIsHelperThread = helperThreadL2CacheRequestStates.get(event.getSet()).get(event.getWay()).getThreadId() == HelperThreadingHelper.getHelperThreadId();
                 handleL2CacheLineInsert(event, lineFoundIsHelperThread);
             }
         });
 
         this.l2CacheController.getBlockingEventDispatcher().addListener(GeneralCacheControllerLastPutSOrPutMAndDataFromOwnerEvent.class, event -> {
             if (event.getCacheController().equals(HelperThreadL2CacheRequestProfilingHelper.this.l2CacheController)) {
-                int set = event.getSet();
-
-                markInvalid(set, event.getWay());
+                markInvalid(event.getSet(), event.getWay());
             }
         });
 

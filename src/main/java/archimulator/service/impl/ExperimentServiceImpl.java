@@ -34,9 +34,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
@@ -73,59 +72,57 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
         try {
             TransactionManager.callInTransaction(getConnectionSource(),
-                    new Callable<Void>() {
-                        public Void call() throws Exception {
-                            try {
-                                File fileExperimentInputs = new File("experiment_inputs");
+                    () -> {
+                        try {
+                            File fileExperimentInputs = new File("experiment_inputs");
 
-                                if(fileExperimentInputs.exists()) {
-                                    List<File> files = new ArrayList<File>(FileUtils.listFiles(fileExperimentInputs, new String[]{"xml"}, true));
+                            if(fileExperimentInputs.exists()) {
+                                List<File> files = new ArrayList<File>(FileUtils.listFiles(fileExperimentInputs, new String[]{"xml"}, true));
 
-                                    Collections.sort(files, (o1, o2) -> o1.getAbsolutePath().compareTo(o2.getAbsolutePath()));
+                                files.sort(Comparator.comparing(File::getAbsolutePath));
 
-                                    for (File file : files) {
-                                        String text = FileUtils.readFileToString(file);
+                                for (File file : files) {
+                                    String text = FileUtils.readFileToString(file);
 
-                                        ExperimentPack experimentPack = XMLSerializationHelper.deserialize(ExperimentPack.class, text);
+                                    ExperimentPack experimentPack = XMLSerializationHelper.deserialize(ExperimentPack.class, text);
 
-                                        if (experimentPack != null) {
-                                            if (getExperimentPackByTitle(experimentPack.getTitle()) == null) {
-                                                addExperimentPack(experimentPack);
-                                                System.out.println("Experiment pack " + experimentPack.getTitle() + " added.");
+                                    if (experimentPack != null) {
+                                        if (getExperimentPackByTitle(experimentPack.getTitle()) == null) {
+                                            addExperimentPack(experimentPack);
+                                            System.out.println("Experiment pack " + experimentPack.getTitle() + " added.");
 
-                                                for (ExperimentSpec experimentSpec : experimentPack.getExperimentSpecs()) {
-                                                    ExperimentType experimentType = experimentPack.getExperimentType();
-                                                    Benchmark benchmark = experimentSpec.getBenchmark();
-                                                    Architecture architecture = experimentSpec.getArchitecture();
-                                                    String arguments = experimentSpec.getBenchmark().getDefaultArguments();
+                                            for (ExperimentSpec experimentSpec : experimentPack.getExperimentSpecs()) {
+                                                ExperimentType experimentType = experimentPack.getExperimentType();
+                                                Benchmark benchmark = experimentSpec.getBenchmark();
+                                                Architecture architecture = experimentSpec.getArchitecture();
+                                                String arguments = experimentSpec.getBenchmark().getDefaultArguments();
 
-                                                    List<ContextMapping> contextMappings = new ArrayList<ContextMapping>();
+                                                List<ContextMapping> contextMappings = new ArrayList<>();
 
-                                                    ContextMapping contextMapping = new ContextMapping(0, benchmark, arguments);
-                                                    contextMapping.setHelperThreadLookahead(experimentSpec.getHelperThreadLookahead());
-                                                    contextMapping.setHelperThreadStride(experimentSpec.getHelperThreadStride());
-                                                    contextMappings.add(contextMapping);
+                                                ContextMapping contextMapping = new ContextMapping(0, benchmark, arguments);
+                                                contextMapping.setHelperThreadLookahead(experimentSpec.getHelperThreadLookahead());
+                                                contextMapping.setHelperThreadStride(experimentSpec.getHelperThreadStride());
+                                                contextMappings.add(contextMapping);
 
-                                                    Experiment experiment = new Experiment(experimentPack, experimentType, architecture, experimentSpec.getNumMaxInstructions(), contextMappings);
-                                                    addExperiment(experiment);
+                                                Experiment experiment = new Experiment(experimentPack, experimentType, architecture, experimentSpec.getNumMaxInstructions(), contextMappings);
+                                                addExperiment(experiment);
 
-                                                    System.out.println("Experiment " + experiment.getTitle() + " added.");
-                                                }
-
-                                                updateExperimentPack(experimentPack);
+                                                System.out.println("Experiment " + experiment.getTitle() + " added.");
                                             }
+
+                                            updateExperimentPack(experimentPack);
                                         }
                                     }
                                 }
-
-                                return null;
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                                throw new RuntimeException(e);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                throw new RuntimeException(e);
                             }
+
+                            return null;
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            throw new RuntimeException(e);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            throw new RuntimeException(e);
                         }
                     });
         } catch (SQLException e) {
@@ -430,7 +427,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
     @Override
     public List<ExperimentPack> getExperimentPacksByTag(String tag) {
-        List<ExperimentPack> result = new ArrayList<ExperimentPack>();
+        List<ExperimentPack> result = new ArrayList<>();
 
         for(ExperimentPack experimentPack : this.getAllExperimentPacks()) {
             if(experimentPack.getTags().contains(tag)) {

@@ -146,9 +146,7 @@ public class BasicMemoryController extends MemoryController {
          */
         private void access(final int row, final boolean contiguous, final Action onCompletedCallback) {
             if (this.status == BankStatus.CLOSED) {
-                this.precharge(() -> {
-                    access(row, contiguous, onCompletedCallback);
-                });
+                this.precharge(() -> access(row, contiguous, onCompletedCallback));
             } else {
                 if (currentRow == row) {
                     if (contiguous) {
@@ -159,10 +157,7 @@ public class BasicMemoryController extends MemoryController {
                 } else {
                     getCycleAccurateEventQueue().schedule(this, () -> {
                         currentRow = row;
-
-                        precharge(() -> {
-                            access(row, contiguous, onCompletedCallback);
-                        });
+                        precharge(() -> access(row, contiguous, onCompletedCallback));
                     }, getConflictLatency());
                 }
             }
