@@ -35,10 +35,9 @@ public class MLPSensitiveLRUPolicy<StateT extends Serializable> extends CostSens
      * Create a MLP sensitive least recently used (LRU) policy for the specified evictable cache.
      *
      * @param cache the parent evictable cache
-     * @param lambda the lambda value
      */
-    public MLPSensitiveLRUPolicy(EvictableCache<StateT> cache, int lambda) {
-        super(cache, lambda);
+    public MLPSensitiveLRUPolicy(EvictableCache<StateT> cache) {
+        super(cache);
 
         cache.getBlockingEventDispatcher().addListener(
                 MLPProfilingHelper.L2MissMLPProfiledEvent.class,

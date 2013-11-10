@@ -142,5 +142,10 @@ public enum CacheReplacementPolicyType {
     /**
      * Linear MLP-aware least recently used (LRU), with lambda being 7.
      */
-    LINEAR_MLP_AWARE_LRU_LAMBDA_7
+    LINEAR_MLP_AWARE_LRU_LAMBDA_7,
+
+    /**
+     * MLP-sensitive least recently used (LRU).
+     */
+    MLP_SENSITIVE_LRU
 }

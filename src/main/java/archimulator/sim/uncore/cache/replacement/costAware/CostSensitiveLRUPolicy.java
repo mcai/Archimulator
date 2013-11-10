@@ -19,7 +19,6 @@
 package archimulator.sim.uncore.cache.replacement.costAware;
 
 import archimulator.sim.uncore.MemoryHierarchyAccess;
-import archimulator.sim.uncore.cache.Cache;
 import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.cache.EvictableCache;
 
@@ -32,14 +31,15 @@ import java.io.Serializable;
  * @author Min Cai
  */
 public abstract class CostSensitiveLRUPolicy<StateT extends Serializable> extends AbstractCostAwareLRUPolicy<StateT> {
+    private double aCost;
+
     /**
      * Create a cost sensitive least recently used (LRU) policy.
      *
      * @param cache the parent evictable cache
-     * @param lambda the lambda value
      */
-    public CostSensitiveLRUPolicy(EvictableCache<StateT> cache, int lambda) {
-        super(cache, lambda);
+    public CostSensitiveLRUPolicy(EvictableCache<StateT> cache) {
+        super(cache);
     }
 
     /**
@@ -52,7 +52,30 @@ public abstract class CostSensitiveLRUPolicy<StateT extends Serializable> extend
      */
     @Override
     public CacheAccess<StateT> handleReplacement(MemoryHierarchyAccess access, int set, int tag) {
-        //TODO
-        return null;
+        int lruWay = this.getLRU(set);
+
+        for (int i = this.getCache().getAssociativity() - 2; i >= 0; i--) {
+            int way = this.getWayInStackPosition(set, i);
+
+            if (this.getCost(set, way) < aCost) {
+                aCost -= (double) this.getQuantizedCost(this.getCost(set, way)) * 2;
+                new CacheAccess<>(this.getCache(), access, set, way, tag);
+            }
+        }
+
+        return new CacheAccess<>(this.getCache(), access, set, lruWay, tag);
+    }
+
+    @Override
+    public void setStackPosition(int set, int way, int newStackPosition) {
+        int oldLruWay = this.getLRU(set);
+
+        super.setStackPosition(set, way, newStackPosition);
+
+        int newLruWay = this.getLRU(set);
+
+        if(oldLruWay != newLruWay) {
+            aCost = this.getCost(set, newLruWay);
+        }
     }
 }

@@ -23,6 +23,7 @@ import archimulator.sim.uncore.cache.partitioning.Partitioner;
 import archimulator.sim.uncore.cache.partitioning.cpiBased.CPIBasedCachePartitioningHelper;
 import archimulator.sim.uncore.cache.partitioning.minMiss.MinMissCachePartitioningHelper;
 import archimulator.sim.uncore.cache.partitioning.mlpAware.MLPAwareCachePartitioningHelper;
+import archimulator.sim.uncore.cache.replacement.costAware.mlp.MLPSensitiveLRUPolicy;
 import archimulator.sim.uncore.cache.replacement.helperThread.HelperThreadAwareLRUPolicy;
 import archimulator.sim.uncore.cache.replacement.helperThread.HelperThreadIntervalAwareLRUPolicy;
 import archimulator.sim.uncore.cache.replacement.costAware.mlp.LinearMLPAwareLRUPolicy;
@@ -112,6 +113,8 @@ public class CacheReplacementPolicyFactory {
                 return new LinearMLPAwareLRUPolicy<>(cache, 6);
             case LINEAR_MLP_AWARE_LRU_LAMBDA_7:
                 return new LinearMLPAwareLRUPolicy<>(cache, 7);
+            case MLP_SENSITIVE_LRU:
+                return new MLPSensitiveLRUPolicy<>(cache);
             default:
                 throw new IllegalArgumentException();
         }

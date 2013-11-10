@@ -31,6 +31,8 @@ import java.io.Serializable;
  * @author Min Cai
  */
 public abstract class CostBasedLRUPolicy<StateT extends Serializable> extends AbstractCostAwareLRUPolicy<StateT> {
+    protected int lambda;
+
     /**
      * Create a cost based least recently used (LRU) policy.
      *
@@ -38,7 +40,8 @@ public abstract class CostBasedLRUPolicy<StateT extends Serializable> extends Ab
      * @param lambda the lambda value
      */
     public CostBasedLRUPolicy(EvictableCache<StateT> cache, int lambda) {
-        super(cache, lambda);
+        super(cache);
+        this.lambda = lambda;
     }
 
     /**

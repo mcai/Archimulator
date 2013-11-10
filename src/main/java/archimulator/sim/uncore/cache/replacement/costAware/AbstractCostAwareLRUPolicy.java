@@ -34,17 +34,14 @@ import java.io.Serializable;
  */
 public abstract class AbstractCostAwareLRUPolicy<StateT extends Serializable> extends LRUPolicy<StateT> {
     protected Cache<Boolean> mirrorCache;
-    protected int lambda;
 
     /**
      * Create an abstract cost aware least recently used (LRU) policy.
      *
      * @param cache the parent evictable cache
-     * @param lambda the lambda value
      */
-    public AbstractCostAwareLRUPolicy(EvictableCache<StateT> cache, int lambda) {
+    public AbstractCostAwareLRUPolicy(EvictableCache<StateT> cache) {
         super(cache);
-        this.lambda = lambda;
         this.mirrorCache = new Cache<>(cache, cache.getName() + ".costBasedLRUPolicy.mirrorCache", cache.getGeometry(), args -> new BooleanValueProvider());
     }
 
