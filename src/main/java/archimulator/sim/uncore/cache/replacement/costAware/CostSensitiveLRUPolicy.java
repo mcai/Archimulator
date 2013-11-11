@@ -21,6 +21,7 @@ package archimulator.sim.uncore.cache.replacement.costAware;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.cache.EvictableCache;
+import archimulator.sim.uncore.coherence.msi.state.DirectoryControllerState;
 
 import java.io.Serializable;
 
@@ -57,15 +58,21 @@ public abstract class CostSensitiveLRUPolicy<StateT extends Serializable> extend
         for (int i = this.getCache().getAssociativity() - 2; i >= 0; i--) {
             int way = this.getWayInStackPosition(set, i);
 
-            double cost = this.getCost(set, way);
+            StateT state = this.getCache().getLine(set, way).getState();
 
-            if(cost <= 0) {
-                throw new IllegalArgumentException(cost + "");
-            }
+            boolean stable = !(state instanceof DirectoryControllerState) || ((DirectoryControllerState) state).isStable();
 
-            if (cost < aCost) {
-                aCost -= cost * 2;
-                new CacheAccess<>(this.getCache(), access, set, way, tag);
+            if(stable) {
+                double cost = this.getCost(set, way);
+
+                if(cost <= 0) {
+                    throw new IllegalArgumentException(cost + "");
+                }
+
+                if (cost < aCost) {
+                    aCost -= cost * 2;
+                    new CacheAccess<>(this.getCache(), access, set, way, tag);
+                }
             }
         }
 
@@ -81,10 +88,16 @@ public abstract class CostSensitiveLRUPolicy<StateT extends Serializable> extend
         int newLruWay = this.getLRU(set);
 
         if (this.getCache().getLine(set, newLruWay).isValid() && oldLruWay != newLruWay) {
-            aCost = this.getCost(set, newLruWay);
+            StateT state = this.getCache().getLine(set, newLruWay).getState();
 
-            if (aCost <= 0) {
-                throw new IllegalArgumentException(aCost + "");
+            boolean stable = !(state instanceof DirectoryControllerState) || ((DirectoryControllerState) state).isStable();
+
+            if(stable) {
+                aCost = this.getCost(set, newLruWay);
+
+                if (aCost <= 0) {
+                    throw new IllegalArgumentException(aCost + "");
+                }
             }
         }
     }
