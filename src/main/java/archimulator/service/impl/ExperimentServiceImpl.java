@@ -77,7 +77,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
                             File fileExperimentInputs = new File("experiment_inputs");
 
                             if(fileExperimentInputs.exists()) {
-                                List<File> files = new ArrayList<File>(FileUtils.listFiles(fileExperimentInputs, new String[]{"xml"}, true));
+                                List<File> files = new ArrayList<>(FileUtils.listFiles(fileExperimentInputs, new String[]{"xml"}, true));
 
                                 files.sort(Comparator.comparing(File::getAbsolutePath));
 

@@ -250,7 +250,7 @@ public class BasicMemoryHierarchy extends BasicSimulationObject implements Memor
 
     @Override
     public List<TranslationLookasideBuffer> getTlbs() {
-        List<TranslationLookasideBuffer> tlbs = new ArrayList<TranslationLookasideBuffer>();
+        List<TranslationLookasideBuffer> tlbs = new ArrayList<>();
         tlbs.addAll(getItlbs());
         tlbs.addAll(getDtlbs());
         return tlbs;

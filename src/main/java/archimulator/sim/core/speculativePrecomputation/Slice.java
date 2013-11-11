@@ -55,8 +55,8 @@ public class Slice {
         this.delinquentLoad = delinquentLoad;
 
         this.setTriggerPc(0);
-        this.setLiveIns(new HashSet<Integer>());
-        this.setPcs(new ArrayList<Integer>());
+        this.setLiveIns(new HashSet<>());
+        this.setPcs(new ArrayList<>());
 
         this.setNumSpawnings(0);
 

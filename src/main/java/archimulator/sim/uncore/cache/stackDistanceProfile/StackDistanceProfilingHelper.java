@@ -113,7 +113,7 @@ public class StackDistanceProfilingHelper implements Reportable {
      */
     private Stack<Integer> getLruStack(int set) {
         if (!this.l2CacheLruStacks.containsKey(set)) {
-            this.l2CacheLruStacks.put(set, new Stack<Integer>());
+            this.l2CacheLruStacks.put(set, new Stack<>());
         }
 
         return this.l2CacheLruStacks.get(set);

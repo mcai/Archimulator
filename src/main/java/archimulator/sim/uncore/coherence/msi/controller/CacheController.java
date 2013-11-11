@@ -414,9 +414,7 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
                 CacheLine<CacheControllerState> line = this.getCache().getLine(set, cacheAccess.getWay());
                 CacheControllerFiniteStateMachine fsm = (CacheControllerFiniteStateMachine) line.getStateProvider();
                 fsm.onEventReplacement(producerFlow, tag, cacheAccess,
-                        () -> {
-                            onReplacementCompletedCallback.apply(set, cacheAccess.getWay());
-                        },
+                        () -> onReplacementCompletedCallback.apply(set, cacheAccess.getWay()),
                         () -> {
                             getCycleAccurateEventQueue().schedule(CacheController.this, onReplacementStalledCallback, 1);
                         }

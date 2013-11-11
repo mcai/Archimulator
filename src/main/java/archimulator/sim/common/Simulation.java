@@ -144,7 +144,7 @@ public abstract class Simulation implements SimulationObject, Reportable {
     /**
      * Pending cache coherence flows.
      */
-    public List<CacheCoherenceFlow> pendingFlows = new ArrayList<CacheCoherenceFlow>();
+    public List<CacheCoherenceFlow> pendingFlows = new ArrayList<>();
 
     /**
      * Create a simulation.

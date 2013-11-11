@@ -59,7 +59,7 @@ public class ServiceManager {
         System.out.println("Archimulator (version: " + PropertiesHelper.getVersion() + ") - CMP Architectural Simulator Written in Java.\n");
         System.out.println("Copyright (c) 2010-2013 by Min Cai (min.cai.china@gmail.com).\n");
 
-        blockingEventDispatcher = new BlockingEventDispatcher<BlockingEvent>();
+        blockingEventDispatcher = new BlockingEventDispatcher<>();
 
         benchmarkService = new BenchmarkServiceImpl();
         architectureService = new ArchitectureServiceImpl();

@@ -227,7 +227,7 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
             }
         }
 
-        return new ArrayList<ExperimentStat>();
+        return new ArrayList<>();
     }
 
     @Override

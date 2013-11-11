@@ -94,7 +94,7 @@ public class BasicProcess extends Process {
                         this.getMemory().writeBlock((int) sectionHeader.getAddress(), (int) sectionHeader.getSize(), sectionHeader.readContent(elfFile));
 
                         if ((sectionHeader.getFlags() & ElfSectionHeader.SHF_EXECINSTR) != 0) {
-                            this.instructions.put(sectionHeader.getName(), new TreeMap<Integer, Instruction>());
+                            this.instructions.put(sectionHeader.getName(), new TreeMap<>());
 
                             for (int i = 0; i < (int) sectionHeader.getSize(); i += 4) {
                                 int pc = (int) sectionHeader.getAddress() + i;

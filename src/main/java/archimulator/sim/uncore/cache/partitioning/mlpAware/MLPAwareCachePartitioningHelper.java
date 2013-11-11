@@ -175,7 +175,7 @@ public class MLPAwareCachePartitioningHelper extends CachePartitioningHelper {
      */
     private void freeInvalidL2CacheHitsPerCycle() {
         for (Map<Integer, PendingL2Hit> pendingL2HitsPerThread : this.pendingL2Hits.values()) {
-            List<Integer> tagsToFree = new ArrayList<Integer>();
+            List<Integer> tagsToFree = new ArrayList<>();
 
             for (PendingL2Hit pendingL2Hit : pendingL2HitsPerThread.values()) {
                 if (pendingL2Hit.getNumCommittedInstructionsSinceAccess() >= this.getL2CacheController().getExperiment().getArchitecture().getReorderBufferCapacity()
@@ -260,7 +260,7 @@ public class MLPAwareCachePartitioningHelper extends CachePartitioningHelper {
         };
 
         if (!this.pendingL2Hits.containsKey(getThreadIdentifier(access.getThread()))) {
-            this.pendingL2Hits.put(getThreadIdentifier(access.getThread()), new LinkedHashMap<Integer, PendingL2Hit>());
+            this.pendingL2Hits.put(getThreadIdentifier(access.getThread()), new LinkedHashMap<>());
         }
 
         this.pendingL2Hits.get(getThreadIdentifier(access.getThread())).put(tag, pendingL2Hit);
@@ -301,7 +301,7 @@ public class MLPAwareCachePartitioningHelper extends CachePartitioningHelper {
      */
     private LRUStack getLruStack(int threadId, int set) {
         if (!this.lruStacks.containsKey(threadId)) {
-            this.lruStacks.put(threadId, new LinkedHashMap<Integer, LRUStack>());
+            this.lruStacks.put(threadId, new LinkedHashMap<>());
         }
 
         if (!this.lruStacks.get(threadId).containsKey(set)) {
@@ -376,7 +376,7 @@ public class MLPAwareCachePartitioningHelper extends CachePartitioningHelper {
             }
         }
 
-        return new Pair<Integer, List<Integer>>(minMlpCostSum, minPartition);
+        return new Pair<>(minMlpCostSum, minPartition);
     }
 
     @Override

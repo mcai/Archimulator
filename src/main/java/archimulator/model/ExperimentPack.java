@@ -236,7 +236,7 @@ public class ExperimentPack implements WithId, WithTitle, WithCreateTime {
      * @param tags the list of tags
      */
     public void setTags(List<String> tags) {
-        this.tags = new ArrayList<String>(tags);
+        this.tags = new ArrayList<>(tags);
     }
 
     /**
@@ -254,7 +254,7 @@ public class ExperimentPack implements WithId, WithTitle, WithCreateTime {
      * @param benchmarkTitle the list of benchmark titles
      */
     public void setBenchmarkTitle(List<String> benchmarkTitle) {
-        this.benchmarkTitle = new ArrayList<String>(benchmarkTitle);
+        this.benchmarkTitle = new ArrayList<>(benchmarkTitle);
     }
 
     /**
@@ -272,7 +272,7 @@ public class ExperimentPack implements WithId, WithTitle, WithCreateTime {
      * @param numMaxInstructions the list of maximum number of instructions
      */
     public void setNumMaxInstructions(List<String> numMaxInstructions) {
-        this.numMaxInstructions = new ArrayList<String>(numMaxInstructions);
+        this.numMaxInstructions = new ArrayList<>(numMaxInstructions);
     }
 
     /**
@@ -290,7 +290,7 @@ public class ExperimentPack implements WithId, WithTitle, WithCreateTime {
      * @param helperThreadLookahead the list of helper thread lookahead values
      */
     public void setHelperThreadLookahead(List<String> helperThreadLookahead) {
-        this.helperThreadLookahead = new ArrayList<String>(helperThreadLookahead);
+        this.helperThreadLookahead = new ArrayList<>(helperThreadLookahead);
     }
 
     /**
@@ -308,7 +308,7 @@ public class ExperimentPack implements WithId, WithTitle, WithCreateTime {
      * @param helperThreadStride the list of helper thread stride values
      */
     public void setHelperThreadStride(List<String> helperThreadStride) {
-        this.helperThreadStride = new ArrayList<String>(helperThreadStride);
+        this.helperThreadStride = new ArrayList<>(helperThreadStride);
     }
 
     /**
@@ -326,7 +326,7 @@ public class ExperimentPack implements WithId, WithTitle, WithCreateTime {
      * @param numMainThreadWaysInStaticPartitionedLRUPolicy the list of number of main thread ways used in the static partitioned LRU policy
      */
     public void setNumMainThreadWaysInStaticPartitionedLRUPolicy(List<String> numMainThreadWaysInStaticPartitionedLRUPolicy) {
-        this.numMainThreadWaysInStaticPartitionedLRUPolicy = new ArrayList<String>(numMainThreadWaysInStaticPartitionedLRUPolicy);
+        this.numMainThreadWaysInStaticPartitionedLRUPolicy = new ArrayList<>(numMainThreadWaysInStaticPartitionedLRUPolicy);
     }
 
     /**
@@ -344,7 +344,7 @@ public class ExperimentPack implements WithId, WithTitle, WithCreateTime {
      * @param numCores the list of number of cores
      */
     public void setNumCores(List<String> numCores) {
-        this.numCores = new ArrayList<String>(numCores);
+        this.numCores = new ArrayList<>(numCores);
     }
 
     /**
@@ -362,7 +362,7 @@ public class ExperimentPack implements WithId, WithTitle, WithCreateTime {
      * @param numThreadsPerCore the list of number of threads per core
      */
     public void setNumThreadsPerCore(List<String> numThreadsPerCore) {
-        this.numThreadsPerCore = new ArrayList<String>(numThreadsPerCore);
+        this.numThreadsPerCore = new ArrayList<>(numThreadsPerCore);
     }
 
     /**
@@ -380,7 +380,7 @@ public class ExperimentPack implements WithId, WithTitle, WithCreateTime {
      * @param l1ISize the list of L1I cache size values
      */
     public void setL1ISize(List<String> l1ISize) {
-        this.l1ISize = new ArrayList<String>(l1ISize);
+        this.l1ISize = new ArrayList<>(l1ISize);
     }
 
     /**
@@ -398,7 +398,7 @@ public class ExperimentPack implements WithId, WithTitle, WithCreateTime {
      * @param l1IAssociativity the list of L1I cache associativity values
      */
     public void setL1IAssociativity(List<String> l1IAssociativity) {
-        this.l1IAssociativity = new ArrayList<String>(l1IAssociativity);
+        this.l1IAssociativity = new ArrayList<>(l1IAssociativity);
     }
 
     /**
@@ -416,7 +416,7 @@ public class ExperimentPack implements WithId, WithTitle, WithCreateTime {
      * @param l1DSize the list of L1D cache size values
      */
     public void setL1DSize(List<String> l1DSize) {
-        this.l1DSize = new ArrayList<String>(l1DSize);
+        this.l1DSize = new ArrayList<>(l1DSize);
     }
 
     /**
@@ -434,7 +434,7 @@ public class ExperimentPack implements WithId, WithTitle, WithCreateTime {
      * @param l1DAssociativity the list of L1D cache associativity values
      */
     public void setL1DAssociativity(List<String> l1DAssociativity) {
-        this.l1DAssociativity = new ArrayList<String>(l1DAssociativity);
+        this.l1DAssociativity = new ArrayList<>(l1DAssociativity);
     }
 
     /**
@@ -452,7 +452,7 @@ public class ExperimentPack implements WithId, WithTitle, WithCreateTime {
      * @param l2Size the list of L2 cache size values
      */
     public void setL2Size(List<String> l2Size) {
-        this.l2Size = new ArrayList<String>(l2Size);
+        this.l2Size = new ArrayList<>(l2Size);
     }
 
     /**
@@ -470,7 +470,7 @@ public class ExperimentPack implements WithId, WithTitle, WithCreateTime {
      * @param l2Associativity the list of L2 cache associativity values
      */
     public void setL2Associativity(List<String> l2Associativity) {
-        this.l2Associativity = new ArrayList<String>(l2Associativity);
+        this.l2Associativity = new ArrayList<>(l2Associativity);
     }
 
     /**
@@ -488,7 +488,7 @@ public class ExperimentPack implements WithId, WithTitle, WithCreateTime {
      * @param l2ReplacementPolicyType the list of L2 cache replacement policy type values
      */
     public void setL2ReplacementPolicyType(List<String> l2ReplacementPolicyType) {
-        this.l2ReplacementPolicyType = new ArrayList<String>(l2ReplacementPolicyType);
+        this.l2ReplacementPolicyType = new ArrayList<>(l2ReplacementPolicyType);
     }
 
     /**
@@ -506,7 +506,7 @@ public class ExperimentPack implements WithId, WithTitle, WithCreateTime {
      * @param memoryControllerType the list of memory controller types
      */
     public void setMemoryControllerType(List<String> memoryControllerType) {
-        this.memoryControllerType = new ArrayList<String>(memoryControllerType);
+        this.memoryControllerType = new ArrayList<>(memoryControllerType);
     }
 
     /**
@@ -524,7 +524,7 @@ public class ExperimentPack implements WithId, WithTitle, WithCreateTime {
      * @param dynamicSpeculativePrecomputationEnabled the list of boolean values indicating whether the dynamic speculative precomputation is enabled or not
      */
     public void setDynamicSpeculativePrecomputationEnabled(List<String> dynamicSpeculativePrecomputationEnabled) {
-        this.dynamicSpeculativePrecomputationEnabled = new ArrayList<String>(dynamicSpeculativePrecomputationEnabled);
+        this.dynamicSpeculativePrecomputationEnabled = new ArrayList<>(dynamicSpeculativePrecomputationEnabled);
     }
 
     /**
@@ -534,7 +534,7 @@ public class ExperimentPack implements WithId, WithTitle, WithCreateTime {
      */
     public List<ExperimentSpec> getExperimentSpecs() {
         try {
-            List<ExperimentSpec> experimentSpecs = new ArrayList<ExperimentSpec>();
+            List<ExperimentSpec> experimentSpecs = new ArrayList<>();
 
             for (List<String> combination : getCombinations()) {
                 ExperimentSpec experimentSpec = new ExperimentSpec();
@@ -563,7 +563,7 @@ public class ExperimentPack implements WithId, WithTitle, WithCreateTime {
      */
     public List<ExperimentPackVariable> getVariables() {
         if (this.variables == null) {
-            this.variables = new ArrayList<ExperimentPackVariable>();
+            this.variables = new ArrayList<>();
         }
 
         if (this.variables.isEmpty()) {

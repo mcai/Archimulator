@@ -104,7 +104,7 @@ public class MinMissCachePartitioningHelper extends CachePartitioningHelper {
      */
     private LRUStack getLruStack(int threadId, int set) {
         if (!this.lruStacks.containsKey(threadId)) {
-            this.lruStacks.put(threadId, new LinkedHashMap<Integer, LRUStack>());
+            this.lruStacks.put(threadId, new LinkedHashMap<>());
         }
 
         if (!this.lruStacks.get(threadId).containsKey(set)) {

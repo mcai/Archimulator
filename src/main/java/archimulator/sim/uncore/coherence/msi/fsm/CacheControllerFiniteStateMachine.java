@@ -357,9 +357,7 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
      * @param event  the L1 cache controller event
      */
     public void stall(final Object sender, final CacheControllerEvent event) {
-        stall((Action) () -> {
-            fireTransition(sender, event);
-        });
+        stall(() -> fireTransition(sender, event));
     }
 
     /**

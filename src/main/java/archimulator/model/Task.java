@@ -114,7 +114,7 @@ public class Task {
      * @param tags the list of tags to run
      */
     public void setTags(List<String> tags) {
-        this.tags = new ArrayList<String>(tags);
+        this.tags = new ArrayList<>(tags);
     }
 
     /**
@@ -132,6 +132,6 @@ public class Task {
      * @param experimentPackTitles the list of experiment pack titles to run
      */
     public void setExperimentPackTitles(List<String> experimentPackTitles) {
-        this.experimentPackTitles = new ArrayList<String>(experimentPackTitles);
+        this.experimentPackTitles = new ArrayList<>(experimentPackTitles);
     }
 }

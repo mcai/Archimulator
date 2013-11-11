@@ -129,9 +129,10 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
             }
         });
 
-        this.l2CacheController.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestEvent.class, event -> {
-            helperThreadL2CacheRequestQualityPredictor.update(event.getPc(), event.getQuality().isUseful());
-        });
+        this.l2CacheController.getBlockingEventDispatcher().addListener(
+                HelperThreadL2CacheRequestEvent.class,
+                event -> helperThreadL2CacheRequestQualityPredictor.update(event.getPc(), event.getQuality().isUseful())
+        );
     }
 
     /**
