@@ -58,21 +58,15 @@ public abstract class CostSensitiveLRUPolicy<StateT extends Serializable> extend
         for (int i = this.getCache().getAssociativity() - 2; i >= 0; i--) {
             int way = this.getWayInStackPosition(set, i);
 
-            StateT state = this.getCache().getLine(set, way).getState();
+            double cost = this.getCost(set, way);
 
-            boolean stable = !(state instanceof DirectoryControllerState) || ((DirectoryControllerState) state).isStable();
+            if(cost <= 0) {
+                throw new IllegalArgumentException(cost + "");
+            }
 
-            if(stable) {
-                double cost = this.getCost(set, way);
-
-                if(cost <= 0) {
-                    throw new IllegalArgumentException(cost + "");
-                }
-
-                if (cost < aCost) {
-                    aCost -= cost * 2;
-                    new CacheAccess<>(this.getCache(), access, set, way, tag);
-                }
+            if (cost < aCost) {
+                aCost -= cost * 2;
+                new CacheAccess<>(this.getCache(), access, set, way, tag);
             }
         }
 
@@ -87,17 +81,13 @@ public abstract class CostSensitiveLRUPolicy<StateT extends Serializable> extend
 
         int newLruWay = this.getLRU(set);
 
-        if (this.getCache().getLine(set, newLruWay).isValid() && oldLruWay != newLruWay) {
-            StateT state = this.getCache().getLine(set, newLruWay).getState();
+        double cost = this.getCost(set, newLruWay);
 
-            boolean stable = !(state instanceof DirectoryControllerState) || ((DirectoryControllerState) state).isStable();
+        if (this.getCache().getLine(set, newLruWay).isValid() && (oldLruWay != newLruWay || aCost > cost)) {
+            aCost = cost;
 
-            if(stable) {
-                aCost = this.getCost(set, newLruWay);
-
-                if (aCost <= 0) {
-                    throw new IllegalArgumentException(aCost + "");
-                }
+            if (aCost <= 0) {
+                throw new IllegalArgumentException(aCost + "");
             }
         }
     }

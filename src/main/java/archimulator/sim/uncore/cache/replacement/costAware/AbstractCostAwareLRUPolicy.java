@@ -22,6 +22,7 @@ import archimulator.sim.uncore.cache.Cache;
 import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.replacement.LRUPolicy;
+import archimulator.sim.uncore.coherence.msi.state.DirectoryControllerState;
 import net.pickapack.util.ValueProvider;
 
 import java.io.Serializable;
@@ -66,6 +67,14 @@ public abstract class AbstractCostAwareLRUPolicy<StateT extends Serializable> ex
      * @return the cost for the given set and way
      */
     public double getCost(int set, int way) {
+        StateT state = this.getCache().getLine(set, way).getState();
+
+        boolean stable = !(state instanceof DirectoryControllerState) || ((DirectoryControllerState) state).isStable();
+
+        if(!stable) {
+            return Double.MAX_VALUE;
+        }
+
         CacheLine<Boolean> mirrorLine = mirrorCache.getLine(set, way);
         BooleanValueProvider stateProvider = (BooleanValueProvider) mirrorLine.getStateProvider();
         return stateProvider.cost;
