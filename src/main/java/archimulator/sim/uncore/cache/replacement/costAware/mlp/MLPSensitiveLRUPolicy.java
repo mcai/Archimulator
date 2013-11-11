@@ -20,6 +20,7 @@ package archimulator.sim.uncore.cache.replacement.costAware.mlp;
 
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.replacement.costAware.CostSensitiveLRUPolicy;
+import archimulator.sim.uncore.coherence.event.GeneralCacheControllerLastPutSOrPutMAndDataFromOwnerEvent;
 import archimulator.sim.uncore.mlp.MLPProfilingHelper;
 
 import java.io.Serializable;
@@ -42,6 +43,15 @@ public class MLPSensitiveLRUPolicy<StateT extends Serializable> extends CostSens
         cache.getBlockingEventDispatcher().addListener(
                 MLPProfilingHelper.L2MissMLPProfiledEvent.class,
                 event -> setCost(event.getSet(), event.getWay(), event.getPendingL2Miss().getMlpCost())
+        );
+
+        cache.getBlockingEventDispatcher().addListener(
+                GeneralCacheControllerLastPutSOrPutMAndDataFromOwnerEvent.class,
+                event -> {
+                    if (event.getCacheController().getCache().equals(getCache())) {
+                        setCost(event.getSet(), event.getWay(), 0);
+                    }
+                }
         );
     }
 

@@ -57,8 +57,14 @@ public abstract class CostSensitiveLRUPolicy<StateT extends Serializable> extend
         for (int i = this.getCache().getAssociativity() - 2; i >= 0; i--) {
             int way = this.getWayInStackPosition(set, i);
 
-            if (this.getCost(set, way) < aCost) {
-                aCost -= (double) this.getQuantizedCost(this.getCost(set, way)) * 2;
+            double cost = this.getCost(set, way);
+
+            if(cost <= 0) {
+                throw new IllegalArgumentException(cost + "");
+            }
+
+            if (cost < aCost) {
+                aCost -= cost * 2;
                 new CacheAccess<>(this.getCache(), access, set, way, tag);
             }
         }
@@ -74,8 +80,12 @@ public abstract class CostSensitiveLRUPolicy<StateT extends Serializable> extend
 
         int newLruWay = this.getLRU(set);
 
-        if(oldLruWay != newLruWay) {
+        if (this.getCache().getLine(set, newLruWay).isValid() && oldLruWay != newLruWay) {
             aCost = this.getCost(set, newLruWay);
+
+            if (aCost <= 0) {
+                throw new IllegalArgumentException(aCost + "");
+            }
         }
     }
 }
