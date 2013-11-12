@@ -42,14 +42,6 @@ public abstract class CostSensitiveLRUPolicy<StateT extends Serializable> extend
         super(cache);
     }
 
-    /**
-     * Handle a cache replacement.
-     *
-     * @param access the memory hierarchy access
-     * @param set    the set index
-     * @param tag    the tag
-     * @return the newly created cache access object
-     */
     @Override
     public CacheAccess<StateT> handleReplacement(MemoryHierarchyAccess access, int set, int tag) {
         int lruWay = this.getLRU(set);
@@ -59,12 +51,8 @@ public abstract class CostSensitiveLRUPolicy<StateT extends Serializable> extend
 
             double cost = this.getCost(set, way);
 
-            if(cost <= 0) {
-                throw new IllegalArgumentException(cost + "");
-            }
-
             if (cost < aCost) {
-                aCost -= cost * 2;
+                aCost = Math.max(aCost - (cost * 2), 0) ;
                 return new CacheAccess<>(this.getCache(), access, set, way, tag);
             }
         }
@@ -80,13 +68,11 @@ public abstract class CostSensitiveLRUPolicy<StateT extends Serializable> extend
 
         int newLruWay = this.getLRU(set);
 
-        double cost = this.getCost(set, newLruWay);
+        if (this.getCache().getLine(set, newLruWay).isValid()) {
+            double cost = this.getCost(set, newLruWay);
 
-        if (this.getCache().getLine(set, newLruWay).isValid() && (oldLruWay != newLruWay || aCost > cost)) {
-            aCost = cost;
-
-            if (aCost <= 0) {
-                throw new IllegalArgumentException(aCost + "");
+            if (oldLruWay != newLruWay || aCost > cost) {
+                aCost = cost;
             }
         }
     }

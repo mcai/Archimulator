@@ -41,38 +41,16 @@ public class LRUPolicy<StateT extends Serializable> extends StackBasedCacheRepla
         super(cache);
     }
 
-    /**
-     * Handle a cache replacement.
-     *
-     * @param access the memory hierarchy access
-     * @param set    the set index
-     * @param tag    the tag
-     * @return the newly created cache access object
-     */
     @Override
     public CacheAccess<StateT> handleReplacement(MemoryHierarchyAccess access, int set, int tag) {
         return new CacheAccess<>(this.getCache(), access, set, this.getLRU(set), tag);
     }
 
-    /**
-     * Handle promotion on a cache hit.
-     *
-     * @param access the memory hierarchy access
-     * @param set    the set index
-     * @param way    the way
-     */
     @Override
     public void handlePromotionOnHit(MemoryHierarchyAccess access, int set, int way) {
         this.setMRU(set, way);
     }
 
-    /**
-     * Handle insertion on a cache miss.
-     *
-     * @param access the memory hierarchy access
-     * @param set    the set index
-     * @param way    the way
-     */
     @Override
     public void handleInsertionOnMiss(MemoryHierarchyAccess access, int set, int way) {
         this.setMRU(set, way);
