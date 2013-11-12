@@ -21,7 +21,6 @@ package archimulator.sim.uncore.cache.replacement.costAware;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.cache.EvictableCache;
-import archimulator.sim.uncore.coherence.msi.state.DirectoryControllerState;
 
 import java.io.Serializable;
 
@@ -66,7 +65,7 @@ public abstract class CostSensitiveLRUPolicy<StateT extends Serializable> extend
 
             if (cost < aCost) {
                 aCost -= cost * 2;
-                new CacheAccess<>(this.getCache(), access, set, way, tag);
+                return new CacheAccess<>(this.getCache(), access, set, way, tag);
             }
         }
 
