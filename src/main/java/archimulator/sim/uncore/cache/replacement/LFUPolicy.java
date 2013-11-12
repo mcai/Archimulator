@@ -48,14 +48,6 @@ public class LFUPolicy<StateT extends Serializable> extends CacheReplacementPoli
         this.mirrorCache = new Cache<>(cache, cache.getName() + "/lfuPolicy/mirrorCache", cache.getGeometry(), args -> new BooleanValueProvider());
     }
 
-    /**
-     * Handle a cache replacement.
-     *
-     * @param access the memory hierarchy access
-     * @param set    the set
-     * @param tag    the tag
-     * @return the newly created cache access object
-     */
     @Override
     public CacheAccess<StateT> handleReplacement(MemoryHierarchyAccess access, int set, int tag) {
         int minFrequency = Integer.MAX_VALUE;
@@ -74,13 +66,6 @@ public class LFUPolicy<StateT extends Serializable> extends CacheReplacementPoli
         return new CacheAccess<>(this.getCache(), access, set, victimWay, tag);
     }
 
-    /**
-     * Handle promotion on a cache hit.
-     *
-     * @param access the memory hierarchy access
-     * @param set    the set index
-     * @param way    the way
-     */
     @Override
     public void handlePromotionOnHit(MemoryHierarchyAccess access, int set, int way) {
         CacheLine<Boolean> line = this.mirrorCache.getLine(set, way);
@@ -88,13 +73,6 @@ public class LFUPolicy<StateT extends Serializable> extends CacheReplacementPoli
         stateProvider.frequency++;
     }
 
-    /**
-     * Handle insertion on a cache miss.
-     *
-     * @param access the memory hierarchy access
-     * @param set    the set index
-     * @param way    the way
-     */
     @Override
     public void handleInsertionOnMiss(MemoryHierarchyAccess access, int set, int way) {
         CacheLine<Boolean> line = this.mirrorCache.getLine(set, way);

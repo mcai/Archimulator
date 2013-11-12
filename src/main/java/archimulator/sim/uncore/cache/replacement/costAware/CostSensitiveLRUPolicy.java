@@ -31,6 +31,8 @@ import java.io.Serializable;
  * @author Min Cai
  */
 public abstract class CostSensitiveLRUPolicy<StateT extends Serializable> extends AbstractCostAwareLRUPolicy<StateT> {
+    private int aTag;
+    private boolean aStable;
     private double aCost;
 
     /**
@@ -52,7 +54,7 @@ public abstract class CostSensitiveLRUPolicy<StateT extends Serializable> extend
             double cost = this.getCost(set, way);
 
             if (cost < aCost) {
-                aCost = Math.max(aCost - (cost * 2), 0) ;
+                aCost = Math.max(aCost - (cost * 2), 0);
                 return new CacheAccess<>(this.getCache(), access, set, way, tag);
             }
         }
@@ -71,8 +73,10 @@ public abstract class CostSensitiveLRUPolicy<StateT extends Serializable> extend
         if (this.getCache().getLine(set, newLruWay).isValid()) {
             double cost = this.getCost(set, newLruWay);
 
-            if (oldLruWay != newLruWay || aCost > cost) {
+            if (oldLruWay != newLruWay || (aTag == this.getCache().getLine(set, newLruWay).getTag() && !aStable && isStable(set, way))) {
+                aTag = this.getCache().getLine(set, newLruWay).getTag();
                 aCost = cost;
+                aStable = isStable(set, way);
             }
         }
     }

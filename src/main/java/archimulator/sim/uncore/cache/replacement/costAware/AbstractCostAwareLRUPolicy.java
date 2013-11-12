@@ -67,17 +67,26 @@ public abstract class AbstractCostAwareLRUPolicy<StateT extends Serializable> ex
      * @return the cost for the given set and way
      */
     public double getCost(int set, int way) {
-        StateT state = this.getCache().getLine(set, way).getState();
-
-        boolean stable = !(state instanceof DirectoryControllerState) || ((DirectoryControllerState) state).isStable();
-
-        if(!stable) {
+        if(!isStable(set, way)) {
             return Double.MAX_VALUE;
         }
 
         CacheLine<Boolean> mirrorLine = mirrorCache.getLine(set, way);
         BooleanValueProvider stateProvider = (BooleanValueProvider) mirrorLine.getStateProvider();
         return stateProvider.cost;
+    }
+
+    /**
+     * Get a value indicating whether the specified line is in the stable state or not.
+     *
+     * @param set the set
+     * @param way the way
+     * @return a value indicating whether the specified line is in the stable state or not
+     */
+    protected boolean isStable(int set, int way) {
+        StateT state = this.getCache().getLine(set, way).getState();
+
+        return !(state instanceof DirectoryControllerState) || ((DirectoryControllerState) state).isStable();
     }
 
     /**
