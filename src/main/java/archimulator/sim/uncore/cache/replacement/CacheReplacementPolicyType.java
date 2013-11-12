@@ -147,5 +147,10 @@ public enum CacheReplacementPolicyType {
     /**
      * MLP-sensitive least recently used (LRU).
      */
-    MLP_SENSITIVE_LRU
+    MLP_SENSITIVE_LRU,
+
+    /**
+     * Helper thread sensitive least recently used (LRU).
+     */
+    HELPER_THREAD_SENSITIVE_LRU
 }

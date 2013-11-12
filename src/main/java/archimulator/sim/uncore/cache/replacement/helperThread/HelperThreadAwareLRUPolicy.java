@@ -83,7 +83,7 @@ public class HelperThreadAwareLRUPolicy<StateT extends Serializable> extends LRU
                 return;
             }
 
-            if(getCache().getSimulation().getHelperThreadL2CacheRequestProfilingHelper().getHelperThreadL2CacheRequestQualityPredictor().predict(access.getVirtualPc())) {
+            if(getCache().getSimulation().getHelperThreadL2CacheRequestProfilingHelper().getHelperThreadL2CacheRequestQualityPredictor().predict(access.getVirtualPc()).isUseful()) {
                 setMRU(set, way);
             }
             else {

@@ -20,7 +20,9 @@ package archimulator.sim.uncore.cache.replacement.costAware;
 
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.CacheAccess;
+import archimulator.sim.uncore.cache.CacheGeometry;
 import archimulator.sim.uncore.cache.EvictableCache;
+import archimulator.sim.uncore.cache.prediction.CacheBasedPredictor;
 
 import java.io.Serializable;
 
@@ -54,7 +56,7 @@ public abstract class CostSensitiveLRUPolicy<StateT extends Serializable> extend
             double cost = this.getCost(set, way);
 
             if (cost < aCost) {
-                aCost = Math.max(aCost - (cost * 2), 0);
+                aCost -= cost * 2;
                 return new CacheAccess<>(this.getCache(), access, set, way, tag);
             }
         }

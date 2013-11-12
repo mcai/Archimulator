@@ -19,8 +19,11 @@
 package archimulator.sim.uncore.cache.replacement.costAware;
 
 import archimulator.sim.uncore.cache.Cache;
+import archimulator.sim.uncore.cache.CacheGeometry;
 import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.cache.EvictableCache;
+import archimulator.sim.uncore.cache.prediction.CacheBasedPredictor;
+import archimulator.sim.uncore.cache.prediction.Predictor;
 import archimulator.sim.uncore.cache.replacement.LRUPolicy;
 import archimulator.sim.uncore.coherence.msi.state.DirectoryControllerState;
 import net.pickapack.util.ValueProvider;
@@ -35,6 +38,7 @@ import java.io.Serializable;
  */
 public abstract class AbstractCostAwareLRUPolicy<StateT extends Serializable> extends LRUPolicy<StateT> {
     protected Cache<Boolean> mirrorCache;
+    private Predictor<Double> costPredictor;
 
     /**
      * Create an abstract cost aware least recently used (LRU) policy.
@@ -43,7 +47,17 @@ public abstract class AbstractCostAwareLRUPolicy<StateT extends Serializable> ex
      */
     public AbstractCostAwareLRUPolicy(EvictableCache<StateT> cache) {
         super(cache);
-        this.mirrorCache = new Cache<>(cache, cache.getName() + ".costBasedLRUPolicy.mirrorCache", cache.getGeometry(), args -> new BooleanValueProvider());
+
+        this.mirrorCache = new Cache<>(cache, cache.getName() + ".abstractCostAwareLRUPolicy.mirrorCache", cache.getGeometry(), args -> new BooleanValueProvider());
+
+        this.costPredictor = new CacheBasedPredictor<>(
+                cache,
+                cache.getName() + ".abstractCostAwareLRUPolicy.costPredictor",
+                new CacheGeometry(16 * 16 * getCache().getLineSize(), 16, getCache().getLineSize()),
+                1,
+                3,
+                Double.MAX_VALUE
+        );
     }
 
     /**
@@ -57,6 +71,8 @@ public abstract class AbstractCostAwareLRUPolicy<StateT extends Serializable> ex
         CacheLine<Boolean> mirrorLine = mirrorCache.getLine(set, way);
         BooleanValueProvider stateProvider = (BooleanValueProvider) mirrorLine.getStateProvider();
         stateProvider.cost = cost;
+
+        this.costPredictor.update(this.getCache().getLine(set, way).getAccess().getVirtualPc(), cost);
     }
 
     /**
@@ -68,7 +84,7 @@ public abstract class AbstractCostAwareLRUPolicy<StateT extends Serializable> ex
      */
     public double getCost(int set, int way) {
         if(!isStable(set, way)) {
-            return Double.MAX_VALUE;
+            return this.costPredictor.predict(this.getCache().getLine(set, way).getAccess().getVirtualPc());
         }
 
         CacheLine<Boolean> mirrorLine = mirrorCache.getLine(set, way);

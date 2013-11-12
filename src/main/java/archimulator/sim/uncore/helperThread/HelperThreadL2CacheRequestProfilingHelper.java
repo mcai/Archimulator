@@ -38,6 +38,7 @@ import java.util.Map;
 
 /**
  * Helper thread L2 cache request profiling helper.
+ *
  * Redundant: HT->HT (USED=true), REDUNDANT++
  * Good: HT->MT, GOOD++
  * Bad: HT->HT (victim->INVALID, USED=true), BAD++
@@ -68,7 +69,7 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
 
     private long numEarlyHelperThreadL2CacheRequests;
 
-    private Predictor<Boolean> helperThreadL2CacheRequestQualityPredictor;
+    private Predictor<HelperThreadL2CacheRequestQuality> helperThreadL2CacheRequestQualityPredictor;
 
     /**
      * Create a helper thread L2 request profiling helper.
@@ -88,7 +89,7 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
             }
         }
 
-        this.helperThreadL2CacheRequestQualityPredictor = new CacheBasedPredictor<>(l2CacheController, l2CacheController.getName() + "/helperThreadL2CacheRequestQualityPredictor", new CacheGeometry(64, 1, 1), 4, 16, false); //TODO: parameters should not be hardcoded
+        this.helperThreadL2CacheRequestQualityPredictor = new CacheBasedPredictor<>(l2CacheController, l2CacheController.getName() + "/helperThreadL2CacheRequestQualityPredictor", new CacheGeometry(64, 1, 1), 4, 16, HelperThreadL2CacheRequestQuality.UGLY); //TODO: parameters should not be hardcoded
 
         this.l2CacheController.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, event -> {
             if (event.getCacheController().equals(HelperThreadL2CacheRequestProfilingHelper.this.l2CacheController)) {
@@ -131,7 +132,7 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
 
         this.l2CacheController.getBlockingEventDispatcher().addListener(
                 HelperThreadL2CacheRequestEvent.class,
-                event -> helperThreadL2CacheRequestQualityPredictor.update(event.getPc(), event.getQuality().isUseful())
+                event -> helperThreadL2CacheRequestQualityPredictor.update(event.getPc(), event.getQuality())
         );
     }
 
@@ -565,7 +566,7 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
      *
      * @return the helper thread L2 cache request quality predictor
      */
-    public Predictor<Boolean> getHelperThreadL2CacheRequestQualityPredictor() {
+    public Predictor<HelperThreadL2CacheRequestQuality> getHelperThreadL2CacheRequestQualityPredictor() {
         return helperThreadL2CacheRequestQualityPredictor;
     }
 
