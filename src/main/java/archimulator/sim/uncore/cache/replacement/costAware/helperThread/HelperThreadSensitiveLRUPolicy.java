@@ -18,11 +18,13 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache.replacement.costAware.helperThread;
 
+import archimulator.sim.uncore.MemoryHierarchyAccessType;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.replacement.costAware.CostSensitiveLRUPolicy;
 import archimulator.sim.uncore.coherence.event.GeneralCacheControllerLastPutSOrPutMAndDataFromOwnerEvent;
 import archimulator.sim.uncore.coherence.event.LastLevelCacheControllerLineInsertEvent;
 import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestQuality;
+import archimulator.sim.uncore.helperThread.HelperThreadingHelper;
 
 import java.io.Serializable;
 
@@ -44,9 +46,11 @@ public class HelperThreadSensitiveLRUPolicy<StateT extends Serializable> extends
         cache.getBlockingEventDispatcher().addListener(
                 LastLevelCacheControllerLineInsertEvent.class,
                 event -> {
-                    int pc = getCache().getLine(event.getSet(), event.getWay()).getAccess().getVirtualPc();
-                    HelperThreadL2CacheRequestQuality quality = getCache().getSimulation().getHelperThreadL2CacheRequestProfilingHelper().getHelperThreadL2CacheRequestQualityPredictor().predict(pc);
-                    setCost(event.getSet(), event.getWay(), getCost(quality));
+                    if (event.getAccess().getType() == MemoryHierarchyAccessType.LOAD && HelperThreadingHelper.isHelperThread(event.getAccess().getThread())) {
+                        int pc = getCache().getLine(event.getSet(), event.getWay()).getAccess().getVirtualPc();
+                        HelperThreadL2CacheRequestQuality quality = getCache().getSimulation().getHelperThreadL2CacheRequestProfilingHelper().getHelperThreadL2CacheRequestQualityPredictor().predict(pc);
+                        setCost(event.getSet(), event.getWay(), getCost(quality));
+                    }
                 }
         );
 
