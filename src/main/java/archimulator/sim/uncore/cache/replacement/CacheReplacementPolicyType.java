@@ -152,5 +152,10 @@ public enum CacheReplacementPolicyType {
     /**
      * Helper thread sensitive least recently used (LRU).
      */
-    HELPER_THREAD_SENSITIVE_LRU
+    HELPER_THREAD_SENSITIVE_LRU,
+
+    /**
+     * Prefetch aware HM least recently used (LRU).
+     */
+    PREFETCH_AWARE_HM_LRU
 }

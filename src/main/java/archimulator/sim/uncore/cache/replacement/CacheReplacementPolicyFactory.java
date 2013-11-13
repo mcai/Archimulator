@@ -118,6 +118,8 @@ public class CacheReplacementPolicyFactory {
                 return new MLPSensitiveLRUPolicy<>(cache);
             case HELPER_THREAD_SENSITIVE_LRU:
                 return new HelperThreadSensitiveLRUPolicy<>(cache);
+            case PREFETCH_AWARE_HM_LRU:
+                return new PrefetchAwareHMLRUPolicy<>(cache);
             default:
                 throw new IllegalArgumentException();
         }
