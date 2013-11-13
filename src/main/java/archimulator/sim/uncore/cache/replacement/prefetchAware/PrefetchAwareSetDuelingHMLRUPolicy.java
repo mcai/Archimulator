@@ -33,7 +33,6 @@ import java.io.Serializable;
  */
 public class PrefetchAwareSetDuelingHMLRUPolicy<StateT extends Serializable> extends LRUPolicy<StateT> {
     private SetDuelingUnit setDuelingUnit;
-    private PrefetchAwareHMLRUPolicy<StateT> policyM;
     private PrefetchAwareHMLRUPolicy<StateT> policyH;
     private PrefetchAwareHMLRUPolicy<StateT> policyHM;
 
@@ -45,11 +44,10 @@ public class PrefetchAwareSetDuelingHMLRUPolicy<StateT extends Serializable> ext
     public PrefetchAwareSetDuelingHMLRUPolicy(EvictableCache<StateT> cache) {
         super(cache);
 
-        this.policyM = new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PrefetchAwareHMLRUPolicyType.M);
         this.policyH = new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PrefetchAwareHMLRUPolicyType.H);
         this.policyHM = new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PrefetchAwareHMLRUPolicyType.HM);
 
-        this.setDuelingUnit = new SetDuelingUnit(cache, 6, 3);
+        this.setDuelingUnit = new SetDuelingUnit(cache, 16, 2);
     }
 
     @Override
@@ -67,10 +65,8 @@ public class PrefetchAwareSetDuelingHMLRUPolicy<StateT extends Serializable> ext
     private PrefetchAwareHMLRUPolicy<StateT> getPolicy(int policyType) {
         switch (policyType) {
             case 0:
-                return policyM;
-            case 1:
                 return policyH;
-            case 2:
+            case 1:
                 return policyHM;
             default:
                 throw new IllegalArgumentException();

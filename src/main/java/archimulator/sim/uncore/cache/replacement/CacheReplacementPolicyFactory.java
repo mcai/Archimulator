@@ -120,12 +120,12 @@ public class CacheReplacementPolicyFactory {
                 return new MLPSensitiveLRUPolicy<>(cache);
             case HELPER_THREAD_SENSITIVE_LRU:
                 return new HelperThreadSensitiveLRUPolicy<>(cache);
-            case PREFETCH_AWARE_HM_LRU:
-                return new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PrefetchAwareHMLRUPolicyType.HM);
             case PREFETCH_AWARE_M_LRU:
                 return new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PrefetchAwareHMLRUPolicyType.M);
             case PREFETCH_AWARE_H_LRU:
                 return new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PrefetchAwareHMLRUPolicyType.H);
+            case PREFETCH_AWARE_HM_LRU:
+                return new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PrefetchAwareHMLRUPolicyType.HM);
             case PREFETCH_AWARE_SET_DUELING_HM_LRU:
                 return new PrefetchAwareSetDuelingHMLRUPolicy<>(cache);
             default:

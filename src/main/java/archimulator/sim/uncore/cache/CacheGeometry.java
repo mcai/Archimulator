@@ -20,6 +20,8 @@
  */
 package archimulator.sim.uncore.cache;
 
+import net.pickapack.util.StorageUnit;
+
 /**
  * Cache geometry.
  *
@@ -113,6 +115,11 @@ public class CacheGeometry {
      */
     public int getNumLines() {
         return numLines;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("CacheGeometry{size=%s, associativity=%d, lineSize=%d, lineSizeInLog2=%d, numSets=%d, numSetsInLog2=%d, numLines=%d}", StorageUnit.toString(size), associativity, lineSize, lineSizeInLog2, numSets, numSetsInLog2, numLines);
     }
 
     /**

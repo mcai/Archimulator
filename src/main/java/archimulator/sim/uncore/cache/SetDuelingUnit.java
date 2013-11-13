@@ -18,10 +18,8 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache;
 
-import archimulator.sim.common.SimulationType;
-import archimulator.sim.uncore.cache.Cache;
 import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestProfilingHelper;
-import archimulator.util.IntervalCounter;
+import net.pickapack.math.SaturatingCounter;
 
 import java.util.*;
 
@@ -36,82 +34,61 @@ public class SetDuelingUnit {
      */
     public static final int FOLLOWERS = -1;
 
-    private int numTotalSetDuelingMonitors;
+    private int numSetDuelingMonitors;
 
     /**
      * Set dueling monitor.
      */
     private class SetDuelingMonitor {
         private int policy;
+        private SaturatingCounter counter;
 
         /**
          * Create a set dueling monitor.
          */
-        private SetDuelingMonitor() {
-            this.policy = FOLLOWERS;
+        private SetDuelingMonitor(int policy) {
+            this.policy = policy;
+            this.counter = new SaturatingCounter(0, 1, 1 << 10, 0);
         }
     }
 
+    private List<Integer> policiesPerSet;
+
     private Cache<?> cache;
-    private Map<Integer, IntervalCounter> numMainThreadL2Misses;
 
     private List<SetDuelingMonitor> setDuelingMonitors;
 
-    private int setDuelingMonitorSize;
+    private int numSetsPerSetDuelingMonitor;
 
     private Random random;
-
-    private int numCyclesElapsedPerInterval;
-
-    private long numIntervals;
-    private int numCyclesElapsed;
 
     /**
      * Create a set dueling unit.
      *
-     * @param cache                      the parent cache
-     * @param setDuelingMonitorSize      the set dueling monitor size
-     * @param numTotalSetDuelingMonitors the number of total set dueling monitors
+     * @param cache                       the parent cache
+     * @param numSetsPerSetDuelingMonitor the number of sets per set dueling monitor
+     * @param numSetDuelingMonitors       the number of set dueling monitors
      */
-    public SetDuelingUnit(final Cache<?> cache, int setDuelingMonitorSize, final int numTotalSetDuelingMonitors) {
+    public SetDuelingUnit(final Cache<?> cache, int numSetsPerSetDuelingMonitor, final int numSetDuelingMonitors) {
         this.cache = cache;
 
-        this.setDuelingMonitorSize = setDuelingMonitorSize;
-        this.numTotalSetDuelingMonitors = numTotalSetDuelingMonitors;
+        this.numSetsPerSetDuelingMonitor = numSetsPerSetDuelingMonitor;
+        this.numSetDuelingMonitors = numSetDuelingMonitors;
 
         this.random = new Random(13);
 
-        this.numMainThreadL2Misses = new TreeMap<>();
-        for (int i = 0; i < this.numTotalSetDuelingMonitors; i++) {
-            this.numMainThreadL2Misses.put(i, new IntervalCounter());
+        this.policiesPerSet = new ArrayList<>();
+
+        for (int i = 0; i < this.cache.getNumSets(); i++) {
+            this.policiesPerSet.add(FOLLOWERS);
         }
 
         this.setDuelingMonitors = new ArrayList<>();
-
-        for (int i = 0; i < this.cache.getNumSets(); i++) {
-            this.setDuelingMonitors.add(new SetDuelingMonitor());
+        for (int i = 0; i < this.numSetDuelingMonitors; i++) {
+            this.setDuelingMonitors.add(new SetDuelingMonitor(i));
         }
 
         this.initializeSetDuelingMonitorsRandomly();
-
-        this.numCyclesElapsedPerInterval = 5000000;
-
-        this.cache.getCycleAccurateEventQueue().getPerCycleEvents().add(() -> {
-            if (cache.getSimulation().getType() != SimulationType.FAST_FORWARD) {
-                numCyclesElapsed++;
-
-                if (numCyclesElapsed == numCyclesElapsedPerInterval) {
-                    int bestPolicy = getBestPolicy();
-
-                    for (int i = 0; i < numTotalSetDuelingMonitors; i++) {
-                        numMainThreadL2Misses.get(i).newInterval();
-                    }
-
-                    numCyclesElapsed = 0;
-                    numIntervals++;
-                }
-            }
-        });
 
         this.cache.getBlockingEventDispatcher().addListener(
                 HelperThreadL2CacheRequestProfilingHelper.MainThreadL2CacheMissEvent.class,
@@ -123,20 +100,20 @@ public class SetDuelingUnit {
      * Randomly assign sets to set dueling monitors.
      */
     private void initializeSetDuelingMonitorsRandomly() {
-        if (this.cache.getNumSets() < this.setDuelingMonitorSize * numTotalSetDuelingMonitors) {
+        if (this.cache.getNumSets() < this.numSetsPerSetDuelingMonitor * numSetDuelingMonitors) {
             throw new IllegalArgumentException();
         }
 
-        for (int policy = 0; policy < numTotalSetDuelingMonitors; policy++) {
-            for (int i = 0; i < this.setDuelingMonitorSize; i++) {
+        for (int policy = 0; policy < numSetDuelingMonitors; policy++) {
+            for (int i = 0; i < this.numSetsPerSetDuelingMonitor; i++) {
                 int set;
 
                 do {
                     set = this.random.nextInt(this.cache.getNumSets());
                 }
-                while (this.setDuelingMonitors.get(set).policy != FOLLOWERS);
+                while (this.policiesPerSet.get(set) != FOLLOWERS);
 
-                this.setDuelingMonitors.get(set).policy = policy;
+                this.policiesPerSet.set(set, policy);
             }
         }
     }
@@ -148,8 +125,8 @@ public class SetDuelingUnit {
      * @return the policy type for the specified set
      */
     public int getPolicyType(int set) {
-        int policy = this.setDuelingMonitors.get(set).policy;
-        return policy == FOLLOWERS ? getBestPolicy() : policy;
+        int policy = this.policiesPerSet.get(set);
+        return policy == FOLLOWERS ? getBestPolicyType() : policy;
     }
 
     /**
@@ -157,11 +134,10 @@ public class SetDuelingUnit {
      *
      * @return the best policy
      */
-    private Integer getBestPolicy() {
+    private int getBestPolicyType() {
         return Collections.min(
-                this.numMainThreadL2Misses.keySet(),
-                Comparator.comparing(policy -> numMainThreadL2Misses.get(policy).getValue())
-        );
+                this.setDuelingMonitors,
+                Comparator.comparing(setDuelingMonitor -> setDuelingMonitor.counter.getValue())).policy;
     }
 
     /**
@@ -170,37 +146,32 @@ public class SetDuelingUnit {
      * @param set the set index
      */
     private void recordMainThreadL2Miss(int set) {
-        int policy = this.setDuelingMonitors.get(set).policy;
+        int policy = this.policiesPerSet.get(set);
 
         if (policy != FOLLOWERS) {
-            this.numMainThreadL2Misses.get(policy).increment();
+            this.setDuelingMonitors.get(policy).counter.update(true);
+            this.setDuelingMonitors.get(policy).counter.update(true);
+
+            this.setDuelingMonitors.forEach(setDuelingMonitor -> {
+                if(setDuelingMonitor.policy != policy) {
+                    setDuelingMonitor.counter.update(false);
+                }
+            });
+
+            boolean saturatedCounterFound = false;
+
+            for(SetDuelingMonitor setDuelingMonitor : this.setDuelingMonitors) {
+                if(setDuelingMonitor.counter.getValue() == setDuelingMonitor.counter.getMaxValue()) {
+                    saturatedCounterFound = true;
+                    break;
+                }
+            }
+
+            if(saturatedCounterFound) {
+                this.setDuelingMonitors.forEach(setDuelingMonitor -> {
+                    setDuelingMonitor.counter.reset();
+                });
+            }
         }
-    }
-
-    /**
-     * Get the measuring interval in cycles.
-     *
-     * @return the measuring interval in cycles
-     */
-    public int getNumCyclesElapsedPerInterval() {
-        return numCyclesElapsedPerInterval;
-    }
-
-    /**
-     * Get the number of intervals.
-     *
-     * @return the number of intervals
-     */
-    public long getNumIntervals() {
-        return numIntervals;
-    }
-
-    /**
-     * Get the number of cycles elapsed.
-     *
-     * @return the number of cycles elapsed
-     */
-    public int getNumCyclesElapsed() {
-        return numCyclesElapsed;
     }
 }
