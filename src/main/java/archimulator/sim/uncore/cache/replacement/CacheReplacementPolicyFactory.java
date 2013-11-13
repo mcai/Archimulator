@@ -35,6 +35,8 @@ import archimulator.sim.uncore.cache.replacement.partitioned.cpiBased.CPIBasedPa
 import archimulator.sim.uncore.cache.replacement.partitioned.minMiss.MinMissPartitionedLRUPolicy;
 import archimulator.sim.uncore.cache.replacement.partitioned.mlpAware.MLPAwarePartitionedLRUPolicy;
 import archimulator.sim.uncore.cache.replacement.partitioned.setDueling.SetDuelingPartitionedLRUPolicy;
+import archimulator.sim.uncore.cache.replacement.prefetchAware.PrefetchAwareHMLRUPolicy;
+import archimulator.sim.uncore.cache.replacement.prefetchAware.PrefetchAwareSetDuelingHMLRUPolicy;
 import archimulator.sim.uncore.cache.replacement.rereferenceIntervalPrediction.RereferenceIntervalPredictionPolicy;
 import archimulator.sim.uncore.cache.replacement.reuseDistancePrediction.ReuseDistancePredictionPolicy;
 
@@ -119,7 +121,13 @@ public class CacheReplacementPolicyFactory {
             case HELPER_THREAD_SENSITIVE_LRU:
                 return new HelperThreadSensitiveLRUPolicy<>(cache);
             case PREFETCH_AWARE_HM_LRU:
-                return new PrefetchAwareHMLRUPolicy<>(cache);
+                return new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PrefetchAwareHMLRUPolicyType.HM);
+            case PREFETCH_AWARE_M_LRU:
+                return new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PrefetchAwareHMLRUPolicyType.M);
+            case PREFETCH_AWARE_H_LRU:
+                return new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PrefetchAwareHMLRUPolicyType.H);
+            case PREFETCH_AWARE_SET_DUELING_HM_LRU:
+                return new PrefetchAwareSetDuelingHMLRUPolicy<>(cache);
             default:
                 throw new IllegalArgumentException();
         }

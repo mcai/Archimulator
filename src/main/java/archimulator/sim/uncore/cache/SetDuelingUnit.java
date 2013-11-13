@@ -16,16 +16,17 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.cache.replacement.partitioned.setDueling;
+package archimulator.sim.uncore.cache;
 
 import archimulator.sim.common.SimulationType;
 import archimulator.sim.uncore.cache.Cache;
+import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestProfilingHelper;
 import archimulator.util.IntervalCounter;
 
 import java.util.*;
 
 /**
- * Set dueling unit for set dueling partitioned least recently used (LRU) policy.
+ * Set dueling unit.
  *
  * @author Min Cai
  */
@@ -52,7 +53,7 @@ public class SetDuelingUnit {
     }
 
     private Cache<?> cache;
-    private Map<Integer, IntervalCounter> numUsefulHelperThreadL2CacheRequestsPerPolicy;
+    private Map<Integer, IntervalCounter> numMainThreadL2Misses;
 
     private List<SetDuelingMonitor> setDuelingMonitors;
 
@@ -66,7 +67,7 @@ public class SetDuelingUnit {
     private int numCyclesElapsed;
 
     /**
-     * Create a set dueling unit for set dueling partitioned least recently used (LRU) policy.
+     * Create a set dueling unit.
      *
      * @param cache                      the parent cache
      * @param setDuelingMonitorSize      the set dueling monitor size
@@ -80,9 +81,9 @@ public class SetDuelingUnit {
 
         this.random = new Random(13);
 
-        this.numUsefulHelperThreadL2CacheRequestsPerPolicy = new TreeMap<>();
+        this.numMainThreadL2Misses = new TreeMap<>();
         for (int i = 0; i < this.numTotalSetDuelingMonitors; i++) {
-            this.numUsefulHelperThreadL2CacheRequestsPerPolicy.put(i, new IntervalCounter());
+            this.numMainThreadL2Misses.put(i, new IntervalCounter());
         }
 
         this.setDuelingMonitors = new ArrayList<>();
@@ -103,9 +104,7 @@ public class SetDuelingUnit {
                     int bestPolicy = getBestPolicy();
 
                     for (int i = 0; i < numTotalSetDuelingMonitors; i++) {
-                        IntervalCounter intervalCounter = numUsefulHelperThreadL2CacheRequestsPerPolicy.get(i);
-
-                        intervalCounter.newInterval();
+                        numMainThreadL2Misses.get(i).newInterval();
                     }
 
                     numCyclesElapsed = 0;
@@ -113,6 +112,11 @@ public class SetDuelingUnit {
                 }
             }
         });
+
+        this.cache.getBlockingEventDispatcher().addListener(
+                HelperThreadL2CacheRequestProfilingHelper.MainThreadL2CacheMissEvent.class,
+                event -> recordMainThreadL2Miss(event.getSet())
+        );
     }
 
     /**
@@ -138,12 +142,12 @@ public class SetDuelingUnit {
     }
 
     /**
-     * Get the partitioning policy type for the specified set.
+     * Get the policy type for the specified set.
      *
      * @param set the set
-     * @return the partitioning policy type for the specified set
+     * @return the policy type for the specified set
      */
-    public int getPartitioningPolicyType(int set) {
+    public int getPolicyType(int set) {
         int policy = this.setDuelingMonitors.get(set).policy;
         return policy == FOLLOWERS ? getBestPolicy() : policy;
     }
@@ -154,23 +158,22 @@ public class SetDuelingUnit {
      * @return the best policy
      */
     private Integer getBestPolicy() {
-        return Collections.max(this.numUsefulHelperThreadL2CacheRequestsPerPolicy.keySet(), (policy1, policy2) -> {
-            Long value1 = numUsefulHelperThreadL2CacheRequestsPerPolicy.get(policy1).getValue();
-            Long value2 = numUsefulHelperThreadL2CacheRequestsPerPolicy.get(policy2).getValue();
-            return value1.compareTo(value2);
-        });
+        return Collections.min(
+                this.numMainThreadL2Misses.keySet(),
+                Comparator.comparing(policy -> numMainThreadL2Misses.get(policy).getValue())
+        );
     }
 
     /**
-     * Record a useful helper thread L2 request.
+     * Record a main thread L2 miss.
      *
      * @param set the set index
      */
-    public void recordUsefulHelperThreadL2Request(int set) {
+    private void recordMainThreadL2Miss(int set) {
         int policy = this.setDuelingMonitors.get(set).policy;
 
         if (policy != FOLLOWERS) {
-            this.numUsefulHelperThreadL2CacheRequestsPerPolicy.get(policy).increment();
+            this.numMainThreadL2Misses.get(policy).increment();
         }
     }
 
