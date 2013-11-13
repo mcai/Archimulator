@@ -18,7 +18,6 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache.replacement.prefetchAware;
 
-import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.SetDuelingUnit;
 import archimulator.sim.uncore.cache.replacement.LRUPolicy;
@@ -31,45 +30,21 @@ import java.io.Serializable;
  * @param <StateT> the state type of the parent evictable cache
  * @author Min Cai
  */
-public class PrefetchAwareSetDuelingHMLRUPolicy<StateT extends Serializable> extends LRUPolicy<StateT> {
+public class PrefetchAwareSetDuelingHMLRUPolicy<StateT extends Serializable> extends SetDuelingPolicy<StateT> {
     private SetDuelingUnit setDuelingUnit;
-    private PrefetchAwareHMLRUPolicy<StateT> policyH;
-    private PrefetchAwareHMLRUPolicy<StateT> policyHM;
 
     /**
      * Create a prefetch aware set dueling based HM least recently used (LRU) policy for the specified evictable cache.
      *
      * @param cache the parent evictable cache
      */
+    @SuppressWarnings("unchecked")
     public PrefetchAwareSetDuelingHMLRUPolicy(EvictableCache<StateT> cache) {
-        super(cache);
-
-        this.policyH = new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PrefetchAwareHMLRUPolicyType.H);
-        this.policyHM = new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PrefetchAwareHMLRUPolicyType.HM);
-
-        this.setDuelingUnit = new SetDuelingUnit(cache, 16, 2);
-    }
-
-    @Override
-    public void handlePromotionOnHit(MemoryHierarchyAccess access, int set, int way) {
-        PrefetchAwareHMLRUPolicy<StateT> policy = this.getPolicy(this.setDuelingUnit.getPolicyType(set));
-        policy.handlePromotionOnHit(access, set, way);
-    }
-
-    @Override
-    public void handleInsertionOnMiss(MemoryHierarchyAccess access, int set, int way) {
-        PrefetchAwareHMLRUPolicy<StateT> policy = this.getPolicy(this.setDuelingUnit.getPolicyType(set));
-        policy.handleInsertionOnMiss(access, set, way);
-    }
-
-    private PrefetchAwareHMLRUPolicy<StateT> getPolicy(int policyType) {
-        switch (policyType) {
-            case 0:
-                return policyH;
-            case 1:
-                return policyHM;
-            default:
-                throw new IllegalArgumentException();
-        }
+        super(
+                cache,
+                new LRUPolicy<>(cache),
+                new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PrefetchAwareHMLRUPolicyType.H),
+                new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PrefetchAwareHMLRUPolicyType.HM)
+        );
     }
 }
