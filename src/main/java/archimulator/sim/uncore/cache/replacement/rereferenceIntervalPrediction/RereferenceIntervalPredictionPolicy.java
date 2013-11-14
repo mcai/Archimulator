@@ -110,14 +110,14 @@ public class RereferenceIntervalPredictionPolicy<StateT extends Serializable> ex
      */
     private class BooleanValueProvider implements ValueProvider<Boolean> {
         private boolean state;
-        private NotThresholdSaturatingCounter predictedRereferenceInterval;
+        private NoThresholdSaturatingCounter predictedRereferenceInterval;
 
         /**
          * Create a boolean value provider.
          */
         public BooleanValueProvider() {
             this.state = true;
-            this.predictedRereferenceInterval = new NotThresholdSaturatingCounter(0, predictedRereferenceIntervalMax, predictedRereferenceIntervalMax);
+            this.predictedRereferenceInterval = new NoThresholdSaturatingCounter(0, predictedRereferenceIntervalMax, predictedRereferenceIntervalMax);
         }
 
         /**
@@ -144,7 +144,7 @@ public class RereferenceIntervalPredictionPolicy<StateT extends Serializable> ex
     /**
      * No threshold saturating counter.
      */
-    private class NotThresholdSaturatingCounter implements Serializable {
+    private class NoThresholdSaturatingCounter implements Serializable {
         private int minValue;
         private int maxValue;
         private int value;
@@ -157,7 +157,7 @@ public class RereferenceIntervalPredictionPolicy<StateT extends Serializable> ex
          * @param maxValue     the max value
          * @param initialValue the initial value
          */
-        public NotThresholdSaturatingCounter(int minValue, int maxValue, int initialValue) {
+        public NoThresholdSaturatingCounter(int minValue, int maxValue, int initialValue) {
             this.minValue = minValue;
             this.maxValue = maxValue;
             this.value = initialValue;
@@ -244,7 +244,7 @@ public class RereferenceIntervalPredictionPolicy<StateT extends Serializable> ex
 
         @Override
         public String toString() {
-            return String.format("NotThresholdSaturatingCounter{minValue=%d, maxValue=%d, value=%d, initialValue=%d}", minValue, maxValue, value, initialValue);
+            return String.format("NoThresholdSaturatingCounter{minValue=%d, maxValue=%d, value=%d, initialValue=%d}", minValue, maxValue, value, initialValue);
         }
     }
 }
