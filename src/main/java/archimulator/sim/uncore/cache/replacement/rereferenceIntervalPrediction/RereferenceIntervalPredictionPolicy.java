@@ -64,7 +64,6 @@ public class RereferenceIntervalPredictionPolicy<StateT extends Serializable> ex
     @Override
     public CacheAccess<StateT> handleReplacement(MemoryHierarchyAccess access, int set, int tag) {
         do {
-            /* Search for victim whose predicted rereference interval value is furthest in future */
             Optional<CacheLine<Boolean>> result = this.mirrorCache.getLines(set).stream().filter(
                     mirrorLine -> {
                         BooleanValueProvider stateProvider = (BooleanValueProvider) mirrorLine.getStateProvider();
@@ -76,7 +75,6 @@ public class RereferenceIntervalPredictionPolicy<StateT extends Serializable> ex
                 return new CacheAccess<>(this.getCache(), access, set, result.get().getWay(), tag);
             }
 
-            /* If victim is not found, then move all rereference prediction values into future and then repeat the search again */
             this.mirrorCache.getLines(set).forEach(mirrorLine -> {
                 BooleanValueProvider stateProvider = (BooleanValueProvider) mirrorLine.getStateProvider();
                 stateProvider.predictedRereferenceInterval.increment();
@@ -86,10 +84,9 @@ public class RereferenceIntervalPredictionPolicy<StateT extends Serializable> ex
 
     @Override
     public void handlePromotionOnHit(MemoryHierarchyAccess access, int set, int way) {
-        // Set the line's predicted rereference interval value to near-immediate (0)
         CacheLine<Boolean> mirrorLine = this.mirrorCache.getLine(set, way);
         BooleanValueProvider stateProvider = (BooleanValueProvider) mirrorLine.getStateProvider();
-        stateProvider.predictedRereferenceInterval.reset();
+        stateProvider.predictedRereferenceInterval.decrement();
     }
 
     @Override
