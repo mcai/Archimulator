@@ -125,7 +125,7 @@ public abstract class SetDuelingUnit {
      * Randomly assign sets to set dueling monitors.
      */
     private void initializeSetDuelingMonitorsRandomly() {
-        if (this.cache.getNumSets() < this.numSetsPerSetDuelingMonitor * numSetDuelingMonitorsPerThread) {
+        if (this.cache.getNumSets() < this.numSetsPerSetDuelingMonitor * this.numSetDuelingMonitorsPerThread * this.numThreads) {
             throw new IllegalArgumentException();
         }
 

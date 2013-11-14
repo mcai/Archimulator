@@ -28,6 +28,7 @@ import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicy;
 import net.pickapack.util.ValueProvider;
 
 import java.io.Serializable;
+import java.util.Optional;
 
 /**
  * Rereference interval prediction policy.
@@ -36,7 +37,7 @@ import java.io.Serializable;
  * @author Min Cai
  */
 public class RereferenceIntervalPredictionPolicy<StateT extends Serializable> extends CacheReplacementPolicy<StateT> {
-    private int predictedRereferenceIntervalMaxValue;
+    private int predictedRereferenceIntervalMax;
     private DynamicInsertionPolicy insertionPolicy;
     private Cache<Boolean> mirrorCache;
 
@@ -48,7 +49,7 @@ public class RereferenceIntervalPredictionPolicy<StateT extends Serializable> ex
     public RereferenceIntervalPredictionPolicy(EvictableCache<StateT> cache) {
         super(cache);
 
-        this.predictedRereferenceIntervalMaxValue = 3;
+        this.predictedRereferenceIntervalMax = (1 << 3) - 1;
 
         this.mirrorCache = new Cache<>(
                 cache,
@@ -57,27 +58,29 @@ public class RereferenceIntervalPredictionPolicy<StateT extends Serializable> ex
                 args -> new BooleanValueProvider()
         );
 
-        this.insertionPolicy = new DynamicInsertionPolicy(cache, cache.getExperiment().getArchitecture().getNumCores(), 2);
+        this.insertionPolicy = new DynamicInsertionPolicy(cache, 16);
     }
 
     @Override
     public CacheAccess<StateT> handleReplacement(MemoryHierarchyAccess access, int set, int tag) {
         do {
             /* Search for victim whose predicted rereference interval value is furthest in future */
-            for (int way = 0; way < this.getCache().getAssociativity(); way++) {
-                CacheLine<Boolean> mirrorLine = this.mirrorCache.getLine(set, way);
-                BooleanValueProvider stateProvider = (BooleanValueProvider) mirrorLine.getStateProvider();
-                if (stateProvider.predictedRereferenceInterval == this.predictedRereferenceIntervalMaxValue) {
-                    return new CacheAccess<>(this.getCache(), access, set, way, tag);
-                }
+            Optional<CacheLine<Boolean>> result = this.mirrorCache.getLines(set).stream().filter(
+                    mirrorLine -> {
+                        BooleanValueProvider stateProvider = (BooleanValueProvider) mirrorLine.getStateProvider();
+                        return stateProvider.predictedRereferenceInterval.getValue() == this.predictedRereferenceIntervalMax;
+                    }
+            ).findFirst();
+
+            if (result.isPresent()) {
+                return new CacheAccess<>(this.getCache(), access, set, result.get().getWay(), tag);
             }
 
             /* If victim is not found, then move all rereference prediction values into future and then repeat the search again */
-            for (int way = 0; way < this.getCache().getAssociativity(); way++) {
-                CacheLine<Boolean> mirrorLine = this.mirrorCache.getLine(set, way);
+            this.mirrorCache.getLines(set).forEach(mirrorLine -> {
                 BooleanValueProvider stateProvider = (BooleanValueProvider) mirrorLine.getStateProvider();
-                stateProvider.predictedRereferenceInterval++;
-            }
+                stateProvider.predictedRereferenceInterval.increment();
+            });
         } while (true);
     }
 
@@ -86,16 +89,19 @@ public class RereferenceIntervalPredictionPolicy<StateT extends Serializable> ex
         // Set the line's predicted rereference interval value to near-immediate (0)
         CacheLine<Boolean> mirrorLine = this.mirrorCache.getLine(set, way);
         BooleanValueProvider stateProvider = (BooleanValueProvider) mirrorLine.getStateProvider();
-        stateProvider.predictedRereferenceInterval = 0;
+        stateProvider.predictedRereferenceInterval.reset();
     }
 
     @Override
     public void handleInsertionOnMiss(MemoryHierarchyAccess access, int set, int way) {
-        if (this.insertionPolicy.shouldDoNormalFill(set, access.getThread().getCore().getNum())) {
-            CacheLine<Boolean> mirrorLine = this.mirrorCache.getLine(set, way);
-            BooleanValueProvider stateProvider = (BooleanValueProvider) mirrorLine.getStateProvider();
-            stateProvider.predictedRereferenceInterval = this.predictedRereferenceIntervalMaxValue - 1;
-        }
+        CacheLine<Boolean> mirrorLine = this.mirrorCache.getLine(set, way);
+        BooleanValueProvider stateProvider = (BooleanValueProvider) mirrorLine.getStateProvider();
+
+        stateProvider.predictedRereferenceInterval.setValue(
+                this.insertionPolicy.shouldDoNormalFill(set, access.getThread().getCore().getNum())
+                        ? this.predictedRereferenceIntervalMax
+                        : this.predictedRereferenceIntervalMax - 1
+        );
     }
 
     @Override
@@ -107,14 +113,14 @@ public class RereferenceIntervalPredictionPolicy<StateT extends Serializable> ex
      */
     private class BooleanValueProvider implements ValueProvider<Boolean> {
         private boolean state;
-        private int predictedRereferenceInterval;
+        private NotThresholdSaturatingCounter predictedRereferenceInterval;
 
         /**
          * Create a boolean value provider.
          */
         public BooleanValueProvider() {
             this.state = true;
-            this.predictedRereferenceInterval = predictedRereferenceIntervalMaxValue;
+            this.predictedRereferenceInterval = new NotThresholdSaturatingCounter(0, predictedRereferenceIntervalMax, predictedRereferenceIntervalMax);
         }
 
         /**
@@ -135,6 +141,113 @@ public class RereferenceIntervalPredictionPolicy<StateT extends Serializable> ex
         @Override
         public Boolean getInitialValue() {
             return true;
+        }
+    }
+
+    /**
+     * No threshold saturating counter.
+     */
+    private class NotThresholdSaturatingCounter implements Serializable {
+        private int minValue;
+        private int maxValue;
+        private int value;
+        private int initialValue;
+
+        /**
+         * Create a no threshold saturating counter.
+         *
+         * @param minValue     the minimum value
+         * @param maxValue     the max value
+         * @param initialValue the initial value
+         */
+        public NotThresholdSaturatingCounter(int minValue, int maxValue, int initialValue) {
+            this.minValue = minValue;
+            this.maxValue = maxValue;
+            this.value = initialValue;
+            this.initialValue = initialValue;
+        }
+
+        /**
+         * Reset the value of the saturating counter to the initial value.
+         */
+        public void reset() {
+            this.value = this.initialValue;
+        }
+
+        /**
+         * Increment the value of the saturating counter.
+         */
+        public void increment() {
+            if (this.value < this.maxValue) {
+                this.value++;
+            }
+        }
+
+        /**
+         * Decrement the value of the saturating counter.
+         */
+        public void decrement() {
+            if (this.value > this.minValue) {
+                this.value--;
+            }
+        }
+
+        /**
+         * Set the value.
+         *
+         * @param value the value
+         */
+        public void setValue(int value) {
+            this.value = value;
+
+            if (this.value > this.maxValue) {
+                this.value = this.maxValue;
+            }
+
+            if (this.value < this.minValue) {
+                this.value = this.minValue;
+            }
+        }
+
+        /**
+         * Get the maximum value.
+         *
+         * @return the maximum value
+         */
+        public int getMinValue() {
+            return minValue;
+        }
+
+        /**
+         * Get the maximum value.
+         *
+         * @return the maximum value
+         */
+        public int getMaxValue() {
+            return maxValue;
+        }
+
+        /**
+         * Get the value.
+         *
+         * @return the value
+         */
+        public int getValue() {
+            return value;
+        }
+
+        /**
+         * Get the initial value.
+         *
+         * @return the initial value
+         */
+        public int getInitialValue() {
+            return initialValue;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("NotThresholdSaturatingCounter{minValue=%d, maxValue=%d, value=%d, initialValue=%d}", minValue, maxValue, value, initialValue);
         }
     }
 }

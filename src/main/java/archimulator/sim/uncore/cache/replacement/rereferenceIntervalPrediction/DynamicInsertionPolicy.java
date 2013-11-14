@@ -39,16 +39,15 @@ public class DynamicInsertionPolicy {
     /**
      * Create a dynamic insertion policy.
      *
-     * @param cache                       the parent cache
-     * @param numThreads                  the number of threads
-     * @param numSetsPerSetDuelingMonitor the number of sets per set dueling monitor
+     * @param cache                          the parent cache
+     * @param numSetsPerSetDuelingMonitor    the number of sets per set dueling monitor
      */
-    public DynamicInsertionPolicy(Cache<?> cache, int numThreads, int numSetsPerSetDuelingMonitor) {
+    public DynamicInsertionPolicy(Cache<?> cache, int numSetsPerSetDuelingMonitor) {
         this.bimodalSuggestionThrottle = 5;
 
         this.random = new Random(13);
 
-        this.setDuelingUnit = new MainThreadL2MissBasedSetDuelingUnit(cache, cache.getExperiment().getArchitecture().getNumCores(), numThreads, numSetsPerSetDuelingMonitor);
+        this.setDuelingUnit = new MainThreadL2MissBasedSetDuelingUnit(cache, cache.getExperiment().getArchitecture().getNumCores(), 2, numSetsPerSetDuelingMonitor);
     }
 
     /**
@@ -59,16 +58,7 @@ public class DynamicInsertionPolicy {
      * @return a value indicating whether it should do normal fill or not
      */
     public boolean shouldDoNormalFill(int set, int threadId) {
-        int policyId = this.setDuelingUnit.getPolicyId(set, threadId);
-
-        switch (policyId) {
-            case 0:
-                return true;
-            case 1:
-                return this.bimodalSuggestion(this.bimodalSuggestionThrottle);
-            default:
-                throw new IllegalArgumentException();
-        }
+        return this.setDuelingUnit.getPolicyId(set, threadId) == 0 || this.bimodalSuggestion(this.bimodalSuggestionThrottle);
     }
 
     /**
@@ -78,6 +68,6 @@ public class DynamicInsertionPolicy {
      * @return the bimodal suggestion
      */
     private boolean bimodalSuggestion(int throttle) {
-        return this.random.nextInt(100) <= throttle;
+        return this.random.nextInt(100) >= throttle;
     }
 }
