@@ -20,9 +20,7 @@ package archimulator.sim.uncore.cache.replacement.costAware;
 
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.CacheAccess;
-import archimulator.sim.uncore.cache.CacheGeometry;
 import archimulator.sim.uncore.cache.EvictableCache;
-import archimulator.sim.uncore.cache.prediction.CacheBasedPredictor;
 
 import java.io.Serializable;
 
@@ -75,7 +73,7 @@ public abstract class CostSensitiveLRUPolicy<StateT extends Serializable> extend
         if (this.getCache().getLine(set, newLruWay).isValid()) {
             double cost = this.getCost(set, newLruWay);
 
-            if (oldLruWay != newLruWay || (aTag == this.getCache().getLine(set, newLruWay).getTag() && !aStable && isStable(set, way))) {
+            if (oldLruWay != newLruWay || aTag == this.getCache().getLine(set, newLruWay).getTag() && !aStable && isStable(set, way)) {
                 aTag = this.getCache().getLine(set, newLruWay).getTag();
                 aCost = cost;
                 aStable = isStable(set, way);

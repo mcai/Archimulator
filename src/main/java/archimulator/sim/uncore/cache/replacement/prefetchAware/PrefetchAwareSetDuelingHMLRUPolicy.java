@@ -19,7 +19,6 @@
 package archimulator.sim.uncore.cache.replacement.prefetchAware;
 
 import archimulator.sim.uncore.cache.EvictableCache;
-import archimulator.sim.uncore.cache.SetDuelingUnit;
 import archimulator.sim.uncore.cache.replacement.LRUPolicy;
 
 import java.io.Serializable;
@@ -31,8 +30,6 @@ import java.io.Serializable;
  * @author Min Cai
  */
 public class PrefetchAwareSetDuelingHMLRUPolicy<StateT extends Serializable> extends SetDuelingPolicy<StateT> {
-    private SetDuelingUnit setDuelingUnit;
-
     /**
      * Create a prefetch aware set dueling based HM least recently used (LRU) policy for the specified evictable cache.
      *
