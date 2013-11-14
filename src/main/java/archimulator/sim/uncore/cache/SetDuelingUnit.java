@@ -158,19 +158,10 @@ public class SetDuelingUnit {
                 }
             });
 
-            boolean saturatedCounterFound = false;
-
-            for(SetDuelingMonitor setDuelingMonitor : this.setDuelingMonitors) {
-                if(setDuelingMonitor.counter.getValue() == setDuelingMonitor.counter.getMaxValue()) {
-                    saturatedCounterFound = true;
-                    break;
-                }
-            }
-
-            if(saturatedCounterFound) {
-                this.setDuelingMonitors.forEach(setDuelingMonitor -> {
-                    setDuelingMonitor.counter.reset();
-                });
+            if(this.setDuelingMonitors.stream().anyMatch(
+                    setDuelingMonitor -> setDuelingMonitor.counter.getValue() == setDuelingMonitor.counter.getMaxValue()
+            )) {
+                this.setDuelingMonitors.forEach(setDuelingMonitor -> setDuelingMonitor.counter.reset());
             }
         }
     }

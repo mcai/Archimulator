@@ -21,7 +21,6 @@ package archimulator.sim.core;
 import archimulator.sim.core.functionalUnit.FunctionalUnitOperationType;
 import archimulator.sim.isa.StaticInstructionType;
 import archimulator.sim.os.ContextState;
-import net.pickapack.action.Function1;
 import net.pickapack.util.Reference;
 import net.pickapack.util.RoundRobinScheduler;
 
@@ -67,18 +66,16 @@ public class BasicCore extends AbstractBasicCore {
         this.dispatchScheduler = new RoundRobinScheduler<>(
                 this.threads,
                 thread -> thread.getContext() != null,
-                (Function1<Thread, Boolean>) Thread::dispatchOne,
+                Thread::dispatchOne,
                 getExperiment().getArchitecture().getDecodeWidth()
         );
     }
 
     @Override
     protected void fetch() {
-        for (Thread thread : this.threads) {
-            if (thread.getContext() != null && thread.getContext().getState() == ContextState.RUNNING) {
-                thread.fetch();
-            }
-        }
+        this.threads.stream().filter(
+                thread -> thread.getContext() != null && thread.getContext().getState() == ContextState.RUNNING
+        ).forEach(Thread::fetch);
     }
 
     @Override
@@ -104,14 +101,8 @@ public class BasicCore extends AbstractBasicCore {
      * @param readyQueue   the ready queue
      */
     private void wakeUp(List<AbstractReorderBufferEntry> waitingQueue, List<AbstractReorderBufferEntry> readyQueue) {
-        for (Iterator<AbstractReorderBufferEntry> it = waitingQueue.iterator(); it.hasNext(); ) {
-            AbstractReorderBufferEntry waitingQueueEntry = it.next();
-
-            if (waitingQueueEntry.isAllOperandReady()) {
-                readyQueue.add(waitingQueueEntry);
-                it.remove();
-            }
-        }
+        waitingQueue.stream().filter(AbstractReorderBufferEntry::isAllOperandReady).forEach(readyQueue::add);
+        waitingQueue.removeIf(AbstractReorderBufferEntry::isAllOperandReady);
     }
 
     @Override
@@ -160,14 +151,11 @@ public class BasicCore extends AbstractBasicCore {
         for (Iterator<AbstractReorderBufferEntry> it = this.readyLoadQueue.iterator(); quant.get() > 0 && it.hasNext(); ) {
             final LoadStoreQueueEntry loadStoreQueueEntry = (LoadStoreQueueEntry) it.next();
 
-            boolean hitInLoadStoreQueue = false;
-
-            for (LoadStoreQueueEntry loadStoreQueueEntryFound : loadStoreQueueEntry.getThread().getLoadStoreQueue().getEntries()) {
-                if (loadStoreQueueEntryFound.getDynamicInstruction().getStaticInstruction().getMnemonic().getType() == StaticInstructionType.STORE && loadStoreQueueEntryFound.getEffectiveAddress() == loadStoreQueueEntry.getEffectiveAddress()) {
-                    hitInLoadStoreQueue = true;
-                    break;
-                }
-            }
+            boolean hitInLoadStoreQueue = loadStoreQueueEntry.getThread().getLoadStoreQueue().getEntries().stream().anyMatch(
+                    loadStoreQueueEntryFound
+                            -> loadStoreQueueEntryFound.getDynamicInstruction().getStaticInstruction().getMnemonic().getType() == StaticInstructionType.STORE
+                            && loadStoreQueueEntryFound.getEffectiveAddress() == loadStoreQueueEntry.getEffectiveAddress()
+            );
 
             if (hitInLoadStoreQueue) {
                 loadStoreQueueEntry.setIssued();
