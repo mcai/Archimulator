@@ -22,6 +22,7 @@ import archimulator.sim.common.Simulation;
 import archimulator.sim.common.SimulationEvent;
 import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.common.report.Reportable;
+import archimulator.sim.core.Thread;
 import archimulator.sim.uncore.cache.CacheGeometry;
 import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.cache.prediction.CacheBasedPredictor;
@@ -719,6 +720,16 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
          */
         public int getThreadId() {
             return threadId;
+        }
+
+        /**
+         * Get the core ID.
+         *
+         * @return the core ID
+         */
+        public int getCoreId() {
+            Thread thread = getSender().getSimulation().getProcessor().getThreads().get(threadId);
+            return thread.getCore().getNum();
         }
 
         /**

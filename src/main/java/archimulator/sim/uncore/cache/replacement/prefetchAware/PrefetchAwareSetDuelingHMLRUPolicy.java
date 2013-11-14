@@ -29,7 +29,7 @@ import java.io.Serializable;
  * @param <StateT> the state type of the parent evictable cache
  * @author Min Cai
  */
-public class PrefetchAwareSetDuelingHMLRUPolicy<StateT extends Serializable> extends SetDuelingPolicy<StateT> {
+public class PrefetchAwareSetDuelingHMLRUPolicy<StateT extends Serializable> extends SetDuelingCacheReplacementPolicy<StateT> {
     /**
      * Create a prefetch aware set dueling based HM least recently used (LRU) policy for the specified evictable cache.
      *

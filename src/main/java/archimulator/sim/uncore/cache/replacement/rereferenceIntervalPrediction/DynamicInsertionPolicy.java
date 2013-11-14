@@ -19,11 +19,9 @@
 package archimulator.sim.uncore.cache.replacement.rereferenceIntervalPrediction;
 
 import archimulator.sim.uncore.cache.Cache;
-import net.pickapack.math.MathHelper;
-import net.pickapack.math.SaturatingCounter;
+import archimulator.sim.uncore.cache.MainThreadL2MissBasedSetDuelingUnit;
+import archimulator.sim.uncore.cache.SetDuelingUnit;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 /**
@@ -32,16 +30,7 @@ import java.util.Random;
  * @author Min Cai
  */
 public class DynamicInsertionPolicy {
-    private Cache<?> cache;
-    private List<SaturatingCounter> policySelectionCounter;
-
-    private boolean adaptive;
-
-    private List<SetDuelingMonitor> setDuelingMonitors;
-
-    private int numThreads;
-
-    private int setDuelingMonitorSize;
+    private SetDuelingUnit setDuelingUnit;
 
     private int bimodalSuggestionThrottle;
 
@@ -50,151 +39,35 @@ public class DynamicInsertionPolicy {
     /**
      * Create a dynamic insertion policy.
      *
-     * @param cache the parent cache
-     * @param numThreads the number of threads
-     * @param policySelectionCounterMaxValue the maximum value of the policy selection counter
-     * @param setDuelingMonitorSize the set dueling monitor size
+     * @param cache                       the parent cache
+     * @param numThreads                  the number of threads
+     * @param numSetsPerSetDuelingMonitor the number of sets per set dueling monitor
      */
-    public DynamicInsertionPolicy(Cache<?> cache, int numThreads, int policySelectionCounterMaxValue, int setDuelingMonitorSize) {
-        this.cache = cache;
-
-        this.numThreads = numThreads;
-        this.setDuelingMonitorSize = setDuelingMonitorSize;
-
+    public DynamicInsertionPolicy(Cache<?> cache, int numThreads, int numSetsPerSetDuelingMonitor) {
         this.bimodalSuggestionThrottle = 5;
-        this.adaptive = true;
 
         this.random = new Random(13);
 
-        int policySelectionCounterThreshold = (int) ((float) policySelectionCounterMaxValue * 0.5);
-
-        this.policySelectionCounter = new ArrayList<>();
-
-        for (int i1 = 0; i1 < this.numThreads; i1++) {
-            this.policySelectionCounter.add(new SaturatingCounter(0, policySelectionCounterThreshold, policySelectionCounterThreshold, 0));
-        }
-
-        this.setDuelingMonitors = new ArrayList<>();
-
-        for (int i = 0; i < this.cache.getNumSets(); i++) {
-            this.setDuelingMonitors.add(new SetDuelingMonitor());
-        }
-
-        this.initSetDuelingMonitorsRandomly();
-//        this.initSetDuelingMonitorsBasedOnSetIndexBits();
-    }
-
-    /**
-     * Randomly assign sets to SDMs.
-     */
-    private void initSetDuelingMonitorsRandomly() {
-        /* total SDM size of cache */
-        int totalSdmSize = this.setDuelingMonitorSize * this.numThreads;
-        /* Number of SDMs per thread */
-        int totalSdmCount = 2;
-
-        if (this.cache.getNumSets() < totalSdmSize * totalSdmCount) {
-            throw new IllegalArgumentException();
-        }
-
-        /* When using multiple cache banks, seeding is to ensure that all banks use the same sampled sets */
-        for (int p = 0; p < totalSdmCount; p++) {
-            /* Assign per-thread SDMs */
-            int threadId = 0;
-            int ownerSets = this.setDuelingMonitorSize;
-
-            for (int ldr = 0; ldr < totalSdmSize; ldr++) {
-                int set;
-                do {
-                    set = this.random.nextInt(this.cache.getNumSets());
-                }
-                while (this.setDuelingMonitors.get(set).type != SetDuelingMonitorType.FOLLOWERS);
-
-                /* Set the Leader Set Type (NF or BF) */
-                this.setDuelingMonitors.get(set).type = p == 0 ? SetDuelingMonitorType.LRU : SetDuelingMonitorType.BIP;
-                /* Set the leader set owner thread id */
-                this.setDuelingMonitors.get(set).ownerThreadId = threadId;
-
-                ownerSets--;
-
-                /* If owner sets has reached zero, move to next threadId */
-                if (ownerSets == 0) {
-                    threadId++;
-                    ownerSets = this.setDuelingMonitorSize;
-                }
-            }
-        }
-    }
-
-    /**
-     * Choose Leader Sets Based on bits 0-5 and 6-10 of the set index.
-     */
-    private void initSetDuelingMonitorsBasedOnSetIndexBits() {
-        for (int set = 0; set < this.cache.getNumSets(); set++) {
-            /* Dedicate Per Thread SDMs. Can determine if it is my dedicated set or not */
-            for (int threadId = 0; threadId < this.numThreads; threadId++) {
-                SetDuelingMonitor setDuelingMonitor = this.setDuelingMonitors.get(set);
-                int index = set - threadId - 1;
-
-                if (((index >> 5) & 1) != 0 && index >= 0 && (MathHelper.bits(index, 11, 6) == MathHelper.bits(index, 5, 0))) {
-                    /* Check to make sure this set isn't already assigned */
-                    if (setDuelingMonitor.type != SetDuelingMonitorType.FOLLOWERS) {
-                        throw new IllegalArgumentException();
-                    }
-
-                    setDuelingMonitor.type = SetDuelingMonitorType.LRU;
-                    setDuelingMonitor.ownerThreadId = threadId;
-                }
-
-                index = set + threadId + 1;
-
-                if (((index >> 5) & 1) == 0 && index <= 2047 && (MathHelper.bits(index, 11, 6) == MathHelper.bits(index, 5, 0))) {
-                    // Check to make sure this set isn't already assigned
-                    if (setDuelingMonitor.type != SetDuelingMonitorType.FOLLOWERS) {
-                        throw new IllegalArgumentException();
-                    }
-
-                    setDuelingMonitor.type = SetDuelingMonitorType.BIP;
-                    setDuelingMonitor.ownerThreadId = threadId;
-                }
-            }
-        }
+        this.setDuelingUnit = new MainThreadL2MissBasedSetDuelingUnit(cache, cache.getExperiment().getArchitecture().getNumCores(), numThreads, numSetsPerSetDuelingMonitor);
     }
 
     /**
      * Get a value indicating whether it should do normal fill or not.
      *
-     * @param set the set
+     * @param set      the set index
      * @param threadId the thread ID
      * @return a value indicating whether it should do normal fill or not
      */
     public boolean shouldDoNormalFill(int set, int threadId) {
-        if (this.setDuelingMonitors.get(set).type == SetDuelingMonitorType.LRU && this.setDuelingMonitors.get(set).ownerThreadId == threadId) {
-            /* Is it an SDM that does normal fill (NF) policy and is dedicated to this thread? */
-            return true;
-        } else if (this.setDuelingMonitors.get(set).type == SetDuelingMonitorType.BIP && this.setDuelingMonitors.get(set).ownerThreadId == threadId) {
-            /* Is it an SDM that does bimodal fill (BF) policy and is dedicated to this thread? */
-            return this.bimodalSuggestion(this.bimodalSuggestionThrottle);
-        } else {
-            /* it is a follower set */
-            return !this.adaptive || !this.policySelectionCounter.get(threadId).isTaken() || this.bimodalSuggestion(this.bimodalSuggestionThrottle);
-        }
-    }
+        int policyId = this.setDuelingUnit.getPolicyId(set, threadId);
 
-    /**
-     * Record a miss.
-     *
-     * @param set the set index
-     */
-    public void recordMiss(int set) {
-        SetDuelingMonitorType sdmType = this.setDuelingMonitors.get(set).type;
-
-        if (sdmType != SetDuelingMonitorType.FOLLOWERS) {
-            int owner = this.setDuelingMonitors.get(set).ownerThreadId;
-
-            /* if it is an SDM that does NF policy increment PSEL */
-            /* if it is an SDM that does BF policy decrement PSEL */
-            this.policySelectionCounter.get(owner).update(sdmType == SetDuelingMonitorType.LRU);
+        switch (policyId) {
+            case 0:
+                return true;
+            case 1:
+                return this.bimodalSuggestion(this.bimodalSuggestionThrottle);
+            default:
+                throw new IllegalArgumentException();
         }
     }
 
@@ -206,40 +79,5 @@ public class DynamicInsertionPolicy {
      */
     private boolean bimodalSuggestion(int throttle) {
         return this.random.nextInt(100) <= throttle;
-    }
-
-    /**
-     * Set dueling monitor type.
-     */
-    private enum SetDuelingMonitorType {
-        /**
-         * Followers.
-         */
-        FOLLOWERS,
-
-        /**
-         * Least recently used (LRU).
-         */
-        LRU,
-
-        /**
-         * Bimodal insertion policy (BIP).
-         */
-        BIP
-    }
-
-    /**
-     * Set dueling monitor.
-     */
-    private class SetDuelingMonitor {
-        private SetDuelingMonitorType type;
-        private int ownerThreadId;
-
-        /**
-         * Create a set dueling monitor.
-         */
-        private SetDuelingMonitor() {
-            this.type = SetDuelingMonitorType.FOLLOWERS;
-        }
     }
 }

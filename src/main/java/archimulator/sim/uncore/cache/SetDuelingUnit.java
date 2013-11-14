@@ -18,7 +18,6 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache;
 
-import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestProfilingHelper;
 import net.pickapack.math.SaturatingCounter;
 
 import java.util.*;
@@ -28,35 +27,61 @@ import java.util.*;
  *
  * @author Min Cai
  */
-public class SetDuelingUnit {
+public abstract class SetDuelingUnit {
     /**
      * Followers.
      */
     public static final int FOLLOWERS = -1;
 
-    private int numSetDuelingMonitors;
+    private int numThreads;
+
+    private int numSetDuelingMonitorsPerThread;
 
     /**
      * Set dueling monitor.
      */
     private class SetDuelingMonitor {
-        private int policy;
+        private int threadId;
+        private int policyId;
         private SaturatingCounter counter;
 
         /**
          * Create a set dueling monitor.
          */
-        private SetDuelingMonitor(int policy) {
-            this.policy = policy;
+        private SetDuelingMonitor(int threadId, int policyId) {
+            this.threadId = threadId;
+            this.policyId = policyId;
             this.counter = new SaturatingCounter(0, 1, 1 << 10, 0);
         }
     }
 
-    private List<Integer> policiesPerSet;
+    /**
+     * Binding.
+     */
+    private class Binding {
+        private int set;
+        private int threadId;
+        private int policyId;
+
+        /**
+         * Create a binding.
+         *
+         * @param set the set index
+         * @param threadId the thread ID
+         * @param policyId the policy ID
+         */
+        private Binding(int set, int threadId, int policyId) {
+            this.set = set;
+            this.threadId = threadId;
+            this.policyId = policyId;
+        }
+    }
+
+    private List<Binding> bindings;
 
     private Cache<?> cache;
 
-    private List<SetDuelingMonitor> setDuelingMonitors;
+    private Map<Integer, List<SetDuelingMonitor>> setDuelingMonitors;
 
     private int numSetsPerSetDuelingMonitor;
 
@@ -65,103 +90,105 @@ public class SetDuelingUnit {
     /**
      * Create a set dueling unit.
      *
-     * @param cache                       the parent cache
-     * @param numSetsPerSetDuelingMonitor the number of sets per set dueling monitor
-     * @param numSetDuelingMonitors       the number of set dueling monitors
+     * @param cache                          the parent cache
+     * @param numThreads                     the number of threads
+     * @param numSetDuelingMonitorsPerThread the number of set dueling monitors per thread
+     * @param numSetsPerSetDuelingMonitor    the number of sets per set dueling monitor
      */
-    public SetDuelingUnit(final Cache<?> cache, int numSetsPerSetDuelingMonitor, final int numSetDuelingMonitors) {
+    public SetDuelingUnit(final Cache<?> cache, int numThreads, final int numSetDuelingMonitorsPerThread, int numSetsPerSetDuelingMonitor) {
         this.cache = cache;
 
+        this.numThreads = numThreads;
         this.numSetsPerSetDuelingMonitor = numSetsPerSetDuelingMonitor;
-        this.numSetDuelingMonitors = numSetDuelingMonitors;
+        this.numSetDuelingMonitorsPerThread = numSetDuelingMonitorsPerThread;
 
         this.random = new Random(13);
 
-        this.policiesPerSet = new ArrayList<>();
-
+        this.bindings = new ArrayList<>();
         for (int i = 0; i < this.cache.getNumSets(); i++) {
-            this.policiesPerSet.add(FOLLOWERS);
+            this.bindings.add(new Binding(i, -1, FOLLOWERS));
         }
 
-        this.setDuelingMonitors = new ArrayList<>();
-        for (int i = 0; i < this.numSetDuelingMonitors; i++) {
-            this.setDuelingMonitors.add(new SetDuelingMonitor(i));
+        this.setDuelingMonitors = new TreeMap<>();
+        for(int i = 0; i < this.numThreads; i++) {
+            this.setDuelingMonitors.put(i, new ArrayList<>());
+
+            for (int j = 0; j < this.numSetDuelingMonitorsPerThread; j++) {
+                this.setDuelingMonitors.get(i).add(new SetDuelingMonitor(i, j));
+            }
         }
 
         this.initializeSetDuelingMonitorsRandomly();
-
-        this.cache.getBlockingEventDispatcher().addListener(
-                HelperThreadL2CacheRequestProfilingHelper.MainThreadL2CacheMissEvent.class,
-                event -> recordMainThreadL2Miss(event.getSet())
-        );
     }
 
     /**
      * Randomly assign sets to set dueling monitors.
      */
     private void initializeSetDuelingMonitorsRandomly() {
-        if (this.cache.getNumSets() < this.numSetsPerSetDuelingMonitor * numSetDuelingMonitors) {
+        if (this.cache.getNumSets() < this.numSetsPerSetDuelingMonitor * numSetDuelingMonitorsPerThread) {
             throw new IllegalArgumentException();
         }
 
-        for (int policy = 0; policy < numSetDuelingMonitors; policy++) {
-            for (int i = 0; i < this.numSetsPerSetDuelingMonitor; i++) {
-                int set;
+        for(int i = 0; i < this.numThreads; i++) {
+            for (int j = 0; j < numSetDuelingMonitorsPerThread; j++) {
+                for (int k = 0; k < this.numSetsPerSetDuelingMonitor; k++) {
+                    int set;
 
-                do {
-                    set = this.random.nextInt(this.cache.getNumSets());
+                    do {
+                        set = this.random.nextInt(this.cache.getNumSets());
+                    }
+                    while (this.bindings.get(set).policyId != FOLLOWERS);
+
+                    this.bindings.set(set, new Binding(i, i, j));
                 }
-                while (this.policiesPerSet.get(set) != FOLLOWERS);
-
-                this.policiesPerSet.set(set, policy);
             }
         }
     }
 
     /**
-     * Get the policy type for the specified set.
-     *
-     * @param set the set
-     * @return the policy type for the specified set
-     */
-    public int getPolicyType(int set) {
-        int policy = this.policiesPerSet.get(set);
-        return policy == FOLLOWERS ? getBestPolicyType() : policy;
-    }
-
-    /**
-     * Get the best policy.
-     *
-     * @return the best policy
-     */
-    private int getBestPolicyType() {
-        return Collections.min(
-                this.setDuelingMonitors,
-                Comparator.comparing(setDuelingMonitor -> setDuelingMonitor.counter.getValue())).policy;
-    }
-
-    /**
-     * Record a main thread L2 miss.
+     * Get the policy ID for the specified set.
      *
      * @param set the set index
+     * @param threadId the thread ID
+     * @return the policy ID for the specified set
      */
-    private void recordMainThreadL2Miss(int set) {
-        int policy = this.policiesPerSet.get(set);
+    public int getPolicyId(int set, int threadId) {
+        Binding binding = this.bindings.get(set);
 
-        if (policy != FOLLOWERS) {
-            this.setDuelingMonitors.get(policy).counter.update(true);
-            this.setDuelingMonitors.get(policy).counter.update(true);
+        if(binding.threadId == threadId) {
+            return binding.policyId;
+        }
 
-            this.setDuelingMonitors.forEach(setDuelingMonitor -> {
-                if(setDuelingMonitor.policy != policy) {
-                    setDuelingMonitor.counter.update(false);
-                }
-            });
+        return getBestPolicyId(threadId);
+    }
 
-            if(this.setDuelingMonitors.stream().anyMatch(
+    /**
+     * Get the best policy ID.
+     *
+     * @return the best policy ID
+     */
+    private int getBestPolicyId(int threadId) {
+        return Collections.min(
+                this.setDuelingMonitors.get(threadId),
+                Comparator.comparing(setDuelingMonitor -> setDuelingMonitor.counter.getValue())).policyId;
+    }
+
+    /**
+     * Increment the specified set's corresponding set dueling monitor's saturating counter value.
+     *
+     * @param set the set index
+     * @param threadId the thread ID
+     */
+    protected void inc(int set, int threadId) {
+        int policyId = this.bindings.get(set).policyId;
+
+        if (policyId != FOLLOWERS) {
+            this.setDuelingMonitors.get(threadId).get(policyId).counter.update(true);
+
+            if (this.setDuelingMonitors.get(threadId).stream().anyMatch(
                     setDuelingMonitor -> setDuelingMonitor.counter.getValue() == setDuelingMonitor.counter.getMaxValue()
             )) {
-                this.setDuelingMonitors.forEach(setDuelingMonitor -> setDuelingMonitor.counter.reset());
+                this.setDuelingMonitors.get(threadId).forEach(setDuelingMonitor -> setDuelingMonitor.counter.reset());
             }
         }
     }

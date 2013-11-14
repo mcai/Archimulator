@@ -20,6 +20,7 @@ package archimulator.sim.uncore.cache.replacement.partitioned.setDueling;
 
 import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.uncore.cache.EvictableCache;
+import archimulator.sim.uncore.cache.MainThreadL2MissBasedSetDuelingUnit;
 import archimulator.sim.uncore.cache.SetDuelingUnit;
 import archimulator.sim.uncore.cache.partitioning.Partitioner;
 import archimulator.sim.uncore.cache.replacement.partitioned.PartitionedLRUPolicy;
@@ -76,18 +77,18 @@ public class SetDuelingPartitionedLRUPolicy<StateT extends Serializable> extends
             Partitioner cachePartitioningHelper = this.partitioners.get(i);
 
             final int tempI = i;
-            cachePartitioningHelper.setShouldIncludePredicate(set -> setDuelingUnit.getPolicyType(set) == tempI);
+            cachePartitioningHelper.setShouldIncludePredicate(set -> setDuelingUnit.getPolicyId(set, 0) == tempI);
         }
 
-        this.setDuelingUnit = new SetDuelingUnit(cache, 6, this.partitioners.size());
+        this.setDuelingUnit = new MainThreadL2MissBasedSetDuelingUnit(cache, 1, this.partitioners.size(), 6);
     }
 
     @Override
     protected List<Integer> getPartition(int set) {
-        int setDuelingMonitorType = setDuelingUnit.getPolicyType(set);
+        int policyId = setDuelingUnit.getPolicyId(set, 0);
 
-        Partitioner partitioningHelper = this.partitioners.get(setDuelingMonitorType);
-        this.numCachePartitioningHelpersUsed.set(setDuelingMonitorType, this.numCachePartitioningHelpersUsed.get(setDuelingMonitorType) + 1);
+        Partitioner partitioningHelper = this.partitioners.get(policyId);
+        this.numCachePartitioningHelpersUsed.set(policyId, this.numCachePartitioningHelpersUsed.get(policyId) + 1);
 
         return partitioningHelper.getPartition();
     }

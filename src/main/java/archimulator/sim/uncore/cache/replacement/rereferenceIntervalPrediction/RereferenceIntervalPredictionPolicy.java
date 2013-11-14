@@ -57,7 +57,7 @@ public class RereferenceIntervalPredictionPolicy<StateT extends Serializable> ex
                 args -> new BooleanValueProvider()
         );
 
-        this.insertionPolicy = new DynamicInsertionPolicy(cache, 4, ((1 << 10) - 1), 6); //TODO: parameter passing
+        this.insertionPolicy = new DynamicInsertionPolicy(cache, cache.getExperiment().getArchitecture().getNumCores(), 2);
     }
 
     @Override
@@ -91,9 +91,7 @@ public class RereferenceIntervalPredictionPolicy<StateT extends Serializable> ex
 
     @Override
     public void handleInsertionOnMiss(MemoryHierarchyAccess access, int set, int way) {
-        this.insertionPolicy.recordMiss(set);
-
-        if (this.insertionPolicy.shouldDoNormalFill(set, access.getThread().getId())) {
+        if (this.insertionPolicy.shouldDoNormalFill(set, access.getThread().getCore().getNum())) {
             CacheLine<Boolean> mirrorLine = this.mirrorCache.getLine(set, way);
             BooleanValueProvider stateProvider = (BooleanValueProvider) mirrorLine.getStateProvider();
             stateProvider.predictedRereferenceInterval = this.predictedRereferenceIntervalMaxValue - 1;

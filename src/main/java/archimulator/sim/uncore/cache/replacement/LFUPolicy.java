@@ -27,6 +27,7 @@ import archimulator.sim.uncore.cache.EvictableCache;
 import net.pickapack.util.ValueProvider;
 
 import java.io.Serializable;
+import java.util.Comparator;
 
 /**
  * Least frequently used (LFU) policy.
@@ -50,18 +51,9 @@ public class LFUPolicy<StateT extends Serializable> extends CacheReplacementPoli
 
     @Override
     public CacheAccess<StateT> handleReplacement(MemoryHierarchyAccess access, int set, int tag) {
-        int minFrequency = Integer.MAX_VALUE;
-        int victimWay = getCache().getAssociativity() - 1;
-
-        for (CacheLine<Boolean> mirrorCacheLine : this.mirrorCache.getLines(set)) {
-            BooleanValueProvider stateProvider = (BooleanValueProvider) mirrorCacheLine.getStateProvider();
-            int frequency = stateProvider.frequency;
-
-            if (frequency < minFrequency) {
-                minFrequency = frequency;
-                victimWay = mirrorCacheLine.getWay();
-            }
-        }
+        int victimWay = this.mirrorCache.getLines(set).stream()
+                .min(Comparator.comparing(mirrorCacheLine -> ((BooleanValueProvider) mirrorCacheLine.getStateProvider()).frequency))
+                .get().getWay();
 
         return new CacheAccess<>(this.getCache(), access, set, victimWay, tag);
     }

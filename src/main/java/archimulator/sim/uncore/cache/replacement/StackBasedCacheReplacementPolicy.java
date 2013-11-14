@@ -148,14 +148,6 @@ public abstract class StackBasedCacheReplacementPolicy<StateT extends Serializab
      * @return the stack entry at the specified set and way
      */
     private Integer getStackEntry(int set, int way) {
-        List<Integer> stackEntriesPerSet = this.stackEntries.get(set);
-
-        for (Integer stackEntry : stackEntriesPerSet) {
-            if (stackEntry == way) {
-                return stackEntry;
-            }
-        }
-
-        throw new IllegalArgumentException();
+        return this.stackEntries.get(set).stream().filter(stackEntry -> stackEntry == way).findFirst().get();
     }
 }
