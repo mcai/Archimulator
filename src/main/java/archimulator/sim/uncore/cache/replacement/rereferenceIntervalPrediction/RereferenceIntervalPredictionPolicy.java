@@ -53,7 +53,7 @@ public class RereferenceIntervalPredictionPolicy<StateT extends Serializable> ex
 
         this.mirrorCache = new Cache<>(
                 cache,
-                getCache().getName() + ".rereferenceIntervalPredictionEvictionPolicy.mirrorCache",
+                getCache().getName() + ".rereferenceIntervalPredictionPolicy.mirrorCache",
                 cache.getGeometry(),
                 args -> new BooleanValueProvider()
         );
