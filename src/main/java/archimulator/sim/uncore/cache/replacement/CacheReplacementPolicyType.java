@@ -172,5 +172,10 @@ public enum CacheReplacementPolicyType {
     /**
      * Prefetch aware set dueling based HM least recently used (LRU).
      */
-    PREFETCH_AWARE_SET_DUELING_HM_LRU
+    PREFETCH_AWARE_SET_DUELING_HM_LRU,
+
+    /**
+     * Dead block prediction based least recently used (LRU).
+     */
+    DEAD_BLOCK_PREDICTION_LRU
 }

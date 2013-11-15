@@ -128,6 +128,8 @@ public class CacheReplacementPolicyFactory {
                 return new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PrefetchAwareHMLRUPolicyType.HM);
             case PREFETCH_AWARE_SET_DUELING_HM_LRU:
                 return new PrefetchAwareSetDuelingHMLRUPolicy<>(cache);
+            case DEAD_BLOCK_PREDICTION_LRU:
+                return new DeadBlockPredictionBasedLRUPolicy<>(cache);
             default:
                 throw new IllegalArgumentException();
         }
