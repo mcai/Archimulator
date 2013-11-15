@@ -69,12 +69,16 @@ public interface Predictor<PredictableT extends Comparable<PredictableT>> extend
      *
      * @return the number of accesses
      */
-    long getNumAccesses();
+    default long getNumAccesses() {
+        return this.getNumHits() + this.getNumMisses();
+    }
 
     /**
      * Get the hit ratio.
      *
      * @return the hit ratio
      */
-    double getHitRatio();
+    default double getHitRatio() {
+        return this.getNumAccesses() > 0 ? (double) this.getNumHits() / this.getNumAccesses() : 0.0;
+    }
 }

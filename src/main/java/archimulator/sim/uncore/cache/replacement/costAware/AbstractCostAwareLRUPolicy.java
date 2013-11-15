@@ -18,10 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache.replacement.costAware;
 
-import archimulator.sim.uncore.cache.Cache;
-import archimulator.sim.uncore.cache.CacheGeometry;
-import archimulator.sim.uncore.cache.CacheLine;
-import archimulator.sim.uncore.cache.EvictableCache;
+import archimulator.sim.uncore.cache.*;
 import archimulator.sim.uncore.cache.prediction.CacheBasedPredictor;
 import archimulator.sim.uncore.cache.prediction.Predictor;
 import archimulator.sim.uncore.cache.replacement.LRUPolicy;
@@ -48,7 +45,7 @@ public abstract class AbstractCostAwareLRUPolicy<StateT extends Serializable> ex
     public AbstractCostAwareLRUPolicy(EvictableCache<StateT> cache) {
         super(cache);
 
-        this.mirrorCache = new Cache<>(cache, cache.getName() + ".abstractCostAwareLRUPolicy.mirrorCache", cache.getGeometry(), args -> new BooleanValueProvider());
+        this.mirrorCache = new BasicCache<>(cache, cache.getName() + ".abstractCostAwareLRUPolicy.mirrorCache", cache.getGeometry(), args -> new BooleanValueProvider());
 
         this.costPredictor = new CacheBasedPredictor<>(
                 cache,

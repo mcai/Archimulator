@@ -16,32 +16,36 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.cache.replacement.prefetchAware;
+package archimulator.sim.uncore.cache.replacement;
 
 import archimulator.sim.uncore.cache.EvictableCache;
-import archimulator.sim.uncore.cache.replacement.LRUPolicy;
 
 import java.io.Serializable;
 
 /**
- * Prefetch aware set dueling based HM Least recently used (LRU) policy.
+ * Abstract cache replacement policy.
  *
- * @param <StateT> the state type of the parent evictable cache
+ * @param <StateT>
  * @author Min Cai
  */
-public class PrefetchAwareSetDuelingHMLRUPolicy<StateT extends Serializable> extends AbstractSetDuelingCacheReplacementPolicy<StateT> {
+public abstract class AbstractCacheReplacementPolicy<StateT extends Serializable> implements CacheReplacementPolicy<StateT> {
+    private EvictableCache<StateT> cache;
+
     /**
-     * Create a prefetch aware set dueling based HM least recently used (LRU) policy for the specified evictable cache.
+     * Create an abstract cache replacement policy for the specified evictable cache.
      *
      * @param cache the parent evictable cache
      */
-    @SuppressWarnings("unchecked")
-    public PrefetchAwareSetDuelingHMLRUPolicy(EvictableCache<StateT> cache) {
-        super(
-                cache,
-                new LRUPolicy<>(cache),
-                new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PrefetchAwareHMLRUPolicyType.H),
-                new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PrefetchAwareHMLRUPolicyType.HM)
-        );
+    public AbstractCacheReplacementPolicy(EvictableCache<StateT> cache) {
+        this.cache = cache;
+    }
+
+    /**
+     * Get the parent evictable cache.
+     *
+     * @return the parent evictable cache
+     */
+    public EvictableCache<StateT> getCache() {
+        return cache;
     }
 }

@@ -60,12 +60,10 @@ public class ElfAnalyzer {
      * Build the control flow graphs.
      */
     public void buildControlFlowGraphs() {
-        for (String sectionName : this.instructions.keySet()) {
-            SortedMap<Integer, Instruction> instsInSection = this.instructions.get(sectionName);
-
+        this.instructions.forEach((sectionName, instructionsInSection) -> {
             Function currentFunction = null;
 
-            for (int pc : instsInSection.keySet()) {
+            for (int pc : instructionsInSection.keySet()) {
                 boolean isEntry = this.elfFile.getLocalFunctionSymbols().containsKey(pc);
 
                 if (isEntry) {
@@ -79,17 +77,13 @@ public class ElfAnalyzer {
                     }
                 }
             }
-        }
+        });
 
-        for (String sectionName : this.instructions.keySet()) {
-            for (Instruction instruction : this.instructions.get(sectionName).values()) {
-                instruction.setSectionName(sectionName);
-            }
-        }
+        this.instructions.forEach((sectionName, instructionsInSection) -> {
+            instructionsInSection.values().forEach(instruction -> instruction.setSectionName(sectionName));
+        });
 
-        for (Function function : this.program.getFunctions()) {
-            this.createControlFlowGraph(function);
-        }
+        this.program.getFunctions().forEach(this::createControlFlowGraph);
     }
 
     /**
@@ -120,11 +114,9 @@ public class ElfAnalyzer {
 
         this.createControlFlowGraphEdges(function);
 
-        for (BasicBlock basicBlock : function.getBasicBlocks()) {
-            if (basicBlock.getType() == BasicBlockType.FUNCTION_CALL) {
-                basicBlock.setType(BasicBlockType.SEQUENTIAL); //TODO: caller-callee information!!!
-            }
-        }
+        function.getBasicBlocks().stream()
+                .filter(basicBlock -> basicBlock.getType() == BasicBlockType.FUNCTION_CALL)
+                .forEach(basicBlock -> basicBlock.setType(BasicBlockType.SEQUENTIAL)); //TODO: caller-callee information!!!
 
         //TODO: ... identify loops
     }

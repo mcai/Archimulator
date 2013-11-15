@@ -18,12 +18,17 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache.replacement.prefetchAware;
 
+import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
-import archimulator.sim.uncore.cache.CacheAccess;
+import archimulator.sim.uncore.cache.EvictableCache;
+import archimulator.sim.uncore.cache.MainThreadL2MissBasedSetDuelingUnit;
 import archimulator.sim.uncore.cache.SetDuelingUnit;
+import archimulator.sim.uncore.cache.replacement.AbstractCacheReplacementPolicy;
 import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicy;
 
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Set dueling based policy.
@@ -31,17 +36,22 @@ import java.io.Serializable;
  * @param <StateT> the state type of the parent evictable cache
  * @author Min Cai
  */
-public interface SetDuelingCacheReplacementPolicy<StateT extends Serializable> extends CacheReplacementPolicy<StateT> {
-    default CacheAccess<StateT> handleReplacement(MemoryHierarchyAccess access, int set, int tag) {
-        return getPolicy(access, set).handleReplacement(access, set, tag);
-    }
+public class AbstractSetDuelingCacheReplacementPolicy<StateT extends Serializable> extends AbstractCacheReplacementPolicy<StateT> implements SetDuelingCacheReplacementPolicy<StateT> {
+    private SetDuelingUnit setDuelingUnit;
+    private List<CacheReplacementPolicy<StateT>> policies;
 
-    default void handlePromotionOnHit(MemoryHierarchyAccess access, int set, int way) {
-        getPolicy(access, set).handlePromotionOnHit(access, set, way);
-    }
+    /**
+     * Create a set dueling based policy for the specified evictable cache.
+     *
+     * @param cache the parent evictable cache
+     */
+    @SuppressWarnings("unchecked")
+    public AbstractSetDuelingCacheReplacementPolicy(EvictableCache<StateT> cache, CacheReplacementPolicy<StateT>... policies) {
+        super(cache);
 
-    default void handleInsertionOnMiss(MemoryHierarchyAccess access, int set, int way) {
-        getPolicy(access, set).handleInsertionOnMiss(access, set, way);
+        this.policies = Arrays.asList(policies);
+
+        this.setDuelingUnit = new MainThreadL2MissBasedSetDuelingUnit(cache, cache.getExperiment().getArchitecture().getNumCores(), this.policies.size(), 2);
     }
 
     /**
@@ -51,12 +61,20 @@ public interface SetDuelingCacheReplacementPolicy<StateT extends Serializable> e
      * @param set the set index
      * @return the cache replacement policy for the specified access and set index
      */
-     CacheReplacementPolicy<StateT> getPolicy(MemoryHierarchyAccess access, int set);
+    public CacheReplacementPolicy<StateT> getPolicy(MemoryHierarchyAccess access, int set) {
+        return this.policies.get(this.setDuelingUnit.getPolicyId(set, access.getThread().getCore().getNum()));
+    }
+
+    @Override
+    public void dumpStats(ReportNode reportNode) {
+    }
 
     /**
      * Get the set dueling unit.
      *
      * @return the set dueling unit
      */
-    public SetDuelingUnit getSetDuelingUnit();
+    public SetDuelingUnit getSetDuelingUnit() {
+        return setDuelingUnit;
+    }
 }

@@ -18,13 +18,8 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache;
 
-import archimulator.sim.common.SimulationObject;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicy;
-import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyFactory;
-import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
-import net.pickapack.util.ValueProvider;
-import net.pickapack.util.ValueProviderFactory;
 
 import java.io.Serializable;
 
@@ -34,27 +29,7 @@ import java.io.Serializable;
  * @param <StateT> state
  * @author Min Cai
  */
-public class EvictableCache<StateT extends Serializable> extends Cache<StateT> {
-    /**
-     * The replacement policy.
-     */
-    protected CacheReplacementPolicy<StateT> replacementPolicy;
-
-    /**
-     * Create an evictable cache.
-     *
-     * @param parent                        the parent simulation object.
-     * @param name                          the name
-     * @param geometry                      the geometry
-     * @param replacementPolicyType         the replacement policy type
-     * @param cacheLineStateProviderFactory the cache line state provider factory
-     */
-    public EvictableCache(SimulationObject parent, String name, CacheGeometry geometry, CacheReplacementPolicyType replacementPolicyType, ValueProviderFactory<StateT, ValueProvider<StateT>> cacheLineStateProviderFactory) {
-        super(parent, name, geometry, cacheLineStateProviderFactory);
-
-        this.replacementPolicy = CacheReplacementPolicyFactory.createCacheReplacementPolicy(replacementPolicyType, this);
-    }
-
+public interface EvictableCache<StateT extends Serializable> extends Cache<StateT> {
     /**
      * Create a new cache access.
      *
@@ -62,7 +37,7 @@ public class EvictableCache<StateT extends Serializable> extends Cache<StateT> {
      * @param address the address
      * @return the newly created cache access
      */
-    public CacheAccess<StateT> newAccess(MemoryHierarchyAccess access, int address) {
+    default CacheAccess<StateT> newAccess(MemoryHierarchyAccess access, int address) {
         CacheLine<StateT> line = this.findLine(address);
 
         int set = this.getSet(address);
@@ -83,7 +58,7 @@ public class EvictableCache<StateT extends Serializable> extends Cache<StateT> {
      * @param way     the way
      * @return the newly created cache hit object
      */
-    private CacheAccess<StateT> newHit(MemoryHierarchyAccess access, int set, int address, int way) {
+    default CacheAccess<StateT> newHit(MemoryHierarchyAccess access, int set, int address, int way) {
         return new CacheAccess<>(this, access, set, way, this.getTag(address));
     }
 
@@ -95,8 +70,8 @@ public class EvictableCache<StateT extends Serializable> extends Cache<StateT> {
      * @param address the address
      * @return the newly created cache miss object
      */
-    private CacheAccess<StateT> newMiss(MemoryHierarchyAccess access, int set, int address) {
-        return this.replacementPolicy.newMiss(access, set, address);
+    default CacheAccess<StateT> newMiss(MemoryHierarchyAccess access, int set, int address) {
+        return this.getReplacementPolicy().newMiss(access, set, address);
     }
 
     /**
@@ -104,7 +79,5 @@ public class EvictableCache<StateT extends Serializable> extends Cache<StateT> {
      *
      * @return the replacement policy
      */
-    public CacheReplacementPolicy<StateT> getReplacementPolicy() {
-        return replacementPolicy;
-    }
+    public CacheReplacementPolicy<StateT> getReplacementPolicy();
 }

@@ -48,7 +48,7 @@ public class TestPolicy2<StateT extends Serializable> extends LRUPolicy<StateT> 
     public TestPolicy2(EvictableCache<StateT> cache) {
         super(cache);
 
-        this.mirrorCache = new Cache<>(
+        this.mirrorCache = new BasicCache<>(
                 cache,
                 getCache().getName() + ".testEvictionPolicy2.mirrorCache",
                 cache.getGeometry(),

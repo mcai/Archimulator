@@ -20,11 +20,8 @@ package archimulator.sim.uncore.cache.replacement.reuseDistancePrediction;
 
 import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
-import archimulator.sim.uncore.cache.Cache;
-import archimulator.sim.uncore.cache.CacheAccess;
-import archimulator.sim.uncore.cache.CacheLine;
-import archimulator.sim.uncore.cache.EvictableCache;
-import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicy;
+import archimulator.sim.uncore.cache.*;
+import archimulator.sim.uncore.cache.replacement.AbstractCacheReplacementPolicy;
 import archimulator.util.HighLowCounter;
 import net.pickapack.util.ValueProvider;
 
@@ -36,7 +33,7 @@ import java.io.Serializable;
  * @param <StateT> the state type of the parent evictable cache
  * @author Min Cai
  */
-public class ReuseDistancePredictionPolicy<StateT extends Serializable> extends CacheReplacementPolicy<StateT> {
+public class ReuseDistancePredictionPolicy<StateT extends Serializable> extends AbstractCacheReplacementPolicy<StateT> {
     private Cache<Boolean> mirrorCache;
 
     private HighLowCounter highLowCounter;
@@ -49,7 +46,7 @@ public class ReuseDistancePredictionPolicy<StateT extends Serializable> extends 
     public ReuseDistancePredictionPolicy(EvictableCache<StateT> cache) {
         super(cache);
 
-        this.mirrorCache = new Cache<>(
+        this.mirrorCache = new BasicCache<>(
                 cache,
                 cache.getName() + ".reuseDistancePredictionPolicy.mirrorCache",
                 cache.getGeometry(),

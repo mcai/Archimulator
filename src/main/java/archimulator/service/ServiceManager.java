@@ -27,7 +27,6 @@ import net.pickapack.event.BlockingEventDispatcher;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -119,9 +118,6 @@ public class ServiceManager {
                 getBlockingEventDispatcher().addListener(ExperimentStartedEvent.class, event -> printStats(event.getSender().getParent()));
                 getBlockingEventDispatcher().addListener(ExperimentStoppedEvent.class, event -> printStats(event.getSender().getParent()));
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);

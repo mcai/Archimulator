@@ -20,11 +20,8 @@ package archimulator.sim.uncore.cache.replacement.rereferenceIntervalPrediction;
 
 import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
-import archimulator.sim.uncore.cache.Cache;
-import archimulator.sim.uncore.cache.CacheAccess;
-import archimulator.sim.uncore.cache.CacheLine;
-import archimulator.sim.uncore.cache.EvictableCache;
-import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicy;
+import archimulator.sim.uncore.cache.*;
+import archimulator.sim.uncore.cache.replacement.AbstractCacheReplacementPolicy;
 import net.pickapack.util.ValueProvider;
 
 import java.io.Serializable;
@@ -36,7 +33,7 @@ import java.util.Optional;
  * @param <StateT> the state type of the parent evictable cache
  * @author Min Cai
  */
-public class RereferenceIntervalPredictionPolicy<StateT extends Serializable> extends CacheReplacementPolicy<StateT> {
+public class RereferenceIntervalPredictionPolicy<StateT extends Serializable> extends AbstractCacheReplacementPolicy<StateT> {
     private int predictedRereferenceIntervalMax;
     private DynamicInsertionPolicy insertionPolicy;
     private Cache<Boolean> mirrorCache;
@@ -51,7 +48,7 @@ public class RereferenceIntervalPredictionPolicy<StateT extends Serializable> ex
 
         this.predictedRereferenceIntervalMax = (1 << 3) - 1;
 
-        this.mirrorCache = new Cache<>(
+        this.mirrorCache = new BasicCache<>(
                 cache,
                 getCache().getName() + ".rereferenceIntervalPredictionPolicy.mirrorCache",
                 cache.getGeometry(),

@@ -19,6 +19,7 @@
 package archimulator.sim.core;
 
 import archimulator.sim.common.SimulationObject;
+import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.common.report.Reportable;
 import archimulator.sim.core.functionalUnit.FunctionalUnitPool;
 import archimulator.sim.uncore.coherence.msi.controller.CacheController;
@@ -99,12 +100,20 @@ public interface Core extends SimulationObject, Reportable {
     /**
      * Do fast forward for one cycle.
      */
-    void doFastForwardOneCycle();
+    default void doFastForwardOneCycle() {
+        for (Thread thread : this.getThreads()) {
+            thread.fastForwardOneCycle();
+        }
+    }
 
     /**
      * Do cache warmup for one cycle.
      */
-    void doCacheWarmupOneCycle();
+    default void doCacheWarmupOneCycle() {
+        for (Thread thread : this.getThreads()) {
+            thread.warmupCacheOneCycle();
+        }
+    }
 
     /**
      * Do measurement for one cycle.
@@ -114,7 +123,13 @@ public interface Core extends SimulationObject, Reportable {
     /**
      * Update the statistics per cycle.
      */
-    void updatePerCycleStats();
+    default void updatePerCycleStats() {
+        for (Thread thread : this.getThreads()) {
+            thread.updatePerCycleStats();
+        }
+
+        this.getFunctionalUnitPool().updatePerCycleStats();
+    }
 
     /**
      * Get the number of the core.
@@ -220,4 +235,20 @@ public interface Core extends SimulationObject, Reportable {
      * @param l1DCacheController the L1D cache controller
      */
     void setL1DCacheController(CacheController l1DCacheController);
+
+    /**
+     * Get the number of instructions executed on all the threads.
+     *
+     * @return the number of instructions executed on all the threads.
+     */
+    default long getNumInstructions() {
+        return this.getThreads().stream().map(Thread::getNumInstructions).count();
+    }
+
+    default void dumpStats(ReportNode reportNode) {
+        reportNode.getChildren().add(new ReportNode(reportNode, getName()) {{
+            getChildren().add(new ReportNode(this, "functionalUnitPool/numStallsOnNoFreeFunctionalUnit", getFunctionalUnitPool().getNumStallsOnNoFreeFunctionalUnit() + ""));
+            getChildren().add(new ReportNode(this, "functionalUnitPool/numStallsOnAcquireFailedOnNoFreeFunctionalUnit", getFunctionalUnitPool().getNumStallsOnAcquireFailedOnNoFreeFunctionalUnit() + ""));
+        }});
+    }
 }

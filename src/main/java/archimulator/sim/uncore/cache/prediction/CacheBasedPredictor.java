@@ -20,10 +20,7 @@ package archimulator.sim.uncore.cache.prediction;
 
 import archimulator.sim.common.SimulationObject;
 import archimulator.sim.common.report.ReportNode;
-import archimulator.sim.uncore.cache.CacheAccess;
-import archimulator.sim.uncore.cache.CacheGeometry;
-import archimulator.sim.uncore.cache.CacheLine;
-import archimulator.sim.uncore.cache.EvictableCache;
+import archimulator.sim.uncore.cache.*;
 import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
 import net.pickapack.math.SaturatingCounter;
 import net.pickapack.util.ValueProvider;
@@ -66,7 +63,7 @@ public class CacheBasedPredictor<PredictableT extends Comparable<PredictableT>> 
      * @param defaultValue               the default value
      */
     public CacheBasedPredictor(SimulationObject parent, String name, CacheGeometry geometry, CacheReplacementPolicyType cacheReplacementPolicyType, final int counterThreshold, final int counterMaxValue, PredictableT defaultValue) {
-        this.cache = new EvictableCache<>(
+        this.cache = new BasicEvictableCache<>(
                 parent,
                 name,
                 geometry,
@@ -147,16 +144,6 @@ public class CacheBasedPredictor<PredictableT extends Comparable<PredictableT>> 
     @Override
     public long getNumMisses() {
         return numMisses;
-    }
-
-    @Override
-    public long getNumAccesses() {
-        return numHits + numMisses;
-    }
-
-    @Override
-    public double getHitRatio() {
-        return this.getNumAccesses() > 0 ? (double) this.numHits / this.getNumAccesses() : 0.0;
     }
 
     /**

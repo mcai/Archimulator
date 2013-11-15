@@ -20,10 +20,7 @@ package archimulator.sim.uncore.cache.replacement.helperThread;
 
 import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
-import archimulator.sim.uncore.cache.Cache;
-import archimulator.sim.uncore.cache.CacheAccess;
-import archimulator.sim.uncore.cache.CacheLine;
-import archimulator.sim.uncore.cache.EvictableCache;
+import archimulator.sim.uncore.cache.*;
 import archimulator.sim.uncore.cache.replacement.LRUPolicy;
 import archimulator.sim.uncore.helperThread.HelperThreadingHelper;
 import net.pickapack.util.IntegerIntegerPair;
@@ -49,7 +46,7 @@ public class ThrashingSensitiveHelperThreadAwareLRUPolicy<StateT extends Seriali
     public ThrashingSensitiveHelperThreadAwareLRUPolicy(EvictableCache<StateT> cache) {
         super(cache);
 
-        this.mirrorCache = new Cache<>(
+        this.mirrorCache = new BasicCache<>(
                 cache,
                 getCache().getName() + ".thrashingSensitiveHelperThreadAwareLRUPolicy.mirrorCache",
                 cache.getGeometry(),

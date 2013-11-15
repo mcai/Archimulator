@@ -20,10 +20,7 @@ package archimulator.sim.uncore.cache.replacement;
 
 import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
-import archimulator.sim.uncore.cache.Cache;
-import archimulator.sim.uncore.cache.CacheAccess;
-import archimulator.sim.uncore.cache.CacheLine;
-import archimulator.sim.uncore.cache.EvictableCache;
+import archimulator.sim.uncore.cache.*;
 import net.pickapack.util.Reference;
 import net.pickapack.util.ValueProvider;
 
@@ -43,14 +40,14 @@ public class DeadBlockPredictionBasedLRUPolicy<StateT extends Serializable> exte
      */
     private class BooleanValueProvider implements ValueProvider<Boolean> {
         private boolean state;
-        boolean prediction;
+        boolean dead;
 
         /**
          * Create a boolean value provider.
          */
         public BooleanValueProvider() {
             this.state = true;
-            this.prediction = false;
+            this.dead = false;
         }
 
         /**
@@ -81,7 +78,7 @@ public class DeadBlockPredictionBasedLRUPolicy<StateT extends Serializable> exte
         private int lruStackPosition;
         private int tag;
         private int trace;
-        private boolean prediction;
+        private boolean dead;
         private boolean valid;
 
         /**
@@ -92,7 +89,7 @@ public class DeadBlockPredictionBasedLRUPolicy<StateT extends Serializable> exte
             valid = false;
             tag = 0;
             trace = 0;
-            prediction = false;
+            dead = false;
         }
     }
 
@@ -128,6 +125,7 @@ public class DeadBlockPredictionBasedLRUPolicy<StateT extends Serializable> exte
 
         private DeadBlockPredictor deadBlockPredictor;
 
+        //TODO: to be refactored!!!
         /**
          * Create a dead block prediction sampler.
          *
@@ -208,20 +206,25 @@ public class DeadBlockPredictionBasedLRUPolicy<StateT extends Serializable> exte
             totalBitsUsed = (numBitsTotal - numBitsLeftOver) + (numBitsPerSet * samplerNumSets);
         }
 
+        //TODO: to be refactored!!!
         /**
          * Access the sampler with an LLC tag.
          *
-         * @param set the set index
+         * @param samplerSet the sampler set index
          * @param threadId the thread ID
          * @param pc the virtual PC address
          * @param tag the tag
          */
-        void access(int set, int threadId, int pc, int tag) {
-            // get a pointer to this set's sampler entries
-            List<DeadBlockPredictionSamplerEntry> blocks = sets.get(set).blocks;
+        void access(int samplerSet, int threadId, int pc, int tag) {
+            if (samplerSet < 0 && samplerSet >= deadBlockPredictionSampler.samplerNumSets){
+                throw new IllegalArgumentException(samplerSet + "");
+            }
+
+            // get a pointer to this samplerSet's sampler entries
+            List<DeadBlockPredictionSamplerEntry> blocks = sets.get(samplerSet).blocks;
 
             // get a partial tag to search for
-            int partialTag = tag & ((1 << danSamplerTagBitsPerEntry) - 1);
+            int partialTag = tag & (1 << danSamplerTagBitsPerEntry) - 1;
 
             // this will be the way of the sampler entry we end up hitting or replacing
             int i;
@@ -242,7 +245,7 @@ public class DeadBlockPredictionBasedLRUPolicy<StateT extends Serializable> exte
                 // no invalid block?  look for a dead block.
                 if (i == danSamplerAssociativity) {
                     // find the LRU dead block
-                    for (i = 0; i < danSamplerAssociativity; i++) if (blocks.get(i).prediction) break;
+                    for (i = 0; i < danSamplerAssociativity; i++) if (blocks.get(i).dead) break;
                 }
 
                 // no invalid or dead block?  use the LRU block
@@ -266,7 +269,7 @@ public class DeadBlockPredictionBasedLRUPolicy<StateT extends Serializable> exte
             blocks.get(i).trace = makeTrace(pc);
 
             // get the next prediction for this entry
-            blocks.get(i).prediction = deadBlockPredictor.predict(threadId, blocks.get(i).trace);
+            blocks.get(i).dead = deadBlockPredictor.predict(threadId, blocks.get(i).trace);
 
             // now the replaced entry should be moved to the MRU position
             int position = blocks.get(i).lruStackPosition;
@@ -323,7 +326,6 @@ public class DeadBlockPredictionBasedLRUPolicy<StateT extends Serializable> exte
         void update(int threadId, int trace, boolean dead) {
             // for each predictor table...
             for (int i = 0; i < danNumPredictionTables; i++) {
-
                 // ...get a pointer to the corresponding entry in that table
                 Reference<Integer> c = tables.get(i).get(getTableIndex(threadId, trace, i));
 
@@ -377,26 +379,26 @@ public class DeadBlockPredictionBasedLRUPolicy<StateT extends Serializable> exte
     private DeadBlockPredictionSampler deadBlockPredictionSampler;
 
     // sampler associativity (changed for 4MB cache)
-    private int danSamplerAssociativity = 12;
+    private static int danSamplerAssociativity = 12;
 
     // number of bits used to index predictor; determines number of
     // entries in prediction tables (changed for 4MB cache)
-    private int danPredictorIndexBits = 12;
+    private static int danPredictorIndexBits = 12;
 
     // number of prediction tables
-    private int danNumPredictionTables = 3;
+    private static int danNumPredictionTables = 3;
 
     // width of prediction saturating counters
-    private int danCounterWidth = 2;
+    private static int danCounterWidth = 2;
 
     // predictor must meet this threshold to predict a block is dead
-    private int danThreshold = 8;
+    private static int danThreshold = 8;
 
     // number of partial tag bits kept per sampler entry
-    private int danSamplerTagBitsPerEntry = 16;
+    private static int danSamplerTagBitsPerEntry = 16;
 
     // number of trace (partial PC) bits kept per sampler entry
-    private int danSamplerTraceBitsPerEntry = 16;
+    private static int danSamplerTraceBitsPerEntry = 16;
 
     // number of entries in prediction table; derived from # of index bits
     private int danPredictionTableEntries;
@@ -415,7 +417,7 @@ public class DeadBlockPredictionBasedLRUPolicy<StateT extends Serializable> exte
     public DeadBlockPredictionBasedLRUPolicy(EvictableCache<StateT> cache) {
         super(cache);
 
-        this.mirrorCache = new Cache<>(
+        this.mirrorCache = new BasicCache<>(
                 cache,
                 getCache().getName() + ".rereferenceIntervalPredictionPolicy.mirrorCache",
                 cache.getGeometry(),
@@ -435,19 +437,12 @@ public class DeadBlockPredictionBasedLRUPolicy<StateT extends Serializable> exte
             CacheLine<Boolean> mirrorLine = this.mirrorCache.getLine(set, i);
             BooleanValueProvider stateProvider = (BooleanValueProvider) mirrorLine.getStateProvider();
 
-            if (stateProvider.prediction) {
+            if (stateProvider.dead) {
                 // found a predicted dead block; this is our new victim
                 victimWay = i;
                 break;
             }
         }
-
-        // predict whether this block is "dead on arrival"
-        int trace = makeTrace(access.getVirtualPc());
-        boolean prediction = deadBlockPredictionSampler.deadBlockPredictor.predict(access.getThread().getId(), trace);
-
-        // if block is predicted dead, then it should put the block in the LRU position
-        if (prediction) victimWay = getLRU(set);
 
         // return the selected victim
         return new CacheAccess<>(this.getCache(), access, set, victimWay, tag);
@@ -480,21 +475,29 @@ public class DeadBlockPredictionBasedLRUPolicy<StateT extends Serializable> exte
         // determine if this is a sampler set
         if (set % deadBlockPredictionSampler.samplerModulus == 0) {
             // this is a sampler set.  access the sampler.
-            int set1 = set / deadBlockPredictionSampler.samplerModulus;
-            if (set1 >= 0 && set1 < deadBlockPredictionSampler.samplerNumSets)
-                deadBlockPredictionSampler.access(set1, threadId, pc, tag);
+            int samplerSet = set / deadBlockPredictionSampler.samplerModulus;
+            deadBlockPredictionSampler.access(samplerSet, threadId, pc, tag);
         }
-
-        // update default replacement policy
-        setMRU(set, way);
 
         // make the trace
         int trace = makeTrace(pc);
 
+        // predict whether this block is "dead on arrival"
+        boolean dead = deadBlockPredictionSampler.deadBlockPredictor.predict(threadId, trace);
+
+        if (dead) {
+            // if block is predicted dead, then the block should be put in the LRU position
+            this.setLRU(set, way);
+        }
+        else {
+            // use default LRU replacement policy
+            this.setMRU(set, way);
+        }
+
         // get the next prediction for this block using that trace
         CacheLine<Boolean> mirrorLine = this.mirrorCache.getLine(set, way);
         BooleanValueProvider stateProvider = (BooleanValueProvider) mirrorLine.getStateProvider();
-        stateProvider.prediction = deadBlockPredictionSampler.deadBlockPredictor.predict(threadId, trace);
+        stateProvider.dead = deadBlockPredictionSampler.deadBlockPredictor.predict(threadId, trace);
     }
 
     /***
@@ -503,7 +506,7 @@ public class DeadBlockPredictionBasedLRUPolicy<StateT extends Serializable> exte
      * @param pc the virtual PC address
      * @return a trace made from the specified PC address
      */
-    private int makeTrace(int pc) {
+    private static int makeTrace(int pc) {
         return pc & ((1 << danSamplerTraceBitsPerEntry) - 1);
     }
 
@@ -515,7 +518,7 @@ public class DeadBlockPredictionBasedLRUPolicy<StateT extends Serializable> exte
      * @param c the c
      * @return the hash of the specified three numbers
      */
-    private int mix(int a, int b, int c) {
+    private static int mix(int a, int b, int c) {
         a = a - b;
         a = a - c;
         a = a ^ (c >> 13);
@@ -534,7 +537,7 @@ public class DeadBlockPredictionBasedLRUPolicy<StateT extends Serializable> exte
      * @param x the x
      * @return the hash of the x
      */
-    private int f1(int x) {
+    private static int f1(int x) {
         return mix(0xfeedface, 0xdeadb10c, x);
     }
 
@@ -544,7 +547,7 @@ public class DeadBlockPredictionBasedLRUPolicy<StateT extends Serializable> exte
      * @param x the x
      * @return the hash of the x
      */
-    private int f2(int x) {
+    private static int f2(int x) {
         return mix(0xc001d00d, 0xfade2b1c, x);
     }
 
@@ -554,7 +557,7 @@ public class DeadBlockPredictionBasedLRUPolicy<StateT extends Serializable> exte
      * @param i the i
      * @return the generalized hash of x with i
      */
-    private int fi(int x, int i) {
+    private static int fi(int x, int i) {
         return f1(x) + (f2(x) >> i);
     }
 }

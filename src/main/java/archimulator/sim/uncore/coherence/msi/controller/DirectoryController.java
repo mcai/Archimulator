@@ -21,10 +21,7 @@ package archimulator.sim.uncore.coherence.msi.controller;
 import archimulator.sim.uncore.MemoryDevice;
 import archimulator.sim.uncore.MemoryHierarchy;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
-import archimulator.sim.uncore.cache.CacheAccess;
-import archimulator.sim.uncore.cache.CacheGeometry;
-import archimulator.sim.uncore.cache.CacheLine;
-import archimulator.sim.uncore.cache.EvictableCache;
+import archimulator.sim.uncore.cache.*;
 import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
 import archimulator.sim.uncore.coherence.msi.event.directory.DirectoryControllerEventType;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
@@ -68,7 +65,7 @@ public class DirectoryController extends GeneralCacheController<DirectoryControl
                 getExperiment().getArchitecture().getL2LineSize()
         );
 
-        this.cache = new EvictableCache<>(
+        this.cache = new BasicEvictableCache<>(
                 memoryHierarchy,
                 name,
                 getGeometry(),

@@ -32,18 +32,7 @@ import java.io.Serializable;
  * @param <StateT>
  * @author Min Cai
  */
-public abstract class CacheReplacementPolicy<StateT extends Serializable> implements Reportable {
-    private EvictableCache<StateT> cache;
-
-    /**
-     * Create a cache replacement policy for the specified evictable cache.
-     *
-     * @param cache the parent evictable cache
-     */
-    public CacheReplacementPolicy(EvictableCache<StateT> cache) {
-        this.cache = cache;
-    }
-
+public interface CacheReplacementPolicy<StateT extends Serializable> extends Reportable {
     /**
      * Create a new cache miss.
      *
@@ -52,13 +41,13 @@ public abstract class CacheReplacementPolicy<StateT extends Serializable> implem
      * @param address the address
      * @return the newly created cache miss object
      */
-    public CacheAccess<StateT> newMiss(MemoryHierarchyAccess access, int set, int address) {
-        int tag = this.cache.getTag(address);
+    default CacheAccess<StateT> newMiss(MemoryHierarchyAccess access, int set, int address) {
+        int tag = this.getCache().getTag(address);
 
-        for (int way = 0; way < this.cache.getAssociativity(); way++) {
-            CacheLine<StateT> line = this.cache.getLine(set, way);
+        for (int way = 0; way < this.getCache().getAssociativity(); way++) {
+            CacheLine<StateT> line = this.getCache().getLine(set, way);
             if (line.getState() == line.getInitialState()) {
-                return new CacheAccess<>(this.cache, access, set, way, tag);
+                return new CacheAccess<>(this.getCache(), access, set, way, tag);
             }
         }
 
@@ -73,7 +62,7 @@ public abstract class CacheReplacementPolicy<StateT extends Serializable> implem
      * @param tag    the tag
      * @return the newly created cache access object
      */
-    public abstract CacheAccess<StateT> handleReplacement(MemoryHierarchyAccess access, int set, int tag);
+    CacheAccess<StateT> handleReplacement(MemoryHierarchyAccess access, int set, int tag);
 
     /**
      * Handle promotion on a cache hit.
@@ -82,7 +71,7 @@ public abstract class CacheReplacementPolicy<StateT extends Serializable> implem
      * @param set    the set index
      * @param way    the way
      */
-    public abstract void handlePromotionOnHit(MemoryHierarchyAccess access, int set, int way);
+    void handlePromotionOnHit(MemoryHierarchyAccess access, int set, int way);
 
     /**
      * Handle insertion on a cache miss.
@@ -91,14 +80,12 @@ public abstract class CacheReplacementPolicy<StateT extends Serializable> implem
      * @param set    the set index
      * @param way    the way
      */
-    public abstract void handleInsertionOnMiss(MemoryHierarchyAccess access, int set, int way);
+    void handleInsertionOnMiss(MemoryHierarchyAccess access, int set, int way);
 
     /**
      * Get the parent evictable cache.
      *
      * @return the parent evictable cache
      */
-    public EvictableCache<StateT> getCache() {
-        return cache;
-    }
+    EvictableCache<StateT> getCache();
 }

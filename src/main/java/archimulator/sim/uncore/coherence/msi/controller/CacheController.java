@@ -24,6 +24,7 @@ import archimulator.sim.uncore.MemoryDevice;
 import archimulator.sim.uncore.MemoryHierarchy;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.MemoryHierarchyAccessType;
+import archimulator.sim.uncore.cache.BasicEvictableCache;
 import archimulator.sim.uncore.cache.CacheAccess;
 import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.cache.EvictableCache;
@@ -64,7 +65,7 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
     public CacheController(MemoryHierarchy memoryHierarchy, final String name) {
         super(memoryHierarchy, name);
 
-        this.cache = new EvictableCache<>(memoryHierarchy, name, getGeometry(), getReplacementPolicyType(), args -> {
+        this.cache = new BasicEvictableCache<>(memoryHierarchy, name, getGeometry(), getReplacementPolicyType(), args -> {
             int set = (Integer) args[0];
             int way = (Integer) args[1];
 

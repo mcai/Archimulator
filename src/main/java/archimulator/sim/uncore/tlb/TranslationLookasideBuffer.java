@@ -23,10 +23,7 @@ import archimulator.sim.common.SimulationObject;
 import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.common.report.Reportable;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
-import archimulator.sim.uncore.cache.CacheAccess;
-import archimulator.sim.uncore.cache.CacheGeometry;
-import archimulator.sim.uncore.cache.CacheLine;
-import archimulator.sim.uncore.cache.EvictableCache;
+import archimulator.sim.uncore.cache.*;
 import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
 import net.pickapack.action.Action;
 import net.pickapack.util.ValueProvider;
@@ -55,7 +52,7 @@ public class TranslationLookasideBuffer implements Named, Reportable {
     public TranslationLookasideBuffer(SimulationObject parent, String name) {
         this.name = name;
 
-        this.cache = new EvictableCache<>(
+        this.cache = new BasicEvictableCache<>(
                 parent,
                 name,
                 new CacheGeometry(

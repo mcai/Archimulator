@@ -32,7 +32,7 @@ import java.util.Random;
  * @param <StateT> the state type of the parent evictable cache
  * @author Min Cai
  */
-public class RandomPolicy<StateT extends Serializable> extends CacheReplacementPolicy<StateT> {
+public class RandomPolicy<StateT extends Serializable> extends AbstractCacheReplacementPolicy<StateT> {
     private Random random;
 
     /**

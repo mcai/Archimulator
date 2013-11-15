@@ -18,13 +18,9 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache;
 
-import archimulator.sim.common.BasicSimulationObject;
 import archimulator.sim.common.SimulationObject;
-import net.pickapack.util.ValueProvider;
-import net.pickapack.util.ValueProviderFactory;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -33,45 +29,14 @@ import java.util.List;
  * @param <StateT> state
  * @author Min Cai
  */
-public class Cache<StateT extends Serializable> extends BasicSimulationObject implements Serializable {
-    private String name;
-    private CacheGeometry geometry;
-    private List<CacheSet<StateT>> sets;
-    private int numTagsInUse;
-
-    /**
-     * Create a cache.
-     *
-     * @param parent                        the parent simulation object
-     * @param name                          the name
-     * @param geometry                      the geometry
-     * @param cacheLineStateProviderFactory the cache line state provider factory
-     */
-    public Cache(SimulationObject parent, String name, CacheGeometry geometry, ValueProviderFactory<StateT, ValueProvider<StateT>> cacheLineStateProviderFactory) {
-        super(parent);
-
-        this.name = name;
-        this.geometry = geometry;
-
-        this.sets = new ArrayList<>();
-        for (int i = 0; i < this.getNumSets(); i++) {
-            this.sets.add(new CacheSet<>(this, this.getAssociativity(), i, cacheLineStateProviderFactory));
-        }
-    }
-
+public interface Cache<StateT extends Serializable> extends SimulationObject {
     /**
      * Get lines in the specified set.
      *
      * @param set the set index
      * @return the lines in the specified set
      */
-    public List<CacheLine<StateT>> getLines(int set) {
-        if (set < 0 || set >= this.getNumSets()) {
-            throw new IllegalArgumentException(String.format("set: %d, this.numSets: %d", set, this.getNumSets()));
-        }
-
-        return this.sets.get(set).getLines();
-    }
+    List<CacheLine<StateT>> getLines(int set);
 
     /**
      * Get the line at the specified set and way.
@@ -80,7 +45,7 @@ public class Cache<StateT extends Serializable> extends BasicSimulationObject im
      * @param way the way
      * @return the line at the specified set and way
      */
-    public CacheLine<StateT> getLine(int set, int way) {
+    default CacheLine<StateT> getLine(int set, int way) {
         if (way < 0 || way >= this.getAssociativity()) {
             getSimulation().dumpPendingFlowTree();
             System.out.flush();
@@ -96,13 +61,7 @@ public class Cache<StateT extends Serializable> extends BasicSimulationObject im
      * @param set the set index
      * @return the set at the specified index
      */
-    public CacheSet<StateT> get(int set) {
-        if (set < 0 || set >= this.getNumSets()) {
-            throw new IllegalArgumentException(String.format("set: %d, this.numSets: %d", set, this.getNumSets()));
-        }
-
-        return this.sets.get(set);
-    }
+    CacheSet<StateT> get(int set);
 
     /**
      * Find the way of the line that matches the specified address.
@@ -110,7 +69,7 @@ public class Cache<StateT extends Serializable> extends BasicSimulationObject im
      * @param address the address
      * @return the way of the line that matches the specified address if any exists; otherwise -1
      */
-    public int findWay(int address) {
+    default int findWay(int address) {
         int tag = this.getTag(address);
         int set = this.getSet(address);
 
@@ -129,7 +88,7 @@ public class Cache<StateT extends Serializable> extends BasicSimulationObject im
      * @param address the address
      * @return the line that matches the specified address if any exists; otherwise null
      */
-    public CacheLine<StateT> findLine(int address) {
+    default CacheLine<StateT> findLine(int address) {
         int set = this.getSet(address);
         int way = this.findWay(address);
         return way != -1 ? this.getLine(set, way) : null;
@@ -141,8 +100,8 @@ public class Cache<StateT extends Serializable> extends BasicSimulationObject im
      * @param address the address
      * @return the tag of the specified address
      */
-    public int getTag(int address) {
-        return CacheGeometry.getTag(address, this.geometry);
+    default int getTag(int address) {
+        return CacheGeometry.getTag(address, this.getGeometry());
     }
 
     /**
@@ -151,8 +110,8 @@ public class Cache<StateT extends Serializable> extends BasicSimulationObject im
      * @param address the address
      * @return the set index of the specified address
      */
-    public int getSet(int address) {
-        int set = CacheGeometry.getSet(address, this.geometry);
+    default int getSet(int address) {
+        int set = CacheGeometry.getSet(address, this.getGeometry());
 
         if (set < 0 || set >= this.getNumSets()) {
             throw new IllegalArgumentException(String.format("address: 0x%08x, set: %d, this.numSets: %d", address, set, this.getNumSets()));
@@ -167,8 +126,8 @@ public class Cache<StateT extends Serializable> extends BasicSimulationObject im
      * @param address the address
      * @return the line ID of the specified address
      */
-    public int getLineId(int address) {
-        return CacheGeometry.getLineId(address, this.geometry);
+    default int getLineId(int address) {
+        return CacheGeometry.getLineId(address, this.getGeometry());
     }
 
     /**
@@ -176,8 +135,8 @@ public class Cache<StateT extends Serializable> extends BasicSimulationObject im
      *
      * @return the number of sets
      */
-    public int getNumSets() {
-        return this.geometry.getNumSets();
+    default int getNumSets() {
+        return this.getGeometry().getNumSets();
     }
 
     /**
@@ -185,8 +144,8 @@ public class Cache<StateT extends Serializable> extends BasicSimulationObject im
      *
      * @return the associativity
      */
-    public int getAssociativity() {
-        return this.geometry.getAssociativity();
+    default int getAssociativity() {
+        return this.getGeometry().getAssociativity();
     }
 
     /**
@@ -194,8 +153,8 @@ public class Cache<StateT extends Serializable> extends BasicSimulationObject im
      *
      * @return the line size
      */
-    public int getLineSize() {
-        return this.geometry.getLineSize();
+    default int getLineSize() {
+        return this.getGeometry().getLineSize();
     }
 
     /**
@@ -203,43 +162,35 @@ public class Cache<StateT extends Serializable> extends BasicSimulationObject im
      *
      * @return the name
      */
-    public String getName() {
-        return name;
-    }
+    String getName();
 
     /**
      * Get the geometry.
      *
      * @return the geometry
      */
-    public CacheGeometry getGeometry() {
-        return geometry;
-    }
+    CacheGeometry getGeometry();
 
     /**
      * Get the number of tags in use.
      *
      * @return the number of tags in use
      */
-    public int getNumTagsInUse() {
-        return numTagsInUse;
-    }
+    int getNumTagsInUse();
 
     /**
      * Set the number of tags in use.
      *
      * @param numTagsInUse the number of tags in use
      */
-    public void setNumTagsInUse(int numTagsInUse) {
-        this.numTagsInUse = numTagsInUse;
-    }
+    void setNumTagsInUse(int numTagsInUse);
 
     /**
      * Get the occupancy ratio.
      *
      * @return the occupancy ratio
      */
-    public double getOccupancyRatio() {
-        return (double) numTagsInUse / this.getGeometry().getNumLines();
+    default double getOccupancyRatio() {
+        return (double) getNumTagsInUse() / this.getGeometry().getNumLines();
     }
 }

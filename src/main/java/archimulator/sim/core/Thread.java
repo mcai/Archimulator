@@ -19,6 +19,7 @@
 package archimulator.sim.core;
 
 import archimulator.sim.common.SimulationObject;
+import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.common.report.Reportable;
 import archimulator.sim.core.bpred.BranchPredictor;
 import archimulator.sim.isa.Mnemonic;
@@ -328,4 +329,36 @@ public interface Thread extends SimulationObject, Reportable {
      * @return the executed system call names
      */
     Map<String, Long> getExecutedSystemCalls();
+
+    default void dumpStats(ReportNode reportNode) {
+        reportNode.getChildren().add(new ReportNode(reportNode, getName()) {{
+            getChildren().add(new ReportNode(this, "numInstructions", getNumInstructions() + ""));
+            getChildren().add(new ReportNode(this, "executedMnemonics", getExecutedMnemonics() + "")); //TODO
+            getChildren().add(new ReportNode(this, "executedSystemCalls", getExecutedSystemCalls() + "")); //TODO
+
+            getChildren().add(new ReportNode(this, "branchPredictor/type", getBranchPredictor().getType() + ""));
+            getChildren().add(new ReportNode(this, "branchPredictor/hitRatio", getBranchPredictor().getHitRatio() + ""));
+            getChildren().add(new ReportNode(this, "branchPredictor/numAccesses", getBranchPredictor().getNumAccesses() + ""));
+            getChildren().add(new ReportNode(this, "branchPredictor/numHits", getBranchPredictor().getNumHits() + ""));
+            getChildren().add(new ReportNode(this, "branchPredictor/numMisses", getBranchPredictor().getNumMisses() + ""));
+
+            getChildren().add(new ReportNode(this, "numDecodeBufferFullStalls", getNumDecodeBufferFullStalls() + ""));
+            getChildren().add(new ReportNode(this, "numReorderBufferFullStalls", getNumReorderBufferFullStalls() + ""));
+            getChildren().add(new ReportNode(this, "numLoadStoreQueueFullStalls", getNumLoadStoreQueueFullStalls() + ""));
+
+            getChildren().add(new ReportNode(this, "numIntPhysicalRegisterFileFullStalls", getNumIntPhysicalRegisterFileFullStalls() + ""));
+            getChildren().add(new ReportNode(this, "numFpPhysicalRegisterFileFullStalls", getNumFpPhysicalRegisterFileFullStalls() + ""));
+            getChildren().add(new ReportNode(this, "numMiscPhysicalRegisterFileFullStalls", getNumMiscPhysicalRegisterFileFullStalls() + ""));
+
+            getChildren().add(new ReportNode(this, "numFetchStallsOnDecodeBufferIsFull", getNumFetchStallsOnDecodeBufferIsFull() + ""));
+
+            getChildren().add(new ReportNode(this, "numRegisterRenameStallsOnDecodeBufferIsEmpty", getNumRegisterRenameStallsOnDecodeBufferIsEmpty() + ""));
+            getChildren().add(new ReportNode(this, "numRegisterRenameStallsOnReorderBufferIsFull", getNumRegisterRenameStallsOnReorderBufferIsFull() + ""));
+            getChildren().add(new ReportNode(this, "numRegisterRenameStallsOnLoadStoreQueueFull", getNumRegisterRenameStallsOnLoadStoreQueueFull() + ""));
+
+            getChildren().add(new ReportNode(this, "numSelectionStallsOnCanNotLoad", getNumSelectionStallsOnCanNotLoad() + ""));
+            getChildren().add(new ReportNode(this, "numSelectionStallsOnCanNotStore", getNumSelectionStallsOnCanNotStore() + ""));
+            getChildren().add(new ReportNode(this, "numSelectionStallsOnNoFreeFunctionalUnit", getNumSelectionStallsOnNoFreeFunctionalUnit() + ""));
+        }});
+    }
 }

@@ -30,6 +30,7 @@ import archimulator.sim.uncore.net.L2ToMemNet;
 import archimulator.sim.uncore.net.Net;
 import archimulator.sim.uncore.tlb.TranslationLookasideBuffer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -81,7 +82,14 @@ public interface MemoryHierarchy extends SimulationObject {
      *
      * @return the list of L1 cache controllers
      */
-    List<GeneralCacheController> getCacheControllers();
+    @SuppressWarnings("unchecked")
+    default List<GeneralCacheController> getCacheControllers() {
+        List<GeneralCacheController> cacheControllers = new ArrayList<>();
+        cacheControllers.add(getL2CacheController());
+        cacheControllers.addAll(getL1ICacheControllers());
+        cacheControllers.addAll(getL1DCacheControllers());
+        return cacheControllers;
+    }
 
     /**
      * Get the list of instruction translation lookaside buffers (iTLBs).
@@ -102,7 +110,12 @@ public interface MemoryHierarchy extends SimulationObject {
      *
      * @return the list of translation lookaside buffers (TLBs)
      */
-    List<TranslationLookasideBuffer> getTlbs();
+    default List<TranslationLookasideBuffer> getTlbs() {
+        List<TranslationLookasideBuffer> tlbs = new ArrayList<>();
+        tlbs.addAll(getItlbs());
+        tlbs.addAll(getDtlbs());
+        return tlbs;
+    }
 
     /**
      * Get the net for the L1 cache controllers to the L2 cache controller.

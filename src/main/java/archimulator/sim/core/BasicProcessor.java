@@ -155,17 +155,6 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
     }
 
     @Override
-    public List<Thread> getThreads() {
-        List<Thread> threads = new ArrayList<>();
-
-        for (Core core : cores) {
-            threads.addAll(core.getThreads());
-        }
-
-        return threads;
-    }
-
-    @Override
     public Kernel getKernel() {
         return kernel;
     }

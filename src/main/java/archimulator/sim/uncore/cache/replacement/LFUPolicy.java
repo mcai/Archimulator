@@ -20,10 +20,7 @@ package archimulator.sim.uncore.cache.replacement;
 
 import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
-import archimulator.sim.uncore.cache.Cache;
-import archimulator.sim.uncore.cache.CacheAccess;
-import archimulator.sim.uncore.cache.CacheLine;
-import archimulator.sim.uncore.cache.EvictableCache;
+import archimulator.sim.uncore.cache.*;
 import net.pickapack.util.ValueProvider;
 
 import java.io.Serializable;
@@ -35,7 +32,7 @@ import java.util.Comparator;
  * @param <StateT> the state type of the parent evictable cache
  * @author Min Cai
  */
-public class LFUPolicy<StateT extends Serializable> extends CacheReplacementPolicy<StateT> {
+public class LFUPolicy<StateT extends Serializable> extends AbstractCacheReplacementPolicy<StateT> {
     private Cache<Boolean> mirrorCache;
 
     /**
@@ -46,7 +43,7 @@ public class LFUPolicy<StateT extends Serializable> extends CacheReplacementPoli
     public LFUPolicy(EvictableCache<StateT> cache) {
         super(cache);
 
-        this.mirrorCache = new Cache<>(cache, cache.getName() + "/lfuPolicy/mirrorCache", cache.getGeometry(), args -> new BooleanValueProvider());
+        this.mirrorCache = new BasicCache<>(cache, cache.getName() + "/lfuPolicy/mirrorCache", cache.getGeometry(), args -> new BooleanValueProvider());
     }
 
     @Override

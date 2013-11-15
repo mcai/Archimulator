@@ -32,10 +32,7 @@ import archimulator.sim.os.Context;
 import archimulator.sim.os.ContextKilledEvent;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.MemoryHierarchyAccessType;
-import archimulator.sim.uncore.cache.CacheAccess;
-import archimulator.sim.uncore.cache.CacheGeometry;
-import archimulator.sim.uncore.cache.CacheLine;
-import archimulator.sim.uncore.cache.EvictableCache;
+import archimulator.sim.uncore.cache.*;
 import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
 import archimulator.sim.uncore.coherence.event.GeneralCacheControllerServiceNonblockingRequestEvent;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
@@ -66,7 +63,7 @@ public class DynamicSpeculativePrecomputationHelper {
     public DynamicSpeculativePrecomputationHelper(Simulation simulation) {
         Processor processor = simulation.getProcessor();
 
-        this.sliceCache = new EvictableCache<>(
+        this.sliceCache = new BasicEvictableCache<>(
                 processor,
                 "sliceCache",
                 new CacheGeometry(SLICE_CACHE_CAPACITY, SLICE_CACHE_CAPACITY, 1),

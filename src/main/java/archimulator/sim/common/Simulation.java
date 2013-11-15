@@ -274,6 +274,8 @@ public abstract class Simulation implements SimulationObject, Reportable {
 
         this.dumpStats(rootReportNode);
 
+        this.processor.dumpStats(rootReportNode);
+
         for(Memory memory : this.getProcessor().getKernel().getMemories()) {
             memory.dumpStats(rootReportNode);
         }
@@ -357,10 +359,7 @@ public abstract class Simulation implements SimulationObject, Reportable {
         Logger.info(Logger.SIMULATION, "Switched to fast forward mode.", this.getCycleAccurateEventQueue().getCurrentCycle());
 
         while (!this.getProcessor().getKernel().getContexts().isEmpty() && this.canDoFastForwardOneCycle()) {
-            for (Core core : this.getProcessor().getCores()) {
-                core.doFastForwardOneCycle();
-            }
-
+            this.getProcessor().getCores().forEach(Core::doFastForwardOneCycle);
             this.advanceOneCycle();
         }
     }
@@ -372,10 +371,7 @@ public abstract class Simulation implements SimulationObject, Reportable {
         Logger.info(Logger.SIMULATION, "Switched to cache warmup mode.", this.getCycleAccurateEventQueue().getCurrentCycle());
 
         while (!this.getProcessor().getKernel().getContexts().isEmpty() && this.canDoCacheWarmupOneCycle()) {
-            for (Core core : this.getProcessor().getCores()) {
-                core.doCacheWarmupOneCycle();
-            }
-
+            this.getProcessor().getCores().forEach(Core::doCacheWarmupOneCycle);
             this.advanceOneCycle();
         }
     }
@@ -387,10 +383,7 @@ public abstract class Simulation implements SimulationObject, Reportable {
         Logger.info(Logger.SIMULATION, "Switched to measurement mode.", this.getCycleAccurateEventQueue().getCurrentCycle());
 
         while (!this.getProcessor().getKernel().getContexts().isEmpty() && this.canDoMeasurementOneCycle()) {
-            for (Core core : this.getProcessor().getCores()) {
-                core.doMeasurementOneCycle();
-            }
-
+            this.getProcessor().getCores().forEach(Core::doMeasurementOneCycle);
             this.advanceOneCycle();
         }
     }
@@ -454,15 +447,6 @@ public abstract class Simulation implements SimulationObject, Reportable {
             getChildren().add(new ReportNode(this, "durationInSeconds", getDurationInSeconds() + ""));
 
             getChildren().add(new ReportNode(this, "cycleAccurateEventQueue/currentCycle", getCycleAccurateEventQueue().getCurrentCycle() + ""));
-            getChildren().add(new ReportNode(this, "numInstructions", getNumInstructions() + ""));
-            getChildren().add(new ReportNode(this, "c0t0NumInstructions", getC0t0NumInstructions() + ""));
-            getChildren().add(new ReportNode(this, "c1t0NumInstructions", getC1t0NumInstructions() + ""));
-            getChildren().add(new ReportNode(this, "instructionsPerCycle", getInstructionsPerCycle() + ""));
-            getChildren().add(new ReportNode(this, "c0t0InstructionsPerCycle", getC0t0InstructionsPerCycle() + ""));
-            getChildren().add(new ReportNode(this, "c1t0InstructionsPerCycle", getC1t0InstructionsPerCycle() + ""));
-            getChildren().add(new ReportNode(this, "cyclesPerInstruction", getCyclesPerInstruction() + ""));
-            getChildren().add(new ReportNode(this, "cyclesPerSecond", getCyclesPerSecond() + ""));
-            getChildren().add(new ReportNode(this, "instructionsPerSecond", getInstructionsPerSecond() + ""));
         }});
     }
 
@@ -527,103 +511,6 @@ public abstract class Simulation implements SimulationObject, Reportable {
      */
     public String getDuration() {
         return DurationFormatUtils.formatDurationHMS(this.getEndTime() - this.getBeginTime());
-    }
-
-    /**
-     * Get the number of instructions executed on all the threads.
-     *
-     * @return the number of instructions executed on all the threads.
-     */
-    public long getNumInstructions() {
-        long numInstructions = 0;
-
-        for (Core core : this.processor.getCores()) {
-            for (Thread thread : core.getThreads()) {
-                numInstructions += thread.getNumInstructions();
-            }
-        }
-
-        return numInstructions;
-    }
-
-    /**
-     * Get the number of instructions executed on the thread C0T0.
-     *
-     * @return the number of instructions executed on the thread C0T0
-     */
-    public long getC0t0NumInstructions() {
-        return this.processor.getCores().get(0).getThreads().get(0).getNumInstructions();
-    }
-
-    /**
-     * Get the number of instructions executed on the thread C1T0.
-     *
-     * @return the number of instructions executed on the thread C1T0
-     */
-    public long getC1t0NumInstructions() {
-        if(this.processor.getCores().size() < 2) {
-            return 0;
-        }
-
-        return this.processor.getCores().get(1).getThreads().get(0).getNumInstructions();
-    }
-
-    /**
-     * Get the IPC (instructions per cycle) value.
-     *
-     * @return the IPC (instructions per cycle) value
-     */
-    public double getInstructionsPerCycle() {
-        return (double) this.getNumInstructions() / this.getCycleAccurateEventQueue().getCurrentCycle();
-    }
-
-    /**
-     * Get the IPC (instructions per cycle) value for the thread C0T0.
-     *
-     * @return the IPC (instructions per cycle) value for the thread C0T0
-     */
-    public double getC0t0InstructionsPerCycle() {
-        return (double) this.processor.getCores().get(0).getThreads().get(0).getNumInstructions() / this.getCycleAccurateEventQueue().getCurrentCycle();
-    }
-
-    /**
-     * Get the IPC (instructions per cycle) value for the thread C1T0.
-     *
-     * @return the IPC (instructions per cycle) value for the thread C1T0
-     */
-    public double getC1t0InstructionsPerCycle() {
-        if(this.processor.getCores().size() < 2) {
-            return 0;
-        }
-
-        return (double) this.processor.getCores().get(1).getThreads().get(0).getNumInstructions() / this.getCycleAccurateEventQueue().getCurrentCycle();
-    }
-
-    /**
-     * Get the CPI (cycles per instruction) value.
-     *
-     * @return the CPI (cycles per instruction) value
-     */
-    public double getCyclesPerInstruction() {
-        return (double) this.getCycleAccurateEventQueue().getCurrentCycle() / this.getNumInstructions();
-    }
-
-    /**
-     * Get the simulation speed expressed as the CPS (cycles per second) value.
-     *
-     * @return the CPS (cycles per second) value
-     */
-    public double getCyclesPerSecond() {
-        return (double) this.getCycleAccurateEventQueue().getCurrentCycle() / this.getDurationInSeconds();
-    }
-
-    /**
-     * Get the simulation speed expressed as the IPS (instructions per second) value.
-     *
-     * @return the IPS (instructions per second) value
-     */
-    public double getInstructionsPerSecond() {
-        return (double) this.getNumInstructions() / this.getDurationInSeconds();
     }
 
     /**

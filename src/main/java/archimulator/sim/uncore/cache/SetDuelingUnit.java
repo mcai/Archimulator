@@ -168,9 +168,9 @@ public abstract class SetDuelingUnit {
      * @return the best policy ID
      */
     private int getBestPolicyId(int threadId) {
-        return Collections.min(
-                this.setDuelingMonitors.get(threadId),
-                Comparator.comparing(setDuelingMonitor -> setDuelingMonitor.counter.getValue())).policyId;
+        return this.setDuelingMonitors.get(threadId).stream().min(
+                Comparator.comparing(setDuelingMonitor -> setDuelingMonitor.counter.getValue())
+        ).get().policyId;
     }
 
     /**

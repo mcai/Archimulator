@@ -31,7 +31,7 @@ import java.util.List;
  * @param <StateT> state
  * @author Min Cai
  */
-public class CacheSet<StateT extends Serializable> {
+public class CacheSet<StateT extends Serializable> implements Serializable {
     private Cache<StateT> cache;
     private List<CacheLine<StateT>> lines;
     private int num;

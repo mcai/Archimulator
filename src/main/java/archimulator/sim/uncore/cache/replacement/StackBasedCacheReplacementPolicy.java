@@ -31,7 +31,7 @@ import java.util.List;
  * @param <StateT> the state type of the parent evictable cache
  * @author Min Cai
  */
-public abstract class StackBasedCacheReplacementPolicy<StateT extends Serializable> extends CacheReplacementPolicy<StateT> {
+public abstract class StackBasedCacheReplacementPolicy<StateT extends Serializable> extends AbstractCacheReplacementPolicy<StateT> {
     private List<List<Integer>> stackEntries;
 
     /**
