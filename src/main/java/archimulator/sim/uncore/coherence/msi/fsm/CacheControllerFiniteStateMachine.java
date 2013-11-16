@@ -349,7 +349,6 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
         this.fireServiceNonblockingRequestEvent(access, tag, true);
         this.cacheController.getCache().getReplacementPolicy().handlePromotionOnHit(access, set, way);
         this.getLine().setAccess(access);
-        this.getLine().setTag(tag);
     }
 
     /**

@@ -209,7 +209,6 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
         this.fireServiceNonblockingRequestEvent(access, tag, true);
         this.directoryController.getCache().getReplacementPolicy().handlePromotionOnHit(access, set, way);
         this.getLine().setAccess(access);
-        this.getLine().setTag(tag);
     }
 
     /**

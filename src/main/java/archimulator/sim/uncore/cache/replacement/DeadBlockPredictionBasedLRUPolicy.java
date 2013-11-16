@@ -202,7 +202,6 @@ public class DeadBlockPredictionBasedLRUPolicy<StateT extends Serializable> exte
                     int j;
                     for (j = 0; j < danSamplerAssociativity; j++)
                         if (blocks.get(j).lruStackPosition == danSamplerAssociativity - 1) break;
-                    assert (j < danSamplerAssociativity);
                     i = j;
                 }
 
@@ -396,8 +395,7 @@ public class DeadBlockPredictionBasedLRUPolicy<StateT extends Serializable> exte
 
     @Override
     public void handlePromotionOnHit(MemoryHierarchyAccess access, int set, int way) {
-        MemoryHierarchyAccess broughterAccess = this.getCache().getLine(set, way).getAccess();
-        this.updateSampler(set, way, broughterAccess.getThread().getId(), broughterAccess.getVirtualPc(), broughterAccess.getPhysicalTag());
+        this.updateSampler(set, way, access.getThread().getId(), access.getVirtualPc(), access.getPhysicalTag());
     }
 
     @Override
