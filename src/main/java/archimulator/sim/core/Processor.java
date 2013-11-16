@@ -74,7 +74,7 @@ public interface Processor extends SimulationObject, Reportable {
      * @return the number of instructions executed on all the threads.
      */
     default long getNumInstructions() {
-        return this.getCores().stream().map(Core::getNumInstructions).count();
+        return this.getCores().stream().mapToLong(Core::getNumInstructions).sum();
     }
 
     /**

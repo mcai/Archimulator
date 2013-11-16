@@ -242,7 +242,7 @@ public interface Core extends SimulationObject, Reportable {
      * @return the number of instructions executed on all the threads.
      */
     default long getNumInstructions() {
-        return this.getThreads().stream().map(Thread::getNumInstructions).count();
+        return this.getThreads().stream().mapToLong(Thread::getNumInstructions).sum();
     }
 
     default void dumpStats(ReportNode reportNode) {
