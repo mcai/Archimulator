@@ -125,85 +125,34 @@ public class DeadBlockPredictionBasedLRUPolicy<StateT extends Serializable> exte
 
         private DeadBlockPredictor deadBlockPredictor;
 
-        //TODO: to be refactored!!!
         /**
          * Create a dead block prediction sampler.
          *
          * @param numSets the number of sets in the parent cache
-         * @param associativity the associativity of the parent cache
          */
-        private DeadBlockPredictionSampler(int numSets, int associativity) {
-            // four-core version gets slightly different parameters
-            if (numSets == 4096) {
-                danSamplerAssociativity = 13;
-                danPredictorIndexBits = 14;
-            }
-
-            // here, we figure out the total number of bits used by the various
-            // structures etc.  along the way we will figure out how many
-            // sampler sets we have room for
-
+        private DeadBlockPredictionSampler(int numSets) {
             // figure out number of entries in each table
             danPredictionTableEntries = 1 << danPredictorIndexBits;
-
-            // compute the total number of bits used by the replacement policy
-
-            // total number of bits available for the contest
-            int numBitsTotal = (numSets * associativity * 8 + 1024);
-
-            // the real LRU policy consumes log(associativity) bits per block
-            int numBitsLRU = associativity * numSets * (int) (Math.log(associativity) / Math.log(2));
-
-            // the dead block predictor consumes (counter width) * (number of tables)
-            // * (entries per table) bits
-            int numBitsPredictor =
-                    danCounterWidth * danNumPredictionTables * danPredictionTableEntries;
-
-            // one prediction bit per cache block.
-            int numBitsCache = 1 * numSets * associativity;
-
-            // some extra bits we account for to be safe; figure we need about 85 bits
-            // for the various run-time constants and variables the CRC guys might want
-            // to charge us for.  in reality we leave a bigger surplus than this so we
-            // should be safe.
-            int numBitsExtra = 85;
-
-            // number of bits left over for the sampler sets
-            int numBitsLeftOver =
-                    numBitsTotal - (numBitsPredictor + numBitsCache + numBitsLRU + numBitsExtra);
-
-            // number of bits in one sampler set: associativity of sampler * bits per sampler block entry
-            int numBitsPerSet =
-                    danSamplerAssociativity
-                            // tag bits, valid bit, prediction bit, trace bits, lru stack position bits
-                            * (danSamplerTagBitsPerEntry + 1 + 1 + 4 + danSamplerTraceBitsPerEntry);
-
-            // maximum number of sampler of sets we can afford with the space left over
-            samplerNumSets = numBitsLeftOver / numBitsPerSet;
 
             // compute the maximum saturating counter value; predictor constructor
             // needs this so we do it here
             danCounterMax = (1 << danCounterWidth) - 1;
 
             // make a predictor
-            deadBlockPredictor = new DeadBlockPredictor();
+            this.deadBlockPredictor = new DeadBlockPredictor();
 
-            // we should have at least one sampler set
-            assert (samplerNumSets >= 0);
+            // figure out what should divide evenly into a set index to be
+            // considered a sampler set
+            this.samplerModulus = 8;
+
+            // maximum number of sampler of sets we can afford with the space left over
+            this.samplerNumSets = numSets / this.samplerModulus;
 
             // make the sampler sets
             this.sets = new ArrayList<>();
             for (int i = 0; i < samplerNumSets; i++) {
                 this.sets.add(new DeadBlockPredictionSamplerSet());
             }
-
-            // figure out what should divide evenly into a set index to be
-            // considered a sampler set
-            samplerModulus = numSets / samplerNumSets;
-
-            // compute total number of bits used; we can print this out to validate
-            // the computation in the paper
-            totalBitsUsed = (numBitsTotal - numBitsLeftOver) + (numBitsPerSet * samplerNumSets);
         }
 
         //TODO: to be refactored!!!
@@ -378,11 +327,11 @@ public class DeadBlockPredictionBasedLRUPolicy<StateT extends Serializable> exte
 
     private DeadBlockPredictionSampler deadBlockPredictionSampler;
 
-    // sampler associativity (changed for 4MB cache)
+    // sampler associativity
     private static int danSamplerAssociativity = 12;
 
     // number of bits used to index predictor; determines number of
-    // entries in prediction tables (changed for 4MB cache)
+    // entries in prediction tables
     private static int danPredictorIndexBits = 12;
 
     // number of prediction tables
@@ -406,9 +355,6 @@ public class DeadBlockPredictionBasedLRUPolicy<StateT extends Serializable> exte
     // maximum value of saturating counter; derived from counter width
     private int danCounterMax;
 
-    // total number of bits used by all structures; computed in sampler::sampler
-    private int totalBitsUsed;
-
     /**
      * Create a dead block prediction based least recently used (LRU) policy for the specified evictable cache.
      *
@@ -424,7 +370,7 @@ public class DeadBlockPredictionBasedLRUPolicy<StateT extends Serializable> exte
                 args -> new BooleanValueProvider()
         );
 
-        this.deadBlockPredictionSampler = new DeadBlockPredictionSampler(cache.getNumSets(), cache.getAssociativity());
+        this.deadBlockPredictionSampler = new DeadBlockPredictionSampler(cache.getNumSets());
     }
 
     @Override
@@ -497,7 +443,7 @@ public class DeadBlockPredictionBasedLRUPolicy<StateT extends Serializable> exte
         // get the next prediction for this block using that trace
         CacheLine<Boolean> mirrorLine = this.mirrorCache.getLine(set, way);
         BooleanValueProvider stateProvider = (BooleanValueProvider) mirrorLine.getStateProvider();
-        stateProvider.dead = deadBlockPredictionSampler.deadBlockPredictor.predict(threadId, trace);
+        stateProvider.dead = dead;
     }
 
     /***
