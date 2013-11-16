@@ -128,7 +128,7 @@ public class HelperThreadAwareLRUPolicy<StateT extends Serializable> extends LRU
      * @return a value indicating whether the line found in the specified set index and way is brought by the helper thread or not
      */
     private boolean lineFoundIsHelperThread(int set, int way) {
-        return HelperThreadingHelper.isHelperThread(getCache().getSimulation().getHelperThreadL2CacheRequestProfilingHelper().getHelperThreadL2CacheRequestStates().get(set).get(way).getThreadId());
+        return HelperThreadingHelper.isHelperThread(this.getCache().getLine(set, way).getAccess().getThread());
     }
 
     /**

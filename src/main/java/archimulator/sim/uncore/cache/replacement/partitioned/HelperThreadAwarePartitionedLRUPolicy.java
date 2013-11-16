@@ -43,7 +43,7 @@ public abstract class HelperThreadAwarePartitionedLRUPolicy<StateT extends Seria
 
     @Override
     public void handlePromotionOnHit(MemoryHierarchyAccess access, int set, int way) {
-        if (access.getType() == MemoryHierarchyAccessType.LOAD && HelperThreadingHelper.isMainThread(access.getThread()) && HelperThreadingHelper.isHelperThread(getCache().getSimulation().getHelperThreadL2CacheRequestProfilingHelper().getHelperThreadL2CacheRequestStates().get(set).get(way).getThreadId())) {
+        if (access.getType() == MemoryHierarchyAccessType.LOAD && HelperThreadingHelper.isMainThread(access.getThread()) && HelperThreadingHelper.isHelperThread(getCache().getLine(set, way).getAccess().getThread())) {
             this.setLRU(set, way);  // supposed to be never used again: low locality => Demote to LRU position
             return;
         }
@@ -54,7 +54,7 @@ public abstract class HelperThreadAwarePartitionedLRUPolicy<StateT extends Seria
     @Override
     public void handleInsertionOnMiss(MemoryHierarchyAccess access, int set, int way) {
         if(access.getType() == MemoryHierarchyAccessType.LOAD && HelperThreadingHelper.isMainThread(access.getThread()) && getCache().getSimulation().getDelinquentLoadIdentificationHelper().isDelinquentPc(access.getThread().getId(), access.getVirtualPc())) {
-            setLRU(set, way);
+            this.setLRU(set, way);
             return;
         }
 

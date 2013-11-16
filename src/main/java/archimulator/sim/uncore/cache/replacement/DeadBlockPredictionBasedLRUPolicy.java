@@ -396,7 +396,8 @@ public class DeadBlockPredictionBasedLRUPolicy<StateT extends Serializable> exte
 
     @Override
     public void handlePromotionOnHit(MemoryHierarchyAccess access, int set, int way) {
-        this.updateSampler(set, way, access.getThread().getId(), access.getVirtualPc(), access.getPhysicalTag());
+        MemoryHierarchyAccess broughterAccess = this.getCache().getLine(set, way).getAccess();
+        this.updateSampler(set, way, broughterAccess.getThread().getId(), broughterAccess.getVirtualPc(), broughterAccess.getPhysicalTag());
     }
 
     @Override

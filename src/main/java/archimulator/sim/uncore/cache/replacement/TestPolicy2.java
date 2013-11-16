@@ -87,7 +87,7 @@ public class TestPolicy2<StateT extends Serializable> extends LRUPolicy<StateT> 
     public void handlePromotionOnHit(MemoryHierarchyAccess access, int set, int way) {
         super.handlePromotionOnHit(access, set, way);
 
-        this.handleLineReference(set, way, access.getThread().getId());
+        this.handleLineReference(set, way, this.getCache().getLine(set, way).getAccess().getThread().getId());
     }
 
     @Override

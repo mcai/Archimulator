@@ -20,11 +20,11 @@ package archimulator.sim.uncore.cache.replacement.helperThread;
 
 import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
-import archimulator.sim.uncore.cache.*;
+import archimulator.sim.uncore.cache.CacheAccess;
+import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.replacement.LRUPolicy;
 import archimulator.sim.uncore.helperThread.HelperThreadingHelper;
 import net.pickapack.util.IntegerIntegerPair;
-import net.pickapack.util.ValueProvider;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -39,19 +39,10 @@ import java.util.List;
  * @author Min Cai
  */
 public class ThrashingSensitiveHelperThreadAwareLRUPolicy<StateT extends Serializable> extends LRUPolicy<StateT> {
-    private Cache<Boolean> mirrorCache;
-
     private List<IntegerIntegerPair> predefinedDelinquentPcs;
 
     public ThrashingSensitiveHelperThreadAwareLRUPolicy(EvictableCache<StateT> cache) {
         super(cache);
-
-        this.mirrorCache = new BasicCache<>(
-                cache,
-                getCache().getName() + ".thrashingSensitiveHelperThreadAwareLRUPolicy.mirrorCache",
-                cache.getGeometry(),
-                args -> new BooleanValueProvider()
-        );
 
         this.predefinedDelinquentPcs = new ArrayList<>();
         this.predefinedDelinquentPcs.add(new IntegerIntegerPair(2, 0x004014d8));
@@ -69,12 +60,8 @@ public class ThrashingSensitiveHelperThreadAwareLRUPolicy<StateT extends Seriali
 
     @Override
     public void handlePromotionOnHit(MemoryHierarchyAccess access, int set, int way) {
-        CacheLine<Boolean> mirrorLine = this.mirrorCache.getLine(set, way);
-        BooleanValueProvider stateProvider = (BooleanValueProvider) mirrorLine.getStateProvider();
-
-        if (access.getType().isRead() && stateProvider.helperThread && HelperThreadingHelper.isMainThread(access.getThread())) {
+        if (access.getType().isRead() && HelperThreadingHelper.isHelperThread(this.getCache().getLine(set, way).getAccess().getThread()) && HelperThreadingHelper.isMainThread(access.getThread())) {
             this.setLRU(set, way);  //HT-MT inter-thread hit: Demote to LRU position; turn off HT bit
-            stateProvider.helperThread = false;
         } else {
             super.handlePromotionOnHit(access, set, way);  //Promote to MRU position
         }
@@ -83,17 +70,11 @@ public class ThrashingSensitiveHelperThreadAwareLRUPolicy<StateT extends Seriali
     //TODO: add HT quality sensitivity (inter-thread reuse distance) into policy selection, e.g., if the HT miss will not be reused by MT, insert it in LRU
     @Override
     public void handleInsertionOnMiss(MemoryHierarchyAccess access, int set, int way) {
-        CacheLine<Boolean> mirrorLine = this.mirrorCache.getLine(set, way);
-        BooleanValueProvider stateProvider = (BooleanValueProvider) mirrorLine.getStateProvider();
-
-        stateProvider.helperThread = false;
-
         if (access.getType().isRead() && this.isDelinquentPc(access.getThread().getId(), access.getVirtualPc())) {
             if (HelperThreadingHelper.isMainThread(access.getThread())) {
                 this.setLRU(set, way); // MT miss: insert in LRU position
             } else if (HelperThreadingHelper.isHelperThread(access.getThread())) {
                 this.setMRU(set, way);  //HT miss: insert in MRU position; turn on HT bit
-                stateProvider.helperThread = true;
             } else {
                 super.handleInsertionOnMiss(access, set, way); //insert in MRU position
             }
@@ -116,30 +97,5 @@ public class ThrashingSensitiveHelperThreadAwareLRUPolicy<StateT extends Seriali
     private boolean isDelinquentPc(int threadId, int pc) {
         return this.predefinedDelinquentPcs.contains(new IntegerIntegerPair(threadId, pc));
 //        return this.processor.getCapability(DelinquentLoadIdentificationHelper.class).isDelinquentPc(threadId, pc);
-    }
-
-    /**
-     * Boolean value provider.
-     */
-    private static class BooleanValueProvider implements ValueProvider<Boolean> {
-        private boolean state;
-        private boolean helperThread;
-
-        /**
-         * Create a boolean value provider.
-         */
-        private BooleanValueProvider() {
-            state = true;
-        }
-
-        @Override
-        public Boolean get() {
-            return state;
-        }
-
-        @Override
-        public Boolean getInitialValue() {
-            return true;
-        }
     }
 }

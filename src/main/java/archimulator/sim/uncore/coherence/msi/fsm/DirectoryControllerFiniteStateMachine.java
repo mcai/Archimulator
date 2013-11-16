@@ -208,6 +208,8 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
     public void hit(MemoryHierarchyAccess access, int tag, int set, int way) {
         this.fireServiceNonblockingRequestEvent(access, tag, true);
         this.directoryController.getCache().getReplacementPolicy().handlePromotionOnHit(access, set, way);
+        this.getLine().setAccess(access);
+        this.getLine().setTag(tag);
     }
 
     /**

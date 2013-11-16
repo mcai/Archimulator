@@ -348,6 +348,8 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
     public void hit(MemoryHierarchyAccess access, int tag, int set, int way) {
         this.fireServiceNonblockingRequestEvent(access, tag, true);
         this.cacheController.getCache().getReplacementPolicy().handlePromotionOnHit(access, set, way);
+        this.getLine().setAccess(access);
+        this.getLine().setTag(tag);
     }
 
     /**

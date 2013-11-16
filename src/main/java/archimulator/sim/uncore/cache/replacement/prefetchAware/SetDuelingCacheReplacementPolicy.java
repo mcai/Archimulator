@@ -33,15 +33,15 @@ import java.io.Serializable;
  */
 public interface SetDuelingCacheReplacementPolicy<StateT extends Serializable> extends CacheReplacementPolicy<StateT> {
     default CacheAccess<StateT> handleReplacement(MemoryHierarchyAccess access, int set, int tag) {
-        return getPolicy(access, set).handleReplacement(access, set, tag);
+        return this.getPolicy(access, set).handleReplacement(access, set, tag);
     }
 
     default void handlePromotionOnHit(MemoryHierarchyAccess access, int set, int way) {
-        getPolicy(access, set).handlePromotionOnHit(access, set, way);
+        this.getPolicy(access, set).handlePromotionOnHit(access, set, way);
     }
 
     default void handleInsertionOnMiss(MemoryHierarchyAccess access, int set, int way) {
-        getPolicy(access, set).handleInsertionOnMiss(access, set, way);
+        this.getPolicy(access, set).handleInsertionOnMiss(access, set, way);
     }
 
     /**
