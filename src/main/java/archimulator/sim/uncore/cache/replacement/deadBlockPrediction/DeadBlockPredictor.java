@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.uncore.cache.replacement.deadBlockPrediction;
 
-import net.pickapack.util.Reference;
+import archimulator.util.NoThresholdSaturatingCounter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,29 +35,25 @@ public class DeadBlockPredictor {
     // predictor must meet this threshold to predict a block is dead
     private static int threshold = 8;
 
-    // maximum value of saturating counter; derived from counter width
-    private int counterMax;
-
     // number of bits used to index predictor; determines number of
     // entries in prediction tables
     private int numPredictorIndexBits;
 
-    private List<List<Reference<Integer>>> tables;
+    private List<List<NoThresholdSaturatingCounter>> tables;
 
     /**
      * Create a dead block predictor.
      */
-    public DeadBlockPredictor(int danPredictionTableEntries, int counterMax, int numPredictorIndexBits) {
-        this.counterMax = counterMax;
+    public DeadBlockPredictor(int numEntriesPerPredictionTable, int counterMax, int numPredictorIndexBits) {
         this.numPredictorIndexBits = numPredictorIndexBits;
 
         this.tables = new ArrayList<>();
 
         for (int i = 0; i < numPredictionTables; i++) {
-            List<Reference<Integer>> table = new ArrayList<>();
+            List<NoThresholdSaturatingCounter> table = new ArrayList<>();
 
-            for (int j = 0; j < danPredictionTableEntries; j++) {
-                table.add(new Reference<>(0));
+            for (int j = 0; j < numEntriesPerPredictionTable; j++) {
+                table.add(new NoThresholdSaturatingCounter(0, counterMax, 0));
             }
 
             this.tables.add(table);
@@ -68,8 +64,8 @@ public class DeadBlockPredictor {
      * Hash a trace, thread ID, and prediction table number into a predictor table index.
      *
      * @param threadId the thread ID
-     * @param trace the trace
-     * @param table the prediction table number
+     * @param trace    the trace
+     * @param table    the prediction table number
      * @return the corresponding table index for the specified thread ID, trace and prediction table number
      */
     private int getTableIndex(int threadId, int trace, int table) {
@@ -81,30 +77,22 @@ public class DeadBlockPredictor {
      * Update the predictor when a block, either dead or not, is encountered.
      *
      * @param threadId the thread ID
-     * @param trace the trace
-     * @param dead a value indicating whether the block is dead or not
+     * @param trace    the trace
+     * @param dead     a value indicating whether the block is dead or not
      */
     public void update(int threadId, int trace, boolean dead) {
         // for each predictor table...
         for (int i = 0; i < numPredictionTables; i++) {
             // ...get a pointer to the corresponding entry in that table
-            Reference<Integer> c = tables.get(i).get(getTableIndex(threadId, trace, i));
+            NoThresholdSaturatingCounter c = tables.get(i).get(getTableIndex(threadId, trace, i));
 
-            // if the block is dead, increment the counter
             if (dead) {
-                if (c.get() < this.counterMax) {
-                    c.set(c.get() + 1);
-                }
+                c.increment();
             } else {
-                // otherwise, decrease the counter
                 if (i % 2 == 1) {
-                    // odd numbered tables decrease exponentially
-                    c.set(c.get() >> 1);
+                    c.decrementExponentially();
                 } else {
-                    // even numbered tables decrease by one
-                    if (c.get() > 0) {
-                        c.set(c.get() - 1);
-                    }
+                    c.decrement();
                 }
             }
         }
@@ -114,27 +102,16 @@ public class DeadBlockPredictor {
      * Get a value indicating whether the specified block is predicted to be dead or not.
      *
      * @param threadId the thread ID
-     * @param trace the trace
+     * @param trace    the trace
      * @return a value indicating whether the specified block is predicted to be dead or not
      */
     public boolean predict(int threadId, int trace) {
-        // start the confidence sum as 0
-        int conf = 0;
-
-        // for each table...
-        for (int i = 0; i < numPredictionTables; i++) {
-            // ...get the counter value for that table...
-            int val = tables.get(i).get(getTableIndex(threadId, trace, i)).get();
-
-            // and add it to the running total
-            conf += val;
-        }
-
-        // if the counter is at least the threshold, the block is predicted dead
-        return conf >= threshold;
+        return this.tables.stream().mapToInt(
+                table -> table.get(getTableIndex(threadId, trace, this.tables.indexOf(table))).get()
+        ).sum() >= threshold;
     }
 
-    /***
+    /**
      * hash three numbers into one.
      *
      * @param a the a
@@ -177,6 +154,7 @@ public class DeadBlockPredictor {
 
     /**
      * The generalized hash function.
+     *
      * @param x the x
      * @param i the i
      * @return the generalized hash of x with i

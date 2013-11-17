@@ -22,6 +22,7 @@ import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.*;
 import archimulator.sim.uncore.cache.replacement.AbstractCacheReplacementPolicy;
+import archimulator.util.NoThresholdSaturatingCounter;
 import net.pickapack.util.ValueProvider;
 
 import java.io.Serializable;
@@ -138,110 +139,4 @@ public class RereferenceIntervalPredictionPolicy<StateT extends Serializable> ex
         }
     }
 
-    /**
-     * No threshold saturating counter.
-     */
-    private class NoThresholdSaturatingCounter implements Serializable {
-        private int minValue;
-        private int maxValue;
-        private int value;
-        private int initialValue;
-
-        /**
-         * Create a no threshold saturating counter.
-         *
-         * @param minValue     the minimum value
-         * @param maxValue     the max value
-         * @param initialValue the initial value
-         */
-        public NoThresholdSaturatingCounter(int minValue, int maxValue, int initialValue) {
-            this.minValue = minValue;
-            this.maxValue = maxValue;
-            this.value = initialValue;
-            this.initialValue = initialValue;
-        }
-
-        /**
-         * Reset the value of the saturating counter to the initial value.
-         */
-        public void reset() {
-            this.value = this.initialValue;
-        }
-
-        /**
-         * Increment the value of the saturating counter.
-         */
-        public void increment() {
-            if (this.value < this.maxValue) {
-                this.value++;
-            }
-        }
-
-        /**
-         * Decrement the value of the saturating counter.
-         */
-        public void decrement() {
-            if (this.value > this.minValue) {
-                this.value--;
-            }
-        }
-
-        /**
-         * Set the value.
-         *
-         * @param value the value
-         */
-        public void setValue(int value) {
-            this.value = value;
-
-            if (this.value > this.maxValue) {
-                this.value = this.maxValue;
-            }
-
-            if (this.value < this.minValue) {
-                this.value = this.minValue;
-            }
-        }
-
-        /**
-         * Get the maximum value.
-         *
-         * @return the maximum value
-         */
-        public int getMinValue() {
-            return minValue;
-        }
-
-        /**
-         * Get the maximum value.
-         *
-         * @return the maximum value
-         */
-        public int getMaxValue() {
-            return maxValue;
-        }
-
-        /**
-         * Get the value.
-         *
-         * @return the value
-         */
-        public int getValue() {
-            return value;
-        }
-
-        /**
-         * Get the initial value.
-         *
-         * @return the initial value
-         */
-        public int getInitialValue() {
-            return initialValue;
-        }
-
-        @Override
-        public String toString() {
-            return String.format("NoThresholdSaturatingCounter{minValue=%d, maxValue=%d, value=%d, initialValue=%d}", minValue, maxValue, value, initialValue);
-        }
-    }
 }

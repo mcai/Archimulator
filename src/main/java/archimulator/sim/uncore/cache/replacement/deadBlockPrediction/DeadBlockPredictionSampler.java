@@ -59,10 +59,10 @@ public class DeadBlockPredictionSampler {
 
     private int numPredictorIndexBits;
 
-    private List<List<DeadBlockPredictionSamplerEntry>> entries;
-
-    private int numNets;
+    private int numSets;
     private int modulus;
+
+    private List<List<DeadBlockPredictionSamplerEntry>> entries;
 
     private DeadBlockPredictor deadBlockPredictor;
 
@@ -85,28 +85,26 @@ public class DeadBlockPredictionSampler {
         this.numPredictorIndexBits = 12;
 
         // figure out number of entries in each table
-        int danPredictionTableEntries = 1 << this.numPredictorIndexBits;
+        int numEntriesPerPredictionTable = 1 << this.numPredictorIndexBits;
 
         // compute the maximum saturating counter value; predictor constructor
         // needs this so we do it here
-        int danCounterMax = (1 << this.counterWidth) - 1;
+        int counterMax = (1 << this.counterWidth) - 1;
 
         // make a predictor
-        this.deadBlockPredictor = new DeadBlockPredictor(danPredictionTableEntries, danCounterMax, this.numPredictorIndexBits);
+        this.deadBlockPredictor = new DeadBlockPredictor(numEntriesPerPredictionTable, counterMax, this.numPredictorIndexBits);
 
         // figure out what should divide evenly into a set index to be
         // considered a sampler set
         this.modulus = 8;
 
         // maximum number of sampler of sets we can afford with the space left over
-        this.numNets = numSets / this.modulus;
-
-        this.entries = new ArrayList<>();
+        this.numSets = numSets / this.modulus;
 
         // make the sampler sets
         this.entries = new ArrayList<>();
 
-        for (int i = 0; i < this.numNets; i++) {
+        for (int i = 0; i < this.numSets; i++) {
             ArrayList<DeadBlockPredictionSamplerEntry> entriesPerSet = new ArrayList<>();
             this.entries.add(entriesPerSet);
 
@@ -128,7 +126,7 @@ public class DeadBlockPredictionSampler {
      * @param tag the tag
      */
     public void access(int set, int threadId, int pc, int tag) {
-        if (set < 0 && set >= this.numNets){
+        if (set < 0 && set >= this.numSets){
             throw new IllegalArgumentException(set + "");
         }
 
@@ -239,8 +237,8 @@ public class DeadBlockPredictionSampler {
      *
      * @return the number of sampler sets
      */
-    public int getNumNets() {
-        return numNets;
+    public int getNumSets() {
+        return numSets;
     }
 
     /**
@@ -252,6 +250,11 @@ public class DeadBlockPredictionSampler {
         return modulus;
     }
 
+    /**
+     * Get the dead block predictor.
+     *
+     * @return the dead block predictor
+     */
     public DeadBlockPredictor getDeadBlockPredictor() {
         return deadBlockPredictor;
     }
