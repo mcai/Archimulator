@@ -69,6 +69,8 @@ public class DeadBlockPredictionBasedLRUPolicy<StateT extends Serializable> exte
         }
     }
 
+    private static final int numTraceBitsPerEntry = 16;
+
     private Cache<Boolean> mirrorCache;
 
     private DeadBlockPredictionSampler deadBlockPredictionSampler;
@@ -93,22 +95,18 @@ public class DeadBlockPredictionBasedLRUPolicy<StateT extends Serializable> exte
 
     @Override
     public CacheAccess<StateT> handleReplacement(MemoryHierarchyAccess access, int set, int tag) {
-        // select a victim using default LRU policy
         int victimWay = super.handleReplacement(access, set, tag).getWay();
 
-        // look for a predicted dead block
         for (int i = 0; i < this.getCache().getAssociativity(); i++) {
             CacheLine<Boolean> mirrorLine = this.mirrorCache.getLine(set, i);
             BooleanValueProvider stateProvider = (BooleanValueProvider) mirrorLine.getStateProvider();
 
             if (stateProvider.dead) {
-                // found a predicted dead block; this is our new victim
                 victimWay = i;
                 break;
             }
         }
 
-        // return the selected victim
         return new CacheAccess<>(this.getCache(), access, set, victimWay, tag);
     }
 
@@ -136,29 +134,22 @@ public class DeadBlockPredictionBasedLRUPolicy<StateT extends Serializable> exte
      * @param tag the tag
      */
     private void updateSampler(int set, int way, int threadId, int pc, int tag) {
-        // determine if this is a sampler set
-        if (set % this.deadBlockPredictionSampler.getModulus() == 0) {
-            // this is a sampler set.  access the sampler.
-            int samplerSet = set / this.deadBlockPredictionSampler.getModulus();
+        if (set % DeadBlockPredictionSampler.getModulus() == 0) {
+            int samplerSet = set / DeadBlockPredictionSampler.getModulus();
             this.deadBlockPredictionSampler.access(samplerSet, threadId, pc, tag);
         }
 
-        // make the trace
-        int trace = makeTrace(pc, this.deadBlockPredictionSampler.getNumTraceBitsPerEntry());
+        int trace = makeTrace(pc);
 
-        // predict whether this block is "dead on arrival"
         boolean dead = this.deadBlockPredictionSampler.getDeadBlockPredictor().predict(threadId, trace);
 
         if (dead) {
-            // if block is predicted dead, then the block should be put in the LRU position
             this.setLRU(set, way);
         }
         else {
-            // use default LRU replacement policy
             this.setMRU(set, way);
         }
 
-        // get the next prediction for this block using that trace
         CacheLine<Boolean> mirrorLine = this.mirrorCache.getLine(set, way);
         BooleanValueProvider stateProvider = (BooleanValueProvider) mirrorLine.getStateProvider();
         stateProvider.dead = dead;
@@ -170,7 +161,7 @@ public class DeadBlockPredictionBasedLRUPolicy<StateT extends Serializable> exte
      * @param pc the virtual PC address
      * @return a trace made from the specified PC address
      */
-    public static int makeTrace(int pc, int danSamplerTraceBitsPerEntry) {
-        return pc & ((1 << danSamplerTraceBitsPerEntry) - 1);
+    public static int makeTrace(int pc) {
+        return pc & ((1 << numTraceBitsPerEntry) - 1);
     }
 }

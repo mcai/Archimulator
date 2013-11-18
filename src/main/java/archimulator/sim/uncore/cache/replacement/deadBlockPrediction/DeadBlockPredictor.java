@@ -29,14 +29,10 @@ import java.util.List;
  * @author Min Cai
  */
 public class DeadBlockPredictor {
-    // number of prediction tables
-    private static int numPredictionTables = 3;
+    private static final int numPredictionTables = 3;
 
-    // predictor must meet this threshold to predict a block is dead
-    private static int threshold = 8;
+    private static final int threshold = 8;
 
-    // number of bits used to index predictor; determines number of
-    // entries in prediction tables
     private int numPredictorIndexBits;
 
     private List<List<NoThresholdSaturatingCounter>> tables;
@@ -44,7 +40,7 @@ public class DeadBlockPredictor {
     /**
      * Create a dead block predictor.
      */
-    public DeadBlockPredictor(int numEntriesPerPredictionTable, int counterMax, int numPredictorIndexBits) {
+    public DeadBlockPredictor(int counterMax, int numPredictorIndexBits) {
         this.numPredictorIndexBits = numPredictorIndexBits;
 
         this.tables = new ArrayList<>();
@@ -52,7 +48,7 @@ public class DeadBlockPredictor {
         for (int i = 0; i < numPredictionTables; i++) {
             List<NoThresholdSaturatingCounter> table = new ArrayList<>();
 
-            for (int j = 0; j < numEntriesPerPredictionTable; j++) {
+            for (int j = 0; j < 1 << numPredictorIndexBits; j++) {
                 table.add(new NoThresholdSaturatingCounter(0, counterMax, 0));
             }
 

@@ -32,7 +32,7 @@ public class DeadBlockPredictionSampler {
      */
     public class DeadBlockPredictionSamplerEntry {
         private int lruStackPosition;
-        private int tag;
+        private int partialTag;
         private int trace;
         private boolean dead;
         private boolean valid;
@@ -42,26 +42,24 @@ public class DeadBlockPredictionSampler {
          */
         public DeadBlockPredictionSamplerEntry(int lruStackPosition) {
             this.lruStackPosition = lruStackPosition;
-            valid = false;
-            tag = 0;
-            trace = 0;
-            dead = false;
+            this.partialTag = 0;
+            this.trace = 0;
+            this.dead = false;
+            this.valid = false;
         }
     }
 
-    private int associativity;
+    private static final int associativity = 12;
 
-    private int numTagBitsPerEntry;
+    private static final int modulus = 8;
 
-    private int numTraceBitsPerEntry;
+    private static final int numTagBitsPerEntry = 16;
 
-    private int counterWidth;
+    private static final int counterWidth = 2;
 
-    private int numPredictorIndexBits;
+    private static final int numPredictorIndexBits = 12;
 
     private int numSets;
-
-    private int modulus;
 
     private List<List<DeadBlockPredictionSamplerEntry>> entries;
 
@@ -70,31 +68,19 @@ public class DeadBlockPredictionSampler {
     /**
      * Create a dead block prediction sampler.
      *
-     * @param numSets the number of sets in the parent cache
+     * @param numSetsParentCache the number of sets in the parent cache
      */
-    public DeadBlockPredictionSampler(int numSets) {
-        this.associativity = 12;
-
-        this.numTagBitsPerEntry = 16;
-
-        this.numTraceBitsPerEntry = 16;
-
-        this.counterWidth = 2;
-
-        this.numPredictorIndexBits = 12;
-
+    public DeadBlockPredictionSampler(int numSetsParentCache) {
         this.deadBlockPredictor = new DeadBlockPredictor(
-                1 << this.numPredictorIndexBits, (1 << this.counterWidth) - 1, this.numPredictorIndexBits
+                (1 << counterWidth) - 1, numPredictorIndexBits
         );
 
-        this.modulus = 8;
-
-        this.numSets = numSets / this.modulus;
+        this.numSets = numSetsParentCache / modulus;
 
         this.entries = new ArrayList<>();
 
         for (int i = 0; i < this.numSets; i++) {
-            ArrayList<DeadBlockPredictionSamplerEntry> entriesPerSet = new ArrayList<>();
+            List<DeadBlockPredictionSamplerEntry> entriesPerSet = new ArrayList<>();
             this.entries.add(entriesPerSet);
 
             for (int j = 0; j < associativity; j++) {
@@ -115,35 +101,35 @@ public class DeadBlockPredictionSampler {
         List<DeadBlockPredictionSamplerEntry> entriesPerSet = this.entries.get(set);
 
         // get a partial tag to search for
-        int partialTag = tag & (1 << this.numTagBitsPerEntry) - 1;
+        int partialTag = tag & (1 << numTagBitsPerEntry) - 1;
 
         // this will be the way of the sampler entry we end up hitting or replacing
         int i;
 
         // search for a matching tag
-        for (i = 0; i < this.associativity; i++)
-            if (entriesPerSet.get(i).valid && entriesPerSet.get(i).tag == partialTag) {
+        for (i = 0; i < associativity; i++)
+            if (entriesPerSet.get(i).valid && entriesPerSet.get(i).partialTag == partialTag) {
                 // we know this block is not dead; inform the predictor
                 this.deadBlockPredictor.update(threadId, entriesPerSet.get(i).trace, false);
                 break;
             }
 
         // did we find a match?
-        if (i == this.associativity) {
+        if (i == associativity) {
             // look for an invalid block to replace
-            for (i = 0; i < this.associativity; i++) if (!entriesPerSet.get(i).valid) break;
+            for (i = 0; i < associativity; i++) if (!entriesPerSet.get(i).valid) break;
 
             // no invalid block?  look for a dead block.
-            if (i == this.associativity) {
+            if (i == associativity) {
                 // find the LRU dead block
-                for (i = 0; i < this.associativity; i++) if (entriesPerSet.get(i).dead) break;
+                for (i = 0; i < associativity; i++) if (entriesPerSet.get(i).dead) break;
             }
 
             // no invalid or dead block?  use the LRU block
-            if (i == this.associativity) {
+            if (i == associativity) {
                 int j;
-                for (j = 0; j < this.associativity; j++)
-                    if (entriesPerSet.get(j).lruStackPosition == this.associativity - 1) break;
+                for (j = 0; associativity > j; j++)
+                    if (entriesPerSet.get(j).lruStackPosition == associativity - 1) break;
                 i = j;
             }
 
@@ -151,19 +137,19 @@ public class DeadBlockPredictionSampler {
             this.deadBlockPredictor.update(threadId, entriesPerSet.get(i).trace, true);
 
             // fill the victim block
-            entriesPerSet.get(i).tag = partialTag;
+            entriesPerSet.get(i).partialTag = partialTag;
             entriesPerSet.get(i).valid = true;
         }
 
         // record the trace
-        entriesPerSet.get(i).trace = DeadBlockPredictionBasedLRUPolicy.makeTrace(pc, this.getNumTraceBitsPerEntry());
+        entriesPerSet.get(i).trace = DeadBlockPredictionBasedLRUPolicy.makeTrace(pc);
 
         // get the next prediction for this entry
         entriesPerSet.get(i).dead = this.deadBlockPredictor.predict(threadId, entriesPerSet.get(i).trace);
 
         // now the replaced entry should be moved to the MRU position
         int position = entriesPerSet.get(i).lruStackPosition;
-        for (int way = 0; way < this.associativity; way++)
+        for (int way = 0; way < associativity; way++)
             if (entriesPerSet.get(way).lruStackPosition < position)
                 entriesPerSet.get(way).lruStackPosition++;
         entriesPerSet.get(i).lruStackPosition = 0;
@@ -174,44 +160,17 @@ public class DeadBlockPredictionSampler {
      *
      * @return the associativity
      */
-    public int getAssociativity() {
+    public static int getAssociativity() {
         return associativity;
     }
 
     /**
-     * Get the number of partial tag bits kept per sampler entry.
+     * Get the modulus value that determines which LLC sets are sampler sets.
      *
-     * @return the number of partial tag bits kept per sampler entry
+     * @return the modulus value that determines which LLC sets are sampler sets
      */
-    public int getNumTagBitsPerEntry() {
-        return numTagBitsPerEntry;
-    }
-
-    /**
-     * Get the number of trace (partial PC) bits kept per sampler entry.
-     *
-     * @return the number of trace (partial PC) bits kept per sampler entry
-     */
-    public int getNumTraceBitsPerEntry() {
-        return numTraceBitsPerEntry;
-    }
-
-    /**
-     * Get the width of prediction saturating counters.
-     *
-     * @return the width of prediction saturating counters
-     */
-    public int getCounterWidth() {
-        return counterWidth;
-    }
-
-    /**
-     * Get the number of bits used to index predictor; determines the number of entries in prediction tables.
-     *
-     * @return the number of bits used to index predictor; determines the number of entries in prediction tables
-     */
-    public int getNumPredictorIndexBits() {
-        return numPredictorIndexBits;
+    public static int getModulus() {
+        return modulus;
     }
 
     /**
@@ -221,15 +180,6 @@ public class DeadBlockPredictionSampler {
      */
     public int getNumSets() {
         return numSets;
-    }
-
-    /**
-     * Get the modulus value that determines which LLC sets are sampler sets.
-     *
-     * @return the modulus value that determines which LLC sets are sampler sets
-     */
-    public int getModulus() {
-        return modulus;
     }
 
     /**
