@@ -83,7 +83,7 @@ public class DeadBlockPredictionBasedLRUPolicy<StateT extends Serializable> exte
 
         this.mirrorCache = new BasicCache<>(
                 cache,
-                getCache().getName() + ".rereferenceIntervalPredictionPolicy.mirrorCache",
+                getCache().getName() + ".deadBlockPredictionBasedLRUPolicy.mirrorCache",
                 cache.getGeometry(),
                 args -> new BooleanValueProvider()
         );

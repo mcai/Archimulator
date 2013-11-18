@@ -123,8 +123,8 @@ public abstract class StackBasedCacheReplacementPolicy<StateT extends Serializab
      * @return the stack position (distance) for the specified way in the specified set
      */
     public int getStackPosition(int set, int way) {
-        Integer stackEntryFound = this.getStackEntry(set, way);
-        return this.stackEntries.get(set).indexOf(stackEntryFound);
+        Integer stackEntry = this.getStackEntry(set, way);
+        return this.stackEntries.get(set).indexOf(stackEntry);
     }
 
     /**
@@ -135,9 +135,9 @@ public abstract class StackBasedCacheReplacementPolicy<StateT extends Serializab
      * @param newStackPosition the new stack position (distance)
      */
     public void setStackPosition(int set, int way, int newStackPosition) {
-        Integer stackEntryFound = this.getStackEntry(set, way);
-        this.stackEntries.get(set).remove(stackEntryFound);
-        this.stackEntries.get(set).add(newStackPosition, stackEntryFound);
+        Integer stackEntry = this.getStackEntry(set, way);
+        this.stackEntries.get(set).remove(stackEntry);
+        this.stackEntries.get(set).add(newStackPosition, stackEntry);
     }
 
     /**
