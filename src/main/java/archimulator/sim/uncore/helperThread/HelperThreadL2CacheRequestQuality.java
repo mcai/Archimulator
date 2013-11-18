@@ -81,4 +81,13 @@ public enum HelperThreadL2CacheRequestQuality {
     public boolean isUseful() {
         return this == TIMELY || this == LATE;
     }
+
+    /**
+     * Get a value indicating whether the current state of the quality is polluting or not.
+     *
+     * @return a value indicating whether the current state of the quality is polluting or not
+     */
+    public boolean isPolluting() {
+        return this == BAD;
+    }
 }

@@ -71,6 +71,8 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
     private long numEarlyHelperThreadL2CacheRequests;
 
     private Predictor<HelperThreadL2CacheRequestQuality> helperThreadL2CacheRequestQualityPredictor;
+    private Predictor<Boolean> helperThreadL2CacheRequestUsefulnessPredictor;
+    private Predictor<Boolean> helperThreadL2CacheRequestPollutionPredictor;
 
     /**
      * Create a helper thread L2 request profiling helper.
@@ -91,6 +93,8 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
         }
 
         this.helperThreadL2CacheRequestQualityPredictor = new CacheBasedPredictor<>(l2CacheController, l2CacheController.getName() + "/helperThreadL2CacheRequestQualityPredictor", new CacheGeometry(64, 1, 1), 4, 16, HelperThreadL2CacheRequestQuality.UGLY); //TODO: parameters should not be hardcoded
+        this.helperThreadL2CacheRequestUsefulnessPredictor = new CacheBasedPredictor<>(l2CacheController, l2CacheController.getName() + "/helperThreadL2CacheRequestUsefulnessPredictor", new CacheGeometry(64, 1, 1), 4, 16, false); //TODO: parameters should not be hardcoded
+        this.helperThreadL2CacheRequestPollutionPredictor = new CacheBasedPredictor<>(l2CacheController, l2CacheController.getName() + "/helperThreadL2CacheRequestPollutionPredictor", new CacheGeometry(64, 1, 1), 4, 16, false); //TODO: parameters should not be hardcoded
 
         this.l2CacheController.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, event -> {
             if (event.getCacheController().equals(HelperThreadL2CacheRequestProfilingHelper.this.l2CacheController)) {
@@ -133,7 +137,11 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
 
         this.l2CacheController.getBlockingEventDispatcher().addListener(
                 HelperThreadL2CacheRequestEvent.class,
-                event -> helperThreadL2CacheRequestQualityPredictor.update(event.getPc(), event.getQuality())
+                event -> {
+                    helperThreadL2CacheRequestQualityPredictor.update(event.getPc(), event.getQuality());
+                    helperThreadL2CacheRequestUsefulnessPredictor.update(event.getPc(), event.getQuality().isUseful());
+                    helperThreadL2CacheRequestPollutionPredictor.update(event.getPc(), event.getQuality().isPolluting());
+                }
         );
     }
 
@@ -569,6 +577,24 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
      */
     public Predictor<HelperThreadL2CacheRequestQuality> getHelperThreadL2CacheRequestQualityPredictor() {
         return helperThreadL2CacheRequestQualityPredictor;
+    }
+
+    /**
+     * Get the helper thread L2 cache request usefulness predictor.
+     *
+     * @return the helper thread L2 cache request usefulness predictor
+     */
+    public Predictor<Boolean> getHelperThreadL2CacheRequestUsefulnessPredictor() {
+        return helperThreadL2CacheRequestUsefulnessPredictor;
+    }
+
+    /**
+     * Get the helper thread L2 cache request pollution predictor.
+     *
+     * @return the helper thread L2 cache request pollution predictor
+     */
+    public Predictor<Boolean> getHelperThreadL2CacheRequestPollutionPredictor() {
+        return helperThreadL2CacheRequestPollutionPredictor;
     }
 
     /**

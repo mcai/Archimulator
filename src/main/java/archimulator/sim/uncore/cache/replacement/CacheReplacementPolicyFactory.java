@@ -27,6 +27,7 @@ import archimulator.sim.uncore.cache.replacement.costAware.helperThread.HelperTh
 import archimulator.sim.uncore.cache.replacement.costAware.mlp.MLPSensitiveLRUPolicy;
 import archimulator.sim.uncore.cache.replacement.deadBlockPrediction.DeadBlockPredictionBasedLRUPolicy;
 import archimulator.sim.uncore.cache.replacement.helperThread.HelperThreadAwareLRUPolicy;
+import archimulator.sim.uncore.cache.replacement.helperThread.HelperThreadAwareLRUPolicy2;
 import archimulator.sim.uncore.cache.replacement.helperThread.HelperThreadIntervalAwareLRUPolicy;
 import archimulator.sim.uncore.cache.replacement.costAware.mlp.LinearMLPAwareLRUPolicy;
 import archimulator.sim.uncore.cache.replacement.partitioned.HelperThreadAndMLPAwarePartitionedLRUPolicy;
@@ -72,6 +73,8 @@ public class CacheReplacementPolicyFactory {
                 return new HelperThreadIntervalAwareLRUPolicy<>(cache);
             case HELPER_THREAD_AWARE_BREAKDOWN_LRU:
                 return new HelperThreadAwareLRUPolicy<>(cache, true);
+            case HELPER_THREAD_AWARE_BREAKDOWN_LRU_2:
+                return new HelperThreadAwareLRUPolicy2<>(cache);
             case REUSE_DISTANCE_PREDICTION:
                 return new ReuseDistancePredictionPolicy<>(cache);
             case REREFERENCE_INTERVAL_PREDICTION:
