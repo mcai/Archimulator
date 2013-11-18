@@ -40,8 +40,8 @@ public class DeadBlockPredictionSampler {
         /**
          * Create a dead block prediction sampler entry.
          */
-        public DeadBlockPredictionSamplerEntry() {
-            lruStackPosition = 0;
+        public DeadBlockPredictionSamplerEntry(int lruStackPosition) {
+            this.lruStackPosition = lruStackPosition;
             valid = false;
             tag = 0;
             trace = 0;
@@ -60,6 +60,7 @@ public class DeadBlockPredictionSampler {
     private int numPredictorIndexBits;
 
     private int numSets;
+
     private int modulus;
 
     private List<List<DeadBlockPredictionSamplerEntry>> entries;
@@ -80,39 +81,24 @@ public class DeadBlockPredictionSampler {
 
         this.counterWidth = 2;
 
-        // number of bits used to index predictor; determines number of
-        // entries in prediction tables
         this.numPredictorIndexBits = 12;
 
-        // figure out number of entries in each table
-        int numEntriesPerPredictionTable = 1 << this.numPredictorIndexBits;
+        this.deadBlockPredictor = new DeadBlockPredictor(
+                1 << this.numPredictorIndexBits, (1 << this.counterWidth) - 1, this.numPredictorIndexBits
+        );
 
-        // compute the maximum saturating counter value; predictor constructor
-        // needs this so we do it here
-        int counterMax = (1 << this.counterWidth) - 1;
-
-        // make a predictor
-        this.deadBlockPredictor = new DeadBlockPredictor(numEntriesPerPredictionTable, counterMax, this.numPredictorIndexBits);
-
-        // figure out what should divide evenly into a set index to be
-        // considered a sampler set
         this.modulus = 8;
 
-        // maximum number of sampler of sets we can afford with the space left over
         this.numSets = numSets / this.modulus;
 
-        // make the sampler sets
         this.entries = new ArrayList<>();
 
         for (int i = 0; i < this.numSets; i++) {
             ArrayList<DeadBlockPredictionSamplerEntry> entriesPerSet = new ArrayList<>();
             this.entries.add(entriesPerSet);
 
-            // initialize the LRU replacement algorithm for these entries
             for (int j = 0; j < associativity; j++) {
-                DeadBlockPredictionSamplerEntry entry = new DeadBlockPredictionSamplerEntry();
-                entry.lruStackPosition = j;
-                entriesPerSet.add(entry);
+                entriesPerSet.add(new DeadBlockPredictionSamplerEntry(j));
             }
         }
     }
@@ -126,11 +112,6 @@ public class DeadBlockPredictionSampler {
      * @param tag the tag
      */
     public void access(int set, int threadId, int pc, int tag) {
-        if (set < 0 && set >= this.numSets){
-            throw new IllegalArgumentException(set + "");
-        }
-
-        // get a pointer to this samplerSet's sampler entries
         List<DeadBlockPredictionSamplerEntry> entriesPerSet = this.entries.get(set);
 
         // get a partial tag to search for
@@ -217,6 +198,7 @@ public class DeadBlockPredictionSampler {
 
     /**
      * Get the width of prediction saturating counters.
+     *
      * @return the width of prediction saturating counters
      */
     public int getCounterWidth() {

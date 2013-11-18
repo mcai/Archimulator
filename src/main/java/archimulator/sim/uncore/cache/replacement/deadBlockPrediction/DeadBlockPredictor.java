@@ -81,9 +81,7 @@ public class DeadBlockPredictor {
      * @param dead     a value indicating whether the block is dead or not
      */
     public void update(int threadId, int trace, boolean dead) {
-        // for each predictor table...
         for (int i = 0; i < numPredictionTables; i++) {
-            // ...get a pointer to the corresponding entry in that table
             NoThresholdSaturatingCounter c = tables.get(i).get(getTableIndex(threadId, trace, i));
 
             if (dead) {
