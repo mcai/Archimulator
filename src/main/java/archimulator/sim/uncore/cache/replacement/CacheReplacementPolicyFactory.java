@@ -75,6 +75,10 @@ public class CacheReplacementPolicyFactory {
                 return new HelperThreadAwareLRUPolicy<>(cache, true);
             case HELPER_THREAD_AWARE_BREAKDOWN_LRU_2:
                 return new HelperThreadAwareLRUPolicy2<>(cache);
+            case HELPER_THREAD_AWARE_BREAKDOWN_LRU_2H:
+                return new HelperThreadAwareLRUPolicy2<>(cache, true, false);
+            case HELPER_THREAD_AWARE_BREAKDOWN_LRU_2M:
+                return new HelperThreadAwareLRUPolicy2<>(cache, false, true);
             case REUSE_DISTANCE_PREDICTION:
                 return new ReuseDistancePredictionPolicy<>(cache);
             case REREFERENCE_INTERVAL_PREDICTION:

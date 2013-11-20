@@ -34,13 +34,27 @@ import java.io.Serializable;
  * @author Min Cai
  */
 public class HelperThreadAwareLRUPolicy2<StateT extends Serializable> extends LRUPolicy<StateT> {
+    private boolean hitAltered;
+    private boolean missAltered;
+
     /**
      * Create a helper thread aware least recently used (LRU) policy 2 for the specified evictable cache.
      *
      * @param cache the parent evictable cache
      */
     public HelperThreadAwareLRUPolicy2(EvictableCache<StateT> cache) {
+        this(cache, true, true);
+    }
+
+    /**
+     * Create a helper thread aware least recently used (LRU) policy 2 for the specified evictable cache.
+     *
+     * @param cache the parent evictable cache
+     */
+    public HelperThreadAwareLRUPolicy2(EvictableCache<StateT> cache, boolean hitAltered, boolean missAltered) {
         super(cache);
+        this.hitAltered = hitAltered;
+        this.missAltered = missAltered;
     }
 
     /**
@@ -52,7 +66,7 @@ public class HelperThreadAwareLRUPolicy2<StateT extends Serializable> extends LR
      */
     @Override
     public void handlePromotionOnHit(MemoryHierarchyAccess access, int set, int way) {
-        if (access.getType() == MemoryHierarchyAccessType.LOAD && requesterIsMainThread(access) && lineFoundIsHelperThread(set, way)) {
+        if (this.hitAltered && access.getType() == MemoryHierarchyAccessType.LOAD && requesterIsMainThread(access) && lineFoundIsHelperThread(set, way)) {
             this.setLRU(set, way);
             return;
         }
@@ -69,7 +83,7 @@ public class HelperThreadAwareLRUPolicy2<StateT extends Serializable> extends LR
      */
     @Override
     public void handleInsertionOnMiss(MemoryHierarchyAccess access, int set, int way) {
-        if (access.getType() == MemoryHierarchyAccessType.LOAD && requesterIsHelperThread(access) && !isUseful(access.getVirtualPc())) {
+        if (this.missAltered && access.getType() == MemoryHierarchyAccessType.LOAD && requesterIsHelperThread(access) && !isUseful(access.getVirtualPc())) {
             this.setLRU(set, way);
             return;
         }

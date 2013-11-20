@@ -84,7 +84,8 @@ public class RereferenceIntervalPredictionPolicy<StateT extends Serializable> ex
     public void handlePromotionOnHit(MemoryHierarchyAccess access, int set, int way) {
         CacheLine<Boolean> mirrorLine = this.mirrorCache.getLine(set, way);
         BooleanValueProvider stateProvider = (BooleanValueProvider) mirrorLine.getStateProvider();
-        stateProvider.predictedRereferenceInterval.decrement();
+//        stateProvider.predictedRereferenceInterval.decrement();
+        stateProvider.predictedRereferenceInterval.reset();
     }
 
     @Override
@@ -138,5 +139,4 @@ public class RereferenceIntervalPredictionPolicy<StateT extends Serializable> ex
             return true;
         }
     }
-
 }
