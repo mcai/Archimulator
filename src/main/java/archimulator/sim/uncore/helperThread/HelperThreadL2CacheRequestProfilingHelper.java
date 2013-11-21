@@ -23,7 +23,6 @@ import archimulator.sim.common.SimulationEvent;
 import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.common.report.Reportable;
 import archimulator.sim.core.Thread;
-import archimulator.sim.uncore.cache.CacheGeometry;
 import archimulator.sim.uncore.cache.CacheLine;
 import archimulator.sim.uncore.cache.prediction.CacheBasedPredictor;
 import archimulator.sim.uncore.cache.prediction.Predictor;
@@ -92,9 +91,32 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
             }
         }
 
-        this.helperThreadL2CacheRequestQualityPredictor = new CacheBasedPredictor<>(l2CacheController, l2CacheController.getName() + "/helperThreadL2CacheRequestQualityPredictor", new CacheGeometry(64, 1, 1), 4, 16, HelperThreadL2CacheRequestQuality.UGLY); //TODO: parameters should not be hardcoded
-        this.helperThreadL2CacheRequestUsefulnessPredictor = new CacheBasedPredictor<>(l2CacheController, l2CacheController.getName() + "/helperThreadL2CacheRequestUsefulnessPredictor", new CacheGeometry(64, 1, 1), 4, 16, false); //TODO: parameters should not be hardcoded
-        this.helperThreadL2CacheRequestPollutionPredictor = new CacheBasedPredictor<>(l2CacheController, l2CacheController.getName() + "/helperThreadL2CacheRequestPollutionPredictor", new CacheGeometry(64, 1, 1), 4, 16, false); //TODO: parameters should not be hardcoded
+        this.helperThreadL2CacheRequestQualityPredictor = new CacheBasedPredictor<>(
+                this.l2CacheController,
+                this.l2CacheController.getName() + "/helperThreadL2CacheRequestQualityPredictor",
+                512,
+                4,
+                16,
+                HelperThreadL2CacheRequestQuality.UGLY
+        );
+
+        this.helperThreadL2CacheRequestUsefulnessPredictor = new CacheBasedPredictor<>(
+                this.l2CacheController,
+                this.l2CacheController.getName() + "/helperThreadL2CacheRequestUsefulnessPredictor",
+                512,
+                4,
+                16,
+                false
+        );
+
+        this.helperThreadL2CacheRequestPollutionPredictor = new CacheBasedPredictor<>(
+                this.l2CacheController,
+                this.l2CacheController.getName() + "/helperThreadL2CacheRequestPollutionPredictor",
+                512,
+                4,
+                16,
+                false
+        );
 
         this.l2CacheController.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, event -> {
             if (event.getCacheController().equals(HelperThreadL2CacheRequestProfilingHelper.this.l2CacheController)) {

@@ -21,7 +21,6 @@ package archimulator.sim.uncore.cache.replacement.reuseDistancePrediction;
 import archimulator.sim.common.Simulation;
 import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.common.report.Reportable;
-import archimulator.sim.uncore.cache.CacheGeometry;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.prediction.CacheBasedPredictor;
 import archimulator.sim.uncore.cache.prediction.Predictor;
@@ -56,8 +55,8 @@ public class ReuseDistancePredictionHelper implements Reportable {
         this.reuseDistancePredictor = new CacheBasedPredictor<>(
                 cache,
                 cache.getName() + ".reuseDistancePredictor",
-                new CacheGeometry(16 * 16 * cache.getGeometry().getLineSize(), 16, cache.getGeometry().getLineSize()),
-                0,
+                512,
+                2,
                 3,
                 0
         );
@@ -65,8 +64,8 @@ public class ReuseDistancePredictionHelper implements Reportable {
         this.helperThreadL2RequestReuseDistancePredictor = new CacheBasedPredictor<>(
                 cache,
                 cache.getName() + ".helperThreadL2RequestReuseDistancePredictor",
-                new CacheGeometry(16 * 16 * cache.getGeometry().getLineSize(), 16, cache.getGeometry().getLineSize()),
-                0,
+                512,
+                2,
                 3,
                 0
         );
@@ -87,13 +86,13 @@ public class ReuseDistancePredictionHelper implements Reportable {
 
         cache.getBlockingEventDispatcher().addListener(ReuseDistanceSampler.ReuseDistanceSampledEvent.class, event -> {
             if (event.getSender() == reuseDistanceSampler) {
-                reuseDistancePredictor.update(event.getPc(), event.getReuseDistance());
+                reuseDistancePredictor.update(event.getPc(), (int) (Math.log(event.getReuseDistance()) / Math.log(2)));
             }
         });
 
         cache.getBlockingEventDispatcher().addListener(HelperThreadAwareReuseDistanceSampler.HelperThreadL2RequestReuseDistanceSampledEvent.class, event -> {
             if (event.getSender() == reuseDistanceSampler) {
-                helperThreadL2RequestReuseDistancePredictor.update(event.getPc(), event.getReuseDistance());
+                helperThreadL2RequestReuseDistancePredictor.update(event.getPc(), (int) (Math.log(event.getReuseDistance()) / Math.log(2)));
             }
         });
     }

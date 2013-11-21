@@ -65,6 +65,13 @@ public interface Predictor<PredictableT extends Comparable<PredictableT>> extend
     long getNumMisses();
 
     /**
+     * Get the number of accesses that are failed to predict.
+     *
+     * @return the number of accesses that are failed to predict
+     */
+    long getNumFailedToPredict();
+
+    /**
      * Get the number of accesses.
      *
      * @return the number of accesses
@@ -80,5 +87,23 @@ public interface Predictor<PredictableT extends Comparable<PredictableT>> extend
      */
     default double getHitRatio() {
         return this.getNumAccesses() > 0 ? (double) this.getNumHits() / this.getNumAccesses() : 0.0;
+    }
+
+    /**
+     * Get the coverage of the predictor.
+     *
+     * @return the coverage of the predictor
+     */
+    default double getCoverage() {
+        return (this.getNumAccesses() + this.getNumFailedToPredict()) > 0 ? (double) this.getNumAccesses() / (this.getNumAccesses() + this.getNumFailedToPredict()) : 0.0;
+    }
+
+    /**
+     * Get the accuracy of the predictor.
+     *
+     * @return the accuracy of the predictor
+     */
+    default double getAccuracy() {
+        return this.getHitRatio();
     }
 }

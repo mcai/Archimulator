@@ -58,8 +58,8 @@ public class TestPolicy2<StateT extends Serializable> extends LRUPolicy<StateT> 
         this.replacementOwnershipPredictor = new CacheBasedPredictor<>(
                 cache,
                 cache.getName() + ".replacementOwnershipPredictor",
-                new CacheGeometry(16 * 16 * getCache().getLineSize(), 16, getCache().getLineSize()),
-                1,
+                512,
+                2,
                 3,
                 false
         );

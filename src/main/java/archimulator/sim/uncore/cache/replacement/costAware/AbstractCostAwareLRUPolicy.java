@@ -50,8 +50,8 @@ public abstract class AbstractCostAwareLRUPolicy<StateT extends Serializable> ex
         this.costPredictor = new CacheBasedPredictor<>(
                 cache,
                 cache.getName() + ".abstractCostAwareLRUPolicy.costPredictor",
-                new CacheGeometry(16 * 16 * getCache().getLineSize(), 16, getCache().getLineSize()),
-                1,
+                512,
+                2,
                 3,
                 Double.MAX_VALUE
         );

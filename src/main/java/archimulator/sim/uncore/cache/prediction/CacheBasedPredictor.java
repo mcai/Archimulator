@@ -25,6 +25,8 @@ import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
 import net.pickapack.math.SaturatingCounter;
 import net.pickapack.util.ValueProvider;
 
+//TODO: report coverage and accuracy.
+
 /**
  * Cache based predictor.
  *
@@ -36,19 +38,20 @@ public class CacheBasedPredictor<PredictableT extends Comparable<PredictableT>> 
     private PredictableT defaultValue;
     private long numHits;
     private long numMisses;
+    private long numFailedToPredict;
 
     /**
-     * Create a cache based predictor.
+     * Create an LRU cache based predictor.
      *
      * @param parent           the parent simulation object
      * @param name             the name of the cache based predictor
-     * @param geometry         the geometry of the cache based predictor
+     * @param capacity         the capacity of the predictor
      * @param counterThreshold the threshold value of the counter
      * @param counterMaxValue  the maximum value of the counter
      * @param defaultValue     the default value
      */
-    public CacheBasedPredictor(SimulationObject parent, String name, CacheGeometry geometry, final int counterThreshold, final int counterMaxValue, PredictableT defaultValue) {
-        this(parent, name, geometry, CacheReplacementPolicyType.LRU, counterThreshold, counterMaxValue, defaultValue);
+    public CacheBasedPredictor(SimulationObject parent, String name, int capacity, final int counterThreshold, final int counterMaxValue, PredictableT defaultValue) {
+        this(parent, name, capacity, CacheReplacementPolicyType.LRU, counterThreshold, counterMaxValue, defaultValue);
     }
 
     /**
@@ -56,17 +59,17 @@ public class CacheBasedPredictor<PredictableT extends Comparable<PredictableT>> 
      *
      * @param parent                     the parent simulation object
      * @param name                       the name of the cache based predictor
-     * @param geometry                   the geometry of the cache based predictor
+     * @param capacity                   the capacity of the predictor
      * @param cacheReplacementPolicyType the type of the cache replacement policy
      * @param counterThreshold           the threshold value of the predictor
      * @param counterMaxValue            the maximum value of the predictor
      * @param defaultValue               the default value
      */
-    public CacheBasedPredictor(SimulationObject parent, String name, CacheGeometry geometry, CacheReplacementPolicyType cacheReplacementPolicyType, final int counterThreshold, final int counterMaxValue, PredictableT defaultValue) {
+    public CacheBasedPredictor(SimulationObject parent, String name, int capacity, CacheReplacementPolicyType cacheReplacementPolicyType, final int counterThreshold, final int counterMaxValue, PredictableT defaultValue) {
         this.cache = new BasicEvictableCache<>(
                 parent,
                 name,
-                geometry,
+                new CacheGeometry(capacity, capacity, 1),
                 cacheReplacementPolicyType,
                 args -> new BooleanValueProvider(counterThreshold, counterMaxValue)
         );
@@ -77,7 +80,12 @@ public class CacheBasedPredictor<PredictableT extends Comparable<PredictableT>> 
     public PredictableT predict(int address) {
         CacheLine<Boolean> lineFound = this.cache.findLine(address);
         BooleanValueProvider stateProvider = lineFound != null ? (BooleanValueProvider) lineFound.getStateProvider() : null;
-        return lineFound != null && stateProvider.confidence.isTaken() ? stateProvider.predictedValue : getDefaultValue();
+        if (lineFound != null && stateProvider.confidence.isTaken()) {
+            return stateProvider.predictedValue;
+        } else {
+            this.numFailedToPredict++;
+            return getDefaultValue();
+        }
     }
 
     public void update(int address, PredictableT observedValue) {
@@ -121,14 +129,12 @@ public class CacheBasedPredictor<PredictableT extends Comparable<PredictableT>> 
     @Override
     public void dumpStats(ReportNode reportNode) {
         reportNode.getChildren().add(new ReportNode(reportNode, cache.getName()) {{
-            for (int i = 0; i < cache.getNumSets(); i++) {
-                for (CacheLine<Boolean> line : cache.getLines(i)) {
-                    if (line.isValid()) {
-                        BooleanValueProvider stateProvider = (BooleanValueProvider) line.getStateProvider();
-                        getChildren().add(new ReportNode(this, line + "", stateProvider + ""));
-                    }
-                }
-            }
+            getChildren().add(new ReportNode(this, "numHits", getNumHits() + ""));
+            getChildren().add(new ReportNode(this, "numMisses", getNumMisses() + ""));
+            getChildren().add(new ReportNode(this, "numAccesses", getNumAccesses() + ""));
+            getChildren().add(new ReportNode(this, "hitRatio", getHitRatio() + ""));
+            getChildren().add(new ReportNode(this, "coverage", getCoverage() + ""));
+            getChildren().add(new ReportNode(this, "accuracy", getAccuracy() + ""));
         }});
     }
 
@@ -144,6 +150,11 @@ public class CacheBasedPredictor<PredictableT extends Comparable<PredictableT>> 
     @Override
     public long getNumMisses() {
         return numMisses;
+    }
+
+    @Override
+    public long getNumFailedToPredict() {
+        return numFailedToPredict;
     }
 
     /**
