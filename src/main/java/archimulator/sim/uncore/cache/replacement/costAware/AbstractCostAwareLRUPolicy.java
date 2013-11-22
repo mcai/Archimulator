@@ -51,7 +51,7 @@ public abstract class AbstractCostAwareLRUPolicy<StateT extends Serializable> ex
                 cache,
                 cache.getName() + ".abstractCostAwareLRUPolicy.costPredictor",
                 512,
-                2,
+                1,
                 3,
                 Double.MAX_VALUE
         );

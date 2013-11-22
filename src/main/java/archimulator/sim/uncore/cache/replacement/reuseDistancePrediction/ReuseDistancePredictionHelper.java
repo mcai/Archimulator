@@ -56,7 +56,7 @@ public class ReuseDistancePredictionHelper implements Reportable {
                 cache,
                 cache.getName() + ".reuseDistancePredictor",
                 512,
-                2,
+                0,
                 3,
                 0
         );
@@ -65,7 +65,7 @@ public class ReuseDistancePredictionHelper implements Reportable {
                 cache,
                 cache.getName() + ".helperThreadL2RequestReuseDistancePredictor",
                 512,
-                2,
+                0,
                 3,
                 0
         );

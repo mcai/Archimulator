@@ -59,7 +59,7 @@ public class TestPolicy2<StateT extends Serializable> extends LRUPolicy<StateT> 
                 cache,
                 cache.getName() + ".replacementOwnershipPredictor",
                 512,
-                2,
+                1,
                 3,
                 false
         );
