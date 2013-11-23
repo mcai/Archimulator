@@ -25,8 +25,6 @@ import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
 import net.pickapack.math.SaturatingCounter;
 import net.pickapack.util.ValueProvider;
 
-//TODO: report coverage and accuracy.
-
 /**
  * Cache based predictor.
  *

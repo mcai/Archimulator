@@ -55,7 +55,7 @@ public class ReuseDistancePredictionHelper implements Reportable {
         this.reuseDistancePredictor = new CacheBasedPredictor<>(
                 cache,
                 cache.getName() + ".reuseDistancePredictor",
-                512,
+                16,
                 0,
                 3,
                 0
@@ -64,7 +64,7 @@ public class ReuseDistancePredictionHelper implements Reportable {
         this.helperThreadL2RequestReuseDistancePredictor = new CacheBasedPredictor<>(
                 cache,
                 cache.getName() + ".helperThreadL2RequestReuseDistancePredictor",
-                512,
+                16,
                 0,
                 3,
                 0

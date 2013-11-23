@@ -112,9 +112,13 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
             throw new IllegalArgumentException();
         }
 
+        List<ExperimentStat> result = new ArrayList<>();
+        result.addAll(stats);
+        result.addAll(getStatsByParent(parent));
+
         String json = JsonSerializationHelper.serialize(
                 new ExperimentStat.ExperimentStatListContainer(
-                        parent.getParent().getTitle(), parent.getTitle(), stats
+                        parent.getParent().getTitle(), parent.getTitle(), result
                 ));
 
         File file = new File(FILE_NAME_EXPERIMENT_STATS + "/" + parent.getId() + ".json");

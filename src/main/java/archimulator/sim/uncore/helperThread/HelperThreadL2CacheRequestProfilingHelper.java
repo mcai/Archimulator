@@ -94,7 +94,7 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
         this.helperThreadL2CacheRequestQualityPredictor = new CacheBasedPredictor<>(
                 this.l2CacheController,
                 this.l2CacheController.getName() + "/helperThreadL2CacheRequestQualityPredictor",
-                512,
+                64,
                 4,
                 16,
                 HelperThreadL2CacheRequestQuality.UGLY
@@ -103,7 +103,7 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
         this.helperThreadL2CacheRequestUsefulnessPredictor = new CacheBasedPredictor<>(
                 this.l2CacheController,
                 this.l2CacheController.getName() + "/helperThreadL2CacheRequestUsefulnessPredictor",
-                512,
+                64,
                 4,
                 16,
                 false
@@ -112,7 +112,7 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
         this.helperThreadL2CacheRequestPollutionPredictor = new CacheBasedPredictor<>(
                 this.l2CacheController,
                 this.l2CacheController.getName() + "/helperThreadL2CacheRequestPollutionPredictor",
-                512,
+                64,
                 4,
                 16,
                 false

@@ -70,6 +70,11 @@ public enum CacheReplacementPolicyType {
     HELPER_THREAD_AWARE_BREAKDOWN_LRU_2M,
 
     /**
+     * Helper thread aware least recently used (LRU) policy 3.
+     */
+    HELPER_THREAD_AWARE_LRU_3,
+
+    /**
      * Reuse distance prediction.
      */
     REUSE_DISTANCE_PREDICTION,
