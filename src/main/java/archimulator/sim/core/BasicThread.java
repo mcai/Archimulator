@@ -23,6 +23,8 @@ import archimulator.sim.core.bpred.BranchPredictorUpdate;
 import archimulator.sim.core.bpred.DynamicBranchPredictor;
 import archimulator.sim.core.event.InstructionCommittedEvent;
 import archimulator.sim.core.event.InstructionDecodedEvent;
+import archimulator.sim.core.event.InstructionFetchBeginEvent;
+import archimulator.sim.core.event.InstructionFetchEndEvent;
 import archimulator.sim.isa.RegisterDependencyType;
 import archimulator.sim.isa.StaticInstruction;
 import archimulator.sim.isa.StaticInstructionType;
@@ -190,7 +192,9 @@ public class BasicThread extends AbstractBasicThread {
                 } else {
                     this.core.ifetch(this, this.fetchNpc, this.fetchNpc, () -> {
                         fetchStalled = false;
+                        this.getBlockingEventDispatcher().dispatch(new InstructionFetchEndEvent(this, this.getCycleAccurateEventQueue().getCurrentCycle(), this.id, this.fetchNpc));
                     });
+                    this.getBlockingEventDispatcher().dispatch(new InstructionFetchBeginEvent(this, this.getCycleAccurateEventQueue().getCurrentCycle(), this.id, this.fetchNpc));
 
                     this.fetchStalled = true;
                     this.lastFetchedCacheLine = cacheLineToFetch;

@@ -87,6 +87,8 @@ public abstract class Simulation implements SimulationObject, Reportable {
 
     //TODO: the following stuffs are to be refactored out!!!
 
+    private LatencyTrackingHelper latencyTrackingHelper;
+
     private StackDistanceProfilingHelper stackDistanceProfilingHelper;
 
     private ReuseDistancePredictionHelper reuseDistancePredictionHelper;
@@ -176,6 +178,8 @@ public abstract class Simulation implements SimulationObject, Reportable {
         }
 
         this.processor = new BasicProcessor(this.experiment, this, this.blockingEventDispatcher, this.cycleAccurateEventQueue, kernel, this.prepareMemoryHierarchy());
+
+        this.latencyTrackingHelper = new LatencyTrackingHelper(this);
 
         this.stackDistanceProfilingHelper = new StackDistanceProfilingHelper(this);
 
@@ -298,6 +302,7 @@ public abstract class Simulation implements SimulationObject, Reportable {
 
         this.getProcessor().getMemoryHierarchy().getMemoryController().dumpStats(rootReportNode);
 
+        this.getLatencyTrackingHelper().dumpStats(rootReportNode);
         this.getStackDistanceProfilingHelper().dumpStats(rootReportNode);
         this.getReuseDistancePredictionHelper().dumpStats(rootReportNode);
         this.getHotspotProfilingHelper().dumpStats(rootReportNode);
@@ -570,6 +575,15 @@ public abstract class Simulation implements SimulationObject, Reportable {
      */
     public BlockingEventDispatcher<SimulationEvent> getBlockingEventDispatcher() {
         return this.blockingEventDispatcher;
+    }
+
+    /**
+     * Get the latency tracking helper.
+     *
+     * @return the latency tracking helper
+     */
+    public LatencyTrackingHelper getLatencyTrackingHelper() {
+        return latencyTrackingHelper;
     }
 
     /**
