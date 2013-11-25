@@ -28,11 +28,8 @@ import net.pickapack.model.WithCreateTime;
 import net.pickapack.model.WithId;
 import net.pickapack.model.WithParentId;
 import net.pickapack.model.WithTitle;
-import net.pickapack.util.StorageUnit;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Experiment summary.
@@ -949,69 +946,5 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
      */
     public Experiment getParent() {
         return ServiceManager.getExperimentService().getExperimentById(parentId);
-    }
-
-    /**
-     * Generate the table summary row.
-     *
-     * @return the table summary row
-     */
-    public List<String> tableSummary2Row() {
-        return new ArrayList<String>() {{
-            boolean helperThreadEnabled = helperThreadLookahead != -1;
-
-            add(parentId + "");
-
-            add(type + "");
-            add(state + "");
-
-            add(beginTimeAsString);
-            add(endTimeAsString);
-            add(duration);
-            add(durationInSeconds + "");
-
-            add(StorageUnit.toString(l2Size).replaceAll(" ", ""));
-            add(l2Associativity + "way");
-            add(l2ReplacementPolicyType + "");
-
-            add(helperThreadEnabled ? "L=" + helperThreadLookahead + "" : "");
-            add(helperThreadEnabled ? "S=" + helperThreadStride + "" : "");
-
-            add("P=" + numMainThreadWaysInStaticPartitionedLRUPolicy + "");
-
-            add(numInstructions + "");
-            add(c0t0NumInstructions + "");
-            add(c1t0NumInstructions + "");
-            add(numCycles + "");
-
-            add(ipc + "");
-            add(c0t0Ipc + "");
-            add(c1t0Ipc + "");
-            add(cpi + "");
-
-            add(numMainThreadL2CacheHits + "");
-            add(numMainThreadL2CacheMisses + "");
-
-            add(numHelperThreadL2CacheHits + "");
-            add(numHelperThreadL2CacheMisses + "");
-
-            add(numL2CacheEvictions + "");
-            add(l2CacheHitRatio + "");
-            add(l2CacheOccupancyRatio + "");
-
-            add(helperThreadL2CacheRequestCoverage + "");
-            add(helperThreadL2CacheRequestAccuracy + "");
-            add(helperThreadL2CacheRequestLateness + "");
-            add(helperThreadL2CacheRequestPollution + "");
-            add(helperThreadL2CacheRequestRedundancy + "");
-
-            add(numLateHelperThreadL2CacheRequests + "");
-            add(numTimelyHelperThreadL2CacheRequests + "");
-            add(numBadHelperThreadL2CacheRequests + "");
-            add(numEarlyHelperThreadL2CacheRequests + "");
-            add(numUglyHelperThreadL2CacheRequests + "");
-            add(numRedundantHitToTransientTagHelperThreadL2CacheRequests + "");
-            add(numRedundantHitToCacheHelperThreadL2CacheRequests + "");
-        }};
     }
 }

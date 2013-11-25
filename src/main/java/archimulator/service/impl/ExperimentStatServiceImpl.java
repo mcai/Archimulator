@@ -31,6 +31,7 @@ import com.j256.ormlite.stmt.PreparedDelete;
 import net.pickapack.io.serialization.JsonSerializationHelper;
 import net.pickapack.model.WithId;
 import net.pickapack.service.AbstractService;
+import net.pickapack.util.StorageUnit;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
@@ -77,17 +78,17 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
 
         List<Long> experimentIds = experiments.stream().map(Experiment::getId).collect(Collectors.toList());
 
-        if(!experimentIds.isEmpty()) {
+        if (!experimentIds.isEmpty()) {
             File directoryExperimentStats = new File(FILE_NAME_EXPERIMENT_STATS);
 
-            if(directoryExperimentStats.exists()) {
+            if (directoryExperimentStats.exists()) {
                 Collection<File> files = FileUtils.listFiles(directoryExperimentStats, new String[]{"json"}, true);
 
-                for(File file : files) {
+                for (File file : files) {
                     String baseName = FilenameUtils.getBaseName(file.getAbsolutePath());
                     long storedExperimentId = Long.parseLong(baseName);
 
-                    if(!experimentIds.contains(storedExperimentId)) {
+                    if (!experimentIds.contains(storedExperimentId)) {
                         clearStatsByParentId(storedExperimentId);
                     }
                 }
@@ -136,6 +137,10 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
         }
 
         invalidateSummaryByParent(parent);
+
+        if (lastExperimentStats != null && !lastExperimentStats.isEmpty() && lastExperimentStats.get(0).getParentId() == parent.getId()) {
+            this.lastExperimentStats = null;
+        }
     }
 
     @Override
@@ -149,8 +154,12 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
     private void clearStatsByParentId(Long parentId) {
         File file = new File(FILE_NAME_EXPERIMENT_STATS + "/" + parentId + ".json");
 
-        if(file.exists()) {
+        if (file.exists()) {
             file.delete();
+        }
+
+        if (lastExperimentStats != null && !lastExperimentStats.isEmpty() && lastExperimentStats.get(0).getParentId() == parentId) {
+            this.lastExperimentStats = null;
         }
     }
 
@@ -158,8 +167,8 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
     public ExperimentStat getStatByParentAndPrefixAndKey(Experiment parent, String prefix, String key) {
         List<ExperimentStat> stats = getStatsByParent(parent);
 
-        for(ExperimentStat stat : stats) {
-            if(stat.getPrefix().equals(prefix) && stat.getKey().equals(key)) {
+        for (ExperimentStat stat : stats) {
+            if (stat.getPrefix().equals(prefix) && stat.getKey().equals(key)) {
                 return stat;
             }
         }
@@ -173,8 +182,8 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
 
         List<ExperimentStat> result = new ArrayList<>();
 
-        for(ExperimentStat stat : stats) {
-            if(stat.getPrefix().equals(prefix) && stat.getKey().contains(keyLike)) {
+        for (ExperimentStat stat : stats) {
+            if (stat.getPrefix().equals(prefix) && stat.getKey().contains(keyLike)) {
                 result.add(stat);
             }
         }
@@ -188,8 +197,8 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
 
         List<ExperimentStat> result = new ArrayList<>();
 
-        for(ExperimentStat stat : stats) {
-            if(stat.getPrefix().equals(prefix)) {
+        for (ExperimentStat stat : stats) {
+            if (stat.getPrefix().equals(prefix)) {
                 result.add(stat);
             }
         }
@@ -203,8 +212,8 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
 
         List<String> prefixes = new ArrayList<>();
 
-        for(ExperimentStat stat : stats) {
-            if(!prefixes.contains(stat.getPrefix())) {
+        for (ExperimentStat stat : stats) {
+            if (!prefixes.contains(stat.getPrefix())) {
                 prefixes.add(stat.getPrefix());
             }
         }
@@ -214,7 +223,7 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
 
     @SuppressWarnings("unchecked")
     private List<ExperimentStat> getStatsByParent(Experiment parent) {
-        if(lastExperimentStats != null && !lastExperimentStats.isEmpty() && lastExperimentStats.get(0).getParentId() == parent.getId()) {
+        if (lastExperimentStats != null && !lastExperimentStats.isEmpty() && lastExperimentStats.get(0).getParentId() == parent.getId()) {
             return this.lastExperimentStats;
         }
 
@@ -452,7 +461,64 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
                 "Redundant_Cache"
         ), new ArrayList<List<String>>() {{
             for (Experiment experiment : experiments) {
-                add(getSummaryByParent(experiment).tableSummary2Row());
+                add(new ArrayList<String>() {{
+                    ExperimentSummary summary = getSummaryByParent(experiment);
+
+                    boolean helperThreadEnabled = summary.getHelperThreadLookahead() != -1;
+
+                    add(summary.getParentId() + "");
+
+                    add(summary.getType() + "");
+                    add(summary.getState() + "");
+
+                    add(summary.getBeginTimeAsString());
+                    add(summary.getEndTimeAsString());
+                    add(summary.getDuration());
+                    add(summary.getDurationInSeconds() + "");
+
+                    add(StorageUnit.toString(summary.getL2Size()).replaceAll(" ", ""));
+                    add(summary.getL2Associativity() + "way");
+                    add(summary.getL2ReplacementPolicyType() + "");
+
+                    add(helperThreadEnabled ? "L=" + summary.getHelperThreadLookahead() + "" : "");
+                    add(helperThreadEnabled ? "S=" + summary.getHelperThreadStride() + "" : "");
+
+                    add("P=" + summary.getNumMainThreadWaysInStaticPartitionedLRUPolicy() + "");
+
+                    add(summary.getNumInstructions() + "");
+                    add(summary.getC0t0NumInstructions() + "");
+                    add(summary.getC1t0NumInstructions() + "");
+                    add(summary.getNumCycles() + "");
+
+                    add(summary.getIpc() + "");
+                    add(summary.getC0t0Ipc() + "");
+                    add(summary.getC1t0Ipc() + "");
+                    add(summary.getCpi() + "");
+
+                    add(summary.getNumMainThreadL2CacheHits() + "");
+                    add(summary.getNumMainThreadL2CacheMisses() + "");
+
+                    add(summary.getNumHelperThreadL2CacheHits() + "");
+                    add(summary.getNumHelperThreadL2CacheMisses() + "");
+
+                    add(summary.getNumL2CacheEvictions() + "");
+                    add(summary.getL2CacheHitRatio() + "");
+                    add(summary.getL2CacheOccupancyRatio() + "");
+
+                    add(summary.getHelperThreadL2CacheRequestCoverage() + "");
+                    add(summary.getHelperThreadL2CacheRequestAccuracy() + "");
+                    add(summary.getHelperThreadL2CacheRequestLateness() + "");
+                    add(summary.getHelperThreadL2CacheRequestPollution() + "");
+                    add(summary.getHelperThreadL2CacheRequestRedundancy() + "");
+
+                    add(summary.getNumLateHelperThreadL2CacheRequests() + "");
+                    add(summary.getNumTimelyHelperThreadL2CacheRequests() + "");
+                    add(summary.getNumBadHelperThreadL2CacheRequests() + "");
+                    add(summary.getNumEarlyHelperThreadL2CacheRequests() + "");
+                    add(summary.getNumUglyHelperThreadL2CacheRequests() + "");
+                    add(summary.getNumRedundantHitToTransientTagHelperThreadL2CacheRequests() + "");
+                    add(summary.getNumRedundantHitToCacheHelperThreadL2CacheRequests() + "");
+                }});
             }
         }});
     }
