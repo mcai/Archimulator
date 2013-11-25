@@ -81,7 +81,7 @@ public class SimpleStaticPartitionedLRUPolicy<StateT extends Serializable> exten
     @Override
     public CacheAccess<StateT> newMiss(MemoryHierarchyAccess access, int set, int address) {
         int tag = this.getCache().getTag(address);
-        Pair<Integer, Integer> partitionBoundary = doGetPartitionBoundary(getThreadIdentifier(access.getThread()));
+        Pair<Integer, Integer> partitionBoundary = this.doGetPartitionBoundary(getThreadIdentifier(access.getThread()));
 
         for(int way = partitionBoundary.getFirst(); way <= partitionBoundary.getSecond(); way++) {
             CacheLine<StateT> line = this.getCache().getLine(set, way);
@@ -103,7 +103,7 @@ public class SimpleStaticPartitionedLRUPolicy<StateT extends Serializable> exten
      */
     @Override
     public CacheAccess<StateT> handleReplacement(MemoryHierarchyAccess access, int set, int tag) {
-        Pair<Integer, Integer> partitionBoundary = doGetPartitionBoundary(getThreadIdentifier(access.getThread()));
+        Pair<Integer, Integer> partitionBoundary = this.doGetPartitionBoundary(getThreadIdentifier(access.getThread()));
 
         for (int stackPosition = this.getCache().getAssociativity() - 1; stackPosition >= 0; stackPosition--) {
             int way = this.getWayInStackPosition(set, stackPosition);
