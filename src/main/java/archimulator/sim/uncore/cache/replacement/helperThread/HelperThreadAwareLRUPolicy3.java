@@ -31,7 +31,7 @@ public class HelperThreadAwareLRUPolicy3<StateT extends Serializable> extends LR
         for (int stackPosition = this.getCache().getAssociativity() - 1; stackPosition >= 0; stackPosition--) {
             int way = this.getWayInStackPosition(set, stackPosition);
             CacheLine<StateT> line = this.getCache().getLine(set, way);
-            if (line.getAccess() != null && getThreadIdentifier(line.getAccess().getThread()) != getThreadIdentifier(access.getThread())) {
+            if (line.getAccess() != null && getThreadIdentifier(line.getAccess().getThread()) == getThreadIdentifier(access.getThread())) {
                 return new CacheAccess<>(this.getCache(), access, set, way, tag);
             }
         }
