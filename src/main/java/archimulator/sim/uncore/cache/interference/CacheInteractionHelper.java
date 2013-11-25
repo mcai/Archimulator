@@ -63,7 +63,8 @@ public class CacheInteractionHelper implements Reportable {
             if (event.getCacheController().equals(CacheInteractionHelper.this.l2CacheController) && event.isHitInCache()) {
                 int set = event.getSet();
                 int way = event.getWay();
-                int broughterThreadId = CacheInteractionHelper.this.l2CacheController.getSimulation().getHelperThreadL2CacheRequestProfilingHelper().getHelperThreadL2CacheRequestStates().get(set).get(way).getThreadId();
+
+                int broughterThreadId = l2CacheController.getCache().getLine(set, way).getAccess().getThread().getId();
                 int requesterThreadId = event.getAccess().getThread().getId();
 
                 if(broughterThreadId == -1) {
@@ -92,7 +93,8 @@ public class CacheInteractionHelper implements Reportable {
             if (event.getCacheController() == CacheInteractionHelper.this.l2CacheController) {
                 int set = event.getSet();
                 int way = event.getWay();
-                int broughterThreadId = CacheInteractionHelper.this.l2CacheController.getSimulation().getHelperThreadL2CacheRequestProfilingHelper().getHelperThreadL2CacheRequestStates().get(set).get(way).getThreadId();
+
+                int broughterThreadId = l2CacheController.getCache().getLine(set, way).getAccess().getThread().getId();
                 int requesterThreadId = event.getAccess().getThread().getId();
 
                 if(broughterThreadId == -1) {
