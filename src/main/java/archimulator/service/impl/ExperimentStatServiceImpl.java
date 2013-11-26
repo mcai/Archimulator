@@ -420,13 +420,12 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
                 "Duration",
                 "Duration in Seconds",
 
+                "Stride",
+                "Lookahead",
+
                 "L2_Size",
                 "L2_Associativity",
                 "L2_Replacement",
-
-                "Lookahead",
-                "Stride",
-
                 "MT_Ways_In_Partitioned_L2",
 
                 "Num_Instructions",
@@ -479,13 +478,12 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
                     add(summary.getDuration());
                     add(summary.getDurationInSeconds() + "");
 
+                    add(helperThreadEnabled ? "S=" + summary.getHelperThreadStride() + "" : "");
+                    add(helperThreadEnabled ? "L=" + summary.getHelperThreadLookahead() + "" : "");
+
                     add(StorageUnit.toString(summary.getL2Size()).replaceAll(" ", ""));
                     add(summary.getL2Associativity() + "way");
                     add(summary.getL2ReplacementPolicyType() + "");
-
-                    add(helperThreadEnabled ? "L=" + summary.getHelperThreadLookahead() + "" : "");
-                    add(helperThreadEnabled ? "S=" + summary.getHelperThreadStride() + "" : "");
-
                     add("P=" + summary.getNumMainThreadWaysInStaticPartitionedLRUPolicy() + "");
 
                     add(summary.getNumInstructions() + "");

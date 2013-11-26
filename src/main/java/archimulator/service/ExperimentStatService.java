@@ -36,13 +36,12 @@ public interface ExperimentStatService extends Service {
     static final TableFilterCriteria SUMMARY_PDF_FILTER_CRITERIA = new TableFilterCriteria(
             "Id",
 
+            "Stride",
+            "Lookahead",
+
             "L2_Size",
             "L2_Associativity",
             "L2_Replacement",
-
-            "Lookahead",
-            "Stride",
-
             "MT_Ways_In_Partitioned_L2",
 
             "Num_Cycles",

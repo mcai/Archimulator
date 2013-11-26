@@ -95,6 +95,6 @@ public class ExperimentTableHelper {
      */
     @SuppressWarnings("unchecked")
     public static void sort(List<Experiment> experiments) {
-        sort(experiments, "l2Size", "l2Associativity", "l2ReplacementPolicyType", "helperThreadStride", "helperThreadLookahead", "numMainThreadWaysInStaticPartitionedLRUPolicy");
+        sort(experiments, "helperThreadStride", "helperThreadLookahead", "l2Size", "l2Associativity", "l2ReplacementPolicyType", "numMainThreadWaysInStaticPartitionedLRUPolicy");
     }
 }
