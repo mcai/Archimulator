@@ -24,6 +24,7 @@ import archimulator.model.ExperimentSummary;
 import archimulator.service.ExperimentStatService;
 import archimulator.service.ServiceManager;
 import archimulator.util.ExperimentStatHelper;
+import archimulator.util.ExperimentTableHelper;
 import archimulator.util.plot.Table;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.DeleteBuilder;
@@ -406,6 +407,8 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
 
     @Override
     public Table tableSummary(final List<Experiment> experiments) {
+        ExperimentTableHelper.sort(experiments);
+
         return new Table(Arrays.asList(
                 "Id",
 

@@ -22,6 +22,7 @@ import archimulator.model.Experiment;
 import archimulator.model.ExperimentStat;
 import archimulator.model.ExperimentSummary;
 import archimulator.util.plot.Table;
+import archimulator.util.plot.TableFilterCriteria;
 import net.pickapack.service.Service;
 
 import java.util.List;
@@ -32,6 +33,29 @@ import java.util.List;
  * @author Min Cai
  */
 public interface ExperimentStatService extends Service {
+    static final TableFilterCriteria SUMMARY_PDF_FILTER_CRITERIA = new TableFilterCriteria(
+            "Id",
+
+            "L2_Size",
+            "L2_Associativity",
+            "L2_Replacement",
+
+            "Lookahead",
+            "Stride",
+
+            "MT_Ways_In_Partitioned_L2",
+
+            "Num_Cycles",
+
+            "Late",
+            "Timely",
+            "Bad",
+            "Early",
+            "Ugly",
+            "Redundant_MSHR",
+            "Redundant_Cache"
+    );
+
     /**
      * Add a list of statistics under the specified parent experiment object.
      *

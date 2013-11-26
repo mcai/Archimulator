@@ -109,12 +109,20 @@ public interface ExperimentService extends Service {
     Experiment getLatestExperimentByTitle(String title);
 
     /**
-     * Get the list of experiments by benchmark.
+     * Get the list of experiments matching the specified benchmark.
      *
      * @param benchmark the benchmark
-     * @return the list of experiments using the benchmark
+     * @return the list of experiments matching the specified benchmark
      */
     List<Experiment> getExperimentsByBenchmark(Benchmark benchmark);
+
+    /**
+     * Get the list of the experiments in the stopped state matching the specified benchmark.
+     *
+     * @param benchmark the benchmark
+     * @return the list of experiments in the stopped state matching the specified benchmark
+     */
+    List<Experiment> getStoppedExperimentsByBenchmark(Benchmark benchmark);
 
     /**
      * Get the list of experiments by architecture.
@@ -169,6 +177,13 @@ public interface ExperimentService extends Service {
      * @return the first experiment to run if any; otherwise null.
      */
     Experiment getFirstExperimentToRun();
+
+    /**
+     * Get the list of all the experiments in the stopped state.
+     *
+     * @return the list of all the experiments in the stopped state
+     */
+    List<Experiment> getAllStoppedExperiments();
 
     /**
      * Get the list of experiments in the stopped state under the specified parent experiment pack.

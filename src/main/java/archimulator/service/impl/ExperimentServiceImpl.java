@@ -295,6 +295,22 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     }
 
     @Override
+    public List<Experiment> getStoppedExperimentsByBenchmark(Benchmark benchmark) { //TODO: to be optimized
+        List<Experiment> result = new ArrayList<>();
+
+        for (Experiment experiment : getAllStoppedExperiments()) {
+            for (ContextMapping contextMapping : experiment.getContextMappings()) {
+                if (contextMapping.getBenchmarkId() == benchmark.getId()) {
+                    result.add(experiment);
+                    break;
+                }
+            }
+        }
+
+        return result;
+    }
+
+    @Override
     public List<Experiment> getExperimentsByArchitecture(Architecture architecture) {
         try {
             PreparedQuery<Experiment> query = this.experiments.queryBuilder().where().eq("architectureId", architecture.getId()).prepare();
@@ -364,6 +380,21 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
             }
         } finally {
             lockGetFirstExperimentToRun.unlock();
+        }
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Experiment> getAllStoppedExperiments() {
+        try {
+            QueryBuilder<Experiment, Long> queryBuilder = this.experiments.queryBuilder();
+
+            queryBuilder.where().eq("state", ExperimentState.COMPLETED).or().eq("state", ExperimentState.ABORTED);
+
+            PreparedQuery<Experiment> query = queryBuilder.prepare();
+            return this.experiments.query(query);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
