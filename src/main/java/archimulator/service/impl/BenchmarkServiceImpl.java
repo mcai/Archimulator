@@ -18,21 +18,17 @@
  ******************************************************************************/
 package archimulator.service.impl;
 
-import archimulator.model.*;
+import archimulator.model.Benchmark;
 import archimulator.service.BenchmarkService;
 import archimulator.service.ServiceManager;
 import archimulator.util.serialization.XMLSerializationHelper;
-import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.misc.TransactionManager;
 import net.pickapack.model.WithId;
 import net.pickapack.service.AbstractService;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Benchmark service implementation.
@@ -40,16 +36,16 @@ import java.util.List;
  * @author Min Cai
  */
 public class BenchmarkServiceImpl extends AbstractService implements BenchmarkService {
-    private Dao<Benchmark, Long> benchmarks;
+    private Map<String, Benchmark> benchmarks;
 
     /**
      * Create a benchmark service implementation.
      */
     @SuppressWarnings("unchecked")
     public BenchmarkServiceImpl() {
-        super(ServiceManager.getDatabaseUrl(), Arrays.<Class<? extends WithId>>asList(Benchmark.class));
+        super(ServiceManager.getDatabaseUrl(), Arrays.<Class<? extends WithId>>asList());
 
-        this.benchmarks = createDao(Benchmark.class);
+        this.benchmarks = new LinkedHashMap<>();
     }
 
     @Override
@@ -93,57 +89,20 @@ public class BenchmarkServiceImpl extends AbstractService implements BenchmarkSe
 
     @Override
     public List<Benchmark> getAllBenchmarks() {
-        return this.getItems(this.benchmarks);
-    }
-
-    @Override
-    public List<Benchmark> getAllBenchmarks(long first, long count) {
-        return this.getItems(this.benchmarks, first, count);
+        return new ArrayList<>(this.benchmarks.values());
     }
 
     @Override
     public long getNumAllBenchmarks() {
-        return this.getNumItems(this.benchmarks);
-    }
-
-    @Override
-    public Benchmark getBenchmarkById(long id) {
-        return this.getItemById(this.benchmarks, id);
+        return this.benchmarks.size();
     }
 
     @Override
     public Benchmark getBenchmarkByTitle(String title) {
-        return this.getFirstItemByTitle(this.benchmarks, title);
+        return this.benchmarks.containsKey(title) ? this.benchmarks.get(title) : null;
     }
 
-    @Override
-    public Benchmark getFirstBenchmark() {
-        return this.getFirstItem(this.benchmarks);
-    }
-
-    @Override
-    public long addBenchmark(Benchmark benchmark) {
-        return this.addItem(this.benchmarks, benchmark);
-    }
-
-    private void addBenchmarkIfNotExists(Benchmark benchmark) {
-        if (this.getBenchmarkByTitle(benchmark.getTitle()) == null) {
-            this.addBenchmark(benchmark);
-        }
-    }
-
-    @Override
-    public void removeBenchmarkById(long id) {
-        this.removeItemById(this.benchmarks, id);
-    }
-
-    @Override
-    public void clearBenchmarks() {
-        this.clearItems(this.benchmarks);
-    }
-
-    @Override
-    public void updateBenchmark(Benchmark benchmark) {
-        this.updateItem(this.benchmarks, benchmark);
+    public void addBenchmark(Benchmark benchmark) {
+        this.benchmarks.put(benchmark.getTitle(), benchmark);
     }
 }

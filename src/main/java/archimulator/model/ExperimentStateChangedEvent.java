@@ -16,43 +16,20 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.service;
-
-import archimulator.model.Benchmark;
-import net.pickapack.service.Service;
-
-import java.util.List;
+package archimulator.model;
 
 /**
- * Service for managing benchmarks.
+ * Experiment state changed event.
  *
  * @author Min Cai
  */
-public interface BenchmarkService extends Service {
+public class ExperimentStateChangedEvent extends ExperimentEvent {
     /**
-     * Get all the benchmarks.
+     * Create a experiment state changed event.
      *
-     * @return the benchmarks
+     * @param sender the sender simulation object
      */
-    List<Benchmark> getAllBenchmarks();
-
-    /**
-     * Get the number of the benchmarks.
-     *
-     * @return the number of the benchmarks
-     */
-    long getNumAllBenchmarks();
-
-    /**
-     * Get a benchmark by title.
-     *
-     * @param title the benchmark's title
-     * @return the benchmark matching the title, if any exists; otherwise null
-     */
-    Benchmark getBenchmarkByTitle(String title);
-
-    /**
-     * Initialize the service.
-     */
-    void initialize();
+    public ExperimentStateChangedEvent(Experiment sender) {
+        super(sender);
+    }
 }

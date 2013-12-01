@@ -18,9 +18,7 @@
  ******************************************************************************/
 package archimulator.sim.common;
 
-import archimulator.model.ContextMapping;
-import archimulator.model.Experiment;
-import archimulator.model.ExperimentStat;
+import archimulator.model.*;
 import archimulator.service.ServiceManager;
 import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.common.report.Reportable;
@@ -74,6 +72,10 @@ public abstract class Simulation implements SimulationObject, Reportable {
     private long beginTime;
 
     private long endTime;
+
+    private boolean running;
+
+    private boolean stopForced;
 
     private SimulationType type;
 
@@ -204,6 +206,14 @@ public abstract class Simulation implements SimulationObject, Reportable {
         this.blpProfilingHelper = new BLPProfilingHelper(this);
 
         this.intervalHelper = new IntervalHelper(this);
+
+        ServiceManager.getBlockingEventDispatcher().addListener(ExperimentStateChangedEvent.class, event -> {
+            if (running
+                    && event.getSender().getId() == experiment.getId()
+                    && ServiceManager.getExperimentService().getExperimentById(this.experiment.getId()).getState() == ExperimentState.PENDING) {
+                stopForced = true;
+            }
+        });
     }
 
     /**
@@ -230,6 +240,8 @@ public abstract class Simulation implements SimulationObject, Reportable {
      * Perform the simulation.
      */
     public void simulate() {
+        this.running = true;
+
         Logger.infof(Logger.SIMULATOR, "begin simulation: %s", this.cycleAccurateEventQueue.getCurrentCycle(), this.getTitle());
 
         Logger.info(Logger.SIMULATOR, "", this.cycleAccurateEventQueue.getCurrentCycle());
@@ -256,6 +268,7 @@ public abstract class Simulation implements SimulationObject, Reportable {
             this.collectStats();
 
             this.endSimulation();
+            this.running = false;
 
             throw new RuntimeException(e);
         }
@@ -264,6 +277,7 @@ public abstract class Simulation implements SimulationObject, Reportable {
         this.collectStats();
 
         this.endSimulation();
+        this.running = false;
     }
 
     /**
@@ -280,23 +294,23 @@ public abstract class Simulation implements SimulationObject, Reportable {
 
         this.processor.dumpStats(rootReportNode);
 
-        for(Memory memory : this.getProcessor().getKernel().getMemories()) {
+        for (Memory memory : this.getProcessor().getKernel().getMemories()) {
             memory.dumpStats(rootReportNode);
         }
 
-        for(Core core : this.getProcessor().getCores()) {
+        for (Core core : this.getProcessor().getCores()) {
             core.dumpStats(rootReportNode);
         }
 
-        for(Thread thread : this.getProcessor().getThreads()) {
+        for (Thread thread : this.getProcessor().getThreads()) {
             thread.dumpStats(rootReportNode);
         }
 
-        for(TranslationLookasideBuffer tlb : this.getProcessor().getMemoryHierarchy().getTlbs()) {
+        for (TranslationLookasideBuffer tlb : this.getProcessor().getMemoryHierarchy().getTlbs()) {
             tlb.dumpStats(rootReportNode);
         }
 
-        for(GeneralCacheController cacheController : this.getProcessor().getMemoryHierarchy().getCacheControllers()) {
+        for (GeneralCacheController cacheController : this.getProcessor().getMemoryHierarchy().getCacheControllers()) {
             cacheController.dumpStats(rootReportNode);
         }
 
@@ -399,6 +413,10 @@ public abstract class Simulation implements SimulationObject, Reportable {
     private void advanceOneCycle() {
         this.doHouseKeeping();
         this.getCycleAccurateEventQueue().advanceOneCycle();
+
+        if (stopForced) {
+            throw new RuntimeException("Aborted by user.");
+        }
 
         if (this.getCycleAccurateEventQueue().getCurrentCycle() % (this.type == SimulationType.FAST_FORWARD ? 100000000 : 10000000) == 0) {
             ServiceManager.getExperimentService().updateExperiment(this.experiment);

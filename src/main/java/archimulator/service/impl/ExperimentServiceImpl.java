@@ -275,7 +275,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
         for (Experiment experiment : getAllExperiments()) {
             for (ContextMapping contextMapping : experiment.getContextMappings()) {
-                if (contextMapping.getBenchmarkId() == benchmark.getId()) {
+                if (contextMapping.getBenchmarkTitle().equals(benchmark.getTitle())) {
                     result.add(experiment);
                     break;
                 }
@@ -291,7 +291,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
 
         for (Experiment experiment : getAllStoppedExperiments()) {
             for (ContextMapping contextMapping : experiment.getContextMappings()) {
-                if (contextMapping.getBenchmarkId() == benchmark.getId()) {
+                if (contextMapping.getBenchmarkTitle().equals(benchmark.getTitle())) {
                     result.add(experiment);
                     break;
                 }
@@ -349,6 +349,7 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     @Override
     public void updateExperiment(Experiment experiment) {
         this.updateItem(this.experiments, experiment);
+        ServiceManager.getBlockingEventDispatcher().dispatch(new ExperimentStateChangedEvent(experiment));
     }
 
     @Override

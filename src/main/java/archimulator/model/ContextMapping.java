@@ -30,7 +30,7 @@ import java.io.Serializable;
 public class ContextMapping implements Serializable {
     private int threadId;
 
-    private long benchmarkId;
+    private String benchmarkTitle;
 
     private String arguments;
 
@@ -63,7 +63,7 @@ public class ContextMapping implements Serializable {
      */
     public ContextMapping(int threadId, Benchmark benchmark, String arguments, String standardOut) {
         this.threadId = threadId;
-        this.benchmarkId = benchmark.getId();
+        this.benchmarkTitle = benchmark.getTitle();
         this.arguments = arguments;
         this.standardOut = standardOut;
     }
@@ -87,22 +87,12 @@ public class ContextMapping implements Serializable {
     }
 
     /**
-     * Get the benchmark ID.
+     * Get the benchmark title.
      *
-     * @return the benchmark ID
+     * @return the benchmark title
      */
-    public long getBenchmarkId() {
-        return benchmarkId;
-    }
-
-    /**
-     * Set the benchmark ID.
-     *
-     * @param benchmarkId the benchmark ID
-     */
-    public void setBenchmarkId(long benchmarkId) {
-        this.benchmarkId = benchmarkId;
-        this.benchmark = ServiceManager.getBenchmarkService().getBenchmarkById(benchmarkId);
+    public String getBenchmarkTitle() {
+        return benchmarkTitle;
     }
 
     /**
@@ -192,7 +182,7 @@ public class ContextMapping implements Serializable {
      */
     public Benchmark getBenchmark() {
         if (benchmark == null) {
-            benchmark = ServiceManager.getBenchmarkService().getBenchmarkById(benchmarkId);
+            benchmark = ServiceManager.getBenchmarkService().getBenchmarkByTitle(benchmarkTitle);
         }
 
         return benchmark;
