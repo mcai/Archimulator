@@ -24,6 +24,9 @@ import net.pickapack.dateTime.DateHelper;
 import net.pickapack.model.WithCreateTime;
 import net.pickapack.model.WithId;
 import net.pickapack.model.WithTitle;
+import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.Root;
 
 import java.util.Date;
 
@@ -32,29 +35,36 @@ import java.util.Date;
  *
  * @author Min Cai
  */
+@Root
 @DatabaseTable(tableName = "Benchmark")
 public class Benchmark implements WithId, WithTitle, WithCreateTime {
     @DatabaseField(generatedId = true)
     private long id;
 
+    @Attribute
     @DatabaseField
     private String title;
 
     @DatabaseField
     private long createTime;
 
+    @Element
     @DatabaseField
     private String workingDirectory;
 
+    @Element
     @DatabaseField
     private String executable;
 
+    @Element(required = false)
     @DatabaseField
     private String defaultArguments;
 
+    @Element(required = false)
     @DatabaseField
     private String standardIn;
 
+    @Element
     @DatabaseField
     private boolean helperThreadEnabled;
 

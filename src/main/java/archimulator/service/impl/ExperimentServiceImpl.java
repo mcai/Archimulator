@@ -30,7 +30,6 @@ import net.pickapack.service.AbstractService;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -68,13 +67,11 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
     public void initialize() {
         this.cleanUpExperiments();
 
-        //TODO: to be exposed as import/upload experiment pack via web UI
-
         try {
             TransactionManager.callInTransaction(getConnectionSource(),
                     () -> {
                         try {
-                            File fileExperimentInputs = new File("experiment_inputs");
+                            File fileExperimentInputs = new File("configs/experiments");
 
                             if(fileExperimentInputs.exists()) {
                                 List<File> files = new ArrayList<>(FileUtils.listFiles(fileExperimentInputs, new String[]{"xml"}, true));
@@ -117,17 +114,11 @@ public class ExperimentServiceImpl extends AbstractService implements Experiment
                             }
 
                             return null;
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                            throw new RuntimeException(e);
                         } catch (Exception e) {
                             e.printStackTrace();
                             throw new RuntimeException(e);
                         }
                     });
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);

@@ -40,7 +40,7 @@ public class ServiceManager {
     /**
      * User home template argument. To be used in benchmark arguments injection.
      */
-    public static final String USER_HOME_TEMPLATE_ARG = "<user.home>";
+    public static final String USER_HOME_TEMPLATE_ARG = "%user.home%";
 
     private static BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher;
 
@@ -85,7 +85,7 @@ public class ServiceManager {
      */
     private static void startTasks() {
         try {
-            File fileTaskInputs = new File("experiment_tasks");
+            File fileTaskInputs = new File("configs/tasks");
 
             if(fileTaskInputs.exists()) {
                 List<File> files = new ArrayList<>(FileUtils.listFiles(fileTaskInputs, new String[]{"xml"}, true));

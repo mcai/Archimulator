@@ -18,14 +18,20 @@
  ******************************************************************************/
 package archimulator.service.impl;
 
-import archimulator.model.Benchmark;
+import archimulator.model.*;
 import archimulator.service.BenchmarkService;
 import archimulator.service.ServiceManager;
+import archimulator.util.serialization.XMLSerializationHelper;
 import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.misc.TransactionManager;
 import net.pickapack.model.WithId;
 import net.pickapack.service.AbstractService;
+import org.apache.commons.io.FileUtils;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -46,141 +52,43 @@ public class BenchmarkServiceImpl extends AbstractService implements BenchmarkSe
         this.benchmarks = createDao(Benchmark.class);
     }
 
-    //TODO: to be refactored to support the bundling of simulation mode and input set!!!
     @Override
     public void initialize() {
-        this.addBaseline();
-        this.addHelperThreaded();
-        this.addBaselineMicro();
-        this.addHelperThreadedMicro();
-    }
+        try {
+            TransactionManager.callInTransaction(getConnectionSource(),
+                    () -> {
+                        try {
+                            File fileBenchmarks = new File("configs/benchmarks");
 
-    private void addBaseline() {
-        this.addBenchmarkIfNotExists(new Benchmark(
-                "mst_baseline", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/baseline",
-                "mst.mips",
-                "4000")); //TODO: 1200 nodes as in [Changhee Jung, IPDPS'06]
+                            if (fileBenchmarks.exists()) {
+                                List<File> files = new ArrayList<>(FileUtils.listFiles(fileBenchmarks, new String[]{"xml"}, true));
 
-        this.addBenchmarkIfNotExists(new Benchmark(
-                "em3d_baseline", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/em3d/baseline",
-                "em3d.mips",
-                "40000 128 75 1")); //TODO: 200,000 as in [Changhee Jung, IPDPS'06]
+                                files.sort(Comparator.comparing(File::getAbsolutePath));
 
-        this.addBenchmarkIfNotExists(new Benchmark(
-                "health_baseline", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/health/baseline",
-                "health.mips",
-                ""));
+                                for (File file : files) {
+                                    String text = FileUtils.readFileToString(file);
 
-        this.addBenchmarkIfNotExists(new Benchmark(
-                "tsp_baseline", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/tsp/baseline",
-                "tsp.mips",
-                ""));
+                                    Benchmark benchmark = XMLSerializationHelper.deserialize(Benchmark.class, text);
 
-        this.addBenchmarkIfNotExists(new Benchmark(
-                "429_mcf_baseline", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline",
-                "429.mcf.mips",
-                ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline/data/ref/input/inp.in"));
+                                    if (benchmark != null) {
+                                        if (getBenchmarkByTitle(benchmark.getTitle()) == null) {
+                                            addBenchmark(benchmark);
+                                            System.out.println("Benchmark " + benchmark.getTitle() + " added.");
+                                        }
+                                    }
+                                }
+                            }
 
-        this.addBenchmarkIfNotExists(new Benchmark(
-                "462_libquantum_baseline", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/462.libquantum/baseline",
-                "462.libquantum.mips",
-                "1397 8"));
-    }
-
-    private void addHelperThreaded() {
-        this.addBenchmarkIfNotExists(new Benchmark(
-                "mst_ht", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/ht",
-                "mst.mips",
-                "4000", "", true));
-
-        this.addBenchmarkIfNotExists(new Benchmark(
-                "em3d_ht", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/em3d/ht",
-                "em3d.mips",
-                "40000 128 75 1", "", true));
-
-        this.addBenchmarkIfNotExists(new Benchmark(
-                "health_ht", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/health/ht",
-                "health.mips",
-                "", "", true));
-
-        this.addBenchmarkIfNotExists(new Benchmark(
-                "tsp_ht", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/tsp/ht",
-                "tsp.mips",
-                "", "", true));
-
-        this.addBenchmarkIfNotExists(new Benchmark(
-                "429_mcf_ht", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht",
-                "429.mcf.mips",
-                ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht/data/ref/input/inp.in", "", true));
-
-        this.addBenchmarkIfNotExists(new Benchmark(
-                "462_libquantum_ht", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/462.libquantum/ht",
-                "462.libquantum.mips",
-                "1397 8", "", true));
-    }
-
-    private void addBaselineMicro() {
-        this.addBenchmarkIfNotExists(new Benchmark(
-                "mst_baseline_micro", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/baseline",
-                "mst.mips",
-                "1024")); //TODO: 1200 nodes as in [Changhee Jung, IPDPS'06]
-
-        this.addBenchmarkIfNotExists(new Benchmark(
-                "em3d_baseline_micro", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/em3d/baseline",
-                "em3d.mips",
-                "4000 128 75 1")); //TODO: 200,000 as in [Changhee Jung, IPDPS'06]
-
-        this.addBenchmarkIfNotExists(new Benchmark(
-                "health_baseline_micro", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/health/baseline",
-                "health.mips",
-                ""));
-
-        this.addBenchmarkIfNotExists(new Benchmark(
-                "tsp_baseline_micro", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/tsp/baseline",
-                "tsp.mips",
-                ""));
-
-        this.addBenchmarkIfNotExists(new Benchmark(
-                "429_mcf_baseline_micro", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline",
-                "429.mcf.mips",
-                ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline/data/ref/input/inp.in"));
-
-        this.addBenchmarkIfNotExists(new Benchmark(
-                "462_libquantum_baseline_micro", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/462.libquantum/baseline",
-                "462.libquantum.mips",
-                "1397 8"));
-    }
-
-    private void addHelperThreadedMicro() {
-        this.addBenchmarkIfNotExists(new Benchmark(
-                "mst_ht_micro", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/mst/ht",
-                "mst.mips",
-                "1024", "", true));
-
-        this.addBenchmarkIfNotExists(new Benchmark(
-                "em3d_ht_micro", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/em3d/ht",
-                "em3d.mips",
-                "4000 128 75 1", "", true));
-
-        this.addBenchmarkIfNotExists(new Benchmark(
-                "health_ht_micro", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/health/ht",
-                "health.mips",
-                "", "", true));
-
-        this.addBenchmarkIfNotExists(new Benchmark(
-                "tsp_ht_micro", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/Olden_Custom1/tsp/ht",
-                "tsp.mips",
-                "", "", true));
-
-        this.addBenchmarkIfNotExists(new Benchmark(
-                "429_mcf_ht_micro", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht",
-                "429.mcf.mips",
-                ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht/data/ref/input/inp.in", "", true));
-
-        this.addBenchmarkIfNotExists(new Benchmark(
-                "462_libquantum_ht_micro", ServiceManager.USER_HOME_TEMPLATE_ARG + "/Archimulator/benchmarks/CPU2006_Custom1/462.libquantum/ht",
-                "462.libquantum.mips",
-                "1397 8", "", true));
+                            return null;
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            throw new RuntimeException(e);
+                        }
+                    });
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
