@@ -35,6 +35,8 @@ import java.util.*;
  * @author Min Cai
  */
 public class ServiceManager {
+    private static boolean runningExperimentsEnabled;
+
     /**
      * User home template argument. To be used in benchmark arguments injection.
      */
@@ -47,7 +49,6 @@ public class ServiceManager {
     private static ExperimentService experimentService;
     private static ExperimentStatService experimentStatService;
     private static UserService userService;
-    private static SystemSettingService systemSettingService;
 
     private static Map<Long, Task> experimentPacksToTasksMap;
 
@@ -65,14 +66,12 @@ public class ServiceManager {
         experimentService = new ExperimentServiceImpl();
         experimentStatService = new ExperimentStatServiceImpl();
         userService = new UserServiceImpl();
-        systemSettingService = new SystemSettingServiceImpl();
 
         benchmarkService.initialize();
         architectureService.initialize();
         experimentService.initialize();
         experimentStatService.initialize();
         userService.initialize();
-        systemSettingService.initialize();
 
         experimentPacksToTasksMap = new LinkedHashMap<>();
 
@@ -189,6 +188,24 @@ public class ServiceManager {
     }
 
     /**
+     * Get a value indicating whether the running of experiments is enabled or not.
+     *
+     * @return a value indicating whether the running of experiments is enabled or not
+     */
+    public static boolean isRunningExperimentsEnabled() {
+        return runningExperimentsEnabled;
+    }
+
+    /**
+     * Set a value indicating whether the running of experiments is enabled or not.
+     *
+     * @param runningExperimentsEnabled a value indicating whether the running of experiments is enabled or not
+     */
+    public static void setRunningExperimentsEnabled(boolean runningExperimentsEnabled) {
+        ServiceManager.runningExperimentsEnabled = runningExperimentsEnabled;
+    }
+
+    /**
      * Get the blocking event dispatcher.
      *
      * @return the blocking event dispatcher
@@ -240,15 +257,6 @@ public class ServiceManager {
      */
     public static UserService getUserService() {
         return userService;
-    }
-
-    /**
-     * Get the system setting service singleton.
-     *
-     * @return system setting service singleton
-     */
-    public static SystemSettingService getSystemSettingService() {
-        return systemSettingService;
     }
 
     /**
