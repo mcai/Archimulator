@@ -217,26 +217,6 @@ public abstract class Simulation implements SimulationObject, Reportable {
     }
 
     /**
-     * Create the kernel.
-     *
-     * @return the kernel that is created
-     */
-    public Kernel createKernel() {
-        Kernel kernel = new Kernel(this);
-
-        for (final ContextMapping contextMapping : this.getExperiment().getContextMappings()) {
-            final Context context = Context.load(kernel, this.getWorkingDirectory(), contextMapping);
-
-            if (!kernel.map(context, candidateThreadId -> candidateThreadId == contextMapping.getThreadId())) {
-                throw new RuntimeException();
-            }
-
-            kernel.getContexts().add(context);
-        }
-        return kernel;
-    }
-
-    /**
      * Perform the simulation.
      */
     public void simulate() {
@@ -414,7 +394,7 @@ public abstract class Simulation implements SimulationObject, Reportable {
         this.doHouseKeeping();
         this.getCycleAccurateEventQueue().advanceOneCycle();
 
-        if (stopForced) {
+        if (this.stopForced) {
             throw new RuntimeException("Aborted by user.");
         }
 
@@ -437,7 +417,18 @@ public abstract class Simulation implements SimulationObject, Reportable {
      * @return the kernel that is prepared
      */
     public Kernel prepareKernel() {
-        return this.createKernel();
+        Kernel kernel = new Kernel(this);
+
+        for (final ContextMapping contextMapping : this.getExperiment().getContextMappings()) {
+            final Context context = Context.load(kernel, this.getWorkingDirectory(), contextMapping);
+
+            if (!kernel.map(context, candidateThreadId -> candidateThreadId == contextMapping.getThreadId())) {
+                throw new RuntimeException();
+            }
+
+            kernel.getContexts().add(context);
+        }
+        return kernel;
     }
 
     /**
@@ -453,7 +444,7 @@ public abstract class Simulation implements SimulationObject, Reportable {
      * Dump the tree of the pending cache coherence flows.
      */
     public void dumpPendingFlowTree() {
-        for (CacheCoherenceFlow pendingFlow : pendingFlows) {
+        for (CacheCoherenceFlow pendingFlow : this.pendingFlows) {
             NodeHelper.print(pendingFlow);
             System.out.println();
         }
