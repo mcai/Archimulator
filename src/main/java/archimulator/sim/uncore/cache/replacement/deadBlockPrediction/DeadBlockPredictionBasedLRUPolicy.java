@@ -95,19 +95,16 @@ public class DeadBlockPredictionBasedLRUPolicy<StateT extends Serializable> exte
 
     @Override
     public CacheAccess<StateT> handleReplacement(MemoryHierarchyAccess access, int set, int tag) {
-        int victimWay = super.handleReplacement(access, set, tag).getWay();
-
         for (int i = 0; i < this.getCache().getAssociativity(); i++) {
             CacheLine<Boolean> mirrorLine = this.mirrorCache.getLine(set, i);
             BooleanValueProvider stateProvider = (BooleanValueProvider) mirrorLine.getStateProvider();
 
             if (stateProvider.dead) {
-                victimWay = i;
-                break;
+                return new CacheAccess<>(this.getCache(), access, set, i, tag);
             }
         }
 
-        return new CacheAccess<>(this.getCache(), access, set, victimWay, tag);
+        return super.handleReplacement(access, set, tag);
     }
 
     @Override

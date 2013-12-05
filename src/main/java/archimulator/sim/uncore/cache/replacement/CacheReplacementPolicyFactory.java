@@ -27,8 +27,6 @@ import archimulator.sim.uncore.cache.replacement.costAware.helperThread.HelperTh
 import archimulator.sim.uncore.cache.replacement.costAware.mlp.LinearMLPAwareLRUPolicy;
 import archimulator.sim.uncore.cache.replacement.costAware.mlp.MLPSensitiveLRUPolicy;
 import archimulator.sim.uncore.cache.replacement.deadBlockPrediction.DeadBlockPredictionBasedLRUPolicy;
-import archimulator.sim.uncore.cache.replacement.helperThread.HelperThreadAwareLRUPolicy;
-import archimulator.sim.uncore.cache.replacement.helperThread.HelperThreadAwareLRUPolicy2;
 import archimulator.sim.uncore.cache.replacement.helperThread.HelperThreadAwareLRUPolicy3;
 import archimulator.sim.uncore.cache.replacement.helperThread.HelperThreadIntervalAwareLRUPolicy;
 import archimulator.sim.uncore.cache.replacement.partitioned.HelperThreadAndMLPAwarePartitionedLRUPolicy;
@@ -68,18 +66,8 @@ public class CacheReplacementPolicyFactory {
                 return new LFUPolicy<>(cache);
             case RANDOM:
                 return new RandomPolicy<>(cache);
-            case HELPER_THREAD_AWARE_LRU:
-                return new HelperThreadAwareLRUPolicy<>(cache, false);
             case HELPER_THREAD_INTERVAL_AWARE_LRU:
                 return new HelperThreadIntervalAwareLRUPolicy<>(cache);
-            case HELPER_THREAD_AWARE_BREAKDOWN_LRU:
-                return new HelperThreadAwareLRUPolicy<>(cache, true);
-            case HELPER_THREAD_AWARE_BREAKDOWN_LRU_2:
-                return new HelperThreadAwareLRUPolicy2<>(cache);
-            case HELPER_THREAD_AWARE_BREAKDOWN_LRU_2H:
-                return new HelperThreadAwareLRUPolicy2<>(cache, true, false);
-            case HELPER_THREAD_AWARE_BREAKDOWN_LRU_2M:
-                return new HelperThreadAwareLRUPolicy2<>(cache, false, true);
             case HELPER_THREAD_AWARE_LRU_3:
                 return new HelperThreadAwareLRUPolicy3<>(cache);
             case REUSE_DISTANCE_PREDICTION:
@@ -131,12 +119,12 @@ public class CacheReplacementPolicyFactory {
                 return new MLPSensitiveLRUPolicy<>(cache);
             case HELPER_THREAD_SENSITIVE_LRU:
                 return new HelperThreadSensitiveLRUPolicy<>(cache);
-            case PREFETCH_AWARE_M_LRU:
-                return new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PrefetchAwareHMLRUPolicyType.M);
-            case PREFETCH_AWARE_H_LRU:
-                return new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PrefetchAwareHMLRUPolicyType.H);
             case PREFETCH_AWARE_HM_LRU:
-                return new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PrefetchAwareHMLRUPolicyType.HM);
+                return new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PolicyType.HM);
+            case PREFETCH_AWARE_M_LRU:
+                return new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PolicyType.M);
+            case PREFETCH_AWARE_H_LRU:
+                return new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PolicyType.H);
             case PREFETCH_AWARE_SET_DUELING_HM_LRU:
                 return new PrefetchAwareSetDuelingHMLRUPolicy<>(cache);
             case DEAD_BLOCK_PREDICTION_LRU:

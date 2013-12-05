@@ -40,8 +40,8 @@ public class PrefetchAwareSetDuelingHMLRUPolicy<StateT extends Serializable> ext
         super(
                 cache,
                 new LRUPolicy<>(cache),
-                new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PrefetchAwareHMLRUPolicyType.H),
-                new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PrefetchAwareHMLRUPolicyType.HM)
+                new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PolicyType.H),
+                new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PolicyType.HM)
         );
     }
 }
