@@ -38,9 +38,7 @@ public class ReuseDistancePredictionHelper implements Reportable {
 
     private Predictor<Integer> reuseDistancePredictor;
 
-    private Predictor<Integer> helperThreadL2RequestReuseDistancePredictor;
-
-    private HelperThreadAwareReuseDistanceSampler reuseDistanceSampler;
+    private ReuseDistanceSampler reuseDistanceSampler;
 
     /**
      * Create a reuse distance prediction helper.
@@ -61,16 +59,7 @@ public class ReuseDistancePredictionHelper implements Reportable {
                 0
         );
 
-        this.helperThreadL2RequestReuseDistancePredictor = new CacheBasedPredictor<>(
-                cache,
-                cache.getName() + ".helperThreadL2RequestReuseDistancePredictor",
-                16,
-                0,
-                3,
-                0
-        );
-
-        this.reuseDistanceSampler = new HelperThreadAwareReuseDistanceSampler(
+        this.reuseDistanceSampler = new ReuseDistanceSampler(
                 cache,
                 cache.getName() + ".reuseDistanceSampler",
                 4096,
@@ -89,19 +78,12 @@ public class ReuseDistancePredictionHelper implements Reportable {
                 reuseDistancePredictor.update(event.getPc(), (int) (Math.log(event.getReuseDistance()) / Math.log(2)));
             }
         });
-
-        cache.getBlockingEventDispatcher().addListener(HelperThreadAwareReuseDistanceSampler.HelperThreadL2RequestReuseDistanceSampledEvent.class, event -> {
-            if (event.getSender() == reuseDistanceSampler) {
-                helperThreadL2RequestReuseDistancePredictor.update(event.getPc(), (int) (Math.log(event.getReuseDistance()) / Math.log(2)));
-            }
-        });
     }
 
     @Override
     public void dumpStats(ReportNode reportNode) {
         reportNode.getChildren().add(new ReportNode(reportNode, "reuseDistancePredictionHelper") {{
             getReuseDistancePredictor().dumpStats(this);
-            getHelperThreadL2RequestReuseDistancePredictor().dumpStats(this);
         }});
     }
 
@@ -121,15 +103,6 @@ public class ReuseDistancePredictionHelper implements Reportable {
      */
     public Predictor<Integer> getReuseDistancePredictor() {
         return reuseDistancePredictor;
-    }
-
-    /**
-     * Get the helper thread L2 request reuse distance predictor.
-     *
-     * @return the helper thread L2 request reuse distance predictor
-     */
-    public Predictor<Integer> getHelperThreadL2RequestReuseDistancePredictor() {
-        return helperThreadL2RequestReuseDistancePredictor;
     }
 
     /**
