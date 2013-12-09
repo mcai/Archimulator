@@ -16,8 +16,9 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.sim.uncore.cache;
+package archimulator.sim.uncore.cache.setDueling;
 
+import archimulator.sim.uncore.cache.Cache;
 import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestProfilingHelper;
 
 /**
@@ -25,7 +26,7 @@ import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestProfilingH
  *
  * @author Min Cai
  */
-public class MainThreadL2MissBasedSetDuelingUnit extends SetDuelingUnit {
+public class MainThreadL2MissBasedSetDuelingUnit extends SaturatingCounterBasedSetDuelingUnit {
     /**
      * Create a main thread L2 miss based set dueling unit.
      *

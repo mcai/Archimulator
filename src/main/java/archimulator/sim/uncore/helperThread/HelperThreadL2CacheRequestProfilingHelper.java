@@ -346,7 +346,7 @@ public class HelperThreadL2CacheRequestProfilingHelper implements Reportable {
             this.l2CacheController.getBlockingEventDispatcher().dispatch(new HelperThreadL2CacheRequestEvent(
                     HelperThreadL2CacheRequestQuality.LATE,
                     event.getSet(),
-                    llcLineState.getInFlightThreadId(),
+                    llcLineState.getThreadId(),
                     llcLineState.getPc(),
                     llcLine.getTag()
             ));

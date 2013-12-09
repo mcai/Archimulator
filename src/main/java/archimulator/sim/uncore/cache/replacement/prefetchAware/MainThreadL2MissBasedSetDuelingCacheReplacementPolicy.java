@@ -19,29 +19,29 @@
 package archimulator.sim.uncore.cache.replacement.prefetchAware;
 
 import archimulator.sim.uncore.cache.EvictableCache;
-import archimulator.sim.uncore.cache.replacement.LRUPolicy;
+import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicy;
+import archimulator.sim.uncore.cache.setDueling.MainThreadL2MissBasedSetDuelingUnit;
 
 import java.io.Serializable;
 
 /**
- * Prefetch aware set dueling based HM Least recently used (LRU) policy.
+ * Main thread L2 miss based set dueling based policy.
  *
  * @param <StateT> the state type of the parent evictable cache
  * @author Min Cai
  */
-public class PrefetchAwareSetDuelingHMLRUPolicy<StateT extends Serializable> extends MainThreadL2MissBasedSetDuelingCacheReplacementPolicy<StateT> {
+public class MainThreadL2MissBasedSetDuelingCacheReplacementPolicy<StateT extends Serializable> extends AbstractSetDuelingCacheReplacementPolicy<StateT> {
     /**
-     * Create a prefetch aware set dueling based HM least recently used (LRU) policy for the specified evictable cache.
+     * Create a main thread L2 miss based set dueling based policy for the specified evictable cache.
      *
      * @param cache the parent evictable cache
      */
     @SuppressWarnings("unchecked")
-    public PrefetchAwareSetDuelingHMLRUPolicy(EvictableCache<StateT> cache) {
-        super(
-                cache,
-                new LRUPolicy<>(cache),
-                new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PolicyType.H),
-                new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PolicyType.HM)
-        );
+    public MainThreadL2MissBasedSetDuelingCacheReplacementPolicy(EvictableCache<StateT> cache, CacheReplacementPolicy<StateT>... policies) {
+        super(cache, policies);
+    }
+
+    protected MainThreadL2MissBasedSetDuelingUnit createSetDuelingUnit(EvictableCache<StateT> cache, int numPolicies) {
+        return new MainThreadL2MissBasedSetDuelingUnit(cache, cache.getExperiment().getArchitecture().getNumCores(), numPolicies, 2);
     }
 }

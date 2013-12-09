@@ -19,29 +19,28 @@
 package archimulator.sim.uncore.cache.replacement.prefetchAware;
 
 import archimulator.sim.uncore.cache.EvictableCache;
-import archimulator.sim.uncore.cache.replacement.LRUPolicy;
+import archimulator.sim.uncore.cache.replacement.reuseDistancePrediction.ReuseDistancePredictionPolicy;
 
 import java.io.Serializable;
 
 /**
- * Prefetch aware set dueling based HM Least recently used (LRU) policy.
+ * Prefetch aware and reuse distance prediction based set dueling policy.
  *
  * @param <StateT> the state type of the parent evictable cache
  * @author Min Cai
  */
-public class PrefetchAwareSetDuelingHMLRUPolicy<StateT extends Serializable> extends MainThreadL2MissBasedSetDuelingCacheReplacementPolicy<StateT> {
+public class PrefetchAwareAndReuseDistancePredictionBasedSetDuelingPolicy<StateT extends Serializable> extends PrefetchAwareSetDuelingCacheReplacementPolicy<StateT> {
     /**
-     * Create a prefetch aware set dueling based HM least recently used (LRU) policy for the specified evictable cache.
+     * Create a prefetch aware and reuse distance prediction based set dueling policy for the specified evictable cache.
      *
      * @param cache the parent evictable cache
      */
     @SuppressWarnings("unchecked")
-    public PrefetchAwareSetDuelingHMLRUPolicy(EvictableCache<StateT> cache) {
+    public PrefetchAwareAndReuseDistancePredictionBasedSetDuelingPolicy(EvictableCache<StateT> cache) {
         super(
                 cache,
-                new LRUPolicy<>(cache),
-                new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PolicyType.H),
-                new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PolicyType.HM)
+                new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PolicyType.RHM),
+                new ReuseDistancePredictionPolicy<>(cache)
         );
     }
 }

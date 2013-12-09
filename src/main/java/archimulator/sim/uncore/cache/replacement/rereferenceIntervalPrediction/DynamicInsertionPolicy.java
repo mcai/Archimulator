@@ -19,8 +19,8 @@
 package archimulator.sim.uncore.cache.replacement.rereferenceIntervalPrediction;
 
 import archimulator.sim.uncore.cache.Cache;
-import archimulator.sim.uncore.cache.MainThreadL2MissBasedSetDuelingUnit;
-import archimulator.sim.uncore.cache.SetDuelingUnit;
+import archimulator.sim.uncore.cache.setDueling.MainThreadL2MissBasedSetDuelingUnit;
+import archimulator.sim.uncore.cache.setDueling.AbstractSetDuelingUnit;
 
 import java.util.Random;
 
@@ -30,7 +30,7 @@ import java.util.Random;
  * @author Min Cai
  */
 public class DynamicInsertionPolicy {
-    private SetDuelingUnit setDuelingUnit;
+    private AbstractSetDuelingUnit setDuelingUnit;
 
     private int bimodalSuggestionThrottle;
 

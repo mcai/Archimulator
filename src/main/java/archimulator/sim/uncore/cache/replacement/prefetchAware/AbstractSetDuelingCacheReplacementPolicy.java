@@ -21,27 +21,26 @@ package archimulator.sim.uncore.cache.replacement.prefetchAware;
 import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.EvictableCache;
-import archimulator.sim.uncore.cache.MainThreadL2MissBasedSetDuelingUnit;
-import archimulator.sim.uncore.cache.SetDuelingUnit;
 import archimulator.sim.uncore.cache.replacement.AbstractCacheReplacementPolicy;
 import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicy;
+import archimulator.sim.uncore.cache.setDueling.AbstractSetDuelingUnit;
 
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
 /**
- * Set dueling based policy.
+ * Abstract Set dueling based cache replacement policy.
  *
  * @param <StateT> the state type of the parent evictable cache
  * @author Min Cai
  */
-public class AbstractSetDuelingCacheReplacementPolicy<StateT extends Serializable> extends AbstractCacheReplacementPolicy<StateT> implements SetDuelingCacheReplacementPolicy<StateT> {
-    private SetDuelingUnit setDuelingUnit;
+public abstract class AbstractSetDuelingCacheReplacementPolicy<StateT extends Serializable> extends AbstractCacheReplacementPolicy<StateT> implements SetDuelingCacheReplacementPolicy<StateT> {
+    private AbstractSetDuelingUnit setDuelingUnit;
     private List<CacheReplacementPolicy<StateT>> policies;
 
     /**
-     * Create a set dueling based policy for the specified evictable cache.
+     * Create a set dueling based cache replacement policy for the specified evictable cache.
      *
      * @param cache the parent evictable cache
      */
@@ -51,8 +50,17 @@ public class AbstractSetDuelingCacheReplacementPolicy<StateT extends Serializabl
 
         this.policies = Arrays.asList(policies);
 
-        this.setDuelingUnit = new MainThreadL2MissBasedSetDuelingUnit(cache, cache.getExperiment().getArchitecture().getNumCores(), this.policies.size(), 2);
+        this.setDuelingUnit = this.createSetDuelingUnit(cache, policies.length);
     }
+
+    /**
+     * Create an set dueling unit.
+     *
+     * @param cache the parent evictable cache
+     * @param numPolicies the number of policies
+     * @return the newly created set dueling unit
+     */
+    protected abstract AbstractSetDuelingUnit createSetDuelingUnit(EvictableCache<StateT> cache, int numPolicies);
 
     /**
      * Get the cache replacement policy for the specified access and set index.
@@ -74,7 +82,7 @@ public class AbstractSetDuelingCacheReplacementPolicy<StateT extends Serializabl
      *
      * @return the set dueling unit
      */
-    public SetDuelingUnit getSetDuelingUnit() {
+    public AbstractSetDuelingUnit getSetDuelingUnit() {
         return setDuelingUnit;
     }
 }

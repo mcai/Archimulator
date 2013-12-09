@@ -36,6 +36,7 @@ import archimulator.sim.uncore.cache.replacement.partitioned.cpiBased.CPIBasedPa
 import archimulator.sim.uncore.cache.replacement.partitioned.minMiss.MinMissPartitionedLRUPolicy;
 import archimulator.sim.uncore.cache.replacement.partitioned.mlpAware.MLPAwarePartitionedLRUPolicy;
 import archimulator.sim.uncore.cache.replacement.partitioned.setDueling.SetDuelingPartitionedLRUPolicy;
+import archimulator.sim.uncore.cache.replacement.prefetchAware.PrefetchAwareAndReuseDistancePredictionBasedSetDuelingPolicy;
 import archimulator.sim.uncore.cache.replacement.prefetchAware.PrefetchAwareHMLRUPolicy;
 import archimulator.sim.uncore.cache.replacement.prefetchAware.PrefetchAwareSetDuelingHMLRUPolicy;
 import archimulator.sim.uncore.cache.replacement.rereferenceIntervalPrediction.RereferenceIntervalPredictionPolicy;
@@ -119,14 +120,24 @@ public class CacheReplacementPolicyFactory {
                 return new MLPSensitiveLRUPolicy<>(cache);
             case HELPER_THREAD_SENSITIVE_LRU:
                 return new HelperThreadSensitiveLRUPolicy<>(cache);
-            case PREFETCH_AWARE_HM_LRU:
-                return new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PolicyType.HM);
-            case PREFETCH_AWARE_M_LRU:
-                return new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PolicyType.M);
+            case PREFETCH_AWARE_R_LRU:
+                return new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PolicyType.R);
             case PREFETCH_AWARE_H_LRU:
                 return new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PolicyType.H);
+            case PREFETCH_AWARE_M_LRU:
+                return new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PolicyType.M);
+            case PREFETCH_AWARE_RH_LRU:
+                return new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PolicyType.RH);
+            case PREFETCH_AWARE_HM_LRU:
+                return new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PolicyType.HM);
+            case PREFETCH_AWARE_RM_LRU:
+                return new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PolicyType.RM);
+            case PREFETCH_AWARE_RHM_LRU:
+                return new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PolicyType.RHM);
             case PREFETCH_AWARE_SET_DUELING_HM_LRU:
                 return new PrefetchAwareSetDuelingHMLRUPolicy<>(cache);
+            case PREFETCH_AWARE_AND_REUSE_DISTANCE_PREDICTION_BASED_SET_DUELING:
+                return new PrefetchAwareAndReuseDistancePredictionBasedSetDuelingPolicy<>(cache);
             case DEAD_BLOCK_PREDICTION_LRU:
                 return new DeadBlockPredictionBasedLRUPolicy<>(cache);
             default:

@@ -20,8 +20,8 @@ package archimulator.sim.uncore.cache.replacement.partitioned.setDueling;
 
 import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.uncore.cache.EvictableCache;
-import archimulator.sim.uncore.cache.MainThreadL2MissBasedSetDuelingUnit;
-import archimulator.sim.uncore.cache.SetDuelingUnit;
+import archimulator.sim.uncore.cache.setDueling.MainThreadL2MissBasedSetDuelingUnit;
+import archimulator.sim.uncore.cache.setDueling.AbstractSetDuelingUnit;
 import archimulator.sim.uncore.cache.partitioning.Partitioner;
 import archimulator.sim.uncore.cache.replacement.partitioned.PartitionedLRUPolicy;
 
@@ -38,7 +38,7 @@ import java.util.List;
  */
 public class SetDuelingPartitionedLRUPolicy<StateT extends Serializable> extends PartitionedLRUPolicy<StateT> {
     private List<Partitioner> partitioners;
-    private SetDuelingUnit setDuelingUnit;
+    private AbstractSetDuelingUnit setDuelingUnit;
 
     private List<Long> numCachePartitioningHelpersUsed;
 

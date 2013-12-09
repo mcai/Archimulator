@@ -20,7 +20,7 @@ package archimulator.sim.uncore.cache.replacement.prefetchAware;
 
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.CacheAccess;
-import archimulator.sim.uncore.cache.SetDuelingUnit;
+import archimulator.sim.uncore.cache.setDueling.AbstractSetDuelingUnit;
 import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicy;
 
 import java.io.Serializable;
@@ -58,5 +58,5 @@ public interface SetDuelingCacheReplacementPolicy<StateT extends Serializable> e
      *
      * @return the set dueling unit
      */
-    public SetDuelingUnit getSetDuelingUnit();
+    public AbstractSetDuelingUnit getSetDuelingUnit();
 }

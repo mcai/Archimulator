@@ -150,14 +150,9 @@ public enum CacheReplacementPolicyType {
     HELPER_THREAD_SENSITIVE_LRU,
 
     /**
-     * Prefetch aware HM least recently used (LRU).
+     * Prefetch aware R least recently used (LRU).
      */
-    PREFETCH_AWARE_HM_LRU,
-
-    /**
-     * Prefetch aware M least recently used (LRU).
-     */
-    PREFETCH_AWARE_M_LRU,
+    PREFETCH_AWARE_R_LRU,
 
     /**
      * Prefetch aware H least recently used (LRU).
@@ -165,9 +160,39 @@ public enum CacheReplacementPolicyType {
     PREFETCH_AWARE_H_LRU,
 
     /**
+     * Prefetch aware M least recently used (LRU).
+     */
+    PREFETCH_AWARE_M_LRU,
+
+    /**
+     * Prefetch aware RH least recently used (LRU).
+     */
+    PREFETCH_AWARE_RH_LRU,
+
+    /**
+     * Prefetch aware HM least recently used (LRU).
+     */
+    PREFETCH_AWARE_HM_LRU,
+
+    /**
+     * Prefetch aware RM least recently used (LRU).
+     */
+    PREFETCH_AWARE_RM_LRU,
+
+    /**
+     * Prefetch aware RHM least recently used (LRU).
+     */
+    PREFETCH_AWARE_RHM_LRU,
+
+    /**
      * Prefetch aware set dueling based HM least recently used (LRU).
      */
     PREFETCH_AWARE_SET_DUELING_HM_LRU,
+
+    /**
+     * Prefetch aware set dueling based HM least recently used (LRU).
+     */
+    PREFETCH_AWARE_AND_REUSE_DISTANCE_PREDICTION_BASED_SET_DUELING,
 
     /**
      * Dead block prediction based least recently used (LRU).
