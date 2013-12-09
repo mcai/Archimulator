@@ -70,7 +70,7 @@ public abstract class AbstractSetDuelingCacheReplacementPolicy<StateT extends Se
      * @return the cache replacement policy for the specified access and set index
      */
     public CacheReplacementPolicy<StateT> getPolicy(MemoryHierarchyAccess access, int set) {
-        return this.policies.get(this.setDuelingUnit.getPolicyId(set, access.getThread().getCore().getNum()));
+        return this.policies.get(this.setDuelingUnit.getPolicyId(set, 0));
     }
 
     @Override
