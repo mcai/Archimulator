@@ -36,7 +36,8 @@ import archimulator.sim.uncore.cache.replacement.partitioned.cpiBased.CPIBasedPa
 import archimulator.sim.uncore.cache.replacement.partitioned.minMiss.MinMissPartitionedLRUPolicy;
 import archimulator.sim.uncore.cache.replacement.partitioned.mlpAware.MLPAwarePartitionedLRUPolicy;
 import archimulator.sim.uncore.cache.replacement.partitioned.setDueling.SetDuelingPartitionedLRUPolicy;
-import archimulator.sim.uncore.cache.replacement.prefetchAware.PrefetchAwareAndReuseDistancePredictionBasedSetDuelingPolicy;
+import archimulator.sim.uncore.cache.replacement.prefetchAware.HelperThreadPrefetchAccuracyBasedHelperThreadAwareAndReuseDistancePredictionSetDuelingPolicy;
+import archimulator.sim.uncore.cache.replacement.prefetchAware.HelperThreadUsefulPrefetchBasedPrefetchAwareAndReuseDistancePredictionSetDuelingPolicy;
 import archimulator.sim.uncore.cache.replacement.prefetchAware.PrefetchAwareHMLRUPolicy;
 import archimulator.sim.uncore.cache.replacement.prefetchAware.PrefetchAwareSetDuelingHMLRUPolicy;
 import archimulator.sim.uncore.cache.replacement.rereferenceIntervalPrediction.RereferenceIntervalPredictionPolicy;
@@ -136,8 +137,10 @@ public class CacheReplacementPolicyFactory {
                 return new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PolicyType.RHM);
             case PREFETCH_AWARE_SET_DUELING_HM_LRU:
                 return new PrefetchAwareSetDuelingHMLRUPolicy<>(cache);
-            case PREFETCH_AWARE_AND_REUSE_DISTANCE_PREDICTION_BASED_SET_DUELING:
-                return new PrefetchAwareAndReuseDistancePredictionBasedSetDuelingPolicy<>(cache);
+            case HELPER_THREAD_PREFETCH_ACCURACY_BASED_PREFETCH_AWARE_AND_REUSE_DISTANCE_PREDICTION_SET_DUELING:
+                return new HelperThreadPrefetchAccuracyBasedHelperThreadAwareAndReuseDistancePredictionSetDuelingPolicy<>(cache);
+            case HELPER_THREAD_USEFUL_PREFETCH_BASED_PREFETCH_AWARE_AND_REUSE_DISTANCE_PREDICTION_SET_DUELING:
+                return new HelperThreadUsefulPrefetchBasedPrefetchAwareAndReuseDistancePredictionSetDuelingPolicy<>(cache);
             case DEAD_BLOCK_PREDICTION_LRU:
                 return new DeadBlockPredictionBasedLRUPolicy<>(cache);
             default:

@@ -26,16 +26,16 @@ import archimulator.util.IntervalCounter;
 import java.util.Comparator;
 
 /**
- * Helper thread aware set dueling unit.
+ * Helper thread prefetch accuracy based set dueling unit.
  *
  * @author Min Cai
  */
-public class HelperThreadAwareSetDuelingUnit extends AbstractSetDuelingUnit<HelperThreadAwareSetDuelingUnit.SetDuelingMonitor> {
+public class HelperThreadPrefetchAccuracyBasedSetDuelingUnit extends AbstractSetDuelingUnit<HelperThreadPrefetchAccuracyBasedSetDuelingUnit.SetDuelingMonitor> {
     /**
      * Set dueling monitor.
      */
     public class SetDuelingMonitor extends AbstractSetDuelingUnit.SetDuelingMonitor {
-        private IntervalCounter numGoodHelperThreadL2CacheRequests;
+        private IntervalCounter numUsefulHelperThreadL2CacheRequests;
         private IntervalCounter numTotalHelperThreadL2CacheRequests;
 
         /**
@@ -43,7 +43,7 @@ public class HelperThreadAwareSetDuelingUnit extends AbstractSetDuelingUnit<Help
          */
         private SetDuelingMonitor(int threadId, int policyId) {
             super(threadId, policyId);
-            this.numGoodHelperThreadL2CacheRequests = new IntervalCounter();
+            this.numUsefulHelperThreadL2CacheRequests = new IntervalCounter();
             this.numTotalHelperThreadL2CacheRequests = new IntervalCounter();
         }
     }
@@ -54,24 +54,23 @@ public class HelperThreadAwareSetDuelingUnit extends AbstractSetDuelingUnit<Help
     private int numEvictedL2CacheLines;
 
     /**
-     * Create a helper thread aware set dueling unit.
+     * Create a helper thread prefetch accuracy based set dueling unit.
      *
      * @param cache                          the parent cache
-     * @param numThreads                     the number of threads
      * @param numSetDuelingMonitorsPerThread the number of set dueling monitors per thread
      * @param numSetsPerSetDuelingMonitor    the number of sets per set dueling monitor
      */
-    public HelperThreadAwareSetDuelingUnit(final Cache<?> cache, int numThreads, final int numSetDuelingMonitorsPerThread, int numSetsPerSetDuelingMonitor) {
-        super(cache, numThreads, numSetDuelingMonitorsPerThread, numSetsPerSetDuelingMonitor);
+    public HelperThreadPrefetchAccuracyBasedSetDuelingUnit(final Cache<?> cache, final int numSetDuelingMonitorsPerThread, int numSetsPerSetDuelingMonitor) {
+        super(cache, 1, numSetDuelingMonitorsPerThread, numSetsPerSetDuelingMonitor);
 
         this.numEvictedL2CacheLinesPerInterval = cache.getNumSets() * cache.getAssociativity() / 2;
 
         cache.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.HelperThreadL2CacheRequestEvent.class, event -> {
             int policyId = this.getBinding(event.getSet()).getPolicyId();
             if (policyId != FOLLOWERS) {
-                SetDuelingMonitor setDuelingMonitor = this.getSetDuelingMonitor(event.getCoreId(), policyId);
+                SetDuelingMonitor setDuelingMonitor = this.getSetDuelingMonitor(0, policyId);
                 if (event.getQuality().isUseful()) {
-                    setDuelingMonitor.numGoodHelperThreadL2CacheRequests.increment();
+                    setDuelingMonitor.numUsefulHelperThreadL2CacheRequests.increment();
                 }
                 setDuelingMonitor.numTotalHelperThreadL2CacheRequests.increment();
             }
@@ -98,7 +97,7 @@ public class HelperThreadAwareSetDuelingUnit extends AbstractSetDuelingUnit<Help
         for(int i = 0; i < this.getNumThreads(); i++) {
             for(int j = 0; j < this.getNumSetDuelingMonitorsPerThread(); j++) {
                 SetDuelingMonitor setDuelingMonitor = this.getSetDuelingMonitor(i, j);
-                setDuelingMonitor.numGoodHelperThreadL2CacheRequests.newInterval();
+                setDuelingMonitor.numUsefulHelperThreadL2CacheRequests.newInterval();
                 setDuelingMonitor.numTotalHelperThreadL2CacheRequests.newInterval();
             }
         }
@@ -112,7 +111,7 @@ public class HelperThreadAwareSetDuelingUnit extends AbstractSetDuelingUnit<Help
     @Override
     public int getBestPolicyId(int threadId) {
         return this.getSetDuelingMonitors(threadId).stream().max(
-                Comparator.comparing(setDuelingMonitor -> setDuelingMonitor.numTotalHelperThreadL2CacheRequests.getValue() == 0 ? 0 : (double) setDuelingMonitor.numGoodHelperThreadL2CacheRequests.getValue() / setDuelingMonitor.numTotalHelperThreadL2CacheRequests.getValue())
+                Comparator.comparing(setDuelingMonitor -> setDuelingMonitor.numTotalHelperThreadL2CacheRequests.getValue() == 0 ? 0 : (double) setDuelingMonitor.numUsefulHelperThreadL2CacheRequests.getValue() / setDuelingMonitor.numTotalHelperThreadL2CacheRequests.getValue())
         ).get().getPolicyId();
     }
 

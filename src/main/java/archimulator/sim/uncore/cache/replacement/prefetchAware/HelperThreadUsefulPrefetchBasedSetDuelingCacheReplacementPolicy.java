@@ -19,28 +19,30 @@
 package archimulator.sim.uncore.cache.replacement.prefetchAware;
 
 import archimulator.sim.uncore.cache.EvictableCache;
-import archimulator.sim.uncore.cache.replacement.reuseDistancePrediction.ReuseDistancePredictionPolicy;
+import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicy;
+import archimulator.sim.uncore.cache.setDueling.AbstractSetDuelingUnit;
+import archimulator.sim.uncore.cache.setDueling.HelperThreadUsefulPrefetchBasedSetDuelingUnit;
 
 import java.io.Serializable;
 
 /**
- * Prefetch aware and reuse distance prediction based set dueling policy.
+ * Helper thread useful prefetch based set dueling cache replacement policy.
  *
  * @param <StateT> the state type of the parent evictable cache
  * @author Min Cai
  */
-public class PrefetchAwareAndReuseDistancePredictionBasedSetDuelingPolicy<StateT extends Serializable> extends PrefetchAwareSetDuelingCacheReplacementPolicy<StateT> {
+public abstract class HelperThreadUsefulPrefetchBasedSetDuelingCacheReplacementPolicy<StateT extends Serializable> extends AbstractSetDuelingCacheReplacementPolicy<StateT> {
     /**
-     * Create a prefetch aware and reuse distance prediction based set dueling policy for the specified evictable cache.
+     * Create a helper thread useful prefetch based set dueling cache replacement policy for the specified evictable cache.
      *
      * @param cache the parent evictable cache
      */
     @SuppressWarnings("unchecked")
-    public PrefetchAwareAndReuseDistancePredictionBasedSetDuelingPolicy(EvictableCache<StateT> cache) {
-        super(
-                cache,
-                new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PolicyType.RHM),
-                new ReuseDistancePredictionPolicy<>(cache)
-        );
+    public HelperThreadUsefulPrefetchBasedSetDuelingCacheReplacementPolicy(EvictableCache<StateT> cache, CacheReplacementPolicy<StateT>... policies) {
+        super(cache, policies);
+    }
+
+    protected AbstractSetDuelingUnit createSetDuelingUnit(EvictableCache<StateT> cache, int numPolicies) {
+        return new HelperThreadUsefulPrefetchBasedSetDuelingUnit(cache, numPolicies, 2);
     }
 }

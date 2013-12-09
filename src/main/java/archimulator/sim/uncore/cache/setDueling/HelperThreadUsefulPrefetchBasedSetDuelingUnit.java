@@ -22,28 +22,29 @@ import archimulator.sim.uncore.cache.Cache;
 import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestProfilingHelper;
 
 /**
- * Main thread L2 miss based Set dueling unit.
+ * Helper thread useful L2 prefetch request based Set dueling unit.
  *
  * @author Min Cai
  */
-public class MainThreadL2MissBasedSetDuelingUnit extends SaturatingCounterBasedSetDuelingUnit {
+public class HelperThreadUsefulPrefetchBasedSetDuelingUnit extends SaturatingCounterBasedSetDuelingUnit {
     /**
-     * Create a main thread L2 miss based set dueling unit.
+     * Create a helper thread useful L2 prefetch request based set dueling unit.
      *
      * @param cache                          the parent cache
      * @param numSetDuelingMonitorsPerThread the number of set dueling monitors per thread
      * @param numSetsPerSetDuelingMonitor    the number of sets per set dueling monitor
      */
-    public MainThreadL2MissBasedSetDuelingUnit(
+    public HelperThreadUsefulPrefetchBasedSetDuelingUnit(
             final Cache<?> cache,
             final int numSetDuelingMonitorsPerThread,
             int numSetsPerSetDuelingMonitor
     ) {
         super(cache, 1, numSetDuelingMonitorsPerThread, numSetsPerSetDuelingMonitor);
 
-        cache.getBlockingEventDispatcher().addListener(
-                HelperThreadL2CacheRequestProfilingHelper.MainThreadL2CacheMissEvent.class,
-                event -> inc(event.getSet(), 0)
-        );
+        cache.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.HelperThreadL2CacheRequestEvent.class, event -> {
+            if (event.getQuality().isUseful()) {
+                inc(event.getSet(), 0);
+            }
+        });
     }
 }

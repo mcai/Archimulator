@@ -21,28 +21,28 @@ package archimulator.sim.uncore.cache.replacement.prefetchAware;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicy;
 import archimulator.sim.uncore.cache.setDueling.AbstractSetDuelingUnit;
-import archimulator.sim.uncore.cache.setDueling.HelperThreadAwareSetDuelingUnit;
+import archimulator.sim.uncore.cache.setDueling.HelperThreadPrefetchAccuracyBasedSetDuelingUnit;
 
 import java.io.Serializable;
 
 /**
- * Prefetch aware set dueling based cache replacement policy.
+ * Helper thread prefetch accuracy based set dueling cache replacement policy.
  *
  * @param <StateT> the state type of the parent evictable cache
  * @author Min Cai
  */
-public class PrefetchAwareSetDuelingCacheReplacementPolicy<StateT extends Serializable> extends AbstractSetDuelingCacheReplacementPolicy<StateT> {
+public abstract class HelperThreadPrefetchAccuracyBasedSetDuelingCacheReplacementPolicy<StateT extends Serializable> extends AbstractSetDuelingCacheReplacementPolicy<StateT> {
     /**
-     * Create a prefetch aware set dueling based cache replacement policy for the specified evictable cache.
+     * Create a helper thread prefetch accuracy based set dueling cache replacement policy for the specified evictable cache.
      *
      * @param cache the parent evictable cache
      */
     @SuppressWarnings("unchecked")
-    public PrefetchAwareSetDuelingCacheReplacementPolicy(EvictableCache<StateT> cache, CacheReplacementPolicy<StateT>... policies) {
+    public HelperThreadPrefetchAccuracyBasedSetDuelingCacheReplacementPolicy(EvictableCache<StateT> cache, CacheReplacementPolicy<StateT>... policies) {
         super(cache, policies);
     }
 
     protected AbstractSetDuelingUnit createSetDuelingUnit(EvictableCache<StateT> cache, int numPolicies) {
-        return new HelperThreadAwareSetDuelingUnit(cache, cache.getExperiment().getArchitecture().getNumCores(), numPolicies, 2);
+        return new HelperThreadPrefetchAccuracyBasedSetDuelingUnit(cache, numPolicies, 2);
     }
 }

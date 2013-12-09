@@ -19,29 +19,28 @@
 package archimulator.sim.uncore.cache.replacement.prefetchAware;
 
 import archimulator.sim.uncore.cache.EvictableCache;
-import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicy;
-import archimulator.sim.uncore.cache.setDueling.MainThreadL2MissBasedSetDuelingUnit;
+import archimulator.sim.uncore.cache.replacement.reuseDistancePrediction.ReuseDistancePredictionPolicy;
 
 import java.io.Serializable;
 
 /**
- * Main thread L2 miss based set dueling based policy.
+ * Helper thread prefetch accuracy based prefetch aware and reuse distance prediction set dueling policy.
  *
  * @param <StateT> the state type of the parent evictable cache
  * @author Min Cai
  */
-public abstract class MainThreadL2MissBasedSetDuelingCacheReplacementPolicy<StateT extends Serializable> extends AbstractSetDuelingCacheReplacementPolicy<StateT> {
+public class HelperThreadPrefetchAccuracyBasedHelperThreadAwareAndReuseDistancePredictionSetDuelingPolicy<StateT extends Serializable> extends HelperThreadPrefetchAccuracyBasedSetDuelingCacheReplacementPolicy<StateT> {
     /**
-     * Create a main thread L2 miss based set dueling based policy for the specified evictable cache.
+     * Create a helper thread prefetch accuracy based prefetch aware and reuse distance prediction set dueling policy for the specified evictable cache.
      *
      * @param cache the parent evictable cache
      */
     @SuppressWarnings("unchecked")
-    public MainThreadL2MissBasedSetDuelingCacheReplacementPolicy(EvictableCache<StateT> cache, CacheReplacementPolicy<StateT>... policies) {
-        super(cache, policies);
-    }
-
-    protected MainThreadL2MissBasedSetDuelingUnit createSetDuelingUnit(EvictableCache<StateT> cache, int numPolicies) {
-        return new MainThreadL2MissBasedSetDuelingUnit(cache, numPolicies, 2);
+    public HelperThreadPrefetchAccuracyBasedHelperThreadAwareAndReuseDistancePredictionSetDuelingPolicy(EvictableCache<StateT> cache) {
+        super(
+                cache,
+                new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PolicyType.RHM),
+                new ReuseDistancePredictionPolicy<>(cache)
+        );
     }
 }

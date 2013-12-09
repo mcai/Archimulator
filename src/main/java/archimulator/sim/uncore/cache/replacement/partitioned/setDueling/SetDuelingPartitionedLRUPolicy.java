@@ -80,7 +80,7 @@ public class SetDuelingPartitionedLRUPolicy<StateT extends Serializable> extends
             cachePartitioningHelper.setShouldIncludePredicate(set -> setDuelingUnit.getPolicyId(set, 0) == tempI);
         }
 
-        this.setDuelingUnit = new MainThreadL2MissBasedSetDuelingUnit(cache, 1, this.partitioners.size(), 6);
+        this.setDuelingUnit = new MainThreadL2MissBasedSetDuelingUnit(cache, this.partitioners.size(), 6);
     }
 
     @Override

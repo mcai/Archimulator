@@ -47,7 +47,7 @@ public class DynamicInsertionPolicy {
 
         this.random = new Random(13);
 
-        this.setDuelingUnit = new MainThreadL2MissBasedSetDuelingUnit(cache, cache.getExperiment().getArchitecture().getNumCores(), 2, numSetsPerSetDuelingMonitor);
+        this.setDuelingUnit = new MainThreadL2MissBasedSetDuelingUnit(cache, 2, numSetsPerSetDuelingMonitor);
     }
 
     /**
