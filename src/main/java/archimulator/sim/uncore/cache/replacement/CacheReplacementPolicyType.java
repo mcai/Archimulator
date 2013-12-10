@@ -192,12 +192,12 @@ public enum CacheReplacementPolicyType {
     /**
      * Helper thread prefetch accuracy based prefetch aware and reuse distance prediction set dueling.
      */
-    HT_PREFETCH_ACCURACY_BASED_PREFETCH_AWARE_AND_RD_PREDICTION_SET_DUELING,
+    HT_PREF_ACC_BASED_PREF_AND_RDP_SET_DUELING,
 
     /**
      * Helper thread useful prefetch based prefetch aware and reuse distance prediction set dueling).
      */
-    HT_USEFUL_PREFETCH_BASED_PREFETCH_AWARE_AND_RD_PREDICTION_SET_DUELING,
+    HT_USEFUL_PREF_BASED_PREF_AND_RDP_SET_DUELING,
 
     /**
      * Dead block prediction based least recently used (LRU).

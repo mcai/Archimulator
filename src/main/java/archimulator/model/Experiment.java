@@ -33,7 +33,6 @@ import net.pickapack.model.WithId;
 import net.pickapack.model.WithParentId;
 import net.pickapack.model.WithTitle;
 import net.pickapack.util.Reference;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 
 import java.util.ArrayList;
@@ -128,7 +127,7 @@ public class Experiment implements WithId, WithParentId, WithTitle, WithCreateTi
         ContextMapping contextMapping = this.contextMappings.get(0);
         Benchmark benchmark = contextMapping.getBenchmark();
 
-        this.title = benchmark.getTitle().replaceAll(" ", "_") + (StringUtils.isEmpty(contextMapping.getArguments()) ? "" : "_" + contextMapping.getArguments().replaceAll(" ", "_"));
+        this.title = benchmark.getTitle().replaceAll(" ", "_");
 
         if (this.type == ExperimentType.FUNCTIONAL) {
             this.title += "-functional";

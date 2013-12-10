@@ -137,9 +137,9 @@ public class CacheReplacementPolicyFactory {
                 return new PrefetchAwareHMLRUPolicy<>(cache, PrefetchAwareHMLRUPolicy.PolicyType.RHM);
             case PREFETCH_AWARE_SET_DUELING_HM_LRU:
                 return new PrefetchAwareSetDuelingHMLRUPolicy<>(cache);
-            case HT_PREFETCH_ACCURACY_BASED_PREFETCH_AWARE_AND_RD_PREDICTION_SET_DUELING:
+            case HT_PREF_ACC_BASED_PREF_AND_RDP_SET_DUELING:
                 return new HelperThreadPrefetchAccuracyBasedHelperThreadAwareAndReuseDistancePredictionSetDuelingPolicy<>(cache);
-            case HT_USEFUL_PREFETCH_BASED_PREFETCH_AWARE_AND_RD_PREDICTION_SET_DUELING:
+            case HT_USEFUL_PREF_BASED_PREF_AND_RDP_SET_DUELING:
                 return new HelperThreadUsefulPrefetchBasedPrefetchAwareAndReuseDistancePredictionSetDuelingPolicy<>(cache);
             case DEAD_BLOCK_PREDICTION_LRU:
                 return new DeadBlockPredictionBasedLRUPolicy<>(cache);
