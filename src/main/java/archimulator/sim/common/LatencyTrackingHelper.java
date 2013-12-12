@@ -20,6 +20,8 @@ package archimulator.sim.common;
 
 import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.common.report.Reportable;
+import archimulator.sim.core.event.StaticInstructionFetchBeginEvent;
+import archimulator.sim.core.event.StaticInstructionFetchEndEvent;
 
 //TODO: track dynamic instructions and memory hierarchy requests' life cycles.
 /**
@@ -39,8 +41,8 @@ public class LatencyTrackingHelper implements Reportable {
         this.simulation = simulation;
 
         //TODO: to be recorded and sent to plots.
-//        simulation.getBlockingEventDispatcher().addListener(InstructionFetchBeginEvent.class, System.out::println);
-//        simulation.getBlockingEventDispatcher().addListener(InstructionFetchEndEvent.class, System.out::println);
+        simulation.getBlockingEventDispatcher().addListener(StaticInstructionFetchBeginEvent.class, event -> {});
+        simulation.getBlockingEventDispatcher().addListener(StaticInstructionFetchEndEvent.class, event -> {});
     }
 
     @Override

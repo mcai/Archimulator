@@ -26,7 +26,7 @@ import archimulator.sim.core.DynamicInstruction;
  *
  * @author Min Cai
  */
-public class InstructionCommittedEvent extends SimulationEvent {
+public class DynamicInstructionCommittedEvent extends SimulationEvent {
     private DynamicInstruction dynamicInstruction;
 
     /**
@@ -34,7 +34,7 @@ public class InstructionCommittedEvent extends SimulationEvent {
      *
      * @param dynamicInstruction the dynamic instruction
      */
-    public InstructionCommittedEvent(DynamicInstruction dynamicInstruction) {
+    public DynamicInstructionCommittedEvent(DynamicInstruction dynamicInstruction) {
         super(dynamicInstruction.getThread());
         this.dynamicInstruction = dynamicInstruction;
     }
@@ -50,6 +50,6 @@ public class InstructionCommittedEvent extends SimulationEvent {
 
     @Override
     public String toString() {
-        return String.format("InstructionCommittedEvent{dynamicInstruction=%s}", dynamicInstruction);
+        return String.format("DynamicInstructionCommittedEvent{dynamicInstruction=%s}", dynamicInstruction);
     }
 }

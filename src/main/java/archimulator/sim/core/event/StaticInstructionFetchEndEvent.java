@@ -22,59 +22,44 @@ import archimulator.sim.common.SimulationEvent;
 import archimulator.sim.common.SimulationObject;
 
 /**
- * Instruction fetch begin event.
+ * Static instruction fetch end event.
  *
  * @author Min Cai
  */
-public class InstructionFetchBeginEvent extends SimulationEvent {
+public class StaticInstructionFetchEndEvent extends SimulationEvent {
     private long currentCycle;
     private int threadId;
     private int pc;
 
     /**
-     * Create an instruction fetch begin event.
+     * Create a static instruction fetch end event.
      *
      * @param sender the sender simulation object
-     * @param currentCycle the current cycle
+     * @param currentCycle t the current cycle
      * @param threadId the thread ID
      * @param pc the PC address
      */
-    public InstructionFetchBeginEvent(SimulationObject sender, long currentCycle, int threadId, int pc) {
+    public StaticInstructionFetchEndEvent(SimulationObject sender, long currentCycle, int threadId, int pc) {
         super(sender);
         this.currentCycle = currentCycle;
         this.threadId = threadId;
         this.pc = pc;
     }
 
-    /**
-     * Get the current cycle.
-     *
-     * @return the current cycle
-     */
     public long getCurrentCycle() {
         return currentCycle;
     }
 
-    /**
-     * Get the thread ID.
-     *
-     * @return the thread ID
-     */
     public int getThreadId() {
         return threadId;
     }
 
-    /**
-     * Get the PC address.
-     *
-     * @return the PC address
-     */
     public int getPc() {
         return pc;
     }
 
     @Override
     public String toString() {
-        return String.format("InstructionFetchBeginEvent{currentCycle=%d, threadId=%d, pc=0x%08x}", currentCycle, threadId, pc);
+        return String.format("StaticInstructionFetchEndEvent{currentCycle=%d, threadId=%d, pc=0x%08x}", currentCycle, threadId, pc);
     }
 }

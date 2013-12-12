@@ -23,8 +23,8 @@ import archimulator.sim.common.Simulation;
 import archimulator.sim.core.Core;
 import archimulator.sim.core.Processor;
 import archimulator.sim.core.Thread;
-import archimulator.sim.core.event.InstructionCommittedEvent;
-import archimulator.sim.core.event.InstructionDecodedEvent;
+import archimulator.sim.core.event.DynamicInstructionCommittedEvent;
+import archimulator.sim.core.event.DynamicInstructionDecodedEvent;
 import archimulator.sim.isa.ArchitecturalRegisterFile;
 import archimulator.sim.isa.StaticInstruction;
 import archimulator.sim.isa.StaticInstructionType;
@@ -216,7 +216,7 @@ public class DynamicSpeculativePrecomputationHelper {
 
             this.state = RetiredInstructionBufferState.IDLE;
 
-            this.thread.getBlockingEventDispatcher().addListener(InstructionCommittedEvent.class, event -> {
+            this.thread.getBlockingEventDispatcher().addListener(DynamicInstructionCommittedEvent.class, event -> {
                 if (event.getDynamicInstruction().getThread() == RetiredInstructionBuffer.this.thread) {
                     if (state == RetiredInstructionBufferState.IDLE && delinquentLoad != null && event.getDynamicInstruction().getPc() == delinquentLoad.getPc() && !event.getDynamicInstruction().getThread().getContext().getFunctionCallContextStack().isEmpty() && event.getDynamicInstruction().getThread().getContext().getFunctionCallContextStack().peek().getPc() == delinquentLoad.getFunctionCallPc()) {
                         state = RetiredInstructionBufferState.INSTRUCTION_GATHERING;
@@ -437,7 +437,7 @@ public class DynamicSpeculativePrecomputationHelper {
 
             this.slices = new ArrayList<>();
 
-            this.thread.getBlockingEventDispatcher().addListener(InstructionDecodedEvent.class, event -> {
+            this.thread.getBlockingEventDispatcher().addListener(DynamicInstructionDecodedEvent.class, event -> {
                 for (Slice slice : slices) {
                     if (event.getDynamicInstruction().getPc() == slice.getTriggerPc() && slice.getSpawnedThreadContext() == null) {
                         spawnPrecomputationThread(slice, event.getDynamicInstruction().getThread().getContext());
@@ -453,7 +453,7 @@ public class DynamicSpeculativePrecomputationHelper {
                 }
             });
 
-            this.thread.getBlockingEventDispatcher().addListener(InstructionCommittedEvent.class, event -> {
+            this.thread.getBlockingEventDispatcher().addListener(DynamicInstructionCommittedEvent.class, event -> {
                 if (SliceInformationTable.this.thread.getNumInstructions() % INSTRUCTIONS_PER_PHASE == 0) {
                     for (Iterator<Slice> it = slices.iterator(); it.hasNext(); ) {
                         Slice slice = it.next();

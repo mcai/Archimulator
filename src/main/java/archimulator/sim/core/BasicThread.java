@@ -21,10 +21,10 @@ package archimulator.sim.core;
 import archimulator.model.ContextMapping;
 import archimulator.sim.core.bpred.BranchPredictorUpdate;
 import archimulator.sim.core.bpred.DynamicBranchPredictor;
-import archimulator.sim.core.event.InstructionCommittedEvent;
-import archimulator.sim.core.event.InstructionDecodedEvent;
-import archimulator.sim.core.event.InstructionFetchBeginEvent;
-import archimulator.sim.core.event.InstructionFetchEndEvent;
+import archimulator.sim.core.event.DynamicInstructionCommittedEvent;
+import archimulator.sim.core.event.DynamicInstructionDecodedEvent;
+import archimulator.sim.core.event.StaticInstructionFetchBeginEvent;
+import archimulator.sim.core.event.StaticInstructionFetchEndEvent;
 import archimulator.sim.isa.RegisterDependencyType;
 import archimulator.sim.isa.StaticInstruction;
 import archimulator.sim.isa.StaticInstructionType;
@@ -192,9 +192,9 @@ public class BasicThread extends AbstractBasicThread {
                 } else {
                     this.core.ifetch(this, this.fetchNpc, this.fetchNpc, () -> {
                         fetchStalled = false;
-                        this.getBlockingEventDispatcher().dispatch(new InstructionFetchEndEvent(this, this.getCycleAccurateEventQueue().getCurrentCycle(), this.id, this.fetchNpc));
+                        this.getBlockingEventDispatcher().dispatch(new StaticInstructionFetchEndEvent(this, this.getCycleAccurateEventQueue().getCurrentCycle(), this.id, this.fetchNpc));
                     });
-                    this.getBlockingEventDispatcher().dispatch(new InstructionFetchBeginEvent(this, this.getCycleAccurateEventQueue().getCurrentCycle(), this.id, this.fetchNpc));
+                    this.getBlockingEventDispatcher().dispatch(new StaticInstructionFetchBeginEvent(this, this.getCycleAccurateEventQueue().getCurrentCycle(), this.id, this.fetchNpc));
 
                     this.fetchStalled = true;
                     this.lastFetchedCacheLine = cacheLineToFetch;
@@ -254,7 +254,7 @@ public class BasicThread extends AbstractBasicThread {
                 this.lastDecodedDynamicInstructionCommitted = false;
             }
 
-            this.getBlockingEventDispatcher().dispatch(new InstructionDecodedEvent(dynamicInstruction));
+            this.getBlockingEventDispatcher().dispatch(new DynamicInstructionDecodedEvent(dynamicInstruction));
 
             if ((this.fetchNpc + 4) % this.lineSizeOfICache == 0) {
                 hasDone = true;
@@ -490,7 +490,7 @@ public class BasicThread extends AbstractBasicThread {
 
             this.core.removeFromQueues(reorderBufferEntry);
 
-            this.getBlockingEventDispatcher().dispatch(new InstructionCommittedEvent(reorderBufferEntry.getDynamicInstruction()));
+            this.getBlockingEventDispatcher().dispatch(new DynamicInstructionCommittedEvent(reorderBufferEntry.getDynamicInstruction()));
 
             if (this.context.getState() == ContextState.FINISHED && reorderBufferEntry.getDynamicInstruction() == this.lastDecodedDynamicInstruction) {
                 this.lastDecodedDynamicInstructionCommitted = true;

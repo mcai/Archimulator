@@ -22,7 +22,10 @@ import archimulator.sim.common.Simulation;
 import archimulator.sim.common.SimulationType;
 import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.common.report.Reportable;
+import archimulator.sim.core.Thread;
+import archimulator.sim.core.event.DynamicInstructionCommittedEvent;
 import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestProfilingHelper;
+import archimulator.sim.uncore.helperThread.HelperThreadingHelper;
 import archimulator.sim.uncore.mlp.BLPProfilingHelper;
 import archimulator.sim.uncore.mlp.MLPProfilingHelper;
 
@@ -39,6 +42,9 @@ public class IntervalHelper implements Reportable {
      * Interval.
      */
     private class Interval {
+        private long numMainThreadDynamicInstructionsCommitted;
+        private long numHelperThreadDynamicInstructionsCommitted;
+
         private long numMainThreadL2CacheHits;
         private long numMainThreadL2CacheMisses;
 
@@ -63,6 +69,15 @@ public class IntervalHelper implements Reportable {
         private double helperThreadL2CacheRequestLateness;
         private double helperThreadL2CacheRequestPollution;
 
+        private double mainThreadIpc;
+        private double helperThreadIpc;
+
+        private double mainThreadCpi;
+        private double helperThreadCpi;
+
+        private double mainThreadMpki;
+        private double helperThreadMpki;
+
         private double l2MissMlpCosts;
         private double numL2MissMlpSamples;
 
@@ -81,6 +96,15 @@ public class IntervalHelper implements Reportable {
             helperThreadL2CacheRequestEarliness = (double) numUglyHelperThreadL2CacheRequests / numUsefulHelperThreadL2CacheRequests;
             helperThreadL2CacheRequestLateness = (double) numLateHelperThreadL2CacheRequests / numUsefulHelperThreadL2CacheRequests;
             helperThreadL2CacheRequestPollution = (double) numBadHelperThreadL2CacheRequests / numUsefulHelperThreadL2CacheRequests;
+
+            mainThreadIpc = (double) numMainThreadDynamicInstructionsCommitted / numCyclesElapsedPerInterval;
+            helperThreadIpc = (double) numHelperThreadDynamicInstructionsCommitted / numCyclesElapsedPerInterval;
+
+            mainThreadCpi = (double) numCyclesElapsedPerInterval / numMainThreadDynamicInstructionsCommitted;
+            helperThreadCpi = (double) numCyclesElapsedPerInterval / numHelperThreadDynamicInstructionsCommitted;
+
+            mainThreadMpki = (double) numMainThreadL2CacheMisses / ((double) numMainThreadDynamicInstructionsCommitted / 1000);
+            helperThreadMpki = (double) numHelperThreadL2CacheMisses / ((double) numHelperThreadDynamicInstructionsCommitted / 1000);
         }
     }
 
@@ -115,6 +139,16 @@ public class IntervalHelper implements Reportable {
                     numCyclesElapsed = 0;
                     currentInterval = new Interval();
                 }
+            }
+        });
+
+        simulation.getBlockingEventDispatcher().addListener(DynamicInstructionCommittedEvent.class, event -> {
+            Thread thread = event.getDynamicInstruction().getThread();
+
+            if (HelperThreadingHelper.isMainThread(thread)) {
+                currentInterval.numMainThreadDynamicInstructionsCommitted++;
+            } else if (HelperThreadingHelper.isHelperThread(thread)) {
+                currentInterval.numHelperThreadDynamicInstructionsCommitted++;
             }
         });
 
@@ -178,6 +212,9 @@ public class IntervalHelper implements Reportable {
         reportNode.getChildren().add(new ReportNode(reportNode, "intervalHelper") {{
             for (int i = 0; i < intervals.size(); i++) {
                 Interval interval = intervals.get(i);
+                getChildren().add(new ReportNode(this, "numMainThreadDynamicInstructionsCommitted[" + i + "]", interval.numMainThreadDynamicInstructionsCommitted + ""));
+                getChildren().add(new ReportNode(this, "numHelperThreadDynamicInstructionsCommitted[" + i + "]", interval.numHelperThreadDynamicInstructionsCommitted + ""));
+
                 getChildren().add(new ReportNode(this, "numMainThreadL2CacheHits[" + i + "]", interval.numMainThreadL2CacheHits + ""));
                 getChildren().add(new ReportNode(this, "numMainThreadL2CacheMisses[" + i + "]", interval.numMainThreadL2CacheMisses + ""));
 
@@ -201,6 +238,15 @@ public class IntervalHelper implements Reportable {
                 getChildren().add(new ReportNode(this, "helperThreadL2CacheRequestEarliness[" + i + "]", interval.helperThreadL2CacheRequestEarliness + ""));
                 getChildren().add(new ReportNode(this, "helperThreadL2CacheRequestLateness[" + i + "]", interval.helperThreadL2CacheRequestLateness + ""));
                 getChildren().add(new ReportNode(this, "helperThreadL2CacheRequestPollution[" + i + "]", interval.helperThreadL2CacheRequestPollution + ""));
+
+                getChildren().add(new ReportNode(this, "mainThreadIpc[" + i + "]", interval.mainThreadIpc + ""));
+                getChildren().add(new ReportNode(this, "helperThreadIpc[" + i + "]", interval.helperThreadIpc + ""));
+
+                getChildren().add(new ReportNode(this, "mainThreadCpi[" + i + "]", interval.mainThreadCpi + ""));
+                getChildren().add(new ReportNode(this, "helperThreadCpi[" + i + "]", interval.helperThreadCpi + ""));
+
+                getChildren().add(new ReportNode(this, "mainThreadMpki[" + i + "]", interval.mainThreadMpki + ""));
+                getChildren().add(new ReportNode(this, "helperThreadMpki[" + i + "]", interval.helperThreadMpki + ""));
 
                 getChildren().add(new ReportNode(this, "averageL2MissMlpCost[" + i + "]", (interval.numL2MissMlpSamples == 0 ? 0 : interval.l2MissMlpCosts / interval.numL2MissMlpSamples) + ""));
                 getChildren().add(new ReportNode(this, "numL2MissMlpSamples[" + i + "]", interval.numL2MissMlpSamples + ""));

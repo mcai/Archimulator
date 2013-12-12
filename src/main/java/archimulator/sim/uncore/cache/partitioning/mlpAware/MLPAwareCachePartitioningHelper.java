@@ -19,7 +19,7 @@
 package archimulator.sim.uncore.cache.partitioning.mlpAware;
 
 import archimulator.sim.common.report.ReportNode;
-import archimulator.sim.core.event.InstructionCommittedEvent;
+import archimulator.sim.core.event.DynamicInstructionCommittedEvent;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.partitioning.CachePartitioningHelper;
@@ -123,7 +123,7 @@ public class MLPAwareCachePartitioningHelper extends CachePartitioningHelper {
 
         });
 
-        cache.getBlockingEventDispatcher().addListener(InstructionCommittedEvent.class, event -> {
+        cache.getBlockingEventDispatcher().addListener(DynamicInstructionCommittedEvent.class, event -> {
             if (pendingL2Hits.containsKey(getThreadIdentifier(event.getDynamicInstruction().getThread()))) {
                 for (PendingL2Hit pendingL2Hit : pendingL2Hits.get(getThreadIdentifier(event.getDynamicInstruction().getThread())).values()) {
                     pendingL2Hit.incrementNumCommittedInstructionsSinceAccess();

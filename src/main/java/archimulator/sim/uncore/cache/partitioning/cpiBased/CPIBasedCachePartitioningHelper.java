@@ -2,7 +2,7 @@ package archimulator.sim.uncore.cache.partitioning.cpiBased;
 
 import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.core.Thread;
-import archimulator.sim.core.event.InstructionCommittedEvent;
+import archimulator.sim.core.event.DynamicInstructionCommittedEvent;
 import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.partitioning.CachePartitioningHelper;
 import org.apache.commons.math3.util.Precision;
@@ -30,7 +30,7 @@ public class CPIBasedCachePartitioningHelper extends CachePartitioningHelper {
 
         this.committedInstructions = new TreeMap<>();
 
-        cache.getBlockingEventDispatcher().addListener(InstructionCommittedEvent.class, event -> {
+        cache.getBlockingEventDispatcher().addListener(DynamicInstructionCommittedEvent.class, event -> {
             Thread thread = event.getDynamicInstruction().getThread();
 
             if (!committedInstructions.containsKey(getThreadIdentifier(thread))) {

@@ -20,7 +20,7 @@ package archimulator.sim.uncore.delinquentLoad;
 
 import archimulator.sim.common.SimulationEvent;
 import archimulator.sim.core.Thread;
-import archimulator.sim.core.event.InstructionCommittedEvent;
+import archimulator.sim.core.event.DynamicInstructionCommittedEvent;
 import archimulator.sim.os.FunctionCallContext;
 import archimulator.sim.uncore.coherence.event.GeneralCacheControllerServiceNonblockingRequestEvent;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
@@ -48,7 +48,7 @@ public class DelinquentLoadIdentificationTable {
         this.thread = thread;
         this.delinquentLoads = new ArrayList<>();
 
-        thread.getBlockingEventDispatcher().addListener(InstructionCommittedEvent.class, event -> {
+        thread.getBlockingEventDispatcher().addListener(DynamicInstructionCommittedEvent.class, event -> {
             if (event.getDynamicInstruction().getThread() == DelinquentLoadIdentificationTable.this.thread) {
                 Stack<FunctionCallContext> functionCallContextStack = event.getDynamicInstruction().getThread().getContext().getFunctionCallContextStack();
 
