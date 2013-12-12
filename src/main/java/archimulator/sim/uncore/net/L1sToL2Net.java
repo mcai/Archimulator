@@ -43,30 +43,30 @@ public class L1sToL2Net extends Net {
      */
     @Override
     protected void setup(MemoryHierarchy memoryHierarchy) {
-        int l2CacheLineSize = 64;
+        int l2LineSize = 64;
 
         this.switchNode = new SwitchNode(this,
                 "l1sToL2Switch",
-                memoryHierarchy.getL1ICacheControllers().size() + memoryHierarchy.getL1DCacheControllers().size() + 1,
-                (l2CacheLineSize + 8) * 2,
-                memoryHierarchy.getL1ICacheControllers().size() + memoryHierarchy.getL1DCacheControllers().size() + 1,
-                (l2CacheLineSize + 8) * 2, 8);
+                memoryHierarchy.getL1IControllers().size() + memoryHierarchy.getL1DControllers().size() + 1,
+                (l2LineSize + 8) * 2,
+                memoryHierarchy.getL1IControllers().size() + memoryHierarchy.getL1DControllers().size() + 1,
+                (l2LineSize + 8) * 2, 8);
 
-        for (CacheController l1ICacheController : memoryHierarchy.getL1ICacheControllers()) {
-            EndPointNode l1ICacheControllerNode = new EndPointNode(this, l1ICacheController.getName());
-            this.endPointNodes.put(l1ICacheController, l1ICacheControllerNode);
-            this.createBidirectionalLink(l1ICacheControllerNode, this.switchNode, 32);
+        for (CacheController l1IController : memoryHierarchy.getL1IControllers()) {
+            EndPointNode l1IControllerNode = new EndPointNode(this, l1IController.getName());
+            this.endPointNodes.put(l1IController, l1IControllerNode);
+            this.createBidirectionalLink(l1IControllerNode, this.switchNode, 32);
         }
 
-        for (CacheController l1DCacheController : memoryHierarchy.getL1DCacheControllers()) {
-            EndPointNode l1DCacheControllerNode = new EndPointNode(this, l1DCacheController.getName());
-            this.endPointNodes.put(l1DCacheController, l1DCacheControllerNode);
-            this.createBidirectionalLink(l1DCacheControllerNode, this.switchNode, 32);
+        for (CacheController l1DController : memoryHierarchy.getL1DControllers()) {
+            EndPointNode l1DControllerNode = new EndPointNode(this, l1DController.getName());
+            this.endPointNodes.put(l1DController, l1DControllerNode);
+            this.createBidirectionalLink(l1DControllerNode, this.switchNode, 32);
         }
 
-        EndPointNode l2CacheControllerNode = new EndPointNode(this, memoryHierarchy.getL2CacheController().getName());
-        this.endPointNodes.put(memoryHierarchy.getL2CacheController(), l2CacheControllerNode);
-        this.createBidirectionalLink(l2CacheControllerNode, this.switchNode, 32);
+        EndPointNode l2ControllerNode = new EndPointNode(this, memoryHierarchy.getL2Controller().getName());
+        this.endPointNodes.put(memoryHierarchy.getL2Controller(), l2ControllerNode);
+        this.createBidirectionalLink(l2ControllerNode, this.switchNode, 32);
     }
 
     /**

@@ -26,7 +26,7 @@ import java.util.List;
  *
  * @author Min Cai
  */
-public class L2CacheAccessMLPCostProfile {
+public class L2AccessMLPCostProfile {
     private List<Integer> hitCounters;
     private int missCounter;
 
@@ -35,7 +35,7 @@ public class L2CacheAccessMLPCostProfile {
      *
      * @param associativity the associativity
      */
-    public L2CacheAccessMLPCostProfile(int associativity) {
+    public L2AccessMLPCostProfile(int associativity) {
         this.hitCounters = new ArrayList<>();
 
         for (int i = 0; i < associativity; i++) {

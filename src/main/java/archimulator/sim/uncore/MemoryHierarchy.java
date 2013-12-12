@@ -61,21 +61,21 @@ public interface MemoryHierarchy extends SimulationObject {
      *
      * @return the L2 cache controller
      */
-    DirectoryController getL2CacheController();
+    DirectoryController getL2Controller();
 
     /**
      * Get the L1I cache controller.
      *
      * @return the L1I cache controller
      */
-    List<CacheController> getL1ICacheControllers();
+    List<CacheController> getL1IControllers();
 
     /**
      * Get the L1D cache controller.
      *
      * @return the L1D cache controller
      */
-    List<CacheController> getL1DCacheControllers();
+    List<CacheController> getL1DControllers();
 
     /**
      * Get the the list of L1 cache controllers.
@@ -85,9 +85,9 @@ public interface MemoryHierarchy extends SimulationObject {
     @SuppressWarnings("unchecked")
     default List<GeneralCacheController> getCacheControllers() {
         List<GeneralCacheController> cacheControllers = new ArrayList<>();
-        cacheControllers.add(getL2CacheController());
-        cacheControllers.addAll(getL1ICacheControllers());
-        cacheControllers.addAll(getL1DCacheControllers());
+        cacheControllers.add(getL2Controller());
+        cacheControllers.addAll(getL1IControllers());
+        cacheControllers.addAll(getL1DControllers());
         return cacheControllers;
     }
 

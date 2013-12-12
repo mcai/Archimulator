@@ -113,9 +113,9 @@ public class BLPProfilingHelper {
         this.statDramBankAccessNumCycles = new SummaryStatistics();
         this.statDramBankAccessBlpCosts = new SummaryStatistics();
 
-        memoryController.getBlockingEventDispatcher().addListener(BasicMemoryController.BeginAccessEvent.class, this::profileBeginServicingL2CacheMiss);
+        memoryController.getBlockingEventDispatcher().addListener(BasicMemoryController.BeginAccessEvent.class, this::profileBeginServicingL2Miss);
 
-        memoryController.getBlockingEventDispatcher().addListener(BasicMemoryController.EndAccessEvent.class, this::profileEndServicingL2CacheMiss);
+        memoryController.getBlockingEventDispatcher().addListener(BasicMemoryController.EndAccessEvent.class, this::profileEndServicingL2Miss);
 
         memoryController.getCycleAccurateEventQueue().getPerCycleEvents().add(this::updateBlpCostsPerCycle);
     }
@@ -135,7 +135,7 @@ public class BLPProfilingHelper {
      *
      * @param event the begin access event
      */
-    private void profileBeginServicingL2CacheMiss(BasicMemoryController.BeginAccessEvent event) {
+    private void profileBeginServicingL2Miss(BasicMemoryController.BeginAccessEvent event) {
         PendingDramBankAccess pendingDramBankAccess = new PendingDramBankAccess(event.getAddress(), event.getBank(), memoryController.getCycleAccurateEventQueue().getCurrentCycle());
 
         if (this.pendingDRAMBankAccesses.containsKey(event.getAddress())) {
@@ -150,7 +150,7 @@ public class BLPProfilingHelper {
      *
      * @param event the end access event
      */
-    private void profileEndServicingL2CacheMiss(BasicMemoryController.EndAccessEvent event) {
+    private void profileEndServicingL2Miss(BasicMemoryController.EndAccessEvent event) {
         PendingDramBankAccess pendingDramBankAccess = this.pendingDRAMBankAccesses.get(event.getAddress());
         pendingDramBankAccess.setEndCycle(this.memoryController.getCycleAccurateEventQueue().getCurrentCycle());
 

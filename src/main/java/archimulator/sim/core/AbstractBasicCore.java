@@ -59,12 +59,12 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
     /**
      * The L1I cache controller.
      */
-    protected CacheController l1ICacheController;
+    protected CacheController l1IController;
 
     /**
      * The L1D cache controller.
      */
-    protected CacheController l1DCacheController;
+    protected CacheController l1DController;
 
     /**
      * The functional unit pool.
@@ -186,33 +186,33 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
 
     @Override
     public boolean canIfetch(Thread thread, int virtualAddress) {
-        int physicalTag = this.l1ICacheController.getCache().getTag(thread.getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress));
-        return this.l1ICacheController.canAccess(MemoryHierarchyAccessType.IFETCH, physicalTag);
+        int physicalTag = this.l1IController.getCache().getTag(thread.getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress));
+        return this.l1IController.canAccess(MemoryHierarchyAccessType.IFETCH, physicalTag);
     }
 
     @Override
     public boolean canLoad(Thread thread, int virtualAddress) {
-        int physicalTag = this.l1DCacheController.getCache().getTag(thread.getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress));
-        return this.l1DCacheController.canAccess(MemoryHierarchyAccessType.LOAD, physicalTag);
+        int physicalTag = this.l1DController.getCache().getTag(thread.getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress));
+        return this.l1DController.canAccess(MemoryHierarchyAccessType.LOAD, physicalTag);
     }
 
     @Override
     public boolean canStore(Thread thread, int virtualAddress) {
-        int physicalTag = this.l1DCacheController.getCache().getTag(thread.getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress));
-        return this.l1DCacheController.canAccess(MemoryHierarchyAccessType.STORE, physicalTag);
+        int physicalTag = this.l1DController.getCache().getTag(thread.getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress));
+        return this.l1DController.canAccess(MemoryHierarchyAccessType.STORE, physicalTag);
     }
 
     @Override
     public void ifetch(Thread thread, int virtualAddress, int virtualPc, final Action onCompletedCallback) {
         final int physicalAddress = thread.getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress);
-        final int physicalTag = this.l1ICacheController.getCache().getTag(physicalAddress);
+        final int physicalTag = this.l1IController.getCache().getTag(physicalAddress);
 
         final Counter counterPending = new Counter(0);
 
         counterPending.increment();
 
-        MemoryHierarchyAccess alias = this.l1ICacheController.findAccess(physicalTag);
-        MemoryHierarchyAccess access = this.l1ICacheController.beginAccess(null, thread, MemoryHierarchyAccessType.IFETCH, virtualPc, physicalAddress, physicalTag, () -> {
+        MemoryHierarchyAccess alias = this.l1IController.findAccess(physicalTag);
+        MemoryHierarchyAccess access = this.l1IController.beginAccess(null, thread, MemoryHierarchyAccessType.IFETCH, virtualPc, physicalAddress, physicalTag, () -> {
             counterPending.decrement();
 
             if (counterPending.getValue() == 0) {
@@ -231,7 +231,7 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
                 }
             });
 
-            this.l1ICacheController.receiveIfetch(access, () -> l1ICacheController.endAccess(physicalTag));
+            this.l1IController.receiveIfetch(access, () -> l1IController.endAccess(physicalTag));
         }
 
         this.getBlockingEventDispatcher().dispatch(new MemoryAccessInitiatedEvent(thread, virtualPc, physicalAddress, physicalTag, MemoryHierarchyAccessType.IFETCH));
@@ -240,14 +240,14 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
     @Override
     public void load(DynamicInstruction dynamicInstruction, int virtualAddress, int virtualPc, final Action onCompletedCallback) {
         final int physicalAddress = dynamicInstruction.getThread().getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress);
-        final int physicalTag = this.l1DCacheController.getCache().getTag(physicalAddress);
+        final int physicalTag = this.l1DController.getCache().getTag(physicalAddress);
 
         final Counter counterPending = new Counter(0);
 
         counterPending.increment();
 
-        MemoryHierarchyAccess alias = this.l1DCacheController.findAccess(physicalTag);
-        MemoryHierarchyAccess access = this.l1DCacheController.beginAccess(dynamicInstruction, dynamicInstruction.getThread(), MemoryHierarchyAccessType.LOAD, virtualPc, physicalAddress, physicalTag, new Action() {
+        MemoryHierarchyAccess alias = this.l1DController.findAccess(physicalTag);
+        MemoryHierarchyAccess access = this.l1DController.beginAccess(dynamicInstruction, dynamicInstruction.getThread(), MemoryHierarchyAccessType.LOAD, virtualPc, physicalAddress, physicalTag, new Action() {
             public void apply() {
                 counterPending.decrement();
 
@@ -268,7 +268,7 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
                 }
             });
 
-            this.l1DCacheController.receiveLoad(access, () -> l1DCacheController.endAccess(physicalTag));
+            this.l1DController.receiveLoad(access, () -> l1DController.endAccess(physicalTag));
         }
 
         this.getBlockingEventDispatcher().dispatch(new MemoryAccessInitiatedEvent(dynamicInstruction.getThread(), virtualPc, physicalAddress, physicalTag, MemoryHierarchyAccessType.LOAD));
@@ -277,14 +277,14 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
     @Override
     public void store(DynamicInstruction dynamicInstruction, int virtualAddress, int virtualPc, final Action onCompletedCallback) {
         final int physicalAddress = dynamicInstruction.getThread().getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress);
-        final int physicalTag = this.l1DCacheController.getCache().getTag(physicalAddress);
+        final int physicalTag = this.l1DController.getCache().getTag(physicalAddress);
 
         final Counter counterPending = new Counter(0);
 
         counterPending.increment();
 
-        MemoryHierarchyAccess alias = this.l1DCacheController.findAccess(physicalTag);
-        MemoryHierarchyAccess access = this.l1DCacheController.beginAccess(dynamicInstruction, dynamicInstruction.getThread(), MemoryHierarchyAccessType.STORE, virtualPc, physicalAddress, physicalTag, new Action() {
+        MemoryHierarchyAccess alias = this.l1DController.findAccess(physicalTag);
+        MemoryHierarchyAccess access = this.l1DController.beginAccess(dynamicInstruction, dynamicInstruction.getThread(), MemoryHierarchyAccessType.STORE, virtualPc, physicalAddress, physicalTag, new Action() {
             public void apply() {
                 counterPending.decrement();
 
@@ -305,7 +305,7 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
                 }
             });
 
-            this.l1DCacheController.receiveStore(access, () -> l1DCacheController.endAccess(physicalTag));
+            this.l1DController.receiveStore(access, () -> l1DController.endAccess(physicalTag));
         }
 
         this.getBlockingEventDispatcher().dispatch(new MemoryAccessInitiatedEvent(dynamicInstruction.getThread(), virtualPc, physicalAddress, physicalTag, MemoryHierarchyAccessType.STORE));
@@ -382,22 +382,22 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
     }
 
     @Override
-    public CacheController getL1ICacheController() {
-        return l1ICacheController;
+    public CacheController getL1IController() {
+        return l1IController;
     }
 
     @Override
-    public void setL1ICacheController(CacheController l1ICacheController) {
-        this.l1ICacheController = l1ICacheController;
+    public void setL1IController(CacheController l1IController) {
+        this.l1IController = l1IController;
     }
 
     @Override
-    public CacheController getL1DCacheController() {
-        return l1DCacheController;
+    public CacheController getL1DController() {
+        return l1DController;
     }
 
     @Override
-    public void setL1DCacheController(CacheController l1DCacheController) {
-        this.l1DCacheController = l1DCacheController;
+    public void setL1DController(CacheController l1DController) {
+        this.l1DController = l1DController;
     }
 }

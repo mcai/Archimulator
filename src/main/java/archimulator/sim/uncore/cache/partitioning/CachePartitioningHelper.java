@@ -57,7 +57,7 @@ public abstract class CachePartitioningHelper implements Partitioner {
     public CachePartitioningHelper(final EvictableCache<?> cache) {
         this.cache = cache;
 
-//        this.numThreads = cache.getExperiment().getArchitecture().getNumThreadsPerCore() * this.l2CacheController.getExperiment().getArchitecture().getNumCores();
+//        this.numThreads = cache.getExperiment().getArchitecture().getNumThreadsPerCore() * this.l2Controller.getExperiment().getArchitecture().getNumCores();
         this.numThreads = this.cache.getExperiment().getArchitecture().getNumCores();
 
         this.partition = new ArrayList<>();
@@ -120,8 +120,8 @@ public abstract class CachePartitioningHelper implements Partitioner {
      *
      * @return the L2 cache controller
      */
-    public DirectoryController getL2CacheController() {
-        return getCache().getSimulation().getProcessor().getMemoryHierarchy().getL2CacheController();
+    public DirectoryController getL2Controller() {
+        return getCache().getSimulation().getProcessor().getMemoryHierarchy().getL2Controller();
     }
 
     /**

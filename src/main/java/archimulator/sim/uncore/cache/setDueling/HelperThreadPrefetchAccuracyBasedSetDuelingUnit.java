@@ -20,7 +20,7 @@ package archimulator.sim.uncore.cache.setDueling;
 
 import archimulator.sim.uncore.cache.Cache;
 import archimulator.sim.uncore.coherence.event.GeneralCacheControllerLineReplacementEvent;
-import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestProfilingHelper;
+import archimulator.sim.uncore.helperThread.HelperThreadL2RequestProfilingHelper;
 import archimulator.util.IntervalCounter;
 
 import java.util.Comparator;
@@ -35,23 +35,23 @@ public class HelperThreadPrefetchAccuracyBasedSetDuelingUnit extends AbstractSet
      * Set dueling monitor.
      */
     public class SetDuelingMonitor extends AbstractSetDuelingUnit.SetDuelingMonitor {
-        private IntervalCounter numUsefulHelperThreadL2CacheRequests;
-        private IntervalCounter numTotalHelperThreadL2CacheRequests;
+        private IntervalCounter numUsefulHelperThreadL2Requests;
+        private IntervalCounter numTotalHelperThreadL2Requests;
 
         /**
          * Create a set dueling monitor.
          */
         private SetDuelingMonitor(int threadId, int policyId) {
             super(threadId, policyId);
-            this.numUsefulHelperThreadL2CacheRequests = new IntervalCounter();
-            this.numTotalHelperThreadL2CacheRequests = new IntervalCounter();
+            this.numUsefulHelperThreadL2Requests = new IntervalCounter();
+            this.numTotalHelperThreadL2Requests = new IntervalCounter();
         }
     }
 
-    private int numEvictedL2CacheLinesPerInterval;
+    private int numEvictedL2LinesPerInterval;
 
     private long numIntervals;
-    private int numEvictedL2CacheLines;
+    private int numEvictedL2Lines;
 
     /**
      * Create a helper thread prefetch accuracy based set dueling unit.
@@ -63,27 +63,27 @@ public class HelperThreadPrefetchAccuracyBasedSetDuelingUnit extends AbstractSet
     public HelperThreadPrefetchAccuracyBasedSetDuelingUnit(final Cache<?> cache, final int numSetDuelingMonitorsPerThread, int numSetsPerSetDuelingMonitor) {
         super(cache, 1, numSetDuelingMonitorsPerThread, numSetsPerSetDuelingMonitor);
 
-        this.numEvictedL2CacheLinesPerInterval = cache.getNumSets() * cache.getAssociativity() / 2;
+        this.numEvictedL2LinesPerInterval = cache.getNumSets() * cache.getAssociativity() / 2;
 
-        cache.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.HelperThreadL2CacheRequestEvent.class, event -> {
+        cache.getBlockingEventDispatcher().addListener(HelperThreadL2RequestProfilingHelper.HelperThreadL2RequestEvent.class, event -> {
             int policyId = this.getBinding(event.getSet()).getPolicyId();
             if (policyId != FOLLOWERS) {
                 SetDuelingMonitor setDuelingMonitor = this.getSetDuelingMonitor(0, policyId);
                 if (event.getQuality().isUseful()) {
-                    setDuelingMonitor.numUsefulHelperThreadL2CacheRequests.increment();
+                    setDuelingMonitor.numUsefulHelperThreadL2Requests.increment();
                 }
-                setDuelingMonitor.numTotalHelperThreadL2CacheRequests.increment();
+                setDuelingMonitor.numTotalHelperThreadL2Requests.increment();
             }
         });
 
         cache.getBlockingEventDispatcher().addListener(GeneralCacheControllerLineReplacementEvent.class, event -> {
             if (event.getCacheController().getCache() == cache) {
-                numEvictedL2CacheLines++;
+                numEvictedL2Lines++;
 
-                if (numEvictedL2CacheLines == numEvictedL2CacheLinesPerInterval) {
+                if (numEvictedL2Lines == numEvictedL2LinesPerInterval) {
                     newInterval();
 
-                    numEvictedL2CacheLines = 0;
+                    numEvictedL2Lines = 0;
                     numIntervals++;
                 }
             }
@@ -97,8 +97,8 @@ public class HelperThreadPrefetchAccuracyBasedSetDuelingUnit extends AbstractSet
         for(int i = 0; i < this.getNumThreads(); i++) {
             for(int j = 0; j < this.getNumSetDuelingMonitorsPerThread(); j++) {
                 SetDuelingMonitor setDuelingMonitor = this.getSetDuelingMonitor(i, j);
-                setDuelingMonitor.numUsefulHelperThreadL2CacheRequests.newInterval();
-                setDuelingMonitor.numTotalHelperThreadL2CacheRequests.newInterval();
+                setDuelingMonitor.numUsefulHelperThreadL2Requests.newInterval();
+                setDuelingMonitor.numTotalHelperThreadL2Requests.newInterval();
             }
         }
     }
@@ -111,7 +111,7 @@ public class HelperThreadPrefetchAccuracyBasedSetDuelingUnit extends AbstractSet
     @Override
     public int getBestPolicyId(int threadId) {
         return this.getSetDuelingMonitors(threadId).stream().max(
-                Comparator.comparing(setDuelingMonitor -> setDuelingMonitor.numTotalHelperThreadL2CacheRequests.getValue() == 0 ? 0 : (double) setDuelingMonitor.numUsefulHelperThreadL2CacheRequests.getValue() / setDuelingMonitor.numTotalHelperThreadL2CacheRequests.getValue())
+                Comparator.comparing(setDuelingMonitor -> setDuelingMonitor.numTotalHelperThreadL2Requests.getValue() == 0 ? 0 : (double) setDuelingMonitor.numUsefulHelperThreadL2Requests.getValue() / setDuelingMonitor.numTotalHelperThreadL2Requests.getValue())
         ).get().getPolicyId();
     }
 
@@ -120,8 +120,8 @@ public class HelperThreadPrefetchAccuracyBasedSetDuelingUnit extends AbstractSet
      *
      * @return the number of evicted L2 cache lines per interval
      */
-    public int getNumEvictedL2CacheLinesPerInterval() {
-        return numEvictedL2CacheLinesPerInterval;
+    public int getNumEvictedL2LinesPerInterval() {
+        return numEvictedL2LinesPerInterval;
     }
 
     /**

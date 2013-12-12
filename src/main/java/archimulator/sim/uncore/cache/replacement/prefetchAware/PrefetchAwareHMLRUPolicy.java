@@ -209,8 +209,8 @@ public class PrefetchAwareHMLRUPolicy<StateT extends Serializable> extends LRUPo
      * @return a value indicating whether prefetches coming from the specified PC address are predicted as useful or not
      */
     private boolean isUseful(int pc) {
-        return getCache().getSimulation().getHelperThreadL2CacheRequestProfilingHelper()
-                .getHelperThreadL2CacheRequestUsefulnessPredictor().predict(pc);
+        return getCache().getSimulation().getHelperThreadL2RequestProfilingHelper()
+                .getHelperThreadL2RequestUsefulnessPredictor().predict(pc);
     }
 
     /**

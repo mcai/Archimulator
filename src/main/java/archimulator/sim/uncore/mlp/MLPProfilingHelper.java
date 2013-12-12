@@ -54,7 +54,7 @@ public class MLPProfilingHelper implements Reportable {
          * @param pendingL2Miss the pending L2 miss
          */
         public L2MissMLPProfiledEvent(int set, int way, PendingL2Miss pendingL2Miss) {
-            super(l2CacheController);
+            super(l2Controller);
             this.set = set;
             this.way = way;
             this.pendingL2Miss = pendingL2Miss;
@@ -65,8 +65,8 @@ public class MLPProfilingHelper implements Reportable {
          *
          * @return the L2 cache controller
          */
-        public DirectoryController getL2CacheController() {
-            return l2CacheController;
+        public DirectoryController getL2Controller() {
+            return l2Controller;
         }
 
         /**
@@ -97,7 +97,7 @@ public class MLPProfilingHelper implements Reportable {
         }
     }
 
-    private DirectoryController l2CacheController;
+    private DirectoryController l2Controller;
 
     private Quantizer mlpCostQuantizer;
 
@@ -111,7 +111,7 @@ public class MLPProfilingHelper implements Reportable {
      * @param simulation the simulation
      */
     public MLPProfilingHelper(Simulation simulation) {
-        this.l2CacheController = simulation.getProcessor().getMemoryHierarchy().getL2CacheController();
+        this.l2Controller = simulation.getProcessor().getMemoryHierarchy().getL2Controller();
 
         this.mlpCostQuantizer = new Quantizer(7, 40);
 
@@ -119,21 +119,21 @@ public class MLPProfilingHelper implements Reportable {
 
         this.numL2MissesPerMlpCostQuantum = new TreeMap<>();
 
-        this.l2CacheController.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, event -> {
-            if (event.getCacheController().equals(MLPProfilingHelper.this.l2CacheController) && !event.isHitInCache()) {
-                profileBeginServicingL2CacheMiss(event.getAccess());
+        this.l2Controller.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, event -> {
+            if (event.getCacheController().equals(MLPProfilingHelper.this.l2Controller) && !event.isHitInCache()) {
+                profileBeginServicingL2Miss(event.getAccess());
             }
         });
 
-        this.l2CacheController.getBlockingEventDispatcher().addListener(LastLevelCacheControllerLineInsertEvent.class, event -> {
-            if (event.getCacheController().equals(MLPProfilingHelper.this.l2CacheController)) {
-                profileEndServicingL2CacheMiss(event.getSet(), event.getWay(), event.getAccess());
+        this.l2Controller.getBlockingEventDispatcher().addListener(LastLevelCacheControllerLineInsertEvent.class, event -> {
+            if (event.getCacheController().equals(MLPProfilingHelper.this.l2Controller)) {
+                profileEndServicingL2Miss(event.getSet(), event.getWay(), event.getAccess());
             }
         });
 
-        this.l2CacheController.getCycleAccurateEventQueue().getPerCycleEvents().add(this::updateL2CacheMlpCostsPerCycle);
+        this.l2Controller.getCycleAccurateEventQueue().getPerCycleEvents().add(this::updateL2MlpCostsPerCycle);
 
-        this.l2CacheController.getBlockingEventDispatcher().addListener(MLPProfilingHelper.L2MissMLPProfiledEvent.class, event -> {
+        this.l2Controller.getBlockingEventDispatcher().addListener(MLPProfilingHelper.L2MissMLPProfiledEvent.class, event -> {
             double mlpCost = event.getPendingL2Miss().getMlpCost();
 
             int quantizedMlpCost = getMlpCostQuantizer().quantize((int) mlpCost);
@@ -148,7 +148,7 @@ public class MLPProfilingHelper implements Reportable {
     /**
      * To be invoked per cycle for updating MLP-costs for in-flight L2 cache accesses.
      */
-    private void updateL2CacheMlpCostsPerCycle() {
+    private void updateL2MlpCostsPerCycle() {
         for (PendingL2Miss pendingL2Miss : this.pendingL2Misses.values()) {
             pendingL2Miss.setMlpCost(pendingL2Miss.getMlpCost() + (double) 1 / this.pendingL2Misses.size());
         }
@@ -159,10 +159,10 @@ public class MLPProfilingHelper implements Reportable {
      *
      * @param access the memory hierarchy access
      */
-    private void profileBeginServicingL2CacheMiss(MemoryHierarchyAccess access) {
+    private void profileBeginServicingL2Miss(MemoryHierarchyAccess access) {
         int tag = access.getPhysicalTag();
 
-        PendingL2Miss pendingL2Miss = new PendingL2Miss(access, this.l2CacheController.getCycleAccurateEventQueue().getCurrentCycle());
+        PendingL2Miss pendingL2Miss = new PendingL2Miss(access, this.l2Controller.getCycleAccurateEventQueue().getCurrentCycle());
         this.pendingL2Misses.put(tag, pendingL2Miss);
     }
 
@@ -173,15 +173,15 @@ public class MLPProfilingHelper implements Reportable {
      * @param way the way
      * @param access the memory hierarchy access
      */
-    private void profileEndServicingL2CacheMiss(int set, int way, MemoryHierarchyAccess access) {
+    private void profileEndServicingL2Miss(int set, int way, MemoryHierarchyAccess access) {
         int tag = access.getPhysicalTag();
 
         PendingL2Miss pendingL2Miss = this.pendingL2Misses.get(tag);
-        pendingL2Miss.setEndCycle(this.l2CacheController.getCycleAccurateEventQueue().getCurrentCycle());
+        pendingL2Miss.setEndCycle(this.l2Controller.getCycleAccurateEventQueue().getCurrentCycle());
 
         this.pendingL2Misses.remove(tag);
 
-        this.l2CacheController.getBlockingEventDispatcher().dispatch(new L2MissMLPProfiledEvent(set, way, pendingL2Miss));
+        this.l2Controller.getBlockingEventDispatcher().dispatch(new L2MissMLPProfiledEvent(set, way, pendingL2Miss));
     }
 
     @Override

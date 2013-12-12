@@ -48,9 +48,9 @@ import java.util.*;
  */
 public class BasicMemoryHierarchy extends BasicSimulationObject implements MemoryHierarchy {
     private MemoryController memoryController;
-    private DirectoryController l2CacheController;
-    private List<CacheController> l1ICacheControllers;
-    private List<CacheController> l1DCacheControllers;
+    private DirectoryController l2Controller;
+    private List<CacheController> l1IControllers;
+    private List<CacheController> l1DControllers;
 
     private List<TranslationLookasideBuffer> itlbs;
     private List<TranslationLookasideBuffer> dtlbs;
@@ -83,23 +83,23 @@ public class BasicMemoryHierarchy extends BasicSimulationObject implements Memor
                 break;
         }
 
-        this.l2CacheController = new DirectoryController(this, "l2");
-        this.l2CacheController.setNext(this.memoryController);
+        this.l2Controller = new DirectoryController(this, "l2");
+        this.l2Controller.setNext(this.memoryController);
 
-        this.l1ICacheControllers = new ArrayList<>();
-        this.l1DCacheControllers = new ArrayList<>();
+        this.l1IControllers = new ArrayList<>();
+        this.l1DControllers = new ArrayList<>();
 
         this.itlbs = new ArrayList<>();
         this.dtlbs = new ArrayList<>();
 
         for (int i = 0; i < getExperiment().getArchitecture().getNumCores(); i++) {
-            CacheController l1ICacheController = new L1ICacheController(this, "c" + i + "/icache");
-            l1ICacheController.setNext(this.l2CacheController);
-            this.l1ICacheControllers.add(l1ICacheController);
+            CacheController l1IController = new L1IController(this, "c" + i + "/icache");
+            l1IController.setNext(this.l2Controller);
+            this.l1IControllers.add(l1IController);
 
-            CacheController l1DCacheController = new L1DCacheController(this, "c" + i + "/dcache");
-            l1DCacheController.setNext(this.l2CacheController);
-            this.l1DCacheControllers.add(l1DCacheController);
+            CacheController l1DController = new L1DController(this, "c" + i + "/dcache");
+            l1DController.setNext(this.l2Controller);
+            this.l1DControllers.add(l1DController);
 
             for (int j = 0; j < getExperiment().getArchitecture().getNumThreadsPerCore(); j++) {
                 TranslationLookasideBuffer itlb = new TranslationLookasideBuffer(this, "c" + i + "t" + j + "/itlb");
@@ -123,14 +123,14 @@ public class BasicMemoryHierarchy extends BasicSimulationObject implements Memor
      */
     @Override
     public void dumpCacheControllerFsmStats(List<ExperimentStat> stats) {
-        for (CacheController l1ICacheController : this.l1ICacheControllers) {
-            dumpCacheControllerFsmStats(stats, l1ICacheController);
+        for (CacheController l1IController : this.l1IControllers) {
+            dumpCacheControllerFsmStats(stats, l1IController);
         }
 
-        for (CacheController l1DCacheController : this.l1DCacheControllers) {
-            dumpCacheControllerFsmStats(stats, l1DCacheController);
+        for (CacheController l1DController : this.l1DControllers) {
+            dumpCacheControllerFsmStats(stats, l1DController);
         }
-        dumpCacheControllerFsmStats(stats, this.l2CacheController);
+        dumpCacheControllerFsmStats(stats, this.l2Controller);
     }
 
     /**
@@ -198,8 +198,8 @@ public class BasicMemoryHierarchy extends BasicSimulationObject implements Memor
      *
      * @return the L2 cache controller
      */
-    public DirectoryController getL2CacheController() {
-        return l2CacheController;
+    public DirectoryController getL2Controller() {
+        return l2Controller;
     }
 
     /**
@@ -207,8 +207,8 @@ public class BasicMemoryHierarchy extends BasicSimulationObject implements Memor
      *
      * @return the list of L1I cache controllers
      */
-    public List<CacheController> getL1ICacheControllers() {
-        return l1ICacheControllers;
+    public List<CacheController> getL1IControllers() {
+        return l1IControllers;
     }
 
     /**
@@ -216,8 +216,8 @@ public class BasicMemoryHierarchy extends BasicSimulationObject implements Memor
      *
      * @return the list of L1D cache controllers
      */
-    public List<CacheController> getL1DCacheControllers() {
-        return l1DCacheControllers;
+    public List<CacheController> getL1DControllers() {
+        return l1DControllers;
     }
 
     /**

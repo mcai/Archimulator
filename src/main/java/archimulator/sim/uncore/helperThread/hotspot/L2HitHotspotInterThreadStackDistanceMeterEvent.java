@@ -20,17 +20,18 @@ package archimulator.sim.uncore.helperThread.hotspot;
 
 import archimulator.sim.common.SimulationObject;
 import archimulator.sim.common.meter.SimulationMeterEvent;
+import archimulator.sim.uncore.helperThread.HelperThreadL2RequestState;
 
 import java.io.Serializable;
 
 /**
- * L2 cache miss Hotspot stack distance meter event.
+ * L2 cache hit Hotspot inter-thread stack distance meter event.
  *
  * @author Min Cai
  */
-public class L2CacheMissHotspotStackDistanceMeterEvent extends SimulationMeterEvent<L2CacheMissHotspotStackDistanceMeterEvent.L2CacheMissHotspotStackDistanceMeterEventValue> {
+public class L2HitHotspotInterThreadStackDistanceMeterEvent extends SimulationMeterEvent<L2HitHotspotInterThreadStackDistanceMeterEvent.L2HitHotspotInterThreadStackDistanceMeterEventValue> {
     /**
-     * Create an L2 cache miss hotspot stack distance meter event.
+     * Create an L2 cache hit hotspot inter-thread stack distance meter event.
      *
      * @param sender       the sender simulation object
      * @param pc           the value of the program counter (PC)
@@ -39,23 +40,36 @@ public class L2CacheMissHotspotStackDistanceMeterEvent extends SimulationMeterEv
      * @param functionName the function symbol name
      * @param value        the value
      */
-    public L2CacheMissHotspotStackDistanceMeterEvent(SimulationObject sender, int pc, int address, int threadId, String functionName, L2CacheMissHotspotStackDistanceMeterEventValue value) {
-        super(sender, "L2CacheMissHotspotStackDistanceMeterEvent", pc, address, threadId, functionName, value);
+    public L2HitHotspotInterThreadStackDistanceMeterEvent(SimulationObject sender, int pc, int address, int threadId, String functionName, L2HitHotspotInterThreadStackDistanceMeterEventValue value) {
+        super(sender, "L2HitHotspotInterThreadStackDistanceMeterEvent", pc, address, threadId, functionName, value);
     }
 
     /**
-     * L2 cache miss Hotspot stack distance meter event value.
+     * L2 cache hit Hotspot inter-thread stack distance meter event value.
      */
-    public static class L2CacheMissHotspotStackDistanceMeterEventValue implements Serializable {
+    public static class L2HitHotspotInterThreadStackDistanceMeterEventValue implements Serializable {
+        private HelperThreadL2RequestState helperThreadL2RequestState;
         private long stackDistance;
 
         /**
-         * Create an L2 cache miss hotspot stack distance meter event value.
+         * Create an L2 cache hit hotspot inter-thread stack distance meter event value.
          *
+         * @param helperThreadL2RequestState
+         *                      the helper thread L2 cache request state
          * @param stackDistance the stack distance
          */
-        public L2CacheMissHotspotStackDistanceMeterEventValue(long stackDistance) {
+        public L2HitHotspotInterThreadStackDistanceMeterEventValue(HelperThreadL2RequestState helperThreadL2RequestState, long stackDistance) {
+            this.helperThreadL2RequestState = helperThreadL2RequestState;
             this.stackDistance = stackDistance;
+        }
+
+        /**
+         * Get the helper thread L2 cache request state.
+         *
+         * @return the helper thread L2 cache request state
+         */
+        public HelperThreadL2RequestState getHelperThreadL2RequestState() {
+            return helperThreadL2RequestState;
         }
 
         /**
@@ -69,7 +83,7 @@ public class L2CacheMissHotspotStackDistanceMeterEvent extends SimulationMeterEv
 
         @Override
         public String toString() {
-            return String.format("{stackDistance=%d}", stackDistance);
+            return String.format("{htRequestState=%s, stackDistance=%d}", helperThreadL2RequestState, stackDistance);
         }
     }
 }

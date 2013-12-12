@@ -19,7 +19,7 @@
 package archimulator.sim.uncore.cache.setDueling;
 
 import archimulator.sim.uncore.cache.Cache;
-import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestProfilingHelper;
+import archimulator.sim.uncore.helperThread.HelperThreadL2RequestProfilingHelper;
 
 /**
  * Helper thread useful L2 prefetch request based Set dueling unit.
@@ -41,7 +41,7 @@ public class HelperThreadUsefulPrefetchBasedSetDuelingUnit extends SaturatingCou
     ) {
         super(cache, 1, numSetDuelingMonitorsPerThread, numSetsPerSetDuelingMonitor);
 
-        cache.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.HelperThreadL2CacheRequestEvent.class, event -> {
+        cache.getBlockingEventDispatcher().addListener(HelperThreadL2RequestProfilingHelper.HelperThreadL2RequestEvent.class, event -> {
             if (event.getQuality().isUseful()) {
                 inc(event.getSet(), 0);
             }

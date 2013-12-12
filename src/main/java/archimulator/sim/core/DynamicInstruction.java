@@ -39,7 +39,7 @@ public class DynamicInstruction {
 
     private boolean useStackPointerAsEffectiveAddressBase;
 
-    private boolean missedInL2Cache;
+    private boolean missedInL2;
     private int numCyclesSpentAtHeadOfReorderBuffer;
 
     /**
@@ -63,7 +63,7 @@ public class DynamicInstruction {
             this.useStackPointerAsEffectiveAddressBase = StaticInstruction.useStackPointerAsEffectiveAddressBase(this.staticInstruction.getMachineInstruction());
         }
 
-        this.missedInL2Cache = false;
+        this.missedInL2 = false;
         this.numCyclesSpentAtHeadOfReorderBuffer = 0;
     }
 
@@ -144,17 +144,17 @@ public class DynamicInstruction {
      *
      * @return a value indicating whether the dynamic instruction has caused an L2 cache miss or not
      */
-    public boolean isMissedInL2Cache() {
-        return missedInL2Cache;
+    public boolean isMissedInL2() {
+        return missedInL2;
     }
 
     /**
      * Set a value indicating whether the dynamic instruction has caused an L2 cache miss or not.
      *
-     * @param missedInL2Cache a value indicating whether the dynamic instruction has caused an L2 cache miss or not
+     * @param missedInL2 a value indicating whether the dynamic instruction has caused an L2 cache miss or not
      */
-    public void setMissedInL2Cache(boolean missedInL2Cache) {
-        this.missedInL2Cache = missedInL2Cache;
+    public void setMissedInL2(boolean missedInL2) {
+        this.missedInL2 = missedInL2;
     }
 
     /**

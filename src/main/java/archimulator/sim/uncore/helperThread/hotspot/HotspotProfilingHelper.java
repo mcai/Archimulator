@@ -32,8 +32,8 @@ import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.stackDistanceProfile.StackDistanceProfilingHelper;
 import archimulator.sim.uncore.coherence.event.GeneralCacheControllerServiceNonblockingRequestEvent;
 import archimulator.sim.uncore.coherence.msi.controller.DirectoryController;
-import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestProfilingHelper;
-import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestState;
+import archimulator.sim.uncore.helperThread.HelperThreadL2RequestProfilingHelper;
+import archimulator.sim.uncore.helperThread.HelperThreadL2RequestState;
 import archimulator.sim.uncore.helperThread.HelperThreadingHelper;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
@@ -46,16 +46,16 @@ import java.util.TreeMap;
  * @author Min Cai
  */
 public class HotspotProfilingHelper implements Reportable {
-    private DirectoryController l2CacheController;
+    private DirectoryController l2Controller;
 
     private Map<String, Map<String, Long>> numCallsPerFunctions;
     private Map<Integer, LoadInstructionEntry> loadsInHotspotFunction;
 
-    private SummaryStatistics statL2CacheHitStackDistances;
-    private SummaryStatistics statL2CacheMissStackDistances;
+    private SummaryStatistics statL2HitStackDistances;
+    private SummaryStatistics statL2MissStackDistances;
 
-    private SummaryStatistics statL2CacheHitHotspotInterThreadStackDistances;
-    private SummaryStatistics statL2CacheMissHotspotStackDistances;
+    private SummaryStatistics statL2HitHotspotInterThreadStackDistances;
+    private SummaryStatistics statL2MissHotspotStackDistances;
 
     /**
      * Create a hotpot profiling helper.
@@ -63,16 +63,16 @@ public class HotspotProfilingHelper implements Reportable {
      * @param simulation the simulation object
      */
     public HotspotProfilingHelper(Simulation simulation) {
-        this.l2CacheController = simulation.getProcessor().getMemoryHierarchy().getL2CacheController();
+        this.l2Controller = simulation.getProcessor().getMemoryHierarchy().getL2Controller();
 
         this.numCallsPerFunctions = new TreeMap<>();
         this.loadsInHotspotFunction = new TreeMap<>();
 
-        this.statL2CacheHitStackDistances = new SummaryStatistics();
-        this.statL2CacheMissStackDistances = new SummaryStatistics();
+        this.statL2HitStackDistances = new SummaryStatistics();
+        this.statL2MissStackDistances = new SummaryStatistics();
 
-        this.statL2CacheHitHotspotInterThreadStackDistances = new SummaryStatistics();
-        this.statL2CacheMissHotspotStackDistances = new SummaryStatistics();
+        this.statL2HitHotspotInterThreadStackDistances = new SummaryStatistics();
+        this.statL2MissHotspotStackDistances = new SummaryStatistics();
 
         this.scanLoadInstructionsInHotspotFunction(simulation.getProcessor().getCores().get(0).getThreads().get(0).getContext().getProcess());
 
@@ -103,7 +103,7 @@ public class HotspotProfilingHelper implements Reportable {
                         if (event.isHitInCache()) {
                             loadInstructionEntry.setL1DHits(loadInstructionEntry.getL1DHits() + 1);
                         }
-                    } else if (event.getCacheController() == l2CacheController) {
+                    } else if (event.getCacheController() == l2Controller) {
                         loadInstructionEntry.setL2Accesses(loadInstructionEntry.getL2Accesses() + 1);
                         if (event.isHitInCache()) {
                             loadInstructionEntry.setL2Hits(loadInstructionEntry.getL2Hits() + 1);
@@ -114,56 +114,56 @@ public class HotspotProfilingHelper implements Reportable {
         });
 
         simulation.getBlockingEventDispatcher().addListener(StackDistanceProfilingHelper.StackDistanceProfiledEvent.class, event -> {
-            if(event.getCacheController() == l2CacheController) {
+            if(event.getCacheController() == l2Controller) {
                 MemoryHierarchyAccess access = event.getAccess();
 
                 if (event.isHitInCache() && HelperThreadingHelper.isMainThread(access.getThread())) {
-                    HelperThreadL2CacheRequestProfilingHelper helperThreadL2CacheRequestProfilingHelper = l2CacheController.getSimulation().getHelperThreadL2CacheRequestProfilingHelper();
+                    HelperThreadL2RequestProfilingHelper helperThreadL2RequestProfilingHelper = l2Controller.getSimulation().getHelperThreadL2RequestProfilingHelper();
 
-                    if (helperThreadL2CacheRequestProfilingHelper != null) {
-                        HelperThreadL2CacheRequestState helperThreadL2CacheRequestState =
-                                helperThreadL2CacheRequestProfilingHelper.getHelperThreadL2CacheRequestStates().get(event.getSet()).get(event.getWay());
+                    if (helperThreadL2RequestProfilingHelper != null) {
+                        HelperThreadL2RequestState helperThreadL2RequestState =
+                                helperThreadL2RequestProfilingHelper.getHelperThreadL2RequestStates().get(event.getSet()).get(event.getWay());
 
-                        if (HelperThreadingHelper.isHelperThread(helperThreadL2CacheRequestState.getThreadId())) {
-                            l2CacheController.getBlockingEventDispatcher().dispatch(new L2CacheHitHotspotInterThreadStackDistanceMeterEvent(
-                                    l2CacheController,
+                        if (HelperThreadingHelper.isHelperThread(helperThreadL2RequestState.getThreadId())) {
+                            l2Controller.getBlockingEventDispatcher().dispatch(new L2HitHotspotInterThreadStackDistanceMeterEvent(
+                                    l2Controller,
                                     access.getVirtualPc(),
                                     access.getPhysicalAddress(),
                                     access.getThread().getId(),
                                     access.getThread().getContext().getProcess().getFunctionNameFromPc(access.getVirtualPc()),
-                                    new L2CacheHitHotspotInterThreadStackDistanceMeterEvent.L2CacheHitHotspotInterThreadStackDistanceMeterEventValue(helperThreadL2CacheRequestState, event.getStackDistance())
+                                    new L2HitHotspotInterThreadStackDistanceMeterEvent.L2HitHotspotInterThreadStackDistanceMeterEventValue(helperThreadL2RequestState, event.getStackDistance())
                             ));
                         }
                     }
                 }
 
                 if (!event.isHitInCache() && HelperThreadingHelper.isMainThread(access.getThread())) {
-                    l2CacheController.getBlockingEventDispatcher().dispatch(new L2CacheMissHotspotStackDistanceMeterEvent(
-                            l2CacheController,
+                    l2Controller.getBlockingEventDispatcher().dispatch(new L2MissHotspotStackDistanceMeterEvent(
+                            l2Controller,
                             access.getVirtualPc(),
                             access.getPhysicalAddress(),
                             access.getThread().getId(),
                             access.getThread().getContext().getProcess().getFunctionNameFromPc(access.getVirtualPc()),
-                            new L2CacheMissHotspotStackDistanceMeterEvent.L2CacheMissHotspotStackDistanceMeterEventValue(event.getStackDistance())
+                            new L2MissHotspotStackDistanceMeterEvent.L2MissHotspotStackDistanceMeterEventValue(event.getStackDistance())
                     ));
                 }
 
                 if (event.isHitInCache()) {
-                    statL2CacheHitStackDistances.addValue(event.getStackDistance());
+                    statL2HitStackDistances.addValue(event.getStackDistance());
                 } else {
-                    statL2CacheMissStackDistances.addValue(event.getStackDistance());
+                    statL2MissStackDistances.addValue(event.getStackDistance());
                 }
             }
         });
 
         simulation.getBlockingEventDispatcher().addListener(
-                L2CacheHitHotspotInterThreadStackDistanceMeterEvent.class,
-                event -> statL2CacheHitHotspotInterThreadStackDistances.addValue(event.getValue().getStackDistance())
+                L2HitHotspotInterThreadStackDistanceMeterEvent.class,
+                event -> statL2HitHotspotInterThreadStackDistances.addValue(event.getValue().getStackDistance())
         );
 
         simulation.getBlockingEventDispatcher().addListener(
-                L2CacheMissHotspotStackDistanceMeterEvent.class,
-                event -> statL2CacheMissHotspotStackDistances.addValue(event.getValue().getStackDistance())
+                L2MissHotspotStackDistanceMeterEvent.class,
+                event -> statL2MissHotspotStackDistances.addValue(event.getValue().getStackDistance())
         );
     }
 
@@ -192,10 +192,10 @@ public class HotspotProfilingHelper implements Reportable {
             getChildren().add(new ReportNode(this, "numCallsPerFunctions", getNumCallsPerFunctions() + "")); //TODO
             getChildren().add(new ReportNode(this, "loadsInHotspotFunction", getLoadsInHotspotFunction() + "")); //TODO
 
-            getChildren().add(new ReportNode(this, "statL2CacheHitStackDistances", getStatL2CacheHitStackDistances() + "")); //TODO
-            getChildren().add(new ReportNode(this, "statL2CacheMissStackDistances", getStatL2CacheMissStackDistances() + "")); //TODO
-            getChildren().add(new ReportNode(this, "statL2CacheHitHotspotInterThreadStackDistances", getStatL2CacheHitHotspotInterThreadStackDistances() + "")); //TODO
-            getChildren().add(new ReportNode(this, "statL2CacheMissHotspotStackDistances", getStatL2CacheMissStackDistances() + "")); //TODO
+            getChildren().add(new ReportNode(this, "statL2HitStackDistances", getStatL2HitStackDistances() + "")); //TODO
+            getChildren().add(new ReportNode(this, "statL2MissStackDistances", getStatL2MissStackDistances() + "")); //TODO
+            getChildren().add(new ReportNode(this, "statL2HitHotspotInterThreadStackDistances", getStatL2HitHotspotInterThreadStackDistances() + "")); //TODO
+            getChildren().add(new ReportNode(this, "statL2MissHotspotStackDistances", getStatL2MissStackDistances() + "")); //TODO
         }});
     }
 
@@ -222,8 +222,8 @@ public class HotspotProfilingHelper implements Reportable {
      *
      * @return the summary statistics on the L2 cache hit stack distances
      */
-    public SummaryStatistics getStatL2CacheHitStackDistances() {
-        return statL2CacheHitStackDistances;
+    public SummaryStatistics getStatL2HitStackDistances() {
+        return statL2HitStackDistances;
     }
 
     /**
@@ -231,8 +231,8 @@ public class HotspotProfilingHelper implements Reportable {
      *
      * @return the summary statistics on the L2 cache miss stack distances
      */
-    public SummaryStatistics getStatL2CacheMissStackDistances() {
-        return statL2CacheMissStackDistances;
+    public SummaryStatistics getStatL2MissStackDistances() {
+        return statL2MissStackDistances;
     }
 
     /**
@@ -240,8 +240,8 @@ public class HotspotProfilingHelper implements Reportable {
      *
      * @return the summary statistics on the L2 cache hit hotspot inter-thread stack distances
      */
-    public SummaryStatistics getStatL2CacheHitHotspotInterThreadStackDistances() {
-        return statL2CacheHitHotspotInterThreadStackDistances;
+    public SummaryStatistics getStatL2HitHotspotInterThreadStackDistances() {
+        return statL2HitHotspotInterThreadStackDistances;
     }
 
     /**
@@ -249,7 +249,7 @@ public class HotspotProfilingHelper implements Reportable {
      *
      * @return the summary statistics on the L2 cache miss hotspot stack distances
      */
-    public SummaryStatistics getStatL2CacheMissHotspotStackDistances() {
-        return statL2CacheMissHotspotStackDistances;
+    public SummaryStatistics getStatL2MissHotspotStackDistances() {
+        return statL2MissHotspotStackDistances;
     }
 }

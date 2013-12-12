@@ -46,7 +46,7 @@ public class ReuseDistancePredictionHelper implements Reportable {
      * @param simulation the simulation
      */
     public ReuseDistancePredictionHelper(Simulation simulation) {
-        final EvictableCache<DirectoryControllerState> cache = simulation.getProcessor().getMemoryHierarchy().getL2CacheController().getCache();
+        final EvictableCache<DirectoryControllerState> cache = simulation.getProcessor().getMemoryHierarchy().getL2Controller().getCache();
 
         this.reuseDistanceQuantizer = new Quantizer(15, 8192);
 

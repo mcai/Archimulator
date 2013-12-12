@@ -34,10 +34,10 @@ import java.util.TreeMap;
  * @author Min Cai
  */
 public class CacheInteractionHelper implements Reportable {
-    private DirectoryController l2CacheController;
+    private DirectoryController l2Controller;
 
-    private Map<Integer, Map<Integer, Long>> numL2CacheInterThreadConstructiveInteractions;
-    private Map<Integer, Map<Integer, Long>> numL2CacheInterThreadEvictions;
+    private Map<Integer, Map<Integer, Long>> numL2InterThreadConstructiveInteractions;
+    private Map<Integer, Map<Integer, Long>> numL2InterThreadEvictions;
 
     /**
      * Create a cache interaction helper.
@@ -45,26 +45,26 @@ public class CacheInteractionHelper implements Reportable {
      * @param simulation simulation
      */
     public CacheInteractionHelper(Simulation simulation) {
-        this(simulation.getProcessor().getMemoryHierarchy().getL2CacheController());
+        this(simulation.getProcessor().getMemoryHierarchy().getL2Controller());
     }
 
     /**
      * Create a cache interaction helper.
      *
-     * @param l2CacheController L2 cache (directory) controller
+     * @param l2Controller L2 cache (directory) controller
      */
-    public CacheInteractionHelper(final DirectoryController l2CacheController) {
-        this.l2CacheController = l2CacheController;
+    public CacheInteractionHelper(final DirectoryController l2Controller) {
+        this.l2Controller = l2Controller;
 
-        this.numL2CacheInterThreadConstructiveInteractions = new TreeMap<>();
-        this.numL2CacheInterThreadEvictions = new TreeMap<>();
+        this.numL2InterThreadConstructiveInteractions = new TreeMap<>();
+        this.numL2InterThreadEvictions = new TreeMap<>();
 
-        l2CacheController.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, event -> {
-            if (event.getCacheController().equals(CacheInteractionHelper.this.l2CacheController) && event.isHitInCache()) {
+        l2Controller.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, event -> {
+            if (event.getCacheController().equals(CacheInteractionHelper.this.l2Controller) && event.isHitInCache()) {
                 int set = event.getSet();
                 int way = event.getWay();
 
-                int broughterThreadId = l2CacheController.getCache().getLine(set, way).getAccess().getThread().getId();
+                int broughterThreadId = l2Controller.getCache().getLine(set, way).getAccess().getThread().getId();
                 int requesterThreadId = event.getAccess().getThread().getId();
 
                 if(broughterThreadId == -1) {
@@ -76,25 +76,25 @@ public class CacheInteractionHelper implements Reportable {
                 }
 
                 if(broughterThreadId != requesterThreadId) {
-                    if(!numL2CacheInterThreadConstructiveInteractions.containsKey(broughterThreadId)) {
-                        numL2CacheInterThreadConstructiveInteractions.put(broughterThreadId, new TreeMap<>());
+                    if(!numL2InterThreadConstructiveInteractions.containsKey(broughterThreadId)) {
+                        numL2InterThreadConstructiveInteractions.put(broughterThreadId, new TreeMap<>());
                     }
 
-                    if(!numL2CacheInterThreadConstructiveInteractions.get(broughterThreadId).containsKey(requesterThreadId)) {
-                        numL2CacheInterThreadConstructiveInteractions.get(broughterThreadId).put(requesterThreadId, 0L);
+                    if(!numL2InterThreadConstructiveInteractions.get(broughterThreadId).containsKey(requesterThreadId)) {
+                        numL2InterThreadConstructiveInteractions.get(broughterThreadId).put(requesterThreadId, 0L);
                     }
 
-                    numL2CacheInterThreadConstructiveInteractions.get(broughterThreadId).put(requesterThreadId, numL2CacheInterThreadConstructiveInteractions.get(broughterThreadId).get(requesterThreadId) + 1);
+                    numL2InterThreadConstructiveInteractions.get(broughterThreadId).put(requesterThreadId, numL2InterThreadConstructiveInteractions.get(broughterThreadId).get(requesterThreadId) + 1);
                 }
             }
         });
 
-        l2CacheController.getBlockingEventDispatcher().addListener(GeneralCacheControllerLineReplacementEvent.class, event -> {
-            if (event.getCacheController() == CacheInteractionHelper.this.l2CacheController) {
+        l2Controller.getBlockingEventDispatcher().addListener(GeneralCacheControllerLineReplacementEvent.class, event -> {
+            if (event.getCacheController() == CacheInteractionHelper.this.l2Controller) {
                 int set = event.getSet();
                 int way = event.getWay();
 
-                int broughterThreadId = l2CacheController.getCache().getLine(set, way).getAccess().getThread().getId();
+                int broughterThreadId = l2Controller.getCache().getLine(set, way).getAccess().getThread().getId();
                 int requesterThreadId = event.getAccess().getThread().getId();
 
                 if(broughterThreadId == -1) {
@@ -106,15 +106,15 @@ public class CacheInteractionHelper implements Reportable {
                 }
 
                 if(broughterThreadId != requesterThreadId) {
-                    if(!numL2CacheInterThreadEvictions.containsKey(broughterThreadId)) {
-                        numL2CacheInterThreadEvictions.put(broughterThreadId, new TreeMap<>());
+                    if(!numL2InterThreadEvictions.containsKey(broughterThreadId)) {
+                        numL2InterThreadEvictions.put(broughterThreadId, new TreeMap<>());
                     }
 
-                    if(!numL2CacheInterThreadEvictions.get(broughterThreadId).containsKey(requesterThreadId)) {
-                        numL2CacheInterThreadEvictions.get(broughterThreadId).put(requesterThreadId, 0L);
+                    if(!numL2InterThreadEvictions.get(broughterThreadId).containsKey(requesterThreadId)) {
+                        numL2InterThreadEvictions.get(broughterThreadId).put(requesterThreadId, 0L);
                     }
 
-                    numL2CacheInterThreadEvictions.get(broughterThreadId).put(requesterThreadId, numL2CacheInterThreadEvictions.get(broughterThreadId).get(requesterThreadId) + 1);
+                    numL2InterThreadEvictions.get(broughterThreadId).put(requesterThreadId, numL2InterThreadEvictions.get(broughterThreadId).get(requesterThreadId) + 1);
                 }
             }
         });
@@ -123,8 +123,8 @@ public class CacheInteractionHelper implements Reportable {
     @Override
     public void dumpStats(ReportNode reportNode) {
         reportNode.getChildren().add(new ReportNode(reportNode, "cacheInteractionHelper") {{
-            getChildren().add(new ReportNode(this, "numL2CacheInterThreadConstructiveInteractions", getNumL2CacheInterThreadConstructiveInteractions() + ""));
-            getChildren().add(new ReportNode(this, "numL2CacheInterThreadEvictions", getNumL2CacheInterThreadEvictions() + ""));
+            getChildren().add(new ReportNode(this, "numL2InterThreadConstructiveInteractions", getNumL2InterThreadConstructiveInteractions() + ""));
+            getChildren().add(new ReportNode(this, "numL2InterThreadEvictions", getNumL2InterThreadEvictions() + ""));
         }});
     }
 
@@ -133,8 +133,8 @@ public class CacheInteractionHelper implements Reportable {
      *
      * @return the number of L2 cache inter-thread constructive interactions
      */
-    public Map<Integer, Map<Integer, Long>> getNumL2CacheInterThreadConstructiveInteractions() {
-        return numL2CacheInterThreadConstructiveInteractions;
+    public Map<Integer, Map<Integer, Long>> getNumL2InterThreadConstructiveInteractions() {
+        return numL2InterThreadConstructiveInteractions;
     }
 
     /**
@@ -142,7 +142,7 @@ public class CacheInteractionHelper implements Reportable {
      *
      * @return the number of L2 cache inter-thread evictions
      */
-    public Map<Integer, Map<Integer, Long>> getNumL2CacheInterThreadEvictions() {
-        return numL2CacheInterThreadEvictions;
+    public Map<Integer, Map<Integer, Long>> getNumL2InterThreadEvictions() {
+        return numL2InterThreadEvictions;
     }
 }

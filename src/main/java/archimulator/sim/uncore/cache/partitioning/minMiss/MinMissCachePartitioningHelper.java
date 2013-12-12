@@ -56,7 +56,7 @@ public class MinMissCachePartitioningHelper extends CachePartitioningHelper {
         this.lruStacks = new LinkedHashMap<>();
 
         cache.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, event -> {
-            if (event.getCacheController() == getL2CacheController() && shouldInclude(event.getSet())) {
+            if (event.getCacheController() == getL2Controller() && shouldInclude(event.getSet())) {
                 profileStackDistance(event.getAccess());
             }
         });
@@ -81,7 +81,7 @@ public class MinMissCachePartitioningHelper extends CachePartitioningHelper {
      */
     private void profileStackDistance(MemoryHierarchyAccess access) {
         int tag = access.getPhysicalTag();
-        int set = this.getL2CacheController().getCache().getSet(tag);
+        int set = this.getL2Controller().getCache().getSet(tag);
         int threadId = getThreadIdentifier(access.getThread());
 
         LRUStack lruStack = getLruStack(threadId, set);
@@ -108,7 +108,7 @@ public class MinMissCachePartitioningHelper extends CachePartitioningHelper {
         }
 
         if (!this.lruStacks.get(threadId).containsKey(set)) {
-            this.lruStacks.get(threadId).put(set, new LRUStack(threadId, set, this.getL2CacheController().getCache().getAssociativity()));
+            this.lruStacks.get(threadId).put(set, new LRUStack(threadId, set, this.getL2Controller().getCache().getAssociativity()));
         }
 
         return this.lruStacks.get(threadId).get(set);
@@ -122,7 +122,7 @@ public class MinMissCachePartitioningHelper extends CachePartitioningHelper {
      * @return the total number of misses for the specified thread ID and associativity
      */
     public int getTotalMisses(int threadId, int associativity) {
-        if (associativity > getL2CacheController().getCache().getAssociativity()) {
+        if (associativity > getL2Controller().getCache().getAssociativity()) {
             throw new IllegalArgumentException();
         }
 
@@ -130,7 +130,7 @@ public class MinMissCachePartitioningHelper extends CachePartitioningHelper {
 
         int totalMisses = 0;
 
-        for (int i = associativity - 1; i < getL2CacheController().getCache().getAssociativity(); i++) {
+        for (int i = associativity - 1; i < getL2Controller().getCache().getAssociativity(); i++) {
             totalMisses += stackDistanceProfile.getHitCounters().get(i);
         }
 
@@ -147,7 +147,7 @@ public class MinMissCachePartitioningHelper extends CachePartitioningHelper {
      */
     private StackDistanceProfile getStackDistanceProfile(int threadId) {
         if (!this.stackDistanceProfiles.containsKey(threadId)) {
-            this.stackDistanceProfiles.put(threadId, new StackDistanceProfile(getL2CacheController().getCache().getAssociativity()));
+            this.stackDistanceProfiles.put(threadId, new StackDistanceProfile(getL2Controller().getCache().getAssociativity()));
         }
 
         return this.stackDistanceProfiles.get(threadId);
@@ -160,7 +160,7 @@ public class MinMissCachePartitioningHelper extends CachePartitioningHelper {
      */
     private Pair<Integer, List<Integer>> getMinMissSumAndPartition() {
         if (partitions == null) {
-            partitions = partition(getL2CacheController().getCache().getAssociativity(), getNumThreads());
+            partitions = partition(getL2Controller().getCache().getAssociativity(), getNumThreads());
         }
 
         int minMissSum = Integer.MAX_VALUE;

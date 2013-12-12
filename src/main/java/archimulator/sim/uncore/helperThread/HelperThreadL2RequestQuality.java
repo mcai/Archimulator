@@ -23,7 +23,7 @@ package archimulator.sim.uncore.helperThread;
  *
  * @author Min Cai
  */
-public enum HelperThreadL2CacheRequestQuality {
+public enum HelperThreadL2RequestQuality {
     /**
      * Redundant hit to transient tag.
      */

@@ -304,90 +304,90 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
                     parent.getStatValueAsDouble(parent.getMeasurementTitlePrefix(), "simulation/cyclesPerInstruction", 0)
             );
 
-            summary.setNumMainThreadL2CacheHits(
-                    parent.getStatValueAsLong(parent.getMeasurementTitlePrefix(), "helperThreadL2CacheRequestProfilingHelper/numMainThreadL2CacheHits", 0)
+            summary.setNumMainThreadL2Hits(
+                    parent.getStatValueAsLong(parent.getMeasurementTitlePrefix(), "helperThreadL2RequestProfilingHelper/numMainThreadL2Hits", 0)
             );
-            summary.setNumMainThreadL2CacheMisses(
-                    parent.getStatValueAsLong(parent.getMeasurementTitlePrefix(), "helperThreadL2CacheRequestProfilingHelper/numMainThreadL2CacheMisses", 0)
-            );
-
-            summary.setNumHelperThreadL2CacheHits(
-                    parent.getStatValueAsLong(parent.getMeasurementTitlePrefix(), "helperThreadL2CacheRequestProfilingHelper/numHelperThreadL2CacheHits", 0)
-            );
-            summary.setNumHelperThreadL2CacheMisses(
-                    parent.getStatValueAsLong(parent.getMeasurementTitlePrefix(), "helperThreadL2CacheRequestProfilingHelper/numHelperThreadL2CacheMisses", 0)
+            summary.setNumMainThreadL2Misses(
+                    parent.getStatValueAsLong(parent.getMeasurementTitlePrefix(), "helperThreadL2RequestProfilingHelper/numMainThreadL2Misses", 0)
             );
 
-            summary.setNumL2CacheEvictions(
+            summary.setNumHelperThreadL2Hits(
+                    parent.getStatValueAsLong(parent.getMeasurementTitlePrefix(), "helperThreadL2RequestProfilingHelper/numHelperThreadL2Hits", 0)
+            );
+            summary.setNumHelperThreadL2Misses(
+                    parent.getStatValueAsLong(parent.getMeasurementTitlePrefix(), "helperThreadL2RequestProfilingHelper/numHelperThreadL2Misses", 0)
+            );
+
+            summary.setNumL2Evictions(
                     parent.getStatValueAsLong(parent.getMeasurementTitlePrefix(), "l2/numEvictions", 0)
             );
 
-            summary.setL2CacheHitRatio(
+            summary.setL2HitRatio(
                     parent.getStatValueAsDouble(parent.getMeasurementTitlePrefix(), "l2/hitRatio", 0)
             );
 
-            summary.setL2CacheOccupancyRatio(
+            summary.setL2OccupancyRatio(
                     parent.getStatValueAsDouble(parent.getMeasurementTitlePrefix(), "l2/occupancyRatio", 0)
             );
 
-            summary.setHelperThreadL2CacheRequestCoverage(
+            summary.setHelperThreadL2RequestCoverage(
                     helperThreadEnabled ? parent.getStatValueAsDouble(parent.getMeasurementTitlePrefix(),
-                            "helperThreadL2CacheRequestProfilingHelper/helperThreadL2CacheRequestCoverage", 0.0f) : 0.0f
+                            "helperThreadL2RequestProfilingHelper/helperThreadL2RequestCoverage", 0.0f) : 0.0f
             );
 
-            summary.setHelperThreadL2CacheRequestAccuracy(
+            summary.setHelperThreadL2RequestAccuracy(
                     helperThreadEnabled ? parent.getStatValueAsDouble(parent.getMeasurementTitlePrefix(),
-                            "helperThreadL2CacheRequestProfilingHelper/helperThreadL2CacheRequestAccuracy", 0.0f) : 0.0f
+                            "helperThreadL2RequestProfilingHelper/helperThreadL2RequestAccuracy", 0.0f) : 0.0f
             );
 
-            summary.setHelperThreadL2CacheRequestLateness(
+            summary.setHelperThreadL2RequestLateness(
                     helperThreadEnabled ? parent.getStatValueAsDouble(parent.getMeasurementTitlePrefix(),
-                            "helperThreadL2CacheRequestProfilingHelper/helperThreadL2CacheRequestLateness", 0.0f) : 0.0f
+                            "helperThreadL2RequestProfilingHelper/helperThreadL2RequestLateness", 0.0f) : 0.0f
             );
 
-            summary.setHelperThreadL2CacheRequestPollution(
+            summary.setHelperThreadL2RequestPollution(
                     helperThreadEnabled ? parent.getStatValueAsDouble(parent.getMeasurementTitlePrefix(),
-                            "helperThreadL2CacheRequestProfilingHelper/helperThreadL2CacheRequestPollution", 0.0f) : 0.0f
+                            "helperThreadL2RequestProfilingHelper/helperThreadL2RequestPollution", 0.0f) : 0.0f
             );
 
-            summary.setHelperThreadL2CacheRequestRedundancy(
+            summary.setHelperThreadL2RequestRedundancy(
                     helperThreadEnabled ? parent.getStatValueAsDouble(parent.getMeasurementTitlePrefix(),
-                            "helperThreadL2CacheRequestProfilingHelper/helperThreadL2CacheRequestRedundancy", 0.0f) : 0.0f
+                            "helperThreadL2RequestProfilingHelper/helperThreadL2RequestRedundancy", 0.0f) : 0.0f
             );
 
-            summary.setNumLateHelperThreadL2CacheRequests(
+            summary.setNumLateHelperThreadL2Requests(
                     helperThreadEnabled ? parent.getStatValueAsLong(parent.getMeasurementTitlePrefix(),
-                            "helperThreadL2CacheRequestProfilingHelper/numLateHelperThreadL2CacheRequests", 0) : 0
+                            "helperThreadL2RequestProfilingHelper/numLateHelperThreadL2Requests", 0) : 0
             );
 
-            summary.setNumTimelyHelperThreadL2CacheRequests(
+            summary.setNumTimelyHelperThreadL2Requests(
                     helperThreadEnabled ? parent.getStatValueAsLong(parent.getMeasurementTitlePrefix(),
-                            "helperThreadL2CacheRequestProfilingHelper/numTimelyHelperThreadL2CacheRequests", 0) : 0
+                            "helperThreadL2RequestProfilingHelper/numTimelyHelperThreadL2Requests", 0) : 0
             );
 
-            summary.setNumBadHelperThreadL2CacheRequests(
+            summary.setNumBadHelperThreadL2Requests(
                     helperThreadEnabled ? parent.getStatValueAsLong(parent.getMeasurementTitlePrefix(),
-                            "helperThreadL2CacheRequestProfilingHelper/numBadHelperThreadL2CacheRequests", 0) : 0
+                            "helperThreadL2RequestProfilingHelper/numBadHelperThreadL2Requests", 0) : 0
             );
 
-            summary.setNumEarlyHelperThreadL2CacheRequests(
+            summary.setNumEarlyHelperThreadL2Requests(
                     helperThreadEnabled ? parent.getStatValueAsLong(parent.getMeasurementTitlePrefix(),
-                            "helperThreadL2CacheRequestProfilingHelper/numEarlyHelperThreadL2CacheRequests", 0) : 0
+                            "helperThreadL2RequestProfilingHelper/numEarlyHelperThreadL2Requests", 0) : 0
             );
 
-            summary.setNumUglyHelperThreadL2CacheRequests(
+            summary.setNumUglyHelperThreadL2Requests(
                     helperThreadEnabled ? parent.getStatValueAsLong(parent.getMeasurementTitlePrefix(),
-                            "helperThreadL2CacheRequestProfilingHelper/numUglyHelperThreadL2CacheRequests", 0) : 0
+                            "helperThreadL2RequestProfilingHelper/numUglyHelperThreadL2Requests", 0) : 0
             );
 
-            summary.setNumRedundantHitToTransientTagHelperThreadL2CacheRequests(
+            summary.setNumRedundantHitToTransientTagHelperThreadL2Requests(
                     helperThreadEnabled ? parent.getStatValueAsLong(parent.getMeasurementTitlePrefix(),
-                            "helperThreadL2CacheRequestProfilingHelper/numRedundantHitToTransientTagHelperThreadL2CacheRequests", 0) : 0
+                            "helperThreadL2RequestProfilingHelper/numRedundantHitToTransientTagHelperThreadL2Requests", 0) : 0
             );
 
-            summary.setNumRedundantHitToCacheHelperThreadL2CacheRequests(
+            summary.setNumRedundantHitToCacheHelperThreadL2Requests(
                     helperThreadEnabled ? parent.getStatValueAsLong(parent.getMeasurementTitlePrefix(),
-                            "helperThreadL2CacheRequestProfilingHelper/numRedundantHitToCacheHelperThreadL2CacheRequests", 0) : 0
+                            "helperThreadL2RequestProfilingHelper/numRedundantHitToCacheHelperThreadL2Requests", 0) : 0
             );
 
             this.addItem(this.summaries, summary);
@@ -496,29 +496,29 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
                     add(summary.getC1t0Ipc() + "");
                     add(summary.getCpi() + "");
 
-                    add(summary.getNumMainThreadL2CacheHits() + "");
-                    add(summary.getNumMainThreadL2CacheMisses() + "");
+                    add(summary.getNumMainThreadL2Hits() + "");
+                    add(summary.getNumMainThreadL2Misses() + "");
 
-                    add(summary.getNumHelperThreadL2CacheHits() + "");
-                    add(summary.getNumHelperThreadL2CacheMisses() + "");
+                    add(summary.getNumHelperThreadL2Hits() + "");
+                    add(summary.getNumHelperThreadL2Misses() + "");
 
-                    add(summary.getNumL2CacheEvictions() + "");
-                    add(summary.getL2CacheHitRatio() + "");
-                    add(summary.getL2CacheOccupancyRatio() + "");
+                    add(summary.getNumL2Evictions() + "");
+                    add(summary.getL2HitRatio() + "");
+                    add(summary.getL2OccupancyRatio() + "");
 
-                    add(summary.getHelperThreadL2CacheRequestCoverage() + "");
-                    add(summary.getHelperThreadL2CacheRequestAccuracy() + "");
-                    add(summary.getHelperThreadL2CacheRequestLateness() + "");
-                    add(summary.getHelperThreadL2CacheRequestPollution() + "");
-                    add(summary.getHelperThreadL2CacheRequestRedundancy() + "");
+                    add(summary.getHelperThreadL2RequestCoverage() + "");
+                    add(summary.getHelperThreadL2RequestAccuracy() + "");
+                    add(summary.getHelperThreadL2RequestLateness() + "");
+                    add(summary.getHelperThreadL2RequestPollution() + "");
+                    add(summary.getHelperThreadL2RequestRedundancy() + "");
 
-                    add(summary.getNumLateHelperThreadL2CacheRequests() + "");
-                    add(summary.getNumTimelyHelperThreadL2CacheRequests() + "");
-                    add(summary.getNumBadHelperThreadL2CacheRequests() + "");
-                    add(summary.getNumEarlyHelperThreadL2CacheRequests() + "");
-                    add(summary.getNumUglyHelperThreadL2CacheRequests() + "");
-                    add(summary.getNumRedundantHitToTransientTagHelperThreadL2CacheRequests() + "");
-                    add(summary.getNumRedundantHitToCacheHelperThreadL2CacheRequests() + "");
+                    add(summary.getNumLateHelperThreadL2Requests() + "");
+                    add(summary.getNumTimelyHelperThreadL2Requests() + "");
+                    add(summary.getNumBadHelperThreadL2Requests() + "");
+                    add(summary.getNumEarlyHelperThreadL2Requests() + "");
+                    add(summary.getNumUglyHelperThreadL2Requests() + "");
+                    add(summary.getNumRedundantHitToTransientTagHelperThreadL2Requests() + "");
+                    add(summary.getNumRedundantHitToCacheHelperThreadL2Requests() + "");
                 }});
             }
         }});

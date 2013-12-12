@@ -24,7 +24,7 @@ import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.common.report.Reportable;
 import archimulator.sim.core.Thread;
 import archimulator.sim.core.event.DynamicInstructionCommittedEvent;
-import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestProfilingHelper;
+import archimulator.sim.uncore.helperThread.HelperThreadL2RequestProfilingHelper;
 import archimulator.sim.uncore.helperThread.HelperThreadingHelper;
 import archimulator.sim.uncore.mlp.BLPProfilingHelper;
 import archimulator.sim.uncore.mlp.MLPProfilingHelper;
@@ -45,29 +45,29 @@ public class IntervalHelper implements Reportable {
         private long numMainThreadDynamicInstructionsCommitted;
         private long numHelperThreadDynamicInstructionsCommitted;
 
-        private long numMainThreadL2CacheHits;
-        private long numMainThreadL2CacheMisses;
+        private long numMainThreadL2Hits;
+        private long numMainThreadL2Misses;
 
-        private long numHelperThreadL2CacheHits;
-        private long numHelperThreadL2CacheMisses;
+        private long numHelperThreadL2Hits;
+        private long numHelperThreadL2Misses;
 
-        private long numRedundantHitToTransientTagHelperThreadL2CacheRequests;
-        private long numRedundantHitToCacheHelperThreadL2CacheRequests;
+        private long numRedundantHitToTransientTagHelperThreadL2Requests;
+        private long numRedundantHitToCacheHelperThreadL2Requests;
 
-        private long numTimelyHelperThreadL2CacheRequests;
-        private long numLateHelperThreadL2CacheRequests;
+        private long numTimelyHelperThreadL2Requests;
+        private long numLateHelperThreadL2Requests;
 
-        private long numBadHelperThreadL2CacheRequests;
+        private long numBadHelperThreadL2Requests;
 
-        private long numEarlyHelperThreadL2CacheRequests;
+        private long numEarlyHelperThreadL2Requests;
 
-        private long numUglyHelperThreadL2CacheRequests;
+        private long numUglyHelperThreadL2Requests;
 
-        private double helperThreadL2CacheRequestAccuracy;
-        private double helperThreadL2CacheRequestRedundancy;
-        private double helperThreadL2CacheRequestEarliness;
-        private double helperThreadL2CacheRequestLateness;
-        private double helperThreadL2CacheRequestPollution;
+        private double helperThreadL2RequestAccuracy;
+        private double helperThreadL2RequestRedundancy;
+        private double helperThreadL2RequestEarliness;
+        private double helperThreadL2RequestLateness;
+        private double helperThreadL2RequestPollution;
 
         private double mainThreadIpc;
         private double helperThreadIpc;
@@ -88,14 +88,14 @@ public class IntervalHelper implements Reportable {
          * Handle when this interval is completed.
          */
         public void onCompleted() {
-            long numTotalHelperThreadL2CacheRequests = numHelperThreadL2CacheHits + numHelperThreadL2CacheMisses;
-            long numUsefulHelperThreadL2CacheRequests = numTimelyHelperThreadL2CacheRequests + numLateHelperThreadL2CacheRequests;
+            long numTotalHelperThreadL2Requests = numHelperThreadL2Hits + numHelperThreadL2Misses;
+            long numUsefulHelperThreadL2Requests = numTimelyHelperThreadL2Requests + numLateHelperThreadL2Requests;
 
-            helperThreadL2CacheRequestAccuracy = (double) numUsefulHelperThreadL2CacheRequests / numTotalHelperThreadL2CacheRequests;
-            helperThreadL2CacheRequestRedundancy = (double) (numRedundantHitToTransientTagHelperThreadL2CacheRequests + numRedundantHitToCacheHelperThreadL2CacheRequests) / numUsefulHelperThreadL2CacheRequests;
-            helperThreadL2CacheRequestEarliness = (double) numUglyHelperThreadL2CacheRequests / numUsefulHelperThreadL2CacheRequests;
-            helperThreadL2CacheRequestLateness = (double) numLateHelperThreadL2CacheRequests / numUsefulHelperThreadL2CacheRequests;
-            helperThreadL2CacheRequestPollution = (double) numBadHelperThreadL2CacheRequests / numUsefulHelperThreadL2CacheRequests;
+            helperThreadL2RequestAccuracy = (double) numUsefulHelperThreadL2Requests / numTotalHelperThreadL2Requests;
+            helperThreadL2RequestRedundancy = (double) (numRedundantHitToTransientTagHelperThreadL2Requests + numRedundantHitToCacheHelperThreadL2Requests) / numUsefulHelperThreadL2Requests;
+            helperThreadL2RequestEarliness = (double) numUglyHelperThreadL2Requests / numUsefulHelperThreadL2Requests;
+            helperThreadL2RequestLateness = (double) numLateHelperThreadL2Requests / numUsefulHelperThreadL2Requests;
+            helperThreadL2RequestPollution = (double) numBadHelperThreadL2Requests / numUsefulHelperThreadL2Requests;
 
             mainThreadIpc = (double) numMainThreadDynamicInstructionsCommitted / numCyclesElapsedPerInterval;
             helperThreadIpc = (double) numHelperThreadDynamicInstructionsCommitted / numCyclesElapsedPerInterval;
@@ -103,8 +103,8 @@ public class IntervalHelper implements Reportable {
             mainThreadCpi = (double) numCyclesElapsedPerInterval / numMainThreadDynamicInstructionsCommitted;
             helperThreadCpi = (double) numCyclesElapsedPerInterval / numHelperThreadDynamicInstructionsCommitted;
 
-            mainThreadMpki = (double) numMainThreadL2CacheMisses / ((double) numMainThreadDynamicInstructionsCommitted / 1000);
-            helperThreadMpki = (double) numHelperThreadL2CacheMisses / ((double) numHelperThreadDynamicInstructionsCommitted / 1000);
+            mainThreadMpki = (double) numMainThreadL2Misses / ((double) numMainThreadDynamicInstructionsCommitted / 1000);
+            helperThreadMpki = (double) numHelperThreadL2Misses / ((double) numHelperThreadDynamicInstructionsCommitted / 1000);
         }
     }
 
@@ -152,44 +152,44 @@ public class IntervalHelper implements Reportable {
             }
         });
 
-        simulation.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.MainThreadL2CacheHitEvent.class, event -> {
-            currentInterval.numMainThreadL2CacheHits++;
+        simulation.getBlockingEventDispatcher().addListener(HelperThreadL2RequestProfilingHelper.MainThreadL2HitEvent.class, event -> {
+            currentInterval.numMainThreadL2Hits++;
         });
 
-        simulation.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.MainThreadL2CacheMissEvent.class, event -> {
-            currentInterval.numMainThreadL2CacheMisses++;
+        simulation.getBlockingEventDispatcher().addListener(HelperThreadL2RequestProfilingHelper.MainThreadL2MissEvent.class, event -> {
+            currentInterval.numMainThreadL2Misses++;
         });
 
-        simulation.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.HelperThreadL2CacheHitEvent.class, event -> {
-            currentInterval.numHelperThreadL2CacheHits++;
+        simulation.getBlockingEventDispatcher().addListener(HelperThreadL2RequestProfilingHelper.HelperThreadL2HitEvent.class, event -> {
+            currentInterval.numHelperThreadL2Hits++;
         });
 
-        simulation.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.HelperThreadL2CacheMissEvent.class, event -> {
-            currentInterval.numHelperThreadL2CacheMisses++;
+        simulation.getBlockingEventDispatcher().addListener(HelperThreadL2RequestProfilingHelper.HelperThreadL2MissEvent.class, event -> {
+            currentInterval.numHelperThreadL2Misses++;
         });
 
-        simulation.getBlockingEventDispatcher().addListener(HelperThreadL2CacheRequestProfilingHelper.HelperThreadL2CacheRequestEvent.class, event -> {
+        simulation.getBlockingEventDispatcher().addListener(HelperThreadL2RequestProfilingHelper.HelperThreadL2RequestEvent.class, event -> {
             switch (event.getQuality()) {
                 case REDUNDANT_HIT_TO_TRANSIENT_TAG:
-                    currentInterval.numRedundantHitToTransientTagHelperThreadL2CacheRequests++;
+                    currentInterval.numRedundantHitToTransientTagHelperThreadL2Requests++;
                     break;
                 case REDUNDANT_HIT_TO_CACHE:
-                    currentInterval.numRedundantHitToCacheHelperThreadL2CacheRequests++;
+                    currentInterval.numRedundantHitToCacheHelperThreadL2Requests++;
                     break;
                 case TIMELY:
-                    currentInterval.numTimelyHelperThreadL2CacheRequests++;
+                    currentInterval.numTimelyHelperThreadL2Requests++;
                     break;
                 case LATE:
-                    currentInterval.numLateHelperThreadL2CacheRequests++;
+                    currentInterval.numLateHelperThreadL2Requests++;
                     break;
                 case BAD:
-                    currentInterval.numBadHelperThreadL2CacheRequests++;
+                    currentInterval.numBadHelperThreadL2Requests++;
                     break;
                 case EARLY:
-                    currentInterval.numEarlyHelperThreadL2CacheRequests++;
+                    currentInterval.numEarlyHelperThreadL2Requests++;
                     break;
                 case UGLY:
-                    currentInterval.numUglyHelperThreadL2CacheRequests++;
+                    currentInterval.numUglyHelperThreadL2Requests++;
                     break;
                 default:
                     throw new IllegalArgumentException();
@@ -215,29 +215,29 @@ public class IntervalHelper implements Reportable {
                 getChildren().add(new ReportNode(this, "numMainThreadDynamicInstructionsCommitted[" + i + "]", interval.numMainThreadDynamicInstructionsCommitted + ""));
                 getChildren().add(new ReportNode(this, "numHelperThreadDynamicInstructionsCommitted[" + i + "]", interval.numHelperThreadDynamicInstructionsCommitted + ""));
 
-                getChildren().add(new ReportNode(this, "numMainThreadL2CacheHits[" + i + "]", interval.numMainThreadL2CacheHits + ""));
-                getChildren().add(new ReportNode(this, "numMainThreadL2CacheMisses[" + i + "]", interval.numMainThreadL2CacheMisses + ""));
+                getChildren().add(new ReportNode(this, "numMainThreadL2Hits[" + i + "]", interval.numMainThreadL2Hits + ""));
+                getChildren().add(new ReportNode(this, "numMainThreadL2Misses[" + i + "]", interval.numMainThreadL2Misses + ""));
 
-                getChildren().add(new ReportNode(this, "numHelperThreadL2CacheHits[" + i + "]", interval.numHelperThreadL2CacheHits + ""));
-                getChildren().add(new ReportNode(this, "numHelperThreadL2CacheMisses[" + i + "]", interval.numHelperThreadL2CacheMisses + ""));
+                getChildren().add(new ReportNode(this, "numHelperThreadL2Hits[" + i + "]", interval.numHelperThreadL2Hits + ""));
+                getChildren().add(new ReportNode(this, "numHelperThreadL2Misses[" + i + "]", interval.numHelperThreadL2Misses + ""));
 
-                getChildren().add(new ReportNode(this, "numRedundantHitToTransientTagHelperThreadL2CacheRequests[" + i + "]", interval.numRedundantHitToTransientTagHelperThreadL2CacheRequests + ""));
-                getChildren().add(new ReportNode(this, "numRedundantHitToCacheHelperThreadL2CacheRequests[" + i + "]", interval.numRedundantHitToCacheHelperThreadL2CacheRequests + ""));
+                getChildren().add(new ReportNode(this, "numRedundantHitToTransientTagHelperThreadL2Requests[" + i + "]", interval.numRedundantHitToTransientTagHelperThreadL2Requests + ""));
+                getChildren().add(new ReportNode(this, "numRedundantHitToCacheHelperThreadL2Requests[" + i + "]", interval.numRedundantHitToCacheHelperThreadL2Requests + ""));
 
-                getChildren().add(new ReportNode(this, "numTimelyHelperThreadL2CacheRequests[" + i + "]", interval.numTimelyHelperThreadL2CacheRequests + ""));
-                getChildren().add(new ReportNode(this, "numLateHelperThreadL2CacheRequests[" + i + "]", interval.numLateHelperThreadL2CacheRequests + ""));
+                getChildren().add(new ReportNode(this, "numTimelyHelperThreadL2Requests[" + i + "]", interval.numTimelyHelperThreadL2Requests + ""));
+                getChildren().add(new ReportNode(this, "numLateHelperThreadL2Requests[" + i + "]", interval.numLateHelperThreadL2Requests + ""));
 
-                getChildren().add(new ReportNode(this, "numBadHelperThreadL2CacheRequests[" + i + "]", interval.numBadHelperThreadL2CacheRequests + ""));
+                getChildren().add(new ReportNode(this, "numBadHelperThreadL2Requests[" + i + "]", interval.numBadHelperThreadL2Requests + ""));
 
-                getChildren().add(new ReportNode(this, "numEarlyHelperThreadL2CacheRequests[" + i + "]", interval.numEarlyHelperThreadL2CacheRequests + ""));
+                getChildren().add(new ReportNode(this, "numEarlyHelperThreadL2Requests[" + i + "]", interval.numEarlyHelperThreadL2Requests + ""));
 
-                getChildren().add(new ReportNode(this, "numUglyHelperThreadL2CacheRequests[" + i + "]", interval.numUglyHelperThreadL2CacheRequests + ""));
+                getChildren().add(new ReportNode(this, "numUglyHelperThreadL2Requests[" + i + "]", interval.numUglyHelperThreadL2Requests + ""));
 
-                getChildren().add(new ReportNode(this, "helperThreadL2CacheRequestAccuracy[" + i + "]", interval.helperThreadL2CacheRequestAccuracy + ""));
-                getChildren().add(new ReportNode(this, "helperThreadL2CacheRequestRedundancy[" + i + "]", interval.helperThreadL2CacheRequestRedundancy + ""));
-                getChildren().add(new ReportNode(this, "helperThreadL2CacheRequestEarliness[" + i + "]", interval.helperThreadL2CacheRequestEarliness + ""));
-                getChildren().add(new ReportNode(this, "helperThreadL2CacheRequestLateness[" + i + "]", interval.helperThreadL2CacheRequestLateness + ""));
-                getChildren().add(new ReportNode(this, "helperThreadL2CacheRequestPollution[" + i + "]", interval.helperThreadL2CacheRequestPollution + ""));
+                getChildren().add(new ReportNode(this, "helperThreadL2RequestAccuracy[" + i + "]", interval.helperThreadL2RequestAccuracy + ""));
+                getChildren().add(new ReportNode(this, "helperThreadL2RequestRedundancy[" + i + "]", interval.helperThreadL2RequestRedundancy + ""));
+                getChildren().add(new ReportNode(this, "helperThreadL2RequestEarliness[" + i + "]", interval.helperThreadL2RequestEarliness + ""));
+                getChildren().add(new ReportNode(this, "helperThreadL2RequestLateness[" + i + "]", interval.helperThreadL2RequestLateness + ""));
+                getChildren().add(new ReportNode(this, "helperThreadL2RequestPollution[" + i + "]", interval.helperThreadL2RequestPollution + ""));
 
                 getChildren().add(new ReportNode(this, "mainThreadIpc[" + i + "]", interval.mainThreadIpc + ""));
                 getChildren().add(new ReportNode(this, "helperThreadIpc[" + i + "]", interval.helperThreadIpc + ""));

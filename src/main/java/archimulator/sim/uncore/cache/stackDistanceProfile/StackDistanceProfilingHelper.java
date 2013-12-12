@@ -38,9 +38,9 @@ import java.util.TreeMap;
  * @author Min Cai
  */
 public class StackDistanceProfilingHelper implements Reportable {
-    private DirectoryController l2CacheController;
-    private Map<Integer, Stack<Integer>> l2CacheLruStacks;
-    private StackDistanceProfile l2CacheStackDistanceProfile;
+    private DirectoryController l2Controller;
+    private Map<Integer, Stack<Integer>> l2LruStacks;
+    private StackDistanceProfile l2StackDistanceProfile;
 
     /**
      * Create a stack distance profiling helper.
@@ -48,12 +48,12 @@ public class StackDistanceProfilingHelper implements Reportable {
      * @param simulation the simulation
      */
     public StackDistanceProfilingHelper(Simulation simulation) {
-        this.l2CacheController = simulation.getProcessor().getMemoryHierarchy().getL2CacheController();
-        this.l2CacheLruStacks = new TreeMap<>();
-        this.l2CacheStackDistanceProfile = new StackDistanceProfile(this.l2CacheController.getCache().getAssociativity());
+        this.l2Controller = simulation.getProcessor().getMemoryHierarchy().getL2Controller();
+        this.l2LruStacks = new TreeMap<>();
+        this.l2StackDistanceProfile = new StackDistanceProfile(this.l2Controller.getCache().getAssociativity());
 
         simulation.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, event -> {
-            if (event.getCacheController() == l2CacheController) {
+            if (event.getCacheController() == l2Controller) {
                 profileStackDistance(event.isHitInCache(), event.getWay(), event.getAccess());
             }
         });
@@ -68,7 +68,7 @@ public class StackDistanceProfilingHelper implements Reportable {
      */
     private void profileStackDistance(boolean hitInCache, int way, MemoryHierarchyAccess access) {
         int tag = access.getPhysicalTag();
-        int set = this.l2CacheController.getCache().getSet(tag);
+        int set = this.l2Controller.getCache().getSet(tag);
 
         Stack<Integer> lruStack = getLruStack(set);
 
@@ -81,16 +81,16 @@ public class StackDistanceProfilingHelper implements Reportable {
 
         lruStack.push(tag);
 
-        if (lruStack.size() > this.l2CacheController.getCache().getAssociativity()) {
+        if (lruStack.size() > this.l2Controller.getCache().getAssociativity()) {
             lruStack.remove(lruStack.size() - 1);
         }
 
-        this.l2CacheController.getBlockingEventDispatcher().dispatch(new StackDistanceProfiledEvent(this.l2CacheController, access, hitInCache, set, way, stackDistance));
+        this.l2Controller.getBlockingEventDispatcher().dispatch(new StackDistanceProfiledEvent(this.l2Controller, access, hitInCache, set, way, stackDistance));
 
         if (stackDistance == -1) {
-            this.l2CacheStackDistanceProfile.incrementMissCounter();
+            this.l2StackDistanceProfile.incrementMissCounter();
         } else {
-            this.l2CacheStackDistanceProfile.incrementHitCounter(stackDistance);
+            this.l2StackDistanceProfile.incrementHitCounter(stackDistance);
         }
     }
 
@@ -98,8 +98,8 @@ public class StackDistanceProfilingHelper implements Reportable {
     public void dumpStats(ReportNode reportNode) {
         reportNode.getChildren().add(new ReportNode(reportNode, "stackDistanceProfilingHelper") {
             {
-                getChildren().add(new ReportNode(this, "l2CacheStackDistanceProfile/hitCounters", getL2CacheStackDistanceProfile().getHitCounters() + ""));
-                getChildren().add(new ReportNode(this, "l2CacheStackDistanceProfile/missCounter", getL2CacheStackDistanceProfile().getMissCounter() + ""));
+                getChildren().add(new ReportNode(this, "l2StackDistanceProfile/hitCounters", getL2StackDistanceProfile().getHitCounters() + ""));
+                getChildren().add(new ReportNode(this, "l2StackDistanceProfile/missCounter", getL2StackDistanceProfile().getMissCounter() + ""));
                 getChildren().add(new ReportNode(this, "assumedNumMissesDistribution", getAssumedNumMissesDistribution() + ""));
             }
         });
@@ -112,11 +112,11 @@ public class StackDistanceProfilingHelper implements Reportable {
      * @return the LRU stack for the specified set in the L2 cache
      */
     private Stack<Integer> getLruStack(int set) {
-        if (!this.l2CacheLruStacks.containsKey(set)) {
-            this.l2CacheLruStacks.put(set, new Stack<>());
+        if (!this.l2LruStacks.containsKey(set)) {
+            this.l2LruStacks.put(set, new Stack<>());
         }
 
-        return this.l2CacheLruStacks.get(set);
+        return this.l2LruStacks.get(set);
     }
 
     /**
@@ -126,17 +126,17 @@ public class StackDistanceProfilingHelper implements Reportable {
      * @return the number of misses for the assumed associativity
      */
     public int getAssumedNumMisses(int associativity) {
-        if (associativity > this.l2CacheController.getCache().getAssociativity()) {
+        if (associativity > this.l2Controller.getCache().getAssociativity()) {
             throw new IllegalArgumentException();
         }
 
         int numMisses = 0;
 
-        for (int i = associativity - 1; i < this.l2CacheController.getCache().getAssociativity(); i++) {
-            numMisses += this.l2CacheStackDistanceProfile.getHitCounters().get(i);
+        for (int i = associativity - 1; i < this.l2Controller.getCache().getAssociativity(); i++) {
+            numMisses += this.l2StackDistanceProfile.getHitCounters().get(i);
         }
 
-        numMisses += this.l2CacheStackDistanceProfile.getMissCounter();
+        numMisses += this.l2StackDistanceProfile.getMissCounter();
 
         return numMisses;
     }
@@ -149,7 +149,7 @@ public class StackDistanceProfilingHelper implements Reportable {
     public Map<Integer, Integer> getAssumedNumMissesDistribution() {
         Map<Integer, Integer> result = new LinkedHashMap<>();
 
-        for (int associativity = 1; associativity <= this.l2CacheController.getCache().getAssociativity(); associativity++) {
+        for (int associativity = 1; associativity <= this.l2Controller.getCache().getAssociativity(); associativity++) {
             result.put(associativity, this.getAssumedNumMisses(associativity));
         }
 
@@ -161,8 +161,8 @@ public class StackDistanceProfilingHelper implements Reportable {
      *
      * @return the stack distance profile for the L2 cache
      */
-    public StackDistanceProfile getL2CacheStackDistanceProfile() {
-        return l2CacheStackDistanceProfile;
+    public StackDistanceProfile getL2StackDistanceProfile() {
+        return l2StackDistanceProfile;
     }
 
     /**

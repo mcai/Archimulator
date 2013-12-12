@@ -27,14 +27,14 @@ import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
  *
  * @author Min Cai
  */
-public class L1ICacheController extends CacheController {
+public class L1IController extends CacheController {
     /**
      * Create an L1I cache controller.
      *
      * @param memoryHierarchy the parent memory hierarchy
      * @param name            the name
      */
-    public L1ICacheController(MemoryHierarchy memoryHierarchy, String name) {
+    public L1IController(MemoryHierarchy memoryHierarchy, String name) {
         super(memoryHierarchy, name);
     }
 

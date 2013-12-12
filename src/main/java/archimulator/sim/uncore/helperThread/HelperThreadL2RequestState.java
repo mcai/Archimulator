@@ -25,7 +25,7 @@ import archimulator.sim.uncore.cache.CacheLine;
  *
  * @author Min Cai
  */
-public class HelperThreadL2CacheRequestState {
+public class HelperThreadL2RequestState {
     private int inFlightThreadId;
     private int threadId;
     private int pc;
@@ -39,7 +39,7 @@ public class HelperThreadL2CacheRequestState {
     /**
      * Create a helper thread L2 cache request state.
      */
-    public HelperThreadL2CacheRequestState() {
+    public HelperThreadL2RequestState() {
         this.inFlightThreadId = -1;
         this.threadId = -1;
         this.pc = -1;
@@ -196,6 +196,6 @@ public class HelperThreadL2CacheRequestState {
 
     @Override
     public String toString() {
-        return String.format("HelperThreadL2CacheRequestState{inFlightThreadId=%d, threadId=%d, pc=0x%08x, used=%s, hitToTransientTag=%s, victimThreadId=%d, victimPc=0x%08x, victimTag=0x%08x}", inFlightThreadId, threadId, pc, used, hitToTransientTag, victimThreadId, victimPc, victimTag);
+        return String.format("HelperThreadL2RequestState{inFlightThreadId=%d, threadId=%d, pc=0x%08x, used=%s, hitToTransientTag=%s, victimThreadId=%d, victimPc=0x%08x, victimTag=0x%08x}", inFlightThreadId, threadId, pc, used, hitToTransientTag, victimThreadId, victimPc, victimTag);
     }
 }

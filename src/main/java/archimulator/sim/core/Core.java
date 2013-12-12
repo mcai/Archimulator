@@ -213,28 +213,28 @@ public interface Core extends SimulationObject, Reportable {
      *
      * @return the L1I cache controller
      */
-    CacheController getL1ICacheController();
+    CacheController getL1IController();
 
     /**
      * Set the L1I cache controller.
      *
-     * @param l1ICacheController the L1I cache controller
+     * @param l1IController the L1I cache controller
      */
-    void setL1ICacheController(CacheController l1ICacheController);
+    void setL1IController(CacheController l1IController);
 
     /**
      * Get the L1D cache controller.
      *
      * @return the L1D cache controller
      */
-    CacheController getL1DCacheController();
+    CacheController getL1DController();
 
     /**
      * Set the L1D cache controller.
      *
-     * @param l1DCacheController the L1D cache controller
+     * @param l1DController the L1D cache controller
      */
-    void setL1DCacheController(CacheController l1DCacheController);
+    void setL1DController(CacheController l1DController);
 
     /**
      * Get the number of instructions executed on all the threads.

@@ -64,7 +64,7 @@ public class DelinquentLoadIdentificationTable {
                         }
                     }
 
-                    if (!delinquentLoadFound && event.getDynamicInstruction().isMissedInL2Cache() && delinquentLoads.size() < CAPACITY) {
+                    if (!delinquentLoadFound && event.getDynamicInstruction().isMissedInL2() && delinquentLoads.size() < CAPACITY) {
                         DelinquentLoad delinquentLoad = new DelinquentLoad(event.getDynamicInstruction().getPc(), functionCallContextStack.peek().getPc());
                         delinquentLoad.setNumExecutions(1);
                         delinquentLoad.setNumCyclesSpentAtHeadOfReorderBuffer(event.getDynamicInstruction().getNumCyclesSpentAtHeadOfReorderBuffer());
@@ -96,7 +96,7 @@ public class DelinquentLoadIdentificationTable {
         thread.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, event -> {
             if (!event.isHitInCache() && event.getAccess().getThread() == DelinquentLoadIdentificationTable.this.thread && event.getCacheController() instanceof DirectoryController && event.getAccess().getType().isRead()) {
                 if (event.getAccess().getDynamicInstruction() != null) {
-                    event.getAccess().getDynamicInstruction().setMissedInL2Cache(true);
+                    event.getAccess().getDynamicInstruction().setMissedInL2(true);
                 }
             }
         });

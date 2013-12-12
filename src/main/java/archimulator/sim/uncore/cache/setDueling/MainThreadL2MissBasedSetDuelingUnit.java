@@ -19,7 +19,7 @@
 package archimulator.sim.uncore.cache.setDueling;
 
 import archimulator.sim.uncore.cache.Cache;
-import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestProfilingHelper;
+import archimulator.sim.uncore.helperThread.HelperThreadL2RequestProfilingHelper;
 
 /**
  * Main thread L2 miss based Set dueling unit.
@@ -42,7 +42,7 @@ public class MainThreadL2MissBasedSetDuelingUnit extends SaturatingCounterBasedS
         super(cache, 1, numSetDuelingMonitorsPerThread, numSetsPerSetDuelingMonitor);
 
         cache.getBlockingEventDispatcher().addListener(
-                HelperThreadL2CacheRequestProfilingHelper.MainThreadL2CacheMissEvent.class,
+                HelperThreadL2RequestProfilingHelper.MainThreadL2MissEvent.class,
                 event -> inc(event.getSet(), 0)
         );
     }

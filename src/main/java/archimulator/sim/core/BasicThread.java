@@ -66,7 +66,7 @@ public class BasicThread extends AbstractBasicThread {
     public BasicThread(Core core, int num) {
         super(core, num);
 
-        this.lineSizeOfICache = this.core.getL1ICacheController().getCache().getGeometry().getLineSize();
+        this.lineSizeOfICache = this.core.getL1IController().getCache().getGeometry().getLineSize();
 
         final Reference<Integer> savedRegisterValue = new Reference<>(-1);
 

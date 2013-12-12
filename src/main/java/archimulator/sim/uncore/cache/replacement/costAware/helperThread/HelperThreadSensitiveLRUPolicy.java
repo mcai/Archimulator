@@ -23,7 +23,7 @@ import archimulator.sim.uncore.cache.EvictableCache;
 import archimulator.sim.uncore.cache.replacement.costAware.CostSensitiveLRUPolicy;
 import archimulator.sim.uncore.coherence.event.GeneralCacheControllerLastPutSOrPutMAndDataFromOwnerEvent;
 import archimulator.sim.uncore.coherence.event.LastLevelCacheControllerLineInsertEvent;
-import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestQuality;
+import archimulator.sim.uncore.helperThread.HelperThreadL2RequestQuality;
 import archimulator.sim.uncore.helperThread.HelperThreadingHelper;
 
 import java.io.Serializable;
@@ -48,7 +48,7 @@ public class HelperThreadSensitiveLRUPolicy<StateT extends Serializable> extends
                 event -> {
                     if (event.getAccess().getType() == MemoryHierarchyAccessType.LOAD && HelperThreadingHelper.isHelperThread(event.getAccess().getThread())) {
                         int pc = getCache().getLine(event.getSet(), event.getWay()).getAccess().getVirtualPc();
-                        HelperThreadL2CacheRequestQuality quality = getCache().getSimulation().getHelperThreadL2CacheRequestProfilingHelper().getHelperThreadL2CacheRequestQualityPredictor().predict(pc);
+                        HelperThreadL2RequestQuality quality = getCache().getSimulation().getHelperThreadL2RequestProfilingHelper().getHelperThreadL2RequestQualityPredictor().predict(pc);
                         setCost(event.getSet(), event.getWay(), getCost(quality));
                     }
                 }
@@ -75,7 +75,7 @@ public class HelperThreadSensitiveLRUPolicy<StateT extends Serializable> extends
      * @param quality the quality
      * @return the cost for the specified helper thread L2 cache request quality
      */
-    public int getCost(HelperThreadL2CacheRequestQuality quality) {
+    public int getCost(HelperThreadL2RequestQuality quality) {
         switch (quality) {
             case TIMELY:
             case LATE:

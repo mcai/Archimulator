@@ -40,7 +40,7 @@ import archimulator.sim.uncore.coherence.msi.controller.GeneralCacheController;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import archimulator.sim.uncore.delinquentLoad.DelinquentLoadIdentificationHelper;
 import archimulator.sim.uncore.helperThread.FeedbackDirectedHelperThreadingHelper;
-import archimulator.sim.uncore.helperThread.HelperThreadL2CacheRequestProfilingHelper;
+import archimulator.sim.uncore.helperThread.HelperThreadL2RequestProfilingHelper;
 import archimulator.sim.uncore.helperThread.hotspot.HotspotProfilingHelper;
 import archimulator.sim.uncore.mlp.BLPProfilingHelper;
 import archimulator.sim.uncore.mlp.MLPProfilingHelper;
@@ -97,7 +97,7 @@ public abstract class Simulation implements SimulationObject, Reportable {
 
     private HotspotProfilingHelper hotspotProfilingHelper;
 
-    private HelperThreadL2CacheRequestProfilingHelper helperThreadL2CacheRequestProfilingHelper;
+    private HelperThreadL2RequestProfilingHelper helperThreadL2RequestProfilingHelper;
 
     private CacheInteractionHelper cacheInteractionHelper;
 
@@ -189,7 +189,7 @@ public abstract class Simulation implements SimulationObject, Reportable {
 
         this.hotspotProfilingHelper = new HotspotProfilingHelper(this);
 
-        this.helperThreadL2CacheRequestProfilingHelper = new HelperThreadL2CacheRequestProfilingHelper(this);
+        this.helperThreadL2RequestProfilingHelper = new HelperThreadL2RequestProfilingHelper(this);
 
         this.cacheInteractionHelper = new CacheInteractionHelper(this);
 
@@ -300,14 +300,14 @@ public abstract class Simulation implements SimulationObject, Reportable {
         this.getStackDistanceProfilingHelper().dumpStats(rootReportNode);
         this.getReuseDistancePredictionHelper().dumpStats(rootReportNode);
         this.getHotspotProfilingHelper().dumpStats(rootReportNode);
-        this.getHelperThreadL2CacheRequestProfilingHelper().dumpStats(rootReportNode);
+        this.getHelperThreadL2RequestProfilingHelper().dumpStats(rootReportNode);
         this.getCacheInteractionHelper().dumpStats(rootReportNode);
         this.getFeedbackDirectedHelperThreadingHelper().dumpStats(rootReportNode);
         this.getDelinquentLoadIdentificationHelper().dumpStats(rootReportNode);
         this.getMlpProfilingHelper().dumpStats(rootReportNode);
         this.getIntervalHelper().dumpStats(rootReportNode);
 
-        this.getProcessor().getMemoryHierarchy().getL2CacheController().getCache().getReplacementPolicy().dumpStats(rootReportNode);
+        this.getProcessor().getMemoryHierarchy().getL2Controller().getCache().getReplacementPolicy().dumpStats(rootReportNode);
 
         rootReportNode.traverse(node -> {
             stats.add(new ExperimentStat(experiment.getId(), getPrefix(), node.getPath(), node.getValue()));
@@ -627,8 +627,8 @@ public abstract class Simulation implements SimulationObject, Reportable {
      *
      * @return the helper thread L2 cache request profiling helper
      */
-    public HelperThreadL2CacheRequestProfilingHelper getHelperThreadL2CacheRequestProfilingHelper() {
-        return helperThreadL2CacheRequestProfilingHelper;
+    public HelperThreadL2RequestProfilingHelper getHelperThreadL2RequestProfilingHelper() {
+        return helperThreadL2RequestProfilingHelper;
     }
 
     /**
