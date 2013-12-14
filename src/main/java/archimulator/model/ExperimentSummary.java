@@ -45,6 +45,9 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
     private String title;
 
     @DatabaseField
+    private String benchmarkTitle;
+
+    @DatabaseField
     private long createTime;
 
     @DatabaseField
@@ -109,6 +112,21 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
 
     @DatabaseField
     private double cpi;
+
+    @DatabaseField
+    private double c0t0Cpi;
+
+    @DatabaseField
+    private double c1t0Cpi;
+
+    @DatabaseField
+    private double l2Mpki;
+
+    @DatabaseField
+    private double c0t0L2Mpki;
+
+    @DatabaseField
+    private double c1t0L2Mpki;
 
     @DatabaseField
     private long numMainThreadL2Hits;
@@ -222,6 +240,24 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
     @Override
     public long getCreateTime() {
         return createTime;
+    }
+
+    /**
+     * Get the benchmark title.
+     *
+     * @return the benchmark title
+     */
+    public String getBenchmarkTitle() {
+        return benchmarkTitle;
+    }
+
+    /**
+     * Set the benchmark title.
+     *
+     * @param benchmarkTitle the benchmark title
+     */
+    public void setBenchmarkTitle(String benchmarkTitle) {
+        this.benchmarkTitle = benchmarkTitle;
     }
 
     /**
@@ -583,6 +619,96 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
      */
     public void setCpi(double cpi) {
         this.cpi = cpi;
+    }
+
+    /**
+     * Get the CPI value for the thread C0T0.
+     *
+     * @return the CPI value for the thread C0T0
+     */
+    public double getC0t0Cpi() {
+        return c0t0Cpi;
+    }
+
+    /**
+     * Set the CPI value for the thread C0T0.
+     *
+     * @param c0t0Cpi the CPI value for the thread C0T0.
+     */
+    public void setC0t0Cpi(double c0t0Cpi) {
+        this.c0t0Cpi = c0t0Cpi;
+    }
+
+    /**
+     * Get the CPI value for the thread C1T0.
+     *
+     * @return the CPI value for the thread C1T0
+     */
+    public double getC1t0Cpi() {
+        return c1t0Cpi;
+    }
+
+    /**
+     * Set the CPI value for the thread C1T0.
+     *
+     * @param c1t0Cpi the CPI value for the thread C1T0
+     */
+    public void setC1t0Cpi(double c1t0Cpi) {
+        this.c1t0Cpi = c1t0Cpi;
+    }
+
+    /**
+     * Get the L2 MPKI value.
+     *
+     * @return the MPKI value
+     */
+    public double getL2Mpki() {
+        return l2Mpki;
+    }
+
+    /**
+     * Set the L2 MPKI value.
+     *
+     * @param l2Mpki the MPKI value
+     */
+    public void setL2Mpki(double l2Mpki) {
+        this.l2Mpki = l2Mpki;
+    }
+
+    /**
+     * Get the L2 MPKI value for the thread C0T0.
+     *
+     * @return the L2 MPKI value for the thread C0T0
+     */
+    public double getC0t0L2Mpki() {
+        return c0t0L2Mpki;
+    }
+
+    /**
+     * Set the L2 MPKI value for the thread C0T0.
+     *
+     * @param c0t0L2Mpki the L2 MPKI value for the thread C0T0
+     */
+    public void setC0t0L2Mpki(double c0t0L2Mpki) {
+        this.c0t0L2Mpki = c0t0L2Mpki;
+    }
+
+    /**
+     * Get the L2 MPKI value for the thread C1T0.
+     *
+     * @return the L2 MPKI value for the thread C1T0
+     */
+    public double getC1t0L2Mpki() {
+        return c1t0L2Mpki;
+    }
+
+    /**
+     * Set the L2 MPKI value for the thread C1T0.
+     *
+     * @param c1t0L2Mpki the L2 MPKI value for the thread C1T0
+     */
+    public void setC1t0L2Mpki(double c1t0L2Mpki) {
+        this.c1t0L2Mpki = c1t0L2Mpki;
     }
 
     /**

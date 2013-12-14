@@ -267,17 +267,27 @@ public class Table implements Serializable {
     }
 
     /**
+     * Merge the specified array of tables into a bigger one.
+     *
+     * @param tables the array of tables to merge
+     * @return the resultant table from the merging of the specified array of tables
+     */
+    public static Table merge(Table... tables) {
+        return merge(Arrays.asList(tables));
+    }
+
+    /**
      * Merge the specified list of tables into a bigger one.
      *
      * @param tables the list of tables to merge
      * @return the resultant table from the merging of the specified list of tables
      */
-    public static Table merge(Table... tables) {
-        if (tables.length == 0) {
+    public static Table merge(List<Table> tables) {
+        if (tables.isEmpty()) {
             throw new IllegalArgumentException();
         }
 
-        List<String> columns = tables[0].getColumns();
+        List<String> columns = tables.get(0).getColumns();
 
         List<List<String>> rows = new ArrayList<>();
 

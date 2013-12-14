@@ -35,6 +35,7 @@ import java.util.List;
 public interface ExperimentStatService extends Service {
     static final TableFilterCriteria SUMMARY_PDF_FILTER_CRITERIA = new TableFilterCriteria(
             "Id",
+            "Benchmark",
 
             "Stride",
             "Lookahead",

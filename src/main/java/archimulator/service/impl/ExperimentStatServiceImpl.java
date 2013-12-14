@@ -18,9 +18,7 @@
  ******************************************************************************/
 package archimulator.service.impl;
 
-import archimulator.model.Experiment;
-import archimulator.model.ExperimentStat;
-import archimulator.model.ExperimentSummary;
+import archimulator.model.*;
 import archimulator.service.ExperimentStatService;
 import archimulator.service.ServiceManager;
 import archimulator.util.ExperimentStatHelper;
@@ -263,6 +261,11 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
 
             ExperimentSummary summary = new ExperimentSummary(parent);
 
+            ContextMapping contextMapping = parent.getContextMappings().get(0);
+            Benchmark benchmark = contextMapping.getBenchmark();
+
+            summary.setBenchmarkTitle(benchmark.getTitle());
+
             summary.setType(parent.getType());
             summary.setState(parent.getState());
 
@@ -304,6 +307,14 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
                     parent.getStatValueAsDouble(parent.getMeasurementTitlePrefix(), "simulation/cyclesPerInstruction", 0)
             );
 
+            summary.setC0t0Cpi(
+                    summary.getC0t0NumInstructions() == 0 ? 0 : (double) summary.getNumCycles() / summary.getC0t0NumInstructions()
+            );
+
+            summary.setC1t0Cpi(
+                    summary.getC1t0NumInstructions() == 0 ? 0 : (double) summary.getNumCycles() / summary.getC1t0NumInstructions()
+            );
+
             summary.setNumMainThreadL2Hits(
                     parent.getStatValueAsLong(parent.getMeasurementTitlePrefix(), "helperThreadL2RequestProfilingHelper/numMainThreadL2Hits", 0)
             );
@@ -328,6 +339,18 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
 
             summary.setL2OccupancyRatio(
                     parent.getStatValueAsDouble(parent.getMeasurementTitlePrefix(), "l2/occupancyRatio", 0)
+            );
+
+            summary.setL2Mpki(
+                    (double) parent.getStatValueAsLong(parent.getMeasurementTitlePrefix(), "l2/numDownwardMisses", 0)  / ((double) summary.getNumInstructions() / 1000)
+            );
+
+            summary.setC0t0L2Mpki(
+                    summary.getC0t0NumInstructions() == 0 ? 0: (double) summary.getNumMainThreadL2Misses()  / ((double) summary.getC0t0NumInstructions() / 1000)
+            );
+
+            summary.setC1t0L2Mpki(
+                    summary.getC1t0NumInstructions() == 0 ? 0 : (double) summary.getNumHelperThreadL2Misses()  / ((double) summary.getC1t0NumInstructions() / 1000)
             );
 
             summary.setHelperThreadL2RequestCoverage(
@@ -411,6 +434,7 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
 
         return new Table(Arrays.asList(
                 "Id",
+                "Benchmark",
 
                 "Type",
                 "State",
@@ -436,7 +460,10 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
                 "IPC",
                 "C0T0.IPC",
                 "C1T0.IPC",
+
                 "CPI",
+                "C0T0.CPI",
+                "C1T0.CPI",
 
                 "MT.Hits",
                 "MT.Misses",
@@ -447,6 +474,10 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
                 "L2.Evictions",
                 "L2.Hit_Ratio",
                 "L2.Occupancy_Ratio",
+
+                "L2_MPKI",
+                "C0T0.L2_MPKI",
+                "C1T0.L2_MPKI",
 
                 "HT.Coverage",
                 "HT.Accuracy",
@@ -469,6 +500,7 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
                     boolean helperThreadEnabled = summary.getHelperThreadLookahead() != -1;
 
                     add(summary.getParentId() + "");
+                    add(summary.getBenchmarkTitle());
 
                     add(summary.getType() + "");
                     add(summary.getState() + "");
@@ -494,7 +526,10 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
                     add(summary.getIpc() + "");
                     add(summary.getC0t0Ipc() + "");
                     add(summary.getC1t0Ipc() + "");
+
                     add(summary.getCpi() + "");
+                    add(summary.getC0t0Cpi() + "");
+                    add(summary.getC1t0Cpi() + "");
 
                     add(summary.getNumMainThreadL2Hits() + "");
                     add(summary.getNumMainThreadL2Misses() + "");
@@ -505,6 +540,10 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
                     add(summary.getNumL2Evictions() + "");
                     add(summary.getL2HitRatio() + "");
                     add(summary.getL2OccupancyRatio() + "");
+
+                    add(summary.getL2Mpki() + "");
+                    add(summary.getC0t0L2Mpki() + "");
+                    add(summary.getC1t0L2Mpki() + "");
 
                     add(summary.getHelperThreadL2RequestCoverage() + "");
                     add(summary.getHelperThreadL2RequestAccuracy() + "");
