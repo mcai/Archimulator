@@ -530,9 +530,10 @@ public class HelperThreadL2RequestProfilingHelper implements Reportable {
 
             getChildren().add(new ReportNode(this, "helperThreadL2RequestCoverage", getHelperThreadL2RequestCoverage() + ""));
             getChildren().add(new ReportNode(this, "helperThreadL2RequestAccuracy", getHelperThreadL2RequestAccuracy() + ""));
+            getChildren().add(new ReportNode(this, "helperThreadL2RequestRedundancy", getHelperThreadL2RequestRedundancy() + ""));
+            getChildren().add(new ReportNode(this, "helperThreadL2RequestEarliness", getHelperThreadL2RequestEarliness() + ""));
             getChildren().add(new ReportNode(this, "helperThreadL2RequestLateness", getHelperThreadL2RequestLateness() + ""));
             getChildren().add(new ReportNode(this, "helperThreadL2RequestPollution", getHelperThreadL2RequestPollution() + ""));
-            getChildren().add(new ReportNode(this, "helperThreadL2RequestRedundancy", getHelperThreadL2RequestRedundancy() + ""));
 
             getHelperThreadL2RequestQualityPredictor().dumpStats(this);
         }});
@@ -557,6 +558,24 @@ public class HelperThreadL2RequestProfilingHelper implements Reportable {
     }
 
     /**
+     * Get the redundancy of the helper thread L2 cache requests.
+     *
+     * @return the redundancy of the helper thread L2 cache requests
+     */
+    public double getHelperThreadL2RequestRedundancy() {
+        return this.getNumTotalHelperThreadL2Requests() == 0 ? 0 : (double) (this.numRedundantHitToTransientTagHelperThreadL2Requests + numRedundantHitToCacheHelperThreadL2Requests) / this.getNumTotalHelperThreadL2Requests();
+    }
+
+    /**
+     * Get the earliness of the helper thread L2 cache requests.
+     *
+     * @return the earliness of the helper thread L2 cache requests
+     */
+    public double getHelperThreadL2RequestEarliness() {
+        return this.getNumTotalHelperThreadL2Requests() == 0 ? 0 : (double) this.numEarlyHelperThreadL2Requests / this.getNumTotalHelperThreadL2Requests();
+    }
+
+    /**
      * Get the lateness of the helper thread L2 cache requests.
      *
      * @return the lateness of the helper thread L2 cache requests
@@ -572,15 +591,6 @@ public class HelperThreadL2RequestProfilingHelper implements Reportable {
      */
     public double getHelperThreadL2RequestPollution() {
         return this.getNumTotalHelperThreadL2Requests() == 0 ? 0 : (double) this.numBadHelperThreadL2Requests / this.getNumTotalHelperThreadL2Requests();
-    }
-
-    /**
-     * Get the redundancy of the helper thread L2 cache requests.
-     *
-     * @return the redundancy of the helper thread L2 cache requests
-     */
-    public double getHelperThreadL2RequestRedundancy() {
-        return this.getNumTotalHelperThreadL2Requests() == 0 ? 0 : (double) (this.numRedundantHitToTransientTagHelperThreadL2Requests + numRedundantHitToCacheHelperThreadL2Requests) / this.getNumTotalHelperThreadL2Requests();
     }
 
     /**

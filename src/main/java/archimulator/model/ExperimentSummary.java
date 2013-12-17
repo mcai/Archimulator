@@ -156,13 +156,16 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
     private double helperThreadL2RequestAccuracy;
 
     @DatabaseField
+    private double helperThreadL2RequestRedundancy;
+
+    @DatabaseField
+    private double helperThreadL2RequestEarliness;
+
+    @DatabaseField
     private double helperThreadL2RequestLateness;
 
     @DatabaseField
     private double helperThreadL2RequestPollution;
-
-    @DatabaseField
-    private double helperThreadL2RequestRedundancy;
 
     @DatabaseField
     private long numLateHelperThreadL2Requests;
@@ -876,6 +879,43 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
     }
 
     /**
+     * Get the redundancy of the helper thread L2 cache requests.
+     *
+     * @return the redundancy of the helper thread L2 cache requests
+     */
+    public double getHelperThreadL2RequestRedundancy() {
+        return helperThreadL2RequestRedundancy;
+    }
+
+    /**
+     * Set the redundancy of the helper thread L2 cache requests.
+     *
+     * @param helperThreadL2RequestRedundancy
+     *         the redundancy of the helper thread L2 cache requests
+     */
+    public void setHelperThreadL2RequestRedundancy(double helperThreadL2RequestRedundancy) {
+        this.helperThreadL2RequestRedundancy = helperThreadL2RequestRedundancy;
+    }
+
+    /**
+     * Get the earliness of the helper thread L2 cache requests.
+     *
+     * @return the earliness of the helper thread L2 cache requests
+     */
+    public double getHelperThreadL2RequestEarliness() {
+        return helperThreadL2RequestEarliness;
+    }
+
+    /**
+     * Set the earliness of the helper thread L2 cache requests.
+     *
+     * @param helperThreadL2RequestEarliness the earliness of the helper thread L2 requests
+     */
+    public void setHelperThreadL2RequestEarliness(double helperThreadL2RequestEarliness) {
+        this.helperThreadL2RequestEarliness = helperThreadL2RequestEarliness;
+    }
+
+    /**
      * Get the lateness of the helper thread L2 cache requests.
      *
      * @return the lateness of the helper thread L2 cache requests
@@ -911,25 +951,6 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
      */
     public void setHelperThreadL2RequestPollution(double helperThreadL2RequestPollution) {
         this.helperThreadL2RequestPollution = helperThreadL2RequestPollution;
-    }
-
-    /**
-     * Get the redundancy of the helper thread L2 cache requests.
-     *
-     * @return the redundancy of the helper thread L2 cache requests
-     */
-    public double getHelperThreadL2RequestRedundancy() {
-        return helperThreadL2RequestRedundancy;
-    }
-
-    /**
-     * Set the redundancy of the helper thread L2 cache requests.
-     *
-     * @param helperThreadL2RequestRedundancy
-     *         the redundancy of the helper thread L2 cache requests
-     */
-    public void setHelperThreadL2RequestRedundancy(double helperThreadL2RequestRedundancy) {
-        this.helperThreadL2RequestRedundancy = helperThreadL2RequestRedundancy;
     }
 
     /**
