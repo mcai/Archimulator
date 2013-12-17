@@ -63,12 +63,6 @@ public class IntervalHelper implements Reportable {
 
         private long numUglyHelperThreadL2Requests;
 
-        private double helperThreadL2RequestAccuracy;
-        private double helperThreadL2RequestRedundancy;
-        private double helperThreadL2RequestEarliness;
-        private double helperThreadL2RequestLateness;
-        private double helperThreadL2RequestPollution;
-
         private double mainThreadIpc;
         private double helperThreadIpc;
 
@@ -88,15 +82,6 @@ public class IntervalHelper implements Reportable {
          * Handle when this interval is completed.
          */
         public void onCompleted() {
-            long numTotalHelperThreadL2Requests = numHelperThreadL2Hits + numHelperThreadL2Misses;
-            long numUsefulHelperThreadL2Requests = numTimelyHelperThreadL2Requests + numLateHelperThreadL2Requests;
-
-            helperThreadL2RequestAccuracy = (double) numUsefulHelperThreadL2Requests / numTotalHelperThreadL2Requests;
-            helperThreadL2RequestRedundancy = (double) (numRedundantHitToTransientTagHelperThreadL2Requests + numRedundantHitToCacheHelperThreadL2Requests) / numUsefulHelperThreadL2Requests;
-            helperThreadL2RequestEarliness = (double) numUglyHelperThreadL2Requests / numUsefulHelperThreadL2Requests;
-            helperThreadL2RequestLateness = (double) numLateHelperThreadL2Requests / numUsefulHelperThreadL2Requests;
-            helperThreadL2RequestPollution = (double) numBadHelperThreadL2Requests / numUsefulHelperThreadL2Requests;
-
             mainThreadIpc = (double) numMainThreadDynamicInstructionsCommitted / numCyclesElapsedPerInterval;
             helperThreadIpc = (double) numHelperThreadDynamicInstructionsCommitted / numCyclesElapsedPerInterval;
 
@@ -232,12 +217,6 @@ public class IntervalHelper implements Reportable {
                 getChildren().add(new ReportNode(this, "numEarlyHelperThreadL2Requests[" + i + "]", interval.numEarlyHelperThreadL2Requests + ""));
 
                 getChildren().add(new ReportNode(this, "numUglyHelperThreadL2Requests[" + i + "]", interval.numUglyHelperThreadL2Requests + ""));
-
-                getChildren().add(new ReportNode(this, "helperThreadL2RequestAccuracy[" + i + "]", interval.helperThreadL2RequestAccuracy + ""));
-                getChildren().add(new ReportNode(this, "helperThreadL2RequestRedundancy[" + i + "]", interval.helperThreadL2RequestRedundancy + ""));
-                getChildren().add(new ReportNode(this, "helperThreadL2RequestEarliness[" + i + "]", interval.helperThreadL2RequestEarliness + ""));
-                getChildren().add(new ReportNode(this, "helperThreadL2RequestLateness[" + i + "]", interval.helperThreadL2RequestLateness + ""));
-                getChildren().add(new ReportNode(this, "helperThreadL2RequestPollution[" + i + "]", interval.helperThreadL2RequestPollution + ""));
 
                 getChildren().add(new ReportNode(this, "mainThreadIpc[" + i + "]", interval.mainThreadIpc + ""));
                 getChildren().add(new ReportNode(this, "helperThreadIpc[" + i + "]", interval.helperThreadIpc + ""));
