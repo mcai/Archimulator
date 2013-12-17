@@ -150,24 +150,6 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
     private double l2OccupancyRatio;
 
     @DatabaseField
-    private double helperThreadL2RequestCoverage;
-
-    @DatabaseField
-    private double helperThreadL2RequestAccuracy;
-
-    @DatabaseField
-    private double helperThreadL2RequestRedundancy;
-
-    @DatabaseField
-    private double helperThreadL2RequestEarliness;
-
-    @DatabaseField
-    private double helperThreadL2RequestLateness;
-
-    @DatabaseField
-    private double helperThreadL2RequestPollution;
-
-    @DatabaseField
     private long numLateHelperThreadL2Requests;
 
     @DatabaseField
@@ -841,119 +823,6 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
     }
 
     /**
-     * Get the coverage of the helper thread L2 cache requests.
-     *
-     * @return the coverage of the helper thread L2 cache requests.
-     */
-    public double getHelperThreadL2RequestCoverage() {
-        return helperThreadL2RequestCoverage;
-    }
-
-    /**
-     * Set the coverage of the helper thread L2 cache requests.
-     *
-     * @param helperThreadL2RequestCoverage
-     *         the coverage of the helper thread L2 cache requests
-     */
-    public void setHelperThreadL2RequestCoverage(double helperThreadL2RequestCoverage) {
-        this.helperThreadL2RequestCoverage = helperThreadL2RequestCoverage;
-    }
-
-    /**
-     * Get the accuracy of the helper thread L2 cache requests.
-     *
-     * @return the accuracy of the helper thread L2 cache requests
-     */
-    public double getHelperThreadL2RequestAccuracy() {
-        return helperThreadL2RequestAccuracy;
-    }
-
-    /**
-     * Set the accuracy of the helper thread L2 cache requests.
-     *
-     * @param helperThreadL2RequestAccuracy
-     *         the accuracy of the helper thread L2 cache requests
-     */
-    public void setHelperThreadL2RequestAccuracy(double helperThreadL2RequestAccuracy) {
-        this.helperThreadL2RequestAccuracy = helperThreadL2RequestAccuracy;
-    }
-
-    /**
-     * Get the redundancy of the helper thread L2 cache requests.
-     *
-     * @return the redundancy of the helper thread L2 cache requests
-     */
-    public double getHelperThreadL2RequestRedundancy() {
-        return helperThreadL2RequestRedundancy;
-    }
-
-    /**
-     * Set the redundancy of the helper thread L2 cache requests.
-     *
-     * @param helperThreadL2RequestRedundancy
-     *         the redundancy of the helper thread L2 cache requests
-     */
-    public void setHelperThreadL2RequestRedundancy(double helperThreadL2RequestRedundancy) {
-        this.helperThreadL2RequestRedundancy = helperThreadL2RequestRedundancy;
-    }
-
-    /**
-     * Get the earliness of the helper thread L2 cache requests.
-     *
-     * @return the earliness of the helper thread L2 cache requests
-     */
-    public double getHelperThreadL2RequestEarliness() {
-        return helperThreadL2RequestEarliness;
-    }
-
-    /**
-     * Set the earliness of the helper thread L2 cache requests.
-     *
-     * @param helperThreadL2RequestEarliness the earliness of the helper thread L2 requests
-     */
-    public void setHelperThreadL2RequestEarliness(double helperThreadL2RequestEarliness) {
-        this.helperThreadL2RequestEarliness = helperThreadL2RequestEarliness;
-    }
-
-    /**
-     * Get the lateness of the helper thread L2 cache requests.
-     *
-     * @return the lateness of the helper thread L2 cache requests
-     */
-    public double getHelperThreadL2RequestLateness() {
-        return helperThreadL2RequestLateness;
-    }
-
-    /**
-     * Set the lateness of the helper thread L2 cache requests.
-     *
-     * @param helperThreadL2RequestLateness
-     *         the lateness of the helper thread L2 cache requests
-     */
-    public void setHelperThreadL2RequestLateness(double helperThreadL2RequestLateness) {
-        this.helperThreadL2RequestLateness = helperThreadL2RequestLateness;
-    }
-
-    /**
-     * Get the pollution of the helper thread L2 cache requests.
-     *
-     * @return the pollution of the helper thread L2 cache requests
-     */
-    public double getHelperThreadL2RequestPollution() {
-        return helperThreadL2RequestPollution;
-    }
-
-    /**
-     * Set the pollution of the helper thread L2 cache requests.
-     *
-     * @param helperThreadL2RequestPollution
-     *         the pollution of the helper thread L2  cache requests
-     */
-    public void setHelperThreadL2RequestPollution(double helperThreadL2RequestPollution) {
-        this.helperThreadL2RequestPollution = helperThreadL2RequestPollution;
-    }
-
-    /**
      * Get the number of the late helper thread L2 cache requests.
      *
      * @return the number of the late helper thread L2 cache requests
@@ -1084,6 +953,99 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
      */
     public void setNumRedundantHitToCacheHelperThreadL2Requests(long numRedundantHitToCacheHelperThreadL2Requests) {
         this.numRedundantHitToCacheHelperThreadL2Requests = numRedundantHitToCacheHelperThreadL2Requests;
+    }
+
+    /**
+     * Get the total number of helper thread L2 cache requests.
+     *
+     * @return the total number of helper thread L2 cache requests
+     */
+    public long getNumTotalHelperThreadL2Requests() {
+        return this.numLateHelperThreadL2Requests + this.numTimelyHelperThreadL2Requests + this.numBadHelperThreadL2Requests
+                + this.numEarlyHelperThreadL2Requests + this.numUglyHelperThreadL2Requests
+                + this.numRedundantHitToTransientTagHelperThreadL2Requests + this.numRedundantHitToCacheHelperThreadL2Requests;
+    }
+
+    /**
+     * Get the number of useful helper thread L2 cache requests.
+     *
+     * @return the number of useful helper thread L2 requests
+     */
+    public long getNumUsefulHelperThreadL2Requests() {
+        return this.numLateHelperThreadL2Requests + this.numTimelyHelperThreadL2Requests;
+    }
+
+    /**
+     * Get the number of useless helper thread L2 cache requests.
+     *
+     * @return the number of useless helper thread L2 cache requests
+     */
+    public long getNumUselessHelperThreadL2Requests() {
+        return this.numEarlyHelperThreadL2Requests + this.numUglyHelperThreadL2Requests
+                + this.numRedundantHitToTransientTagHelperThreadL2Requests + this.numRedundantHitToCacheHelperThreadL2Requests;
+    }
+
+    /**
+     * Get the coverage of helper thread L2 cache requests.
+     *
+     * @return the coverage of helper thread L2 cache requests
+     */
+    public double getHelperThreadL2RequestCoverage() {
+        return (this.numMainThreadL2Misses + this.getNumUsefulHelperThreadL2Requests()) == 0 ? 0 : (double) this.getNumUsefulHelperThreadL2Requests() / (this.numMainThreadL2Misses + this.getNumUsefulHelperThreadL2Requests());
+    }
+
+    /**
+     * Get the accuracy of helper thread L2 cache requests.
+     *
+     * @return the accuracy of helper thread L2 cache requests
+     */
+    public double getHelperThreadL2RequestAccuracy() {
+        return this.getNumTotalHelperThreadL2Requests() == 0 ? 0 : (double) this.getNumUsefulHelperThreadL2Requests() / this.getNumTotalHelperThreadL2Requests();
+    }
+
+    /**
+     * Get the uselessness of helper thread L2 cache requests.
+     *
+     * @return the accuracy of helper thread L2 cache requests
+     */
+    public double getHelperThreadL2RequestUselessness() {
+        return this.getNumTotalHelperThreadL2Requests() == 0 ? 0 : (double) this.getNumUselessHelperThreadL2Requests() / this.getNumTotalHelperThreadL2Requests();
+    }
+
+    /**
+     * Get the redundancy of helper thread L2 cache requests.
+     *
+     * @return the redundancy of helper thread L2 cache requests
+     */
+    public double getHelperThreadL2RequestRedundancy() {
+        return this.getNumTotalHelperThreadL2Requests() == 0 ? 0 : (double) (this.numRedundantHitToTransientTagHelperThreadL2Requests + numRedundantHitToCacheHelperThreadL2Requests) / this.getNumTotalHelperThreadL2Requests();
+    }
+
+    /**
+     * Get the earliness of helper thread L2 cache requests.
+     *
+     * @return the earliness of helper thread L2 cache requests
+     */
+    public double getHelperThreadL2RequestEarliness() {
+        return this.getNumTotalHelperThreadL2Requests() == 0 ? 0 : (double) this.numEarlyHelperThreadL2Requests / this.getNumTotalHelperThreadL2Requests();
+    }
+
+    /**
+     * Get the lateness of helper thread L2 cache requests.
+     *
+     * @return the lateness of helper thread L2 cache requests
+     */
+    public double getHelperThreadL2RequestLateness() {
+        return this.getNumTotalHelperThreadL2Requests() == 0 ? 0 : (double) this.numLateHelperThreadL2Requests / this.getNumTotalHelperThreadL2Requests();
+    }
+
+    /**
+     * Get the pollution of helper thread L2 cache requests.
+     *
+     * @return the pollution of helper thread L2 cache requests
+     */
+    public double getHelperThreadL2RequestPollution() {
+        return this.getNumTotalHelperThreadL2Requests() == 0 ? 0 : (double) this.numBadHelperThreadL2Requests / this.getNumTotalHelperThreadL2Requests();
     }
 
     /**

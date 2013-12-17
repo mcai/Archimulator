@@ -388,43 +388,6 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
                             "helperThreadL2RequestProfilingHelper/numRedundantHitToCacheHelperThreadL2Requests", 0) : 0
             );
 
-            summary.setHelperThreadL2RequestCoverage(
-                    helperThreadEnabled ? parent.getStatValueAsDouble(parent.getMeasurementTitlePrefix(),
-                            "helperThreadL2RequestProfilingHelper/helperThreadL2RequestCoverage", 0.0f) : 0.0f
-            );
-
-            summary.setHelperThreadL2RequestAccuracy(
-                    helperThreadEnabled ? parent.getStatValueAsDouble(parent.getMeasurementTitlePrefix(),
-                            "helperThreadL2RequestProfilingHelper/helperThreadL2RequestAccuracy", 0.0f) : 0.0f
-            );
-
-            summary.setHelperThreadL2RequestRedundancy(
-                    helperThreadEnabled ? parent.getStatValueAsDouble(parent.getMeasurementTitlePrefix(),
-                            "helperThreadL2RequestProfilingHelper/helperThreadL2RequestRedundancy", 0.0f) : 0.0f
-            );
-
-            //TODO
-//            summary.setHelperThreadL2RequestEarliness(
-//                    helperThreadEnabled ? parent.getStatValueAsDouble(parent.getMeasurementTitlePrefix(),
-//                            "helperThreadL2RequestProfilingHelper/helperThreadL2RequestEarliness", 0.0f) : 0.0f
-//            );
-
-            long numTotalHelperThreadL2Requests = summary.getNumHelperThreadL2Hits() + summary.getNumHelperThreadL2Misses();
-
-            summary.setHelperThreadL2RequestEarliness(
-                    helperThreadEnabled && numTotalHelperThreadL2Requests != 0 ? (double) summary.getNumEarlyHelperThreadL2Requests() / numTotalHelperThreadL2Requests : 0
-            );
-
-            summary.setHelperThreadL2RequestLateness(
-                    helperThreadEnabled ? parent.getStatValueAsDouble(parent.getMeasurementTitlePrefix(),
-                            "helperThreadL2RequestProfilingHelper/helperThreadL2RequestLateness", 0.0f) : 0.0f
-            );
-
-            summary.setHelperThreadL2RequestPollution(
-                    helperThreadEnabled ? parent.getStatValueAsDouble(parent.getMeasurementTitlePrefix(),
-                            "helperThreadL2RequestProfilingHelper/helperThreadL2RequestPollution", 0.0f) : 0.0f
-            );
-
             this.addItem(this.summaries, summary);
         }
     }
@@ -493,6 +456,7 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
 
                 "HT.Coverage",
                 "HT.Accuracy",
+                "HT.Uselessness",
                 "HT.Redundancy",
                 "HT.Earliness",
                 "HT.Lateness",
@@ -560,6 +524,7 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
 
                     add(summary.getHelperThreadL2RequestCoverage() + "");
                     add(summary.getHelperThreadL2RequestAccuracy() + "");
+                    add(summary.getHelperThreadL2RequestUselessness() + "");
                     add(summary.getHelperThreadL2RequestRedundancy() + "");
                     add(summary.getHelperThreadL2RequestEarliness() + "");
                     add(summary.getHelperThreadL2RequestLateness() + "");
