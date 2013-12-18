@@ -733,6 +733,15 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
     }
 
     /**
+     * Get the number of main thread L2 cache accesses.
+     *
+     * @return the number of main thread L2 cache accesses
+     */
+    public long getNumMainThreadL2Accesses() {
+        return this.numMainThreadL2Hits + this.numMainThreadL2Misses;
+    }
+
+    /**
      * Get the number of the helper thread L2 cache hits.
      *
      * @return the number of the helper thread L2 cache hits
@@ -766,6 +775,15 @@ public class ExperimentSummary implements WithId, WithParentId, WithTitle, WithC
      */
     public void setNumHelperThreadL2Misses(long numHelperThreadL2Misses) {
         this.numHelperThreadL2Misses = numHelperThreadL2Misses;
+    }
+
+    /**
+     * Get the number of helper thread L2 accesses.
+     *
+     * @return the number of helper thread L2 accesses
+     */
+    public long getNumHelperThreadL2Accesses() {
+        return this.numHelperThreadL2Hits + this.numHelperThreadL2Misses;
     }
 
     /**
