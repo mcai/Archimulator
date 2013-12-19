@@ -26,7 +26,7 @@ import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.common.report.Reportable;
 import archimulator.sim.core.DynamicInstruction;
 import archimulator.sim.isa.StaticInstructionType;
-import archimulator.sim.isa.event.FunctionalCallEvent;
+import archimulator.sim.isa.event.FunctionCallEvent;
 import archimulator.sim.os.Process;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.cache.stackDistanceProfile.StackDistanceProfilingHelper;
@@ -37,6 +37,7 @@ import archimulator.sim.uncore.helperThread.HelperThreadL2RequestState;
 import archimulator.sim.uncore.helperThread.HelperThreadingHelper;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -74,9 +75,9 @@ public class HotspotProfilingHelper implements Reportable {
         this.statL2HitHotspotInterThreadStackDistances = new SummaryStatistics();
         this.statL2MissHotspotStackDistances = new SummaryStatistics();
 
-        this.scanLoadInstructionsInHotspotFunction(simulation.getProcessor().getCores().get(0).getThreads().get(0).getContext().getProcess());
+        this.scanLoadInstructionsInHotspotFunctions(simulation.getProcessor().getCores().get(0).getThreads().get(0).getContext().getProcess());
 
-        simulation.getBlockingEventDispatcher().addListener(FunctionalCallEvent.class, event -> {
+        simulation.getBlockingEventDispatcher().addListener(FunctionCallEvent.class, event -> {
             String callerFunctionName = event.getContext().getProcess().getFunctionNameFromPc(event.getFunctionCallContext().getPc());
             String calleeFunctionName = event.getContext().getProcess().getFunctionNameFromPc(event.getFunctionCallContext().getTargetPc());
             if (callerFunctionName != null) {
@@ -168,14 +169,14 @@ public class HotspotProfilingHelper implements Reportable {
     }
 
     /**
-     * Scan the load instructions in the first identified hotspot function in the specified process.
+     * Scan the load instructions in all the identified hotspot functions in the specified process.
      *
      * @param process the process
      */
-    private void scanLoadInstructionsInHotspotFunction(Process process) {
-        Function hotspotFunction = process.getHotspotFunction();
+    private void scanLoadInstructionsInHotspotFunctions(Process process) {
+        List<Function> hotspotFunctions = process.getHotspotFunctions();
 
-        if (hotspotFunction != null) {
+        for(Function hotspotFunction : hotspotFunctions) {
             for (BasicBlock basicBlock : hotspotFunction.getBasicBlocks()) {
                 for (Instruction instruction : basicBlock.getInstructions()) {
                     if (instruction.getStaticInstruction().getMnemonic().getType() == StaticInstructionType.LOAD) {

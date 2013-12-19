@@ -27,7 +27,7 @@ import archimulator.sim.os.FunctionCallContext;
  *
  * @author Min Cai
  */
-public class FunctionalCallEvent extends SimulationEvent {
+public class FunctionCallEvent extends SimulationEvent {
     private FunctionCallContext functionCallContext;
 
     /**
@@ -35,7 +35,7 @@ public class FunctionalCallEvent extends SimulationEvent {
      *
      * @param functionCallContext the function call context
      */
-    public FunctionalCallEvent(FunctionCallContext functionCallContext) {
+    public FunctionCallEvent(FunctionCallContext functionCallContext) {
         super(functionCallContext.getContext());
         this.functionCallContext = functionCallContext;
     }

@@ -21,7 +21,7 @@ package archimulator.sim.isa;
 import archimulator.sim.common.Logger;
 import archimulator.sim.core.functionalUnit.FunctionalUnitOperationType;
 import archimulator.sim.isa.event.FunctionReturnEvent;
-import archimulator.sim.isa.event.FunctionalCallEvent;
+import archimulator.sim.isa.event.FunctionCallEvent;
 import archimulator.sim.isa.event.InstructionFunctionallyExecutedEvent;
 import archimulator.sim.isa.event.PseudoCallEncounteredEvent;
 import archimulator.sim.os.Context;
@@ -2618,7 +2618,7 @@ public class StaticInstruction {
         int targetPc = jalr ? getTargetPcForJalr(context, staticInst.getMachineInstruction()) : getTargetPcForJr(context, staticInst.getMachineInstruction());
         FunctionCallContext functionCallContext = new FunctionCallContext(context, context.getRegisterFile().getPc(), targetPc);
         context.getFunctionCallContextStack().push(functionCallContext);
-        context.getBlockingEventDispatcher().dispatch(new FunctionalCallEvent(functionCallContext));
+        context.getBlockingEventDispatcher().dispatch(new FunctionCallEvent(functionCallContext));
     }
 
     /**

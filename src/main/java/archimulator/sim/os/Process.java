@@ -20,14 +20,13 @@ package archimulator.sim.os;
 
 import archimulator.model.ContextMapping;
 import archimulator.service.ServiceManager;
+import archimulator.sim.analysis.BasicBlock;
 import archimulator.sim.analysis.ElfAnalyzer;
 import archimulator.sim.analysis.Function;
+import archimulator.sim.analysis.Instruction;
 import archimulator.sim.common.BasicSimulationObject;
 import archimulator.sim.common.SimulationObject;
-import archimulator.sim.isa.BitField;
-import archimulator.sim.isa.Memory;
-import archimulator.sim.isa.Mnemonic;
-import archimulator.sim.isa.StaticInstruction;
+import archimulator.sim.isa.*;
 import net.pickapack.dateTime.DateHelper;
 import net.pickapack.io.cmd.CommandLineHelper;
 import net.pickapack.io.cmd.SedHelper;
@@ -44,6 +43,7 @@ import java.nio.channels.OverlappingFileLockException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Process.
@@ -517,9 +517,30 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
     public abstract String getFunctionNameFromPc(int pc);
 
     /**
-     * Get the first hotspot function in the process.
+     * Get the list of hotspot functions in the current process.
      *
-     * @return the first hotspot function in the process if any exists; otherwise null
+     * @return the list of hotspot functions in the current process
      */
-    public abstract Function getHotspotFunction();
+    public List<Function> getHotspotFunctions() {
+        return this.getElfAnalyzer().getProgram().getFunctions().stream().filter(this::isHotspotFunction).collect(Collectors.toList());
+    }
+
+    /**
+     * Get a value indicating whether the specified function is a hotspot function or not.
+     *
+     * @param function the function
+     * @return a value indicating whether the specified function is a hotspot function or not
+     */
+    public boolean isHotspotFunction(Function function) {
+        for (BasicBlock basicBlock : function.getBasicBlocks()) {
+            for (Instruction instruction : basicBlock.getInstructions()) {
+                PseudoCall pseudoCall = StaticInstruction.getPseudoCall(instruction.getStaticInstruction().getMachineInstruction());
+                if (pseudoCall != null && pseudoCall.getImm() == PseudoCall.PSEUDOCALL_HOTSPOT_FUNCTION_BEGIN) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
 }
