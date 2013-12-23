@@ -25,7 +25,6 @@ import archimulator.sim.isa.ArchitecturalRegisterFile;
 import archimulator.sim.isa.event.SystemCallExecutedEvent;
 import archimulator.sim.os.event.*;
 import archimulator.sim.os.signal.SignalMask;
-import net.pickapack.action.Predicate;
 import net.pickapack.io.buffer.CircularByteBuffer;
 import org.jruby.ext.posix.FileStat;
 
@@ -666,7 +665,7 @@ public class SystemCallEmulation extends BasicSimulationObject implements Simula
      */
     private void clone_impl(Context context) {
         int cloneFlags = context.getRegisterFile().getGpr(ArchitecturalRegisterFile.REGISTER_A0);
-        int newsp = context.getRegisterFile().getGpr(ArchitecturalRegisterFile.REGISTER_A1);
+        int newSp = context.getRegisterFile().getGpr(ArchitecturalRegisterFile.REGISTER_A1);
 
         Context newContext;
         try {
@@ -675,17 +674,13 @@ public class SystemCallEmulation extends BasicSimulationObject implements Simula
             throw new RuntimeException(e);
         }
 
-        if (!context.getKernel().map(newContext, new Predicate<Integer>() {
-            public boolean apply(Integer candidateThreadId) {
-                return true;
-            }
-        })) {
+        if (!context.getKernel().map(newContext, candidateThreadId -> true)) {
             throw new RuntimeException();
         }
 
         context.getKernel().getContexts().add(newContext);
 
-        newContext.getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_SP, newsp);
+        newContext.getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_SP, newSp);
         newContext.getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_A3, 0);
         newContext.getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_V0, 0);
 
