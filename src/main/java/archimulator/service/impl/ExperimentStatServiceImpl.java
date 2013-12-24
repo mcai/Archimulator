@@ -456,9 +456,6 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
 
                 "HT.Coverage",
                 "HT.Accuracy",
-                "HT.Uselessness",
-                "HT.Redundancy",
-                "HT.Earliness",
                 "HT.Lateness",
                 "HT.Pollution",
 
@@ -524,9 +521,6 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
 
                     add(summary.getHelperThreadL2RequestCoverage() + "");
                     add(summary.getHelperThreadL2RequestAccuracy() + "");
-                    add(summary.getHelperThreadL2RequestUselessness() + "");
-                    add(summary.getHelperThreadL2RequestRedundancy() + "");
-                    add(summary.getHelperThreadL2RequestEarliness() + "");
                     add(summary.getHelperThreadL2RequestLateness() + "");
                     add(summary.getHelperThreadL2RequestPollution() + "");
 

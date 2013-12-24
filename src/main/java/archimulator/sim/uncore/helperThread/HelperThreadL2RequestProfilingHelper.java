@@ -46,7 +46,7 @@ import java.util.Map;
  *
  * @author Min Cai
  */
-public class HelperThreadL2RequestProfilingHelper implements Reportable {
+public class HelperThreadL2RequestProfilingHelper implements Reportable, HelperThreadL2RequestBreakdown {
     private DirectoryController l2Controller;
 
     private Map<Integer, Map<Integer, HelperThreadL2RequestState>> helperThreadL2RequestStates;
@@ -60,7 +60,7 @@ public class HelperThreadL2RequestProfilingHelper implements Reportable {
     private long numRedundantHitToTransientTagHelperThreadL2Requests;
     private long numRedundantHitToCacheHelperThreadL2Requests;
 
-    private long numUsefulHelperThreadL2Requests;
+    private long numGoodHelperThreadL2Requests;
 
     private long numTimelyHelperThreadL2Requests;
     private long numLateHelperThreadL2Requests;
@@ -202,7 +202,7 @@ public class HelperThreadL2RequestProfilingHelper implements Reportable {
                 ));
 
                 if (lineFoundIsHelperThread && !llcLineState.isUsed()) {
-                    this.numUsefulHelperThreadL2Requests++;
+                    this.numGoodHelperThreadL2Requests++;
                 }
             } else {
                 this.numMainThreadL2Misses++;
@@ -510,23 +510,14 @@ public class HelperThreadL2RequestProfilingHelper implements Reportable {
             getChildren().add(new ReportNode(this, "numRedundantHitToTransientTagHelperThreadL2Requests", getNumRedundantHitToTransientTagHelperThreadL2Requests() + ""));
             getChildren().add(new ReportNode(this, "numRedundantHitToCacheHelperThreadL2Requests", getNumRedundantHitToCacheHelperThreadL2Requests() + ""));
 
-            getChildren().add(new ReportNode(this, "numUsefulHelperThreadL2Requests", getNumUsefulHelperThreadL2Requests() + ""));
+            getChildren().add(new ReportNode(this, "numGoodHelperThreadL2Requests", getNumGoodHelperThreadL2Requests() + ""));
 
             getChildren().add(new ReportNode(this, "numTimelyHelperThreadL2Requests", getNumTimelyHelperThreadL2Requests() + ""));
             getChildren().add(new ReportNode(this, "numLateHelperThreadL2Requests", getNumLateHelperThreadL2Requests() + ""));
 
             getChildren().add(new ReportNode(this, "numBadHelperThreadL2Requests", getNumBadHelperThreadL2Requests() + ""));
             getChildren().add(new ReportNode(this, "numEarlyHelperThreadL2Requests", getNumEarlyHelperThreadL2Requests() + ""));
-            getChildren().add(new ReportNode(this, "numUglyHelperThreadL2Requests",
-                    (getNumTotalHelperThreadL2Requests()
-                            - getNumRedundantHitToCacheHelperThreadL2Requests()
-                            - getNumRedundantHitToTransientTagHelperThreadL2Requests()
-                            - getNumTimelyHelperThreadL2Requests()
-                            - getNumLateHelperThreadL2Requests()
-                            - getNumBadHelperThreadL2Requests()
-                            - getNumEarlyHelperThreadL2Requests()
-                    ) +
-                            ""));
+            getChildren().add(new ReportNode(this, "numUglyHelperThreadL2Requests", getNumUglyHelperThreadL2Requests() + ""));
 
             getHelperThreadL2RequestQualityPredictor().dumpStats(this);
         }});
@@ -605,15 +596,6 @@ public class HelperThreadL2RequestProfilingHelper implements Reportable {
     }
 
     /**
-     * Get the number of total helper thread L2 cache requests.
-     *
-     * @return the number of total helper thread L2 cache requests
-     */
-    public long getNumTotalHelperThreadL2Requests() {
-        return numHelperThreadL2Hits + numHelperThreadL2Misses;
-    }
-
-    /**
      * Get the number of redundant "hit to transient tag" helper thread L2 cache requests.
      *
      * @return the number of redundant "hit to transient tag" helper thread L2 cache requests
@@ -636,8 +618,8 @@ public class HelperThreadL2RequestProfilingHelper implements Reportable {
      *
      * @return the number of useful helper thread L2 cache requests
      */
-    public long getNumUsefulHelperThreadL2Requests() {
-        return numUsefulHelperThreadL2Requests;
+    public long getNumGoodHelperThreadL2Requests() {
+        return numGoodHelperThreadL2Requests;
     }
 
     /**
@@ -674,6 +656,17 @@ public class HelperThreadL2RequestProfilingHelper implements Reportable {
      */
     public long getNumEarlyHelperThreadL2Requests() {
         return numEarlyHelperThreadL2Requests;
+    }
+
+    @Override
+    public long getNumUglyHelperThreadL2Requests() {
+        return getNumTotalHelperThreadL2Requests()
+                - getNumRedundantHitToCacheHelperThreadL2Requests()
+                - getNumRedundantHitToTransientTagHelperThreadL2Requests()
+                - getNumTimelyHelperThreadL2Requests()
+                - getNumLateHelperThreadL2Requests()
+                - getNumBadHelperThreadL2Requests()
+                - getNumEarlyHelperThreadL2Requests();
     }
 
     /**
