@@ -123,8 +123,31 @@ public class CacheInteractionHelper implements Reportable {
     @Override
     public void dumpStats(ReportNode reportNode) {
         reportNode.getChildren().add(new ReportNode(reportNode, "cacheInteractionHelper") {{
-            getChildren().add(new ReportNode(this, "numL2InterThreadConstructiveInteractions", getNumL2InterThreadConstructiveInteractions() + ""));
-            getChildren().add(new ReportNode(this, "numL2InterThreadEvictions", getNumL2InterThreadEvictions() + ""));
+            for(int threadFrom : numL2InterThreadConstructiveInteractions.keySet()) {
+                Map<Integer, Long> constructiveInteractionsPerThread = numL2InterThreadConstructiveInteractions.get(threadFrom);
+                for(int threadTo : constructiveInteractionsPerThread.keySet()) {
+                    getChildren().add(
+                            new ReportNode(
+                                    this,
+                                    "numL2InterThreadConstructiveInteractions[" + threadFrom + "," + threadTo + "]",
+                                    constructiveInteractionsPerThread.get(threadTo) + ""
+                            )
+                    );
+                }
+            }
+
+            for(int threadFrom : numL2InterThreadEvictions.keySet()) {
+                Map<Integer, Long> evictionsPerThread = numL2InterThreadEvictions.get(threadFrom);
+                for(int threadTo : evictionsPerThread.keySet()) {
+                    getChildren().add(
+                            new ReportNode(
+                                    this,
+                                    "numL2InterThreadEvictions[" + threadFrom + "," + threadTo + "]",
+                                    evictionsPerThread.get(threadTo) + ""
+                            )
+                    );
+                }
+            }
         }});
     }
 
