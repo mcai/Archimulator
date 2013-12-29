@@ -105,6 +105,8 @@ public class MLPProfilingHelper implements Reportable {
 
     private Map<Integer, Long> numL2MissesPerMlpCostQuantum;
 
+    private Map<Integer, Long> numCyclesPerMlp;
+
     /**
      * Create an MLP profiling helper.
      *
@@ -118,6 +120,8 @@ public class MLPProfilingHelper implements Reportable {
         this.pendingL2Misses = new LinkedHashMap<>();
 
         this.numL2MissesPerMlpCostQuantum = new TreeMap<>();
+
+        this.numCyclesPerMlp = new TreeMap<>();
 
         this.l2Controller.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, event -> {
             if (event.getCacheController().equals(MLPProfilingHelper.this.l2Controller) && !event.isHitInCache()) {
@@ -149,8 +153,17 @@ public class MLPProfilingHelper implements Reportable {
      * To be invoked per cycle for updating MLP-costs for in-flight L2 cache accesses.
      */
     private void updateL2MlpCostsPerCycle() {
-        for (PendingL2Miss pendingL2Miss : this.pendingL2Misses.values()) {
-            pendingL2Miss.setMlpCost(pendingL2Miss.getMlpCost() + (double) 1 / this.pendingL2Misses.size());
+        int mlp = this.pendingL2Misses.size();
+
+        if(!this.pendingL2Misses.isEmpty()) {
+            for (PendingL2Miss pendingL2Miss : this.pendingL2Misses.values()) {
+                pendingL2Miss.setMlpCost(pendingL2Miss.getMlpCost() + (double) 1 / mlp);
+            }
+
+            if(!this.numCyclesPerMlp.containsKey(mlp)) {
+                this.numCyclesPerMlp.put(mlp, 0L);
+            }
+            this.numCyclesPerMlp.put(mlp, this.numCyclesPerMlp.get(mlp) + 1);
         }
     }
 
@@ -193,6 +206,10 @@ public class MLPProfilingHelper implements Reportable {
 
         for(int i = 0; i < mlpCostQuantizer.getMaxValue(); i++) {
             reportNode.getChildren().add(new ReportNode(reportNode, "numL2MissesPerMlpCostQuantum[" + i + "]", (numL2MissesPerMlpCostQuantum.containsKey(i) ? numL2MissesPerMlpCostQuantum.get(i) : 0) + ""));
+        }
+
+        for(int i : numCyclesPerMlp.keySet()) {
+            reportNode.getChildren().add(new ReportNode(reportNode, "numCyclesPerMlp[" + i + "]", numCyclesPerMlp.get(i) + ""));
         }
     }
 
