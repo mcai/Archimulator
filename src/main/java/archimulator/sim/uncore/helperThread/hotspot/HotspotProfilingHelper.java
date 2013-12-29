@@ -75,6 +75,10 @@ public class HotspotProfilingHelper implements Reportable {
         this.statL2HitHotspotInterThreadStackDistances = new SummaryStatistics();
         this.statL2MissHotspotStackDistances = new SummaryStatistics();
 
+        if(simulation.getProcessor().getCores().get(0).getThreads().get(0).getContext() == null) {
+            return;
+        }
+
         this.scanLoadInstructionsInHotspotFunctions(simulation.getProcessor().getCores().get(0).getThreads().get(0).getContext().getProcess());
 
         simulation.getBlockingEventDispatcher().addListener(FunctionCallEvent.class, event -> {

@@ -142,7 +142,7 @@ public interface HelperThreadL2RequestBreakdown {
      */
     default double getHelperThreadL2RequestCoverage(
     ) {
-        return (getNumMainThreadL2Misses() + getNumUsefulHelperThreadL2Requests()) == 0 ? 0 : (double) getNumUsefulHelperThreadL2Requests() / (getNumMainThreadL2Misses() + getNumUsefulHelperThreadL2Requests());
+        return getNumMainThreadL2Misses() == 0 ? 0 : (double) getNumUsefulHelperThreadL2Requests() / (getNumMainThreadL2Misses());
     }
 
     /**
