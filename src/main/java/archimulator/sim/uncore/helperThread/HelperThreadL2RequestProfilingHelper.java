@@ -660,7 +660,7 @@ public class HelperThreadL2RequestProfilingHelper implements Reportable, HelperT
 
     @Override
     public long getNumUglyHelperThreadL2Requests() {
-        return getNumTotalHelperThreadL2Requests()
+        return numHelperThreadL2Hits + numHelperThreadL2Misses
                 - getNumRedundantHitToCacheHelperThreadL2Requests()
                 - getNumRedundantHitToTransientTagHelperThreadL2Requests()
                 - getNumTimelyHelperThreadL2Requests()
