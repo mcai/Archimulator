@@ -18,8 +18,6 @@
  ******************************************************************************/
 package archimulator.sim.uncore.helperThread;
 
-import archimulator.sim.common.report.ReportNode;
-
 /**
  * Helper thread L2 cache request breakdown.
  *
@@ -133,6 +131,17 @@ public interface HelperThreadL2RequestBreakdown {
         return getNumBadHelperThreadL2Requests()
                 + getNumEarlyHelperThreadL2Requests() + getNumUglyHelperThreadL2Requests()
                 + getNumRedundantHitToTransientTagHelperThreadL2Requests() + getNumRedundantHitToCacheHelperThreadL2Requests();
+    }
+
+    /**
+     * Get the coverage of helper thread L2 cache requests.
+     *
+     * @return the coverage of helper thread L2 cache requests
+     * @param numMainThreadL2MissesInBaselineExperiment the number of main thread L2 misses in the baseline experiment
+     */
+    default double getHelperThreadL2RequestCoverage(
+            long numMainThreadL2MissesInBaselineExperiment) {
+        return numMainThreadL2MissesInBaselineExperiment == 0 ? 0 : (double) getNumUsefulHelperThreadL2Requests() / numMainThreadL2MissesInBaselineExperiment;
     }
 
     /**

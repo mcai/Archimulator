@@ -19,6 +19,7 @@
 package archimulator.service.impl;
 
 import archimulator.model.*;
+import archimulator.service.ExperimentService;
 import archimulator.service.ExperimentStatService;
 import archimulator.service.ServiceManager;
 import archimulator.util.ExperimentStatHelper;
@@ -37,10 +38,7 @@ import org.apache.commons.io.FilenameUtils;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -431,6 +429,7 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
                 "C0T0.Num_Instructions",
                 "C1T0.Num_Instructions",
                 "Num_Cycles",
+                "Speedup",
 
                 "IPC",
                 "C0T0.IPC",
@@ -469,6 +468,8 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
         ), new ArrayList<List<String>>() {{
             for (Experiment experiment : experiments) {
                 add(new ArrayList<String>() {{
+                    Experiment baselineExperiment = ExperimentService.getBaselineExperiment(experiment);
+
                     ExperimentSummary summary = getSummaryByParent(experiment);
 
                     boolean helperThreadEnabled = summary.getHelperThreadLookahead() != -1;
@@ -497,6 +498,9 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
                     add(summary.getC1t0NumInstructions() + "");
                     add(summary.getNumCycles() + "");
 
+                    long numCyclesInBaselineExperiment = baselineExperiment == null ? 0 : getSummaryByParent(baselineExperiment).getNumCycles();
+                    add((numCyclesInBaselineExperiment == 0 ? 0 : (double) numCyclesInBaselineExperiment / summary.getNumCycles()) + "");
+
                     add(summary.getIpc() + "");
                     add(summary.getC0t0Ipc() + "");
                     add(summary.getC1t0Ipc() + "");
@@ -519,7 +523,9 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
                     add(summary.getC0t0L2Mpki() + "");
                     add(summary.getC1t0L2Mpki() + "");
 
-                    add(summary.getHelperThreadL2RequestCoverage() + "");
+                    long numMainThreadL2MissesInBaselineExperiment = baselineExperiment == null ? 0 : getSummaryByParent(baselineExperiment).getNumMainThreadL2Misses();
+
+                    add(summary.getHelperThreadL2RequestCoverage(numMainThreadL2MissesInBaselineExperiment) + "");
                     add(summary.getHelperThreadL2RequestAccuracy() + "");
                     add(summary.getHelperThreadL2RequestLateness() + "");
                     add(summary.getHelperThreadL2RequestPollution() + "");

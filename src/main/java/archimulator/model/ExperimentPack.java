@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.model;
 
+import archimulator.service.ServiceManager;
 import archimulator.util.PropertyArray;
 import archimulator.util.serialization.StringArrayListJsonSerializableType;
 import com.j256.ormlite.field.DatabaseField;
@@ -608,5 +609,14 @@ public class ExperimentPack implements WithId, WithTitle, WithCreateTime {
      */
     private List<List<String>> getCombinations() {
         return CombinationHelper.getCombinations(this.getVariables().stream().map(ExperimentPackVariable::getValues).collect(Collectors.toList()));
+    }
+
+    /**
+     * Get the list of experiments under this experiment pack.
+     *
+     * @return the list of experiments under this experiment pack
+     */
+    public List<Experiment> getExperiments() {
+        return ServiceManager.getExperimentService().getExperimentsByParent(this);
     }
 }
