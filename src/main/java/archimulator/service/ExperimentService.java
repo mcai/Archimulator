@@ -22,6 +22,7 @@ import archimulator.model.*;
 import net.pickapack.service.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Service for managing experiments.
@@ -330,4 +331,99 @@ public interface ExperimentService extends Service {
      * Initialize the service.
      */
     void initialize();
+
+    /**
+     * Get the corresponding baseline experiment for the specified experiment.
+     *
+     * @param experiment the experiment
+     * @return the corresponding baseline experiment for the specified experiment
+     */
+    static Experiment getBaselineExperiment(Experiment experiment) {
+        Experiment baselineExperiment = null;
+
+        String experimentPackTitle = experiment.getParent().getTitle();
+        if (experimentPackTitle.endsWith("_baseline_lru")) {
+            baselineExperiment = experiment;
+        } else if (experimentPackTitle.endsWith("_baseline_lru_l2Sizes")) {
+            ExperimentPack baselineExperimentPack = ServiceManager.getExperimentService().getExperimentPackByTitle(
+                    experimentPackTitle.replaceAll("_baseline_lru_l2Sizes", "_baseline_lru")
+            );
+
+            if (baselineExperimentPack == null || baselineExperimentPack.getExperiments().isEmpty()) {
+                throw new IllegalArgumentException();
+            }
+
+            baselineExperiment = baselineExperimentPack.getExperiments().get(0);
+        } else if (experimentPackTitle.endsWith("_ht_lru")) {
+            ExperimentPack baselineExperimentPack = ServiceManager.getExperimentService().getExperimentPackByTitle(
+                    experimentPackTitle.replaceAll("_ht_lru", "_baseline_lru")
+            );
+
+            if (baselineExperimentPack == null || baselineExperimentPack.getExperiments().isEmpty()) {
+                throw new IllegalArgumentException();
+            }
+
+            baselineExperiment = baselineExperimentPack.getExperiments().get(0);
+        } else if (experimentPackTitle.endsWith("_ht_lru_l2Sizes")) {
+            ExperimentPack baselineExperimentPack = ServiceManager.getExperimentService().getExperimentPackByTitle(
+                    experimentPackTitle.replaceAll("_ht_lru_l2Sizes", "_baseline_lru_l2Sizes")
+            );
+
+            if (baselineExperimentPack == null || baselineExperimentPack.getExperiments().isEmpty()) {
+                throw new IllegalArgumentException();
+            }
+
+            Optional<Experiment> baselineExperimentOptional = baselineExperimentPack.getExperiments().stream().filter(
+                    experimentFound -> experimentFound.getArchitecture().getL2Size() == experiment.getArchitecture().getL2Size()
+            ).findFirst();
+
+            if (!baselineExperimentOptional.isPresent()) {
+                throw new IllegalArgumentException();
+            }
+
+            baselineExperiment = baselineExperimentOptional.get();
+        } else if (experimentPackTitle.endsWith("_ht_lru_lookaheads")) {
+            ExperimentPack baselineExperimentPack = ServiceManager.getExperimentService().getExperimentPackByTitle(
+                    experimentPackTitle.replaceAll("_ht_lru_lookaheads", "_baseline_lru")
+            );
+
+            if (baselineExperimentPack == null || baselineExperimentPack.getExperiments().isEmpty()) {
+                throw new IllegalArgumentException();
+            }
+
+            baselineExperiment = baselineExperimentPack.getExperiments().get(0);
+        } else if (experimentPackTitle.endsWith("_ht_lru_static_partitioned")) {
+            ExperimentPack baselineExperimentPack = ServiceManager.getExperimentService().getExperimentPackByTitle(
+                    experimentPackTitle.replaceAll("_ht_lru_static_partitioned", "_baseline_lru")
+            );
+
+            if (baselineExperimentPack == null || baselineExperimentPack.getExperiments().isEmpty()) {
+                throw new IllegalArgumentException();
+            }
+
+            baselineExperiment = baselineExperimentPack.getExperiments().get(0);
+        } else if (experimentPackTitle.endsWith("_ht_lru_dynamic_partitioned")) {
+            ExperimentPack baselineExperimentPack = ServiceManager.getExperimentService().getExperimentPackByTitle(
+                    experimentPackTitle.replaceAll("_ht_lru_dynamic_partitioned", "_baseline_lru")
+            );
+
+            if (baselineExperimentPack == null || baselineExperimentPack.getExperiments().isEmpty()) {
+                throw new IllegalArgumentException();
+            }
+
+            baselineExperiment = baselineExperimentPack.getExperiments().get(0);
+        } else if (experimentPackTitle.endsWith("_ht_l2ReplacementPolicies")) {
+            ExperimentPack baselineExperimentPack = ServiceManager.getExperimentService().getExperimentPackByTitle(
+                    experimentPackTitle.replaceAll("_ht_l2ReplacementPolicies", "_baseline_lru")
+            );
+
+            if (baselineExperimentPack == null || baselineExperimentPack.getExperiments().isEmpty()) {
+                throw new IllegalArgumentException();
+            }
+
+            baselineExperiment = baselineExperimentPack.getExperiments().get(0);
+        }
+
+        return baselineExperiment;
+    }
 }
