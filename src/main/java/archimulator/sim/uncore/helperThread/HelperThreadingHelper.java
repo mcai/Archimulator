@@ -18,6 +18,8 @@
  ******************************************************************************/
 package archimulator.sim.uncore.helperThread;
 
+import archimulator.model.Benchmark;
+import archimulator.service.ServiceManager;
 import archimulator.sim.core.Thread;
 
 /**
@@ -82,5 +84,25 @@ public class HelperThreadingHelper {
      */
     public static int getHelperThreadId() {
         return 2; //TODO: helper thread should not be hard coded.
+    }
+
+    /**
+     * Get the baseline benchmark for the specified benchmark.
+     *
+     * @param benchmark the benchmark
+     * @return the baseline benchmark for the specified benchmark
+     */
+    public static Benchmark getBaselineBenchmark(Benchmark benchmark) {
+        return ServiceManager.getBenchmarkService().getBenchmarkByTitle(benchmark.getTitle().replaceAll("_ht", "_baseline"));
+    }
+
+    /**
+     * Get the helper threaded benchmark for the specified benchmark.
+     *
+     * @param benchmark the benchmark
+     * @return the helper threaded benchmark for the specified benchmark
+     */
+    public static Benchmark getHelperThreadedBenchmark(Benchmark benchmark) {
+        return ServiceManager.getBenchmarkService().getBenchmarkByTitle(benchmark.getTitle().replaceAll("_baseline", "_ht"));
     }
 }

@@ -19,6 +19,7 @@
 package archimulator.service;
 
 import archimulator.model.Experiment;
+import archimulator.model.ExperimentPack;
 import archimulator.model.ExperimentStat;
 import archimulator.model.ExperimentSummary;
 import archimulator.util.plot.Table;
@@ -126,10 +127,11 @@ public interface ExperimentStatService extends Service {
     /**
      * Generate a table of summaries for the specified list of experiments.
      *
+     * @param experimentPack the experiment pack
      * @param experiments a list of experiments
      * @return a table of summaries for the specified list of experiments
      */
-    Table tableSummary(List<Experiment> experiments);
+    Table tableSummary(ExperimentPack experimentPack, List<Experiment> experiments);
 
     /**
      * Initialize the service.

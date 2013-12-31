@@ -36,33 +36,35 @@ public class ExperimentTableHelper {
     /**
      * Generate the CSV file.
      *
-     * @param criteria             the criteria
-     * @param experimentPackTitles the array of experiment pack titles
+     * @param criteria                   the criteria
+     * @param currentExperimentPackTitle the current experiment pack title
+     * @param experimentPackTitles       the array of experiment pack titles
      */
     public static Table table(
             TableFilterCriteria criteria,
+            String currentExperimentPackTitle,
             String... experimentPackTitles
     ) {
         List<Experiment> experiments = new ArrayList<>();
 
         for (String experimentPackTitle : experimentPackTitles) {
-            ExperimentPack experimentPack = ServiceManager.getExperimentService().getExperimentPackByTitle(experimentPackTitle);
+            ExperimentPack experimentPackFound = ServiceManager.getExperimentService().getExperimentPackByTitle(experimentPackTitle);
 
-            if (experimentPack == null) {
+            if (experimentPackFound == null) {
                 List<ExperimentPack> allExperimentPacks = ServiceManager.getExperimentService().getAllExperimentPacks();
-                for (ExperimentPack experimentPackFound : allExperimentPacks) {
-                    System.out.println("Found: " + experimentPackFound.getTitle());
-                }
+                allExperimentPacks.forEach(expPack -> System.out.println("Found: " + expPack.getTitle()));
 
                 throw new IllegalArgumentException(experimentPackTitle);
             }
 
-            experiments.addAll(ServiceManager.getExperimentService().getExperimentsByParent(experimentPack));
+            experiments.addAll(ServiceManager.getExperimentService().getExperimentsByParent(experimentPackFound));
         }
 
         sort(experiments);
 
-        return ServiceManager.getExperimentStatService().tableSummary(experiments).filter(criteria);
+        ExperimentPack currentExperimentPack = ServiceManager.getExperimentService().getExperimentPackByTitle(currentExperimentPackTitle);
+
+        return ServiceManager.getExperimentStatService().tableSummary(currentExperimentPack, experiments).filter(criteria);
     }
 
     /**
@@ -91,7 +93,7 @@ public class ExperimentTableHelper {
     /**
      * Sort the specified list of experiments.
      *
-     * @param experiments   the list of experiments to be sorted
+     * @param experiments the list of experiments to be sorted
      */
     @SuppressWarnings("unchecked")
     public static void sort(List<Experiment> experiments) {

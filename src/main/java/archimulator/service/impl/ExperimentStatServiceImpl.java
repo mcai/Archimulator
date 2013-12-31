@@ -25,6 +25,7 @@ import archimulator.service.ServiceManager;
 import archimulator.util.ExperimentStatHelper;
 import archimulator.util.ExperimentTableHelper;
 import archimulator.util.plot.Table;
+import com.Ostermiller.util.SignificantFigures;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.PreparedDelete;
@@ -38,7 +39,10 @@ import org.apache.commons.io.FilenameUtils;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -48,6 +52,8 @@ import java.util.stream.Collectors;
  */
 public class ExperimentStatServiceImpl extends AbstractService implements ExperimentStatService {
     public static final String FILE_NAME_EXPERIMENT_STATS = "experiment_stats";
+
+    public static final int significantFigures = 4;
 
     private Dao<ExperimentSummary, Long> summaries;
 
@@ -402,7 +408,7 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
     }
 
     @Override
-    public Table tableSummary(final List<Experiment> experiments) {
+    public Table tableSummary(ExperimentPack experimentPack, final List<Experiment> experiments) {
         ExperimentTableHelper.sort(experiments);
 
         return new Table(Arrays.asList(
@@ -428,16 +434,25 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
                 "Num_Instructions",
                 "C0T0.Num_Instructions",
                 "C1T0.Num_Instructions",
-                "Num_Cycles",
-                "Speedup",
+
+                ///////////////////////////////////////////
 
                 "IPC",
-                "C0T0.IPC",
-                "C1T0.IPC",
 
                 "CPI",
                 "C0T0.CPI",
                 "C1T0.CPI",
+
+                "L2.Occupancy_Ratio",
+
+                "L2_MPKI",
+
+                ///////////////////////////////////////////
+
+                "Num_Cycles",
+                "Speedup",
+                "C0T0.IPC",
+                "C1T0.IPC",
 
                 "MT.Hits",
                 "MT.Misses",
@@ -447,16 +462,9 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
 
                 "L2.Evictions",
                 "L2.Hit_Ratio",
-                "L2.Occupancy_Ratio",
 
-                "L2_MPKI",
                 "C0T0.L2_MPKI",
                 "C1T0.L2_MPKI",
-
-                "HT.Coverage",
-                "HT.Accuracy",
-                "HT.Lateness",
-                "HT.Pollution",
 
                 "Late",
                 "Timely",
@@ -464,11 +472,17 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
                 "Early",
                 "Ugly",
                 "Redundant_MSHR",
-                "Redundant_Cache"
+                "Redundant_Cache",
+
+                "HT.Coverage",
+                "HT.Accuracy",
+                "HT.Lateness",
+                "HT.Pollution"
         ), new ArrayList<List<String>>() {{
             for (Experiment experiment : experiments) {
                 add(new ArrayList<String>() {{
-                    Experiment baselineExperiment = ExperimentService.getBaselineExperiment(experiment);
+                    Experiment speedupBaselineExperiment = ExperimentService.getSpeedupBaselineExperiment(experimentPack, experiment);
+                    Experiment helperThreadPrefetchCoverageBaselineExperiment = ExperimentService.getHelperThreadPrefetchCoverageBaselineExperiment(experiment);
 
                     ExperimentSummary summary = getSummaryByParent(experiment);
 
@@ -496,18 +510,29 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
                     add(summary.getNumInstructions() + "");
                     add(summary.getC0t0NumInstructions() + "");
                     add(summary.getC1t0NumInstructions() + "");
+
+                    ///////////////////////////////////////////
+
+                    add(SignificantFigures.format(summary.getIpc(), significantFigures));
+
+                    add(SignificantFigures.format(summary.getCpi(), significantFigures));
+                    add(SignificantFigures.format(summary.getC0t0Cpi(), significantFigures));
+                    add(SignificantFigures.format(summary.getC1t0Cpi(), significantFigures));
+
+                    add(SignificantFigures.format(summary.getL2OccupancyRatio(), significantFigures));
+
+                    add(SignificantFigures.format(summary.getL2Mpki(), significantFigures));
+
+                    ///////////////////////////////////////////
+
                     add(summary.getNumCycles() + "");
 
-                    long numCyclesInBaselineExperiment = baselineExperiment == null ? 0 : getSummaryByParent(baselineExperiment).getNumCycles();
-                    add((numCyclesInBaselineExperiment == 0 ? 0 : (double) numCyclesInBaselineExperiment / summary.getNumCycles()) + "");
+                    long numCyclesInBaselineExperiment = speedupBaselineExperiment == null ? 0 : getSummaryByParent(speedupBaselineExperiment).getNumCycles();
+                    double speedup = numCyclesInBaselineExperiment == 0 ? 0 : (double) numCyclesInBaselineExperiment / summary.getNumCycles();
+                    add(SignificantFigures.format(speedup, significantFigures));
 
-                    add(summary.getIpc() + "");
-                    add(summary.getC0t0Ipc() + "");
-                    add(summary.getC1t0Ipc() + "");
-
-                    add(summary.getCpi() + "");
-                    add(summary.getC0t0Cpi() + "");
-                    add(summary.getC1t0Cpi() + "");
+                    add(SignificantFigures.format(summary.getC0t0Ipc(), significantFigures));
+                    add(SignificantFigures.format(summary.getC1t0Ipc(), significantFigures));
 
                     add(summary.getNumMainThreadL2Hits() + "");
                     add(summary.getNumMainThreadL2Misses() + "");
@@ -516,19 +541,10 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
                     add(summary.getNumHelperThreadL2Misses() + "");
 
                     add(summary.getNumL2Evictions() + "");
-                    add(summary.getL2HitRatio() + "");
-                    add(summary.getL2OccupancyRatio() + "");
+                    add(SignificantFigures.format(summary.getL2HitRatio(), significantFigures));
 
-                    add(summary.getL2Mpki() + "");
-                    add(summary.getC0t0L2Mpki() + "");
-                    add(summary.getC1t0L2Mpki() + "");
-
-                    long numMainThreadL2MissesInBaselineExperiment = baselineExperiment == null ? 0 : getSummaryByParent(baselineExperiment).getNumMainThreadL2Misses();
-
-                    add(summary.getHelperThreadL2RequestCoverage(numMainThreadL2MissesInBaselineExperiment) + "");
-                    add(summary.getHelperThreadL2RequestAccuracy() + "");
-                    add(summary.getHelperThreadL2RequestLateness() + "");
-                    add(summary.getHelperThreadL2RequestPollution() + "");
+                    add(SignificantFigures.format(summary.getC0t0L2Mpki(), significantFigures));
+                    add(SignificantFigures.format(summary.getC1t0L2Mpki(), significantFigures));
 
                     add(summary.getNumLateHelperThreadL2Requests() + "");
                     add(summary.getNumTimelyHelperThreadL2Requests() + "");
@@ -537,6 +553,13 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
                     add(summary.getNumUglyHelperThreadL2Requests() + "");
                     add(summary.getNumRedundantHitToTransientTagHelperThreadL2Requests() + "");
                     add(summary.getNumRedundantHitToCacheHelperThreadL2Requests() + "");
+
+                    long numMainThreadL2MissesInBaselineExperiment = helperThreadPrefetchCoverageBaselineExperiment == null ? 0 : getSummaryByParent(helperThreadPrefetchCoverageBaselineExperiment).getNumMainThreadL2Misses();
+
+                    add(SignificantFigures.format(summary.getHelperThreadL2RequestCoverage(numMainThreadL2MissesInBaselineExperiment), significantFigures));
+                    add(SignificantFigures.format(summary.getHelperThreadL2RequestAccuracy(), significantFigures));
+                    add(SignificantFigures.format(summary.getHelperThreadL2RequestLateness(), significantFigures));
+                    add(SignificantFigures.format(summary.getHelperThreadL2RequestPollution(), significantFigures));
                 }});
             }
         }});

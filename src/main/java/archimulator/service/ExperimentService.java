@@ -19,10 +19,14 @@
 package archimulator.service;
 
 import archimulator.model.*;
+import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
+import archimulator.sim.uncore.helperThread.HelperThreadingHelper;
 import net.pickapack.service.Service;
+import net.pickapack.util.StorageUnitHelper;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.function.Predicate;
 
 /**
  * Service for managing experiments.
@@ -333,97 +337,65 @@ public interface ExperimentService extends Service {
     void initialize();
 
     /**
-     * Get the corresponding baseline experiment for the specified experiment.
+     * Get the corresponding helper thread prefetch coverage baseline experiment for the specified experiment.
      *
      * @param experiment the experiment
-     * @return the corresponding baseline experiment for the specified experiment
+     * @return the corresponding helper thread prefetch coverage baseline experiment for the specified experiment
      */
-    static Experiment getBaselineExperiment(Experiment experiment) {
-        Experiment baselineExperiment = null;
+    static Experiment getHelperThreadPrefetchCoverageBaselineExperiment(Experiment experiment) {
+        List<Experiment> experimentsByBenchmark = ServiceManager.getExperimentService().getExperimentsByBenchmark(
+                HelperThreadingHelper.getBaselineBenchmark(experiment.getContextMappings().get(0).getBenchmark())
+        );
 
-        String experimentPackTitle = experiment.getParent().getTitle();
-        if (experimentPackTitle.endsWith("_baseline_lru")) {
-            baselineExperiment = experiment;
-        } else if (experimentPackTitle.endsWith("_baseline_lru_l2Sizes")) {
-            ExperimentPack baselineExperimentPack = ServiceManager.getExperimentService().getExperimentPackByTitle(
-                    experimentPackTitle.replaceAll("_baseline_lru_l2Sizes", "_baseline_lru")
-            );
+        return experimentsByBenchmark.stream().filter(exp -> exp.getArchitecture().getL2Size() == experiment.getArchitecture().getL2Size()
+                && exp.getArchitecture().getL2ReplacementPolicyType() == CacheReplacementPolicyType.LRU
+        ).findFirst().get();
+    }
 
-            if (baselineExperimentPack == null || baselineExperimentPack.getExperiments().isEmpty()) {
-                throw new IllegalArgumentException();
-            }
-
-            baselineExperiment = baselineExperimentPack.getExperiments().get(0);
-        } else if (experimentPackTitle.endsWith("_ht_lru")) {
-            ExperimentPack baselineExperimentPack = ServiceManager.getExperimentService().getExperimentPackByTitle(
-                    experimentPackTitle.replaceAll("_ht_lru", "_baseline_lru")
-            );
-
-            if (baselineExperimentPack == null || baselineExperimentPack.getExperiments().isEmpty()) {
-                throw new IllegalArgumentException();
-            }
-
-            baselineExperiment = baselineExperimentPack.getExperiments().get(0);
-        } else if (experimentPackTitle.endsWith("_ht_lru_l2Sizes")) {
-            ExperimentPack baselineExperimentPack = ServiceManager.getExperimentService().getExperimentPackByTitle(
-                    experimentPackTitle.replaceAll("_ht_lru_l2Sizes", "_baseline_lru_l2Sizes")
-            );
-
-            if (baselineExperimentPack == null || baselineExperimentPack.getExperiments().isEmpty()) {
-                throw new IllegalArgumentException();
-            }
-
-            Optional<Experiment> baselineExperimentOptional = baselineExperimentPack.getExperiments().stream().filter(
-                    experimentFound -> experimentFound.getArchitecture().getL2Size() == experiment.getArchitecture().getL2Size()
-            ).findFirst();
-
-            if (!baselineExperimentOptional.isPresent()) {
-                throw new IllegalArgumentException();
-            }
-
-            baselineExperiment = baselineExperimentOptional.get();
-        } else if (experimentPackTitle.endsWith("_ht_lru_lookaheads")) {
-            ExperimentPack baselineExperimentPack = ServiceManager.getExperimentService().getExperimentPackByTitle(
-                    experimentPackTitle.replaceAll("_ht_lru_lookaheads", "_baseline_lru")
-            );
-
-            if (baselineExperimentPack == null || baselineExperimentPack.getExperiments().isEmpty()) {
-                throw new IllegalArgumentException();
-            }
-
-            baselineExperiment = baselineExperimentPack.getExperiments().get(0);
-        } else if (experimentPackTitle.endsWith("_ht_lru_static_partitioned")) {
-            ExperimentPack baselineExperimentPack = ServiceManager.getExperimentService().getExperimentPackByTitle(
-                    experimentPackTitle.replaceAll("_ht_lru_static_partitioned", "_baseline_lru")
-            );
-
-            if (baselineExperimentPack == null || baselineExperimentPack.getExperiments().isEmpty()) {
-                throw new IllegalArgumentException();
-            }
-
-            baselineExperiment = baselineExperimentPack.getExperiments().get(0);
-        } else if (experimentPackTitle.endsWith("_ht_lru_dynamic_partitioned")) {
-            ExperimentPack baselineExperimentPack = ServiceManager.getExperimentService().getExperimentPackByTitle(
-                    experimentPackTitle.replaceAll("_ht_lru_dynamic_partitioned", "_baseline_lru")
-            );
-
-            if (baselineExperimentPack == null || baselineExperimentPack.getExperiments().isEmpty()) {
-                throw new IllegalArgumentException();
-            }
-
-            baselineExperiment = baselineExperimentPack.getExperiments().get(0);
-        } else if (experimentPackTitle.endsWith("_ht_l2ReplacementPolicies")) {
-            ExperimentPack baselineExperimentPack = ServiceManager.getExperimentService().getExperimentPackByTitle(
-                    experimentPackTitle.replaceAll("_ht_l2ReplacementPolicies", "_baseline_lru")
-            );
-
-            if (baselineExperimentPack == null || baselineExperimentPack.getExperiments().isEmpty()) {
-                throw new IllegalArgumentException();
-            }
-
-            baselineExperiment = baselineExperimentPack.getExperiments().get(0);
+    /**
+     * Get the corresponding speedup baseline experiment for the specified experiment.
+     *
+     * @return the corresponding speedup baseline experiment for the specified experiment
+     */
+    static Experiment getSpeedupBaselineExperiment(ExperimentPack experimentPack, Experiment experiment) {
+        if(experimentPack == null) {
+            return null;
         }
 
-        return baselineExperiment;
+        String experimentPackTitle = experimentPack.getTitle();
+
+        List<ExperimentPack> baselineExperimentPacks = new ArrayList<>();
+
+        Predicate<Experiment> speedupBaselineExperimentPredicate = null;
+
+        if (experimentPackTitle.endsWith("_baseline_lru")) {
+            baselineExperimentPacks.add(experimentPack);
+            speedupBaselineExperimentPredicate = exp -> true;
+        } else if (experimentPackTitle.endsWith("_baseline_lru_l2Sizes")) {
+            baselineExperimentPacks.add(ServiceManager.getExperimentService().getExperimentPackByTitle(experimentPackTitle.replaceAll("_baseline_lru_l2Sizes", "_baseline_lru")));
+            speedupBaselineExperimentPredicate = exp -> exp.getArchitecture().getL2Size() == StorageUnitHelper.displaySizeToByteCount("96 KB");
+        } else if (experimentPackTitle.endsWith("_ht_lru")) {
+            baselineExperimentPacks.add(ServiceManager.getExperimentService().getExperimentPackByTitle(experimentPackTitle.replaceAll("_ht_lru", "_baseline_lru")));
+            speedupBaselineExperimentPredicate = exp -> true;
+        } else if (experimentPackTitle.endsWith("_ht_lru_l2Sizes")) {
+            baselineExperimentPacks.add(ServiceManager.getExperimentService().getExperimentPackByTitle(experimentPackTitle.replaceAll("_ht_lru_l2Sizes", "_baseline_lru")));
+            baselineExperimentPacks.add(ServiceManager.getExperimentService().getExperimentPackByTitle(experimentPackTitle.replaceAll("_ht_lru_l2Sizes", "_baseline_lru_l2Sizes")));
+            speedupBaselineExperimentPredicate = exp -> exp.getArchitecture().getL2Size() == experiment.getArchitecture().getL2Size();
+        } else if (experimentPackTitle.endsWith("_ht_lru_lookaheads")) {
+            baselineExperimentPacks.add(ServiceManager.getExperimentService().getExperimentPackByTitle(experimentPackTitle.replaceAll("_ht_lru_lookaheads", "_ht_lru")));
+            baselineExperimentPacks.add(experimentPack);
+            speedupBaselineExperimentPredicate = exp -> exp.getContextMappings().get(0).getHelperThreadLookahead() == 0;
+        } else if (experimentPackTitle.endsWith("_ht_lru_static_partitioned")) {
+            baselineExperimentPacks.add(ServiceManager.getExperimentService().getExperimentPackByTitle(experimentPackTitle.replaceAll("_ht_lru_static_partitioned", "_ht_lru")));
+            speedupBaselineExperimentPredicate = exp -> exp.getArchitecture().getL2ReplacementPolicyType() == CacheReplacementPolicyType.LRU;
+        } else if (experimentPackTitle.endsWith("_ht_lru_dynamic_partitioned")) {
+            baselineExperimentPacks.add(ServiceManager.getExperimentService().getExperimentPackByTitle(experimentPackTitle.replaceAll("_ht_lru_dynamic_partitioned", "_ht_lru")));
+            speedupBaselineExperimentPredicate = exp -> exp.getArchitecture().getL2ReplacementPolicyType() == CacheReplacementPolicyType.LRU;
+        } else if (experimentPackTitle.endsWith("_ht_l2ReplacementPolicies")) {
+            baselineExperimentPacks.add(ServiceManager.getExperimentService().getExperimentPackByTitle(experimentPackTitle.replaceAll("_ht_l2ReplacementPolicies", "_ht_lru")));
+            speedupBaselineExperimentPredicate = exp -> exp.getArchitecture().getL2ReplacementPolicyType() == CacheReplacementPolicyType.LRU;
+        }
+
+        return baselineExperimentPacks.isEmpty() || speedupBaselineExperimentPredicate == null ? null : baselineExperimentPacks.stream().flatMap(expPack -> expPack.getExperiments().stream()).filter(speedupBaselineExperimentPredicate).findFirst().get();
     }
 }
