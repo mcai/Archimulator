@@ -382,9 +382,8 @@ public interface ExperimentService extends Service {
             baselineExperimentPacks.add(ServiceManager.getExperimentService().getExperimentPackByTitle(experimentPackTitle.replaceAll("_ht_lru_l2Sizes", "_baseline_lru_l2Sizes")));
             speedupBaselineExperimentPredicate = exp -> exp.getArchitecture().getL2Size() == experiment.getArchitecture().getL2Size();
         } else if (experimentPackTitle.endsWith("_ht_lru_lookaheads")) {
-            baselineExperimentPacks.add(ServiceManager.getExperimentService().getExperimentPackByTitle(experimentPackTitle.replaceAll("_ht_lru_lookaheads", "_ht_lru")));
-            baselineExperimentPacks.add(experimentPack);
-            speedupBaselineExperimentPredicate = exp -> exp.getContextMappings().get(0).getHelperThreadLookahead() == 0;
+            baselineExperimentPacks.add(ServiceManager.getExperimentService().getExperimentPackByTitle(experimentPackTitle.replaceAll("_ht_lru_lookaheads", "_baseline_lru")));
+            speedupBaselineExperimentPredicate = exp -> true;
         } else if (experimentPackTitle.endsWith("_ht_lru_static_partitioned")) {
             baselineExperimentPacks.add(ServiceManager.getExperimentService().getExperimentPackByTitle(experimentPackTitle.replaceAll("_ht_lru_static_partitioned", "_ht_lru")));
             speedupBaselineExperimentPredicate = exp -> exp.getArchitecture().getL2ReplacementPolicyType() == CacheReplacementPolicyType.LRU;
