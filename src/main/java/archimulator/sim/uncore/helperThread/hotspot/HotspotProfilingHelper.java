@@ -118,6 +118,7 @@ public class HotspotProfilingHelper implements Reportable {
             }
         });
 
+        //TODO: to be removed out of HotspotProfilingHelper!!!
         simulation.getBlockingEventDispatcher().addListener(StackDistanceProfilingHelper.StackDistanceProfiledEvent.class, event -> {
             if(event.getCacheController() == l2Controller) {
                 MemoryHierarchyAccess access = event.getAccess();
