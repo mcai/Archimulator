@@ -61,6 +61,8 @@ public class ExperimentSpec implements Serializable {
 
     private boolean dynamicSpeculativePrecomputationEnabled;
 
+    private boolean coherenceMessageTraceEnabled;
+
     private String memoryControllerType;
 
     private transient Architecture architecture;

@@ -21,6 +21,9 @@ package archimulator.sim.uncore.coherence.msi.message;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.msi.controller.Controller;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
+import org.apache.commons.lang.ArrayUtils;
+
+import java.util.Arrays;
 
 /**
  * Cache coherence message.
@@ -50,6 +53,11 @@ public abstract class CoherenceMessage extends CacheCoherenceFlow {
      */
     public void onDestinationArrived() {
         this.destinationArrived = true;
+
+        if ((this.getType() == CoherenceMessageType.DATA || this.getType() == CoherenceMessageType.PUTM_AND_DATA)
+                && Arrays.asList(ArrayUtils.toObject(this.getData())).stream().anyMatch(b -> b != 0)) {
+            this.getGenerator().getBlockingEventDispatcher().dispatch(new CoherenceMessageTraceHelper.CoherenceMessageTraceEvent(this.getGenerator(), this));
+        }
     }
 
     /**

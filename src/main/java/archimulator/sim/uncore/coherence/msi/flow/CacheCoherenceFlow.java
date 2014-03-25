@@ -18,10 +18,11 @@
  ******************************************************************************/
 package archimulator.sim.uncore.coherence.msi.flow;
 
+import archimulator.sim.isa.Memory;
 import archimulator.sim.uncore.MemoryHierarchyAccess;
 import archimulator.sim.uncore.coherence.msi.controller.Controller;
-import net.pickapack.util.Params;
 import net.pickapack.collection.tree.Node;
+import net.pickapack.util.Params;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -198,5 +199,16 @@ public abstract class CacheCoherenceFlow extends Params implements Node {
      */
     public int getTag() {
         return tag;
+    }
+
+    /**
+     * Get the data if meaningful.
+     *
+     * @return the data if meaningful
+     */
+    public byte[] getData() {
+        Memory memory = this.getAccess().getThread().getContext().getProcess().getMemory();
+        int lineSize = this.getAccess().getThread().getExperiment().getArchitecture().getL1DLineSize();
+        return memory.readBlock(this.getTag(), lineSize / 4);
     }
 }

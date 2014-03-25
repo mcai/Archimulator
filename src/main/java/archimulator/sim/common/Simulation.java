@@ -38,6 +38,7 @@ import archimulator.sim.uncore.cache.replacement.reuseDistancePrediction.ReuseDi
 import archimulator.sim.uncore.cache.stackDistanceProfile.StackDistanceProfilingHelper;
 import archimulator.sim.uncore.coherence.msi.controller.GeneralCacheController;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
+import archimulator.sim.uncore.coherence.msi.message.CoherenceMessageTraceHelper;
 import archimulator.sim.uncore.delinquentLoad.DelinquentLoadIdentificationHelper;
 import archimulator.sim.uncore.helperThread.FeedbackDirectedHelperThreadingHelper;
 import archimulator.sim.uncore.helperThread.HelperThreadL2RequestProfilingHelper;
@@ -110,6 +111,8 @@ public abstract class Simulation implements SimulationObject, Reportable {
     private MLPProfilingHelper mlpProfilingHelper;
 
     private BLPProfilingHelper blpProfilingHelper;
+
+    private CoherenceMessageTraceHelper coherenceMessageTraceHelper;
 
     private IntervalHelper intervalHelper;
 
@@ -204,6 +207,10 @@ public abstract class Simulation implements SimulationObject, Reportable {
         this.mlpProfilingHelper = new MLPProfilingHelper(this);
 
         this.blpProfilingHelper = new BLPProfilingHelper(this);
+
+        this.coherenceMessageTraceHelper = new CoherenceMessageTraceHelper(this);
+
+        this.coherenceMessageTraceHelper.setEnabled(true); //TODO: read from configurations instead!
 
         this.intervalHelper = new IntervalHelper(this);
 
@@ -318,6 +325,8 @@ public abstract class Simulation implements SimulationObject, Reportable {
         }
 
         ServiceManager.getExperimentStatService().addStatsByParent(this.getExperiment(), stats);
+
+        this.getCoherenceMessageTraceHelper().close();
     }
 
     /**
@@ -683,6 +692,15 @@ public abstract class Simulation implements SimulationObject, Reportable {
      */
     public BLPProfilingHelper getBlpProfilingHelper() {
         return blpProfilingHelper;
+    }
+
+    /**
+     * Get the coherence message trace helper.
+     *
+     * @return the coherence message trace helper
+     */
+    public CoherenceMessageTraceHelper getCoherenceMessageTraceHelper() {
+        return coherenceMessageTraceHelper;
     }
 
     /**
