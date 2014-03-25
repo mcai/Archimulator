@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
-  <component name="NewModuleRootManager" inherit-compiler-output="false">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/target/classes" />
     <output-test url="file://$MODULE_DIR$/target/test-classes" />
     <content url="file://$MODULE_DIR$">
@@ -140,6 +140,7 @@
     <orderEntry type="library" name="Maven: ro.fortsoft.pf4j:pf4j:0.4" level="project" />
     <orderEntry type="library" name="Maven: net.java.sezpoz:sezpoz:1.9" level="project" />
     <orderEntry type="library" name="Maven: redis.clients:jedis:2.0.0" level="project" />
+    <orderEntry type="library" name="Maven: org.jocl:jocl:0.1.9" level="project" />
   </component>
 </module>
 
