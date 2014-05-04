@@ -72,11 +72,11 @@ public class FunctionCallContext {
     public String toString() {
         return String.format(
                 "FunctionCallContext{context.name=%s, %s.pc=0x%08x, %s.targetPc=0x%08x}",
-                context.getName(),
-                context.getProcess().getFunctionNameFromPc(pc),
-                pc,
-                context.getProcess().getFunctionNameFromPc(targetPc),
-                targetPc
+                this.context.getName(),
+                this.context.getProcess().getFunctionNameFromPc(this.pc),
+                this.pc,
+                this.context.getProcess().getFunctionNameFromPc(this.targetPc),
+                this.targetPc
         );
     }
 }

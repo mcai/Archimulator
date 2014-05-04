@@ -32,28 +32,28 @@ public class NativeSystemCalls {
      */
     public interface LibC extends Library {
         /**
-         * getuid.
+         * Get the user ID.
          *
          * @return the result
          */
         long getuid();
 
         /**
-         * geteuid.
+         * Get the effective user ID.
          *
          * @return the result
          */
         long geteuid();
 
         /**
-         * getgid.
+         * Get the group ID.
          *
          * @return the result
          */
         long getgid();
 
         /**
-         * getegid.
+         * Get the effective group ID.
          *
          * @return the result
          */

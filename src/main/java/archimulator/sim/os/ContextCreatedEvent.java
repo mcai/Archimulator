@@ -15,6 +15,7 @@ public class ContextCreatedEvent extends SimulationEvent {
      */
     public ContextCreatedEvent(Context context) {
         super(context);
+
         this.context = context;
     }
 

@@ -47,23 +47,23 @@ public final class EnhancedLinuxPOSIX extends BaseNativePOSIX {
     public EnhancedLinuxPOSIX(String libraryName, LibC libc, POSIXHandler handler) {
         super(libraryName, libc, handler);
 
-        statVersion = Platform.IS_32_BIT ? 3 : 0;
+        this.statVersion = Platform.IS_32_BIT ? 3 : 0;
 
         /*
          * Most linux systems define stat/lstat/fstat as macros which force
          * us to call these weird signature versions.
          */
-        hasFxstat = hasMethod("__fxstat64");
-        hasLxstat = hasMethod("__lxstat64");
-        hasXstat = hasMethod("__xstat64");
+        this.hasFxstat = this.hasMethod("__fxstat64");
+        this.hasLxstat = this.hasMethod("__lxstat64");
+        this.hasXstat = this.hasMethod("__xstat64");
 
         /*
         * At least one person is using uLibc on linux which has real
         * definitions for stat/lstat/fstat.
         */
-        hasFstat = !hasFxstat && hasMethod("fstat64");
-        hasLstat = !hasLxstat && hasMethod("lstat64");
-        hasStat = !hasXstat && hasMethod("stat64");
+        this.hasFstat = !this.hasFxstat && this.hasMethod("fstat64");
+        this.hasLstat = !this.hasLxstat && this.hasMethod("lstat64");
+        this.hasStat = !this.hasXstat && this.hasMethod("stat64");
     }
 
     /**
@@ -88,16 +88,16 @@ public final class EnhancedLinuxPOSIX extends BaseNativePOSIX {
      */
     @Override
     public FileStat fstat(FileDescriptor fileDescriptor) {
-        if (!hasFxstat) {
-            if (hasFstat) return super.fstat(fileDescriptor);
+        if (!this.hasFxstat) {
+            if (this.hasFstat) return super.fstat(fileDescriptor);
 
-            handler.unimplementedError("fstat");
+            this.handler.unimplementedError("fstat");
         }
 
         FileStat stat = allocateStat();
-        int fd = helper.getfd(fileDescriptor);
+        int fd = this.helper.getfd(fileDescriptor);
 
-        if (((LinuxLibC) libc).__fxstat64(statVersion, fd, stat) < 0) handler.error(ERRORS.ENOENT, "" + fd);
+        if (((LinuxLibC) this.libc).__fxstat64(this.statVersion, fd, stat) < 0) this.handler.error(ERRORS.ENOENT, "" + fd);
 
         return stat;
     }
@@ -109,13 +109,13 @@ public final class EnhancedLinuxPOSIX extends BaseNativePOSIX {
      * @return the newly created file stat structure based on the specified file descriptor number
      */
     public FileStat fstat(int fd) {
-        if (!hasFxstat) {
+        if (!this.hasFxstat) {
             throw new UnsupportedOperationException();
         }
 
         FileStat stat = allocateStat();
 
-        if (((LinuxLibC) libc).__fxstat64(statVersion, fd, stat) < 0) handler.error(ERRORS.ENOENT, "" + fd);
+        if (((LinuxLibC) this.libc).__fxstat64(this.statVersion, fd, stat) < 0) this.handler.error(ERRORS.ENOENT, "" + fd);
 
         return stat;
     }

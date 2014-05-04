@@ -35,6 +35,7 @@ public class ContextKilledEvent extends SimulationEvent {
      */
     public ContextKilledEvent(Context context) {
         super(context);
+
         this.context = context;
     }
 

@@ -49,7 +49,7 @@ public class WaitForProcessIdCriterion implements SystemEventCriterion {
     }
 
     public boolean needProcess(Context context) {
-        return ((this.getProcessId() == -1) && this.hasProcessIdKilled) || ((this.getProcessId() > 0) && (context.getKernel().getContextFromProcessId(this.processId) == null));
+        return this.getProcessId() == -1 && this.hasProcessIdKilled || this.getProcessId() > 0 && context.getKernel().getContextFromProcessId(this.processId) == null;
     }
 
     /**

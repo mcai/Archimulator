@@ -219,8 +219,8 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
      * @param fileDescriptors the array of two descriptor numbers
      */
     public void createPipe(int[] fileDescriptors) {
-        fileDescriptors[0] = currentFd++;
-        fileDescriptors[1] = currentFd++;
+        fileDescriptors[0] = this.currentFd++;
+        fileDescriptors[1] = this.currentFd++;
         this.pipes.add(new Pipe(fileDescriptors));
     }
 
@@ -291,7 +291,7 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
      */
     public void runSignalHandler(Context context, int signal) {
         try {
-            if (signalActions.get(signal - 1).getHandler() == 0) {
+            if (this.signalActions.get(signal - 1).getHandler() == 0) {
                 throw new RuntimeException();
             }
 
@@ -302,9 +302,9 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
             ArchitecturalRegisterFile oldRegisterFile = (ArchitecturalRegisterFile) context.getRegisterFile().clone();
 
             context.getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_A0, signal);
-            context.getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_T9, signalActions.get(signal - 1).getHandler());
+            context.getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_T9, this.signalActions.get(signal - 1).getHandler());
             context.getRegisterFile().setGpr(ArchitecturalRegisterFile.REGISTER_RA, 0xffffffff);
-            context.getRegisterFile().setNpc(signalActions.get(signal - 1).getHandler());
+            context.getRegisterFile().setNpc(this.signalActions.get(signal - 1).getHandler());
             context.getRegisterFile().setNnpc(context.getRegisterFile().getNpc() + 4);
 
             while (context.getState() == ContextState.RUNNING && context.getRegisterFile().getNpc() != 0xffffffff) {

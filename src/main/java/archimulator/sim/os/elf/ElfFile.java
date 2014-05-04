@@ -58,7 +58,7 @@ public class ElfFile {
     private long position;
 
     /**
-     * ELF file.
+     * Create an ELF file.
      *
      * @param filename the file name
      */
@@ -251,8 +251,8 @@ public class ElfFile {
         this.file.close();
     }
 
-    protected void finalize()
-            throws Throwable {
+    @Override
+    protected void finalize() throws Throwable {
         super.finalize();
         this.close();
     }
