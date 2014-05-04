@@ -38,7 +38,7 @@ public class SortHelper {
     @SuppressWarnings("unchecked")
     public static <T> void sort(List<T> elements, List<Function<T, Comparable>> keyExtractors) {
         if(!keyExtractors.isEmpty()) {
-            Comparator<? super T> comparator = Comparator.comparing(element -> keyExtractors.get(0).apply(element));
+            Comparator<? super T> comparator = Comparator.comparing(keyExtractors.get(0));
 
             if(keyExtractors.size() > 1) {
                 for(Function<T, Comparable> function : keyExtractors.subList(1, keyExtractors.size())) {
