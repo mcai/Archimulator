@@ -48,7 +48,14 @@ public class CacheBasedPredictor<PredictableT extends Comparable<PredictableT>> 
      * @param counterMaxValue  the maximum value of the counter
      * @param defaultValue     the default value
      */
-    public CacheBasedPredictor(SimulationObject parent, String name, int capacity, final int counterThreshold, final int counterMaxValue, PredictableT defaultValue) {
+    public CacheBasedPredictor(
+            SimulationObject parent,
+            String name,
+            int capacity,
+            final int counterThreshold,
+            final int counterMaxValue,
+            PredictableT defaultValue
+    ) {
         this(parent, name, capacity, CacheReplacementPolicyType.LRU, counterThreshold, counterMaxValue, defaultValue);
     }
 
@@ -63,7 +70,15 @@ public class CacheBasedPredictor<PredictableT extends Comparable<PredictableT>> 
      * @param counterMaxValue            the maximum value of the predictor
      * @param defaultValue               the default value
      */
-    public CacheBasedPredictor(SimulationObject parent, String name, int capacity, CacheReplacementPolicyType cacheReplacementPolicyType, final int counterThreshold, final int counterMaxValue, PredictableT defaultValue) {
+    public CacheBasedPredictor(
+            SimulationObject parent,
+            String name,
+            int capacity,
+            CacheReplacementPolicyType cacheReplacementPolicyType,
+            final int counterThreshold,
+            final int counterMaxValue,
+            PredictableT defaultValue
+    ) {
         this.cache = new BasicEvictableCache<>(
                 parent,
                 name,
@@ -75,6 +90,7 @@ public class CacheBasedPredictor<PredictableT extends Comparable<PredictableT>> 
         this.defaultValue = defaultValue;
     }
 
+    @Override
     public PredictableT predict(int address) {
         CacheLine<Boolean> lineFound = this.cache.findLine(address);
         BooleanValueProvider stateProvider = lineFound != null ? (BooleanValueProvider) lineFound.getStateProvider() : null;
@@ -86,6 +102,7 @@ public class CacheBasedPredictor<PredictableT extends Comparable<PredictableT>> 
         }
     }
 
+    @Override
     public void update(int address, PredictableT observedValue) {
         if (this.predict(address).equals(observedValue)) {
             this.numHits++;
@@ -136,6 +153,7 @@ public class CacheBasedPredictor<PredictableT extends Comparable<PredictableT>> 
         }});
     }
 
+    @Override
     public PredictableT getDefaultValue() {
         return defaultValue;
     }
