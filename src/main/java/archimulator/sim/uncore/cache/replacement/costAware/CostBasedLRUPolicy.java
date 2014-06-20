@@ -53,7 +53,7 @@ public abstract class CostBasedLRUPolicy<StateT extends Serializable> extends Ab
             int recency = this.getCache().getAssociativity() - getStackPosition(set, way);
             int quantizedCost = this.getQuantizedCost(this.getCost(set, way));
 
-            int linearSum = recency + lambda * quantizedCost;
+            int linearSum = recency + this.lambda * quantizedCost;
 
             if (linearSum < victimLinearSum) {
                 victimLinearSum = linearSum;

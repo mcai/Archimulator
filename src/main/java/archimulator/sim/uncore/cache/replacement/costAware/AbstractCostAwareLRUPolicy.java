@@ -65,7 +65,7 @@ public abstract class AbstractCostAwareLRUPolicy<StateT extends Serializable> ex
      * @param cost the cost
      */
     public void setCost(int set, int way, double cost) {
-        CacheLine<Boolean> mirrorLine = mirrorCache.getLine(set, way);
+        CacheLine<Boolean> mirrorLine = this.mirrorCache.getLine(set, way);
         BooleanValueProvider stateProvider = (BooleanValueProvider) mirrorLine.getStateProvider();
         stateProvider.cost = cost;
 
@@ -84,7 +84,7 @@ public abstract class AbstractCostAwareLRUPolicy<StateT extends Serializable> ex
             return this.costPredictor.predict(this.getCache().getLine(set, way).getAccess().getVirtualPc());
         }
 
-        CacheLine<Boolean> mirrorLine = mirrorCache.getLine(set, way);
+        CacheLine<Boolean> mirrorLine = this.mirrorCache.getLine(set, way);
         BooleanValueProvider stateProvider = (BooleanValueProvider) mirrorLine.getStateProvider();
         return stateProvider.cost;
     }
