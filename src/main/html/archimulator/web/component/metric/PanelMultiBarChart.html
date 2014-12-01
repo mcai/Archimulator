@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns:wicket="http://wicket.apache.org">
+<body>
+<wicket:panel>
+
+    <section>
+        <div class="page-header">
+            <h1 wicket:id="sectionHeader"></h1>
+        </div>
+
+        <div wicket:id="chart" style="height: 500px; margin: 10px; min-width: 100px; min-height: 100px;">
+            <svg id="svg"></svg>
+        </div>
+
+        <script>
+            function plot(data, chart_id) {
+            nv.addGraph(function() {
+            var chart = nv.models.multiBarChart().color(d3.scale.category10().range());
+
+            chart.xAxis
+            .tickFormat(d3.requote);
+
+            chart.yAxis
+            .tickFormat(d3.format(',.1f'));
+
+            d3.select('#' + chart_id + ' svg')
+            .datum(data)
+            .transition().duration(500).call(chart);
+
+            nv.utils.windowResize(chart.update);
+
+            return chart;
+            });
+            }
+        </script>
+
+        <script wicket:id="script1"></script>
+
+    </section>
+</wicket:panel>
+</body>
+</html>

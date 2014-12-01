@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:wicket="http://wicket.apache.org">
+<body>
+<wicket:extend>
+
+    <div class="container-fluid">
+        <section>
+            <div class="page-header">
+                <h1>
+                    Experiment Packs
+                </h1>
+            </div>
+
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Tags</th>
+                    <th>Type</th>
+                    <th># Max Instructions</th>
+                    <th>Benchmark</th>
+                    <th>Create Time</th>
+                </tr>
+                </thead>
+                <tbody wicket:id="experimentPack">
+                <tr>
+                    <td wicket:id="id" class="span1"></td>
+                    <td wicket:id="title" class="span3"></td>
+                    <td wicket:id="tags" class="span2"></td>
+                    <td wicket:id="experimentType" class="span1"></td>
+                    <td wicket:id="numMaxInstructions" class="span2"></td>
+                    <td wicket:id="benchmarkTitle" class="span2"></td>
+                    <td wicket:id="createTimeAsString" class="span1"></td>
+                </tr>
+                <tr>
+                    <td colspan="7" wicket:id="state">
+                        Total: <span wicket:id="numTotal"></span> |
+
+                        Pending: <span wicket:id="numPending"></span> |
+
+                        ReadyToRun: <span wicket:id="numReadyToRun"></span> |
+
+                        Running: <span wicket:id="numRunning"></span> |
+
+                        Completed: <span wicket:id="numCompleted"></span> |
+
+                        Aborted: <span wicket:id="numAborted"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="7" wicket:id="operations">
+                        <div class="pull-right">
+                            <a class="btn btn-success" wicket:id="resultsCsv">Results (CSV)</a>
+                            <a class="btn btn-success" wicket:id="resultsPdf">Results (PDF)</a>
+                        </div>
+
+                        <div>
+                            <a class="btn" wicket:id="start">Start</a>
+                            <a class="btn" wicket:id="stop">Stop</a>
+                            <a class="btn btn-warning" wicket:id="resetCompletedExperiments">Reset Completed</a>
+                            <a class="btn btn-warning" wicket:id="resetAbortedExperiments">Reset Aborted</a>
+                            <a class="btn" wicket:id="view"><i class="icon-edit"></i>View</a>
+                            <a class="btn btn-danger" wicket:id="remove">Remove</a>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="7"></td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div class="pagination pagination-centered">
+                <div wicket:id="navigator"></div>
+            </div>
+
+        </section>
+    </div>
+
+</wicket:extend>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<html xmlns:wicket="http://wicket.apache.org">
+<body>
+<wicket:panel>
+    <div class="row-fluid">
+        <div class="control-group">
+            <label for="id" class="control-label">Id:</label>
+
+            <div class="controls">
+                <span id="id" class="span1 input uneditable-input" wicket:id="id"></span>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label for="title" class="control-label">Title:</label>
+
+            <div class="controls">
+                <span id="title" class="span9 input uneditable-input" wicket:id="title"></span>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label for="type" class="control-label">Type:</label>
+
+            <div class="controls">
+                <select id="type" wicket:id="type"></select>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label for="state" class="control-label">State:</label>
+
+            <div class="controls">
+                <select id="state" wicket:id="state"></select>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label for="failedReason" class="control-label">Failed Reason:</label>
+
+            <div class="controls">
+                <textarea id="failedReason" class="span9 input uneditable-input" rows="6" cols="40"
+                          wicket:id="failedReason"></textarea>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label for="architecture" class="control-label">Architecture:</label>
+
+            <div class="controls">
+                <select id="architecture" class="span9"
+                        wicket:id="architecture"></select>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label for="numMaxInstructions" class="control-label"># Max
+                Insts:</label>
+
+            <div class="controls">
+                <input type="number" id="numMaxInstructions"
+                       wicket:id="numMaxInstructions"/>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label for="createTimeAsString" class="control-label">Create Time:</label>
+
+            <div class="controls">
+                <span id="createTimeAsString" class="input uneditable-input" wicket:id="createTimeAsString"></span>
+            </div>
+        </div>
+    </div>
+</wicket:panel>
+</body>
+</html>

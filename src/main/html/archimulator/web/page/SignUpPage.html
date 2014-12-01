@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:wicket="http://wicket.apache.org">
+<body>
+<wicket:extend>
+    <div class="container-fluid">
+        <section>
+            <div class="page-header">
+                <h1>Create your Archimulator account</h1>
+            </div>
+
+            <p>
+                Already have an account?
+                <strong><a href="./sign_in">Sign In</a></strong>.
+            </p>
+
+            <br/>
+
+            <span wicket:id="feedback"></span>
+
+            <form class="form-horizontal" action="" wicket:id="signUp">
+                <div class="control-group">
+                    <label class="control-label" for="email">Email</label>
+
+                    <div class="controls">
+                        <input type="email" placeholder="Email" id="email" wicket:id="email" required/>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" for="password">Password</label>
+
+                    <div class="controls">
+                        <input type="password" placeholder="Password" id="password" wicket:id="password" required/>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" for="password2">Password (Again)</label>
+
+                    <div class="controls">
+                        <input type="password" placeholder="Password Again" id="password2" wicket:id="password2"
+                               required/>
+                    </div>
+                </div>
+
+                <div wicket:id="captcha"></div>
+
+                <div class="control-group">
+                    <div class="controls">
+                        <button class="btn btn-primary" type="submit" wicket:id="submit">Sign Up</button>
+                        <button class="btn" type="reset" value="Reset">Reset</button>
+                    </div>
+                </div>
+            </form>
+        </section>
+
+    </div>
+
+</wicket:extend>
+</body>
+</html>

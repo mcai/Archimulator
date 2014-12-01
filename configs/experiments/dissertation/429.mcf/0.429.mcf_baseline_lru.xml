@@ -1,0 +1,53 @@
+<experimentPack title="429.mcf_baseline_lru" experimentType="TWO_PHASE">
+    <tags>
+        <string>dissertation</string>
+    </tags>
+    <benchmarkTitle>
+        <string>429.mcf_baseline</string>
+    </benchmarkTitle>
+    <numMaxInstructions>
+        <string>100000000</string>
+    </numMaxInstructions>
+    <helperThreadLookahead>
+        <string>-1</string>
+    </helperThreadLookahead>
+    <helperThreadStride>
+        <string>-1</string>
+    </helperThreadStride>
+    <numMainThreadWaysInStaticPartitionedLRUPolicy>
+        <string>-1</string>
+    </numMainThreadWaysInStaticPartitionedLRUPolicy>
+    <numCores>
+        <string>2</string>
+    </numCores>
+    <numThreadsPerCore>
+        <string>2</string>
+    </numThreadsPerCore>
+    <l1ISize>
+        <string>64 KB</string>
+    </l1ISize>
+    <l1IAssociativity>
+        <string>4</string>
+    </l1IAssociativity>
+    <l1DSize>
+        <string>64 KB</string>
+    </l1DSize>
+    <l1DAssociativity>
+        <string>4</string>
+    </l1DAssociativity>
+    <l2Size>
+        <string>96 KB</string>
+    </l2Size>
+    <l2Associativity>
+        <string>16</string>
+    </l2Associativity>
+    <l2ReplacementPolicyType>
+        <string>LRU</string>
+    </l2ReplacementPolicyType>
+    <memoryControllerType>
+        <string>FIXED_LATENCY</string>
+    </memoryControllerType>
+    <dynamicSpeculativePrecomputationEnabled>
+        <string>false</string>
+    </dynamicSpeculativePrecomputationEnabled>
+</experimentPack>

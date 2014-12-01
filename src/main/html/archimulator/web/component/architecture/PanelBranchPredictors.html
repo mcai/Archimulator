@@ -1,0 +1,241 @@
+<html xmlns:wicket="http://wicket.apache.org">
+<body>
+<wicket:panel>
+<div class="row-fluid">
+    <div class="control-group">
+        <label for="branchPredictorType" class="control-label">Branch Predictor Type:</label>
+
+        <div class="controls">
+            <select id="branchPredictorType" wicket:id="branchPredictorType"></select>
+        </div>
+    </div>
+
+    <div wicket:id="twoBitBranchPredictor">
+        <div class="row-fluid">
+            <div class="span9">
+
+                <div class="control-group">
+                    <label for="twoBitBranchPredictorBimodSize" class="control-label">
+                        Bimod Size:</label>
+
+                    <div class="controls">
+                        <input type="number" id="twoBitBranchPredictorBimodSize"
+                               wicket:id="twoBitBranchPredictorBimodSize"/>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label for="twoBitBranchPredictorBranchTargetBufferNumSets" class="control-label">
+                        Number of BTB Sets:</label>
+
+                    <div class="controls">
+                        <input type="number" id="twoBitBranchPredictorBranchTargetBufferNumSets"
+                               wicket:id="twoBitBranchPredictorBranchTargetBufferNumSets"/>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label for="twoBitBranchPredictorBranchTargetBufferAssociativity" class="control-label">
+                        BTB Associativity:</label>
+
+                    <div class="controls">
+                        <input type="number" id="twoBitBranchPredictorBranchTargetBufferAssociativity"
+                               wicket:id="twoBitBranchPredictorBranchTargetBufferAssociativity"/>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label for="twoBitBranchPredictorReturnAddressStackSize" class="control-label">
+                        RAS Size:</label>
+
+                    <div class="controls">
+                        <input type="number" id="twoBitBranchPredictorReturnAddressStackSize"
+                               wicket:id="twoBitBranchPredictorReturnAddressStackSize"/>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div wicket:id="twoLevelBranchPredictor">
+
+        <div class="row-fluid">
+            <div class="span9">
+
+                <div class="control-group">
+                    <label for="twoLevelBranchPredictorL1Size" class="control-label">
+                        L1 Size:</label>
+
+                    <div class="controls">
+                        <input type="number" id="twoLevelBranchPredictorL1Size"
+                               wicket:id="twoLevelBranchPredictorL1Size"/>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label for="twoLevelBranchPredictorL2Size" class="control-label">
+                        L2 Size:</label>
+
+                    <div class="controls">
+                        <input type="number" id="twoLevelBranchPredictorL2Size"
+                               wicket:id="twoLevelBranchPredictorL2Size"/>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label for="twoLevelBranchPredictorShiftWidth" class="control-label">
+                        Shift Width:</label>
+
+                    <div class="controls">
+                        <input type="number" id="twoLevelBranchPredictorShiftWidth"
+                               wicket:id="twoLevelBranchPredictorShiftWidth"/>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label for="twoLevelBranchPredictorXor" class="control-label">
+                        Xor:</label>
+
+                    <div class="controls">
+                        <input type="checkbox" id="twoLevelBranchPredictorXor"
+                               wicket:id="twoLevelBranchPredictorXor"/>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label for="twoLevelBranchPredictorBranchTargetBufferNumSets" class="control-label">
+                        Number of BTB Sets:</label>
+
+                    <div class="controls">
+                        <input type="number" id="twoLevelBranchPredictorBranchTargetBufferNumSets"
+                               wicket:id="twoLevelBranchPredictorBranchTargetBufferNumSets"/>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label for="twoLevelBranchPredictorBranchTargetBufferAssociativity" class="control-label">
+                        BTB Associativity:</label>
+
+                    <div class="controls">
+                        <input type="number" id="twoLevelBranchPredictorBranchTargetBufferAssociativity"
+                               wicket:id="twoLevelBranchPredictorBranchTargetBufferAssociativity"/>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label for="twoLevelBranchPredictorReturnAddressStackSize" class="control-label">
+                        RAS Size:</label>
+
+                    <div class="controls">
+                        <input type="number" id="twoLevelBranchPredictorReturnAddressStackSize"
+                               wicket:id="twoLevelBranchPredictorReturnAddressStackSize"/>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div wicket:id="combinedBranchPredictor">
+
+        <div class="row-fluid">
+            <div class="span9">
+
+                <div class="control-group">
+                    <label for="combinedBranchPredictorBimodSize" class="control-label">
+                        Bimod Size:</label>
+
+                    <div class="controls">
+                        <input type="number" id="combinedBranchPredictorBimodSize"
+                               wicket:id="combinedBranchPredictorBimodSize"/>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label for="combinedBranchPredictorL1Size" class="control-label">
+                        L1 Size:</label>
+
+                    <div class="controls">
+                        <input type="number" id="combinedBranchPredictorL1Size"
+                               wicket:id="combinedBranchPredictorL1Size"/>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label for="combinedBranchPredictorL2Size" class="control-label">
+                        L2 Size:</label>
+
+                    <div class="controls">
+                        <input type="number" id="combinedBranchPredictorL2Size"
+                               wicket:id="combinedBranchPredictorL2Size"/>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label for="combinedBranchPredictorMetaSize" class="control-label">
+                        Meta Size:</label>
+
+                    <div class="controls">
+                        <input type="number" id="combinedBranchPredictorMetaSize"
+                               wicket:id="combinedBranchPredictorMetaSize"/>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label for="combinedBranchPredictorShiftWidth" class="control-label">
+                        Shift Width:</label>
+
+                    <div class="controls">
+                        <input type="number" id="combinedBranchPredictorShiftWidth"
+                               wicket:id="combinedBranchPredictorShiftWidth"/>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label for="combinedBranchPredictorXor" class="control-label">
+                        Xor:</label>
+
+                    <div class="controls">
+                        <input type="checkbox" id="combinedBranchPredictorXor"
+                               wicket:id="combinedBranchPredictorXor"/>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label for="combinedBranchPredictorBranchTargetBufferNumSets" class="control-label">
+                        Number of BTB Sets:</label>
+
+                    <div class="controls">
+                        <input type="number" id="combinedBranchPredictorBranchTargetBufferNumSets"
+                               wicket:id="combinedBranchPredictorBranchTargetBufferNumSets"/>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label for="combinedBranchPredictorBranchTargetBufferAssociativity" class="control-label">
+                        BTB Associativity:</label>
+
+                    <div class="controls">
+                        <input type="number" id="combinedBranchPredictorBranchTargetBufferAssociativity"
+                               wicket:id="combinedBranchPredictorBranchTargetBufferAssociativity"/>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label for="combinedBranchPredictorReturnAddressStackSize" class="control-label">
+                        RAS Size:</label>
+
+                    <div class="controls">
+                        <input type="number" id="combinedBranchPredictorReturnAddressStackSize"
+                               wicket:id="combinedBranchPredictorReturnAddressStackSize"/>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+</wicket:panel>
+</body>
+</html>

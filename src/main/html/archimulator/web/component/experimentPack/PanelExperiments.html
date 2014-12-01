@@ -1,0 +1,46 @@
+<html xmlns:wicket="http://wicket.apache.org">
+<body>
+<wicket:panel>
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Type</th>
+            <th>State</th>
+            <th>Architecture</th>
+            <th># Max Insts</th>
+            <th>Create Time</th>
+        </tr>
+        </thead>
+        <tbody wicket:id="experiment">
+        <tr>
+            <td wicket:id="id"></td>
+            <td wicket:id="title"></td>
+            <td wicket:id="type"></td>
+            <td wicket:id="state"></td>
+            <td wicket:id="architecture.id"></td>
+            <td wicket:id="numMaxInstructions"></td>
+            <td wicket:id="createTimeAsString"></td>
+        </tr>
+        <tr>
+            <td  colspan="7" wicket:id="operations">
+                <a class="btn" wicket:id="start">Start</a>
+                <a class="btn" wicket:id="stop">Stop</a>
+                <a class="btn btn-warning" wicket:id="resetCompleted">Reset Completed</a>
+                <a class="btn btn-warning" wicket:id="resetAborted">Reset Aborted</a>
+                <a class="btn" wicket:id="view"><i class="icon-edit"></i>View</a>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="7"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="pagination pagination-centered">
+        <div wicket:id="navigator"></div>
+    </div>
+</wicket:panel>
+</body>
+</html>

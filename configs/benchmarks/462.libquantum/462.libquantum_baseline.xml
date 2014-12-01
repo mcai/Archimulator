@@ -1,0 +1,7 @@
+<benchmark title="462.libquantum_baseline">
+    <workingDirectory>%user.home%/Archimulator/benchmarks/CPU2006_Custom1/462.libquantum/baseline</workingDirectory>
+    <executable>462.libquantum.mips</executable>
+    <defaultArguments>1397 8</defaultArguments>
+    <standardIn/>
+    <helperThreadEnabled>false</helperThreadEnabled>
+</benchmark>

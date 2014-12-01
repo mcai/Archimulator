@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:wicket="http://wicket.apache.org">
+<body>
+<wicket:extend>
+
+    <div class="container-fluid">
+        <section>
+            <div class="page-header">
+                <h1>
+                    Benchmarks
+                </h1>
+            </div>
+
+            <table class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Executable</th>
+                    <th>Default Arguments</th>
+                    <th>Standard In</th>
+                    <th>HT</th>
+                    <th>Operations</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr wicket:id="benchmark">
+                    <td wicket:id="title"></td>
+                    <td wicket:id="executable"></td>
+                    <td wicket:id="defaultArguments"></td>
+                    <td wicket:id="standardIn"></td>
+                    <td wicket:id="helperThreadEnabled"></td>
+                    <td wicket:id="operations">
+                        <a class="btn" wicket:id="view"><i class="icon-edit"></i>View</a>
+                        <a class="btn btn-success" wicket:id="resultsPdf">Results (PDF)</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+        </section>
+    </div>
+
+</wicket:extend>
+</body>
+</html>

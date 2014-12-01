@@ -1,0 +1,7 @@
+<benchmark title="429.mcf_baseline">
+    <workingDirectory>%user.home%/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline</workingDirectory>
+    <executable>429.mcf.mips</executable>
+    <defaultArguments>%user.home%/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/baseline/data/ref/input/inp.in</defaultArguments>
+    <standardIn/>
+    <helperThreadEnabled>false</helperThreadEnabled>
+</benchmark>

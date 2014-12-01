@@ -346,7 +346,7 @@ public class ExperimentStatServiceImpl extends AbstractService implements Experi
             );
 
             summary.setL2Mpki(
-                    (double) parent.getStatValueAsLong(parent.getMeasurementTitlePrefix(), "l2/numDownwardMisses", 0) / ((double) summary.getNumInstructions() / 1000)
+                    summary.getNumInstructions() == 0 ? 0 : (double) parent.getStatValueAsLong(parent.getMeasurementTitlePrefix(), "l2/numDownwardMisses", 0) / ((double) summary.getNumInstructions() / 1000)
             );
 
             summary.setC0t0L2Mpki(

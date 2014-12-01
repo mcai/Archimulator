@@ -1,0 +1,53 @@
+<html xmlns:wicket="http://wicket.apache.org">
+<body>
+<wicket:panel>
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th>Thread Id</th>
+            <th>Benchmark</th>
+            <th>Arguments</th>
+            <th>Standard out</th>
+            <th>HT Lookahead</th>
+            <th>HT Stride</th>
+            <th>Operations</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr wicket:id="contextMapping">
+            <td class="span1">
+                <label>
+                    <select wicket:id="threadId"></select>
+                </label>
+            </td>
+            <td class="span2">
+                <label>
+                    <select wicket:id="benchmarkTitle"></select>
+                </label>
+            </td>
+            <td class="span2">
+                <label>
+                    <input type="text" wicket:id="arguments"/>
+                </label>
+            </td>
+            <td class="span1">
+                <label>
+                    <input type="text" wicket:id="standardOut"/>
+                </label>
+            </td>
+            <td class="span1">
+                <label>
+                    <input type="text" wicket:id="helperThreadLookahead"/>
+                </label>
+            </td>
+            <td class="span1">
+                <label>
+                    <input type="text" wicket:id="helperThreadStride"/>
+                </label>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</wicket:panel>
+</body>
+</html>

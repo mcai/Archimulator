@@ -1,0 +1,7 @@
+<benchmark title="tsp_ht">
+    <workingDirectory>%user.home%/Archimulator/benchmarks/Olden_Custom1/tsp/ht</workingDirectory>
+    <executable>tsp.mips</executable>
+    <defaultArguments/>
+    <standardIn/>
+    <helperThreadEnabled>true</helperThreadEnabled>
+</benchmark>

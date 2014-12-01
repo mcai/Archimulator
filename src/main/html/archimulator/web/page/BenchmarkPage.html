@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:wicket="http://wicket.apache.org">
+<body>
+<wicket:extend>
+
+    <div class="container-fluid">
+        <section>
+            <div class="page-header">
+                <h1 wicket:id="section_header_benchmark"></h1>
+            </div>
+
+            <span wicket:id="feedback"></span>
+
+            <div class="row-fluid">
+
+                <form class="form-horizontal span12" wicket:id="benchmark">
+
+                    <div class="control-group">
+                        <label for="title" class="control-label">Title:</label>
+
+                        <div class="controls">
+                            <input type="text" id="title" class="span9" wicket:id="title"/>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="workingDirectory" class="control-label">Working Directory:</label>
+
+                        <div class="controls">
+                            <input type="text" id="workingDirectory" class="span9" wicket:id="workingDirectory"/>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="executable" class="control-label">Executable:</label>
+
+                        <div class="controls">
+                            <input type="text" id="executable" class="span9" wicket:id="executable"/>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="defaultArguments" class="control-label">Default Arguments:</label>
+
+                        <div class="controls">
+                            <input type="text" id="defaultArguments" class="span9" wicket:id="defaultArguments"/>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="standardIn" class="control-label">Standard In:</label>
+
+                        <div class="controls">
+                            <input type="text" id="standardIn" class="span9" wicket:id="standardIn"/>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="helperThreadEnabled" class="control-label">Helper Thread Enabled:</label>
+
+                        <div class="controls">
+                            <input type="checkbox" id="helperThreadEnabled" wicket:id="helperThreadEnabled"/>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <input type="submit" value="OK" class="btn" wicket:id="ok"/>
+                    </div>
+
+                </form>
+
+            </div>
+
+            <div class="row-fluid status-bar">
+                <div class="span12">
+                    <div class="alert alert-success" style="display: none">
+                        <b>Success!</b> Saved successfully
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </div>
+
+</wicket:extend>
+</body>
+</html>

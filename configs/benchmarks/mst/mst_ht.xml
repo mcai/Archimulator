@@ -1,0 +1,7 @@
+<benchmark title="mst_ht">
+    <workingDirectory>%user.home%/Archimulator/benchmarks/Olden_Custom1/mst/ht</workingDirectory>
+    <executable>mst.mips</executable>
+    <defaultArguments>4000</defaultArguments>
+    <standardIn/>
+    <helperThreadEnabled>true</helperThreadEnabled>
+</benchmark>
