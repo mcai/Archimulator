@@ -24,18 +24,46 @@ package archimulator.util.ai.aco;
  * @author Min Cai
  */
 public class AntColonyOptimizationHelper {
+    /**
+     * Ant.
+     */
     public class Ant {
 
     }
 
+    /**
+     * Ant colony.
+     */
     public class AntColony {
 
     }
 
+    /**
+     * Ant colony optimization problem.
+     */
     public class AntColonyOptimizationProblem {
 
     }
 
+    /**
+     * Pheromone.
+     */
+    public class Pheromone {
+
+    }
+
+    /**
+     * Path.
+     */
+    public class Path {
+
+    }
+
+    /**
+     * Entry point.
+     *
+     * @param args the arguments
+     */
     public static void main(String[] args) {
 
     }
