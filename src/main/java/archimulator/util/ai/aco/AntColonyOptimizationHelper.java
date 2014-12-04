@@ -18,8 +18,6 @@
  ******************************************************************************/
 package archimulator.util.ai.aco;
 
-import cern.jet.random.Uniform;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
@@ -33,27 +31,10 @@ import java.util.concurrent.Executors;
  * @author Min Cai
  */
 public final class AntColonyOptimizationHelper extends AbstractAntColonyOptimizationHelper {
-    // greedy
-    public static final double ALPHA = -0.2d;
-    // rapid selection
-    public static final double BETA = 9.6d;
-
-    // heuristic parameters
-    public static final double Q = 0.0001d; // somewhere between 0 and 1
-    public static final double PHEROMONE_PERSISTENCE = 0.3d; // between 0 and 1
-    public static final double INITIAL_PHEROMONES = 0.8d; // can be anything
-
-    // use power of 2
     public static final int NUM_AGENTS = 2048 * 20;
     private static final int POOL_SIZE = Runtime.getRuntime().availableProcessors();
 
-    protected final double[][] matrix;
-    protected final double[][] invertedMatrix;
-
-    protected final double[][] pheromones;
     protected final Object[][] mutexes;
-
-    private Uniform uniform;
 
     private static final ExecutorService THREAD_POOL = Executors.newFixedThreadPool(POOL_SIZE);
 
@@ -61,13 +42,8 @@ public final class AntColonyOptimizationHelper extends AbstractAntColonyOptimiza
             THREAD_POOL);
 
     public AntColonyOptimizationHelper(String fileName) throws IOException {
-        this.matrix = readMatrixFromFile(fileName);
-        this.invertedMatrix = invertMatrix();
-        this.pheromones = initializePheromones();
+        super(fileName);
         this.mutexes = initializeMutexObjects();
-
-        // (double min, double max, int seed)
-        this.uniform = new Uniform(0, matrix.length - 1, (int) System.currentTimeMillis());
     }
 
     private Object[][] initializeMutexObjects() {
@@ -80,10 +56,6 @@ public final class AntColonyOptimizationHelper extends AbstractAntColonyOptimiza
         }
 
         return localMatrix;
-    }
-
-    final double readPheromone(int x, int y) {
-        return pheromones[x][y];
     }
 
     final void adjustPheromone(int x, int y, double newPheromone) {
@@ -99,32 +71,6 @@ public final class AntColonyOptimizationHelper extends AbstractAntColonyOptimiza
 
     private double calculatePheromones(double current, double newPheromone) {
         return (1 - AntColonyOptimizationHelper.PHEROMONE_PERSISTENCE) * current + newPheromone;
-    }
-
-    private double[][] initializePheromones() {
-        final double[][] localMatrix = new double[matrix.length][matrix.length];
-        int rows = matrix.length;
-        for (int columns = 0; columns < matrix.length; columns++) {
-            for (int i = 0; i < rows; i++) {
-                localMatrix[columns][i] = INITIAL_PHEROMONES;
-            }
-        }
-
-        return localMatrix;
-    }
-
-    private double[][] invertMatrix() {
-        double[][] local = new double[matrix.length][matrix.length];
-        for (int i = 0; i < matrix.length; i++) {
-            for (int j = 0; j < matrix.length; j++) {
-                local[i][j] = invertDouble(matrix[i][j]);
-            }
-        }
-        return local;
-    }
-
-    private double invertDouble(double distance) {
-        return distance == 0d ? 0d : 1.0d / distance;
     }
 
     final double start() throws InterruptedException, ExecutionException {
@@ -148,15 +94,13 @@ public final class AntColonyOptimizationHelper extends AbstractAntColonyOptimiza
             }
         }
         final int left = numAgentsSent - numAgentsDone;
-        System.out.println("Waiting for " + left
-                + " agents to finish their random walk!");
+        System.out.println("Waiting for " + left + " agents to finish their random walk!");
 
         for (int i = 0; i < left; i++) {
             WalkedWay way = agentCompletionService.take().get();
             if (bestDistance == null || way.distance < bestDistance.distance) {
                 bestDistance = way;
-                System.out.println("Agent returned with new best distance of: "
-                        + way.distance);
+                System.out.println("Agent returned with new best distance of: " + way.distance);
             }
         }
 
@@ -165,10 +109,6 @@ public final class AntColonyOptimizationHelper extends AbstractAntColonyOptimiza
         System.out.println(Arrays.toString(bestDistance.way));
 
         return bestDistance.distance;
-    }
-
-    private int getGaussianDistributionRowIndex() {
-        return uniform.nextInt();
     }
 
     static class WalkedWay {

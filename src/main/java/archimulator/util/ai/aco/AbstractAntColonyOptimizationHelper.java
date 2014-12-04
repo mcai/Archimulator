@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.util.ai.aco;
 
+import cern.jet.random.Uniform;
 import net.pickapack.util.Pair;
 import org.apache.commons.math3.ml.distance.EuclideanDistance;
 
@@ -34,10 +35,38 @@ import java.util.List;
  * @author Min Cai
  */
 public abstract class AbstractAntColonyOptimizationHelper {
+    // greedy
+    public static final double ALPHA = -0.2d;
+    // rapid selection
+    public static final double BETA = 9.6d;
+
+    // heuristic parameters
+    public static final double Q = 0.0001d; // somewhere between 0 and 1
+    public static final double PHEROMONE_PERSISTENCE = 0.3d; // between 0 and 1
+    public static final double INITIAL_PHEROMONES = 0.8d; // can be anything
+
+    protected final double[][] matrix;
+    protected final double[][] invertedMatrix;
+
+    protected final double[][] pheromones;
+
     private EuclideanDistance euclideanDistance;
 
-    protected AbstractAntColonyOptimizationHelper() {
+    private Uniform uniform;
+
+    protected AbstractAntColonyOptimizationHelper(String fileName) throws IOException {
         this.euclideanDistance = new EuclideanDistance();
+
+        this.matrix = readMatrixFromFile(fileName);
+        this.invertedMatrix = invertMatrix();
+        this.pheromones = initializePheromones();
+
+        // (double min, double max, int seed)
+        this.uniform = new Uniform(0, matrix.length - 1, (int) System.currentTimeMillis());
+    }
+
+    final double readPheromone(int x, int y) {
+        return pheromones[x][y];
     }
 
     protected double[][] readMatrixFromFile(String fileName) throws IOException {
@@ -54,7 +83,7 @@ public abstract class AbstractAntColonyOptimizationHelper {
             }
 
             if (readAhead) {
-                String[] split = sweepNumbers(line.trim());
+                String[] split = line.trim().split(" ");
                 records.add(new Pair<>(Double.parseDouble(split[1].trim()), Double
                         .parseDouble(split[2].trim())));
             }
@@ -81,26 +110,33 @@ public abstract class AbstractAntColonyOptimizationHelper {
         return localMatrix;
     }
 
-    private String[] sweepNumbers(String trim) {
-        String[] arr = new String[3];
-        int currentIndex = 0;
-        for (int i = 0; i < trim.length(); i++) {
-            final char c = trim.charAt(i);
-            if ((c) != 32) {
-                for (int f = i + 1; f < trim.length(); f++) {
-                    final char x = trim.charAt(f);
-                    if (x == 32) {
-                        arr[currentIndex] = trim.substring(i, f);
-                        currentIndex++;
-                        break;
-                    } else if (f == trim.length() - 1) {
-                        arr[currentIndex] = trim.substring(i, trim.length());
-                        break;
-                    }
-                }
-                i = i + arr[currentIndex - 1].length();
+    private double[][] initializePheromones() {
+        final double[][] localMatrix = new double[matrix.length][matrix.length];
+        int rows = matrix.length;
+        for (int columns = 0; columns < matrix.length; columns++) {
+            for (int i = 0; i < rows; i++) {
+                localMatrix[columns][i] = INITIAL_PHEROMONES;
             }
         }
-        return arr;
+
+        return localMatrix;
+    }
+
+    private double[][] invertMatrix() {
+        double[][] local = new double[matrix.length][matrix.length];
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix.length; j++) {
+                local[i][j] = invertDouble(matrix[i][j]);
+            }
+        }
+        return local;
+    }
+
+    private double invertDouble(double distance) {
+        return distance == 0d ? 0d : 1.0d / distance;
+    }
+
+    protected int getGaussianDistributionRowIndex() {
+        return uniform.nextInt();
     }
 }
