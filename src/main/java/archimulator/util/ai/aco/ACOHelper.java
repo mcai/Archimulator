@@ -27,229 +27,23 @@ import java.util.List;
  * @author Min Cai
  */
 public class ACOHelper {
-    /**
-     * Node.
-     */
-    public class Node {
-        private String name;
-        private List<Edge> edges;
-
-        /**
-         * Create a node.
-         *
-         * @param name the name
-         */
-        public Node(String name) {
-            this.name = name;
-            this.edges = new ArrayList<>();
-        }
-
-        /**
-         * Get the name.
-         *
-         * @return the name
-         */
-        public String getName() {
-            return name;
-        }
-
-        /**
-         * Get the list of edges.
-         *
-         * @return the list of edges
-         */
-        public List<Edge> getEdges() {
-            return edges;
-        }
-    }
-
-    /**
-     * Edge.
-     */
-    public abstract class Edge {
-        private Node nodeFrom;
-        private Node nodeTo;
-
-        private double pheromone;
-        private double cost;
-
-        /**
-         * Create an edge.
-         *
-         * @param nodeFrom the source node
-         * @param nodeTo the destination node
-         * @param pheromone the initial pheromone value
-         * @param cost the initial cost
-         */
-        public Edge(Node nodeFrom, Node nodeTo, double pheromone, double cost) {
-            this.nodeFrom = nodeFrom;
-            this.nodeTo = nodeTo;
-
-            this.pheromone = pheromone;
-            this.cost = cost;
-        }
-
-        /**
-         * Deposit.
-         */
-        public void deposit() {
-            this.pheromone += delta * (maxPheromone - this.pheromone);
-        }
-
-        /**
-         * Evaporate.
-         */
-        public void evaporate() {
-            this.pheromone *= (1 - p);
-        }
-
-        /**
-         * Set the cost.
-         *
-         * @param cost the cost
-         */
-        public void setCost(double cost) {
-            this.cost = cost;
-        }
-
-        /**
-         * Get the source node.
-         *
-         * @return the source node
-         */
-        public Node getNodeFrom() {
-            return nodeFrom;
-        }
-
-        /**
-         * Get the destination node.
-         *
-         * @return the destination node
-         */
-        public Node getNodeTo() {
-            return nodeTo;
-        }
-
-        /**
-         * Get the pheromone.
-         *
-         * @return the pheromone
-         */
-        public double getPheromone() {
-            return pheromone;
-        }
-
-        /**
-         * Get the cost.
-         *
-         * @return the cost
-         */
-        public double getCost() {
-            return cost;
-        }
-    }
-
-    /**
-     * Ant.
-     */
-    public abstract class Ant {
-        private String name;
-        private Node node;
-        private List<Edge> path;
-
-        /**
-         * Create an ant.
-         *
-         * @param name the name
-         * @param node the initial node at which the ant begins
-         */
-        public Ant(String name, Node node) {
-            this.name = name;
-            this.node = node;
-            this.path = new ArrayList<>();
-        }
-
-        /**
-         * Go forward.
-         */
-        public void forward() {
-            Node nextNodeToVisit = getNextNodeToVisit();
-            this.path.add(getEdge(this.node, nextNodeToVisit));
-            this.node = nextNodeToVisit;
-        }
-
-        /**
-         * Get the next node to visit.
-         *
-         * @return the next node to visit
-         */
-        protected Node getNextNodeToVisit() {
-            //TODO
-            return null;
-        }
-
-        private double getP(Node nodeFrom, Node nodeTo) {
-            Edge edge = getEdge(nodeFrom, nodeTo);
-            double yita = 1 - edge.getCost() / nodeFrom.getEdges().stream().mapToDouble(Edge::getCost).sum();
-            return Math.pow(edge.getPheromone(), getAlpha()) * Math.pow(yita, getBeta()) / nodeFrom.getEdges().stream().mapToDouble(e -> Math.pow(e.getPheromone(), getAlpha()) * Math.pow(yita, getBeta())).sum();
-        }
-
-        /**
-         * Get the name.
-         *
-         * @return the name
-         */
-        public String getName() {
-            return name;
-        }
-
-        /**
-         * Get the node where the ant resides.
-         *
-         * @return the node where the ant resides
-         */
-        public Node getNode() {
-            return node;
-        }
-
-        /**
-         * Get the list of edges that the ant has visited so far.
-         *
-         * @return the list of edges that the ant has visited so far
-         */
-        public List<Edge> getPath() {
-            return path;
-        }
-
-        /**
-         * Get the cost of the path.
-         *
-         * @return the cost of the path
-         */
-        public double getPathCost() {
-            return this.path.stream().mapToDouble(Edge::getCost).sum();
-        }
-    }
-
     private double p;
-
     private double delta;
     private double maxPheromone;
-
     private double alpha;
     private double beta;
-
     private List<Node> nodes;
     private List<Edge> edges;
     private List<Ant> ants;
 
     /**
      * Create an ACOHelper.
-     *  @param p the p value
-     * @param delta the delta value
+     *
+     * @param p            the p value
+     * @param delta        the delta value
      * @param maxPheromone the max pheromone value
-     * @param alpha the alpha value
-     * @param beta the beta value
+     * @param alpha        the alpha value
+     * @param beta         the beta value
      */
     public ACOHelper(double p, double delta, double maxPheromone, double alpha, double beta) {
         this.p = p;
@@ -261,6 +55,23 @@ public class ACOHelper {
         this.nodes = new ArrayList<>();
         this.edges = new ArrayList<>();
         this.ants = new ArrayList<>();
+    }
+
+    /**
+     * Entry point.
+     *
+     * @param args the arguments
+     */
+    public static void main(String[] args) {
+        ACOHelper acoHelper = new ACOHelper(0.1, 0.5, 1, 0.5, 0.5);
+
+        for (int i = 0; i < 1000; i++) {
+            acoHelper.getAnts().forEach(Ant::forward);
+            acoHelper.getEdges().forEach(Edge::evaporate);
+        }
+
+        Ant antOfShortestPath = acoHelper.getAntOfShortestPath();
+        System.out.println(antOfShortestPath);
     }
 
     /**
@@ -283,9 +94,9 @@ public class ACOHelper {
         double pathCost = Double.MAX_VALUE;
         Ant antOfShortestPath = null;
 
-        for(Ant ant : this.getAnts()) {
+        for (Ant ant : this.getAnts()) {
             double newPathCost = ant.getPathCost();
-            if(newPathCost < pathCost) {
+            if (newPathCost < pathCost) {
                 pathCost = newPathCost;
                 antOfShortestPath = ant;
             }
@@ -340,19 +151,206 @@ public class ACOHelper {
     }
 
     /**
-     * Entry point.
-     *
-     * @param args the arguments
+     * Node.
      */
-    public static void main(String[] args) {
-        ACOHelper acoHelper = new ACOHelper(0.1, 0.5, 1, 0.5, 0.5);
+    public class Node {
+        private String name;
+        private List<Edge> edges;
 
-        for(int i = 0; i < 1000; i++) {
-            acoHelper.getAnts().forEach(Ant::forward);
-            acoHelper.getEdges().forEach(Edge::evaporate);
+        /**
+         * Create a node.
+         *
+         * @param name the name
+         */
+        public Node(String name) {
+            this.name = name;
+            this.edges = new ArrayList<>();
         }
 
-        Ant antOfShortestPath = acoHelper.getAntOfShortestPath();
-        System.out.println(antOfShortestPath);
+        /**
+         * Get the name.
+         *
+         * @return the name
+         */
+        public String getName() {
+            return name;
+        }
+
+        /**
+         * Get the list of edges.
+         *
+         * @return the list of edges
+         */
+        public List<Edge> getEdges() {
+            return edges;
+        }
+    }
+
+    /**
+     * Edge.
+     */
+    public abstract class Edge {
+        private Node nodeFrom;
+        private Node nodeTo;
+
+        private double pheromone;
+        private double cost;
+
+        /**
+         * Create an edge.
+         *
+         * @param nodeFrom  the source node
+         * @param nodeTo    the destination node
+         * @param pheromone the initial pheromone value
+         * @param cost      the initial cost
+         */
+        public Edge(Node nodeFrom, Node nodeTo, double pheromone, double cost) {
+            this.nodeFrom = nodeFrom;
+            this.nodeTo = nodeTo;
+
+            this.pheromone = pheromone;
+            this.cost = cost;
+        }
+
+        /**
+         * Deposit.
+         */
+        public void deposit() {
+            this.pheromone += delta * (maxPheromone - this.pheromone);
+        }
+
+        /**
+         * Evaporate.
+         */
+        public void evaporate() {
+            this.pheromone *= (1 - p);
+        }
+
+        /**
+         * Get the source node.
+         *
+         * @return the source node
+         */
+        public Node getNodeFrom() {
+            return nodeFrom;
+        }
+
+        /**
+         * Get the destination node.
+         *
+         * @return the destination node
+         */
+        public Node getNodeTo() {
+            return nodeTo;
+        }
+
+        /**
+         * Get the pheromone.
+         *
+         * @return the pheromone
+         */
+        public double getPheromone() {
+            return pheromone;
+        }
+
+        /**
+         * Get the cost.
+         *
+         * @return the cost
+         */
+        public double getCost() {
+            return cost;
+        }
+
+        /**
+         * Set the cost.
+         *
+         * @param cost the cost
+         */
+        public void setCost(double cost) {
+            this.cost = cost;
+        }
+    }
+
+    /**
+     * Ant.
+     */
+    public abstract class Ant {
+        private String name;
+        private Node node;
+        private List<Edge> path;
+
+        /**
+         * Create an ant.
+         *
+         * @param name the name
+         * @param node the initial node at which the ant begins
+         */
+        public Ant(String name, Node node) {
+            this.name = name;
+            this.node = node;
+            this.path = new ArrayList<>();
+        }
+
+        /**
+         * Go forward.
+         */
+        public void forward() {
+            Node nextNodeToVisit = getNextNodeToVisit();
+            this.path.add(getEdge(this.node, nextNodeToVisit));
+            this.node = nextNodeToVisit;
+        }
+
+        /**
+         * Get the next node to visit.
+         *
+         * @return the next node to visit
+         */
+        protected Node getNextNodeToVisit() {
+            //TODO
+            return null;
+        }
+
+        private double getP(Node nodeFrom, Node nodeTo) {
+            Edge edge = getEdge(nodeFrom, nodeTo);
+            double eta = 1 - edge.getCost() / nodeFrom.getEdges().stream().mapToDouble(Edge::getCost).sum();
+            return Math.pow(edge.getPheromone(), getAlpha()) * Math.pow(eta, getBeta()) / nodeFrom.getEdges().stream().mapToDouble(e -> Math.pow(e.getPheromone(), getAlpha()) * Math.pow(eta, getBeta())).sum();
+        }
+
+        /**
+         * Get the name.
+         *
+         * @return the name
+         */
+        public String getName() {
+            return name;
+        }
+
+        /**
+         * Get the node where the ant resides.
+         *
+         * @return the node where the ant resides
+         */
+        public Node getNode() {
+            return node;
+        }
+
+        /**
+         * Get the list of edges that the ant has visited so far.
+         *
+         * @return the list of edges that the ant has visited so far
+         */
+        public List<Edge> getPath() {
+            return path;
+        }
+
+        /**
+         * Get the cost of the path.
+         *
+         * @return the cost of the path
+         */
+        public double getPathCost() {
+            return this.path.stream().mapToDouble(Edge::getCost).sum();
+        }
     }
 }
