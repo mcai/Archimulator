@@ -32,6 +32,7 @@ public class ACOHelper {
      */
     public class Node {
         private String name;
+        private List<Edge> edges;
 
         /**
          * Create a node.
@@ -40,6 +41,7 @@ public class ACOHelper {
          */
         public Node(String name) {
             this.name = name;
+            this.edges = new ArrayList<>();
         }
 
         /**
@@ -49,6 +51,15 @@ public class ACOHelper {
          */
         public String getName() {
             return name;
+        }
+
+        /**
+         * Get the list of edges.
+         *
+         * @return the list of edges
+         */
+        public List<Edge> getEdges() {
+            return edges;
         }
     }
 
@@ -81,12 +92,16 @@ public class ACOHelper {
         /**
          * Deposit.
          */
-        public abstract void deposit();
+        public void deposit() {
+            this.pheromone += delta * (maxPheromone - this.pheromone);
+        }
 
         /**
          * Evaporate.
          */
-        public abstract void evaporate();
+        public void evaporate() {
+            this.pheromone *= (1 - p);
+        }
 
         /**
          * Set the cost.
@@ -168,7 +183,16 @@ public class ACOHelper {
          *
          * @return the next node to visit
          */
-        protected abstract Node getNextNodeToVisit();
+        protected Node getNextNodeToVisit() {
+            //TODO
+            return null;
+        }
+
+        private double getP(Node nodeFrom, Node nodeTo) {
+            Edge edge = getEdge(nodeFrom, nodeTo);
+            double yita = 1 - edge.getCost() / nodeFrom.getEdges().stream().mapToDouble(Edge::getCost).sum();
+            return Math.pow(edge.getPheromone(), getAlpha()) * Math.pow(yita, getBeta()) / nodeFrom.getEdges().stream().mapToDouble(e -> Math.pow(e.getPheromone(), getAlpha()) * Math.pow(yita, getBeta())).sum();
+        }
 
         /**
          * Get the name.
@@ -207,6 +231,11 @@ public class ACOHelper {
         }
     }
 
+    private double p;
+
+    private double delta;
+    private double maxPheromone;
+
     private double alpha;
     private double beta;
 
@@ -216,11 +245,16 @@ public class ACOHelper {
 
     /**
      * Create an ACOHelper.
-     *
+     *  @param p the p value
+     * @param delta the delta value
+     * @param maxPheromone the max pheromone value
      * @param alpha the alpha value
      * @param beta the beta value
      */
-    public ACOHelper(double alpha, double beta) {
+    public ACOHelper(double p, double delta, double maxPheromone, double alpha, double beta) {
+        this.p = p;
+        this.delta = delta;
+        this.maxPheromone = maxPheromone;
         this.alpha = alpha;
         this.beta = beta;
 
@@ -237,8 +271,7 @@ public class ACOHelper {
      * @return the edge for the specified source and destination nodes
      */
     public Edge getEdge(Node nodeFrom, Node nodeTo) {
-        //TODO
-        return null;
+        return nodeFrom.getEdges().stream().filter(edge -> edge.getNodeTo().equals(nodeTo)).findFirst().orElseGet(() -> null);
     }
 
     /**
@@ -312,7 +345,7 @@ public class ACOHelper {
      * @param args the arguments
      */
     public static void main(String[] args) {
-        ACOHelper acoHelper = new ACOHelper(0.5, 0.5);
+        ACOHelper acoHelper = new ACOHelper(0.1, 0.5, 1, 0.5, 0.5);
 
         for(int i = 0; i < 1000; i++) {
             acoHelper.getAnts().forEach(Ant::forward);
