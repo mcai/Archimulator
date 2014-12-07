@@ -63,11 +63,6 @@ public class Edge {
         this.pheromone *= (1 - this.acoHelper.getP());
     }
 
-    @Override
-    public String toString() {
-        return String.format("Edge{nodeFrom=%s, nodeTo=%s, pheromone=%.4f, cost=%.4f}", nodeFrom, nodeTo, pheromone, cost);
-    }
-
     /**
      * Get the ACO helper.
      *
@@ -120,5 +115,10 @@ public class Edge {
      */
     public void setCost(double cost) {
         this.cost = cost;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Edge{nodeFrom=%s, nodeTo=%s, pheromone=%.4f, cost=%.4f}", nodeFrom, nodeTo, pheromone, cost);
     }
 }

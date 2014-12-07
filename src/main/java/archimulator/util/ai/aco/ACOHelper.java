@@ -106,46 +106,6 @@ public class ACOHelper<NodeT extends EuclideanNode> {
         }
     }
 
-    private static EuclideanDistance euclideanDistance = new EuclideanDistance();
-
-    /**
-     * Entry point.
-     *
-     * @param args the arguments
-     */
-    public static void main(String[] args) {
-        ACOHelper<EuclideanNode> acoHelper = read("/home/itecgo/Archimulator/src/main/java/archimulator/util/ai/aco/berlin52.tsp", 0.1, 0.5, 1, 0.5, 0.5);
-
-        EuclideanNode firstNode = acoHelper.getNodes().get(0);
-
-        for(int i = 0; i < acoHelper.getNodes().size(); i++) {
-            acoHelper.getAnts().add(new Ant(acoHelper, "" + i, firstNode));
-        }
-
-        List<Edge> shortestPath;
-        double shortestPathCost = Double.MAX_VALUE;
-
-        for (int i = 0; i < 10; i++) {
-            acoHelper.getAnts().forEach(Ant::onePass);
-            acoHelper.getEdges().forEach(Edge::evaporate);
-
-            Ant antOfShortestPath = acoHelper.getAntOfShortestPath();
-
-            List<Edge> newShortestPath = antOfShortestPath.getPath();
-            double newShortestPathCost = antOfShortestPath.getPathCost();
-
-            if(newShortestPathCost < shortestPathCost) {
-                shortestPath = newShortestPath;
-                shortestPathCost = newShortestPathCost;
-
-                System.out.println("New shortest path found: " + shortestPath.stream().map(edge -> edge.getNodeFrom().getName()).collect(Collectors.toList()));
-                System.out.println("New shortest path cost found: " + shortestPathCost);
-            }
-
-            acoHelper.getAnts().forEach(Ant::reset);
-        }
-    }
-
     /**
      * Get the edge for the specified source and destination nodes.
      *
@@ -252,5 +212,45 @@ public class ACOHelper<NodeT extends EuclideanNode> {
      */
     public List<Ant> getAnts() {
         return ants;
+    }
+
+    private static EuclideanDistance euclideanDistance = new EuclideanDistance();
+
+    /**
+     * Entry point.
+     *
+     * @param args the arguments
+     */
+    public static void main(String[] args) {
+        ACOHelper<EuclideanNode> acoHelper = read("/home/itecgo/Archimulator/src/main/java/archimulator/util/ai/aco/berlin52.tsp", 0.1, 0.5, 1, 0.5, 0.5);
+
+        EuclideanNode firstNode = acoHelper.getNodes().get(0);
+
+        for(int i = 0; i < acoHelper.getNodes().size(); i++) {
+            acoHelper.getAnts().add(new Ant(acoHelper, "" + i, firstNode));
+        }
+
+        List<Edge> shortestPath;
+        double shortestPathCost = Double.MAX_VALUE;
+
+        for (int i = 0; i < 10; i++) {
+            acoHelper.getAnts().forEach(Ant::onePass);
+            acoHelper.getEdges().forEach(Edge::evaporate);
+
+            Ant antOfShortestPath = acoHelper.getAntOfShortestPath();
+
+            List<Edge> newShortestPath = antOfShortestPath.getPath();
+            double newShortestPathCost = antOfShortestPath.getPathCost();
+
+            if(newShortestPathCost < shortestPathCost) {
+                shortestPath = newShortestPath;
+                shortestPathCost = newShortestPathCost;
+
+                System.out.println("New shortest path found: " + shortestPath.stream().map(edge -> edge.getNodeFrom().getName()).collect(Collectors.toList()));
+                System.out.println("New shortest path cost found: " + shortestPathCost);
+            }
+
+            acoHelper.getAnts().forEach(Ant::reset);
+        }
     }
 }

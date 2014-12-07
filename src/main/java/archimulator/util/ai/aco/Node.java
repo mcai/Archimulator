@@ -41,11 +41,6 @@ public class Node {
         this.name = name;
     }
 
-    @Override
-    public String toString() {
-        return String.format("'%s'", name);
-    }
-
     /**
      * Get the ACO helper.
      *
@@ -71,5 +66,10 @@ public class Node {
      */
     public List<Edge> getEdges() {
         return this.getAcoHelper().getEdges().stream().filter(edge -> edge.getNodeFrom() == this).collect(Collectors.toList());
+    }
+
+    @Override
+    public String toString() {
+        return String.format("'%s'", name);
     }
 }

@@ -117,11 +117,6 @@ public class Ant {
         return 1 - edge.getCost() / nodeFrom.getEdges().stream().mapToDouble(Edge::getCost).sum();
     }
 
-    @Override
-    public String toString() {
-        return String.format("Ant{name='%s', node=%s}", name, node);
-    }
-
     /**
      * Get the ACO helper.
      *
@@ -174,5 +169,10 @@ public class Ant {
      */
     public double getPathCost() {
         return this.path.stream().mapToDouble(Edge::getCost).sum();
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Ant{name='%s', node=%s}", name, node);
     }
 }
