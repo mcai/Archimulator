@@ -18,26 +18,34 @@
  ******************************************************************************/
 package archimulator.util.ai.aco;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.math3.ml.distance.EuclideanDistance;
+
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * ACO helper.
  *
+ * @param <NodeT> the node type
  * @author Min Cai
  */
-public class ACOHelper {
+public class ACOHelper<NodeT extends EuclideanNode> {
     private double p;
     private double delta;
     private double maxPheromone;
     private double alpha;
     private double beta;
-    private List<Node> nodes;
+    private List<NodeT> nodes;
     private List<Edge> edges;
     private List<Ant> ants;
 
     /**
-     * Create an ACOHelper.
+     * Create an ACO helper.
      *
      * @param p            the p value
      * @param delta        the delta value
@@ -58,20 +66,84 @@ public class ACOHelper {
     }
 
     /**
+     * Create an ACO helper from the specified file.
+     *
+     * @param fileName     the file name
+     * @param p            the p value
+     * @param delta        the delta value
+     * @param maxPheromone the max pheromone value
+     * @param alpha        the alpha value
+     * @param beta         the beta value
+     * @return the newly created ACO helper
+     */
+    public static ACOHelper<EuclideanNode> read(String fileName, double p, double delta, double maxPheromone, double alpha, double beta) {
+        try {
+            ACOHelper<EuclideanNode> acoHelper = new ACOHelper<>(p, delta, maxPheromone, alpha, beta);
+
+            List<String> lines = IOUtils.readLines(new FileReader(fileName));
+
+            for (String line : lines) {
+                String[] parts = line.split(" ");
+                if (parts.length == 3 && NumberUtils.isNumber(parts[0].trim()) && NumberUtils.isNumber(parts[1].trim()) && NumberUtils.isNumber(parts[2].trim())) {
+                    int i = Integer.parseInt(parts[0].trim());
+                    double x = Double.parseDouble(parts[1].trim());
+                    double y = Double.parseDouble(parts[2].trim());
+                    acoHelper.getNodes().add(new EuclideanNode(acoHelper, "" + i, x, y));
+                }
+            }
+
+            for (EuclideanNode nodeFrom : acoHelper.getNodes()) {
+                for (EuclideanNode nodeTo : acoHelper.getNodes()) {
+                    if (nodeFrom != nodeTo && acoHelper.getEdge(nodeFrom, nodeTo) == null) {
+                        acoHelper.getEdges().add(new Edge(acoHelper, nodeFrom, nodeTo, 1, euclideanDistance.compute(new double[]{nodeFrom.getX(), nodeFrom.getY()}, new double[]{nodeTo.getX(), nodeTo.getY()})));
+                    }
+                }
+            }
+
+            return acoHelper;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static EuclideanDistance euclideanDistance = new EuclideanDistance();
+
+    /**
      * Entry point.
      *
      * @param args the arguments
      */
     public static void main(String[] args) {
-        ACOHelper acoHelper = new ACOHelper(0.1, 0.5, 1, 0.5, 0.5);
+        ACOHelper<EuclideanNode> acoHelper = read("/home/itecgo/Archimulator/src/main/java/archimulator/util/ai/aco/berlin52.tsp", 0.1, 0.5, 1, 0.5, 0.5);
 
-        for (int i = 0; i < 1000; i++) {
-            acoHelper.getAnts().forEach(Ant::forward);
-            acoHelper.getEdges().forEach(Edge::evaporate);
+        EuclideanNode firstNode = acoHelper.getNodes().get(0);
+
+        for(int i = 0; i < acoHelper.getNodes().size(); i++) {
+            acoHelper.getAnts().add(new Ant(acoHelper, "" + i, firstNode));
         }
 
-        Ant antOfShortestPath = acoHelper.getAntOfShortestPath();
-        System.out.println(antOfShortestPath);
+        List<Edge> shortestPath;
+        double shortestPathCost = Double.MAX_VALUE;
+
+        for (int i = 0; i < 10; i++) {
+            acoHelper.getAnts().forEach(Ant::onePass);
+            acoHelper.getEdges().forEach(Edge::evaporate);
+
+            Ant antOfShortestPath = acoHelper.getAntOfShortestPath();
+
+            List<Edge> newShortestPath = antOfShortestPath.getPath();
+            double newShortestPathCost = antOfShortestPath.getPathCost();
+
+            if(newShortestPathCost < shortestPathCost) {
+                shortestPath = newShortestPath;
+                shortestPathCost = newShortestPathCost;
+
+                System.out.println("New shortest path found: " + shortestPath.stream().map(edge -> edge.getNodeFrom().getName()).collect(Collectors.toList()));
+                System.out.println("New shortest path cost found: " + shortestPathCost);
+            }
+
+            acoHelper.getAnts().forEach(Ant::reset);
+        }
     }
 
     /**
@@ -105,6 +177,38 @@ public class ACOHelper {
         return antOfShortestPath;
     }
 
+    @Override
+    public String toString() {
+        return String.format("ACOHelper{p=%s, delta=%s, maxPheromone=%s, alpha=%s, beta=%s}", p, delta, maxPheromone, alpha, beta);
+    }
+
+    /**
+     * Get the p value.
+     *
+     * @return the p value
+     */
+    public double getP() {
+        return p;
+    }
+
+    /**
+     * Get the delta value.
+     *
+     * @return the delta value
+     */
+    public double getDelta() {
+        return delta;
+    }
+
+    /**
+     * Get the max pheromone value.
+     *
+     * @return the max pheromone value
+     */
+    public double getMaxPheromone() {
+        return maxPheromone;
+    }
+
     /**
      * Get the alpha value.
      *
@@ -128,7 +232,7 @@ public class ACOHelper {
      *
      * @return the list of nodes
      */
-    public List<Node> getNodes() {
+    public List<NodeT> getNodes() {
         return nodes;
     }
 
@@ -148,209 +252,5 @@ public class ACOHelper {
      */
     public List<Ant> getAnts() {
         return ants;
-    }
-
-    /**
-     * Node.
-     */
-    public class Node {
-        private String name;
-        private List<Edge> edges;
-
-        /**
-         * Create a node.
-         *
-         * @param name the name
-         */
-        public Node(String name) {
-            this.name = name;
-            this.edges = new ArrayList<>();
-        }
-
-        /**
-         * Get the name.
-         *
-         * @return the name
-         */
-        public String getName() {
-            return name;
-        }
-
-        /**
-         * Get the list of edges.
-         *
-         * @return the list of edges
-         */
-        public List<Edge> getEdges() {
-            return edges;
-        }
-    }
-
-    /**
-     * Edge.
-     */
-    public abstract class Edge {
-        private Node nodeFrom;
-        private Node nodeTo;
-
-        private double pheromone;
-        private double cost;
-
-        /**
-         * Create an edge.
-         *
-         * @param nodeFrom  the source node
-         * @param nodeTo    the destination node
-         * @param pheromone the initial pheromone value
-         * @param cost      the initial cost
-         */
-        public Edge(Node nodeFrom, Node nodeTo, double pheromone, double cost) {
-            this.nodeFrom = nodeFrom;
-            this.nodeTo = nodeTo;
-
-            this.pheromone = pheromone;
-            this.cost = cost;
-        }
-
-        /**
-         * Deposit.
-         */
-        public void deposit() {
-            this.pheromone += delta * (maxPheromone - this.pheromone);
-        }
-
-        /**
-         * Evaporate.
-         */
-        public void evaporate() {
-            this.pheromone *= (1 - p);
-        }
-
-        /**
-         * Get the source node.
-         *
-         * @return the source node
-         */
-        public Node getNodeFrom() {
-            return nodeFrom;
-        }
-
-        /**
-         * Get the destination node.
-         *
-         * @return the destination node
-         */
-        public Node getNodeTo() {
-            return nodeTo;
-        }
-
-        /**
-         * Get the pheromone.
-         *
-         * @return the pheromone
-         */
-        public double getPheromone() {
-            return pheromone;
-        }
-
-        /**
-         * Get the cost.
-         *
-         * @return the cost
-         */
-        public double getCost() {
-            return cost;
-        }
-
-        /**
-         * Set the cost.
-         *
-         * @param cost the cost
-         */
-        public void setCost(double cost) {
-            this.cost = cost;
-        }
-    }
-
-    /**
-     * Ant.
-     */
-    public abstract class Ant {
-        private String name;
-        private Node node;
-        private List<Edge> path;
-
-        /**
-         * Create an ant.
-         *
-         * @param name the name
-         * @param node the initial node at which the ant begins
-         */
-        public Ant(String name, Node node) {
-            this.name = name;
-            this.node = node;
-            this.path = new ArrayList<>();
-        }
-
-        /**
-         * Go forward.
-         */
-        public void forward() {
-            Node nextNodeToVisit = getNextNodeToVisit();
-            this.path.add(getEdge(this.node, nextNodeToVisit));
-            this.node = nextNodeToVisit;
-        }
-
-        /**
-         * Get the next node to visit.
-         *
-         * @return the next node to visit
-         */
-        protected Node getNextNodeToVisit() {
-            //TODO
-            return null;
-        }
-
-        private double getP(Node nodeFrom, Node nodeTo) {
-            Edge edge = getEdge(nodeFrom, nodeTo);
-            double eta = 1 - edge.getCost() / nodeFrom.getEdges().stream().mapToDouble(Edge::getCost).sum();
-            return Math.pow(edge.getPheromone(), getAlpha()) * Math.pow(eta, getBeta()) / nodeFrom.getEdges().stream().mapToDouble(e -> Math.pow(e.getPheromone(), getAlpha()) * Math.pow(eta, getBeta())).sum();
-        }
-
-        /**
-         * Get the name.
-         *
-         * @return the name
-         */
-        public String getName() {
-            return name;
-        }
-
-        /**
-         * Get the node where the ant resides.
-         *
-         * @return the node where the ant resides
-         */
-        public Node getNode() {
-            return node;
-        }
-
-        /**
-         * Get the list of edges that the ant has visited so far.
-         *
-         * @return the list of edges that the ant has visited so far
-         */
-        public List<Edge> getPath() {
-            return path;
-        }
-
-        /**
-         * Get the cost of the path.
-         *
-         * @return the cost of the path
-         */
-        public double getPathCost() {
-            return this.path.stream().mapToDouble(Edge::getCost).sum();
-        }
     }
 }
