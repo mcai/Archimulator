@@ -21,10 +21,9 @@ package archimulator.sim.common;
 import archimulator.model.Experiment;
 import archimulator.sim.isa.event.PseudoCallEncounteredEvent;
 import archimulator.sim.os.Kernel;
-import net.pickapack.util.Reference;
-import net.pickapack.action.Action1;
 import net.pickapack.event.BlockingEventDispatcher;
 import net.pickapack.event.CycleAccurateEventQueue;
+import net.pickapack.util.Reference;
 
 /**
  * "To ROI" fast forward simulation.
@@ -83,11 +82,9 @@ public class ToRoiFastForwardSimulation extends Simulation {
     public void beginSimulation() {
         this.pthreadHasSpawned = false;
 
-        this.getProcessor().getKernel().getBlockingEventDispatcher().addListener(PseudoCallEncounteredEvent.class, new Action1<PseudoCallEncounteredEvent>() {
-            public void apply(PseudoCallEncounteredEvent event) {
-                if (event.getPseudoCall().getImm() == getExperiment().getArchitecture().getHelperThreadPthreadSpawnIndex()) {
-                    pthreadHasSpawned = true;
-                }
+        this.getProcessor().getKernel().getBlockingEventDispatcher().addListener(PseudoCallEncounteredEvent.class, event -> {
+            if (event.getPseudoCall().getImm() == getExperiment().getArchitecture().getHelperThreadPthreadSpawnIndex()) {
+                pthreadHasSpawned = true;
             }
         });
     }
