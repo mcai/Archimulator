@@ -60,7 +60,7 @@ public class Edge {
      * Evaporate.
      */
     public void evaporate() {
-        this.pheromone *= (1 - this.acoHelper.getP());
+        this.pheromone *= 1 - this.acoHelper.getP();
     }
 
     /**
