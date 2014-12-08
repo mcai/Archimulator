@@ -105,4 +105,4 @@ Please report bugs and send suggestions to:
 
 Min Cai (<min.cai.china@gmail.com>)
 
-School of Computer Science and Technology, Beijing Institute of Technology, Beijing, China
+College of Computer Science, Beijing University of Technology, Beijing, China
