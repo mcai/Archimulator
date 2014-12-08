@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * ACO helper.
+ * Ant Colony Optimization (ACO) helper.
  *
  * @param <NodeT> the node type
  * @author Min Cai
@@ -55,7 +55,7 @@ public class ACOHelper<NodeT extends EuclideanNode> {
     private double shortestPathCost;
 
     /**
-     * Create an ACO helper.
+     * Create an Ant Colony Optimization (ACO) helper.
      *
      * @param blockingEventDispatcher the blocking event dispatcher
      * @param cycleAccurateEventQueue the cycle accurate event queue
