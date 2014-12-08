@@ -18,6 +18,9 @@
  ******************************************************************************/
 package archimulator.util.ai.aco;
 
+import net.pickapack.event.BlockingEvent;
+import net.pickapack.event.BlockingEventDispatcher;
+import net.pickapack.event.CycleAccurateEventQueue;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.math3.ml.distance.EuclideanDistance;
@@ -35,25 +38,37 @@ import java.util.stream.Collectors;
  * @author Min Cai
  */
 public class ACOHelper<NodeT extends EuclideanNode> {
+    private BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher;
+    private CycleAccurateEventQueue cycleAccurateEventQueue;
+
     private double p;
     private double delta;
     private double maxPheromone;
     private double alpha;
     private double beta;
+
     private List<NodeT> nodes;
     private List<Edge> edges;
     private List<Ant> ants;
 
+    private List<Edge> shortestPath;
+    private double shortestPathCost;
+
     /**
      * Create an ACO helper.
      *
-     * @param p            the p value
-     * @param delta        the delta value
-     * @param maxPheromone the max pheromone value
-     * @param alpha        the alpha value
-     * @param beta         the beta value
+     * @param blockingEventDispatcher the blocking event dispatcher
+     * @param cycleAccurateEventQueue the cycle accurate event queue
+     * @param p                       the p value
+     * @param delta                   the delta value
+     * @param maxPheromone            the max pheromone value
+     * @param alpha                   the alpha value
+     * @param beta                    the beta value
      */
-    public ACOHelper(double p, double delta, double maxPheromone, double alpha, double beta) {
+    public ACOHelper(BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, double p, double delta, double maxPheromone, double alpha, double beta) {
+        this.blockingEventDispatcher = blockingEventDispatcher;
+        this.cycleAccurateEventQueue = cycleAccurateEventQueue;
+
         this.p = p;
         this.delta = delta;
         this.maxPheromone = maxPheromone;
@@ -63,22 +78,37 @@ public class ACOHelper<NodeT extends EuclideanNode> {
         this.nodes = new ArrayList<>();
         this.edges = new ArrayList<>();
         this.ants = new ArrayList<>();
+
+        this.shortestPath = null;
+        this.shortestPathCost = Double.MAX_VALUE;
+
+        this.blockingEventDispatcher.addListener(PathGeneratedEvent.class, event -> {
+            if (event.getPathCost() < shortestPathCost) {
+                shortestPath = event.getPath();
+                shortestPathCost = event.getPathCost();
+
+                System.out.println("New shortest path found: " + shortestPath.stream().map(edge -> edge.getNodeFrom().getName()).collect(Collectors.toList()));
+                System.out.println("New shortest path cost found: " + shortestPathCost);
+            }
+        });
     }
 
     /**
      * Create an ACO helper from the specified file.
      *
-     * @param fileName     the file name
-     * @param p            the p value
-     * @param delta        the delta value
-     * @param maxPheromone the max pheromone value
-     * @param alpha        the alpha value
-     * @param beta         the beta value
+     * @param blockingEventDispatcher the blocking event dispatcher
+     * @param cycleAccurateEventQueue the cycle accurate event queue
+     * @param fileName                the file name
+     * @param p                       the p value
+     * @param delta                   the delta value
+     * @param maxPheromone            the max pheromone value
+     * @param alpha                   the alpha value
+     * @param beta                    the beta value
      * @return the newly created ACO helper
      */
-    public static ACOHelper<EuclideanNode> read(String fileName, double p, double delta, double maxPheromone, double alpha, double beta) {
+    public static ACOHelper<EuclideanNode> read(BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, String fileName, double p, double delta, double maxPheromone, double alpha, double beta) {
         try {
-            ACOHelper<EuclideanNode> acoHelper = new ACOHelper<>(p, delta, maxPheromone, alpha, beta);
+            ACOHelper<EuclideanNode> acoHelper = new ACOHelper<>(blockingEventDispatcher, cycleAccurateEventQueue, p, delta, maxPheromone, alpha, beta);
 
             List<String> lines = IOUtils.readLines(new FileReader(fileName));
 
@@ -118,28 +148,21 @@ public class ACOHelper<NodeT extends EuclideanNode> {
     }
 
     /**
-     * Get the ant of the shortest path.
+     * Get the blocking event dispatcher.
      *
-     * @return the ant of the shortest path
+     * @return the blocking event dispatcher
      */
-    public Ant getAntOfShortestPath() {
-        double pathCost = Double.MAX_VALUE;
-        Ant antOfShortestPath = null;
-
-        for (Ant ant : this.getAnts()) {
-            double newPathCost = ant.getPathCost();
-            if (newPathCost < pathCost) {
-                pathCost = newPathCost;
-                antOfShortestPath = ant;
-            }
-        }
-
-        return antOfShortestPath;
+    public BlockingEventDispatcher<BlockingEvent> getBlockingEventDispatcher() {
+        return blockingEventDispatcher;
     }
 
-    @Override
-    public String toString() {
-        return String.format("ACOHelper{p=%s, delta=%s, maxPheromone=%s, alpha=%s, beta=%s}", p, delta, maxPheromone, alpha, beta);
+    /**
+     * Get the cycle accurate event queue.
+     *
+     * @return the cycle accurate event queue
+     */
+    public CycleAccurateEventQueue getCycleAccurateEventQueue() {
+        return cycleAccurateEventQueue;
     }
 
     /**
@@ -214,6 +237,29 @@ public class ACOHelper<NodeT extends EuclideanNode> {
         return ants;
     }
 
+    /**
+     * Get the list of edges composing the shortest path.
+     *
+     * @return the list of edges composing the shortest path
+     */
+    public List<Edge> getShortestPath() {
+        return shortestPath;
+    }
+
+    /**
+     * Get the cost of the shortest path.
+     *
+     * @return the cost of the shortest path
+     */
+    public double getShortestPathCost() {
+        return shortestPathCost;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("ACOHelper{p=%s, delta=%s, maxPheromone=%s, alpha=%s, beta=%s}", p, delta, maxPheromone, alpha, beta);
+    }
+
     private static EuclideanDistance euclideanDistance = new EuclideanDistance();
 
     /**
@@ -222,35 +268,19 @@ public class ACOHelper<NodeT extends EuclideanNode> {
      * @param args the arguments
      */
     public static void main(String[] args) {
-        ACOHelper<EuclideanNode> acoHelper = read("/home/itecgo/Archimulator/src/main/java/archimulator/util/ai/aco/berlin52.tsp", 0.1, 0.5, 1, 0.5, 0.5);
+        BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher = new BlockingEventDispatcher<>();
+        CycleAccurateEventQueue cycleAccurateEventQueue = new CycleAccurateEventQueue();
 
-        EuclideanNode firstNode = acoHelper.getNodes().get(0);
+        ACOHelper<EuclideanNode> acoHelper = read(blockingEventDispatcher, cycleAccurateEventQueue, "/home/itecgo/Archimulator/src/main/java/archimulator/util/ai/aco/berlin52.tsp", 0.1, 0.5, 1, 0.5, 0.5);
 
-        for(int i = 0; i < acoHelper.getNodes().size(); i++) {
-            acoHelper.getAnts().add(new Ant(acoHelper, "" + i, firstNode));
+        cycleAccurateEventQueue.getPerCycleEvents().add(() -> acoHelper.getEdges().forEach(Edge::evaporate));
+
+        for (int i = 0; i < acoHelper.getNodes().size(); i++) {
+            acoHelper.getAnts().add(new Ant(acoHelper, "" + i, acoHelper.getNodes().get(i)));
         }
 
-        List<Edge> shortestPath;
-        double shortestPathCost = Double.MAX_VALUE;
-
-        for (int i = 0; i < 10; i++) {
-            acoHelper.getAnts().forEach(Ant::onePass);
-            acoHelper.getEdges().forEach(Edge::evaporate);
-
-            Ant antOfShortestPath = acoHelper.getAntOfShortestPath();
-
-            List<Edge> newShortestPath = antOfShortestPath.getPath();
-            double newShortestPathCost = antOfShortestPath.getPathCost();
-
-            if(newShortestPathCost < shortestPathCost) {
-                shortestPath = newShortestPath;
-                shortestPathCost = newShortestPathCost;
-
-                System.out.println("New shortest path found: " + shortestPath.stream().map(edge -> edge.getNodeFrom().getName()).collect(Collectors.toList()));
-                System.out.println("New shortest path cost found: " + shortestPathCost);
-            }
-
-            acoHelper.getAnts().forEach(Ant::reset);
+        for (; ; ) {
+            cycleAccurateEventQueue.advanceOneCycle();
         }
     }
 }

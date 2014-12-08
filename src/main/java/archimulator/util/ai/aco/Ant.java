@@ -48,6 +48,8 @@ public class Ant {
         this.initialNode = node;
         this.node = node;
         this.path = new ArrayList<>();
+
+        acoHelper.getCycleAccurateEventQueue().schedule(this, this::forward, 1);
     }
 
     /**
@@ -57,28 +59,29 @@ public class Ant {
         Node nextNodeToVisit = getNextNodeToVisit();
 
         if(nextNodeToVisit != null) {
-            this.path.add(this.getAcoHelper().getEdge(this.node, nextNodeToVisit));
+            Edge edge = this.getAcoHelper().getEdge(this.node, nextNodeToVisit);
+            this.getPath().add(edge);
             this.node = nextNodeToVisit;
-        }
-    }
 
-    /**
-     * Do one pass.
-     */
-    public void onePass() {
-        while (this.path.size() < this.getAcoHelper().getNodes().size() - 1) {
-            this.forward();
+            getAcoHelper().getCycleAccurateEventQueue().schedule(this, this::forward, (int)edge.getCost() + 1);
         }
+        else {
+            this.getPath().forEach(Edge::deposit);
 
-        this.path.forEach(Edge::deposit);
+            this.getAcoHelper().getBlockingEventDispatcher().dispatch(new PathGeneratedEvent(this, this.path, this.getPathCost()));
+
+            this.reset();
+
+            getAcoHelper().getCycleAccurateEventQueue().schedule(this, this::forward, 1);
+        }
     }
 
     /**
      * Reset.
      */
     public void reset() {
-        this.node = this.initialNode;
-        this.path.clear();
+        this.node = this.getInitialNode();
+        this.getPath().clear();
     }
 
     /**
@@ -87,7 +90,7 @@ public class Ant {
      * @return the next node to visit
      */
     protected Node getNextNodeToVisit() {
-        return this.node.getEdges().stream().filter(edge -> edge.getNodeTo() != this.initialNode && !this.path.stream().map(Edge::getNodeTo).collect(Collectors.toList()).contains(edge.getNodeTo())).sorted(Comparator.comparing(this::getP)).map(Edge::getNodeTo).findFirst().orElseGet(() -> null);
+        return this.getNode().getEdges().stream().filter(edge -> edge.getNodeTo() != this.getInitialNode() && !this.getPath().stream().map(Edge::getNodeTo).collect(Collectors.toList()).contains(edge.getNodeTo())).max(Comparator.comparing(this::getP)).map(Edge::getNodeTo).orElseGet(() -> null);
     }
 
     /**
