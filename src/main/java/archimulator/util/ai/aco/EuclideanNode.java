@@ -32,8 +32,8 @@ public class EuclideanNode extends Node {
      *
      * @param acoHelper the ACO helper
      * @param name      the name
-     * @param x         the x
-     * @param y         the y
+     * @param x         the x coordinate
+     * @param y         the y coordinate
      */
     public EuclideanNode(ACOHelper acoHelper, String name, double x, double y) {
         super(acoHelper, name);
@@ -51,9 +51,9 @@ public class EuclideanNode extends Node {
     }
 
     /**
-     * Get the y.
+     * Get the y coordinate.
      *
-     * @return the y
+     * @return the y coordinate
      */
     public double getY() {
         return y;
