@@ -18,9 +18,12 @@
  ******************************************************************************/
 package archimulator.util.ai.aco;
 
+import org.graphstream.algorithm.generator.Generator;
+import org.graphstream.algorithm.generator.PetersenGraphGenerator;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
+import org.graphstream.graph.implementations.MultiGraph;
 import org.graphstream.graph.implementations.SingleGraph;
 
 /**
@@ -45,6 +48,8 @@ public class GraphStreamViewer {
         this.acoHelper = acoHelper;
 
         this.graph = new SingleGraph("ACO for TSP");
+        this.graph.addAttribute("ui.quality");
+        this.graph.addAttribute("ui.antialias");
 
         acoHelper.getNodes().forEach(node -> {
             Node graphNode = graph.addNode(node.getName());
@@ -66,6 +71,22 @@ public class GraphStreamViewer {
         graph.addAttribute("ui.stylesheet", "url('/home/itecgo/Archimulator/src/main/java/archimulator/util/ai/aco/stylesheet')");
 
         this.graph.display(false);
+    }
+
+    public static void main(String[] args) {
+        Graph graph = new MultiGraph("random walk");
+        Generator gen = new PetersenGraphGenerator();
+
+        gen.addSink(graph);
+        gen.begin();
+        for (int i = 0; i < 400; i++) {
+            gen.nextEvents();
+        }
+        gen.end();
+
+        graph.addAttribute("ui.quality");
+        graph.addAttribute("ui.antialias");
+        graph.display(false);
     }
 
     /**
