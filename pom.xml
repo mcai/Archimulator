@@ -279,18 +279,24 @@
             <version>5.13.0.0</version>
         </dependency>
         <dependency>
-            <artifactId>gs-core</artifactId>
-            <groupId>org.graphstream</groupId>
-            <version>1.0</version>
-            <optional>false</optional>
-        </dependency>
-
-        <!-- The new dependency : -->
-        <dependency>
-            <artifactId>commons-math</artifactId>
             <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math</artifactId>
             <version>2.1</version>
-            <optional>false</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.graphstream</groupId>
+            <artifactId>gs-core</artifactId>
+            <version>1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.graphstream</groupId>
+            <artifactId>gs-algo</artifactId>
+            <version>1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.graphstream</groupId>
+            <artifactId>gs-ui</artifactId>
+            <version>1.2</version>
         </dependency>
     </dependencies>
 
