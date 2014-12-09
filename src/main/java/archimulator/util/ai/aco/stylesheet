@@ -4,7 +4,7 @@ graph {
 }
 node {
     size: 15px, 15px;
-    shape: rounded-box;
+    shape: circle;
     fill-color: cyan;
     stroke-mode: plain;
     stroke-color: black;
