@@ -25,8 +25,8 @@ package archimulator.util.ai.aco;
  */
 public class Edge {
     private ACOHelper acoHelper;
-    private Vertex vertexFrom;
-    private Vertex vertexTo;
+    private Node nodeFrom;
+    private Node nodeTo;
 
     private double pheromone;
     private double weight;
@@ -35,15 +35,15 @@ public class Edge {
      * Create an edge.
      *
      * @param acoHelper the ACO helper
-     * @param vertexFrom  the source node
-     * @param vertexTo    the destination node
+     * @param nodeFrom  the source node
+     * @param nodeTo    the destination node
      * @param pheromone the initial pheromone value
      * @param weight    the initial weight
      */
-    public Edge(ACOHelper acoHelper, Vertex vertexFrom, Vertex vertexTo, double pheromone, double weight) {
+    public Edge(ACOHelper acoHelper, Node nodeFrom, Node nodeTo, double pheromone, double weight) {
         this.acoHelper = acoHelper;
-        this.vertexFrom = vertexFrom;
-        this.vertexTo = vertexTo;
+        this.nodeFrom = nodeFrom;
+        this.nodeTo = nodeTo;
 
         this.pheromone = pheromone;
         this.weight = weight;
@@ -77,8 +77,8 @@ public class Edge {
      *
      * @return the source node
      */
-    private Vertex getVertexFrom() {
-        return vertexFrom;
+    public Node getNodeFrom() {
+        return nodeFrom;
     }
 
     /**
@@ -86,18 +86,18 @@ public class Edge {
      *
      * @return the destination node
      */
-    private Vertex getVertexTo() {
-        return vertexTo;
+    public Node getNodeTo() {
+        return nodeTo;
     }
 
     /**
      * Get the other node.
      *
-     * @param vertex the node
+     * @param node the node
      * @return the other node
      */
-    public Vertex getOtherNode(Vertex vertex) {
-        return vertex == this.getVertexFrom() ? this.getVertexTo() : this.getVertexFrom();
+    public Node getOtherNode(Node node) {
+        return node == this.getNodeFrom() ? this.getNodeTo() : this.getNodeFrom();
     }
 
     /**
@@ -128,9 +128,12 @@ public class Edge {
         this.getAcoHelper().getGraph().setEdgeWeight(this, weight);
     }
 
+    public String getName() {
+        return String.format("%s-%s", nodeFrom.getName(), nodeTo.getName());
+    }
+
     @Override
     public String toString() {
-//        return String.format("pheromone=%.4f, weight=%.4f", nodeFrom, nodeTo, pheromone, weight);
-        return String.format("%.4f", pheromone);
+        return String.format("%s-%s{pheromone=%s, weight=%s}", nodeFrom.getName(), nodeTo.getName(), pheromone, weight);
     }
 }

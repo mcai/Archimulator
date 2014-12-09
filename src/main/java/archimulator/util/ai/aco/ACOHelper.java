@@ -41,7 +41,7 @@ public class ACOHelper {
     private BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher;
     private CycleAccurateEventQueue cycleAccurateEventQueue;
 
-    private ListenableUndirectedWeightedGraph<Vertex, Edge> graph;
+    private ListenableUndirectedWeightedGraph<Node, Edge> graph;
 
     private double p;
     private double delta;
@@ -49,11 +49,11 @@ public class ACOHelper {
     private double alpha;
     private double beta;
 
-    private List<Vertex> vertexes;
+    private List<Node> nodes;
     private List<Edge> edges;
     private List<Ant> ants;
 
-    private List<Vertex> shortestPath;
+    private List<Node> shortestPath;
     private double shortestPathCost;
 
     /**
@@ -79,7 +79,7 @@ public class ACOHelper {
         this.alpha = alpha;
         this.beta = beta;
 
-        this.vertexes = new ArrayList<>();
+        this.nodes = new ArrayList<>();
         this.edges = new ArrayList<>();
         this.ants = new ArrayList<>();
 
@@ -91,8 +91,7 @@ public class ACOHelper {
                 shortestPath = event.getPath();
                 shortestPathCost = event.getPathCost();
 
-                System.out.println("New shortest path found: " + shortestPath.stream().map(Vertex::getName).collect(Collectors.toList()));
-                System.out.println("New shortest path cost found: " + shortestPathCost);
+                blockingEventDispatcher.dispatch(new ShortestPathGeneratedEvent(event.getAnt(), event.getPath(), event.getPathEdges(), event.getPathCost()));
             }
         });
     }
@@ -122,17 +121,17 @@ public class ACOHelper {
                     int i = Integer.parseInt(parts[0].trim());
                     double x = Double.parseDouble(parts[1].trim());
                     double y = Double.parseDouble(parts[2].trim());
-                    Vertex vertex = new Vertex(acoHelper, "" + i, x, y);
-                    acoHelper.getGraph().addVertex(vertex);
-                    acoHelper.getVertexes().add(vertex);
+                    Node node = new Node(acoHelper, "" + i, x, y);
+                    acoHelper.getGraph().addVertex(node);
+                    acoHelper.getNodes().add(node);
                 }
             }
 
-            for (Vertex vertexFrom : acoHelper.getVertexes()) {
-                for (Vertex vertexTo : acoHelper.getVertexes()) {
-                    if (vertexFrom != vertexTo && acoHelper.getEdge(vertexFrom, vertexTo) == null) {
-                        Edge edge = new Edge(acoHelper, vertexFrom, vertexTo, 1, euclideanDistance.compute(new double[]{vertexFrom.getX(), vertexFrom.getY()}, new double[]{vertexTo.getX(), vertexTo.getY()}));
-                        acoHelper.getGraph().addEdge(vertexFrom, vertexTo, edge);
+            for (Node nodeFrom : acoHelper.getNodes()) {
+                for (Node nodeTo : acoHelper.getNodes()) {
+                    if (nodeFrom != nodeTo && acoHelper.getEdge(nodeFrom, nodeTo) == null) {
+                        Edge edge = new Edge(acoHelper, nodeFrom, nodeTo, 1, euclideanDistance.compute(new double[]{nodeFrom.getX(), nodeFrom.getY()}, new double[]{nodeTo.getX(), nodeTo.getY()}));
+                        acoHelper.getGraph().addEdge(nodeFrom, nodeTo, edge);
                         acoHelper.getEdges().add(edge);
                     }
                 }
@@ -147,12 +146,12 @@ public class ACOHelper {
     /**
      * Get the edge for the specified source and destination nodes.
      *
-     * @param vertexFrom the source node
-     * @param vertexTo   the destination node
+     * @param nodeFrom the source node
+     * @param nodeTo   the destination node
      * @return the edge for the specified source and destination nodes
      */
-    public Edge getEdge(Vertex vertexFrom, Vertex vertexTo) {
-        return this.getGraph().getEdge(vertexFrom, vertexTo);
+    public Edge getEdge(Node nodeFrom, Node nodeTo) {
+        return this.getGraph().getEdge(nodeFrom, nodeTo);
     }
 
     /**
@@ -223,7 +222,7 @@ public class ACOHelper {
      *
      * @return the graph
      */
-    public ListenableUndirectedWeightedGraph<Vertex, Edge> getGraph() {
+    public ListenableUndirectedWeightedGraph<Node, Edge> getGraph() {
         return graph;
     }
 
@@ -232,8 +231,8 @@ public class ACOHelper {
      *
      * @return the list of nodes
      */
-    public List<Vertex> getVertexes() {
-        return vertexes;
+    public List<Node> getNodes() {
+        return nodes;
     }
 
     /**
@@ -259,7 +258,7 @@ public class ACOHelper {
      *
      * @return the list of edges composing the shortest path
      */
-    public List<Vertex> getShortestPath() {
+    public List<Node> getShortestPath() {
         return shortestPath;
     }
 
@@ -292,14 +291,23 @@ public class ACOHelper {
 
         cycleAccurateEventQueue.getPerCycleEvents().add(() -> acoHelper.getEdges().forEach(Edge::evaporate));
 
-        for (int i = 0; i < acoHelper.getVertexes().size(); i++) {
-            acoHelper.getAnts().add(new Ant(acoHelper, "" + i, acoHelper.getVertexes().get(i)));
+        for (int i = 0; i < acoHelper.getNodes().size(); i++) {
+            acoHelper.getAnts().add(new Ant(acoHelper, "" + i, acoHelper.getNodes().get(i)));
         }
 
-        JGraphAdapterFrame jGraphAdapterFrame = new JGraphAdapterFrame(acoHelper);
-        jGraphAdapterFrame.setVisible(true);
+        GraphStreamViewer viewer = new GraphStreamViewer(acoHelper);
 
-        cycleAccurateEventQueue.getPerCycleEvents().add(jGraphAdapterFrame::refresh);
+        acoHelper.getBlockingEventDispatcher().addListener(ShortestPathGeneratedEvent.class, event -> {
+            viewer.getGraph().getEdgeSet().forEach(e -> e.removeAttribute("ui.class"));
+
+            event.getPathEdges().stream()
+                    .map(edge -> (org.graphstream.graph.Edge) viewer.getGraph().getEdge(edge.getNodeFrom().getName() + "-" + edge.getNodeTo().getName()))
+                    .forEach(e -> e.addAttribute("ui.class", "shortestPath"));
+
+            System.out.println("New shortest path found: " + event.getPath().stream().map(Node::getName).collect(Collectors.toList()));
+            System.out.println("New shortest path of edges found: " + event.getPathEdges().stream().map(Edge::getName).collect(Collectors.toList()));
+            System.out.println("New shortest path cost found: " + event.getPathCost());
+        });
 
         for (; ; ) {
             cycleAccurateEventQueue.advanceOneCycle();

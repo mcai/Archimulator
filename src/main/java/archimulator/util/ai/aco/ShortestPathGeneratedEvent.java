@@ -23,25 +23,25 @@ import net.pickapack.event.BlockingEvent;
 import java.util.List;
 
 /**
- * The event occurred when a new path is generated.
+ * The event occurred when a new shortest path is generated.
  *
  * @author Min Cai
  */
-public class PathGeneratedEvent implements BlockingEvent {
+public class ShortestPathGeneratedEvent implements BlockingEvent {
     private Ant ant;
     private List<Node> path;
     private List<Edge> pathEdges;
     private double pathCost;
 
     /**
-     * Create an event when a new path is generated.
+     * Create an event when a new shortest path is generated.
      *
      * @param ant       the ant
      * @param path      the path
      * @param pathEdges the path of edges
      * @param pathCost  the path cost
      */
-    public PathGeneratedEvent(Ant ant, List<Node> path, List<Edge> pathEdges, double pathCost) {
+    public ShortestPathGeneratedEvent(Ant ant, List<Node> path, List<Edge> pathEdges, double pathCost) {
         this.ant = ant;
         this.path = path;
         this.pathEdges = pathEdges;

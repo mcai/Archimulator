@@ -25,7 +25,7 @@ import java.util.Set;
  *
  * @author Min Cai
  */
-public class Vertex {
+public class Node {
     private ACOHelper acoHelper;
     private String name;
 
@@ -40,7 +40,7 @@ public class Vertex {
      * @param x         the x coordinate
      * @param y         the y coordinate
      */
-    public Vertex(ACOHelper acoHelper, String name, double x, double y) {
+    public Node(ACOHelper acoHelper, String name, double x, double y) {
         this.acoHelper = acoHelper;
         this.name = name;
         this.x = x;
