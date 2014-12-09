@@ -48,8 +48,8 @@ public class GraphStreamViewer {
         this.acoHelper = acoHelper;
 
         this.graph = new SingleGraph("ACO for TSP");
-        this.graph.addAttribute("ui.quality");
-        this.graph.addAttribute("ui.antialias");
+//        this.graph.addAttribute("ui.quality");
+//        this.graph.addAttribute("ui.antialias");
 
         acoHelper.getNodes().forEach(node -> {
             Node graphNode = graph.addNode(node.getName());
