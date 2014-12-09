@@ -22,6 +22,16 @@
             <id>erichseifert.de</id>
             <url>http://mvn.erichseifert.de/maven2</url>
         </repository>
+        <repository>
+            <id>sonatype-nexus-releases</id>
+            <name>Sonatype Nexus Releases</name>
+            <url>http://oss.sonatype.org/content/repositories/releases</url>
+        </repository>
+        <repository>
+            <id>sonatype-nexus-snapshots</id>
+            <name>Sonatype Nexus Snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -252,6 +262,35 @@
             <groupId>colt</groupId>
             <artifactId>colt</artifactId>
             <version>1.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jgrapht</groupId>
+            <artifactId>jgrapht-core</artifactId>
+            <version>0.9.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jgrapht</groupId>
+            <artifactId>jgrapht-ext</artifactId>
+            <version>0.9.0</version>
+        </dependency>
+        <dependency>
+            <groupId>jgraph</groupId>
+            <artifactId>jgraph</artifactId>
+            <version>5.13.0.0</version>
+        </dependency>
+        <dependency>
+            <artifactId>gs-core</artifactId>
+            <groupId>org.graphstream</groupId>
+            <version>1.0</version>
+            <optional>false</optional>
+        </dependency>
+
+        <!-- The new dependency : -->
+        <dependency>
+            <artifactId>commons-math</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <version>2.1</version>
+            <optional>false</optional>
         </dependency>
     </dependencies>
 

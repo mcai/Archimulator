@@ -24,6 +24,7 @@ import net.pickapack.event.CycleAccurateEventQueue;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.math3.ml.distance.EuclideanDistance;
+import org.jgrapht.graph.ListenableUndirectedWeightedGraph;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -34,12 +35,13 @@ import java.util.stream.Collectors;
 /**
  * Ant Colony Optimization (ACO) helper.
  *
- * @param <NodeT> the node type
  * @author Min Cai
  */
-public class ACOHelper<NodeT extends EuclideanNode> {
+public class ACOHelper {
     private BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher;
     private CycleAccurateEventQueue cycleAccurateEventQueue;
+
+    private ListenableUndirectedWeightedGraph<Vertex, Edge> graph;
 
     private double p;
     private double delta;
@@ -47,11 +49,11 @@ public class ACOHelper<NodeT extends EuclideanNode> {
     private double alpha;
     private double beta;
 
-    private List<NodeT> nodes;
+    private List<Vertex> vertexes;
     private List<Edge> edges;
     private List<Ant> ants;
 
-    private List<Edge> shortestPath;
+    private List<Vertex> shortestPath;
     private double shortestPathCost;
 
     /**
@@ -69,13 +71,15 @@ public class ACOHelper<NodeT extends EuclideanNode> {
         this.blockingEventDispatcher = blockingEventDispatcher;
         this.cycleAccurateEventQueue = cycleAccurateEventQueue;
 
+        this.graph = new ListenableUndirectedWeightedGraph<>(Edge.class);
+
         this.p = p;
         this.delta = delta;
         this.maxPheromone = maxPheromone;
         this.alpha = alpha;
         this.beta = beta;
 
-        this.nodes = new ArrayList<>();
+        this.vertexes = new ArrayList<>();
         this.edges = new ArrayList<>();
         this.ants = new ArrayList<>();
 
@@ -87,7 +91,7 @@ public class ACOHelper<NodeT extends EuclideanNode> {
                 shortestPath = event.getPath();
                 shortestPathCost = event.getPathCost();
 
-                System.out.println("New shortest path found: " + shortestPath.stream().map(edge -> edge.getNodeFrom().getName()).collect(Collectors.toList()));
+                System.out.println("New shortest path found: " + shortestPath.stream().map(Vertex::getName).collect(Collectors.toList()));
                 System.out.println("New shortest path cost found: " + shortestPathCost);
             }
         });
@@ -106,9 +110,9 @@ public class ACOHelper<NodeT extends EuclideanNode> {
      * @param beta                    the beta value
      * @return the newly created ACO helper
      */
-    public static ACOHelper<EuclideanNode> read(BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, String fileName, double p, double delta, double maxPheromone, double alpha, double beta) {
+    public static ACOHelper read(BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, String fileName, double p, double delta, double maxPheromone, double alpha, double beta) {
         try {
-            ACOHelper<EuclideanNode> acoHelper = new ACOHelper<>(blockingEventDispatcher, cycleAccurateEventQueue, p, delta, maxPheromone, alpha, beta);
+            ACOHelper acoHelper = new ACOHelper(blockingEventDispatcher, cycleAccurateEventQueue, p, delta, maxPheromone, alpha, beta);
 
             List<String> lines = IOUtils.readLines(new FileReader(fileName));
 
@@ -118,14 +122,18 @@ public class ACOHelper<NodeT extends EuclideanNode> {
                     int i = Integer.parseInt(parts[0].trim());
                     double x = Double.parseDouble(parts[1].trim());
                     double y = Double.parseDouble(parts[2].trim());
-                    acoHelper.getNodes().add(new EuclideanNode(acoHelper, "" + i, x, y));
+                    Vertex vertex = new Vertex(acoHelper, "" + i, x, y);
+                    acoHelper.getGraph().addVertex(vertex);
+                    acoHelper.getVertexes().add(vertex);
                 }
             }
 
-            for (EuclideanNode nodeFrom : acoHelper.getNodes()) {
-                for (EuclideanNode nodeTo : acoHelper.getNodes()) {
-                    if (nodeFrom != nodeTo && acoHelper.getEdge(nodeFrom, nodeTo) == null) {
-                        acoHelper.getEdges().add(new Edge(acoHelper, nodeFrom, nodeTo, 1, euclideanDistance.compute(new double[]{nodeFrom.getX(), nodeFrom.getY()}, new double[]{nodeTo.getX(), nodeTo.getY()})));
+            for (Vertex vertexFrom : acoHelper.getVertexes()) {
+                for (Vertex vertexTo : acoHelper.getVertexes()) {
+                    if (vertexFrom != vertexTo && acoHelper.getEdge(vertexFrom, vertexTo) == null) {
+                        Edge edge = new Edge(acoHelper, vertexFrom, vertexTo, 1, euclideanDistance.compute(new double[]{vertexFrom.getX(), vertexFrom.getY()}, new double[]{vertexTo.getX(), vertexTo.getY()}));
+                        acoHelper.getGraph().addEdge(vertexFrom, vertexTo, edge);
+                        acoHelper.getEdges().add(edge);
                     }
                 }
             }
@@ -139,12 +147,12 @@ public class ACOHelper<NodeT extends EuclideanNode> {
     /**
      * Get the edge for the specified source and destination nodes.
      *
-     * @param nodeFrom the source node
-     * @param nodeTo   the destination node
+     * @param vertexFrom the source node
+     * @param vertexTo   the destination node
      * @return the edge for the specified source and destination nodes
      */
-    public Edge getEdge(Node nodeFrom, Node nodeTo) {
-        return nodeFrom.getEdges().stream().filter(edge -> edge.getNodeTo().equals(nodeTo)).findFirst().orElseGet(() -> null);
+    public Edge getEdge(Vertex vertexFrom, Vertex vertexTo) {
+        return this.getGraph().getEdge(vertexFrom, vertexTo);
     }
 
     /**
@@ -211,12 +219,21 @@ public class ACOHelper<NodeT extends EuclideanNode> {
     }
 
     /**
+     * Get the graph.
+     *
+     * @return the graph
+     */
+    public ListenableUndirectedWeightedGraph<Vertex, Edge> getGraph() {
+        return graph;
+    }
+
+    /**
      * Get the list of nodes.
      *
      * @return the list of nodes
      */
-    public List<NodeT> getNodes() {
-        return nodes;
+    public List<Vertex> getVertexes() {
+        return vertexes;
     }
 
     /**
@@ -242,7 +259,7 @@ public class ACOHelper<NodeT extends EuclideanNode> {
      *
      * @return the list of edges composing the shortest path
      */
-    public List<Edge> getShortestPath() {
+    public List<Vertex> getShortestPath() {
         return shortestPath;
     }
 
@@ -271,13 +288,18 @@ public class ACOHelper<NodeT extends EuclideanNode> {
         BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher = new BlockingEventDispatcher<>();
         CycleAccurateEventQueue cycleAccurateEventQueue = new CycleAccurateEventQueue();
 
-        ACOHelper<EuclideanNode> acoHelper = read(blockingEventDispatcher, cycleAccurateEventQueue, "/home/itecgo/Archimulator/src/main/java/archimulator/util/ai/aco/berlin52.tsp", 0.1, 0.5, 1, 0.5, 0.5);
+        ACOHelper acoHelper = read(blockingEventDispatcher, cycleAccurateEventQueue, "/home/itecgo/Archimulator/src/main/java/archimulator/util/ai/aco/berlin52.tsp", 0.1, 0.5, 1, 0.5, 0.5);
 
         cycleAccurateEventQueue.getPerCycleEvents().add(() -> acoHelper.getEdges().forEach(Edge::evaporate));
 
-        for (int i = 0; i < acoHelper.getNodes().size(); i++) {
-            acoHelper.getAnts().add(new Ant(acoHelper, "" + i, acoHelper.getNodes().get(i)));
+        for (int i = 0; i < acoHelper.getVertexes().size(); i++) {
+            acoHelper.getAnts().add(new Ant(acoHelper, "" + i, acoHelper.getVertexes().get(i)));
         }
+
+        JGraphAdapterFrame jGraphAdapterFrame = new JGraphAdapterFrame(acoHelper);
+        jGraphAdapterFrame.setVisible(true);
+
+        cycleAccurateEventQueue.getPerCycleEvents().add(jGraphAdapterFrame::refresh);
 
         for (; ; ) {
             cycleAccurateEventQueue.advanceOneCycle();

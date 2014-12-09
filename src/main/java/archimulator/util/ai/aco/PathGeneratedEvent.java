@@ -29,7 +29,7 @@ import java.util.List;
  */
 public class PathGeneratedEvent implements BlockingEvent {
     private Ant ant;
-    private List<Edge> path;
+    private List<Vertex> path;
     private double pathCost;
 
     /**
@@ -39,7 +39,7 @@ public class PathGeneratedEvent implements BlockingEvent {
      * @param path the path
      * @param pathCost the path cost
      */
-    public PathGeneratedEvent(Ant ant, List<Edge> path, double pathCost) {
+    public PathGeneratedEvent(Ant ant, List<Vertex> path, double pathCost) {
         this.ant = ant;
         this.path = path;
         this.pathCost = pathCost;
@@ -59,7 +59,7 @@ public class PathGeneratedEvent implements BlockingEvent {
      *
      * @return the path
      */
-    public List<Edge> getPath() {
+    public List<Vertex> getPath() {
         return path;
     }
 

@@ -24,29 +24,29 @@ package archimulator.util.ai.aco;
  * @author Min Cai
  */
 public class Edge {
-    private ACOHelper<?> acoHelper;
-    private Node nodeFrom;
-    private Node nodeTo;
+    private ACOHelper acoHelper;
+    private Vertex vertexFrom;
+    private Vertex vertexTo;
 
     private double pheromone;
-    private double cost;
+    private double weight;
 
     /**
      * Create an edge.
      *
      * @param acoHelper the ACO helper
-     * @param nodeFrom  the source node
-     * @param nodeTo    the destination node
+     * @param vertexFrom  the source node
+     * @param vertexTo    the destination node
      * @param pheromone the initial pheromone value
-     * @param cost      the initial cost
+     * @param weight    the initial weight
      */
-    public Edge(ACOHelper<?> acoHelper, Node nodeFrom, Node nodeTo, double pheromone, double cost) {
+    public Edge(ACOHelper acoHelper, Vertex vertexFrom, Vertex vertexTo, double pheromone, double weight) {
         this.acoHelper = acoHelper;
-        this.nodeFrom = nodeFrom;
-        this.nodeTo = nodeTo;
+        this.vertexFrom = vertexFrom;
+        this.vertexTo = vertexTo;
 
         this.pheromone = pheromone;
-        this.cost = cost;
+        this.weight = weight;
     }
 
     /**
@@ -68,7 +68,7 @@ public class Edge {
      *
      * @return the ACO helper
      */
-    public ACOHelper<?> getAcoHelper() {
+    public ACOHelper getAcoHelper() {
         return acoHelper;
     }
 
@@ -77,8 +77,8 @@ public class Edge {
      *
      * @return the source node
      */
-    public Node getNodeFrom() {
-        return nodeFrom;
+    private Vertex getVertexFrom() {
+        return vertexFrom;
     }
 
     /**
@@ -86,8 +86,18 @@ public class Edge {
      *
      * @return the destination node
      */
-    public Node getNodeTo() {
-        return nodeTo;
+    private Vertex getVertexTo() {
+        return vertexTo;
+    }
+
+    /**
+     * Get the other node.
+     *
+     * @param vertex the node
+     * @return the other node
+     */
+    public Vertex getOtherNode(Vertex vertex) {
+        return vertex == this.getVertexFrom() ? this.getVertexTo() : this.getVertexFrom();
     }
 
     /**
@@ -100,25 +110,27 @@ public class Edge {
     }
 
     /**
-     * Get the cost.
+     * Get the weight.
      *
-     * @return the cost
+     * @return the weight
      */
-    public double getCost() {
-        return cost;
+    public double getWeight() {
+        return weight;
     }
 
     /**
      * Set the cost.
      *
-     * @param cost the cost
+     * @param weight the cost
      */
-    public void setCost(double cost) {
-        this.cost = cost;
+    public void setWeight(double weight) {
+        this.weight = weight;
+        this.getAcoHelper().getGraph().setEdgeWeight(this, weight);
     }
 
     @Override
     public String toString() {
-        return String.format("Edge{nodeFrom=%s, nodeTo=%s, pheromone=%.4f, cost=%.4f}", nodeFrom, nodeTo, pheromone, cost);
+//        return String.format("pheromone=%.4f, weight=%.4f", nodeFrom, nodeTo, pheromone, weight);
+        return String.format("%.4f", pheromone);
     }
 }

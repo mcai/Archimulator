@@ -21,7 +21,6 @@ package archimulator.util.ai.aco;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Ant.
@@ -29,25 +28,31 @@ import java.util.stream.Collectors;
  * @author Min Cai
  */
 public class Ant {
-    private ACOHelper<?> acoHelper;
+    private ACOHelper acoHelper;
     private String name;
-    private Node initialNode;
-    private Node node;
-    private List<Edge> path;
+    private Vertex initialVertex;
+    private Vertex vertex;
+
+    private List<Vertex> path;
+    private List<Edge> pathEdges;
+    private double pathCost;
 
     /**
      * Create an ant.
      *
      * @param acoHelper the ACO helper
      * @param name      the name
-     * @param node      the initial node at which the ant begins
+     * @param vertex      the initial node at which the ant begins
      */
-    public Ant(ACOHelper<?> acoHelper, String name, Node node) {
+    public Ant(ACOHelper acoHelper, String name, Vertex vertex) {
         this.acoHelper = acoHelper;
         this.name = name;
-        this.initialNode = node;
-        this.node = node;
+        this.initialVertex = vertex;
+        this.vertex = vertex;
+
         this.path = new ArrayList<>();
+        this.pathEdges = new ArrayList<>();
+        this.pathCost = 0;
 
         acoHelper.getCycleAccurateEventQueue().schedule(this, this::forward, 1);
     }
@@ -56,17 +61,22 @@ public class Ant {
      * Go forward.
      */
     protected void forward() {
-        Node nextNodeToVisit = getNextNodeToVisit();
+        Vertex nextVertexToVisit = getNextNodeToVisit();
 
-        if(nextNodeToVisit != null) {
-            Edge edge = this.getAcoHelper().getEdge(this.node, nextNodeToVisit);
-            this.getPath().add(edge);
-            this.node = nextNodeToVisit;
+        if(nextVertexToVisit != null) {
+            Edge edge = this.getAcoHelper().getEdge(this.vertex, nextVertexToVisit);
 
-            getAcoHelper().getCycleAccurateEventQueue().schedule(this, this::forward, (int)edge.getCost() + 1);
+            this.getPath().add(nextVertexToVisit);
+            this.pathEdges.add(edge);
+            this.pathCost += edge.getWeight();
+
+            this.vertex = nextVertexToVisit;
+
+//            getAcoHelper().getCycleAccurateEventQueue().schedule(this, this::forward, (int)edge.getCost() + 1);
+            getAcoHelper().getCycleAccurateEventQueue().schedule(this, this::forward, 1);
         }
         else {
-            this.getPath().forEach(Edge::deposit);
+            this.pathEdges.forEach(Edge::deposit);
 
             this.getAcoHelper().getBlockingEventDispatcher().dispatch(new PathGeneratedEvent(this, this.path, this.getPathCost()));
 
@@ -80,8 +90,9 @@ public class Ant {
      * Reset.
      */
     public void reset() {
-        this.node = this.getInitialNode();
+        this.vertex = this.getInitialVertex();
         this.getPath().clear();
+        this.pathCost = 0;
     }
 
     /**
@@ -89,22 +100,24 @@ public class Ant {
      *
      * @return the next node to visit
      */
-    protected Node getNextNodeToVisit() {
-        return this.getNode().getEdges().stream().filter(edge -> edge.getNodeTo() != this.getInitialNode() && !this.getPath().stream().map(Edge::getNodeTo).collect(Collectors.toList()).contains(edge.getNodeTo())).max(Comparator.comparing(this::getP)).map(Edge::getNodeTo).orElseGet(() -> null);
+    protected Vertex getNextNodeToVisit() {
+        return this.getVertex().getEdges().stream().map(edge -> edge.getOtherNode(this.getVertex())).filter(node -> node != this.getInitialVertex() && !this.getPath().contains(node))
+                .max(Comparator.comparing(this::getP)).orElseGet(() -> null);
     }
 
     /**
      * Get the p value for the specified edge.
      *
-     * @param edge the edge
+     * @param otherVertex the other node
      * @return the p value for the specified edge
      */
-    private double getP(Edge edge) {
-        Node nodeFrom = edge.getNodeFrom();
+    private double getP(Vertex otherVertex) {
+        Edge edge = this.getAcoHelper().getEdge(this.getVertex(), otherVertex);
+
         double eta = getEta(edge);
 
         double a = Math.pow(edge.getPheromone(), this.getAcoHelper().getAlpha()) * Math.pow(eta, this.getAcoHelper().getBeta());
-        double sum = nodeFrom.getEdges().stream().mapToDouble(e -> Math.pow(e.getPheromone(), this.getAcoHelper().getAlpha()) * Math.pow(getEta(e), this.getAcoHelper().getBeta())).sum();
+        double sum = this.getVertex().getEdges().stream().mapToDouble(e -> Math.pow(e.getPheromone(), this.getAcoHelper().getAlpha()) * Math.pow(getEta(e), this.getAcoHelper().getBeta())).sum();
 
         return a / sum;
     }
@@ -116,8 +129,7 @@ public class Ant {
      * @return the eta for the specified edge
      */
     private double getEta(Edge edge) {
-        Node nodeFrom = edge.getNodeFrom();
-        return 1 - edge.getCost() / nodeFrom.getEdges().stream().mapToDouble(Edge::getCost).sum();
+        return 1 - edge.getWeight() / getVertex().getEdges().stream().mapToDouble(Edge::getWeight).sum();
     }
 
     /**
@@ -125,7 +137,7 @@ public class Ant {
      *
      * @return the ACO helper
      */
-    public ACOHelper<?> getAcoHelper() {
+    public ACOHelper getAcoHelper() {
         return acoHelper;
     }
 
@@ -143,8 +155,8 @@ public class Ant {
      *
      * @return the initial node
      */
-    public Node getInitialNode() {
-        return initialNode;
+    public Vertex getInitialVertex() {
+        return initialVertex;
     }
 
     /**
@@ -152,8 +164,8 @@ public class Ant {
      *
      * @return the node where the ant resides
      */
-    public Node getNode() {
-        return node;
+    public Vertex getVertex() {
+        return vertex;
     }
 
     /**
@@ -161,7 +173,7 @@ public class Ant {
      *
      * @return the list of edges that the ant has visited so far
      */
-    public List<Edge> getPath() {
+    public List<Vertex> getPath() {
         return path;
     }
 
@@ -171,11 +183,11 @@ public class Ant {
      * @return the cost of the path
      */
     public double getPathCost() {
-        return this.path.stream().mapToDouble(Edge::getCost).sum();
+        return this.pathCost;
     }
 
     @Override
     public String toString() {
-        return String.format("Ant{name='%s', node=%s}", name, node);
+        return String.format("Ant{name='%s', node=%s}", name, vertex);
     }
 }

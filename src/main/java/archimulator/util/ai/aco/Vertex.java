@@ -18,27 +18,33 @@
  ******************************************************************************/
 package archimulator.util.ai.aco;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 /**
  * Node.
  *
  * @author Min Cai
  */
-public class Node {
-    private ACOHelper<?> acoHelper;
+public class Vertex {
+    private ACOHelper acoHelper;
     private String name;
+
+    private double x;
+    private double y;
 
     /**
      * Create a node.
      *
      * @param acoHelper the ACO helper
      * @param name      the name
+     * @param x         the x coordinate
+     * @param y         the y coordinate
      */
-    public Node(ACOHelper<?> acoHelper, String name) {
+    public Vertex(ACOHelper acoHelper, String name, double x, double y) {
         this.acoHelper = acoHelper;
         this.name = name;
+        this.x = x;
+        this.y = y;
     }
 
     /**
@@ -46,7 +52,7 @@ public class Node {
      *
      * @return the ACO helper
      */
-    public ACOHelper<?> getAcoHelper() {
+    public ACOHelper getAcoHelper() {
         return acoHelper;
     }
 
@@ -60,16 +66,34 @@ public class Node {
     }
 
     /**
-     * Get the list of edges.
+     * Get the x coordinate.
      *
-     * @return the list of edges
+     * @return the x coordinate
      */
-    public List<Edge> getEdges() {
-        return this.getAcoHelper().getEdges().stream().filter(edge -> edge.getNodeFrom() == this).collect(Collectors.toList());
+    public double getX() {
+        return x;
+    }
+
+    /**
+     * Get the y coordinate.
+     *
+     * @return the y coordinate
+     */
+    public double getY() {
+        return y;
+    }
+
+    /**
+     * Get the set of edges.
+     *
+     * @return the set of edges
+     */
+    public Set<Edge> getEdges() {
+        return this.getAcoHelper().getGraph().edgesOf(this);
     }
 
     @Override
     public String toString() {
-        return String.format("'%s'", name);
+        return String.format("%s", this.getName());
     }
 }
