@@ -18,9 +18,7 @@
  ******************************************************************************/
 package archimulator.web.application;
 
-import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.bio.SocketConnector;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.jetty.webapp.WebInfConfiguration;
 import org.eclipse.jetty.webapp.WebXmlConfiguration;
@@ -42,7 +40,7 @@ public class ArchimulatorWebServer {
             return;
         }
 
-        Server server = new Server();
+        Server server = new Server(Integer.parseInt(args[1]));
 
         WebAppContext app = new WebAppContext();
         app.setContextPath("/");
@@ -52,11 +50,6 @@ public class ArchimulatorWebServer {
         app.setConfigurationClasses(new String[]{WebInfConfiguration.class.getName(), WebXmlConfiguration.class.getName()});
         app.setParentLoaderPriority(true);
 
-        Connector connector = new SocketConnector();
-        connector.setPort(Integer.parseInt(args[1]));
-        connector.setMaxIdleTime(60000);
-
-        server.setConnectors(new Connector[]{connector});
         server.setHandler(app);
         server.setAttribute("org.mortbay.jetty.Request.maxFormContentSize", 0);
         server.setStopAtShutdown(true);
