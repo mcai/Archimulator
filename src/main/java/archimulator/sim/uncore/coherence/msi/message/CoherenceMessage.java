@@ -53,11 +53,6 @@ public abstract class CoherenceMessage extends CacheCoherenceFlow {
      */
     public void onDestinationArrived() {
         this.destinationArrived = true;
-
-        if ((this.getType() == CoherenceMessageType.DATA || this.getType() == CoherenceMessageType.PUTM_AND_DATA)
-                && Arrays.asList(ArrayUtils.toObject(this.getData())).stream().anyMatch(b -> b != 0)) {
-            this.getGenerator().getBlockingEventDispatcher().dispatch(new CoherenceMessageTraceHelper.CoherenceMessageTraceEvent(this.getGenerator(), this));
-        }
     }
 
     /**
