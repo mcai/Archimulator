@@ -21,6 +21,14 @@ public class PdfToJpgConverter {
         convert("/home/itecgo/Archimulator.Ext/doc/cacheconfig_cn.pdf");
         convert("/home/itecgo/Archimulator.Ext/doc/prefetch_timeline_cn.pdf");
 
+        convert("/home/itecgo/Archimulator.Boot/2.Research/0.proposals/2015/自然科学基金项目申请/archimulator_architecture_cn.pdf");
+        convert("/home/itecgo/Archimulator.Boot/2.Research/0.proposals/2015/自然科学基金项目申请/archimulator_module_relationships_cn.pdf");
+        convert("/home/itecgo/Archimulator.Boot/2.Research/0.proposals/2015/自然科学基金项目申请/cacheconfig_cn.pdf");
+        convert("/home/itecgo/Archimulator.Boot/2.Research/0.proposals/2015/自然科学基金项目申请/ht_scheme_cn.pdf");
+        convert("/home/itecgo/Archimulator.Boot/2.Research/0.proposals/2015/自然科学基金项目申请/landscape_partitioned_llc_ht_cn.pdf");
+        convert("/home/itecgo/Archimulator.Boot/2.Research/0.proposals/2015/自然科学基金项目申请/prefetch_timeline_cn.pdf");
+        convert("/home/itecgo/Archimulator.Boot/2.Research/0.proposals/2015/自然科学基金项目申请/technical_route.pdf");
+
         List<String> benchmarks = new ArrayList<String>() {{
             add("mst");
             add("em3d");
