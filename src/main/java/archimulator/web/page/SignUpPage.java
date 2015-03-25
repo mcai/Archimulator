@@ -20,7 +20,6 @@ package archimulator.web.page;
 
 import archimulator.model.User;
 import archimulator.service.ServiceManager;
-import archimulator.web.component.PanelCaptcha;
 import de.agilecoders.wicket.markup.html.bootstrap.common.NotificationPanel;
 import org.apache.wicket.authroles.authentication.AuthenticatedWebSession;
 import org.apache.wicket.markup.html.form.*;
@@ -59,8 +58,6 @@ public class SignUpPage extends BasePage {
 
                 PasswordTextField inputPassword2 = new PasswordTextField("password2", Model.of(" "));
                 add(inputPassword2);
-
-                add(new PanelCaptcha("captcha"));
 
                 add(new EqualPasswordInputValidator(inputPassword, inputPassword2));
 

@@ -169,8 +169,6 @@ public class PanelSignIn extends Panel {
             add(new EmailTextField("email"));
             add(new PasswordTextField("password"));
 
-            add(new PanelCaptcha("captcha"));
-
             add(new CheckBox("rememberMe"));
         }
 
