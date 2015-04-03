@@ -66,8 +66,8 @@ public class ArchimulatorApplication extends WebApplication {
      * Create an Archimulator application.
      */
     public ArchimulatorApplication() {
-//        setConfigurationType(RuntimeConfigurationType.DEVELOPMENT);
-        setConfigurationType(RuntimeConfigurationType.DEPLOYMENT);
+        setConfigurationType(RuntimeConfigurationType.DEVELOPMENT);
+//        setConfigurationType(RuntimeConfigurationType.DEPLOYMENT);
     }
 
     @Override

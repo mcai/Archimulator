@@ -349,7 +349,7 @@ public interface ExperimentService extends Service {
 
         return experimentsByBenchmark.stream().filter(exp -> exp.getArchitecture().getL2Size() == experiment.getArchitecture().getL2Size()
                 && exp.getArchitecture().getL2ReplacementPolicyType() == CacheReplacementPolicyType.LRU
-        ).findFirst().get();
+        ).findFirst().orElseGet(() -> null);
     }
 
     /**
@@ -372,32 +372,62 @@ public interface ExperimentService extends Service {
             baselineExperimentPacks.add(experimentPack);
             speedupBaselineExperimentPredicate = exp -> true;
         } else if (experimentPackTitle.endsWith("_baseline_lru_l2Sizes")) {
-            baselineExperimentPacks.add(ServiceManager.getExperimentService().getExperimentPackByTitle(experimentPackTitle.replaceAll("_baseline_lru_l2Sizes", "_baseline_lru")));
+            ExperimentPack baselineExperimentPack = ServiceManager.getExperimentService().getExperimentPackByTitle(experimentPackTitle.replaceAll("_baseline_lru_l2Sizes", "_baseline_lru"));
+            if(baselineExperimentPack != null) {
+                baselineExperimentPacks.add(baselineExperimentPack);
+            }
             speedupBaselineExperimentPredicate = exp -> exp.getArchitecture().getL2Size() == StorageUnitHelper.displaySizeToByteCount("96 KB");
         } else if (experimentPackTitle.endsWith("_ht_lru")) {
-            baselineExperimentPacks.add(ServiceManager.getExperimentService().getExperimentPackByTitle(experimentPackTitle.replaceAll("_ht_lru", "_baseline_lru")));
+            ExperimentPack baselineExperimentPack = ServiceManager.getExperimentService().getExperimentPackByTitle(experimentPackTitle.replaceAll("_ht_lru", "_baseline_lru"));
+            if(baselineExperimentPack != null) {
+                baselineExperimentPacks.add(baselineExperimentPack);
+            }
             speedupBaselineExperimentPredicate = exp -> true;
         } else if (experimentPackTitle.endsWith("_ht_lru_l2Sizes")) {
-            baselineExperimentPacks.add(ServiceManager.getExperimentService().getExperimentPackByTitle(experimentPackTitle.replaceAll("_ht_lru_l2Sizes", "_baseline_lru")));
-            baselineExperimentPacks.add(ServiceManager.getExperimentService().getExperimentPackByTitle(experimentPackTitle.replaceAll("_ht_lru_l2Sizes", "_baseline_lru_l2Sizes")));
+            ExperimentPack baselineExperimentPack = ServiceManager.getExperimentService().getExperimentPackByTitle(experimentPackTitle.replaceAll("_ht_lru_l2Sizes", "_baseline_lru"));
+            ExperimentPack baselineL2SizesExperimentPack = ServiceManager.getExperimentService().getExperimentPackByTitle(experimentPackTitle.replaceAll("_ht_lru_l2Sizes", "_baseline_lru_l2Sizes"));
+
+            if(baselineExperimentPack != null) {
+                baselineExperimentPacks.add(baselineExperimentPack);
+            }
+            if(baselineL2SizesExperimentPack != null) {
+                baselineExperimentPacks.add(baselineL2SizesExperimentPack);
+            }
+
             speedupBaselineExperimentPredicate = exp -> exp.getArchitecture().getL2Size() == experiment.getArchitecture().getL2Size();
         } else if (experimentPackTitle.endsWith("_ht_lru_lookaheads")) {
-            baselineExperimentPacks.add(ServiceManager.getExperimentService().getExperimentPackByTitle(experimentPackTitle.replaceAll("_ht_lru_lookaheads", "_baseline_lru")));
+            ExperimentPack baselineExperimentPack = ServiceManager.getExperimentService().getExperimentPackByTitle(experimentPackTitle.replaceAll("_ht_lru_lookaheads", "_baseline_lru"));
+            if(baselineExperimentPack != null) {
+                baselineExperimentPacks.add(baselineExperimentPack);
+            }
             speedupBaselineExperimentPredicate = exp -> true;
         } else if (experimentPackTitle.endsWith("_ht_lru_strides")) {
-            baselineExperimentPacks.add(ServiceManager.getExperimentService().getExperimentPackByTitle(experimentPackTitle.replaceAll("_ht_lru_strides", "_baseline_lru")));
+            ExperimentPack baselineExperimentPack = ServiceManager.getExperimentService().getExperimentPackByTitle(experimentPackTitle.replaceAll("_ht_lru_strides", "_baseline_lru"));
+            if(baselineExperimentPack != null) {
+                baselineExperimentPacks.add(baselineExperimentPack);
+            }
             speedupBaselineExperimentPredicate = exp -> true;
         } else if (experimentPackTitle.endsWith("_ht_lru_static_partitioned")) {
-            baselineExperimentPacks.add(ServiceManager.getExperimentService().getExperimentPackByTitle(experimentPackTitle.replaceAll("_ht_lru_static_partitioned", "_ht_lru")));
+            ExperimentPack baselineExperimentPack = ServiceManager.getExperimentService().getExperimentPackByTitle(experimentPackTitle.replaceAll("_ht_lru_static_partitioned", "_ht_lru"));
+            if(baselineExperimentPack != null) {
+                baselineExperimentPacks.add(baselineExperimentPack);
+            }
             speedupBaselineExperimentPredicate = exp -> exp.getArchitecture().getL2ReplacementPolicyType() == CacheReplacementPolicyType.LRU;
         } else if (experimentPackTitle.endsWith("_ht_lru_dynamic_partitioned")) {
-            baselineExperimentPacks.add(ServiceManager.getExperimentService().getExperimentPackByTitle(experimentPackTitle.replaceAll("_ht_lru_dynamic_partitioned", "_ht_lru")));
+            ExperimentPack baselineExperimentPack = ServiceManager.getExperimentService().getExperimentPackByTitle(experimentPackTitle.replaceAll("_ht_lru_dynamic_partitioned", "_ht_lru"));
+            if(baselineExperimentPack != null) {
+                baselineExperimentPacks.add(baselineExperimentPack);
+            }
             speedupBaselineExperimentPredicate = exp -> exp.getArchitecture().getL2ReplacementPolicyType() == CacheReplacementPolicyType.LRU;
         } else if (experimentPackTitle.endsWith("_ht_l2ReplacementPolicies")) {
-            baselineExperimentPacks.add(ServiceManager.getExperimentService().getExperimentPackByTitle(experimentPackTitle.replaceAll("_ht_l2ReplacementPolicies", "_ht_lru")));
+            ExperimentPack baselineExperimentPack = ServiceManager.getExperimentService().getExperimentPackByTitle(experimentPackTitle.replaceAll("_ht_l2ReplacementPolicies", "_ht_lru"));
+            if(baselineExperimentPack != null) {
+                baselineExperimentPacks.add(baselineExperimentPack);
+            }
             speedupBaselineExperimentPredicate = exp -> exp.getArchitecture().getL2ReplacementPolicyType() == CacheReplacementPolicyType.LRU;
         }
 
-        return baselineExperimentPacks.isEmpty() || speedupBaselineExperimentPredicate == null ? null : baselineExperimentPacks.stream().flatMap(expPack -> expPack.getExperiments().stream()).filter(speedupBaselineExperimentPredicate).findFirst().get();
+        return baselineExperimentPacks.isEmpty() || speedupBaselineExperimentPredicate == null ?
+                null : baselineExperimentPacks.stream().flatMap(expPack -> expPack.getExperiments().stream()).filter(speedupBaselineExperimentPredicate).findFirst().orElseGet(() -> null);
     }
 }
