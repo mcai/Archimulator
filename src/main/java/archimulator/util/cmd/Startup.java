@@ -29,8 +29,6 @@ public class Startup {
             else {
                 switch (commander.getParsedCommand()) {
                     case "simulate":
-                        String benchmarkTitle = simulateCommand.getBenchmarkTitle();
-                        System.out.printf("simulating %s...\n", benchmarkTitle);
                         simulateCommand.run();
                         break;
                     default:

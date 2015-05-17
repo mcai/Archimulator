@@ -31,15 +31,10 @@ import net.pickapack.dateTime.DateHelper;
 import net.pickapack.io.cmd.CommandLineHelper;
 import net.pickapack.io.cmd.SedHelper;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.math.RandomUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.io.Serializable;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
-import java.nio.channels.OverlappingFileLockException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -99,35 +94,12 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
         this.memory = new Memory(kernel, this.littleEndian, this.id);
 
         try {
-            File file = new File(getTransformedBenchmarkWorkingDirectory(contextMapping.getBenchmark().getWorkingDirectory()) + "/archimulator_lock");
-            FileChannel channel = new RandomAccessFile(file, "rw").getChannel();
-
-            FileLock lock = null;
-
-            for (; ; ) {
-                try {
-                    lock = channel.tryLock();
-                } catch (OverlappingFileLockException e) {
-                    // File is already locked in this thread or virtual machine
-                }
-
-                if (lock != null) {
-                    break;
-                }
-
-                Thread.sleep(RandomUtils.nextInt(10) * 1000);
-            }
-
             buildBenchmark(
                     contextMapping.getBenchmark().getWorkingDirectory(),
                     contextMapping.getBenchmark().getHelperThreadEnabled(),
                     contextMapping.getHelperThreadLookahead(), contextMapping.getHelperThreadStride()
             );
             this.loadProgram(kernel, contextMapping);
-
-            lock.release();
-
-            channel.close();
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(-1);

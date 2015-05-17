@@ -50,7 +50,7 @@ public class Benchmark implements Serializable {
     private boolean helperThreadEnabled;
 
     /**
-     * Create a benchmark. Reserved for ORM only.
+     * Create a benchmark. Reserved for XML mapping only.
      */
     public Benchmark() {
     }

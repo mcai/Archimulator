@@ -38,19 +38,19 @@ public class SimulateCommand {
     @Parameter(names = "-numThreadsPerCore", description = "Number of threads per core")
     private int numThreadsPerCore = 2;
 
-    @Parameter(names = "-l1ISize", description = "L1 instruction cache size(KB,MB,GB)")
+    @Parameter(names = "-l1ISize", description = "L1 instruction cache size(B,KB,MB,GB)")
     private String l1ISize = "64KB";
 
     @Parameter(names = "-l1IAssoc", description = "L1 instruction cache associativity")
     private int l1IAssociativity = 4;
 
-    @Parameter(names = "-l1DSize", description = "L1 data cache size(KB,MB,GB)")
+    @Parameter(names = "-l1DSize", description = "L1 data cache size(B,KB,MB,GB)")
     private String l1DSize = "64KB";
 
     @Parameter(names = "-l1DAssoc", description = "L1 data cache associativity")
     private int l1DAssociativity = 4;
 
-    @Parameter(names = "-l2Size", description = "L2 cache size(KB,MB,GB)")
+    @Parameter(names = "-l2Size", description = "L2 cache size(B,KB,MB,GB)")
     private String l2Size = "512KB";
 
     @Parameter(names = "-l2Assoc", description = "L2 cache associativity")
@@ -129,11 +129,7 @@ public class SimulateCommand {
             if (!file.exists()) {
                 List<ExperimentStat> stats = experiment.getStats();
 
-                String json = JsonSerializationHelper.serialize(
-                        new ExperimentStat.ExperimentStatListContainer(
-                                stats
-                        )
-                );
+                String json = JsonSerializationHelper.toJson(stats, true);
 
                 if (!file.getParentFile().exists()) {
                     if (!file.getParentFile().mkdirs()) {
