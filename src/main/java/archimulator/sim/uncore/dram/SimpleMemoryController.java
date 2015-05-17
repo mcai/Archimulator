@@ -37,9 +37,9 @@ public class SimpleMemoryController extends MemoryController {
     public SimpleMemoryController(MemoryHierarchy memoryHierarchy) {
         super(memoryHierarchy);
 
-        int busWidth = getExperiment().getArchitecture().getSimpleMemoryControllerBusWidth();
-        int memoryLatency = getExperiment().getArchitecture().getSimpleMemoryControllerMemoryLatency();
-        int memoryTrunkLatency = getExperiment().getArchitecture().getSimpleMemoryControllerMemoryTrunkLatency();
+        int busWidth = getExperiment().getSimpleMemoryControllerBusWidth();
+        int memoryLatency = getExperiment().getSimpleMemoryControllerMemoryLatency();
+        int memoryTrunkLatency = getExperiment().getSimpleMemoryControllerMemoryTrunkLatency();
 
         int numChunks = (this.getLineSize() - (busWidth - 1)) / busWidth;
         if ((numChunks <= 0)) {

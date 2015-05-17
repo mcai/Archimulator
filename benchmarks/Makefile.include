@@ -1,0 +1,20 @@
+CC  = gcc
+CFLAGS  = $(EXTRA_CFLAGS) -O3
+LDFLAGS = $(EXTRA_LDFLAGS) -static -O3
+LIBS = $(EXTRA_LIBS)
+
+all: $(PROG)
+
+%.s: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(PROG): $(OBJS)
+	$(CC) $(LDFLAGS) $^ -o $@ $(LIBS)
+
+clean:
+	rm -f $(PROG)
+	rm -f *.o
+

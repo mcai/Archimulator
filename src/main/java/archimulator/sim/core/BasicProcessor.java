@@ -72,13 +72,13 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
 
         this.cores = new ArrayList<>();
 
-        for (int i = 0; i < getExperiment().getArchitecture().getNumCores(); i++) {
+        for (int i = 0; i < getExperiment().getNumCores(); i++) {
             Core core = new BasicCore(this, i);
 
             core.setL1IController(memoryHierarchy.getL1IControllers().get(i));
             core.setL1DController(memoryHierarchy.getL1DControllers().get(i));
 
-            for (int j = 0; j < getExperiment().getArchitecture().getNumThreadsPerCore(); j++) {
+            for (int j = 0; j < getExperiment().getNumThreadsPerCore(); j++) {
                 BasicThread thread = new BasicThread(core, j);
                 core.getThreads().add(thread);
 
@@ -103,8 +103,8 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
             if (context.getThreadId() != -1 && this.contextToThreadMappings.get(context) == null) {
                 context.setState(ContextState.RUNNING);
 
-                int coreNum = context.getThreadId() / getExperiment().getArchitecture().getNumThreadsPerCore();
-                int threadNum = context.getThreadId() % getExperiment().getArchitecture().getNumThreadsPerCore();
+                int coreNum = context.getThreadId() / getExperiment().getNumThreadsPerCore();
+                int threadNum = context.getThreadId() % getExperiment().getNumThreadsPerCore();
 
                 Thread candidateThread = this.getCores().get(coreNum).getThreads().get(threadNum);
 

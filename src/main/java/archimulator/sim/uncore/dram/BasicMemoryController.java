@@ -332,7 +332,7 @@ public class BasicMemoryController extends MemoryController {
      * @return the "to DRAM" latency
      */
     public int getToDramLatency() {
-        return getExperiment().getArchitecture().getBasicMemoryControllerToDramLatency();
+        return getExperiment().getBasicMemoryControllerToDramLatency();
     }
 
     /**
@@ -341,7 +341,7 @@ public class BasicMemoryController extends MemoryController {
      * @return the "from DRAM" latency
      */
     public int getFromDramLatency() {
-        return getExperiment().getArchitecture().getBasicMemoryControllerFromDramLatency();
+        return getExperiment().getBasicMemoryControllerFromDramLatency();
     }
 
     /**
@@ -350,7 +350,7 @@ public class BasicMemoryController extends MemoryController {
      * @return the precharge latency
      */
     public int getPrechargeLatency() {
-        return getExperiment().getArchitecture().getBasicMemoryControllerPrechargeLatency();
+        return getExperiment().getBasicMemoryControllerPrechargeLatency();
     }
 
     /**
@@ -359,7 +359,7 @@ public class BasicMemoryController extends MemoryController {
      * @return the closed latency
      */
     public int getClosedLatency() {
-        return getExperiment().getArchitecture().getBasicMemoryControllerClosedLatency();
+        return getExperiment().getBasicMemoryControllerClosedLatency();
     }
 
     /**
@@ -368,7 +368,7 @@ public class BasicMemoryController extends MemoryController {
      * @return the conflict latency
      */
     public int getConflictLatency() {
-        return getExperiment().getArchitecture().getBasicMemoryControllerConflictLatency();
+        return getExperiment().getBasicMemoryControllerConflictLatency();
     }
 
     /**
@@ -377,7 +377,7 @@ public class BasicMemoryController extends MemoryController {
      * @return the bus width
      */
     public int getBusWidth() {
-        return getExperiment().getArchitecture().getBasicMemoryControllerBusWidth();
+        return getExperiment().getBasicMemoryControllerBusWidth();
     }
 
     /**
@@ -386,7 +386,7 @@ public class BasicMemoryController extends MemoryController {
      * @return the number of banks
      */
     public int getNumBanks() {
-        return getExperiment().getArchitecture().getBasicMemoryControllerNumBanks();
+        return getExperiment().getBasicMemoryControllerNumBanks();
     }
 
     /**
@@ -395,6 +395,6 @@ public class BasicMemoryController extends MemoryController {
      * @return the size of a row
      */
     public int getRowSize() {
-        return getExperiment().getArchitecture().getBasicMemoryControllerRowSize();
+        return getExperiment().getBasicMemoryControllerRowSize();
     }
 }

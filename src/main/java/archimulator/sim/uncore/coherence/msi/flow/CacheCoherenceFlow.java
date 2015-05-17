@@ -208,7 +208,7 @@ public abstract class CacheCoherenceFlow extends Params implements Node {
      */
     public byte[] getData() {
         Memory memory = this.getAccess().getThread().getContext().getProcess().getMemory();
-        int lineSize = this.getAccess().getThread().getExperiment().getArchitecture().getL1DLineSize();
+        int lineSize = this.getAccess().getThread().getExperiment().getL1DLineSize();
         return memory.readBlock(this.getTag(), lineSize / 4);
     }
 }

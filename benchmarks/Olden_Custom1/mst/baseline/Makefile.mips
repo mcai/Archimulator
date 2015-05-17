@@ -1,0 +1,8 @@
+EXTRA_CFLAGS =
+EXTRA_LDFLAGS =
+EXTRA_LIBS = -lm
+
+PROG = mst.mips
+OBJS = mst.o args.o hash.o makegraph.o
+
+include ../../../Makefile.mips.include

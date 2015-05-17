@@ -20,89 +20,36 @@ package archimulator.service.impl;
 
 import archimulator.model.Benchmark;
 import archimulator.service.BenchmarkService;
-import archimulator.service.ServiceManager;
 import archimulator.util.serialization.XMLSerializationHelper;
-import com.j256.ormlite.misc.TransactionManager;
-import net.pickapack.model.WithId;
-import net.pickapack.service.AbstractService;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
-import java.util.*;
 
 /**
  * Benchmark service implementation.
  *
  * @author Min Cai
  */
-public class BenchmarkServiceImpl extends AbstractService implements BenchmarkService {
-    private Map<String, Benchmark> benchmarks;
-
-    /**
-     * Create a benchmark service implementation.
-     */
-    @SuppressWarnings("unchecked")
-    public BenchmarkServiceImpl() {
-        super(ServiceManager.getDatabaseUrl(), Arrays.<Class<? extends WithId>>asList());
-
-        this.benchmarks = new LinkedHashMap<>();
-    }
-
+public class BenchmarkServiceImpl implements BenchmarkService {
     @Override
-    public void initialize() {
+    public Benchmark getBenchmarkByTitle(String title) {
         try {
-            TransactionManager.callInTransaction(getConnectionSource(),
-                    () -> {
-                        try {
-                            File fileBenchmarks = new File("configs/benchmarks");
+            File file = new File("configs/benchmarks/", title + ".xml");
 
-                            if (fileBenchmarks.exists()) {
-                                List<File> files = new ArrayList<>(FileUtils.listFiles(fileBenchmarks, new String[]{"xml"}, true));
+            if (file.exists()) {
+                String text = FileUtils.readFileToString(file);
 
-                                files.sort(Comparator.comparing(File::getAbsolutePath));
+                Benchmark benchmark = XMLSerializationHelper.deserialize(Benchmark.class, text);
 
-                                for (File file : files) {
-                                    String text = FileUtils.readFileToString(file);
+                if (benchmark != null) {
+                    return benchmark;
+                }
+            }
 
-                                    Benchmark benchmark = XMLSerializationHelper.deserialize(Benchmark.class, text);
-
-                                    if (benchmark != null) {
-                                        if (getBenchmarkByTitle(benchmark.getTitle()) == null) {
-                                            addBenchmark(benchmark);
-                                            System.out.println("Benchmark " + benchmark.getTitle() + " added.");
-                                        }
-                                    }
-                                }
-                            }
-
-                            return null;
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            throw new RuntimeException(e);
-                        }
-                    });
+            return null;
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public List<Benchmark> getAllBenchmarks() {
-        return new ArrayList<>(this.benchmarks.values());
-    }
-
-    @Override
-    public long getNumAllBenchmarks() {
-        return this.benchmarks.size();
-    }
-
-    @Override
-    public Benchmark getBenchmarkByTitle(String title) {
-        return this.benchmarks.containsKey(title) ? this.benchmarks.get(title) : null;
-    }
-
-    public void addBenchmark(Benchmark benchmark) {
-        this.benchmarks.put(benchmark.getTitle(), benchmark);
     }
 }

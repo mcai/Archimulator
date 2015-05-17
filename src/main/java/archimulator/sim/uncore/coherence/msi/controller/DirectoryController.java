@@ -60,9 +60,9 @@ public class DirectoryController extends GeneralCacheController<DirectoryControl
         super(memoryHierarchy, name);
 
         this.cacheGeometry = new CacheGeometry(
-                getExperiment().getArchitecture().getL2Size(),
-                getExperiment().getArchitecture().getL2Associativity(),
-                getExperiment().getArchitecture().getL2LineSize()
+                getExperiment().getL2Size(),
+                getExperiment().getL2Associativity(),
+                getExperiment().getL2LineSize()
         );
 
         this.cache = new BasicEvictableCache<>(
@@ -293,12 +293,12 @@ public class DirectoryController extends GeneralCacheController<DirectoryControl
 
     @Override
     public int getHitLatency() {
-        return getExperiment().getArchitecture().getL2HitLatency();
+        return getExperiment().getL2HitLatency();
     }
 
     @Override
     public CacheReplacementPolicyType getReplacementPolicyType() {
-        return getExperiment().getArchitecture().getL2ReplacementPolicyType();
+        return getExperiment().getL2ReplacementPolicyType();
     }
 
     @Override

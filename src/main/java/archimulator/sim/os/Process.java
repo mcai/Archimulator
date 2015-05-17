@@ -78,10 +78,10 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
      * Create a process.
      *
      * @param kernel              the kernel
-     * @param simulationDirectory the simulation directory
+     * @param outputDirectory     the output directory
      * @param contextMapping      the context mapping
      */
-    public Process(Kernel kernel, String simulationDirectory, ContextMapping contextMapping) {
+    public Process(Kernel kernel, String outputDirectory, ContextMapping contextMapping) {
         super(kernel);
 
         this.contextMapping = contextMapping;
@@ -89,8 +89,8 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
         this.id = getExperiment().currentProcessId++;
         kernel.getProcesses().add(this);
 
-        this.standardInFileDescriptor = contextMapping.getBenchmark().getStandardIn().length() > 0 ? NativeSystemCalls.LIBC.open(simulationDirectory + File.separator + contextMapping.getBenchmark().getStandardIn(), OpenFlags.O_RDONLY) : 0;
-        this.standardOutFileDescriptor = contextMapping.getStandardOut().length() > 0 ? NativeSystemCalls.LIBC.open(simulationDirectory + File.separator + contextMapping.getStandardOut(), OpenFlags.O_CREAT | OpenFlags.O_APPEND | OpenFlags.O_TRUNC | OpenFlags.O_WRONLY, 0660) : 1;
+        this.standardInFileDescriptor = contextMapping.getBenchmark().getStandardIn().length() > 0 ? NativeSystemCalls.LIBC.open(outputDirectory + File.separator + contextMapping.getBenchmark().getStandardIn(), OpenFlags.O_RDONLY) : 0;
+        this.standardOutFileDescriptor = contextMapping.getStandardOut().length() > 0 ? NativeSystemCalls.LIBC.open(outputDirectory + File.separator + contextMapping.getStandardOut(), OpenFlags.O_CREAT | OpenFlags.O_APPEND | OpenFlags.O_TRUNC | OpenFlags.O_WRONLY, 0660) : 1;
 
         this.environments = new ArrayList<>();
 
@@ -123,7 +123,7 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
                     contextMapping.getBenchmark().getHelperThreadEnabled(),
                     contextMapping.getHelperThreadLookahead(), contextMapping.getHelperThreadStride()
             );
-            this.loadProgram(kernel, simulationDirectory, contextMapping);
+            this.loadProgram(kernel, contextMapping);
 
             lock.release();
 
@@ -136,12 +136,10 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
 
     /**
      * Load the program.
-     *
-     * @param kernel              the kernel
-     * @param simulationDirectory the simulation directory
+     *  @param kernel              the kernel
      * @param contextMapping      the context mapping
      */
-    protected abstract void loadProgram(Kernel kernel, String simulationDirectory, ContextMapping contextMapping);
+    protected abstract void loadProgram(Kernel kernel, ContextMapping contextMapping);
 
     /**
      * Translate the specified file descriptor number.
@@ -471,7 +469,9 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
      */
     private static void buildWithMakeFile(String workingDirectory) {
         System.err.printf("[%s] Building with Makefile\n", DateHelper.toString(new Date()));
-        List<String> result = CommandLineHelper.invokeShellCommandAndGetResult("sh -c 'cd " + getTransformedBenchmarkWorkingDirectory(workingDirectory) +
+        String transformedBenchmarkWorkingDirectory = getTransformedBenchmarkWorkingDirectory(workingDirectory);
+        System.err.printf("cd %s\n", transformedBenchmarkWorkingDirectory);
+        List<String> result = CommandLineHelper.invokeShellCommandAndGetResult("sh -c 'cd " + transformedBenchmarkWorkingDirectory +
                 ";make -f Makefile.mips -B CROSS_COMPILER_ROOT=" + getCurrentDirectory() + "/tools/cross_compiler'");
         for (String line : result) {
             System.err.println(line);

@@ -83,7 +83,7 @@ public class ToRoiFastForwardSimulation extends Simulation {
         this.pthreadHasSpawned = false;
 
         this.getProcessor().getKernel().getBlockingEventDispatcher().addListener(PseudoCallEncounteredEvent.class, event -> {
-            if (event.getPseudoCall().getImm() == getExperiment().getArchitecture().getHelperThreadPthreadSpawnIndex()) {
+            if (event.getPseudoCall().getImm() == getExperiment().getHelperThreadPthreadSpawnIndex()) {
                 pthreadHasSpawned = true;
             }
         });

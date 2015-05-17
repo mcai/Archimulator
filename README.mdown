@@ -76,7 +76,7 @@ Quick Start
 ------------------
 
 0. For Debian/Ubuntu based Linux distros (other distros can be similarly prepared):
-	- sudo apt-get install build-essential ia32-libs git-core mysql-server apache2 phpmyadmin redis-server
+	- sudo apt-get install build-essential gcc-multilib git-core mysql-server apache2 phpmyadmin redis-server
 	- Configure MySQL server, Apache 2 server and PHPMyAdmin.
 	- Create a database named Archimulator on the local MySQL server.
 

@@ -1,0 +1,19 @@
+CC = $(CROSS_COMPILER_ROOT)/mips-unknown-linux-gnu/bin/mips-unknown-linux-gnu-gcc
+CFLAGS = $(EXTRA_CFLAGS) -DMIPS_1 -O3
+LDFLAGS = $(EXTRA_LDFLAGS) -static -O3
+LIBS = $(EXTRA_LIBS)
+
+all: $(PROG)
+
+%.s: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(PROG): $(OBJS)
+	$(CC) $(LDFLAGS) $^ -o $@ $(LIBS)
+
+clean:
+	rm -f $(PROG)
+	rm -f *.o

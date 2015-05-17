@@ -51,22 +51,20 @@ public class BasicProcess extends Process {
      * Create a basic process.
      *
      * @param kernel              the kernel
-     * @param simulationDirectory the simulation directory
+     * @param outputDirectory     the output directory
      * @param contextMapping      the context mapping
      */
-    public BasicProcess(Kernel kernel, String simulationDirectory, ContextMapping contextMapping) {
-        super(kernel, simulationDirectory, contextMapping);
+    public BasicProcess(Kernel kernel, String outputDirectory, ContextMapping contextMapping) {
+        super(kernel, outputDirectory, contextMapping);
     }
 
     /**
      * Load the program.
-     *
-     * @param kernel              the kernel
-     * @param simulationDirectory the simulation directory
+     *  @param kernel              the kernel
      * @param contextMapping      the context mapping
      */
     @Override
-    protected void loadProgram(Kernel kernel, String simulationDirectory, ContextMapping contextMapping) {
+    protected void loadProgram(Kernel kernel, ContextMapping contextMapping) {
         this.pcsToMachineInstructions = new TreeMap<>();
         this.machineInstructionsToStaticInstructions = new TreeMap<>();
 

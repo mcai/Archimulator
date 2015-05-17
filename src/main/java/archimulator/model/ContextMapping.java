@@ -18,8 +18,6 @@
  ******************************************************************************/
 package archimulator.model;
 
-import archimulator.service.ServiceManager;
-
 import java.io.Serializable;
 
 /**
@@ -30,7 +28,7 @@ import java.io.Serializable;
 public class ContextMapping implements Serializable {
     private int threadId;
 
-    private String benchmarkTitle;
+    private Benchmark benchmark;
 
     private String arguments;
 
@@ -39,8 +37,6 @@ public class ContextMapping implements Serializable {
     private int helperThreadLookahead;
 
     private int helperThreadStride;
-
-    private transient Benchmark benchmark;
 
     /**
      * Create a context mapping.
@@ -63,7 +59,7 @@ public class ContextMapping implements Serializable {
      */
     public ContextMapping(int threadId, Benchmark benchmark, String arguments, String standardOut) {
         this.threadId = threadId;
-        this.benchmarkTitle = benchmark.getTitle();
+        this.benchmark = benchmark;
         this.arguments = arguments;
         this.standardOut = standardOut;
     }
@@ -84,15 +80,6 @@ public class ContextMapping implements Serializable {
      */
     public void setThreadId(int threadId) {
         this.threadId = threadId;
-    }
-
-    /**
-     * Get the benchmark title.
-     *
-     * @return the benchmark title
-     */
-    public String getBenchmarkTitle() {
-        return benchmarkTitle;
     }
 
     /**
@@ -181,10 +168,6 @@ public class ContextMapping implements Serializable {
      * @return the benchmark
      */
     public Benchmark getBenchmark() {
-        if (benchmark == null) {
-            benchmark = ServiceManager.getBenchmarkService().getBenchmarkByTitle(benchmarkTitle);
-        }
-
         return benchmark;
     }
 

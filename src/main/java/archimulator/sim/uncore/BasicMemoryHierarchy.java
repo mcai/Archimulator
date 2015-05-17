@@ -71,7 +71,7 @@ public class BasicMemoryHierarchy extends BasicSimulationObject implements Memor
     public BasicMemoryHierarchy(Experiment experiment, Simulation simulation, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
         super(experiment, simulation, blockingEventDispatcher, cycleAccurateEventQueue);
 
-        switch (getExperiment().getArchitecture().getMemoryControllerType()) {
+        switch (getExperiment().getMemoryControllerType()) {
             case SIMPLE:
                 this.memoryController = new SimpleMemoryController(this);
                 break;
@@ -92,7 +92,7 @@ public class BasicMemoryHierarchy extends BasicSimulationObject implements Memor
         this.itlbs = new ArrayList<>();
         this.dtlbs = new ArrayList<>();
 
-        for (int i = 0; i < getExperiment().getArchitecture().getNumCores(); i++) {
+        for (int i = 0; i < getExperiment().getNumCores(); i++) {
             CacheController l1IController = new L1IController(this, "c" + i + "/icache");
             l1IController.setNext(this.l2Controller);
             this.l1IControllers.add(l1IController);
@@ -101,7 +101,7 @@ public class BasicMemoryHierarchy extends BasicSimulationObject implements Memor
             l1DController.setNext(this.l2Controller);
             this.l1DControllers.add(l1DController);
 
-            for (int j = 0; j < getExperiment().getArchitecture().getNumThreadsPerCore(); j++) {
+            for (int j = 0; j < getExperiment().getNumThreadsPerCore(); j++) {
                 TranslationLookasideBuffer itlb = new TranslationLookasideBuffer(this, "c" + i + "t" + j + "/itlb");
                 this.itlbs.add(itlb);
 
@@ -157,7 +157,7 @@ public class BasicMemoryHierarchy extends BasicSimulationObject implements Memor
         cacheController.getFsmFactory().dump(PREFIX_CC_FSM + cacheController.getName(), finiteStateMachines, statsMap);
 
         for (Map.Entry<String, String> entry : statsMap.entrySet()) {
-            stats.add(new ExperimentStat(getExperiment().getId(), getSimulation().getPrefix(), entry.getKey(), entry.getValue()));
+            stats.add(new ExperimentStat(getSimulation().getPrefix(), entry.getKey(), entry.getValue()));
         }
     }
 

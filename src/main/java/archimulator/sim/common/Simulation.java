@@ -18,8 +18,9 @@
  ******************************************************************************/
 package archimulator.sim.common;
 
-import archimulator.model.*;
-import archimulator.service.ServiceManager;
+import archimulator.model.ContextMapping;
+import archimulator.model.Experiment;
+import archimulator.model.ExperimentStat;
 import archimulator.sim.common.report.ReportNode;
 import archimulator.sim.common.report.Reportable;
 import archimulator.sim.core.BasicProcessor;
@@ -67,15 +68,9 @@ import java.util.List;
 public abstract class Simulation implements SimulationObject, Reportable {
     protected Reference<Kernel> kernelRef;
 
-    private String title;
-
     private long beginTime;
 
     private long endTime;
-
-    private boolean running;
-
-    private boolean stopForced;
 
     private SimulationType type;
 
@@ -164,10 +159,9 @@ public abstract class Simulation implements SimulationObject, Reportable {
         this.blockingEventDispatcher = blockingEventDispatcher;
         this.cycleAccurateEventQueue = cycleAccurateEventQueue;
 
-        this.title = experiment.getId() + "/" + getPrefix();
         this.type = type;
 
-        File cwdFile = new File(this.getWorkingDirectory());
+        File cwdFile = new File(this.getExperiment().getOutputDirectory());
         if (cwdFile.exists() && !FileHelper.deleteDir(cwdFile) || !cwdFile.mkdirs()) {
             throw new RuntimeException();
         }
@@ -197,7 +191,7 @@ public abstract class Simulation implements SimulationObject, Reportable {
 
         this.delinquentLoadIdentificationHelper = new DelinquentLoadIdentificationHelper(this);
 
-        if (getExperiment().getArchitecture().getDynamicSpeculativePrecomputationEnabled()) {
+        if (getExperiment().getDynamicSpeculativePrecomputationEnabled()) {
             this.dynamicSpeculativePrecomputationHelper = new DynamicSpeculativePrecomputationHelper(this);
         }
 
@@ -206,28 +200,12 @@ public abstract class Simulation implements SimulationObject, Reportable {
         this.blpProfilingHelper = new BLPProfilingHelper(this);
 
         this.intervalHelper = new IntervalHelper(this);
-
-        ServiceManager.getBlockingEventDispatcher().addListener(ExperimentStateChangedEvent.class, event -> {
-            if (running
-                    && event.getSender().getId() == experiment.getId()
-                    && ServiceManager.getExperimentService().getExperimentById(this.experiment.getId()).getState() == ExperimentState.PENDING) {
-                stopForced = true;
-            }
-        });
     }
 
     /**
      * Perform the simulation.
      */
     public void simulate() {
-        this.running = true;
-
-        Logger.infof(Logger.SIMULATOR, "begin simulation: %s", this.cycleAccurateEventQueue.getCurrentCycle(), this.getTitle());
-
-        Logger.info(Logger.SIMULATOR, "", this.cycleAccurateEventQueue.getCurrentCycle());
-
-        Logger.infof(Logger.SIMULATION, "  architecture: %s", this.cycleAccurateEventQueue.getCurrentCycle(), getExperiment().getArchitecture());
-
         Logger.info(Logger.SIMULATOR, "", this.cycleAccurateEventQueue.getCurrentCycle());
 
         this.beginTime = DateHelper.toTick(new Date());
@@ -248,7 +226,6 @@ public abstract class Simulation implements SimulationObject, Reportable {
             this.collectStats();
 
             this.endSimulation();
-            this.running = false;
 
             throw new RuntimeException(e);
         }
@@ -257,7 +234,6 @@ public abstract class Simulation implements SimulationObject, Reportable {
         this.collectStats();
 
         this.endSimulation();
-        this.running = false;
     }
 
     /**
@@ -309,15 +285,13 @@ public abstract class Simulation implements SimulationObject, Reportable {
 
         this.getProcessor().getMemoryHierarchy().getL2Controller().getCache().getReplacementPolicy().dumpStats(rootReportNode);
 
-        rootReportNode.traverse(node -> {
-            stats.add(new ExperimentStat(experiment.getId(), getPrefix(), node.getPath(), node.getValue()));
-        });
+        rootReportNode.traverse(node -> stats.add(new ExperimentStat(getPrefix(), node.getPath(), node.getValue())));
 
         if (this.getType() == SimulationType.MEASUREMENT || this.getType() == SimulationType.CACHE_WARMUP) {
             getProcessor().getMemoryHierarchy().dumpCacheControllerFsmStats(stats);
         }
 
-        ServiceManager.getExperimentStatService().addStatsByParent(this.getExperiment(), stats);
+        this.getExperiment().getStats().addAll(stats);
     }
 
     /**
@@ -393,14 +367,6 @@ public abstract class Simulation implements SimulationObject, Reportable {
     private void advanceOneCycle() {
         this.doHouseKeeping();
         this.getCycleAccurateEventQueue().advanceOneCycle();
-
-        if (this.stopForced) {
-            throw new RuntimeException("Aborted by user.");
-        }
-
-        if (this.getCycleAccurateEventQueue().getCurrentCycle() % (this.type == SimulationType.FAST_FORWARD ? 100000000 : 10000000) == 0) {
-            ServiceManager.getExperimentService().updateExperiment(this.experiment);
-        }
     }
 
     /**
@@ -420,7 +386,7 @@ public abstract class Simulation implements SimulationObject, Reportable {
         Kernel kernel = new Kernel(this);
 
         for (final ContextMapping contextMapping : this.getExperiment().getContextMappings()) {
-            final Context context = Context.load(kernel, this.getWorkingDirectory(), contextMapping);
+            final Context context = Context.load(kernel, this.getExperiment().getOutputDirectory(), contextMapping);
 
             if (!kernel.map(context, candidateThreadId -> candidateThreadId == contextMapping.getThreadId())) {
                 throw new RuntimeException();
@@ -525,24 +491,6 @@ public abstract class Simulation implements SimulationObject, Reportable {
      */
     public String getDuration() {
         return DurationFormatUtils.formatDurationHMS(this.getEndTime() - this.getBeginTime());
-    }
-
-    /**
-     * Get the simulation title.
-     *
-     * @return the simulation title
-     */
-    public String getTitle() {
-        return title;
-    }
-
-    /**
-     * Get the simulation's working directory.
-     *
-     * @return the simulation's working directory
-     */
-    public String getWorkingDirectory() {
-        return "experiments" + File.separator + this.title;
     }
 
     /**

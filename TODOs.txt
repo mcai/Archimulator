@@ -26,3 +26,7 @@ Hadoop、Spark、Storm等大数据平台应运而生，这些分布式计算平�
 （1）研究并建立大数据平台的运行时性能模型，为大数据平台性能分析提供可靠的基础；
 （2）研究大数据平台性能分析和性能瓶颈定位方法，依据聚类、粗糙集和关键路径等方法进行性能瓶颈定位；
 （3）开发大数据平台性能分析工具，通过大数据平台应用实例进行实验验证。
+
+
+1. command line interface
+2. bio inspired adaptive routing for big data applications

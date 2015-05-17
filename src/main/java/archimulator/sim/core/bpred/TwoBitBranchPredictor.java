@@ -64,7 +64,7 @@ public class TwoBitBranchPredictor extends DynamicBranchPredictor {
      * @param name the name
      */
     public TwoBitBranchPredictor(Thread thread, String name) {
-        this(thread, name, thread.getExperiment().getArchitecture().getTwoBitBranchPredictorBimodSize(), thread.getExperiment().getArchitecture().getTwoBitBranchPredictorBranchTargetBufferNumSets(), thread.getExperiment().getArchitecture().getTwoBitBranchPredictorBranchTargetBufferAssociativity(), thread.getExperiment().getArchitecture().getTwoBitBranchPredictorReturnAddressStackSize());
+        this(thread, name, thread.getExperiment().getTwoBitBranchPredictorBimodSize(), thread.getExperiment().getTwoBitBranchPredictorBranchTargetBufferNumSets(), thread.getExperiment().getTwoBitBranchPredictorBranchTargetBufferAssociativity(), thread.getExperiment().getTwoBitBranchPredictorReturnAddressStackSize());
     }
 
     @Override

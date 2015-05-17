@@ -178,7 +178,7 @@ public class MLPAwareCachePartitioningHelper extends CachePartitioningHelper {
             List<Integer> tagsToFree = new ArrayList<>();
 
             for (PendingL2Hit pendingL2Hit : pendingL2HitsPerThread.values()) {
-                if (pendingL2Hit.getNumCommittedInstructionsSinceAccess() >= this.getL2Controller().getExperiment().getArchitecture().getReorderBufferCapacity()
+                if (pendingL2Hit.getNumCommittedInstructionsSinceAccess() >= this.getL2Controller().getExperiment().getReorderBufferCapacity()
                         || pendingL2Hit.getNumCyclesElapsedSinceAccess() >= memoryLatencyMeter.getAverageLatency()) {
                     tagsToFree.add(pendingL2Hit.getAccess().getPhysicalTag());
                 }

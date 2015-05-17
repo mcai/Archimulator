@@ -190,11 +190,11 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
         this.core = core;
 
         this.num = num;
-        this.id = this.core.getNum() * getExperiment().getArchitecture().getNumThreadsPerCore() + this.num;
+        this.id = this.core.getNum() * getExperiment().getNumThreadsPerCore() + this.num;
 
         this.name = "c" + this.core.getNum() + "t" + this.num;
 
-        switch (getExperiment().getArchitecture().getBranchPredictorType()) {
+        switch (getExperiment().getBranchPredictorType()) {
             case PERFECT:
                 this.branchPredictor = new PerfectBranchPredictor(this, this.name + "/branchPredictor");
                 break;
@@ -217,9 +217,9 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
                 throw new IllegalArgumentException();
         }
 
-        this.intPhysicalRegisterFile = new PhysicalRegisterFile(this.name + "/intPhysicalRegisterFile", getExperiment().getArchitecture().getPhysicalRegisterFileCapacity());
-        this.fpPhysicalRegisterFile = new PhysicalRegisterFile(this.name + "/fpPhysicalRegisterFile", getExperiment().getArchitecture().getPhysicalRegisterFileCapacity());
-        this.miscPhysicalRegisterFile = new PhysicalRegisterFile(this.name + "/miscPhysicalRegisterFile", getExperiment().getArchitecture().getPhysicalRegisterFileCapacity());
+        this.intPhysicalRegisterFile = new PhysicalRegisterFile(this.name + "/intPhysicalRegisterFile", getExperiment().getPhysicalRegisterFileCapacity());
+        this.fpPhysicalRegisterFile = new PhysicalRegisterFile(this.name + "/fpPhysicalRegisterFile", getExperiment().getPhysicalRegisterFileCapacity());
+        this.miscPhysicalRegisterFile = new PhysicalRegisterFile(this.name + "/miscPhysicalRegisterFile", getExperiment().getPhysicalRegisterFileCapacity());
 
         this.renameTable = new RegisterRenameTable(this.name + "/renameTable");
 
@@ -244,9 +244,9 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
             this.renameTable.put(dep, physReg);
         }
 
-        this.decodeBuffer = new PipelineBuffer<>(getExperiment().getArchitecture().getDecodeBufferCapacity());
-        this.reorderBuffer = new PipelineBuffer<>(getExperiment().getArchitecture().getReorderBufferCapacity());
-        this.loadStoreQueue = new PipelineBuffer<>(getExperiment().getArchitecture().getLoadStoreQueueCapacity());
+        this.decodeBuffer = new PipelineBuffer<>(getExperiment().getDecodeBufferCapacity());
+        this.reorderBuffer = new PipelineBuffer<>(getExperiment().getReorderBufferCapacity());
+        this.loadStoreQueue = new PipelineBuffer<>(getExperiment().getLoadStoreQueueCapacity());
 
         this.executedMnemonics = new TreeMap<>();
         this.executedSystemCalls = new TreeMap<>();

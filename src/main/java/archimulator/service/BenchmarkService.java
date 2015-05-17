@@ -19,7 +19,6 @@
 package archimulator.service;
 
 import archimulator.model.Benchmark;
-import net.pickapack.service.Service;
 
 import java.util.List;
 
@@ -28,21 +27,7 @@ import java.util.List;
  *
  * @author Min Cai
  */
-public interface BenchmarkService extends Service {
-    /**
-     * Get all the benchmarks.
-     *
-     * @return the benchmarks
-     */
-    List<Benchmark> getAllBenchmarks();
-
-    /**
-     * Get the number of the benchmarks.
-     *
-     * @return the number of the benchmarks
-     */
-    long getNumAllBenchmarks();
-
+public interface BenchmarkService {
     /**
      * Get a benchmark by title.
      *
@@ -50,9 +35,4 @@ public interface BenchmarkService extends Service {
      * @return the benchmark matching the title, if any exists; otherwise null
      */
     Benchmark getBenchmarkByTitle(String title);
-
-    /**
-     * Initialize the service.
-     */
-    void initialize();
 }

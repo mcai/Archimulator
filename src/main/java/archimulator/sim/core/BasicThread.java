@@ -435,7 +435,7 @@ public class BasicThread extends AbstractBasicThread {
 
         int numCommitted = 0;
 
-        while (!this.reorderBuffer.isEmpty() && numCommitted < getExperiment().getArchitecture().getCommitWidth()) {
+        while (!this.reorderBuffer.isEmpty() && numCommitted < getExperiment().getCommitWidth()) {
             ReorderBufferEntry reorderBufferEntry = this.reorderBuffer.getEntries().get(0);
 
             if (!reorderBufferEntry.isCompleted()) {
