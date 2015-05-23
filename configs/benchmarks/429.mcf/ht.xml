@@ -1,7 +1,6 @@
 <benchmark title="429.mcf_ht">
     <workingDirectory>%user.home%/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht</workingDirectory>
     <executable>429.mcf.mips</executable>
-    <defaultArguments>%user.home%/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht/data/ref/input/inp.in</defaultArguments>
+    <arguments>%user.home%/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht/data/ref/input/inp.in</arguments>
     <standardIn/>
-    <helperThreadEnabled>true</helperThreadEnabled>
 </benchmark>

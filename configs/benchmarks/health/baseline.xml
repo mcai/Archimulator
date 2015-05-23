@@ -1,7 +1,6 @@
 <benchmark title="health_baseline">
     <workingDirectory>%user.home%/Archimulator/benchmarks/Olden_Custom1/health/baseline</workingDirectory>
     <executable>health.mips</executable>
-    <defaultArguments/>
+    <arguments/>
     <standardIn/>
-    <helperThreadEnabled>false</helperThreadEnabled>
 </benchmark>

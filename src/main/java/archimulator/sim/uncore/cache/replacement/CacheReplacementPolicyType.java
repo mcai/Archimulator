@@ -40,11 +40,6 @@ public enum CacheReplacementPolicyType {
     RANDOM,
 
     /**
-     * Helper thread interval aware least recently used (LRU).
-     */
-    HELPER_THREAD_INTERVAL_AWARE_LRU,
-
-    /**
      * Helper thread aware least recently used (LRU) policy 3.
      */
     HELPER_THREAD_AWARE_LRU_3,

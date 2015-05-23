@@ -1,9 +1,9 @@
 package archimulator.util.cmd;
 
 import archimulator.model.*;
-import archimulator.service.ServiceManager;
 import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
 import archimulator.sim.uncore.dram.MemoryControllerType;
+import archimulator.util.serialization.XMLSerializationHelper;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import net.pickapack.io.serialization.JsonSerializationHelper;
@@ -62,63 +62,18 @@ public class SimulateCommand {
     @Parameter(names = "-mcType", description = "Memory controller type")
     private MemoryControllerType memoryControllerType = MemoryControllerType.FIXED_LATENCY;
 
-    public String getBenchmarkTitle() {
-        return benchmarkTitle;
-    }
-
-    public long getNumMaxInstructions() {
-        return numMaxInstructions;
-    }
-
-    public int getNumCores() {
-        return numCores;
-    }
-
-    public int getNumThreadsPerCore() {
-        return numThreadsPerCore;
-    }
-
-    public String getL1ISize() {
-        return l1ISize;
-    }
-
-    public int getL1IAssociativity() {
-        return l1IAssociativity;
-    }
-
-    public String getL1DSize() {
-        return l1DSize;
-    }
-
-    public int getL1DAssociativity() {
-        return l1DAssociativity;
-    }
-
-    public String getL2Size() {
-        return l2Size;
-    }
-
-    public int getL2Associativity() {
-        return l2Associativity;
-    }
-
-    public CacheReplacementPolicyType getL2ReplacementPolicyType() {
-        return l2ReplacementPolicyType;
-    }
-
-    public MemoryControllerType getMemoryControllerType() {
-        return memoryControllerType;
-    }
-
+    /**
+     * Run the simulate command.
+     */
     public void run() {
-        Benchmark benchmark = ServiceManager.getBenchmarkService().getBenchmarkByTitle(benchmarkTitle);
+        Benchmark benchmark = getBenchmarkByTitle(benchmarkTitle);
 
         if (benchmark == null) {
             throw new IllegalArgumentException(benchmarkTitle);
         }
 
         List<ContextMapping> contextMappings = new ArrayList<>();
-        contextMappings.add(new ContextMapping(0, benchmark, benchmark.getDefaultArguments()));
+        contextMappings.add(new ContextMapping(0, benchmark, benchmark.getArguments()));
 
         Experiment experiment = new Experiment(ExperimentType.TWO_PHASE, outputDirectory, false, -1, numCores, numThreadsPerCore, (int) displaySizeToByteCount(l1ISize), l1IAssociativity, (int) displaySizeToByteCount(l1DSize), l1DAssociativity, (int) displaySizeToByteCount(l2Size), l2Associativity, l2ReplacementPolicyType, memoryControllerType, numMaxInstructions, contextMappings);
         experiment.run();
@@ -148,6 +103,35 @@ public class SimulateCommand {
         }
     }
 
+    /**
+     * Get the benchmark matching the specified title.
+     *
+     * @param title the title
+     * @return the benchmark matching the specified title
+     */
+    public static Benchmark getBenchmarkByTitle(String title) {
+        try {
+            File file = new File("configs/benchmarks/", title + ".xml");
+            if (file.exists()) {
+                String text = FileUtils.readFileToString(file);
+                Benchmark benchmark = XMLSerializationHelper.deserialize(Benchmark.class, text);
+                if (benchmark != null) {
+                    return benchmark;
+                }
+            }
+            return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Convert from display size to byte count.
+     *
+     * @param displaySize the display size
+     * @return the byte count
+     */
     private long displaySizeToByteCount(String displaySize) {
         displaySize = displaySize.trim();
         displaySize = displaySize.replaceAll(",", ".");
@@ -156,7 +140,6 @@ public class SimulateCommand {
         } catch (NumberFormatException ignored) {
         }
         final Matcher m = Pattern.compile("([\\d.,]+)\\s*(\\w)").matcher(displaySize);
-        //noinspection ResultOfMethodCallIgnored
         m.find();
         int scale = 1;
         switch (m.group(2).charAt(0)) {

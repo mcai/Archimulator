@@ -18,9 +18,6 @@
  ******************************************************************************/
 package archimulator.service;
 
-import archimulator.service.impl.BenchmarkServiceImpl;
-import archimulator.util.PropertiesHelper;
-
 /**
  * Helper class for retrieving services.
  *
@@ -31,25 +28,4 @@ public class ServiceManager {
      * User home template argument. To be used in benchmark arguments injection.
      */
     public static final String USER_HOME_TEMPLATE_ARG = "%user.home%";
-
-    private static BenchmarkService benchmarkService;
-
-    /**
-     * Static constructor.
-     */
-    static {
-        System.out.println("Archimulator (version: " + PropertiesHelper.getVersion() + ") - CMP Architectural Simulator Written in Java.");
-        System.out.println("Copyright (c) 2010-2015 by Min Cai (min.cai.china@gmail.com).\n");
-
-        benchmarkService = new BenchmarkServiceImpl();
-    }
-
-    /**
-     * Get the benchmark service singleton.
-     *
-     * @return benchmark service singleton
-     */
-    public static BenchmarkService getBenchmarkService() {
-        return benchmarkService;
-    }
 }

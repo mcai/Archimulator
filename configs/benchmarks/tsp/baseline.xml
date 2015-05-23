@@ -1,7 +1,6 @@
 <benchmark title="tsp_baseline">
     <workingDirectory>%user.home%/Archimulator/benchmarks/Olden_Custom1/tsp/baseline</workingDirectory>
     <executable>tsp.mips</executable>
-    <defaultArguments/>
+    <arguments/>
     <standardIn/>
-    <helperThreadEnabled>false</helperThreadEnabled>
 </benchmark>

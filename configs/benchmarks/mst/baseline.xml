@@ -1,7 +1,6 @@
 <benchmark title="mst_baseline">
     <workingDirectory>%user.home%/Archimulator/benchmarks/Olden_Custom1/mst/baseline</workingDirectory>
     <executable>mst.mips</executable>
-    <defaultArguments>4000</defaultArguments>
+    <arguments>4000</arguments>
     <standardIn/>
-    <helperThreadEnabled>false</helperThreadEnabled>
 </benchmark>

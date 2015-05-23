@@ -29,7 +29,6 @@ import archimulator.sim.common.SimulationObject;
 import archimulator.sim.isa.*;
 import net.pickapack.dateTime.DateHelper;
 import net.pickapack.io.cmd.CommandLineHelper;
-import net.pickapack.io.cmd.SedHelper;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -94,11 +93,7 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
         this.memory = new Memory(kernel, this.littleEndian, this.id);
 
         try {
-            buildBenchmark(
-                    contextMapping.getBenchmark().getWorkingDirectory(),
-                    contextMapping.getBenchmark().getHelperThreadEnabled(),
-                    contextMapping.getHelperThreadLookahead(), contextMapping.getHelperThreadStride()
-            );
+            buildWithMakeFile(contextMapping.getBenchmark().getWorkingDirectory());
             this.loadProgram(kernel, contextMapping);
         } catch (Exception e) {
             e.printStackTrace();
@@ -402,62 +397,17 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
     }
 
     /**
-     * Build the benchmark.
-     *
-     * @param workingDirectory      the working directory
-     * @param helperThreadEnabled   a value indicating whether the helper threading is enabled or not
-     * @param helperThreadLookahead the helper thread lookahead
-     * @param helperThreadStride    the helper thread stride
-     */
-    private static void buildBenchmark(String workingDirectory, boolean helperThreadEnabled, int helperThreadLookahead, int helperThreadStride) {
-        if (helperThreadEnabled) {
-            pushMacroDefineArg(workingDirectory, "push_params.h", "LOOKAHEAD", helperThreadLookahead + "");
-            pushMacroDefineArg(workingDirectory, "push_params.h", "STRIDE", helperThreadStride + "");
-        }
-        buildWithMakeFile(workingDirectory);
-    }
-
-    /**
-     * Push the macro #define argument.
-     *
-     * @param workingDirectory the working directory
-     * @param fileName         the file name
-     * @param key              the key
-     * @param value            the value
-     */
-    private static void pushMacroDefineArg(String workingDirectory, String fileName, String key, String value) {
-        fileName = getTransformedBenchmarkWorkingDirectory(workingDirectory) + "/" + fileName;
-        System.err.printf("[%s] Pushing Macro Define Arg in %s: %s, %s\n", DateHelper.toString(new Date()), fileName, key, value);
-        List<String> result = SedHelper.sedInPlace(fileName, "#define " + key, "#define " + key + " " + value);
-        for (String line : result) {
-            System.err.println(line);
-        }
-    }
-
-    /**
      * Build the benchmark using a Makefile.
      *
      * @param workingDirectory the working directory
      */
     private static void buildWithMakeFile(String workingDirectory) {
         System.err.printf("[%s] Building with Makefile\n", DateHelper.toString(new Date()));
-        String transformedBenchmarkWorkingDirectory = getTransformedBenchmarkWorkingDirectory(workingDirectory);
+        String transformedBenchmarkWorkingDirectory = workingDirectory.replaceAll(ServiceManager.USER_HOME_TEMPLATE_ARG, FileUtils.getUserDirectoryPath());
         System.err.printf("cd %s\n", transformedBenchmarkWorkingDirectory);
         List<String> result = CommandLineHelper.invokeShellCommandAndGetResult("sh -c 'cd " + transformedBenchmarkWorkingDirectory +
                 ";make -f Makefile.mips -B CROSS_COMPILER_ROOT=" + getCurrentDirectory() + "/tools/cross_compiler'");
-        for (String line : result) {
-            System.err.println(line);
-        }
-    }
-
-    /**
-     * Get the transformed benchmark's working directory with parameters filled in.
-     *
-     * @param workingDirectory the working directory
-     * @return the transformed benchmark's working directory with parameters filled in
-     */
-    private static String getTransformedBenchmarkWorkingDirectory(String workingDirectory) {
-        return workingDirectory.replaceAll(ServiceManager.USER_HOME_TEMPLATE_ARG, FileUtils.getUserDirectoryPath());
+        result.forEach(System.err::println);
     }
 
     /**

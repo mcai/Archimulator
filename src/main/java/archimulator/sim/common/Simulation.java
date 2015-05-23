@@ -40,7 +40,6 @@ import archimulator.sim.uncore.cache.stackDistanceProfile.StackDistanceProfiling
 import archimulator.sim.uncore.coherence.msi.controller.GeneralCacheController;
 import archimulator.sim.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import archimulator.sim.uncore.delinquentLoad.DelinquentLoadIdentificationHelper;
-import archimulator.sim.uncore.helperThread.FeedbackDirectedHelperThreadingHelper;
 import archimulator.sim.uncore.helperThread.HelperThreadL2RequestProfilingHelper;
 import archimulator.sim.uncore.helperThread.hotspot.HotspotProfilingHelper;
 import archimulator.sim.uncore.mlp.BLPProfilingHelper;
@@ -95,8 +94,6 @@ public abstract class Simulation implements SimulationObject, Reportable {
     private HelperThreadL2RequestProfilingHelper helperThreadL2RequestProfilingHelper;
 
     private CacheInteractionHelper cacheInteractionHelper;
-
-    private FeedbackDirectedHelperThreadingHelper feedbackDirectedHelperThreadingHelper;
 
     private DelinquentLoadIdentificationHelper delinquentLoadIdentificationHelper;
 
@@ -187,8 +184,6 @@ public abstract class Simulation implements SimulationObject, Reportable {
 
         this.cacheInteractionHelper = new CacheInteractionHelper(this);
 
-        this.feedbackDirectedHelperThreadingHelper = new FeedbackDirectedHelperThreadingHelper(this);
-
         this.delinquentLoadIdentificationHelper = new DelinquentLoadIdentificationHelper(this);
 
         if (getExperiment().getDynamicSpeculativePrecomputationEnabled()) {
@@ -278,7 +273,6 @@ public abstract class Simulation implements SimulationObject, Reportable {
         this.getHotspotProfilingHelper().dumpStats(rootReportNode);
         this.getHelperThreadL2RequestProfilingHelper().dumpStats(rootReportNode);
         this.getCacheInteractionHelper().dumpStats(rootReportNode);
-        this.getFeedbackDirectedHelperThreadingHelper().dumpStats(rootReportNode);
         this.getDelinquentLoadIdentificationHelper().dumpStats(rootReportNode);
         this.getMlpProfilingHelper().dumpStats(rootReportNode);
         this.getIntervalHelper().dumpStats(rootReportNode);
@@ -586,15 +580,6 @@ public abstract class Simulation implements SimulationObject, Reportable {
      */
     public CacheInteractionHelper getCacheInteractionHelper() {
         return cacheInteractionHelper;
-    }
-
-    /**
-     * Get the feedback directed helper threading helper.
-     *
-     * @return the feedback directed helper threading helper
-     */
-    public FeedbackDirectedHelperThreadingHelper getFeedbackDirectedHelperThreadingHelper() {
-        return feedbackDirectedHelperThreadingHelper;
     }
 
     /**

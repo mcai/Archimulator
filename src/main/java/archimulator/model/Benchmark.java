@@ -41,13 +41,10 @@ public class Benchmark implements Serializable {
     private String executable;
 
     @Element(required = false)
-    private String defaultArguments;
+    private String arguments;
 
     @Element(required = false)
     private String standardIn;
-
-    @Element
-    private boolean helperThreadEnabled;
 
     /**
      * Create a benchmark. Reserved for XML mapping only.
@@ -61,10 +58,10 @@ public class Benchmark implements Serializable {
      * @param title            the title
      * @param workingDirectory the working directory
      * @param executable       the executable
-     * @param defaultArguments the default arguments
+     * @param arguments the default arguments
      */
-    public Benchmark(String title, String workingDirectory, String executable, String defaultArguments) {
-        this(title, workingDirectory, executable, defaultArguments, "", false);
+    public Benchmark(String title, String workingDirectory, String executable, String arguments) {
+        this(title, workingDirectory, executable, arguments, "");
     }
 
     /**
@@ -73,18 +70,15 @@ public class Benchmark implements Serializable {
      * @param title               the title
      * @param workingDirectory    the working directory
      * @param executable          the executable
-     * @param defaultArguments    the default arguments
+     * @param arguments    the default arguments
      * @param standardIn          the standard in
-     * @param helperThreadEnabled a value indicating whether the helper threading is enabled or not
      */
-    public Benchmark(String title, String workingDirectory, String executable, String defaultArguments, String standardIn, boolean helperThreadEnabled) {
+    public Benchmark(String title, String workingDirectory, String executable, String arguments, String standardIn) {
         this.title = title;
         this.workingDirectory = workingDirectory;
         this.executable = executable;
-        this.defaultArguments = defaultArguments;
+        this.arguments = arguments;
         this.standardIn = standardIn;
-
-        this.helperThreadEnabled = helperThreadEnabled;
     }
 
     /**
@@ -115,12 +109,12 @@ public class Benchmark implements Serializable {
     }
 
     /**
-     * Get the default arguments.
+     * Get the arguments.
      *
-     * @return the default arguments
+     * @return the arguments
      */
-    public String getDefaultArguments() {
-        return defaultArguments;
+    public String getArguments() {
+        return arguments;
     }
 
     /**
@@ -136,17 +130,8 @@ public class Benchmark implements Serializable {
         return standardIn;
     }
 
-    /**
-     * Get a value indicating whether the helper threading is enabled or not.
-     *
-     * @return a value indicating whether the helper threading is enabled or not.
-     */
-    public boolean getHelperThreadEnabled() {
-        return helperThreadEnabled;
-    }
-
     @Override
     public String toString() {
-        return String.format("Benchmark{title='%s', workingDirectory='%s', executable='%s', standardIn='%s', helperThreadEnabled=%s}", title, workingDirectory, executable, standardIn, helperThreadEnabled);
+        return String.format("Benchmark{title='%s', workingDirectory='%s', executable='%s', arguments='%s', standardIn='%s'}", title, workingDirectory, executable, arguments, standardIn);
     }
 }

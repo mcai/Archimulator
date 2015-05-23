@@ -175,26 +175,6 @@
             <version>2.11.0</version>
         </dependency>
         <dependency>
-            <groupId>de.erichseifert.vectorgraphics2d</groupId>
-            <artifactId>VectorGraphics2D</artifactId>
-            <version>0.9.1</version>
-        </dependency>
-        <dependency>
-            <groupId>de.erichseifert.gral</groupId>
-            <artifactId>gral-core</artifactId>
-            <version>0.9</version>
-        </dependency>
-        <dependency>
-            <groupId>de.erichseifert.gral</groupId>
-            <artifactId>gral-examples</artifactId>
-            <version>0.9</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jfree</groupId>
-            <artifactId>jfreechart</artifactId>
-            <version>1.0.14</version>
-        </dependency>
-        <dependency>
             <groupId>colt</groupId>
             <artifactId>colt</artifactId>
             <version>1.2.0</version>
@@ -252,10 +232,6 @@
             <resource>
                 <filtering>true</filtering>
                 <directory>src/main/resources</directory>
-            </resource>
-            <resource>
-                <filtering>true</filtering>
-                <directory>src/main/html</directory>
             </resource>
             <resource>
                 <filtering>false</filtering>

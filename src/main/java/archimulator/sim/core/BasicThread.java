@@ -18,7 +18,6 @@
  ******************************************************************************/
 package archimulator.sim.core;
 
-import archimulator.model.ContextMapping;
 import archimulator.sim.core.bpred.BranchPredictorUpdate;
 import archimulator.sim.core.bpred.DynamicBranchPredictor;
 import archimulator.sim.core.event.DynamicInstructionCommittedEvent;
@@ -28,7 +27,6 @@ import archimulator.sim.core.event.StaticInstructionFetchEndEvent;
 import archimulator.sim.isa.RegisterDependencyType;
 import archimulator.sim.isa.StaticInstruction;
 import archimulator.sim.isa.StaticInstructionType;
-import archimulator.sim.isa.event.PseudoCallEncounteredEvent;
 import archimulator.sim.os.ContextState;
 import net.pickapack.util.Reference;
 
@@ -67,28 +65,6 @@ public class BasicThread extends AbstractBasicThread {
         super(core, num);
 
         this.lineSizeOfICache = this.core.getL1IController().getCache().getGeometry().getLineSize();
-
-        final Reference<Integer> savedRegisterValue = new Reference<>(-1);
-
-        this.getBlockingEventDispatcher().addListener(PseudoCallEncounteredEvent.class, event -> {
-            if (event.getContext() == getContext()) {
-                ContextMapping contextMapping = event.getContext().getProcess().getContextMapping();
-
-                if (contextMapping.getBenchmark().getHelperThreadEnabled()) {
-                    if (event.getPseudoCall().getImm() == 3820) {
-                        savedRegisterValue.set(event.getContext().getRegisterFile().getGpr(event.getPseudoCall().getRs()));
-                        event.getContext().getRegisterFile().setGpr(event.getPseudoCall().getRs(), contextMapping.getHelperThreadLookahead());
-                    } else if (event.getPseudoCall().getImm() == 3821) {
-                        event.getContext().getRegisterFile().setGpr(event.getPseudoCall().getRs(), savedRegisterValue.get());
-                    } else if (event.getPseudoCall().getImm() == 3822) {
-                        savedRegisterValue.set(event.getContext().getRegisterFile().getGpr(event.getPseudoCall().getRs()));
-                        event.getContext().getRegisterFile().setGpr(event.getPseudoCall().getRs(), contextMapping.getHelperThreadStride());
-                    } else if (event.getPseudoCall().getImm() == 3823) {
-                        event.getContext().getRegisterFile().setGpr(event.getPseudoCall().getRs(), savedRegisterValue.get());
-                    }
-                }
-            }
-        });
     }
 
     @Override

@@ -30,37 +30,18 @@ public class ContextMapping implements Serializable {
 
     private Benchmark benchmark;
 
-    private String arguments;
-
     private String standardOut;
-
-    private int helperThreadLookahead;
-
-    private int helperThreadStride;
-
-    /**
-     * Create a context mapping.
-     *
-     * @param threadId  the hardware thread ID.
-     * @param benchmark the benchmark.
-     * @param arguments the command line arguments used in running the software context
-     */
-    public ContextMapping(int threadId, Benchmark benchmark, String arguments) {
-        this(threadId, benchmark, arguments, getDefaultStandardOut(threadId));
-    }
 
     /**
      * Create a context mapping.
      *
      * @param threadId    the hardware thread ID.
      * @param benchmark   the benchmark
-     * @param arguments   the command line arguments used in running the software context
      * @param standardOut the standard out
      */
-    public ContextMapping(int threadId, Benchmark benchmark, String arguments, String standardOut) {
+    public ContextMapping(int threadId, Benchmark benchmark, String standardOut) {
         this.threadId = threadId;
         this.benchmark = benchmark;
-        this.arguments = arguments;
         this.standardOut = standardOut;
     }
 
@@ -80,28 +61,6 @@ public class ContextMapping implements Serializable {
      */
     public void setThreadId(int threadId) {
         this.threadId = threadId;
-    }
-
-    /**
-     * Get the command line arguments used in running the software context.
-     *
-     * @return the command line arguments used in running the software context
-     */
-    public String getArguments() {
-        if (arguments == null) {
-            arguments = "";
-        }
-
-        return arguments;
-    }
-
-    /**
-     * Set the command line arguments used in running the software context
-     *
-     * @param arguments the command line arguments used in running the software context
-     */
-    public void setArguments(String arguments) {
-        this.arguments = arguments;
     }
 
     /**
@@ -127,42 +86,6 @@ public class ContextMapping implements Serializable {
     }
 
     /**
-     * Get the dynamic value of the helper thread lookahead.
-     *
-     * @return the dynamic value of the helper thread lookahead
-     */
-    public int getHelperThreadLookahead() {
-        return helperThreadLookahead;
-    }
-
-    /**
-     * Set the dynamic value of the helper thread lookahead.
-     *
-     * @param helperThreadLookahead the dynamic value of the helper thread lookahead
-     */
-    public void setHelperThreadLookahead(int helperThreadLookahead) {
-        this.helperThreadLookahead = helperThreadLookahead;
-    }
-
-    /**
-     * Get the dynamic value of the helper thread stride.
-     *
-     * @return the dynamic value of the helper thread stride
-     */
-    public int getHelperThreadStride() {
-        return helperThreadStride;
-    }
-
-    /**
-     * Set the dynamic value of the helper thread stride.
-     *
-     * @param helperThreadStride the dynamic value of the helper thread stride
-     */
-    public void setHelperThreadStride(int helperThreadStride) {
-        this.helperThreadStride = helperThreadStride;
-    }
-
-    /**
      * Get the benchmark.
      *
      * @return the benchmark
@@ -173,7 +96,7 @@ public class ContextMapping implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("thread #%d->'%s'", threadId, getBenchmark().getTitle() + "_" + arguments + "-lookahead_" + helperThreadLookahead + "-stride_" + helperThreadStride);
+        return String.format("thread #%d->'%s'", threadId, getBenchmark().getTitle());
     }
 
     /**
