@@ -73,7 +73,7 @@ public class SimulateCommand {
         }
 
         List<ContextMapping> contextMappings = new ArrayList<>();
-        contextMappings.add(new ContextMapping(0, benchmark, benchmark.getArguments()));
+        contextMappings.add(new ContextMapping(0, benchmark));
 
         Experiment experiment = new Experiment(ExperimentType.TWO_PHASE, outputDirectory, false, -1, numCores, numThreadsPerCore, (int) displaySizeToByteCount(l1ISize), l1IAssociativity, (int) displaySizeToByteCount(l1DSize), l1DAssociativity, (int) displaySizeToByteCount(l2Size), l2Associativity, l2ReplacementPolicyType, memoryControllerType, numMaxInstructions, contextMappings);
         experiment.run();

@@ -51,11 +51,10 @@ public class BasicProcess extends Process {
      * Create a basic process.
      *
      * @param kernel              the kernel
-     * @param outputDirectory     the output directory
      * @param contextMapping      the context mapping
      */
-    public BasicProcess(Kernel kernel, String outputDirectory, ContextMapping contextMapping) {
-        super(kernel, outputDirectory, contextMapping);
+    public BasicProcess(Kernel kernel, ContextMapping contextMapping) {
+        super(kernel, contextMapping);
     }
 
     /**

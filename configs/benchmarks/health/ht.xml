@@ -2,5 +2,4 @@
     <workingDirectory>%user.home%/Archimulator/benchmarks/Olden_Custom1/health/ht</workingDirectory>
     <executable>health.mips</executable>
     <arguments/>
-    <standardIn/>
 </benchmark>

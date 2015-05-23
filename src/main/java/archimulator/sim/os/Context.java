@@ -71,12 +71,11 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
      * Create a context.
      *
      * @param kernel              the kernel
-     * @param outputDirectory     the output directory
      * @param contextMapping      the context mapping
      * @return the newly created context
      */
-    public static Context load(Kernel kernel, String outputDirectory, ContextMapping contextMapping) {
-        Process process = new BasicProcess(kernel, outputDirectory, contextMapping);
+    public static Context load(Kernel kernel, ContextMapping contextMapping) {
+        Process process = new BasicProcess(kernel, contextMapping);
 
         ArchitecturalRegisterFile regs = new ArchitecturalRegisterFile(process.isLittleEndian());
         regs.setNpc(process.getProgramEntry());

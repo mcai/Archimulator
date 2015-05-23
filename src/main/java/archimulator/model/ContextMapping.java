@@ -27,22 +27,17 @@ import java.io.Serializable;
  */
 public class ContextMapping implements Serializable {
     private int threadId;
-
     private Benchmark benchmark;
-
-    private String standardOut;
 
     /**
      * Create a context mapping.
      *
      * @param threadId    the hardware thread ID.
      * @param benchmark   the benchmark
-     * @param standardOut the standard out
      */
-    public ContextMapping(int threadId, Benchmark benchmark, String standardOut) {
+    public ContextMapping(int threadId, Benchmark benchmark) {
         this.threadId = threadId;
         this.benchmark = benchmark;
-        this.standardOut = standardOut;
     }
 
     /**
@@ -64,28 +59,6 @@ public class ContextMapping implements Serializable {
     }
 
     /**
-     * Get the standard out.
-     *
-     * @return the standard out
-     */
-    public String getStandardOut() {
-        if (standardOut == null) {
-            standardOut = "";
-        }
-
-        return standardOut;
-    }
-
-    /**
-     * Set the standard out.
-     *
-     * @param standardOut the standard out
-     */
-    public void setStandardOut(String standardOut) {
-        this.standardOut = standardOut;
-    }
-
-    /**
      * Get the benchmark.
      *
      * @return the benchmark
@@ -97,15 +70,5 @@ public class ContextMapping implements Serializable {
     @Override
     public String toString() {
         return String.format("thread #%d->'%s'", threadId, getBenchmark().getTitle());
-    }
-
-    /**
-     * Get the default standard out by the hardware thread ID.
-     *
-     * @param threadId the hardware thread ID
-     * @return the default standard out by the hardware thread ID
-     */
-    public static String getDefaultStandardOut(int threadId) {
-        return "ctx" + threadId + "_out.txt";
     }
 }

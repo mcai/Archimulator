@@ -43,9 +43,6 @@ public class Benchmark implements Serializable {
     @Element(required = false)
     private String arguments;
 
-    @Element(required = false)
-    private String standardIn;
-
     /**
      * Create a benchmark. Reserved for XML mapping only.
      */
@@ -55,30 +52,16 @@ public class Benchmark implements Serializable {
     /**
      * Create a benchmark.
      *
-     * @param title            the title
-     * @param workingDirectory the working directory
-     * @param executable       the executable
-     * @param arguments the default arguments
-     */
-    public Benchmark(String title, String workingDirectory, String executable, String arguments) {
-        this(title, workingDirectory, executable, arguments, "");
-    }
-
-    /**
-     * Create a benchmark.
-     *
      * @param title               the title
      * @param workingDirectory    the working directory
      * @param executable          the executable
      * @param arguments    the default arguments
-     * @param standardIn          the standard in
      */
-    public Benchmark(String title, String workingDirectory, String executable, String arguments, String standardIn) {
+    public Benchmark(String title, String workingDirectory, String executable, String arguments) {
         this.title = title;
         this.workingDirectory = workingDirectory;
         this.executable = executable;
         this.arguments = arguments;
-        this.standardIn = standardIn;
     }
 
     /**
@@ -117,21 +100,8 @@ public class Benchmark implements Serializable {
         return arguments;
     }
 
-    /**
-     * Get the standard in.
-     *
-     * @return the standard in
-     */
-    public String getStandardIn() {
-        if (standardIn == null) {
-            standardIn = "";
-        }
-
-        return standardIn;
-    }
-
     @Override
     public String toString() {
-        return String.format("Benchmark{title='%s', workingDirectory='%s', executable='%s', arguments='%s', standardIn='%s'}", title, workingDirectory, executable, arguments, standardIn);
+        return String.format("Benchmark{title='%s', workingDirectory='%s', executable='%s', arguments='%s'}", title, workingDirectory, executable, arguments);
     }
 }

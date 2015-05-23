@@ -2,5 +2,4 @@
     <workingDirectory>%user.home%/Archimulator/benchmarks/Olden_Custom1/mst/baseline</workingDirectory>
     <executable>mst.mips</executable>
     <arguments>4000</arguments>
-    <standardIn/>
 </benchmark>

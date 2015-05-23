@@ -72,10 +72,9 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
      * Create a process.
      *
      * @param kernel              the kernel
-     * @param outputDirectory     the output directory
      * @param contextMapping      the context mapping
      */
-    public Process(Kernel kernel, String outputDirectory, ContextMapping contextMapping) {
+    public Process(Kernel kernel, ContextMapping contextMapping) {
         super(kernel);
 
         this.contextMapping = contextMapping;
@@ -83,8 +82,8 @@ public abstract class Process extends BasicSimulationObject implements Simulatio
         this.id = getExperiment().currentProcessId++;
         kernel.getProcesses().add(this);
 
-        this.standardInFileDescriptor = contextMapping.getBenchmark().getStandardIn().length() > 0 ? NativeSystemCalls.LIBC.open(outputDirectory + File.separator + contextMapping.getBenchmark().getStandardIn(), OpenFlags.O_RDONLY) : 0;
-        this.standardOutFileDescriptor = contextMapping.getStandardOut().length() > 0 ? NativeSystemCalls.LIBC.open(outputDirectory + File.separator + contextMapping.getStandardOut(), OpenFlags.O_CREAT | OpenFlags.O_APPEND | OpenFlags.O_TRUNC | OpenFlags.O_WRONLY, 0660) : 1;
+        this.standardInFileDescriptor = 0;
+        this.standardOutFileDescriptor = 1;
 
         this.environments = new ArrayList<>();
 

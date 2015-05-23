@@ -2,5 +2,4 @@
     <workingDirectory>%user.home%/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht</workingDirectory>
     <executable>429.mcf.mips</executable>
     <arguments>%user.home%/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht/data/ref/input/inp.in</arguments>
-    <standardIn/>
 </benchmark>
