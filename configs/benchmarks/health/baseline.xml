@@ -1,5 +1,5 @@
 <benchmark title="health_baseline">
-    <workingDirectory>%user.home%/Archimulator/benchmarks/Olden_Custom1/health/baseline</workingDirectory>
+    <workingDirectory>/home/itecgo/Archimulator/benchmarks/Olden_Custom1/health/baseline</workingDirectory>
     <executable>health.mips</executable>
     <arguments/>
 </benchmark>

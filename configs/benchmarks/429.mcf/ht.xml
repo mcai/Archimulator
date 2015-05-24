@@ -1,5 +1,5 @@
 <benchmark title="429.mcf_ht">
-    <workingDirectory>%user.home%/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht</workingDirectory>
+    <workingDirectory>/home/itecgo/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht</workingDirectory>
     <executable>429.mcf.mips</executable>
-    <arguments>%user.home%/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht/data/ref/input/inp.in</arguments>
+    <arguments>/home/itecgo/Archimulator/benchmarks/CPU2006_Custom1/429.mcf/ht/data/ref/input/inp.in</arguments>
 </benchmark>

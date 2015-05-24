@@ -1,12 +1,11 @@
 package archimulator.util.cmd;
 
-import archimulator.model.*;
-import archimulator.sim.uncore.cache.replacement.CacheReplacementPolicyType;
-import archimulator.sim.uncore.dram.MemoryControllerType;
-import archimulator.util.serialization.XMLSerializationHelper;
+import archimulator.common.*;
+import archimulator.uncore.cache.replacement.CacheReplacementPolicyType;
+import archimulator.uncore.dram.MemoryControllerType;
+import archimulator.util.serialization.JsonSerializationHelper;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
-import net.pickapack.io.serialization.JsonSerializationHelper;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -23,16 +22,19 @@ import java.util.regex.Pattern;
  */
 @Parameters(commandNames = "simulate", separators = "=")
 public class SimulateCommand {
-    @Parameter(required = true, names = "-p", description = "Output directory for all generated files")
+    @Parameter(required = true, names = "-d", description = "Output directory for all generated files")
     private String outputDirectory = null;
 
-    @Parameter(required = true, names = "-b", description = "Benchmark title")
-    private String benchmarkTitle = null;
+    @Parameter(required = true, names = "-e", description = "Executable to be simulated")
+    private String executable = null;
+
+    @Parameter(names = "-a", description = "Arguments passed to the executable")
+    private String arguments = "";
 
     @Parameter(names = "-numMaxInsts", description = "Number of maximum instructions executed")
     private long numMaxInstructions = -1;
 
-    @Parameter(names = "-numCores", description = "Number of cores")
+    @Parameter(names = {"-n", "-numCores"}, description = "Number of cores")
     private int numCores = 2;
 
     @Parameter(names = "-numThreadsPerCore", description = "Number of threads per core")
@@ -66,14 +68,8 @@ public class SimulateCommand {
      * Run the simulate command.
      */
     public void run() {
-        Benchmark benchmark = getBenchmarkByTitle(benchmarkTitle);
-
-        if (benchmark == null) {
-            throw new IllegalArgumentException(benchmarkTitle);
-        }
-
         List<ContextMapping> contextMappings = new ArrayList<>();
-        contextMappings.add(new ContextMapping(0, benchmark));
+        contextMappings.add(new ContextMapping(0, executable, arguments));
 
         Experiment experiment = new Experiment(ExperimentType.TWO_PHASE, outputDirectory, false, -1, numCores, numThreadsPerCore, (int) displaySizeToByteCount(l1ISize), l1IAssociativity, (int) displaySizeToByteCount(l1DSize), l1DAssociativity, (int) displaySizeToByteCount(l2Size), l2Associativity, l2ReplacementPolicyType, memoryControllerType, numMaxInstructions, contextMappings);
         experiment.run();
@@ -100,29 +96,6 @@ public class SimulateCommand {
 
                 System.out.println("Experiment statistics has been written to " + file.getPath());
             }
-        }
-    }
-
-    /**
-     * Get the benchmark matching the specified title.
-     *
-     * @param title the title
-     * @return the benchmark matching the specified title
-     */
-    public static Benchmark getBenchmarkByTitle(String title) {
-        try {
-            File file = new File("configs/benchmarks/", title + ".xml");
-            if (file.exists()) {
-                String text = FileUtils.readFileToString(file);
-                Benchmark benchmark = XMLSerializationHelper.deserialize(Benchmark.class, text);
-                if (benchmark != null) {
-                    return benchmark;
-                }
-            }
-            return null;
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
         }
     }
 

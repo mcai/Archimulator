@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.util.ai.aco;
 
-import net.pickapack.event.BlockingEvent;
+import archimulator.util.event.BlockingEvent;
 
 import java.util.List;
 

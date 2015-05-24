@@ -1,5 +1,5 @@
 <benchmark title="em3d_ht">
-    <workingDirectory>%user.home%/Archimulator/benchmarks/Olden_Custom1/em3d/ht</workingDirectory>
+    <workingDirectory>/home/itecgo/Archimulator/benchmarks/Olden_Custom1/em3d/ht</workingDirectory>
     <executable>em3d.mips</executable>
     <arguments>40000 128 75 1</arguments>
 </benchmark>

@@ -1,5 +1,4 @@
 <benchmark title="tsp_baseline">
-    <workingDirectory>%user.home%/Archimulator/benchmarks/Olden_Custom1/tsp/baseline</workingDirectory>
-    <executable>tsp.mips</executable>
+    <executable>/home/itecgo/Archimulator/benchmarks/Olden_Custom1/tsp/baseline/tsp.mips</executable>
     <arguments/>
 </benchmark>

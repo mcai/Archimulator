@@ -1,5 +1,5 @@
 <benchmark title="462.libquantum_ht">
-    <workingDirectory>%user.home%/Archimulator/benchmarks/CPU2006_Custom1/462.libquantum/ht</workingDirectory>
+    <workingDirectory>/home/itecgo/Archimulator/benchmarks/CPU2006_Custom1/462.libquantum/ht</workingDirectory>
     <executable>462.libquantum.mips</executable>
     <arguments>1397 8</arguments>
 </benchmark>
