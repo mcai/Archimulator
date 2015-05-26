@@ -16,22 +16,26 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.uncore.net;
+package archimulator.uncore.net.ext;
 
 import archimulator.uncore.MemoryHierarchy;
+import archimulator.uncore.coherence.msi.controller.CacheController;
+import archimulator.uncore.net.node.EndPointNode;
+import archimulator.uncore.net.Net;
+import archimulator.uncore.net.node.SwitchNode;
 
 /**
- * The net for connecting the L2 cache controller to the memory controller.
+ * The net for connecting the L1 cache controllers to the L2 cache controller
  *
  * @author Min Cai
  */
-public class L2ToMemNet extends Net {
+public class L1sToL2Net extends Net {
     /**
-     * Create a net for connecting the L2 cache controller to the memory controller.
+     * Create a net for connecting the L1 cache controllers to the L2 cache controller.
      *
      * @param memoryHierarchy the memory hierarchy
      */
-    public L2ToMemNet(MemoryHierarchy memoryHierarchy) {
+    public L1sToL2Net(MemoryHierarchy memoryHierarchy) {
         super(memoryHierarchy);
     }
 
@@ -42,22 +46,30 @@ public class L2ToMemNet extends Net {
      */
     @Override
     protected void setup(MemoryHierarchy memoryHierarchy) {
-        int memBlockSize = 64;
+        int l2LineSize = 64;
 
         this.switchNode = new SwitchNode(this,
-                "l2ToMemSwitch",
-                2,
-                (memBlockSize + 8) * 2,
-                2,
-                (memBlockSize + 8) * 2, 8);
+                "l1sToL2Switch",
+                memoryHierarchy.getL1IControllers().size() + memoryHierarchy.getL1DControllers().size() + 1,
+                (l2LineSize + 8) * 2,
+                memoryHierarchy.getL1IControllers().size() + memoryHierarchy.getL1DControllers().size() + 1,
+                (l2LineSize + 8) * 2, 8);
+
+        for (CacheController l1IController : memoryHierarchy.getL1IControllers()) {
+            EndPointNode l1IControllerNode = new EndPointNode(this, l1IController.getName());
+            this.endPointNodes.put(l1IController, l1IControllerNode);
+            this.createBidirectionalLink(l1IControllerNode, this.switchNode, 32);
+        }
+
+        for (CacheController l1DController : memoryHierarchy.getL1DControllers()) {
+            EndPointNode l1DControllerNode = new EndPointNode(this, l1DController.getName());
+            this.endPointNodes.put(l1DController, l1DControllerNode);
+            this.createBidirectionalLink(l1DControllerNode, this.switchNode, 32);
+        }
 
         EndPointNode l2ControllerNode = new EndPointNode(this, memoryHierarchy.getL2Controller().getName());
         this.endPointNodes.put(memoryHierarchy.getL2Controller(), l2ControllerNode);
         this.createBidirectionalLink(l2ControllerNode, this.switchNode, 32);
-
-        EndPointNode memoryControllerNode = new EndPointNode(this, memoryHierarchy.getMemoryController().getName());
-        this.endPointNodes.put(memoryHierarchy.getMemoryController(), memoryControllerNode);
-        this.createBidirectionalLink(memoryControllerNode, this.switchNode, 32);
     }
 
     /**
@@ -67,6 +79,6 @@ public class L2ToMemNet extends Net {
      */
     @Override
     public String getName() {
-        return "l2ToMemNet";
+        return "l1sToL2Net";
     }
 }

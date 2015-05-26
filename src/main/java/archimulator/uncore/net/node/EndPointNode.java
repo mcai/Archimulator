@@ -16,44 +16,23 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.uncore.net;
+package archimulator.uncore.net.node;
+
+import archimulator.uncore.net.Net;
 
 /**
- * In buffer.
+ * End point node.
  *
  * @author Min Cai
  */
-public class InBuffer extends NetBuffer {
-    private InPort port;
-
+public class EndPointNode extends NetNode {
     /**
-     * Create an in buffer.
+     * Create an end point node.
      *
-     * @param port the in port
-     * @param size the size of the buffer
+     * @param net  the parent net
+     * @param name the name of the end point node
      */
-    public InBuffer(InPort port, int size) {
-        super(size);
-        this.port = port;
-    }
-
-    /**
-     * End the writing of the specified message.
-     *
-     * @param message the message
-     */
-    public void endWrite(NetMessage message) {
-        super.endWrite(message);
-        this.getPort().toCrossbar(message);
-    }
-
-    /**
-     * Get the in port.
-     *
-     * @return the in port
-     */
-    @Override
-    public InPort getPort() {
-        return port;
+    public EndPointNode(Net net, String name) {
+        super(net, name, 1, 0, 1, 0, 1);
     }
 }

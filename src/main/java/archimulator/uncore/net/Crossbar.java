@@ -18,6 +18,8 @@
  ******************************************************************************/
 package archimulator.uncore.net;
 
+import archimulator.uncore.net.node.NetNode;
+import archimulator.uncore.net.port.OutPort;
 import archimulator.util.action.Action;
 
 import java.util.ArrayList;

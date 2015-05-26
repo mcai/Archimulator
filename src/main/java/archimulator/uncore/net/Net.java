@@ -21,6 +21,10 @@ package archimulator.uncore.net;
 import archimulator.common.BasicSimulationObject;
 import archimulator.uncore.MemoryDevice;
 import archimulator.uncore.MemoryHierarchy;
+import archimulator.uncore.net.node.EndPointNode;
+import archimulator.uncore.net.node.NetNode;
+import archimulator.uncore.net.node.SwitchNode;
+import archimulator.uncore.net.port.OutPort;
 import archimulator.util.action.Action;
 
 import java.util.ArrayList;

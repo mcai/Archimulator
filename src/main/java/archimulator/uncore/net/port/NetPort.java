@@ -16,21 +16,53 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.uncore.net;
+package archimulator.uncore.net.port;
+
+import archimulator.uncore.net.NetLink;
+import archimulator.uncore.net.node.NetNode;
 
 /**
- * End point node.
+ * Net port.
  *
  * @author Min Cai
  */
-public class EndPointNode extends NetNode {
+public abstract class NetPort {
+    private NetNode node;
+    private NetLink link;
+
     /**
-     * Create an end point node.
+     * Create a net port.
      *
-     * @param net  the parent net
-     * @param name the name of the end point node
+     * @param node the node
      */
-    public EndPointNode(Net net, String name) {
-        super(net, name, 1, 0, 1, 0, 1);
+    public NetPort(NetNode node) {
+        this.node = node;
+    }
+
+    /**
+     * Get the node.
+     *
+     * @return the node
+     */
+    public NetNode getNode() {
+        return node;
+    }
+
+    /**
+     * Get the link.
+     *
+     * @return the link
+     */
+    public NetLink getLink() {
+        return link;
+    }
+
+    /**
+     * Set the link.
+     *
+     * @param link the link
+     */
+    public void setLink(NetLink link) {
+        this.link = link;
     }
 }

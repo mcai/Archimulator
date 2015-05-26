@@ -16,7 +16,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.uncore.net;
+package archimulator.uncore.net.port;
+
+import archimulator.uncore.net.NetMessage;
+import archimulator.uncore.net.node.NetNode;
+import archimulator.uncore.net.buffer.InBuffer;
 
 /**
  * In port.

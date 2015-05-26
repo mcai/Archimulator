@@ -16,7 +16,14 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.uncore.net;
+package archimulator.uncore.net.node;
+
+import archimulator.uncore.net.Crossbar;
+import archimulator.uncore.net.Net;
+import archimulator.uncore.net.RoutingEntry;
+import archimulator.uncore.net.port.InPort;
+import archimulator.uncore.net.port.NetPort;
+import archimulator.uncore.net.port.OutPort;
 
 import java.util.ArrayList;
 import java.util.HashMap;

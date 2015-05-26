@@ -16,23 +16,26 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.uncore.net;
+package archimulator.uncore.net.buffer;
+
+import archimulator.uncore.net.port.InPort;
+import archimulator.uncore.net.NetMessage;
 
 /**
- * Out buffer.
+ * In buffer.
  *
  * @author Min Cai
  */
-public class OutBuffer extends NetBuffer {
-    private OutPort port;
+public class InBuffer extends NetBuffer {
+    private InPort port;
 
     /**
-     * Create an out buffer.
+     * Create an in buffer.
      *
-     * @param port the out port
+     * @param port the in port
      * @param size the size of the buffer
      */
-    public OutBuffer(OutPort port, int size) {
+    public InBuffer(InPort port, int size) {
         super(size);
         this.port = port;
     }
@@ -44,16 +47,16 @@ public class OutBuffer extends NetBuffer {
      */
     public void endWrite(NetMessage message) {
         super.endWrite(message);
-        this.getPort().toLink(message);
+        this.getPort().toCrossbar(message);
     }
 
     /**
-     * Get the out port.
+     * Get the in port.
      *
-     * @return the out port
+     * @return the in port
      */
     @Override
-    public OutPort getPort() {
+    public InPort getPort() {
         return port;
     }
 }

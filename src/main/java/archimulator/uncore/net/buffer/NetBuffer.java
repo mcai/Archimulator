@@ -16,8 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.uncore.net;
+package archimulator.uncore.net.buffer;
 
+import archimulator.uncore.net.NetMessage;
+import archimulator.uncore.net.port.NetPort;
 import archimulator.util.action.Action;
 
 import java.util.ArrayList;

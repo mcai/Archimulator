@@ -16,50 +16,47 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.uncore.net;
+package archimulator.uncore.net.buffer;
+
+import archimulator.uncore.net.NetMessage;
+import archimulator.uncore.net.port.OutPort;
 
 /**
- * Net port.
+ * Out buffer.
  *
  * @author Min Cai
  */
-public abstract class NetPort {
-    private NetNode node;
-    private NetLink link;
+public class OutBuffer extends NetBuffer {
+    private OutPort port;
 
     /**
-     * Create a net port.
+     * Create an out buffer.
      *
-     * @param node the node
+     * @param port the out port
+     * @param size the size of the buffer
      */
-    public NetPort(NetNode node) {
-        this.node = node;
+    public OutBuffer(OutPort port, int size) {
+        super(size);
+        this.port = port;
     }
 
     /**
-     * Get the node.
+     * End the writing of the specified message.
      *
-     * @return the node
+     * @param message the message
      */
-    public NetNode getNode() {
-        return node;
+    public void endWrite(NetMessage message) {
+        super.endWrite(message);
+        this.getPort().toLink(message);
     }
 
     /**
-     * Get the link.
+     * Get the out port.
      *
-     * @return the link
+     * @return the out port
      */
-    public NetLink getLink() {
-        return link;
-    }
-
-    /**
-     * Set the link.
-     *
-     * @param link the link
-     */
-    public void setLink(NetLink link) {
-        this.link = link;
+    @Override
+    public OutPort getPort() {
+        return port;
     }
 }

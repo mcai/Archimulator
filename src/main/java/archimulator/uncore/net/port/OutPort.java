@@ -16,7 +16,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.uncore.net;
+package archimulator.uncore.net.port;
+
+import archimulator.uncore.net.NetLink;
+import archimulator.uncore.net.NetMessage;
+import archimulator.uncore.net.node.NetNode;
+import archimulator.uncore.net.buffer.OutBuffer;
 
 /**
  * Out port.
@@ -50,8 +55,6 @@ public class OutPort extends NetPort {
      * @param message the message
      */
     public void toLink(final NetMessage message) {
-        final NetLink link = this.getLink();
-
         if (this.buffer != null && this.buffer.isReadBusy()) {
             this.buffer.addPendingReadAction(() -> toLink(message));
         } else if (this.getLink().isBusy()) {
@@ -59,8 +62,8 @@ public class OutPort extends NetPort {
         } else {
             int latency = (message.getSize() + this.getLink().getBandwidth()) / this.getLink().getBandwidth();
 
-            link.beginTransfer();
-            this.getNode().getNet().getCycleAccurateEventQueue().schedule(this, () -> link.endTransfer(message), latency);
+            this.getLink().beginTransfer();
+            this.getNode().getNet().getCycleAccurateEventQueue().schedule(this, () -> getLink().endTransfer(message), latency);
 
             if (this.buffer != null) {
                 this.buffer.beginRead();
