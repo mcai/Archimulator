@@ -60,14 +60,12 @@ public class Crossbar {
             } else if (destinationPort.getBuffer().getCount() + message.getSize() > destinationPort.getBuffer().getSize()) {
                 destinationPort.getBuffer().addPendingFullAction(() -> toOutBuffer(message));
             } else {
-                if (destinationPort.getBuffer() != null) {
-                    if (destinationPort.getBuffer().getCount() + message.getSize() > destinationPort.getBuffer().getSize()) {
-                        throw new IllegalArgumentException();
-                    }
-
-                    destinationPort.getBuffer().beginWrite();
-                    this.node.getNet().getCycleAccurateEventQueue().schedule(this, () -> destinationPort.getBuffer().endWrite(message), 1); //TODO: latency
+                if (destinationPort.getBuffer().getCount() + message.getSize() > destinationPort.getBuffer().getSize()) {
+                    throw new IllegalArgumentException();
                 }
+
+                destinationPort.getBuffer().beginWrite();
+                this.node.getNet().getCycleAccurateEventQueue().schedule(this, () -> destinationPort.getBuffer().endWrite(message), 1); //TODO: latency
             }
         }
     }

@@ -66,14 +66,12 @@ public class NetLink {
             } else if (this.destinationPort.getBuffer().getCount() + message.getSize() > this.destinationPort.getBuffer().getSize()) {
                 this.destinationPort.getBuffer().addPendingFullAction(() -> toInBuffer(message));
             } else {
-                if (this.destinationPort.getBuffer() != null) {
-                    if (destinationPort.getBuffer().getCount() + message.getSize() > destinationPort.getBuffer().getSize()) {
-                        throw new IllegalArgumentException();
-                    }
-
-                    this.destinationPort.getBuffer().beginWrite();
-                    this.sourcePort.getNode().getNet().getCycleAccurateEventQueue().schedule(this, () -> destinationPort.getBuffer().endWrite(message), 1); //TODO: latency
+                if (destinationPort.getBuffer().getCount() + message.getSize() > destinationPort.getBuffer().getSize()) {
+                    throw new IllegalArgumentException();
                 }
+
+                this.destinationPort.getBuffer().beginWrite();
+                this.sourcePort.getNode().getNet().getCycleAccurateEventQueue().schedule(this, () -> destinationPort.getBuffer().endWrite(message), 1); //TODO: latency
             }
         } else {
             message.complete();
