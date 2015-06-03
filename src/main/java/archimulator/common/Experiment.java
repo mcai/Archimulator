@@ -22,6 +22,7 @@ import archimulator.core.bpred.BranchPredictorType;
 import archimulator.os.Kernel;
 import archimulator.uncore.cache.replacement.CacheReplacementPolicyType;
 import archimulator.uncore.dram.MemoryControllerType;
+import archimulator.uncore.net.routing.RoutingAlgorithmType;
 import archimulator.util.Reference;
 import archimulator.util.StorageUnit;
 import archimulator.util.StorageUnitHelper;
@@ -164,6 +165,8 @@ public class Experiment {
 
     private CacheReplacementPolicyType l2ReplacementPolicyType;
 
+    private RoutingAlgorithmType routingAlgorithmType;
+
     private MemoryControllerType memoryControllerType;
 
     private int memoryControllerLineSize;
@@ -210,12 +213,12 @@ public class Experiment {
 
     /**
      * Create an experiment.
-     *  @param type               the experiment type
+     * @param type               the experiment type
      * @param outputDirectory     the output directory
      * @param dynamicSpeculativePrecomputationEnabled
-     *                                a value indicating whether the dynamic speculative precomputation is enabled or not
+ *                                a value indicating whether the dynamic speculative precomputation is enabled or not
      * @param numMainThreadWaysInStaticPartitionedLRUPolicy
- *                                the number of main thread ways used in the static partitioned LRU policy for the shared L2 cache
+*                                the number of main thread ways used in the static partitioned LRU policy for the shared L2 cache
      * @param numCores                the number of cores
      * @param numThreadsPerCore       the number of threads per core
      * @param l1ISize                 the size of the L1I caches in bytes
@@ -225,11 +228,12 @@ public class Experiment {
      * @param l2Size                  the size of the L2 caches in bytes
      * @param l2Assoc                 the associativity of the L2 cache
      * @param l2ReplacementPolicyType the replacement policy type of the L2 cache
+     * @param routingAlgorithmType the routing algorithm type
      * @param memoryControllerType    the memory controller type
      * @param numMaxInstructions the upper limit of the number of instructions executed on the first hardware thread
      * @param contextMappings    the context mappings
      */
-    public Experiment(ExperimentType type, String outputDirectory, boolean dynamicSpeculativePrecomputationEnabled, int numMainThreadWaysInStaticPartitionedLRUPolicy, int numCores, int numThreadsPerCore, int l1ISize, int l1IAssoc, int l1DSize, int l1DAssoc, int l2Size, int l2Assoc, CacheReplacementPolicyType l2ReplacementPolicyType, MemoryControllerType memoryControllerType, long numMaxInstructions, List<ContextMapping> contextMappings) {
+    public Experiment(ExperimentType type, String outputDirectory, boolean dynamicSpeculativePrecomputationEnabled, int numMainThreadWaysInStaticPartitionedLRUPolicy, int numCores, int numThreadsPerCore, int l1ISize, int l1IAssoc, int l1DSize, int l1DAssoc, int l2Size, int l2Assoc, CacheReplacementPolicyType l2ReplacementPolicyType, RoutingAlgorithmType routingAlgorithmType, MemoryControllerType memoryControllerType, long numMaxInstructions, List<ContextMapping> contextMappings) {
         this.type = type;
         this.outputDirectory = outputDirectory;
         this.state = ExperimentState.PENDING;
@@ -306,6 +310,8 @@ public class Experiment {
         this.l2LineSize = 64;
         this.l2HitLatency = 10;
         this.l2ReplacementPolicyType = l2ReplacementPolicyType;
+
+        this.routingAlgorithmType = routingAlgorithmType;
 
         this.memoryControllerType = memoryControllerType;
         this.memoryControllerLineSize = 64;
@@ -948,6 +954,15 @@ public class Experiment {
      */
     public CacheReplacementPolicyType getL2ReplacementPolicyType() {
         return l2ReplacementPolicyType;
+    }
+
+    /**
+     * Get the on-chip interconnect routing algorithm type.
+     *
+     * @return on-chip interconnect routing algorithm type
+     */
+    public RoutingAlgorithmType getRoutingAlgorithmType() {
+        return routingAlgorithmType;
     }
 
     /**
@@ -1602,6 +1617,15 @@ public class Experiment {
      */
     public void setL2ReplacementPolicyType(CacheReplacementPolicyType l2ReplacementPolicyType) {
         this.l2ReplacementPolicyType = l2ReplacementPolicyType;
+    }
+
+    /**
+     * Set the on-chip interconnect routing algorithm type.
+     *
+     * @param routingAlgorithmType the on-chip interconnect  routing algorithm type
+     */
+    public void setRoutingAlgorithmType(RoutingAlgorithmType routingAlgorithmType) {
+        this.routingAlgorithmType = routingAlgorithmType;
     }
 
     /**

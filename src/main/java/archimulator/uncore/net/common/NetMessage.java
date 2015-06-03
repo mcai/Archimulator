@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.uncore.net;
+package archimulator.uncore.net.common;
 
 import archimulator.uncore.net.node.NetNode;
 import archimulator.util.action.Action;
@@ -28,8 +28,8 @@ import archimulator.util.action.Action;
  */
 public class NetMessage {
     private long id;
-    private NetNode sourceNode;
-    private NetNode destinationNode;
+    private NetNode nodeFrom;
+    private NetNode nodeTo;
     private int size;
     private Action onCompletedCallback;
 
@@ -39,16 +39,16 @@ public class NetMessage {
      * Create a net message.
      *
      * @param net                 the parent net
-     * @param sourceNode          the source node
-     * @param destinationNode     the destination node
+     * @param nodeFrom          the source node
+     * @param nodeTo     the destination node
      * @param size                the size of the message
      * @param onCompletedCallback the callback action performed when the transfer of the message is completed
      */
-    public NetMessage(Net net, NetNode sourceNode, NetNode destinationNode, int size, Action onCompletedCallback) {
+    public NetMessage(Net net, NetNode nodeFrom, NetNode nodeTo, int size, Action onCompletedCallback) {
         this.id = net.getSimulation().currentNetMessageId++;
 
-        this.sourceNode = sourceNode;
-        this.destinationNode = destinationNode;
+        this.nodeFrom = nodeFrom;
+        this.nodeTo = nodeTo;
         this.size = size;
         this.onCompletedCallback = onCompletedCallback;
 
@@ -76,8 +76,8 @@ public class NetMessage {
      *
      * @return the source node
      */
-    public NetNode getSourceNode() {
-        return sourceNode;
+    public NetNode getNodeFrom() {
+        return nodeFrom;
     }
 
     /**
@@ -85,8 +85,8 @@ public class NetMessage {
      *
      * @return the destination node
      */
-    public NetNode getDestinationNode() {
-        return destinationNode;
+    public NetNode getNodeTo() {
+        return nodeTo;
     }
 
     /**

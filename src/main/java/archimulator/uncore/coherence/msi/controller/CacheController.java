@@ -37,7 +37,7 @@ import archimulator.uncore.coherence.msi.fsm.CacheControllerFiniteStateMachine;
 import archimulator.uncore.coherence.msi.fsm.CacheControllerFiniteStateMachineFactory;
 import archimulator.uncore.coherence.msi.message.*;
 import archimulator.uncore.coherence.msi.state.CacheControllerState;
-import archimulator.uncore.net.Net;
+import archimulator.uncore.net.common.Net;
 import archimulator.util.action.Action;
 import archimulator.util.action.Action2;
 

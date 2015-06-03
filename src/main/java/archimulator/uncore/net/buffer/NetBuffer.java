@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.uncore.net.buffer;
 
-import archimulator.uncore.net.NetMessage;
+import archimulator.uncore.net.common.NetMessage;
 import archimulator.uncore.net.port.NetPort;
 import archimulator.util.action.Action;
 
@@ -130,9 +130,7 @@ public abstract class NetBuffer {
      */
     private void doPendingReadActions() {
         if (!this.pendingReadActions.isEmpty()) {
-            Action action = this.pendingReadActions.get(0);
-            action.apply();
-            this.pendingReadActions.remove(action);
+            this.pendingReadActions.remove(0).apply();
         }
     }
 
@@ -141,9 +139,7 @@ public abstract class NetBuffer {
      */
     private void doPendingWriteActions() {
         if (!this.pendingWriteActions.isEmpty()) {
-            Action action = this.pendingWriteActions.get(0);
-            action.apply();
-            this.pendingWriteActions.remove(action);
+            this.pendingWriteActions.remove(0).apply();
         }
     }
 
@@ -152,9 +148,7 @@ public abstract class NetBuffer {
      */
     private void doPendingFullActions() {
         if (!this.pendingFullActions.isEmpty()) {
-            Action action = this.pendingFullActions.get(0);
-            action.apply();
-            this.pendingFullActions.remove(action);
+            this.pendingFullActions.remove(0).apply();
         }
     }
 
@@ -199,5 +193,15 @@ public abstract class NetBuffer {
      */
     public boolean isWriteBusy() {
         return writeBusy;
+    }
+
+    /**
+     * Get a value indicating whether the buffer becomes full after accommodating the message of the specified size.
+     *
+     * @param message the message that is to be accommodated
+     * @return a value indicating whether the buffer becomes full after accommodating the message of the specified size
+     */
+    public boolean becomesFull(NetMessage message) {
+        return this.getCount() + message.getSize() > this.getSize();
     }
 }

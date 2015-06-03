@@ -16,11 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.uncore.net.ext;
+package archimulator.uncore;
 
-import archimulator.uncore.MemoryHierarchy;
+import archimulator.uncore.net.common.Net;
 import archimulator.uncore.net.node.EndPointNode;
-import archimulator.uncore.net.Net;
 import archimulator.uncore.net.node.SwitchNode;
 
 /**
@@ -35,7 +34,7 @@ public class L2ToMemNet extends Net {
      * @param memoryHierarchy the memory hierarchy
      */
     public L2ToMemNet(MemoryHierarchy memoryHierarchy) {
-        super(memoryHierarchy);
+        super(memoryHierarchy, "l2ToMemNet");
     }
 
     /**
@@ -47,29 +46,19 @@ public class L2ToMemNet extends Net {
     protected void setup(MemoryHierarchy memoryHierarchy) {
         int memBlockSize = 64;
 
-        this.switchNode = new SwitchNode(this,
+        this.setSwitchNode(new SwitchNode(this,
                 "l2ToMemSwitch",
                 2,
                 (memBlockSize + 8) * 2,
                 2,
-                (memBlockSize + 8) * 2, 8);
+                (memBlockSize + 8) * 2, 8));
 
         EndPointNode l2ControllerNode = new EndPointNode(this, memoryHierarchy.getL2Controller().getName());
-        this.endPointNodes.put(memoryHierarchy.getL2Controller(), l2ControllerNode);
-        this.createBidirectionalLink(l2ControllerNode, this.switchNode, 32);
+        this.getEndPointNodes().put(memoryHierarchy.getL2Controller(), l2ControllerNode);
+        this.createBidirectionalLink(l2ControllerNode, this.getSwitchNode(), 32);
 
         EndPointNode memoryControllerNode = new EndPointNode(this, memoryHierarchy.getMemoryController().getName());
-        this.endPointNodes.put(memoryHierarchy.getMemoryController(), memoryControllerNode);
-        this.createBidirectionalLink(memoryControllerNode, this.switchNode, 32);
-    }
-
-    /**
-     * Get the name of the net.
-     *
-     * @return the name of the net
-     */
-    @Override
-    public String getName() {
-        return "l2ToMemNet";
+        this.getEndPointNodes().put(memoryHierarchy.getMemoryController(), memoryControllerNode);
+        this.createBidirectionalLink(memoryControllerNode, this.getSwitchNode(), 32);
     }
 }

@@ -26,8 +26,7 @@ import archimulator.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.uncore.coherence.msi.controller.GeneralCacheController;
 import archimulator.uncore.coherence.msi.message.CoherenceMessage;
 import archimulator.uncore.dram.MemoryController;
-import archimulator.uncore.net.ext.L2ToMemNet;
-import archimulator.uncore.net.Net;
+import archimulator.uncore.net.common.Net;
 import archimulator.uncore.tlb.TranslationLookasideBuffer;
 
 import java.util.ArrayList;

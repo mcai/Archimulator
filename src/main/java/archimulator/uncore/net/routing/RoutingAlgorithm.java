@@ -16,47 +16,23 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.uncore.net.buffer;
+package archimulator.uncore.net.routing;
 
-import archimulator.uncore.net.common.NetMessage;
-import archimulator.uncore.net.port.OutPort;
+import archimulator.uncore.net.common.Route;
+import archimulator.uncore.net.node.NetNode;
 
 /**
- * Out buffer.
+ * Routing algorithm.
  *
  * @author Min Cai
  */
-public class OutBuffer extends NetBuffer {
-    private OutPort port;
-
+public interface RoutingAlgorithm {
     /**
-     * Create an out buffer.
+     * Get the route from the source node to the destination node.
      *
-     * @param port the out port
-     * @param size the size of the buffer
+     * @param nodeFrom the source node
+     * @param nodeTo the destination node
+     * @return the route from the source node to the destination node
      */
-    public OutBuffer(OutPort port, int size) {
-        super(size);
-        this.port = port;
-    }
-
-    /**
-     * End the writing of the specified message.
-     *
-     * @param message the message
-     */
-    public void endWrite(NetMessage message) {
-        super.endWrite(message);
-        this.getPort().toLink(message);
-    }
-
-    /**
-     * Get the out port.
-     *
-     * @return the out port
-     */
-    @Override
-    public OutPort getPort() {
-        return port;
-    }
+    Route getRoute(NetNode nodeFrom, NetNode nodeTo);
 }

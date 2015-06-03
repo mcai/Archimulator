@@ -16,47 +16,40 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.uncore.net.buffer;
+package archimulator.uncore.net.routing;
 
-import archimulator.uncore.net.common.NetMessage;
-import archimulator.uncore.net.port.OutPort;
+import archimulator.uncore.net.common.Net;
+import archimulator.uncore.net.common.Route;
+import archimulator.uncore.net.node.NetNode;
 
 /**
- * Out buffer.
+ * Simple adaptive routing algorithm.
  *
  * @author Min Cai
  */
-public class OutBuffer extends NetBuffer {
-    private OutPort port;
+public class SimpleAdaptiveRoutingAlgorithm implements RoutingAlgorithm {
+    private Net net;
 
     /**
-     * Create an out buffer.
+     * Create a simple adaptive routing algorithm.
      *
-     * @param port the out port
-     * @param size the size of the buffer
+     * @param net the parent net
      */
-    public OutBuffer(OutPort port, int size) {
-        super(size);
-        this.port = port;
+    public SimpleAdaptiveRoutingAlgorithm(Net net) {
+        this.net = net;
     }
 
-    /**
-     * End the writing of the specified message.
-     *
-     * @param message the message
-     */
-    public void endWrite(NetMessage message) {
-        super.endWrite(message);
-        this.getPort().toLink(message);
-    }
-
-    /**
-     * Get the out port.
-     *
-     * @return the out port
-     */
     @Override
-    public OutPort getPort() {
-        return port;
+    public Route getRoute(NetNode nodeFrom, NetNode nodeTo) {
+        //TODO
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Get the parent net.
+     * @return parent net
+     */
+    public Net getNet() {
+        return net;
     }
 }

@@ -16,12 +16,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.uncore.net.ext;
+package archimulator.uncore;
 
-import archimulator.uncore.MemoryHierarchy;
 import archimulator.uncore.coherence.msi.controller.CacheController;
+import archimulator.uncore.net.common.Net;
 import archimulator.uncore.net.node.EndPointNode;
-import archimulator.uncore.net.Net;
 import archimulator.uncore.net.node.SwitchNode;
 
 /**
@@ -36,7 +35,7 @@ public class L1sToL2Net extends Net {
      * @param memoryHierarchy the memory hierarchy
      */
     public L1sToL2Net(MemoryHierarchy memoryHierarchy) {
-        super(memoryHierarchy);
+        super(memoryHierarchy, "l1sToL2Net");
     }
 
     /**
@@ -48,37 +47,27 @@ public class L1sToL2Net extends Net {
     protected void setup(MemoryHierarchy memoryHierarchy) {
         int l2LineSize = 64;
 
-        this.switchNode = new SwitchNode(this,
+        this.setSwitchNode(new SwitchNode(this,
                 "l1sToL2Switch",
                 memoryHierarchy.getL1IControllers().size() + memoryHierarchy.getL1DControllers().size() + 1,
                 (l2LineSize + 8) * 2,
                 memoryHierarchy.getL1IControllers().size() + memoryHierarchy.getL1DControllers().size() + 1,
-                (l2LineSize + 8) * 2, 8);
+                (l2LineSize + 8) * 2, 8));
 
         for (CacheController l1IController : memoryHierarchy.getL1IControllers()) {
             EndPointNode l1IControllerNode = new EndPointNode(this, l1IController.getName());
-            this.endPointNodes.put(l1IController, l1IControllerNode);
-            this.createBidirectionalLink(l1IControllerNode, this.switchNode, 32);
+            this.getEndPointNodes().put(l1IController, l1IControllerNode);
+            this.createBidirectionalLink(l1IControllerNode, this.getSwitchNode(), 32);
         }
 
         for (CacheController l1DController : memoryHierarchy.getL1DControllers()) {
             EndPointNode l1DControllerNode = new EndPointNode(this, l1DController.getName());
-            this.endPointNodes.put(l1DController, l1DControllerNode);
-            this.createBidirectionalLink(l1DControllerNode, this.switchNode, 32);
+            this.getEndPointNodes().put(l1DController, l1DControllerNode);
+            this.createBidirectionalLink(l1DControllerNode, this.getSwitchNode(), 32);
         }
 
         EndPointNode l2ControllerNode = new EndPointNode(this, memoryHierarchy.getL2Controller().getName());
-        this.endPointNodes.put(memoryHierarchy.getL2Controller(), l2ControllerNode);
-        this.createBidirectionalLink(l2ControllerNode, this.switchNode, 32);
-    }
-
-    /**
-     * Get the name of the net.
-     *
-     * @return the name of the net
-     */
-    @Override
-    public String getName() {
-        return "l1sToL2Net";
+        this.getEndPointNodes().put(memoryHierarchy.getL2Controller(), l2ControllerNode);
+        this.createBidirectionalLink(l2ControllerNode, this.getSwitchNode(), 32);
     }
 }

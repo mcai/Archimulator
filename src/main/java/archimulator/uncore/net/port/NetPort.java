@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.uncore.net.port;
 
-import archimulator.uncore.net.NetLink;
+import archimulator.uncore.net.common.NetLink;
 import archimulator.uncore.net.node.NetNode;
 
 /**

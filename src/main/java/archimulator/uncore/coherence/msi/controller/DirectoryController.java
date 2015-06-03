@@ -30,7 +30,7 @@ import archimulator.uncore.coherence.msi.fsm.DirectoryControllerFiniteStateMachi
 import archimulator.uncore.coherence.msi.message.*;
 import archimulator.uncore.coherence.msi.state.DirectoryControllerState;
 import archimulator.uncore.dram.MemoryController;
-import archimulator.uncore.net.Net;
+import archimulator.uncore.net.common.Net;
 import archimulator.util.action.Action;
 import archimulator.util.action.Action2;
 

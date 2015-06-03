@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.uncore.net.node;
 
-import archimulator.uncore.net.Net;
+import archimulator.uncore.net.common.Net;
 
 /**
  * End point node.

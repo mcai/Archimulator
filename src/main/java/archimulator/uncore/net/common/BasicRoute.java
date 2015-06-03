@@ -16,31 +16,31 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.uncore.net;
+package archimulator.uncore.net.common;
 
 import archimulator.uncore.net.node.NetNode;
 import archimulator.uncore.net.port.OutPort;
 
 /**
- * Routing entry.
+ * Basic route.
  *
  * @author Min Cai
  */
-public class RoutingEntry {
-    private NetNode sourceNode;
-    private NetNode destinationNode;
+public class BasicRoute implements Route {
+    private NetNode nodeFrom;
+    private NetNode nodeTo;
     private int cost;
     private OutPort outPort;
 
     /**
-     * Create a routing entry from the source node to the destination node.
+     * Create a basic route from the source node to the destination node.
      *
-     * @param sourceNode      the source node
-     * @param destinationNode the destination node
+     * @param nodeFrom      the source node
+     * @param nodeTo          the destination node
      */
-    public RoutingEntry(NetNode sourceNode, NetNode destinationNode) {
-        this.sourceNode = sourceNode;
-        this.destinationNode = destinationNode;
+    public BasicRoute(NetNode nodeFrom, NetNode nodeTo) {
+        this.nodeFrom = nodeFrom;
+        this.nodeTo = nodeTo;
     }
 
     /**
@@ -48,8 +48,8 @@ public class RoutingEntry {
      *
      * @return the source node
      */
-    public NetNode getSourceNode() {
-        return sourceNode;
+    public NetNode getNodeFrom() {
+        return nodeFrom;
     }
 
     /**
@@ -57,8 +57,8 @@ public class RoutingEntry {
      *
      * @return the destination node
      */
-    public NetNode getDestinationNode() {
-        return destinationNode;
+    public NetNode getNodeTo() {
+        return nodeTo;
     }
 
     /**
@@ -84,6 +84,7 @@ public class RoutingEntry {
      *
      * @return the out port
      */
+    @Override
     public OutPort getOutPort() {
         return outPort;
     }

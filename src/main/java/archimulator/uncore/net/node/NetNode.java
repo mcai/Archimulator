@@ -18,17 +18,14 @@
  ******************************************************************************/
 package archimulator.uncore.net.node;
 
-import archimulator.uncore.net.Crossbar;
-import archimulator.uncore.net.Net;
-import archimulator.uncore.net.RoutingEntry;
+import archimulator.uncore.net.common.Crossbar;
+import archimulator.uncore.net.common.Net;
 import archimulator.uncore.net.port.InPort;
 import archimulator.uncore.net.port.NetPort;
 import archimulator.uncore.net.port.OutPort;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Net node.
@@ -42,8 +39,6 @@ public abstract class NetNode {
     private List<InPort> inPorts;
     private List<OutPort> outPorts;
     private Crossbar crossbar;
-
-    private Map<NetNode, RoutingEntry> routingEntries;
 
     /**
      * Create a net node.
@@ -71,8 +66,6 @@ public abstract class NetNode {
         }
 
         this.crossbar = new Crossbar(this, bandwidth);
-
-        this.routingEntries = new HashMap<>();
     }
 
     /**
@@ -113,11 +106,11 @@ public abstract class NetNode {
     /**
      * Get the out port for the specified destination node.
      *
-     * @param destinationNode the destination node
+     * @param nodeTo the destination node
      * @return the out port for the specified destination node
      */
-    public OutPort getPort(NetNode destinationNode) {
-        return this.routingEntries.get(destinationNode).getOutPort();
+    public OutPort getPort(NetNode nodeTo) {
+        return this.getNet().getRoutingAlgorithm().getRoute(this, nodeTo).getOutPort();
     }
 
     /**
@@ -163,14 +156,5 @@ public abstract class NetNode {
      */
     public Crossbar getCrossbar() {
         return crossbar;
-    }
-
-    /**
-     * Get the map of the destination nodes to the routing entries.
-     *
-     * @return the map of the destination nodes to the routing entries
-     */
-    public Map<NetNode, RoutingEntry> getRoutingEntries() {
-        return routingEntries;
     }
 }

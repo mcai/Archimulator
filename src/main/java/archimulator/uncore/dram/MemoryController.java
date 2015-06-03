@@ -23,7 +23,7 @@ import archimulator.common.report.Reportable;
 import archimulator.uncore.MemoryDevice;
 import archimulator.uncore.MemoryHierarchy;
 import archimulator.uncore.coherence.msi.controller.DirectoryController;
-import archimulator.uncore.net.Net;
+import archimulator.uncore.net.common.Net;
 import archimulator.util.action.Action;
 
 /**
