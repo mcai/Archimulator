@@ -18,11 +18,7 @@
  ******************************************************************************/
 package archimulator.uncore;
 
-import archimulator.common.Experiment;
-import archimulator.common.ExperimentStat;
-import archimulator.common.BasicSimulationObject;
-import archimulator.common.Simulation;
-import archimulator.common.SimulationEvent;
+import archimulator.common.*;
 import archimulator.uncore.cache.CacheLine;
 import archimulator.uncore.coherence.msi.controller.*;
 import archimulator.uncore.coherence.msi.message.CoherenceMessage;
@@ -30,6 +26,7 @@ import archimulator.uncore.dram.BasicMemoryController;
 import archimulator.uncore.dram.FixedLatencyMemoryController;
 import archimulator.uncore.dram.MemoryController;
 import archimulator.uncore.dram.SimpleMemoryController;
+import archimulator.uncore.net.visualization.NetVisualizer;
 import archimulator.uncore.net.common.Net;
 import archimulator.uncore.tlb.TranslationLookasideBuffer;
 import archimulator.util.event.BlockingEventDispatcher;
@@ -110,6 +107,10 @@ public class BasicMemoryHierarchy extends BasicSimulationObject implements Memor
 
         this.l1sToL2Net = new L1sToL2Net(this);
         this.l2ToMemNet = new L2ToMemNet(this);
+
+        if(this.getSimulation().getType() == SimulationType.MEASUREMENT) {
+            NetVisualizer.run(Arrays.asList(this.l1sToL2Net, this.l2ToMemNet));
+        }
 
         this.p2pReorderBuffers = new HashMap<>();
     }

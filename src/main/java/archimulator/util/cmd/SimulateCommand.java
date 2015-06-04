@@ -23,6 +23,9 @@ import java.util.regex.Pattern;
  */
 @Parameters(commandNames = "simulate", separators = "=")
 public class SimulateCommand {
+    @Parameter(names = "-t", description = "Experiment type")
+    private ExperimentType experimentType = ExperimentType.TWO_PHASE;
+
     @Parameter(required = true, names = "-d", description = "Output directory for all generated files")
     private String outputDirectory = null;
 
@@ -75,7 +78,7 @@ public class SimulateCommand {
         List<ContextMapping> contextMappings = new ArrayList<>();
         contextMappings.add(new ContextMapping(0, executable, arguments));
 
-        Experiment experiment = new Experiment(ExperimentType.TWO_PHASE, outputDirectory, false, -1, numCores, numThreadsPerCore, (int) displaySizeToByteCount(l1ISize), l1IAssociativity, (int) displaySizeToByteCount(l1DSize), l1DAssociativity, (int) displaySizeToByteCount(l2Size), l2Associativity, l2ReplacementPolicyType, routingAlgorithmType, memoryControllerType, numMaxInstructions, contextMappings);
+        Experiment experiment = new Experiment(experimentType, outputDirectory, false, -1, numCores, numThreadsPerCore, (int) displaySizeToByteCount(l1ISize), l1IAssociativity, (int) displaySizeToByteCount(l1DSize), l1DAssociativity, (int) displaySizeToByteCount(l2Size), l2Associativity, l2ReplacementPolicyType, routingAlgorithmType, memoryControllerType, numMaxInstructions, contextMappings);
         experiment.run();
 
         if (experiment.getState() == ExperimentState.COMPLETED) {

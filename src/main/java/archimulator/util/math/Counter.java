@@ -40,6 +40,13 @@ public class Counter implements Serializable {
     }
 
     /**
+     * Create a counter using 0 as the initial value.
+     */
+    public Counter() {
+        this(0);
+    }
+
+    /**
      * Increment the value of the counter.
      *
      * @return the counter itself

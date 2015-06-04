@@ -18,8 +18,10 @@
  ******************************************************************************/
 package archimulator.uncore.net.port;
 
-import archimulator.uncore.net.common.NetMessage;
 import archimulator.uncore.net.buffer.OutBuffer;
+import archimulator.uncore.net.common.NetMessage;
+import archimulator.uncore.net.common.NetMessageBeginLinkTransferEvent;
+import archimulator.uncore.net.common.NetMessageEndLinkTransferEvent;
 import archimulator.uncore.net.node.NetNode;
 
 /**
@@ -62,7 +64,14 @@ public class OutPort extends NetPort {
             int latency = (message.getSize() + this.getLink().getBandwidth()) / this.getLink().getBandwidth();
 
             this.getLink().beginTransfer();
-            this.getNode().getNet().getCycleAccurateEventQueue().schedule(this, () -> getLink().endTransfer(message), latency);
+            this.getNode().getNet().getBlockingEventDispatcher().dispatch(
+                    new NetMessageBeginLinkTransferEvent(this.getNode().getNet(), this.getLink().getPortFrom().getNode(), this.getLink().getPortTo().getNode()));
+
+            this.getNode().getNet().getCycleAccurateEventQueue().schedule(this, () -> {
+                getLink().endTransfer(message);
+                this.getNode().getNet().getBlockingEventDispatcher().dispatch(
+                        new NetMessageEndLinkTransferEvent(this.getNode().getNet(), this.getLink().getPortFrom().getNode(), this.getLink().getPortTo().getNode()));
+            }, latency);
 
             if (this.buffer != null) {
                 this.buffer.beginRead();

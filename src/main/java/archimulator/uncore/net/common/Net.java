@@ -30,7 +30,9 @@ import archimulator.uncore.net.routing.RoutingAlgorithmType;
 import archimulator.uncore.net.routing.SimpleAdaptiveRoutingAlgorithm;
 import archimulator.util.action.Action;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -40,8 +42,12 @@ import java.util.Map;
  */
 public abstract class Net extends BasicSimulationObject {
     private String name;
+
     private Map<MemoryDevice, EndPointNode> endPointNodes;
     private SwitchNode switchNode;
+
+    private List<NetLink> links;
+
     private RoutingAlgorithm routingAlgorithm;
 
     /**
@@ -54,7 +60,10 @@ public abstract class Net extends BasicSimulationObject {
         super(memoryHierarchy);
 
         this.name = name;
+
         this.endPointNodes = new HashMap<>();
+
+        this.links = new ArrayList<>();
 
         this.setup(memoryHierarchy);
 
@@ -85,8 +94,8 @@ public abstract class Net extends BasicSimulationObject {
      * @param bandwidth the bandwidth of the bi-directional link
      */
     protected void createBidirectionalLink(NetNode node1, NetNode node2, int bandwidth) {
-        new NetLink(node1, node2, bandwidth);
-        new NetLink(node2, node1, bandwidth);
+        this.links.add(new NetLink(node1, node2, bandwidth));
+        this.links.add(new NetLink(node2, node1, bandwidth));
     }
 
     /**
@@ -100,7 +109,8 @@ public abstract class Net extends BasicSimulationObject {
     public void transfer(MemoryDevice deviceFrom, MemoryDevice deviceTo, int size, Action onCompletedCallback) {
         EndPointNode nodeFrom = this.endPointNodes.get(deviceFrom);
         EndPointNode nodeTo = this.endPointNodes.get(deviceTo);
-        nodeFrom.getPort(nodeTo).toLink(new NetMessage(this, nodeFrom, nodeTo, size, onCompletedCallback));
+        Route route = this.getRoutingAlgorithm().getRoute(nodeFrom, nodeTo);
+        route.getOutPort().toLink(new NetMessage(this, nodeFrom, nodeTo, size, onCompletedCallback));
     }
 
     /**
@@ -132,6 +142,18 @@ public abstract class Net extends BasicSimulationObject {
     }
 
     /**
+     * Get the list of nodes.
+     *
+     * @return the list of nodes
+     */
+    public List<NetNode> getNodes() {
+        List<NetNode> nodes = new ArrayList<>();
+        nodes.add(this.switchNode);
+        nodes.addAll(this.endPointNodes.values());
+        return nodes;
+    }
+
+    /**
      * Get the routing algorithm.
      *
      * @return the routing algorithm
@@ -156,5 +178,14 @@ public abstract class Net extends BasicSimulationObject {
      */
     protected void setSwitchNode(SwitchNode switchNode) {
         this.switchNode = switchNode;
+    }
+
+    /**
+     * Get the list of links.
+     *
+     * @return the list of links
+     */
+    public List<NetLink> getLinks() {
+        return links;
     }
 }
